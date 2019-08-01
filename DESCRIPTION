@@ -1,14 +1,17 @@
 Package: multinma
-Title: What the Package Does (One Line, Title Case)
+Title: Network Meta-Analysis of Individual and Aggregate Data in Stan
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "David",
+           family = "Phillippo",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: What license it uses
+           email = "david.phillippo@bristol.ac.uk",
+           comment = c(ORCID = "0000-0003-2672-7841"))
+Description: This package implements network meta-analysis (NMA) and network 
+    meta-regression (NMR) models for aggregate data (AgD), individual patient data (IPD),
+    and mixtures of both IPD and AgD using multilevel NMR (ML-NMR). Models are estimated
+    in a Bayesian framwork using Stan.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Biarch: true
@@ -26,3 +29,4 @@ LinkingTo:
     rstan (>= 2.18.1),
     StanHeaders (>= 2.18.0)
 SystemRequirements: GNU make
+RoxygenNote: 6.1.1
