@@ -34,3 +34,5 @@ RoxygenNote: 6.1.1
 Suggests: 
     testthat
 RdMacros: Rdpack
+URL: http://github.com/dmphillippo/multinma
+BugReports: http://github.com/dmphillippo/multinma/issues
