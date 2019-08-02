@@ -1,7 +1,8 @@
 #' The nma_data class
 #'
-#' The \code{nma_data} class contains the study data for a NMA in a standard
-#' format, created using the function \code{network}.
+#' The \code{nma_data} class contains the data for a NMA in a standard format,
+#' created using the functions \code{set_ipd}, \code{set_agd_arm},
+#' \code{set_agd_contrast}, or \code{combine}.
 #'
 #' @rdname nma_data-class
 #' @name nma_data-class
@@ -37,7 +38,5 @@
 #' The classes \code{nma_data_ipd}, \code{nma_data_agd_arm}, and
 #' \code{nma_data_agd_contrast} inherit from the \code{nma_data} class, with
 #' only the corresponding data components filled.
-#'
-#' @exportClass nma_data nma_data_ipd nma_data_agd_arm nma_data_agd_contrast
 #'
 NULL

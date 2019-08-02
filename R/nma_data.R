@@ -1,7 +1,20 @@
-
-#
+#' Set up individual patient data
+#'
+#' @param data
+#' @param trt
+#' @param study
+#' @param y
+#' @param se
+#' @param r
+#' @param E
+#' @param surv
+#'
+#' @return
+#' @export
+#'
+#' @examples
 set_ipd <- function(data,
-                    trt, trt_ref,
+                    trt,
                     study,
                     y, se,
                     r, E,
@@ -13,9 +26,24 @@ set_ipd <- function(data,
   return(out)
 }
 
-#
+
+#' Set up arm-based aggregate data
+#'
+#' @param data
+#' @param trt
+#' @param study
+#' @param y
+#' @param se
+#' @param r
+#' @param n
+#' @param E
+#'
+#' @return
+#' @export
+#'
+#' @examples
 set_agd_arm <- function(data,
-                        trt, trt_ref,
+                        trt,
                         study,
                         y, se,
                         r, n, E) {
@@ -26,9 +54,22 @@ set_agd_arm <- function(data,
   return(out)
 }
 
-#
+
+#' Set up contrast-based aggregate data
+#'
+#' @param data
+#' @param trt
+#' @param trt_b
+#' @param study
+#' @param y
+#' @param se
+#'
+#' @return
+#' @export
+#'
+#' @examples
 set_agd_contrast <- function(data,
-                             trt, trt_b, trt_ref,
+                             trt, trt_b,
                              study,
                              y, se) {
   # ...
@@ -38,8 +79,17 @@ set_agd_contrast <- function(data,
   return(out)
 }
 
-#
-combine <- function(..., trt_ref = NULL) {
+
+#' Combine multiple data sources into one network
+#'
+#' @param ...
+#' @param trt_ref
+#'
+#' @return
+#' @export
+#'
+#' @examples
+combine <- function(..., trt_ref) {
   # Check that arguments all inherit from nma_data class
 
   # Check that all data sources use same reference treatment, warn otherwise to
