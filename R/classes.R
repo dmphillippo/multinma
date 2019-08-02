@@ -34,6 +34,10 @@
 #'   data frame}
 #'   }
 #'
-#' @exportClass nma_data
+#' The classes \code{nma_data_ipd}, \code{nma_data_agd_arm}, and
+#' \code{nma_data_agd_contrast} inherit from the \code{nma_data} class, with
+#' only the corresponding data components filled.
+#'
+#' @exportClass nma_data nma_data_ipd nma_data_agd_arm nma_data_agd_contrast
 #'
 NULL
