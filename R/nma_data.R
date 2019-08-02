@@ -1,0 +1,55 @@
+
+#
+set_ipd <- function(data,
+                    trt, trt_ref,
+                    study,
+                    y, se,
+                    r, E,
+                    surv) {
+  # ...
+
+  # Produce nma_data_ipd object
+  out <- structure(list(), class = "nma_data_ipd")
+  return(out)
+}
+
+#
+set_agd_arm <- function(data,
+                        trt, trt_ref,
+                        study,
+                        y, se,
+                        r, n, E) {
+  # ...
+
+  # Produce nma_data_agd_arm object
+  out <- structure(list(), class = "nma_data_agd_arm")
+  return(out)
+}
+
+#
+set_agd_contrast <- function(data,
+                             trt, trt_b, trt_ref,
+                             study,
+                             y, se) {
+  # ...
+
+  # Produce nma_data_agd_contrast object
+  out <- structure(list(), class = "nma_data_agd_contrast")
+  return(out)
+}
+
+#
+combine <- function(..., trt_ref = NULL) {
+  # Check that arguments all inherit from nma_data class
+
+  # Check that all data sources use same reference treatment, warn otherwise to
+  # use trt_ref
+
+  # Combine treatment code factor
+
+  # Combine study code factor
+
+  # Produce nma_data object
+  out <- structure(list(), class = "nma_data")
+  return(out)
+}
