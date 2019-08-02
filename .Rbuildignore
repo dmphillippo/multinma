@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 ^inst/.*\.bib\.bak$
 ^inst/.*\.bib\.sav$
+^README\.Rmd$
