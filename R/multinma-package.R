@@ -1,4 +1,5 @@
-#' The 'multinma' package.
+#' multinma: A Package for Network Meta-Analysis of Individual and Aggregate
+#' Data in Stan
 #'
 #' @description This package implements network meta-analysis (NMA) and network
 #'   meta-regression (NMR) models for aggregate data (AgD), individual patient
@@ -12,8 +13,8 @@
 #' @import methods
 #' @import Rcpp
 #' @importFrom rstan sampling
+#' @importFrom Rdpack reprompt
 #'
-#' @references Stan Development Team (2019). RStan: the R interface to Stan. R
-#' package version 2.19.2. https://mc-stan.org
+#' @references
 #'
 NULL
