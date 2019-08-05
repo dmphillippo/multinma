@@ -1,3 +1,5 @@
+library(multinma)
+
 test_that("set_* produces empty nma_data objects", {
   empty_nma_data <- structure(
     list(agd_arm = NULL,

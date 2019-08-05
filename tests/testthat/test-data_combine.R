@@ -1,3 +1,5 @@
+library(multinma)
+
 test_that("combine_network error if not passed nma_data objects", {
   msg <- "Expecting to combine objects of class `nma_data`, created using set_* functions"
 
