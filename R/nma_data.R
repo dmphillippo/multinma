@@ -1,6 +1,7 @@
 #' Set up individual patient data
 #'
-#' @templateVar args-data data, trt, study, y, se, r, E, Surv
+#' @template args-data_common
+#' @template args-data_arm
 #'
 #' @return
 #' @export
@@ -22,7 +23,9 @@ set_ipd <- function(data,
 
 #' Set up arm-based aggregate data
 #'
-#' @templateVar args-data data, trt, study, y, se, r, n, E, Surv
+#' @template args-data_common
+#' @template args-data_arm
+#' @param n column of \code{data} specifying Binomial outcome numerator
 #'
 #' @return
 #' @export
@@ -44,7 +47,7 @@ set_agd_arm <- function(data,
 
 #' Set up contrast-based aggregate data
 #'
-#' @templateVar args-data data, trt, study, y, se
+#' @template args-data_common
 #' @param trt_b
 #'
 #' @return
