@@ -10,3 +10,11 @@ test_that("empty objects are produced", {
   expect_equal(set_agd_arm(smoking[NA, ]), empty_nma_data)
   expect_equal(set_agd_contrast(smoking[NA, ]), empty_nma_data)
 })
+
+test_that("error if `data` does not inherit data.frame", {
+  vec <- 1:5
+
+  expect_error(set_ipd(vec), "should be a data frame")
+  expect_error(set_agd_arm(vec), "should be a data frame")
+  expect_error(set_agd_contrast(vec), "should be a data frame")
+})
