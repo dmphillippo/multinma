@@ -48,6 +48,8 @@ set_ipd <- function(data,
 #'
 #' @template args-data_common
 #' @template args-data_arm
+#' @param se column of `data` specifying the standard error for a continuous
+#'   outcome
 #' @param n column of `data` specifying Binomial outcome numerator
 #'
 #' @return
@@ -116,6 +118,8 @@ set_agd_arm <- function(data,
 #' Set up contrast-based aggregate data
 #'
 #' @template args-data_common
+#' @param se column of `data` specifying the standard error for a continuous
+#'   outcome
 #' @param trt_b column of `data` specifying the reference/baseline treatment for
 #'   each contrast
 #'
