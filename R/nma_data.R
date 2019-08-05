@@ -22,7 +22,7 @@ set_ipd <- function(data,
   # ...
 
   # Produce nma_data_ipd object
-  out <- structure(list(), class = "nma_data_ipd")
+  out <- structure(list(), class = c("nma_data_ipd", "nma_data"))
   return(out)
 }
 
@@ -50,7 +50,7 @@ set_agd_arm <- function(data,
   # ...
 
   # Produce nma_data_agd_arm object
-  out <- structure(list(), class = "nma_data_agd_arm")
+  out <- structure(list(), class = c("nma_data_agd_arm", "nma_data"))
   return(out)
 }
 
@@ -75,7 +75,7 @@ set_agd_contrast <- function(data,
   # ...
 
   # Produce nma_data_agd_contrast object
-  out <- structure(list(), class = "nma_data_agd_contrast")
+  out <- structure(list(), class = c("nma_data_agd_contrast", "nma_data"))
   return(out)
 }
 
