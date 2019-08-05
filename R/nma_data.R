@@ -1,13 +1,6 @@
 #' Set up individual patient data
 #'
-#' @param data
-#' @param trt
-#' @param study
-#' @param y
-#' @param se
-#' @param r
-#' @param E
-#' @param surv
+#' @templateVar args-data data, trt, study, y, se, r, E, surv
 #'
 #' @return
 #' @export
@@ -29,14 +22,7 @@ set_ipd <- function(data,
 
 #' Set up arm-based aggregate data
 #'
-#' @param data
-#' @param trt
-#' @param study
-#' @param y
-#' @param se
-#' @param r
-#' @param n
-#' @param E
+#' @templateVar args-data data, trt, study, y, se, r, n, E, surv
 #'
 #' @return
 #' @export
@@ -46,7 +32,8 @@ set_agd_arm <- function(data,
                         trt,
                         study,
                         y, se,
-                        r, n, E) {
+                        r, n, E,
+                        surv) {
   # ...
 
   # Produce nma_data_agd_arm object
@@ -57,12 +44,8 @@ set_agd_arm <- function(data,
 
 #' Set up contrast-based aggregate data
 #'
-#' @param data
-#' @param trt
+#' @templateVar args-data data, trt, study, y, se
 #' @param trt_b
-#' @param study
-#' @param y
-#' @param se
 #'
 #' @return
 #' @export
