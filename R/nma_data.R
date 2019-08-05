@@ -7,8 +7,8 @@
 #' @export
 #'
 #' @seealso [set_agd_arm()] for arm-based aggregate data, [set_agd_contrast()]
-#'   for contrast-based aggregate data, and [combine()] for combining several data
-#'   sources in one network.
+#'   for contrast-based aggregate data, and [combine()] for combining several
+#'   data sources in one network.
 #' @examples
 set_ipd <- function(data,
                     trt,
@@ -28,7 +28,7 @@ set_ipd <- function(data,
 #'
 #' @template args-data_common
 #' @template args-data_arm
-#' @param n column of \code{data} specifying Binomial outcome numerator
+#' @param n column of `data` specifying Binomial outcome numerator
 #'
 #' @return
 #' @export
@@ -54,8 +54,8 @@ set_agd_arm <- function(data,
 #' Set up contrast-based aggregate data
 #'
 #' @template args-data_common
-#' @param trt_b column of \code{data} specifying the reference/baseline
-#'   treatment for each contrast
+#' @param trt_b column of `data` specifying the reference/baseline treatment for
+#'   each contrast
 #'
 #' @return
 #' @export
@@ -78,7 +78,7 @@ set_agd_contrast <- function(data,
 
 #' Combine multiple data sources into one network
 #'
-#' @param ... multiple data sources, as defined using the \code{set_*} functions
+#' @param ... multiple data sources, as defined using the `set_*` functions
 #' @param trt_ref reference treatment for the entire network (string, factor, or
 #'   integer)
 #'

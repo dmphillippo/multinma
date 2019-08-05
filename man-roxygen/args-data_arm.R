@@ -1,4 +1,4 @@
-#' @param E column of \code{data} specifying the total time at risk for Poisson
+#' @param E column of `data` specifying the total time at risk for Poisson
 #'   outcomes
-#' @param Surv column of \code{data} specifying a survival outcome, using the
-#'   \code{survival::Surv} function
+#' @param Surv column of `data` specifying a survival outcome, using the
+#'   `survival::Surv` function
