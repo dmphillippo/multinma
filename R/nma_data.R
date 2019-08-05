@@ -63,6 +63,7 @@ set_agd_arm <- function(data,
   # Allow any number of outcomes to be given, but check that all components are present
   o_continuous <- check_outcome_continuous(data, enquo(y), enquo(se))
   o_count <- check_outcome_count(data, enquo(r), enquo(n), enquo(E))
+  # o_surv <- check_outcome_surv(data, enquo(Surv))
 
   # Create tibble in standard format
   dat <- tibble::tibble(
@@ -72,7 +73,8 @@ set_agd_arm <- function(data,
     .se = o_continuous$se,
     .r = o_count$r,
     .n = o_count$n,
-    .E = o_count$E
+    .E = o_count$E#,
+    # .Surv = o_surv$Surv
   )
 
   # Produce nma_data_agd_arm object
