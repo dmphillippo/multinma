@@ -11,5 +11,5 @@
 #' @param n column of \code{data} specifying Binomial outcome numerator
 #' @param E column of \code{data} specifying the total time at risk for Poisson
 #'   outcomes
-#' @param surv column of \code{data} specifying a survival outcome, using the
+#' @param Surv column of \code{data} specifying a survival outcome, using the
 #'   \code{survival::Surv} function
