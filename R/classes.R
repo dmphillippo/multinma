@@ -1,8 +1,8 @@
 #' The nma_data class
 #'
 #' The `nma_data` class contains the data for a NMA in a standard format,
-#' created using the functions `set_ipd`, `set_agd_arm`, `set_agd_contrast`, or
-#' `combine`.
+#' created using the functions [set_ipd()], [set_agd_arm()],
+#' [set_agd_contrast()], or [combine()].
 #'
 #' @rdname nma_data-class
 #' @name nma_data-class
