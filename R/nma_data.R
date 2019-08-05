@@ -16,6 +16,10 @@ set_ipd <- function(data,
                     y, se,
                     r, E,
                     Surv) {
+
+  # Check data is data frame
+  if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
+
   # ...
 
   dat <- tibble::tibble(
@@ -45,9 +49,9 @@ set_ipd <- function(data,
 set_agd_arm <- function(data,
                         study,
                         trt,
-                        y = NULL, se = NULL,
-                        r = NULL, n = NULL, E = NULL,
-                        Surv = NULL) {
+                        y, se,
+                        r, n, E,
+                        Surv) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -100,6 +104,10 @@ set_agd_contrast <- function(data,
                              study,
                              trt, trt_b,
                              y, se) {
+
+  # Check data is data frame
+  if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
+
   # ...
 
   dat <- tibble::tibble(
