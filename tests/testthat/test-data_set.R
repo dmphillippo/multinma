@@ -8,9 +8,9 @@ test_that("set_* produces empty nma_data objects", {
          treatments = NULL,
          studies = NULL), class = "nma_data")
 
-  expect_equal(set_ipd(smoking[NA, ], "studyn", "trtc"), empty_nma_data)
-  expect_equal(set_agd_arm(smoking[NA, ], "studyn", "trtc"), empty_nma_data)
-  expect_equal(set_agd_contrast(smoking[NA, ], "studyn", "trtc"), empty_nma_data)
+  expect_equal(set_ipd(smoking[0, ]), empty_nma_data)
+  expect_equal(set_agd_arm(smoking[0, ]), empty_nma_data)
+  expect_equal(set_agd_contrast(smoking[0, ]), empty_nma_data)
 })
 
 test_that("set_* error if data does not inherit data.frame", {
