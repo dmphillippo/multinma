@@ -7,8 +7,8 @@
 #' @export
 #'
 #' @seealso [set_agd_arm()] for arm-based aggregate data, [set_agd_contrast()]
-#'   for contrast-based aggregate data, and [combine()] for combining several
-#'   data sources in one network.
+#'   for contrast-based aggregate data, and [combine_network()] for combining
+#'   several data sources in one network.
 #' @examples
 set_ipd <- function(data,
                     trt,
@@ -34,8 +34,8 @@ set_ipd <- function(data,
 #' @export
 #'
 #' @seealso [set_ipd()] for individual patient data, [set_agd_contrast()] for
-#'   contrast-based aggregate data, and [combine()] for combining several data
-#'   sources in one network.
+#'   contrast-based aggregate data, and [combine_network()] for combining
+#'   several data sources in one network.
 #' @examples
 set_agd_arm <- function(data,
                         trt,
@@ -61,8 +61,8 @@ set_agd_arm <- function(data,
 #' @export
 #'
 #' @seealso [set_ipd()] for individual patient data, [set_agd_arm()] for
-#'   arm-based aggregate data, and [combine()] for combining several data
-#'   sources in one network.
+#'   arm-based aggregate data, and [combine_network()] for combining several
+#'   data sources in one network.
 #' @examples
 set_agd_contrast <- function(data,
                              trt, trt_b,
@@ -88,7 +88,7 @@ set_agd_contrast <- function(data,
 #' @seealso [set_ipd()], [set_agd_arm()], and [set_agd_contrast()] for defining
 #'   different data sources
 #' @examples
-combine <- function(..., trt_ref) {
+combine_network <- function(..., trt_ref) {
   # Check that arguments all inherit from nma_data class
 
   # Check that all data sources use same reference treatment, warn otherwise to
