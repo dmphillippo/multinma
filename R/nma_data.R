@@ -220,7 +220,7 @@ check_outcome_count <- function(data, r, n, E) {
       } else {
         E <- dplyr::pull(data, {{ E }})
         if (!is.numeric(E)) abort("Time at risk `E` must be numeric")
-        if (any(E) <= 0) abort("Time at risk `E` must be positive")
+        if (any(E <= 0)) abort("Time at risk `E` must be positive")
       }
   } else {
     E <- NA_real_
