@@ -48,7 +48,8 @@ set_agd_arm <- function(data,
 #' Set up contrast-based aggregate data
 #'
 #' @template args-data_common
-#' @param trt_b
+#' @param trt_b column of \code{data} specifying the reference/baseline
+#'   treatment for each contrast
 #'
 #' @return
 #' @export
@@ -68,8 +69,9 @@ set_agd_contrast <- function(data,
 
 #' Combine multiple data sources into one network
 #'
-#' @param ...
-#' @param trt_ref
+#' @param ... multiple data sources, as defined using the \code{set_*} functions
+#' @param trt_ref reference treatment for the entire network (string, factor, or
+#'   integer)
 #'
 #' @return
 #' @export
