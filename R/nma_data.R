@@ -19,6 +19,17 @@ set_ipd <- function(data,
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
+  if (nrow(data) == 0) {
+    return(
+      structure(
+        list(agd_arm = NULL,
+             agd_contrast = NULL,
+             ipd = NULL,
+             treatments = NULL,
+             studies = NULL),
+        class = "nma_data")
+    )
+  }
 
   # ...
 
@@ -55,6 +66,17 @@ set_agd_arm <- function(data,
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
+  if (nrow(data) == 0) {
+    return(
+      structure(
+        list(agd_arm = NULL,
+             agd_contrast = NULL,
+             ipd = NULL,
+             treatments = NULL,
+             studies = NULL),
+        class = "nma_data")
+    )
+  }
 
   # Pull single columns
   .study <- dplyr::pull(data, {{ study }})
@@ -109,6 +131,17 @@ set_agd_contrast <- function(data,
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
+  if (nrow(data) == 0) {
+    return(
+      structure(
+        list(agd_arm = NULL,
+             agd_contrast = NULL,
+             ipd = NULL,
+             treatments = NULL,
+             studies = NULL),
+        class = "nma_data")
+    )
+  }
 
   # ...
 
