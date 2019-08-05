@@ -13,9 +13,9 @@
 set_ipd <- function(data,
                     study,
                     trt,
-                    y, se,
-                    r, E,
-                    Surv) {
+                    y = NULL, se = NULL,
+                    r = NULL, E = NULL,
+                    Surv = NULL) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -49,9 +49,9 @@ set_ipd <- function(data,
 set_agd_arm <- function(data,
                         study,
                         trt,
-                        y, se,
-                        r, n, E,
-                        Surv) {
+                        y = NULL, se = NULL,
+                        r = NULL, n = NULL, E = NULL,
+                        Surv = NULL) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
