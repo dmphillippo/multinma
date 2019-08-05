@@ -56,7 +56,7 @@ test_that("count outcome checks work", {
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = cont, n = disc), "must be integer")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = cont), "must be integer")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc_neg, n = disc), "must be between 0 and `n`")
-  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc_m1, n = disc), "must be between 0 and `n`")
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc_p1, n = disc), "must be between 0 and `n`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_neg), "greater than zero")
   expect_warning(set_agd_arm(agd_arm, "studyn", "trtc", E = cont_pos), "Ignoring `E`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = cont_neg), "must be positive")
