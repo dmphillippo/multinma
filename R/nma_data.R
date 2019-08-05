@@ -88,7 +88,7 @@ set_agd_arm <- function(data,
   # o_surv <- check_outcome_surv(data, enquo(Surv))
 
   # Create tibble in standard format
-  dat <- tibble::tibble(
+  d <- tibble::tibble(
     .study = factor(.study),
     .trt = factor(.trt),
     .y = o_continuous$y,
@@ -96,12 +96,14 @@ set_agd_arm <- function(data,
     .r = o_count$r,
     .n = o_count$n,
     .E = o_count$E#,
-    # .Surv = o_surv$Surv
-  )
+    # .Surv = o_surv$Surv,
+    )
 
-  # Produce nma_data_agd_arm object
+  d <- dplyr::bind_cols(d, data)
+
+  # Produce nma_data object
   out <- structure(
-    list(agd_arm = dat,
+    list(agd_arm = d,
          agd_contrast = NULL,
          ipd = NULL,
          treatments = NA,
@@ -143,15 +145,36 @@ set_agd_contrast <- function(data,
     )
   }
 
-  # ...
 
-  dat <- tibble::tibble(
-    .study = factor(study),
-    .trt = factor(trt)
-  )
+  # Pull single columns
+  .study <- dplyr::pull(data, {{ study }})
+  .trt <- dplyr::pull(data, {{ trt }})
+  .trt_b <- dplyr::pull(data, {{ trt_b }})
 
-  # Produce nma_data_agd_contrast object
-  out <- structure(list(), class = "nma_data")
+  # Check continuous outcome
+  o_continuous <- check_outcome_continuous(data, enquo(y), enquo(se))
+
+  # Get all treatments
+  trts <- sort(unique(c(.trt, .trt_b)))
+
+  # Create tibble in standard format
+  d <- tibble::tibble(
+    .study = factor(.study),
+    .trt = factor(.trt, levels = trts),
+    .trt_b = factor(.trt, levels = trts),
+    .y = o_continuous$y,
+    .se = o_continuous$se)
+
+  d <- dplyr::bind_cols(d, data)
+
+  # Produce nma_data object
+  out <- structure(
+    list(agd_arm = NULL,
+         agd_contrast = d,
+         ipd = NULL,
+         treatments = NA,
+         studies = NA),
+    class = "nma_data")
   return(out)
 }
 
