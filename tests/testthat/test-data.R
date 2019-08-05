@@ -1,4 +1,4 @@
-test_that("empty objects are produced", {
+test_that("set_* produces empty nma_data objects", {
   empty_nma_data <- structure(
     list(agd_arm = NULL,
          agd_contrast = NULL,
@@ -11,8 +11,15 @@ test_that("empty objects are produced", {
   expect_equal(set_agd_contrast(smoking[NA, ]), empty_nma_data)
 })
 
-test_that("error if `data` does not inherit data.frame", {
+test_that("set_* error if data does not inherit data.frame", {
   vec <- 1:5
+  msg <- "Argument `data` should be a data frame"
+
+  expect_error(set_ipd(vec), msg)
+  expect_error(set_agd_arm(vec), msg)
+  expect_error(set_agd_contrast(vec), msg)
+})
+
 
   expect_error(set_ipd(vec), "should be a data frame")
   expect_error(set_agd_arm(vec), "should be a data frame")
