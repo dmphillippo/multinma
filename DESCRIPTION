@@ -24,7 +24,8 @@ Imports:
     rstantools (>= 2.0.0.9000),
     Rdpack (>= 0.7),
     tibble,
-    dplyr
+    dplyr,
+    rlang
 LinkingTo: 
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),

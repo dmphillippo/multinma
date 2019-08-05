@@ -12,6 +12,7 @@
 #' @useDynLib multinma, .registration = TRUE
 #' @import methods
 #' @import Rcpp
+#' @importFrom rlang abort warn inform enquo
 #' @importFrom rstan sampling
 #' @importFrom Rdpack reprompt
 #'
