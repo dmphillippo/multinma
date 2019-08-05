@@ -200,8 +200,8 @@ check_outcome_count <- function(data, r, n, E) {
     if (!is.numeric(n)) abort("Denominator `n` must be numeric")
     if (any(r != trunc(r))) abort("Count outcome `r` must be integer-valued")
     if (any(n != trunc(n))) abort("Denominator `n` must be integer-valued")
-    if (any(n < r | r < 0)) abort("Count outcome `r` must be between 0 and `n`")
     if (any(n <= 0)) abort("Denominator `n` must be greater than zero")
+    if (any(n < r | r < 0)) abort("Count outcome `r` must be between 0 and `n`")
   } else if (!null_n & null_r) {
     warn("Ignoring `n` without `r`")
 
