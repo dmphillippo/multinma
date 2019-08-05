@@ -33,8 +33,4 @@
 #'   frame}
 #'   }
 #'
-#' The classes `nma_data_ipd`, `nma_data_agd_arm`, and `nma_data_agd_contrast`
-#' inherit from the `nma_data` class, with only the corresponding data
-#' components filled.
-#'
 NULL
