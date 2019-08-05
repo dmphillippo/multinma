@@ -13,7 +13,7 @@
 set_ipd <- function(data,
                     study,
                     trt,
-                    y = NULL, se = NULL,
+                    y = NULL,
                     r = NULL, E = NULL,
                     Surv = NULL) {
 
@@ -31,15 +31,35 @@ set_ipd <- function(data,
     )
   }
 
-  # ...
+  # Pull single columns
+  .study <- dplyr::pull(data, {{ study }})
+  .trt <- dplyr::pull(data, {{ trt }})
 
-  dat <- tibble::tibble(
-    .study = factor(study),
-    .trt = factor(trt)
+  # Allow any number of outcomes to be given, but check that all components are present
+  o_continuous <- check_outcome_continuous(data, enquo(y), NA_real_)
+  o_count <- check_outcome_count(data, enquo(r), enquo(n))
+  # o_surv <- check_outcome_surv(data, enquo(Surv))
+
+  # Create tibble in standard format
+  d <- tibble::tibble(
+    .study = factor(.study),
+    .trt = factor(.trt),
+    .y = o_continuous$y,
+    .r = o_count$r,
+    .n = o_count$n#,
+    # .Surv = o_surv$Surv,
   )
 
-  # Produce nma_data_ipd object
-  out <- structure(list(), class = "nma_data")
+  d <- dplyr::bind_cols(d, data)
+
+  # Produce nma_data object
+  out <- structure(
+    list(agd_arm = NULL,
+         agd_contrast = NULL,
+         ipd = d,
+         treatments = NA,
+         studies = NA),
+    class = "nma_data")
   return(out)
 }
 
