@@ -102,3 +102,22 @@ test_that("set_ipd - binary outcome checks work", {
     set_ipd(agd_arm, "studyn", "trtc", r = bin, E = cont_pos)$ipd[, c(".r", ".E")],
     transmute(agd_arm, .r = bin, .E = cont_pos))
 })
+
+# Dummy contrast data
+agd_contrast <- agd_arm %>%
+  group_by(studyn) %>%
+  mutate(trt_b = first(trtf)) %>%
+  filter(trt_b != trtf) %>%
+  ungroup()
+
+test_that("set_agd_contrast - continuous outcome checks work", {
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc"), "Specify `trt_b`")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", y = cont), "Specify standard error")
+  expect_warning(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", se = cont_pos), "Ignoring standard error")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", y = trtc, se = cont_pos), "must be numeric")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", y = cont, se = trtc), "must be numeric")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", y = cont, se = cont_neg), "must be positive")
+  expect_equivalent(
+    set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", y = cont, se = cont_pos)$agd_contrast[, c(".y", ".se")],
+    transmute(agd_contrast, .y = cont, .se = cont_pos))
+})
