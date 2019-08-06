@@ -1,4 +1,5 @@
 library(multinma)
+library(dplyr)
 
 test_that("set_* produces empty nma_data objects", {
   empty_nma_data <- structure(
@@ -23,7 +24,7 @@ test_that("set_* error if data does not inherit data.frame", {
 })
 
 # Dummy data
-agd_arm <- tibble::tibble(
+agd_arm <- tibble(
  studyn = c(1, 1, 2, 2, 2),
  studyc = c("a", "a", "b", "b", "b"),
  studyf = factor(studyc),
@@ -40,15 +41,18 @@ agd_arm <- tibble::tibble(
  #Surv =
 )
 
-test_that("continuous outcome checks work", {
+test_that("set_agd_arm - continuous outcome checks work", {
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont), "Specify standard error")
   expect_warning(set_agd_arm(agd_arm, "studyn", "trtc", se = cont_pos), "Ignoring standard error")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = trtc, se = cont_pos), "must be numeric")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = trtc), "must be numeric")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = cont_neg), "must be positive")
+  expect_equivalent(
+    set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = cont_pos)$agd_arm[, c(".y", ".se")],
+    transmute(agd_arm, .y = cont, .se = cont_pos))
 })
 
-test_that("count outcome checks work", {
+test_that("set_agd_arm - count outcome checks work", {
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc), "Specify denominator")
   expect_warning(set_agd_arm(agd_arm, "studyn", "trtc", n = disc_p1), "Ignoring `n`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = trtc, n = disc_p1), "must be numeric")
@@ -61,4 +65,7 @@ test_that("count outcome checks work", {
   expect_warning(set_agd_arm(agd_arm, "studyn", "trtc", E = cont_pos), "Ignoring `E`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = cont_neg), "must be positive")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = trtc), "must be numeric")
+  expect_equivalent(
+    set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = cont_pos)$agd_arm[, c(".r", ".n", ".E")],
+    transmute(agd_arm, .r = disc, .n = disc_p1, .E = cont_pos))
 })
