@@ -239,8 +239,8 @@ set_agd_contrast <- function(data,
 #' Combine multiple data sources into one network
 #'
 #' @param ... multiple data sources, as defined using the `set_*` functions
-#' @param trt_ref reference treatment for the entire network (string, factor, or
-#'   integer)
+#' @param trt_ref reference treatment for the entire network, as a string (or
+#'   coerced as such) referring to the levels of the treatment factor variable
 #'
 #' @return An object of class [nma_data]
 #' @export
