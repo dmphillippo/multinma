@@ -146,8 +146,8 @@ test_that("set_* return `treatments` factor", {
 test_that("set_* return `studies` factor", {
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont)$studies,
                factor(letters[1:2]))
-  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos)$treatments,
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos)$studies,
                factor(letters[1:2]))
-  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, trt_b, y = cont, se = cont_pos)$treatments,
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, trt_b, y = cont, se = cont_pos)$studies,
                factor(letters[1:2]))
 })
