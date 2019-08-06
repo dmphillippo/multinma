@@ -248,7 +248,7 @@ set_agd_contrast <- function(data,
 #' @seealso [set_ipd()], [set_agd_arm()], and [set_agd_contrast()] for defining
 #'   different data sources
 #' @examples
-combine_network <- function(..., trt_ref) {
+combine_network <- function(..., trt_ref, trt_refn) {
   s <- list(...)
 
   # Check that arguments all inherit from nma_data class
@@ -257,11 +257,51 @@ combine_network <- function(..., trt_ref) {
   }
 
   # Combine treatment code factor
+  trts <- sort(forcats::lvls_union(purrr::map(s, "treatments")))
+  if (!missing(trt_ref)) {
+    if (! trt_ref %in% trts) {
+      abort(sprintf("`trt_ref` does not match a treatment in the network.\nSuitable values are: %s",
+                      ifelse(length(trts) <= 5,
+                             paste0(trts, collapse = ", "),
+                             paste0(paste0(trts[1:5], collapse = ", "), ", ..."))))
+    }
+    trts <- c(trt_ref, setdiff(trts, trt_ref))
+  }
+
+  # Check that no studies are duplicated between data sources
 
   # Combine study code factor
+  studs <- sort(forcats::lvls_union(purrr::map(s, "studies")))
+
+  # Get ipd
+  ipd <- purrr::map_dfr(s, "ipd")
+  if (!rlang::is_empty(ipd)) {
+    ipd$.trt <- forcats::lvls_expand(ipd$.trt, trts)
+    ipd$.study <- forcats::lvls_expand(ipd$.study, studs)
+  }
+
+  # Get agd_arm
+  agd_arm <- purrr::map_dfr(s, "agd_arm")
+  if (!rlang::is_empty(agd_arm)) {
+    agd_arm$.trt <- forcats::lvls_expand(agd_arm$.trt, trts)
+    agd_arm$.study <- forcats::lvls_expand(agd_arm$.study, studs)
+  }
+
+  # Get agd_contrast
+  agd_contrast <- purrr::map_dfr(s, "agd_contrast")
+  if (!rlang::is_empty(agd_contrast)) {
+    agd_contrast$.trt <- forcats::lvls_expand(agd_contrast$.trt, trts)
+    agd_contrast$.study <- forcats::lvls_expand(agd_contrast$.study, studs)
+  }
 
   # Produce nma_data object
-  out <- structure(list(), class = "nma_data")
+  out <- structure(
+    list(agd_arm = agd_arm,
+         agd_contrast = agd_contrast,
+         ipd = ipd,
+         treatments = factor(trts),
+         studies = factor(studs)),
+    class = "nma_data")
   return(out)
 }
 
