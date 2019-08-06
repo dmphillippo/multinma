@@ -175,7 +175,7 @@ set_agd_arm <- function(data,
 set_agd_contrast <- function(data,
                              study,
                              trt, trt_b,
-                             y, se) {
+                             y = NULL, se = NULL) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
