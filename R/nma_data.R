@@ -212,7 +212,7 @@ set_agd_contrast <- function(data,
   o_continuous <- check_outcome_continuous(.y, .se, with_se = TRUE)
 
   # Get all treatments
-  trts <- sort(unique(c(.trt, .trt_b)))
+  trts <- sort(forcats::lvls_union(list(factor(.trt), factor(.trt_b))))
 
   # Create tibble in standard format
   d <- tibble::tibble(
