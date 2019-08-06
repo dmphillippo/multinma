@@ -269,6 +269,11 @@ combine_network <- function(..., trt_ref, trt_refn) {
   }
 
   # Check that no studies are duplicated between data sources
+  all_studs <- purrr::flatten_chr(purrr::map(s, ~levels(.$studies)))
+  if (anyDuplicated(all_studs)) {
+    abort(sprintf("Studies with same label found in multiple data sources: %s",
+                  paste0(unique(all_studs[duplicated(all_studs)]), collapse = ", ")))
+  }
 
   # Combine study code factor
   studs <- sort(forcats::lvls_union(purrr::map(s, "studies")))
