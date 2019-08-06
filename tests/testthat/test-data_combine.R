@@ -83,4 +83,9 @@ test_that("combine_network can set alternative trt_ref", {
                                        studyf, trtf, y = y),
                                trt_ref = 2),
                "does not match a treatment.*Suitable values are: A, B, C, D, E, \\.\\.\\.")
+
+  expect_error(combine_network(net_a_a, net_a_c,
+                               set_ipd(mutate(ipd, studyf = factor("a")),
+                                       studyf, trtf, y = y)),
+               "Studies with same label found in multiple data sources")
 })
