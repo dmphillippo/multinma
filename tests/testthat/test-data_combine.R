@@ -42,7 +42,7 @@ ipd <- tibble(
   studyn = c(4, 4, 4, 5, 5),
   studyc = letters[studyn],
   studyf = factor(studyc),
-  trtn = c(1, 2, 2, 3, 4),
+  trtn = c(1, 2, 3, 3, 4),
   trtc = LETTERS[trtn],
   trtf = factor(trtc),
   y = rnorm(5)
@@ -71,14 +71,16 @@ test_that("combine_network produces combined treatment and study factors", {
 
 test_that("combine_network can set alternative trt_ref", {
   c1 <- combine_network(net_a_a, net_i, net_a_c, trt_ref = "B")
-  expect_equal(c1, factor(LETTERS[c(2, 1, 3, 4)]))
+  expect_equal(c1$treatments, factor(LETTERS[c(2, 1, 3, 4)]))
   expect_equal(levels(c1$agd_arm$.trt), LETTERS[c(2, 1, 3, 4)])
   expect_equal(levels(c1$agd_contrast$.trt), LETTERS[c(2, 1, 3, 4)])
   expect_equal(levels(c1$ipd$.trt), LETTERS[c(2, 1, 3, 4)])
 
-  c2 <- combine_network(net_a_a, net_i, net_a_c, trt_ref = 2)
-  expect_equal(c2, factor(LETTERS[c(2, 1, 3, 4)]))
-  expect_equal(levels(c2$agd_arm$.trt), LETTERS[c(2, 1, 3, 4)])
-  expect_equal(levels(c2$agd_contrast$.trt), LETTERS[c(2, 1, 3, 4)])
-  expect_equal(levels(c2$ipd$.trt), LETTERS[c(2, 1, 3, 4)])
+  expect_error(combine_network(net_a_a, net_i, net_a_c, trt_ref = 2),
+               "does not match a treatment.*Suitable values are: A, B, C, D")
+  expect_error(combine_network(net_a_a, net_a_c,
+                               set_ipd(mutate(ipd, trtf = factor(LETTERS[3:7])),
+                                       studyf, trtf, y = y),
+                               trt_ref = 2),
+               "does not match a treatment.*Suitable values are: A, B, C, D, E, \\.\\.\\.")
 })
