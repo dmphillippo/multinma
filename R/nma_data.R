@@ -259,7 +259,7 @@ combine_network <- function(..., trt_ref) {
 #'
 #' @noRd
 pull_non_null <- function(data, var) {
-  var_null <- rlang::quo_is_null(var)
+  var_null <- rlang::quo_is_missing(var) | rlang::quo_is_null(var)
   if (!var_null) return(dplyr::pull(data, {{ var }}))
   else return(NULL)
 }
