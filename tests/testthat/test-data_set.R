@@ -50,21 +50,21 @@ test_that("set_* error if trt not given or missing values", {
 
 # Dummy data
 agd_arm <- tibble(
- studyn = c(1, 1, 2, 2, 2),
- studyc = c("a", "a", "b", "b", "b"),
- studyf = factor(studyc),
- trtn = c(1, 2, 1, 2, 3),
- trtc = c("A", "B", "A", "B", "C"),
- trtf = factor(trtc),
- cont = rnorm(5),
- cont_pos = abs(cont),
- cont_neg = -cont_pos,
- disc = rbinom(5, 20, 0.5) + 1,
- disc_p1 = disc + 1,
- disc_m1 = disc - 1,
- disc_neg = -disc,
- bin = rbinom(5, 1, 0.5)
- #Surv =
+  studyn = c(1, 1, 2, 2, 2),
+  studyc = letters[studyn],
+  studyf = factor(studyc),
+  trtn = c(1, 2, 1, 2, 3),
+  trtc = LETTERS[trtn],
+  trtf = factor(trtc),
+  cont = rnorm(5),
+  cont_pos = abs(cont),
+  cont_neg = -cont_pos,
+  disc = rbinom(5, 20, 0.5) + 1,
+  disc_p1 = disc + 1,
+  disc_m1 = disc - 1,
+  disc_neg = -disc,
+  bin = rbinom(5, 1, 0.5)
+  #Surv =
 )
 
 test_that("set_agd_arm - continuous outcome checks work", {

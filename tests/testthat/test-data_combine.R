@@ -1,4 +1,5 @@
 library(multinma)
+library(dplyr)
 
 test_that("combine_network error if not passed nma_data objects", {
   msg <- "Expecting to combine objects of class `nma_data`, created using set_* functions"
@@ -7,4 +8,60 @@ test_that("combine_network error if not passed nma_data objects", {
   expect_error(combine_network(1, 2), msg)
   expect_error(combine_network(1, set_ipd(smoking[NA, ])), msg)
   expect_error(combine_network(set_ipd(smoking[NA, ]), 1), msg)
+})
+
+# Dummy data
+agd_arm <- tibble(
+  studyn = c(1, 1, 2, 2, 2),
+  studyc = letters[studyn],
+  studyf = factor(studyc),
+  trtn = c(1, 2, 1, 2, 3),
+  trtc = LETTERS[trtn],
+  trtf = factor(trtc),
+  y = rnorm(5),
+  se = runif(5)
+)
+net_a_a <- set_agd_arm(agd_arm, studyf, trtf, y = y, se = se)
+
+agd_contrast <- tibble(
+  studyn = c(3, 3),
+  studyc = letters[studyn],
+  studyf = factor(studyc),
+  trtn = c(2, 4),
+  trtc = LETTERS[trtn],
+  trtf = factor(trtc),
+  trtbn = c(1, 2),
+  trtbc = LETTERS[trtbn],
+  trtbf = factor(trtbc),
+  y = rnorm(2),
+  se = runif(2)
+)
+net_a_c <- set_agd_contrast(agd_contrast, studyf, trtf, trtbf, y = y, se = se)
+
+ipd <- tibble(
+  studyn = c(4, 4, 4, 5, 5),
+  studyc = letters[studyn],
+  studyf = factor(studyc),
+  trtn = c(1, 2, 2, 3, 4),
+  trtc = LETTERS[trtn],
+  trtf = factor(trtc),
+  y = rnorm(5)
+)
+net_i <- set_ipd(ipd, studyf, trtf, y = y)
+
+test_that("combine_network produces combined treatment and study factors", {
+  c1 <- combine_network(net_a_a, net_i)
+  expect_equal(c1$treatments, factor(LETTERS[1:4]))
+  expect_equal(c1$studies, factor(letters[c(1, 2, 4, 5)]))
+
+  c2 <- combine_network(net_a_a, net_i, net_a_c)
+  expect_equal(c2$treatments, factor(LETTERS[1:4]))
+  expect_equal(c2$studies, factor(letters[1:5]))
+})
+
+test_that("combine_network can set alternative trt_ref", {
+  expect_equal(combine_network(net_a_a, net_i, net_a_c, trt_ref = "B"),
+               factor(LETTERS[c(2, 1, 3, 4)]))
+  expect_equal(combine_network(net_a_a, net_i, net_a_c, trt_ref = 2),
+               factor(LETTERS[c(2, 1, 3, 4)]))
 })
