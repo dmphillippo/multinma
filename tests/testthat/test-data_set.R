@@ -135,19 +135,19 @@ test_that("set_agd_contrast - continuous outcome checks work", {
 })
 
 test_that("set_* return `treatments` factor", {
-  expect_equal(set_ipd(agd_arm, studyn, trtc, y = cont)$treatments,
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont)$treatments,
                factor(LETTERS[1:3]))
-  expect_equal(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos)$treatments,
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos)$treatments,
                factor(LETTERS[1:3]))
-  expect_equal(set_agd_contrast(agd_contrast, studyn, trtc, trt_b, y = cont, se = cont_pos)$treatments,
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, trt_b, y = cont, se = cont_pos)$treatments,
                factor(LETTERS[1:3]))
 })
 
 test_that("set_* return `studies` factor", {
-  expect_equal(set_ipd(agd_arm, studyn, trtc, y = cont)$studies,
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont)$studies,
                factor(letters[1:2]))
-  expect_equal(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos)$treatments,
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos)$treatments,
                factor(letters[1:2]))
-  expect_equal(set_agd_contrast(agd_contrast, studyn, trtc, trt_b, y = cont, se = cont_pos)$treatments,
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, trt_b, y = cont, se = cont_pos)$treatments,
                factor(letters[1:2]))
 })
