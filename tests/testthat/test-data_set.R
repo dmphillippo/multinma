@@ -37,7 +37,8 @@ agd_arm <- tibble(
  disc = rbinom(5, 20, 0.5) + 1,
  disc_p1 = disc + 1,
  disc_m1 = disc - 1,
- disc_neg = -disc
+ disc_neg = -disc,
+ bin = rbinom(5, 1, 0.5)
  #Surv =
 )
 
@@ -68,4 +69,23 @@ test_that("set_agd_arm - count outcome checks work", {
   expect_equivalent(
     set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = cont_pos)$agd_arm[, c(".r", ".n", ".E")],
     transmute(agd_arm, .r = disc, .n = disc_p1, .E = cont_pos))
+})
+
+test_that("set_ipd - continuous outcome checks work", {
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", y = trtc), "must be numeric")
+  expect_equivalent(
+    set_ipd(agd_arm, "studyn", "trtc", y = cont)$agd_arm[, ".y"],
+    transmute(agd_arm, .y = cont))
+})
+
+test_that("set_ipd - binary outcome checks work", {
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", r = trtc), "must be numeric")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", r = cont), "must equal 0 or 1")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", r = disc_neg), "must equal 0 or 1")
+  expect_warning(set_ipd(agd_arm, "studyn", "trtc", E = cont_pos), "Ignoring `E`")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = cont_neg), "must be positive")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = trtc), "must be numeric")
+  expect_equivalent(
+    set_ipd(agd_arm, "studyn", "trtc", r = bin, E = cont_pos)$agd_arm[, c(".r", ".E")],
+    transmute(agd_arm, .r = bin, .E = cont_pos))
 })
