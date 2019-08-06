@@ -87,7 +87,7 @@ test_that("set_agd_arm - count outcome checks work", {
 test_that("set_ipd - continuous outcome checks work", {
   expect_error(set_ipd(agd_arm, "studyn", "trtc", y = trtc), "must be numeric")
   expect_equivalent(
-    set_ipd(agd_arm, "studyn", "trtc", y = cont)$agd_arm[, ".y"],
+    set_ipd(agd_arm, "studyn", "trtc", y = cont)$ipd[, ".y"],
     transmute(agd_arm, .y = cont))
 })
 
@@ -99,6 +99,6 @@ test_that("set_ipd - binary outcome checks work", {
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = cont_neg), "must be positive")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = trtc), "must be numeric")
   expect_equivalent(
-    set_ipd(agd_arm, "studyn", "trtc", r = bin, E = cont_pos)$agd_arm[, c(".r", ".E")],
+    set_ipd(agd_arm, "studyn", "trtc", r = bin, E = cont_pos)$ipd[, c(".r", ".E")],
     transmute(agd_arm, .r = bin, .E = cont_pos))
 })
