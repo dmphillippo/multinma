@@ -37,18 +37,23 @@ set_ipd <- function(data,
   if (missing(trt)) abort("Specify `trt`")
   .trt <- dplyr::pull(data, {{ trt }})
 
-  # Allow any number of outcomes to be given, but check that all components are present
-  o_continuous <- check_outcome_continuous(data, enquo(y), NA_real_)
-  o_count <- check_outcome_count(data, enquo(r), enquo(n))
-  # o_surv <- check_outcome_surv(data, enquo(Surv))
+  # Pull and check outcomes
+  .y <- pull_non_null(data, enquo(y))
+  .r <- pull_non_null(data, enquo(r))
+  .E <- pull_non_null(data, enquo(E))
+  # .Surv <- ...
+
+  o_continuous <- check_outcome_continuous(.y, with_se = FALSE)
+  o_binary <- check_outcome_binary(.r, .E)
+  # o_surv <- check_outcome_surv(.Surv)
 
   # Create tibble in standard format
   d <- tibble::tibble(
     .study = factor(.study),
     .trt = factor(.trt),
     .y = o_continuous$y,
-    .r = o_count$r,
-    .n = o_count$n#,
+    .r = o_binary$r,
+    .E = o_binary$E#,
     # .Surv = o_surv$Surv,
   )
 
@@ -108,10 +113,17 @@ set_agd_arm <- function(data,
   if (missing(trt)) abort("Specify `trt`")
   .trt <- dplyr::pull(data, {{ trt }})
 
-  # Allow any number of outcomes to be given, but check that all components are present
-  o_continuous <- check_outcome_continuous(data, enquo(y), enquo(se))
-  o_count <- check_outcome_count(data, enquo(r), enquo(n), enquo(E))
-  # o_surv <- check_outcome_surv(data, enquo(Surv))
+  # Pull and check outcomes
+  .y <- pull_non_null(data, enquo(y))
+  .se <- pull_non_null(data, enquo(se))
+  .r <- pull_non_null(data, enquo(r))
+  .n <- pull_non_null(data, enquo(n))
+  .E <- pull_non_null(data, enquo(E))
+  # .Surv <- ...
+
+  o_continuous <- check_outcome_continuous(.y, .se, with_se = TRUE)
+  o_count <- check_outcome_count(.r, .n, .E)
+  # o_surv <- check_outcome_surv(.Surv)
 
   # Create tibble in standard format
   d <- tibble::tibble(
@@ -182,8 +194,11 @@ set_agd_contrast <- function(data,
   if (missing(trt_b)) abort("Specify `trt_b`")
   .trt_b <- dplyr::pull(data, {{ trt_b }})
 
-  # Check continuous outcome
-  o_continuous <- check_outcome_continuous(data, enquo(y), enquo(se))
+  # Pull and check outcomes
+  .y <- pull_non_null(data, enquo(y))
+  .se <- pull_non_null(data, enquo(se))
+
+  o_continuous <- check_outcome_continuous(.y, .se, with_se = TRUE)
 
   # Get all treatments
   trts <- sort(unique(c(.trt, .trt_b)))
@@ -237,54 +252,65 @@ combine_network <- function(..., trt_ref) {
   return(out)
 }
 
-#' Check continuous outcomes
+#' Pull non-null variables from data
 #'
 #' @param data data frame
-#' @param y quosure
-#' @param se quosure
+#' @param var quosure (possibly NULL) for variable to pull
 #'
 #' @noRd
-check_outcome_continuous <- function(data, y, se) {
-  # Check NULL instead of missing(), since "missingness" is not passed from
-  # calling function
-  null_y <- rlang::quo_is_null(y)
-  null_se <- rlang::quo_is_null(se)
+pull_non_null <- function(data, var) {
+  var_null <- rlang::quo_is_null(var)
+  if (!var_null) return(dplyr::pull(data, {{ var }}))
+  else return(NULL)
+}
 
-  if (!null_y & !null_se) {
-    y <- dplyr::pull(data, {{ y }})
-    se <- dplyr::pull(data, {{ se }})
 
-    if (!is.numeric(y)) abort("Continuous outcome `y` must be numeric")
-    if (!is.numeric(se)) abort("Standard error `se` must be numeric")
-    if (any(se <= 0)) abort("Standard errors must be positive")
+#' Check continuous outcomes
+#'
+#' @param y vector
+#' @param se vector
+#' @param with_se continuous outcome with SE?
+#'
+#' @noRd
+check_outcome_continuous <- function(y, se = NULL, with_se = TRUE) {
+  null_y <- is.null(y)
+  null_se <- is.null(se)
+
+  if (with_se) {
+    if (!null_y & !null_se) {
+      if (!is.numeric(y)) abort("Continuous outcome `y` must be numeric")
+      if (!is.numeric(se)) abort("Standard error `se` must be numeric")
+      if (any(se <= 0)) abort("Standard errors must be positive")
+    } else {
+      if (!null_y) abort("Specify standard error `se` for continuous outcome `y`")
+      if (!null_se) warn("Ignoring standard error `se` without continuous outcome `y`")
+      y <- NA_real_
+      se <- NA_real_
+    }
+    return(list(y = y, se = se))
   } else {
-    if (!null_y) abort("Specify standard error `se` for continuous outcome `y`")
-    if (!null_se) warn("Ignoring standard error `se` without continuous outcome `y`")
-    y <- NA_real_
-    se <- NA_real_
+    if (!null_y) {
+      if (!is.numeric(y)) abort("Continuous outcome `y` must be numeric")
+    } else {
+      y <- NA_real_
+    }
+    return(list(y = y))
   }
-  return(list(y = y, se = se))
 }
 
 #' Check count outcomes
 #'
-#' @param data data frame
-#' @param r quosure
-#' @param n quosure
-#' @param E quosure
+#' @param r vector
+#' @param n vector
+#' @param E vector
 #'
 #' @noRd
-check_outcome_count <- function(data, r, n, E) {
-  # Check NULL instead of missing(), since "missingness" is not passed from
-  # calling function
-  null_r <- rlang::quo_is_null(r)
-  null_n <- rlang::quo_is_null(n)
-  null_E <- rlang::quo_is_null(E)
+check_outcome_count <- function(r, n, E) {
+  null_r <- is.null(r)
+  null_n <- is.null(n)
+  null_E <- is.null(E)
 
   if (!null_r & !null_n) {
-    r <- dplyr::pull(data, {{ r }})
-    n <- dplyr::pull(data, {{ n }})
-
     if (!is.numeric(r)) abort("Count outcome `r` must be numeric")
     if (!is.numeric(n)) abort("Denominator `n` must be numeric")
     if (any(r != trunc(r))) abort("Count outcome `r` must be integer-valued")
@@ -307,7 +333,6 @@ check_outcome_count <- function(data, r, n, E) {
         warn("Ignoring `E` without `r` or `n`")
         E <- NA_real_
       } else {
-        E <- dplyr::pull(data, {{ E }})
         if (!is.numeric(E)) abort("Time at risk `E` must be numeric")
         if (any(E <= 0)) abort("Time at risk `E` must be positive")
       }
@@ -315,4 +340,34 @@ check_outcome_count <- function(data, r, n, E) {
     E <- NA_real_
   }
   return(list(r = r, n = n, E = E))
+}
+
+#' Check binary outcomes
+#'
+#' @param r vector
+#' @param E vector
+#'
+#' @noRd
+check_outcome_binary <- function(r, E) {
+  null_r <- is.null(r)
+  null_E <- is.null(E)
+
+  if (!null_r) {
+    if (!is.numeric(r)) abort("Binary outcome `r` must be numeric")
+    if (any(! r %in% c(0, 1))) abort("Binary outcome `r` must equal 0 or 1")
+  } else {
+    r <- NA_integer_
+  }
+  if (!null_E) {
+    if (null_r) {
+      warn("Ignoring `E` without `r`")
+      E <- NA_real_
+    } else {
+      if (!is.numeric(E)) abort("Time at risk `E` must be numeric")
+      if (any(E <= 0)) abort("Time at risk `E` must be positive")
+    }
+  } else {
+    E <- NA_real_
+  }
+  return(list(r = r, E = E))
 }
