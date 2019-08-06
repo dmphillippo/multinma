@@ -9,9 +9,9 @@ test_that("set_* produces empty nma_data objects", {
          treatments = NULL,
          studies = NULL), class = "nma_data")
 
-  expect_equal(set_ipd(smoking[0, ]), empty_nma_data)
-  expect_equal(set_agd_arm(smoking[0, ]), empty_nma_data)
-  expect_equal(set_agd_contrast(smoking[0, ]), empty_nma_data)
+  expect_equal(set_ipd(smoking[0, ], "studyn", "trtc"), empty_nma_data)
+  expect_equal(set_agd_arm(smoking[0, ], "studyn", "trtc"), empty_nma_data)
+  expect_equal(set_agd_contrast(smoking[0, ], "studyn", "trtc"), empty_nma_data)
 })
 
 test_that("set_* error if data does not inherit data.frame", {
@@ -21,6 +21,19 @@ test_that("set_* error if data does not inherit data.frame", {
   expect_error(set_ipd(vec), msg)
   expect_error(set_agd_arm(vec), msg)
   expect_error(set_agd_contrast(vec), msg)
+})
+
+test_that("set_* error if study not given", {
+  expect_error(set_ipd(smoking), "Specify `study`")
+  expect_error(set_agd_arm(smoking), "Specify `study`")
+  expect_error(set_agd_contrast(smoking), "Specify `study`")
+})
+
+test_that("set_* error if trt not given", {
+  expect_error(set_ipd(smoking, "studyn"), "Specify `trt`")
+  expect_error(set_agd_arm(smoking, "studyn"), "Specify `trt`")
+  expect_error(set_agd_contrast(smoking, "studyn"), "Specify `trt`")
+  expect_error(set_agd_contrast(smoking, "studyn", "trtc"), "Specify `trt_b`")
 })
 
 # Dummy data
