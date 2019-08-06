@@ -249,10 +249,12 @@ set_agd_contrast <- function(data,
 #'   different data sources
 #' @examples
 combine_network <- function(..., trt_ref) {
-  # Check that arguments all inherit from nma_data class
+  s <- list(...)
 
-  # Check that all data sources use same reference treatment, warn otherwise to
-  # use trt_ref
+  # Check that arguments all inherit from nma_data class
+  if (!purrr::every(s, inherits, what = "nma_data")) {
+    abort("Expecting to combine objects of class `nma_data`, created using set_* functions")
+  }
 
   # Combine treatment code factor
 
