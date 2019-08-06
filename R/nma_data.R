@@ -31,8 +31,10 @@ set_ipd <- function(data,
     )
   }
 
-  # Pull single columns
+  # Pull study and treatment columns
+  if (missing(study)) abort("Specify `study`")
   .study <- dplyr::pull(data, {{ study }})
+  if (missing(trt)) abort("Specify `trt`")
   .trt <- dplyr::pull(data, {{ trt }})
 
   # Allow any number of outcomes to be given, but check that all components are present
@@ -100,8 +102,10 @@ set_agd_arm <- function(data,
     )
   }
 
-  # Pull single columns
+  # Pull study and treatment columns
+  if (missing(study)) abort("Specify `study`")
   .study <- dplyr::pull(data, {{ study }})
+  if (missing(trt)) abort("Specify `trt`")
   .trt <- dplyr::pull(data, {{ trt }})
 
   # Allow any number of outcomes to be given, but check that all components are present
@@ -170,9 +174,12 @@ set_agd_contrast <- function(data,
   }
 
 
-  # Pull single columns
+  # Pull study and treatment columns
+  if (missing(study)) abort("Specify `study`")
   .study <- dplyr::pull(data, {{ study }})
+  if (missing(trt)) abort("Specify `trt`")
   .trt <- dplyr::pull(data, {{ trt }})
+  if (missing(trt_b)) abort("Specify `trt_b`")
   .trt_b <- dplyr::pull(data, {{ trt_b }})
 
   # Check continuous outcome
