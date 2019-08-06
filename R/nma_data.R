@@ -67,8 +67,8 @@ set_ipd <- function(data,
     list(agd_arm = NULL,
          agd_contrast = NULL,
          ipd = d,
-         treatments = NA,
-         studies = NA),
+         treatments = forcats::fct_unique(d$.trt),
+         studies = forcats::fct_unique(d$.study)),
     class = "nma_data")
   return(out)
 }
@@ -150,8 +150,8 @@ set_agd_arm <- function(data,
     list(agd_arm = d,
          agd_contrast = NULL,
          ipd = NULL,
-         treatments = NA,
-         studies = NA),
+         treatments = forcats::fct_unique(d$.trt),
+         studies = forcats::fct_unique(d$.study)),
     class = "nma_data")
   return(out)
 }
@@ -229,8 +229,8 @@ set_agd_contrast <- function(data,
     list(agd_arm = NULL,
          agd_contrast = d,
          ipd = NULL,
-         treatments = NA,
-         studies = NA),
+         treatments = forcats::fct_unique(d$.trt),
+         studies = forcats::fct_unique(d$.study)),
     class = "nma_data")
   return(out)
 }
