@@ -218,7 +218,7 @@ set_agd_contrast <- function(data,
   d <- tibble::tibble(
     .study = factor(.study),
     .trt = factor(.trt, levels = trts),
-    .trt_b = factor(.trt, levels = trts),
+    .trt_b = factor(.trt_b, levels = trts),
     .y = o_continuous$y,
     .se = o_continuous$se)
 
