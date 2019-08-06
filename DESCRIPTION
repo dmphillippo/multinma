@@ -26,7 +26,8 @@ Imports:
     tibble,
     dplyr,
     rlang,
-    purrr
+    purrr,
+    forcats
 LinkingTo: 
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),
