@@ -23,17 +23,29 @@ test_that("set_* error if data does not inherit data.frame", {
   expect_error(set_agd_contrast(vec), msg)
 })
 
-test_that("set_* error if study not given", {
+test_that("set_* error if study not given or missing values", {
   expect_error(set_ipd(smoking), "Specify `study`")
   expect_error(set_agd_arm(smoking), "Specify `study`")
   expect_error(set_agd_contrast(smoking), "Specify `study`")
+
+  smk_miss <- smoking
+  smk_miss[1, "studyn"] <- NA
+  expect_error(set_ipd(smk_miss, "studyn", "trtc"), "cannot contain missing values")
+  expect_error(set_agd_arm(smk_miss, "studyn", "trtc"), "cannot contain missing values")
+  expect_error(set_agd_contrast(smk_miss, "studyn", "trtc", "trtn"), "cannot contain missing values")
 })
 
-test_that("set_* error if trt not given", {
+test_that("set_* error if trt not given or missing values", {
   expect_error(set_ipd(smoking, "studyn"), "Specify `trt`")
   expect_error(set_agd_arm(smoking, "studyn"), "Specify `trt`")
   expect_error(set_agd_contrast(smoking, "studyn"), "Specify `trt`")
   expect_error(set_agd_contrast(smoking, "studyn", "trtc"), "Specify `trt_b`")
+
+  smk_miss <- smoking
+  smk_miss[1, "trtc"] <- NA
+  expect_error(set_ipd(smk_miss, "studyn", "trtc"), "cannot contain missing values")
+  expect_error(set_agd_arm(smk_miss, "studyn", "trtc"), "cannot contain missing values")
+  expect_error(set_agd_contrast(smk_miss, "studyn", "trtn", "trtc"), "cannot contain missing values")
 })
 
 # Dummy data
