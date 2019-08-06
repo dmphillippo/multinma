@@ -34,8 +34,11 @@ set_ipd <- function(data,
   # Pull study and treatment columns
   if (missing(study)) abort("Specify `study`")
   .study <- dplyr::pull(data, {{ study }})
+  if (any(is.na(.study))) abort("`study` cannot contain missing values")
+
   if (missing(trt)) abort("Specify `trt`")
   .trt <- dplyr::pull(data, {{ trt }})
+  if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
 
   # Pull and check outcomes
   .y <- pull_non_null(data, enquo(y))
@@ -110,8 +113,11 @@ set_agd_arm <- function(data,
   # Pull study and treatment columns
   if (missing(study)) abort("Specify `study`")
   .study <- dplyr::pull(data, {{ study }})
+  if (any(is.na(.study))) abort("`study` cannot contain missing values")
+
   if (missing(trt)) abort("Specify `trt`")
   .trt <- dplyr::pull(data, {{ trt }})
+  if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
 
   # Pull and check outcomes
   .y <- pull_non_null(data, enquo(y))
@@ -189,10 +195,15 @@ set_agd_contrast <- function(data,
   # Pull study and treatment columns
   if (missing(study)) abort("Specify `study`")
   .study <- dplyr::pull(data, {{ study }})
+  if (any(is.na(.study))) abort("`study` cannot contain missing values")
+
   if (missing(trt)) abort("Specify `trt`")
   .trt <- dplyr::pull(data, {{ trt }})
+  if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
+
   if (missing(trt_b)) abort("Specify `trt_b`")
   .trt_b <- dplyr::pull(data, {{ trt_b }})
+  if (any(is.na(.trt_b))) abort("`trt_b` cannot contain missing values")
 
   # Pull and check outcomes
   .y <- pull_non_null(data, enquo(y))
