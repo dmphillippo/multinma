@@ -3,7 +3,7 @@
 #' @template args-data_common
 #' @template args-data_arm
 #'
-#' @return
+#' @return An object of class [nma_data]
 #' @export
 #'
 #' @seealso [set_agd_arm()] for arm-based aggregate data, [set_agd_contrast()]
@@ -79,7 +79,7 @@ set_ipd <- function(data,
 #'   outcome
 #' @param n column of `data` specifying Binomial outcome numerator
 #'
-#' @return
+#' @return An object of class [nma_data]
 #' @export
 #'
 #' @seealso [set_ipd()] for individual patient data, [set_agd_contrast()] for
@@ -159,7 +159,7 @@ set_agd_arm <- function(data,
 #' @param trt_b column of `data` specifying the reference/baseline treatment for
 #'   each contrast
 #'
-#' @return
+#' @return An object of class [nma_data]
 #' @export
 #'
 #' @seealso [set_ipd()] for individual patient data, [set_agd_arm()] for
@@ -231,7 +231,7 @@ set_agd_contrast <- function(data,
 #' @param trt_ref reference treatment for the entire network (string, factor, or
 #'   integer)
 #'
-#' @return
+#' @return An object of class [nma_data]
 #' @export
 #'
 #' @seealso [set_ipd()], [set_agd_arm()], and [set_agd_contrast()] for defining

@@ -6,6 +6,7 @@
 #'
 #' @rdname nma_data-class
 #' @name nma_data-class
+#' @aliases nma_data
 #'
 #' @details Objects of class `nma_data` have the following components:
 #'   \describe{
