@@ -25,7 +25,8 @@ Imports:
     Rdpack (>= 0.7),
     tibble,
     dplyr,
-    rlang
+    rlang,
+    purrr
 LinkingTo: 
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),
