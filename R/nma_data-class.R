@@ -92,9 +92,16 @@ print.nma_data <- function(d, ..., n = 10) {
     n_agd_contrast <- 0
   }
 
-  cglue("A `nma_data` object with {n_ipd} IPD studies, ",
-        "{n_agd_arm} AgD studies (arm-based), and ",
-        "{n_agd_contrast} AgD studies (contrast-based).")
+  if (all(n_ipd == 0, n_agd_arm == 0, n_agd_contrast == 0)) {
+    cglue("An empty `nma_data` object.")
+  } else {
+    cglue("A `nma_data` object with ", glue::glue_collapse(c(
+      "{n_ipd} IPD stud{ifelse(n_ipd == 1, 'y', 'ies')}",
+      "{n_agd_arm} AgD stud{ifelse(n_agd_arm == 1, 'y', 'ies')} (arm-based)",
+      "{n_agd_contrast} AgD stud{ifelse(n_agd_contrast == 1, 'y', 'ies')} (contrast-based)"
+    )[c(n_ipd > 0, n_agd_arm > 0, n_agd_contrast > 0)],
+    last = ", and ", sep = ", "), ".")
+  }
   cat("\n")
 
   if (n_ipd > 0) {
