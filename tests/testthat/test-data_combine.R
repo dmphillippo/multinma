@@ -71,7 +71,7 @@ test_that("combine_network produces combined treatment and study factors", {
 
 test_that("combine_network can set alternative trt_ref", {
   c1 <- combine_network(net_a_a, net_i, net_a_c, trt_ref = "B")
-  expect_equal(c1$treatments, factor(LETTERS[c(2, 1, 3, 4)]))
+  expect_equal(c1$treatments, factor(LETTERS[c(2, 1, 3, 4)], levels = LETTERS[c(2, 1, 3, 4)]))
   expect_equal(levels(c1$agd_arm$.trt), LETTERS[c(2, 1, 3, 4)])
   expect_equal(levels(c1$agd_contrast$.trt), LETTERS[c(2, 1, 3, 4)])
   expect_equal(levels(c1$ipd$.trt), LETTERS[c(2, 1, 3, 4)])
