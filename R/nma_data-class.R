@@ -125,6 +125,7 @@ print.nma_data <- function(d, ..., n = 10) {
     cat("\n")
   }
 
+  sec_header()
   cglue("Total number of treatments: {length(d$treatments)}")
   cglue("Total number of studies: {length(d$studies)}")
   cglue("Reference treatment is: {levels(d$treatments)[1]}")
