@@ -1,7 +1,8 @@
 #' Set up individual patient data
 #'
 #' @template args-data_common
-#' @template args-data_arm
+#' @template args-data_rE
+#' @template args-data_Surv
 #'
 #' @return An object of class [nma_data]
 #' @export
@@ -77,9 +78,9 @@ set_ipd <- function(data,
 #' Set up arm-based aggregate data
 #'
 #' @template args-data_common
-#' @template args-data_arm
-#' @param se column of `data` specifying the standard error for a continuous
-#'   outcome
+#' @template args-data_se
+#' @template args-data_rE
+#' @template args-data_Surv
 #' @param n column of `data` specifying Binomial outcome numerator
 #'
 #' @return An object of class [nma_data]
@@ -160,8 +161,7 @@ set_agd_arm <- function(data,
 #' Set up contrast-based aggregate data
 #'
 #' @template args-data_common
-#' @param se column of `data` specifying the standard error for a continuous
-#'   outcome
+#' @template args-data_se
 #' @param trt_b column of `data` specifying the reference/baseline treatment for
 #'   each contrast
 #'
