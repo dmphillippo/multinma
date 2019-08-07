@@ -133,10 +133,16 @@ print.nma_data <- function(d, ..., n = 10) {
 #' Make section headers for print.nma_class
 #'
 #' @param s section header string
+#' @param width line width
+#' @param sep separator between s and surrounding dashes
 #'
 #' @noRd
-sec_header <- function(s, width = min(80, getOption("width"))) {
-  cat(subtle(rep('-', width - nchar(s) - 6)), " ", s, subtle(" ----"), "\n", sep = "")
+sec_header <- function(s = "",
+                       width = min(80, getOption("width")),
+                       sep = ifelse(nchar(s), " ", "")) {
+  cat(subtle(strrep('-', width - nchar(s) - 2*nchar(sep))),
+      s,
+      subtle("----"), "\n", sep = sep)
 }
 
 #' Cat out glue objects
