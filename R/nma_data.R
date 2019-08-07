@@ -248,7 +248,7 @@ set_agd_contrast <- function(data,
 #' @seealso [set_ipd()], [set_agd_arm()], and [set_agd_contrast()] for defining
 #'   different data sources
 #' @examples
-combine_network <- function(..., trt_ref, trt_refn) {
+combine_network <- function(..., trt_ref) {
   s <- list(...)
 
   # Check that arguments all inherit from nma_data class
