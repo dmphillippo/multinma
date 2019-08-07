@@ -38,21 +38,21 @@ NULL
 
 #' Print `nma_data` objects
 #'
-#' @param d `nma_data` object
+#' @param x `nma_data` object
 #' @param ... other options (not used)
 #' @param n number of studies of each type to print
 #'
 #' @export
 #'
 #' @examples
-print.nma_data <- function(d, ..., n = 10) {
+print.nma_data <- function(x, ..., n = 10) {
   cwidth <- getOption("width")
 
   # Error if n is not an integer
   if (!is.numeric(n) | trunc(n) != n) abort("Argument `n` should be an integer")
 
-  if (!is.null(d$ipd)) {
-    s_ipd <- d$ipd %>%
+  if (!is.null(x$ipd)) {
+    s_ipd <- x$ipd %>%
       dplyr::distinct(.study, .trt) %>%
       dplyr::group_by(.study) %>%
       dplyr::summarise(Treatments = glue::glue("{dplyr::n()}: ",
@@ -64,8 +64,8 @@ print.nma_data <- function(d, ..., n = 10) {
     n_ipd <- 0
   }
 
-  if (!is.null(d$agd_arm)) {
-    s_agd_arm <- d$agd_arm %>%
+  if (!is.null(x$agd_arm)) {
+    s_agd_arm <- x$agd_arm %>%
       dplyr::distinct(.study, .trt) %>%
       dplyr::group_by(.study) %>%
       dplyr::summarise(Treatments = glue::glue("{dplyr::n()}: ",
@@ -77,8 +77,8 @@ print.nma_data <- function(d, ..., n = 10) {
     n_agd_arm <- 0
   }
 
-  if (!is.null(d$agd_contrast)) {
-    s_agd_contrast <- d$agd_contrast %>%
+  if (!is.null(x$agd_contrast)) {
+    s_agd_contrast <- x$agd_contrast %>%
       dplyr::distinct(.study, .trt, .trt_b) %>%
       dplyr::group_by(.study) %>%
       dplyr::summarise(
