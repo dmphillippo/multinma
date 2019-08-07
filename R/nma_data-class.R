@@ -53,11 +53,11 @@ print.nma_data <- function(x, ..., n = 10) {
 
   if (!is.null(x$ipd)) {
     s_ipd <- x$ipd %>%
-      dplyr::distinct(.study, .trt) %>%
-      dplyr::group_by(.study) %>%
+      dplyr::distinct(.data$.study, .data$.trt) %>%
+      dplyr::group_by(.data$.study) %>%
       dplyr::summarise(Treatments = glue::glue("{dplyr::n()}: ",
-                                              glue::glue_collapse(.trt, sep = " | ", width = 0.8*cwidth))) %>%
-      dplyr::rename(Study = .study) %>%
+                                              glue::glue_collapse(.data$.trt, sep = " | ", width = 0.8*cwidth))) %>%
+      dplyr::rename(Study = .data$.study) %>%
       as.data.frame()
     n_ipd <- nrow(s_ipd)
   } else {
@@ -66,11 +66,11 @@ print.nma_data <- function(x, ..., n = 10) {
 
   if (!is.null(x$agd_arm)) {
     s_agd_arm <- x$agd_arm %>%
-      dplyr::distinct(.study, .trt) %>%
-      dplyr::group_by(.study) %>%
+      dplyr::distinct(.data$.study, .data$.trt) %>%
+      dplyr::group_by(.data$.study) %>%
       dplyr::summarise(Treatments = glue::glue("{dplyr::n()}: ",
-                                              glue::glue_collapse(.trt, sep = " | ", width = 0.8*cwidth))) %>%
-      dplyr::rename(Study = .study) %>%
+                                              glue::glue_collapse(.data$.trt, sep = " | ", width = 0.8*cwidth))) %>%
+      dplyr::rename(Study = .data$.study) %>%
       as.data.frame()
     n_agd_arm <- nrow(s_agd_arm)
   } else {
@@ -79,13 +79,13 @@ print.nma_data <- function(x, ..., n = 10) {
 
   if (!is.null(x$agd_contrast)) {
     s_agd_contrast <- x$agd_contrast %>%
-      dplyr::distinct(.study, .trt, .trt_b) %>%
-      dplyr::group_by(.study) %>%
+      dplyr::distinct(.data$.study, .data$.trt, .data$.trt_b) %>%
+      dplyr::group_by(.data$.study) %>%
       dplyr::summarise(
         Treatments = glue::glue("{dplyr::n()}: ",
-                     glue::glue_collapse(sort(unique(forcats::fct_c(.trt, .trt_b))),
+                     glue::glue_collapse(sort(unique(forcats::fct_c(.data$.trt, .data$.trt_b))),
                                          sep = " | ", width = 0.8*cwidth))) %>%
-      dplyr::rename(Study = .study) %>%
+      dplyr::rename(Study = .data$.study) %>%
       as.data.frame()
     n_agd_contrast <- nrow(s_agd_contrast)
   } else {
