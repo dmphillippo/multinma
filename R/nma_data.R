@@ -304,7 +304,7 @@ combine_network <- function(..., trt_ref, trt_refn) {
     list(agd_arm = agd_arm,
          agd_contrast = agd_contrast,
          ipd = ipd,
-         treatments = factor(trts),
+         treatments = factor(trts, levels = trts),
          studies = factor(studs)),
     class = "nma_data")
   return(out)
