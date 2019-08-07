@@ -134,6 +134,26 @@ test_that("set_agd_contrast - continuous outcome checks work", {
     transmute(agd_contrast, .y = cont, .se = cont_pos))
 })
 
+test_that("set_* `.trt` column is correct", {
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont)$ipd$.trt,
+               agd_arm$trtf)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos)$agd_arm$.trt,
+               agd_arm$trtf)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, trt_b, y = cont, se = cont_pos)$agd_contrast$.trt,
+               agd_contrast$trtf)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, trt_b, y = cont, se = cont_pos)$agd_contrast$.trt_b,
+               agd_contrast$trt_b)
+})
+
+test_that("set_* `.study` column is correct", {
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont)$ipd$.study,
+               agd_arm$studyf)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos)$agd_arm$.study,
+               agd_arm$studyf)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, trt_b, y = cont, se = cont_pos)$agd_contrast$.study,
+               agd_contrast$studyf)
+})
+
 test_that("set_* return `treatments` factor", {
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont)$treatments,
                factor(LETTERS[1:3]))
