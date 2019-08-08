@@ -106,7 +106,7 @@ print.nma_data <- function(x, ..., n = 10) {
 
   if (n_ipd > 0) {
     sec_header("IPD studies")
-    print(s_ipd[1:min(n_ipd, n), ], right = FALSE, row.names = FALSE, 9999L)
+    print(s_ipd[1:min(n_ipd, n), ], right = FALSE, row.names = FALSE, max = 9999L)
     if (n_ipd > n) cglue(subtle(" ... plus {n_ipd - n} more studies"))
     cat("\n")
   }
