@@ -107,21 +107,21 @@ print.nma_data <- function(x, ..., n = 10) {
   if (n_ipd > 0) {
     sec_header("IPD studies")
     print(s_ipd[1:min(n_ipd, n), ], right = FALSE, row.names = FALSE, 9999L)
-    if (nrow(s_ipd) > n) cglue(subtle("... with {nrow(s_ipd) - n} more rows"))
+    if (n_ipd > n) cglue(subtle(" ... plus {n_ipd - n} more studies"))
     cat("\n")
   }
 
   if (n_agd_arm > 0) {
     sec_header("AgD studies (arm-based)")
     print(s_agd_arm[1:min(n_agd_arm, n), ], right = FALSE, row.names = FALSE, max = 9999L)
-    if (nrow(s_agd_arm) > n) cglue(subtle("... with {nrow(s_agd_arm) - n} more rows"))
+    if (n_agd_arm > n) cglue(subtle(" ... plus {n_agd_arm - n} more studies"))
     cat("\n")
   }
 
   if (n_agd_contrast > 0) {
     sec_header("AgD studies (contrast-based)")
     print(s_agd_contrast[1:min(n_agd_contrast, n), ], right = FALSE, row.names = FALSE, max = 9999L)
-    if (nrow(s_agd_contrast) > n) cglue(subtle("... with {nrow(s_agd_contrast) - n} more rows"))
+    if (n_agd_contrast > n) cglue(subtle(" ... plus {n_agd_contrast - n} more studies"))
     cat("\n")
   }
 
