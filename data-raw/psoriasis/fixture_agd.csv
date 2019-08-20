@@ -1,0 +1,5 @@
+study,trtc,sample_size_w0,bsa_mean,bsa_sd,weight_mean,weight_sd,durnpso_mean,durnpso_sd,prevsys,psa,pasi75_n,pasi75_r
+FIXTURE,ETN,326,33.6,18,84.6,20.5,16.4,12,65.6,13.5,323,142
+FIXTURE,PBO,326,35.2,19.1,82,20.4,16.6,11.6,62.6,15,324,16
+FIXTURE,SEC_150,327,34.5,19.4,83.6,20.8,17.3,12.2,64.8,15,327,219
+FIXTURE,SEC_300,327,34.3,19.2,83,21.6,15.8,12.3,63,15.3,323,249
