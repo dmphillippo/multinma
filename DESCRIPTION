@@ -22,7 +22,14 @@ Imports:
     Rcpp (>= 0.12.0),
     rstan (>= 2.18.1),
     rstantools (>= 2.0.0.9000),
-    Rdpack (>= 0.7)
+    Rdpack (>= 0.7),
+    tibble,
+    dplyr,
+    rlang,
+    purrr,
+    forcats,
+    glue,
+    crayon
 LinkingTo: 
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),
@@ -31,8 +38,9 @@ LinkingTo:
     StanHeaders (>= 2.18.0)
 SystemRequirements: GNU make
 RoxygenNote: 6.1.1
+Roxygen: list(markdown = TRUE)
 Suggests: 
-    testthat
+    testthat (>= 2.1.0)
 RdMacros: Rdpack
 URL: http://github.com/dmphillippo/multinma
 BugReports: http://github.com/dmphillippo/multinma/issues

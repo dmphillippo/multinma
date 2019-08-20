@@ -3,3 +3,5 @@
 ^inst/.*\.bib\.bak$
 ^inst/.*\.bib\.sav$
 ^README\.Rmd$
+^data-raw/.*$
+^man-roxygen/.*$
