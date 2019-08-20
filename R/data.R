@@ -21,10 +21,10 @@
 #' Plaque psoriasis data
 #'
 #' Two data frames, `psoriasis_ipd` and `psoriasis_agd`, containing (simulated)
-#' individual patient data from three studies (UNCOVER-1, -2, and
-#' -3) \insertCite{Griffiths2015,Gordon2016}{multinma} and aggregate data from
-#' one study (FIXTURE) \insertCite{Langley2014}{multinma}, respectively. Outcomes
-#' are binary success/failure to achieve 75% reduction in symptoms on the
+#' individual patient data from three studies (UNCOVER-1, -2, and -3)
+#' \insertCite{Griffiths2015,Gordon2016}{multinma} and aggregate data from one
+#' study (FIXTURE) \insertCite{Langley2014}{multinma}, respectively. Outcomes
+#' are binary success/failure to achieve 75\% reduction in symptoms on the
 #' Psoriasis Area and Severity Index (PASI) scale.
 #'
 #' @format The individual patient data are contained in a data frame
