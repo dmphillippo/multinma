@@ -21,7 +21,9 @@
 #'
 #' @examples
 add_integration <- function(network, ..., cor = NULL, n_int = 100L, sobol_args = list()) {
-
+  if (!inherits(network, "nma_data")) {
+    abort("Expecting an `nma_data` object, as created by the `set_*` or `combine_network` functions")
+  }
 }
 
 
