@@ -8,7 +8,6 @@
 #' @param p proportion in $[0,1]$
 #'
 #' @return An object of class [distribution]
-#' @export
 #'
 #' @name distributions
 #'
