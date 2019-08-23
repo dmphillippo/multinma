@@ -34,7 +34,7 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, sobol_args =
 #' @param ... parameters of the distribution as arguments to `qfun`, these will
 #'   be quoted and evaluated later in the context of the aggregate data sources
 #'
-#' @return An object of class [distribution].
+#' @return An object of class [distr].
 #' @export
 #'
 #' @examples
