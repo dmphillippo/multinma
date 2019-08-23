@@ -17,9 +17,7 @@
 #' @details The arguments passed to `...` specify distributions for the
 #'   covariates. Argument names specify the name of the covariate, which should
 #'   match a covariate name in the IPD (if IPD are present). The required
-#'   marginal distribution is then specified using the function [distr()], or one
-#'   of the short-hand functions [normal()], [gamma()], [lognormal()],
-#'   [logitnormal()], [binomial()], [bernoulli()].
+#'   marginal distribution is then specified using the function [distr()].
 #'
 #' @examples
 add_integration <- function(network, ..., cor = NULL, n_int = 100L, sobol_args = list()) {

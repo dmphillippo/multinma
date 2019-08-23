@@ -2,13 +2,8 @@
 
 S3method(print,nma_data)
 export(add_integration)
-export(bernoulli)
 export(combine_network)
 export(distr)
-export(gamma)
-export(logitnormal)
-export(lognormal)
-export(normal)
 export(set_agd_arm)
 export(set_agd_contrast)
 export(set_ipd)
