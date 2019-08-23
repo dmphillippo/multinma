@@ -11,7 +11,7 @@
 #' @param n_int number of integration points to generate, default 100
 #' @param sobol_args a named list of arguments to pass to [randtoolbox::sobol()]
 #'
-#' @return An object of class [nma_data]
+#' @return An object of class [nma_data].
 #' @export
 #'
 #' @details The arguments passed to `...` specify distributions for the
