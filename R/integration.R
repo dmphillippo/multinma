@@ -24,6 +24,10 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, sobol_args =
   if (!inherits(network, "nma_data")) {
     abort("Expecting an `nma_data` object, as created by the `set_*` or `combine_network` functions")
   }
+
+  if (all(purrr::map_lgl(network, is.null))) {
+    abort("Empty network")
+  }
 }
 
 
