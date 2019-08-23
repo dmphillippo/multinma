@@ -39,5 +39,9 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, sobol_args =
 #'
 #' @examples
 distr <- function(qfun, ...) {
-
+  qfun <- match.fun(qfun)
+  d <- as.list(rlang::enquos(...))
+  d$qfun <- qfun
+  class(d) <- "distr"
+  return(d)
 }
