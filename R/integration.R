@@ -9,7 +9,7 @@
 #' @param cor correlation matrix to use for generating the integration points.
 #'   By default, this takes a weighted correlation matrix from all IPD studies.
 #' @param n_int number of integration points to generate, default 100
-#' @param sobol_args a named list of arguments to pass to [randtoolbox::sobol()]
+#' @param int_args a named list of arguments to pass to [randtoolbox::sobol()]
 #'
 #' @return An object of class [nma_data].
 #' @export
@@ -20,7 +20,7 @@
 #'   marginal distribution is then specified using the function [distr()].
 #'
 #' @examples
-add_integration <- function(network, ..., cor = NULL, n_int = 100L, sobol_args = list()) {
+add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = list()) {
   if (!inherits(network, "nma_data")) {
     abort("Expecting an `nma_data` object, as created by the `set_*` or `combine_network` functions.")
   }
