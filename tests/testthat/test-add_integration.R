@@ -26,4 +26,12 @@ test_that("int_args is named list", {
   expect_error(add_integration(smknet, int_args = NULL), m)
   expect_error(add_integration(smknet, int_args = list(a = 1, 2)), m)
 })
+
+test_that("covariate arguments should be named distr", {
+  m <- "should be specified as named arguments using the function `distr`"
+  expect_error(add_integration(smknet, x1 = "a"), m)
+  expect_error(add_integration(smknet, x1 = list()), m)
+  expect_error(add_integration(smknet, "a"), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = 1, sd = 1), x2 = list(), m))
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = 1, sd = 1), distr(qnorm, mean = 1, sd = 1), m))
 })
