@@ -51,7 +51,7 @@ print.nma_data <- function(x, ..., n = 10) {
   # Error if n is not an integer
   if (!is.numeric(n) | trunc(n) != n) abort("Argument `n` should be an integer")
 
-  if (!is.null(x$ipd)) {
+  if (has_ipd(x)) {
     s_ipd <- x$ipd %>%
       dplyr::distinct(.data$.study, .data$.trt) %>%
       dplyr::group_by(.data$.study) %>%
@@ -64,7 +64,7 @@ print.nma_data <- function(x, ..., n = 10) {
     n_ipd <- 0
   }
 
-  if (!is.null(x$agd_arm)) {
+  if (has_agd_arm(x)) {
     s_agd_arm <- x$agd_arm %>%
       dplyr::distinct(.data$.study, .data$.trt) %>%
       dplyr::group_by(.data$.study) %>%
@@ -77,7 +77,7 @@ print.nma_data <- function(x, ..., n = 10) {
     n_agd_arm <- 0
   }
 
-  if (!is.null(x$agd_contrast)) {
+  if (has_agd_contrast(x)) {
     s_agd_contrast <- x$agd_contrast %>%
       dplyr::distinct(.data$.study, .data$.trt, .data$.trt_b) %>%
       dplyr::group_by(.data$.study) %>%
