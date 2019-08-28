@@ -87,16 +87,18 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
       warn("Missing values found for some covariates in IPD. Calculating correlations using complete cases.")
     }
 
+    # Weighted z-transform average
     ipd_cors <-
       network$ipd %>%
       dplyr::group_by(.data$.study) %>%
-      dplyr::group_modify(
-        ~tibble::tibble(w = nrow(.) - 3,
-                r = cor(dplyr::select(., !! x_names), method = "spearman", use = "complete.obs"),
-                wcor = list(w * log((1 + r) / (1 - r)) / 2))) %>%
+      dplyr::group_modify(~tibble::tibble(
+        w = nrow(.) - 3,
+        r = list(cor(dplyr::select(., !! x_names), method = "spearman", use = "complete.obs"))
+        )) %>%
+      dplyr::mutate(z = purrr::map2(.data$w, .data$r, ~.x * log((1 + .y) / (1 - .y)) / 2))
 
-    ipd_cor <- {Reduce(`+`, ipd_cors$wcor) / sum(ipd_cors$w)} %>%
-      {(exp(2 * .) - 1) / (exp(2 * .) + 1)}
+    w_z <- Reduce(`+`, ipd_cors$z) / sum(ipd_cors$w)
+    ipd_cor <- (exp(2 * w_z) - 1) / (exp(2 * w_z) + 1)
 
     diag(ipd_cor) <- 1
 
