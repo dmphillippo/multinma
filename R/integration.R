@@ -159,6 +159,12 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
 #' @return An object of class [distr].
 #' @export
 #'
+#' @details The function `qfun` should have a formal argument called `p`. This
+#'   restriction serves as a crude check for inverse CDFs (e.g. an error will be
+#'   given if `dnorm` is used instead of `qnorm`). If a user-written CDF is
+#'   supplied, it must have an argument `p` which takes a vector of
+#'   probabilities.
+#'
 #' @examples
 distr <- function(qfun, ...) {
   d <- list(qfun = match.fun(qfun),
