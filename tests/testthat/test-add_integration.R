@@ -1,4 +1,5 @@
 library(multinma)
+library(dplyr)
 
 test_that("expects nma_data object", {
   expect_error(add_integration("uh oh"), "nma_data")
@@ -12,8 +13,29 @@ test_that("error if no AgD", {
   expect_error(add_integration(set_ipd(smoking, studyn, trtc, y = r)), "No aggregate data")
 })
 
-smknet <- set_agd_arm(smoking, studyn, trtc, r = r, n = n)
+# Make dummy covariate data for smoking network
+ns_agd <- max(smoking$studyn)
+smkdummy <-
+  smoking %>%
+  group_by(studyn) %>%
+  mutate(x1_mean = rnorm(1), x1_sd = runif(1, 0.5, 2),
+         x2 = runif(1))
+
 cormat <- matrix(c(1, 0.4, 0.4, 1), nrow = 2)
+
+cop <- copula::normalCopula(copula::P2p(cormat), dim = 2, dispstr = "un")
+u_cor <- as.data.frame(copula::cCopula(matrix(runif(400), ncol = 2), cop, inverse = TRUE))
+
+ipddummy <-
+  tibble(studyn = c(rep(ns_agd + 1, 100), rep(ns_agd + 2, 100)),
+         trtn = c(sample(c(1, 2), 100, TRUE),
+                  sample(c(1, 3), 100, TRUE))) %>%
+  mutate(x1 = qnorm(u_cor[,1]), x2 = qbinom(u_cor[,2], 1, 0.6),
+         r = rbinom(200, 1, 0.2))
+
+smknet_agd <- set_agd_arm(smkdummy, studyn, trtn, r = r, n = n)
+smknet_ipd <- set_ipd(ipddummy, studyn, trtn, r = r)
+smknet <- combine_network(smknet_agd, smknet_ipd)
 
 test_that("n_int should be a positive integer", {
   m <- "should be a positive integer"
@@ -42,7 +64,7 @@ test_that("cor should be correlation matrix or NULL", {
 })
 
 test_that("cor must be specified if no IPD", {
-  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = 1, sd = 1), cor = NULL),
+  expect_error(add_integration(smknet_agd, x1 = distr(qnorm, mean = 1, sd = 1), cor = NULL),
                "Specify a correlation matrix")
 })
 
