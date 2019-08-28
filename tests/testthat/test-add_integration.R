@@ -41,6 +41,11 @@ test_that("cor should be correlation matrix or NULL", {
   expect_error(add_integration(smknet, cor = matrix(1:4, nrow = 2)), m)
 })
 
+test_that("cor must be specified if no IPD", {
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = 1, sd = 1), cor = NULL),
+               "Specify a correlation matrix")
+})
+
 test_that("covariate arguments should be named distr", {
   m <- "should be specified as named arguments using the function `distr`"
   expect_error(add_integration(smknet, cor = cormat, x1 = "a"), m)

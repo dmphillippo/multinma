@@ -55,6 +55,8 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
         !all(eigen(cor, symmetric = TRUE)$values > 0)) {
       abort("cor should be a correlation matrix or NULL")
     }
+  } else {
+    if (is.null(network$ipd)) abort("Specify a correlation matrix using the `cor` argument, or provide IPD studies in the network.")
   }
 
   # Check covariate arguments
