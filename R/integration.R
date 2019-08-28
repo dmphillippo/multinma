@@ -163,6 +163,9 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
 distr <- function(qfun, ...) {
   d <- list(qfun = match.fun(qfun),
             args = rlang::enquos(...))
+  if (! "p" %in% rlang::fn_fmls_names(qfun)) {
+    abort("`qfun` should be an inverse CDF function (for example `qnorm`, `qgamma`, `qbinom`, ...) but does not appear to be (no formal argument `p`)")
+  }
   class(d) <- "distr"
   return(d)
 }
