@@ -21,7 +21,7 @@
 #'
 #' @examples
 add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = list()) {
-  # Checks
+  # Check network
   if (!inherits(network, "nma_data")) {
     abort("Expecting an `nma_data` object, as created by the `set_*` or `combine_network` functions.")
   }
@@ -30,14 +30,30 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
     abort("Empty network.")
   }
 
+  # Check n_int
   if (!is.numeric(n_int) || n_int != trunc(n_int) || n_int <= 0 || length(n_int) > 1) {
     abort("`n_int` should be a positive integer.")
   }
 
+  # Check int_args
   if (!is.list(int_args) || (!rlang::is_empty(int_args) && !rlang::is_named(int_args))) {
     abort("`int_args` should be a named list.")
   }
 
+  # Check cor
+  if (!is.null(cor)) {
+    tryCatch(cor <- as.matrix(cor),
+             error = function(e) abort("cor should be a correlation matrix or NULL"))
+
+    if (!is.numeric(cor) ||
+        !isSymmetric(cor) ||
+        !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)))) ||
+        !all(eigen(cor, symmetric = TRUE)$values > 0)) {
+      abort("cor should be a correlation matrix or NULL")
+    }
+  }
+
+  # Check covariate arguments
   ds <- list(...)
 
   if (any(purrr::map_lgl(ds, ~!inherits(., "distr"))) || !rlang::is_named(ds)) {

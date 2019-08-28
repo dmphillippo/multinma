@@ -27,6 +27,15 @@ test_that("int_args is named list", {
   expect_error(add_integration(smknet, int_args = list(a = 1, 2)), m)
 })
 
+test_that("cor should be correlation matrix or NULL", {
+  m <- "should be a correlation matrix or NULL"
+  expect_error(add_integration(smknet, cor = "a"), m)
+  expect_error(add_integration(smknet, cor = list()), m)
+  expect_error(add_integration(smknet, cor = 2), m)
+  expect_error(add_integration(smknet, cor = matrix(1:4)), m)
+  expect_error(add_integration(smknet, cor = matrix(1:4, nrow = 2)), m)
+})
+
 test_that("covariate arguments should be named distr", {
   m <- "should be specified as named arguments using the function `distr`"
   expect_error(add_integration(smknet, x1 = "a"), m)
