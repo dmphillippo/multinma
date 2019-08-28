@@ -24,7 +24,7 @@ Imports:
     rstantools (>= 2.0.0.9000),
     Rdpack (>= 0.7),
     tibble,
-    dplyr,
+    dplyr (>= 0.8.1),
     rlang,
     purrr,
     forcats,
