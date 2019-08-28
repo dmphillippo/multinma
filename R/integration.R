@@ -30,6 +30,10 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
     abort("Empty network.")
   }
 
+  if (is.null(network$agd_arm) && is.null(network$agd_contrast)) {
+    abort("No aggregate data found in network.")
+  }
+
   # Check n_int
   if (!is.numeric(n_int) || n_int != trunc(n_int) || n_int <= 0 || length(n_int) > 1) {
     abort("`n_int` should be a positive integer.")

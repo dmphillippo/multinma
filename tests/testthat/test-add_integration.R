@@ -8,6 +8,10 @@ test_that("error on empty network", {
   expect_error(add_integration(set_ipd(data.frame())), "Empty network")
 })
 
+test_that("error if no AgD", {
+  expect_error(add_integration(set_ipd(smoking, studyn, trtc, y = r)), "No aggregate data")
+})
+
 smknet <- set_agd_arm(smoking, studyn, trtc, r = r, n = n)
 
 test_that("n_int should be a positive integer", {
