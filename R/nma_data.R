@@ -429,3 +429,24 @@ check_outcome_binary <- function(r, E) {
   }
   return(list(r = r, E = E))
 }
+
+#' Check for IPD and AgD in network
+#'
+#' @param network nma_data object
+#'
+#' @return logical TRUE/FALSE
+#' @noRd
+has_ipd <- function(network) {
+  if (!inherits(network, "nma_data")) abort("Not nma_data object.")
+  return(!rlang::is_empty(network$ipd))
+}
+
+has_agd_arm <- function(network) {
+  if (!inherits(network, "nma_data")) abort("Not nma_data object.")
+  return(!rlang::is_empty(network$agd_arm))
+}
+
+has_agd_contrast <- function(network) {
+  if (!inherits(network, "nma_data")) abort("Not nma_data object.")
+  return(!rlang::is_empty(network$agd_contrast))
+}
