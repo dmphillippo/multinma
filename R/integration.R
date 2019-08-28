@@ -60,9 +60,14 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
   # Check covariate arguments
   ds <- list(...)
 
+  if (length(ds) == 0) {
+    abort("No covariate distributions specified. Covariate distributions should be specified as named arguments using the function `distr`.")
+  }
+
   if (any(purrr::map_lgl(ds, ~!inherits(., "distr"))) || !rlang::is_named(ds)) {
     abort("Covariate distributions should be specified as named arguments using the function `distr`.")
   }
+
 }
 
 

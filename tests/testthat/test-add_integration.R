@@ -13,6 +13,7 @@ test_that("error if no AgD", {
 })
 
 smknet <- set_agd_arm(smoking, studyn, trtc, r = r, n = n)
+cormat <- matrix(c(1, 0.4, 0.4, 1), nrow = 2)
 
 test_that("n_int should be a positive integer", {
   m <- "should be a positive integer"
@@ -42,9 +43,12 @@ test_that("cor should be correlation matrix or NULL", {
 
 test_that("covariate arguments should be named distr", {
   m <- "should be specified as named arguments using the function `distr`"
-  expect_error(add_integration(smknet, x1 = "a"), m)
-  expect_error(add_integration(smknet, x1 = list()), m)
-  expect_error(add_integration(smknet, "a"), m)
-  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = 1, sd = 1), x2 = list(), m))
-  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = 1, sd = 1), distr(qnorm, mean = 1, sd = 1), m))
+  expect_error(add_integration(smknet, cor = cormat, x1 = "a"), m)
+  expect_error(add_integration(smknet, cor = cormat, x1 = list()), m)
+  expect_error(add_integration(smknet, cor = cormat, "a"), m)
+  expect_error(add_integration(smknet, cor = cormat,
+                               x1 = distr(qnorm, mean = 1, sd = 1), x2 = list(), m))
+  expect_error(add_integration(smknet, cor = cormat,
+                               x1 = distr(qnorm, mean = 1, sd = 1), distr(qnorm, mean = 1, sd = 1), m))
+  expect_error(add_integration(smknet, cor = cormat), paste("No covariate distributions specified.+", m))
 })
