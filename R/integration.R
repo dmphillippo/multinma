@@ -71,10 +71,10 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
   }
 
   x_names <- names(ds)
-  nd <- length(ds)
+  nx <- length(ds)
 
   # Use weighted average correlation matrix from IPD, if cor = NULL
-  if (is.null(cor)) {
+  if (is.null(cor) && nx > 1) {
     inform("Using weighted average correlation matrix computed from IPD studies.")
 
     # Check whether covariate names are in IPD
@@ -105,6 +105,45 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
     cor <- ipd_cor
   }
 
+  # Generate Sobol points
+  u <- do.call(randtoolbox::sobol, purrr::list_modify(list(n = n_int, dim = nx), !!! int_args))
+
+  # Correlate Sobol points with Gaussian copula
+  if (nx > 1) {
+    cop <- copula::normalCopula(copula::P2p(cor), dim = nx, dispstr = "un")
+    u_cor <- copula::cCopula(u, copula = cop, inverse = TRUE)
+    # columns to list
+    u_cor_l <- purrr::array_branch(u_cor, 2)
+  } else {
+    u_cor <- u
+    u_cor_l <- list(u_cor)
+  }
+
+  # Use inverse CDFs to get integration points for specified marginals
+  out <- network
+  x_int_names <- paste0(".int_", x_names)
+
+  if (has_agd_arm(network)) {
+    out$agd_arm <-
+      dplyr::bind_cols(
+        network$agd_arm,
+        purrr::pmap_dfc(list(x_int_names, ds, u_cor_l),
+                        ~ rowwise(network$agd_arm) %>%
+                          transmute(!! ..1 := list(rlang::eval_tidy(rlang::call2(..2$qfun, p = ..3, !!! ..2$args)))))
+      )
+  }
+
+  if (has_agd_contrast(network)) {
+    out$agd_contrast <-
+      dplyr::bind_cols(
+        network$agd_contrast,
+        purrr::pmap_dfc(list(x_int_names, ds, u_cor_l),
+                        ~ rowwise(network$agd_contrast) %>%
+                          transmute(!! ..1 := list(rlang::eval_tidy(rlang::call2(..2$qfun, p = ..3, !!! ..2$args)))))
+      )
+  }
+
+  return(out)
 }
 
 
@@ -122,9 +161,8 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
 #'
 #' @examples
 distr <- function(qfun, ...) {
-  qfun <- match.fun(qfun)
-  d <- as.list(rlang::enquos(...))
-  d$qfun <- qfun
+  d <- list(qfun = match.fun(qfun),
+            args = rlang::enquos(...))
   class(d) <- "distr"
   return(d)
 }
