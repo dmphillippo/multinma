@@ -70,6 +70,39 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
     abort("Covariate distributions should be specified as named arguments using the function `distr`.")
   }
 
+  x_names <- names(ds)
+  nd <- length(ds)
+
+  # Use weighted average correlation matrix from IPD, if cor = NULL
+  if (is.null(cor)) {
+    inform("Using weighted average correlation matrix computed from IPD studies.")
+
+    # Check whether covariate names are in IPD
+    if (any(! x_names %in% colnames(network$ipd))) {
+      abort("Matching covariate name(s) not found in IPD.")
+    }
+
+    # Check for any missing covariates
+    if (!all(complete.cases(dplyr::select(network$ipd, !! x_names)))) {
+      warn("Missing values found for some covariates in IPD. Calculating correlations using complete cases.")
+    }
+
+    ipd_cors <-
+      network$ipd %>%
+      dplyr::group_by(.data$.study) %>%
+      dplyr::group_modify(
+        ~tibble::tibble(w = nrow(.) - 3,
+                r = cor(dplyr::select(., !! x_names), method = "spearman", use = "complete.obs"),
+                wcor = list(w * log((1 + r) / (1 - r)) / 2))) %>%
+
+    ipd_cor <- {Reduce(`+`, ipd_cors$wcor) / sum(ipd_cors$w)} %>%
+      {(exp(2 * .) - 1) / (exp(2 * .) + 1)}
+
+    diag(ipd_cor) <- 1
+
+    cor <- ipd_cor
+  }
+
 }
 
 
