@@ -32,6 +32,10 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
   if (!is.numeric(n_int) || n_int != trunc(n_int) || n_int <= 0 || length(n_int) > 1) {
     abort("`n_int` should be a positive integer.")
   }
+
+  if (!is.list(int_args) || (!rlang::is_empty(int_args) && !rlang::is_named(int_args))) {
+    abort("`int_args` should be a named list.")
+  }
 }
 
 
