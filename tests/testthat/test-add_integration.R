@@ -91,3 +91,12 @@ test_that("covariate names must match IPD if provided", {
                                aaa = distr(qbinom, size = 1, prob = x2),
                                cor = cormat), m)
 })
+
+test_that("warning if missing covariate values when calculating correlations from IPD", {
+  smknet_miss <- smknet
+  smknet_miss$ipd[5, "x1"] <- NA
+  expect_warning(add_integration(smknet_miss,
+                                 x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                 x2 = distr(qbinom, size = 1, prob = x2)),
+                 "Missing values.+complete cases")
+})
