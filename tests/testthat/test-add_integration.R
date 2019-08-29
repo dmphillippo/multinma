@@ -79,3 +79,15 @@ test_that("covariate arguments should be named distr", {
                                x1 = distr(qnorm, mean = 1, sd = 1), distr(qnorm, mean = 1, sd = 1), m))
   expect_error(add_integration(smknet, cor = cormat), paste("No covariate distributions specified.+", m))
 })
+
+test_that("covariate names must match IPD if provided", {
+  m <- "Covariate name\\(s\\) not found in IPD: aaa"
+  expect_error(add_integration(smknet, aaa = distr(qnorm, mean = x1_mean, sd = x1_sd)), m)
+  expect_error(add_integration(smknet,
+                               x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               aaa = distr(qbinom, size = 1, prob = x2)), m)
+  expect_error(add_integration(smknet,
+                               x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               aaa = distr(qbinom, size = 1, prob = x2),
+                               cor = cormat), m)
+})

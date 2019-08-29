@@ -73,14 +73,16 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
   x_names <- names(ds)
   nx <- length(ds)
 
+  # If IPD is provided, check that covariate names match
+  if (has_ipd(network) && any(! x_names %in% colnames(network$ipd))) {
+    abort(paste0("Covariate name(s) not found in IPD: ",
+                 paste0(setdiff(x_names, colnames(network$ipd)), collapse = ", ")))
+  }
+
   # Use weighted average correlation matrix from IPD, if cor = NULL
   if (is.null(cor) && nx > 1) {
     inform("Using weighted average correlation matrix computed from IPD studies.")
 
-    # Check whether covariate names are in IPD
-    if (any(! x_names %in% colnames(network$ipd))) {
-      abort("Matching covariate name(s) not found in IPD.")
-    }
 
     # Check for any missing covariates
     if (!all(complete.cases(dplyr::select(network$ipd, !! x_names)))) {
