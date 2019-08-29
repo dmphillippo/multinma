@@ -1,5 +1,6 @@
 library(multinma)
 library(dplyr)
+library(purrr)
 
 test_that("expects nma_data object", {
   expect_error(add_integration("uh oh"), "nma_data")
@@ -21,17 +22,20 @@ smkdummy <-
   mutate(x1_mean = rnorm(1), x1_sd = runif(1, 0.5, 2),
          x2 = runif(1))
 
-cormat <- matrix(c(1, 0.4, 0.4, 1), nrow = 2)
+smk_cor <- 0.4
+smk_n <- 200
+cormat <- matrix(c(1, smk_cor, smk_cor, 1), nrow = 2)
 
 cop <- copula::normalCopula(copula::P2p(cormat), dim = 2, dispstr = "un")
-u_cor <- as.data.frame(copula::cCopula(matrix(runif(400), ncol = 2), cop, inverse = TRUE))
+u <- matrix(runif(smk_n * 2), ncol = 2)
+u_cor <- as.data.frame(copula::cCopula(u, cop, inverse = TRUE))
 
 ipddummy <-
-  tibble(studyn = c(rep(ns_agd + 1, 100), rep(ns_agd + 2, 100)),
-         trtn = c(sample(c(1, 2), 100, TRUE),
-                  sample(c(1, 3), 100, TRUE))) %>%
+  tibble(studyn = c(rep(ns_agd + 1, smk_n/2), rep(ns_agd + 2, smk_n/2)),
+         trtn = c(sample(c(1, 2), smk_n/2, TRUE),
+                  sample(c(1, 3), smk_n/2, TRUE))) %>%
   mutate(x1 = qnorm(u_cor[,1]), x2 = qbinom(u_cor[,2], 1, 0.6),
-         r = rbinom(200, 1, 0.2))
+         r = rbinom(smk_n, 1, 0.2))
 
 smknet_agd <- set_agd_arm(smkdummy, studyn, trtn, r = r, n = n)
 smknet_ipd <- set_ipd(ipddummy, studyn, trtn, r = r)
@@ -99,4 +103,38 @@ test_that("warning if missing covariate values when calculating correlations fro
                                  x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
                                  x2 = distr(qbinom, size = 1, prob = x2)),
                  "Missing values.+complete cases")
+})
+
+test_that("integration point marginals and correlations are correct", {
+  skip_on_cran()
+  tol <- 0.01
+  n_int <- 1000
+
+  # 1 covariate
+  a <- add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = n_int)
+  expect_equal(map_dbl(a$agd_arm$.int_x1, mean), a$agd_arm$x1_mean, tolerance = tol)
+  expect_equal(map_dbl(a$agd_arm$.int_x1, sd), a$agd_arm$x1_sd, tolerance = tol)
+
+  # 2 covariates, IPD cor matrix
+  b <- add_integration(smknet,
+                       x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                       x2 = distr(qbinom, size = 1, prob = x2),
+                       n_int = n_int)
+  expect_equal(map_dbl(b$agd_arm$.int_x1, mean), b$agd_arm$x1_mean, tolerance = tol)
+  expect_equal(map_dbl(b$agd_arm$.int_x1, sd), b$agd_arm$x1_sd, tolerance = tol)
+  expect_equal(map_dbl(b$agd_arm$.int_x2, mean), b$agd_arm$x2, tolerance = tol)
+  expect_equal(map2_dbl(b$agd_arm$.int_x1, b$agd_arm$.int_x2, cor),
+               rep(smk_cor, nrow(b$agd_arm)), tolerance = tol)
+
+  # 2 covariates, user cor matrix
+  c <- add_integration(smknet,
+                       x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                       x2 = distr(qbinom, size = 1, prob = x2),
+                       cor = cormat,
+                       n_int = n_int)
+  expect_equal(map_dbl(c$agd_arm$.int_x1, mean), c$agd_arm$x1_mean, tolerance = tol)
+  expect_equal(map_dbl(c$agd_arm$.int_x1, sd), c$agd_arm$x1_sd, tolerance = tol)
+  expect_equal(map_dbl(c$agd_arm$.int_x2, mean), c$agd_arm$x2, tolerance = tol)
+  expect_equal(map2_dbl(c$agd_arm$.int_x1, c$agd_arm$.int_x2, cor),
+               rep(smk_cor, nrow(c$agd_arm)), tolerance = tol)
 })
