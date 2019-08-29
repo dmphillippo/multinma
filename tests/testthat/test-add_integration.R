@@ -22,20 +22,21 @@ smkdummy <-
   mutate(x1_mean = rnorm(1), x1_sd = runif(1, 0.5, 2),
          x2 = runif(1))
 
-smk_cor <- 0.4
-smk_n <- 200
-cormat <- matrix(c(1, smk_cor, smk_cor, 1), nrow = 2)
+ns_ipd <- 5
+
+x1_x2_cor <- 0.4
+n_i <- 200
+cormat <- matrix(c(1, x1_x2_cor, x1_x2_cor, 1), nrow = 2)
 
 cop <- copula::normalCopula(copula::P2p(cormat), dim = 2, dispstr = "un")
-u <- matrix(runif(smk_n * 2), ncol = 2)
+u <- matrix(runif(n_i * 2 * ns_ipd), ncol = 2)
 u_cor <- as.data.frame(copula::cCopula(u, cop, inverse = TRUE))
 
 ipddummy <-
-  tibble(studyn = c(rep(ns_agd + 1, smk_n/2), rep(ns_agd + 2, smk_n/2)),
-         trtn = c(sample(c(1, 2), smk_n/2, TRUE),
-                  sample(c(1, 3), smk_n/2, TRUE))) %>%
+  tibble(studyn = rep(ns_agd, n_i * ns_ipd) + rep(1:ns_ipd, each = n_i),
+         trtn = sample(1:2, n_i * ns_ipd, TRUE)) %>%
   mutate(x1 = qnorm(u_cor[,1]), x2 = qbinom(u_cor[,2], 1, 0.6),
-         r = rbinom(smk_n, 1, 0.2))
+         r = rbinom(n(), 1, 0.2))
 
 smknet_agd <- set_agd_arm(smkdummy, studyn, trtn, r = r, n = n)
 smknet_ipd <- set_ipd(ipddummy, studyn, trtn, r = r)
@@ -124,7 +125,7 @@ test_that("integration point marginals and correlations are correct", {
   expect_equal(map_dbl(b$agd_arm$.int_x1, sd), b$agd_arm$x1_sd, tolerance = tol)
   expect_equal(map_dbl(b$agd_arm$.int_x2, mean), b$agd_arm$x2, tolerance = tol)
   expect_equal(map2_dbl(b$agd_arm$.int_x1, b$agd_arm$.int_x2, cor),
-               rep(smk_cor, nrow(b$agd_arm)), tolerance = tol)
+               rep(x1_x2_cor, nrow(b$agd_arm)), tolerance = tol)
 
   # 2 covariates, user cor matrix
   c <- add_integration(smknet,
@@ -136,5 +137,5 @@ test_that("integration point marginals and correlations are correct", {
   expect_equal(map_dbl(c$agd_arm$.int_x1, sd), c$agd_arm$x1_sd, tolerance = tol)
   expect_equal(map_dbl(c$agd_arm$.int_x2, mean), c$agd_arm$x2, tolerance = tol)
   expect_equal(map2_dbl(c$agd_arm$.int_x1, c$agd_arm$.int_x2, cor),
-               rep(smk_cor, nrow(c$agd_arm)), tolerance = tol)
+               rep(x1_x2_cor, nrow(c$agd_arm)), tolerance = tol)
 })
