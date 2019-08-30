@@ -117,39 +117,39 @@ test_that("integration point marginals and correlations are correct", {
   n_int <- 10000
 
   # 1 covariate
-  a <- add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = n_int)
-  expect_equal(map_dbl(a$agd_arm$.int_x1, mean), a$agd_arm$x1_mean, tolerance = tol)
-  expect_equal(map_dbl(a$agd_arm$.int_x1, sd), a$agd_arm$x1_sd, tolerance = tol)
+  s1 <- add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = n_int)
+  expect_equal(map_dbl(s1$agd_arm$.int_x1, mean), s1$agd_arm$x1_mean, tolerance = tol)
+  expect_equal(map_dbl(s1$agd_arm$.int_x1, sd), s1$agd_arm$x1_sd, tolerance = tol)
 
   # 2 covariates, IPD cor matrix
-  b <- add_integration(smknet,
+  s2 <- add_integration(smknet,
                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
                        x2 = distr(qbinom, size = 1, prob = x2),
                        x3 = distr(qnorm, mean = x3_mean, sd = x3_sd),
                        n_int = n_int)
-  expect_equal(map_dbl(b$agd_arm$.int_x1, mean), b$agd_arm$x1_mean, tolerance = tol)
-  expect_equal(map_dbl(b$agd_arm$.int_x1, sd), b$agd_arm$x1_sd, tolerance = tol)
-  expect_equal(map_dbl(b$agd_arm$.int_x2, mean), b$agd_arm$x2, tolerance = tol)
-  expect_equal(map2_dbl(b$agd_arm$.int_x1, b$agd_arm$.int_x3, cor, method = "spearman"),
-               rep(x1_x2_cor, nrow(b$agd_arm)), tolerance = cor_tol)
+  expect_equal(map_dbl(s2$agd_arm$.int_x1, mean), s2$agd_arm$x1_mean, tolerance = tol)
+  expect_equal(map_dbl(s2$agd_arm$.int_x1, sd), s2$agd_arm$x1_sd, tolerance = tol)
+  expect_equal(map_dbl(s2$agd_arm$.int_x2, mean), s2$agd_arm$x2, tolerance = tol)
+  expect_equal(map2_dbl(s2$agd_arm$.int_x1, s2$agd_arm$.int_x3, cor, method = "spearman"),
+               rep(x1_x2_cor, nrow(s2$agd_arm)), tolerance = cor_tol)
 
   # 2 covariates, user cor matrix
-  c <- add_integration(smknet,
+  s3 <- add_integration(smknet,
                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
                        x2 = distr(qbinom, size = 1, prob = x2),
                        x3 = distr(qnorm, mean = x3_mean, sd = x3_sd),
                        cor = cormat,
                        n_int = n_int)
-  expect_equal(map_dbl(c$agd_arm$.int_x1, mean), c$agd_arm$x1_mean, tolerance = tol)
-  expect_equal(map_dbl(c$agd_arm$.int_x1, sd), c$agd_arm$x1_sd, tolerance = tol)
-  expect_equal(map_dbl(c$agd_arm$.int_x2, mean), c$agd_arm$x2, tolerance = tol)
-  expect_equal(map2_dbl(c$agd_arm$.int_x1, c$agd_arm$.int_x3, cor, method = "spearman"),
-               rep(x1_x2_cor, nrow(c$agd_arm)), tolerance = cor_tol)
+  expect_equal(map_dbl(s3$agd_arm$.int_x1, mean), s3$agd_arm$x1_mean, tolerance = tol)
+  expect_equal(map_dbl(s3$agd_arm$.int_x1, sd), s3$agd_arm$x1_sd, tolerance = tol)
+  expect_equal(map_dbl(s3$agd_arm$.int_x2, mean), s3$agd_arm$x2, tolerance = tol)
+  expect_equal(map2_dbl(s3$agd_arm$.int_x1, s3$agd_arm$.int_x3, cor, method = "spearman"),
+               rep(x1_x2_cor, nrow(s3$agd_arm)), tolerance = cor_tol)
 
   # Correlations between continuous and discrete seem hard to produce from the copula
   skip("Correlations between continuous and discrete covariates are difficult to recreate")
-  expect_equal(map2_dbl(b$agd_arm$.int_x1, b$agd_arm$.int_x2, cor, method = "spearman"),
-               rep(x1_x2_cor, nrow(b$agd_arm)), tolerance = cor_tol)
-  expect_equal(map2_dbl(c$agd_arm$.int_x1, c$agd_arm$.int_x2, cor, method = "spearman"),
-               rep(x1_x2_cor, nrow(c$agd_arm)), tolerance = cor_tol)
+  expect_equal(map2_dbl(s2$agd_arm$.int_x1, s2$agd_arm$.int_x2, cor, method = "spearman"),
+               rep(x1_x2_cor, nrow(s2$agd_arm)), tolerance = cor_tol)
+  expect_equal(map2_dbl(s3$agd_arm$.int_x1, s3$agd_arm$.int_x2, cor, method = "spearman"),
+               rep(x1_x2_cor, nrow(s3$agd_arm)), tolerance = cor_tol)
 })
