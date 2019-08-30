@@ -140,6 +140,8 @@ print.nma_data <- function(x, ..., n = 10) {
   cglue("Total number of treatments: {length(x$treatments)}")
   cglue("Total number of studies: {length(x$studies)}")
   cglue("Reference treatment is: {levels(x$treatments)[1]}")
+
+  invisible(x)
 }
 
 #' Make section headers for print.nma_class
