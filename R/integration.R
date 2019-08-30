@@ -147,6 +147,7 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
 
   # Set as mlnmr_data class
   out$n_int <- n_int
+  out$int_names <- x_names
   class(out) <- c("mlnmr_data", "nma_data")
   return(out)
 }
