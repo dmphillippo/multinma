@@ -2,11 +2,13 @@
 #'
 #' The `nma_data` class contains the data for a NMA in a standard format,
 #' created using the functions [set_ipd()], [set_agd_arm()],
-#' [set_agd_contrast()], or [combine_network()].
+#' [set_agd_contrast()], or [combine_network()]. The sub-class `mlnmr_data` is
+#' created by the function [add_integration()], and further contains numerical
+#' integration points for the aggregate data.
 #'
 #' @rdname nma_data-class
 #' @name nma_data-class
-#' @aliases nma_data
+#' @aliases nma_data mlnmr_data mlnmr_data-class
 #'
 #' @details Objects of class `nma_data` have the following components:
 #'   \describe{
@@ -33,6 +35,15 @@
 #'   \item{`...`}{other columns (typically covariates) from the original data
 #'   frame}
 #'   }
+#'
+#' Objects of class `mlnmr_data` additionally have components:
+#'   \describe{
+#'   \item{`n_int`}{number of numerical integration points}
+#'   }
+#'
+#' The `agd_arm` and `agd_contrast` tibbles have additional list columns with
+#' prefix `.int_`, one for each covariate, which contain the numerical
+#' integration points nested as length-`n_int` vectors within each row.
 #'
 NULL
 
