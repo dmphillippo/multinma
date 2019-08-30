@@ -105,9 +105,9 @@ print.nma_data <- function(x, ..., n = 10) {
   }
 
   if (all(n_ipd == 0, n_agd_arm == 0, n_agd_contrast == 0)) {
-    cglue("An empty `{class(x)[1]}` object.")
+    cglue("An empty network.")
   } else {
-    cglue("A `{class(x)[1]}` object with ", glue::glue_collapse(c(
+    cglue("A network with ", glue::glue_collapse(c(
       "{n_ipd} IPD stud{ifelse(n_ipd == 1, 'y', 'ies')}",
       "{n_agd_arm} AgD stud{ifelse(n_agd_arm == 1, 'y', 'ies')} (arm-based)",
       "{n_agd_contrast} AgD stud{ifelse(n_agd_contrast == 1, 'y', 'ies')} (contrast-based)"
