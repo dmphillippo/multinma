@@ -145,6 +145,18 @@ print.nma_data <- function(x, ..., n = 10) {
   invisible(x)
 }
 
+#' @describeIn print.nma_data
+#' @export
+print.mlnmr_data <- function(x, ..., n = 10) {
+  NextMethod()
+  cat("\n")
+  sec_header("Numerical integration")
+  cglue("Numerical integration points available for {length(x$int_names)} covariates: ")
+  cat(" ", x$int_names, "\n")
+  cglue("Number of numerical integration points: {n_int}")
+  invisible(x)
+}
+
 #' Make section headers for print.nma_class
 #'
 #' @param s section header string
