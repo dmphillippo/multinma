@@ -152,7 +152,7 @@ print.mlnmr_data <- function(x, ..., n = 10) {
   cat("\n")
   sec_header("Numerical integration")
   cglue("Numerical integration points available for {length(x$int_names)} covariates: ")
-  cat(" ", x$int_names, "\n")
+  cat(x$int_names, fill = TRUE, labels = " ")
   cglue("Number of numerical integration points: {n_int}")
   invisible(x)
 }
