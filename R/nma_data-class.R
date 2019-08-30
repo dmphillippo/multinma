@@ -168,7 +168,7 @@ sec_header <- function(s = "",
                        width = min(80, getOption("width")),
                        sep = ifelse(nchar(s), " ", "")) {
   cat(subtle(strrep('-', width - nchar(s) - 2*nchar(sep))),
-      s,
+      crayon::bold(s),
       subtle("----"), "\n", sep = sep)
 }
 
