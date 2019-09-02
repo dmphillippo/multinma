@@ -34,7 +34,19 @@ cauchy <- function(median = 0, sd) {
 
 #' @rdname priors
 #' @export
+half_cauchy <- function(sd) {
+
+}
+
+#' @rdname priors
+#' @export
 student_t <- function(mean = 0, sd, df) {
+
+}
+
+#' @rdname priors
+#' @export
+half_student_t <- function(sd, df) {
 
 }
 
