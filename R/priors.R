@@ -21,12 +21,16 @@
 normal <- function(mean = 0, sd) {
   check_prior_location(mean)
   check_prior_scale(sd)
+
+  return(new_nma_prior("normal", mean = mean, sd = sd))
 }
 
 #' @rdname priors
 #' @export
 half_normal <- function(sd) {
   check_prior_scale(sd)
+
+  return(new_nma_prior("half-normal", sd = sd))
 }
 
 #' @rdname priors
@@ -34,12 +38,16 @@ half_normal <- function(sd) {
 cauchy <- function(median = 0, scale) {
   check_prior_location(median, type = "median")
   check_prior_scale(scale, type = "scale")
+
+  return(new_nma_prior("cauchy", median = median, scale = scale))
 }
 
 #' @rdname priors
 #' @export
 half_cauchy <- function(scale) {
   check_prior_scale(scale, type = "scale")
+
+  return(new_nma_prior("half-cauchy", scale = scale))
 }
 
 #' @rdname priors
@@ -48,6 +56,8 @@ student_t <- function(mean = 0, sd, df) {
   check_prior_location(mean)
   check_prior_scale(sd)
   check_prior_scale(df, type = "degrees of freedom")
+
+  return(new_nma_prior("student t", mean = mean, sd = sd, df = df))
 }
 
 #' @rdname priors
@@ -55,12 +65,16 @@ student_t <- function(mean = 0, sd, df) {
 half_student_t <- function(sd, df) {
   check_prior_scale(sd)
   check_prior_scale(df, type = "degrees of freedom")
+
+  return(new_nma_prior("half-student t", sd = sd, df = df))
 }
 
 #' @rdname priors
 #' @export
 exponential <- function(rate) {
   check_prior_scale(rate, type = "rate")
+
+  return(new_nma_prior("exponential", rate = rate))
 }
 
 #' @rdname priors
@@ -68,6 +82,8 @@ exponential <- function(rate) {
 uniform <- function(lower, upper) {
   check_prior_location(lower, type = "lower limit")
   check_prior_location(lower, type = "upper limit")
+
+  return(new_nma_prior("uniform", lower = lower, upper = upper))
 }
 
 # Check functions
