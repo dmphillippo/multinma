@@ -13,7 +13,7 @@
 #' @rdname priors
 #' @aliases normal
 #'
-#' @return Object of class [prior].
+#' @return Object of class [nma_prior].
 #' @export
 #'
 #' @examples
