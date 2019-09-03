@@ -11,7 +11,8 @@
 #' @param lower,upper Lower and upper bounds for a uniform prior distribution.
 #'
 #' @rdname priors
-#' @aliases normal
+#' @name priors
+#' @aliases priors normal
 #'
 #' @return Object of class [nma_prior].
 #' @export
