@@ -99,7 +99,7 @@ check_prior_scale <- function(x, type = "standard deviation") {
 }
 
 new_nma_prior <- function(dist, ...) {
-  o <- rlang::list2(dist = dist, !!! ...)
+  o <- list(dist = dist, ...)
   class(o) <- "nma_prior"
   return(o)
 }
