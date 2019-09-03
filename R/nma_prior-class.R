@@ -15,3 +15,11 @@
 #' The distribution parameters, specified as named components in `...`, match
 #' those in the constructor functions (see [priors]).
 NULL
+
+#' @export
+#' @noRd
+print.nma_prior <- function(x, ...) {
+  p <- purrr::list_modify(x, dist = purrr::zap())
+  cglue("A {x$dist} prior distribution: {paste(names(p), p, sep = ' = ', collapse = ', ')}.")
+  invisible(x)
+}

@@ -2,6 +2,7 @@
 
 S3method(print,mlnmr_data)
 S3method(print,nma_data)
+S3method(print,nma_prior)
 export(add_integration)
 export(cauchy)
 export(combine_network)
