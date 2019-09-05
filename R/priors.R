@@ -22,7 +22,7 @@ normal <- function(mean = 0, sd) {
   check_prior_location(mean)
   check_prior_scale(sd)
 
-  return(new_nma_prior("normal", mean = mean, sd = sd))
+  return(new_nma_prior("Normal", mean = mean, sd = sd))
 }
 
 #' @rdname priors
@@ -30,7 +30,7 @@ normal <- function(mean = 0, sd) {
 half_normal <- function(sd) {
   check_prior_scale(sd)
 
-  return(new_nma_prior("half-normal", sd = sd))
+  return(new_nma_prior("half-Normal", sd = sd))
 }
 
 #' @rdname priors
@@ -39,7 +39,7 @@ cauchy <- function(median = 0, scale) {
   check_prior_location(median, type = "median")
   check_prior_scale(scale, type = "scale")
 
-  return(new_nma_prior("cauchy", median = median, scale = scale))
+  return(new_nma_prior("Cauchy", median = median, scale = scale))
 }
 
 #' @rdname priors
@@ -47,7 +47,7 @@ cauchy <- function(median = 0, scale) {
 half_cauchy <- function(scale) {
   check_prior_scale(scale, type = "scale")
 
-  return(new_nma_prior("half-cauchy", scale = scale))
+  return(new_nma_prior("half-Cauchy", scale = scale))
 }
 
 #' @rdname priors
@@ -57,7 +57,7 @@ student_t <- function(mean = 0, sd, df) {
   check_prior_scale(sd)
   check_prior_scale(df, type = "degrees of freedom")
 
-  return(new_nma_prior("student t", mean = mean, sd = sd, df = df))
+  return(new_nma_prior("Student t", mean = mean, sd = sd, df = df))
 }
 
 #' @rdname priors
@@ -66,7 +66,7 @@ half_student_t <- function(sd, df) {
   check_prior_scale(sd)
   check_prior_scale(df, type = "degrees of freedom")
 
-  return(new_nma_prior("half-student t", sd = sd, df = df))
+  return(new_nma_prior("half-Student t", sd = sd, df = df))
 }
 
 #' @rdname priors
@@ -74,7 +74,7 @@ half_student_t <- function(sd, df) {
 exponential <- function(rate) {
   check_prior_scale(rate, type = "rate")
 
-  return(new_nma_prior("exponential", rate = rate))
+  return(new_nma_prior("Exponential", rate = rate))
 }
 
 #' @rdname priors
@@ -83,7 +83,7 @@ uniform <- function(lower, upper) {
   check_prior_location(lower, type = "lower limit")
   check_prior_location(lower, type = "upper limit")
 
-  return(new_nma_prior("uniform", lower = lower, upper = upper))
+  return(new_nma_prior("Uniform", lower = lower, upper = upper))
 }
 
 # Check functions
