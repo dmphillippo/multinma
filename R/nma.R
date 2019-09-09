@@ -38,11 +38,41 @@ nma <- function(network,
                 ...,
                 prior_intercept = normal(sd = 10),
                 prior_trt = normal(sd = 10),
-                prior_het = normal(sd = 5),
+                prior_het = half_normal(sd = 5),
                 prior_reg = normal(sd = 10),
                 prior_aux = normal(sd = 5),
                 QR = FALSE,
                 adapt_delta = NULL) {
+
+  # Check network
+  if (!inherits(network, "nma_data")) {
+    abort("Expecting an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
+  }
+
+  if (all(purrr::map_lgl(network, is.null))) {
+    abort("Empty network.")
+  }
+
+  # Check model arguments
+  consistency <- rlang::arg_match(consistency)
+  trt_effects <- rlang::arg_match(trt_effects)
+
+  if (!rlang::is_formula(regression, lhs = FALSE)) {
+    abort("`regression` should be a one-sided formula.")
+  }
+
+  # Check priors
+  if (!inherits(prior_intercept, "nma_prior")) abort("`prior_intercept` should be a prior distribution, see ?priors.")
+  if (!inherits(prior_trt, "nma_prior")) abort("`prior_trt` should be a prior distribution, see ?priors.")
+  if (!inherits(prior_het, "nma_prior")) abort("`prior_het` should be a prior distribution, see ?priors.")
+  if (!inherits(prior_reg, "nma_prior")) abort("`prior_reg` should be a prior distribution, see ?priors.")
+  if (!inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
+
+  # Check other args
+  if (!is.logical(QR) || length(QR) > 1) abort("`QR` should be a logical scalar (TRUE or FALSE).")
+  if (!is.numeric(adapt_delta) ||
+      length(adapt_delta) > 1 ||
+      adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
 }
 
@@ -67,10 +97,31 @@ nma.fit <- function(ipd_x, ipd_y,
                     ...,
                     prior_intercept = normal(sd = 10),
                     prior_trt = normal(sd = 10),
-                    prior_het = normal(sd = 5),
+                    prior_het = half_normal(sd = 5),
                     prior_reg = normal(sd = 10),
                     prior_aux = normal(sd = 5),
                     QR = FALSE,
                     adapt_delta = NULL) {
+
+  # Check model arguments
+  consistency <- rlang::arg_match(consistency)
+  trt_effects <- rlang::arg_match(trt_effects)
+
+  if (!rlang::is_formula(regression, lhs = FALSE)) {
+    abort("`regression` should be a one-sided formula.")
+  }
+
+  # Check priors
+  if (!inherits(prior_intercept, "nma_prior")) abort("`prior_intercept` should be a prior distribution, see ?priors.")
+  if (!inherits(prior_trt, "nma_prior")) abort("`prior_trt` should be a prior distribution, see ?priors.")
+  if (!inherits(prior_het, "nma_prior")) abort("`prior_het` should be a prior distribution, see ?priors.")
+  if (!inherits(prior_reg, "nma_prior")) abort("`prior_reg` should be a prior distribution, see ?priors.")
+  if (!inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
+
+  # Check other args
+  if (!is.logical(QR) || length(QR) > 1) abort("`QR` should be a logical scalar (TRUE or FALSE).")
+  if (!is.numeric(adapt_delta) ||
+      length(adapt_delta) > 1 ||
+      adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
 }
