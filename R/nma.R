@@ -10,8 +10,10 @@
 #' @param trt_effects Character string specifying either `"fixed"` or `"random"` effects
 #' @param regression A one-sided model formula, specifying the prognostic and
 #'   effect-modifying terms for a regression model
-#' @param likelihood A suitable likelihood specification, if unspecified will be
-#'   inferred from the data
+#' @param likelihood Character string specifying a likelihood, if unspecified
+#'   will be inferred from the data
+#' @param link Character string specifying a link function, if unspecified will
+#'   default to the canonical link
 #' @param ... Further arguments passed to [rstan::sampling()], such as `iter`,
 #'   `chains`, `cores`, etc.
 #' @param prior_intercept Specification of prior distribution for the intercept
@@ -35,6 +37,7 @@ nma <- function(network,
                 trt_effects = c("fixed", "random"),
                 regression = NULL,
                 likelihood = NULL,
+                link = NULL,
                 ...,
                 prior_intercept = normal(sd = 10),
                 prior_trt = normal(sd = 10),
@@ -60,6 +63,9 @@ nma <- function(network,
   if (!rlang::is_formula(regression, lhs = FALSE)) {
     abort("`regression` should be a one-sided formula.")
   }
+
+  likelihood <- check_likelihood(likelihood)
+  link <- check_link(link, likelihood)
 
   # Check priors
   if (!inherits(prior_intercept, "nma_prior")) abort("`prior_intercept` should be a prior distribution, see ?priors.")
@@ -94,6 +100,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     trt_effects = c("fixed", "random"),
                     regression = NULL,
                     likelihood = NULL,
+                    link = NULL,
                     ...,
                     prior_intercept = normal(sd = 10),
                     prior_trt = normal(sd = 10),
@@ -111,6 +118,9 @@ nma.fit <- function(ipd_x, ipd_y,
     abort("`regression` should be a one-sided formula.")
   }
 
+  likelihood <- check_likelihood(likelihood)
+  link <- check_link(link, likelihood)
+
   # Check priors
   if (!inherits(prior_intercept, "nma_prior")) abort("`prior_intercept` should be a prior distribution, see ?priors.")
   if (!inherits(prior_trt, "nma_prior")) abort("`prior_trt` should be a prior distribution, see ?priors.")
@@ -124,4 +134,27 @@ nma.fit <- function(ipd_x, ipd_y,
       length(adapt_delta) > 1 ||
       adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
+}
+
+
+check_likelihood <- function(x) {
+  valid_lhood <- c("normal", "bernoulli", "binomial")
+
+  if (!is.character(x) || length(x) > 1 || !tolower(x) %in% valid_lhood) {
+    abort(glue::glue("`likelihood` should be a character string specifying a valid likelihood.\n",
+                     "Suitable options are currently: {paste(valid_lhood, collapse = ', ')}."))
+  }
+  return(tolower(x))
+}
+
+check_link <- function(x, lik) {
+  valid_link <- list(normal = c("identity", "log"),
+                     bernoulli = c("logit", "probit", "cloglog"),
+                     binomial = c("logit", "probit", "cloglog"))[[lik]]
+
+  if (!is.character(x) || length(x) > 1 || !tolower(x) %in% valid_link) {
+    abort(glue::glue("`link` should be a character string specifying a valid likelihood.\n",
+                     "Suitable options for a {lik} likelihood are currently: {paste(valid_link, collapse = ', ')}."))
+  }
+  return(tolower(x))
 }
