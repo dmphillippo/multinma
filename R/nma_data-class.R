@@ -18,6 +18,7 @@
 #'   \item{`ipd`}{data from studies with individual patient data}
 #'   \item{`treatments`}{treatment coding factor for entire network}
 #'   \item{`studies`}{study coding factor for entire network}
+#'   \item{`outcome`}{outcome type, at the finest level of data available}
 #'   }
 #'
 #' The `agd_arm`, `agd_contrast`, and `ipd` components are
@@ -112,7 +113,7 @@ print.nma_data <- function(x, ..., n = 10) {
       "{n_agd_arm} AgD stud{ifelse(n_agd_arm == 1, 'y', 'ies')} (arm-based)",
       "{n_agd_contrast} AgD stud{ifelse(n_agd_contrast == 1, 'y', 'ies')} (contrast-based)"
     )[c(n_ipd > 0, n_agd_arm > 0, n_agd_contrast > 0)],
-    last = ", and ", sep = ", "), ".")
+    last = ", and ", sep = ", "), ", and a {x$outcome} outcome.")
   }
   cat("\n")
 

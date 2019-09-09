@@ -51,15 +51,22 @@ set_ipd <- function(data,
   o_binary <- check_outcome_binary(.r, .E)
   # o_surv <- check_outcome_surv(.Surv)
 
+  o_type <- get_outcome_type(y = o_continuous$y, se = NULL,
+                             r = o_binary$r, n = NULL, E = o_binary$E)
+
   # Create tibble in standard format
   d <- tibble::tibble(
     .study = factor(.study),
-    .trt = factor(.trt),
-    .y = o_continuous$y,
-    .r = o_binary$r,
-    .E = o_binary$E#,
-    # .Surv = o_surv$Surv,
+    .trt = factor(.trt)
   )
+
+  if (o_type == "continuous") {
+    d <- tibble::add_column(d, .y = o_continuous$y)
+  } else if (o_type == "binary") {
+    d <- tibble::add_column(d, .r = o_binary$r)
+  } else if (o_type == "rate") {
+    d <- tibble::add_column(d, .r = o_binary$r, .E = o_binary$E)
+  }
 
   d <- dplyr::bind_cols(d, data)
 
@@ -69,7 +76,8 @@ set_ipd <- function(data,
          agd_contrast = NULL,
          ipd = d,
          treatments = forcats::fct_unique(d$.trt),
-         studies = forcats::fct_unique(d$.study)),
+         studies = forcats::fct_unique(d$.study),
+         outcome = o_type),
     class = "nma_data")
   return(out)
 }
@@ -132,17 +140,22 @@ set_agd_arm <- function(data,
   o_count <- check_outcome_count(.r, .n, .E)
   # o_surv <- check_outcome_surv(.Surv)
 
+  o_type <- get_outcome_type(y = o_continuous$y, se = o_continuous$se,
+                             r = o_count$r, n = o_count$n, E = o_count$E)
+
   # Create tibble in standard format
   d <- tibble::tibble(
     .study = factor(.study),
-    .trt = factor(.trt),
-    .y = o_continuous$y,
-    .se = o_continuous$se,
-    .r = o_count$r,
-    .n = o_count$n,
-    .E = o_count$E#,
-    # .Surv = o_surv$Surv,
-    )
+    .trt = factor(.trt)
+  )
+
+  if (o_type == "continuous") {
+    d <- tibble::add_column(d, .y = o_continuous$y, .se = o_continuous$se)
+  } else if (o_type == "count") {
+    d <- tibble::add_column(d, .r = o_count$r, .n = o_count$n)
+  } else if (o_type == "rate") {
+    d <- tibble::add_column(d, .r = o_count$r, .n = o_count$n, .E = o_count$E)
+  }
 
   d <- dplyr::bind_cols(d, data)
 
@@ -152,7 +165,8 @@ set_agd_arm <- function(data,
          agd_contrast = NULL,
          ipd = NULL,
          treatments = forcats::fct_unique(d$.trt),
-         studies = forcats::fct_unique(d$.study)),
+         studies = forcats::fct_unique(d$.study),
+         outcome = o_type),
     class = "nma_data")
   return(out)
 }
@@ -211,6 +225,9 @@ set_agd_contrast <- function(data,
 
   o_continuous <- check_outcome_continuous(.y, .se, with_se = TRUE)
 
+  o_type <- get_outcome_type(y = o_continuous$y, se = o_continuous$se,
+                             r = NULL, n = NULL, E = NULL)
+
   # Get all treatments
   trts <- sort(forcats::lvls_union(list(factor(.trt), factor(.trt_b))))
 
@@ -230,7 +247,8 @@ set_agd_contrast <- function(data,
          agd_contrast = d,
          ipd = NULL,
          treatments = forcats::fct_unique(d$.trt),
-         studies = forcats::fct_unique(d$.study)),
+         studies = forcats::fct_unique(d$.study),
+         outcome = o_type),
     class = "nma_data")
   return(out)
 }
@@ -322,6 +340,25 @@ pull_non_null <- function(data, var) {
   else return(NULL)
 }
 
+#' Get outcome type
+#'
+#' Determines outcome type based on which inputs are NA
+#'
+#' @noRd
+get_outcome_type <- function(y, se, r, n, E) {
+  o <- c()
+  if (!is.null(y)) o <- c(o, "continuous")
+  if (!is.null(r)) {
+    if (!is.null(E)) o <- c(o, "rate")
+    else if (!is.null(n)) o <- c(o, "count")
+    else o <- c(o, "binary")
+  }
+  if (length(o) == 0) abort("Please specify one and only one outcome.")
+  if (length(o) > 1) abort(glue::glue("Please specify one and only one outcome, instead of ",
+                                      glue::glue_collapse(o, sep = ", ", last = " and "), "."))
+
+  return(o)
+}
 
 #' Check continuous outcomes
 #'
@@ -335,22 +372,22 @@ check_outcome_continuous <- function(y, se = NULL, with_se = TRUE) {
   null_se <- is.null(se)
 
   if (with_se) {
-    if (!null_y & !null_se) {
+    if (!null_y && !null_se) {
       if (!is.numeric(y)) abort("Continuous outcome `y` must be numeric")
       if (!is.numeric(se)) abort("Standard error `se` must be numeric")
       if (any(se <= 0)) abort("Standard errors must be positive")
     } else {
       if (!null_y) abort("Specify standard error `se` for continuous outcome `y`")
-      if (!null_se) warn("Ignoring standard error `se` without continuous outcome `y`")
-      y <- NA_real_
-      se <- NA_real_
+      if (!null_se) abort("Specify continuous outcome `y`")
+      y <- NULL
+      se <- NULL
     }
     return(list(y = y, se = se))
   } else {
     if (!null_y) {
       if (!is.numeric(y)) abort("Continuous outcome `y` must be numeric")
     } else {
-      y <- NA_real_
+      y <- NULL
     }
     return(list(y = y))
   }
@@ -368,7 +405,7 @@ check_outcome_count <- function(r, n, E) {
   null_n <- is.null(n)
   null_E <- is.null(E)
 
-  if (!null_r & !null_n) {
+  if (!null_r && !null_n) {
     if (!is.numeric(r)) abort("Count outcome `r` must be numeric")
     if (!is.numeric(n)) abort("Denominator `n` must be numeric")
     if (any(r != trunc(r))) abort("Count outcome `r` must be integer-valued")
@@ -376,26 +413,26 @@ check_outcome_count <- function(r, n, E) {
     if (any(n <= 0)) abort("Denominator `n` must be greater than zero")
     if (any(n < r | r < 0)) abort("Count outcome `r` must be between 0 and `n`")
   } else if (!null_n & null_r) {
-    warn("Ignoring `n` without `r`")
+    abort("Specify numerator `r`")
 
-    r <- NA_integer_
-    n <- NA_integer_
-  } else if (null_n & !null_r) {
-    abort("Specify denominator `n` for count outcome `r`")
+    r <- NULL
+    n <- NULL
+  } else if (null_n && !null_r) {
+    abort("Specify denominator `n` for count outcome")
   } else {
-    r <- NA_integer_
-    n <- NA_integer_
+    r <- NULL
+    n <- NULL
   }
   if (!null_E) {
-      if (null_n | null_r) {
-        warn("Ignoring `E` without `r` or `n`")
-        E <- NA_real_
+      if (null_n || null_r) {
+        abort("Specify numerator `r` and denominator `n` for rate outcome")
+        E <- NULL
       } else {
         if (!is.numeric(E)) abort("Time at risk `E` must be numeric")
         if (any(E <= 0)) abort("Time at risk `E` must be positive")
       }
   } else {
-    E <- NA_real_
+    E <- NULL
   }
   return(list(r = r, n = n, E = E))
 }
@@ -414,18 +451,18 @@ check_outcome_binary <- function(r, E) {
     if (!is.numeric(r)) abort("Binary outcome `r` must be numeric")
     if (any(! r %in% c(0, 1))) abort("Binary outcome `r` must equal 0 or 1")
   } else {
-    r <- NA_integer_
+    r <- NULL
   }
   if (!null_E) {
     if (null_r) {
-      warn("Ignoring `E` without `r`")
-      E <- NA_real_
+      abort("Specify `r` for rate outcome")
+      E <- NULL
     } else {
       if (!is.numeric(E)) abort("Time at risk `E` must be numeric")
       if (any(E <= 0)) abort("Time at risk `E` must be positive")
     }
   } else {
-    E <- NA_real_
+    E <- NULL
   }
   return(list(r = r, E = E))
 }

@@ -69,7 +69,7 @@ agd_arm <- tibble(
 
 test_that("set_agd_arm - continuous outcome checks work", {
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont), "Specify standard error")
-  expect_warning(set_agd_arm(agd_arm, "studyn", "trtc", se = cont_pos), "Ignoring standard error")
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", se = cont_pos), "Specify continuous outcome `y`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = trtc, se = cont_pos), "must be numeric")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = trtc), "must be numeric")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = cont_neg), "must be positive")
@@ -80,7 +80,7 @@ test_that("set_agd_arm - continuous outcome checks work", {
 
 test_that("set_agd_arm - count outcome checks work", {
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc), "Specify denominator")
-  expect_warning(set_agd_arm(agd_arm, "studyn", "trtc", n = disc_p1), "Ignoring `n`")
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", n = disc_p1), "Specify numerator")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = trtc, n = disc_p1), "must be numeric")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = trtc), "must be numeric")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = cont, n = disc), "must be integer")
@@ -88,7 +88,7 @@ test_that("set_agd_arm - count outcome checks work", {
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc_neg, n = disc), "must be between 0 and `n`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc_p1, n = disc), "must be between 0 and `n`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_neg), "greater than zero")
-  expect_warning(set_agd_arm(agd_arm, "studyn", "trtc", E = cont_pos), "Ignoring `E`")
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", E = cont_pos), "Specify numerator `r` and denominator `n`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = cont_neg), "must be positive")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = trtc), "must be numeric")
   expect_equivalent(
@@ -107,7 +107,7 @@ test_that("set_ipd - binary outcome checks work", {
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = trtc), "must be numeric")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = cont), "must equal 0 or 1")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = disc_neg), "must equal 0 or 1")
-  expect_warning(set_ipd(agd_arm, "studyn", "trtc", E = cont_pos), "Ignoring `E`")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", E = cont_pos), "Specify `r`")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = cont_neg), "must be positive")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = trtc), "must be numeric")
   expect_equivalent(
@@ -125,13 +125,20 @@ agd_contrast <- agd_arm %>%
 test_that("set_agd_contrast - continuous outcome checks work", {
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc"), "Specify `trt_b`")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", y = cont), "Specify standard error")
-  expect_warning(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", se = cont_pos), "Ignoring standard error")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", se = cont_pos), "Specify continuous outcome `y`")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", y = trtc, se = cont_pos), "must be numeric")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", y = cont, se = trtc), "must be numeric")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", y = cont, se = cont_neg), "must be positive")
   expect_equivalent(
     set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", y = cont, se = cont_pos)$agd_contrast[, c(".y", ".se")],
     transmute(agd_contrast, .y = cont, .se = cont_pos))
+})
+
+test_that("set_* - take one and only one outcome", {
+  m <- "specify one and only one outcome"
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, y = cont), m)
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, y = cont, se = cont_pos), m)
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b"), m)
 })
 
 test_that("set_* `.trt` column is correct", {
