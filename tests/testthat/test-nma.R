@@ -33,3 +33,19 @@ test_that("nma() trt_effects argument must be one listed", {
   # expect_error(nma(smknet, trt_effects = c("fixed", "random")), m)
 })
 
+test_that("nma() likelihood must be valid", {
+  m <- "`likelihood` should be"
+  expect_error(nma(smknet, likelihood = 1), m)
+  expect_error(nma(smknet, likelihood = "a"), m)
+  expect_error(nma(smknet, likelihood = "norm"), m)
+  expect_error(nma(smknet, likelihood = c("normal", "bernoulli")), m)
+})
+
+test_that("nma() link must be valid", {
+  m <- "`link` should be"
+  expect_error(nma(smknet, link = 1), m)
+  expect_error(nma(smknet, link = "a"), m)
+  expect_error(nma(smknet, link = "lo"), m)
+  expect_error(nma(smknet, link = c("log", "identity")), m)
+})
+
