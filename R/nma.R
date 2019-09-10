@@ -146,7 +146,7 @@ nma.fit <- function(ipd_x, ipd_y,
 
 
 check_likelihood <- function(x) {
-  valid_lhood <- c("normal", "bernoulli", "binomial")
+  valid_lhood <- c("normal", "bernoulli", "binomial", "poisson")
 
   if (!is.character(x) || length(x) > 1 || !tolower(x) %in% valid_lhood) {
     abort(glue::glue("`likelihood` should be a character string specifying a valid likelihood.\n",
@@ -159,8 +159,9 @@ check_likelihood <- function(x) {
 
 check_link <- function(x, lik) {
   valid_link <- list(normal = c("identity", "log"),
-                     bernoulli = c("logit", "probit", "cloglog"),
-                     binomial = c("logit", "probit", "cloglog"))[[lik]]
+                     bernoulli = c("logit", "probit"),
+                     binomial = c("logit", "probit"),
+                     poisson = "log")[[lik]]
 
   if (is.null(x)) {
     x <- valid_link[1]
