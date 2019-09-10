@@ -27,6 +27,8 @@
 #' @param QR Logical scalar (default `FALSE`), whether to apply a QR
 #'   decomposition to the model design matrix
 #' @param adapt_delta See [adapt_delta] for details
+#' @param int_thin A single integer value, the thinning factor for returning
+#'   cumulative estimates of integration error
 #'
 #' @return A [stan_nma] object.
 #' @export
@@ -45,7 +47,8 @@ nma <- function(network,
                 prior_reg = normal(sd = 10),
                 prior_aux = normal(sd = 5),
                 QR = FALSE,
-                adapt_delta = NULL) {
+                adapt_delta = NULL,
+                int_thin = 100L) {
 
   # Check network
   if (!inherits(network, "nma_data")) {
@@ -110,7 +113,8 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_reg = normal(sd = 10),
                     prior_aux = normal(sd = 5),
                     QR = FALSE,
-                    adapt_delta = NULL) {
+                    adapt_delta = NULL,
+                    int_thin = 100L) {
 
   # Check model arguments
   consistency <- rlang::arg_match(consistency)
