@@ -31,7 +31,8 @@ Imports:
     glue,
     crayon,
     randtoolbox,
-    copula
+    copula,
+    tidyr (>= 0.8.3)
 LinkingTo: 
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),
