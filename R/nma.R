@@ -69,7 +69,7 @@ nma <- function(network,
     abort("`regression` should be a one-sided formula.")
   }
 
-  likelihood <- check_likelihood(likelihood)
+  likelihood <- check_likelihood(likelihood, network$outcome)
   link <- check_link(link, likelihood)
 
   # Check priors
@@ -145,10 +145,23 @@ nma.fit <- function(ipd_x, ipd_y,
 }
 
 
-check_likelihood <- function(x) {
+check_likelihood <- function(x, outcome = NULL) {
   valid_lhood <- c("normal", "bernoulli", "binomial", "poisson")
+  default_lhood <- list(binary = "bernoulli",
+                        count = "binomial",
+                        rate = "poisson",
+                        continuous = "normal")
 
-  if (!is.character(x) || length(x) > 1 || !tolower(x) %in% valid_lhood) {
+  # Choose default likelihood if NULL
+  if (is.null(x) && is.null(outcome)) abort("Please specify a suitable likelihood.")
+  else if (is.null(x)) {
+    if (!is.na(outcome$ipd)) x <- default_lhood[[outcome$ipd]]
+    else if (!is.na(outcome$agd_arm)) x <- default_lhood[[outcome$agd_arm]]
+    else if (!is.na(outcome$agd_contrast)) x <- default_lhood[[outcome$agd_contrast]]
+    else abort("No outcomes specified in network data.")
+
+  # Check valid option if given
+  } else if (!is.character(x) || length(x) > 1 || !tolower(x) %in% valid_lhood) {
     abort(glue::glue("`likelihood` should be a character string specifying a valid likelihood.\n",
                      "Suitable options are currently: ",
                      glue::glue_collapse(dQuote(valid_lhood, FALSE), sep = ", ", last = " or "),
