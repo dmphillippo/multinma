@@ -6,8 +6,8 @@ test_that("combine_network error if not passed nma_data objects", {
 
   expect_error(combine_network(1), msg)
   expect_error(combine_network(1, 2), msg)
-  expect_error(combine_network(1, set_ipd(smoking, studyn, trtc)), msg)
-  expect_error(combine_network(set_ipd(smoking, studyn, trtc), 1), msg)
+  expect_error(combine_network(1, set_agd_arm(smoking, studyn, trtc, r = r, n = n)), msg)
+  expect_error(combine_network(set_agd_arm(smoking, studyn, trtc, r = r, n = n), 1), msg)
 })
 
 # Dummy data
@@ -90,4 +90,15 @@ test_that("combine_network can set alternative trt_ref", {
                "Studies with same label found in multiple data sources: a")
   expect_error(combine_network(net_a_a, net_a_a),
                "Studies with same label found in multiple data sources: a, b")
+})
+
+test_that("combine_network error if outcomes do not match for same data source type", {
+  m <- "Multiple outcome types present"
+  dat_a <- tibble(study = 1, trt = 1:2, r = 1, n = 1, y = 1, se = 1)
+  dat_b <- tibble(study = 2, trt = 2:3, r = 1, n = 1, y = 1, se = 1)
+
+  expect_error(combine_network(set_ipd(dat_a, study, trt, r = r),
+                               set_ipd(dat_b, study, trt, y = y)), m)
+  expect_error(combine_network(set_agd_arm(dat_a, study, trt, r = r, n = n),
+                               set_agd_arm(dat_b, study, trt, y = y, se = se)), m)
 })

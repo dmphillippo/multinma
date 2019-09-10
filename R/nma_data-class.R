@@ -18,7 +18,7 @@
 #'   \item{`ipd`}{data from studies with individual patient data}
 #'   \item{`treatments`}{treatment coding factor for entire network}
 #'   \item{`studies`}{study coding factor for entire network}
-#'   \item{`outcome`}{outcome type, at the finest level of data available}
+#'   \item{`outcome`}{outcome type for each data source, named list}
 #'   }
 #'
 #' The `agd_arm`, `agd_contrast`, and `ipd` components are
@@ -113,7 +113,7 @@ print.nma_data <- function(x, ..., n = 10) {
       "{n_agd_arm} AgD stud{ifelse(n_agd_arm == 1, 'y', 'ies')} (arm-based)",
       "{n_agd_contrast} AgD stud{ifelse(n_agd_contrast == 1, 'y', 'ies')} (contrast-based)"
     )[c(n_ipd > 0, n_agd_arm > 0, n_agd_contrast > 0)],
-    last = ", and ", sep = ", "), ", and a {x$outcome} outcome.")
+    last = ", and ", sep = ", "), ".")
   }
   cat("\n")
 
@@ -122,6 +122,8 @@ print.nma_data <- function(x, ..., n = 10) {
     print(s_ipd[1:min(n_ipd, n), ], right = FALSE, row.names = FALSE, max = 9999L)
     if (n_ipd > n) cglue(subtle(" ... plus {n_ipd - n} more studies"))
     cat("\n")
+    cglue(" Outcome type: {x$outcome$ipd}")
+    # cat("\n")
   }
 
   if (n_agd_arm > 0) {
@@ -129,6 +131,8 @@ print.nma_data <- function(x, ..., n = 10) {
     print(s_agd_arm[1:min(n_agd_arm, n), ], right = FALSE, row.names = FALSE, max = 9999L)
     if (n_agd_arm > n) cglue(subtle(" ... plus {n_agd_arm - n} more studies"))
     cat("\n")
+    cglue(" Outcome type: {x$outcome$agd_arm}")
+    # cat("\n")
   }
 
   if (n_agd_contrast > 0) {
@@ -136,6 +140,8 @@ print.nma_data <- function(x, ..., n = 10) {
     print(s_agd_contrast[1:min(n_agd_contrast, n), ], right = FALSE, row.names = FALSE, max = 9999L)
     if (n_agd_contrast > n) cglue(subtle(" ... plus {n_agd_contrast - n} more studies"))
     cat("\n")
+    cglue(" Outcome type: {x$outcome$agd_contrast}")
+    # cat("\n")
   }
 
   sec_header()

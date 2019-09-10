@@ -77,7 +77,7 @@ set_ipd <- function(data,
          ipd = d,
          treatments = forcats::fct_unique(d$.trt),
          studies = forcats::fct_unique(d$.study),
-         outcome = o_type),
+         outcome = list(agd_arm = NA, agd_contrast = NA, ipd = o_type)),
     class = "nma_data")
   return(out)
 }
@@ -166,7 +166,7 @@ set_agd_arm <- function(data,
          ipd = NULL,
          treatments = forcats::fct_unique(d$.trt),
          studies = forcats::fct_unique(d$.study),
-         outcome = o_type),
+         outcome = list(agd_arm = o_type, agd_contrast = NA, ipd = NA)),
     class = "nma_data")
   return(out)
 }
@@ -248,7 +248,7 @@ set_agd_contrast <- function(data,
          ipd = NULL,
          treatments = forcats::fct_unique(d$.trt),
          studies = forcats::fct_unique(d$.study),
-         outcome = o_type),
+         outcome = list(agd_arm = NA, agd_contrast = o_type, ipd = NA)),
     class = "nma_data")
   return(out)
 }
@@ -297,25 +297,53 @@ combine_network <- function(..., trt_ref) {
   studs <- sort(forcats::lvls_union(purrr::map(s, "studies")))
 
   # Get ipd
-  ipd <- purrr::map_dfr(s, "ipd")
+  ipd <- purrr::map(s, "ipd")
   if (!rlang::is_empty(ipd)) {
-    ipd$.trt <- forcats::lvls_expand(ipd$.trt, trts)
-    ipd$.study <- forcats::lvls_expand(ipd$.study, studs)
+    for (j in 1:length(ipd)) {
+      if (rlang::is_empty(ipd[[j]])) next
+      ipd[[j]]$.trt <- forcats::lvls_expand(ipd[[j]]$.trt, trts)
+      ipd[[j]]$.study <- forcats::lvls_expand(ipd[[j]]$.study, studs)
+    }
   }
+  ipd <- dplyr::bind_rows(ipd)
 
   # Get agd_arm
-  agd_arm <- purrr::map_dfr(s, "agd_arm")
+  agd_arm <- purrr::map(s, "agd_arm")
   if (!rlang::is_empty(agd_arm)) {
-    agd_arm$.trt <- forcats::lvls_expand(agd_arm$.trt, trts)
-    agd_arm$.study <- forcats::lvls_expand(agd_arm$.study, studs)
+    for (j in 1:length(agd_arm)) {
+      if (rlang::is_empty(agd_arm[[j]])) next
+      agd_arm[[j]]$.trt <- forcats::lvls_expand(agd_arm[[j]]$.trt, trts)
+      agd_arm[[j]]$.study <- forcats::lvls_expand(agd_arm[[j]]$.study, studs)
+    }
   }
+  agd_arm <- dplyr::bind_rows(agd_arm)
 
   # Get agd_contrast
-  agd_contrast <- purrr::map_dfr(s, "agd_contrast")
+  agd_contrast <- purrr::map(s, "agd_contrast")
   if (!rlang::is_empty(agd_contrast)) {
-    agd_contrast$.trt <- forcats::lvls_expand(agd_contrast$.trt, trts)
-    agd_contrast$.study <- forcats::lvls_expand(agd_contrast$.study, studs)
+    for (j in 1:length(agd_contrast)) {
+      if (rlang::is_empty(agd_contrast[[j]])) next
+      agd_contrast[[j]]$.trt <- forcats::lvls_expand(agd_contrast[[j]]$.trt, trts)
+      agd_contrast[[j]]$.study <- forcats::lvls_expand(agd_contrast[[j]]$.study, studs)
+    }
   }
+  agd_contrast <- dplyr::bind_rows(agd_contrast)
+
+  # Get outcome type
+  o_ipd <- unique(purrr::map_chr(purrr::map(s, "outcome"), "ipd"))
+  o_ipd <- o_ipd[!is.na(o_ipd)]
+  if (length(o_ipd) > 1) abort("Multiple outcome types present in IPD.")
+  if (length(o_ipd) == 0) o_ipd <- NA
+
+  o_agd_arm <- unique(purrr::map_chr(purrr::map(s, "outcome"), "agd_arm"))
+  o_agd_arm <- o_agd_arm[!is.na(o_agd_arm)]
+  if (length(o_agd_arm) > 1) abort("Multiple outcome types present in AgD (arm-based).")
+  if (length(o_agd_arm) == 0) o_agd_arm <- NA
+
+  o_agd_contrast <- unique(purrr::map_chr(purrr::map(s, "outcome"), "agd_contrast"))
+  o_agd_contrast <- o_agd_contrast[!is.na(o_agd_contrast)]
+  if (length(o_agd_contrast) > 1) abort("Multiple outcome types present in AgD (contrast-based).")
+  if (length(o_agd_contrast) == 0) o_agd_contrast <- NA
 
   # Produce nma_data object
   out <- structure(
@@ -323,7 +351,10 @@ combine_network <- function(..., trt_ref) {
          agd_contrast = agd_contrast,
          ipd = ipd,
          treatments = factor(trts, levels = trts),
-         studies = factor(studs)),
+         studies = factor(studs),
+         outcome = list(agd_arm = o_agd_arm,
+                        agd_contrast = o_agd_contrast,
+                        ipd = o_ipd)),
     class = "nma_data")
   return(out)
 }
