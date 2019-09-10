@@ -175,13 +175,14 @@ nma <- function(network,
 }
 
 
-#' @param n_int Number of numerical integration points used
 #' @param ipd_x Design matrix for IPD studies
 #' @param ipd_y Outcome data frame for IPD studies
 #' @param agd_arm_x  Design matrix for AgD studies (arm-based)
 #' @param agd_arm_y  Outcome data frame for AgD studies (arm-based)
 #' @param agd_contrast_x  Design matrix for AgD studies (contrast-based)
 #' @param agd_contrast_y  Outcome data frame for AgD studies (contrast-based)
+#' @param n_int Number of numerical integration points used
+#' @param RE_cor Random effects correlation matrix, when `trt_effects = "random"`
 #'
 #' @export
 #'
@@ -192,6 +193,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     n_int = NULL,
                     consistency = c("consistency", "nodesplit", "ume"),
                     trt_effects = c("fixed", "random"),
+                    RE_cor = NULL,
                     regression = NULL,
                     likelihood = NULL,
                     link = NULL,
