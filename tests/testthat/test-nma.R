@@ -16,6 +16,20 @@ test_that("nma() consistency argument must be one listed", {
   expect_error(nma(smknet, consistency = 1), m)
   expect_error(nma(smknet, consistency = NA), m)
   expect_error(nma(smknet, consistency = NULL), m)
-  expect_error(nma(smknet, consistency = c("consistency", "ume")), m)
+
+  # Not needed - rlang::arg_match always returns a single string
+  # expect_error(nma(smknet, consistency = c("consistency", "ume")), m)
+})
+
+test_that("nma() trt_effects argument must be one listed", {
+  m <- "`trt_effects` must be"
+  expect_error(nma(smknet, trt_effects = "fix"), m)
+  expect_error(nma(smknet, trt_effects = "a"), m)
+  expect_error(nma(smknet, trt_effects = 1), m)
+  expect_error(nma(smknet, trt_effects = NA), m)
+  expect_error(nma(smknet, trt_effects = NULL), m)
+
+  # Not needed - rlang::arg_match always returns a single string
+  # expect_error(nma(smknet, trt_effects = c("fixed", "random")), m)
 })
 

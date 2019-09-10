@@ -58,7 +58,9 @@ nma <- function(network,
 
   # Check model arguments
   consistency <- rlang::arg_match(consistency)
+  if (length(consistency) > 1) abort("`consistency` must be a single string.")
   trt_effects <- rlang::arg_match(trt_effects)
+  if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
 
   if (!is.null(regression) && !rlang::is_formula(regression, lhs = FALSE)) {
     abort("`regression` should be a one-sided formula.")
