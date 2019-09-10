@@ -84,6 +84,10 @@ nma <- function(network,
   if (!is.numeric(adapt_delta) ||
       length(adapt_delta) > 1 ||
       adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
+  if (!is.numeric(int_thin) ||
+      length(int_thin) > 1 ||
+      int_thin < 1 ||
+      trunc(int_thin) != int_thin) abort("`int_thin` should be an integer > 0.")
 
 }
 
@@ -141,6 +145,10 @@ nma.fit <- function(ipd_x, ipd_y,
   if (!is.numeric(adapt_delta) ||
       length(adapt_delta) > 1 ||
       adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
+  if (!is.numeric(int_thin) ||
+      length(int_thin) > 1 ||
+      int_thin < 1 ||
+      trunc(int_thin) != int_thin) abort("`int_thin` should be an integer > 0")
 
 }
 
