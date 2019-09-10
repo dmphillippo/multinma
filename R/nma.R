@@ -60,7 +60,7 @@ nma <- function(network,
   consistency <- rlang::arg_match(consistency)
   trt_effects <- rlang::arg_match(trt_effects)
 
-  if (!rlang::is_formula(regression, lhs = FALSE)) {
+  if (!is.null(regression) && !rlang::is_formula(regression, lhs = FALSE)) {
     abort("`regression` should be a one-sided formula.")
   }
 
