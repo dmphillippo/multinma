@@ -93,6 +93,85 @@ nma <- function(network,
       length(adapt_delta) > 1 ||
       adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
+  # Get design matrices and outcomes
+  if (has_ipd(network)) {
+    dat_ipd <- network$ipd
+    o_ipd <- get_outcome_variables(dat_ipd, network$outcome$ipd)
+  } else {
+    dat_ipd <- tibble::tibble()
+    o_ipd <- NULL
+  }
+
+  if (has_agd_arm(network)) {
+    dat_agd_arm <- network$agd_arm
+    o_agd_arm <- get_outcome_variables(dat_agd_arm, network$outcome$agd_arm)
+
+    # Set up integration variables if present
+    if (inherits(network, "mlnmr_data")) {
+      dat_agd_arm <- dat_agd_arm %>%
+        dplyr::select(-dplyr::one_of(intersect(network$int_names, colnames(dat_agd_arm)))) %>%
+        dplyr::rename_at(dplyr::vars(dplyr::starts_with(".int_")), ~gsub(".int_", "", ., fixed = TRUE)) %>%
+        tidyr::unnest(!!! rlang::syms(network$int_names))
+    }
+  } else {
+    dat_agd_arm <- tibble::tibble()
+    o_agd_arm <- NULL
+  }
+
+  if (has_agd_contrast(network)) {
+    dat_agd_contrast <- network$agd_contrast
+    o_agd_contrast <- get_outcome_variables(dat_agd_contrast, network$outcome$agd_contrast)
+
+    # Set up integration variables if present
+    if (inherits(network, "mlnmr_data")) {
+      dat_agd_contrast <- dat_agd_contrast %>%
+        dplyr::select(-dplyr::one_of(union(network$int_names, colnames(dat_agd_contrast)))) %>%
+        dplyr::rename_at(dplyr::vars(dplyr::starts_with(".int_")), ~gsub(".int_", "", ., fixed = TRUE)) %>%
+        tidyr::unnest(!!! rlang::syms(network$int_names))
+    }
+  } else {
+    dat_agd_contrast <- tibble::tibble()
+    o_agd_contrast <- NULL
+  }
+
+  # Construct design matrix all together then split out, so that same dummy
+  # coding is used everywhere
+  dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
+
+  if (!is.null(regression)) {
+    # Warn if combining AgD and IPD in a meta-regression without using integration
+    if (!inherits(network, "mlnmr_data") && has_ipd(network) &&
+        (has_agd_arm(network) || has_agd_contrast(network))) {
+      warn(glue::glue("No integration points available, using naive plug-in model at aggregate level.\n",
+                      "Use `add_integration()` to add integration points to the network."))
+    }
+
+    nma_formula <- update.formula(regression, ~-1 + .study + .trt + .)
+  } else {
+    nma_formula <- ~-1 + .study + .trt
+  }
+
+  X_all <- model.matrix(nma_formula, data = dat_all)
+
+  if (has_ipd(network)) {
+    X_ipd <- X_all[1:nrow(dat_ipd), ]
+  } else {
+    X_ipd <- NULL
+  }
+
+  if (has_agd_arm(network)) {
+    X_agd_arm <- X_all[nrow(dat_ipd) + 1:nrow(dat_agd_arm), ]
+  } else {
+    X_agd_arm <- NULL
+  }
+
+  if (has_agd_contrast(network)) {
+    X_agd_contrast <- X_all[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast), ]
+  } else {
+    X_agd_contrast <- NULL
+  }
+
+
 }
 
 
@@ -203,4 +282,24 @@ check_link <- function(x, lik) {
                      "."))
   }
   return(tolower(x))
+}
+
+#' Get outcome variables from internal nma_data
+#'
+#' @param x A data frame
+#' @param o_type Outcome type
+#'
+#' @return A data frame with outcome variables selected
+#' @noRd
+get_outcome_variables <- function(x, o_type) {
+  o_vars <- list(
+    binary = ".r",
+    rate = c(".r", ".E"),
+    count = c(".r", ".n"),
+    continuous = c(".y", ".se")
+  )[[o_type]]
+
+  return(
+    dplyr::select(x, dplyr::one_of(intersect(o_vars, colnames(x))))
+  )
 }
