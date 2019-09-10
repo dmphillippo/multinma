@@ -345,6 +345,13 @@ combine_network <- function(..., trt_ref) {
   if (length(o_agd_contrast) > 1) abort("Multiple outcome types present in AgD (contrast-based).")
   if (length(o_agd_contrast) == 0) o_agd_contrast <- NA
 
+  outcome <- list(agd_arm = o_agd_arm,
+                  agd_contrast = o_agd_contrast,
+                  ipd = o_ipd)
+
+  # Check outcome combination
+  check_outcome_combination(outcome)
+
   # Produce nma_data object
   out <- structure(
     list(agd_arm = agd_arm,
@@ -352,9 +359,7 @@ combine_network <- function(..., trt_ref) {
          ipd = ipd,
          treatments = factor(trts, levels = trts),
          studies = factor(studs),
-         outcome = list(agd_arm = o_agd_arm,
-                        agd_contrast = o_agd_contrast,
-                        ipd = o_ipd)),
+         outcome = outcome),
     class = "nma_data")
   return(out)
 }
@@ -496,6 +501,34 @@ check_outcome_binary <- function(r, E) {
     E <- NULL
   }
   return(list(r = r, E = E))
+}
+
+#' Check valid outcome combination across data sources
+#'
+#' @param outcomes outcome list, see nma_data-class
+#'
+#' @noRd
+check_outcome_combination <- function(outcomes) {
+  valid <- list(
+    list(agd_arm = c("count", NA),
+         agd_contrast = c("continuous", NA),
+         ipd = c("binary", NA)),
+    list(agd_arm = c("rate", NA),
+         agd_contrast = c("continuous", NA),
+         ipd = c("rate", NA)),
+    list(agd_arm = c("continuous", NA),
+         agd_contrast = c("continuous", NA),
+         ipd = c("continuous", NA))
+  )
+
+  if (!any(purrr::map_lgl(valid,
+                 ~all(c(outcomes$agd_arm %in% .$agd_arm,
+                        outcomes$agd_contrast %in% .$agd_contrast,
+                        outcomes$ipd %in% .$ipd))))) {
+    rlang::abort(glue::glue("Combining ",
+                     glue::glue_collapse(outcomes[!is.na(outcomes)], sep = ', ', last = ' and '),
+                     " outcomes is not supported."))
+  }
 }
 
 #' Check for IPD and AgD in network

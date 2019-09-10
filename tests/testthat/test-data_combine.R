@@ -102,3 +102,18 @@ test_that("combine_network error if outcomes do not match for same data source t
   expect_error(combine_network(set_agd_arm(dat_a, study, trt, r = r, n = n),
                                set_agd_arm(dat_b, study, trt, y = y, se = se)), m)
 })
+
+test_that("combine_network error if mismatch outcomes across data types", {
+  m <- "Combining.+not supported"
+  dat_a <- tibble(study = 1, trt = 1:2, r = 1, n = 1, E = 1, y = 1, se = 1)
+  dat_b <- tibble(study = 2, trt = 2:3, r = 1, n = 1, E = 1, y = 1, se = 1)
+
+  expect_error(combine_network(set_ipd(dat_a, study, trt, r = r),
+                               set_agd_arm(dat_b, study, trt, y = y, se = se)), m)
+  expect_error(combine_network(set_ipd(dat_a, study, trt, r = r, E = E),
+                               set_agd_arm(dat_b, study, trt, y = y, se = se)), m)
+  expect_error(combine_network(set_ipd(dat_a, study, trt, y = y),
+                               set_agd_arm(dat_b, study, trt, r = r, n = n)), m)
+  expect_error(combine_network(set_ipd(dat_a, study, trt, y = y),
+                               set_agd_arm(dat_b, study, trt, r = r, n = n, E = E)), m)
+})
