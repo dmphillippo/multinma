@@ -167,6 +167,9 @@ nma <- function(network,
 
   if (has_agd_contrast(network)) {
     X_agd_contrast <- X_all[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast), ]
+
+    # Need to difference .trtb terms - write custom model.matrix?
+    abort("Contrast-based AgD not yet supported.")
   } else {
     X_agd_contrast <- NULL
   }
