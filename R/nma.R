@@ -165,8 +165,8 @@ check_link <- function(x, lik) {
   if (is.null(x)) {
     x <- valid_link[1]
   } else if (!is.character(x) || length(x) > 1 || !tolower(x) %in% valid_link) {
-    abort(glue::glue("`link` should be a character string specifying a valid likelihood.\n",
-                     "Suitable options are currently: ",
+    abort(glue::glue("`link` should be a character string specifying a valid link function.\n",
+                     "Suitable options for a {lik} likelihood are currently: ",
                      glue::glue_collapse(dQuote(valid_link, FALSE), sep = ", ", last = " or "),
                      "."))
   }
