@@ -263,6 +263,12 @@ nma.fit <- function(ipd_x, ipd_y,
 }
 
 
+#' Check likelihood function, or provide default value
+#'
+#' @param x likelihood type as string
+#' @param outcome outcome type as string
+#'
+#' @noRd
 check_likelihood <- function(x, outcome = NULL) {
   valid_lhood <- c("normal", "bernoulli", "binomial", "poisson")
   default_lhood <- list(binary = "bernoulli",
@@ -288,6 +294,12 @@ check_likelihood <- function(x, outcome = NULL) {
   return(tolower(x))
 }
 
+#' Check link function, or provide default value
+#'
+#' @param x link function, as string
+#' @param lik likelihood, as string
+#'
+#' @noRd
 check_link <- function(x, lik) {
   valid_link <- list(normal = c("identity", "log"),
                      bernoulli = c("logit", "probit"),
