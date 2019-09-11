@@ -115,5 +115,5 @@ test_that("combine_network error if mismatch outcomes across data types", {
   expect_error(combine_network(set_ipd(dat_a, study, trt, y = y),
                                set_agd_arm(dat_b, study, trt, r = r, n = n)), m)
   expect_error(combine_network(set_ipd(dat_a, study, trt, y = y),
-                               set_agd_arm(dat_b, study, trt, r = r, n = n, E = E)), m)
+                               set_agd_arm(dat_b, study, trt, r = r, E = E)), m)
 })
