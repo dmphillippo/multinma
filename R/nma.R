@@ -262,6 +262,109 @@ nma.fit <- function(ipd_x, ipd_y,
 
 }
 
+#' Random effects structure
+#'
+#' Use `RE_cor` to generate the random effects correlation matrix, under the
+#' assumption of common heterogeneity variance (i.e. all within-study
+#' correlations are 0.5). Use `which_delta` to return a vector of IDs for the RE
+#' deltas (0 means no RE delta on this arm).
+#'
+#' @param study A vector of study IDs (integer, character, or factor)
+#' @param trt A factor vector of treatment codes (or coercible as such), with
+#'   first level indicating the reference treatment
+#' @param type Character string, whether to generate RE structure under the
+#'   "reference treatment" paramterisation, or the "baseline shift"
+#'   parameterisation.
+#'
+#' @return
+#' @export
+#' @aliases RE_cor
+#' @rdname random_effects
+#'
+#' @examples
+#' RE_cor(smoking$studyn, smoking$trtn)
+#' RE_cor(smoking$studyn, smoking$trtn, type = "blshift")
+RE_cor <- function(study, trt, type = c("reftrt", "blshift")) {
+  if (!is.numeric(study) && !is.character(study) && !is.factor(study) || is.matrix(study)) {
+    abort("`study` must be a vector, either numeric, character, or factor.")
+  }
+  if (!is.factor(trt)) {
+    trt <- tryCatch(as.factor(trt),
+                    error = function(e) {
+                      abort("`trt` must be a factor (or coercible to factor).")
+                    }, finally = inform("Coerced `trt` to factor."))
+  }
+  if (length(study) != length(trt)) abort("`study` and `trt` must be the same length.")
+  type <- rlang::arg_match(type)
+
+  n_i <- length(study)
+
+  if (type == "reftrt") {
+    reftrt <- levels(trt)[1]
+    Rho <- matrix(0, nrow = n_i, ncol = n_i)
+    diag(Rho) <- 1
+    for (i in 1:(n_i - 1)) {
+      for (j in (i + 1):n_i) {
+        if (study[i] == study[j] && trt[i] != reftrt && trt[j] != reftrt) {
+          Rho[i, j] <- 0.5
+          Rho[j, i] <- 0.5
+        }
+      }
+    }
+  } else if (type == "blshift") {
+    bl <- !duplicated(study)
+    trtb <- trt[bl]
+    studyb <- study[bl]
+    Rho <- matrix(0, nrow = n_i, ncol = n_i)
+    diag(Rho) <- 1
+    for (i in 1:(n_i - 1)) {
+      for (j in (i + 1):n_i) {
+        if (study[i] == study[j] &&
+            trt[i] != trtb[studyb == study[i]] &&
+            trt[j] != trtb[studyb == study[j]]) {
+          Rho[i, j] <- 0.5
+          Rho[j, i] <- 0.5
+        }
+      }
+    }
+  }
+
+  return(Rho)
+}
+
+#' @rdname random_effects
+#' @aliases which_delta
+#' @export
+#' @examples
+#' which_delta(smoking$studyn, smoking$trtn)
+#' which_delta(smoking$studyn, smoking$trtn, type = "blshift")
+which_delta <- function(study, trt, type = c("reftrt", "blshift")) {
+  if (!is.numeric(study) && !is.character(study) && !is.factor(study) || is.matrix(study)) {
+    abort("`study` must be a vector, either numeric, character, or factor.")
+  }
+  if (!is.factor(trt)) {
+    trt <- tryCatch(as.factor(trt),
+                    error = function(e) {
+                      abort("`trt` must be a factor (or coercible to factor).")
+                    }, finally = inform("Coerced `trt` to factor."))
+  }
+  if (length(study) != length(trt)) abort("`study` and `trt` must be the same length.")
+  type <- rlang::arg_match(type)
+
+  n_i <- length(study)
+  id <- rep(0, n_i)
+
+  if (type == "reftrt") {
+    reftrt <- levels(trt)[1]
+    trt_nonref <- trt != reftrt
+    id[trt_nonref] <- 1:sum(trt_nonref)
+  } else if (type == "blshift") {
+    non_bl <- duplicated(study)
+    id[non_bl] <- 1:sum(non_bl)
+  }
+
+  return(id)
+}
 
 #' Check likelihood function, or provide default value
 #'
