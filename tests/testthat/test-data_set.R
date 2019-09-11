@@ -80,7 +80,7 @@ test_that("set_agd_arm - continuous outcome checks work", {
 
 test_that("set_agd_arm - count outcome checks work", {
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc), "Specify denominator")
-  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", n = disc_p1), "Specify numerator")
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", n = disc_p1), "Specify outcome count `r`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = trtc, n = disc_p1), "must be numeric")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = trtc), "must be numeric")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = cont, n = disc), "must be integer")
@@ -88,12 +88,15 @@ test_that("set_agd_arm - count outcome checks work", {
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc_neg, n = disc), "must be between 0 and `n`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc_p1, n = disc), "must be between 0 and `n`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_neg), "greater than zero")
-  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", E = cont_pos), "Specify numerator `r` and denominator `n`")
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", E = cont_pos), "Specify outcome count `r`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = cont_neg), "must be positive")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = trtc), "must be numeric")
   expect_equivalent(
-    set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = cont_pos)$agd_arm[, c(".r", ".n", ".E")],
-    transmute(agd_arm, .r = disc, .n = disc_p1, .E = cont_pos))
+    set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1)$agd_arm[, c(".r", ".n")],
+    transmute(agd_arm, .r = disc, .n = disc_p1))
+  expect_equivalent(
+    set_agd_arm(agd_arm, "studyn", "trtc", r = disc, E = cont_pos)$agd_arm[, c(".r", ".E")],
+    transmute(agd_arm, .r = disc, .E = cont_pos))
 })
 
 test_that("set_ipd - continuous outcome checks work", {
@@ -107,7 +110,7 @@ test_that("set_ipd - binary outcome checks work", {
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = trtc), "must be numeric")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = cont), "must equal 0 or 1")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = disc_neg), "must equal 0 or 1")
-  expect_error(set_ipd(agd_arm, "studyn", "trtc", E = cont_pos), "Specify `r`")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", E = cont_pos), "Specify count `r`")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = cont_neg), "must be positive")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = trtc), "must be numeric")
   expect_equivalent(

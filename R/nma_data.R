@@ -154,7 +154,7 @@ set_agd_arm <- function(data,
   } else if (o_type == "count") {
     d <- tibble::add_column(d, .r = o_count$r, .n = o_count$n)
   } else if (o_type == "rate") {
-    d <- tibble::add_column(d, .r = o_count$r, .n = o_count$n, .E = o_count$E)
+    d <- tibble::add_column(d, .r = o_count$r, .E = o_count$E)
   }
 
   d <- dplyr::bind_cols(d, data)
@@ -386,8 +386,8 @@ get_outcome_type <- function(y, se, r, n, E) {
   if (!is.null(y)) o <- c(o, "continuous")
   if (!is.null(r)) {
     if (!is.null(E)) o <- c(o, "rate")
-    else if (!is.null(n)) o <- c(o, "count")
-    else o <- c(o, "binary")
+    if (!is.null(n)) o <- c(o, "count")
+    if (is.null(n) && is.null(E)) o <- c(o, "binary")
   }
   if (length(o) == 0) abort("Please specify one and only one outcome.")
   if (length(o) > 1) abort(glue::glue("Please specify one and only one outcome, instead of ",
@@ -441,35 +441,27 @@ check_outcome_count <- function(r, n, E) {
   null_n <- is.null(n)
   null_E <- is.null(E)
 
-  if (!null_r && !null_n) {
-    if (!is.numeric(r)) abort("Count outcome `r` must be numeric")
+  if (!null_n) {
     if (!is.numeric(n)) abort("Denominator `n` must be numeric")
-    if (any(r != trunc(r))) abort("Count outcome `r` must be integer-valued")
     if (any(n != trunc(n))) abort("Denominator `n` must be integer-valued")
     if (any(n <= 0)) abort("Denominator `n` must be greater than zero")
-    if (any(n < r | r < 0)) abort("Count outcome `r` must be between 0 and `n`")
-  } else if (!null_n & null_r) {
-    abort("Specify numerator `r`")
+    if (null_r) abort("Specify outcome count `r`.")
+  }
 
-    r <- NULL
-    n <- NULL
-  } else if (null_n && !null_r) {
-    abort("Specify denominator `n` for count outcome")
-  } else {
-    r <- NULL
-    n <- NULL
-  }
   if (!null_E) {
-      if (null_n || null_r) {
-        abort("Specify numerator `r` and denominator `n` for rate outcome")
-        E <- NULL
-      } else {
-        if (!is.numeric(E)) abort("Time at risk `E` must be numeric")
-        if (any(E <= 0)) abort("Time at risk `E` must be positive")
-      }
-  } else {
-    E <- NULL
+    if (!is.numeric(E)) abort("Time at risk `E` must be numeric")
+    if (any(E <= 0)) abort("Time at risk `E` must be positive")
+    if (null_r) abort("Specify outcome count `r`.")
   }
+
+  if (!null_r) {
+    if (null_n && null_E) abort("Specify denominator `n` (count outcome) or time at risk `E` (rate outcome)")
+    if (!is.numeric(r)) abort("Outcome count `r` must be numeric")
+    if (any(r != trunc(r))) abort("Outcome count `r` must be integer-valued")
+    if (!null_n && any(n < r | r < 0)) abort("Count outcome `r` must be between 0 and `n`")
+    if (!null_E && any(r < 0)) abort("Rate outcome count `r` must be non-negative")
+  }
+
   return(list(r = r, n = n, E = E))
 }
 
@@ -483,23 +475,21 @@ check_outcome_binary <- function(r, E) {
   null_r <- is.null(r)
   null_E <- is.null(E)
 
-  if (!null_r) {
-    if (!is.numeric(r)) abort("Binary outcome `r` must be numeric")
-    if (any(! r %in% c(0, 1))) abort("Binary outcome `r` must equal 0 or 1")
-  } else {
-    r <- NULL
-  }
   if (!null_E) {
     if (null_r) {
-      abort("Specify `r` for rate outcome")
-      E <- NULL
+      abort("Specify count `r` for rate outcome")
     } else {
       if (!is.numeric(E)) abort("Time at risk `E` must be numeric")
       if (any(E <= 0)) abort("Time at risk `E` must be positive")
+      if (!is.numeric(r)) abort("Rate outcome count `r` must be numeric")
+      if (any(r != trunc(r))) abort("Rate outcome count `r` must be non-negative integer")
+      if (any(r < 0)) abort("Rate outcome count `r` must be non-negative integer")
     }
-  } else {
-    E <- NULL
+  } else if (!null_r) {
+    if (!is.numeric(r)) abort("Binary outcome `r` must be numeric")
+    if (any(! r %in% c(0, 1))) abort("Binary outcome `r` must equal 0 or 1")
   }
+
   return(list(r = r, E = E))
 }
 
