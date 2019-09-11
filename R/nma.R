@@ -108,13 +108,13 @@ nma <- function(network,
 
     # Set up integration variables if present
     if (inherits(network, "mlnmr_data")) {
-      dat_agd_arm <- dat_agd_arm %>%
-        dplyr::select(-dplyr::one_of(intersect(network$int_names, colnames(dat_agd_arm)))) %>%
-        dplyr::rename_at(dplyr::vars(dplyr::starts_with(".int_")), ~gsub(".int_", "", ., fixed = TRUE)) %>%
-        tidyr::unnest(!!! rlang::syms(network$int_names))
+      idat_agd_arm <- dat_agd_arm %>%
+         dplyr::select(-dplyr::one_of(intersect(network$int_names, colnames(dat_agd_arm)))) %>%
+         dplyr::rename_at(dplyr::vars(dplyr::starts_with(".int_")), ~gsub(".int_", "", ., fixed = TRUE)) %>%
+         tidyr::unnest(!!! rlang::syms(network$int_names))
     }
   } else {
-    dat_agd_arm <- tibble::tibble()
+    dat_agd_arm <- idat_agd_arm <- tibble::tibble()
     o_agd_arm <- NULL
   }
 
@@ -124,19 +124,19 @@ nma <- function(network,
 
     # Set up integration variables if present
     if (inherits(network, "mlnmr_data")) {
-      dat_agd_contrast <- dat_agd_contrast %>%
+      idat_agd_contrast <- dat_agd_contrast %>%
         dplyr::select(-dplyr::one_of(union(network$int_names, colnames(dat_agd_contrast)))) %>%
         dplyr::rename_at(dplyr::vars(dplyr::starts_with(".int_")), ~gsub(".int_", "", ., fixed = TRUE)) %>%
         tidyr::unnest(!!! rlang::syms(network$int_names))
     }
   } else {
-    dat_agd_contrast <- tibble::tibble()
+    dat_agd_contrast <- idat_agd_contrast <- tibble::tibble()
     o_agd_contrast <- NULL
   }
 
   # Construct design matrix all together then split out, so that same dummy
   # coding is used everywhere
-  dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
+  idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast)
 
   if (!is.null(regression)) {
     # Warn if combining AgD and IPD in a meta-regression without using integration
@@ -151,7 +151,7 @@ nma <- function(network,
     nma_formula <- ~-1 + .study + .trt
   }
 
-  X_all <- model.matrix(nma_formula, data = dat_all)
+  X_all <- model.matrix(nma_formula, data = idat_all)
 
   if (has_ipd(network)) {
     X_ipd <- X_all[1:nrow(dat_ipd), ]
@@ -160,13 +160,13 @@ nma <- function(network,
   }
 
   if (has_agd_arm(network)) {
-    X_agd_arm <- X_all[nrow(dat_ipd) + 1:nrow(dat_agd_arm), ]
+    X_agd_arm <- X_all[nrow(dat_ipd) + 1:nrow(idat_agd_arm), ]
   } else {
     X_agd_arm <- NULL
   }
 
   if (has_agd_contrast(network)) {
-    X_agd_contrast <- X_all[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast), ]
+    X_agd_contrast <- X_all[nrow(dat_ipd) + nrow(idat_agd_arm) + 1:nrow(idat_agd_contrast), ]
 
     # Need to difference .trtb terms - write custom model.matrix?
     abort("Contrast-based AgD not yet supported.")
@@ -175,7 +175,18 @@ nma <- function(network,
   }
 
   # Construct RE correlation matrix
-  Rho <- matrix()
+  if (trt_effects == "random") {
+    dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
+    if (consistency == "consistency") {
+      Rho <- RE_cor(dat_all$.study, dat_all$.trt, type = "reftrt")
+    } else if (consistency == "ume") {
+      Rho <- RE_cor(dat_all$.study, dat_all$.trt, type = "blshift")
+    } else {
+      abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
+    }
+  } else {
+    Rho <- NULL
+  }
 
   # Fit using nma.fit
   out <- nma.fit(ipd_x = X_ipd, ipd_y = o_ipd,
