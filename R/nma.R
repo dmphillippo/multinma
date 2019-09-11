@@ -179,13 +179,16 @@ nma <- function(network,
     dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
     if (consistency == "consistency") {
       Rho <- RE_cor(dat_all$.study, dat_all$.trt, type = "reftrt")
+      delta_id <- which_RE(dat_all$.study, dat_all$.trt, type = "reftrt")
     } else if (consistency == "ume") {
       Rho <- RE_cor(dat_all$.study, dat_all$.trt, type = "blshift")
+      delta_id <- which_RE(dat_all$.study, dat_all$.trt, type = "blshift")
     } else {
       abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
     }
   } else {
     Rho <- NULL
+    delta_id <- NULL
   }
 
   # Fit using nma.fit
@@ -195,6 +198,7 @@ nma <- function(network,
                  n_int = network$n_int,
                  trt_effects = trt_effects,
                  RE_cor = Rho,
+                 which_RE = delta_id,
                  likelihood = likelihood,
                  link = link,
                  ...,
@@ -229,6 +233,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     n_int = NULL,
                     trt_effects = c("fixed", "random"),
                     RE_cor = NULL,
+                    which_RE = NULL,
                     likelihood = NULL,
                     link = NULL,
                     ...,
