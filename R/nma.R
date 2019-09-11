@@ -112,6 +112,8 @@ nma <- function(network,
          dplyr::select(-dplyr::one_of(intersect(network$int_names, colnames(dat_agd_arm)))) %>%
          dplyr::rename_at(dplyr::vars(dplyr::starts_with(".int_")), ~gsub(".int_", "", ., fixed = TRUE)) %>%
          tidyr::unnest(!!! rlang::syms(network$int_names))
+    } else {
+      idat_agd_arm <- dat_agd_arm
     }
   } else {
     dat_agd_arm <- idat_agd_arm <- tibble::tibble()
@@ -128,6 +130,8 @@ nma <- function(network,
         dplyr::select(-dplyr::one_of(union(network$int_names, colnames(dat_agd_contrast)))) %>%
         dplyr::rename_at(dplyr::vars(dplyr::starts_with(".int_")), ~gsub(".int_", "", ., fixed = TRUE)) %>%
         tidyr::unnest(!!! rlang::syms(network$int_names))
+    } else {
+      idat_agd_contrast <- dat_agd_contrast
     }
   } else {
     dat_agd_contrast <- idat_agd_contrast <- tibble::tibble()
