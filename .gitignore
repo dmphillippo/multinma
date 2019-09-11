@@ -16,3 +16,4 @@ vignettes/*.html
 vignettes/*_files
 inst/*.bib.bak
 inst/*.bib.sav
+inst/doc
