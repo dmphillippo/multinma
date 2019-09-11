@@ -277,7 +277,7 @@ nma.fit <- function(ipd_x, ipd_y,
 #'
 #' Use `RE_cor` to generate the random effects correlation matrix, under the
 #' assumption of common heterogeneity variance (i.e. all within-study
-#' correlations are 0.5). Use `which_delta` to return a vector of IDs for the RE
+#' correlations are 0.5). Use `which_RE` to return a vector of IDs for the RE
 #' deltas (0 means no RE delta on this arm).
 #'
 #' @param study A vector of study IDs (integer, character, or factor)
@@ -344,12 +344,12 @@ RE_cor <- function(study, trt, type = c("reftrt", "blshift")) {
 }
 
 #' @rdname random_effects
-#' @aliases which_delta
+#' @aliases which_RE
 #' @export
 #' @examples
-#' which_delta(smoking$studyn, smoking$trtn)
-#' which_delta(smoking$studyn, smoking$trtn, type = "blshift")
-which_delta <- function(study, trt, type = c("reftrt", "blshift")) {
+#' which_RE(smoking$studyn, smoking$trtn)
+#' which_RE(smoking$studyn, smoking$trtn, type = "blshift")
+which_RE <- function(study, trt, type = c("reftrt", "blshift")) {
   if (!is.numeric(study) && !is.character(study) && !is.factor(study) || is.matrix(study)) {
     abort("`study` must be a vector, either numeric, character, or factor.")
   }
