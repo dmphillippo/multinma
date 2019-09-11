@@ -47,12 +47,12 @@ set_ipd <- function(data,
   .E <- pull_non_null(data, enquo(E))
   # .Surv <- ...
 
-  o_continuous <- check_outcome_continuous(.y, with_se = FALSE)
-  o_binary <- check_outcome_binary(.r, .E)
-  # o_surv <- check_outcome_surv(.Surv)
+  check_outcome_continuous(.y, with_se = FALSE)
+  check_outcome_binary(.r, .E)
+  # check_outcome_surv(.Surv)
 
-  o_type <- get_outcome_type(y = o_continuous$y, se = NULL,
-                             r = o_binary$r, n = NULL, E = o_binary$E)
+  o_type <- get_outcome_type(y = .y, se = NULL,
+                             r = .r, n = NULL, E = .E)
 
   # Create tibble in standard format
   d <- tibble::tibble(
@@ -61,11 +61,11 @@ set_ipd <- function(data,
   )
 
   if (o_type == "continuous") {
-    d <- tibble::add_column(d, .y = o_continuous$y)
+    d <- tibble::add_column(d, .y = .y)
   } else if (o_type == "binary") {
-    d <- tibble::add_column(d, .r = o_binary$r)
+    d <- tibble::add_column(d, .r = .r)
   } else if (o_type == "rate") {
-    d <- tibble::add_column(d, .r = o_binary$r, .E = o_binary$E)
+    d <- tibble::add_column(d, .r = .r, .E = .E)
   }
 
   d <- dplyr::bind_cols(d, data)
@@ -136,12 +136,12 @@ set_agd_arm <- function(data,
   .E <- pull_non_null(data, enquo(E))
   # .Surv <- ...
 
-  o_continuous <- check_outcome_continuous(.y, .se, with_se = TRUE)
-  o_count <- check_outcome_count(.r, .n, .E)
-  # o_surv <- check_outcome_surv(.Surv)
+  check_outcome_continuous(.y, .se, with_se = TRUE)
+  check_outcome_count(.r, .n, .E)
+  # check_outcome_surv(.Surv)
 
-  o_type <- get_outcome_type(y = o_continuous$y, se = o_continuous$se,
-                             r = o_count$r, n = o_count$n, E = o_count$E)
+  o_type <- get_outcome_type(y = .y, se = .se,
+                             r = .r, n = .n, E = .E)
 
   # Create tibble in standard format
   d <- tibble::tibble(
@@ -150,11 +150,11 @@ set_agd_arm <- function(data,
   )
 
   if (o_type == "continuous") {
-    d <- tibble::add_column(d, .y = o_continuous$y, .se = o_continuous$se)
+    d <- tibble::add_column(d, .y = .y, .se = .se)
   } else if (o_type == "count") {
-    d <- tibble::add_column(d, .r = o_count$r, .n = o_count$n)
+    d <- tibble::add_column(d, .r = .r, .n = .n)
   } else if (o_type == "rate") {
-    d <- tibble::add_column(d, .r = o_count$r, .E = o_count$E)
+    d <- tibble::add_column(d, .r = .r, .E = .E)
   }
 
   d <- dplyr::bind_cols(d, data)
@@ -223,9 +223,9 @@ set_agd_contrast <- function(data,
   .y <- pull_non_null(data, enquo(y))
   .se <- pull_non_null(data, enquo(se))
 
-  o_continuous <- check_outcome_continuous(.y, .se, with_se = TRUE)
+  check_outcome_continuous(.y, .se, with_se = TRUE)
 
-  o_type <- get_outcome_type(y = o_continuous$y, se = o_continuous$se,
+  o_type <- get_outcome_type(y = .y, se = .se,
                              r = NULL, n = NULL, E = NULL)
 
   # Get all treatments
@@ -236,8 +236,8 @@ set_agd_contrast <- function(data,
     .study = factor(.study),
     .trt = factor(.trt, levels = trts),
     .trt_b = factor(.trt_b, levels = trts),
-    .y = o_continuous$y,
-    .se = o_continuous$se)
+    .y = .y,
+    .se = .se)
 
   d <- dplyr::bind_cols(d, data)
 
