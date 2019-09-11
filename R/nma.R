@@ -247,8 +247,6 @@ nma.fit <- function(ipd_x, ipd_y,
                     int_thin = 100L) {
 
   # Check model arguments
-  consistency <- rlang::arg_match(consistency)
-  if (length(consistency) > 1) abort("`consistency` must be a single string.")
   trt_effects <- rlang::arg_match(trt_effects)
   if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
 
