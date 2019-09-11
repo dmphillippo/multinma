@@ -174,7 +174,30 @@ nma <- function(network,
     X_agd_contrast <- NULL
   }
 
+  # Construct RE correlation matrix
+  Rho <- matrix()
 
+  # Fit using nma.fit
+  out <- nma.fit(ipd_x = X_ipd, ipd_y = o_ipd,
+                 agd_arm_x = X_agd_arm, agd_arm_y = o_agd_arm,
+                 agd_contrast_x = X_agd_contrast, agd_contrast_y = o_agd_contrast,
+                 n_int = network$n_int,
+                 consistency = consistency,
+                 trt_effects = trt_effects,
+                 RE_cor = Rho,
+                 likelihood = likelihood,
+                 link = link,
+                 ...,
+                 prior_intercept = prior_intercept,
+                 prior_trt = prior_trt,
+                 prior_het = prior_het,
+                 prior_reg = prior_reg,
+                 prior_aux = prior_aux,
+                 QR = QR,
+                 adapt_delta = adapt_delta,
+                 int_thin = int_thin)
+
+  return(out)
 }
 
 
