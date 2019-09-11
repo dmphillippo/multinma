@@ -255,6 +255,18 @@ nma.fit <- function(ipd_x, ipd_y,
   likelihood <- check_likelihood(likelihood)
   link <- check_link(link, likelihood)
 
+  if (!is.null(RE_cor) &&
+      (!is.matrix(RE_cor) || !is.numeric(RE_cor))) {
+    abort("`RE_cor` should be a numeric matrix.")
+  }
+  if (!is.null(which_RE) &&
+      (!is.numeric(which_RE) ||
+       trunc(which_RE) != which_RE ||
+       any(which_RE) < 0 ||
+       is.matrix(which_RE))) {
+    abort("`which_RE` should be an integer ")
+  }
+
   # Check priors
   if (!inherits(prior_intercept, "nma_prior")) abort("`prior_intercept` should be a prior distribution, see ?priors.")
   if (!inherits(prior_trt, "nma_prior")) abort("`prior_trt` should be a prior distribution, see ?priors.")
