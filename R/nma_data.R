@@ -415,17 +415,13 @@ check_outcome_continuous <- function(y, se = NULL, with_se = TRUE) {
     } else {
       if (!null_y) abort("Specify standard error `se` for continuous outcome `y`")
       if (!null_se) abort("Specify continuous outcome `y`")
-      y <- NULL
-      se <- NULL
     }
-    return(list(y = y, se = se))
+    invisible(list(y = y, se = se))
   } else {
     if (!null_y) {
       if (!is.numeric(y)) abort("Continuous outcome `y` must be numeric")
-    } else {
-      y <- NULL
     }
-    return(list(y = y))
+    invisible(list(y = y))
   }
 }
 
@@ -462,7 +458,7 @@ check_outcome_count <- function(r, n, E) {
     if (!null_E && any(r < 0)) abort("Rate outcome count `r` must be non-negative")
   }
 
-  return(list(r = r, n = n, E = E))
+  invisible(list(r = r, n = n, E = E))
 }
 
 #' Check binary outcomes
@@ -490,7 +486,7 @@ check_outcome_binary <- function(r, E) {
     if (any(! r %in% c(0, 1))) abort("Binary outcome `r` must equal 0 or 1")
   }
 
-  return(list(r = r, E = E))
+  invisible(list(r = r, E = E))
 }
 
 #' Check valid outcome combination across data sources
