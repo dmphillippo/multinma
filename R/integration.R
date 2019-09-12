@@ -126,23 +126,67 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
   x_int_names <- paste0(".int_", x_names)
 
   if (has_agd_arm(network)) {
+    # rlang::with_handlers(
     out$agd_arm <-
       dplyr::bind_cols(
         network$agd_arm,
         purrr::pmap_dfc(list(x_int_names, ds, u_cor_l),
                         ~ rowwise(network$agd_arm) %>%
                           transmute(!! ..1 := list(rlang::eval_tidy(rlang::call2(..2$qfun, p = ..3, !!! ..2$args)))))
+      )#,
+    # error = abort,
+    # warning = rlang::calling(~{warn(.); rlang::cnd_muffle(.)})
+    # )
+
+    # Check valid values produced
+    invalid_rows <- out$agd_arm %>%
+      dplyr::mutate_at(x_int_names,
+                       .funs = ~purrr::map_lgl(.,
+                                 ~any(is.na(.) || is.infinite(.) ||
+                                      is.null(.) || is.nan(.)))
+                       ) %>%
+      dplyr::filter_at(x_int_names, dplyr::any_vars(.))
+
+    if (nrow(invalid_rows) > 0) {
+      abort(
+        glue::glue("Invalid integration points were generated (either NA, NaN, Inf, or NULL).\n",
+                   "Check the input parameters for the following (study, treatment):\n",
+                   glue::glue_collapse(glue::glue(" {invalid_rows$.study}, {invalid_rows$.trt}"),
+                                       sep = "\n"))
       )
+    }
   }
 
   if (has_agd_contrast(network)) {
+    # rlang::with_handlers(
     out$agd_contrast <-
       dplyr::bind_cols(
         network$agd_contrast,
         purrr::pmap_dfc(list(x_int_names, ds, u_cor_l),
                         ~ rowwise(network$agd_contrast) %>%
                           transmute(!! ..1 := list(rlang::eval_tidy(rlang::call2(..2$qfun, p = ..3, !!! ..2$args)))))
+      )#,
+    # error = abort,
+    # warning = rlang::calling(~{warn(.); rlang::cnd_muffle(.)})
+    # )
+
+    # Check valid values produced
+    invalid_rows <- out$agd_contrast %>%
+      dplyr::mutate_at(x_int_names,
+                       .funs = ~purrr::map_lgl(.,
+                                               ~any(is.na(.) || is.infinite(.) ||
+                                                      is.null(.) || is.nan(.)))
+      ) %>%
+      dplyr::filter_at(x_int_names, dplyr::any_vars(.))
+
+    if (nrow(invalid_rows) > 0) {
+      abort(
+        glue::glue("Invalid integration points were generated (either NA, NaN, Inf, or NULL).\n",
+                   "Check the input parameters for the following (study, comparison):\n",
+                   glue::glue_collapse(glue::glue(" {invalid_rows$.study}, {invalid_rows$.trt} vs. {invalid_rows$.trt_b}"),
+                                       sep = "\n"))
       )
+    }
   }
 
   # Set as mlnmr_data class

@@ -21,7 +21,8 @@ smkdummy <-
   group_by(studyn) %>%
   mutate(x1_mean = rnorm(1), x1_sd = runif(1, 0.5, 2),
          x2 = runif(1),
-         x3_mean = rnorm(1), x3_sd = runif(1, 0.5, 2))
+         x3_mean = rnorm(1), x3_sd = runif(1, 0.5, 2)) %>%
+  ungroup()
 
 ns_ipd <- 2
 
@@ -102,12 +103,65 @@ test_that("covariate names must match IPD if provided", {
 })
 
 test_that("warning if missing covariate values when calculating correlations from IPD", {
-  smknet_miss <- smknet
+  smknet_miss <- combine_network(smknet_ipd,
+                                 set_agd_arm(smkdummy, studyn, trtn, r = r, n = n))
   smknet_miss$ipd[5, "x1"] <- NA
   expect_warning(add_integration(smknet_miss,
                                  x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
                                  x2 = distr(qbinom, size = 1, prob = x2)),
                  "Missing values.+complete cases")
+})
+
+make_sub <- function(x, n, sub) {
+  x[sample.int(length(x), n)] <- sub
+  return(x)
+}
+
+test_that("error if qfun produces NaN, NA, NULL, Inf", {
+  m <- "Invalid integration points were generated"
+
+  smkdummy_miss <- smkdummy %>% mutate(x1_mean = make_sub(x1_mean, 5, NA),
+                                       x3_mean = make_sub(x3_mean, 5, NA))
+
+  smknet_miss <- set_agd_arm(smkdummy_miss, studyn, trtn, r = r, n = n) %>%
+    combine_network(smknet_ipd)
+  smknet_missc <- set_agd_contrast(smkdummy_miss, studyn, trtn, trtn, y = r, se = n) %>%
+    combine_network(smknet_ipd)
+
+  expect_error(suppressWarnings(
+    add_integration(smknet_miss,
+                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                    x2 = distr(qbinom, 1, x2),
+                    x3 = distr(qnorm, x3_mean, x3_sd))),
+               m)
+
+  expect_error(suppressWarnings(
+    add_integration(smknet_missc,
+                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                    x2 = distr(qbinom, 1, x2),
+                    x3 = distr(qnorm, x3_mean, x3_sd))),
+               m)
+
+  smkdummy_bad <- smkdummy %>% mutate(x1_sd = make_sub(x1_sd, 5, -1),
+                                      x3_sd = make_sub(x3_sd, 5, -1))
+
+  smknet_bad <- set_agd_arm(smkdummy_bad, studyn, trtn, r = r, n = n) %>%
+    combine_network(smknet_ipd)
+  smknet_badc <- set_agd_contrast(smkdummy_bad, studyn, trtn, trtn, y = r, se = n) %>%
+    combine_network(smknet_ipd)
+
+  expect_error(suppressWarnings(
+    add_integration(smknet_bad,
+                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                    x3 = distr(qnorm, mean = x3_mean, sd = x3_sd))),
+               m)
+
+  expect_error(suppressWarnings(
+    add_integration(smknet_badc,
+                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                    x3 = distr(qnorm, mean = x3_mean, sd = x3_sd))),
+               m)
+
 })
 
 test_that("integration point marginals and correlations are correct", {
