@@ -337,6 +337,16 @@ nma.fit <- function(ipd_x, ipd_y,
              length(adapt_delta) > 1 ||
              adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
+  # Check design matrices
+  if (!is.null(ipd_x) && (!is.matrix(ipd_x) || !is.numeric(ipd_x))) {
+    abort("`ipd_x` should be a numeric matrix.")
+  }
+  if (!is.null(agd_arm_x) && (!is.matrix(agd_arm_x) || !is.numeric(agd_arm_x))) {
+    abort("`agd_arm_x` should be a numeric matrix.")
+  }
+  if (!is.null(agd_contrast_x) && (!is.matrix(agd_contrast_x) || !is.numeric(agd_contrast_x))) {
+    abort("`agd_contrast_x` should be a numeric matrix.")
+  }
 }
 
 #' Random effects structure
