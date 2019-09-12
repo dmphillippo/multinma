@@ -181,3 +181,25 @@ test_that("set_* return `studies` factor", {
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, trt_b, y = cont, se = cont_pos)$studies,
                factor(letters[1:2]))
 })
+
+make_na <- function(x, n) {
+  x[sample.int(length(x), n)] <- NA
+  return(x)
+}
+
+test_that("set_* error if outcomes contain missing values", {
+  agd_arm_miss <- agd_arm %>% mutate_at(vars(cont:bin), ~make_na(., 1))
+  agd_contrast_miss <- agd_contrast %>% mutate_at(vars(cont:bin), ~make_na(., 1))
+
+  m <- "contains missing values"
+
+  expect_error(set_agd_arm(agd_arm_miss, studyn, trtn, y = cont, se = cont_pos), m)
+  expect_error(set_agd_arm(agd_arm_miss, studyn, trtn, r = disc, n = disc_p1), m)
+  expect_error(set_agd_arm(agd_arm_miss, studyn, trtn, r = disc, E = cont_pos), m)
+
+  expect_error(set_ipd(agd_arm_miss, studyn, trtn, y = cont), m)
+  expect_error(set_ipd(agd_arm_miss, studyn, trtn, r = disc), m)
+  expect_error(set_ipd(agd_arm_miss, studyn, trtn, r = disc, E = cont_pos), m)
+
+  expect_error(set_agd_contrast(agd_contrast_miss, studyn, trtn, trt_b, y = cont, se = cont_pos), m)
+})

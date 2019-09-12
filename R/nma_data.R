@@ -411,6 +411,8 @@ check_outcome_continuous <- function(y, se = NULL, with_se = TRUE) {
     if (!null_y && !null_se) {
       if (!is.numeric(y)) abort("Continuous outcome `y` must be numeric")
       if (!is.numeric(se)) abort("Standard error `se` must be numeric")
+      if (any(is.na(y))) abort("Continuous outcome `y` contains missing values")
+      if (any(is.na(se))) abort("Standard error `se` contains missing values")
       if (any(se <= 0)) abort("Standard errors must be positive")
     } else {
       if (!null_y) abort("Specify standard error `se` for continuous outcome `y`")
@@ -419,6 +421,7 @@ check_outcome_continuous <- function(y, se = NULL, with_se = TRUE) {
     invisible(list(y = y, se = se))
   } else {
     if (!null_y) {
+      if (any(is.na(y))) abort("Continuous outcome `y` contains missing values")
       if (!is.numeric(y)) abort("Continuous outcome `y` must be numeric")
     }
     invisible(list(y = y))
@@ -439,6 +442,7 @@ check_outcome_count <- function(r, n, E) {
 
   if (!null_n) {
     if (!is.numeric(n)) abort("Denominator `n` must be numeric")
+    if (any(is.na(n))) abort("Denominator `n` contains missing values")
     if (any(n != trunc(n))) abort("Denominator `n` must be integer-valued")
     if (any(n <= 0)) abort("Denominator `n` must be greater than zero")
     if (null_r) abort("Specify outcome count `r`.")
@@ -446,6 +450,7 @@ check_outcome_count <- function(r, n, E) {
 
   if (!null_E) {
     if (!is.numeric(E)) abort("Time at risk `E` must be numeric")
+    if (any(is.na(E))) abort("Time at risk `E` contains missing values")
     if (any(E <= 0)) abort("Time at risk `E` must be positive")
     if (null_r) abort("Specify outcome count `r`.")
   }
@@ -453,6 +458,7 @@ check_outcome_count <- function(r, n, E) {
   if (!null_r) {
     if (null_n && null_E) abort("Specify denominator `n` (count outcome) or time at risk `E` (rate outcome)")
     if (!is.numeric(r)) abort("Outcome count `r` must be numeric")
+    if (any(is.na(r))) abort("Outcome count `r` contains missing values")
     if (any(r != trunc(r))) abort("Outcome count `r` must be integer-valued")
     if (!null_n && any(n < r | r < 0)) abort("Count outcome `r` must be between 0 and `n`")
     if (!null_E && any(r < 0)) abort("Rate outcome count `r` must be non-negative")
@@ -476,13 +482,16 @@ check_outcome_binary <- function(r, E) {
       abort("Specify count `r` for rate outcome")
     } else {
       if (!is.numeric(E)) abort("Time at risk `E` must be numeric")
+      if (any(is.na(E))) abort("Time at risk `E` contains missing values")
       if (any(E <= 0)) abort("Time at risk `E` must be positive")
       if (!is.numeric(r)) abort("Rate outcome count `r` must be numeric")
+      if (any(is.na(r))) abort("Rate outcome count `r` contains missing values")
       if (any(r != trunc(r))) abort("Rate outcome count `r` must be non-negative integer")
       if (any(r < 0)) abort("Rate outcome count `r` must be non-negative integer")
     }
   } else if (!null_r) {
     if (!is.numeric(r)) abort("Binary outcome `r` must be numeric")
+    if (any(is.na(r))) abort("Binary outcome `r` contains missing values")
     if (any(! r %in% c(0, 1))) abort("Binary outcome `r` must equal 0 or 1")
   }
 
