@@ -142,6 +142,10 @@ nma <- function(network,
   # coding is used everywhere
   idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast)
 
+  if (consistency != "consistency") {
+    abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
+  }
+
   if (!is.null(regression)) {
     # Warn if combining AgD and IPD in a meta-regression without using integration
     if (!inherits(network, "mlnmr_data") && has_ipd(network) &&
