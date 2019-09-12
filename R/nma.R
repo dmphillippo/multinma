@@ -347,6 +347,18 @@ nma.fit <- function(ipd_x, ipd_y,
   if (!is.null(agd_contrast_x) && (!is.matrix(agd_contrast_x) || !is.numeric(agd_contrast_x))) {
     abort("`agd_contrast_x` should be a numeric matrix.")
   }
+
+  # Make full design matrix
+  X_all <- rbind(ipd_x, agd_arm_x, agd_contrast_x)
+
+  # Take thin QR decomposition if QR = TRUE
+  if (QR) {
+    X_all_qr <- qr(X_all)
+    X_all_Q <- qr.Q(X_all_qr) * sqrt(nrow(X_all) - 1)
+    X_all_R <- qr.R(X_all_qr)[, sort.list(X_all_qr$pivot)] / sqrt(nrow(X_all) - 1)
+    X_all_R_inv <- solve(X_all_R)
+  }
+
 }
 
 #' Random effects structure
