@@ -297,6 +297,59 @@ nma.fit <- function(ipd_x, ipd_y,
                     adapt_delta = NULL,
                     int_thin = 100L) {
 
+  if (missing(ipd_x)) ipd_x <- NULL
+  if (missing(ipd_y)) ipd_y <- NULL
+  if (missing(agd_arm_x)) agd_arm_x <- NULL
+  if (missing(agd_arm_y)) agd_arm_y <- NULL
+  if (missing(agd_contrast_x)) agd_contrast_x <- NULL
+  if (missing(agd_contrast_y)) agd_contrast_y <- NULL
+
+  # Check available x and y
+  if (xor(is.null(ipd_x), is.null(ipd_y)))
+    abort("`ipd_x` and `ipd_y` should both be present or both NULL.")
+  if (xor(is.null(agd_arm_x), is.null(agd_arm_y)))
+    abort("`ipd_x` and `ipd_y` should both be present or both NULL.")
+  if (xor(is.null(agd_contrast_x), is.null(agd_contrast_y)))
+    abort("`ipd_x` and `ipd_y` should both be present or both NULL.")
+
+  has_ipd <- !is.null(ipd_x) && !is.null(ipd_y)
+  has_agd_arm <- !is.null(agd_arm_x) && !is.null(agd_arm_y)
+  has_agd_contrast <-  !is.null(agd_contrast_x) && !is.null(agd_contrast_y)
+
+  # Check design matrices, outcomes
+  if (has_ipd) {
+    if (!is.matrix(ipd_x) || !is.numeric(ipd_x))
+      abort("`ipd_x` should be a numeric matrix.")
+    if (any(!purrr::map_lgl(ipd_x, is.numeric)))
+      abort("`ipd_y` should be numeric outcome data.")
+    if (nrow(ipd_x) != nrow(ipd_y))
+      abort("Number of rows in `ipd_x` and `ipd_y` do not match.")
+  }
+  if (!is.null(agd_arm_x)) {
+    if (!is.matrix(agd_arm_x) || !is.numeric(agd_arm_x))
+      abort("`agd_arm_x` should be a numeric matrix.")
+    if (any(!purrr::map_lgl(agd_arm_x, is.numeric)))
+      abort("`agd_arm_y` should be numeric outcome data.")
+    if (nrow(agd_arm_x) != nrow(agd_arm_y))
+      abort("Number of rows in `agd_arm_x` and `agd_arm_y` do not match.")
+  }
+  if (!is.null(agd_contrast_x)) {
+    if (!is.matrix(agd_contrast_x) || !is.numeric(agd_contrast_x))
+      abort("`agd_contrast_x` should be a numeric matrix.")
+    if (any(!purrr::map_lgl(agd_contrast_x, is.numeric)))
+      abort("`agd_contrast_y` should be numeric outcome data.")
+    if (nrow(agd_contrast_x) != nrow(agd_contrast_y))
+      abort("Number of rows in `agd_contrast_x` and `agd_contrast_y` do not match.")
+  }
+
+  # Check matching X column names and dimensions if more than one present
+  if ((has_ipd &&
+       ((has_agd_arm && !identical(colnames(ipd_x), colnames(agd_arm_x)))) ||
+       ((has_agd_contrast && !identical(colnames(ipd_x), colnames(agd_contrast_x))))) ||
+      (has_agd_arm &&
+       (has_agd_contrast && !identical(colnames(agd_arm_x), colnames(agd_contrast_x)))))
+    abort("Non-matching columns in *_x matrices.")
+
   # Check model arguments
   trt_effects <- rlang::arg_match(trt_effects)
   if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
@@ -337,16 +390,6 @@ nma.fit <- function(ipd_x, ipd_y,
              length(adapt_delta) > 1 ||
              adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
-  # Check design matrices
-  if (!is.null(ipd_x) && (!is.matrix(ipd_x) || !is.numeric(ipd_x))) {
-    abort("`ipd_x` should be a numeric matrix.")
-  }
-  if (!is.null(agd_arm_x) && (!is.matrix(agd_arm_x) || !is.numeric(agd_arm_x))) {
-    abort("`agd_arm_x` should be a numeric matrix.")
-  }
-  if (!is.null(agd_contrast_x) && (!is.matrix(agd_contrast_x) || !is.numeric(agd_contrast_x))) {
-    abort("`agd_contrast_x` should be a numeric matrix.")
-  }
 
   # Make full design matrix
   X_all <- rbind(ipd_x, agd_arm_x, agd_contrast_x)

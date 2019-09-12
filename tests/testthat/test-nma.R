@@ -114,3 +114,53 @@ test_that("nma() error if missing values in outcomes or predictors", {
     nma(combine_network(smknet_agd_missx, smknet_ipd_missx),
         regression = ~x1)), m)
 })
+
+test_that("nma.fit() error if only one of x or y provided", {
+  x <- matrix(1, nrow = 3, ncol = 3)
+  colnames(x) <- c("a", "b", "c")
+
+  y <- tibble(.y = 1:3)
+
+  m <- "both be present or both NULL"
+  expect_error(nma.fit(ipd_x = x), m)
+  expect_error(nma.fit(ipd_y = y), m)
+  expect_error(nma.fit(agd_arm_x = x), m)
+  expect_error(nma.fit(agd_arm_y = y), m)
+  expect_error(nma.fit(agd_contrast_x = x), m)
+  expect_error(nma.fit(agd_contrast_y = y), m)
+})
+
+test_that("nma.fit() error if x and y dimension mismatch", {
+  x <- matrix(1, nrow = 3, ncol = 3)
+  colnames(x) <- c("a", "b", "c")
+
+  y <- tibble(.y = 1:2)
+
+  m <- "Number of rows.+do not match"
+  expect_error(nma.fit(ipd_x = x, ipd_y = y), m)
+  expect_error(nma.fit(agd_arm_x = x, agd_arm_y = y), m)
+  expect_error(nma.fit(agd_contrast_x = x, agd_contrast_y = y), m)
+})
+
+test_that("nma.fit() error if x column names different", {
+  x1 <- x2 <- matrix(1, nrow = 3, ncol = 3)
+  colnames(x1) <- c("a", "b", "c")
+  colnames(x2) <- c("a", "b", "D")
+  x3 <- x1[, 1:2]
+
+  y <- tibble(.y = 1:3)
+
+  m <- "Non-matching columns"
+  expect_error(nma.fit(ipd_x = x1, ipd_y = y,
+                       agd_arm_x = x2, agd_arm_y = y), m)
+  expect_error(nma.fit(ipd_x = x1, ipd_y = y,
+                       agd_contrast_x = x2, agd_contrast_y = y), m)
+  expect_error(nma.fit(agd_arm_x = x2, agd_arm_y = y,
+                       agd_contrast_x = x2, agd_contrast_y = y), m)
+  expect_error(nma.fit(ipd_x = x1, ipd_y = y,
+                       agd_arm_x = x3, agd_arm_y = y), m)
+  expect_error(nma.fit(ipd_x = x1, ipd_y = y,
+                       agd_contrast_x = x3, agd_contrast_y = y), m)
+  expect_error(nma.fit(agd_arm_x = x2, agd_arm_y = y,
+                       agd_contrast_x = x3, agd_contrast_y = y), m)
+})
