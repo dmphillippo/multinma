@@ -313,7 +313,7 @@ nma.fit <- function(ipd_x, ipd_y,
        trunc(which_RE) != which_RE ||
        any(which_RE) < 0 ||
        is.matrix(which_RE))) {
-    abort("`which_RE` should be an integer ")
+    abort("`which_RE` should be an integer vector.")
   }
 
   # Check priors
