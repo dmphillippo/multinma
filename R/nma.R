@@ -155,6 +155,49 @@ nma <- function(network,
     nma_formula <- ~-1 + .study + .trt
   }
 
+  # Check that required variables are present in each data set, and non-missing
+  if (has_ipd(network)) {
+    rlang::with_handlers(
+      X_ipd_frame <- model.frame(nma_formula, dat_ipd, na.action = NULL),
+      error = ~abort(paste0("Failed to construct design matrix for IPD.\n", .)))
+
+    X_ipd_has_na <- names(which(purrr::map_lgl(X_ipd_frame, ~any(is.na(.)))))
+  } else {
+    X_ipd_has_na <- character(0)
+  }
+
+  if (has_agd_arm(network)) {
+    rlang::with_handlers(
+      X_agd_arm_frame <- model.frame(nma_formula, idat_agd_arm, na.action = NULL),
+      error = ~abort(paste0("Failed to construct design matrix for AgD (arm-based).\n", .)))
+
+    X_agd_arm_has_na <- names(which(purrr::map_lgl(X_agd_arm_frame, ~any(is.na(.)))))
+  } else {
+    X_agd_arm_has_na <- character(0)
+  }
+
+  if (has_agd_contrast(network)) {
+    rlang::with_handlers(
+      X_agd_contrast_frame <- model.frame(nma_formula, idat_agd_contrast, na.action = NULL),
+      error = ~abort(paste0("Failed to construct design matrix for AgD (contrast-based).\n", .)))
+
+    X_agd_contrast_has_na <- names(which(purrr::map_lgl(X_agd_contrast_frame, ~any(is.na(.)))))
+  } else {
+    X_agd_contrast_has_na <- character(0)
+  }
+
+  dat_has_na <- c(length(X_ipd_has_na) > 0,
+                  length(X_agd_arm_has_na) > 0,
+                  length(X_agd_contrast_has_na) > 0)
+  if (any(dat_has_na)) {
+    abort(glue::glue(glue::glue_collapse(
+      c("Variables with missing values in IPD: {paste(X_ipd_has_na, collapse = ', ')}.",
+        "Variables with missing values in AgD (arm-based): {paste(X_agd_arm_has_na, collapse = ', ')}.",
+        "Variables with missing values in AgD (contrast-based): {paste(X_agd_contrast_has_na, collapse = ', ')}."
+       )[dat_has_na], sep = "\n")))
+  }
+
+  # Construct model matrix
   X_all <- model.matrix(nma_formula, data = idat_all)
 
   if (has_ipd(network)) {

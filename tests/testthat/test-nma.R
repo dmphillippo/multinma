@@ -87,9 +87,30 @@ smknet_2 <- combine_network(smknet_agd, smknet_ipd) %>%
 
 test_that("nma() regression formula is valid", {
   expect_error(nma(smknet_2, regression = y ~ x), "one-sided formula")
-  skip("Not sure how to do this yet...")
-  expect_error(nma(smknet_2, regression = ~ a), "not present in data")
-  expect_error(nma(smknet_2, regression = ~ a*.trt), "not present in data")
-  expect_error(nma(smknet_2, regression = ~ (a + b)*.trt), "not present in data")
+  expect_error(nma(smknet_2, regression = ~ a), "Failed to construct design matrix")
+  expect_error(nma(smknet_2, regression = ~ a*.trt), "Failed to construct design matrix")
+  expect_error(nma(smknet_2, regression = ~ (a + b)*.trt), "Failed to construct design matrix")
 })
 
+make_na <- function(x, n) {
+  x[sample.int(length(x), n)] <- NA
+  return(x)
+}
+
+smknet_agd_missx <- smkdummy %>%
+  mutate(x1_mean = make_na(x1_mean, 2), x1 = x1_mean) %>%
+  set_agd_arm(studyn, trtn, r = r, n = n)
+
+smknet_ipd_missx <- ipddummy %>%
+  mutate(x1 = make_na(x1, 10)) %>%
+  set_ipd(studyn, trtn, r = r)
+
+test_that("nma() error if missing values in outcomes or predictors", {
+  m <- "missing values"
+  expect_error(nma(smknet_agd_missx, regression = ~x1_mean), m)
+  expect_error(nma(smknet_ipd_missx, regression = ~x1), m)
+  expect_error(suppressWarnings(
+    # Suppress warning about naive plug-in model
+    nma(combine_network(smknet_agd_missx, smknet_ipd_missx),
+        regression = ~x1)), m)
+})
