@@ -104,15 +104,15 @@ nma <- function(network,
   # Get design matrices and outcomes
   if (has_ipd(network)) {
     dat_ipd <- network$ipd
-    o_ipd <- get_outcome_variables(dat_ipd, network$outcome$ipd)
+    y_ipd <- get_outcome_variables(dat_ipd, network$outcome$ipd)
   } else {
     dat_ipd <- tibble::tibble()
-    o_ipd <- NULL
+    y_ipd <- NULL
   }
 
   if (has_agd_arm(network)) {
     dat_agd_arm <- network$agd_arm
-    o_agd_arm <- get_outcome_variables(dat_agd_arm, network$outcome$agd_arm)
+    y_agd_arm <- get_outcome_variables(dat_agd_arm, network$outcome$agd_arm)
 
     # Set up integration variables if present
     if (inherits(network, "mlnmr_data")) {
@@ -125,12 +125,12 @@ nma <- function(network,
     }
   } else {
     dat_agd_arm <- idat_agd_arm <- tibble::tibble()
-    o_agd_arm <- NULL
+    y_agd_arm <- NULL
   }
 
   if (has_agd_contrast(network)) {
     dat_agd_contrast <- network$agd_contrast
-    o_agd_contrast <- get_outcome_variables(dat_agd_contrast, network$outcome$agd_contrast)
+    y_agd_contrast <- get_outcome_variables(dat_agd_contrast, network$outcome$agd_contrast)
 
     # Set up integration variables if present
     if (inherits(network, "mlnmr_data")) {
@@ -143,7 +143,7 @@ nma <- function(network,
     }
   } else {
     dat_agd_contrast <- idat_agd_contrast <- tibble::tibble()
-    o_agd_contrast <- NULL
+    y_agd_contrast <- NULL
   }
 
   # Construct design matrix all together then split out, so that same dummy
@@ -283,9 +283,9 @@ nma <- function(network,
   }
 
   # Fit using nma.fit
-  out <- nma.fit(ipd_x = X_ipd, ipd_y = o_ipd,
-                 agd_arm_x = X_agd_arm, agd_arm_y = o_agd_arm,
-                 agd_contrast_x = X_agd_contrast, agd_contrast_y = o_agd_contrast,
+  out <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
+                 agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
+                 agd_contrast_x = X_agd_contrast, agd_contrast_y = y_agd_contrast,
                  n_int = if (inherits(network, "mlnmr_data")) network$n_int else 1,
                  trt_effects = trt_effects,
                  RE_cor = .RE_cor,
