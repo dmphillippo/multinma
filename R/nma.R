@@ -455,28 +455,37 @@ nma.fit <- function(ipd_x, ipd_y,
   n_study <- sum(col_study)
   n_trt <- sum(col_trt)
 
+  get_study <- function(x) which(x == 1)
+  get_trt <- function(x, v = 1) if (any(x == v)) which(x == v) + 1 else 1
+
   if (has_ipd) {
-    ipd_study <- apply(ipd_x[, col_study], 1, function(x) which(x == 1))
-    ipd_trt <- apply(ipd_x[, col_trt], 1, function(x) which(x == 1))
-    n_ipd <- nrow(ipd_x)
+    ipd_study <- apply(ipd_x[, col_study], 1, get_study)
+    ipd_trt <- apply(ipd_x[, col_trt], 1, get_trt)
+    ni_ipd <- nrow(ipd_x)
   } else {
     ipd_study <- ipd_trt <- numeric()
-    n_ipd <- 0
+    ni_ipd <- 0
   }
 
   if (has_agd_arm) {
-    agd_arm_study <- apply(agd_arm_x[, col_study], 1, function(x) which(x == 1))
-    agd_arm_trt <- apply(agd_arm_x[, col_trt], 1, function(x) which(x == 1))
+    ni_agd_arm <- nrow(agd_arm_y)
+    aa1 <- 0:(ni_agd_arm - 1)*n_int + 1
+    agd_arm_study <- apply(agd_arm_x[aa1, col_study], 1, get_study)
+    agd_arm_trt <- apply(agd_arm_x[aa1, col_trt], 1, get_trt)
   } else {
     agd_arm_study <- agd_arm_trt <- numeric()
+    ni_agd_arm <- 0
   }
 
   if (has_agd_contrast) {
-    agd_contrast_study <- apply(agd_contrast_x[, col_study], 1, function(x) which(x == 1))
-    agd_contrast_trt <- apply(agd_contrast_x[, col_trt], 1, function(x) which(x == 1))
-    agd_contrast_trt_b <- apply(agd_contrast_x[, col_trt], 1, function(x) which(x == -1))
+    ni_agd_contrast <- nrow(agd_contrast_y)
+    ac1 <- 0:(ni_agd_contrast - 1)*n_int + 1
+    agd_contrast_study <- apply(agd_contrast_x[ac1, col_study], 1, get_study)
+    agd_contrast_trt <- apply(agd_contrast_x[ac1, col_trt], 1, get_trt)
+    agd_contrast_trt_b <- apply(agd_contrast_x[ac1, col_trt], 1, get_trt, v = -1)
   } else {
     agd_contrast_study <- agd_contrast_trt <- agd_contrast_trt_b <- numeric()
+    ni_agd_contrast <- 0
   }
 
   # Make full design matrix
@@ -490,7 +499,7 @@ nma.fit <- function(ipd_x, ipd_y,
       abort("Provide vector of AgD (contrast-based) sample sizes `N_agd_contrast`, in order to calculate global means for centering (center = TRUE).")
 
     X_all_reg <- X_all[, col_reg]
-    wts <- c(rep(1, n_ipd),
+    wts <- c(rep(1, ni_ipd),
              rep(N_agd_arm / n_int, each = n_int),
              rep(N_agd_contrast / n_int, each = n_int))
     Xbar <-
@@ -515,11 +524,11 @@ nma.fit <- function(ipd_x, ipd_y,
   standat <- list(
     # Constants
     ns_ipd = length(unique(agd_arm_study)),
-    ni_ipd = if (has_ipd) nrow(ipd_y) else 0L,
+    ni_ipd = ni_ipd,
     ns_agd_arm = length(unique(agd_arm_study)),
-    ni_agd_arm = if (has_agd_arm) nrow(agd_arm_y) else 0L,
-    # ns_agd_contrast = length(unique(agd_contrast_study)),
-    # ni_agd_contrast = if (has_agd_contrast) nrow(agd_contrast_y) else 0L,
+    ni_agd_arm = ni_agd_arm,
+    ns_agd_contrast = length(unique(agd_contrast_study)),
+    ni_agd_contrast = ni_agd_contrast,
     nt = n_trt,
     nint = n_int,
     nX = ncol(X_all),
@@ -527,8 +536,8 @@ nma.fit <- function(ipd_x, ipd_y,
     # Study and treatment details
     ipd_trt = ipd_trt,
     agd_arm_trt = agd_arm_trt,
-    # agd_contrast_trt = agd_contrast_trt,
-    # agd_contrast_trt_b = agd_contrast_trt_b,
+    agd_contrast_trt = agd_contrast_trt,
+    agd_contrast_trt_b = agd_contrast_trt_b,
     ipd_study = ipd_study,
     agd_arm_study = agd_arm_study,
     # agd_contrast_study = agd_contrast_study,
