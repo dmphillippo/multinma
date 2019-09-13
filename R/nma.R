@@ -26,6 +26,8 @@
 #'   parameter, if applicable
 #' @param QR Logical scalar (default `FALSE`), whether to apply a QR
 #'   decomposition to the model design matrix
+#' @param center Logical scalar (default `TRUE`), whether to center the
+#'   regression terms about the overall mean
 #' @param adapt_delta See [adapt_delta] for details
 #' @param int_thin A single integer value, the thinning factor for returning
 #'   cumulative estimates of integration error
@@ -47,6 +49,7 @@ nma <- function(network,
                 prior_reg = normal(sd = 10),
                 prior_aux = normal(sd = 5),
                 QR = FALSE,
+                center = TRUE,
                 adapt_delta = NULL,
                 int_thin = 100L) {
 
@@ -81,6 +84,8 @@ nma <- function(network,
 
   # Check other args
   if (!is.logical(QR) || length(QR) > 1) abort("`QR` should be a logical scalar (TRUE or FALSE).")
+  if (!is.logical(center) || length(center) > 1)
+    abort("`center` should be a logical scalar (TRUE or FALSE).")
   if (!is.numeric(int_thin) ||
       length(int_thin) > 1 ||
       int_thin < 1 ||
@@ -294,6 +299,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_reg = normal(sd = 10),
                     prior_aux = normal(sd = 5),
                     QR = FALSE,
+                    center = TRUE,
                     adapt_delta = NULL,
                     int_thin = 100L) {
 
@@ -378,6 +384,8 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Check other args
   if (!is.logical(QR) || length(QR) > 1) abort("`QR` should be a logical scalar (TRUE or FALSE).")
+  if (!is.logical(center) || length(center) > 1)
+    abort("`center` should be a logical scalar (TRUE or FALSE).")
   if (!is.numeric(int_thin) ||
       length(int_thin) > 1 ||
       int_thin < 1 ||
