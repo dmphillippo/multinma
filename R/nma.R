@@ -432,9 +432,11 @@ nma.fit <- function(ipd_x, ipd_y,
     agd_contrast_study <- agd_contrast_trt <- agd_contrast_trt_b <- numeric()
   }
 
-
   # Make full design matrix
   X_all <- rbind(ipd_x, agd_arm_x, agd_contrast_x)
+
+  # Make sure columns of X_all are in correct order (study, trt, regression terms)
+  X_all <- cbind(X_all[, col_study], X_all[, col_trt], X_all[, col_reg])
 
   # Take thin QR decomposition if QR = TRUE
   if (QR) {
