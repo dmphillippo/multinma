@@ -551,7 +551,7 @@ nma.fit <- function(ipd_x, ipd_y,
     which_RE = which_RE,
     # Design matrix or QR decomposition
     X = if (QR) matrix() else X_all,
-    QR = if (QR) 1L else 0L,
+    QR = QR,
     Q = if (QR) X_all_Q else matrix(),
     R_inv = if (QR) X_all_R_inv else matrix()
     )
