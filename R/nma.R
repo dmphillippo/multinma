@@ -390,6 +390,40 @@ nma.fit <- function(ipd_x, ipd_y,
              length(adapt_delta) > 1 ||
              adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
+  # Pull study and treatment details from *_x
+  if (has_ipd) x_names <- colnames(ipd_x)
+  else if (has_agd_arm) x_names <- colnames(agd_arm_x)
+  else if (has_agd_contrast) x_names <- colnames(agd_contrast_x)
+
+  col_study <- grepl("^\\.study", x_names)
+  col_trt <- grepl("^\\.trt", x_names)
+  col_reg <- !col_study & !col_trt
+
+  n_study <- sum(col_study)
+  n_trt <- sum(col_trt)
+
+  if (has_ipd) {
+    ipd_study <- apply(ipd_x[, col_study], 1, function(x) which(x == 1))
+    ipd_trt <- apply(ipd_x[, col_trt], 1, function(x) which(x == 1))
+  } else {
+    ipd_study <- ipd_trt <- numeric()
+  }
+
+  if (has_agd_arm) {
+    agd_arm_study <- apply(agd_arm_x[, col_study], 1, function(x) which(x == 1))
+    agd_arm_trt <- apply(agd_arm_x[, col_trt], 1, function(x) which(x == 1))
+  } else {
+    agd_arm_study <- agd_arm_trt <- numeric()
+  }
+
+  if (has_agd_contrast) {
+    agd_contrast_study <- apply(agd_contrast_x[, col_study], 1, function(x) which(x == 1))
+    agd_contrast_trt <- apply(agd_contrast_x[, col_trt], 1, function(x) which(x == 1))
+    agd_contrast_trt_b <- apply(agd_contrast_x[, col_trt], 1, function(x) which(x == -1))
+  } else {
+    agd_contrast_study <- agd_contrast_trt <- agd_contrast_trt_b <- numeric()
+  }
+
 
   # Make full design matrix
   X_all <- rbind(ipd_x, agd_arm_x, agd_contrast_x)
