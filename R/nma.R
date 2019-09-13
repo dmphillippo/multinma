@@ -237,17 +237,17 @@ nma <- function(network,
   if (trt_effects == "random") {
     dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
     if (consistency == "consistency") {
-      Rho <- RE_cor(dat_all$.study, dat_all$.trt, type = "reftrt")
-      delta_id <- which_RE(dat_all$.study, dat_all$.trt, type = "reftrt")
+      .RE_cor <- RE_cor(dat_all$.study, dat_all$.trt, type = "reftrt")
+      .which_RE <- which_RE(dat_all$.study, dat_all$.trt, type = "reftrt")
     } else if (consistency == "ume") {
-      Rho <- RE_cor(dat_all$.study, dat_all$.trt, type = "blshift")
-      delta_id <- which_RE(dat_all$.study, dat_all$.trt, type = "blshift")
+      .RE_cor <- RE_cor(dat_all$.study, dat_all$.trt, type = "blshift")
+      .which_RE <- which_RE(dat_all$.study, dat_all$.trt, type = "blshift")
     } else {
       abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
     }
   } else {
-    Rho <- NULL
-    delta_id <- NULL
+    .RE_cor <- NULL
+    .which_RE <- NULL
   }
 
   # Get sample sizes for centering
@@ -288,8 +288,8 @@ nma <- function(network,
                  agd_contrast_x = X_agd_contrast, agd_contrast_y = o_agd_contrast,
                  n_int = if (inherits(network, "mlnmr_data")) network$n_int else 1,
                  trt_effects = trt_effects,
-                 RE_cor = Rho,
-                 which_RE = delta_id,
+                 RE_cor = .RE_cor,
+                 which_RE = .which_RE,
                  likelihood = likelihood,
                  link = link,
                  ...,
@@ -406,13 +406,18 @@ nma.fit <- function(ipd_x, ipd_y,
   if (!is.null(RE_cor) &&
       (!is.matrix(RE_cor) || !is.numeric(RE_cor))) {
     abort("`RE_cor` should be a numeric matrix.")
+  } else {
+    RE_cor <- matrix()
   }
+
   if (!is.null(which_RE) &&
       (!is.numeric(which_RE) ||
        trunc(which_RE) != which_RE ||
        any(which_RE < 0) ||
        is.matrix(which_RE))) {
     abort("`which_RE` should be an integer vector.")
+  } else {
+    which_RE <- integer()
   }
 
   # Check priors
@@ -527,8 +532,8 @@ nma.fit <- function(ipd_x, ipd_y,
     ni_ipd = ni_ipd,
     ns_agd_arm = length(unique(agd_arm_study)),
     ni_agd_arm = ni_agd_arm,
-    ns_agd_contrast = length(unique(agd_contrast_study)),
-    ni_agd_contrast = ni_agd_contrast,
+    # ns_agd_contrast = length(unique(agd_contrast_study)),
+    # ni_agd_contrast = ni_agd_contrast,
     nt = n_trt,
     nint = n_int,
     nX = ncol(X_all),
@@ -536,11 +541,14 @@ nma.fit <- function(ipd_x, ipd_y,
     # Study and treatment details
     ipd_trt = ipd_trt,
     agd_arm_trt = agd_arm_trt,
-    agd_contrast_trt = agd_contrast_trt,
-    agd_contrast_trt_b = agd_contrast_trt_b,
+    # agd_contrast_trt = agd_contrast_trt,
+    # agd_contrast_trt_b = agd_contrast_trt_b,
     ipd_study = ipd_study,
     agd_arm_study = agd_arm_study,
     # agd_contrast_study = agd_contrast_study,
+    # Random effects
+    RE_cor = RE_cor,
+    which_RE = which_RE,
     # Design matrix or QR decomposition
     X = if (QR) matrix() else X_all,
     QR = if (QR) 1L else 0L,
