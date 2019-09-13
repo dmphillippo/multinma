@@ -515,44 +515,38 @@ nma.fit <- function(ipd_x, ipd_y,
     ns_agd_arm = length(unique(agd_arm_study)),
     ni_agd_arm = if (has_agd_arm) nrow(agd_arm_y) else 0L,
     # ns_agd_contrast = length(unique(agd_contrast_study)),
-    # ni_agd_contrast = nrow(agd_contrast_y),
+    # ni_agd_contrast = if (has_agd_contrast) nrow(agd_contrast_y) else 0L,
     nt = n_trt,
     nint = n_int,
     nX = ncol(X_all),
     int_thin = int_thin,
     # Study and treatment details
-    ipd_trt = if (has_ipd) ipd_trt else numeric(),
-    agd_arm_trt = if (has_ipd) agd_arm_trt else numeric(),
+    ipd_trt = ipd_trt,
+    agd_arm_trt = agd_arm_trt,
     # agd_contrast_trt = agd_contrast_trt,
     # agd_contrast_trt_b = agd_contrast_trt_b,
-    ipd_study = if (has_ipd) ipd_study else numeric(),
-    agd_arm_study = if (has_agd_arm) agd_arm_study else numeric(),
-    # agd_contrast_study = if (has_agd_contrast) agd_contrast_study else numeric(),
+    ipd_study = ipd_study,
+    agd_arm_study = agd_arm_study,
+    # agd_contrast_study = agd_contrast_study,
     # Design matrix or QR decomposition
     X = if (QR) matrix() else X_all,
     QR = if (QR) 1L else 0L,
     Q = if (QR) X_all_Q else matrix(),
-    R_inv = if (QR) X_all_R_inv else matrix(),
-    # Intercept prior
-    prior_mu_type = ,
-    prior_mu_arg1 = ,
-    prior_mu_arg2 = ,
-    prior_mu_arg3 = ,
-    # Regression priors, args are vectors
-    prior_reg_type = ,
-    prior_reg_arg1 = ,
-    prior_reg_arg2 = ,
-    prior_reg_arg3 = ,
-    # Treatment effect priors, args are vectors
-    prior_trt_type = ,
-    prior_trt_arg1 = ,
-    prior_trt_arg2 = ,
-    prior_trt_arg3 = ,
-    # Heterogeneity prior
-    prior_het_type = ,
-    prior_het_arg1 = ,
-    prior_het_arg2 = ,
-    prior_het_arg3 =
+    R_inv = if (QR) X_all_R_inv else matrix()
+    )
+
+  # Add priors
+  standat <- purrr::list_modify(standat,
+    !!! prior_standat(prior_intercept, "prior_intercept",
+                      valid = c("Normal", "Cauchy", "Student t")),
+    !!! prior_standat(prior_trt, "prior_trt",
+                      valid = c("Normal", "Cauchy", "Student t")),
+    !!! prior_standat(prior_reg, "prior_reg",
+                      valid = c("Normal", "Cauchy", "Student t")),
+    !!! prior_standat(prior_het, "prior_het",
+                      valid = c("Normal", "half-Normal",
+                                "Cauchy",  "half-Cauchy",
+                                "Student t", "half-Student t"))
     )
 
   # Call Stan model for given likelihood
@@ -735,4 +729,35 @@ get_outcome_variables <- function(x, o_type) {
   return(
     dplyr::select(x, dplyr::one_of(intersect(o_vars, colnames(x))))
   )
+}
+
+#' Set prior details for Stan models
+#'
+#' @param x a `nma_prior` object
+#' @param par character string, giving the Stan root parameter name (e.g.
+#'   "prior_trt")
+#' @param valid character vector, giving valid distributions
+#'
+#' @noRd
+prior_standat <- function(x, par, valid){
+  if (!inherits(x, "nma_prior")) abort("Not a `nma_prior` object.")
+
+  dist <- x$dist
+
+  if (!dist %in% valid)
+    abort(glue::glue("Invalid `{par}`. Suitable distributions are: ",
+                glue::collapse(valid, sep = ", ", last = ", or ")))
+
+  type <- switch(dist,
+                 Normal = , `half-Normal` = 1,
+                 Cauchy = , `half-Cauchy` = 2,
+                 `Student t` = , `half-Student t` = 3,
+                 Exponential = 4)
+
+  out <- purrr::list_modify(dist, type = type, dist = purrr::zap())
+  # Set unnecessary (NA) parameters to zero. These will be ignored by Stan, but
+  # need to pass rstan checks
+  out <- out[!is.na(out)]
+  names(out) <- paste0(par, "_", names(out))
+  return(out)
 }
