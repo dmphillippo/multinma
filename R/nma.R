@@ -758,7 +758,7 @@ prior_standat <- function(x, par, valid){
                  `Student t` = , `half-Student t` = 3,
                  Exponential = 4)
 
-  out <- purrr::list_modify(dist, type = type, dist = purrr::zap())
+  out <- purrr::list_modify(c(x), type = type, dist = purrr::zap())
   # Set unnecessary (NA) parameters to zero. These will be ignored by Stan, but
   # need to pass rstan checks
   out <- out[!is.na(out)]
