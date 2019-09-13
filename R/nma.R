@@ -456,7 +456,7 @@ nma.fit <- function(ipd_x, ipd_y,
   col_reg <- !col_study & !col_trt
 
   n_study <- sum(col_study)
-  n_trt <- sum(col_trt)
+  n_trt <- sum(col_trt) + 1
 
   get_study <- function(x) which(x == 1)
   get_trt <- function(x, v = 1) if (any(x == v)) which(x == v) + 1 else 1
