@@ -20,6 +20,7 @@ NULL
 #' @noRd
 print.nma_prior <- function(x, ...) {
   p <- purrr::list_modify(x, dist = purrr::zap())
+  p <- p[!is.na(p)]
   cglue("A {x$dist} prior distribution: {paste(names(p), p, sep = ' = ', collapse = ', ')}.")
   invisible(x)
 }
