@@ -92,7 +92,7 @@ nma <- function(network,
   if (!is.numeric(int_thin) ||
       length(int_thin) > 1 ||
       int_thin < 1 ||
-      trunc(int_thin) != int_thin) abort("`int_thin` should be an integer > 0.")
+      trunc(int_thin) != int_thin) abort("`int_thin` should be an integer >= 1.")
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
@@ -376,16 +376,16 @@ nma.fit <- function(ipd_x, ipd_y,
       abort("`agd_arm_x` should be a numeric matrix.")
     if (any(!purrr::map_lgl(agd_arm_x, is.numeric)))
       abort("`agd_arm_y` should be numeric outcome data.")
-    if (nrow(agd_arm_x) != nrow(agd_arm_y))
-      abort("Number of rows in `agd_arm_x` and `agd_arm_y` do not match.")
+    if (nrow(agd_arm_x) != nrow(agd_arm_y) * n_int)
+      abort("Number of rows in `agd_arm_x`, `agd_arm_y`, and `n_int` do not match.")
   }
   if (!is.null(agd_contrast_x)) {
     if (!is.matrix(agd_contrast_x) || !is.numeric(agd_contrast_x))
       abort("`agd_contrast_x` should be a numeric matrix.")
     if (any(!purrr::map_lgl(agd_contrast_x, is.numeric)))
       abort("`agd_contrast_y` should be numeric outcome data.")
-    if (nrow(agd_contrast_x) != nrow(agd_contrast_y))
-      abort("Number of rows in `agd_contrast_x` and `agd_contrast_y` do not match.")
+    if (nrow(agd_contrast_x) != nrow(agd_contrast_y) * n_int)
+      abort("Number of rows in `agd_contrast_x`, `agd_contrast_y`, and `n_int` do not match.")
   }
 
   # Check matching X column names and dimensions if more than one present
@@ -427,7 +427,11 @@ nma.fit <- function(ipd_x, ipd_y,
   if (!is.numeric(int_thin) ||
       length(int_thin) > 1 ||
       int_thin < 1 ||
-      trunc(int_thin) != int_thin) abort("`int_thin` should be an integer > 0.")
+      trunc(int_thin) != int_thin) abort("`int_thin` should be an integer >= 1.")
+  if (!is.numeric(n_int) ||
+      length(n_int) > 1 ||
+      n_int < 1 ||
+      trunc(n_int) != n_int) abort("`n_int` should be an integer >= 1.")
 
   if (!is.logical(center) || length(center) > 1)
     abort("`center` should be a logical scalar (TRUE or FALSE).")
