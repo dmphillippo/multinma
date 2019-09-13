@@ -28,6 +28,8 @@
 #'   decomposition to the model design matrix
 #' @param center Logical scalar (default `TRUE`), whether to center the
 #'   regression terms about the overall mean
+#' @param agd_sample_size Column name (either bare or a string) in the AgD
+#'   giving the sample size to use for calculating the global means
 #' @param adapt_delta See [adapt_delta] for details
 #' @param int_thin A single integer value, the thinning factor for returning
 #'   cumulative estimates of integration error
@@ -50,6 +52,7 @@ nma <- function(network,
                 prior_aux = normal(sd = 5),
                 QR = FALSE,
                 center = TRUE,
+                agd_sample_size = NULL,
                 adapt_delta = NULL,
                 int_thin = 100L) {
 
@@ -247,6 +250,38 @@ nma <- function(network,
     delta_id <- NULL
   }
 
+  # Get sample sizes for centering
+  agd_sample_size <- rlang::enquo(agd_sample_size)
+
+  if (has_agd_arm(network) && !is.null(regression) && center) {
+    if (is.null(agd_sample_size))
+      abort("Specify AgD sample size column in data `agd_sample_size` to calculate global mean for centering, or set center = FALSE.")
+
+    N_agd_arm <- dplyr::pull(network$agd_arm, !! agd_sample_size)
+  } else {
+    N_agd_arm <- NULL
+  }
+
+  if (has_agd_contrast(network) && !is.null(regression) && center) {
+    if (is.null(agd_sample_size))
+      abort("Specify AgD sample size column in data `agd_sample_size` to calculate global mean for centering, or set center = FALSE.")
+
+    # For contrast-based data, the "contrast" sample size is undefined -
+    # expecting instead to see study sample size repeated by contrast (ditto for
+    # regression terms). For centering, take the first value of N, and set
+    # others to zero.
+    first_then_zero <- function(x) {
+      x[2:length(x)] <- 0
+      return(x)
+    }
+    N_agd_contrast <- network$agd_contrast %>%
+      dplyr::group_by(.data$.study) %>%
+      dplyr::mutate_at(dplyr::vars(!! agd_sample_size), first_then_zero) %>%
+      dplyr::pull(network$agd_arm, !! agd_sample_size)
+  } else {
+    N_agd_contrast <- NULL
+  }
+
   # Fit using nma.fit
   out <- nma.fit(ipd_x = X_ipd, ipd_y = o_ipd,
                  agd_arm_x = X_agd_arm, agd_arm_y = o_agd_arm,
@@ -264,6 +299,9 @@ nma <- function(network,
                  prior_reg = prior_reg,
                  prior_aux = prior_aux,
                  QR = QR,
+                 center = center,
+                 N_agd_arm = N_agd_arm,
+                 N_agd_contrast = N_agd_contrast,
                  adapt_delta = adapt_delta,
                  int_thin = int_thin)
 
@@ -300,6 +338,8 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_aux = normal(sd = 5),
                     QR = FALSE,
                     center = TRUE,
+                    N_agd_arm = NULL,
+                    N_agd_contrast = NULL,
                     adapt_delta = NULL,
                     int_thin = 100L) {
 
@@ -384,12 +424,17 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Check other args
   if (!is.logical(QR) || length(QR) > 1) abort("`QR` should be a logical scalar (TRUE or FALSE).")
-  if (!is.logical(center) || length(center) > 1)
-    abort("`center` should be a logical scalar (TRUE or FALSE).")
   if (!is.numeric(int_thin) ||
       length(int_thin) > 1 ||
       int_thin < 1 ||
       trunc(int_thin) != int_thin) abort("`int_thin` should be an integer > 0.")
+
+  if (!is.logical(center) || length(center) > 1)
+    abort("`center` should be a logical scalar (TRUE or FALSE).")
+  if (has_agd_arm && center && is.null(N_agd_arm))
+    abort("Provide vector of AgD (arm-based) sample sizes `N_agd_arm`, in order to calculate global means for centering (center = TRUE).")
+  if (has_agd_contrast && center && is.null(N_agd_contrast))
+    abort("Provide vector of AgD (contrast-based) sample sizes `N_agd_contrast`, in order to calculate global means for centering (center = TRUE).")
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
