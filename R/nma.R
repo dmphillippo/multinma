@@ -451,8 +451,8 @@ nma.fit <- function(ipd_x, ipd_y,
   else if (has_agd_arm) x_names <- colnames(agd_arm_x)
   else if (has_agd_contrast) x_names <- colnames(agd_contrast_x)
 
-  col_study <- grepl("^\\.study", x_names)
-  col_trt <- grepl("^\\.trt", x_names)
+  col_study <- grepl("^\\.study[^:]+$", x_names)
+  col_trt <- grepl("^\\.trt[^:]+$", x_names)
   col_reg <- !col_study & !col_trt
 
   n_study <- sum(col_study)
