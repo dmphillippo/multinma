@@ -52,7 +52,7 @@ nma <- function(network,
                 prior_aux = normal(scale = 5),
                 QR = FALSE,
                 center = TRUE,
-                agd_sample_size = NULL,
+                agd_sample_size,
                 adapt_delta = NULL,
                 int_thin = 100L) {
 
@@ -251,19 +251,17 @@ nma <- function(network,
   }
 
   # Get sample sizes for centering
-  agd_sample_size <- rlang::enquo(agd_sample_size)
-
   if (has_agd_arm(network) && !is.null(regression) && center) {
-    if (is.null(agd_sample_size))
+    if (missing(agd_sample_size))
       abort("Specify AgD sample size column in data `agd_sample_size` to calculate global mean for centering, or set center = FALSE.")
 
-    N_agd_arm <- dplyr::pull(network$agd_arm, !! agd_sample_size)
+    N_agd_arm <- dplyr::pull(network$agd_arm, {{ agd_sample_size }})
   } else {
     N_agd_arm <- NULL
   }
 
   if (has_agd_contrast(network) && !is.null(regression) && center) {
-    if (is.null(agd_sample_size))
+    if (missing(agd_sample_size))
       abort("Specify AgD sample size column in data `agd_sample_size` to calculate global mean for centering, or set center = FALSE.")
 
     # For contrast-based data, the "contrast" sample size is undefined -
@@ -276,8 +274,8 @@ nma <- function(network,
     }
     N_agd_contrast <- network$agd_contrast %>%
       dplyr::group_by(.data$.study) %>%
-      dplyr::mutate_at(dplyr::vars(!! agd_sample_size), first_then_zero) %>%
-      dplyr::pull(network$agd_arm, !! agd_sample_size)
+      dplyr::mutate_at(dplyr::vars({{ agd_sample_size }}), first_then_zero) %>%
+      dplyr::pull(network$agd_arm, {{ agd_sample_size }})
   } else {
     N_agd_contrast <- NULL
   }
