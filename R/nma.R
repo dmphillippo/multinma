@@ -324,7 +324,7 @@ nma <- function(network,
 nma.fit <- function(ipd_x, ipd_y,
                     agd_arm_x, agd_arm_y,
                     agd_contrast_x, agd_contrast_y,
-                    n_int = NULL,
+                    n_int,
                     trt_effects = c("fixed", "random"),
                     RE_cor = NULL,
                     which_RE = NULL,
@@ -431,10 +431,6 @@ nma.fit <- function(ipd_x, ipd_y,
 
   if (!is.logical(center) || length(center) > 1)
     abort("`center` should be a logical scalar (TRUE or FALSE).")
-  if (has_agd_arm && center && is.null(N_agd_arm))
-    abort("Provide vector of AgD (arm-based) sample sizes `N_agd_arm`, in order to calculate global means for centering (center = TRUE).")
-  if (has_agd_contrast && center && is.null(N_agd_contrast))
-    abort("Provide vector of AgD (contrast-based) sample sizes `N_agd_contrast`, in order to calculate global means for centering (center = TRUE).")
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
@@ -458,8 +454,10 @@ nma.fit <- function(ipd_x, ipd_y,
   if (has_ipd) {
     ipd_study <- apply(ipd_x[, col_study], 1, function(x) which(x == 1))
     ipd_trt <- apply(ipd_x[, col_trt], 1, function(x) which(x == 1))
+    n_ipd <- nrow(ipd_x)
   } else {
     ipd_study <- ipd_trt <- numeric()
+    n_ipd <- 0
   }
 
   if (has_agd_arm) {
@@ -479,6 +477,24 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Make full design matrix
   X_all <- rbind(ipd_x, agd_arm_x, agd_contrast_x)
+
+  # Center regression terms
+  if (center && any(col_reg)) {
+    if (has_agd_arm && is.null(N_agd_arm))
+      abort("Provide vector of AgD (arm-based) sample sizes `N_agd_arm`, in order to calculate global means for centering (center = TRUE).")
+    if (has_agd_contrast && is.null(N_agd_contrast))
+      abort("Provide vector of AgD (contrast-based) sample sizes `N_agd_contrast`, in order to calculate global means for centering (center = TRUE).")
+
+    X_all_reg <- X_all[, col_reg]
+    wts <- c(rep(1, n_ipd),
+             rep(N_agd_arm / n_int, each = n_int),
+             rep(N_agd_contrast / n_int, each = n_int))
+    Xbar <-
+      purrr::array_tree(X_all_reg, margin = 2) %>%
+      purrr::map_dbl(weighted.mean, w = wts)
+
+    X_all[, col_reg] <- sweep(X_all_reg, 2, Xbar, FUN = "-")
+  }
 
   # Make sure columns of X_all are in correct order (study, trt, regression terms)
   X_all <- cbind(X_all[, col_study], X_all[, col_trt], X_all[, col_reg])
