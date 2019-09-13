@@ -501,7 +501,7 @@ nma.fit <- function(ipd_x, ipd_y,
     if (has_agd_contrast && is.null(N_agd_contrast))
       abort("Provide vector of AgD (contrast-based) sample sizes `N_agd_contrast`, in order to calculate global means for centering (center = TRUE).")
 
-    X_all_reg <- X_all[, col_reg]
+    X_all_reg <- X_all[, col_reg, drop = FALSE]
     wts <- c(rep(1, ni_ipd),
              rep(N_agd_arm / n_int, each = n_int),
              rep(N_agd_contrast / n_int, each = n_int))
@@ -513,7 +513,9 @@ nma.fit <- function(ipd_x, ipd_y,
   }
 
   # Make sure columns of X_all are in correct order (study, trt, regression terms)
-  X_all <- cbind(X_all[, col_study], X_all[, col_trt], X_all[, col_reg])
+  X_all <- cbind(X_all[, col_study, drop = FALSE],
+                 X_all[, col_trt, drop = FALSE],
+                 X_all[, col_reg, drop = FALSE])
 
   # Take thin QR decomposition if QR = TRUE
   if (QR) {
