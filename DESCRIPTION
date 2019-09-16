@@ -21,7 +21,7 @@ Imports:
     methods,
     Rcpp (>= 0.12.0),
     rstan (>= 2.18.1),
-    rstantools (>= 2.0.0.9000),
+    rstantools (>= 2.0.0),
     Rdpack (>= 0.7),
     tibble,
     dplyr (>= 0.8.1),
