@@ -148,7 +148,11 @@ nma <- function(network,
 
   # Construct design matrix all together then split out, so that same dummy
   # coding is used everywhere
-  idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast)
+  idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast) %>%
+
+  # Sanitise study and treatment factor labels (for :)
+    dplyr::mutate(.study = forcats::fct_relabel(.data$.study, ~gsub(":", "_", ., fixed = TRUE)),
+                  .trt = forcats::fct_relabel(.data$.trt, ~gsub(":", "_", ., fixed = TRUE)))
 
   if (consistency != "consistency") {
     abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
