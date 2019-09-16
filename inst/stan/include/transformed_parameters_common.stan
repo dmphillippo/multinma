@@ -28,8 +28,8 @@ vector[ni_agd_arm + ni_agd_contrast] theta_bar;
 {
   vector[ni_ipd] eta_ipd_noRE = Q_ipd * beta_tilde;
   for (i in 1:ni_ipd) {
-    if (delta_design[ipd_arm[i]])
-      eta_ipd[i] = eta_ipd_noRE[i] + f_delta[delta_design[ipd_arm[i]]];
+    if (which_RE[ipd_arm[i]])
+      eta_ipd[i] = eta_ipd_noRE[i] + f_delta[which_RE[ipd_arm[i]]];
     else
       eta_ipd[i] = eta_ipd_noRE[i];
   }
@@ -39,8 +39,8 @@ vector[ni_agd_arm + ni_agd_contrast] theta_bar;
 {
   vector[ni_agd_contrast] eta_agd_contrast_noRE = Q_agd_contrast * beta_tilde;
   for (i in 1:ni_agd_contrast) {
-    if (delta_design[narm_ipd + ni_agd_arm + i])
-      eta_agd_contrast[i] = eta_agd_contrast_noRE[i] + f_delta[delta_design[narm_ipd + ni_agd_arm + i]];
+    if (which_RE[narm_ipd + ni_agd_arm + i])
+      eta_agd_contrast[i] = eta_agd_contrast_noRE[i] + f_delta[which_RE[narm_ipd + ni_agd_arm + i]];
     else
       eta_agd_contrast[i] = eta_agd_contrast_noRE[i];
   }
