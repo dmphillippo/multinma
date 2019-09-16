@@ -539,6 +539,8 @@ nma.fit <- function(ipd_x, ipd_y,
     agd_arm_trt = agd_arm_trt,
     # agd_contrast_trt = agd_contrast_trt,
     # agd_contrast_trt_b = agd_contrast_trt_b,
+    # agd_contrast_y = agd_contrast_y$.y,
+    # agd_contrast_se = agd_contrast_y$.se,
     ipd_study = ipd_study,
     agd_arm_study = agd_arm_study,
     # agd_contrast_study = agd_contrast_study,
@@ -580,6 +582,62 @@ nma.fit <- function(ipd_x, ipd_y,
   }
 
   # Call Stan model for given likelihood
+
+  # -- Normal likelihood
+  if (likelihood == "normal") {
+
+    standat <- purrr::list_modify(standat,
+    # Add outcomes
+      ipd_y = ipd_y$.y,
+      agd_arm_y = agd_arm_y$.y, agd_arm_se = agd_arm_y$.se,
+
+    # Add prior for auxilliary parameter - individual-level variance
+      !!! prior_standat(prior_het, "prior_aux",
+                        valid = c("Normal", "half-Normal",
+                                  "Cauchy",  "half-Cauchy",
+                                  "Student t", "half-Student t")))
+
+    stanfit <- rstan::sampling(stanmodels$normal, data = standat,
+                               pars = c(pars, "sigma"), ...)
+
+
+  # -- Bernoulli/binomial likelihood (one parameter)
+  } else if (likelihood %in% c("bernoulli", "binomial")) {
+
+    # Add outcomes
+    standat <- purrr::list_modify(standat,
+      ipd_r = ipd_y$.r,
+      agd_arm_r = agd_arm_y$.r, agd_arm_n = agd_arm_y$.n)
+
+    stanfit <- rstan::sampling(stanmodels$binomial_1par, data = standat,
+                               pars = pars, ...)
+
+  # -- Bernoulli/binomial likelihood (two parameter)
+  } else if (likelihood %in% c("bernoulli2", "binomial2")) {
+
+    # Add outcomes
+    standat <- purrr::list_modify(standat,
+      ipd_r = ipd_y$.r,
+      agd_arm_r = agd_arm_y$.r, agd_arm_n = agd_arm_y$.n)
+
+
+    stanfit <- rstan::sampling(stanmodels$binomial_2par, data = standat,
+                               pars = c(pars, "theta2_bar_cum"), ...)
+
+  # -- Poisson likelihood
+  } else if (likelihood == "poisson") {
+
+    # Add outcomes
+    standat <- purrr::list_modify(standat,
+      ipd_r = ipd_y$.r, ipd_E = ipd_y$.E,
+      agd_arm_r = agd_arm_y$.r, agd_arm_E = agd_arm_y$.E)
+
+    stanfit <- rstan::sampling(stanmodels$poisson, data = standat,
+                               pars = pars, ...)
+
+  } else {
+    abort(glue::glue('"{likelihood}" likelihood not supported.'))
+  }
 
 }
 
