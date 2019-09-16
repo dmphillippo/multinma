@@ -86,10 +86,10 @@ smknet_2 <- combine_network(smknet_agd, smknet_ipd) %>%
                   x3 = distr(qnorm, x3_mean, x3_sd))
 
 test_that("nma() regression formula is valid", {
-  expect_error(nma(smknet_2, regression = y ~ x), "one-sided formula")
-  expect_error(nma(smknet_2, regression = ~ a), "Failed to construct design matrix")
-  expect_error(nma(smknet_2, regression = ~ a*.trt), "Failed to construct design matrix")
-  expect_error(nma(smknet_2, regression = ~ (a + b)*.trt), "Failed to construct design matrix")
+  expect_error(nma(smknet_2, regression = y ~ x, center = FALSE), "one-sided formula")
+  expect_error(nma(smknet_2, regression = ~ a, center = FALSE), "Failed to construct design matrix")
+  expect_error(nma(smknet_2, regression = ~ a*.trt, center = FALSE), "Failed to construct design matrix")
+  expect_error(nma(smknet_2, regression = ~ (a + b)*.trt, center = FALSE), "Failed to construct design matrix")
 })
 
 make_na <- function(x, n) {
@@ -107,12 +107,12 @@ smknet_ipd_missx <- ipddummy %>%
 
 test_that("nma() error if missing values in outcomes or predictors", {
   m <- "missing values"
-  expect_error(nma(smknet_agd_missx, regression = ~x1_mean), m)
-  expect_error(nma(smknet_ipd_missx, regression = ~x1), m)
+  expect_error(nma(smknet_agd_missx, regression = ~x1_mean, center = FALSE), m)
+  expect_error(nma(smknet_ipd_missx, regression = ~x1, center = FALSE), m)
   expect_error(suppressWarnings(
     # Suppress warning about naive plug-in model
     nma(combine_network(smknet_agd_missx, smknet_ipd_missx),
-        regression = ~x1)), m)
+        regression = ~x1, center = FALSE)), m)
 })
 
 test_that("nma.fit() error if only one of x or y provided", {
