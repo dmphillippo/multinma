@@ -677,28 +677,37 @@ which_RE <- function(study, trt, type = c("reftrt", "blshift")) {
 #' Check likelihood function, or provide default value
 #'
 #' @param x likelihood type as string
-#' @param outcome outcome type as string
+#' @param outcome outcome types as named list (ipd, agd_arm, agd_contrast)
 #'
 #' @noRd
-check_likelihood <- function(x, outcome = NULL) {
-  valid_lhood <- c("normal", "bernoulli", "binomial", "poisson")
-  default_lhood <- list(binary = "bernoulli",
-                        count = "binomial",
-                        rate = "poisson",
-                        continuous = "normal")
+check_likelihood <- function(x, outcome) {
+  valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
+                      count = c("binomial", "binomial2"),
+                      rate = "poisson",
+                      continuous = "normal")
+
+  if (missing(outcome)) valid_lhood <- unlist(valid_lhood)
+  else if (!is.na(outcome$ipd)) {
+    valid_lhood <- valid_lhood[[outcome$ipd]]
+    otype <- outcome$ipd
+  } else if (!is.na(outcome$agd_arm)) {
+    valid_lhood <- valid_lhood[[outcome$agd_arm]]
+    otype <- outcome$agd_arm
+  } else if (!is.na(outcome$agd_contrast)) {
+    valid_lhood <- valid_lhood[[outcome$agd_contrast]]
+    otype <- outcome$agd_contrast
+  }
+  else abort("No outcomes specified in network data.")
 
   # Choose default likelihood if NULL
-  if (is.null(x) && is.null(outcome)) abort("Please specify a suitable likelihood.")
+  if (is.null(x) && missing(outcome)) abort("Please specify a suitable likelihood.")
   else if (is.null(x)) {
-    if (!is.na(outcome$ipd)) x <- default_lhood[[outcome$ipd]]
-    else if (!is.na(outcome$agd_arm)) x <- default_lhood[[outcome$agd_arm]]
-    else if (!is.na(outcome$agd_contrast)) x <- default_lhood[[outcome$agd_contrast]]
-    else abort("No outcomes specified in network data.")
+    x <- valid_lhood[1]
 
   # Check valid option if given
   } else if (!is.character(x) || length(x) > 1 || !tolower(x) %in% valid_lhood) {
     abort(glue::glue("`likelihood` should be a character string specifying a valid likelihood.\n",
-                     "Suitable options are currently: ",
+                     "Suitable options for {otype} outcomes are currently: ",
                      glue::glue_collapse(dQuote(valid_lhood, FALSE), sep = ", ", last = " or "),
                      "."))
   }
