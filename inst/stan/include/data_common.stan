@@ -14,7 +14,6 @@ int<lower=1> agd_arm_trt[ni_agd_arm];
 int<lower=1> agd_contrast_trt[ni_agd_contrast];
 int<lower=1> agd_contrast_trt_b[ni_agd_contrast];
 
-
 // Study IDs
 int<lower=1> ipd_study[ni_ipd];
 int<lower=1> agd_arm_study[ni_agd_arm];
@@ -43,10 +42,23 @@ int<lower=1> ipd_arm[ni_ipd]; // Arm indicator for IPD (i.e. picking element of 
 int<lower=0> which_RE[max(ipd_arm) + ni_agd_arm + ni_agd_contrast]; // ID of RE delta for each arm (0 for no RE delta)
 corr_matrix[max(ipd_arm) + ni_agd_arm + ni_agd_contrast] RE_cor; // RE correlation matrix
 
-
 // -- Priors --
-real prior_sd_beta0;
-real prior_sd_beta1;
-real prior_sd_beta2;
-real prior_sd_gamma;
-real prior_sd_sigma;
+int<lower=1,upper=3> prior_intercept_type;
+real prior_intercept_location;
+real<lower=0> prior_intercept_scale;
+real<lower=0> prior_intercept_df;
+
+int<lower=1,upper=3> prior_trt_type;
+real prior_trt_location;
+real<lower=0> prior_trt_scale;
+real<lower=0> prior_trt_df;
+
+int<lower=1,upper=4> prior_het_type;
+real<lower=0> prior_het_location;
+real<lower=0> prior_het_scale;
+real<lower=0> prior_het_df;
+
+int<lower=1,upper=3> prior_reg_type;
+real prior_reg_location;
+real<lower=0> prior_reg_scale;
+real<lower=0> prior_reg_df;
