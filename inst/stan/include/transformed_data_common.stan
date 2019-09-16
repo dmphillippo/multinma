@@ -8,10 +8,12 @@ vector[n_delta] RE_mu = rep_vector(0, n_delta);
 // Cholesky decomposition of RE MVN correlations
 cholesky_factor_corr[n_delta] RE_L = cholesky_decompose(RE_cor);
 
-
 // Total number of data points
 int totni = ni_ipd + nint * (ni_agd_arm + ni_agd_contrast);
 int totns = ns_ipd + ns_agd_arm + ns_agd_contrast;
+
+// Number of IPD arms
+int <lower=0> narm_ipd = max(ipd_arm);
 
 // Split Q matrix into IPD and AgD rows
 matrix[ni_ipd, nX] Q_ipd = Q[1:ni_ipd];
