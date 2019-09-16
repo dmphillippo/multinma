@@ -51,7 +51,7 @@ transformed parameters {
       theta2_bar[i] = dot_self(theta_ii[(1 + (i-1)*nint):(i*nint)]) / nint;
 
       // Calculate adjusted n and p
-      nprime[i] = ag_n[i] * theta_bar[i]^2 / theta2_bar[i];
+      nprime[i] = agd_arm_n[i] * theta_bar[i]^2 / theta2_bar[i];
       pprime[i] = theta2_bar[i] / theta_bar[i];
 
       // Reject sample if nprime less than number of observed events (shouldn't be necessary...)
