@@ -13,3 +13,5 @@ tau ~ prior_select(prior_het_type, prior_het_location, prior_het_scale, prior_he
 // -- Random effects --
 u_delta ~ std_normal();
 
+// -- AgD model (contrast-based) --
+agd_contrast_y ~ normal(eta_agd_contrast, agd_contrast_se);
