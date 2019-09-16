@@ -1,8 +1,8 @@
 functions {
-  #include prior_select.stan
+#include /include/prior_select.stan
 }
 data {
-  #include data_common.stan
+#include /include/data_common.stan
 
   // Outcomes
   int<lower=0, upper=1> ipd_r[ni_ipd];
@@ -10,15 +10,15 @@ data {
   int<lower=0> agd_arm_r[ni_agd];
 }
 transformed data {
-  #include transformed_data_common.stan
+#include /include/transformed_data_common.stan
 }
 parameters {
-  #include parameters_common.stan
+#include /include/parameters_common.stan
   real<lower=0> nprime[ni_agd_arm];
   real<lower=0, upper=1> pprime[ni_agd_arm];
 }
 transformed parameters {
-  #include transformed_parameters_common.stan
+#include /include/transformed_parameters_common.stan
 
   // -- IPD model --
   if (link == 1) // logit link
@@ -60,7 +60,7 @@ transformed parameters {
   }
 }
 model {
-  #include model_common.stan
+#include /include/model_common.stan
 
   // -- IPD likelihood --
   if (link == 1) { // logit link
