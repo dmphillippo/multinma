@@ -450,6 +450,9 @@ nma.fit <- function(ipd_x, ipd_y,
       n_int < 1 ||
       trunc(n_int) != n_int) abort("`n_int` should be an integer >= 1.")
 
+  # Allow n_int = NULL if no AgD
+  if (!has_agd_arm(network) && !has_agd_contrast(network)) n_int <- 0
+
   # Set adapt_delta
   if (is.null(adapt_delta)) {
     adapt_delta <- switch(trt_effects, fixed = 0.8, random = 0.95)

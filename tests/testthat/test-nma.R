@@ -138,8 +138,8 @@ test_that("nma.fit() error if x and y dimension mismatch", {
 
   m <- "Number of rows.+do not match"
   expect_error(nma.fit(ipd_x = x, ipd_y = y), m)
-  expect_error(nma.fit(agd_arm_x = x, agd_arm_y = y), m)
-  expect_error(nma.fit(agd_contrast_x = x, agd_contrast_y = y), m)
+  expect_error(nma.fit(agd_arm_x = x, agd_arm_y = y, n_int = 1), m)
+  expect_error(nma.fit(agd_contrast_x = x, agd_contrast_y = y, n_int = 1), m)
 })
 
 test_that("nma.fit() error if x column names different", {
@@ -152,15 +152,21 @@ test_that("nma.fit() error if x column names different", {
 
   m <- "Non-matching columns"
   expect_error(nma.fit(ipd_x = x1, ipd_y = y,
-                       agd_arm_x = x2, agd_arm_y = y), m)
+                       agd_arm_x = x2, agd_arm_y = y,
+                       n_int = 1), m)
   expect_error(nma.fit(ipd_x = x1, ipd_y = y,
-                       agd_contrast_x = x2, agd_contrast_y = y), m)
+                       agd_contrast_x = x2, agd_contrast_y = y,
+                       n_int = 1), m)
   expect_error(nma.fit(agd_arm_x = x2, agd_arm_y = y,
-                       agd_contrast_x = x2, agd_contrast_y = y), m)
+                       agd_contrast_x = x2, agd_contrast_y = y,
+                       n_int = 1), m)
   expect_error(nma.fit(ipd_x = x1, ipd_y = y,
-                       agd_arm_x = x3, agd_arm_y = y), m)
+                       agd_arm_x = x3, agd_arm_y = y,
+                       n_int = 1), m)
   expect_error(nma.fit(ipd_x = x1, ipd_y = y,
-                       agd_contrast_x = x3, agd_contrast_y = y), m)
+                       agd_contrast_x = x3, agd_contrast_y = y,
+                       n_int = 1), m)
   expect_error(nma.fit(agd_arm_x = x2, agd_arm_y = y,
-                       agd_contrast_x = x3, agd_contrast_y = y), m)
+                       agd_contrast_x = x3, agd_contrast_y = y,
+                       n_int = 1), m)
 })
