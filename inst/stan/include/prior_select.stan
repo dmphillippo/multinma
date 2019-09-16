@@ -8,5 +8,8 @@ real prior_select_lpdf(real y, int type, real location, real scale, real df) {
     return student_t_lpdf(y | df, location, scale);
   } else if (type == 4) { // Exponential
     return exponential_lpdf(y | 1/scale);
+  } else {
+    reject("Not a supported prior type.");
+    return log(0);
   }
 }
