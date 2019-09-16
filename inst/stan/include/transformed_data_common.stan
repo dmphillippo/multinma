@@ -2,11 +2,11 @@
 
 // -- Random effects --
 // number of random effects
-int<lower=0> n_delta = max(which_delta);
+int<lower=0> n_delta = max(which_RE);
 // RE MVN mean and correlations
 vector[n_delta] RE_mu = rep_vector(0, n_delta);
 // Cholesky decomposition of RE MVN correlations
-matrix[n_delta, n_delta] RE_L = cholesky_decompose(Rho(trt, study, narm_ipd + ni_agd, ns_ipd + ns_agd));
+cholesky_factor_corr[n_delta] RE_L = cholesky_decompose(RE_cor);
 
 
 // Total number of data points
