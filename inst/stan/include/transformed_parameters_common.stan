@@ -14,7 +14,7 @@ vector[ns_ipd + ns_agd_arm + ns_agd_contrast] beta0 = allbeta[1:totns];
 // Treatment effects
 vector[nt - 1] gamma = allbeta[(totns +1):(totns + nt - 1)];
 // Regression predictors
-vector[nPV] beta = allbeta[(totns + nt):];
+vector[nX] beta = allbeta[(totns + nt):];
 
 // -- AgD integration --
 vector[nint * (ni_agd_arm + ni_agd_contrast)] theta_ii;
