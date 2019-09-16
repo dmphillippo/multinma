@@ -60,10 +60,7 @@ transformed parameters {
   }
 }
 model {
-  #include priors.stan
-
-  // -- Random effects --
-  u_delta ~ normal(0, 1);
+  #include model_common.stan
 
   // -- IPD likelihood --
   if (link == 1) { // logit link
