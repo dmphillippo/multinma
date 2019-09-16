@@ -32,15 +32,15 @@ transformed parameters {
 
     if (link == 1) { // logit link
       for (i in 1:ni_agd_arm) {
-        if (delta_design[narm_ipd + i])
-          theta_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[delta_design[narm_ipd + i]]);
+        if (which_RE[narm_ipd + i])
+          theta_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
         else
           theta_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_noRE[(1 + (i-1)*nint):(i*nint)]);
       }
     } else if (link == 2) { // probit link
       for (i in 1:ni_agd_arm) {
-        if (delta_design[narm_ipd + i])
-          theta_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[delta_design[narm_ipd + i]]);
+        if (which_RE[narm_ipd + i])
+          theta_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
         else
           theta_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_noRE[(1 + (i-1)*nint):(i*nint)]);
       }
@@ -96,7 +96,7 @@ generated quantities {
   // For the shrunken estimates, since trt 1 is the reference and REs are treatment based
   // rather than arm based, any trt 1 arm has delta = 0
   for (i in 1:(narm_ipd + ni_agd_arm + ni_agd_contrast)) {
-    delta[i] = trt[i] == 1 ? 0 : gamma[trt[i] - 1] + f_delta[delta_design[i]];
+    delta[i] = trt[i] == 1 ? 0 : gamma[trt[i] - 1] + f_delta[which_RE[i]];
   }
 
   for (i in 1:ni_ipd) {
