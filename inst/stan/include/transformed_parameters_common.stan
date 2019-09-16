@@ -5,7 +5,7 @@ vector[ni_ipd] eta_ipd; // IPD linear predictor
 vector[ni_ipd] theta_ipd; // IPD transformed predictor
 
 // -- RE deltas --
-vector[n_delta] f_delta = sigma * RE_L * u_delta;
+vector[n_delta] f_delta = tau * RE_L * u_delta;
 
 // -- Back-transformed parameters --
 vector[nX] allbeta = QR ? R_inv * beta_tilde : beta_tilde;
