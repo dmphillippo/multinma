@@ -595,7 +595,11 @@ nma.fit <- function(ipd_x, ipd_y,
       !!! prior_standat(prior_het, "prior_aux",
                         valid = c("Normal", "half-Normal",
                                   "Cauchy",  "half-Cauchy",
-                                  "Student t", "half-Student t")))
+                                  "Student t", "half-Student t")),
+
+    # Specify link
+    link = switch(link, identity = 1, log = 2)
+    )
 
     stanfit <- rstan::sampling(stanmodels$normal, data = standat,
                                pars = c(pars, "sigma"), ...)
@@ -604,10 +608,14 @@ nma.fit <- function(ipd_x, ipd_y,
   # -- Bernoulli/binomial likelihood (one parameter)
   } else if (likelihood %in% c("bernoulli", "binomial")) {
 
-    # Add outcomes
     standat <- purrr::list_modify(standat,
+    # Add outcomes
       ipd_r = ipd_y$.r,
-      agd_arm_r = agd_arm_y$.r, agd_arm_n = agd_arm_y$.n)
+      agd_arm_r = agd_arm_y$.r, agd_arm_n = agd_arm_y$.n,
+
+      # Specify link
+      link = switch(link, logit = 1, probit = 2)
+    )
 
     stanfit <- rstan::sampling(stanmodels$binomial_1par, data = standat,
                                pars = pars, ...)
@@ -615,10 +623,14 @@ nma.fit <- function(ipd_x, ipd_y,
   # -- Bernoulli/binomial likelihood (two parameter)
   } else if (likelihood %in% c("bernoulli2", "binomial2")) {
 
-    # Add outcomes
     standat <- purrr::list_modify(standat,
+      # Add outcomes
       ipd_r = ipd_y$.r,
-      agd_arm_r = agd_arm_y$.r, agd_arm_n = agd_arm_y$.n)
+      agd_arm_r = agd_arm_y$.r, agd_arm_n = agd_arm_y$.n,
+
+      # Specify link
+      link = switch(link, logit = 1, probit = 2)
+    )
 
 
     stanfit <- rstan::sampling(stanmodels$binomial_2par, data = standat,
@@ -627,10 +639,14 @@ nma.fit <- function(ipd_x, ipd_y,
   # -- Poisson likelihood
   } else if (likelihood == "poisson") {
 
-    # Add outcomes
     standat <- purrr::list_modify(standat,
+    # Add outcomes
       ipd_r = ipd_y$.r, ipd_E = ipd_y$.E,
-      agd_arm_r = agd_arm_y$.r, agd_arm_E = agd_arm_y$.E)
+      agd_arm_r = agd_arm_y$.r, agd_arm_E = agd_arm_y$.E,
+
+    # Specify link
+      link = switch(link, log = 1)
+    )
 
     stanfit <- rstan::sampling(stanmodels$poisson, data = standat,
                                pars = pars, ...)
