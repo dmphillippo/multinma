@@ -566,6 +566,19 @@ nma.fit <- function(ipd_x, ipd_y,
                                 "Student t", "half-Student t"))
     )
 
+  # Standard pars to monitor
+  pars <- c("mu", "beta1", "beta2", "gamma",
+            "log_lik", "resdev", "lp__")
+
+  # Monitor heterogeneity SD and study deltas if RE model
+  if (trt_effects == "random") {
+    pars <- c(pars, "tau", "delta")
+  }
+  # Monitor cumulative integration error if using numerical integration
+  if (n_int > 1) {
+    pars <- c(par, "theta_bar_cum")
+  }
+
   # Call Stan model for given likelihood
 
 }
