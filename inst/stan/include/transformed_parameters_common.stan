@@ -34,3 +34,14 @@ vector[ni_agd_arm + ni_agd_contrast] theta_bar;
       eta_ipd[i] = eta_ipd_noRE[i];
   }
 }
+
+// -- AgD model (contrast-based) --
+{
+  vector[ni_agd_contrast] eta_agd_contrast_noRE = Q_agd_contrast * beta_tilde;
+  for (i in 1:ni_agd_contrast) {
+    if (delta_design[narm_ipd + ni_agd_arm + i])
+      eta_agd_contrast[i] = eta_agd_contrast_noRE[i] + f_delta[delta_design[narm_ipd + ni_agd_arm + i]];
+    else
+      eta_agd_contrast[i] = eta_agd_contrast_noRE[i];
+  }
+}
