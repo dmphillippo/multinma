@@ -27,7 +27,7 @@
 #' @param QR Logical scalar (default `FALSE`), whether to apply a QR
 #'   decomposition to the model design matrix
 #' @param center Logical scalar (default `TRUE`), whether to center the
-#'   regression terms about the overall mean
+#'   (numeric) regression terms about the overall means
 #' @param agd_sample_size Column name (either bare or a string) in the AgD
 #'   giving the sample size to use for calculating the global means
 #' @param adapt_delta See [adapt_delta] for details
@@ -101,6 +101,10 @@ nma <- function(network,
       length(adapt_delta) > 1 ||
       adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
+  # Number of numerical integration points
+  # Set to 1 if no numerical integration, so that regression on summary data is possible
+  n_int <- if (inherits(network, "mlnmr_data")) network$n_int else 1
+
   # Get design matrices and outcomes
   if (has_ipd(network)) {
     dat_ipd <- network$ipd
@@ -150,9 +154,46 @@ nma <- function(network,
   # coding is used everywhere
   idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast) %>%
 
-  # Sanitise study and treatment factor labels (for :)
+    # Sanitise study and treatment factor labels (for :)
     dplyr::mutate(.study = forcats::fct_relabel(.data$.study, ~gsub(":", "_", ., fixed = TRUE)),
                   .trt = forcats::fct_relabel(.data$.trt, ~gsub(":", "_", ., fixed = TRUE)))
+
+  # Get sample sizes for centering
+  if (!is.null(regression) && center) {
+    if ((has_agd_arm(network) || has_agd_contrast(network))&& missing(agd_sample_size))
+      abort("Specify AgD sample size column in data `agd_sample_size` to calculate global mean for centering, or set center = FALSE.")
+
+    if (has_agd_arm(network)) {
+      N_agd_arm <- dplyr::pull(network$agd_arm, {{ agd_sample_size }})
+    } else {
+      N_agd_arm <- NULL
+    }
+
+  if (has_agd_contrast(network)) {
+
+    # For contrast-based data, the "contrast" sample size is undefined -
+    # expecting instead to see study sample size repeated by contrast (ditto for
+    # regression terms). For centering, take the first value of N, and set
+    # others to zero.
+    first_then_zero <- function(x) {
+      x[2:length(x)] <- 0
+      return(x)
+    }
+      N_agd_contrast <- network$agd_contrast %>%
+        dplyr::group_by(.data$.study) %>%
+        dplyr::mutate_at(dplyr::vars({{ agd_sample_size }}), first_then_zero) %>%
+        dplyr::pull(network$agd_arm, {{ agd_sample_size }})
+    } else {
+      N_agd_contrast <- NULL
+    }
+
+  # Center numeric columns in data
+    wts <- c(rep(1, nrow(dat_ipd)),
+             rep(N_agd_arm / n_int, each = n_int),
+             rep(N_agd_contrast / n_int, each = n_int))
+
+    idat_all <- dplyr::mutate_if(idat_all, is.numeric, ~. - weighted.mean(., wts))
+  }
 
   if (consistency != "consistency") {
     abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
@@ -254,41 +295,11 @@ nma <- function(network,
     .which_RE <- NULL
   }
 
-  # Get sample sizes for centering
-  if (has_agd_arm(network) && !is.null(regression) && center) {
-    if (missing(agd_sample_size))
-      abort("Specify AgD sample size column in data `agd_sample_size` to calculate global mean for centering, or set center = FALSE.")
-
-    N_agd_arm <- dplyr::pull(network$agd_arm, {{ agd_sample_size }})
-  } else {
-    N_agd_arm <- NULL
-  }
-
-  if (has_agd_contrast(network) && !is.null(regression) && center) {
-    if (missing(agd_sample_size))
-      abort("Specify AgD sample size column in data `agd_sample_size` to calculate global mean for centering, or set center = FALSE.")
-
-    # For contrast-based data, the "contrast" sample size is undefined -
-    # expecting instead to see study sample size repeated by contrast (ditto for
-    # regression terms). For centering, take the first value of N, and set
-    # others to zero.
-    first_then_zero <- function(x) {
-      x[2:length(x)] <- 0
-      return(x)
-    }
-    N_agd_contrast <- network$agd_contrast %>%
-      dplyr::group_by(.data$.study) %>%
-      dplyr::mutate_at(dplyr::vars({{ agd_sample_size }}), first_then_zero) %>%
-      dplyr::pull(network$agd_arm, {{ agd_sample_size }})
-  } else {
-    N_agd_contrast <- NULL
-  }
-
   # Fit using nma.fit
   out <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
                  agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
                  agd_contrast_x = X_agd_contrast, agd_contrast_y = y_agd_contrast,
-                 n_int = if (inherits(network, "mlnmr_data")) network$n_int else 1,
+                 n_int = n_int,
                  trt_effects = trt_effects,
                  RE_cor = .RE_cor,
                  which_RE = .which_RE,
@@ -339,7 +350,6 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_reg = normal(scale = 10),
                     prior_aux = normal(scale = 5),
                     QR = FALSE,
-                    center = TRUE,
                     N_agd_arm = NULL,
                     N_agd_contrast = NULL,
                     adapt_delta = NULL,
@@ -440,9 +450,6 @@ nma.fit <- function(ipd_x, ipd_y,
       n_int < 1 ||
       trunc(n_int) != n_int) abort("`n_int` should be an integer >= 1.")
 
-  if (!is.logical(center) || length(center) > 1)
-    abort("`center` should be a logical scalar (TRUE or FALSE).")
-
   # Set adapt_delta
   if (is.null(adapt_delta)) {
     adapt_delta <- switch(trt_effects, fixed = 0.8, random = 0.95)
@@ -497,24 +504,6 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Make full design matrix
   X_all <- rbind(ipd_x, agd_arm_x, agd_contrast_x)
-
-  # Center regression terms
-  if (center && any(col_reg)) {
-    if (has_agd_arm && is.null(N_agd_arm))
-      abort("Provide vector of AgD (arm-based) sample sizes `N_agd_arm`, in order to calculate global means for centering (center = TRUE).")
-    if (has_agd_contrast && is.null(N_agd_contrast))
-      abort("Provide vector of AgD (contrast-based) sample sizes `N_agd_contrast`, in order to calculate global means for centering (center = TRUE).")
-
-    X_all_reg <- X_all[, col_reg, drop = FALSE]
-    wts <- c(rep(1, ni_ipd),
-             rep(N_agd_arm / n_int, each = n_int),
-             rep(N_agd_contrast / n_int, each = n_int))
-    Xbar <-
-      purrr::array_tree(X_all_reg, margin = 2) %>%
-      purrr::map_dbl(weighted.mean, w = wts)
-
-    X_all[, col_reg] <- sweep(X_all_reg, 2, Xbar, FUN = "-")
-  }
 
   # Make sure columns of X_all are in correct order (study, trt, regression terms)
   X_all <- cbind(X_all[, col_study, drop = FALSE],
