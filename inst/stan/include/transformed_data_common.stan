@@ -15,8 +15,8 @@ int totns = ns_ipd + ns_agd_arm + ns_agd_contrast;
 
 // Split Q matrix into IPD and AgD rows
 matrix[ni_ipd, nX] Q_ipd = Q[1:ni_ipd];
-matrix[nint * ni_agd_arm, nX] Q_agd_arm = Q[ni_ipd + (1:ni_agd_arm)];
-matrix[nint * ni_agd_contrast, nX] Q_agd_contrast = Q[ni_ipd + ni_agd_arm + (1:ni_agd_contrast)];
+matrix[nint * ni_agd_arm, nX] Q_agd_arm = Q[(ni_ipd + 1):(ni_ipd + ni_agd_arm)];
+matrix[nint * ni_agd_contrast, nX] Q_agd_contrast = Q[(ni_ipd + ni_agd_arm + 1):(ni_ipd + ni_agd_arm + ni_agd_contrast)];
 
 // Priors on transformed QR scale
 // Equivalent to allbeta ~ normal(0, 100)
