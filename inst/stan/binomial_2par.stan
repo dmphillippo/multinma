@@ -76,28 +76,33 @@ model {
   // binomial here, as N is not necessarily an integer (which Stan doesn't
   // like). The following is exactly equivalent to:
   // ag_r ~ binomial(nprime, pprime);
-  for (i in 1:ni_agd)
+  for (i in 1:ni_agd_arm)
     target += lchoose(nprime[i], agd_arm_r[i]) +
               lmultiply(agd_arm_r[i], pprime[i]) +
               (nprime[i] - agd_arm_r[i]) * log1m(pprime[i]);
 }
 generated quantities {
 #include /include/generated_quantities_common.stan
-
-  // -- Estimate integration error --
   vector[ni_agd * n_int_thin] theta2_bar_cum;
 
+  // IPD log likelihood and residual deviance
   for (i in 1:ni_ipd) {
     log_lik[i] = bernoulli_lpmf(ipd_r[i] | theta_ipd[i]);
     resdev[i] = -2 * log_lik[i];
   }
 
-  for (i in 1:ni_agd) {
-    log_lik[ni_ipd + i] = lchoose(nprime[i], ag_r[i]) + lmultiply(ag_r[i], pprime[i]) + (nprime[i] - ag_r[i]) * log1m(pprime[i]);
+  // AgD (arm-based) log likelihood and residual deviance
+  for (i in 1:ni_agd_arm) {
+    log_lik[ni_ipd + i] = lchoose(nprime[i], agd_arm_r[i]) +
+                          lmultiply(agd_arm_r[i], pprime[i]) +
+                          (nprime[i] - agd_arm_r[i]) * log1m(pprime[i]);
     // Approximate residual deviance for AgD, letting nprime be fixed
-    resdev[ni_ipd + i] = 2 * (lmultiply(ag_r[i], ag_r[i] / (nprime[i] * pprime[i])) + lmultiply(ag_n[i] - ag_r[i], (ag_n[i] - ag_r[i]) / (ag_n[i] - nprime[i] * pprime[i])));
+    resdev[ni_ipd + i] = 2 * (lmultiply(agd_arm_r[i],
+                                        agd_arm_r[i] / (nprime[i] * pprime[i])) +
+                              lmultiply(agd_arm_n[i] - agd_arm_r[i],
+                                        (agd_arm_n[i] - agd_arm_r[i]) / (agd_arm_n[i] - nprime[i] * pprime[i])));
 
-	for (j in 1:n_int_thin) {
+	  for (j in 1:n_int_thin) {
       p_bar_cum[(i-1)*n_int_thin + j] = mean(p_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);
       p2_bar_cum[(i-1)*n_int_thin + j] = (dot_self(p_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]) / (j*int_thin));
     }
