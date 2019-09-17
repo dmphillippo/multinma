@@ -415,23 +415,6 @@ nma.fit <- function(ipd_x, ipd_y,
   likelihood <- check_likelihood(likelihood)
   link <- check_link(link, likelihood)
 
-  if (!is.null(RE_cor) &&
-      (!is.matrix(RE_cor) || !is.numeric(RE_cor))) {
-    abort("`RE_cor` should be a numeric matrix.")
-  } else {
-    RE_cor <- numeric()
-  }
-
-  if (!is.null(which_RE) &&
-      (!is.numeric(which_RE) ||
-       trunc(which_RE) != which_RE ||
-       any(which_RE < 0) ||
-       is.matrix(which_RE))) {
-    abort("`which_RE` should be an integer vector.")
-  } else {
-    which_RE <- integer()
-  }
-
   # Check priors
   if (!inherits(prior_intercept, "nma_prior")) abort("`prior_intercept` should be a prior distribution, see ?priors.")
   if (!inherits(prior_trt, "nma_prior")) abort("`prior_trt` should be a prior distribution, see ?priors.")
@@ -479,10 +462,12 @@ nma.fit <- function(ipd_x, ipd_y,
     ipd_study <- apply(ipd_x[, col_study], 1, get_study)
     ipd_trt <- apply(ipd_x[, col_trt], 1, get_trt)
     ipd_arm <- dplyr::tibble(ipd_study, ipd_trt) %>% dplyr::group_indices(.data$ipd_study, .data$ipd_trt)
+    narm_ipd <- max(ipd_arm)
     ni_ipd <- nrow(ipd_x)
   } else {
     ipd_study <- ipd_trt <- ipd_arm <- numeric()
     ni_ipd <- 0
+    narm_ipd <- 0
   }
 
   if (has_agd_arm) {
@@ -504,6 +489,36 @@ nma.fit <- function(ipd_x, ipd_y,
   } else {
     agd_contrast_study <- agd_contrast_trt <- agd_contrast_trt_b <- numeric()
     ni_agd_contrast <- 0
+  }
+
+  # Set up random effects
+  nRE <- narm_ipd + ni_agd_arm + ni_agd_contrast
+  if (trt_effects == "random") {
+    if (!is.null(RE_cor)) {
+      if (!is.matrix(RE_cor) || !is.numeric(RE_cor))
+        abort("`RE_cor` should be a numeric matrix.")
+      if (any(dim(RE_cor) != c(nRE, nRE)))
+        abort(glue::glue("Dimensions of `RE_cor` do not match the data.\n",
+                         "Expecting [{nRE} x {nRE}], instead [{nrow(RE_cor)} x {ncol(RE_cor)}]."))
+    } else {
+      abort("Specify `RE_cor` when trt_effects = 'random'.")
+    }
+
+    if (!is.null(which_RE)) {
+      if (!is.numeric(which_RE) ||
+          trunc(which_RE) != which_RE ||
+          any(which_RE < 0) ||
+          is.matrix(which_RE))
+        abort("`which_RE` should be an integer vector.")
+      if (length(which_RE) != nrow(RE_cor))
+        abort(glue::glue("Length of `which_RE` does not match the dimensions of `RE_cor`.\n",
+                         "Expecting length {nrow(RE_cor)}, instead length {length(which_RE)}."))
+    } else {
+      abort("Specify `which_RE` when trt_effects = 'random'.")
+    }
+  } else {
+    RE_cor <- matrix(0, 0, 0)
+    which_RE <- rep(0L, nRE)
   }
 
   # Make full design matrix
@@ -536,7 +551,7 @@ nma.fit <- function(ipd_x, ipd_y,
     nX = ncol(X_all),
     int_thin = int_thin,
     # Study and treatment details
-    narm_ipd = if (has_ipd) max(ipd_arm) else 0,
+    narm_ipd = narm_ipd,
     ipd_arm = ipd_arm,
     ipd_trt = ipd_trt,
     agd_arm_trt = agd_arm_trt,
