@@ -814,7 +814,9 @@ check_likelihood <- function(x, outcome) {
 check_link <- function(x, lik) {
   valid_link <- list(normal = c("identity", "log"),
                      bernoulli = c("logit", "probit"),
+                     bernoulli2 = c("logit", "probit"),
                      binomial = c("logit", "probit"),
+                     binomial2 = c("logit", "probit"),
                      poisson = "log")[[lik]]
 
   if (is.null(x)) {
