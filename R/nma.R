@@ -419,7 +419,7 @@ nma.fit <- function(ipd_x, ipd_y,
       (!is.matrix(RE_cor) || !is.numeric(RE_cor))) {
     abort("`RE_cor` should be a numeric matrix.")
   } else {
-    RE_cor <- matrix()
+    RE_cor <- numeric()
   }
 
   if (!is.null(which_RE) &&
@@ -548,10 +548,10 @@ nma.fit <- function(ipd_x, ipd_y,
     RE_cor = RE_cor,
     which_RE = which_RE,
     # Design matrix or QR decomposition
-    X = if (QR) matrix() else X_all,
+    X = if (QR) numeric() else X_all,
     QR = QR,
-    Q = if (QR) X_all_Q else matrix(),
-    R_inv = if (QR) X_all_R_inv else matrix()
+    Q = if (QR) X_all_Q else numeric(),
+    R_inv = if (QR) X_all_R_inv else numeric()
     )
 
   # Add priors
