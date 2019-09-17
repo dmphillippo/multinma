@@ -478,9 +478,10 @@ nma.fit <- function(ipd_x, ipd_y,
   if (has_ipd) {
     ipd_study <- apply(ipd_x[, col_study], 1, get_study)
     ipd_trt <- apply(ipd_x[, col_trt], 1, get_trt)
+    ipd_arm <- dplyr::tibble(ipd_study, ipd_trt) %>% dplyr::group_indices(.data$ipd_study, .data$ipd_trt)
     ni_ipd <- nrow(ipd_x)
   } else {
-    ipd_study <- ipd_trt <- numeric()
+    ipd_study <- ipd_trt <- ipd_arm <- numeric()
     ni_ipd <- 0
   }
 
@@ -535,6 +536,7 @@ nma.fit <- function(ipd_x, ipd_y,
     nX = ncol(X_all),
     int_thin = int_thin,
     # Study and treatment details
+    ipd_arm = ipd_arm,
     ipd_trt = ipd_trt,
     agd_arm_trt = agd_arm_trt,
     agd_contrast_trt = agd_contrast_trt,
