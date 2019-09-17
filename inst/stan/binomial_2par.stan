@@ -66,9 +66,9 @@ model {
   // -- IPD likelihood --
   if (link == 1) { // logit link
     // Could replace with bernoulli_logit_glm in Stan > 2.20
-    y ~ bernoulli_logit(eta_ipd);
+    ipd_r ~ bernoulli_logit(eta_ipd);
   } else {
-    y ~ bernoulli(theta_ipd);
+    ipd_r ~ bernoulli(theta_ipd);
   }
 
   // -- AgD likelihood (arm-based) --
@@ -88,7 +88,7 @@ generated quantities {
   vector[ni_agd * n_int_thin] theta2_bar_cum;
 
   for (i in 1:ni_ipd) {
-    log_lik[i] = bernoulli_lpmf(y[i] | theta_ipd[i]);
+    log_lik[i] = bernoulli_lpmf(ipd_r[i] | theta_ipd[i]);
     resdev[i] = -2 * log_lik[i];
   }
 
