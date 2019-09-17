@@ -16,9 +16,9 @@ int<lower=1> agd_contrast_trt[ni_agd_contrast];
 int<lower=1> agd_contrast_trt_b[ni_agd_contrast];
 
 // Study IDs
-int<lower=1> ipd_study[max(ipd_arm)];
-int<lower=1> agd_arm_study[ni_agd_arm];
-int<lower=1> agd_contrast_study[ni_agd_contrast];
+// int<lower=1> ipd_study[max(ipd_arm)];
+// int<lower=1> agd_arm_study[ni_agd_arm];
+// int<lower=1> agd_contrast_study[ni_agd_contrast];
 
 int<lower=1> nt; // number of treatments
 int<lower=0> nX; // number of columns of design matrix
