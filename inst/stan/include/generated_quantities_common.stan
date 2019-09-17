@@ -12,7 +12,7 @@ vector[(ni_agd_arm + ni_agd_contrast) * n_int_thin] theta_bar_cum;
 vector[n_delta ? narm_ipd + ni_agd_arm + ni_agd_contrast : 0] delta;
 
 for (i in 1:(narm_ipd + ni_agd_arm + ni_agd_contrast)) {
-  delta[i] = which_re[i] ? 0 : gamma[trt[i] - 1] + f_delta[which_RE[i]];
+  delta[i] = which_RE[i] ? 0 : gamma[trt[i] - 1] + f_delta[which_RE[i]];
 }
 
 // Integration error for AgD
