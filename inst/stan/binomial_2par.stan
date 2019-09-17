@@ -81,39 +81,18 @@ model {
               (nprime[i] - agd_arm_r[i]) * log1m(pprime[i]);
 }
 generated quantities {
-  // -- Log likelihood and residual deviance calculation --
-  vector[ni_ipd + ni_agd_arm + ni_agd_contrast] log_lik;
-  vector[ni_ipd + ni_agd_arm + ni_agd_contrast] resdev;
+#include /include/generated_quantities_common.stan
 
   // -- Estimate integration error --
-  vector[ni_agd * n_int_thin] theta_bar_cum;
   vector[ni_agd * n_int_thin] theta2_bar_cum;
 
-  // -- RE shrunken estimate delta --
-  // Note: These are the individual-level trial-specific treatment effects
-  vector[narm_ipd + ni_agd_arm + ni_agd_contrast] delta;
-
-  // For the shrunken estimates, since trt 1 is the reference and REs are treatment based
-  // rather than arm based, any trt 1 arm has delta = 0
-  for (i in 1:(narm_ipd + ni_agd_arm + ni_agd_contrast)) {
-    delta[i] = trt[i] == 1 ? 0 : gamma[trt[i] - 1] + f_delta[which_RE[i]];
-  }
-
   for (i in 1:ni_ipd) {
-	  p_hat[i] = theta[i];
-	  r_hat[i] = theta[i];
     log_lik[i] = bernoulli_lpmf(y[i] | theta[i]);
     resdev[i] = -2 * log_lik[i];
   }
 
   for (i in 1:ni_agd) {
     log_lik[ni_ipd + i] = lchoose(nprime[i], ag_r[i]) + lmultiply(ag_r[i], pprime[i]) + (nprime[i] - ag_r[i]) * log1m(pprime[i]);
-    // p_bar_diff[i] = p_bar[i] - mean(p_ii[(1 + (i-1)*nint):((i-1)*nint + half_nint)]);
-    // p2_bar_diff[i] = p2_bar[i] - (dot_self(p_ii[(1 + (i-1)*nint):((i-1)*nint + half_nint)]) / (half_nint));
-
-    r_hat[ni_ipd + i] = nprime[i] * pprime[i];
-    p_hat[ni_ipd + i] = r_hat[i] / ag_n[i];
-
     // Approximate residual deviance for AgD, letting nprime be fixed
     resdev[ni_ipd + i] = 2 * (lmultiply(ag_r[i], ag_r[i] / (nprime[i] * pprime[i])) + lmultiply(ag_n[i] - ag_r[i], (ag_n[i] - ag_r[i]) / (ag_n[i] - nprime[i] * pprime[i])));
 
