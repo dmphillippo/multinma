@@ -10,7 +10,9 @@ cholesky_factor_corr[n_delta] RE_L = cholesky_decompose(RE_cor);
 
 // Total number of data points
 int totni = ni_ipd + nint * (ni_agd_arm + ni_agd_contrast);
-int totns = ns_ipd + ns_agd_arm + ns_agd_contrast;
+
+// Total number of study intercepts (none for contrast-based data)
+int totns = ns_ipd + ns_agd_arm; // + ns_agd_contrast;
 
 // Number of IPD arms
 int<lower=0> narm_ipd = max(ipd_arm);
