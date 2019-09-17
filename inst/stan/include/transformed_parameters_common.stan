@@ -14,7 +14,7 @@ vector[n_delta] f_delta = tau[1] * RE_L * u_delta;
 // -- Back-transformed parameters --
 vector[nX] allbeta = QR ? R_inv * beta_tilde : beta_tilde;
 // Study baselines
-vector[ns_ipd + ns_agd_arm + ns_agd_contrast] beta0 = allbeta[1:totns];
+vector[ns_ipd + ns_agd_arm + ns_agd_contrast] mu = allbeta[1:totns];
 // Treatment effects
 vector[nt - 1] gamma = allbeta[(totns +1):(totns + nt - 1)];
 // Regression predictors
