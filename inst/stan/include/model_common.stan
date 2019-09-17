@@ -8,7 +8,7 @@ gamma ~ prior_select(prior_trt_type, prior_trt_location, prior_trt_scale, prior_
 // Regression parameters
 beta ~ prior_select(prior_reg_type, prior_reg_location, prior_reg_scale, prior_reg_df);
 // Heterogeneity
-tau ~ prior_select(prior_het_type, prior_het_location, prior_het_scale, prior_het_df);
+to_vector(tau) ~ prior_select(prior_het_type, prior_het_location, prior_het_scale, prior_het_df);
 
 // -- Random effects --
 u_delta ~ std_normal();

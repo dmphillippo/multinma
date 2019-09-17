@@ -1,5 +1,5 @@
 // Function for selecting given prior distribution, provides sampling statement ~prior_select(...)
-real prior_select_lpdf(real y, int type, real location, real scale, real df) {
+real prior_select_lpdf(vector y, int type, real location, real scale, real df) {
   if (type == 1) { // Normal
     return normal_lpdf(y | location, scale);
   } else if (type == 2) { // Cauchy
