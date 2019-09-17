@@ -518,7 +518,7 @@ nma.fit <- function(ipd_x, ipd_y,
       abort("Specify `which_RE` when trt_effects = 'random'.")
     }
   } else {
-    RE_cor <- matrix(0, 0, 0)
+    RE_cor <- matrix(1, 1, 1)
     which_RE <- integer()
   }
 
