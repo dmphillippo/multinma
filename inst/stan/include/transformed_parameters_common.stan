@@ -23,6 +23,8 @@ vector[nX] beta = allbeta[(totns + nt):];
 // -- AgD integration --
 vector[nint * ni_agd_arm] theta_agd_arm_ii;
 vector[ni_agd_arm] theta_agd_arm_bar;
+vector[nint * ni_agd_contrast] eta_agd_contrast_ii;
+vector[ni_agd_contrast] eta_agd_contrast_bar;
 
 // -- IPD model --
 // We define the IPD and AgD models here in the transformed parameters block,
@@ -41,11 +43,15 @@ vector[ni_agd_arm] theta_agd_arm_bar;
 
 // -- AgD model (contrast-based) --
 {
-  vector[ni_agd_contrast] eta_agd_contrast_noRE = Q_agd_contrast * beta_tilde;
+  vector[nint * ni_agd_contrast] eta_agd_contrast_noRE = Q_agd_contrast * beta_tilde;
   for (i in 1:ni_agd_contrast) {
     if (which_RE[narm_ipd + ni_agd_arm + i])
-      eta_agd_contrast[i] = eta_agd_contrast_noRE[i] + f_delta[which_RE[narm_ipd + ni_agd_arm + i]];
+      eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] =
+        eta_agd_contrast_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + ni_agd_arm + i]];
     else
-      eta_agd_contrast[i] = eta_agd_contrast_noRE[i];
+      eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] =
+        eta_agd_contrast_noRE[(1 + (i-1)*nint):(i*nint)];
+
+    eta_agd_contrast_bar[i] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)]);
   }
 }
