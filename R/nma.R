@@ -492,8 +492,9 @@ nma.fit <- function(ipd_x, ipd_y,
   }
 
   # Set up random effects
-  nRE <- narm_ipd + ni_agd_arm + ni_agd_contrast
   if (trt_effects == "random") {
+    nRE <- narm_ipd + ni_agd_arm + ni_agd_contrast
+
     if (!is.null(RE_cor)) {
       if (!is.matrix(RE_cor) || !is.numeric(RE_cor))
         abort("`RE_cor` should be a numeric matrix.")
@@ -518,7 +519,7 @@ nma.fit <- function(ipd_x, ipd_y,
     }
   } else {
     RE_cor <- matrix(0, 0, 0)
-    which_RE <- rep(0L, nRE)
+    which_RE <- integer()
   }
 
   # Make full design matrix
@@ -563,6 +564,7 @@ nma.fit <- function(ipd_x, ipd_y,
     # agd_arm_study = agd_arm_study,
     # agd_contrast_study = agd_contrast_study,
     # Random effects
+    RE = switch(trt_effects, fixed = 0, random = 1),
     RE_cor = RE_cor,
     which_RE = which_RE,
     # Design matrix or QR decomposition

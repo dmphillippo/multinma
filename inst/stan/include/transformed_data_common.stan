@@ -2,7 +2,7 @@
 
 // -- Random effects --
 // number of random effects
-int<lower=0> n_delta = max(which_RE);
+int<lower=0> n_delta = RE ? max(which_RE) : 0;
 // RE MVN mean and correlations
 vector[n_delta] RE_mu = rep_vector(0, n_delta);
 // Cholesky decomposition of RE MVN correlations

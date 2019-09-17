@@ -40,8 +40,9 @@ matrix[QR ? (ni_ipd + nint * (ni_agd_arm + ni_agd_contrast)) : 0, QR ? nX : 0] Q
 matrix[QR ? nX : 0, QR ? nX : 0] R_inv;
 
 // -- Random effects --
-int<lower=0> which_RE[narm_ipd + ni_agd_arm + ni_agd_contrast]; // ID of RE delta for each arm (0 for no RE delta)
-corr_matrix[narm_ipd + ni_agd_arm + ni_agd_contrast] RE_cor; // RE correlation matrix
+int<lower=0, upper=1> RE; // Random effects flag (yes = 1)
+int<lower=0> which_RE[RE ? narm_ipd + ni_agd_arm + ni_agd_contrast : 0]; // ID of RE delta for each arm (0 for no RE delta)
+corr_matrix[RE ? narm_ipd + ni_agd_arm + ni_agd_contrast : 0] RE_cor; // RE correlation matrix
 
 // -- Priors --
 int<lower=1,upper=3> prior_intercept_type;
