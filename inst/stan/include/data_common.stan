@@ -9,8 +9,9 @@ int<lower=0> ni_agd_arm; // total number of AgD (arm-based) data points
 int<lower=0> ni_agd_contrast; // total number of AgD (contrast-based) data points
 
 // Treatment IDs
-int<lower=1> ipd_arm[max(ni_ipd, 1)]; // Arm indicator for IPD (i.e. picking element of which_RE)
-int<lower=1> ipd_trt[max(ipd_arm)];
+int<lower=0> narm_ipd; // Number of IPD arms
+int<lower=1> ipd_arm[ni_ipd]; // Arm indicator for IPD (i.e. picking element of which_RE)
+int<lower=1> ipd_trt[narm_ipd];
 int<lower=1> agd_arm_trt[ni_agd_arm];
 int<lower=1> agd_contrast_trt[ni_agd_contrast];
 int<lower=1> agd_contrast_trt_b[ni_agd_contrast];
@@ -39,8 +40,8 @@ matrix[QR ? (ni_ipd + nint * (ni_agd_arm + ni_agd_contrast)) : 0, QR ? nX : 0] Q
 matrix[QR ? nX : 0, QR ? nX : 0] R_inv;
 
 // -- Random effects --
-int<lower=0> which_RE[max(ipd_arm) + ni_agd_arm + ni_agd_contrast]; // ID of RE delta for each arm (0 for no RE delta)
-corr_matrix[max(ipd_arm) + ni_agd_arm + ni_agd_contrast] RE_cor; // RE correlation matrix
+int<lower=0> which_RE[narm_ipd + ni_agd_arm + ni_agd_contrast]; // ID of RE delta for each arm (0 for no RE delta)
+corr_matrix[narm_ipd + ni_agd_arm + ni_agd_contrast] RE_cor; // RE correlation matrix
 
 // -- Priors --
 int<lower=1,upper=3> prior_intercept_type;

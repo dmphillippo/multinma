@@ -536,6 +536,7 @@ nma.fit <- function(ipd_x, ipd_y,
     nX = ncol(X_all),
     int_thin = int_thin,
     # Study and treatment details
+    narm_ipd = if (has_ipd) max(ipd_arm) else 0,
     ipd_arm = ipd_arm,
     ipd_trt = ipd_trt,
     agd_arm_trt = agd_arm_trt,
