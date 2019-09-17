@@ -82,8 +82,8 @@ model {
               (nprime[i] - agd_arm_r[i]) * log1m(pprime[i]);
 }
 generated quantities {
+  vector[ni_agd_arm * n_int_thin] theta2_bar_cum;
 #include /include/generated_quantities_common.stan
-  vector[ni_agd * n_int_thin] theta2_bar_cum;
 
   // IPD log likelihood and residual deviance
   for (i in 1:ni_ipd) {
@@ -103,8 +103,8 @@ generated quantities {
                                         (agd_arm_n[i] - agd_arm_r[i]) / (agd_arm_n[i] - nprime[i] * pprime[i])));
 
 	  for (j in 1:n_int_thin) {
-      p_bar_cum[(i-1)*n_int_thin + j] = mean(p_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);
-      p2_bar_cum[(i-1)*n_int_thin + j] = (dot_self(p_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]) / (j*int_thin));
+      theta_bar_cum[(i-1)*n_int_thin + j] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);
+      theta2_bar_cum[(i-1)*n_int_thin + j] = (dot_self(theta_agd_arm_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]) / (j*int_thin));
     }
   }
 
