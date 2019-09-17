@@ -18,6 +18,7 @@ parameters {
   real<lower=0, upper=1> pprime[ni_agd_arm];
 }
 transformed parameters {
+  vector[ni_agd_arm] theta2_agd_arm_bar;
 #include /include/transformed_parameters_common.stan
 
   // -- IPD model --
@@ -33,22 +34,22 @@ transformed parameters {
     if (link == 1) { // logit link
       for (i in 1:ni_agd_arm) {
         if (which_RE[narm_ipd + i])
-          theta_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
+          theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
         else
-          theta_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_noRE[(1 + (i-1)*nint):(i*nint)]);
+          theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
       }
     } else if (link == 2) { // probit link
       for (i in 1:ni_agd_arm) {
         if (which_RE[narm_ipd + i])
-          theta_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
+          theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
         else
-          theta_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_noRE[(1 + (i-1)*nint):(i*nint)]);
+          theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
       }
     }
 
     for (i in 1:ni_agd_arm) {
-      theta_bar[i] = mean(theta_ii[(1 + (i-1)*nint):(i*nint)]);
-      theta2_bar[i] = dot_self(theta_ii[(1 + (i-1)*nint):(i*nint)]) / nint;
+      theta_agd_arm_bar[i] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)]);
+      theta2_agd_arm_bar[i] = dot_self(theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)]) / nint;
 
       // Calculate adjusted n and p
       nprime[i] = agd_arm_n[i] * theta_bar[i]^2 / theta2_bar[i];
@@ -87,7 +88,7 @@ generated quantities {
   vector[ni_agd * n_int_thin] theta2_bar_cum;
 
   for (i in 1:ni_ipd) {
-    log_lik[i] = bernoulli_lpmf(y[i] | theta[i]);
+    log_lik[i] = bernoulli_lpmf(y[i] | theta_ipd[i]);
     resdev[i] = -2 * log_lik[i];
   }
 

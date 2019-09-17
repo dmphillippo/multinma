@@ -21,8 +21,8 @@ vector[nt - 1] gamma = allbeta[(totns +1):(totns + nt - 1)];
 vector[nX] beta = allbeta[(totns + nt):];
 
 // -- AgD integration --
-vector[nint * (ni_agd_arm + ni_agd_contrast)] theta_ii;
-vector[ni_agd_arm + ni_agd_contrast] theta_bar;
+vector[nint * ni_agd_arm] theta_agd_arm_ii;
+vector[ni_agd_arm] theta_agd_arm_bar;
 
 // -- IPD model --
 // We define the IPD and AgD models here in the transformed parameters block,
