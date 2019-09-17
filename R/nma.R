@@ -529,7 +529,7 @@ nma.fit <- function(ipd_x, ipd_y,
     ns_agd_arm = length(unique(agd_arm_study)),
     ni_agd_arm = ni_agd_arm,
     # ns_agd_contrast = length(unique(agd_contrast_study)),
-    # ni_agd_contrast = ni_agd_contrast,
+    ni_agd_contrast = ni_agd_contrast,
     nt = n_trt,
     nint = n_int,
     nX = ncol(X_all),
@@ -537,10 +537,10 @@ nma.fit <- function(ipd_x, ipd_y,
     # Study and treatment details
     ipd_trt = ipd_trt,
     agd_arm_trt = agd_arm_trt,
-    # agd_contrast_trt = agd_contrast_trt,
-    # agd_contrast_trt_b = agd_contrast_trt_b,
-    # agd_contrast_y = agd_contrast_y$.y,
-    # agd_contrast_se = agd_contrast_y$.se,
+    agd_contrast_trt = agd_contrast_trt,
+    agd_contrast_trt_b = agd_contrast_trt_b,
+    agd_contrast_y = if (has_agd_contrast) agd_contrast_y$.y else numeric(),
+    agd_contrast_se = if (has_agd_contrast) agd_contrast_y$.se else numeric(),
     ipd_study = ipd_study,
     agd_arm_study = agd_arm_study,
     # agd_contrast_study = agd_contrast_study,
@@ -610,8 +610,9 @@ nma.fit <- function(ipd_x, ipd_y,
 
     standat <- purrr::list_modify(standat,
     # Add outcomes
-      ipd_r = ipd_y$.r,
-      agd_arm_r = agd_arm_y$.r, agd_arm_n = agd_arm_y$.n,
+      ipd_r = if (has_ipd) ipd_y$.r else integer(),
+      agd_arm_r = if (has_agd_arm) agd_arm_y$.r else integer(),
+      agd_arm_n = if (has_agd_arm) agd_arm_y$.n else integer(),
 
       # Specify link
       link = switch(link, logit = 1, probit = 2)
@@ -625,8 +626,9 @@ nma.fit <- function(ipd_x, ipd_y,
 
     standat <- purrr::list_modify(standat,
       # Add outcomes
-      ipd_r = ipd_y$.r,
-      agd_arm_r = agd_arm_y$.r, agd_arm_n = agd_arm_y$.n,
+      ipd_r = if (has_ipd) ipd_y$.r else integer(),
+      agd_arm_r = if (has_agd_arm) agd_arm_y$.r else integer(),
+      agd_arm_n = if (has_agd_arm) agd_arm_y$.n else integer(),
 
       # Specify link
       link = switch(link, logit = 1, probit = 2)
@@ -641,8 +643,10 @@ nma.fit <- function(ipd_x, ipd_y,
 
     standat <- purrr::list_modify(standat,
     # Add outcomes
-      ipd_r = ipd_y$.r, ipd_E = ipd_y$.E,
-      agd_arm_r = agd_arm_y$.r, agd_arm_E = agd_arm_y$.E,
+      ipd_r = if (has_ipd) ipd_y$.r else integer(),
+      ipd_E = if (has_ipd) ipd_y$.E else numeric(),
+      agd_arm_r = if (has_agd_arm) agd_arm_y$.r else integer(),
+      agd_arm_E = if (has_agd_arm) agd_arm_y$.E else numeric(),
 
     # Specify link
       link = switch(link, log = 1)
