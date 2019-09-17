@@ -22,11 +22,11 @@ for (i in 1:ni_agd_contrast) {
 // Integration error for AgD
 for (i in 1:ni_agd_arm) {
   for (j in 1:n_int_thin) {
-    theta_bar_cum[(i-1)*n_int_thin + j] = mean(theta_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);
+    theta_bar_cum[(i-1)*n_int_thin + j] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);
   }
 }
-for (i in (ni_agd_arm + 1):(ni_agd_arm + ni_agd_contrast)) {
+for (i in 1:ni_agd_contrast) {
   for (j in 1:n_int_thin) {
-    theta_bar_cum[(i-1)*n_int_thin + j] = mean(eta_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);
+    theta_bar_cum[ni_agd_arm + (i-1)*n_int_thin + j] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);
   }
 }
