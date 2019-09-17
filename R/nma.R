@@ -481,9 +481,8 @@ nma.fit <- function(ipd_x, ipd_y,
     ipd_arm <- dplyr::tibble(ipd_study, ipd_trt) %>% dplyr::group_indices(.data$ipd_study, .data$ipd_trt)
     ni_ipd <- nrow(ipd_x)
   } else {
-    ipd_study <- ipd_trt <- numeric()
+    ipd_study <- ipd_trt <- ipd_arm <- numeric()
     ni_ipd <- 0
-    ipd_arm <- 0
   }
 
   if (has_agd_arm) {
@@ -551,10 +550,10 @@ nma.fit <- function(ipd_x, ipd_y,
     RE_cor = RE_cor,
     which_RE = which_RE,
     # Design matrix or QR decomposition
-    X = if (QR) numeric() else X_all,
+    X = if (QR) matrix(0, 0, 0) else X_all,
     QR = QR,
-    Q = if (QR) X_all_Q else numeric(),
-    R_inv = if (QR) X_all_R_inv else numeric()
+    Q = if (QR) X_all_Q else matrix(0, 0, 0),
+    R_inv = if (QR) X_all_R_inv else matrix(0, 0, 0)
     )
 
   # Add priors

@@ -34,8 +34,8 @@ real agd_contrast_y[ni_agd_contrast];
 real<lower=0> agd_contrast_se[ni_agd_contrast];
 
 // -- Design matrix or thin QR decomposition --
-matrix[ni_ipd + nint * ni_agd_arm + nint*ni_agd_contrast, QR ? 0 : nX] X;
-matrix[ni_ipd + nint * ni_agd_arm + nint*ni_agd_contrast, QR ? nX : 0] Q;
+matrix[QR ? 0 : (ni_ipd + nint * (ni_agd_arm + ni_agd_contrast)), QR ? 0 : nX] X;
+matrix[QR ? (ni_ipd + nint * (ni_agd_arm + ni_agd_contrast)) : 0, QR ? nX : 0] Q;
 matrix[QR ? nX : 0, QR ? nX : 0] R_inv;
 
 // -- Random effects --
