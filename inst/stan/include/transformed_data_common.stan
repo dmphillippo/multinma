@@ -13,7 +13,10 @@ int totni = ni_ipd + nint * (ni_agd_arm + ni_agd_contrast);
 int totns = ns_ipd + ns_agd_arm + ns_agd_contrast;
 
 // Number of IPD arms
-int <lower=0> narm_ipd = max(ipd_arm);
+int<lower=0> narm_ipd = max(ipd_arm);
+
+// All treatments vector
+int<lower=1> trt[narm_ipd + ni_agd_arm + ni_agd_contrast] = append_array(append_array(ipd_trt, agd_arm_trt), agd_contrast_trt);
 
 // Split Q matrix into IPD and AgD rows
 matrix[ni_ipd, nX] Q_ipd = Q[1:ni_ipd];
