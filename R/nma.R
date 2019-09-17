@@ -896,7 +896,7 @@ prior_standat <- function(x, par, valid){
   out <- purrr::list_modify(c(x), type = type, dist = purrr::zap())
   # Set unnecessary (NA) parameters to zero. These will be ignored by Stan, but
   # need to pass rstan checks
-  out <- out[!is.na(out)]
+  out[is.na(out)] <- 0
   names(out) <- paste0(par, "_", names(out))
   return(out)
 }
