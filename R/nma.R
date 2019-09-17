@@ -481,8 +481,9 @@ nma.fit <- function(ipd_x, ipd_y,
     ipd_arm <- dplyr::tibble(ipd_study, ipd_trt) %>% dplyr::group_indices(.data$ipd_study, .data$ipd_trt)
     ni_ipd <- nrow(ipd_x)
   } else {
-    ipd_study <- ipd_trt <- ipd_arm <- numeric()
+    ipd_study <- ipd_trt <- numeric()
     ni_ipd <- 0
+    ipd_arm <- 0
   }
 
   if (has_agd_arm) {

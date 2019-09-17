@@ -9,7 +9,7 @@ int<lower=0> ni_agd_arm; // total number of AgD (arm-based) data points
 int<lower=0> ni_agd_contrast; // total number of AgD (contrast-based) data points
 
 // Treatment IDs
-int<lower=1> ipd_arm[ni_ipd]; // Arm indicator for IPD (i.e. picking element of which_RE)
+int<lower=1> ipd_arm[max(ni_ipd, 1)]; // Arm indicator for IPD (i.e. picking element of which_RE)
 int<lower=1> ipd_trt[max(ipd_arm)];
 int<lower=1> agd_arm_trt[ni_agd_arm];
 int<lower=1> agd_contrast_trt[ni_agd_contrast];
