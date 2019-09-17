@@ -1,8 +1,12 @@
 // Common definitions for the transformed parameters block
 
-// -- Likelihood parameters needed later for log lik calculation --
+// -- Linear and transformed predictors --
 vector[ni_ipd] eta_ipd; // IPD linear predictor
 vector[ni_ipd] theta_ipd; // IPD transformed predictor
+
+vector[ni_agd_arm] theta_agd_arm; // AgD (arm-based) transformed predictor
+
+vector[ni_agd_contrast] eta_agd_contrast; // AgD (contrast-based) linear predictor
 
 // -- RE deltas --
 vector[n_delta] f_delta = tau[1] * RE_L * u_delta;
