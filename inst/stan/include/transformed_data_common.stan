@@ -6,7 +6,8 @@ int<lower=0> n_delta = RE ? max(which_RE) : 0;
 // RE MVN mean and correlations
 vector[n_delta] RE_mu = rep_vector(0, n_delta);
 // Cholesky decomposition of RE MVN correlations
-cholesky_factor_corr[n_delta] RE_L = cholesky_decompose(RE_cor);
+matrix[0, 0] mdummy; // Use dummy zero-dim matrix to set RE_L to [0x0] when n_delta = 0
+cholesky_factor_corr[n_delta] RE_L = n_delta ? cholesky_decompose(RE_cor) : mdummy;
 
 // Total number of data points
 int totni = ni_ipd + nint * (ni_agd_arm + ni_agd_contrast);
