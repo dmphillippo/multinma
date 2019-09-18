@@ -16,3 +16,24 @@
 #'   }
 #'
 NULL
+
+#' Print stan_nma objects
+#'
+#' See [print.stanfit()].
+#'
+#' @export
+print.stan_nma <- function(x, ...) {
+  sf <- as.stanfit(x)
+  print(sf, ...)
+  invisible(x)
+}
+
+#' @export
+#' @noRd
+as.stanfit.stan_nma <- function(x, ...) {
+  return(x[["stanfit"]])
+}
+
+as.stanfit <- function(x, ...) {
+  UseMethod("as.stanfit")
+}
