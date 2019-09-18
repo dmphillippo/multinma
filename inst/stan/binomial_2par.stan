@@ -34,14 +34,14 @@ transformed parameters {
 
     if (link == 1) { // logit link
       for (i in 1:ni_agd_arm) {
-        if (which_RE[narm_ipd + i])
+        if (RE && which_RE[narm_ipd + i])
           theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
         else
           theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
       }
     } else if (link == 2) { // probit link
       for (i in 1:ni_agd_arm) {
-        if (which_RE[narm_ipd + i])
+        if (RE && which_RE[narm_ipd + i])
           theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
         else
           theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);

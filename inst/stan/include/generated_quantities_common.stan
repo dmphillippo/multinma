@@ -9,14 +9,16 @@ vector[(ni_agd_arm + ni_agd_contrast) * n_int_thin] theta_bar_cum;
 
 // -- RE shrunken estimate delta --
 // Note: These are the individual-level trial-specific treatment effects
-vector[n_delta ? narm_ipd + ni_agd_arm + ni_agd_contrast : 0] delta;
+vector[RE ? narm_ipd + ni_agd_arm + ni_agd_contrast : 0] delta;
 
-for (i in 1:(narm_ipd + ni_agd_arm + ni_agd_contrast)) {
-  delta[i] = which_RE[i] ? 0 : gamma[trt[i] - 1] + f_delta[which_RE[i]];
-}
-for (i in 1:ni_agd_contrast) {
-  if (which_RE[narm_ipd + ni_agd_arm + i])
-    delta[narm_ipd + ni_agd_arm + i] -= gamma[agd_contrast_trt_b[i] - 1];
+if (RE) {
+  for (i in 1:(narm_ipd + ni_agd_arm + ni_agd_contrast)) {
+    delta[i] = gamma[trt[i] - 1] + f_delta[which_RE[i]];
+  }
+  for (i in 1:ni_agd_contrast) {
+    if (which_RE[narm_ipd + ni_agd_arm + i])
+      delta[narm_ipd + ni_agd_arm + i] -= gamma[agd_contrast_trt_b[i] - 1];
+  }
 }
 
 // Integration error for AgD
