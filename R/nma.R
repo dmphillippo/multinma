@@ -34,7 +34,8 @@
 #' @param int_thin A single integer value, the thinning factor for returning
 #'   cumulative estimates of integration error
 #'
-#' @return A [stan_nma] object.
+#' @return `nma()` returns a [stan_nma] object, `nma.fit()` returns a [stanfit]
+#'   object.
 #' @export
 #'
 #' @examples
@@ -296,24 +297,28 @@ nma <- function(network,
   }
 
   # Fit using nma.fit
-  out <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
-                 agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
-                 agd_contrast_x = X_agd_contrast, agd_contrast_y = y_agd_contrast,
-                 n_int = n_int,
-                 trt_effects = trt_effects,
-                 RE_cor = .RE_cor,
-                 which_RE = .which_RE,
-                 likelihood = likelihood,
-                 link = link,
-                 ...,
-                 prior_intercept = prior_intercept,
-                 prior_trt = prior_trt,
-                 prior_het = prior_het,
-                 prior_reg = prior_reg,
-                 prior_aux = prior_aux,
-                 QR = QR,
-                 adapt_delta = adapt_delta,
-                 int_thin = int_thin)
+  stanfit <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
+    agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
+    agd_contrast_x = X_agd_contrast, agd_contrast_y = y_agd_contrast,
+    n_int = n_int,
+    trt_effects = trt_effects,
+    RE_cor = .RE_cor,
+    which_RE = .which_RE,
+    likelihood = likelihood,
+    link = link,
+    ...,
+    prior_intercept = prior_intercept,
+    prior_trt = prior_trt,
+    prior_het = prior_het,
+    prior_reg = prior_reg,
+    prior_aux = prior_aux,
+    QR = QR,
+    adapt_delta = adapt_delta,
+    int_thin = int_thin)
+
+  # Create stan_nma object
+  out <- list(network = network, stanfit = stanfit)
+  class(out) <- "stan_nma"
 
   return(out)
 }
@@ -674,6 +679,7 @@ nma.fit <- function(ipd_x, ipd_y,
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
   }
 
+  return(stanfit)
 }
 
 #' Random effects structure
