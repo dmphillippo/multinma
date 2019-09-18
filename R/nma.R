@@ -488,29 +488,30 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Set up random effects
   if (trt_effects == "random") {
-    nRE <- narm_ipd + ni_agd_arm + ni_agd_contrast
-
-    if (!is.null(RE_cor)) {
-      if (!is.matrix(RE_cor) || !is.numeric(RE_cor))
-        abort("`RE_cor` should be a numeric matrix.")
-      if (any(dim(RE_cor) != c(nRE, nRE)))
-        abort(glue::glue("Dimensions of `RE_cor` do not match the data.\n",
-                         "Expecting [{nRE} x {nRE}], instead [{nrow(RE_cor)} x {ncol(RE_cor)}]."))
-    } else {
-      abort("Specify `RE_cor` when trt_effects = 'random'.")
-    }
-
+    narm <- narm_ipd + ni_agd_arm + ni_agd_contrast
     if (!is.null(which_RE)) {
       if (!is.numeric(which_RE) ||
           trunc(which_RE) != which_RE ||
           any(which_RE < 0) ||
           is.matrix(which_RE))
         abort("`which_RE` should be an integer vector.")
-      if (length(which_RE) != nrow(RE_cor))
-        abort(glue::glue("Length of `which_RE` does not match the dimensions of `RE_cor`.\n",
-                         "Expecting length {nrow(RE_cor)}, instead length {length(which_RE)}."))
+      if (length(which_RE) != narm)
+        abort(glue::glue("Length of `which_RE` does not match the number of arms/contrasts.\n",
+                         "Expecting length {narm}, instead length {length(which_RE)}."))
     } else {
       abort("Specify `which_RE` when trt_effects = 'random'.")
+    }
+
+    nRE <- sum(which_RE != 0)
+
+    if (!is.null(RE_cor)) {
+      if (!is.matrix(RE_cor) || !is.numeric(RE_cor))
+        abort("`RE_cor` should be a numeric matrix.")
+      if (any(dim(RE_cor) != c(nRE, nRE)))
+        abort(glue::glue("Dimensions of `RE_cor` do not match the number of random effects.\n",
+                         "Expecting [{nRE} x {nRE}], instead [{nrow(RE_cor)} x {ncol(RE_cor)}]."))
+    } else {
+      abort("Specify `RE_cor` when trt_effects = 'random'.")
     }
   } else {
     RE_cor <- matrix(1, 1, 1)
@@ -710,34 +711,28 @@ RE_cor <- function(study, trt, type = c("reftrt", "blshift")) {
   if (length(study) != length(trt)) abort("`study` and `trt` must be the same length.")
   type <- rlang::arg_match(type)
 
-  n_i <- length(study)
 
   if (type == "reftrt") {
     reftrt <- levels(trt)[1]
-    Rho <- matrix(0, nrow = n_i, ncol = n_i)
-    diag(Rho) <- 1
-    for (i in 1:(n_i - 1)) {
-      for (j in (i + 1):n_i) {
-        if (study[i] == study[j] && trt[i] != reftrt && trt[j] != reftrt) {
-          Rho[i, j] <- 0.5
-          Rho[j, i] <- 0.5
-        }
-      }
-    }
+    nonref <- trt != reftrt
+    nRE <- sum(nonref)  # RE for each non ref trt arm
+    Rho <- matrix(0, nrow = nRE, ncol = nRE)
+    study <- study[nonref]
+    trt <- trt[nonref]
   } else if (type == "blshift") {
     bl <- !duplicated(study)
-    trtb <- trt[bl]
-    studyb <- study[bl]
-    Rho <- matrix(0, nrow = n_i, ncol = n_i)
-    diag(Rho) <- 1
-    for (i in 1:(n_i - 1)) {
-      for (j in (i + 1):n_i) {
-        if (study[i] == study[j] &&
-            trt[i] != trtb[studyb == study[i]] &&
-            trt[j] != trtb[studyb == study[j]]) {
-          Rho[i, j] <- 0.5
-          Rho[j, i] <- 0.5
-        }
+    nRE <- sum(!bl)  # RE for each non baseline arm
+    Rho <- matrix(0, nrow = nRE, ncol = nRE)
+    study <- study[!bl]
+    trt <- trt[!bl]
+  }
+
+  diag(Rho) <- 1
+  for (i in 1:(nRE - 1)) {
+    for (j in (i + 1):nRE) {
+      if (study[i] == study[j]) {
+        Rho[i, j] <- 0.5
+        Rho[j, i] <- 0.5
       }
     }
   }
