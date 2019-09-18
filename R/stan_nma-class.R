@@ -24,7 +24,11 @@ NULL
 #' @export
 print.stan_nma <- function(x, ...) {
   sf <- as.stanfit(x)
-  print(sf, ...)
+  dots <- list(...)
+  include <- "pars" %in% names(dots)
+  dots <- rlang::dots_list(x = sf, pars = c("log_lik", "resdev"), include = include, !!! dots,
+                           .homonyms = "last")
+  do.call(print, dots)
   invisible(x)
 }
 
