@@ -312,9 +312,6 @@ nma <- function(network,
                  prior_reg = prior_reg,
                  prior_aux = prior_aux,
                  QR = QR,
-                 center = center,
-                 N_agd_arm = N_agd_arm,
-                 N_agd_contrast = N_agd_contrast,
                  adapt_delta = adapt_delta,
                  int_thin = int_thin)
 
@@ -350,8 +347,6 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_reg = normal(scale = 10),
                     prior_aux = normal(scale = 5),
                     QR = FALSE,
-                    N_agd_arm = NULL,
-                    N_agd_contrast = NULL,
                     adapt_delta = NULL,
                     int_thin = 100L) {
 
