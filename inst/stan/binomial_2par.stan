@@ -28,6 +28,7 @@ transformed parameters {
     theta_ipd = Phi(eta_ipd);
 
   // -- AgD model (arm-based) --
+  if (ni_agd_arm) {
   {
     vector[nint * ni_agd_arm] eta_agd_arm_noRE = X_agd_arm * beta_tilde;
 
@@ -58,6 +59,7 @@ transformed parameters {
       // Reject sample if nprime less than number of observed events (shouldn't be necessary...)
       if (nprime[i] < agd_arm_r[i]) reject("nprime = ", nprime[i], " less than r = ", agd_arm_r[i]);
     }
+  }
   }
 }
 model {

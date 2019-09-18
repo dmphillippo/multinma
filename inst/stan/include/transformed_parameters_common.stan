@@ -32,17 +32,24 @@ vector[ni_agd_contrast] eta_agd_contrast_bar;
 // as the linear predictors are required to calculate the log likelihood
 // later on. This is slightly more inefficient than defining the models
 // locally in the model block.
-{
-  vector[ni_ipd] eta_ipd_noRE = X_ipd * beta_tilde;
-  for (i in 1:ni_ipd) {
-    if (which_RE[ipd_arm[i]])
-      eta_ipd[i] = eta_ipd_noRE[i] + f_delta[which_RE[ipd_arm[i]]];
-    else
-      eta_ipd[i] = eta_ipd_noRE[i];
+if (ni_ipd) {
+if (RE) {
+  {
+    vector[ni_ipd] eta_ipd_noRE = X_ipd * beta_tilde;
+    for (i in 1:ni_ipd) {
+      if (which_RE[ipd_arm[i]])
+        eta_ipd[i] = eta_ipd_noRE[i] + f_delta[which_RE[ipd_arm[i]]];
+      else
+        eta_ipd[i] = eta_ipd_noRE[i];
+    }
   }
+} else {
+  eta_ipd = X_ipd * beta_tilde;
+}
 }
 
 // -- AgD model (contrast-based) --
+if (ni_agd_contrast) {
 {
   vector[nint * ni_agd_contrast] eta_agd_contrast_noRE = X_agd_contrast * beta_tilde;
   for (i in 1:ni_agd_contrast) {
@@ -55,4 +62,5 @@ vector[ni_agd_contrast] eta_agd_contrast_bar;
 
     eta_agd_contrast_bar[i] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)]);
   }
+}
 }
