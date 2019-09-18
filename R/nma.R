@@ -536,7 +536,7 @@ nma.fit <- function(ipd_x, ipd_y,
   # Set common Stan data
   standat <- list(
     # Constants
-    ns_ipd = length(unique(agd_arm_study)),
+    ns_ipd = length(unique(ipd_study)),
     ni_ipd = ni_ipd,
     ns_agd_arm = length(unique(agd_arm_study)),
     ni_agd_arm = ni_agd_arm,
