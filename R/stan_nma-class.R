@@ -32,16 +32,25 @@ print.stan_nma <- function(x, ...) {
   invisible(x)
 }
 
+#' as.stanfit
+#'
+#' Attempt to turn an object into a [rstan::stanfit] object.
+#'
+#' @param x an object
+#' @param ... additional arguments
+#'
+#' @return A [rstan::stanfit] object.
 #' @export
-#' @noRd
+#'
+#' @examples
+as.stanfit <- function(x, ...) {
+  UseMethod("as.stanfit")
+}
+
 as.stanfit.stan_nma <- function(x, ...) {
   return(x[["stanfit"]])
 }
 
 as.stanfit.default <- function(x, ...) {
   abort(glue::glue("Cannot coerce object of class '{class(x)}' to 'stanfit'."))
-}
-
-as.stanfit <- function(x, ...) {
-  UseMethod("as.stanfit")
 }
