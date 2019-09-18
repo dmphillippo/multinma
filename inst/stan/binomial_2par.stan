@@ -29,7 +29,7 @@ transformed parameters {
 
   // -- AgD model (arm-based) --
   {
-    vector[nint * ni_agd_arm] eta_agd_arm_noRE = Q_agd_arm * beta_tilde;
+    vector[nint * ni_agd_arm] eta_agd_arm_noRE = X_agd_arm * beta_tilde;
 
     if (link == 1) { // logit link
       for (i in 1:ni_agd_arm) {

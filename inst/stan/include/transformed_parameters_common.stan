@@ -32,7 +32,7 @@ vector[ni_agd_contrast] eta_agd_contrast_bar;
 // later on. This is slightly more inefficient than defining the models
 // locally in the model block.
 {
-  vector[ni_ipd] eta_ipd_noRE = Q_ipd * beta_tilde;
+  vector[ni_ipd] eta_ipd_noRE = X_ipd * beta_tilde;
   for (i in 1:ni_ipd) {
     if (which_RE[ipd_arm[i]])
       eta_ipd[i] = eta_ipd_noRE[i] + f_delta[which_RE[ipd_arm[i]]];
@@ -43,7 +43,7 @@ vector[ni_agd_contrast] eta_agd_contrast_bar;
 
 // -- AgD model (contrast-based) --
 {
-  vector[nint * ni_agd_contrast] eta_agd_contrast_noRE = Q_agd_contrast * beta_tilde;
+  vector[nint * ni_agd_contrast] eta_agd_contrast_noRE = X_agd_contrast * beta_tilde;
   for (i in 1:ni_agd_contrast) {
     if (which_RE[narm_ipd + ni_agd_arm + i])
       eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] =
