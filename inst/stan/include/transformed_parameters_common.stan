@@ -19,7 +19,7 @@ vector[totns] mu = allbeta[1:totns];
 // Treatment effects
 vector[nt - 1] gamma = allbeta[(totns +1):(totns + nt - 1)];
 // Regression predictors
-vector[nX] beta = allbeta[(totns + nt):];
+vector[nX - totns - (nt - 1)] beta = allbeta[(totns + nt):];
 
 // -- AgD integration --
 vector[nint * ni_agd_arm] theta_agd_arm_ii;
