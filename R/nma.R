@@ -583,7 +583,7 @@ nma.fit <- function(ipd_x, ipd_y,
     )
 
   # Standard pars to monitor
-  pars <- c("mu", "beta1", "beta2", "gamma",
+  pars <- c("mu", "beta", "gamma",
             "log_lik", "resdev", "lp__")
 
   # Monitor heterogeneity SD and study deltas if RE model
