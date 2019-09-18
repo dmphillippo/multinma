@@ -14,4 +14,4 @@ prior_select_lp(to_vector(tau), prior_het_type, prior_het_location, prior_het_sc
 u_delta ~ std_normal();
 
 // -- AgD model (contrast-based) --
-agd_contrast_y ~ normal(eta_agd_contrast, agd_contrast_se);
+agd_contrast_y ~ normal(eta_agd_contrast_bar, agd_contrast_se);

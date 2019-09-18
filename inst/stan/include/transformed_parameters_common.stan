@@ -4,10 +4,6 @@
 vector[ni_ipd] eta_ipd; // IPD linear predictor
 vector[ni_ipd] theta_ipd; // IPD transformed predictor
 
-vector[ni_agd_arm] theta_agd_arm; // AgD (arm-based) transformed predictor
-
-vector[ni_agd_contrast] eta_agd_contrast; // AgD (contrast-based) linear predictor
-
 // -- RE deltas --
 // Avoid evaluating tau[1] when no RE (u_delta is zero dim in this case)
 vector[n_delta] f_delta = RE ? tau[1] * RE_L * u_delta : u_delta;
