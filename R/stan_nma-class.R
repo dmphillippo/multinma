@@ -19,7 +19,8 @@ NULL
 
 #' Print stan_nma objects
 #'
-#' See [print.stanfit()].
+#' @param x A [stan_nma] object
+#' @param ... Further arguments passed to [print.stanfit()]
 #'
 #' @export
 print.stan_nma <- function(x, ...) {
