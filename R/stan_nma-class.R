@@ -61,3 +61,16 @@ as.stanfit.stan_nma <- function(x, ...) {
 as.stanfit.default <- function(x, ...) {
   abort(glue::glue("Cannot coerce object of class '{class(x)}' to 'stanfit'."))
 }
+
+#' as.array
+#'
+#' Turn a `stan_nma` object into a 3D array \[Iteration, Chain, Parameter\].
+#' Enables [bayesplot] functions to seamlessly work on `stan_nma`` objects.
+#'
+#' @param x an object
+#' @param ... additional arguments to [as.array.stanfit]
+#'
+#' @export
+as.array.stan_nma <- function(x, ...) {
+  return(as.array(as.stanfit(x), ...))
+}
