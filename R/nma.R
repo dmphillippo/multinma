@@ -601,7 +601,7 @@ nma.fit <- function(ipd_x, ipd_y,
   }
   # Monitor cumulative integration error if using numerical integration
   if (n_int > 1) {
-    pars <- c(par, "theta_bar_cum")
+    pars <- c(pars, "theta_bar_cum")
   }
 
   # Call Stan model for given likelihood
