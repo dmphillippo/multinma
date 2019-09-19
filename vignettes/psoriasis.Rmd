@@ -103,6 +103,7 @@ psoriasis_mlnmr <- nma(psoriasis_net,
                        prior_intercept = normal(scale = 100),
                        prior_trt = normal(scale = 100),
                        prior_reg = normal(scale = 100),
+                       init_r = 0.5,
                        iter = 1000, chains = 4, QR = TRUE)
 
 print(psoriasis_mlnmr)
