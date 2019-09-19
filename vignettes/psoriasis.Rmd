@@ -99,9 +99,10 @@ We run four chains of 1000 iterations each, and utilise the QR decomposition for
 psoriasis_mlnmr <- nma(psoriasis_net, 
                        regression = ~(durnpso + prevsys + bsa + weight + psa)*trtclass,
                        link = "probit", trt_effects = "fixed",
-                       prior_intercept = half_normal(100),
-                       prior_trt = half_normal(100),
-                       prior_reg = half_normal(100),
+                       agd_sample_size = sample_size_w0,
+                       prior_intercept = normal(scale = 100),
+                       prior_trt = normal(scale = 100),
+                       prior_reg = normal(scale = 100),
                        iter = 1000, chains = 4, QR = TRUE)
 
 # print(psoriasis_mlnmr)
