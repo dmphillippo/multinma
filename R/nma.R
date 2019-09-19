@@ -682,6 +682,16 @@ nma.fit <- function(ipd_x, ipd_y,
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
   }
 
+  # Set readable parameter names in the stanfit object
+  fnames_oi <- stanfit@sim$fnames_oi
+  x_names_sub <- gsub("^(.study|.trt)", "", x_names)
+
+  fnames_oi[grepl("^mu\\[[0-9]+\\]$", fnames_oi)] <- paste0("mu[", x_names_sub[col_study], "]")
+  fnames_oi[grepl("^gamma\\[[0-9]+\\]$", fnames_oi)] <- paste0("d[", x_names_sub[col_trt], "]")
+  fnames_oi[grepl("^beta\\[[0-9]+\\]$", fnames_oi)] <- paste0("beta[", x_names_sub[col_reg], "]")
+  fnames_oi <- gsub("tau[1]", "tau", fnames_oi, fixed = TRUE)
+  stanfit@sim$fnames_oi <- fnames_oi
+
   return(stanfit)
 }
 
