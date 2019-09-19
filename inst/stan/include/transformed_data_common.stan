@@ -24,8 +24,8 @@ int<lower=1> trt[narm_ipd + ni_agd_arm + ni_agd_contrast] = append_array(append_
 // Split Q matrix or X matrix into IPD and AgD rows
 matrix[0, nX] Xdummy;
 matrix[ni_ipd, nX] X_ipd = ni_ipd ? X[1:ni_ipd] : Xdummy;
-matrix[nint * ni_agd_arm, nX] X_agd_arm = ni_agd_arm ? X[(ni_ipd + 1):(ni_ipd + ni_agd_arm)] : Xdummy;
-matrix[nint * ni_agd_contrast, nX] X_agd_contrast = ni_agd_contrast ? X[(ni_ipd + ni_agd_arm + 1):(ni_ipd + ni_agd_arm + ni_agd_contrast)] : Xdummy;
+matrix[nint * ni_agd_arm, nX] X_agd_arm = ni_agd_arm ? X[(ni_ipd + 1):(ni_ipd + nint * ni_agd_arm)] : Xdummy;
+matrix[nint * ni_agd_contrast, nX] X_agd_contrast = ni_agd_contrast ? X[(ni_ipd + nint * ni_agd_arm + 1):(ni_ipd + nint * (ni_agd_arm + ni_agd_contrast))] : Xdummy;
 
 // nint/int_thin for numerical integration checks
 int n_int_thin = nint / int_thin;
