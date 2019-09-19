@@ -26,29 +26,54 @@ transformed parameters {
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
-  {
-    vector[nint * ni_agd_arm] eta_agd_arm_noRE = X_agd_arm * beta_tilde;
+    if (nint > 1) { // -- If integration points are used --
+      vector[nint * ni_agd_arm] eta_agd_arm_noRE = X_agd_arm * beta_tilde;
 
-    if (link == 1) { // logit link
-      for (i in 1:ni_agd_arm) {
-        if (RE && which_RE[narm_ipd + i])
-          theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
-        else
-          theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
+      if (link == 1) { // logit link
+        for (i in 1:ni_agd_arm) {
+          if (RE && which_RE[narm_ipd + i])
+            theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
+          else
+            theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
+        }
+      } else if (link == 2) { // probit link
+        for (i in 1:ni_agd_arm) {
+          if (RE && which_RE[narm_ipd + i])
+            theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
+          else
+            theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
+        }
       }
-    } else if (link == 2) { // probit link
+
       for (i in 1:ni_agd_arm) {
-        if (RE && which_RE[narm_ipd + i])
-          theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
-        else
-          theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
+        theta_agd_arm_bar[i] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)]);
+      }
+    } else { // -- If no integration --
+      if (RE) {
+      vector[nint * ni_agd_arm] eta_agd_arm_noRE = X_agd_arm * beta_tilde;
+
+      if (link == 1) { // logit link
+        for (i in 1:ni_agd_arm) {
+          if (which_RE[narm_ipd + i])
+            theta_agd_arm_bar[i] = inv_logit(eta_agd_arm_noRE[i] + f_delta[which_RE[narm_ipd + i]]);
+          else
+            theta_agd_arm_bar[i] = inv_logit(eta_agd_arm_noRE[i]);
+        }
+      } else if (link == 2) { // probit link
+        for (i in 1:ni_agd_arm) {
+          if (which_RE[narm_ipd + i])
+            theta_agd_arm_bar[i] = Phi(eta_agd_arm_noRE[i] + f_delta[which_RE[narm_ipd + i]]);
+          else
+            theta_agd_arm_bar[i] = Phi(eta_agd_arm_noRE[i]);
+        }
+      }
+      } else {
+        if (link == 1) // logit link
+          theta_agd_arm_bar = inv_logit(X_agd_arm * beta_tilde);
+        else if (link == 2) // probit link
+          theta_agd_arm_bar = Phi(X_agd_arm * beta_tilde);
       }
     }
-
-    for (i in 1:ni_agd_arm) {
-      theta_agd_arm_bar[i] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)]);
-    }
-  }
   }
 }
 model {

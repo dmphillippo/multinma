@@ -29,37 +29,73 @@ transformed parameters {
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
-  {
-    vector[nint * ni_agd_arm] eta_agd_arm_noRE = X_agd_arm * beta_tilde;
+    if (nint > 1) { // -- If integration points are used --
+      vector[nint * ni_agd_arm] eta_agd_arm_noRE = X_agd_arm * beta_tilde;
 
-    if (link == 1) { // logit link
-      for (i in 1:ni_agd_arm) {
-        if (RE && which_RE[narm_ipd + i])
-          theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
-        else
-          theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
+      if (link == 1) { // logit link
+        for (i in 1:ni_agd_arm) {
+          if (RE && which_RE[narm_ipd + i])
+            theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
+          else
+            theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
+        }
+      } else if (link == 2) { // probit link
+        for (i in 1:ni_agd_arm) {
+          if (RE && which_RE[narm_ipd + i])
+            theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
+          else
+            theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
+        }
       }
-    } else if (link == 2) { // probit link
+
       for (i in 1:ni_agd_arm) {
-        if (RE && which_RE[narm_ipd + i])
-          theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
-        else
-          theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
+        theta_agd_arm_bar[i] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)]);
+        theta2_agd_arm_bar[i] = dot_self(theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)]) / nint;
+
+        // Calculate adjusted n and p
+        nprime[i] = agd_arm_n[i] * theta_agd_arm_bar[i]^2 / theta2_agd_arm_bar[i];
+        pprime[i] = theta2_agd_arm_bar[i] / theta_agd_arm_bar[i];
+
+        // Reject sample if nprime less than number of observed events (shouldn't be necessary...)
+        if (nprime[i] < agd_arm_r[i]) reject("nprime = ", nprime[i], " less than r = ", agd_arm_r[i]);
+      }
+    } else { // -- If no integration --
+      if (RE) {
+        vector[nint * ni_agd_arm] eta_agd_arm_noRE = X_agd_arm * beta_tilde;
+
+        if (link == 1) { // logit link
+          for (i in 1:ni_agd_arm) {
+            if (which_RE[narm_ipd + i])
+              theta_agd_arm_bar[i] = inv_logit(eta_agd_arm_noRE[i] + f_delta[which_RE[narm_ipd + i]]);
+            else
+              theta_agd_arm_bar[i] = inv_logit(eta_agd_arm_noRE[i]);
+          }
+        } else if (link == 2) { // probit link
+          for (i in 1:ni_agd_arm) {
+            if (which_RE[narm_ipd + i])
+              theta_agd_arm_bar[i] = Phi(eta_agd_arm_noRE[i] + f_delta[which_RE[narm_ipd + i]]);
+            else
+              theta_agd_arm_bar[i] = Phi(eta_agd_arm_noRE[i]);
+          }
+        }
+      } else {
+        if (link == 1) // logit link
+          theta_agd_arm_bar = inv_logit(X_agd_arm * beta_tilde);
+        else if (link == 2) // probit link
+          theta_agd_arm_bar = Phi(X_agd_arm * beta_tilde);
+      }
+
+      theta2_agd_arm_bar = theta_agd_arm_bar .* theta_agd_arm_bar;
+
+      for (i in 1:ni_agd_arm) {
+        // Calculate adjusted n and p
+        nprime[i] = agd_arm_n[i] * theta_agd_arm_bar[i]^2 / theta2_agd_arm_bar[i];
+        pprime[i] = theta2_agd_arm_bar[i] / theta_agd_arm_bar[i];
+
+        // Reject sample if nprime less than number of observed events (shouldn't be necessary...)
+        if (nprime[i] < agd_arm_r[i]) reject("nprime = ", nprime[i], " less than r = ", agd_arm_r[i]);
       }
     }
-
-    for (i in 1:ni_agd_arm) {
-      theta_agd_arm_bar[i] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)]);
-      theta2_agd_arm_bar[i] = dot_self(theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)]) / nint;
-
-      // Calculate adjusted n and p
-      nprime[i] = agd_arm_n[i] * theta_agd_arm_bar[i]^2 / theta2_agd_arm_bar[i];
-      pprime[i] = theta2_agd_arm_bar[i] / theta_agd_arm_bar[i];
-
-      // Reject sample if nprime less than number of observed events (shouldn't be necessary...)
-      if (nprime[i] < agd_arm_r[i]) reject("nprime = ", nprime[i], " less than r = ", agd_arm_r[i]);
-    }
-  }
   }
 }
 model {
