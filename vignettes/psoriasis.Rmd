@@ -93,17 +93,18 @@ psoriasis_net <- add_integration(psoriasis_net,
 
 Now run a fixed effect (FE) multilevel network meta-regression (ML-NMR) model, using `nma()`.
 We utilise the shared effect modifier assumption, setting treatment-covariate interactions to be equal within each class.
-We specify a probit link function, and vague $N(0, 100^2)$ priors on each parameter.
+We specify a probit link function, and weakly-informative $N(0, 10^2)$ priors on each parameter.
 We run four chains of 1000 iterations each, and utilise the QR decomposition for efficiency.
 ```{r}
 psoriasis_mlnmr <- nma(psoriasis_net, 
-                       regression = ~(durnpso + prevsys + bsa + weight + psa)*trtclass,
+                       regression = ~durnpso + prevsys + bsa + weight + psa + 
+                                     (durnpso + prevsys + bsa + weight + psa):trtclass,
                        link = "probit", trt_effects = "fixed",
                        agd_sample_size = sample_size_w0,
-                       prior_intercept = normal(scale = 100),
-                       prior_trt = normal(scale = 100),
-                       prior_reg = normal(scale = 100),
-                       init_r = 0.5,
+                       prior_intercept = normal(scale = 10),
+                       prior_trt = normal(scale = 10),
+                       prior_reg = normal(scale = 10),
+                       init_r = 0.1,
                        iter = 1000, chains = 4, QR = TRUE)
 
 print(psoriasis_mlnmr)
