@@ -27,7 +27,9 @@ print.stan_nma <- function(x, ...) {
   sf <- as.stanfit(x)
   dots <- list(...)
   include <- "pars" %in% names(dots)
-  dots <- rlang::dots_list(x = sf, pars = c("log_lik", "resdev"), include = include, !!! dots,
+  dots <- rlang::dots_list(x = sf,
+                           pars = c("log_lik", "resdev", "theta_bar_cum", "theta2_bar_cum"),
+                           include = include, !!! dots,
                            .homonyms = "last")
   do.call(print, dots)
   invisible(x)
