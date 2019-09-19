@@ -23,7 +23,7 @@ int<lower=1> agd_contrast_trt_b[ni_agd_contrast];
 
 int<lower=1> nt; // number of treatments
 int<lower=0> nX; // number of columns of design matrix
-int<lower=1> nint; // number of samples for numerical integration
+int<lower=0> nint; // number of samples for numerical integration
 int<lower=1> int_thin; // thinning factor for saved integration points
 
 int<lower=1> link; // link function
