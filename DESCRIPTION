@@ -44,7 +44,8 @@ RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 Suggests: 
     testthat (>= 2.1.0),
-    parallel
+    parallel,
+    bayesplot
 RdMacros: Rdpack
 URL: http://github.com/dmphillippo/multinma
 BugReports: http://github.com/dmphillippo/multinma/issues
