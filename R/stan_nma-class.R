@@ -48,10 +48,14 @@ as.stanfit <- function(x, ...) {
   UseMethod("as.stanfit")
 }
 
+#' @export
+#' @noRd
 as.stanfit.stan_nma <- function(x, ...) {
   return(x[["stanfit"]])
 }
 
+#' @export
+#' @noRd
 as.stanfit.default <- function(x, ...) {
   abort(glue::glue("Cannot coerce object of class '{class(x)}' to 'stanfit'."))
 }
