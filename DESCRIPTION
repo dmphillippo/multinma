@@ -33,7 +33,8 @@ Imports:
     randtoolbox,
     copula,
     tidyr (>= 0.8.3),
-    stringr
+    stringr,
+    logitnorm
 LinkingTo: 
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),
