@@ -32,7 +32,8 @@ Imports:
     crayon,
     randtoolbox,
     copula,
-    tidyr (>= 0.8.3)
+    tidyr (>= 0.8.3),
+    stringr
 LinkingTo: 
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),
@@ -44,7 +45,8 @@ RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 Suggests: 
     testthat (>= 2.1.0),
-    parallel
+    parallel,
+    bayesplot
 RdMacros: Rdpack
 URL: http://github.com/dmphillippo/multinma
 BugReports: http://github.com/dmphillippo/multinma/issues

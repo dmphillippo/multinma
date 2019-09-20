@@ -56,8 +56,8 @@ set_ipd <- function(data,
 
   # Create tibble in standard format
   d <- tibble::tibble(
-    .study = factor(.study),
-    .trt = factor(.trt)
+    .study = nfactor(.study),
+    .trt = nfactor(.trt)
   )
 
   if (o_type == "continuous") {
@@ -145,8 +145,8 @@ set_agd_arm <- function(data,
 
   # Create tibble in standard format
   d <- tibble::tibble(
-    .study = factor(.study),
-    .trt = factor(.trt)
+    .study = nfactor(.study),
+    .trt = nfactor(.trt)
   )
 
   if (o_type == "continuous") {
@@ -229,11 +229,11 @@ set_agd_contrast <- function(data,
                              r = NULL, n = NULL, E = NULL)
 
   # Get all treatments
-  trts <- sort(forcats::lvls_union(list(factor(.trt), factor(.trt_b))))
+  trts <- stringr::str_sort(forcats::lvls_union(list(nfactor(.trt), nfactor(.trt_b))), numeric = TRUE)
 
   # Create tibble in standard format
   d <- tibble::tibble(
-    .study = factor(.study),
+    .study = nfactor(.study),
     .trt = factor(.trt, levels = trts),
     .trt_b = factor(.trt_b, levels = trts),
     .y = .y,
@@ -275,7 +275,7 @@ combine_network <- function(..., trt_ref) {
   }
 
   # Combine treatment code factor
-  trts <- sort(forcats::lvls_union(purrr::map(s, "treatments")))
+  trts <- stringr::str_sort(forcats::lvls_union(purrr::map(s, "treatments")), numeric = TRUE)
   if (!missing(trt_ref)) {
     if (! trt_ref %in% trts) {
       abort(sprintf("`trt_ref` does not match a treatment in the network.\nSuitable values are: %s",
@@ -294,7 +294,7 @@ combine_network <- function(..., trt_ref) {
   }
 
   # Combine study code factor
-  studs <- sort(forcats::lvls_union(purrr::map(s, "studies")))
+  studs <- stringr::str_sort(forcats::lvls_union(purrr::map(s, "studies")), numeric = TRUE)
 
   # Get ipd
   ipd <- purrr::map(s, "ipd")
@@ -358,7 +358,7 @@ combine_network <- function(..., trt_ref) {
          agd_contrast = agd_contrast,
          ipd = ipd,
          treatments = factor(trts, levels = trts),
-         studies = factor(studs),
+         studies = factor(studs, levels = studs),
          outcome = outcome),
     class = "nma_data")
   return(out)
@@ -545,4 +545,13 @@ has_agd_arm <- function(network) {
 has_agd_contrast <- function(network) {
   if (!inherits(network, "nma_data")) abort("Not nma_data object.")
   return(!rlang::is_empty(network$agd_contrast))
+}
+
+#' Natural-order factors
+#'
+#' Produces factors with levels in natural sort order (i.e. 1 5 10 not 1 10 5)
+#'
+#' @noRd
+nfactor <- function(x, ..., numeric = TRUE) {
+  return(factor(x, levels = stringr::str_sort(unique(x), numeric = numeric), ...))
 }
