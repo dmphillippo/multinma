@@ -159,43 +159,6 @@ nma <- function(network,
     dplyr::mutate(.study = forcats::fct_relabel(.data$.study, ~gsub(":", "_", ., fixed = TRUE)),
                   .trt = forcats::fct_relabel(.data$.trt, ~gsub(":", "_", ., fixed = TRUE)))
 
-  # Get sample sizes for centering
-  if (!is.null(regression) && center) {
-    if ((has_agd_arm(network) || has_agd_contrast(network))&& missing(agd_sample_size))
-      abort("Specify AgD sample size column in data `agd_sample_size` to calculate global mean for centering, or set center = FALSE.")
-
-    if (has_agd_arm(network)) {
-      N_agd_arm <- dplyr::pull(network$agd_arm, {{ agd_sample_size }})
-    } else {
-      N_agd_arm <- NULL
-    }
-
-  if (has_agd_contrast(network)) {
-
-    # For contrast-based data, the "contrast" sample size is undefined -
-    # expecting instead to see study sample size repeated by contrast (ditto for
-    # regression terms). For centering, take the first value of N, and set
-    # others to zero.
-    first_then_zero <- function(x) {
-      x[2:length(x)] <- 0
-      return(x)
-    }
-      N_agd_contrast <- network$agd_contrast %>%
-        dplyr::group_by(.data$.study) %>%
-        dplyr::mutate_at(dplyr::vars({{ agd_sample_size }}), first_then_zero) %>%
-        dplyr::pull(network$agd_arm, {{ agd_sample_size }})
-    } else {
-      N_agd_contrast <- NULL
-    }
-
-  # Center numeric columns in data
-    wts <- c(rep(1, nrow(dat_ipd)),
-             rep(N_agd_arm / n_int, each = n_int),
-             rep(N_agd_contrast / n_int, each = n_int))
-
-    idat_all <- dplyr::mutate_if(idat_all, is.numeric, ~. - weighted.mean(., wts))
-  }
-
   if (consistency != "consistency") {
     abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
   }
@@ -253,6 +216,47 @@ nma <- function(network,
         "Variables with missing values in AgD (arm-based): {paste(X_agd_arm_has_na, collapse = ', ')}.",
         "Variables with missing values in AgD (contrast-based): {paste(X_agd_contrast_has_na, collapse = ', ')}."
        )[dat_has_na], sep = "\n")))
+  }
+
+  # Get sample sizes for centering
+  if (!is.null(regression) && center) {
+    if ((has_agd_arm(network) || has_agd_contrast(network)) && missing(agd_sample_size))
+      abort("Specify AgD sample size column in data `agd_sample_size` to calculate global mean for centering, or set center = FALSE.")
+
+    if (has_agd_arm(network)) {
+      N_agd_arm <- dplyr::pull(network$agd_arm, {{ agd_sample_size }})
+    } else {
+      N_agd_arm <- NULL
+    }
+
+    if (has_agd_contrast(network)) {
+
+      # For contrast-based data, the "contrast" sample size is undefined -
+      # expecting instead to see study sample size repeated by contrast (ditto for
+      # regression terms). For centering, take the first value of N, and set
+      # others to zero.
+      first_then_zero <- function(x) {
+        x[2:length(x)] <- 0
+        return(x)
+      }
+      N_agd_contrast <- network$agd_contrast %>%
+        dplyr::group_by(.data$.study) %>%
+        dplyr::mutate_at(dplyr::vars({{ agd_sample_size }}), first_then_zero) %>%
+        dplyr::pull(network$agd_arm, {{ agd_sample_size }})
+    } else {
+      N_agd_contrast <- NULL
+    }
+
+    # Center numeric columns used in regression model
+    wts <- c(rep(1, nrow(dat_ipd)),
+             rep(N_agd_arm / n_int, each = n_int),
+             rep(N_agd_contrast / n_int, each = n_int))
+
+    reg_names <- colnames(model.frame(nma_formula, data = idat_all))
+
+    idat_all[, reg_names] <- dplyr::mutate_if(idat_all[, reg_names],
+                                              is.numeric,
+                                              ~. - weighted.mean(., wts))
   }
 
   # Construct model matrix
