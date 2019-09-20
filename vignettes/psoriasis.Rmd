@@ -79,14 +79,11 @@ psoriasis_net
 Add numerical integration points using `add_integration()`.
 ```{r}
 psoriasis_net <- add_integration(psoriasis_net,
-  durnpso = distr(qgamma, (durnpso_mean / durnpso_sd)^2, durnpso_mean / durnpso_sd^2),
-  # prevsys = distr(qbern, prevsys),
-  prevsys = distr(qbinom, 1, prevsys),
-  # bsa = distr(qlogitnorm, bsa_mean, bsa_sd),
-  bsa = distr(qgamma, (bsa_mean / bsa_sd)^2, bsa_mean / bsa_sd^2),
-  weight = distr(qgamma, (weight_mean / weight_sd)^2, weight_mean / weight_sd^2),
-  psa = distr(qbinom, 1, psa),
-  # psa = distr(qbern, psa),
+  durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+  prevsys = distr(qbern, prevsys),
+  bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+  weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
+  psa = distr(qbern, psa),
   n_int = 1000
 )
 ```
