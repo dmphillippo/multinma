@@ -327,7 +327,7 @@ pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
 qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
-  return(logitnorm::qlogitnorm(p, pars$mu, pars$sigma))
+  return(logitnorm::qlogitnorm(p, pars[["mu"]], pars[["sigma"]]))
 }
 
 #' @export
@@ -336,7 +336,7 @@ qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
 dlogitnorm <- function(x, mu = 0, sigma = 1, ..., mean, sd) {
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
-  return(logitnorm::dlogitnorm(x, pars$mu, pars$sigma))
+  return(logitnorm::dlogitnorm(x, pars[["mu"]], pars[["sigma"]]))
 }
 
 #' @export
@@ -345,7 +345,7 @@ dlogitnorm <- function(x, mu = 0, sigma = 1, ..., mean, sd) {
 plogitnorm <- function(q, mu = 0, sigma = 1, ..., mean, sd) {
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
-  return(logitnorm::plogitnorm(q, pars$mu, pars$sigma))
+  return(logitnorm::plogitnorm(q, pars[["mu"]], pars[["sigma"]]))
 }
 
 # Internal functions for *logitnorm()
@@ -359,9 +359,9 @@ plogitnorm <- function(q, mu = 0, sigma = 1, ..., mean, sd) {
 
   if (opt$convergence != 0) {
     warn("Optimisation did not converge, NAs produced.")
-    return(list(mu = NA, sigma = NA))
+    return(c(mu = NA, sigma = NA))
   } else {
-    return(list(mu = opt$par[1], sigma = opt$par[2]))
+    return(c(mu = opt$par[1], sigma = opt$par[2]))
   }
 }
 
