@@ -225,3 +225,151 @@ distr <- function(qfun, ...) {
   class(d) <- "distr"
   return(d)
 }
+
+#' The Bernoulli Distribution
+#'
+#' The quantile function `qbern` for a Bernoulli distribution, with success
+#' probability `prob`. This is equivalent to `qbinom(p, 1, prob)`.
+#'
+#' @param x,q vector of quantiles
+#' @param p vector of probabilities
+#' @param prob probability of success
+#' @param lower.tail,log.p,log see [stats::Binomial]
+#'
+#' @export
+#' @rdname Bernoulli
+#' @aliases qbern
+qbern <- function(p, prob, lower.tail = TRUE, log.p = FALSE) {
+  return(qbinom(p, size = 1, prob = prob, lower.tail = lower.tail, log.p = log.p))
+}
+
+#' @export
+#' @rdname Bernoulli
+#' @aliases pbern
+pbern <- function(q, prob, lower.tail = TRUE, log.p = FALSE) {
+  return(pbinom(q, size = 1, prob = prob, lower.tail = lower.tail, log.p = log.p))
+}
+
+#' @export
+#' @rdname Bernoulli
+#' @aliases dbern
+dbern <- function(x, prob, log = FALSE) {
+  return(dbinom(x, size = 1, prob = prob, log = log))
+}
+
+#' The Gamma distribution
+#'
+#' We provide convenient extensions of the `[dpq]gamma` functions, which allow
+#' the distribution to be specified in terms of its mean and standard deviation,
+#' instead of shape and rate/scale.
+#'
+#' @param x,q vector of quantiles
+#' @param p vector of probabilities
+#' @param shape,rate,scale,log,lower.tail,log.p see [stats::GammaDist]
+#' @param mean,sd mean and standard deviation, overriding `shape` and
+#'   `rate` or `scale` if specified
+#'
+#' @return
+#' @export
+#' @rdname GammaDist
+#' @aliases qgamma
+qgamma <- function(p, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
+                   log.p = FALSE, mean, sd) {
+  if (!missing(mean) && !missing(sd))
+    return(stats::qgamma(p, shape = (mean / sd)^2, rate = mean / sd^2,
+                        lower.tail = lower.tail, log.p = log.p))
+  else
+    return(stats::qgamma(p, shape = shape, rate = rate,
+                        lower.tail = lower.tail, log.p = log.p))
+}
+
+#' @export
+#' @rdname GammaDist
+#' @aliases dgamma
+dgamma <- function(x, shape, rate = 1, scale = 1/rate, log = FALSE, mean, sd) {
+  if (!missing(mean) && !missing(sd))
+    return(stats::dgamma(x, shape = (mean / sd)^2, rate = mean / sd^2, log = log))
+  else
+    return(stats::dgamma(x, shape = shape, rate = rate, log = log))
+}
+
+#' @export
+#' @rdname GammaDist
+#' @aliases pgamma
+pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
+                   log.p = FALSE, mean, sd) {
+  if (!missing(mean) && !missing(sd))
+    return(stats::pgamma(q, shape = (mean / sd)^2, rate = mean / sd^2,
+                         lower.tail = lower.tail, log.p = log.p))
+  else
+    return(stats::pgamma(q, shape = shape, rate = rate,
+                         lower.tail = lower.tail, log.p = log.p))
+}
+
+
+#' The logit Normal distribution
+#'
+#' We provide convenient extensions of the `[dpq]logitnorm` functions in the
+#' package [logitnorm], which allow the distribution to be specified in terms of
+#' its mean and standard deviation, instead of its logit-mean and logit-sd.
+#'
+#' @param p,x vector of quantiles
+#' @param q vector of probabilities
+#' @param mu,sigma see [logitnorm]
+#' @param ...
+#' @param mean,sd mean and standard deviation, overriding `mu` and `sigma` if
+#'   specified
+#'
+#' @return
+#' @export
+#' @rdname logitNormal
+#' @aliases qlogitnorm
+qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
+  if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
+  else pars <- list(mu = mu, sigma = sigma)
+  return(logitnorm::qlogitnorm(p, pars$mu, pars$sigma))
+}
+
+#' @export
+#' @rdname logitNormal
+#' @aliases dlogitnorm
+dlogitnorm <- function(x, mu = 0, sigma = 1, ..., mean, sd) {
+  if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
+  else pars <- list(mu = mu, sigma = sigma)
+  return(logitnorm::dlogitnorm(x, pars$mu, pars$sigma))
+}
+
+#' @export
+#' @rdname logitNormal
+#' @aliases plogitnorm
+plogitnorm <- function(q, mu = 0, sigma = 1, ..., mean, sd) {
+  if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
+  else pars <- list(mu = mu, sigma = sigma)
+  return(logitnorm::plogitnorm(q, pars$mu, pars$sigma))
+}
+
+# Internal functions for *logitnorm()
+.lndiff <- function(est, m, s){
+  x <- logitnorm::momentsLogitnorm(est[1], est[2])
+  return((x[1] - m)^2 + (sqrt(x[2]) - s)^2)
+}
+
+.lnopt <- function(m, s) {
+  opt <- optim(c(m, s), .lndiff, m = m, s = s)
+
+  if (opt$convergence != 0) {
+    warn("Optimisation did not converge, NAs produced.")
+    return(list(mu = NA, sigma = NA))
+  } else {
+    return(list(mu = opt$par[1], sigma = opt$par[2]))
+  }
+}
+
+# Estimate mu and sigma parameters of logit-normal from sample mean and sd
+pars_logitnorm <- function(m, s) {
+  if (length(m) != length(s)) abort("Parameters not same length.")
+  if (any(m > 1 | m < 0)) abort("Mean not in [0,1]. Have you rescaled?")
+
+  return(as.data.frame(do.call(rbind, mapply(.lnopt, m, s, SIMPLIFY = FALSE))))
+
+}
