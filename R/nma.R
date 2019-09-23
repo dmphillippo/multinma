@@ -642,8 +642,9 @@ nma.fit <- function(ipd_x, ipd_y,
 
     standat <- purrr::list_modify(standat,
       # Add outcomes
-      ipd_y = ipd_y$.y,
-      agd_arm_y = agd_arm_y$.y, agd_arm_se = agd_arm_y$.se,
+      ipd_y = if (has_ipd) ipd_y$.y else numeric(),
+      agd_arm_y = if (has_agd_arm) agd_arm_y$.y else numeric(),
+      agd_arm_se = if (has_agd_arm) agd_arm_y$.se else numeric(),
 
       # Add prior for auxilliary parameter - individual-level variance
       !!! prior_standat(prior_het, "prior_aux",
