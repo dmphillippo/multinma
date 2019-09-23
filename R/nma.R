@@ -134,6 +134,10 @@ nma <- function(network,
   }
 
   if (has_agd_contrast(network)) {
+    abort("Contrast-based AgD not yet supported.")
+    # Need to figure out how best to specify correlations for trials with 2+ contrasts...
+    # Could ask user to give *all* contrasts?
+
     dat_agd_contrast <- network$agd_contrast
     y_agd_contrast <- get_outcome_variables(dat_agd_contrast, network$outcome$agd_contrast)
 
