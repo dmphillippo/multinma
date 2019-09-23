@@ -93,3 +93,29 @@ as.stanfit.default <- function(x, ...) {
 as.array.stan_nma <- function(x, ...) {
   return(as.array(as.stanfit(x), ...))
 }
+
+#' as.data.frame
+#'
+#' Turn a `stan_nma` object into a data frame containing posterior samples (post
+#' warm-up) of each parameter.
+#'
+#' @param x an object
+#' @param ... additional arguments to [as.data.frame.stanfit]
+#'
+#' @export
+as.data.frame.stan_nma <- function(x, ...) {
+  return(as.data.frame(as.stanfit(x), ...))
+}
+
+#' as.matrix
+#'
+#' Turn a `stan_nma` object into a matrix containing posterior samples (post
+#' warm-up) of each parameter.
+#'
+#' @param x an object
+#' @param ... additional arguments to [as.matrix.stanfit]
+#'
+#' @export
+as.matrix.stan_nma <- function(x, ...) {
+  return(as.matrix(as.stanfit(x), ...))
+}
