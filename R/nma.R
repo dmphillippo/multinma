@@ -254,9 +254,15 @@ nma <- function(network,
 
     reg_names <- colnames(model.frame(nma_formula, data = idat_all))
 
-    idat_all[, reg_names] <- dplyr::mutate_if(idat_all[, reg_names],
-                                              is.numeric,
-                                              ~. - weighted.mean(., wts))
+    reg_numeric <- purrr::map_lgl(idat_all[, reg_names], is.numeric)
+
+    xbar <- purrr::map_dbl(idat_all[, reg_names[reg_numeric]], weighted.mean, w = wts)
+
+    idat_all[, reg_names[reg_numeric]] <-
+      purrr::map2(idat_all[, reg_names[reg_numeric]], xbar, ~.x - .y)
+
+  } else {
+    xbar <- NULL
   }
 
   # Construct model matrix
@@ -326,6 +332,7 @@ nma <- function(network,
               trt_effects = trt_effects,
               consistency = consistency,
               regression = regression,
+              xbar = xbar,
               likelihood = likelihood,
               link = link,
               priors = list(prior_intercept = prior_intercept,

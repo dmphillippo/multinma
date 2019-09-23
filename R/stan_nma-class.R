@@ -16,6 +16,7 @@
 #'   \item{`trt_effects`}{Whether fixed or random effects were used (character string)}
 #'   \item{`consistency`}{The consistency/inconsistency model used (character string)}
 #'   \item{`regression`}{The regression model used (formula)}
+#'   \item{`xbar`}{A named vector of values used for centering}
 #'   \item{`likelihood`}{The likelihood used (character string)}
 #'   \item{`link`}{The link function used (character string)}
 #'   \item{`priors`}{A list containing the priors used (as [nma_prior] objects)}
