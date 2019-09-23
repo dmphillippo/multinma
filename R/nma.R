@@ -628,35 +628,43 @@ nma.fit <- function(ipd_x, ipd_y,
     pars <- c(pars, "theta_bar_cum")
   }
 
+  # Set adapt_delta, but respect other control arguments if passed in ...
+  stanargs <- list(...)
+  if ("control" %in% names(stanargs))
+    stanargs$control <- purrr::list_modify(stanargs$control, adapt_delta = adapt_delta)
+  else
+    stanargs$control <- list(adapt_delta = adapt_delta)
+
   # Call Stan model for given likelihood
 
   # -- Normal likelihood
   if (likelihood == "normal") {
 
     standat <- purrr::list_modify(standat,
-    # Add outcomes
+      # Add outcomes
       ipd_y = ipd_y$.y,
       agd_arm_y = agd_arm_y$.y, agd_arm_se = agd_arm_y$.se,
 
-    # Add prior for auxilliary parameter - individual-level variance
+      # Add prior for auxilliary parameter - individual-level variance
       !!! prior_standat(prior_het, "prior_aux",
                         valid = c("Normal", "half-Normal",
                                   "Cauchy",  "half-Cauchy",
                                   "Student t", "half-Student t")),
 
-    # Specify link
-    link = switch(link, identity = 1, log = 2)
+      # Specify link
+      link = switch(link, identity = 1, log = 2)
     )
 
-    stanfit <- rstan::sampling(stanmodels$normal, data = standat,
-                               pars = c(pars, "sigma"), ...)
-
+    stanargs <- purrr::list_modify(stanargs,
+                                   object = stanmodels$normal,
+                                   data = standat,
+                                   pars = c(pars, "sigma"))
 
   # -- Bernoulli/binomial likelihood (one parameter)
   } else if (likelihood %in% c("bernoulli", "binomial")) {
 
     standat <- purrr::list_modify(standat,
-    # Add outcomes
+      # Add outcomes
       ipd_r = if (has_ipd) ipd_y$.r else integer(),
       agd_arm_r = if (has_agd_arm) agd_arm_y$.r else integer(),
       agd_arm_n = if (has_agd_arm) agd_arm_y$.n else integer(),
@@ -665,8 +673,10 @@ nma.fit <- function(ipd_x, ipd_y,
       link = switch(link, logit = 1, probit = 2)
     )
 
-    stanfit <- rstan::sampling(stanmodels$binomial_1par, data = standat,
-                               pars = pars, ...)
+    stanargs <- purrr::list_modify(stanargs,
+                                   object = stanmodels$binomial_1par,
+                                   data = standat,
+                                   pars = pars)
 
   # -- Bernoulli/binomial likelihood (two parameter)
   } else if (likelihood %in% c("bernoulli2", "binomial2")) {
@@ -681,30 +691,35 @@ nma.fit <- function(ipd_x, ipd_y,
       link = switch(link, logit = 1, probit = 2)
     )
 
-
-    stanfit <- rstan::sampling(stanmodels$binomial_2par, data = standat,
-                               pars = c(pars, "theta2_bar_cum"), ...)
+    stanargs <- purrr::list_modify(stanargs,
+                                   object = stanmodels$binomial_2par,
+                                   data = standat,
+                                   pars = c(pars, "theta2_bar_cum"))
 
   # -- Poisson likelihood
   } else if (likelihood == "poisson") {
 
     standat <- purrr::list_modify(standat,
-    # Add outcomes
+      # Add outcomes
       ipd_r = if (has_ipd) ipd_y$.r else integer(),
       ipd_E = if (has_ipd) ipd_y$.E else numeric(),
       agd_arm_r = if (has_agd_arm) agd_arm_y$.r else integer(),
       agd_arm_E = if (has_agd_arm) agd_arm_y$.E else numeric(),
 
-    # Specify link
+      # Specify link
       link = switch(link, log = 1)
     )
 
-    stanfit <- rstan::sampling(stanmodels$poisson, data = standat,
-                               pars = pars, ...)
+    stanargs <- purrr::list_modify(stanargs,
+                                   object = stanmodels$poisson,
+                                   data = standat,
+                                   pars = pars)
 
   } else {
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
   }
+
+  stanfit <- do.call(rstan::sampling, stanargs)
 
   # Set readable parameter names in the stanfit object
   fnames_oi <- stanfit@sim$fnames_oi
