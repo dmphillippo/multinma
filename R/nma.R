@@ -500,8 +500,8 @@ nma.fit <- function(ipd_x, ipd_y,
   if (has_agd_arm) {
     ni_agd_arm <- nrow(agd_arm_y)
     aa1 <- 0:(ni_agd_arm - 1)*n_int + 1
-    agd_arm_study <- apply(agd_arm_x[aa1, col_study], 1, get_study)
-    agd_arm_trt <- apply(agd_arm_x[aa1, col_trt], 1, get_trt)
+    agd_arm_study <- apply(agd_arm_x[aa1, col_study, drop = FALSE], 1, get_study)
+    agd_arm_trt <- apply(agd_arm_x[aa1, col_trt, drop = FALSE], 1, get_trt)
   } else {
     agd_arm_study <- agd_arm_trt <- numeric()
     ni_agd_arm <- 0
@@ -510,9 +510,9 @@ nma.fit <- function(ipd_x, ipd_y,
   if (has_agd_contrast) {
     ni_agd_contrast <- nrow(agd_contrast_y)
     ac1 <- 0:(ni_agd_contrast - 1)*n_int + 1
-    agd_contrast_study <- apply(agd_contrast_x[ac1, col_study], 1, get_study)
-    agd_contrast_trt <- apply(agd_contrast_x[ac1, col_trt], 1, get_trt)
-    agd_contrast_trt_b <- apply(agd_contrast_x[ac1, col_trt], 1, get_trt, v = -1)
+    agd_contrast_study <- apply(agd_contrast_x[ac1, col_study, drop = FALSE], 1, get_study)
+    agd_contrast_trt <- apply(agd_contrast_x[ac1, col_trt, drop = FALSE], 1, get_trt)
+    agd_contrast_trt_b <- apply(agd_contrast_x[ac1, col_trt, drop = FALSE], 1, get_trt, v = -1)
   } else {
     agd_contrast_study <- agd_contrast_trt <- agd_contrast_trt_b <- numeric()
     ni_agd_contrast <- 0
