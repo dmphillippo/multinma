@@ -13,11 +13,11 @@ vector[RE ? narm_ipd + ni_agd_arm + ni_agd_contrast : 0] delta;
 
 if (RE) {
   for (i in 1:(narm_ipd + ni_agd_arm + ni_agd_contrast)) {
-    delta[i] = (trt[i] > 1 ? gamma[trt[i] - 1] : 0) + (which_RE[i] ? f_delta[which_RE[i]] : 0);
+    delta[i] = (trt[i] > 1 ? d[trt[i] - 1] : 0) + (which_RE[i] ? f_delta[which_RE[i]] : 0);
   }
   for (i in 1:ni_agd_contrast) {
     if (which_RE[narm_ipd + ni_agd_arm + i] && agd_contrast_trt_b[i] > 1)
-      delta[narm_ipd + ni_agd_arm + i] -= gamma[agd_contrast_trt_b[i] - 1];
+      delta[narm_ipd + ni_agd_arm + i] -= d[agd_contrast_trt_b[i] - 1];
   }
 }
 

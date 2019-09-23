@@ -13,7 +13,7 @@ vector[nX] allbeta = QR ? R_inv * beta_tilde : beta_tilde;
 // Study baselines
 vector[totns] mu = allbeta[1:totns];
 // Treatment effects
-vector[nt - 1] gamma = allbeta[(totns +1):(totns + nt - 1)];
+vector[nt - 1] d = allbeta[(totns +1):(totns + nt - 1)];
 // Regression predictors
 vector[nX - totns - (nt - 1)] beta = allbeta[(totns + nt):];
 

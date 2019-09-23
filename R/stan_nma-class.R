@@ -1,19 +1,32 @@
 #' The stan_nma class
 #'
-#' The `stan_nma` class contains the results from running a model with the
-#' function [nma()].
+#' The `stan_nma` and `stan_mlnmr` classes contains the results from running a
+#' model with the function [nma()].
 #'
 #' @rdname stan_nma-class
 #' @name stan_nma-class
-#' @aliases stan_nma
+#' @aliases stan_nma stan_mlnmr
 #'
-#' @details Objects of class `stan_nma` have the following components:
+#' @details Objects of class `stan_nma` and `stan_mlnmr` have the following
+#'   components:
 #'   \describe{
 #'   \item{`network`}{The network data from which the model was run (class
-#'   [nma_data] or [mlnmr_data])}
+#'   [nma_data] for `stan_nma`, or class [mlnmr_data] for `stan_mlnmr`)}
 #'   \item{`stanfit`}{The `stanfit` object returned by calling
 #'   [rstan::sampling()] for the model}
+#'   \item{`trt_effects`}{Whether fixed or random effects were used (character
+#'   string)}
+#'   \item{`consistency`}{The consistency/inconsistency model used (character
+#'   string)}
+#'   \item{`regression`}{The regression model used (formula)}
+#'   \item{`xbar`}{A named vector of values used for centering}
+#'   \item{`likelihood`}{The likelihood used (character string)}
+#'   \item{`link`}{The link function used (character string)}
+#'   \item{`priors`}{A list containing the priors used (as [nma_prior] objects)}
 #'   }
+#'
+#' The `stan_mlnmr` sub-class inherits from `stan_nma`, and differs only in the
+#' class of the `network` object.
 #'
 NULL
 
@@ -24,6 +37,12 @@ NULL
 #'
 #' @export
 print.stan_nma <- function(x, ...) {
+  if (inherits(x$network, "mlnmr_data")) type <- "ML-NMR"
+  else type <- "NMA"
+  cglue("A {x$trt_effects} effects {type} with a {x$likelihood} likelihood ({x$link} link).")
+  if (x$consistency != "consistency") cglue("An inconsistency model ('{x$consistency}') was fitted.")
+  if (!is.null(x$regression)) cglue("Regression model: {rlang::as_label(x$regression)}.")
+
   sf <- as.stanfit(x)
   dots <- list(...)
   include <- "pars" %in% names(dots)

@@ -254,9 +254,15 @@ nma <- function(network,
 
     reg_names <- colnames(model.frame(nma_formula, data = idat_all))
 
-    idat_all[, reg_names] <- dplyr::mutate_if(idat_all[, reg_names],
-                                              is.numeric,
-                                              ~. - weighted.mean(., wts))
+    reg_numeric <- purrr::map_lgl(idat_all[, reg_names], is.numeric)
+
+    xbar <- purrr::map_dbl(idat_all[, reg_names[reg_numeric]], weighted.mean, w = wts)
+
+    idat_all[, reg_names[reg_numeric]] <-
+      purrr::map2(idat_all[, reg_names[reg_numeric]], xbar, ~.x - .y)
+
+  } else {
+    xbar <- NULL
   }
 
   # Construct model matrix
@@ -321,8 +327,22 @@ nma <- function(network,
     int_thin = int_thin)
 
   # Create stan_nma object
-  out <- list(network = network, stanfit = stanfit)
-  class(out) <- "stan_nma"
+  out <- list(network = network,
+              stanfit = stanfit,
+              trt_effects = trt_effects,
+              consistency = consistency,
+              regression = regression,
+              xbar = xbar,
+              likelihood = likelihood,
+              link = link,
+              priors = list(prior_intercept = prior_intercept,
+                            prior_trt = prior_trt,
+                            prior_het = prior_het,
+                            prior_reg = prior_reg,
+                            prior_aux = prior_aux))
+
+  if (inherits(network, "mlnmr_data")) class(out) <- c("stan_mlnmr", "stan_nma")
+  else class(out) <- "stan_nma"
 
   return(out)
 }
@@ -480,8 +500,8 @@ nma.fit <- function(ipd_x, ipd_y,
   if (has_agd_arm) {
     ni_agd_arm <- nrow(agd_arm_y)
     aa1 <- 0:(ni_agd_arm - 1)*n_int + 1
-    agd_arm_study <- apply(agd_arm_x[aa1, col_study], 1, get_study)
-    agd_arm_trt <- apply(agd_arm_x[aa1, col_trt], 1, get_trt)
+    agd_arm_study <- apply(agd_arm_x[aa1, col_study, drop = FALSE], 1, get_study)
+    agd_arm_trt <- apply(agd_arm_x[aa1, col_trt, drop = FALSE], 1, get_trt)
   } else {
     agd_arm_study <- agd_arm_trt <- numeric()
     ni_agd_arm <- 0
@@ -490,9 +510,9 @@ nma.fit <- function(ipd_x, ipd_y,
   if (has_agd_contrast) {
     ni_agd_contrast <- nrow(agd_contrast_y)
     ac1 <- 0:(ni_agd_contrast - 1)*n_int + 1
-    agd_contrast_study <- apply(agd_contrast_x[ac1, col_study], 1, get_study)
-    agd_contrast_trt <- apply(agd_contrast_x[ac1, col_trt], 1, get_trt)
-    agd_contrast_trt_b <- apply(agd_contrast_x[ac1, col_trt], 1, get_trt, v = -1)
+    agd_contrast_study <- apply(agd_contrast_x[ac1, col_study, drop = FALSE], 1, get_study)
+    agd_contrast_trt <- apply(agd_contrast_x[ac1, col_trt, drop = FALSE], 1, get_trt)
+    agd_contrast_trt_b <- apply(agd_contrast_x[ac1, col_trt, drop = FALSE], 1, get_trt, v = -1)
   } else {
     agd_contrast_study <- agd_contrast_trt <- agd_contrast_trt_b <- numeric()
     ni_agd_contrast <- 0
@@ -596,7 +616,7 @@ nma.fit <- function(ipd_x, ipd_y,
     )
 
   # Standard pars to monitor
-  pars <- c("mu", "beta", "gamma",
+  pars <- c("mu", "beta", "d",
             "log_lik", "resdev", "lp__")
 
   # Monitor heterogeneity SD and study deltas if RE model
@@ -608,35 +628,43 @@ nma.fit <- function(ipd_x, ipd_y,
     pars <- c(pars, "theta_bar_cum")
   }
 
+  # Set adapt_delta, but respect other control arguments if passed in ...
+  stanargs <- list(...)
+  if ("control" %in% names(stanargs))
+    stanargs$control <- purrr::list_modify(stanargs$control, adapt_delta = adapt_delta)
+  else
+    stanargs$control <- list(adapt_delta = adapt_delta)
+
   # Call Stan model for given likelihood
 
   # -- Normal likelihood
   if (likelihood == "normal") {
 
     standat <- purrr::list_modify(standat,
-    # Add outcomes
+      # Add outcomes
       ipd_y = ipd_y$.y,
       agd_arm_y = agd_arm_y$.y, agd_arm_se = agd_arm_y$.se,
 
-    # Add prior for auxilliary parameter - individual-level variance
+      # Add prior for auxilliary parameter - individual-level variance
       !!! prior_standat(prior_het, "prior_aux",
                         valid = c("Normal", "half-Normal",
                                   "Cauchy",  "half-Cauchy",
                                   "Student t", "half-Student t")),
 
-    # Specify link
-    link = switch(link, identity = 1, log = 2)
+      # Specify link
+      link = switch(link, identity = 1, log = 2)
     )
 
-    stanfit <- rstan::sampling(stanmodels$normal, data = standat,
-                               pars = c(pars, "sigma"), ...)
-
+    stanargs <- purrr::list_modify(stanargs,
+                                   object = stanmodels$normal,
+                                   data = standat,
+                                   pars = c(pars, "sigma"))
 
   # -- Bernoulli/binomial likelihood (one parameter)
   } else if (likelihood %in% c("bernoulli", "binomial")) {
 
     standat <- purrr::list_modify(standat,
-    # Add outcomes
+      # Add outcomes
       ipd_r = if (has_ipd) ipd_y$.r else integer(),
       agd_arm_r = if (has_agd_arm) agd_arm_y$.r else integer(),
       agd_arm_n = if (has_agd_arm) agd_arm_y$.n else integer(),
@@ -645,8 +673,10 @@ nma.fit <- function(ipd_x, ipd_y,
       link = switch(link, logit = 1, probit = 2)
     )
 
-    stanfit <- rstan::sampling(stanmodels$binomial_1par, data = standat,
-                               pars = pars, ...)
+    stanargs <- purrr::list_modify(stanargs,
+                                   object = stanmodels$binomial_1par,
+                                   data = standat,
+                                   pars = pars)
 
   # -- Bernoulli/binomial likelihood (two parameter)
   } else if (likelihood %in% c("bernoulli2", "binomial2")) {
@@ -661,37 +691,42 @@ nma.fit <- function(ipd_x, ipd_y,
       link = switch(link, logit = 1, probit = 2)
     )
 
-
-    stanfit <- rstan::sampling(stanmodels$binomial_2par, data = standat,
-                               pars = c(pars, "theta2_bar_cum"), ...)
+    stanargs <- purrr::list_modify(stanargs,
+                                   object = stanmodels$binomial_2par,
+                                   data = standat,
+                                   pars = c(pars, "theta2_bar_cum"))
 
   # -- Poisson likelihood
   } else if (likelihood == "poisson") {
 
     standat <- purrr::list_modify(standat,
-    # Add outcomes
+      # Add outcomes
       ipd_r = if (has_ipd) ipd_y$.r else integer(),
       ipd_E = if (has_ipd) ipd_y$.E else numeric(),
       agd_arm_r = if (has_agd_arm) agd_arm_y$.r else integer(),
       agd_arm_E = if (has_agd_arm) agd_arm_y$.E else numeric(),
 
-    # Specify link
+      # Specify link
       link = switch(link, log = 1)
     )
 
-    stanfit <- rstan::sampling(stanmodels$poisson, data = standat,
-                               pars = pars, ...)
+    stanargs <- purrr::list_modify(stanargs,
+                                   object = stanmodels$poisson,
+                                   data = standat,
+                                   pars = pars)
 
   } else {
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
   }
+
+  stanfit <- do.call(rstan::sampling, stanargs)
 
   # Set readable parameter names in the stanfit object
   fnames_oi <- stanfit@sim$fnames_oi
   x_names_sub <- gsub("^(.study|.trt)", "", x_names)
 
   fnames_oi[grepl("^mu\\[[0-9]+\\]$", fnames_oi)] <- paste0("mu[", x_names_sub[col_study], "]")
-  fnames_oi[grepl("^gamma\\[[0-9]+\\]$", fnames_oi)] <- paste0("d[", x_names_sub[col_trt], "]")
+  fnames_oi[grepl("^d\\[[0-9]+\\]$", fnames_oi)] <- paste0("d[", x_names_sub[col_trt], "]")
   fnames_oi[grepl("^beta\\[[0-9]+\\]$", fnames_oi)] <- paste0("beta[", x_names_sub[col_reg], "]")
   fnames_oi <- gsub("tau[1]", "tau", fnames_oi, fixed = TRUE)
   stanfit@sim$fnames_oi <- fnames_oi
