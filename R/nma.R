@@ -323,8 +323,14 @@ nma <- function(network,
   # Create stan_nma object
   out <- list(network = network,
               stanfit = stanfit,
+              trt_effects = trt_effects,
               likelihood = likelihood,
-              link = link)
+              link = link,
+              priors = list(prior_intercept = prior_intercept,
+                            prior_trt = prior_trt,
+                            prior_het = prior_het,
+                            prior_reg = prior_reg,
+                            prior_aux = prior_aux))
   class(out) <- "stan_nma"
 
   return(out)

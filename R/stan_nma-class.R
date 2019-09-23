@@ -13,8 +13,10 @@
 #'   [nma_data] or [mlnmr_data])}
 #'   \item{`stanfit`}{The `stanfit` object returned by calling
 #'   [rstan::sampling()] for the model}
+#'   \item{`trt_effects`}{Whether fixed or random effects were used (character string)}
 #'   \item{`likelihood`}{The likelihood used (character string)}
 #'   \item{`link`}{The link function used (character string)}
+#'   \item{`priors`}{A list containing the priors used (as [nma_prior] objects)}
 #'   }
 #'
 NULL
