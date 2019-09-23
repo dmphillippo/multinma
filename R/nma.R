@@ -340,7 +340,9 @@ nma <- function(network,
                             prior_het = prior_het,
                             prior_reg = prior_reg,
                             prior_aux = prior_aux))
-  class(out) <- "stan_nma"
+
+  if (inherits(network, "mlnmr_data")) class(out) <- c("stan_mlnmr", "stan_nma")
+  else class(out) <- "stan_nma"
 
   return(out)
 }
