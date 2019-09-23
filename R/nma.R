@@ -621,7 +621,8 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Standard pars to monitor
   pars <- c("mu", "beta", "d",
-            "log_lik", "resdev", "lp__")
+            "log_lik", "resdev", "fitted",
+            "lp__")
 
   # Monitor heterogeneity SD and study deltas if RE model
   if (trt_effects == "random") {

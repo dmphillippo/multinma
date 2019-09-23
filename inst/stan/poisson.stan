@@ -98,6 +98,7 @@ generated quantities {
     for (i in 1:ni_ipd) {
       log_lik[i] = poisson_log_lpmf(ipd_r[i] | E_eta_ipd[i]);
       resdev[i] = 2 * ((E_theta_ipd[i] - ipd_r[i]) + lmultiply(ipd_r[i], ipd_r[i] / E_theta_ipd[i]));
+      fitted[i] = E_theta_ipd[i];
     }
   }
 
@@ -106,6 +107,7 @@ generated quantities {
     log_lik[ni_ipd + i] = poisson_lpmf(agd_arm_r[i] | E_theta_agd_arm[i]);
     resdev[ni_ipd + i] = 2 * ((E_theta_agd_arm[i] - agd_arm_r[i]) +
                               lmultiply(agd_arm_r[i], agd_arm_r[i] / E_theta_agd_arm[i]));
+    fitted[ni_ipd + i] = E_theta_agd_arm[i];
 
 	  for (j in 1:n_int_thin) {
       theta_bar_cum[(i-1)*n_int_thin + j] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);

@@ -1,8 +1,9 @@
 // Common definitions for the generated quantities block
 
-// -- Log likelihood and residual deviance calculation --
+// -- Log likelihood, residual deviance, fitted values --
 vector[ni_ipd + ni_agd_arm + ni_agd_contrast] log_lik;
 vector[ni_ipd + ni_agd_arm + ni_agd_contrast] resdev;
+vector[ni_ipd + ni_agd_arm + ni_agd_contrast] fitted;
 
 // -- Estimate integration error --
 vector[(ni_agd_arm + ni_agd_contrast) * n_int_thin] theta_bar_cum;
@@ -28,7 +29,13 @@ for (i in 1:ni_agd_arm) {
   }
 }
 for (i in 1:ni_agd_contrast) {
+  // log likelihood, residual deviance, fitted values for contrast-based AgD
+  log_lik[ni_ipd + ni_agd_arm + i] = normal_lpdf(agd_contrast_y[i] | eta_agd_contrast_bar[i], agd_contrast_se[i]);
+  resdev[ni_ipd + ni_agd_arm + i] = -2 * log_lik[i];
+  fitted[ni_ipd + ni_agd_arm + i] = eta_agd_contrast_bar[i];
+
   for (j in 1:n_int_thin) {
     theta_bar_cum[ni_agd_arm + (i-1)*n_int_thin + j] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);
   }
 }
+

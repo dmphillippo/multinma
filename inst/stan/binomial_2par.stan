@@ -135,6 +135,7 @@ generated quantities {
   for (i in 1:ni_ipd) {
     log_lik[i] = bernoulli_lpmf(ipd_r[i] | theta_ipd[i]);
     resdev[i] = -2 * log_lik[i];
+    fitted[i] = theta_ipd[i];
   }
 
   // AgD (arm-based) log likelihood and residual deviance
@@ -147,6 +148,7 @@ generated quantities {
                                         agd_arm_r[i] / (nprime[i] * pprime[i])) +
                               lmultiply(agd_arm_n[i] - agd_arm_r[i],
                                         (agd_arm_n[i] - agd_arm_r[i]) / (agd_arm_n[i] - nprime[i] * pprime[i])));
+    fitted[ni_ipd + i] = nprime[i] * pprime[i];
 
 	  for (j in 1:n_int_thin) {
       theta_bar_cum[(i-1)*n_int_thin + j] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);

@@ -107,12 +107,14 @@ generated quantities {
   for (i in 1:ni_ipd) {
     log_lik[i] = normal_lpdf(ipd_y[i] | theta_ipd[i], sigma[ipd_arm[i]]);
     resdev[i] = -2 * log_lik[i];
+    fitted[i] = theta_ipd[i];
   }
 
   // AgD (arm-based) log likelihood and residual deviance
   for (i in 1:ni_agd_arm) {
     log_lik[ni_ipd + i] = normal_lpdf(agd_arm_y[i] | theta_agd_arm_bar[i], agd_arm_se[i]);
     resdev[ni_ipd + i] = -2 * log_lik[i];
+    fitted[ni_ipd + i] = theta_agd_arm_bar[i];
 
 	  for (j in 1:n_int_thin) {
       theta_bar_cum[(i-1)*n_int_thin + j] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);
