@@ -596,7 +596,7 @@ nma.fit <- function(ipd_x, ipd_y,
     )
 
   # Standard pars to monitor
-  pars <- c("mu", "beta", "gamma",
+  pars <- c("mu", "beta", "d",
             "log_lik", "resdev", "lp__")
 
   # Monitor heterogeneity SD and study deltas if RE model
@@ -691,7 +691,7 @@ nma.fit <- function(ipd_x, ipd_y,
   x_names_sub <- gsub("^(.study|.trt)", "", x_names)
 
   fnames_oi[grepl("^mu\\[[0-9]+\\]$", fnames_oi)] <- paste0("mu[", x_names_sub[col_study], "]")
-  fnames_oi[grepl("^gamma\\[[0-9]+\\]$", fnames_oi)] <- paste0("d[", x_names_sub[col_trt], "]")
+  fnames_oi[grepl("^d\\[[0-9]+\\]$", fnames_oi)] <- paste0("d[", x_names_sub[col_trt], "]")
   fnames_oi[grepl("^beta\\[[0-9]+\\]$", fnames_oi)] <- paste0("beta[", x_names_sub[col_reg], "]")
   fnames_oi <- gsub("tau[1]", "tau", fnames_oi, fixed = TRUE)
   stanfit@sim$fnames_oi <- fnames_oi
