@@ -122,14 +122,14 @@ as.matrix.stan_nma <- function(x, ...) {
 
 #' Model comparison using the `loo` package
 #'
-#' The [loo()] and [waic()] functions from the `loo` package may be called
-#' directly on [stan_nma] and [stan_mlnmr] objects.
+#' The [loo::loo()] and [loo::waic()] functions from the `loo` package may be
+#' called directly on [stan_nma] and [stan_mlnmr] objects.
 #'
 #' @param x An object of class [stan_nma] or [stan_mlnmr]
 #' @param ... Further arguments to [rstan::loo.stanfit()] or [loo::waic()]
 #'
-#' @importFrom loo loo
 #' @export
+#' @importFrom loo loo
 #' @rdname loo
 #' @aliases loo
 loo.stan_nma <- function(x, ...) {
@@ -137,8 +137,8 @@ loo.stan_nma <- function(x, ...) {
   return(rstan::loo(sf, ...))
 }
 
-#' @importFrom loo waic
 #' @export
+#' @importFrom loo waic
 #' @rdname loo
 #' @aliases waic
 waic.stan_nma <- function(x, ...) {
