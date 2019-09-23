@@ -119,3 +119,29 @@ as.data.frame.stan_nma <- function(x, ...) {
 as.matrix.stan_nma <- function(x, ...) {
   return(as.matrix(as.stanfit(x), ...))
 }
+
+#' Model comparison using the `loo` package
+#'
+#' The [loo()] and [waic()] functions from the `loo` package may be called
+#' directly on [stan_nma] and [stan_mlnmr] objects.
+#'
+#' @param x An object of class [stan_nma] or [stan_mlnmr]
+#' @param ... Further arguments to [rstan::loo.stanfit()] or [loo::waic()]
+#'
+#' @importFrom loo loo
+#' @export
+#' @rdname loo
+#' @aliases loo
+loo.stan_nma <- function(x, ...) {
+  sf <- as.stanfit(x)
+  return(rstan::loo(sf, ...))
+}
+
+#' @importFrom loo waic
+#' @export
+#' @rdname loo
+#' @aliases waic
+waic.stan_nma <- function(x, ...) {
+  ll <- as.array(x, pars = "log_lik")
+  return(loo::waic(ll, ...))
+}
