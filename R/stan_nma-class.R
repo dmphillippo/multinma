@@ -13,6 +13,8 @@
 #'   [nma_data] or [mlnmr_data])}
 #'   \item{`stanfit`}{The `stanfit` object returned by calling
 #'   [rstan::sampling()] for the model}
+#'   \item{`likelihood`}{The likelihood used (character string)}
+#'   \item{`link`}{The link function used (character string)}
 #'   }
 #'
 NULL

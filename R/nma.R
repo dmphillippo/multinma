@@ -321,7 +321,10 @@ nma <- function(network,
     int_thin = int_thin)
 
   # Create stan_nma object
-  out <- list(network = network, stanfit = stanfit)
+  out <- list(network = network,
+              stanfit = stanfit,
+              likelihood = likelihood,
+              link = link)
   class(out) <- "stan_nma"
 
   return(out)
