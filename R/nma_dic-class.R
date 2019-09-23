@@ -11,9 +11,29 @@
 #'   \describe{
 #'   \item{`dic`}{The DIC value}
 #'   \item{`pd`}{The effective number of parameters}
-#'   \item{`dbar`}{The total residual deviance}
+#'   \item{`resdev`}{The total residual deviance}
 #'   \item{`pointwise`}{A list of data frames containing the pointwise
 #'   contributions for the IPD and AgD.}
 #'   }
 #'
 NULL
+
+#' Print DIC details
+#'
+#' @param x An object of class [nma_dic]
+#' @param digits An integer passed to [round()]
+#' @param ... Ignored
+#'
+#' @return
+#' @export
+#'
+#' @examples
+print.nma_dic <- function(x, digits = 1, ...) {
+  if (!is.numeric(digits) ||
+      length(digits) > 1 ||
+      trunc(digits) != digits) abort("`digits` must be a single integer.")
+
+  cglue("Residual deviance: {round(x$resdev, digits)}")
+  cglue("               pD: {round(x$pd, digits)}")
+  cglue("              DIC: {round(x$dic, digits)}")
+}

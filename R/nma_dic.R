@@ -148,12 +148,12 @@ dic <- function(x, ...) {
   }
 
   # Calculate pD, DIC
-  dbar <- sum(resdev)
+  totresdev <- sum(resdev)
   pd <- sum(leverage_ipd, leverage_agd_arm, leverage_agd_contrast)
-  dic <- dbar + pd
+  dic <- totresdev + pd
 
   # Return nma_dic object
-  out <- list(dic = dic, pd = pd, dbar = dbar, pointwise = pw)
+  out <- list(dic = dic, pd = pd, resdev = totresdev, pointwise = pw)
   class(out) <- "nma_dic"
   return(out)
 }
