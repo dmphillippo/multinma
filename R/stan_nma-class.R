@@ -31,6 +31,10 @@ NULL
 #'
 #' @export
 print.stan_nma <- function(x, ...) {
+  cglue("A {x$trt_effects} effects NMA with a {x$likelihood} likelihood ({x$link} link).")
+  if (x$consistency != "consistency") cglue("An inconsistency model ('{x$consistency}') was fitted.")
+  if (!is.null(x$regression)) cglue("Regression model: {rlang::as_label(x$regression)}.")
+
   sf <- as.stanfit(x)
   dots <- list(...)
   include <- "pars" %in% names(dots)
