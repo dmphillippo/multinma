@@ -192,6 +192,6 @@ cglue <- function(..., sep = "\n") {
 #' Define crayon styles
 #'
 #' @noRd
-subtle <- crayon::silver
-emph_r <- crayon::red$bold
-emph_g <- crayon::green$bold
+subtle <- function(...) crayon::silver(...)
+emph_r <- function(...) crayon::red$bold(...)
+emph_g <- function(...) crayon::green$bold(...)
