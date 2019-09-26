@@ -26,7 +26,6 @@
 #'   \describe{
 #'   \item{`.study`}{study (as factor)}
 #'   \item{`.trt`}{treatment (as factor)}
-#'   \item{`.trt_b`}{baseline treatment for contrast data (as factor)}
 #'   \item{`.y`}{outcome (continuous)}
 #'   \item{`.se`}{standard error (continuous)}
 #'   \item{`.r`}{event count (discrete)}
@@ -92,12 +91,10 @@ print.nma_data <- function(x, ..., n = 10) {
 
   if (has_agd_contrast(x)) {
     s_agd_contrast <- x$agd_contrast %>%
-      dplyr::distinct(.data$.study, .data$.trt, .data$.trt_b) %>%
+      dplyr::distinct(.data$.study, .data$.trt) %>%
       dplyr::group_by(.data$.study) %>%
-      dplyr::summarise(
-        Treatments = glue::glue("{dplyr::n()}: ",
-                     glue::glue_collapse(sort(unique(forcats::fct_c(.data$.trt, .data$.trt_b))),
-                                         sep = " | ", width = 0.8*cwidth))) %>%
+      dplyr::summarise(Treatments = glue::glue("{dplyr::n()}: ",
+                                               glue::glue_collapse(.data$.trt, sep = " | ", width = 0.8*cwidth))) %>%
       dplyr::rename(Study = .data$.study) %>%
       as.data.frame()
     n_agd_contrast <- nrow(s_agd_contrast)

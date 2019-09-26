@@ -176,8 +176,15 @@ set_agd_arm <- function(data,
 #'
 #' @template args-data_common
 #' @template args-data_se
-#' @param trt_b column of `data` specifying the reference/baseline treatment for
-#'   each contrast
+#'
+#' @details Each study should have a single reference/baseline treatment,
+#'   against which relatve effects in the other arm(s) are given. For the
+#'   reference arm, include a data row with continuous outcome `y` equal to
+#'   `NA`. If a study has three or more arms (so two or more relative effects),
+#'   set the standard error `se` for the reference arm data row equal to the
+#'   standard error of the mean outcome on the reference arm (this determines
+#'   the covariance of the relative effects, when expressed as differences in
+#'   mean outcomes between arms).
 #'
 #' @return An object of class [nma_data]
 #' @export
@@ -188,7 +195,7 @@ set_agd_arm <- function(data,
 #' @examples
 set_agd_contrast <- function(data,
                              study,
-                             trt, trt_b,
+                             trt,
                              y = NULL, se = NULL) {
 
   # Check data is data frame
@@ -215,27 +222,33 @@ set_agd_contrast <- function(data,
   .trt <- dplyr::pull(data, {{ trt }})
   if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
 
-  if (missing(trt_b)) abort("Specify `trt_b`")
-  .trt_b <- dplyr::pull(data, {{ trt_b }})
-  if (any(is.na(.trt_b))) abort("`trt_b` cannot contain missing values")
-
   # Pull and check outcomes
   .y <- pull_non_null(data, enquo(y))
   .se <- pull_non_null(data, enquo(se))
 
-  check_outcome_continuous(.y, .se, with_se = TRUE)
+  # Determine baseline arms by .y = NA
+  bl <- is.na(.y)
 
-  o_type <- get_outcome_type(y = .y, se = .se,
+  if (anyDuplicated(.study[bl])) abort("Multiple baseline arms (where y = NA) for a study.")
+
+  tibble::tibble(.study, .trt, bl, .se) %>%
+    dplyr::group_by(.data$.study) %>%
+    dplyr::mutate(arm = 1:dplyr::n(), n_arms = dplyr::n()) %>%
+    dplyr::filter(.data$arm == 1, .data$n_arms > 2) %>%
+    {
+      if (any(is.na(.$.se)))
+        abort("Specify standard errors for mean outcomes on baseline arms in studies with >2 arms.")
+    }
+
+  check_outcome_continuous(.y[!bl], .se[!bl], with_se = TRUE)
+
+  o_type <- get_outcome_type(y = .y[!bl], se = .se[!bl],
                              r = NULL, n = NULL, E = NULL)
-
-  # Get all treatments
-  trts <- stringr::str_sort(forcats::lvls_union(list(nfactor(.trt), nfactor(.trt_b))), numeric = TRUE)
 
   # Create tibble in standard format
   d <- tibble::tibble(
     .study = nfactor(.study),
-    .trt = factor(.trt, levels = trts),
-    .trt_b = factor(.trt_b, levels = trts),
+    .trt = nfactor(.trt),
     .y = .y,
     .se = .se)
 
