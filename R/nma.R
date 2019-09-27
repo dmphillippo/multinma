@@ -189,6 +189,7 @@ nma <- function(network,
   # Construct design matrix all together then split out, so that same dummy
   # coding is used everywhere
   idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast_nonbl)
+  idat_all_plus_bl <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast)
 
   if (consistency != "consistency") {
     abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
@@ -261,19 +262,7 @@ nma <- function(network,
     }
 
     if (has_agd_contrast(network)) {
-
-      # For contrast-based data, the "contrast" sample size is undefined -
-      # expecting instead to see study sample size repeated by contrast (ditto for
-      # regression terms). For centering, take the first value of N, and set
-      # others to zero.
-      first_then_zero <- function(x) {
-        x[2:length(x)] <- 0
-        return(x)
-      }
-      N_agd_contrast <- network$agd_contrast %>%
-        dplyr::group_by(.data$.study) %>%
-        dplyr::mutate_at(dplyr::vars({{ agd_sample_size }}), first_then_zero) %>%
-        dplyr::pull(network$agd_arm, {{ agd_sample_size }})
+      N_agd_contrast <- dplyr::pull(network$agd_contrast, {{ agd_sample_size }})
     } else {
       N_agd_contrast <- NULL
     }
@@ -287,10 +276,16 @@ nma <- function(network,
 
     reg_numeric <- purrr::map_lgl(idat_all[, reg_names], is.numeric)
 
-    xbar <- purrr::map_dbl(idat_all[, reg_names[reg_numeric]], weighted.mean, w = wts)
+    # Take weighted mean of all rows (including baseline rows for contrast data)
+    xbar <- purrr::map_dbl(idat_all_plus_bl[, reg_names[reg_numeric]], weighted.mean, w = wts)
 
     idat_all[, reg_names[reg_numeric]] <-
       purrr::map2(idat_all[, reg_names[reg_numeric]], xbar, ~.x - .y)
+
+    if (has_agd_contrast) {
+      idat_agd_contrast_bl[, reg_names[reg_numeric]] <-
+        purrr::map2(idat_agd_contrast_bl[, reg_names[reg_numeric]], xbar, ~.x - .y)
+    }
 
   } else {
     xbar <- NULL
