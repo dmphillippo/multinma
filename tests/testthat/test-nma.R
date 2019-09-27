@@ -173,3 +173,20 @@ test_that("nma.fit() error if x column names different", {
                        agd_contrast_x = x3, agd_contrast_y = y, agd_contrast_Sigma = Sigma,
                        n_int = 1), m)
 })
+
+test_that("nma.fit() error if agd_contrast_Sigma is not right dimensions", {
+  x1 <- matrix(1, nrow = 3, ncol = 3)
+  colnames(x1) <- c(".study1", ".trt1", "x")
+
+  y <- tibble(.y = 1:3, .se = 1:3)
+
+  Sigma1 <- list(matrix(1, 3, 3), matrix(1, 1, 1))
+  Sigma2 <- list(matrix(1, 4, 4))
+
+  expect_error(nma.fit(agd_contrast_x = x1, agd_contrast_y = y,
+                       agd_contrast_Sigma = Sigma1, likelihood = "normal", link = "identity",
+                       n_int = 1), "should be a list of covariance matrices, of length")
+  expect_error(nma.fit(agd_contrast_x = x1, agd_contrast_y = y,
+                       agd_contrast_Sigma = Sigma2, likelihood = "normal", link = "identity",
+                       n_int = 1), "Dimensions of `agd_contrast_Sigma`.+do not match")
+})
