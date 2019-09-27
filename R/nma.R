@@ -555,8 +555,18 @@ nma.fit <- function(ipd_x, ipd_y,
     agd_contrast_study <- apply(agd_contrast_x[ac1, col_study, drop = FALSE], 1, get_study)
     agd_contrast_trt <- apply(agd_contrast_x[ac1, col_trt, drop = FALSE], 1, get_trt)
     agd_contrast_trt_b <- apply(agd_contrast_x[ac1, col_trt, drop = FALSE], 1, get_trt, v = -1)
+
+    if (length(agd_contrast_Sigma) != length(unique(agd_contrast_study)))
+      abort("`agd_contrast_Sigma` should be a list of covariance matrices, of length equal to the number of AgD (contrast-based) studies.")
+
+    # Construct block-diagonal contrast covariance matrix
+    Sigma <- as.matrix(Matrix::bdiag(agd_contrast_Sigma))
+
+    if (nrow(Sigma) != ni_agd_contrast)
+      abort("Dimensions of `agd_contrast_Sigma` covariance matrices do not match the contrast-based data.")
   } else {
     agd_contrast_study <- agd_contrast_trt <- agd_contrast_trt_b <- numeric()
+    Sigma <- matrix(1, 1, 1)
     ni_agd_contrast <- 0
   }
 
@@ -629,7 +639,7 @@ nma.fit <- function(ipd_x, ipd_y,
     agd_contrast_trt = agd_contrast_trt,
     agd_contrast_trt_b = agd_contrast_trt_b,
     agd_contrast_y = if (has_agd_contrast) agd_contrast_y$.y else numeric(),
-    agd_contrast_se = if (has_agd_contrast) agd_contrast_y$.se else numeric(),
+    agd_contrast_Sigma = Sigma,
     # ipd_study = ipd_study,
     # agd_arm_study = agd_arm_study,
     # agd_contrast_study = agd_contrast_study,
