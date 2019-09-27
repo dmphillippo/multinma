@@ -462,7 +462,7 @@ nma.fit <- function(ipd_x, ipd_y,
       abort("`agd_contrast_y` should be numeric outcome data.")
     if (nrow(agd_contrast_x) != nrow(agd_contrast_y) * n_int)
       abort("Number of rows in `agd_contrast_x`, `agd_contrast_y`, and `n_int` do not match.")
-    if (!is.list(agd_contrast_Sigma) || !is.numeric(agd_contrast_Sigma))
+    if (!is.list(agd_contrast_Sigma) || any(purrr::map_lgl(agd_contrast_Sigma, ~!is.numeric(.))))
       abort("`agd_contrast_Sigma` should be a list of covariance matrices, of length equal to the number of AgD (contrast-based) studies.")
   }
 
