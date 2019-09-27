@@ -29,8 +29,8 @@ int<lower=1> int_thin; // thinning factor for saved integration points
 int<lower=1> link; // link function
 
 // -- AgD (contrast-based) outcomes
-real agd_contrast_y[ni_agd_contrast];
-real<lower=0> agd_contrast_se[ni_agd_contrast];
+vector[ni_agd_contrast] agd_contrast_y;
+cov_matrix[ni_agd_contrast] agd_contrast_Sigma;
 
 // -- Design matrix or thin QR decomposition --
 int<lower=0, upper=1> QR; // use QR decomposition (yes = 1)

@@ -28,9 +28,10 @@ for (i in 1:ni_agd_arm) {
     theta_bar_cum[(i-1)*n_int_thin + j] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);
   }
 }
+
 for (i in 1:ni_agd_contrast) {
   // log likelihood, residual deviance, fitted values for contrast-based AgD
-  log_lik[ni_ipd + ni_agd_arm + i] = normal_lpdf(agd_contrast_y[i] | eta_agd_contrast_bar[i], agd_contrast_se[i]);
+  log_lik[ni_ipd + ni_agd_arm + i] = normal_lpdf(agd_contrast_y[i] | eta_agd_contrast_bar[i], agd_contrast_Sigma[i,i]);
   resdev[ni_ipd + ni_agd_arm + i] = -2 * log_lik[i];
   fitted[ni_ipd + ni_agd_arm + i] = eta_agd_contrast_bar[i];
 
