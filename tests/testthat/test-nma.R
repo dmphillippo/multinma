@@ -126,8 +126,9 @@ test_that("nma.fit() error if only one of x or y provided", {
   expect_error(nma.fit(ipd_y = y), m)
   expect_error(nma.fit(agd_arm_x = x), m)
   expect_error(nma.fit(agd_arm_y = y), m)
-  expect_error(nma.fit(agd_contrast_x = x), m)
-  expect_error(nma.fit(agd_contrast_y = y), m)
+  expect_error(nma.fit(agd_contrast_x = x), "all be present or all NULL")
+  expect_error(nma.fit(agd_contrast_y = y), "all be present or all NULL")
+  expect_error(nma.fit(agd_contrast_Sigma = list()), "all be present or all NULL")
 })
 
 test_that("nma.fit() error if x and y dimension mismatch", {
@@ -139,34 +140,36 @@ test_that("nma.fit() error if x and y dimension mismatch", {
   m <- "Number of rows.+do not match"
   expect_error(nma.fit(ipd_x = x, ipd_y = y), m)
   expect_error(nma.fit(agd_arm_x = x, agd_arm_y = y, n_int = 1), m)
-  expect_error(nma.fit(agd_contrast_x = x, agd_contrast_y = y, n_int = 1), m)
+  expect_error(nma.fit(agd_contrast_x = x, agd_contrast_y = y, agd_contrast_Sigma = list(), n_int = 1), m)
 })
 
 test_that("nma.fit() error if x column names different", {
   x1 <- x2 <- matrix(1, nrow = 3, ncol = 3)
-  colnames(x1) <- c("a", "b", "c")
-  colnames(x2) <- c("a", "b", "D")
+  colnames(x1) <- c(".study1", ".trt1", "c")
+  colnames(x2) <- c(".study1", ".trt1", "D")
   x3 <- x1[, 1:2]
 
-  y <- tibble(.y = 1:3)
+  y <- tibble(.y = 1:3, .se = 1:3)
+
+  Sigma <- list(matrix(1, 3, 3))
 
   m <- "Non-matching columns"
   expect_error(nma.fit(ipd_x = x1, ipd_y = y,
                        agd_arm_x = x2, agd_arm_y = y,
                        n_int = 1), m)
   expect_error(nma.fit(ipd_x = x1, ipd_y = y,
-                       agd_contrast_x = x2, agd_contrast_y = y,
+                       agd_contrast_x = x2, agd_contrast_y = y, agd_contrast_Sigma = Sigma,
                        n_int = 1), m)
   expect_error(nma.fit(agd_arm_x = x2, agd_arm_y = y,
-                       agd_contrast_x = x2, agd_contrast_y = y,
+                       agd_contrast_x = x2, agd_contrast_y = y, agd_contrast_Sigma = Sigma,
                        n_int = 1), m)
   expect_error(nma.fit(ipd_x = x1, ipd_y = y,
                        agd_arm_x = x3, agd_arm_y = y,
                        n_int = 1), m)
   expect_error(nma.fit(ipd_x = x1, ipd_y = y,
-                       agd_contrast_x = x3, agd_contrast_y = y,
+                       agd_contrast_x = x3, agd_contrast_y = y, agd_contrast_Sigma = Sigma,
                        n_int = 1), m)
   expect_error(nma.fit(agd_arm_x = x2, agd_arm_y = y,
-                       agd_contrast_x = x3, agd_contrast_y = y,
+                       agd_contrast_x = x3, agd_contrast_y = y, agd_contrast_Sigma = Sigma,
                        n_int = 1), m)
 })
