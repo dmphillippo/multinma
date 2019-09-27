@@ -2,7 +2,7 @@
 // -- Constants --
 int<lower=0> ns_ipd; // number of IPD studies
 int<lower=0> ns_agd_arm; // number of AgD (arm-based) studies
-// int<lower=0> ns_agd_contrast; // number of AgD (contrast-based) studies
+int<lower=0> ns_agd_contrast; // number of AgD (contrast-based) studies
 
 int<lower=0> ni_ipd; // total number of IPD individuals
 int<lower=0> ni_agd_arm; // total number of AgD (arm-based) data points
