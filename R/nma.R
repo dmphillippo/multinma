@@ -134,10 +134,6 @@ nma <- function(network,
   }
 
   if (has_agd_contrast(network)) {
-    abort("Contrast-based AgD not yet supported.")
-    # Need to figure out how best to specify correlations for trials with 2+ contrasts...
-    # Could ask user to give *all* contrasts?
-
     dat_agd_contrast <- network$agd_contrast
     y_agd_contrast <- get_outcome_variables(dat_agd_contrast, network$outcome$agd_contrast)
 
@@ -150,9 +146,30 @@ nma <- function(network,
     } else {
       idat_agd_contrast <- dat_agd_contrast
     }
+
+    # Get covariance structure for relative effects, using .se on baseline arm
+    .make_Sigma <- function(x) {
+      s_ij <- x[is.na(x$.y), ".se", drop = TRUE]^2  # Covariances
+      s_ii <- x[!is.na(x$.y), ".se", drop = TRUE]^2  # Variances
+      narm <- length(s_ii)
+      S <- matrix(s_ij, nrow = narm, ncol = narm)
+      diag(S) <- s_ii
+      return(S)
+    }
+
+    Sigma_agd_contrast <-
+      by(dat_agd_contrast, dat_agd_contrast$.study, FUN = .make_Sigma, simplify = FALSE)
+
+    # Split into baseline and non-baseline arms
+    dat_agd_contrast_bl <- dplyr::filter(dat_agd_contrast, !is.na(.data$.y))
+    dat_agd_contrast <- dplyr::filter(dat_agd_contrast, is.na(.data$.y))
+    idat_agd_contrast_bl <- dplyr::filter(idat_agd_contrast, !is.na(.data$.y))
+    idat_agd_contrast <- dplyr::filter(idat_agd_contrast, is.na(.data$.y))
+    y_agd_contrast <- filter(y_agd_contrast, !is.na(.data$.y))
   } else {
     dat_agd_contrast <- idat_agd_contrast <- tibble::tibble()
     y_agd_contrast <- NULL
+    Sigma_agd_contrast <- NULL
   }
 
   # Construct design matrix all together then split out, so that same dummy
