@@ -160,7 +160,7 @@ test_that("nma.fit() error if x column names different", {
   expect_error(nma.fit(ipd_x = x1, ipd_y = y,
                        agd_contrast_x = x2, agd_contrast_y = y, agd_contrast_Sigma = Sigma,
                        n_int = 1), m)
-  expect_error(nma.fit(agd_arm_x = x2, agd_arm_y = y,
+  expect_error(nma.fit(agd_arm_x = x1, agd_arm_y = y,
                        agd_contrast_x = x2, agd_contrast_y = y, agd_contrast_Sigma = Sigma,
                        n_int = 1), m)
   expect_error(nma.fit(ipd_x = x1, ipd_y = y,
