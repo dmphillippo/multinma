@@ -324,7 +324,10 @@ nma <- function(network,
 
   # Construct RE correlation matrix
   if (trt_effects == "random") {
-    dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
+    dat_all <- dplyr::bind_rows(
+      dat_ipd %>% dplyr::group_by(.data$.study, .data$.trt) %>% dplyr::summarise(.ss = dplyr::n()),
+      dat_agd_arm,
+      dat_agd_contrast_nonbl)
     contr <- rep(c(FALSE, TRUE), each = c(nrow(dat_ipd), nrow(dat_agd_arm), nrow(dat_agd_contrast_nonbl)))
     if (consistency == "consistency") {
       .RE_cor <- RE_cor(dat_all$.study, dat_all$.trt, contrast = contr, type = "reftrt")
