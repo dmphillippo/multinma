@@ -30,3 +30,21 @@ matrix[nint * ni_agd_contrast, nX] X_agd_contrast = ni_agd_contrast ? X[(ni_ipd 
 // nint/int_thin for numerical integration checks
 int n_int_thin = nint / int_thin;
 
+// Construct number of contrasts for contrast-based AgD by looking at Sigma covariance matrix
+int nc_agd_contrast[ns_agd_contrast];
+if (ns_agd_contrast) {
+  int s = 1;
+  int c = 1;
+  for (i in 1:(ni_agd_contrast - 1)) {
+    if (agd_contrast_Sigma[i, i+1] == 0) {
+      nc_agd_contrast[s] = c;
+      s += 1;
+      c = 1;
+    } else {
+      c += 1;
+    }
+  }
+  // for i = ni_agd_contrast
+  nc_agd_contrast[s] = c;
+  print("nc_agd_contrast: ", nc_agd_contrast);
+}
