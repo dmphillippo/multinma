@@ -318,6 +318,15 @@ nma <- function(network,
       abort("Mismatch design matrices for baseline and non-baseline arms. Dropped factor levels?")
 
     X_agd_contrast <- X_agd_contrast - X_bl
+
+    # Remove columns for study baselines corresponding to contrast-based studies - not used
+    s_contr <- unique(dat_agd_contrast$.study)
+    bl_s_reg <- paste0("^\\.study", paste0(s_contr, collapse = "|"))
+    bl_cols <- grepl(bl_s_reg, colnames(X_agd_contrast))
+
+    X_agd_contrast <- X_agd_contrast[, !bl_cols]
+    if (has_ipd) X_ipd <- X_ipd[, !bl_cols]
+    if (has_agd_arm) X_agd_arm <- X_agd_arm[, !bl_cols]
   } else {
     X_agd_contrast <- NULL
   }
