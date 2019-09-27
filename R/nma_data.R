@@ -226,19 +226,33 @@ set_agd_contrast <- function(data,
   .y <- pull_non_null(data, enquo(y))
   .se <- pull_non_null(data, enquo(se))
 
+  if (is.null(.y)) abort("Specify continuous outcome `y`")
+  if (is.null(.se)) abort("Specify standard error `se`")
+
   # Determine baseline arms by .y = NA
   bl <- is.na(.y)
 
-  if (anyDuplicated(.study[bl])) abort("Multiple baseline arms (where y = NA) for a study.")
+  # if (anyDuplicated(.study[bl])) abort("Multiple baseline arms (where y = NA) for a study.")
 
   tibble::tibble(.study, .trt, bl, .se) %>%
     dplyr::group_by(.data$.study) %>%
-    dplyr::mutate(arm = 1:dplyr::n(), n_arms = dplyr::n()) %>%
-    dplyr::filter(.data$arm == 1, .data$n_arms > 2) %>%
+    dplyr::mutate(n_arms = dplyr::n(),
+                  n_bl = sum(.data$bl)) %>%
+    {
+      if (any(.$n_bl > 1))
+        abort("Multiple baseline arms (where y = NA) in a study or studies.")
+      else if (any(.$n_bl == 0))
+        abort("Study or studies without a specified baseline arm (where y = NA).")
+      else .
+    } %>%
+    dplyr::filter(.data$bl, .data$n_arms > 2) %>%
     {
       if (any(is.na(.$.se)))
         abort("Specify standard errors for mean outcomes on baseline arms in studies with >2 arms.")
     }
+
+  if (any(is.na(.se[!bl])))
+    abort("Standard error `se` contains missing values for non-baseline rows (i.e. those specifying contrasts against baseline).")
 
   check_outcome_continuous(.y[!bl], .se[!bl], with_se = TRUE)
 
