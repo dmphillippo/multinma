@@ -108,7 +108,11 @@ nma <- function(network,
 
   # Get design matrices and outcomes
   if (has_ipd(network)) {
-    dat_ipd <- network$ipd
+    dat_ipd <- network$ipd %>%
+      # Sanitise study and treatment factor labels (for :)
+      dplyr::mutate(.study = forcats::fct_relabel(.data$.study, ~gsub(":", "_", ., fixed = TRUE)),
+                    .trt = forcats::fct_relabel(.data$.trt, ~gsub(":", "_", ., fixed = TRUE)))
+
     y_ipd <- get_outcome_variables(dat_ipd, network$outcome$ipd)
   } else {
     dat_ipd <- tibble::tibble()
@@ -116,7 +120,11 @@ nma <- function(network,
   }
 
   if (has_agd_arm(network)) {
-    dat_agd_arm <- network$agd_arm
+    dat_agd_arm <- network$agd_arm %>%
+      # Sanitise study and treatment factor labels (for :)
+      dplyr::mutate(.study = forcats::fct_relabel(.data$.study, ~gsub(":", "_", ., fixed = TRUE)),
+                    .trt = forcats::fct_relabel(.data$.trt, ~gsub(":", "_", ., fixed = TRUE)))
+
     y_agd_arm <- get_outcome_variables(dat_agd_arm, network$outcome$agd_arm)
 
     # Set up integration variables if present
@@ -134,7 +142,11 @@ nma <- function(network,
   }
 
   if (has_agd_contrast(network)) {
-    dat_agd_contrast <- network$agd_contrast
+    dat_agd_contrast <- network$agd_contrast %>%
+      # Sanitise study and treatment factor labels (for :)
+      dplyr::mutate(.study = forcats::fct_relabel(.data$.study, ~gsub(":", "_", ., fixed = TRUE)),
+                    .trt = forcats::fct_relabel(.data$.trt, ~gsub(":", "_", ., fixed = TRUE)))
+
     y_agd_contrast <- get_outcome_variables(dat_agd_contrast, network$outcome$agd_contrast)
 
     # Set up integration variables if present
@@ -162,23 +174,21 @@ nma <- function(network,
 
     # Split into baseline and non-baseline arms
     dat_agd_contrast_bl <- dplyr::filter(dat_agd_contrast, !is.na(.data$.y))
-    dat_agd_contrast <- dplyr::filter(dat_agd_contrast, is.na(.data$.y))
+    dat_agd_contrast_nonbl <- dplyr::filter(dat_agd_contrast, is.na(.data$.y))
     idat_agd_contrast_bl <- dplyr::filter(idat_agd_contrast, !is.na(.data$.y))
-    idat_agd_contrast <- dplyr::filter(idat_agd_contrast, is.na(.data$.y))
+    idat_agd_contrast_nonbl <- dplyr::filter(idat_agd_contrast, is.na(.data$.y))
     y_agd_contrast <- filter(y_agd_contrast, !is.na(.data$.y))
   } else {
-    dat_agd_contrast <- idat_agd_contrast <- tibble::tibble()
+    dat_agd_contrast <- idat_agd_contrast <-
+      dat_agd_contrast_bl <- idat_agd_contrast_bl <-
+      dat_agd_contrast_nonbl <- idat_agd_contrast_nonbl <- tibble::tibble()
     y_agd_contrast <- NULL
     Sigma_agd_contrast <- NULL
   }
 
   # Construct design matrix all together then split out, so that same dummy
   # coding is used everywhere
-  idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast) %>%
-
-    # Sanitise study and treatment factor labels (for :)
-    dplyr::mutate(.study = forcats::fct_relabel(.data$.study, ~gsub(":", "_", ., fixed = TRUE)),
-                  .trt = forcats::fct_relabel(.data$.trt, ~gsub(":", "_", ., fixed = TRUE)))
+  idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast_nonbl)
 
   if (consistency != "consistency") {
     abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
