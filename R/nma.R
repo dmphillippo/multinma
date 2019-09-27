@@ -309,8 +309,15 @@ nma <- function(network,
   if (has_agd_contrast(network)) {
     X_agd_contrast <- X_all[nrow(dat_ipd) + nrow(idat_agd_arm) + 1:nrow(idat_agd_contrast), ]
 
-    # Need to difference .trtb terms - write custom model.matrix?
-    abort("Contrast-based AgD not yet supported.")
+    # Difference out the baseline arms
+    X_bl <- model.matrix(nma_formula, data = idat_agd_contrast_bl)
+    # The factor levels should be the same between idat_all and
+    # idat_agd_contrast_bl, so the same columns should be present in both design
+    # matrices - but check anyway
+    if (any(colnames(X_agd_contrast) != colnames(X_bl)))
+      abort("Mismatch design matrices for baseline and non-baseline arms. Dropped factor levels?")
+
+    X_agd_contrast <- X_agd_contrast - X_bl
   } else {
     X_agd_contrast <- NULL
   }
