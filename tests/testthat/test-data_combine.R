@@ -24,19 +24,16 @@ agd_arm <- tibble(
 net_a_a <- set_agd_arm(agd_arm, studyf, trtf, y = y, se = se)
 
 agd_contrast <- tibble(
-  studyn = c(3, 3),
+  studyn = c(3, 3, 3),
   studyc = letters[studyn],
   studyf = factor(studyc),
-  trtn = c(2, 4),
+  trtn = c(2, 3, 4),
   trtc = LETTERS[trtn],
   trtf = factor(trtc),
-  trtbn = c(1, 2),
-  trtbc = LETTERS[trtbn],
-  trtbf = factor(trtbc),
-  y = rnorm(2),
-  se = runif(2)
+  y = c(NA, rnorm(2)),
+  se = runif(3)
 )
-net_a_c <- set_agd_contrast(agd_contrast, studyf, trtf, trtbf, y = y, se = se)
+net_a_c <- set_agd_contrast(agd_contrast, studyf, trtf, y = y, se = se)
 
 ipd <- tibble(
   studyn = c(4, 4, 4, 5, 5),
