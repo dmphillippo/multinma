@@ -392,6 +392,7 @@ nma <- function(network,
 #' @param agd_arm_y  Outcome data frame for AgD studies (arm-based)
 #' @param agd_contrast_x  Design matrix for AgD studies (contrast-based)
 #' @param agd_contrast_y  Outcome data frame for AgD studies (contrast-based)
+#' @param agd_contrast_Sigma List of covariance matrices for contrast-based data
 #' @param n_int Number of numerical integration points used
 #' @param RE_cor Random effects correlation matrix, when `trt_effects = "random"`
 #'
@@ -400,7 +401,7 @@ nma <- function(network,
 #' @rdname nma
 nma.fit <- function(ipd_x, ipd_y,
                     agd_arm_x, agd_arm_y,
-                    agd_contrast_x, agd_contrast_y,
+                    agd_contrast_x, agd_contrast_y, agd_contrast_Sigma,
                     n_int,
                     trt_effects = c("fixed", "random"),
                     RE_cor = NULL,
@@ -423,18 +424,19 @@ nma.fit <- function(ipd_x, ipd_y,
   if (missing(agd_arm_y)) agd_arm_y <- NULL
   if (missing(agd_contrast_x)) agd_contrast_x <- NULL
   if (missing(agd_contrast_y)) agd_contrast_y <- NULL
+  if (missing(agd_contrast_Sigma)) agd_contrast_Sigma <- NULL
 
   # Check available x and y
   if (xor(is.null(ipd_x), is.null(ipd_y)))
     abort("`ipd_x` and `ipd_y` should both be present or both NULL.")
   if (xor(is.null(agd_arm_x), is.null(agd_arm_y)))
-    abort("`ipd_x` and `ipd_y` should both be present or both NULL.")
-  if (xor(is.null(agd_contrast_x), is.null(agd_contrast_y)))
-    abort("`ipd_x` and `ipd_y` should both be present or both NULL.")
+    abort("`agd_arm_x` and `agd_arm_y` should both be present or both NULL.")
+  if (xor(xor(is.null(agd_contrast_x), is.null(agd_contrast_y)), is.null(agd_contrast_Sigma)))
+    abort("`agd_contrast_x`, `agd_contrast_y`, `agd_contrast_Sigma` should all be present or all NULL.")
 
   has_ipd <- !is.null(ipd_x) && !is.null(ipd_y)
   has_agd_arm <- !is.null(agd_arm_x) && !is.null(agd_arm_y)
-  has_agd_contrast <-  !is.null(agd_contrast_x) && !is.null(agd_contrast_y)
+  has_agd_contrast <-  !is.null(agd_contrast_x) && !is.null(agd_contrast_y) && !is.null(agd_contrast_Sigma)
 
   # Check design matrices, outcomes
   if (has_ipd) {
