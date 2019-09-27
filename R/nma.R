@@ -431,7 +431,7 @@ nma.fit <- function(ipd_x, ipd_y,
     abort("`ipd_x` and `ipd_y` should both be present or both NULL.")
   if (xor(is.null(agd_arm_x), is.null(agd_arm_y)))
     abort("`agd_arm_x` and `agd_arm_y` should both be present or both NULL.")
-  if (xor(xor(is.null(agd_contrast_x), is.null(agd_contrast_y)), is.null(agd_contrast_Sigma)))
+  if (xor(is.null(agd_contrast_x), is.null(agd_contrast_y)) || xor(is.null(agd_contrast_x), is.null(agd_contrast_Sigma)))
     abort("`agd_contrast_x`, `agd_contrast_y`, `agd_contrast_Sigma` should all be present or all NULL.")
 
   has_ipd <- !is.null(ipd_x) && !is.null(ipd_y)
