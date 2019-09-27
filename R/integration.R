@@ -182,8 +182,8 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
     if (nrow(invalid_rows) > 0) {
       abort(
         glue::glue("Invalid integration points were generated (either NA, NaN, Inf, or NULL).\n",
-                   "Check the input parameters for the following (study, comparison):\n",
-                   glue::glue_collapse(glue::glue(" {invalid_rows$.study}, {invalid_rows$.trt} vs. {invalid_rows$.trt_b}"),
+                   "Check the input parameters for the following (study, treatment):\n",
+                   glue::glue_collapse(glue::glue(" {invalid_rows$.study}, {invalid_rows$.trt}"),
                                        sep = "\n"))
       )
     }
