@@ -32,20 +32,19 @@ test_that("set_* error if study not given or missing values", {
   smk_miss[1, "studyn"] <- NA
   expect_error(set_ipd(smk_miss, "studyn", "trtc"), "cannot contain missing values")
   expect_error(set_agd_arm(smk_miss, "studyn", "trtc"), "cannot contain missing values")
-  expect_error(set_agd_contrast(smk_miss, "studyn", "trtc", "trtn"), "cannot contain missing values")
+  expect_error(set_agd_contrast(smk_miss, "studyn", "trtc"), "cannot contain missing values")
 })
 
 test_that("set_* error if trt not given or missing values", {
   expect_error(set_ipd(smoking, "studyn"), "Specify `trt`")
   expect_error(set_agd_arm(smoking, "studyn"), "Specify `trt`")
   expect_error(set_agd_contrast(smoking, "studyn"), "Specify `trt`")
-  expect_error(set_agd_contrast(smoking, "studyn", "trtc"), "Specify `trt_b`")
 
   smk_miss <- smoking
   smk_miss[1, "trtc"] <- NA
   expect_error(set_ipd(smk_miss, "studyn", "trtc"), "cannot contain missing values")
   expect_error(set_agd_arm(smk_miss, "studyn", "trtc"), "cannot contain missing values")
-  expect_error(set_agd_contrast(smk_miss, "studyn", "trtn", "trtc"), "cannot contain missing values")
+  expect_error(set_agd_contrast(smk_miss, "studyn", "trtc"), "cannot contain missing values")
 })
 
 # Dummy data
@@ -121,27 +120,32 @@ test_that("set_ipd - binary outcome checks work", {
 # Dummy contrast data
 agd_contrast <- agd_arm %>%
   group_by(studyn) %>%
-  mutate(trt_b = first(trtf)) %>%
-  filter(trt_b != trtf) %>%
+  mutate(arm = 1:n(),
+         ydiff = if_else(arm == 1, NA_real_, cont - first(cont)),
+         ydiff_chr = if_else(arm == 1, NA_character_, trtc),
+         ydiff_multi = if_else(arm %in% 1:2, NA_real_, cont - first(cont)),
+         sediff = if_else(arm == 1, cont_pos, sqrt(cont_pos^2 + first(cont_pos)^2)),
+         sediff_miss = if_else(arm == 1, NA_real_, sqrt(cont_pos^2 + first(cont_pos)^2))) %>%
   ungroup()
 
 test_that("set_agd_contrast - continuous outcome checks work", {
-  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc"), "Specify `trt_b`")
-  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", y = cont), "Specify standard error")
-  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", se = cont_pos), "Specify continuous outcome `y`")
-  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", y = trtc, se = cont_pos), "must be numeric")
-  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", y = cont, se = trtc), "must be numeric")
-  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", y = cont, se = cont_neg), "must be positive")
-  expect_equivalent(
-    set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b", y = cont, se = cont_pos)$agd_contrast[, c(".y", ".se")],
-    transmute(agd_contrast, .y = cont, .se = cont_pos))
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff), "Specify standard error")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", se = sediff), "Specify continuous outcome `y`")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff_chr, se = sediff), "must be numeric")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = trtc), "must be numeric")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = cont_neg), "must be positive")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = trtn, se = sediff), "without a specified baseline arm")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff_multi, se = sediff), "Multiple baseline arms")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = sediff_miss), "Specify standard errors.+on baseline arms")
+  expect_equivalent(    set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = sediff)$agd_contrast[, c(".y", ".se")],
+    transmute(agd_contrast, .y = ydiff, .se = sediff))
 })
 
 test_that("set_* - take one and only one outcome", {
   m <- "specify one and only one outcome"
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, y = cont), m)
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, y = cont, se = cont_pos), m)
-  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", "trt_b"), m)
+  # expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc"), m)
 })
 
 test_that("set_* `.trt` column is correct", {
@@ -149,10 +153,8 @@ test_that("set_* `.trt` column is correct", {
                agd_arm$trtf)
   expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos)$agd_arm$.trt,
                agd_arm$trtf)
-  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, trt_b, y = cont, se = cont_pos)$agd_contrast$.trt,
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff)$agd_contrast$.trt,
                agd_contrast$trtf)
-  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, trt_b, y = cont, se = cont_pos)$agd_contrast$.trt_b,
-               agd_contrast$trt_b)
 })
 
 test_that("set_* `.study` column is correct", {
@@ -160,7 +162,7 @@ test_that("set_* `.study` column is correct", {
                agd_arm$studyf)
   expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos)$agd_arm$.study,
                agd_arm$studyf)
-  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, trt_b, y = cont, se = cont_pos)$agd_contrast$.study,
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff)$agd_contrast$.study,
                agd_contrast$studyf)
 })
 
@@ -169,7 +171,7 @@ test_that("set_* return `treatments` factor", {
                factor(LETTERS[1:3]))
   expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos)$treatments,
                factor(LETTERS[1:3]))
-  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, trt_b, y = cont, se = cont_pos)$treatments,
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff)$treatments,
                factor(LETTERS[1:3]))
 })
 
@@ -178,7 +180,7 @@ test_that("set_* return `studies` factor", {
                factor(letters[1:2]))
   expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos)$studies,
                factor(letters[1:2]))
-  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, trt_b, y = cont, se = cont_pos)$studies,
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff)$studies,
                factor(letters[1:2]))
 })
 
@@ -189,7 +191,6 @@ make_na <- function(x, n) {
 
 test_that("set_* error if outcomes contain missing values", {
   agd_arm_miss <- agd_arm %>% mutate_at(vars(cont:bin), ~make_na(., 1))
-  agd_contrast_miss <- agd_contrast %>% mutate_at(vars(cont:bin), ~make_na(., 1))
 
   m <- "contains missing values"
 
@@ -201,5 +202,8 @@ test_that("set_* error if outcomes contain missing values", {
   expect_error(set_ipd(agd_arm_miss, studyn, trtn, r = disc), m)
   expect_error(set_ipd(agd_arm_miss, studyn, trtn, r = disc, E = cont_pos), m)
 
-  expect_error(set_agd_contrast(agd_contrast_miss, studyn, trtn, trt_b, y = cont, se = cont_pos), m)
+  # For set_agd_contrast, multiple missing y will trigger multiple baselines error
+  # Missing se on baseline arm will trigger covariance error if >2 arms (otherwise fine)
+  agd_contrast_miss <- agd_contrast %>% mutate(sediff = if_else(arm > 1, NA_real_, sediff))
+  expect_error(set_agd_contrast(agd_contrast_miss, studyn, trtn, y = ydiff, se = sediff), m)
 })
