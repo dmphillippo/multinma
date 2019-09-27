@@ -1,8 +1,8 @@
 // Common definitions for the generated quantities block
 
 // -- Log likelihood, residual deviance, fitted values --
-vector[ni_ipd + ni_agd_arm + ni_agd_contrast] log_lik;
-vector[ni_ipd + ni_agd_arm + ni_agd_contrast] resdev;
+vector[ni_ipd + ni_agd_arm + ns_agd_contrast] log_lik;
+vector[ni_ipd + ni_agd_arm + ns_agd_contrast] resdev;
 vector[ni_ipd + ni_agd_arm + ni_agd_contrast] fitted;
 
 // -- Estimate integration error --
@@ -30,13 +30,23 @@ for (i in 1:ni_agd_arm) {
 }
 
 for (i in 1:ni_agd_contrast) {
-  // log likelihood, residual deviance, fitted values for contrast-based AgD
-  log_lik[ni_ipd + ni_agd_arm + i] = normal_lpdf(agd_contrast_y[i] | eta_agd_contrast_bar[i], agd_contrast_Sigma[i,i]);
-  resdev[ni_ipd + ni_agd_arm + i] = -2 * log_lik[i];
-  fitted[ni_ipd + ni_agd_arm + i] = eta_agd_contrast_bar[i];
-
   for (j in 1:n_int_thin) {
     theta_bar_cum[ni_agd_arm + (i-1)*n_int_thin + j] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);
+  }
+  // Fitted values
+  fitted[ni_ipd + ni_agd_arm + i] = eta_agd_contrast_bar[i];
+}
+
+// log likelihood, residual deviance for contrast-based AgD are *per study*
+{
+  int a = 0;
+  int nc;
+  for (s in 1:ns_agd_contrast) {
+    nc = nc_agd_contrast[s];
+    log_lik[ni_ipd + ni_agd_arm + s] = multi_normal_lpdf(agd_contrast_y[(a + 1):(a + nc)] |
+      eta_agd_contrast_bar[(a + 1):(a + nc)], agd_contrast_Sigma[(a + 1):(a + nc), (a + 1):(a + nc)]);
+    resdev[ni_ipd + ni_agd_arm + s] = -2 * log_lik[ni_ipd + ni_agd_arm + s];
+    a += nc;
   }
 }
 
