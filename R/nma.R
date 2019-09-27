@@ -325,12 +325,13 @@ nma <- function(network,
   # Construct RE correlation matrix
   if (trt_effects == "random") {
     dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
+    contr <- rep(c(FALSE, TRUE), each = c(nrow(dat_ipd), nrow(dat_agd_arm), nrow(dat_agd_contrast_nonbl)))
     if (consistency == "consistency") {
-      .RE_cor <- RE_cor(dat_all$.study, dat_all$.trt, type = "reftrt")
-      .which_RE <- which_RE(dat_all$.study, dat_all$.trt, type = "reftrt")
+      .RE_cor <- RE_cor(dat_all$.study, dat_all$.trt, contrast = contr, type = "reftrt")
+      .which_RE <- which_RE(dat_all$.study, dat_all$.trt, contrast = contr, type = "reftrt")
     } else if (consistency == "ume") {
-      .RE_cor <- RE_cor(dat_all$.study, dat_all$.trt, type = "blshift")
-      .which_RE <- which_RE(dat_all$.study, dat_all$.trt, type = "blshift")
+      .RE_cor <- RE_cor(dat_all$.study, dat_all$.trt, contrast = contr, type = "blshift")
+      .which_RE <- which_RE(dat_all$.study, dat_all$.trt, contrast = contr, type = "blshift")
     } else {
       abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
     }
@@ -779,6 +780,9 @@ nma.fit <- function(ipd_x, ipd_y,
 #' @param study A vector of study IDs (integer, character, or factor)
 #' @param trt A factor vector of treatment codes (or coercible as such), with
 #'   first level indicating the reference treatment
+#' @param contrast A logical vector, of the same length as `study` and `trt`,
+#'   indicating whether the corresponding data are in contrast rather than arm
+#'   format.
 #' @param type Character string, whether to generate RE structure under the
 #'   "reference treatment" paramterisation, or the "baseline shift"
 #'   parameterisation.
@@ -789,9 +793,9 @@ nma.fit <- function(ipd_x, ipd_y,
 #' @rdname random_effects
 #'
 #' @examples
-#' RE_cor(smoking$studyn, smoking$trtn)
-#' RE_cor(smoking$studyn, smoking$trtn, type = "blshift")
-RE_cor <- function(study, trt, type = c("reftrt", "blshift")) {
+#' RE_cor(smoking$studyn, smoking$trtn, contrast = rep(FALSE, nrow(smoking)))
+#' RE_cor(smoking$studyn, smoking$trtn, contrast = rep(FALSE, nrow(smoking)), type = "blshift")
+RE_cor <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
   if (!is.numeric(study) && !is.character(study) && !is.factor(study) || is.matrix(study)) {
     abort("`study` must be a vector, either numeric, character, or factor.")
   }
@@ -801,23 +805,28 @@ RE_cor <- function(study, trt, type = c("reftrt", "blshift")) {
                       abort("`trt` must be a factor (or coercible to factor).")
                     }, finally = inform("Coerced `trt` to factor."))
   }
-  if (length(study) != length(trt)) abort("`study` and `trt` must be the same length.")
+  if (!is.logical(contrast) || is.matrix(contrast))
+    abort("`contrast` must be a logical vector.")
+  if (length(study) != length(trt) || length(study) != length(contrast))
+    abort("`study`, `trt`, and `contrast` must be the same length.")
   type <- rlang::arg_match(type)
 
 
   if (type == "reftrt") {
     reftrt <- levels(trt)[1]
-    nonref <- trt != reftrt
+    # Treat contrast rows as non ref trt arms (since they always have REs)
+    nonref <- trt != reftrt | contrast
     nRE <- sum(nonref)  # RE for each non ref trt arm
     Rho <- matrix(0, nrow = nRE, ncol = nRE)
     study <- study[nonref]
     trt <- trt[nonref]
   } else if (type == "blshift") {
-    bl <- !duplicated(study)
-    nRE <- sum(!bl)  # RE for each non baseline arm
+    # Treat contrast rows as non baseline arms (since they always have REs)
+    nonbl <- duplicated(study) | contrast
+    nRE <- sum(nonbl)  # RE for each non baseline arm
     Rho <- matrix(0, nrow = nRE, ncol = nRE)
-    study <- study[!bl]
-    trt <- trt[!bl]
+    study <- study[nonbl]
+    trt <- trt[nonbl]
   }
 
   diag(Rho) <- 1
@@ -837,9 +846,9 @@ RE_cor <- function(study, trt, type = c("reftrt", "blshift")) {
 #' @aliases which_RE
 #' @export
 #' @examples
-#' which_RE(smoking$studyn, smoking$trtn)
-#' which_RE(smoking$studyn, smoking$trtn, type = "blshift")
-which_RE <- function(study, trt, type = c("reftrt", "blshift")) {
+#' which_RE(smoking$studyn, smoking$trtn, contrast = rep(FALSE, nrow(smoking)))
+#' which_RE(smoking$studyn, smoking$trtn, contrast = rep(FALSE, nrow(smoking)), type = "blshift")
+which_RE <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
   if (!is.numeric(study) && !is.character(study) && !is.factor(study) || is.matrix(study)) {
     abort("`study` must be a vector, either numeric, character, or factor.")
   }
@@ -849,7 +858,10 @@ which_RE <- function(study, trt, type = c("reftrt", "blshift")) {
                       abort("`trt` must be a factor (or coercible to factor).")
                     }, finally = inform("Coerced `trt` to factor."))
   }
-  if (length(study) != length(trt)) abort("`study` and `trt` must be the same length.")
+  if (!is.logical(contrast) || is.matrix(contrast))
+    abort("`contrast` must be a logical vector.")
+  if (length(study) != length(trt) || length(study) != length(contrast))
+    abort("`study`, `trt`, and `contrast` must be the same length.")
   type <- rlang::arg_match(type)
 
   n_i <- length(study)
@@ -857,10 +869,10 @@ which_RE <- function(study, trt, type = c("reftrt", "blshift")) {
 
   if (type == "reftrt") {
     reftrt <- levels(trt)[1]
-    trt_nonref <- trt != reftrt
+    trt_nonref <- trt != reftrt | contrast
     id[trt_nonref] <- 1:sum(trt_nonref)
   } else if (type == "blshift") {
-    non_bl <- duplicated(study)
+    non_bl <- duplicated(study) | contrast
     id[non_bl] <- 1:sum(non_bl)
   }
 
