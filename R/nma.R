@@ -468,8 +468,8 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Check matching X column names and dimensions if more than one present
   if ((has_ipd &&
-       ((has_agd_arm && !identical(colnames(ipd_x), colnames(agd_arm_x)))) ||
-       ((has_agd_contrast && !identical(colnames(ipd_x), colnames(agd_contrast_x))))) ||
+       ((has_agd_arm && !identical(colnames(ipd_x), colnames(agd_arm_x))) ||
+        (has_agd_contrast && !identical(colnames(ipd_x), colnames(agd_contrast_x))))) ||
       (has_agd_arm &&
        (has_agd_contrast && !identical(colnames(agd_arm_x), colnames(agd_contrast_x)))))
     abort("Non-matching columns in *_x matrices.")
