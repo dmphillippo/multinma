@@ -307,7 +307,7 @@ nma <- function(network,
   }
 
   if (has_agd_contrast(network)) {
-    X_agd_contrast <- X_all[nrow(dat_ipd) + nrow(idat_agd_arm) + 1:nrow(idat_agd_contrast), ]
+    X_agd_contrast <- X_all[nrow(dat_ipd) + nrow(idat_agd_arm) + 1:nrow(idat_agd_contrast_nonbl), ]
 
     # Difference out the baseline arms
     X_bl <- model.matrix(nma_formula, data = idat_agd_contrast_bl)
