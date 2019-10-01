@@ -185,7 +185,7 @@ test_that("nma.fit() error if agd_contrast_Sigma is not right dimensions", {
 
   expect_error(nma.fit(agd_contrast_x = x1, agd_contrast_y = y,
                        agd_contrast_Sigma = Sigma1, likelihood = "normal", link = "identity",
-                       n_int = 1), "should be a list of covariance matrices, of length")
+                       n_int = 1), "Dimensions of `agd_contrast_Sigma`.+do not match")
   expect_error(nma.fit(agd_contrast_x = x1, agd_contrast_y = y,
                        agd_contrast_Sigma = Sigma2, likelihood = "normal", link = "identity",
                        n_int = 1), "Dimensions of `agd_contrast_Sigma`.+do not match")
