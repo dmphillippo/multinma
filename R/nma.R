@@ -579,7 +579,7 @@ nma.fit <- function(ipd_x, ipd_y,
       abort("Dimensions of `agd_contrast_Sigma` covariance matrices do not match the contrast-based data.")
   } else {
     agd_contrast_trt <- agd_contrast_trt_b <- numeric()
-    Sigma <- matrix(1, 1, 1)
+    Sigma <- matrix(1, 0, 0)
     ni_agd_contrast <- 0
     ns_agd_contrast <- 0
   }
