@@ -317,7 +317,12 @@ nma <- function(network,
     if (any(colnames(X_agd_contrast) != colnames(X_bl)))
       abort("Mismatch design matrices for baseline and non-baseline arms. Dropped factor levels?")
 
-    X_agd_contrast <- X_agd_contrast - X_bl
+    # Match non-baseline rows with baseline rows by study
+    bl_lookup <- vapply(idat_agd_contrast_nonbl$.study,
+                        FUN = function(x) which(x == idat_agd_contrast_bl$.study),
+                        FUN.VALUE = numeric(1))
+
+    X_agd_contrast <- X_agd_contrast - X_bl[bl_lookup, , drop = FALSE]
 
     # Remove columns for study baselines corresponding to contrast-based studies - not used
     s_contr <- unique(dat_agd_contrast$.study)
