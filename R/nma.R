@@ -326,7 +326,7 @@ nma <- function(network,
 
     # Remove columns for study baselines corresponding to contrast-based studies - not used
     s_contr <- unique(dat_agd_contrast$.study)
-    bl_s_reg <- paste0("^\\.study", paste0(s_contr, collapse = "|"))
+    bl_s_reg <- paste0("^\\.study(", paste0(s_contr, collapse = "|"), ")")
     bl_cols <- grepl(bl_s_reg, colnames(X_agd_contrast))
 
     X_agd_contrast <- X_agd_contrast[, !bl_cols]
