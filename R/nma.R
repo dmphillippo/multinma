@@ -330,8 +330,8 @@ nma <- function(network,
     bl_cols <- grepl(bl_s_reg, colnames(X_agd_contrast))
 
     X_agd_contrast <- X_agd_contrast[, !bl_cols]
-    if (has_ipd) X_ipd <- X_ipd[, !bl_cols]
-    if (has_agd_arm) X_agd_arm <- X_agd_arm[, !bl_cols]
+    if (has_ipd(network)) X_ipd <- X_ipd[, !bl_cols]
+    if (has_agd_arm(network)) X_agd_arm <- X_agd_arm[, !bl_cols]
   } else {
     X_agd_contrast <- NULL
   }
