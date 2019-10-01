@@ -177,7 +177,7 @@ nma <- function(network,
     dat_agd_contrast_nonbl <- dplyr::filter(dat_agd_contrast, !is.na(.data$.y))
     idat_agd_contrast_bl <- dplyr::filter(idat_agd_contrast, is.na(.data$.y))
     idat_agd_contrast_nonbl <- dplyr::filter(idat_agd_contrast, !is.na(.data$.y))
-    y_agd_contrast <- filter(y_agd_contrast, !is.na(.data$.y))
+    y_agd_contrast <- dplyr::filter(y_agd_contrast, !is.na(.data$.y))
   } else {
     dat_agd_contrast <- idat_agd_contrast <-
       dat_agd_contrast_bl <- idat_agd_contrast_bl <-
