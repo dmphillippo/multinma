@@ -30,7 +30,7 @@ int<lower=1> link; // link function
 
 // -- AgD (contrast-based) outcomes
 vector[ni_agd_contrast] agd_contrast_y;
-matrix[ni_agd_contrast, ni_agd_contrast] agd_contrast_Sigma;
+cov_matrix[ni_agd_contrast ? ni_agd_contrast : 1] agd_contrast_Sigma;
 
 // -- Design matrix or thin QR decomposition --
 int<lower=0, upper=1> QR; // use QR decomposition (yes = 1)
