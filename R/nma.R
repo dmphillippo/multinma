@@ -569,15 +569,19 @@ nma.fit <- function(ipd_x, ipd_y,
     agd_contrast_trt <- apply(agd_contrast_x[ac1, col_trt, drop = FALSE], 1, get_trt)
     agd_contrast_trt_b <- apply(agd_contrast_x[ac1, col_trt, drop = FALSE], 1, get_trt, v = -1)
 
+    # Get number of contrast-based studies from length of Sigma list
+    ns_agd_contrast <- length(agd_contrast_Sigma)
+
     # Construct block-diagonal contrast covariance matrix
     Sigma <- as.matrix(Matrix::bdiag(agd_contrast_Sigma))
 
     if (nrow(Sigma) != ni_agd_contrast)
       abort("Dimensions of `agd_contrast_Sigma` covariance matrices do not match the contrast-based data.")
   } else {
-    agd_contrast_study <- agd_contrast_trt <- agd_contrast_trt_b <- numeric()
+    agd_contrast_trt <- agd_contrast_trt_b <- numeric()
     Sigma <- matrix(1, 1, 1)
     ni_agd_contrast <- 0
+    ns_agd_contrast <- 0
   }
 
   # Set up random effects
@@ -635,7 +639,7 @@ nma.fit <- function(ipd_x, ipd_y,
     ni_ipd = ni_ipd,
     ns_agd_arm = length(unique(agd_arm_study)),
     ni_agd_arm = ni_agd_arm,
-    ns_agd_contrast = length(unique(agd_contrast_study)),
+    ns_agd_contrast = ns_agd_contrast,
     ni_agd_contrast = ni_agd_contrast,
     nt = n_trt,
     nint = n_int,
