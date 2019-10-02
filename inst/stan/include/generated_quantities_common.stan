@@ -45,7 +45,8 @@ for (i in 1:ni_agd_contrast) {
     nc = nc_agd_contrast[s];
     log_lik[ni_ipd + ni_agd_arm + s] = multi_normal_lpdf(agd_contrast_y[(a + 1):(a + nc)] |
       eta_agd_contrast_bar[(a + 1):(a + nc)], agd_contrast_Sigma[(a + 1):(a + nc), (a + 1):(a + nc)]);
-    resdev[ni_ipd + ni_agd_arm + s] = -2 * log_lik[ni_ipd + ni_agd_arm + s];
+    resdev[ni_ipd + ni_agd_arm + s] = quad_form(inv_Sigma[(a + 1):(a + nc), (a + 1):(a + nc)],
+                                                agd_contrast_y[(a + 1):(a + nc)] - eta_agd_contrast_bar[(a + 1):(a + nc)]);
     a += nc;
   }
 }
