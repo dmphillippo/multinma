@@ -31,7 +31,7 @@ matrix[nint * ni_agd_contrast, nX] X_agd_contrast = ni_agd_contrast ? X[(ni_ipd 
 int n_int_thin = nint / int_thin;
 
 // Inverse covariance matrix for contrasts
-matrix[ns_agd_contrast, ns_agd_contrast] inv_Sigma = inverse_spd(agd_contrast_Sigma);
+matrix[ni_agd_contrast ? ni_agd_contrast : 1, ni_agd_contrast ? ni_agd_contrast : 1] inv_Sigma = inverse_spd(agd_contrast_Sigma);
 
 // Construct number of contrasts in each study for contrast-based AgD by looking at Sigma covariance matrix
 // NOTE: Sigma must be block diagonal (i.e. all contrasts for a single study together)
