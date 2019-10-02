@@ -160,17 +160,7 @@ nma <- function(network,
     }
 
     # Get covariance structure for relative effects, using .se on baseline arm
-    .make_Sigma <- function(x) {
-      s_ij <- x[is.na(x$.y), ".se", drop = TRUE]^2  # Covariances
-      s_ii <- x[!is.na(x$.y), ".se", drop = TRUE]^2  # Variances
-      narm <- length(s_ii)
-      S <- matrix(s_ij, nrow = narm, ncol = narm)
-      diag(S) <- s_ii
-      return(S)
-    }
-
-    Sigma_agd_contrast <-
-      by(dat_agd_contrast, dat_agd_contrast$.study, FUN = .make_Sigma, simplify = FALSE)
+    Sigma_agd_contrast <- make_Sigma(dat_agd_contrast)
 
     # Split into baseline and non-baseline arms
     dat_agd_contrast_bl <- dplyr::filter(dat_agd_contrast, is.na(.data$.y))
@@ -1033,4 +1023,23 @@ prior_standat <- function(x, par, valid){
   out[is.na(out)] <- 0
   names(out) <- paste0(par, "_", names(out))
   return(out)
+}
+
+#' Get covariance structure contrast-based data, using se on baseline arm
+#'
+#' @param x A data frame of agd_contrast data
+#'
+#' @return A list of covariance matrices, of length equal to the number of studies
+#' @noRd
+make_Sigma <- function(x) {
+  return(by(x, x$.study, FUN = make_Sigma_block, simplify = FALSE))
+}
+
+make_Sigma_block <- function(x) {
+  s_ij <- x[is.na(x$.y), ".se", drop = TRUE]^2  # Covariances
+  s_ii <- x[!is.na(x$.y), ".se", drop = TRUE]^2  # Variances
+  narm <- length(s_ii)
+  S <- matrix(s_ij, nrow = narm, ncol = narm)
+  diag(S) <- s_ii
+  return(S)
 }
