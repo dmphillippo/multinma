@@ -119,12 +119,14 @@ dic <- function(x, ...) {
     # Get covariance structure
     Sigma <- make_Sigma(net$agd_contrast)
 
-    resdev_dat <-
+    agd_contrast_resdev_dat <-
       net$agd_contrast %>%
         dplyr::filter(!is.na(.data$.y)) %>%
         dplyr::mutate(.fitted = fitted_agd_contrast) %>%
         dplyr::group_by(.data$.study) %>%
-        dplyr::summarise(.y = list(.data$.y), fitted = list(.data$.fitted)) %>%
+        dplyr::summarise(.y = list(.data$.y),
+                         fitted = list(.data$.fitted),
+                         n_contrast = dplyr::n()) %>%
         dplyr::mutate(Sigma = Sigma, resdev = resdev_agd_contrast) %>%
         dplyr::rowwise() %>%
         dplyr::mutate(resdevfit = tcrossprod(crossprod(.data$.y - .data$fitted,
@@ -132,7 +134,7 @@ dic <- function(x, ...) {
                                              .data$.y - .data$fitted),
                       leverage = .data$resdev - .data$resdevfit)
 
-    leverage_agd_contrast <- resdev_dat$leverage
+    leverage_agd_contrast <- agd_contrast_resdev_dat$leverage
   } else {
     leverage_agd_contrast <- NULL
   }
@@ -140,25 +142,34 @@ dic <- function(x, ...) {
   # Set pointwise contributions
   pw <- list()
   if (has_ipd(net)) {
-    pw$ipd <- tibble::tibble(resdev = resdev_ipd,
-                             leverage = leverage_ipd,
-                             dic = resdev_ipd + leverage_ipd)
+    pw$ipd <- tibble::tibble(
+      .study = net$ipd$.study,
+      .trt = net$ipd$.trt,
+      resdev = resdev_ipd,
+      leverage = leverage_ipd,
+      dic = resdev_ipd + leverage_ipd)
   } else {
     pw$ipd <- NULL
   }
 
   if (has_agd_arm(net)) {
-    pw$agd_arm <- tibble::tibble(resdev = resdev_agd_arm,
-                             leverage = leverage_agd_arm,
-                             dic = resdev_agd_arm + leverage_agd_arm)
+    pw$agd_arm <- tibble::tibble(
+      .study = net$agd_arm$.study,
+      .trt = net$agd_arm$.trt,
+      resdev = resdev_agd_arm,
+      leverage = leverage_agd_arm,
+      dic = resdev_agd_arm + leverage_agd_arm)
   } else {
     pw$agd_arm <- NULL
   }
 
   if (has_agd_contrast(net)) {
-    pw$agd_contrast <- tibble::tibble(resdev = resdev_agd_contrast,
-                                 leverage = leverage_agd_contrast,
-                                 dic = resdev_agd_contrast + leverage_agd_contrast)
+    pw$agd_contrast <- tibble::tibble(
+      .study = agd_contrast_resdev_dat$.study,
+      n_contrast = agd_contrast_resdev_dat$n_contrast,
+      resdev = resdev_agd_contrast,
+      leverage = leverage_agd_contrast,
+      dic = resdev_agd_contrast + leverage_agd_contrast)
   } else {
     pw$agd_contrast <- NULL
   }
