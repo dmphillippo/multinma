@@ -33,7 +33,9 @@ print.nma_dic <- function(x, digits = 1, ...) {
       length(digits) > 1 ||
       trunc(digits) != digits) abort("`digits` must be a single integer.")
 
-  n <- sum(purrr::map_dbl(x$pointwise, nrow))
+  n <- sum(nrow(x$pointwise$ipd),
+           nrow(x$pointwise$agd_arm),
+           x$pointwise$agd_contrast$n_contrast)
 
   cglue("Residual deviance: {round(x$resdev, digits)}", subtle(" (on {n} data points)", sep = ""))
   cglue("               pD: {round(x$pd, digits)}")
