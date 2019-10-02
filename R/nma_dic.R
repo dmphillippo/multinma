@@ -35,11 +35,14 @@ dic <- function(x, ...) {
   }
 
   if (has_agd_contrast(net)) {
-    n_agd_contrast <- nrow(net$agd_contrast)
-    resdev_agd_contrast <- resdev[n_ipd + n_agd_arm + (1:n_agd_contrast)]
-    fitted_agd_contrast <- fitted[n_ipd + n_agd_arm + (1:n_agd_contrast)]
+    # Number of residual deviances is equal to the number of studies
+    nr_agd_contrast <- length(unique(net$agd_contrast$.study))
+    # Number of fitted values is equal to the number of contrasts
+    nf_agd_contrast <- nrow(dplyr::filter(net$agd_contrast, !is.na(.data$.y)))
+    resdev_agd_contrast <- resdev[n_ipd + n_agd_arm + (1:nr_agd_contrast)]
+    fitted_agd_contrast <- fitted[n_ipd + n_agd_arm + (1:nf_agd_contrast)]
   } else {
-    n_agd_contrast <- 0
+    nr_agd_contrast <- nf_agd_contrast <- 0
   }
 
 
@@ -113,10 +116,23 @@ dic <- function(x, ...) {
   }
 
   if (has_agd_contrast(net)) {
-    agd_contrast_y <- net$agd_contrast$.y
-    agd_contrast_se <- net$agd_contrast$.se
-    resdevfit_agd_contrast <- (agd_contrast_y - fitted_agd_contrast)^2 / agd_contrast_se^2
-    leverage_agd_contrast <- resdev_agd_contrast - resdevfit_agd_contrast
+    # Get covariance structure
+    Sigma <- make_Sigma(net$agd_contrast)
+
+    resdev_dat <-
+      net$agd_contrast %>%
+        dplyr::filter(!is.na(.data$.y)) %>%
+        dplyr::mutate(.fitted = fitted_agd_contrast) %>%
+        dplyr::group_by(.data$.study) %>%
+        dplyr::summarise(.y = list(.data$.y), fitted = list(.data$.fitted)) %>%
+        dplyr::mutate(Sigma = Sigma, resdev = resdev_agd_contrast) %>%
+        dplyr::rowwise() %>%
+        dplyr::mutate(resdevfit = tcrossprod(crossprod(.data$.y - .data$fitted,
+                                                       .data$Sigma),
+                                             .data$.y - .data$fitted),
+                      leverage = .data$resdev - .data$resdevfit)
+
+    leverage_agd_contrast <- resdev_dat$leverage
   } else {
     leverage_agd_contrast <- NULL
   }
