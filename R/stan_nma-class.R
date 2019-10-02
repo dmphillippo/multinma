@@ -145,3 +145,21 @@ waic.stan_nma <- function(x, ...) {
   ll <- as.array(x, pars = "log_lik")
   return(loo::waic(ll, ...))
 }
+
+#' Matrix of plots for a `stan_nma` object
+#'
+#' A [pairs()] method for `stan_nma` objects, which calls
+#' [rstan::pairs.stanfit()] on the underlying `stanfit` object.
+#'
+#' @param x An object of class `stan_nma`
+#' @param ... Other arguments passed to [rstan::pairs.stanfit()], such as `pars`
+#'   to select the parameters to display.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+pairs.stan_nma <- function(x, ...) {
+  sf <- as.stanfit(x)
+  pairs(sf, ...)
+}
