@@ -130,7 +130,7 @@ dic <- function(x, ...) {
         dplyr::mutate(Sigma = Sigma, resdev = resdev_agd_contrast) %>%
         dplyr::rowwise() %>%
         dplyr::mutate(resdevfit = tcrossprod(crossprod(.data$.y - .data$fitted,
-                                                       .data$Sigma),
+                                                       solve(.data$Sigma)),
                                              .data$.y - .data$fitted),
                       leverage = .data$resdev - .data$resdevfit)
 
