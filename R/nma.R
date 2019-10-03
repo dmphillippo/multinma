@@ -272,7 +272,7 @@ nma <- function(network,
     idat_all[, reg_names[reg_numeric]] <-
       purrr::map2(idat_all[, reg_names[reg_numeric]], xbar, ~.x - .y)
 
-    if (has_agd_contrast) {
+    if (has_agd_contrast(network)) {
       idat_agd_contrast_bl[, reg_names[reg_numeric]] <-
         purrr::map2(idat_agd_contrast_bl[, reg_names[reg_numeric]], xbar, ~.x - .y)
     }
