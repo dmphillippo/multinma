@@ -102,9 +102,13 @@ nma <- function(network,
       length(adapt_delta) > 1 ||
       adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
+  # Use numerical integration? TRUE if class mlnmr_data and regression is not NULL
+  # (Avoids unnecessary use of integration points if regression formula not specified)
+  use_int <- inherits(network, "mlnmr_data") && !is.null(regression)
+
   # Number of numerical integration points
   # Set to 1 if no numerical integration, so that regression on summary data is possible
-  n_int <- if (inherits(network, "mlnmr_data")) network$n_int else 1
+  n_int <- if (use_int) network$n_int else 1
 
   # Get design matrices and outcomes
   if (has_ipd(network)) {
@@ -128,7 +132,7 @@ nma <- function(network,
     y_agd_arm <- get_outcome_variables(dat_agd_arm, network$outcome$agd_arm)
 
     # Set up integration variables if present
-    if (inherits(network, "mlnmr_data")) {
+    if (use_int) {
       idat_agd_arm <- dat_agd_arm %>%
          dplyr::select(-dplyr::one_of(intersect(network$int_names, colnames(dat_agd_arm)))) %>%
          dplyr::rename_at(dplyr::vars(dplyr::starts_with(".int_")), ~gsub(".int_", "", ., fixed = TRUE)) %>%
@@ -150,7 +154,7 @@ nma <- function(network,
     y_agd_contrast <- get_outcome_variables(dat_agd_contrast, network$outcome$agd_contrast)
 
     # Set up integration variables if present
-    if (inherits(network, "mlnmr_data")) {
+    if (use_int) {
       idat_agd_contrast <- dat_agd_contrast %>%
         dplyr::select(-dplyr::one_of(union(network$int_names, colnames(dat_agd_contrast)))) %>%
         dplyr::rename_at(dplyr::vars(dplyr::starts_with(".int_")), ~gsub(".int_", "", ., fixed = TRUE)) %>%
