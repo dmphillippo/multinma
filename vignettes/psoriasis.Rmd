@@ -102,9 +102,30 @@ psoriasis_mlnmr <- nma(psoriasis_net,
                        prior_trt = normal(scale = 10),
                        prior_reg = normal(scale = 10),
                        init_r = 0.1,
-                       iter = 1000, chains = 4, QR = TRUE)
+                       iter = 2000, chains = 4, QR = TRUE)
 
 print(psoriasis_mlnmr)
 # summary(psoriasis_mlnmr)
 ```
+Now run a random effects (RE) model.
+```{r}
+psoriasis_mlnmr_re <- nma(psoriasis_net, 
+                       regression = ~durnpso + prevsys + bsa + weight + psa + 
+                                     (durnpso + prevsys + bsa + weight + psa):trtclass,
+                       link = "probit", trt_effects = "random",
+                       agd_sample_size = sample_size_w0,
+                       prior_intercept = normal(scale = 10),
+                       prior_trt = normal(scale = 10),
+                       prior_reg = normal(scale = 10),
+                       prior_het = normal(scale = 2.5),
+                       init_r = 0.1,
+                       iter = 2000, chains = 4, QR = TRUE)
 
+print(psoriasis_mlnmr_re)
+# summary(psoriasis_mlnmr_re)
+```
+Compare the model fit under fixed and random effects.
+```{r}
+dic(psoriasis_mlnmr)
+dic(psoriasis_mlnmr_re)
+```
