@@ -9,7 +9,8 @@
 #' @param cor correlation matrix to use for generating the integration points.
 #'   By default, this takes a weighted correlation matrix from all IPD studies.
 #' @param n_int number of integration points to generate, default 100
-#' @param int_args a named list of arguments to pass to [randtoolbox::sobol()]
+#' @param int_args a named list of arguments to pass to
+#'   `\link[randtoolbox:quasiRNG]{sobol()}`
 #'
 #' @return An object of class [nma_data].
 #' @export
