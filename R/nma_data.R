@@ -16,7 +16,8 @@ set_ipd <- function(data,
                     trt,
                     y = NULL,
                     r = NULL, E = NULL,
-                    Surv = NULL) {
+                    Surv = NULL,
+                    trt_ref = NULL) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -41,6 +42,8 @@ set_ipd <- function(data,
   .trt <- dplyr::pull(data, {{ trt }})
   if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
 
+  if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
+
   # Pull and check outcomes
   .y <- pull_non_null(data, enquo(y))
   .r <- pull_non_null(data, enquo(r))
@@ -59,6 +62,17 @@ set_ipd <- function(data,
     .study = nfactor(.study),
     .trt = nfactor(.trt)
   )
+
+  if (!is.null(trt_ref)) {
+    trt_ref <- as.character(trt_ref)
+    lvls_trt <- levels(d$.trt)
+    if (! trt_ref %in% lvls_trt)
+      abort(sprintf("`trt_ref` does not match a treatment in the data.\nSuitable values are: %s",
+                    ifelse(length(lvls_trt) <= 5,
+                           paste0(lvls_trt, collapse = ", "),
+                           paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
+    d$.trt <- forcats::fct_relevel(d$.trt, trt_ref)
+  }
 
   if (o_type == "continuous") {
     d <- tibble::add_column(d, .y = .y)
@@ -103,7 +117,8 @@ set_agd_arm <- function(data,
                         trt,
                         y = NULL, se = NULL,
                         r = NULL, n = NULL, E = NULL,
-                        Surv = NULL) {
+                        Surv = NULL,
+                        trt_ref = NULL) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -128,6 +143,8 @@ set_agd_arm <- function(data,
   .trt <- dplyr::pull(data, {{ trt }})
   if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
 
+  if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
+
   # Pull and check outcomes
   .y <- pull_non_null(data, enquo(y))
   .se <- pull_non_null(data, enquo(se))
@@ -148,6 +165,17 @@ set_agd_arm <- function(data,
     .study = nfactor(.study),
     .trt = nfactor(.trt)
   )
+
+  if (!is.null(trt_ref)) {
+    trt_ref <- as.character(trt_ref)
+    lvls_trt <- levels(d$.trt)
+    if (! trt_ref %in% lvls_trt)
+      abort(sprintf("`trt_ref` does not match a treatment in the data.\nSuitable values are: %s",
+                    ifelse(length(lvls_trt) <= 5,
+                           paste0(lvls_trt, collapse = ", "),
+                           paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
+    d$.trt <- forcats::fct_relevel(d$.trt, trt_ref)
+  }
 
   if (o_type == "continuous") {
     d <- tibble::add_column(d, .y = .y, .se = .se)
@@ -196,7 +224,8 @@ set_agd_arm <- function(data,
 set_agd_contrast <- function(data,
                              study,
                              trt,
-                             y = NULL, se = NULL) {
+                             y = NULL, se = NULL,
+                             trt_ref = NULL) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -221,6 +250,8 @@ set_agd_contrast <- function(data,
   if (missing(trt)) abort("Specify `trt`")
   .trt <- dplyr::pull(data, {{ trt }})
   if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
+
+  if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
 
   # Pull and check outcomes
   .y <- pull_non_null(data, enquo(y))
@@ -267,6 +298,17 @@ set_agd_contrast <- function(data,
     .se = .se)
 
   d <- dplyr::bind_cols(d, data)
+
+  if (!is.null(trt_ref)) {
+    trt_ref <- as.character(trt_ref)
+    lvls_trt <- levels(d$.trt)
+    if (! trt_ref %in% lvls_trt)
+      abort(sprintf("`trt_ref` does not match a treatment in the data.\nSuitable values are: %s",
+                    ifelse(length(lvls_trt) <= 5,
+                           paste0(lvls_trt, collapse = ", "),
+                           paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
+    d$.trt <- forcats::fct_relevel(d$.trt, trt_ref)
+  }
 
   # Produce nma_data object
   out <- structure(

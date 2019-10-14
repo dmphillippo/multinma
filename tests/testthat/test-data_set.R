@@ -175,6 +175,35 @@ test_that("set_* return `treatments` factor", {
                factor(LETTERS[1:3]))
 })
 
+test_that("set_* can set `trt_ref`", {
+  f_BAC <- factor(LETTERS[c(2,1,3)], levels = LETTERS[c(2,1,3)])
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont, trt_ref = "B")$treatments,
+               f_BAC)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_ref = "B")$treatments,
+               f_BAC)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_ref = "B")$treatments,
+               f_BAC)
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont, trt_ref = factor("B"))$treatments,
+               f_BAC)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_ref = factor("B"))$treatments,
+               f_BAC)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_ref = factor("B"))$treatments,
+               f_BAC)
+
+  f_213 <- factor(c(2, 1, 3), levels = c(2, 1, 3))
+  expect_equal(set_ipd(agd_arm, studyc, trtn, y = cont, trt_ref = 2)$treatments,
+               f_213)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtn, y = cont, se = cont_pos, trt_ref = 2)$treatments,
+               f_213)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtn, y = ydiff, se = sediff, trt_ref = 2)$treatments,
+               f_213)
+
+  m <- "`trt_ref` does not match a treatment in the data.+Suitable values are:"
+  expect_error(set_ipd(agd_arm, studyc, trtc, y = cont, trt_ref = 2), m)
+  expect_error(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_ref = 2), m)
+  expect_error(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_ref = 2), m)
+})
+
 test_that("set_* return `studies` factor", {
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont)$studies,
                factor(letters[1:2]))
