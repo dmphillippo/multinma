@@ -1,7 +1,7 @@
 #' Add numerical integration points to aggregate data
 #'
 #' This function creates numerical integration points using a Gaussian copula
-#' approach, as described in \insertCite{methods_paper}{multinma}.
+#' approach, as described in \insertCite{methods_paper;textual}{multinma}.
 #'
 #' @param network an `nma_data` object, as created by the `set_*()` functions or
 #'   `combine_network()`
@@ -19,6 +19,9 @@
 #'   covariates. Argument names specify the name of the covariate, which should
 #'   match a covariate name in the IPD (if IPD are present). The required
 #'   marginal distribution is then specified using the function [distr()].
+#'
+#' @references
+#'   \insertAllCited{}
 #'
 #' @examples
 add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = list()) {
