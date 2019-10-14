@@ -71,3 +71,28 @@
 #'
 
 "psoriasis_ipd"
+
+#' Thrombolytic treatments data
+#'
+#' Data frame containing the results of 50 trials of 8 thrombolytic drugs
+#' (streptokinase, SK; alteplase, t-PA; accelerated alteplase, Acc t-PA;
+#' streptokinase plus alteplase, SK+tPA; reteplase, r-PA; tenocteplase, TNK;
+#' urokinase, UK; anistreptilase, ASPAC) plus per-cutaneous transluminal
+#' coronary angioplasty (PTCA)
+#' \insertCite{Boland2003,Lu2006,TSD4}{multinma}. The number of
+#' deaths in 30 or 35 days following accute myocardial infarction are recorded.
+#'
+#' @format A data frame with 50 rows and 5 variables:
+#' \describe{
+#'   \item{studyn}{numeric study ID}
+#'   \item{trtn}{numeric treatment code}
+#'   \item{trtc}{treatment name}
+#'   \item{r}{total number of events}
+#'   \item{n}{total number of individuals}
+#' }
+#'
+#' @references
+#'   \insertAllCited{}
+#'
+
+"thrombolytics"
