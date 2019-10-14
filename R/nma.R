@@ -14,7 +14,8 @@
 #'   will be inferred from the data
 #' @param link Character string specifying a link function, if unspecified will
 #'   default to the canonical link
-#' @param ... Further arguments passed to [rstan::sampling()], such as `iter`,
+#' @param ... Further arguments passed to
+#'   `\link[rstan:stanmodel-method-sampling]{sampling()}`, such as `iter`,
 #'   `chains`, `cores`, etc.
 #' @param prior_intercept Specification of prior distribution for the intercept
 #' @param prior_trt Specification of prior distribution for the treatment effects

@@ -13,7 +13,7 @@
 #'   \item{`network`}{The network data from which the model was run (class
 #'   [nma_data] for `stan_nma`, or class [mlnmr_data] for `stan_mlnmr`)}
 #'   \item{`stanfit`}{The `stanfit` object returned by calling
-#'   [rstan::sampling()] for the model}
+#'   `\link[rstan:stanmodel-method-sampling]{sampling()}` for the model}
 #'   \item{`trt_effects`}{Whether fixed or random effects were used (character
 #'   string)}
 #'   \item{`consistency`}{The consistency/inconsistency model used (character
@@ -56,12 +56,12 @@ print.stan_nma <- function(x, ...) {
 
 #' as.stanfit
 #'
-#' Attempt to turn an object into a [rstan::stanfit] object.
+#' Attempt to turn an object into a `\link[rstan:stanfit-class]{stanfit}` object.
 #'
 #' @param x an object
 #' @param ... additional arguments
 #'
-#' @return A [rstan::stanfit] object.
+#' @return A `\link[rstan:stanfit-class]{stanfit}` object.
 #' @export
 #'
 #' @examples
@@ -122,11 +122,12 @@ as.matrix.stan_nma <- function(x, ...) {
 
 #' Model comparison using the `loo` package
 #'
-#' The [loo::loo()] and [loo::waic()] functions from the `loo` package may be
-#' called directly on [stan_nma] and [stan_mlnmr] objects.
+#' The `\link[loo:loo]{loo()}` and `\link[loo:waic]{waic()}` functions from the `loo`
+#' package may be called directly on [stan_nma] and [stan_mlnmr] objects.
 #'
 #' @param x An object of class [stan_nma] or [stan_mlnmr]
-#' @param ... Further arguments to [rstan::loo.stanfit()] or [loo::waic()]
+#' @param ... Further arguments to `\link[rstan:stanfit-method-loo]{loo()}` or
+#'   `\link[loo:waic]{waic()}`
 #'
 #' @export
 #' @importFrom loo loo
@@ -149,11 +150,13 @@ waic.stan_nma <- function(x, ...) {
 #' Matrix of plots for a `stan_nma` object
 #'
 #' A [pairs()] method for `stan_nma` objects, which calls
-#' [rstan::pairs.stanfit()] on the underlying `stanfit` object.
+#' `\link[rstan:stanfit-method-pairs]{pairs()}` on the underlying `stanfit`
+#' object.
 #'
 #' @param x An object of class `stan_nma`
-#' @param ... Other arguments passed to [rstan::pairs.stanfit()], such as `pars`
-#'   to select the parameters to display.
+#' @param ... Other arguments passed to
+#'   `\link[rstan:stanfit-method-pairs]{pairs()}`, such as `pars` to select the
+#'   parameters to display.
 #'
 #' @return
 #' @export
