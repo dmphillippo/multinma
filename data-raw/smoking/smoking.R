@@ -5,7 +5,7 @@ library(tidyr)
 library(readr)
 
 # Read wide data
-smk_wide <- read_tsv("./data-raw/smoking.txt") %>% mutate(studyn = 1:n())
+smk_wide <- read_tsv("./data-raw/smoking/smoking.txt") %>% mutate(studyn = 1:n())
 
 # Make into long (tidy) format
 smk <- smk_wide %>%
