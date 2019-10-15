@@ -2,7 +2,7 @@
 #'
 #' @template args-data_common
 #' @template args-data_rE
-#' @template args-data_Surv
+# #' @template args-data_Surv
 #'
 #' @return An object of class [nma_data]
 #' @export
@@ -16,7 +16,7 @@ set_ipd <- function(data,
                     trt,
                     y = NULL,
                     r = NULL, E = NULL,
-                    Surv = NULL,
+                    # Surv = NULL,
                     trt_ref = NULL) {
 
   # Check data is data frame
@@ -102,7 +102,7 @@ set_ipd <- function(data,
 #' @template args-data_common
 #' @template args-data_se
 #' @template args-data_rE
-#' @template args-data_Surv
+# #' @template args-data_Surv
 #' @param n column of `data` specifying Binomial outcome numerator
 #'
 #' @return An object of class [nma_data]
@@ -117,7 +117,7 @@ set_agd_arm <- function(data,
                         trt,
                         y = NULL, se = NULL,
                         r = NULL, n = NULL, E = NULL,
-                        Surv = NULL,
+                        # Surv = NULL,
                         trt_ref = NULL) {
 
   # Check data is data frame
