@@ -278,14 +278,12 @@ set_agd_contrast <- function(data,
     } %>%
     dplyr::filter(.data$bl, .data$n_arms > 2) %>%
     {
-      if (any(is.na(.$.se)))
-        abort("Specify standard errors for mean outcomes on baseline arms in studies with >2 arms.")
+      check_outcome_continuous(1, .$.se, with_se = TRUE,
+                               append = " on baseline arms in studies with >2 arms.")
     }
 
-  if (any(is.na(.se[!bl])))
-    abort("Standard error `se` contains missing values for non-baseline rows (i.e. those specifying contrasts against baseline).")
-
-  check_outcome_continuous(.y[!bl], .se[!bl], with_se = TRUE)
+  check_outcome_continuous(.y[!bl], .se[!bl], with_se = TRUE,
+    append = " for non-baseline rows (i.e. those specifying contrasts against baseline).")
 
   o_type <- get_outcome_type(y = .y[!bl], se = .se[!bl],
                              r = NULL, n = NULL, E = NULL)
@@ -470,28 +468,31 @@ get_outcome_type <- function(y, se, r, n, E) {
 #' @param y vector
 #' @param se vector
 #' @param with_se continuous outcome with SE?
+#' @param append text to append to error message
 #'
 #' @noRd
-check_outcome_continuous <- function(y, se = NULL, with_se = TRUE) {
+check_outcome_continuous <- function(y, se = NULL, with_se = TRUE, append = NULL) {
   null_y <- is.null(y)
   null_se <- is.null(se)
 
   if (with_se) {
     if (!null_y && !null_se) {
-      if (!is.numeric(y)) abort("Continuous outcome `y` must be numeric")
-      if (!is.numeric(se)) abort("Standard error `se` must be numeric")
-      if (any(is.na(y))) abort("Continuous outcome `y` contains missing values")
-      if (any(is.na(se))) abort("Standard error `se` contains missing values")
-      if (any(se <= 0)) abort("Standard errors must be positive")
+      if (!is.numeric(y)) abort(paste0("Continuous outcome `y` must be numeric", append))
+      if (!is.numeric(se)) abort(paste0("Standard error `se` must be numeric", append))
+      if (any(is.nan(se))) abort(paste0("Standard error `se` cannot be NaN", append))
+      if (any(is.na(y))) abort(paste0("Continuous outcome `y` contains missing values", append))
+      if (any(is.na(se))) abort(paste0("Standard error `se` contains missing values", append))
+      if (any(is.infinite(se))) abort(paste0("Standard error `se` cannot be infinite", append))
+      if (any(se <= 0)) abort(paste0("Standard errors must be positive", append))
     } else {
-      if (!null_y) abort("Specify standard error `se` for continuous outcome `y`")
-      if (!null_se) abort("Specify continuous outcome `y`")
+      if (!null_y) abort(paste0("Specify standard error `se` for continuous outcome `y`", append))
+      if (!null_se) abort(paste0("Specify continuous outcome `y`", append))
     }
     invisible(list(y = y, se = se))
   } else {
     if (!null_y) {
-      if (any(is.na(y))) abort("Continuous outcome `y` contains missing values")
-      if (!is.numeric(y)) abort("Continuous outcome `y` must be numeric")
+      if (any(is.na(y))) abort(paste0("Continuous outcome `y` contains missing values", append))
+      if (!is.numeric(y)) abort(paste0("Continuous outcome `y` must be numeric", append))
     }
     invisible(list(y = y))
   }

@@ -58,6 +58,8 @@ agd_arm <- tibble(
   cont = rnorm(5),
   cont_pos = abs(cont),
   cont_neg = -cont_pos,
+  cont_inf = c(cont_pos[1:4], Inf),
+  cont_nan = c(cont_pos[1:4], NaN),
   disc = rbinom(5, 20, 0.5) + 1,
   disc_p1 = disc + 1,
   disc_m1 = disc - 1,
@@ -72,6 +74,8 @@ test_that("set_agd_arm - continuous outcome checks work", {
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = trtc, se = cont_pos), "must be numeric")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = trtc), "must be numeric")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = cont_neg), "must be positive")
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = cont_inf), "cannot be infinite")
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = cont_nan), "cannot be NaN")
   expect_equivalent(
     set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = cont_pos)$agd_arm[, c(".y", ".se")],
     transmute(agd_arm, .y = cont, .se = cont_pos))
@@ -134,9 +138,11 @@ test_that("set_agd_contrast - continuous outcome checks work", {
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff_chr, se = sediff), "must be numeric")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = trtc), "must be numeric")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = cont_neg), "must be positive")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = cont_inf), "cannot be infinite")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = cont_nan), "cannot be NaN")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = trtn, se = sediff), "without a specified baseline arm")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff_multi, se = sediff), "Multiple baseline arms")
-  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = sediff_miss), "Specify standard errors.+on baseline arms")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = sediff_miss), "Standard error.+missing values on baseline arms")
   expect_equivalent(    set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = sediff)$agd_contrast[, c(".y", ".se")],
     transmute(agd_contrast, .y = ydiff, .se = sediff))
 })
