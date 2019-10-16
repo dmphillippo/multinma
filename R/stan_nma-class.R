@@ -47,7 +47,9 @@ print.stan_nma <- function(x, ...) {
   dots <- list(...)
   include <- "pars" %in% names(dots)
   dots <- rlang::dots_list(x = sf,
-                           pars = c("log_lik", "resdev", "fitted", "theta_bar_cum", "theta2_bar_cum"),
+                           pars = c("log_lik", "resdev", "fitted",
+                                    "theta_bar_cum", "theta2_bar_cum",
+                                    "mu", "delta"),
                            include = include, !!! dots,
                            .homonyms = "last")
   do.call(print, dots)
