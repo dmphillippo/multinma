@@ -146,8 +146,8 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
     invalid_rows <- out$agd_arm %>%
       dplyr::mutate_at(x_int_names,
                        .funs = ~purrr::map_lgl(.,
-                                 ~any(is.na(.) || is.infinite(.) ||
-                                      is.null(.) || is.nan(.)))
+                                 ~any(is.na(.) | is.infinite(.) |
+                                      is.null(.) | is.nan(.)))
                        ) %>%
       dplyr::filter_at(x_int_names, dplyr::any_vars(.))
 
@@ -178,8 +178,8 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
     invalid_rows <- out$agd_contrast %>%
       dplyr::mutate_at(x_int_names,
                        .funs = ~purrr::map_lgl(.,
-                                               ~any(is.na(.) || is.infinite(.) ||
-                                                      is.null(.) || is.nan(.)))
+                                               ~any(is.na(.) | is.infinite(.) |
+                                                      is.null(.) | is.nan(.)))
       ) %>%
       dplyr::filter_at(x_int_names, dplyr::any_vars(.))
 
