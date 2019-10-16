@@ -10,7 +10,7 @@ Authors@R:
 Description: This package implements network meta-analysis (NMA) and network 
     meta-regression (NMR) models for aggregate data (AgD), individual patient data (IPD),
     and mixtures of both IPD and AgD using multilevel NMR (ML-NMR). Models are estimated
-    in a Bayesian framwork using Stan.
+    in a Bayesian framework using Stan.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
