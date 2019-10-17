@@ -39,7 +39,7 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
   }
 
   # Check n_int
-  if (!is.numeric(n_int) || n_int != trunc(n_int) || n_int <= 0 || length(n_int) > 1) {
+  if (length(n_int) > 1 || !is.numeric(n_int) || n_int != trunc(n_int) || n_int <= 0) {
     abort("`n_int` should be a positive integer.")
   }
 
