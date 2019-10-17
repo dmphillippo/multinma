@@ -16,6 +16,9 @@
 #' @importFrom rlang abort warn inform enquo .data
 #' @importFrom rstan sampling
 #' @importFrom Rdpack reprompt
+#' @importFrom graphics pairs
+#' @importFrom stats complete.cases dbinom median model.frame model.matrix optim
+#'   pbinom qbinom update.formula weighted.mean
 #'
 #' @references
 #'

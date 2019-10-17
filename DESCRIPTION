@@ -19,6 +19,8 @@ Depends:
     R (>= 3.4.0)
 Imports: 
     methods,
+    stats,
+    graphics,
     Rcpp (>= 0.12.0),
     rstan (>= 2.18.1),
     rstantools (>= 2.0.0),
