@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(multinma)
 library(dplyr)
+options(mc.cores = parallel::detectCores())
 ```
 
 Plaque psoriasis analysis from methods paper.
