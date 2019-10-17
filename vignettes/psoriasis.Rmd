@@ -1,0 +1,131 @@
+---
+title: "Example: Plaque Psoriasis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Example: Plaque Psoriasis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(multinma)
+library(dplyr)
+```
+
+Plaque psoriasis analysis from methods paper.
+
+Simulated individual patient data (IPD) from studies UNCOVER-1, UNCOVER-2, and UNCOVER-3 are found in the data set `psoriasis_ipd`.
+Aggregate data (AgD) from the FIXTURE study are found in the data set `psoriasis_agd`.
+
+```{r}
+head(psoriasis_ipd)
+head(psoriasis_agd)
+```
+
+Transform `prevsys`, `bsa`, and `psa` to be proportions in $[0,1]$, rather than out of 100.
+Add in a `trtclass` variable, indicating which treatments belong to which classes.
+Check for complete cases in the IPD.
+```{r}
+psoriasis_ipd <- psoriasis_ipd %>% 
+  mutate(bsa = bsa / 100,
+         trtclass = recode_factor(trtn,
+                                  "1" = 1,   # Placebo
+                                  "2" = 2, "3" = 2, "5" = 2, "6" = 2,  # IL-* blockers
+                                  "4" = 3),  # TNFa blocker
+         # Check complete cases for covariates of interest
+         complete = complete.cases(durnpso, prevsys, bsa, weight, psa)
+  )
+psoriasis_agd <- psoriasis_agd %>% 
+  mutate(
+    bsa_mean = bsa_mean / 100,
+    bsa_sd = bsa_sd / 100,
+    prevsys = prevsys / 100,
+    psa = psa / 100,
+    trtclass = recode_factor(trtn,
+                                  "1" = 1,   # Placebo
+                                  "2" = 2, "3" = 2, "5" = 2, "6" = 2,  # IL-* blockers
+                                  "4" = 3)   # TNFa blocker
+  )
+```
+
+A small number of individuals have missing covariates:
+```{r}
+sum(!psoriasis_ipd$complete)
+mean(!psoriasis_ipd$complete)
+```
+Since the proportion of missing data is so small, we will simply exclude these individuals from the analysis.
+```{r}
+psoriasis_ipd <- filter(psoriasis_ipd, complete)
+```
+
+Set up the network, setting the IPD with `set_ipd()`, AgD (arm-based) with `set_agd_arm()`, and combining together using `combine_network()`.
+```{r}
+psoriasis_net <- combine_network(
+  set_ipd(psoriasis_ipd, study = studyc, trt = trtc, r = pasi75),
+  set_agd_arm(psoriasis_agd, study = studyc, trt = trtc, r = pasi75_r, n = pasi75_n),
+  trt_ref = "PBO"
+)
+
+psoriasis_net
+```
+
+Add numerical integration points using `add_integration()`.
+```{r}
+psoriasis_net <- add_integration(psoriasis_net,
+  durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+  prevsys = distr(qbern, prevsys),
+  bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+  weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
+  psa = distr(qbern, psa),
+  n_int = 1000
+)
+```
+
+Now run a fixed effect (FE) multilevel network meta-regression (ML-NMR) model, using `nma()`.
+We utilise the shared effect modifier assumption, setting treatment-covariate interactions to be equal within each class.
+We specify a probit link function, and weakly-informative $N(0, 10^2)$ priors on each parameter.
+We run four chains of 1000 iterations each, and utilise the QR decomposition for efficiency.
+```{r}
+psoriasis_mlnmr <- nma(psoriasis_net, 
+                       regression = ~durnpso + prevsys + bsa + weight + psa + 
+                                     (durnpso + prevsys + bsa + weight + psa):trtclass,
+                       link = "probit", trt_effects = "fixed",
+                       agd_sample_size = sample_size_w0,
+                       prior_intercept = normal(scale = 10),
+                       prior_trt = normal(scale = 10),
+                       prior_reg = normal(scale = 10),
+                       init_r = 0.1,
+                       iter = 2000, chains = 4, QR = TRUE)
+
+print(psoriasis_mlnmr)
+# summary(psoriasis_mlnmr)
+```
+Now run a random effects (RE) model.
+```{r}
+psoriasis_mlnmr_re <- nma(psoriasis_net, 
+                       regression = ~durnpso + prevsys + bsa + weight + psa + 
+                                     (durnpso + prevsys + bsa + weight + psa):trtclass,
+                       link = "probit", trt_effects = "random",
+                       agd_sample_size = sample_size_w0,
+                       prior_intercept = normal(scale = 10),
+                       prior_trt = normal(scale = 10),
+                       prior_reg = normal(scale = 10),
+                       prior_het = normal(scale = 2.5),
+                       init_r = 0.1,
+                       iter = 2000, chains = 4, QR = TRUE)
+
+print(psoriasis_mlnmr_re)
+# summary(psoriasis_mlnmr_re)
+```
+Compare the model fit under fixed and random effects.
+```{r}
+dic(psoriasis_mlnmr)
+dic(psoriasis_mlnmr_re)
+```
