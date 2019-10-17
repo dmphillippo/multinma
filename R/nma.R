@@ -420,6 +420,7 @@ nma <- function(network,
 #' @param agd_contrast_Sigma List of covariance matrices for contrast-based data
 #' @param n_int Number of numerical integration points used
 #' @param RE_cor Random effects correlation matrix, when `trt_effects = "random"`
+#' @param which_RE Random effects design vector, when `trt_effects = "random"`
 #'
 #' @export
 #'
