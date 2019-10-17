@@ -86,7 +86,8 @@ as.stanfit.default <- function(x, ...) {
 #' as.array
 #'
 #' Turn a `stan_nma` object into a 3D array \[Iteration, Chain, Parameter\].
-#' Enables [bayesplot] functions to seamlessly work on `stan_nma`` objects.
+#' Enables `\link[bayesplot:bayesplot-package]{bayesplot}` functions to
+#' seamlessly work on `stan_nma` objects.
 #'
 #' @param x an object
 #' @param ... additional arguments to [as.array.stanfit]
