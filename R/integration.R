@@ -319,8 +319,7 @@ pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
 #'
 #' @param p,x vector of quantiles
 #' @param q vector of probabilities
-#' @param mu,sigma see [logitnorm]
-#' @param ...
+#' @param mu,sigma,... see [logitnorm]
 #' @param mean,sd mean and standard deviation, overriding `mu` and `sigma` if
 #'   specified
 #'
@@ -331,7 +330,7 @@ pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
 qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
-  return(logitnorm::qlogitnorm(p, pars[["mu"]], pars[["sigma"]]))
+  return(logitnorm::qlogitnorm(p, pars[["mu"]], pars[["sigma"]], ...))
 }
 
 #' @export
@@ -340,7 +339,7 @@ qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
 dlogitnorm <- function(x, mu = 0, sigma = 1, ..., mean, sd) {
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
-  return(logitnorm::dlogitnorm(x, pars[["mu"]], pars[["sigma"]]))
+  return(logitnorm::dlogitnorm(x, pars[["mu"]], pars[["sigma"]], ...))
 }
 
 #' @export
@@ -349,7 +348,7 @@ dlogitnorm <- function(x, mu = 0, sigma = 1, ..., mean, sd) {
 plogitnorm <- function(q, mu = 0, sigma = 1, ..., mean, sd) {
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
-  return(logitnorm::plogitnorm(q, pars[["mu"]], pars[["sigma"]]))
+  return(logitnorm::plogitnorm(q, pars[["mu"]], pars[["sigma"]], ...))
 }
 
 # Internal functions for *logitnorm()
