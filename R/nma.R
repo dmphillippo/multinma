@@ -137,7 +137,11 @@ nma <- function(network,
       idat_agd_arm <- dat_agd_arm %>%
          dplyr::select(-dplyr::one_of(intersect(network$int_names, colnames(dat_agd_arm)))) %>%
          dplyr::rename_at(dplyr::vars(dplyr::starts_with(".int_")), ~gsub(".int_", "", ., fixed = TRUE)) %>%
-         tidyr::unnest(!!! rlang::syms(network$int_names))
+        {if (getNamespaceVersion("tidyr") < "1.0.0") {
+           tidyr::unnest(., !!! rlang::syms(network$int_names))
+         } else {
+           tidyr::unnest(., c(!!! rlang::syms(network$int_names)))
+        }}
     } else {
       idat_agd_arm <- dat_agd_arm
     }
@@ -159,7 +163,11 @@ nma <- function(network,
       idat_agd_contrast <- dat_agd_contrast %>%
         dplyr::select(-dplyr::one_of(union(network$int_names, colnames(dat_agd_contrast)))) %>%
         dplyr::rename_at(dplyr::vars(dplyr::starts_with(".int_")), ~gsub(".int_", "", ., fixed = TRUE)) %>%
-        tidyr::unnest(!!! rlang::syms(network$int_names))
+        {if (getNamespaceVersion("tidyr") < "1.0.0") {
+           tidyr::unnest(., !!! rlang::syms(network$int_names))
+         } else {
+           tidyr::unnest(., c(!!! rlang::syms(network$int_names)))
+        }}
     } else {
       idat_agd_contrast <- dat_agd_contrast
     }
