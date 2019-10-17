@@ -6,3 +6,4 @@
 ^data-raw/.*$
 ^man-roxygen/.*$
 ^data-raw$
+^\.travis\.yml$
