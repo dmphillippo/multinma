@@ -20,3 +20,6 @@
 #' @references
 #'
 NULL
+
+# Stop R CMD check thinking . used in pipes is an undeclared global variable
+if (getRversion() >= "2.15.1")  utils::globalVariables(c("."))
