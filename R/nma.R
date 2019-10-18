@@ -234,7 +234,7 @@ nma <- function(network,
     # Bind all together
     contrs_all <- dplyr::bind_rows(contrs_arm, contrs_contr) %>%
       dplyr::transmute(.data$.study, .data$.trt,
-                       .contr = forcats::fct_relevel(factor(.data$.contr), "..ref.."),
+                       .contr = forcats::fct_relevel(nfactor(.data$.contr), "..ref.."),
                        .data$.contr_sign)
 
     # Join contrast info on to study data
