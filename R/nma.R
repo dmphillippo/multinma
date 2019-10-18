@@ -204,10 +204,10 @@ nma <- function(network,
         dplyr::group_by(.data$.study) %>%
         dplyr::mutate(.trt_b = dplyr::first(.data$.trt)) %>%
         dplyr::ungroup() %>%
-        dplyr::mutate(.contrast = dplyr::if_else(.data$.trt == .data$.trt_b,
+        dplyr::mutate(.contr = dplyr::if_else(.data$.trt == .data$.trt_b,
                                           "..ref..",
                                           paste0(.data$.trt, " vs. ", .data$.trt_b)),
-                      .contrast_sign = 1)
+                      .contr_sign = 1)
     } else {
       contrs_arm <- tibble::tibble()
     }
@@ -221,10 +221,10 @@ nma <- function(network,
         dplyr::mutate(.trt_b = .data$.trt[which(is.na(.data$.y))]) %>%
         dplyr::ungroup() %>%
         dplyr::distinct(.data$.study, .data$.trt, .data$.trt_b) %>%
-        dplyr::mutate(.contrast_sign = dplyr::if_else(as.numeric(.data$.trt) < as.numeric(.data$.trt_b), -1, 1),
-                      .contrast = dplyr::if_else(.data$.trt == .data$.trt_b,
+        dplyr::mutate(.contr_sign = dplyr::if_else(as.numeric(.data$.trt) < as.numeric(.data$.trt_b), -1, 1),
+                      .contr = dplyr::if_else(.data$.trt == .data$.trt_b,
                                                  "..ref..",
-                                                 dplyr::if_else(.data$.contrast_sign == 1,
+                                                 dplyr::if_else(.data$.contr_sign == 1,
                                                                 paste0(.data$.trt, " vs. ", .data$.trt_b),
                                                                 paste0(.data$.trt_b, " vs. ", .data$.trt))))
     } else {
@@ -234,8 +234,8 @@ nma <- function(network,
     # Bind all together
     contrs_all <- dplyr::bind_rows(contrs_arm, contrs_contr) %>%
       dplyr::transmute(.data$.study, .data$.trt,
-                       .contrast = forcats::fct_relevel(factor(.data$.contrast), "..ref.."),
-                       .data$.contrast_sign)
+                       .contr = forcats::fct_relevel(factor(.data$.contr), "..ref.."),
+                       .data$.contr_sign)
 
     # Join contrast info on to study data
     if (has_ipd(network))
@@ -258,16 +258,6 @@ nma <- function(network,
   # coding is used everywhere
   idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast_nonbl)
   idat_all_plus_bl <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast)
-
-
-  if (consistency == "ume") {
-    # For UME model, create contrast design matrix here rather than in the formula below,
-    # so that we can set the necessary entries to +/-1 more easily
-    .contr <- model.matrix(~.contrast, data = idat_all)[,-1]
-    colnames(.contr) <- stringr::str_remove_all(colnames(.contr), "^\\.contrast")
-    .contr <- sweep(.contr, MARGIN = 1,
-                    STATS = idat_all$.contrast_sign, FUN = "*")
-  }
 
   if (!is.null(regression)) {
     # Warn if combining AgD and IPD in a meta-regression without using integration
@@ -376,6 +366,13 @@ nma <- function(network,
   # Construct model matrix
   X_all <- model.matrix(nma_formula, data = idat_all)
 
+  if (consistency == "ume") {
+    # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
+    contr_cols <- grepl("^\\.contr", colnames(X_all))
+    X_all[, contr_cols] <- sweep(X_all[, contr_cols], MARGIN = 1,
+                                 STATS = idat_all$.contr_sign, FUN = "*")
+  }
+
   if (has_ipd(network)) {
     X_ipd <- X_all[1:nrow(dat_ipd), ]
   } else {
@@ -393,11 +390,18 @@ nma <- function(network,
 
     # Difference out the baseline arms
     X_bl <- model.matrix(nma_formula, data = idat_agd_contrast_bl)
+
     # The factor levels should be the same between idat_all and
     # idat_agd_contrast_bl, so the same columns should be present in both design
     # matrices - but check anyway
     if (any(colnames(X_agd_contrast) != colnames(X_bl)))
       abort("Mismatch design matrices for baseline and non-baseline arms. Dropped factor levels?")
+
+    if (consistency == "ume") {
+      # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
+      X_bl[, contr_cols] <- sweep(X_bl[, contr_cols], MARGIN = 1,
+                                  STATS = idat_agd_contrast_bl$.contr_sign, FUN = "*")
+    }
 
     # Match non-baseline rows with baseline rows by study
     bl_lookup <- vapply(idat_agd_contrast_nonbl$.study,
