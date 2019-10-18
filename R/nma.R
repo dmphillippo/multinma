@@ -189,13 +189,84 @@ nma <- function(network,
     Sigma_agd_contrast <- NULL
   }
 
+  if (! consistency %in% c("consistency", "ume")) {
+    abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
+  }
+
+  # Define contrasts for UME model
+  if (consistency == "ume") {
+    # For IPD and AgD (arm-based), take the first-ordered arm as baseline
+    # So the contrast sign will always be positive
+    if (has_ipd(network) || has_agd_arm(network)) {
+      contrs_arm <- dplyr::bind_rows(dat_ipd, dat_agd_arm) %>%
+        dplyr::distinct(.data$.study, .data$.trt) %>%
+        dplyr::arrange(.data$.study, .data$.trt) %>%
+        dplyr::group_by(.data$.study) %>%
+        dplyr::mutate(.trt_b = dplyr::first(.data$.trt)) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(.contrast = dplyr::if_else(.data$.trt == .data$.trt_b,
+                                          "..ref..",
+                                          paste0(.data$.trt, " vs. ", .data$.trt_b)),
+                      .contrast_sign = 1)
+    } else {
+      contrs_arm <- tibble::tibble()
+    }
+
+    # For AgD (contrast-based), take the specified baseline arm (with .y = NA)
+    # Need to make sure to construct contrast the correct way around (d_12 instead of d_21)
+    # and then make a note to change the sign if necessary
+    if (has_agd_contrast(network)) {
+      contrs_contr <- dat_agd_contrast %>%
+        dplyr::group_by(.data$.study) %>%
+        dplyr::mutate(.trt_b = .data$.trt[which(is.na(.data$.y))]) %>%
+        dplyr::ungroup() %>%
+        dplyr::distinct(.data$.study, .data$.trt, .data$.trt_b) %>%
+        dplyr::mutate(.contrast_sign = dplyr::if_else(as.numeric(.data$.trt) < as.numeric(.data$.trt_b), -1, 1),
+                      .contrast = dplyr::if_else(.data$.trt == .data$.trt_b,
+                                                 "..ref..",
+                                                 dplyr::if_else(.data$.contrast_sign == 1,
+                                                                paste0(.data$.trt, " vs. ", .data$.trt_b),
+                                                                paste0(.data$.trt_b, " vs. ", .data$.trt))))
+    } else {
+      contrs_contr <- tibble::tibble()
+    }
+
+    # Bind all together
+    contrs_all <- dplyr::bind_rows(contrs_arm, contrs_contr) %>%
+      dplyr::transmute(.data$.study, .data$.trt,
+                       .contrast = forcats::fct_relevel(factor(.data$.contrast), "..ref.."),
+                       .data$.contrast_sign)
+
+    # Join contrast info on to study data
+    if (has_ipd(network))
+      dat_ipd <- dplyr::left_join(dat_ipd, contrs_all, by = c(".study", ".trt"))
+    if (has_agd_arm(network)) {
+      dat_agd_arm <- dplyr::left_join(dat_agd_arm, contrs_all, by = c(".study", ".trt"))
+      idat_agd_arm <- dplyr::left_join(idat_agd_arm, contrs_all, by = c(".study", ".trt"))
+    }
+    if (has_agd_contrast(network)) {
+      dat_agd_contrast <- dplyr::left_join(dat_agd_contrast, contrs_all, by = c(".study", ".trt"))
+      idat_agd_contrast <- dplyr::left_join(idat_agd_contrast, contrs_all, by = c(".study", ".trt"))
+      dat_agd_contrast_bl <- dplyr::left_join(dat_agd_contrast_bl, contrs_all, by = c(".study", ".trt"))
+      idat_agd_contrast_bl <- dplyr::left_join(idat_agd_contrast_bl, contrs_all, by = c(".study", ".trt"))
+      dat_agd_contrast_nonbl <- dplyr::left_join(dat_agd_contrast_nonbl, contrs_all, by = c(".study", ".trt"))
+      idat_agd_contrast_nonbl <- dplyr::left_join(idat_agd_contrast_nonbl, contrs_all, by = c(".study", ".trt"))
+    }
+  }
+
   # Construct design matrix all together then split out, so that same dummy
   # coding is used everywhere
   idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast_nonbl)
   idat_all_plus_bl <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast)
 
-  if (consistency != "consistency") {
-    abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
+
+  if (consistency == "ume") {
+    # For UME model, create contrast design matrix here rather than in the formula below,
+    # so that we can set the necessary entries to +/-1 more easily
+    .contr <- model.matrix(~.contrast, data = idat_all)[,-1]
+    colnames(.contr) <- stringr::str_remove_all(colnames(.contr), "^\\.contrast")
+    .contr <- sweep(.contr, MARGIN = 1,
+                    STATS = idat_all$.contrast_sign, FUN = "*")
   }
 
   if (!is.null(regression)) {
@@ -206,9 +277,17 @@ nma <- function(network,
                       "Use `add_integration()` to add integration points to the network."))
     }
 
-    nma_formula <- update.formula(regression, ~-1 + .study + .trt + .)
+    if (consistency == "ume") {
+      nma_formula <- update.formula(regression, ~-1 + .study + .contr + .)
+    } else {
+      nma_formula <- update.formula(regression, ~-1 + .study + .trt + .)
+    }
   } else {
-    nma_formula <- ~-1 + .study + .trt
+    if (consistency == "ume") {
+      nma_formula <- ~-1 + .study + .contr
+    } else {
+      nma_formula <- ~-1 + .study + .trt
+    }
   }
 
   # Check that required variables are present in each data set, and non-missing
