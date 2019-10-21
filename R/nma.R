@@ -231,10 +231,16 @@ nma <- function(network,
       contrs_contr <- tibble::tibble()
     }
 
+    # Vector of all K(K-1)/2 possible contrast levels
+    nt <- nlevels(network$treatments)
+    ctr <- which(lower.tri(diag(nt)), arr.ind = TRUE)
+    trt_lev <- levels(network$treatments)
+    c_lev <- paste(trt_lev[ctr[, "row"]], trt_lev[ctr[, "col"]], sep = " vs. ")
+
     # Bind all together
     contrs_all <- dplyr::bind_rows(contrs_arm, contrs_contr) %>%
       dplyr::transmute(.data$.study, .data$.trt,
-                       .contr = forcats::fct_relevel(nfactor(.data$.contr), "..ref.."),
+                       .contr = forcats::fct_drop(factor(.data$.contr, levels = c("..ref..", c_lev))),
                        .data$.contr_sign)
 
     # Join contrast info on to study data
