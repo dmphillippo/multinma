@@ -1135,7 +1135,10 @@ prior_standat <- function(x, par, valid){
 #' @return A list of covariance matrices, of length equal to the number of studies
 #' @noRd
 make_Sigma <- function(x) {
-  return(by(x, x$.study, FUN = make_Sigma_block, simplify = FALSE))
+  return(by(x,
+            forcats::fct_drop(x$.study),
+            FUN = make_Sigma_block,
+            simplify = FALSE))
 }
 
 make_Sigma_block <- function(x) {
