@@ -41,7 +41,13 @@ print.stan_nma <- function(x, ...) {
   else type <- "NMA"
   cglue("A {x$trt_effects} effects {type} with a {x$likelihood} likelihood ({x$link} link).")
   if (x$consistency != "consistency") cglue("An inconsistency model ('{x$consistency}') was fitted.")
-  if (!is.null(x$regression)) cglue("Regression model: {rlang::as_label(x$regression)}.")
+  if (!is.null(x$regression)) {
+    cglue("Regression model: {rlang::as_label(x$regression)}.")
+    if (!is.null(x$xbar)) {
+      cglue("Centred covariates at the following overall mean values:")
+      print(x$xbar)
+    }
+  }
 
   sf <- as.stanfit(x)
   dots <- list(...)
