@@ -56,7 +56,9 @@ print.stan_nma <- function(x, ...) {
                            pars = c("log_lik", "resdev", "fitted",
                                     "theta_bar_cum", "theta2_bar_cum",
                                     "mu", "delta"),
-                           include = include, !!! dots,
+                           include = include,
+                           use_cache = FALSE,
+                           !!! dots,
                            .homonyms = "last")
   do.call(print, dots)
   invisible(x)
