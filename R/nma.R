@@ -1046,7 +1046,7 @@ check_likelihood <- function(x, outcome) {
   } else if (!is.character(x) || length(x) > 1 || !tolower(x) %in% valid_lhood) {
     abort(glue::glue("`likelihood` should be a character string specifying a valid likelihood.\n",
                      "Suitable options for {otype} outcomes are currently: ",
-                     glue::glue_collapse(dQuote(valid_lhood, FALSE), sep = ", ", last = " or "),
+                     glue::glue_collapse(glue::double_quote(valid_lhood), sep = ", ", last = " or "),
                      "."))
   }
   return(tolower(x))
@@ -1071,7 +1071,7 @@ check_link <- function(x, lik) {
   } else if (!is.character(x) || length(x) > 1 || !tolower(x) %in% valid_link) {
     abort(glue::glue("`link` should be a character string specifying a valid link function.\n",
                      "Suitable options for a {lik} likelihood are currently: ",
-                     glue::glue_collapse(dQuote(valid_link, FALSE), sep = ", ", last = " or "),
+                     glue::glue_collapse(glue::double_quote(valid_link), sep = ", ", last = " or "),
                      "."))
   }
   return(tolower(x))
