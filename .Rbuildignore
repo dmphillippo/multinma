@@ -1,2 +1,9 @@
 ^multinma\.Rproj$
 ^\.Rproj\.user$
+^inst/.*\.bib\.bak$
+^inst/.*\.bib\.sav$
+^README\.Rmd$
+^data-raw/.*$
+^man-roxygen/.*$
+^data-raw$
+^\.travis\.yml$
