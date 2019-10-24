@@ -116,6 +116,14 @@ test_that("warning if missing covariate values when calculating correlations fro
                  "Missing values.+complete cases")
 })
 
+test_that("replaces already present integration points with warning", {
+  smknet_int <- add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd))
+  m <- "Replacing integration points already present in network"
+
+  expect_warning(add_integration(smknet_int, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd)), m)
+  expect_warning(add_integration(smknet_int, x3 = distr(qnorm, mean = x3_mean, sd = x3_sd)), m)
+})
+
 make_sub <- function(x, n, sub) {
   x[sample.int(length(x), n)] <- sub
   return(x)

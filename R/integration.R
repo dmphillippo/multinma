@@ -130,10 +130,15 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
   x_int_names <- paste0(".int_", x_names)
 
   if (has_agd_arm(network)) {
+    # If integration points already present, remove and warn
+    aa_int_cols <- stringr::str_detect(colnames(network$agd_arm), "^\\.int_")
+    if (any(aa_int_cols))
+      warn("Replacing integration points already present in network.")
+
     # rlang::with_handlers(
     out$agd_arm <-
       dplyr::bind_cols(
-        network$agd_arm,
+        network$agd_arm[, !aa_int_cols],
         purrr::pmap_dfc(list(x_int_names, ds, u_cor_l),
                         ~ rowwise(network$agd_arm) %>%
                           transmute(!! ..1 := list(rlang::eval_tidy(rlang::call2(..2$qfun, p = ..3, !!! ..2$args)))))
@@ -162,10 +167,15 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
   }
 
   if (has_agd_contrast(network)) {
+    # If integration points already present, remove and warn
+    ac_int_cols <- stringr::str_detect(colnames(network$agd_contrast), "^\\.int_")
+    if (any(ac_int_cols))
+      warn("Replacing integration points already present in network.")
+
     # rlang::with_handlers(
     out$agd_contrast <-
       dplyr::bind_cols(
-        network$agd_contrast,
+        network$agd_contrast[, !ac_int_cols],
         purrr::pmap_dfc(list(x_int_names, ds, u_cor_l),
                         ~ rowwise(network$agd_contrast) %>%
                           transmute(!! ..1 := list(rlang::eval_tidy(rlang::call2(..2$qfun, p = ..3, !!! ..2$args)))))
