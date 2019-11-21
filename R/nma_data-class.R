@@ -192,3 +192,97 @@ cglue <- function(..., sep = "\n") {
 subtle <- function(...) crayon::silver(...)
 emph_r <- function(...) crayon::red$bold(...)
 emph_g <- function(...) crayon::green$bold(...)
+
+#' Convert networks to graph objects
+#'
+#' The method `as.igraph()` converts `nma_data` objects into the form used by
+#' the [igraph] package. The method `as_tbl_graph()` converts `nma_data` objects
+#' into the form used by the [ggraph] and [tidygraph] packages.
+#'
+#' @param x An [nma_data] object to convert
+#' @param ... Additional arguments
+#'
+#' @return
+#' @export
+#'
+#' @rdname graph_conversion
+#'
+#' @importFrom igraph as.igraph
+#'
+#' @examples
+as.igraph.nma_data <- function(x, ...) {
+
+  if (has_ipd(x)) {
+    e_ipd <- x$ipd %>%
+      dplyr::distinct(.data$.study, .data$.trt) %>%
+      dplyr::group_by(.data$.study) %>%
+      dplyr::group_modify(~make_contrasts(.x$.trt)) %>%
+      dplyr::group_by(.data$.trt, .data$.trt_b) %>%
+      dplyr::summarise(nstudy_ipd = dplyr::n())
+
+    v_ipd <- x$ipd %>% dplyr::distinct(.data$.trt)
+  } else {
+    e_ipd <- tibble::tibble(.trt = factor(levels = levels(x$treatments)),
+                            .trt_b = factor(levels = levels(x$treatments)),
+                            nstudy_ipd = integer())
+    v_ipd <- tibble::tibble()
+  }
+
+  if (has_agd_arm(x)) {
+    e_agd_arm <- x$agd_arm %>%
+      dplyr::group_by(.data$.study) %>%
+      dplyr::group_modify(~make_contrasts(.x$.trt)) %>%
+      dplyr::group_by(.data$.trt, .data$.trt_b) %>%
+      dplyr::summarise(nstudy_agd_arm = dplyr::n())
+
+    v_agd_arm <- x$agd_arm %>% dplyr::distinct(.data$.trt)
+  } else {
+    e_agd_arm <- tibble::tibble(.trt = factor(levels = levels(x$treatments)),
+                                              .trt_b = factor(levels = levels(x$treatments)),
+                                              nstudy_agd_arm = integer())
+    v_agd_arm <- tibble::tibble()
+  }
+
+  if (has_agd_contrast(x)) {
+    e_agd_contrast <- x$agd_contrast %>%
+      dplyr::group_by(.data$.study) %>%
+      dplyr::group_modify(~make_contrasts(.x$.trt)) %>%
+      dplyr::group_by(.data$.trt, .data$.trt_b) %>%
+      dplyr::summarise(nstudy_agd_contrast = dplyr::n())
+
+    v_agd_contrast <- x$agd_contrast %>% dplyr::distinct(.data$.trt)
+  } else {
+    e_agd_contrast <- tibble::tibble(.trt = factor(levels = levels(x$treatments)),
+                                     .trt_b = factor(levels = levels(x$treatments)),
+                                     nstudy_agd_contrast = integer())
+    v_agd_contrast <- tibble::tibble()
+  }
+
+  e_all <- dplyr::full_join(e_ipd, e_agd_arm, by = c(".trt", ".trt_b")) %>%
+    dplyr::full_join(e_agd_contrast, by = c(".trt", ".trt_b")) %>%
+    dplyr::rename(from = .data$.trt_b, to = .data$.trt) %>%
+    dplyr::mutate(nstudy_ipd = dplyr::if_else(is.na(.data$nstudy_ipd), 0L, .data$nstudy_ipd),
+                  nstudy_agd_arm = dplyr::if_else(is.na(.data$nstudy_agd_arm), 0L, .data$nstudy_agd_arm),
+                  nstudy_agd_contrast = dplyr::if_else(is.na(.data$nstudy_agd_contrast), 0L, .data$nstudy_agd_contrast),
+                  nstudy = sum(.data$nstudy_ipd,
+                               .data$nstudy_agd_arm,
+                               .data$nstudy_agd_contrast))
+
+  v_all <- dplyr::bind_rows(v_ipd, v_agd_arm, v_agd_contrast) %>%
+    dplyr::distinct(.data$.trt)
+
+  g <- igraph::graph_from_data_frame(e_all, directed = FALSE, vertices = v_all)
+  return(g)
+}
+
+#' Make treatment contrasts
+#'
+#' @param trt Vector of treatment codes
+#'
+#' @return
+#' @noRd
+make_contrasts <- function(trt) {
+  contrs <- utils::combn(trt, 2)
+  return(dplyr::tibble(.trt = contrs[2,],
+                       .trt_b = contrs[1,]))
+}
