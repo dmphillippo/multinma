@@ -38,7 +38,8 @@ Imports:
     tidyr (>= 0.8.3),
     stringr,
     logitnorm,
-    Matrix
+    Matrix,
+    igraph
 LinkingTo: 
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),
