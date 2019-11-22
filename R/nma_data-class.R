@@ -285,7 +285,7 @@ as.igraph.nma_data <- function(x, ...) {
 #'
 #' @examples
 as_tbl_graph.nma_data <- function(x, ...) {
-  return(igraph::as.igraph(x, ...))
+  return(tidygraph::as_tbl_graph(igraph::as.igraph(x, ...)))
 }
 
 #' Make treatment contrasts
