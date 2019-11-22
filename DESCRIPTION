@@ -41,7 +41,8 @@ Imports:
     Matrix,
     igraph,
     tidygraph,
-    ggraph
+    ggraph,
+    ggplot2
 LinkingTo: 
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),
