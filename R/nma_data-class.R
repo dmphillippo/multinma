@@ -273,3 +273,48 @@ make_contrasts <- function(trt) {
   return(dplyr::tibble(.trt = contrs[2,],
                        .trt_b = contrs[1,]))
 }
+
+
+#' Network plots
+#'
+#' Create a network plot from a `nma_data` network object.
+#'
+#' @param x A [nma_data] object to plot
+#' @param ... Additional arguments passed to [ggraph()] and on to the layout
+#'   function
+#' @param layout The type of layout to create. Any layout accepted by [ggraph()]
+#'   may be used, including all of the layout functions provided by [igraph].
+#' @param circular Whether to use a circular representation. See [ggraph()].
+#'
+#' @details The default is equivalent to `layout = "linear"` and `circular =
+#'   TRUE`, which places the treatment nodes on a circle in the order defined by
+#'   the treatment factor variable. An alternative layout which may give good
+#'   results for simple networks is `"sugiyama"`, which attempts to minimise the
+#'   number of edge crossings.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+plot.nma_data <- function(x, ..., layout, circular) {
+  if (missing(layout) && missing(circular)) {
+    layout <- "linear"
+    circular <- TRUE
+  } else if (missing(layout)) {
+    layout <- "linear"
+  } else if (missing(circular)) {
+    circular <- FALSE
+  }
+  dat_mixed <- has_ipd(x) && (has_agd_arm(x) || has_agd_contrast(x))
+  g <-
+    ggraph::ggraph(x, layout = layout, circular = circular, ...) +
+    ggraph::geom_edge_fan(ggplot2::aes(edge_width = .data$nstudy,
+                                       edge_colour = .data$type), lineend = "round") +
+    ggraph::geom_node_label(ggplot2::aes(label = .data$name), fill = "grey90") +
+    ggraph::scale_edge_colour_manual("Data", values = c(AgD = "#113259", IPD = "#55A480"),
+                                     guide = if (dat_mixed) "legend" else FALSE) +
+    ggraph::scale_edge_width_continuous("Number of studies") +
+    ggraph::theme_graph(base_family = "") +
+    ggplot2::coord_cartesian(clip = "off")
+  return(g)
+}
