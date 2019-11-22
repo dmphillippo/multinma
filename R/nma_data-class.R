@@ -269,7 +269,8 @@ as.igraph.nma_data <- function(x, ...) {
                                .data$nstudy_agd_contrast))
 
   v_all <- dplyr::bind_rows(v_ipd, v_agd_arm, v_agd_contrast) %>%
-    dplyr::distinct(.data$.trt)
+    dplyr::distinct(.data$.trt) %>%
+    dplyr::arrange(.data$.trt)
 
   g <- igraph::graph_from_data_frame(e_all, directed = FALSE, vertices = v_all)
   return(g)
