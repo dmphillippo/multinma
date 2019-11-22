@@ -285,6 +285,7 @@ make_contrasts <- function(trt) {
 #' @param layout The type of layout to create. Any layout accepted by [ggraph()]
 #'   may be used, including all of the layout functions provided by [igraph].
 #' @param circular Whether to use a circular representation. See [ggraph()].
+#' @param weight_edges Weight edges by the number of studies? Default is `TRUE`.
 #'
 #' @details The default is equivalent to `layout = "linear"` and `circular =
 #'   TRUE`, which places the treatment nodes on a circle in the order defined by
@@ -296,7 +297,7 @@ make_contrasts <- function(trt) {
 #' @export
 #'
 #' @examples
-plot.nma_data <- function(x, ..., layout, circular) {
+plot.nma_data <- function(x, ..., layout, circular, weight_edges = TRUE) {
   if (missing(layout) && missing(circular)) {
     layout <- "linear"
     circular <- TRUE
@@ -305,15 +306,26 @@ plot.nma_data <- function(x, ..., layout, circular) {
   } else if (missing(circular)) {
     circular <- FALSE
   }
+
+  if (!is.logical(weight_edges) || length(weight_edges) > 1)
+    abort("`weight_edges` must be TRUE or FALSE.")
+
   dat_mixed <- has_ipd(x) && (has_agd_arm(x) || has_agd_contrast(x))
   g <-
     ggraph::ggraph(x, layout = layout, circular = circular, ...) +
-    ggraph::geom_edge_fan(ggplot2::aes(edge_width = .data$nstudy,
-                                       edge_colour = .data$type), lineend = "round") +
+    {if (weight_edges) {
+      ggraph::geom_edge_fan(ggplot2::aes(edge_width = .data$nstudy,
+                                         edge_colour = .data$type),
+                            lineend = "round")
+    } else {
+      ggraph::geom_edge_fan(ggplot2::aes(edge_colour = .data$type),
+                            edge_width = 1,
+                            lineend = "round")
+    }} +
     ggraph::geom_node_label(ggplot2::aes(label = .data$name), fill = "grey90") +
     ggraph::scale_edge_colour_manual("Data", values = c(AgD = "#113259", IPD = "#55A480"),
                                      guide = if (dat_mixed) "legend" else FALSE) +
-    ggraph::scale_edge_width_continuous("Number of studies") +
+    {if (weight_edges) ggraph::scale_edge_width_continuous("Number of studies")} +
     ggraph::theme_graph(base_family = "") +
     ggplot2::coord_cartesian(clip = "off")
   return(g)
