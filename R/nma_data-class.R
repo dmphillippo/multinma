@@ -218,57 +218,31 @@ as.igraph.nma_data <- function(x, ...) {
       dplyr::group_by(.data$.study) %>%
       dplyr::group_modify(~make_contrasts(.x$.trt)) %>%
       dplyr::group_by(.data$.trt, .data$.trt_b) %>%
-      dplyr::summarise(nstudy_ipd = dplyr::n())
+      dplyr::summarise(nstudy = dplyr::n(), type = "IPD")
 
     v_ipd <- x$ipd %>% dplyr::distinct(.data$.trt)
   } else {
-    e_ipd <- tibble::tibble(.trt = factor(levels = levels(x$treatments)),
-                            .trt_b = factor(levels = levels(x$treatments)),
-                            nstudy_ipd = integer())
-    v_ipd <- tibble::tibble()
+    e_ipd <- v_ipd <- tibble::tibble()
   }
 
-  if (has_agd_arm(x)) {
-    e_agd_arm <- x$agd_arm %>%
+  if (has_agd_arm(x) || has_agd_contrast(x)) {
+    agd_all <- dplyr::bind_rows(x$agd_arm, x$agd_contrast)
+    e_agd <- agd_all %>%
       dplyr::group_by(.data$.study) %>%
       dplyr::group_modify(~make_contrasts(.x$.trt)) %>%
       dplyr::group_by(.data$.trt, .data$.trt_b) %>%
-      dplyr::summarise(nstudy_agd_arm = dplyr::n())
+      dplyr::summarise(nstudy = dplyr::n(), type = "AgD")
 
-    v_agd_arm <- x$agd_arm %>% dplyr::distinct(.data$.trt)
+    v_agd <- agd_all %>% dplyr::distinct(.data$.trt)
   } else {
-    e_agd_arm <- tibble::tibble(.trt = factor(levels = levels(x$treatments)),
-                                              .trt_b = factor(levels = levels(x$treatments)),
-                                              nstudy_agd_arm = integer())
-    v_agd_arm <- tibble::tibble()
+    e_agd <- v_agd <- tibble::tibble()
   }
 
-  if (has_agd_contrast(x)) {
-    e_agd_contrast <- x$agd_contrast %>%
-      dplyr::group_by(.data$.study) %>%
-      dplyr::group_modify(~make_contrasts(.x$.trt)) %>%
-      dplyr::group_by(.data$.trt, .data$.trt_b) %>%
-      dplyr::summarise(nstudy_agd_contrast = dplyr::n())
-
-    v_agd_contrast <- x$agd_contrast %>% dplyr::distinct(.data$.trt)
-  } else {
-    e_agd_contrast <- tibble::tibble(.trt = factor(levels = levels(x$treatments)),
-                                     .trt_b = factor(levels = levels(x$treatments)),
-                                     nstudy_agd_contrast = integer())
-    v_agd_contrast <- tibble::tibble()
-  }
-
-  e_all <- dplyr::full_join(e_ipd, e_agd_arm, by = c(".trt", ".trt_b")) %>%
-    dplyr::full_join(e_agd_contrast, by = c(".trt", ".trt_b")) %>%
+  e_all <- dplyr::bind_rows(e_ipd, e_agd) %>%
     dplyr::rename(from = .data$.trt_b, to = .data$.trt) %>%
-    dplyr::mutate(nstudy_ipd = dplyr::if_else(is.na(.data$nstudy_ipd), 0L, .data$nstudy_ipd),
-                  nstudy_agd_arm = dplyr::if_else(is.na(.data$nstudy_agd_arm), 0L, .data$nstudy_agd_arm),
-                  nstudy_agd_contrast = dplyr::if_else(is.na(.data$nstudy_agd_contrast), 0L, .data$nstudy_agd_contrast),
-                  nstudy = sum(.data$nstudy_ipd,
-                               .data$nstudy_agd_arm,
-                               .data$nstudy_agd_contrast))
+    dplyr::mutate(nstudy = dplyr::if_else(is.na(.data$nstudy), 0L, .data$nstudy))
 
-  v_all <- dplyr::bind_rows(v_ipd, v_agd_arm, v_agd_contrast) %>%
+  v_all <- dplyr::bind_rows(v_ipd, v_agd) %>%
     dplyr::distinct(.data$.trt) %>%
     dplyr::arrange(.data$.trt)
 
