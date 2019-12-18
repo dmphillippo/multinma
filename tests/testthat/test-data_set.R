@@ -64,6 +64,8 @@ agd_arm <- tibble(
   disc_p1 = disc + 1,
   disc_m1 = disc - 1,
   disc_neg = -disc,
+  disc_inf = c(disc[1:4], Inf),
+  disc_nan = c(disc[1:4], NaN),
   bin = rbinom(5, 1, 0.5)
   #Surv =
 )
@@ -100,6 +102,19 @@ test_that("set_agd_arm - count outcome checks work", {
   expect_equivalent(
     set_agd_arm(agd_arm, "studyn", "trtc", r = disc, E = cont_pos)$agd_arm[, c(".r", ".E")],
     transmute(agd_arm, .r = disc, .E = cont_pos))
+})
+
+test_that("set_agd_arm - sample size checks work", {
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = trtc),
+               "must be numeric")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = cont),
+               "must be integer")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = disc_neg),
+               "must be greater than zero")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = disc_inf),
+               "cannot be infinite")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = disc_nan),
+               "cannot be NaN")
 })
 
 test_that("set_ipd - continuous outcome checks work", {
@@ -145,6 +160,19 @@ test_that("set_agd_contrast - continuous outcome checks work", {
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = sediff_miss), "Standard error.+missing values on baseline arms")
   expect_equivalent(    set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = sediff)$agd_contrast[, c(".y", ".se")],
     transmute(agd_contrast, .y = ydiff, .se = sediff))
+})
+
+test_that("set_agd_contrast - sample size checks work", {
+  expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = trtc),
+               "must be numeric")
+  expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = cont),
+               "must be integer")
+  expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = disc_neg),
+               "must be greater than zero")
+  expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = disc_inf),
+               "cannot be infinite")
+  expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = disc_nan),
+               "cannot be NaN")
 })
 
 test_that("set_* - take one and only one outcome", {

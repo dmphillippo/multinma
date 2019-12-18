@@ -104,9 +104,22 @@ set_ipd <- function(data,
 #' @template args-data_rE
 # #' @template args-data_Surv
 #' @param n column of `data` specifying Binomial outcome numerator
+#' @param sample_size column of `data` giving the sample size in each arm.
+#'   Optional, see details.
 #'
 #' @return An object of class [nma_data]
 #' @export
+#'
+#' @details The `sample_size` argument is optional, but when specified:
+#'
+#'   * Enables centering of predictors (`center = TRUE`) in [nma()] when
+#'     a regression model is given
+#'   * Enables production of study-specific relative effects, rank probabilities,
+#'     etc. for studies in the network when a regression model is given
+#'   * Edges and nodes in [plot.nma_data()] may be weighted by sample size
+#'
+#' If a Binomial outcome is specified and `sample_size` is omitted, `n` will be
+#' used as the sample size by default.
 #'
 #' @seealso [set_ipd()] for individual patient data, [set_agd_contrast()] for
 #'   contrast-based aggregate data, and [combine_network()] for combining
@@ -118,6 +131,7 @@ set_agd_arm <- function(data,
                         y = NULL, se = NULL,
                         r = NULL, n = NULL, E = NULL,
                         # Surv = NULL,
+                        sample_size = NULL,
                         trt_ref = NULL) {
 
   # Check data is data frame
@@ -185,6 +199,14 @@ set_agd_arm <- function(data,
     d <- tibble::add_column(d, .r = .r, .E = .E)
   }
 
+  # Pull and check sample size
+  .sample_size <- pull_non_null(data, enquo(sample_size))
+  if (!is.null(.sample_size)) check_sample_size(.sample_size)
+  else if (o_type == "count") .sample_size <- .n
+
+  if (!is.null(.sample_size)) d <- tibble::add_column(d, .sample_size = .sample_size)
+
+  # Bind in original data
   d <- dplyr::bind_cols(d, data)
 
   # Produce nma_data object
@@ -204,6 +226,8 @@ set_agd_arm <- function(data,
 #'
 #' @template args-data_common
 #' @template args-data_se
+#' @param sample_size column of `data` giving the sample size in each arm.
+#'   Optional, see details.
 #'
 #' @details Each study should have a single reference/baseline treatment,
 #'   against which relatve effects in the other arm(s) are given. For the
@@ -213,6 +237,14 @@ set_agd_arm <- function(data,
 #'   standard error of the mean outcome on the reference arm (this determines
 #'   the covariance of the relative effects, when expressed as differences in
 #'   mean outcomes between arms).
+#'
+#'   The `sample_size` argument is optional, but when specified:
+#'
+#'   * Enables centering of predictors (`center = TRUE`) in [nma()] when
+#'     a regression model is given
+#'   * Enables production of study-specific relative effects, rank probabilities,
+#'     etc. for studies in the network when a regression model is given
+#'   * Edges and nodes in [plot.nma_data()] may be weighted by sample size
 #'
 #' @return An object of class [nma_data]
 #' @export
@@ -225,6 +257,7 @@ set_agd_contrast <- function(data,
                              study,
                              trt,
                              y = NULL, se = NULL,
+                             sample_size = NULL,
                              trt_ref = NULL) {
 
   # Check data is data frame
@@ -295,6 +328,14 @@ set_agd_contrast <- function(data,
     .y = .y,
     .se = .se)
 
+  # Pull and check sample size
+  .sample_size <- pull_non_null(data, enquo(sample_size))
+  if (!is.null(.sample_size)) {
+    check_sample_size(.sample_size)
+    d <- tibble::add_column(d, .sample_size = .sample_size)
+  }
+
+  # Bind in original data
   d <- dplyr::bind_cols(d, data)
 
   if (!is.null(trt_ref)) {
@@ -595,6 +636,26 @@ check_outcome_combination <- function(outcomes) {
                      " outcomes is not supported."))
   }
 }
+
+#' Check sample size
+#'
+#' @param sample_size vector
+#'
+#' @noRd
+check_sample_size <- function(sample_size) {
+    if (!is.numeric(sample_size))
+      abort("Sample size `sample_size` must be numeric")
+    if (any(is.nan(sample_size)))
+      abort("Sample size `sample_size` cannot be NaN")
+    if (any(is.na(sample_size)))
+      abort("Sample size `sample_size` contains missing values")
+    if (any(sample_size != trunc(sample_size)))
+      abort("Sample size `sample_size` must be integer-valued")
+    if (any(sample_size <= 0))
+      abort("Sample size `sample_size` must be greater than zero")
+    if (any(is.infinite(sample_size)))
+      abort("Sample size `sample_size` cannot be infinite")
+  }
 
 #' Check for IPD and AgD in network
 #'
