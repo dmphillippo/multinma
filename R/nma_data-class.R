@@ -219,9 +219,11 @@ as.igraph.nma_data <- function(x, ...) {
       dplyr::group_by(.data$.study) %>%
       dplyr::group_modify(~make_contrasts(.x$.trt)) %>%
       dplyr::group_by(.data$.trt, .data$.trt_b) %>%
-      dplyr::summarise(nstudy = dplyr::n(), type = "IPD")
+      dplyr::summarise(.nstudy = dplyr::n(), .type = "IPD")
 
-    v_ipd <- x$ipd %>% dplyr::distinct(.data$.trt)
+    v_ipd <- x$ipd %>%
+      dplyr::group_by(.data$.trt) %>%
+      dplyr::summarise(.sample_size = dplyr::n())
   } else {
     e_ipd <- v_ipd <- tibble::tibble()
   }
@@ -232,20 +234,33 @@ as.igraph.nma_data <- function(x, ...) {
       dplyr::group_by(.data$.study) %>%
       dplyr::group_modify(~make_contrasts(.x$.trt)) %>%
       dplyr::group_by(.data$.trt, .data$.trt_b) %>%
-      dplyr::summarise(nstudy = dplyr::n(), type = "AgD")
+      dplyr::summarise(.nstudy = dplyr::n(), .type = "AgD")
 
-    v_agd <- agd_all %>% dplyr::distinct(.data$.trt)
+    if (has_agd_sample_size(x)) {
+      v_agd <- agd_all %>%
+        dplyr::group_by(.data$.trt) %>%
+        dplyr::summarise(.sample_size = sum(.data$.sample_size))
+    } else {
+      v_agd <- agd_all %>% dplyr::distinct(.data$.trt)
+    }
   } else {
     e_agd <- v_agd <- tibble::tibble()
   }
 
   e_all <- dplyr::bind_rows(e_ipd, e_agd) %>%
     dplyr::rename(from = .data$.trt_b, to = .data$.trt) %>%
-    dplyr::mutate(nstudy = dplyr::if_else(is.na(.data$nstudy), 0L, .data$nstudy))
+    dplyr::mutate(.nstudy = dplyr::if_else(is.na(.data$.nstudy), 0L, .data$.nstudy))
 
-  v_all <- dplyr::bind_rows(v_ipd, v_agd) %>%
-    dplyr::distinct(.data$.trt) %>%
-    dplyr::arrange(.data$.trt)
+  if (has_agd_sample_size(x)) {
+    v_all <- dplyr::bind_rows(v_ipd, v_agd) %>%
+      dplyr::group_by(.data$.trt) %>%
+      dplyr::summarise(.sample_size = sum(.data$.sample_size, na.rm = TRUE)) %>%
+      dplyr::arrange(.data$.trt)
+  } else {
+    v_all <- dplyr::bind_rows(v_ipd, v_agd) %>%
+      dplyr::distinct(.data$.trt) %>%
+      dplyr::arrange(.data$.trt)
+  }
 
   g <- igraph::graph_from_data_frame(e_all, directed = FALSE, vertices = v_all)
   return(g)
@@ -315,11 +330,11 @@ plot.nma_data <- function(x, ..., layout, circular, weight_edges = TRUE) {
   g <-
     ggraph::ggraph(x, layout = layout, circular = circular, ...) +
     {if (weight_edges) {
-      ggraph::geom_edge_fan(ggplot2::aes(edge_width = .data$nstudy,
-                                         edge_colour = .data$type),
+      ggraph::geom_edge_fan(ggplot2::aes(edge_width = .data$.nstudy,
+                                         edge_colour = .data$.type),
                             lineend = "round")
     } else {
-      ggraph::geom_edge_fan(ggplot2::aes(edge_colour = .data$type),
+      ggraph::geom_edge_fan(ggplot2::aes(edge_colour = .data$.type),
                             edge_width = 1,
                             lineend = "round")
     }} +
