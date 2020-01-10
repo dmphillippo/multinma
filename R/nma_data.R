@@ -116,7 +116,7 @@ set_ipd <- function(data,
 #'     a regression model is given
 #'   * Enables production of study-specific relative effects, rank probabilities,
 #'     etc. for studies in the network when a regression model is given
-#'   * Edges and nodes in [plot.nma_data()] may be weighted by sample size
+#'   * Nodes in [plot.nma_data()] may be weighted by sample size
 #'
 #' If a Binomial outcome is specified and `sample_size` is omitted, `n` will be
 #' used as the sample size by default.
@@ -245,7 +245,7 @@ set_agd_arm <- function(data,
 #'     a regression model is given
 #'   * Enables production of study-specific relative effects, rank probabilities,
 #'     etc. for studies in the network when a regression model is given
-#'   * Edges and nodes in [plot.nma_data()] may be weighted by sample size
+#'   * Nodes in [plot.nma_data()] may be weighted by sample size
 #'
 #' @return An object of class [nma_data]
 #' @export

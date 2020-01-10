@@ -7,7 +7,7 @@
     a regression model is given, replacing the `agd_sample_size` argument of `nma()`
   - Enables production of study-specific relative effects, rank probabilities,
     etc. for studies in the network when a regression model is given
-  - Allows edges and nodes in network plots to be weighted by sample size
+  - Allows nodes in network plots to be weighted by sample size
 
 # multinma 0.0.1
 
