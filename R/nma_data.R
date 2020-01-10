@@ -681,6 +681,19 @@ has_agd_contrast <- function(network) {
   return(!rlang::is_empty(network$agd_contrast))
 }
 
+#' Check whether AgD sample size columns are available
+#'
+#' @param network nma_data object
+#'
+#' @return logical TRUE/FALSE
+#' @noRd
+has_agd_sample_size <- function(network) {
+  if (!inherits(network, "nma_data")) abort("Not nma_data object.")
+  ss_a <- !has_agd_arm(network) || tibble::has_name(network$agd_arm, ".sample_size")
+  ss_c <- !has_agd_contrast(network) || tibble::has_name(network$agd_contrast, ".sample_size")
+  return(ss_a && ss_c)
+}
+
 #' Natural-order factors
 #'
 #' Produces factors with levels in natural sort order (i.e. 1 5 10 not 1 10 5)
