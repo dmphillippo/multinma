@@ -302,6 +302,7 @@ make_contrasts <- function(trt) {
 #'   may be used, including all of the layout functions provided by [igraph].
 #' @param circular Whether to use a circular representation. See [ggraph()].
 #' @param weight_edges Weight edges by the number of studies? Default is `TRUE`.
+#' @param weight_nodes Weight nodes by the total sample size? Default is `FALSE`.
 #'
 #' @details The default is equivalent to `layout = "linear"` and `circular =
 #'   TRUE`, which places the treatment nodes on a circle in the order defined by
@@ -309,11 +310,16 @@ make_contrasts <- function(trt) {
 #'   results for simple networks is `"sugiyama"`, which attempts to minimise the
 #'   number of edge crossings.
 #'
+#'   `weight_nodes = TRUE` requires that sample sizes have been specified for
+#'   any aggregate data in the network, using the `sample_size` option of
+#'   `set_agd_*()`.
+#'
 #' @return
 #' @export
 #'
 #' @examples
-plot.nma_data <- function(x, ..., layout, circular, weight_edges = TRUE) {
+plot.nma_data <- function(x, ..., layout, circular,
+                          weight_edges = TRUE, weight_nodes = FALSE) {
   if (missing(layout) && missing(circular)) {
     layout <- "linear"
     circular <- TRUE
@@ -327,22 +333,36 @@ plot.nma_data <- function(x, ..., layout, circular, weight_edges = TRUE) {
     abort("`weight_edges` must be TRUE or FALSE.")
 
   dat_mixed <- has_ipd(x) && (has_agd_arm(x) || has_agd_contrast(x))
-  g <-
-    ggraph::ggraph(x, layout = layout, circular = circular, ...) +
-    {if (weight_edges) {
+  g <- ggraph::ggraph(x, layout = layout, circular = circular, ...)
+
+  if (weight_edges) {
+    g <- g +
       ggraph::geom_edge_fan(ggplot2::aes(edge_width = .data$.nstudy,
-                                         edge_colour = .data$.type),
-                            lineend = "round")
-    } else {
+                                       edge_colour = .data$.type),
+                            lineend = "round") +
+      ggraph::scale_edge_width_continuous("Number of studies")
+  } else {
+    g <- g +
       ggraph::geom_edge_fan(ggplot2::aes(edge_colour = .data$.type),
                             edge_width = 1,
                             lineend = "round")
-    }} +
-    ggraph::geom_node_label(ggplot2::aes(label = .data$name), fill = "grey90") +
+  }
+
+  if (weight_nodes) {
+    g <- g +
+      ggraph::geom_node_point(ggplot2::aes(size = .data$.sample_size),
+                              shape = 21, fill = "grey90") +
+      ggraph::geom_node_text(ggplot2::aes(label = .data$name)) +
+      ggplot2::scale_size_area("Total sample size", max_size = 12)
+  } else {
+    g <- g +
+      ggraph::geom_node_label(ggplot2::aes(label = .data$name), fill = "grey90")
+  }
+
+  g <- g +
     ggraph::scale_edge_colour_manual("Data", values = c(AgD = "#113259", IPD = "#55A480"),
                                      guide = if (dat_mixed) "legend" else FALSE) +
-    {if (weight_edges) ggraph::scale_edge_width_continuous("Number of studies")} +
     ggraph::theme_graph(base_family = "") +
-    ggplot2::coord_cartesian(clip = "off")
+    ggplot2::coord_fixed(clip = "off")
   return(g)
 }
