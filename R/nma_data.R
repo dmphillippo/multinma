@@ -203,7 +203,7 @@ set_agd_arm <- function(data,
   .sample_size <- pull_non_null(data, enquo(sample_size))
   if (!is.null(.sample_size)) check_sample_size(.sample_size)
   else if (o_type == "count") .sample_size <- .n
-  else inform("NOTE: Optional argument `sample_size` not provided, some features may not be available (see ?set_agd_arm).")
+  else inform("Note: Optional argument `sample_size` not provided, some features may not be available (see ?set_agd_arm).")
 
   if (!is.null(.sample_size)) d <- tibble::add_column(d, .sample_size = .sample_size)
 
@@ -335,7 +335,7 @@ set_agd_contrast <- function(data,
     check_sample_size(.sample_size)
     d <- tibble::add_column(d, .sample_size = .sample_size)
   } else {
-    inform("NOTE: Optional argument `sample_size` not provided, some features may not be available (see ?set_agd_contrast).")
+    inform("Note: Optional argument `sample_size` not provided, some features may not be available (see ?set_agd_contrast).")
   }
 
   # Bind in original data
