@@ -115,6 +115,8 @@ test_that("set_agd_arm - sample size checks work", {
                "cannot be infinite")
   expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = disc_nan),
                "cannot be NaN")
+  expect_message(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos), "`sample_size` not provided")
+  expect_equal(set_agd_arm(agd_arm, studyn, trtc, r = disc, n = disc_p1)$agd_arm$.sample_size, agd_arm$disc_p1)
 })
 
 test_that("set_ipd - continuous outcome checks work", {
@@ -173,6 +175,7 @@ test_that("set_agd_contrast - sample size checks work", {
                "cannot be infinite")
   expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = disc_nan),
                "cannot be NaN")
+  expect_message(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff), "`sample_size` not provided")
 })
 
 test_that("set_* - take one and only one outcome", {
