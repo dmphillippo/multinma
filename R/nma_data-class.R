@@ -351,7 +351,7 @@ plot.nma_data <- function(x, ..., layout, circular,
   if (weight_nodes) {
     g <- g +
       ggraph::geom_node_point(ggplot2::aes(size = .data$.sample_size),
-                              shape = 21, fill = "grey90") +
+                              shape = 21, fill = "grey90", colour = "grey60") +
       ggraph::geom_node_text(ggplot2::aes(label = .data$name),
                              hjust = "outward", vjust = "outward") +
       ggplot2::scale_size_area("Total sample size", max_size = 12)
