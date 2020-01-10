@@ -29,8 +29,6 @@
 #'   decomposition to the model design matrix
 #' @param center Logical scalar (default `TRUE`), whether to center the
 #'   (numeric) regression terms about the overall means
-#' @param agd_sample_size Column name (either bare or a string) in the AgD
-#'   giving the sample size to use for calculating the global means
 #' @param adapt_delta See [adapt_delta] for details
 #' @param int_thin A single integer value, the thinning factor for returning
 #'   cumulative estimates of integration error
@@ -54,7 +52,6 @@ nma <- function(network,
                 prior_aux = normal(scale = 5),
                 QR = FALSE,
                 center = TRUE,
-                agd_sample_size,
                 adapt_delta = NULL,
                 int_thin = 100L) {
 
@@ -330,17 +327,18 @@ nma <- function(network,
 
   # Get sample sizes for centering
   if (!is.null(regression) && center) {
-    if ((has_agd_arm(network) || has_agd_contrast(network)) && missing(agd_sample_size))
-      abort("Specify AgD sample size column in data `agd_sample_size` to calculate global mean for centering, or set center = FALSE.")
+    if ((has_agd_arm(network) || has_agd_contrast(network)) && !has_agd_sample_size(network))
+      abort(paste("AgD study sample sizes not specified in network, cannot calculate centering values.",
+                  "Specify `sample_size` in set_agd_*(), or set center = FALSE.", sep = "\n"))
 
     if (has_agd_arm(network)) {
-      N_agd_arm <- dplyr::pull(network$agd_arm, {{ agd_sample_size }})
+      N_agd_arm <- network$agd_arm[[".sample_size"]]
     } else {
       N_agd_arm <- NULL
     }
 
     if (has_agd_contrast(network)) {
-      N_agd_contrast <- dplyr::pull(network$agd_contrast, {{ agd_sample_size }})
+      N_agd_contrast <- network$agd_contrast[[".sample_size"]]
     } else {
       N_agd_contrast <- NULL
     }
