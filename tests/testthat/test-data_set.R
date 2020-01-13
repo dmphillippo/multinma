@@ -7,6 +7,7 @@ test_that("set_* produces empty nma_data objects", {
          agd_contrast = NULL,
          ipd = NULL,
          treatments = NULL,
+         classes = NULL,
          studies = NULL), class = "nma_data")
 
   expect_equal(set_ipd(smoking[0, ], "studyn", "trtc"), empty_nma_data)
