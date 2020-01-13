@@ -332,6 +332,13 @@ plot.nma_data <- function(x, ..., layout, circular,
   if (!is.logical(weight_edges) || length(weight_edges) > 1)
     abort("`weight_edges` must be TRUE or FALSE.")
 
+  if (!is.logical(weight_nodes) || length(weight_nodes) > 1)
+    abort("`weight_nodes` must be TRUE or FALSE.")
+
+  if (weight_nodes && !has_agd_sample_size(x))
+    abort(paste("AgD study sample sizes not specified in network, cannot weight nodes.",
+                "Specify `sample_size` in set_agd_*(), or set weight_nodes = FALSE.", sep = "\n"))
+
   dat_mixed <- has_ipd(x) && (has_agd_arm(x) || has_agd_contrast(x))
   g <- ggraph::ggraph(x, layout = layout, circular = circular, ...)
 
