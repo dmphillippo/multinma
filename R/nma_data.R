@@ -658,7 +658,22 @@ check_sample_size <- function(sample_size) {
       abort("Sample size `sample_size` must be greater than zero")
     if (any(is.infinite(sample_size)))
       abort("Sample size `sample_size` cannot be infinite")
-  }
+}
+
+#' Check treatment class coding
+#'
+#' @param trt_class Class vector
+#' @param trt Treatment vector
+#'
+#' @noRd
+check_trt_class <- function(trt_class, trt) {
+  if (any(is.na(trt)))
+    abort("`trt` cannot contain missing values")
+  if (any(is.na(trt_class)))
+    abort("`trt_class` cannot contain missing values")
+  if (anyDuplicated(unique(cbind(trt, trt_class))[, "trt"]))
+    abort("Treatment present in more than one class (check `trt` and `trt_class`)")
+}
 
 #' Check for IPD and AgD in network
 #'
