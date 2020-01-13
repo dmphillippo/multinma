@@ -17,7 +17,8 @@ set_ipd <- function(data,
                     y = NULL,
                     r = NULL, E = NULL,
                     # Surv = NULL,
-                    trt_ref = NULL) {
+                    trt_ref = NULL,
+                    trt_class = NULL) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -28,6 +29,7 @@ set_ipd <- function(data,
              agd_contrast = NULL,
              ipd = NULL,
              treatments = NULL,
+             classes = NULL,
              studies = NULL),
         class = "nma_data")
     )
@@ -41,6 +43,12 @@ set_ipd <- function(data,
   if (missing(trt)) abort("Specify `trt`")
   .trt <- dplyr::pull(data, {{ trt }})
   if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
+
+  # Treatment classes
+  if (!is.null(trt_class)) {
+    .trtclass <- dplyr::pull(data, {{ trt_class }})
+    check_trt_class(.trtclass, .trt)
+  }
 
   if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
 
@@ -74,6 +82,16 @@ set_ipd <- function(data,
     d$.trt <- forcats::fct_relevel(d$.trt, trt_ref)
   }
 
+  if (!is.null(trt_class)) {
+    d <- tibble::add_column(d, .trtclass = forcats::fct_relevel(nfactor(.trtclass), levels(d$.trt)[1]))
+    classes <- d %>%
+      dplyr::distinct(.data$.trt, .data$.trtclass) %>%
+      dplyr::arrange(.data$.trt) %>%
+      dplyr::pull(.data$.trtclass)
+  } else {
+    classes <- NULL
+  }
+
   if (o_type == "continuous") {
     d <- tibble::add_column(d, .y = .y)
   } else if (o_type == "binary") {
@@ -90,6 +108,7 @@ set_ipd <- function(data,
          agd_contrast = NULL,
          ipd = d,
          treatments = forcats::fct_unique(d$.trt),
+         classes = classes,
          studies = forcats::fct_unique(d$.study),
          outcome = list(agd_arm = NA, agd_contrast = NA, ipd = o_type)),
     class = "nma_data")
@@ -132,7 +151,8 @@ set_agd_arm <- function(data,
                         r = NULL, n = NULL, E = NULL,
                         # Surv = NULL,
                         sample_size = NULL,
-                        trt_ref = NULL) {
+                        trt_ref = NULL,
+                        trt_class = NULL) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -143,6 +163,7 @@ set_agd_arm <- function(data,
              agd_contrast = NULL,
              ipd = NULL,
              treatments = NULL,
+             classes = NULL,
              studies = NULL),
         class = "nma_data")
     )
@@ -156,6 +177,12 @@ set_agd_arm <- function(data,
   if (missing(trt)) abort("Specify `trt`")
   .trt <- dplyr::pull(data, {{ trt }})
   if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
+
+  # Treatment classes
+  if (!is.null(trt_class)) {
+    .trtclass <- dplyr::pull(data, {{ trt_class }})
+    check_trt_class(.trtclass, .trt)
+  }
 
   if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
 
@@ -174,6 +201,12 @@ set_agd_arm <- function(data,
   o_type <- get_outcome_type(y = .y, se = .se,
                              r = .r, n = .n, E = .E)
 
+  # Pull and check sample size
+  .sample_size <- pull_non_null(data, enquo(sample_size))
+  if (!is.null(.sample_size)) check_sample_size(.sample_size)
+  else if (o_type == "count") .sample_size <- .n
+  else inform("Note: Optional argument `sample_size` not provided, some features may not be available (see ?set_agd_arm).")
+
   # Create tibble in standard format
   d <- tibble::tibble(
     .study = nfactor(.study),
@@ -191,6 +224,16 @@ set_agd_arm <- function(data,
     d$.trt <- forcats::fct_relevel(d$.trt, trt_ref)
   }
 
+  if (!is.null(trt_class)) {
+    d <- tibble::add_column(d, .trtclass = forcats::fct_relevel(nfactor(.trtclass), levels(d$.trt)[1]))
+    classes <- d %>%
+      dplyr::distinct(.data$.trt, .data$.trtclass) %>%
+      dplyr::arrange(.data$.trt) %>%
+      dplyr::pull(.data$.trtclass)
+  } else {
+    classes <- NULL
+  }
+
   if (o_type == "continuous") {
     d <- tibble::add_column(d, .y = .y, .se = .se)
   } else if (o_type == "count") {
@@ -198,12 +241,6 @@ set_agd_arm <- function(data,
   } else if (o_type == "rate") {
     d <- tibble::add_column(d, .r = .r, .E = .E)
   }
-
-  # Pull and check sample size
-  .sample_size <- pull_non_null(data, enquo(sample_size))
-  if (!is.null(.sample_size)) check_sample_size(.sample_size)
-  else if (o_type == "count") .sample_size <- .n
-  else inform("Note: Optional argument `sample_size` not provided, some features may not be available (see ?set_agd_arm).")
 
   if (!is.null(.sample_size)) d <- tibble::add_column(d, .sample_size = .sample_size)
 
@@ -216,6 +253,7 @@ set_agd_arm <- function(data,
          agd_contrast = NULL,
          ipd = NULL,
          treatments = forcats::fct_unique(d$.trt),
+         classes = classes,
          studies = forcats::fct_unique(d$.study),
          outcome = list(agd_arm = o_type, agd_contrast = NA, ipd = NA)),
     class = "nma_data")
@@ -259,7 +297,8 @@ set_agd_contrast <- function(data,
                              trt,
                              y = NULL, se = NULL,
                              sample_size = NULL,
-                             trt_ref = NULL) {
+                             trt_ref = NULL,
+                             trt_class = NULL) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -270,6 +309,7 @@ set_agd_contrast <- function(data,
              agd_contrast = NULL,
              ipd = NULL,
              treatments = NULL,
+             classes = NULL,
              studies = NULL),
         class = "nma_data")
     )
@@ -285,6 +325,13 @@ set_agd_contrast <- function(data,
   .trt <- dplyr::pull(data, {{ trt }})
   if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
 
+
+  # Treatment classes
+  if (!is.null(trt_class)) {
+    .trtclass <- dplyr::pull(data, {{ trt_class }})
+    check_trt_class(.trtclass, .trt)
+  }
+
   if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
 
   # Pull and check outcomes
@@ -293,6 +340,14 @@ set_agd_contrast <- function(data,
 
   if (is.null(.y)) abort("Specify continuous outcome `y`")
   if (is.null(.se)) abort("Specify standard error `se`")
+
+  # Pull and check sample size
+  .sample_size <- pull_non_null(data, enquo(sample_size))
+  if (!is.null(.sample_size)) {
+    check_sample_size(.sample_size)
+  } else {
+    inform("Note: Optional argument `sample_size` not provided, some features may not be available (see ?set_agd_contrast).")
+  }
 
   # Determine baseline arms by .y = NA
   bl <- is.na(.y)
@@ -329,18 +384,6 @@ set_agd_contrast <- function(data,
     .y = .y,
     .se = .se)
 
-  # Pull and check sample size
-  .sample_size <- pull_non_null(data, enquo(sample_size))
-  if (!is.null(.sample_size)) {
-    check_sample_size(.sample_size)
-    d <- tibble::add_column(d, .sample_size = .sample_size)
-  } else {
-    inform("Note: Optional argument `sample_size` not provided, some features may not be available (see ?set_agd_contrast).")
-  }
-
-  # Bind in original data
-  d <- dplyr::bind_cols(d, data)
-
   if (!is.null(trt_ref)) {
     trt_ref <- as.character(trt_ref)
     lvls_trt <- levels(d$.trt)
@@ -352,12 +395,30 @@ set_agd_contrast <- function(data,
     d$.trt <- forcats::fct_relevel(d$.trt, trt_ref)
   }
 
+  if (!is.null(trt_class)) {
+    d <- tibble::add_column(d, .trtclass = forcats::fct_relevel(nfactor(.trtclass), levels(d$.trt)[1]))
+    classes <- d %>%
+      dplyr::distinct(.data$.trt, .data$.trtclass) %>%
+      dplyr::arrange(.data$.trt) %>%
+      dplyr::pull(.data$.trtclass)
+  } else {
+    classes <- NULL
+  }
+
+  if (!is.null(.sample_size)) {
+    d <- tibble::add_column(d, .sample_size = .sample_size)
+  }
+
+  # Bind in original data
+  d <- dplyr::bind_cols(d, data)
+
   # Produce nma_data object
   out <- structure(
     list(agd_arm = NULL,
          agd_contrast = d,
          ipd = NULL,
          treatments = forcats::fct_unique(d$.trt),
+         classes = classes,
          studies = forcats::fct_unique(d$.study),
          outcome = list(agd_arm = NA, agd_contrast = o_type, ipd = NA)),
     class = "nma_data")

@@ -17,6 +17,8 @@
 #'   format)}
 #'   \item{`ipd`}{data from studies with individual patient data}
 #'   \item{`treatments`}{treatment coding factor for entire network}
+#'   \item{`classes`}{treatment class coding factor (same length as `treatments`
+#'   for entire network)}
 #'   \item{`studies`}{study coding factor for entire network}
 #'   \item{`outcome`}{outcome type for each data source, named list}
 #'   }
@@ -26,7 +28,8 @@
 #'   \describe{
 #'   \item{`.study`}{study (as factor)}
 #'   \item{`.trt`}{treatment (as factor)}
-#'   \item{`.y`}{outcome (continuous)}
+#'   \item{`.trtclass`}{treatment class (as factor), if specified}
+#'   \item{`.y`}{continuous outcome}
 #'   \item{`.se`}{standard error (continuous)}
 #'   \item{`.r`}{event count (discrete)}
 #'   \item{`.n`}{event count denominator (discrete, `agd_arm` only)}
