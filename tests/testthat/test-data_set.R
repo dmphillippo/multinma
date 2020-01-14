@@ -56,6 +56,9 @@ agd_arm <- tibble(
   trtn = c(1, 2, 1, 2, 3),
   trtc = LETTERS[trtn],
   trtf = factor(trtc),
+  tclassn = c(1, 2, 1, 2, 2),
+  tclassc = letters[tclassn],
+  tclassf = factor(tclassc),
   cont = rnorm(5),
   cont_pos = abs(cont),
   cont_neg = -cont_pos,
@@ -240,6 +243,61 @@ test_that("set_* can set `trt_ref`", {
   expect_error(set_ipd(agd_arm, studyc, trtc, y = cont, trt_ref = 2), m)
   expect_error(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_ref = 2), m)
   expect_error(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_ref = 2), m)
+})
+
+test_that("set_* returns correct .trtclass column", {
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
+                       trt_class = tclassc)$ipd$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = tclassc)$agd_arm$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = tclassc)$agd_contrast$.trtclass,
+               agd_contrast$tclassf)
+})
+
+test_that("set_* returns classes factor variable", {
+  f_class <- factor(c("a", "b", "b"))
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont, trt_class = tclassc)$classes,
+               f_class)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_class = tclassc)$classes,
+               f_class)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_class = tclassc)$classes,
+               f_class)
+
+  f_class2 <- factor(c("b", "a", "b"), levels = c("b", "a"))
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
+                       trt_class = tclassc, trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = tclassc, trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = tclassc, trt_ref = "B")$classes,
+               f_class2)
+})
+
+test_that("set_* checks for bad class variable work", {
+  aa2 <- agd_arm
+  aa2$tclassn <- c(1, 2, 2, 1, 2) # Trt 2 and 3 in two classes
+  aa2$tclassc[1] <- NA
+
+  ac2 <- agd_contrast
+  ac2$tclassn <- c(1, 2, 2, 1, 2) # Trt 2 and 3 in two classes
+  ac2$tclassc[1] <- NA
+
+  m <- "Treatment present in more than one class"
+
+  expect_error(set_ipd(aa2, studyc, trtc, y = cont, trt_class = tclassn), m)
+  expect_error(set_agd_arm(aa2, studyc, trtc, y = cont, se = cont_pos, trt_class = tclassn), m)
+  expect_error(set_agd_contrast(ac2, studyc, trtc, y = ydiff, se = sediff, trt_class = tclassn), m)
+
+  m2 <- "cannot contain missing values"
+
+  expect_error(set_ipd(aa2, studyc, trtc, y = cont, trt_class = tclassc), m2)
+  expect_error(set_agd_arm(aa2, studyc, trtc, y = cont, se = cont_pos, trt_class = tclassc), m2)
+  expect_error(set_agd_contrast(ac2, studyc, trtc, y = ydiff, se = sediff, trt_class = tclassc), m2)
 })
 
 test_that("set_* return `studies` factor", {
