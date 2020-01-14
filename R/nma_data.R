@@ -45,10 +45,8 @@ set_ipd <- function(data,
   if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
 
   # Treatment classes
-  if (!is.null(trt_class)) {
-    .trtclass <- dplyr::pull(data, {{ trt_class }})
-    check_trt_class(.trtclass, .trt)
-  }
+  .trtclass <- pull_non_null(data, enquo(trt_class))
+  if (!is.null(.trtclass)) check_trt_class(.trtclass, .trt)
 
   if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
 
@@ -82,7 +80,7 @@ set_ipd <- function(data,
     d$.trt <- forcats::fct_relevel(d$.trt, trt_ref)
   }
 
-  if (!is.null(trt_class)) {
+  if (!is.null(.trtclass)) {
     d <- tibble::add_column(d, .trtclass = forcats::fct_relevel(nfactor(.trtclass), levels(d$.trt)[1]))
     classes <- d %>%
       dplyr::distinct(.data$.trt, .data$.trtclass) %>%
@@ -179,10 +177,8 @@ set_agd_arm <- function(data,
   if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
 
   # Treatment classes
-  if (!is.null(trt_class)) {
-    .trtclass <- dplyr::pull(data, {{ trt_class }})
-    check_trt_class(.trtclass, .trt)
-  }
+  .trtclass <- pull_non_null(data, enquo(trt_class))
+  if (!is.null(.trtclass)) check_trt_class(.trtclass, .trt)
 
   if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
 
@@ -224,7 +220,7 @@ set_agd_arm <- function(data,
     d$.trt <- forcats::fct_relevel(d$.trt, trt_ref)
   }
 
-  if (!is.null(trt_class)) {
+  if (!is.null(.trtclass)) {
     d <- tibble::add_column(d, .trtclass = forcats::fct_relevel(nfactor(.trtclass), levels(d$.trt)[1]))
     classes <- d %>%
       dplyr::distinct(.data$.trt, .data$.trtclass) %>%
@@ -327,10 +323,8 @@ set_agd_contrast <- function(data,
 
 
   # Treatment classes
-  if (!is.null(trt_class)) {
-    .trtclass <- dplyr::pull(data, {{ trt_class }})
-    check_trt_class(.trtclass, .trt)
-  }
+  .trtclass <- pull_non_null(data, enquo(trt_class))
+  if (!is.null(.trtclass)) check_trt_class(.trtclass, .trt)
 
   if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
 
@@ -395,7 +389,7 @@ set_agd_contrast <- function(data,
     d$.trt <- forcats::fct_relevel(d$.trt, trt_ref)
   }
 
-  if (!is.null(trt_class)) {
+  if (!is.null(.trtclass)) {
     d <- tibble::add_column(d, .trtclass = forcats::fct_relevel(nfactor(.trtclass), levels(d$.trt)[1]))
     classes <- d %>%
       dplyr::distinct(.data$.trt, .data$.trtclass) %>%
