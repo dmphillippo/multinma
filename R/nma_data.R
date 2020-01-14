@@ -81,11 +81,13 @@ set_ipd <- function(data,
   }
 
   if (!is.null(.trtclass)) {
-    d <- tibble::add_column(d, .trtclass = forcats::fct_relevel(nfactor(.trtclass), levels(d$.trt)[1]))
-    classes <- d %>%
+    d <- tibble::add_column(d, .trtclass = nfactor(.trtclass))
+    class_lookup <- d %>%
       dplyr::distinct(.data$.trt, .data$.trtclass) %>%
-      dplyr::arrange(.data$.trt) %>%
-      dplyr::pull(.data$.trtclass)
+      dplyr::arrange(.data$.trt)
+    class_ref <- as.character(class_lookup[[1, ".trtclass"]])
+    d$.trtclass <- forcats::fct_relevel(d$.trtclass, class_ref)
+    classes <- forcats::fct_relevel(nfactor(class_lookup$.trtclass), class_ref)
   } else {
     classes <- NULL
   }
@@ -221,11 +223,13 @@ set_agd_arm <- function(data,
   }
 
   if (!is.null(.trtclass)) {
-    d <- tibble::add_column(d, .trtclass = forcats::fct_relevel(nfactor(.trtclass), levels(d$.trt)[1]))
-    classes <- d %>%
+    d <- tibble::add_column(d, .trtclass = nfactor(.trtclass))
+    class_lookup <- d %>%
       dplyr::distinct(.data$.trt, .data$.trtclass) %>%
-      dplyr::arrange(.data$.trt) %>%
-      dplyr::pull(.data$.trtclass)
+      dplyr::arrange(.data$.trt)
+    class_ref <- as.character(class_lookup[[1, ".trtclass"]])
+    d$.trtclass <- forcats::fct_relevel(d$.trtclass, class_ref)
+    classes <- forcats::fct_relevel(nfactor(class_lookup$.trtclass), class_ref)
   } else {
     classes <- NULL
   }
@@ -390,11 +394,13 @@ set_agd_contrast <- function(data,
   }
 
   if (!is.null(.trtclass)) {
-    d <- tibble::add_column(d, .trtclass = forcats::fct_relevel(nfactor(.trtclass), levels(d$.trt)[1]))
-    classes <- d %>%
+    d <- tibble::add_column(d, .trtclass = nfactor(.trtclass))
+    class_lookup <- d %>%
       dplyr::distinct(.data$.trt, .data$.trtclass) %>%
-      dplyr::arrange(.data$.trt) %>%
-      dplyr::pull(.data$.trtclass)
+      dplyr::arrange(.data$.trt)
+    class_ref <- as.character(class_lookup[[1, ".trtclass"]])
+    d$.trtclass <- forcats::fct_relevel(d$.trtclass, class_ref)
+    classes <- forcats::fct_relevel(nfactor(class_lookup$.trtclass), class_ref)
   } else {
     classes <- NULL
   }
