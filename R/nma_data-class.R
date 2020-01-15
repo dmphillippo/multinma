@@ -314,6 +314,8 @@ make_contrasts <- function(trt) {
 #' @param circular Whether to use a circular representation. See [ggraph()].
 #' @param weight_edges Weight edges by the number of studies? Default is `TRUE`.
 #' @param weight_nodes Weight nodes by the total sample size? Default is `FALSE`.
+#' @param show_trt_class Colour treatment nodes by class, if `trt_class` is set?
+#'   Default is `FALSE`.
 #'
 #' @details The default is equivalent to `layout = "linear"` and `circular =
 #'   TRUE`, which places the treatment nodes on a circle in the order defined by
@@ -330,7 +332,8 @@ make_contrasts <- function(trt) {
 #'
 #' @examples
 plot.nma_data <- function(x, ..., layout, circular,
-                          weight_edges = TRUE, weight_nodes = FALSE) {
+                          weight_edges = TRUE, weight_nodes = FALSE,
+                          show_trt_class = FALSE) {
   if (missing(layout) && missing(circular)) {
     layout <- "linear"
     circular <- TRUE
@@ -350,6 +353,13 @@ plot.nma_data <- function(x, ..., layout, circular,
     abort(paste("AgD study sample sizes not specified in network, cannot weight nodes.",
                 "Specify `sample_size` in set_agd_*(), or set weight_nodes = FALSE.", sep = "\n"))
 
+  if (!is.logical(show_trt_class) || length(show_trt_class) > 1)
+    abort("`show_trt_class` must be TRUE or FALSE.")
+
+  if (show_trt_class && is.null(x$classes))
+    abort(paste("Treatment classes not specified in network.",
+                "Specify `trt_class` in set_*(), or set show_trt_class = FALSE.", sep = "\n"))
+
   dat_mixed <- has_ipd(x) && (has_agd_arm(x) || has_agd_contrast(x))
   g <- ggraph::ggraph(x, layout = layout, circular = circular, ...)
 
@@ -367,15 +377,36 @@ plot.nma_data <- function(x, ..., layout, circular,
   }
 
   if (weight_nodes) {
+    if (show_trt_class) {
+      g <- g +
+        ggraph::geom_node_point(ggplot2::aes(size = .data$.sample_size,
+                                             fill = .data$.trtclass,
+                                             colour = .data$.trtclass),
+                                shape = 21)
+    } else {
+      g <- g +
+        ggraph::geom_node_point(ggplot2::aes(size = .data$.sample_size),
+                                fill = "grey90", colour = "grey60",
+                                shape = 21)
+    }
     g <- g +
-      ggraph::geom_node_point(ggplot2::aes(size = .data$.sample_size),
-                              shape = 21, fill = "grey90", colour = "grey60") +
       ggraph::geom_node_text(ggplot2::aes(label = .data$name),
                              hjust = "outward", vjust = "outward") +
       ggplot2::scale_size_area("Total sample size", max_size = 12)
   } else {
-    g <- g +
-      ggraph::geom_node_label(ggplot2::aes(label = .data$name), fill = "grey90")
+    if (show_trt_class) {
+      g <- g +
+        ggraph::geom_node_label(ggplot2::aes(label = .data$name,
+                                             fill = .data$.trtclass))
+    } else {
+      g <- g +
+        ggraph::geom_node_label(ggplot2::aes(label = .data$name),
+                                fill = "grey90")
+    }
+  }
+
+  if (show_trt_class) {
+    g <- g + ggplot2::scale_fill_discrete("Treatment Class", aesthetics = c("fill", "colour"))
   }
 
   g <- g +
