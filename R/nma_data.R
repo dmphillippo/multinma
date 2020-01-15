@@ -474,7 +474,7 @@ combine_network <- function(..., trt_ref) {
     class_ref <- as.character(class_lookup[[1, ".trtclass"]])
     class_lvls <- c(class_ref, setdiff(class_lvls, class_ref))
 
-    levels(class_lookup$.trtclass) <- class_lvls
+    class_lookup$.trtclass <- forcats::fct_relevel(class_lookup$.trtclass, class_ref)
 
     classes <- class_lookup$.trtclass
   } else if (any(has_classes)) {
