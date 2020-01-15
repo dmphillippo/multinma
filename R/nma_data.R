@@ -472,7 +472,7 @@ combine_network <- function(..., trt_ref) {
 
     class_lvls <- stringr::str_sort(levels(class_lookup$.trtclass), numeric = TRUE)
     class_ref <- as.character(class_lookup[[1, ".trtclass"]])
-    class_lvls <- c(class_lvls, setdiff(class_lvls, class_ref))
+    class_lvls <- c(class_ref, setdiff(class_lvls, class_ref))
 
     levels(class_lookup$.trtclass) <- class_lvls
 
