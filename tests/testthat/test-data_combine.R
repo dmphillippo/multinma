@@ -18,6 +18,9 @@ agd_arm <- tibble(
   trtn = c(1, 2, 1, 2, 3),
   trtc = LETTERS[trtn],
   trtf = factor(trtc),
+  tclassn = c(1, 2, 1, 2, 2),
+  tclassc = letters[tclassn],
+  tclassf = factor(tclassc),
   y = rnorm(5),
   se = runif(5)
 )
@@ -30,6 +33,10 @@ agd_contrast <- tibble(
   trtn = c(2, 3, 4),
   trtc = LETTERS[trtn],
   trtf = factor(trtc),
+  tclassn = c(2, 2, 3),
+  tclassc = letters[tclassn],
+  tclassf = factor(tclassc),
+  tclassn_bad = c(3, 3, 3),
   y = c(NA, rnorm(2)),
   se = runif(3)
 )
@@ -42,11 +49,15 @@ ipd <- tibble(
   trtn = c(1, 2, 3, 3, 4),
   trtc = LETTERS[trtn],
   trtf = factor(trtc),
+  tclassn = c(1, 2, 2, 2, 3),
+  tclassc = letters[tclassn],
+  tclassf = factor(tclassc),
+  tclassn_bad = c(1, 3, 3, 3, 4),
   y = rnorm(5)
 )
 net_i <- set_ipd(ipd, studyf, trtf, y = y)
 
-test_that("combine_network produces combined treatment and study factors", {
+test_that("combine_network produces combined treatment, class, and study factors", {
   c1 <- combine_network(net_a_a, net_i)
   expect_equal(c1$treatments, factor(LETTERS[1:4]))
   expect_equal(levels(c1$agd_arm$.trt), LETTERS[1:4])
@@ -64,6 +75,38 @@ test_that("combine_network produces combined treatment and study factors", {
   expect_equal(levels(c2$agd_arm$.study), letters[1:5])
   expect_equal(levels(c2$agd_contrast$.study), letters[1:5])
   expect_equal(levels(c2$ipd$.study), letters[1:5])
+
+  c1_classed <- combine_network(
+    set_agd_arm(agd_arm, studyf, trtf, y = y, se = se, trt_class = tclassc),
+    set_ipd(ipd, studyf, trtf, y = y, trt_class = tclassc)
+  )
+  expect_equal(c1_classed$treatments, factor(LETTERS[1:4]))
+  expect_equal(levels(c1_classed$agd_arm$.trt), LETTERS[1:4])
+  expect_equal(levels(c1_classed$ipd$.trt), LETTERS[1:4])
+  expect_equal(c1_classed$studies, factor(letters[c(1, 2, 4, 5)]))
+  expect_equal(levels(c1_classed$agd_arm$.study), letters[c(1, 2, 4, 5)])
+  expect_equal(levels(c1_classed$ipd$.study), letters[c(1, 2, 4, 5)])
+  expect_equal(c1_classed$classes, factor(letters[c(1, 2, 2, 3)]))
+  expect_equal(levels(c1_classed$agd_arm$.trtclass), letters[1:3])
+  expect_equal(levels(c1_classed$ipd$.trtclass), letters[1:3])
+
+  c2_classed <- combine_network(
+    set_agd_arm(agd_arm, studyf, trtf, y = y, se = se, trt_class = tclassc),
+    set_ipd(ipd, studyf, trtf, y = y, trt_class = tclassc),
+    set_agd_contrast(agd_contrast, studyf, trtf, y = y, se = se, trt_class = tclassc)
+  )
+  expect_equal(c2_classed$treatments, factor(LETTERS[1:4]))
+  expect_equal(levels(c2_classed$agd_arm$.trt), LETTERS[1:4])
+  expect_equal(levels(c2_classed$agd_contrast$.trt), LETTERS[1:4])
+  expect_equal(levels(c2_classed$ipd$.trt), LETTERS[1:4])
+  expect_equal(c2_classed$studies, factor(letters[1:5]))
+  expect_equal(levels(c2_classed$agd_arm$.study), letters[1:5])
+  expect_equal(levels(c2_classed$agd_contrast$.study), letters[1:5])
+  expect_equal(levels(c2_classed$ipd$.study), letters[1:5])
+  expect_equal(c2_classed$classes, factor(letters[c(1, 2, 2, 3)]))
+  expect_equal(levels(c2_classed$agd_arm$.trtclass), letters[1:3])
+  expect_equal(levels(c2_classed$ipd$.trtclass), letters[1:3])
+  expect_equal(levels(c2_classed$agd_contrast$.trtclass), letters[1:3])
 })
 
 test_that("combine_network can set alternative trt_ref", {
@@ -87,6 +130,21 @@ test_that("combine_network can set alternative trt_ref", {
                "Studies with same label found in multiple data sources: a")
   expect_error(combine_network(net_a_a, net_a_a),
                "Studies with same label found in multiple data sources: a, b")
+
+  c1_classed <- combine_network(
+    set_agd_arm(agd_arm, studyf, trtf, y = y, se = se, trt_class = tclassc),
+    set_ipd(ipd, studyf, trtf, y = y, trt_class = tclassc),
+    set_agd_contrast(agd_contrast, studyf, trtf, y = y, se = se, trt_class = tclassc),
+    trt_ref = "B"
+  )
+  expect_equal(c1_classed$treatments, factor(LETTERS[c(2, 1, 3, 4)], levels = LETTERS[c(2, 1, 3, 4)]))
+  expect_equal(levels(c1_classed$agd_arm$.trt), LETTERS[c(2, 1, 3, 4)])
+  expect_equal(levels(c1_classed$agd_contrast$.trt), LETTERS[c(2, 1, 3, 4)])
+  expect_equal(levels(c1_classed$ipd$.trt), LETTERS[c(2, 1, 3, 4)])
+  expect_equal(c1_classed$classes, factor(letters[c(2, 1, 2, 3)], levels = letters[c(2, 1, 3)]))
+  expect_equal(levels(c1_classed$agd_arm$.trtclass), letters[c(2, 1, 3)])
+  expect_equal(levels(c1_classed$agd_contrast$.trtclass), letters[c(2, 1, 3)])
+  expect_equal(levels(c1_classed$ipd$.trtclass), letters[c(2, 1, 3)])
 })
 
 test_that("combine_network error if outcomes do not match for same data source type", {
@@ -113,4 +171,23 @@ test_that("combine_network error if mismatch outcomes across data types", {
                                set_agd_arm(dat_b, study, trt, r = r, n = n)), m)
   expect_error(combine_network(set_ipd(dat_a, study, trt, y = y),
                                set_agd_arm(dat_b, study, trt, r = r, E = E)), m)
+})
+
+test_that("combine_network error if treatment classes do not match across sources", {
+  m <- "Treatment present in more than one class"
+
+  expect_error(combine_network(
+    set_agd_arm(agd_arm, studyf, trtf, y = y, se = se, trt_class = tclassn),
+    set_ipd(ipd, studyf, trtf, y = y, trt_class = tclassn_bad)), m)
+
+  expect_error(combine_network(
+    set_agd_arm(agd_arm, studyf, trtf, y = y, se = se, trt_class = tclassn),
+    set_ipd(ipd, studyf, trtf, y = y, trt_class = tclassn_bad),
+    set_agd_contrast(agd_contrast, studyf, trtf, y = y, se = se, trt_class = tclassn_bad)), m)
+})
+
+test_that("combine_network warns if not all sources have treatment classes", {
+  expect_warning(combine_network(net_a_a,
+                                 set_ipd(ipd, studyf, trtf, y = y, trt_class = tclassc)),
+                 "Not all data sources have defined treatment classes")
 })
