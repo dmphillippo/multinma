@@ -146,7 +146,11 @@ print.nma_data <- function(x, ..., n = 10) {
   }
 
   sec_header()
-  cglue("Total number of treatments: {length(x$treatments)}")
+  if (!is.null(x$classes)) {
+    cglue("Total number of treatments: {length(x$treatments)}, in {nlevels(x$classes)} classes")
+  } else {
+    cglue("Total number of treatments: {length(x$treatments)}")
+  }
   cglue("Total number of studies: {length(x$studies)}")
   cglue("Reference treatment is: {levels(x$treatments)[1]}")
 
