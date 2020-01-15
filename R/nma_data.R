@@ -462,9 +462,9 @@ combine_network <- function(..., trt_ref) {
   has_classes <- purrr::map_lgl(purrr::map(s, "classes"), ~!is.null(.))
 
   if (all(has_classes)) {
-    class_lookup <- tibble::tibble(.trt = forcats::fct_c(purrr::map(s, "treatments")),
-                                   .trtclass = forcats::fct_c(purrr::map(s, "classes"))) %>%
-      dplyr::mutate(.trt = forcats::fct_relevel(.trt, trts)) %>%
+    class_lookup <- tibble::tibble(.trt = forcats::fct_c(!!! purrr::map(s, "treatments")),
+                                   .trtclass = forcats::fct_c(!!! purrr::map(s, "classes"))) %>%
+      dplyr::mutate(.trt = forcats::fct_relevel(.data$.trt, trts)) %>%
       dplyr::distinct(.data$.trt, .data$.trtclass) %>%
       dplyr::arrange(.data$.trt)
 
