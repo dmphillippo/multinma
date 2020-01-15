@@ -468,6 +468,8 @@ combine_network <- function(..., trt_ref) {
       dplyr::distinct(.data$.trt, .data$.trtclass) %>%
       dplyr::arrange(.data$.trt)
 
+    check_trt_class(class_lookup$.trtclass, class_lookup$.trt)
+
     class_lvls <- stringr::str_sort(levels(class_lookup$.trtclass), numeric = TRUE)
     class_ref <- as.character(class_lookup[[1, ".trtclass"]])
     class_lvls <- c(class_lvls, setdiff(class_lvls, class_ref))
