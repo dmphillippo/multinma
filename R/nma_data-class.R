@@ -269,6 +269,10 @@ as.igraph.nma_data <- function(x, ...) {
       dplyr::arrange(.data$.trt)
   }
 
+  if (!is.null(x$classes)) {
+    v_all$.trtclass <- x$classes
+  }
+
   g <- igraph::graph_from_data_frame(e_all, directed = FALSE, vertices = v_all)
   return(g)
 }
