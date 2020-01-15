@@ -458,6 +458,30 @@ combine_network <- function(..., trt_ref) {
     trts <- c(trt_ref, setdiff(trts, trt_ref))
   }
 
+  # Combine classes factor
+  has_classes <- purrr::map_lgl(purrr::map(s, "classes"), ~!is.null(.))
+
+  if (all(has_classes)) {
+    class_lookup <- tibble::tibble(.trt = forcats::fct_c(purrr::map(s, "treatments")),
+                                   .trtclass = forcats::fct_c(purrr::map(s, "classes"))) %>%
+      dplyr::mutate(.trt = forcats::fct_relevel(.trt, trts)) %>%
+      dplyr::distinct(.data$.trt, .data$.trtclass) %>%
+      dplyr::arrange(.data$.trt)
+
+    class_lvls <- stringr::str_sort(levels(class_lookup$.trtclass), numeric = TRUE)
+    class_ref <- as.character(class_lookup[[1, ".trtclass"]])
+    class_lvls <- c(class_lvls, setdiff(class_lvls, class_ref))
+
+    levels(class_lookup$.trtclass) <- class_lvls
+
+    classes <- class_lookup$.trtclass
+  } else if (any(has_classes)) {
+    warn("Not all data sources have defined treatment classes. Removing treatment class information.")
+    classes <- NULL
+  } else {
+    classes <- NULL
+  }
+
   # Check that no studies are duplicated between data sources
   all_studs <- purrr::flatten_chr(purrr::map(s, ~levels(.$studies)))
   if (anyDuplicated(all_studs)) {
@@ -475,6 +499,7 @@ combine_network <- function(..., trt_ref) {
       if (rlang::is_empty(ipd[[j]])) next
       ipd[[j]]$.trt <- forcats::lvls_expand(ipd[[j]]$.trt, trts)
       ipd[[j]]$.study <- forcats::lvls_expand(ipd[[j]]$.study, studs)
+      if (!is.null(classes)) ipd[[j]]$.trtclass <- forcats::lvls_expand(ipd[[j]]$.trtclass, class_lvls)
     }
   }
   ipd <- dplyr::bind_rows(ipd)
@@ -486,6 +511,8 @@ combine_network <- function(..., trt_ref) {
       if (rlang::is_empty(agd_arm[[j]])) next
       agd_arm[[j]]$.trt <- forcats::lvls_expand(agd_arm[[j]]$.trt, trts)
       agd_arm[[j]]$.study <- forcats::lvls_expand(agd_arm[[j]]$.study, studs)
+      if (!is.null(classes))
+        agd_arm[[j]]$.trtclass <- forcats::lvls_expand(agd_arm[[j]]$.trtclass, class_lvls)
     }
   }
   agd_arm <- dplyr::bind_rows(agd_arm)
@@ -497,6 +524,8 @@ combine_network <- function(..., trt_ref) {
       if (rlang::is_empty(agd_contrast[[j]])) next
       agd_contrast[[j]]$.trt <- forcats::lvls_expand(agd_contrast[[j]]$.trt, trts)
       agd_contrast[[j]]$.study <- forcats::lvls_expand(agd_contrast[[j]]$.study, studs)
+      if (!is.null(classes))
+        agd_contrast[[j]]$.trtclass <- forcats::lvls_expand(agd_contrast[[j]]$.trtclass, class_lvls)
     }
   }
   agd_contrast <- dplyr::bind_rows(agd_contrast)
@@ -530,6 +559,7 @@ combine_network <- function(..., trt_ref) {
          agd_contrast = agd_contrast,
          ipd = ipd,
          treatments = factor(trts, levels = trts),
+         classes = classes,
          studies = factor(studs, levels = studs),
          outcome = outcome),
     class = "nma_data")
