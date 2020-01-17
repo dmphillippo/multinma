@@ -9,7 +9,9 @@
 #'   model to fit, either `"consistency"`, `"nodesplit"`, or `"ume"`
 #' @param trt_effects Character string specifying either `"fixed"` or `"random"` effects
 #' @param regression A one-sided model formula, specifying the prognostic and
-#'   effect-modifying terms for a regression model
+#'   effect-modifying terms for a regression model. Any references to treatment
+#'   should use the `.trt` special variable, for example specifying effect
+#'   modifier interactions as `variable:.trt` (see details).
 #' @param likelihood Character string specifying a likelihood, if unspecified
 #'   will be inferred from the data
 #' @param link Character string specifying a link function, if unspecified will
@@ -32,6 +34,19 @@
 #' @param adapt_delta See [adapt_delta] for details
 #' @param int_thin A single integer value, the thinning factor for returning
 #'   cumulative estimates of integration error
+#'
+#' @details When specifying a model formula in the `regression` argument, the
+#'   usual formula syntax is available (as interpreted by [model.matrix()]). The
+#'   only additional requirement here is that the special variable `.trt` should
+#'   be used to refer to treatment. For example, effect modifier interactions
+#'   should be specified as `variable:.trt`. Prognostic (main) effects and
+#'   interactions can be included together compactly as `variable*.trt`, which
+#'   expands to `variable + variable:.trt` (plus `.trt`, which is already in the
+#'   NMA model).
+#'
+#'   For the advanced user, the additional specials `.study` and `.trtclass` are
+#'   also available, and refer to studies and (if specified) treatment classes
+#'   respectively.
 #'
 #' @return `nma()` returns a [stan_nma] object, `nma.fit()` returns a [stanfit]
 #'   object.
