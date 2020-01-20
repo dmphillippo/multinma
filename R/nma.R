@@ -93,6 +93,10 @@ nma <- function(network,
     abort("`regression` should be a one-sided formula.")
   }
 
+  if (is.null(network$classes) && !missing(class_interactions)) {
+    abort(paste("Setting `class_interactions` requires treatment classes to be specified in the network.",
+                "See set_*() argument `trt_class`.", sep = "\n"))
+  }
   class_interactions <- rlang::arg_match(class_interactions)
   if (length(class_interactions) > 1) abort("`class_interactions` must be a single string.")
 
