@@ -19,6 +19,9 @@
 #'   \item{`consistency`}{The consistency/inconsistency model used (character
 #'   string)}
 #'   \item{`regression`}{The regression model used (formula)}
+#'   \item{`class_interactions`}{If treatment classes and a regression model are
+#'   specified, the model used for interactions within each class (common,
+#'   exchangeable, or independent)}
 #'   \item{`xbar`}{A named vector of values used for centering}
 #'   \item{`likelihood`}{The likelihood used (character string)}
 #'   \item{`link`}{The link function used (character string)}

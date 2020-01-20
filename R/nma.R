@@ -12,6 +12,9 @@
 #'   effect-modifying terms for a regression model. Any references to treatment
 #'   should use the `.trt` special variable, for example specifying effect
 #'   modifier interactions as `variable:.trt` (see details).
+#' @param class_interactions Character string specifying whether effect modifier
+#'   interactions are specified as `"common"`, `"exchangeable"`, or
+#'   `"independent"`.
 #' @param likelihood Character string specifying a likelihood, if unspecified
 #'   will be inferred from the data
 #' @param link Character string specifying a link function, if unspecified will
@@ -57,6 +60,7 @@ nma <- function(network,
                 consistency = c("consistency", "nodesplit", "ume"),
                 trt_effects = c("fixed", "random"),
                 regression = NULL,
+                class_interactions = c("common", "exchangeable", "independent"),
                 likelihood = NULL,
                 link = NULL,
                 ...,
@@ -88,6 +92,9 @@ nma <- function(network,
   if (!is.null(regression) && !rlang::is_formula(regression, lhs = FALSE)) {
     abort("`regression` should be a one-sided formula.")
   }
+
+  class_interactions <- rlang::arg_match(class_interactions)
+  if (length(class_interactions) > 1) abort("`class_interactions` must be a single string.")
 
   likelihood <- check_likelihood(likelihood, network$outcome)
   link <- check_link(link, likelihood)
@@ -123,12 +130,19 @@ nma <- function(network,
   # Set to 1 if no numerical integration, so that regression on summary data is possible
   n_int <- if (use_int) network$n_int else 1
 
+  # Define factor label sanitising function
+  fct_sanitise <- function(f) {
+    forcats::fct_relabel(f, ~gsub(":", "_", ., fixed = TRUE))
+  }
+
   # Get design matrices and outcomes
   if (has_ipd(network)) {
     dat_ipd <- network$ipd %>%
-      # Sanitise study and treatment factor labels (for :)
-      dplyr::mutate(.study = forcats::fct_relabel(.data$.study, ~gsub(":", "_", ., fixed = TRUE)),
-                    .trt = forcats::fct_relabel(.data$.trt, ~gsub(":", "_", ., fixed = TRUE)))
+      # Sanitise study and treatment factor labels
+      dplyr::mutate_at(
+        .vars = if (!is.null(network$classes)) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
+        .funs = fct_sanitise
+      )
 
     y_ipd <- get_outcome_variables(dat_ipd, network$outcome$ipd)
   } else {
@@ -138,9 +152,11 @@ nma <- function(network,
 
   if (has_agd_arm(network)) {
     dat_agd_arm <- network$agd_arm %>%
-      # Sanitise study and treatment factor labels (for :)
-      dplyr::mutate(.study = forcats::fct_relabel(.data$.study, ~gsub(":", "_", ., fixed = TRUE)),
-                    .trt = forcats::fct_relabel(.data$.trt, ~gsub(":", "_", ., fixed = TRUE)))
+      # Sanitise study and treatment factor labels
+      dplyr::mutate_at(
+        .vars = if (!is.null(network$classes)) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
+        .funs = fct_sanitise
+      )
 
     y_agd_arm <- get_outcome_variables(dat_agd_arm, network$outcome$agd_arm)
 
@@ -164,9 +180,11 @@ nma <- function(network,
 
   if (has_agd_contrast(network)) {
     dat_agd_contrast <- network$agd_contrast %>%
-      # Sanitise study and treatment factor labels (for :)
-      dplyr::mutate(.study = forcats::fct_relabel(.data$.study, ~gsub(":", "_", ., fixed = TRUE)),
-                    .trt = forcats::fct_relabel(.data$.trt, ~gsub(":", "_", ., fixed = TRUE)))
+      # Sanitise study and treatment factor labels
+      dplyr::mutate_at(
+        .vars = if (!is.null(network$classes)) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
+        .funs = fct_sanitise
+      )
 
     y_agd_contrast <- get_outcome_variables(dat_agd_contrast, network$outcome$agd_contrast)
 
@@ -285,10 +303,25 @@ nma <- function(network,
                       "Use `add_integration()` to add integration points to the network."))
     }
 
-    if (consistency == "ume") {
-      nma_formula <- update.formula(regression, ~-1 + .study + .contr + .)
+    # Set up treatment classes
+    if (!is.null(network$classes)) {
+      if (class_interactions == "common") {
+        nma_formula <- do.call("substitute",
+                               list(regression,
+                                    .trt = quote(.trtclass)))
+      } else if (class_interactions == "exchangeable") {
+        abort('Exchangeable treatment class interactions (class_interactions = "exchangeable") not yet supported.')
+      } else {
+        nma_formula <- regression
+      }
     } else {
-      nma_formula <- update.formula(regression, ~-1 + .study + .trt + .)
+      nma_formula <- regression
+    }
+
+    if (consistency == "ume") {
+      nma_formula <- update.formula(nma_formula, ~-1 + .study + .contr + .)
+    } else {
+      nma_formula <- update.formula(nma_formula, ~-1 + .study + .trt + .)
     }
   } else {
     if (consistency == "ume") {
@@ -497,6 +530,7 @@ nma <- function(network,
               trt_effects = trt_effects,
               consistency = consistency,
               regression = regression,
+              class_interactions = if (!is.null(regression) && !is.null(network$classes)) class_interactions else NULL,
               xbar = xbar,
               likelihood = likelihood,
               link = link,
