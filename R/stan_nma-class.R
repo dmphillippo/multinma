@@ -33,7 +33,7 @@
 #'
 NULL
 
-#' Print stan_nma objects
+#' Print `stan_nma` objects
 #'
 #' @param x A [stan_nma] object
 #' @param ... Further arguments passed to [print.stanfit()]
@@ -65,6 +65,24 @@ print.stan_nma <- function(x, ...) {
                            .homonyms = "last")
   do.call(print, dots)
   invisible(x)
+}
+
+#' Posterior summaries from `stan_nma` objects
+#'
+#' @param x A `stan_nma` object
+#' @param ... Further arguments passed to [rstan::monitor()]
+#' @param pars,include See [rstan::extract()]
+#'
+#' @return A [nma_summary] object
+#' @export
+#'
+#' @examples
+summary.stan_nma <- function(x, ..., pars, include = TRUE) {
+  sims <- as.array(x, pars = pars, include = include)
+  sums <- tibble::as_tibble(rstan::monitor(sims, ..., print = FALSE))
+  ss <- list(summary = sums, sims = sims)
+  class(ss) <- "nma_summary"
+  return(ss)
 }
 
 #' as.stanfit
