@@ -79,7 +79,7 @@ print.stan_nma <- function(x, ...) {
 #' @examples
 summary.stan_nma <- function(x, ..., pars, include = TRUE) {
   sims <- as.array(x, pars = pars, include = include)
-  sums <- tibble::as_tibble(rstan::summary(sims, ...), rownames = "parameter")
+  sums <- tibble::as_tibble(rstan::summary(as.stanfit(x), ...)$summary, rownames = "parameter")
   ss <- list(summary = sums, sims = sims)
   class(ss) <- "nma_summary"
   return(ss)
