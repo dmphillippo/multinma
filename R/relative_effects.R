@@ -22,4 +22,29 @@
 #' @examples
 relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FALSE) {
 
+  # Checks
+  if (!inherits(x, "stan_nma")) abort("Expecting a `stan_nma` object, as returned by nma().")
+
+  if (!is.null(newdata)) {
+    if (!is.data.frame(newdata)) abort("`newdata` is not a data frame.")
+
+    if (rlang::quo_is_null(study)) {
+      newdata$.study <- 1:nrow(newdata)
+    } else {
+      newdata <- dplyr::mutate(newdata, .study = {{ study }})
+
+      if (anyDuplicated(newdata$.study))
+        abort("Duplicate values in `study` column. Expecting one row per study.")
+    }
+
+    # TODO: Check that integration points are given in newdata for ML-NMR models
+  }
+
+  if (!is.logical(all_contrasts) || length(all_contrasts) > 1)
+    abort("`all_contrasts` should be TRUE or FALSE.")
+
+  # Cannot produce relative effects for inconsistency models
+  if (x$consistency != "consistency")
+    abort(glue::glue("Cannot produce relative effects under inconsistency '{x$consistency}' model."))
+
 }
