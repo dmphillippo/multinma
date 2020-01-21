@@ -57,13 +57,13 @@ as.data.frame.nma_summary <- function(x, ...) {
 #' @rdname nma_summary-methods
 #' @export
 as.tibble.nma_summary <- function(x, ...) {
-  return(x$summary)
+  return(tibble::as.tibble(x$summary, ...))
 }
 
 #' @rdname nma_summary-methods
 #' @export
 as_tibble.nma_summary <- function(x, ...) {
-  return(x$summary)
+  return(tibble::as_tibble(x$summary, ...))
 }
 
 #' @rdname nma_summary-methods
