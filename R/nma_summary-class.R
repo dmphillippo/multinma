@@ -27,23 +27,61 @@ NULL
 #'
 #' @param x A `nma_summary` object
 #' @param ... Additional arguments passed on to other methods
+#' @param digits Integer number of digits to display
+#' @param pars Character vector of parameters to display in the printed summary
+#' @param include Logical, are parameters named in `pars` included (`TRUE`) or excluded (`FALSE`)
 #'
 #' @rdname nma_summary-methods
 #'
 #' @return
 #' @export
 #'
-print.nma_summary <- function(x, ...) {
+print.nma_summary <- function(x, ..., digits = 2, pars, include) {
+  # Set defaults for pars, include
+  if (missing(include)) {
+    include <- !missing(pars)
+  } else {
+    if (!is.logical(include) || length(include) > 1) abort("`include` should be TRUE or FALSE")
+  }
+  if (missing(pars)) {
+    pars <- c("log_lik", "resdev", "fitted",
+              "theta_bar_cum", "theta2_bar_cum",
+              "mu", "delta", "lp__")
+  } else {
+    if (!is.character(pars)) abort("`pars` should be a character vector")
+  }
+
+  if (!is.numeric(digits) ||
+      length(digits) > 1 ||
+      trunc(digits) != digits) abort("`digits` must be a single integer")
+
+  x_sum <- tibble::as_tibble(x) %>%
+    dplyr::filter(
+      if (include) grepl(paste0("^", pars, "(\\[.+\\])?$", collapse = "|"), .data$parameter)
+      else !grepl(paste0("^", pars, "(\\[.+\\])?$", collapse = "|"), .data$parameter)
+      )
+
+  # Get numeric columns for formatting, handling n_eff, Rhat separately
+  num_col <- setdiff(names(x_sum)[purrr::map_lgl(x_sum, is.numeric)], c("n_eff", "Rhat"))
+
+  x_sum <- dplyr::mutate_at(x_sum, num_col, ~round(., digits))
+
+  if (rlang::has_name(x_sum, "n_eff")) x_sum$n_eff <- round(x_sum$n_eff, 0)
+  if (rlang::has_name(x_sum, "Rhat")) x_sum$Rhat <- round(x_sum$Rhat, max(2, digits))
+
+  x_sum <- tibble::column_to_rownames(x_sum, "parameter")
+
   # Format summaries nicely by study, if given
   print_study_block <- function(s, ...) {
     this_study <- unique(s$study)
     sec_header(this_study)
     s %>% dplyr::select(-.data$study) %>% print(...)
   }
-  if (rlang::has_name(x, "study")) {
-    by(x, x$study, print_study_block, ..., simplify = FALSE)
+
+  if (rlang::has_name(x_sum, "study")) {
+    by(x_sum, x_sum$study, print_study_block, ..., simplify = FALSE)
   } else {
-    print(x$summary, ...)
+    print(x_sum, ...)
   }
   invisible(x)
 }
