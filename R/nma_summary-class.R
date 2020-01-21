@@ -75,7 +75,9 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include) {
   print_study_block <- function(s, ...) {
     this_study <- unique(s$study)
     sec_header(this_study)
+    cat("\n")
     s %>% dplyr::select(-.data$study) %>% print(...)
+    cat("\n")
   }
 
   if (rlang::has_name(x_sum, "study")) {
