@@ -422,6 +422,13 @@ nma <- function(network,
   # Construct model matrix
   X_all <- model.matrix(nma_formula, data = idat_all)
 
+  # Remove columns for reference level of .trtclass
+  if (!is.null(network$classes)) {
+    col_trtclass_ref <- grepl(paste0(".trtclass",levels(network$classes)[1]),
+                              colnames(X_all), fixed = TRUE)
+    X_all <- X_all[, !col_trtclass_ref]
+  }
+
   if (consistency == "ume") {
     # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
     contr_cols <- grepl("^\\.contr", colnames(X_all))
