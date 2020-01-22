@@ -312,7 +312,7 @@ nma <- function(network,
       if (class_interactions == "common") {
         nma_formula <- do.call("substitute",
                                list(regression,
-                                    .trt = quote(.trtclass)))
+                                    list(.trt = quote(.trtclass))))
       } else if (class_interactions == "exchangeable") {
         abort('Exchangeable treatment class interactions (class_interactions = "exchangeable") not yet supported.')
       } else {
