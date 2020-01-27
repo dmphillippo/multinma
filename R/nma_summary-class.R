@@ -123,3 +123,30 @@ as.matrix.nma_summary <- function(x, ...){
   dimnames(a) <- names_a[-2]
   return(a)
 }
+
+#' Compute summary statistics from a 3D MCMC array
+#'
+#' @param x A 3D MCMC array
+#' @param probs Numeric vector of quantiles of interest
+#'
+#' @return A data frame of computed summaries, one row per parameter
+#' @noRd
+summary_mcmc_array <- function(x, probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
+  if (!is.array(x) || length(dim(x)) != 3) abort("Not a 3D MCMC array, [Iterations, Chains, Parameters]")
+
+  pars <- dimnames(x)[[3]]
+  p_mean <- apply(x, 3, mean)
+  p_sd <- apply(x, 3, sd)
+  p_n_eff <- apply(x, 3, rstan::ess_bulk)
+  p_rhat <- apply(x, 3, rstan::Rhat)
+  p_se_mean <- p_sd / sqrt(p_n_eff)
+  p_quan <- as.data.frame(t(apply(x, 3, quantile, probs = probs)))
+
+  ss <- tibble::tibble(
+    parameter = pars,
+    mean = p_mean, se_mean = p_se_mean, sd = p_sd,
+    !!! p_quan,
+    n_eff = p_n_eff, Rhat = p_rhat)
+
+  return(ss)
+}
