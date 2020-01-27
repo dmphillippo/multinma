@@ -22,7 +22,7 @@ Imports:
     stats,
     graphics,
     Rcpp (>= 0.12.0),
-    rstan (>= 2.18.1),
+    rstan (>= 2.19.2),
     rstantools (>= 2.0.0),
     loo (>= 2.0.0),
     Rdpack (>= 0.7),
