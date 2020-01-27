@@ -140,7 +140,13 @@ summary_mcmc_array <- function(x, probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
   p_n_eff <- apply(x, 3, rstan::ess_bulk)
   p_rhat <- apply(x, 3, rstan::Rhat)
   p_se_mean <- p_sd / sqrt(p_n_eff)
-  p_quan <- as.data.frame(t(apply(x, 3, quantile, probs = probs)))
+
+  p_quan <- apply(x, 3, quantile, probs = probs)
+  if (length(probs) == 1) {
+    p_quan <- tibble::tibble(!! paste0(probs*100, "%") := p_quan)
+  } else {
+    p_quan <- as.data.frame(t(p_quan))
+  }
 
   ss <- tibble::tibble(
     parameter = pars,
