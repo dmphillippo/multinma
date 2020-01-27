@@ -60,4 +60,36 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
     }
   }
+
+#' Make all treatment contrasts
+#'
+#' @param d A 3D MCMC array of basic treatment effects
+#' @param trt_ref String naming the reference treatment
+#'
+#' @return A 3D MCMC array of all contrasts
+#' @noRd
+make_all_contrasts <- function(d, trt_ref) {
+  if (!is.array(d) || length(dim(d)) != 3) abort("Not a 3D MCMC array [Iterations, Chains, Treatments]")
+  if (!rlang::is_string(trt_ref)) abort("`trt_ref` must be a single string")
+
+  trts <- c(trt_ref, stringr::str_extract(dimnames(d)[[3]], "(?<=\\[)(.+)(?=\\]$)"))
+  ntrt <- length(trts)
+
+  d_ab <- utils::combn(ntrt, 2)
+
+  dim_out <- dim(d)
+  dim_out[3] <- ncol(d_ab)
+
+  contrs <- array(NA_real_, dim = dim_out)
+
+  contrs[ , , 1:(ntrt - 1)] <- d
+  for (i in ntrt:ncol(d_ab)) {
+    contrs[ , , i] <- d[ , , d_ab[2, i] - 1] - d[ , , d_ab[1, i] - 1]
+  }
+
+  new_dimnames <- dimnames(d)
+  new_dimnames[[3]] <- paste0("d[", trts[d_ab[2, ]], " vs. ", trts[d_ab[1, ]], "]")
+  dimnames(contrs) <- new_dimnames
+
+  return(contrs)
 }
