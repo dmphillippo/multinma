@@ -36,8 +36,6 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
       if (anyDuplicated(newdata$.study))
         abort("Duplicate values in `study` column. Expecting one row per study.")
     }
-
-    # TODO: Check that integration points are given in newdata for ML-NMR models
   }
 
   if (!is.logical(all_contrasts) || length(all_contrasts) > 1)
@@ -47,4 +45,19 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
   if (x$consistency != "consistency")
     abort(glue::glue("Cannot produce relative effects under inconsistency '{x$consistency}' model."))
 
+  # Produce relative effects
+  if (is.null(x$regression)) {
+    # If no regression model, relative effects are just the d's
+
+  } else {
+    # If regression model, relative effects are study-specific
+
+    if (is.null(newdata)) {
+      # Produce relative effects for all studies in network
+
+    } else {
+      # Produce relative effects for all studies in newdata
+
+    }
+  }
 }
