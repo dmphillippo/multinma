@@ -61,12 +61,15 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include) {
       else !grepl(paste0("^", pars, "(\\[.+\\])?$", collapse = "|"), .data$parameter)
       )
 
-  # Get numeric columns for formatting, handling n_eff, Rhat separately
-  num_col <- setdiff(names(x_sum)[purrr::map_lgl(x_sum, is.numeric)], c("n_eff", "Rhat"))
+  # Get numeric columns for formatting, handling effective sample sizes and Rhat separately
+  num_col <- setdiff(names(x_sum)[purrr::map_lgl(x_sum, is.numeric)],
+                     c("n_eff", "Bulk_ESS", "Tail_ESS", "Rhat"))
 
   x_sum <- dplyr::mutate_at(x_sum, num_col, ~round(., digits))
 
   if (rlang::has_name(x_sum, "n_eff")) x_sum$n_eff <- round(x_sum$n_eff, 0)
+  if (rlang::has_name(x_sum, "Bulk_ESS")) x_sum$Bulk_ESS <- round(x_sum$Bulk_ESS, 0)
+  if (rlang::has_name(x_sum, "Tail_ESS")) x_sum$Tail_ESS <- round(x_sum$Tail_ESS, 0)
   if (rlang::has_name(x_sum, "Rhat")) x_sum$Rhat <- round(x_sum$Rhat, max(2, digits))
 
   x_sum <- tibble::column_to_rownames(x_sum, "parameter")
@@ -137,9 +140,10 @@ summary_mcmc_array <- function(x, probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
   pars <- dimnames(x)[[3]]
   p_mean <- apply(x, 3, mean)
   p_sd <- apply(x, 3, sd)
-  p_n_eff <- apply(x, 3, rstan::ess_bulk)
+  p_ess_bulk <- apply(x, 3, rstan::ess_bulk)
+  p_ess_tail <- apply(x, 3, rstan::ess_tail)
   p_rhat <- apply(x, 3, rstan::Rhat)
-  p_se_mean <- p_sd / sqrt(apply(x, 3, rstan::ess_mean))
+  p_se_mean <- p_sd / sqrt(apply(x, 3, rstan:::ess_mean))
 
   p_quan <- apply(x, 3, quantile, probs = probs)
   if (length(probs) == 1) {
@@ -152,7 +156,7 @@ summary_mcmc_array <- function(x, probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
     parameter = pars,
     mean = p_mean, se_mean = p_se_mean, sd = p_sd,
     !!! p_quan,
-    n_eff = p_n_eff, Rhat = p_rhat)
+    Bulk_ESS = p_ess_bulk, Tail_ESS = p_ess_tail, Rhat = p_rhat)
 
   return(ss)
 }
