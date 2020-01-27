@@ -15,12 +15,15 @@
 #' @param all_contrasts Logical, generate estimates for all contrasts (`TRUE`),
 #'   or just the "basic" contrasts against the network reference treatment
 #'   (`FALSE`)? Default `FALSE`.
+#' @param probs Numeric vector of quantiles of interest to present in computed
+#'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`
 #'
 #' @return A [nma_summary] object.
 #' @export
 #'
 #' @examples
-relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FALSE) {
+relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FALSE,
+                             probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
 
   # Checks
   if (!inherits(x, "stan_nma")) abort("Expecting a `stan_nma` object, as returned by nma().")
@@ -58,7 +61,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
       re_array <- make_all_contrasts(re_array, trt_ref = trt_ref)
     }
 
-    re_summary <- summary_mcmc_array(re_array)
+    re_summary <- summary_mcmc_array(re_array, probs = probs)
 
   } else {
     # If regression model, relative effects are study-specific
