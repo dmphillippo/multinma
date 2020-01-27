@@ -45,9 +45,20 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
   if (x$consistency != "consistency")
     abort(glue::glue("Cannot produce relative effects under inconsistency '{x$consistency}' model."))
 
+  # Get reference treatment
+  trt_ref <- levels(x$network$treatments)[1]
+
   # Produce relative effects
   if (is.null(x$regression)) {
     # If no regression model, relative effects are just the d's
+
+    re_array <- as.array(as.stanfit(x), pars = "d")
+
+    if (all_contrasts) {
+      re_array <- make_all_contrasts(re_array, trt_ref = trt_ref)
+    }
+
+    re_summary <- summary_mcmc_array(re_array)
 
   } else {
     # If regression model, relative effects are study-specific
@@ -60,6 +71,13 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
     }
   }
+
+  out <- list(summary = re_summary, sims = re_array)
+  class(out) <- "nma_summary"
+
+  return(out)
+}
+
 
 #' Make all treatment contrasts
 #'
