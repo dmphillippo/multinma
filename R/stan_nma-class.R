@@ -70,16 +70,18 @@ print.stan_nma <- function(x, ...) {
 #' Posterior summaries from `stan_nma` objects
 #'
 #' @param x A `stan_nma` object
-#' @param ... Further arguments passed to [rstan::monitor()]
 #' @param pars,include See [rstan::extract()]
+#' @param probs Numeric vector of specifying quantiles of interest, default
+#'   `c(0.025, 0.25, 0.5, 0.75, 0.975)`
 #'
 #' @return A [nma_summary] object
 #' @export
 #'
 #' @examples
-summary.stan_nma <- function(x, ..., pars, include = TRUE) {
+summary.stan_nma <- function(x, pars, include = TRUE,
+                             probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
   sims <- as.array(x, pars = pars, include = include)
-  sums <- tibble::as_tibble(rstan::summary(as.stanfit(x), ...)$summary, rownames = "parameter")
+  sums <- summary_mcmc_array(sims, probs = probs)
   ss <- list(summary = sums, sims = sims)
   class(ss) <- "nma_summary"
   return(ss)
