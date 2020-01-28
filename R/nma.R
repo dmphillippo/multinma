@@ -166,14 +166,7 @@ nma <- function(network,
 
     # Set up integration variables if present
     if (use_int) {
-      idat_agd_arm <- dat_agd_arm %>%
-         dplyr::select(-dplyr::one_of(intersect(network$int_names, colnames(dat_agd_arm)))) %>%
-         dplyr::rename_at(dplyr::vars(dplyr::starts_with(".int_")), ~gsub(".int_", "", ., fixed = TRUE)) %>%
-        {if (getNamespaceVersion("tidyr") < "1.0.0") {
-           tidyr::unnest(., !!! rlang::syms(network$int_names))
-         } else {
-           tidyr::unnest(., c(!!! rlang::syms(network$int_names)))
-        }}
+      idat_agd_arm <- unnest_integration_points(dat_agd_arm, network$int_names)
     } else {
       idat_agd_arm <- dat_agd_arm
     }
@@ -194,14 +187,7 @@ nma <- function(network,
 
     # Set up integration variables if present
     if (use_int) {
-      idat_agd_contrast <- dat_agd_contrast %>%
-        dplyr::select(-dplyr::one_of(union(network$int_names, colnames(dat_agd_contrast)))) %>%
-        dplyr::rename_at(dplyr::vars(dplyr::starts_with(".int_")), ~gsub(".int_", "", ., fixed = TRUE)) %>%
-        {if (getNamespaceVersion("tidyr") < "1.0.0") {
-           tidyr::unnest(., !!! rlang::syms(network$int_names))
-         } else {
-           tidyr::unnest(., c(!!! rlang::syms(network$int_names)))
-        }}
+      idat_agd_contrast <-  unnest_integration_points(dat_agd_contrast, network$int_names)
     } else {
       idat_agd_contrast <- dat_agd_contrast
     }
@@ -1206,4 +1192,27 @@ make_Sigma_block <- function(x) {
   S <- matrix(s_ij, nrow = narm, ncol = narm)
   diag(S) <- s_ii
   return(S)
+}
+
+#' Prepare integration points ready for design matrix
+#'
+#' Unnest integration points stored in .int_* list columns, renaming to the
+#' target variable name so that model.matrix can be called
+#'
+#' @param x Data frame with nested integration points, stored in list
+#'   columns as .int_<variable name>
+#' @param int_names Character vector of target variable names
+#'
+#' @noRd
+unnest_integration_points <- function(x, int_names) {
+  idat <- x %>%
+    dplyr::select(-dplyr::one_of(intersect(int_names, colnames(x)))) %>%
+    dplyr::rename_at(dplyr::vars(dplyr::starts_with(".int_")), ~gsub(".int_", "", ., fixed = TRUE)) %>%
+    {if (getNamespaceVersion("tidyr") < "1.0.0") {
+      tidyr::unnest(., !!! rlang::syms(int_names))
+    } else {
+      tidyr::unnest(., c(!!! rlang::syms(int_names)))
+    }}
+
+  return(idat)
 }
