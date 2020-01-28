@@ -69,6 +69,14 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
     if (is.null(newdata)) {
       # Produce relative effects for all studies in network
 
+      # Make data frame of study covariate means
+      if ((has_agd_arm(x$network) || has_agd_contrast(x$network)) && !has_agd_sample_size(x$network))
+        abort(
+          paste("AgD study sample sizes not specified in network, cannot calculate mean covariate values.",
+                "  - Specify `sample_size` in set_agd_*(), or",
+                "  - Specify covariate values for relative effects using the `newdata` argument",
+                sep = "\n"))
+
     } else {
       # Produce relative effects for all studies in newdata
 
