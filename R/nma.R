@@ -280,41 +280,18 @@ nma <- function(network,
   idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast_nonbl)
   idat_all_plus_bl <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast)
 
-  if (!is.null(regression)) {
-    # Warn if combining AgD and IPD in a meta-regression without using integration
-    if (!inherits(network, "mlnmr_data") && has_ipd(network) &&
-        (has_agd_arm(network) || has_agd_contrast(network))) {
-      warn(glue::glue("No integration points available, using naive plug-in model at aggregate level.\n",
-                      "Use `add_integration()` to add integration points to the network."))
-    }
-
-    # Set up treatment classes
-    if (!is.null(network$classes)) {
-      if (class_interactions == "common") {
-        nma_formula <- do.call("substitute",
-                               list(regression,
-                                    list(.trt = quote(.trtclass))))
-      } else if (class_interactions == "exchangeable") {
-        abort('Exchangeable treatment class interactions (class_interactions = "exchangeable") not yet supported.')
-      } else {
-        nma_formula <- regression
-      }
-    } else {
-      nma_formula <- regression
-    }
-
-    if (consistency == "ume") {
-      nma_formula <- update.formula(nma_formula, ~-1 + .study + .contr + .)
-    } else {
-      nma_formula <- update.formula(nma_formula, ~-1 + .study + .trt + .)
-    }
-  } else {
-    if (consistency == "ume") {
-      nma_formula <- ~-1 + .study + .contr
-    } else {
-      nma_formula <- ~-1 + .study + .trt
-    }
+  # Warn if combining AgD and IPD in a meta-regression without using integration
+  if (!is.null(regression) && !inherits(network, "mlnmr_data") && has_ipd(network) &&
+      (has_agd_arm(network) || has_agd_contrast(network))) {
+    warn(glue::glue("No integration points available, using naive plug-in model at aggregate level.\n",
+                    "Use `add_integration()` to add integration points to the network."))
   }
+
+  # Make NMA formula
+  nma_formula <- make_nma_formula(regression,
+                                  consistency = consistency,
+                                  classes = !is.null(network$classes),
+                                  class_interactions = class_interactions)
 
   # Check that required variables are present in each data set, and non-missing
   if (has_ipd(network)) {
@@ -1134,6 +1111,60 @@ get_outcome_variables <- function(x, o_type) {
   return(
     dplyr::select(x, dplyr::one_of(intersect(o_vars, colnames(x))))
   )
+}
+
+#' Construct NMA formula
+#'
+#' @param regression Regression formula, or NULL
+#' @param consistency Consistency/inconsistency model (character string)
+#' @param classes Classes present? TRUE / FALSE
+#' @param class_interactions Class interaction specification (character string)
+#'
+#' @return A formula
+make_nma_formula <- function(regression,
+                             consistency = c("consistency", "nodesplit", "ume"),
+                             classes,
+                             class_interactions = c("common", "exchangeable", "independent")
+                             ) {
+
+  if (!is.null(regression) && !rlang::is_formula(regression)) abort("`regression` is not a formula")
+  consistency <- rlang::arg_match(consistency)
+  if (!rlang::is_bool(classes)) abort("`classes` should be TRUE or FALSE")
+
+  if (!is.null(regression)) {
+
+    # Set up treatment classes
+    if (classes) {
+
+      if (class_interactions == "common") {
+        nma_formula <- do.call("substitute",
+                               list(regression,
+                                    list(.trt = quote(.trtclass))))
+
+        # Remove any main effect of .trtclass, e.g. if user specified var*.trt
+        nma_formula <- update.formula(nma_formula, ~. - .trtclass)
+
+      } else if (class_interactions == "exchangeable") {
+        abort('Exchangeable treatment class interactions (class_interactions = "exchangeable") not yet supported.')
+      } else {
+        nma_formula <- regression
+      }
+    } else {
+      nma_formula <- regression
+    }
+
+    if (consistency == "ume") {
+      nma_formula <- update.formula(nma_formula, ~-1 + .study + .contr + .)
+    } else {
+      nma_formula <- update.formula(nma_formula, ~-1 + .study + .trt + .)
+    }
+  } else {
+    if (consistency == "ume") {
+      nma_formula <- ~-1 + .study + .contr
+    } else {
+      nma_formula <- ~-1 + .study + .trt
+    }
+  }
 }
 
 #' Set prior details for Stan models
