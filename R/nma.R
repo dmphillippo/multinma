@@ -134,11 +134,6 @@ nma <- function(network,
   # Set to 1 if no numerical integration, so that regression on summary data is possible
   n_int <- if (use_int) network$n_int else 1
 
-  # Define factor label sanitising function
-  fct_sanitise <- function(f) {
-    forcats::fct_relabel(f, ~gsub(":", "_", ., fixed = TRUE))
-  }
-
   # Get design matrices and outcomes
   if (has_ipd(network)) {
     dat_ipd <- network$ipd %>%
@@ -1215,4 +1210,15 @@ unnest_integration_points <- function(x, int_names) {
     }}
 
   return(idat)
+}
+
+#' Sanitise factor labels
+#'
+#' Remove forbidden chars from factor labels, replacing with "_"
+#'
+#' @param f A factor
+#'
+#' @noRd
+fct_sanitise <- function(f) {
+  forcats::fct_relabel(f, ~gsub(":", "_", ., fixed = TRUE))
 }
