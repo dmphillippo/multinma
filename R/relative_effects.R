@@ -164,3 +164,28 @@ make_all_contrasts <- function(d, trt_ref) {
 
   return(contrs)
 }
+
+#' Crossproduct for 3D MCMC arrays
+#'
+#' @param x A matrix
+#' @param a A 3D MCMC array
+#'
+#' @return A 3D MCMC array
+tcrossprod_mcmc_array <- function(a, x) {
+  if (!is.array(a) || length(dim(a)) != 3) abort("Not a 3D MCMC array [Iterations, Chains, Parameters]")
+
+  dim_out <- c(dim(a)[1:2], NROW(x))
+  dimnames_out <- dimnames(a)
+  dimnames_out[[3]] <- if (!is.null(rownames(x))) rownames(x) else paste0("V", 1:NROW(x))
+  out <- array(NA_real_, dim = dim_out)
+
+  nchains <- dim(a)[2]
+
+  for (i in 1:nchains) {
+    out[ , i, ] <- tcrossprod(a[ , i, ], x)
+  }
+
+  dimnames(out) <- dimnames_out
+
+  return(out)
+}
