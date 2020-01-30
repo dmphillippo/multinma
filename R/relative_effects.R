@@ -112,20 +112,10 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
       dat_all <- dplyr::bind_rows(dat_agd_arm, dat_agd_contrast, dat_ipd)
 
-      # Make one row per study, taking weighted mean
-      # For factor / character vars, make a note of the proportions at each
-      # level to insert into the design matrix later
-      numeric_cols <- names(dat_all)[purrr::map_lgl(dat_all, is.numeric) &
-                                       !startsWith(names(dat_all), ".")]
-
+      # Take the first row for each study. We will correct the design matrix below
       dat_studies <- dat_all %>%
         dplyr::group_by(.data$.study) %>%
-        {dplyr::left_join(
-          dplyr::slice(., 1) %>% dplyr::select(-dplyr::one_of(numeric_cols, ".trt", ".trtclass"),),
-          dplyr::summarise_at(., numeric_cols, ~weighted.mean(., w = .data$.sample_size)),
-          by = ".study")
-        }
-
+        dplyr::slice(1)
 
     } else {
       # Produce relative effects for all studies in newdata
@@ -141,6 +131,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
     # Expand rows for every treatment
     all_trts <- tidyr::expand_grid(.study = dat_studies$.study, .trt = x$network$treatments[-1])
+    if (rlang::has_name(dat_studies, ".trt")) dat_studies <- dplyr::select(dat_studies, -.data$.trt)
     dat_studies <- dplyr::left_join(all_trts, dat_studies, by = ".study")
 
     # Add in .trtclass if defined in network
@@ -162,21 +153,44 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
     X_all <- model.matrix(nma_formula, data = dat_studies)
 
+    # Calculate mean covariate values by study in the network, if newdata is NULL
+    if (is.null(newdata)) {
+      X_study_means <- model.matrix(nma_formula, data = dat_all) %>%
+        tibble::as_tibble() %>%
+        tibble::add_column(.study = dat_all$.study, .sample_size = dat_all$.sample_size, .before = 1) %>%
+        dplyr::group_by(.data$.study) %>%
+        dplyr::summarise_at(setdiff(colnames(.), c(".sample_size", ".study")),
+                            ~weighted.mean(., w = .data$.sample_size)) %>%
+        dplyr::select(-.data$.study) %>%
+        as.matrix()
+    }
+
     # Remove columns for reference level of .trtclass
     if (!is.null(x$network$classes)) {
-      col_trtclass_ref <- grepl(paste0(".trtclass",levels(x$network$classes)[1]),
+      col_trtclass_ref <- grepl(paste0(".trtclass", levels(x$network$classes)[1]),
                                 colnames(X_all), fixed = TRUE)
       X_all <- X_all[, !col_trtclass_ref]
     }
 
-    # Subset design matrix into EM columns and trt columns, naming columns to
-    # match Stan parameters
-
+    # Subset design matrix into EM columns and trt columns
     X_EM <- X_all[, grepl("(^\\.trt(class)?.+\\:)|(\\:\\.trt(class)?)",
                           colnames(X_all))]
+    X_d <- X_all[, grepl("^(\\.trt|\\.contr)[^:]+$",
+                         colnames(X_all))]
 
-    X_d <- X_all[, grepl("^(\\.trt|\\.contr)[^:]+$", colnames(X_all))]
+    # Replace EM design matrix with study means if newdata is NULL
+    if (is.null(newdata)) {
+      X_EM_names <- colnames(X_EM)
+      X_mean_names <- colnames(X_study_means)
+      ntrt <- nlevels(x$network$treatments)
+      for (i in 1:NCOL(X_EM)) {
+        if (X_EM_names[i] %in% X_mean_names) {
+          X_EM[, i] <- rep(X_study_means[, X_EM_names[i]], each = ntrt - 1)
+        }
+      }
+    }
 
+    # Name columns to match Stan parameters
     colnames(X_EM) <- paste0("beta[", colnames(X_EM), "]")
     colnames(X_d) <- paste0("d[", x$network$treatments[-1], "]")
 
