@@ -77,7 +77,6 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
                 "  - Specify covariate values for relative effects using the `newdata` argument",
                 sep = "\n"))
 
-
       if (has_agd_arm(x$network)) {
         if (inherits(x$network, "mlnmr_data")) {
           dat_agd_arm <- unnest_integration_points(x$network$agd_arm, x$network$int_names) %>%
@@ -111,18 +110,98 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
         dat_ipd <- tibble::tibble()
       }
 
-      dat_all <- dplyr::bind_rows(dat_agd_arm, dat_agd_contrast, dat_ipd) %>%
+      dat_all <- dplyr::bind_rows(dat_agd_arm, dat_agd_contrast, dat_ipd)
+
+      # Make one row per study, taking weighted mean
+      # For factor / character vars, make a note of the proportions at each
+      # level to insert into the design matrix later
+      numeric_cols <- names(dat_all)[purrr::map_lgl(dat_all, is.numeric) &
+                                       !startsWith(names(dat_all), ".")]
+
+      dat_studies <- dat_all %>%
         dplyr::group_by(.data$.study) %>%
-        dplyr::summarise_if(is.numeric, ~weighted.mean(., w = .data$.sample_size))
+        {dplyr::left_join(
+          dplyr::slice(., 1) %>% dplyr::select(-dplyr::one_of(numeric_cols, ".trt", ".trtclass"),),
+          dplyr::summarise_at(., numeric_cols, ~weighted.mean(., w = .data$.sample_size)),
+          by = ".study")
+        }
+
 
     } else {
       # Produce relative effects for all studies in newdata
 
-      dat_all <- newdata
-    } else {
-      # Produce relative effects for all studies in newdata
-
+      dat_studies <- newdata
     }
+
+    # Apply centering if used
+    if (!is.null(x$xbar)) {
+      cen_vars <- intersect(names(dat_studies), names(x$xbar))
+      dat_studies[, cen_vars] <- sweep(dat_studies[, cen_vars], 2, x$xbar[cen_vars])
+    }
+
+    # Expand rows for every treatment
+    all_trts <- tidyr::expand_grid(.study = dat_studies$.study, .trt = x$network$treatments[-1])
+    dat_studies <- dplyr::left_join(all_trts, dat_studies, by = ".study")
+
+    # Add in .trtclass if defined in network
+    if (!is.null(x$network$classes)) {
+      dat_studies$.trtclass <- x$network$classes[as.numeric(dat_studies$.trt)]
+    }
+
+    # Sanitise factor levels
+    dat_studies <- dplyr::mutate_at(dat_studies,
+      .vars = if (!is.null(x$network$classes)) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
+      .funs = fct_sanitise
+    )
+
+    # Get design matrix
+    nma_formula <- make_nma_formula(x$regression,
+                                    consistency = x$consistency,
+                                    classes = !is.null(x$network$classes),
+                                    class_interactions = x$class_interactions)
+
+    X_all <- model.matrix(nma_formula, data = dat_studies)
+
+    # Remove columns for reference level of .trtclass
+    if (!is.null(x$network$classes)) {
+      col_trtclass_ref <- grepl(paste0(".trtclass",levels(x$network$classes)[1]),
+                                colnames(X_all), fixed = TRUE)
+      X_all <- X_all[, !col_trtclass_ref]
+    }
+
+    # Subset design matrix into EM columns and trt columns, naming columns to
+    # match Stan parameters
+
+    X_EM <- X_all[, grepl("(^\\.trt(class)?.+\\:)|(\\:\\.trt(class)?)",
+                          colnames(X_all))]
+
+    X_d <- X_all[, grepl("^(\\.trt|\\.contr)[^:]+$", colnames(X_all))]
+
+    colnames(X_EM) <- paste0("beta[", colnames(X_EM), "]")
+    colnames(X_d) <- paste0("d[", x$network$treatments[-1], "]")
+
+    X_EM_d <- cbind(X_EM, X_d)
+
+    # Name rows by treatment for now (required for make_all_contrasts)
+    rownames(X_EM_d) <- paste0("d[", rep(x$network$treatments[-1],
+                                         times = dplyr::n_distinct(dat_studies$.study)) , "]")
+
+    # Linear combination with posterior MCMC array
+    d_array <- as.array(x, pars = colnames(X_EM_d))
+    re_array <- tcrossprod_mcmc_array(d_array, X_EM_d)
+
+    # Produce all contrasts, if required
+    if (all_contrasts)
+      re_array <- make_all_contrasts(re_array, trt_ref = levels(x$network$treatments)[1])
+
+    # Add in study names to parameters
+    parnames <- stringr::str_extract(dimnames(re_array)[[3]], "(?<=^d\\[)(.+)(?=\\]$)")
+    study_parnames <- paste0("d[", dat_studies$.study, ": ", parnames, "]")
+    dimnames(re_array)[[3]] <- study_parnames
+
+    # Create summary stats, adding in study and covariate information
+    re_summary <- summary_mcmc_array(re_array, probs = probs) %>%
+      tibble::add_column(study = dat_studies$.study, .before = 1)
   }
 
   out <- list(summary = re_summary, sims = re_array)
