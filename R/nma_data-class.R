@@ -179,6 +179,7 @@ print.mlnmr_data <- function(x, ..., n = 10) {
 sec_header <- function(s = "",
                        width = min(80, getOption("width")),
                        sep = ifelse(nchar(s), " ", "")) {
+  s <- as.character(s)
   cat(subtle(strrep('-', width - nchar(s) - 2*nchar(sep))),
       crayon::bold(s),
       subtle("----"), "\n", sep = sep)
