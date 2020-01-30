@@ -77,7 +77,7 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include) {
   # Format summaries nicely by study, if given
   print_study_block <- function(s, ...) {
     this_study <- unique(s$study)
-    sec_header(this_study)
+    sec_header(paste("Study:", this_study))
     cat("\n")
     s %>% dplyr::select(-.data$study) %>% print(...)
     cat("\n")
