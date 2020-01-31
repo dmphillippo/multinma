@@ -148,13 +148,42 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
       .funs = fct_sanitise
     )
 
-    # Get design matrix
+    # Get model formula and design matrix
     nma_formula <- make_nma_formula(x$regression,
                                     consistency = x$consistency,
                                     classes = !is.null(x$network$classes),
                                     class_interactions = x$class_interactions)
 
+
+    # Drop study to factor to 1L if only one study (avoid contrasts need 2 or
+    # more levels error)
+    if (dplyr::n_distinct(dat_studies$.study) == 1) {
+
+      # Save study label to restore
+      single_study_label <- unique(dat_studies$.study)
+      dat_studies$.study_temp <- dat_studies$.study
+      dat_studies$.study <- 1L
+
+      # Fix up model formula with an intercept
+      nma_formula <- update.formula(nma_formula, ~. + 1)
+    } else {
+      single_study_label <- NULL
+    }
+
     X_all <- model.matrix(nma_formula, data = dat_studies)
+
+    if (!is.null(single_study_label)) {
+      # Restore single study label and .study column
+      colnames(X_all) <- stringr::str_replace(colnames(X_all),
+                                              "^\\.study$",
+                                              paste0(".study", single_study_label))
+      dat_studies <- dat_studies %>%
+        dplyr::mutate(.study = .data$.study_temp) %>%
+        dplyr::select(-.data$.study_temp)
+
+      # Drop intercept column from design matrix
+      X_all <- X_all[, -1, drop = FALSE]
+    }
 
     # Remove columns for reference level of .trtclass
     if (!is.null(x$network$classes)) {
