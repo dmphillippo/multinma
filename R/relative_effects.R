@@ -31,10 +31,11 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
   if (!is.null(newdata)) {
     if (!is.data.frame(newdata)) abort("`newdata` is not a data frame.")
 
-    if (rlang::quo_is_null(study)) {
-      newdata$.study <- 1:nrow(newdata)
+    .study <- pull_non_null(newdata, enquo(study))
+    if (is.null(.study)) {
+      newdata$.study <- nfactor(seq_len(nrow(newdata)))
     } else {
-      newdata <- dplyr::mutate(newdata, .study = {{ study }})
+      newdata <- dplyr::mutate(newdata, .study = nfactor(.study))
 
       if (anyDuplicated(newdata$.study))
         abort("Duplicate values in `study` column. Expecting one row per study.")
