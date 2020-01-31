@@ -226,7 +226,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
     # Create summary stats
     re_summary <- summary_mcmc_array(re_array, probs = probs) %>%
-      tibble::add_column(study = dat_studies$.study, .before = 1)
+      tibble::add_column(.study = dat_studies$.study, .before = 1)
 
     # Prepare study covariate info
     study_EMs <- X_study_means

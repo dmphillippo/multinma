@@ -13,6 +13,9 @@
 #'   \item{summary}{A data frame containing the computed summary statistics}
 #'   \item{sims}{A 3D array \[Iteration, Chain, Parameter\] of MCMC
 #'   simulations}
+#'   \item{studies}{(Optional) A data frame containing study information,
+#'   printed along with the corresponding summary statistics if `summary`
+#'   contains a `.study` column. Should have a matching `.study` column.}
 #'   }
 #'
 NULL
@@ -75,16 +78,26 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include) {
   x_sum <- tibble::column_to_rownames(x_sum, "parameter")
 
   # Format summaries nicely by study, if given
-  print_study_block <- function(s, ...) {
-    this_study <- unique(s$study)
+  print_study_block <- function(s, info = NULL, ...) {
+    this_study <- unique(s$.study)
     sec_header(paste("Study:", this_study))
     cat("\n")
-    s %>% dplyr::select(-.data$study) %>% print(...)
+    if (!is.null(info)) {
+      cat("Covariate values:\n")
+      info %>%
+        dplyr::filter(.data$.study == this_study) %>%
+        dplyr::select(-.data$.study) %>%
+        dplyr::mutate_if(is.numeric, round, digits = digits) %>%
+        as.data.frame() %>%
+        print(..., row.names = FALSE)
+      cat("\n")
+    }
+    s %>% dplyr::select(-.data$.study) %>% print(...)
     cat("\n")
   }
 
-  if (rlang::has_name(x_sum, "study")) {
-    by(x_sum, x_sum$study, print_study_block, ..., simplify = FALSE)
+  if (rlang::has_name(x_sum, ".study")) {
+    by(x_sum, x_sum$.study, print_study_block, info = x$studies, ..., simplify = FALSE)
   } else {
     print(x_sum, ...)
   }
