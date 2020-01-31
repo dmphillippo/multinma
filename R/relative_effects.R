@@ -63,6 +63,8 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
     re_summary <- summary_mcmc_array(re_array, probs = probs)
 
+    out <- list(summary = re_summary, sims = re_array)
+
   } else {
     # If regression model, relative effects are study-specific
 
@@ -222,14 +224,29 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
     study_parnames <- paste0("d[", dat_studies$.study, ": ", parnames, "]")
     dimnames(re_array)[[3]] <- study_parnames
 
-    # Create summary stats, adding in study and covariate information
+    # Create summary stats
     re_summary <- summary_mcmc_array(re_array, probs = probs) %>%
       tibble::add_column(study = dat_studies$.study, .before = 1)
+
+    # Prepare study covariate info
+    study_EMs <- X_study_means
+    colnames(study_EMs) <- stringr::str_remove(colnames(study_EMs), "\\:?\\.trt(class)?\\:?")
+    study_EMs <- study_EMs[, !duplicated(colnames(study_EMs))]
+
+    # Uncenter, if necessary
+    if (!is.null(x$xbar)) {
+      cen_vars <- intersect(colnames(study_EMs), names(x$xbar))
+      study_EMs[, cen_vars] <- sweep(study_EMs[, cen_vars], 2, x$xbar[cen_vars], FUN = "+")
+    }
+
+    study_EMs <- tibble::as_tibble(study_EMs) %>%
+      tibble::add_column(.study = unique(dat_studies$.study), .before = 1)
+
+    out <- list(summary = re_summary, sims = re_array, studies = study_EMs)
   }
 
-  out <- list(summary = re_summary, sims = re_array)
+  # Return nma_summary object
   class(out) <- "nma_summary"
-
   return(out)
 }
 
