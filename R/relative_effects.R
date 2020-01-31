@@ -153,18 +153,6 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
     X_all <- model.matrix(nma_formula, data = dat_studies)
 
-    # Calculate mean covariate values by study in the network, if newdata is NULL
-    if (is.null(newdata)) {
-      X_study_means <- model.matrix(nma_formula, data = dat_all) %>%
-        tibble::as_tibble() %>%
-        tibble::add_column(.study = dat_all$.study, .sample_size = dat_all$.sample_size, .before = 1) %>%
-        dplyr::group_by(.data$.study) %>%
-        dplyr::summarise_at(setdiff(colnames(.), c(".sample_size", ".study")),
-                            ~weighted.mean(., w = .data$.sample_size)) %>%
-        dplyr::select(-.data$.study) %>%
-        as.matrix()
-    }
-
     # Remove columns for reference level of .trtclass
     if (!is.null(x$network$classes)) {
       col_trtclass_ref <- grepl(paste0(".trtclass", levels(x$network$classes)[1]),
@@ -180,17 +168,35 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
     # Replace EM design matrix with study means if newdata is NULL
     if (is.null(newdata)) {
+
+      # Apply centering if used
+      if (!is.null(x$xbar)) {
+        cen_vars <- intersect(names(dat_all), names(x$xbar))
+        dat_all_cen <- dat_all
+        dat_all_cen[, cen_vars] <- sweep(dat_all[, cen_vars], 2, x$xbar[cen_vars])
+      }
+
+      # Calculate mean covariate values by study in the network
+      X_study_means <- model.matrix(nma_formula, data = dat_all_cen) %>%
+        tibble::as_tibble() %>%
+        tibble::add_column(.study = dat_all$.study, .sample_size = dat_all$.sample_size, .before = 1) %>%
+        dplyr::group_by(.data$.study) %>%
+        dplyr::summarise_at(setdiff(colnames(.), c(".sample_size", ".study")),
+                            ~weighted.mean(., w = .data$.sample_size)) %>%
+        dplyr::select(-.data$.study) %>%
+        as.matrix()
+
       # Pick out variables used in X_EM
       X_study_means <- X_study_means[, colnames(X_EM)]
 
       # Repeat study rows for the number of treatment parameters
       ntrt <- nlevels(x$network$treatments)
-      X_study_means <- apply(X_study_means, 2, rep, each = ntrt - 1)
+      X_study_means_rep <- apply(X_study_means, 2, rep, each = ntrt - 1)
 
       # Replace non-zero entries of design matrix
       # This works only because trt columns are 0/1, so interactions are just the covariate values
       nonzero <- X_EM != 0
-      X_EM[nonzero] <- X_study_means[nonzero]
+      X_EM[nonzero] <- X_study_means_rep[nonzero]
     }
 
     # Name columns to match Stan parameters
