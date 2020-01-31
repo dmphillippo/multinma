@@ -1121,6 +1121,7 @@ get_outcome_variables <- function(x, o_type) {
 #' @param class_interactions Class interaction specification (character string)
 #'
 #' @return A formula
+#' @noRd
 make_nma_formula <- function(regression,
                              consistency = c("consistency", "nodesplit", "ume"),
                              classes,

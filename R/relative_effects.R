@@ -296,6 +296,7 @@ make_all_contrasts <- function(d, trt_ref) {
 #' @param a A 3D MCMC array
 #'
 #' @return A 3D MCMC array
+#' @noRd
 tcrossprod_mcmc_array <- function(a, x) {
   if (!is.array(a) || length(dim(a)) != 3) abort("Not a 3D MCMC array [Iterations, Chains, Parameters]")
 
