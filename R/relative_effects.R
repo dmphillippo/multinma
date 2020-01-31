@@ -180,14 +180,17 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
     # Replace EM design matrix with study means if newdata is NULL
     if (is.null(newdata)) {
-      X_EM_names <- colnames(X_EM)
-      X_mean_names <- colnames(X_study_means)
+      # Pick out variables used in X_EM
+      X_study_means <- X_study_means[, colnames(X_EM)]
+
+      # Repeat study rows for the number of treatment parameters
       ntrt <- nlevels(x$network$treatments)
-      for (i in 1:NCOL(X_EM)) {
-        if (X_EM_names[i] %in% X_mean_names) {
-          X_EM[, i] <- rep(X_study_means[, X_EM_names[i]], each = ntrt - 1)
-        }
-      }
+      X_study_means <- apply(X_study_means, 2, rep, each = ntrt - 1)
+
+      # Replace non-zero entries of design matrix
+      # This works only because trt columns are 0/1, so interactions are just the covariate values
+      nonzero <- X_EM != 0
+      X_EM[nonzero] <- X_study_means[nonzero]
     }
 
     # Name columns to match Stan parameters
