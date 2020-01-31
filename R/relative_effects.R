@@ -128,7 +128,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
     # Apply centering if used
     if (!is.null(x$xbar)) {
       cen_vars <- intersect(names(dat_studies), names(x$xbar))
-      dat_studies[, cen_vars] <- sweep(dat_studies[, cen_vars], 2, x$xbar[cen_vars])
+      dat_studies[, cen_vars] <- sweep(dat_studies[, cen_vars, drop = FALSE], 2, x$xbar[cen_vars])
     }
 
     # Expand rows for every treatment
@@ -159,14 +159,13 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
     if (!is.null(x$network$classes)) {
       col_trtclass_ref <- grepl(paste0(".trtclass", levels(x$network$classes)[1]),
                                 colnames(X_all), fixed = TRUE)
-      X_all <- X_all[, !col_trtclass_ref]
+      X_all <- X_all[, !col_trtclass_ref, drop = FALSE]
     }
 
     # Subset design matrix into EM columns and trt columns
-    X_EM <- X_all[, grepl("(^\\.trt(class)?.+\\:)|(\\:\\.trt(class)?)",
-                          colnames(X_all))]
-    X_d <- X_all[, grepl("^(\\.trt|\\.contr)[^:]+$",
-                         colnames(X_all))]
+    EM_regex <- "(^\\.trt(class)?.+\\:)|(\\:\\.trt(class)?.+$)"
+    X_EM <- X_all[, grepl(EM_regex, colnames(X_all))]
+    X_d <- X_all[, grepl("^(\\.trt|\\.contr)[^:]+$", colnames(X_all))]
 
     # Replace EM design matrix with study means if newdata is NULL
     if (is.null(newdata)) {
@@ -175,27 +174,35 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
       if (!is.null(x$xbar)) {
         cen_vars <- intersect(names(dat_all), names(x$xbar))
         dat_all_cen <- dat_all
-        dat_all_cen[, cen_vars] <- sweep(dat_all[, cen_vars], 2, x$xbar[cen_vars])
+        dat_all_cen[, cen_vars] <- sweep(dat_all[, cen_vars, drop = FALSE], 2, x$xbar[cen_vars])
+      } else {
+        dat_all_cen <- dat_all
       }
 
+      # Figure out which covariates are EMs from model matrix
+      EM_col_names <- stringr::str_remove(colnames(X_EM), EM_regex)
+      EM_vars <- unique(EM_col_names)
+      EM_formula <- as.formula(paste0("~", paste(EM_vars, collapse = " + ")))
+
+
       # Calculate mean covariate values by study in the network
-      X_study_means <- model.matrix(nma_formula, data = dat_all_cen) %>%
+      X_study_means <- model.matrix(EM_formula, data = dat_all_cen) %>%
         tibble::as_tibble() %>%
         tibble::add_column(.study = dat_all$.study, .sample_size = dat_all$.sample_size, .before = 1) %>%
         dplyr::group_by(.data$.study) %>%
         dplyr::summarise_at(setdiff(colnames(.), c(".sample_size", ".study")),
                             ~weighted.mean(., w = .data$.sample_size)) %>%
-        dplyr::select(-.data$.study) %>%
+        dplyr::select(!!! unique(EM_col_names)) %>%
         as.matrix()
 
-      # Pick out variables used in X_EM
-      X_study_means <- X_study_means[, colnames(X_EM)]
+      # Repeat columns across interaction columns in X_EM
+      X_study_means_rep <- X_study_means[, EM_col_names, drop = FALSE]
 
       # Repeat study rows for the number of treatment parameters
       ntrt <- nlevels(x$network$treatments)
-      X_study_means_rep <- apply(X_study_means, 2, rep, each = ntrt - 1)
+      X_study_means_rep <- apply(X_study_means_rep, 2, rep, each = ntrt - 1)
 
-      # Replace non-zero entries of design matrix
+      # Replace non-zero entries of design matrix X_EM with corresponding mean values
       # This works only because trt columns are 0/1, so interactions are just the covariate values
       nonzero <- X_EM != 0
       X_EM[nonzero] <- X_study_means_rep[nonzero]
@@ -230,13 +237,11 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
     # Prepare study covariate info
     study_EMs <- X_study_means
-    colnames(study_EMs) <- stringr::str_remove(colnames(study_EMs), "\\:?\\.trt(class)?\\:?")
-    study_EMs <- study_EMs[, !duplicated(colnames(study_EMs))]
 
     # Uncenter, if necessary
     if (!is.null(x$xbar)) {
       cen_vars <- intersect(colnames(study_EMs), names(x$xbar))
-      study_EMs[, cen_vars] <- sweep(study_EMs[, cen_vars], 2, x$xbar[cen_vars], FUN = "+")
+      study_EMs[, cen_vars] <- sweep(study_EMs[, cen_vars, drop = FALSE], 2, x$xbar[cen_vars], FUN = "+")
     }
 
     study_EMs <- tibble::as_tibble(study_EMs) %>%
