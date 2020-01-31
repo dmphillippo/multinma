@@ -126,6 +126,9 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
       dat_studies <- newdata
     }
 
+    # Get number of treatments
+    ntrt <- nlevels(x$network$treatments)
+
     # Apply centering if used
     if (!is.null(x$xbar)) {
       cen_vars <- intersect(names(dat_studies), names(x$xbar))
@@ -232,7 +235,6 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
       X_study_means_rep <- X_study_means[, EM_col_names, drop = FALSE]
 
       # Repeat study rows for the number of treatment parameters
-      ntrt <- nlevels(x$network$treatments)
       X_study_means_rep <- apply(X_study_means_rep, 2, rep, each = ntrt - 1)
 
       # Replace non-zero entries of design matrix X_EM with corresponding mean values
@@ -266,7 +268,13 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
     # Create summary stats
     re_summary <- summary_mcmc_array(re_array, probs = probs) %>%
-      tibble::add_column(.study = dat_studies$.study, .before = 1)
+      tibble::add_column(.study =
+                           if (all_contrasts) {
+                             rep(unique(dat_studies$.study), each = ntrt * (ntrt - 1) / 2)
+                           } else {
+                             dat_studies$.study
+                           },
+                         .before = 1)
 
     # Prepare study covariate info
     if (is.null(newdata)) {
