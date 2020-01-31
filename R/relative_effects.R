@@ -197,6 +197,10 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
     X_EM <- X_all[, grepl(EM_regex, colnames(X_all))]
     X_d <- X_all[, grepl("^(\\.trt|\\.contr)[^:]+$", colnames(X_all))]
 
+    # Figure out which covariates are EMs from model matrix
+    EM_col_names <- stringr::str_remove(colnames(X_EM), EM_regex)
+    EM_vars <- unique(EM_col_names)
+
     # Replace EM design matrix with study means if newdata is NULL
     if (is.null(newdata)) {
 
@@ -209,9 +213,8 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
         dat_all_cen <- dat_all
       }
 
-      # Figure out which covariates are EMs from model matrix
-      EM_col_names <- stringr::str_remove(colnames(X_EM), EM_regex)
-      EM_vars <- unique(EM_col_names)
+      # Get model matrix of EM "main effects" - notably this expands out factors
+      # into dummy variables so we can average those too
       EM_formula <- as.formula(paste0("~", paste(EM_vars, collapse = " + ")))
 
 
@@ -266,12 +269,16 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
       tibble::add_column(.study = dat_studies$.study, .before = 1)
 
     # Prepare study covariate info
-    study_EMs <- X_study_means
+    if (is.null(newdata)) {
+      study_EMs <- X_study_means
 
-    # Uncenter, if necessary
-    if (!is.null(x$xbar)) {
-      cen_vars <- intersect(colnames(study_EMs), names(x$xbar))
-      study_EMs[, cen_vars] <- sweep(study_EMs[, cen_vars, drop = FALSE], 2, x$xbar[cen_vars], FUN = "+")
+      # Uncenter if necessary
+      if (!is.null(x$xbar)) {
+        cen_vars <- intersect(colnames(study_EMs), names(x$xbar))
+        study_EMs[, cen_vars] <- sweep(study_EMs[, cen_vars, drop = FALSE], 2, x$xbar[cen_vars], FUN = "+")
+      }
+    } else {
+      study_EMs <- newdata[EM_vars]
     }
 
     study_EMs <- tibble::as_tibble(study_EMs) %>%
