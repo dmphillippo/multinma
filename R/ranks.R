@@ -1,4 +1,8 @@
-#' Treatment rankings
+#' Treatment rankings and rank probabilities
+#'
+#' Produce posterior treatment rankings and rank probabilities from a fitted NMA
+#' model. When a meta-regression is fitted with effect modifier interactions
+#' with treatment, these will differ by study population.
 #'
 #' @param x A `stan_nma` object created by [nma()]
 #' @param newdata Only used if a regression model is fitted. A data frame of
@@ -19,12 +23,17 @@
 #'   frame of study information.
 #' @export
 #'
-#' @details The argument `lower_better` specifies whether lower treatment
+#' @details The function `posterior_ranks()` produces posterior rankings, which
+#'   have a distribution (e.g. mean/median rank and 95\% Credible Interval). The
+#'   function `posterior_rank_probs()` produces rank probabilities, which give
+#'   the posterior probabilities of being ranked first, second, etc. out of all
+#'   treatments.
+#'
+#'   The argument `lower_better` specifies whether lower treatment
 #'   effects or higher treatment effects are preferred. For example, with a
 #'   negative binary outcome lower (more negative) log odds ratios are
 #'   preferred, so `lower_better = TRUE`. Conversely, for example, if treatments
-#'   aim to increase the rate of a positive outcome then `lower_better =
-#'   FALSE`.
+#'   aim to increase the rate of a positive outcome then `lower_better = FALSE`.
 #'
 #' @examples
 posterior_ranks <- function(x, newdata = NULL, study = NULL,
