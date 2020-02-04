@@ -12,8 +12,11 @@
 #'   default) or higher better (`FALSE`)? See details.
 #' @param probs Numeric vector of quantiles of interest to present in computed
 #'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`
+#' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #'
-#' @return A [nma_summary] object
+#' @return A [nma_summary] object if `summary = TRUE`, otherwise a list
+#'   containing a 3D MCMC array of samples and (for regression models) a data
+#'   frame of study information.
 #' @export
 #'
 #' @details The argument `lower_better` specifies whether lower treatment
@@ -26,10 +29,14 @@
 #' @examples
 posterior_rank <- function(x, newdata = NULL, study = NULL,
                            lower_better = TRUE,
-                           probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
+                           probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
+                           summary = TRUE) {
   # Checks
   if (!rlang::is_bool(lower_better))
     abort("`lower_better` should be TRUE or FALSE.")
+
+  if (!rlang::is_bool(summary))
+    abort("`summary` should be TRUE or FALSE.")
 
   # Cannot produce relative effects for inconsistency models
   if (x$consistency != "consistency")
@@ -63,8 +70,12 @@ posterior_rank <- function(x, newdata = NULL, study = NULL,
     dimnames(rk)[[3]] <- paste0("rank[", levels(x$network$treatments), "]")
 
     # Get summaries
-    rk_summary <- summary_mcmc_array(rk, probs = probs)
-    out <- list(summary = rk_summary, sims = rk)
+    if (summary) {
+      rk_summary <- summary_mcmc_array(rk, probs = probs)
+      out <- list(summary = rk_summary, sims = rk)
+    } else {
+      out <- list(sims = rk)
+    }
 
   } else { # Study-specific treatment effects
     nstudy <- nrow(studies)
@@ -103,14 +114,18 @@ posterior_rank <- function(x, newdata = NULL, study = NULL,
     dimnames(rk)[[3]] <- gsub("^d\\[", "rank\\[", rk_names)
 
     # Get summaries
-    rk_summary <- summary_mcmc_array(rk, probs = probs) %>%
-      # Add in study info
-      tibble::add_column(.study = rep(studies$.study, each = ntrt), .before = 1)
+    if (summary) {
+      rk_summary <- summary_mcmc_array(rk, probs = probs) %>%
+        # Add in study info
+        tibble::add_column(.study = rep(studies$.study, each = ntrt), .before = 1)
 
-    out <- list(summary = rk_summary, sims = rk, studies = studies)
+      out <- list(summary = rk_summary, sims = rk, studies = studies)
+    } else {
+      out <- list(sims = rk, studies = studies)
+    }
   }
 
-  class(out) <- "nma_summary"
+  if (summary) class(out) <- "nma_summary"
   return(out)
 }
 
