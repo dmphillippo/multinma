@@ -27,10 +27,10 @@
 #'   FALSE`.
 #'
 #' @examples
-posterior_rank <- function(x, newdata = NULL, study = NULL,
-                           lower_better = TRUE,
-                           probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
-                           summary = TRUE) {
+posterior_ranks <- function(x, newdata = NULL, study = NULL,
+                            lower_better = TRUE,
+                            probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
+                            summary = TRUE) {
   # Checks
   if (!rlang::is_bool(lower_better))
     abort("`lower_better` should be TRUE or FALSE.")
@@ -130,7 +130,7 @@ posterior_rank <- function(x, newdata = NULL, study = NULL,
 }
 
 #' @export
-#' @rdname posterior_rank
+#' @rdname posterior_ranks
 #' @examples
 posterior_rank_prob <- function(x, newdata = NULL, study = NULL, lower_better = TRUE) {
 
