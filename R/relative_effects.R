@@ -17,13 +17,17 @@
 #'   (`FALSE`)? Default `FALSE`.
 #' @param probs Numeric vector of quantiles of interest to present in computed
 #'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`
+#' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #'
-#' @return A [nma_summary] object.
+#' @return A [nma_summary] object if `summary = TRUE`, otherwise a list
+#'   containing a 3D MCMC array of samples and (for regression models) a data
+#'   frame of study information.
 #' @export
 #'
 #' @examples
 relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FALSE,
-                             probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
+                             probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
+                             summary = TRUE) {
 
   # Checks
   if (!inherits(x, "stan_nma")) abort("Expecting a `stan_nma` object, as returned by nma().")
@@ -42,8 +46,11 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
     }
   }
 
-  if (!is.logical(all_contrasts) || length(all_contrasts) > 1)
+  if (!rlang::is_bool(all_contrasts))
     abort("`all_contrasts` should be TRUE or FALSE.")
+
+  if (!rlang::is_bool(summary))
+    abort("`summary` should be TRUE or FALSE.")
 
   # Cannot produce relative effects for inconsistency models
   if (x$consistency != "consistency")
@@ -59,8 +66,12 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
     if (all_contrasts) {
       re_array <- make_all_contrasts(re_array, trt_ref = trt_ref)
     }
-    re_summary <- summary_mcmc_array(re_array, probs = probs)
-    out <- list(summary = re_summary, sims = re_array)
+    if (summary) {
+      re_summary <- summary_mcmc_array(re_array, probs = probs)
+      out <- list(summary = re_summary, sims = re_array)
+    } else {
+      out <- list(sims = re_array)
+    }
 
   } else {
     # If regression model, relative effects are study-specific
@@ -203,8 +214,12 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
       if (all_contrasts) {
         re_array <- make_all_contrasts(re_array, trt_ref = trt_ref)
       }
-      re_summary <- summary_mcmc_array(re_array, probs = probs)
-      out <- list(summary = re_summary, sims = re_array)
+      if (summary) {
+        re_summary <- summary_mcmc_array(re_array, probs = probs)
+        out <- list(summary = re_summary, sims = re_array)
+      } else {
+        out <- list(sims = re_array)
+      }
     } else {
 
       # Figure out which covariates are EMs from model matrix
@@ -274,14 +289,16 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
       dimnames(re_array)[[3]] <- study_parnames
 
       # Create summary stats
-      re_summary <- summary_mcmc_array(re_array, probs = probs) %>%
-        tibble::add_column(.study =
-                             if (all_contrasts) {
-                               rep(unique(dat_studies$.study), each = ntrt * (ntrt - 1) / 2)
-                             } else {
-                               dat_studies$.study
-                             },
-                           .before = 1)
+      if (summary) {
+        re_summary <- summary_mcmc_array(re_array, probs = probs) %>%
+          tibble::add_column(.study =
+                               if (all_contrasts) {
+                                 rep(unique(dat_studies$.study), each = ntrt * (ntrt - 1) / 2)
+                               } else {
+                                 dat_studies$.study
+                               },
+                             .before = 1)
+      }
 
       # Prepare study covariate info
       if (is.null(newdata)) {
@@ -299,12 +316,16 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
       study_EMs <- tibble::as_tibble(study_EMs) %>%
         tibble::add_column(.study = unique(dat_studies$.study), .before = 1)
 
-      out <- list(summary = re_summary, sims = re_array, studies = study_EMs)
+      if (summary) {
+        out <- list(summary = re_summary, sims = re_array, studies = study_EMs)
+      } else {
+        out <- list(sims = re_array, studies = study_EMs)
+      }
     }
   }
 
   # Return nma_summary object
-  class(out) <- "nma_summary"
+  if (summary) class(out) <- "nma_summary"
   return(out)
 }
 
