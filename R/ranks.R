@@ -141,6 +141,6 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
 #' @export
 #' @rdname posterior_ranks
 #' @examples
-posterior_rank_prob <- function(x, newdata = NULL, study = NULL, lower_better = TRUE) {
+posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better = TRUE) {
 
 }
