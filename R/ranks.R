@@ -43,8 +43,9 @@ posterior_rank <- function(x, newdata = NULL, study = NULL,
   rel_eff <- relative_effects(x = x, newdata = newdata, study = enquo(study),
                               all_contrasts = FALSE, summary = FALSE)
 
+  studies <- rel_eff$studies
 
-  if (is.null(rel_eff$studies)) { # No study-specific treatment effects
+  if (is.null(studies)) { # No study-specific treatment effects
     # Add zeros for d[1]
     dim_d <- dim(rel_eff$sim)
     dim_d[3] <- dim_d[3] + 1
@@ -66,7 +67,47 @@ posterior_rank <- function(x, newdata = NULL, study = NULL,
     out <- list(summary = rk_summary, sims = rk)
 
   } else { # Study-specific treatment effects
+    nstudy <- nrow(studies)
 
+    d <- rel_eff$sim
+    d_names <- dimnames(d)[[3]]
+
+    # Calculate ranks within each study population
+    dim_rk <- dim(d)
+    dim_rk[3] <- dim_rk[3] + nstudy
+    rk_names <- vector("character", dim_rk[[3]])
+    dimnames_rk <- dimnames(d)
+    dimnames_rk[[3]] <- rk_names
+    rk <- array(NA_real_, dim = dim_rk, dimnames = dimnames_rk)
+
+    dim_temp_d <- dim(d)
+    dim_temp_d[[3]] <- ntrt
+    dimnames_temp_d <- dimnames(d)
+    dimnames_temp_d[[3]] <- paste0("d[", levels(x$network$treatments), "]")
+    temp_d <- array(NA_real_, dim = dim_temp_d, dimnames = dimnames_temp_d)
+    temp_d[ , , 1] <- 0
+
+    for (i in seq_len(nstudy)) {
+      rk_names[(i - 1)*ntrt + 1:ntrt] <-
+        c(paste0("d[", studies$.study[i], ": ", trt_ref, "]"),
+          d_names[(i - 1)*(ntrt - 1) + 1:(ntrt - 1)])
+
+      temp_d[ , , 2:ntrt] <- d[ , , (i - 1)*(ntrt - 1) + 1:(ntrt - 1)]
+
+      rk[ , , (i - 1)*ntrt + 1:ntrt] <-
+        aperm(apply(temp_d, 1:2, rank, ties.method = "average"),
+              c("iterations", "chains", "parameters"))
+    }
+
+    # Rename parameters
+    dimnames(rk)[[3]] <- gsub("^d\\[", "rank\\[", rk_names)
+
+    # Get summaries
+    rk_summary <- summary_mcmc_array(rk, probs = probs) %>%
+      # Add in study info
+      tibble::add_column(.study = rep(studies$.study, each = ntrt), .before = 1)
+
+    out <- list(summary = rk_summary, sims = rk, studies = studies)
   }
 
   class(out) <- "nma_summary"
