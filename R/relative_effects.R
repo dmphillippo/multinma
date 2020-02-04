@@ -55,15 +55,11 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
   # Produce relative effects
   if (is.null(x$regression)) {
     # If no regression model, relative effects are just the d's
-
     re_array <- as.array(as.stanfit(x), pars = "d")
-
     if (all_contrasts) {
       re_array <- make_all_contrasts(re_array, trt_ref = trt_ref)
     }
-
     re_summary <- summary_mcmc_array(re_array, probs = probs)
-
     out <- list(summary = re_summary, sims = re_array)
 
   } else {
@@ -196,103 +192,115 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
     }
 
     # Subset design matrix into EM columns and trt columns
+    X_d <- X_all[, grepl("^(\\.trt|\\.contr)[^:]+$", colnames(X_all))]
     EM_regex <- "(^\\.trt(class)?.+\\:)|(\\:\\.trt(class)?.+$)"
     X_EM <- X_all[, grepl(EM_regex, colnames(X_all))]
-    X_d <- X_all[, grepl("^(\\.trt|\\.contr)[^:]+$", colnames(X_all))]
 
-    # Figure out which covariates are EMs from model matrix
-    EM_col_names <- stringr::str_remove(colnames(X_EM), EM_regex)
-    EM_vars <- unique(EM_col_names)
-
-    # Replace EM design matrix with study means if newdata is NULL
-    if (is.null(newdata)) {
-
-      # Apply centering if used
-      if (!is.null(x$xbar)) {
-        cen_vars <- intersect(names(dat_all), names(x$xbar))
-        dat_all_cen <- dat_all
-        dat_all_cen[, cen_vars] <- sweep(dat_all[, cen_vars, drop = FALSE], 2, x$xbar[cen_vars])
-      } else {
-        dat_all_cen <- dat_all
+    # If there are no EMs (regression model had no interactions with .trt) then
+    # just return the treatment effects (not study specific)
+    if (ncol(X_EM) == 0) {
+      re_array <- as.array(as.stanfit(x), pars = "d")
+      if (all_contrasts) {
+        re_array <- make_all_contrasts(re_array, trt_ref = trt_ref)
       }
-
-      # Get model matrix of EM "main effects" - notably this expands out factors
-      # into dummy variables so we can average those too
-      EM_formula <- as.formula(paste0("~", paste(EM_vars, collapse = " + ")))
-
-
-      # Calculate mean covariate values by study in the network
-      X_study_means <- model.matrix(EM_formula, data = dat_all_cen) %>%
-        tibble::as_tibble() %>%
-        tibble::add_column(.study = dat_all$.study, .sample_size = dat_all$.sample_size, .before = 1) %>%
-        dplyr::group_by(.data$.study) %>%
-        dplyr::summarise_at(setdiff(colnames(.), c(".sample_size", ".study")),
-                            ~weighted.mean(., w = .data$.sample_size)) %>%
-        dplyr::select(!!! unique(EM_col_names)) %>%
-        as.matrix()
-
-      # Repeat columns across interaction columns in X_EM
-      X_study_means_rep <- X_study_means[, EM_col_names, drop = FALSE]
-
-      # Repeat study rows for the number of treatment parameters
-      X_study_means_rep <- apply(X_study_means_rep, 2, rep, each = ntrt - 1)
-
-      # Replace non-zero entries of design matrix X_EM with corresponding mean values
-      # This works only because trt columns are 0/1, so interactions are just the covariate values
-      nonzero <- X_EM != 0
-      X_EM[nonzero] <- X_study_means_rep[nonzero]
-    }
-
-    # Name columns to match Stan parameters
-    colnames(X_EM) <- paste0("beta[", colnames(X_EM), "]")
-    colnames(X_d) <- paste0("d[", x$network$treatments[-1], "]")
-
-    X_EM_d <- cbind(X_EM, X_d)
-
-    # Name rows by treatment for now (required for make_all_contrasts)
-    rownames(X_EM_d) <- paste0("d[", rep(x$network$treatments[-1],
-                                         times = dplyr::n_distinct(dat_studies$.study)) , "]")
-
-    # Linear combination with posterior MCMC array
-    d_array <- as.array(x, pars = colnames(X_EM_d))
-    re_array <- tcrossprod_mcmc_array(d_array, X_EM_d)
-
-    # Produce all contrasts, if required
-    if (all_contrasts)
-      re_array <- make_all_contrasts(re_array, trt_ref = levels(x$network$treatments)[1])
-
-    # Add in study names to parameters
-    parnames <- stringr::str_extract(dimnames(re_array)[[3]], "(?<=^d\\[)(.+)(?=\\]$)")
-    study_parnames <- paste0("d[", dat_studies$.study, ": ", parnames, "]")
-    dimnames(re_array)[[3]] <- study_parnames
-
-    # Create summary stats
-    re_summary <- summary_mcmc_array(re_array, probs = probs) %>%
-      tibble::add_column(.study =
-                           if (all_contrasts) {
-                             rep(unique(dat_studies$.study), each = ntrt * (ntrt - 1) / 2)
-                           } else {
-                             dat_studies$.study
-                           },
-                         .before = 1)
-
-    # Prepare study covariate info
-    if (is.null(newdata)) {
-      study_EMs <- X_study_means
-
-      # Uncenter if necessary
-      if (!is.null(x$xbar)) {
-        cen_vars <- intersect(colnames(study_EMs), names(x$xbar))
-        study_EMs[, cen_vars] <- sweep(study_EMs[, cen_vars, drop = FALSE], 2, x$xbar[cen_vars], FUN = "+")
-      }
+      re_summary <- summary_mcmc_array(re_array, probs = probs)
+      out <- list(summary = re_summary, sims = re_array)
     } else {
-      study_EMs <- newdata[EM_vars]
+
+      # Figure out which covariates are EMs from model matrix
+      EM_col_names <- stringr::str_remove(colnames(X_EM), EM_regex)
+      EM_vars <- unique(EM_col_names)
+
+      # Replace EM design matrix with study means if newdata is NULL
+      if (is.null(newdata)) {
+
+        # Apply centering if used
+        if (!is.null(x$xbar)) {
+          cen_vars <- intersect(names(dat_all), names(x$xbar))
+          dat_all_cen <- dat_all
+          dat_all_cen[, cen_vars] <- sweep(dat_all[, cen_vars, drop = FALSE], 2, x$xbar[cen_vars])
+        } else {
+          dat_all_cen <- dat_all
+        }
+
+        # Get model matrix of EM "main effects" - notably this expands out factors
+        # into dummy variables so we can average those too
+        EM_formula <- as.formula(paste0("~", paste(EM_vars, collapse = " + ")))
+
+
+        # Calculate mean covariate values by study in the network
+        X_study_means <- model.matrix(EM_formula, data = dat_all_cen) %>%
+          tibble::as_tibble() %>%
+          tibble::add_column(.study = dat_all$.study, .sample_size = dat_all$.sample_size, .before = 1) %>%
+          dplyr::group_by(.data$.study) %>%
+          dplyr::summarise_at(setdiff(colnames(.), c(".sample_size", ".study")),
+                              ~weighted.mean(., w = .data$.sample_size)) %>%
+          dplyr::select(!!! unique(EM_col_names)) %>%
+          as.matrix()
+
+        # Repeat columns across interaction columns in X_EM
+        X_study_means_rep <- X_study_means[, EM_col_names, drop = FALSE]
+
+        # Repeat study rows for the number of treatment parameters
+        X_study_means_rep <- apply(X_study_means_rep, 2, rep, each = ntrt - 1)
+
+        # Replace non-zero entries of design matrix X_EM with corresponding mean values
+        # This works only because trt columns are 0/1, so interactions are just the covariate values
+        nonzero <- X_EM != 0
+        X_EM[nonzero] <- X_study_means_rep[nonzero]
+      }
+
+      # Name columns to match Stan parameters
+      colnames(X_EM) <- paste0("beta[", colnames(X_EM), "]")
+      colnames(X_d) <- paste0("d[", x$network$treatments[-1], "]")
+
+      X_EM_d <- cbind(X_EM, X_d)
+
+      # Name rows by treatment for now (required for make_all_contrasts)
+      rownames(X_EM_d) <- paste0("d[", rep(x$network$treatments[-1],
+                                           times = dplyr::n_distinct(dat_studies$.study)) , "]")
+
+      # Linear combination with posterior MCMC array
+      d_array <- as.array(x, pars = colnames(X_EM_d))
+      re_array <- tcrossprod_mcmc_array(d_array, X_EM_d)
+
+      # Produce all contrasts, if required
+      if (all_contrasts)
+        re_array <- make_all_contrasts(re_array, trt_ref = levels(x$network$treatments)[1])
+
+      # Add in study names to parameters
+      parnames <- stringr::str_extract(dimnames(re_array)[[3]], "(?<=^d\\[)(.+)(?=\\]$)")
+      study_parnames <- paste0("d[", dat_studies$.study, ": ", parnames, "]")
+      dimnames(re_array)[[3]] <- study_parnames
+
+      # Create summary stats
+      re_summary <- summary_mcmc_array(re_array, probs = probs) %>%
+        tibble::add_column(.study =
+                             if (all_contrasts) {
+                               rep(unique(dat_studies$.study), each = ntrt * (ntrt - 1) / 2)
+                             } else {
+                               dat_studies$.study
+                             },
+                           .before = 1)
+
+      # Prepare study covariate info
+      if (is.null(newdata)) {
+        study_EMs <- X_study_means
+
+        # Uncenter if necessary
+        if (!is.null(x$xbar)) {
+          cen_vars <- intersect(colnames(study_EMs), names(x$xbar))
+          study_EMs[, cen_vars] <- sweep(study_EMs[, cen_vars, drop = FALSE], 2, x$xbar[cen_vars], FUN = "+")
+        }
+      } else {
+        study_EMs <- newdata[EM_vars]
+      }
+
+      study_EMs <- tibble::as_tibble(study_EMs) %>%
+        tibble::add_column(.study = unique(dat_studies$.study), .before = 1)
+
+      out <- list(summary = re_summary, sims = re_array, studies = study_EMs)
     }
-
-    study_EMs <- tibble::as_tibble(study_EMs) %>%
-      tibble::add_column(.study = unique(dat_studies$.study), .before = 1)
-
-    out <- list(summary = re_summary, sims = re_array, studies = study_EMs)
   }
 
   # Return nma_summary object
