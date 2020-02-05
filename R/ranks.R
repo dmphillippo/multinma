@@ -75,6 +75,9 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
     rk <- aperm(apply(d, 1:2, rank, ties.method = "min"),
                 c("iterations", "chains", "parameters"))
 
+    # If higher treatment effects are better
+    if (!lower_better) rk <- ntrt + 1 - rk
+
     # Rename parameters
     dimnames(rk)[[3]] <- paste0("rank[", levels(x$network$treatments), "]")
 
@@ -118,6 +121,9 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
         aperm(apply(temp_d, 1:2, rank, ties.method = "min"),
               c("iterations", "chains", "parameters"))
     }
+
+    # If higher treatment effects are better
+    if (!lower_better) rk <- ntrt + 1 - rk
 
     # Rename parameters
     dimnames(rk)[[3]] <- gsub("^d\\[", "rank\\[", rk_names)
