@@ -148,5 +148,18 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
 #' @rdname posterior_ranks
 #' @examples
 posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better = TRUE) {
+  # All checks handled by posterior_ranks()
+  rk <- posterior_ranks(x = x, newdata = newdata, study = enquo(study),
+                        lower_better = lower_better, summary = FALSE)
 
+  ntrt <- nlevels(x$network$treatments)
+  studies <- rk$studies
+
+  if (is.null(studies)) { # No study-specific treatment effects
+    p_rank <- apply(apply(rk$sims, 1:3, `==`, 1:ntrt), c(4, 1), mean)
+    rownames(p_rank) <- stringr::str_replace(rownames(p_rank), "^rank\\[", "d\\[")
+    colnames(p_rank) <- paste0("p_rank[", 1:ntrt, "]")
+  } else { # Study-specific treatment effects
+
+  }
 }
