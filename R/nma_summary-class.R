@@ -6,7 +6,7 @@
 #'
 #' @rdname nma_summary-class
 #' @name nma_summary-class
-#' @aliases nma_summary
+#' @aliases nma_summary nma_rank_probs
 #'
 #' @details Objects of class `nma_summary` have the following components:
 #'   \describe{
@@ -17,6 +17,13 @@
 #'   printed along with the corresponding summary statistics if `summary`
 #'   contains a `.study` column. Should have a matching `.study` column.}
 #'   }
+#'
+#' The subclass `nma_rank_probs` is used by the function
+#' [posterior_rank_probs()], and contains posterior rank probabilities. This
+#' subclass does not have a `sims` component, as the rank probabilities are
+#' themselves posterior summaries of the ranks (i.e. they do not have a
+#' posterior distribution). The posterior ranks from which the rank
+#' probabilities are calculated may be obtained from [posterior_ranks()].
 #'
 NULL
 
