@@ -150,6 +150,23 @@ as.matrix.nma_summary <- function(x, ...){
   return(a)
 }
 
+#' @rdname nma_summary-methods
+#' @export
+as.array.nma_rank_probs <- function(x, ...) {
+  abort(paste("Objects of class `nma_rank_probs` do not contain a 3D MCMC array of simulations, see ?nma_rank_probs.",
+              "  - Use as.matrix(), as.data.frame(), or as_tibble() to access the summary rank probabilities",
+              "  - Use posterior_ranks() to obtain the posterior ranks themselves", sep = "\n"))
+}
+
+#' @rdname nma_summary-methods
+#' @export
+as.matrix.nma_rank_probs <- function(x, ...){
+  df_summary <- tibble::as_tibble(x, ...)
+  if (rlang::has_name(df_summary, ".study")) df_summary <- dplyr::select(df_summary, -.data$.study)
+  m <- as.matrix(tibble::column_to_rownames(df_summary, "parameter"))
+  return(m)
+}
+
 #' Compute summary statistics from a 3D MCMC array
 #'
 #' @param x A 3D MCMC array
