@@ -144,11 +144,20 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
   return(out)
 }
 
+#' @param cumulative Logical, return cumulative rank probabilities? Default is
+#'   `FALSE`, return posterior probabilities of each treatment having a given
+#'   rank. If `TRUE`, cumulative posterior rank probabilities are returned for
+#'   each treatment having a given rank or better.
 #' @export
 #' @rdname posterior_ranks
 #' @examples
-posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better = TRUE) {
-  # All checks handled by posterior_ranks()
+posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better = TRUE,
+                                 cumulative = FALSE) {
+  # Checks
+  if (!rlang::is_bool(cumulative))
+    abort("`cumulative` should be TRUE or FALSE.")
+
+  # All other checks handled by posterior_ranks()
   rk <- posterior_ranks(x = x, newdata = newdata, study = enquo(study),
                         lower_better = lower_better, summary = FALSE)
 
@@ -156,15 +165,37 @@ posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better =
   studies <- rk$studies
 
   if (is.null(studies)) { # No study-specific treatment effects
+
     p_rank <- apply(apply(rk$sims, 1:3, `==`, 1:ntrt), c(4, 1), mean)
+    if (cumulative) p_rank <- t(apply(p_rank, 1, cumsum))
+
     rownames(p_rank) <- stringr::str_replace(rownames(p_rank), "^rank\\[", "d\\[")
     colnames(p_rank) <- paste0("p_rank[", 1:ntrt, "]")
     p_rank <- tibble::as_tibble(p_rank, rownames = "parameter")
+    out <- list(summary = p_rank)
+
   } else { # Study-specific treatment effects
+
+    nstudy <- nrow(studies)
+
+    p_rank <- matrix(NA_real_, nrow = ntrt * nstudy, ncol = ntrt)
+    rk_sims <- rk$sims
+    for (i in seq_len(nstudy)) {
+      p_rank[(i - 1)*ntrt + 1:ntrt, ] <-
+        apply(apply(rk_sims[ , , (i - 1)*ntrt + 1:ntrt], 1:3, `==`, 1:ntrt), c(4, 1), mean)
+    }
+
+    if (cumulative) p_rank <- t(apply(p_rank, 1, cumsum))
+
+    rownames(p_rank) <- stringr::str_replace(dimnames(rk_sims)[[3]], "^rank\\[", "d\\[")
+    colnames(p_rank) <- paste0("p_rank[", 1:ntrt, "]")
+    p_rank <- tibble::as_tibble(p_rank, rownames = "parameter") %>%
+      # Add in study info
+      tibble::add_column(.study = rep(studies$.study, each = ntrt), .before = 1)
+    out <- list(summary = p_rank, studies = studies)
 
   }
 
-  out <- list(summary = p_rank)
   class(out) <- c("nma_rank_probs", "nma_summary")
   return(out)
 }
