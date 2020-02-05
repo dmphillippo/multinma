@@ -103,13 +103,13 @@ as.stanfit <- function(x, ...) {
 }
 
 #' @export
-#' @noRd
+#' @rdname as.stanfit
 as.stanfit.stan_nma <- function(x, ...) {
   return(x[["stanfit"]])
 }
 
 #' @export
-#' @noRd
+#' @rdname as.stanfit
 as.stanfit.default <- function(x, ...) {
   abort(glue::glue("Cannot coerce object of class '{class(x)}' to 'stanfit'."))
 }
