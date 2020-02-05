@@ -56,7 +56,7 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
   ntrt <- nlevels(x$network$treatments)
 
   # All other checks handled by relative_effects()
-  rel_eff <- relative_effects(x = x, newdata = newdata, study = enquo(study),
+  rel_eff <- relative_effects(x = x, newdata = newdata, study = {{ study }},
                               all_contrasts = FALSE, summary = FALSE)
 
   studies <- rel_eff$studies
@@ -158,7 +158,7 @@ posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better =
     abort("`cumulative` should be TRUE or FALSE.")
 
   # All other checks handled by posterior_ranks()
-  rk <- posterior_ranks(x = x, newdata = newdata, study = enquo(study),
+  rk <- posterior_ranks(x = x, newdata = newdata, study = {{ study }},
                         lower_better = lower_better, summary = FALSE)
 
   ntrt <- nlevels(x$network$treatments)
