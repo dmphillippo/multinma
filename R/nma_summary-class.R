@@ -121,12 +121,15 @@ as.data.frame.nma_summary <- function(x, ...) {
 }
 
 #' @rdname nma_summary-methods
+#' @importFrom tibble as.tibble
+#' @method as.tibble nma_summary
 #' @export
 as.tibble.nma_summary <- function(x, ...) {
   return(tibble::as.tibble(x$summary, ...))
 }
 
 #' @rdname nma_summary-methods
+#' @importFrom tibble as_tibble
 #' @export
 as_tibble.nma_summary <- function(x, ...) {
   return(tibble::as_tibble(x$summary, ...))
