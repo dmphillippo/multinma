@@ -159,7 +159,12 @@ posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better =
     p_rank <- apply(apply(rk$sims, 1:3, `==`, 1:ntrt), c(4, 1), mean)
     rownames(p_rank) <- stringr::str_replace(rownames(p_rank), "^rank\\[", "d\\[")
     colnames(p_rank) <- paste0("p_rank[", 1:ntrt, "]")
+    p_rank <- tibble::as_tibble(p_rank, rownames = "parameter")
   } else { # Study-specific treatment effects
 
   }
+
+  out <- list(summary = p_rank)
+  class(out) <- c("nma_rank_probs", "nma_summary")
+  return(out)
 }
