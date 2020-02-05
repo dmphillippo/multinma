@@ -10,7 +10,10 @@
 #'
 #' @details Objects of class `nma_summary` have the following components:
 #'   \describe{
-#'   \item{summary}{A data frame containing the computed summary statistics}
+#'   \item{summary}{A data frame containing the computed summary statistics. If
+#'   a regression model was fitted with effect modifier interactions with
+#'   treatment, these summaries will be study-specific. In this case, the
+#'   corresponding study population is indicated in a column named `.study`.}
 #'   \item{sims}{A 3D array \[Iteration, Chain, Parameter\] of MCMC
 #'   simulations}
 #'   \item{studies}{(Optional) A data frame containing study information,
