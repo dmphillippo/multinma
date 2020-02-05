@@ -72,7 +72,7 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
     d[ , , 2:ntrt] <- rel_eff$sim
 
     # Get ranks at each iteration
-    rk <- aperm(apply(d, 1:2, rank, ties.method = "average"),
+    rk <- aperm(apply(d, 1:2, rank, ties.method = "min"),
                 c("iterations", "chains", "parameters"))
 
     # Rename parameters
@@ -115,7 +115,7 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
       temp_d[ , , 2:ntrt] <- d[ , , (i - 1)*(ntrt - 1) + 1:(ntrt - 1)]
 
       rk[ , , (i - 1)*ntrt + 1:ntrt] <-
-        aperm(apply(temp_d, 1:2, rank, ties.method = "average"),
+        aperm(apply(temp_d, 1:2, rank, ties.method = "min"),
               c("iterations", "chains", "parameters"))
     }
 
