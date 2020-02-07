@@ -3,8 +3,8 @@
 #' This function creates numerical integration points using a Gaussian copula
 #' approach, as described in \insertCite{methods_paper;textual}{multinma}.
 #'
-#' @param network an `nma_data` object, as created by the `set_*()` functions or
-#'   `combine_network()`
+#' @param x an `nma_data` object, as created by the `set_*()` functions or
+#'   `combine_network()`, or data frame
 #' @param ... distributions for covariates, see "Details"
 #' @param cor correlation matrix to use for generating the integration points.
 #'   By default, this takes a weighted correlation matrix from all IPD studies.
