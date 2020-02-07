@@ -24,7 +24,30 @@
 #'   \insertAllCited{}
 #'
 #' @examples
-add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = list()) {
+add_integration <- function(x, ...) {
+  UseMethod("add_integration")
+}
+
+#' @export
+#' @rdname add_integration
+add_integration.default <- function(x, ...) {
+  abort(glue::glue("No add_integration method defined for class '{class(x)}'."))
+}
+
+#' @export
+#' @rdname add_integration
+add_integration.data.frame <- function(x, ...,
+                                       cor = NULL, n_int = 100L, int_args = list()) {
+
+}
+
+#' @export
+#' @rdname add_integration
+add_integration.nma_data <- function(x, ...,
+                                     cor = NULL, n_int = 100L, int_args = list()) {
+
+  network <- x
+
   # Check network
   if (!inherits(network, "nma_data")) {
     abort("Expecting an `nma_data` object, as created by the `set_*` or `combine_network` functions.")
