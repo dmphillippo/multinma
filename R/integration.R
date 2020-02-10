@@ -293,7 +293,7 @@ unnest_integration <- function(data) {
 
   name_conflicts <- rlang::has_name(data, x_names)
   if (any(name_conflicts)) {
-    warn(glue::glue("Columns will be overwritten when unnesting integration points:\n",
+    warn(glue::glue("Columns will be overwritten when unnesting integration points: ",
                     glue::glue_collapse(x_names[name_conflicts], sep = ", ")),
          "unnest_name_conflict")
   }
