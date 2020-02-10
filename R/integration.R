@@ -239,9 +239,12 @@ add_integration.nma_data <- function(x, ...,
   # Set as mlnmr_data class
   out$n_int <- n_int
   out$int_names <- x_names
+
+  if (nx == 1) cor <- matrix(1)
   colnames(cor) <- x_names
   rownames(cor) <- x_names
   out$int_cor <- cor
+
   class(out) <- c("mlnmr_data", "nma_data")
   return(out)
 }
