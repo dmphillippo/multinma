@@ -270,6 +270,41 @@ add_integration.nma_data <- function(x, ...,
 }
 
 
+#' @param data Data frame with nested integration points, stored in list
+#'   columns as `.int_<variable name>`
+#'
+#' @export
+#' @rdname add_integration
+unnest_integration <- function(data) {
+  if (!inherits(data, "data.frame")) abort("Expecting a data frame.")
+
+  # Get integration variable names
+  data_names <- colnames(data)
+  x_int_names <- stringr::str_subset(data_names, "^\\.int_")
+  x_names <- stringr::str_remove(x_int_names, "^\\.int_")
+
+  if (length(x_int_names) == 0)
+    abort("No integration points present in data frame.")
+
+  if (name_conflicts <- any(rlang::has_name(data, x_names))) {
+    warn(glue::glue("Columns will be overwritten when unnesting integration points:",
+                    glue::glue_collapse(data_names[name_conflicts], sep = ", ")),
+         "unnest_name_conflict")
+  }
+
+  out <- data %>%
+    dplyr::select(-dplyr::one_of(data_names[name_conflicts])) %>%
+    dplyr::rename_at(x_int_names, ~stringr::str_remove(., "^\\.int_")) %>%
+    {if (getNamespaceVersion("tidyr") < "1.0.0") {
+      tidyr::unnest(., !!! rlang::syms(x_names))
+    } else {
+      tidyr::unnest(., x_names)
+    }}
+
+  return(out)
+}
+
+
 #' Specify a general marginal distribution
 #'
 #' `distr()` is used within the function [add_integration()] to specify marginal
