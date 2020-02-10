@@ -3,7 +3,7 @@ library(dplyr)
 library(purrr)
 
 test_that("expects nma_data object", {
-  expect_error(add_integration("uh oh"), "nma_data")
+  expect_error(add_integration("uh oh"), "No add_integration method defined")
 })
 
 test_that("error on empty network", {
@@ -53,28 +53,38 @@ smknet <- combine_network(smknet_agd, smknet_ipd)
 
 test_that("n_int should be a positive integer", {
   m <- "should be a positive integer"
-  expect_error(add_integration(smknet, n_int = "oh dear"), m)
-  expect_error(add_integration(smknet, n_int = 1.1), m)
-  expect_error(add_integration(smknet, n_int = -5), m)
-  expect_error(add_integration(smknet, n_int = 0), m)
-  expect_error(add_integration(smknet, n_int = 1:2), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = "oh dear"), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = 1.1), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = -5), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = 0), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = 1:2), m)
 })
 
 test_that("int_args is named list", {
   m <- "should be a named list"
-  expect_error(add_integration(smknet, int_args = "oh dear"), m)
-  expect_error(add_integration(smknet, int_args = 1.1), m)
-  expect_error(add_integration(smknet, int_args = NULL), m)
-  expect_error(add_integration(smknet, int_args = list(a = 1, 2)), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = "oh dear"), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = 1.1), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = NULL), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = list(a = 1, 2)), m)
 })
 
 test_that("cor should be correlation matrix or NULL", {
   m <- "should be a correlation matrix or NULL"
-  expect_error(add_integration(smknet, cor = "a"), m)
-  expect_error(add_integration(smknet, cor = list()), m)
-  expect_error(add_integration(smknet, cor = 2), m)
-  expect_error(add_integration(smknet, cor = matrix(1:4)), m)
-  expect_error(add_integration(smknet, cor = matrix(1:4, nrow = 2)), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = "a"), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = list()), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = 2), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = matrix(1:4)), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = matrix(1:4, nrow = 2)), m)
 })
 
 test_that("cor must be specified if no IPD", {
