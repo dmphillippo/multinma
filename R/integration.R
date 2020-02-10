@@ -1,23 +1,28 @@
 #' Add numerical integration points to aggregate data
 #'
-#' This function creates numerical integration points using a Gaussian copula
-#' approach, as described in \insertCite{methods_paper;textual}{multinma}.
+#' The `add_integration()` generic creates numerical integration points using a
+#' Gaussian copula approach, as described in
+#' \insertCite{methods_paper;textual}{multinma}. Methods are available for
+#' networks stored in `nma_data` objects, and for data frames. The function
+#' `unnest_integration()` unnests integration points stored in a data frame, to
+#' aid plotting or other exploration.
 #'
-#' @param x an `nma_data` object, as created by the `set_*()` functions or
+#' @param x An `nma_data` object, as created by the `set_*()` functions or
 #'   `combine_network()`, or data frame
-#' @param ... distributions for covariates, see "Details"
-#' @param cor correlation matrix to use for generating the integration points.
+#' @param ... Distributions for covariates, see "Details"
+#' @param cor Correlation matrix to use for generating the integration points.
 #'   By default, this takes a weighted correlation matrix from all IPD studies.
 #'   Rows and columns should match the order of covariates specified in `...`.
-#' @param n_int number of integration points to generate, default 100
-#' @param int_args a named list of arguments to pass to
+#' @param n_int Number of integration points to generate, default 100
+#' @param int_args A named list of arguments to pass to
 #'   `\link[randtoolbox:quasiRNG]{sobol()}`
 #'
 #' @return For the `nma_data` method, an object of class [nma_data]. For the
 #'   `data.frame` method, the input data frame is returned (as a [tibble]) with
 #'   an added column for each covariate (prefixed with ".int_"), containing the
 #'   numerical integration points nested as length-`n_int` vectors within each
-#'   row.
+#'   row. For `unnest_integration()`, a data frame with integration points
+#'   unnested.
 #' @export
 #'
 #' @details The arguments passed to `...` specify distributions for the
