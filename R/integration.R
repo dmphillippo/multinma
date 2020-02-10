@@ -79,6 +79,10 @@ add_integration.data.frame <- function(x, ...,
   x_names <- names(ds)  # Covariate names
   nx <- length(ds)      # Number of covariates
 
+  # Check cor dimensions
+  if (ncol(cor) != nx)
+    abort("Dimensions of correlation matrix `cor` and number of covariates specified in `...` do not match.")
+
   # Generate Sobol points
   u <- do.call(randtoolbox::sobol, purrr::list_modify(list(n = n_int, dim = nx), !!! int_args))
 
