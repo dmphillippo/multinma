@@ -89,7 +89,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
       if (has_agd_arm(x$network)) {
         if (inherits(x$network, "mlnmr_data")) {
-          dat_agd_arm <- unnest_integration(x$network$agd_arm) %>%
+          dat_agd_arm <- .unnest_integration(x$network$agd_arm) %>%
             dplyr::mutate(.sample_size = .data$.sample_size / x$network$n_int)
         } else {
           dat_agd_arm <- x$network$agd_arm
@@ -100,7 +100,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
       if (has_agd_contrast(x$network)) {
         if (inherits(x$network, "mlnmr_data")) {
-          dat_agd_contrast <- unnest_integration(x$network$agd_contrast) %>%
+          dat_agd_contrast <- .unnest_integration(x$network$agd_contrast) %>%
             dplyr::mutate(.sample_size = .data$.sample_size / x$network$n_int)
         } else {
           dat_agd_contrast <- x$network$agd_contrast

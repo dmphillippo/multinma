@@ -309,6 +309,15 @@ unnest_integration <- function(data) {
   return(out)
 }
 
+#' Internal version of unnest_integration, doesn't throw warnings when
+#' overwriting columns
+#' @noRd
+.unnest_integration <- function(data) {
+  ignore <- function(wrn) rlang::cnd_muffle(wrn)
+  out <- rlang::with_handlers(unnest_integration.data.frame(data),
+                              unnest_name_conflict = rlang::calling(ignore))
+  return(out)
+}
 
 #' Specify a general marginal distribution
 #'

@@ -161,7 +161,7 @@ nma <- function(network,
 
     # Set up integration variables if present
     if (use_int) {
-      idat_agd_arm <- unnest_integration(dat_agd_arm)
+      idat_agd_arm <- .unnest_integration(dat_agd_arm)
     } else {
       idat_agd_arm <- dat_agd_arm
     }
@@ -182,7 +182,7 @@ nma <- function(network,
 
     # Set up integration variables if present
     if (use_int) {
-      idat_agd_contrast <-  unnest_integration(dat_agd_contrast)
+      idat_agd_contrast <-  .unnest_integration(dat_agd_contrast)
     } else {
       idat_agd_contrast <- dat_agd_contrast
     }
