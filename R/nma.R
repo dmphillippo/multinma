@@ -161,7 +161,7 @@ nma <- function(network,
 
     # Set up integration variables if present
     if (use_int) {
-      idat_agd_arm <- unnest_integration_points(dat_agd_arm, network$int_names)
+      idat_agd_arm <- unnest_integration(dat_agd_arm)
     } else {
       idat_agd_arm <- dat_agd_arm
     }
@@ -182,7 +182,7 @@ nma <- function(network,
 
     # Set up integration variables if present
     if (use_int) {
-      idat_agd_contrast <-  unnest_integration_points(dat_agd_contrast, network$int_names)
+      idat_agd_contrast <-  unnest_integration(dat_agd_contrast)
     } else {
       idat_agd_contrast <- dat_agd_contrast
     }
@@ -1221,27 +1221,38 @@ make_Sigma_block <- function(x) {
   return(S)
 }
 
-#' Prepare integration points ready for design matrix
+#' @param data Data frame with nested integration points, stored in list
+#'   columns as `.int_<variable name>`
 #'
-#' Unnest integration points stored in .int_* list columns, renaming to the
-#' target variable name so that model.matrix can be called
-#'
-#' @param x Data frame with nested integration points, stored in list
-#'   columns as .int_<variable name>
-#' @param int_names Character vector of target variable names
-#'
-#' @noRd
-unnest_integration_points <- function(x, int_names) {
-  idat <- x %>%
-    dplyr::select(-dplyr::one_of(intersect(int_names, colnames(x)))) %>%
-    dplyr::rename_at(dplyr::vars(dplyr::starts_with(".int_")), ~gsub(".int_", "", ., fixed = TRUE)) %>%
+#' @export
+#' @rdname add_integration
+unnest_integration <- function(data) {
+  if (!inherits(data, "data.frame")) abort("Expecting a data frame.")
+
+  # Get integration variable names
+  data_names <- colnames(data)
+  x_int_names <- stringr::str_subset(data_names, "^\\.int_")
+  x_names <- stringr::str_remove(x_int_names, "^\\.int_")
+
+  if (length(x_int_names) == 0)
+    abort("No integration points present in data frame.")
+
+  if (name_conflicts <- any(rlang::has_name(data, x_names))) {
+    warn(glue::glue("Columns will be overwritten when unnesting integration points:",
+                    glue::glue_collapse(data_names[name_conflicts], sep = ", ")),
+         "unnest_name_conflict")
+  }
+
+  out <- data %>%
+    dplyr::select(-dplyr::one_of(data_names[name_conflicts])) %>%
+    dplyr::rename_at(x_int_names, ~stringr::str_remove(., "^\\.int_")) %>%
     {if (getNamespaceVersion("tidyr") < "1.0.0") {
-      tidyr::unnest(., !!! rlang::syms(int_names))
+      tidyr::unnest(., !!! rlang::syms(x_names))
     } else {
-      tidyr::unnest(., c(!!! rlang::syms(int_names)))
+      tidyr::unnest(., x_names)
     }}
 
-  return(idat)
+  return(out)
 }
 
 #' Sanitise factor labels

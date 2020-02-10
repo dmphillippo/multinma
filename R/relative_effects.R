@@ -89,7 +89,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
       if (has_agd_arm(x$network)) {
         if (inherits(x$network, "mlnmr_data")) {
-          dat_agd_arm <- unnest_integration_points(x$network$agd_arm, x$network$int_names) %>%
+          dat_agd_arm <- unnest_integration(x$network$agd_arm) %>%
             dplyr::mutate(.sample_size = .data$.sample_size / x$network$n_int)
         } else {
           dat_agd_arm <- x$network$agd_arm
@@ -100,7 +100,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
       if (has_agd_contrast(x$network)) {
         if (inherits(x$network, "mlnmr_data")) {
-          dat_agd_contrast <- unnest_integration_points(x$network$agd_contrast, x$network$int_names) %>%
+          dat_agd_contrast <- unnest_integration(x$network$agd_contrast) %>%
             dplyr::mutate(.sample_size = .data$.sample_size / x$network$n_int)
         } else {
           dat_agd_contrast <- x$network$agd_contrast
@@ -110,11 +110,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
       }
 
       if (has_ipd(x$network)) {
-        if (inherits(x$network, "mlnmr_data")) {
-          dat_ipd <- unnest_integration_points(x$network$ipd, x$network$int_names)
-        } else {
-          dat_ipd <- x$network$ipd
-        }
+        dat_ipd <- x$network$ipd
         dat_ipd$.sample_size <- 1
       } else {
         dat_ipd <- tibble::tibble()
