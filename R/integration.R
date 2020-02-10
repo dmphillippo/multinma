@@ -104,7 +104,7 @@ add_integration.data.frame <- function(x, ...,
   # If integration points already present, remove and warn
   int_cols <- stringr::str_detect(colnames(x), "^\\.int_")
   if (any(int_cols))
-    warn("Replacing integration points already present in data frame.")
+    warn("Replacing integration points already present in data frame.", "int_col_present")
 
   # Bind in generated integration points
   out <-
@@ -126,6 +126,7 @@ add_integration.data.frame <- function(x, ...,
 
   if (nrow(invalid_rows) > 0)
     abort("Invalid integration points were generated (either NA, NaN, Inf, or NULL).",
+          "invalid_int_generated",
           invalid_rows = invalid_rows)
 
   return(out)
@@ -219,21 +220,36 @@ add_integration.nma_data <- function(x, ...,
 
   out <- network
 
-  if (has_agd_arm(network)) {
-    out$agd_arm <- add_integration.data.frame(network$agd_arm, ...,
-                                              cor = cor, n_int = n_int, int_args = int_args)
+  # Establish handlers for more specific errors / warnings when possible
+  int_col_present <- function(wrn) {
+    warn("Replacing integration points already present in network.")
+    rlang::cnd_muffle(wrn)
+  }
 
-      # abort(
-      #   glue::glue("Invalid integration points were generated (either NA, NaN, Inf, or NULL).\n",
-      #              "Check the input parameters for the following (study, treatment):\n",
-      #              glue::glue_collapse(glue::glue(" {invalid_rows$.study}, {invalid_rows$.trt}"),
-      #                                  sep = "\n"))
-      # )
+  invalid_int_generated <- function(err) {
+    invalid_rows <- err$invalid_rows
+    abort(
+      glue::glue("Invalid integration points were generated (either NA, NaN, Inf, or NULL).\n",
+                 "Check the input parameters for the following (study, treatment):\n",
+                 glue::glue_collapse(glue::glue(" {invalid_rows$.study}, {invalid_rows$.trt}"),
+                                     sep = "\n"))
+    )
+  }
+
+  if (has_agd_arm(network)) {
+    out$agd_arm <- rlang::with_handlers(
+      add_integration.data.frame(network$agd_arm, ...,
+                                 cor = cor, n_int = n_int, int_args = int_args),
+      int_col_present = rlang::calling(int_col_present),
+      invalid_int_generated = invalid_int_generated)
   }
 
   if (has_agd_contrast(network)) {
-    out$agd_contrast <- add_integration.data.frame(network$agd_contrast, ...,
-                                                   cor = cor, n_int = n_int, int_args = int_args)
+    out$agd_contrast <- rlang::with_handlers(
+      add_integration.data.frame(network$agd_contrast, ...,
+                                 cor = cor, n_int = n_int, int_args = int_args),
+      int_col_present = rlang::calling(int_col_present),
+      invalid_int_generated = invalid_int_generated)
   }
 
   # Set as mlnmr_data class
