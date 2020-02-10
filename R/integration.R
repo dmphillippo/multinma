@@ -77,13 +77,13 @@ add_integration.data.frame <- function(x, ...,
   if (nx > 1) {
     if (!is.null(cor)) {
       tryCatch(cor <- as.matrix(cor),
-               error = function(e) abort("cor should be a correlation matrix or NULL"))
+               error = function(e) abort("`cor` should be a correlation matrix or NULL"))
 
       if (!is.numeric(cor) ||
           !isSymmetric(cor) ||
           !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)), check.names = FALSE)) ||
           !all(eigen(cor, symmetric = TRUE)$values > 0))
-        abort("cor should be a correlation matrix or NULL")
+        abort("`cor` should be a correlation matrix or NULL")
 
       if (ncol(cor) != nx)
         abort("Dimensions of correlation matrix `cor` and number of covariates specified in `...` do not match.")
@@ -166,13 +166,13 @@ add_integration.nma_data <- function(x, ...,
   # Check cor
   if (!is.null(cor)) {
     tryCatch(cor <- as.matrix(cor),
-             error = function(e) abort("cor should be a correlation matrix or NULL"))
+             error = function(e) abort("`cor` should be a correlation matrix or NULL"))
 
     if (!is.numeric(cor) ||
         !isSymmetric(cor) ||
         !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)), check.names = FALSE)) ||
         !all(eigen(cor, symmetric = TRUE)$values > 0)) {
-      abort("cor should be a correlation matrix or NULL")
+      abort("`cor` should be a correlation matrix or NULL")
     }
   } else {
     if (!has_ipd(network)) abort("Specify a correlation matrix using the `cor` argument, or provide IPD studies in the network.")
