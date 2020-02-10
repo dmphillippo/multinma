@@ -50,21 +50,6 @@ add_integration.data.frame <- function(x, ...,
     abort("`int_args` should be a named list.")
   }
 
-  # Check cor
-  if (!is.null(cor)) {
-    tryCatch(cor <- as.matrix(cor),
-             error = function(e) abort("cor should be a correlation matrix or NULL"))
-
-    if (!is.numeric(cor) ||
-        !isSymmetric(cor) ||
-        !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)), check.names = FALSE)) ||
-        !all(eigen(cor, symmetric = TRUE)$values > 0)) {
-      abort("cor should be a correlation matrix or NULL")
-    }
-  } else {
-    abort("Specify a correlation matrix using the `cor` argument.")
-  }
-
   # Check covariate arguments
   ds <- list(...)
 
@@ -79,9 +64,24 @@ add_integration.data.frame <- function(x, ...,
   x_names <- names(ds)  # Covariate names
   nx <- length(ds)      # Number of covariates
 
-  # Check cor dimensions
-  if (ncol(cor) != nx)
-    abort("Dimensions of correlation matrix `cor` and number of covariates specified in `...` do not match.")
+  # Check cor
+  if (nx > 1) {
+    if (!is.null(cor)) {
+      tryCatch(cor <- as.matrix(cor),
+               error = function(e) abort("cor should be a correlation matrix or NULL"))
+
+      if (!is.numeric(cor) ||
+          !isSymmetric(cor) ||
+          !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)), check.names = FALSE)) ||
+          !all(eigen(cor, symmetric = TRUE)$values > 0))
+        abort("cor should be a correlation matrix or NULL")
+
+      if (ncol(cor) != nx)
+        abort("Dimensions of correlation matrix `cor` and number of covariates specified in `...` do not match.")
+    } else {
+      abort("Specify a correlation matrix using the `cor` argument.")
+    }
+  }
 
   # Generate Sobol points
   u <- do.call(randtoolbox::sobol, purrr::list_modify(list(n = n_int, dim = nx), !!! int_args))
