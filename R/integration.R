@@ -40,28 +40,6 @@ add_integration.default <- function(x, ...) {
 add_integration.data.frame <- function(x, ...,
                                        cor = NULL, n_int = 100L, int_args = list()) {
 
-}
-
-#' @export
-#' @rdname add_integration
-add_integration.nma_data <- function(x, ...,
-                                     cor = NULL, n_int = 100L, int_args = list()) {
-
-  network <- x
-
-  # Check network
-  if (!inherits(network, "nma_data")) {
-    abort("Expecting an `nma_data` object, as created by the `set_*` or `combine_network` functions.")
-  }
-
-  if (all(purrr::map_lgl(network, is.null))) {
-    abort("Empty network.")
-  }
-
-  if (!has_agd_arm(network) && !has_agd_contrast(network)) {
-    abort("No aggregate data found in network.")
-  }
-
   # Check n_int
   if (length(n_int) > 1 || !is.numeric(n_int) || n_int != trunc(n_int) || n_int <= 0) {
     abort("`n_int` should be a positive integer.")
@@ -84,10 +62,110 @@ add_integration.nma_data <- function(x, ...,
       abort("cor should be a correlation matrix or NULL")
     }
   } else {
-    if (!has_ipd(network)) abort("Specify a correlation matrix using the `cor` argument, or provide IPD studies in the network.")
+    abort("Specify a correlation matrix using the `cor` argument.")
   }
 
   # Check covariate arguments
+  ds <- list(...)
+
+  if (length(ds) == 0) {
+    abort("No covariate distributions specified. Covariate distributions should be specified as named arguments using the function `distr`.")
+  }
+
+  if (any(purrr::map_lgl(ds, ~!inherits(., "distr"))) || !rlang::is_named(ds)) {
+    abort("Covariate distributions should be specified as named arguments using the function `distr`.")
+  }
+
+  x_names <- names(ds)  # Covariate names
+  nx <- length(ds)      # Number of covariates
+
+  # Generate Sobol points
+  u <- do.call(randtoolbox::sobol, purrr::list_modify(list(n = n_int, dim = nx), !!! int_args))
+
+  # Correlate Sobol points with Gaussian copula
+  if (nx > 1) {
+    cop <- copula::normalCopula(copula::P2p(cor), dim = nx, dispstr = "un")
+    u_cor <- copula::cCopula(u, copula = cop, inverse = TRUE)
+    # columns to list
+    u_cor_l <- purrr::array_branch(u_cor, 2)
+  } else {
+    u_cor <- u
+    u_cor_l <- list(u_cor)
+  }
+
+  # Use inverse CDFs to get integration points for specified marginals
+  out <- x
+  x_int_names <- paste0(".int_", x_names)
+
+  # If integration points already present, remove and warn
+  int_cols <- stringr::str_detect(colnames(x), "^\\.int_")
+  if (any(int_cols))
+    warn("Replacing integration points already present in data frame.")
+
+  # Bind in generated integration points
+  out <-
+    dplyr::bind_cols(
+      x[, !int_cols],
+      purrr::pmap_dfc(list(x_int_names, ds, u_cor_l),
+                      ~ rowwise(x) %>%
+                        transmute(!! ..1 := list(rlang::eval_tidy(rlang::call2(..2$qfun, p = ..3, !!! ..2$args)))))
+    )
+
+  # Check valid values produced
+  invalid_rows <- out %>%
+    dplyr::mutate_at(x_int_names,
+                     .funs = ~purrr::map_lgl(.,
+                                             ~any(is.na(.) | is.infinite(.) |
+                                                    is.null(.) | is.nan(.)))
+    ) %>%
+    dplyr::filter_at(x_int_names, dplyr::any_vars(.))
+
+  if (nrow(invalid_rows) > 0)
+    abort("Invalid integration points were generated (either NA, NaN, Inf, or NULL).",
+          invalid_rows = invalid_rows)
+
+  return(out)
+}
+
+#' @export
+#' @rdname add_integration
+add_integration.nma_data <- function(x, ...,
+                                     cor = NULL, n_int = 100L, int_args = list()) {
+
+  network <- x
+
+  # Checks for n_int and int_args performed in data.frame method
+
+  # Check network
+  if (!inherits(network, "nma_data")) {
+    abort("Expecting an `nma_data` object, as created by the `set_*` or `combine_network` functions.")
+  }
+
+  if (all(purrr::map_lgl(network, is.null))) {
+    abort("Empty network.")
+  }
+
+  if (!has_agd_arm(network) && !has_agd_contrast(network)) {
+    abort("No aggregate data found in network.")
+  }
+
+  # Check cor
+  if (!is.null(cor)) {
+    tryCatch(cor <- as.matrix(cor),
+             error = function(e) abort("cor should be a correlation matrix or NULL"))
+
+    if (!is.numeric(cor) ||
+        !isSymmetric(cor) ||
+        !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)))) ||
+        !all(eigen(cor, symmetric = TRUE)$values > 0)) {
+      abort("cor should be a correlation matrix or NULL")
+    }
+  } else {
+    if (!has_ipd(network)) abort("Specify a correlation matrix using the `cor` argument, or provide IPD studies in the network.")
+  }
+
+
+  # Covariate arguments
   ds <- list(...)
 
   if (length(ds) == 0) {
@@ -135,96 +213,23 @@ add_integration.nma_data <- function(x, ...,
     cor <- ipd_cor
   }
 
-  # Generate Sobol points
-  u <- do.call(randtoolbox::sobol, purrr::list_modify(list(n = n_int, dim = nx), !!! int_args))
-
-  # Correlate Sobol points with Gaussian copula
-  if (nx > 1) {
-    cop <- copula::normalCopula(copula::P2p(cor), dim = nx, dispstr = "un")
-    u_cor <- copula::cCopula(u, copula = cop, inverse = TRUE)
-    # columns to list
-    u_cor_l <- purrr::array_branch(u_cor, 2)
-  } else {
-    u_cor <- u
-    u_cor_l <- list(u_cor)
-  }
-
-  # Use inverse CDFs to get integration points for specified marginals
   out <- network
-  x_int_names <- paste0(".int_", x_names)
 
   if (has_agd_arm(network)) {
-    # If integration points already present, remove and warn
-    aa_int_cols <- stringr::str_detect(colnames(network$agd_arm), "^\\.int_")
-    if (any(aa_int_cols))
-      warn("Replacing integration points already present in network.")
+    out$agd_arm <- add_integration.data.frame(network$agd_arm, ...,
+                                              cor = cor, n_int = n_int, int_args = int_args)
 
-    # rlang::with_handlers(
-    out$agd_arm <-
-      dplyr::bind_cols(
-        network$agd_arm[, !aa_int_cols],
-        purrr::pmap_dfc(list(x_int_names, ds, u_cor_l),
-                        ~ rowwise(network$agd_arm) %>%
-                          transmute(!! ..1 := list(rlang::eval_tidy(rlang::call2(..2$qfun, p = ..3, !!! ..2$args)))))
-      )#,
-    # error = abort,
-    # warning = rlang::calling(~{warn(.); rlang::cnd_muffle(.)})
-    # )
-
-    # Check valid values produced
-    invalid_rows <- out$agd_arm %>%
-      dplyr::mutate_at(x_int_names,
-                       .funs = ~purrr::map_lgl(.,
-                                 ~any(is.na(.) | is.infinite(.) |
-                                      is.null(.) | is.nan(.)))
-                       ) %>%
-      dplyr::filter_at(x_int_names, dplyr::any_vars(.))
-
-    if (nrow(invalid_rows) > 0) {
-      abort(
-        glue::glue("Invalid integration points were generated (either NA, NaN, Inf, or NULL).\n",
-                   "Check the input parameters for the following (study, treatment):\n",
-                   glue::glue_collapse(glue::glue(" {invalid_rows$.study}, {invalid_rows$.trt}"),
-                                       sep = "\n"))
-      )
-    }
+      # abort(
+      #   glue::glue("Invalid integration points were generated (either NA, NaN, Inf, or NULL).\n",
+      #              "Check the input parameters for the following (study, treatment):\n",
+      #              glue::glue_collapse(glue::glue(" {invalid_rows$.study}, {invalid_rows$.trt}"),
+      #                                  sep = "\n"))
+      # )
   }
 
   if (has_agd_contrast(network)) {
-    # If integration points already present, remove and warn
-    ac_int_cols <- stringr::str_detect(colnames(network$agd_contrast), "^\\.int_")
-    if (any(ac_int_cols))
-      warn("Replacing integration points already present in network.")
-
-    # rlang::with_handlers(
-    out$agd_contrast <-
-      dplyr::bind_cols(
-        network$agd_contrast[, !ac_int_cols],
-        purrr::pmap_dfc(list(x_int_names, ds, u_cor_l),
-                        ~ rowwise(network$agd_contrast) %>%
-                          transmute(!! ..1 := list(rlang::eval_tidy(rlang::call2(..2$qfun, p = ..3, !!! ..2$args)))))
-      )#,
-    # error = abort,
-    # warning = rlang::calling(~{warn(.); rlang::cnd_muffle(.)})
-    # )
-
-    # Check valid values produced
-    invalid_rows <- out$agd_contrast %>%
-      dplyr::mutate_at(x_int_names,
-                       .funs = ~purrr::map_lgl(.,
-                                               ~any(is.na(.) | is.infinite(.) |
-                                                      is.null(.) | is.nan(.)))
-      ) %>%
-      dplyr::filter_at(x_int_names, dplyr::any_vars(.))
-
-    if (nrow(invalid_rows) > 0) {
-      abort(
-        glue::glue("Invalid integration points were generated (either NA, NaN, Inf, or NULL).\n",
-                   "Check the input parameters for the following (study, treatment):\n",
-                   glue::glue_collapse(glue::glue(" {invalid_rows$.study}, {invalid_rows$.trt}"),
-                                       sep = "\n"))
-      )
-    }
+    out$agd_contrast <- add_integration.data.frame(network$agd_contrast, ...,
+                                                   cor = cor, n_int = n_int, int_args = int_args)
   }
 
   # Set as mlnmr_data class
