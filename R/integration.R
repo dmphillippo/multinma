@@ -291,14 +291,15 @@ unnest_integration <- function(data) {
   if (length(x_int_names) == 0)
     abort("No integration points present in data frame.")
 
-  if (name_conflicts <- any(rlang::has_name(data, x_names))) {
-    warn(glue::glue("Columns will be overwritten when unnesting integration points:",
-                    glue::glue_collapse(data_names[name_conflicts], sep = ", ")),
+  name_conflicts <- rlang::has_name(data, x_names)
+  if (any(name_conflicts)) {
+    warn(glue::glue("Columns will be overwritten when unnesting integration points:\n",
+                    glue::glue_collapse(x_names[name_conflicts], sep = ", ")),
          "unnest_name_conflict")
   }
 
   out <- data %>%
-    dplyr::select(-dplyr::one_of(data_names[name_conflicts])) %>%
+    dplyr::select(-dplyr::one_of(x_names[name_conflicts])) %>%
     dplyr::rename_at(x_int_names, ~stringr::str_remove(., "^\\.int_")) %>%
     {if (getNamespaceVersion("tidyr") < "1.0.0") {
       tidyr::unnest(., !!! rlang::syms(x_names))
@@ -314,7 +315,7 @@ unnest_integration <- function(data) {
 #' @noRd
 .unnest_integration <- function(data) {
   ignore <- function(wrn) rlang::cnd_muffle(wrn)
-  out <- rlang::with_handlers(unnest_integration.data.frame(data),
+  out <- rlang::with_handlers(unnest_integration(data),
                               unnest_name_conflict = rlang::calling(ignore))
   return(out)
 }
