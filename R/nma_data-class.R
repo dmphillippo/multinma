@@ -44,6 +44,8 @@
 #'   \describe{
 #'   \item{`n_int`}{number of numerical integration points}
 #'   \item{`int_names`}{names of covariates with numerical integration points}
+#'   \item{`int_cor`}{correlation matrix for covariates used to generate
+#'   numerical integration points}
 #'   }
 #'
 #' The `agd_arm` and `agd_contrast` tibbles have additional list columns with
