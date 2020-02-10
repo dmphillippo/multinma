@@ -57,7 +57,7 @@ add_integration.data.frame <- function(x, ...,
 
     if (!is.numeric(cor) ||
         !isSymmetric(cor) ||
-        !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)))) ||
+        !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)), check.names = FALSE)) ||
         !all(eigen(cor, symmetric = TRUE)$values > 0)) {
       abort("cor should be a correlation matrix or NULL")
     }
@@ -156,7 +156,7 @@ add_integration.nma_data <- function(x, ...,
 
     if (!is.numeric(cor) ||
         !isSymmetric(cor) ||
-        !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)))) ||
+        !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)), check.names = FALSE)) ||
         !all(eigen(cor, symmetric = TRUE)$values > 0)) {
       abort("cor should be a correlation matrix or NULL")
     }
