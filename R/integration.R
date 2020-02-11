@@ -138,6 +138,7 @@ add_integration.data.frame <- function(x, ...,
           "invalid_int_generated",
           invalid_rows = invalid_rows)
 
+  class(out) <- c("integration_tbl", class(out))
   return(out)
 }
 
