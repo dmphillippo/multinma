@@ -52,5 +52,39 @@ predict.stan_nma <- function(object,
                              level = c("aggregate", "individual"),
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
                              summary = TRUE) {
+  # Checks
+  if (!inherits(object, "stan_nma")) abort("Expecting a `stan_nma` object, as returned by nma().")
+
+  type <- rlang::arg_match(type)
+  level <- rlang::arg_match(level)
+
+  if (!is.null(baseline)) {
+    if (!inherits(baseline, "distr"))
+      abort("Baseline response `baseline` should be specified using distr(), or NULL.")
+  }
+
+  if ((is.null(newdata) || is.null(baseline)) && !is.null(object$regression))
+    abort("Specify both `newdata` and `baseline`, or neither.")
+
+  if (!is.null(newdata)) {
+    if (!is.data.frame(newdata)) abort("`newdata` is not a data frame.")
+
+    .study <- pull_non_null(newdata, enquo(study))
+    if (is.null(.study)) {
+      if (inherits(object, "integration_tbl"))
+        newdata$.study <- nfactor(paste("New", seq_len(nrow(newdata))))
+      else
+        newdata$.study <- nfactor("New 1")
+    } else {
+      newdata <- dplyr::mutate(newdata, .study = nfactor(.study))
+    }
+  }
+
+  if (!rlang::is_bool(summary))
+    abort("`summary` should be TRUE or FALSE.")
+
+  # Cannot produce predictions for inconsistency models
+  if (object$consistency != "consistency")
+    abort(glue::glue("Cannot produce predictions under inconsistency '{x$consistency}' model."))
 
 }
