@@ -25,8 +25,10 @@
 #'
 #'   If `NULL`, prections are produced for all studies with IPD and/or
 #'   contrast-based AgD in the network, depending on the value of `type`.
-#' @param study Column of `newdata` which specifies study names or IDs, required
-#'   if `newdata` is specified.
+#' @param study Column of `newdata` which specifies study names or IDs. When not
+#'   specified: if `newdata` contains integration points produced by
+#'   [add_integration()], studies will be labelled sequentially by row;
+#'   otherwise data will be assumed to come from a single study.
 #' @param type Whether to produce predictions on the `"link"` scale (the
 #'   default, e.g. log odds) or `"response"` scale (e.g. probabilities).
 #' @param level The level at which predictions are produced, either
