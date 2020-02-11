@@ -46,7 +46,7 @@
 #' @examples
 predict.stan_nma <- function(object,
                              baseline = NULL, newdata = NULL, study = NULL,
-                             type = c("response", "link"),
+                             type = c("link", "response"),
                              level = c("aggregate", "individual"),
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
                              summary = TRUE) {
