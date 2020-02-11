@@ -37,7 +37,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
 
     .study <- pull_non_null(newdata, enquo(study))
     if (is.null(.study)) {
-      newdata$.study <- nfactor(seq_len(nrow(newdata)))
+      newdata$.study <- nfactor(paste("New", seq_len(nrow(newdata))))
     } else {
       newdata <- dplyr::mutate(newdata, .study = nfactor(.study))
 
