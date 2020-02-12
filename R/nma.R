@@ -134,15 +134,16 @@ nma <- function(network,
   # Set to 1 if no numerical integration, so that regression on summary data is possible
   n_int <- if (use_int) network$n_int else 1
 
-  # Get design matrices and outcomes
-  if (has_ipd(network)) {
-    dat_ipd <- network$ipd %>%
-      # Sanitise study and treatment factor labels
-      dplyr::mutate_at(
-        .vars = if (!is.null(network$classes)) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
-        .funs = fct_sanitise
-      )
+  # Warn if combining AgD and IPD in a meta-regression without using integration
+  if (!is.null(regression) && !inherits(network, "mlnmr_data") && has_ipd(network) &&
+      (has_agd_arm(network) || has_agd_contrast(network))) {
+    warn(glue::glue("No integration points available, using naive plug-in model at aggregate level.\n",
+                    "Use `add_integration()` to add integration points to the network."))
+  }
 
+  # Get data for design matrices and outcomes
+  if (has_ipd(network)) {
+    dat_ipd <- network$ipd
     y_ipd <- get_outcome_variables(dat_ipd, network$outcome$ipd)
   } else {
     dat_ipd <- tibble::tibble()
@@ -150,13 +151,7 @@ nma <- function(network,
   }
 
   if (has_agd_arm(network)) {
-    dat_agd_arm <- network$agd_arm %>%
-      # Sanitise study and treatment factor labels
-      dplyr::mutate_at(
-        .vars = if (!is.null(network$classes)) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
-        .funs = fct_sanitise
-      )
-
+    dat_agd_arm <- network$agd_arm
     y_agd_arm <- get_outcome_variables(dat_agd_arm, network$outcome$agd_arm)
 
     # Set up integration variables if present
@@ -171,13 +166,7 @@ nma <- function(network,
   }
 
   if (has_agd_contrast(network)) {
-    dat_agd_contrast <- network$agd_contrast %>%
-      # Sanitise study and treatment factor labels
-      dplyr::mutate_at(
-        .vars = if (!is.null(network$classes)) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
-        .funs = fct_sanitise
-      )
-
+    dat_agd_contrast <- network$agd_contrast
     y_agd_contrast <- get_outcome_variables(dat_agd_contrast, network$outcome$agd_contrast)
 
     # Set up integration variables if present
@@ -192,8 +181,8 @@ nma <- function(network,
 
     # Split into baseline and non-baseline arms
     dat_agd_contrast_bl <- dplyr::filter(dat_agd_contrast, is.na(.data$.y))
-    dat_agd_contrast_nonbl <- dplyr::filter(dat_agd_contrast, !is.na(.data$.y))
     idat_agd_contrast_bl <- dplyr::filter(idat_agd_contrast, is.na(.data$.y))
+    dat_agd_contrast_nonbl <- dplyr::filter(dat_agd_contrast, !is.na(.data$.y))
     idat_agd_contrast_nonbl <- dplyr::filter(idat_agd_contrast, !is.na(.data$.y))
     y_agd_contrast <- dplyr::filter(y_agd_contrast, !is.na(.data$.y))
   } else {
@@ -204,136 +193,9 @@ nma <- function(network,
     Sigma_agd_contrast <- NULL
   }
 
-  if (! consistency %in% c("consistency", "ume")) {
-    abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
-  }
-
-  # Define contrasts for UME model
-  if (consistency == "ume") {
-    # For IPD and AgD (arm-based), take the first-ordered arm as baseline
-    # So the contrast sign will always be positive
-    if (has_ipd(network) || has_agd_arm(network)) {
-      contrs_arm <- dplyr::bind_rows(dat_ipd, dat_agd_arm) %>%
-        dplyr::distinct(.data$.study, .data$.trt) %>%
-        dplyr::arrange(.data$.study, .data$.trt) %>%
-        dplyr::group_by(.data$.study) %>%
-        dplyr::mutate(.trt_b = dplyr::first(.data$.trt)) %>%
-        dplyr::ungroup() %>%
-        dplyr::mutate(.contr = dplyr::if_else(.data$.trt == .data$.trt_b,
-                                          "..ref..",
-                                          paste0(.data$.trt, " vs. ", .data$.trt_b)),
-                      .contr_sign = 1)
-    } else {
-      contrs_arm <- tibble::tibble()
-    }
-
-    # For AgD (contrast-based), take the specified baseline arm (with .y = NA)
-    # Need to make sure to construct contrast the correct way around (d_12 instead of d_21)
-    # and then make a note to change the sign if necessary
-    if (has_agd_contrast(network)) {
-      contrs_contr <- dat_agd_contrast %>%
-        dplyr::group_by(.data$.study) %>%
-        dplyr::mutate(.trt_b = .data$.trt[which(is.na(.data$.y))]) %>%
-        dplyr::ungroup() %>%
-        dplyr::distinct(.data$.study, .data$.trt, .data$.trt_b) %>%
-        dplyr::mutate(.contr_sign = dplyr::if_else(as.numeric(.data$.trt) < as.numeric(.data$.trt_b), -1, 1),
-                      .contr = dplyr::if_else(.data$.trt == .data$.trt_b,
-                                                 "..ref..",
-                                                 dplyr::if_else(.data$.contr_sign == 1,
-                                                                paste0(.data$.trt, " vs. ", .data$.trt_b),
-                                                                paste0(.data$.trt_b, " vs. ", .data$.trt))))
-    } else {
-      contrs_contr <- tibble::tibble()
-    }
-
-    # Vector of all K(K-1)/2 possible contrast levels
-    nt <- nlevels(network$treatments)
-    ctr <- which(lower.tri(diag(nt)), arr.ind = TRUE)
-    trt_lev <- levels(network$treatments)
-    c_lev <- paste(trt_lev[ctr[, "row"]], trt_lev[ctr[, "col"]], sep = " vs. ")
-
-    # Bind all together
-    contrs_all <- dplyr::bind_rows(contrs_arm, contrs_contr) %>%
-      dplyr::transmute(.data$.study, .data$.trt,
-                       .contr = forcats::fct_drop(factor(.data$.contr, levels = c("..ref..", c_lev))),
-                       .data$.contr_sign)
-
-    # Join contrast info on to study data
-    if (has_ipd(network))
-      dat_ipd <- dplyr::left_join(dat_ipd, contrs_all, by = c(".study", ".trt"))
-    if (has_agd_arm(network)) {
-      dat_agd_arm <- dplyr::left_join(dat_agd_arm, contrs_all, by = c(".study", ".trt"))
-      idat_agd_arm <- dplyr::left_join(idat_agd_arm, contrs_all, by = c(".study", ".trt"))
-    }
-    if (has_agd_contrast(network)) {
-      dat_agd_contrast <- dplyr::left_join(dat_agd_contrast, contrs_all, by = c(".study", ".trt"))
-      idat_agd_contrast <- dplyr::left_join(idat_agd_contrast, contrs_all, by = c(".study", ".trt"))
-      dat_agd_contrast_bl <- dplyr::left_join(dat_agd_contrast_bl, contrs_all, by = c(".study", ".trt"))
-      idat_agd_contrast_bl <- dplyr::left_join(idat_agd_contrast_bl, contrs_all, by = c(".study", ".trt"))
-      dat_agd_contrast_nonbl <- dplyr::left_join(dat_agd_contrast_nonbl, contrs_all, by = c(".study", ".trt"))
-      idat_agd_contrast_nonbl <- dplyr::left_join(idat_agd_contrast_nonbl, contrs_all, by = c(".study", ".trt"))
-    }
-  }
-
-  # Construct design matrix all together then split out, so that same dummy
-  # coding is used everywhere
+  # Combine
   idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast_nonbl)
   idat_all_plus_bl <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast)
-
-  # Warn if combining AgD and IPD in a meta-regression without using integration
-  if (!is.null(regression) && !inherits(network, "mlnmr_data") && has_ipd(network) &&
-      (has_agd_arm(network) || has_agd_contrast(network))) {
-    warn(glue::glue("No integration points available, using naive plug-in model at aggregate level.\n",
-                    "Use `add_integration()` to add integration points to the network."))
-  }
-
-  # Make NMA formula
-  nma_formula <- make_nma_formula(regression,
-                                  consistency = consistency,
-                                  classes = !is.null(network$classes),
-                                  class_interactions = class_interactions)
-
-  # Check that required variables are present in each data set, and non-missing
-  if (has_ipd(network)) {
-    rlang::with_handlers(
-      X_ipd_frame <- model.frame(nma_formula, dat_ipd, na.action = NULL),
-      error = ~abort(paste0("Failed to construct design matrix for IPD.\n", .)))
-
-    X_ipd_has_na <- names(which(purrr::map_lgl(X_ipd_frame, ~any(is.na(.)))))
-  } else {
-    X_ipd_has_na <- character(0)
-  }
-
-  if (has_agd_arm(network)) {
-    rlang::with_handlers(
-      X_agd_arm_frame <- model.frame(nma_formula, idat_agd_arm, na.action = NULL),
-      error = ~abort(paste0("Failed to construct design matrix for AgD (arm-based).\n", .)))
-
-    X_agd_arm_has_na <- names(which(purrr::map_lgl(X_agd_arm_frame, ~any(is.na(.)))))
-  } else {
-    X_agd_arm_has_na <- character(0)
-  }
-
-  if (has_agd_contrast(network)) {
-    rlang::with_handlers(
-      X_agd_contrast_frame <- model.frame(nma_formula, idat_agd_contrast, na.action = NULL),
-      error = ~abort(paste0("Failed to construct design matrix for AgD (contrast-based).\n", .)))
-
-    X_agd_contrast_has_na <- names(which(purrr::map_lgl(X_agd_contrast_frame, ~any(is.na(.)))))
-  } else {
-    X_agd_contrast_has_na <- character(0)
-  }
-
-  dat_has_na <- c(length(X_ipd_has_na) > 0,
-                  length(X_agd_arm_has_na) > 0,
-                  length(X_agd_contrast_has_na) > 0)
-  if (any(dat_has_na)) {
-    abort(glue::glue(glue::glue_collapse(
-      c("Variables with missing values in IPD: {paste(X_ipd_has_na, collapse = ', ')}.",
-        "Variables with missing values in AgD (arm-based): {paste(X_agd_arm_has_na, collapse = ', ')}.",
-        "Variables with missing values in AgD (contrast-based): {paste(X_agd_contrast_has_na, collapse = ', ')}."
-       )[dat_has_na], sep = "\n")))
-  }
 
   # Get sample sizes for centering
   if (!is.null(regression) && center) {
@@ -358,90 +220,37 @@ nma <- function(network,
              rep(N_agd_arm / n_int, each = n_int),
              rep(N_agd_contrast / n_int, each = n_int))
 
-    reg_names <- colnames(model.frame(nma_formula, data = idat_all))
+    reg_names <- colnames(model.frame(regression, data = idat_all))
 
     reg_numeric <- purrr::map_lgl(idat_all[, reg_names], is.numeric)
 
     # Take weighted mean of all rows (including baseline rows for contrast data)
     xbar <- purrr::map_dbl(idat_all_plus_bl[, reg_names[reg_numeric]], weighted.mean, w = wts)
 
-    idat_all[, reg_names[reg_numeric]] <-
-      purrr::map2(idat_all[, reg_names[reg_numeric]], xbar, ~.x - .y)
-
-    if (has_agd_contrast(network)) {
-      idat_agd_contrast_bl[, reg_names[reg_numeric]] <-
-        purrr::map2(idat_agd_contrast_bl[, reg_names[reg_numeric]], xbar, ~.x - .y)
-    }
-
   } else {
     xbar <- NULL
   }
 
+  # Make NMA formula
+  nma_formula <- make_nma_formula(regression,
+                                  consistency = consistency,
+                                  classes = !is.null(network$classes),
+                                  class_interactions = class_interactions)
+
   # Construct model matrix
-  X_all <- model.matrix(nma_formula, data = idat_all)
+  X_list <- make_nma_model_matrix(nma_formula = nma_formula,
+                                  dat_ipd = dat_ipd,
+                                  dat_agd_arm = idat_agd_arm,
+                                  dat_agd_contrast = idat_agd_contrast,
+                                  agd_contrast_bl = is.na(idat_agd_contrast$.y),
+                                  xbar = xbar,
+                                  consistency = consistency,
+                                  classes = !is.null(network$classes))
 
-  # Remove columns for reference level of .trtclass
-  if (!is.null(network$classes)) {
-    col_trtclass_ref <- grepl(paste0(".trtclass",levels(network$classes)[1]),
-                              colnames(X_all), fixed = TRUE)
-    X_all <- X_all[, !col_trtclass_ref]
-  }
-
-  if (consistency == "ume") {
-    # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
-    contr_cols <- grepl("^\\.contr", colnames(X_all))
-    X_all[, contr_cols] <- sweep(X_all[, contr_cols], MARGIN = 1,
-                                 STATS = idat_all$.contr_sign, FUN = "*")
-  }
-
-  if (has_ipd(network)) {
-    X_ipd <- X_all[1:nrow(dat_ipd), ]
-  } else {
-    X_ipd <- NULL
-  }
-
-  if (has_agd_arm(network)) {
-    X_agd_arm <- X_all[nrow(dat_ipd) + 1:nrow(idat_agd_arm), ]
-  } else {
-    X_agd_arm <- NULL
-  }
-
-  if (has_agd_contrast(network)) {
-    X_agd_contrast <- X_all[nrow(dat_ipd) + nrow(idat_agd_arm) + 1:nrow(idat_agd_contrast_nonbl), ]
-
-    # Difference out the baseline arms
-    X_bl <- model.matrix(nma_formula, data = idat_agd_contrast_bl)
-
-    # The factor levels should be the same between idat_all and
-    # idat_agd_contrast_bl, so the same columns should be present in both design
-    # matrices - but check anyway
-    if (any(colnames(X_agd_contrast) != colnames(X_bl)))
-      abort("Mismatch design matrices for baseline and non-baseline arms. Dropped factor levels?")
-
-    if (consistency == "ume") {
-      # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
-      X_bl[, contr_cols] <- sweep(X_bl[, contr_cols], MARGIN = 1,
-                                  STATS = idat_agd_contrast_bl$.contr_sign, FUN = "*")
-    }
-
-    # Match non-baseline rows with baseline rows by study
-    bl_lookup <- vapply(idat_agd_contrast_nonbl$.study,
-                        FUN = function(x) which(x == idat_agd_contrast_bl$.study),
-                        FUN.VALUE = numeric(1))
-
-    X_agd_contrast <- X_agd_contrast - X_bl[bl_lookup, , drop = FALSE]
-
-    # Remove columns for study baselines corresponding to contrast-based studies - not used
-    s_contr <- unique(dat_agd_contrast$.study)
-    bl_s_reg <- paste0("^\\.study(\\Q", paste0(s_contr, collapse = "\\E|\\Q"), "\\E)$")
-    bl_cols <- grepl(bl_s_reg, colnames(X_agd_contrast), perl = TRUE)
-
-    X_agd_contrast <- X_agd_contrast[, !bl_cols]
-    if (has_ipd(network)) X_ipd <- X_ipd[, !bl_cols]
-    if (has_agd_arm(network)) X_agd_arm <- X_agd_arm[, !bl_cols]
-  } else {
-    X_agd_contrast <- NULL
-  }
+  X_ipd <- X_list$X_ipd
+  X_agd_arm <- X_list$X_agd_arm
+  X_agd_contrast <- X_list$X_agd_contrast
+  X_all <- do.call(rbind, X_list)
 
   # Construct RE correlation matrix
   if (trt_effects == "random") {
@@ -1130,6 +939,7 @@ make_nma_formula <- function(regression,
 
   if (!is.null(regression) && !rlang::is_formula(regression)) abort("`regression` is not a formula")
   consistency <- rlang::arg_match(consistency)
+  class_interactions <- rlang::arg_match(class_interactions)
   if (!rlang::is_bool(classes)) abort("`classes` should be TRUE or FALSE")
 
   if (!is.null(regression)) {
@@ -1166,6 +976,265 @@ make_nma_formula <- function(regression,
       nma_formula <- ~-1 + .study + .trt
     }
   }
+}
+
+#' Construct NMA design matrix
+#'
+#' @param nma_formula NMA formula, returned by [make_nma_formula()]
+#' @param ipd,agd_arm,agd_contrast Data frames
+#' @param agd_contrast_bl Logical vector identifying baseline rows for contrast
+#'   data
+#' @param xbar Named numeric vector of centering values, or NULL
+#' @param consistency Consistency/inconsistency model (character string)
+#' @param classes Classes present? TRUE / FALSE
+#' @param class_interactions Class interaction specification (character string)
+#'
+#' @return A named list of three matrices: X_ipd, X_agd_arm, X_agd_contrast
+#' @noRd
+make_nma_model_matrix <- function(nma_formula,
+                                  dat_ipd = tibble::tibble(),
+                                  dat_agd_arm = tibble::tibble(),
+                                  dat_agd_contrast = tibble::tibble(),
+                                  agd_contrast_bl = logical(),
+                                  xbar = NULL,
+                                  consistency = c("consistency", "nodesplit", "ume"),
+                                  classes = FALSE) {
+  # Checks
+  if (!rlang::is_formula(nma_formula)) abort("`nma_formula` is not a formula")
+  stopifnot(is.data.frame(dat_ipd),
+            is.data.frame(dat_agd_arm),
+            is.data.frame(dat_agd_contrast))
+  consistency <- rlang::arg_match(consistency)
+  if (!rlang::is_bool(classes)) abort("`classes` should be TRUE or FALSE")
+  if (nrow(dat_agd_contrast) && !rlang::is_logical(agd_contrast_bl, n = nrow(dat_agd_contrast)))
+    abort("`agd_contrast_bl` should be a logical vector of length nrow(agd_contrast)")
+  if (!is.null(xbar) && (
+        !(rlang::is_double(xbar) || rlang::is_integer(xbar)) || !rlang::is_named(xbar)))
+    abort("`xbar` should be a named numeric vector")
+
+  if (!consistency %in% c("consistency", "ume")) {
+    abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
+  }
+
+  .has_ipd <- if (nrow(dat_ipd)) TRUE else FALSE
+  .has_agd_arm <- if (nrow(dat_agd_arm)) TRUE else FALSE
+  .has_agd_contrast <- if (nrow(dat_agd_contrast)) TRUE else FALSE
+
+  # Sanitise factors
+  if (.has_ipd) {
+    dat_ipd <- dplyr::mutate_at(dat_ipd,
+      .vars = if (classes) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
+      .funs = fct_sanitise)
+  }
+  if (.has_agd_arm) {
+    dat_agd_arm <- dplyr::mutate_at(dat_agd_arm,
+                            .vars = if (classes) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
+                            .funs = fct_sanitise)
+  }
+  if (.has_agd_contrast) {
+    dat_agd_contrast <- dplyr::mutate_at(dat_agd_contrast,
+                            .vars = if (classes) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
+                            .funs = fct_sanitise)
+
+    # Split contrast-based data into baseline and non-baseline arms
+    dat_agd_contrast_bl <- dat_agd_contrast[agd_contrast_bl, ]
+    dat_agd_contrast_nonbl <- dat_agd_contrast[!agd_contrast_bl, ]
+  } else {
+    dat_agd_contrast_bl <- dat_agd_contrast_nonbl <- tibble::tibble()
+  }
+
+  # Define contrasts for UME model
+  if (consistency == "ume") {
+    # For IPD and AgD (arm-based), take the first-ordered arm as baseline
+    # So the contrast sign will always be positive
+    if (.has_ipd || .has_agd_arm) {
+      contrs_arm <- dplyr::bind_rows(dat_ipd, dat_agd_arm) %>%
+        dplyr::distinct(.data$.study, .data$.trt) %>%
+        dplyr::arrange(.data$.study, .data$.trt) %>%
+        dplyr::group_by(.data$.study) %>%
+        dplyr::mutate(.trt_b = dplyr::first(.data$.trt)) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(.contr = dplyr::if_else(.data$.trt == .data$.trt_b,
+                                              "..ref..",
+                                              paste0(.data$.trt, " vs. ", .data$.trt_b)),
+                      .contr_sign = 1)
+    } else {
+      contrs_arm <- tibble::tibble()
+    }
+
+    # For AgD (contrast-based), take the specified baseline arm (with .y = NA)
+    # Need to make sure to construct contrast the correct way around (d_12 instead of d_21)
+    # and then make a note to change the sign if necessary
+    if (.has_agd_contrast) {
+      contrs_contr <- dat_agd_contrast %>%
+        dplyr::distinct(.data$.study, .data$.trt) %>%  # In case integration data passed
+        dplyr::group_by(.data$.study) %>%
+        dplyr::mutate(.trt_b = .data$.trt[which(is.na(.data$.y))]) %>%
+        dplyr::ungroup() %>%
+        dplyr::distinct(.data$.study, .data$.trt, .data$.trt_b) %>%
+        dplyr::mutate(.contr_sign = dplyr::if_else(as.numeric(.data$.trt) < as.numeric(.data$.trt_b), -1, 1),
+                      .contr = dplyr::if_else(.data$.trt == .data$.trt_b,
+                                              "..ref..",
+                                              dplyr::if_else(.data$.contr_sign == 1,
+                                                             paste0(.data$.trt, " vs. ", .data$.trt_b),
+                                                             paste0(.data$.trt_b, " vs. ", .data$.trt))))
+    } else {
+      contrs_contr <- tibble::tibble()
+    }
+
+    # Make contrast info
+    contrs_all <- dplyr::bind_rows(contrs_arm, contrs_contr)
+
+    # Vector of all K(K-1)/2 possible contrast levels
+    nt <- nlevels(contrs_all$.trt)
+    ctr <- which(lower.tri(diag(nt)), arr.ind = TRUE)
+    trt_lev <- levels(contrs_all$.trt)
+    c_lev <- paste(trt_lev[ctr[, "row"]], trt_lev[ctr[, "col"]], sep = " vs. ")
+
+    contrs_all <- dplyr::transmute(contrs_all,
+      .data$.study, .data$.trt,
+      .contr = forcats::fct_drop(factor(.data$.contr, levels = c("..ref..", c_lev))),
+      .data$.contr_sign)
+
+    # Join contrast info on to study data
+    if (.has_ipd)
+      dat_ipd <- dplyr::left_join(dat_ipd, contrs_all, by = c(".study", ".trt"))
+    if (.has_agd_arm) {
+      dat_agd_arm <- dplyr::left_join(dat_agd_arm, contrs_all, by = c(".study", ".trt"))
+    }
+    if (.has_agd_contrast) {
+      dat_agd_contrast <- dplyr::left_join(dat_agd_contrast, contrs_all, by = c(".study", ".trt"))
+      dat_agd_contrast_bl <- dplyr::left_join(dat_agd_contrast_bl, contrs_all, by = c(".study", ".trt"))
+      dat_agd_contrast_nonbl <- dplyr::left_join(dat_agd_contrast_nonbl, contrs_all, by = c(".study", ".trt"))
+    }
+  }
+
+  # Construct design matrix all together then split out, so that same dummy
+  # coding is used everywhere
+  dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast_nonbl)
+
+  # Check that required variables are present in each data set, and non-missing
+  if (.has_ipd) {
+    rlang::with_handlers(
+      X_ipd_frame <- model.frame(nma_formula, dat_ipd, na.action = NULL),
+      error = ~abort(paste0("Failed to construct design matrix for IPD.\n", .)))
+
+    X_ipd_has_na <- names(which(purrr::map_lgl(X_ipd_frame, ~any(is.na(.)))))
+  } else {
+    X_ipd_has_na <- character(0)
+  }
+
+  if (.has_agd_arm) {
+    rlang::with_handlers(
+      X_agd_arm_frame <- model.frame(nma_formula, dat_agd_arm, na.action = NULL),
+      error = ~abort(paste0("Failed to construct design matrix for AgD (arm-based).\n", .)))
+
+    X_agd_arm_has_na <- names(which(purrr::map_lgl(X_agd_arm_frame, ~any(is.na(.)))))
+  } else {
+    X_agd_arm_has_na <- character(0)
+  }
+
+  if (.has_agd_contrast) {
+    rlang::with_handlers(
+      X_agd_contrast_frame <- model.frame(nma_formula, dat_agd_contrast, na.action = NULL),
+      error = ~abort(paste0("Failed to construct design matrix for AgD (contrast-based).\n", .)))
+
+    X_agd_contrast_has_na <- names(which(purrr::map_lgl(X_agd_contrast_frame, ~any(is.na(.)))))
+  } else {
+    X_agd_contrast_has_na <- character(0)
+  }
+
+  dat_has_na <- c(length(X_ipd_has_na) > 0,
+                  length(X_agd_arm_has_na) > 0,
+                  length(X_agd_contrast_has_na) > 0)
+  if (any(dat_has_na)) {
+    abort(glue::glue(glue::glue_collapse(
+      c("Variables with missing values in IPD: {paste(X_ipd_has_na, collapse = ', ')}.",
+        "Variables with missing values in AgD (arm-based): {paste(X_agd_arm_has_na, collapse = ', ')}.",
+        "Variables with missing values in AgD (contrast-based): {paste(X_agd_contrast_has_na, collapse = ', ')}."
+      )[dat_has_na], sep = "\n")))
+  }
+
+  # Center
+  if (!is.null(xbar)) {
+    dat_all[, names(xbar)] <-
+      purrr::map2(dat_all[, names(xbar)], xbar, ~.x - .y)
+
+    if (.has_agd_contrast) {
+      dat_agd_contrast_bl[, names(xbar)] <-
+        purrr::map2(dat_agd_contrast_bl[, names(xbar)], xbar, ~.x - .y)
+    }
+  }
+
+  # Apply NMA formula to get design matrix
+  X_all <- model.matrix(nma_formula, data = dat_all)
+
+  # Remove columns for reference level of .trtclass
+  if (classes) {
+    col_trtclass_ref <- grepl(paste0(".trtclass", levels(dat_all$.trtclass)[1]),
+                              colnames(X_all), fixed = TRUE)
+    X_all <- X_all[, !col_trtclass_ref]
+  }
+
+  if (consistency == "ume") {
+    # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
+    contr_cols <- grepl("^\\.contr", colnames(X_all))
+    X_all[, contr_cols] <- sweep(X_all[, contr_cols], MARGIN = 1,
+                                 STATS = dat_all$.contr_sign, FUN = "*")
+  }
+
+  if (.has_ipd) {
+    X_ipd <- X_all[1:nrow(dat_ipd), ]
+  } else {
+    X_ipd <- NULL
+  }
+
+  if (.has_agd_arm) {
+    X_agd_arm <- X_all[nrow(dat_ipd) + 1:nrow(dat_agd_arm), ]
+  } else {
+    X_agd_arm <- NULL
+  }
+
+  if (.has_agd_contrast) {
+    X_agd_contrast <- X_all[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast_nonbl), ]
+
+    # Difference out the baseline arms
+    X_bl <- model.matrix(nma_formula, data = dat_agd_contrast_bl)
+
+    # The factor levels should be the same between idat_all and
+    # idat_agd_contrast_bl, so the same columns should be present in both design
+    # matrices - but check anyway
+    if (any(colnames(X_agd_contrast) != colnames(X_bl)))
+      abort("Mismatch design matrices for baseline and non-baseline arms. Dropped factor levels?")
+
+    if (consistency == "ume") {
+      # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
+      X_bl[, contr_cols] <- sweep(X_bl[, contr_cols], MARGIN = 1,
+                                  STATS = dat_agd_contrast_bl$.contr_sign, FUN = "*")
+    }
+
+    # Match non-baseline rows with baseline rows by study
+    bl_lookup <- vapply(dat_agd_contrast_nonbl$.study,
+                        FUN = function(x) which(x == dat_agd_contrast_bl$.study),
+                        FUN.VALUE = numeric(1))
+
+    X_agd_contrast <- X_agd_contrast - X_bl[bl_lookup, , drop = FALSE]
+
+    # Remove columns for study baselines corresponding to contrast-based studies - not used
+    s_contr <- unique(dat_agd_contrast$.study)
+    bl_s_reg <- paste0("^\\.study(\\Q", paste0(s_contr, collapse = "\\E|\\Q"), "\\E)$")
+    bl_cols <- grepl(bl_s_reg, colnames(X_agd_contrast), perl = TRUE)
+
+    X_agd_contrast <- X_agd_contrast[, !bl_cols]
+    if (.has_ipd) X_ipd <- X_ipd[, !bl_cols]
+    if (.has_agd_arm) X_agd_arm <- X_agd_arm[, !bl_cols]
+  } else {
+    X_agd_contrast <- NULL
+  }
+
+  return(list(X_ipd = X_ipd,
+              X_agd_arm = X_agd_arm,
+              X_agd_contrast = X_agd_contrast))
 }
 
 #' Set prior details for Stan models
