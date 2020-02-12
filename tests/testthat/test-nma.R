@@ -8,7 +8,7 @@ test_that("nma() wants a nma_data object", {
   expect_error(nma(network = NULL), m)
 })
 
-smknet <- set_agd_arm(smoking, studyn, trtc, r = r, n = n)
+smknet <- set_agd_arm(smoking, studyn, trtc, r = r, n = n, trt_ref = "No intervention")
 
 test_that("nma() consistency argument must be one listed", {
   m <- "`consistency` must be"
@@ -200,4 +200,24 @@ test_that("nma.fit() error if agd_contrast_Sigma is not right dimensions", {
   expect_error(nma.fit(agd_contrast_x = x1, agd_contrast_y = y,
                        agd_contrast_Sigma = Sigma2, likelihood = "normal", link = "identity",
                        n_int = 1), "Dimensions of `agd_contrast_Sigma`.+do not match")
+})
+
+test_that("nma() doesn't fail with a single study", {
+  skip_on_cran()
+
+  single_study_a <- tibble(study = "A", trt = c("a", "b"), r = 500, n = 1000)
+  net_ss_a <- set_agd_arm(single_study_a, study, trt, r = r, n = n)
+  fit_ss_a <- nma(net_ss_a)
+  expect_s3_class(fit_ss_a, "stan_nma")
+  d_ss_a <- relative_effects(fit_ss_a)
+  expect_equal(d_ss_a$summary$mean, 0, tol = 0.01)
+  expect_equal(d_ss_a$summary$sd, sqrt(4/500), tol = 0.01)
+
+  single_study_c <- tibble(study = "A", trt = c("a", "b"), y = c(NA, 0), se = c(NA, sqrt(4/500)))
+  net_ss_c <- set_agd_contrast(single_study_c, study, trt, y = y, se = se)
+  fit_ss_c <- nma(net_ss_c)
+  expect_s3_class(fit_ss_c, "stan_nma")
+  d_ss_c <- relative_effects(fit_ss_c)
+  expect_equal(d_ss_c$summary$mean, 0, tol = 0.01)
+  expect_equal(d_ss_c$summary$sd, sqrt(4/500), tol = 0.01)
 })
