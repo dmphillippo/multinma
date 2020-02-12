@@ -58,6 +58,13 @@ predict.stan_nma <- function(object,
   type <- rlang::arg_match(type)
   level <- rlang::arg_match(level)
 
+  if (level == "individual") {
+    if (is.null(object$regression))
+      abort("Cannot produce individual predictions without a regression model.")
+    if (!has_ipd(object$network))
+      warn("Producing individual predictions from an aggregate-level regression. Interpret with great caution!")
+  }
+
   if (!is.null(baseline)) {
     if (!inherits(baseline, "distr"))
       abort("Baseline response `baseline` should be specified using distr(), or NULL.")
