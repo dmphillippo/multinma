@@ -1136,40 +1136,87 @@ make_nma_model_matrix <- function(nma_formula,
     }
   }
 
+  # Drop study to factor to 1L if only one study (avoid contrasts need 2 or
+  # more levels error)
+  if (dplyr::n_distinct(dat_all$.study) == 1) {
+
+    # Save study label to restore
+    single_study_label <- unique(dat_all$.study)
+    dat_all$.study_temp <- dat_all$.study
+    dat_all$.study <- 1L
+
+    # Fix up model formula with an intercept
+    nma_formula <- update.formula(nma_formula, ~. + 1)
+  } else {
+    single_study_label <- NULL
+  }
+
   # Apply NMA formula to get design matrix
   X_all <- model.matrix(nma_formula, data = dat_all)
+
+  if (!is.null(single_study_label)) {
+    # Restore single study label and .study column
+    colnames(X_all) <- stringr::str_replace(colnames(X_all),
+                                            "^\\.study$",
+                                            paste0(".study", single_study_label))
+    dat_all <- dat_all %>%
+      dplyr::mutate(.study = .data$.study_temp) %>%
+      dplyr::select(-.data$.study_temp)
+
+    # Drop intercept column from design matrix
+    X_all <- X_all[, -1, drop = FALSE]
+  }
 
   # Remove columns for reference level of .trtclass
   if (classes) {
     col_trtclass_ref <- grepl(paste0(".trtclass", levels(dat_all$.trtclass)[1]),
                               colnames(X_all), fixed = TRUE)
-    X_all <- X_all[, !col_trtclass_ref]
+    X_all <- X_all[, !col_trtclass_ref, drop = FALSE]
   }
 
   if (consistency == "ume") {
     # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
     contr_cols <- grepl("^\\.contr", colnames(X_all))
-    X_all[, contr_cols] <- sweep(X_all[, contr_cols], MARGIN = 1,
+    X_all[, contr_cols] <- sweep(X_all[, contr_cols, drop = FALSE], MARGIN = 1,
                                  STATS = dat_all$.contr_sign, FUN = "*")
   }
 
   if (.has_ipd) {
-    X_ipd <- X_all[1:nrow(dat_ipd), ]
+    X_ipd <- X_all[1:nrow(dat_ipd), , drop = FALSE]
   } else {
     X_ipd <- NULL
   }
 
   if (.has_agd_arm) {
-    X_agd_arm <- X_all[nrow(dat_ipd) + 1:nrow(dat_agd_arm), ]
+    X_agd_arm <- X_all[nrow(dat_ipd) + 1:nrow(dat_agd_arm), , drop = FALSE]
   } else {
     X_agd_arm <- NULL
   }
 
   if (.has_agd_contrast) {
-    X_agd_contrast <- X_all[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast_nonbl), ]
+    X_agd_contrast <- X_all[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast_nonbl), , drop = FALSE]
+
+    # Fix up single study case
+    if (!is.null(single_study_label)) {
+      dat_agd_contrast_bl$.study_temp <- dat_agd_contrast_bl$.study
+      dat_agd_contrast_bl$.study <- 1L
+    }
 
     # Difference out the baseline arms
     X_bl <- model.matrix(nma_formula, data = dat_agd_contrast_bl)
+
+    if (!is.null(single_study_label)) {
+      # Restore single study label and .study column
+      colnames(X_bl) <- stringr::str_replace(colnames(X_bl),
+                                             "^\\.study$",
+                                             paste0(".study", single_study_label))
+      dat_agd_contrast_bl <- dat_agd_contrast_bl %>%
+        dplyr::mutate(.study = .data$.study_temp) %>%
+        dplyr::select(-.data$.study_temp)
+
+      # Drop intercept column from design matrix
+      X_bl <- X_bl[, -1, drop = FALSE]
+    }
 
     # The factor levels should be the same between idat_all and
     # idat_agd_contrast_bl, so the same columns should be present in both design
@@ -1179,7 +1226,7 @@ make_nma_model_matrix <- function(nma_formula,
 
     if (consistency == "ume") {
       # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
-      X_bl[, contr_cols] <- sweep(X_bl[, contr_cols], MARGIN = 1,
+      X_bl[, contr_cols] <- sweep(X_bl[, contr_cols, drop = FALSE], MARGIN = 1,
                                   STATS = dat_agd_contrast_bl$.contr_sign, FUN = "*")
     }
 
@@ -1195,9 +1242,9 @@ make_nma_model_matrix <- function(nma_formula,
     bl_s_reg <- paste0("^\\.study(\\Q", paste0(s_contr, collapse = "\\E|\\Q"), "\\E)$")
     bl_cols <- grepl(bl_s_reg, colnames(X_agd_contrast), perl = TRUE)
 
-    X_agd_contrast <- X_agd_contrast[, !bl_cols]
-    if (.has_ipd) X_ipd <- X_ipd[, !bl_cols]
-    if (.has_agd_arm) X_agd_arm <- X_agd_arm[, !bl_cols]
+    X_agd_contrast <- X_agd_contrast[, !bl_cols, drop = FALSE]
+    if (.has_ipd) X_ipd <- X_ipd[, !bl_cols, drop = FALSE]
+    if (.has_agd_arm) X_agd_arm <- X_agd_arm[, !bl_cols, drop = FALSE]
   } else {
     X_agd_contrast <- NULL
   }
