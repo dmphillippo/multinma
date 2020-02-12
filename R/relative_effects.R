@@ -132,12 +132,6 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
     # Get number of treatments
     ntrt <- nlevels(x$network$treatments)
 
-    # Apply centering if used
-    if (!is.null(x$xbar)) {
-      cen_vars <- intersect(names(dat_studies), names(x$xbar))
-      dat_studies[, cen_vars] <- sweep(dat_studies[, cen_vars, drop = FALSE], 2, x$xbar[cen_vars])
-    }
-
     # Expand rows for every treatment
     all_trts <- tidyr::expand_grid(.study = dat_studies$.study, .trt = x$network$treatments[-1])
     if (rlang::has_name(dat_studies, ".trt")) dat_studies <- dplyr::select(dat_studies, -.data$.trt)
@@ -148,55 +142,18 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
       dat_studies$.trtclass <- x$network$classes[as.numeric(dat_studies$.trt)]
     }
 
-    # Sanitise factor levels
-    dat_studies <- dplyr::mutate_at(dat_studies,
-      .vars = if (!is.null(x$network$classes)) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
-      .funs = fct_sanitise
-    )
-
     # Get model formula and design matrix
     nma_formula <- make_nma_formula(x$regression,
                                     consistency = x$consistency,
                                     classes = !is.null(x$network$classes),
                                     class_interactions = x$class_interactions)
 
-
-    # Drop study to factor to 1L if only one study (avoid contrasts need 2 or
-    # more levels error)
-    if (dplyr::n_distinct(dat_studies$.study) == 1) {
-
-      # Save study label to restore
-      single_study_label <- unique(dat_studies$.study)
-      dat_studies$.study_temp <- dat_studies$.study
-      dat_studies$.study <- 1L
-
-      # Fix up model formula with an intercept
-      nma_formula <- update.formula(nma_formula, ~. + 1)
-    } else {
-      single_study_label <- NULL
-    }
-
-    X_all <- model.matrix(nma_formula, data = dat_studies)
-
-    if (!is.null(single_study_label)) {
-      # Restore single study label and .study column
-      colnames(X_all) <- stringr::str_replace(colnames(X_all),
-                                              "^\\.study$",
-                                              paste0(".study", single_study_label))
-      dat_studies <- dat_studies %>%
-        dplyr::mutate(.study = .data$.study_temp) %>%
-        dplyr::select(-.data$.study_temp)
-
-      # Drop intercept column from design matrix
-      X_all <- X_all[, -1, drop = FALSE]
-    }
-
-    # Remove columns for reference level of .trtclass
-    if (!is.null(x$network$classes)) {
-      col_trtclass_ref <- grepl(paste0(".trtclass", levels(x$network$classes)[1]),
-                                colnames(X_all), fixed = TRUE)
-      X_all <- X_all[, !col_trtclass_ref, drop = FALSE]
-    }
+    X_list <- make_nma_model_matrix(nma_formula,
+                                    dat_agd_arm = dat_studies,
+                                    xbar = x$xbar,
+                                    consistency = x$consistency,
+                                    classes = !is.null(x$network$classes))
+    X_all <- X_list$X_agd_arm
 
     # Subset design matrix into EM columns and trt columns
     X_d <- X_all[, grepl("^(\\.trt|\\.contr)[^:]+$", colnames(X_all))]
