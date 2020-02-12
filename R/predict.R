@@ -10,7 +10,7 @@
 #'   absolute effects. For example, in a model with a logit link, this would be
 #'   a distribution for the baseline log odds of an event. If `NULL`,
 #'   predictions are produced using the baseline response for each study in the
-#'   network with IPD or contrast-based AgD.
+#'   network with IPD or arm-based AgD.
 #' @param newdata Only required if a regression model is fitted and `baseline`
 #'   is specified. A data frame of covariate details, for which to produce
 #'   predictions. Column names must match variables in the regression model.
@@ -24,7 +24,7 @@
 #'   covariate values, one row per individual.
 #'
 #'   If `NULL`, prections are produced for all studies with IPD and/or
-#'   contrast-based AgD in the network, depending on the value of `type`.
+#'   arm-based AgD in the network, depending on the value of `type`.
 #' @param study Column of `newdata` which specifies study names or IDs. When not
 #'   specified: if `newdata` contains integration points produced by
 #'   [add_integration()], studies will be labelled sequentially by row;
@@ -34,7 +34,7 @@
 #' @param level The level at which predictions are produced, either
 #'   `"aggregate"` (the default), or `"individual"`. If `baseline` is not
 #'   specified, predictions are produced for all IPD studies in the network if
-#'   `type` is `"individual"` or `"aggregate"`, and for all contrast-based AgD
+#'   `type` is `"individual"` or `"aggregate"`, and for all arm-based AgD
 #'   studies in the network if `type` is `"aggregate"`.
 #' @param probs Numeric vector of quantiles of interest to present in computed
 #'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`
