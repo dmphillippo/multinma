@@ -58,13 +58,6 @@ predict.stan_nma <- function(object,
   type <- rlang::arg_match(type)
   level <- rlang::arg_match(level)
 
-  if (level == "individual") {
-    if (is.null(object$regression))
-      abort("Cannot produce individual predictions without a regression model.")
-    if (!has_ipd(object$network))
-      warn("Producing individual predictions from an aggregate-level regression. Interpret with great caution!")
-  }
-
   if (!is.null(baseline)) {
     if (!inherits(baseline, "distr"))
       abort("Baseline response `baseline` should be specified using distr(), or NULL.")
@@ -94,4 +87,49 @@ predict.stan_nma <- function(object,
   if (object$consistency != "consistency")
     abort(glue::glue("Cannot produce predictions under inconsistency '{x$consistency}' model."))
 
+
+  # Without regression model
+  if (is.null(object$regression)) {
+
+    if (level == "individual")
+      abort("Cannot produce individual predictions without a regression model.")
+
+    # Without baseline specified
+    if (is.null(baseline)) {
+
+      # Get study baselines for arm-based data
+      if (!has_ipd(object$network) && !has_agd_arm) {
+        abort("No arm-based data (IPD or AgD) in network. Specify `baseline` to produce predictions of absolute effects.")
+      } else {
+
+      }
+    # With baseline specified
+    } else {
+
+    }
+
+  # With regression model
+  } else {
+
+    # Without baseline (and newdata) specified
+    if (is.null(baseline)) {
+      if (level == "individual" && !has_ipd(object$network))
+        abort(paste("No IPD in network to produce individual predictions for.",
+                    "  - Specify IPD in `newdata` for which to produce predictions, or",
+                    '  - Produce aggregate predictions with level = "aggregate"',
+                    sep = "\n"))
+    } else {
+
+      if (level == "individual" && !has_ipd(object$network))
+        warn("Producing individual predictions from an aggregate-level regression. Interpret with great caution!")
+
+    }
+
+  }
+
+  # Transform predictions if type = "response"
+
+  # Aggregate predictions if level = "aggregate"
+
+  # Produce nma_summary
 }
