@@ -199,6 +199,12 @@ nma <- function(network,
 
   # Get sample sizes for centering
   if (!is.null(regression) && center) {
+    # Check that required variables are present in each data set, and non-missing
+    check_regression_data(regression,
+                          dat_ipd = dat_ipd,
+                          dat_agd_arm = dat_agd_arm,
+                          dat_agd_contrast = dat_agd_contrast)
+
     if ((has_agd_arm(network) || has_agd_contrast(network)) && !has_agd_sample_size(network))
       abort(paste("AgD study sample sizes not specified in network, cannot calculate centering values.",
                   "Specify `sample_size` in set_agd_*(), or set center = FALSE.", sep = "\n"))
@@ -1114,46 +1120,10 @@ make_nma_model_matrix <- function(nma_formula,
   dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast_nonbl)
 
   # Check that required variables are present in each data set, and non-missing
-  if (.has_ipd) {
-    rlang::with_handlers(
-      X_ipd_frame <- model.frame(nma_formula, dat_ipd, na.action = NULL),
-      error = ~abort(paste0("Failed to construct design matrix for IPD.\n", .)))
-
-    X_ipd_has_na <- names(which(purrr::map_lgl(X_ipd_frame, ~any(is.na(.)))))
-  } else {
-    X_ipd_has_na <- character(0)
-  }
-
-  if (.has_agd_arm) {
-    rlang::with_handlers(
-      X_agd_arm_frame <- model.frame(nma_formula, dat_agd_arm, na.action = NULL),
-      error = ~abort(paste0("Failed to construct design matrix for AgD (arm-based).\n", .)))
-
-    X_agd_arm_has_na <- names(which(purrr::map_lgl(X_agd_arm_frame, ~any(is.na(.)))))
-  } else {
-    X_agd_arm_has_na <- character(0)
-  }
-
-  if (.has_agd_contrast) {
-    rlang::with_handlers(
-      X_agd_contrast_frame <- model.frame(nma_formula, dat_agd_contrast, na.action = NULL),
-      error = ~abort(paste0("Failed to construct design matrix for AgD (contrast-based).\n", .)))
-
-    X_agd_contrast_has_na <- names(which(purrr::map_lgl(X_agd_contrast_frame, ~any(is.na(.)))))
-  } else {
-    X_agd_contrast_has_na <- character(0)
-  }
-
-  dat_has_na <- c(length(X_ipd_has_na) > 0,
-                  length(X_agd_arm_has_na) > 0,
-                  length(X_agd_contrast_has_na) > 0)
-  if (any(dat_has_na)) {
-    abort(glue::glue(glue::glue_collapse(
-      c("Variables with missing values in IPD: {paste(X_ipd_has_na, collapse = ', ')}.",
-        "Variables with missing values in AgD (arm-based): {paste(X_agd_arm_has_na, collapse = ', ')}.",
-        "Variables with missing values in AgD (contrast-based): {paste(X_agd_contrast_has_na, collapse = ', ')}."
-      )[dat_has_na], sep = "\n")))
-  }
+  check_regression_data(nma_formula,
+                        dat_ipd = dat_ipd,
+                        dat_agd_arm = dat_agd_arm,
+                        dat_agd_contrast = dat_agd_contrast)
 
   # Center
   if (!is.null(xbar)) {
@@ -1235,6 +1205,69 @@ make_nma_model_matrix <- function(nma_formula,
   return(list(X_ipd = X_ipd,
               X_agd_arm = X_agd_arm,
               X_agd_contrast = X_agd_contrast))
+}
+
+#' Check data for regression
+#'
+#' Validates data for regression model. Checks that model matrix can be
+#' constructed, and that there are no missing values.
+#'
+#' @param formula Model formula
+#' @param dat_ipd,dat_agd_arm,dat_agd_contrast Data frames
+#'
+#' @noRd
+check_regression_data <- function(formula,
+                                  dat_ipd = tibble::tibble(),
+                                  dat_agd_arm = tibble::tibble(),
+                                  dat_agd_contrast = tibble::tibble()) {
+
+  .has_ipd <- if (nrow(dat_ipd)) TRUE else FALSE
+  .has_agd_arm <- if (nrow(dat_agd_arm)) TRUE else FALSE
+  .has_agd_contrast <- if (nrow(dat_agd_contrast)) TRUE else FALSE
+
+  # Check that required variables are present in each data set, and non-missing
+  if (.has_ipd) {
+    rlang::with_handlers(
+      X_ipd_frame <- model.frame(formula, dat_ipd, na.action = NULL),
+      error = ~abort(paste0("Failed to construct design matrix for IPD.\n", .)))
+
+    X_ipd_has_na <- names(which(purrr::map_lgl(X_ipd_frame, ~any(is.na(.)))))
+  } else {
+    X_ipd_has_na <- character(0)
+  }
+
+  if (.has_agd_arm) {
+    rlang::with_handlers(
+      X_agd_arm_frame <- model.frame(formula, dat_agd_arm, na.action = NULL),
+      error = ~abort(paste0("Failed to construct design matrix for AgD (arm-based).\n", .)))
+
+    X_agd_arm_has_na <- names(which(purrr::map_lgl(X_agd_arm_frame, ~any(is.na(.)))))
+  } else {
+    X_agd_arm_has_na <- character(0)
+  }
+
+  if (.has_agd_contrast) {
+    rlang::with_handlers(
+      X_agd_contrast_frame <- model.frame(formula, dat_agd_contrast, na.action = NULL),
+      error = ~abort(paste0("Failed to construct design matrix for AgD (contrast-based).\n", .)))
+
+    X_agd_contrast_has_na <- names(which(purrr::map_lgl(X_agd_contrast_frame, ~any(is.na(.)))))
+  } else {
+    X_agd_contrast_has_na <- character(0)
+  }
+
+  dat_has_na <- c(length(X_ipd_has_na) > 0,
+                  length(X_agd_arm_has_na) > 0,
+                  length(X_agd_contrast_has_na) > 0)
+  if (any(dat_has_na)) {
+    abort(glue::glue(glue::glue_collapse(
+      c("Variables with missing values in IPD: {paste(X_ipd_has_na, collapse = ', ')}.",
+        "Variables with missing values in AgD (arm-based): {paste(X_agd_arm_has_na, collapse = ', ')}.",
+        "Variables with missing values in AgD (contrast-based): {paste(X_agd_contrast_has_na, collapse = ', ')}."
+      )[dat_has_na], sep = "\n")))
+  }
+
+  invisible()
 }
 
 #' Set prior details for Stan models
