@@ -908,6 +908,25 @@ check_link <- function(x, lik) {
   return(tolower(x))
 }
 
+#' Inverse link functions
+#'
+#' @param x Linear predictor values
+#' @param link Character string specifying link function
+#' @param ... Other parameters passed to link function
+#'
+#' @noRd
+inverse_link <- function(x, link = c("identity", "log", "logit", "probit"), ...) {
+  link <- rlang::arg_match(link)
+
+  out <-
+    if (link == "identity") x
+    else if (link == "log") exp(x)
+    else if (link == "logit") plogis(x, ...)
+    else if (link == "probit") pnorm(x, ...)
+
+  return(out)
+}
+
 #' Get outcome variables from internal nma_data
 #'
 #' @param x A data frame
