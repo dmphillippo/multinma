@@ -135,6 +135,42 @@ predict.stan_nma <- function(object,
     # With baseline specified
     } else {
 
+      # Make design matrix of SINGLE study, and all treatments
+      preddat <- tidyr::expand_grid(.study = factor("..dummy.."), .trt = object$network$treatments)
+
+      # Add in .trtclass if defined in network
+      if (!is.null(object$network$classes)) {
+        preddat$.trtclass <- object$network$classes[as.numeric(preddat$.trt)]
+      }
+
+      # Design matrix, just treating all data as AgD arm
+      X_list <- make_nma_model_matrix(nma_formula,
+                                      dat_agd_arm = preddat,
+                                      xbar = object$xbar,
+                                      consistency = object$consistency,
+                                      classes = !is.null(object$network$classes))
+      X_all <- X_list$X_agd_arm
+      rownames(X_all) <- paste0("pred[", preddat$.trt, "]")
+
+      # Get posterior samples
+      d <- as.array(object, pars = "d")
+
+      # Generate baseline samples
+      dim_d <- dim(d)
+      dim_mu <- c(dim_d[1:2], 1)
+      u <- runif(prod(dim_mu))
+      mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
+                  dim = dim_mu)
+
+      # Combine mu and d
+      dim_post <- c(dim_d[1:2], dim_d[3] + 1)
+      post <- array(NA_real_, dim = dim_post)
+      post[ , , 1] <- mu
+      post[ , , 2:dim_post[3]] <- d
+
+      # Get prediction array
+      pred_array <- tcrossprod_mcmc_array(post, X_all)
+
     }
 
     # Transform predictions if type = "response"
@@ -144,8 +180,9 @@ predict.stan_nma <- function(object,
 
     # Produce nma_summary
     if (summary) {
-      pred_summary <- summary_mcmc_array(pred_array, probs) %>%
-        tibble::add_column(.study = preddat$.study, .before = 1)
+      pred_summary <- summary_mcmc_array(pred_array, probs)
+      if (is.null(baseline))
+        pred_summary <- tibble::add_column(pred_summary, .study = preddat$.study, .before = 1)
       out <- list(summary = pred_summary, sims = pred_array)
     } else {
       out <- list(sims = pred_array)
