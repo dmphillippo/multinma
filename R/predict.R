@@ -87,6 +87,11 @@ predict.stan_nma <- function(object,
   if (object$consistency != "consistency")
     abort(glue::glue("Cannot produce predictions under inconsistency '{x$consistency}' model."))
 
+  # Get NMA formula
+  nma_formula <- make_nma_formula(object$regression,
+                                  consistency = object$consistency,
+                                  classes = !is.null(object$network$classes),
+                                  class_interactions = object$class_interactions)
 
   # Without regression model
   if (is.null(object$regression)) {
@@ -97,15 +102,53 @@ predict.stan_nma <- function(object,
     # Without baseline specified
     if (is.null(baseline)) {
 
-      # Get study baselines for arm-based data
-      if (!has_ipd(object$network) && !has_agd_arm) {
+      if (!has_ipd(object$network) && !has_agd_arm(object$network)) {
         abort("No arm-based data (IPD or AgD) in network. Specify `baseline` to produce predictions of absolute effects.")
       } else {
+
+        # Make design matrix of all studies with baselines, and all treatments
+        studies <- forcats::fct_unique(dplyr::bind_rows(object$network$ipd, object$network$agd_arm)$.study)
+        preddat <- tidyr::expand_grid(.study = studies, .trt = object$network$treatments)
+
+
+        # Add in .trtclass if defined in network
+        if (!is.null(object$network$classes)) {
+          preddat$.trtclass <- object$network$classes[as.numeric(preddat$.trt)]
+        }
+
+        # Design matrix, just treating all data as AgD arm
+        X_list <- make_nma_model_matrix(nma_formula,
+                                        dat_agd_arm = preddat,
+                                        xbar = object$xbar,
+                                        consistency = object$consistency,
+                                        classes = !is.null(object$network$classes))
+        X_all <- X_list$X_agd_arm
+        rownames(X_all) <- paste0("pred[", preddat$.study, ": ", preddat$.trt, "]")
+
+        # Get posterior samples
+        post <- as.array(object, pars = c("mu", "d"))
+
+        # Get prediction array
+        pred_array <- tcrossprod_mcmc_array(post, X_all)
 
       }
     # With baseline specified
     } else {
 
+    }
+
+    # Transform predictions if type = "response"
+    if (type == "response") {
+      pred_array <- inverse_link(pred_array, link = object$link)
+    }
+
+    # Produce nma_summary
+    if (summary) {
+      pred_summary <- summary_mcmc_array(pred_array, probs) %>%
+        tibble::add_column(.study = preddat$.study, .before = 1)
+      out <- list(summary = pred_summary, sims = pred_array)
+    } else {
+      out <- list(sims = pred_array)
     }
 
   # With regression model
@@ -131,5 +174,6 @@ predict.stan_nma <- function(object,
 
   # Aggregate predictions if level = "aggregate"
 
-  # Produce nma_summary
+  if (summary) class(out) <- "nma_summary"
+  return(out)
 }
