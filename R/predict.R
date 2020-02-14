@@ -136,7 +136,7 @@ predict.stan_nma <- function(object,
     } else {
 
       # Make design matrix of SINGLE study, and all treatments
-      preddat <- tidyr::expand_grid(.study = factor("..dummy.."), .trt = object$network$treatments)
+      preddat <- tibble::tibble(.study = factor("..dummy.."), .trt = object$network$treatments)
 
       # Add in .trtclass if defined in network
       if (!is.null(object$network$classes)) {
