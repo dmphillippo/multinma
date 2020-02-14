@@ -964,8 +964,8 @@ make_nma_formula <- function(regression,
 
   if (!is.null(regression) && !rlang::is_formula(regression)) abort("`regression` is not a formula")
   consistency <- rlang::arg_match(consistency)
-  class_interactions <- rlang::arg_match(class_interactions)
   if (!rlang::is_bool(classes)) abort("`classes` should be TRUE or FALSE")
+  if (classes) class_interactions <- rlang::arg_match(class_interactions)
 
   if (!is.null(regression)) {
 
