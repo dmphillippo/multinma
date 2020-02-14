@@ -191,25 +191,168 @@ predict.stan_nma <- function(object,
   # With regression model
   } else {
 
-    # Without baseline (and newdata) specified
-    if (is.null(baseline)) {
-      if (level == "individual" && !has_ipd(object$network))
-        abort(paste("No IPD in network to produce individual predictions for.",
-                    "  - Specify IPD in `newdata` for which to produce predictions, or",
-                    '  - Produce aggregate predictions with level = "aggregate"',
-                    sep = "\n"))
+    # Without baseline and newdata specified
+    if (is.null(baseline) && is.null(newdata)) {
+
+      # Get data for prediction
+      if (level == "individual") {
+        if (!has_ipd(object$network))
+          abort(paste("No IPD in network to produce individual predictions for.",
+                      "  - Specify IPD in `newdata` for which to produce predictions, or",
+                      '  - Produce aggregate predictions with level = "aggregate"',
+                      sep = "\n"))
+
+        preddat <- object$network$ipd
+
+      } else {
+        if ((has_agd_arm(object$network) || has_agd_contrast(object$network)) && !has_agd_sample_size(object$network))
+          abort(
+            paste("AgD study sample sizes not specified in network, cannot calculate aggregate predictions.",
+                  "  - Specify `sample_size` in set_agd_*(), or",
+                  "  - Specify covariate values for relative effects using the `newdata` argument",
+                  sep = "\n"))
+
+        if (has_agd_arm(object$network)) {
+          if (inherits(object$network, "mlnmr_data")) {
+            dat_agd_arm <- .unnest_integration(object$network$agd_arm) %>%
+              dplyr::mutate(.sample_size = .data$.sample_size / object$network$n_int)
+          } else {
+            dat_agd_arm <- object$network$agd_arm
+          }
+        } else {
+          dat_agd_arm <- tibble::tibble()
+        }
+
+        if (has_ipd(object$network)) {
+          dat_ipd <- object$network$ipd
+          dat_ipd$.sample_size <- 1
+        } else {
+          dat_ipd <- tibble::tibble()
+        }
+
+        preddat <- dplyr::bind_rows(dat_ipd, dat_agd_arm)
+      }
+
+      preddat <- preddat %>%
+        dplyr::mutate(.trt_old = .data$.trt) %>%
+        dplyr::left_join(tidyr::expand_grid(.data$.study, .data$.trt), by = ".study")
+
+      # Add in .trtclass if defined in network
+      if (!is.null(object$network$classes)) {
+        preddat$.trtclass <- object$network$classes[as.numeric(preddat$.trt)]
+      }
+
+      # Design matrix, just treating all data as IPD
+      X_list <- make_nma_model_matrix(nma_formula,
+                                      dat_ipd = preddat,
+                                      xbar = object$xbar,
+                                      consistency = object$consistency,
+                                      classes = !is.null(object$network$classes))
+      X_all <- X_list$X_ipd
+      rownames(X_all) <- paste0("pred[", preddat$.study, ": ", preddat$.trt, "]")
+
+      # Get posterior samples
+      post <- as.array(object, pars = c("mu", "d"))
+
+      # Get prediction array
+      pred_array <- tcrossprod_mcmc_array(post, X_all)
+
+    # With baseline and newdata specified
     } else {
 
-      if (level == "individual" && !has_ipd(object$network))
-        warn("Producing individual predictions from an aggregate-level regression. Interpret with great caution!")
+      if (level == "individual") {
+        if (!has_ipd(object$network))
+          warn("Producing individual predictions from an aggregate-level regression. Interpret with great caution!")
+
+        preddat <- newdata
+      } else {
+        if (inherits(object, "stan_mlnmr") && !inherits(newdata, "integration_df"))
+          abort("No integration points found in `newdata`. Specify integration points using add_integration().")
+
+        preddat <- .unnest_integration(newdata)
+      }
+
+      preddat$.sample_size <- 1
+
+      # Make design matrix of all studies and all treatments
+      if (rlang::has_name(preddat, ".trt")) preddat <- dplyr::select(preddat, -.data$.trt)
+      preddat <- dplyr::left_join(preddat, tidyr::expand_grid(.data$.study, .data$.trt), by = ".study")
+
+      # Add in .trtclass if defined in network
+      if (!is.null(object$network$classes)) {
+        preddat$.trtclass <- object$network$classes[as.numeric(preddat$.trt)]
+      }
+
+      # Design matrix, just treating all data as IPD
+      X_list <- make_nma_model_matrix(nma_formula,
+                                      dat_ipd = preddat,
+                                      xbar = object$xbar,
+                                      consistency = object$consistency,
+                                      classes = !is.null(object$network$classes))
+      X_all <- X_list$X_ipd
+      rownames(X_all) <- paste0("pred[", preddat$.study, ": ", preddat$.trt, "]")
+
+      # Get posterior samples
+      d <- as.array(object, pars = "d")
+
+      # Generate baseline samples
+      dim_d <- dim(d)
+      dim_mu <- c(dim_d[1:2], 1)
+      u <- runif(prod(dim_mu))
+      mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
+                  dim = dim_mu)
+
+      # Combine mu and d
+      dim_post <- c(dim_d[1:2], dim_d[3] + 1)
+      post <- array(NA_real_, dim = dim_post)
+      post[ , , 1] <- mu
+      post[ , , 2:dim_post[3]] <- d
+
+      # Get prediction array
+      pred_array <- tcrossprod_mcmc_array(post, X_all)
 
     }
 
+    # Transform predictions if type = "response"
+    if (type == "response") {
+      pred_array <- inverse_link(pred_array, link = object$link)
+    }
+
+    # Aggregate predictions if level = "aggregate"
+    if (level == "aggregate") {
+      studies <- preddat$.study
+      n_studies <- nlevels(studies)
+      n_trt <- nlevels(object$network$treatments)
+
+      weight_dat <- preddat %>%
+        dplyr::group_by(.data$.study, .data$.trt) %>%
+        dplyr::mutate(.weights = .data$.sample_size / sum(.data$.sample_size)) %>%
+        dplyr::summarise(.group_n = dplyr::n(), .weights = list(.data$.weights))
+
+      X_weighted_mean <- matrix(0, ncol = dim(pred_array)[3], nrow = n_studies * n_trt)
+
+      .col <- 0
+      for (i in 1:nrow(weight_dat)) {
+        X_weighted_mean[i, .col + 1:weight_dat[[i, ".group_n"]]] <- weight_dat[[i, ".weights"]]
+        .col <- .col + weight_dat[[i, ".group_n"]]
+      }
+
+      rownames(X_weighted_mean) <- paste0("pred[", weight_dat$.study, ": ", weight_dat$.trt, "]")
+
+      preddat <- tcrossprod_mcmc_array(preddat, X_weighted_mean)
+    }
+
+    # Produce nma_summary
+    if (summary) {
+      pred_summary <- summary_mcmc_array(pred_array, probs)
+      if (is.null(baseline))
+        pred_summary <- tibble::add_column(pred_summary, .study = preddat$.study, .before = 1)
+      out <- list(summary = pred_summary, sims = pred_array)
+    } else {
+      out <- list(sims = pred_array)
+    }
+
   }
-
-  # Transform predictions if type = "response"
-
-  # Aggregate predictions if level = "aggregate"
 
   if (summary) class(out) <- "nma_summary"
   return(out)
