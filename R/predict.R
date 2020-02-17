@@ -345,7 +345,7 @@ predict.stan_nma <- function(object,
 
       rownames(X_weighted_mean) <- paste0("pred[", weight_dat$.study, ": ", weight_dat$.trt, "]")
 
-      preddat <- tcrossprod_mcmc_array(preddat, X_weighted_mean)
+      pred_array <- tcrossprod_mcmc_array(pred_array, X_weighted_mean)
     }
 
     # Produce nma_summary
