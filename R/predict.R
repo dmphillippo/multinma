@@ -254,7 +254,7 @@ predict.stan_nma <- function(object,
       rownames(X_all) <- paste0("pred[", preddat$.study, ": ", preddat$.trt, "]")
 
       # Get posterior samples
-      post <- as.array(object, pars = c("mu", "d"))
+      post <- as.array(object, pars = c("mu", "d", "beta"))
 
       # Get prediction array
       pred_array <- tcrossprod_mcmc_array(post, X_all)
