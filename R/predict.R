@@ -63,7 +63,7 @@ predict.stan_nma <- function(object,
       abort("Baseline response `baseline` should be specified using distr(), or NULL.")
   }
 
-  if ((is.null(newdata) || is.null(baseline)) && !is.null(object$regression))
+  if (xor(is.null(newdata), is.null(baseline)) && !is.null(object$regression))
     abort("Specify both `newdata` and `baseline`, or neither.")
 
   if (!is.null(newdata)) {
