@@ -310,19 +310,22 @@ predict.stan_nma <- function(object,
 
       # Get posterior samples
       d <- as.array(object, pars = "d")
+      beta <- as.array(object, pars = "beta")
 
       # Generate baseline samples
       dim_d <- dim(d)
+      dim_beta <- dim(beta)
       dim_mu <- c(dim_d[1:2], 1)
       u <- runif(prod(dim_mu))
       mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
                   dim = dim_mu)
 
-      # Combine mu and d
-      dim_post <- c(dim_d[1:2], dim_d[3] + 1)
+      # Combine mu, d, and beta
+      dim_post <- c(dim_d[1:2], 1 + dim_d[3] + dim_beta[3])
       post <- array(NA_real_, dim = dim_post)
       post[ , , 1] <- mu
-      post[ , , 2:dim_post[3]] <- d
+      post[ , , 1 + 1:dim_d[3]] <- d
+      post[ , , 1 + dim_d[3] + 1:dim_beta[3]] <- beta
 
       # Get prediction array
       pred_array <- tcrossprod_mcmc_array(post, X_all)
