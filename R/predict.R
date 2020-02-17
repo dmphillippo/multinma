@@ -234,8 +234,10 @@ predict.stan_nma <- function(object,
       }
 
       preddat <- preddat %>%
-        dplyr::mutate(.trt_old = .data$.trt) %>%
-        dplyr::left_join(tidyr::expand_grid(.data$.study, .data$.trt), by = ".study")
+        dplyr::rename(.trt_old = .data$.trt) %>%
+        dplyr::left_join(tidyr::expand(., .study = .data$.study,
+                                          .trt = .data$.trt_old),
+                         by = ".study")
 
       # Add in .trtclass if defined in network
       if (!is.null(object$network$classes)) {
@@ -276,7 +278,11 @@ predict.stan_nma <- function(object,
 
       # Make design matrix of all studies and all treatments
       if (rlang::has_name(preddat, ".trt")) preddat <- dplyr::select(preddat, -.data$.trt)
-      preddat <- dplyr::left_join(preddat, tidyr::expand_grid(.data$.study, .data$.trt), by = ".study")
+      preddat <- dplyr::left_join(preddat,
+                                  tidyr::expand(preddat,
+                                                .study = .data$.study,
+                                                .trt = object$network$treatments),
+                                  by = ".study")
 
       # Add in .trtclass if defined in network
       if (!is.null(object$network$classes)) {
