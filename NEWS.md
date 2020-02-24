@@ -2,6 +2,12 @@
 
 * Feature: Network plots, using a `plot()` method for `nma_data` objects.
 * Feature: `as.igraph()`, `as_tbl_graph()` methods for `nma_data` objects.
+* Feature: Produce relative effect estimates with `relative_effects()`,
+posterior ranks with `posterior_ranks()`, and posterior rank probabilities with
+`posterior_rank_probs()`. These will be study-specific when a regression model
+is given.
+* Feature: Produce predictions of absolute effects with a `predict()` method for
+`stan_nma` objects.
 * Feature: Optional `sample_size` argument for `set_agd_*()` that:
   - Enables centering of predictors (`center = TRUE`) in `nma()` when
     a regression model is given, replacing the `agd_sample_size` argument of `nma()`
