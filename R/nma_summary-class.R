@@ -148,6 +148,13 @@ plot.nma_summary <- function(x, ...,
   # Is a horizontal geom specified?
   horizontal <- stringr::str_ends(geom, "h")
 
+  # Get axis labels from attributes, if available
+  p_xlab <- attr(x, "xlab", TRUE)
+  if (is.null(p_xlab)) p_xlab <- ""
+
+  p_ylab <- attr(x, "ylab", TRUE)
+  if (is.null(p_ylab)) p_ylab <- ""
+
   # Get draws
   draws <- tibble::as_tibble(as.matrix(x))
 
@@ -174,7 +181,8 @@ plot.nma_summary <- function(x, ...,
 
     p <- ggplot2::ggplot(draws, ggplot2::aes(y = .data$Treatment, x = .data$value)) +
       ggplot2::geom_vline(xintercept = ref_line, na.rm = TRUE, colour = "grey60") +
-      ggplot2::scale_y_discrete("", limits = rev(levels(draws$Treatment)))
+      ggplot2::scale_y_discrete(p_xlab, limits = rev(levels(draws$Treatment))) +
+      ggplot2::xlab(p_ylab)
 
     if (has_studies) p <- p + ggplot2::facet_grid(Study~.)
 
@@ -182,7 +190,7 @@ plot.nma_summary <- function(x, ...,
 
     p <- ggplot2::ggplot(draws, ggplot2::aes(x = .data$Treatment, y = .data$value)) +
       ggplot2::geom_hline(yintercept = ref_line, na.rm = TRUE, colour = "grey60") +
-      ggplot2::xlab("")
+      ggplot2::xlab(p_xlab) + ggplot2::ylab(p_ylab)
 
     if (has_studies) p <- p + ggplot2::facet_grid(.~Study)
 
