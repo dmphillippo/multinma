@@ -1,6 +1,20 @@
-
-theme_multinma <- function() {
-  ggplot2::theme_light() +
+#' Plot theme for multinma plots
+#'
+#' A simple `ggplot2` theme for plots in the `multinma` package.
+#'
+#' @param ... Arguments passed to [ggplot2::theme_light()]
+#'
+#' @return A `ggplot2` theme
+#' @export
+#'
+#' @seealso [ggplot2::theme()], [ggplot2::theme_set()]
+#'
+#' @examples
+#' library(ggplot2)
+#' theme_set(theme_multinma())
+#'
+theme_multinma <- function(...) {
+  ggplot2::theme_light(...) +
     ggplot2::theme(
       panel.border = ggplot2::element_rect(colour = "grey70", fill = NA),
       panel.grid.major = ggplot2::element_line(colour = "grey95"),
