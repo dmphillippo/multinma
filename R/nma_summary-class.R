@@ -205,6 +205,75 @@ plot.nma_summary <- function(x, ...,
 
 #' @rdname nma_summary-methods
 #' @export
+plot.nma_parameter_summary <- function(x, ...,
+                                       geom = "pointintervalh",
+                                       ref_line = NA_real_) {
+  # Checks
+  if (!rlang::is_string(geom))
+    abort("`geom` should be a character string specifying the name of a tidybayes geom.")
+
+  tb_geom <- tryCatch(getExportedValue("tidybayes", paste0("stat_", geom)),
+                      error = function(err) {
+                        abort(paste("`geom` should be a character string specifying the name of a tidybayes geom:",
+                                    err, sep = "\n"))
+                      })
+
+
+  if (!is.numeric(ref_line) || !is.null(dim(ref_line)))
+    abort("`ref_line` should be a numeric vector.")
+
+  # Is a horizontal geom specified?
+  horizontal <- stringr::str_ends(geom, "h")
+
+  # Get axis labels from attributes, if available
+  p_xlab <- attr(x, "xlab", TRUE)
+  if (is.null(p_xlab)) p_xlab <- ""
+
+  p_ylab <- attr(x, "ylab", TRUE)
+  if (is.null(p_ylab)) p_ylab <- ""
+
+  # Get draws
+  draws <- tibble::as_tibble(as.matrix(x))
+
+  if (packageVersion("tidyr") >= "1.0.0") {
+    draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
+                                 names_to = "parameter", values_to = "value")
+  } else {
+    draws <- tidyr::gather(key = "parameter",
+                           value = "value",
+                           dplyr::everything())
+  }
+
+  draws$par_base <- forcats::fct_inorder(factor(
+    stringr::str_remove(draws$parameter, "\\[.*\\]")))
+  draws$parameter <- forcats::fct_inorder(factor(draws$parameter))
+
+  if (horizontal) {
+
+    p <- ggplot2::ggplot(draws, ggplot2::aes(y = .data$parameter, x = .data$value)) +
+      ggplot2::geom_vline(xintercept = ref_line, na.rm = TRUE, colour = "grey60") +
+      ggplot2::scale_y_discrete(p_xlab, limits = rev(levels(draws$parameter))) +
+      ggplot2::xlab(p_ylab) +
+      ggplot2::facet_grid(par_base~., scales = "free", space = "free")
+
+  } else {
+
+    p <- ggplot2::ggplot(draws, ggplot2::aes(x = .data$parameter, y = .data$value)) +
+      ggplot2::geom_hline(yintercept = ref_line, na.rm = TRUE, colour = "grey60") +
+      ggplot2::xlab(p_xlab) + ggplot2::ylab(p_ylab) +
+      ggplot2::facet_grid(.~par_base, scales = "free", space = "free")
+
+  }
+
+  p <- p +
+    do.call(tb_geom, args = list(...)) +
+    theme_multinma()
+
+  return(p)
+}
+
+#' @rdname nma_summary-methods
+#' @export
 as.data.frame.nma_summary <- function(x, ...) {
   return(as.data.frame(x$summary, ...))
 }

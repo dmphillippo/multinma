@@ -73,20 +73,41 @@ print.stan_nma <- function(x, ...) {
 #' @param pars,include See [rstan::extract()]
 #' @param probs Numeric vector of specifying quantiles of interest, default
 #'   `c(0.025, 0.25, 0.5, 0.75, 0.975)`
+#' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #'
 #' @return A [nma_summary] object
 #' @export
 #'
 #' @examples
 summary.stan_nma <- function(x, pars, include = TRUE,
-                             probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
+                             probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
+                             summary = TRUE) {
   sims <- as.array(x, pars = pars, include = include)
   sums <- summary_mcmc_array(sims, probs = probs)
   ss <- list(summary = sums, sims = sims)
-  class(ss) <- "nma_summary"
+  class(ss) <- c("nma_parameter_summary", "nma_summary")
   attr(ss, "xlab") <- "Parameter"
   attr(ss, "ylab") <- "Value"
   return(ss)
+}
+
+#' @param ... Additional arguments passed on to other methods
+#' @param geom Character string specifying the `tidybayes` plot geom to use,
+#'   default `"pointintervalh"`
+#' @param ref_line Numeric vector of positions for reference lines, by default
+#'   no reference lines are drawn
+#' @rdname summary.stan_nma
+#' @export
+plot.stan_nma <- function(x, pars, include = TRUE,
+                          ...,
+                          geom = "pointintervalh",
+                          ref_line = NA_real_) {
+
+  # All checks carried out by downstream functions
+
+  s <- summary(x, pars = pars, include = include)
+  p <- plot(s, ..., geom = geom, ref_line = ref_line)
+  return(p)
 }
 
 #' as.stanfit
