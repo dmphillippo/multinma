@@ -114,6 +114,78 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include) {
   invisible(x)
 }
 
+#' @param geom Character string specifying the `tidybayes` plot geom to use,
+#'   default `"pointintervalh"`
+#' @param ref_line Numeric vector of positions for reference lines, by default
+#'   no reference lines are drawn
+#' @rdname nma_summary-methods
+#' @export
+plot.nma_summary <- function(x, ...,
+                             geom = "pointintervalh",
+                             ref_line = NA_real_) {
+  # Checks
+  if (!rlang::is_string(geom))
+    abort("`geom` should be a character string specifying the name of a tidybayes geom.")
+
+  tb_geom <- tryCatch(getExportedValue("tidybayes", paste0("stat_", geom)),
+    error = function(err) {
+      abort(paste("`geom` should be a character string specifying the name of a tidybayes geom:",
+                  err, sep = "\n"))
+      })
+
+
+  if (!is.numeric(ref_line) || !is.null(dim(ref_line)))
+    abort("`ref_line` should be a numeric vector.")
+
+  # Is a horizontal geom specified?
+  horizontal <- stringr::str_ends(geom, "h")
+
+  # Get draws
+  draws <- tibble::as_tibble(as.matrix(x))
+
+  if (packageVersion("tidyr") >= "1.0.0") {
+    draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
+                                 names_to = "parameter", values_to = "value")
+  } else {
+    draws <- tidyr::gather(key = "parameter",
+                           value = "value",
+                           dplyr::everything())
+  }
+
+  if (has_studies <- rlang::has_name(x$summary, ".study")) {
+    draws$Study <- forcats::fct_inorder(factor(
+      stringr::str_extract(draws$parameter, "(?<=\\[).+(?=\\:)")))
+    draws$Treatment <- forcats::fct_inorder(factor(
+      stringr::str_extract(draws$parameter, "(?<=\\: ).+(?=\\])")))
+  } else {
+    draws$Treatment <- forcats::fct_inorder(factor(
+      stringr::str_extract(draws$parameter, "(?<=\\[).+(?=\\])")))
+  }
+
+  if (horizontal) {
+
+    p <- ggplot2::ggplot(draws, ggplot2::aes(y = .data$Treatment, x = .data$value)) +
+      ggplot2::geom_vline(xintercept = ref_line, na.rm = TRUE, colour = "grey60") +
+      ggplot2::scale_y_discrete("", limits = rev(levels(draws$Treatment)))
+
+    if (has_studies) p <- p + ggplot2::facet_grid(Study~.)
+
+  } else {
+
+    p <- ggplot2::ggplot(draws, ggplot2::aes(x = .data$Treatment, y = .data$value)) +
+      ggplot2::geom_hline(yintercept = ref_line, na.rm = TRUE, colour = "grey60") +
+      ggplot2::xlab("")
+
+    if (has_studies) p <- p + ggplot2::facet_grid(.~Study)
+
+  }
+
+  p <- p +
+    do.call(tb_geom, args = list(...))
+
+  return(p)
+}
+
 #' @rdname nma_summary-methods
 #' @export
 as.data.frame.nma_summary <- function(x, ...) {
