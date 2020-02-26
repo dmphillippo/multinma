@@ -927,6 +927,84 @@ inverse_link <- function(x, link = c("identity", "log", "logit", "probit"), ...)
   return(out)
 }
 
+#' Get scale of outcome / linear predictor for reporting and plotting
+#'
+#' @param likelihood String, giving likelihood
+#' @param link String, giving link function
+#' @param measure String, specifying whether relative or absolute scale required
+#' @param type String, specifying whether link scale or response scale required
+#'
+#' @return String giving the scale name, e.g. "log Odds Ratio"
+#' @noRd
+get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
+                                          "binomial", "binomial2", "poisson"),
+                           link = c("identity", "log", "logit", "probit"),
+                           measure = c("relative", "absolute"),
+                           type = c("link", "response")) {
+
+  likelihood <- rlang::arg_match(likelihood)
+  link <- rlang::arg_match(link)
+  measure <- rlang::arg_match(measure)
+  type <- rlang::arg_match(type)
+
+  check_link(link, likelihood)
+
+  if (likelihood == "normal") {
+
+    if (link == "identity") {
+      if (measure == "relative") {
+        out <- "Relative Effect"
+      } else if (measure == "absolute") {
+        out <- "Absolute Effect"
+      }
+    } else if (link == "log") {
+      if (measure == "relative") {
+        if (type == "link") out <- "Relative Effect (on log scale)"
+        else out <- "Relative Effect (on response scale)"
+      } else if (measure == "absolute") {
+        if (type == "link") out <- "Absolute Effect (on log scale)"
+        else out <- "Absolute Effect (on response scale)"
+      }
+    }
+
+  } else if (likelihood %in% c("bernoulli", "bernoulli2", "binomial", "binomial2")) {
+
+    if (link == "logit") {
+      if (measure == "relative") {
+        if (type == "link") out <- "log Odds Ratio"
+        else out <- ""
+      } else if (measure == "absolute") {
+        if (type == "link") out <- "log Odds"
+        else out <- "Probability"
+      }
+    } else if (link == "probit") {
+      if (measure == "relative") {
+        if (type == "link") out <- "Probit Difference"
+        else out <- ""
+      } else if (measure == "absolute") {
+        if (type == "link") out <- "Probit Probability"
+        else out <- "Probability"
+      }
+    }
+
+  } else if (likelihood == "poisson") {
+
+    if (link == "log") {
+      if (measure == "relative") {
+        if (type == "link") out <- "log Rate Ratio"
+        else out <- ""
+      } else if (measure == "absolute") {
+        if (type == "link") out <- "log Rate"
+        else out <- "Rate"
+      }
+    }
+
+  } else {
+    out <- ""
+  }
+  return(out)
+}
+
 #' Get outcome variables from internal nma_data
 #'
 #' @param x A data frame
