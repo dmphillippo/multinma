@@ -278,7 +278,14 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
   }
 
   # Return nma_summary object
-  if (summary) class(out) <- "nma_summary"
+  if (summary) {
+    class(out) <- "nma_summary"
+    attr(out, "xlab") <- if (all_contrasts) "Contrast" else "Treatment"
+    attr(out, "ylab") <- get_scale_name(likelihood = x$likelihood,
+                                        link = x$link,
+                                        measure = "relative",
+                                        type = "link")
+  }
   return(out)
 }
 

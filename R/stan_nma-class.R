@@ -84,6 +84,8 @@ summary.stan_nma <- function(x, pars, include = TRUE,
   sums <- summary_mcmc_array(sims, probs = probs)
   ss <- list(summary = sums, sims = sims)
   class(ss) <- "nma_summary"
+  attr(ss, "xlab") <- "Parameter"
+  attr(ss, "ylab") <- "Value"
   return(ss)
 }
 

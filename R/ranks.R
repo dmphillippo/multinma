@@ -140,7 +140,11 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
     }
   }
 
-  if (summary) class(out) <- "nma_summary"
+  if (summary) {
+    class(out) <- "nma_summary"
+    attr(out, "xlab") <- "Treatment"
+    attr(out, "ylab") <- "Posterior Rank"
+  }
   return(out)
 }
 
@@ -197,5 +201,7 @@ posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better =
   }
 
   class(out) <- c("nma_rank_probs", "nma_summary")
+  attr(out, "xlab") <- "Treatment"
+  attr(out, "ylab") <- "Rank Probability"
   return(out)
 }

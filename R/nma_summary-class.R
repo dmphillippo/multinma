@@ -21,6 +21,14 @@
 #'   contains a `.study` column. Should have a matching `.study` column.}
 #'   }
 #'
+#' The following attributes may also be set:
+#'   \describe{
+#'   \item{xlab}{Label for x axis in plots, usually either `"Treatment"` or
+#'   `"Contrast"`.}
+#'   \item{ylab}{Label for y axis in plots, usually used for the scale e.g.
+#'   `"log Odds Ratio"`.}
+#'   }
+#'
 #' The subclass `nma_rank_probs` is used by the function
 #' [posterior_rank_probs()], and contains posterior rank probabilities. This
 #' subclass does not have a `sims` component, as the rank probabilities are

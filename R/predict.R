@@ -374,6 +374,13 @@ predict.stan_nma <- function(object,
 
   }
 
-  if (summary) class(out) <- "nma_summary"
+  if (summary) {
+    class(out) <- "nma_summary"
+    attr(out, "xlab") <- "Treatment"
+    attr(out, "ylab") <- get_scale_name(likelihood = object$likelihood,
+                                        link = object$link,
+                                        measure = "absolute",
+                                        type = type)
+  }
   return(out)
 }
