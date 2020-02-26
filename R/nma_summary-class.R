@@ -179,10 +179,11 @@ plot.nma_summary <- function(x, ...,
 
   if (horizontal) {
 
+    draws$Treatment <- forcats::fct_rev(draws$Treatment)
+
     p <- ggplot2::ggplot(draws, ggplot2::aes(y = .data$Treatment, x = .data$value)) +
       ggplot2::geom_vline(xintercept = ref_line, na.rm = TRUE, colour = "grey60") +
-      ggplot2::scale_y_discrete(p_xlab, limits = rev(levels(draws$Treatment))) +
-      ggplot2::xlab(p_ylab)
+      ggplot2::ylab(p_xlab) + ggplot2::xlab(p_ylab)
 
     if (has_studies) p <- p + ggplot2::facet_grid(Study~.)
 
@@ -250,10 +251,11 @@ plot.nma_parameter_summary <- function(x, ...,
 
   if (horizontal) {
 
+    draws$parameter <- forcats::fct_rev(draws$parameter)
+
     p <- ggplot2::ggplot(draws, ggplot2::aes(y = .data$parameter, x = .data$value)) +
       ggplot2::geom_vline(xintercept = ref_line, na.rm = TRUE, colour = "grey60") +
-      ggplot2::scale_y_discrete(p_xlab, limits = rev(levels(draws$parameter))) +
-      ggplot2::xlab(p_ylab) +
+      ggplot2::ylab(p_xlab) + ggplot2::xlab(p_ylab) +
       ggplot2::facet_grid(par_base~., scales = "free", space = "free")
 
   } else {
