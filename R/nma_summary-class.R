@@ -181,7 +181,8 @@ plot.nma_summary <- function(x, ...,
   }
 
   p <- p +
-    do.call(tb_geom, args = list(...))
+    do.call(tb_geom, args = list(...)) +
+    theme_multinma()
 
   return(p)
 }
