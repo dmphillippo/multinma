@@ -94,7 +94,7 @@ summary.stan_nma <- function(x, ...,
   if (missing(pars)) {
     pars <- c("log_lik", "resdev", "fitted",
               "theta_bar_cum", "theta2_bar_cum",
-              "mu", "delta", "lp__")
+              "lp__")
   } else {
     if (!is.character(pars)) abort("`pars` should be a character vector")
   }
@@ -119,21 +119,7 @@ plot.stan_nma <- function(x, ...,
                           stat = "pointintervalh",
                           ref_line = NA_real_) {
 
-  # Set defaults for pars, include
-  if (missing(include)) {
-    include <- !missing(pars)
-  } else {
-    if (!rlang::is_bool(include)) abort("`include` should be TRUE or FALSE")
-  }
-  if (missing(pars)) {
-    pars <- c("log_lik", "resdev", "fitted",
-              "theta_bar_cum", "theta2_bar_cum",
-              "lp__")
-  } else {
-    if (!is.character(pars)) abort("`pars` should be a character vector")
-  }
-
-  # All other checks carried out by downstream functions
+  # All checks carried out by downstream functions
 
   s <- summary(x, pars = pars, include = include)
   p <- plot(s, ..., stat = stat, ref_line = ref_line)
