@@ -312,6 +312,57 @@ plot.nma_parameter_summary <- function(x, ...,
   return(p)
 }
 
+#' @rdname plot.nma_summary
+#' @export
+plot.nma_rank_probs <- function(x, ...) {
+  # Get axis labels from attributes, if available
+  p_xlab <- attr(x, "xlab", TRUE)
+  if (is.null(p_xlab)) p_xlab <- ""
+
+  p_ylab <- attr(x, "ylab", TRUE)
+  if (is.null(p_ylab)) p_ylab <- ""
+
+  dat <- as.data.frame(x)
+
+  if (has_studies <- rlang::has_name(dat, ".study")) {
+    dat$Study <- forcats::fct_inorder(factor(dat$.study))
+    dat$Treatment <- forcats::fct_inorder(factor(
+      stringr::str_extract(dat$parameter, "(?<=\\: ).+(?=\\])")))
+  } else {
+    dat$Treatment <- forcats::fct_inorder(factor(
+      stringr::str_extract(dat$parameter, "(?<=\\[).+(?=\\])")))
+  }
+
+  if (packageVersion("tidyr") >= "1.0.0") {
+    dat <- tidyr::pivot_longer(dat, cols = dplyr::starts_with("p_rank"),
+                                 names_to = "rank", values_to = "probability",
+                                 names_pattern = "^p_rank\\[([0-9]+)\\]$",
+                                 names_ptypes = list(rank = integer()))
+  } else {
+    dat <-
+      tidyr::gather(dat, key = "rank",
+                    value = "probability",
+                    dplyr::starts_with("p_rank")) %>%
+      tidyr::extract(.data$rank, "rank", "^p_rank\\[([0-9]+)\\]$", convert = TRUE)
+  }
+
+
+  p <- ggplot2::ggplot(dat,
+                       ggplot2::aes(x = .data$rank, y = .data$probability)) +
+    ggplot2::geom_line(...) +
+    ggplot2::xlab(p_xlab) + ggplot2::ylab(p_ylab) +
+    ggplot2::coord_cartesian(ylim = c(0, 1)) +
+    theme_multinma()
+
+  if (has_studies) {
+    p <- p + ggplot2::facet_grid(Study~Treatment)
+  } else {
+    p <- p + ggplot2::facet_wrap(~Treatment)
+  }
+
+  return(p)
+}
+
 #' @rdname nma_summary-methods
 #' @export
 as.data.frame.nma_summary <- function(x, ...) {

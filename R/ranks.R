@@ -203,7 +203,7 @@ posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better =
   }
 
   class(out) <- c("nma_rank_probs", "nma_summary")
-  attr(out, "xlab") <- "Treatment"
-  attr(out, "ylab") <- "Rank Probability"
+  attr(out, "xlab") <- "Rank"
+  attr(out, "ylab") <- if (cumulative) "Cumulative Rank Probability" else "Rank Probability"
   return(out)
 }
