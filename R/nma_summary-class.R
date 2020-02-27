@@ -62,7 +62,7 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include) {
   if (missing(include)) {
     include <- !missing(pars)
   } else {
-    if (!is.logical(include) || length(include) > 1) abort("`include` should be TRUE or FALSE")
+    if (!rlang::is_bool(include)) abort("`include` should be TRUE or FALSE")
   }
   if (missing(pars)) {
     pars <- c("log_lik", "resdev", "fitted",
