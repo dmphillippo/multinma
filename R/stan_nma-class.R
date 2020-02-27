@@ -77,7 +77,7 @@ print.stan_nma <- function(x, ...) {
 #'
 #' @param x A `stan_nma` object
 #' @param ... Additional arguments passed on to other methods
-#' @param pars,include See [rstan::extract()]
+#' @param pars,include See `\link[rstan:stanfit-method-extract]{rstan::extract()}`
 #' @param probs Numeric vector of specifying quantiles of interest, default
 #'   `c(0.025, 0.25, 0.5, 0.75, 0.975)`
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
