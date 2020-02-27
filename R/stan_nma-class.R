@@ -70,6 +70,7 @@ print.stan_nma <- function(x, ...) {
 #' Posterior summaries from `stan_nma` objects
 #'
 #' @param x A `stan_nma` object
+#' @param ... Additional arguments passed on to other methods
 #' @param pars,include See [rstan::extract()]
 #' @param probs Numeric vector of specifying quantiles of interest, default
 #'   `c(0.025, 0.25, 0.5, 0.75, 0.975)`
@@ -79,9 +80,28 @@ print.stan_nma <- function(x, ...) {
 #' @export
 #'
 #' @examples
-summary.stan_nma <- function(x, pars, include = TRUE,
-                             probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
-                             summary = TRUE) {
+summary.stan_nma <- function(x, ...,
+                             pars, include,
+                             probs = c(0.025, 0.25, 0.5, 0.75, 0.975)
+                             ) {
+
+  # Set defaults for pars, include
+  if (missing(include)) {
+    include <- !missing(pars)
+  } else {
+    if (!rlang::is_bool(include)) abort("`include` should be TRUE or FALSE")
+  }
+  if (missing(pars)) {
+    pars <- c("log_lik", "resdev", "fitted",
+              "theta_bar_cum", "theta2_bar_cum",
+              "mu", "delta", "lp__")
+  } else {
+    if (!is.character(pars)) abort("`pars` should be a character vector")
+  }
+
+  if (!rlang::is_bool(summary))
+    abort("`summary` should be TRUE or FALSE.")
+
   sims <- as.array(x, pars = pars, include = include)
   sums <- summary_mcmc_array(sims, probs = probs)
   ss <- list(summary = sums, sims = sims)
@@ -91,19 +111,32 @@ summary.stan_nma <- function(x, pars, include = TRUE,
   return(ss)
 }
 
-#' @param ... Additional arguments passed on to other methods
 #' @param stat Character string specifying the `tidybayes` plot stat to use,
 #'   default `"pointintervalh"`
 #' @param ref_line Numeric vector of positions for reference lines, by default
 #'   no reference lines are drawn
 #' @rdname summary.stan_nma
 #' @export
-plot.stan_nma <- function(x, pars, include = TRUE,
-                          ...,
+plot.stan_nma <- function(x, ...,
+                          pars, include,
                           stat = "pointintervalh",
                           ref_line = NA_real_) {
 
-  # All checks carried out by downstream functions
+  # Set defaults for pars, include
+  if (missing(include)) {
+    include <- !missing(pars)
+  } else {
+    if (!rlang::is_bool(include)) abort("`include` should be TRUE or FALSE")
+  }
+  if (missing(pars)) {
+    pars <- c("log_lik", "resdev", "fitted",
+              "theta_bar_cum", "theta2_bar_cum",
+              "lp__")
+  } else {
+    if (!is.character(pars)) abort("`pars` should be a character vector")
+  }
+
+  # All other checks carried out by downstream functions
 
   s <- summary(x, pars = pars, include = include)
   p <- plot(s, ..., stat = stat, ref_line = ref_line)
