@@ -57,30 +57,25 @@ NULL
 #' @return
 #' @export
 #'
-print.nma_summary <- function(x, ..., digits = 2, pars, include) {
-  # Set defaults for pars, include
-  if (missing(include)) {
-    include <- !missing(pars)
-  } else {
-    if (!rlang::is_bool(include)) abort("`include` should be TRUE or FALSE")
-  }
-  if (missing(pars)) {
-    pars <- c("log_lik", "resdev", "fitted",
-              "theta_bar_cum", "theta2_bar_cum",
-              "mu", "delta", "lp__")
-  } else {
-    if (!is.character(pars)) abort("`pars` should be a character vector")
-  }
+print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
+  # Checks
+  if (!rlang::is_bool(include)) abort("`include` should be TRUE or FALSE")
+
+  if (!missing(pars) && !is.character(pars)) abort("`pars` should be a character vector")
 
   if (!is.numeric(digits) ||
       length(digits) > 1 ||
       trunc(digits) != digits) abort("`digits` must be a single integer")
 
-  x_sum <- tibble::as_tibble(x) %>%
-    dplyr::filter(
-      if (include) grepl(paste0("^", pars, "(\\[.+\\])?$", collapse = "|"), .data$parameter)
-      else !grepl(paste0("^", pars, "(\\[.+\\])?$", collapse = "|"), .data$parameter)
-      )
+  x_sum <- tibble::as_tibble(x)
+
+  if (!missing(pars)) {
+    x_sum <-
+      dplyr::filter(x_sum,
+        if (include) grepl(paste0("^", pars, "(\\[.+\\])?$", collapse = "|"), .data$parameter)
+        else !grepl(paste0("^", pars, "(\\[.+\\])?$", collapse = "|"), .data$parameter)
+        )
+  }
 
   # Get numeric columns for formatting, handling effective sample sizes and Rhat separately
   num_col <- setdiff(names(x_sum)[purrr::map_lgl(x_sum, is.numeric)],
