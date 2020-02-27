@@ -69,6 +69,12 @@ print.stan_nma <- function(x, ...) {
 
 #' Posterior summaries from `stan_nma` objects
 #'
+#' Posterior summaries of model parameters in `stan_nma` objects may be produced
+#' using the `summary()` method and plotted with the `plot()` method. NOTE: To
+#' produce relative effects, absolute predictions, or posterior ranks, see
+#' [relative_effects()], [predict.stan_nma()], [posterior_ranks()],
+#' [posterior_rank_probs()].
+#'
 #' @param x A `stan_nma` object
 #' @param ... Additional arguments passed on to other methods
 #' @param pars,include See [rstan::extract()]
@@ -76,8 +82,14 @@ print.stan_nma <- function(x, ...) {
 #'   `c(0.025, 0.25, 0.5, 0.75, 0.975)`
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #'
+#' @details The `plot()` method is a shortcut for `plot(summary(stan_nma))`. For
+#'   details of plotting options, see [plot.nma_summary()].
+#'
 #' @return A [nma_summary] object
 #' @export
+#'
+#' @seealso [plot.nma_summary()], [relative_effects()], [predict.stan_nma()],
+#'   [posterior_ranks()], [posterior_rank_probs()]
 #'
 #' @examples
 summary.stan_nma <- function(x, ...,

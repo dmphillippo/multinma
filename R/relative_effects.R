@@ -24,6 +24,8 @@
 #'   frame of study information.
 #' @export
 #'
+#' @seealso [plot.nma_summary()] for plotting the relative effects.
+#'
 #' @examples
 relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FALSE,
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),

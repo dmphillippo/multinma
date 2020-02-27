@@ -45,6 +45,8 @@
 #'   frame of study information.
 #' @export
 #'
+#' @seealso [plot.nma_summary()] for plotting the predictions.
+#'
 #' @examples
 predict.stan_nma <- function(object,
                              baseline = NULL, newdata = NULL, study = NULL,

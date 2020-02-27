@@ -23,6 +23,8 @@
 #'   frame of study information.
 #' @export
 #'
+#' @seealso [plot.nma_summary()] for plotting the ranks and rank probabilities.
+#'
 #' @details The function `posterior_ranks()` produces posterior rankings, which
 #'   have a distribution (e.g. mean/median rank and 95\% Credible Interval). The
 #'   function `posterior_rank_probs()` produces rank probabilities, which give
