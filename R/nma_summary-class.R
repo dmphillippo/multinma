@@ -54,6 +54,8 @@ NULL
 #'
 #' @rdname nma_summary-methods
 #'
+#' @seealso [plot.nma_summary()]
+#'
 #' @return
 #' @export
 #'
@@ -117,12 +119,49 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
   invisible(x)
 }
 
+#' Plots of summary results
+#'
+#' The `plot` method for `nma_summary` objects is used to produce plots of
+#' parameter estimates (when called on a `stan_nma` object or its summary),
+#' relative effects (when called on the output of [relative_effects()]),
+#' absolute predictions (when called on the output of [predict.stan_nma()]),
+#' posterior ranks and rank probabilities (when called on the output of
+#' [posterior_ranks()] or [posterior_rank_probs()]).
+#'
+#' @param x A `nma_summary` object
+#' @param ... Additional arguments passed on to the underlying `tidybayes` plot
+#'   stat, see Details
 #' @param stat Character string specifying the `tidybayes` plot stat to use,
 #'   default `"pointintervalh"`
 #' @param ref_line Numeric vector of positions for reference lines, by default
 #'   no reference lines are drawn
-#' @rdname nma_summary-methods
+#'
+#' @details Plotting is handled by [ggplot2] and the stats and geoms provided in
+#'   the [tidybayes] package. As a result, the output is very flexible. Any
+#'   plotting stats provided by `tidybayes` may be used, via the argument
+#'   `stat`. The default uses [tidybayes::stat_pointintervalh()], to produce
+#'   medians and 95\% Credible Intervals with 66\% inner bands.
+#'
+#'   Additional arguments in `...` are passed to the `tidybayes` stat, to
+#'   customise the output. For example, to produce means and Credible Intervals,
+#'   specify `point_interval = mean_qi`. To produce an 80\% Credible Interval
+#'   with no inner band, specify `.width = c(0, 0.8)`.
+#'
+#'   Alternative stats can be specified to produce different summaries. For
+#'   example, specify `stat = "[half]eye[h]"` to produce (half) eye plots
+#'   (horizontally), or `stat = "histinterval[h]"` to produce histograms with
+#'   intervals (horizontally).
+#'
+#'   A full list of options and examples is found in the `tidybayes` vignette
+#'   `vignette("slabinterval", package = "tidybayes")`.
+#'
+#'   A `ggplot` object is returned which can be further modified through the
+#'   usual [ggplot2] functions to add further aesthetics, geoms, themes, etc.
+#'
+#' @return A `ggplot` object.
+#'
 #' @export
+#' @examples
 plot.nma_summary <- function(x, ...,
                              stat = "pointintervalh",
                              ref_line = NA_real_) {
@@ -201,7 +240,7 @@ plot.nma_summary <- function(x, ...,
   return(p)
 }
 
-#' @rdname nma_summary-methods
+#' @rdname plot.nma_summary
 #' @export
 plot.nma_parameter_summary <- function(x, ...,
                                        stat = "pointintervalh",
