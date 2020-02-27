@@ -92,7 +92,7 @@ summary.stan_nma <- function(x, pars, include = TRUE,
 }
 
 #' @param ... Additional arguments passed on to other methods
-#' @param geom Character string specifying the `tidybayes` plot geom to use,
+#' @param stat Character string specifying the `tidybayes` plot stat to use,
 #'   default `"pointintervalh"`
 #' @param ref_line Numeric vector of positions for reference lines, by default
 #'   no reference lines are drawn
@@ -100,13 +100,13 @@ summary.stan_nma <- function(x, pars, include = TRUE,
 #' @export
 plot.stan_nma <- function(x, pars, include = TRUE,
                           ...,
-                          geom = "pointintervalh",
+                          stat = "pointintervalh",
                           ref_line = NA_real_) {
 
   # All checks carried out by downstream functions
 
   s <- summary(x, pars = pars, include = include)
-  p <- plot(s, ..., geom = geom, ref_line = ref_line)
+  p <- plot(s, ..., stat = stat, ref_line = ref_line)
   return(p)
 }
 

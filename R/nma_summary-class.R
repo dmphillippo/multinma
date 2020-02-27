@@ -122,22 +122,24 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include) {
   invisible(x)
 }
 
-#' @param geom Character string specifying the `tidybayes` plot geom to use,
+#' @param stat Character string specifying the `tidybayes` plot stat to use,
 #'   default `"pointintervalh"`
 #' @param ref_line Numeric vector of positions for reference lines, by default
 #'   no reference lines are drawn
 #' @rdname nma_summary-methods
 #' @export
 plot.nma_summary <- function(x, ...,
-                             geom = "pointintervalh",
+                             stat = "pointintervalh",
                              ref_line = NA_real_) {
   # Checks
-  if (!rlang::is_string(geom))
-    abort("`geom` should be a character string specifying the name of a tidybayes geom.")
+  if (!rlang::is_string(stat))
+    abort("`stat` should be a character string specifying the name of a tidybayes stat")
 
-  tb_geom <- tryCatch(getExportedValue("tidybayes", paste0("stat_", geom)),
+  stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
+
+  tb_geom <- tryCatch(getExportedValue("tidybayes", paste0("stat_", stat)),
     error = function(err) {
-      abort(paste("`geom` should be a character string specifying the name of a tidybayes geom:",
+      abort(paste("`stat` should be a character string specifying the name of a tidybayes stat:",
                   err, sep = "\n"))
       })
 
@@ -146,7 +148,7 @@ plot.nma_summary <- function(x, ...,
     abort("`ref_line` should be a numeric vector.")
 
   # Is a horizontal geom specified?
-  horizontal <- stringr::str_ends(geom, "h")
+  horizontal <- stringr::str_ends(stat, "h")
 
   # Get axis labels from attributes, if available
   p_xlab <- attr(x, "xlab", TRUE)
@@ -207,15 +209,17 @@ plot.nma_summary <- function(x, ...,
 #' @rdname nma_summary-methods
 #' @export
 plot.nma_parameter_summary <- function(x, ...,
-                                       geom = "pointintervalh",
+                                       stat = "pointintervalh",
                                        ref_line = NA_real_) {
   # Checks
-  if (!rlang::is_string(geom))
-    abort("`geom` should be a character string specifying the name of a tidybayes geom.")
+  if (!rlang::is_string(stat))
+    abort("`stat` should be a character string specifying the name of a tidybayes stat.")
 
-  tb_geom <- tryCatch(getExportedValue("tidybayes", paste0("stat_", geom)),
+  stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
+
+  tb_geom <- tryCatch(getExportedValue("tidybayes", paste0("stat_", stat)),
                       error = function(err) {
-                        abort(paste("`geom` should be a character string specifying the name of a tidybayes geom:",
+                        abort(paste("`stat` should be a character string specifying the name of a tidybayes stat:",
                                     err, sep = "\n"))
                       })
 
@@ -224,7 +228,7 @@ plot.nma_parameter_summary <- function(x, ...,
     abort("`ref_line` should be a numeric vector.")
 
   # Is a horizontal geom specified?
-  horizontal <- stringr::str_ends(geom, "h")
+  horizontal <- stringr::str_ends(stat, "h")
 
   # Get axis labels from attributes, if available
   p_xlab <- attr(x, "xlab", TRUE)
