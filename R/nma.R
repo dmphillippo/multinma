@@ -1475,5 +1475,5 @@ make_Sigma_block <- function(x) {
 #'
 #' @noRd
 fct_sanitise <- function(f) {
-  forcats::fct_relabel(f, ~gsub(":", "_", ., fixed = TRUE))
+  forcats::fct_relabel(f, ~stringr::str_replace_all(., "[:\\[\\]]", "_"))
 }
