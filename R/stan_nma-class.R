@@ -99,9 +99,6 @@ summary.stan_nma <- function(x, ...,
     if (!is.character(pars)) abort("`pars` should be a character vector")
   }
 
-  if (!rlang::is_bool(summary))
-    abort("`summary` should be TRUE or FALSE.")
-
   sims <- as.array(x, pars = pars, include = include)
   sums <- summary_mcmc_array(sims, probs = probs)
   ss <- list(summary = sums, sims = sims)
