@@ -13,15 +13,26 @@ dic <- function(x, ...) {
   if (!inherits(x, "stan_nma")) abort("Not a `stan_nma` object.")
 
   net <- x$network
-  sf <- as.stanfit(x)
 
-  resdev <- colMeans(as.matrix(sf, pars = "resdev"))
-  fitted <- colMeans(as.matrix(sf, pars = "fitted"))
+  resdev <- colMeans(as.matrix(x, pars = "resdev"))
+  fitted <- colMeans(as.matrix(x, pars = "fitted"))
+
+  resdev_array <- as.array(x, pars = "resdev")
+  dn_resdev_array <- dimnames(resdev_array)
 
   if (has_ipd(net)) {
     n_ipd <- nrow(net$ipd)
     resdev_ipd <- resdev[1:n_ipd]
     fitted_ipd <- fitted[1:n_ipd]
+
+    dn_resdev_array[[3]][1:n_ipd] <- net$ipd %>%
+      dplyr::group_by(.data$.study, .data$.trt) %>%
+      dplyr::mutate(.label = paste0("resdev[",
+                                    .data$.study, ": ",
+                                    .data$.trt, ", ",
+                                    1:dplyr::n(), "]")) %>%
+      dplyr::pull(.data$.label)
+
   } else {
     n_ipd <- 0
   }
@@ -30,6 +41,10 @@ dic <- function(x, ...) {
     n_agd_arm <- nrow(net$agd_arm)
     resdev_agd_arm <- resdev[n_ipd + (1:n_agd_arm)]
     fitted_agd_arm <- fitted[n_ipd + (1:n_agd_arm)]
+
+    dn_resdev_array[[3]][n_ipd + (1:n_agd_arm)] <-
+      paste0("resdev[", net$agd_arm$.study, ": ", net$agd_arm$.trt, "]")
+
   } else {
     n_agd_arm <- 0
   }
@@ -39,11 +54,28 @@ dic <- function(x, ...) {
     nr_agd_contrast <- length(unique(net$agd_contrast$.study))
     # Number of fitted values is equal to the number of contrasts
     nf_agd_contrast <- nrow(dplyr::filter(net$agd_contrast, !is.na(.data$.y)))
+
     resdev_agd_contrast <- resdev[n_ipd + n_agd_arm + (1:nr_agd_contrast)]
     fitted_agd_contrast <- fitted[n_ipd + n_agd_arm + (1:nf_agd_contrast)]
+
+    agd_contrast_bl <- dplyr::filter(net$agd_contrast, is.na(.data$.y)) %>%
+      dplyr::transmute(.study = .data$.study, .trt_b = .data$.trt)
+
+    dn_resdev_array[[3]][n_ipd + n_agd_arm + (1:nf_agd_contrast)] <- net$agd_contrast %>%
+      dplyr::filter(!is.na(.data$.y)) %>%
+      dplyr::left_join(agd_contrast_bl, by = c(".study", ".trt")) %>%
+      dplyr::mutate(.label = paste0("resdev[",
+                                    .data$.study, ": ",
+                                    .data$.trt, " vs. ",
+                                    .data$.trt_b, "]")) %>%
+      dplyr::pull(.data$.label)
+
   } else {
     nr_agd_contrast <- nf_agd_contrast <- 0
   }
+
+  # Apply formatted dimnames to resdev_array
+  dimnames(resdev_array) <- dn_resdev_array
 
 
   if (x$likelihood %in% c("bernoulli", "bernoulli2", "binomial", "binomial2")) {
@@ -186,7 +218,7 @@ dic <- function(x, ...) {
   dic <- totresdev + pd
 
   # Return nma_dic object
-  out <- list(dic = dic, pd = pd, resdev = totresdev, pointwise = pw)
+  out <- list(dic = dic, pd = pd, resdev = totresdev, pointwise = pw, resdev_array = resdev_array)
   class(out) <- "nma_dic"
   return(out)
 }

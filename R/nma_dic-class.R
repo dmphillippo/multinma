@@ -14,6 +14,8 @@
 #'   \item{`resdev`}{The total residual deviance}
 #'   \item{`pointwise`}{A list of data frames containing the pointwise
 #'   contributions for the IPD and AgD.}
+#'   \item{`resdev_array`}{A 3D MCMC array \[Iterations, Chains, Parameters\] of
+#'   posterior residual deviance samples.}
 #'   }
 #'
 NULL
