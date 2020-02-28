@@ -75,9 +75,15 @@ dic <- function(x, ...) {
   } else if (x$likelihood == "normal") {
     if (has_ipd(net)) {
       ipd_y <- net$ipd$.y
+      ipd_arm <-  dplyr::group_indices(net$ipd, .data$.study, .data$.trt)
+
       # Use posterior median for sigma
-      ipd_sigma <- median(as.matrix(sf, pars = "sigma"))
-      resdevfit_ipd <- (ipd_y - fitted_ipd)^2 / ipd_sigma^2
+      ipd_sigma <- apply(as.matrix(x, pars = "sigma"), 2, median)
+
+      resdevfit_ipd <- resdev_ipd
+      for (i in seq_along(ipd_y)) {
+        resdevfit_ipd[i] <- (ipd_y[i] - fitted_ipd[i])^2 / ipd_sigma[ipd_arm[i]]^2
+      }
       leverage_ipd <- resdev_ipd - resdevfit_ipd
     } else {
       leverage_ipd <- NULL
