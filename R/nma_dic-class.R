@@ -84,27 +84,27 @@ plot.nma_dic <- function(x, y, ...,
   resdev_post <- as.matrix.nma_summary(x$resdev_array) %>%
     tibble::as_tibble()
 
-    if (packageVersion("tidyr") >= "1.0.0") {
-      resdev_post <- tidyr::pivot_longer(resdev_post, cols = dplyr::everything(),
-                                   names_to = "parameter", values_to = "resdev")
-    } else {
-      resdev_post <- tidyr::gather(key = "parameter",
-                             value = "resdev",
-                             dplyr::everything())
-    }
+  if (packageVersion("tidyr") >= "1.0.0") {
+    resdev_post <- tidyr::pivot_longer(resdev_post, cols = dplyr::everything(),
+                                       names_to = "parameter", values_to = "resdev")
+  } else {
+    resdev_post <- tidyr::gather(key = "parameter",
+                                 value = "resdev",
+                                 dplyr::everything())
+  }
 
-    resdev_post$.label <- forcats::fct_inorder(factor(
-      stringr::str_extract(resdev_post$parameter, "(?<=\\[).+(?=\\]$)")))
+  resdev_post$.label <- forcats::fct_inorder(factor(
+    stringr::str_extract(resdev_post$parameter, "(?<=\\[).+(?=\\]$)")))
 
-    Type <- c(rep("IPD", NROW(x$pointwise$ipd)),
-              rep("AgD (arm-based)", NROW(x$pointwise$agd_arm)),
-              rep("AgD (contrast-based)", NROW(x$pointwise$agd_contrast)))
+  Type <- c(rep("IPD", NROW(x$pointwise$ipd)),
+            rep("AgD (arm-based)", NROW(x$pointwise$agd_arm)),
+            rep("AgD (contrast-based)", NROW(x$pointwise$agd_contrast)))
 
-    resdev_post$Type <- rep(Type, each = prod(dim(x$resdev_array)[1:2]))
+  resdev_post$Type <- rep(Type, each = prod(dim(x$resdev_array)[1:2]))
 
-    if (!show_uncertainty) {
-      resdev_post <- dplyr::group_by(resdev_post, .data$parameter,
-                                     .data$.label, .data$Type) %>%
+  if (!show_uncertainty) {
+    resdev_post <- dplyr::group_by(resdev_post, .data$parameter,
+                                   .data$.label, .data$Type) %>%
       dplyr::summarise(resdev = mean(.data$resdev))
   }
 
@@ -173,6 +173,7 @@ plot.nma_dic <- function(x, y, ...,
                              args = rlang::dots_list(.data = resdev_post,
                                                      rlang::quo(.data$resdev),
                                                      .width = c(0.66, 0.95),
+                                                     .point = mean,
                                                      !!! int_dots)) %>%
         dplyr::rename(resdev_x = .data$resdev,
                       x_lower = .data$.lower,
@@ -183,6 +184,7 @@ plot.nma_dic <- function(x, y, ...,
                                args = rlang::dots_list(.data = y_resdev_post,
                                                        rlang::quo(.data$resdev),
                                                        .width = c(0.66, 0.95),
+                                                       .point = mean,
                                                        !!! int_dots)) %>%
         dplyr::rename(resdev_y = .data$resdev,
                       y_lower = .data$.lower,
@@ -268,7 +270,10 @@ plot.nma_dic <- function(x, y, ...,
     }
 
     if (show_uncertainty) {
-      p <- p + do.call(tb_geom, args = list(...))
+      p <- p + do.call(tb_stat,
+                       args = rlang::dots_list(point_interval = tidybayes::mean_qi,
+                                               ...,
+                                               .homonyms = "last"))
     } else {
       p <- p + ggplot2::geom_point(...)
     }
