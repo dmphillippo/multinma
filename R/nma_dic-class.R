@@ -140,15 +140,20 @@ plot.nma_dic <- function(x, y, ...,
                            ggplot2::aes(y = .data$.label,
                                         x = .data$resdev)) +
         ggplot2::geom_vline(xintercept = 1, colour = "grey60") +
-        ggplot2::facet_grid(Type~., space = "free") +
         ggplot2::labs(x = "Residual Deviance", y = "Data Point")
+
+      if (dplyr::n_distinct(resdev_post$Type) > 1)
+        p <- p + ggplot2::facet_grid(Type~., space = "free")
+
     } else {
       p <- ggplot2::ggplot(resdev_post,
                            ggplot2::aes(x = .data$.label,
                                         y = .data$resdev)) +
         ggplot2::geom_hline(yintercept = 1, colour = "grey60") +
-        ggplot2::facet_grid(.~Type, space = "free") +
         ggplot2::labs(y = "Residual Deviance", x = "Data Point")
+
+      if (dplyr::n_distinct(resdev_post$Type) > 1)
+        p <- p + ggplot2::facet_grid(.~Type, space = "free")
     }
 
     if (show_uncertainty) {
