@@ -56,10 +56,6 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' @param y (Optional) A second `nma_dic` object, to produce "dev-dev" plots for
 #'   model comparison.
 #' @param ... Additional arguments passed on to other methods
-#' @param type Type of plot to produce, either `"resdev"` (the default) for
-#'   plots of residual deviance contributions, or `"leverage"` for plots of
-#'   leverage (pD) against residual deviance. Only `"resdev"` is supported if
-#'   `y` is provided.
 #' @param show_uncertainty Logical, show uncertainty with a `tidybayes` plot
 #'   stat? Default `TRUE`. Only used when `type = "resdev"`.
 #' @param stat Character string specifying the `tidybayes` plot stat to use if
@@ -74,7 +70,6 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #'
 #' @examples
 plot.nma_dic <- function(x, y, ...,
-                         type = c("resdev", "pd"),
                          show_uncertainty = TRUE,
                          stat = "pointinterval") {
   # Checks
@@ -82,9 +77,6 @@ plot.nma_dic <- function(x, y, ...,
 
   if (has_y && !inherits(y, "nma_dic"))
     abort("Second argument `y` should be a `nma_dic` object produced by dic(), or missing.")
-
-  if (!has_y)
-    type <- rlang::arg_match(type)
 
   if (!rlang::is_bool(show_uncertainty))
     abort("`show_uncertainty` should be TRUE or FALSE.")
@@ -111,72 +103,66 @@ plot.nma_dic <- function(x, y, ...,
 
     # Check resdev[] names match
 
-  } else { # Produce resdev or leverage plots
+  } else { # Produce resdev plot
 
-    if (type == "resdev") {
+    # Get resdev samples from resdev_array
+    resdev_post <- as.matrix.nma_summary(x$resdev_array) %>%
+      tibble::as_tibble()
 
-      # Get resdev samples from resdev_array
-      resdev_post <- as.matrix.nma_summary(x$resdev_array) %>%
-        tibble::as_tibble()
+    if (packageVersion("tidyr") >= "1.0.0") {
+      resdev_post <- tidyr::pivot_longer(resdev_post, cols = dplyr::everything(),
+                                   names_to = "parameter", values_to = "resdev")
+    } else {
+      resdev_post <- tidyr::gather(key = "parameter",
+                             value = "resdev",
+                             dplyr::everything())
+    }
 
-      if (packageVersion("tidyr") >= "1.0.0") {
-        resdev_post <- tidyr::pivot_longer(resdev_post, cols = dplyr::everything(),
-                                     names_to = "parameter", values_to = "resdev")
-      } else {
-        resdev_post <- tidyr::gather(key = "parameter",
-                               value = "resdev",
-                               dplyr::everything())
-      }
+    resdev_post$.label <- forcats::fct_inorder(factor(
+      stringr::str_extract(resdev_post$parameter, "(?<=\\[).+(?=\\]$)")))
 
-      resdev_post$.label <- forcats::fct_inorder(factor(
-        stringr::str_extract(resdev_post$parameter, "(?<=\\[).+(?=\\]$)")))
+    Type <- c(rep("IPD", NROW(x$pointwise$ipd)),
+              rep("AgD (arm-based)", NROW(x$pointwise$agd_arm)),
+              rep("AgD (contrast-based)", NROW(x$pointwise$agd_contrast)))
 
-      Type <- c(rep("IPD", NROW(x$pointwise$ipd)),
-                rep("AgD (arm-based)", NROW(x$pointwise$agd_arm)),
-                rep("AgD (contrast-based)", NROW(x$pointwise$agd_contrast)))
+    resdev_post$Type <- rep(Type, each = prod(dim(x$resdev_array)[1:2]))
 
-      resdev_post$Type <- rep(Type, each = prod(dim(x$resdev_array)[1:2]))
+    if (!show_uncertainty) {
+      resdev_post <- dplyr::group_by(resdev_post, .data$parameter,
+                                     .data$.label, .data$Type) %>%
+        dplyr::summarise(resdev = mean(.data$resdev))
+    }
 
-      if (!show_uncertainty) {
-        resdev_post <- dplyr::group_by(resdev_post, .data$parameter,
-                                       .data$.label, .data$Type) %>%
-          dplyr::summarise(resdev = mean(.data$resdev))
-      }
+    if (horizontal) {
+      resdev_post$.label <- forcats::fct_rev(resdev_post$.label)
 
-      if (horizontal) {
-        resdev_post$.label <- forcats::fct_rev(resdev_post$.label)
+      p <- ggplot2::ggplot(resdev_post,
+                           ggplot2::aes(y = .data$.label,
+                                        x = .data$resdev)) +
+        ggplot2::geom_vline(xintercept = 1, colour = "grey60") +
+        ggplot2::facet_grid(Type~., space = "free") +
+        ggplot2::labs(x = "Residual Deviance", y = "Data Point")
+    } else {
+      p <- ggplot2::ggplot(resdev_post,
+                           ggplot2::aes(x = .data$.label,
+                                        y = .data$resdev)) +
+        ggplot2::geom_hline(yintercept = 1, colour = "grey60") +
+        ggplot2::facet_grid(.~Type, space = "free") +
+        ggplot2::labs(y = "Residual Deviance", x = "Data Point")
+    }
 
-        p <- ggplot2::ggplot(resdev_post,
-                             ggplot2::aes(y = .data$.label,
-                                          x = .data$resdev)) +
-          ggplot2::geom_vline(xintercept = 1, colour = "grey60") +
-          ggplot2::facet_grid(Type~., space = "free") +
-          ggplot2::labs(x = "Residual Deviance", y = "Data Point")
-      } else {
-        p <- ggplot2::ggplot(resdev_post,
-                             ggplot2::aes(x = .data$.label,
-                                          y = .data$resdev)) +
-          ggplot2::geom_hline(yintercept = 1, colour = "grey60") +
-          ggplot2::facet_grid(.~Type, space = "free") +
-          ggplot2::labs(y = "Residual Deviance", x = "Data Point")
-      }
+    if (show_uncertainty) {
+      p <- p + do.call(tb_geom, args = list(...))
+    } else {
+      p <- p + ggplot2::geom_point(...)
+    }
 
-      if (show_uncertainty) {
-        p <- p + do.call(tb_geom, args = list(...))
-      } else {
-        p <- p + ggplot2::geom_point(...)
-      }
+    p <- p + theme_multinma()
 
-      p <- p + theme_multinma()
-
-      if (!horizontal) {
-        p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 0))
-      } else {
-        p <- p + ggplot2::theme(axis.text.y = ggplot2::element_text(hjust = 0))
-      }
-
-    } else if (type == "leverage") {
-
+    if (!horizontal) {
+      p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 0))
+    } else {
+      p <- p + ggplot2::theme(axis.text.y = ggplot2::element_text(hjust = 0))
     }
   }
 
