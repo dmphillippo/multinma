@@ -25,14 +25,8 @@ dic <- function(x, ...) {
     resdev_ipd <- resdev[1:n_ipd]
     fitted_ipd <- fitted[1:n_ipd]
 
-    dn_resdev_array[[3]][1:n_ipd] <- net$ipd %>%
-      dplyr::group_by(.data$.study, .data$.trt) %>%
-      dplyr::mutate(.label = paste0("resdev[",
-                                    .data$.study, ": ",
-                                    .data$.trt, ", ",
-                                    1:dplyr::n(), "]")) %>%
-      dplyr::pull(.data$.label)
-
+    dn_resdev_array[[3]][1:n_ipd] <-
+      paste0("resdev[", make_data_labels(net$ipd$.study, net$ipd$.trt), "]")
   } else {
     n_ipd <- 0
   }
@@ -43,7 +37,7 @@ dic <- function(x, ...) {
     fitted_agd_arm <- fitted[n_ipd + (1:n_agd_arm)]
 
     dn_resdev_array[[3]][n_ipd + (1:n_agd_arm)] <-
-      paste0("resdev[", net$agd_arm$.study, ": ", net$agd_arm$.trt, "]")
+      paste0("resdev[", make_data_labels(net$agd_arm$.study, net$agd_arm$.trt), "]")
 
   } else {
     n_agd_arm <- 0
@@ -58,17 +52,7 @@ dic <- function(x, ...) {
     resdev_agd_contrast <- resdev[n_ipd + n_agd_arm + (1:nr_agd_contrast)]
     fitted_agd_contrast <- fitted[n_ipd + n_agd_arm + (1:nf_agd_contrast)]
 
-    agd_contrast_bl <- dplyr::filter(net$agd_contrast, is.na(.data$.y)) %>%
-      dplyr::transmute(.study = .data$.study, .trt_b = .data$.trt)
-
-    dn_resdev_array[[3]][n_ipd + n_agd_arm + (1:nf_agd_contrast)] <- net$agd_contrast %>%
-      dplyr::filter(!is.na(.data$.y)) %>%
-      dplyr::left_join(agd_contrast_bl, by = c(".study", ".trt")) %>%
-      dplyr::mutate(.label = paste0("resdev[",
-                                    .data$.study, ": ",
-                                    .data$.trt, " vs. ",
-                                    .data$.trt_b, "]")) %>%
-      dplyr::pull(.data$.label)
+    # dn_resdev_array is fixed below for agd_contrast (one resdev per study)
 
   } else {
     nr_agd_contrast <- nf_agd_contrast <- 0
@@ -173,6 +157,11 @@ dic <- function(x, ...) {
                       leverage = .data$resdev - .data$resdevfit)
 
     leverage_agd_contrast <- agd_contrast_resdev_dat$leverage
+
+    dn_resdev_array[[3]][n_ipd + n_agd_arm + (1:nf_agd_contrast)] <-
+      paste0(agd_contrast_resdev_dat$.study, " (",
+             agd_contrast_resdev_dat$n_contrast + 1, " arms)")
+
   } else {
     leverage_agd_contrast <- NULL
   }
@@ -221,4 +210,29 @@ dic <- function(x, ...) {
   out <- list(dic = dic, pd = pd, resdev = totresdev, pointwise = pw, resdev_array = resdev_array)
   class(out) <- "nma_dic"
   return(out)
+}
+
+#' Make labels for data points
+#'
+#' @param study Study vector, coerced to character
+#' @param trt Treatment vector, coerced to character
+#' @param trt_b Baseline treatment vector if contrast-based, coerced to character
+#'
+#' @return Character vector of labels
+#'
+#' @noRd
+make_data_labels <- function(study, trt, trt_b = NA) {
+  tibble::tibble(study = study, trt = trt, trt_b = trt_b) %>%
+    dplyr::group_by_all() %>%
+    dplyr::mutate(grp_n = dplyr::n(),
+                  grp_id = 1:dplyr::n(),
+                  vs_trt_b = dplyr::if_else(is.na(trt_b),
+                                            NA_character_,
+                                            paste0(" vs. ", trt_b)),
+                  label = as.character(
+                    dplyr::if_else(.data$grp_n > 1,
+                      glue::glue("{study}: {trt}{vs_trt_b}, {grp_id}", .na = ""),
+                      glue::glue("{study}: {trt}{vs_trt_b}", .na = "")))
+    ) %>%
+    dplyr::pull(.data$label)
 }
