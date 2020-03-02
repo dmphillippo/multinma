@@ -57,10 +57,9 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #'   model comparison.
 #' @param ... Additional arguments passed on to other methods
 #' @param show_uncertainty Logical, show uncertainty with a `tidybayes` plot
-#'   stat? Default `TRUE`. Only used when `type = "resdev"`.
+#'   stat? Default `TRUE`.
 #' @param stat Character string specifying the `tidybayes` plot stat to use if
-#'   `show_uncertainty = TRUE`, default `"pointinterval"`. Only used when `type
-#'   = "resdev"`.
+#'   `show_uncertainty = TRUE`, default `"pointinterval"`.
 #'
 #' @return A `ggplot` object.
 #' @export
