@@ -58,11 +58,13 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' @param ... Additional arguments passed on to other methods
 #' @param type Type of plot to produce, either `"resdev"` (the default) for
 #'   plots of residual deviance contributions, or `"leverage"` for plots of
-#'   leverage (pD) against residual deviance. Only used if `y` is missing.
+#'   leverage (pD) against residual deviance. Only `"resdev"` is supported if
+#'   `y` is provided.
 #' @param show_uncertainty Logical, show uncertainty with a `tidybayes` plot
-#'   stat? Default `TRUE`.
+#'   stat? Default `TRUE`. Only used when `type = "resdev"`.
 #' @param stat Character string specifying the `tidybayes` plot stat to use if
-#'   `show_uncertainty = TRUE`, default `"pointinterval"`.
+#'   `show_uncertainty = TRUE`, default `"pointinterval"`. Only used when `type
+#'   = "resdev"`.
 #'
 #' @return A `ggplot` object.
 #' @export
