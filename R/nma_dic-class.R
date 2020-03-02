@@ -109,51 +109,55 @@ plot.nma_dic <- function(x, y, ...,
 
   if (has_y) { # Produce dev-dev plot
 
+    # Check resdev[] names match
+
   } else { # Produce resdev or leverage plots
-    if (!is.null(x$pointwise$ipd)) {
-      dat_ipd <- x$pointwise$ipd %>%
-        dplyr::mutate(.id = 1:dplyr::n(),
-                      .label = as.character(glue::glue("{.study}: {.trt}, {.id}")),
-                      Type = "IPD")
-    } else {
-      dat_ipd <- tibble::tibble()
-    }
-
-    if (!is.null(x$pointwise$agd_arm)) {
-      dat_agd_arm <- x$pointwise$agd_arm %>%
-        dplyr::mutate(.label = as.character(glue::glue("{.study}: {.trt}")),
-                      Type = "AgD (arm-based)")
-    } else {
-      dat_agd_arm <- tibble::tibble()
-    }
-
-    if (!is.null(x$pointwise$agd_contrast)) {
-      dat_agd_contrast <- x$pointwise$agd_contrast %>%
-        dplyr::mutate(.label = as.character(glue::glue("{.study} ({n_contrast + 1} arms)")),
-                      Type = "AgD (contrast-based)")
-    } else {
-      dat_agd_contrast <- tibble::tibble()
-    }
-
-    dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
-    dat_all$.label <- forcats::fct_inorder(factor(dat_all$.label))
 
     if (type == "resdev") {
-      if (horizontal) {
-        dat_all$.label <- forcats::fct_rev(dat_all$.label)
 
-        p <- ggplot2::ggplot(dat_all,
+      # Get resdev samples from resdev_array
+      resdev_post <- as.matrix.nma_summary(x$resdev_array) %>%
+        tibble::as_tibble()
+
+      if (packageVersion("tidyr") >= "1.0.0") {
+        resdev_post <- tidyr::pivot_longer(resdev_post, cols = dplyr::everything(),
+                                     names_to = "parameter", values_to = "resdev")
+      } else {
+        resdev_post <- tidyr::gather(key = "parameter",
+                               value = "resdev",
+                               dplyr::everything())
+      }
+
+      resdev_post$.label <- forcats::fct_inorder(factor(
+        stringr::str_extract(resdev_post$parameter, "(?<=\\[).+(?=\\]$)")))
+
+      Type <- c(rep("IPD", NROW(x$pointwise$ipd)),
+                rep("AgD (arm-based)", NROW(x$pointwise$agd_arm)),
+                rep("AgD (contrast-based)", NROW(x$pointwise$agd_contrast)))
+
+      resdev_post$Type <- rep(Type, each = prod(dim(x$resdev_array)[1:2]))
+
+      if (!show_uncertainty) {
+        resdev_post <- dplyr::group_by(resdev_post, .data$parameter,
+                                       .data$.label, .data$Type) %>%
+          dplyr::summarise(resdev = mean(.data$resdev))
+      }
+
+      if (horizontal) {
+        resdev_post$.label <- forcats::fct_rev(resdev_post$.label)
+
+        p <- ggplot2::ggplot(resdev_post,
                              ggplot2::aes(y = .data$.label,
                                           x = .data$resdev)) +
           ggplot2::geom_vline(xintercept = 1, colour = "grey60") +
-          ggplot2::facet_grid(Type~., scales = "free", space = "free") +
+          ggplot2::facet_grid(Type~., space = "free") +
           ggplot2::labs(x = "Residual Deviance", y = "Data Point")
       } else {
-        p <- ggplot2::ggplot(dat_all,
+        p <- ggplot2::ggplot(resdev_post,
                              ggplot2::aes(x = .data$.label,
                                           y = .data$resdev)) +
           ggplot2::geom_hline(yintercept = 1, colour = "grey60") +
-          ggplot2::facet_grid(.~Type, scales = "free", space = "free") +
+          ggplot2::facet_grid(.~Type, space = "free") +
           ggplot2::labs(y = "Residual Deviance", x = "Data Point")
       }
 
