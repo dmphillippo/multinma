@@ -80,33 +80,9 @@ plot.nma_dic <- function(x, y, ...,
   if (!rlang::is_bool(show_uncertainty))
     abort("`show_uncertainty` should be TRUE or FALSE.")
 
-  if (show_uncertainty) {
-    if (!rlang::is_string(stat))
-      abort("`stat` should be a character string specifying the name of a tidybayes stat")
-
-    stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
-
-    tb_geom <- tryCatch(getExportedValue("tidybayes", paste0("stat_", stat)),
-                        error = function(err) {
-                          abort(paste("`stat` should be a character string specifying the name of a tidybayes stat:",
-                                      err, sep = "\n"))
-                        })
-
-    # Is a horizontal geom specified?
-    horizontal <- stringr::str_ends(stat, "h")
-  } else {
-    horizontal <- FALSE
-  }
-
-  if (has_y) { # Produce dev-dev plot
-
-    # Check resdev[] names match
-
-  } else { # Produce resdev plot
-
-    # Get resdev samples from resdev_array
-    resdev_post <- as.matrix.nma_summary(x$resdev_array) %>%
-      tibble::as_tibble()
+  # Get resdev samples from resdev_array
+  resdev_post <- as.matrix.nma_summary(x$resdev_array) %>%
+    tibble::as_tibble()
 
     if (packageVersion("tidyr") >= "1.0.0") {
       resdev_post <- tidyr::pivot_longer(resdev_post, cols = dplyr::everything(),
@@ -129,7 +105,143 @@ plot.nma_dic <- function(x, y, ...,
     if (!show_uncertainty) {
       resdev_post <- dplyr::group_by(resdev_post, .data$parameter,
                                      .data$.label, .data$Type) %>%
-        dplyr::summarise(resdev = mean(.data$resdev))
+      dplyr::summarise(resdev = mean(.data$resdev))
+  }
+
+  if (has_y) { # Produce dev-dev plot
+
+    # Check resdev[] names match
+    if (isFALSE(all.equal(dimnames(x$resdev_array)[3], dimnames(y$resdev_array)[3])))
+      abort("Data points in `x` and `y` do not match")
+
+    # Get y resdev samples from resdev_array
+    y_resdev_post <- as.matrix.nma_summary(y$resdev_array) %>%
+      tibble::as_tibble()
+
+    if (packageVersion("tidyr") >= "1.0.0") {
+      y_resdev_post <- tidyr::pivot_longer(y_resdev_post, cols = dplyr::everything(),
+                                           names_to = "parameter", values_to = "resdev")
+    } else {
+      y_resdev_post <- tidyr::gather(key = "parameter",
+                                   value = "resdev",
+                                   dplyr::everything())
+    }
+
+    y_resdev_post$.label <- forcats::fct_inorder(factor(
+      stringr::str_extract(y_resdev_post$parameter, "(?<=\\[).+(?=\\]$)")))
+
+    y_resdev_post$Type <- rep(Type, each = prod(dim(x$resdev_array)[1:2]))
+
+    if (!show_uncertainty) {
+      y_resdev_post <- dplyr::group_by(y_resdev_post, .data$parameter,
+                                       .data$.label, .data$Type) %>%
+        dplyr::summarise(resdev_y = mean(.data$resdev))
+
+      resdev_post <- dplyr::rename(resdev_post, resdev_x = .data$resdev)
+
+      xy_resdev_post <- dplyr::left_join(resdev_post, y_resdev_post, by = c("parameter", ".label"))
+    } else {
+
+      if (!rlang::is_string(stat))
+        abort("`stat` should be a character string specifying the name of a tidybayes stat")
+
+      stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
+      stat <- stringr::str_remove(stat, "h$")
+
+      stath <- paste0(stat, "h")
+      tb_geomh <- tryCatch(getExportedValue("tidybayes", paste0("geom_", stath)),
+                           error = function(err) {
+                             abort(paste("`stat` should be a character string specifying the name of a tidybayes geom:",
+                                         err, sep = "\n"))
+                           })
+
+      tb_geom <- tryCatch(getExportedValue("tidybayes", paste0("geom_", stat)),
+                          error = function(err) {
+                            abort(paste("`stat` should be a character string specifying the name of a tidybayes geom:",
+                                        err, sep = "\n"))
+                          })
+
+      # Parse ... for arguments to point_interval()
+      dots <- list(...)
+      is_int_arg <- names(dots) %in% c(".width", ".point", ".interval")
+      int_dots <- dots[is_int_arg]
+      geom_dots <- dots[!is_int_arg]
+
+      # Summarise resdev_post and y_resdev_post with tidybayes::point_interval()
+      resdev_post <- dplyr::group_by(resdev_post, .data$parameter, .data$.label, .data$Type)
+      resdev_post <- do.call(tidybayes::point_intervalh,
+                             args = rlang::dots_list(.data = resdev_post,
+                                                     rlang::quo(.data$resdev),
+                                                     .width = c(0.66, 0.95),
+                                                     !!! int_dots)) %>%
+        dplyr::rename(resdev_x = .data$resdev,
+                      x_lower = .data$.lower,
+                      x_upper = .data$.upper)
+
+      y_resdev_post <- dplyr::group_by(y_resdev_post, .data$parameter, .data$.label, .data$Type)
+      y_resdev_post <- do.call(tidybayes::point_interval,
+                               args = rlang::dots_list(.data = y_resdev_post,
+                                                       rlang::quo(.data$resdev),
+                                                       .width = c(0.66, 0.95),
+                                                       !!! int_dots)) %>%
+        dplyr::rename(resdev_y = .data$resdev,
+                      y_lower = .data$.lower,
+                      y_upper = .data$.upper)
+
+      xy_resdev_post <- dplyr::left_join(resdev_post, y_resdev_post,
+                                         by = c("parameter", ".label", "Type",
+                                                ".width", ".point", ".interval"))
+
+    }
+
+    ulim <- max(xy_resdev_post$x_upper, xy_resdev_post$y_upper)
+
+    p <- ggplot2::ggplot(xy_resdev_post,
+                         ggplot2::aes(y = .data$resdev_y,
+                                      x = .data$resdev_x,
+                                      xmin = .data$x_lower, xmax = .data$x_upper,
+                                      ymin = .data$y_lower, ymax = .data$y_upper,
+                                      colour = .data$Type,
+                                      label = .data$.label)) +
+      ggplot2::labs(x = "Residual Deviance (model 1)",
+                    y = "Residual Deviance (model 2)") +
+      ggplot2::coord_fixed(xlim = c(0, ulim), ylim = c(0, ulim)) +
+      ggplot2::geom_abline(slope = 1, intercept = 0, colour = "grey60")
+
+    if (dplyr::n_distinct(xy_resdev_post$Type) > 1) {
+      p <- p + ggplot2::scale_colour_viridis_d("")
+    } else {
+      p <- p + ggplot2::guides(colour = "none")
+    }
+
+    if (show_uncertainty) {
+      p <- p +
+        do.call(tb_geom, args = geom_dots) +
+        do.call(tb_geomh, args = geom_dots)
+    } else {
+      p <- p + ggplot2::geom_point(...)
+    }
+
+    p <- p + theme_multinma()
+
+  } else { # Produce resdev plot
+
+    if (show_uncertainty) {
+      if (!rlang::is_string(stat))
+        abort("`stat` should be a character string specifying the name of a tidybayes stat")
+
+      stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
+
+      tb_stat <- tryCatch(getExportedValue("tidybayes", paste0("stat_", stat)),
+                          error = function(err) {
+                            abort(paste("`stat` should be a character string specifying the name of a tidybayes stat:",
+                                        err, sep = "\n"))
+                          })
+
+      # Is a horizontal geom specified?
+      horizontal <- stringr::str_ends(stat, "h")
+    } else {
+      horizontal <- FALSE
     }
 
     if (horizontal) {
