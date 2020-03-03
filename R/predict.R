@@ -312,23 +312,20 @@ predict.stan_nma <- function(object,
       offset_all <- X_list$offset_ipd
 
       # Get posterior samples
-      d <- as.array(object, pars = "d")
-      beta <- as.array(object, pars = "beta")
+      post_temp <- as.array(object, pars = c("d", "beta"))
 
       # Generate baseline samples
-      dim_d <- dim(d)
-      dim_beta <- dim(beta)
-      dim_mu <- c(dim_d[1:2], 1)
+      dim_post_temp <- dim(post_temp)
+      dim_mu <- c(dim_post_temp[1:2], dplyr::n_distinct(preddat$.study))
       u <- runif(prod(dim_mu))
       mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
                   dim = dim_mu)
 
       # Combine mu, d, and beta
-      dim_post <- c(dim_d[1:2], 1 + dim_d[3] + dim_beta[3])
+      dim_post <- c(dim_post_temp[1:2], dim_mu[3] + dim_post_temp[3])
       post <- array(NA_real_, dim = dim_post)
-      post[ , , 1] <- mu
-      post[ , , 1 + 1:dim_d[3]] <- d
-      post[ , , 1 + dim_d[3] + 1:dim_beta[3]] <- beta
+      post[ , , 1:dim_mu[3]] <- mu
+      post[ , , dim_mu[3] + 1:dim_post_temp[3]] <- post_temp
 
     }
 
