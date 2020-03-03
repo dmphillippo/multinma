@@ -8,6 +8,9 @@
 #' @return A [nma_dic] object.
 #' @export
 #'
+#' @seealso [print.nma_dic()] for printing details, [plot.nma_dic()] for
+#'   producing plots of residual deviance contributions.
+#'
 #' @examples
 dic <- function(x, ...) {
   if (!inherits(x, "stan_nma")) abort("Not a `stan_nma` object.")

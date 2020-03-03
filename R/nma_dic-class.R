@@ -1,7 +1,7 @@
 #' The nma_dic class
 #'
 #' The `nma_dic` class contains details of the Deviance Information Criterion
-#' (DIC).
+#' (DIC), produced using the [dic()] function.
 #'
 #' @rdname nma_dic-class
 #' @name nma_dic-class
@@ -17,6 +17,8 @@
 #'   \item{`resdev_array`}{A 3D MCMC array \[Iterations, Chains, Parameters\] of
 #'   posterior residual deviance samples.}
 #'   }
+#'
+#' @seealso [dic()], [print.nma_dic()], [plot.nma_dic()].
 #'
 NULL
 
@@ -42,12 +44,14 @@ print.nma_dic <- function(x, digits = 1, ...) {
   cglue("Residual deviance: {round(x$resdev, digits)}", subtle(" (on {n} data points)", sep = ""))
   cglue("               pD: {round(x$pd, digits)}")
   cglue("              DIC: {round(x$dic, digits)}")
+
+  invisible(x)
 }
 
 
 #' Plots of model fit diagnostics
 #'
-#' The `plot()` method for [nma_dic] objected produced by [dic()] produces
+#' The `plot()` method for [nma_dic] objects produced by [dic()] produces
 #' several useful diagnostic plots for checking model fit and model comparison.
 #' Further detail on these plots and their interpretation is given by
 #' \insertCite{TSD2;textual}{multinma}.
@@ -64,6 +68,24 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #'
 #' @return A `ggplot` object.
 #' @export
+#'
+#' @details When a single `nma_dic` object is given, a plot of the residual
+#'   deviance contribution for each data point is produced. For a good fitting
+#'   model, each data point is expected to have a residual deviance of 1; larger
+#'   values indicate data points that are fit poorly by the model.
+#'
+#'   When two `nma_dic` objects are given, a "dev-dev" plot comparing the
+#'   residual deviance contributions under each model is produced. Data points
+#'   with residual deviance contributions lying on the line of equality are fit
+#'   equally well under either model. Data points lying below the line of
+#'   equality indicate better fit under the second model (`y`); conversely, data
+#'   points lying above the line of equality indicate better fit under the first
+#'   model (`x`). A common use case is to compare a standard consistency model
+#'   (fitted using [nma()] with `consistency = "consistency"`) with an unrelated
+#'   mean effects (UME) inconsistency model (fitted using [nma()] with
+#'   `consistency = "ume"`), to check for potential inconsistency.
+#'
+#'   See \insertCite{TSD2;textual}{multinma} for further details.
 #'
 #' @references
 #'   \insertAllCited{}
