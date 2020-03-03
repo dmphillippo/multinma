@@ -59,7 +59,8 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' @param show_uncertainty Logical, show uncertainty with a `tidybayes` plot
 #'   stat? Default `TRUE`.
 #' @param stat Character string specifying the `tidybayes` plot stat to use if
-#'   `show_uncertainty = TRUE`, default `"pointinterval"`.
+#'   `show_uncertainty = TRUE`, default `"pointinterval"`. If `y` is provided,
+#'   currently only `"pointinterval"` is supported.
 #'
 #' @return A `ggplot` object.
 #' @export
@@ -148,6 +149,11 @@ plot.nma_dic <- function(x, y, ...,
 
       stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
       stat <- stringr::str_remove(stat, "h$")
+
+      if (stat != "pointinterval")
+        warn(glue::glue('Currently only stat = "pointinterval" is supported when `y` is given.',
+                        'Results may be unexpected with stat = "{stat}"!',
+                        .sep = "\n"))
 
       stath <- paste0(stat, "h")
       tb_geomh <- tryCatch(getExportedValue("tidybayes", paste0("geom_", stath)),
