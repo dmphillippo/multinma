@@ -386,7 +386,7 @@ nma.fit <- function(ipd_x, ipd_y,
   if (has_ipd) {
     if (!is.matrix(ipd_x) || !is.numeric(ipd_x))
       abort("`ipd_x` should be a numeric matrix.")
-    if (any(!purrr::map_lgl(ipd_x, is.numeric)))
+    if (any(!purrr::map_lgl(ipd_y, is.numeric)))
       abort("`ipd_y` should be numeric outcome data.")
     if (nrow(ipd_x) != nrow(ipd_y))
       abort("Number of rows in `ipd_x` and `ipd_y` do not match.")
@@ -394,7 +394,7 @@ nma.fit <- function(ipd_x, ipd_y,
   if (has_agd_arm) {
     if (!is.matrix(agd_arm_x) || !is.numeric(agd_arm_x))
       abort("`agd_arm_x` should be a numeric matrix.")
-    if (any(!purrr::map_lgl(agd_arm_x, is.numeric)))
+    if (any(!purrr::map_lgl(agd_arm_y, is.numeric)))
       abort("`agd_arm_y` should be numeric outcome data.")
     if (nrow(agd_arm_x) != nrow(agd_arm_y) * n_int)
       abort("Number of rows in `agd_arm_x`, `agd_arm_y`, and `n_int` do not match.")
@@ -402,7 +402,7 @@ nma.fit <- function(ipd_x, ipd_y,
   if (has_agd_contrast) {
     if (!is.matrix(agd_contrast_x) || !is.numeric(agd_contrast_x))
       abort("`agd_contrast_x` should be a numeric matrix.")
-    if (any(!purrr::map_lgl(agd_contrast_x, is.numeric)))
+    if (any(!purrr::map_lgl(agd_contrast_y, is.numeric)))
       abort("`agd_contrast_y` should be numeric outcome data.")
     if (nrow(agd_contrast_x) != nrow(agd_contrast_y) * n_int)
       abort("Number of rows in `agd_contrast_x`, `agd_contrast_y`, and `n_int` do not match.")
