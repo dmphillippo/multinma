@@ -346,23 +346,20 @@ predict.stan_nma <- function(object,
       n_studies <- nlevels(studies)
       n_trt <- nlevels(object$network$treatments)
 
-      weight_dat <- preddat %>%
+      preddat <- preddat %>%
         dplyr::group_by(.data$.study, .data$.trt) %>%
-        dplyr::mutate(.weights = .data$.sample_size / sum(.data$.sample_size)) %>%
-        dplyr::summarise(.group_n = dplyr::n(), .weights = list(.data$.weights))
+        dplyr::mutate(.weights = .data$.sample_size / sum(.data$.sample_size))
 
       X_weighted_mean <- matrix(0, ncol = dim(pred_array)[3], nrow = n_studies * n_trt)
 
-      .col <- 0
-      for (i in 1:nrow(weight_dat)) {
-        X_weighted_mean[i, .col + 1:weight_dat[[i, ".group_n"]]] <- weight_dat[[i, ".weights"]]
-        .col <- .col + weight_dat[[i, ".group_n"]]
-      }
+      X_weighted_mean[cbind(dplyr::group_indices(preddat),
+                            1:dim(pred_array)[3])] <- preddat$.weights
 
-      rownames(X_weighted_mean) <- paste0("pred[", weight_dat$.study, ": ", weight_dat$.trt, "]")
+      preddat <- dplyr::summarise(preddat, .weights = list(.data$.weights))
+
+      rownames(X_weighted_mean) <- paste0("pred[", preddat$.study, ": ", preddat$.trt, "]")
 
       pred_array <- tcrossprod_mcmc_array(pred_array, X_weighted_mean)
-      preddat <- weight_dat
     }
 
     # Produce nma_summary
