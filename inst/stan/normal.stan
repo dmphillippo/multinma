@@ -29,7 +29,9 @@ transformed parameters {
   if (ni_agd_arm) {
     if (nint > 1) { // -- If integration points are used --
       if (RE) {
-        vector[nint * ni_agd_arm] eta_agd_arm_noRE = X_agd_arm * beta_tilde;
+        vector[nint * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+          X_agd_arm * beta_tilde + offset_agd_arm :
+          X_agd_arm * beta_tilde;
 
         if (link == 1) { // identity link
           for (i in 1:ni_agd_arm) {
@@ -53,9 +55,13 @@ transformed parameters {
 
       } else {
         if (link == 1) { // identity link
-          theta_agd_arm_ii = X_agd_arm * beta_tilde;
+          theta_agd_arm_ii = has_offset ?
+            X_agd_arm * beta_tilde + offset_agd_arm :
+            X_agd_arm * beta_tilde;
         } else if (link == 2) { // log link
-          theta_agd_arm_ii = exp(X_agd_arm * beta_tilde);
+          theta_agd_arm_ii = has_offset ?
+            exp(X_agd_arm * beta_tilde + offset_agd_arm) :
+            exp(X_agd_arm * beta_tilde);
         }
 
         for (i in 1:ni_agd_arm) {
@@ -64,7 +70,9 @@ transformed parameters {
       }
     } else { // -- If no integration --
       if (RE) {
-        vector[nint * ni_agd_arm] eta_agd_arm_noRE = X_agd_arm * beta_tilde;
+        vector[nint * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+          X_agd_arm * beta_tilde + offset_agd_arm :
+          X_agd_arm * beta_tilde;
 
         if (link == 1) { // identity link
           for (i in 1:ni_agd_arm) {
@@ -83,9 +91,13 @@ transformed parameters {
         }
       } else {
         if (link == 1) // identity link
-          theta_agd_arm_bar = X_agd_arm * beta_tilde;
+          theta_agd_arm_bar = has_offset ?
+            X_agd_arm * beta_tilde + offset_agd_arm :
+            X_agd_arm * beta_tilde;
         else if (link == 2) // log link
-          theta_agd_arm_bar = exp(X_agd_arm * beta_tilde);
+          theta_agd_arm_bar = has_offset ?
+            exp(X_agd_arm * beta_tilde + offset_agd_arm) :
+            exp(X_agd_arm * beta_tilde);
       }
     }
   }

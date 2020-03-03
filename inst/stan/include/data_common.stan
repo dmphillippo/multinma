@@ -37,6 +37,10 @@ int<lower=0, upper=1> QR; // use QR decomposition (yes = 1)
 matrix[ni_ipd + nint * (ni_agd_arm + ni_agd_contrast), nX] X; // X is Q from QR decomposition if QR = 1
 matrix[QR ? nX : 0, QR ? nX : 0] R_inv;
 
+// -- Offsets --
+int<lower=0, upper=1> has_offset; // Offset flag (yes = 1)
+vector[has_offset ? ni_ipd + nint * (ni_agd_arm + ni_agd_contrast) : 0] offset; // Vector of offsets
+
 // -- Random effects --
 int<lower=0, upper=1> RE; // Random effects flag (yes = 1)
 int<lower=0> which_RE[RE ? narm_ipd + ni_agd_arm + ni_agd_contrast : 0]; // ID of RE delta for each arm (0 for no RE delta)
