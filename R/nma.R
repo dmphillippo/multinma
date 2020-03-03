@@ -339,6 +339,9 @@ nma <- function(network,
 #' @param agd_contrast_y  Outcome data frame for AgD studies (contrast-based)
 #' @param agd_contrast_Sigma List of covariance matrices for contrast-based data
 #' @param n_int Number of numerical integration points used
+#' @param ipd_offset Vector of offset values for IPD
+#' @param agd_arm_offset Vector of offset values for AgD (arm-based)
+#' @param agd_contrast_offset Vector of offset values for AgD (contrast-based)
 #' @param RE_cor Random effects correlation matrix, when `trt_effects = "random"`
 #' @param which_RE Random effects design vector, when `trt_effects = "random"`
 #'
@@ -347,6 +350,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     agd_arm_x, agd_arm_y,
                     agd_contrast_x, agd_contrast_y, agd_contrast_Sigma,
                     n_int,
+                    ipd_offset = NULL, agd_arm_offset = NULL, agd_contrast_offset = NULL,
                     trt_effects = c("fixed", "random"),
                     RE_cor = NULL,
                     which_RE = NULL,
@@ -409,6 +413,32 @@ nma.fit <- function(ipd_x, ipd_y,
     if (!is.list(agd_contrast_Sigma) || any(purrr::map_lgl(agd_contrast_Sigma, ~!is.numeric(.))))
       abort("`agd_contrast_Sigma` should be a list of covariance matrices, of length equal to the number of AgD (contrast-based) studies.")
   }
+
+  # Check offsets
+  has_ipd_offset <- !is.null(ipd_offset)
+  has_agd_arm_offset <- !is.null(agd_arm_offset)
+  has_agd_contrast_offset <- !is.null(agd_contrast_offset)
+
+  if (has_ipd_offset && !has_ipd)
+    abort("`ipd_offset` given but not `ipd_x` and `ipd_y`.")
+  if (has_agd_arm_offset && !has_agd_arm)
+    abort("`agd_arm_offset` given but not `agd_arm_x` and `agd_arm_y`.")
+  if (has_agd_contrast_offset && !has_agd_contrast)
+    abort("`agd_contrast_offset` given but not `agd_contrast_x` and `agd_contrast_y`.")
+
+  has_offsets <- any(has_ipd_offset, has_agd_arm_offset, has_agd_contrast_offset)
+  if (has_offsets &&
+      !all(has_ipd_offset[has_ipd],
+           has_agd_arm_offset[has_agd_arm],
+           has_agd_contrast_offset[has_agd_contrast]))
+    abort("Offsets provided for some data sources but not all.")
+
+  if (has_ipd_offset && (!is.numeric(ipd_offset) || length(ipd_offset != nrow(ipd_x))))
+    abort("`ipd_offset` should be a numeric vector with length matching `ipd_x`, `ipd_y`")
+  if (has_agd_arm_offset && (!is.numeric(agd_arm_offset) || length(agd_arm_offset != nrow(agd_arm_x))))
+    abort("`agd_arm_offset` should be a numeric vector with length matching `agd_arm_x`, `agd_arm_y`")
+  if (has_agd_contrast_offset && (!is.numeric(agd_contrast_offset) || length(agd_contrast_offset != nrow(agd_contrast_x))))
+    abort("`agd_contrast_offset` should be a numeric vector with length matching `agd_contrast_x`, `agd_contrast_y`")
 
   # Check matching X column names and dimensions if more than one present
   if ((has_ipd &&
@@ -594,7 +624,10 @@ nma.fit <- function(ipd_x, ipd_y,
     # Design matrix or QR decomposition
     QR = QR,
     X = if (QR) X_all_Q else X_all,
-    R_inv = if (QR) X_all_R_inv else matrix(0, 0, 0)
+    R_inv = if (QR) X_all_R_inv else matrix(0, 0, 0),
+    # Offsets
+    has_offset = has_offsets,
+    offset = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric()
     )
 
   # Add priors
