@@ -23,6 +23,8 @@ transformed parameters {
     theta_ipd = inv_logit(eta_ipd);
   else if (link == 2) // probit link
     theta_ipd = Phi(eta_ipd);
+  else if (link == 3) // cloglog link
+    theta_ipd = inv_cloglog(eta_ipd);
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
@@ -46,6 +48,13 @@ transformed parameters {
             else
               theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
           }
+        } else if (link == 3) { // cloglog link
+          for (i in 1:ni_agd_arm) {
+            if (which_RE[narm_ipd + i])
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_cloglog(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
+            else
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_cloglog(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
+          }
         }
 
         for (i in 1:ni_agd_arm) {
@@ -61,6 +70,10 @@ transformed parameters {
           theta_agd_arm_ii = has_offset ?
             Phi(X_agd_arm * beta_tilde + offset_agd_arm) :
             Phi(X_agd_arm * beta_tilde);
+        } else if (link == 3) { // cloglog link
+          theta_agd_arm_ii = has_offset ?
+            inv_cloglog(X_agd_arm * beta_tilde + offset_agd_arm) :
+            inv_cloglog(X_agd_arm * beta_tilde);
         }
 
         for (i in 1:ni_agd_arm) {
@@ -87,6 +100,13 @@ transformed parameters {
             else
               theta_agd_arm_bar[i] = Phi(eta_agd_arm_noRE[i]);
           }
+        } else if (link == 3) { // cloglog link
+          for (i in 1:ni_agd_arm) {
+            if (which_RE[narm_ipd + i])
+              theta_agd_arm_bar[i] = inv_cloglog(eta_agd_arm_noRE[i] + f_delta[which_RE[narm_ipd + i]]);
+            else
+              theta_agd_arm_bar[i] = inv_cloglog(eta_agd_arm_noRE[i]);
+          }
         }
       } else {
         if (link == 1) // logit link
@@ -97,6 +117,10 @@ transformed parameters {
           theta_agd_arm_bar = has_offset ?
             Phi(X_agd_arm * beta_tilde + offset_agd_arm) :
             Phi(X_agd_arm * beta_tilde);
+        else if (link == 3) // cloglog link
+          theta_agd_arm_bar = has_offset ?
+            inv_cloglog(X_agd_arm * beta_tilde + offset_agd_arm) :
+            inv_cloglog(X_agd_arm * beta_tilde);
       }
     }
   }

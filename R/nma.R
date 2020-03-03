@@ -708,7 +708,7 @@ nma.fit <- function(ipd_x, ipd_y,
       agd_arm_n = if (has_agd_arm) agd_arm_y$.n else integer(),
 
       # Specify link
-      link = switch(link, logit = 1, probit = 2)
+      link = switch(link, logit = 1, probit = 2, cloglog = 3)
     )
 
     stanargs <- purrr::list_modify(stanargs,
@@ -726,7 +726,7 @@ nma.fit <- function(ipd_x, ipd_y,
       agd_arm_n = if (has_agd_arm) agd_arm_y$.n else integer(),
 
       # Specify link
-      link = switch(link, logit = 1, probit = 2)
+      link = switch(link, logit = 1, probit = 2, cloglog = 3)
     )
 
     stanargs <- purrr::list_modify(stanargs,
@@ -929,10 +929,10 @@ check_likelihood <- function(x, outcome) {
 #' @noRd
 check_link <- function(x, lik) {
   valid_link <- list(normal = c("identity", "log"),
-                     bernoulli = c("logit", "probit"),
-                     bernoulli2 = c("logit", "probit"),
-                     binomial = c("logit", "probit"),
-                     binomial2 = c("logit", "probit"),
+                     bernoulli = c("logit", "probit", "cloglog"),
+                     bernoulli2 = c("logit", "probit", "cloglog"),
+                     binomial = c("logit", "probit", "cloglog"),
+                     binomial2 = c("logit", "probit", "cloglog"),
                      poisson = "log")[[lik]]
 
   if (is.null(x)) {
@@ -953,7 +953,7 @@ check_link <- function(x, lik) {
 #' @param ... Other parameters passed to link function
 #'
 #' @noRd
-inverse_link <- function(x, link = c("identity", "log", "logit", "probit"), ...) {
+inverse_link <- function(x, link = c("identity", "log", "logit", "probit", "cloglog"), ...) {
   link <- rlang::arg_match(link)
 
   out <-
@@ -961,6 +961,7 @@ inverse_link <- function(x, link = c("identity", "log", "logit", "probit"), ...)
     else if (link == "log") exp(x)
     else if (link == "logit") plogis(x, ...)
     else if (link == "probit") pnorm(x, ...)
+    else if (link == "cloglog") 1 - exp(-exp(x))
 
   return(out)
 }
@@ -976,7 +977,7 @@ inverse_link <- function(x, link = c("identity", "log", "logit", "probit"), ...)
 #' @noRd
 get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
                                           "binomial", "binomial2", "poisson"),
-                           link = c("identity", "log", "logit", "probit"),
+                           link = c("identity", "log", "logit", "probit", "cloglog"),
                            measure = c("relative", "absolute"),
                            type = c("link", "response")) {
 
@@ -1023,17 +1024,25 @@ get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
         if (type == "link") out <- "Probit Probability"
         else out <- "Probability"
       }
+    } else if (link == "cloglog") {
+      if (measure == "relative") {
+        if (type == "link") out <- "log Hazard Ratio"
+        else out <- ""
+      } else if (measure == "absolute") {
+        if (type == "link") out <- "log Hazard"
+        else out <- "Hazard"
+      }
     }
 
   } else if (likelihood == "poisson") {
 
     if (link == "log") {
       if (measure == "relative") {
-        if (type == "link") out <- "log Rate Ratio"
+        if (type == "link") out <- "log Hazard Ratio"
         else out <- ""
       } else if (measure == "absolute") {
-        if (type == "link") out <- "log Rate"
-        else out <- "Rate"
+        if (type == "link") out <- "log Hazard"
+        else out <- "Hazard"
       }
     }
 
