@@ -14,6 +14,9 @@ is given.
   - Enables production of study-specific relative effects, rank probabilities,
     etc. for studies in the network when a regression model is given
   - Allows nodes in network plots to be weighted by sample size
+* Feature: Plots of residual deviance contributions for a model and "dev-dev"
+plots comparing residual deviance contributions between two models, using a
+`plot()` method for `nma_dic` objects produced by `dic()`.
 
 # multinma 0.0.1
 
