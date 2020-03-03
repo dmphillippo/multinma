@@ -227,6 +227,8 @@ nma <- function(network,
              rep(N_agd_contrast / n_int, each = n_int))
 
     reg_names <- colnames(model.frame(regression, data = idat_all))
+    # Ignore offset variables
+    reg_names <- reg_names[!stringr::str_match(reg_names, "^offset\\(.*\\)$")]
 
     reg_numeric <- purrr::map_lgl(idat_all[, reg_names], is.numeric)
 
@@ -256,6 +258,10 @@ nma <- function(network,
   X_ipd <- X_list$X_ipd
   X_agd_arm <- X_list$X_agd_arm
   X_agd_contrast <- X_list$X_agd_contrast
+
+  offset_ipd <- X_list$offset_ipd
+  offset_agd_arm <- X_list$offset_agd_arm
+  offset_agd_contrast <- X_list$offset_agd_contrast
 
   # Construct RE correlation matrix
   if (trt_effects == "random") {
@@ -292,6 +298,9 @@ nma <- function(network,
     agd_contrast_x = X_agd_contrast, agd_contrast_y = y_agd_contrast,
     agd_contrast_Sigma = Sigma_agd_contrast,
     n_int = n_int,
+    ipd_offset = offset_ipd,
+    agd_arm_offset = offset_agd_arm,
+    agd_contrast_offset = offset_agd_contrast,
     trt_effects = trt_effects,
     RE_cor = .RE_cor,
     which_RE = .which_RE,
