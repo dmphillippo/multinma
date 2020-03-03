@@ -29,9 +29,9 @@ matrix[nint * ni_agd_contrast, nX] X_agd_contrast = ni_agd_contrast ? X[(ni_ipd 
 
 // Split offsets into IPD and AgD rows
 vector[0] odummy;
-vector[ni_ipd] offset_ipd = has_offset && ni_ipd ? offset[1:ni_ipd] : odummy;
-vector[nint * ni_agd_arm] offset_agd_arm = has_offset && ni_agd_arm ? offset[(ni_ipd + 1):(ni_ipd + nint * ni_agd_arm)] : odummy;
-vector[nint * ni_agd_contrast] offset_agd_contrast = has_offset && ni_agd_contrast ? offset[(ni_ipd + nint * ni_agd_arm + 1):(ni_ipd + nint * (ni_agd_arm + ni_agd_contrast))] : odummy;
+vector[has_offset && ni_ipd ? ni_ipd : 0] offset_ipd = has_offset && ni_ipd ? offset[1:ni_ipd] : odummy;
+vector[has_offset && ni_agd_arm ? nint * ni_agd_arm : 0] offset_agd_arm = has_offset && ni_agd_arm ? offset[(ni_ipd + 1):(ni_ipd + nint * ni_agd_arm)] : odummy;
+vector[has_offset && ni_agd_contrast ? nint * ni_agd_contrast : 0] offset_agd_contrast = has_offset && ni_agd_contrast ? offset[(ni_ipd + nint * ni_agd_arm + 1):(ni_ipd + nint * (ni_agd_arm + ni_agd_contrast))] : odummy;
 
 // nint/int_thin for numerical integration checks
 int n_int_thin = nint / int_thin;
