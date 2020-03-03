@@ -368,8 +368,7 @@ predict.stan_nma <- function(object,
     # Produce nma_summary
     if (summary) {
       pred_summary <- summary_mcmc_array(pred_array, probs)
-      if (is.null(baseline))
-        pred_summary <- tibble::add_column(pred_summary, .study = preddat$.study, .before = 1)
+      pred_summary <- tibble::add_column(pred_summary, .study = preddat$.study, .before = 1)
       out <- list(summary = pred_summary, sims = pred_array)
     } else {
       out <- list(sims = pred_array)
