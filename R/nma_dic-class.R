@@ -139,7 +139,8 @@ plot.nma_dic <- function(x, y, ...,
 
       resdev_post <- dplyr::rename(resdev_post, resdev_x = .data$resdev)
 
-      xy_resdev_post <- dplyr::left_join(resdev_post, y_resdev_post, by = c("parameter", ".label"))
+      xy_resdev_post <- dplyr::left_join(resdev_post, y_resdev_post,
+                                         by = c("parameter", ".label", "Type"))
     } else {
 
       if (!rlang::is_string(stat))
@@ -196,15 +197,27 @@ plot.nma_dic <- function(x, y, ...,
 
     }
 
-    ulim <- max(xy_resdev_post$x_upper, xy_resdev_post$y_upper)
+    if (show_uncertainty) {
+      ulim <- max(xy_resdev_post$x_upper, xy_resdev_post$y_upper)
 
-    p <- ggplot2::ggplot(xy_resdev_post,
-                         ggplot2::aes(y = .data$resdev_y,
-                                      x = .data$resdev_x,
-                                      xmin = .data$x_lower, xmax = .data$x_upper,
-                                      ymin = .data$y_lower, ymax = .data$y_upper,
-                                      colour = .data$Type,
-                                      label = .data$.label)) +
+      p <- ggplot2::ggplot(xy_resdev_post,
+                           ggplot2::aes(y = .data$resdev_y,
+                                        x = .data$resdev_x,
+                                        xmin = .data$x_lower, xmax = .data$x_upper,
+                                        ymin = .data$y_lower, ymax = .data$y_upper,
+                                        colour = .data$Type,
+                                        label = .data$.label))
+    } else {
+      ulim <- max(xy_resdev_post$resdev_x, xy_resdev_post$resdev_y)
+
+      p <- ggplot2::ggplot(xy_resdev_post,
+                           ggplot2::aes(y = .data$resdev_y,
+                                        x = .data$resdev_x,
+                                        colour = .data$Type,
+                                        label = .data$.label))
+    }
+
+    p <- p +
       ggplot2::labs(x = "Residual Deviance (model 1)",
                     y = "Residual Deviance (model 2)") +
       ggplot2::coord_fixed(xlim = c(0, ulim), ylim = c(0, ulim)) +
