@@ -441,11 +441,11 @@ nma.fit <- function(ipd_x, ipd_y,
            has_agd_contrast_offset[has_agd_contrast]))
     abort("Offsets provided for some data sources but not all.")
 
-  if (has_ipd_offset && (!is.numeric(ipd_offset) || length(ipd_offset != nrow(ipd_x))))
+  if (has_ipd_offset && (!is.numeric(ipd_offset) || length(ipd_offset) != nrow(ipd_x)))
     abort("`ipd_offset` should be a numeric vector with length matching `ipd_x`, `ipd_y`")
-  if (has_agd_arm_offset && (!is.numeric(agd_arm_offset) || length(agd_arm_offset != nrow(agd_arm_x))))
+  if (has_agd_arm_offset && (!is.numeric(agd_arm_offset) || length(agd_arm_offset) != nrow(agd_arm_x)))
     abort("`agd_arm_offset` should be a numeric vector with length matching `agd_arm_x`, `agd_arm_y`")
-  if (has_agd_contrast_offset && (!is.numeric(agd_contrast_offset) || length(agd_contrast_offset != nrow(agd_contrast_x))))
+  if (has_agd_contrast_offset && (!is.numeric(agd_contrast_offset) || length(agd_contrast_offset) != nrow(agd_contrast_x)))
     abort("`agd_contrast_offset` should be a numeric vector with length matching `agd_contrast_x`, `agd_contrast_y`")
 
   # Check matching X column names and dimensions if more than one present
