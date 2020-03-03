@@ -256,7 +256,6 @@ nma <- function(network,
   X_ipd <- X_list$X_ipd
   X_agd_arm <- X_list$X_agd_arm
   X_agd_contrast <- X_list$X_agd_contrast
-  X_all <- do.call(rbind, X_list)
 
   # Construct RE correlation matrix
   if (trt_effects == "random") {
@@ -492,7 +491,6 @@ nma.fit <- function(ipd_x, ipd_y,
   col_trt <- grepl("^(\\.trt|\\.contr)[^:]+$", x_names)
   col_reg <- !col_study & !col_trt
 
-  n_study <- sum(col_study)
   n_trt <- sum(col_trt) + 1
 
   get_study <- function(x) which(x == 1)
