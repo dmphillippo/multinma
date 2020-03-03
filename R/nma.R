@@ -1121,7 +1121,8 @@ make_nma_formula <- function(regression,
 #' @param classes Classes present? TRUE / FALSE
 #' @param class_interactions Class interaction specification (character string)
 #'
-#' @return A named list of three matrices: X_ipd, X_agd_arm, X_agd_contrast
+#' @return A named list of three matrices: X_ipd, X_agd_arm, X_agd_contrast; and
+#'   three vectors of offsets: offset_ipd, offset_agd_arm, offset_agd_contrast.
 #' @noRd
 make_nma_model_matrix <- function(nma_formula,
                                   dat_ipd = tibble::tibble(),
@@ -1279,6 +1280,8 @@ make_nma_model_matrix <- function(nma_formula,
 
   # Apply NMA formula to get design matrix
   X_all <- model.matrix(nma_formula, data = dat_all)
+  offsets <- model.offset(model.frame(nma_formula, data = dat_all))
+  has_offset <- !is.null(offsets)
 
   if (!is.null(single_study_label)) {
     # Restore single study label and .study column
@@ -1309,18 +1312,26 @@ make_nma_model_matrix <- function(nma_formula,
 
   if (.has_ipd) {
     X_ipd <- X_all[1:nrow(dat_ipd), , drop = FALSE]
+    offset_ipd <- if (has_offset) offsets[1:nrow(dat_ipd)] else NULL
   } else {
-    X_ipd <- NULL
+    X_ipd <- offset_ipd <- NULL
   }
 
   if (.has_agd_arm) {
     X_agd_arm <- X_all[nrow(dat_ipd) + 1:nrow(dat_agd_arm), , drop = FALSE]
+    offset_agd_arm <- if (has_offset) offsets[nrow(dat_ipd) + 1:nrow(dat_agd_arm)] else NULL
   } else {
-    X_agd_arm <- NULL
+    X_agd_arm <- offset_agd_arm <- NULL
   }
 
   if (.has_agd_contrast) {
     X_agd_contrast <- X_all[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast_nonbl), , drop = FALSE]
+    offset_agd_contrast <-
+      if (has_offset) {
+        offsets[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast_nonbl)]
+      } else {
+        NULL
+      }
 
     # Fix up single study case
     if (!is.null(single_study_label)) {
@@ -1330,6 +1341,7 @@ make_nma_model_matrix <- function(nma_formula,
 
     # Difference out the baseline arms
     X_bl <- model.matrix(nma_formula, data = dat_agd_contrast_bl)
+    if (has_offset) offset_bl <- model.offset(model.frame(nma_formula, data = dat_agd_contrast_bl))
 
     if (!is.null(single_study_label)) {
       # Restore single study label and .study column
@@ -1362,6 +1374,7 @@ make_nma_model_matrix <- function(nma_formula,
                         FUN.VALUE = numeric(1))
 
     X_agd_contrast <- X_agd_contrast - X_bl[bl_lookup, , drop = FALSE]
+    if (has_offset) offset_agd_contrast <- offset_agd_contrast - offset_bl[bl_lookup]
 
     # Remove columns for study baselines corresponding to contrast-based studies - not used
     s_contr <- unique(dat_agd_contrast$.study)
@@ -1372,12 +1385,15 @@ make_nma_model_matrix <- function(nma_formula,
     if (.has_ipd) X_ipd <- X_ipd[, !bl_cols, drop = FALSE]
     if (.has_agd_arm) X_agd_arm <- X_agd_arm[, !bl_cols, drop = FALSE]
   } else {
-    X_agd_contrast <- NULL
+    X_agd_contrast <- offset_agd_contrast <- NULL
   }
 
   return(list(X_ipd = X_ipd,
               X_agd_arm = X_agd_arm,
-              X_agd_contrast = X_agd_contrast))
+              X_agd_contrast = X_agd_contrast,
+              offset_ipd = offset_ipd,
+              offset_agd_arm = offset_agd_arm,
+              offset_agd_contrast = offset_agd_contrast))
 }
 
 #' Check data for regression
