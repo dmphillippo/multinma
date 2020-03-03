@@ -255,11 +255,10 @@ predict.stan_nma <- function(object,
       X_all <- X_list$X_ipd
       rownames(X_all) <- paste0("pred[", preddat$.study, ": ", preddat$.trt, "]")
 
+      offset_all <- X_list$offset_ipd
+
       # Get posterior samples
       post <- as.array(object, pars = c("mu", "d", "beta"))
-
-      # Get prediction array
-      pred_array <- tcrossprod_mcmc_array(post, X_all)
 
     # With baseline and newdata specified
     } else {
@@ -310,6 +309,8 @@ predict.stan_nma <- function(object,
       X_all <- X_list$X_ipd
       rownames(X_all) <- paste0("pred[", preddat$.study, ": ", preddat$.trt, "]")
 
+      offset_all <- X_list$offset_ipd
+
       # Get posterior samples
       d <- as.array(object, pars = "d")
       beta <- as.array(object, pars = "beta")
@@ -329,10 +330,13 @@ predict.stan_nma <- function(object,
       post[ , , 1 + 1:dim_d[3]] <- d
       post[ , , 1 + dim_d[3] + 1:dim_beta[3]] <- beta
 
-      # Get prediction array
-      pred_array <- tcrossprod_mcmc_array(post, X_all)
-
     }
+
+    # Get prediction array
+    pred_array <- tcrossprod_mcmc_array(post, X_all)
+
+    if (!is.null(offset_all))
+      pred_array <- sweep(pred_array, 3, offset_all, FUN = "+")
 
     # Transform predictions if type = "response"
     if (type == "response") {
