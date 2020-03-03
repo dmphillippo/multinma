@@ -228,7 +228,7 @@ nma <- function(network,
 
     reg_names <- colnames(model.frame(regression, data = idat_all))
     # Ignore offset variables
-    reg_names <- reg_names[!stringr::str_match(reg_names, "^offset\\(.*\\)$")]
+    reg_names <- reg_names[!stringr::str_detect(reg_names, "^offset\\(.*\\)$")]
 
     reg_numeric <- purrr::map_lgl(idat_all[, reg_names], is.numeric)
 
