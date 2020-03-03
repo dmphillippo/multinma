@@ -342,9 +342,7 @@ nma <- function(network,
 #' @param RE_cor Random effects correlation matrix, when `trt_effects = "random"`
 #' @param which_RE Random effects design vector, when `trt_effects = "random"`
 #'
-#' @export
-#'
-#' @rdname nma
+#' @noRd
 nma.fit <- function(ipd_x, ipd_y,
                     agd_arm_x, agd_arm_y,
                     agd_contrast_x, agd_contrast_y, agd_contrast_Sigma,
