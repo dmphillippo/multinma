@@ -1033,8 +1033,8 @@ get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
         if (type == "link") out <- "log Hazard Ratio"
         else out <- ""
       } else if (measure == "absolute") {
-        if (type == "link") out <- "log Hazard"
-        else out <- "Hazard"
+        if (type == "link") out <- "cloglog Probability"
+        else out <- "Probability"
       }
     }
 
