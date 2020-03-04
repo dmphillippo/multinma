@@ -17,6 +17,8 @@ is given.
 * Feature: Plots of residual deviance contributions for a model and "dev-dev"
 plots comparing residual deviance contributions between two models, using a
 `plot()` method for `nma_dic` objects produced by `dic()`.
+* Feature: Complementary log-log (cloglog) link function `link = "cloglog"` for
+binomial likelihoods.
 
 # multinma 0.0.1
 
