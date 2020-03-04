@@ -1,6 +1,9 @@
 library(multinma)
 library(dplyr)
 
+# Expose internal nma.fit()
+nma.fit <- multinma:::nma.fit
+
 test_that("nma() wants a nma_data object", {
   m <- "Expecting an `nma_data` object"
   expect_error(nma(network = 1), m)
