@@ -1520,7 +1520,7 @@ prior_standat <- function(x, par, valid){
 #' @noRd
 make_Sigma <- function(x) {
   return(by(x,
-            forcats::fct_drop(x$.study),
+            forcats::fct_inorder(forcats::fct_drop(x$.study)),
             FUN = make_Sigma_block,
             simplify = FALSE))
 }
