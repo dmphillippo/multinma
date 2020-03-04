@@ -96,3 +96,26 @@
 #'
 
 "thrombolytics"
+
+#' Incidence of diabetes in trials of antihypertensive drugs
+#'
+#' Data frame containing the number of new cases of diabetes in 22 trials of 6
+#' antihypertensive drugs \insertCite{Elliott2007,TSD2}{multinma}. The trial
+#' duration (in years) is also recorded.
+#'
+#' @format A data frame with 48 rows and 7 variables:
+#' \describe{
+#'   \item{studyn}{numeric study ID}
+#'   \item{studyc}{study name}
+#'   \item{trtn}{numeric treatment code}
+#'   \item{trtc}{treatment name}
+#'   \item{r}{total number of events}
+#'   \item{n}{total number of individuals}
+#'   \item{time}{trial follow-up (years)}
+#' }
+#'
+#' @references
+#'   \insertAllCited{}
+#'
+
+"diabetes"
