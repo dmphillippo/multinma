@@ -233,7 +233,11 @@ nma <- function(network,
     reg_numeric <- purrr::map_lgl(idat_all[, reg_names], is.numeric)
 
     # Take weighted mean of all rows (including baseline rows for contrast data)
-    xbar <- purrr::map_dbl(idat_all_plus_bl[, reg_names[reg_numeric]], weighted.mean, w = wts)
+    if (any(reg_numeric)) {
+      xbar <- purrr::map_dbl(idat_all_plus_bl[, reg_names[reg_numeric]], weighted.mean, w = wts)
+    } else {
+      xbar <- NULL
+    }
 
   } else {
     xbar <- NULL
