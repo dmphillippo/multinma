@@ -61,9 +61,6 @@ dic <- function(x, ...) {
     nr_agd_contrast <- nf_agd_contrast <- 0
   }
 
-  # Apply formatted dimnames to resdev_array
-  dimnames(resdev_array) <- dn_resdev_array
-
 
   if (x$likelihood %in% c("bernoulli", "bernoulli2", "binomial", "binomial2")) {
     if (has_ipd(net)) {
@@ -147,12 +144,15 @@ dic <- function(x, ...) {
     agd_contrast_resdev_dat <-
       net$agd_contrast %>%
         dplyr::filter(!is.na(.data$.y)) %>%
-        dplyr::mutate(.fitted = fitted_agd_contrast) %>%
-        dplyr::group_by(.data$.study) %>%
+        dplyr::mutate(.fitted = fitted_agd_contrast,
+                      .study_inorder = forcats::fct_inorder(.data$.study)) %>%
+        dplyr::group_by(.data$.study_inorder, .data$.study) %>%
         dplyr::summarise(.y = list(.data$.y),
                          fitted = list(.data$.fitted),
                          n_contrast = dplyr::n()) %>%
-        dplyr::mutate(Sigma = Sigma, resdev = resdev_agd_contrast) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(Sigma = Sigma,
+                      resdev = resdev_agd_contrast) %>%
         dplyr::rowwise() %>%
         dplyr::mutate(resdevfit = tcrossprod(crossprod(.data$.y - .data$fitted,
                                                        solve(.data$Sigma)),
@@ -161,9 +161,8 @@ dic <- function(x, ...) {
 
     leverage_agd_contrast <- agd_contrast_resdev_dat$leverage
 
-    dn_resdev_array[[3]][n_ipd + n_agd_arm + (1:nf_agd_contrast)] <-
-      paste0(agd_contrast_resdev_dat$.study, " (",
-             agd_contrast_resdev_dat$n_contrast + 1, " arms)")
+    dn_resdev_array[[3]][n_ipd + n_agd_arm + (1:nr_agd_contrast)] <-
+      paste0("resdev[", agd_contrast_resdev_dat$.study, "]")
 
   } else {
     leverage_agd_contrast <- NULL
@@ -208,6 +207,9 @@ dic <- function(x, ...) {
   totresdev <- sum(resdev)
   pd <- sum(leverage_ipd, leverage_agd_arm, leverage_agd_contrast)
   dic <- totresdev + pd
+
+  # Apply formatted dimnames to resdev_array
+  dimnames(resdev_array) <- dn_resdev_array
 
   # Return nma_dic object
   out <- list(dic = dic, pd = pd, resdev = totresdev, pointwise = pw, resdev_array = resdev_array)
