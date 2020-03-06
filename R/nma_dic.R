@@ -154,9 +154,9 @@ dic <- function(x, ...) {
         dplyr::mutate(Sigma = Sigma,
                       resdev = resdev_agd_contrast) %>%
         dplyr::rowwise() %>%
-        dplyr::mutate(resdevfit = tcrossprod(crossprod(.data$.y - .data$fitted,
-                                                       solve(.data$Sigma)),
-                                             .data$.y - .data$fitted),
+        dplyr::mutate(resdevfit = crossprod(.data$.y - .data$fitted,
+                                            solve(.data$Sigma,
+                                                  .data$.y - .data$fitted)),
                       leverage = .data$resdev - .data$resdevfit)
 
     leverage_agd_contrast <- agd_contrast_resdev_dat$leverage
