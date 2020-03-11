@@ -25,7 +25,11 @@
 #' @param prior_intercept Specification of prior distribution for the intercept
 #' @param prior_trt Specification of prior distribution for the treatment effects
 #' @param prior_het Specification of prior distribution for the heterogeneity
-#'   standard deviation (if `trt_effects = "random"`)
+#'   (if `trt_effects = "random"`)
+#' @param prior_het_type Character string specifying whether the prior
+#'   distribution `prior_het` is placed on the heterogeneity standard deviation
+#'   \eqn{\tau} (`"sd"`, the default), variance \eqn{\tau^2} (`"var"`), or
+#'   precision \eqn{1/\tau^2} (`"prec"`).
 #' @param prior_reg Specification of prior distribution for the regression
 #'   coefficients (if `regression` formula specified)
 #' @param prior_aux Specification of prior distribution for the auxilliary
@@ -67,6 +71,7 @@ nma <- function(network,
                 prior_intercept = normal(scale = 10),
                 prior_trt = normal(scale = 10),
                 prior_het = half_normal(scale = 5),
+                prior_het_type = c("sd", "var", "prec"),
                 prior_reg = normal(scale = 10),
                 prior_aux = normal(scale = 5),
                 QR = FALSE,
@@ -109,6 +114,8 @@ nma <- function(network,
   if (!inherits(prior_het, "nma_prior")) abort("`prior_het` should be a prior distribution, see ?priors.")
   if (!inherits(prior_reg, "nma_prior")) abort("`prior_reg` should be a prior distribution, see ?priors.")
   if (!inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
+
+  prior_het_type <- rlang::arg_match(prior_het_type)
 
   # Check other args
   if (!is.logical(QR) || length(QR) > 1) abort("`QR` should be a logical scalar (TRUE or FALSE).")
@@ -314,6 +321,7 @@ nma <- function(network,
     prior_intercept = prior_intercept,
     prior_trt = prior_trt,
     prior_het = prior_het,
+    prior_het_type = prior_het_type,
     prior_reg = prior_reg,
     prior_aux = prior_aux,
     QR = QR,
@@ -333,6 +341,7 @@ nma <- function(network,
               priors = list(prior_intercept = prior_intercept,
                             prior_trt = prior_trt,
                             prior_het = prior_het,
+                            prior_het_type = prior_het_type,
                             prior_reg = prior_reg,
                             prior_aux = prior_aux))
 
@@ -372,6 +381,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_intercept = normal(scale = 10),
                     prior_trt = normal(scale = 10),
                     prior_het = half_normal(scale = 5),
+                    prior_het_type = c("sd", "var", "prec"),
                     prior_reg = normal(scale = 10),
                     prior_aux = normal(scale = 5),
                     QR = FALSE,
@@ -473,6 +483,8 @@ nma.fit <- function(ipd_x, ipd_y,
   if (!inherits(prior_het, "nma_prior")) abort("`prior_het` should be a prior distribution, see ?priors.")
   if (!inherits(prior_reg, "nma_prior")) abort("`prior_reg` should be a prior distribution, see ?priors.")
   if (!inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
+
+  prior_het_type <- rlang::arg_match(prior_het_type)
 
   # Check other args
   if (!is.logical(QR) || length(QR) > 1) abort("`QR` should be a logical scalar (TRUE or FALSE).")
@@ -652,7 +664,10 @@ nma.fit <- function(ipd_x, ipd_y,
     !!! prior_standat(prior_het, "prior_het",
                       valid = c("Normal", "half-Normal",
                                 "Cauchy",  "half-Cauchy",
-                                "Student t", "half-Student t"))
+                                "Student t", "half-Student t",
+                                "Exponential")),
+    prior_het_type = switch(prior_het_type,
+                            sd = 1, var = 2, prec = 3)
     )
 
   # Standard pars to monitor
