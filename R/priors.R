@@ -33,6 +33,15 @@ half_normal <- function(scale) {
 
 #' @rdname priors
 #' @export
+log_normal <- function(location, scale) {
+  check_prior_location(location)
+  check_prior_scale(scale)
+
+  return(new_nma_prior("log-Normal", location = location, scale = scale))
+}
+
+#' @rdname priors
+#' @export
 cauchy <- function(location = 0, scale) {
   check_prior_location(location, type = "location (median)")
   check_prior_scale(scale, type = "scale")
