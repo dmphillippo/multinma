@@ -2,8 +2,8 @@
 #'
 #' These functions are used to specify prior distributions for the model parameters.
 #'
-#' @param location Prior location. Typically prior mean, except for Cauchy which is prior median.
-#' @param scale Prior scale. Typically prior standard deviation.
+#' @param location Prior location. Typically prior mean (see details).
+#' @param scale Prior scale. Typically prior standard deviation (see details).
 #' @param df Prior degrees of freedom.
 #' @param rate Prior rate.
 # #' @param lower,upper Lower and upper bounds for a uniform prior distribution.
@@ -11,6 +11,28 @@
 #' @rdname priors
 #' @name priors
 #' @aliases priors normal
+#'
+#' @details The `location` and `scale` parameters are typically the prior mean
+#'   and standard deviation, with the following exceptions:
+#'   \itemize{
+#'   \item For the Cauchy distribution `location` is the prior median and
+#'   `scale` is the prior scale.
+#'   \item For the log-Normal distribution, `location` and `scale` are the prior
+#'   mean and standard deviation of the logarithm.
+#'   }
+#'
+#' @section Compatibility with model parameters:
+#'
+#' | \strong{Distribution} | \strong{Intercept} `prior_intercept` | \strong{Treatment effects} `prior_trt` | \strong{Heterogeneity} `prior_het` | \strong{Regression coefficients} `prior_reg` | \strong{Auxilliary parameter} `prior_aux` |
+#' | ----- | :---: | :---: | :---: | :---: | :---: |
+#' | \strong{Normal} `normal()` | Yes | Yes | Yes | Yes | Yes |
+#' | \strong{half-Normal} `half_normal()` | No | No | Yes | No | Yes |
+#' | \strong{log-Normal} `log_normal()` | No | No | Yes | No | Yes |
+#' | \strong{Cauchy }`cauchy()` | Yes | Yes | Yes | Yes | Yes |
+#' | \strong{half-Cauchy} `half_cauchy()` | No | No | Yes | No | Yes |
+#' | \strong{Student t} `student_t()` | Yes | Yes | Yes | Yes | Yes |
+#' | \strong{half-Student t} `half_student_t()` | No | No | Yes | No | Yes |
+#' | \strong{Exponential} `exponential()` | Yes | Yes | Yes | Yes | Yes |
 #'
 #' @return Object of class [nma_prior].
 #' @export
