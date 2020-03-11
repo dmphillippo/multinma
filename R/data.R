@@ -119,3 +119,26 @@
 #'
 
 "diabetes"
+
+#' Granulocyte transfusion in patients with neutropenia or neutrophil
+#' dysfunction
+#'
+#' Data frame containing the number of deaths in 6 trials comparing transfusion
+#' of granulocytes (white blood cells) to control
+#' \insertCite{Stanworth2005}{multinma}. Previously used to demonstrate
+#' informative prior distributions for the heterogeneity variance by
+#' \insertCite{Turner2012;textual}{multinma}.
+#'
+#' @format A data frame with 12 rows and 4 variables:
+#' \describe{
+#'   \item{studyc}{study name}
+#'   \item{trtc}{treatment name}
+#'   \item{r}{total number of deaths}
+#'   \item{n}{total number of individuals}
+#' }
+#'
+#' @references
+#'   \insertAllCited{}
+#'
+
+"transfusion"
