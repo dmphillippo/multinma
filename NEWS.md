@@ -19,6 +19,8 @@ plots comparing residual deviance contributions between two models, using a
 `plot()` method for `nma_dic` objects produced by `dic()`.
 * Feature: Complementary log-log (cloglog) link function `link = "cloglog"` for
 binomial likelihoods.
+* Feature: Option to specify priors for heterogeneity on the standard deviation,
+variance, or precision, with argument `prior_het_type`.
 
 # multinma 0.0.1
 
