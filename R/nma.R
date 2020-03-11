@@ -662,7 +662,7 @@ nma.fit <- function(ipd_x, ipd_y,
     !!! prior_standat(prior_reg, "prior_reg",
                       valid = c("Normal", "Cauchy", "Student t")),
     !!! prior_standat(prior_het, "prior_het",
-                      valid = c("Normal", "half-Normal",
+                      valid = c("Normal", "half-Normal", "log-Normal",
                                 "Cauchy",  "half-Cauchy",
                                 "Student t", "half-Student t",
                                 "Exponential")),
@@ -704,9 +704,10 @@ nma.fit <- function(ipd_x, ipd_y,
 
       # Add prior for auxilliary parameter - individual-level variance
       !!! prior_standat(prior_het, "prior_aux",
-                        valid = c("Normal", "half-Normal",
+                        valid = c("Normal", "half-Normal", "log-Normal",
                                   "Cauchy",  "half-Cauchy",
-                                  "Student t", "half-Student t")),
+                                  "Student t", "half-Student t",
+                                  "Exponential")),
 
       # Specify link
       link = switch(link, identity = 1, log = 2)
@@ -1517,7 +1518,8 @@ prior_standat <- function(x, par, valid){
                   Normal = , `half-Normal` = 1,
                   Cauchy = , `half-Cauchy` = 2,
                   `Student t` = , `half-Student t` = 3,
-                  Exponential = 4)
+                  Exponential = 4,
+                  `log-Normal` = 5)
 
   out <- purrr::list_modify(c(x), dist = distn)
   # Set unnecessary (NA) parameters to zero. These will be ignored by Stan, but
