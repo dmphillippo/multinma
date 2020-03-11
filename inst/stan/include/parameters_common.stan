@@ -4,4 +4,4 @@ vector[nX] beta_tilde;
 
 // (Uncorrelated) random effects and heterogeneity SD
 vector[n_delta] u_delta;
-real<lower = 0> tau[n_delta ? 1 : 0];
+vector<lower = 0>[RE ? 1 : 0] tau;
