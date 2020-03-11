@@ -21,18 +21,24 @@
 #'   mean and standard deviation of the logarithm.
 #'   }
 #'
-#' @section Compatibility with model parameters:
+#' ## Compatibility with model parameters
+#' The following table summarises which prior distributions may be used with
+#' which model parameters. Essentially, priors that take only non-negative
+#' values (e.g. half-Normal) may only be used for non-negative parameters
+#' (heterogeneity SD/variance/precision, and any auxilliary parameter). If a
+#' real-valued prior distribution is specified for a non-negative parameter, it
+#' will be truncated at 0 to be non-negative.
 #'
-#' | \strong{Distribution} | \strong{Intercept} `prior_intercept` | \strong{Treatment effects} `prior_trt` | \strong{Heterogeneity} `prior_het` | \strong{Regression coefficients} `prior_reg` | \strong{Auxilliary parameter} `prior_aux` |
+#' |       | \strong{Intercept} `prior_intercept` | \strong{Treatment effects} `prior_trt` | \strong{Heterogeneity} `prior_het` | \strong{Regression coefficients} `prior_reg` | \strong{Auxilliary parameter} `prior_aux` |
 #' | ----- | :---: | :---: | :---: | :---: | :---: |
 #' | \strong{Normal} `normal()` | Yes | Yes | Yes | Yes | Yes |
-#' | \strong{half-Normal} `half_normal()` | No | No | Yes | No | Yes |
-#' | \strong{log-Normal} `log_normal()` | No | No | Yes | No | Yes |
+#' | \strong{half-Normal} `half_normal()` | - | - | Yes | - | Yes |
+#' | \strong{log-Normal} `log_normal()` | - | - | Yes | - | Yes |
 #' | \strong{Cauchy }`cauchy()` | Yes | Yes | Yes | Yes | Yes |
-#' | \strong{half-Cauchy} `half_cauchy()` | No | No | Yes | No | Yes |
+#' | \strong{half-Cauchy} `half_cauchy()` | - | - | Yes | - | Yes |
 #' | \strong{Student t} `student_t()` | Yes | Yes | Yes | Yes | Yes |
-#' | \strong{half-Student t} `half_student_t()` | No | No | Yes | No | Yes |
-#' | \strong{Exponential} `exponential()` | Yes | Yes | Yes | Yes | Yes |
+#' | \strong{half-Student t} `half_student_t()` | - | - | Yes | - | Yes |
+#' | \strong{Exponential} `exponential()` | - | - | Yes | - | Yes |
 #'
 #' @return Object of class [nma_prior].
 #' @export
