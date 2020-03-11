@@ -59,7 +59,7 @@ real<lower=0> prior_trt_df;
 
 int<lower=1,upper=5> prior_het_dist;
 int<lower=1,upper=3> prior_het_type;
-real<lower=0> prior_het_location;
+real prior_het_location;
 real<lower=0> prior_het_scale;
 real<lower=0> prior_het_df;
 
