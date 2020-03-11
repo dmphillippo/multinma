@@ -21,6 +21,7 @@ plots comparing residual deviance contributions between two models, using a
 binomial likelihoods.
 * Feature: Option to specify priors for heterogeneity on the standard deviation,
 variance, or precision, with argument `prior_het_type`.
+* Feature: Added log-Normal prior distribution.
 
 # multinma 0.0.1
 
