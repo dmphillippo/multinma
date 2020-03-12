@@ -138,6 +138,135 @@ plot.stan_nma <- function(x, ...,
   return(p)
 }
 
+plot_prior_posterior <- function(x, ...,
+                                 prior = NULL,
+                                 post_args = list(),
+                                 prior_args = list(),
+                                 overlay = c("prior", "posterior"),
+                                 ref_line = NA_real_) {
+
+  # Checks
+  if (!inherits(x, "stan_nma"))
+    abort("Not a `stan_nma` object.")
+
+  priors_used <-
+    c("intercept"[!is.null(x$priors$prior_intercept)],
+      "trt"[!is.null(x$priors$prior_trt)],
+      "het"[!is.null(x$priors$prior_het)],
+      "reg"[!is.null(x$priors$prior_reg)],
+      "aux"[!is.null(x$priors$prior_aux)])
+
+  if (is.null(prior)) {
+    prior <- priors_used
+  } else if (!rlang::is_character(prior) || !all(prior %in% priors_used)) {
+    abort(paste0("`prior` should be a character vector, with elements from ",
+                paste(priors_used, collapse = ", ")))
+  }
+
+  if (!is.list(post_args))
+    abort("`post_args` should be a list of arguments to pass to tidybayes::stat_sample_slabinterval")
+
+  if (!is.list(prior_args))
+    abort("`prior_args` should be a list of arguments to pass to tidybayes::stat_dist_slabinterval")
+
+  overlay <- rlang::arg_match(overlay)
+
+  if (!is.numeric(ref_line) || !is.null(dim(ref_line)))
+    abort("`ref_line` should be a numeric vector.")
+
+  # Get prior details
+  prior_dat <- vector("list", length(prior))
+  for (i in seq_along(prior)) {
+    if (prior[i] %in% c("het", "aux")) trunc <- c(0, Inf)
+    else trunc <- NULL
+    prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc) %>%
+      tibble::add_column(prior = prior[i])
+  }
+
+  prior_dat <- dplyr::bind_rows(prior_dat) %>%
+    dplyr::mutate(par_base = dplyr::recode(.data$prior,
+                                           intercept = "mu",
+                                           trt = "d",
+                                           het = "tau",
+                                           reg = "beta",
+                                           aux = "sigma"))
+
+
+  # Get parameter samples
+  pars <- unique(prior_dat$par_base)
+
+  draws <- tibble::as_tibble(as.matrix(x, pars = pars))
+
+  # Transform heterogeneity samples to prior scale (SD, variance, precision)
+  if ("het" %in% prior) {
+    if (x$priors$prior_het_type == "var") {
+      draws$tausq <- draws$tau^2
+      draws <- dplyr::select(draws, -.data$tau)
+      prior_dat$par_base <- dplyr::recode(prior_dat$par_base, tau = "tausq")
+    } else if (x$priors$prior_het_type == "prec") {
+      draws$prec <- draws$tau^-2
+      draws <- dplyr::select(draws, -.data$tau)
+      prior_dat$par_base <- dplyr::recode(prior_dat$par_base, tau = "prec")
+    }
+  }
+
+  if (packageVersion("tidyr") >= "1.0.0") {
+    draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
+                                 names_to = "parameter", values_to = "value")
+  } else {
+    draws <- tidyr::gather(key = "parameter",
+                           value = "value",
+                           dplyr::everything())
+  }
+
+  draws$par_base <- stringr::str_remove(draws$parameter, "\\[.*\\]")
+  draws$parameter <- forcats::fct_inorder(factor(draws$parameter))
+
+  # Join prior name into posterior
+  draws <- dplyr::left_join(draws, prior_dat[, c("par_base", "prior")], by = "par_base")
+
+  # Repeat rows of prior_dat for each corresponding parameter
+  prior_dat <- dplyr::left_join(prior_dat,
+                                dplyr::distinct(draws, .data$par_base, .data$parameter),
+                                by = "par_base")
+
+  # Construct plot
+
+  xlim <- c(min(draws$value), max(draws$value))
+
+  p <- ggplot2::ggplot() +
+    ggplot2::geom_vline(xintercept = ref_line, na.rm = TRUE, colour = "grey60") +
+    ggplot2::coord_cartesian(xlim = xlim)
+
+  g_prior <- rlang::call2(tidybayes::stat_dist_slabinterval,
+                          !!! rlang::dots_list(mapping = ggplot2::aes(y = .data$parameter, dist = .data$dist, args = .data$args),
+                                               data = prior_dat,
+                                               orientation = "horizontal", show_interval = FALSE, normalize = "none",
+                                               slab_fill = NA, slab_colour = "black", slab_size = 0.5,
+                                               !!! prior_args,
+                                               .homonyms = "last"))
+
+  g_post <- rlang::call2(tidybayes::stat_sample_slabinterval,
+                         !!! rlang::dots_list(mapping = ggplot2::aes(y = .data$parameter, x = .data$value),
+                                              data = draws,
+                                              orientation = "horizontal", show_interval = FALSE, normalize = "none",
+                                              slab_type = "histogram",
+                                              !!! post_args,
+                                              .homonyms = "last"))
+
+  if (overlay == "prior") {
+    p <- p + eval(g_post) + eval(g_prior)
+  } else {
+    p <- p + eval(g_prior) + eval(g_post)
+  }
+
+  p <- p +
+    ggplot2::facet_grid(rows = "prior", scales = "free", space = "free") +
+    theme_multinma()
+
+  return(p)
+}
+
 #' as.stanfit
 #'
 #' Attempt to turn an object into a `\link[rstan:stanfit-class]{stanfit}` object.
