@@ -328,6 +328,9 @@ nma <- function(network,
     adapt_delta = adapt_delta,
     int_thin = int_thin)
 
+  # Was prior_aux used? Currently just for Normal IPD variance
+  has_aux <- "sigma" %in% stanfit@model_pars
+
   # Create stan_nma object
   out <- list(network = network,
               stanfit = stanfit,
@@ -340,10 +343,10 @@ nma <- function(network,
               link = link,
               priors = list(prior_intercept = prior_intercept,
                             prior_trt = prior_trt,
-                            prior_het = prior_het,
-                            prior_het_type = prior_het_type,
-                            prior_reg = prior_reg,
-                            prior_aux = prior_aux))
+                            prior_het = if (trt_effects == "random") prior_het else NULL,
+                            prior_het_type = if (trt_effects == "random") prior_het_type else NULL,
+                            prior_reg = if (!is.null(regression)) prior_reg else NULL,
+                            prior_aux = if (has_aux) prior_aux) else NULL)
 
   if (inherits(network, "mlnmr_data")) class(out) <- c("stan_mlnmr", "stan_nma")
   else class(out) <- "stan_nma"
