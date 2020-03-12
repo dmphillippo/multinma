@@ -14,7 +14,7 @@ transformed data {
 }
 parameters {
 #include /include/parameters_common.stan
-  real<lower=0> sigma[narm_ipd];
+  vector<lower=0>[narm_ipd] sigma;
 }
 transformed parameters {
 #include /include/transformed_parameters_common.stan
@@ -104,6 +104,9 @@ transformed parameters {
 }
 model {
 #include /include/model_common.stan
+
+  // -- Prior on arm-level variance --
+  prior_select_lp(sigma, prior_aux_dist, prior_aux_location, prior_aux_scale, prior_aux_df);
 
   // -- IPD likelihood --
   // Could replace identity link sampling statement with normal_id_glm in Stan > 2.20
