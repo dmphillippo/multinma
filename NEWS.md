@@ -22,6 +22,8 @@ binomial likelihoods.
 * Feature: Option to specify priors for heterogeneity on the standard deviation,
 variance, or precision, with argument `prior_het_type`.
 * Feature: Added log-Normal prior distribution.
+* Feature: Plots of prior distributions vs. posterior distributions with
+`plot_prior_posterior()`.
 
 # multinma 0.0.1
 
