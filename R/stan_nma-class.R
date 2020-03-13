@@ -225,32 +225,63 @@ plot_prior_posterior <- function(x, ...,
   # Join prior name into posterior
   draws <- dplyr::left_join(draws, prior_dat[, c("par_base", "prior")], by = "par_base")
 
+  # Calculate prior density lines
+  if (rlang::has_name(prior_args, "p_limits")) {
+    p_limits <- prior_args$p_limits
+    prior_args <- purrr::list_modify(prior_args, p_limits = purrr::zap())
+  } else {
+    p_limits <- c(0.001, 0.999)
+  }
+  if (rlang::has_name(prior_args, "n")) {
+    n <- prior_args$n
+    prior_args <- purrr::list_modify(prior_args, n = purrr::zap())
+  } else {
+    n <- 501
+  }
+
+  xseq <- dens <- vector("list", nrow(prior_dat))
+  for (i in seq_len(nrow(prior_dat))) {
+    dist <- prior_dat[[i, "dist"]]
+    args <- prior_dat[[i, "args"]]
+
+    lower <- eval(rlang::call2(paste0("q", dist), p = p_limits[1], !!! args))
+    upper <- eval(rlang::call2(paste0("q", dist), p = p_limits[2], !!! args))
+
+    xseq[[i]] <- seq(from = lower, to = upper, length.out = n)
+
+    dens[[i]] <- eval(rlang::call2(paste0("d", dist), x = xseq[[i]], !!! args))
+  }
+
+  prior_dat <- tibble::add_column(prior_dat, xseq = xseq, dens = dens)
+  if (getNamespaceVersion("tidyr") < "1.0.0") {
+    prior_dat <- tidyr::unnest(prior_dat, .data$xseq, .data$dens)
+  } else {
+    prior_dat <- tidyr::unnest(prior_dat, c(.data$xseq, .data$dens))
+  }
+
   # Repeat rows of prior_dat for each corresponding parameter
   prior_dat <- dplyr::left_join(prior_dat,
                                 dplyr::distinct(draws, .data$par_base, .data$parameter),
                                 by = "par_base")
 
   # Construct plot
-
-  xlim <- c(min(draws$value), max(draws$value))
+  xlim <- c(min(draws$value, 0), max(draws$value))
 
   p <- ggplot2::ggplot() +
     ggplot2::geom_vline(xintercept = ref_line, na.rm = TRUE, colour = "grey60") +
     ggplot2::coord_cartesian(xlim = xlim)
 
-  g_prior <- rlang::call2(tidybayes::stat_dist_slabinterval,
-                          !!! rlang::dots_list(mapping = ggplot2::aes(y = .data$parameter, dist = .data$dist, args = .data$args),
+  g_prior <- rlang::call2(ggplot2::geom_line,
+                          !!! rlang::dots_list(mapping = ggplot2::aes(x = .data$xseq, y = .data$dens),
                                                data = prior_dat,
-                                               orientation = "horizontal", show_interval = FALSE, normalize = "none",
-                                               slab_fill = NA, slab_colour = "black", slab_size = 0.5,
                                                !!! prior_args,
                                                .homonyms = "last"))
 
-  g_post <- rlang::call2(tidybayes::stat_sample_slabinterval,
-                         !!! rlang::dots_list(mapping = ggplot2::aes(y = .data$parameter, x = .data$value),
+  g_post <- rlang::call2(ggplot2::geom_histogram,
+                         !!! rlang::dots_list(mapping = ggplot2::aes_(y = ~..density.., x = ~value, group = ~parameter),
                                               data = draws,
-                                              orientation = "horizontal", show_interval = FALSE, normalize = "none",
-                                              slab_type = "histogram",
+                                              binwidth = function(x) diff(range(x)) / nclass.Sturges(x),
+                                              boundary = 0,
                                               !!! post_args,
                                               .homonyms = "last"))
 
@@ -261,7 +292,7 @@ plot_prior_posterior <- function(x, ...,
   }
 
   p <- p +
-    ggplot2::facet_grid(rows = "prior", scales = "free", space = "free") +
+    ggplot2::facet_wrap("parameter", scales = "free") +
     theme_multinma()
 
   return(p)
