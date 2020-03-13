@@ -363,6 +363,32 @@ get_default_trt_ref <- function(network, ...) {
   return(as.character(nodes[[1, ".trt"]]))
 }
 
+#' Check network connectedness
+#'
+#' Check whether a network is connected - whether there is a path of study
+#' evidence linking every pair of treatments in the network.
+#'
+#' @param network An `nma_data` object, as created by the functions `set_*()`,
+#'   `combine_network()`, or `add_integration()`
+#'
+#' @return Logical `TRUE` or `FALSE`
+#' @export
+#'
+#' @examples
+is_network_connected <- function(network) {
+
+  # Check network
+  if (!inherits(network, "nma_data")) {
+    abort("Expecting an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
+  }
+
+  if (all(purrr::map_lgl(network, is.null))) {
+    abort("Empty network.")
+  }
+
+  return(igraph::is_connected(igraph::as.igraph(network)))
+}
+
 #' Network plots
 #'
 #' Create a network plot from a `nma_data` network object.
