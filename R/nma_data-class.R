@@ -212,6 +212,10 @@ emph_g <- function(...) crayon::green$bold(...)
 #'
 #' @param x An [nma_data] object to convert
 #' @param ... Additional arguments
+#' @param collapse Logical, collapse edges over studies? Default `TRUE`, only
+#'   one edge is produced for each comparison (by IPD or AgD study type) with a
+#'   `.nstudy` attribute giving the number of studies making that comparison. If
+#'   `FALSE`, repeated edges are added for each study making the comparison.
 #'
 #' @return
 #' @export
@@ -221,15 +225,24 @@ emph_g <- function(...) crayon::green$bold(...)
 #' @importFrom igraph as.igraph
 #'
 #' @examples
-as.igraph.nma_data <- function(x, ...) {
+as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
+
+  if (!rlang::is_bool(collapse))
+    abort("`collapse` must be TRUE or FALSE.")
 
   if (has_ipd(x)) {
     e_ipd <- x$ipd %>%
       dplyr::distinct(.data$.study, .data$.trt) %>%
       dplyr::group_by(.data$.study) %>%
-      dplyr::group_modify(~make_contrasts(.x$.trt)) %>%
-      dplyr::group_by(.data$.trt, .data$.trt_b) %>%
-      dplyr::summarise(.nstudy = dplyr::n(), .type = "IPD")
+      dplyr::group_modify(~make_contrasts(.x$.trt))
+
+    if (collapse) {
+      e_ipd <- e_ipd %>%
+        dplyr::group_by(.data$.trt, .data$.trt_b) %>%
+        dplyr::summarise(.nstudy = dplyr::n(), .type = "IPD")
+    } else {
+      e_ipd$.type <- "IPD"
+    }
 
     v_ipd <- x$ipd %>%
       dplyr::group_by(.data$.trt) %>%
@@ -242,9 +255,15 @@ as.igraph.nma_data <- function(x, ...) {
     agd_all <- dplyr::bind_rows(x$agd_arm, x$agd_contrast)
     e_agd <- agd_all %>%
       dplyr::group_by(.data$.study) %>%
-      dplyr::group_modify(~make_contrasts(.x$.trt)) %>%
-      dplyr::group_by(.data$.trt, .data$.trt_b) %>%
-      dplyr::summarise(.nstudy = dplyr::n(), .type = "AgD")
+      dplyr::group_modify(~make_contrasts(.x$.trt))
+
+    if (collapse) {
+      e_agd <- e_agd %>%
+        dplyr::group_by(.data$.trt, .data$.trt_b) %>%
+        dplyr::summarise(.nstudy = dplyr::n(), .type = "AgD")
+    } else {
+      e_agd$.type <- "AgD"
+    }
 
     if (has_agd_sample_size(x)) {
       v_agd <- agd_all %>%
@@ -259,7 +278,12 @@ as.igraph.nma_data <- function(x, ...) {
 
   e_all <- dplyr::bind_rows(e_ipd, e_agd) %>%
     dplyr::rename(from = .data$.trt_b, to = .data$.trt) %>%
-    dplyr::mutate(.nstudy = dplyr::if_else(is.na(.data$.nstudy), 0L, .data$.nstudy))
+    dplyr::select(.data$from, .data$to, dplyr::everything())
+
+  if (collapse) {
+    e_all <- e_all %>%
+      dplyr::mutate(.nstudy = dplyr::if_else(is.na(.data$.nstudy), 0L, .data$.nstudy))
+  }
 
   if (has_agd_sample_size(x)) {
     v_all <- dplyr::bind_rows(v_ipd, v_agd) %>%
