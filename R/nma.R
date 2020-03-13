@@ -346,7 +346,7 @@ nma <- function(network,
                             prior_het = if (trt_effects == "random") prior_het else NULL,
                             prior_het_type = if (trt_effects == "random") prior_het_type else NULL,
                             prior_reg = if (!is.null(regression)) prior_reg else NULL,
-                            prior_aux = if (has_aux) prior_aux) else NULL)
+                            prior_aux = if (has_aux) prior_aux else NULL))
 
   if (inherits(network, "mlnmr_data")) class(out) <- c("stan_mlnmr", "stan_nma")
   else class(out) <- "stan_nma"
