@@ -138,6 +138,31 @@ plot.stan_nma <- function(x, ...,
   return(p)
 }
 
+#' Plot prior vs posterior distribution
+#'
+#' @param x A `stan_nma` object
+#' @param ... Additional arguments passed on to methods
+#' @param prior Character vector selecting the prior and posterior
+#'   distribution(s) to plot. May include `"intercept"`, `"trt"`, `"het"`,
+#'   `"reg"`, or `"aux"`, as appropriate.
+#' @param post_args List of arguments passed on to [ggplot2::geom_histogram] to
+#'   control plot output for the posterior distribution
+#' @param prior_args List of arguments passed on to [ggplot2::geom_path] to
+#'   control plot output for the prior distribution. Additionally, `n` controls
+#'   the number of points the density curve is evaluate at (default `500`), and
+#'   `p_limits` controls the endpoints of the curve as quantiles (default
+#'   `c(.001, .999)`).
+#' @param overlay String, should prior or posterior be shown on top? Default
+#'   `"prior"`.
+#' @param ref_line Numeric vector of positions for reference lines, by default
+#'   no reference lines are drawn
+#'
+#' @return A `ggplot` object.
+#' @export
+#'
+#' @importFrom truncdist dtrunc ptrunc qtrunc
+#'
+#' @examples
 plot_prior_posterior <- function(x, ...,
                                  prior = NULL,
                                  post_args = list(),

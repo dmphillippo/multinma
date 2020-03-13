@@ -169,9 +169,10 @@ get_tidy_prior <- function(prior, trunc = NULL) {
   } else if (d == "half-Normal") {
     out <- tibble::tibble(dist_label = d,
                           dist = "trunc",
-                          args = list(list(dist = "norm",
-                                      trunc = if (is_trunc) c(max(0, trunc[1]), trunc[2]) else c(0, Inf),
-                                      mean = prior$location, sd = prior$scale)))
+                          args = list(list(spec = "norm",
+                                           a = if (is_trunc) max(0, trunc[1]) else 0,
+                                           b = if (is_trunc) trunc[2] else Inf,
+                                           mean = prior$location, sd = prior$scale)))
   } else if (d == "log-Normal") {
     out <- tibble::tibble(dist_label = d,
                           dist = "lnorm",
@@ -183,9 +184,10 @@ get_tidy_prior <- function(prior, trunc = NULL) {
   } else if (d == "half-Cauchy") {
     out <- tibble::tibble(dist_label = d,
                           dist = "trunc",
-                          args = list(list(dist = "cauchy",
-                                      trunc = if (is_trunc) c(max(0, trunc[1]), trunc[2]) else c(0, Inf),
-                                      location = prior$location, scale = prior$scale)))
+                          args = list(list(spec = "cauchy",
+                                           a = if (is_trunc) max(0, trunc[1]) else 0,
+                                           b = if (is_trunc) trunc[2] else Inf,
+                                           location = prior$location, scale = prior$scale)))
   } else if (d == "Student t") {
     out <- tibble::tibble(dist_label = d,
                           dist = "t",
@@ -193,9 +195,10 @@ get_tidy_prior <- function(prior, trunc = NULL) {
   } else if (d == "half-Student t") {
     out <- tibble::tibble(dist_label = d,
                           dist = "trunc",
-                          args = list(list(dist = "t",
-                                      trunc = if (is_trunc) c(max(0, trunc[1]), trunc[2]) else c(0, Inf),
-                                      mean = prior$location, sd = prior$scale, df = prior$df)))
+                          args = list(list(spec = "t",
+                                           a = if (is_trunc) max(0, trunc[1]) else 0,
+                                           b = if (is_trunc) trunc[2] else Inf,
+                                           mean = prior$location, sd = prior$scale, df = prior$df)))
   } else if (d == "Exponential") {
     out <- tibble::tibble(dist_label = d,
                           dist = "exp",
@@ -203,49 +206,49 @@ get_tidy_prior <- function(prior, trunc = NULL) {
   }
 
   if (is_trunc && d %in% c("Normal", "Cauchy", "Student t", "Exponential", "log-Normal")) {
-    out[[1, "args"]] <- rlang::list2(dist = out$dist, trunc = trunc, !!! out[[1, "args"]])
+    out[[1, "args"]] <- rlang::list2(spec = out$dist, a = trunc[1], b = trunc[2], !!! out[[1, "args"]])
     out$dist <- "trunc"
   }
 
   return(out)
 }
 
-# Density for general truncated distribution
-dtrunc <- function(x, dist, trunc, ...) {
-  a <- list(...)
-  dfun <- paste0("d", dist)
-  pfun <- paste0("p", dist)
-
-  out <- ifelse(x < trunc[1] | x > trunc[2],
-                0,
-                do.call(dfun, args = rlang::list2(x = x, !!! a)) / (do.call(pfun, args = rlang::list2(q = trunc[2], !!! a)) - do.call(pfun, args = rlang::list2(q = trunc[1], !!! a))))
-
-  return(out)
-}
-
-# CDF for general truncated distribution
-ptrunc <- function(q, dist, trunc, ...) {
-  a <- list(...)
-  pfun <- paste0("p", dist)
-
-  out <- (do.call(pfun, args = rlang::list2(q = q, !!! a)) - do.call(pfun, args = rlang::list2(q = trunc[1], !!! a))) /
-    (do.call(pfun, args = rlang::list2(q = trunc[2], !!! a)) - do.call(pfun, args = rlang::list2(q = trunc[1], !!! a)))
-
-  return(out)
-}
-
-# Inverse CDF for general truncated distribution
-qtrunc <- function(p, dist, trunc, ...) {
-  a <- list(...)
-  qfun <- paste0("q", dist)
-  pfun <- paste0("p", dist)
-
-  pU <- do.call(pfun, args = rlang::list2(q = trunc[2], !!! a))
-  pL <- do.call(pfun, args = rlang::list2(q = trunc[1], !!! a))
-
-  pt <- pL + p * (pU - pL)
-
-  out <- do.call(qfun, args = rlang::list2(p = pt, !!! a))
-  out <- pmin(pmax(trunc[1], out), trunc[2])
-  return(out)
-}
+# # Density for general truncated distribution
+# dtrunc <- function(x, dist, trunc, ...) {
+#   a <- list(...)
+#   dfun <- paste0("d", dist)
+#   pfun <- paste0("p", dist)
+#
+#   out <- ifelse(x < trunc[1] | x > trunc[2],
+#                 0,
+#                 do.call(dfun, args = rlang::list2(x = x, !!! a)) / (do.call(pfun, args = rlang::list2(q = trunc[2], !!! a)) - do.call(pfun, args = rlang::list2(q = trunc[1], !!! a))))
+#
+#   return(out)
+# }
+#
+# # CDF for general truncated distribution
+# ptrunc <- function(q, dist, trunc, ...) {
+#   a <- list(...)
+#   pfun <- paste0("p", dist)
+#
+#   out <- (do.call(pfun, args = rlang::list2(q = q, !!! a)) - do.call(pfun, args = rlang::list2(q = trunc[1], !!! a))) /
+#     (do.call(pfun, args = rlang::list2(q = trunc[2], !!! a)) - do.call(pfun, args = rlang::list2(q = trunc[1], !!! a)))
+#
+#   return(out)
+# }
+#
+# # Inverse CDF for general truncated distribution
+# qtrunc <- function(p, dist, trunc, ...) {
+#   a <- list(...)
+#   qfun <- paste0("q", dist)
+#   pfun <- paste0("p", dist)
+#
+#   pU <- do.call(pfun, args = rlang::list2(q = trunc[2], !!! a))
+#   pL <- do.call(pfun, args = rlang::list2(q = trunc[1], !!! a))
+#
+#   pt <- pL + p * (pU - pL)
+#
+#   out <- do.call(qfun, args = rlang::list2(p = pt, !!! a))
+#   out <- pmin(pmax(trunc[1], out), trunc[2])
+#   return(out)
+# }
