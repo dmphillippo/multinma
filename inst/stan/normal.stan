@@ -4,6 +4,12 @@ functions {
 data {
 #include /include/data_common.stan
 
+  // Prior on IPD variance
+  int<lower=1,upper=5> prior_aux_dist;
+  real prior_aux_location;
+  real<lower=0> prior_aux_scale;
+  real<lower=0> prior_aux_df;
+
   // Outcomes
   real ipd_y[ni_ipd];
   real agd_arm_y[ni_agd_arm];

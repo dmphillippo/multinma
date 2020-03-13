@@ -67,8 +67,3 @@ int<lower=1,upper=3> prior_reg_dist;
 real prior_reg_location;
 real<lower=0> prior_reg_scale;
 real<lower=0> prior_reg_df;
-
-int<lower=1,upper=5> prior_aux_dist;
-real prior_aux_location;
-real<lower=0> prior_aux_scale;
-real<lower=0> prior_aux_df;
