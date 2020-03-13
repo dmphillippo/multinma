@@ -328,6 +328,40 @@ make_contrasts <- function(trt) {
                        .trt_b = contrs[1,]))
 }
 
+#' Get default reference treatment
+#'
+#' @param network An `nma_data` object, as created by the functions `set_*()`,
+#'   `combine_network()`, or `add_integration()`
+#' @param ... Other arguments (unused)
+#'
+#' @return String
+#' @noRd
+get_default_trt_ref <- function(network, ...) {
+
+  # Check network
+  if (!inherits(network, "nma_data")) {
+    abort("Expecting an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
+  }
+
+  if (all(purrr::map_lgl(network, is.null))) {
+    abort("Empty network.")
+  }
+
+  # g_c <- igraph::as.igraph(x)
+  g_nc <- igraph::as.igraph(network, collapse = FALSE)
+
+  nodes <-
+    tibble::tibble(
+      .trt = network$treatments,
+      degree = igraph::degree(g_nc),
+      betweenness = igraph::betweenness(g_nc)
+    ) %>%
+    dplyr::arrange(dplyr::desc(.data$degree),
+                   dplyr::desc(.data$betweenness),
+                   .data$.trt)
+
+  return(as.character(nodes[[1, ".trt"]]))
+}
 
 #' Network plots
 #'
