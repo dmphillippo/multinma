@@ -112,6 +112,15 @@ set_ipd <- function(data,
          studies = forcats::fct_unique(d$.study),
          outcome = list(agd_arm = NA, agd_contrast = NA, ipd = o_type)),
     class = "nma_data")
+
+  # If trt_ref not specified, mark treatments factor as default, calculate
+  # current reference trt
+  if (is.null(trt_ref)) {
+    trt_ref <- get_default_trt_ref(out)
+    out$treatments <- .default(forcats::fct_relevel(out$treatments, trt_ref))
+    out$ipd$.trt <- forcats::fct_relevel(out$ipd$.trt, trt_ref)
+  }
+
   return(out)
 }
 
@@ -257,6 +266,15 @@ set_agd_arm <- function(data,
          studies = forcats::fct_unique(d$.study),
          outcome = list(agd_arm = o_type, agd_contrast = NA, ipd = NA)),
     class = "nma_data")
+
+  # If trt_ref not specified, mark treatments factor as default, calculate
+  # current reference trt
+  if (is.null(trt_ref)) {
+    trt_ref <- get_default_trt_ref(out)
+    out$treatments <- .default(forcats::fct_relevel(out$treatments, trt_ref))
+    out$agd_arm$.trt <- forcats::fct_relevel(out$agd_arm$.trt, trt_ref)
+  }
+
   return(out)
 }
 
@@ -427,6 +445,15 @@ set_agd_contrast <- function(data,
          studies = forcats::fct_unique(d$.study),
          outcome = list(agd_arm = NA, agd_contrast = o_type, ipd = NA)),
     class = "nma_data")
+
+  # If trt_ref not specified, mark treatments factor as default, calculate
+  # current reference trt
+  if (is.null(trt_ref)) {
+    trt_ref <- get_default_trt_ref(out)
+    out$treatments <- .default(forcats::fct_relevel(out$treatments, trt_ref))
+    out$agd_contrast$.trt <- forcats::fct_relevel(out$agd_contrast$.trt, trt_ref)
+  }
+
   return(out)
 }
 

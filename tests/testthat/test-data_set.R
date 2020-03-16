@@ -207,13 +207,13 @@ test_that("set_* `.study` column is correct", {
                agd_contrast$studyf)
 })
 
-test_that("set_* return `treatments` factor", {
+test_that("set_* return default `treatments` factor", {
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont)$treatments,
-               factor(LETTERS[1:3]))
+               .default(factor(LETTERS[1:3])))
   expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos)$treatments,
-               factor(LETTERS[1:3]))
+               .default(factor(LETTERS[1:3])))
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff)$treatments,
-               factor(LETTERS[1:3]))
+               .default(factor(LETTERS[1:3])))
 })
 
 test_that("set_* can set `trt_ref`", {
