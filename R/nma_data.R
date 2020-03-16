@@ -597,6 +597,20 @@ combine_network <- function(..., trt_ref) {
          studies = factor(studs, levels = studs),
          outcome = outcome),
     class = "nma_data")
+
+  # If trt_ref not specified, mark treatments factor as default, calculate
+  # current reference trt
+  if (missing(trt_ref)) {
+    trt_ref <- get_default_trt_ref(out)
+    out$treatments <- .default(forcats::fct_relevel(out$treatments, trt_ref))
+    if (has_ipd(out))
+      out$ipd$.trt <- forcats::fct_relevel(out$ipd$.trt, trt_ref)
+    if (has_agd_arm(out))
+      out$agd_arm$.trt <- forcats::fct_relevel(out$agd_arm$.trt, trt_ref)
+    if (has_agd_contrast(out))
+      out$agd_contrast$.trt <- forcats::fct_relevel(out$agd_contrast$.trt, trt_ref)
+  }
+
   return(out)
 }
 
