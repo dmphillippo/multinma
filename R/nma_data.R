@@ -102,6 +102,10 @@ set_ipd <- function(data,
 
   d <- dplyr::bind_cols(d, data)
 
+  # Drop original study and treatment columns
+  d <- dplyr::select(d, - {{ study }}, - {{ trt }})
+  if (!is.null(.trtclass)) d <- dplyr::select(d, - {{ trt_class }})
+
   # Produce nma_data object
   out <- structure(
     list(agd_arm = NULL,
@@ -255,6 +259,10 @@ set_agd_arm <- function(data,
 
   # Bind in original data
   d <- dplyr::bind_cols(d, data)
+
+  # Drop original study and treatment columns
+  d <- dplyr::select(d, - {{ study }}, - {{ trt }})
+  if (!is.null(.trtclass)) d <- dplyr::select(d, - {{ trt_class }})
 
   # Produce nma_data object
   out <- structure(
@@ -429,6 +437,10 @@ set_agd_contrast <- function(data,
 
   # Bind in original data
   d <- dplyr::bind_cols(d, data)
+
+  # Drop original study and treatment columns
+  d <- dplyr::select(d, - {{ study }}, - {{ trt }})
+  if (!is.null(.trtclass)) d <- dplyr::select(d, - {{ trt_class }})
 
   # Make sure rows from each study are next to each other (required for Stan resdev/log_lik code)
   d <- dplyr::mutate(d, .study_inorder = forcats::fct_inorder(.data$.study)) %>%
