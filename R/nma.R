@@ -153,6 +153,10 @@ nma <- function(network,
     inform(glue::glue('Note: Setting "{levels(network$treatments)[1]}" as the network reference treatment.\n',
                       "This may be changed using the `trt_ref` argument in set_*() or combine_network()."))
 
+  # Notify if network is disconnected
+  if (!is_network_connected(network))
+    inform("Note: Network is disconnected. See ?is_network_connected for more details.")
+
   # Get data for design matrices and outcomes
   if (has_ipd(network)) {
     dat_ipd <- network$ipd
