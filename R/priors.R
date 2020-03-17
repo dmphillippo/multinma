@@ -123,14 +123,18 @@ exponential <- function(scale = 1/rate, rate = 1/scale) {
 
 # Check functions
 check_prior_location <- function(x, type = "location (mean)") {
-  if (!is.numeric(x)) abort(glue::glue("Prior {type} must be numeric."))
-  if (length(x) > 1) abort(glue::glue("Prior {type} must be numeric, length 1."))
+  if (!(.is_default(x) && rlang::is_empty(x))) {
+    if (!is.numeric(x)) abort(glue::glue("Prior {type} must be numeric."))
+    if (length(x) > 1) abort(glue::glue("Prior {type} must be numeric, length 1."))
+  }
 }
 
 check_prior_scale <- function(x, type = "scale (standard deviation)") {
-  if (!is.numeric(x)) abort(glue::glue("Prior {type} must be numeric."))
-  if (length(x) > 1) abort(glue::glue("Prior {type} must be numeric, length 1."))
-  if (x <= 0) abort(glue::glue("Prior {type} must be strictly positive."))
+  if (!(.is_default(x) && rlang::is_empty(x))) {
+    if (!is.numeric(x)) abort(glue::glue("Prior {type} must be numeric."))
+    if (length(x) > 1) abort(glue::glue("Prior {type} must be numeric, length 1."))
+    if (x <= 0) abort(glue::glue("Prior {type} must be strictly positive."))
+  }
 }
 
 new_nma_prior <- function(dist, location = NA_real_, scale = NA_real_, df = NA_real_, ...) {
