@@ -369,11 +369,18 @@ get_default_trt_ref <- function(network, ...) {
 #' Check whether a network is connected - whether there is a path of study
 #' evidence linking every pair of treatments in the network.
 #'
-#' @param network An `nma_data` object, as created by the functions `set_*()`,
-#'   `combine_network()`, or `add_integration()`
+#' @param network An `nma_data` object, as created by the functions `set_*()` or
+#'   `combine_network()`.
 #'
 #' @return Logical `TRUE` or `FALSE`
 #' @export
+#'
+#' @details Models will still run with disconnected networks. However, estimated
+#'   relative effects between treatments across disconnected parts of the
+#'   network will be entirely based on the prior distribution (typically very
+#'   uncertain), as there is no information to update the prior distribution.
+#'   Relative effects within each connected sub-network will be estimated as if
+#'   each sub-network had been analysed separately.
 #'
 #' @examples
 is_network_connected <- function(network) {
