@@ -148,6 +148,11 @@ nma <- function(network,
                     "Use `add_integration()` to add integration points to the network."))
   }
 
+  # Notify if default reference treatment is used
+  if (.is_default(network$treatments))
+    inform(glue::glue('Note: Setting "{levels(network$treatments)[1]}" as the network reference treatment.\n',
+                      "This may be changed using the `trt_ref` argument in set_*() or combine_network()."))
+
   # Get data for design matrices and outcomes
   if (has_ipd(network)) {
     dat_ipd <- network$ipd
