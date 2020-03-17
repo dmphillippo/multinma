@@ -155,6 +155,7 @@ print.nma_data <- function(x, ..., n = 10) {
   }
   cglue("Total number of studies: {length(x$studies)}")
   cglue("Reference treatment is: {levels(x$treatments)[1]}")
+  cglue("Network is {if (is_network_connected(x)) crayon::green('connected') else crayon::red('disconnected')}")
 
   invisible(x)
 }
