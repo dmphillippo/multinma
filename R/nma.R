@@ -55,6 +55,12 @@
 #'   also available, and refer to studies and (if specified) treatment classes
 #'   respectively.
 #'
+#'   Default prior distributions are available, but will raise a warning if
+#'   used. Please consider appropriate prior distributions for the particular
+#'   setting, such as the scales of outcomes and covariates, etc. The function
+#'   [plot_prior_posterior()] may be useful in examining the influence of the
+#'   chosen prior distributions on the posterior distributions.
+#'
 #' @return `nma()` returns a [stan_nma] object, `nma.fit()` returns a [stanfit]
 #'   object.
 #' @export
