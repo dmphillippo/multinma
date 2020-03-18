@@ -55,11 +55,15 @@
 #'   also available, and refer to studies and (if specified) treatment classes
 #'   respectively.
 #'
-#'   Default prior distributions are available, but will raise a warning if
-#'   used. Please consider appropriate prior distributions for the particular
-#'   setting, such as the scales of outcomes and covariates, etc. The function
-#'   [plot_prior_posterior()] may be useful in examining the influence of the
-#'   chosen prior distributions on the posterior distributions.
+#'   See `\link[priors]{?priors}` for details on prior specification. Default
+#'   prior distributions are available, but may not be appropriate for the
+#'   particular setting and will raise a warning if used. No attempt is made to
+#'   tailor these defaults to the data provided. Please consider appropriate
+#'   prior distributions for the particular setting, accounting for the scales
+#'   of outcomes and covariates, etc. The function [plot_prior_posterior()] may
+#'   be useful in examining the influence of the chosen prior distributions on
+#'   the posterior distributions, and the `\link[summary.nma_prior]{summary()}`
+#'   method for `nma_prior` objects prints prior intervals.
 #'
 #' @return `nma()` returns a [stan_nma] object, `nma.fit()` returns a [stanfit]
 #'   object.
