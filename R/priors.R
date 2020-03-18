@@ -194,15 +194,15 @@ get_tidy_prior <- function(prior, trunc = NULL) {
                                            location = prior$location, scale = prior$scale)))
   } else if (d == "Student t") {
     out <- tibble::tibble(dist_label = d,
-                          dist = "t",
-                          args = list(list(mean = prior$location, sd = prior$scale, df = prior$df)))
+                          dist = "gent",
+                          args = list(list(location = prior$location, scale = prior$scale, df = prior$df)))
   } else if (d == "half-Student t") {
     out <- tibble::tibble(dist_label = d,
                           dist = "trunc",
-                          args = list(list(spec = "t",
+                          args = list(list(spec = "gent",
                                            a = if (is_trunc) max(0, trunc[1]) else 0,
                                            b = if (is_trunc) trunc[2] else Inf,
-                                           mean = prior$location, sd = prior$scale, df = prior$df)))
+                                           location = prior$location, scale = prior$scale, df = prior$df)))
   } else if (d == "Exponential") {
     out <- tibble::tibble(dist_label = d,
                           dist = "exp",
@@ -256,3 +256,51 @@ get_tidy_prior <- function(prior, trunc = NULL) {
 #   out <- pmin(pmax(trunc[1], out), trunc[2])
 #   return(out)
 # }
+
+#' Generalised Student's t distribution (with location and scale)
+#'
+#' Density, distribution, and quantile function for the generalised t
+#' distribution with degrees of freedom `df`, shifted by `location` and scaled
+#' by `scale`.
+#'
+#' @param x,q Vector of quantiles
+#' @param p Vector of probabilities
+#' @param df Degrees of freedom, greater than zero
+#' @param location Location parameter
+#' @param scale Scale parameter, greater than zero
+#'
+#' @return `dgent()` gives the density, `pgent()` gives the distribution
+#'   function, `qgent()` gives the quantile function.
+#' @export
+#' @rdname generalised_t
+#'
+dgent <- function(x, df, location = 0, scale = 1) {
+  if (!is.numeric(location))
+    abort("`location` must be numeric.")
+  if (!is.numeric(scale) || any(scale <= 0))
+    abort("`scale` must be numeric, greater than zero.")
+
+  return(stats::dt((x - location) / scale, df) / scale)
+}
+
+#' @export
+#' @rdname generalised_t
+pgent <- function(q, df, location = 0, scale = 1) {
+  if (!is.numeric(location))
+    abort("`location` must be numeric.")
+  if (!is.numeric(scale) || any(scale <= 0))
+    abort("`scale` must be numeric, greater than zero.")
+
+  return(stats::pt((q - location) / scale, df))
+}
+
+#' @export
+#' @rdname generalised_t
+qgent <- function(p, df, location = 0, scale = 1) {
+  if (!is.numeric(location))
+    abort("`location` must be numeric.")
+  if (!is.numeric(scale) || any(scale <= 0))
+    abort("`scale` must be numeric, greater than zero.")
+
+  return(location + scale * stats::qt(p, df))
+}
