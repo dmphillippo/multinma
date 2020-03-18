@@ -46,7 +46,7 @@ print.nma_prior <- function(x, ...) {
 #' @examples
 #' summary(normal(location = 0, scale = 1))
 #' summary(half_normal(scale = 1))
-#' summary(log_normal(−3.93, 1.51))
+#' summary(log_normal(location = -3.93, scale = 1.51))
 #'
 #' # Truncation limits may be set, for example to restrict a prior to positive values
 #' summary(normal(location = 0.5, scale = 1), trunc = c(0, Inf))
