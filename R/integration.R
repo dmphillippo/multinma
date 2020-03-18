@@ -15,7 +15,7 @@
 #'   Rows and columns should match the order of covariates specified in `...`.
 #' @param n_int Number of integration points to generate, default 100
 #' @param int_args A named list of arguments to pass to
-#'   `\link[randtoolbox:quasiRNG]{sobol()}`
+#'   \code{\link[randtoolbox:quasiRNG]{sobol()}}
 #'
 #' @return For the `nma_data` method, an object of class [nma_data]. For the
 #'   `data.frame` method, the input data frame is returned (as a [tibble]) with

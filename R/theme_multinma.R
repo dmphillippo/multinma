@@ -3,12 +3,12 @@
 #' A simple `ggplot2` theme for plots in the `multinma` package.
 #'
 #' @param ... Arguments passed to
-#'   `\link[ggplot2:ggtheme]{ggplot2::theme_light()}`
+#'   \code{\link[ggplot2:ggtheme]{ggplot2::theme_light()}}
 #'
 #' @return A `ggplot2` theme
 #' @export
 #'
-#' @seealso [ggplot2::theme()], `\link[ggplot2:theme_get]{ggplot2::theme_set()}`
+#' @seealso [ggplot2::theme()], \code{\link[ggplot2:theme_get]{ggplot2::theme_set()}}
 #'
 #' @examples
 #' library(ggplot2)

@@ -20,7 +20,7 @@
 #' @param link Character string specifying a link function, if unspecified will
 #'   default to the canonical link
 #' @param ... Further arguments passed to
-#'   `\link[rstan:stanmodel-method-sampling]{sampling()}`, such as `iter`,
+#'   \code{\link[rstan:stanmodel-method-sampling]{sampling()}}, such as `iter`,
 #'   `chains`, `cores`, etc.
 #' @param prior_intercept Specification of prior distribution for the intercept
 #' @param prior_trt Specification of prior distribution for the treatment effects
@@ -55,15 +55,16 @@
 #'   also available, and refer to studies and (if specified) treatment classes
 #'   respectively.
 #'
-#'   See `\link[priors]{?priors}` for details on prior specification. Default
-#'   prior distributions are available, but may not be appropriate for the
-#'   particular setting and will raise a warning if used. No attempt is made to
-#'   tailor these defaults to the data provided. Please consider appropriate
-#'   prior distributions for the particular setting, accounting for the scales
-#'   of outcomes and covariates, etc. The function [plot_prior_posterior()] may
-#'   be useful in examining the influence of the chosen prior distributions on
-#'   the posterior distributions, and the `\link[summary.nma_prior]{summary()}`
-#'   method for `nma_prior` objects prints prior intervals.
+#'   See \code{\link[multinma:priors]{?priors}} for details on prior
+#'   specification. Default prior distributions are available, but may not be
+#'   appropriate for the particular setting and will raise a warning if used. No
+#'   attempt is made to tailor these defaults to the data provided. Please
+#'   consider appropriate prior distributions for the particular setting,
+#'   accounting for the scales of outcomes and covariates, etc. The function
+#'   [plot_prior_posterior()] may be useful in examining the influence of the
+#'   chosen prior distributions on the posterior distributions, and the
+#'   \code{\link[multinma:summary.nma_prior]{summary()}} method for `nma_prior`
+#'   objects prints prior intervals.
 #'
 #' @return `nma()` returns a [stan_nma] object, `nma.fit()` returns a [stanfit]
 #'   object.

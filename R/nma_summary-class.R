@@ -140,7 +140,7 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #'   the [tidybayes] package. As a result, the output is very flexible. Any
 #'   plotting stats provided by `tidybayes` may be used, via the argument
 #'   `stat`. The default uses
-#'   `\link[tidybayes:stat_pointinterval]{tidybayes::stat_pointintervalh()}`, to
+#'   \code{\link[tidybayes:stat_pointinterval]{tidybayes::stat_pointintervalh()}}, to
 #'   produce medians and 95\% Credible Intervals with 66\% inner bands.
 #'   Additional arguments in `...` are passed to the `tidybayes` stat, to
 #'   customise the output. For example, to produce means and Credible Intervals,
