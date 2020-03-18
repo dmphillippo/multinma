@@ -68,12 +68,12 @@ nma <- function(network,
                 likelihood = NULL,
                 link = NULL,
                 ...,
-                prior_intercept = normal(scale = 10),
-                prior_trt = normal(scale = 10),
-                prior_het = half_normal(scale = 5),
+                prior_intercept = .default(normal(scale = 10)),
+                prior_trt = .default(normal(scale = 10)),
+                prior_het = .default(half_normal(scale = 5)),
                 prior_het_type = c("sd", "var", "prec"),
-                prior_reg = normal(scale = 10),
-                prior_aux = normal(scale = 5),
+                prior_reg = .default(normal(scale = 10)),
+                prior_aux = .default(),
                 QR = FALSE,
                 center = TRUE,
                 adapt_delta = NULL,
@@ -113,9 +113,35 @@ nma <- function(network,
   if (!inherits(prior_trt, "nma_prior")) abort("`prior_trt` should be a prior distribution, see ?priors.")
   if (!inherits(prior_het, "nma_prior")) abort("`prior_het` should be a prior distribution, see ?priors.")
   if (!inherits(prior_reg, "nma_prior")) abort("`prior_reg` should be a prior distribution, see ?priors.")
-  if (!inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
+  if (!.is_default(prior_aux) && !inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
 
   prior_het_type <- rlang::arg_match(prior_het_type)
+
+  # Prior defaults
+  prior_defaults <- list()
+  if (.is_default(prior_intercept))
+    prior_defaults$prior_intercept <- get_default_call(prior_intercept)
+  if (.is_default(prior_trt))
+    prior_defaults$prior_trt <- get_default_call(prior_trt)
+  if (trt_effects == "random" && .is_default(prior_het))
+    prior_defaults$prior_het <- get_default_call(prior_het)
+  if (!is.null(regression) && .is_default(prior_reg))
+    prior_defaults$prior_reg <- get_default_call(prior_reg)
+  if (.is_default(prior_reg)) {
+    if (likelihood == "normal") {
+      prior_aux <- .default(half_normal(scale = 5))
+      prior_defaults$prior_aux <- get_default_call(prior_aux)
+    }
+  }
+
+  # Warn where default priors are used
+  if (!rlang::is_empty(prior_defaults)) {
+    warn(glue::glue(
+      "Prior distributions were left at default values:",
+      paste(paste(names(prior_defaults), prior_defaults, sep = " = "), collapse = "\n"),
+      .sep = "\n"
+    ))
+  }
 
   # Check other args
   if (!is.logical(QR) || length(QR) > 1) abort("`QR` should be a logical scalar (TRUE or FALSE).")
@@ -390,12 +416,12 @@ nma.fit <- function(ipd_x, ipd_y,
                     likelihood = NULL,
                     link = NULL,
                     ...,
-                    prior_intercept = normal(scale = 10),
-                    prior_trt = normal(scale = 10),
-                    prior_het = half_normal(scale = 5),
+                    prior_intercept,
+                    prior_trt,
+                    prior_het,
                     prior_het_type = c("sd", "var", "prec"),
-                    prior_reg = normal(scale = 10),
-                    prior_aux = normal(scale = 5),
+                    prior_reg,
+                    prior_aux,
                     QR = FALSE,
                     adapt_delta = NULL,
                     int_thin = 100L) {
@@ -494,7 +520,7 @@ nma.fit <- function(ipd_x, ipd_y,
   if (!inherits(prior_trt, "nma_prior")) abort("`prior_trt` should be a prior distribution, see ?priors.")
   if (!inherits(prior_het, "nma_prior")) abort("`prior_het` should be a prior distribution, see ?priors.")
   if (!inherits(prior_reg, "nma_prior")) abort("`prior_reg` should be a prior distribution, see ?priors.")
-  if (!inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
+  if (likelihood == "normal" && !inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
 
   prior_het_type <- rlang::arg_match(prior_het_type)
 
