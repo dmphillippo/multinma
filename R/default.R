@@ -15,16 +15,11 @@
 #' @rdname default_values
 #'
 .default <- function(x = list()) {
-  x_call <- rlang::enquo(x)
-  return(structure(x, class = c(".default", class(x)), call = x_call))
+  return(structure(x, class = c(".default", class(x))))
 }
 
 #' @export
 #' @rdname default_values
 .is_default <- function(x) {
   return(inherits(x, ".default"))
-}
-
-get_default_call <- function(x) {
-  return(rlang::as_label(attr(x, "call")))
 }
