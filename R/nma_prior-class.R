@@ -30,7 +30,7 @@ print.nma_prior <- function(x, ...) {
 #'
 #' Print a summary of prior distribution details.
 #'
-#' @param x Prior distribution as a `nma_prior` object
+#' @param object Prior distribution as a `nma_prior` object
 #' @param ... Additional arguments, not used
 #' @param probs Numeric vector of probabilities to calculate prior intervals
 #' @param digits Number of digits to display
@@ -50,14 +50,14 @@ print.nma_prior <- function(x, ...) {
 #' # Truncation limits may be set, for example to restrict a prior to positive values
 #' summary(normal(location = 0.5, scale = 1), trunc = c(0, Inf))
 #'
-summary.nma_prior <- function(x, ..., probs = c(0.5, 0.95), digits = 2, trunc = NULL) {
+summary.nma_prior <- function(object, ..., probs = c(0.5, 0.95), digits = 2, trunc = NULL) {
   if (!rlang::is_double(probs) || !all(probs <= 1) || !all(probs >= 0))
     abort("`probs` must be a numeric vector of probabilities.")
 
-  prior <- get_tidy_prior(x, trunc = trunc) %>%
+  prior <- get_tidy_prior(object, trunc = trunc) %>%
     tidyr::expand_grid(probs = probs) %>%
     dplyr::group_by(.data[["dist"]], .data[["probs"]]) %>%
-    {if (stringr::str_starts(x$dist, "log-|half-")) {
+    {if (stringr::str_starts(object$dist, "log-|half-")) {
       dplyr::summarise(., qfun = paste0("q", .data[["dist"]]),
                        lower = 0,
                        upper = do.call(.data[["qfun"]], args = rlang::list2(p = .data[["probs"]], !!! .[["args"]][[1]])))
@@ -67,7 +67,7 @@ summary.nma_prior <- function(x, ..., probs = c(0.5, 0.95), digits = 2, trunc = 
                        upper = do.call(.data[["qfun"]], args = rlang::list2(p = 1 - (1 - .data[["probs"]]) / 2, !!! .[["args"]][[1]])))
     }}
 
-  print(x)
+  print(object)
   cglue("{prior$probs*100}% of the prior density lies between {round(prior$lower, digits)} and {round(prior$upper, digits)}.")
 
   invisible(prior[ , c("probs", "lower", "upper")])
