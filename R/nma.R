@@ -131,17 +131,17 @@ nma <- function(network,
   # Prior defaults
   prior_defaults <- list()
   if (.is_default(prior_intercept))
-    prior_defaults$prior_intercept <- get_default_call(prior_intercept)
+    prior_defaults$prior_intercept <- get_prior_call(prior_intercept)
   if (.is_default(prior_trt))
-    prior_defaults$prior_trt <- get_default_call(prior_trt)
+    prior_defaults$prior_trt <- get_prior_call(prior_trt)
   if (trt_effects == "random" && .is_default(prior_het))
-    prior_defaults$prior_het <- get_default_call(prior_het)
+    prior_defaults$prior_het <- get_prior_call(prior_het)
   if (!is.null(regression) && .is_default(prior_reg))
-    prior_defaults$prior_reg <- get_default_call(prior_reg)
+    prior_defaults$prior_reg <- get_prior_call(prior_reg)
   if (.is_default(prior_reg)) {
     if (likelihood == "normal") {
       prior_aux <- .default(half_normal(scale = 5))
-      prior_defaults$prior_aux <- get_default_call(prior_aux)
+      prior_defaults$prior_aux <- get_prior_call(prior_aux)
     }
   }
 
@@ -1570,7 +1570,7 @@ prior_standat <- function(x, par, valid){
                   Exponential = 4,
                   `log-Normal` = 5)
 
-  out <- purrr::list_modify(c(x), dist = distn)
+  out <- purrr::list_modify(c(x), dist = distn, fun = purrr::zap())
   # Set unnecessary (NA) parameters to zero. These will be ignored by Stan, but
   # need to pass rstan checks
   out[is.na(out)] <- 0

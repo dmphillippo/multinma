@@ -139,6 +139,7 @@ check_prior_scale <- function(x, type = "scale (standard deviation)") {
 
 new_nma_prior <- function(dist, location = NA_real_, scale = NA_real_, df = NA_real_, ...) {
   o <- list(dist = dist,
+            fun = deparse(sys.call(sys.parent())[[1]]),
             location = location,
             scale = scale,
             df = df,
@@ -214,6 +215,25 @@ get_tidy_prior <- function(prior, trunc = NULL) {
     out$dist <- "trunc"
   }
 
+  return(out)
+}
+
+
+#' Get prior distribution call
+#'
+#' @param x A nma_prior object
+#'
+#' @return String giving call to construct x
+#' @noRd
+get_prior_call <- function(x) {
+  if (!inherits(x, "nma_prior"))
+    abort("Not a `nma_prior` object.")
+
+  prior_args <- purrr::list_modify(x, dist = purrr::zap(), fun = purrr::zap())
+  prior_args <- prior_args[!is.na(prior_args)]
+  out <- paste0(x$fun, "(",
+                paste(names(prior_args), prior_args, sep = ' = ', collapse = ', '),
+                ")")
   return(out)
 }
 

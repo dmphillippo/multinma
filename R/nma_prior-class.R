@@ -9,6 +9,7 @@
 #' @details Objects of class `nma_prior` have the following components:
 #'   \describe{
 #'   \item{`dist`}{Distribution name}
+#'   \item{`fun`}{Name of constructor function, as string (e.g. `"normal"`)}
 #'   \item{`...`}{Parameters of the distribution}
 #'   }
 #'
@@ -19,7 +20,7 @@ NULL
 #' @export
 #' @noRd
 print.nma_prior <- function(x, ...) {
-  p <- purrr::list_modify(x, dist = purrr::zap())
+  p <- purrr::list_modify(x, dist = purrr::zap(), fun = purrr::zap())
   p <- p[!is.na(p)]
   cglue("A {x$dist} prior distribution: {paste(names(p), p, sep = ' = ', collapse = ', ')}.")
   invisible(x)
