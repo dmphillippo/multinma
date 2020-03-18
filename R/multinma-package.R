@@ -13,12 +13,15 @@
 #' @import methods
 #' @import Rcpp
 #' @importFrom dplyr %>%
-#' @importFrom rlang abort warn inform enquo .data
+#' @importFrom rlang abort warn inform enquo .data :=
 #' @importFrom rstan sampling
 #' @importFrom Rdpack reprompt
-#' @importFrom graphics pairs
-#' @importFrom stats complete.cases dbinom median model.frame model.matrix optim
-#'   pbinom qbinom update.formula weighted.mean
+#' @importFrom graphics plot pairs
+#' @importFrom grDevices nclass.Sturges
+#' @importFrom stats complete.cases sd median quantile model.frame model.matrix
+#'   model.offset optim pbinom dbinom qbinom as.formula update.formula
+#'   weighted.mean runif plogis pnorm
+#' @importFrom utils packageVersion
 #'
 #' @references
 #'
