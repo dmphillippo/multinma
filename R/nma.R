@@ -570,8 +570,8 @@ nma.fit <- function(ipd_x, ipd_y,
   get_trt <- function(x, v = 1) if (any(x == v)) which(x == v) + 1 else 1
 
   if (has_ipd) {
-    ipd_s_t <- dplyr::tibble(.study = apply(ipd_x[, col_study], 1, get_study),
-                             .trt = apply(ipd_x[, col_trt], 1, get_trt))
+    ipd_s_t <- dplyr::tibble(.study = apply(ipd_x[, col_study, drop = FALSE], 1, get_study),
+                             .trt = apply(ipd_x[, col_trt, drop = FALSE], 1, get_trt))
     ipd_arm <-  dplyr::group_indices(ipd_s_t, .data$.study, .data$.trt)
     ipd_s_t <- dplyr::distinct(ipd_s_t)
     ipd_study <- ipd_s_t$.study
