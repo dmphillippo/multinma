@@ -159,3 +159,100 @@ plot(smk_cumrankprobs)
 ```
 
 ## References
+
+```{r smoking_tests, eval=FALSE, include=FALSE}
+#--- Test against TSD 4 results ---
+library(testthat)
+library(dplyr)
+
+# A = No intervention
+# B = Self-help
+# C = Individual counselling
+# D = Group counselling
+
+trt_codes <- c(A = "No intervention",
+               B = "Self-help",
+               C = "Individual counselling",
+               D = "Group counselling")
+
+# Relative effects
+tsd_re <- tribble(
+  ~contrast, ~est, ~sd, ~lower, ~upper,
+  "dAB", 0.49, 0.40, -0.29, 1.31,
+  "dAC", 0.84, 0.24,  0.39, 1.34,
+  "dAD", 1.10, 0.44,  0.26, 2.00,
+  "dBC", 0.35, 0.41, -0.46, 1.18,
+  "dBD", 0.61, 0.49, -0.34, 1.59,
+  "dCD", 0.26, 0.41, -0.55, 1.09) %>% 
+  mutate(trt_b = recode(substr(contrast, 2, 2),
+                        !!! trt_codes),
+         trt = recode(substr(contrast, 3, 3),
+                        !!! trt_codes),
+         trt_b = ordered(trt_b, levels = levels(smknet$treatments)),
+         trt = ordered(trt, levels = levels(smknet$treatments)),
+         rev = if_else(trt_b > trt, -1, 1),
+         .l = lower, .u = upper,
+         lower = if_else(trt_b > trt, .u, .l),
+         upper = if_else(trt_b > trt, .l, .u)) %>% 
+  arrange(trt_b, trt) %>% 
+  mutate_at(vars(est, lower, upper), ~.*rev)
+
+expect_equal(smk_releff$summary$mean, tsd_re$est, tol = 0.01)
+expect_equal(smk_releff$summary$sd, tsd_re$sd, tol = 0.01)
+expect_equal(smk_releff$summary$`2.5%`, tsd_re$lower, tol = 0.05)
+expect_equal(smk_releff$summary$`97.5%`, tsd_re$upper, tol = 0.05)
+
+# Heterogeneity SD
+smk_tau <- summary(smkfit, pars = "tau")
+expect_equal(smk_tau$summary$`50%`, 0.82, tol = 0.01)
+expect_equal(smk_tau$summary$sd, 0.19, tol = 0.01)
+expect_equal(smk_tau$summary$`2.5%`, 0.55, tol = 0.05)
+expect_equal(smk_tau$summary$`97.5%`, 1.27, tol = 0.05)
+
+# DIC
+expect_equal(dic_consistency$resdev, 54.0, tol = 0.1)
+expect_equal(dic_consistency$pd, 45.0, tol = 0.1)
+expect_equal(dic_consistency$dic, 99.0, tol = 0.1)
+
+# Relative effects (UME)
+tsd_ume <- tribble(
+  ~contrast, ~est, ~sd, ~lower, ~upper,
+  "dAB",  0.34, 0.58, -0.81, 1.50,
+  "dAC",  0.86, 0.27,  0.34, 1.43,
+  "dAD",  1.43, 0.88, -0.21, 3.29,
+  "dBC", -0.05, 0.74, -1.53, 1.42,
+  "dBD",  0.65, 0.73, -0.80, 2.12,
+  "dCD",  0.20, 0.78, -1.37, 1.73)  %>% 
+  mutate(trt_b = recode(substr(contrast, 2, 2),
+                        !!! trt_codes),
+         trt = recode(substr(contrast, 3, 3),
+                        !!! trt_codes),
+         trt_b = ordered(trt_b, levels = levels(smknet$treatments)),
+         trt = ordered(trt, levels = levels(smknet$treatments)),
+         rev = if_else(trt_b > trt, -1, 1),
+         .l = lower, .u = upper,
+         lower = if_else(trt_b > trt, .u, .l),
+         upper = if_else(trt_b > trt, .l, .u)) %>% 
+  arrange(trt_b, trt) %>% 
+  mutate_at(vars(est:upper), ~.*rev)
+
+smk_ume_releff <- summary(smkfit_ume, pars = "d")
+
+expect_equal(smk_ume_releff$summary$mean, tsd_ume$est, tol = 0.01)
+expect_equal(smk_ume_releff$summary$sd, tsd_ume$sd, tol = 0.01)
+expect_equal(smk_ume_releff$summary$`2.5%`, tsd_ume$lower, tol = 0.05)
+expect_equal(smk_ume_releff$summary$`97.5%`, tsd_ume$upper, tol = 0.05)
+
+# Heterogeneity SD (UME)
+smk_ume_tau <- summary(smkfit_ume, pars = "tau")
+expect_equal(smk_ume_tau$summary$`50%`, 0.89, tol = 0.01)
+expect_equal(smk_ume_tau$summary$sd, 0.22, tol = 0.01)
+expect_equal(smk_ume_tau$summary$`2.5%`, 0.58, tol = 0.05)
+expect_equal(smk_ume_tau$summary$`97.5%`, 1.45, tol = 0.05)
+
+# DIC (UME)
+expect_equal(dic_ume$resdev, 53.4, tol = 0.1)
+expect_equal(dic_ume$pd, 46.1, tol = 0.1)
+expect_equal(dic_ume$dic, 99.5, tol = 0.1)
+```
+
