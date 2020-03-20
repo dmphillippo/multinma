@@ -322,9 +322,9 @@ plot.nma_dic <- function(x, y, ...,
     p <- p + theme_multinma()
 
     if (!horizontal) {
-      p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 0))
+      p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5))
     } else {
-      p <- p + ggplot2::theme(axis.text.y = ggplot2::element_text(hjust = 0))
+      p <- p + ggplot2::theme(axis.text.y = ggplot2::element_text(hjust = 0, vjust = 0.5))
     }
   }
 
