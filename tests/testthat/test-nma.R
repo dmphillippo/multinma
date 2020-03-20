@@ -243,30 +243,70 @@ test_that("nma.fit() error if agd_contrast_Sigma is not right dimensions", {
                        n_int = 1), "Dimensions of `agd_contrast_Sigma`.+do not match")
 })
 
+
+single_study_a <- tibble(study = "A", trt = c("a", "b"), r = 500, n = 1000)
+net_ss_a <- set_agd_arm(single_study_a, study, trt, r = r, n = n)
+
+single_study_c <- tibble(study = "A", trt = c("a", "b"), y = c(NA, 0), se = c(NA, sqrt(4/500)))
+net_ss_c <- set_agd_contrast(single_study_c, study, trt, y = y, se = se)
+
+single_study_i <- tibble(study = "A", trt = rep(c("a", "b"), each = 100), y = c(rnorm(100, 0, 0.1), rnorm(100, 1, 0.1)))
+net_ss_i <- set_ipd(single_study_i, study, trt, y = y)
+
 test_that("nma() doesn't fail with a single study", {
   skip_on_cran()
 
-  single_study_a <- tibble(study = "A", trt = c("a", "b"), r = 500, n = 1000)
-  net_ss_a <- set_agd_arm(single_study_a, study, trt, r = r, n = n)
   fit_ss_a <- nma(net_ss_a, prior_intercept = normal(0, 10), prior_trt = normal(0, 10))
   expect_s3_class(fit_ss_a, "stan_nma")
   d_ss_a <- relative_effects(fit_ss_a)
   expect_equal(d_ss_a$summary$mean, 0, tol = 0.01)
   expect_equal(d_ss_a$summary$sd, sqrt(4/500), tol = 0.01)
 
-  single_study_c <- tibble(study = "A", trt = c("a", "b"), y = c(NA, 0), se = c(NA, sqrt(4/500)))
-  net_ss_c <- set_agd_contrast(single_study_c, study, trt, y = y, se = se)
   fit_ss_c <- nma(net_ss_c, prior_intercept = normal(0, 10), prior_trt = normal(0, 10))
   expect_s3_class(fit_ss_c, "stan_nma")
   d_ss_c <- relative_effects(fit_ss_c)
   expect_equal(d_ss_c$summary$mean, 0, tol = 0.01)
   expect_equal(d_ss_c$summary$sd, sqrt(4/500), tol = 0.01)
 
-  single_study_i <- tibble(study = "A", trt = rep(c("a", "b"), each = 100), y = c(rnorm(100, 0, 0.1), rnorm(100, 1, 0.1)))
-  net_ss_i <- set_ipd(single_study_i, study, trt, y = y)
   fit_ss_i <- nma(net_ss_i, prior_intercept = normal(0, 10), prior_trt = normal(0, 10), prior_aux = half_normal(2))
   expect_s3_class(fit_ss_i, "stan_nma")
   d_ss_i <- relative_effects(fit_ss_i)
   expect_equal(d_ss_i$summary$mean, 1, tol = 0.1)
   expect_equal(d_ss_i$summary$sd, sqrt(0.1^2 + 0.1^2)/sqrt(200), tol = 0.01)
+})
+
+test_that("nma() gives warnings for default priors", {
+  m <- "Prior distributions were left at default values:"
+
+  # Use test_grad = TRUE to avoid running any samples, just check logic works
+
+  expect_warning(nma(smknet, test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_trt.+"))
+  expect_warning(nma(smknet, prior_intercept = normal(0, 1), test_grad = TRUE), paste0(m, ".+prior_trt.+"))
+  expect_warning(nma(smknet, prior_trt = normal(0, 1), test_grad = TRUE), paste0(m, ".+prior_intercept.+"))
+
+  expect_warning(nma(smknet, trt_effects = "random", test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_trt.+", "prior_het.+"))
+  expect_warning(nma(smknet, trt_effects = "random", prior_intercept = normal(0, 1), test_grad = TRUE), paste0(m, ".+prior_trt.+", "prior_het.+"))
+  expect_warning(nma(smknet, trt_effects = "random", prior_trt = normal(0, 1), test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_het.+"))
+  expect_warning(nma(smknet, trt_effects = "random", prior_het = half_normal(1), test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_trt.+"))
+
+  smknet_yi <- set_ipd(smoking, studyn, trtc, y = r)
+
+  expect_warning(nma(smknet_yi, test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_trt.+", "prior_aux.+"))
+  expect_warning(nma(smknet_yi, prior_intercept = normal(0, 1), test_grad = TRUE), paste0(m, ".+prior_trt.+", "prior_aux.+"))
+  expect_warning(nma(smknet_yi, prior_trt = normal(0, 1), test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_aux.+"))
+  expect_warning(nma(smknet_yi, prior_aux = half_normal(1), test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_trt.+"))
+
+  expect_warning(nma(smknet_yi, trt_effects = "random", test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_trt.+", "prior_het.+", "prior_aux.+"))
+  expect_warning(nma(smknet_yi, trt_effects = "random", prior_intercept = normal(0, 1), test_grad = TRUE), paste0(m, ".+prior_trt.+", "prior_het.+", "prior_aux.+"))
+  expect_warning(nma(smknet_yi, trt_effects = "random", prior_trt = normal(0, 1), test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_het.+", "prior_aux.+"))
+  expect_warning(nma(smknet_yi, trt_effects = "random", prior_het = half_normal(1), test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_trt.+", "prior_aux.+"))
+  expect_warning(nma(smknet_yi, trt_effects = "random", prior_aux = half_normal(1), test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_trt.+", "prior_het.+"))
+
+})
+
+test_that("nma() error with incompatible priors", {
+  m <- "Invalid `prior_.+`\\. Suitable distributions are"
+
+  expect_error(nma(smknet, prior_intercept = half_normal(1), prior_trt = normal(0, 1)), m)
+  expect_error(nma(smknet, prior_intercept = normal(0, 1), prior_trt = half_normal(1)), m)
 })
