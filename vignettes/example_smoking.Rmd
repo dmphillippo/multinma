@@ -1,0 +1,25 @@
+---
+title: "Example: Smoking Cessation"
+output: rmarkdown::html_vignette
+bibliography: ../inst/REFERENCES.bib
+vignette: >
+  %\VignetteIndexEntry{Example: Smoking Cessation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(multinma)
+options(mc.cores = parallel::detectCores())
+```
+
+This vignette describes the analysis of smoking cessation data [@Hasselblad1998], replicating the analysis in NICE Technical Support Document 4 [@TSD4].
+
+## References
