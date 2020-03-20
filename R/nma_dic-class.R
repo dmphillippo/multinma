@@ -233,7 +233,6 @@ plot.nma_dic <- function(x, y, ...,
                                         x = .data$resdev_x,
                                         xmin = .data$x_lower, xmax = .data$x_upper,
                                         ymin = .data$y_lower, ymax = .data$y_upper,
-                                        colour = .data$Type,
                                         label = .data$.label))
     } else {
       ulim <- max(xy_resdev_post$resdev_x, xy_resdev_post$resdev_y)
@@ -241,8 +240,13 @@ plot.nma_dic <- function(x, y, ...,
       p <- ggplot2::ggplot(xy_resdev_post,
                            ggplot2::aes(y = .data$resdev_y,
                                         x = .data$resdev_x,
-                                        colour = .data$Type,
                                         label = .data$.label))
+    }
+
+    if (dplyr::n_distinct(xy_resdev_post$Type) > 1) {
+      p <- p +
+        ggplot2::aes(colour = .data$Type) +
+        ggplot2::scale_colour_viridis_d("")
     }
 
     p <- p +
@@ -250,12 +254,6 @@ plot.nma_dic <- function(x, y, ...,
                     y = "Residual Deviance (model 2)") +
       ggplot2::coord_fixed(xlim = c(0, ulim), ylim = c(0, ulim)) +
       ggplot2::geom_abline(slope = 1, intercept = 0, colour = "grey60")
-
-    if (dplyr::n_distinct(xy_resdev_post$Type) > 1) {
-      p <- p + ggplot2::scale_colour_viridis_d("")
-    } else {
-      p <- p + ggplot2::guides(colour = "none")
-    }
 
     if (show_uncertainty) {
       p <- p +
