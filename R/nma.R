@@ -130,6 +130,7 @@ nma <- function(network,
 
   # Prior defaults
   prior_defaults <- list()
+  has_aux <- FALSE
   if (.is_default(prior_intercept))
     prior_defaults$prior_intercept <- get_prior_call(prior_intercept)
   if (.is_default(prior_trt))
@@ -138,10 +139,11 @@ nma <- function(network,
     prior_defaults$prior_het <- get_prior_call(prior_het)
   if (!is.null(regression) && .is_default(prior_reg))
     prior_defaults$prior_reg <- get_prior_call(prior_reg)
-  if (.is_default(prior_reg)) {
-    if (likelihood == "normal") {
+  if (.is_default(prior_aux)) {
+    if (likelihood == "normal" && has_ipd(network)) {
       prior_aux <- .default(half_normal(scale = 5))
       prior_defaults$prior_aux <- get_prior_call(prior_aux)
+      has_aux <- TRUE
     }
   }
 
@@ -374,9 +376,6 @@ nma <- function(network,
     adapt_delta = adapt_delta,
     int_thin = int_thin)
 
-  # Was prior_aux used? Currently just for Normal IPD variance
-  has_aux <- "sigma" %in% stanfit@model_pars
-
   # Create stan_nma object
   out <- list(network = network,
               stanfit = stanfit,
@@ -531,7 +530,7 @@ nma.fit <- function(ipd_x, ipd_y,
   if (!inherits(prior_trt, "nma_prior")) abort("`prior_trt` should be a prior distribution, see ?priors.")
   if (!inherits(prior_het, "nma_prior")) abort("`prior_het` should be a prior distribution, see ?priors.")
   if (!inherits(prior_reg, "nma_prior")) abort("`prior_reg` should be a prior distribution, see ?priors.")
-  if (likelihood == "normal" && !inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
+  if (likelihood == "normal" && has_ipd && !inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
 
   prior_het_type <- rlang::arg_match(prior_het_type)
 
@@ -752,7 +751,7 @@ nma.fit <- function(ipd_x, ipd_y,
       agd_arm_se = if (has_agd_arm) agd_arm_y$.se else numeric(),
 
       # Add prior for auxilliary parameter - individual-level variance
-      !!! prior_standat(prior_het, "prior_aux",
+      !!! prior_standat(prior_aux, "prior_aux",
                         valid = c("Normal", "half-Normal", "log-Normal",
                                   "Cauchy",  "half-Cauchy",
                                   "Student t", "half-Student t",
