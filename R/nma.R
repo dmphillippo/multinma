@@ -1571,7 +1571,7 @@ prior_standat <- function(x, par, valid){
 
   if (!dist %in% valid)
     abort(glue::glue("Invalid `{par}`. Suitable distributions are: ",
-                glue::collapse(valid, sep = ", ", last = ", or ")))
+                glue::glue_collapse(valid, sep = ", ", last = ", or ")))
 
   distn <- switch(dist,
                   Normal = , `half-Normal` = 1,
