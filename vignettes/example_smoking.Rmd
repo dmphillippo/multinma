@@ -11,7 +11,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.width = 8, 
+  fig.height = 6
 )
 ```
 
@@ -21,5 +23,139 @@ options(mc.cores = parallel::detectCores())
 ```
 
 This vignette describes the analysis of smoking cessation data [@Hasselblad1998], replicating the analysis in NICE Technical Support Document 4 [@TSD4].
+The data are available in this package as `smoking`:
+```{r}
+head(smoking)
+```
+
+
+### Setting up the network
+We begin by setting up the network.
+We have arm-level count data giving the number quitting smoking (`r`) out of the total (`n`) in each arm, so we use the function `set_agd_arm()`.
+Treatment "No intervention" is set as the network reference treatment.
+```{r}
+smknet <- set_agd_arm(smoking, 
+                      study = studyn,
+                      trt = trtc,
+                      r = r, 
+                      n = n,
+                      trt_ref = "No intervention")
+smknet
+```
+
+Plot the network structure.
+```{r smoking_network_plot, eval=2, echo=1}
+plot(smknet, weight_edges = TRUE, weight_nodes = TRUE)
+plot(smknet, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(plot.margin = ggplot2::unit(c(1, 1, 1, 6), "lines"))
+```
+
+### Random effects NMA
+Following TSD 4, we fit a random effects NMA model, using the `nma()` function with `trt_effects = "random"`.
+We use $\mathrm{N}(0, 10^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and a $\mathrm{half-N}(5^2)$ prior distribution for the between-study heterogeneity standard deviation $\tau$.
+We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
+```{r}
+summary(normal(scale = 10))
+```
+```{r}
+summary(half_normal(scale = 5))
+```
+
+The model is fitted using the `nma()` function.
+By default, this will use a Binomial likelihood and a logit link function, auto-detected from the data.
+```{r}
+smkfit <- nma(smknet, 
+              trt_effects = "random",
+              prior_intercept = normal(scale = 10),
+              prior_trt = normal(scale = 10),
+              prior_het = normal(scale = 5))
+```
+
+Basic paramter summaries are given by the `print()` method:
+```{r}
+smkfit
+```
+
+By default, summaries of the study-specific intercepts $\mu_j$ and study-specific relative effects $\delta_{jk}$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(smkfit, pars = c("d", "tau", "mu", "delta"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r smoking_pp_plot}
+plot_prior_posterior(smkfit)
+```
+
+By default, this displays all model parameters given prior distributions (in this case $d_k$, $\mu_j$, and $\tau$), but this may be changed using the `prior` argument:
+```{r smoking_pp_plot_tau}
+plot_prior_posterior(smkfit, prior = "het")
+```
+
+Model fit can be checked using the `dic()` function
+```{r}
+(dic_consistency <- dic(smkfit))
+```
+
+and the residual deviance contributions examined with the corresponding `plot()` method
+```{r smoking_resdev_plot}
+plot(dic_consistency)
+```
+
+Overall model fit seems to be adequate, with almost all points showing good fit (mean residual deviance contribution of 1).
+The only two points with higher residual deviance (i.e. worse fit) correspond to the two zero counts in the data:
+```{r}
+smoking[smoking$r == 0, ]
+```
+
+
+### Checking for inconsistency
+We fit an unrelated mean effects (UME) model [@TSD4] to assess the consistency assumption.
+Again, we use the function `nma()`, but now with the argument `consistency = "ume"`.
+```{r}
+smkfit_ume <- nma(smknet, 
+                  consistency = "ume",
+                  trt_effects = "random",
+                  prior_intercept = normal(scale = 10),
+                  prior_trt = normal(scale = 10),
+                  prior_het = normal(scale = 5))
+smkfit_ume
+```
+
+Comparing the model fit statistics
+```{r}
+dic_consistency
+(dic_ume <- dic(smkfit_ume))
+```
+
+We see that there is little to choose between the two models.
+However, it is also important to examine the individual contributions to model fit of each data point under the two models (a so-called "dev-dev" plot).
+Passing two `nma_dic` objects produced by the `dic()` function to the `plot()` method produces this dev-dev plot:
+```{r smoking_devdev_plot}
+plot(dic_consistency, dic_ume, point_alpha = 0.5, interval_alpha = 0.2)
+```
+
+All points lie roughly on the line of equality, so there is no evidence for inconsistency here.
+
+### Further results
+Pairwise relative effects, for all pairwise contrasts with `all_contrasts = TRUE`.
+```{r smoking_releff}
+(smk_releff <- relative_effects(smkfit, all_contrasts = TRUE))
+plot(smk_releff, ref_line = 0)
+```
+
+Treatment rankings, rank probabilities, and cumulative rank probabilities.
+We set `lower_better = FALSE` since a higher log odds of cessation is better (the outcome is positive).
+```{r smoking_ranks, fig.height=3}
+(smk_ranks <- posterior_ranks(smkfit, lower_better = FALSE))
+plot(smk_ranks)
+```
+```{r smoking_rankprobs}
+(smk_rankprobs <- posterior_rank_probs(smkfit, lower_better = FALSE))
+plot(smk_rankprobs)
+```
+```{r smoking_cumrankprobs}
+(smk_cumrankprobs <- posterior_rank_probs(smkfit, lower_better = FALSE, cumulative = TRUE))
+plot(smk_cumrankprobs)
+```
 
 ## References
