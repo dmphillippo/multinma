@@ -119,6 +119,9 @@ nma <- function(network,
   likelihood <- check_likelihood(likelihood, network$outcome)
   link <- check_link(link, likelihood)
 
+  # When are priors on auxilliary parameters required?
+  has_aux <- (likelihood == "normal" && has_ipd(network))
+
   # Check priors
   if (!inherits(prior_intercept, "nma_prior")) abort("`prior_intercept` should be a prior distribution, see ?priors.")
   if (!inherits(prior_trt, "nma_prior")) abort("`prior_trt` should be a prior distribution, see ?priors.")
@@ -128,9 +131,9 @@ nma <- function(network,
 
   prior_het_type <- rlang::arg_match(prior_het_type)
 
+
   # Prior defaults
   prior_defaults <- list()
-  has_aux <- FALSE
   if (.is_default(prior_intercept))
     prior_defaults$prior_intercept <- get_prior_call(prior_intercept)
   if (.is_default(prior_trt))
@@ -139,11 +142,10 @@ nma <- function(network,
     prior_defaults$prior_het <- get_prior_call(prior_het)
   if (!is.null(regression) && .is_default(prior_reg))
     prior_defaults$prior_reg <- get_prior_call(prior_reg)
-  if (.is_default(prior_aux)) {
+  if (has_aux && .is_default(prior_aux)) {
     if (likelihood == "normal" && has_ipd(network)) {
       prior_aux <- .default(half_normal(scale = 5))
       prior_defaults$prior_aux <- get_prior_call(prior_aux)
-      has_aux <- TRUE
     }
   }
 
@@ -525,14 +527,20 @@ nma.fit <- function(ipd_x, ipd_y,
   likelihood <- check_likelihood(likelihood)
   link <- check_link(link, likelihood)
 
+  # When are priors on auxilliary parameters required?
+  has_aux <- (likelihood == "normal" && has_ipd)
+
   # Check priors
   if (!inherits(prior_intercept, "nma_prior")) abort("`prior_intercept` should be a prior distribution, see ?priors.")
   if (!inherits(prior_trt, "nma_prior")) abort("`prior_trt` should be a prior distribution, see ?priors.")
-  if (!inherits(prior_het, "nma_prior")) abort("`prior_het` should be a prior distribution, see ?priors.")
+  if (trt_effects == "random" && !inherits(prior_het, "nma_prior")) abort("`prior_het` should be a prior distribution, see ?priors.")
   if (!inherits(prior_reg, "nma_prior")) abort("`prior_reg` should be a prior distribution, see ?priors.")
-  if (likelihood == "normal" && has_ipd && !inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
+  if (has_aux && !inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
 
   prior_het_type <- rlang::arg_match(prior_het_type)
+
+  # Dummy RE prior for FE model, not used but requested by Stan data
+  if (trt_effects == "fixed") prior_het <- half_normal(1)
 
   # Check other args
   if (!is.logical(QR) || length(QR) > 1) abort("`QR` should be a logical scalar (TRUE or FALSE).")
@@ -743,6 +751,9 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # -- Normal likelihood
   if (likelihood == "normal") {
+
+    # Dummy prior for IPD variance when no IPD - not used, but requested by Stan data
+    if (!has_ipd) prior_aux <- half_normal(1)
 
     standat <- purrr::list_modify(standat,
       # Add outcomes
