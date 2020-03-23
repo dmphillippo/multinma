@@ -45,8 +45,10 @@ smknet
 ```
 
 Plot the network structure.
-```{r smoking_network_plot, eval=2, echo=1}
+```{r, eval=FALSE}
 plot(smknet, weight_edges = TRUE, weight_nodes = TRUE)
+```
+```{r smoking_network_plot, echo=FALSE}
 plot(smknet, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(plot.margin = ggplot2::unit(c(1, 1, 1, 6), "lines"))
 ```
 
