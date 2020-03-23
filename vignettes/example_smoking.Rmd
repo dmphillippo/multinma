@@ -141,7 +141,7 @@ All points lie roughly on the line of equality, so there is no evidence for inco
 
 ### Further results
 Pairwise relative effects, for all pairwise contrasts with `all_contrasts = TRUE`.
-```{r smoking_releff}
+```{r smoking_releff, fig.height=4.5}
 (smk_releff <- relative_effects(smkfit, all_contrasts = TRUE))
 plot(smk_releff, ref_line = 0)
 ```
