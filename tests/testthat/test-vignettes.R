@@ -6,3 +6,8 @@ test_that("Smoking example", {
   rmarkdown::render("../../vignettes/example_smoking.Rmd")
   file.remove("../../vignettes/example_smoking.html")
 })
+
+test_that("Thrombolytics example", {
+  rmarkdown::render("../../vignettes/example_thrombolytics.Rmd")
+  file.remove("../../vignettes/example_thrombolytics.html")
+})
