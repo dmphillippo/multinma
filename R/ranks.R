@@ -143,7 +143,7 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
   }
 
   if (summary) {
-    class(out) <- "nma_summary"
+    class(out) <- c("nma_ranks", "nma_summary")
     attr(out, "xlab") <- "Treatment"
     attr(out, "ylab") <- "Posterior Rank"
   }

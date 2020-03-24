@@ -191,6 +191,11 @@ plot.nma_summary <- function(x, ...,
   p_ylab <- attr(x, "ylab", TRUE)
   if (is.null(p_ylab)) p_ylab <- ""
 
+  # Tweak output if rank summary
+  if (is_ranks <- inherits(x, "nma_ranks")) {
+    ntrt <- nrow(as.data.frame(x))
+  }
+
   # Get draws
   draws <- tibble::as_tibble(as.matrix(x))
 
@@ -203,7 +208,7 @@ plot.nma_summary <- function(x, ...,
                            dplyr::everything())
   }
 
-  if (has_studies <- rlang::has_name(x$summary, ".study")) {
+  if (has_studies <- rlang::has_name(as.data.frame(x), ".study")) {
     draws$Study <- forcats::fct_inorder(factor(
       stringr::str_extract(draws$parameter, "(?<=\\[).+(?=\\:)")))
     draws$Treatment <- forcats::fct_inorder(factor(
@@ -219,17 +224,29 @@ plot.nma_summary <- function(x, ...,
 
     p <- ggplot2::ggplot(draws, ggplot2::aes(y = .data$Treatment, x = .data$value)) +
       ggplot2::geom_vline(xintercept = ref_line, na.rm = TRUE, colour = "grey60") +
-      ggplot2::ylab(p_xlab) + ggplot2::xlab(p_ylab)
+      ggplot2::ylab(p_xlab)
 
     if (has_studies) p <- p + ggplot2::facet_grid(Study~.)
+
+    if (is_ranks) {
+      p <- p + ggplot2::scale_x_continuous(p_ylab, breaks = 1:ntrt, minor_breaks = NULL)
+    } else {
+      p <- p + ggplot2::xlab(p_ylab)
+    }
 
   } else {
 
     p <- ggplot2::ggplot(draws, ggplot2::aes(x = .data$Treatment, y = .data$value)) +
       ggplot2::geom_hline(yintercept = ref_line, na.rm = TRUE, colour = "grey60") +
-      ggplot2::xlab(p_xlab) + ggplot2::ylab(p_ylab)
+      ggplot2::xlab(p_xlab)
 
     if (has_studies) p <- p + ggplot2::facet_grid(.~Study)
+
+    if (is_ranks) {
+      p <- p + ggplot2::scale_y_continuous(p_ylab, breaks = 1:ntrt, minor_breaks = NULL)
+    } else {
+      p <- p + ggplot2::ylab(p_ylab)
+    }
 
   }
 
@@ -324,6 +341,8 @@ plot.nma_rank_probs <- function(x, ...) {
 
   dat <- as.data.frame(x)
 
+  ntrt <- nrow(dat)
+
   if (has_studies <- rlang::has_name(dat, ".study")) {
     dat$Study <- forcats::fct_inorder(factor(dat$.study))
     dat$Treatment <- forcats::fct_inorder(factor(
@@ -350,7 +369,8 @@ plot.nma_rank_probs <- function(x, ...) {
   p <- ggplot2::ggplot(dat,
                        ggplot2::aes(x = .data$rank, y = .data$probability)) +
     ggplot2::geom_line(...) +
-    ggplot2::xlab(p_xlab) + ggplot2::ylab(p_ylab) +
+    ggplot2::ylab(p_ylab) +
+    ggplot2::scale_x_continuous(p_xlab, breaks = 1:ntrt, minor_breaks = NULL) +
     ggplot2::coord_cartesian(ylim = c(0, 1)) +
     theme_multinma()
 
