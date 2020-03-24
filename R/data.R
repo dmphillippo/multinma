@@ -142,3 +142,24 @@
 #'
 
 "transfusion"
+
+#' Beta blockers to prevent mortality after MI
+#'
+#' Data frame containing the number of deaths in 22 trials comparing beta
+#' blockers vs. control for preventing mortality after myocardial infarction
+#' \insertCite{Carlin1992,TSD2}{multinma}.
+#'
+#' @format A data frame with 44 rows and 5 variables:
+#' \describe{
+#'   \item{studyn}{numeric study ID}
+#'   \item{trtn}{numeric treatment code}
+#'   \item{trtc}{treatment name}
+#'   \item{r}{total number of events}
+#'   \item{n}{total number of individuals}
+#' }
+#'
+#' @references
+#'   \insertAllCited{}
+#'
+
+"blocker"
