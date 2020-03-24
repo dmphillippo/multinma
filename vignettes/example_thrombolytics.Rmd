@@ -1,0 +1,261 @@
+---
+title: "Example: Thrombolytic Treatments"
+output: rmarkdown::html_vignette
+bibliography: ../inst/REFERENCES.bib
+vignette: >
+  %\VignetteIndexEntry{Example: Thrombolytic Treatments}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8, 
+  fig.height = 6,
+  eval = identical(Sys.getenv("NOT_CRAN"), "true")
+)
+```
+
+```{r setup}
+library(multinma)
+options(mc.cores = parallel::detectCores())
+```
+
+This vignette describes the analysis of 50 trials of 8 thrombolytic drugs (streptokinase, SK; alteplase, t-PA; accelerated alteplase, Acc t-PA; streptokinase plus alteplase, SK+tPA; reteplase, r-PA; tenocteplase, TNK; urokinase, UK; anistreptilase, ASPAC) plus per-cutaneous transluminal coronary angioplasty (PTCA) [@Boland2003; @Lu2006; @TSD4].
+The number of deaths in 30 or 35 days following accute myocardial infarction are recorded.
+The data are available in this package as `thrombolytics`:
+```{r}
+head(thrombolytics)
+```
+
+
+### Setting up the network
+We begin by setting up the network.
+We have arm-level count data giving the number of deaths (`r`) out of the total (`n`) in each arm, so we use the function `set_agd_arm()`.
+By default, SK is set as the network reference treatment.
+```{r}
+thrombo_net <- set_agd_arm(thrombolytics, 
+                           study = studyn,
+                           trt = trtc,
+                           r = r, 
+                           n = n)
+thrombo_net
+```
+
+Plot the network structure.
+```{r, eval=FALSE}
+plot(thrombo_net, weight_edges = TRUE, weight_nodes = TRUE)
+```
+```{r thrombo_net_plot, echo=FALSE}
+plot(thrombo_net, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(legend.margin = ggplot2::margin(l = 4, unit = "lines"))
+```
+
+
+### Random effects NMA
+Following TSD 4 [@TSD4], we fit a fixed effects NMA model, using the `nma()` function with `trt_effects = "fixed"`.
+We use $\mathrm{N}(0, 10^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$.
+We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
+```{r}
+summary(normal(scale = 10))
+```
+
+The model is fitted using the `nma()` function.
+By default, this will use a Binomial likelihood and a logit link function, auto-detected from the data.
+```{r}
+thrombo_fit <- nma(thrombo_net, 
+                   trt_effects = "fixed",
+                   prior_intercept = normal(scale = 10),
+                   prior_trt = normal(scale = 10))
+```
+
+Basic paramter summaries are given by the `print()` method:
+```{r}
+thrombo_fit
+```
+
+By default, summaries of the study-specific intercepts $\mu_j$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(thrombo_fit, pars = c("d", "mu"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r thrombo_pp_plot}
+plot_prior_posterior(thrombo_fit, prior = "trt")
+```
+
+Model fit can be checked using the `dic()` function
+```{r}
+(dic_consistency <- dic(thrombo_fit))
+```
+
+and the residual deviance contributions examined with the corresponding `plot()` method.
+```{r thrombo_resdev_plot, fig.width=12}
+plot(dic_consistency)
+```
+
+There are a number of points which are not very well fit by the model, having posterior mean residual deviance contributions greater than 1.
+
+
+### Checking for inconsistency
+We fit an unrelated mean effects (UME) model [@TSD4] to assess the consistency assumption.
+Again, we use the function `nma()`, but now with the argument `consistency = "ume"`.
+```{r}
+thrombo_fit_ume <- nma(thrombo_net, 
+                  consistency = "ume",
+                  trt_effects = "fixed",
+                  prior_intercept = normal(scale = 10),
+                  prior_trt = normal(scale = 10))
+thrombo_fit_ume
+```
+
+Comparing the model fit statistics
+```{r}
+dic_consistency
+(dic_ume <- dic(thrombo_fit_ume))
+```
+
+Whilst the UME model fits the data better, having a lower residual deviance, the additional parameters in the UME model mean that the DIC is very similar between both models.
+However, it is also important to examine the individual contributions to model fit of each data point under the two models (a so-called "dev-dev" plot).
+Passing two `nma_dic` objects produced by the `dic()` function to the `plot()` method produces this dev-dev plot:
+```{r thrombo_devdev_plot}
+plot(dic_consistency, dic_ume, show_uncertainty = FALSE)
+```
+
+The four points lying in the lower right corner of the plot have much lower posterior mean residual deviance under the UME model, indicating that these data are potentially inconsistent.
+These points correspond to trials 44 and 45, the only two trials comparing Acc t-PA to ASPAC.
+The ASPAC vs. Acc t-PA estimates are very different under the consistency model and inconsistency (UME) model, suggesting that these two trials may be systematically different from the others in the network.
+
+### Further results
+Relative effects for all pairwise contrasts between treatments can be produced using the `relative_effects()` function, with `all_contrasts = TRUE`.
+```{r thrombo_releff}
+(thrombo_releff <- relative_effects(thrombo_fit, all_contrasts = TRUE))
+plot(thrombo_releff, ref_line = 0)
+```
+
+Treatment rankings, rank probabilities, and cumulative rank probabilities.
+```{r thrombo_ranks}
+(thrombo_ranks <- posterior_ranks(thrombo_fit))
+plot(thrombo_ranks)
+```
+```{r thrombo_rankprobs}
+(thrombo_rankprobs <- posterior_rank_probs(thrombo_fit))
+plot(thrombo_rankprobs)
+```
+```{r thrombo_cumrankprobs}
+(thrombo_cumrankprobs <- posterior_rank_probs(thrombo_fit, cumulative = TRUE))
+plot(thrombo_cumrankprobs)
+```
+
+## References
+
+```{r thrombo_tests, include=FALSE, error=TRUE}
+#--- Test against TSD 4 results ---
+library(testthat)
+library(dplyr)
+
+test_that("Reference trt is SK", {
+  expect_equal(levels(thrombo_net$treatments)[1], "SK")
+})
+
+tol <- 0.05
+tol_dic <- 0.1
+
+# Relative effects
+tsd_releff <- tribble(
+~trt_b    , ~trt       , ~mean , ~sd  , ~lower, ~upper,
+"SK"      , "t-PA"     , 0.002 , 0.030, -0.06 , 0.06  ,
+"SK"      , "Acc t-PA" , -0.177, 0.043, -0.26 , -0.09 ,
+"SK"      , "SK + t-PA", -0.049, 0.046, -0.14 , 0.04  ,
+"SK"      , "r-PA"     , -0.124, 0.060, -0.24 , -0.01 ,
+"SK"      , "PTCA"     , -0.476, 0.101, -0.67 , -0.28 ,
+"SK"      , "UK"       , -0.203, 0.221, -0.64 , 0.23  ,
+"SK"      , "ASPAC"    , 0.016 , 0.037, -0.06 , 0.09  ,
+"t-PA"    , "PTCA"     , -0.478, 0.104, -0.68 , -0.27 ,
+"t-PA"    , "UK"       , -0.206, 0.221, -0.64 , 0.23  ,
+"t-PA"    , "ASPAC"    , 0.013 , 0.037, -0.06 , 0.09  ,
+"Acc t-PA", "r-PA"     , 0.054 , 0.055, -0.05 , 0.16  ,
+"Acc t-PA", "TNK"      , 0.005 , 0.064, -0.12 , 0.13  ,
+"Acc t-PA", "PTCA"     , -0.298, 0.098, -0.49 , -0.11 ,
+"Acc t-PA", "UK"       , -0.026, 0.221, -0.46 , 0.41  ,
+"Acc t-PA", "ASPAC"    , 0.193 , 0.056, 0.08  , 0.30  ) %>% 
+  mutate(.trt_b = ordered(trt_b, levels = levels(thrombo_net$treatments)),
+         .trt = ordered(trt, levels = levels(thrombo_net$treatments)),
+         rev = if_else(.trt_b > .trt, -1, 1),
+         .l = lower, .u = upper,
+         lower = if_else(.trt_b > .trt, .u, .l),
+         upper = if_else(.trt_b > .trt, .l, .u),
+         trt_b = if_else(.trt_b > .trt, .trt, .trt_b),
+         trt = if_else(.trt_b > .trt, .trt_b, .trt),
+         lab = paste0("d[", trt, " vs. ", trt_b, "]")) %>% 
+  arrange(trt_b, trt) %>% 
+  mutate_at(vars(mean, lower, upper), ~.*rev)
+
+thrombo_releff_summary <- as.data.frame(thrombo_releff) %>% 
+  filter(parameter %in% tsd_releff$lab)
+
+test_that("FE relative effects", {
+  expect_equal(thrombo_releff_summary$mean, tsd_releff$mean, tolerance = tol)
+  expect_equal(thrombo_releff_summary$sd, tsd_releff$sd, tolerance = tol)
+  expect_equal(thrombo_releff_summary$`2.5%`, tsd_releff$lower, tolerance = tol)
+  expect_equal(thrombo_releff_summary$`97.5%`, tsd_releff$upper, tolerance = tol)
+})
+
+# DIC
+test_that("DIC", {
+  expect_equal(dic_consistency$resdev, 105.9, tolerance = tol_dic)
+  expect_equal(dic_consistency$pd, 58, tolerance = tol_dic)
+  expect_equal(dic_consistency$dic, 163.9, tolerance = tol_dic)
+})
+
+# Relative effects (UME)
+
+# FE UME model, so no differences by reference treatment, no multi-arm correction
+tsd_ume <- tribble(
+~trt_b    , ~trt       , ~mean , ~sd  , ~lower, ~upper,
+"SK"      , "t-PA"     , -0.004, 0.030, -0.06 , 0.06  ,
+"SK"      , "Acc t-PA" , -0.158, 0.049, -0.25 , -0.06 ,
+"SK"      , "SK + t-PA", -0.044, 0.047, -0.14 , 0.05  ,
+"SK"      , "r-PA"     , -0.060, 0.089, -0.23 , 0.11  ,
+"SK"      , "PTCA"     , -0.665, 0.185, -1.03 , -0.31 ,
+"SK"      , "UK"       , -0.369, 0.518, -1.41 , 0.63  ,
+"SK"      , "ASPAC"    , 0.005 , 0.037, -0.07 , 0.08  ,
+"t-PA"    , "PTCA"     , -0.544, 0.417, -1.38 , 0.25  ,
+"t-PA"    , "UK"       , -0.294, 0.347, -0.99 , 0.37  ,
+"t-PA"    , "ASPAC"    , -0.290, 0.361, -1.01 , 0.41  ,
+"Acc t-PA", "r-PA"     , 0.019 , 0.066, -0.11 , 0.15  ,
+"Acc t-PA", "TNK"      , 0.006 , 0.064, -0.12 , 0.13  ,
+"Acc t-PA", "PTCA"     , -0.216, 0.119, -0.45 , 0.02  ,
+"Acc t-PA", "UK"       , 0.146 , 0.358, -0.54 , 0.86  ,
+"Acc t-PA", "ASPAC"    , 1.405 , 0.417, 0.63  , 2.27  ) %>% 
+  mutate(.trt_b = ordered(trt_b, levels = levels(thrombo_net$treatments)),
+         .trt = ordered(trt, levels = levels(thrombo_net$treatments)),
+         rev = if_else(.trt_b > .trt, -1, 1),
+         .l = lower, .u = upper,
+         lower = if_else(.trt_b > .trt, .u, .l),
+         upper = if_else(.trt_b > .trt, .l, .u),
+         trt_b = if_else(.trt_b > .trt, .trt, .trt_b),
+         trt = if_else(.trt_b > .trt, .trt_b, .trt),
+         lab = paste0("d[", trt, " vs. ", trt_b, "]")) %>%
+  arrange(trt_b, trt) %>%
+  mutate_at(vars(mean, lower, upper), ~.*rev)
+
+thrombo_ume_releff <- summary(thrombo_fit_ume, pars = "d")
+
+test_that("UME relative effects", {
+  expect_equal(thrombo_ume_releff$summary$mean, tsd_ume$mean, tolerance = tol)
+  expect_equal(thrombo_ume_releff$summary$sd, tsd_ume$sd, tolerance = tol)
+  expect_equal(thrombo_ume_releff$summary$`2.5%`, tsd_ume$lower, tolerance = tol)
+  expect_equal(thrombo_ume_releff$summary$`97.5%`, tsd_ume$upper, tolerance = tol)
+})
+
+# DIC (UME)
+test_that("UME DIC", {
+  expect_equal(dic_ume$resdev, 99.7, tolerance = tol_dic)
+  expect_equal(dic_ume$pd, 65, tolerance = tol_dic)
+  expect_equal(dic_ume$dic, 164.7, tolerance = tol_dic)
+})
+```
+
