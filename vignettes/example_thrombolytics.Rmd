@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
   fig.height = 6,
   eval = identical(Sys.getenv("NOT_CRAN"), "true")
 )
+options(width = 100)
 ```
 
 ```{r setup}
