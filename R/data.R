@@ -163,3 +163,25 @@
 #'
 
 "blocker"
+
+#' Reduced dietary fat to prevent mortality
+#'
+#' Data frame containing the number of deaths and person-years at risk in 10
+#' trials comparing reduced fat diets vs. control (non-reduced fat diet) for
+#' preventing mortality \insertCite{Hooper2000,TSD2}{multinma}.
+#'
+#' @format A data frame with 21 rows and 6 variables:
+#' \describe{
+#'   \item{studyn}{numeric study ID}
+#'   \item{studyc}{study name}
+#'   \item{trtn}{numeric treatment code}
+#'   \item{trtc}{treatment name}
+#'   \item{r}{total number of events}
+#'   \item{E}{person-years at risk}
+#' }
+#'
+#' @references
+#'   \insertAllCited{}
+#'
+
+"dietary_fat"
