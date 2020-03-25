@@ -170,13 +170,14 @@
 #' trials comparing reduced fat diets vs. control (non-reduced fat diet) for
 #' preventing mortality \insertCite{Hooper2000,TSD2}{multinma}.
 #'
-#' @format A data frame with 21 rows and 6 variables:
+#' @format A data frame with 21 rows and 7 variables:
 #' \describe{
 #'   \item{studyn}{numeric study ID}
 #'   \item{studyc}{study name}
 #'   \item{trtn}{numeric treatment code}
 #'   \item{trtc}{treatment name}
-#'   \item{r}{total number of events}
+#'   \item{r}{number of events}
+#'   \item{n}{number randomised}
 #'   \item{E}{person-years at risk}
 #' }
 #'

@@ -10,9 +10,9 @@ df_wide <- read_tsv("./data-raw/dietary_fat/dietary_fat.txt") %>% mutate(studyn 
 # Make into long (tidy) format
 dietary_fat <- df_wide %>%
   group_by(studyn) %>%
-  gather(key, var, t1:r3) %>%
-  mutate(arm = gsub("[rtE]([0-9]+)", "\\1", key),
-         key = gsub("([rtE])[0-9]+", "\\1", key)) %>%
+  gather(key, var, t1:n3) %>%
+  mutate(arm = gsub("[rntE]([0-9]+)", "\\1", key),
+         key = gsub("([rntE])[0-9]+", "\\1", key)) %>%
   spread(key, var) %>%
   filter(!is.na(t)) %>%
   ungroup() %>%
@@ -22,7 +22,7 @@ dietary_fat <- df_wide %>%
             trtc = recode(trtn,
                           "Control",
                           "Reduced Fat"),
-            r, E) %>%
+            r, n, E) %>%
   arrange(studyn, trtn)
 
 # Store as standard data.frame
