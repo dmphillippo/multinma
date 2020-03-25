@@ -2,17 +2,21 @@
 
 skip_on_cran()
 
+td <- tempdir()
+
 test_that("Smoking example", {
-  rmarkdown::render("../../vignettes/example_smoking.Rmd")
-  file.remove("../../vignettes/example_smoking.html")
+  rmarkdown::render("../../vignettes/example_smoking.Rmd", output_dir = td)
 })
 
 test_that("Thrombolytics example", {
-  rmarkdown::render("../../vignettes/example_thrombolytics.Rmd")
-  file.remove("../../vignettes/example_thrombolytics.html")
+  rmarkdown::render("../../vignettes/example_thrombolytics.Rmd", output_dir = td)
 })
 
 test_that("Blocker example", {
-  rmarkdown::render("../../vignettes/example_blocker.Rmd")
-  file.remove("../../vignettes/example_blocker.html")
+  rmarkdown::render("../../vignettes/example_blocker.Rmd", output_dir = td)
 })
+
+test_that("Dietary fat example", {
+  rmarkdown::render("../../vignettes/example_dietary_fat.Rmd", output_dir = td)
+})
+
