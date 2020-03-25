@@ -1,0 +1,250 @@
+---
+title: "Example: Dietary Fat"
+output: rmarkdown::html_vignette
+bibliography: ../inst/REFERENCES.bib
+vignette: >
+  %\VignetteIndexEntry{Example: Dietary Fat}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8, 
+  fig.height = 6,
+  eval = identical(Sys.getenv("NOT_CRAN"), "true")
+)
+options(width = 100)
+```
+
+```{r setup}
+library(multinma)
+options(mc.cores = parallel::detectCores())
+```
+
+This vignette describes the analysis of 10 trials comparing reduced fat diets to control (non-reduced fat diets) for preventing mortality [@Hooper2000; @TSD2].
+The data are available in this package as `dietary_fat`:
+```{r}
+head(dietary_fat)
+```
+
+
+### Setting up the network
+We begin by setting up the network - here just a pairwise meta-analysis.
+We have arm-level rate data giving the number of deaths (`r`) and the person-years at risk (`E`) in each arm, so we use the function `set_agd_arm()`.
+We set "Control" as the reference treatment.
+```{r}
+diet_net <- set_agd_arm(dietary_fat, 
+                        study = studyc,
+                        trt = trtc,
+                        r = r, 
+                        E = E,
+                        trt_ref = "Control",
+                        sample_size = n)
+diet_net
+```
+
+We also specify the optional `sample_size` argument, although it is not strictly necessary here.
+In this case `sample_size` would only be required to produce a network plot with nodes weighted by sample size, and a network plot is not particularly informative for a meta-analysis of only two treatments.
+(The `sample_size` argument is more important when a regression model is specified, since it also enables automatic centering of predictors and production of predictions for studies in the network, see `?set_agd_arm`.)
+
+### Meta-analysis models
+We fit both fixed effect (FE) and random effects (RE) models.
+
+#### Fixed effect meta-analysis
+First, we fit a fixed effect model using the `nma()` function with `trt_effects = "fixed"`.
+We use $\mathrm{N}(0, 10^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$.
+We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
+```{r}
+summary(normal(scale = 10))
+```
+
+The model is fitted using the `nma()` function.
+By default, this will use a Poisson likelihood with a log link function, auto-detected from the data.
+```{r}
+diet_fit_FE <- nma(diet_net, 
+                   trt_effects = "fixed",
+                   prior_intercept = normal(scale = 10),
+                   prior_trt = normal(scale = 10))
+```
+
+Basic paramter summaries are given by the `print()` method:
+```{r}
+diet_fit_FE
+```
+
+By default, summaries of the study-specific intercepts $\mu_j$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(diet_fit_FE, pars = c("d", "mu"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r diet_FE_pp_plot}
+plot_prior_posterior(diet_fit_FE)
+```
+
+#### Random effects meta-analysis
+We now fit a random effects model using the `nma()` function with `trt_effects = "random"`.
+Again, we use $\mathrm{N}(0, 10^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and we additionally use a $\mathrm{half-N}(5^2)$ prior for the heterogeneity standard deviation $\tau$.
+We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
+```{r}
+summary(normal(scale = 10))
+summary(half_normal(scale = 5))
+```
+
+Fitting the RE model
+```{r, warning=FALSE}
+diet_fit_RE <- nma(diet_net, 
+                   trt_effects = "random",
+                   prior_intercept = normal(scale = 10),
+                   prior_trt = normal(scale = 10),
+                   prior_het = half_normal(scale = 5))
+```
+
+Basic paramter summaries are given by the `print()` method:
+```{r}
+diet_fit_RE
+```
+
+By default, summaries of the study-specific intercepts $\mu_j$ and study-specific relative effects $\delta_{jk}$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(diet_fit_FE, pars = c("d", "mu", "delta"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r diet_RE_pp_plot}
+plot_prior_posterior(diet_fit_RE, prior = c("trt", "het"))
+```
+
+
+#### Model comparison
+Model fit can be checked using the `dic()` function:
+```{r}
+(dic_FE <- dic(diet_fit_FE))
+```
+```{r}
+(dic_RE <- dic(diet_fit_RE))
+```
+
+Both models appear to fit the data well, as the residual deviance is close to the number of data points.
+The DIC is very similar between models, so the FE model may be preferred for parsimony.
+
+We can also examine the residual deviance contributions with the corresponding `plot()` method.
+```{r diet_FE_resdev_plot}
+plot(dic_FE)
+```
+
+```{r diet_RE_resdev_plot}
+plot(dic_RE)
+```
+
+
+### Further results
+@TSD2 produce absolute predictions of the mortality rates on reduced fat and control diets, assuming a Normal distribution on the baseline log rate of mortality with mean $-3$ and precision $1.77$.
+We can replicate these results using the `predict()` method.
+The `baseline` argument takes a `distr()` distribution object, with which we specify the corresponding Normal distribution.
+We set `type = "response"` to produce predicted rates (`type = "link"` would produce predicted log rates).
+```{r diet_pred_FE, fig.height = 2}
+pred_FE <- predict(diet_fit_FE, 
+                   baseline = distr(qnorm, mean = -3, sd = 1.77^-0.5), 
+                   type = "response")
+pred_FE
+plot(pred_FE)
+```
+```{r diet_pred_RE, fig.height = 2}
+pred_RE <- predict(diet_fit_RE, 
+                   baseline = distr(qnorm, mean = -3, sd = 1.77^-0.5), 
+                   type = "response")
+pred_RE
+plot(pred_RE)
+```
+
+If the `baseline` argument is ommitted, predicted rates will be produced for every study in the network based on their estimated baseline log rate $\mu_j$:
+```{r diet_pred_FE_all, fig.height=10}
+pred_FE_studies <- predict(diet_fit_FE, type = "response")
+pred_FE_studies
+plot(pred_FE_studies) + ggplot2::facet_grid(Study~., labeller = ggplot2::label_wrap_gen(width = 10))
+```
+
+
+## References
+
+```{r diet_tests, error=TRUE, include=FALSE}
+#--- Test against TSD 2 results ---
+library(testthat)
+library(dplyr)
+
+tol <- 0.05
+tol_dic <- 0.1
+
+# Relative effects
+diet_FE_releff <- as.data.frame(relative_effects(diet_fit_FE))
+
+test_that("FE relative effects", {
+  expect_equal(diet_FE_releff$mean, -0.01, tolerance = tol)
+  expect_equal(diet_FE_releff$sd, 0.054, tolerance = tol)
+  expect_equal(diet_FE_releff$`2.5%`, -0.11, tolerance = tol)
+  expect_equal(diet_FE_releff$`50%`, -0.01, tolerance = tol)
+  expect_equal(diet_FE_releff$`97.5%`, 0.10, tolerance = tol)
+})
+
+diet_RE_releff <- as.data.frame(relative_effects(diet_fit_RE))
+
+test_that("RE relative effects", {
+  expect_equal(diet_RE_releff$mean, -0.02, tolerance = tol)
+  expect_equal(diet_RE_releff$sd, 0.09, tolerance = tol)
+  expect_equal(diet_RE_releff$`2.5%`, -0.19, tolerance = tol)
+  expect_equal(diet_RE_releff$`50%`, -0.01, tolerance = tol)
+  expect_equal(diet_RE_releff$`97.5%`, 0.16, tolerance = tol)
+})
+
+# RE heterogeneity SD
+diet_RE_sd <- as.data.frame(summary(diet_fit_RE, pars = "tau"))
+
+test_that("RE heterogeneity SD", {
+  expect_equal(diet_RE_sd$mean, 0.13, tolerance = tol)
+  expect_equal(diet_RE_sd$sd, 0.12, tolerance = tol)
+  expect_equal(diet_RE_sd$`2.5%`, 0.00, tolerance = tol)
+  expect_equal(diet_RE_sd$`50%`, 0.10, tolerance = tol)
+  expect_equal(diet_RE_sd$`97.5%`, 0.43, tolerance = tol)
+})
+
+# DIC
+test_that("FE DIC", {
+  expect_equal(dic_FE$resdev, 23.32, tolerance = tol_dic)
+  expect_equal(dic_FE$pd, 10.9, tolerance = tol_dic)
+  expect_equal(dic_FE$dic, 33.2, tolerance = tol_dic)
+})
+
+test_that("RE DIC", {
+  expect_equal(dic_RE$resdev, 21.5, tolerance = tol_dic)
+  expect_equal(dic_RE$pd, 13.3, tolerance = tol_dic)
+  expect_equal(dic_RE$dic, 34.8, tolerance = tol_dic)
+})
+
+# Predictions
+diet_pred_FE <- as.data.frame(pred_FE)
+
+test_that("FE predicted probabilities", {
+  expect_equal(diet_pred_FE$mean, c(0.06, 0.06), tolerance = tol_dic)
+  expect_equal(diet_pred_FE$sd, c(0.04, 0.04), tolerance = tol_dic)
+  expect_equal(diet_pred_FE$`2.5%`, c(0.01, 0.01), tolerance = tol_dic)
+  expect_equal(diet_pred_FE$`50%`, c(0.05, 0.05), tolerance = tol_dic)
+  expect_equal(diet_pred_FE$`97.5%`, c(0.18, 0.18), tolerance = tol_dic)
+})
+
+diet_pred_RE <- as.data.frame(pred_RE)
+
+test_that("RE predicted probabilities", {
+  expect_equal(diet_pred_RE$mean, c(0.06, 0.06), tolerance = tol_dic)
+  expect_equal(diet_pred_RE$sd, c(0.04, 0.04), tolerance = tol_dic)
+  expect_equal(diet_pred_RE$`2.5%`, c(0.01, 0.01), tolerance = tol_dic)
+  expect_equal(diet_pred_RE$`50%`, c(0.05, 0.05), tolerance = tol_dic)
+  expect_equal(diet_pred_RE$`97.5%`, c(0.18, 0.18), tolerance = tol_dic)
+})
+```
