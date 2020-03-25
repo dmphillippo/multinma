@@ -11,3 +11,8 @@ test_that("Thrombolytics example", {
   rmarkdown::render("../../vignettes/example_thrombolytics.Rmd")
   file.remove("../../vignettes/example_thrombolytics.html")
 })
+
+test_that("Blocker example", {
+  rmarkdown::render("../../vignettes/example_blocker.Rmd")
+  file.remove("../../vignettes/example_blocker.html")
+})
