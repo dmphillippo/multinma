@@ -20,3 +20,7 @@ test_that("Dietary fat example", {
   rmarkdown::render("../../vignettes/example_dietary_fat.Rmd", output_dir = td)
 })
 
+test_that("Diabetes example", {
+  rmarkdown::render("../../vignettes/example_diabetes.Rmd", output_dir = td)
+})
+
