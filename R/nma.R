@@ -140,7 +140,7 @@ nma <- function(network,
     prior_defaults$prior_trt <- get_prior_call(prior_trt)
   if (trt_effects == "random" && .is_default(prior_het))
     prior_defaults$prior_het <- get_prior_call(prior_het)
-  if (!is.null(regression) && .is_default(prior_reg))
+  if (!is.null(regression) && !is_only_offset(regression) && .is_default(prior_reg))
     prior_defaults$prior_reg <- get_prior_call(prior_reg)
   if (has_aux && .is_default(prior_aux)) {
     if (likelihood == "normal" && has_ipd(network)) {
@@ -392,7 +392,7 @@ nma <- function(network,
                             prior_trt = prior_trt,
                             prior_het = if (trt_effects == "random") prior_het else NULL,
                             prior_het_type = if (trt_effects == "random") prior_het_type else NULL,
-                            prior_reg = if (!is.null(regression)) prior_reg else NULL,
+                            prior_reg = if (!is.null(regression) && !is_only_offset(regression)) prior_reg else NULL,
                             prior_aux = if (has_aux) prior_aux else NULL))
 
   if (inherits(network, "mlnmr_data")) class(out) <- c("stan_mlnmr", "stan_nma")
@@ -1619,4 +1619,18 @@ make_Sigma_block <- function(x) {
 #' @noRd
 fct_sanitise <- function(f) {
   forcats::fct_relabel(f, ~stringr::str_replace_all(., "[:\\[\\]]", "_"))
+}
+
+#' Check if formula only contains an offset
+#'
+#' @param f A one-sided formula, as used for regression argument in nma()
+#' @noRd
+is_only_offset <- function(f) {
+  if (!rlang::is_formula(f, lhs = FALSE))
+    abort("`f` should be a one-sided formula.")
+
+  fterms <- terms(f)
+
+  out <- !is.null(attr(fterms, "offset")) && length(attr(fterms, "factors")) == 0
+  return(out)
 }
