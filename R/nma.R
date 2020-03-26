@@ -191,8 +191,7 @@ nma <- function(network,
 
   # Notify if default reference treatment is used
   if (.is_default(network$treatments))
-    inform(glue::glue('Note: Setting "{levels(network$treatments)[1]}" as the network reference treatment.\n',
-                      "This may be changed using the `trt_ref` argument in set_*() or combine_network()."))
+    inform(glue::glue('Note: Setting "{levels(network$treatments)[1]}" as the network reference treatment.'))
 
   # Notify if network is disconnected
   if (!is_network_connected(network))
