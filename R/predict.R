@@ -29,6 +29,10 @@
 #'   specified: if `newdata` contains integration points produced by
 #'   [add_integration()], studies will be labelled sequentially by row;
 #'   otherwise data will be assumed to come from a single study.
+#' @param trt_ref Treatment to which the `baseline` response distribution
+#'   refers, if `baseline` is specified. By default, the baseline response
+#'   distribution will refer to the network reference treatment. Coerced to
+#'   character string.
 #' @param type Whether to produce predictions on the `"link"` scale (the
 #'   default, e.g. log odds) or `"response"` scale (e.g. probabilities).
 #' @param level The level at which predictions are produced, either
@@ -49,7 +53,7 @@
 #'
 #' @examples
 predict.stan_nma <- function(object,
-                             baseline = NULL, newdata = NULL, study = NULL,
+                             baseline = NULL, newdata = NULL, study = NULL, trt_ref = NULL,
                              type = c("link", "response"),
                              level = c("aggregate", "individual"),
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
@@ -63,6 +67,22 @@ predict.stan_nma <- function(object,
   if (!is.null(baseline)) {
     if (!inherits(baseline, "distr"))
       abort("Baseline response `baseline` should be specified using distr(), or NULL.")
+  }
+
+  if (!is.null(trt_ref)) {
+    if (is.null(baseline)) {
+      # warn("Ignoring `trt_ref` since `baseline` is not given.")
+      trt_ref <- NULL
+    } else {
+      if (length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
+      trt_ref <- as.character(trt_ref)
+      lvls_trt <- levels(object$network$treatments)
+      if (! trt_ref %in% lvls_trt)
+        abort(sprintf("`trt_ref` does not match a treatment in the network.\nSuitable values are: %s",
+                      ifelse(length(lvls_trt) <= 5,
+                             paste0(lvls_trt, collapse = ", "),
+                             paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
+    }
   }
 
   if (xor(is.null(newdata), is.null(baseline)) && !is.null(object$regression))
@@ -88,6 +108,9 @@ predict.stan_nma <- function(object,
   # Cannot produce predictions for inconsistency models
   if (object$consistency != "consistency")
     abort(glue::glue("Cannot produce predictions under inconsistency '{x$consistency}' model."))
+
+  # Get network reference treatment
+  nrt <- levels(object$network$treatments)[1]
 
   # Get NMA formula
   nma_formula <- make_nma_formula(object$regression,
@@ -163,6 +186,11 @@ predict.stan_nma <- function(object,
       u <- runif(prod(dim_mu))
       mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
                   dim = dim_mu)
+
+      # Convert to samples on network ref trt if trt_ref given
+      if (!is.null(trt_ref) && trt_ref != nrt) {
+        mu <- mu - d[ , , paste0("d[", trt_ref, "]"), drop = FALSE]
+      }
 
       # Combine mu and d
       dim_post <- c(dim_d[1:2], dim_d[3] + 1)
@@ -320,6 +348,11 @@ predict.stan_nma <- function(object,
       u <- runif(prod(dim_mu))
       mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
                   dim = dim_mu)
+
+      # Convert to samples on network ref trt if trt_ref given
+      if (!is.null(trt_ref) && trt_ref != nrt) {
+        mu <- sweep(mu, 1:2, post_temp[ , , paste0("d[", trt_ref, "]"), drop = FALSE], FUN = "-")
+      }
 
       # Combine mu, d, and beta
       dim_post <- c(dim_post_temp[1:2], dim_mu[3] + dim_post_temp[3])
