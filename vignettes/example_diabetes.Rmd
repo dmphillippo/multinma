@@ -34,14 +34,16 @@ head(diabetes)
 ### Setting up the network
 We begin by setting up the network.
 We have arm-level count data giving the number of new cases of diabetes (`r`) out of the total (`n`) in each arm, so we use the function `set_agd_arm()`.
-Treatment "Diuretic" is set as the network reference treatment following @Elliott2007.
+For computational efficiency, we let "Beta Blocker" be set as the network reference treatment by default.
+@Elliott2007 and @TSD2 use "Diuretic" as the reference, but it is a simple matter to transform the results after fitting the NMA model.^[The gain in efficiency here from using "Beta Blocker" as the network reference treatment instead of "Diuretic" is considerable - around 4-8 times, in terms of effective samples per second.
+The functions in this package will always attempt to choose a default network reference treatment that maximises computational efficiency and stability.
+If you have chosen an alternative network reference treatment and the model runs very slowly or has low effective sample size, this is a likely cause.]
 ```{r}
 db_net <- set_agd_arm(diabetes, 
                       study = studyc,
                       trt = trtc,
                       r = r, 
-                      n = n,
-                      trt_ref = "Diuretic")
+                      n = n)
 db_net
 ```
 
@@ -154,33 +156,46 @@ plot(dic_RE)
 
 
 ### Further results
+For comparison with @Elliott2007 and @TSD2, we can produce relative effects against "Diuretic" using the `relative_effects()` function with `trt_ref = "Diuretic"`:
+```{r diabetes_releff_FE, fig.height=3}
+(db_releff_FE <- relative_effects(db_fit_FE, trt_ref = "Diuretic"))
+plot(db_releff_FE, ref_line = 0)
+```
+```{r diabetes_releff_RE, fig.height=3}
+(db_releff_RE <- relative_effects(db_fit_RE, trt_ref = "Diuretic"))
+plot(db_releff_RE, ref_line = 0)
+```
+
+
 @TSD2 produce absolute predictions of the probability of developing diabetes after three years, assuming a Normal distribution on the baseline cloglog probability of developing diabetes on diuretic treatment with mean $-4.2$ and precision $1.11$.
 We can replicate these results using the `predict()` method.
 We specify a data frame of `newdata`, containing the `time` offset(s) at which to produce predictions (here only 3 years).
-The `baseline` argument takes a `distr()` distribution object, with which we specify the corresponding Normal distribution on the baseline cloglog probability.
-We set `type = "response"` to produce predicted rates (`type = "link"` would produce predicted cloglog probabilities).
+The `baseline` argument takes a `distr()` distribution object with which we specify the corresponding Normal distribution on the baseline cloglog probability, and we set `trt_ref = "Diuretic"` to indicate that the baseline distribution corresponds to "Diuretic" rather than the network reference "Beta Blocker".
+We set `type = "response"` to produce predicted event probabilities (`type = "link"` would produce predicted cloglog probabilities).
 ```{r db_pred_FE, fig.height = 2}
-pred_FE <- predict(db_fit_FE, 
-                   newdata = data.frame(time = 3),
-                   baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5), 
-                   type = "response")
-pred_FE
-plot(pred_FE)
+db_pred_FE <- predict(db_fit_FE, 
+                      newdata = data.frame(time = 3),
+                      baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5), 
+                      trt_ref = "Diuretic",
+                      type = "response")
+db_pred_FE
+plot(db_pred_FE)
 ```
 ```{r db_pred_RE, fig.height = 2}
-pred_RE <- predict(db_fit_RE, 
-                   newdata = data.frame(time = 3),
-                   baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5), 
-                   type = "response")
-pred_RE
-plot(pred_RE)
+db_pred_RE <- predict(db_fit_RE, 
+                      newdata = data.frame(time = 3),
+                      baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5), 
+                      trt_ref = "Diuretic",
+                      type = "response")
+db_pred_RE
+plot(db_pred_RE)
 ```
 
 If the `baseline` and `newdata` arguments are ommitted, predicted probabilities will be produced for every study in the network based on their follow-up times and estimated baseline cloglog probabilities $\mu_j$:
 ```{r db_pred_RE_all, fig.height=16}
-pred_RE_studies <- predict(db_fit_RE, type = "response")
-pred_RE_studies
-plot(pred_RE_studies)
+db_pred_RE_studies <- predict(db_fit_RE, type = "response")
+db_pred_RE_studies
+plot(db_pred_RE_studies)
 ```
 
 We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.
@@ -227,14 +242,14 @@ tsd_FE <- tribble(
   mutate(trt = ordered(trt, levels = levels(db_net$treatments))) %>%
   arrange(trt)
 
-db_FE_releff <- as.data.frame(relative_effects(db_fit_FE))
+db_releff_FE <- as.data.frame(db_releff_FE)
 
 test_that("FE relative effects", {
-  expect_equal(db_FE_releff$mean, tsd_FE$mean, tolerance = tol)
-  expect_equal(db_FE_releff$sd, tsd_FE$sd, tolerance = tol)
-  expect_equal(db_FE_releff$`50%`, tsd_FE$median, tolerance = tol)
-  expect_equal(db_FE_releff$`2.5%`, tsd_FE$lower, tolerance = tol)
-  expect_equal(db_FE_releff$`97.5%`, tsd_FE$upper, tolerance = tol)
+  expect_equal(db_releff_FE$mean, tsd_FE$mean, tolerance = tol)
+  expect_equal(db_releff_FE$sd, tsd_FE$sd, tolerance = tol)
+  expect_equal(db_releff_FE$`50%`, tsd_FE$median, tolerance = tol)
+  expect_equal(db_releff_FE$`2.5%`, tsd_FE$lower, tolerance = tol)
+  expect_equal(db_releff_FE$`97.5%`, tsd_FE$upper, tolerance = tol)
 })
 
 # RE Relative effects
@@ -249,14 +264,14 @@ tsd_RE <- tribble(
   mutate(trt = ordered(trt, levels = levels(db_net$treatments))) %>%
   arrange(trt)
 
-db_RE_releff <- as.data.frame(relative_effects(db_fit_RE))
+db_releff_RE <- as.data.frame(db_releff_RE)
 
 test_that("RE relative effects", {
-  expect_equal(db_RE_releff$mean, tsd_RE$mean, tolerance = tol)
-  expect_equal(db_RE_releff$sd, tsd_RE$sd, tolerance = tol)
-  expect_equal(db_RE_releff$`50%`, tsd_RE$median, tolerance = tol)
-  expect_equal(db_RE_releff$`2.5%`, tsd_RE$lower, tolerance = tol)
-  expect_equal(db_RE_releff$`97.5%`, tsd_RE$upper, tolerance = tol)
+  expect_equal(db_releff_RE$mean, tsd_RE$mean, tolerance = tol)
+  expect_equal(db_releff_RE$sd, tsd_RE$sd, tolerance = tol)
+  expect_equal(db_releff_RE$`50%`, tsd_RE$median, tolerance = tol)
+  expect_equal(db_releff_RE$`2.5%`, tsd_RE$lower, tolerance = tol)
+  expect_equal(db_releff_RE$`97.5%`, tsd_RE$upper, tolerance = tol)
 })
 
 # Heterogeneity SD
@@ -283,14 +298,14 @@ tsd_pred_FE <- tribble(
   mutate(trt = ordered(trt, levels = levels(db_net$treatments))) %>%
   arrange(trt)
 
-db_FE_pred <- as.data.frame(pred_FE)
+db_pred_FE <- as.data.frame(db_pred_FE)
 
 test_that("FE predicted probabilities at 3 years", {
-  expect_equal(db_FE_pred$mean, tsd_pred_FE$mean, tolerance = tol)
-  expect_equal(db_FE_pred$sd, tsd_pred_FE$sd, tolerance = tol)
-  expect_equal(db_FE_pred$`50%`, tsd_pred_FE$median, tolerance = tol)
-  expect_equal(db_FE_pred$`2.5%`, tsd_pred_FE$lower, tolerance = tol)
-  expect_equal(db_FE_pred$`97.5%`, tsd_pred_FE$upper, tolerance = tol)
+  expect_equal(db_pred_FE$mean, tsd_pred_FE$mean, tolerance = tol)
+  expect_equal(db_pred_FE$sd, tsd_pred_FE$sd, tolerance = tol)
+  expect_equal(db_pred_FE$`50%`, tsd_pred_FE$median, tolerance = tol)
+  expect_equal(db_pred_FE$`2.5%`, tsd_pred_FE$lower, tolerance = tol)
+  expect_equal(db_pred_FE$`97.5%`, tsd_pred_FE$upper, tolerance = tol)
 })
 
 # RE probabilities
@@ -306,14 +321,14 @@ tsd_pred_RE <- tribble(
   mutate(trt = ordered(trt, levels = levels(db_net$treatments))) %>%
   arrange(trt)
 
-db_RE_pred <- as.data.frame(pred_RE)
+db_pred_RE <- as.data.frame(db_pred_RE)
 
 test_that("RE predicted probabilities at 3 years", {
-  expect_equal(db_RE_pred$mean, tsd_pred_RE$mean, tolerance = tol)
-  expect_equal(db_RE_pred$sd, tsd_pred_RE$sd, tolerance = tol)
-  expect_equal(db_RE_pred$`50%`, tsd_pred_RE$median, tolerance = tol)
-  expect_equal(db_RE_pred$`2.5%`, tsd_pred_RE$lower, tolerance = tol)
-  expect_equal(db_RE_pred$`97.5%`, tsd_pred_RE$upper, tolerance = tol)
+  expect_equal(db_pred_RE$mean, tsd_pred_RE$mean, tolerance = tol)
+  expect_equal(db_pred_RE$sd, tsd_pred_RE$sd, tolerance = tol)
+  expect_equal(db_pred_RE$`50%`, tsd_pred_RE$median, tolerance = tol)
+  expect_equal(db_pred_RE$`2.5%`, tsd_pred_RE$lower, tolerance = tol)
+  expect_equal(db_pred_RE$`97.5%`, tsd_pred_RE$upper, tolerance = tol)
 })
 
 # RE DIC
