@@ -160,7 +160,7 @@ print.nma_data <- function(x, ..., n = 10) {
   invisible(x)
 }
 
-#' @describeIn print.nma_data
+#' @rdname print.nma_data
 #' @export
 print.mlnmr_data <- function(x, ..., n = 10) {
   NextMethod()
