@@ -15,6 +15,9 @@
 #' @param all_contrasts Logical, generate estimates for all contrasts (`TRUE`),
 #'   or just the "basic" contrasts against the network reference treatment
 #'   (`FALSE`)? Default `FALSE`.
+#' @param trt_ref Reference treatment to construct relative effects against, if
+#'   `all_contrasts = FALSE`. By default, relative effects will be against the
+#'   network reference treatment. Coerced to character string.
 #' @param probs Numeric vector of quantiles of interest to present in computed
 #'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
@@ -27,7 +30,8 @@
 #' @seealso [plot.nma_summary()] for plotting the relative effects.
 #'
 #' @examples
-relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FALSE,
+relative_effects <- function(x, newdata = NULL, study = NULL,
+                             all_contrasts = FALSE, trt_ref = NULL,
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
                              summary = TRUE) {
 
@@ -51,6 +55,22 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
   if (!rlang::is_bool(all_contrasts))
     abort("`all_contrasts` should be TRUE or FALSE.")
 
+  if (!is.null(trt_ref)) {
+    if (all_contrasts) {
+      warn("Ignoring `trt_ref` when all_contrasts = TRUE.")
+      trt_ref <- NULL
+    } else {
+      if (length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
+      trt_ref <- as.character(trt_ref)
+      lvls_trt <- levels(x$network$treatments)
+      if (! trt_ref %in% lvls_trt)
+        abort(sprintf("`trt_ref` does not match a treatment in the network.\nSuitable values are: %s",
+                      ifelse(length(lvls_trt) <= 5,
+                             paste0(lvls_trt, collapse = ", "),
+                             paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
+    }
+  }
+
   if (!rlang::is_bool(summary))
     abort("`summary` should be TRUE or FALSE.")
 
@@ -58,15 +78,28 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
   if (x$consistency != "consistency")
     abort(glue::glue("Cannot produce relative effects under inconsistency '{x$consistency}' model."))
 
-  # Get reference treatment
-  trt_ref <- levels(x$network$treatments)[1]
+  # Get network reference treatment
+  nrt <- levels(x$network$treatments)[1]
 
   # Produce relative effects
-  if (is.null(x$regression)) {
+  if (is.null(x$regression) || is_only_offset(x$regression)) {
     # If no regression model, relative effects are just the d's
     re_array <- as.array(as.stanfit(x), pars = "d")
     if (all_contrasts) {
-      re_array <- make_all_contrasts(re_array, trt_ref = trt_ref)
+      re_array <- make_all_contrasts(re_array, trt_ref = nrt)
+    } else if (!is.null(trt_ref) && trt_ref != nrt) {
+      d_ref <- re_array[ , , paste0("d[", trt_ref, "]"), drop = FALSE]
+      re_array <- sweep(re_array, 1:2, d_ref, FUN = "-")
+
+      # Add in parameter for network ref trt in place of trt_ref
+      re_array[ , , paste0("d[", trt_ref, "]")] <- -d_ref
+      d_names <- dimnames(re_array)[[3]]
+      d_names[d_names == paste0("d[", trt_ref, "]")] <- paste0("d[", nrt, "]")
+      dimnames(re_array)[[3]] <- d_names
+
+      # Reorder paramters
+      d_names <- c(paste0("d[", nrt, "]"), d_names[d_names != paste0("d[", nrt, "]")])
+      re_array <- re_array[ , , d_names, drop = FALSE]
     }
     if (summary) {
       re_summary <- summary_mcmc_array(re_array, probs = probs)
@@ -167,7 +200,20 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
     if (ncol(X_EM) == 0) {
       re_array <- as.array(as.stanfit(x), pars = "d")
       if (all_contrasts) {
-        re_array <- make_all_contrasts(re_array, trt_ref = trt_ref)
+        re_array <- make_all_contrasts(re_array, trt_ref = nrt)
+      } else if (!is.null(trt_ref) && trt_ref != nrt) {
+        d_ref <- re_array[ , , paste0("d[", trt_ref, "]"), drop = FALSE]
+        re_array <- sweep(re_array, 1:2, d_ref, FUN = "-")
+
+        # Add in parameter for network ref trt in place of trt_ref
+        re_array[ , , paste0("d[", trt_ref, "]")] <- -d_ref
+        d_names <- dimnames(re_array)[[3]]
+        d_names[d_names == paste0("d[", trt_ref, "]")] <- paste0("d[", nrt, "]")
+        dimnames(re_array)[[3]] <- d_names
+
+        # Reorder paramters
+        d_names <- c(paste0("d[", nrt, "]"), d_names[d_names != paste0("d[", nrt, "]")])
+        re_array <- re_array[ , , d_names, drop = FALSE]
       }
       if (summary) {
         re_summary <- summary_mcmc_array(re_array, probs = probs)
@@ -235,13 +281,33 @@ relative_effects <- function(x, newdata = NULL, study = NULL, all_contrasts = FA
       re_array <- tcrossprod_mcmc_array(d_array, X_EM_d)
 
       # Produce all contrasts, if required
-      if (all_contrasts)
-        re_array <- make_all_contrasts(re_array, trt_ref = levels(x$network$treatments)[1])
+      if (all_contrasts) {
+        re_array <- make_all_contrasts(re_array, trt_ref = nrt)
+      }
 
       # Add in study names to parameters
       parnames <- stringr::str_extract(dimnames(re_array)[[3]], "(?<=^d\\[)(.+)(?=\\]$)")
       study_parnames <- paste0("d[", dat_studies$.study, ": ", parnames, "]")
       dimnames(re_array)[[3]] <- study_parnames
+
+      # Rebase against ref_trt if given
+      if (!is.null(trt_ref) && trt_ref != nrt) {
+        for (j in unique(dat_studies$.study)) {
+          j_pars <- dat_studies$.study == j
+          d_ref <- re_array[ , , paste0("d[", j, ": ", trt_ref, "]"), drop = FALSE]
+          re_array[ , , j_pars] <- sweep(re_array[ , , j_pars], 1:2, d_ref, FUN = "-")
+
+          # Add in parameter for network ref trt in place of trt_ref
+          re_array[ , , paste0("d[", j, ": ", trt_ref, "]")] <- -d_ref
+          d_names <- dimnames(re_array)[[3]]
+          d_names[d_names == paste0("d[", j, ": ", trt_ref, "]")] <- paste0("d[", j, ": ", nrt, "]")
+          dimnames(re_array)[[3]] <- d_names
+
+          # Reorder paramters
+          d_names[j_pars] <- c(paste0("d[", j, ": ", nrt, "]"), d_names[j_pars & d_names != paste0("d[", j, ": ", nrt, "]")])
+          re_array <- re_array[ , , d_names, drop = FALSE]
+        }
+      }
 
       # Create summary stats
       if (summary) {
