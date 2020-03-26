@@ -7,6 +7,8 @@
 #' @return An object of class [nma_data]
 #' @export
 #'
+#' @template args-details_trt_ref
+#'
 #' @seealso [set_agd_arm()] for arm-based aggregate data, [set_agd_contrast()]
 #'   for contrast-based aggregate data, and [combine_network()] for combining
 #'   several data sources in one network.
@@ -141,15 +143,10 @@ set_ipd <- function(data,
 #'
 #' @return An object of class [nma_data]
 #' @export
-#'
-#' @details The `sample_size` argument is optional, but when specified:
-#'
-#'   * Enables centering of predictors (`center = TRUE`) in [nma()] when
-#'     a regression model is given
-#'   * Enables production of study-specific relative effects, rank probabilities,
-#'     etc. for studies in the network when a regression model is given
-#'   * Nodes in [plot.nma_data()] may be weighted by sample size
-#'
+
+#' @template args-details_trt_ref
+#' @template args-details_sample_size
+#' @details
 #' If a Binomial outcome is specified and `sample_size` is omitted, `n` will be
 #' used as the sample size by default.
 #'
@@ -303,13 +300,8 @@ set_agd_arm <- function(data,
 #'   the covariance of the relative effects, when expressed as differences in
 #'   mean outcomes between arms).
 #'
-#'   The `sample_size` argument is optional, but when specified:
-#'
-#'   * Enables centering of predictors (`center = TRUE`) in [nma()] when
-#'     a regression model is given
-#'   * Enables production of study-specific relative effects, rank probabilities,
-#'     etc. for studies in the network when a regression model is given
-#'   * Nodes in [plot.nma_data()] may be weighted by sample size
+#' @template args-details_trt_ref
+#' @template args-details_sample_size
 #'
 #' @return An object of class [nma_data]
 #' @export
