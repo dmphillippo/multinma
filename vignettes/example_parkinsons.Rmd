@@ -174,8 +174,15 @@ plot(dic_RE)
 
 
 ### Further results
-Following @TSD2, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean $-4.2$ and precision $1.11$.
-We use the `predict()` method, where the `baseline` argument takes a `distr()` distribution object with which we specify the corresponding Normal distribution.
+For comparison with @TSD2, we can produce relative effects against placebo using the `relative_effects()` function with `trt_ref = 1`:
+```{r arm_releff_FE, fig.height=3}
+(arm_releff_FE <- relative_effects(arm_fit_FE, trt_ref = 1))
+plot(arm_releff_FE, ref_line = 0)
+```
+```{r arm_releff_RE, fig.height=3}
+(arm_releff_RE <- relative_effects(arm_fit_RE, trt_ref = 1))
+plot(arm_releff_RE, ref_line = 0)
+```
 
 Following @TSD2, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean $-0.73$ and precision $21$.
 We use the `predict()` method, where the `baseline` argument takes a `distr()` distribution object with which we specify the corresponding Normal distribution, and we specify `trt_ref = 1` to indicate that the baseline distribution corresponds to treatment 1.
