@@ -57,11 +57,11 @@ arm_net <- set_agd_arm(parkinsons,
                       trt = trtn,
                       y = y, 
                       se = se,
-                      sample_size = n,
-                      trt_ref = 1)
+                      sample_size = n)
 arm_net
 ```
 
+We let treatment 4 be set by default as the network reference treatment, since this results in considerably improved sampling efficiency over choosing treatment 1 as the network reference.
 The `sample_size` argument is optional, but enables the nodes to be weighted by sample size in the network plot.
 
 Plot the network structure.
@@ -165,24 +165,30 @@ plot(dic_RE)
 ### Further results
 Following @TSD2, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean $-4.2$ and precision $1.11$.
 We use the `predict()` method, where the `baseline` argument takes a `distr()` distribution object with which we specify the corresponding Normal distribution.
+
+Following @TSD2, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean $-0.73$ and precision $21$.
+We use the `predict()` method, where the `baseline` argument takes a `distr()` distribution object with which we specify the corresponding Normal distribution, and we specify `trt_ref = 1` to indicate that the baseline distribution corresponds to treatment 1.
+(Strictly speaking, `type = "response"` is unnecessary here, since the identity link function was used.)
 ```{r arm_pred_FE, fig.height = 2}
 arm_pred_FE <- predict(arm_fit_FE, 
                        newdata = data.frame(time = 3),
-                       baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5),
-                       type = "response")
+                       baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
+                       type = "response",
+                       trt_ref = 1)
 arm_pred_FE
 plot(arm_pred_FE)
 ```
 ```{r arm_pred_RE, fig.height = 2}
 arm_pred_RE <- predict(arm_fit_RE, 
                        newdata = data.frame(time = 3),
-                       baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5),
-                       type = "response")
+                       baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
+                       type = "response",
+                       trt_ref = 1)
 arm_pred_RE
 plot(arm_pred_RE)
 ```
 
-If the `baseline` argument is ommitted, predictions of mean off-time reduction will be produced for every study in the network based on their estimated baseline response on placebo $\mu_j$:
+If the `baseline` argument is omitted, predictions of mean off-time reduction will be produced for every study in the network based on their estimated baseline response $\mu_j$:
 ```{r arm_pred_RE_all, fig.height=8}
 arm_pred_FE_studies <- predict(arm_fit_FE, type = "response")
 arm_pred_FE_studies
