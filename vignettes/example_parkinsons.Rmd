@@ -274,12 +274,6 @@ Basic paramter summaries are given by the `print()` method:
 contr_fit_FE
 ```
 
-By default, summaries of the study-specific intercepts $\mu_j$ are hidden, but could be examined by changing the `pars` argument:
-```{r, eval=FALSE}
-# Not run
-print(contr_fit_FE, pars = c("d", "mu"))
-```
-
 The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
 ```{r contr_FE_pp_plot}
 plot_prior_posterior(contr_fit_FE)
@@ -319,10 +313,10 @@ Basic paramter summaries are given by the `print()` method:
 contr_fit_RE
 ```
 
-By default, summaries of the study-specific intercepts $\mu_j$ and study-specific relative effects $\delta_{jk}$ are hidden, but could be examined by changing the `pars` argument:
+By default, summaries of the study-specific relative effects $\delta_{jk}$ are hidden, but could be examined by changing the `pars` argument:
 ```{r, eval=FALSE}
 # Not run
-print(contr_fit_RE, pars = c("d", "mu", "delta"))
+print(contr_fit_RE, pars = c("d", "delta"))
 ```
 
 The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
