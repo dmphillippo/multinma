@@ -24,3 +24,8 @@ test_that("Diabetes example", {
   rmarkdown::render("../../vignettes/example_diabetes.Rmd", output_dir = td)
 })
 
+test_that("Parkinsons example", {
+  rmarkdown::render("../../vignettes/example_parkinsons.Rmd", output_dir = td)
+})
+
+
