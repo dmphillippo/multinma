@@ -122,6 +122,9 @@ nma <- function(network,
   # When are priors on auxilliary parameters required?
   has_aux <- (likelihood == "normal" && has_ipd(network))
 
+  # Are study intercepts present? Not if only contrast data
+  has_intercepts <- has_agd_arm(network) || has_ipd(network)
+
   # Check priors
   if (!inherits(prior_intercept, "nma_prior")) abort("`prior_intercept` should be a prior distribution, see ?priors.")
   if (!inherits(prior_trt, "nma_prior")) abort("`prior_trt` should be a prior distribution, see ?priors.")
@@ -134,7 +137,7 @@ nma <- function(network,
 
   # Prior defaults
   prior_defaults <- list()
-  if (.is_default(prior_intercept))
+  if (has_intercepts && .is_default(prior_intercept))
     prior_defaults$prior_intercept <- get_prior_call(prior_intercept)
   if (.is_default(prior_trt))
     prior_defaults$prior_trt <- get_prior_call(prior_trt)
@@ -387,7 +390,7 @@ nma <- function(network,
               xbar = xbar,
               likelihood = likelihood,
               link = link,
-              priors = list(prior_intercept = prior_intercept,
+              priors = list(prior_intercept = if (has_intercepts) prior_intercept else NULL,
                             prior_trt = prior_trt,
                             prior_het = if (trt_effects == "random") prior_het else NULL,
                             prior_het_type = if (trt_effects == "random") prior_het_type else NULL,
