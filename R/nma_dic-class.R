@@ -305,7 +305,7 @@ plot.nma_dic <- function(x, y, ...,
         ggplot2::labs(x = "Residual Deviance", y = "Data Point")
 
       if (dplyr::n_distinct(resdev_post$Type) > 1)
-        p <- p + ggplot2::facet_grid(Type~., space = "free")
+        p <- p + ggplot2::facet_grid(Type~., space = "free", scales = "free_y")
 
     } else {
       p <- ggplot2::ggplot(resdev_post,
@@ -315,7 +315,7 @@ plot.nma_dic <- function(x, y, ...,
         ggplot2::labs(y = "Residual Deviance", x = "Data Point")
 
       if (dplyr::n_distinct(resdev_post$Type) > 1)
-        p <- p + ggplot2::facet_grid(.~Type, space = "free")
+        p <- p + ggplot2::facet_grid(.~Type, space = "free", scales = "free_x")
     }
 
     if (show_uncertainty) {
