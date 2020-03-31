@@ -120,6 +120,10 @@ plot.nma_dic <- function(x, y, ...,
   resdev_post$.label <- forcats::fct_inorder(factor(
     stringr::str_extract(resdev_post$parameter, "(?<=\\[).+(?=\\]$)")))
 
+  # Make sure rows for parameters are together - behaviour change between gather() and pivot_longer()
+  resdev_post$.ord <- factor(resdev_post$parameter, levels = dimnames(x$resdev_array)[[3]])
+  resdev_post <- dplyr::arrange(resdev_post, .data$.ord)
+
   Type <- c(rep("IPD", NROW(x$pointwise$ipd)),
             rep("AgD (arm-based)", NROW(x$pointwise$agd_arm)),
             rep("AgD (contrast-based)", NROW(x$pointwise$agd_contrast)))
@@ -135,7 +139,7 @@ plot.nma_dic <- function(x, y, ...,
   if (has_y) { # Produce dev-dev plot
 
     # Check resdev[] names match
-    if (isFALSE(all.equal(dimnames(x$resdev_array)[3], dimnames(y$resdev_array)[3])))
+    if (isFALSE(all.equal(dimnames(x$resdev_array)[[3]], dimnames(y$resdev_array)[[3]])))
       abort("Data points in `x` and `y` do not match")
 
     # Get y resdev samples from resdev_array
@@ -154,6 +158,10 @@ plot.nma_dic <- function(x, y, ...,
 
     y_resdev_post$.label <- forcats::fct_inorder(factor(
       stringr::str_extract(y_resdev_post$parameter, "(?<=\\[).+(?=\\]$)")))
+
+    # Make sure rows for parameters are together - behaviour change between gather() and pivot_longer()
+    y_resdev_post$.ord <- factor(y_resdev_post$parameter, levels = dimnames(y$resdev_array)[[3]])
+    y_resdev_post <- dplyr::arrange(y_resdev_post, .data$.ord)
 
     y_resdev_post$Type <- rep(Type, each = prod(dim(x$resdev_array)[1:2]))
 
