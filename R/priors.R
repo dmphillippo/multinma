@@ -207,7 +207,7 @@ get_tidy_prior <- function(prior, trunc = NULL) {
   } else if (d == "Exponential") {
     out <- tibble::tibble(dist_label = d,
                           dist = "exp",
-                          args = list(list(rate = prior$rate)))
+                          args = list(list(rate = 1 / prior$scale)))
   }
 
   if (is_trunc && d %in% c("Normal", "Cauchy", "Student t", "Exponential", "log-Normal")) {
