@@ -145,7 +145,7 @@ dic <- function(x, ...) {
       net$agd_contrast %>%
         dplyr::filter(!is.na(.data$.y)) %>%
         dplyr::mutate(.fitted = fitted_agd_contrast,
-                      .study_inorder = forcats::fct_inorder(.data$.study)) %>%
+                      .study_inorder = forcats::fct_inorder(forcats::fct_drop(.data$.study))) %>%
         dplyr::group_by(.data$.study_inorder, .data$.study) %>%
         dplyr::summarise(.y = list(.data$.y),
                          fitted = list(.data$.fitted),
