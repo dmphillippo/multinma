@@ -111,7 +111,8 @@ plot.nma_dic <- function(x, y, ...,
     resdev_post <- tidyr::pivot_longer(resdev_post, cols = dplyr::everything(),
                                        names_to = "parameter", values_to = "resdev")
   } else {
-    resdev_post <- tidyr::gather(key = "parameter",
+    resdev_post <- tidyr::gather(resdev_post,
+                                 key = "parameter",
                                  value = "resdev",
                                  dplyr::everything())
   }
@@ -145,9 +146,10 @@ plot.nma_dic <- function(x, y, ...,
       y_resdev_post <- tidyr::pivot_longer(y_resdev_post, cols = dplyr::everything(),
                                            names_to = "parameter", values_to = "resdev")
     } else {
-      y_resdev_post <- tidyr::gather(key = "parameter",
-                                   value = "resdev",
-                                   dplyr::everything())
+      y_resdev_post <- tidyr::gather(y_resdev_post,
+                                     key = "parameter",
+                                     value = "resdev",
+                                     dplyr::everything())
     }
 
     y_resdev_post$.label <- forcats::fct_inorder(factor(

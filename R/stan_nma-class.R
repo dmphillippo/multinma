@@ -239,7 +239,8 @@ plot_prior_posterior <- function(x, ...,
     draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
                                  names_to = "parameter", values_to = "value")
   } else {
-    draws <- tidyr::gather(key = "parameter",
+    draws <- tidyr::gather(draws,
+                           key = "parameter",
                            value = "value",
                            dplyr::everything())
   }
