@@ -58,7 +58,7 @@ summary.nma_prior <- function(object, ..., probs = c(0.5, 0.95), digits = 2, tru
   prior <- get_tidy_prior(object, trunc = trunc) %>%
     tidyr::expand_grid(probs = probs) %>%
     dplyr::group_by(.data[["dist"]], .data[["probs"]]) %>%
-    {if (stringr::str_starts(object$dist, "log-|half-")) {
+    {if (stringr::str_starts(object$dist, "half-|Exponential")) {
       dplyr::summarise(., qfun = paste0("q", .data[["dist"]]),
                        lower = 0,
                        upper = do.call(.data[["qfun"]], args = rlang::list2(p = .data[["probs"]], !!! .[["args"]][[1]])))
