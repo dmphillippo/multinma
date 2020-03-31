@@ -132,7 +132,7 @@ predict.stan_nma <- function(object,
       } else {
 
         # Make design matrix of all studies with baselines, and all treatments
-        studies <- forcats::fct_unique(dplyr::bind_rows(object$network$ipd, object$network$agd_arm)$.study)
+        studies <- forcats::fct_unique(forcats::fct_drop(dplyr::bind_rows(object$network$ipd, object$network$agd_arm)$.study))
         preddat <- tidyr::expand_grid(.study = studies, .trt = object$network$treatments)
 
 
@@ -274,9 +274,17 @@ predict.stan_nma <- function(object,
         preddat$.trtclass <- object$network$classes[as.numeric(preddat$.trt)]
       }
 
+      if (has_agd_contrast(object$network)) {
+        dat_agd_contrast <- object$network$agd_contrast
+      } else {
+        dat_agd_contrast <- tibble::tibble()
+      }
+
       # Design matrix, just treating all data as IPD
+      # Contrast data is included just so that the correct columns are excluded
       X_list <- make_nma_model_matrix(nma_formula,
                                       dat_ipd = preddat,
+                                      dat_agd_contrast = dat_agd_contrast,
                                       xbar = object$xbar,
                                       consistency = object$consistency,
                                       classes = !is.null(object$network$classes))
