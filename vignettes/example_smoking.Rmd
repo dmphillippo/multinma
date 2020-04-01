@@ -164,7 +164,7 @@ plot(smk_cumrankprobs)
 
 ## References
 
-```{r smoking_tests, include=FALSE, error=TRUE}
+```{r smoking_tests, include=FALSE, eval=testthat::is_testing()}
 #--- Test against TSD 4 results ---
 library(testthat)
 library(dplyr)

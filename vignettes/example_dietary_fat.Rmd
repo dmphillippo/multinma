@@ -174,7 +174,7 @@ plot(pred_FE_studies) + ggplot2::facet_grid(Study~., labeller = ggplot2::label_w
 
 ## References
 
-```{r diet_tests, error=TRUE, include=FALSE}
+```{r diet_tests_tests, include=FALSE, eval=testthat::is_testing()}
 #--- Test against TSD 2 results ---
 library(testthat)
 library(dplyr)

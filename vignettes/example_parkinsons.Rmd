@@ -594,7 +594,7 @@ plot(mix_cumrankprobs)
 
 ## References
 
-```{r parkinsons_tests, include=FALSE, error=TRUE}
+```{r parkinsons_tests, include=FALSE, eval=testthat::is_testing()}
 #--- Test against TSD 2 results ---
 library(testthat)
 library(dplyr)

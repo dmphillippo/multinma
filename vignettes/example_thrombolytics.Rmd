@@ -152,7 +152,7 @@ plot(thrombo_cumrankprobs)
 
 ## References
 
-```{r thrombo_tests, include=FALSE, error=TRUE}
+```{r thrombo_tests, include=FALSE, eval=testthat::is_testing()}
 #--- Test against TSD 4 results ---
 library(testthat)
 library(dplyr)

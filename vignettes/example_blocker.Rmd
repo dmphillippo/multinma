@@ -166,7 +166,7 @@ plot(pred_RE)
 
 ## References
 
-```{r blocker_tests, error=TRUE, include=FALSE}
+```{r blocker_tests, include=FALSE, eval=testthat::is_testing()}
 #--- Test against TSD 2 results ---
 library(testthat)
 library(dplyr)
