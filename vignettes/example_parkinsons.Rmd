@@ -65,7 +65,7 @@ We let treatment 4 be set by default as the network reference treatment, since t
 The `sample_size` argument is optional, but enables the nodes to be weighted by sample size in the network plot.
 
 Plot the network structure.
-```{r parkinsons_network_plot}
+```{r parkinsons_arm_network_plot}
 plot(arm_net, weight_edges = TRUE, weight_nodes = TRUE)
 ```
 
@@ -213,11 +213,11 @@ plot(arm_pred_FE_studies)
 ```
 
 We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.
-```{r parkinsons_ranks, fig.height=2}
+```{r parkinsons_arm_ranks, fig.height=2}
 (arm_ranks <- posterior_ranks(arm_fit_FE))
 plot(arm_ranks)
 ```
-```{r parkinsons_rankprobs}
+```{r parkinson_arm_rankprobs}
 (arm_rankprobs <- posterior_rank_probs(arm_fit_FE))
 plot(arm_rankprobs)
 ```
@@ -244,7 +244,7 @@ contr_net
 The `sample_size` argument is optional, but enables the nodes to be weighted by sample size in the network plot.
 
 Plot the network structure.
-```{r parkinsons_network_plot}
+```{r parkinsons_contr_network_plot}
 plot(contr_net, weight_edges = TRUE, weight_nodes = TRUE)
 ```
 
@@ -383,15 +383,15 @@ predict(contr_fit_FE, type = "response")
 ```
 
 We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.
-```{r parkinsons_ranks, fig.height=2}
+```{r parkinsons_contr_ranks, fig.height=2}
 (contr_ranks <- posterior_ranks(contr_fit_FE))
 plot(contr_ranks)
 ```
-```{r parkinsons_rankprobs}
+```{r parkinsons_contr_rankprobs}
 (contr_rankprobs <- posterior_rank_probs(contr_fit_FE))
 plot(contr_rankprobs)
 ```
-```{r parkinsons_cumrankprobs}
+```{r parkinsons_contr_cumrankprobs}
 (contr_cumrankprobs <- posterior_rank_probs(contr_fit_FE, cumulative = TRUE))
 plot(contr_cumrankprobs)
 ```
@@ -430,7 +430,7 @@ mix_net
 The `sample_size` argument is optional, but enables the nodes to be weighted by sample size in the network plot.
 
 Plot the network structure.
-```{r parkinsons_network_plot}
+```{r parkinsons_mix_network_plot}
 plot(mix_net, weight_edges = TRUE, weight_nodes = TRUE)
 ```
 
@@ -578,15 +578,15 @@ plot(mix_pred_FE_studies)
 ```
 
 We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.
-```{r parkinsons_ranks, fig.height=2}
+```{r parkinsons_mix_ranks, fig.height=2}
 (mix_ranks <- posterior_ranks(mix_fit_FE))
 plot(mix_ranks)
 ```
-```{r parkinsons_rankprobs}
+```{r parkinsons_mix_rankprobs}
 (mix_rankprobs <- posterior_rank_probs(mix_fit_FE))
 plot(mix_rankprobs)
 ```
-```{r parkinsons_cumrankprobs}
+```{r parkinsons_mix_cumrankprobs}
 (mix_cumrankprobs <- posterior_rank_probs(mix_fit_FE, cumulative = TRUE))
 plot(mix_cumrankprobs)
 ```
