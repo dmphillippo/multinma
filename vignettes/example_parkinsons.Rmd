@@ -782,6 +782,74 @@ test_that("RE DIC", {
 })
 
 
+# Test contrast-data rows in incorrect order
+park_reorder <- sample_frac(parkinsons, size = 1, replace = FALSE)
+
+reorder_net <- set_agd_contrast(park_reorder, 
+                              study = studyn,
+                              trt = trtn,
+                              y = diff, 
+                              se = se_diff,
+                              sample_size = n)
+
+reorder_fit_FE <- nma(reorder_net, 
+                    trt_effects = "fixed",
+                    prior_trt = normal(scale = 10))
+
+reorder_fit_RE <- nma(reorder_net, 
+                    trt_effects = "random",
+                    prior_trt = normal(scale = 10),
+                    prior_het = half_normal(scale = 2.5),
+                    adapt_delta = 0.99)
+
+expect_equal_nma_summary <- function(object, expected, ...) {
+  
+  act <- quasi_label(enquo(object), arg = "object")
+  exp <- quasi_label(enquo(expected), arg = "expected")
+  
+  comp <- compare(act$val %>% as.data.frame() %>% select(-c(se_mean, Bulk_ESS, Tail_ESS, Rhat)), 
+                  exp$val %>% as.data.frame() %>% select(-c(se_mean, Bulk_ESS, Tail_ESS, Rhat)), 
+                  ...)
+  expect(comp$equal, sprintf("%s not equal to %s.\n%s", 
+         act$lab, exp$lab, comp$message))
+  
+  invisible(act$val)
+}
+
+test_that("Analysis of reordered contrast data gives same results", {
+  expect_equal_nma_summary(relative_effects(reorder_fit_FE, trt_ref = 1),
+                           contr_releff_FE, 
+                           tolerance = tol)
+  expect_equal_nma_summary(relative_effects(reorder_fit_RE, trt_ref = 1),
+                           contr_releff_RE, 
+                           tolerance = tol)
+  
+  expect_equal_nma_summary(predict(reorder_fit_FE, 
+                                     baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
+                                     type = "response",
+                                     trt_ref = 1),
+                           contr_pred_FE,
+                           tolerance = tol)
+  expect_equal_nma_summary(predict(reorder_fit_RE, 
+                                     baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
+                                     type = "response",
+                                     trt_ref = 1),
+                           contr_pred_RE,
+                           tolerance = tol)
+  
+  expect_equal(dic(reorder_fit_FE)$resdev, contr_dic_FE$resdev, tolerance = tol_dic)
+  expect_equal(dic(reorder_fit_FE)$pd, contr_dic_FE$pd, tolerance = tol_dic)
+  expect_equal(dic(reorder_fit_FE)$dic, contr_dic_FE$dic, tolerance = tol_dic)
+  expect_equal(dic(reorder_fit_RE)$resdev, contr_dic_RE$resdev, tolerance = tol_dic)
+  expect_equal(dic(reorder_fit_RE)$pd, contr_dic_RE$pd, tolerance = tol_dic)
+  expect_equal(dic(reorder_fit_RE)$dic, contr_dic_RE$dic, tolerance = tol_dic)
+  
+  expect_equal_nma_summary(summary(reorder_fit_RE, pars = "tau"), 
+                           contr_tau,
+                           tolerance = tol)
+})
+
+
 #--- Mixed data ---
 
 # Relative effects, heterogeneity, absolute effects are all equal across data scenarios
