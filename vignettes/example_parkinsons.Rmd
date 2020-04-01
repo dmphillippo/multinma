@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
   eval = identical(Sys.getenv("NOT_CRAN"), "true")
 )
 options(width = 100)
+set.seed(1042020)
 ```
 
 ```{r setup}
@@ -116,6 +117,7 @@ summary(half_normal(scale = 2.5))
 Fitting the RE model
 ```{r}
 arm_fit_RE <- nma(arm_net, 
+                  seed = 379394727,
                   trt_effects = "random",
                   prior_intercept = normal(scale = 10),
                   prior_trt = normal(scale = 10),
@@ -286,6 +288,7 @@ summary(half_normal(scale = 2.5))
 Fitting the RE model
 ```{r}
 contr_fit_RE <- nma(contr_net, 
+                    seed = 1150676438,
                     trt_effects = "random",
                     prior_trt = normal(scale = 10),
                     prior_het = half_normal(scale = 2.5),
@@ -477,6 +480,7 @@ summary(half_normal(scale = 2.5))
 Fitting the RE model
 ```{r}
 mix_fit_RE <- nma(mix_net, 
+                  seed = 437219664,
                   trt_effects = "random",
                   prior_intercept = normal(scale = 10),
                   prior_trt = normal(scale = 10),
@@ -793,14 +797,16 @@ reorder_net <- set_agd_contrast(park_reorder,
                               sample_size = n)
 
 reorder_fit_FE <- nma(reorder_net, 
-                    trt_effects = "fixed",
-                    prior_trt = normal(scale = 10))
+                      seed = 1878819627,
+                      trt_effects = "fixed",
+                      prior_trt = normal(scale = 10))
 
 reorder_fit_RE <- nma(reorder_net, 
-                    trt_effects = "random",
-                    prior_trt = normal(scale = 10),
-                    prior_het = half_normal(scale = 2.5),
-                    adapt_delta = 0.99)
+                      seed = 1147315,
+                      trt_effects = "random",
+                      prior_trt = normal(scale = 10),
+                      prior_het = half_normal(scale = 2.5),
+                      adapt_delta = 0.99)
 
 expect_equal_nma_summary <- function(object, expected, ...) {
   
