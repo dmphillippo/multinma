@@ -108,7 +108,7 @@ blocker_fit_RE
 By default, summaries of the study-specific intercepts $\mu_j$ and study-specific relative effects $\delta_{jk}$ are hidden, but could be examined by changing the `pars` argument:
 ```{r, eval=FALSE}
 # Not run
-print(blocker_fit_FE, pars = c("d", "mu", "delta"))
+print(blocker_fit_RE, pars = c("d", "mu", "delta"))
 ```
 
 The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
