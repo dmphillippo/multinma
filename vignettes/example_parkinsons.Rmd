@@ -188,7 +188,6 @@ We use the `predict()` method, where the `baseline` argument takes a `distr()` d
 (Strictly speaking, `type = "response"` is unnecessary here, since the identity link function was used.)
 ```{r arm_pred_FE, fig.height = 2}
 arm_pred_FE <- predict(arm_fit_FE, 
-                       newdata = data.frame(time = 3),
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
                        trt_ref = 1)
@@ -197,7 +196,6 @@ plot(arm_pred_FE)
 ```
 ```{r arm_pred_RE, fig.height = 2}
 arm_pred_RE <- predict(arm_fit_RE, 
-                       newdata = data.frame(time = 3),
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
                        trt_ref = 1)
@@ -359,7 +357,6 @@ We use the `predict()` method, where the `baseline` argument takes a `distr()` d
 (Strictly speaking, `type = "response"` is unnecessary here, since the identity link function was used.)
 ```{r contr_pred_FE, fig.height = 2}
 contr_pred_FE <- predict(contr_fit_FE, 
-                       newdata = data.frame(time = 3),
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
                        trt_ref = 1)
@@ -368,7 +365,6 @@ plot(contr_pred_FE)
 ```
 ```{r contr_pred_RE, fig.height = 2}
 contr_pred_RE <- predict(contr_fit_RE, 
-                       newdata = data.frame(time = 3),
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
                        trt_ref = 1)
@@ -553,7 +549,6 @@ We use the `predict()` method, where the `baseline` argument takes a `distr()` d
 (Strictly speaking, `type = "response"` is unnecessary here, since the identity link function was used.)
 ```{r mix_pred_FE, fig.height = 2}
 mix_pred_FE <- predict(mix_fit_FE, 
-                       newdata = data.frame(time = 3),
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
                        trt_ref = 1)
@@ -562,7 +557,6 @@ plot(mix_pred_FE)
 ```
 ```{r mix_pred_RE, fig.height = 2}
 mix_pred_RE <- predict(mix_fit_RE, 
-                       newdata = data.frame(time = 3),
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
                        trt_ref = 1)
