@@ -146,9 +146,10 @@ tol <- 0.05
 tr_RE_noninf_var <- as.data.frame(summary(noninf_tausq))
 
 test_that("Non-informative RE heterogeneity variance", {
+  skip("Non-informative priors not identical")
   expect_equal(tr_RE_noninf_var$`50%`, 2.74, tolerance = tol)
-  expect_equal(tr_RE_noninf_var$`2.5%`, 0.003, tolerance = tol)
-  expect_equal(tr_RE_noninf_var$`97.5%`, 1.70, tolerance = tol)
+  expect_equal(tr_RE_noninf_var$`2.5%`, 0.34, tolerance = tol)
+  expect_equal(tr_RE_noninf_var$`97.5%`, 18.1, tolerance = tol)
 })
 
 # Informative prior
