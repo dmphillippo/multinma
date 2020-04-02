@@ -89,7 +89,7 @@ print(tr_fit_RE_noninf, pars = c("d", "mu", "delta"))
 ```
 
 The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
-```{r tr_RE_pp_plot}
+```{r tr_RE_noninf_pp_plot}
 plot_prior_posterior(tr_fit_RE_noninf, prior = c("trt", "het"))
 ```
 
@@ -140,7 +140,7 @@ print(tr_fit_RE_inf, pars = c("d", "mu", "delta"))
 ```
 
 The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
-```{r tr_RE_pp_plot}
+```{r tr_RE_inf_pp_plot}
 plot_prior_posterior(tr_fit_RE_inf, prior = c("trt", "het"))
 ```
 
