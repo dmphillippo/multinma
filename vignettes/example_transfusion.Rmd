@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
   eval = identical(Sys.getenv("NOT_CRAN"), "true")
 )
 options(width = 100)
+set.seed(2684319)
 ```
 
 ```{r setup}
@@ -60,8 +61,16 @@ summary(half_normal(scale = 5))
 ```
 
 Fitting the RE model
-```{r}
+```{r, eval=FALSE, echo=TRUE}
 tr_fit_RE_noninf <- nma(tr_net, 
+                        trt_effects = "random",
+                        prior_intercept = normal(scale = 10),
+                        prior_trt = normal(scale = 10),
+                        prior_het = half_normal(scale = 5))
+```
+```{r, echo=FALSE}
+tr_fit_RE_noninf <- nma(tr_net, 
+                        seed = 857369814,
                         trt_effects = "random",
                         prior_intercept = normal(scale = 10),
                         prior_trt = normal(scale = 10),
@@ -89,7 +98,7 @@ The posterior distribution for the heterogeneity variance $tau^2$ is summarised 
 noninf_tau <- as.array(tr_fit_RE_noninf, pars = "tau")
 noninf_tausq <- noninf_tau^2
 dimnames(noninf_tausq)[[3]] <- "tausq"
-summary_mcmc_array(noninf_tausq)
+summary(noninf_tausq)
 ```
 
 
@@ -101,8 +110,17 @@ summary(log_normal(-3.93, 1.51))
 ```
 
 Fitting the RE model, we specify the `log_normal` prior distribution in the `prior_het` argument, and set `prior_het_type = "var"` to indicate that this prior distribution is on the variance scale (instead of the standard deviation, the default).
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 tr_fit_RE_inf <- nma(tr_net, 
+                     trt_effects = "random",
+                     prior_intercept = normal(scale = 10),
+                     prior_trt = normal(scale = 10),
+                     prior_het = log_normal(-3.93, 1.51),
+                     prior_het_type = "var")
+```
+```{r, echo=FALSE}
+tr_fit_RE_inf <- nma(tr_net, 
+                     seed = 1803772660,
                      trt_effects = "random",
                      prior_intercept = normal(scale = 10),
                      prior_trt = normal(scale = 10),
@@ -131,7 +149,7 @@ The posterior distribution for the heterogeneity variance $tau^2$ is summarised 
 inf_tau <- as.array(tr_fit_RE_inf, pars = "tau")
 inf_tausq <- inf_tau^2
 dimnames(inf_tausq)[[3]] <- "tausq"
-summary_mcmc_array(inf_tausq)
+summary(inf_tausq)
 ```
 
 ## References
