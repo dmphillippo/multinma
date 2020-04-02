@@ -219,3 +219,30 @@
 
 "parkinsons"
 
+#' Stroke prevention in atrial fibrillation patients
+#'
+#' Data frame containing the results of 26 trials comparing 17 treatments in 4
+#' classes for the prevention of stroke in patients with atrial fibrillation
+#' \insertCite{Cooper2009}{multinma}. The data are the corrected versions
+#' given by \insertCite{gemtc;textual}{multinma}.
+#'
+#' @format A data frame with 63 rows and 11 variables:
+#' \describe{
+#'   \item{studyc}{study name}
+#'   \item{studyn}{numeric study ID}
+#'   \item{trtc}{treatment name}
+#'   \item{trtn}{numeric treatment code}
+#'   \item{trt_class}{treatment class}
+#'   \item{r}{number of events}
+#'   \item{n}{sample size}
+#'   \item{E}{person-years at risk}
+#'   \item{stroke}{proportion of individuals with prior stroke}
+#'   \item{year}{year of study publication}
+#'   \item{followup}{mean length of follow-up (years)}
+#' }
+#'
+#' @references
+#'   \insertAllCited{}
+#'
+
+"atrial_fibrillation"
