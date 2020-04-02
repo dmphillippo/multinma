@@ -106,7 +106,7 @@ tr_fit_RE_inf <- nma(tr_net,
                      trt_effects = "random",
                      prior_intercept = normal(scale = 10),
                      prior_trt = normal(scale = 10),
-                     prior_het = log_normal(3.93, 1.51),
+                     prior_het = log_normal(-3.93, 1.51),
                      prior_het_type = "var")
 ```
 
