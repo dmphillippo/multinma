@@ -409,7 +409,9 @@ as_tibble.nma_summary <- function(x, ...) {
 #' @rdname nma_summary-methods
 #' @export
 as.array.nma_summary <- function(x, ...) {
-  return(x$sims)
+  out <- x$sims
+  class(out) <-  c("mcmc_array", "array")
+  return(out)
 }
 
 #' @rdname nma_summary-methods

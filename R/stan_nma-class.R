@@ -362,7 +362,9 @@ as.stanfit.default <- function(x, ...) {
 #'
 #' @export
 as.array.stan_nma <- function(x, ...) {
-  return(as.array(as.stanfit(x), ...))
+  out <- as.array(as.stanfit(x), ...)
+  class(out) <- c("mcmc_array", "array")
+  return(out)
 }
 
 #' as.data.frame
