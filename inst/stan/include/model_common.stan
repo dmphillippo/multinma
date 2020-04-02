@@ -23,7 +23,7 @@ if (RE) {
     }
     else if (prior_het_type == 3) { // Prior on prec = tau^-2
       tau_t[1] = tau[1]^-2;
-      target += -log(tau);
+      target += -3*log(tau);
     }
     prior_select_lp(tau_t, prior_het_dist, prior_het_location, prior_het_scale, prior_het_df);
   }}
