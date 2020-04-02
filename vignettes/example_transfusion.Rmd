@@ -93,7 +93,7 @@ The prior and posterior distributions can be compared visually using the `plot_p
 plot_prior_posterior(tr_fit_RE_noninf, prior = c("trt", "het"))
 ```
 
-The posterior distribution for the heterogeneity variance $tau^2$ is summarised by
+The posterior distribution for the heterogeneity variance $\tau^2$ is summarised by
 ```{r}
 noninf_tau <- as.array(tr_fit_RE_noninf, pars = "tau")
 noninf_tausq <- noninf_tau^2
@@ -144,7 +144,7 @@ The prior and posterior distributions can be compared visually using the `plot_p
 plot_prior_posterior(tr_fit_RE_inf, prior = c("trt", "het"))
 ```
 
-The posterior distribution for the heterogeneity variance $tau^2$ is summarised by
+The posterior distribution for the heterogeneity variance $\tau^2$ is summarised by
 ```{r}
 inf_tau <- as.array(tr_fit_RE_inf, pars = "tau")
 inf_tausq <- inf_tau^2
