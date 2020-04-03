@@ -1,0 +1,256 @@
+---
+title: "Example: Stroke prevention in atrial fibrillation patients"
+output: rmarkdown::html_vignette
+bibliography: ../inst/REFERENCES.bib
+vignette: >
+  %\VignetteIndexEntry{Example: Stroke prevention in atrial fibrillation patients}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8, 
+  fig.height = 6,
+  eval = identical(Sys.getenv("NOT_CRAN"), "true")
+)
+options(width = 100)
+```
+
+```{r setup}
+library(multinma)
+options(mc.cores = parallel::detectCores())
+```
+
+This vignette describes the analysis of 26 trials comparing 17 treatments in 4 classes for the prevention of stroke in patients with atrial fibrillation [@Cooper2009].
+The data are available in this package as `atrial_fibrillation`:
+```{r}
+head(atrial_fibrillation)
+```
+
+@Cooper2009 used this data to demonstrate meta-regression models, which we recreate here.
+
+### Setting up the network
+Whilst we have data on the patient-years at risk in each study (`E`), we ignore this here to follow the analysis of @Cooper2009, instead analysing the number of patients with stroke (`r`) out of the total (`n`) in each arm.
+We use the function `set_agd_arm()` to set up the network, making sure to specify the treatment classes `trt_class`.
+```{r}
+af_net <- set_agd_arm(atrial_fibrillation, 
+                      study = studyc,
+                      trt = trtc,
+                      r = r, 
+                      n = n,
+                      trt_class = trt_class)
+af_net
+```
+
+(A better analysis, accounting for differences in the patient-years at risk between studies, can be performed by specifying a rate outcome with `r` and `E` in `set_agd_arm()` above.
+The following code remains identical.)
+
+Plot the network with the `plot()` method:
+```{r af_network_plot}
+plot(af_net, weight_nodes = TRUE, weight_edges = TRUE)
+```
+
+
+### Meta-analysis models
+We fit two (random effects) models:
+
+1. A standard NMA model without any covariates (model 1 of @Cooper2009);
+2. A meta-regression model adjusting for the proportion of individuals in each study with prior stroke, with shared interaction coefficients by treatment class (model 4b of @Cooper2009).
+
+#### NMA with no covariates
+We fit a random effects model using the `nma()` function with `trt_effects = "random"`.
+We use $\mathrm{N}(0, 10^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and a $\textrm{half-N}(10^2)$ prior for the heterogeneity standard deviation $\tau$.
+We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
+```{r}
+summary(normal(scale = 10))
+summary(half_normal(scale = 10))
+```
+
+Fitting the model with the `nma()` function:
+```{r}
+af_fit_1 <- nma(af_net, 
+                trt_effects = "random",
+                prior_intercept = normal(scale = 10),
+                prior_trt = normal(scale = 10),
+                prior_het = half_normal(scale = 10))
+```
+
+Basic paramter summaries are given by the `print()` method:
+```{r}
+af_fit_1
+```
+
+By default, summaries of the study-specific intercepts $\mu_j$ and study-specific relative effects $\delta_{jk}$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(af_fit_1, pars = c("d", "mu", "delta"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r af_1_pp_plot}
+plot_prior_posterior(af_fit_1, prior = c("trt", "het"))
+```
+
+We can compute relative effects against placebo/standard care with the `relative_effects()` function with the `trt_ref` argument:
+```{r}
+(af_1_releff <- relative_effects(af_fit_1, trt_ref = "Placebo/Standard care"))
+```
+
+These estimates can easily be plotted with the `plot()` method:
+```{r af_1_releff_plot}
+plot(af_1_releff, ref_line = 0)
+```
+
+We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.
+```{r af_1_ranks}
+(af_1_ranks <- posterior_ranks(af_fit_1))
+plot(af_1_ranks)
+```
+```{r af_1_rankprobs}
+(af_1_rankprobs <- posterior_rank_probs(af_fit_1))
+plot(af_1_rankprobs)
+```
+```{r af_1_cumrankprobs}
+(af_1_cumrankprobs <- posterior_rank_probs(af_fit_1, cumulative = TRUE))
+plot(af_1_cumrankprobs)
+```
+
+#### Network meta-regression adjusting for proportion of prior stroke
+We now consider a meta-regression model adjusting for the proportion of individuals in each study with prior stroke, with shared interaction coefficients by treatment class.
+The regression model is specified in the `nma()` function using a formula in the `regression` argument.
+The formula `~ .trt:stroke` means that interactions of prior stroke with treatment will be included; the `.trt` special variable indicates treatment, and `stroke` is in the original data set.
+We specify `class_interactions = "common"` to denote that the interaction parameters are to be common (i.e. shared) between treatments within each class.
+(Setting `class_interactions = "independent"` would fit model 2 of @Cooper2009 with separate interactions for each treatment, data permitting.)
+We use the same prior distributions as above, but additionally require a prior distribution for the regression coefficients `prior_reg`; we use a $\mathrm{N}(0, 10^2)$ prior distribution.
+```{r}
+af_fit_4b <- nma(af_net, 
+                 trt_effects = "random",
+                 regression = ~ .trt:stroke,
+                 class_interactions = "common",
+                 prior_intercept = normal(scale = 10),
+                 prior_trt = normal(scale = 10),
+                 prior_reg = normal(scale = 10),
+                 prior_het = half_normal(scale = 10))
+```
+
+Basic paramter summaries are given by the `print()` method:
+```{r}
+af_fit_4b
+```
+
+The estimated treatment effects `d[]` shown here correspond to relative effects at the reference level of the covariate, here proportion of prior stroke centered at the network mean value 0.22.
+
+By default, summaries of the study-specific intercepts $\mu_j$ and study-specific relative effects $\delta_{jk}$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(af_fit_4b, pars = c("d", "mu", "delta"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r af_4b_pp_plot}
+plot_prior_posterior(af_fit_4b, prior = c("reg", "het"))
+```
+
+We can compute relative effects against placebo/standard care with the `relative_effects()` function with the `trt_ref` argument, which by default produces relative effects for the observed proportions of prior stroke in each study:
+```{r af_4b_releff_plot}
+(af_4b_releff <- relative_effects(af_fit_4b, trt_ref = "Placebo/Standard care"))
+plot(af_4b_releff, ref_line = 0)
+```
+
+We can produce estimated treatment effects for particular covariate values using the `newdata` argument.
+For example, treatment effects when no individuals or all individuals have prior stroke are produced by
+```{r af_4b_releff_01_plot}
+(af_4b_releff_01 <- relative_effects(af_fit_4b, 
+                                     trt_ref = "Placebo/Standard care",
+                                     newdata = data.frame(stroke = c(0, 1), label = c("stroke = 0", "stroke = 1")),
+                                     study = label))
+plot(af_4b_releff_01, ref_line = 0)
+```
+
+
+The estimated class interactions (against the reference "Mixed" class) are very uncertain.
+```{r af_4b_betas}
+plot(af_fit_4b, pars = "beta", stat = "halfeyeh", ref_line = 0)
+```
+
+The interactions are more straightforward to interpret if we transform the interaction coefficients (using the consistency equations) so that they are against the control class:
+```{r af_4b_betas_transformed}
+af_4b_beta <- as.array(af_fit_4b, pars = "beta")
+
+# Subtract beta[Control:stroke] from the other class interactions
+af_4b_beta[ , , 1:2] <- sweep(af_4b_beta[ , , 1:2], 1:2, af_4b_beta[ , , "beta[Control:stroke]"], FUN = "-")
+
+# Set beta[Mixed:stroke] = -beta[Control:stroke]
+af_4b_beta[ , , "beta[Control:stroke]"] <- -af_4b_beta[ , , "beta[Control:stroke]"]
+dimnames(af_4b_beta)[[3]][3] <- "beta[Mixed:stroke]"
+
+# Summarise
+summary(af_4b_beta)
+plot(summary(af_4b_beta), stat = "halfeyeh", ref_line = 0)
+```
+
+There is some evidence that the effect of anti-coagulants increases (compared to control) with prior stroke.
+There is little evidence the effect of anti-platelets reduces with prior stroke, although the point estimate represents a substantial reduction in effectiveness, and the 95% Credible Interval includes values that correspond to substantial increases in treatment effect.
+The interaction effect of stroke on mixed treatments is very uncertain, but potentially indicates a substantial reduction in treatment effects with prior stroke.
+
+We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.
+By default (without the `newdata` argument specified), these are produced at the value of `stroke` for each study in the network in turn.
+To instead produce rankings for when no individuals or all individuals have prior stroke, we specify the `newdata` argument.
+```{r af_4b_ranks}
+(af_4b_ranks <- posterior_ranks(af_fit_4b,
+                                newdata = data.frame(stroke = c(0, 1), 
+                                                     label = c("stroke = 0", "stroke = 1")), 
+                                study = label))
+plot(af_4b_ranks)
+```
+```{r af_4b_rankprobs}
+(af_4b_rankprobs <- posterior_rank_probs(af_fit_4b,
+                                         newdata = data.frame(stroke = c(0, 1), 
+                                                              label = c("stroke = 0", "stroke = 1")), 
+                                         study = label))
+plot(af_4b_rankprobs)
+```
+```{r af_4b_cumrankprobs}
+(af_4b_cumrankprobs <- posterior_rank_probs(af_fit_4b, cumulative = TRUE,
+                                            newdata = data.frame(stroke = c(0, 1), 
+                                                                 label = c("stroke = 0", "stroke = 1")), 
+                                            study = label))
+plot(af_4b_cumrankprobs)
+```
+
+### Model fit and comparison
+Model fit can be checked using the `dic()` function:
+```{r}
+(af_dic_1 <- dic(af_fit_1))
+```
+```{r}
+(af_dic_4b <- dic(af_fit_4b))
+```
+
+Both models fit the data well, having posterior mean residual deviance close to the number of data points.
+The DIC is slightly lower for the meta-regression model, although only by a couple of points (substantial differences are usually considered 3-5 points).
+The estimated heterogeneity standard deviation is much lower for the meta-regression model, suggesting that adjusting for the proportion of patients with prior stroke is explaining some of the heterogeneity in the data.
+
+We can also examine the residual deviance contributions with the corresponding `plot()` method.
+```{r af_1_resdev_plot}
+plot(af_dic_1)
+```
+
+```{r af_4b_resdev_plot}
+plot(af_dic_4b)
+```
+
+## References
+
+```{r atrial_fibrillation_tests, include=FALSE, eval=testthat::is_testing()}
+#--- Test against TSD 2 results ---
+library(testthat)
+
+tol <- 0.05
+
+
+```
