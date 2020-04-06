@@ -423,6 +423,7 @@ as.matrix.nma_summary <- function(x, ...){
   dim_a <- dim(a)
   dim(a) <- c(dim_a[1] * dim_a[2], dim_a[3])
   dimnames(a) <- names_a[-2]
+  class(a) <- "matrix"
   return(a)
 }
 
