@@ -351,16 +351,27 @@ as.stanfit.default <- function(x, ...) {
   abort(glue::glue("Cannot coerce object of class '{class(x)}' to 'stanfit'."))
 }
 
-#' as.array
+#' Convert samples into arrays, matrices, or data frames
 #'
-#' Turn a `stan_nma` object into a 3D array \[Iteration, Chain, Parameter\].
-#' Enables \code{\link[bayesplot:bayesplot-package]{bayesplot}} functions to
-#' seamlessly work on `stan_nma` objects.
+#' Samples (post warm-up) from a `stan_nma` model object can be coerced into an
+#' array, matrix, or data frame.
 #'
 #' @param x A `stan_nma` object
 #' @param ... Additional arguments passed to [as.array.stanfit()]
 #' @param pars Optional character vector of parameter names to include in output. If not specified, all parameters are used.
 #' @param include Logical, are parameters in `pars` to be included (`TRUE`, default) or excluded (`FALSE`)?
+#'
+#' @return The `as.array()` method produces a 3D array \[Iteration, Chain,
+#'   Parameter\] containing posterior samples of each parameter. This has the
+#'   side effect of enabling
+#'   \code{\link[bayesplot:bayesplot-package]{bayesplot}} functions to
+#'   seamlessly work on `stan_nma` objects.
+#'
+#'   The `as.data.frame()` method produces a data frame containing posterior
+#'   samples of each parameter, combined over all chains.
+#'
+#'   The `as.matrix()` method produces a matrix containing posterior samples of
+#'   each parameter, combined over all chains.
 #'
 #' @export
 as.array.stan_nma <- function(x, ..., pars, include = TRUE) {
@@ -398,30 +409,22 @@ as.array.stan_nma <- function(x, ..., pars, include = TRUE) {
   return(out)
 }
 
-#' as.data.frame
-#'
-#' Turn a `stan_nma` object into a data frame containing posterior samples (post
-#' warm-up) of each parameter.
-#'
-#' @param x an object
-#' @param ... additional arguments to [as.data.frame.stanfit]
-#'
+#' @rdname as.array.stan_nma
 #' @export
-as.data.frame.stan_nma <- function(x, ...) {
-  return(as.data.frame(as.stanfit(x), ...))
+as.data.frame.stan_nma <- function(x, ..., pars, include = TRUE) {
+  return(as.data.frame(as.matrix(x, ..., pars = pars, include = include)))
 }
 
-#' as.matrix
-#'
-#' Turn a `stan_nma` object into a matrix containing posterior samples (post
-#' warm-up) of each parameter.
-#'
-#' @param x an object
-#' @param ... additional arguments to [as.matrix.stanfit]
-#'
+#' @rdname as.array.stan_nma
 #' @export
-as.matrix.stan_nma <- function(x, ...) {
-  return(as.matrix(as.stanfit(x), ...))
+as.matrix.stan_nma <- function(x, ..., pars, include = TRUE) {
+  a <- as.array(x, ..., pars = pars, include = include)
+  names_a <- dimnames(a)
+  dim_a <- dim(a)
+  dim(a) <- c(dim_a[1] * dim_a[2], dim_a[3])
+  dimnames(a) <- names_a[-2]
+  class(a) <- "matrix"
+  return(a)
 }
 
 #' Model comparison using the `loo` package
