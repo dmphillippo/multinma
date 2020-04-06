@@ -357,13 +357,44 @@ as.stanfit.default <- function(x, ...) {
 #' Enables \code{\link[bayesplot:bayesplot-package]{bayesplot}} functions to
 #' seamlessly work on `stan_nma` objects.
 #'
-#' @param x an object
-#' @param ... additional arguments to [as.array.stanfit]
+#' @param x A `stan_nma` object
+#' @param ... Additional arguments passed to [as.array.stanfit()]
+#' @param pars Optional character vector of parameter names to include in output. If not specified, all parameters are used.
+#' @param include Logical, are parameters in `pars` to be included (`TRUE`, default) or excluded (`FALSE`)?
 #'
 #' @export
-as.array.stan_nma <- function(x, ...) {
-  out <- as.array(as.stanfit(x), ...)
+as.array.stan_nma <- function(x, ..., pars, include = TRUE) {
+  if (!rlang::is_bool(include))
+    abort("`include` must be TRUE or FALSE.")
+  if (!missing(pars)) {
+    if (!is.character(pars))
+      abort("`pars` must be a character vector of paramters to include (or missing).")
+
+    allpars <- c(x$stanfit@sim$pars_oi, x$stanfit@sim$fnames_oi)
+    badpars <- setdiff(pars, allpars)
+    if (length(badpars))
+      abort(glue::glue("No parameter{if (length(badpars) > 1) 's' else ''} ",
+                       glue::glue_collapse(glue::double_quote(badpars), sep = ", ", last = " or "), "."))
+  }
+
+  a <- as.array(as.stanfit(x), ...)
+
+  if (!missing(pars)) {
+    # Get parameter indices, respecting order of `pars`
+    par_regex <- paste0("^\\Q", pars, "\\E(\\[|$)")
+    par_select <- unlist(lapply(par_regex, grep, x = dimnames(a)[[3]], perl = TRUE))
+
+    if (include) {
+      out <- a[ , , par_select, drop = FALSE]
+    } else {
+      out <- a[ , , -par_select, drop = FALSE]
+    }
+  } else {
+    out <- a
+  }
+
   class(out) <- c("mcmc_array", "array")
+
   return(out)
 }
 
