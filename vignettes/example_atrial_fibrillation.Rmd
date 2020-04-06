@@ -182,11 +182,11 @@ The interactions are more straightforward to interpret if we transform the inter
 af_4b_beta <- as.array(af_fit_4b, pars = "beta")
 
 # Subtract beta[Control:stroke] from the other class interactions
-af_4b_beta[ , , 1:2] <- sweep(af_4b_beta[ , , 1:2], 1:2, af_4b_beta[ , , "beta[Control:stroke]"], FUN = "-")
+af_4b_beta[ , , 1:2] <- sweep(af_4b_beta[ , , 1:2], 1:2, af_4b_beta[ , , "beta[.trtclassControl:stroke]"], FUN = "-")
 
 # Set beta[Mixed:stroke] = -beta[Control:stroke]
-af_4b_beta[ , , "beta[Control:stroke]"] <- -af_4b_beta[ , , "beta[Control:stroke]"]
-dimnames(af_4b_beta)[[3]][3] <- "beta[Mixed:stroke]"
+af_4b_beta[ , , "beta[.trtclassControl:stroke]"] <- -af_4b_beta[ , , "beta[.trtclassControl:stroke]"]
+dimnames(af_4b_beta)[[3]][3] <- "beta[.trtclassMixed:stroke]"
 
 # Summarise
 summary(af_4b_beta)
