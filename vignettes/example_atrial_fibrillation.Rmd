@@ -156,7 +156,8 @@ plot_prior_posterior(af_fit_4b, prior = c("reg", "het"))
 ```
 
 We can compute relative effects against placebo/standard care with the `relative_effects()` function with the `trt_ref` argument, which by default produces relative effects for the observed proportions of prior stroke in each study:
-```{r af_4b_releff_plot}
+```{r af_4b_releff_plot, fig.height = 16, eval=FALSE}
+# Not run
 (af_4b_releff <- relative_effects(af_fit_4b, trt_ref = "Placebo/Standard care"))
 plot(af_4b_releff, ref_line = 0)
 ```
@@ -166,7 +167,8 @@ For example, treatment effects when no individuals or all individuals have prior
 ```{r af_4b_releff_01_plot}
 (af_4b_releff_01 <- relative_effects(af_fit_4b, 
                                      trt_ref = "Placebo/Standard care",
-                                     newdata = data.frame(stroke = c(0, 1), label = c("stroke = 0", "stroke = 1")),
+                                     newdata = data.frame(stroke = c(0, 1), 
+                                                          label = c("stroke = 0", "stroke = 1")),
                                      study = label))
 plot(af_4b_releff_01, ref_line = 0)
 ```
@@ -182,7 +184,8 @@ The interactions are more straightforward to interpret if we transform the inter
 af_4b_beta <- as.array(af_fit_4b, pars = "beta")
 
 # Subtract beta[Control:stroke] from the other class interactions
-af_4b_beta[ , , 1:2] <- sweep(af_4b_beta[ , , 1:2], 1:2, af_4b_beta[ , , "beta[.trtclassControl:stroke]"], FUN = "-")
+af_4b_beta[ , , 1:2] <- sweep(af_4b_beta[ , , 1:2], 1:2, 
+                              af_4b_beta[ , , "beta[.trtclassControl:stroke]"], FUN = "-")
 
 # Set beta[Mixed:stroke] = -beta[Control:stroke]
 af_4b_beta[ , , "beta[.trtclassControl:stroke]"] <- -af_4b_beta[ , , "beta[.trtclassControl:stroke]"]
@@ -207,19 +210,27 @@ To instead produce rankings for when no individuals or all individuals have prio
                                 study = label))
 plot(af_4b_ranks)
 ```
-```{r af_4b_rankprobs}
+```{r af_4b_rankprobs, fig.height=12}
 (af_4b_rankprobs <- posterior_rank_probs(af_fit_4b,
                                          newdata = data.frame(stroke = c(0, 1), 
                                                               label = c("stroke = 0", "stroke = 1")), 
                                          study = label))
-plot(af_4b_rankprobs)
+
+# Modify the default output with ggplot2 functionality
+library(ggplot2)
+plot(af_4b_rankprobs) + 
+  facet_grid(Treatment~Study, labeller = label_wrap_gen(20)) + 
+  theme(strip.text.y = element_text(angle = 0))
 ```
-```{r af_4b_cumrankprobs}
+```{r af_4b_cumrankprobs, fig.height=12}
 (af_4b_cumrankprobs <- posterior_rank_probs(af_fit_4b, cumulative = TRUE,
                                             newdata = data.frame(stroke = c(0, 1), 
                                                                  label = c("stroke = 0", "stroke = 1")), 
                                             study = label))
-plot(af_4b_cumrankprobs)
+
+plot(af_4b_cumrankprobs) + 
+  facet_grid(Treatment~Study, labeller = label_wrap_gen(20)) + 
+  theme(strip.text.y = element_text(angle = 0))
 ```
 
 ### Model fit and comparison
