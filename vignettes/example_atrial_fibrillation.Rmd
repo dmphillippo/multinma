@@ -140,7 +140,7 @@ We use the same prior distributions as above, but additionally require a prior d
 The [QR decomposition](https://mc-stan.org/users/documentation/case-studies/qr_regression.html) can greatly improve the efficiency of sampling for regression models by decorrelating the sampling space; we specify that this should be used with `QR = TRUE`, and increase the target acceptance rate `adapt_delta = 0.99` to minimise divergent transition warnings.
 ```{r, echo=FALSE}
 af_fit_4b <- nma(af_net, 
-                 seed = 200407913,
+                 seed = 1935414139,
                  trt_effects = "random",
                  regression = ~ .trt:stroke,
                  class_interactions = "common",
@@ -214,9 +214,9 @@ af_4b_beta <- as.array(af_fit_4b, pars = "beta")
 af_4b_beta[ , , 1:2] <- sweep(af_4b_beta[ , , 1:2], 1:2, 
                               af_4b_beta[ , , "beta[.trtclassControl:stroke]"], FUN = "-")
 
-# Set beta[Mixed:stroke] = -beta[Control:stroke]
+# Set beta[Anti-coagulant:stroke] = -beta[Control:stroke]
 af_4b_beta[ , , "beta[.trtclassControl:stroke]"] <- -af_4b_beta[ , , "beta[.trtclassControl:stroke]"]
-dimnames(af_4b_beta)[[3]][3] <- "beta[.trtclassMixed:stroke]"
+dimnames(af_4b_beta)[[3]][3] <- "beta[.trtclassAnti-coagulant:stroke]"
 
 # Summarise
 summary(af_4b_beta)
@@ -374,9 +374,9 @@ test_that("Relative effects (common interaction)", {
 
 Cooper_4b_beta <- tribble(
 ~trt_class       , ~est , ~lower, ~upper,
-"Anti-coagulant", -0.71,-1.58  , 0.15  ,
-"Anti-platelet" , 0.23 ,-0.45  , 0.93  ,
 "Mixed"          , 3.05 ,-1.26  , 7.30  ,
+"Anti-platelet" , 0.23 ,-0.45  , 0.93  ,
+"Anti-coagulant", -0.71,-1.58  , 0.15  ,
 )
 
 af_4b_beta_df <- as.data.frame(summary(af_4b_beta))
