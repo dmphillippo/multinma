@@ -52,8 +52,9 @@ af_net
 The following code remains identical.)
 
 Plot the network with the `plot()` method:
-```{r af_network_plot}
-plot(af_net, weight_nodes = TRUE, weight_edges = TRUE)
+```{r af_network_plot, fig.height = 8}
+plot(af_net, weight_nodes = TRUE, weight_edges = TRUE) + 
+  ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
 ```
 
 
