@@ -81,6 +81,7 @@ test_that("combine_network produces combined treatment, class, and study factors
     set_agd_arm(agd_arm, studyf, trtf, y = y, se = se, trt_class = tclassc),
     set_ipd(ipd, studyf, trtf, y = y, trt_class = tclassc)
   )
+  # Reference trt is A
   expect_equal(c1_classed$treatments, .default(factor(LETTERS[1:4])))
   expect_equal(levels(c1_classed$agd_arm$.trt), LETTERS[1:4])
   expect_equal(levels(c1_classed$ipd$.trt), LETTERS[1:4])
@@ -96,6 +97,7 @@ test_that("combine_network produces combined treatment, class, and study factors
     set_ipd(ipd, studyf, trtf, y = y, trt_class = tclassc),
     set_agd_contrast(agd_contrast, studyf, trtf, y = y, se = se, trt_class = tclassc)
   )
+  # Reference treatment is B
   expect_equal(c2_classed$treatments, .default(factor(LETTERS[c(2, 1, 3, 4)],
                                                       levels = LETTERS[c(2, 1, 3, 4)])))
   expect_equal(levels(c2_classed$agd_arm$.trt), LETTERS[c(2, 1, 3, 4)])
@@ -105,10 +107,10 @@ test_that("combine_network produces combined treatment, class, and study factors
   expect_equal(levels(c2_classed$agd_arm$.study), letters[1:5])
   expect_equal(levels(c2_classed$agd_contrast$.study), letters[1:5])
   expect_equal(levels(c2_classed$ipd$.study), letters[1:5])
-  expect_equal(c2_classed$classes, factor(letters[c(1, 2, 2, 3)]))
-  expect_equal(levels(c2_classed$agd_arm$.trtclass), letters[1:3])
-  expect_equal(levels(c2_classed$ipd$.trtclass), letters[1:3])
-  expect_equal(levels(c2_classed$agd_contrast$.trtclass), letters[1:3])
+  expect_equal(c2_classed$classes, factor(letters[c(2, 1, 2, 3)], levels = c(letters[c(2, 1, 3)])))
+  expect_equal(levels(c2_classed$agd_arm$.trtclass), letters[c(2, 1, 3)])
+  expect_equal(levels(c2_classed$ipd$.trtclass), letters[c(2, 1, 3)])
+  expect_equal(levels(c2_classed$agd_contrast$.trtclass), letters[c(2, 1, 3)])
 })
 
 test_that("combine_network can set alternative trt_ref", {
