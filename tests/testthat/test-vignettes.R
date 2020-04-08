@@ -32,3 +32,6 @@ test_that("Transfusion example", {
   rmarkdown::render("../../vignettes/example_transfusion.Rmd", output_dir = td)
 })
 
+test_that("Atrial fibrillation example", {
+  rmarkdown::render("../../vignettes/example_atrial_fibrillation.Rmd", output_dir = td)
+})
