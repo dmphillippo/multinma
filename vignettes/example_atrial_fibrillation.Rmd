@@ -66,10 +66,10 @@ We fit two (random effects) models:
 
 #### NMA with no covariates
 We fit a random effects model using the `nma()` function with `trt_effects = "random"`.
-We use $\mathrm{N}(0, 10^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and a $\textrm{half-N}(10^2)$ prior for the heterogeneity standard deviation $\tau$.
+We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and a $\textrm{half-N}(10^2)$ prior for the heterogeneity standard deviation $\tau$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
 ```{r}
-summary(normal(scale = 10))
+summary(normal(scale = 100))
 summary(half_normal(scale = 10))
 ```
 
@@ -78,15 +78,15 @@ Fitting the model with the `nma()` function:
 af_fit_1 <- nma(af_net, 
                 seed = 103533305,
                 trt_effects = "random",
-                prior_intercept = normal(scale = 10),
-                prior_trt = normal(scale = 10),
+                prior_intercept = normal(scale = 100),
+                prior_trt = normal(scale = 100),
                 prior_het = half_normal(scale = 10))
 ```
 ```{r, eval=FALSE}
 af_fit_1 <- nma(af_net, 
                 trt_effects = "random",
-                prior_intercept = normal(scale = 10),
-                prior_trt = normal(scale = 10),
+                prior_intercept = normal(scale = 100),
+                prior_trt = normal(scale = 100),
                 prior_het = half_normal(scale = 10))
 ```
 
@@ -137,7 +137,7 @@ The formula `~ .trt:stroke` means that interactions of prior stroke with treatme
 We specify `class_interactions = "common"` to denote that the interaction parameters are to be common (i.e. shared) between treatments within each class.
 (Setting `class_interactions = "independent"` would fit model 2 of @Cooper2009 with separate interactions for each treatment, data permitting.)
 We use the same prior distributions as above, but additionally require a prior distribution for the regression coefficients `prior_reg`; we use a $\mathrm{N}(0, 10^2)$ prior distribution.
-The [QR decomposition](https://mc-stan.org/users/documentation/case-studies/qr_regression.html) can greatly improve the efficiency of sampling for regression models by decorrelating the sampling space; we specify that this should be used with `QR = TRUE`, and increase the target acceptance rate `adapt_delta = 0.99` to remove divergent transition warnings.
+The [QR decomposition](https://mc-stan.org/users/documentation/case-studies/qr_regression.html) can greatly improve the efficiency of sampling for regression models by decorrelating the sampling space; we specify that this should be used with `QR = TRUE`, and increase the target acceptance rate `adapt_delta = 0.99` to minimise divergent transition warnings.
 ```{r, echo=FALSE}
 af_fit_4b <- nma(af_net, 
                  seed = 200407913,
@@ -145,9 +145,9 @@ af_fit_4b <- nma(af_net,
                  regression = ~ .trt:stroke,
                  class_interactions = "common",
                  QR = TRUE,
-                 prior_intercept = normal(scale = 10),
-                 prior_trt = normal(scale = 10),
-                 prior_reg = normal(scale = 10),
+                 prior_intercept = normal(scale = 100),
+                 prior_trt = normal(scale = 100),
+                 prior_reg = normal(scale = 100),
                  prior_het = half_normal(scale = 10),
                  adapt_delta = 0.99)
 ```
@@ -157,9 +157,9 @@ af_fit_4b <- nma(af_net,
                  regression = ~ .trt:stroke,
                  class_interactions = "common",
                  QR = TRUE,
-                 prior_intercept = normal(scale = 10),
-                 prior_trt = normal(scale = 10),
-                 prior_reg = normal(scale = 10),
+                 prior_intercept = normal(scale = 100),
+                 prior_trt = normal(scale = 100),
+                 prior_reg = normal(scale = 100),
                  prior_het = half_normal(scale = 10),
                  adapt_delta = 0.99)
 ```
