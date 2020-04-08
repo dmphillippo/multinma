@@ -123,8 +123,14 @@ set_ipd <- function(data,
   # current reference trt
   if (is.null(trt_ref)) {
     trt_ref <- get_default_trt_ref(out)
-    out$treatments <- .default(sort(forcats::fct_relevel(out$treatments, trt_ref)))
+    trt_sort <- order(forcats::fct_relevel(out$treatments, trt_ref))
+    out$treatments <- .default(forcats::fct_relevel(out$treatments, trt_ref)[trt_sort])
     out$ipd$.trt <- forcats::fct_relevel(out$ipd$.trt, trt_ref)
+    if (!is.null(.trtclass)) {
+      class_ref <- as.character(out$classes[trt_sort[1]])
+      out$ipd$.trtclass <- forcats::fct_relevel(out$ipd$.trtclass, class_ref)
+      out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
+    }
   }
 
   return(out)
@@ -276,8 +282,14 @@ set_agd_arm <- function(data,
   # current reference trt
   if (is.null(trt_ref)) {
     trt_ref <- get_default_trt_ref(out)
-    out$treatments <- .default(sort(forcats::fct_relevel(out$treatments, trt_ref)))
+    trt_sort <- order(forcats::fct_relevel(out$treatments, trt_ref))
+    out$treatments <- .default(forcats::fct_relevel(out$treatments, trt_ref)[trt_sort])
     out$agd_arm$.trt <- forcats::fct_relevel(out$agd_arm$.trt, trt_ref)
+    if (!is.null(.trtclass)) {
+      class_ref <- as.character(out$classes[trt_sort[1]])
+      out$agd_arm$.trtclass <- forcats::fct_relevel(out$agd_arm$.trtclass, class_ref)
+      out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
+    }
   }
 
   return(out)
@@ -454,8 +466,14 @@ set_agd_contrast <- function(data,
   # current reference trt
   if (is.null(trt_ref)) {
     trt_ref <- get_default_trt_ref(out)
-    out$treatments <- .default(sort(forcats::fct_relevel(out$treatments, trt_ref)))
+    trt_sort <- order(forcats::fct_relevel(out$treatments, trt_ref))
+    out$treatments <- .default(forcats::fct_relevel(out$treatments, trt_ref)[trt_sort])
     out$agd_contrast$.trt <- forcats::fct_relevel(out$agd_contrast$.trt, trt_ref)
+    if (!is.null(.trtclass)) {
+      class_ref <- as.character(out$classes[trt_sort[1]])
+      out$agd_contrast$.trtclass <- forcats::fct_relevel(out$agd_contrast$.trtclass, class_ref)
+      out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
+    }
   }
 
   return(out)
@@ -606,13 +624,27 @@ combine_network <- function(..., trt_ref) {
   # current reference trt
   if (missing(trt_ref)) {
     trt_ref <- get_default_trt_ref(out)
-    out$treatments <- .default(sort(forcats::fct_relevel(out$treatments, trt_ref)))
+    trt_sort <- order(forcats::fct_relevel(out$treatments, trt_ref))
+    out$treatments <- .default(forcats::fct_relevel(out$treatments, trt_ref)[trt_sort])
+
     if (has_ipd(out))
       out$ipd$.trt <- forcats::fct_relevel(out$ipd$.trt, trt_ref)
     if (has_agd_arm(out))
       out$agd_arm$.trt <- forcats::fct_relevel(out$agd_arm$.trt, trt_ref)
     if (has_agd_contrast(out))
       out$agd_contrast$.trt <- forcats::fct_relevel(out$agd_contrast$.trt, trt_ref)
+
+    if (!is.null(classes)) {
+      class_ref <- as.character(out$classes[trt_sort[1]])
+      out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
+
+      if (has_ipd(out))
+        out$ipd$.trtclass <- forcats::fct_relevel(out$ipd$.trtclass, class_ref)
+      if (has_agd_arm(out))
+        out$agd_arm$.trtclass <- forcats::fct_relevel(out$agd_arm$.trtclass, class_ref)
+      if (has_agd_contrast(out))
+        out$agd_contrast$.trtclass <- forcats::fct_relevel(out$agd_contrast$.trtclass, class_ref)
+    }
   }
 
   return(out)
