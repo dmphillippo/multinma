@@ -245,6 +245,14 @@ test_that("set_* can set `trt_ref`", {
   expect_error(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_ref = 2), m)
 })
 
+# Check classes when default reference treatment is not first in sort order
+# Add new study to make B the default trt_ref
+newstudy <- tibble(studyc = "c", trtc = c("B", "C"), tclassc = "b",
+                   cont = rnorm(2), cont_pos = runif(2, 0, 1),
+                   ydiff = c(NA, cont[2]), sediff = 1)
+aa <- bind_rows(agd_arm, newstudy)
+ac <- bind_rows(agd_contrast, newstudy)
+
 test_that("set_* returns correct .trtclass column", {
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = tclassc)$ipd$.trtclass,
@@ -255,6 +263,35 @@ test_that("set_* returns correct .trtclass column", {
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
                                 trt_class = tclassc)$agd_contrast$.trtclass,
                agd_contrast$tclassf)
+  expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
+                       trt_class = tclassc))$ipd$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(combine_network(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = tclassc))$agd_arm$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = tclassc))$agd_contrast$.trtclass,
+               agd_contrast$tclassf)
+
+  # Checks when default trt_ref not first in sort order
+  expect_equal(set_ipd(aa, studyc, trtc, y = cont,
+                       trt_class = tclassc)$ipd$.trtclass,
+               factor(aa$tclassc, levels = c("b", "a")))
+  expect_equal(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = tclassc)$agd_arm$.trtclass,
+               factor(aa$tclassc, levels = c("b", "a")))
+  expect_equal(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = tclassc)$agd_contrast$.trtclass,
+               factor(ac$tclassc, levels = c("b", "a")))
+  expect_equal(combine_network(set_ipd(aa, studyc, trtc, y = cont,
+                                       trt_class = tclassc))$ipd$.trtclass,
+               factor(aa$tclassc, levels = c("b", "a")))
+  expect_equal(combine_network(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
+                                           trt_class = tclassc))$agd_arm$.trtclass,
+               factor(aa$tclassc, levels = c("b", "a")))
+  expect_equal(combine_network(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
+                                                trt_class = tclassc))$agd_contrast$.trtclass,
+               factor(ac$tclassc, levels = c("b", "a")))
 })
 
 test_that("set_* returns classes factor variable", {
@@ -264,6 +301,12 @@ test_that("set_* returns classes factor variable", {
   expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_class = tclassc)$classes,
                f_class)
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_class = tclassc)$classes,
+               f_class)
+  expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont, trt_class = tclassc))$classes,
+               f_class)
+  expect_equal(combine_network(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_class = tclassc))$classes,
+               f_class)
+  expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_class = tclassc))$classes,
                f_class)
 
   f_class2 <- factor(c("b", "a", "b"), levels = c("b", "a"))
@@ -275,6 +318,35 @@ test_that("set_* returns classes factor variable", {
                f_class2)
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
                                 trt_class = tclassc, trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
+                       trt_class = tclassc), trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = tclassc), trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = tclassc), trt_ref = "B")$classes,
+               f_class2)
+
+  # Checks when default trt_ref not first in sort order
+  expect_equal(set_ipd(aa, studyc, trtc, y = cont,
+                       trt_class = tclassc)$classes,
+               f_class2)
+  expect_equal(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = tclassc)$classes,
+               f_class2)
+  expect_equal(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = tclassc)$classes,
+               f_class2)
+  expect_equal(combine_network(set_ipd(aa, studyc, trtc, y = cont,
+                       trt_class = tclassc))$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = tclassc))$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = tclassc))$classes,
                f_class2)
 })
 
