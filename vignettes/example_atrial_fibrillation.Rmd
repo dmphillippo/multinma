@@ -37,8 +37,9 @@ head(atrial_fibrillation)
 ### Setting up the network
 Whilst we have data on the patient-years at risk in each study (`E`), we ignore this here to follow the analysis of @Cooper2009, instead analysing the number of patients with stroke (`r`) out of the total (`n`) in each arm.
 We use the function `set_agd_arm()` to set up the network, making sure to specify the treatment classes `trt_class`.
+We remove the WASPO study from the network as both arms had zero events, and this study therefore contributes no information.
 ```{r}
-af_net <- set_agd_arm(atrial_fibrillation, 
+af_net <- set_agd_arm(atrial_fibrillation[atrial_fibrillation$studyc != "WASPO", ], 
                       study = studyc,
                       trt = trtc,
                       r = r, 
