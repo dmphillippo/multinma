@@ -55,10 +55,10 @@ plot(smknet, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(plot.mar
 
 ### Random effects NMA
 Following TSD 4, we fit a random effects NMA model, using the `nma()` function with `trt_effects = "random"`.
-We use $\mathrm{N}(0, 10^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and a $\mathrm{half-N}(5^2)$ prior distribution for the between-study heterogeneity standard deviation $\tau$.
+We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and a $\mathrm{half-N}(5^2)$ prior distribution for the between-study heterogeneity standard deviation $\tau$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
 ```{r}
-summary(normal(scale = 10))
+summary(normal(scale = 100))
 ```
 ```{r}
 summary(half_normal(scale = 5))
@@ -69,8 +69,8 @@ By default, this will use a Binomial likelihood and a logit link function, auto-
 ```{r}
 smkfit <- nma(smknet, 
               trt_effects = "random",
-              prior_intercept = normal(scale = 10),
-              prior_trt = normal(scale = 10),
+              prior_intercept = normal(scale = 100),
+              prior_trt = normal(scale = 100),
               prior_het = normal(scale = 5))
 ```
 
@@ -119,8 +119,8 @@ Again, we use the function `nma()`, but now with the argument `consistency = "um
 smkfit_ume <- nma(smknet, 
                   consistency = "ume",
                   trt_effects = "random",
-                  prior_intercept = normal(scale = 10),
-                  prior_trt = normal(scale = 10),
+                  prior_intercept = normal(scale = 100),
+                  prior_trt = normal(scale = 100),
                   prior_het = normal(scale = 5))
 smkfit_ume
 ```
@@ -235,8 +235,8 @@ smknet2 <- set_agd_arm(smoking, studyn, trtn, r = r, n = n, trt_ref = 1)
 smkfit_ume2 <- nma(smknet2, 
                    consistency = "ume",
                    trt_effects = "random",
-                   prior_intercept = normal(scale = 10),
-                   prior_trt = normal(scale = 10),
+                   prior_intercept = normal(scale = 100),
+                   prior_trt = normal(scale = 100),
                    prior_het = normal(scale = 5))
 
 # Results of modified TSD 4 model including multi-arm correction

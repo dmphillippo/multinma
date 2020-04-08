@@ -53,10 +53,10 @@ We fit two random effects models, first with a non-informative prior for the het
 
 #### Random effects meta-analysis with non-informative heterogeneity prior
 We fit a random effects model using the `nma()` function with `trt_effects = "random"`.
-We use $\mathrm{N}(0, 10^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and a non-informative $\textrm{half-N}(5^2)$ prior for the heterogeneity standard deviation $\tau$.
+We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and a non-informative $\textrm{half-N}(5^2)$ prior for the heterogeneity standard deviation $\tau$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
 ```{r}
-summary(normal(scale = 10))
+summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 ```
 
@@ -64,16 +64,16 @@ Fitting the RE model
 ```{r, eval=FALSE, echo=TRUE}
 tr_fit_RE_noninf <- nma(tr_net, 
                         trt_effects = "random",
-                        prior_intercept = normal(scale = 10),
-                        prior_trt = normal(scale = 10),
+                        prior_intercept = normal(scale = 100),
+                        prior_trt = normal(scale = 100),
                         prior_het = half_normal(scale = 5))
 ```
 ```{r, echo=FALSE}
 tr_fit_RE_noninf <- nma(tr_net, 
                         seed = 857369814,
                         trt_effects = "random",
-                        prior_intercept = normal(scale = 10),
-                        prior_trt = normal(scale = 10),
+                        prior_intercept = normal(scale = 100),
+                        prior_trt = normal(scale = 100),
                         prior_het = half_normal(scale = 5))
 ```
 
@@ -113,8 +113,8 @@ Fitting the RE model, we specify the `log_normal` prior distribution in the `pri
 ```{r, echo=TRUE, eval=FALSE}
 tr_fit_RE_inf <- nma(tr_net, 
                      trt_effects = "random",
-                     prior_intercept = normal(scale = 10),
-                     prior_trt = normal(scale = 10),
+                     prior_intercept = normal(scale = 100),
+                     prior_trt = normal(scale = 100),
                      prior_het = log_normal(-3.93, 1.51),
                      prior_het_type = "var")
 ```
@@ -122,8 +122,8 @@ tr_fit_RE_inf <- nma(tr_net,
 tr_fit_RE_inf <- nma(tr_net, 
                      seed = 1803772660,
                      trt_effects = "random",
-                     prior_intercept = normal(scale = 10),
-                     prior_trt = normal(scale = 10),
+                     prior_intercept = normal(scale = 100),
+                     prior_trt = normal(scale = 100),
                      prior_het = log_normal(-3.93, 1.51),
                      prior_het_type = "var")
 ```
