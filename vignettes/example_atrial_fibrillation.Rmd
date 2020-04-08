@@ -365,8 +365,8 @@ test_that("Relative effects (common interaction)", {
 
 Cooper_4b_beta <- tribble(
 ~trt_class       , ~est , ~lower, ~upper,
-"Anti-coagulants", -0.71,-1.58  , 0.15  ,
-"Anti-platelets" , 0.23 ,-0.45  , 0.93  ,
+"Anti-coagulant", -0.71,-1.58  , 0.15  ,
+"Anti-platelet" , 0.23 ,-0.45  , 0.93  ,
 "Mixed"          , 3.05 ,-1.26  , 7.30  ,
 )
 
