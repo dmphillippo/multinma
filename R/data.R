@@ -246,3 +246,29 @@
 #'
 
 "atrial_fibrillation"
+
+#' Statins for cholesterol lowering
+#'
+#' Data frame containing the results of 19 trials comparing statins to placebo
+#' or usual care \insertCite{TSD3}{multinma}. The number of deaths (all-cause
+#' mortality) are recorded. In some studies the aim was primary prevention
+#' (patients had no previous heart disease), and in others the aim was secondary
+#' prevention (patients had previous heart disease).
+#'
+#' @format A data frame with 38 rows and 7 variables:
+#' \describe{
+#'   \item{studyn}{numeric study ID}
+#'   \item{studyc}{study name}
+#'   \item{trtn}{numeric treatment code}
+#'   \item{trtc}{treatment name}
+#'   \item{prevention}{primary or secondary prevention study}
+#'   \item{r}{number of deaths}
+#'   \item{n}{sample size}
+#' }
+#'
+#' @references
+#'   \insertAllCited{}
+#'
+
+"statins"
+
