@@ -1397,10 +1397,20 @@ make_nma_model_matrix <- function(nma_formula,
 
   # Remove columns for reference level of .trtclass
   if (classes) {
-    col_trtclass_ref <- grepl(paste0(".trtclass", levels(dat_all$.trtclass)[1]),
+    ref_class <- levels(dat_all$.trtclass)[1]
+    col_trtclass_ref <- grepl(paste0(".trtclass", ref_class),
                               colnames(X_all), fixed = TRUE)
     X_all <- X_all[, !col_trtclass_ref, drop = FALSE]
   }
+
+  # Remove columns for interactions with reference level of .trt or .trtclass
+  ref_trt <- levels(dat_all$.trt)[1]
+  regex_int_ref <- paste0("\\:\\.trt\\Q", ref_trt, "\\E$|^\\.trt\\Q", ref_trt, "\\E\\:")
+  if (classes)
+    regex_int_ref <- paste0(regex_int_ref, "|",
+                            "\\:\\.trtclass\\Q", ref_class, "\\E$|^\\.trtclass\\Q", ref_class, "\\E\\:")
+  col_int_ref <- grepl(regex_int_ref, colnames(X_all), perl = TRUE)
+  X_all <- X_all[, !col_int_ref, drop = FALSE]
 
   if (consistency == "ume") {
     # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
