@@ -53,7 +53,7 @@ The following code remains identical.)
 
 Plot the network with the `plot()` method:
 ```{r af_network_plot, fig.height = 8}
-plot(af_net, weight_nodes = TRUE, weight_edges = TRUE) + 
+plot(af_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) + 
   ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
 ```
 
