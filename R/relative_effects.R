@@ -191,9 +191,9 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
     X_all <- X_list$X_agd_arm
 
     # Subset design matrix into EM columns and trt columns
-    X_d <- X_all[, grepl("^(\\.trt|\\.contr)[^:]+$", colnames(X_all))]
+    X_d <- X_all[, grepl("^(\\.trt|\\.contr)[^:]+$", colnames(X_all)), drop = FALSE]
     EM_regex <- "(^\\.trt(class)?.+\\:)|(\\:\\.trt(class)?.+$)"
-    X_EM <- X_all[, grepl(EM_regex, colnames(X_all))]
+    X_EM <- X_all[, grepl(EM_regex, colnames(X_all)), drop = FALSE]
 
     # If there are no EMs (regression model had no interactions with .trt) then
     # just return the treatment effects (not study specific)
@@ -223,9 +223,9 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       }
     } else {
 
-      # Figure out which covariates are EMs from model matrix
+      # Which covariates are EMs
       EM_col_names <- stringr::str_remove(colnames(X_EM), EM_regex)
-      EM_vars <- unique(EM_col_names)
+      EM_vars <- get_EM_vars(nma_formula)
 
       # Replace EM design matrix with study means if newdata is NULL
       if (is.null(newdata)) {
@@ -295,7 +295,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         for (j in unique(dat_studies$.study)) {
           j_pars <- dat_studies$.study == j
           d_ref <- re_array[ , , paste0("d[", j, ": ", trt_ref, "]"), drop = FALSE]
-          re_array[ , , j_pars] <- sweep(re_array[ , , j_pars], 1:2, d_ref, FUN = "-")
+          re_array[ , , j_pars] <- sweep(re_array[ , , j_pars, drop = FALSE], 1:2, d_ref, FUN = "-")
 
           # Add in parameter for network ref trt in place of trt_ref
           re_array[ , , paste0("d[", j, ": ", trt_ref, "]")] <- -d_ref

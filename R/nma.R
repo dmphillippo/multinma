@@ -1651,3 +1651,21 @@ is_only_offset <- function(f) {
   out <- !is.null(attr(fterms, "offset")) && length(attr(fterms, "factors")) == 0
   return(out)
 }
+
+#' Get EM variables from a model formula
+#'
+#' @param f A one-sided formula, as used for regression argument / output from make_nma_formula
+#' @noRd
+#' @return A character vector or character(0)
+get_EM_vars <- function(f) {
+  if (!rlang::is_formula(f, lhs = FALSE))
+    abort("`f` should be a one-sided formula.")
+
+  fnames <- colnames(attr(terms(f), "factor"))
+
+  EM_regex <- "(^\\.trt(class)?\\:)|(\\:\\.trt(class)?$)"
+
+  out <- stringr::str_subset(fnames, EM_regex)
+  out <- unique(stringr::str_remove(out, EM_regex))
+  return(out)
+}
