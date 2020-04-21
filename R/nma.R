@@ -109,9 +109,14 @@ nma <- function(network,
     abort("`regression` should be a one-sided formula.")
   }
 
-  if (is.null(network$classes) && !missing(class_interactions)) {
-    abort(paste("Setting `class_interactions` requires treatment classes to be specified in the network.",
-                "See set_*() argument `trt_class`.", sep = "\n"))
+  if (is.null(network$classes)) {
+    if (!missing(class_interactions)) {
+      abort(paste("Setting `class_interactions` requires treatment classes to be specified in the network.",
+                  "See set_*() argument `trt_class`.", sep = "\n"))
+    } else if (!is.null(regression)) {
+      inform(paste("Note: No treatment classes specified in network, any interactions in `regression` formula will be separate (independent) for each treatment.",
+                   "Use set_*() argument `trt_class` and nma() argument `class_interactions` to change this.", sep = "\n"))
+    }
   }
   class_interactions <- rlang::arg_match(class_interactions)
   if (length(class_interactions) > 1) abort("`class_interactions` must be a single string.")
