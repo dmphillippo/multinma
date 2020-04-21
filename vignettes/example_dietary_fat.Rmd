@@ -6,6 +6,8 @@ vignette: >
   %\VignetteIndexEntry{Example: Dietary Fat}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+params:
+  run_tests: FALSE
 ---
 
 
@@ -174,7 +176,7 @@ plot(pred_FE_studies) + ggplot2::facet_grid(Study~., labeller = ggplot2::label_w
 
 ## References
 
-```{r diet_tests_tests, include=FALSE, eval=testthat::is_testing()}
+```{r diet_tests_tests, include=FALSE, eval=params$run_tests}
 #--- Test against TSD 2 results ---
 library(testthat)
 library(dplyr)

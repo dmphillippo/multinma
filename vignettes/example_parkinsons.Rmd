@@ -6,6 +6,8 @@ vignette: >
   %\VignetteIndexEntry{Example: Mean off-time reduction in Parkinson's disease}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+params:
+  run_tests: FALSE
 ---
 
 ```{r, include = FALSE}
@@ -592,7 +594,7 @@ plot(mix_cumrankprobs)
 
 ## References
 
-```{r parkinsons_tests, include=FALSE, eval=testthat::is_testing()}
+```{r parkinsons_tests, include=FALSE, eval=params$run_tests}
 #--- Test against TSD 2 results ---
 library(testthat)
 library(dplyr)

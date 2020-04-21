@@ -6,6 +6,8 @@ vignette: >
   %\VignetteIndexEntry{Example: Beta Blockers}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+params:
+  run_tests: FALSE
 ---
 
 ```{r, include = FALSE}
@@ -166,7 +168,7 @@ plot(pred_RE)
 
 ## References
 
-```{r blocker_tests, include=FALSE, eval=testthat::is_testing()}
+```{r blocker_tests, include=FALSE, eval=params$run_tests}
 #--- Test against TSD 2 results ---
 library(testthat)
 library(dplyr)
