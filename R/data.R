@@ -272,3 +272,27 @@
 
 "statins"
 
+#' BCG vaccination
+#'
+#' Data frame containing the results of 13 trials comparing BCG vaccination to
+#' no vaccination for preventing tuberculosis (TB)
+#' \insertCite{TSD3,Berkey1995}{multinma}. The numbers of individuals diagnosed
+#' with TB in each arm during the study follow-up period are recorded. The
+#' absolute degrees latitude at which the study was conducted are also recorded.
+#'
+#' @format A data frame with 26 rows and 6 variables:
+#' \describe{
+#'   \item{studyn}{numeric study ID}
+#'   \item{trtn}{numeric treatment code}
+#'   \item{trtc}{treatment name}
+#'   \item{latitude}{absolute degrees latitude}
+#'   \item{r}{number diagnosed with TB}
+#'   \item{n}{sample size}
+#' }
+#'
+#' @references
+#'   \insertAllCited{}
+#'
+
+"bcg_vaccine"
+
