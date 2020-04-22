@@ -39,3 +39,8 @@ test_that("Atrial fibrillation example", {
 test_that("Statins example", {
   rmarkdown::render("../../vignettes/example_statins.Rmd", output_dir = td, params = list(run_tests = TRUE))
 })
+
+test_that("BCG vaccine example", {
+  rmarkdown::render("../../vignettes/example_bcg_vaccine.Rmd", output_dir = td, params = list(run_tests = TRUE))
+})
+
