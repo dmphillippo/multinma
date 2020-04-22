@@ -269,27 +269,38 @@ nma <- function(network,
                           dat_agd_arm = dat_agd_arm,
                           dat_agd_contrast = dat_agd_contrast)
 
-    if ((has_agd_arm(network) || has_agd_contrast(network)) && !has_agd_sample_size(network))
+    # If IPD or IPD+AgD use weighted means for centering, otherwise with only AgD use raw mean
+
+    if (has_ipd(network) && (has_agd_arm(network) || has_agd_contrast(network)) && !has_agd_sample_size(network))
       abort(paste("AgD study sample sizes not specified in network, cannot calculate centering values.",
                   "Specify `sample_size` in set_agd_*(), or set center = FALSE.", sep = "\n"))
 
     if (has_agd_arm(network)) {
-      N_agd_arm <- network$agd_arm[[".sample_size"]]
+      if (has_ipd(network)) {
+        N_agd_arm <- network$agd_arm[[".sample_size"]]
+      } else {
+        N_agd_arm <- rep(n_int, nrow(network$agd_arm))
+      }
     } else {
       N_agd_arm <- NULL
     }
 
     if (has_agd_contrast(network)) {
-      N_agd_contrast <- network$agd_contrast[[".sample_size"]]
+      if (has_ipd(network)) {
+        N_agd_contrast <- network$agd_contrast[[".sample_size"]]
+      } else {
+        N_agd_contrast <- rep(n_int, nrow(network$agd_contrast))
+      }
     } else {
       N_agd_contrast <- NULL
     }
 
-    # Center numeric columns used in regression model
+    # Apply weights across integration points
     wts <- c(rep(1, nrow(dat_ipd)),
              rep(N_agd_arm / n_int, each = n_int),
              rep(N_agd_contrast / n_int, each = n_int))
 
+    # Center numeric columns used in regression model
     reg_names <- colnames(model.frame(regression, data = idat_all))
     # Ignore offset variables
     reg_names <- reg_names[!stringr::str_detect(reg_names, "^offset\\(.*\\)$")]
