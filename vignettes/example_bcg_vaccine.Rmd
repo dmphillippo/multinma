@@ -63,16 +63,16 @@ summary(half_normal(scale = 5))
 ```
 
 The model is fitted with the `nma()` function, with a random effects model specified by `trt_effects = "random"`.
-```{r, echo = FALSE}
+```{r, eval = FALSE}
 bcg_fit_unadj <- nma(bcg_net, 
-                     seed = 14308133,
                      trt_effects = "random",
                      prior_intercept = normal(scale = 100),
                      prior_trt = normal(scale = 100),
                      prior_het = half_normal(scale = 5))
 ```
-```{r, eval = FALSE}
+```{r, echo = FALSE}
 bcg_fit_unadj <- nma(bcg_net, 
+                     seed = 14308133,
                      trt_effects = "random",
                      prior_intercept = normal(scale = 100),
                      prior_trt = normal(scale = 100),
@@ -108,9 +108,8 @@ summary(half_normal(scale = 5))
 Again, the model is fitted with the `nma()` function.
 The `regression` formula `~ .trt:latitude` means that the interaction of latitude with treatment will be included; the `.trt` special variable indicates treatment, and `latitude` is in the original data set.
 We increase `adapt_delta` to 0.99 to remove a small number of divergent transition errors (the default for RE models is set to 0.95).
-```{r, echo = FALSE}
+```{r, eval = FALSE}
 bcg_fit_lat <- nma(bcg_net, 
-                   seed = 1932599147,
                    trt_effects = "random",
                    regression = ~.trt:latitude,
                    prior_intercept = normal(scale = 100),
@@ -119,8 +118,9 @@ bcg_fit_lat <- nma(bcg_net,
                    prior_het = half_normal(scale = 5),
                    adapt_delta = 0.99)
 ```
-```{r, eval = FALSE}
+```{r, echo = FALSE}
 bcg_fit_lat <- nma(bcg_net, 
+                   seed = 1932599147,
                    trt_effects = "random",
                    regression = ~.trt:latitude,
                    prior_intercept = normal(scale = 100),
