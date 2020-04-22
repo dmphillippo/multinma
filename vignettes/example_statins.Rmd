@@ -180,7 +180,7 @@ Whilst the 95% Credible Interval includes zero, there is a suggestion that stati
 ## References
 
 ```{r statins_tests, include=FALSE, eval=params$run_tests}
-#--- Test against TSD 2 results ---
+#--- Test against TSD 3 results ---
 library(testthat)
 library(dplyr)
 
