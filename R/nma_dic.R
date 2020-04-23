@@ -21,15 +21,11 @@ dic <- function(x, ...) {
   fitted <- colMeans(as.matrix(x, pars = "fitted"))
 
   resdev_array <- as.array(x, pars = "resdev")
-  dn_resdev_array <- dimnames(resdev_array)
 
   if (has_ipd(net)) {
     n_ipd <- nrow(net$ipd)
     resdev_ipd <- resdev[1:n_ipd]
     fitted_ipd <- fitted[1:n_ipd]
-
-    dn_resdev_array[[3]][1:n_ipd] <-
-      paste0("resdev[", make_data_labels(net$ipd$.study, net$ipd$.trt), "]")
   } else {
     n_ipd <- 0
   }
@@ -38,10 +34,6 @@ dic <- function(x, ...) {
     n_agd_arm <- nrow(net$agd_arm)
     resdev_agd_arm <- resdev[n_ipd + (1:n_agd_arm)]
     fitted_agd_arm <- fitted[n_ipd + (1:n_agd_arm)]
-
-    dn_resdev_array[[3]][n_ipd + (1:n_agd_arm)] <-
-      paste0("resdev[", make_data_labels(net$agd_arm$.study, net$agd_arm$.trt), "]")
-
   } else {
     n_agd_arm <- 0
   }
@@ -54,9 +46,6 @@ dic <- function(x, ...) {
 
     resdev_agd_contrast <- resdev[n_ipd + n_agd_arm + (1:nr_agd_contrast)]
     fitted_agd_contrast <- fitted[n_ipd + n_agd_arm + (1:nf_agd_contrast)]
-
-    # dn_resdev_array is fixed below for agd_contrast (one resdev per study)
-
   } else {
     nr_agd_contrast <- nf_agd_contrast <- 0
   }
@@ -160,10 +149,6 @@ dic <- function(x, ...) {
                       leverage = .data$resdev - .data$resdevfit)
 
     leverage_agd_contrast <- agd_contrast_resdev_dat$leverage
-
-    dn_resdev_array[[3]][n_ipd + n_agd_arm + (1:nr_agd_contrast)] <-
-      paste0("resdev[", agd_contrast_resdev_dat$.study, "]")
-
   } else {
     leverage_agd_contrast <- NULL
   }
@@ -208,36 +193,8 @@ dic <- function(x, ...) {
   pd <- sum(leverage_ipd, leverage_agd_arm, leverage_agd_contrast)
   dic <- totresdev + pd
 
-  # Apply formatted dimnames to resdev_array
-  dimnames(resdev_array) <- dn_resdev_array
-
   # Return nma_dic object
   out <- list(dic = dic, pd = pd, resdev = totresdev, pointwise = pw, resdev_array = resdev_array)
   class(out) <- "nma_dic"
   return(out)
-}
-
-#' Make labels for data points
-#'
-#' @param study Study vector, coerced to character
-#' @param trt Treatment vector, coerced to character
-#' @param trt_b Baseline treatment vector if contrast-based, coerced to character
-#'
-#' @return Character vector of labels
-#'
-#' @noRd
-make_data_labels <- function(study, trt, trt_b = NA) {
-  tibble::tibble(study = study, trt = trt, trt_b = trt_b) %>%
-    dplyr::group_by_all() %>%
-    dplyr::mutate(grp_n = dplyr::n(),
-                  grp_id = 1:dplyr::n(),
-                  vs_trt_b = dplyr::if_else(is.na(trt_b),
-                                            NA_character_,
-                                            paste0(" vs. ", trt_b)),
-                  label = as.character(
-                    dplyr::if_else(.data$grp_n > 1,
-                      glue::glue("{study}: {trt}{vs_trt_b}, {grp_id}", .na = ""),
-                      glue::glue("{study}: {trt}{vs_trt_b}", .na = "")))
-    ) %>%
-    dplyr::pull(.data$label)
 }

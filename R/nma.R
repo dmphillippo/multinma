@@ -1719,3 +1719,28 @@ get_EM_vars <- function(f) {
   out <- unique(stringr::str_remove(out, EM_regex))
   return(out)
 }
+
+#' Make labels for data points
+#'
+#' @param study Study vector, coerced to character
+#' @param trt Treatment vector, coerced to character
+#' @param trt_b Baseline treatment vector if contrast-based, coerced to character
+#'
+#' @return Character vector of labels
+#'
+#' @noRd
+make_data_labels <- function(study, trt, trt_b = NA) {
+  tibble::tibble(study = study, trt = trt, trt_b = trt_b) %>%
+    dplyr::group_by_all() %>%
+    dplyr::mutate(grp_n = dplyr::n(),
+                  grp_id = 1:dplyr::n(),
+                  vs_trt_b = dplyr::if_else(is.na(trt_b),
+                                            NA_character_,
+                                            paste0(" vs. ", trt_b)),
+                  label = as.character(
+                    dplyr::if_else(.data$grp_n > 1,
+                                   glue::glue("{study}: {trt}{vs_trt_b}, {grp_id}", .na = ""),
+                                   glue::glue("{study}: {trt}{vs_trt_b}", .na = "")))
+    ) %>%
+    dplyr::pull(.data$label)
+}
