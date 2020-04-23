@@ -431,7 +431,17 @@ nma <- function(network,
   fnames_oi[grepl("^log_lik\\[[0-9]+\\]$", fnames_oi)] <- paste0("log_lik[", dev_labels, "]")
   fnames_oi[grepl("^resdev\\[[0-9]+\\]$", fnames_oi)] <- paste0("resdev[", dev_labels, "]")
 
-  #TODO: Cumulative integration points
+  # Labels for cumulative integration points
+  if (inherits(network, "mlnmr_data") && (has_agd_arm(network) || has_agd_contrast(network))) {
+    n_int_thin <- n_int %/% int_thin
+    cumint_labels <- c(rep(agd_arm_data_labels, each = n_int_thin),
+                       rep(agd_contrast_data_labels, each = n_int_thin))
+    cumint_labels <- paste0(cumint_labels, ", ", rep_len(1:n_int_thin * int_thin, length.out = length(cumint_labels)))
+
+    fnames_oi[grepl("^theta_bar_cum\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta_bar_cum[", cumint_labels, "]")
+    if (likelihood == "binomial2")
+      fnames_oi[grepl("^theta2_bar_cum\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta2_bar_cum[", cumint_labels, "]")
+  }
 
   stanfit@sim$fnames_oi <- fnames_oi
 
