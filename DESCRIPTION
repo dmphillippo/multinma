@@ -44,7 +44,8 @@ Imports:
     ggraph,
     ggplot2,
     tidybayes,
-    truncdist
+    truncdist,
+    bayesplot
 LinkingTo: 
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),
@@ -58,8 +59,7 @@ Suggests:
     testthat (>= 2.1.0),
     knitr,
     rmarkdown,
-    parallel,
-    bayesplot
+    parallel
 RdMacros: Rdpack
 URL: http://github.com/dmphillippo/multinma
 BugReports: http://github.com/dmphillippo/multinma/issues
