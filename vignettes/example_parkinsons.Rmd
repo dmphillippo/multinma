@@ -128,9 +128,9 @@ arm_fit_RE <- nma(arm_net,
 ```
 
 We do see a small number of divergent transition errors, which cannot simply be removed by increasing the value of the `adapt_delta` argument (by default set to `0.95` for RE models).
-To diagnose, we use the `pairs()` method to investigate where in the posterior distribution these divergences are happening (indicated by red dots):
+To diagnose, we use the `pairs()` method to investigate where in the posterior distribution these divergences are happening (indicated by red crosses):
 ```{r plot_arm_RE_pairs, fig.width = 6}
-pairs(arm_fit_RE, pars = c("mu[4]", "d[3]", "delta[8]", "tau"))
+pairs(arm_fit_RE, pars = c("mu[4]", "d[3]", "delta[4: 3]", "tau"))
 ```
 
 The divergent transitions occur in the upper tail of the heterogeneity standard deviation.
@@ -298,9 +298,9 @@ contr_fit_RE <- nma(contr_net,
 ```
 
 We do see a small number of divergent transition errors, which cannot simply be removed by increasing the value of the `adapt_delta` argument (by default set to `0.95` for RE models).
-To diagnose, we use the `pairs()` method to investigate where in the posterior distribution these divergences are happening (indicated by red dots):
+To diagnose, we use the `pairs()` method to investigate where in the posterior distribution these divergences are happening (indicated by red crosses):
 ```{r plot_contr_RE_pairs, fig.width = 6}
-pairs(contr_fit_RE, pars = c("d[3]", "delta[5]", "tau"))
+pairs(contr_fit_RE, pars = c("d[3]", "delta[4: 4 vs. 3]", "tau"))
 ```
 
 The divergent transitions occur in the upper tail of the heterogeneity standard deviation.
@@ -491,9 +491,9 @@ mix_fit_RE <- nma(mix_net,
 ```
 
 We do see a small number of divergent transition errors, which cannot simply be removed by increasing the value of the `adapt_delta` argument (by default set to `0.95` for RE models).
-To diagnose, we use the `pairs()` method to investigate where in the posterior distribution these divergences are happening (indicated by red dots):
+To diagnose, we use the `pairs()` method to investigate where in the posterior distribution these divergences are happening (indicated by red crosses):
 ```{r plot_mix_RE_pairs, fig.width = 6}
-pairs(mix_fit_RE, pars = c("d[3]", "delta[8]", "tau"))
+pairs(mix_fit_RE, pars = c("d[3]", "delta[4: 4 vs. 3]", "tau"))
 ```
 
 The divergent transitions occur in the upper tail of the heterogeneity standard deviation.
