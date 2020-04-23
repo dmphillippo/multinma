@@ -396,6 +396,45 @@ nma <- function(network,
     adapt_delta = adapt_delta,
     int_thin = int_thin)
 
+  # Make readable parameter names for generated quantities
+  fnames_oi <- stanfit@sim$fnames_oi
+
+  ipd_data_labels <- if (has_ipd(network)) make_data_labels(dat_ipd$.study, dat_ipd$.trt) else NULL
+  agd_arm_data_labels <- if (has_agd_arm(network)) make_data_labels(dat_agd_arm$.study, dat_agd_arm$.trt) else NULL
+
+  if (has_agd_contrast(network)) {
+    dat_agd_contrast_nonbl <-
+      dplyr::left_join(dat_agd_contrast_nonbl,
+                       dplyr::transmute(dat_agd_contrast_bl, .data$.study, .trt_b = .data$.trt),
+                       by = ".study")
+
+    agd_contrast_data_labels <- make_data_labels(dat_agd_contrast_nonbl$.study,
+                                                 dat_agd_contrast_nonbl$.trt,
+                                                 dat_agd_contrast_nonbl$.trt_b)
+  } else {
+    agd_contrast_data_labels <- NULL
+  }
+
+  # Labels for fitted values, RE deltas
+  data_labels <- c(ipd_data_labels,
+                   agd_arm_data_labels,
+                   agd_contrast_data_labels)
+
+  fnames_oi[grepl("^fitted\\[[0-9]+\\]$", fnames_oi)] <- paste0("fitted[", data_labels, "]")
+  if (trt_effects == "random") fnames_oi[grepl("^delta\\[[0-9]+\\]$", fnames_oi)] <- paste0("delta[", data_labels, "]")
+
+  # Labels for log_lik, resdev (only one entry per AgD contrast study)
+  dev_labels <- c(ipd_data_labels,
+                  agd_arm_data_labels,
+                  dat_agd_contrast_bl$.study)
+
+  fnames_oi[grepl("^log_lik\\[[0-9]+\\]$", fnames_oi)] <- paste0("log_lik[", dev_labels, "]")
+  fnames_oi[grepl("^resdev\\[[0-9]+\\]$", fnames_oi)] <- paste0("resdev[", dev_labels, "]")
+
+  #TODO: Cumulative integration points
+
+  stanfit@sim$fnames_oi <- fnames_oi
+
   # Create stan_nma object
   out <- list(network = network,
               stanfit = stanfit,
