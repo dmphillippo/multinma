@@ -457,19 +457,38 @@ waic.stan_nma <- function(x, ...) {
 #' Matrix of plots for a `stan_nma` object
 #'
 #' A [pairs()] method for `stan_nma` objects, which calls
-#' \code{\link[rstan:stanfit-method-pairs]{pairs()}} on the underlying `stanfit`
-#' object.
+#' \code{\link[bayesplot:MCMC-scatterplots]{bayesplot::mcmc_pairs()}} on the
+#' underlying `stanfit` object.
 #'
 #' @param x An object of class `stan_nma`
 #' @param ... Other arguments passed to
-#'   \code{\link[rstan:stanfit-method-pairs]{pairs()}}, such as `pars` to select the
-#'   parameters to display.
+#'   \code{\link[bayesplot:MCMC-scatterplots]{bayesplot::mcmc_pairs()}}
+#' @param pars Optional character vector of parameter names to include in
+#'   output. If not specified, all parameters are used.
+#' @param include Logical, are parameters in `pars` to be included (`TRUE`,
+#'   default) or excluded (`FALSE`)?
 #'
 #' @return
 #' @export
 #'
 #' @examples
-pairs.stan_nma <- function(x, ...) {
+pairs.stan_nma <- function(x, ..., pars, include = TRUE) {
   sf <- as.stanfit(x)
-  pairs(sf, ...)
+  post_array <- as.array(x, pars = pars, include = include)
+
+  max_td <- sf@stan_args[[1]]$control$max_treedepth
+  if (is.null(max_td)) max_td <- NULL
+
+  args <- rlang::dots_list(x = post_array,
+                           np = bayesplot::nuts_params(sf),
+                           lp = bayesplot::log_posterior(sf),
+                           max_treedepth = max_td,
+                           ...,
+                           condition = bayesplot::pairs_condition(nuts = "accept_stat__"),
+                           .homonyms = "first")
+
+  thm <- bayesplot::bayesplot_theme_set(theme_multinma())
+  out <- do.call(bayesplot::mcmc_pairs, args = args)
+  bayesplot::bayesplot_theme_set(thm)
+  return(out)
 }
