@@ -42,6 +42,7 @@ plaque_psoriasis_ipd <-
          pasi100 = pasi100_w12_nri,
          male = sex) %>%
   mutate_at(vars(pasi75, pasi90, pasi100, prevsys, psa), YNtoTF) %>%
+  mutate_at(vars(pasi75, pasi90, pasi100), as.numeric) %>%
   select(studyc, trtc_long, trtc, trtn, pasi75, pasi90, pasi100, everything())
 
 # Check treatment and variables

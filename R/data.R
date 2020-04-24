@@ -33,9 +33,9 @@
 #'     \item{trtc_long}{treatment name (long format)}
 #'     \item{trtc}{treatment name}
 #'     \item{trtn}{numeric treatment code}
-#'     \item{pasi75}{binary PASI 75 outcome achieved (TRUE or FALSE)}
-#'     \item{pasi90}{binary PASI 90 outcome achieved (TRUE or FALSE)}
-#'     \item{pasi100}{binary PASI 100 outcome achieved (TRUE or FALSE)}
+#'     \item{pasi75}{binary PASI 75 outcome}
+#'     \item{pasi90}{binary PASI 90 outcome}
+#'     \item{pasi100}{binary PASI 100 outcome}
 #'     \item{age}{age (years)}
 #'     \item{bmi}{body mass index (BMI)}
 #'     \item{pasi_w0}{PASI score at week 0}
