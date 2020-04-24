@@ -20,48 +20,53 @@
 
 #' Plaque psoriasis data
 #'
-#' Two data frames, `plaque_psoriasis_ipd` and `plaque_psoriasis_agd`, containing (simulated)
-#' individual patient data from three studies (UNCOVER-1, -2, and -3)
-#' \insertCite{Griffiths2015,Gordon2016}{multinma} and aggregate data from one
-#' study (FIXTURE) \insertCite{Langley2014}{multinma}, respectively. Outcomes
-#' are binary success/failure to achieve 75\%, 90\%, or 100\% reduction in symptoms on the
-#' Psoriasis Area and Severity Index (PASI) scale.
+#' Two data frames, `plaque_psoriasis_ipd` and `plaque_psoriasis_agd`,
+#' containing (simulated) individual patient data from four studies and
+#' aggregate data from five studies \insertCite{Phillippo_thesis}{multinma}.
+#' Outcomes are binary success/failure to achieve 75%, 90%, or 100% reduction in
+#' symptoms on the Psoriasis Area and Severity Index (PASI) scale.
 #'
 #' @format The individual patient data are contained in a data frame
-#'   `plaque_psoriasis_ipd` with 3858 rows, one per individual, and 11 variables:
+#'   `plaque_psoriasis_ipd` with 4118 rows, one per individual, and 16 variables:
 #'   \describe{
 #'     \item{studyc}{study name}
-#'     \item{studyn}{numeric study ID}
 #'     \item{trtc_long}{treatment name (long format)}
 #'     \item{trtc}{treatment name}
 #'     \item{trtn}{numeric treatment code}
+#'     \item{pasi75}{binary PASI 75 outcome achieved (TRUE or FALSE)}
+#'     \item{pasi90}{binary PASI 90 outcome achieved (TRUE or FALSE)}
+#'     \item{pasi100}{binary PASI 100 outcome achieved (TRUE or FALSE)}
+#'     \item{age}{age (years)}
+#'     \item{bmi}{body mass index (BMI)}
+#'     \item{pasi_w0}{PASI score at week 0}
+#'     \item{male}{male sex (TRUE or FALSE)}
 #'     \item{bsa}{body surface area (percent)}
 #'     \item{weight}{weight (kilograms)}
 #'     \item{durnpso}{duration of psoriasis (years)}
-#'     \item{prevsys}{previous systemic treatmet (yes = 1, no = 0)}
-#'     \item{psa}{psoriatic arthritis (yes = 1, no = 0)}
-#'     \item{pasi75}{binary PASI 75 outcome (success = 1, failure = 0)}
+#'     \item{prevsys}{previous systemic treatment (TRUE or FALSE)}
+#'     \item{psa}{psoriatic arthritis (TRUE or FALSE)}
 #'   }
 #'
-#'  The aggregate data are contained in a data frame `plaque_psoriasis_agd` with 4
-#'  rows, one per study arm, and 16 variables:
+#'  The aggregate data are contained in a data frame `plaque_psoriasis_agd` with 15
+#'  rows, one per study arm, and 26 variables:
 #'   \describe{
 #'     \item{studyc}{study name}
-#'     \item{studyn}{numeric study ID}
 #'     \item{trtc_long}{treatment name (long format)}
 #'     \item{trtc}{treatment name}
 #'     \item{trtn}{numeric treatment code}
+#'     \item{pasi75_r, pasi75_n}{PASI 75 outcome count and denominator}
+#'     \item{pasi90_r, pasi90_n}{PASI 75 outcome count and denominator}
+#'     \item{pasi100_r, pasi100_n}{PASI 75 outcome count and denominator}
 #'     \item{sample_size_w0}{sample size at week zero}
-#'     \item{bsa_mean}{mean body surface area (percent)}
-#'     \item{bsa_sd}{standard deviation of body surface area (percent)}
-#'     \item{weight_mean}{mean weight (kilograms)}
-#'     \item{weight_sd}{standard deviation of weight (kilograms)}
-#'     \item{durnpso_mean}{mean duration of psoriasis (years)}
-#'     \item{durnpso_sd}{standard deviation of duration of psoriasis (years)}
+#'     \item{age_mean, age_sd}{mean and standard deviation of age (years)}
+#'     \item{bmi_mean, bmi_sd}{mean and standard deviation of BMI}
+#'     \item{pasi_w0_mean, pasi_w0_sd}{mean and standard deviation of PASI score at week 0}
+#'     \item{male}{percentage of males}
+#'     \item{bsa_mean, bsa_sd}{mean and standard deviation of body surface area (percent)}
+#'     \item{weight_mean, weight_sd}{mean and standard deviation of weight (kilograms)}
+#'     \item{durnpso_mean, durnpso_sd}{mean and standard deviation of duration of psoriasis (years)}
 #'     \item{prevsys}{percentage of individuals with previous systemic treatment}
 #'     \item{psa}{percentage of individuals with psoriatic arthritis}
-#'     \item{pasi75_n}{PASI 75 outcome denominator}
-#'     \item{pasi75_r}{PASI 75 outcome numerator}
 #'   }
 #'
 #' @references \insertAllCited{}
