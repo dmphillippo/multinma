@@ -20,15 +20,15 @@
 
 #' Plaque psoriasis data
 #'
-#' Two data frames, `psoriasis_ipd` and `psoriasis_agd`, containing (simulated)
+#' Two data frames, `plaque_psoriasis_ipd` and `plaque_psoriasis_agd`, containing (simulated)
 #' individual patient data from three studies (UNCOVER-1, -2, and -3)
 #' \insertCite{Griffiths2015,Gordon2016}{multinma} and aggregate data from one
 #' study (FIXTURE) \insertCite{Langley2014}{multinma}, respectively. Outcomes
-#' are binary success/failure to achieve 75\% reduction in symptoms on the
+#' are binary success/failure to achieve 75\%, 90\%, or 100\% reduction in symptoms on the
 #' Psoriasis Area and Severity Index (PASI) scale.
 #'
 #' @format The individual patient data are contained in a data frame
-#'   `psoriasis_ipd` with 3858 rows, one per individual, and 11 variables:
+#'   `plaque_psoriasis_ipd` with 3858 rows, one per individual, and 11 variables:
 #'   \describe{
 #'     \item{studyc}{study name}
 #'     \item{studyn}{numeric study ID}
@@ -43,7 +43,7 @@
 #'     \item{pasi75}{binary PASI 75 outcome (success = 1, failure = 0)}
 #'   }
 #'
-#'  The aggregate data are contained in a data frame `psoriasis_agd` with 4
+#'  The aggregate data are contained in a data frame `plaque_psoriasis_agd` with 4
 #'  rows, one per study arm, and 16 variables:
 #'   \describe{
 #'     \item{studyc}{study name}
@@ -66,11 +66,14 @@
 #'
 #' @references \insertAllCited{}
 #'
-#' @rdname psoriasis
-#' @aliases psoriasis psoriasis_agd
+#' @rdname plaque_psoriasis
+#' @aliases plaque_psoriasis
 #'
 
-"psoriasis_ipd"
+"plaque_psoriasis_ipd"
+
+#' @rdname plaque_psoriasis
+"plaque_psoriasis_agd"
 
 #' Thrombolytic treatments data
 #'

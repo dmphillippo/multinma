@@ -12,7 +12,8 @@ make_trtn <- function(trtc) {
          IXE_Q4W = 3L,
          ETN = 4L,
          SEC_150 = 5L,
-         SEC_300 = 6L)
+         SEC_300 = 6L,
+         UST = 7L)
 }
 
 make_trtc_long <- function(trtc) {
@@ -22,51 +23,52 @@ make_trtc_long <- function(trtc) {
          IXE_Q4W = "Ixekizumab Q4W",
          ETN = "Etanercept",
          SEC_150 = "Secukinumab 150 mg",
-         SEC_300 = "Secukinumab 300 mg")
+         SEC_300 = "Secukinumab 300 mg",
+         UST = "Ustekinumab")
 }
 
+YNtoTF <- function(x) {case_when(x %in% c("y", "Y") ~ TRUE, x %in% c("n", "N") ~ FALSE)}
 
 # Individual patient data -------------------------------------------------
-psoriasis_ipd <-
-  read_csv("./data-raw/psoriasis/dummy_ipd.csv") %>%
+plaque_psoriasis_ipd <-
+  read_csv("./data-raw/plaque_psoriasis/dummy_ipd.csv") %>%
   # Add in treatment codes
   mutate(trtn = make_trtn(trtc),
          trtc_long = make_trtc_long(trtc),
-  # Add in numeric study IDs
-         studyn = recode(study,
-                         `UNCOVER-1` = 1L,
-                         `UNCOVER-2` = 2L,
-                         `UNCOVER-3` = 3L)) %>%
+         sex = case_when(sex == "M" ~ TRUE, sex == "F" ~ FALSE)) %>%
   rename(studyc = study,
-         pasi75 = pasi75_w12_nri_01,
-         prevsys = prevsys_01,
-         psa = psa_01) %>%
-  select(studyc, studyn, trtc_long, trtc, trtn, everything())
+         pasi75 = pasi75_w12_nri,
+         pasi90 = pasi90_w12_nri,
+         pasi100 = pasi100_w12_nri,
+         male = sex) %>%
+  mutate_at(vars(pasi75, pasi90, pasi100, prevsys, psa), YNtoTF) %>%
+  select(studyc, trtc_long, trtc, trtn, pasi75, pasi90, pasi100, everything())
 
-# Check treatment and study variables
-distinct(psoriasis_ipd, trtc, trtn, trtc_long)
-distinct(psoriasis_ipd, studyc, studyn)
+# Check treatment and variables
+distinct(plaque_psoriasis_ipd, trtc, trtn, trtc_long)
 
 # Store as standard data.frame
-psoriasis_ipd <- as.data.frame(psoriasis_ipd)
+plaque_psoriasis_ipd <- as.data.frame(plaque_psoriasis_ipd)
 
 
 # Aggregate data ----------------------------------------------------------
-psoriasis_agd <- read_csv("./data-raw/psoriasis/fixture_agd.csv") %>%
-  mutate(studyn = 4L,
-         trtn = make_trtn(trtc),
+plaque_psoriasis_agd <- read_csv("./data-raw/plaque_psoriasis/all_agd.csv") %>%
+  mutate(trtn = make_trtn(trtc),
          trtc_long = make_trtc_long(trtc)) %>%
-  rename(studyc = study) %>%
-  select(studyc, studyn, trtc_long, trtc, trtn, everything())
+  rename(studyc = study, male = sex) %>%
+  select(studyc, trtc_long, trtc, trtn,
+         pasi75_r, pasi75_n,
+         pasi90_r, pasi90_n,
+         pasi100_r, pasi100_n,
+         everything())
 
 # Check treatment and study variables
-distinct(psoriasis_agd, trtc, trtn, trtc_long)
-distinct(psoriasis_agd, studyc, studyn)
+distinct(plaque_psoriasis_agd, trtc, trtn, trtc_long)
 
 # Store as standard data.frame
-psoriasis_agd <- as.data.frame(psoriasis_agd)
+plaque_psoriasis_agd <- as.data.frame(plaque_psoriasis_agd)
 
 
 # Output to data dir ------------------------------------------------------
-usethis::use_data(psoriasis_ipd)
-usethis::use_data(psoriasis_agd)
+usethis::use_data(plaque_psoriasis_ipd)
+usethis::use_data(plaque_psoriasis_agd)
