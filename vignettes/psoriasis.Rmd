@@ -1,17 +1,24 @@
 ---
 title: "Example: Plaque Psoriasis"
 output: rmarkdown::html_vignette
+bibliography: ../inst/REFERENCES.bib
 vignette: >
   %\VignetteIndexEntry{Example: Plaque Psoriasis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+params:
+  run_tests: FALSE
 ---
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.width = 8, 
+  fig.height = 6,
+  eval = identical(Sys.getenv("NOT_CRAN"), "true")
 )
+options(width = 100)
 ```
 
 ```{r setup}
@@ -20,66 +27,105 @@ library(dplyr)
 options(mc.cores = parallel::detectCores())
 ```
 
-Plaque psoriasis analysis from methods paper.
-
-Simulated individual patient data (IPD) from studies UNCOVER-1, UNCOVER-2, and UNCOVER-3 are found in the data set `psoriasis_ipd`.
-Aggregate data (AgD) from the FIXTURE study are found in the data set `psoriasis_agd`.
+Simulated individual patient data (IPD) from trials comparing treatments for plaque psoriasis are found in the data set `plaque_psoriasis_ipd`.
+Aggregate data (AgD) are available on a further set of trials, found in the data set `plaque_psoriasis_agd`.
+In this vignette, we recreate the multilevel network meta-regression (ML-NMR) analyses performed by @methods_paper [see also @Phillippo_thesis].
+We will analyse IPD from three studies, UNCOVER-1, UNCOVER-2, and UNCOVER-3 [@Griffiths2015;@Gordon2016], and AgD from one study, FIXTURE [@Langley2014].
 
 ```{r}
-head(psoriasis_ipd)
-head(psoriasis_agd)
+pso_ipd <- filter(plaque_psoriasis_ipd,
+                  studyc %in% c("UNCOVER-1", "UNCOVER-2", "UNCOVER-3"))
+
+pso_agd <- filter(plaque_psoriasis_agd,
+                  studyc == "FIXTURE")
+
+head(pso_ipd)
+head(pso_agd)
 ```
 
+We consider running a ML-NMR adjusting for five potential effect-modifying covariates: duration of psoriasis `durnpso`, weight `weight`, previous systemic treatment `prevsys`, body surface area `bsa`, and psoriatic arthritis `psa`.
+
+# Setup
+## Preparing the data
+We need to prepare the data so that it is in an acceptable format to run a ML-NMR model.
+Firstly, we need to handle the binary covariates `prevsys` and `psa`.
+In the IPD, these are coded as `TRUE` or `FALSE`, but in the AgD these are coded as percentages (out of 100).
+We need these to transform both of these sets of variables so that they are numeric and lie in the interval $[0,1]$, so that the variables are compatible across the data sources.
+Whilst we are here, we also transform body surface area `bsa` (a percentage) to lie in $[0,1]$, since that will make specifying an appropriate marginal distribution easier later.
 Transform `prevsys`, `bsa`, and `psa` to be proportions in $[0,1]$, rather than out of 100.
-Add in a `trtclass` variable, indicating which treatments belong to which classes.
-Check for complete cases in the IPD.
+We also add in a `trtclass` variable, indicating which treatments belong to which classes.
+Finally, we check for missing values in the IPD.
 ```{r}
-psoriasis_ipd <- psoriasis_ipd %>% 
-  mutate(bsa = bsa / 100,
-         trtclass = recode_factor(trtn,
-                                  "1" = 1,   # Placebo
-                                  "2" = 2, "3" = 2, "5" = 2, "6" = 2,  # IL-* blockers
-                                  "4" = 3),  # TNFa blocker
+pso_ipd <- pso_ipd %>% 
+  mutate(# Variable transformations
+         bsa = bsa / 100,
+         prevsys = as.numeric(prevsys),
+         psa = as.numeric(psa),
+         # Treatment classes
+         trtclass = case_when(trtn == 1 ~ "Placebo",
+                              trtn %in% c(2, 3, 5, 6) ~ "IL blockers",
+                              trtn == 4 ~ "TNFa blocker"),
          # Check complete cases for covariates of interest
          complete = complete.cases(durnpso, prevsys, bsa, weight, psa)
   )
-psoriasis_agd <- psoriasis_agd %>% 
+
+pso_agd <- pso_agd %>% 
   mutate(
+    # Variable transformations
     bsa_mean = bsa_mean / 100,
     bsa_sd = bsa_sd / 100,
     prevsys = prevsys / 100,
     psa = psa / 100,
-    trtclass = recode_factor(trtn,
-                                  "1" = 1,   # Placebo
-                                  "2" = 2, "3" = 2, "5" = 2, "6" = 2,  # IL-* blockers
-                                  "4" = 3)   # TNFa blocker
+    # Treatment classes
+    trtclass = case_when(trtn == 1 ~ "Placebo",
+                              trtn %in% c(2, 3, 5, 6) ~ "IL blockers",
+                              trtn == 4 ~ "TNFa blocker")
   )
 ```
 
 A small number of individuals have missing covariates:
 ```{r}
-sum(!psoriasis_ipd$complete)
-mean(!psoriasis_ipd$complete)
+sum(!pso_ipd$complete)
+mean(!pso_ipd$complete)
 ```
+
 Since the proportion of missing data is so small, we will simply exclude these individuals from the analysis.
 ```{r}
-psoriasis_ipd <- filter(psoriasis_ipd, complete)
+pso_ipd <- filter(pso_ipd, complete)
 ```
 
+## Creating the network
 Set up the network, setting the IPD with `set_ipd()`, AgD (arm-based) with `set_agd_arm()`, and combining together using `combine_network()`.
+We specify the binary `pasi75` outcome as `r` in the IPD, and the count `pasi75_r` and denominator `pasi75_n` as `r` and `n` in the AgD.
+We specify the treatment classes with `trt_class = trtclass`.
 ```{r}
-psoriasis_net <- combine_network(
-  set_ipd(psoriasis_ipd, study = studyc, trt = trtc, r = pasi75),
-  set_agd_arm(psoriasis_agd, study = studyc, trt = trtc, r = pasi75_r, n = pasi75_n),
-  trt_ref = "PBO"
+pso_net <- combine_network(
+  set_ipd(pso_ipd, 
+          study = studyc, 
+          trt = trtc, 
+          r = pasi75,
+          trt_class = trtclass),
+  set_agd_arm(pso_agd, 
+              study = studyc, 
+              trt = trtc, 
+              r = pasi75_r, 
+              n = pasi75_n,
+              trt_class = trtclass)
 )
 
-psoriasis_net
+pso_net
 ```
 
+We can produce a network plot with the `plot()` method:
+```{r pso_network_plot}
+plot(pso_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) + 
+  ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
+```
+
+## Numerical integration for ML-NMR
 Add numerical integration points using `add_integration()`.
 ```{r}
-psoriasis_net <- add_integration(psoriasis_net,
+pso_net <- add_integration(pso_net,
   durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
   prevsys = distr(qbern, prevsys),
   bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
@@ -89,12 +135,15 @@ psoriasis_net <- add_integration(psoriasis_net,
 )
 ```
 
+# ML-NMR models
+
+## Fixed effect ML-NMR
 Now run a fixed effect (FE) multilevel network meta-regression (ML-NMR) model, using `nma()`.
 We utilise the shared effect modifier assumption, setting treatment-covariate interactions to be equal within each class.
 We specify a probit link function, and weakly-informative $N(0, 10^2)$ priors on each parameter.
 We run four chains of 1000 iterations each, and utilise the QR decomposition for efficiency.
 ```{r}
-psoriasis_mlnmr <- nma(psoriasis_net, 
+psoriasis_mlnmr <- nma(pso_net, 
                        regression = ~durnpso + prevsys + bsa + weight + psa + 
                                      (durnpso + prevsys + bsa + weight + psa):trtclass,
                        link = "probit", trt_effects = "fixed",
@@ -108,9 +157,11 @@ psoriasis_mlnmr <- nma(psoriasis_net,
 print(psoriasis_mlnmr)
 # summary(psoriasis_mlnmr)
 ```
+
+## Random effects ML-NMR
 Now run a random effects (RE) model.
 ```{r}
-psoriasis_mlnmr_re <- nma(psoriasis_net, 
+psoriasis_mlnmr_re <- nma(pso_net, 
                        regression = ~durnpso + prevsys + bsa + weight + psa + 
                                      (durnpso + prevsys + bsa + weight + psa):trtclass,
                        link = "probit", trt_effects = "random",
@@ -125,8 +176,23 @@ psoriasis_mlnmr_re <- nma(psoriasis_net,
 print(psoriasis_mlnmr_re)
 # summary(psoriasis_mlnmr_re)
 ```
+
+# Model comparison
 Compare the model fit under fixed and random effects.
 ```{r}
 dic(psoriasis_mlnmr)
 dic(psoriasis_mlnmr_re)
+```
+
+# Further results
+
+# References
+
+```{r pso_tests, include=FALSE, eval=params$run_tests}
+#--- Test against results computed with standalone code from Phillippo thesis ---
+library(testthat)
+library(dplyr)
+
+tol <- 0.05
+tol_dic <- 0.1
 ```
