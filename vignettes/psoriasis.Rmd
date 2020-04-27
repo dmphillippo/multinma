@@ -53,8 +53,7 @@ We need to prepare the data so that it is in an acceptable format to run a ML-NM
 Firstly, we need to handle the binary covariates `prevsys` and `psa`.
 In the IPD, these are coded as `TRUE` or `FALSE`, but in the AgD these are coded as percentages (out of 100).
 We need these to transform both of these sets of variables so that they are numeric and lie in the interval $[0,1]$, so that the variables are compatible across the data sources.
-Whilst we are here, we also transform body surface area `bsa` (a percentage) to lie in $[0,1]$, since that will make specifying an appropriate marginal distribution easier later.
-Transform `prevsys`, `bsa`, and `psa` to be proportions in $[0,1]$, rather than out of 100.
+Whilst we are here, we also transform body surface area `bsa` (a percentage) to lie in $[0,1]$, since that will make specifying an appropriate marginal distribution easier later, and rescale `weight` and `duration` to aid interpretation of the regression coefficients (in terms of 10 kilos and 10 years respectively).
 We also add in a `trtclass` variable, indicating which treatments belong to which classes.
 Finally, we check for missing values in the IPD.
 ```{r}
@@ -63,6 +62,8 @@ pso_ipd <- pso_ipd %>%
          bsa = bsa / 100,
          prevsys = as.numeric(prevsys),
          psa = as.numeric(psa),
+         weight = weight / 10,
+         durnpso = durnpso / 10,
          # Treatment classes
          trtclass = case_when(trtn == 1 ~ "Placebo",
                               trtn %in% c(2, 3, 5, 6) ~ "IL blocker",
@@ -78,6 +79,10 @@ pso_agd <- pso_agd %>%
     bsa_sd = bsa_sd / 100,
     prevsys = prevsys / 100,
     psa = psa / 100,
+    weight_mean = weight_mean / 10,
+    weight_sd = weight_sd / 10,
+    durnpso_mean = durnpso_mean / 10,
+    durnpso_sd = durnpso_sd / 10,
     # Treatment classes
     trtclass = case_when(trtn == 1 ~ "Placebo",
                               trtn %in% c(2, 3, 5, 6) ~ "IL blocker",
