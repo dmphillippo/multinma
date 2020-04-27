@@ -129,6 +129,10 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         } else {
           dat_agd_arm <- x$network$agd_arm
         }
+
+        # Only take necessary columns
+        dat_agd_arm <- dplyr::select(dat_agd_arm, dplyr::starts_with("."),
+                                     colnames(model.frame(x$regression, data = dat_agd_arm)))
       } else {
         dat_agd_arm <- tibble::tibble()
       }
@@ -140,6 +144,10 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         } else {
           dat_agd_contrast <- x$network$agd_contrast
         }
+
+        # Only take necessary columns
+        dat_agd_contrast <- dplyr::select(dat_agd_contrast, dplyr::starts_with("."),
+                                     colnames(model.frame(x$regression, data = dat_agd_contrast)))
       } else {
         dat_agd_contrast <- tibble::tibble()
       }
@@ -147,6 +155,10 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       if (has_ipd(x$network)) {
         dat_ipd <- x$network$ipd
         dat_ipd$.sample_size <- 1
+
+        # Only take necessary columns
+        dat_ipd <- dplyr::select(dat_ipd, dplyr::starts_with("."),
+                                 colnames(model.frame(x$regression, data = dat_ipd)))
       } else {
         dat_ipd <- tibble::tibble()
       }

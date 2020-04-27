@@ -132,7 +132,10 @@ predict.stan_nma <- function(object,
       } else {
 
         # Make design matrix of all studies with baselines, and all treatments
-        studies <- forcats::fct_unique(forcats::fct_drop(dplyr::bind_rows(object$network$ipd, object$network$agd_arm)$.study))
+        studies <- forcats::fct_unique(forcats::fct_drop(forcats::fct_c(
+          if (has_ipd(object$network)) object$network$ipd$.studies else factor(),
+          if (has_agd_arm(object$network)) object$network$agd_arm$.studies else factor()
+          )))
         preddat <- tidyr::expand_grid(.study = studies, .trt = object$network$treatments)
 
 
@@ -249,12 +252,23 @@ predict.stan_nma <- function(object,
           } else {
             dat_agd_arm <- object$network$agd_arm
           }
+
+          # Only take necessary columns
+          dat_agd_arm <- dplyr::select(dat_agd_arm,
+                                       dplyr::starts_with("."),
+                                       colnames(model.frame(object$regression, data = dat_agd_arm)))
         } else {
           dat_agd_arm <- tibble::tibble()
         }
 
         if (has_ipd(object$network)) {
           dat_ipd <- object$network$ipd
+
+          # Only take necessary columns
+          dat_ipd <- dplyr::select(dat_ipd,
+                                   dplyr::starts_with("."),
+                                   colnames(model.frame(object$regression, data = dat_ipd)))
+
           dat_ipd$.sample_size <- 1
         } else {
           dat_ipd <- tibble::tibble()
