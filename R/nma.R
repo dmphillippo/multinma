@@ -208,6 +208,15 @@ nma <- function(network,
   # Get data for design matrices and outcomes
   if (has_ipd(network)) {
     dat_ipd <- network$ipd
+
+    # Only take necessary columns
+    if (!is.null(regression)) {
+      dat_ipd <- dplyr::select(dat_ipd, dplyr::starts_with("."),
+                               colnames(model.frame(regression, data = dat_ipd)))
+    } else {
+      dat_ipd <- dplyr::select(dat_ipd, dplyr::starts_with("."))
+    }
+
     y_ipd <- get_outcome_variables(dat_ipd, network$outcome$ipd)
   } else {
     dat_ipd <- tibble::tibble()
@@ -216,6 +225,7 @@ nma <- function(network,
 
   if (has_agd_arm(network)) {
     dat_agd_arm <- network$agd_arm
+
     y_agd_arm <- get_outcome_variables(dat_agd_arm, network$outcome$agd_arm)
 
     # Set up integration variables if present
@@ -224,6 +234,15 @@ nma <- function(network,
     } else {
       idat_agd_arm <- dat_agd_arm
     }
+
+    # Only take necessary columns
+    if (!is.null(regression)) {
+      idat_agd_arm <- dplyr::select(idat_agd_arm, dplyr::starts_with("."),
+                                    colnames(model.frame(regression, data = idat_agd_arm)))
+    } else {
+      idat_agd_arm <- dplyr::select(idat_agd_arm, dplyr::starts_with("."))
+    }
+
   } else {
     dat_agd_arm <- idat_agd_arm <- tibble::tibble()
     y_agd_arm <- NULL
@@ -231,6 +250,7 @@ nma <- function(network,
 
   if (has_agd_contrast(network)) {
     dat_agd_contrast <- network$agd_contrast
+
     y_agd_contrast <- get_outcome_variables(dat_agd_contrast, network$outcome$agd_contrast)
 
     # Set up integration variables if present
@@ -238,6 +258,14 @@ nma <- function(network,
       idat_agd_contrast <-  .unnest_integration(dat_agd_contrast)
     } else {
       idat_agd_contrast <- dat_agd_contrast
+    }
+
+    # Only take necessary columns
+    if (!is.null(regression)) {
+      idat_agd_contrast <- dplyr::select(idat_agd_contrast, dplyr::starts_with("."),
+                                         colnames(model.frame(regression, data = idat_agd_contrast)))
+    } else {
+      idat_agd_contrast <- dplyr::select(idat_agd_contrast, dplyr::starts_with("."))
     }
 
     # Get covariance structure for relative effects, using .se on baseline arm
@@ -266,8 +294,8 @@ nma <- function(network,
     # Check that required variables are present in each data set, and non-missing
     check_regression_data(regression,
                           dat_ipd = dat_ipd,
-                          dat_agd_arm = dat_agd_arm,
-                          dat_agd_contrast = dat_agd_contrast)
+                          dat_agd_arm = idat_agd_arm,
+                          dat_agd_contrast = idat_agd_contrast)
 
     # If IPD or IPD+AgD use weighted means for centering, otherwise with only AgD use raw mean
 
@@ -344,25 +372,39 @@ nma <- function(network,
 
   # Construct RE correlation matrix
   if (trt_effects == "random") {
+
+    # Get study/treatment data
     if (has_ipd(network)) {
-      dat_ipd_arm <- dat_ipd %>%
+      tdat_ipd_arm <- dat_ipd %>%
         dplyr::group_by(.data$.study, .data$.trt) %>%
         dplyr::summarise(.ss = dplyr::n())
     } else {
-      dat_ipd_arm <- tibble::tibble()
+      tdat_ipd_arm <- tibble::tibble()
     }
 
-    dat_all <- dplyr::bind_rows(dat_ipd_arm, dat_agd_arm, dat_agd_contrast_nonbl)
+    if (has_agd_arm(network)) {
+      tdat_agd_arm <- dplyr::select(dat_agd_arm, .data$.study, .data$.trt)
+    } else {
+      tdat_agd_arm <- tibble::tibble()
+    }
+
+    if (has_agd_contrast(network)) {
+      tdat_agd_contrast_nonbl <- dplyr::select(dat_agd_contrast_nonbl, .data$.study, .data$.trt)
+    } else {
+      tdat_agd_contrast_nonbl <- tibble::tibble()
+    }
+
+    tdat_all <- dplyr::bind_rows(tdat_ipd_arm, tdat_agd_arm, tdat_agd_contrast_nonbl)
 
     contr <- rep(c(FALSE, FALSE, TRUE),
-                 times = c(nrow(dat_ipd_arm), nrow(dat_agd_arm), nrow(dat_agd_contrast_nonbl)))
+                 times = c(nrow(tdat_ipd_arm), nrow(tdat_agd_arm), nrow(tdat_agd_contrast_nonbl)))
 
     if (consistency == "consistency") {
-      .RE_cor <- RE_cor(dat_all$.study, dat_all$.trt, contrast = contr, type = "reftrt")
-      .which_RE <- which_RE(dat_all$.study, dat_all$.trt, contrast = contr, type = "reftrt")
+      .RE_cor <- RE_cor(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "reftrt")
+      .which_RE <- which_RE(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "reftrt")
     } else if (consistency == "ume") {
-      .RE_cor <- RE_cor(dat_all$.study, dat_all$.trt, contrast = contr, type = "blshift")
-      .which_RE <- which_RE(dat_all$.study, dat_all$.trt, contrast = contr, type = "blshift")
+      .RE_cor <- RE_cor(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "blshift")
+      .which_RE <- which_RE(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "blshift")
     } else {
       abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
     }
