@@ -426,7 +426,7 @@ nma <- function(network,
   # Labels for log_lik, resdev (only one entry per AgD contrast study)
   dev_labels <- c(ipd_data_labels,
                   agd_arm_data_labels,
-                  dat_agd_contrast_bl$.study)
+                  if (has_agd_contrast(network)) dat_agd_contrast_bl$.study else NULL)
 
   fnames_oi[grepl("^log_lik\\[[0-9]+\\]$", fnames_oi)] <- paste0("log_lik[", dev_labels, "]")
   fnames_oi[grepl("^resdev\\[[0-9]+\\]$", fnames_oi)] <- paste0("resdev[", dev_labels, "]")
