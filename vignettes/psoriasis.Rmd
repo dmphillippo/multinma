@@ -280,11 +280,95 @@ plot_prior_posterior(pso_fit_RE, prior = c("intercept", "trt", "reg", "het"))
 # Model comparison
 Compare the model fit under fixed and random effects.
 ```{r}
-dic(pso_fit_FE)
-dic(pso_fit_RE)
+(pso_dic_FE <- dic(pso_fit_FE))
+(pso_dic_RE <- dic(pso_fit_RE))
 ```
 
 # Further results
+Parameter estimates can be plotted using the `plot()` method, for example to examine the estimated regression coefficients:
+```{r}
+plot(pso_fit_FE,
+     pars = "beta",
+     stat = "halfeyeh",
+     ref_line = 0)
+```
+
+
+We can produce population-adjusted relative effects for each study population in the network using the `relative_effects()` function.
+```{r pso_releff_FE}
+(pso_releff_FE <- relative_effects(pso_fit_FE))
+plot(pso_releff_FE, ref_line = 0)
+```
+
+Predicted probabilities of achieving PASI 75 in each study population on each treatment are produced using the `predict()` method.
+The argument `type = "reponse"` specifies that we want predicted probabilities, rather than probit probabilities.
+```{r pso_pred_FE}
+(pso_pred_FE <- predict(pso_fit_FE, type = "response"))
+plot(pso_pred_FE, ref_line = c(0, 1))
+```
+
+We can produce population-adjusted ranks, rank probabilities, and cumulative rank probabilities in each study population using the `posterior_ranks()` and `posterior_rank_probs()` functions.
+We specify `lower_better = FALSE`, since a higher outcome is better (higher chance of achieving PASI 75).
+```{r pso_ranks_FE}
+(pso_ranks_FE <- posterior_ranks(pso_fit_FE, lower_better = FALSE))
+plot(pso_ranks_FE)
+```
+
+```{r pso_rankprobs_FE}
+(pso_rankprobs_FE <- posterior_rank_probs(pso_fit_FE, lower_better = FALSE))
+plot(pso_rankprobs_FE)
+```
+
+```{r pso_cumrankprobs_FE}
+(pso_cumrankprobs_FE <- posterior_rank_probs(pso_fit_FE, lower_better = FALSE, cumulative = TRUE))
+plot(pso_cumrankprobs_FE)
+```
+
+All of the above estimates (relative effects, predictions, rankings) can also be produced for a specific target population or populations by providing the `newdata` arguments to each function (and a `baseline` distribution for `predict()`).
+If IPD are available for the target population(s), `newdata` is simply a data frame of the IPD.
+If AgD are available for the target population(s), `newdata` must be a data frame with added integration points, created using the `add_integration()` function.
+For example, suppose we wanted estimates for a population with the following aggregate characteristics:
+```{r}
+new_agd <- tibble(
+  bsa_mean = 0.6,
+  bsa_sd = 0.3,
+  prevsys = 0.1,
+  psa = 0.2,
+  weight_mean = 10,
+  weight_sd = 1,
+  durnpso_mean = 3,
+  durnpso_sd = 1
+)
+```
+
+We add integration points to this data frame in a similar manner to before.
+We use the same weighted mean correlation matrix computed earlier from the IPD in the network, which is stored in the network object as `int_cor`.
+```{r}
+new_agd <- add_integration(new_agd,
+  durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+  prevsys = distr(qbern, prob = prevsys),
+  bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+  weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
+  psa = distr(qbern, prob = psa),
+  cor = pso_net$int_cor,
+  n_int = 1000)
+```
+
+Population-adjusted relative effects for this target population are then given by
+```{r pso_releff_FE_target}
+(pso_releff_FE_new <- relative_effects(pso_fit_FE,
+                                       newdata = new_agd))
+plot(pso_releff_FE_new, ref_line = 0)
+```
+
+Predicted probabilities of achieving PASI 75 in this target population, given a $N(-1.75, 0.08^2)$ distribution on the baseline probability of response on Placebo (at the reference levels of the covariates), are given by
+```{r pso_pred_FE_target}
+(pso_pred_FE_new <- predict(pso_fit_FE, 
+                            type = "response",
+                            newdata = new_agd,
+                            baseline = distr(qnorm, -1.75, 0.08)))
+plot(pso_pred_FE_new, ref_line = c(0, 1))
+```
 
 # References
 
