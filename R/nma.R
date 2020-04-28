@@ -441,6 +441,7 @@ nma <- function(network,
   # Make readable parameter names for generated quantities
   fnames_oi <- stanfit@sim$fnames_oi
 
+  # Labels for fitted values
   ipd_data_labels <- if (has_ipd(network)) make_data_labels(dat_ipd$.study, dat_ipd$.trt) else NULL
   agd_arm_data_labels <- if (has_agd_arm(network)) make_data_labels(dat_agd_arm$.study, dat_agd_arm$.trt) else NULL
 
@@ -457,13 +458,26 @@ nma <- function(network,
     agd_contrast_data_labels <- NULL
   }
 
-  # Labels for fitted values, RE deltas
   data_labels <- c(ipd_data_labels,
                    agd_arm_data_labels,
                    agd_contrast_data_labels)
 
   fnames_oi[grepl("^fitted\\[[0-9]+\\]$", fnames_oi)] <- paste0("fitted[", data_labels, "]")
-  if (trt_effects == "random") fnames_oi[grepl("^delta\\[[0-9]+\\]$", fnames_oi)] <- paste0("delta[", data_labels, "]")
+
+  # Labels for RE deltas
+  if (trt_effects == "random") {
+    if (has_ipd(network)) {
+      ipd_arms <- dplyr::distinct(dat_ipd, .data$.study, .data$.trt)
+      ipd_delta_labels <- make_data_labels(ipd_arms$.study, ipd_arms$.trt)
+    } else {
+      ipd_delta_labels <- NULL
+    }
+    delta_labels <- c(ipd_delta_labels,
+                      agd_arm_data_labels,
+                      agd_contrast_data_labels)
+
+    fnames_oi[grepl("^delta\\[[0-9]+\\]$", fnames_oi)] <- paste0("delta[", delta_labels, "]")
+  }
 
   # Labels for log_lik, resdev (only one entry per AgD contrast study)
   dev_labels <- c(ipd_data_labels,
