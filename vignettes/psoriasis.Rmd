@@ -272,6 +272,14 @@ By default, summaries of the study-specific intercepts $\mu_j$ and study-specifi
 print(pso_fit_RE, pars = c("d", "beta", "tau", "mu", "delta"))
 ```
 
+There are a number of divergent transitions, which we can investigate using the `pairs()` method:
+```{r pso_RE_pairs}
+pairs(pso_fit_RE, pars = c("delta[UNCOVER-2: ETN]", "d[ETN]", "tau", "lp__"))
+```
+
+The divergent transition errors (red crosses) seem to be concentrated in the upper tail of the heterogeneity standard deviation parameter.
+This suggests that the information to identify the heterogeneity parameter is weak - we have only four studies in the network - and that a more informative prior distribution might aid estimation.
+
 The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
 ```{r pso_FE_pp_plot}
 plot_prior_posterior(pso_fit_RE, prior = c("intercept", "trt", "reg", "het"))
