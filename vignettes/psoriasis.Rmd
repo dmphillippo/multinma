@@ -286,11 +286,13 @@ plot_prior_posterior(pso_fit_RE, prior = c("intercept", "trt", "reg", "het"))
 ```
 
 # Model comparison
-Compare the model fit under fixed and random effects.
+The model fit under the FE and RE models can be checked using the `dic()` function.
 ```{r}
 (pso_dic_FE <- dic(pso_fit_FE))
 (pso_dic_RE <- dic(pso_fit_RE))
 ```
+
+The DIC is similar between the FE and RE models, suggesting that there is little evidence for any residual heterogeneity.
 
 # Further results
 Parameter estimates can be plotted using the `plot()` method, for example to examine the estimated regression coefficients:
