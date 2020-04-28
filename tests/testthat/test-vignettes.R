@@ -44,3 +44,6 @@ test_that("BCG vaccine example", {
   rmarkdown::render("../../vignettes/example_bcg_vaccine.Rmd", output_dir = td, params = list(run_tests = TRUE))
 })
 
+test_that("Plaque psoriasis example", {
+  rmarkdown::render("../../vignettes/example_plaque_psoriasis.Rmd", output_dir = td, params = list(run_tests = TRUE))
+})
