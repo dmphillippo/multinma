@@ -383,7 +383,7 @@ new_agd_int <- add_integration(new_agd_int,
   n_int = 1000)
 ```
 
-Predicted probabilities of achieving PASI 75 in this target population, given a $N(-1.75, 0.08^2)$ distribution on the baseline probability of response on Placebo (at the reference levels of the covariates), are then produced using the `predict()` method:
+Predicted probabilities of achieving PASI 75 in this target population, given a $N(-1.75, 0.08^2)$ distribution on the baseline probit-probability of response on Placebo (at the reference levels of the covariates), are then produced using the `predict()` method:
 ```{r pso_pred_FE_new}
 (pso_pred_FE_new <- predict(pso_fit_FE, 
                             type = "response",
