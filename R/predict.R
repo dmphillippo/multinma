@@ -320,13 +320,13 @@ predict.stan_nma <- function(object,
         preddat <- newdata
       } else {
         if (inherits(object, "stan_mlnmr")) {
-          if (!inherits(newdata, "integration_df")) {
+          if (!inherits(newdata, "integration_tbl")) {
             abort("No integration points found in `newdata`. Specify integration points using add_integration().")
           } else {
             preddat <- .unnest_integration(newdata)
           }
         } else {
-          if (has_ipd(object$network) && inherits(newdata, "integration_df")) {
+          if (has_ipd(object$network) && inherits(newdata, "integration_tbl")) {
             # Allow integration of IPD model over aggregate population
             preddat <- .unnest_integration(newdata)
           } else {
