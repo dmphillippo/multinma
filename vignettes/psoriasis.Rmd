@@ -303,7 +303,6 @@ plot(pso_fit_FE,
      ref_line = 0)
 ```
 
-
 We can produce population-adjusted relative effects for each study population in the network using the `relative_effects()` function.
 ```{r pso_releff_FE}
 (pso_releff_FE <- relative_effects(pso_fit_FE))
@@ -334,12 +333,32 @@ plot(pso_rankprobs_FE)
 plot(pso_cumrankprobs_FE)
 ```
 
-All of the above estimates (relative effects, predictions, rankings) can also be produced for a specific target population or populations by providing the `newdata` arguments to each function (and a `baseline` distribution for `predict()`).
-If IPD are available for the target population(s), `newdata` is simply a data frame of the IPD.
-If AgD are available for the target population(s), `newdata` must be a data frame with added integration points, created using the `add_integration()` function.
-For example, suppose we wanted estimates for a population with the following aggregate characteristics:
+All of the above estimates (relative effects, predictions, rankings) can also be produced for a specific target population or populations by providing a suitable `newdata` argument to for function (and a `baseline` distribution for `predict()`).
+
+To produce population-adjusted relative effects (and corresponding rankings) for a chosen target population, we require only the mean covariate values in that population.
+For example, `newdata` could provide the following mean covariate values:
 ```{r}
-new_agd <- tibble(
+new_agd_means <- tibble(
+  bsa = 0.6,
+  prevsys = 0.1,
+  psa = 0.2,
+  weight = 10,
+  durnpso = 3)
+```
+
+Population-adjusted relative effects in this target population are then calculated using the `relative_effects()` function, and can be plotted with the corresponding `plot()` method:
+```{r pso_releff_FE_new}
+(pso_releff_FE_new <- relative_effects(pso_fit_FE, newdata = new_agd_means))
+plot(pso_releff_FE_new, ref_line = 0)
+```
+
+For absolute predictions, we require information about the full covariate distribution in the target population, not just the mean values.
+If IPD are available for the target population, `newdata` is simply a data frame of the IPD.
+If AgD are available for the target population, `newdata` must be a data frame with added integration points created using the `add_integration()` function.
+ 
+For example, suppose the aggregate target population introduced above had the following covariate means and standard deviations (for continuous covariates) or proportions (for discrete covariates):
+```{r}
+new_agd_int <- tibble(
   bsa_mean = 0.6,
   bsa_sd = 0.3,
   prevsys = 0.1,
@@ -352,9 +371,9 @@ new_agd <- tibble(
 ```
 
 We add integration points to this data frame in a similar manner to before.
-We use the same weighted mean correlation matrix computed earlier from the IPD in the network, which is stored in the network object as `int_cor`.
+Again, we need to supply a correlation matrix for the joint covariate distribution; we use the same weighted mean correlation matrix computed earlier from the IPD in the network, which is stored in the network object as `int_cor`.
 ```{r}
-new_agd <- add_integration(new_agd,
+new_agd_int <- add_integration(new_agd_int,
   durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
   prevsys = distr(qbern, prob = prevsys),
   bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
@@ -364,18 +383,11 @@ new_agd <- add_integration(new_agd,
   n_int = 1000)
 ```
 
-Population-adjusted relative effects for this target population are then given by
-```{r pso_releff_FE_target}
-(pso_releff_FE_new <- relative_effects(pso_fit_FE,
-                                       newdata = new_agd))
-plot(pso_releff_FE_new, ref_line = 0)
-```
-
-Predicted probabilities of achieving PASI 75 in this target population, given a $N(-1.75, 0.08^2)$ distribution on the baseline probability of response on Placebo (at the reference levels of the covariates), are given by
-```{r pso_pred_FE_target}
+Predicted probabilities of achieving PASI 75 in this target population, given a $N(-1.75, 0.08^2)$ distribution on the baseline probability of response on Placebo (at the reference levels of the covariates), are then produced using the `predict()` method:
+```{r pso_pred_FE_new}
 (pso_pred_FE_new <- predict(pso_fit_FE, 
                             type = "response",
-                            newdata = new_agd,
+                            newdata = new_agd_int,
                             baseline = distr(qnorm, -1.75, 0.08)))
 plot(pso_pred_FE_new, ref_line = c(0, 1))
 ```
