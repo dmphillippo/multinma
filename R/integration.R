@@ -13,7 +13,7 @@
 #' @param cor Correlation matrix to use for generating the integration points.
 #'   By default, this takes a weighted correlation matrix from all IPD studies.
 #'   Rows and columns should match the order of covariates specified in `...`.
-#' @param n_int Number of integration points to generate, default 100
+#' @param n_int Number of integration points to generate, default 1000
 #' @param int_args A named list of arguments to pass to
 #'   \code{\link[randtoolbox:quasiRNG]{sobol()}}
 #'
@@ -47,7 +47,7 @@ add_integration.default <- function(x, ...) {
 #' @export
 #' @rdname add_integration
 add_integration.data.frame <- function(x, ...,
-                                       cor = NULL, n_int = 100L, int_args = list()) {
+                                       cor = NULL, n_int = 1000L, int_args = list()) {
 
   # Check n_int
   if (length(n_int) > 1 || !is.numeric(n_int) || n_int != trunc(n_int) || n_int <= 0) {
@@ -145,7 +145,7 @@ add_integration.data.frame <- function(x, ...,
 #' @export
 #' @rdname add_integration
 add_integration.nma_data <- function(x, ...,
-                                     cor = NULL, n_int = 100L, int_args = list()) {
+                                     cor = NULL, n_int = 1000L, int_args = list()) {
 
   network <- x
 

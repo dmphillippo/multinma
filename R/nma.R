@@ -88,7 +88,7 @@ nma <- function(network,
                 QR = FALSE,
                 center = TRUE,
                 adapt_delta = NULL,
-                int_thin = 100L) {
+                int_thin = max(network$n_int %/% 10, 1)) {
 
   # Check network
   if (!inherits(network, "nma_data")) {
