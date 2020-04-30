@@ -493,7 +493,7 @@ nma <- function(network,
     cumint_labels <- paste0(cumint_labels, ", ", rep_len(1:n_int_thin * int_thin, length.out = length(cumint_labels)))
 
     fnames_oi[grepl("^theta_bar_cum\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta_bar_cum[", cumint_labels, "]")
-    if (likelihood == "binomial2")
+    if (likelihood %in% c("bernoulli2", "binomial2"))
       fnames_oi[grepl("^theta2_bar_cum\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta2_bar_cum[", cumint_labels, "]")
   }
 
