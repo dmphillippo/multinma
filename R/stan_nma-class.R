@@ -324,6 +324,28 @@ plot_prior_posterior <- function(x, ...,
   return(p)
 }
 
+#' Plot numerical integration error
+#'
+#' Plot the estimated numerical integration error over the entire posterior
+#' distribution for ML-NMR models.
+#'
+#' @param x An object of type `stan_mlnmr`
+#' @param ...
+#' @param stat Character string specifying the `tidybayes` plot stat used to
+#'   summarise the integration error over the posterior, default `"eye"`.
+#' @param show_expected_rate Logical, show typical convergence rate
+#'   \eqn{1/\tilde{N}}? Default `TRUE`.
+#'
+#' @return A `ggplot` object.
+#' @export
+#'
+#' @examples
+plot_integration_error <- function(x, ...,
+                                   stat = "eye",
+                                   show_expected_rate = TRUE) {
+
+}
+
 #' as.stanfit
 #'
 #' Attempt to turn an object into a \code{\link[rstan:stanfit-class]{stanfit}} object.
