@@ -326,13 +326,14 @@ plot_prior_posterior <- function(x, ...,
 
 #' Plot numerical integration error
 #'
-#' Plot the estimated numerical integration error over the entire posterior
-#' distribution for ML-NMR models.
+#' For ML-NMR models, plot the estimated numerical integration error over the
+#' entire posterior distribution, with increasing numbers of integration points.
 #'
 #' @param x An object of type `stan_mlnmr`
 #' @param ...
 #' @param stat Character string specifying the `tidybayes` plot stat used to
-#'   summarise the integration error over the posterior, default `"eye"`.
+#'   summarise the integration error over the posterior. Default is `"violin"`,
+#'   which is equivalent to `"eye"` with some cosmetic tweaks.
 #' @param show_expected_rate Logical, show typical convergence rate
 #'   \eqn{1/\tilde{N}}? Default `TRUE`.
 #'
@@ -341,9 +342,140 @@ plot_prior_posterior <- function(x, ...,
 #'
 #' @examples
 plot_integration_error <- function(x, ...,
-                                   stat = "eye",
+                                   stat = "violin",
                                    show_expected_rate = TRUE) {
+  # Checks
+  if (!inherits(x, "stan_mlnmr"))
+    abort("Expecting a `stan_mlnmr` object, created by fitting a ML-NMR model with numerical integration using the `nma()` function.")
 
+  if (!rlang::is_bool(show_expected_rate))
+    abort("`show_expected_rate` must be a logical value, TRUE or FALSE.")
+
+  if (!rlang::is_string(stat))
+    abort("`stat` should be a character string specifying the name of a tidybayes stat")
+
+  stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
+
+  if (stat %in% c("violin", "violinh")) {
+    violin <- TRUE
+    stat <- switch(stat, violin = "eye", violinh = "eyeh")
+  }
+
+  tb_geom <- tryCatch(getExportedValue("tidybayes", paste0("stat_", stat)),
+                      error = function(err) {
+                        abort(paste("`stat` should be a character string specifying the name of a tidybayes stat:",
+                                    err, sep = "\n"))
+                      })
+
+  # Is a horizontal geom specified?
+  horizontal <- stringr::str_ends(stat, "h")
+
+  # Get cumulative integration points
+  twoparbin <- x$likelihood %in% c("binomial2", "bernoulli2")
+  ipars <- if (twoparbin) c("theta_bar_cum", "theta2_bar_cum") else "theta_bar_cum"
+  int_dat <- as.data.frame(x, pars = ipars) %>%
+    dplyr::mutate(.draw = 1:dplyr::n())
+
+  n_int <- x$network$n_int
+
+  rx <- "^(theta2?)_bar_cum\\[(.+): (.+), ([0-9]+)\\]$"
+
+  if (packageVersion("tidyr") >= "1.0.0") {
+    int_dat <- tidyr::pivot_longer(int_dat, cols = -dplyr::one_of(".draw"),
+                                   names_pattern = rx,
+                                   names_to = c("parameter", "study", "treatment", "n_int"),
+                                   names_ptypes = list(n_int = integer()),
+                                   values_to = "value")
+  } else {
+    int_dat <- tidyr::gather(int_dat,
+                           key = "parameter",
+                           value = "value",
+                           -dplyr::one_of(".draw")) %>%
+      tidyr::extract(.data$parameter,
+                     into = c("parameter", "study", "treatment", "n_int"),
+                     regex = rx,
+                     convert = TRUE)
+  }
+
+  int_dat$study <- factor(int_dat$study, levels = levels(x$network$studies))
+  int_dat$treatment <- factor(int_dat$treatment, levels = levels(x$network$treatments))
+
+  # Estimate integration error by subtracting final value
+  int_dat <- dplyr::left_join(dplyr::filter(int_dat, .data$n_int != max(.data$n_int)),
+                              dplyr::filter(int_dat, .data$n_int == max(.data$n_int)) %>%
+                                dplyr::rename(final_value = .data$value) %>%
+                                dplyr::select(-.data$n_int),
+                              by = c("parameter", "study", "treatment", ".draw")) %>%
+    dplyr::mutate(diff = .data$value - .data$final_value)
+
+  # Reference convergence rates
+  if (show_expected_rate) {
+    conv_dat <- dplyr::bind_rows(
+      tibble::tibble(n_int = seq(1, n_int, length.out = 501), diff = n_int^-1, group = "pos"),
+      tibble::tibble(n_int = seq(1, n_int, length.out = 501), diff = -n_int^-1, group = "neg"))
+  }
+
+  # Create plot
+  if (horizontal) {
+    p <- ggplot2::ggplot(int_dat, ggplot2::aes(y = .data$n_int, x = .data$diff)) +
+      ggplot2::geom_vline(xintercept = 0, colour = "grey60") +
+      ggplot2::xlab("Estimated integration error") +
+      ggplot2::ylab("Number of integration points") +
+      ggplot2::coord_cartesian(xlim = range(int_dat$diff))
+  } else {
+    p <- ggplot2::ggplot(int_dat, ggplot2::aes(x = .data$n_int, y = .data$diff)) +
+      ggplot2::geom_hline(yintercept = 0, colour = "grey60") +
+      ggplot2::ylab("Estimated integration error") +
+      ggplot2::xlab("Number of integration points") +
+      ggplot2::coord_cartesian(ylim = range(int_dat$diff))
+  }
+
+  if (show_expected_rate) {
+    p <- p +
+      ggplot2::geom_line(ggplot2::aes(group = .data$group),
+                         data = conv_dat,
+                         colour = "grey60", linetype = 2)
+  }
+
+  # Custom format for violin plot
+  v_args <-
+    if (violin) {
+      if (twoparbin) {
+        list(point_interval = NULL,
+             alpha = 0.5,
+             slab_size = 0.5)
+        } else {
+          list(point_interval = NULL,
+               slab_colour = "black",
+               slab_size = 0.5)
+        }
+    } else list()
+
+  if (twoparbin) {
+    p <- p +
+      do.call(tb_geom,
+              args = rlang::dots_list(ggplot2::aes(colour = .data$parameter,
+                                                   fill = .data$parameter,
+                                                   slab_colour = .data$parameter),
+                                      ...,
+                                      !!! v_args,
+                                      .homonyms = "first")) +
+      ggplot2::scale_colour_viridis_d("Parameter",
+                                      labels = function(x) switch(x,
+                                                                  theta = expression(bar(p)),
+                                                                  theta2 = expression(bar(p)^2)),
+                                      aesthetics = c("colour", "fill", "slab_colour"))
+  } else {
+    p <- p +
+      do.call(tb_geom,
+              args = rlang::dots_list(..., !!! v_args, .homonyms = "first"))
+  }
+
+  p <- p +
+    ggplot2::facet_wrap(~ study + treatment) +
+    theme_multinma()
+
+  return(p)
 }
 
 #' as.stanfit
