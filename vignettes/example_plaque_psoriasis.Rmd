@@ -198,13 +198,14 @@ We fit both fixed effect (FE) and random effects (RE) ML-NMR models.
 
 ## Fixed effect ML-NMR
 First, we fit a FE ML-NMR model using the function `nma()`.
-Following [@methods_paper] we will use a probit link function (`link = "probit"`), and specify weakly-informative $N(0, 10^2)$ priors on each parameter.
+Following [@methods_paper] we specify weakly-informative $N(0, 10^2)$ priors on each parameter.
 The range of parameter values implied by these prior distributions can be checked using the `summary()` method:
 ```{r}
 summary(normal(scale = 10))
 ```
 
 The regresison model is specified with `regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt`, which will include the main (prognostic) effects of each covariate as well as interactions with treatment.
+We use a probit link function (`link = "probit"`), and specify that the two-parameter Binomial approximation for the aggregate-level likelihood should be used (`likelihood = "bernoulli2"`, where "bernoulli" refers to the individual-level likelihood, and "2" denotes the two-parameter adjustment to the aggregate-level likelihood) [@methods_paper].
 We utilise the shared effect modifier assumption to help identify the model, setting treatment-covariate interactions to be equal within each class (`class_interactions = "common"`).
 We narrow the possible range for random initial values with `init_r = 0.1` (the default is `init_r = 2`), since probit models in particular are often hard to initialise.
 Using the QR decomposition (`QR = TRUE`) greatly improves sampling efficiency here, as is often the case for regression models.
@@ -212,6 +213,7 @@ Using the QR decomposition (`QR = TRUE`) greatly improves sampling efficiency he
 pso_fit_FE <- nma(pso_net, 
                   trt_effects = "fixed",
                   link = "probit", 
+                  likelihood = "bernoulli2",
                   regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
                   class_interactions = "common",
                   prior_intercept = normal(scale = 10),
@@ -237,6 +239,11 @@ The prior and posterior distributions can be compared visually using the `plot_p
 plot_prior_posterior(pso_fit_FE, prior = c("intercept", "trt", "reg"))
 ```
 
+Plots of estimated numerical integration error are produced using the `plot_integration_error()` function:
+```{r pso_FE_cumint}
+plot_integration_error(pso_fit_FE)
+```
+
 ## Random effects ML-NMR
 We now fit a RE model.
 Again, we specify weakly-informative $N(0, 10^2)$ priors on each parameter, and now specify a $\textrm{half-N}(0, 2.5^2)$ prior for the heterogeneity standard deviation $\tau$.
@@ -251,6 +258,7 @@ Fitting the model uses the same call to `nma()` as before, except now with `trt_
 pso_fit_RE <- nma(pso_net, 
                   trt_effects = "random",
                   link = "probit", 
+                  likelihood = "binomial2",
                   regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
                   class_interactions = "common",
                   prior_intercept = normal(scale = 10),
@@ -283,6 +291,11 @@ This suggests that the information to identify the heterogeneity parameter is we
 The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
 ```{r pso_FE_pp_plot}
 plot_prior_posterior(pso_fit_RE, prior = c("intercept", "trt", "reg", "het"))
+```
+
+Plots of estimated numerical integration error are produced using the `plot_integration_error()` function:
+```{r pso_RE_cumint}
+plot_integration_error(pso_fit_RE)
 ```
 
 # Model comparison
