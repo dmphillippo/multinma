@@ -327,15 +327,27 @@ plot_prior_posterior <- function(x, ...,
 #' Plot numerical integration error
 #'
 #' For ML-NMR models, plot the estimated numerical integration error over the
-#' entire posterior distribution, with increasing numbers of integration points.
+#' entire posterior distribution, as the number of integration points increases.
+#' See \insertCite{methods_paper,Phillippo_thesis}{multinma} for details.
 #'
 #' @param x An object of type `stan_mlnmr`
 #' @param ...
 #' @param stat Character string specifying the `tidybayes` plot stat used to
 #'   summarise the integration error over the posterior. Default is `"violin"`,
 #'   which is equivalent to `"eye"` with some cosmetic tweaks.
-#' @param show_expected_rate Logical, show typical convergence rate
-#'   \eqn{1/\tilde{N}}? Default `TRUE`.
+#' @param show_expected_rate Logical, show typical convergence rate \eqn{1/N}?
+#'   Default `TRUE`.
+#'
+#' @details The total number of integration points is set by the `n_int`
+#'   argument to [add_integration()], and the intervals at which integration
+#'   error is estimated are set by the `int_thin` argument to [nma()]. The
+#'   typical convergence rate of Quasi-Monte Carlo integration (as used here) is
+#'   \eqn{1/N}, which by default is displayed on the plot output.
+#'
+#'   The integration error at each thinning interval \eqn{N_\mathrm{thin}}{N_thin} is
+#'   estimated for each point in the posterior distribution by subtracting the
+#'   final estimate (using all `n_int` points) from the estimate using only the
+#'   first \eqn{N_\mathrm{thin}}{N_thin} points.
 #'
 #' @return A `ggplot` object.
 #' @export
