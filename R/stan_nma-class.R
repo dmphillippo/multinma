@@ -356,8 +356,7 @@ plot_integration_error <- function(x, ...,
 
   stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
 
-  if (stat %in% c("violin", "violinh")) {
-    violin <- TRUE
+  if (violin <- stat %in% c("violin", "violinh")) {
     stat <- switch(stat, violin = "eye", violinh = "eyeh")
   }
 
@@ -408,6 +407,8 @@ plot_integration_error <- function(x, ...,
                               by = c("parameter", "study", "treatment", ".draw")) %>%
     dplyr::mutate(diff = .data$value - .data$final_value)
 
+  int_thin <- min(int_dat$n_int)
+
   # Reference convergence rates
   if (show_expected_rate) {
     conv_dat <- dplyr::bind_rows(
@@ -442,7 +443,7 @@ plot_integration_error <- function(x, ...,
     if (violin) {
       if (twoparbin) {
         list(point_interval = NULL,
-             alpha = 0.5,
+             alpha = 0.8,
              slab_size = 0.5)
         } else {
           list(point_interval = NULL,
@@ -459,12 +460,14 @@ plot_integration_error <- function(x, ...,
                                                    slab_colour = .data$parameter),
                                       ...,
                                       !!! v_args,
+                                      position = if (!horizontal) ggplot2::position_dodge(width = int_thin / 10) else "identity",
                                       .homonyms = "first")) +
-      ggplot2::scale_colour_viridis_d("Parameter",
-                                      labels = function(x) switch(x,
-                                                                  theta = expression(bar(p)),
-                                                                  theta2 = expression(bar(p)^2)),
-                                      aesthetics = c("colour", "fill", "slab_colour"))
+      ggplot2::scale_colour_manual("Parameter",
+                                   values = c(theta = "#113259", theta2 = "#55A480"),
+                                   labels = function(x) dplyr::recode(x,
+                                     theta = expression(bar(p)),
+                                     theta2 = expression(bar(p)^2)),
+                                   aesthetics = c("colour", "fill", "slab_colour"))
   } else {
     p <- p +
       do.call(tb_geom,
