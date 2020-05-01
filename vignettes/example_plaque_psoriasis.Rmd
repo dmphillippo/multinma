@@ -408,10 +408,6 @@ plot(pso_pred_FE_new, ref_line = c(0, 1))
 # References
 
 ```{r pso_tests, include=FALSE, eval=params$run_tests}
-#--- Test against results computed with standalone code from Phillippo thesis ---
 library(testthat)
-library(dplyr)
-
-tol <- 0.05
-tol_dic <- 0.1
+skip("Run local tests")
 ```
