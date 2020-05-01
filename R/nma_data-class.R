@@ -324,7 +324,7 @@ as_tbl_graph.nma_data <- function(x, ...) {
 #' @return
 #' @noRd
 make_contrasts <- function(trt) {
-  contrs <- utils::combn(trt, 2)
+  contrs <- utils::combn(sort(trt), 2)
   return(dplyr::tibble(.trt = contrs[2,],
                        .trt_b = contrs[1,]))
 }
