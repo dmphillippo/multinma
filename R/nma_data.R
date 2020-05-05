@@ -13,6 +13,27 @@
 #'   for contrast-based aggregate data, and [combine_network()] for combining
 #'   several data sources in one network.
 #' @examples
+#' # Set up network of plaque psoriasis IPD
+#' head(plaque_psoriasis_ipd)
+#'
+#' pso_net <- set_ipd(plaque_psoriasis_ipd,
+#'                    study = studyc,
+#'                    trt = trtc,
+#'                    r = pasi75)
+#'
+#' # Print network details
+#' pso_net
+#'
+#' # Plot network
+#' plot(pso_net)
+#'
+#' # Setting a different reference treatment
+#' set_ipd(plaque_psoriasis_ipd,
+#'         study = studyc,
+#'         trt = trtc,
+#'         r = pasi75,
+#'         trt_ref = "PBO")
+
 set_ipd <- function(data,
                     study,
                     trt,
@@ -159,7 +180,11 @@ set_ipd <- function(data,
 #' @seealso [set_ipd()] for individual patient data, [set_agd_contrast()] for
 #'   contrast-based aggregate data, and [combine_network()] for combining
 #'   several data sources in one network.
+#' @template ex_smoking_network
 #' @examples
+#'
+#' # Plot network
+#' plot(smk_net)
 set_agd_arm <- function(data,
                         study,
                         trt,
@@ -322,6 +347,22 @@ set_agd_arm <- function(data,
 #'   arm-based aggregate data, and [combine_network()] for combining several
 #'   data sources in one network.
 #' @examples
+#' # Set up network of Parkinson's contrast data
+#' head(parkinsons)
+#'
+#' park_net <- set_agd_contrast(parkinsons,
+#'                              study = studyn,
+#'                              trt = trtn,
+#'                              y = diff,
+#'                              se = se_diff,
+#'                              sample_size = n)
+#'
+#' # Print details
+#' park_net
+#'
+#' # Plot network
+#' plot(park_net)
+
 set_agd_contrast <- function(data,
                              study,
                              trt,
@@ -491,7 +532,40 @@ set_agd_contrast <- function(data,
 #'
 #' @seealso [set_ipd()], [set_agd_arm()], and [set_agd_contrast()] for defining
 #'   different data sources
+#'
+#' @examples ## Parkinson's - combining contrast- and arm-based data
+#' studies <- parkinsons$studyn
+#' (parkinsons_arm <- parkinsons[studies %in% 1:3, ])
+#' (parkinsons_contr <- parkinsons[studies %in% 4:7, ])
+#'
+#' park_arm_net <- set_agd_arm(parkinsons_arm,
+#'                             study = studyn,
+#'                             trt = trtn,
+#'                             y = y,
+#'                             se = se,
+#'                             sample_size = n)
+#'
+#' park_contr_net <- set_agd_contrast(parkinsons_contr,
+#'                                    study = studyn,
+#'                                    trt = trtn,
+#'                                    y = diff,
+#'                                    se = se_diff,
+#'                                    sample_size = n)
+#'
+#' park_net <- combine_network(park_arm_net, park_contr_net)
+#'
+#' # Print network details
+#' park_net
+#'
+#' # Plot network
+#' plot(park_net, weight_edges = TRUE, weight_nodes = TRUE)
+#'
+#' @examples ## Plaque Psoriasis - combining IPD and AgD in a network
+#' @template ex_plaque_psoriasis_network
 #' @examples
+#'
+#' # Plot network
+#' plot(pso_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE)
 combine_network <- function(..., trt_ref) {
   s <- list(...)
 
