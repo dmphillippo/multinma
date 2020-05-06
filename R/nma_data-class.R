@@ -226,7 +226,15 @@ emph_g <- function(...) crayon::green$bold(...)
 #'
 #' @importFrom igraph as.igraph
 #'
+#' @template ex_smoking_network
 #' @examples
+#' # Convert to igraph object
+#' igraph::as.igraph(smk_net)  # Edges combined by default
+#' igraph::as.igraph(smk_net, collapse = FALSE)  # Without combining edges
+#'
+#' # Convert to tbl_graph object
+#' tidygraph::as_tbl_graph(smk_net)  # Edges combined by default
+#' tidygraph::as_tbl_graph(smk_net, collapse = FALSE)  # Without combining edges
 as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
 
   if (!rlang::is_bool(collapse))
@@ -312,8 +320,6 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
 #' @rdname graph_conversion
 #'
 #' @importFrom tidygraph as_tbl_graph
-#'
-#' @examples
 as_tbl_graph.nma_data <- function(x, ...) {
   return(tidygraph::as_tbl_graph(igraph::as.igraph(x, ...)))
 }
