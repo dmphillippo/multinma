@@ -1,5 +1,8 @@
 #' Set up individual patient data
 #'
+#' Set up a network containing individual patient data (IPD). Multiple data
+#' sources may be combined once created using [combine_network()].
+#'
 #' @template args-data_common
 # #' @template args-data_rE
 #' @param r column of `data` specifying a binary outcome or Poisson outcome count
@@ -15,6 +18,7 @@
 #' @seealso [set_agd_arm()] for arm-based aggregate data, [set_agd_contrast()]
 #'   for contrast-based aggregate data, and [combine_network()] for combining
 #'   several data sources in one network.
+#' @template seealso_nma_data
 #' @examples
 #' # Set up network of plaque psoriasis IPD
 #' head(plaque_psoriasis_ipd)
@@ -163,6 +167,10 @@ set_ipd <- function(data,
 
 #' Set up arm-based aggregate data
 #'
+#' Set up a network containing arm-based aggregate data (AgD), such as event
+#' counts or mean outcomes on each arm. Multiple data sources may be combined
+#' once created using [combine_network()].
+#'
 #' @template args-data_common
 #' @template args-data_se
 #' @template args-data_rE
@@ -183,6 +191,7 @@ set_ipd <- function(data,
 #' @seealso [set_ipd()] for individual patient data, [set_agd_contrast()] for
 #'   contrast-based aggregate data, and [combine_network()] for combining
 #'   several data sources in one network.
+#' @template seealso_nma_data
 #' @template ex_smoking_network
 #' @examples
 #'
@@ -326,6 +335,10 @@ set_agd_arm <- function(data,
 
 #' Set up contrast-based aggregate data
 #'
+#' Set up a network containing contrast-based aggregate data (AgD), i.e.
+#' summaries of relative effects between treatments such as log Odds Ratios.
+#' Multiple data sources may be combined once created using [combine_network()].
+#'
 #' @template args-data_common
 #' @template args-data_se
 #' @param sample_size column of `data` giving the sample size in each arm.
@@ -349,6 +362,7 @@ set_agd_arm <- function(data,
 #' @seealso [set_ipd()] for individual patient data, [set_agd_arm()] for
 #'   arm-based aggregate data, and [combine_network()] for combining several
 #'   data sources in one network.
+#' @template seealso_nma_data
 #' @examples
 #' # Set up network of Parkinson's contrast data
 #' head(parkinsons)
@@ -526,6 +540,9 @@ set_agd_contrast <- function(data,
 
 #' Combine multiple data sources into one network
 #'
+#' Multiple data sources created using [set_ipd()], [set_agd_arm()], or
+#' [set_agd_contrast()] can be combined into a single network for analysis.
+#'
 #' @param ... multiple data sources, as defined using the `set_*` functions
 #' @param trt_ref reference treatment for the entire network, as a string (or
 #'   coerced as such) referring to the levels of the treatment factor variable
@@ -534,7 +551,8 @@ set_agd_contrast <- function(data,
 #' @export
 #'
 #' @seealso [set_ipd()], [set_agd_arm()], and [set_agd_contrast()] for defining
-#'   different data sources
+#'   different data sources.
+#' @template seealso_nma_data
 #'
 #' @examples ## Parkinson's - combining contrast- and arm-based data
 #' studies <- parkinsons$studyn
