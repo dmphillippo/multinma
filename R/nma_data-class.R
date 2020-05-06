@@ -56,6 +56,9 @@ NULL
 
 #' Print `nma_data` objects
 #'
+#' Print details of networks stored as [nma_data] objects, as created by
+#' [set_ipd()], [set_agd_arm()], [set_agd_contrast()], or [combine_network()].
+#'
 #' @param x `nma_data` object
 #' @param ... other options (not used)
 #' @param n number of studies of each type to print
