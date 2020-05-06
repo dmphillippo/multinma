@@ -78,6 +78,8 @@ add_integration.default <- function(x, ...) {
 add_integration.data.frame <- function(x, ...,
                                        cor = NULL, n_int = 1000L, int_args = list()) {
 
+  x <- tibble::as_tibble(x)
+
   # Check n_int
   if (!rlang::is_scalar_integerish(n_int) || n_int <= 0) {
     abort("`n_int` should be a positive integer.")
