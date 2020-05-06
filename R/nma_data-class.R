@@ -435,7 +435,37 @@ is_network_connected <- function(network) {
 #' @return
 #' @export
 #'
-#' @examples
+#' @examples ## Stroke prevention in atrial fibrillation
+#' # Setting up the network
+#' af_net <- set_agd_arm(atrial_fibrillation,
+#'                       study = studyc,
+#'                       trt = trtc,
+#'                       r = r,
+#'                       n = n,
+#'                       trt_class = trt_class)
+#' af_net
+#'
+#' # Basic plot
+#' plot(af_net)
+#'
+#' # Turn off weighting edges by number of studies
+#' plot(af_net, weight_edges = FALSE)
+#'
+#' # Turn on weighting nodes by sample size
+#' plot(af_net, weight_nodes = TRUE)
+#'
+#' # Colour treatment nodes by class
+#' plot(af_net, weight_nodes = TRUE, show_trt_class = TRUE)
+#'
+#' # Output may be customised using standard ggplot commands
+#' # For example, to display the legends below the plot:
+#' plot(af_net, weight_nodes = TRUE, show_trt_class = TRUE) +
+#'   ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
+#'
+#' # Choosing a different ggraph layout
+#' plot(af_net, weight_nodes = TRUE, show_trt_class = TRUE,
+#'      layout = "star")
+#'
 plot.nma_data <- function(x, ..., layout, circular,
                           weight_edges = TRUE, weight_nodes = FALSE,
                           show_trt_class = FALSE) {
