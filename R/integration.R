@@ -353,7 +353,9 @@ unnest_integration <- function(data) {
 #' Specify a general marginal distribution
 #'
 #' `distr()` is used within the function [add_integration()] to specify marginal
-#' distributions for the covariates, via a corresponding inverse CDF.
+#' distributions for the covariates, via a corresponding inverse CDF. It is also
+#' used in [predict.stan_nma()] to specify a distribution for the baseline
+#' response (intercept) when predicting absolute outcomes.
 #'
 #' @param qfun an inverse CDF, either as a function name or a string
 #' @param ... parameters of the distribution as arguments to `qfun`, these will
@@ -368,7 +370,20 @@ unnest_integration <- function(data) {
 #'   supplied, it must have an argument `p` which takes a vector of
 #'   probabilities.
 #'
+#' @seealso [add_integration()] where `distr()` is used to specify marginal
+#'   distributions for covariates to integrate over, and [predict.stan_nma()]
+#'   where `distr()` is used to specify a distribution on the baseline response.
 #' @examples
+#' ## Specifying marginal distributions for integration
+#'
+#' df <- data.frame(x1_mean = 2, x1_sd = 0.5, x2 = 0.8)
+#'
+#' # Distribution parameters are evaluated in the context of the data frame
+#' add_integration(df,
+#'                 x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+#'                 x2 = distr(qbern, prob = x2),
+#'                 cor = diag(2))
+#'
 distr <- function(qfun, ...) {
   d <- list(qfun = match.fun(qfun),
             args = rlang::enquos(...))
