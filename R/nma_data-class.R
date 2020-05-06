@@ -61,8 +61,6 @@ NULL
 #' @param n number of studies of each type to print
 #'
 #' @export
-#'
-#' @examples
 print.nma_data <- function(x, ..., n = 10) {
   cwidth <- getOption("width")
 
@@ -382,7 +380,19 @@ get_default_trt_ref <- function(network, ...) {
 #'   Relative effects within each connected sub-network will be estimated as if
 #'   each sub-network had been analysed separately.
 #'
+#' @examples ## Smoking cessation
+#' @template ex_smoking_network
+#' @examples is_network_connected(smk_net)  # TRUE, network is connected
 #' @examples
+#' ## A disconnected network
+#' disc_net <- set_agd_arm(smoking[smoking$studyn %in% c(15, 21), ],
+#'                         study = studyn,
+#'                         trt = trtc,
+#'                         r = r,
+#'                         n = n)
+#' is_network_connected(disc_net)  # FALSE, network is disconnected
+#' disc_net
+#' plot(disc_net)
 is_network_connected <- function(network) {
 
   # Check network
