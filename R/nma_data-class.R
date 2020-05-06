@@ -52,6 +52,7 @@
 #' prefix `.int_`, one for each covariate, which contain the numerical
 #' integration points nested as length-`n_int` vectors within each row.
 #'
+#' @template seealso_nma_data
 NULL
 
 #' Print `nma_data` objects
