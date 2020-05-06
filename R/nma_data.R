@@ -1,7 +1,10 @@
 #' Set up individual patient data
 #'
 #' @template args-data_common
-#' @template args-data_rE
+# #' @template args-data_rE
+#' @param r column of `data` specifying a binary outcome or Poisson outcome count
+#' @param E column of `data` specifying the total time at risk for Poisson
+#'   outcomes
 # #' @template args-data_Surv
 #'
 #' @return An object of class [nma_data]
