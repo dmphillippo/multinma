@@ -33,7 +33,36 @@
 #' @references
 #'   \insertAllCited{}
 #'
+#' @examples ## Plaque psoriasis ML-NMR - network setup and adding integration points
+#' @template ex_plaque_psoriasis_network
+#' @template ex_plaque_psoriasis_integration
 #' @examples
+#'
+#' ## Adding integration points to a data frame, e.g. for prediction
+#' # Define a data frame of covariate summaries
+#' new_agd_int <- data.frame(
+#'   bsa_mean = 0.6,
+#'   bsa_sd = 0.3,
+#'   prevsys = 0.1,
+#'   psa = 0.2,
+#'   weight_mean = 10,
+#'   weight_sd = 1,
+#'   durnpso_mean = 3,
+#'   durnpso_sd = 1)
+#'
+#' # Adding integration points, using the weighted average correlation matrix
+#' # computed for the plaque psoriasis network
+#' new_agd_int <- add_integration(new_agd_int,
+#'   durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+#'   prevsys = distr(qbern, prob = prevsys),
+#'   bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+#'   weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
+#'   psa = distr(qbern, prob = psa),
+#'   cor = pso_net$int_cor,
+#'   n_int = 1000)
+#'
+#' new_agd_int
+#'
 add_integration <- function(x, ...) {
   UseMethod("add_integration")
 }
