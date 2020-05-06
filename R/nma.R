@@ -167,19 +167,15 @@ nma <- function(network,
   }
 
   # Check other args
-  if (!is.logical(QR) || length(QR) > 1) abort("`QR` should be a logical scalar (TRUE or FALSE).")
-  if (!is.logical(center) || length(center) > 1)
-    abort("`center` should be a logical scalar (TRUE or FALSE).")
-  if (!is.numeric(int_thin) ||
-      length(int_thin) > 1 ||
-      int_thin < 1 ||
-      trunc(int_thin) != int_thin) abort("`int_thin` should be an integer >= 1.")
+  if (!rlang::is_bool(QR)) abort("`QR` should be a logical scalar (TRUE or FALSE).")
+  if (!rlang::is_bool(center)) abort("`center` should be a logical scalar (TRUE or FALSE).")
+  if (!rlang::is_scalar_integerish(int_thin) ||
+      int_thin < 1) abort("`int_thin` should be an integer >= 1.")
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
     adapt_delta <- switch(trt_effects, fixed = 0.8, random = 0.95)
-  } else if (!is.numeric(adapt_delta) ||
-      length(adapt_delta) > 1 ||
+  } else if (!rlang::is_scalar_double(adapt_delta) ||
       adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
   # Use numerical integration? TRUE if class mlnmr_data and regression is not NULL
@@ -664,15 +660,11 @@ nma.fit <- function(ipd_x, ipd_y,
   if (trt_effects == "fixed") prior_het <- half_normal(1)
 
   # Check other args
-  if (!is.logical(QR) || length(QR) > 1) abort("`QR` should be a logical scalar (TRUE or FALSE).")
-  if (!is.numeric(int_thin) ||
-      length(int_thin) > 1 ||
-      int_thin < 1 ||
-      trunc(int_thin) != int_thin) abort("`int_thin` should be an integer >= 1.")
-  if (!is.numeric(n_int) ||
-      length(n_int) > 1 ||
-      n_int < 1 ||
-      trunc(n_int) != n_int) abort("`n_int` should be an integer >= 1.")
+  if (!rlang::is_bool(QR)) abort("`QR` should be a logical scalar (TRUE or FALSE).")
+  if (!rlang::is_scalar_integerish(int_thin) ||
+      int_thin < 1) abort("`int_thin` should be an integer >= 1.")
+  if (!rlang::is_scalar_integerish(n_int) ||
+      n_int < 1) abort("`n_int` should be an integer >= 1.")
 
   # Allow n_int = NULL if no AgD
   if (!has_agd_arm && !has_agd_contrast) n_int <- 0

@@ -50,7 +50,7 @@ add_integration.data.frame <- function(x, ...,
                                        cor = NULL, n_int = 1000L, int_args = list()) {
 
   # Check n_int
-  if (length(n_int) > 1 || !is.numeric(n_int) || n_int != trunc(n_int) || n_int <= 0) {
+  if (!rlang::is_scalar_integerish(n_int) || n_int <= 0) {
     abort("`n_int` should be a positive integer.")
   }
 

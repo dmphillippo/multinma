@@ -65,9 +65,7 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 
   if (!missing(pars) && !is.character(pars)) abort("`pars` should be a character vector")
 
-  if (!is.numeric(digits) ||
-      length(digits) > 1 ||
-      trunc(digits) != digits) abort("`digits` must be a single integer")
+  if (!rlang::is_scalar_integerish(digits)) abort("`digits` must be a single integer")
 
   x_sum <- tibble::as_tibble(x)
 

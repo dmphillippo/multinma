@@ -481,17 +481,17 @@ plot.nma_data <- function(x, ..., layout, circular,
     circular <- FALSE
   }
 
-  if (!is.logical(weight_edges) || length(weight_edges) > 1)
+  if (!rlang::is_bool(weight_edges))
     abort("`weight_edges` must be TRUE or FALSE.")
 
-  if (!is.logical(weight_nodes) || length(weight_nodes) > 1)
+  if (!rlang::is_bool(weight_nodes))
     abort("`weight_nodes` must be TRUE or FALSE.")
 
   if (weight_nodes && !has_agd_sample_size(x))
     abort(paste("AgD study sample sizes not specified in network, cannot weight nodes.",
                 "Specify `sample_size` in set_agd_*(), or set weight_nodes = FALSE.", sep = "\n"))
 
-  if (!is.logical(show_trt_class) || length(show_trt_class) > 1)
+  if (!rlang::is_bool(show_trt_class))
     abort("`show_trt_class` must be TRUE or FALSE.")
 
   if (show_trt_class && is.null(x$classes))

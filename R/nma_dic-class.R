@@ -33,9 +33,7 @@ NULL
 #'
 #' @examples
 print.nma_dic <- function(x, digits = 1, ...) {
-  if (!is.numeric(digits) ||
-      length(digits) > 1 ||
-      trunc(digits) != digits) abort("`digits` must be a single integer.")
+  if (!rlang::is_scalar_integerish(digits)) abort("`digits` must be a single integer.")
 
   n <- sum(nrow(x$pointwise$ipd),
            nrow(x$pointwise$agd_arm),
