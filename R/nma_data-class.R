@@ -68,7 +68,7 @@ print.nma_data <- function(x, ..., n = 10) {
   cwidth <- getOption("width")
 
   # Error if n is not an integer
-  if (!is.numeric(n) | trunc(n) != n) abort("Argument `n` should be an integer")
+  if (!rlang::is_scalar_integerish(n)) abort("Argument `n` should be an integer")
 
   if (has_ipd(x)) {
     s_ipd <- x$ipd %>%
