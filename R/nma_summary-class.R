@@ -160,6 +160,39 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #'
 #' @export
 #' @examples
+#' ## Smoking cessation
+#' @template ex_smoking_network
+#' @template ex_smoking_nma_re
+#' @examples \donttest{
+#' # Produce relative effects
+#' smk_releff_RE <- relative_effects(smk_fit_RE)
+#' plot(smk_releff_RE, ref_line = 0)
+#'
+#' # Customise plot options
+#' plot(smk_releff_RE, ref_line = 0, stat = "halfeyeh")
+#'
+#' # Further customisation is possible with ggplot commands
+#' plot(smk_releff_RE, ref_line = 0, stat = "halfeyeh", slab_alpha = 0.6) +
+#'   ggplot2::aes(slab_fill = ifelse(..x.. < 0, "darkred", "grey60"))
+#'
+#' # Produce posterior ranks
+#' smk_rank_RE <- posterior_ranks(smk_fit_RE, lower_better = FALSE)
+#' plot(smk_rank_RE)
+#'
+#' # Produce rank probabilities
+#' smk_rankprob_RE <- posterior_rank_probs(smk_fit_RE, lower_better = FALSE)
+#' plot(smk_rankprob_RE)
+#'
+#' # Produce cumulative rank probabilities
+#' smk_cumrankprob_RE <- posterior_rank_probs(smk_fit_RE, lower_better = FALSE,
+#'                                            cumulative = TRUE)
+#' plot(smk_cumrankprob_RE)
+#'
+#' #' # Further customisation is possible with ggplot commands
+#' plot(smk_cumrankprob_RE) +
+#'   ggplot2::facet_null() +
+#'   ggplot2::aes(colour = Treatment)
+#' }
 plot.nma_summary <- function(x, ...,
                              stat = "pointintervalh",
                              ref_line = NA_real_) {
