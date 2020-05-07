@@ -163,6 +163,22 @@ plot.stan_nma <- function(x, ...,
 #' @importFrom truncdist dtrunc ptrunc qtrunc
 #'
 #' @examples
+#' ## Smoking cessation NMA
+#' @template ex_smoking_network
+#' @template ex_smoking_nma_re
+#' @examples \donttest{
+#' # Plot prior vs. posterior, by default all parameters are plotted
+#' plot_prior_posterior(smk_fit_RE)
+#'
+#' # Plot prior vs. posterior for heterogeneity SD only
+#' plot_prior_posterior(smk_fit_RE, prior = "het")
+#'
+#' # Customise plot
+#' plot_prior_posterior(smk_fit_RE, prior = "het",
+#'                      prior_args = list(colour = "darkred", size = 2),
+#'                      post_args = list(alpha = 0.6))
+#' }
+#'
 plot_prior_posterior <- function(x, ...,
                                  prior = NULL,
                                  post_args = list(),
