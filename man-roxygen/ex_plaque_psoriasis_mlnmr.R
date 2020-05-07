@@ -1,4 +1,4 @@
-#' @examples
+#' @examples \donttest{
 #' # Fitting a ML-NMR model.
 #' # Specify a regression model to include effect modifier interactions for five
 #' # covariates, along with main (prognostic) effects. We use a probit link and
@@ -19,4 +19,5 @@
 #'                prior_reg = normal(scale = 10),
 #'                init_r = 0.1,
 #'                QR = TRUE)
+#' }
 #'
