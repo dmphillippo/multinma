@@ -107,7 +107,12 @@ half_student_t <- function(scale, df) {
 #' @rdname priors
 #' @export
 exponential <- function(scale = 1/rate, rate = 1/scale) {
-  check_prior_scale(rate, type = "scale or rate")
+  if (missing(scale) && missing(rate))
+    abort("Missing argument. Specify either `rate` or `scale`.")
+  if (!missing(rate) && !missing(scale))
+    warn("Both `rate` and `scale` provided, only `scale` will be used")
+
+  check_prior_scale(scale, type = "scale or rate")
 
   return(new_nma_prior("Exponential", scale = scale))
 }
