@@ -11,3 +11,4 @@
 #'
 #' # Print details
 #' smk_net
+#'

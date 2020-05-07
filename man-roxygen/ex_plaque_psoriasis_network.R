@@ -61,3 +61,4 @@
 #'
 #' # Print network details
 #' pso_net
+#'
