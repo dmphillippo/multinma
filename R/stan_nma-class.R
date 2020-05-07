@@ -92,6 +92,24 @@ print.stan_nma <- function(x, ...) {
 #'   [posterior_ranks()], [posterior_rank_probs()]
 #'
 #' @examples
+#' ## Smoking cessation
+#' @template ex_smoking_network
+#' @template ex_smoking_nma_re
+#' @examples \donttest{
+#' # Summary and plot of all model parameters
+#' summary(smk_fit_RE)
+#' plot(smkf_fit_RE)
+#'
+#' # Summary and plot of heterogeneity tau only
+#' summary(smk_fit_RE, pars = "tau")
+#' plot(smk_fit_RE, pars = "tau")
+#'
+#' # Customising plot output
+#' plot(smk_fit_RE,
+#'      pars = c("d", "tau"),
+#'      stat = "halfeyeh",
+#'      ref_line = 0)
+#' }
 summary.stan_nma <- function(x, ...,
                              pars, include,
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975)
