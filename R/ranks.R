@@ -38,6 +38,74 @@
 #'   aim to increase the rate of a positive outcome then `lower_better = FALSE`.
 #'
 #' @examples
+#' ## Smoking cessation
+#' @template ex_smoking_network
+#' @template ex_smoking_nma_re
+#' @examples \donttest{
+#' # Produce posterior ranks
+#' smk_rank_RE <- posterior_ranks(smk_fit_RE, lower_better = FALSE)
+#' smk_rank_RE
+#' plot(smk_rank_RE)
+#'
+#' # Produce rank probabilities
+#' smk_rankprob_RE <- posterior_rank_probs(smk_fit_RE, lower_better = FALSE)
+#' smk_rankprob_RE
+#' plot(smk_rankprob_RE)
+#'
+#' # Produce cumulative rank probabilities
+#' smk_cumrankprob_RE <- posterior_rank_probs(smk_fit_RE, lower_better = FALSE,
+#'                                            cumulative = TRUE)
+#' smk_cumrankprob_RE
+#' plot(smk_cumrankprob_RE)
+#'
+#' #' # Further customisation is possible with ggplot commands
+#' plot(smk_cumrankprob_RE) +
+#'   ggplot2::facet_null() +
+#'   ggplot2::aes(colour = Treatment)
+#' }
+#'
+#' ## Plaque psoriasis ML-NMR
+#' @template ex_plaque_psoriasis_network
+#' @template ex_plaque_psoriasis_integration
+#' @template ex_plaque_psoriasis_mlnmr
+#' @examples \donttest{
+#' # Produce population-adjusted rankings for all study populations in
+#' # the network
+#'
+#' # Ranks
+#' pso_rank <- posterior_ranks(pso_fit)
+#' pso_rank
+#' plot(pso_rank)
+#'
+#' # Rank probabilities
+#' pso_rankprobs <- posterior_rank_probs(pso_fit)
+#' pso_rankprobs
+#' plot(pso_rankprobs)
+#'
+#' # Cumulative rank probabilities
+#' pso_cumrankprobs <- posterior_rank_probs(pso_fit, cumulative = TRUE)
+#' pso_cumrankprobs
+#' plot(pso_cumrankprobs)
+#'
+#' # Produce population-adjusted rankings for a different target
+#' # population
+#' new_agd_means <- data.frame(
+#'   bsa = 0.6,
+#'   prevsys = 0.1,
+#'   psa = 0.2,
+#'   weight = 10,
+#'   durnpso = 3)
+#'
+#' # Ranks
+#' posterior_ranks(pso_fit, newdata = new_agd_means)
+#'
+#' # Rank probabilities
+#' posterior_rank_probs(pso_fit, newdata = new_agd_means)
+#'
+#' # Cumulative rank probabilities
+#' posterior_rank_probs(pso_fit, newdata = new_agd_means,
+#'                      cumulative = TRUE)
+#' }
 posterior_ranks <- function(x, newdata = NULL, study = NULL,
                             lower_better = TRUE,
                             probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
@@ -156,7 +224,6 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
 #'   each treatment having a given rank or better.
 #' @export
 #' @rdname posterior_ranks
-#' @examples
 posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better = TRUE,
                                  cumulative = FALSE) {
   # Checks
