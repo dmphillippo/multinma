@@ -353,7 +353,7 @@ plot_prior_posterior <- function(x, ...,
 #' See \insertCite{methods_paper,Phillippo_thesis}{multinma} for details.
 #'
 #' @param x An object of type `stan_mlnmr`
-#' @param ...
+#' @param ... Additional arguments passed to the `tidybayes` plot stat.
 #' @param stat Character string specifying the `tidybayes` plot stat used to
 #'   summarise the integration error over the posterior. Default is `"violin"`,
 #'   which is equivalent to `"eye"` with some cosmetic tweaks.
@@ -375,6 +375,14 @@ plot_prior_posterior <- function(x, ...,
 #' @export
 #'
 #' @examples
+#' ## Plaque psoriasis ML-NMR
+#' @template ex_plaque_psoriasis_network
+#' @template ex_plaque_psoriasis_integration
+#' @template ex_plaque_psoriasis_mlnmr
+#' @examples \donttest{
+#' # Plot numerical integration error
+#' plot_integration_error(pso_fit)
+#' }
 plot_integration_error <- function(x, ...,
                                    stat = "violin",
                                    show_expected_rate = TRUE) {
