@@ -71,6 +71,16 @@
 #' @export
 #'
 #' @examples
+#' ## Smoking cessation NMA
+#' @template ex_smoking_network
+#' @template ex_smoking_nma
+#' @examples
+#'
+#' ## Plaque psoriasis ML-NMR
+#' @template ex_plaque_psoriasis_network
+#' @template ex_plaque_psoriasis_integration
+#' @template ex_plaque_psoriasis_mlnmr
+#'
 nma <- function(network,
                 consistency = c("consistency", "nodesplit", "ume"),
                 trt_effects = c("fixed", "random"),
