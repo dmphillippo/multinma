@@ -104,9 +104,9 @@ summary.stan_nma <- function(x, ...,
     if (!rlang::is_bool(include)) abort("`include` should be TRUE or FALSE")
   }
   if (missing(pars)) {
-    pars <- c("log_lik", "resdev", "fitted",
-              "theta_bar_cum", "theta2_bar_cum",
-              "lp__")
+    pars <- c("log_lik", "resdev", "fitted", "lp__")
+    if (inherits(x, "stan_mlnmr")) pars <- c(pars, "theta_bar_cum")
+    if (x$likelihood %in% c("bernoulli2", "binomial2")) pars <- c(pars, "theta2_bar_cum")
   } else {
     if (!is.character(pars)) abort("`pars` should be a character vector")
   }
