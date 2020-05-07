@@ -140,6 +140,9 @@ plot.stan_nma <- function(x, ...,
 
 #' Plot prior vs posterior distribution
 #'
+#' Produce plots comparing the prior and posterior distributions of model
+#' parameters.
+#'
 #' @param x A `stan_nma` object
 #' @param ... Additional arguments passed on to methods
 #' @param prior Character vector selecting the prior and posterior
@@ -159,6 +162,9 @@ plot.stan_nma <- function(x, ...,
 #'
 #' @return A `ggplot` object.
 #' @export
+#'
+#' @details Prior distributions are displayed as lines, posterior distributions
+#'   are displayed as histograms.
 #'
 #' @importFrom truncdist dtrunc ptrunc qtrunc
 #'
