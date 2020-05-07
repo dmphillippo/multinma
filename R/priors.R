@@ -43,7 +43,9 @@
 #' @return Object of class [nma_prior].
 #' @export
 #'
-#' @examples
+#' @seealso [summary.nma_prior()] for summarising details of prior
+#'   distributions. [plot_prior_posterior()] for plots comparing the prior and
+#'   posterior distributions of model parameters.
 normal <- function(location = 0, scale) {
   check_prior_location(location)
   check_prior_scale(scale)
