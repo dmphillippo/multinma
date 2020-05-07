@@ -30,6 +30,44 @@
 #' @seealso [plot.nma_summary()] for plotting the relative effects.
 #'
 #' @examples
+#' ## Smoking cessation
+#' @template ex_smoking_network
+#' @template ex_smoking_nma_re
+#' @examples \donttest{
+#' # Produce relative effects
+#' smk_releff_RE <- relative_effects(smk_fit_RE)
+#' smk_releff_RE
+#' plot(smk_releff_RE, ref_line = 0)
+#'
+#' # Relative effects for all pairwise comparisons
+#' relative_effects(smk_fit_RE, all_contrasts = TRUE)
+#'
+#' # Relative effects against a different reference treatment
+#' relative_effects(smk_fit_RE, trt_ref = "Self-help")
+#' }
+#'
+#' ## Plaque psoriasis ML-NMR
+#' @template ex_plaque_psoriasis_network
+#' @template ex_plaque_psoriasis_integration
+#' @template ex_plaque_psoriasis_mlnmr
+#' @examples \donttest{
+#' # Produce population-adjusted relative effects for all study populations in
+#' # the network
+#' pso_releff <- relative_effects(pso_fit)
+#' pso_releff
+#' plot(pso_releff, ref_line = 0)
+#'
+#' # Produce population-adjusted relative effects for a different target
+#' # population
+#' new_agd_means <- data.frame(
+#'   bsa = 0.6,
+#'   prevsys = 0.1,
+#'   psa = 0.2,
+#'   weight = 10,
+#'   durnpso = 3)
+#'
+#' relative_effects(pso_fit, newdata = new_agd_means)
+#' }
 relative_effects <- function(x, newdata = NULL, study = NULL,
                              all_contrasts = FALSE, trt_ref = NULL,
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
