@@ -73,7 +73,9 @@
 #' @examples
 #' ## Smoking cessation NMA
 #' @template ex_smoking_network
-#' @template ex_smoking_nma
+#' @template ex_smoking_nma_fe
+#' @template ex_smoking_nma_re
+#' @template ex_smoking_nma_re_ume
 #' @examples
 #'
 #' ## Plaque psoriasis ML-NMR
