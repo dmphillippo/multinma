@@ -7,6 +7,35 @@
 #' @name mcmc_array-class
 #' @aliases mcmc_array
 #'
+#' @examples
+#' ## Smoking cessation
+#' @template ex_smoking_network
+#' @template ex_smoking_nma_re
+#' @examples
+#' # Working with arrays of posterior draws (as mcmc_array objects) is
+#' # convenient when transforming parameters
+#'
+#' # Transforming log odds ratios to odds ratios
+#' LOR_array <- as.array(smk_releff_RE)
+#' OR_array <- exp(LOR_array)
+#'
+#' # mcmc_array objects can be summarised to produce a nma_summary object
+#' smk_OR_RE <- summary(OR_array)
+#'
+#' # This can then be printed or plotted
+#' smk_OR_RE
+#' plot(smk_OR_RE, ref_line = 1)
+#'
+#' # Transforming heterogeneity SD to variance
+#' tau_array <- as.array(smk_fit_RE, pars = "tau")
+#' tausq_array <- tau_array^2
+#'
+#' # Correct parameter names
+#' names(tausq_array) <- "tausq"
+#'
+#' # Summarise
+#' summary(tausq_array)
+#'
 NULL
 
 #' @param x,object A 3D MCMC array of class `mcmc_array`
