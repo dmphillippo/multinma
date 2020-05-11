@@ -41,9 +41,10 @@ NULL
 #' Methods for `nma_summary` objects
 #'
 #' The `as.data.frame()`, `as_tibble()`, and `as.tibble()` methods return the
-#' posterior summary statistics in a data frame or tibble. The `as.matrix()` and
-#' `as.array()` methods return the posterior draws as a matrix or 3D array
-#' (Iteration, Chain, Parameter).
+#' posterior summary statistics in a data frame or tibble. The `as.matrix()`
+#' method returns a matrix of posterior draws. The `as.array()` method returns a
+#' 3D array \[Iteration, Chain, Parameter\] of posterior draws (as class
+#' [mcmc_array]).
 #'
 #'
 #' @param x A `nma_summary` object

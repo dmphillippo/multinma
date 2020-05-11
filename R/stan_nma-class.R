@@ -579,8 +579,8 @@ as.stanfit.default <- function(x, ...) {
 #' @param include Logical, are parameters in `pars` to be included (`TRUE`, default) or excluded (`FALSE`)?
 #'
 #' @return The `as.array()` method produces a 3D array \[Iteration, Chain,
-#'   Parameter\] containing posterior samples of each parameter. This has the
-#'   side effect of enabling
+#'   Parameter\] containing posterior samples of each parameter (as class
+#'   [mcmc_array]). This has the side effect of enabling
 #'   \code{\link[bayesplot:bayesplot-package]{bayesplot}} functions to
 #'   seamlessly work on `stan_nma` objects.
 #'
