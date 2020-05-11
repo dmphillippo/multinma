@@ -218,7 +218,7 @@ af_4b_beta[ , , 1:2] <- sweep(af_4b_beta[ , , 1:2], 1:2,
 
 # Set beta[Anti-coagulant:stroke] = -beta[Control:stroke]
 af_4b_beta[ , , "beta[.trtclassControl:stroke]"] <- -af_4b_beta[ , , "beta[.trtclassControl:stroke]"]
-dimnames(af_4b_beta)[[3]][3] <- "beta[.trtclassAnti-coagulant:stroke]"
+names(af_4b_beta)[3] <- "beta[.trtclassAnti-coagulant:stroke]"
 
 # Summarise
 summary(af_4b_beta)

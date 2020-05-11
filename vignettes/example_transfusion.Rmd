@@ -99,7 +99,7 @@ The posterior distribution for the heterogeneity variance $\tau^2$ is summarised
 ```{r}
 noninf_tau <- as.array(tr_fit_RE_noninf, pars = "tau")
 noninf_tausq <- noninf_tau^2
-dimnames(noninf_tausq)[[3]] <- "tausq"
+names(noninf_tausq) <- "tausq"
 summary(noninf_tausq)
 ```
 
@@ -150,7 +150,7 @@ The posterior distribution for the heterogeneity variance $\tau^2$ is summarised
 ```{r}
 inf_tau <- as.array(tr_fit_RE_inf, pars = "tau")
 inf_tausq <- inf_tau^2
-dimnames(inf_tausq)[[3]] <- "tausq"
+names(inf_tausq) <- "tausq"
 summary(inf_tausq)
 ```
 
