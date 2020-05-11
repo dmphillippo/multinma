@@ -15,7 +15,9 @@ NULL
 #'
 #' @rdname mcmc_array-class
 #' @return The `summary()` method returns a [nma_summary] object, the `print()`
-#'   method returns `x` invisibly.
+#'   method returns `x` invisibly. The `names()` method returns a character
+#'   vector of parameter names, and `names()<-` returns the object with updated
+#'   parameter names.
 #' @export
 summary.mcmc_array <- function(object, ..., probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
   ss <- summary_mcmc_array(object, probs = probs)
@@ -31,4 +33,19 @@ print.mcmc_array <- function(x, ...) {
   cglue("A MCMC array with {prod(d[1:2])} draws ({d[1]} iterations in {d[2]} chain{if (d[2] > 1) 's' else ''}) of {d[3]} parameter{if (d[3] > 1) 's' else ''}.")
   NextMethod(...)
   invisible(x)
+}
+
+#' @rdname mcmc_array-class
+#' @export
+names.mcmc_array <- function(x) {
+  return(dimnames(x)[[3]])
+}
+
+#' @rdname mcmc_array-class
+#' @param value Character vector of replacement parameter names
+#' @export
+`names<-.mcmc_array` <- function(x, value) {
+  out <- x
+  dimnames(out)[[3]] <- value
+  return(out)
 }
