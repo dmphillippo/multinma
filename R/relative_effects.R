@@ -44,6 +44,18 @@
 #'
 #' # Relative effects against a different reference treatment
 #' relative_effects(smk_fit_RE, trt_ref = "Self-help")
+#'
+#' # Transforming to odds ratios
+#' # We work with the array of relative effects samples
+#' LOR_array <- as.array(smk_releff_RE)
+#' OR_array <- exp(LOR_array)
+#'
+#' # mcmc_array objects can be summarised to produce a nma_summary object
+#' smk_OR_RE <- summary(OR_array)
+#'
+#' # This can then be printed or plotted
+#' smk_OR_RE
+#' plot(smk_OR_RE, ref_line = 1)
 #' }
 #'
 #' ## Plaque psoriasis ML-NMR
