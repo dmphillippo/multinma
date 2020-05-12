@@ -550,8 +550,6 @@ plot_integration_error <- function(x, ...,
 #'
 #' @return A \code{\link[rstan:stanfit-class]{stanfit}} object.
 #' @export
-#'
-#' @examples
 as.stanfit <- function(x, ...) {
   UseMethod("as.stanfit")
 }
