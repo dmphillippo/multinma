@@ -11,7 +11,29 @@
 #' @seealso [print.nma_dic()] for printing details, [plot.nma_dic()] for
 #'   producing plots of residual deviance contributions.
 #'
-#' @examples
+#' @examples ## Smoking cessation
+#' @template ex_smoking_network
+#' @template ex_smoking_nma_fe
+#' @template ex_smoking_nma_re
+#' @examples \donttest{
+#' # Compare DIC of FE and RE models
+#' (smk_dic_FE <- dic(smk_fit_FE))
+#' (smk_dic_RE <- dic(smk_fit_RE))   # substantially better fit
+#'
+#' # Plot residual deviance contributions under RE model
+#' plot(smk_dic_RE)
+#'
+#' # Check for inconsistency using UME model
+#' }
+#' @template ex_smoking_nma_re_ume
+#' @examples \donttest{
+#' # Compare DIC
+#' smk_dic_RE
+#' (smk_dic_RE_UME <- dic(smk_fit_RE_UME))  # no difference in fit
+#'
+#' # Compare residual deviance contributions
+#' plot(smk_dic_RE, smk_dic_RE_UME, show_uncertainty = FALSE)
+#' }
 dic <- function(x, ...) {
   if (!inherits(x, "stan_nma")) abort("Not a `stan_nma` object.")
 

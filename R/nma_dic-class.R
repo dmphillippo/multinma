@@ -30,8 +30,6 @@ NULL
 #'
 #' @return
 #' @export
-#'
-#' @examples
 print.nma_dic <- function(x, digits = 1, ...) {
   if (!rlang::is_scalar_integerish(digits)) abort("`digits` must be a single integer.")
 
@@ -88,7 +86,51 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' @references
 #'   \insertAllCited{}
 #'
-#' @examples
+#' @examples ## Smoking cessation
+#' @template ex_smoking_network
+#' @template ex_smoking_nma_fe
+#' @template ex_smoking_nma_re
+#' @examples \donttest{
+#' # Compare DIC of FE and RE models
+#' (smk_dic_FE <- dic(smk_fit_FE))
+#' (smk_dic_RE <- dic(smk_fit_RE))   # substantially better fit
+#'
+#' # Plot residual deviance contributions under RE model
+#' plot(smk_dic_RE)
+#'
+#' # Changing the plot stat used
+#' plot(smk_dic_RE, stat = "intervalh")
+#'
+#' # Further customisation is possible using ggplot commands
+#' # For example, highlighting data points with residual deviance above a certain threshold
+#' plot(smk_dic_RE) +
+#'   ggplot2::aes(colour = ifelse(..y.. > 1.5, "darkorange", "black")) +
+#'   ggplot2::scale_colour_identity()
+#'
+#' # Or by posterior probability, for example here a central probability of 0.6
+#' # corresponds to a lower tail probability of (1 - 0.6)/2 = 0.2
+#' plot(smk_dic_RE, .width = c(0.6, 0.95)) +
+#'   ggplot2::aes(colour = ifelse(..ymin.. > 1, "darkorange", "black")) +
+#'   ggplot2::scale_colour_identity()
+#'
+#' # Check for inconsistency using UME model
+#' }
+#' @template ex_smoking_nma_re_ume
+#' @examples \donttest{
+#' # Compare DIC
+#' smk_dic_RE
+#' (smk_dic_RE_UME <- dic(smk_fit_RE_UME))  # no difference in fit
+#'
+#' # Compare residual deviance contributions with a "dev-dev" plot
+#' plot(smk_dic_RE, smk_dic_RE_UME)
+#'
+#' # By default the dev-dev plot can be a little cluttered
+#' # Hiding the credible intervals
+#' plot(smk_dic_RE, smk_dic_RE_UME, show_uncertainty = FALSE)
+#'
+#' # Changing transparency
+#' plot(smk_dic_RE, smk_dic_RE_UME, point_alpha = 0.5, interval_alpha = 0.1)
+#' }
 plot.nma_dic <- function(x, y, ...,
                          show_uncertainty = TRUE,
                          stat = "pointinterval") {
