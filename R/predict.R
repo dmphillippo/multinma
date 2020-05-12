@@ -51,7 +51,65 @@
 #'
 #' @seealso [plot.nma_summary()] for plotting the predictions.
 #'
-#' @examples
+#' @examples ## Smoking cessation
+#' @template ex_smoking_network
+#' @template ex_smoking_nma_re
+#' @examples \donttest{
+#' # Predicted log odds of success in each study in the network
+#' predict(smk_fit_RE)
+#'
+#' # Predicted probabilities of success in each study in the network
+#' (smk_pred_RE <- predict(smk_fit_RE, type = "response"))
+#' plot(smk_pred_RE, ref_line = c(0, 1))
+#'
+#' # Predicted probabilities in a population with a baseline log odds of
+#' # response on No Intervantion given a Normal distribution with mean -2
+#' # and SD 0.15
+#' predict(smk_fit_RE, baseline = distr(qnorm, mean = -2, sd = 0.15))
+#' }
+#'
+#' ## Plaque psoriasis ML-NMR
+#' @template ex_plaque_psoriasis_network
+#' @template ex_plaque_psoriasis_integration
+#' @template ex_plaque_psoriasis_mlnmr
+#' @examples \donttest{
+#' # Predicted probabilities of response in each study in the network
+#' (pso_pred <- predict(pso_fit, type = "response"))
+#' plot(pso_pred, ref_line = c(0, 1))
+#'
+#' # Predicted probabilites of response in a new target population, with means
+#' # and SDs or proportions given by
+#' new_agd_int <- data.frame(
+#'   bsa_mean = 0.6,
+#'   bsa_sd = 0.3,
+#'   prevsys = 0.1,
+#'   psa = 0.2,
+#'   weight_mean = 10,
+#'   weight_sd = 1,
+#'   durnpso_mean = 3,
+#'   durnpso_sd = 1
+#' )
+#'
+#' # We need to add integration points to this data frame of new data
+#' # We use the weighted mean correlation matrix computed from the IPD studies
+#' new_agd_int <- add_integration(new_agd_int,
+#'                                durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+#'                                prevsys = distr(qbern, prob = prevsys),
+#'                                bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+#'                                weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
+#'                                psa = distr(qbern, prob = psa),
+#'                                cor = pso_net$int_cor,
+#'                                n_int = 1000)
+#'
+#' # Predicted probabilities of achieving PASI 75 in this target population, given
+#' # a Normal(-1.75, 0.08^2) distribution on the baseline probit-probability of
+#' # response on Placebo (at the reference levels of the covariates), are given by
+#' (pso_pred_new <- predict(pso_fit,
+#'                          type = "response",
+#'                          newdata = new_agd_int,
+#'                          baseline = distr(qnorm, -1.75, 0.08)))
+#' plot(pso_pred_new, ref_line = c(0, 1))
+#' }
 predict.stan_nma <- function(object,
                              baseline = NULL, newdata = NULL, study = NULL, trt_ref = NULL,
                              type = c("link", "response"),
