@@ -24,6 +24,8 @@ NULL
 
 #' Print DIC details
 #'
+#' Print details of DIC model fit statistics, computed by [dic()] function.
+#'
 #' @param x An object of class [nma_dic]
 #' @param digits An integer passed to [round()]
 #' @param ... Ignored
