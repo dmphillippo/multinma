@@ -133,8 +133,8 @@ predict.stan_nma <- function(object,
 
         # Make design matrix of all studies with baselines, and all treatments
         studies <- forcats::fct_unique(forcats::fct_drop(forcats::fct_c(
-          if (has_ipd(object$network)) object$network$ipd$.studies else factor(),
-          if (has_agd_arm(object$network)) object$network$agd_arm$.studies else factor()
+          if (has_ipd(object$network)) object$network$ipd$.study else factor(),
+          if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor()
           )))
         preddat <- tidyr::expand_grid(.study = studies, .trt = object$network$treatments)
 
