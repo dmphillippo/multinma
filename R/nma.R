@@ -585,6 +585,12 @@ nma.fit <- function(ipd_x, ipd_y,
   has_agd_arm <- !is.null(agd_arm_x) && !is.null(agd_arm_y)
   has_agd_contrast <-  !is.null(agd_contrast_x) && !is.null(agd_contrast_y) && !is.null(agd_contrast_Sigma)
 
+  # Ignore n_int if no AgD
+  if (!has_agd_arm && !has_agd_contrast) n_int <- 1
+  # Check n_int
+  if (!rlang::is_scalar_integerish(n_int) ||
+      n_int < 1) abort("`n_int` should be an integer >= 1.")
+
   # Check design matrices, outcomes
   if (has_ipd) {
     if (!is.matrix(ipd_x) || !is.numeric(ipd_x))
@@ -673,11 +679,6 @@ nma.fit <- function(ipd_x, ipd_y,
   if (!rlang::is_bool(QR)) abort("`QR` should be a logical scalar (TRUE or FALSE).")
   if (!rlang::is_scalar_integerish(int_thin) ||
       int_thin < 1) abort("`int_thin` should be an integer >= 1.")
-  if (!rlang::is_scalar_integerish(n_int) ||
-      n_int < 1) abort("`n_int` should be an integer >= 1.")
-
-  # Allow n_int = NULL if no AgD
-  if (!has_agd_arm && !has_agd_contrast) n_int <- 0
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
