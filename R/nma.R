@@ -328,9 +328,16 @@ nma <- function(network,
              rep(N_agd_contrast / n_int, each = n_int))
 
     # Center numeric columns used in regression model
-    reg_names <- colnames(model.frame(regression, data = idat_all))
-    # Ignore offset variables
-    reg_names <- reg_names[!stringr::str_detect(reg_names, "^offset\\(.*\\)$")]
+    reg_names <- all.vars(regression)
+
+    # Ignore any variable(s) used as offset(s)
+    reg_terms <- terms(regression)
+
+    if (length(attr(reg_terms, "offset"))) {
+      off_terms <- rownames(attr(reg_terms, "factors"))[attr(reg_terms, "offset")]
+      off_names <- all.vars(as.formula(paste("~", off_terms, sep = "+")))
+      reg_names <- setdiff(reg_names, off_names)
+    }
 
     reg_numeric <- purrr::map_lgl(idat_all[, reg_names], is.numeric)
 
