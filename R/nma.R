@@ -289,7 +289,7 @@ nma <- function(network,
   idat_all_plus_bl <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast)
 
   # Get sample sizes for centering
-  if (!is.null(regression) && center) {
+  if (!is.null(regression) && !is_only_offset(regression) && center) {
     # Check that required variables are present in each data set, and non-missing
     check_regression_data(regression,
                           dat_ipd = dat_ipd,
