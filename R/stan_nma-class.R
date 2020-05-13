@@ -348,6 +348,7 @@ plot_prior_posterior <- function(x, ...,
                                               data = draws,
                                               binwidth = function(x) diff(range(x)) / nclass.Sturges(x),
                                               boundary = 0,
+                                              position = "identity",
                                               !!! post_args,
                                               .homonyms = "last"))
 
