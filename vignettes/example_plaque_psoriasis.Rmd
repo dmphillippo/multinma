@@ -289,7 +289,7 @@ The divergent transition errors (red crosses) seem to be concentrated in the upp
 This suggests that the information to identify the heterogeneity parameter is weak - we have only four studies in the network - and that a more informative prior distribution might aid estimation.
 
 The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
-```{r pso_FE_pp_plot}
+```{r pso_RE_pp_plot}
 plot_prior_posterior(pso_fit_RE, prior = c("intercept", "trt", "reg", "het"))
 ```
 
