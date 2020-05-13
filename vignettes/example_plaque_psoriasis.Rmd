@@ -258,7 +258,7 @@ Fitting the model uses the same call to `nma()` as before, except now with `trt_
 pso_fit_RE <- nma(pso_net, 
                   trt_effects = "random",
                   link = "probit", 
-                  likelihood = "binomial2",
+                  likelihood = "bernoulli2",
                   regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
                   class_interactions = "common",
                   prior_intercept = normal(scale = 10),
