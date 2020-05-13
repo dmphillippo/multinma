@@ -218,12 +218,9 @@ nma <- function(network,
     dat_ipd <- network$ipd
 
     # Only take necessary columns
-    if (!is.null(regression)) {
-      dat_ipd <- dplyr::select(dat_ipd, dplyr::starts_with("."),
-                               colnames(model.frame(regression, data = dat_ipd)))
-    } else {
-      dat_ipd <- dplyr::select(dat_ipd, dplyr::starts_with("."))
-    }
+    dat_ipd <- get_model_data_columns(dat_ipd,
+                                      regression = regression,
+                                      label = "IPD")
 
     y_ipd <- get_outcome_variables(dat_ipd, network$outcome$ipd)
   } else {
@@ -244,12 +241,9 @@ nma <- function(network,
     }
 
     # Only take necessary columns
-    if (!is.null(regression)) {
-      idat_agd_arm <- dplyr::select(idat_agd_arm, dplyr::starts_with("."),
-                                    colnames(model.frame(regression, data = idat_agd_arm)))
-    } else {
-      idat_agd_arm <- dplyr::select(idat_agd_arm, dplyr::starts_with("."))
-    }
+    idat_agd_arm <- get_model_data_columns(idat_agd_arm,
+                                           regression = regression,
+                                           label = "AgD (arm-based)")
 
   } else {
     dat_agd_arm <- idat_agd_arm <- tibble::tibble()
@@ -269,12 +263,9 @@ nma <- function(network,
     }
 
     # Only take necessary columns
-    if (!is.null(regression)) {
-      idat_agd_contrast <- dplyr::select(idat_agd_contrast, dplyr::starts_with("."),
-                                         colnames(model.frame(regression, data = idat_agd_contrast)))
-    } else {
-      idat_agd_contrast <- dplyr::select(idat_agd_contrast, dplyr::starts_with("."))
-    }
+    idat_agd_contrast <- get_model_data_columns(idat_agd_contrast,
+                                                regression = regression,
+                                                label = "AgD (contrast-based)")
 
     # Get covariance structure for relative effects, using .se on baseline arm
     Sigma_agd_contrast <- make_Sigma(dat_agd_contrast)
@@ -1626,6 +1617,33 @@ make_nma_model_matrix <- function(nma_formula,
               offset_ipd = offset_ipd,
               offset_agd_arm = offset_agd_arm,
               offset_agd_contrast = offset_agd_contrast))
+}
+
+#' Extract columns used in model from data frame
+#'
+#' @param data Data frame
+#' @param regression Regression formula or NULL
+#' @param label Label for data source or NULL, used for informative errors
+#'
+#' @return Data frame with required columns
+#' @noRd
+get_model_data_columns <- function(data, regression = NULL, label = NULL) {
+  if (!is.null(label)) label <- paste(" in", label)
+  if (!is.null(regression)) {
+    regvars <- setdiff(all.vars(regression), c(".trt", ".trtclass", ".study"))
+    badvars <- setdiff(regvars, colnames(data))
+    if (length(badvars)) {
+      abort(
+        glue::glue("Regression variable{if (length(badvars) > 1) 's' else ''} ",
+                   glue::glue_collapse(glue::double_quote(badvars), sep = ", ", last = " and "),
+                   " not found", label, ".")
+      )
+    }
+    out <- dplyr::select(data, dplyr::starts_with("."), !! regvars)
+  } else {
+    out <- dplyr::select(data, dplyr::starts_with("."))
+  }
+  return(out)
 }
 
 #' Check data for regression

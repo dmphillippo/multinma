@@ -181,8 +181,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         }
 
         # Only take necessary columns
-        dat_agd_arm <- dplyr::select(dat_agd_arm, dplyr::starts_with("."),
-                                     colnames(model.frame(x$regression, data = dat_agd_arm)))
+        dat_agd_arm <- get_model_data_columns(dat_agd_arm, regression = x$regression, label = "AgD (arm-based)")
       } else {
         dat_agd_arm <- tibble::tibble()
       }
@@ -196,8 +195,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         }
 
         # Only take necessary columns
-        dat_agd_contrast <- dplyr::select(dat_agd_contrast, dplyr::starts_with("."),
-                                     colnames(model.frame(x$regression, data = dat_agd_contrast)))
+        dat_agd_contrast <- get_model_data_columns(dat_agd_contrast, regression = x$regression, label = "AgD (contrast-based)")
       } else {
         dat_agd_contrast <- tibble::tibble()
       }
@@ -207,8 +205,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         dat_ipd$.sample_size <- 1
 
         # Only take necessary columns
-        dat_ipd <- dplyr::select(dat_ipd, dplyr::starts_with("."),
-                                 colnames(model.frame(x$regression, data = dat_ipd)))
+        dat_ipd <- get_model_data_columns(dat_ipd, regression = x$regression, label = "IPD")
       } else {
         dat_ipd <- tibble::tibble()
       }

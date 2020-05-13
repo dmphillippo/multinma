@@ -312,9 +312,7 @@ predict.stan_nma <- function(object,
           }
 
           # Only take necessary columns
-          dat_agd_arm <- dplyr::select(dat_agd_arm,
-                                       dplyr::starts_with("."),
-                                       colnames(model.frame(object$regression, data = dat_agd_arm)))
+          dat_agd_arm <- get_model_data_columns(dat_agd_arm, regression = object$regression, label = "AgD (arm-based)")
         } else {
           dat_agd_arm <- tibble::tibble()
         }
@@ -323,9 +321,7 @@ predict.stan_nma <- function(object,
           dat_ipd <- object$network$ipd
 
           # Only take necessary columns
-          dat_ipd <- dplyr::select(dat_ipd,
-                                   dplyr::starts_with("."),
-                                   colnames(model.frame(object$regression, data = dat_ipd)))
+          dat_ipd <- get_model_data_columns(dat_ipd, regression = object$regression, label = "IPD")
 
           dat_ipd$.sample_size <- 1
         } else {
