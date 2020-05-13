@@ -170,7 +170,7 @@ plot.stan_nma <- function(x, ...,
 #'   control plot output for the posterior distribution
 #' @param prior_args List of arguments passed on to [ggplot2::geom_path] to
 #'   control plot output for the prior distribution. Additionally, `n` controls
-#'   the number of points the density curve is evaluate at (default `500`), and
+#'   the number of points the density curve is evaluated at (default `500`), and
 #'   `p_limits` controls the endpoints of the curve as quantiles (default
 #'   `c(.001, .999)`).
 #' @param overlay String, should prior or posterior be shown on top? Default
