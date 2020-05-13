@@ -93,29 +93,37 @@ test_that("nma() regression formula is valid", {
   expect_error(nma(smknet_2, regression = ~ a, center = FALSE,
                    prior_intercept = normal(0, 10),
                    prior_trt = normal(0, 10),
-                   prior_reg = normal(0, 5)), "Failed to construct design matrix")
+                   prior_reg = normal(0, 5)), 'Regression variable "a" not found')
   expect_error(nma(smknet_2, regression = ~ a*.trt, center = FALSE,
                    prior_intercept = normal(0, 10),
                    prior_trt = normal(0, 10),
-                   prior_reg = normal(0, 5)), "Failed to construct design matrix")
+                   prior_reg = normal(0, 5)), 'Regression variable "a" not found')
+  expect_error(nma(smknet_2, regression = ~ a^2*.trt, center = FALSE,
+                   prior_intercept = normal(0, 10),
+                   prior_trt = normal(0, 10),
+                   prior_reg = normal(0, 5)), 'Regression variable "a" not found')
   expect_error(nma(smknet_2, regression = ~ (a + b)*.trt, center = FALSE,
                    prior_intercept = normal(0, 10),
                    prior_trt = normal(0, 10),
-                   prior_reg = normal(0, 5)), "Failed to construct design matrix")
+                   prior_reg = normal(0, 5)), 'Regression variables "a" and "b" not found')
 
   expect_error(nma(smknet_2, regression = y ~ x, center = TRUE), "one-sided formula")
   expect_error(nma(smknet_2, regression = ~ a, center = TRUE,
                    prior_intercept = normal(0, 10),
                    prior_trt = normal(0, 10),
-                   prior_reg = normal(0, 5)), "Failed to construct design matrix")
+                   prior_reg = normal(0, 5)), 'Regression variable "a" not found')
   expect_error(nma(smknet_2, regression = ~ a*.trt, center = TRUE,
                    prior_intercept = normal(0, 10),
                    prior_trt = normal(0, 10),
-                   prior_reg = normal(0, 5)), "Failed to construct design matrix")
+                   prior_reg = normal(0, 5)), 'Regression variable "a" not found')
+  expect_error(nma(smknet_2, regression = ~ a^2*.trt, center = TRUE,
+                   prior_intercept = normal(0, 10),
+                   prior_trt = normal(0, 10),
+                   prior_reg = normal(0, 5)), 'Regression variable "a" not found')
   expect_error(nma(smknet_2, regression = ~ (a + b)*.trt, center = TRUE,
                    prior_intercept = normal(0, 10),
                    prior_trt = normal(0, 10),
-                   prior_reg = normal(0, 5)), "Failed to construct design matrix")
+                   prior_reg = normal(0, 5)), 'Regression variables "a" and "b" not found')
 })
 
 make_na <- function(x, n) {
