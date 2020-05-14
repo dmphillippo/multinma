@@ -194,7 +194,7 @@ test_that("error if qfun produces NaN, NA, NULL, Inf", {
 
 test_that("integration point marginals and correlations are correct", {
   skip_on_cran()
-  tol <- 0.001
+  tol <- 0.005
   cor_tol <- 0.05
   n_int <- 10000
 
@@ -212,8 +212,10 @@ test_that("integration point marginals and correlations are correct", {
   expect_equal(map_dbl(s2$agd_arm$.int_x1, mean), s2$agd_arm$x1_mean, tolerance = tol)
   expect_equal(map_dbl(s2$agd_arm$.int_x1, sd), s2$agd_arm$x1_sd, tolerance = tol)
   expect_equal(map_dbl(s2$agd_arm$.int_x2, mean), s2$agd_arm$x2, tolerance = tol)
+  # expect_equal(map2_dbl(s2$agd_arm$.int_x1, s2$agd_arm$.int_x3, cor, method = "spearman"),
+  #              rep(x1_x2_cor, nrow(s2$agd_arm)), tolerance = cor_tol)
   expect_equal(map2_dbl(s2$agd_arm$.int_x1, s2$agd_arm$.int_x3, cor, method = "spearman"),
-               rep(x1_x2_cor, nrow(s2$agd_arm)), tolerance = cor_tol)
+               rep(s2$int_cor[1, 3], nrow(s2$agd_arm)), tolerance = cor_tol)
 
   # 2 covariates, user cor matrix
   s3 <- add_integration(smknet,
@@ -230,8 +232,10 @@ test_that("integration point marginals and correlations are correct", {
 
   # Correlations between continuous and discrete seem hard to produce from the copula
   skip("Correlations between continuous and discrete covariates are difficult to recreate")
+  # expect_equal(map2_dbl(s2$agd_arm$.int_x1, s2$agd_arm$.int_x2, cor, method = "spearman"),
+  #              rep(x1_x2_cor, nrow(s2$agd_arm)), tolerance = cor_tol)
   expect_equal(map2_dbl(s2$agd_arm$.int_x1, s2$agd_arm$.int_x2, cor, method = "spearman"),
-               rep(x1_x2_cor, nrow(s2$agd_arm)), tolerance = cor_tol)
+               rep(s2$int_cor[1, 2], nrow(s2$agd_arm)), tolerance = cor_tol)
   expect_equal(map2_dbl(s3$agd_arm$.int_x1, s3$agd_arm$.int_x2, cor, method = "spearman"),
                rep(x1_x2_cor, nrow(s3$agd_arm)), tolerance = cor_tol)
 })
