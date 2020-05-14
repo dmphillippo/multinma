@@ -684,7 +684,8 @@ waic.stan_nma <- function(x, ...) {
 #' @param include Logical, are parameters in `pars` to be included (`TRUE`,
 #'   default) or excluded (`FALSE`)?
 #'
-#' @return
+#' @return A grid of ggplot objects produced by
+#'   \code{\link[bayesplot:MCMC-scatterplots]{bayesplot::mcmc_pairs()}}.
 #' @export
 #'
 #' @examples \donttest{
