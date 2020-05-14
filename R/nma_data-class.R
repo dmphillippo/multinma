@@ -441,7 +441,7 @@ is_network_connected <- function(network) {
 #'   any aggregate data in the network, using the `sample_size` option of
 #'   `set_agd_*()`.
 #'
-#' @return
+#' @return A `ggplot` object, as produced by [ggraph()].
 #' @export
 #'
 #' @examples ## Stroke prevention in atrial fibrillation
