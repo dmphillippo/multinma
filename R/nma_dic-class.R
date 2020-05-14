@@ -30,7 +30,7 @@ NULL
 #' @param digits An integer passed to [round()]
 #' @param ... Ignored
 #'
-#' @return
+#' @return `x` is returned invisibly.
 #' @export
 print.nma_dic <- function(x, digits = 1, ...) {
   if (!rlang::is_scalar_integerish(digits)) abort("`digits` must be a single integer.")
