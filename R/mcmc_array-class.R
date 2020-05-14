@@ -11,7 +11,7 @@
 #' ## Smoking cessation
 #' @template ex_smoking_network
 #' @template ex_smoking_nma_re
-#' @examples
+#' @examples \donttest{
 #' # Working with arrays of posterior draws (as mcmc_array objects) is
 #' # convenient when transforming parameters
 #'
@@ -35,7 +35,7 @@
 #'
 #' # Summarise
 #' summary(tausq_array)
-#'
+#' }
 NULL
 
 #' @param x,object A 3D MCMC array of class `mcmc_array`
