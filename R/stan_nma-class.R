@@ -75,7 +75,7 @@ print.stan_nma <- function(x, ...) {
 #' [relative_effects()], [predict.stan_nma()], [posterior_ranks()],
 #' [posterior_rank_probs()].
 #'
-#' @param x A `stan_nma` object
+#' @param object A `stan_nma` object
 #' @param ... Additional arguments passed on to other methods
 #' @param pars,include See \code{\link[rstan:stanfit-method-extract]{rstan::extract()}}
 #' @param probs Numeric vector of specifying quantiles of interest, default
@@ -110,7 +110,7 @@ print.stan_nma <- function(x, ...) {
 #'      stat = "halfeyeh",
 #'      ref_line = 0)
 #' }
-summary.stan_nma <- function(x, ...,
+summary.stan_nma <- function(object, ...,
                              pars, include,
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975)
                              ) {
@@ -123,13 +123,13 @@ summary.stan_nma <- function(x, ...,
   }
   if (missing(pars)) {
     pars <- c("log_lik", "resdev", "fitted", "lp__")
-    if (inherits(x, "stan_mlnmr")) pars <- c(pars, "theta_bar_cum")
-    if (x$likelihood %in% c("bernoulli2", "binomial2")) pars <- c(pars, "theta2_bar_cum")
+    if (inherits(object, "stan_mlnmr")) pars <- c(pars, "theta_bar_cum")
+    if (object$likelihood %in% c("bernoulli2", "binomial2")) pars <- c(pars, "theta2_bar_cum")
   } else {
     if (!is.character(pars)) abort("`pars` should be a character vector")
   }
 
-  sims <- as.array(x, pars = pars, include = include)
+  sims <- as.array(object, pars = pars, include = include)
   sums <- summary_mcmc_array(sims, probs = probs)
   ss <- list(summary = sums, sims = sims)
   class(ss) <- c("nma_parameter_summary", "nma_summary")
