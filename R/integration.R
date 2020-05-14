@@ -151,8 +151,8 @@ add_integration.data.frame <- function(x, ...,
     dplyr::bind_cols(
       x[, !int_cols],
       purrr::pmap_dfc(list(x_int_names, ds, u_cor_l),
-                      ~ rowwise(x) %>%
-                        transmute(!! ..1 := list(rlang::eval_tidy(rlang::call2(..2$qfun, p = ..3, !!! ..2$args)))))
+                      ~ dplyr::rowwise(x) %>%
+                        dplyr::transmute(!! ..1 := list(rlang::eval_tidy(rlang::call2(..2$qfun, p = ..3, !!! ..2$args)))))
     )
 
   # Check valid values produced
