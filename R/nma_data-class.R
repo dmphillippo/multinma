@@ -220,7 +220,8 @@ emph_g <- function(...) crayon::green$bold(...)
 #'   `.nstudy` attribute giving the number of studies making that comparison. If
 #'   `FALSE`, repeated edges are added for each study making the comparison.
 #'
-#' @return
+#' @return An `igraph` object for `as.igraph()`, a `tbl_graph` object for
+#'   `as_tbl_graph()`.
 #' @export
 #'
 #' @rdname graph_conversion
@@ -315,9 +316,7 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
   return(g)
 }
 
-#' @return
 #' @export
-#'
 #' @rdname graph_conversion
 #'
 #' @importFrom tidygraph as_tbl_graph
