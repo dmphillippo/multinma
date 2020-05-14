@@ -19,7 +19,7 @@
 #' @importFrom graphics plot pairs
 #' @importFrom grDevices nclass.Sturges
 #' @importFrom stats complete.cases sd median quantile model.frame model.matrix
-#'   model.offset optim pbinom dbinom qbinom as.formula update.formula
+#'   model.offset terms optim pbinom dbinom qbinom as.formula update.formula
 #'   weighted.mean runif plogis pnorm
 #' @importFrom utils packageVersion
 #'
