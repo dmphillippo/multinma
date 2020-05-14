@@ -439,7 +439,6 @@ dbern <- function(x, prob, log = FALSE) {
 #' @param mean,sd mean and standard deviation, overriding `shape` and
 #'   `rate` or `scale` if specified
 #'
-#' @return
 #' @export
 #' @rdname GammaDist
 #' @aliases qgamma
@@ -489,7 +488,6 @@ pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
 #' @param mean,sd mean and standard deviation, overriding `mu` and `sigma` if
 #'   specified
 #'
-#' @return
 #' @export
 #' @rdname logitNormal
 #' @aliases qlogitnorm
