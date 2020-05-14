@@ -4,7 +4,8 @@
 #' For example, if a model is fitted to binary data with a logit link, predicted
 #' outcome probabilities or log odds can be produced.
 #'
-#' @param object A `stan_nma` object created by [nma()]
+#' @param object A `stan_nma` object created by [nma()].
+#' @param ... Additional arguments (not used).
 #' @param baseline An optional [distr()] distribution for the baseline response
 #'   (i.e. intercept) on the linear predictor scale, about which to produce
 #'   absolute effects. For example, in a model with a logit link, this would be
@@ -110,7 +111,7 @@
 #'                          baseline = distr(qnorm, -1.75, 0.08)))
 #' plot(pso_pred_new, ref_line = c(0, 1))
 #' }
-predict.stan_nma <- function(object,
+predict.stan_nma <- function(object, ...,
                              baseline = NULL, newdata = NULL, study = NULL, trt_ref = NULL,
                              type = c("link", "response"),
                              level = c("aggregate", "individual"),
