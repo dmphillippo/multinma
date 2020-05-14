@@ -992,7 +992,11 @@ nma.fit <- function(ipd_x, ipd_y,
 #'   "reference treatment" paramterisation, or the "baseline shift"
 #'   parameterisation.
 #'
-#' @return
+#' @return For `RE_cor()`, a correlation matrix of dimension equal to the number
+#'   of random effects deltas (excluding those that are set equal to zero).
+#'
+#'   For `which_RE()`, an integer vector of IDs indexing the rows and columns of
+#'   the correlation matrix returned by `RE_cor()`.
 #' @export
 #' @aliases RE_cor
 #' @rdname random_effects
