@@ -751,8 +751,7 @@ nma.fit <- function(ipd_x, ipd_y,
   if (trt_effects == "random") {
     narm <- narm_ipd + ni_agd_arm + ni_agd_contrast
     if (!is.null(which_RE)) {
-      if (!is.numeric(which_RE) ||
-          trunc(which_RE) != which_RE ||
+      if (!rlang::is_integerish(which_RE) ||
           any(which_RE < 0) ||
           is.matrix(which_RE))
         abort("`which_RE` should be an integer vector.")
