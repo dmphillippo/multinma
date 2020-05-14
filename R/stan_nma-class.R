@@ -75,7 +75,7 @@ print.stan_nma <- function(x, ...) {
 #' [relative_effects()], [predict.stan_nma()], [posterior_ranks()],
 #' [posterior_rank_probs()].
 #'
-#' @param object A `stan_nma` object
+#' @param x,object A `stan_nma` object
 #' @param ... Additional arguments passed on to other methods
 #' @param pars,include See \code{\link[rstan:stanfit-method-extract]{rstan::extract()}}
 #' @param probs Numeric vector of specifying quantiles of interest, default
