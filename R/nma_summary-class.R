@@ -57,7 +57,11 @@ NULL
 #'
 #' @seealso [plot.nma_summary()]
 #'
-#' @return
+#' @return A `data.frame` for `as.data.frame()`, a `tbl_df` for `as.tibble()`
+#'   and `as_tibble()`, a `matrix` for `as.matrix()`, and an `mcmc_array` for
+#'   `as.array()`.
+#'
+#'   The `print()` method returns `x` invisibly.
 #' @export
 #'
 print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
