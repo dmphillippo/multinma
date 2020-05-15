@@ -24,6 +24,10 @@ variance, or precision, with argument `prior_het_type`.
 * Feature: Added log-Normal prior distribution.
 * Feature: Plots of prior distributions vs. posterior distributions with
 `plot_prior_posterior()`.
+* Fix: Random effects models with even moderate numbers of studies could be very
+slow. These now run much more quickly, using a sparse representation of the RE
+correlation matrix which is automatically enabled for sparsity above 90%
+(roughly equivalent to 10 or more studies).
 
 # multinma 0.0.1
 
