@@ -1,5 +1,6 @@
 functions {
 #include /include/prior_select.stan
+#include /include/count_nonzero.stan
 }
 data {
 #include /include/data_common.stan

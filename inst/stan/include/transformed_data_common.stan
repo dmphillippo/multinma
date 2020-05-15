@@ -8,6 +8,14 @@ vector[n_delta] RE_mu = rep_vector(0, n_delta);
 // Cholesky decomposition of RE MVN correlations
 matrix[0, 0] REdummy; // Use dummy zero-dim matrix to set RE_L to [0x0] when n_delta = 0
 cholesky_factor_corr[n_delta] RE_L = n_delta ? cholesky_decompose(RE_cor) : REdummy;
+// Sparse representation
+vector[0] wdummy;
+int vudummy[0];
+int RE_L_nz = count_nonzero(RE_L); // Number of non-zero entries
+int RE_sparse = RE_L_nz * 1.0 / num_elements(RE_L) <= 0.1; // Use sparse representation? (yes = 1)
+vector[RE_sparse ? RE_L_nz : 0] RE_L_w = RE_sparse ? csr_extract_w(RE_L): wdummy; // Non-zero entries
+int RE_L_v[RE_sparse ? RE_L_nz : 0] = RE_sparse ? csr_extract_v(RE_L): vudummy; // v sparse component
+int RE_L_u[RE_sparse ? n_delta + 1 : 0] = RE_sparse ? csr_extract_u(RE_L) : vudummy; // u sparse component
 
 // Total number of data points
 int totni = ni_ipd + nint * (ni_agd_arm + ni_agd_contrast);
