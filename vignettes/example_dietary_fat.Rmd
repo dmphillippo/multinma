@@ -11,15 +11,7 @@ params:
 ---
 
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.width = 8, 
-  fig.height = 6,
-  eval = identical(Sys.getenv("NOT_CRAN"), "true")
-)
-options(width = 100)
+```{r, child="children/knitr_setup.Rmd"}
 ```
 
 ```{r setup}
