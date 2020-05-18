@@ -59,8 +59,11 @@ Suggests:
     testthat (>= 2.1.0),
     knitr,
     rmarkdown,
-    parallel
+    parallel,
+    R.rsp
 RdMacros: Rdpack
 URL: http://github.com/dmphillippo/multinma
 BugReports: http://github.com/dmphillippo/multinma/issues
-VignetteBuilder: knitr
+VignetteBuilder: 
+    knitr,
+    R.rsp
