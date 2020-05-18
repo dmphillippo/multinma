@@ -2,15 +2,11 @@
 title: "Example: Transfusion in patients with neutropenia or neutrophil dysfunction"
 output: rmarkdown::html_vignette
 bibliography: ../inst/REFERENCES.bib
-vignette: >
-  %\VignetteIndexEntry{Example: Transfusion in patients with neutropenia or neutrophil dysfunction}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 params:
   run_tests: FALSE
 ---
 
-```{r, child="children/knitr_setup.Rmd"}
+```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
 ```
 ```{r, include=FALSE}
 set.seed(2684319)
