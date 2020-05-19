@@ -60,7 +60,8 @@ Suggests:
     knitr,
     rmarkdown,
     parallel,
-    R.rsp
+    R.rsp,
+    rprojroot
 RdMacros: Rdpack
 URL: http://github.com/dmphillippo/multinma
 BugReports: http://github.com/dmphillippo/multinma/issues
