@@ -2,3 +2,4 @@
 *.R
 *.asis
 !*/knitr_setup.R
+!precompile.R
