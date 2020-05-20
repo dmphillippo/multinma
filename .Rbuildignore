@@ -7,3 +7,4 @@
 ^man-roxygen/.*$
 ^data-raw$
 ^\.travis\.yml$
+^vignettes/example_.*\.Rmd$
