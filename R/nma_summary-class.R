@@ -496,7 +496,7 @@ summary_mcmc_array <- function(x, probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
   p_ess_bulk <- apply(x, 3, rstan::ess_bulk)
   p_ess_tail <- apply(x, 3, rstan::ess_tail)
   p_rhat <- apply(x, 3, rstan::Rhat)
-  p_se_mean <- p_sd / sqrt(apply(x, 3, rstan:::ess_mean))
+  # p_se_mean <- p_sd / sqrt(apply(x, 3, rstan:::ess_mean))
 
   p_quan <- apply(x, 3, quantile, probs = probs)
   if (length(probs) == 1) {
@@ -507,7 +507,9 @@ summary_mcmc_array <- function(x, probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
 
   ss <- tibble::tibble(
     parameter = pars,
-    mean = p_mean, se_mean = p_se_mean, sd = p_sd,
+    mean = p_mean,
+    # se_mean = p_se_mean,
+    sd = p_sd,
     !!! p_quan,
     Bulk_ESS = p_ess_bulk, Tail_ESS = p_ess_tail, Rhat = p_rhat)
 
