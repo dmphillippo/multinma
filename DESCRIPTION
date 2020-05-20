@@ -2,7 +2,7 @@ Package: multinma
 Title: Network Meta-Analysis of Individual and Aggregate Data in Stan
 Version: 0.0.1.9000
 Authors@R: 
-    person(given = "David",
+    person(given = c("David", "M."),
            family = "Phillippo",
            role = c("aut", "cre"),
            email = "david.phillippo@bristol.ac.uk",
