@@ -1,5 +1,6 @@
 ---
 output: github_document
+bibliography: inst/REFERENCES.bib
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -18,8 +19,8 @@ knitr::opts_chunk$set(
 [![CRAN status](https://www.r-pkg.org/badges/version/multinma)](https://CRAN.R-project.org/package=multinma)
 <!-- badges: end -->
 
-This `multinma` package implements network meta-analysis (NMA) and network meta-regression (NMR) models for aggregate data (AgD), individual patient data (IPD), and mixtures of both IPD and AgD using multilevel NMR (ML-NMR).
-Models are estimated in a Bayesian framwork using Stan.
+The `multinma` package implements network meta-analysis, network meta-regression, and multilevel network meta-regression models which combine evidence from a network of studies and treatments using either aggregate data or individual patient data from each study [@methods_paper;@Phillippo_thesis].
+Models are estimated in a Bayesian framwork using Stan [@Carpenter2017].
 
 ## Installation
 
@@ -35,3 +36,5 @@ And the development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("dmphillippo/multinma")
 ```
+
+## References
