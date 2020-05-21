@@ -478,7 +478,7 @@ nma <- function(network,
     }
     delta_labels <- c(ipd_delta_labels,
                       agd_arm_data_labels,
-                      agd_contrast_data_labels)
+                      agd_contrast_data_labels)[.which_RE > 0]
 
     fnames_oi[grepl("^delta\\[[0-9]+\\]$", fnames_oi)] <- paste0("delta[", delta_labels, "]")
   }
