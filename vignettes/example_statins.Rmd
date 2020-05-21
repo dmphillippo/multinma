@@ -179,61 +179,61 @@ tol_dic <- 0.1
 statin_FE_releff <- as.data.frame(summary(statin_fit_FE, pars = "d"))
 
 test_that("FE relative effects", {
-  expect_equal(statin_FE_releff$mean, -0.11, tolerance = tol)
-  expect_equal(statin_FE_releff$sd, 0.10, tolerance = tol)
-  expect_equal(statin_FE_releff$`2.5%`, -0.30, tolerance = tol)
-  expect_equal(statin_FE_releff$`97.5%`, 0.09, tolerance = tol)
+  expect_equivalent(statin_FE_releff$mean, -0.11, tolerance = tol)
+  expect_equivalent(statin_FE_releff$sd, 0.10, tolerance = tol)
+  expect_equivalent(statin_FE_releff$`2.5%`, -0.30, tolerance = tol)
+  expect_equivalent(statin_FE_releff$`97.5%`, 0.09, tolerance = tol)
 })
 
 statin_RE_releff <- as.data.frame(summary(statin_fit_RE, pars = "d"))
 
 test_that("RE relative effects", {
-  expect_equal(statin_RE_releff$mean, -0.07, tolerance = tol)
-  expect_equal(statin_RE_releff$sd, 0.20, tolerance = tol)
-  expect_equal(statin_RE_releff$`2.5%`, -0.48, tolerance = tol)
-  expect_equal(statin_RE_releff$`97.5%`, 0.36, tolerance = tol)
+  expect_equivalent(statin_RE_releff$mean, -0.07, tolerance = tol)
+  expect_equivalent(statin_RE_releff$sd, 0.20, tolerance = tol)
+  expect_equivalent(statin_RE_releff$`2.5%`, -0.48, tolerance = tol)
+  expect_equivalent(statin_RE_releff$`97.5%`, 0.36, tolerance = tol)
 })
 
 # Regression coefficients
 statin_FE_beta <- as.data.frame(summary(statin_fit_FE, pars = "beta"))
 
 test_that("FE regression beta", {
-  expect_equal(statin_FE_beta$mean, -0.21, tolerance = tol)
-  expect_equal(statin_FE_beta$sd, 0.11, tolerance = tol)
-  expect_equal(statin_FE_beta$`2.5%`, -0.42, tolerance = tol)
-  expect_equal(statin_FE_beta$`97.5%`, 0.01, tolerance = tol)
+  expect_equivalent(statin_FE_beta$mean, -0.21, tolerance = tol)
+  expect_equivalent(statin_FE_beta$sd, 0.11, tolerance = tol)
+  expect_equivalent(statin_FE_beta$`2.5%`, -0.42, tolerance = tol)
+  expect_equivalent(statin_FE_beta$`97.5%`, 0.01, tolerance = tol)
 })
 
 statin_RE_beta <- as.data.frame(summary(statin_fit_RE, pars = "beta"))
 
 test_that("RE regression beta", {
-  expect_equal(statin_RE_beta$mean, -0.29, tolerance = tol)
-  expect_equal(statin_RE_beta$sd, 0.26, tolerance = tol)
-  expect_equal(statin_RE_beta$`2.5%`, -0.86, tolerance = tol)
-  expect_equal(statin_RE_beta$`97.5%`, 0.20, tolerance = tol)
+  expect_equivalent(statin_RE_beta$mean, -0.29, tolerance = tol)
+  expect_equivalent(statin_RE_beta$sd, 0.26, tolerance = tol)
+  expect_equivalent(statin_RE_beta$`2.5%`, -0.86, tolerance = tol)
+  expect_equivalent(statin_RE_beta$`97.5%`, 0.20, tolerance = tol)
 })
 
 # RE heterogeneity SD
 statin_RE_sd <- as.data.frame(summary(statin_fit_RE, pars = "tau"))
 
 test_that("RE heterogeneity SD", {
-  expect_equal(statin_RE_sd$`50%`, 0.19, tolerance = tol)
-  expect_equal(statin_RE_sd$sd, 0.20, tolerance = tol)
-  expect_equal(statin_RE_sd$`2.5%`, 0.01, tolerance = tol)
-  expect_equal(statin_RE_sd$`97.5%`, 0.76, tolerance = tol)
+  expect_equivalent(statin_RE_sd$`50%`, 0.19, tolerance = tol)
+  expect_equivalent(statin_RE_sd$sd, 0.20, tolerance = tol)
+  expect_equivalent(statin_RE_sd$`2.5%`, 0.01, tolerance = tol)
+  expect_equivalent(statin_RE_sd$`97.5%`, 0.76, tolerance = tol)
 })
 
 # DIC
 test_that("FE DIC", {
-  expect_equal(statin_dic_FE$resdev, 45.9, tolerance = tol_dic)
-  expect_equal(statin_dic_FE$pd, 21.0, tolerance = tol_dic)
-  expect_equal(statin_dic_FE$dic, 66.9, tolerance = tol_dic)
+  expect_equivalent(statin_dic_FE$resdev, 45.9, tolerance = tol_dic)
+  expect_equivalent(statin_dic_FE$pd, 21.0, tolerance = tol_dic)
+  expect_equivalent(statin_dic_FE$dic, 66.9, tolerance = tol_dic)
 })
 
 test_that("RE DIC", {
-  expect_equal(statin_dic_RE$resdev, 42.6, tolerance = tol_dic)
-  expect_equal(statin_dic_RE$pd, 24.2, tolerance = tol_dic)
-  expect_equal(statin_dic_RE$dic, 66.8, tolerance = tol_dic)
+  expect_equivalent(statin_dic_RE$resdev, 42.6, tolerance = tol_dic)
+  expect_equivalent(statin_dic_RE$pd, 24.2, tolerance = tol_dic)
+  expect_equivalent(statin_dic_RE$dic, 66.8, tolerance = tol_dic)
 })
 
 

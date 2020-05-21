@@ -176,65 +176,65 @@ tol_dic <- 0.1
 diet_FE_releff <- as.data.frame(relative_effects(diet_fit_FE))
 
 test_that("FE relative effects", {
-  expect_equal(diet_FE_releff$mean, -0.01, tolerance = tol)
-  expect_equal(diet_FE_releff$sd, 0.054, tolerance = tol)
-  expect_equal(diet_FE_releff$`2.5%`, -0.11, tolerance = tol)
-  expect_equal(diet_FE_releff$`50%`, -0.01, tolerance = tol)
-  expect_equal(diet_FE_releff$`97.5%`, 0.10, tolerance = tol)
+  expect_equivalent(diet_FE_releff$mean, -0.01, tolerance = tol)
+  expect_equivalent(diet_FE_releff$sd, 0.054, tolerance = tol)
+  expect_equivalent(diet_FE_releff$`2.5%`, -0.11, tolerance = tol)
+  expect_equivalent(diet_FE_releff$`50%`, -0.01, tolerance = tol)
+  expect_equivalent(diet_FE_releff$`97.5%`, 0.10, tolerance = tol)
 })
 
 diet_RE_releff <- as.data.frame(relative_effects(diet_fit_RE))
 
 test_that("RE relative effects", {
-  expect_equal(diet_RE_releff$mean, -0.02, tolerance = tol)
-  expect_equal(diet_RE_releff$sd, 0.09, tolerance = tol)
-  expect_equal(diet_RE_releff$`2.5%`, -0.19, tolerance = tol)
-  expect_equal(diet_RE_releff$`50%`, -0.01, tolerance = tol)
-  expect_equal(diet_RE_releff$`97.5%`, 0.16, tolerance = tol)
+  expect_equivalent(diet_RE_releff$mean, -0.02, tolerance = tol)
+  expect_equivalent(diet_RE_releff$sd, 0.09, tolerance = tol)
+  expect_equivalent(diet_RE_releff$`2.5%`, -0.19, tolerance = tol)
+  expect_equivalent(diet_RE_releff$`50%`, -0.01, tolerance = tol)
+  expect_equivalent(diet_RE_releff$`97.5%`, 0.16, tolerance = tol)
 })
 
 # RE heterogeneity SD
 diet_RE_sd <- as.data.frame(summary(diet_fit_RE, pars = "tau"))
 
 test_that("RE heterogeneity SD", {
-  expect_equal(diet_RE_sd$mean, 0.13, tolerance = tol)
-  expect_equal(diet_RE_sd$sd, 0.12, tolerance = tol)
-  expect_equal(diet_RE_sd$`2.5%`, 0.00, tolerance = tol)
-  expect_equal(diet_RE_sd$`50%`, 0.10, tolerance = tol)
-  expect_equal(diet_RE_sd$`97.5%`, 0.43, tolerance = tol)
+  expect_equivalent(diet_RE_sd$mean, 0.13, tolerance = tol)
+  expect_equivalent(diet_RE_sd$sd, 0.12, tolerance = tol)
+  expect_equivalent(diet_RE_sd$`2.5%`, 0.00, tolerance = tol)
+  expect_equivalent(diet_RE_sd$`50%`, 0.10, tolerance = tol)
+  expect_equivalent(diet_RE_sd$`97.5%`, 0.43, tolerance = tol)
 })
 
 # DIC
 test_that("FE DIC", {
-  expect_equal(dic_FE$resdev, 23.32, tolerance = tol_dic)
-  expect_equal(dic_FE$pd, 10.9, tolerance = tol_dic)
-  expect_equal(dic_FE$dic, 33.2, tolerance = tol_dic)
+  expect_equivalent(dic_FE$resdev, 23.32, tolerance = tol_dic)
+  expect_equivalent(dic_FE$pd, 10.9, tolerance = tol_dic)
+  expect_equivalent(dic_FE$dic, 33.2, tolerance = tol_dic)
 })
 
 test_that("RE DIC", {
-  expect_equal(dic_RE$resdev, 21.5, tolerance = tol_dic)
-  expect_equal(dic_RE$pd, 13.3, tolerance = tol_dic)
-  expect_equal(dic_RE$dic, 34.8, tolerance = tol_dic)
+  expect_equivalent(dic_RE$resdev, 21.5, tolerance = tol_dic)
+  expect_equivalent(dic_RE$pd, 13.3, tolerance = tol_dic)
+  expect_equivalent(dic_RE$dic, 34.8, tolerance = tol_dic)
 })
 
 # Predictions
 diet_pred_FE <- as.data.frame(pred_FE)
 
 test_that("FE predicted probabilities", {
-  expect_equal(diet_pred_FE$mean, c(0.06, 0.06), tolerance = tol_dic)
-  expect_equal(diet_pred_FE$sd, c(0.04, 0.04), tolerance = tol_dic)
-  expect_equal(diet_pred_FE$`2.5%`, c(0.01, 0.01), tolerance = tol_dic)
-  expect_equal(diet_pred_FE$`50%`, c(0.05, 0.05), tolerance = tol_dic)
-  expect_equal(diet_pred_FE$`97.5%`, c(0.18, 0.18), tolerance = tol_dic)
+  expect_equivalent(diet_pred_FE$mean, c(0.06, 0.06), tolerance = tol_dic)
+  expect_equivalent(diet_pred_FE$sd, c(0.04, 0.04), tolerance = tol_dic)
+  expect_equivalent(diet_pred_FE$`2.5%`, c(0.01, 0.01), tolerance = tol_dic)
+  expect_equivalent(diet_pred_FE$`50%`, c(0.05, 0.05), tolerance = tol_dic)
+  expect_equivalent(diet_pred_FE$`97.5%`, c(0.18, 0.18), tolerance = tol_dic)
 })
 
 diet_pred_RE <- as.data.frame(pred_RE)
 
 test_that("RE predicted probabilities", {
-  expect_equal(diet_pred_RE$mean, c(0.06, 0.06), tolerance = tol_dic)
-  expect_equal(diet_pred_RE$sd, c(0.04, 0.04), tolerance = tol_dic)
-  expect_equal(diet_pred_RE$`2.5%`, c(0.01, 0.01), tolerance = tol_dic)
-  expect_equal(diet_pred_RE$`50%`, c(0.05, 0.05), tolerance = tol_dic)
-  expect_equal(diet_pred_RE$`97.5%`, c(0.18, 0.18), tolerance = tol_dic)
+  expect_equivalent(diet_pred_RE$mean, c(0.06, 0.06), tolerance = tol_dic)
+  expect_equivalent(diet_pred_RE$sd, c(0.04, 0.04), tolerance = tol_dic)
+  expect_equivalent(diet_pred_RE$`2.5%`, c(0.01, 0.01), tolerance = tol_dic)
+  expect_equivalent(diet_pred_RE$`50%`, c(0.05, 0.05), tolerance = tol_dic)
+  expect_equivalent(diet_pred_RE$`97.5%`, c(0.18, 0.18), tolerance = tol_dic)
 })
 ```

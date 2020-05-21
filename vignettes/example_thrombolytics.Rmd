@@ -148,7 +148,7 @@ library(testthat)
 library(dplyr)
 
 test_that("Reference trt is SK", {
-  expect_equal(levels(thrombo_net$treatments)[1], "SK")
+  expect_equivalent(levels(thrombo_net$treatments)[1], "SK")
 })
 
 tol <- 0.05
@@ -188,17 +188,17 @@ thrombo_releff_summary <- as.data.frame(thrombo_releff) %>%
   filter(parameter %in% tsd_releff$lab)
 
 test_that("FE relative effects", {
-  expect_equal(thrombo_releff_summary$mean, tsd_releff$mean, tolerance = tol)
-  expect_equal(thrombo_releff_summary$sd, tsd_releff$sd, tolerance = tol)
-  expect_equal(thrombo_releff_summary$`2.5%`, tsd_releff$lower, tolerance = tol)
-  expect_equal(thrombo_releff_summary$`97.5%`, tsd_releff$upper, tolerance = tol)
+  expect_equivalent(thrombo_releff_summary$mean, tsd_releff$mean, tolerance = tol)
+  expect_equivalent(thrombo_releff_summary$sd, tsd_releff$sd, tolerance = tol)
+  expect_equivalent(thrombo_releff_summary$`2.5%`, tsd_releff$lower, tolerance = tol)
+  expect_equivalent(thrombo_releff_summary$`97.5%`, tsd_releff$upper, tolerance = tol)
 })
 
 # DIC
 test_that("DIC", {
-  expect_equal(dic_consistency$resdev, 105.9, tolerance = tol_dic)
-  expect_equal(dic_consistency$pd, 58, tolerance = tol_dic)
-  expect_equal(dic_consistency$dic, 163.9, tolerance = tol_dic)
+  expect_equivalent(dic_consistency$resdev, 105.9, tolerance = tol_dic)
+  expect_equivalent(dic_consistency$pd, 58, tolerance = tol_dic)
+  expect_equivalent(dic_consistency$dic, 163.9, tolerance = tol_dic)
 })
 
 # Relative effects (UME)
@@ -236,17 +236,17 @@ tsd_ume <- tribble(
 thrombo_ume_releff <- summary(thrombo_fit_ume, pars = "d")
 
 test_that("UME relative effects", {
-  expect_equal(thrombo_ume_releff$summary$mean, tsd_ume$mean, tolerance = tol)
-  expect_equal(thrombo_ume_releff$summary$sd, tsd_ume$sd, tolerance = tol)
-  expect_equal(thrombo_ume_releff$summary$`2.5%`, tsd_ume$lower, tolerance = tol)
-  expect_equal(thrombo_ume_releff$summary$`97.5%`, tsd_ume$upper, tolerance = tol)
+  expect_equivalent(thrombo_ume_releff$summary$mean, tsd_ume$mean, tolerance = tol)
+  expect_equivalent(thrombo_ume_releff$summary$sd, tsd_ume$sd, tolerance = tol)
+  expect_equivalent(thrombo_ume_releff$summary$`2.5%`, tsd_ume$lower, tolerance = tol)
+  expect_equivalent(thrombo_ume_releff$summary$`97.5%`, tsd_ume$upper, tolerance = tol)
 })
 
 # DIC (UME)
 test_that("UME DIC", {
-  expect_equal(dic_ume$resdev, 99.7, tolerance = tol_dic)
-  expect_equal(dic_ume$pd, 65, tolerance = tol_dic)
-  expect_equal(dic_ume$dic, 164.7, tolerance = tol_dic)
+  expect_equivalent(dic_ume$resdev, 99.7, tolerance = tol_dic)
+  expect_equivalent(dic_ume$pd, 65, tolerance = tol_dic)
+  expect_equivalent(dic_ume$dic, 164.7, tolerance = tol_dic)
 })
 ```
 

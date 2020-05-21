@@ -313,23 +313,23 @@ Cooper_1_releff <- tribble(
 af_1_releff_df <- as.data.frame(af_1_releff)
 
 test_that("Relative effects (no covariates)", {
-  expect_equal(af_1_releff_df$mean, Cooper_1_releff$est, tolerance = tol)
-  expect_equal(af_1_releff_df$`2.5%`, Cooper_1_releff$lower, tolerance = tol)
-  expect_equal(af_1_releff_df$`97.5%`, Cooper_1_releff$upper, tolerance = tol)
+  expect_equivalent(af_1_releff_df$mean, Cooper_1_releff$est, tolerance = tol)
+  expect_equivalent(af_1_releff_df$`2.5%`, Cooper_1_releff$lower, tolerance = tol)
+  expect_equivalent(af_1_releff_df$`97.5%`, Cooper_1_releff$upper, tolerance = tol)
 })
 
 af_1_tau <- as.data.frame(summary(af_fit_1, pars = "tau"))
 
 test_that("Heterogeneity SD (no covariates)", {
-  expect_equal(af_1_tau$`50%`, 0.28, tolerance = tol)
-  expect_equal(af_1_tau$`2.5%`, 0.02, tolerance = tol)
-  expect_equal(af_1_tau$`97.5%`, 0.57, tolerance = tol)
+  expect_equivalent(af_1_tau$`50%`, 0.28, tolerance = tol)
+  expect_equivalent(af_1_tau$`2.5%`, 0.02, tolerance = tol)
+  expect_equivalent(af_1_tau$`97.5%`, 0.57, tolerance = tol)
 })
 
 test_that("DIC (no covariates)", {
-  expect_equal(af_dic_1$resdev, 60.22, tolerance = tol_dic)
-  expect_equal(af_dic_1$pd, 48.35, tolerance = tol_dic)
-  expect_equal(af_dic_1$dic, 108.57, tolerance = tol_dic)
+  expect_equivalent(af_dic_1$resdev, 60.22, tolerance = tol_dic)
+  expect_equivalent(af_dic_1$pd, 48.35, tolerance = tol_dic)
+  expect_equivalent(af_dic_1$dic, 108.57, tolerance = tol_dic)
 })
 
 # With stroke covariate, shared interactions
@@ -361,9 +361,9 @@ af_4b_releff_Cooper <- as.data.frame(relative_effects(af_fit_4b,
                                                       trt_ref = "Placebo/Standard care"))
 
 test_that("Relative effects (common interaction)", {
-  expect_equal(af_4b_releff_Cooper$mean, Cooper_4b_releff$est, tolerance = tol)
-  expect_equal(af_4b_releff_Cooper$`2.5%`, Cooper_4b_releff$lower, tolerance = tol)
-  expect_equal(af_4b_releff_Cooper$`97.5%`, Cooper_4b_releff$upper, tolerance = tol)
+  expect_equivalent(af_4b_releff_Cooper$mean, Cooper_4b_releff$est, tolerance = tol)
+  expect_equivalent(af_4b_releff_Cooper$`2.5%`, Cooper_4b_releff$lower, tolerance = tol)
+  expect_equivalent(af_4b_releff_Cooper$`97.5%`, Cooper_4b_releff$upper, tolerance = tol)
 })
 
 Cooper_4b_beta <- tribble(
@@ -376,23 +376,23 @@ Cooper_4b_beta <- tribble(
 af_4b_beta_df <- as.data.frame(summary(af_4b_beta))
 
 test_that("Interaction estimates (common interaction)", {
-  expect_equal(af_4b_beta_df$mean, Cooper_4b_beta$est, tolerance = tol)
-  expect_equal(af_4b_beta_df$`2.5%`, Cooper_4b_beta$lower, tolerance = tol)
-  expect_equal(af_4b_beta_df$`97.5%`, Cooper_4b_beta$upper, tolerance = tol)
+  expect_equivalent(af_4b_beta_df$mean, Cooper_4b_beta$est, tolerance = tol)
+  expect_equivalent(af_4b_beta_df$`2.5%`, Cooper_4b_beta$lower, tolerance = tol)
+  expect_equivalent(af_4b_beta_df$`97.5%`, Cooper_4b_beta$upper, tolerance = tol)
 })
 
 af_4b_tau <- as.data.frame(summary(af_fit_4b, pars = "tau"))
 
 test_that("Heterogeneity SD (common interaction)", {
-  expect_equal(af_4b_tau$`50%`, 0.19, tolerance = tol)
-  expect_equal(af_4b_tau$`2.5%`, 0.01, tolerance = tol)
-  expect_equal(af_4b_tau$`97.5%`, 0.48, tolerance = tol)
+  expect_equivalent(af_4b_tau$`50%`, 0.19, tolerance = tol)
+  expect_equivalent(af_4b_tau$`2.5%`, 0.01, tolerance = tol)
+  expect_equivalent(af_4b_tau$`97.5%`, 0.48, tolerance = tol)
 })
 
 test_that("DIC (common interaction)", {
-  expect_equal(af_dic_4b$resdev, 58.74, tolerance = tol_dic)
-  expect_equal(af_dic_4b$pd, 48.25, tolerance = tol_dic)
-  expect_equal(af_dic_4b$dic, 106.99, tolerance = tol_dic)
+  expect_equivalent(af_dic_4b$resdev, 58.74, tolerance = tol_dic)
+  expect_equivalent(af_dic_4b$pd, 48.25, tolerance = tol_dic)
+  expect_equivalent(af_dic_4b$dic, 106.99, tolerance = tol_dic)
 })
 
 ```

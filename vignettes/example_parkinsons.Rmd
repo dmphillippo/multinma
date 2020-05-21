@@ -610,11 +610,11 @@ tsd_FE <- tribble(
 arm_releff_FE <- as.data.frame(arm_releff_FE)
 
 test_that("FE relative effects", {
-  expect_equal(arm_releff_FE$mean, tsd_FE$mean, tolerance = tol)
-  expect_equal(arm_releff_FE$sd, tsd_FE$sd, tolerance = tol)
-  expect_equal(arm_releff_FE$`50%`, tsd_FE$median, tolerance = tol)
-  expect_equal(arm_releff_FE$`2.5%`, tsd_FE$lower, tolerance = tol)
-  expect_equal(arm_releff_FE$`97.5%`, tsd_FE$upper, tolerance = tol)
+  expect_equivalent(arm_releff_FE$mean, tsd_FE$mean, tolerance = tol)
+  expect_equivalent(arm_releff_FE$sd, tsd_FE$sd, tolerance = tol)
+  expect_equivalent(arm_releff_FE$`50%`, tsd_FE$median, tolerance = tol)
+  expect_equivalent(arm_releff_FE$`2.5%`, tsd_FE$lower, tolerance = tol)
+  expect_equivalent(arm_releff_FE$`97.5%`, tsd_FE$upper, tolerance = tol)
 })
 
 # RE Relative effects
@@ -631,22 +631,22 @@ tsd_RE <- tribble(
 arm_releff_RE <- as.data.frame(arm_releff_RE)
 
 test_that("RE relative effects", {
-  expect_equal(arm_releff_RE$mean, tsd_RE$mean, tolerance = tol)
-  expect_equal(arm_releff_RE$sd, tsd_RE$sd, tolerance = tol)
-  expect_equal(arm_releff_RE$`50%`, tsd_RE$median, tolerance = tol)
-  expect_equal(arm_releff_RE$`2.5%`, tsd_RE$lower, tolerance = tol)
-  expect_equal(arm_releff_RE$`97.5%`, tsd_RE$upper, tolerance = tol)
+  expect_equivalent(arm_releff_RE$mean, tsd_RE$mean, tolerance = tol)
+  expect_equivalent(arm_releff_RE$sd, tsd_RE$sd, tolerance = tol)
+  expect_equivalent(arm_releff_RE$`50%`, tsd_RE$median, tolerance = tol)
+  expect_equivalent(arm_releff_RE$`2.5%`, tsd_RE$lower, tolerance = tol)
+  expect_equivalent(arm_releff_RE$`97.5%`, tsd_RE$upper, tolerance = tol)
 })
 
 # Heterogeneity SD
 arm_tau <- as.data.frame(summary(arm_fit_RE, pars = "tau"))
 
 test_that("RE heterogeneity SD", {
-  expect_equal(arm_tau$mean, 0.4, tolerance = tol)
-  expect_equal(arm_tau$sd, 0.43, tolerance = tol)
-  expect_equal(arm_tau$`50%`, 0.28, tolerance = tol)
-  expect_equal(arm_tau$`2.5%`, 0.01, tolerance = tol)
-  expect_equal(arm_tau$`97.5%`, 1.55, tolerance = tol)
+  expect_equivalent(arm_tau$mean, 0.4, tolerance = tol)
+  expect_equivalent(arm_tau$sd, 0.43, tolerance = tol)
+  expect_equivalent(arm_tau$`50%`, 0.28, tolerance = tol)
+  expect_equivalent(arm_tau$`2.5%`, 0.01, tolerance = tol)
+  expect_equivalent(arm_tau$`97.5%`, 1.55, tolerance = tol)
 })
 
 # FE probabilities
@@ -664,11 +664,11 @@ tsd_pred_FE <- tribble(
 arm_pred_FE <- as.data.frame(arm_pred_FE)
 
 test_that("FE predicted probabilities at 3 years", {
-  expect_equal(arm_pred_FE$mean, tsd_pred_FE$mean, tolerance = tol)
-  expect_equal(arm_pred_FE$sd, tsd_pred_FE$sd, tolerance = tol)
-  expect_equal(arm_pred_FE$`50%`, tsd_pred_FE$median, tolerance = tol)
-  expect_equal(arm_pred_FE$`2.5%`, tsd_pred_FE$lower, tolerance = tol)
-  expect_equal(arm_pred_FE$`97.5%`, tsd_pred_FE$upper, tolerance = tol)
+  expect_equivalent(arm_pred_FE$mean, tsd_pred_FE$mean, tolerance = tol)
+  expect_equivalent(arm_pred_FE$sd, tsd_pred_FE$sd, tolerance = tol)
+  expect_equivalent(arm_pred_FE$`50%`, tsd_pred_FE$median, tolerance = tol)
+  expect_equivalent(arm_pred_FE$`2.5%`, tsd_pred_FE$lower, tolerance = tol)
+  expect_equivalent(arm_pred_FE$`97.5%`, tsd_pred_FE$upper, tolerance = tol)
 })
 
 # RE probabilities
@@ -686,25 +686,25 @@ tsd_pred_RE <- tribble(
 arm_pred_RE <- as.data.frame(arm_pred_RE)
 
 test_that("RE predicted probabilities at 3 years", {
-  expect_equal(arm_pred_RE$mean, tsd_pred_RE$mean, tolerance = tol)
-  expect_equal(arm_pred_RE$sd, tsd_pred_RE$sd, tolerance = tol)
-  expect_equal(arm_pred_RE$`50%`, tsd_pred_RE$median, tolerance = tol)
-  expect_equal(arm_pred_RE$`2.5%`, tsd_pred_RE$lower, tolerance = tol)
-  expect_equal(arm_pred_RE$`97.5%`, tsd_pred_RE$upper, tolerance = tol)
+  expect_equivalent(arm_pred_RE$mean, tsd_pred_RE$mean, tolerance = tol)
+  expect_equivalent(arm_pred_RE$sd, tsd_pred_RE$sd, tolerance = tol)
+  expect_equivalent(arm_pred_RE$`50%`, tsd_pred_RE$median, tolerance = tol)
+  expect_equivalent(arm_pred_RE$`2.5%`, tsd_pred_RE$lower, tolerance = tol)
+  expect_equivalent(arm_pred_RE$`97.5%`, tsd_pred_RE$upper, tolerance = tol)
 })
 
 # FE DIC
 test_that("FE DIC", {
-  expect_equal(arm_dic_FE$resdev, 13.3, tolerance = tol_dic)
-  expect_equal(arm_dic_FE$pd, 11.0, tolerance = tol_dic)
-  expect_equal(arm_dic_FE$dic, 24.3, tolerance = tol_dic)
+  expect_equivalent(arm_dic_FE$resdev, 13.3, tolerance = tol_dic)
+  expect_equivalent(arm_dic_FE$pd, 11.0, tolerance = tol_dic)
+  expect_equivalent(arm_dic_FE$dic, 24.3, tolerance = tol_dic)
 })
 
 # RE DIC
 test_that("RE DIC", {
-  expect_equal(arm_dic_RE$resdev, 13.6, tolerance = tol_dic)
-  expect_equal(arm_dic_RE$pd, 12.4, tolerance = tol_dic)
-  expect_equal(arm_dic_RE$dic, 26.0, tolerance = tol_dic)
+  expect_equivalent(arm_dic_RE$resdev, 13.6, tolerance = tol_dic)
+  expect_equivalent(arm_dic_RE$pd, 12.4, tolerance = tol_dic)
+  expect_equivalent(arm_dic_RE$dic, 26.0, tolerance = tol_dic)
 })
 
 
@@ -715,66 +715,66 @@ test_that("RE DIC", {
 contr_releff_FE <- as.data.frame(contr_releff_FE)
 
 test_that("FE relative effects", {
-  expect_equal(contr_releff_FE$mean, tsd_FE$mean, tolerance = tol)
-  expect_equal(contr_releff_FE$sd, tsd_FE$sd, tolerance = tol)
-  expect_equal(contr_releff_FE$`50%`, tsd_FE$median, tolerance = tol)
-  expect_equal(contr_releff_FE$`2.5%`, tsd_FE$lower, tolerance = tol)
-  expect_equal(contr_releff_FE$`97.5%`, tsd_FE$upper, tolerance = tol)
+  expect_equivalent(contr_releff_FE$mean, tsd_FE$mean, tolerance = tol)
+  expect_equivalent(contr_releff_FE$sd, tsd_FE$sd, tolerance = tol)
+  expect_equivalent(contr_releff_FE$`50%`, tsd_FE$median, tolerance = tol)
+  expect_equivalent(contr_releff_FE$`2.5%`, tsd_FE$lower, tolerance = tol)
+  expect_equivalent(contr_releff_FE$`97.5%`, tsd_FE$upper, tolerance = tol)
 })
 
 contr_releff_RE <- as.data.frame(contr_releff_RE)
 
 test_that("RE relative effects", {
-  expect_equal(contr_releff_RE$mean, tsd_RE$mean, tolerance = tol)
-  expect_equal(contr_releff_RE$sd, tsd_RE$sd, tolerance = tol)
-  expect_equal(contr_releff_RE$`50%`, tsd_RE$median, tolerance = tol)
-  expect_equal(contr_releff_RE$`2.5%`, tsd_RE$lower, tolerance = tol)
-  expect_equal(contr_releff_RE$`97.5%`, tsd_RE$upper, tolerance = tol)
+  expect_equivalent(contr_releff_RE$mean, tsd_RE$mean, tolerance = tol)
+  expect_equivalent(contr_releff_RE$sd, tsd_RE$sd, tolerance = tol)
+  expect_equivalent(contr_releff_RE$`50%`, tsd_RE$median, tolerance = tol)
+  expect_equivalent(contr_releff_RE$`2.5%`, tsd_RE$lower, tolerance = tol)
+  expect_equivalent(contr_releff_RE$`97.5%`, tsd_RE$upper, tolerance = tol)
 })
 
 # Heterogeneity SD
 contr_tau <- as.data.frame(summary(contr_fit_RE, pars = "tau"))
 
 test_that("RE heterogeneity SD", {
-  expect_equal(contr_tau$mean, 0.4, tolerance = tol)
-  expect_equal(contr_tau$sd, 0.43, tolerance = tol)
-  expect_equal(contr_tau$`50%`, 0.28, tolerance = tol)
-  expect_equal(contr_tau$`2.5%`, 0.01, tolerance = tol)
-  expect_equal(contr_tau$`97.5%`, 1.55, tolerance = tol)
+  expect_equivalent(contr_tau$mean, 0.4, tolerance = tol)
+  expect_equivalent(contr_tau$sd, 0.43, tolerance = tol)
+  expect_equivalent(contr_tau$`50%`, 0.28, tolerance = tol)
+  expect_equivalent(contr_tau$`2.5%`, 0.01, tolerance = tol)
+  expect_equivalent(contr_tau$`97.5%`, 1.55, tolerance = tol)
 })
 
 contr_pred_FE <- as.data.frame(contr_pred_FE)
 
 test_that("FE predicted probabilities at 3 years", {
-  expect_equal(contr_pred_FE$mean, tsd_pred_FE$mean, tolerance = tol)
-  expect_equal(contr_pred_FE$sd, tsd_pred_FE$sd, tolerance = tol)
-  expect_equal(contr_pred_FE$`50%`, tsd_pred_FE$median, tolerance = tol)
-  expect_equal(contr_pred_FE$`2.5%`, tsd_pred_FE$lower, tolerance = tol)
-  expect_equal(contr_pred_FE$`97.5%`, tsd_pred_FE$upper, tolerance = tol)
+  expect_equivalent(contr_pred_FE$mean, tsd_pred_FE$mean, tolerance = tol)
+  expect_equivalent(contr_pred_FE$sd, tsd_pred_FE$sd, tolerance = tol)
+  expect_equivalent(contr_pred_FE$`50%`, tsd_pred_FE$median, tolerance = tol)
+  expect_equivalent(contr_pred_FE$`2.5%`, tsd_pred_FE$lower, tolerance = tol)
+  expect_equivalent(contr_pred_FE$`97.5%`, tsd_pred_FE$upper, tolerance = tol)
 })
 
 contr_pred_RE <- as.data.frame(contr_pred_RE)
 
 test_that("RE predicted probabilities at 3 years", {
-  expect_equal(contr_pred_RE$mean, tsd_pred_RE$mean, tolerance = tol)
-  expect_equal(contr_pred_RE$sd, tsd_pred_RE$sd, tolerance = tol)
-  expect_equal(contr_pred_RE$`50%`, tsd_pred_RE$median, tolerance = tol)
-  expect_equal(contr_pred_RE$`2.5%`, tsd_pred_RE$lower, tolerance = tol)
-  expect_equal(contr_pred_RE$`97.5%`, tsd_pred_RE$upper, tolerance = tol)
+  expect_equivalent(contr_pred_RE$mean, tsd_pred_RE$mean, tolerance = tol)
+  expect_equivalent(contr_pred_RE$sd, tsd_pred_RE$sd, tolerance = tol)
+  expect_equivalent(contr_pred_RE$`50%`, tsd_pred_RE$median, tolerance = tol)
+  expect_equivalent(contr_pred_RE$`2.5%`, tsd_pred_RE$lower, tolerance = tol)
+  expect_equivalent(contr_pred_RE$`97.5%`, tsd_pred_RE$upper, tolerance = tol)
 })
 
 # FE DIC
 test_that("FE DIC", {
-  expect_equal(contr_dic_FE$resdev, 6.3, tolerance = tol_dic)
-  expect_equal(contr_dic_FE$pd, 4.0, tolerance = tol_dic)
-  expect_equal(contr_dic_FE$dic, 10.3, tolerance = tol_dic)
+  expect_equivalent(contr_dic_FE$resdev, 6.3, tolerance = tol_dic)
+  expect_equivalent(contr_dic_FE$pd, 4.0, tolerance = tol_dic)
+  expect_equivalent(contr_dic_FE$dic, 10.3, tolerance = tol_dic)
 })
 
 # RE DIC
 test_that("RE DIC", {
-  expect_equal(contr_dic_RE$resdev, 6.6, tolerance = tol_dic)
-  expect_equal(contr_dic_RE$pd, 5.5, tolerance = tol_dic)
-  expect_equal(contr_dic_RE$dic, 12.1, tolerance = tol_dic)
+  expect_equivalent(contr_dic_RE$resdev, 6.6, tolerance = tol_dic)
+  expect_equivalent(contr_dic_RE$pd, 5.5, tolerance = tol_dic)
+  expect_equivalent(contr_dic_RE$dic, 12.1, tolerance = tol_dic)
 })
 
 
@@ -800,7 +800,7 @@ reorder_fit_RE <- nma(reorder_net,
                       prior_het = half_normal(scale = 5),
                       adapt_delta = 0.99)
 
-expect_equal_nma_summary <- function(object, expected, ...) {
+expect_equivalent_nma_summary <- function(object, expected, ...) {
   
   act <- quasi_label(enquo(object), arg = "object")
   exp <- quasi_label(enquo(expected), arg = "expected")
@@ -815,34 +815,34 @@ expect_equal_nma_summary <- function(object, expected, ...) {
 }
 
 test_that("Analysis of reordered contrast data gives same results", {
-  expect_equal_nma_summary(relative_effects(reorder_fit_FE, trt_ref = 1),
+  expect_equivalent_nma_summary(relative_effects(reorder_fit_FE, trt_ref = 1),
                            contr_releff_FE, 
                            tolerance = tol)
-  expect_equal_nma_summary(relative_effects(reorder_fit_RE, trt_ref = 1),
+  expect_equivalent_nma_summary(relative_effects(reorder_fit_RE, trt_ref = 1),
                            contr_releff_RE, 
                            tolerance = tol)
   
-  expect_equal_nma_summary(predict(reorder_fit_FE, 
+  expect_equivalent_nma_summary(predict(reorder_fit_FE, 
                                      baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                                      type = "response",
                                      trt_ref = 1),
                            contr_pred_FE,
                            tolerance = tol)
-  expect_equal_nma_summary(predict(reorder_fit_RE, 
+  expect_equivalent_nma_summary(predict(reorder_fit_RE, 
                                      baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                                      type = "response",
                                      trt_ref = 1),
                            contr_pred_RE,
                            tolerance = tol)
   
-  expect_equal(dic(reorder_fit_FE)$resdev, contr_dic_FE$resdev, tolerance = tol_dic)
-  expect_equal(dic(reorder_fit_FE)$pd, contr_dic_FE$pd, tolerance = tol_dic)
-  expect_equal(dic(reorder_fit_FE)$dic, contr_dic_FE$dic, tolerance = tol_dic)
-  expect_equal(dic(reorder_fit_RE)$resdev, contr_dic_RE$resdev, tolerance = tol_dic)
-  expect_equal(dic(reorder_fit_RE)$pd, contr_dic_RE$pd, tolerance = tol_dic)
-  expect_equal(dic(reorder_fit_RE)$dic, contr_dic_RE$dic, tolerance = tol_dic)
+  expect_equivalent(dic(reorder_fit_FE)$resdev, contr_dic_FE$resdev, tolerance = tol_dic)
+  expect_equivalent(dic(reorder_fit_FE)$pd, contr_dic_FE$pd, tolerance = tol_dic)
+  expect_equivalent(dic(reorder_fit_FE)$dic, contr_dic_FE$dic, tolerance = tol_dic)
+  expect_equivalent(dic(reorder_fit_RE)$resdev, contr_dic_RE$resdev, tolerance = tol_dic)
+  expect_equivalent(dic(reorder_fit_RE)$pd, contr_dic_RE$pd, tolerance = tol_dic)
+  expect_equivalent(dic(reorder_fit_RE)$dic, contr_dic_RE$dic, tolerance = tol_dic)
   
-  expect_equal_nma_summary(summary(reorder_fit_RE, pars = "tau"), 
+  expect_equivalent_nma_summary(summary(reorder_fit_RE, pars = "tau"), 
                            contr_tau,
                            tolerance = tol)
 })
@@ -855,65 +855,65 @@ test_that("Analysis of reordered contrast data gives same results", {
 mix_releff_FE <- as.data.frame(mix_releff_FE)
 
 test_that("FE relative effects", {
-  expect_equal(mix_releff_FE$mean, tsd_FE$mean, tolerance = tol)
-  expect_equal(mix_releff_FE$sd, tsd_FE$sd, tolerance = tol)
-  expect_equal(mix_releff_FE$`50%`, tsd_FE$median, tolerance = tol)
-  expect_equal(mix_releff_FE$`2.5%`, tsd_FE$lower, tolerance = tol)
-  expect_equal(mix_releff_FE$`97.5%`, tsd_FE$upper, tolerance = tol)
+  expect_equivalent(mix_releff_FE$mean, tsd_FE$mean, tolerance = tol)
+  expect_equivalent(mix_releff_FE$sd, tsd_FE$sd, tolerance = tol)
+  expect_equivalent(mix_releff_FE$`50%`, tsd_FE$median, tolerance = tol)
+  expect_equivalent(mix_releff_FE$`2.5%`, tsd_FE$lower, tolerance = tol)
+  expect_equivalent(mix_releff_FE$`97.5%`, tsd_FE$upper, tolerance = tol)
 })
 
 mix_releff_RE <- as.data.frame(mix_releff_RE)
 
 test_that("RE relative effects", {
-  expect_equal(mix_releff_RE$mean, tsd_RE$mean, tolerance = tol)
-  expect_equal(mix_releff_RE$sd, tsd_RE$sd, tolerance = tol)
-  expect_equal(mix_releff_RE$`50%`, tsd_RE$median, tolerance = tol)
-  expect_equal(mix_releff_RE$`2.5%`, tsd_RE$lower, tolerance = tol)
-  expect_equal(mix_releff_RE$`97.5%`, tsd_RE$upper, tolerance = tol)
+  expect_equivalent(mix_releff_RE$mean, tsd_RE$mean, tolerance = tol)
+  expect_equivalent(mix_releff_RE$sd, tsd_RE$sd, tolerance = tol)
+  expect_equivalent(mix_releff_RE$`50%`, tsd_RE$median, tolerance = tol)
+  expect_equivalent(mix_releff_RE$`2.5%`, tsd_RE$lower, tolerance = tol)
+  expect_equivalent(mix_releff_RE$`97.5%`, tsd_RE$upper, tolerance = tol)
 })
 
 # Heterogeneity SD
 mix_tau <- as.data.frame(summary(mix_fit_RE, pars = "tau"))
 
 test_that("RE heterogeneity SD", {
-  expect_equal(mix_tau$mean, 0.4, tolerance = tol)
-  expect_equal(mix_tau$sd, 0.43, tolerance = tol)
-  expect_equal(mix_tau$`50%`, 0.28, tolerance = tol)
-  expect_equal(mix_tau$`2.5%`, 0.01, tolerance = tol)
-  expect_equal(mix_tau$`97.5%`, 1.55, tolerance = tol)
+  expect_equivalent(mix_tau$mean, 0.4, tolerance = tol)
+  expect_equivalent(mix_tau$sd, 0.43, tolerance = tol)
+  expect_equivalent(mix_tau$`50%`, 0.28, tolerance = tol)
+  expect_equivalent(mix_tau$`2.5%`, 0.01, tolerance = tol)
+  expect_equivalent(mix_tau$`97.5%`, 1.55, tolerance = tol)
 })
 
 mix_pred_FE <- as.data.frame(mix_pred_FE)
 
 test_that("FE predicted probabilities at 3 years", {
-  expect_equal(mix_pred_FE$mean, tsd_pred_FE$mean, tolerance = tol)
-  expect_equal(mix_pred_FE$sd, tsd_pred_FE$sd, tolerance = tol)
-  expect_equal(mix_pred_FE$`50%`, tsd_pred_FE$median, tolerance = tol)
-  expect_equal(mix_pred_FE$`2.5%`, tsd_pred_FE$lower, tolerance = tol)
-  expect_equal(mix_pred_FE$`97.5%`, tsd_pred_FE$upper, tolerance = tol)
+  expect_equivalent(mix_pred_FE$mean, tsd_pred_FE$mean, tolerance = tol)
+  expect_equivalent(mix_pred_FE$sd, tsd_pred_FE$sd, tolerance = tol)
+  expect_equivalent(mix_pred_FE$`50%`, tsd_pred_FE$median, tolerance = tol)
+  expect_equivalent(mix_pred_FE$`2.5%`, tsd_pred_FE$lower, tolerance = tol)
+  expect_equivalent(mix_pred_FE$`97.5%`, tsd_pred_FE$upper, tolerance = tol)
 })
 
 mix_pred_RE <- as.data.frame(mix_pred_RE)
 
 test_that("RE predicted probabilities at 3 years", {
-  expect_equal(mix_pred_RE$mean, tsd_pred_RE$mean, tolerance = tol)
-  expect_equal(mix_pred_RE$sd, tsd_pred_RE$sd, tolerance = tol)
-  expect_equal(mix_pred_RE$`50%`, tsd_pred_RE$median, tolerance = tol)
-  expect_equal(mix_pred_RE$`2.5%`, tsd_pred_RE$lower, tolerance = tol)
-  expect_equal(mix_pred_RE$`97.5%`, tsd_pred_RE$upper, tolerance = tol)
+  expect_equivalent(mix_pred_RE$mean, tsd_pred_RE$mean, tolerance = tol)
+  expect_equivalent(mix_pred_RE$sd, tsd_pred_RE$sd, tolerance = tol)
+  expect_equivalent(mix_pred_RE$`50%`, tsd_pred_RE$median, tolerance = tol)
+  expect_equivalent(mix_pred_RE$`2.5%`, tsd_pred_RE$lower, tolerance = tol)
+  expect_equivalent(mix_pred_RE$`97.5%`, tsd_pred_RE$upper, tolerance = tol)
 })
 
 # FE DIC
 test_that("FE DIC", {
-  expect_equal(mix_dic_FE$resdev, 9.3, tolerance = tol_dic)
-  expect_equal(mix_dic_FE$pd, 7.0, tolerance = tol_dic)
-  expect_equal(mix_dic_FE$dic, 16.3, tolerance = tol_dic)
+  expect_equivalent(mix_dic_FE$resdev, 9.3, tolerance = tol_dic)
+  expect_equivalent(mix_dic_FE$pd, 7.0, tolerance = tol_dic)
+  expect_equivalent(mix_dic_FE$dic, 16.3, tolerance = tol_dic)
 })
 
 # RE DIC
 test_that("RE DIC", {
-  expect_equal(mix_dic_RE$resdev, 9.6, tolerance = tol_dic)
-  expect_equal(mix_dic_RE$pd, 8.5, tolerance = tol_dic)
-  expect_equal(mix_dic_RE$dic, 18.1, tolerance = tol_dic)
+  expect_equivalent(mix_dic_RE$resdev, 9.6, tolerance = tol_dic)
+  expect_equivalent(mix_dic_RE$pd, 8.5, tolerance = tol_dic)
+  expect_equivalent(mix_dic_RE$dic, 18.1, tolerance = tol_dic)
 })
 ```
