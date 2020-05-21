@@ -307,8 +307,8 @@ plot_prior_posterior <- function(x, ...,
 
   xseq <- dens <- vector("list", nrow(prior_dat))
   for (i in seq_len(nrow(prior_dat))) {
-    dist <- prior_dat[[i, "dist"]]
-    args <- prior_dat[[i, "args"]]
+    dist <- prior_dat$dist[[i]]
+    args <- prior_dat$args[[i]]
 
     lower <- eval(rlang::call2(paste0("q", dist), p = p_limits[1], !!! args))
     upper <- eval(rlang::call2(paste0("q", dist), p = p_limits[2], !!! args))
