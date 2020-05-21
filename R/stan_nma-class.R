@@ -440,11 +440,11 @@ plot_integration_error <- function(x, ...,
 
   rx <- "^(theta2?)_bar_cum\\[(.+): (.+), ([0-9]+)\\]$"
 
-  if (packageVersion("tidyr") >= "1.0.0") {
+  if (packageVersion("tidyr") >= "1.1.0") {
     int_dat <- tidyr::pivot_longer(int_dat, cols = -dplyr::one_of(".draw"),
                                    names_pattern = rx,
                                    names_to = c("parameter", "study", "treatment", "n_int"),
-                                   names_ptypes = list(n_int = integer()),
+                                   names_transform = list(n_int = as.integer),
                                    values_to = "value")
   } else {
     int_dat <- tidyr::gather(int_dat,

@@ -390,11 +390,11 @@ plot.nma_rank_probs <- function(x, ...) {
       stringr::str_extract(dat$parameter, "(?<=\\[).+(?=\\])")))
   }
 
-  if (packageVersion("tidyr") >= "1.0.0") {
+  if (packageVersion("tidyr") >= "1.1.0") {
     dat <- tidyr::pivot_longer(dat, cols = dplyr::starts_with("p_rank"),
                                  names_to = "rank", values_to = "probability",
                                  names_pattern = "^p_rank\\[([0-9]+)\\]$",
-                                 names_ptypes = list(rank = integer()))
+                                 names_transform = list(rank = as.integer))
   } else {
     dat <-
       tidyr::gather(dat, key = "rank",
