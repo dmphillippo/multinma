@@ -218,7 +218,7 @@ get_tidy_prior <- function(prior, trunc = NULL) {
   }
 
   if (is_trunc && d %in% c("Normal", "Cauchy", "Student t", "Exponential", "log-Normal")) {
-    out$args <- list(rlang::list2(spec = out$dist, a = trunc[1], b = trunc[2], !!! out[[1, "args"]]))
+    out$args <- list(rlang::list2(spec = out$dist, a = trunc[1], b = trunc[2], !!! out$args[[1]]))
     out$dist <- "trunc"
   }
 
