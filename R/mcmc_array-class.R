@@ -16,7 +16,7 @@
 #' # convenient when transforming parameters
 #'
 #' # Transforming log odds ratios to odds ratios
-#' LOR_array <- as.array(smk_releff_RE)
+#' LOR_array <- as.array(relative_effects(smk_fit_RE))
 #' OR_array <- exp(LOR_array)
 #'
 #' # mcmc_array objects can be summarised to produce a nma_summary object
