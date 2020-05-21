@@ -6,19 +6,19 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
 
 
-## ----setup---------------------------------------------------------------
+## ----setup----------------------------------------------------------------------------------------
 library(multinma)
 options(mc.cores = parallel::detectCores())
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 head(thrombolytics)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 thrombo_net <- set_agd_arm(thrombolytics, 
                            study = studyn,
                            trt = trtc,
@@ -27,46 +27,46 @@ thrombo_net <- set_agd_arm(thrombolytics,
 thrombo_net
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## plot(thrombo_net, weight_edges = TRUE, weight_nodes = TRUE)
 
-## ----thrombo_net_plot, echo=FALSE----------------------------------------
+## ----thrombo_net_plot, echo=FALSE-----------------------------------------------------------------
 plot(thrombo_net, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(legend.margin = ggplot2::margin(l = 4, unit = "lines"))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 thrombo_fit <- nma(thrombo_net, 
                    trt_effects = "fixed",
                    prior_intercept = normal(scale = 100),
                    prior_trt = normal(scale = 100))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 thrombo_fit
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(thrombo_fit, pars = c("d", "mu"))
 
 
-## ----thrombo_pp_plot-----------------------------------------------------
+## ----thrombo_pp_plot------------------------------------------------------------------------------
 plot_prior_posterior(thrombo_fit, prior = "trt")
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (dic_consistency <- dic(thrombo_fit))
 
 
-## ----thrombo_resdev_plot, fig.width=12-----------------------------------
+## ----thrombo_resdev_plot, fig.width=12------------------------------------------------------------
 plot(dic_consistency)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 thrombo_fit_ume <- nma(thrombo_net, 
                   consistency = "ume",
                   trt_effects = "fixed",
@@ -75,40 +75,40 @@ thrombo_fit_ume <- nma(thrombo_net,
 thrombo_fit_ume
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 dic_consistency
 (dic_ume <- dic(thrombo_fit_ume))
 
 
-## ----thrombo_devdev_plot-------------------------------------------------
+## ----thrombo_devdev_plot--------------------------------------------------------------------------
 plot(dic_consistency, dic_ume, show_uncertainty = FALSE)
 
 
-## ----thrombo_releff------------------------------------------------------
+## ----thrombo_releff-------------------------------------------------------------------------------
 (thrombo_releff <- relative_effects(thrombo_fit, all_contrasts = TRUE))
 plot(thrombo_releff, ref_line = 0)
 
 
-## ----thrombo_ranks-------------------------------------------------------
+## ----thrombo_ranks--------------------------------------------------------------------------------
 (thrombo_ranks <- posterior_ranks(thrombo_fit))
 plot(thrombo_ranks)
 
-## ----thrombo_rankprobs---------------------------------------------------
+## ----thrombo_rankprobs----------------------------------------------------------------------------
 (thrombo_rankprobs <- posterior_rank_probs(thrombo_fit))
 plot(thrombo_rankprobs)
 
-## ----thrombo_cumrankprobs------------------------------------------------
+## ----thrombo_cumrankprobs-------------------------------------------------------------------------
 (thrombo_cumrankprobs <- posterior_rank_probs(thrombo_fit, cumulative = TRUE))
 plot(thrombo_cumrankprobs)
 
 
-## ----thrombo_tests, include=FALSE, eval=params$run_tests-----------------
+## ----thrombo_tests, include=FALSE, eval=params$run_tests------------------------------------------
 #--- Test against TSD 4 results ---
 library(testthat)
 library(dplyr)
 
 test_that("Reference trt is SK", {
-  expect_equal(levels(thrombo_net$treatments)[1], "SK")
+  expect_equivalent(levels(thrombo_net$treatments)[1], "SK")
 })
 
 tol <- 0.05
@@ -148,17 +148,17 @@ thrombo_releff_summary <- as.data.frame(thrombo_releff) %>%
   filter(parameter %in% tsd_releff$lab)
 
 test_that("FE relative effects", {
-  expect_equal(thrombo_releff_summary$mean, tsd_releff$mean, tolerance = tol)
-  expect_equal(thrombo_releff_summary$sd, tsd_releff$sd, tolerance = tol)
-  expect_equal(thrombo_releff_summary$`2.5%`, tsd_releff$lower, tolerance = tol)
-  expect_equal(thrombo_releff_summary$`97.5%`, tsd_releff$upper, tolerance = tol)
+  expect_equivalent(thrombo_releff_summary$mean, tsd_releff$mean, tolerance = tol)
+  expect_equivalent(thrombo_releff_summary$sd, tsd_releff$sd, tolerance = tol)
+  expect_equivalent(thrombo_releff_summary$`2.5%`, tsd_releff$lower, tolerance = tol)
+  expect_equivalent(thrombo_releff_summary$`97.5%`, tsd_releff$upper, tolerance = tol)
 })
 
 # DIC
 test_that("DIC", {
-  expect_equal(dic_consistency$resdev, 105.9, tolerance = tol_dic)
-  expect_equal(dic_consistency$pd, 58, tolerance = tol_dic)
-  expect_equal(dic_consistency$dic, 163.9, tolerance = tol_dic)
+  expect_equivalent(dic_consistency$resdev, 105.9, tolerance = tol_dic)
+  expect_equivalent(dic_consistency$pd, 58, tolerance = tol_dic)
+  expect_equivalent(dic_consistency$dic, 163.9, tolerance = tol_dic)
 })
 
 # Relative effects (UME)
@@ -196,16 +196,16 @@ tsd_ume <- tribble(
 thrombo_ume_releff <- summary(thrombo_fit_ume, pars = "d")
 
 test_that("UME relative effects", {
-  expect_equal(thrombo_ume_releff$summary$mean, tsd_ume$mean, tolerance = tol)
-  expect_equal(thrombo_ume_releff$summary$sd, tsd_ume$sd, tolerance = tol)
-  expect_equal(thrombo_ume_releff$summary$`2.5%`, tsd_ume$lower, tolerance = tol)
-  expect_equal(thrombo_ume_releff$summary$`97.5%`, tsd_ume$upper, tolerance = tol)
+  expect_equivalent(thrombo_ume_releff$summary$mean, tsd_ume$mean, tolerance = tol)
+  expect_equivalent(thrombo_ume_releff$summary$sd, tsd_ume$sd, tolerance = tol)
+  expect_equivalent(thrombo_ume_releff$summary$`2.5%`, tsd_ume$lower, tolerance = tol)
+  expect_equivalent(thrombo_ume_releff$summary$`97.5%`, tsd_ume$upper, tolerance = tol)
 })
 
 # DIC (UME)
 test_that("UME DIC", {
-  expect_equal(dic_ume$resdev, 99.7, tolerance = tol_dic)
-  expect_equal(dic_ume$pd, 65, tolerance = tol_dic)
-  expect_equal(dic_ume$dic, 164.7, tolerance = tol_dic)
+  expect_equivalent(dic_ume$resdev, 99.7, tolerance = tol_dic)
+  expect_equivalent(dic_ume$pd, 65, tolerance = tol_dic)
+  expect_equivalent(dic_ume$dic, 164.7, tolerance = tol_dic)
 })
 

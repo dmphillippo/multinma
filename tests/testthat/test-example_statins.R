@@ -6,19 +6,19 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
 
 
-## ----setup---------------------------------------------------------------
+## ----setup----------------------------------------------------------------------------------------
 library(multinma)
 options(mc.cores = parallel::detectCores())
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 head(statins)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 statin_net <- set_agd_arm(statins, 
                           study = studyc,
                           trt = trtc,
@@ -28,11 +28,11 @@ statin_net <- set_agd_arm(statins,
 statin_net
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 statin_fit_FE <- nma(statin_net, 
                      trt_effects = "fixed",
                      regression = ~.trt:prevention,
@@ -41,25 +41,25 @@ statin_fit_FE <- nma(statin_net,
                      prior_reg = normal(scale = 100))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 statin_fit_FE
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(statin_fit_FE, pars = c("d", "beta", "mu"))
 
 
-## ----statin_FE_pp_plot---------------------------------------------------
+## ----statin_FE_pp_plot----------------------------------------------------------------------------
 plot_prior_posterior(statin_fit_FE, prior = c("trt", "reg"))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 statin_fit_RE <- nma(statin_net, 
                      trt_effects = "random",
                      regression = ~.trt:prevention,
@@ -70,35 +70,35 @@ statin_fit_RE <- nma(statin_net,
                      adapt_delta = 0.99)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 statin_fit_RE
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(statin_fit_RE, pars = c("d", "beta", "mu", "delta"))
 
 
-## ----statin_RE_pp_plot---------------------------------------------------
+## ----statin_RE_pp_plot----------------------------------------------------------------------------
 plot_prior_posterior(statin_fit_RE, prior = c("trt", "reg", "het"))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (statin_dic_FE <- dic(statin_fit_FE))
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (statin_dic_RE <- dic(statin_fit_RE))
 
 
-## ----statin_FE_resdev_plot-----------------------------------------------
+## ----statin_FE_resdev_plot------------------------------------------------------------------------
 plot(statin_dic_FE)
 
 
-## ----statin_RE_resdev_plot-----------------------------------------------
+## ----statin_RE_resdev_plot------------------------------------------------------------------------
 plot(statin_dic_RE)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 statin_releff_FE <- relative_effects(statin_fit_FE,
                                      newdata = data.frame(prevention = c("Primary", "Secondary")),
                                      study = prevention)
@@ -106,19 +106,19 @@ statin_releff_FE <- relative_effects(statin_fit_FE,
 statin_releff_FE
 
 
-## ----statins_releff_FE, fig.height = 2-----------------------------------
+## ----statins_releff_FE, fig.height = 2------------------------------------------------------------
 plot(statin_releff_FE, 
      ref_line = 0)
 
 
-## ----statins_beta_FE, fig.height = 4-------------------------------------
+## ----statins_beta_FE, fig.height = 4--------------------------------------------------------------
 plot(statin_fit_FE, 
      pars = "beta", 
      ref_line = 0,
      stat = "halfeyeh")
 
 
-## ----statins_tests, include=FALSE, eval=params$run_tests-----------------
+## ----statins_tests, include=FALSE, eval=params$run_tests------------------------------------------
 #--- Test against TSD 3 results ---
 library(testthat)
 library(dplyr)
@@ -130,61 +130,61 @@ tol_dic <- 0.1
 statin_FE_releff <- as.data.frame(summary(statin_fit_FE, pars = "d"))
 
 test_that("FE relative effects", {
-  expect_equal(statin_FE_releff$mean, -0.11, tolerance = tol)
-  expect_equal(statin_FE_releff$sd, 0.10, tolerance = tol)
-  expect_equal(statin_FE_releff$`2.5%`, -0.30, tolerance = tol)
-  expect_equal(statin_FE_releff$`97.5%`, 0.09, tolerance = tol)
+  expect_equivalent(statin_FE_releff$mean, -0.11, tolerance = tol)
+  expect_equivalent(statin_FE_releff$sd, 0.10, tolerance = tol)
+  expect_equivalent(statin_FE_releff$`2.5%`, -0.30, tolerance = tol)
+  expect_equivalent(statin_FE_releff$`97.5%`, 0.09, tolerance = tol)
 })
 
 statin_RE_releff <- as.data.frame(summary(statin_fit_RE, pars = "d"))
 
 test_that("RE relative effects", {
-  expect_equal(statin_RE_releff$mean, -0.07, tolerance = tol)
-  expect_equal(statin_RE_releff$sd, 0.20, tolerance = tol)
-  expect_equal(statin_RE_releff$`2.5%`, -0.48, tolerance = tol)
-  expect_equal(statin_RE_releff$`97.5%`, 0.36, tolerance = tol)
+  expect_equivalent(statin_RE_releff$mean, -0.07, tolerance = tol)
+  expect_equivalent(statin_RE_releff$sd, 0.20, tolerance = tol)
+  expect_equivalent(statin_RE_releff$`2.5%`, -0.48, tolerance = tol)
+  expect_equivalent(statin_RE_releff$`97.5%`, 0.36, tolerance = tol)
 })
 
 # Regression coefficients
 statin_FE_beta <- as.data.frame(summary(statin_fit_FE, pars = "beta"))
 
 test_that("FE regression beta", {
-  expect_equal(statin_FE_beta$mean, -0.21, tolerance = tol)
-  expect_equal(statin_FE_beta$sd, 0.11, tolerance = tol)
-  expect_equal(statin_FE_beta$`2.5%`, -0.42, tolerance = tol)
-  expect_equal(statin_FE_beta$`97.5%`, 0.01, tolerance = tol)
+  expect_equivalent(statin_FE_beta$mean, -0.21, tolerance = tol)
+  expect_equivalent(statin_FE_beta$sd, 0.11, tolerance = tol)
+  expect_equivalent(statin_FE_beta$`2.5%`, -0.42, tolerance = tol)
+  expect_equivalent(statin_FE_beta$`97.5%`, 0.01, tolerance = tol)
 })
 
 statin_RE_beta <- as.data.frame(summary(statin_fit_RE, pars = "beta"))
 
 test_that("RE regression beta", {
-  expect_equal(statin_RE_beta$mean, -0.29, tolerance = tol)
-  expect_equal(statin_RE_beta$sd, 0.26, tolerance = tol)
-  expect_equal(statin_RE_beta$`2.5%`, -0.86, tolerance = tol)
-  expect_equal(statin_RE_beta$`97.5%`, 0.20, tolerance = tol)
+  expect_equivalent(statin_RE_beta$mean, -0.29, tolerance = tol)
+  expect_equivalent(statin_RE_beta$sd, 0.26, tolerance = tol)
+  expect_equivalent(statin_RE_beta$`2.5%`, -0.86, tolerance = tol)
+  expect_equivalent(statin_RE_beta$`97.5%`, 0.20, tolerance = tol)
 })
 
 # RE heterogeneity SD
 statin_RE_sd <- as.data.frame(summary(statin_fit_RE, pars = "tau"))
 
 test_that("RE heterogeneity SD", {
-  expect_equal(statin_RE_sd$`50%`, 0.19, tolerance = tol)
-  expect_equal(statin_RE_sd$sd, 0.20, tolerance = tol)
-  expect_equal(statin_RE_sd$`2.5%`, 0.01, tolerance = tol)
-  expect_equal(statin_RE_sd$`97.5%`, 0.76, tolerance = tol)
+  expect_equivalent(statin_RE_sd$`50%`, 0.19, tolerance = tol)
+  expect_equivalent(statin_RE_sd$sd, 0.20, tolerance = tol)
+  expect_equivalent(statin_RE_sd$`2.5%`, 0.01, tolerance = tol)
+  expect_equivalent(statin_RE_sd$`97.5%`, 0.76, tolerance = tol)
 })
 
 # DIC
 test_that("FE DIC", {
-  expect_equal(statin_dic_FE$resdev, 45.9, tolerance = tol_dic)
-  expect_equal(statin_dic_FE$pd, 21.0, tolerance = tol_dic)
-  expect_equal(statin_dic_FE$dic, 66.9, tolerance = tol_dic)
+  expect_equivalent(statin_dic_FE$resdev, 45.9, tolerance = tol_dic)
+  expect_equivalent(statin_dic_FE$pd, 21.0, tolerance = tol_dic)
+  expect_equivalent(statin_dic_FE$dic, 66.9, tolerance = tol_dic)
 })
 
 test_that("RE DIC", {
-  expect_equal(statin_dic_RE$resdev, 42.6, tolerance = tol_dic)
-  expect_equal(statin_dic_RE$pd, 24.2, tolerance = tol_dic)
-  expect_equal(statin_dic_RE$dic, 66.8, tolerance = tol_dic)
+  expect_equivalent(statin_dic_RE$resdev, 42.6, tolerance = tol_dic)
+  expect_equivalent(statin_dic_RE$pd, 24.2, tolerance = tol_dic)
+  expect_equivalent(statin_dic_RE$dic, 66.8, tolerance = tol_dic)
 })
 
 

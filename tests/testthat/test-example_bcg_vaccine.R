@@ -6,22 +6,22 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
 
-## ---- include=FALSE------------------------------------------------------
+## ---- include=FALSE-------------------------------------------------------------------------------
 set.seed(18284729)
 
 
-## ----setup---------------------------------------------------------------
+## ----setup----------------------------------------------------------------------------------------
 library(multinma)
 options(mc.cores = parallel::detectCores())
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 head(bcg_vaccine)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 bcg_net <- set_agd_arm(bcg_vaccine, 
                        study = studyn,
                        trt = trtc,
@@ -31,19 +31,19 @@ bcg_net <- set_agd_arm(bcg_vaccine,
 bcg_net
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval = FALSE-------------------------------------------------------
+## ---- eval = FALSE--------------------------------------------------------------------------------
 ## bcg_fit_unadj <- nma(bcg_net,
 ##                      trt_effects = "random",
 ##                      prior_intercept = normal(scale = 100),
 ##                      prior_trt = normal(scale = 100),
 ##                      prior_het = half_normal(scale = 5))
 
-## ---- echo = FALSE-------------------------------------------------------
+## ---- echo = FALSE--------------------------------------------------------------------------------
 bcg_fit_unadj <- nma(bcg_net, 
                      seed = 14308133,
                      trt_effects = "random",
@@ -52,25 +52,25 @@ bcg_fit_unadj <- nma(bcg_net,
                      prior_het = half_normal(scale = 5))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 bcg_fit_unadj
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(bcg_fit_unadj, pars = c("d", "mu", "delta", "tau"))
 
 
-## ----bcg_unadj_pp_plot---------------------------------------------------
+## ----bcg_unadj_pp_plot----------------------------------------------------------------------------
 plot_prior_posterior(bcg_fit_unadj, prior = c("trt", "het"))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval = FALSE-------------------------------------------------------
+## ---- eval = FALSE--------------------------------------------------------------------------------
 ## bcg_fit_lat <- nma(bcg_net,
 ##                    trt_effects = "random",
 ##                    regression = ~.trt:latitude,
@@ -80,7 +80,7 @@ summary(half_normal(scale = 5))
 ##                    prior_het = half_normal(scale = 5),
 ##                    adapt_delta = 0.99)
 
-## ---- echo = FALSE-------------------------------------------------------
+## ---- echo = FALSE--------------------------------------------------------------------------------
 bcg_fit_lat <- nma(bcg_net, 
                    seed = 1932599147,
                    trt_effects = "random",
@@ -92,32 +92,32 @@ bcg_fit_lat <- nma(bcg_net,
                    adapt_delta = 0.99)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 bcg_fit_lat
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(bcg_fit_lat, pars = c("d", "beta", "mu", "delta", "tau"))
 
 
-## ----bcg_lat_pp_plot-----------------------------------------------------
+## ----bcg_lat_pp_plot------------------------------------------------------------------------------
 plot_prior_posterior(bcg_fit_lat, prior = c("trt", "reg", "het"))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (bcg_dic_unadj <- dic(bcg_fit_unadj))
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (bcg_dic_lat <- dic(bcg_fit_lat))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(bcg_fit_unadj, pars = "tau")
 summary(bcg_fit_lat, pars = "tau")
 
 
-## ----bcg_vaccine_beta_lat, fig.height = 4--------------------------------
+## ----bcg_vaccine_beta_lat, fig.height = 4---------------------------------------------------------
 summary(bcg_fit_lat, pars = "beta")
 
 plot(bcg_fit_lat, 
@@ -126,7 +126,7 @@ plot(bcg_fit_lat,
      stat = "halfeyeh")
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 bcg_releff_lat <- relative_effects(bcg_fit_lat,
                                    newdata = tibble::tibble(latitude = seq(10, 50, by = 10),
                                                             label = paste0(latitude, "\u00B0 latitude")),
@@ -135,12 +135,12 @@ bcg_releff_lat <- relative_effects(bcg_fit_lat,
 bcg_releff_lat
 
 
-## ----bcg_vaccine_releff_lat, fig.height = 5------------------------------
+## ----bcg_vaccine_releff_lat, fig.height = 5-------------------------------------------------------
 plot(bcg_releff_lat, 
      ref_line = 0)
 
 
-## ----bcg_vaccine_reg_plot------------------------------------------------
+## ----bcg_vaccine_reg_plot-------------------------------------------------------------------------
 library(dplyr)
 library(ggplot2)
 
@@ -174,7 +174,7 @@ ggplot(aes(x = latitude), data = bcg_lor) +
   theme_multinma()
 
 
-## ----bcg_vaccine_tests, include=FALSE, eval=params$run_tests-------------
+## ----bcg_vaccine_tests, include=FALSE, eval=params$run_tests--------------------------------------
 #--- Test against TSD 3 results ---
 library(testthat)
 library(dplyr)
@@ -186,60 +186,60 @@ tol_dic <- 0.1
 bcg_unadj_releff <- as.data.frame(summary(bcg_fit_unadj, pars = "d"))
 
 test_that("Unadjusted relative effects", {
-  expect_equal(bcg_unadj_releff$mean, -0.762, tolerance = tol)
-  expect_equal(bcg_unadj_releff$sd, 0.22, tolerance = tol)
-  expect_equal(bcg_unadj_releff$`2.5%`, -1.21, tolerance = tol)
-  expect_equal(bcg_unadj_releff$`97.5%`, -0.34, tolerance = tol)
+  expect_equivalent(bcg_unadj_releff$mean, -0.762, tolerance = tol)
+  expect_equivalent(bcg_unadj_releff$sd, 0.22, tolerance = tol)
+  expect_equivalent(bcg_unadj_releff$`2.5%`, -1.21, tolerance = tol)
+  expect_equivalent(bcg_unadj_releff$`97.5%`, -0.34, tolerance = tol)
 })
 
 bcg_lat_releff <- as.data.frame(summary(bcg_fit_lat, pars = "d"))
 
 test_that("Regression relative effects", {
-  expect_equal(bcg_lat_releff$mean, -0.763, tolerance = tol)
-  expect_equal(bcg_lat_releff$sd, 0.126, tolerance = tol)
-  expect_equal(bcg_lat_releff$`2.5%`, -1.04, tolerance = tol)
-  expect_equal(bcg_lat_releff$`97.5%`, -0.52, tolerance = tol)
+  expect_equivalent(bcg_lat_releff$mean, -0.763, tolerance = tol)
+  expect_equivalent(bcg_lat_releff$sd, 0.126, tolerance = tol)
+  expect_equivalent(bcg_lat_releff$`2.5%`, -1.04, tolerance = tol)
+  expect_equivalent(bcg_lat_releff$`97.5%`, -0.52, tolerance = tol)
 })
 
 # Regression coefficients
 bcg_lat_beta <- as.data.frame(summary(bcg_fit_lat, pars = "beta"))
 
 test_that("Regression beta", {
-  expect_equal(bcg_lat_beta$mean, -0.032, tolerance = tol)
-  expect_equal(bcg_lat_beta$sd, 0.009, tolerance = tol)
-  expect_equal(bcg_lat_beta$`2.5%`, -0.05, tolerance = tol)
-  expect_equal(bcg_lat_beta$`97.5%`, -0.01, tolerance = tol)
+  expect_equivalent(bcg_lat_beta$mean, -0.032, tolerance = tol)
+  expect_equivalent(bcg_lat_beta$sd, 0.009, tolerance = tol)
+  expect_equivalent(bcg_lat_beta$`2.5%`, -0.05, tolerance = tol)
+  expect_equivalent(bcg_lat_beta$`97.5%`, -0.01, tolerance = tol)
 })
 
 # RE heterogeneity SD
 bcg_unadj_sd <- as.data.frame(summary(bcg_fit_unadj, pars = "tau"))
 
 test_that("Unadjusted heterogeneity SD", {
-  expect_equal(bcg_unadj_sd$`50%`, 0.649, tolerance = tol)
-  expect_equal(bcg_unadj_sd$sd, 0.202, tolerance = tol)
-  expect_equal(bcg_unadj_sd$`2.5%`, 0.39, tolerance = tol)
-  expect_equal(bcg_unadj_sd$`97.5%`, 1.17, tolerance = tol)
+  expect_equivalent(bcg_unadj_sd$`50%`, 0.649, tolerance = tol)
+  expect_equivalent(bcg_unadj_sd$sd, 0.202, tolerance = tol)
+  expect_equivalent(bcg_unadj_sd$`2.5%`, 0.39, tolerance = tol)
+  expect_equivalent(bcg_unadj_sd$`97.5%`, 1.17, tolerance = tol)
 })
 
 bcg_lat_sd <- as.data.frame(summary(bcg_fit_lat, pars = "tau"))
 
 test_that("Regression heterogeneity SD", {
-  expect_equal(bcg_lat_sd$`50%`, 0.272, tolerance = tol)
-  expect_equal(bcg_lat_sd$sd, 0.188, tolerance = tol)
-  expect_equal(bcg_lat_sd$`2.5%`, 0.03, tolerance = tol)
-  expect_equal(bcg_lat_sd$`97.5%`, 0.75, tolerance = tol)
+  expect_equivalent(bcg_lat_sd$`50%`, 0.272, tolerance = tol)
+  expect_equivalent(bcg_lat_sd$sd, 0.188, tolerance = tol)
+  expect_equivalent(bcg_lat_sd$`2.5%`, 0.03, tolerance = tol)
+  expect_equivalent(bcg_lat_sd$`97.5%`, 0.75, tolerance = tol)
 })
 
 # DIC
 test_that("Unadjusted DIC", {
-  expect_equal(bcg_dic_unadj$resdev, 26.1, tolerance = tol_dic)
-  expect_equal(bcg_dic_unadj$pd, 23.5, tolerance = tol_dic)
-  expect_equal(bcg_dic_unadj$dic, 49.6, tolerance = tol_dic)
+  expect_equivalent(bcg_dic_unadj$resdev, 26.1, tolerance = tol_dic)
+  expect_equivalent(bcg_dic_unadj$pd, 23.5, tolerance = tol_dic)
+  expect_equivalent(bcg_dic_unadj$dic, 49.6, tolerance = tol_dic)
 })
 
 test_that("Regression DIC", {
-  expect_equal(bcg_dic_lat$resdev, 30.4, tolerance = tol_dic)
-  expect_equal(bcg_dic_lat$pd, 21.1, tolerance = tol_dic)
-  expect_equal(bcg_dic_lat$dic, 51.5, tolerance = tol_dic)
+  expect_equivalent(bcg_dic_lat$resdev, 30.4, tolerance = tol_dic)
+  expect_equivalent(bcg_dic_lat$pd, 21.1, tolerance = tol_dic)
+  expect_equivalent(bcg_dic_lat$dic, 51.5, tolerance = tol_dic)
 })
 

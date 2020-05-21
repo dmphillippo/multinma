@@ -6,19 +6,19 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
 
 
-## ----setup---------------------------------------------------------------
+## ----setup----------------------------------------------------------------------------------------
 library(multinma)
 options(mc.cores = parallel::detectCores())
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 head(diabetes)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 db_net <- set_agd_arm(diabetes, 
                       study = studyc,
                       trt = trtc,
@@ -27,18 +27,18 @@ db_net <- set_agd_arm(diabetes,
 db_net
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## plot(db_net, weight_edges = TRUE, weight_nodes = TRUE)
 
-## ----diabetes_network_plot, echo=FALSE-----------------------------------
+## ----diabetes_network_plot, echo=FALSE------------------------------------------------------------
 plot(db_net, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(legend.box.margin = ggplot2::unit(c(0, 0, 0, 4), "lines"))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 db_fit_FE <- nma(db_net, 
                  trt_effects = "fixed",
                  link = "cloglog",
@@ -47,25 +47,25 @@ db_fit_FE <- nma(db_net,
                  prior_trt = normal(scale = 100))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 db_fit_FE
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(db_fit_FE, pars = c("d", "mu"))
 
 
-## ----db_FE_pp_plot-------------------------------------------------------
+## ----db_FE_pp_plot--------------------------------------------------------------------------------
 plot_prior_posterior(db_fit_FE)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- warning=FALSE------------------------------------------------------
+## ---- warning=FALSE-------------------------------------------------------------------------------
 db_fit_RE <- nma(db_net, 
                  trt_effects = "random",
                  link = "cloglog",
@@ -75,44 +75,44 @@ db_fit_RE <- nma(db_net,
                  prior_het = half_normal(scale = 5))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 db_fit_RE
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(db_fit_RE, pars = c("d", "mu", "delta"))
 
 
-## ----db_RE_pp_plot-------------------------------------------------------
+## ----db_RE_pp_plot--------------------------------------------------------------------------------
 plot_prior_posterior(db_fit_RE, prior = c("trt", "het"))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (dic_FE <- dic(db_fit_FE))
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (dic_RE <- dic(db_fit_RE))
 
 
-## ----db_FE_resdev_plot---------------------------------------------------
+## ----db_FE_resdev_plot----------------------------------------------------------------------------
 plot(dic_FE)
 
 
-## ----db_RE_resdev_plot---------------------------------------------------
+## ----db_RE_resdev_plot----------------------------------------------------------------------------
 plot(dic_RE)
 
 
-## ----diabetes_releff_FE, fig.height=3------------------------------------
+## ----diabetes_releff_FE, fig.height=3-------------------------------------------------------------
 (db_releff_FE <- relative_effects(db_fit_FE, trt_ref = "Diuretic"))
 plot(db_releff_FE, ref_line = 0)
 
-## ----diabetes_releff_RE, fig.height=3------------------------------------
+## ----diabetes_releff_RE, fig.height=3-------------------------------------------------------------
 (db_releff_RE <- relative_effects(db_fit_RE, trt_ref = "Diuretic"))
 plot(db_releff_RE, ref_line = 0)
 
 
-## ----db_pred_FE, fig.height = 2------------------------------------------
+## ----db_pred_FE, fig.height = 2-------------------------------------------------------------------
 db_pred_FE <- predict(db_fit_FE, 
                       newdata = data.frame(time = 3),
                       baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5), 
@@ -121,7 +121,7 @@ db_pred_FE <- predict(db_fit_FE,
 db_pred_FE
 plot(db_pred_FE)
 
-## ----db_pred_RE, fig.height = 2------------------------------------------
+## ----db_pred_RE, fig.height = 2-------------------------------------------------------------------
 db_pred_RE <- predict(db_fit_RE, 
                       newdata = data.frame(time = 3),
                       baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5), 
@@ -131,26 +131,26 @@ db_pred_RE
 plot(db_pred_RE)
 
 
-## ----db_pred_RE_all, fig.height=16---------------------------------------
+## ----db_pred_RE_all, fig.height=16----------------------------------------------------------------
 db_pred_RE_studies <- predict(db_fit_RE, type = "response")
 db_pred_RE_studies
 plot(db_pred_RE_studies)
 
 
-## ----diabetes_ranks------------------------------------------------------
+## ----diabetes_ranks-------------------------------------------------------------------------------
 (db_ranks <- posterior_ranks(db_fit_RE))
 plot(db_ranks)
 
-## ----diabetes_rankprobs--------------------------------------------------
+## ----diabetes_rankprobs---------------------------------------------------------------------------
 (db_rankprobs <- posterior_rank_probs(db_fit_RE))
 plot(db_rankprobs)
 
-## ----diabetes_cumrankprobs-----------------------------------------------
+## ----diabetes_cumrankprobs------------------------------------------------------------------------
 (db_cumrankprobs <- posterior_rank_probs(db_fit_RE, cumulative = TRUE))
 plot(db_cumrankprobs)
 
 
-## ----diabetes_tests, include=FALSE, eval=params$run_tests----------------
+## ----diabetes_tests, include=FALSE, eval=params$run_tests-----------------------------------------
 #--- Test against TSD 2 results ---
 library(testthat)
 library(dplyr)
@@ -181,11 +181,11 @@ tsd_FE <- tribble(
 db_releff_FE <- as.data.frame(db_releff_FE)
 
 test_that("FE relative effects", {
-  expect_equal(db_releff_FE$mean, tsd_FE$mean, tolerance = tol)
-  expect_equal(db_releff_FE$sd, tsd_FE$sd, tolerance = tol)
-  expect_equal(db_releff_FE$`50%`, tsd_FE$median, tolerance = tol)
-  expect_equal(db_releff_FE$`2.5%`, tsd_FE$lower, tolerance = tol)
-  expect_equal(db_releff_FE$`97.5%`, tsd_FE$upper, tolerance = tol)
+  expect_equivalent(db_releff_FE$mean, tsd_FE$mean, tolerance = tol)
+  expect_equivalent(db_releff_FE$sd, tsd_FE$sd, tolerance = tol)
+  expect_equivalent(db_releff_FE$`50%`, tsd_FE$median, tolerance = tol)
+  expect_equivalent(db_releff_FE$`2.5%`, tsd_FE$lower, tolerance = tol)
+  expect_equivalent(db_releff_FE$`97.5%`, tsd_FE$upper, tolerance = tol)
 })
 
 # RE Relative effects
@@ -203,22 +203,22 @@ tsd_RE <- tribble(
 db_releff_RE <- as.data.frame(db_releff_RE)
 
 test_that("RE relative effects", {
-  expect_equal(db_releff_RE$mean, tsd_RE$mean, tolerance = tol)
-  expect_equal(db_releff_RE$sd, tsd_RE$sd, tolerance = tol)
-  expect_equal(db_releff_RE$`50%`, tsd_RE$median, tolerance = tol)
-  expect_equal(db_releff_RE$`2.5%`, tsd_RE$lower, tolerance = tol)
-  expect_equal(db_releff_RE$`97.5%`, tsd_RE$upper, tolerance = tol)
+  expect_equivalent(db_releff_RE$mean, tsd_RE$mean, tolerance = tol)
+  expect_equivalent(db_releff_RE$sd, tsd_RE$sd, tolerance = tol)
+  expect_equivalent(db_releff_RE$`50%`, tsd_RE$median, tolerance = tol)
+  expect_equivalent(db_releff_RE$`2.5%`, tsd_RE$lower, tolerance = tol)
+  expect_equivalent(db_releff_RE$`97.5%`, tsd_RE$upper, tolerance = tol)
 })
 
 # Heterogeneity SD
 db_tau <- as.data.frame(summary(db_fit_RE, pars = "tau"))
 
 test_that("RE heterogeneity SD", {
-  expect_equal(db_tau$mean, 0.13, tolerance = tol)
-  expect_equal(db_tau$sd, 0.04, tolerance = tol)
-  expect_equal(db_tau$`50%`, 0.12, tolerance = tol)
-  expect_equal(db_tau$`2.5%`, 0.05, tolerance = tol)
-  expect_equal(db_tau$`97.5%`, 0.23, tolerance = tol)
+  expect_equivalent(db_tau$mean, 0.13, tolerance = tol)
+  expect_equivalent(db_tau$sd, 0.04, tolerance = tol)
+  expect_equivalent(db_tau$`50%`, 0.12, tolerance = tol)
+  expect_equivalent(db_tau$`2.5%`, 0.05, tolerance = tol)
+  expect_equivalent(db_tau$`97.5%`, 0.23, tolerance = tol)
 })
 
 # FE probabilities
@@ -237,11 +237,11 @@ tsd_pred_FE <- tribble(
 db_pred_FE <- as.data.frame(db_pred_FE)
 
 test_that("FE predicted probabilities at 3 years", {
-  expect_equal(db_pred_FE$mean, tsd_pred_FE$mean, tolerance = tol)
-  expect_equal(db_pred_FE$sd, tsd_pred_FE$sd, tolerance = tol)
-  expect_equal(db_pred_FE$`50%`, tsd_pred_FE$median, tolerance = tol)
-  expect_equal(db_pred_FE$`2.5%`, tsd_pred_FE$lower, tolerance = tol)
-  expect_equal(db_pred_FE$`97.5%`, tsd_pred_FE$upper, tolerance = tol)
+  expect_equivalent(db_pred_FE$mean, tsd_pred_FE$mean, tolerance = tol)
+  expect_equivalent(db_pred_FE$sd, tsd_pred_FE$sd, tolerance = tol)
+  expect_equivalent(db_pred_FE$`50%`, tsd_pred_FE$median, tolerance = tol)
+  expect_equivalent(db_pred_FE$`2.5%`, tsd_pred_FE$lower, tolerance = tol)
+  expect_equivalent(db_pred_FE$`97.5%`, tsd_pred_FE$upper, tolerance = tol)
 })
 
 # RE probabilities
@@ -260,24 +260,24 @@ tsd_pred_RE <- tribble(
 db_pred_RE <- as.data.frame(db_pred_RE)
 
 test_that("RE predicted probabilities at 3 years", {
-  expect_equal(db_pred_RE$mean, tsd_pred_RE$mean, tolerance = tol)
-  expect_equal(db_pred_RE$sd, tsd_pred_RE$sd, tolerance = tol)
-  expect_equal(db_pred_RE$`50%`, tsd_pred_RE$median, tolerance = tol)
-  expect_equal(db_pred_RE$`2.5%`, tsd_pred_RE$lower, tolerance = tol)
-  expect_equal(db_pred_RE$`97.5%`, tsd_pred_RE$upper, tolerance = tol)
+  expect_equivalent(db_pred_RE$mean, tsd_pred_RE$mean, tolerance = tol)
+  expect_equivalent(db_pred_RE$sd, tsd_pred_RE$sd, tolerance = tol)
+  expect_equivalent(db_pred_RE$`50%`, tsd_pred_RE$median, tolerance = tol)
+  expect_equivalent(db_pred_RE$`2.5%`, tsd_pred_RE$lower, tolerance = tol)
+  expect_equivalent(db_pred_RE$`97.5%`, tsd_pred_RE$upper, tolerance = tol)
 })
 
 # RE DIC
 test_that("RE DIC", {
-  expect_equal(dic_RE$resdev, 53.7, tolerance = tol_dic)
-  expect_equal(dic_RE$pd, 38.0, tolerance = tol_dic)
-  expect_equal(dic_RE$dic, 91.7, tolerance = tol_dic)
+  expect_equivalent(dic_RE$resdev, 53.7, tolerance = tol_dic)
+  expect_equivalent(dic_RE$pd, 38.0, tolerance = tol_dic)
+  expect_equivalent(dic_RE$dic, 91.7, tolerance = tol_dic)
 })
 
 # FE DIC
 test_that("FE DIC", {
-  expect_equal(dic_FE$resdev, 78.25, tolerance = tol_dic)
-  expect_equal(dic_FE$pd, 27.0, tolerance = tol_dic)
-  expect_equal(dic_FE$dic, 105.2, tolerance = tol_dic)
+  expect_equivalent(dic_FE$resdev, 78.25, tolerance = tol_dic)
+  expect_equivalent(dic_FE$pd, 27.0, tolerance = tol_dic)
+  expect_equivalent(dic_FE$dic, 105.2, tolerance = tol_dic)
 })
 

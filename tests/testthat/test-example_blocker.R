@@ -6,19 +6,19 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
 
 
-## ----setup---------------------------------------------------------------
+## ----setup----------------------------------------------------------------------------------------
 library(multinma)
 options(mc.cores = parallel::detectCores())
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 head(blocker)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 blocker_net <- set_agd_arm(blocker, 
                            study = studyn,
                            trt = trtc,
@@ -28,36 +28,36 @@ blocker_net <- set_agd_arm(blocker,
 blocker_net
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 blocker_fit_FE <- nma(blocker_net, 
                    trt_effects = "fixed",
                    prior_intercept = normal(scale = 100),
                    prior_trt = normal(scale = 100))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 blocker_fit_FE
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(blocker_fit_FE, pars = c("d", "mu"))
 
 
-## ----blocker_FE_pp_plot--------------------------------------------------
+## ----blocker_FE_pp_plot---------------------------------------------------------------------------
 plot_prior_posterior(blocker_fit_FE, prior = "trt")
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 blocker_fit_RE <- nma(blocker_net, 
                    trt_effects = "random",
                    prior_intercept = normal(scale = 100),
@@ -65,42 +65,42 @@ blocker_fit_RE <- nma(blocker_net,
                    prior_het = half_normal(scale = 5))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 blocker_fit_RE
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(blocker_fit_RE, pars = c("d", "mu", "delta"))
 
 
-## ----blocker_RE_pp_plot--------------------------------------------------
+## ----blocker_RE_pp_plot---------------------------------------------------------------------------
 plot_prior_posterior(blocker_fit_RE, prior = c("trt", "het"))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (dic_FE <- dic(blocker_fit_FE))
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (dic_RE <- dic(blocker_fit_RE))
 
 
-## ----blocker_FE_resdev_plot----------------------------------------------
+## ----blocker_FE_resdev_plot-----------------------------------------------------------------------
 plot(dic_FE)
 
 
-## ----blocker_RE_resdev_plot----------------------------------------------
+## ----blocker_RE_resdev_plot-----------------------------------------------------------------------
 plot(dic_RE)
 
 
-## ----blocker_pred_FE, fig.height = 2-------------------------------------
+## ----blocker_pred_FE, fig.height = 2--------------------------------------------------------------
 pred_FE <- predict(blocker_fit_FE, 
                    baseline = distr(qnorm, mean = -2.2, sd = 3.3^-0.5), 
                    type = "response")
 pred_FE
 plot(pred_FE)
 
-## ----blocker_pred_RE, fig.height = 2-------------------------------------
+## ----blocker_pred_RE, fig.height = 2--------------------------------------------------------------
 pred_RE <- predict(blocker_fit_RE, 
                    baseline = distr(qnorm, mean = -2.2, sd = 3.3^-0.5), 
                    type = "response")
@@ -108,7 +108,7 @@ pred_RE
 plot(pred_RE)
 
 
-## ----blocker_tests, include=FALSE, eval=params$run_tests-----------------
+## ----blocker_tests, include=FALSE, eval=params$run_tests------------------------------------------
 #--- Test against TSD 2 results ---
 library(testthat)
 library(dplyr)
@@ -120,65 +120,65 @@ tol_dic <- 0.1
 blocker_FE_releff <- as.data.frame(relative_effects(blocker_fit_FE))
 
 test_that("FE relative effects", {
-  expect_equal(blocker_FE_releff$mean, -0.26, tolerance = tol)
-  expect_equal(blocker_FE_releff$sd, 0.050, tolerance = tol)
-  expect_equal(blocker_FE_releff$`2.5%`, -0.36, tolerance = tol)
-  expect_equal(blocker_FE_releff$`50%`, -0.26, tolerance = tol)
-  expect_equal(blocker_FE_releff$`97.5%`, -0.16, tolerance = tol)
+  expect_equivalent(blocker_FE_releff$mean, -0.26, tolerance = tol)
+  expect_equivalent(blocker_FE_releff$sd, 0.050, tolerance = tol)
+  expect_equivalent(blocker_FE_releff$`2.5%`, -0.36, tolerance = tol)
+  expect_equivalent(blocker_FE_releff$`50%`, -0.26, tolerance = tol)
+  expect_equivalent(blocker_FE_releff$`97.5%`, -0.16, tolerance = tol)
 })
 
 blocker_RE_releff <- as.data.frame(relative_effects(blocker_fit_RE))
 
 test_that("RE relative effects", {
-  expect_equal(blocker_RE_releff$mean, -0.25, tolerance = tol)
-  expect_equal(blocker_RE_releff$sd, 0.066, tolerance = tol)
-  expect_equal(blocker_RE_releff$`2.5%`, -0.38, tolerance = tol)
-  expect_equal(blocker_RE_releff$`50%`, -0.25, tolerance = tol)
-  expect_equal(blocker_RE_releff$`97.5%`, -0.12, tolerance = tol)
+  expect_equivalent(blocker_RE_releff$mean, -0.25, tolerance = tol)
+  expect_equivalent(blocker_RE_releff$sd, 0.066, tolerance = tol)
+  expect_equivalent(blocker_RE_releff$`2.5%`, -0.38, tolerance = tol)
+  expect_equivalent(blocker_RE_releff$`50%`, -0.25, tolerance = tol)
+  expect_equivalent(blocker_RE_releff$`97.5%`, -0.12, tolerance = tol)
 })
 
 # RE heterogeneity SD
 blocker_RE_sd <- as.data.frame(summary(blocker_fit_RE, pars = "tau"))
 
 test_that("RE heterogeneity SD", {
-  expect_equal(blocker_RE_sd$mean, 0.14, tolerance = tol)
-  expect_equal(blocker_RE_sd$sd, 0.082, tolerance = tol)
-  expect_equal(blocker_RE_sd$`2.5%`, 0.01, tolerance = tol)
-  expect_equal(blocker_RE_sd$`50%`, 0.13, tolerance = tol)
-  expect_equal(blocker_RE_sd$`97.5%`, 0.32, tolerance = tol)
+  expect_equivalent(blocker_RE_sd$mean, 0.14, tolerance = tol)
+  expect_equivalent(blocker_RE_sd$sd, 0.082, tolerance = tol)
+  expect_equivalent(blocker_RE_sd$`2.5%`, 0.01, tolerance = tol)
+  expect_equivalent(blocker_RE_sd$`50%`, 0.13, tolerance = tol)
+  expect_equivalent(blocker_RE_sd$`97.5%`, 0.32, tolerance = tol)
 })
 
 # DIC
 test_that("FE DIC", {
-  expect_equal(dic_FE$resdev, 46.8, tolerance = tol_dic)
-  expect_equal(dic_FE$pd, 23.0, tolerance = tol_dic)
-  expect_equal(dic_FE$dic, 69.8, tolerance = tol_dic)
+  expect_equivalent(dic_FE$resdev, 46.8, tolerance = tol_dic)
+  expect_equivalent(dic_FE$pd, 23.0, tolerance = tol_dic)
+  expect_equivalent(dic_FE$dic, 69.8, tolerance = tol_dic)
 })
 
 test_that("RE DIC", {
-  expect_equal(dic_RE$resdev, 41.9, tolerance = tol_dic)
-  expect_equal(dic_RE$pd, 28.1, tolerance = tol_dic)
-  expect_equal(dic_RE$dic, 70.0, tolerance = tol_dic)
+  expect_equivalent(dic_RE$resdev, 41.9, tolerance = tol_dic)
+  expect_equivalent(dic_RE$pd, 28.1, tolerance = tol_dic)
+  expect_equivalent(dic_RE$dic, 70.0, tolerance = tol_dic)
 })
 
 # Predictions
 blocker_pred_FE <- as.data.frame(pred_FE)
 
 test_that("FE predicted probabilities", {
-  expect_equal(blocker_pred_FE$mean, c(0.11, 0.09), tolerance = tol_dic)
-  expect_equal(blocker_pred_FE$sd, c(0.055, 0.045), tolerance = tol_dic)
-  expect_equal(blocker_pred_FE$`2.5%`, c(0.04, 0.03), tolerance = tol_dic)
-  expect_equal(blocker_pred_FE$`50%`, c(0.10, 0.08), tolerance = tol_dic)
-  expect_equal(blocker_pred_FE$`97.5%`, c(0.25, 0.20), tolerance = tol_dic)
+  expect_equivalent(blocker_pred_FE$mean, c(0.11, 0.09), tolerance = tol_dic)
+  expect_equivalent(blocker_pred_FE$sd, c(0.055, 0.045), tolerance = tol_dic)
+  expect_equivalent(blocker_pred_FE$`2.5%`, c(0.04, 0.03), tolerance = tol_dic)
+  expect_equivalent(blocker_pred_FE$`50%`, c(0.10, 0.08), tolerance = tol_dic)
+  expect_equivalent(blocker_pred_FE$`97.5%`, c(0.25, 0.20), tolerance = tol_dic)
 })
 
 blocker_pred_RE <- as.data.frame(pred_RE)
 
 test_that("RE predicted probabilities", {
-  expect_equal(blocker_pred_RE$mean, c(0.11, 0.09), tolerance = tol_dic)
-  expect_equal(blocker_pred_RE$sd, c(0.055, 0.046), tolerance = tol_dic)
-  expect_equal(blocker_pred_RE$`2.5%`, c(0.04, 0.03), tolerance = tol_dic)
-  expect_equal(blocker_pred_RE$`50%`, c(0.10, 0.08), tolerance = tol_dic)
-  expect_equal(blocker_pred_RE$`97.5%`, c(0.25, 0.20), tolerance = tol_dic)
+  expect_equivalent(blocker_pred_RE$mean, c(0.11, 0.09), tolerance = tol_dic)
+  expect_equivalent(blocker_pred_RE$sd, c(0.055, 0.046), tolerance = tol_dic)
+  expect_equivalent(blocker_pred_RE$`2.5%`, c(0.04, 0.03), tolerance = tol_dic)
+  expect_equivalent(blocker_pred_RE$`50%`, c(0.10, 0.08), tolerance = tol_dic)
+  expect_equivalent(blocker_pred_RE$`97.5%`, c(0.25, 0.20), tolerance = tol_dic)
 })
 

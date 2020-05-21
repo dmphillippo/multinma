@@ -6,22 +6,22 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
 
-## ---- include=FALSE------------------------------------------------------
+## ---- include=FALSE-------------------------------------------------------------------------------
 set.seed(4783982)
 
 
-## ----setup---------------------------------------------------------------
+## ----setup----------------------------------------------------------------------------------------
 library(multinma)
 options(mc.cores = parallel::detectCores())
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 head(atrial_fibrillation)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 af_net <- set_agd_arm(atrial_fibrillation[atrial_fibrillation$studyc != "WASPO", ], 
                       study = studyc,
                       trt = trtc,
@@ -31,17 +31,17 @@ af_net <- set_agd_arm(atrial_fibrillation[atrial_fibrillation$studyc != "WASPO",
 af_net
 
 
-## ----af_network_plot-----------------------------------------------------
+## ----af_network_plot------------------------------------------------------------------------------
 plot(af_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) + 
   ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## af_fit_1 <- nma(af_net,
 ##                 trt_effects = "random",
 ##                 prior_intercept = normal(scale = 100),
@@ -49,7 +49,7 @@ summary(half_normal(scale = 5))
 ##                 prior_het = half_normal(scale = 5),
 ##                 adapt_delta = 0.99)
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=FALSE----------------------------------------------------------------------------------
 af_fit_1 <- nma(af_net, 
                 seed = 103533305,
                 trt_effects = "random",
@@ -59,41 +59,41 @@ af_fit_1 <- nma(af_net,
                 adapt_delta = 0.99)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 af_fit_1
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(af_fit_1, pars = c("d", "mu", "delta"))
 
 
-## ----af_1_pp_plot--------------------------------------------------------
+## ----af_1_pp_plot---------------------------------------------------------------------------------
 plot_prior_posterior(af_fit_1, prior = c("trt", "het"))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (af_1_releff <- relative_effects(af_fit_1, trt_ref = "Placebo/Standard care"))
 
 
-## ----af_1_releff_plot----------------------------------------------------
+## ----af_1_releff_plot-----------------------------------------------------------------------------
 plot(af_1_releff, ref_line = 0)
 
 
-## ----af_1_ranks----------------------------------------------------------
+## ----af_1_ranks-----------------------------------------------------------------------------------
 (af_1_ranks <- posterior_ranks(af_fit_1))
 plot(af_1_ranks)
 
-## ----af_1_rankprobs------------------------------------------------------
+## ----af_1_rankprobs-------------------------------------------------------------------------------
 (af_1_rankprobs <- posterior_rank_probs(af_fit_1))
 plot(af_1_rankprobs)
 
-## ----af_1_cumrankprobs---------------------------------------------------
+## ----af_1_cumrankprobs----------------------------------------------------------------------------
 (af_1_cumrankprobs <- posterior_rank_probs(af_fit_1, cumulative = TRUE))
 plot(af_1_cumrankprobs)
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## af_fit_4b <- nma(af_net,
 ##                  trt_effects = "random",
 ##                  regression = ~ .trt:stroke,
@@ -105,7 +105,7 @@ plot(af_1_cumrankprobs)
 ##                  prior_het = half_normal(scale = 5),
 ##                  adapt_delta = 0.99)
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=FALSE----------------------------------------------------------------------------------
 af_fit_4b <- nma(af_net, 
                  seed = 579212814,
                  trt_effects = "random",
@@ -119,26 +119,26 @@ af_fit_4b <- nma(af_net,
                  adapt_delta = 0.99)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 af_fit_4b
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(af_fit_4b, pars = c("d", "mu", "delta"))
 
 
-## ----af_4b_pp_plot-------------------------------------------------------
+## ----af_4b_pp_plot--------------------------------------------------------------------------------
 plot_prior_posterior(af_fit_4b, prior = c("reg", "het"))
 
 
-## ----af_4b_releff_plot, fig.height = 16, eval=FALSE----------------------
+## ----af_4b_releff_plot, fig.height = 16, eval=FALSE-----------------------------------------------
 ## # Not run
 ## (af_4b_releff <- relative_effects(af_fit_4b, trt_ref = "Placebo/Standard care"))
 ## plot(af_4b_releff, ref_line = 0)
 
 
-## ----af_4b_releff_01_plot------------------------------------------------
+## ----af_4b_releff_01_plot-------------------------------------------------------------------------
 (af_4b_releff_01 <- relative_effects(af_fit_4b, 
                                      trt_ref = "Placebo/Standard care",
                                      newdata = data.frame(stroke = c(0, 1), 
@@ -147,11 +147,11 @@ plot_prior_posterior(af_fit_4b, prior = c("reg", "het"))
 plot(af_4b_releff_01, ref_line = 0)
 
 
-## ----af_4b_betas---------------------------------------------------------
+## ----af_4b_betas----------------------------------------------------------------------------------
 plot(af_fit_4b, pars = "beta", stat = "halfeyeh", ref_line = 0)
 
 
-## ----af_4b_betas_transformed---------------------------------------------
+## ----af_4b_betas_transformed----------------------------------------------------------------------
 af_4b_beta <- as.array(af_fit_4b, pars = "beta")
 
 # Subtract beta[Control:stroke] from the other class interactions
@@ -167,14 +167,14 @@ summary(af_4b_beta)
 plot(summary(af_4b_beta), stat = "halfeyeh", ref_line = 0)
 
 
-## ----af_4b_ranks---------------------------------------------------------
+## ----af_4b_ranks----------------------------------------------------------------------------------
 (af_4b_ranks <- posterior_ranks(af_fit_4b,
                                 newdata = data.frame(stroke = c(0, 1), 
                                                      label = c("stroke = 0", "stroke = 1")), 
                                 study = label))
 plot(af_4b_ranks)
 
-## ----af_4b_rankprobs, fig.height=12--------------------------------------
+## ----af_4b_rankprobs, fig.height=12---------------------------------------------------------------
 (af_4b_rankprobs <- posterior_rank_probs(af_fit_4b,
                                          newdata = data.frame(stroke = c(0, 1), 
                                                               label = c("stroke = 0", "stroke = 1")), 
@@ -186,7 +186,7 @@ plot(af_4b_rankprobs) +
   facet_grid(Treatment~Study, labeller = label_wrap_gen(20)) + 
   theme(strip.text.y = element_text(angle = 0))
 
-## ----af_4b_cumrankprobs, fig.height=12-----------------------------------
+## ----af_4b_cumrankprobs, fig.height=12------------------------------------------------------------
 (af_4b_cumrankprobs <- posterior_rank_probs(af_fit_4b, cumulative = TRUE,
                                             newdata = data.frame(stroke = c(0, 1), 
                                                                  label = c("stroke = 0", "stroke = 1")), 
@@ -197,22 +197,22 @@ plot(af_4b_cumrankprobs) +
   theme(strip.text.y = element_text(angle = 0))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (af_dic_1 <- dic(af_fit_1))
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (af_dic_4b <- dic(af_fit_4b))
 
 
-## ----af_1_resdev_plot----------------------------------------------------
+## ----af_1_resdev_plot-----------------------------------------------------------------------------
 plot(af_dic_1)
 
 
-## ----af_4b_resdev_plot---------------------------------------------------
+## ----af_4b_resdev_plot----------------------------------------------------------------------------
 plot(af_dic_4b)
 
 
-## ----atrial_fibrillation_tests, include=FALSE, eval=params$run_tests-----
+## ----atrial_fibrillation_tests, include=FALSE, eval=params$run_tests------------------------------
 #--- Test against TSD 2 results ---
 library(testthat)
 library(dplyr)
@@ -247,23 +247,23 @@ Cooper_1_releff <- tribble(
 af_1_releff_df <- as.data.frame(af_1_releff)
 
 test_that("Relative effects (no covariates)", {
-  expect_equal(af_1_releff_df$mean, Cooper_1_releff$est, tolerance = tol)
-  expect_equal(af_1_releff_df$`2.5%`, Cooper_1_releff$lower, tolerance = tol)
-  expect_equal(af_1_releff_df$`97.5%`, Cooper_1_releff$upper, tolerance = tol)
+  expect_equivalent(af_1_releff_df$mean, Cooper_1_releff$est, tolerance = tol)
+  expect_equivalent(af_1_releff_df$`2.5%`, Cooper_1_releff$lower, tolerance = tol)
+  expect_equivalent(af_1_releff_df$`97.5%`, Cooper_1_releff$upper, tolerance = tol)
 })
 
 af_1_tau <- as.data.frame(summary(af_fit_1, pars = "tau"))
 
 test_that("Heterogeneity SD (no covariates)", {
-  expect_equal(af_1_tau$`50%`, 0.28, tolerance = tol)
-  expect_equal(af_1_tau$`2.5%`, 0.02, tolerance = tol)
-  expect_equal(af_1_tau$`97.5%`, 0.57, tolerance = tol)
+  expect_equivalent(af_1_tau$`50%`, 0.28, tolerance = tol)
+  expect_equivalent(af_1_tau$`2.5%`, 0.02, tolerance = tol)
+  expect_equivalent(af_1_tau$`97.5%`, 0.57, tolerance = tol)
 })
 
 test_that("DIC (no covariates)", {
-  expect_equal(af_dic_1$resdev, 60.22, tolerance = tol_dic)
-  expect_equal(af_dic_1$pd, 48.35, tolerance = tol_dic)
-  expect_equal(af_dic_1$dic, 108.57, tolerance = tol_dic)
+  expect_equivalent(af_dic_1$resdev, 60.22, tolerance = tol_dic)
+  expect_equivalent(af_dic_1$pd, 48.35, tolerance = tol_dic)
+  expect_equivalent(af_dic_1$dic, 108.57, tolerance = tol_dic)
 })
 
 # With stroke covariate, shared interactions
@@ -295,9 +295,9 @@ af_4b_releff_Cooper <- as.data.frame(relative_effects(af_fit_4b,
                                                       trt_ref = "Placebo/Standard care"))
 
 test_that("Relative effects (common interaction)", {
-  expect_equal(af_4b_releff_Cooper$mean, Cooper_4b_releff$est, tolerance = tol)
-  expect_equal(af_4b_releff_Cooper$`2.5%`, Cooper_4b_releff$lower, tolerance = tol)
-  expect_equal(af_4b_releff_Cooper$`97.5%`, Cooper_4b_releff$upper, tolerance = tol)
+  expect_equivalent(af_4b_releff_Cooper$mean, Cooper_4b_releff$est, tolerance = tol)
+  expect_equivalent(af_4b_releff_Cooper$`2.5%`, Cooper_4b_releff$lower, tolerance = tol)
+  expect_equivalent(af_4b_releff_Cooper$`97.5%`, Cooper_4b_releff$upper, tolerance = tol)
 })
 
 Cooper_4b_beta <- tribble(
@@ -310,23 +310,23 @@ Cooper_4b_beta <- tribble(
 af_4b_beta_df <- as.data.frame(summary(af_4b_beta))
 
 test_that("Interaction estimates (common interaction)", {
-  expect_equal(af_4b_beta_df$mean, Cooper_4b_beta$est, tolerance = tol)
-  expect_equal(af_4b_beta_df$`2.5%`, Cooper_4b_beta$lower, tolerance = tol)
-  expect_equal(af_4b_beta_df$`97.5%`, Cooper_4b_beta$upper, tolerance = tol)
+  expect_equivalent(af_4b_beta_df$mean, Cooper_4b_beta$est, tolerance = tol)
+  expect_equivalent(af_4b_beta_df$`2.5%`, Cooper_4b_beta$lower, tolerance = tol)
+  expect_equivalent(af_4b_beta_df$`97.5%`, Cooper_4b_beta$upper, tolerance = tol)
 })
 
 af_4b_tau <- as.data.frame(summary(af_fit_4b, pars = "tau"))
 
 test_that("Heterogeneity SD (common interaction)", {
-  expect_equal(af_4b_tau$`50%`, 0.19, tolerance = tol)
-  expect_equal(af_4b_tau$`2.5%`, 0.01, tolerance = tol)
-  expect_equal(af_4b_tau$`97.5%`, 0.48, tolerance = tol)
+  expect_equivalent(af_4b_tau$`50%`, 0.19, tolerance = tol)
+  expect_equivalent(af_4b_tau$`2.5%`, 0.01, tolerance = tol)
+  expect_equivalent(af_4b_tau$`97.5%`, 0.48, tolerance = tol)
 })
 
 test_that("DIC (common interaction)", {
-  expect_equal(af_dic_4b$resdev, 58.74, tolerance = tol_dic)
-  expect_equal(af_dic_4b$pd, 48.25, tolerance = tol_dic)
-  expect_equal(af_dic_4b$dic, 106.99, tolerance = tol_dic)
+  expect_equivalent(af_dic_4b$resdev, 58.74, tolerance = tol_dic)
+  expect_equivalent(af_dic_4b$pd, 48.25, tolerance = tol_dic)
+  expect_equivalent(af_dic_4b$dic, 106.99, tolerance = tol_dic)
 })
 
 

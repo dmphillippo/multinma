@@ -6,22 +6,22 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
 
-## ---- include=FALSE------------------------------------------------------
+## ---- include=FALSE-------------------------------------------------------------------------------
 set.seed(2684319)
 
 
-## ----setup---------------------------------------------------------------
+## ----setup----------------------------------------------------------------------------------------
 library(multinma)
 options(mc.cores = parallel::detectCores())
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 head(transfusion)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 tr_net <- set_agd_arm(transfusion, 
                            study = studyc,
                            trt = trtc,
@@ -31,19 +31,19 @@ tr_net <- set_agd_arm(transfusion,
 tr_net
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval=FALSE, echo=TRUE----------------------------------------------
+## ---- eval=FALSE, echo=TRUE-----------------------------------------------------------------------
 ## tr_fit_RE_noninf <- nma(tr_net,
 ##                         trt_effects = "random",
 ##                         prior_intercept = normal(scale = 100),
 ##                         prior_trt = normal(scale = 100),
 ##                         prior_het = half_normal(scale = 5))
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=FALSE----------------------------------------------------------------------------------
 tr_fit_RE_noninf <- nma(tr_net, 
                         seed = 857369814,
                         trt_effects = "random",
@@ -52,31 +52,31 @@ tr_fit_RE_noninf <- nma(tr_net,
                         prior_het = half_normal(scale = 5))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 tr_fit_RE_noninf
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(tr_fit_RE_noninf, pars = c("d", "mu", "delta"))
 
 
-## ----tr_RE_noninf_pp_plot------------------------------------------------
+## ----tr_RE_noninf_pp_plot-------------------------------------------------------------------------
 plot_prior_posterior(tr_fit_RE_noninf, prior = c("trt", "het"))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 noninf_tau <- as.array(tr_fit_RE_noninf, pars = "tau")
 noninf_tausq <- noninf_tau^2
 names(noninf_tausq) <- "tausq"
 summary(noninf_tausq)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(log_normal(-3.93, 1.51))
 
 
-## ---- echo=TRUE, eval=FALSE----------------------------------------------
+## ---- echo=TRUE, eval=FALSE-----------------------------------------------------------------------
 ## tr_fit_RE_inf <- nma(tr_net,
 ##                      trt_effects = "random",
 ##                      prior_intercept = normal(scale = 100),
@@ -84,7 +84,7 @@ summary(log_normal(-3.93, 1.51))
 ##                      prior_het = log_normal(-3.93, 1.51),
 ##                      prior_het_type = "var")
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=FALSE----------------------------------------------------------------------------------
 tr_fit_RE_inf <- nma(tr_net, 
                      seed = 1803772660,
                      trt_effects = "random",
@@ -94,27 +94,27 @@ tr_fit_RE_inf <- nma(tr_net,
                      prior_het_type = "var")
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 tr_fit_RE_inf
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(tr_fit_RE_inf, pars = c("d", "mu", "delta"))
 
 
-## ----tr_RE_inf_pp_plot---------------------------------------------------
+## ----tr_RE_inf_pp_plot----------------------------------------------------------------------------
 plot_prior_posterior(tr_fit_RE_inf, prior = c("trt", "het"))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 inf_tau <- as.array(tr_fit_RE_inf, pars = "tau")
 inf_tausq <- inf_tau^2
 names(inf_tausq) <- "tausq"
 summary(inf_tausq)
 
 
-## ----transfusion_tests, include=FALSE, eval=params$run_tests-------------
+## ----transfusion_tests, include=FALSE, eval=params$run_tests--------------------------------------
 #--- Test against TSD 2 results ---
 library(testthat)
 
@@ -125,17 +125,17 @@ tr_RE_noninf_var <- as.data.frame(summary(noninf_tausq))
 
 test_that("Non-informative RE heterogeneity variance", {
   skip("Non-informative priors not identical")
-  expect_equal(tr_RE_noninf_var$`50%`, 2.74, tolerance = tol)
-  expect_equal(tr_RE_noninf_var$`2.5%`, 0.34, tolerance = tol)
-  expect_equal(tr_RE_noninf_var$`97.5%`, 18.1, tolerance = tol)
+  expect_equivalent(tr_RE_noninf_var$`50%`, 2.74, tolerance = tol)
+  expect_equivalent(tr_RE_noninf_var$`2.5%`, 0.34, tolerance = tol)
+  expect_equivalent(tr_RE_noninf_var$`97.5%`, 18.1, tolerance = tol)
 })
 
 # Informative prior
 tr_RE_inf_var <- as.data.frame(summary(inf_tausq))
 
 test_that("Informative RE heterogeneity variance", {
-  expect_equal(tr_RE_inf_var$`50%`, 0.18, tolerance = tol)
-  expect_equal(tr_RE_inf_var$`2.5%`, 0.003, tolerance = tol)
-  expect_equal(tr_RE_inf_var$`97.5%`, 1.70, tolerance = tol)
+  expect_equivalent(tr_RE_inf_var$`50%`, 0.18, tolerance = tol)
+  expect_equivalent(tr_RE_inf_var$`2.5%`, 0.003, tolerance = tol)
+  expect_equivalent(tr_RE_inf_var$`97.5%`, 1.70, tolerance = tol)
 })
 

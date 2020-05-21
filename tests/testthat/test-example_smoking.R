@@ -6,19 +6,19 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
 
 
-## ----setup---------------------------------------------------------------
+## ----setup----------------------------------------------------------------------------------------
 library(multinma)
 options(mc.cores = parallel::detectCores())
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 head(smoking)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 smknet <- set_agd_arm(smoking, 
                       study = studyn,
                       trt = trtc,
@@ -28,21 +28,21 @@ smknet <- set_agd_arm(smoking,
 smknet
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## plot(smknet, weight_edges = TRUE, weight_nodes = TRUE)
 
-## ----smoking_network_plot, echo=FALSE------------------------------------
+## ----smoking_network_plot, echo=FALSE-------------------------------------------------------------
 plot(smknet, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(plot.margin = ggplot2::unit(c(1, 1, 1, 6), "lines"))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(half_normal(scale = 5))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 smkfit <- nma(smknet, 
               trt_effects = "random",
               prior_intercept = normal(scale = 100),
@@ -50,36 +50,36 @@ smkfit <- nma(smknet,
               prior_het = normal(scale = 5))
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 smkfit
 
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(smkfit, pars = c("d", "tau", "mu", "delta"))
 
 
-## ----smoking_pp_plot-----------------------------------------------------
+## ----smoking_pp_plot------------------------------------------------------------------------------
 plot_prior_posterior(smkfit)
 
 
-## ----smoking_pp_plot_tau-------------------------------------------------
+## ----smoking_pp_plot_tau--------------------------------------------------------------------------
 plot_prior_posterior(smkfit, prior = "het")
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (dic_consistency <- dic(smkfit))
 
 
-## ----smoking_resdev_plot-------------------------------------------------
+## ----smoking_resdev_plot--------------------------------------------------------------------------
 plot(dic_consistency)
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 smoking[smoking$r == 0, ]
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 smkfit_ume <- nma(smknet, 
                   consistency = "ume",
                   trt_effects = "random",
@@ -89,34 +89,34 @@ smkfit_ume <- nma(smknet,
 smkfit_ume
 
 
-## ------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 dic_consistency
 (dic_ume <- dic(smkfit_ume))
 
 
-## ----smoking_devdev_plot-------------------------------------------------
+## ----smoking_devdev_plot--------------------------------------------------------------------------
 plot(dic_consistency, dic_ume, point_alpha = 0.5, interval_alpha = 0.2)
 
 
-## ----smoking_releff, fig.height=4.5--------------------------------------
+## ----smoking_releff, fig.height=4.5---------------------------------------------------------------
 (smk_releff <- relative_effects(smkfit, all_contrasts = TRUE))
 plot(smk_releff, ref_line = 0)
 
 
-## ----smoking_ranks, fig.height=3-----------------------------------------
+## ----smoking_ranks, fig.height=3------------------------------------------------------------------
 (smk_ranks <- posterior_ranks(smkfit, lower_better = FALSE))
 plot(smk_ranks)
 
-## ----smoking_rankprobs---------------------------------------------------
+## ----smoking_rankprobs----------------------------------------------------------------------------
 (smk_rankprobs <- posterior_rank_probs(smkfit, lower_better = FALSE))
 plot(smk_rankprobs)
 
-## ----smoking_cumrankprobs------------------------------------------------
+## ----smoking_cumrankprobs-------------------------------------------------------------------------
 (smk_cumrankprobs <- posterior_rank_probs(smkfit, lower_better = FALSE, cumulative = TRUE))
 plot(smk_cumrankprobs)
 
 
-## ----smoking_tests, include=FALSE, eval=params$run_tests-----------------
+## ----smoking_tests, include=FALSE, eval=params$run_tests------------------------------------------
 #--- Test against TSD 4 results ---
 library(testthat)
 library(dplyr)
@@ -157,27 +157,27 @@ tsd_re <- tribble(
   mutate_at(vars(est, lower, upper), ~.*rev)
 
 test_that("RE relative effects", {
-  expect_equal(smk_releff$summary$mean, tsd_re$est, tolerance = tol)
-  expect_equal(smk_releff$summary$sd, tsd_re$sd, tolerance = tol)
-  expect_equal(smk_releff$summary$`2.5%`, tsd_re$lower, tolerance = tol)
-  expect_equal(smk_releff$summary$`97.5%`, tsd_re$upper, tolerance = tol)
+  expect_equivalent(smk_releff$summary$mean, tsd_re$est, tolerance = tol)
+  expect_equivalent(smk_releff$summary$sd, tsd_re$sd, tolerance = tol)
+  expect_equivalent(smk_releff$summary$`2.5%`, tsd_re$lower, tolerance = tol)
+  expect_equivalent(smk_releff$summary$`97.5%`, tsd_re$upper, tolerance = tol)
 })
 
 # Heterogeneity SD
 smk_tau <- summary(smkfit, pars = "tau")
 
 test_that("RE heterogeneity SD", {
-  expect_equal(smk_tau$summary$`50%`, 0.82, tolerance = tol)
-  expect_equal(smk_tau$summary$sd, 0.19, tolerance = tol)
-  expect_equal(smk_tau$summary$`2.5%`, 0.55, tolerance = tol)
-  expect_equal(smk_tau$summary$`97.5%`, 1.27, tolerance = tol)
+  expect_equivalent(smk_tau$summary$`50%`, 0.82, tolerance = tol)
+  expect_equivalent(smk_tau$summary$sd, 0.19, tolerance = tol)
+  expect_equivalent(smk_tau$summary$`2.5%`, 0.55, tolerance = tol)
+  expect_equivalent(smk_tau$summary$`97.5%`, 1.27, tolerance = tol)
 })
 
 # DIC
 test_that("DIC", {
-  expect_equal(dic_consistency$resdev, 54.0, tolerance = tol_dic)
-  expect_equal(dic_consistency$pd, 45.0, tolerance = tol_dic)
-  expect_equal(dic_consistency$dic, 99.0, tolerance = tol_dic)
+  expect_equivalent(dic_consistency$resdev, 54.0, tolerance = tol_dic)
+  expect_equivalent(dic_consistency$pd, 45.0, tolerance = tol_dic)
+  expect_equivalent(dic_consistency$dic, 99.0, tolerance = tol_dic)
 })
 
 # Relative effects (UME)
@@ -223,10 +223,10 @@ smk_ume_releff <- summary(smkfit_ume2, pars = "d")
 
 test_that("UME relative effects", {
   # skip("Different model parameterisation")
-  expect_equal(smk_ume_releff$summary$mean, tsd_ume$est, tolerance = tol)
-  expect_equal(smk_ume_releff$summary$sd, tsd_ume$sd, tolerance = tol)
-  expect_equal(smk_ume_releff$summary$`2.5%`, tsd_ume$lower, tolerance = tol)
-  expect_equal(smk_ume_releff$summary$`97.5%`, tsd_ume$upper, tolerance = tol)
+  expect_equivalent(smk_ume_releff$summary$mean, tsd_ume$est, tolerance = tol)
+  expect_equivalent(smk_ume_releff$summary$sd, tsd_ume$sd, tolerance = tol)
+  expect_equivalent(smk_ume_releff$summary$`2.5%`, tsd_ume$lower, tolerance = tol)
+  expect_equivalent(smk_ume_releff$summary$`97.5%`, tsd_ume$upper, tolerance = tol)
 })
 
 # Heterogeneity SD (UME)
@@ -234,27 +234,27 @@ smk_ume_tau <- summary(smkfit_ume2, pars = "tau")
 
 test_that("UME heterogeneity SD", {
   # skip("Different model parameterisation")
-  # expect_equal(smk_ume_tau$summary$`50%`, 0.89, tolerance = tol)
-  # expect_equal(smk_ume_tau$summary$sd, 0.22, tolerance = tol)
-  # expect_equal(smk_ume_tau$summary$`2.5%`, 0.58, tolerance = tol)
-  # expect_equal(smk_ume_tau$summary$`97.5%`, 1.45, tolerance = tol)
-  expect_equal(smk_ume_tau$summary$`50%`, 0.91, tolerance = tol)
-  expect_equal(smk_ume_tau$summary$sd, 0.21, tolerance = tol)
-  expect_equal(smk_ume_tau$summary$`2.5%`, 0.59, tolerance = tol)
-  expect_equal(smk_ume_tau$summary$`97.5%`, 1.48, tolerance = tol)
+  # expect_equivalent(smk_ume_tau$summary$`50%`, 0.89, tolerance = tol)
+  # expect_equivalent(smk_ume_tau$summary$sd, 0.22, tolerance = tol)
+  # expect_equivalent(smk_ume_tau$summary$`2.5%`, 0.58, tolerance = tol)
+  # expect_equivalent(smk_ume_tau$summary$`97.5%`, 1.45, tolerance = tol)
+  expect_equivalent(smk_ume_tau$summary$`50%`, 0.91, tolerance = tol)
+  expect_equivalent(smk_ume_tau$summary$sd, 0.21, tolerance = tol)
+  expect_equivalent(smk_ume_tau$summary$`2.5%`, 0.59, tolerance = tol)
+  expect_equivalent(smk_ume_tau$summary$`97.5%`, 1.48, tolerance = tol)
 })
 
 # DIC (UME)
 test_that("UME DIC", {
-  expect_equal(dic_ume$resdev, 53.4, tolerance = tol_dic)
-  expect_equal(dic_ume$pd, 46.1, tolerance = tol_dic)
-  expect_equal(dic_ume$dic, 99.5, tolerance = tol_dic)
+  expect_equivalent(dic_ume$resdev, 53.4, tolerance = tol_dic)
+  expect_equivalent(dic_ume$pd, 46.1, tolerance = tol_dic)
+  expect_equivalent(dic_ume$dic, 99.5, tolerance = tol_dic)
 })
 
 dic_ume2 <- dic(smkfit_ume2)
 test_that("UME DIC", {
-  expect_equal(dic_ume2$resdev, 53.4, tolerance = tol_dic)
-  expect_equal(dic_ume2$pd, 46.1, tolerance = tol_dic)
-  expect_equal(dic_ume2$dic, 99.5, tolerance = tol_dic)
+  expect_equivalent(dic_ume2$resdev, 53.4, tolerance = tol_dic)
+  expect_equivalent(dic_ume2$pd, 46.1, tolerance = tol_dic)
+  expect_equivalent(dic_ume2$dic, 99.5, tolerance = tol_dic)
 })
 
