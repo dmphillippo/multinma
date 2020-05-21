@@ -64,7 +64,7 @@ smkfit <- nma(smknet,
               prior_het = normal(scale = 5))
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 smkfit
 ```
