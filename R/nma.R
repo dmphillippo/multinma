@@ -729,8 +729,8 @@ nma.fit <- function(ipd_x, ipd_y,
   get_trt <- function(x, v = 1) if (any(x == v)) which(x == v) + 1 else 1
 
   if (has_ipd) {
-    ipd_s_t_all <- dplyr::tibble(.study = apply(ipd_x[, col_study, drop = FALSE], 1, get_study),
-                             .trt = apply(ipd_x[, col_trt, drop = FALSE], 1, get_trt))
+    ipd_s_t_all <- dplyr::tibble(.study = unname(apply(ipd_x[, col_study, drop = FALSE], 1, get_study)),
+                                 .trt = unname(apply(ipd_x[, col_trt, drop = FALSE], 1, get_trt)))
     ipd_s_t <- dplyr::distinct(ipd_s_t_all) %>% dplyr::mutate(.arm = 1:dplyr::n())
     ipd_arm <-  dplyr::left_join(ipd_s_t_all, ipd_s_t, by = c(".study", ".trt")) %>% dplyr::pull(.data$.arm)
     ipd_study <- ipd_s_t$.study
