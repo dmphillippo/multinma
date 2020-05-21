@@ -1020,8 +1020,8 @@ RE_cor <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
   type <- rlang::arg_match(type)
 
 
+  reftrt <- levels(trt)[1]
   if (type == "reftrt") {
-    reftrt <- levels(trt)[1]
     # Treat contrast rows as non ref trt arms (since they always have REs)
     nonref <- trt != reftrt | contrast
     nRE <- sum(nonref)  # RE for each non ref trt arm
@@ -1029,8 +1029,12 @@ RE_cor <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
     study <- study[nonref]
     trt <- trt[nonref]
   } else if (type == "blshift") {
+    # Consider baseline arm to be first by treatment order
     # Treat contrast rows as non baseline arms (since they always have REs)
-    nonbl <- duplicated(study) | contrast
+    nonbl <- tibble::tibble(study, trt, contrast) %>%
+      dplyr::group_by(.data$study) %>%
+      dplyr::mutate(nonbl = .data$contrast | .data$trt != sort(.data$trt)[1] | (duplicated(.data$trt) & .data$trt != reftrt)) %>%
+      dplyr::pull(.data$nonbl)
     nRE <- sum(nonbl)  # RE for each non baseline arm
     Rho <- matrix(0, nrow = nRE, ncol = nRE)
     study <- study[nonbl]
@@ -1075,12 +1079,16 @@ which_RE <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
   n_i <- length(study)
   id <- rep(0, n_i)
 
+  reftrt <- levels(trt)[1]
   if (type == "reftrt") {
-    reftrt <- levels(trt)[1]
     trt_nonref <- trt != reftrt | contrast
     id[trt_nonref] <- 1:sum(trt_nonref)
   } else if (type == "blshift") {
-    non_bl <- duplicated(study) | contrast
+    # Consider baseline arm to be first by treatment order
+    non_bl <- tibble::tibble(study, trt, contrast) %>%
+      dplyr::group_by(.data$study) %>%
+      dplyr::mutate(non_bl = .data$contrast | .data$trt != sort(.data$trt)[1] | (duplicated(.data$trt) & .data$trt != reftrt)) %>%
+      dplyr::pull(.data$non_bl)
     id[non_bl] <- 1:sum(non_bl)
   }
 
