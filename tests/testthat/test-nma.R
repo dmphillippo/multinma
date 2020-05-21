@@ -301,20 +301,20 @@ test_that("nma() doesn't fail with a single study", {
   fit_ss_a <- nma(net_ss_a, prior_intercept = normal(0, 10), prior_trt = normal(0, 10))
   expect_s3_class(fit_ss_a, "stan_nma")
   d_ss_a <- relative_effects(fit_ss_a)
-  expect_equal(d_ss_a$summary$mean, 0, tol = 0.01)
-  expect_equal(d_ss_a$summary$sd, sqrt(4/500), tol = 0.01)
+  expect_equivalent(d_ss_a$summary$mean, 0, tol = 0.01)
+  expect_equivalent(d_ss_a$summary$sd, sqrt(4/500), tol = 0.01)
 
   fit_ss_c <- nma(net_ss_c, prior_intercept = normal(0, 10), prior_trt = normal(0, 10))
   expect_s3_class(fit_ss_c, "stan_nma")
   d_ss_c <- relative_effects(fit_ss_c)
-  expect_equal(d_ss_c$summary$mean, 0, tol = 0.01)
-  expect_equal(d_ss_c$summary$sd, sqrt(4/500), tol = 0.01)
+  expect_equivalent(d_ss_c$summary$mean, 0, tol = 0.01)
+  expect_equivalent(d_ss_c$summary$sd, sqrt(4/500), tol = 0.01)
 
   fit_ss_i <- nma(net_ss_i, prior_intercept = normal(0, 10), prior_trt = normal(0, 10), prior_aux = half_normal(2))
   expect_s3_class(fit_ss_i, "stan_nma")
   d_ss_i <- relative_effects(fit_ss_i)
-  expect_equal(d_ss_i$summary$mean, 1, tol = 0.1)
-  expect_equal(d_ss_i$summary$sd, sqrt(0.1^2 + 0.1^2)/sqrt(200), tol = 0.01)
+  expect_equivalent(d_ss_i$summary$mean, 1, tol = 0.1)
+  expect_equivalent(d_ss_i$summary$sd, sqrt(0.1^2 + 0.1^2)/sqrt(200), tol = 0.01)
 })
 
 test_that("nma() gives warnings for default priors", {
