@@ -470,15 +470,42 @@ nma <- function(network,
 
   # Labels for RE deltas
   if (trt_effects == "random") {
-    if (has_ipd(network)) {
-      ipd_arms <- dplyr::distinct(dat_ipd, .data$.study, .data$.trt)
-      ipd_delta_labels <- make_data_labels(ipd_arms$.study, ipd_arms$.trt)
-    } else {
-      ipd_delta_labels <- NULL
+
+    if (consistency == "ume") { # Baseline shift models (currently only UME)
+      if (has_ipd(network)) {
+        ipd_arms <- dplyr::distinct(dat_ipd, .data$.study, .data$.trt) %>%
+          dplyr::group_by(.data$.study) %>%
+          dplyr::mutate(.trt_b = sort(.data$.trt)[1])
+        ipd_delta_labels <- make_data_labels(ipd_arms$.study, ipd_arms$.trt, ipd_arms$.trt_b)
+      } else {
+        ipd_delta_labels <- NULL
+      }
+
+      if (has_agd_arm(network)) {
+        agd_arm_trt_b <- dat_agd_arm %>%
+          dplyr::group_by(.data$.study) %>%
+          dplyr::mutate(.trt_b = sort(.data$.trt)[1]) %>%
+          dplyr::pull(.data$.trt_b)
+        agd_arm_delta_labels <- make_data_labels(dat_agd_arm$.study, dat_agd_arm$.trt, agd_arm_trt_b)
+      } else {
+        agd_arm_delta_labels <- NULL
+      }
+
+    } else { # Reference treatment models
+      if (has_ipd(network)) {
+        ipd_arms <- dplyr::distinct(dat_ipd, .data$.study, .data$.trt)
+        ipd_delta_labels <- make_data_labels(ipd_arms$.study, ipd_arms$.trt)
+      } else {
+        ipd_delta_labels <- NULL
+      }
+      agd_arm_delta_labels <- agd_arm_data_labels
     }
+
+    agd_contrast_delta_labels <- agd_contrast_data_labels
+
     delta_labels <- c(ipd_delta_labels,
-                      agd_arm_data_labels,
-                      agd_contrast_data_labels)[.which_RE > 0]
+                      agd_arm_delta_labels,
+                      agd_contrast_delta_labels)[.which_RE > 0]
 
     fnames_oi[grepl("^delta\\[[0-9]+\\]$", fnames_oi)] <- paste0("delta[", delta_labels, "]")
   }
