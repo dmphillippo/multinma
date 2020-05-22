@@ -1,4 +1,4 @@
-#' @examples \donttest{
+#' @examples \dontrun{
 #' # Fitting a random effects model
 #' smk_fit_RE <- nma(smk_net,
 #'                   trt_effects = "random",
