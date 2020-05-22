@@ -98,7 +98,7 @@ print.stan_nma <- function(x, ...) {
 #' @examples \donttest{
 #' # Summary and plot of all model parameters
 #' summary(smk_fit_RE)
-#' plot(smkf_fit_RE)
+#' plot(smk_fit_RE)
 #'
 #' # Summary and plot of heterogeneity tau only
 #' summary(smk_fit_RE, pars = "tau")
