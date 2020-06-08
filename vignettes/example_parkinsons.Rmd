@@ -805,8 +805,8 @@ expect_equivalent_nma_summary <- function(object, expected, ...) {
   act <- quasi_label(enquo(object), arg = "object")
   exp <- quasi_label(enquo(expected), arg = "expected")
   
-  comp <- compare(act$val %>% as.data.frame() %>% select(-c(se_mean, Bulk_ESS, Tail_ESS, Rhat)), 
-                  exp$val %>% as.data.frame() %>% select(-c(se_mean, Bulk_ESS, Tail_ESS, Rhat)), 
+  comp <- compare(act$val %>% as.data.frame() %>% select(-c(Bulk_ESS, Tail_ESS, Rhat)), 
+                  exp$val %>% as.data.frame() %>% select(-c(Bulk_ESS, Tail_ESS, Rhat)), 
                   ...)
   expect(comp$equal, sprintf("%s not equal to %s.\n%s", 
          act$lab, exp$lab, comp$message))

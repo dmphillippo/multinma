@@ -22,10 +22,10 @@ head(parkinsons)
 
 
 ## -------------------------------------------------------------------------------------------------
-arm_net <- set_agd_arm(parkinsons, 
+arm_net <- set_agd_arm(parkinsons,
                       study = studyn,
                       trt = trtn,
-                      y = y, 
+                      y = y,
                       se = se,
                       sample_size = n)
 arm_net
@@ -40,7 +40,7 @@ summary(normal(scale = 100))
 
 
 ## -------------------------------------------------------------------------------------------------
-arm_fit_FE <- nma(arm_net, 
+arm_fit_FE <- nma(arm_net,
                   trt_effects = "fixed",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 10))
@@ -65,7 +65,7 @@ summary(half_normal(scale = 5))
 
 
 ## -------------------------------------------------------------------------------------------------
-arm_fit_RE <- nma(arm_net, 
+arm_fit_RE <- nma(arm_net,
                   seed = 379394727,
                   trt_effects = "random",
                   prior_intercept = normal(scale = 100),
@@ -116,7 +116,7 @@ plot(arm_releff_RE, ref_line = 0)
 
 
 ## ----arm_pred_FE, fig.height = 2------------------------------------------------------------------
-arm_pred_FE <- predict(arm_fit_FE, 
+arm_pred_FE <- predict(arm_fit_FE,
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
                        trt_ref = 1)
@@ -124,7 +124,7 @@ arm_pred_FE
 plot(arm_pred_FE)
 
 ## ----arm_pred_RE, fig.height = 2------------------------------------------------------------------
-arm_pred_RE <- predict(arm_fit_RE, 
+arm_pred_RE <- predict(arm_fit_RE,
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
                        trt_ref = 1)
@@ -152,10 +152,10 @@ plot(arm_cumrankprobs)
 
 
 ## -------------------------------------------------------------------------------------------------
-contr_net <- set_agd_contrast(parkinsons, 
+contr_net <- set_agd_contrast(parkinsons,
                               study = studyn,
                               trt = trtn,
-                              y = diff, 
+                              y = diff,
                               se = se_diff,
                               sample_size = n)
 contr_net
@@ -170,7 +170,7 @@ summary(normal(scale = 100))
 
 
 ## -------------------------------------------------------------------------------------------------
-contr_fit_FE <- nma(contr_net, 
+contr_fit_FE <- nma(contr_net,
                     trt_effects = "fixed",
                     prior_trt = normal(scale = 100))
 
@@ -189,7 +189,7 @@ summary(half_normal(scale = 5))
 
 
 ## -------------------------------------------------------------------------------------------------
-contr_fit_RE <- nma(contr_net, 
+contr_fit_RE <- nma(contr_net,
                     seed = 1150676438,
                     trt_effects = "random",
                     prior_trt = normal(scale = 100),
@@ -239,7 +239,7 @@ plot(contr_releff_RE, ref_line = 0)
 
 
 ## ----contr_pred_FE, fig.height = 2----------------------------------------------------------------
-contr_pred_FE <- predict(contr_fit_FE, 
+contr_pred_FE <- predict(contr_fit_FE,
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
                        trt_ref = 1)
@@ -247,7 +247,7 @@ contr_pred_FE
 plot(contr_pred_FE)
 
 ## ----contr_pred_RE, fig.height = 2----------------------------------------------------------------
-contr_pred_RE <- predict(contr_fit_RE, 
+contr_pred_RE <- predict(contr_fit_RE,
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
                        trt_ref = 1)
@@ -280,17 +280,17 @@ studies <- parkinsons$studyn
 
 
 ## -------------------------------------------------------------------------------------------------
-mix_arm_net <- set_agd_arm(parkinsons_arm, 
+mix_arm_net <- set_agd_arm(parkinsons_arm,
                            study = studyn,
                            trt = trtn,
-                           y = y, 
+                           y = y,
                            se = se,
                            sample_size = n)
 
-mix_contr_net <- set_agd_contrast(parkinsons_contr, 
+mix_contr_net <- set_agd_contrast(parkinsons_contr,
                                   study = studyn,
                                   trt = trtn,
-                                  y = diff, 
+                                  y = diff,
                                   se = se_diff,
                                   sample_size = n)
 
@@ -307,7 +307,7 @@ summary(normal(scale = 100))
 
 
 ## -------------------------------------------------------------------------------------------------
-mix_fit_FE <- nma(mix_net, 
+mix_fit_FE <- nma(mix_net,
                   trt_effects = "fixed",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 100))
@@ -332,7 +332,7 @@ summary(half_normal(scale = 5))
 
 
 ## -------------------------------------------------------------------------------------------------
-mix_fit_RE <- nma(mix_net, 
+mix_fit_RE <- nma(mix_net,
                   seed = 437219664,
                   trt_effects = "random",
                   prior_intercept = normal(scale = 100),
@@ -383,7 +383,7 @@ plot(mix_releff_RE, ref_line = 0)
 
 
 ## ----mix_pred_FE, fig.height = 2------------------------------------------------------------------
-mix_pred_FE <- predict(mix_fit_FE, 
+mix_pred_FE <- predict(mix_fit_FE,
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
                        trt_ref = 1)
@@ -391,7 +391,7 @@ mix_pred_FE
 plot(mix_pred_FE)
 
 ## ----mix_pred_RE, fig.height = 2------------------------------------------------------------------
-mix_pred_RE <- predict(mix_fit_RE, 
+mix_pred_RE <- predict(mix_fit_RE,
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
                        trt_ref = 1)
@@ -437,7 +437,7 @@ tsd_FE <- tribble(
 4   , -0.52, 0.48, -0.52  , -1.46 ,0.43   ,
 5   , -0.82, 0.52, -0.82  , -1.84 ,0.22   ,
 
-) %>% 
+) %>%
   mutate(trt = ordered(trt, levels = levels(arm_net$treatments))) %>%
   arrange(trt)
 
@@ -458,7 +458,7 @@ tsd_RE <- tribble(
 3   , -0.50, 0.66, -0.50  , -1.78 ,0.75   ,
 4   , -0.53, 0.65, -0.53  , -1.77 ,0.71   ,
 5   , -0.83, 0.80, -0.83  , -2.35 ,0.69   ,
-) %>% 
+) %>%
   mutate(trt = ordered(trt, levels = levels(arm_net$treatments))) %>%
   arrange(trt)
 
@@ -491,7 +491,7 @@ tsd_pred_FE <- tribble(
 3   , -1.21, 0.53, -1.20  , -2.25 ,-0.15  ,
 4   , -1.25, 0.53, -1.25  , -2.28 ,-0.21  ,
 5   , -1.55, 0.57, -1.55  , -2.66 ,-0.43  ,
-) %>% 
+) %>%
   mutate(trt = ordered(trt, levels = levels(arm_net$treatments))) %>%
   arrange(trt)
 
@@ -512,8 +512,8 @@ tsd_pred_RE <- tribble(
 2   , -2.58, 0.58, -2.57  , -3.72 ,-1.50  ,
 3   , -1.23, 0.70, -1.23  , -2.57 ,0.10   ,
 4   , -1.26, 0.69, -1.26  , -2.57 ,0.05   ,
-5   , -1.57, 0.83, -1.56  , -3.14 ,0.02   , 
-) %>% 
+5   , -1.57, 0.83, -1.56  , -3.14 ,0.02   ,
+) %>%
   mutate(trt = ordered(trt, levels = levels(arm_net$treatments))) %>%
   arrange(trt)
 
@@ -615,19 +615,19 @@ test_that("RE DIC", {
 # Test contrast-data rows in incorrect order
 park_reorder <- sample_frac(parkinsons, size = 1, replace = FALSE)
 
-reorder_net <- set_agd_contrast(park_reorder, 
+reorder_net <- set_agd_contrast(park_reorder,
                               study = studyn,
                               trt = trtn,
-                              y = diff, 
+                              y = diff,
                               se = se_diff,
                               sample_size = n)
 
-reorder_fit_FE <- nma(reorder_net, 
+reorder_fit_FE <- nma(reorder_net,
                       seed = 1878819627,
                       trt_effects = "fixed",
                       prior_trt = normal(scale = 100))
 
-reorder_fit_RE <- nma(reorder_net, 
+reorder_fit_RE <- nma(reorder_net,
                       seed = 1147315,
                       trt_effects = "random",
                       prior_trt = normal(scale = 100),
@@ -635,48 +635,48 @@ reorder_fit_RE <- nma(reorder_net,
                       adapt_delta = 0.99)
 
 expect_equivalent_nma_summary <- function(object, expected, ...) {
-  
+
   act <- quasi_label(enquo(object), arg = "object")
   exp <- quasi_label(enquo(expected), arg = "expected")
-  
-  comp <- compare(act$val %>% as.data.frame() %>% select(-c(se_mean, Bulk_ESS, Tail_ESS, Rhat)), 
-                  exp$val %>% as.data.frame() %>% select(-c(se_mean, Bulk_ESS, Tail_ESS, Rhat)), 
+
+  comp <- compare(act$val %>% as.data.frame() %>% select(-c(Bulk_ESS, Tail_ESS, Rhat)),
+                  exp$val %>% as.data.frame() %>% select(-c(Bulk_ESS, Tail_ESS, Rhat)),
                   ...)
-  expect(comp$equal, sprintf("%s not equal to %s.\n%s", 
+  expect(comp$equal, sprintf("%s not equal to %s.\n%s",
          act$lab, exp$lab, comp$message))
-  
+
   invisible(act$val)
 }
 
 test_that("Analysis of reordered contrast data gives same results", {
   expect_equivalent_nma_summary(relative_effects(reorder_fit_FE, trt_ref = 1),
-                           contr_releff_FE, 
+                           contr_releff_FE,
                            tolerance = tol)
   expect_equivalent_nma_summary(relative_effects(reorder_fit_RE, trt_ref = 1),
-                           contr_releff_RE, 
+                           contr_releff_RE,
                            tolerance = tol)
-  
-  expect_equivalent_nma_summary(predict(reorder_fit_FE, 
+
+  expect_equivalent_nma_summary(predict(reorder_fit_FE,
                                      baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                                      type = "response",
                                      trt_ref = 1),
                            contr_pred_FE,
                            tolerance = tol)
-  expect_equivalent_nma_summary(predict(reorder_fit_RE, 
+  expect_equivalent_nma_summary(predict(reorder_fit_RE,
                                      baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                                      type = "response",
                                      trt_ref = 1),
                            contr_pred_RE,
                            tolerance = tol)
-  
+
   expect_equivalent(dic(reorder_fit_FE)$resdev, contr_dic_FE$resdev, tolerance = tol_dic)
   expect_equivalent(dic(reorder_fit_FE)$pd, contr_dic_FE$pd, tolerance = tol_dic)
   expect_equivalent(dic(reorder_fit_FE)$dic, contr_dic_FE$dic, tolerance = tol_dic)
   expect_equivalent(dic(reorder_fit_RE)$resdev, contr_dic_RE$resdev, tolerance = tol_dic)
   expect_equivalent(dic(reorder_fit_RE)$pd, contr_dic_RE$pd, tolerance = tol_dic)
   expect_equivalent(dic(reorder_fit_RE)$dic, contr_dic_RE$dic, tolerance = tol_dic)
-  
-  expect_equivalent_nma_summary(summary(reorder_fit_RE, pars = "tau"), 
+
+  expect_equivalent_nma_summary(summary(reorder_fit_RE, pars = "tau"),
                            contr_tau,
                            tolerance = tol)
 })
