@@ -25,11 +25,11 @@
 #' The following table summarises which prior distributions may be used with
 #' which model parameters. Essentially, priors that take only non-negative
 #' values (e.g. half-Normal) may only be used for non-negative parameters
-#' (heterogeneity SD/variance/precision, and any auxilliary parameter). If a
+#' (heterogeneity SD/variance/precision, and any auxiliary parameter). If a
 #' real-valued prior distribution is specified for a non-negative parameter, it
 #' will be truncated at 0 to be non-negative.
 #'
-#' |       | \strong{Intercept} `prior_intercept` | \strong{Treatment effects} `prior_trt` | \strong{Heterogeneity} `prior_het` | \strong{Regression coefficients} `prior_reg` | \strong{Auxilliary parameter} `prior_aux` |
+#' |       | \strong{Intercept} `prior_intercept` | \strong{Treatment effects} `prior_trt` | \strong{Heterogeneity} `prior_het` | \strong{Regression coefficients} `prior_reg` | \strong{Auxiliary parameter} `prior_aux` |
 #' | ----- | :---: | :---: | :---: | :---: | :---: |
 #' | \strong{Normal} `normal()` | Yes | Yes | Yes | Yes | Yes |
 #' | \strong{half-Normal} `half_normal()` | - | - | Yes | - | Yes |

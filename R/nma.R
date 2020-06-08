@@ -32,7 +32,7 @@
 #'   precision \eqn{1/\tau^2} (`"prec"`).
 #' @param prior_reg Specification of prior distribution for the regression
 #'   coefficients (if `regression` formula specified)
-#' @param prior_aux Specification of prior distribution for the auxilliary
+#' @param prior_aux Specification of prior distribution for the auxiliary
 #'   parameter, if applicable
 #' @param QR Logical scalar (default `FALSE`), whether to apply a QR
 #'   decomposition to the model design matrix
@@ -136,7 +136,7 @@ nma <- function(network,
   likelihood <- check_likelihood(likelihood, network$outcome)
   link <- check_link(link, likelihood)
 
-  # When are priors on auxilliary parameters required?
+  # When are priors on auxiliary parameters required?
   has_aux <- (likelihood == "normal" && has_ipd(network))
 
   # Are study intercepts present? Not if only contrast data
@@ -687,7 +687,7 @@ nma.fit <- function(ipd_x, ipd_y,
   likelihood <- check_likelihood(likelihood)
   link <- check_link(link, likelihood)
 
-  # When are priors on auxilliary parameters required?
+  # When are priors on auxiliary parameters required?
   has_aux <- (likelihood == "normal" && has_ipd)
 
   # Check priors
@@ -911,7 +911,7 @@ nma.fit <- function(ipd_x, ipd_y,
       agd_arm_y = if (has_agd_arm) agd_arm_y$.y else numeric(),
       agd_arm_se = if (has_agd_arm) agd_arm_y$.se else numeric(),
 
-      # Add prior for auxilliary parameter - individual-level variance
+      # Add prior for auxiliary parameter - individual-level variance
       !!! prior_standat(prior_aux, "prior_aux",
                         valid = c("Normal", "half-Normal", "log-Normal",
                                   "Cauchy",  "half-Cauchy",
