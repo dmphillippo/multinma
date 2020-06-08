@@ -20,11 +20,11 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 
 The `multinma` package implements network meta-analysis, network meta-regression, and multilevel network meta-regression models which combine evidence from a network of studies and treatments using either aggregate data or individual patient data from each study [@methods_paper;@Phillippo_thesis].
-Models are estimated in a Bayesian framwork using Stan [@Carpenter2017].
+Models are estimated in a Bayesian framework using Stan [@Carpenter2017].
 
 ## Installation
 
-You can install the released version of multinma from [CRAN](https://CRAN.R-project.org) with:
+You can install the released version of `multinma` from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
 install.packages("multinma")

@@ -13,12 +13,12 @@ The `multinma` package implements network meta-analysis, network
 meta-regression, and multilevel network meta-regression models which
 combine evidence from a network of studies and treatments using either
 aggregate data or individual patient data from each study (Phillippo et
-al., n.d.; Phillippo 2019). Models are estimated in a Bayesian framwork
+al. 2020; Phillippo 2019). Models are estimated in a Bayesian framework
 using Stan (Carpenter et al. 2017).
 
 ## Installation
 
-You can install the released version of multinma from
+You can install the released version of `multinma` from
 [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
@@ -62,9 +62,9 @@ University of Bristol.
 
 Phillippo, David M., Sofia Dias, A. E. Ades, Mark Belger, Alan Brnabic,
 Alexander Schacht, Daniel Saure, Zbigniew Kadziola, and Nicky J. Welton.
-n.d. “Multilevel Network Meta-Regression for Population-Adjusted
+2020. “Multilevel Network Meta-Regression for Population-Adjusted
 Treatment Comparisons.” *Journal of the Royal Statistical Society:
-Series A (Statistics in Society)*.
+Series A (Statistics in Society)*. <https://doi.org/10.1111/rssa.12579>.
 
 </div>
 
