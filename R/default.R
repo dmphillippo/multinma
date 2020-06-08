@@ -9,17 +9,18 @@
 #'
 #' @param x An object
 #'
-#' @return For `.default()`, an identical object with additional class
+#' @return For `.default()`, an identical object with additional attribute
 #'   `.default`. For `.is_default()`, a logical value (`TRUE` or `FALSE`).
 #' @export
 #' @rdname default_values
 #'
 .default <- function(x = list()) {
-  return(structure(x, class = c(".default", class(x))))
+  attr(x, ".default") <- TRUE
+  return(x)
 }
 
 #' @export
 #' @rdname default_values
 .is_default <- function(x) {
-  return(inherits(x, ".default"))
+  return(isTRUE(attr(x, ".default", exact = TRUE)))
 }
