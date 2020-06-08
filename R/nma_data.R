@@ -345,7 +345,7 @@ set_agd_arm <- function(data,
 #'   Optional, see details.
 #'
 #' @details Each study should have a single reference/baseline treatment,
-#'   against which relatve effects in the other arm(s) are given. For the
+#'   against which relative effects in the other arm(s) are given. For the
 #'   reference arm, include a data row with continuous outcome `y` equal to
 #'   `NA`. If a study has three or more arms (so two or more relative effects),
 #'   set the standard error `se` for the reference arm data row equal to the

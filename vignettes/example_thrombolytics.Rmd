@@ -15,7 +15,7 @@ options(mc.cores = parallel::detectCores())
 ```
 
 This vignette describes the analysis of 50 trials of 8 thrombolytic drugs (streptokinase, SK; alteplase, t-PA; accelerated alteplase, Acc t-PA; streptokinase plus alteplase, SK+tPA; reteplase, r-PA; tenocteplase, TNK; urokinase, UK; anistreptilase, ASPAC) plus per-cutaneous transluminal coronary angioplasty (PTCA) [@Boland2003; @Lu2006; @TSD4].
-The number of deaths in 30 or 35 days following accute myocardial infarction are recorded.
+The number of deaths in 30 or 35 days following acute myocardial infarction are recorded.
 The data are available in this package as `thrombolytics`:
 ```{r}
 head(thrombolytics)
@@ -61,7 +61,7 @@ thrombo_fit <- nma(thrombo_net,
                    prior_trt = normal(scale = 100))
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 thrombo_fit
 ```

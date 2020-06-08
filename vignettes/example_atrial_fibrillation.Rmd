@@ -84,7 +84,7 @@ af_fit_1 <- nma(af_net,
                 adapt_delta = 0.99)
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 af_fit_1
 ```
@@ -158,7 +158,7 @@ af_fit_4b <- nma(af_net,
                  adapt_delta = 0.99)
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 af_fit_4b
 ```

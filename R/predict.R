@@ -24,7 +24,7 @@
 #'   If `type = "individual"` this should be a data frame of individual
 #'   covariate values, one row per individual.
 #'
-#'   If `NULL`, prections are produced for all studies with IPD and/or
+#'   If `NULL`, predictions are produced for all studies with IPD and/or
 #'   arm-based AgD in the network, depending on the value of `type`.
 #' @param study Column of `newdata` which specifies study names or IDs. When not
 #'   specified: if `newdata` contains integration points produced by

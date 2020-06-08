@@ -56,7 +56,7 @@ blocker_fit_FE <- nma(blocker_net,
                    prior_trt = normal(scale = 100))
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 blocker_fit_FE
 ```
@@ -90,7 +90,7 @@ blocker_fit_RE <- nma(blocker_net,
                    prior_het = half_normal(scale = 5))
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 blocker_fit_RE
 ```

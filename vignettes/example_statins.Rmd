@@ -41,7 +41,7 @@ The `prevention` variable in the `statins` data frame will automatically be avai
 We fit fixed effect (FE) and random effects (RE) models, with a meta-regression on the binary covariate `prevention`.
 
 #### Fixed effect meta-regression
-We start by fiting a FE model.
+We start by fitting a FE model.
 We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effect $d_\mathrm{Statin}$, study-specific intercepts $\mu_j$, and regression coefficient $\beta$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
 ```{r}
@@ -59,7 +59,7 @@ statin_fit_FE <- nma(statin_net,
                      prior_reg = normal(scale = 100))
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 statin_fit_FE
 ```
@@ -98,7 +98,7 @@ statin_fit_RE <- nma(statin_net,
                      adapt_delta = 0.99)
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 statin_fit_RE
 ```

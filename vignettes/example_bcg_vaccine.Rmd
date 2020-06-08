@@ -44,7 +44,7 @@ The `latitude` variable in the `bcg_vaccine` data frame will automatically be av
 We fit random effects (RE) models, firstly without any covariates, and then with a meta-regression on the continuous covariate `latitude`.
 
 #### RE meta-analysis (no covariate)
-We start by fiting a standard RE model without any covariates.
+We start by fitting a standard RE model without any covariates.
 We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effect $d_\mathrm{Vaccine}$ and study-specific intercepts $\mu_j$, and a $\textrm{half-N}(0, 5^2)$ prior distribution for the heterogeneity standard deviation $\tau$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
 ```{r}
@@ -69,7 +69,7 @@ bcg_fit_unadj <- nma(bcg_net,
                      prior_het = half_normal(scale = 5))
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 bcg_fit_unadj
 ```
@@ -120,7 +120,7 @@ bcg_fit_lat <- nma(bcg_net,
                    adapt_delta = 0.99)
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 bcg_fit_lat
 ```
@@ -169,7 +169,7 @@ plot(bcg_fit_lat,
 
 Altogether, we might prefer the model with the adjustment for latitude.
 When considering covariates in random effects models it is important not to just look at the DIC [@TSD3].
-We should also consider any reductions in heterogeneity, and the estimated regression coeffients and their standard error.
+We should also consider any reductions in heterogeneity, and the estimated regression coefficients and their standard error.
 The DIC is not sensitive to changes in the heterogeneity, as RE models are very flexible and can fit the data well whatever the level of heterogeneity.
 
 ## Further results

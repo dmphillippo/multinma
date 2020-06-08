@@ -1,6 +1,6 @@
 #' Relative treatment effects
 #'
-#' Generate (population-average) relative treatment efects. If a ML-NMR or
+#' Generate (population-average) relative treatment effects. If a ML-NMR or
 #' meta-regression model was fitted, these are specific to each study
 #' population.
 #'
@@ -147,7 +147,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       d_names[d_names == paste0("d[", trt_ref, "]")] <- paste0("d[", nrt, "]")
       dimnames(re_array)[[3]] <- d_names
 
-      # Reorder paramters
+      # Reorder parameters
       d_names <- c(paste0("d[", nrt, "]"), d_names[d_names != paste0("d[", nrt, "]")])
       re_array <- re_array[ , , d_names, drop = FALSE]
     }
@@ -270,7 +270,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         d_names[d_names == paste0("d[", trt_ref, "]")] <- paste0("d[", nrt, "]")
         dimnames(re_array)[[3]] <- d_names
 
-        # Reorder paramters
+        # Reorder parameters
         d_names <- c(paste0("d[", nrt, "]"), d_names[d_names != paste0("d[", nrt, "]")])
         re_array <- re_array[ , , d_names, drop = FALSE]
       }
@@ -362,7 +362,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
           d_names[d_names == paste0("d[", j, ": ", trt_ref, "]")] <- paste0("d[", j, ": ", nrt, "]")
           dimnames(re_array)[[3]] <- d_names
 
-          # Reorder paramters
+          # Reorder parameters
           d_names[j_pars] <- c(paste0("d[", j, ": ", nrt, "]"), d_names[j_pars & d_names != paste0("d[", j, ": ", nrt, "]")])
           re_array <- re_array[ , , d_names, drop = FALSE]
         }

@@ -61,7 +61,7 @@ diet_fit_FE <- nma(diet_net,
                    prior_trt = normal(scale = 100))
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 diet_fit_FE
 ```
@@ -95,7 +95,7 @@ diet_fit_RE <- nma(diet_net,
                    prior_het = half_normal(scale = 5))
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 diet_fit_RE
 ```
@@ -154,7 +154,7 @@ pred_RE
 plot(pred_RE)
 ```
 
-If the `baseline` argument is ommitted, predicted rates will be produced for every study in the network based on their estimated baseline log rate $\mu_j$:
+If the `baseline` argument is omitted, predicted rates will be produced for every study in the network based on their estimated baseline log rate $\mu_j$:
 ```{r diet_pred_FE_all, fig.height=10}
 pred_FE_studies <- predict(diet_fit_FE, type = "response")
 pred_FE_studies

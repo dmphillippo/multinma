@@ -168,8 +168,8 @@ ggplot(aes(x = value)) +
 
 We add integration points to the AgD studies in the network using the `add_integration()` function.
 Marginal distributions for each covariate are specified using the `distr()` function, which takes a cumulative distribution function corresponding to the chosen marginal distribution, and arguments to that distribution as column names in the aggregate data.
-(Note: This pacakge provides several convenience functions for specifying these distributions, including `qgamma()` which allows for a parameterisation of the Gamma distribution in terms of mean and standard deviation, `qbern()` which provides the Bernoulli distribution, and `qlogitnorm()` which provides the logit-Normal distribution allowing for a parameterisation in terms of mean and standard deviation.)
-Since we do not know the correlations between covariates in the AgD studies, we impute these with the weighted mean of the correlations in the IPD studies (the defaul option).
+(Note: This package provides several convenience functions for specifying these distributions, including `qgamma()` which allows for a parameterisation of the Gamma distribution in terms of mean and standard deviation, `qbern()` which provides the Bernoulli distribution, and `qlogitnorm()` which provides the logit-Normal distribution allowing for a parameterisation in terms of mean and standard deviation.)
+Since we do not know the correlations between covariates in the AgD studies, we impute these with the weighted mean of the correlations in the IPD studies (the default option).
 ```{r}
 pso_net <- add_integration(pso_net,
   durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
@@ -192,7 +192,7 @@ The range of parameter values implied by these prior distributions can be checke
 summary(normal(scale = 10))
 ```
 
-The regresison model is specified with `regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt`, which will include the main (prognostic) effects of each covariate as well as interactions with treatment.
+The regression model is specified with `regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt`, which will include the main (prognostic) effects of each covariate as well as interactions with treatment.
 We use a probit link function (`link = "probit"`), and specify that the two-parameter Binomial approximation for the aggregate-level likelihood should be used (`likelihood = "bernoulli2"`, where "bernoulli" refers to the individual-level likelihood, and "2" denotes the two-parameter adjustment to the aggregate-level likelihood) [@methods_paper].
 We utilise the shared effect modifier assumption to help identify the model, setting treatment-covariate interactions to be equal within each class (`class_interactions = "common"`).
 We narrow the possible range for random initial values with `init_r = 0.1` (the default is `init_r = 2`), since probit models in particular are often hard to initialise.
@@ -211,7 +211,7 @@ pso_fit_FE <- nma(pso_net,
                   QR = TRUE)
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 print(pso_fit_FE)
 ```
@@ -257,7 +257,7 @@ pso_fit_RE <- nma(pso_net,
                   QR = TRUE)
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 print(pso_fit_RE)
 ```

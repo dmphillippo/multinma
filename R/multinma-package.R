@@ -27,7 +27,7 @@
 #'   produced for any study population in the network, or for an external target
 #'   population.
 #'
-#'   Models are estimated in a Bayesian framwork using Stan
+#'   Models are estimated in a Bayesian framework using Stan
 #'   \insertCite{Carpenter2017}{multinma}. Quasi-Monte Carlo numerical
 #'   integration based on Sobol' sequences is used for the integration in ML-NMR
 #'   models, with a Gaussian copula to account for correlations between

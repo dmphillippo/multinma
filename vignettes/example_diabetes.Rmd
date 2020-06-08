@@ -70,7 +70,7 @@ db_fit_FE <- nma(db_net,
                  prior_trt = normal(scale = 100))
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 db_fit_FE
 ```
@@ -106,7 +106,7 @@ db_fit_RE <- nma(db_net,
                  prior_het = half_normal(scale = 5))
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 db_fit_RE
 ```
@@ -181,7 +181,7 @@ db_pred_RE
 plot(db_pred_RE)
 ```
 
-If the `baseline` and `newdata` arguments are ommitted, predicted probabilities will be produced for every study in the network based on their follow-up times and estimated baseline cloglog probabilities $\mu_j$:
+If the `baseline` and `newdata` arguments are omitted, predicted probabilities will be produced for every study in the network based on their follow-up times and estimated baseline cloglog probabilities $\mu_j$:
 ```{r db_pred_RE_all, fig.height=16}
 db_pred_RE_studies <- predict(db_fit_RE, type = "response")
 db_pred_RE_studies

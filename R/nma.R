@@ -1015,7 +1015,7 @@ nma.fit <- function(ipd_x, ipd_y,
 #'   indicating whether the corresponding data are in contrast rather than arm
 #'   format.
 #' @param type Character string, whether to generate RE structure under the
-#'   "reference treatment" paramterisation, or the "baseline shift"
+#'   "reference treatment" parameterisation, or the "baseline shift"
 #'   parameterisation.
 #'
 #' @return For `RE_cor()`, a correlation matrix of dimension equal to the number

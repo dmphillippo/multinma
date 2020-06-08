@@ -88,7 +88,7 @@
 #' urokinase, UK; anistreptilase, ASPAC) plus per-cutaneous transluminal
 #' coronary angioplasty (PTCA)
 #' \insertCite{Boland2003,Lu2006,TSD4}{multinma}. The number of
-#' deaths in 30 or 35 days following accute myocardial infarction are recorded.
+#' deaths in 30 or 35 days following acute myocardial infarction are recorded.
 #'
 #' @format A data frame with 50 rows and 5 variables:
 #' \describe{

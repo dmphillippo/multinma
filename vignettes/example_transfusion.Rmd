@@ -69,7 +69,7 @@ tr_fit_RE_noninf <- nma(tr_net,
                         prior_het = half_normal(scale = 5))
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 tr_fit_RE_noninf
 ```
@@ -120,7 +120,7 @@ tr_fit_RE_inf <- nma(tr_net,
                      prior_het_type = "var")
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 tr_fit_RE_inf
 ```

@@ -595,7 +595,7 @@ as.array.stan_nma <- function(x, ..., pars, include = TRUE) {
     abort("`include` must be TRUE or FALSE.")
   if (!missing(pars)) {
     if (!is.character(pars))
-      abort("`pars` must be a character vector of paramters to include (or missing).")
+      abort("`pars` must be a character vector of parameters to include (or missing).")
 
     allpars <- c(x$stanfit@sim$pars_oi, x$stanfit@sim$fnames_oi)
     badpars <- setdiff(pars, allpars)

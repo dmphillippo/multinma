@@ -81,7 +81,7 @@ arm_fit_FE <- nma(arm_net,
                   prior_trt = normal(scale = 10))
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 arm_fit_FE
 ```
@@ -127,7 +127,7 @@ The divergent transitions occur in the upper tail of the heterogeneity standard 
 In this case, with only a small number of studies, there is not very much information to estimate the heterogeneity standard deviation and the prior distribution may be too heavy-tailed.
 We could consider a more informative prior distribution for the heterogeneity variance to aid estimation.
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 arm_fit_RE
 ```
@@ -258,7 +258,7 @@ contr_fit_FE <- nma(contr_net,
                     prior_trt = normal(scale = 100))
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 contr_fit_FE
 ```
@@ -297,7 +297,7 @@ The divergent transitions occur in the upper tail of the heterogeneity standard 
 In this case, with only a small number of studies, there is not very much information to estimate the heterogeneity standard deviation and the prior distribution may be too heavy-tailed.
 We could consider a more informative prior distribution for the heterogeneity variance to aid estimation.
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 contr_fit_RE
 ```
@@ -444,7 +444,7 @@ mix_fit_FE <- nma(mix_net,
                   prior_trt = normal(scale = 100))
 ```
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 mix_fit_FE
 ```
@@ -490,7 +490,7 @@ The divergent transitions occur in the upper tail of the heterogeneity standard 
 In this case, with only a small number of studies, there is not very much information to estimate the heterogeneity standard deviation and the prior distribution may be too heavy-tailed.
 We could consider a more informative prior distribution for the heterogeneity variance to aid estimation.
 
-Basic paramter summaries are given by the `print()` method:
+Basic parameter summaries are given by the `print()` method:
 ```{r}
 mix_fit_RE
 ```
