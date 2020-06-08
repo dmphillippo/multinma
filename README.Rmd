@@ -37,4 +37,7 @@ And the development version from [GitHub](https://github.com/) with:
 devtools::install_github("dmphillippo/multinma")
 ```
 
+Installing from source (either from CRAN or GitHub) requires that the `rstan` package is installed and configured. 
+See the installation guide [here](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started).
+
 ## References
