@@ -6,7 +6,7 @@
 #' @param network An `nma_data` object, as created by the functions `set_*()`,
 #'   `combine_network()`, or `add_integration()`
 #' @param consistency Character string specifying the type of (in)consistency
-#'   model to fit, either `"consistency"`, `"nodesplit"`, or `"ume"`
+#'   model to fit, currently either `"consistency"` or `"ume"`
 #' @param trt_effects Character string specifying either `"fixed"` or `"random"` effects
 #' @param regression A one-sided model formula, specifying the prognostic and
 #'   effect-modifying terms for a regression model. Any references to treatment
@@ -84,7 +84,7 @@
 #' @template ex_plaque_psoriasis_mlnmr
 #'
 nma <- function(network,
-                consistency = c("consistency", "nodesplit", "ume"),
+                consistency = c("consistency", "ume"),
                 trt_effects = c("fixed", "random"),
                 regression = NULL,
                 class_interactions = c("common", "exchangeable", "independent"),
