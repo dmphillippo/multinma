@@ -492,6 +492,7 @@ pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
 #' @rdname logitNormal
 #' @aliases qlogitnorm
 qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
+  require_pkg("logitnorm")
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
   return(logitnorm::qlogitnorm(p, pars[["mu"]], pars[["sigma"]], ...))
@@ -501,6 +502,7 @@ qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
 #' @rdname logitNormal
 #' @aliases dlogitnorm
 dlogitnorm <- function(x, mu = 0, sigma = 1, ..., mean, sd) {
+  require_pkg("logitnorm")
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
   return(logitnorm::dlogitnorm(x, pars[["mu"]], pars[["sigma"]], ...))
@@ -510,6 +512,7 @@ dlogitnorm <- function(x, mu = 0, sigma = 1, ..., mean, sd) {
 #' @rdname logitNormal
 #' @aliases plogitnorm
 plogitnorm <- function(q, mu = 0, sigma = 1, ..., mean, sd) {
+  require_pkg("logitnorm")
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
   return(logitnorm::plogitnorm(q, pars[["mu"]], pars[["sigma"]], ...))
