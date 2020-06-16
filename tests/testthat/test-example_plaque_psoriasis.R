@@ -2,6 +2,7 @@
 # Instead edit example_plaque_psoriasis.Rmd and then run precompile.R
 
 skip_on_cran()
+skip_on_travis()
 
 params <-
 list(run_tests = FALSE)

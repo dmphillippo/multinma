@@ -2,6 +2,8 @@
 # Instead edit example_statins.Rmd and then run precompile.R
 
 skip_on_cran()
+skip_on_travis()
+
 
 params <-
 list(run_tests = FALSE)
