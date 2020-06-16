@@ -42,7 +42,7 @@ precompile("example_diabetes.Rmd")
 precompile("example_parkinsons.Rmd", skip_on_travis = TRUE)
 precompile("example_transfusion.Rmd")
 precompile("example_atrial_fibrillation.Rmd", skip_on_travis = TRUE)
-precompile("example_statins.Rmd")
+precompile("example_statins.Rmd", skip_on_travis = TRUE)
 precompile("example_bcg_vaccine.Rmd")
 precompile("example_plaque_psoriasis.Rmd", skip_on_travis = TRUE)
 
