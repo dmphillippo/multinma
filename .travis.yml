@@ -8,19 +8,17 @@ latex: false
 
 env:
   matrix:
-    - CXX_OLEVEL=2 CXX=clang++
+    - CXX_OLEVEL=2 CXX=g++
 
 matrix:
   include:
     - os: linux
-      compiler: clang
+      compiler: gcc
       addons:
         apt:
-          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-7' ]
-          packages:
-            - llvm-7-dev
+          sources: [ 'ubuntu-toolchain-r-test' ]
       env:
-        - CXX_OLEVEL=2 CXX=clang++
+        - CXX_OLEVEL=2 CXX=g++
 
 
 before_install:
@@ -28,8 +26,8 @@ before_install:
   - sudo apt-get update -q
   - mkdir -p ~/.R/
   - echo "CXX = `R CMD config CXX`" >> ~/.R/Makevars
-  - echo "CXXFLAGS = `R CMD config CXXFLAGS` -pedantic -g0 -flto -stdlib=libc++" >> ~/.R/Makevars
-  - echo "LDFLAGS += -flto -stdlib=libc++" >> ~/.R/Makevars
+  - echo "CXXFLAGS = `R CMD config CXXFLAGS` -pedantic -g0 -flto" >> ~/.R/Makevars
+  - echo "LDFLAGS += -flto" >> ~/.R/Makevars
   - export CLANG_EXTRA_ARG=""
   - if [[ $CXX = "clang++" ]] ;  then export CLANG_EXTRA_ARG=" -Qunused-arguments -fcolor-diagnostics " ; fi
   - sed -i.bak "s/ g++/ ${CXX}${CLANG_EXTRA_ARG}/" ~/.R/Makevars
