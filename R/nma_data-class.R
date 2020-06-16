@@ -157,7 +157,7 @@ print.nma_data <- function(x, ..., n = 10) {
   }
   cglue("Total number of studies: {length(x$studies)}")
   cglue("Reference treatment is: {levels(x$treatments)[1]}")
-  cglue("Network is {if (is_network_connected(x)) crayon::green('connected') else crayon::red('disconnected')}")
+  cglue("Network is {if (is_network_connected(x)) green('connected') else red('disconnected')}")
 
   invisible(x)
 }
@@ -186,7 +186,7 @@ sec_header <- function(s = "",
                        sep = ifelse(nchar(s), " ", "")) {
   s <- as.character(s)
   cat(subtle(strrep('-', width - nchar(s) - 2*nchar(sep))),
-      crayon::bold(s),
+      bold(s),
       subtle("----"), "\n", sep = sep)
 }
 
@@ -203,9 +203,30 @@ cglue <- function(..., sep = "\n") {
 #' Define crayon styles
 #'
 #' @noRd
-subtle <- function(...) crayon::silver(...)
-emph_r <- function(...) crayon::red$bold(...)
-emph_g <- function(...) crayon::green$bold(...)
+subtle <- function(...) {
+  if (require_pkg("crayon", error = FALSE))
+    return(crayon::silver(...))
+  else
+    return(...)
+}
+bold <- function(...) {
+  if (require_pkg("crayon", error = FALSE))
+    return(crayon::bold(...))
+  else
+    return(...)
+}
+red <- function(...) {
+  if (require_pkg("crayon", error = FALSE))
+    return(crayon::red(...))
+  else
+    return(...)
+}
+green <- function(...) {
+  if (require_pkg("crayon", error = FALSE))
+    return(crayon::green(...))
+  else
+    return(...)
+}
 
 #' Convert networks to graph objects
 #'

@@ -31,7 +31,6 @@ Imports:
     purrr,
     forcats,
     glue,
-    crayon,
     randtoolbox,
     copula,
     tidyr (>= 0.8.3),
@@ -61,7 +60,8 @@ Suggests:
     R.rsp,
     rprojroot,
     loo (>= 2.0.0),
-    logitnorm
+    logitnorm,
+    crayon
 RdMacros: Rdpack
 URL: http://github.com/dmphillippo/multinma
 BugReports: http://github.com/dmphillippo/multinma/issues
