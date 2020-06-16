@@ -24,7 +24,6 @@ Imports:
     Rcpp (>= 0.12.0),
     rstan (>= 2.19.2),
     rstantools (>= 2.0.0),
-    loo (>= 2.0.0),
     Rdpack (>= 0.7),
     tibble,
     dplyr (>= 0.8.1),
@@ -61,7 +60,8 @@ Suggests:
     rmarkdown,
     parallel,
     R.rsp,
-    rprojroot
+    rprojroot,
+    loo (>= 2.0.0),
 RdMacros: Rdpack
 URL: http://github.com/dmphillippo/multinma
 BugReports: http://github.com/dmphillippo/multinma/issues
