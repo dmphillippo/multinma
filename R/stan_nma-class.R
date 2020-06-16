@@ -654,6 +654,7 @@ as.matrix.stan_nma <- function(x, ..., pars, include = TRUE) {
 #'
 #' @rdname loo
 #' @aliases loo
+#' @method loo stan_nma
 # Dynamically exported, see zzz.R
 loo.stan_nma <- function(x, ...) {
   sf <- as.stanfit(x)
@@ -663,6 +664,7 @@ loo.stan_nma <- function(x, ...) {
 
 #' @rdname loo
 #' @aliases waic
+#' @method waic stan_nma
 # Dynamically exported, see zzz.R
 waic.stan_nma <- function(x, ...) {
   ll <- as.array(x, pars = "log_lik")
