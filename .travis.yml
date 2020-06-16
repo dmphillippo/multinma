@@ -27,6 +27,7 @@ before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -q
   - mkdir -p ~/.R/
+  - chmod +x configure
   - echo "CXX = `R CMD config CXX`" >> ~/.R/Makevars
   - echo "CXXFLAGS = `R CMD config CXXFLAGS` -pedantic -g0 -flto" >> ~/.R/Makevars
   - echo "LDFLAGS += -flto" >> ~/.R/Makevars
