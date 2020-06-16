@@ -3,11 +3,11 @@ sudo: false
 r: devel
 cache: packages
 
-latex: true
+latex: false
 
 
 env:
-  matrix: 
+  matrix:
     - CXX_OLEVEL=2 CXX=clang++
 
 matrix:
@@ -16,9 +16,9 @@ matrix:
       compiler: clang
       addons:
         apt:
-          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-5.0' ]        
+          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-7' ]
           packages:
-            - llvm-5.0-dev
+            - llvm-7-dev
       env:
         - CXX_OLEVEL=2 CXX=clang++
 
@@ -35,7 +35,7 @@ before_install:
   - sed -i.bak "s/ g++/ ${CXX}${CLANG_EXTRA_ARG}/" ~/.R/Makevars
   - sed -i.bak "s/O[0-3]/O$CXX_OLEVEL/" ~/.R/Makevars
 
-script: 
+script:
   - |
     travis_wait 42 R CMD build .
     travis_wait 59 R CMD check multinma*tar.gz
