@@ -232,7 +232,8 @@ green <- function(...) {
 #'
 #' The method `as.igraph()` converts `nma_data` objects into the form used by
 #' the [igraph] package. The method `as_tbl_graph()` converts `nma_data` objects
-#' into the form used by the [ggraph] and [tidygraph] packages.
+#' into the form used by the [ggraph] and
+#' \link[tidygraph:tidygraph-package]{tidygraph} packages.
 #'
 #' @param x An [nma_data] object to convert
 #' @param ... Additional arguments
