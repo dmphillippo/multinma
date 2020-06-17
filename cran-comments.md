@@ -1,7 +1,8 @@
 ## Test environments
 * local R installation (windows), R 4.0.1, 4.0.0
-* win-builder (devel, release)
+* win-builder (release, devel)
 * rhub (ubuntu release, fedora devel)
+* Travis ubuntu (release, devel)
 
 ## R CMD check results
 
@@ -15,7 +16,7 @@ New submission
 This is the first submission of this package.
 
 * checking package dependencies ... NOTE
-Imports includes 25 non-default packages.
+Imports includes 21 non-default packages.
 Importing from so many packages makes the package vulnerable to any of
 them becoming unavailable.  Move as many as possible to Suggests and
 use conditionally.
