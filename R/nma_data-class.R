@@ -337,11 +337,12 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
   return(g)
 }
 
-#' @export
 #' @rdname graph_conversion
 #'
-#' @importFrom tidygraph as_tbl_graph
+#' @method as_tbl_graph nma_data
+# Dynamically exported, see zzz.R
 as_tbl_graph.nma_data <- function(x, ...) {
+  require_pkg("tidygraph")
   return(tidygraph::as_tbl_graph(igraph::as.igraph(x, ...)))
 }
 
@@ -526,7 +527,7 @@ plot.nma_data <- function(x, ..., layout, circular,
                 "Specify `trt_class` in set_*(), or set show_trt_class = FALSE.", sep = "\n"))
 
   dat_mixed <- has_ipd(x) && (has_agd_arm(x) || has_agd_contrast(x))
-  g <- ggraph::ggraph(x, layout = layout, circular = circular, ...)
+  g <- ggraph::ggraph(igraph::as.igraph(x), layout = layout, circular = circular, ...)
 
   if (weight_edges) {
     g <- g +

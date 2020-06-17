@@ -37,7 +37,6 @@ Imports:
     stringr,
     Matrix,
     igraph,
-    tidygraph,
     ggraph,
     ggplot2,
     tidybayes,
@@ -61,7 +60,8 @@ Suggests:
     rprojroot,
     loo (>= 2.0.0),
     logitnorm,
-    crayon
+    crayon,
+    tidygraph
 RdMacros: Rdpack
 URL: http://github.com/dmphillippo/multinma
 BugReports: http://github.com/dmphillippo/multinma/issues

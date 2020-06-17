@@ -8,6 +8,7 @@
 .onLoad <- function(...) {
   s3_register("loo::loo", "stan_nma")
   s3_register("loo::waic", "stan_nma")
+  s3_register("tidygraph::as_tbl_graph", "nma_data")
 
   invisible()
 }
