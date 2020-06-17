@@ -20,7 +20,7 @@ require_pkg <- function(p, error = TRUE) {
   if (requireNamespace(p, quietly = TRUE)) {
     invisible(TRUE)
   } else if (error) {
-    abort(glue::glue("Install suggested package `{p}` to use this function."))
+    abort(glue::glue('Install suggested package `{p}` to use this function: install.packages("{p}")'))
   } else {
     invisible(FALSE)
   }
