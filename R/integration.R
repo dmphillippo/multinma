@@ -479,12 +479,13 @@ pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
 #' The logit Normal distribution
 #'
 #' We provide convenient extensions of the `[dpq]logitnorm` functions in the
-#' package [logitnorm], which allow the distribution to be specified in terms of
-#' its mean and standard deviation, instead of its logit-mean and logit-sd.
+#' package \link[logitnorm:logitnorm-package]{logitnorm}, which allow the
+#' distribution to be specified in terms of its mean and standard deviation,
+#' instead of its logit-mean and logit-sd.
 #'
 #' @param p,x vector of quantiles
 #' @param q vector of probabilities
-#' @param mu,sigma,... see [logitnorm]
+#' @param mu,sigma,... see \code{\link[logitnorm:logitnorm-package]{logitnorm}}
 #' @param mean,sd mean and standard deviation, overriding `mu` and `sigma` if
 #'   specified
 #'
@@ -492,6 +493,7 @@ pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
 #' @rdname logitNormal
 #' @aliases qlogitnorm
 qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
+  require_pkg("logitnorm")
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
   return(logitnorm::qlogitnorm(p, pars[["mu"]], pars[["sigma"]], ...))
@@ -501,6 +503,7 @@ qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
 #' @rdname logitNormal
 #' @aliases dlogitnorm
 dlogitnorm <- function(x, mu = 0, sigma = 1, ..., mean, sd) {
+  require_pkg("logitnorm")
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
   return(logitnorm::dlogitnorm(x, pars[["mu"]], pars[["sigma"]], ...))
@@ -510,6 +513,7 @@ dlogitnorm <- function(x, mu = 0, sigma = 1, ..., mean, sd) {
 #' @rdname logitNormal
 #' @aliases plogitnorm
 plogitnorm <- function(q, mu = 0, sigma = 1, ..., mean, sd) {
+  require_pkg("logitnorm")
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
   return(logitnorm::plogitnorm(q, pars[["mu"]], pars[["sigma"]], ...))

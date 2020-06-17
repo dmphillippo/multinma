@@ -26,7 +26,8 @@ An \code{igraph} object for \code{as.igraph()}, a \code{tbl_graph} object for
 \description{
 The method \code{as.igraph()} converts \code{nma_data} objects into the form used by
 the \link{igraph} package. The method \code{as_tbl_graph()} converts \code{nma_data} objects
-into the form used by the \link{ggraph} and \link{tidygraph} packages.
+into the form used by the \link{ggraph} and
+\link[tidygraph:tidygraph-package]{tidygraph} packages.
 }
 \examples{
 # Set up network of smoking cessation data

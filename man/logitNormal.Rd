@@ -15,7 +15,7 @@ plogitnorm(q, mu = 0, sigma = 1, ..., mean, sd)
 \arguments{
 \item{p, x}{vector of quantiles}
 
-\item{mu, sigma, ...}{see \link{logitnorm}}
+\item{mu, sigma, ...}{see \code{\link[logitnorm:logitnorm-package]{logitnorm}}}
 
 \item{mean, sd}{mean and standard deviation, overriding \code{mu} and \code{sigma} if
 specified}
@@ -24,6 +24,7 @@ specified}
 }
 \description{
 We provide convenient extensions of the \verb{[dpq]logitnorm} functions in the
-package \link{logitnorm}, which allow the distribution to be specified in terms of
-its mean and standard deviation, instead of its logit-mean and logit-sd.
+package \link[logitnorm:logitnorm-package]{logitnorm}, which allow the
+distribution to be specified in terms of its mean and standard deviation,
+instead of its logit-mean and logit-sd.
 }

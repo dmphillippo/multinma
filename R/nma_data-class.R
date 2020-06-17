@@ -157,7 +157,7 @@ print.nma_data <- function(x, ..., n = 10) {
   }
   cglue("Total number of studies: {length(x$studies)}")
   cglue("Reference treatment is: {levels(x$treatments)[1]}")
-  cglue("Network is {if (is_network_connected(x)) crayon::green('connected') else crayon::red('disconnected')}")
+  cglue("Network is {if (is_network_connected(x)) green('connected') else red('disconnected')}")
 
   invisible(x)
 }
@@ -186,7 +186,7 @@ sec_header <- function(s = "",
                        sep = ifelse(nchar(s), " ", "")) {
   s <- as.character(s)
   cat(subtle(strrep('-', width - nchar(s) - 2*nchar(sep))),
-      crayon::bold(s),
+      bold(s),
       subtle("----"), "\n", sep = sep)
 }
 
@@ -203,15 +203,37 @@ cglue <- function(..., sep = "\n") {
 #' Define crayon styles
 #'
 #' @noRd
-subtle <- function(...) crayon::silver(...)
-emph_r <- function(...) crayon::red$bold(...)
-emph_g <- function(...) crayon::green$bold(...)
+subtle <- function(...) {
+  if (require_pkg("crayon", error = FALSE))
+    return(crayon::silver(...))
+  else
+    return(...)
+}
+bold <- function(...) {
+  if (require_pkg("crayon", error = FALSE))
+    return(crayon::bold(...))
+  else
+    return(...)
+}
+red <- function(...) {
+  if (require_pkg("crayon", error = FALSE))
+    return(crayon::red(...))
+  else
+    return(...)
+}
+green <- function(...) {
+  if (require_pkg("crayon", error = FALSE))
+    return(crayon::green(...))
+  else
+    return(...)
+}
 
 #' Convert networks to graph objects
 #'
 #' The method `as.igraph()` converts `nma_data` objects into the form used by
 #' the [igraph] package. The method `as_tbl_graph()` converts `nma_data` objects
-#' into the form used by the [ggraph] and [tidygraph] packages.
+#' into the form used by the [ggraph] and
+#' \link[tidygraph:tidygraph-package]{tidygraph} packages.
 #'
 #' @param x An [nma_data] object to convert
 #' @param ... Additional arguments
@@ -316,11 +338,12 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
   return(g)
 }
 
-#' @export
 #' @rdname graph_conversion
 #'
-#' @importFrom tidygraph as_tbl_graph
+#' @method as_tbl_graph nma_data
+# Dynamically exported, see zzz.R
 as_tbl_graph.nma_data <- function(x, ...) {
+  require_pkg("tidygraph")
   return(tidygraph::as_tbl_graph(igraph::as.igraph(x, ...)))
 }
 
@@ -505,7 +528,7 @@ plot.nma_data <- function(x, ..., layout, circular,
                 "Specify `trt_class` in set_*(), or set show_trt_class = FALSE.", sep = "\n"))
 
   dat_mixed <- has_ipd(x) && (has_agd_arm(x) || has_agd_contrast(x))
-  g <- ggraph::ggraph(x, layout = layout, circular = circular, ...)
+  g <- ggraph::ggraph(igraph::as.igraph(x), layout = layout, circular = circular, ...)
 
   if (weight_edges) {
     g <- g +

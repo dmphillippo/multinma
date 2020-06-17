@@ -652,19 +652,20 @@ as.matrix.stan_nma <- function(x, ..., pars, include = TRUE) {
 #' @param ... Further arguments to \code{\link[rstan:stanfit-method-loo]{loo()}} or
 #'   \code{\link[loo:waic]{waic()}}
 #'
-#' @export
-#' @importFrom loo loo
 #' @rdname loo
 #' @aliases loo
+#' @method loo stan_nma
+# Dynamically exported, see zzz.R
 loo.stan_nma <- function(x, ...) {
   sf <- as.stanfit(x)
   return(rstan::loo(sf, ...))
 }
 
-#' @export
-#' @importFrom loo waic
+
 #' @rdname loo
 #' @aliases waic
+#' @method waic stan_nma
+# Dynamically exported, see zzz.R
 waic.stan_nma <- function(x, ...) {
   ll <- as.array(x, pars = "log_lik")
   return(loo::waic(ll, ...))
