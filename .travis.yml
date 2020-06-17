@@ -7,23 +7,15 @@ cache: packages
 
 latex: false
 
-
+os: linux
+compiler: gcc
+addons:
+  apt:
+    sources: [ 'ubuntu-toolchain-r-test' ]
+    packages:
+      - libgsl-dev
 env:
-  matrix:
-    - CXX_OLEVEL=2 CXX=g++
-
-matrix:
-  include:
-    - os: linux
-      compiler: gcc
-      addons:
-        apt:
-          sources: [ 'ubuntu-toolchain-r-test' ]
-          packages:
-            - libgsl-dev
-      env:
-        - CXX_OLEVEL=2 CXX=g++
-
+  - CXX_OLEVEL=2 CXX=g++
 
 before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
