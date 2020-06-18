@@ -1,7 +1,6 @@
 ## Test environments
-* local R installation (windows), R 4.0.1, 4.0.0
+* local R installation (windows), R 4.0.1
 * win-builder (release, devel)
-* rhub (ubuntu release, fedora devel)
 * Travis ubuntu (release, devel)
 
 ## R CMD check results
