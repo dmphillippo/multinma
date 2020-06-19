@@ -132,20 +132,20 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #' [posterior_ranks()] or [posterior_rank_probs()]).
 #'
 #' @param x A `nma_summary` object
-#' @param ... Additional arguments passed on to the underlying `tidybayes` plot
+#' @param ... Additional arguments passed on to the underlying `ggdist` plot
 #'   stat, see Details
-#' @param stat Character string specifying the `tidybayes` plot stat to use,
+#' @param stat Character string specifying the `ggdist` plot stat to use,
 #'   default `"pointintervalh"`
 #' @param ref_line Numeric vector of positions for reference lines, by default
 #'   no reference lines are drawn
 #'
 #' @details Plotting is handled by [ggplot2] and the stats and geoms provided in
-#'   the [tidybayes] package. As a result, the output is very flexible. Any
-#'   plotting stats provided by `tidybayes` may be used, via the argument
+#'   the [ggdist] package. As a result, the output is very flexible. Any
+#'   plotting stats provided by `ggdist` may be used, via the argument
 #'   `stat`. The default uses
-#'   \code{\link[tidybayes:stat_pointinterval]{tidybayes::stat_pointintervalh()}}, to
+#'   \code{\link[ggdist:stat_pointinterval]{ggdist::stat_pointintervalh()}}, to
 #'   produce medians and 95\% Credible Intervals with 66\% inner bands.
-#'   Additional arguments in `...` are passed to the `tidybayes` stat, to
+#'   Additional arguments in `...` are passed to the `ggdist` stat, to
 #'   customise the output. For example, to produce means and Credible Intervals,
 #'   specify `point_interval = mean_qi`. To produce an 80\% Credible Interval
 #'   with no inner band, specify `.width = c(0, 0.8)`.
@@ -155,8 +155,8 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #'   (horizontally), or `stat = "histinterval[h]"` to produce histograms with
 #'   intervals (horizontally).
 #'
-#'   A full list of options and examples is found in the `tidybayes` vignette
-#'   `vignette("slabinterval", package = "tidybayes")`.
+#'   A full list of options and examples is found in the `ggdist` vignette
+#'   `vignette("slabinterval", package = "ggdist")`.
 #'
 #'   A `ggplot` object is returned which can be further modified through the
 #'   usual [ggplot2] functions to add further aesthetics, geoms, themes, etc.
@@ -203,13 +203,13 @@ plot.nma_summary <- function(x, ...,
                              ref_line = NA_real_) {
   # Checks
   if (!rlang::is_string(stat))
-    abort("`stat` should be a character string specifying the name of a tidybayes stat")
+    abort("`stat` should be a character string specifying the name of a ggdist stat")
 
   stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
 
-  tb_geom <- tryCatch(getExportedValue("tidybayes", paste0("stat_", stat)),
+  tb_geom <- tryCatch(getExportedValue("ggdist", paste0("stat_", stat)),
     error = function(err) {
-      abort(paste("`stat` should be a character string specifying the name of a tidybayes stat:",
+      abort(paste("`stat` should be a character string specifying the name of a ggdist stat:",
                   err, sep = "\n"))
       })
 
@@ -301,13 +301,13 @@ plot.nma_parameter_summary <- function(x, ...,
                                        ref_line = NA_real_) {
   # Checks
   if (!rlang::is_string(stat))
-    abort("`stat` should be a character string specifying the name of a tidybayes stat.")
+    abort("`stat` should be a character string specifying the name of a ggdist stat.")
 
   stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
 
-  tb_geom <- tryCatch(getExportedValue("tidybayes", paste0("stat_", stat)),
+  tb_geom <- tryCatch(getExportedValue("ggdist", paste0("stat_", stat)),
                       error = function(err) {
-                        abort(paste("`stat` should be a character string specifying the name of a tidybayes stat:",
+                        abort(paste("`stat` should be a character string specifying the name of a ggdist stat:",
                                     err, sep = "\n"))
                       })
 

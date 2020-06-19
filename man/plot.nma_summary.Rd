@@ -15,10 +15,10 @@
 \arguments{
 \item{x}{A \code{nma_summary} object}
 
-\item{...}{Additional arguments passed on to the underlying \code{tidybayes} plot
+\item{...}{Additional arguments passed on to the underlying \code{ggdist} plot
 stat, see Details}
 
-\item{stat}{Character string specifying the \code{tidybayes} plot stat to use,
+\item{stat}{Character string specifying the \code{ggdist} plot stat to use,
 default \code{"pointintervalh"}}
 
 \item{ref_line}{Numeric vector of positions for reference lines, by default
@@ -37,12 +37,12 @@ posterior ranks and rank probabilities (when called on the output of
 }
 \details{
 Plotting is handled by \link{ggplot2} and the stats and geoms provided in
-the \link{tidybayes} package. As a result, the output is very flexible. Any
-plotting stats provided by \code{tidybayes} may be used, via the argument
+the \link{ggdist} package. As a result, the output is very flexible. Any
+plotting stats provided by \code{ggdist} may be used, via the argument
 \code{stat}. The default uses
-\code{\link[tidybayes:stat_pointinterval]{tidybayes::stat_pointintervalh()}}, to
+\code{\link[ggdist:stat_pointinterval]{ggdist::stat_pointintervalh()}}, to
 produce medians and 95\\% Credible Intervals with 66\\% inner bands.
-Additional arguments in \code{...} are passed to the \code{tidybayes} stat, to
+Additional arguments in \code{...} are passed to the \code{ggdist} stat, to
 customise the output. For example, to produce means and Credible Intervals,
 specify \code{point_interval = mean_qi}. To produce an 80\\% Credible Interval
 with no inner band, specify \code{.width = c(0, 0.8)}.
@@ -52,8 +52,8 @@ example, specify \code{stat = "[half]eye[h]"} to produce (half) eye plots
 (horizontally), or \code{stat = "histinterval[h]"} to produce histograms with
 intervals (horizontally).
 
-A full list of options and examples is found in the \code{tidybayes} vignette
-\code{vignette("slabinterval", package = "tidybayes")}.
+A full list of options and examples is found in the \code{ggdist} vignette
+\code{vignette("slabinterval", package = "ggdist")}.
 
 A \code{ggplot} object is returned which can be further modified through the
 usual \link{ggplot2} functions to add further aesthetics, geoms, themes, etc.

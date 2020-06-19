@@ -58,9 +58,9 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' @param y (Optional) A second `nma_dic` object, to produce "dev-dev" plots for
 #'   model comparison.
 #' @param ... Additional arguments passed on to other methods
-#' @param show_uncertainty Logical, show uncertainty with a `tidybayes` plot
+#' @param show_uncertainty Logical, show uncertainty with a `ggdist` plot
 #'   stat? Default `TRUE`.
-#' @param stat Character string specifying the `tidybayes` plot stat to use if
+#' @param stat Character string specifying the `ggdist` plot stat to use if
 #'   `show_uncertainty = TRUE`, default `"pointinterval"`. If `y` is provided,
 #'   currently only `"pointinterval"` is supported.
 #'
@@ -219,7 +219,7 @@ plot.nma_dic <- function(x, y, ...,
     } else {
 
       if (!rlang::is_string(stat))
-        abort("`stat` should be a character string specifying the name of a tidybayes stat")
+        abort("`stat` should be a character string specifying the name of a ggdist stat")
 
       stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
       stat <- stringr::str_remove(stat, "h$")
@@ -230,15 +230,15 @@ plot.nma_dic <- function(x, y, ...,
                         .sep = "\n"))
 
       stath <- paste0(stat, "h")
-      tb_geomh <- tryCatch(getExportedValue("tidybayes", paste0("geom_", stath)),
+      tb_geomh <- tryCatch(getExportedValue("ggdist", paste0("geom_", stath)),
                            error = function(err) {
-                             abort(paste("`stat` should be a character string specifying the name of a tidybayes geom:",
+                             abort(paste("`stat` should be a character string specifying the name of a ggdist geom:",
                                          err, sep = "\n"))
                            })
 
-      tb_geom <- tryCatch(getExportedValue("tidybayes", paste0("geom_", stat)),
+      tb_geom <- tryCatch(getExportedValue("ggdist", paste0("geom_", stat)),
                           error = function(err) {
-                            abort(paste("`stat` should be a character string specifying the name of a tidybayes geom:",
+                            abort(paste("`stat` should be a character string specifying the name of a ggdist geom:",
                                         err, sep = "\n"))
                           })
 
@@ -248,9 +248,9 @@ plot.nma_dic <- function(x, y, ...,
       int_dots <- dots[is_int_arg]
       geom_dots <- dots[!is_int_arg]
 
-      # Summarise resdev_post and y_resdev_post with tidybayes::point_interval()
+      # Summarise resdev_post and y_resdev_post with ggdist::point_interval()
       resdev_post <- dplyr::group_by(resdev_post, .data$parameter, .data$.label, .data$Type)
-      resdev_post <- do.call(tidybayes::point_intervalh,
+      resdev_post <- do.call(ggdist::point_intervalh,
                              args = rlang::dots_list(.data = resdev_post,
                                                      rlang::quo(.data$resdev),
                                                      .width = c(0.66, 0.95),
@@ -261,7 +261,7 @@ plot.nma_dic <- function(x, y, ...,
                       x_upper = .data$.upper)
 
       y_resdev_post <- dplyr::group_by(y_resdev_post, .data$parameter, .data$.label, .data$Type)
-      y_resdev_post <- do.call(tidybayes::point_interval,
+      y_resdev_post <- do.call(ggdist::point_interval,
                                args = rlang::dots_list(.data = y_resdev_post,
                                                        rlang::quo(.data$resdev),
                                                        .width = c(0.66, 0.95),
@@ -321,13 +321,13 @@ plot.nma_dic <- function(x, y, ...,
 
     if (show_uncertainty) {
       if (!rlang::is_string(stat))
-        abort("`stat` should be a character string specifying the name of a tidybayes stat")
+        abort("`stat` should be a character string specifying the name of a ggdist stat")
 
       stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
 
-      tb_stat <- tryCatch(getExportedValue("tidybayes", paste0("stat_", stat)),
+      tb_stat <- tryCatch(getExportedValue("ggdist", paste0("stat_", stat)),
                           error = function(err) {
-                            abort(paste("`stat` should be a character string specifying the name of a tidybayes stat:",
+                            abort(paste("`stat` should be a character string specifying the name of a ggdist stat:",
                                         err, sep = "\n"))
                           })
 
@@ -362,7 +362,7 @@ plot.nma_dic <- function(x, y, ...,
 
     if (show_uncertainty) {
       p <- p + do.call(tb_stat,
-                       args = rlang::dots_list(point_interval = tidybayes::mean_qi,
+                       args = rlang::dots_list(point_interval = ggdist::mean_qi,
                                                ...,
                                                .homonyms = "last"))
     } else {

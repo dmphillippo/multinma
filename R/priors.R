@@ -158,7 +158,7 @@ new_nma_prior <- function(dist, location = NA_real_, scale = NA_real_, df = NA_r
 #' Produce tidy prior details
 #'
 #' Produces prior details in a data frame, in a suitable format for
-#' tidybayes::stat_dist_*
+#' ggdist::stat_dist_*
 #'
 #' @param prior A nma_prior object
 #' @param trunc Optional vector of truncation limits

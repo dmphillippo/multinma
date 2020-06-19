@@ -9,9 +9,9 @@ plot_integration_error(x, ..., stat = "violin", show_expected_rate = TRUE)
 \arguments{
 \item{x}{An object of type \code{stan_mlnmr}}
 
-\item{...}{Additional arguments passed to the \code{tidybayes} plot stat.}
+\item{...}{Additional arguments passed to the \code{ggdist} plot stat.}
 
-\item{stat}{Character string specifying the \code{tidybayes} plot stat used to
+\item{stat}{Character string specifying the \code{ggdist} plot stat used to
 summarise the integration error over the posterior. Default is \code{"violin"},
 which is equivalent to \code{"eye"} with some cosmetic tweaks.}
 

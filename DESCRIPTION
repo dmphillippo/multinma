@@ -39,7 +39,7 @@ Imports:
     igraph,
     ggraph,
     ggplot2,
-    tidybayes,
+    ggdist (>= 2.1.1),
     truncdist,
     bayesplot
 LinkingTo: 

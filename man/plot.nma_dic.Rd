@@ -14,10 +14,10 @@ model comparison.}
 
 \item{...}{Additional arguments passed on to other methods}
 
-\item{show_uncertainty}{Logical, show uncertainty with a \code{tidybayes} plot
+\item{show_uncertainty}{Logical, show uncertainty with a \code{ggdist} plot
 stat? Default \code{TRUE}.}
 
-\item{stat}{Character string specifying the \code{tidybayes} plot stat to use if
+\item{stat}{Character string specifying the \code{ggdist} plot stat to use if
 \code{show_uncertainty = TRUE}, default \code{"pointinterval"}. If \code{y} is provided,
 currently only \code{"pointinterval"} is supported.}
 }

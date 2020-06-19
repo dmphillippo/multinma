@@ -138,7 +138,7 @@ summary.stan_nma <- function(object, ...,
   return(ss)
 }
 
-#' @param stat Character string specifying the `tidybayes` plot stat to use,
+#' @param stat Character string specifying the `ggdist` plot stat to use,
 #'   default `"pointintervalh"`
 #' @param ref_line Numeric vector of positions for reference lines, by default
 #'   no reference lines are drawn
@@ -229,10 +229,10 @@ plot_prior_posterior <- function(x, ...,
   }
 
   if (!is.list(post_args))
-    abort("`post_args` should be a list of arguments to pass to tidybayes::stat_sample_slabinterval")
+    abort("`post_args` should be a list of arguments to pass to ggdist::stat_sample_slabinterval")
 
   if (!is.list(prior_args))
-    abort("`prior_args` should be a list of arguments to pass to tidybayes::stat_dist_slabinterval")
+    abort("`prior_args` should be a list of arguments to pass to ggdist::stat_dist_slabinterval")
 
   overlay <- rlang::arg_match(overlay)
 
@@ -372,8 +372,8 @@ plot_prior_posterior <- function(x, ...,
 #' See \insertCite{methods_paper,Phillippo_thesis}{multinma} for details.
 #'
 #' @param x An object of type `stan_mlnmr`
-#' @param ... Additional arguments passed to the `tidybayes` plot stat.
-#' @param stat Character string specifying the `tidybayes` plot stat used to
+#' @param ... Additional arguments passed to the `ggdist` plot stat.
+#' @param stat Character string specifying the `ggdist` plot stat used to
 #'   summarise the integration error over the posterior. Default is `"violin"`,
 #'   which is equivalent to `"eye"` with some cosmetic tweaks.
 #' @param show_expected_rate Logical, show typical convergence rate \eqn{1/N}?
@@ -413,7 +413,7 @@ plot_integration_error <- function(x, ...,
     abort("`show_expected_rate` must be a logical value, TRUE or FALSE.")
 
   if (!rlang::is_string(stat))
-    abort("`stat` should be a character string specifying the name of a tidybayes stat")
+    abort("`stat` should be a character string specifying the name of a ggdist stat")
 
   stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
 
@@ -421,9 +421,9 @@ plot_integration_error <- function(x, ...,
     stat <- switch(stat, violin = "eye", violinh = "eyeh")
   }
 
-  tb_geom <- tryCatch(getExportedValue("tidybayes", paste0("stat_", stat)),
+  tb_geom <- tryCatch(getExportedValue("ggdist", paste0("stat_", stat)),
                       error = function(err) {
-                        abort(paste("`stat` should be a character string specifying the name of a tidybayes stat:",
+                        abort(paste("`stat` should be a character string specifying the name of a ggdist stat:",
                                     err, sep = "\n"))
                       })
 

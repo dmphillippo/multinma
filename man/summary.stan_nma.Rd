@@ -19,7 +19,7 @@
 
 \item{x, object}{A \code{stan_nma} object}
 
-\item{stat}{Character string specifying the \code{tidybayes} plot stat to use,
+\item{stat}{Character string specifying the \code{ggdist} plot stat to use,
 default \code{"pointintervalh"}}
 
 \item{ref_line}{Numeric vector of positions for reference lines, by default
