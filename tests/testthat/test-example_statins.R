@@ -4,7 +4,6 @@
 skip_on_cran()
 skip_on_travis()
 
-
 params <-
 list(run_tests = FALSE)
 
@@ -117,7 +116,7 @@ plot(statin_releff_FE,
 plot(statin_fit_FE, 
      pars = "beta", 
      ref_line = 0,
-     stat = "halfeyeh")
+     stat = "halfeye")
 
 
 ## ----statins_tests, include=FALSE, eval=params$run_tests------------------------------------------

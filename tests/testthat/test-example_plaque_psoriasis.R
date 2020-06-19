@@ -223,7 +223,7 @@ plot_integration_error(pso_fit_RE)
 ## -------------------------------------------------------------------------------------------------
 plot(pso_fit_FE,
      pars = "beta",
-     stat = "halfeyeh",
+     stat = "halfeye",
      ref_line = 0)
 
 

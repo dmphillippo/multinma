@@ -197,7 +197,7 @@ plot(af_4b_releff_01, ref_line = 0)
 
 The estimated class interactions (against the reference "Mixed" class) are very uncertain.
 ```{r af_4b_betas}
-plot(af_fit_4b, pars = "beta", stat = "halfeyeh", ref_line = 0)
+plot(af_fit_4b, pars = "beta", stat = "halfeye", ref_line = 0)
 ```
 
 The interactions are more straightforward to interpret if we transform the interaction coefficients (using the consistency equations) so that they are against the control class:
@@ -214,7 +214,7 @@ names(af_4b_beta)[3] <- "beta[.trtclassAnti-coagulant:stroke]"
 
 # Summarise
 summary(af_4b_beta)
-plot(summary(af_4b_beta), stat = "halfeyeh", ref_line = 0)
+plot(summary(af_4b_beta), stat = "halfeye", ref_line = 0)
 ```
 
 There is some evidence that the effect of anti-coagulants increases (compared to control) with prior stroke.

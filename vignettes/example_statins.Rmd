@@ -160,7 +160,7 @@ Model parameters may be plotted with the corresponding `plot()` method:
 plot(statin_fit_FE, 
      pars = "beta", 
      ref_line = 0,
-     stat = "halfeyeh")
+     stat = "halfeye")
 ```
 
 Whilst the 95% Credible Interval includes zero, there is a suggestion that statins are more effective for secondary prevention.

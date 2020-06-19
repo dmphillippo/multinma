@@ -300,7 +300,7 @@ Parameter estimates can be plotted using the `plot()` method, for example to exa
 ```{r}
 plot(pso_fit_FE,
      pars = "beta",
-     stat = "halfeyeh",
+     stat = "halfeye",
      ref_line = 0)
 ```
 

@@ -149,7 +149,7 @@ plot(af_4b_releff_01, ref_line = 0)
 
 
 ## ----af_4b_betas----------------------------------------------------------------------------------
-plot(af_fit_4b, pars = "beta", stat = "halfeyeh", ref_line = 0)
+plot(af_fit_4b, pars = "beta", stat = "halfeye", ref_line = 0)
 
 
 ## ----af_4b_betas_transformed----------------------------------------------------------------------
@@ -165,7 +165,7 @@ names(af_4b_beta)[3] <- "beta[.trtclassAnti-coagulant:stroke]"
 
 # Summarise
 summary(af_4b_beta)
-plot(summary(af_4b_beta), stat = "halfeyeh", ref_line = 0)
+plot(summary(af_4b_beta), stat = "halfeye", ref_line = 0)
 
 
 ## ----af_4b_ranks----------------------------------------------------------------------------------

@@ -124,7 +124,7 @@ summary(bcg_fit_lat, pars = "beta")
 plot(bcg_fit_lat, 
      pars = "beta", 
      ref_line = 0,
-     stat = "halfeyeh")
+     stat = "halfeye")
 
 
 ## -------------------------------------------------------------------------------------------------
