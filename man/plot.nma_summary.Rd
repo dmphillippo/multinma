@@ -6,9 +6,21 @@
 \alias{plot.nma_rank_probs}
 \title{Plots of summary results}
 \usage{
-\method{plot}{nma_summary}(x, ..., stat = "pointintervalh", ref_line = NA_real_)
+\method{plot}{nma_summary}(
+  x,
+  ...,
+  stat = "pointinterval",
+  orientation = c("horizontal", "vertical", "y", "x"),
+  ref_line = NA_real_
+)
 
-\method{plot}{nma_parameter_summary}(x, ..., stat = "pointintervalh", ref_line = NA_real_)
+\method{plot}{nma_parameter_summary}(
+  x,
+  ...,
+  stat = "pointinterval",
+  orientation = c("horizontal", "vertical", "y", "x"),
+  ref_line = NA_real_
+)
 
 \method{plot}{nma_rank_probs}(x, ...)
 }
@@ -19,7 +31,10 @@
 stat, see Details}
 
 \item{stat}{Character string specifying the \code{ggdist} plot stat to use,
-default \code{"pointintervalh"}}
+default \code{"pointinterval"}}
+
+\item{orientation}{Whether the \code{ggdist} geom is drawn horizontally
+(\code{"horizontal"}) or vertically (\code{"vertical"}), default \code{"horizontal"}}
 
 \item{ref_line}{Numeric vector of positions for reference lines, by default
 no reference lines are drawn}
@@ -40,7 +55,7 @@ Plotting is handled by \link{ggplot2} and the stats and geoms provided in
 the \link{ggdist} package. As a result, the output is very flexible. Any
 plotting stats provided by \code{ggdist} may be used, via the argument
 \code{stat}. The default uses
-\code{\link[ggdist:stat_pointinterval]{ggdist::stat_pointintervalh()}}, to
+\code{\link[ggdist:stat_pointinterval]{ggdist::stat_pointinterval()}}, to
 produce medians and 95\\% Credible Intervals with 66\\% inner bands.
 Additional arguments in \code{...} are passed to the \code{ggdist} stat, to
 customise the output. For example, to produce means and Credible Intervals,
@@ -48,9 +63,7 @@ specify \code{point_interval = mean_qi}. To produce an 80\\% Credible Interval
 with no inner band, specify \code{.width = c(0, 0.8)}.
 
 Alternative stats can be specified to produce different summaries. For
-example, specify \code{stat = "[half]eye[h]"} to produce (half) eye plots
-(horizontally), or \code{stat = "histinterval[h]"} to produce histograms with
-intervals (horizontally).
+example, specify \code{stat = "[half]eye"} to produce (half) eye plots, or \code{stat = "histinterval"} to produce histograms with intervals.
 
 A full list of options and examples is found in the \code{ggdist} vignette
 \code{vignette("slabinterval", package = "ggdist")}.
@@ -90,10 +103,10 @@ smk_releff_RE <- relative_effects(smk_fit_RE)
 plot(smk_releff_RE, ref_line = 0)
 
 # Customise plot options
-plot(smk_releff_RE, ref_line = 0, stat = "halfeyeh")
+plot(smk_releff_RE, ref_line = 0, stat = "halfeye")
 
 # Further customisation is possible with ggplot commands
-plot(smk_releff_RE, ref_line = 0, stat = "halfeyeh", slab_alpha = 0.6) +
+plot(smk_releff_RE, ref_line = 0, stat = "halfeye", slab_alpha = 0.6) +
   ggplot2::aes(slab_fill = ifelse(..x.. < 0, "darkred", "grey60"))
 
 # Produce posterior ranks

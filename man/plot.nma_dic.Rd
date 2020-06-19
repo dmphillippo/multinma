@@ -4,7 +4,14 @@
 \alias{plot.nma_dic}
 \title{Plots of model fit diagnostics}
 \usage{
-\method{plot}{nma_dic}(x, y, ..., show_uncertainty = TRUE, stat = "pointinterval")
+\method{plot}{nma_dic}(
+  x,
+  y,
+  ...,
+  show_uncertainty = TRUE,
+  stat = "pointinterval",
+  orientation = c("vertical", "horizontal", "x", "y")
+)
 }
 \arguments{
 \item{x}{A \code{nma_dic} object}
@@ -20,6 +27,10 @@ stat? Default \code{TRUE}.}
 \item{stat}{Character string specifying the \code{ggdist} plot stat to use if
 \code{show_uncertainty = TRUE}, default \code{"pointinterval"}. If \code{y} is provided,
 currently only \code{"pointinterval"} is supported.}
+
+\item{orientation}{Whether the \code{ggdist} geom is drawn horizontally
+(\code{"horizontal"}) or vertically (\code{"vertical"}). Only used for residual
+deviance plots, default \code{"vertical"}.}
 }
 \value{
 A \code{ggplot} object.
@@ -94,7 +105,7 @@ smk_fit_RE
 plot(smk_dic_RE)
 
 # Changing the plot stat used
-plot(smk_dic_RE, stat = "intervalh")
+plot(smk_dic_RE, stat = "interval", orientation = "horizontal")
 
 # Further customisation is possible using ggplot commands
 # For example, highlighting data points with residual deviance above a certain threshold

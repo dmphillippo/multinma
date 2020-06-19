@@ -4,7 +4,13 @@
 \alias{plot_integration_error}
 \title{Plot numerical integration error}
 \usage{
-plot_integration_error(x, ..., stat = "violin", show_expected_rate = TRUE)
+plot_integration_error(
+  x,
+  ...,
+  stat = "violin",
+  orientation = c("vertical", "horizontal", "x", "y"),
+  show_expected_rate = TRUE
+)
 }
 \arguments{
 \item{x}{An object of type \code{stan_mlnmr}}
@@ -14,6 +20,9 @@ plot_integration_error(x, ..., stat = "violin", show_expected_rate = TRUE)
 \item{stat}{Character string specifying the \code{ggdist} plot stat used to
 summarise the integration error over the posterior. Default is \code{"violin"},
 which is equivalent to \code{"eye"} with some cosmetic tweaks.}
+
+\item{orientation}{Whether the \code{ggdist} geom is drawn horizontally
+(\code{"horizontal"}) or vertically (\code{"vertical"}), default \code{"vertical"}}
 
 \item{show_expected_rate}{Logical, show typical convergence rate \eqn{1/N}?
 Default \code{TRUE}.}

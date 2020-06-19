@@ -107,7 +107,7 @@ print.stan_nma <- function(x, ...) {
 #' # Customising plot output
 #' plot(smk_fit_RE,
 #'      pars = c("d", "tau"),
-#'      stat = "halfeyeh",
+#'      stat = "halfeye",
 #'      ref_line = 0)
 #' }
 summary.stan_nma <- function(object, ...,
@@ -139,20 +139,23 @@ summary.stan_nma <- function(object, ...,
 }
 
 #' @param stat Character string specifying the `ggdist` plot stat to use,
-#'   default `"pointintervalh"`
+#'   default `"pointinterval"`
+#' @param orientation Whether the `ggdist` geom is drawn horizontally
+#'   (`"horizontal"`) or vertically (`"vertical"`), default `"horizontal"`
 #' @param ref_line Numeric vector of positions for reference lines, by default
 #'   no reference lines are drawn
 #' @rdname summary.stan_nma
 #' @export
 plot.stan_nma <- function(x, ...,
                           pars, include,
-                          stat = "pointintervalh",
+                          stat = "pointinterval",
+                          orientation = c("horizontal", "vertical", "y", "x"),
                           ref_line = NA_real_) {
 
   # All checks carried out by downstream functions
 
   s <- summary(x, pars = pars, include = include)
-  p <- plot(s, ..., stat = stat, ref_line = ref_line)
+  p <- plot(s, ..., stat = stat, orientation = orientation, ref_line = ref_line)
   return(p)
 }
 
@@ -376,6 +379,8 @@ plot_prior_posterior <- function(x, ...,
 #' @param stat Character string specifying the `ggdist` plot stat used to
 #'   summarise the integration error over the posterior. Default is `"violin"`,
 #'   which is equivalent to `"eye"` with some cosmetic tweaks.
+#' @param orientation Whether the `ggdist` geom is drawn horizontally
+#'   (`"horizontal"`) or vertically (`"vertical"`), default `"vertical"`
 #' @param show_expected_rate Logical, show typical convergence rate \eqn{1/N}?
 #'   Default `TRUE`.
 #'
@@ -404,6 +409,7 @@ plot_prior_posterior <- function(x, ...,
 #' }
 plot_integration_error <- function(x, ...,
                                    stat = "violin",
+                                   orientation = c("vertical", "horizontal", "x", "y"),
                                    show_expected_rate = TRUE) {
   # Checks
   if (!inherits(x, "stan_mlnmr"))
@@ -417,8 +423,8 @@ plot_integration_error <- function(x, ...,
 
   stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
 
-  if (violin <- stat %in% c("violin", "violinh")) {
-    stat <- switch(stat, violin = "eye", violinh = "eyeh")
+  if (violin <- stat == "violin") {
+    stat <- "eye"
   }
 
   tb_geom <- tryCatch(getExportedValue("ggdist", paste0("stat_", stat)),
@@ -427,8 +433,12 @@ plot_integration_error <- function(x, ...,
                                     err, sep = "\n"))
                       })
 
+  orientation <- rlang::arg_match(orientation)
+  if (orientation == "x") orientation <- "vertical"
+  else if (orientation == "y") orientation <- "horizontal"
+
   # Is a horizontal geom specified?
-  horizontal <- stringr::str_ends(stat, "h")
+  horizontal <- orientation == "horizontal"
 
   # Get cumulative integration points
   twoparbin <- x$likelihood %in% c("binomial2", "bernoulli2")
@@ -519,6 +529,7 @@ plot_integration_error <- function(x, ...,
               args = rlang::dots_list(ggplot2::aes(colour = .data$parameter,
                                                    fill = .data$parameter,
                                                    slab_colour = .data$parameter),
+                                      orientation = orientation,
                                       ...,
                                       !!! v_args,
                                       position = if (!horizontal) ggplot2::position_dodge(width = int_thin / 10) else "identity",
@@ -532,7 +543,7 @@ plot_integration_error <- function(x, ...,
   } else {
     p <- p +
       do.call(tb_geom,
-              args = rlang::dots_list(..., !!! v_args, .homonyms = "first"))
+              args = rlang::dots_list(orientation = orientation, ..., !!! v_args, .homonyms = "first"))
   }
 
   p <- p +

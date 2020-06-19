@@ -63,6 +63,9 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' @param stat Character string specifying the `ggdist` plot stat to use if
 #'   `show_uncertainty = TRUE`, default `"pointinterval"`. If `y` is provided,
 #'   currently only `"pointinterval"` is supported.
+#' @param orientation Whether the `ggdist` geom is drawn horizontally
+#'   (`"horizontal"`) or vertically (`"vertical"`). Only used for residual
+#'   deviance plots, default `"vertical"`.
 #'
 #' @return A `ggplot` object.
 #' @export
@@ -101,7 +104,7 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' plot(smk_dic_RE)
 #'
 #' # Changing the plot stat used
-#' plot(smk_dic_RE, stat = "intervalh")
+#' plot(smk_dic_RE, stat = "interval", orientation = "horizontal")
 #'
 #' # Further customisation is possible using ggplot commands
 #' # For example, highlighting data points with residual deviance above a certain threshold
@@ -135,7 +138,8 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' }
 plot.nma_dic <- function(x, y, ...,
                          show_uncertainty = TRUE,
-                         stat = "pointinterval") {
+                         stat = "pointinterval",
+                         orientation = c("vertical", "horizontal", "x", "y")) {
   # Checks
   has_y <- !missing(y)
 
@@ -144,6 +148,10 @@ plot.nma_dic <- function(x, y, ...,
 
   if (!rlang::is_bool(show_uncertainty))
     abort("`show_uncertainty` should be TRUE or FALSE.")
+
+  orientation <- rlang::arg_match(orientation)
+  if (orientation == "x") orientation <- "vertical"
+  else if (orientation == "y") orientation <- "horizontal"
 
   # Get resdev samples from resdev_array
   resdev_post <- as.matrix.nma_summary(x$resdev_array) %>%
@@ -219,22 +227,14 @@ plot.nma_dic <- function(x, y, ...,
     } else {
 
       if (!rlang::is_string(stat))
-        abort("`stat` should be a character string specifying the name of a ggdist stat")
+        abort("`stat` should be a character string specifying the name of a ggdist geom")
 
       stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
-      stat <- stringr::str_remove(stat, "h$")
 
       if (stat != "pointinterval")
         warn(glue::glue('Currently only stat = "pointinterval" is supported when `y` is given.',
                         'Results may be unexpected with stat = "{stat}"!',
                         .sep = "\n"))
-
-      stath <- paste0(stat, "h")
-      tb_geomh <- tryCatch(getExportedValue("ggdist", paste0("geom_", stath)),
-                           error = function(err) {
-                             abort(paste("`stat` should be a character string specifying the name of a ggdist geom:",
-                                         err, sep = "\n"))
-                           })
 
       tb_geom <- tryCatch(getExportedValue("ggdist", paste0("geom_", stat)),
                           error = function(err) {
@@ -250,7 +250,7 @@ plot.nma_dic <- function(x, y, ...,
 
       # Summarise resdev_post and y_resdev_post with ggdist::point_interval()
       resdev_post <- dplyr::group_by(resdev_post, .data$parameter, .data$.label, .data$Type)
-      resdev_post <- do.call(ggdist::point_intervalh,
+      resdev_post <- do.call(ggdist::point_interval,
                              args = rlang::dots_list(.data = resdev_post,
                                                      rlang::quo(.data$resdev),
                                                      .width = c(0.66, 0.95),
@@ -309,8 +309,8 @@ plot.nma_dic <- function(x, y, ...,
 
     if (show_uncertainty) {
       p <- p +
-        do.call(tb_geom, args = geom_dots) +
-        do.call(tb_geomh, args = geom_dots)
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, orientation = "vertical")) +
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, orientation = "horizontal"))
     } else {
       p <- p + ggplot2::geom_point(...)
     }
@@ -331,11 +331,10 @@ plot.nma_dic <- function(x, y, ...,
                                         err, sep = "\n"))
                           })
 
-      # Is a horizontal geom specified?
-      horizontal <- stringr::str_ends(stat, "h")
-    } else {
-      horizontal <- FALSE
     }
+
+    # Is a horizontal geom specified?
+    horizontal <- orientation == "horizontal"
 
     if (horizontal) {
       resdev_post$.label <- forcats::fct_rev(resdev_post$.label)
@@ -364,6 +363,7 @@ plot.nma_dic <- function(x, y, ...,
       p <- p + do.call(tb_stat,
                        args = rlang::dots_list(point_interval = ggdist::mean_qi,
                                                ...,
+                                               orientation = orientation,
                                                .homonyms = "last"))
     } else {
       p <- p + ggplot2::geom_point(...)

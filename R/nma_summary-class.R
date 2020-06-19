@@ -135,7 +135,9 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #' @param ... Additional arguments passed on to the underlying `ggdist` plot
 #'   stat, see Details
 #' @param stat Character string specifying the `ggdist` plot stat to use,
-#'   default `"pointintervalh"`
+#'   default `"pointinterval"`
+#' @param orientation Whether the `ggdist` geom is drawn horizontally
+#'   (`"horizontal"`) or vertically (`"vertical"`), default `"horizontal"`
 #' @param ref_line Numeric vector of positions for reference lines, by default
 #'   no reference lines are drawn
 #'
@@ -143,7 +145,7 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #'   the [ggdist] package. As a result, the output is very flexible. Any
 #'   plotting stats provided by `ggdist` may be used, via the argument
 #'   `stat`. The default uses
-#'   \code{\link[ggdist:stat_pointinterval]{ggdist::stat_pointintervalh()}}, to
+#'   \code{\link[ggdist:stat_pointinterval]{ggdist::stat_pointinterval()}}, to
 #'   produce medians and 95\% Credible Intervals with 66\% inner bands.
 #'   Additional arguments in `...` are passed to the `ggdist` stat, to
 #'   customise the output. For example, to produce means and Credible Intervals,
@@ -151,9 +153,8 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #'   with no inner band, specify `.width = c(0, 0.8)`.
 #'
 #'   Alternative stats can be specified to produce different summaries. For
-#'   example, specify `stat = "[half]eye[h]"` to produce (half) eye plots
-#'   (horizontally), or `stat = "histinterval[h]"` to produce histograms with
-#'   intervals (horizontally).
+#'   example, specify `stat = "[half]eye"` to produce (half) eye plots, or `stat
+#'   = "histinterval"` to produce histograms with intervals.
 #'
 #'   A full list of options and examples is found in the `ggdist` vignette
 #'   `vignette("slabinterval", package = "ggdist")`.
@@ -174,10 +175,10 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #' plot(smk_releff_RE, ref_line = 0)
 #'
 #' # Customise plot options
-#' plot(smk_releff_RE, ref_line = 0, stat = "halfeyeh")
+#' plot(smk_releff_RE, ref_line = 0, stat = "halfeye")
 #'
 #' # Further customisation is possible with ggplot commands
-#' plot(smk_releff_RE, ref_line = 0, stat = "halfeyeh", slab_alpha = 0.6) +
+#' plot(smk_releff_RE, ref_line = 0, stat = "halfeye", slab_alpha = 0.6) +
 #'   ggplot2::aes(slab_fill = ifelse(..x.. < 0, "darkred", "grey60"))
 #'
 #' # Produce posterior ranks
@@ -199,7 +200,8 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #'   ggplot2::aes(colour = Treatment)
 #' }
 plot.nma_summary <- function(x, ...,
-                             stat = "pointintervalh",
+                             stat = "pointinterval",
+                             orientation = c("horizontal", "vertical", "y", "x"),
                              ref_line = NA_real_) {
   # Checks
   if (!rlang::is_string(stat))
@@ -217,8 +219,12 @@ plot.nma_summary <- function(x, ...,
   if (!is.numeric(ref_line) || !is.null(dim(ref_line)))
     abort("`ref_line` should be a numeric vector.")
 
+  orientation <- rlang::arg_match(orientation)
+  if (orientation == "x") orientation <- "vertical"
+  else if (orientation == "y") orientation <- "horizontal"
+
   # Is a horizontal geom specified?
-  horizontal <- stringr::str_ends(stat, "h")
+  horizontal <- orientation == "horizontal"
 
   # Get axis labels from attributes, if available
   p_xlab <- attr(x, "xlab", TRUE)
@@ -288,7 +294,7 @@ plot.nma_summary <- function(x, ...,
   }
 
   p <- p +
-    do.call(tb_geom, args = list(...)) +
+    do.call(tb_geom, args = list(orientation = orientation, ...)) +
     theme_multinma()
 
   return(p)
@@ -297,7 +303,8 @@ plot.nma_summary <- function(x, ...,
 #' @rdname plot.nma_summary
 #' @export
 plot.nma_parameter_summary <- function(x, ...,
-                                       stat = "pointintervalh",
+                                       stat = "pointinterval",
+                                       orientation = c("horizontal", "vertical", "y", "x"),
                                        ref_line = NA_real_) {
   # Checks
   if (!rlang::is_string(stat))
@@ -315,8 +322,12 @@ plot.nma_parameter_summary <- function(x, ...,
   if (!is.numeric(ref_line) || !is.null(dim(ref_line)))
     abort("`ref_line` should be a numeric vector.")
 
+  orientation <- rlang::arg_match(orientation)
+  if (orientation == "x") orientation <- "vertical"
+  else if (orientation == "y") orientation <- "horizontal"
+
   # Is a horizontal geom specified?
-  horizontal <- stringr::str_ends(stat, "h")
+  horizontal <- orientation == "horizontal"
 
   # Get axis labels from attributes, if available
   p_xlab <- attr(x, "xlab", TRUE)
@@ -361,7 +372,7 @@ plot.nma_parameter_summary <- function(x, ...,
   }
 
   p <- p +
-    do.call(tb_geom, args = list(...)) +
+    do.call(tb_geom, args = list(orientation = orientation, ...)) +
     theme_multinma()
 
   return(p)

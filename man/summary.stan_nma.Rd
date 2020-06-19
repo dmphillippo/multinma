@@ -7,7 +7,15 @@
 \usage{
 \method{summary}{stan_nma}(object, ..., pars, include, probs = c(0.025, 0.25, 0.5, 0.75, 0.975))
 
-\method{plot}{stan_nma}(x, ..., pars, include, stat = "pointintervalh", ref_line = NA_real_)
+\method{plot}{stan_nma}(
+  x,
+  ...,
+  pars,
+  include,
+  stat = "pointinterval",
+  orientation = c("horizontal", "vertical", "y", "x"),
+  ref_line = NA_real_
+)
 }
 \arguments{
 \item{...}{Additional arguments passed on to other methods}
@@ -20,7 +28,10 @@
 \item{x, object}{A \code{stan_nma} object}
 
 \item{stat}{Character string specifying the \code{ggdist} plot stat to use,
-default \code{"pointintervalh"}}
+default \code{"pointinterval"}}
+
+\item{orientation}{Whether the \code{ggdist} geom is drawn horizontally
+(\code{"horizontal"}) or vertically (\code{"vertical"}), default \code{"horizontal"}}
 
 \item{ref_line}{Numeric vector of positions for reference lines, by default
 no reference lines are drawn}
@@ -79,7 +90,7 @@ plot(smk_fit_RE, pars = "tau")
 # Customising plot output
 plot(smk_fit_RE,
      pars = c("d", "tau"),
-     stat = "halfeyeh",
+     stat = "halfeye",
      ref_line = 0)
 }
 }
