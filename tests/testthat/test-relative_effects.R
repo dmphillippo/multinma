@@ -36,6 +36,9 @@ test_that("trt_ref argument", {
 test_that("probs argument", {
   m <- "numeric vector of probabilities"
   expect_error(relative_effects(smk_fit_RE, probs = "a"), m)
+  expect_error(relative_effects(smk_fit_RE, probs = -1), m)
+  expect_error(relative_effects(smk_fit_RE, probs = 1.5), m)
+  expect_error(relative_effects(smk_fit_RE, probs = Inf), m)
   expect_error(relative_effects(smk_fit_RE, probs = list()), m)
   expect_error(relative_effects(smk_fit_RE, probs = NA), m)
   expect_error(relative_effects(smk_fit_RE, probs = NULL), m)

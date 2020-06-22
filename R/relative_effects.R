@@ -124,6 +124,8 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
   if (!rlang::is_bool(summary))
     abort("`summary` should be TRUE or FALSE.")
 
+  check_probs(probs)
+
   # Cannot produce relative effects for inconsistency models
   if (x$consistency != "consistency")
     abort(glue::glue("Cannot produce relative effects under inconsistency '{x$consistency}' model."))

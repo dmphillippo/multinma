@@ -164,6 +164,8 @@ predict.stan_nma <- function(object, ...,
   if (!rlang::is_bool(summary))
     abort("`summary` should be TRUE or FALSE.")
 
+  check_probs(probs)
+
   # Cannot produce predictions for inconsistency models
   if (object$consistency != "consistency")
     abort(glue::glue("Cannot produce predictions under inconsistency '{x$consistency}' model."))

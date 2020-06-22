@@ -500,6 +500,7 @@ as.matrix.nma_rank_probs <- function(x, ...){
 #' @noRd
 summary_mcmc_array <- function(x, probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
   if (!is.array(x) || length(dim(x)) != 3) abort("Not a 3D MCMC array, [Iterations, Chains, Parameters]")
+  check_probs(probs)
 
   pars <- dimnames(x)[[3]]
   p_mean <- apply(x, 3, mean)
@@ -525,4 +526,11 @@ summary_mcmc_array <- function(x, probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
     Bulk_ESS = p_ess_bulk, Tail_ESS = p_ess_tail, Rhat = p_rhat)
 
   return(ss)
+}
+
+#' Validate probs argument
+#' @noRd
+check_probs <- function(probs) {
+  if (!rlang::is_double(probs, finite = TRUE) || any(probs < 0) || any(probs > 1))
+    rlang::abort("`probs` must be a numeric vector of probabilities between 0 and 1.")
 }
