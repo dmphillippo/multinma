@@ -64,7 +64,8 @@ Phillippo, David M., Sofia Dias, A. E. Ades, Mark Belger, Alan Brnabic,
 Alexander Schacht, Daniel Saure, Zbigniew Kadziola, and Nicky J. Welton.
 2020. “Multilevel Network Meta-Regression for Population-Adjusted
 Treatment Comparisons.” *Journal of the Royal Statistical Society:
-Series A (Statistics in Society)*. <https://doi.org/10.1111/rssa.12579>.
+Series A (Statistics in Society)* 183 (3): 1189–1210.
+<https://doi.org/10.1111/rssa.12579>.
 
 </div>
 
