@@ -60,9 +60,3 @@ test_that("newdata argument", {
   expect_error(relative_effects(smk_fit_RE, newdata = list()), m)
   expect_error(relative_effects(smk_fit_RE, newdata = NA), m)
 })
-
-test_that("study argument", {
-  df <- data.frame(study = c("a", "b"), x = 1:2)
-  expect_error(relative_effects(smk_fit_RE, newdata = df, study = foo), "not found")
-  expect_error(relative_effects(smk_fit_RE, newdata = df, study = "bar"), "doesn't exist")
-})
