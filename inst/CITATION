@@ -23,4 +23,7 @@ bibentry(bibtype = "Article",
          year = "2020",
          doi = "10.1111/rssa.12579",
          journal = "Journal of the Royal Statistical Society: Series A (Statistics in Society)",
+         volume = 183,
+         number = 3,
+         pages = "1189-1210",
          header = "When fitting ML-NMR models with IPD and AgD, please cite the methods paper:")
