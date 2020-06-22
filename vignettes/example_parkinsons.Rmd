@@ -12,9 +12,16 @@ params:
 set.seed(1042020)
 ```
 
-```{r setup}
+```{r, eval = FALSE}
 library(multinma)
 options(mc.cores = parallel::detectCores())
+```
+```{r setup, echo = FALSE}
+library(multinma)
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
+             "true" =, "warn" = 2, 
+             parallel::detectCores())
+options(mc.cores = nc)
 ```
 
 This vignette describes the analysis of data on the mean off-time reduction in patients given dopamine agonists as adjunct therapy in Parkinson's disease, in a network of 7 trials of 4 active drugs plus placebo [@TSD2].

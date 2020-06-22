@@ -10,9 +10,16 @@ params:
 ```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
 ```
 
-```{r setup}
+```{r, eval = FALSE}
 library(multinma)
 options(mc.cores = parallel::detectCores())
+```
+```{r setup, echo = FALSE}
+library(multinma)
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
+             "true" =, "warn" = 2, 
+             parallel::detectCores())
+options(mc.cores = nc)
 ```
 
 This vignette describes the analysis of 10 trials comparing reduced fat diets to control (non-reduced fat diets) for preventing mortality [@Hooper2000; @TSD2].

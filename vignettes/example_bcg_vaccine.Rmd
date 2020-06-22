@@ -12,9 +12,16 @@ params:
 set.seed(18284729)
 ```
 
-```{r setup}
+```{r, eval = FALSE}
 library(multinma)
 options(mc.cores = parallel::detectCores())
+```
+```{r setup, echo = FALSE}
+library(multinma)
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
+             "true" =, "warn" = 2, 
+             parallel::detectCores())
+options(mc.cores = nc)
 ```
 
 This vignette describes the analysis of 13 trials investigating BCG vaccination vs. no vaccination for prevention of Tuberculosis (TB) [@TSD3;@Berkey1995].

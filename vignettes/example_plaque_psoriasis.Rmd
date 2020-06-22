@@ -14,7 +14,15 @@ library(multinma)
 library(dplyr)      # dplyr and tidyr for data manipulation
 library(tidyr)
 library(ggplot2)    # ggplot2 for plotting covariate distributions
+```
+```{r, eval = FALSE}
 options(mc.cores = parallel::detectCores())
+```
+```{r, echo = FALSE}
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
+             "true" =, "warn" = 2, 
+             parallel::detectCores())
+options(mc.cores = nc)
 ```
 
 Simulated individual patient data (IPD) from trials comparing treatments for plaque psoriasis are found in the data set `plaque_psoriasis_ipd`.

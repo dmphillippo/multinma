@@ -12,9 +12,16 @@ params:
 set.seed(2684319)
 ```
 
-```{r setup}
+```{r, eval = FALSE}
 library(multinma)
 options(mc.cores = parallel::detectCores())
+```
+```{r setup, echo = FALSE}
+library(multinma)
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
+             "true" =, "warn" = 2, 
+             parallel::detectCores())
+options(mc.cores = nc)
 ```
 
 This vignette describes the analysis of 6 trials comparing transfusion of granulocytes (white blood cells) to control for preventing mortality in patients with neutropenia or neutrophil dysfunction [@Stanworth2005; @Turner2012].
