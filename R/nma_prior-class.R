@@ -52,8 +52,11 @@ print.nma_prior <- function(x, ...) {
 #' summary(normal(location = 0.5, scale = 1), trunc = c(0, Inf))
 #'
 summary.nma_prior <- function(object, ..., probs = c(0.5, 0.95), digits = 2, trunc = NULL) {
-  if (!rlang::is_double(probs) || !all(probs <= 1) || !all(probs >= 0))
-    abort("`probs` must be a numeric vector of probabilities.")
+  check_probs(probs)
+  if (!rlang::is_scalar_integerish(digits, finite = TRUE))
+    abort("`digits` must be a single integer.")
+  if (!is.null(trunc) && !rlang::is_double(trunc, n = 2) || any(is.na(trunc)))
+    abort("`trunc` must be a length 2 numeric vector of truncation limits.")
 
   prior <- get_tidy_prior(object, trunc = trunc) %>%
     tidyr::expand_grid(probs = probs) %>%
