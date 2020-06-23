@@ -1,5 +1,8 @@
 # multinma 0.1.0.9000
 
+* Reduced size of vignettes
+* Added methods paper reference to DESCRIPTION
+
 # multinma 0.1.0
 
 * Feature: Network plots, using a `plot()` method for `nma_data` objects.
