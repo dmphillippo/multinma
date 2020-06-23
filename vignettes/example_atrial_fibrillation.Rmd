@@ -51,7 +51,7 @@ af_net
 The following code remains identical.)
 
 Plot the network with the `plot()` method:
-```{r af_network_plot}
+```{r af_network_plot, fig.width=8, fig.height=6, out.width="100%"}
 plot(af_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) + 
   ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
 ```
@@ -103,7 +103,7 @@ print(af_fit_1, pars = c("d", "mu", "delta"))
 ```
 
 The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
-```{r af_1_pp_plot}
+```{r af_1_pp_plot, fig.width=8, fig.height=6, out.width="100%"}
 plot_prior_posterior(af_fit_1, prior = c("trt", "het"))
 ```
 

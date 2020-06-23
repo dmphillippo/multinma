@@ -89,7 +89,7 @@ print(db_fit_FE, pars = c("d", "mu"))
 ```
 
 The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
-```{r db_FE_pp_plot}
+```{r db_FE_pp_plot, fig.width=8, fig.height=6, out.width="100%"}
 plot_prior_posterior(db_fit_FE)
 ```
 
