@@ -113,7 +113,20 @@ plot(af_1_cumrankprobs)
 ##                  prior_het = half_normal(scale = 5),
 ##                  adapt_delta = 0.99)
 
-## ---- echo=FALSE--------------------------------------------------------------
+## ---- echo=FALSE, eval=!params$run_tests--------------------------------------
+## af_fit_4b <- nma(af_net,
+##                  seed = 579212814,
+##                  trt_effects = "random",
+##                  regression = ~ .trt:stroke,
+##                  class_interactions = "common",
+##                  QR = TRUE,
+##                  prior_intercept = normal(scale = 100),
+##                  prior_trt = normal(scale = 100),
+##                  prior_reg = normal(scale = 100),
+##                  prior_het = half_normal(scale = 5),
+##                  adapt_delta = 0.99)
+
+## ---- echo=FALSE, eval=params$run_tests---------------------------------------
 af_fit_4b <- nma(af_net, 
                  seed = 579212814,
                  trt_effects = "random",
@@ -124,7 +137,8 @@ af_fit_4b <- nma(af_net,
                  prior_trt = normal(scale = 100),
                  prior_reg = normal(scale = 100),
                  prior_het = half_normal(scale = 5),
-                 adapt_delta = 0.99)
+                 adapt_delta = 0.99,
+                 iter = 5000)
 
 
 ## -----------------------------------------------------------------------------
