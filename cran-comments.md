@@ -1,5 +1,5 @@
 ## Test environments
-* local R installation (windows), R 4.0.1
+* local R installation (windows), R 4.0.1, 4.0.2
 * win-builder (release, devel)
 * Travis ubuntu (release, devel)
 
