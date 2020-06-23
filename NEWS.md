@@ -8,6 +8,8 @@ posterior ranks with `posterior_ranks()`, and posterior rank probabilities with
 is given.
 * Feature: Produce predictions of absolute effects with a `predict()` method for
 `stan_nma` objects.
+* Feature: Plots of relative effects, ranks, predictions, and parameter
+estimates via `plot.nma_summary()`.
 * Feature: Optional `sample_size` argument for `set_agd_*()` that:
   - Enables centering of predictors (`center = TRUE`) in `nma()` when
     a regression model is given, replacing the `agd_sample_size` argument of `nma()`
@@ -24,6 +26,7 @@ variance, or precision, with argument `prior_het_type`.
 * Feature: Added log-Normal prior distribution.
 * Feature: Plots of prior distributions vs. posterior distributions with
 `plot_prior_posterior()`.
+* Feature: Pairs plot method `pairs()`.
 * Fix: Random effects models with even moderate numbers of studies could be very
 slow. These now run much more quickly, using a sparse representation of the RE
 correlation matrix which is automatically enabled for sparsity above 90%
