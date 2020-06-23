@@ -1,4 +1,4 @@
-# multinma 0.1.0.9000
+# multinma 0.1.1
 
 * Reduced size of vignettes
 * Added methods paper reference to DESCRIPTION
