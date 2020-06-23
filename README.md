@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# multinma
+# multinma: Network Meta-Analysis of individual and aggregate data in Stan
 
 <!-- badges: start -->
 
