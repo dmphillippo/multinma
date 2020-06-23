@@ -9,6 +9,7 @@
 status](https://www.r-pkg.org/badges/version/multinma)](https://CRAN.R-project.org/package=multinma)
 [![Build
 Status](https://travis-ci.org/dmphillippo/multinma.svg?branch=master)](https://travis-ci.org/dmphillippo/multinma)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3904454.svg)](https://doi.org/10.5281/zenodo.3904454)
 <!-- badges: end -->
 
 The `multinma` package implements network meta-analysis, network

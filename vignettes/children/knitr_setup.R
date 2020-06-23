@@ -2,10 +2,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   dev.args = list(type = "cairo-png", antialias = "subpixel"),
-  dpi = 150,
-  fig.width = 8,
-  fig.height = 6,
-  out.width = "100%",
+  fig.width = 6,
+  fig.height = 4.5,
   fig.align = "center"
 )
 options(width = 100)

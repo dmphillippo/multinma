@@ -85,7 +85,7 @@ plot_prior_posterior(statin_fit_FE, prior = c("trt", "reg"))
 #### Random effects meta-regression
 We now fit a RE model.
 We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effect $d_\mathrm{Statin}$, study-specific intercepts $\mu_j$, and regression coefficient $\beta$.
-We use a $\mathrm{half-N}(0, 5^2)$ prior distribution for the heterogeneity standard deviation $\tau$.
+We use a $\textrm{half-N}(0, 5^2)$ prior distribution for the heterogeneity standard deviation $\tau$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
 ```{r}
 summary(normal(scale = 100))

@@ -89,13 +89,13 @@ print(db_fit_FE, pars = c("d", "mu"))
 ```
 
 The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
-```{r db_FE_pp_plot}
+```{r db_FE_pp_plot, fig.width=8, fig.height=6, out.width="100%"}
 plot_prior_posterior(db_fit_FE)
 ```
 
 #### Random effects meta-analysis
 We now fit a random effects model using the `nma()` function with `trt_effects = "random"`.
-Again, we use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and we additionally use a $\mathrm{half-N}(5^2)$ prior for the heterogeneity standard deviation $\tau$.
+Again, we use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and we additionally use a $\textrm{half-N}(5^2)$ prior for the heterogeneity standard deviation $\tau$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
 ```{r}
 summary(normal(scale = 100))
