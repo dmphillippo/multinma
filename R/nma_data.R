@@ -1,23 +1,54 @@
 #' Set up individual patient data
 #'
+#' Set up a network containing individual patient data (IPD). Multiple data
+#' sources may be combined once created using [combine_network()].
+#'
 #' @template args-data_common
-#' @template args-data_rE
+# #' @template args-data_rE
+#' @param r column of `data` specifying a binary outcome or Poisson outcome count
+#' @param E column of `data` specifying the total time at risk for Poisson
+#'   outcomes
 # #' @template args-data_Surv
 #'
 #' @return An object of class [nma_data]
 #' @export
 #'
+#' @template args-details_trt_ref
+#'
 #' @seealso [set_agd_arm()] for arm-based aggregate data, [set_agd_contrast()]
 #'   for contrast-based aggregate data, and [combine_network()] for combining
 #'   several data sources in one network.
+#' @template seealso_nma_data
 #' @examples
+#' # Set up network of plaque psoriasis IPD
+#' head(plaque_psoriasis_ipd)
+#'
+#' pso_net <- set_ipd(plaque_psoriasis_ipd,
+#'                    study = studyc,
+#'                    trt = trtc,
+#'                    r = pasi75)
+#'
+#' # Print network details
+#' pso_net
+#'
+#' # Plot network
+#' plot(pso_net)
+#'
+#' # Setting a different reference treatment
+#' set_ipd(plaque_psoriasis_ipd,
+#'         study = studyc,
+#'         trt = trtc,
+#'         r = pasi75,
+#'         trt_ref = "PBO")
+
 set_ipd <- function(data,
                     study,
                     trt,
                     y = NULL,
                     r = NULL, E = NULL,
                     # Surv = NULL,
-                    trt_ref = NULL) {
+                    trt_ref = NULL,
+                    trt_class = NULL) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -28,6 +59,7 @@ set_ipd <- function(data,
              agd_contrast = NULL,
              ipd = NULL,
              treatments = NULL,
+             classes = NULL,
              studies = NULL),
         class = "nma_data")
     )
@@ -41,6 +73,10 @@ set_ipd <- function(data,
   if (missing(trt)) abort("Specify `trt`")
   .trt <- dplyr::pull(data, {{ trt }})
   if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
+
+  # Treatment classes
+  .trtclass <- pull_non_null(data, enquo(trt_class))
+  if (!is.null(.trtclass)) check_trt_class(.trtclass, .trt)
 
   if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
 
@@ -74,6 +110,18 @@ set_ipd <- function(data,
     d$.trt <- forcats::fct_relevel(d$.trt, trt_ref)
   }
 
+  if (!is.null(.trtclass)) {
+    d <- tibble::add_column(d, .trtclass = nfactor(.trtclass))
+    class_lookup <- d %>%
+      dplyr::distinct(.data$.trt, .data$.trtclass) %>%
+      dplyr::arrange(.data$.trt)
+    class_ref <- as.character(class_lookup[[1, ".trtclass"]])
+    d$.trtclass <- forcats::fct_relevel(d$.trtclass, class_ref)
+    classes <- forcats::fct_relevel(nfactor(class_lookup$.trtclass), class_ref)
+  } else {
+    classes <- NULL
+  }
+
   if (o_type == "continuous") {
     d <- tibble::add_column(d, .y = .y)
   } else if (o_type == "binary") {
@@ -84,41 +132,80 @@ set_ipd <- function(data,
 
   d <- dplyr::bind_cols(d, data)
 
+  # Drop original study and treatment columns
+  d <- dplyr::select(d, - {{ study }}, - {{ trt }})
+  if (!is.null(.trtclass)) d <- dplyr::select(d, - {{ trt_class }})
+
   # Produce nma_data object
   out <- structure(
     list(agd_arm = NULL,
          agd_contrast = NULL,
          ipd = d,
          treatments = forcats::fct_unique(d$.trt),
+         classes = classes,
          studies = forcats::fct_unique(d$.study),
          outcome = list(agd_arm = NA, agd_contrast = NA, ipd = o_type)),
     class = "nma_data")
+
+  # If trt_ref not specified, mark treatments factor as default, calculate
+  # current reference trt
+  if (is.null(trt_ref)) {
+    trt_ref <- get_default_trt_ref(out)
+    trt_sort <- order(forcats::fct_relevel(out$treatments, trt_ref))
+    out$treatments <- .default(forcats::fct_relevel(out$treatments, trt_ref)[trt_sort])
+    out$ipd$.trt <- forcats::fct_relevel(out$ipd$.trt, trt_ref)
+    if (!is.null(.trtclass)) {
+      class_ref <- as.character(out$classes[trt_sort[1]])
+      out$ipd$.trtclass <- forcats::fct_relevel(out$ipd$.trtclass, class_ref)
+      out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
+    }
+  }
+
   return(out)
 }
 
 
 #' Set up arm-based aggregate data
 #'
+#' Set up a network containing arm-based aggregate data (AgD), such as event
+#' counts or mean outcomes on each arm. Multiple data sources may be combined
+#' once created using [combine_network()].
+#'
 #' @template args-data_common
 #' @template args-data_se
 #' @template args-data_rE
 # #' @template args-data_Surv
 #' @param n column of `data` specifying Binomial outcome numerator
+#' @param sample_size column of `data` giving the sample size in each arm.
+#'   Optional, see details.
 #'
 #' @return An object of class [nma_data]
 #' @export
+
+#' @template args-details_trt_ref
+#' @template args-details_sample_size
+#' @details
+#' If a Binomial outcome is specified and `sample_size` is omitted, `n` will be
+#' used as the sample size by default.
 #'
 #' @seealso [set_ipd()] for individual patient data, [set_agd_contrast()] for
 #'   contrast-based aggregate data, and [combine_network()] for combining
 #'   several data sources in one network.
+#' @template seealso_nma_data
+#' @template ex_smoking_network
 #' @examples
+#'
+#' # Plot network
+#' plot(smk_net)
 set_agd_arm <- function(data,
                         study,
                         trt,
                         y = NULL, se = NULL,
                         r = NULL, n = NULL, E = NULL,
                         # Surv = NULL,
-                        trt_ref = NULL) {
+                        sample_size = NULL,
+                        trt_ref = NULL,
+                        trt_class = NULL) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -129,6 +216,7 @@ set_agd_arm <- function(data,
              agd_contrast = NULL,
              ipd = NULL,
              treatments = NULL,
+             classes = NULL,
              studies = NULL),
         class = "nma_data")
     )
@@ -142,6 +230,10 @@ set_agd_arm <- function(data,
   if (missing(trt)) abort("Specify `trt`")
   .trt <- dplyr::pull(data, {{ trt }})
   if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
+
+  # Treatment classes
+  .trtclass <- pull_non_null(data, enquo(trt_class))
+  if (!is.null(.trtclass)) check_trt_class(.trtclass, .trt)
 
   if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
 
@@ -160,6 +252,12 @@ set_agd_arm <- function(data,
   o_type <- get_outcome_type(y = .y, se = .se,
                              r = .r, n = .n, E = .E)
 
+  # Pull and check sample size
+  .sample_size <- pull_non_null(data, enquo(sample_size))
+  if (!is.null(.sample_size)) check_sample_size(.sample_size)
+  else if (o_type == "count") .sample_size <- .n
+  else inform("Note: Optional argument `sample_size` not provided, some features may not be available (see ?set_agd_arm).")
+
   # Create tibble in standard format
   d <- tibble::tibble(
     .study = nfactor(.study),
@@ -177,6 +275,18 @@ set_agd_arm <- function(data,
     d$.trt <- forcats::fct_relevel(d$.trt, trt_ref)
   }
 
+  if (!is.null(.trtclass)) {
+    d <- tibble::add_column(d, .trtclass = nfactor(.trtclass))
+    class_lookup <- d %>%
+      dplyr::distinct(.data$.trt, .data$.trtclass) %>%
+      dplyr::arrange(.data$.trt)
+    class_ref <- as.character(class_lookup[[1, ".trtclass"]])
+    d$.trtclass <- forcats::fct_relevel(d$.trtclass, class_ref)
+    classes <- forcats::fct_relevel(nfactor(class_lookup$.trtclass), class_ref)
+  } else {
+    classes <- NULL
+  }
+
   if (o_type == "continuous") {
     d <- tibble::add_column(d, .y = .y, .se = .se)
   } else if (o_type == "count") {
@@ -185,7 +295,14 @@ set_agd_arm <- function(data,
     d <- tibble::add_column(d, .r = .r, .E = .E)
   }
 
+  if (!is.null(.sample_size)) d <- tibble::add_column(d, .sample_size = .sample_size)
+
+  # Bind in original data
   d <- dplyr::bind_cols(d, data)
+
+  # Drop original study and treatment columns
+  d <- dplyr::select(d, - {{ study }}, - {{ trt }})
+  if (!is.null(.trtclass)) d <- dplyr::select(d, - {{ trt_class }})
 
   # Produce nma_data object
   out <- structure(
@@ -193,20 +310,42 @@ set_agd_arm <- function(data,
          agd_contrast = NULL,
          ipd = NULL,
          treatments = forcats::fct_unique(d$.trt),
+         classes = classes,
          studies = forcats::fct_unique(d$.study),
          outcome = list(agd_arm = o_type, agd_contrast = NA, ipd = NA)),
     class = "nma_data")
+
+  # If trt_ref not specified, mark treatments factor as default, calculate
+  # current reference trt
+  if (is.null(trt_ref)) {
+    trt_ref <- get_default_trt_ref(out)
+    trt_sort <- order(forcats::fct_relevel(out$treatments, trt_ref))
+    out$treatments <- .default(forcats::fct_relevel(out$treatments, trt_ref)[trt_sort])
+    out$agd_arm$.trt <- forcats::fct_relevel(out$agd_arm$.trt, trt_ref)
+    if (!is.null(.trtclass)) {
+      class_ref <- as.character(out$classes[trt_sort[1]])
+      out$agd_arm$.trtclass <- forcats::fct_relevel(out$agd_arm$.trtclass, class_ref)
+      out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
+    }
+  }
+
   return(out)
 }
 
 
 #' Set up contrast-based aggregate data
 #'
+#' Set up a network containing contrast-based aggregate data (AgD), i.e.
+#' summaries of relative effects between treatments such as log Odds Ratios.
+#' Multiple data sources may be combined once created using [combine_network()].
+#'
 #' @template args-data_common
 #' @template args-data_se
+#' @param sample_size column of `data` giving the sample size in each arm.
+#'   Optional, see details.
 #'
 #' @details Each study should have a single reference/baseline treatment,
-#'   against which relatve effects in the other arm(s) are given. For the
+#'   against which relative effects in the other arm(s) are given. For the
 #'   reference arm, include a data row with continuous outcome `y` equal to
 #'   `NA`. If a study has three or more arms (so two or more relative effects),
 #'   set the standard error `se` for the reference arm data row equal to the
@@ -214,18 +353,40 @@ set_agd_arm <- function(data,
 #'   the covariance of the relative effects, when expressed as differences in
 #'   mean outcomes between arms).
 #'
+#' @template args-details_trt_ref
+#' @template args-details_sample_size
+#'
 #' @return An object of class [nma_data]
 #' @export
 #'
 #' @seealso [set_ipd()] for individual patient data, [set_agd_arm()] for
 #'   arm-based aggregate data, and [combine_network()] for combining several
 #'   data sources in one network.
+#' @template seealso_nma_data
 #' @examples
+#' # Set up network of Parkinson's contrast data
+#' head(parkinsons)
+#'
+#' park_net <- set_agd_contrast(parkinsons,
+#'                              study = studyn,
+#'                              trt = trtn,
+#'                              y = diff,
+#'                              se = se_diff,
+#'                              sample_size = n)
+#'
+#' # Print details
+#' park_net
+#'
+#' # Plot network
+#' plot(park_net)
+
 set_agd_contrast <- function(data,
                              study,
                              trt,
                              y = NULL, se = NULL,
-                             trt_ref = NULL) {
+                             sample_size = NULL,
+                             trt_ref = NULL,
+                             trt_class = NULL) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -236,6 +397,7 @@ set_agd_contrast <- function(data,
              agd_contrast = NULL,
              ipd = NULL,
              treatments = NULL,
+             classes = NULL,
              studies = NULL),
         class = "nma_data")
     )
@@ -251,6 +413,11 @@ set_agd_contrast <- function(data,
   .trt <- dplyr::pull(data, {{ trt }})
   if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
 
+
+  # Treatment classes
+  .trtclass <- pull_non_null(data, enquo(trt_class))
+  if (!is.null(.trtclass)) check_trt_class(.trtclass, .trt)
+
   if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
 
   # Pull and check outcomes
@@ -259,6 +426,14 @@ set_agd_contrast <- function(data,
 
   if (is.null(.y)) abort("Specify continuous outcome `y`")
   if (is.null(.se)) abort("Specify standard error `se`")
+
+  # Pull and check sample size
+  .sample_size <- pull_non_null(data, enquo(sample_size))
+  if (!is.null(.sample_size)) {
+    check_sample_size(.sample_size)
+  } else {
+    inform("Note: Optional argument `sample_size` not provided, some features may not be available (see ?set_agd_contrast).")
+  }
 
   # Determine baseline arms by .y = NA
   bl <- is.na(.y)
@@ -295,8 +470,6 @@ set_agd_contrast <- function(data,
     .y = .y,
     .se = .se)
 
-  d <- dplyr::bind_cols(d, data)
-
   if (!is.null(trt_ref)) {
     trt_ref <- as.character(trt_ref)
     lvls_trt <- levels(d$.trt)
@@ -308,20 +481,67 @@ set_agd_contrast <- function(data,
     d$.trt <- forcats::fct_relevel(d$.trt, trt_ref)
   }
 
+  if (!is.null(.trtclass)) {
+    d <- tibble::add_column(d, .trtclass = nfactor(.trtclass))
+    class_lookup <- d %>%
+      dplyr::distinct(.data$.trt, .data$.trtclass) %>%
+      dplyr::arrange(.data$.trt)
+    class_ref <- as.character(class_lookup[[1, ".trtclass"]])
+    d$.trtclass <- forcats::fct_relevel(d$.trtclass, class_ref)
+    classes <- forcats::fct_relevel(nfactor(class_lookup$.trtclass), class_ref)
+  } else {
+    classes <- NULL
+  }
+
+  if (!is.null(.sample_size)) {
+    d <- tibble::add_column(d, .sample_size = .sample_size)
+  }
+
+  # Bind in original data
+  d <- dplyr::bind_cols(d, data)
+
+  # Drop original study and treatment columns
+  d <- dplyr::select(d, - {{ study }}, - {{ trt }})
+  if (!is.null(.trtclass)) d <- dplyr::select(d, - {{ trt_class }})
+
+  # Make sure rows from each study are next to each other (required for Stan resdev/log_lik code)
+  d <- dplyr::mutate(d, .study_inorder = forcats::fct_inorder(.data$.study)) %>%
+    dplyr::arrange(.data$.study_inorder) %>%
+    dplyr::select(-.data$.study_inorder)
+
   # Produce nma_data object
   out <- structure(
     list(agd_arm = NULL,
          agd_contrast = d,
          ipd = NULL,
          treatments = forcats::fct_unique(d$.trt),
+         classes = classes,
          studies = forcats::fct_unique(d$.study),
          outcome = list(agd_arm = NA, agd_contrast = o_type, ipd = NA)),
     class = "nma_data")
+
+  # If trt_ref not specified, mark treatments factor as default, calculate
+  # current reference trt
+  if (is.null(trt_ref)) {
+    trt_ref <- get_default_trt_ref(out)
+    trt_sort <- order(forcats::fct_relevel(out$treatments, trt_ref))
+    out$treatments <- .default(forcats::fct_relevel(out$treatments, trt_ref)[trt_sort])
+    out$agd_contrast$.trt <- forcats::fct_relevel(out$agd_contrast$.trt, trt_ref)
+    if (!is.null(.trtclass)) {
+      class_ref <- as.character(out$classes[trt_sort[1]])
+      out$agd_contrast$.trtclass <- forcats::fct_relevel(out$agd_contrast$.trtclass, class_ref)
+      out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
+    }
+  }
+
   return(out)
 }
 
 
 #' Combine multiple data sources into one network
+#'
+#' Multiple data sources created using [set_ipd()], [set_agd_arm()], or
+#' [set_agd_contrast()] can be combined into a single network for analysis.
 #'
 #' @param ... multiple data sources, as defined using the `set_*` functions
 #' @param trt_ref reference treatment for the entire network, as a string (or
@@ -331,8 +551,42 @@ set_agd_contrast <- function(data,
 #' @export
 #'
 #' @seealso [set_ipd()], [set_agd_arm()], and [set_agd_contrast()] for defining
-#'   different data sources
+#'   different data sources.
+#' @template seealso_nma_data
+#'
+#' @examples ## Parkinson's - combining contrast- and arm-based data
+#' studies <- parkinsons$studyn
+#' (parkinsons_arm <- parkinsons[studies %in% 1:3, ])
+#' (parkinsons_contr <- parkinsons[studies %in% 4:7, ])
+#'
+#' park_arm_net <- set_agd_arm(parkinsons_arm,
+#'                             study = studyn,
+#'                             trt = trtn,
+#'                             y = y,
+#'                             se = se,
+#'                             sample_size = n)
+#'
+#' park_contr_net <- set_agd_contrast(parkinsons_contr,
+#'                                    study = studyn,
+#'                                    trt = trtn,
+#'                                    y = diff,
+#'                                    se = se_diff,
+#'                                    sample_size = n)
+#'
+#' park_net <- combine_network(park_arm_net, park_contr_net)
+#'
+#' # Print network details
+#' park_net
+#'
+#' # Plot network
+#' plot(park_net, weight_edges = TRUE, weight_nodes = TRUE)
+#'
+#' @examples ## Plaque Psoriasis - combining IPD and AgD in a network
+#' @template ex_plaque_psoriasis_network
 #' @examples
+#'
+#' # Plot network
+#' plot(pso_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE)
 combine_network <- function(..., trt_ref) {
   s <- list(...)
 
@@ -353,6 +607,32 @@ combine_network <- function(..., trt_ref) {
     trts <- c(trt_ref, setdiff(trts, trt_ref))
   }
 
+  # Combine classes factor
+  has_classes <- purrr::map_lgl(purrr::map(s, "classes"), ~!is.null(.))
+
+  if (all(has_classes)) {
+    class_lookup <- tibble::tibble(.trt = forcats::fct_c(!!! purrr::map(s, "treatments")),
+                                   .trtclass = forcats::fct_c(!!! purrr::map(s, "classes"))) %>%
+      dplyr::mutate(.trt = forcats::fct_relevel(.data$.trt, trts)) %>%
+      dplyr::distinct(.data$.trt, .data$.trtclass) %>%
+      dplyr::arrange(.data$.trt)
+
+    check_trt_class(class_lookup$.trtclass, class_lookup$.trt)
+
+    class_lvls <- stringr::str_sort(levels(class_lookup$.trtclass), numeric = TRUE)
+    class_ref <- as.character(class_lookup[[1, ".trtclass"]])
+    class_lvls <- c(class_ref, setdiff(class_lvls, class_ref))
+
+    class_lookup$.trtclass <- forcats::fct_relevel(class_lookup$.trtclass, class_ref)
+
+    classes <- class_lookup$.trtclass
+  } else if (any(has_classes)) {
+    warn("Not all data sources have defined treatment classes. Removing treatment class information.")
+    classes <- NULL
+  } else {
+    classes <- NULL
+  }
+
   # Check that no studies are duplicated between data sources
   all_studs <- purrr::flatten_chr(purrr::map(s, ~levels(.$studies)))
   if (anyDuplicated(all_studs)) {
@@ -370,6 +650,7 @@ combine_network <- function(..., trt_ref) {
       if (rlang::is_empty(ipd[[j]])) next
       ipd[[j]]$.trt <- forcats::lvls_expand(ipd[[j]]$.trt, trts)
       ipd[[j]]$.study <- forcats::lvls_expand(ipd[[j]]$.study, studs)
+      if (!is.null(classes)) ipd[[j]]$.trtclass <- forcats::lvls_expand(ipd[[j]]$.trtclass, class_lvls)
     }
   }
   ipd <- dplyr::bind_rows(ipd)
@@ -381,6 +662,8 @@ combine_network <- function(..., trt_ref) {
       if (rlang::is_empty(agd_arm[[j]])) next
       agd_arm[[j]]$.trt <- forcats::lvls_expand(agd_arm[[j]]$.trt, trts)
       agd_arm[[j]]$.study <- forcats::lvls_expand(agd_arm[[j]]$.study, studs)
+      if (!is.null(classes))
+        agd_arm[[j]]$.trtclass <- forcats::lvls_expand(agd_arm[[j]]$.trtclass, class_lvls)
     }
   }
   agd_arm <- dplyr::bind_rows(agd_arm)
@@ -392,6 +675,8 @@ combine_network <- function(..., trt_ref) {
       if (rlang::is_empty(agd_contrast[[j]])) next
       agd_contrast[[j]]$.trt <- forcats::lvls_expand(agd_contrast[[j]]$.trt, trts)
       agd_contrast[[j]]$.study <- forcats::lvls_expand(agd_contrast[[j]]$.study, studs)
+      if (!is.null(classes))
+        agd_contrast[[j]]$.trtclass <- forcats::lvls_expand(agd_contrast[[j]]$.trtclass, class_lvls)
     }
   }
   agd_contrast <- dplyr::bind_rows(agd_contrast)
@@ -425,9 +710,38 @@ combine_network <- function(..., trt_ref) {
          agd_contrast = agd_contrast,
          ipd = ipd,
          treatments = factor(trts, levels = trts),
+         classes = classes,
          studies = factor(studs, levels = studs),
          outcome = outcome),
     class = "nma_data")
+
+  # If trt_ref not specified, mark treatments factor as default, calculate
+  # current reference trt
+  if (missing(trt_ref)) {
+    trt_ref <- get_default_trt_ref(out)
+    trt_sort <- order(forcats::fct_relevel(out$treatments, trt_ref))
+    out$treatments <- .default(forcats::fct_relevel(out$treatments, trt_ref)[trt_sort])
+
+    if (has_ipd(out))
+      out$ipd$.trt <- forcats::fct_relevel(out$ipd$.trt, trt_ref)
+    if (has_agd_arm(out))
+      out$agd_arm$.trt <- forcats::fct_relevel(out$agd_arm$.trt, trt_ref)
+    if (has_agd_contrast(out))
+      out$agd_contrast$.trt <- forcats::fct_relevel(out$agd_contrast$.trt, trt_ref)
+
+    if (!is.null(classes)) {
+      class_ref <- as.character(out$classes[trt_sort[1]])
+      out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
+
+      if (has_ipd(out))
+        out$ipd$.trtclass <- forcats::fct_relevel(out$ipd$.trtclass, class_ref)
+      if (has_agd_arm(out))
+        out$agd_arm$.trtclass <- forcats::fct_relevel(out$agd_arm$.trtclass, class_ref)
+      if (has_agd_contrast(out))
+        out$agd_contrast$.trtclass <- forcats::fct_relevel(out$agd_contrast$.trtclass, class_ref)
+    }
+  }
+
   return(out)
 }
 
@@ -596,6 +910,41 @@ check_outcome_combination <- function(outcomes) {
   }
 }
 
+#' Check sample size
+#'
+#' @param sample_size vector
+#'
+#' @noRd
+check_sample_size <- function(sample_size) {
+    if (!is.numeric(sample_size))
+      abort("Sample size `sample_size` must be numeric")
+    if (any(is.nan(sample_size)))
+      abort("Sample size `sample_size` cannot be NaN")
+    if (any(is.na(sample_size)))
+      abort("Sample size `sample_size` contains missing values")
+    if (any(sample_size != trunc(sample_size)))
+      abort("Sample size `sample_size` must be integer-valued")
+    if (any(sample_size <= 0))
+      abort("Sample size `sample_size` must be greater than zero")
+    if (any(is.infinite(sample_size)))
+      abort("Sample size `sample_size` cannot be infinite")
+}
+
+#' Check treatment class coding
+#'
+#' @param trt_class Class vector
+#' @param trt Treatment vector
+#'
+#' @noRd
+check_trt_class <- function(trt_class, trt) {
+  if (any(is.na(trt)))
+    abort("`trt` cannot contain missing values")
+  if (any(is.na(trt_class)))
+    abort("`trt_class` cannot contain missing values")
+  if (anyDuplicated(unique(cbind(trt, trt_class))[, "trt"]))
+    abort("Treatment present in more than one class (check `trt` and `trt_class`)")
+}
+
 #' Check for IPD and AgD in network
 #'
 #' @param network nma_data object
@@ -615,6 +964,19 @@ has_agd_arm <- function(network) {
 has_agd_contrast <- function(network) {
   if (!inherits(network, "nma_data")) abort("Not nma_data object.")
   return(!rlang::is_empty(network$agd_contrast))
+}
+
+#' Check whether AgD sample size columns are available
+#'
+#' @param network nma_data object
+#'
+#' @return logical TRUE/FALSE
+#' @noRd
+has_agd_sample_size <- function(network) {
+  if (!inherits(network, "nma_data")) abort("Not nma_data object.")
+  ss_a <- !has_agd_arm(network) || tibble::has_name(network$agd_arm, ".sample_size")
+  ss_c <- !has_agd_contrast(network) || tibble::has_name(network$agd_contrast, ".sample_size")
+  return(ss_a && ss_c)
 }
 
 #' Natural-order factors

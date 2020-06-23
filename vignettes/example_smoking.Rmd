@@ -1,0 +1,306 @@
+---
+title: "Example: Smoking Cessation"
+output: rmarkdown::html_vignette
+bibliography: ../inst/REFERENCES.bib
+params:
+  run_tests: FALSE
+---
+
+```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
+```
+
+```{r, eval = FALSE}
+library(multinma)
+options(mc.cores = parallel::detectCores())
+```
+```{r setup, echo = FALSE}
+library(multinma)
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
+             "true" =, "warn" = 2, 
+             parallel::detectCores())
+options(mc.cores = nc)
+```
+
+This vignette describes the analysis of smoking cessation data [@Hasselblad1998], replicating the analysis in NICE Technical Support Document 4 [@TSD4].
+The data are available in this package as `smoking`:
+```{r}
+head(smoking)
+```
+
+
+### Setting up the network
+We begin by setting up the network.
+We have arm-level count data giving the number quitting smoking (`r`) out of the total (`n`) in each arm, so we use the function `set_agd_arm()`.
+Treatment "No intervention" is set as the network reference treatment.
+```{r}
+smknet <- set_agd_arm(smoking, 
+                      study = studyn,
+                      trt = trtc,
+                      r = r, 
+                      n = n,
+                      trt_ref = "No intervention")
+smknet
+```
+
+Plot the network structure.
+```{r, eval=FALSE}
+plot(smknet, weight_edges = TRUE, weight_nodes = TRUE)
+```
+```{r smoking_network_plot, echo=FALSE}
+plot(smknet, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(plot.margin = ggplot2::unit(c(1, 1, 1, 6), "lines"))
+```
+
+### Random effects NMA
+Following TSD 4, we fit a random effects NMA model, using the `nma()` function with `trt_effects = "random"`.
+We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and a $\mathrm{half-N}(5^2)$ prior distribution for the between-study heterogeneity standard deviation $\tau$.
+We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
+```{r}
+summary(normal(scale = 100))
+```
+```{r}
+summary(half_normal(scale = 5))
+```
+
+The model is fitted using the `nma()` function.
+By default, this will use a Binomial likelihood and a logit link function, auto-detected from the data.
+```{r}
+smkfit <- nma(smknet, 
+              trt_effects = "random",
+              prior_intercept = normal(scale = 100),
+              prior_trt = normal(scale = 100),
+              prior_het = normal(scale = 5))
+```
+
+Basic parameter summaries are given by the `print()` method:
+```{r}
+smkfit
+```
+
+By default, summaries of the study-specific intercepts $\mu_j$ and study-specific relative effects $\delta_{jk}$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(smkfit, pars = c("d", "tau", "mu", "delta"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r smoking_pp_plot}
+plot_prior_posterior(smkfit)
+```
+
+By default, this displays all model parameters given prior distributions (in this case $d_k$, $\mu_j$, and $\tau$), but this may be changed using the `prior` argument:
+```{r smoking_pp_plot_tau}
+plot_prior_posterior(smkfit, prior = "het")
+```
+
+Model fit can be checked using the `dic()` function
+```{r}
+(dic_consistency <- dic(smkfit))
+```
+
+and the residual deviance contributions examined with the corresponding `plot()` method
+```{r smoking_resdev_plot}
+plot(dic_consistency)
+```
+
+Overall model fit seems to be adequate, with almost all points showing good fit (mean residual deviance contribution of 1).
+The only two points with higher residual deviance (i.e. worse fit) correspond to the two zero counts in the data:
+```{r}
+smoking[smoking$r == 0, ]
+```
+
+
+### Checking for inconsistency
+We fit an unrelated mean effects (UME) model [@TSD4] to assess the consistency assumption.
+Again, we use the function `nma()`, but now with the argument `consistency = "ume"`.
+```{r}
+smkfit_ume <- nma(smknet, 
+                  consistency = "ume",
+                  trt_effects = "random",
+                  prior_intercept = normal(scale = 100),
+                  prior_trt = normal(scale = 100),
+                  prior_het = normal(scale = 5))
+smkfit_ume
+```
+
+Comparing the model fit statistics
+```{r}
+dic_consistency
+(dic_ume <- dic(smkfit_ume))
+```
+
+We see that there is little to choose between the two models.
+However, it is also important to examine the individual contributions to model fit of each data point under the two models (a so-called "dev-dev" plot).
+Passing two `nma_dic` objects produced by the `dic()` function to the `plot()` method produces this dev-dev plot:
+```{r smoking_devdev_plot}
+plot(dic_consistency, dic_ume, point_alpha = 0.5, interval_alpha = 0.2)
+```
+
+All points lie roughly on the line of equality, so there is no evidence for inconsistency here.
+
+### Further results
+Pairwise relative effects, for all pairwise contrasts with `all_contrasts = TRUE`.
+```{r smoking_releff, fig.height=4.5}
+(smk_releff <- relative_effects(smkfit, all_contrasts = TRUE))
+plot(smk_releff, ref_line = 0)
+```
+
+Treatment rankings, rank probabilities, and cumulative rank probabilities.
+We set `lower_better = FALSE` since a higher log odds of cessation is better (the outcome is positive).
+```{r smoking_ranks, fig.height=3}
+(smk_ranks <- posterior_ranks(smkfit, lower_better = FALSE))
+plot(smk_ranks)
+```
+```{r smoking_rankprobs}
+(smk_rankprobs <- posterior_rank_probs(smkfit, lower_better = FALSE))
+plot(smk_rankprobs)
+```
+```{r smoking_cumrankprobs}
+(smk_cumrankprobs <- posterior_rank_probs(smkfit, lower_better = FALSE, cumulative = TRUE))
+plot(smk_cumrankprobs)
+```
+
+## References
+
+```{r smoking_tests, include=FALSE, eval=params$run_tests}
+#--- Test against TSD 4 results ---
+library(testthat)
+library(dplyr)
+
+tol <- 0.05
+tol_dic <- 0.1
+
+# A = No intervention
+# B = Self-help
+# C = Individual counselling
+# D = Group counselling
+
+trt_codes <- c(A = "No intervention",
+               B = "Self-help",
+               C = "Individual counselling",
+               D = "Group counselling")
+
+# Relative effects
+tsd_re <- tribble(
+  ~contrast, ~est, ~sd, ~lower, ~upper,
+  "dAB", 0.49, 0.40, -0.29, 1.31,
+  "dAC", 0.84, 0.24,  0.39, 1.34,
+  "dAD", 1.10, 0.44,  0.26, 2.00,
+  "dBC", 0.35, 0.41, -0.46, 1.18,
+  "dBD", 0.61, 0.49, -0.34, 1.59,
+  "dCD", 0.26, 0.41, -0.55, 1.09) %>% 
+  mutate(trt_b = recode(substr(contrast, 2, 2),
+                        !!! trt_codes),
+         trt = recode(substr(contrast, 3, 3),
+                        !!! trt_codes),
+         trt_b = ordered(trt_b, levels = levels(smknet$treatments)),
+         trt = ordered(trt, levels = levels(smknet$treatments)),
+         rev = if_else(trt_b > trt, -1, 1),
+         .l = lower, .u = upper,
+         lower = if_else(trt_b > trt, .u, .l),
+         upper = if_else(trt_b > trt, .l, .u)) %>% 
+  arrange(trt_b, trt) %>% 
+  mutate_at(vars(est, lower, upper), ~.*rev)
+
+test_that("RE relative effects", {
+  expect_equivalent(smk_releff$summary$mean, tsd_re$est, tolerance = tol)
+  expect_equivalent(smk_releff$summary$sd, tsd_re$sd, tolerance = tol)
+  expect_equivalent(smk_releff$summary$`2.5%`, tsd_re$lower, tolerance = tol)
+  expect_equivalent(smk_releff$summary$`97.5%`, tsd_re$upper, tolerance = tol)
+})
+
+# Heterogeneity SD
+smk_tau <- summary(smkfit, pars = "tau")
+
+test_that("RE heterogeneity SD", {
+  expect_equivalent(smk_tau$summary$`50%`, 0.82, tolerance = tol)
+  expect_equivalent(smk_tau$summary$sd, 0.19, tolerance = tol)
+  expect_equivalent(smk_tau$summary$`2.5%`, 0.55, tolerance = tol)
+  expect_equivalent(smk_tau$summary$`97.5%`, 1.27, tolerance = tol)
+})
+
+# DIC
+test_that("DIC", {
+  expect_equivalent(dic_consistency$resdev, 54.0, tolerance = tol_dic)
+  expect_equivalent(dic_consistency$pd, 45.0, tolerance = tol_dic)
+  expect_equivalent(dic_consistency$dic, 99.0, tolerance = tol_dic)
+})
+
+# Relative effects (UME)
+
+# Treatment ordering is different in TSD 4 - use trtn instead which reflects this
+smknet2 <- set_agd_arm(smoking, studyn, trtn, r = r, n = n, trt_ref = 1)
+smkfit_ume2 <- nma(smknet2, 
+                   consistency = "ume",
+                   trt_effects = "random",
+                   prior_intercept = normal(scale = 100),
+                   prior_trt = normal(scale = 100),
+                   prior_het = normal(scale = 5))
+
+# Results of modified TSD 4 model including multi-arm correction
+tsd_ume <- tribble(
+  ~contrast, ~est, ~sd, ~lower, ~upper,
+  # "dAB",  0.34, 0.58, -0.81, 1.50,
+  # "dAC",  0.86, 0.27,  0.34, 1.43,
+  # "dAD",  1.43, 0.88, -0.21, 3.29,
+  # "dBC", -0.05, 0.74, -1.53, 1.42,
+  # "dBD",  0.65, 0.73, -0.80, 2.12,
+  # "dCD",  0.20, 0.78, -1.37, 1.73)  %>% 
+  "dAB",  0.34, 0.59, -0.82, 1.51,
+  "dAC",  0.90, 0.28,  0.37, 1.49,
+  "dAD",  1.12, 0.80, -0.36, 2.80,
+  "dBC",  0.04, 0.73, -1.39, 1.50,
+  "dBD",  0.61, 0.72, -0.80, 2.05,
+  "dCD",  0.20, 0.79, -1.40, 1.75)
+  # mutate(trt_b = recode(substr(contrast, 2, 2),
+  #                       !!! trt_codes),
+  #        trt = recode(substr(contrast, 3, 3),
+  #                       !!! trt_codes),
+  #        trt_b = ordered(trt_b, levels = levels(smknet$treatments)),
+  #        trt = ordered(trt, levels = levels(smknet$treatments)),
+  #        rev = if_else(trt_b > trt, -1, 1),
+  #        .l = lower, .u = upper,
+  #        lower = if_else(trt_b > trt, .u, .l),
+  #        upper = if_else(trt_b > trt, .l, .u)) %>% 
+  # arrange(trt_b, trt) %>% 
+  # mutate_at(vars(est:upper), ~.*rev)
+
+smk_ume_releff <- summary(smkfit_ume2, pars = "d")
+
+test_that("UME relative effects", {
+  # skip("Different model parameterisation")
+  expect_equivalent(smk_ume_releff$summary$mean, tsd_ume$est, tolerance = tol)
+  expect_equivalent(smk_ume_releff$summary$sd, tsd_ume$sd, tolerance = tol)
+  expect_equivalent(smk_ume_releff$summary$`2.5%`, tsd_ume$lower, tolerance = tol)
+  expect_equivalent(smk_ume_releff$summary$`97.5%`, tsd_ume$upper, tolerance = tol)
+})
+
+# Heterogeneity SD (UME)
+smk_ume_tau <- summary(smkfit_ume2, pars = "tau")
+
+test_that("UME heterogeneity SD", {
+  # skip("Different model parameterisation")
+  # expect_equivalent(smk_ume_tau$summary$`50%`, 0.89, tolerance = tol)
+  # expect_equivalent(smk_ume_tau$summary$sd, 0.22, tolerance = tol)
+  # expect_equivalent(smk_ume_tau$summary$`2.5%`, 0.58, tolerance = tol)
+  # expect_equivalent(smk_ume_tau$summary$`97.5%`, 1.45, tolerance = tol)
+  expect_equivalent(smk_ume_tau$summary$`50%`, 0.91, tolerance = tol)
+  expect_equivalent(smk_ume_tau$summary$sd, 0.21, tolerance = tol)
+  expect_equivalent(smk_ume_tau$summary$`2.5%`, 0.59, tolerance = tol)
+  expect_equivalent(smk_ume_tau$summary$`97.5%`, 1.48, tolerance = tol)
+})
+
+# DIC (UME)
+test_that("UME DIC", {
+  expect_equivalent(dic_ume$resdev, 53.4, tolerance = tol_dic)
+  expect_equivalent(dic_ume$pd, 46.1, tolerance = tol_dic)
+  expect_equivalent(dic_ume$dic, 99.5, tolerance = tol_dic)
+})
+
+dic_ume2 <- dic(smkfit_ume2)
+test_that("UME DIC", {
+  expect_equivalent(dic_ume2$resdev, 53.4, tolerance = tol_dic)
+  expect_equivalent(dic_ume2$pd, 46.1, tolerance = tol_dic)
+  expect_equivalent(dic_ume2$dic, 99.5, tolerance = tol_dic)
+})
+```
+

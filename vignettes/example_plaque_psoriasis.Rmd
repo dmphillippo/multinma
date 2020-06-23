@@ -1,0 +1,409 @@
+---
+title: "Example: Plaque Psoriasis"
+output: rmarkdown::html_vignette
+bibliography: ../inst/REFERENCES.bib
+params:
+  run_tests: FALSE
+---
+
+```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
+```
+
+```{r setup}
+library(multinma)
+library(dplyr)      # dplyr and tidyr for data manipulation
+library(tidyr)
+library(ggplot2)    # ggplot2 for plotting covariate distributions
+```
+```{r, eval = FALSE}
+options(mc.cores = parallel::detectCores())
+```
+```{r, echo = FALSE}
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
+             "true" =, "warn" = 2, 
+             parallel::detectCores())
+options(mc.cores = nc)
+```
+
+Simulated individual patient data (IPD) from trials comparing treatments for plaque psoriasis are found in the data set `plaque_psoriasis_ipd`.
+Aggregate data (AgD) are available on a further set of trials, found in the data set `plaque_psoriasis_agd`.
+In this vignette, we recreate the multilevel network meta-regression (ML-NMR) analyses performed by @methods_paper [see also @Phillippo_thesis].
+We will analyse IPD from three studies, UNCOVER-1, UNCOVER-2, and UNCOVER-3 [@Griffiths2015;@Gordon2016], and AgD from one study, FIXTURE [@Langley2014].
+
+```{r}
+pso_ipd <- filter(plaque_psoriasis_ipd,
+                  studyc %in% c("UNCOVER-1", "UNCOVER-2", "UNCOVER-3"))
+
+pso_agd <- filter(plaque_psoriasis_agd,
+                  studyc == "FIXTURE")
+
+head(pso_ipd)
+head(pso_agd)
+```
+
+We consider running a ML-NMR adjusting for five potential effect-modifying covariates: duration of psoriasis `durnpso`, weight `weight`, previous systemic treatment `prevsys`, body surface area `bsa`, and psoriatic arthritis `psa`.
+
+# Setup
+## Preparing the data
+We need to prepare the data so that it is in an acceptable format to run a ML-NMR model.
+Firstly, we need to handle the binary covariates `prevsys` and `psa`.
+In the IPD, these are coded as `TRUE` or `FALSE`, but in the AgD these are coded as percentages (out of 100).
+We need these to transform both of these sets of variables so that they are numeric and lie in the interval $[0,1]$, so that the variables are compatible across the data sources.
+Whilst we are here, we also transform body surface area `bsa` (a percentage) to lie in $[0,1]$, since that will make specifying an appropriate marginal distribution easier later, and rescale `weight` and `duration` to aid interpretation of the regression coefficients (in terms of 10 kilos and 10 years respectively).
+We also add in a `trtclass` variable, indicating which treatments belong to which classes.
+Finally, we check for missing values in the IPD.
+```{r}
+pso_ipd <- pso_ipd %>% 
+  mutate(# Variable transformations
+         bsa = bsa / 100,
+         prevsys = as.numeric(prevsys),
+         psa = as.numeric(psa),
+         weight = weight / 10,
+         durnpso = durnpso / 10,
+         # Treatment classes
+         trtclass = case_when(trtn == 1 ~ "Placebo",
+                              trtn %in% c(2, 3, 5, 6) ~ "IL blocker",
+                              trtn == 4 ~ "TNFa blocker"),
+         # Check complete cases for covariates of interest
+         complete = complete.cases(durnpso, prevsys, bsa, weight, psa)
+  )
+
+pso_agd <- pso_agd %>% 
+  mutate(
+    # Variable transformations
+    bsa_mean = bsa_mean / 100,
+    bsa_sd = bsa_sd / 100,
+    prevsys = prevsys / 100,
+    psa = psa / 100,
+    weight_mean = weight_mean / 10,
+    weight_sd = weight_sd / 10,
+    durnpso_mean = durnpso_mean / 10,
+    durnpso_sd = durnpso_sd / 10,
+    # Treatment classes
+    trtclass = case_when(trtn == 1 ~ "Placebo",
+                              trtn %in% c(2, 3, 5, 6) ~ "IL blocker",
+                              trtn == 4 ~ "TNFa blocker")
+  )
+```
+
+A small number of individuals have missing covariates:
+```{r}
+sum(!pso_ipd$complete)
+mean(!pso_ipd$complete)
+```
+
+Since the proportion of missing data is so small, we will simply exclude these individuals from the analysis.
+```{r}
+pso_ipd <- filter(pso_ipd, complete)
+```
+
+## Creating the network
+Set up the network, setting the IPD with `set_ipd()`, AgD (arm-based) with `set_agd_arm()`, and combining together using `combine_network()`.
+We specify the binary `pasi75` outcome as `r` in the IPD, and the count outcome `pasi75_r` and denominator `pasi75_n` as `r` and `n` in the AgD.
+We specify the treatment classes with `trt_class = trtclass`.
+```{r}
+pso_net <- combine_network(
+  set_ipd(pso_ipd, 
+          study = studyc, 
+          trt = trtc, 
+          r = pasi75,
+          trt_class = trtclass),
+  set_agd_arm(pso_agd, 
+              study = studyc, 
+              trt = trtc, 
+              r = pasi75_r, 
+              n = pasi75_n,
+              trt_class = trtclass)
+)
+
+pso_net
+```
+
+We can produce a network plot with the `plot()` method:
+```{r pso_network_plot}
+plot(pso_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) + 
+  ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
+```
+
+## Numerical integration for ML-NMR
+ML-NMR models define the meta-regression model at the individual level, in exactly the same manner as a full-IPD meta-regression.
+ML-NMR then incorporates the AgD into the model by integrating this individual-level model over the covariate distribution in each AgD study [@methods_paper;@Phillippo_thesis].
+Using integration, instead of simply "plugging-in" mean covariate values for the AgD studies, avoids aggregation bias when the link function is not the identity function.
+
+This package utilises numerical integration to incorporate the aggregate data - specifically, quasi-Monte Carlo (QMC) integration with a Gaussian copula [@methods_paper;@Phillippo_thesis].
+QMC integration is a very general and flexible integration approach, which typically requires far fewer integration points than standard (pseudo-random) Monte-Carlo integration to achieve the same numerical accuracy.^[The convergence rate of QMC is typically $\mathcal{O}(1/n)$, whereas the expected convergence rate of standard MC is $\mathcal{O}(1/n^\frac{1}{2})$ [@Caflisch1998;@Niederreiter1978].]
+A Gaussian copula allows us to account for correlations between covariates, which may have any specified marginal distributions.
+
+We now set up the numerical integration for the network.
+The five covariates that we will consider adjusting for are body surface area `bsa`, duration of psoriasis `durnpso`, previous systemic treatment `prevsys`, psoriatic arthritis `psa`, and weight `weight`.
+We need to choose suitable marginal distributions for these covariates to draw the integration points from.
+`prevsys` and `psa` are binary covariates, so these are given a Bernoulli distribution.
+`bsa` is a percentage, so we choose a logit-Normal distribution.
+We choose Gamma distributions for `durnpso` and `weight` to account for skewness.
+These choices seem to match well the marginal distributions observed in the IPD:
+```{r pso_covariate_plot}
+# Get mean and sd of covariates in each study
+ipd_summary <- pso_ipd %>% 
+  group_by(studyc) %>% 
+  summarise_at(vars(weight, durnpso, bsa), list(mean = mean, sd = sd, min = min, max = max)) %>% 
+  pivot_longer(weight_mean:bsa_max, names_sep = "_", names_to = c("covariate", ".value")) %>% 
+  # Assign distributions
+  mutate(dist = recode(covariate,
+                       bsa = "dlogitnorm",
+                       durnpso = "dgamma",
+                       weight = "dgamma")) %>% 
+  # Compute density curves
+  group_by(studyc, covariate) %>% 
+  mutate(value = if_else(dist == "dlogitnorm",
+                         list(seq(0, 1, length.out = 101)),
+                         list(seq(min*0.8, max*1.2, length.out = 101)))) %>% 
+  unnest(cols = value) %>% 
+  mutate(dens = do.call(first(dist), args = list(x = value, mean = first(mean), sd = first(sd))))
+
+# Plot histograms and assumed densities
+pso_ipd %>% 
+  pivot_longer(c(weight, durnpso, bsa), names_to = "covariate", values_to = "value") %>% 
+ggplot(aes(x = value)) +
+  geom_histogram(aes(y = stat(density)), 
+                 binwidth = function(x) diff(range(x)) / nclass.Sturges(x),
+                 boundary = 0,
+                 fill = "grey50") +
+  geom_line(aes(y = dens), data = ipd_summary,
+            colour = "darkred", size = 0.5) +
+  facet_wrap(~studyc + covariate, scales = "free", ncol = 3) +
+  theme_multinma()
+```
+
+We add integration points to the AgD studies in the network using the `add_integration()` function.
+Marginal distributions for each covariate are specified using the `distr()` function, which takes a cumulative distribution function corresponding to the chosen marginal distribution, and arguments to that distribution as column names in the aggregate data.
+(Note: This package provides several convenience functions for specifying these distributions, including `qgamma()` which allows for a parameterisation of the Gamma distribution in terms of mean and standard deviation, `qbern()` which provides the Bernoulli distribution, and `qlogitnorm()` which provides the logit-Normal distribution allowing for a parameterisation in terms of mean and standard deviation.)
+Since we do not know the correlations between covariates in the AgD studies, we impute these with the weighted mean of the correlations in the IPD studies (the default option).
+```{r}
+pso_net <- add_integration(pso_net,
+  durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+  prevsys = distr(qbern, prob = prevsys),
+  bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+  weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
+  psa = distr(qbern, prob = psa),
+  n_int = 1000
+)
+```
+
+# ML-NMR models
+We fit both fixed effect (FE) and random effects (RE) ML-NMR models.
+
+## Fixed effect ML-NMR
+First, we fit a FE ML-NMR model using the function `nma()`.
+Following [@methods_paper] we specify weakly-informative $N(0, 10^2)$ priors on each parameter.
+The range of parameter values implied by these prior distributions can be checked using the `summary()` method:
+```{r}
+summary(normal(scale = 10))
+```
+
+The regression model is specified with `regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt`, which will include the main (prognostic) effects of each covariate as well as interactions with treatment.
+We use a probit link function (`link = "probit"`), and specify that the two-parameter Binomial approximation for the aggregate-level likelihood should be used (`likelihood = "bernoulli2"`, where "bernoulli" refers to the individual-level likelihood, and "2" denotes the two-parameter adjustment to the aggregate-level likelihood) [@methods_paper].
+We utilise the shared effect modifier assumption to help identify the model, setting treatment-covariate interactions to be equal within each class (`class_interactions = "common"`).
+We narrow the possible range for random initial values with `init_r = 0.1` (the default is `init_r = 2`), since probit models in particular are often hard to initialise.
+Using the QR decomposition (`QR = TRUE`) greatly improves sampling efficiency here, as is often the case for regression models.
+```{r}
+pso_fit_FE <- nma(pso_net, 
+                  trt_effects = "fixed",
+                  link = "probit", 
+                  likelihood = "bernoulli2",
+                  regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
+                  class_interactions = "common",
+                  prior_intercept = normal(scale = 10),
+                  prior_trt = normal(scale = 10),
+                  prior_reg = normal(scale = 10),
+                  init_r = 0.1,
+                  QR = TRUE)
+```
+
+Basic parameter summaries are given by the `print()` method:
+```{r}
+print(pso_fit_FE)
+```
+
+By default, summaries of the study-specific intercepts $\mu_j$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(pso_fit_FE, pars = c("d", "beta", "mu"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r pso_FE_pp_plot}
+plot_prior_posterior(pso_fit_FE, prior = c("intercept", "trt", "reg"))
+```
+
+Plots of estimated numerical integration error are produced using the `plot_integration_error()` function:
+```{r pso_FE_cumint}
+plot_integration_error(pso_fit_FE)
+```
+
+## Random effects ML-NMR
+We now fit a RE model.
+Again, we specify weakly-informative $N(0, 10^2)$ priors on each parameter, and now specify a $\textrm{half-N}(0, 2.5^2)$ prior for the heterogeneity standard deviation $\tau$.
+The range of parameter values implied by these prior distributions can be checked using the `summary()` method:
+```{r}
+summary(normal(scale = 10))
+summary(half_normal(scale = 2.5))
+```
+
+Fitting the model uses the same call to `nma()` as before, except now with `trt_effects = "random"`.
+```{r}
+pso_fit_RE <- nma(pso_net, 
+                  trt_effects = "random",
+                  link = "probit", 
+                  likelihood = "bernoulli2",
+                  regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
+                  class_interactions = "common",
+                  prior_intercept = normal(scale = 10),
+                  prior_trt = normal(scale = 10),
+                  prior_reg = normal(scale = 10),
+                  prior_het = half_normal(scale = 2.5),
+                  init_r = 0.1,
+                  QR = TRUE)
+```
+
+Basic parameter summaries are given by the `print()` method:
+```{r}
+print(pso_fit_RE)
+```
+
+By default, summaries of the study-specific intercepts $\mu_j$ and study-specific relative effects $\delta_{jk}$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(pso_fit_RE, pars = c("d", "beta", "tau", "mu", "delta"))
+```
+
+There are a number of divergent transitions, which we can investigate using the `pairs()` method:
+```{r pso_RE_pairs}
+pairs(pso_fit_RE, pars = c("delta[UNCOVER-2: ETN]", "d[ETN]", "tau", "lp__"))
+```
+
+The divergent transition errors (red crosses) seem to be concentrated in the upper tail of the heterogeneity standard deviation parameter.
+This suggests that the information to identify the heterogeneity parameter is weak - we have only four studies in the network - and that a more informative prior distribution might aid estimation.
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r pso_RE_pp_plot}
+plot_prior_posterior(pso_fit_RE, prior = c("intercept", "trt", "reg", "het"))
+```
+
+Plots of estimated numerical integration error are produced using the `plot_integration_error()` function:
+```{r pso_RE_cumint}
+plot_integration_error(pso_fit_RE)
+```
+
+# Model comparison
+The model fit under the FE and RE models can be checked using the `dic()` function.
+```{r}
+(pso_dic_FE <- dic(pso_fit_FE))
+(pso_dic_RE <- dic(pso_fit_RE))
+```
+
+The DIC is similar between the FE and RE models, suggesting that there is little evidence for any residual heterogeneity.
+
+# Further results
+Parameter estimates can be plotted using the `plot()` method, for example to examine the estimated regression coefficients:
+```{r}
+plot(pso_fit_FE,
+     pars = "beta",
+     stat = "halfeye",
+     ref_line = 0)
+```
+
+We can produce population-adjusted relative effects for each study population in the network using the `relative_effects()` function.
+```{r pso_releff_FE}
+(pso_releff_FE <- relative_effects(pso_fit_FE))
+plot(pso_releff_FE, ref_line = 0)
+```
+
+Predicted probabilities of achieving PASI 75 in each study population on each treatment are produced using the `predict()` method.
+The argument `type = "reponse"` specifies that we want predicted probabilities, rather than probit probabilities.
+```{r pso_pred_FE}
+(pso_pred_FE <- predict(pso_fit_FE, type = "response"))
+plot(pso_pred_FE, ref_line = c(0, 1))
+```
+
+We can produce population-adjusted ranks, rank probabilities, and cumulative rank probabilities in each study population using the `posterior_ranks()` and `posterior_rank_probs()` functions.
+We specify `lower_better = FALSE`, since a higher outcome is better (higher chance of achieving PASI 75).
+```{r pso_ranks_FE}
+(pso_ranks_FE <- posterior_ranks(pso_fit_FE, lower_better = FALSE))
+plot(pso_ranks_FE)
+```
+
+```{r pso_rankprobs_FE}
+(pso_rankprobs_FE <- posterior_rank_probs(pso_fit_FE, lower_better = FALSE))
+plot(pso_rankprobs_FE)
+```
+
+```{r pso_cumrankprobs_FE}
+(pso_cumrankprobs_FE <- posterior_rank_probs(pso_fit_FE, lower_better = FALSE, cumulative = TRUE))
+plot(pso_cumrankprobs_FE)
+```
+
+All of the above estimates (relative effects, predictions, rankings) can also be produced for a specific target population or populations by providing a suitable `newdata` argument to for function (and a `baseline` distribution for `predict()`).
+
+To produce population-adjusted relative effects (and corresponding rankings) for a chosen target population, we require only the mean covariate values in that population.
+For example, `newdata` could provide the following mean covariate values:
+```{r}
+new_agd_means <- tibble(
+  bsa = 0.6,
+  prevsys = 0.1,
+  psa = 0.2,
+  weight = 10,
+  durnpso = 3)
+```
+
+Population-adjusted relative effects in this target population are then calculated using the `relative_effects()` function, and can be plotted with the corresponding `plot()` method:
+```{r pso_releff_FE_new}
+(pso_releff_FE_new <- relative_effects(pso_fit_FE, newdata = new_agd_means))
+plot(pso_releff_FE_new, ref_line = 0)
+```
+
+For absolute predictions, we require information about the full covariate distribution in the target population, not just the mean values.
+If IPD are available for the target population, `newdata` is simply a data frame of the IPD.
+If AgD are available for the target population, `newdata` must be a data frame with added integration points created using the `add_integration()` function.
+ 
+For example, suppose the aggregate target population introduced above had the following covariate means and standard deviations (for continuous covariates) or proportions (for discrete covariates):
+```{r}
+new_agd_int <- tibble(
+  bsa_mean = 0.6,
+  bsa_sd = 0.3,
+  prevsys = 0.1,
+  psa = 0.2,
+  weight_mean = 10,
+  weight_sd = 1,
+  durnpso_mean = 3,
+  durnpso_sd = 1
+)
+```
+
+We add integration points to this data frame in a similar manner to before.
+Again, we need to supply a correlation matrix for the joint covariate distribution; we use the same weighted mean correlation matrix computed earlier from the IPD in the network, which is stored in the network object as `int_cor`.
+```{r}
+new_agd_int <- add_integration(new_agd_int,
+  durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+  prevsys = distr(qbern, prob = prevsys),
+  bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+  weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
+  psa = distr(qbern, prob = psa),
+  cor = pso_net$int_cor,
+  n_int = 1000)
+```
+
+Predicted probabilities of achieving PASI 75 in this target population, given a $N(-1.75, 0.08^2)$ distribution on the baseline probit-probability of response on Placebo (at the reference levels of the covariates), are then produced using the `predict()` method:
+```{r pso_pred_FE_new}
+(pso_pred_FE_new <- predict(pso_fit_FE, 
+                            type = "response",
+                            newdata = new_agd_int,
+                            baseline = distr(qnorm, -1.75, 0.08)))
+plot(pso_pred_FE_new, ref_line = c(0, 1))
+```
+
+# References
+
+```{r pso_tests, include=FALSE, eval=params$run_tests}
+library(testthat)
+skip("Run local tests")
+```

@@ -8,15 +8,41 @@
 #' @return A [nma_dic] object.
 #' @export
 #'
-#' @examples
+#' @seealso [print.nma_dic()] for printing details, [plot.nma_dic()] for
+#'   producing plots of residual deviance contributions.
+#'
+#' @examples ## Smoking cessation
+#' @template ex_smoking_network
+#' @template ex_smoking_nma_fe
+#' @template ex_smoking_nma_re
+#' @examples \dontrun{
+#' # Compare DIC of FE and RE models
+#' (smk_dic_FE <- dic(smk_fit_FE))
+#' (smk_dic_RE <- dic(smk_fit_RE))   # substantially better fit
+#'
+#' # Plot residual deviance contributions under RE model
+#' plot(smk_dic_RE)
+#'
+#' # Check for inconsistency using UME model
+#' }
+#' @template ex_smoking_nma_re_ume
+#' @examples \dontrun{
+#' # Compare DIC
+#' smk_dic_RE
+#' (smk_dic_RE_UME <- dic(smk_fit_RE_UME))  # no difference in fit
+#'
+#' # Compare residual deviance contributions
+#' plot(smk_dic_RE, smk_dic_RE_UME, show_uncertainty = FALSE)
+#' }
 dic <- function(x, ...) {
   if (!inherits(x, "stan_nma")) abort("Not a `stan_nma` object.")
 
   net <- x$network
-  sf <- as.stanfit(x)
 
-  resdev <- colMeans(as.matrix(sf, pars = "resdev"))
-  fitted <- colMeans(as.matrix(sf, pars = "fitted"))
+  resdev <- colMeans(as.matrix(x, pars = "resdev"))
+  fitted <- colMeans(as.matrix(x, pars = "fitted"))
+
+  resdev_array <- as.array(x, pars = "resdev")
 
   if (has_ipd(net)) {
     n_ipd <- nrow(net$ipd)
@@ -39,6 +65,7 @@ dic <- function(x, ...) {
     nr_agd_contrast <- length(unique(net$agd_contrast$.study))
     # Number of fitted values is equal to the number of contrasts
     nf_agd_contrast <- nrow(dplyr::filter(net$agd_contrast, !is.na(.data$.y)))
+
     resdev_agd_contrast <- resdev[n_ipd + n_agd_arm + (1:nr_agd_contrast)]
     fitted_agd_contrast <- fitted[n_ipd + n_agd_arm + (1:nf_agd_contrast)]
   } else {
@@ -75,9 +102,15 @@ dic <- function(x, ...) {
   } else if (x$likelihood == "normal") {
     if (has_ipd(net)) {
       ipd_y <- net$ipd$.y
+      ipd_arm <-  dplyr::group_indices(net$ipd, .data$.study, .data$.trt)
+
       # Use posterior median for sigma
-      ipd_sigma <- median(as.matrix(sf, pars = "sigma"))
-      resdevfit_ipd <- (ipd_y - fitted_ipd)^2 / ipd_sigma^2
+      ipd_sigma <- apply(as.matrix(x, pars = "sigma"), 2, median)
+
+      resdevfit_ipd <- resdev_ipd
+      for (i in seq_along(ipd_y)) {
+        resdevfit_ipd[i] <- (ipd_y[i] - fitted_ipd[i])^2 / ipd_sigma[ipd_arm[i]]^2
+      }
       leverage_ipd <- resdev_ipd - resdevfit_ipd
     } else {
       leverage_ipd <- NULL
@@ -122,16 +155,19 @@ dic <- function(x, ...) {
     agd_contrast_resdev_dat <-
       net$agd_contrast %>%
         dplyr::filter(!is.na(.data$.y)) %>%
-        dplyr::mutate(.fitted = fitted_agd_contrast) %>%
-        dplyr::group_by(.data$.study) %>%
+        dplyr::mutate(.fitted = fitted_agd_contrast,
+                      .study_inorder = forcats::fct_inorder(forcats::fct_drop(.data$.study))) %>%
+        dplyr::group_by(.data$.study_inorder, .data$.study) %>%
         dplyr::summarise(.y = list(.data$.y),
                          fitted = list(.data$.fitted),
                          n_contrast = dplyr::n()) %>%
-        dplyr::mutate(Sigma = Sigma, resdev = resdev_agd_contrast) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(Sigma = Sigma,
+                      resdev = resdev_agd_contrast) %>%
         dplyr::rowwise() %>%
-        dplyr::mutate(resdevfit = tcrossprod(crossprod(.data$.y - .data$fitted,
-                                                       solve(.data$Sigma)),
-                                             .data$.y - .data$fitted),
+        dplyr::mutate(resdevfit = crossprod(.data$.y - .data$fitted,
+                                            solve(.data$Sigma,
+                                                  .data$.y - .data$fitted)),
                       leverage = .data$resdev - .data$resdevfit)
 
     leverage_agd_contrast <- agd_contrast_resdev_dat$leverage
@@ -180,7 +216,7 @@ dic <- function(x, ...) {
   dic <- totresdev + pd
 
   # Return nma_dic object
-  out <- list(dic = dic, pd = pd, resdev = totresdev, pointwise = pw)
+  out <- list(dic = dic, pd = pd, resdev = totresdev, pointwise = pw, resdev_array = resdev_array)
   class(out) <- "nma_dic"
   return(out)
 }

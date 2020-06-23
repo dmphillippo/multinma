@@ -10,15 +10,26 @@ vector[(ni_agd_arm + ni_agd_contrast) * n_int_thin] theta_bar_cum;
 
 // -- RE shrunken estimate delta --
 // Note: These are the individual-level trial-specific treatment effects
-vector[RE ? narm_ipd + ni_agd_arm + ni_agd_contrast : 0] delta;
+vector[n_delta] delta;
 
 if (RE) {
-  for (i in 1:(narm_ipd + ni_agd_arm + ni_agd_contrast)) {
-    delta[i] = (trt[i] > 1 ? d[trt[i] - 1] : 0) + (which_RE[i] ? f_delta[which_RE[i]] : 0);
+  int s = 1;
+  for (i in 1:(narm_ipd + ni_agd_arm)) {
+    if (which_RE[i]) {
+      delta[s] = (trt[i] > 1 ? d[trt[i] - 1] : 0) + (which_RE[i] ? f_delta[which_RE[i]] : 0);
+      s += 1;
+    }
   }
   for (i in 1:ni_agd_contrast) {
-    if (agd_contrast_trt_b[i] > 1)
-      delta[narm_ipd + ni_agd_arm + i] -= d[agd_contrast_trt_b[i] - 1];
+    if (which_RE[narm_ipd + ni_agd_arm + i]) {
+      delta[s] = (trt[narm_ipd + ni_agd_arm + i] > 1 ? d[trt[narm_ipd + ni_agd_arm + i] - 1] : 0) +
+        (which_RE[narm_ipd + ni_agd_arm + i] ? f_delta[which_RE[narm_ipd + ni_agd_arm + i]] : 0);
+
+      if (agd_contrast_trt_b[i] > 1)
+        delta[s] -= d[agd_contrast_trt_b[i] - 1];
+
+      s += 1;
+    }
   }
 }
 

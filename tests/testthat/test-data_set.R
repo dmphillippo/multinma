@@ -7,6 +7,7 @@ test_that("set_* produces empty nma_data objects", {
          agd_contrast = NULL,
          ipd = NULL,
          treatments = NULL,
+         classes = NULL,
          studies = NULL), class = "nma_data")
 
   expect_equal(set_ipd(smoking[0, ], "studyn", "trtc"), empty_nma_data)
@@ -55,6 +56,9 @@ agd_arm <- tibble(
   trtn = c(1, 2, 1, 2, 3),
   trtc = LETTERS[trtn],
   trtf = factor(trtc),
+  tclassn = c(1, 2, 1, 2, 2),
+  tclassc = letters[tclassn],
+  tclassf = factor(tclassc),
   cont = rnorm(5),
   cont_pos = abs(cont),
   cont_neg = -cont_pos,
@@ -64,6 +68,8 @@ agd_arm <- tibble(
   disc_p1 = disc + 1,
   disc_m1 = disc - 1,
   disc_neg = -disc,
+  disc_inf = c(disc[1:4], Inf),
+  disc_nan = c(disc[1:4], NaN),
   bin = rbinom(5, 1, 0.5)
   #Surv =
 )
@@ -100,6 +106,21 @@ test_that("set_agd_arm - count outcome checks work", {
   expect_equivalent(
     set_agd_arm(agd_arm, "studyn", "trtc", r = disc, E = cont_pos)$agd_arm[, c(".r", ".E")],
     transmute(agd_arm, .r = disc, .E = cont_pos))
+})
+
+test_that("set_agd_arm - sample size checks work", {
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = trtc),
+               "must be numeric")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = cont),
+               "must be integer")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = disc_neg),
+               "must be greater than zero")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = disc_inf),
+               "cannot be infinite")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = disc_nan),
+               "cannot be NaN")
+  expect_message(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos), "`sample_size` not provided")
+  expect_equal(set_agd_arm(agd_arm, studyn, trtc, r = disc, n = disc_p1)$agd_arm$.sample_size, agd_arm$disc_p1)
 })
 
 test_that("set_ipd - continuous outcome checks work", {
@@ -147,6 +168,20 @@ test_that("set_agd_contrast - continuous outcome checks work", {
     transmute(agd_contrast, .y = ydiff, .se = sediff))
 })
 
+test_that("set_agd_contrast - sample size checks work", {
+  expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = trtc),
+               "must be numeric")
+  expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = cont),
+               "must be integer")
+  expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = disc_neg),
+               "must be greater than zero")
+  expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = disc_inf),
+               "cannot be infinite")
+  expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = disc_nan),
+               "cannot be NaN")
+  expect_message(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff), "`sample_size` not provided")
+})
+
 test_that("set_* - take one and only one outcome", {
   m <- "specify one and only one outcome"
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, y = cont), m)
@@ -172,13 +207,13 @@ test_that("set_* `.study` column is correct", {
                agd_contrast$studyf)
 })
 
-test_that("set_* return `treatments` factor", {
+test_that("set_* return default `treatments` factor", {
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont)$treatments,
-               factor(LETTERS[1:3]))
+               .default(factor(LETTERS[1:3])))
   expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos)$treatments,
-               factor(LETTERS[1:3]))
+               .default(factor(LETTERS[1:3])))
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff)$treatments,
-               factor(LETTERS[1:3]))
+               .default(factor(LETTERS[1:3])))
 })
 
 test_that("set_* can set `trt_ref`", {
@@ -208,6 +243,133 @@ test_that("set_* can set `trt_ref`", {
   expect_error(set_ipd(agd_arm, studyc, trtc, y = cont, trt_ref = 2), m)
   expect_error(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_ref = 2), m)
   expect_error(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_ref = 2), m)
+})
+
+# Check classes when default reference treatment is not first in sort order
+# Add new study to make B the default trt_ref
+newstudy <- tibble(studyc = "c", trtc = c("B", "C"), tclassc = "b",
+                   cont = rnorm(2), cont_pos = runif(2, 0, 1),
+                   ydiff = c(NA, cont[2]), sediff = 1)
+aa <- bind_rows(agd_arm, newstudy)
+ac <- bind_rows(agd_contrast, newstudy)
+
+test_that("set_* returns correct .trtclass column", {
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
+                       trt_class = tclassc)$ipd$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = tclassc)$agd_arm$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = tclassc)$agd_contrast$.trtclass,
+               agd_contrast$tclassf)
+  expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
+                       trt_class = tclassc))$ipd$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(combine_network(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = tclassc))$agd_arm$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = tclassc))$agd_contrast$.trtclass,
+               agd_contrast$tclassf)
+
+  # Checks when default trt_ref not first in sort order
+  expect_equal(set_ipd(aa, studyc, trtc, y = cont,
+                       trt_class = tclassc)$ipd$.trtclass,
+               factor(aa$tclassc, levels = c("b", "a")))
+  expect_equal(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = tclassc)$agd_arm$.trtclass,
+               factor(aa$tclassc, levels = c("b", "a")))
+  expect_equal(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = tclassc)$agd_contrast$.trtclass,
+               factor(ac$tclassc, levels = c("b", "a")))
+  expect_equal(combine_network(set_ipd(aa, studyc, trtc, y = cont,
+                                       trt_class = tclassc))$ipd$.trtclass,
+               factor(aa$tclassc, levels = c("b", "a")))
+  expect_equal(combine_network(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
+                                           trt_class = tclassc))$agd_arm$.trtclass,
+               factor(aa$tclassc, levels = c("b", "a")))
+  expect_equal(combine_network(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
+                                                trt_class = tclassc))$agd_contrast$.trtclass,
+               factor(ac$tclassc, levels = c("b", "a")))
+})
+
+test_that("set_* returns classes factor variable", {
+  f_class <- factor(c("a", "b", "b"))
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont, trt_class = tclassc)$classes,
+               f_class)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_class = tclassc)$classes,
+               f_class)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_class = tclassc)$classes,
+               f_class)
+  expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont, trt_class = tclassc))$classes,
+               f_class)
+  expect_equal(combine_network(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_class = tclassc))$classes,
+               f_class)
+  expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_class = tclassc))$classes,
+               f_class)
+
+  f_class2 <- factor(c("b", "a", "b"), levels = c("b", "a"))
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
+                       trt_class = tclassc, trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = tclassc, trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = tclassc, trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
+                       trt_class = tclassc), trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = tclassc), trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = tclassc), trt_ref = "B")$classes,
+               f_class2)
+
+  # Checks when default trt_ref not first in sort order
+  expect_equal(set_ipd(aa, studyc, trtc, y = cont,
+                       trt_class = tclassc)$classes,
+               f_class2)
+  expect_equal(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = tclassc)$classes,
+               f_class2)
+  expect_equal(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = tclassc)$classes,
+               f_class2)
+  expect_equal(combine_network(set_ipd(aa, studyc, trtc, y = cont,
+                       trt_class = tclassc))$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = tclassc))$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = tclassc))$classes,
+               f_class2)
+})
+
+test_that("set_* checks for bad class variable work", {
+  aa2 <- agd_arm
+  aa2$tclassn <- c(1, 2, 2, 1, 2) # Trt 2 and 3 in two classes
+  aa2$tclassc[1] <- NA
+
+  ac2 <- agd_contrast
+  ac2$tclassn <- c(1, 2, 2, 1, 2) # Trt 2 and 3 in two classes
+  ac2$tclassc[1] <- NA
+
+  m <- "Treatment present in more than one class"
+
+  expect_error(set_ipd(aa2, studyc, trtc, y = cont, trt_class = tclassn), m)
+  expect_error(set_agd_arm(aa2, studyc, trtc, y = cont, se = cont_pos, trt_class = tclassn), m)
+  expect_error(set_agd_contrast(ac2, studyc, trtc, y = ydiff, se = sediff, trt_class = tclassn), m)
+
+  m2 <- "cannot contain missing values"
+
+  expect_error(set_ipd(aa2, studyc, trtc, y = cont, trt_class = tclassc), m2)
+  expect_error(set_agd_arm(aa2, studyc, trtc, y = cont, se = cont_pos, trt_class = tclassc), m2)
+  expect_error(set_agd_contrast(ac2, studyc, trtc, y = ydiff, se = sediff, trt_class = tclassc), m2)
 })
 
 test_that("set_* return `studies` factor", {

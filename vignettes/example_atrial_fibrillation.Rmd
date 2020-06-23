@@ -1,0 +1,419 @@
+---
+title: "Example: Stroke prevention in atrial fibrillation patients"
+output: rmarkdown::html_vignette
+bibliography: ../inst/REFERENCES.bib
+params:
+  run_tests: FALSE
+---
+
+
+```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
+```
+```{r, include=FALSE}
+set.seed(4783982)
+```
+
+```{r, eval = FALSE}
+library(multinma)
+options(mc.cores = parallel::detectCores())
+```
+```{r setup, echo = FALSE}
+library(multinma)
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
+             "true" =, "warn" = 2, 
+             parallel::detectCores())
+options(mc.cores = nc)
+```
+
+This vignette describes the analysis of 26 trials comparing 17 treatments in 4 classes for the prevention of stroke in patients with atrial fibrillation [@Cooper2009].
+The data are available in this package as `atrial_fibrillation`:
+```{r}
+head(atrial_fibrillation)
+```
+
+@Cooper2009 used this data to demonstrate meta-regression models, which we recreate here.
+
+### Setting up the network
+Whilst we have data on the patient-years at risk in each study (`E`), we ignore this here to follow the analysis of @Cooper2009, instead analysing the number of patients with stroke (`r`) out of the total (`n`) in each arm.
+We use the function `set_agd_arm()` to set up the network, making sure to specify the treatment classes `trt_class`.
+We remove the WASPO study from the network as both arms had zero events, and this study therefore contributes no information.
+```{r}
+af_net <- set_agd_arm(atrial_fibrillation[atrial_fibrillation$studyc != "WASPO", ], 
+                      study = studyc,
+                      trt = trtc,
+                      r = r, 
+                      n = n,
+                      trt_class = trt_class)
+af_net
+```
+
+(A better analysis, accounting for differences in the patient-years at risk between studies, can be performed by specifying a rate outcome with `r` and `E` in `set_agd_arm()` above.
+The following code remains identical.)
+
+Plot the network with the `plot()` method:
+```{r af_network_plot}
+plot(af_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) + 
+  ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
+```
+
+
+### Meta-analysis models
+We fit two (random effects) models:
+
+1. A standard NMA model without any covariates (model 1 of @Cooper2009);
+2. A meta-regression model adjusting for the proportion of individuals in each study with prior stroke, with shared interaction coefficients by treatment class (model 4b of @Cooper2009).
+
+#### NMA with no covariates
+We fit a random effects model using the `nma()` function with `trt_effects = "random"`.
+We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and a $\textrm{half-N}(5^2)$ prior for the heterogeneity standard deviation $\tau$.
+We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
+```{r}
+summary(normal(scale = 100))
+summary(half_normal(scale = 5))
+```
+
+Fitting the model with the `nma()` function. We increase the target acceptance rate `adapt_delta = 0.99` to minimise divergent transition warnings.
+```{r, eval=FALSE}
+af_fit_1 <- nma(af_net, 
+                trt_effects = "random",
+                prior_intercept = normal(scale = 100),
+                prior_trt = normal(scale = 100),
+                prior_het = half_normal(scale = 5),
+                adapt_delta = 0.99)
+```
+```{r, echo=FALSE}
+af_fit_1 <- nma(af_net, 
+                seed = 103533305,
+                trt_effects = "random",
+                prior_intercept = normal(scale = 100),
+                prior_trt = normal(scale = 100),
+                prior_het = half_normal(scale = 5),
+                adapt_delta = 0.99)
+```
+
+Basic parameter summaries are given by the `print()` method:
+```{r}
+af_fit_1
+```
+
+By default, summaries of the study-specific intercepts $\mu_j$ and study-specific relative effects $\delta_{jk}$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(af_fit_1, pars = c("d", "mu", "delta"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r af_1_pp_plot}
+plot_prior_posterior(af_fit_1, prior = c("trt", "het"))
+```
+
+We can compute relative effects against placebo/standard care with the `relative_effects()` function with the `trt_ref` argument:
+```{r}
+(af_1_releff <- relative_effects(af_fit_1, trt_ref = "Placebo/Standard care"))
+```
+
+These estimates can easily be plotted with the `plot()` method:
+```{r af_1_releff_plot}
+plot(af_1_releff, ref_line = 0)
+```
+
+We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.
+```{r af_1_ranks}
+(af_1_ranks <- posterior_ranks(af_fit_1))
+plot(af_1_ranks)
+```
+```{r af_1_rankprobs}
+(af_1_rankprobs <- posterior_rank_probs(af_fit_1))
+plot(af_1_rankprobs)
+```
+```{r af_1_cumrankprobs}
+(af_1_cumrankprobs <- posterior_rank_probs(af_fit_1, cumulative = TRUE))
+plot(af_1_cumrankprobs)
+```
+
+#### Network meta-regression adjusting for proportion of prior stroke
+We now consider a meta-regression model adjusting for the proportion of individuals in each study with prior stroke, with shared interaction coefficients by treatment class.
+The regression model is specified in the `nma()` function using a formula in the `regression` argument.
+The formula `~ .trt:stroke` means that interactions of prior stroke with treatment will be included; the `.trt` special variable indicates treatment, and `stroke` is in the original data set.
+We specify `class_interactions = "common"` to denote that the interaction parameters are to be common (i.e. shared) between treatments within each class.
+(Setting `class_interactions = "independent"` would fit model 2 of @Cooper2009 with separate interactions for each treatment, data permitting.)
+We use the same prior distributions as above, but additionally require a prior distribution for the regression coefficients `prior_reg`; we use a $\mathrm{N}(0, 100^2)$ prior distribution.
+The [QR decomposition](https://mc-stan.org/users/documentation/case-studies/qr_regression.html) can greatly improve the efficiency of sampling for regression models by decorrelating the sampling space; we specify that this should be used with `QR = TRUE`, and increase the target acceptance rate `adapt_delta = 0.99` to minimise divergent transition warnings.
+```{r, eval=FALSE}
+af_fit_4b <- nma(af_net, 
+                 trt_effects = "random",
+                 regression = ~ .trt:stroke,
+                 class_interactions = "common",
+                 QR = TRUE,
+                 prior_intercept = normal(scale = 100),
+                 prior_trt = normal(scale = 100),
+                 prior_reg = normal(scale = 100),
+                 prior_het = half_normal(scale = 5),
+                 adapt_delta = 0.99)
+```
+```{r, echo=FALSE, eval=!params$run_tests}
+af_fit_4b <- nma(af_net, 
+                 seed = 579212814,
+                 trt_effects = "random",
+                 regression = ~ .trt:stroke,
+                 class_interactions = "common",
+                 QR = TRUE,
+                 prior_intercept = normal(scale = 100),
+                 prior_trt = normal(scale = 100),
+                 prior_reg = normal(scale = 100),
+                 prior_het = half_normal(scale = 5),
+                 adapt_delta = 0.99)
+```
+```{r, echo=FALSE, eval=params$run_tests}
+af_fit_4b <- nma(af_net, 
+                 seed = 579212814,
+                 trt_effects = "random",
+                 regression = ~ .trt:stroke,
+                 class_interactions = "common",
+                 QR = TRUE,
+                 prior_intercept = normal(scale = 100),
+                 prior_trt = normal(scale = 100),
+                 prior_reg = normal(scale = 100),
+                 prior_het = half_normal(scale = 5),
+                 adapt_delta = 0.99,
+                 iter = 5000)
+```
+
+Basic parameter summaries are given by the `print()` method:
+```{r}
+af_fit_4b
+```
+
+The estimated treatment effects `d[]` shown here correspond to relative effects at the reference level of the covariate, here proportion of prior stroke centered at the network mean value 0.296.
+
+By default, summaries of the study-specific intercepts $\mu_j$ and study-specific relative effects $\delta_{jk}$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(af_fit_4b, pars = c("d", "mu", "delta"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r af_4b_pp_plot}
+plot_prior_posterior(af_fit_4b, prior = c("reg", "het"))
+```
+
+We can compute relative effects against placebo/standard care with the `relative_effects()` function with the `trt_ref` argument, which by default produces relative effects for the observed proportions of prior stroke in each study:
+```{r af_4b_releff_plot, fig.height = 16, eval=FALSE}
+# Not run
+(af_4b_releff <- relative_effects(af_fit_4b, trt_ref = "Placebo/Standard care"))
+plot(af_4b_releff, ref_line = 0)
+```
+
+We can produce estimated treatment effects for particular covariate values using the `newdata` argument.
+For example, treatment effects when no individuals or all individuals have prior stroke are produced by
+```{r af_4b_releff_01_plot}
+(af_4b_releff_01 <- relative_effects(af_fit_4b, 
+                                     trt_ref = "Placebo/Standard care",
+                                     newdata = data.frame(stroke = c(0, 1), 
+                                                          label = c("stroke = 0", "stroke = 1")),
+                                     study = label))
+plot(af_4b_releff_01, ref_line = 0)
+```
+
+
+The estimated class interactions (against the reference "Mixed" class) are very uncertain.
+```{r af_4b_betas}
+plot(af_fit_4b, pars = "beta", stat = "halfeye", ref_line = 0)
+```
+
+The interactions are more straightforward to interpret if we transform the interaction coefficients (using the consistency equations) so that they are against the control class:
+```{r af_4b_betas_transformed}
+af_4b_beta <- as.array(af_fit_4b, pars = "beta")
+
+# Subtract beta[Control:stroke] from the other class interactions
+af_4b_beta[ , , 1:2] <- sweep(af_4b_beta[ , , 1:2], 1:2, 
+                              af_4b_beta[ , , "beta[.trtclassControl:stroke]"], FUN = "-")
+
+# Set beta[Anti-coagulant:stroke] = -beta[Control:stroke]
+af_4b_beta[ , , "beta[.trtclassControl:stroke]"] <- -af_4b_beta[ , , "beta[.trtclassControl:stroke]"]
+names(af_4b_beta)[3] <- "beta[.trtclassAnti-coagulant:stroke]"
+
+# Summarise
+summary(af_4b_beta)
+plot(summary(af_4b_beta), stat = "halfeye", ref_line = 0)
+```
+
+There is some evidence that the effect of anti-coagulants increases (compared to control) with prior stroke.
+There is little evidence the effect of anti-platelets reduces with prior stroke, although the point estimate represents a substantial reduction in effectiveness, and the 95% Credible Interval includes values that correspond to substantial increases in treatment effect.
+The interaction effect of stroke on mixed treatments is very uncertain, but potentially indicates a substantial reduction in treatment effects with prior stroke.
+
+We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.
+By default (without the `newdata` argument specified), these are produced at the value of `stroke` for each study in the network in turn.
+To instead produce rankings for when no individuals or all individuals have prior stroke, we specify the `newdata` argument.
+```{r af_4b_ranks}
+(af_4b_ranks <- posterior_ranks(af_fit_4b,
+                                newdata = data.frame(stroke = c(0, 1), 
+                                                     label = c("stroke = 0", "stroke = 1")), 
+                                study = label))
+plot(af_4b_ranks)
+```
+```{r af_4b_rankprobs, fig.height=12}
+(af_4b_rankprobs <- posterior_rank_probs(af_fit_4b,
+                                         newdata = data.frame(stroke = c(0, 1), 
+                                                              label = c("stroke = 0", "stroke = 1")), 
+                                         study = label))
+
+# Modify the default output with ggplot2 functionality
+library(ggplot2)
+plot(af_4b_rankprobs) + 
+  facet_grid(Treatment~Study, labeller = label_wrap_gen(20)) + 
+  theme(strip.text.y = element_text(angle = 0))
+```
+```{r af_4b_cumrankprobs, fig.height=12}
+(af_4b_cumrankprobs <- posterior_rank_probs(af_fit_4b, cumulative = TRUE,
+                                            newdata = data.frame(stroke = c(0, 1), 
+                                                                 label = c("stroke = 0", "stroke = 1")), 
+                                            study = label))
+
+plot(af_4b_cumrankprobs) + 
+  facet_grid(Treatment~Study, labeller = label_wrap_gen(20)) + 
+  theme(strip.text.y = element_text(angle = 0))
+```
+
+### Model fit and comparison
+Model fit can be checked using the `dic()` function:
+```{r}
+(af_dic_1 <- dic(af_fit_1))
+```
+```{r}
+(af_dic_4b <- dic(af_fit_4b))
+```
+
+Both models fit the data well, having posterior mean residual deviance close to the number of data points.
+The DIC is slightly lower for the meta-regression model, although only by a couple of points (substantial differences are usually considered 3-5 points).
+The estimated heterogeneity standard deviation is much lower for the meta-regression model, suggesting that adjusting for the proportion of patients with prior stroke is explaining some of the heterogeneity in the data.
+
+We can also examine the residual deviance contributions with the corresponding `plot()` method.
+```{r af_1_resdev_plot}
+plot(af_dic_1)
+```
+
+```{r af_4b_resdev_plot}
+plot(af_dic_4b)
+```
+
+## References
+
+```{r atrial_fibrillation_tests, include=FALSE, eval=params$run_tests}
+#--- Test against TSD 2 results ---
+library(testthat)
+library(dplyr)
+
+tol <- 0.05
+tol_dic <- 0.1
+
+# No covariates
+
+Cooper_1_releff <- tribble(
+~trt                                       , ~est , ~lower, ~upper,
+"Low adjusted dose anti-coagulant"         , -1.08,-1.77  , -0.37 ,
+"Standard adjusted dose anti-coagulant"    , -0.76,-1.16  , -0.36 ,
+"Fixed dose warfarin"                      , 0.18 ,-0.73  , 1.06  ,
+"Low dose aspirin"                         , -0.15,-0.56  , 0.27  ,
+"Medium dose aspirin"                      , -0.37,-0.83  , 0.07  ,
+"High dose aspirin"                        , -0.25,-1.72  , 1.23  ,
+"Alternate day aspirin"                    , -1.67,-4.54  , 0.41  ,
+"Ximelagatran"                             , -0.84,-1.50  , -0.18 ,
+"Triflusal"                                , -0.11,-1.35  , 1.20  ,
+"Indobufen"                                , -0.52,-1.47  , 0.47  ,
+"Dipyridamole"                             , -0.18,-1.02  , 0.66  ,
+"Fixed dose warfarin + low dose aspirin"   , -0.29,-1.09  , 0.51  ,
+"Fixed dose warfarin + medium dose aspirin", 0.13 ,-0.60  , 0.83  ,
+"Acenocoumarol"                            , -1.56,-3.31  , 0.06  ,
+"Low dose aspirin + copidogrel"            , -0.24,-1.06  , 0.57  ,
+"Low dose aspirin + dipyridamole"          , -0.49,-1.38  , 0.38  ,
+) %>% 
+  mutate(trt = ordered(trt, levels = levels(af_net$treatments))) %>%
+  arrange(trt)
+
+af_1_releff_df <- as.data.frame(af_1_releff)
+
+test_that("Relative effects (no covariates)", {
+  expect_equivalent(af_1_releff_df$mean, Cooper_1_releff$est, tolerance = tol)
+  expect_equivalent(af_1_releff_df$`2.5%`, Cooper_1_releff$lower, tolerance = tol)
+  expect_equivalent(af_1_releff_df$`97.5%`, Cooper_1_releff$upper, tolerance = tol)
+})
+
+af_1_tau <- as.data.frame(summary(af_fit_1, pars = "tau"))
+
+test_that("Heterogeneity SD (no covariates)", {
+  expect_equivalent(af_1_tau$`50%`, 0.28, tolerance = tol)
+  expect_equivalent(af_1_tau$`2.5%`, 0.02, tolerance = tol)
+  expect_equivalent(af_1_tau$`97.5%`, 0.57, tolerance = tol)
+})
+
+test_that("DIC (no covariates)", {
+  expect_equivalent(af_dic_1$resdev, 60.22, tolerance = tol_dic)
+  expect_equivalent(af_dic_1$pd, 48.35, tolerance = tol_dic)
+  expect_equivalent(af_dic_1$dic, 108.57, tolerance = tol_dic)
+})
+
+# With stroke covariate, shared interactions
+
+Cooper_4b_releff <- tribble(
+~trt                                       , ~est  , ~lower, ~upper, 
+"Low adjusted dose anti-coagulant"         , -1.20 ,-1.89  , -0.54 ,
+"Standard adjusted dose anti-coagulant"    , -0.77 ,-1.14  , -0.38 ,
+"Fixed dose warfarin"                      , -0.11 ,-0.90  , 0.72  ,
+"Low dose aspirin"                         , -0.08 ,-0.47  , 0.30  ,
+"Medium dose aspirin"                      , -0.45 ,-0.87  , -0.03 ,
+"High dose aspirin"                        , -0.39 ,-1.86  , 1.11  ,
+"Alternate day aspirin"                    , -1.74 ,-5.16  , 0.48  ,
+"Ximelagatran"                             , -0.86 ,-1.42  , -0.27 ,
+"Triflusal"                                , 0.13  ,-1.05  , 1.38  ,
+"Indobufen"                                , -1.21 ,-2.26  , -0.13 ,
+"Dipyridamole"                             , -0.21 ,-1.01  , 0.58  ,
+"Fixed dose warfarin + low dose aspirin"   , 0.54  ,-0.80  , 1.85  ,
+"Fixed dose warfarin + medium dose aspirin", 0.12  ,-0.53  , 0.80  ,
+"Acenocoumarol"                            , -0.534,-2.67  , 1.38  ,
+"Low dose aspirin + copidogrel"            , -0.14 ,-0.82  , 0.53  ,
+"Low dose aspirin + dipyridamole"          , -0.53 ,-1.38  , 0.30  ,
+) %>% 
+  mutate(trt = ordered(trt, levels = levels(af_net$treatments))) %>%
+  arrange(trt)
+
+af_4b_releff_Cooper <- as.data.frame(relative_effects(af_fit_4b, 
+                                                      newdata = tibble(stroke = 0.27),
+                                                      trt_ref = "Placebo/Standard care"))
+
+test_that("Relative effects (common interaction)", {
+  expect_equivalent(af_4b_releff_Cooper$mean, Cooper_4b_releff$est, tolerance = tol)
+  expect_equivalent(af_4b_releff_Cooper$`2.5%`, Cooper_4b_releff$lower, tolerance = tol)
+  expect_equivalent(af_4b_releff_Cooper$`97.5%`, Cooper_4b_releff$upper, tolerance = tol)
+})
+
+Cooper_4b_beta <- tribble(
+~trt_class       , ~est , ~lower, ~upper,
+"Mixed"          , 3.05 ,-1.26  , 7.30  ,
+"Anti-platelet" , 0.23 ,-0.45  , 0.93  ,
+"Anti-coagulant", -0.71,-1.58  , 0.15  ,
+)
+
+af_4b_beta_df <- as.data.frame(summary(af_4b_beta))
+
+test_that("Interaction estimates (common interaction)", {
+  expect_equivalent(af_4b_beta_df$mean, Cooper_4b_beta$est, tolerance = tol)
+  expect_equivalent(af_4b_beta_df$`2.5%`, Cooper_4b_beta$lower, tolerance = tol)
+  expect_equivalent(af_4b_beta_df$`97.5%`, Cooper_4b_beta$upper, tolerance = tol)
+})
+
+af_4b_tau <- as.data.frame(summary(af_fit_4b, pars = "tau"))
+
+test_that("Heterogeneity SD (common interaction)", {
+  expect_equivalent(af_4b_tau$`50%`, 0.19, tolerance = tol)
+  expect_equivalent(af_4b_tau$`2.5%`, 0.01, tolerance = tol)
+  expect_equivalent(af_4b_tau$`97.5%`, 0.48, tolerance = tol)
+})
+
+test_that("DIC (common interaction)", {
+  expect_equivalent(af_dic_4b$resdev, 58.74, tolerance = tol_dic)
+  expect_equivalent(af_dic_4b$pd, 48.25, tolerance = tol_dic)
+  expect_equivalent(af_dic_4b$dic, 106.99, tolerance = tol_dic)
+})
+
+```

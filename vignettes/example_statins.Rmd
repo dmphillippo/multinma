@@ -1,0 +1,247 @@
+---
+title: "Example: Statins for cholesterol lowering"
+output: rmarkdown::html_vignette
+bibliography: ../inst/REFERENCES.bib
+params:
+  run_tests: FALSE
+---
+
+```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
+```
+
+```{r, eval = FALSE}
+library(multinma)
+options(mc.cores = parallel::detectCores())
+```
+```{r setup, echo = FALSE}
+library(multinma)
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
+             "true" =, "warn" = 2, 
+             parallel::detectCores())
+options(mc.cores = nc)
+```
+
+This vignette describes the analysis of 19 trials comparing statins to placebo or usual care [@TSD3].
+The data are available in this package as `statins`:
+```{r}
+head(statins)
+```
+
+@TSD3 used these data to demonstrate meta-regression models adjusting for the binary covariate `prevention` (primary or secondary prevention), which we recreate here.
+
+### Setting up the network
+We have data giving the number of deaths (`r`) out of the total (`n`) in each arm, so we use the function `set_agd_arm()` to set up the network.
+We set placebo as the network reference treatment.
+```{r}
+statin_net <- set_agd_arm(statins, 
+                          study = studyc,
+                          trt = trtc,
+                          r = r, 
+                          n = n,
+                          trt_ref = "Placebo")
+statin_net
+```
+
+The `prevention` variable in the `statins` data frame will automatically be available to use in a meta-regression model.
+
+### Meta-analysis models
+We fit fixed effect (FE) and random effects (RE) models, with a meta-regression on the binary covariate `prevention`.
+
+#### Fixed effect meta-regression
+We start by fitting a FE model.
+We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effect $d_\mathrm{Statin}$, study-specific intercepts $\mu_j$, and regression coefficient $\beta$.
+We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
+```{r}
+summary(normal(scale = 100))
+```
+
+The model is fitted with the `nma()` function, with a fixed effect model specified by `trt_effects = "fixed"`.
+The `regression` formula `~ .trt:prevention` means that interaction of primary/secondary prevention with treatment will be included; the `.trt` special variable indicates treatment, and `prevention` is in the original data set.
+```{r}
+statin_fit_FE <- nma(statin_net, 
+                     trt_effects = "fixed",
+                     regression = ~.trt:prevention,
+                     prior_intercept = normal(scale = 100),
+                     prior_trt = normal(scale = 100),
+                     prior_reg = normal(scale = 100))
+```
+
+Basic parameter summaries are given by the `print()` method:
+```{r}
+statin_fit_FE
+```
+
+By default, summaries of the study-specific intercepts $\mu_j$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(statin_fit_FE, pars = c("d", "beta", "mu"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r statin_FE_pp_plot}
+plot_prior_posterior(statin_fit_FE, prior = c("trt", "reg"))
+```
+
+#### Random effects meta-regression
+We now fit a RE model.
+We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effect $d_\mathrm{Statin}$, study-specific intercepts $\mu_j$, and regression coefficient $\beta$.
+We use a $\mathrm{half-N}(0, 5^2)$ prior distribution for the heterogeneity standard deviation $\tau$.
+We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
+```{r}
+summary(normal(scale = 100))
+summary(half_normal(scale = 5))
+```
+
+Again, the model is fitted with the `nma()` function, now with `trt_effects = "random"`.
+We increase `adapt_delta` to 0.99 to remove a small number of divergent transition errors (the default for RE models is set to 0.95).
+```{r}
+statin_fit_RE <- nma(statin_net, 
+                     trt_effects = "random",
+                     regression = ~.trt:prevention,
+                     prior_intercept = normal(scale = 100),
+                     prior_trt = normal(scale = 100),
+                     prior_reg = normal(scale = 100),
+                     prior_het = half_normal(scale = 5),
+                     adapt_delta = 0.99)
+```
+
+Basic parameter summaries are given by the `print()` method:
+```{r}
+statin_fit_RE
+```
+
+By default, summaries of the study-specific intercepts $\mu_j$ and study-specific relative effects $\delta_{jk}$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(statin_fit_RE, pars = c("d", "beta", "mu", "delta"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r statin_RE_pp_plot}
+plot_prior_posterior(statin_fit_RE, prior = c("trt", "reg", "het"))
+```
+
+### Model fit and comparison
+Model fit can be checked using the `dic()` function:
+```{r}
+(statin_dic_FE <- dic(statin_fit_FE))
+```
+```{r}
+(statin_dic_RE <- dic(statin_fit_RE))
+```
+
+The DIC is very similar between FE and RE models, so we might choose the FE model based on parsimony.
+The residual deviance statistics are larger than the number of data points, suggesting that some data points are not fit well.
+
+We can also examine the residual deviance contributions with the corresponding `plot()` method.
+```{r statin_FE_resdev_plot}
+plot(statin_dic_FE)
+```
+
+```{r statin_RE_resdev_plot}
+plot(statin_dic_RE)
+```
+
+
+There are a number of studies which are not fit well under either model, having posterior mean residual deviance contributions greater than 1, and should be investigated to see if there are further substantive differences between studies.
+
+## Further results
+We can produce estimates of the relative effect of statins vs. placebo for either primary or secondary prevention, using the `relative_effects()` function.
+The `newdata` argument specifies a data frame containing the levels of the covariate `prevention` that we are interested in, and the `study` argument is used to specify a column of `newdata` for an informative label.
+```{r}
+statin_releff_FE <- relative_effects(statin_fit_FE,
+                                     newdata = data.frame(prevention = c("Primary", "Secondary")),
+                                     study = prevention)
+
+statin_releff_FE
+```
+
+The `plot()` method may be used to visually compare these estimates:
+```{r statins_releff_FE, fig.height = 2}
+plot(statin_releff_FE, 
+     ref_line = 0)
+```
+
+Model parameters may be plotted with the corresponding `plot()` method:
+```{r statins_beta_FE, fig.height = 4}
+plot(statin_fit_FE, 
+     pars = "beta", 
+     ref_line = 0,
+     stat = "halfeye")
+```
+
+Whilst the 95% Credible Interval includes zero, there is a suggestion that statins are more effective for secondary prevention.
+
+## References
+
+```{r statins_tests, include=FALSE, eval=params$run_tests}
+#--- Test against TSD 3 results ---
+library(testthat)
+library(dplyr)
+
+tol <- 0.05
+tol_dic <- 0.1
+
+# Relative effects
+statin_FE_releff <- as.data.frame(summary(statin_fit_FE, pars = "d"))
+
+test_that("FE relative effects", {
+  expect_equivalent(statin_FE_releff$mean, -0.11, tolerance = tol)
+  expect_equivalent(statin_FE_releff$sd, 0.10, tolerance = tol)
+  expect_equivalent(statin_FE_releff$`2.5%`, -0.30, tolerance = tol)
+  expect_equivalent(statin_FE_releff$`97.5%`, 0.09, tolerance = tol)
+})
+
+statin_RE_releff <- as.data.frame(summary(statin_fit_RE, pars = "d"))
+
+test_that("RE relative effects", {
+  expect_equivalent(statin_RE_releff$mean, -0.07, tolerance = tol)
+  expect_equivalent(statin_RE_releff$sd, 0.20, tolerance = tol)
+  expect_equivalent(statin_RE_releff$`2.5%`, -0.48, tolerance = tol)
+  expect_equivalent(statin_RE_releff$`97.5%`, 0.36, tolerance = tol)
+})
+
+# Regression coefficients
+statin_FE_beta <- as.data.frame(summary(statin_fit_FE, pars = "beta"))
+
+test_that("FE regression beta", {
+  expect_equivalent(statin_FE_beta$mean, -0.21, tolerance = tol)
+  expect_equivalent(statin_FE_beta$sd, 0.11, tolerance = tol)
+  expect_equivalent(statin_FE_beta$`2.5%`, -0.42, tolerance = tol)
+  expect_equivalent(statin_FE_beta$`97.5%`, 0.01, tolerance = tol)
+})
+
+statin_RE_beta <- as.data.frame(summary(statin_fit_RE, pars = "beta"))
+
+test_that("RE regression beta", {
+  expect_equivalent(statin_RE_beta$mean, -0.29, tolerance = tol)
+  expect_equivalent(statin_RE_beta$sd, 0.26, tolerance = tol)
+  expect_equivalent(statin_RE_beta$`2.5%`, -0.86, tolerance = tol)
+  expect_equivalent(statin_RE_beta$`97.5%`, 0.20, tolerance = tol)
+})
+
+# RE heterogeneity SD
+statin_RE_sd <- as.data.frame(summary(statin_fit_RE, pars = "tau"))
+
+test_that("RE heterogeneity SD", {
+  expect_equivalent(statin_RE_sd$`50%`, 0.19, tolerance = tol)
+  expect_equivalent(statin_RE_sd$sd, 0.20, tolerance = tol)
+  expect_equivalent(statin_RE_sd$`2.5%`, 0.01, tolerance = tol)
+  expect_equivalent(statin_RE_sd$`97.5%`, 0.76, tolerance = tol)
+})
+
+# DIC
+test_that("FE DIC", {
+  expect_equivalent(statin_dic_FE$resdev, 45.9, tolerance = tol_dic)
+  expect_equivalent(statin_dic_FE$pd, 21.0, tolerance = tol_dic)
+  expect_equivalent(statin_dic_FE$dic, 66.9, tolerance = tol_dic)
+})
+
+test_that("RE DIC", {
+  expect_equivalent(statin_dic_RE$resdev, 42.6, tolerance = tol_dic)
+  expect_equivalent(statin_dic_RE$pd, 24.2, tolerance = tol_dic)
+  expect_equivalent(statin_dic_RE$dic, 66.8, tolerance = tol_dic)
+})
+
+
+```

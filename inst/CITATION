@@ -1,0 +1,29 @@
+
+bibentry(bibtype = "Manual",
+         title = "multinma: Network Meta-Analysis of Individual and Aggregate Data in Stan",
+         author = person(c("David", "M."), "Phillippo"),
+         year = substr(meta$Date, 1, 4),
+         note = sprintf("R package version %s", meta$Version),
+         url = "http://github.com/dmphillippo/multinma",
+         header = "To cite multinma in publications use:")
+
+bibentry(bibtype = "Article",
+         title = "Multilevel Network Meta-Regression for population-adjusted treatment comparisons",
+         author = personList(
+           person(c("David", "M."), "Phillippo"),
+           person("Sofia", "Dias"),
+           person(c("A.", "E."), "Ades"),
+           person("Mark", "Belger"),
+           person("Alan", "Brnabic"),
+           person("Alexander", "Schacht"),
+           person("Daniel", "Saure"),
+           person("Zbigniew", "Kadziola"),
+           person(c("Nicky", "J."), "Welton")
+         ),
+         year = "2020",
+         doi = "10.1111/rssa.12579",
+         journal = "Journal of the Royal Statistical Society: Series A (Statistics in Society)",
+         volume = 183,
+         number = 3,
+         pages = "1189-1210",
+         header = "When fitting ML-NMR models with IPD and AgD, please cite the methods paper:")

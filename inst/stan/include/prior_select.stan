@@ -1,15 +1,17 @@
 // Function for selecting given prior distribution, provides sampling statement ~prior_select(...)
-void prior_select_lp(vector y, int type, real location, real scale, real df) {
-  if (type == 1) { // Normal
+void prior_select_lp(vector y, int dist, real location, real scale, real df) {
+  if (dist == 1) { // Normal
     y ~ normal(location, scale);
-  } else if (type == 2) { // Cauchy
+  } else if (dist == 2) { // Cauchy
     y ~ cauchy(location, scale);
-  } else if (type == 3) { // Student t
+  } else if (dist == 3) { // Student t
     y ~ student_t(df, location, scale);
-  } else if (type == 4) { // Exponential
+  } else if (dist == 4) { // Exponential
     y ~ exponential(1/scale);
+  } else if (dist == 5) { // log-Normal
+    y ~ lognormal(location, scale);
   } else {
-    reject("Not a supported prior type.");
+    reject("Not a supported prior dist.");
   }
   return;
 }

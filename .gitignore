@@ -9,10 +9,8 @@ src/*.h
 src/multinma.so
 src/multinma.dll
 src/init.o
-man/*.Rd
 vignettes/*.R
 !vignettes/*.Rmd
-vignettes/*.html
 vignettes/*_files
 inst/*.bib.bak
 inst/*.bib.sav

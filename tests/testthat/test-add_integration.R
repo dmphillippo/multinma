@@ -3,7 +3,7 @@ library(dplyr)
 library(purrr)
 
 test_that("expects nma_data object", {
-  expect_error(add_integration("uh oh"), "nma_data")
+  expect_error(add_integration("uh oh"), "No add_integration method defined")
 })
 
 test_that("error on empty network", {
@@ -53,28 +53,38 @@ smknet <- combine_network(smknet_agd, smknet_ipd)
 
 test_that("n_int should be a positive integer", {
   m <- "should be a positive integer"
-  expect_error(add_integration(smknet, n_int = "oh dear"), m)
-  expect_error(add_integration(smknet, n_int = 1.1), m)
-  expect_error(add_integration(smknet, n_int = -5), m)
-  expect_error(add_integration(smknet, n_int = 0), m)
-  expect_error(add_integration(smknet, n_int = 1:2), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = "oh dear"), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = 1.1), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = -5), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = 0), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = 1:2), m)
 })
 
 test_that("int_args is named list", {
   m <- "should be a named list"
-  expect_error(add_integration(smknet, int_args = "oh dear"), m)
-  expect_error(add_integration(smknet, int_args = 1.1), m)
-  expect_error(add_integration(smknet, int_args = NULL), m)
-  expect_error(add_integration(smknet, int_args = list(a = 1, 2)), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = "oh dear"), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = 1.1), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = NULL), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = list(a = 1, 2)), m)
 })
 
 test_that("cor should be correlation matrix or NULL", {
   m <- "should be a correlation matrix or NULL"
-  expect_error(add_integration(smknet, cor = "a"), m)
-  expect_error(add_integration(smknet, cor = list()), m)
-  expect_error(add_integration(smknet, cor = 2), m)
-  expect_error(add_integration(smknet, cor = matrix(1:4)), m)
-  expect_error(add_integration(smknet, cor = matrix(1:4, nrow = 2)), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = "a"), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = list()), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = 2), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = matrix(1:4)), m)
+  expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = matrix(1:4, nrow = 2)), m)
 })
 
 test_that("cor must be specified if no IPD", {
@@ -184,7 +194,7 @@ test_that("error if qfun produces NaN, NA, NULL, Inf", {
 
 test_that("integration point marginals and correlations are correct", {
   skip_on_cran()
-  tol <- 0.001
+  tol <- 0.005
   cor_tol <- 0.05
   n_int <- 10000
 
@@ -202,8 +212,10 @@ test_that("integration point marginals and correlations are correct", {
   expect_equal(map_dbl(s2$agd_arm$.int_x1, mean), s2$agd_arm$x1_mean, tolerance = tol)
   expect_equal(map_dbl(s2$agd_arm$.int_x1, sd), s2$agd_arm$x1_sd, tolerance = tol)
   expect_equal(map_dbl(s2$agd_arm$.int_x2, mean), s2$agd_arm$x2, tolerance = tol)
+  # expect_equal(map2_dbl(s2$agd_arm$.int_x1, s2$agd_arm$.int_x3, cor, method = "spearman"),
+  #              rep(x1_x2_cor, nrow(s2$agd_arm)), tolerance = cor_tol)
   expect_equal(map2_dbl(s2$agd_arm$.int_x1, s2$agd_arm$.int_x3, cor, method = "spearman"),
-               rep(x1_x2_cor, nrow(s2$agd_arm)), tolerance = cor_tol)
+               rep(s2$int_cor[1, 3], nrow(s2$agd_arm)), tolerance = cor_tol)
 
   # 2 covariates, user cor matrix
   s3 <- add_integration(smknet,
@@ -220,8 +232,10 @@ test_that("integration point marginals and correlations are correct", {
 
   # Correlations between continuous and discrete seem hard to produce from the copula
   skip("Correlations between continuous and discrete covariates are difficult to recreate")
+  # expect_equal(map2_dbl(s2$agd_arm$.int_x1, s2$agd_arm$.int_x2, cor, method = "spearman"),
+  #              rep(x1_x2_cor, nrow(s2$agd_arm)), tolerance = cor_tol)
   expect_equal(map2_dbl(s2$agd_arm$.int_x1, s2$agd_arm$.int_x2, cor, method = "spearman"),
-               rep(x1_x2_cor, nrow(s2$agd_arm)), tolerance = cor_tol)
+               rep(s2$int_cor[1, 2], nrow(s2$agd_arm)), tolerance = cor_tol)
   expect_equal(map2_dbl(s3$agd_arm$.int_x1, s3$agd_arm$.int_x2, cor, method = "spearman"),
                rep(x1_x2_cor, nrow(s3$agd_arm)), tolerance = cor_tol)
 })

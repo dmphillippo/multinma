@@ -1,0 +1,344 @@
+---
+title: "Example: Diabetes"
+output: rmarkdown::html_vignette
+bibliography: ../inst/REFERENCES.bib
+params:
+  run_tests: FALSE
+---
+
+```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
+```
+
+```{r, eval = FALSE}
+library(multinma)
+options(mc.cores = parallel::detectCores())
+```
+```{r setup, echo = FALSE}
+library(multinma)
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
+             "true" =, "warn" = 2, 
+             parallel::detectCores())
+options(mc.cores = nc)
+```
+
+This vignette describes the analysis of data on the number of new cases of diabetes in 22 trials of 6 antihypertensive drugs [@Elliott2007; @TSD2].
+The data are available in this package as `diabetes`:
+```{r}
+head(diabetes)
+```
+
+
+### Setting up the network
+We begin by setting up the network.
+We have arm-level count data giving the number of new cases of diabetes (`r`) out of the total (`n`) in each arm, so we use the function `set_agd_arm()`.
+For computational efficiency, we let "Beta Blocker" be set as the network reference treatment by default.
+@Elliott2007 and @TSD2 use "Diuretic" as the reference, but it is a simple matter to transform the results after fitting the NMA model.^[The gain in efficiency here from using "Beta Blocker" as the network reference treatment instead of "Diuretic" is considerable - around 4-8 times, in terms of effective samples per second.
+The functions in this package will always attempt to choose a default network reference treatment that maximises computational efficiency and stability.
+If you have chosen an alternative network reference treatment and the model runs very slowly or has low effective sample size, this is a likely cause.]
+```{r}
+db_net <- set_agd_arm(diabetes, 
+                      study = studyc,
+                      trt = trtc,
+                      r = r, 
+                      n = n)
+db_net
+```
+
+We also have details of length of follow-up in years in each trial (`time`), which we will use as an offset with a cloglog link function to model the data as rates.
+We do not have to specify this in the function `set_agd_arm()`: any additional columns in the data (e.g. offsets or covariates, here the column `time`) will automatically be made available in the network.
+
+Plot the network structure.
+```{r, eval=FALSE}
+plot(db_net, weight_edges = TRUE, weight_nodes = TRUE)
+```
+```{r diabetes_network_plot, echo=FALSE}
+plot(db_net, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(legend.box.margin = ggplot2::unit(c(0, 0, 0, 4), "lines"))
+```
+
+### Meta-analysis models
+We fit both fixed effect (FE) and random effects (RE) models.
+
+#### Fixed effect meta-analysis
+First, we fit a fixed effect model using the `nma()` function with `trt_effects = "fixed"`.
+We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$.
+We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
+```{r}
+summary(normal(scale = 100))
+```
+
+The model is fitted using the `nma()` function.
+We specify that a cloglog link will be used with `link = "cloglog"` (the Binomial likelihood is the default for these data), and specify the log follow-up time offset using the regression formula `regression = ~offset(log(time))`.
+```{r}
+db_fit_FE <- nma(db_net, 
+                 trt_effects = "fixed",
+                 link = "cloglog",
+                 regression = ~offset(log(time)),
+                 prior_intercept = normal(scale = 100),
+                 prior_trt = normal(scale = 100))
+```
+
+Basic parameter summaries are given by the `print()` method:
+```{r}
+db_fit_FE
+```
+
+By default, summaries of the study-specific intercepts $\mu_j$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(db_fit_FE, pars = c("d", "mu"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r db_FE_pp_plot}
+plot_prior_posterior(db_fit_FE)
+```
+
+#### Random effects meta-analysis
+We now fit a random effects model using the `nma()` function with `trt_effects = "random"`.
+Again, we use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and we additionally use a $\mathrm{half-N}(5^2)$ prior for the heterogeneity standard deviation $\tau$.
+We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
+```{r}
+summary(normal(scale = 100))
+summary(half_normal(scale = 5))
+```
+
+Fitting the RE model
+```{r, warning=FALSE}
+db_fit_RE <- nma(db_net, 
+                 trt_effects = "random",
+                 link = "cloglog",
+                 regression = ~offset(log(time)),
+                 prior_intercept = normal(scale = 10),
+                 prior_trt = normal(scale = 10),
+                 prior_het = half_normal(scale = 5))
+```
+
+Basic parameter summaries are given by the `print()` method:
+```{r}
+db_fit_RE
+```
+
+By default, summaries of the study-specific intercepts $\mu_j$ and study-specific relative effects $\delta_{jk}$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(db_fit_RE, pars = c("d", "mu", "delta"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r db_RE_pp_plot}
+plot_prior_posterior(db_fit_RE, prior = c("trt", "het"))
+```
+
+
+#### Model comparison
+Model fit can be checked using the `dic()` function:
+```{r}
+(dic_FE <- dic(db_fit_FE))
+```
+```{r}
+(dic_RE <- dic(db_fit_RE))
+```
+
+The FE model is a very poor fit to the data, with a residual deviance much higher than the number of data points.
+The RE model fits the data better, and has a much lower DIC; we prefer the RE model.
+
+We can also examine the residual deviance contributions with the corresponding `plot()` method.
+```{r db_FE_resdev_plot}
+plot(dic_FE)
+```
+
+```{r db_RE_resdev_plot}
+plot(dic_RE)
+```
+
+
+### Further results
+For comparison with @Elliott2007 and @TSD2, we can produce relative effects against "Diuretic" using the `relative_effects()` function with `trt_ref = "Diuretic"`:
+```{r diabetes_releff_FE, fig.height=3}
+(db_releff_FE <- relative_effects(db_fit_FE, trt_ref = "Diuretic"))
+plot(db_releff_FE, ref_line = 0)
+```
+```{r diabetes_releff_RE, fig.height=3}
+(db_releff_RE <- relative_effects(db_fit_RE, trt_ref = "Diuretic"))
+plot(db_releff_RE, ref_line = 0)
+```
+
+
+@TSD2 produce absolute predictions of the probability of developing diabetes after three years, assuming a Normal distribution on the baseline cloglog probability of developing diabetes on diuretic treatment with mean $-4.2$ and precision $1.11$.
+We can replicate these results using the `predict()` method.
+We specify a data frame of `newdata`, containing the `time` offset(s) at which to produce predictions (here only 3 years).
+The `baseline` argument takes a `distr()` distribution object with which we specify the corresponding Normal distribution on the baseline cloglog probability, and we set `trt_ref = "Diuretic"` to indicate that the baseline distribution corresponds to "Diuretic" rather than the network reference "Beta Blocker".
+We set `type = "response"` to produce predicted event probabilities (`type = "link"` would produce predicted cloglog probabilities).
+```{r db_pred_FE, fig.height = 2}
+db_pred_FE <- predict(db_fit_FE, 
+                      newdata = data.frame(time = 3),
+                      baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5), 
+                      trt_ref = "Diuretic",
+                      type = "response")
+db_pred_FE
+plot(db_pred_FE)
+```
+```{r db_pred_RE, fig.height = 2}
+db_pred_RE <- predict(db_fit_RE, 
+                      newdata = data.frame(time = 3),
+                      baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5), 
+                      trt_ref = "Diuretic",
+                      type = "response")
+db_pred_RE
+plot(db_pred_RE)
+```
+
+If the `baseline` and `newdata` arguments are omitted, predicted probabilities will be produced for every study in the network based on their follow-up times and estimated baseline cloglog probabilities $\mu_j$:
+```{r db_pred_RE_all, fig.height=16}
+db_pred_RE_studies <- predict(db_fit_RE, type = "response")
+db_pred_RE_studies
+plot(db_pred_RE_studies)
+```
+
+We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.
+```{r diabetes_ranks}
+(db_ranks <- posterior_ranks(db_fit_RE))
+plot(db_ranks)
+```
+```{r diabetes_rankprobs}
+(db_rankprobs <- posterior_rank_probs(db_fit_RE))
+plot(db_rankprobs)
+```
+```{r diabetes_cumrankprobs}
+(db_cumrankprobs <- posterior_rank_probs(db_fit_RE, cumulative = TRUE))
+plot(db_cumrankprobs)
+```
+
+## References
+
+```{r diabetes_tests, include=FALSE, eval=params$run_tests}
+#--- Test against TSD 2 results ---
+library(testthat)
+library(dplyr)
+
+tol <- 0.05
+tol_dic <- 0.1
+
+# TSD treatment codes
+# trt_codes <- c(1 = "Diuretic",
+#                2 = "Placebo",
+#                3 = "Beta Blocker",
+#                4 = "CCB",
+#                5 = "ACE Inhibitor",
+#                6 = "ARB")
+
+# FE Relative effects
+tsd_FE <- tribble(
+~trt           , ~mean, ~sd , ~median, ~lower, ~upper,
+"Placebo"      , -0.25, 0.06, -0.25  , -0.36 , -0.14 ,
+"Beta Blocker" , -0.06, 0.06, -0.06  , -0.17 ,  0.05 ,
+"CCB"          , -0.25, 0.05, -0.25  , -0.36 , -0.15 ,
+"ACE Inhibitor", -0.36, 0.05, -0.36  , -0.46 , -0.25 ,
+"ARB"          , -0.45, 0.06, -0.45  , -0.58 , -0.33 ,
+) %>% 
+  mutate(trt = ordered(trt, levels = levels(db_net$treatments))) %>%
+  arrange(trt)
+
+db_releff_FE <- as.data.frame(db_releff_FE)
+
+test_that("FE relative effects", {
+  expect_equivalent(db_releff_FE$mean, tsd_FE$mean, tolerance = tol)
+  expect_equivalent(db_releff_FE$sd, tsd_FE$sd, tolerance = tol)
+  expect_equivalent(db_releff_FE$`50%`, tsd_FE$median, tolerance = tol)
+  expect_equivalent(db_releff_FE$`2.5%`, tsd_FE$lower, tolerance = tol)
+  expect_equivalent(db_releff_FE$`97.5%`, tsd_FE$upper, tolerance = tol)
+})
+
+# RE Relative effects
+tsd_RE <- tribble(
+~trt           , ~mean, ~sd , ~median, ~lower, ~upper,
+"Placebo"      , -0.29, 0.09, -0.29  , -0.47 , -0.12 ,
+"Beta Blocker" , -0.07, 0.09, -0.07  , -0.25 ,  0.10 ,
+"CCB"          , -0.24, 0.08, -0.24  , -0.41 , -0.08 ,
+"ACE Inhibitor", -0.40, 0.09, -0.40  , -0.58 , -0.24 ,
+"ARB"          , -0.47, 0.11, -0.47  , -0.70 , -0.27 ,
+) %>% 
+  mutate(trt = ordered(trt, levels = levels(db_net$treatments))) %>%
+  arrange(trt)
+
+db_releff_RE <- as.data.frame(db_releff_RE)
+
+test_that("RE relative effects", {
+  expect_equivalent(db_releff_RE$mean, tsd_RE$mean, tolerance = tol)
+  expect_equivalent(db_releff_RE$sd, tsd_RE$sd, tolerance = tol)
+  expect_equivalent(db_releff_RE$`50%`, tsd_RE$median, tolerance = tol)
+  expect_equivalent(db_releff_RE$`2.5%`, tsd_RE$lower, tolerance = tol)
+  expect_equivalent(db_releff_RE$`97.5%`, tsd_RE$upper, tolerance = tol)
+})
+
+# Heterogeneity SD
+db_tau <- as.data.frame(summary(db_fit_RE, pars = "tau"))
+
+test_that("RE heterogeneity SD", {
+  expect_equivalent(db_tau$mean, 0.13, tolerance = tol)
+  expect_equivalent(db_tau$sd, 0.04, tolerance = tol)
+  expect_equivalent(db_tau$`50%`, 0.12, tolerance = tol)
+  expect_equivalent(db_tau$`2.5%`, 0.05, tolerance = tol)
+  expect_equivalent(db_tau$`97.5%`, 0.23, tolerance = tol)
+})
+
+# FE probabilities
+tsd_pred_FE <- tribble(
+~trt           , ~mean, ~sd  , ~median, ~lower, ~upper,
+"Diuretic"     , 0.065, 0.067, 0.044  , 0.01  ,0.25   ,
+"Placebo"      , 0.052, 0.055, 0.034  , 0.01  ,0.20   ,
+"Beta Blocker" , 0.062, 0.064, 0.042  , 0.01  ,0.24   ,
+"CCB"          , 0.051, 0.055, 0.034  , 0.01  ,0.20   ,
+"ACE Inhibitor", 0.047, 0.050, 0.031  , 0.00  ,0.18   ,
+"ARB"          , 0.043, 0.046, 0.028  , 0.00  ,0.17   ,
+) %>% 
+  mutate(trt = ordered(trt, levels = levels(db_net$treatments))) %>%
+  arrange(trt)
+
+db_pred_FE <- as.data.frame(db_pred_FE)
+
+test_that("FE predicted probabilities at 3 years", {
+  expect_equivalent(db_pred_FE$mean, tsd_pred_FE$mean, tolerance = tol)
+  expect_equivalent(db_pred_FE$sd, tsd_pred_FE$sd, tolerance = tol)
+  expect_equivalent(db_pred_FE$`50%`, tsd_pred_FE$median, tolerance = tol)
+  expect_equivalent(db_pred_FE$`2.5%`, tsd_pred_FE$lower, tolerance = tol)
+  expect_equivalent(db_pred_FE$`97.5%`, tsd_pred_FE$upper, tolerance = tol)
+})
+
+# RE probabilities
+tsd_pred_RE <- tribble(
+~trt           , ~mean, ~sd  , ~median, ~lower, ~upper,
+"Diuretic"     , 0.065, 0.067, 0.044  , 0.01  ,0.25   ,
+"Placebo"      , 0.050, 0.053, 0.033  , 0.01  ,0.20   ,
+"Beta Blocker" , 0.061, 0.064, 0.041  , 0.01  ,0.24   ,
+"CCB"          , 0.052, 0.056, 0.035  , 0.01  ,0.20   ,
+"ACE Inhibitor", 0.045, 0.048, 0.030  , 0.00  ,0.18   ,
+"ARB"          , 0.042, 0.046, 0.028  , 0.00  ,0.17   ,
+) %>% 
+  mutate(trt = ordered(trt, levels = levels(db_net$treatments))) %>%
+  arrange(trt)
+
+db_pred_RE <- as.data.frame(db_pred_RE)
+
+test_that("RE predicted probabilities at 3 years", {
+  expect_equivalent(db_pred_RE$mean, tsd_pred_RE$mean, tolerance = tol)
+  expect_equivalent(db_pred_RE$sd, tsd_pred_RE$sd, tolerance = tol)
+  expect_equivalent(db_pred_RE$`50%`, tsd_pred_RE$median, tolerance = tol)
+  expect_equivalent(db_pred_RE$`2.5%`, tsd_pred_RE$lower, tolerance = tol)
+  expect_equivalent(db_pred_RE$`97.5%`, tsd_pred_RE$upper, tolerance = tol)
+})
+
+# RE DIC
+test_that("RE DIC", {
+  expect_equivalent(dic_RE$resdev, 53.7, tolerance = tol_dic)
+  expect_equivalent(dic_RE$pd, 38.0, tolerance = tol_dic)
+  expect_equivalent(dic_RE$dic, 91.7, tolerance = tol_dic)
+})
+
+# FE DIC
+test_that("FE DIC", {
+  expect_equivalent(dic_FE$resdev, 78.25, tolerance = tol_dic)
+  expect_equivalent(dic_FE$pd, 27.0, tolerance = tol_dic)
+  expect_equivalent(dic_FE$dic, 105.2, tolerance = tol_dic)
+})
+```

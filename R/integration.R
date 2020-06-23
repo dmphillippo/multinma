@@ -1,18 +1,28 @@
 #' Add numerical integration points to aggregate data
 #'
-#' This function creates numerical integration points using a Gaussian copula
-#' approach, as described in \insertCite{methods_paper;textual}{multinma}.
+#' The `add_integration()` generic creates numerical integration points using a
+#' Gaussian copula approach, as described in
+#' \insertCite{methods_paper;textual}{multinma}. Methods are available for
+#' networks stored in `nma_data` objects, and for data frames. The function
+#' `unnest_integration()` unnests integration points stored in a data frame, to
+#' aid plotting or other exploration.
 #'
-#' @param network an `nma_data` object, as created by the `set_*()` functions or
-#'   `combine_network()`
-#' @param ... distributions for covariates, see "Details"
-#' @param cor correlation matrix to use for generating the integration points.
+#' @param x An `nma_data` object, as created by the `set_*()` functions or
+#'   `combine_network()`, or data frame
+#' @param ... Distributions for covariates, see "Details"
+#' @param cor Correlation matrix to use for generating the integration points.
 #'   By default, this takes a weighted correlation matrix from all IPD studies.
-#' @param n_int number of integration points to generate, default 100
-#' @param int_args a named list of arguments to pass to
-#'   `\link[randtoolbox:quasiRNG]{sobol()}`
+#'   Rows and columns should match the order of covariates specified in `...`.
+#' @param n_int Number of integration points to generate, default 1000
+#' @param int_args A named list of arguments to pass to
+#'   \code{\link[randtoolbox:quasiRNG]{sobol()}}
 #'
-#' @return An object of class [nma_data].
+#' @return For the `nma_data` method, an object of class [nma_data]. For the
+#'   `data.frame` method, the input data frame is returned (as a [tibble]) with
+#'   an added column for each covariate (prefixed with ".int_"), containing the
+#'   numerical integration points nested as length-`n_int` vectors within each
+#'   row. For `unnest_integration()`, a data frame with integration points
+#'   unnested.
 #' @export
 #'
 #' @details The arguments passed to `...` specify distributions for the
@@ -23,8 +33,155 @@
 #' @references
 #'   \insertAllCited{}
 #'
+#' @examples ## Plaque psoriasis ML-NMR - network setup and adding integration points
+#' @template ex_plaque_psoriasis_network
+#' @template ex_plaque_psoriasis_integration
 #' @examples
-add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = list()) {
+#'
+#' ## Adding integration points to a data frame, e.g. for prediction
+#' # Define a data frame of covariate summaries
+#' new_agd_int <- data.frame(
+#'   bsa_mean = 0.6,
+#'   bsa_sd = 0.3,
+#'   prevsys = 0.1,
+#'   psa = 0.2,
+#'   weight_mean = 10,
+#'   weight_sd = 1,
+#'   durnpso_mean = 3,
+#'   durnpso_sd = 1)
+#'
+#' # Adding integration points, using the weighted average correlation matrix
+#' # computed for the plaque psoriasis network
+#' new_agd_int <- add_integration(new_agd_int,
+#'   durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+#'   prevsys = distr(qbern, prob = prevsys),
+#'   bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+#'   weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
+#'   psa = distr(qbern, prob = psa),
+#'   cor = pso_net$int_cor,
+#'   n_int = 1000)
+#'
+#' new_agd_int
+#'
+add_integration <- function(x, ...) {
+  UseMethod("add_integration")
+}
+
+#' @export
+#' @rdname add_integration
+add_integration.default <- function(x, ...) {
+  abort(glue::glue("No add_integration method defined for class '{class(x)}'."))
+}
+
+#' @export
+#' @rdname add_integration
+add_integration.data.frame <- function(x, ...,
+                                       cor = NULL, n_int = 1000L, int_args = list()) {
+
+  x <- tibble::as_tibble(x)
+
+  # Check n_int
+  if (!rlang::is_scalar_integerish(n_int) || n_int <= 0) {
+    abort("`n_int` should be a positive integer.")
+  }
+
+  # Check int_args
+  if (!is.list(int_args) || (!rlang::is_empty(int_args) && !rlang::is_named(int_args))) {
+    abort("`int_args` should be a named list.")
+  }
+
+  # Check covariate arguments
+  ds <- list(...)
+
+  if (length(ds) == 0) {
+    abort("No covariate distributions specified. Covariate distributions should be specified as named arguments using the function `distr`.")
+  }
+
+  if (any(purrr::map_lgl(ds, ~!inherits(., "distr"))) || !rlang::is_named(ds)) {
+    abort("Covariate distributions should be specified as named arguments using the function `distr`.")
+  }
+
+  x_names <- names(ds)  # Covariate names
+  nx <- length(ds)      # Number of covariates
+
+  # Check cor
+  if (nx > 1) {
+    if (!is.null(cor)) {
+      tryCatch(cor <- as.matrix(cor),
+               error = function(e) abort("`cor` should be a correlation matrix or NULL"))
+
+      if (!is.numeric(cor) ||
+          !isSymmetric(cor) ||
+          !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)), check.names = FALSE)) ||
+          !all(eigen(cor, symmetric = TRUE)$values > 0))
+        abort("`cor` should be a correlation matrix or NULL")
+
+      if (ncol(cor) != nx)
+        abort("Dimensions of correlation matrix `cor` and number of covariates specified in `...` do not match.")
+    } else {
+      abort("Specify a correlation matrix using the `cor` argument.")
+    }
+  }
+
+  # Generate Sobol points
+  u <- do.call(randtoolbox::sobol, purrr::list_modify(list(n = n_int, dim = nx), !!! int_args))
+
+  # Correlate Sobol points with Gaussian copula
+  if (nx > 1) {
+    cop <- copula::normalCopula(copula::P2p(cor), dim = nx, dispstr = "un")
+    u_cor <- copula::cCopula(u, copula = cop, inverse = TRUE)
+    # columns to list
+    u_cor_l <- purrr::array_branch(u_cor, 2)
+  } else {
+    u_cor <- u
+    u_cor_l <- list(u_cor)
+  }
+
+  # Use inverse CDFs to get integration points for specified marginals
+  out <- x
+  x_int_names <- paste0(".int_", x_names)
+
+  # If integration points already present, remove and warn
+  int_cols <- stringr::str_detect(colnames(x), "^\\.int_")
+  if (any(int_cols))
+    warn("Replacing integration points already present in data frame.", "int_col_present")
+
+  # Bind in generated integration points
+  out <-
+    dplyr::bind_cols(
+      x[, !int_cols],
+      purrr::pmap_dfc(list(x_int_names, ds, u_cor_l),
+                      ~ dplyr::rowwise(x) %>%
+                        dplyr::transmute(!! ..1 := list(rlang::eval_tidy(rlang::call2(..2$qfun, p = ..3, !!! ..2$args)))))
+    )
+
+  # Check valid values produced
+  invalid_rows <- out %>%
+    dplyr::mutate_at(x_int_names,
+                     .funs = ~purrr::map_lgl(.,
+                                             ~any(is.na(.) | is.infinite(.) |
+                                                    is.null(.) | is.nan(.)))
+    ) %>%
+    dplyr::filter_at(x_int_names, dplyr::any_vars(.))
+
+  if (nrow(invalid_rows) > 0)
+    abort("Invalid integration points were generated (either NA, NaN, Inf, or NULL).",
+          "invalid_int_generated",
+          invalid_rows = invalid_rows)
+
+  class(out) <- c("integration_tbl", class(out))
+  return(out)
+}
+
+#' @export
+#' @rdname add_integration
+add_integration.nma_data <- function(x, ...,
+                                     cor = NULL, n_int = 1000L, int_args = list()) {
+
+  network <- x
+
+  # Checks for n_int and int_args performed in data.frame method
+
   # Check network
   if (!inherits(network, "nma_data")) {
     abort("Expecting an `nma_data` object, as created by the `set_*` or `combine_network` functions.")
@@ -38,32 +195,23 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
     abort("No aggregate data found in network.")
   }
 
-  # Check n_int
-  if (length(n_int) > 1 || !is.numeric(n_int) || n_int != trunc(n_int) || n_int <= 0) {
-    abort("`n_int` should be a positive integer.")
-  }
-
-  # Check int_args
-  if (!is.list(int_args) || (!rlang::is_empty(int_args) && !rlang::is_named(int_args))) {
-    abort("`int_args` should be a named list.")
-  }
-
   # Check cor
   if (!is.null(cor)) {
     tryCatch(cor <- as.matrix(cor),
-             error = function(e) abort("cor should be a correlation matrix or NULL"))
+             error = function(e) abort("`cor` should be a correlation matrix or NULL"))
 
     if (!is.numeric(cor) ||
         !isSymmetric(cor) ||
-        !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)))) ||
+        !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)), check.names = FALSE)) ||
         !all(eigen(cor, symmetric = TRUE)$values > 0)) {
-      abort("cor should be a correlation matrix or NULL")
+      abort("`cor` should be a correlation matrix or NULL")
     }
   } else {
     if (!has_ipd(network)) abort("Specify a correlation matrix using the `cor` argument, or provide IPD studies in the network.")
   }
 
-  # Check covariate arguments
+
+  # Covariate arguments
   ds <- list(...)
 
   if (length(ds) == 0) {
@@ -111,110 +259,105 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
     cor <- ipd_cor
   }
 
-  # Generate Sobol points
-  u <- do.call(randtoolbox::sobol, purrr::list_modify(list(n = n_int, dim = nx), !!! int_args))
+  out <- network
 
-  # Correlate Sobol points with Gaussian copula
-  if (nx > 1) {
-    cop <- copula::normalCopula(copula::P2p(cor), dim = nx, dispstr = "un")
-    u_cor <- copula::cCopula(u, copula = cop, inverse = TRUE)
-    # columns to list
-    u_cor_l <- purrr::array_branch(u_cor, 2)
-  } else {
-    u_cor <- u
-    u_cor_l <- list(u_cor)
+  # Establish handlers for more specific errors / warnings when possible
+  int_col_present <- function(wrn) {
+    warn("Replacing integration points already present in network.")
+    rlang::cnd_muffle(wrn)
   }
 
-  # Use inverse CDFs to get integration points for specified marginals
-  out <- network
-  x_int_names <- paste0(".int_", x_names)
+  invalid_int_generated <- function(err) {
+    invalid_rows <- err$invalid_rows
+    abort(
+      glue::glue("Invalid integration points were generated (either NA, NaN, Inf, or NULL).\n",
+                 "Check the input parameters for the following (study, treatment):\n",
+                 glue::glue_collapse(glue::glue(" {invalid_rows$.study}, {invalid_rows$.trt}"),
+                                     sep = "\n"))
+    )
+  }
 
   if (has_agd_arm(network)) {
-    # If integration points already present, remove and warn
-    aa_int_cols <- stringr::str_detect(colnames(network$agd_arm), "^\\.int_")
-    if (any(aa_int_cols))
-      warn("Replacing integration points already present in network.")
-
-    # rlang::with_handlers(
-    out$agd_arm <-
-      dplyr::bind_cols(
-        network$agd_arm[, !aa_int_cols],
-        purrr::pmap_dfc(list(x_int_names, ds, u_cor_l),
-                        ~ rowwise(network$agd_arm) %>%
-                          transmute(!! ..1 := list(rlang::eval_tidy(rlang::call2(..2$qfun, p = ..3, !!! ..2$args)))))
-      )#,
-    # error = abort,
-    # warning = rlang::calling(~{warn(.); rlang::cnd_muffle(.)})
-    # )
-
-    # Check valid values produced
-    invalid_rows <- out$agd_arm %>%
-      dplyr::mutate_at(x_int_names,
-                       .funs = ~purrr::map_lgl(.,
-                                 ~any(is.na(.) | is.infinite(.) |
-                                      is.null(.) | is.nan(.)))
-                       ) %>%
-      dplyr::filter_at(x_int_names, dplyr::any_vars(.))
-
-    if (nrow(invalid_rows) > 0) {
-      abort(
-        glue::glue("Invalid integration points were generated (either NA, NaN, Inf, or NULL).\n",
-                   "Check the input parameters for the following (study, treatment):\n",
-                   glue::glue_collapse(glue::glue(" {invalid_rows$.study}, {invalid_rows$.trt}"),
-                                       sep = "\n"))
-      )
-    }
+    out$agd_arm <- rlang::with_handlers(
+      add_integration.data.frame(network$agd_arm, ...,
+                                 cor = cor, n_int = n_int, int_args = int_args),
+      int_col_present = rlang::calling(int_col_present),
+      invalid_int_generated = invalid_int_generated)
   }
 
   if (has_agd_contrast(network)) {
-    # If integration points already present, remove and warn
-    ac_int_cols <- stringr::str_detect(colnames(network$agd_contrast), "^\\.int_")
-    if (any(ac_int_cols))
-      warn("Replacing integration points already present in network.")
-
-    # rlang::with_handlers(
-    out$agd_contrast <-
-      dplyr::bind_cols(
-        network$agd_contrast[, !ac_int_cols],
-        purrr::pmap_dfc(list(x_int_names, ds, u_cor_l),
-                        ~ rowwise(network$agd_contrast) %>%
-                          transmute(!! ..1 := list(rlang::eval_tidy(rlang::call2(..2$qfun, p = ..3, !!! ..2$args)))))
-      )#,
-    # error = abort,
-    # warning = rlang::calling(~{warn(.); rlang::cnd_muffle(.)})
-    # )
-
-    # Check valid values produced
-    invalid_rows <- out$agd_contrast %>%
-      dplyr::mutate_at(x_int_names,
-                       .funs = ~purrr::map_lgl(.,
-                                               ~any(is.na(.) | is.infinite(.) |
-                                                      is.null(.) | is.nan(.)))
-      ) %>%
-      dplyr::filter_at(x_int_names, dplyr::any_vars(.))
-
-    if (nrow(invalid_rows) > 0) {
-      abort(
-        glue::glue("Invalid integration points were generated (either NA, NaN, Inf, or NULL).\n",
-                   "Check the input parameters for the following (study, treatment):\n",
-                   glue::glue_collapse(glue::glue(" {invalid_rows$.study}, {invalid_rows$.trt}"),
-                                       sep = "\n"))
-      )
-    }
+    out$agd_contrast <- rlang::with_handlers(
+      add_integration.data.frame(network$agd_contrast, ...,
+                                 cor = cor, n_int = n_int, int_args = int_args),
+      int_col_present = rlang::calling(int_col_present),
+      invalid_int_generated = invalid_int_generated)
   }
 
   # Set as mlnmr_data class
   out$n_int <- n_int
   out$int_names <- x_names
+
+  if (nx == 1) cor <- matrix(1)
+  colnames(cor) <- x_names
+  rownames(cor) <- x_names
+  out$int_cor <- cor
+
   class(out) <- c("mlnmr_data", "nma_data")
   return(out)
 }
 
 
+#' @param data Data frame with nested integration points, stored in list
+#'   columns as `.int_<variable name>`
+#'
+#' @export
+#' @rdname add_integration
+unnest_integration <- function(data) {
+  if (!inherits(data, "data.frame")) abort("Expecting a data frame.")
+
+  # Get integration variable names
+  data_names <- colnames(data)
+  x_int_names <- stringr::str_subset(data_names, "^\\.int_")
+  x_names <- stringr::str_remove(x_int_names, "^\\.int_")
+
+  if (length(x_int_names) == 0)
+    abort("No integration points present in data frame.")
+
+  name_conflicts <- rlang::has_name(data, x_names)
+  if (any(name_conflicts)) {
+    warn(glue::glue("Columns will be overwritten when unnesting integration points: ",
+                    glue::glue_collapse(x_names[name_conflicts], sep = ", ")),
+         "unnest_name_conflict")
+  }
+
+  out <- data %>%
+    dplyr::select(-dplyr::one_of(x_names[name_conflicts])) %>%
+    dplyr::rename_at(x_int_names, ~stringr::str_remove(., "^\\.int_")) %>%
+    {if (getNamespaceVersion("tidyr") < "1.0.0") {
+      tidyr::unnest(., !!! rlang::syms(x_names))
+    } else {
+      tidyr::unnest(., x_names)
+    }}
+
+  return(out)
+}
+
+#' Internal version of unnest_integration, doesn't throw warnings when
+#' overwriting columns
+#' @noRd
+.unnest_integration <- function(data) {
+  ignore <- function(wrn) rlang::cnd_muffle(wrn)
+  out <- rlang::with_handlers(unnest_integration(data),
+                              unnest_name_conflict = rlang::calling(ignore))
+  return(out)
+}
+
 #' Specify a general marginal distribution
 #'
 #' `distr()` is used within the function [add_integration()] to specify marginal
-#' distributions for the covariates, via a corresponding inverse CDF.
+#' distributions for the covariates, via a corresponding inverse CDF. It is also
+#' used in [predict.stan_nma()] to specify a distribution for the baseline
+#' response (intercept) when predicting absolute outcomes.
 #'
 #' @param qfun an inverse CDF, either as a function name or a string
 #' @param ... parameters of the distribution as arguments to `qfun`, these will
@@ -229,7 +372,20 @@ add_integration <- function(network, ..., cor = NULL, n_int = 100L, int_args = l
 #'   supplied, it must have an argument `p` which takes a vector of
 #'   probabilities.
 #'
+#' @seealso [add_integration()] where `distr()` is used to specify marginal
+#'   distributions for covariates to integrate over, and [predict.stan_nma()]
+#'   where `distr()` is used to specify a distribution on the baseline response.
 #' @examples
+#' ## Specifying marginal distributions for integration
+#'
+#' df <- data.frame(x1_mean = 2, x1_sd = 0.5, x2 = 0.8)
+#'
+#' # Distribution parameters are evaluated in the context of the data frame
+#' add_integration(df,
+#'                 x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+#'                 x2 = distr(qbern, prob = x2),
+#'                 cor = diag(2))
+#'
 distr <- function(qfun, ...) {
   d <- list(qfun = match.fun(qfun),
             args = rlang::enquos(...))
@@ -283,7 +439,6 @@ dbern <- function(x, prob, log = FALSE) {
 #' @param mean,sd mean and standard deviation, overriding `shape` and
 #'   `rate` or `scale` if specified
 #'
-#' @return
 #' @export
 #' @rdname GammaDist
 #' @aliases qgamma
@@ -324,20 +479,21 @@ pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
 #' The logit Normal distribution
 #'
 #' We provide convenient extensions of the `[dpq]logitnorm` functions in the
-#' package [logitnorm], which allow the distribution to be specified in terms of
-#' its mean and standard deviation, instead of its logit-mean and logit-sd.
+#' package \link[logitnorm:logitnorm-package]{logitnorm}, which allow the
+#' distribution to be specified in terms of its mean and standard deviation,
+#' instead of its logit-mean and logit-sd.
 #'
 #' @param p,x vector of quantiles
 #' @param q vector of probabilities
-#' @param mu,sigma,... see [logitnorm]
+#' @param mu,sigma,... see \code{\link[logitnorm:logitnorm-package]{logitnorm}}
 #' @param mean,sd mean and standard deviation, overriding `mu` and `sigma` if
 #'   specified
 #'
-#' @return
 #' @export
 #' @rdname logitNormal
 #' @aliases qlogitnorm
 qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
+  require_pkg("logitnorm")
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
   return(logitnorm::qlogitnorm(p, pars[["mu"]], pars[["sigma"]], ...))
@@ -347,6 +503,7 @@ qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
 #' @rdname logitNormal
 #' @aliases dlogitnorm
 dlogitnorm <- function(x, mu = 0, sigma = 1, ..., mean, sd) {
+  require_pkg("logitnorm")
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
   return(logitnorm::dlogitnorm(x, pars[["mu"]], pars[["sigma"]], ...))
@@ -356,6 +513,7 @@ dlogitnorm <- function(x, mu = 0, sigma = 1, ..., mean, sd) {
 #' @rdname logitNormal
 #' @aliases plogitnorm
 plogitnorm <- function(q, mu = 0, sigma = 1, ..., mean, sd) {
+  require_pkg("logitnorm")
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
   return(logitnorm::plogitnorm(q, pars[["mu"]], pars[["sigma"]], ...))

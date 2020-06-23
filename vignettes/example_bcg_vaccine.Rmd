@@ -1,0 +1,305 @@
+---
+title: "Example: BCG Vaccine for Tuberculosis"
+output: rmarkdown::html_vignette
+bibliography: ../inst/REFERENCES.bib
+params:
+  run_tests: FALSE
+---
+
+```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
+```
+```{r, include=FALSE}
+set.seed(18284729)
+```
+
+```{r, eval = FALSE}
+library(multinma)
+options(mc.cores = parallel::detectCores())
+```
+```{r setup, echo = FALSE}
+library(multinma)
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
+             "true" =, "warn" = 2, 
+             parallel::detectCores())
+options(mc.cores = nc)
+```
+
+This vignette describes the analysis of 13 trials investigating BCG vaccination vs. no vaccination for prevention of Tuberculosis (TB) [@TSD3;@Berkey1995].
+The data are available in this package as `bcg_vaccine`:
+```{r}
+head(bcg_vaccine)
+```
+
+@TSD3 used these data to demonstrate meta-regression models adjusting for the continuous covariate `latitude`, the absolute degrees latitude at which the study was conducted, which we recreate here.
+
+### Setting up the network
+We have data giving the number diagnosed with TB during trial follow-up (`r`) out of the total (`n`) in each arm, so we use the function `set_agd_arm()` to set up the network.
+We set "unvaccinated" as the network reference treatment.
+```{r}
+bcg_net <- set_agd_arm(bcg_vaccine, 
+                       study = studyn,
+                       trt = trtc,
+                       r = r, 
+                       n = n,
+                       trt_ref = "Unvaccinated")
+bcg_net
+```
+
+The `latitude` variable in the `bcg_vaccine` data frame will automatically be available to use in a meta-regression model.
+
+### Meta-analysis models
+We fit random effects (RE) models, firstly without any covariates, and then with a meta-regression on the continuous covariate `latitude`.
+
+#### RE meta-analysis (no covariate)
+We start by fitting a standard RE model without any covariates.
+We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effect $d_\mathrm{Vaccine}$ and study-specific intercepts $\mu_j$, and a $\textrm{half-N}(0, 5^2)$ prior distribution for the heterogeneity standard deviation $\tau$.
+We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
+```{r}
+summary(normal(scale = 100))
+summary(half_normal(scale = 5))
+```
+
+The model is fitted with the `nma()` function, with a random effects model specified by `trt_effects = "random"`.
+```{r, eval = FALSE}
+bcg_fit_unadj <- nma(bcg_net, 
+                     trt_effects = "random",
+                     prior_intercept = normal(scale = 100),
+                     prior_trt = normal(scale = 100),
+                     prior_het = half_normal(scale = 5))
+```
+```{r, echo = FALSE}
+bcg_fit_unadj <- nma(bcg_net, 
+                     seed = 14308133,
+                     trt_effects = "random",
+                     prior_intercept = normal(scale = 100),
+                     prior_trt = normal(scale = 100),
+                     prior_het = half_normal(scale = 5))
+```
+
+Basic parameter summaries are given by the `print()` method:
+```{r}
+bcg_fit_unadj
+```
+
+By default, summaries of the study-specific intercepts $\mu_j$ and random effects $\delta_j$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(bcg_fit_unadj, pars = c("d", "mu", "delta", "tau"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r bcg_unadj_pp_plot}
+plot_prior_posterior(bcg_fit_unadj, prior = c("trt", "het"))
+```
+
+#### RE meta-regression with covariate `latitude`
+We now fit a RE meta-regression model, adjusting for `latitude`.
+We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effect $d_\mathrm{Vaccine}$, study-specific intercepts $\mu_j$, and regression coefficient $\beta$.
+We use a $\text{half-N}(0, 5^2)$ prior distribution for the heterogeneity standard deviation $\tau$.
+We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
+```{r}
+summary(normal(scale = 100))
+summary(half_normal(scale = 5))
+```
+
+Again, the model is fitted with the `nma()` function.
+The `regression` formula `~ .trt:latitude` means that the interaction of latitude with treatment will be included; the `.trt` special variable indicates treatment, and `latitude` is in the original data set.
+We increase `adapt_delta` to 0.99 to remove a small number of divergent transition errors (the default for RE models is set to 0.95).
+```{r, eval = FALSE}
+bcg_fit_lat <- nma(bcg_net, 
+                   trt_effects = "random",
+                   regression = ~.trt:latitude,
+                   prior_intercept = normal(scale = 100),
+                   prior_trt = normal(scale = 100),
+                   prior_reg = normal(scale = 100),
+                   prior_het = half_normal(scale = 5),
+                   adapt_delta = 0.99)
+```
+```{r, echo = FALSE}
+bcg_fit_lat <- nma(bcg_net, 
+                   seed = 1932599147,
+                   trt_effects = "random",
+                   regression = ~.trt:latitude,
+                   prior_intercept = normal(scale = 100),
+                   prior_trt = normal(scale = 100),
+                   prior_reg = normal(scale = 100),
+                   prior_het = half_normal(scale = 5),
+                   adapt_delta = 0.99)
+```
+
+Basic parameter summaries are given by the `print()` method:
+```{r}
+bcg_fit_lat
+```
+
+Note that `latitude` has automatically been centered at 33.46, the mean value for the studies in the network.
+
+By default, summaries of the study-specific intercepts $\mu_j$ and study-specific relative effects $\delta_{jk}$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(bcg_fit_lat, pars = c("d", "beta", "mu", "delta", "tau"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r bcg_lat_pp_plot}
+plot_prior_posterior(bcg_fit_lat, prior = c("trt", "reg", "het"))
+```
+
+### Model fit and comparison
+Model fit can be checked using the `dic()` function:
+```{r}
+(bcg_dic_unadj <- dic(bcg_fit_unadj))
+```
+```{r}
+(bcg_dic_lat <- dic(bcg_fit_lat))
+```
+
+The DIC is very similar between the two models, so we might at first choose the unadjusted model.
+The posterior mean residual deviance is larger for the model with the covariate, but this model also has a lower effective number of parameters $p_D$ so is allowing for more shrinkage of the random treatment effects.
+Moreover, the model with the covariate has a much lower estimated heterogeneity standard deviation:
+```{r}
+summary(bcg_fit_unadj, pars = "tau")
+summary(bcg_fit_lat, pars = "tau")
+```
+
+Adjusting for latitude is explaining a substantial amount of heterogeneity in the data.
+The 95% Credible Interval for the regression coefficient also excludes zero:
+```{r bcg_vaccine_beta_lat, fig.height = 4}
+summary(bcg_fit_lat, pars = "beta")
+
+plot(bcg_fit_lat, 
+     pars = "beta", 
+     ref_line = 0,
+     stat = "halfeye")
+```
+
+
+Altogether, we might prefer the model with the adjustment for latitude.
+When considering covariates in random effects models it is important not to just look at the DIC [@TSD3].
+We should also consider any reductions in heterogeneity, and the estimated regression coefficients and their standard error.
+The DIC is not sensitive to changes in the heterogeneity, as RE models are very flexible and can fit the data well whatever the level of heterogeneity.
+
+## Further results
+We can produce estimates of the relative effect of vaccination at any latitude using the `relative_effects()` function.
+The `newdata` argument specifies a data frame containing the values of the covariate `latitude` that we are interested in, and the `study` argument is used to specify a column of `newdata` for an informative label.
+```{r}
+bcg_releff_lat <- relative_effects(bcg_fit_lat,
+                                   newdata = tibble::tibble(latitude = seq(10, 50, by = 10),
+                                                            label = paste0(latitude, "\u00B0 latitude")),
+                                   study = label)
+
+bcg_releff_lat
+```
+
+The `plot()` method may be used to visually compare these estimates:
+```{r bcg_vaccine_releff_lat, fig.height = 5}
+plot(bcg_releff_lat, 
+     ref_line = 0)
+```
+
+A more sophisticated plot shows the regression line and confidence band for the effect of latitude, overlaid on the observed log odds ratios in each study:
+```{r bcg_vaccine_reg_plot}
+library(dplyr)
+library(ggplot2)
+
+# Get data for regression line
+lat_range <- range(bcg_vaccine$latitude)
+lat_dat <- tibble(latitude = seq(lat_range[1], lat_range[2], by = 1))
+
+bcg_lat_reg <- relative_effects(bcg_fit_lat, 
+                                newdata = lat_dat) %>% 
+  as_tibble() %>% 
+  bind_cols(lat_dat)
+
+# Get study log odds ratios
+bcg_lor <- bcg_vaccine %>% 
+  group_by(studyn) %>% 
+  mutate(lor = log(r / (n - r)) - log(first(r) / (first(n) - first(r))),
+         sample_size = sum(n)) %>% 
+  slice(-1)
+
+# Plot
+ggplot(aes(x = latitude), data = bcg_lor) +
+  geom_hline(yintercept = 0, colour = "grey60") +
+  geom_ribbon(aes(ymin = `2.5%`, ymax = `97.5%`), data = bcg_lat_reg,
+              fill = "darkred", alpha = 0.3) +
+  geom_line(aes(y = mean), data = bcg_lat_reg,
+            colour = "darkred") +
+  geom_point(aes(y = lor, size = sample_size), alpha = 0.6) +
+  coord_cartesian(xlim = c(0, 60)) +
+  xlab("Degrees Latitude") + ylab("log Odds Ratio") +
+  scale_size("Sample Size") +
+  theme_multinma()
+```
+
+## References
+
+```{r bcg_vaccine_tests, include=FALSE, eval=params$run_tests}
+#--- Test against TSD 3 results ---
+library(testthat)
+library(dplyr)
+
+tol <- 0.05
+tol_dic <- 0.1
+
+# Relative effects
+bcg_unadj_releff <- as.data.frame(summary(bcg_fit_unadj, pars = "d"))
+
+test_that("Unadjusted relative effects", {
+  expect_equivalent(bcg_unadj_releff$mean, -0.762, tolerance = tol)
+  expect_equivalent(bcg_unadj_releff$sd, 0.22, tolerance = tol)
+  expect_equivalent(bcg_unadj_releff$`2.5%`, -1.21, tolerance = tol)
+  expect_equivalent(bcg_unadj_releff$`97.5%`, -0.34, tolerance = tol)
+})
+
+bcg_lat_releff <- as.data.frame(summary(bcg_fit_lat, pars = "d"))
+
+test_that("Regression relative effects", {
+  expect_equivalent(bcg_lat_releff$mean, -0.763, tolerance = tol)
+  expect_equivalent(bcg_lat_releff$sd, 0.126, tolerance = tol)
+  expect_equivalent(bcg_lat_releff$`2.5%`, -1.04, tolerance = tol)
+  expect_equivalent(bcg_lat_releff$`97.5%`, -0.52, tolerance = tol)
+})
+
+# Regression coefficients
+bcg_lat_beta <- as.data.frame(summary(bcg_fit_lat, pars = "beta"))
+
+test_that("Regression beta", {
+  expect_equivalent(bcg_lat_beta$mean, -0.032, tolerance = tol)
+  expect_equivalent(bcg_lat_beta$sd, 0.009, tolerance = tol)
+  expect_equivalent(bcg_lat_beta$`2.5%`, -0.05, tolerance = tol)
+  expect_equivalent(bcg_lat_beta$`97.5%`, -0.01, tolerance = tol)
+})
+
+# RE heterogeneity SD
+bcg_unadj_sd <- as.data.frame(summary(bcg_fit_unadj, pars = "tau"))
+
+test_that("Unadjusted heterogeneity SD", {
+  expect_equivalent(bcg_unadj_sd$`50%`, 0.649, tolerance = tol)
+  expect_equivalent(bcg_unadj_sd$sd, 0.202, tolerance = tol)
+  expect_equivalent(bcg_unadj_sd$`2.5%`, 0.39, tolerance = tol)
+  expect_equivalent(bcg_unadj_sd$`97.5%`, 1.17, tolerance = tol)
+})
+
+bcg_lat_sd <- as.data.frame(summary(bcg_fit_lat, pars = "tau"))
+
+test_that("Regression heterogeneity SD", {
+  expect_equivalent(bcg_lat_sd$`50%`, 0.272, tolerance = tol)
+  expect_equivalent(bcg_lat_sd$sd, 0.188, tolerance = tol)
+  expect_equivalent(bcg_lat_sd$`2.5%`, 0.03, tolerance = tol)
+  expect_equivalent(bcg_lat_sd$`97.5%`, 0.75, tolerance = tol)
+})
+
+# DIC
+test_that("Unadjusted DIC", {
+  expect_equivalent(bcg_dic_unadj$resdev, 26.1, tolerance = tol_dic)
+  expect_equivalent(bcg_dic_unadj$pd, 23.5, tolerance = tol_dic)
+  expect_equivalent(bcg_dic_unadj$dic, 49.6, tolerance = tol_dic)
+})
+
+test_that("Regression DIC", {
+  expect_equivalent(bcg_dic_lat$resdev, 30.4, tolerance = tol_dic)
+  expect_equivalent(bcg_dic_lat$pd, 21.1, tolerance = tol_dic)
+  expect_equivalent(bcg_dic_lat$dic, 51.5, tolerance = tol_dic)
+})
+```

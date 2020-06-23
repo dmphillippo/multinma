@@ -1,8 +1,15 @@
 functions {
 #include /include/prior_select.stan
+#include /include/count_nonzero.stan
 }
 data {
 #include /include/data_common.stan
+
+  // Prior on IPD variance
+  int<lower=1,upper=5> prior_aux_dist;
+  real prior_aux_location;
+  real<lower=0> prior_aux_scale;
+  real<lower=0> prior_aux_df;
 
   // Outcomes
   real ipd_y[ni_ipd];
@@ -14,7 +21,7 @@ transformed data {
 }
 parameters {
 #include /include/parameters_common.stan
-  real<lower=0> sigma[narm_ipd];
+  vector<lower=0>[narm_ipd] sigma;
 }
 transformed parameters {
 #include /include/transformed_parameters_common.stan
@@ -29,7 +36,9 @@ transformed parameters {
   if (ni_agd_arm) {
     if (nint > 1) { // -- If integration points are used --
       if (RE) {
-        vector[nint * ni_agd_arm] eta_agd_arm_noRE = X_agd_arm * beta_tilde;
+        vector[nint * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+          X_agd_arm * beta_tilde + offset_agd_arm :
+          X_agd_arm * beta_tilde;
 
         if (link == 1) { // identity link
           for (i in 1:ni_agd_arm) {
@@ -53,9 +62,13 @@ transformed parameters {
 
       } else {
         if (link == 1) { // identity link
-          theta_agd_arm_ii = X_agd_arm * beta_tilde;
+          theta_agd_arm_ii = has_offset ?
+            X_agd_arm * beta_tilde + offset_agd_arm :
+            X_agd_arm * beta_tilde;
         } else if (link == 2) { // log link
-          theta_agd_arm_ii = exp(X_agd_arm * beta_tilde);
+          theta_agd_arm_ii = has_offset ?
+            exp(X_agd_arm * beta_tilde + offset_agd_arm) :
+            exp(X_agd_arm * beta_tilde);
         }
 
         for (i in 1:ni_agd_arm) {
@@ -64,7 +77,9 @@ transformed parameters {
       }
     } else { // -- If no integration --
       if (RE) {
-        vector[nint * ni_agd_arm] eta_agd_arm_noRE = X_agd_arm * beta_tilde;
+        vector[nint * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+          X_agd_arm * beta_tilde + offset_agd_arm :
+          X_agd_arm * beta_tilde;
 
         if (link == 1) { // identity link
           for (i in 1:ni_agd_arm) {
@@ -83,15 +98,22 @@ transformed parameters {
         }
       } else {
         if (link == 1) // identity link
-          theta_agd_arm_bar = X_agd_arm * beta_tilde;
+          theta_agd_arm_bar = has_offset ?
+            X_agd_arm * beta_tilde + offset_agd_arm :
+            X_agd_arm * beta_tilde;
         else if (link == 2) // log link
-          theta_agd_arm_bar = exp(X_agd_arm * beta_tilde);
+          theta_agd_arm_bar = has_offset ?
+            exp(X_agd_arm * beta_tilde + offset_agd_arm) :
+            exp(X_agd_arm * beta_tilde);
       }
     }
   }
 }
 model {
 #include /include/model_common.stan
+
+  // -- Prior on arm-level variance --
+  prior_select_lp(sigma, prior_aux_dist, prior_aux_location, prior_aux_scale, prior_aux_df);
 
   // -- IPD likelihood --
   // Could replace identity link sampling statement with normal_id_glm in Stan > 2.20

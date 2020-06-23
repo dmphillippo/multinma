@@ -1,0 +1,5 @@
+^*\.R$
+^*\.html$
+!^*/knitr_setup\.R$
+!^precompile\.R$
+!^example_*\.html$

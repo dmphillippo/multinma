@@ -1,16 +1,16 @@
 Package: multinma
 Title: Network Meta-Analysis of Individual and Aggregate Data in Stan
-Version: 0.0.1
+Version: 0.1.0
 Authors@R: 
-    person(given = "David",
+    person(given = c("David", "M."),
            family = "Phillippo",
            role = c("aut", "cre"),
            email = "david.phillippo@bristol.ac.uk",
            comment = c(ORCID = "0000-0003-2672-7841"))
-Description: Network meta-analysis (NMA) and network meta-regression (NMR) models for 
-    aggregate data (AgD), individual patient data (IPD), and mixtures of both IPD and AgD
-    using multilevel NMR (ML-NMR). Models are estimated in a Bayesian framework using 
-    Stan.
+Description: Network meta-analysis and network meta-regression models for 
+    aggregate data, individual patient data, and mixtures of both individual 
+    and aggregate data using multilevel network meta-regression. Models are 
+    estimated in a Bayesian framework using Stan.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -22,9 +22,8 @@ Imports:
     stats,
     graphics,
     Rcpp (>= 0.12.0),
-    rstan (>= 2.18.1),
+    rstan (>= 2.19.2),
     rstantools (>= 2.0.0),
-    loo (>= 2.0.0),
     Rdpack (>= 0.7),
     tibble,
     dplyr (>= 0.8.1),
@@ -32,13 +31,17 @@ Imports:
     purrr,
     forcats,
     glue,
-    crayon,
     randtoolbox,
     copula,
     tidyr (>= 0.8.3),
     stringr,
-    logitnorm,
-    Matrix
+    Matrix,
+    igraph,
+    ggraph,
+    ggplot2,
+    ggdist (>= 2.1.1),
+    truncdist,
+    bayesplot
 LinkingTo: 
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),
@@ -46,15 +49,22 @@ LinkingTo:
     rstan (>= 2.18.1),
     StanHeaders (>= 2.18.0)
 SystemRequirements: GNU make
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
 Roxygen: list(markdown = TRUE)
 Suggests: 
     testthat (>= 2.1.0),
     knitr,
     rmarkdown,
     parallel,
-    bayesplot
+    R.rsp,
+    rprojroot,
+    loo (>= 2.0.0),
+    logitnorm,
+    crayon,
+    tidygraph
 RdMacros: Rdpack
 URL: http://github.com/dmphillippo/multinma
 BugReports: http://github.com/dmphillippo/multinma/issues
-VignetteBuilder: knitr
+VignetteBuilder: 
+    knitr,
+    R.rsp
