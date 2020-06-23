@@ -27,6 +27,7 @@ variance, or precision, with argument `prior_het_type`.
 * Feature: Plots of prior distributions vs. posterior distributions with
 `plot_prior_posterior()`.
 * Feature: Pairs plot method `pairs()`.
+* Feature: Added vignettes with example analyses from the NICE TSDs and more.
 * Fix: Random effects models with even moderate numbers of studies could be very
 slow. These now run much more quickly, using a sparse representation of the RE
 correlation matrix which is automatically enabled for sparsity above 90%
