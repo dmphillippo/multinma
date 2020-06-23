@@ -81,11 +81,18 @@ summary(normal(scale = 100))
 ```
 
 The model is fitted using the `nma()` function.
-```{r}
+```{r, eval=!params$run_tests}
 arm_fit_FE <- nma(arm_net, 
                   trt_effects = "fixed",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 10))
+```
+```{r, eval=params$run_tests, echo=FALSE}
+arm_fit_FE <- nma(arm_net, 
+                  trt_effects = "fixed",
+                  prior_intercept = normal(scale = 100),
+                  prior_trt = normal(scale = 10),
+                  iter = 10000)
 ```
 
 Basic parameter summaries are given by the `print()` method:
@@ -114,7 +121,7 @@ summary(half_normal(scale = 5))
 ```
 
 Fitting the RE model
-```{r}
+```{r, eval=!params$run_tests}
 arm_fit_RE <- nma(arm_net, 
                   seed = 379394727,
                   trt_effects = "random",
@@ -122,6 +129,16 @@ arm_fit_RE <- nma(arm_net,
                   prior_trt = normal(scale = 100),
                   prior_het = half_normal(scale = 5),
                   adapt_delta = 0.99)
+```
+```{r, eval=params$run_tests, echo=FALSE}
+arm_fit_RE <- nma(arm_net, 
+                  seed = 379394727,
+                  trt_effects = "random",
+                  prior_intercept = normal(scale = 100),
+                  prior_trt = normal(scale = 100),
+                  prior_het = half_normal(scale = 5),
+                  adapt_delta = 0.99,
+                  iter = 10000)
 ```
 
 We do see a small number of divergent transition errors, which cannot simply be removed by increasing the value of the `adapt_delta` argument (by default set to `0.95` for RE models).
@@ -259,10 +276,16 @@ summary(normal(scale = 100))
 ```
 
 The model is fitted using the `nma()` function.
-```{r}
+```{r, eval=!params$run_tests}
 contr_fit_FE <- nma(contr_net, 
                     trt_effects = "fixed",
                     prior_trt = normal(scale = 100))
+```
+```{r, eval=params$run_tests, echo=FALSE}
+contr_fit_FE <- nma(contr_net, 
+                    trt_effects = "fixed",
+                    prior_trt = normal(scale = 100),
+                    iter = 10000)
 ```
 
 Basic parameter summaries are given by the `print()` method:
@@ -285,13 +308,22 @@ summary(half_normal(scale = 5))
 ```
 
 Fitting the RE model
-```{r}
+```{r, eval=!params$run_tests}
 contr_fit_RE <- nma(contr_net, 
                     seed = 1150676438,
                     trt_effects = "random",
                     prior_trt = normal(scale = 100),
                     prior_het = half_normal(scale = 5),
                     adapt_delta = 0.99)
+```
+```{r, eval=params$run_tests, echo=FALSE}
+contr_fit_RE <- nma(contr_net, 
+                    seed = 1150676438,
+                    trt_effects = "random",
+                    prior_trt = normal(scale = 100),
+                    prior_het = half_normal(scale = 5),
+                    adapt_delta = 0.99,
+                    iter = 10000)
 ```
 
 We do see a small number of divergent transition errors, which cannot simply be removed by increasing the value of the `adapt_delta` argument (by default set to `0.95` for RE models).
@@ -444,11 +476,18 @@ summary(normal(scale = 100))
 ```
 
 The model is fitted using the `nma()` function.
-```{r}
+```{r, eval=!params$run_tests}
 mix_fit_FE <- nma(mix_net, 
                   trt_effects = "fixed",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 100))
+```
+```{r, eval=params$run_tests, echo=FALSE}
+mix_fit_FE <- nma(mix_net, 
+                  trt_effects = "fixed",
+                  prior_intercept = normal(scale = 100),
+                  prior_trt = normal(scale = 100),
+                  iter = 10000)
 ```
 
 Basic parameter summaries are given by the `print()` method:
@@ -477,7 +516,7 @@ summary(half_normal(scale = 5))
 ```
 
 Fitting the RE model
-```{r}
+```{r, eval=!params$run_tests}
 mix_fit_RE <- nma(mix_net, 
                   seed = 437219664,
                   trt_effects = "random",
@@ -485,6 +524,16 @@ mix_fit_RE <- nma(mix_net,
                   prior_trt = normal(scale = 100),
                   prior_het = half_normal(scale = 5),
                   adapt_delta = 0.99)
+```
+```{r, eval=params$run_tests, echo=FALSE}
+mix_fit_RE <- nma(mix_net, 
+                  seed = 437219664,
+                  trt_effects = "random",
+                  prior_intercept = normal(scale = 100),
+                  prior_trt = normal(scale = 100),
+                  prior_het = half_normal(scale = 5),
+                  adapt_delta = 0.99,
+                  iter=10000)
 ```
 
 We do see a small number of divergent transition errors, which cannot simply be removed by increasing the value of the `adapt_delta` argument (by default set to `0.95` for RE models).
@@ -798,14 +847,16 @@ reorder_net <- set_agd_contrast(park_reorder,
 reorder_fit_FE <- nma(reorder_net, 
                       seed = 1878819627,
                       trt_effects = "fixed",
-                      prior_trt = normal(scale = 100))
+                      prior_trt = normal(scale = 100),
+                      iter = 10000)
 
 reorder_fit_RE <- nma(reorder_net, 
                       seed = 1147315,
                       trt_effects = "random",
                       prior_trt = normal(scale = 100),
                       prior_het = half_normal(scale = 5),
-                      adapt_delta = 0.99)
+                      adapt_delta = 0.99,
+                      iter = 10000)
 
 expect_equivalent_nma_summary <- function(object, expected, ...) {
   
