@@ -2,6 +2,7 @@
 
 * Reduced size of vignettes
 * Added methods paper reference to DESCRIPTION
+* Added zenodo DOI
 
 # multinma 0.1.0
 
