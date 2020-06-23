@@ -56,10 +56,10 @@ the \link{ggdist} package. As a result, the output is very flexible. Any
 plotting stats provided by \code{ggdist} may be used, via the argument
 \code{stat}. The default uses
 \code{\link[ggdist:stat_pointinterval]{ggdist::stat_pointinterval()}}, to
-produce medians and 95\\% Credible Intervals with 66\\% inner bands.
+produce medians and 95\% Credible Intervals with 66\% inner bands.
 Additional arguments in \code{...} are passed to the \code{ggdist} stat, to
 customise the output. For example, to produce means and Credible Intervals,
-specify \code{point_interval = mean_qi}. To produce an 80\\% Credible Interval
+specify \code{point_interval = mean_qi}. To produce an 80\% Credible Interval
 with no inner band, specify \code{.width = c(0, 0.8)}.
 
 Alternative stats can be specified to produce different summaries. For

@@ -59,7 +59,7 @@ with treatment, these will differ by study population.
 }
 \details{
 The function \code{posterior_ranks()} produces posterior rankings, which
-have a distribution (e.g. mean/median rank and 95\\% Credible Interval). The
+have a distribution (e.g. mean/median rank and 95\% Credible Interval). The
 function \code{posterior_rank_probs()} produces rank probabilities, which give
 the posterior probabilities of being ranked first, second, etc. out of all
 treatments.
