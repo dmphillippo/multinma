@@ -1,4 +1,4 @@
-# multinma 0.0.2
+# multinma 0.1.0
 
 * Feature: Network plots, using a `plot()` method for `nma_data` objects.
 * Feature: `as.igraph()`, `as_tbl_graph()` methods for `nma_data` objects.
