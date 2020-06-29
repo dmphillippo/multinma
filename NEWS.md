@@ -1,5 +1,7 @@
 # multinma 0.1.2.9000
 
+* Format DESCRIPTION to CRAN requirements
+
 # multinma 0.1.2
 
 * Wrapped long-running examples in \donttest{} instead of \dontrun{}
