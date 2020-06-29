@@ -93,7 +93,7 @@ smk_net <- set_agd_arm(smoking,
 # Print details
 smk_net
 
-\dontrun{
+\donttest{
 # Fitting a random effects model
 smk_fit_RE <- nma(smk_net,
                   trt_effects = "random",
@@ -104,7 +104,7 @@ smk_fit_RE <- nma(smk_net,
 smk_fit_RE
 }
 
-\dontrun{
+\donttest{
 # Predicted log odds of success in each study in the network
 predict(smk_fit_RE)
 
@@ -191,7 +191,7 @@ pso_net <- add_integration(pso_net,
   psa = distr(qbern, prob = psa),
   n_int = 1000)
 
-\dontrun{
+\donttest{
 # Fitting a ML-NMR model.
 # Specify a regression model to include effect modifier interactions for five
 # covariates, along with main (prognostic) effects. We use a probit link and
@@ -214,7 +214,7 @@ pso_fit <- nma(pso_net,
                QR = TRUE)
 }
 
-\dontrun{
+\donttest{
 # Predicted probabilities of response in each study in the network
 (pso_pred <- predict(pso_fit, type = "response"))
 plot(pso_pred, ref_line = c(0, 1))

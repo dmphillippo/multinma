@@ -33,7 +33,7 @@
 #' ## Smoking cessation
 #' @template ex_smoking_network
 #' @template ex_smoking_nma_re
-#' @examples \dontrun{
+#' @examples \donttest{
 #' # Produce relative effects
 #' smk_releff_RE <- relative_effects(smk_fit_RE)
 #' smk_releff_RE
@@ -62,7 +62,7 @@
 #' @template ex_plaque_psoriasis_network
 #' @template ex_plaque_psoriasis_integration
 #' @template ex_plaque_psoriasis_mlnmr
-#' @examples \dontrun{
+#' @examples \donttest{
 #' # Produce population-adjusted relative effects for all study populations in
 #' # the network
 #' pso_releff <- relative_effects(pso_fit)

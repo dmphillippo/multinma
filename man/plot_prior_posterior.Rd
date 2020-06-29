@@ -64,7 +64,7 @@ smk_net <- set_agd_arm(smoking,
 # Print details
 smk_net
 
-\dontrun{
+\donttest{
 # Fitting a random effects model
 smk_fit_RE <- nma(smk_net,
                   trt_effects = "random",
@@ -75,7 +75,7 @@ smk_fit_RE <- nma(smk_net,
 smk_fit_RE
 }
 
-\dontrun{
+\donttest{
 # Plot prior vs. posterior, by default all parameters are plotted
 plot_prior_posterior(smk_fit_RE)
 

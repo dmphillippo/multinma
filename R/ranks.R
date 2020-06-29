@@ -41,7 +41,7 @@
 #' ## Smoking cessation
 #' @template ex_smoking_network
 #' @template ex_smoking_nma_re
-#' @examples \dontrun{
+#' @examples \donttest{
 #' # Produce posterior ranks
 #' smk_rank_RE <- posterior_ranks(smk_fit_RE, lower_better = FALSE)
 #' smk_rank_RE
@@ -68,7 +68,7 @@
 #' @template ex_plaque_psoriasis_network
 #' @template ex_plaque_psoriasis_integration
 #' @template ex_plaque_psoriasis_mlnmr
-#' @examples \dontrun{
+#' @examples \donttest{
 #' # Produce population-adjusted rankings for all study populations in
 #' # the network
 #'

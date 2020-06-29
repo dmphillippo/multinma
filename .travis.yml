@@ -15,7 +15,7 @@ addons:
     packages:
       - libgsl-dev
 env:
-  - CXX_OLEVEL=2 CXX=g++
+  - CXX_OLEVEL=2 CXX=g++ _R_CHECK_DONTTEST_EXAMPLES_=false
 
 before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y

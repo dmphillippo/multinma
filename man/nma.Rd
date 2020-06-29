@@ -130,7 +130,7 @@ smk_net <- set_agd_arm(smoking,
 # Print details
 smk_net
 
-\dontrun{
+\donttest{
 # Fitting a fixed effect model
 smk_fit_FE <- nma(smk_net,
               trt_effects = "fixed",
@@ -140,7 +140,7 @@ smk_fit_FE <- nma(smk_net,
 smk_fit_FE
 }
 
-\dontrun{
+\donttest{
 # Fitting a random effects model
 smk_fit_RE <- nma(smk_net,
                   trt_effects = "random",
@@ -151,7 +151,7 @@ smk_fit_RE <- nma(smk_net,
 smk_fit_RE
 }
 
-\dontrun{
+\donttest{
 # Fitting an unrelated mean effects (inconsistency) model
 smk_fit_RE_UME <- nma(smk_net,
                       consistency = "ume",
@@ -237,7 +237,7 @@ pso_net <- add_integration(pso_net,
   psa = distr(qbern, prob = psa),
   n_int = 1000)
 
-\dontrun{
+\donttest{
 # Fitting a ML-NMR model.
 # Specify a regression model to include effect modifier interactions for five
 # covariates, along with main (prognostic) effects. We use a probit link and

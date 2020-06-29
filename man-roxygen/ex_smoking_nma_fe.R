@@ -1,4 +1,4 @@
-#' @examples \dontrun{
+#' @examples \donttest{
 #' # Fitting a fixed effect model
 #' smk_fit_FE <- nma(smk_net,
 #'               trt_effects = "fixed",
