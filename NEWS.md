@@ -1,5 +1,7 @@
 # multinma 0.1.1.9000
 
+* Wrapped long-running examples in \donttest{} instead of \dontrun{}
+
 # multinma 0.1.1
 
 * Reduced size of vignettes
