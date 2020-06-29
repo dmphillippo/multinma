@@ -1,9 +1,10 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* Changed \dontrun{} to \donttest{} for long-running examples, as requested.
-* One example (for pairs.stan_nma) remains with \dontrun{}, as it is expected to
-produce warnings.
+* Used single quotes for 'Stan' in the DESCRIPTION file.
+* Confirmed that no vignettes, examples or tests run on more than two cores.
+Vignettes are provided as pre-compiled HTML files since they take a while to
+build. All examples and tests run on only one core on CRAN.
 
 ## Test environments
 * local R installation (windows), R 4.0.1, 4.0.2
