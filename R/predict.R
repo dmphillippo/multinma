@@ -55,7 +55,7 @@
 #' @examples ## Smoking cessation
 #' @template ex_smoking_network
 #' @template ex_smoking_nma_re
-#' @examples \dontrun{
+#' @examples \donttest{
 #' # Predicted log odds of success in each study in the network
 #' predict(smk_fit_RE)
 #'
@@ -73,7 +73,7 @@
 #' @template ex_plaque_psoriasis_network
 #' @template ex_plaque_psoriasis_integration
 #' @template ex_plaque_psoriasis_mlnmr
-#' @examples \dontrun{
+#' @examples \donttest{
 #' # Predicted probabilities of response in each study in the network
 #' (pso_pred <- predict(pso_fit, type = "response"))
 #' plot(pso_pred, ref_line = c(0, 1))

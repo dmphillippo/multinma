@@ -1,4 +1,4 @@
-#' @examples \dontrun{
+#' @examples \donttest{
 #' # Fitting an unrelated mean effects (inconsistency) model
 #' smk_fit_RE_UME <- nma(smk_net,
 #'                       consistency = "ume",

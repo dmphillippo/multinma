@@ -95,7 +95,7 @@ print.stan_nma <- function(x, ...) {
 #' ## Smoking cessation
 #' @template ex_smoking_network
 #' @template ex_smoking_nma_re
-#' @examples \dontrun{
+#' @examples \donttest{
 #' # Summary and plot of all model parameters
 #' summary(smk_fit_RE)
 #' plot(smk_fit_RE)
@@ -193,7 +193,7 @@ plot.stan_nma <- function(x, ...,
 #' ## Smoking cessation NMA
 #' @template ex_smoking_network
 #' @template ex_smoking_nma_re
-#' @examples \dontrun{
+#' @examples \donttest{
 #' # Plot prior vs. posterior, by default all parameters are plotted
 #' plot_prior_posterior(smk_fit_RE)
 #'
@@ -403,7 +403,7 @@ plot_prior_posterior <- function(x, ...,
 #' @template ex_plaque_psoriasis_network
 #' @template ex_plaque_psoriasis_integration
 #' @template ex_plaque_psoriasis_mlnmr
-#' @examples \dontrun{
+#' @examples \donttest{
 #' # Plot numerical integration error
 #' plot_integration_error(pso_fit)
 #' }

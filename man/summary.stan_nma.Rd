@@ -67,7 +67,7 @@ smk_net <- set_agd_arm(smoking,
 # Print details
 smk_net
 
-\dontrun{
+\donttest{
 # Fitting a random effects model
 smk_fit_RE <- nma(smk_net,
                   trt_effects = "random",
@@ -78,7 +78,7 @@ smk_fit_RE <- nma(smk_net,
 smk_fit_RE
 }
 
-\dontrun{
+\donttest{
 # Summary and plot of all model parameters
 summary(smk_fit_RE)
 plot(smk_fit_RE)

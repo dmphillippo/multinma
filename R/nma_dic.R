@@ -15,7 +15,7 @@
 #' @template ex_smoking_network
 #' @template ex_smoking_nma_fe
 #' @template ex_smoking_nma_re
-#' @examples \dontrun{
+#' @examples \donttest{
 #' # Compare DIC of FE and RE models
 #' (smk_dic_FE <- dic(smk_fit_FE))
 #' (smk_dic_RE <- dic(smk_fit_RE))   # substantially better fit
@@ -26,7 +26,7 @@
 #' # Check for inconsistency using UME model
 #' }
 #' @template ex_smoking_nma_re_ume
-#' @examples \dontrun{
+#' @examples \donttest{
 #' # Compare DIC
 #' smk_dic_RE
 #' (smk_dic_RE_UME <- dic(smk_fit_RE_UME))  # no difference in fit

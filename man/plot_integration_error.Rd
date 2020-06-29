@@ -121,7 +121,7 @@ pso_net <- add_integration(pso_net,
   psa = distr(qbern, prob = psa),
   n_int = 1000)
 
-\dontrun{
+\donttest{
 # Fitting a ML-NMR model.
 # Specify a regression model to include effect modifier interactions for five
 # covariates, along with main (prognostic) effects. We use a probit link and
@@ -144,7 +144,7 @@ pso_fit <- nma(pso_net,
                QR = TRUE)
 }
 
-\dontrun{
+\donttest{
 # Plot numerical integration error
 plot_integration_error(pso_fit)
 }

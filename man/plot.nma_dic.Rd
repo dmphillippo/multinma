@@ -75,7 +75,7 @@ smk_net <- set_agd_arm(smoking,
 # Print details
 smk_net
 
-\dontrun{
+\donttest{
 # Fitting a fixed effect model
 smk_fit_FE <- nma(smk_net,
               trt_effects = "fixed",
@@ -85,7 +85,7 @@ smk_fit_FE <- nma(smk_net,
 smk_fit_FE
 }
 
-\dontrun{
+\donttest{
 # Fitting a random effects model
 smk_fit_RE <- nma(smk_net,
                   trt_effects = "random",
@@ -96,7 +96,7 @@ smk_fit_RE <- nma(smk_net,
 smk_fit_RE
 }
 
-\dontrun{
+\donttest{
 # Compare DIC of FE and RE models
 (smk_dic_FE <- dic(smk_fit_FE))
 (smk_dic_RE <- dic(smk_fit_RE))   # substantially better fit
@@ -121,7 +121,7 @@ plot(smk_dic_RE, .width = c(0.6, 0.95)) +
 
 # Check for inconsistency using UME model
 }
-\dontrun{
+\donttest{
 # Fitting an unrelated mean effects (inconsistency) model
 smk_fit_RE_UME <- nma(smk_net,
                       consistency = "ume",
@@ -133,7 +133,7 @@ smk_fit_RE_UME <- nma(smk_net,
 smk_fit_RE_UME
 }
 
-\dontrun{
+\donttest{
 # Compare DIC
 smk_dic_RE
 (smk_dic_RE_UME <- dic(smk_fit_RE_UME))  # no difference in fit
