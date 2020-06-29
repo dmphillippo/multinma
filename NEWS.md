@@ -1,3 +1,5 @@
+# multinma 0.1.2.9000
+
 # multinma 0.1.2
 
 * Wrapped long-running examples in \donttest{} instead of \dontrun{}
