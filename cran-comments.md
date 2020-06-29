@@ -1,10 +1,9 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* Reduced the tarball size to under 5 MB (now 3.7 MB) by reducing the size of
-  the vignettes
-* Added methods reference Phillippo et al. (2020) <doi:10.1111/rssa.12579> to
-  the DESCRIPTION file
+* Changed \dontrun{} to \donttest{} for long-running examples, as requested.
+* One example (for pairs.stan_nma) remains with \dontrun{}, as it is expected to
+produce warnings.
 
 ## Test environments
 * local R installation (windows), R 4.0.1, 4.0.2
