@@ -194,7 +194,7 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #'                                            cumulative = TRUE)
 #' plot(smk_cumrankprob_RE)
 #'
-#' #' # Further customisation is possible with ggplot commands
+#' # Further customisation is possible with ggplot commands
 #' plot(smk_cumrankprob_RE) +
 #'   ggplot2::facet_null() +
 #'   ggplot2::aes(colour = Treatment)

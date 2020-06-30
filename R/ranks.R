@@ -58,7 +58,7 @@
 #' smk_cumrankprob_RE
 #' plot(smk_cumrankprob_RE)
 #'
-#' #' # Further customisation is possible with ggplot commands
+#' # Further customisation is possible with ggplot commands
 #' plot(smk_cumrankprob_RE) +
 #'   ggplot2::facet_null() +
 #'   ggplot2::aes(colour = Treatment)

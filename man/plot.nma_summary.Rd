@@ -122,7 +122,7 @@ smk_cumrankprob_RE <- posterior_rank_probs(smk_fit_RE, lower_better = FALSE,
                                            cumulative = TRUE)
 plot(smk_cumrankprob_RE)
 
-#' # Further customisation is possible with ggplot commands
+# Further customisation is possible with ggplot commands
 plot(smk_cumrankprob_RE) +
   ggplot2::facet_null() +
   ggplot2::aes(colour = Treatment)
