@@ -24,6 +24,7 @@ parameters {
   vector<lower=0>[narm_ipd] sigma;
 }
 transformed parameters {
+#include /include/transformed_parameters_theta.stan
 #include /include/transformed_parameters_common.stan
 
   // -- IPD model --

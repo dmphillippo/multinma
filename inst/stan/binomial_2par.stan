@@ -20,6 +20,7 @@ transformed parameters {
   vector[ni_agd_arm] theta2_agd_arm_bar;
   real<lower=0> nprime[ni_agd_arm];
   real<lower=0, upper=1> pprime[ni_agd_arm];
+#include /include/transformed_parameters_theta.stan
 #include /include/transformed_parameters_common.stan
 
   // -- IPD model --

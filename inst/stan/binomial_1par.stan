@@ -17,6 +17,7 @@ parameters {
 #include /include/parameters_common.stan
 }
 transformed parameters {
+#include /include/transformed_parameters_theta.stan
 #include /include/transformed_parameters_common.stan
 
   // -- IPD model --

@@ -21,6 +21,7 @@ transformed parameters {
   vector<lower=0>[ni_ipd] E_eta_ipd;
   vector<lower=0>[ni_agd_arm] E_theta_agd_arm;
 
+#include /include/transformed_parameters_theta.stan
 #include /include/transformed_parameters_common.stan
 
   // -- IPD model --

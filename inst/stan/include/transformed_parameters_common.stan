@@ -2,7 +2,7 @@
 
 // -- Linear and transformed predictors --
 vector[ni_ipd] eta_ipd; // IPD linear predictor
-vector[ni_ipd] theta_ipd; // IPD transformed predictor
+// vector[ni_ipd] theta_ipd; // IPD transformed predictor
 
 // -- RE deltas --
 // Avoid evaluating tau[1] when no RE (u_delta is zero dim in this case)
@@ -23,8 +23,8 @@ vector[nt - 1] d = allbeta[(totns +1):(totns + nt - 1)];
 vector[nX - totns - (nt - 1)] beta = allbeta[(totns + nt):];
 
 // -- AgD integration --
-vector[nint > 1 ? nint * ni_agd_arm : 0] theta_agd_arm_ii;
-vector[ni_agd_arm] theta_agd_arm_bar;
+// vector[nint > 1 ? nint * ni_agd_arm : 0] theta_agd_arm_ii;
+// vector[ni_agd_arm] theta_agd_arm_bar;
 vector[nint > 1 ? nint * ni_agd_contrast : 0] eta_agd_contrast_ii;
 vector[ni_agd_contrast] eta_agd_contrast_bar;
 
