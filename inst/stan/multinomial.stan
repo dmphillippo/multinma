@@ -18,7 +18,13 @@ data {
 
 }
 transformed data {
+  vector[ni_agd_arm] agd_arm_n; // AgD arm sample sizes
+
 #include /include/transformed_data_common.stan
+
+  for (i in 1:ni_agd_arm) {
+    agd_arm_n[i] = sum(agd_arm_r[i, ]);
+  }
 }
 parameters {
 #include /include/parameters_common.stan
@@ -241,27 +247,40 @@ model {
   }
 }
 generated quantities {
+  vector[ncat] fitted_ipd[ni_ipd];
+  vector[ncat] fitted_agd_arm[ni_agd_arm];
+  matrix[ni_agd_arm * n_int_thin, ncat] theta_bar_cum_agd_arm;
+
 #include /include/generated_quantities_common.stan
 
   // IPD log likelihood and residual deviance
   for (i in 1:ni_ipd) {
-    log_lik[i] = bernoulli_lpmf(ipd_r[i] | theta_ipd[i]);
+    log_lik[i] = categorical_lpmf(ipd_r[i] | theta_ipd[i]);
     resdev[i] = -2 * log_lik[i];
-    fitted[i] = theta_ipd[i];
+    fitted_ipd[i] = theta_ipd[i];
   }
 
   // AgD (arm-based) log likelihood and residual deviance
-  for (i in 1:ni_agd_arm) {
-    log_lik[ni_ipd + i] = binomial_lpmf(agd_arm_r[i] | agd_arm_n[i], theta_agd_arm_bar[i]);
-    resdev[ni_ipd + i] = 2 *
-      (lmultiply(agd_arm_r[i],
-                 agd_arm_r[i] / (agd_arm_n[i] * theta_agd_arm_bar[i])) +
-       lmultiply(agd_arm_n[i] - agd_arm_r[i],
-                 (agd_arm_n[i] - agd_arm_r[i]) / (agd_arm_n[i] - agd_arm_n[i] * theta_agd_arm_bar[i])));
-    fitted[ni_ipd + i] = agd_arm_n[i] * theta_agd_arm_bar[i];
+  {
+    vector[ncat] dv;
+    for (i in 1:ni_agd_arm) {
+      log_lik[ni_ipd + i] = multinomial_lpmf(agd_arm_r[i] | theta_agd_arm_bar[i]);
+      fitted_agd_arm[i] = agd_arm_n[i] * theta_agd_arm_bar[i];
 
-	  for (j in 1:n_int_thin) {
-      theta_bar_cum[(i-1)*n_int_thin + j] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);
+      // Multinomial residual deviance
+      for (k in 1:ncat) {
+        dv[k] = agd_arm_r[i, k] == 0 ? 0 : lmultiply(agd_arm_r[i, k], agd_arm_r[i, k] / fitted_agd_arm[i, k]);
+      }
+      resdev[ni_ipd + i] = 2 * sum(dv);
+    }
+  }
+
+  // Cumulative integration - note this is for the intermediate q
+  for (k in 1:(ncat - 1)) {
+    for (i in 1:ni_agd_arm) {
+      for (j in 1:n_int_thin) {
+        theta_bar_cum_agd_arm[(i - 1)*n_int_thin + j, k] = mean(theta_agd_arm_ii[(1 + (i - 1)*nint):((i - 1)*nint + j*int_thin), k]);
+      }
     }
   }
 
