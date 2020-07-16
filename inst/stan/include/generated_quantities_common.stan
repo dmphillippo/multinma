@@ -3,10 +3,10 @@
 // -- Log likelihood, residual deviance, fitted values --
 vector[ni_ipd + ni_agd_arm + ns_agd_contrast] log_lik;
 vector[ni_ipd + ni_agd_arm + ns_agd_contrast] resdev;
-vector[ni_ipd + ni_agd_arm + ni_agd_contrast] fitted;
+vector[ni_agd_contrast] fitted_agd_contrast;
 
 // -- Estimate integration error --
-vector[(ni_agd_arm + ni_agd_contrast) * n_int_thin] theta_bar_cum;
+  vector[ni_agd_contrast * n_int_thin] theta_bar_cum_agd_contrast;
 
 // -- RE shrunken estimate delta --
 // Note: These are the individual-level trial-specific treatment effects
@@ -34,19 +34,13 @@ if (RE) {
 }
 
 // Integration error for AgD
-for (i in 1:ni_agd_arm) {
-  for (j in 1:n_int_thin) {
-    theta_bar_cum[(i-1)*n_int_thin + j] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);
-  }
-}
-
 for (i in 1:ni_agd_contrast) {
   for (j in 1:n_int_thin) {
-    theta_bar_cum[ni_agd_arm + (i-1)*n_int_thin + j] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);
+    theta_bar_cum_agd_contrast[(i-1)*n_int_thin + j] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):((i-1)*nint + j*int_thin)]);
   }
-  // Fitted values
-  fitted[ni_ipd + ni_agd_arm + i] = eta_agd_contrast_bar[i];
 }
+// Fitted values
+fitted_agd_contrast = eta_agd_contrast_bar;
 
 // log likelihood, residual deviance for contrast-based AgD are *per study*
 {
