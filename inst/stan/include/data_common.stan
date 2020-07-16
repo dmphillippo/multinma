@@ -39,7 +39,7 @@ matrix[QR ? nX : 0, QR ? nX : 0] R_inv;
 
 // -- Offsets --
 int<lower=0, upper=1> has_offset; // Offset flag (yes = 1)
-vector[has_offset ? ni_ipd + nint * (ni_agd_arm + ni_agd_contrast) : 0] offset; // Vector of offsets
+vector[has_offset ? ni_ipd + nint * (ni_agd_arm + ni_agd_contrast) : 0] offsets; // Vector of offsets
 
 // -- Random effects --
 int<lower=0, upper=1> RE; // Random effects flag (yes = 1)

@@ -856,7 +856,7 @@ nma.fit <- function(ipd_x, ipd_y,
     R_inv = if (QR) X_all_R_inv else matrix(0, 0, 0),
     # Offsets
     has_offset = has_offsets,
-    offset = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric()
+    offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric()
     )
 
   # Add priors
