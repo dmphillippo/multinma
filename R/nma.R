@@ -462,11 +462,14 @@ nma <- function(network,
     agd_contrast_data_labels <- NULL
   }
 
-  data_labels <- c(ipd_data_labels,
-                   agd_arm_data_labels,
-                   agd_contrast_data_labels)
+  if (has_ipd(network))
+    fnames_oi[grepl("^fitted_ipd\\[[0-9]+\\]$", fnames_oi)] <- paste0("fitted_ipd[", ipd_data_labels, "]")
 
-  fnames_oi[grepl("^fitted\\[[0-9]+\\]$", fnames_oi)] <- paste0("fitted[", data_labels, "]")
+  if (has_agd_arm(network))
+    fnames_oi[grepl("^fitted_agd_arm\\[[0-9]+\\]$", fnames_oi)] <- paste0("fitted_agd_arm[", agd_arm_data_labels, "]")
+
+  if (has_agd_contrast(network))
+    fnames_oi[grepl("^fitted_agd_contrast\\[[0-9]+\\]$", fnames_oi)] <- paste0("fitted_agd_contrast[", agd_contrast_data_labels, "]")
 
   # Labels for RE deltas
   if (trt_effects == "random") {
@@ -521,13 +524,23 @@ nma <- function(network,
   # Labels for cumulative integration points
   if (inherits(network, "mlnmr_data") && (has_agd_arm(network) || has_agd_contrast(network))) {
     n_int_thin <- n_int %/% int_thin
-    cumint_labels <- c(rep(agd_arm_data_labels, each = n_int_thin),
-                       rep(agd_contrast_data_labels, each = n_int_thin))
-    cumint_labels <- paste0(cumint_labels, ", ", rep_len(1:n_int_thin * int_thin, length.out = length(cumint_labels)))
 
-    fnames_oi[grepl("^theta_bar_cum\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta_bar_cum[", cumint_labels, "]")
-    if (likelihood %in% c("bernoulli2", "binomial2"))
-      fnames_oi[grepl("^theta2_bar_cum\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta2_bar_cum[", cumint_labels, "]")
+    if (has_agd_arm(network)) {
+      agd_arm_cumint_labels <- rep(agd_arm_data_labels, each = n_int_thin)
+      agd_arm_cumint_labels <- paste0(agd_arm_cumint_labels, ", ", rep_len(1:n_int_thin * int_thin, length.out = length(agd_arm_cumint_labels)))
+
+      fnames_oi[grepl("^theta_bar_cum_agd_arm\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta_bar_cum_agd_arm[", agd_arm_cumint_labels, "]")
+      if (likelihood %in% c("bernoulli2", "binomial2"))
+        fnames_oi[grepl("^theta2_bar_cum\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta2_bar_cum[", agd_arm_cumint_labels, "]")
+    }
+
+    if (has_agd_contrast(network)) {
+      agd_contrast_cumint_labels <- rep(agd_contrast_data_labels, each = n_int_thin)
+      agd_contrast_cumint_labels <- paste0(agd_contrast_cumint_labels, ", ", rep_len(1:n_int_thin * int_thin, length.out = length(agd_contrast_cumint_labels)))
+
+      fnames_oi[grepl("^theta_bar_cum_agd_contrast\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta_bar_cum_agd_contrast[", agd_contrast_cumint_labels, "]")
+    }
+
   }
 
   stanfit@sim$fnames_oi <- fnames_oi
