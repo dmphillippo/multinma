@@ -56,8 +56,13 @@ print.stan_nma <- function(x, ...) {
   dots <- list(...)
   include <- "pars" %in% names(dots)
   dots <- rlang::dots_list(x = sf,
-                           pars = c("log_lik", "resdev", "fitted",
-                                    "theta_bar_cum", "theta2_bar_cum",
+                           pars = c("log_lik", "resdev",
+                                    "fitted_ipd",
+                                    "fitted_agd_arm",
+                                    "fitted_agd_contrast",
+                                    "theta_bar_cum_agd_arm",
+                                    "theta_bar_cum_agd_contrast",
+                                    "theta2_bar_cum",
                                     "mu", "delta"),
                            include = include,
                            use_cache = FALSE,
