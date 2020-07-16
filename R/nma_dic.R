@@ -40,14 +40,13 @@ dic <- function(x, ...) {
   net <- x$network
 
   resdev <- colMeans(as.matrix(x, pars = "resdev"))
-  fitted <- colMeans(as.matrix(x, pars = "fitted"))
 
   resdev_array <- as.array(x, pars = "resdev")
 
   if (has_ipd(net)) {
     n_ipd <- nrow(net$ipd)
     resdev_ipd <- resdev[1:n_ipd]
-    fitted_ipd <- fitted[1:n_ipd]
+    fitted_ipd <- colMeans(as.matrix(x, pars = "fitted_ipd"))
   } else {
     n_ipd <- 0
   }
@@ -55,7 +54,7 @@ dic <- function(x, ...) {
   if (has_agd_arm(net)) {
     n_agd_arm <- nrow(net$agd_arm)
     resdev_agd_arm <- resdev[n_ipd + (1:n_agd_arm)]
-    fitted_agd_arm <- fitted[n_ipd + (1:n_agd_arm)]
+    fitted_agd_arm <- colMeans(as.matrix(x, pars = "fitted_agd_arm"))
   } else {
     n_agd_arm <- 0
   }
@@ -67,7 +66,7 @@ dic <- function(x, ...) {
     nf_agd_contrast <- nrow(dplyr::filter(net$agd_contrast, !is.na(.data$.y)))
 
     resdev_agd_contrast <- resdev[n_ipd + n_agd_arm + (1:nr_agd_contrast)]
-    fitted_agd_contrast <- fitted[n_ipd + n_agd_arm + (1:nf_agd_contrast)]
+    fitted_agd_contrast <- colMeans(as.matrix(x, pars = "fitted_agd_contrast"))
   } else {
     nr_agd_contrast <- nf_agd_contrast <- 0
   }
