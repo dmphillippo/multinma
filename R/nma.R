@@ -878,8 +878,12 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Standard pars to monitor
   pars <- c("mu", "beta", "d",
-            "log_lik", "resdev", "fitted",
+            "log_lik", "resdev",
             "lp__")
+
+  if (has_ipd) pars <- c(pars, "fitted_ipd")
+  if (has_agd_arm) pars <- c(pars, "fitted_agd_arm")
+  if (has_agd_contrast) pars <- c(pars, "fitted_agd_contrast")
 
   # Monitor heterogeneity SD and study deltas if RE model
   if (trt_effects == "random") {
@@ -887,7 +891,8 @@ nma.fit <- function(ipd_x, ipd_y,
   }
   # Monitor cumulative integration error if using numerical integration
   if (n_int > 1) {
-    pars <- c(pars, "theta_bar_cum")
+    if (has_agd_arm) pars <- c(pars, "theta_bar_cum_agd_arm")
+    if (has_agd_contrast) pars <- c(pars, "theta_bar_cum_agd_contrast")
   }
 
   # Set adapt_delta, but respect other control arguments if passed in ...
