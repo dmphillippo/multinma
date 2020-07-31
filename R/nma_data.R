@@ -133,7 +133,8 @@ set_ipd <- function(data,
     d <- tibble::add_column(d, .r = .r, .E = .E)
   }
 
-  d <- dplyr::bind_cols(d, data)
+  drop_reserved <- setdiff(colnames(data), colnames(d))
+  d <- dplyr::bind_cols(d, data[, drop_reserved, drop = FALSE])
 
   # Drop original study and treatment columns
   d <- drop_original(d, data, enquo(study))
@@ -306,7 +307,8 @@ set_agd_arm <- function(data,
   if (!is.null(.sample_size)) d <- tibble::add_column(d, .sample_size = .sample_size)
 
   # Bind in original data
-  d <- dplyr::bind_cols(d, data)
+  drop_reserved <- setdiff(colnames(data), colnames(d))
+  d <- dplyr::bind_cols(d, data[, drop_reserved, drop = FALSE])
 
   # Drop original study and treatment columns
   d <- drop_original(d, data, enquo(study))
@@ -511,7 +513,8 @@ set_agd_contrast <- function(data,
   }
 
   # Bind in original data
-  d <- dplyr::bind_cols(d, data)
+  drop_reserved <- setdiff(colnames(data), colnames(d))
+  d <- dplyr::bind_cols(d, data[, drop_reserved, drop = FALSE])
 
   # Drop original study and treatment columns
   d <- drop_original(d, data, enquo(study))
@@ -789,13 +792,18 @@ pull_non_null <- function(data, var) {
 #' @noRd
 drop_original <- function(data, orig_data, var) {
   e_var <- rlang::quo_get_expr(var)
-  if (rlang::is_symbolic(e_var)) { # Mutate expression, don't drop
-    return(data)
-  } else if (rlang::is_integerish(e_var)) { # Integer column number, drop based on original location
+  if (rlang::is_symbol(e_var)) {
+    # Character/bare column name, drop unless protected name (starts with dot)
+    if (stringr::str_starts(rlang::as_name(e_var), "\\.")) return(data)
+    else return(dplyr::select(data, - {{ var }}))
+  } else if (rlang::is_integerish(e_var)) {
+    # Integer column number, drop based on original location
     orig_var <- colnames(orig_data)[e_var]
-    return(dplyr::select(data, - {{ orig_var }}))
-  } else { # Character/bare column name, drop
-    return(dplyr::select(data, - {{ var }}))
+    if (stringr::str_starts(orig_var, "\\.")) return(data)
+    else return(dplyr::select(data, - {{ orig_var }}))
+  } else {
+    # Mutate expression, don't drop
+    return(data)
   }
 }
 

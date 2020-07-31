@@ -301,6 +301,22 @@ test_that("set_* `.study` column is correct", {
                agd_arm$studyf)
   expect_equal(set_agd_contrast(agd_contrast, factor(studyc), trtc, y = ydiff, se = sediff)$agd_contrast$.study,
                agd_contrast$studyf)
+
+  # Check reserved column names handled correctly
+  aa <- mutate(agd_arm, .study = studyc)
+  ac <- mutate(agd_contrast, .study = studyc)
+  expect_equal(set_ipd(aa, .study, trtc, y = cont)$ipd$.study,
+               agd_arm$studyf)
+  expect_equal(set_agd_arm(aa, .study, trtc, y = cont, se = cont_pos)$agd_arm$.study,
+               agd_arm$studyf)
+  expect_equal(set_agd_contrast(ac, .study, trtc, y = ydiff, se = sediff)$agd_contrast$.study,
+               agd_contrast$studyf)
+  expect_equal(set_ipd(aa, 22, trtc, y = cont)$ipd$.study,
+               agd_arm$studyf)
+  expect_equal(set_agd_arm(aa, 22, trtc, y = cont, se = cont_pos)$agd_arm$.study,
+               agd_arm$studyf)
+  expect_equal(set_agd_contrast(ac, 28, trtc, y = ydiff, se = sediff)$agd_contrast$.study,
+               agd_contrast$studyf)
 })
 
 test_that("set_* return default `treatments` factor", {
