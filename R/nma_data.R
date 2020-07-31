@@ -136,9 +136,9 @@ set_ipd <- function(data,
   d <- dplyr::bind_cols(d, data)
 
   # Drop original study and treatment columns
-  if (!rlang::is_symbolic(rlang::enexpr(study))) d <- dplyr::select(d, - {{ study }})
-  if (!rlang::is_symbolic(rlang::enexpr(trt))) d <- dplyr::select(d, - {{ trt }})
-  if (!is.null(.trtclass) && !rlang::is_symbolic(rlang::enexpr(trt_class))) d <- dplyr::select(d, - {{ trt_class }})
+  d <- drop_original(d, data, enquo(study))
+  d <- drop_original(d, data, enquo(trt))
+  if (!is.null(.trtclass)) d <- drop_original(d, data, enquo(trt_class))
 
   # Produce nma_data object
   out <- structure(
@@ -309,9 +309,9 @@ set_agd_arm <- function(data,
   d <- dplyr::bind_cols(d, data)
 
   # Drop original study and treatment columns
-  if (!rlang::is_symbolic(rlang::enexpr(study))) d <- dplyr::select(d, - {{ study }})
-  if (!rlang::is_symbolic(rlang::enexpr(trt))) d <- dplyr::select(d, - {{ trt }})
-  if (!is.null(.trtclass) && !rlang::is_symbolic(rlang::enexpr(trt_class))) d <- dplyr::select(d, - {{ trt_class }})
+  d <- drop_original(d, data, enquo(study))
+  d <- drop_original(d, data, enquo(trt))
+  if (!is.null(.trtclass)) d <- drop_original(d, data, enquo(trt_class))
 
   # Produce nma_data object
   out <- structure(
@@ -514,9 +514,9 @@ set_agd_contrast <- function(data,
   d <- dplyr::bind_cols(d, data)
 
   # Drop original study and treatment columns
-  if (!rlang::is_symbolic(rlang::enexpr(study))) d <- dplyr::select(d, - {{ study }})
-  if (!rlang::is_symbolic(rlang::enexpr(trt))) d <- dplyr::select(d, - {{ trt }})
-  if (!is.null(.trtclass) && !rlang::is_symbolic(rlang::enexpr(trt_class))) d <- dplyr::select(d, - {{ trt_class }})
+  d <- drop_original(d, data, enquo(study))
+  d <- drop_original(d, data, enquo(trt))
+  if (!is.null(.trtclass)) d <- drop_original(d, data, enquo(trt_class))
 
   # Make sure rows from each study are next to each other (required for Stan resdev/log_lik code)
   d <- dplyr::mutate(d, .study_inorder = forcats::fct_inorder(.data$.study)) %>%
@@ -775,6 +775,28 @@ pull_non_null <- function(data, var) {
     else return(dplyr::pull(data, {{ var }}))
   }
   else return(NULL)
+}
+
+#' Drop variables from original data set
+#'
+#' Allows for combination of pull and mutate semantics - doesn't drop mutated
+#' results, handles integer column references
+#'
+#' @param data data frame after transformation
+#' @param orig_data original data frame
+#' @param var quosure for variable to drop
+#'
+#' @noRd
+drop_original <- function(data, orig_data, var) {
+  e_var <- rlang::quo_get_expr(var)
+  if (rlang::is_symbolic(e_var)) { # Mutate expression, don't drop
+    return(data)
+  } else if (rlang::is_integerish(e_var)) { # Integer column number, drop based on original location
+    orig_var <- colnames(orig_data)[e_var]
+    return(dplyr::select(data, - {{ orig_var }}))
+  } else { # Character/bare column name, drop
+    return(dplyr::select(data, - {{ var }}))
+  }
 }
 
 #' Get outcome type

@@ -251,6 +251,13 @@ test_that("set_* `.trt` column is correct", {
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff)$agd_contrast$.trt,
                agd_contrast$trtf)
 
+  expect_equal(set_ipd(agd_arm, studyc, 5, y = cont)$ipd$.trt,
+               agd_arm$trtf)
+  expect_equal(set_agd_arm(agd_arm, studyc, 5, y = cont, se = cont_pos)$agd_arm$.trt,
+               agd_arm$trtf)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, 5, y = ydiff, se = sediff)$agd_contrast$.trt,
+               agd_contrast$trtf)
+
   expect_equal(set_ipd(agd_arm, studyc, "trtc", y = cont)$ipd$.trt,
                agd_arm$trtf)
   expect_equal(set_agd_arm(agd_arm, studyc, "trtc", y = cont, se = cont_pos)$agd_arm$.trt,
@@ -272,6 +279,13 @@ test_that("set_* `.study` column is correct", {
   expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos)$agd_arm$.study,
                agd_arm$studyf)
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff)$agd_contrast$.study,
+               agd_contrast$studyf)
+
+  expect_equal(set_ipd(agd_arm, 2, trtc, y = cont)$ipd$.study,
+               agd_arm$studyf)
+  expect_equal(set_agd_arm(agd_arm, 2, trtc, y = cont, se = cont_pos)$agd_arm$.study,
+               agd_arm$studyf)
+  expect_equal(set_agd_contrast(agd_contrast, 2, trtc, y = ydiff, se = sediff)$agd_contrast$.study,
                agd_contrast$studyf)
 
   expect_equal(set_ipd(agd_arm, "studyc", trtc, y = cont)$ipd$.study,
@@ -353,6 +367,25 @@ test_that("set_* returns correct .trtclass column", {
                agd_arm$tclassf)
   expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
                                 trt_class = tclassc))$agd_contrast$.trtclass,
+               agd_contrast$tclassf)
+
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
+                       trt_class = 8)$ipd$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = 8)$agd_arm$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = 8)$agd_contrast$.trtclass,
+               agd_contrast$tclassf)
+  expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
+                                       trt_class = 8))$ipd$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(combine_network(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                                           trt_class = 8))$agd_arm$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                                trt_class = 8))$agd_contrast$.trtclass,
                agd_contrast$tclassf)
 
   # Checks when default trt_ref not first in sort order
