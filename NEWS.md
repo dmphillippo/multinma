@@ -1,5 +1,8 @@
 # multinma 0.1.3.9000
 
+* Feature: The `set_*()` functions now accept `dplyr::mutate()` style semantics,
+allowing inline variable transformations.
+
 # multinma 0.1.3
 
 * Format DESCRIPTION to CRAN requirements
