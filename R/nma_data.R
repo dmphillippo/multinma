@@ -67,11 +67,13 @@ set_ipd <- function(data,
 
   # Pull study and treatment columns
   if (missing(study)) abort("Specify `study`")
-  .study <- dplyr::pull(data, {{ study }})
+  .study <- pull_non_null(data, enquo(study))
+  if (is.null(.study)) abort("`study` cannot be NULL")
   if (any(is.na(.study))) abort("`study` cannot contain missing values")
 
   if (missing(trt)) abort("Specify `trt`")
-  .trt <- dplyr::pull(data, {{ trt }})
+  .trt <- pull_non_null(data, enquo(trt))
+  if (is.null(.trt)) abort("`trt` cannot be NULL")
   if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
 
   # Treatment classes
@@ -133,8 +135,9 @@ set_ipd <- function(data,
   d <- dplyr::bind_cols(d, data)
 
   # Drop original study and treatment columns
-  d <- dplyr::select(d, - {{ study }}, - {{ trt }})
-  if (!is.null(.trtclass)) d <- dplyr::select(d, - {{ trt_class }})
+  if (!rlang::is_symbolic(rlang::enexpr(study))) d <- dplyr::select(d, - {{ study }})
+  if (!rlang::is_symbolic(rlang::enexpr(trt))) d <- dplyr::select(d, - {{ trt }})
+  if (!is.null(.trtclass) && !rlang::is_symbolic(rlang::enexpr(trt_class))) d <- dplyr::select(d, - {{ trt_class }})
 
   # Produce nma_data object
   out <- structure(
@@ -224,11 +227,13 @@ set_agd_arm <- function(data,
 
   # Pull study and treatment columns
   if (missing(study)) abort("Specify `study`")
-  .study <- dplyr::pull(data, {{ study }})
+  .study <- pull_non_null(data, enquo(study))
+  if (is.null(.study)) abort("`study` cannot be NULL")
   if (any(is.na(.study))) abort("`study` cannot contain missing values")
 
   if (missing(trt)) abort("Specify `trt`")
-  .trt <- dplyr::pull(data, {{ trt }})
+  .trt <- pull_non_null(data, enquo(trt))
+  if (is.null(.trt)) abort("`trt` cannot be NULL")
   if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
 
   # Treatment classes
@@ -301,8 +306,9 @@ set_agd_arm <- function(data,
   d <- dplyr::bind_cols(d, data)
 
   # Drop original study and treatment columns
-  d <- dplyr::select(d, - {{ study }}, - {{ trt }})
-  if (!is.null(.trtclass)) d <- dplyr::select(d, - {{ trt_class }})
+  if (!rlang::is_symbolic(rlang::enexpr(study))) d <- dplyr::select(d, - {{ study }})
+  if (!rlang::is_symbolic(rlang::enexpr(trt))) d <- dplyr::select(d, - {{ trt }})
+  if (!is.null(.trtclass) && !rlang::is_symbolic(rlang::enexpr(trt_class))) d <- dplyr::select(d, - {{ trt_class }})
 
   # Produce nma_data object
   out <- structure(
@@ -406,11 +412,13 @@ set_agd_contrast <- function(data,
 
   # Pull study and treatment columns
   if (missing(study)) abort("Specify `study`")
-  .study <- dplyr::pull(data, {{ study }})
+  .study <- pull_non_null(data, enquo(study))
+  if (is.null(.study)) abort("`study` cannot be NULL")
   if (any(is.na(.study))) abort("`study` cannot contain missing values")
 
   if (missing(trt)) abort("Specify `trt`")
-  .trt <- dplyr::pull(data, {{ trt }})
+  .trt <- pull_non_null(data, enquo(trt))
+  if (is.null(.trt)) abort("`trt` cannot be NULL")
   if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
 
 
@@ -501,8 +509,9 @@ set_agd_contrast <- function(data,
   d <- dplyr::bind_cols(d, data)
 
   # Drop original study and treatment columns
-  d <- dplyr::select(d, - {{ study }}, - {{ trt }})
-  if (!is.null(.trtclass)) d <- dplyr::select(d, - {{ trt_class }})
+  if (!rlang::is_symbolic(rlang::enexpr(study))) d <- dplyr::select(d, - {{ study }})
+  if (!rlang::is_symbolic(rlang::enexpr(trt))) d <- dplyr::select(d, - {{ trt }})
+  if (!is.null(.trtclass) && !rlang::is_symbolic(rlang::enexpr(trt_class))) d <- dplyr::select(d, - {{ trt_class }})
 
   # Make sure rows from each study are next to each other (required for Stan resdev/log_lik code)
   d <- dplyr::mutate(d, .study_inorder = forcats::fct_inorder(.data$.study)) %>%
@@ -747,13 +756,19 @@ combine_network <- function(..., trt_ref) {
 
 #' Pull non-null variables from data
 #'
+#' Allows mutate syntax, e.g. factor(study) or sqrt(var)
+#' Uses pull for variable names as strings or integer positions
+#'
 #' @param data data frame
 #' @param var quosure (possibly NULL) for variable to pull
 #'
 #' @noRd
 pull_non_null <- function(data, var) {
   var_null <- rlang::quo_is_missing(var) | rlang::quo_is_null(var)
-  if (!var_null) return(dplyr::pull(data, {{ var }}))
+  if (!var_null) {
+    if (rlang::is_symbolic(rlang::quo_get_expr(var))) return(dplyr::pull(dplyr::transmute(data, {{ var }})))
+    else return(dplyr::pull(data, {{ var }}))
+  }
   else return(NULL)
 }
 
