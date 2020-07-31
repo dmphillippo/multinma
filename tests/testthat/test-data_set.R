@@ -78,8 +78,11 @@ test_that("set_agd_arm - continuous outcome checks work", {
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont), "Specify standard error")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", se = cont_pos), "Specify continuous outcome `y`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = trtc, se = cont_pos), "must be numeric")
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = as.character(trtn), se = cont_pos), "must be numeric")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = trtc), "must be numeric")
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = as.character(trtn)), "must be numeric")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = cont_neg), "must be positive")
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = -cont), "must be positive")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = cont_inf), "cannot be infinite")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = cont_nan), "cannot be NaN")
   expect_equivalent(
@@ -95,25 +98,45 @@ test_that("set_agd_arm - count outcome checks work", {
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = cont, n = disc), "must be integer")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = cont), "must be integer")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc_neg, n = disc), "must be between 0 and `n`")
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = -disc, n = disc), "must be between 0 and `n`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc_p1, n = disc), "must be between 0 and `n`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_neg), "greater than zero")
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = -disc), "greater than zero")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", E = cont_pos), "Specify outcome count `r`")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = cont_neg), "must be positive")
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = -cont), "must be positive")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = trtc), "must be numeric")
+  expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = as.character(trtn)), "must be numeric")
   expect_equivalent(
     set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1)$agd_arm[, c(".r", ".n")],
     transmute(agd_arm, .r = disc, .n = disc_p1))
   expect_equivalent(
+    set_agd_arm(agd_arm, "studyn", "trtc", r = "disc", n = "disc_p1")$agd_arm[, c(".r", ".n")],
+    transmute(agd_arm, .r = disc, .n = disc_p1))
+  expect_equivalent(
+    set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc + 1)$agd_arm[, c(".r", ".n")],
+    transmute(agd_arm, .r = disc, .n = disc_p1))
+  expect_equivalent(
+    set_agd_arm(agd_arm, "studyn", "trtc", r = floor(disc/2), n = disc)$agd_arm[, c(".r", ".n")],
+    transmute(agd_arm, .r = floor(disc/2), .n = disc))
+  expect_equivalent(
     set_agd_arm(agd_arm, "studyn", "trtc", r = disc, E = cont_pos)$agd_arm[, c(".r", ".E")],
+    transmute(agd_arm, .r = disc, .E = cont_pos))
+  expect_equivalent(
+    set_agd_arm(agd_arm, "studyn", "trtc", r = "disc", E = "cont_pos")$agd_arm[, c(".r", ".E")],
     transmute(agd_arm, .r = disc, .E = cont_pos))
 })
 
 test_that("set_agd_arm - sample size checks work", {
   expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = trtc),
                "must be numeric")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = as.character(trtn)),
+               "must be numeric")
   expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = cont),
                "must be integer")
   expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = disc_neg),
+               "must be greater than zero")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = -disc),
                "must be greater than zero")
   expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = disc_inf),
                "cannot be infinite")
@@ -121,25 +144,43 @@ test_that("set_agd_arm - sample size checks work", {
                "cannot be NaN")
   expect_message(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos), "`sample_size` not provided")
   expect_equal(set_agd_arm(agd_arm, studyn, trtc, r = disc, n = disc_p1)$agd_arm$.sample_size, agd_arm$disc_p1)
+  expect_equal(set_agd_arm(agd_arm, studyn, trtc, r = floor(disc/2), n = disc, sample_size = disc + 1)$agd_arm$.sample_size, agd_arm$disc_p1)
 })
 
 test_that("set_ipd - continuous outcome checks work", {
   expect_error(set_ipd(agd_arm, "studyn", "trtc", y = trtc), "must be numeric")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", y = as.character(trtn)), "must be numeric")
   expect_equivalent(
     set_ipd(agd_arm, "studyn", "trtc", y = cont)$ipd[, ".y"],
     transmute(agd_arm, .y = cont))
+  expect_equivalent(
+    set_ipd(agd_arm, "studyn", "trtc", y = "cont")$ipd[, ".y"],
+    transmute(agd_arm, .y = cont))
+  expect_equivalent(
+    set_ipd(agd_arm, "studyn", "trtc", y = cont/2)$ipd[, ".y"],
+    transmute(agd_arm, .y = cont/2))
 })
 
 test_that("set_ipd - binary outcome checks work", {
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = trtc), "must be numeric")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", r = as.character(trtn)), "must be numeric")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = cont), "must equal 0 or 1")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = disc_neg), "must equal 0 or 1")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin + 1), "must equal 0 or 1")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", E = cont_pos), "Specify count `r`")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = cont_neg), "must be positive")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = -cont), "must be positive")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = trtc), "must be numeric")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = as.character(trtn)), "must be numeric")
   expect_equivalent(
     set_ipd(agd_arm, "studyn", "trtc", r = bin, E = cont_pos)$ipd[, c(".r", ".E")],
     transmute(agd_arm, .r = bin, .E = cont_pos))
+  expect_equivalent(
+    set_ipd(agd_arm, "studyn", "trtc", r = "bin", E = "cont_pos")$ipd[, c(".r", ".E")],
+    transmute(agd_arm, .r = bin, .E = cont_pos))
+  expect_equivalent(
+    set_ipd(agd_arm, "studyn", "trtc", r = bin, E = cont_pos/2)$ipd[, c(".r", ".E")],
+    transmute(agd_arm, .r = bin, .E = cont_pos/2))
 })
 
 # Dummy contrast data
@@ -157,23 +198,36 @@ test_that("set_agd_contrast - continuous outcome checks work", {
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff), "Specify standard error")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", se = sediff), "Specify continuous outcome `y`")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff_chr, se = sediff), "must be numeric")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = as.character(ydiff), se = sediff), "must be numeric")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = trtc), "must be numeric")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = as.character(sediff)), "must be numeric")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = cont_neg), "must be positive")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = -cont), "must be positive")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = cont_inf), "cannot be infinite")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = cont_nan), "cannot be NaN")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = trtn, se = sediff), "without a specified baseline arm")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff_multi, se = sediff), "Multiple baseline arms")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = sediff_miss), "Standard error.+missing values on baseline arms")
-  expect_equivalent(    set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = sediff)$agd_contrast[, c(".y", ".se")],
-    transmute(agd_contrast, .y = ydiff, .se = sediff))
+  expect_equivalent(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = sediff)$agd_contrast[, c(".y", ".se")],
+                    transmute(agd_contrast, .y = ydiff, .se = sediff))
+  expect_equivalent(set_agd_contrast(agd_contrast, "studyn", "trtc", y = "ydiff", se = "sediff")$agd_contrast[, c(".y", ".se")],
+                    transmute(agd_contrast, .y = ydiff, .se = sediff))
+  expect_equivalent(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff/2, se = sediff)$agd_contrast[, c(".y", ".se")],
+                    transmute(agd_contrast, .y = ydiff/2, .se = sediff))
 })
 
 test_that("set_agd_contrast - sample size checks work", {
   expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = trtc),
                "must be numeric")
+  expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = as.character(trtn)),
+               "must be numeric")
   expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = cont),
                "must be integer")
+  expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = cont/2),
+               "must be integer")
   expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = disc_neg),
+               "must be greater than zero")
+  expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = -disc),
                "must be greater than zero")
   expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = disc_inf),
                "cannot be infinite")
@@ -196,6 +250,20 @@ test_that("set_* `.trt` column is correct", {
                agd_arm$trtf)
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff)$agd_contrast$.trt,
                agd_contrast$trtf)
+
+  expect_equal(set_ipd(agd_arm, studyc, "trtc", y = cont)$ipd$.trt,
+               agd_arm$trtf)
+  expect_equal(set_agd_arm(agd_arm, studyc, "trtc", y = cont, se = cont_pos)$agd_arm$.trt,
+               agd_arm$trtf)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, "trtc", y = ydiff, se = sediff)$agd_contrast$.trt,
+               agd_contrast$trtf)
+
+  expect_equal(set_ipd(agd_arm, studyc, factor(trtc), y = cont)$ipd$.trt,
+               agd_arm$trtf)
+  expect_equal(set_agd_arm(agd_arm, studyc, factor(trtc), y = cont, se = cont_pos)$agd_arm$.trt,
+               agd_arm$trtf)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, factor(trtc), y = ydiff, se = sediff)$agd_contrast$.trt,
+               agd_contrast$trtf)
 })
 
 test_that("set_* `.study` column is correct", {
@@ -204,6 +272,20 @@ test_that("set_* `.study` column is correct", {
   expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos)$agd_arm$.study,
                agd_arm$studyf)
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff)$agd_contrast$.study,
+               agd_contrast$studyf)
+
+  expect_equal(set_ipd(agd_arm, "studyc", trtc, y = cont)$ipd$.study,
+               agd_arm$studyf)
+  expect_equal(set_agd_arm(agd_arm, "studyc", trtc, y = cont, se = cont_pos)$agd_arm$.study,
+               agd_arm$studyf)
+  expect_equal(set_agd_contrast(agd_contrast, "studyc", trtc, y = ydiff, se = sediff)$agd_contrast$.study,
+               agd_contrast$studyf)
+
+  expect_equal(set_ipd(agd_arm, factor(studyc), trtc, y = cont)$ipd$.study,
+               agd_arm$studyf)
+  expect_equal(set_agd_arm(agd_arm, factor(studyc), trtc, y = cont, se = cont_pos)$agd_arm$.study,
+               agd_arm$studyf)
+  expect_equal(set_agd_contrast(agd_contrast, factor(studyc), trtc, y = ydiff, se = sediff)$agd_contrast$.study,
                agd_contrast$studyf)
 })
 
@@ -309,6 +391,25 @@ test_that("set_* returns classes factor variable", {
   expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_class = tclassc))$classes,
                f_class)
 
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
+                       trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"))$classes,
+               f_class)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"))$classes,
+               f_class)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"))$classes,
+               f_class)
+  expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
+                                       trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")))$classes,
+               f_class)
+  expect_equal(combine_network(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")))$classes,
+               f_class)
+  expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                                trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")))$classes,
+               f_class)
+
   f_class2 <- factor(c("b", "a", "b"), levels = c("b", "a"))
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = tclassc, trt_ref = "B")$classes,
@@ -329,6 +430,31 @@ test_that("set_* returns classes factor variable", {
                                 trt_class = tclassc), trt_ref = "B")$classes,
                f_class2)
 
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
+                       trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
+                       trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
+                           trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
+                                trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
+                                       trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
+                               trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
+                               trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                                trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
+                               trt_ref = "B")$classes,
+               f_class2)
+
   # Checks when default trt_ref not first in sort order
   expect_equal(set_ipd(aa, studyc, trtc, y = cont,
                        trt_class = tclassc)$classes,
@@ -347,6 +473,31 @@ test_that("set_* returns classes factor variable", {
                f_class2)
   expect_equal(combine_network(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
                                 trt_class = tclassc))$classes,
+               f_class2)
+
+  expect_equal(set_ipd(aa, studyc, trtc, y = cont,
+                       trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
+                       trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
+                           trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
+                                trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_ipd(aa, studyc, trtc, y = cont,
+                                       trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
+                               trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
+                                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
+                               trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
+                                                trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
+                               trt_ref = "B")$classes,
                f_class2)
 })
 
