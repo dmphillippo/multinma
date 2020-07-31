@@ -14,6 +14,7 @@
 #' @export
 #'
 #' @template args-details_trt_ref
+#' @template args-details_mutate
 #'
 #' @seealso [set_agd_arm()] for arm-based aggregate data, [set_agd_contrast()]
 #'   for contrast-based aggregate data, and [combine_network()] for combining
@@ -191,6 +192,8 @@ set_ipd <- function(data,
 #' If a Binomial outcome is specified and `sample_size` is omitted, `n` will be
 #' used as the sample size by default.
 #'
+#' @template args-details_mutate
+#'
 #' @seealso [set_ipd()] for individual patient data, [set_agd_contrast()] for
 #'   contrast-based aggregate data, and [combine_network()] for combining
 #'   several data sources in one network.
@@ -358,6 +361,8 @@ set_agd_arm <- function(data,
 #'   standard error of the mean outcome on the reference arm (this determines
 #'   the covariance of the relative effects, when expressed as differences in
 #'   mean outcomes between arms).
+#'
+#' @template args-details_mutate
 #'
 #' @template args-details_trt_ref
 #' @template args-details_sample_size

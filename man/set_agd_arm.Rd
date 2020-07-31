@@ -78,6 +78,13 @@ etc. for studies in the network when a regression model is given
 
 If a Binomial outcome is specified and \code{sample_size} is omitted, \code{n} will be
 used as the sample size by default.
+
+All arguments specifying columns of \code{data} accept the following:
+\itemize{
+\item A column name as a character string, e.g. \code{study = "studyc"}
+\item A bare column name, e.g. \code{study = studyc}
+\item \code{dplyr::mutate()} style semantics for inline variable transformations, e.g. \code{study = paste(author, year)}
+}
 }
 \examples{
 # Set up network of smoking cessation data
