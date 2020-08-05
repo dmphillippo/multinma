@@ -157,6 +157,7 @@ predict.stan_nma <- function(object, ...,
       else
         newdata$.study <- nfactor("New 1")
     } else {
+      check_study(.study)
       newdata <- dplyr::mutate(newdata, .study = nfactor(.study))
     }
   }

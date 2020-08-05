@@ -95,6 +95,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
     if (is.null(.study)) {
       newdata$.study <- nfactor(paste("New", seq_len(nrow(newdata))))
     } else {
+      check_study(.study)
       newdata <- dplyr::mutate(newdata, .study = nfactor(.study))
 
       if (anyDuplicated(newdata$.study))

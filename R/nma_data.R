@@ -70,12 +70,12 @@ set_ipd <- function(data,
   if (missing(study)) abort("Specify `study`")
   .study <- pull_non_null(data, enquo(study))
   if (is.null(.study)) abort("`study` cannot be NULL")
-  if (any(is.na(.study))) abort("`study` cannot contain missing values")
+  check_study(.study)
 
   if (missing(trt)) abort("Specify `trt`")
   .trt <- pull_non_null(data, enquo(trt))
   if (is.null(.trt)) abort("`trt` cannot be NULL")
-  if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
+  check_trt(.trt)
 
   # Treatment classes
   .trtclass <- pull_non_null(data, enquo(trt_class))
@@ -233,12 +233,12 @@ set_agd_arm <- function(data,
   if (missing(study)) abort("Specify `study`")
   .study <- pull_non_null(data, enquo(study))
   if (is.null(.study)) abort("`study` cannot be NULL")
-  if (any(is.na(.study))) abort("`study` cannot contain missing values")
+  check_study(.study)
 
   if (missing(trt)) abort("Specify `trt`")
   .trt <- pull_non_null(data, enquo(trt))
   if (is.null(.trt)) abort("`trt` cannot be NULL")
-  if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
+  check_trt(.trt)
 
   # Treatment classes
   .trtclass <- pull_non_null(data, enquo(trt_class))
@@ -421,12 +421,12 @@ set_agd_contrast <- function(data,
   if (missing(study)) abort("Specify `study`")
   .study <- pull_non_null(data, enquo(study))
   if (is.null(.study)) abort("`study` cannot be NULL")
-  if (any(is.na(.study))) abort("`study` cannot contain missing values")
+  check_study(.study)
 
   if (missing(trt)) abort("Specify `trt`")
   .trt <- pull_non_null(data, enquo(trt))
   if (is.null(.trt)) abort("`trt` cannot be NULL")
-  if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
+  check_trt(.trt)
 
 
   # Treatment classes
@@ -979,6 +979,31 @@ check_sample_size <- function(sample_size) {
     if (any(is.infinite(sample_size)))
       abort("Sample size `sample_size` cannot be infinite")
 }
+
+#' Check treatment column
+#'
+#' @param trt Treatment vector
+#'
+#' @noRd
+check_trt <- function(trt) {
+  if (any(is.na(trt)))
+    abort("`trt` cannot contain missing values")
+  if (rlang::is_list(trt) || !is.null(dim(trt)))
+    abort("`trt` must be a regular column (not a list or matrix column)")
+}
+
+#' Check study column
+#'
+#' @param study Treatment vector
+#'
+#' @noRd
+check_study <- function(study) {
+  if (any(is.na(study)))
+    abort("`study` cannot contain missing values")
+  if (rlang::is_list(study) || !is.null(dim(study)))
+    abort("`study` must be a regular column (not a list or matrix column)")
+}
+
 
 #' Check treatment class coding
 #'
