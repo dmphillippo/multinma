@@ -24,7 +24,7 @@ test_that("set_* error if data does not inherit data.frame", {
   expect_error(set_agd_contrast(vec), msg)
 })
 
-test_that("set_* error if study not given or missing values", {
+test_that("set_* error if study not given, missing values, or not regular 1D column", {
   expect_error(set_ipd(smoking), "Specify `study`")
   expect_error(set_agd_arm(smoking), "Specify `study`")
   expect_error(set_agd_contrast(smoking), "Specify `study`")
@@ -34,9 +34,16 @@ test_that("set_* error if study not given or missing values", {
   expect_error(set_ipd(smk_miss, "studyn", "trtc"), "cannot contain missing values")
   expect_error(set_agd_arm(smk_miss, "studyn", "trtc"), "cannot contain missing values")
   expect_error(set_agd_contrast(smk_miss, "studyn", "trtc"), "cannot contain missing values")
+
+  expect_error(set_ipd(smoking, cbind(studyn, studyn)), "must be a regular column")
+  expect_error(set_ipd(smoking, list(studyn)), "must be a regular column")
+  expect_error(set_agd_arm(smoking, cbind(studyn, studyn)), "must be a regular column")
+  expect_error(set_agd_arm(smoking, list(studyn)), "must be a regular column")
+  expect_error(set_agd_contrast(smoking, cbind(studyn, studyn)), "must be a regular column")
+  expect_error(set_agd_contrast(smoking, list(studyn)), "must be a regular column")
 })
 
-test_that("set_* error if trt not given or missing values", {
+test_that("set_* error if trt not given, missing values, or not regular 1D column", {
   expect_error(set_ipd(smoking, "studyn"), "Specify `trt`")
   expect_error(set_agd_arm(smoking, "studyn"), "Specify `trt`")
   expect_error(set_agd_contrast(smoking, "studyn"), "Specify `trt`")
@@ -46,6 +53,13 @@ test_that("set_* error if trt not given or missing values", {
   expect_error(set_ipd(smk_miss, "studyn", "trtc"), "cannot contain missing values")
   expect_error(set_agd_arm(smk_miss, "studyn", "trtc"), "cannot contain missing values")
   expect_error(set_agd_contrast(smk_miss, "studyn", "trtc"), "cannot contain missing values")
+
+  expect_error(set_ipd(smoking, studyn, cbind(trtc, trtc)), "must be a regular column")
+  expect_error(set_ipd(smoking, studyn, list(trtc)), "must be a regular column")
+  expect_error(set_agd_arm(smoking, studyn, cbind(trtc, trtc)), "must be a regular column")
+  expect_error(set_agd_arm(smoking, studyn, list(trtc)), "must be a regular column")
+  expect_error(set_agd_contrast(smoking, studyn, cbind(trtc, trtc)), "must be a regular column")
+  expect_error(set_agd_contrast(smoking, studyn, list(trtc)), "must be a regular column")
 })
 
 # Dummy data
@@ -85,6 +99,10 @@ test_that("set_agd_arm - continuous outcome checks work", {
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = -cont), "must be positive")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = cont_inf), "cannot be infinite")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = cont_nan), "cannot be NaN")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cbind(cont, cont), se = cont_pos),
+               "must be a regular column")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cbind(cont_pos, cont_pos)),
+               "must be a regular column")
   expect_equivalent(
     set_agd_arm(agd_arm, "studyn", "trtc", y = cont, se = cont_pos)$agd_arm[, c(".y", ".se")],
     transmute(agd_arm, .y = cont, .se = cont_pos))
@@ -107,6 +125,9 @@ test_that("set_agd_arm - count outcome checks work", {
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = -cont), "must be positive")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = trtc), "must be numeric")
   expect_error(set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1, E = as.character(trtn)), "must be numeric")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, r = cbind(disc, disc), n = disc_p1), "must be a regular column")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, r = disc, n = cbind(disc_p1, disc_p1)), "must be a regular column")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, r = disc, E = cbind(cont_pos, cont_pos)), "must be a regular column")
   expect_equivalent(
     set_agd_arm(agd_arm, "studyn", "trtc", r = disc, n = disc_p1)$agd_arm[, c(".r", ".n")],
     transmute(agd_arm, .r = disc, .n = disc_p1))
@@ -142,6 +163,10 @@ test_that("set_agd_arm - sample size checks work", {
                "cannot be infinite")
   expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = disc_nan),
                "cannot be NaN")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = cbind(disc, disc)),
+               "must be a regular column")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = list(disc)),
+               "must be a regular column")
   expect_message(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos), "`sample_size` not provided")
   expect_equal(set_agd_arm(agd_arm, studyn, trtc, r = disc, n = disc_p1)$agd_arm$.sample_size, agd_arm$disc_p1)
   expect_equal(set_agd_arm(agd_arm, studyn, trtc, r = floor(disc/2), n = disc, sample_size = disc + 1)$agd_arm$.sample_size, agd_arm$disc_p1)
@@ -150,6 +175,8 @@ test_that("set_agd_arm - sample size checks work", {
 test_that("set_ipd - continuous outcome checks work", {
   expect_error(set_ipd(agd_arm, "studyn", "trtc", y = trtc), "must be numeric")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", y = as.character(trtn)), "must be numeric")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", y = cbind(cont, cont)), "must be a regular column")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", y = list(cont)), "must be a regular column")
   expect_equivalent(
     set_ipd(agd_arm, "studyn", "trtc", y = cont)$ipd[, ".y"],
     transmute(agd_arm, .y = cont))
@@ -172,6 +199,9 @@ test_that("set_ipd - binary outcome checks work", {
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = -cont), "must be positive")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = trtc), "must be numeric")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = as.character(trtn)), "must be numeric")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", r = cbind(bin, bin)), "must be a regular column")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", r = cbind(bin, bin), E = cont_pos), "must be a regular column")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, E = cbind(cont_pos, cont_pos)), "must be a regular column")
   expect_equivalent(
     set_ipd(agd_arm, "studyn", "trtc", r = bin, E = cont_pos)$ipd[, c(".r", ".E")],
     transmute(agd_arm, .r = bin, .E = cont_pos))
@@ -208,6 +238,8 @@ test_that("set_agd_contrast - continuous outcome checks work", {
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = trtn, se = sediff), "without a specified baseline arm")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff_multi, se = sediff), "Multiple baseline arms")
   expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = sediff_miss), "Standard error.+missing values on baseline arms")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = cbind(ydiff, ydiff), se = sediff), "must be a regular column")
+  expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = cbind(sediff, sediff)), "must be a regular column")
   expect_equivalent(set_agd_contrast(agd_contrast, "studyn", "trtc", y = ydiff, se = sediff)$agd_contrast[, c(".y", ".se")],
                     transmute(agd_contrast, .y = ydiff, .se = sediff))
   expect_equivalent(set_agd_contrast(agd_contrast, "studyn", "trtc", y = "ydiff", se = "sediff")$agd_contrast[, c(".y", ".se")],
@@ -233,6 +265,10 @@ test_that("set_agd_contrast - sample size checks work", {
                "cannot be infinite")
   expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = disc_nan),
                "cannot be NaN")
+  expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = cbind(disc, disc)),
+               "must be a regular column")
+  expect_error(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff, sample_size = list(disc)),
+               "must be a regular column")
   expect_message(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff), "`sample_size` not provided")
 })
 
@@ -570,6 +606,11 @@ test_that("set_* checks for bad class variable work", {
   expect_error(set_ipd(aa2, studyc, trtc, y = cont, trt_class = tclassc), m2)
   expect_error(set_agd_arm(aa2, studyc, trtc, y = cont, se = cont_pos, trt_class = tclassc), m2)
   expect_error(set_agd_contrast(ac2, studyc, trtc, y = ydiff, se = sediff, trt_class = tclassc), m2)
+
+  m3 <- "must be a regular column"
+  expect_error(set_ipd(agd_arm, studyc, trtc, y = cont, trt_class = cbind(trtc, trtc)), m3)
+  expect_error(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_class = cbind(trtc, trtc)), m3)
+  expect_error(set_agd_contrast(agd_contrast, studyc, trtc, y = cont, se = cont_pos, trt_class = cbind(trtc, trtc)), m3)
 })
 
 test_that("set_* return `studies` factor", {

@@ -440,7 +440,12 @@ set_agd_contrast <- function(data,
   .se <- pull_non_null(data, enquo(se))
 
   if (is.null(.y)) abort("Specify continuous outcome `y`")
+  if (rlang::is_list(.y) || !is.null(dim(.y)))
+    abort("Continuous outcome `y` must be a regular column (not a list or matrix column)")
+
   if (is.null(.se)) abort("Specify standard error `se`")
+  if (rlang::is_list(.se) || !is.null(dim(.se)))
+    abort("Standard error `se` must be a regular column (not a list or matrix column)")
 
   # Pull and check sample size
   .sample_size <- pull_non_null(data, enquo(sample_size))
@@ -841,6 +846,10 @@ check_outcome_continuous <- function(y, se = NULL, with_se = TRUE, append = NULL
 
   if (with_se) {
     if (!null_y && !null_se) {
+      if (rlang::is_list(y) || !is.null(dim(y)))
+        abort("Continuous outcome `y` must be a regular column (not a list or matrix column)")
+      if (rlang::is_list(se) || !is.null(dim(se)))
+        abort("Standard error `se` must be a regular column (not a list or matrix column)")
       if (!is.numeric(y)) abort(paste0("Continuous outcome `y` must be numeric", append))
       if (!is.numeric(se)) abort(paste0("Standard error `se` must be numeric", append))
       if (any(is.nan(se))) abort(paste0("Standard error `se` cannot be NaN", append))
@@ -855,6 +864,8 @@ check_outcome_continuous <- function(y, se = NULL, with_se = TRUE, append = NULL
     invisible(list(y = y, se = se))
   } else {
     if (!null_y) {
+      if (rlang::is_list(y) || !is.null(dim(y)))
+        abort("Continuous outcome `y` must be a regular column (not a list or matrix column)")
       if (any(is.na(y))) abort(paste0("Continuous outcome `y` contains missing values", append))
       if (!is.numeric(y)) abort(paste0("Continuous outcome `y` must be numeric", append))
     }
@@ -875,6 +886,8 @@ check_outcome_count <- function(r, n, E) {
   null_E <- is.null(E)
 
   if (!null_n) {
+    if (rlang::is_list(n) || !is.null(dim(n)))
+      abort("Denominator `n` must be a regular column (not a list or matrix column)")
     if (!is.numeric(n)) abort("Denominator `n` must be numeric")
     if (any(is.na(n))) abort("Denominator `n` contains missing values")
     if (any(n != trunc(n))) abort("Denominator `n` must be integer-valued")
@@ -883,6 +896,8 @@ check_outcome_count <- function(r, n, E) {
   }
 
   if (!null_E) {
+    if (rlang::is_list(E) || !is.null(dim(E)))
+      abort("Time at risk `E` must be a regular column (not a list or matrix column)")
     if (!is.numeric(E)) abort("Time at risk `E` must be numeric")
     if (any(is.na(E))) abort("Time at risk `E` contains missing values")
     if (any(E <= 0)) abort("Time at risk `E` must be positive")
@@ -890,6 +905,8 @@ check_outcome_count <- function(r, n, E) {
   }
 
   if (!null_r) {
+    if (rlang::is_list(r) || !is.null(dim(r)))
+      abort("Outcome count `r` must be a regular column (not a list or matrix column)")
     if (null_n && null_E) abort("Specify denominator `n` (count outcome) or time at risk `E` (rate outcome)")
     if (!is.numeric(r)) abort("Outcome count `r` must be numeric")
     if (any(is.na(r))) abort("Outcome count `r` contains missing values")
@@ -915,6 +932,10 @@ check_outcome_binary <- function(r, E) {
     if (null_r) {
       abort("Specify count `r` for rate outcome")
     } else {
+      if (rlang::is_list(r) || !is.null(dim(r)))
+        abort("Rate outcome count `r` must be a regular column (not a list or matrix column)")
+      if (rlang::is_list(E) || !is.null(dim(E)))
+        abort("Time at risk `E` must be a regular column (not a list or matrix column)")
       if (!is.numeric(E)) abort("Time at risk `E` must be numeric")
       if (any(is.na(E))) abort("Time at risk `E` contains missing values")
       if (any(E <= 0)) abort("Time at risk `E` must be positive")
@@ -924,6 +945,8 @@ check_outcome_binary <- function(r, E) {
       if (any(r < 0)) abort("Rate outcome count `r` must be non-negative integer")
     }
   } else if (!null_r) {
+    if (rlang::is_list(r) || !is.null(dim(r)))
+      abort("Binary outcome `r` must be a regular column (not a list or matrix column)")
     if (!is.numeric(r)) abort("Binary outcome `r` must be numeric")
     if (any(is.na(r))) abort("Binary outcome `r` contains missing values")
     if (any(! r %in% c(0, 1))) abort("Binary outcome `r` must equal 0 or 1")
@@ -966,18 +989,20 @@ check_outcome_combination <- function(outcomes) {
 #'
 #' @noRd
 check_sample_size <- function(sample_size) {
-    if (!is.numeric(sample_size))
-      abort("Sample size `sample_size` must be numeric")
-    if (any(is.nan(sample_size)))
-      abort("Sample size `sample_size` cannot be NaN")
-    if (any(is.na(sample_size)))
-      abort("Sample size `sample_size` contains missing values")
-    if (any(sample_size != trunc(sample_size)))
-      abort("Sample size `sample_size` must be integer-valued")
-    if (any(sample_size <= 0))
-      abort("Sample size `sample_size` must be greater than zero")
-    if (any(is.infinite(sample_size)))
-      abort("Sample size `sample_size` cannot be infinite")
+  if (rlang::is_list(sample_size) || !is.null(dim(sample_size)))
+    abort("Sample size `sample_size` must be a regular column (not a list or matrix column)")
+  if (!is.numeric(sample_size))
+    abort("Sample size `sample_size` must be numeric")
+  if (any(is.nan(sample_size)))
+    abort("Sample size `sample_size` cannot be NaN")
+  if (any(is.na(sample_size)))
+    abort("Sample size `sample_size` contains missing values")
+  if (any(sample_size != trunc(sample_size)))
+    abort("Sample size `sample_size` must be integer-valued")
+  if (any(sample_size <= 0))
+    abort("Sample size `sample_size` must be greater than zero")
+  if (any(is.infinite(sample_size)))
+    abort("Sample size `sample_size` cannot be infinite")
 }
 
 #' Check treatment column
@@ -1012,6 +1037,8 @@ check_study <- function(study) {
 #'
 #' @noRd
 check_trt_class <- function(trt_class, trt) {
+  if (rlang::is_list(trt_class) || !is.null(dim(trt_class)))
+    abort("`trt_class` must be a regular column (not a list or matrix column)")
   if (any(is.na(trt)))
     abort("`trt` cannot contain missing values")
   if (any(is.na(trt_class)))
