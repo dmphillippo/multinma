@@ -767,6 +767,91 @@ combine_network <- function(..., trt_ref) {
   return(out)
 }
 
+#' Multinomial outcome data
+#'
+#' This function aids the specification of multinomial outcome data when setting
+#' up a network with [set_agd_arm()] or [set_ipd()]. It takes a set of columns
+#' (or, more generally, numeric vectors of the same length) of outcome counts in
+#' each category, and binds these together to produce a matrix.
+#'
+#' @param ... Two or more numeric columns (or vectors) of category counts.
+#'   Argument names (optional) will be used to label the categories.
+#' @param inclusive Logical, are ordered category counts inclusive (`TRUE`) or
+#'   exclusive (`FALSE`)? Default `FALSE`. Only used when `ordered = TRUE`. See details.
+#' @param type String, indicating whether categories are `"ordered"` or
+#'   `"competing"`. Currently only ordered categorical outcomes are supported by
+#'   the modelling functions in this package.
+#'
+#' @details When specifying ordered categorical counts, these can either be
+#'   given as *exclusive* counts (`inclusive = FALSE`, the default) where
+#'   individuals are only counted in the highest category they achieve, or
+#'   *inclusive* counts (`inclusive = TRUE`) where individuals are counted in
+#'   every category up to and including the highest category achieved.
+#'   (Competing outcomes, by nature, are always specified as exclusive counts.)
+#'
+#' @return A matrix of (exclusive) category counts
+#' @export
+#'
+#' @examples
+multi <- function(..., inclusive = FALSE, type = c("ordered", "competing")) {
+  # Argument checks
+  if (!rlang::is_bool(inclusive)) abort("`inclusive` must be a logical value TRUE/FALSE")
+  type <- rlang::arg_match(type)
+
+  if (type == "competing" && inclusive) {
+    warn("Ignoring inclusive = TRUE, competing outcomes are always given by exclusive counts.")
+    inclusive <- FALSE
+  }
+
+  # Collect dots
+  # We take this route via quosures to simplify automatic naming
+  q_dots <- rlang::enquos(..., .named = TRUE)
+
+  if (length(q_dots) < 2) abort("At least 2 outcomes must be specified in `...`")
+
+  if (anyDuplicated(names(q_dots))) {
+    dups <- unique(names(q_dots)[duplicated(names(q_dots))])
+    abort(glue::glue("Duplicate outcome category labels ",
+                     glue::glue_collapse(glue::double_quote(dups), sep = ", ", last = " and "),
+                     "."))
+  }
+
+  # Construct outcome matrix
+  dots <- purrr::map(q_dots, rlang::eval_tidy)
+
+  if (length(unique(lengths(dots))) > 1) abort("Input vectors in `...` are not the same length.")
+
+  out <- do.call(cbind, dots)
+
+  # Check counts
+  if (!is.numeric(out)) abort("Categorical outcome count must be numeric")
+  if (any(is.na(out))) abort("Categorical outcome count contains missing values")
+  if (any(out != trunc(out))) abort("Categorical outcome count must be integer-valued")
+  if (any(out < 0)) abort("Categorical outcome count must be non-negative")
+
+  if (inclusive) {
+    if (any(non_decreasing <- apply(out, 1, diff) > 0)) {
+      non_decreasing_rows <- which(apply(non_decreasing, 2, any))
+      abort(glue::glue("Inclusive ordered outcome counts must be decreasing or constant across increasing categories.\n",
+                       "Increasing counts found in row{if (length(non_decreasing_rows) > 1) 's' else ''} ",
+                       glue::glue_collapse(non_decreasing_rows, sep = ", ", width = 10, last = " and "), "."))
+    }
+
+    # Store internally as exclusive counts
+    for (j in 1:(ncol(out) - 1)) {
+      out[, j] <- out[, j] - out[, j+1]
+    }
+  }
+
+  # Transform inclusive to exclusive counts
+
+  class(out) <- c(switch(type,
+                         ordered = "multi_ordered",
+                         competing = "multi_competing"),
+                  class(out))
+  return(out)
+}
+
 #' Pull non-null variables from data
 #'
 #' Allows mutate syntax, e.g. factor(study) or sqrt(var)
