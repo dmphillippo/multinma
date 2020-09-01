@@ -1095,7 +1095,10 @@ check_outcome_combination <- function(outcomes) {
          ipd = c("rate", NA)),
     list(agd_arm = c("continuous", NA),
          agd_contrast = c("continuous", NA),
-         ipd = c("continuous", NA))
+         ipd = c("continuous", NA)),
+    list(agd_arm = c("ordered", NA),
+         agd_contrast = c("continuous", NA),
+         ipd = c("ordered", NA))
   )
 
   if (!any(purrr::map_lgl(valid,
