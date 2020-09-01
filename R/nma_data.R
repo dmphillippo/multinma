@@ -92,8 +92,16 @@ set_ipd <- function(data,
   check_outcome_continuous(.y, with_se = FALSE)
 
   if (!is.null(.r) && inherits(.r, c("multi_ordered", "multi_competing"))) {
-    # Most checks are carried out by multi()
-    if (any(! .r %in% c(0, 1))) abort("Multinomial outcome `r` must be either 0 or 1")
+    # Most checks are carried out by multi(), some additional checks here specific to IPD
+    if (any(! .r %in% c(0, 1))) abort("Multinomial outcome `r` must equal 0 or 1")
+    if (any(r_zero_rows <- rowSums(.r) == 0))
+      abort(glue::glue("Individual{if (sum(r_zero_rows) > 1) 's' else ''} without outcomes in any category, ",
+                       "row{if (sum(r_zero_rows) > 1) 's' else ''} ",
+                       glue::glue_collapse(which(r_zero_rows), sep = ", ", last = " and "), "."))
+    if (any(r_multi_rows <- rowSums(.r) > 1))
+      abort(glue::glue("Individual{if (sum(r_multi_rows) > 1) 's' else ''} with outcomes in more than one category, ",
+                       "row{if (sum(r_multi_rows) > 1) 's' else ''} ",
+                       glue::glue_collapse(which(r_multi_rows), sep = ", ", last = " and "), "."))
   } else {
     check_outcome_binary(.r, .E)
   }
