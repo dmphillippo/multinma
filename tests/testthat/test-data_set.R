@@ -84,6 +84,7 @@ agd_arm <- tibble(
   disc_neg = -disc,
   disc_inf = c(disc[1:4], Inf),
   disc_nan = c(disc[1:4], NaN),
+  disc_na = c(disc[1:4], NA),
   bin = rbinom(5, 1, 0.5)
   #Surv =
 )
@@ -148,6 +149,52 @@ test_that("set_agd_arm - count outcome checks work", {
     transmute(agd_arm, .r = disc, .E = cont_pos))
 })
 
+
+multi_inclusive <- tribble(~r_a, ~r_b, ~r_c,
+                           1, 1, 1,
+                           5, 4, 1,
+                           5, 2, 2,
+                           10, 5, 0,
+                           6, 0, 0)
+agd_arm_multi_i <- bind_cols(agd_arm, multi_inclusive)
+
+multi_exclusive <- tribble(~r_a, ~r_b, ~r_c,
+                           0, 0, 1,
+                           1, 3, 1,
+                           3, 0, 2,
+                           5, 5, 0,
+                           6, 0, 0)
+agd_arm_multi_e <- bind_cols(agd_arm, multi_exclusive)
+
+test_that("set_agd_arm - multinomial outcome checks work", {
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc)),
+               "At least 2 outcomes", class = "error")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, disc)),
+               "Duplicate outcome category labels", class = "error")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, 1:2)),
+               "not the same length", class = "error")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, disc_inf)),
+               "cannot be Inf", class = "error")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, disc_nan)),
+               "cannot be NaN", class = "error")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, disc_na)),
+               "contains missing values", class = "error")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, trtc)),
+               "must be numeric", class = "error")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, cont_pos)),
+               "must be integer", class = "error")
+  expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, disc_neg)),
+               "must be non-negative", class = "error")
+
+  expect_error(set_agd_arm(agd_arm_multi_i, studyn, trtc, r = multi(r_c, r_b, r_a, inclusive = TRUE)),
+               "must be decreasing or constant", class = "error")
+  expect_equivalent(unclass(set_agd_arm(agd_arm_multi_i, studyn, trtc, r = multi(r_a, r_b, r_c, inclusive = TRUE))$agd_arm$.r),
+                    as.matrix(multi_exclusive))
+
+  expect_equivalent(unclass(set_agd_arm(agd_arm_multi_e, studyn, trtc, r = multi(r_a, r_b, r_c, inclusive = FALSE))$agd_arm$.r),
+                    as.matrix(multi_exclusive))
+})
+
 test_that("set_agd_arm - sample size checks work", {
   expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = trtc),
                "must be numeric")
@@ -168,8 +215,11 @@ test_that("set_agd_arm - sample size checks work", {
   expect_error(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos, sample_size = list(disc)),
                "must be a regular column")
   expect_message(set_agd_arm(agd_arm, studyn, trtc, y = cont, se = cont_pos), "`sample_size` not provided")
+
   expect_equal(set_agd_arm(agd_arm, studyn, trtc, r = disc, n = disc_p1)$agd_arm$.sample_size, agd_arm$disc_p1)
   expect_equal(set_agd_arm(agd_arm, studyn, trtc, r = floor(disc/2), n = disc, sample_size = disc + 1)$agd_arm$.sample_size, agd_arm$disc_p1)
+  expect_equal(set_agd_arm(agd_arm_multi_i, studyn, trtc, r = multi(r_a, r_b, r_c, inclusive = TRUE))$agd_arm$.sample_size, multi_inclusive$r_a)
+  expect_equal(set_agd_arm(agd_arm_multi_e, studyn, trtc, r = multi(r_a, r_b, r_c, inclusive = FALSE))$agd_arm$.sample_size, multi_inclusive$r_a)
 })
 
 test_that("set_ipd - continuous outcome checks work", {
@@ -211,6 +261,57 @@ test_that("set_ipd - binary outcome checks work", {
   expect_equivalent(
     set_ipd(agd_arm, "studyn", "trtc", r = bin, E = cont_pos/2)$ipd[, c(".r", ".E")],
     transmute(agd_arm, .r = bin, .E = cont_pos/2))
+})
+
+test_that("set_ipd - multinomial outcome checks work", {
+  expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(bin)),
+               "At least 2 outcomes", class = "error")
+  expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(bin, bin)),
+               "Duplicate outcome category labels", class = "error")
+  expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(bin, 1:2)),
+               "not the same length", class = "error")
+  expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(disc, disc_inf)),
+               "cannot be Inf", class = "error")
+  expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(disc, disc_nan)),
+               "cannot be NaN", class = "error")
+  expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(disc, disc_na)),
+               "contains missing values", class = "error")
+  expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(disc, trtc)),
+               "must be numeric", class = "error")
+  expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(bin, bin + 1)),
+               "must equal 0 or 1", class = "error")
+  expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(bin, -bin)),
+               "must be non-negative", class = "error")
+
+  i_multi_inclusive <- tribble(~r_a, ~r_b, ~r_c,
+                               1, 1, 1,
+                               1, 1, 0,
+                               1, 0, 0,
+                               1, 1, 0,
+                               1, 0, 0)
+  ipd_multi_i <- bind_cols(agd_arm, i_multi_inclusive)
+
+  i_multi_exclusive <- tribble(~r_a, ~r_b, ~r_c,
+                               0, 0, 1,
+                               0, 1, 0,
+                               1, 0, 0,
+                               0, 1, 0,
+                               1, 0, 0)
+  ipd_multi_e <- bind_cols(agd_arm, i_multi_exclusive)
+
+  expect_error(set_ipd(ipd_multi_i, studyn, trtc, r = multi(r_c, r_b, r_a, inclusive = TRUE)),
+               "must be decreasing or constant", class = "error")
+  expect_error(set_ipd(ipd_multi_i, studyn, trtc, r = multi(r_b, r_c, inclusive = TRUE)),
+               "Individuals without outcomes in any category, rows 3 and 5", class = "error")
+  expect_equivalent(unclass(set_ipd(ipd_multi_i, studyn, trtc, r = multi(r_a, r_b, r_c, inclusive = TRUE))$ipd$.r),
+                    as.matrix(i_multi_exclusive))
+
+  expect_error(set_ipd(ipd_multi_e, studyn, trtc, r = multi(r_b, r_c, inclusive = FALSE)),
+               "Individuals without outcomes in any category, rows 3 and 5", class = "error")
+  expect_error(set_ipd(ipd_multi_e, studyn, trtc, r = multi(rep(1, 5), r_a, r_b, inclusive = FALSE)),
+               "Individuals with outcomes in more than one category, rows 2, 3, 4 and 5", class = "error")
+  expect_equivalent(unclass(set_ipd(ipd_multi_e, studyn, trtc, r = multi(r_a, r_b, r_c, inclusive = FALSE))$ipd$.r),
+                    as.matrix(i_multi_exclusive))
 })
 
 # Dummy contrast data
@@ -347,11 +448,11 @@ test_that("set_* `.study` column is correct", {
                agd_arm$studyf)
   expect_equal(set_agd_contrast(ac, .study, trtc, y = ydiff, se = sediff)$agd_contrast$.study,
                agd_contrast$studyf)
-  expect_equal(set_ipd(aa, 22, trtc, y = cont)$ipd$.study,
+  expect_equal(set_ipd(aa, 23, trtc, y = cont)$ipd$.study,
                agd_arm$studyf)
-  expect_equal(set_agd_arm(aa, 22, trtc, y = cont, se = cont_pos)$agd_arm$.study,
+  expect_equal(set_agd_arm(aa, 23, trtc, y = cont, se = cont_pos)$agd_arm$.study,
                agd_arm$studyf)
-  expect_equal(set_agd_contrast(ac, 28, trtc, y = ydiff, se = sediff)$agd_contrast$.study,
+  expect_equal(set_agd_contrast(ac, 29, trtc, y = ydiff, se = sediff)$agd_contrast$.study,
                agd_contrast$studyf)
 })
 

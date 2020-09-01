@@ -30,6 +30,8 @@ test_that("basic validation of `...`", {
   expect_error(multi(a, a), "Duplicate outcome category labels")
   expect_error(multi(1:2, 1:4), "not the same length")
   expect_error(multi(a = 1, b = NA), "contains missing values")
+  expect_error(multi(a = 1, b = Inf), "cannot be Inf")
+  expect_error(multi(a = 1, b = NaN), "cannot be NaN")
   expect_error(multi(a = 1, b = "a"), "must be numeric")
   expect_error(multi(a = 1, b = 1.5), "must be integer")
   expect_error(multi(a = 1, b = -1), "must be non-negative")
