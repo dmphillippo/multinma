@@ -937,7 +937,7 @@ get_outcome_type <- function(y, se, r, n, E) {
     if (inherits(r, "multi_competing")) o <- c(o, "competing")
     if (!is.null(E)) o <- c(o, "rate")
     if (!is.null(n)) o <- c(o, "count")
-    if (is.null(n) && is.null(E)) o <- c(o, "binary")
+    if (!inherits(r, c("multi_ordered", "multi_competing")) && is.null(n) && is.null(E)) o <- c(o, "binary")
   }
   if (length(o) == 0) abort("Please specify one and only one outcome.")
   if (length(o) > 1) abort(glue::glue("Please specify one and only one outcome, instead of ",
