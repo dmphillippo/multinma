@@ -200,7 +200,9 @@ set_ipd <- function(data,
 #' @template args-details_sample_size
 #' @details
 #' If a Binomial outcome is specified and `sample_size` is omitted, `n` will be
-#' used as the sample size by default.
+#' used as the sample size by default. If a Multinomial outcome is specified and
+#' `sample_size` is omitted, the sample size will be determined automatically
+#' from the supplied counts by default.
 #'
 #' @template args-details_mutate
 #'
@@ -278,8 +280,14 @@ set_agd_arm <- function(data,
 
   # Pull and check sample size
   .sample_size <- pull_non_null(data, enquo(sample_size))
-  if (!is.null(.sample_size)) check_sample_size(.sample_size)
-  else if (o_type == "count") .sample_size <- .n
+  if (!is.null(.sample_size)) {
+    check_sample_size(.sample_size)
+  } else if (o_type == "count") {
+    .sample_size <- .n
+  } else if (o_type %in% c("ordered", "competing")) {
+    # Always stored as exclusive counts
+    .sample_size <- rowSums(.r)
+  }
   else inform("Note: Optional argument `sample_size` not provided, some features may not be available (see ?set_agd_arm).")
 
   # Create tibble in standard format

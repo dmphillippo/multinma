@@ -77,7 +77,9 @@ etc. for studies in the network when a regression model is given
 }
 
 If a Binomial outcome is specified and \code{sample_size} is omitted, \code{n} will be
-used as the sample size by default.
+used as the sample size by default. If a Multinomial outcome is specified and
+\code{sample_size} is omitted, the sample size will be determined automatically
+from the supplied counts by default.
 
 All arguments specifying columns of \code{data} accept the following:
 \itemize{
