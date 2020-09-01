@@ -92,6 +92,8 @@ set_ipd <- function(data,
   check_outcome_continuous(.y, with_se = FALSE)
 
   if (!is.null(.r) && inherits(.r, c("multi_ordered", "multi_competing"))) {
+    if (inherits(.r, "multi_competing")) abort("Competing multinomial outcomes are not yet supported.")
+
     # Most checks are carried out by multi(), some additional checks here specific to IPD
     if (any(! .r %in% c(0, 1))) abort("Multinomial outcome `r` must equal 0 or 1")
     if (any(r_zero_rows <- rowSums(.r) == 0))
@@ -277,6 +279,7 @@ set_agd_arm <- function(data,
 
   if (!is.null(.r) && inherits(.r, c("multi_ordered", "multi_competing"))) {
     # Checks are carried out by multi()
+    if (inherits(.r, "multi_competing")) abort("Competing multinomial outcomes are not yet supported.")
   } else {
     check_outcome_count(.r, .n, .E)
   }
