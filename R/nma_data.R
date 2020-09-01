@@ -90,7 +90,14 @@ set_ipd <- function(data,
   # .Surv <- ...
 
   check_outcome_continuous(.y, with_se = FALSE)
-  check_outcome_binary(.r, .E)
+
+  if (!is.null(.r) && inherits(.r, c("multi_ordered", "multi_competing"))) {
+    # Most checks are carried out by multi()
+    if (any(! .r %in% c(0, 1))) abort("Multinomial outcome `r` must be either 0 or 1")
+  } else {
+    check_outcome_binary(.r, .E)
+  }
+
   # check_outcome_surv(.Surv)
 
   o_type <- get_outcome_type(y = .y, se = NULL,
@@ -131,6 +138,8 @@ set_ipd <- function(data,
     d <- tibble::add_column(d, .r = .r)
   } else if (o_type == "rate") {
     d <- tibble::add_column(d, .r = .r, .E = .E)
+  } else if (o_type %in% c("ordered", "competing")) {
+    d <- tibble::add_column(d, .r = .r)
   }
 
   drop_reserved <- setdiff(colnames(data), colnames(d))
@@ -255,7 +264,13 @@ set_agd_arm <- function(data,
   # .Surv <- ...
 
   check_outcome_continuous(.y, .se, with_se = TRUE)
-  check_outcome_count(.r, .n, .E)
+
+  if (!is.null(.r) && inherits(.r, c("multi_ordered", "multi_competing"))) {
+    # Checks are carried out by multi()
+  } else {
+    check_outcome_count(.r, .n, .E)
+  }
+
   # check_outcome_surv(.Surv)
 
   o_type <- get_outcome_type(y = .y, se = .se,
@@ -302,6 +317,8 @@ set_agd_arm <- function(data,
     d <- tibble::add_column(d, .r = .r, .n = .n)
   } else if (o_type == "rate") {
     d <- tibble::add_column(d, .r = .r, .E = .E)
+  } else if (o_type %in% c("ordered", "competing")) {
+    d <- tibble::add_column(d, .r = .r)
   }
 
   if (!is.null(.sample_size)) d <- tibble::add_column(d, .sample_size = .sample_size)
@@ -825,7 +842,9 @@ multi <- function(..., inclusive = FALSE, type = c("ordered", "competing")) {
 
   # Check counts
   if (!is.numeric(out)) abort("Categorical outcome count must be numeric")
+  if (any(is.nan(out))) abort("Categorical outcome count cannot be NaN")
   if (any(is.na(out))) abort("Categorical outcome count contains missing values")
+  if (any(is.infinite(out))) abort("Categorical outcome count cannot be Inf")
   if (any(out != trunc(out))) abort("Categorical outcome count must be integer-valued")
   if (any(out < 0)) abort("Categorical outcome count must be non-negative")
 
@@ -906,6 +925,8 @@ get_outcome_type <- function(y, se, r, n, E) {
   o <- c()
   if (!is.null(y)) o <- c(o, "continuous")
   if (!is.null(r)) {
+    if (inherits(r, "multi_ordered")) o <- c(o, "ordered")
+    if (inherits(r, "multi_competing")) o <- c(o, "competing")
     if (!is.null(E)) o <- c(o, "rate")
     if (!is.null(n)) o <- c(o, "count")
     if (is.null(n) && is.null(E)) o <- c(o, "binary")
