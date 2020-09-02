@@ -149,6 +149,10 @@ set_ipd <- function(data,
   } else if (o_type == "rate") {
     d <- tibble::add_column(d, .r = .r, .E = .E)
   } else if (o_type %in% c("ordered", "competing")) {
+    # Store internally as a standard matrix (strip class attribute) as a simple
+    # work-around for dplyr/vctrs not using s3 inheritance to find matrix methods
+    .r <- unclass(.r)
+
     d <- tibble::add_column(d, .r = .r)
   }
 
@@ -337,6 +341,10 @@ set_agd_arm <- function(data,
   } else if (o_type == "rate") {
     d <- tibble::add_column(d, .r = .r, .E = .E)
   } else if (o_type %in% c("ordered", "competing")) {
+    # Store internally as a standard matrix (strip class attribute) as a simple
+    # work-around for dplyr/vctrs not using s3 inheritance to find matrix methods
+    .r <- unclass(.r)
+
     d <- tibble::add_column(d, .r = .r)
   }
 
