@@ -1000,6 +1000,35 @@ nma.fit <- function(ipd_x, ipd_y,
                                    data = standat,
                                    pars = pars)
 
+  # -- Ordered multinomial likelihood
+  } else if (likelihood == "ordered") {
+
+    if (has_ipd) {
+      # Determine number of categories
+      ncat <- ncol(ipd_y$.r)
+      # Stan model takes IPD as an integer vector of category numbers
+      ipd_r_int <- apply(ipd_y$.r == 1, 1, which)
+    } else if (has_agd_arm) {
+      ncat <- ncol(agd_arm_y$.r)
+    } else {
+      abort("No IPD or AgD (arm-based) in the network. Cannot fit ordered model to contrast data only.")
+    }
+
+    standat <- purrr::list_modify(standat,
+                                  # Add outcomes
+                                  ncat = ncat,
+                                  ipd_r = if (has_ipd) ipd_r_int else integer(),
+                                  agd_arm_r = if (has_agd_arm) agd_arm_y$.r else matrix(0, 0, ncat),
+
+                                  # Specify link
+                                  link = switch(link, logit = 1, probit = 2, cloglog = 3)
+    )
+
+    stanargs <- purrr::list_modify(stanargs,
+                                   object = stanmodels$ordered_multinomial,
+                                   data = standat,
+                                   pars = c(pars, "cc"))
+
   } else {
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
   }
@@ -1150,7 +1179,8 @@ check_likelihood <- function(x, outcome) {
   valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
                       count = c("binomial", "binomial2"),
                       rate = "poisson",
-                      continuous = "normal")
+                      continuous = "normal",
+                      ordered = "ordered")
 
   if (missing(outcome)) valid_lhood <- unlist(valid_lhood)
   else if (!is.na(outcome$ipd)) {
@@ -1192,7 +1222,8 @@ check_link <- function(x, lik) {
                      bernoulli2 = c("logit", "probit", "cloglog"),
                      binomial = c("logit", "probit", "cloglog"),
                      binomial2 = c("logit", "probit", "cloglog"),
-                     poisson = "log")[[lik]]
+                     poisson = "log",
+                     ordered = c("logit", "probit", "cloglog"))[[lik]]
 
   if (is.null(x)) {
     x <- valid_link[1]
@@ -1235,7 +1266,8 @@ inverse_link <- function(x, link = c("identity", "log", "logit", "probit", "clog
 #' @return String giving the scale name, e.g. "log Odds Ratio"
 #' @noRd
 get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
-                                          "binomial", "binomial2", "poisson"),
+                                          "binomial", "binomial2", "poisson",
+                                          "ordered"),
                            link = c("identity", "log", "logit", "probit", "cloglog"),
                            measure = c("relative", "absolute"),
                            type = c("link", "response")) {
@@ -1265,7 +1297,7 @@ get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
       }
     }
 
-  } else if (likelihood %in% c("bernoulli", "bernoulli2", "binomial", "binomial2")) {
+  } else if (likelihood %in% c("bernoulli", "bernoulli2", "binomial", "binomial2", "ordered")) {
 
     if (link == "logit") {
       if (measure == "relative") {
@@ -1323,7 +1355,8 @@ get_outcome_variables <- function(x, o_type) {
     binary = ".r",
     rate = c(".r", ".E"),
     count = c(".r", ".n"),
-    continuous = c(".y", ".se")
+    continuous = c(".y", ".se"),
+    ordered = ".r"
   )[[o_type]]
 
   return(
