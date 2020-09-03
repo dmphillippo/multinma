@@ -719,7 +719,6 @@ combine_network <- function(..., trt_ref) {
       if (!is.null(classes)) ipd[[j]]$.trtclass <- forcats::lvls_expand(ipd[[j]]$.trtclass, class_lvls)
     }
   }
-  ipd <- dplyr::bind_rows(ipd)
 
   # Get agd_arm
   agd_arm <- purrr::map(s, "agd_arm")
@@ -732,7 +731,6 @@ combine_network <- function(..., trt_ref) {
         agd_arm[[j]]$.trtclass <- forcats::lvls_expand(agd_arm[[j]]$.trtclass, class_lvls)
     }
   }
-  agd_arm <- dplyr::bind_rows(agd_arm)
 
   # Get agd_contrast
   agd_contrast <- purrr::map(s, "agd_contrast")
@@ -745,7 +743,6 @@ combine_network <- function(..., trt_ref) {
         agd_contrast[[j]]$.trtclass <- forcats::lvls_expand(agd_contrast[[j]]$.trtclass, class_lvls)
     }
   }
-  agd_contrast <- dplyr::bind_rows(agd_contrast)
 
   # Get outcome type
   o_ipd <- unique(purrr::map_chr(purrr::map(s, "outcome"), "ipd"))
@@ -770,7 +767,19 @@ combine_network <- function(..., trt_ref) {
   # Check outcome combination
   check_outcome_combination(outcome)
 
+  # Additional checks when combining multinomial outcomes
+  if (o_ipd %in% c("ordered", "competing"))
+    check_multi_combine(purrr::map(ipd, ".r"))
+  if (o_agd_arm %in% c("ordered", "competing"))
+    check_multi_combine(purrr::map(agd_arm, ".r"))
+  if (o_ipd %in% c("ordered", "competing") && o_agd_arm %in% c("ordered", "competing"))
+    check_multi_combine(purrr::map(c(ipd, agd_arm), ".r"))
+
   # Produce nma_data object
+  ipd <- dplyr::bind_rows(ipd)
+  agd_arm <- dplyr::bind_rows(agd_arm)
+  agd_contrast <- dplyr::bind_rows(agd_contrast)
+
   out <- structure(
     list(agd_arm = agd_arm,
          agd_contrast = agd_contrast,
@@ -1181,6 +1190,31 @@ check_trt_class <- function(trt_class, trt) {
     abort("`trt_class` cannot contain missing values")
   if (anyDuplicated(unique(cbind(trt, trt_class))[, "trt"]))
     abort("Treatment present in more than one class (check `trt` and `trt_class`)")
+}
+
+#' Checks for combining multinomial outcomes
+#'
+#' @param x List containing class `multi_*` outcome objects or the unclassed
+#'   matrices within
+#'
+#' @noRd
+check_multi_combine <- function(x) {
+  # Remove any NULL elements
+  x <- x[!purrr::map_lgl(x, is.null)]
+
+  is_ordered <- purrr::map_lgl(x, ~inherits(., "multi_ordered"))
+  is_competing <- purrr::map_lgl(x, ~inherits(., "multi_competing"))
+  if (any(is_ordered) && any(is_competing))
+    abort("Cannot combine ordered and competing multinomial outcomes.")
+
+  x_u <- purrr::map(x, unclass)
+  n_cat <- purrr::map_int(x_u, ncol)
+  if (any(n_cat != n_cat[1]))
+    abort("Cannot combine multinomial outcomes with different numbers of categories.")
+
+  l_cat <- purrr::map(x_u, colnames)
+  if (any(purrr::map_lgl(l_cat, ~any(. != l_cat[[1]]))))
+    abort("Cannot combine multinomial outcomes with different category labels.")
 }
 
 #' Check for IPD and AgD in network
