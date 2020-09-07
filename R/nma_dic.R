@@ -143,6 +143,33 @@ dic <- function(x, ...) {
       leverage_agd_arm <- NULL
     }
 
+  } else if (x$likelihood == "ordered") {
+    if (has_ipd(net)) {
+      ipd_r <- net$ipd$.r
+      m_fitted_ipd <- matrix(fitted_ipd, nrow = n_ipd)
+
+      resdevfit_ipd <- vector("double", n_ipd)
+      for (i in 1:n_ipd) {
+        resdevfit_ipd[i] <- 2 * sum((ipd_r[i,] * log(ipd_r[i,] / m_fitted_ipd[i,]))[ipd_r[i,] > 0])
+      }
+      leverage_ipd <- resdev_ipd - resdevfit_ipd
+    } else {
+      leverage_ipd <- NULL
+    }
+
+    if (has_agd_arm(net)) {
+      agd_arm_r <- net$agd_arm$.r
+      m_fitted_agd_arm <- matrix(fitted_agd_arm, nrow = n_agd_arm)
+
+      resdevfit_agd_arm <- vector("double", n_agd_arm)
+      for (i in 1:n_agd_arm) {
+        resdevfit_agd_arm[i] <- 2 * sum((agd_arm_r[i,] * log(agd_arm_r[i,] / m_fitted_agd_arm[i,]))[agd_arm_r[i,] > 0])
+      }
+      leverage_agd_arm <- resdev_agd_arm - resdevfit_agd_arm
+    } else {
+      leverage_agd_arm <- NULL
+    }
+
   } else {
     abort(glue::glue("DIC not supported for likelihood of type '{x$likelihood}'."))
   }
