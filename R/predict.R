@@ -268,6 +268,29 @@ predict.stan_nma <- function(object, ...,
 
     }
 
+    # Get predictions for each category for ordered models
+    if (object$likelihood == "ordered") {
+      cc <- as.array(object, pars = "cc")
+      n_cc <- dim(cc)[3]
+      l_cc <- stringr::str_replace(dimnames(cc)[[3]], "^cc\\[(.+)\\]$", "\\1")
+
+      # Apply cutoffs
+      d_p <- d_pt <- dim(pred_array)
+      d_pt[3] <- d_p[3]*n_cc
+      dn_p <- dn_pt <- dimnames(pred_array)
+      dn_pt[[3]] <- rep(dn_p[[3]], each = n_cc)
+      pred_temp <- array(dim = d_pt, dimnames = dn_pt)
+
+      for (i in 1:d_p[3]) {
+        pred_temp[ , , (i-1)*n_cc + 1:n_cc] <- sweep(cc, 1:2, pred_array[ , , i, drop = FALSE],
+                                                     FUN = function(x, y) {y - x})
+        dn_pt[[3]][(i-1)*n_cc + 1:n_cc] <- paste0(stringr::str_sub(dn_p[[3]][i], start = 1, end = -2),
+                                                  ", ", l_cc, "]")
+      }
+      dimnames(pred_temp) <- dn_pt
+      pred_array <- pred_temp
+    }
+
     # Transform predictions if type = "response"
     if (type == "response") {
       pred_array <- inverse_link(pred_array, link = object$link)
@@ -276,8 +299,15 @@ predict.stan_nma <- function(object, ...,
     # Produce nma_summary
     if (summary) {
       pred_summary <- summary_mcmc_array(pred_array, probs)
-      if (is.null(baseline))
-        pred_summary <- tibble::add_column(pred_summary, .study = preddat$.study, .before = 1)
+      if (is.null(baseline)) {
+        if (object$likelihood == "ordered") {
+          pred_summary <- tibble::add_column(pred_summary,
+                                             .study = rep(preddat$.study, each = n_cc),
+                                             .before = 1)
+        } else {
+          pred_summary <- tibble::add_column(pred_summary, .study = preddat$.study, .before = 1)
+        }
+      }
       out <- list(summary = pred_summary, sims = pred_array)
     } else {
       out <- list(sims = pred_array)
@@ -448,6 +478,29 @@ predict.stan_nma <- function(object, ...,
     if (!is.null(offset_all))
       pred_array <- sweep(pred_array, 3, offset_all, FUN = "+")
 
+    # Get predictions for each category for ordered models
+    if (object$likelihood == "ordered") {
+      cc <- as.array(object, pars = "cc")
+      n_cc <- dim(cc)[3]
+      l_cc <- stringr::str_replace(dimnames(cc)[[3]], "^cc\\[(.+)\\]$", "\\1")
+
+      # Apply cutoffs
+      d_p <- d_pt <- dim(pred_array)
+      d_pt[3] <- d_p[3]*n_cc
+      dn_p <- dn_pt <- dimnames(pred_array)
+      dn_pt[[3]] <- rep(dn_p[[3]], each = n_cc)
+      pred_temp <- array(dim = d_pt, dimnames = dn_pt)
+
+      for (i in 1:d_p[3]) {
+        pred_temp[ , , (i-1)*n_cc + 1:n_cc] <- sweep(cc, 1:2, pred_array[ , , i, drop = FALSE],
+                                                     FUN = function(x, y) {y - x})
+        dn_pt[[3]][(i-1)*n_cc + 1:n_cc] <- paste0(stringr::str_sub(dn_p[[3]][i], start = 1, end = -2),
+                                                  ", ", l_cc, "]")
+      }
+      dimnames(pred_temp) <- dn_pt
+      pred_array <- pred_temp
+    }
+
     # Transform predictions if type = "response"
     if (type == "response") {
       pred_array <- inverse_link(pred_array, link = object$link)
@@ -478,7 +531,13 @@ predict.stan_nma <- function(object, ...,
     # Produce nma_summary
     if (summary) {
       pred_summary <- summary_mcmc_array(pred_array, probs)
-      pred_summary <- tibble::add_column(pred_summary, .study = preddat$.study, .before = 1)
+      if (object$likelihood == "ordered") {
+        pred_summary <- tibble::add_column(pred_summary,
+                                           .study = rep(preddat$.study, each = n_cc),
+                                           .before = 1)
+      } else {
+        pred_summary <- tibble::add_column(pred_summary, .study = preddat$.study, .before = 1)
+      }
       out <- list(summary = pred_summary, sims = pred_array)
     } else {
       out <- list(sims = pred_array)
@@ -487,7 +546,10 @@ predict.stan_nma <- function(object, ...,
   }
 
   if (summary) {
-    class(out) <- "nma_summary"
+    if (object$likelihood == "ordered")
+      class(out) <- c("ordered_nma_summary", "nma_summary")
+    else
+      class(out) <- "nma_summary"
     attr(out, "xlab") <- "Treatment"
     attr(out, "ylab") <- get_scale_name(likelihood = object$likelihood,
                                         link = object$link,
