@@ -25,7 +25,8 @@ print.nma_prior <- function(x, ...) {
   } else {
     p <- purrr::list_modify(x, dist = purrr::zap(), fun = purrr::zap())
     p <- p[!is.na(p)]
-  cglue("A {x$dist} prior distribution: {paste(names(p), p, sep = ' = ', collapse = ', ')}.")
+    cglue("A{if (stringr::str_starts(x$dist, '[aeiouAEIOU]')) 'n' else ''} ",
+          "{x$dist} prior distribution: {paste(names(p), p, sep = ' = ', collapse = ', ')}.", sep = "")
   }
   invisible(x)
 }
