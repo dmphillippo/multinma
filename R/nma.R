@@ -1052,6 +1052,13 @@ nma.fit <- function(ipd_x, ipd_y,
   fnames_oi[grepl("^d\\[[0-9]+\\]$", fnames_oi)] <- paste0("d[", x_names_sub[col_trt], "]")
   fnames_oi[grepl("^beta\\[[0-9]+\\]$", fnames_oi)] <- paste0("beta[", x_names[col_reg], "]")
   fnames_oi <- gsub("tau[1]", "tau", fnames_oi, fixed = TRUE)
+
+  if (likelihood == "ordered") {
+    if (has_ipd) l_cat <- colnames(ipd_y$.r)[-1]
+    else if (has_agd_arm) l_cat <- colnames(agd_arm_y$.r)[-1]
+    fnames_oi[grepl("^cc\\[[0-9]+\\]$", fnames_oi)] <- paste0("cc[", l_cat, "]")
+  }
+
   stanfit@sim$fnames_oi <- fnames_oi
 
   return(stanfit)
