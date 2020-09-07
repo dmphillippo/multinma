@@ -72,6 +72,7 @@ will be truncated at 0 to be non-negative.\tabular{lccccc}{
    \strong{Student t} \code{student_t()} \tab Yes \tab Yes \tab Yes \tab Yes \tab Yes \cr
    \strong{half-Student t} \code{half_student_t()} \tab - \tab - \tab Yes \tab - \tab Yes \cr
    \strong{Exponential} \code{exponential()} \tab - \tab - \tab Yes \tab - \tab Yes \cr
+   \strong{Flat} \code{flat()} \tab Yes \tab Yes \tab Yes \tab Yes \tab Yes \cr
 }
 
 
