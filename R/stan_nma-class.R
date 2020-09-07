@@ -127,7 +127,10 @@ summary.stan_nma <- function(object, ...,
     if (!rlang::is_bool(include)) abort("`include` should be TRUE or FALSE")
   }
   if (missing(pars)) {
-    pars <- c("log_lik", "resdev", "fitted", "lp__")
+    pars <- c("log_lik", "resdev", "lp__")
+    if (has_ipd(object$network)) pars <- c(pars, "fitted_ipd")
+    if (has_agd_arm(object$network)) pars <- c(pars, "fitted_agd_arm")
+    if (has_agd_contrast(object$network)) pars <- c(pars, "fitted_agd_contrast")
     if (inherits(object, "stan_mlnmr")) pars <- c(pars, "theta_bar_cum")
     if (object$likelihood %in% c("bernoulli2", "binomial2")) pars <- c(pars, "theta2_bar_cum")
   } else {
