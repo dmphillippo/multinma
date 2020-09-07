@@ -1824,6 +1824,7 @@ prior_standat <- function(x, par, valid){
                 glue::glue_collapse(valid, sep = ", ", last = ", or ")))
 
   distn <- switch(dist,
+                  `flat (implicit)` = 0,
                   Normal = , `half-Normal` = 1,
                   Cauchy = , `half-Cauchy` = 2,
                   `Student t` = , `half-Student t` = 3,
