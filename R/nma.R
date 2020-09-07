@@ -137,7 +137,7 @@ nma <- function(network,
   link <- check_link(link, likelihood)
 
   # When are priors on auxiliary parameters required?
-  has_aux <- (likelihood == "normal" && has_ipd(network))
+  has_aux <- (likelihood == "normal" && has_ipd(network)) || likelihood == "ordered"
 
   # Are study intercepts present? Not if only contrast data
   has_intercepts <- has_agd_arm(network) || has_ipd(network)
@@ -165,8 +165,10 @@ nma <- function(network,
   if (has_aux && .is_default(prior_aux)) {
     if (likelihood == "normal" && has_ipd(network)) {
       prior_aux <- .default(half_normal(scale = 5))
-      prior_defaults$prior_aux <- get_prior_call(prior_aux)
+    } else if (likelihood == "ordered") {
+      prior_aux <- .default(flat())
     }
+    prior_defaults$prior_aux <- get_prior_call(prior_aux)
   }
 
   # Warn where default priors are used
@@ -701,7 +703,7 @@ nma.fit <- function(ipd_x, ipd_y,
   link <- check_link(link, likelihood)
 
   # When are priors on auxiliary parameters required?
-  has_aux <- (likelihood == "normal" && has_ipd)
+  has_aux <- (likelihood == "normal" && has_ipd) || likelihood == "ordered"
 
   # Check priors
   if (!inherits(prior_intercept, "nma_prior")) abort("`prior_intercept` should be a prior distribution, see ?priors.")
@@ -1015,13 +1017,20 @@ nma.fit <- function(ipd_x, ipd_y,
     }
 
     standat <- purrr::list_modify(standat,
-                                  # Add outcomes
-                                  ncat = ncat,
-                                  ipd_r = if (has_ipd) ipd_r_int else integer(),
-                                  agd_arm_r = if (has_agd_arm) agd_arm_y$.r else matrix(0, 0, ncat),
+      # Add outcomes
+      ncat = ncat,
+      ipd_r = if (has_ipd) ipd_r_int else integer(),
+      agd_arm_r = if (has_agd_arm) agd_arm_y$.r else matrix(0, 0, ncat),
 
-                                  # Specify link
-                                  link = switch(link, logit = 1, probit = 2, cloglog = 3)
+      # Add prior for auxiliary parameters - latent cutoffs
+      !!! prior_standat(prior_aux, "prior_aux",
+                        valid = c("Normal", "half-Normal", "log-Normal",
+                                  "Cauchy",  "half-Cauchy",
+                                  "Student t", "half-Student t",
+                                  "Exponential", "flat (implicit)")),
+
+      # Specify link
+      link = switch(link, logit = 1, probit = 2, cloglog = 3)
     )
 
     stanargs <- purrr::list_modify(stanargs,
