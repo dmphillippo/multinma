@@ -262,7 +262,7 @@ plot_prior_posterior <- function(x, ...,
                                            trt = "d",
                                            het = "tau",
                                            reg = "beta",
-                                           aux = "sigma"))
+                                           aux = switch(x$likelihood, normal = "sigma", ordered = "cc")))
 
 
   # Get parameter samples
@@ -318,12 +318,24 @@ plot_prior_posterior <- function(x, ...,
     dist <- prior_dat$dist[[i]]
     args <- prior_dat$args[[i]]
 
-    lower <- eval(rlang::call2(paste0("q", dist), p = p_limits[1], !!! args))
-    upper <- eval(rlang::call2(paste0("q", dist), p = p_limits[2], !!! args))
+    if (dist == "unif") {
+      # lower <- max(args$min, -1e12)
+      # upper <- min(args$max, 1e12)
 
-    xseq[[i]] <- seq(from = lower, to = upper, length.out = n)
+      xseq[[i]] <- c(args$min, args$max)
+      if (is.infinite(args$min) || is.infinite(args$max)) {
+        dens[[i]] <- c(0, 0)
+      } else {
+        dens[[i]] <- dunif(xseq[[i]], min = args$min, max = args$max)
+      }
+    } else {
+      lower <- eval(rlang::call2(paste0("q", dist), p = p_limits[1], !!! args))
+      upper <- eval(rlang::call2(paste0("q", dist), p = p_limits[2], !!! args))
 
-    dens[[i]] <- eval(rlang::call2(paste0("d", dist), x = xseq[[i]], !!! args))
+      xseq[[i]] <- seq(from = lower, to = upper, length.out = n)
+
+      dens[[i]] <- eval(rlang::call2(paste0("d", dist), x = xseq[[i]], !!! args))
+    }
   }
 
   prior_dat <- tibble::add_column(prior_dat, xseq = xseq, dens = dens)

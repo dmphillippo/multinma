@@ -230,8 +230,9 @@ get_tidy_prior <- function(prior, trunc = NULL) {
                           args = list(list(rate = 1 / prior$scale)))
   } else if (d == "flat (implicit)") {
     out <- tibble::tibble(dist_label = d,
-                          dist = "flat",
-                          args = list())
+                          dist = "unif",
+                          args = list(list(min = if (is_trunc) trunc[1] else -Inf,
+                                           max = if (is_trunc) trunc[2] else Inf)))
   }
 
   if (is_trunc && d %in% c("Normal", "Cauchy", "Student t", "Exponential", "log-Normal")) {
