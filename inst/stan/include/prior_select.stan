@@ -1,6 +1,8 @@
 // Function for selecting given prior distribution, provides sampling statement ~prior_select(...)
 void prior_select_lp(vector y, int dist, real location, real scale, real df) {
-  if (dist == 1) { // Normal
+  if (dist == 0) { // Implicit flat prior
+
+  } else if (dist == 1) { // Normal
     y ~ normal(location, scale);
   } else if (dist == 2) { // Cauchy
     y ~ cauchy(location, scale);

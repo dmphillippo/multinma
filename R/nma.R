@@ -877,16 +877,16 @@ nma.fit <- function(ipd_x, ipd_y,
   # Add priors
   standat <- purrr::list_modify(standat,
     !!! prior_standat(prior_intercept, "prior_intercept",
-                      valid = c("Normal", "Cauchy", "Student t")),
+                      valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
     !!! prior_standat(prior_trt, "prior_trt",
-                      valid = c("Normal", "Cauchy", "Student t")),
+                      valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
     !!! prior_standat(prior_reg, "prior_reg",
-                      valid = c("Normal", "Cauchy", "Student t")),
+                      valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
     !!! prior_standat(prior_het, "prior_het",
                       valid = c("Normal", "half-Normal", "log-Normal",
                                 "Cauchy",  "half-Cauchy",
                                 "Student t", "half-Student t",
-                                "Exponential")),
+                                "Exponential", "flat (implicit)")),
     prior_het_type = switch(prior_het_type,
                             sd = 1, var = 2, prec = 3)
     )
@@ -936,7 +936,7 @@ nma.fit <- function(ipd_x, ipd_y,
                         valid = c("Normal", "half-Normal", "log-Normal",
                                   "Cauchy",  "half-Cauchy",
                                   "Student t", "half-Student t",
-                                  "Exponential")),
+                                  "Exponential", "flat (implicit)")),
 
       # Specify link
       link = switch(link, identity = 1, log = 2)
