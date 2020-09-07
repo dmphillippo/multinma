@@ -33,7 +33,7 @@
 #' @param prior_reg Specification of prior distribution for the regression
 #'   coefficients (if `regression` formula specified)
 #' @param prior_aux Specification of prior distribution for the auxiliary
-#'   parameter, if applicable
+#'   parameter, if applicable (see details)
 #' @param QR Logical scalar (default `FALSE`), whether to apply a QR
 #'   decomposition to the model design matrix
 #' @param center Logical scalar (default `TRUE`), whether to center the
@@ -65,6 +65,23 @@
 #'   chosen prior distributions on the posterior distributions, and the
 #'   \code{\link[multinma:summary.nma_prior]{summary()}} method for `nma_prior`
 #'   objects prints prior intervals.
+#'
+#' @section Auxiliary parameters:
+#'   Auxiliary parameters are only present in the following models.
+#'
+#'   ## Normal likelihood with IPD
+#'   When a Normal likelihood is fitted to IPD, the auxiliary parameters are the
+#'   arm-level standard deviations \eqn{\sigma_{jk}} on treatment \eqn{k} in
+#'   study \eqn{j}.
+#'
+#'   ## Ordered multinomial likelihood
+#'   When fitting a model to \eqn{M} ordered outcomes, the auxiliary parameters
+#'   are the latent cutoffs between each category, \eqn{c_0 < c_1 < \dots <
+#'   c_M}. Only \eqn{c_2} to \eqn{c_{M-1}} are estimated; we fix \eqn{c_0 =
+#'   -\infty}, \eqn{c_1 = 0}, and \eqn{c_M = \infty}. When specifying priors for
+#'   these latent cutoffs, we choose to specify priors on the *differences*
+#'   \eqn{c_{m+1} - c_m}. Stan automatically truncates any priors so that the
+#'   ordering constraints are satisfied.
 #'
 #' @return `nma()` returns a [stan_nma] object, `nma.fit()` returns a [stanfit]
 #'   object.
