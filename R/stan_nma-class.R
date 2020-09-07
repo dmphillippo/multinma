@@ -283,6 +283,25 @@ plot_prior_posterior <- function(x, ...,
     }
   }
 
+  # For ordered likelihood, priors are specified on differences between cutoffs
+  if (x$likelihood == "ordered") {
+    l_cat <- if (has_ipd(x$network)) colnames(x$network$ipd$.r) else colnames(x$network$agd_arm$.r)
+    n_cat <- length(l_cat)
+
+    if (n_cat <= 2) {
+      draws <- dplyr::select(draws, -dplyr::starts_with("cc["))
+      prior_dat <- dplyr::filter(prior_dat, prior != "aux")
+    } else {
+      for (i in 2:(n_cat-1)) {
+        draws <- dplyr::mutate(draws, !! paste0("diff_cc[", l_cat[i+1], " - ", l_cat[i], "]") :=
+                                        !! as.symbol(paste0("cc[", l_cat[i+1], "]")) - !! as.symbol(paste0("cc[", l_cat[i], "]")))
+      }
+      draws <- dplyr::select(draws, -dplyr::starts_with("cc["))
+    }
+
+    prior_dat <- dplyr::mutate(prior_dat, par_base = dplyr::recode(.data$par_base, cc = "diff_cc"))
+  }
+
   if (packageVersion("tidyr") >= "1.0.0") {
     draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
                                  names_to = "parameter", values_to = "value")
