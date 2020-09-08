@@ -486,13 +486,24 @@ plot_integration_error <- function(x, ...,
 
   # Get cumulative integration points
   twoparbin <- x$likelihood %in% c("binomial2", "bernoulli2")
-  ipars <- if (twoparbin) c("theta_bar_cum", "theta2_bar_cum") else "theta_bar_cum"
+  ipars <- c()
+  if (has_agd_arm(x$network)) {
+    ipars <- c(ipars, "theta_bar_cum_agd_arm")
+  }
+  if (has_agd_contrast(x$network)) {
+    ipars <- c(ipars, "theta_bar_cum_agd_contrast")
+  }
+  if (twoparbin) {
+    ipars <- c(ipars, "theta2_bar_cum")
+  }
   int_dat <- as.data.frame(x, pars = ipars) %>%
     dplyr::mutate(.draw = 1:dplyr::n())
 
+  colnames(int_dat) <- stringr::str_remove(colnames(int_dat), "_bar_cum(_agd_arm|_agd_contrast)?")
+
   n_int <- x$network$n_int
 
-  rx <- "^(theta2?)_bar_cum\\[(.+): (.+), ([0-9]+)\\]$"
+  rx <- "^(theta2?)\\[(.+): (.+), ([0-9]+)\\]$"
 
   if (packageVersion("tidyr") >= "1.1.0") {
     int_dat <- tidyr::pivot_longer(int_dat, cols = -dplyr::one_of(".draw"),
