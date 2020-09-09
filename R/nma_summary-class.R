@@ -290,6 +290,8 @@ plot.nma_summary <- function(x, ...,
       } else {
         p <- p + ggplot2::facet_grid(Study~.)
       }
+    } else if (inherits(x, "ordered_nma_summary")) {
+      p <- p + ggplot2::facet_grid(.~Category)
     }
 
     if (is_ranks) {
@@ -310,7 +312,10 @@ plot.nma_summary <- function(x, ...,
       } else {
         p <- p + ggplot2::facet_grid(.~Study)
       }
+    } else if (inherits(x, "ordered_nma_summary")) {
+      p <- p + ggplot2::facet_grid(Category~.)
     }
+
 
     if (is_ranks) {
       p <- p + ggplot2::scale_y_continuous(p_ylab, breaks = 1:ntrt, minor_breaks = NULL)
