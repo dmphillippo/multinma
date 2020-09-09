@@ -1027,17 +1027,46 @@ nma.fit <- function(ipd_x, ipd_y,
       ncat <- ncol(ipd_y$.r)
       # Stan model takes IPD as an integer vector of category numbers
       ipd_r_int <- apply(ipd_y$.r == 1, 1, which)
-    } else if (has_agd_arm) {
-      ncat <- ncol(agd_arm_y$.r)
-    } else {
+      # Determine which categories are present
+      ipd_cat <- t(apply(ipd_y$.r, 1,
+                         function(x) {
+                           cs <- which(!is.na(x))
+                           c(cs, rep(0, ncat - length(cs)))
+                         }))
+      ipd_ncat <- rowSums(ipd_cat > 0)
+    }
+
+    if (has_agd_arm) {
+      # Determine number of categories
+      if (!has_ipd) ncat <- ncol(agd_arm_y$.r)
+      # Determine which categories are present
+      agd_arm_cat <- t(apply(agd_arm_y$.r, 1,
+                         function(x) {
+                           cs <- which(!is.na(x))
+                           c(cs, rep(0, ncat - length(cs)))
+                         }))
+      agd_arm_ncat <- rowSums(agd_arm_cat > 0)
+      # Replace missing category counts with 0 (these will drop out of the likelihood)
+      agd_arm_r <- tidyr::replace_na(agd_arm_y$.r, 0)
+      agd_arm_n <- rowSums(agd_arm_y$.r, na.rm = TRUE)
+    }
+
+    if (!has_ipd && !has_agd_arm) {
       abort("No IPD or AgD (arm-based) in the network. Cannot fit ordered model to contrast data only.")
     }
 
     standat <- purrr::list_modify(standat,
       # Add outcomes
       ncat = ncat,
+
       ipd_r = if (has_ipd) ipd_r_int else integer(),
-      agd_arm_r = if (has_agd_arm) agd_arm_y$.r else matrix(0, 0, ncat),
+      ipd_cat = if (has_ipd) ipd_cat else matrix(0, 0, ncat),
+      ipd_ncat = if (has_ipd) ipd_ncat else integer(),
+
+      agd_arm_r = if (has_agd_arm) agd_arm_r else matrix(0, 0, ncat),
+      agd_arm_n = if (has_agd_arm) agd_arm_n else integer(),
+      agd_arm_cat = if (has_agd_arm) agd_arm_cat else matrix(0, 0, ncat),
+      agd_arm_ncat = if (has_agd_arm) agd_arm_ncat else integer(),
 
       # Add prior for auxiliary parameters - latent cutoffs
       !!! prior_standat(prior_aux, "prior_aux",
