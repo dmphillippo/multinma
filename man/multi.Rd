@@ -33,4 +33,7 @@ individuals are only counted in the highest category they achieve, or
 \emph{inclusive} counts (\code{inclusive = TRUE}) where individuals are counted in
 every category up to and including the highest category achieved.
 (Competing outcomes, by nature, are always specified as exclusive counts.)
+
+\code{NA} values can be used to indicate categories/cutpoints that were not
+measured.
 }

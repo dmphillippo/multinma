@@ -842,6 +842,9 @@ combine_network <- function(..., trt_ref) {
 #'   every category up to and including the highest category achieved.
 #'   (Competing outcomes, by nature, are always specified as exclusive counts.)
 #'
+#'   `NA` values can be used to indicate categories/cutpoints that were not
+#'   measured.
+#'
 #' @return A matrix of (exclusive) category counts
 #' @export
 #'
@@ -879,26 +882,48 @@ multi <- function(..., inclusive = FALSE, type = c("ordered", "competing")) {
   # Check counts
   if (!is.numeric(out)) abort("Categorical outcome count must be numeric")
   if (any(is.nan(out))) abort("Categorical outcome count cannot be NaN")
-  if (any(is.na(out))) abort("Categorical outcome count contains missing values")
   if (any(is.infinite(out))) abort("Categorical outcome count cannot be Inf")
-  if (any(out != trunc(out))) abort("Categorical outcome count must be integer-valued")
-  if (any(out < 0)) abort("Categorical outcome count must be non-negative")
+  if (!rlang::is_integerish(out)) abort("Categorical outcome count must be integer-valued")
+  if (any(out < 0, na.rm = TRUE)) abort("Categorical outcome count must be non-negative")
 
-  if (inclusive) {
-    if (any(non_decreasing <- apply(out, 1, diff) > 0)) {
-      non_decreasing_rows <- which(apply(non_decreasing, 2, any))
-      abort(glue::glue("Inclusive ordered outcome counts must be decreasing or constant across increasing categories.\n",
-                       "Increasing counts found in row{if (length(non_decreasing_rows) > 1) 's' else ''} ",
-                       glue::glue_collapse(non_decreasing_rows, sep = ", ", width = 10, last = " and "), "."))
-    }
-
-    # Store internally as exclusive counts
-    for (j in 1:(ncol(out) - 1)) {
-      out[, j] <- out[, j] - out[, j+1]
+  if (type == "ordered") {
+    if (any(c1_na <- is.na(out[, 1]))) {
+      abort(glue::glue("Ordered outcome counts cannot be missing in the lowest category.\n",
+                       "NAs found in row{if (sum(c1_na) > 1) 's' else ''} ",
+                       glue::glue_collapse(which(c1_na), sep = ", ", width = 30, last = " and "), "."))
     }
   }
 
-  # Transform inclusive to exclusive counts
+
+  if (any(only1 <- apply(out, 1, function(x) sum(!is.na(x))) < 2)) {
+    abort(glue::glue("Outcome counts must be present for at least 2 categories.\n",
+                     "Issues in row{if (sum(only1) > 1) 's' else ''} ",
+                     glue::glue_collapse(which(only1), sep = ", ", width = 30, last = " and "), "."))
+  }
+
+  if (inclusive) {
+    if (any(non_decreasing <- apply(out, 1, function(x) max(diff(x[!is.na(x)]))) > 0)) {
+      abort(glue::glue("Inclusive ordered outcome counts must be decreasing or constant across increasing categories.\n",
+                       "Increasing counts found in row{if (sum(non_decreasing) > 1) 's' else ''} ",
+                       glue::glue_collapse(which(non_decreasing), sep = ", ", width = 30, last = " and "), "."))
+    }
+
+    # Store internally as exclusive counts
+    ncat <- ncol(out)
+    for (i in 1:nrow(out)) {
+      j <- 1L
+      k <- 2L
+      while (k <= ncat) {
+        if (is.na(out[i, k])) {
+          k <- k + 1L
+        } else {
+          out[i, j] <- out[i, j] - out[i, k]
+          j <- k
+          k <- k + 1L
+        }
+      }
+    }
+  }
 
   class(out) <- c(switch(type,
                          ordered = "multi_ordered",
