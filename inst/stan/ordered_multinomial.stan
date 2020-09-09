@@ -272,16 +272,16 @@ generated quantities {
 
   // AgD (arm-based) log likelihood and residual deviance
   {
-    vector[ncat] dv;
+    vector[ncat] dv[ni_agd_arm];
     for (i in 1:ni_agd_arm) {
       log_lik[ni_ipd + i] = multinomial_lpmf(agd_arm_r[i] | theta_agd_arm_bar[i]);
       fitted_agd_arm[i] = agd_arm_n[i] * theta_agd_arm_bar[i];
 
       for (k in 1:agd_arm_ncat[i]) {
         // Multinomial residual deviance
-        dv[k] = agd_arm_r[i, agd_arm_cat[i, k]] == 0 ? 0 : lmultiply(agd_arm_r[i, agd_arm_cat[i, k]], agd_arm_r[i, agd_arm_cat[i, k]] / fitted_agd_arm[i, agd_arm_cat[i, k]]);
+        dv[i, k] = agd_arm_r[i, agd_arm_cat[i, k]] == 0 ? 0 : lmultiply(agd_arm_r[i, agd_arm_cat[i, k]], agd_arm_r[i, agd_arm_cat[i, k]] / fitted_agd_arm[i, agd_arm_cat[i, k]]);
       }
-      resdev[ni_ipd + i] = 2 * sum(dv);
+      resdev[ni_ipd + i] = 2 * sum(dv[i, 1:agd_arm_ncat[i]]);
     }
   }
 
