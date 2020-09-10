@@ -71,6 +71,7 @@ dic <- function(x, ...) {
     nr_agd_contrast <- nf_agd_contrast <- 0
   }
 
+  df_ipd <- df_agd_arm <- df_agd_contrast <- NULL
 
   if (x$likelihood %in% c("bernoulli", "bernoulli2", "binomial", "binomial2")) {
     if (has_ipd(net)) {
@@ -153,6 +154,9 @@ dic <- function(x, ...) {
         resdevfit_ipd[i] <- 2 * sum((ipd_r[i,] * log(ipd_r[i,] / m_fitted_ipd[i,]))[!is.na(ipd_r[i,]) & ipd_r[i,] > 0])
       }
       leverage_ipd <- resdev_ipd - resdevfit_ipd
+
+      # Degrees of freedom is 1 - number of categories
+      df_ipd <- rowSums(!is.na(ipd_r)) - 1
     } else {
       leverage_ipd <- NULL
     }
@@ -166,8 +170,15 @@ dic <- function(x, ...) {
         resdevfit_agd_arm[i] <- 2 * sum((agd_arm_r[i,] * log(agd_arm_r[i,] / m_fitted_agd_arm[i,]))[!is.na(agd_arm_r[i,]) & agd_arm_r[i,] > 0])
       }
       leverage_agd_arm <- resdev_agd_arm - resdevfit_agd_arm
+
+      # Degrees of freedom is 1 - number of categories
+      df_agd_arm <- rowSums(!is.na(agd_arm_r)) - 1
     } else {
       leverage_agd_arm <- NULL
+    }
+
+    if (has_agd_contrast(net)) {
+      df_agd_contrast <- 1
     }
 
   } else {
@@ -209,7 +220,8 @@ dic <- function(x, ...) {
       .trt = net$ipd$.trt,
       resdev = resdev_ipd,
       leverage = leverage_ipd,
-      dic = resdev_ipd + leverage_ipd)
+      dic = resdev_ipd + leverage_ipd,
+      df = df_ipd)
   } else {
     pw$ipd <- NULL
   }
@@ -220,7 +232,8 @@ dic <- function(x, ...) {
       .trt = net$agd_arm$.trt,
       resdev = resdev_agd_arm,
       leverage = leverage_agd_arm,
-      dic = resdev_agd_arm + leverage_agd_arm)
+      dic = resdev_agd_arm + leverage_agd_arm,
+      df = df_agd_arm)
   } else {
     pw$agd_arm <- NULL
   }
@@ -231,7 +244,8 @@ dic <- function(x, ...) {
       n_contrast = agd_contrast_resdev_dat$n_contrast,
       resdev = resdev_agd_contrast,
       leverage = leverage_agd_contrast,
-      dic = resdev_agd_contrast + leverage_agd_contrast)
+      dic = resdev_agd_contrast + leverage_agd_contrast,
+      df = df_agd_contrast)
   } else {
     pw$agd_contrast <- NULL
   }
