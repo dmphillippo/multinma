@@ -35,9 +35,9 @@ NULL
 print.nma_dic <- function(x, digits = 1, ...) {
   if (!rlang::is_scalar_integerish(digits)) abort("`digits` must be a single integer.")
 
-  n <- sum(nrow(x$pointwise$ipd),
-           nrow(x$pointwise$agd_arm),
-           x$pointwise$agd_contrast$n_contrast)
+  n <- sum(if (rlang::has_name(x$pointwise$ipd, "df")) x$pointwise$ipd$df else nrow(x$pointwise$ipd),
+           if (rlang::has_name(x$pointwise$agd_arm, "df")) x$pointwise$agd_arm$df else nrow(x$pointwise$agd_arm),
+           if (rlang::has_name(x$pointwise$agd_contrast, "df")) x$pointwise$agd_contrast$df else x$pointwise$agd_contrast$n_contrast)
 
   cglue("Residual deviance: {round(x$resdev, digits)}", subtle(" (on {n} data points)", sep = ""))
   cglue("               pD: {round(x$pd, digits)}")
