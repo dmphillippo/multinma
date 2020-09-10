@@ -177,8 +177,6 @@ test_that("set_agd_arm - multinomial outcome checks work", {
                "cannot be Inf", class = "error")
   expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, disc_nan)),
                "cannot be NaN", class = "error")
-  expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, disc_na)),
-               "contains missing values", class = "error")
   expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, trtc)),
                "must be numeric", class = "error")
   expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, cont_pos)),
@@ -274,8 +272,6 @@ test_that("set_ipd - multinomial outcome checks work", {
                "cannot be Inf", class = "error")
   expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(disc, disc_nan)),
                "cannot be NaN", class = "error")
-  expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(disc, disc_na)),
-               "contains missing values", class = "error")
   expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(disc, trtc)),
                "must be numeric", class = "error")
   expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(bin, bin + 1)),
