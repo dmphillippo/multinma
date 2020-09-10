@@ -301,7 +301,7 @@ set_agd_arm <- function(data,
     .sample_size <- .n
   } else if (o_type %in% c("ordered", "competing")) {
     # Always stored as exclusive counts
-    .sample_size <- rowSums(.r)
+    .sample_size <- rowSums(.r, na.rm = TRUE)
   }
   else inform("Note: Optional argument `sample_size` not provided, some features may not be available (see ?set_agd_arm).")
 
