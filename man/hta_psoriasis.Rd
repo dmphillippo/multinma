@@ -37,9 +37,9 @@ categories PASI > 50, PASI > 70, and PASI > 90.) The count for the fourth
 category (the lowest), 0 < PASI < 50, is equal to \code{sample_size - PASI50 - PASI75 - PASI90}.
 
 Missing values are used where studies only report a subset of the outcomes.
-For a study reporting only two outcomes, say 50 and 90, the counts
-represent 50 < PASI < 90 and 90 < PASI < 100. For a study reporting only
-one outcome, say PASI 70, the count represents 70 < PASI < 100.
+For a study reporting only two outcomes, say 50 and 75, the counts
+represent 50 < PASI < 75 and 75 < PASI < 100. For a study reporting only
+one outcome, say PASI 75, the count represents 75 < PASI < 100.
 }
 \references{
 \insertAllCited{}
