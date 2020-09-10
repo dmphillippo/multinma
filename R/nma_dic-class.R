@@ -180,9 +180,24 @@ plot.nma_dic <- function(x, y, ...,
 
   resdev_post$Type <- rep(Type, each = prod(dim(x$resdev_array)[1:2]))
 
+  # Some likelihoods have data points with >1 df, these are stored in `df` column
+  has_df_ipd <- rlang::has_name(x$pointwise$ipd, "df")
+  has_df_agd_arm <- rlang::has_name(x$pointwise$agd_arm, "df")
+  has_df_agd_contrast <- rlang::has_name(x$pointwise$agd_contrast, "df")
+
+  has_df <- has_df_ipd || has_df_agd_arm || has_df_agd_contrast
+
+  df <- c(if (has_df_ipd) x$pointwise$ipd$df else rep(1, NROW(x$pointwise$ipd)),
+          if (has_df_agd_arm) x$pointwise$agd_arm$df else rep(1, NROW(x$pointwise$agd_arm)),
+          if (has_df_agd_contrast) x$pointwise$agd_contrast$df else rep(1, NROW(x$pointwise$agd_contrast)))
+
+  resdev_post$df <- rep(df, each = prod(dim(x$resdev_array)[1:2]))
+  resdev_post$df_label <- paste0("df = ", resdev_post$df)
+
   if (!show_uncertainty) {
     resdev_post <- dplyr::group_by(resdev_post, .data$parameter,
-                                   .data$.label, .data$Type) %>%
+                                   .data$.label, .data$Type,
+                                   .data$df, .data$df_label) %>%
       dplyr::summarise(resdev = mean(.data$resdev))
   }
 
@@ -342,21 +357,43 @@ plot.nma_dic <- function(x, y, ...,
       p <- ggplot2::ggplot(resdev_post,
                            ggplot2::aes(y = .data$.label,
                                         x = .data$resdev)) +
-        ggplot2::geom_vline(xintercept = 1, colour = "grey60") +
         ggplot2::labs(x = "Residual Deviance", y = "Data Point")
 
-      if (dplyr::n_distinct(resdev_post$Type) > 1)
-        p <- p + ggplot2::facet_grid(Type~., space = "free", scales = "free_y")
+      if (dplyr::n_distinct(resdev_post$df) > 1) {
+        if (dplyr::n_distinct(resdev_post$Type) > 1) {
+          p <- p + ggplot2::facet_grid(Type~df_label, space = "free", scales = "free_y") +
+            ggplot2::geom_vline(ggplot2::aes(xintercept = df), colour = "grey60")
+        } else {
+          p <- p + ggplot2::facet_grid(df_label~., space = "free", scales = "free_y") +
+            ggplot2::geom_vline(ggplot2::aes(xintercept = df), colour = "grey60")
+        }
+      } else {
+        p <- p + ggplot2::geom_vline(xintercept = 1, colour = "grey60")
+        if (dplyr::n_distinct(resdev_post$Type) > 1) {
+          p <- p + ggplot2::facet_grid(Type~., space = "free", scales = "free_y")
+        }
+      }
 
     } else {
       p <- ggplot2::ggplot(resdev_post,
                            ggplot2::aes(x = .data$.label,
                                         y = .data$resdev)) +
-        ggplot2::geom_hline(yintercept = 1, colour = "grey60") +
         ggplot2::labs(y = "Residual Deviance", x = "Data Point")
 
-      if (dplyr::n_distinct(resdev_post$Type) > 1)
-        p <- p + ggplot2::facet_grid(.~Type, space = "free", scales = "free_x")
+      if (dplyr::n_distinct(resdev_post$df) > 1) {
+        if (dplyr::n_distinct(resdev_post$Type) > 1) {
+          p <- p + ggplot2::facet_grid(df_label~Type, space = "free", scales = "free_x") +
+            ggplot2::geom_hline(ggplot2::aes(yintercept = df), colour = "grey60")
+        } else {
+          p <- p + ggplot2::facet_grid(.~df_label, space = "free", scales = "free_x") +
+            ggplot2::geom_hline(ggplot2::aes(yintercept = df), colour = "grey60")
+        }
+      } else {
+        p <- p + ggplot2::geom_hline(yintercept = 1, colour = "grey60")
+        if (dplyr::n_distinct(resdev_post$Type) > 1) {
+          p <- p + ggplot2::facet_grid(.~Type, space = "free", scales = "free_x")
+        }
+      }
     }
 
     if (show_uncertainty) {
