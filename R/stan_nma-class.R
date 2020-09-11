@@ -292,7 +292,7 @@ plot_prior_posterior <- function(x, ...,
   }
 
   # For ordered likelihood, priors are specified on differences between cutoffs
-  if (x$likelihood == "ordered") {
+  if (x$likelihood == "ordered" && "aux" %in% prior) {
     l_cat <- if (has_ipd(x$network)) colnames(x$network$ipd$.r) else colnames(x$network$agd_arm$.r)
     n_cat <- length(l_cat)
 
