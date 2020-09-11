@@ -18,6 +18,12 @@ addons:
 env:
   - CXX_OLEVEL=2 CXX=g++ _R_CHECK_DONTTEST_EXAMPLES_=false
 
+matrix:
+  include:
+    r: release
+    name: old-tidyverse
+    before_script: Rscript -e "remotes::install_version('dplyr', '0.8.5'); remotes::install_version('tibble', '2.1.3'); remotes::install_version('tidyr', '0.8.3');"
+
 before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -q
