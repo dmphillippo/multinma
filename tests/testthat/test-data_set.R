@@ -283,28 +283,28 @@ test_that("set_ipd - multinomial outcome checks work", {
                                1, 1, 1,
                                1, 1, 0,
                                1, 0, 0,
-                               1, 1, 0,
-                               1, 0, 0)
+                               1, 1, NA,
+                               1, NA, 0)
   ipd_multi_i <- bind_cols(agd_arm, i_multi_inclusive)
 
   i_multi_exclusive <- tribble(~r_a, ~r_b, ~r_c,
                                0, 0, 1,
                                0, 1, 0,
                                1, 0, 0,
-                               0, 1, 0,
-                               1, 0, 0)
+                               0, 1, NA,
+                               1, NA, 0)
   ipd_multi_e <- bind_cols(agd_arm, i_multi_exclusive)
 
-  expect_error(set_ipd(ipd_multi_i, studyn, trtc, r = multi(r_c, r_b, r_a, inclusive = TRUE)),
+  expect_error(set_ipd(ipd_multi_i[-4,], studyn, trtc, r = multi(r_c, r_b, r_a, inclusive = TRUE)),
                "must be decreasing or constant", class = "error")
-  expect_error(set_ipd(ipd_multi_i, studyn, trtc, r = multi(r_b, r_c, inclusive = TRUE)),
-               "Individuals without outcomes in any category, rows 3 and 5", class = "error")
+  expect_error(set_ipd(ipd_multi_i[-c(4,5),], studyn, trtc, r = multi(r_b, r_c, inclusive = TRUE)),
+               "Individual without outcomes in any category, row 3", class = "error")
   expect_equivalent(unclass(set_ipd(ipd_multi_i, studyn, trtc, r = multi(r_a, r_b, r_c, inclusive = TRUE))$ipd$.r),
                     as.matrix(i_multi_exclusive))
 
-  expect_error(set_ipd(ipd_multi_e, studyn, trtc, r = multi(r_b, r_c, inclusive = FALSE)),
-               "Individuals without outcomes in any category, rows 3 and 5", class = "error")
-  expect_error(set_ipd(ipd_multi_e, studyn, trtc, r = multi(rep(1, 5), r_a, r_b, inclusive = FALSE)),
+  expect_error(set_ipd(ipd_multi_e[-c(4,5),], studyn, trtc, r = multi(r_b, r_c, inclusive = FALSE)),
+               "Individual without outcomes in any category, row 3", class = "error")
+  expect_error(set_ipd(ipd_multi_e, studyn, trtc, r = multi(c = 1, r_a, r_b, inclusive = FALSE)),
                "Individuals with outcomes in more than one category, rows 2, 3, 4 and 5", class = "error")
   expect_equivalent(unclass(set_ipd(ipd_multi_e, studyn, trtc, r = multi(r_a, r_b, r_c, inclusive = FALSE))$ipd$.r),
                     as.matrix(i_multi_exclusive))
