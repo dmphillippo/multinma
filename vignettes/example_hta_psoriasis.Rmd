@@ -61,7 +61,8 @@ Plot the network structure.
 ```{r hta_psoriasis_network_plot}
 plot(pso_net, weight_edges = TRUE, weight_nodes = TRUE) + 
   # Nudge the legend over
-  ggplot2::theme(legend.box.spacing = ggplot2::unit(0.75, "in"))
+  ggplot2::theme(legend.box.spacing = ggplot2::unit(0.75, "in"),
+                 plot.margin = ggplot2::margin(0.1, 0, 0.1, 0.75, "in"))
 ```
 
 ### Meta-analysis models
