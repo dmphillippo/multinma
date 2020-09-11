@@ -2,6 +2,11 @@
 
 * Feature: The `set_*()` functions now accept `dplyr::mutate()` style semantics,
 allowing inline variable transformations.
+* Feature: Added ordered multinomial models, with helper function `multi()` for
+specifying the outcomes. Accompanied by a new data set `hta_psoriasis` and
+vignette.
+* Feature: Implicit flat priors can now be specified, on any parameter, using
+`flat()`.
 
 # multinma 0.1.3
 
