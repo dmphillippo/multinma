@@ -28,7 +28,7 @@ test_that("basic validation of `...`", {
   expect_error(multi(a = 1:4, a = 1:4), "Duplicate outcome category labels")
   a <- 1:4
   expect_error(multi(a, a), "Duplicate outcome category labels")
-  expect_error(multi(1:2, 1:4), "not the same length")
+  expect_error(multi(1:2, 1:4), "must be the same length")
   expect_error(multi(a = 1, b = Inf), "cannot be Inf")
   expect_error(multi(a = 1, b = NaN), "cannot be NaN")
   expect_error(multi(a = 1, b = "a"), "must be numeric")

@@ -875,7 +875,9 @@ multi <- function(..., inclusive = FALSE, type = c("ordered", "competing")) {
   # Construct outcome matrix
   dots <- purrr::map(q_dots, rlang::eval_tidy)
 
-  if (length(unique(lengths(dots))) > 1) abort("Input vectors in `...` are not the same length.")
+  # Input vectors must be same length (or length 1 for recycling)
+  dots_lengths <- lengths(dots)
+  if (length(unique(dots_lengths[dots_lengths > 1])) > 1) abort("Input vectors in `...` must be the same length (or length 1).")
 
   out <- do.call(cbind, dots)
 

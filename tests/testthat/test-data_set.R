@@ -172,7 +172,7 @@ test_that("set_agd_arm - multinomial outcome checks work", {
   expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, disc)),
                "Duplicate outcome category labels", class = "error")
   expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, 1:2)),
-               "not the same length", class = "error")
+               "must be the same length", class = "error")
   expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, disc_inf)),
                "cannot be Inf", class = "error")
   expect_error(set_agd_arm(agd_arm, studyn, trtc, r = multi(disc, disc_nan)),
@@ -267,7 +267,7 @@ test_that("set_ipd - multinomial outcome checks work", {
   expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(bin, bin)),
                "Duplicate outcome category labels", class = "error")
   expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(bin, 1:2)),
-               "not the same length", class = "error")
+               "must be the same length", class = "error")
   expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(disc, disc_inf)),
                "cannot be Inf", class = "error")
   expect_error(set_ipd(agd_arm, studyn, trtc, r = multi(disc, disc_nan)),
