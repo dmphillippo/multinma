@@ -216,9 +216,9 @@ plot(pred_RE)
 
 We can modify the plots using standard `ggplot2` functions.
 For example, to plot the cutpoints together with a colour coding (instead of split into facets):
-```{r pso_pred_RE_colour, fig.height = 2}
+```{r pso_pred_RE_colour, fig.height = 3}
 library(ggplot2)
-plot(pred_RE) +
+plot(pred_RE, position = position_dodge(width = 0.75)) +
   facet_null() +
   aes(colour = Category) +
   scale_colour_brewer(palette = "Blues")
