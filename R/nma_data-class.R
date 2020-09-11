@@ -127,7 +127,8 @@ print.nma_data <- function(x, ..., n = 10) {
     print(s_ipd[1:min(n_ipd, n), ], right = FALSE, row.names = FALSE, max = 9999L)
     if (n_ipd > n) cglue(subtle(" ... plus {n_ipd - n} more studies"))
     cat("\n")
-    cglue(" Outcome type: {x$outcome$ipd}")
+    cglue(" Outcome type: {x$outcome$ipd}",
+          if (x$outcome$ipd == "ordered") " ({ncol(x$ipd$.r)} categories)" else "")
     # cat("\n")
   }
 
@@ -136,7 +137,8 @@ print.nma_data <- function(x, ..., n = 10) {
     print(s_agd_arm[1:min(n_agd_arm, n), ], right = FALSE, row.names = FALSE, max = 9999L)
     if (n_agd_arm > n) cglue(subtle(" ... plus {n_agd_arm - n} more studies"))
     cat("\n")
-    cglue(" Outcome type: {x$outcome$agd_arm}")
+    cglue(" Outcome type: {x$outcome$agd_arm}",
+          if (x$outcome$agd_arm == "ordered") " ({ncol(x$agd_arm$.r)} categories)" else "")
     # cat("\n")
   }
 
