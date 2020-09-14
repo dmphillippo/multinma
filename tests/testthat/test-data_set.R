@@ -85,7 +85,7 @@ agd_arm <- tibble(
   disc_inf = c(disc[1:4], Inf),
   disc_nan = c(disc[1:4], NaN),
   disc_na = c(disc[1:4], NA),
-  bin = rbinom(5, 1, 0.5)
+  bin = sample(c(0,0,0,0,1,1,1,1), 5)
   #Surv =
 )
 
