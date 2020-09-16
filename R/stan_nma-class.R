@@ -670,18 +670,19 @@ as.array.stan_nma <- function(x, ..., pars, include = TRUE) {
                        glue::glue_collapse(glue::double_quote(badpars), sep = ", ", last = " or "), "."))
 
     # Extract from stanfit only parameters represented in pars
-    par_base <- stringr::str_remove(pars, "\\[.*$")
+    if (include) {
+      par_base <- stringr::str_remove(pars, "\\[.*$")
+    } else {
+      par_base <- setdiff(x$stanfit@sim$pars_oi, pars)
+    }
     a <- as.array(as.stanfit(x), pars = par_base, ...)
 
     # Get parameter indices, respecting order of `pars`
     par_regex <- paste0("^\\Q", pars, "\\E(\\[|$)")
-    par_select <- unlist(lapply(par_regex, grep, x = dimnames(a)[[3]], perl = TRUE))
+    par_select <- unique(unlist(lapply(par_regex, grep, x = dimnames(a)[[3]],
+                                       perl = TRUE, invert = !include)))
+    out <- a[ , , par_select, drop = FALSE]
 
-    if (include) {
-      out <- a[ , , par_select, drop = FALSE]
-    } else {
-      out <- a[ , , -par_select, drop = FALSE]
-    }
   } else {
     out <- as.array(as.stanfit(x), ...)
   }
