@@ -668,11 +668,11 @@ as.array.stan_nma <- function(x, ..., pars, include = TRUE) {
     if (length(badpars))
       abort(glue::glue("No parameter{if (length(badpars) > 1) 's' else ''} ",
                        glue::glue_collapse(glue::double_quote(badpars), sep = ", ", last = " or "), "."))
-  }
 
-  a <- as.array(as.stanfit(x), ...)
+    # Extract from stanfit only parameters represented in pars
+    par_base <- stringr::str_remove(pars, "\\[.*$")
+    a <- as.array(as.stanfit(x), pars = par_base, ...)
 
-  if (!missing(pars)) {
     # Get parameter indices, respecting order of `pars`
     par_regex <- paste0("^\\Q", pars, "\\E(\\[|$)")
     par_select <- unlist(lapply(par_regex, grep, x = dimnames(a)[[3]], perl = TRUE))
@@ -683,7 +683,7 @@ as.array.stan_nma <- function(x, ..., pars, include = TRUE) {
       out <- a[ , , -par_select, drop = FALSE]
     }
   } else {
-    out <- a
+    out <- as.array(as.stanfit(x), ...)
   }
 
   class(out) <- c("mcmc_array", "array")
