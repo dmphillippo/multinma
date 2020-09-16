@@ -7,6 +7,8 @@ specifying the outcomes. Accompanied by a new data set `hta_psoriasis` and
 vignette.
 * Feature: Implicit flat priors can now be specified, on any parameter, using
 `flat()`.
+* Improvement: `as.array.stan_nma()` is now much more efficient, meaning that
+many post-estimation functions are also now much more efficient.
 
 # multinma 0.1.3
 
