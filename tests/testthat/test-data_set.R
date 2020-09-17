@@ -43,6 +43,15 @@ test_that("set_* error if study not given, missing values, or not regular 1D col
   expect_error(set_agd_contrast(smoking, list(studyn)), "must be a regular column")
 })
 
+test_that("set_* error if single-arm studies included", {
+  m <- "Single-arm studies are not supported"
+
+  s <- tibble(study = c("a", "b", "b", "c"), trt = c("A", "A", "A", "B"), r = 1, n = 2)
+  expect_error(set_ipd(s, study, trt, r = r), paste0(m, '.+studies "a", "b" and "c"'))
+  expect_error(set_agd_arm(s, study, trt, r = r, n = n), paste0(m, '.+studies "a" and "c"'))
+  expect_error(set_agd_contrast(s, study, trt, y = r, se = n), paste0(m, '.+studies "a" and "c"'))
+})
+
 test_that("set_* error if trt not given, missing values, or not regular 1D column", {
   expect_error(set_ipd(smoking, "studyn"), "Specify `trt`")
   expect_error(set_agd_arm(smoking, "studyn"), "Specify `trt`")
@@ -295,14 +304,14 @@ test_that("set_ipd - multinomial outcome checks work", {
                                1, NA, 0)
   ipd_multi_e <- bind_cols(agd_arm, i_multi_exclusive)
 
-  expect_error(set_ipd(ipd_multi_i[-4,], studyn, trtc, r = multi(r_c, r_b, r_a, inclusive = TRUE)),
+  expect_error(set_ipd(ipd_multi_i[-4,], study = I(1), trtc, r = multi(r_c, r_b, r_a, inclusive = TRUE)),
                "must be decreasing or constant", class = "error")
-  expect_error(set_ipd(ipd_multi_i[-c(4,5),], studyn, trtc, r = multi(r_b, r_c, inclusive = TRUE)),
+  expect_error(set_ipd(ipd_multi_i[-c(4,5),], study = I(1), trtc, r = multi(r_b, r_c, inclusive = TRUE)),
                "Individual without outcomes in any category, row 3", class = "error")
   expect_equivalent(unclass(set_ipd(ipd_multi_i, studyn, trtc, r = multi(r_a, r_b, r_c, inclusive = TRUE))$ipd$.r),
                     as.matrix(i_multi_exclusive))
 
-  expect_error(set_ipd(ipd_multi_e[-c(4,5),], studyn, trtc, r = multi(r_b, r_c, inclusive = FALSE)),
+  expect_error(set_ipd(ipd_multi_e[-c(4,5),], study = I(1), trtc, r = multi(r_b, r_c, inclusive = FALSE)),
                "Individual without outcomes in any category, row 3", class = "error")
   expect_error(set_ipd(ipd_multi_e, studyn, trtc, r = multi(c = 1, r_a, r_b, inclusive = FALSE)),
                "Individuals with outcomes in more than one category, rows 2, 3, 4 and 5", class = "error")

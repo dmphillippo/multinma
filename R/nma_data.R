@@ -77,6 +77,18 @@ set_ipd <- function(data,
   if (is.null(.trt)) abort("`trt` cannot be NULL")
   check_trt(.trt)
 
+  # Check for single-arm studies
+  single_arm_studies <- tibble::tibble(.study, .trt) %>%
+    dplyr::distinct(.data$.study, .data$.trt) %>%
+    dplyr::group_by(.data$.study) %>%
+    dplyr::filter(dplyr::n() == 1) %>%
+    dplyr::pull(.data$.study)
+
+  if (length(single_arm_studies)) {
+    abort(glue::glue("Single-arm studies are not supported: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
+                     glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
+  }
+
   # Treatment classes
   .trtclass <- pull_non_null(data, enquo(trt_class))
   if (!is.null(.trtclass)) check_trt_class(.trtclass, .trt)
@@ -264,6 +276,17 @@ set_agd_arm <- function(data,
   .trt <- pull_non_null(data, enquo(trt))
   if (is.null(.trt)) abort("`trt` cannot be NULL")
   check_trt(.trt)
+
+  # Check for single-arm studies
+  single_arm_studies <- tibble::tibble(.study, .trt) %>%
+    dplyr::group_by(.data$.study) %>%
+    dplyr::filter(dplyr::n() == 1) %>%
+    dplyr::pull(.data$.study)
+
+  if (length(single_arm_studies)) {
+    abort(glue::glue("Single-arm studies are not supported: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
+                     glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
+  }
 
   # Treatment classes
   .trtclass <- pull_non_null(data, enquo(trt_class))
@@ -472,6 +495,16 @@ set_agd_contrast <- function(data,
   if (is.null(.trt)) abort("`trt` cannot be NULL")
   check_trt(.trt)
 
+  # Check for single-arm studies
+  single_arm_studies <- tibble::tibble(.study, .trt) %>%
+    dplyr::group_by(.data$.study) %>%
+    dplyr::filter(dplyr::n() == 1) %>%
+    dplyr::pull(.data$.study)
+
+  if (length(single_arm_studies)) {
+    abort(glue::glue("Single-arm studies are not supported: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
+                     glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
+  }
 
   # Treatment classes
   .trtclass <- pull_non_null(data, enquo(trt_class))
