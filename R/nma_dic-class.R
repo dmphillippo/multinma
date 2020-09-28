@@ -270,7 +270,8 @@ plot.nma_dic <- function(x, y, ...,
                                                      rlang::quo(.data$resdev),
                                                      .width = c(0.66, 0.95),
                                                      .point = mean,
-                                                     !!! int_dots)) %>%
+                                                     !!! int_dots,
+                                                     .homonyms = "last")) %>%
         dplyr::rename(resdev_x = .data$resdev,
                       x_lower = .data$.lower,
                       x_upper = .data$.upper)
@@ -281,7 +282,8 @@ plot.nma_dic <- function(x, y, ...,
                                                        rlang::quo(.data$resdev),
                                                        .width = c(0.66, 0.95),
                                                        .point = mean,
-                                                       !!! int_dots)) %>%
+                                                       !!! int_dots,
+                                                       .homonyms = "last")) %>%
         dplyr::rename(resdev_y = .data$resdev,
                       y_lower = .data$.lower,
                       y_upper = .data$.upper)
