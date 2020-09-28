@@ -9,6 +9,8 @@ vignette.
 `flat()`.
 * Improvement: `as.array.stan_nma()` is now much more efficient, meaning that
 many post-estimation functions are also now much more efficient.
+* Fix: No longer gives an error when attempting to specify `.width` argument to
+`plot.nma_dic()` when producing "dev-dev" plots
 
 # multinma 0.1.3
 
