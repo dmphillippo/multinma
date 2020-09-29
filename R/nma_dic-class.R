@@ -242,7 +242,9 @@ plot.nma_dic <- function(x, y, ...,
       resdev_post <- dplyr::rename(resdev_post, resdev_x = .data$resdev)
 
       xy_resdev_post <- dplyr::left_join(resdev_post, y_resdev_post,
-                                         by = c("parameter", ".label", "Type"))
+                                         by = c("parameter", ".label", "Type")) %>%
+        # Plot IPD points underneath for better clarity
+        dplyr::arrange(dplyr::desc(.data$Type), .data$parameter, .data$.label)
     } else {
 
       if (!rlang::is_string(stat))
@@ -330,8 +332,13 @@ plot.nma_dic <- function(x, y, ...,
 
     if (show_uncertainty) {
       p <- p +
-        do.call(tb_geom, args = purrr::list_modify(geom_dots, orientation = "vertical")) +
-        do.call(tb_geom, args = purrr::list_modify(geom_dots, orientation = "horizontal"))
+        # Have to layer up by data type by hand, due to the dual vertical and horizontal geoms
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "IPD"), orientation = "vertical")) +
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "IPD"), orientation = "horizontal")) +
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "AgD (arm-based)"), orientation = "vertical")) +
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "AgD (arm-based)"), orientation = "horizontal")) +
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "AgD (contrast-based)"), orientation = "vertical")) +
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "AgD (contrast-based)"), orientation = "horizontal"))
     } else {
       p <- p + ggplot2::geom_point(...)
     }
