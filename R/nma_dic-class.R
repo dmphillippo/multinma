@@ -157,6 +157,9 @@ plot.nma_dic <- function(x, y, ...,
   resdev_post <- as.matrix.nma_summary(x$resdev_array) %>%
     tibble::as_tibble()
 
+  data_labels <- stringr::str_extract(colnames(resdev_post), "(?<=\\[).+(?=\\]$)")
+  colnames(resdev_post) <- data_labels
+
   if (packageVersion("tidyr") >= "1.0.0") {
     resdev_post <- tidyr::pivot_longer(resdev_post, cols = dplyr::everything(),
                                        names_to = "parameter", values_to = "resdev")
@@ -167,11 +170,10 @@ plot.nma_dic <- function(x, y, ...,
                                  dplyr::everything())
   }
 
-  resdev_post$.label <- forcats::fct_inorder(factor(
-    stringr::str_extract(resdev_post$parameter, "(?<=\\[).+(?=\\]$)")))
+  resdev_post$.label <- forcats::fct_inorder(factor(resdev_post$parameter))
 
   # Make sure rows for parameters are together - behaviour change between gather() and pivot_longer()
-  resdev_post$.ord <- factor(resdev_post$parameter, levels = dimnames(x$resdev_array)[[3]])
+  resdev_post$.ord <- factor(resdev_post$parameter, levels = data_labels)
   resdev_post <- dplyr::arrange(resdev_post, .data$.ord)
 
   Type <- c(rep("IPD", NROW(x$pointwise$ipd)),
@@ -203,13 +205,16 @@ plot.nma_dic <- function(x, y, ...,
 
   if (has_y) { # Produce dev-dev plot
 
-    # Check resdev[] names match
-    if (isFALSE(all.equal(dimnames(x$resdev_array)[[3]], dimnames(y$resdev_array)[[3]])))
-      abort("Data points in `x` and `y` do not match")
-
     # Get y resdev samples from resdev_array
     y_resdev_post <- as.matrix.nma_summary(y$resdev_array) %>%
       tibble::as_tibble()
+
+    y_data_labels <- stringr::str_extract(colnames(y_resdev_post), "(?<=\\[).+(?=\\]$)")
+    colnames(y_resdev_post) <- y_data_labels
+
+    # Check resdev[] names match
+    if (any(data_labels != y_data_labels))
+      abort("Data points in `x` and `y` do not match")
 
     if (packageVersion("tidyr") >= "1.0.0") {
       y_resdev_post <- tidyr::pivot_longer(y_resdev_post, cols = dplyr::everything(),
@@ -221,11 +226,10 @@ plot.nma_dic <- function(x, y, ...,
                                      dplyr::everything())
     }
 
-    y_resdev_post$.label <- forcats::fct_inorder(factor(
-      stringr::str_extract(y_resdev_post$parameter, "(?<=\\[).+(?=\\]$)")))
+    y_resdev_post$.label <- forcats::fct_inorder(factor(y_resdev_post$parameter))
 
     # Make sure rows for parameters are together - behaviour change between gather() and pivot_longer()
-    y_resdev_post$.ord <- factor(y_resdev_post$parameter, levels = dimnames(y$resdev_array)[[3]])
+    y_resdev_post$.ord <- factor(y_resdev_post$parameter, levels = y_data_labels)
     y_resdev_post <- dplyr::arrange(y_resdev_post, .data$.ord)
 
     y_resdev_post$Type <- rep(Type, each = prod(dim(x$resdev_array)[1:2]))
