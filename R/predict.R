@@ -581,7 +581,9 @@ predict.stan_nma <- function(object, ...,
         if (object$likelihood == "ordered") {
           s_preddat <- preddat[ss, c(".study", ".trt", ".sample_size")] %>%
             dplyr::slice(rep(seq_len(nrow(.)), each = n_cc)) %>%
-            dplyr::mutate(.cc = rep_len(l_cc, nrow(.))) %>%
+            dplyr::mutate(.study = forcats::fct_inorder(forcats::fct_drop(.data$.study)),
+                          .trt = forcats::fct_inorder(.data$.trt),
+                          .cc = forcats::fct_inorder(rep_len(l_cc, nrow(.)))) %>%
             dplyr::group_by(.data$.study, .data$.trt, .data$.cc) %>%
             dplyr::mutate(.weights = .data$.sample_size / sum(.data$.sample_size))
 
@@ -591,6 +593,8 @@ predict.stan_nma <- function(object, ...,
                                 1:dim(s_pred_array)[3])] <- s_preddat$.weights
         } else {
           s_preddat <- preddat[ss, c(".study", ".trt", ".sample_size")] %>%
+            dplyr::mutate(.study = forcats::fct_inorder(forcats::fct_drop(.data$.study)),
+                          .trt = forcats::fct_inorder(.data$.trt)) %>%
             dplyr::group_by(.data$.study, .data$.trt) %>%
             dplyr::mutate(.weights = .data$.sample_size / sum(.data$.sample_size))
 
