@@ -472,60 +472,139 @@ predict.stan_nma <- function(object, ...,
 
     }
 
-    # Get prediction array
-    pred_array <- tcrossprod_mcmc_array(post, X_all)
-
-    if (!is.null(offset_all))
-      pred_array <- sweep(pred_array, 3, offset_all, FUN = "+")
-
-    # Get predictions for each category for ordered models
+    # Get cutoffs for ordered models
     if (object$likelihood == "ordered") {
       cc <- as.array(object, pars = "cc")
       n_cc <- dim(cc)[3]
       l_cc <- stringr::str_replace(dimnames(cc)[[3]], "^cc\\[(.+)\\]$", "\\1")
+    }
 
-      # Apply cutoffs
-      d_p <- d_pt <- dim(pred_array)
-      d_pt[3] <- d_p[3]*n_cc
-      dn_p <- dn_pt <- dimnames(pred_array)
-      dn_pt[[3]] <- rep(dn_p[[3]], each = n_cc)
-      pred_temp <- array(dim = d_pt, dimnames = dn_pt)
+    if (level == "individual") {
 
-      for (i in 1:d_p[3]) {
-        pred_temp[ , , (i-1)*n_cc + 1:n_cc] <- sweep(cc, 1:2, pred_array[ , , i, drop = FALSE],
-                                                     FUN = function(x, y) {y - x})
-        dn_pt[[3]][(i-1)*n_cc + 1:n_cc] <- paste0(stringr::str_sub(dn_p[[3]][i], start = 1, end = -2),
-                                                  ", ", l_cc, "]")
+      # Get prediction array
+      pred_array <- tcrossprod_mcmc_array(post, X_all)
+
+      if (!is.null(offset_all))
+        pred_array <- sweep(pred_array, 3, offset_all, FUN = "+")
+
+      # Get predictions for each category for ordered models
+      if (object$likelihood == "ordered") {
+        # Apply cutoffs
+        d_p <- d_pt <- dim(pred_array)
+        d_pt[3] <- d_p[3]*n_cc
+        dn_p <- dn_pt <- dimnames(pred_array)
+        dn_pt[[3]] <- rep(dn_p[[3]], each = n_cc)
+        pred_temp <- array(dim = d_pt, dimnames = dn_pt)
+
+        for (i in 1:d_p[3]) {
+          pred_temp[ , , (i-1)*n_cc + 1:n_cc] <- sweep(cc, 1:2, pred_array[ , , i, drop = FALSE],
+                                                       FUN = function(x, y) {y - x})
+          dn_pt[[3]][(i-1)*n_cc + 1:n_cc] <- paste0(stringr::str_sub(dn_p[[3]][i], start = 1, end = -2),
+                                                    ", ", l_cc, "]")
+        }
+        dimnames(pred_temp) <- dn_pt
+        pred_array <- pred_temp
       }
-      dimnames(pred_temp) <- dn_pt
-      pred_array <- pred_temp
-    }
 
-    # Transform predictions if type = "response"
-    if (type == "response") {
-      pred_array <- inverse_link(pred_array, link = object$link)
-    }
+      # Transform predictions if type = "response"
+      if (type == "response") {
+        pred_array <- inverse_link(pred_array, link = object$link)
+      }
 
-    # Aggregate predictions if level = "aggregate"
-    if (level == "aggregate") {
-      studies <- preddat$.study
-      n_studies <- nlevels(studies)
-      n_trt <- nlevels(object$network$treatments)
+    } else { # Predictions aggregated over each population
 
-      preddat <- preddat %>%
-        dplyr::group_by(.data$.study, .data$.trt) %>%
-        dplyr::mutate(.weights = .data$.sample_size / sum(.data$.sample_size))
+      # Produce aggregated predictions study by study - more memory efficient
+      outdat <- dplyr::distinct(preddat, .data$.study, .data$.trt)
 
-      X_weighted_mean <- matrix(0, ncol = dim(pred_array)[3], nrow = n_studies * n_trt)
+      if (object$likelihood == "ordered") {
+        outdat <- tibble::tibble(.study = rep(outdat$.study, each = n_cc),
+                                 .trt = rep(outdat$.trt, each = n_cc),
+                                 .cc = rep(l_cc, times = nrow(outdat)))
+      }
 
-      X_weighted_mean[cbind(dplyr::group_indices(preddat),
-                            1:dim(pred_array)[3])] <- preddat$.weights
+      studies <- unique(outdat$.study)
+      n_studies <- length(studies)
+      treatments <- unique(outdat$.trt)
+      n_trt <- length(treatments)
 
-      preddat <- dplyr::summarise(preddat, .weights = list(.data$.weights))
+      dim_pred_array <- dim(post)
+      dim_pred_array[3] <- nrow(outdat)
+      dimnames_pred_array <- dimnames(post)
+      if (object$likelihood == "ordered") {
+        dimnames_pred_array[[3]] <- paste0("pred[", outdat$.study, ": ", outdat$.trt, ", ", outdat$.cc, "]")
+      } else {
+        dimnames_pred_array[[3]] <- paste0("pred[", outdat$.study, ": ", outdat$.trt, "]")
+      }
 
-      rownames(X_weighted_mean) <- paste0("pred[", preddat$.study, ": ", preddat$.trt, "]")
+      pred_array <- array(NA_real_,
+                          dim = dim_pred_array,
+                          dimnames = dimnames_pred_array)
 
-      pred_array <- tcrossprod_mcmc_array(pred_array, X_weighted_mean)
+      ss <- vector(length = nrow(outdat))
+
+      for (s in 1:n_studies) {
+
+        # Study select
+        ss <- preddat$.study == studies[s]
+
+        # Get prediction array for this study
+        s_pred_array <- tcrossprod_mcmc_array(post, X_all[ss, , drop = FALSE])
+
+        if (!is.null(offset_all))
+          s_pred_array <- sweep(s_pred_array, 3, offset_all[ss], FUN = "+")
+
+        # Get predictions for each category for ordered models
+        if (object$likelihood == "ordered") {
+          # Apply cutoffs
+          d_p <- d_pt <- dim(s_pred_array)
+          d_pt[3] <- d_p[3]*n_cc
+          dn_p <- dn_pt <- dimnames(s_pred_array)
+          dn_pt[[3]] <- rep(dn_p[[3]], each = n_cc)
+          pred_temp <- array(dim = d_pt, dimnames = dn_pt)
+
+          for (i in 1:d_p[3]) {
+            pred_temp[ , , (i-1)*n_cc + 1:n_cc] <- sweep(cc, 1:2, s_pred_array[ , , i, drop = FALSE],
+                                                         FUN = function(x, y) {y - x})
+            dn_pt[[3]][(i-1)*n_cc + 1:n_cc] <- paste0(stringr::str_sub(dn_p[[3]][i], start = 1, end = -2),
+                                                      ", ", l_cc, "]")
+          }
+          dimnames(pred_temp) <- dn_pt
+          s_pred_array <- pred_temp
+        }
+
+        # Transform predictions if type = "response"
+        if (type == "response") {
+          s_pred_array <- inverse_link(s_pred_array, link = object$link)
+        }
+
+        # Aggregate predictions since level = "aggregate"
+        if (object$likelihood == "ordered") {
+          s_preddat <- preddat[ss, c(".study", ".trt", ".sample_size")] %>%
+            dplyr::slice(rep(seq_len(nrow(.)), each = n_cc)) %>%
+            dplyr::mutate(.cc = rep_len(l_cc, nrow(.))) %>%
+            dplyr::group_by(.data$.study, .data$.trt, .data$.cc) %>%
+            dplyr::mutate(.weights = .data$.sample_size / sum(.data$.sample_size))
+
+          X_weighted_mean <- matrix(0, ncol = dim(s_pred_array)[3], nrow = n_trt * n_cc)
+
+          X_weighted_mean[cbind(dplyr::group_indices(s_preddat),
+                                1:dim(s_pred_array)[3])] <- s_preddat$.weights
+        } else {
+          s_preddat <- preddat[ss, c(".study", ".trt", ".sample_size")] %>%
+            dplyr::group_by(.data$.study, .data$.trt) %>%
+            dplyr::mutate(.weights = .data$.sample_size / sum(.data$.sample_size))
+
+          X_weighted_mean <- matrix(0, ncol = dim(s_pred_array)[3], nrow = n_trt)
+
+          X_weighted_mean[cbind(dplyr::group_indices(s_preddat),
+                                1:dim(s_pred_array)[3])] <- s_preddat$.weights
+        }
+
+        pred_array[ , , outdat$.study == studies[s]] <- tcrossprod_mcmc_array(s_pred_array, X_weighted_mean)
+
+      }
+
+      preddat <- dplyr::distinct(preddat, .data$.study, .data$.trt)
     }
 
     # Produce nma_summary
