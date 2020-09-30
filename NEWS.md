@@ -14,6 +14,8 @@ numbers of data points.
 * Improvement: The layering of points when producing "dev-dev" plots using
 `plot.nma_dic()` with multiple data types has been reversed for improved clarity
 (now AgD over the top of IPD).
+* Improvement: Aggregate-level predictions with `predict()` from ML-NMR / IPD
+regression models are now calculated in a much more memory-efficient manner.
 * Fix: `plot.nma_dic()` no longer gives an error when attempting to specify
 `.width` argument when producing "dev-dev" plots
 
