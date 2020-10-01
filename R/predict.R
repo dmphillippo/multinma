@@ -371,6 +371,12 @@ predict.stan_nma <- function(object, ...,
                                           .trt = .data$.trt_old),
                          by = ".study")
 
+      # If producing aggregate-level predictions, output these in factor order
+      # Individual-level predictions will be in the order of the input data
+      if (level == "aggregate") {
+        preddat <- dplyr::arrange(preddat, .data$.study, .data$.trt)
+      }
+
       # Add in .trtclass if defined in network
       if (!is.null(object$network$classes)) {
         preddat$.trtclass <- object$network$classes[as.numeric(preddat$.trt)]
