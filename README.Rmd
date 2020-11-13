@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/multinma)](https://CRAN.R-project.org/package=multinma)
 [![Build Status](https://travis-ci.org/dmphillippo/multinma.svg?branch=master)](https://travis-ci.org/dmphillippo/multinma)
+[![R build status](https://github.com/dmphillippo/multinma/workflows/R-CMD-check/badge.svg)](https://github.com/dmphillippo/multinma/actions)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3904454.svg)](https://doi.org/10.5281/zenodo.3904454)
 <!-- badges: end -->
 

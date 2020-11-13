@@ -11,3 +11,4 @@
 ^vignettes/precompile\.R$
 ^vignettes/children/*$
 ^cran-comments\.md$
+^\.github$
