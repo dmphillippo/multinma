@@ -1,7 +1,9 @@
 # Precompile vignettes that run Stan models, and write out tests
 
 precompile <- function(vignette,
-                       skip_on_cran = TRUE, skip_on_travis = FALSE,
+                       skip_on_cran = TRUE,
+                       skip_on_ci = FALSE,
+                       skip_on_travis = skip_on_ci,
                        build_vignette = TRUE, write_tests = TRUE) {
   root <- rprojroot::is_r_package
 
@@ -25,6 +27,7 @@ precompile <- function(vignette,
         paste0("# Instead edit ", vignette, " and then run precompile.R"),
         "",
         if (skip_on_cran) "skip_on_cran()" else "",
+        if (skip_on_ci) "skip_on_ci()" else "",
         if (skip_on_travis) "skip_on_travis()" else "",
         "",
         readLines(r_out)
@@ -39,11 +42,11 @@ precompile("example_thrombolytics.Rmd")
 precompile("example_blocker.Rmd")
 precompile("example_dietary_fat.Rmd")
 precompile("example_diabetes.Rmd")
-precompile("example_parkinsons.Rmd", skip_on_travis = TRUE)
+precompile("example_parkinsons.Rmd", skip_on_ci = TRUE)
 precompile("example_transfusion.Rmd")
-precompile("example_atrial_fibrillation.Rmd", skip_on_travis = TRUE)
-precompile("example_statins.Rmd", skip_on_travis = TRUE)
+precompile("example_atrial_fibrillation.Rmd", skip_on_ci = TRUE)
+precompile("example_statins.Rmd", skip_on_ci = TRUE)
 precompile("example_bcg_vaccine.Rmd")
-precompile("example_plaque_psoriasis.Rmd", skip_on_travis = TRUE)
+precompile("example_plaque_psoriasis.Rmd", skip_on_ci = TRUE)
 precompile("example_hta_psoriasis.Rmd")
 

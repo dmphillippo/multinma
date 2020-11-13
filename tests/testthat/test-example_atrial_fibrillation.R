@@ -2,6 +2,7 @@
 # Instead edit example_atrial_fibrillation.Rmd and then run precompile.R
 
 skip_on_cran()
+skip_on_ci()
 skip_on_travis()
 
 params <-
