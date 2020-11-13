@@ -24,7 +24,6 @@ jobs:
       RSPM: ${{ matrix.config.rspm }}
       CXX_OLEVEL: 2
       CXX: g++
-      _R_CHECK_DONTTEST_EXAMPLES_: false
 
     steps:
       - uses: actions/checkout@v2
@@ -67,6 +66,7 @@ jobs:
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
+          _R_CHECK_DONTTEST_EXAMPLES_: false
         run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
 
