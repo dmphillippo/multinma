@@ -71,11 +71,11 @@ jobs:
           CXX <- Sys.getenv("CXX")
           cCXX <- system("R CMD config CXX", intern = TRUE)
           if (CXX == "clang++") {
-            cXXX <- gsub(" g++", " clang++ -Qunused-arguments -fcolor-diagnostics", fixed = TRUE)
+            cCXX <- gsub(" g++", " clang++ -Qunused-arguments -fcolor-diagnostics", cCXX, fixed = TRUE)
           }
           cat("CXX =", cCXX, file = "~/.R/.makevars", append = TRUE)
           cCXXFLAGS <- system("R CMD config CXXFLAGS", intern = TRUE)
-          cCXXFLAGS <- gsub("O[0-3]", paste0("O", Sys.getenv("CXX_OLEVEL")))
+          cCXXFLAGS <- gsub("O[0-3]", paste0("O", Sys.getenv("CXX_OLEVEL")), cCXXFLAGS)
           cat("CXXFLAGS =", cCXXFLAGS, "-pedantic -g0 -flto", file = "~/.R/.makevars", append = TRUE)
           cat("LDFLAGS += -flto", file = "~/.R/.makevars", append = TRUE)
         shell: Rscript {0}
