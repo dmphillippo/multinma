@@ -84,6 +84,7 @@ jobs:
           cCXXFLAGS <- gsub("O[0-3]", paste0("O", Sys.getenv("CXX_OLEVEL")), cCXXFLAGS)
           cat("CXXFLAGS =", cCXXFLAGS, "-pedantic -g0 -flto", file = mv, append = TRUE)
           cat("LDFLAGS += -flto", file = mv, append = TRUE)
+          cat(readLines(mv), sep = "\n")
         shell: Rscript {0}
 
       - name: Check
