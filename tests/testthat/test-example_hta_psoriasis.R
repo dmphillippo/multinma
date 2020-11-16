@@ -337,6 +337,7 @@ test_that("RE heterogeneity SD", {
   expect_equivalent(pso_tau$summary$mean, 0.31, tolerance = tol)
   expect_equivalent(pso_tau$summary$sd, 0.23, tolerance = tol)
   expect_equivalent(pso_tau$summary$`50%`, 0.26, tolerance = tol)
+  skip_on_ci()
   expect_equivalent(pso_tau$summary$`2.5%`, 0.01, tolerance = tol)
   expect_equivalent(pso_tau$summary$`97.5%`, 0.88, tolerance = tol)
 })
