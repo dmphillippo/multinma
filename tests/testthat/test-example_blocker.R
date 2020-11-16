@@ -201,14 +201,16 @@ blocker_ord_fit_FE <-  nma(blocker_ord_net,
                        trt_effects = "fixed",
                        link = "logit",
                        prior_intercept = normal(scale = 100),
-                       prior_trt = normal(scale = 100))
+                       prior_trt = normal(scale = 100),
+                       prior_aux = flat())
 
 blocker_ord_fit_RE <-  nma(blocker_ord_net, 
                        trt_effects = "random",
                        link = "logit",
                        prior_intercept = normal(scale = 100),
                        prior_trt = normal(scale = 100),
-                       prior_het = half_normal(scale = 5))
+                       prior_het = half_normal(scale = 5),
+                       prior_aux = flat())
 
 blocker_ord_FE_releff <- as.data.frame(relative_effects(blocker_ord_fit_FE))
 

@@ -94,12 +94,21 @@ summary(half_normal(scale = 5))
 ```
 
 Fitting the RE model
-```{r, warning=FALSE}
+```{r, eval=FALSE}
 diet_fit_RE <- nma(diet_net, 
                    trt_effects = "random",
                    prior_intercept = normal(scale = 10),
                    prior_trt = normal(scale = 10),
                    prior_het = half_normal(scale = 5))
+```
+```{r, echo=FALSE, warning=FALSE}
+diet_fit_RE <- nowarn_on_ci(
+                 nma(diet_net, 
+                     trt_effects = "random",
+                     prior_intercept = normal(scale = 10),
+                     prior_trt = normal(scale = 10),
+                     prior_het = half_normal(scale = 5))
+                 )
 ```
 
 Basic parameter summaries are given by the `print()` method:

@@ -80,7 +80,8 @@ db_fit_RE <- nma(db_net,
                  regression = ~offset(log(time)),
                  prior_intercept = normal(scale = 10),
                  prior_trt = normal(scale = 10),
-                 prior_het = half_normal(scale = 5))
+                 prior_het = half_normal(scale = 5),
+                 init_r = 0.5)
 
 
 ## -------------------------------------------------------------------------------------------------

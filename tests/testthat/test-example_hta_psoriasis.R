@@ -105,6 +105,7 @@ pso_fit_RE <- nma(pso_net,
                   prior_aux = flat(),
                   prior_het = half_normal(scale = 2.5),
                   adapt_delta = 0.99,
+                  iter = if (isTRUE(as.logical(Sys.getenv("CI")))) 5000 else 2000,
                   seed = 1713435794)
 
 

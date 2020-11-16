@@ -197,7 +197,8 @@ smkfit_ume2 <- nma(smknet2,
                    trt_effects = "random",
                    prior_intercept = normal(scale = 100),
                    prior_trt = normal(scale = 100),
-                   prior_het = normal(scale = 5))
+                   prior_het = normal(scale = 5),
+                   iter = 4000)
 
 # Results of modified TSD 4 model including multi-arm correction
 tsd_ume <- tribble(

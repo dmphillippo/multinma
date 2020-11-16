@@ -103,14 +103,15 @@ summary(half_normal(scale = 5))
 ```
 
 Fitting the RE model
-```{r, warning=FALSE}
+```{r}
 db_fit_RE <- nma(db_net, 
                  trt_effects = "random",
                  link = "cloglog",
                  regression = ~offset(log(time)),
                  prior_intercept = normal(scale = 10),
                  prior_trt = normal(scale = 10),
-                 prior_het = half_normal(scale = 5))
+                 prior_het = half_normal(scale = 5),
+                 init_r = 0.5)
 ```
 
 Basic parameter summaries are given by the `print()` method:

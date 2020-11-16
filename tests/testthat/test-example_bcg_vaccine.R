@@ -89,7 +89,8 @@ summary(half_normal(scale = 5))
 ##                    adapt_delta = 0.99)
 
 ## ---- echo = FALSE--------------------------------------------------------------------------------
-bcg_fit_lat <- nma(bcg_net, 
+bcg_fit_lat <- nowarn_on_ci(
+                 nma(bcg_net, 
                    seed = 1932599147,
                    trt_effects = "random",
                    regression = ~.trt:latitude,
@@ -98,6 +99,7 @@ bcg_fit_lat <- nma(bcg_net,
                    prior_reg = normal(scale = 100),
                    prior_het = half_normal(scale = 5),
                    adapt_delta = 0.99)
+                 )
 
 
 ## -------------------------------------------------------------------------------------------------
