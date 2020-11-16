@@ -286,7 +286,7 @@ pso_releff_RE <- as.data.frame(relative_effects(pso_fit_RE))
 test_that("RE relative effects", {
   expect_equivalent(pso_releff_RE$mean, tsd_re$est, tolerance = tol)
   expect_equivalent(pso_releff_RE$sd, tsd_re$sd, tolerance = tol)
-  expect_equivalent(pso_releff_FE$`50%`, tsd_re$median, tolerance = tol)
+  expect_equivalent(pso_releff_RE$`50%`, tsd_re$median, tolerance = tol)
   expect_equivalent(pso_releff_RE$`2.5%`, tsd_re$lower, tolerance = tol)
   expect_equivalent(pso_releff_RE$`97.5%`, tsd_re$upper, tolerance = tol)
 })
