@@ -16,6 +16,7 @@ numbers of data points.
 (now AgD over the top of IPD).
 * Improvement: Aggregate-level predictions with `predict()` from ML-NMR / IPD
 regression models are now calculated in a much more memory-efficient manner.
+* Improvement: Added an overview of examples given in the vignettes.
 * Fix: `plot.nma_dic()` no longer gives an error when attempting to specify
 `.width` argument when producing "dev-dev" plots
 
