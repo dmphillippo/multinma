@@ -1,13 +1,18 @@
 ---
-title: "Overview of Vignettes"
+title: "Overview of Examples"
 output: rmarkdown::html_vignette
+bibliography: ../inst/REFERENCES.bib
 vignette: >
-  %\VignetteIndexEntry{*Overview of Vignettes}
+  %\VignetteIndexEntry{*Overview of Examples}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 This package contains a number of vignettes, each one walking through an example analysis.
+The table below gives an overview.
+
+Many of these examples recreate analyses from the series of Technical Support Documents published by the NICE Decision Support Unit [@TSD_evsynth].
+The exceptions are atrial fibrillation [@Cooper2009], white blood cell transfusion [@Turner2012], and plaque psoriasis multilevel network meta-regression [@methods_paper].
 
 
 Title | Outcome type | Likelihood | Link function | Notable features
@@ -24,3 +29,7 @@ Title | Outcome type | Likelihood | Link function | Notable features
 [Atrial fibrillation](example_thrombolytics.html) | Counts | Binomial | logit | Meta-regression with shared class interactions
 [WBC transfusion](example_transfusion.html) | Counts | Binomial | logit | Informative log-Normal prior on $\tau^2$
 [ML-NMR plaque psoriasis](example_plaque_psoriasis.html) | Binary (IPD) and counts (AgD) | Bernoulli (IPD) and two-parameter Binomial (AgD) | probit | Multilevel network meta-regression combining IPD and AgD
+
+
+## References
+
