@@ -42,4 +42,23 @@ devtools::install_github("dmphillippo/multinma")
 Installing from source (either from CRAN or GitHub) requires that the `rstan` package is installed and configured. 
 See the installation guide [here](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started).
 
+## Getting started
+A good place to start is with the package vignettes which walk through example analyses, see `vignette("vignette_overview")` for an overview.
+The series of NICE Technical Support Documents on evidence synthesis gives a detailed introduction to network meta-analysis:
+
+> Dias, S. et al. (2011). "NICE DSU Technical Support Documents 1-7: Evidence Synthesis for Decision Making." _National Institute for Health and Care Excellence._ Available from http://www.nicedsu.org.uk.
+
+Multilevel network meta-regression is set out in the following methods paper:
+
+> Phillippo, D. M. et al. (2020). "Multilevel Network Meta-Regression for population-adjusted treatment comparisons." _Journal of the Royal Statistical Society: Series A (Statistics in Society)_, 183(3):1189-1210. doi: [10.1111/rssa.12579](https://doi.org/10.1111/rssa.12579).
+
+## Citing multinma
+The `multinma` package can be cited as follows:
+
+> Phillippo, D. M. (`r format(Sys.Date(), "%Y")`). _multinma: Network Meta-Analysis of Individual and Aggregate Data in Stan_. R package version `r getNamespaceVersion("multinma")`, doi: [10.5281/zenodo.3904454](https://doi.org/10.5281/zenodo.3904454).
+
+When fitting ML-NMR models, please cite the methods paper:
+
+> Phillippo, D. M. et al. (2020). "Multilevel Network Meta-Regression for population-adjusted treatment comparisons." _Journal of the Royal Statistical Society: Series A (Statistics in Society)_, 183(3):1189-1210. doi: [10.1111/rssa.12579](https://doi.org/10.1111/rssa.12579).
+
 ## References
