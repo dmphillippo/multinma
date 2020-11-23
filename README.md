@@ -82,30 +82,28 @@ When fitting ML-NMR models, please cite the methods paper:
 
 <div id="ref-Carpenter2017">
 
-Carpenter, Bob, Andrew Gelman, Matthew D. Hoffman, Daniel Lee, Ben
-Goodrich, Michael Betancourt, Marcus Brubaker, Jiqiang Guo, Peter Li,
-and Allen Riddell. 2017. “Stan: A Probabilistic Programming Language.”
-*Journal of Statistical Software* 76 (1).
-<https://doi.org/10.18637/jss.v076.i01>.
+Carpenter, B., A. Gelman, M. D. Hoffman, D. Lee, B. Goodrich, M.
+Betancourt, M. Brubaker, J. Guo, P. Li, and A. Riddell. 2017. “Stan: A
+Probabilistic Programming Language.” *Journal of Statistical Software*
+76 (1). <https://doi.org/10.18637/jss.v076.i01>.
 
 </div>
 
 <div id="ref-Phillippo_thesis">
 
-Phillippo, David Mark. 2019. “Calibration of Treatment Effects in
-Network Meta-Analysis Using Individual Patient Data.” PhD thesis,
-University of Bristol.
+Phillippo, D. M. 2019. “Calibration of Treatment Effects in Network
+Meta-Analysis Using Individual Patient Data.” PhD thesis, University of
+Bristol.
 
 </div>
 
 <div id="ref-methods_paper">
 
-Phillippo, David M., Sofia Dias, A. E. Ades, Mark Belger, Alan Brnabic,
-Alexander Schacht, Daniel Saure, Zbigniew Kadziola, and Nicky J. Welton.
-2020. “Multilevel Network Meta-Regression for Population-Adjusted
-Treatment Comparisons.” *Journal of the Royal Statistical Society:
-Series A (Statistics in Society)* 183 (3): 1189–1210.
-<https://doi.org/10.1111/rssa.12579>.
+Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A.
+Schacht, D. Saure, Z. Kadziola, and N. J. Welton. 2020. “Multilevel
+Network Meta-Regression for Population-Adjusted Treatment Comparisons.”
+*Journal of the Royal Statistical Society: Series A (Statistics in
+Society)* 183 (3): 1189–1210. <https://doi.org/10.1111/rssa.12579>.
 
 </div>
 
