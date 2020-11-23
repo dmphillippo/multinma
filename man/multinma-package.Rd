@@ -40,6 +40,20 @@ integration based on Sobol' sequences is used for the integration in ML-NMR
 models, with a Gaussian copula to account for correlations between
 covariates \insertCite{methods_paper,Phillippo_thesis}{multinma}.
 }
+\section{Getting Started}{
+
+A good place to start is with the package vignettes which walk through
+example analyses, see \code{vignette("vignette_overview")} for an overview.
+The series of NICE Technical Support Documents on evidence synthesis gives
+a detailed introduction to network meta-analysis:
+
+\insertRef{TSD_evsynth}{multinma}
+
+Multilevel network meta-regression is set out in the following methods paper:
+
+\insertRef{methods_paper}{multinma}
+}
+
 \references{
 \insertAllCited{}
 }
