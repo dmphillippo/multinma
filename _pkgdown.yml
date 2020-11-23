@@ -1,3 +1,14 @@
 template:
   params:
     bootswatch: paper
+
+
+articles:
+- title: Overview of Examples
+  navbar: ~
+  contents:
+  - vignette_overview
+
+- title: Examples
+  navbar: Examples
+  contents: starts_with("example_")
