@@ -1,5 +1,13 @@
 
-if (!pkgdown::in_pkgdown()) { # Setup for vignettes
+if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) { # Setup for pkgdown articles
+  knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>",
+    fig.align = "center"
+  )
+  options(width = 100)
+
+} else { # Setup for vignettes
   knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>",
@@ -21,13 +29,6 @@ if (!pkgdown::in_pkgdown()) { # Setup for vignettes
       sep = "\n",
       file = .asis)
   }
-} else { # Setup for pkgdown articles
-  knitr::opts_chunk$set(
-    collapse = TRUE,
-    comment = "#>",
-    fig.align = "center"
-  )
-  options(width = 100)
 }
 
 nowarn_on_ci <- function(expr, ...) {
