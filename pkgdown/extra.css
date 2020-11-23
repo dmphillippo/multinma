@@ -12,6 +12,10 @@ body {
   background-color: #eee;
 }
 
+blockquote {
+  font-size: 14px;
+}
+
 h1, .h1 {
   font-size: 32px;
   font-weight: bold;
