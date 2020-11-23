@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
-# multinma: Network Meta-Analysis of individual and aggregate data in Stan
+# multinma: Network Meta-Analysis of individual and aggregate data in Stan <img src='man/figures/logo.svg' align="right" height="139" />
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/multinma)](https://CRAN.R-project.org/package=multinma)

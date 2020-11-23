@@ -7,9 +7,9 @@
 \title{multinma: A Package for Network Meta-Analysis of Individual and Aggregate
 Data in Stan}
 \description{
-An R package for performing network meta-analysis and network
-meta-regression with aggregate data, individual patient data, or mixtures
-of both.
+\if{html}{\figure{logo.svg}{options: height="139px" align="right" alt="multinma logo"}}
+An R package for performing network meta-analysis and network meta-regression
+with aggregate data, individual patient data, or mixtures of both.
 }
 \details{
 Network meta-analysis (NMA) combines (aggregate) data from multiple
