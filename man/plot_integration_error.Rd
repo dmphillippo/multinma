@@ -142,6 +142,7 @@ pso_fit <- nma(pso_net,
                prior_reg = normal(scale = 10),
                init_r = 0.1,
                QR = TRUE)
+pso_fit
 }
 
 \donttest{
