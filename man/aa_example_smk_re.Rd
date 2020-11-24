@@ -41,6 +41,7 @@ smk_fit_RE
 
 \dontshow{
 if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) {
+  assign("smk_net", smk_net, .GlobalEnv)
   assign("smk_fit_RE", smk_fit_RE, .GlobalEnv)
 }
 }

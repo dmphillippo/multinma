@@ -14,6 +14,7 @@
 #' @template ex_smoking_nma_fe
 #' @examples \dontshow{
 #' if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) {
+#'   assign("smk_net", smk_net, .GlobalEnv)
 #'   assign("smk_fit_FE", smk_fit_FE, .GlobalEnv)
 #' }
 #' }
@@ -35,6 +36,7 @@ NULL
 #' @template ex_smoking_nma_re
 #' @examples \dontshow{
 #' if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) {
+#'   assign("smk_net", smk_net, .GlobalEnv)
 #'   assign("smk_fit_RE", smk_fit_RE, .GlobalEnv)
 #' }
 #' }
@@ -56,6 +58,7 @@ NULL
 #' @template ex_smoking_nma_re_ume
 #' @examples \dontshow{
 #' if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) {
+#'   assign("smk_net", smk_net, .GlobalEnv)
 #'   assign("smk_fit_RE_UME", smk_fit_RE_UME, .GlobalEnv)
 #' }
 #' }
@@ -78,6 +81,7 @@ NULL
 #' @template ex_plaque_psoriasis_mlnmr
 #' @examples \dontshow{
 #' if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) {
+#'   assign("pso_net", pso_net, .GlobalEnv)
 #'   assign("pso_fit", pso_fit, .GlobalEnv)
 #' }
 #' }

@@ -113,6 +113,7 @@ pso_fit
 
 \dontshow{
 if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) {
+  assign("pso_net", pso_net, .GlobalEnv)
   assign("pso_fit", pso_fit, .GlobalEnv)
 }
 }
