@@ -10,6 +10,8 @@ jobs:
     runs-on: macOS-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      CXX_OLEVEL: 2
+      CXX: g++
     steps:
       - uses: actions/checkout@v2
 
