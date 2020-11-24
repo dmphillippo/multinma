@@ -38,5 +38,10 @@ smk_fit_FE <- nma(smk_net,
 smk_fit_FE
 }
 
+\dontshow{
+if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) {
+  assign("smk_fit_FE", smk_fit_FE, .GlobalEnv)
+}
+}
 }
 \keyword{examples}

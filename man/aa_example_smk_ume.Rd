@@ -40,5 +40,10 @@ smk_fit_RE_UME <- nma(smk_net,
 smk_fit_RE_UME
 }
 
+\dontshow{
+if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) {
+  assign("smk_fit_RE_UME", smk_fit_RE_UME, .GlobalEnv)
+}
+}
 }
 \keyword{examples}
