@@ -53,8 +53,7 @@
 #' @seealso [plot.nma_summary()] for plotting the predictions.
 #'
 #' @examples ## Smoking cessation
-#' @template ex_smoking_network
-#' @template ex_smoking_nma_re
+#' @template ex_smoking_nma_re_example
 #' @examples \donttest{
 #' # Predicted log odds of success in each study in the network
 #' predict(smk_fit_RE)
@@ -70,9 +69,7 @@
 #' }
 #'
 #' ## Plaque psoriasis ML-NMR
-#' @template ex_plaque_psoriasis_network
-#' @template ex_plaque_psoriasis_integration
-#' @template ex_plaque_psoriasis_mlnmr
+#' @template ex_plaque_psoriasis_mlnmr_example
 #' @examples \donttest{
 #' # Predicted probabilities of response in each study in the network
 #' (pso_pred <- predict(pso_fit, type = "response"))

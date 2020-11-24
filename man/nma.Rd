@@ -155,9 +155,11 @@ smk_net
 \donttest{
 # Fitting a fixed effect model
 smk_fit_FE <- nma(smk_net,
-              trt_effects = "fixed",
-              prior_intercept = normal(scale = 100),
-              prior_trt = normal(scale = 100))
+                  trt_effects = "fixed",
+                  prior_intercept = normal(scale = 100),
+                  prior_trt = normal(scale = 100),
+                  # Hide progress
+                  refresh = 0)
 
 smk_fit_FE
 }
@@ -168,7 +170,9 @@ smk_fit_RE <- nma(smk_net,
                   trt_effects = "random",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 100),
-                  prior_het = normal(scale = 5))
+                  prior_het = normal(scale = 5),
+                  # Hide progress
+                  refresh = 0)
 
 smk_fit_RE
 }
@@ -180,7 +184,9 @@ smk_fit_RE_UME <- nma(smk_net,
                       trt_effects = "random",
                       prior_intercept = normal(scale = 100),
                       prior_trt = normal(scale = 100),
-                      prior_het = normal(scale = 5))
+                      prior_het = normal(scale = 5),
+                      # Hide progress
+                      refresh = 0)
 
 smk_fit_RE_UME
 }
@@ -279,7 +285,9 @@ pso_fit <- nma(pso_net,
                prior_trt = normal(scale = 10),
                prior_reg = normal(scale = 10),
                init_r = 0.1,
-               QR = TRUE)
+               QR = TRUE,
+               # Hide progress
+               refresh = 0)
 pso_fit
 }
 

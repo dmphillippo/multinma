@@ -167,8 +167,7 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #' @export
 #' @examples
 #' ## Smoking cessation
-#' @template ex_smoking_network
-#' @template ex_smoking_nma_re
+#' @template ex_smoking_nma_re_example
 #' @examples \donttest{
 #' # Produce relative effects
 #' smk_releff_RE <- relative_effects(smk_fit_RE)

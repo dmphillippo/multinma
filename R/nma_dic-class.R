@@ -92,9 +92,8 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #'   \insertAllCited{}
 #'
 #' @examples ## Smoking cessation
-#' @template ex_smoking_network
-#' @template ex_smoking_nma_fe
-#' @template ex_smoking_nma_re
+#' @template ex_smoking_nma_fe_example
+#' @template ex_smoking_nma_re_example
 #' @examples \donttest{
 #' # Compare DIC of FE and RE models
 #' (smk_dic_FE <- dic(smk_fit_FE))
@@ -120,7 +119,7 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #'
 #' # Check for inconsistency using UME model
 #' }
-#' @template ex_smoking_nma_re_ume
+#' @template ex_smoking_nma_re_ume_example
 #' @examples \donttest{
 #' # Compare DIC
 #' smk_dic_RE

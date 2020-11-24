@@ -108,3 +108,4 @@ reference:
   desc: Datasets used for examples and vignettes.
   contents:
   - has_keyword("datasets")
+  - has_keyword("examples")

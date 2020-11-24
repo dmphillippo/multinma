@@ -4,7 +4,9 @@
 #'                   trt_effects = "random",
 #'                   prior_intercept = normal(scale = 100),
 #'                   prior_trt = normal(scale = 100),
-#'                   prior_het = normal(scale = 5))
+#'                   prior_het = normal(scale = 5),
+#'                   # Hide progress
+#'                   refresh = 0)
 #'
 #' smk_fit_RE
 #' }

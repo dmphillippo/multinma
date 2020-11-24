@@ -54,30 +54,10 @@ details of plotting options, see \code{\link[=plot.nma_summary]{plot.nma_summary
 }
 \examples{
 ## Smoking cessation
-# Set up network of smoking cessation data
-head(smoking)
-
-smk_net <- set_agd_arm(smoking,
-                       study = studyn,
-                       trt = trtc,
-                       r = r,
-                       n = n,
-                       trt_ref = "No intervention")
-
-# Print details
-smk_net
-
 \donttest{
-# Fitting a random effects model
-smk_fit_RE <- nma(smk_net,
-                  trt_effects = "random",
-                  prior_intercept = normal(scale = 100),
-                  prior_trt = normal(scale = 100),
-                  prior_het = normal(scale = 5))
-
-smk_fit_RE
+# Run smoking RE NMA example if not already available
+if (!exists("smk_fit_RE")) example("example_smk_re")
 }
-
 \donttest{
 # Summary and plot of all model parameters
 summary(smk_fit_RE)

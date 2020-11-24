@@ -18,7 +18,9 @@
 #'                prior_trt = normal(scale = 10),
 #'                prior_reg = normal(scale = 10),
 #'                init_r = 0.1,
-#'                QR = TRUE)
+#'                QR = TRUE,
+#'                # Hide progress
+#'                refresh = 0)
 #' pso_fit
 #' }
 #'
