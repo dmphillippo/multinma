@@ -89,13 +89,15 @@ if (!exists("smk_fit_RE")) example("example_smk_re")
 predict(smk_fit_RE)
 
 # Predicted probabilities of success in each study in the network
-(smk_pred_RE <- predict(smk_fit_RE, type = "response"))
-plot(smk_pred_RE, ref_line = c(0, 1))
+predict(smk_fit_RE, type = "response")
 
 # Predicted probabilities in a population with a baseline log odds of
-# response on No Intervantion given a Normal distribution with mean -2
+# response on No Intervention given a Normal distribution with mean -2
 # and SD 0.15
-predict(smk_fit_RE, baseline = distr(qnorm, mean = -2, sd = 0.15))
+(smk_pred_RE <- predict(smk_fit_RE,
+                        baseline = distr(qnorm, mean = -2, sd = 0.15),
+                        type = "response"))
+plot(smk_pred_RE, ref_line = c(0, 1))
 }
 
 ## Plaque psoriasis ML-NMR
