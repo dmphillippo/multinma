@@ -1032,7 +1032,7 @@ frame of study information.</p>
                                psa <span class='op'>=</span> <span class='fu'><a href='distr.html'>distr</a></span><span class='op'>(</span><span class='va'>qbern</span>, prob <span class='op'>=</span> <span class='va'>psa</span><span class='op'>)</span>,
                                cor <span class='op'>=</span> <span class='va'>pso_net</span><span class='op'>$</span><span class='va'>int_cor</span>,
                                n_int <span class='op'>=</span> <span class='fl'>1000</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in add_integration.data.frame(new_agd_int, durnpso = distr(qgamma,     mean = durnpso_mean, sd = durnpso_sd), prevsys = distr(qbern,     prob = prevsys), bsa = distr(qlogitnorm, mean = bsa_mean,     sd = bsa_sd), weight = distr(qgamma, mean = weight_mean,     sd = weight_sd), psa = distr(qbern, prob = psa), cor = pso_net$int_cor,     n_int = 1000): object 'pso_net' not found</span></div><div class='input'>
+
 <span class='co'># Predicted probabilities of achieving PASI 75 in this target population, given</span>
 <span class='co'># a Normal(-1.75, 0.08^2) distribution on the baseline probit-probability of</span>
 <span class='co'># response on Placebo (at the reference levels of the covariates), are given by</span>
@@ -1040,8 +1040,17 @@ frame of study information.</p>
                          type <span class='op'>=</span> <span class='st'>"response"</span>,
                          newdata <span class='op'>=</span> <span class='va'>new_agd_int</span>,
                          baseline <span class='op'>=</span> <span class='fu'><a href='distr.html'>distr</a></span><span class='op'>(</span><span class='va'>qnorm</span>, <span class='op'>-</span><span class='fl'>1.75</span>, <span class='fl'>0.08</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error: No integration points found in `newdata`. Specify integration points using add_integration().</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>pso_pred_new</span>, ref_line <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in plot(pso_pred_new, ref_line = c(0, 1)): object 'pso_pred_new' not found</span></div><div class='input'><span class='co'># }</span>
+</div><div class='output co'>#&gt; </span><span style='color: #555555;'>------------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: New 1</span><span> </span><span style='color: #555555;'>----</span><span> 
+#&gt; 
+#&gt;                      mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
+#&gt; pred[New 1: PBO]     0.06 0.03 0.03 0.04 0.06 0.08  0.12     5962     3834    1
+#&gt; pred[New 1: ETN]     0.37 0.06 0.26 0.33 0.37 0.41  0.49     6739     3469    1
+#&gt; pred[New 1: IXE_Q2W] 0.90 0.02 0.84 0.88 0.90 0.92  0.94     6647     3259    1
+#&gt; pred[New 1: IXE_Q4W] 0.81 0.04 0.73 0.78 0.81 0.83  0.87     6199     3383    1
+#&gt; pred[New 1: SEC_150] 0.68 0.06 0.57 0.64 0.68 0.72  0.78     6154     3418    1
+#&gt; pred[New 1: SEC_300] 0.78 0.05 0.68 0.75 0.78 0.81  0.86     6367     3450    1
+#&gt; </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>pso_pred_new</span>, ref_line <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='img'><img src='predict.stan_nma-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
