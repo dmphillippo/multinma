@@ -98,12 +98,10 @@ Basic parameter summaries are given by the `print()` method:
 pso_fit_FE
 ```
 
----
-Note: the treatment effects are the *opposite sign* to those in TSD 2 [@TSD2].
-This is because we parameterise the linear predictor as $\mu_j + d_k + c_m$, rather than $\mu_j + d_k - c_m$.
-The interpretation here thus follows that of a standard binomial probit (or logit) regression; SMDs (or log ORs) greater than zero mean that the treatment increases the probability of an event compared to the comparator (and less than zero mean a reduction in probability).
-Here higher outcomes are positive, and all of the active treatments are estimated to increase the response (i.e. a greater reduction) on the PASI scale compared to the network reference (supportive care).
----
+> **Note:** the treatment effects are the *opposite sign* to those in TSD 2 [@TSD2].
+> This is because we parameterise the linear predictor as $\mu_j + d_k + c_m$, rather than $\mu_j + d_k - c_m$.
+> The interpretation here thus follows that of a standard binomial probit (or logit) regression; SMDs (or log ORs) greater than zero mean that the treatment increases the probability of an event compared to the comparator (and less than zero mean a reduction in probability).
+> Here higher outcomes are positive, and all of the active treatments are estimated to increase the response (i.e. a greater reduction) on the PASI scale compared to the network reference (supportive care).
 
 By default, summaries of the study-specific intercepts $\mu_j$ are hidden, but could be examined by changing the `pars` argument:
 ```{r, eval=FALSE}
