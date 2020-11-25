@@ -26,7 +26,7 @@ Title | Outcome type | Likelihood | Link function | Notable features
 [BCG vaccine](example_bcg_vaccine.html) | Counts | Binomial | logit | Meta-regression with a continuous covariate
 [Smoking cessation](example_smoking.html) | Counts | Binomial | logit | UME inconsistency model
 [Thrombolytics](example_thrombolytics.html) | Counts | Binomial | logit | UME inconsistency model
-[Atrial fibrillation](example_thrombolytics.html) | Counts | Binomial | logit | Meta-regression with shared class interactions
+[Atrial fibrillation](example_atrial_fibrillation.html) | Counts | Binomial | logit | Meta-regression with shared class interactions
 [WBC transfusion](example_transfusion.html) | Counts | Binomial | logit | Informative log-Normal prior on $\tau^2$
 [ML-NMR plaque psoriasis](example_plaque_psoriasis.html) | Binary (IPD) and counts (AgD) | Bernoulli (IPD) and two-parameter Binomial (AgD) | probit | Multilevel network meta-regression combining IPD and AgD
 
