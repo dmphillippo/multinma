@@ -2,8 +2,8 @@
 # Instead edit example_atrial_fibrillation.Rmd and then run precompile.R
 
 skip_on_cran()
-skip_on_ci()
-skip_on_travis()
+
+
 
 params <-
 list(run_tests = FALSE)
@@ -325,7 +325,8 @@ test_that("Relative effects (common interaction)", {
 
 Cooper_4b_beta <- tribble(
 ~trt_class       , ~est , ~lower, ~upper,
-"Mixed"          , 3.05 ,-1.26  , 7.30  ,
+#"Mixed"          , 3.05 ,-1.26  , 7.30  ,
+"Mixed"          , 3.05 ,-0.91  , 7.30  ,
 "Anti-platelet" , 0.23 ,-0.45  , 0.93  ,
 "Anti-coagulant", -0.71,-1.58  , 0.15  ,
 )
