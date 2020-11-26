@@ -2,8 +2,8 @@
 # Instead edit example_parkinsons.Rmd and then run precompile.R
 
 skip_on_cran()
-skip_on_ci()
-skip_on_travis()
+
+
 
 params <-
 list(run_tests = FALSE)
@@ -90,14 +90,14 @@ summary(half_normal(scale = 5))
 ##                   adapt_delta = 0.99)
 
 ## ---- eval=params$run_tests, echo=FALSE-----------------------------------------------------------
-arm_fit_RE <- nma(arm_net, 
+arm_fit_RE <- nowarn_on_ci(nma(arm_net, 
                   seed = 379394727,
                   trt_effects = "random",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 100),
                   prior_het = half_normal(scale = 5),
                   adapt_delta = 0.99,
-                  iter = 10000)
+                  iter = 10000))
 
 
 ## ----plot_arm_RE_pairs, fig.width = 6-------------------------------------------------------------
@@ -229,13 +229,13 @@ summary(half_normal(scale = 5))
 ##                     adapt_delta = 0.99)
 
 ## ---- eval=params$run_tests, echo=FALSE-----------------------------------------------------------
-contr_fit_RE <- nma(contr_net, 
+contr_fit_RE <- nowarn_on_ci(nma(contr_net, 
                     seed = 1150676438,
                     trt_effects = "random",
                     prior_trt = normal(scale = 100),
                     prior_het = half_normal(scale = 5),
                     adapt_delta = 0.99,
-                    iter = 10000)
+                    iter = 10000))
 
 
 ## ----plot_contr_RE_pairs, fig.width = 6-----------------------------------------------------------
@@ -389,14 +389,14 @@ summary(half_normal(scale = 5))
 ##                   adapt_delta = 0.99)
 
 ## ---- eval=params$run_tests, echo=FALSE-----------------------------------------------------------
-mix_fit_RE <- nma(mix_net, 
+mix_fit_RE <- nowarn_on_ci(nma(mix_net, 
                   seed = 437219664,
                   trt_effects = "random",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 100),
                   prior_het = half_normal(scale = 5),
                   adapt_delta = 0.99,
-                  iter=10000)
+                  iter=10000))
 
 
 ## ----plot_mix_RE_pairs, fig.width = 6-------------------------------------------------------------
@@ -526,6 +526,7 @@ test_that("RE relative effects", {
   expect_equivalent(arm_releff_RE$mean, tsd_RE$mean, tolerance = tol)
   expect_equivalent(arm_releff_RE$sd, tsd_RE$sd, tolerance = tol)
   expect_equivalent(arm_releff_RE$`50%`, tsd_RE$median, tolerance = tol)
+  skip_on_ci()
   expect_equivalent(arm_releff_RE$`2.5%`, tsd_RE$lower, tolerance = tol)
   expect_equivalent(arm_releff_RE$`97.5%`, tsd_RE$upper, tolerance = tol)
 })
@@ -537,6 +538,7 @@ test_that("RE heterogeneity SD", {
   expect_equivalent(arm_tau$mean, 0.4, tolerance = tol)
   expect_equivalent(arm_tau$sd, 0.43, tolerance = tol)
   expect_equivalent(arm_tau$`50%`, 0.28, tolerance = tol)
+  skip_on_ci()
   expect_equivalent(arm_tau$`2.5%`, 0.01, tolerance = tol)
   expect_equivalent(arm_tau$`97.5%`, 1.55, tolerance = tol)
 })
@@ -620,6 +622,7 @@ test_that("RE relative effects", {
   expect_equivalent(contr_releff_RE$mean, tsd_RE$mean, tolerance = tol)
   expect_equivalent(contr_releff_RE$sd, tsd_RE$sd, tolerance = tol)
   expect_equivalent(contr_releff_RE$`50%`, tsd_RE$median, tolerance = tol)
+  skip_on_ci()
   expect_equivalent(contr_releff_RE$`2.5%`, tsd_RE$lower, tolerance = tol)
   expect_equivalent(contr_releff_RE$`97.5%`, tsd_RE$upper, tolerance = tol)
 })
@@ -631,6 +634,7 @@ test_that("RE heterogeneity SD", {
   expect_equivalent(contr_tau$mean, 0.4, tolerance = tol)
   expect_equivalent(contr_tau$sd, 0.43, tolerance = tol)
   expect_equivalent(contr_tau$`50%`, 0.28, tolerance = tol)
+  skip_on_ci()
   expect_equivalent(contr_tau$`2.5%`, 0.01, tolerance = tol)
   expect_equivalent(contr_tau$`97.5%`, 1.55, tolerance = tol)
 })
@@ -712,9 +716,6 @@ test_that("Analysis of reordered contrast data gives same results", {
   expect_equivalent_nma_summary(relative_effects(reorder_fit_FE, trt_ref = 1),
                            contr_releff_FE, 
                            tolerance = tol)
-  expect_equivalent_nma_summary(relative_effects(reorder_fit_RE, trt_ref = 1),
-                           contr_releff_RE, 
-                           tolerance = tol)
   
   expect_equivalent_nma_summary(predict(reorder_fit_FE, 
                                      baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
@@ -722,19 +723,26 @@ test_that("Analysis of reordered contrast data gives same results", {
                                      trt_ref = 1),
                            contr_pred_FE,
                            tolerance = tol)
+  
+  expect_equivalent(dic(reorder_fit_FE)$resdev, contr_dic_FE$resdev, tolerance = tol_dic)
+  expect_equivalent(dic(reorder_fit_FE)$pd, contr_dic_FE$pd, tolerance = tol_dic)
+  expect_equivalent(dic(reorder_fit_FE)$dic, contr_dic_FE$dic, tolerance = tol_dic)
+  
+  expect_equivalent(dic(reorder_fit_RE)$resdev, contr_dic_RE$resdev, tolerance = tol_dic)
+  expect_equivalent(dic(reorder_fit_RE)$pd, contr_dic_RE$pd, tolerance = tol_dic)
+  expect_equivalent(dic(reorder_fit_RE)$dic, contr_dic_RE$dic, tolerance = tol_dic)
+  
+  skip_on_ci()
+  expect_equivalent_nma_summary(relative_effects(reorder_fit_RE, trt_ref = 1),
+                           contr_releff_RE, 
+                           tolerance = tol)
+  
   expect_equivalent_nma_summary(predict(reorder_fit_RE, 
                                      baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                                      type = "response",
                                      trt_ref = 1),
                            contr_pred_RE,
                            tolerance = tol)
-  
-  expect_equivalent(dic(reorder_fit_FE)$resdev, contr_dic_FE$resdev, tolerance = tol_dic)
-  expect_equivalent(dic(reorder_fit_FE)$pd, contr_dic_FE$pd, tolerance = tol_dic)
-  expect_equivalent(dic(reorder_fit_FE)$dic, contr_dic_FE$dic, tolerance = tol_dic)
-  expect_equivalent(dic(reorder_fit_RE)$resdev, contr_dic_RE$resdev, tolerance = tol_dic)
-  expect_equivalent(dic(reorder_fit_RE)$pd, contr_dic_RE$pd, tolerance = tol_dic)
-  expect_equivalent(dic(reorder_fit_RE)$dic, contr_dic_RE$dic, tolerance = tol_dic)
   
   expect_equivalent_nma_summary(summary(reorder_fit_RE, pars = "tau"), 
                            contr_tau,
@@ -762,6 +770,7 @@ test_that("RE relative effects", {
   expect_equivalent(mix_releff_RE$mean, tsd_RE$mean, tolerance = tol)
   expect_equivalent(mix_releff_RE$sd, tsd_RE$sd, tolerance = tol)
   expect_equivalent(mix_releff_RE$`50%`, tsd_RE$median, tolerance = tol)
+  skip_on_ci()
   expect_equivalent(mix_releff_RE$`2.5%`, tsd_RE$lower, tolerance = tol)
   expect_equivalent(mix_releff_RE$`97.5%`, tsd_RE$upper, tolerance = tol)
 })
@@ -773,6 +782,7 @@ test_that("RE heterogeneity SD", {
   expect_equivalent(mix_tau$mean, 0.4, tolerance = tol)
   expect_equivalent(mix_tau$sd, 0.43, tolerance = tol)
   expect_equivalent(mix_tau$`50%`, 0.28, tolerance = tol)
+  skip_on_ci()
   expect_equivalent(mix_tau$`2.5%`, 0.01, tolerance = tol)
   expect_equivalent(mix_tau$`97.5%`, 1.55, tolerance = tol)
 })
