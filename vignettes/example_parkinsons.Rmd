@@ -36,14 +36,10 @@ We consider analysing these data in three separate ways:
 2. Using contrast-based data (mean differences `diff` and corresponding standard errors `se_diff`);
 3. A combination of the two, where some studies contribute arm-based data, and other contribute contrast-based data.
 
-***
-
-**Note:** In this case, with Normal likelihoods for both arms and contrasts, we will see that the three analyses give identical results.
-In general, unless the arm-based likelihood is Normal, results from a model using a contrast-based likelihood will not exactly match those from a model using an arm-based likelihood, since the contrast-based Normal likelihood is only an approximation.
-Similarity of results depends on the suitability of the Normal approximation, which may not always be appropriate - e.g. with a small number of events or small sample size for a binary outcome.
-The use of an arm-based likelihood (sometimes called an "exact" likelihood) is therefore preferable where possible in general.
-
-***
+> **Note:** In this case, with Normal likelihoods for both arms and contrasts, we will see that the three analyses give identical results.
+> In general, unless the arm-based likelihood is Normal, results from a model using a contrast-based likelihood will not exactly match those from a model using an arm-based likelihood, since the contrast-based Normal likelihood is only an approximation.
+> Similarity of results depends on the suitability of the Normal approximation, which may not always be appropriate - e.g. with a small number of events or small sample size for a binary outcome.
+> The use of an arm-based likelihood (sometimes called an "exact" likelihood) is therefore preferable where possible in general.
 
 ## Analysis of arm-based data
 We begin with an analysis of the arm-based data - means and standard errors.
