@@ -141,7 +141,7 @@ pso_fit_RE <- nma(pso_net,
                   adapt_delta = 0.99)
 ```
 ```{r, echo = FALSE, warning = FALSE}
-pso_fit_RE <- nma(pso_net, 
+pso_fit_RE <- nowarn_on_ci(nma(pso_net, 
                   trt_effects = "random",
                   link = "probit",
                   prior_intercept = normal(scale = 100),
@@ -150,7 +150,7 @@ pso_fit_RE <- nma(pso_net,
                   prior_het = half_normal(scale = 2.5),
                   adapt_delta = 0.99,
                   iter = if (isTRUE(as.logical(Sys.getenv("CI")))) 5000 else 2000,
-                  seed = 1713435794)
+                  seed = 1713435794))
 ```
 
 Basic parameter summaries are given by the `print()` method:

@@ -399,6 +399,7 @@ af_4b_beta_df <- as.data.frame(summary(af_4b_beta))
 
 test_that("Interaction estimates (common interaction)", {
   expect_equivalent(af_4b_beta_df$mean, Cooper_4b_beta$est, tolerance = tol)
+  skip_on_ci()
   expect_equivalent(af_4b_beta_df$`2.5%`, Cooper_4b_beta$lower, tolerance = tol)
   expect_equivalent(af_4b_beta_df$`97.5%`, Cooper_4b_beta$upper, tolerance = tol)
 })
