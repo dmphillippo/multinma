@@ -71,7 +71,7 @@ tr_fit_RE_noninf
 
 
 ## ----tr_RE_noninf_pp_plot-------------------------------------------------------------------------
-plot_prior_posterior(tr_fit_RE_noninf, prior = c("trt", "het"))
+plot_prior_posterior(tr_fit_RE_noninf, prior = "het")
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ tr_fit_RE_inf
 
 
 ## ----tr_RE_inf_pp_plot----------------------------------------------------------------------------
-plot_prior_posterior(tr_fit_RE_inf, prior = c("trt", "het"))
+plot_prior_posterior(tr_fit_RE_inf, prior = "het")
 
 
 ## -------------------------------------------------------------------------------------------------
