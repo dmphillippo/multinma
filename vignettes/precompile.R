@@ -47,6 +47,6 @@ precompile("example_transfusion.Rmd")
 precompile("example_atrial_fibrillation.Rmd")
 precompile("example_statins.Rmd")
 precompile("example_bcg_vaccine.Rmd")
-precompile("example_plaque_psoriasis.Rmd", skip_on_ci = TRUE)
+precompile("example_plaque_psoriasis.Rmd")
 precompile("example_hta_psoriasis.Rmd")
 

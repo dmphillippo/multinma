@@ -250,7 +250,7 @@ summary(half_normal(scale = 2.5))
 ```
 
 Fitting the model uses the same call to `nma()` as before, except now with `trt_effects = "random"`.
-```{r}
+```{r, eval=!params$run_tests}
 pso_fit_RE <- nma(pso_net, 
                   trt_effects = "random",
                   link = "probit", 
@@ -266,7 +266,7 @@ pso_fit_RE <- nma(pso_net,
 ```
 
 Basic parameter summaries are given by the `print()` method:
-```{r}
+```{r, eval=!params$run_tests}
 print(pso_fit_RE)
 ```
 
@@ -277,7 +277,7 @@ print(pso_fit_RE, pars = c("d", "beta", "tau", "mu", "delta"))
 ```
 
 There are a number of divergent transitions, which we can investigate using the `pairs()` method:
-```{r pso_RE_pairs}
+```{r pso_RE_pairs, eval=!params$run_tests}
 pairs(pso_fit_RE, pars = c("delta[UNCOVER-2: ETN]", "d[ETN]", "tau", "lp__"))
 ```
 
@@ -285,20 +285,23 @@ The divergent transition errors (red crosses) seem to be concentrated in the upp
 This suggests that the information to identify the heterogeneity parameter is weak - we have only four studies in the network - and that a more informative prior distribution might aid estimation.
 
 The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
-```{r pso_RE_pp_plot, fig.width=8, fig.height=6, out.width="100%"}
+```{r pso_RE_pp_plot, eval=!params$run_tests, fig.width=8, fig.height=6, out.width="100%"}
 plot_prior_posterior(pso_fit_RE, prior = c("intercept", "trt", "reg", "het"))
 ```
 
 Plots of estimated numerical integration error are produced using the `plot_integration_error()` function:
-```{r pso_RE_cumint}
+```{r pso_RE_cumint, eval=!params$run_tests}
 plot_integration_error(pso_fit_RE)
 ```
 
 # Model comparison
 The model fit under the FE and RE models can be checked using the `dic()` function.
-```{r}
+```{r, eval=!params$run_tests}
 (pso_dic_FE <- dic(pso_fit_FE))
 (pso_dic_RE <- dic(pso_fit_RE))
+```
+```{r, eval=params$run_tests, echo=FALSE}
+(pso_dic_FE <- dic(pso_fit_FE))
 ```
 
 The DIC is similar between the FE and RE models, suggesting that there is little evidence for any residual heterogeneity.
