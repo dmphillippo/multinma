@@ -1,5 +1,5 @@
 ---
-title: "Example: BCG Vaccine for Tuberculosis"
+title: "Example: BCG vaccine for tuberculosis"
 output: rmarkdown::html_vignette
 bibliography: ../inst/REFERENCES.bib
 params:

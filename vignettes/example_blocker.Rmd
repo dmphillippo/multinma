@@ -1,5 +1,5 @@
 ---
-title: "Example: Beta Blockers"
+title: "Example: Beta blockers"
 output: rmarkdown::html_vignette
 bibliography: ../inst/REFERENCES.bib
 params:

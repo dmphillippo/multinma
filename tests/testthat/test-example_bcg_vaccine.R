@@ -4,6 +4,7 @@
 skip_on_cran()
 
 
+
 params <-
 list(run_tests = FALSE)
 
@@ -91,14 +92,14 @@ summary(half_normal(scale = 5))
 ## ---- echo = FALSE--------------------------------------------------------------------------------
 bcg_fit_lat <- nowarn_on_ci(
                  nma(bcg_net, 
-                   seed = 1932599147,
-                   trt_effects = "random",
-                   regression = ~.trt:latitude,
-                   prior_intercept = normal(scale = 100),
-                   prior_trt = normal(scale = 100),
-                   prior_reg = normal(scale = 100),
-                   prior_het = half_normal(scale = 5),
-                   adapt_delta = 0.99)
+                     seed = 1932599147,
+                     trt_effects = "random",
+                     regression = ~.trt:latitude,
+                     prior_intercept = normal(scale = 100),
+                     prior_trt = normal(scale = 100),
+                     prior_reg = normal(scale = 100),
+                     prior_het = half_normal(scale = 5),
+                     adapt_delta = 0.99)
                  )
 
 

@@ -1,5 +1,5 @@
 ---
-title: "Example: Transfusion in patients with neutropenia or neutrophil dysfunction"
+title: "Example: White blood cell transfusion"
 output: rmarkdown::html_vignette
 bibliography: ../inst/REFERENCES.bib
 params:

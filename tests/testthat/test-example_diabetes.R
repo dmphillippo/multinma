@@ -4,6 +4,7 @@
 skip_on_cran()
 
 
+
 params <-
 list(run_tests = FALSE)
 
@@ -73,7 +74,7 @@ summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- warning=FALSE-------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 db_fit_RE <- nma(db_net, 
                  trt_effects = "random",
                  link = "cloglog",

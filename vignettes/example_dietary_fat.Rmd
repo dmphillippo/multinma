@@ -1,5 +1,5 @@
 ---
-title: "Example: Dietary Fat"
+title: "Example: Dietary fat"
 output: rmarkdown::html_vignette
 bibliography: ../inst/REFERENCES.bib
 params:

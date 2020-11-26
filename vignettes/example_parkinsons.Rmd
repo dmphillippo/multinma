@@ -1,5 +1,5 @@
 ---
-title: "Example: Mean off-time reduction in Parkinson's disease"
+title: "Example: Parkinson's disease"
 output: rmarkdown::html_vignette
 bibliography: ../inst/REFERENCES.bib
 params:

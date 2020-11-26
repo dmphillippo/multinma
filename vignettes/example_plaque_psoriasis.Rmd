@@ -1,5 +1,5 @@
 ---
-title: "Example: Plaque Psoriasis"
+title: "Example: Plaque psoriasis ML-NMR"
 output: rmarkdown::html_vignette
 bibliography: ../inst/REFERENCES.bib
 params:

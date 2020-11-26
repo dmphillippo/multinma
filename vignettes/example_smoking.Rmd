@@ -1,5 +1,5 @@
 ---
-title: "Example: Smoking Cessation"
+title: "Example: Smoking cessation"
 output: rmarkdown::html_vignette
 bibliography: ../inst/REFERENCES.bib
 params:

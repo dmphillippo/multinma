@@ -1,5 +1,5 @@
 ---
-title: "Example: Plaque Psoriasis HTA report"
+title: "Example: Plaque psoriasis HTA report"
 output: rmarkdown::html_vignette
 bibliography: ../inst/REFERENCES.bib
 params:
