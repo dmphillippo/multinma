@@ -538,7 +538,8 @@ plot.nma_data <- function(x, ..., layout, circular,
                                        edge_colour = .data$.type),
                             lineend = "round") +
       ggraph::scale_edge_width_continuous("Number of studies",
-                                          breaks = breaks_integer(positive = TRUE))
+                                          breaks = breaks_integer(positive = TRUE),
+                                          limits = function(x) range(breaks_integer(positive = TRUE)(x)))
   } else {
     g <- g +
       ggraph::geom_edge_fan(ggplot2::aes(edge_colour = .data$.type),
