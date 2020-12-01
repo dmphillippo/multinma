@@ -17,8 +17,11 @@ numbers of data points.
 * Improvement: Aggregate-level predictions with `predict()` from ML-NMR / IPD
 regression models are now calculated in a much more memory-efficient manner.
 * Improvement: Added an overview of examples given in the vignettes.
+* Improvement: Network plots with `weight_edges = TRUE` no longer produce
+legends with non-integer values for the number of studies, thanks to a new
+breaks function `breaks_integer()`.
 * Fix: `plot.nma_dic()` no longer gives an error when attempting to specify
-`.width` argument when producing "dev-dev" plots
+`.width` argument when producing "dev-dev" plots.
 
 # multinma 0.1.3
 
