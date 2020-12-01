@@ -585,3 +585,63 @@ plot.nma_data <- function(x, ..., layout, circular,
     ggplot2::coord_fixed(clip = "off")
   return(g)
 }
+
+#' Automatic breaks for integer scales
+#'
+#' Compute automatic breaks for integer scales, making sure that the breaks are
+#' also integers.
+#'
+#' @param prefer_n Set of preferred numbers of break points.
+#' @param extend Extend the breaks beyond the range of the data? If `TRUE`
+#'   ensures that breaks are equally spaced. Default `TRUE`.
+#' @param positive Create breaks for strictly positive integers? Default `TRUE`.
+#' @param ... Unused.
+#'
+#' @details If `extend = TRUE` (the default), breaks may lie outside of the
+#'   range of the data, but are guaranteed to be equally spaced. If `extend =
+#'   FALSE`, the limits of the breaks are equal to the smallest and largest
+#'   values in the data, but within this range breaks may not be equally spaced.
+#'
+#' @return Returns a function to compute breaks, as required by the `breaks`
+#'   argument to the `scale_*_continuous` functions in `ggplot2`.
+#' @export
+#'
+#' @examples
+#' breaks_integer()(1:9)
+#' breaks_integer()(1:18) # extended, equally spaced
+#' breaks_integer(extend = FALSE)(1:18) # un-extended, unequally spaced
+#' breaks_integer(positive = FALSE)(-1:10) # allow negative values
+breaks_integer <- function(prefer_n = c(5, 4, 3, 6), extend = TRUE, positive = TRUE, ...) {
+  if (!rlang::is_integerish(prefer_n, finite = TRUE) || any(prefer_n < 2))
+    abort("`prefer_n` must be a vector of integers greater than 1.")
+  if (!rlang::is_bool(extend))
+    abort("`extend` must be a logical value TRUE or FALSE.")
+  if (!rlang::is_bool(positive))
+    abort("`positive` must be a logical value TRUE or FALSE.")
+
+  def_prefer_n <- prefer_n
+  def_extend <- extend
+  def_positive <- positive
+
+  function(x, prefer_n = def_prefer_n, extend = def_extend, positive = def_positive, ...) {
+    r <- range(x)
+    l <- diff(r)
+
+    if (l < max(prefer_n) - 1) {
+      return(seq.int(r[1], r[2]))
+    }
+
+    n <- prefer_n[which.min(l %% (prefer_n - 1))]
+    if (!extend || l %% (n - 1) == 0) {
+      return(unique(round(seq.int(r[1], r[2], length.out = n))))
+    } else {
+      remainders <- l %% (prefer_n - 1)
+      shifts <- prefer_n - 1 - remainders
+      n <- prefer_n[which.min(shifts)]
+      shift <- min(shifts)
+      s_l <- if (positive) min(floor(shift / 2), r[1] - 1) else floor(shift / 2)
+      s_u <- shift - s_l
+      return(seq.int(r[1] - s_l, r[2] + s_u, length.out = n))
+    }
+  }
+}
