@@ -67,8 +67,8 @@ Suggests:
     tidygraph,
     pkgdown
 RdMacros: Rdpack
-URL: http://dmphillippo.github.io/multinma, http://github.com/dmphillippo/multinma
-BugReports: http://github.com/dmphillippo/multinma/issues
+URL: https://dmphillippo.github.io/multinma, https://github.com/dmphillippo/multinma
+BugReports: https://github.com/dmphillippo/multinma/issues
 VignetteBuilder: 
     knitr,
     R.rsp
