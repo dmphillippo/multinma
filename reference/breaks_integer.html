@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • multinma</title>
+<title>Automatic breaks for integer scales — breaks_integer • multinma</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -48,7 +48,9 @@
   <link href="../extra.css" rel="stylesheet">
   
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="Automatic breaks for integer scales — breaks_integer" />
+<meta property="og:description" content="Compute automatic breaks for integer scales, making sure that the breaks are
+also integers." />
 <meta property="og:image" content="http://dmphillippo.github.io/multinma/logo.svg" />
 
 
@@ -68,7 +70,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -170,98 +172,62 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href='http://github.com/dmphillippo/multinma/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+    <h1>Automatic breaks for integer scales</h1>
+    <small class="dont-index">Source: <a href='http://github.com/dmphillippo/multinma/blob/master/R/nma_data-class.R'><code>R/nma_data-class.R</code></a></small>
+    <div class="hidden name"><code>breaks_integer.Rd</code></div>
     </div>
 
-    <div id="multinma-0139000" class="section level1">
-<h1 class="page-header" data-toc-text="0.1.3.9000">
-<a href="#multinma-0139000" class="anchor"></a>multinma 0.1.3.9000<small> Unreleased </small>
-</h1>
-<ul>
-<li>Feature: The <code>set_*()</code> functions now accept <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">dplyr::mutate()</a></code> style semantics, allowing inline variable transformations.</li>
-<li>Feature: Added ordered multinomial models, with helper function <code><a href="../reference/multi.html">multi()</a></code> for specifying the outcomes. Accompanied by a new data set <code>hta_psoriasis</code> and vignette.</li>
-<li>Feature: Implicit flat priors can now be specified, on any parameter, using <code><a href="../reference/priors.html">flat()</a></code>.</li>
-<li>Improvement: <code><a href="../reference/as.array.stan_nma.html">as.array.stan_nma()</a></code> is now much more efficient, meaning that many post-estimation functions are also now much more efficient.</li>
-<li>Improvement: <code><a href="../reference/plot.nma_dic.html">plot.nma_dic()</a></code> is now more efficient, particularly with large numbers of data points.</li>
-<li>Improvement: The layering of points when producing “dev-dev” plots using <code><a href="../reference/plot.nma_dic.html">plot.nma_dic()</a></code> with multiple data types has been reversed for improved clarity (now AgD over the top of IPD).</li>
-<li>Improvement: Aggregate-level predictions with <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> from ML-NMR / IPD regression models are now calculated in a much more memory-efficient manner.</li>
-<li>Improvement: Added an overview of examples given in the vignettes.</li>
-<li>Improvement: Network plots with <code>weight_edges = TRUE</code> no longer produce legends with non-integer values for the number of studies, thanks to a new breaks function <code><a href="../reference/breaks_integer.html">breaks_integer()</a></code>.</li>
-<li>Fix: <code><a href="../reference/plot.nma_dic.html">plot.nma_dic()</a></code> no longer gives an error when attempting to specify <code>.width</code> argument when producing “dev-dev” plots.</li>
-</ul>
-</div>
-    <div id="multinma-013" class="section level1">
-<h1 class="page-header" data-toc-text="0.1.3">
-<a href="#multinma-013" class="anchor"></a>multinma 0.1.3<small> 2020-06-30 </small>
-</h1>
-<ul>
-<li>Format DESCRIPTION to CRAN requirements</li>
-</ul>
-</div>
-    <div id="multinma-012" class="section level1">
-<h1 class="page-header" data-toc-text="0.1.2">
-<a href="#multinma-012" class="anchor"></a>multinma 0.1.2<small> Unreleased </small>
-</h1>
-<ul>
-<li>Wrapped long-running examples in <code>\donttest{}</code> instead of <code>\dontrun{}</code>
-</li>
-</ul>
-</div>
-    <div id="multinma-011" class="section level1">
-<h1 class="page-header" data-toc-text="0.1.1">
-<a href="#multinma-011" class="anchor"></a>multinma 0.1.1<small> Unreleased </small>
-</h1>
-<ul>
-<li>Reduced size of vignettes</li>
-<li>Added methods paper reference to DESCRIPTION</li>
-<li>Added zenodo DOI</li>
-</ul>
-</div>
-    <div id="multinma-010" class="section level1">
-<h1 class="page-header" data-toc-text="0.1.0">
-<a href="#multinma-010" class="anchor"></a>multinma 0.1.0<small> Unreleased </small>
-</h1>
-<ul>
-<li>Feature: Network plots, using a <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code> method for <code>nma_data</code> objects.</li>
-<li>Feature: <code>as.igraph()</code>, <code>as_tbl_graph()</code> methods for <code>nma_data</code> objects.</li>
-<li>Feature: Produce relative effect estimates with <code><a href="../reference/relative_effects.html">relative_effects()</a></code>, posterior ranks with <code><a href="../reference/posterior_ranks.html">posterior_ranks()</a></code>, and posterior rank probabilities with <code><a href="../reference/posterior_ranks.html">posterior_rank_probs()</a></code>. These will be study-specific when a regression model is given.</li>
-<li>Feature: Produce predictions of absolute effects with a <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> method for <code>stan_nma</code> objects.</li>
-<li>Feature: Plots of relative effects, ranks, predictions, and parameter estimates via <code><a href="../reference/plot.nma_summary.html">plot.nma_summary()</a></code>.</li>
-<li>Feature: Optional <code>sample_size</code> argument for <code>set_agd_*()</code> that:
-<ul>
-<li>Enables centering of predictors (<code>center = TRUE</code>) in <code><a href="../reference/nma.html">nma()</a></code> when a regression model is given, replacing the <code>agd_sample_size</code> argument of <code><a href="../reference/nma.html">nma()</a></code>
-</li>
-<li>Enables production of study-specific relative effects, rank probabilities, etc. for studies in the network when a regression model is given</li>
-<li>Allows nodes in network plots to be weighted by sample size</li>
-</ul>
-</li>
-<li>Feature: Plots of residual deviance contributions for a model and “dev-dev” plots comparing residual deviance contributions between two models, using a <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code> method for <code>nma_dic</code> objects produced by <code><a href="../reference/dic.html">dic()</a></code>.</li>
-<li>Feature: Complementary log-log (cloglog) link function <code>link = "cloglog"</code> for binomial likelihoods.</li>
-<li>Feature: Option to specify priors for heterogeneity on the standard deviation, variance, or precision, with argument <code>prior_het_type</code>.</li>
-<li>Feature: Added log-Normal prior distribution.</li>
-<li>Feature: Plots of prior distributions vs. posterior distributions with <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code>.</li>
-<li>Feature: Pairs plot method <code><a href="https://rdrr.io/r/graphics/pairs.html">pairs()</a></code>.</li>
-<li>Feature: Added vignettes with example analyses from the NICE TSDs and more.</li>
-<li>Fix: Random effects models with even moderate numbers of studies could be very slow. These now run much more quickly, using a sparse representation of the RE correlation matrix which is automatically enabled for sparsity above 90% (roughly equivalent to 10 or more studies).</li>
-</ul>
-</div>
-    <div id="multinma-001" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.1">
-<a href="#multinma-001" class="anchor"></a>multinma 0.0.1<small> Unreleased </small>
-</h1>
-<ul>
-<li>Initial release.</li>
-</ul>
-</div>
-  </div>
+    <div class="ref-description">
+    <p>Compute automatic breaks for integer scales, making sure that the breaks are
+also integers.</p>
+    </div>
 
+    <pre class="usage"><span class='fu'>breaks_integer</span><span class='op'>(</span>prefer_n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>4</span>, <span class='fl'>3</span>, <span class='fl'>6</span><span class='op'>)</span>, extend <span class='op'>=</span> <span class='cn'>TRUE</span>, positive <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>prefer_n</th>
+      <td><p>Set of preferred numbers of break points.</p></td>
+    </tr>
+    <tr>
+      <th>extend</th>
+      <td><p>Extend the breaks beyond the range of the data? If <code>TRUE</code>
+ensures that breaks are equally spaced. Default <code>TRUE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>positive</th>
+      <td><p>Create breaks for strictly positive integers? Default <code>TRUE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Unused.</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Returns a function to compute breaks, as required by the <code>breaks</code>
+argument to the <code>scale_*_continuous</code> functions in <code>ggplot2</code>.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>If <code>extend = TRUE</code> (the default), breaks may lie outside of the
+range of the data, but are guaranteed to be equally spaced. If <code>extend = FALSE</code>, the limits of the breaks are equal to the smallest and largest
+values in the data, but within this range breaks may not be equally spaced.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>breaks_integer</span><span class='op'>(</span><span class='op'>)</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>9</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 1 3 5 7 9</div><div class='input'><span class='fu'>breaks_integer</span><span class='op'>(</span><span class='op'>)</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>18</span><span class='op'>)</span> <span class='co'># extended, equally spaced</span>
+</div><div class='output co'>#&gt; [1]  1  7 13 19</div><div class='input'><span class='fu'>breaks_integer</span><span class='op'>(</span>extend <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>18</span><span class='op'>)</span> <span class='co'># un-extended, unequally spaced</span>
+</div><div class='output co'>#&gt; [1]  1  5 10 14 18</div><div class='input'><span class='fu'>breaks_integer</span><span class='op'>(</span>positive <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>(</span><span class='op'>-</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span> <span class='co'># allow negative values</span>
+</div><div class='output co'>#&gt; [1] -1  2  5  8 11</div></pre>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
 
 
