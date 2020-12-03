@@ -111,7 +111,6 @@ reference:
   desc: Default plot theme used by all package plotting functions.
   contents:
   - theme_multinma
-  - breaks_integer
 
 - title: Datasets
   desc: Datasets used for examples and vignettes.

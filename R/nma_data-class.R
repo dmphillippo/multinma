@@ -606,7 +606,7 @@ plot.nma_data <- function(x, ..., layout, circular,
 #'
 #' @return Returns a function to compute breaks, as required by the `breaks`
 #'   argument to the `scale_*_continuous` functions in `ggplot2`.
-#' @export
+#' @noRd
 #'
 #' @examples
 #' breaks_integer()(1:9)
