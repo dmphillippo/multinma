@@ -53,7 +53,7 @@
 the igraph package. The method as_tbl_graph() converts nma_data objects
 into the form used by the ggraph and
 tidygraph packages." />
-<meta property="og:image" content="http://dmphillippo.github.io/multinma/logo.svg" />
+<meta property="og:image" content="https://dmphillippo.github.io/multinma/logo.svg" />
 
 
 
@@ -156,7 +156,7 @@ tidygraph packages." />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="http://github.com/dmphillippo/multinma/">
+  <a href="https://github.com/dmphillippo/multinma/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -175,7 +175,7 @@ tidygraph packages." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Convert networks to graph objects</h1>
-    <small class="dont-index">Source: <a href='http://github.com/dmphillippo/multinma/blob/master/R/nma_data-class.R'><code>R/nma_data-class.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/dmphillippo/multinma/blob/master/R/nma_data-class.R'><code>R/nma_data-class.R</code></a></small>
     <div class="hidden name"><code>graph_conversion.Rd</code></div>
     </div>
 
@@ -260,18 +260,18 @@ one edge is produced for each comparison (by IPD or AgD study type) with a
 #&gt; Network is </span><span style='color: #00BB00;'>connected</span><span></div><div class='input'>
 <span class='co'># Convert to igraph object</span>
 <span class='fu'>igraph</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/igraph/man/as.igraph.html'>as.igraph</a></span><span class='op'>(</span><span class='va'>smk_net</span><span class='op'>)</span>  <span class='co'># Edges combined by default</span>
-</div><div class='output co'>#&gt; IGRAPH c9759ea UN-- 4 6 -- 
+</div><div class='output co'>#&gt; IGRAPH 41ba96c UN-- 4 6 -- 
 #&gt; + attr: name (v/c), .sample_size (v/n), .nstudy (e/n), .type (e/c)
-#&gt; + edges from c9759ea (vertex names):
+#&gt; + edges from 41ba96c (vertex names):
 #&gt; [1] No intervention       --Group counselling     
 #&gt; [2] No intervention       --Individual counselling
 #&gt; [3] Group counselling     --Individual counselling
 #&gt; [4] No intervention       --Self-help             
 #&gt; [5] Group counselling     --Self-help             
 #&gt; [6] Individual counselling--Self-help             </div><div class='input'><span class='fu'>igraph</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/igraph/man/as.igraph.html'>as.igraph</a></span><span class='op'>(</span><span class='va'>smk_net</span>, collapse <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>  <span class='co'># Without combining edges</span>
-</div><div class='output co'>#&gt; IGRAPH 4ebdf37 UN-- 4 28 -- 
+</div><div class='output co'>#&gt; IGRAPH 107a86e UN-- 4 28 -- 
 #&gt; + attr: name (v/c), .sample_size (v/n), .study (e/c), .type (e/c)
-#&gt; + edges from 4ebdf37 (vertex names):
+#&gt; + edges from 107a86e (vertex names):
 #&gt;  [1] No intervention       --Group counselling     
 #&gt;  [2] No intervention       --Individual counselling
 #&gt;  [3] Group counselling     --Individual counselling
