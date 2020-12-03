@@ -1,6 +1,14 @@
 url: https://dmphillippo.github.io/multinma
 
 
+home:
+  title: Bayesian network meta-analysis of individual and aggregate data
+  description: >
+    multinma is an R package for network meta-analysis and (multilevel) network
+    meta-regression of aggregate data, individual patient data, and mixtures of
+    both. Models are estimated in a Bayesian framework using Stan.
+
+
 template:
   params:
     bootswatch: paper
