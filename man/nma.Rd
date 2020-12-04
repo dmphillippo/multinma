@@ -154,39 +154,33 @@ smk_net
 
 \donttest{
 # Fitting a fixed effect model
-smk_fit_FE <- nma(smk_net,
+smk_fit_FE <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
                   trt_effects = "fixed",
                   prior_intercept = normal(scale = 100),
-                  prior_trt = normal(scale = 100),
-                  # Hide progress
-                  refresh = 0)
+                  prior_trt = normal(scale = 100))
 
 smk_fit_FE
 }
 
 \donttest{
 # Fitting a random effects model
-smk_fit_RE <- nma(smk_net,
+smk_fit_RE <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
                   trt_effects = "random",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 100),
-                  prior_het = normal(scale = 5),
-                  # Hide progress
-                  refresh = 0)
+                  prior_het = normal(scale = 5))
 
 smk_fit_RE
 }
 
 \donttest{
 # Fitting an unrelated mean effects (inconsistency) model
-smk_fit_RE_UME <- nma(smk_net,
+smk_fit_RE_UME <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
                       consistency = "ume",
                       trt_effects = "random",
                       prior_intercept = normal(scale = 100),
                       prior_trt = normal(scale = 100),
-                      prior_het = normal(scale = 5),
-                      # Hide progress
-                      refresh = 0)
+                      prior_het = normal(scale = 5))
 
 smk_fit_RE_UME
 }
@@ -275,7 +269,7 @@ pso_net <- add_integration(pso_net,
 # init_r = 0.1, since probit models in particular are often hard to initialise.
 # Using the QR decomposition greatly improves sampling efficiency here, as is
 # often the case for regression models.
-pso_fit <- nma(pso_net,
+pso_fit <- nma(pso_net, \dontshow{refresh = if (interactive()) 200 else 0,}
                trt_effects = "fixed",
                link = "probit",
                likelihood = "bernoulli2",
@@ -285,9 +279,7 @@ pso_fit <- nma(pso_net,
                prior_trt = normal(scale = 10),
                prior_reg = normal(scale = 10),
                init_r = 0.1,
-               QR = TRUE,
-               # Hide progress
-               refresh = 0)
+               QR = TRUE)
 pso_fit
 }
 
