@@ -1,4 +1,4 @@
-# multinma 0.1.3.9000
+# multinma 0.2.0
 
 * Feature: The `set_*()` functions now accept `dplyr::mutate()` style semantics,
 allowing inline variable transformations.
