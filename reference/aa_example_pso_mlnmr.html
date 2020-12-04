@@ -330,7 +330,7 @@ available in the global environment.</p>
 <span class='co'># init_r = 0.1, since probit models in particular are often hard to initialise.</span>
 <span class='co'># Using the QR decomposition greatly improves sampling efficiency here, as is</span>
 <span class='co'># often the case for regression models.</span>
-<span class='va'>pso_fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nma.html'>nma</a></span><span class='op'>(</span><span class='va'>pso_net</span>,
+<span class='va'>pso_fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nma.html'>nma</a></span><span class='op'>(</span><span class='va'>pso_net</span>, refresh <span class='op'>=</span> <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='fl'>200</span> <span class='kw'>else</span> <span class='fl'>0</span>,
                trt_effects <span class='op'>=</span> <span class='st'>"fixed"</span>,
                link <span class='op'>=</span> <span class='st'>"probit"</span>,
                likelihood <span class='op'>=</span> <span class='st'>"bernoulli2"</span>,
@@ -340,9 +340,7 @@ available in the global environment.</p>
                prior_trt <span class='op'>=</span> <span class='fu'><a href='priors.html'>normal</a></span><span class='op'>(</span>scale <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span>,
                prior_reg <span class='op'>=</span> <span class='fu'><a href='priors.html'>normal</a></span><span class='op'>(</span>scale <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span>,
                init_r <span class='op'>=</span> <span class='fl'>0.1</span>,
-               QR <span class='op'>=</span> <span class='cn'>TRUE</span>,
-               <span class='co'># Hide progress</span>
-               refresh <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span>
+               QR <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Note: Setting "PBO" as the network reference treatment.</span></div><div class='input'><span class='va'>pso_fit</span>
 </div><div class='output co'>#&gt; A fixed effects ML-NMR with a bernoulli2 likelihood (probit link).
 #&gt; Regression model: ~(durnpso + prevsys + bsa + weight + psa) * .trt.
@@ -398,7 +396,7 @@ available in the global environment.</p>
 #&gt; d[SEC_300]                              2.45     2.53     2.69  7808    1
 #&gt; lp__                                -1576.15 -1573.86 -1570.64  1424    1
 #&gt; 
-#&gt; Samples were drawn using NUTS(diag_e) at Thu Dec  3 18:04:08 2020.
+#&gt; Samples were drawn using NUTS(diag_e) at Fri Dec  4 10:50:51 2020.
 #&gt; For each parameter, n_eff is a crude measure of effective sample size,
 #&gt; and Rhat is the potential scale reduction factor on split chains (at 
 #&gt; convergence, Rhat=1).</div><div class='input'><span class='co'># }</span>

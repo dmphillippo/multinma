@@ -235,12 +235,10 @@ available in the global environment.</p>
 #&gt; Network is </span><span style='color: #00BB00;'>connected</span><span></div><div class='input'>
 <span class='co'># \donttest{</span>
 <span class='co'># Fitting a fixed effect model</span>
-<span class='va'>smk_fit_FE</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nma.html'>nma</a></span><span class='op'>(</span><span class='va'>smk_net</span>,
+<span class='va'>smk_fit_FE</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nma.html'>nma</a></span><span class='op'>(</span><span class='va'>smk_net</span>, refresh <span class='op'>=</span> <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='fl'>200</span> <span class='kw'>else</span> <span class='fl'>0</span>,
                   trt_effects <span class='op'>=</span> <span class='st'>"fixed"</span>,
                   prior_intercept <span class='op'>=</span> <span class='fu'><a href='priors.html'>normal</a></span><span class='op'>(</span>scale <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>,
-                  prior_trt <span class='op'>=</span> <span class='fu'><a href='priors.html'>normal</a></span><span class='op'>(</span>scale <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>,
-                  <span class='co'># Hide progress</span>
-                  refresh <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span>
+                  prior_trt <span class='op'>=</span> <span class='fu'><a href='priors.html'>normal</a></span><span class='op'>(</span>scale <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='va'>smk_fit_FE</span>
 </div><div class='output co'>#&gt; A fixed effects NMA with a binomial likelihood (logit link).
@@ -259,7 +257,7 @@ available in the global environment.</p>
 #&gt; d[Self-help]                  0.31     0.47  3063    1
 #&gt; lp__                      -5856.69 -5853.09  1690    1
 #&gt; 
-#&gt; Samples were drawn using NUTS(diag_e) at Thu Dec  3 18:05:31 2020.
+#&gt; Samples were drawn using NUTS(diag_e) at Fri Dec  4 10:52:16 2020.
 #&gt; For each parameter, n_eff is a crude measure of effective sample size,
 #&gt; and Rhat is the potential scale reduction factor on split chains (at 
 #&gt; convergence, Rhat=1).</div><div class='input'><span class='co'># }</span>
