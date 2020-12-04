@@ -1,9 +1,10 @@
 #' multinma: A Package for Network Meta-Analysis of Individual and Aggregate
 #' Data in Stan
 #'
-#' @description An R package for performing network meta-analysis and network
-#'   meta-regression with aggregate data, individual patient data, or mixtures
-#'   of both.
+#' @description
+#'   \if{html}{\figure{logo.svg}{options: height="139px" align="right" alt="multinma logo"}}
+#'   An R package for performing network meta-analysis and network meta-regression
+#'   with aggregate data, individual patient data, or mixtures of both.
 #'
 #' @details Network meta-analysis (NMA) combines (aggregate) data from multiple
 #'   studies on multiple treatments in order to produce consistent estimates of
@@ -33,6 +34,18 @@
 #'   models, with a Gaussian copula to account for correlations between
 #'   covariates \insertCite{methods_paper,Phillippo_thesis}{multinma}.
 #'
+#' @section Getting Started:
+#'   A good place to start is with the package vignettes which walk through
+#'   example analyses, see `vignette("vignette_overview")` for an overview.
+#'   The series of NICE Technical Support Documents on evidence synthesis gives
+#'   a detailed introduction to network meta-analysis:
+#'
+#'   \insertRef{TSD_evsynth}{multinma}
+#'
+#'   Multilevel network meta-regression is set out in the following methods paper:
+#'
+#'   \insertRef{methods_paper}{multinma}
+#'
 #' @docType package
 #' @name multinma-package
 #' @aliases multinma
@@ -47,7 +60,7 @@
 #' @importFrom grDevices nclass.Sturges
 #' @importFrom stats complete.cases sd median quantile model.frame model.matrix
 #'   model.offset terms optim pbinom dbinom qbinom as.formula update.formula
-#'   weighted.mean runif plogis pnorm
+#'   weighted.mean runif dunif plogis pnorm
 #' @importFrom utils packageVersion
 #'
 #' @references

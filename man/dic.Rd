@@ -19,40 +19,14 @@ Calculate the DIC for a model fitted using the \code{\link[=nma]{nma()}} functio
 }
 \examples{
 ## Smoking cessation
-# Set up network of smoking cessation data
-head(smoking)
-
-smk_net <- set_agd_arm(smoking,
-                       study = studyn,
-                       trt = trtc,
-                       r = r,
-                       n = n,
-                       trt_ref = "No intervention")
-
-# Print details
-smk_net
-
 \donttest{
-# Fitting a fixed effect model
-smk_fit_FE <- nma(smk_net,
-              trt_effects = "fixed",
-              prior_intercept = normal(scale = 100),
-              prior_trt = normal(scale = 100))
-
-smk_fit_FE
+# Run smoking FE NMA example if not already available
+if (!exists("smk_fit_FE")) example("example_smk_fe")
 }
-
 \donttest{
-# Fitting a random effects model
-smk_fit_RE <- nma(smk_net,
-                  trt_effects = "random",
-                  prior_intercept = normal(scale = 100),
-                  prior_trt = normal(scale = 100),
-                  prior_het = normal(scale = 5))
-
-smk_fit_RE
+# Run smoking RE NMA example if not already available
+if (!exists("smk_fit_RE")) example("example_smk_re")
 }
-
 \donttest{
 # Compare DIC of FE and RE models
 (smk_dic_FE <- dic(smk_fit_FE))
@@ -64,17 +38,9 @@ plot(smk_dic_RE)
 # Check for inconsistency using UME model
 }
 \donttest{
-# Fitting an unrelated mean effects (inconsistency) model
-smk_fit_RE_UME <- nma(smk_net,
-                      consistency = "ume",
-                      trt_effects = "random",
-                      prior_intercept = normal(scale = 100),
-                      prior_trt = normal(scale = 100),
-                      prior_het = normal(scale = 5))
-
-smk_fit_RE_UME
+# Run smoking UME NMA example if not already available
+if (!exists("smk_fit_RE_UME")) example("example_smk_ume")
 }
-
 \donttest{
 # Compare DIC
 smk_dic_RE

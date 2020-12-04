@@ -4,6 +4,7 @@
 skip_on_cran()
 
 
+
 params <-
 list(run_tests = FALSE)
 
@@ -73,14 +74,15 @@ summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- warning=FALSE-------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 db_fit_RE <- nma(db_net, 
                  trt_effects = "random",
                  link = "cloglog",
                  regression = ~offset(log(time)),
                  prior_intercept = normal(scale = 10),
                  prior_trt = normal(scale = 10),
-                 prior_het = half_normal(scale = 5))
+                 prior_het = half_normal(scale = 5),
+                 init_r = 0.5)
 
 
 ## -------------------------------------------------------------------------------------------------

@@ -1,43 +1,31 @@
-## Resubmission
-This is a resubmission. In this version I have:
-
-* Used single quotes for 'Stan' in the DESCRIPTION file.
-* Confirmed that no vignettes, examples or tests run on more than two cores.
-Vignettes are provided as pre-compiled HTML files since they take a while to
-build. All examples and tests run on only one core on CRAN.
-
 ## Test environments
-* local R installation (windows), R 4.0.1, 4.0.2
+* local R installation (Windows 10), R 4.0.3
 * win-builder (release, devel)
-* Travis ubuntu (release, devel)
+* Ubuntu 20.04 on GitHub Actions (release, devel)
+* Mac OS 10.15.7 on GitHub Actions (release)
+* Windows Server 2019 10.0.17763 on GitHub Actions (release)
 
 ## R CMD check results
 
-0 errors | 0 warnings | 4 notes
-
-* checking CRAN incoming feasibility ... NOTE
-Maintainer: 'David M. Phillippo <david.phillippo@bristol.ac.uk>'
-
-New submission
-
-This is the first submission of this package.
+0 errors | 0 warnings | 3 notes
 
 * checking package dependencies ... NOTE
-Imports includes 21 non-default packages.
-Importing from so many packages makes the package vulnerable to any of
-them becoming unavailable.  Move as many as possible to Suggests and
-use conditionally.
+  Imports includes 22 non-default packages.
 
 * checking installed package size ... NOTE
-  installed size is 15.9Mb
+  installed size is 12.5Mb
   sub-directories of 1Mb or more:
-    doc    5.2Mb
-    libs   9.7Mb
+    doc    5.7Mb
+    libs   5.6Mb
 
-The docs directory contains 11 html vignettes demonstrating full analyses using
+The docs directory contains 12 html vignettes demonstrating full analyses using
 the package.
 
 * checking for GNU extensions in Makefiles ... NOTE
-GNU make is a SystemRequirements.
+  GNU make is a SystemRequirements.
 
 Required to compile Stan models with rstan package.
+
+## Downstream dependencies
+There are currently no downstream dependencies for this package.
+

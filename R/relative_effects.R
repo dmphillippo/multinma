@@ -31,8 +31,7 @@
 #'
 #' @examples
 #' ## Smoking cessation
-#' @template ex_smoking_network
-#' @template ex_smoking_nma_re
+#' @template ex_smoking_nma_re_example
 #' @examples \donttest{
 #' # Produce relative effects
 #' smk_releff_RE <- relative_effects(smk_fit_RE)
@@ -59,9 +58,7 @@
 #' }
 #'
 #' ## Plaque psoriasis ML-NMR
-#' @template ex_plaque_psoriasis_network
-#' @template ex_plaque_psoriasis_integration
-#' @template ex_plaque_psoriasis_mlnmr
+#' @template ex_plaque_psoriasis_mlnmr_example
 #' @examples \donttest{
 #' # Produce population-adjusted relative effects for all study populations in
 #' # the network
@@ -95,6 +92,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
     if (is.null(.study)) {
       newdata$.study <- nfactor(paste("New", seq_len(nrow(newdata))))
     } else {
+      check_study(.study)
       newdata <- dplyr::mutate(newdata, .study = nfactor(.study))
 
       if (anyDuplicated(newdata$.study))

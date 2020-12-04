@@ -33,7 +33,7 @@
 #' @param prior_reg Specification of prior distribution for the regression
 #'   coefficients (if `regression` formula specified)
 #' @param prior_aux Specification of prior distribution for the auxiliary
-#'   parameter, if applicable
+#'   parameter, if applicable (see details)
 #' @param QR Logical scalar (default `FALSE`), whether to apply a QR
 #'   decomposition to the model design matrix
 #' @param center Logical scalar (default `TRUE`), whether to center the
@@ -65,6 +65,23 @@
 #'   chosen prior distributions on the posterior distributions, and the
 #'   \code{\link[multinma:summary.nma_prior]{summary()}} method for `nma_prior`
 #'   objects prints prior intervals.
+#'
+#' @section Auxiliary parameters:
+#'   Auxiliary parameters are only present in the following models.
+#'
+#'   ## Normal likelihood with IPD
+#'   When a Normal likelihood is fitted to IPD, the auxiliary parameters are the
+#'   arm-level standard deviations \eqn{\sigma_{jk}} on treatment \eqn{k} in
+#'   study \eqn{j}.
+#'
+#'   ## Ordered multinomial likelihood
+#'   When fitting a model to \eqn{M} ordered outcomes, the auxiliary parameters
+#'   are the latent cutoffs between each category, \eqn{c_0 < c_1 < \dots <
+#'   c_M}. Only \eqn{c_2} to \eqn{c_{M-1}} are estimated; we fix \eqn{c_0 =
+#'   -\infty}, \eqn{c_1 = 0}, and \eqn{c_M = \infty}. When specifying priors for
+#'   these latent cutoffs, we choose to specify priors on the *differences*
+#'   \eqn{c_{m+1} - c_m}. Stan automatically truncates any priors so that the
+#'   ordering constraints are satisfied.
 #'
 #' @return `nma()` returns a [stan_nma] object, `nma.fit()` returns a [stanfit]
 #'   object.
@@ -137,7 +154,7 @@ nma <- function(network,
   link <- check_link(link, likelihood)
 
   # When are priors on auxiliary parameters required?
-  has_aux <- (likelihood == "normal" && has_ipd(network))
+  has_aux <- (likelihood == "normal" && has_ipd(network)) || likelihood == "ordered"
 
   # Are study intercepts present? Not if only contrast data
   has_intercepts <- has_agd_arm(network) || has_ipd(network)
@@ -165,8 +182,10 @@ nma <- function(network,
   if (has_aux && .is_default(prior_aux)) {
     if (likelihood == "normal" && has_ipd(network)) {
       prior_aux <- .default(half_normal(scale = 5))
-      prior_defaults$prior_aux <- get_prior_call(prior_aux)
+    } else if (likelihood == "ordered") {
+      prior_aux <- .default(flat())
     }
+    prior_defaults$prior_aux <- get_prior_call(prior_aux)
   }
 
   # Warn where default priors are used
@@ -462,11 +481,14 @@ nma <- function(network,
     agd_contrast_data_labels <- NULL
   }
 
-  data_labels <- c(ipd_data_labels,
-                   agd_arm_data_labels,
-                   agd_contrast_data_labels)
+  if (has_ipd(network))
+    fnames_oi[grepl("^fitted_ipd\\[[0-9]+\\]$", fnames_oi)] <- paste0("fitted_ipd[", ipd_data_labels, "]")
 
-  fnames_oi[grepl("^fitted\\[[0-9]+\\]$", fnames_oi)] <- paste0("fitted[", data_labels, "]")
+  if (has_agd_arm(network))
+    fnames_oi[grepl("^fitted_agd_arm\\[[0-9]+\\]$", fnames_oi)] <- paste0("fitted_agd_arm[", agd_arm_data_labels, "]")
+
+  if (has_agd_contrast(network))
+    fnames_oi[grepl("^fitted_agd_contrast\\[[0-9]+\\]$", fnames_oi)] <- paste0("fitted_agd_contrast[", agd_contrast_data_labels, "]")
 
   # Labels for RE deltas
   if (trt_effects == "random") {
@@ -521,13 +543,23 @@ nma <- function(network,
   # Labels for cumulative integration points
   if (inherits(network, "mlnmr_data") && (has_agd_arm(network) || has_agd_contrast(network))) {
     n_int_thin <- n_int %/% int_thin
-    cumint_labels <- c(rep(agd_arm_data_labels, each = n_int_thin),
-                       rep(agd_contrast_data_labels, each = n_int_thin))
-    cumint_labels <- paste0(cumint_labels, ", ", rep_len(1:n_int_thin * int_thin, length.out = length(cumint_labels)))
 
-    fnames_oi[grepl("^theta_bar_cum\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta_bar_cum[", cumint_labels, "]")
-    if (likelihood %in% c("bernoulli2", "binomial2"))
-      fnames_oi[grepl("^theta2_bar_cum\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta2_bar_cum[", cumint_labels, "]")
+    if (has_agd_arm(network)) {
+      agd_arm_cumint_labels <- rep(agd_arm_data_labels, each = n_int_thin)
+      agd_arm_cumint_labels <- paste0(agd_arm_cumint_labels, ", ", rep_len(1:n_int_thin * int_thin, length.out = length(agd_arm_cumint_labels)))
+
+      fnames_oi[grepl("^theta_bar_cum_agd_arm\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta_bar_cum_agd_arm[", agd_arm_cumint_labels, "]")
+      if (likelihood %in% c("bernoulli2", "binomial2"))
+        fnames_oi[grepl("^theta2_bar_cum\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta2_bar_cum[", agd_arm_cumint_labels, "]")
+    }
+
+    if (has_agd_contrast(network)) {
+      agd_contrast_cumint_labels <- rep(agd_contrast_data_labels, each = n_int_thin)
+      agd_contrast_cumint_labels <- paste0(agd_contrast_cumint_labels, ", ", rep_len(1:n_int_thin * int_thin, length.out = length(agd_contrast_cumint_labels)))
+
+      fnames_oi[grepl("^theta_bar_cum_agd_contrast\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta_bar_cum_agd_contrast[", agd_contrast_cumint_labels, "]")
+    }
+
   }
 
   stanfit@sim$fnames_oi <- fnames_oi
@@ -688,7 +720,7 @@ nma.fit <- function(ipd_x, ipd_y,
   link <- check_link(link, likelihood)
 
   # When are priors on auxiliary parameters required?
-  has_aux <- (likelihood == "normal" && has_ipd)
+  has_aux <- (likelihood == "normal" && has_ipd) || likelihood == "ordered"
 
   # Check priors
   if (!inherits(prior_intercept, "nma_prior")) abort("`prior_intercept` should be a prior distribution, see ?priors.")
@@ -856,30 +888,34 @@ nma.fit <- function(ipd_x, ipd_y,
     R_inv = if (QR) X_all_R_inv else matrix(0, 0, 0),
     # Offsets
     has_offset = has_offsets,
-    offset = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric()
+    offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric()
     )
 
   # Add priors
   standat <- purrr::list_modify(standat,
     !!! prior_standat(prior_intercept, "prior_intercept",
-                      valid = c("Normal", "Cauchy", "Student t")),
+                      valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
     !!! prior_standat(prior_trt, "prior_trt",
-                      valid = c("Normal", "Cauchy", "Student t")),
+                      valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
     !!! prior_standat(prior_reg, "prior_reg",
-                      valid = c("Normal", "Cauchy", "Student t")),
+                      valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
     !!! prior_standat(prior_het, "prior_het",
                       valid = c("Normal", "half-Normal", "log-Normal",
                                 "Cauchy",  "half-Cauchy",
                                 "Student t", "half-Student t",
-                                "Exponential")),
+                                "Exponential", "flat (implicit)")),
     prior_het_type = switch(prior_het_type,
                             sd = 1, var = 2, prec = 3)
     )
 
   # Standard pars to monitor
   pars <- c("mu", "beta", "d",
-            "log_lik", "resdev", "fitted",
+            "log_lik", "resdev",
             "lp__")
+
+  if (has_ipd) pars <- c(pars, "fitted_ipd")
+  if (has_agd_arm) pars <- c(pars, "fitted_agd_arm")
+  if (has_agd_contrast) pars <- c(pars, "fitted_agd_contrast")
 
   # Monitor heterogeneity SD and study deltas if RE model
   if (trt_effects == "random") {
@@ -887,7 +923,8 @@ nma.fit <- function(ipd_x, ipd_y,
   }
   # Monitor cumulative integration error if using numerical integration
   if (n_int > 1) {
-    pars <- c(pars, "theta_bar_cum")
+    if (has_agd_arm) pars <- c(pars, "theta_bar_cum_agd_arm")
+    if (has_agd_contrast) pars <- c(pars, "theta_bar_cum_agd_contrast")
   }
 
   # Set adapt_delta, but respect other control arguments if passed in ...
@@ -916,7 +953,7 @@ nma.fit <- function(ipd_x, ipd_y,
                         valid = c("Normal", "half-Normal", "log-Normal",
                                   "Cauchy",  "half-Cauchy",
                                   "Student t", "half-Student t",
-                                  "Exponential")),
+                                  "Exponential", "flat (implicit)")),
 
       # Specify link
       link = switch(link, identity = 1, log = 2)
@@ -982,6 +1019,71 @@ nma.fit <- function(ipd_x, ipd_y,
                                    data = standat,
                                    pars = pars)
 
+  # -- Ordered multinomial likelihood
+  } else if (likelihood == "ordered") {
+
+    if (has_ipd) {
+      # Determine number of categories
+      ncat <- ncol(ipd_y$.r)
+      # Stan model takes IPD as an integer vector of category numbers
+      ipd_r_int <- apply(ipd_y$.r == 1, 1, which)
+      # Determine which categories are present
+      ipd_cat <- t(apply(ipd_y$.r, 1,
+                         function(x) {
+                           cs <- which(!is.na(x))
+                           c(cs, rep(0, ncat - length(cs)))
+                         }))
+      ipd_ncat <- rowSums(ipd_cat > 0)
+    }
+
+    if (has_agd_arm) {
+      # Determine number of categories
+      if (!has_ipd) ncat <- ncol(agd_arm_y$.r)
+      # Determine which categories are present
+      agd_arm_cat <- t(apply(agd_arm_y$.r, 1,
+                         function(x) {
+                           cs <- which(!is.na(x))
+                           c(cs, rep(0, ncat - length(cs)))
+                         }))
+      agd_arm_ncat <- rowSums(agd_arm_cat > 0)
+      # Replace missing category counts with 0 (these will drop out of the likelihood)
+      agd_arm_r <- tidyr::replace_na(agd_arm_y$.r, 0)
+      agd_arm_n <- rowSums(agd_arm_y$.r, na.rm = TRUE)
+    }
+
+    if (!has_ipd && !has_agd_arm) {
+      abort("No IPD or AgD (arm-based) in the network. Cannot fit ordered model to contrast data only.")
+    }
+
+    standat <- purrr::list_modify(standat,
+      # Add outcomes
+      ncat = ncat,
+
+      ipd_r = if (has_ipd) ipd_r_int else integer(),
+      ipd_cat = if (has_ipd) ipd_cat else matrix(0, 0, ncat),
+      ipd_ncat = if (has_ipd) ipd_ncat else integer(),
+
+      agd_arm_r = if (has_agd_arm) agd_arm_r else matrix(0, 0, ncat),
+      agd_arm_n = if (has_agd_arm) agd_arm_n else integer(),
+      agd_arm_cat = if (has_agd_arm) agd_arm_cat else matrix(0, 0, ncat),
+      agd_arm_ncat = if (has_agd_arm) agd_arm_ncat else integer(),
+
+      # Add prior for auxiliary parameters - latent cutoffs
+      !!! prior_standat(prior_aux, "prior_aux",
+                        valid = c("Normal", "half-Normal", "log-Normal",
+                                  "Cauchy",  "half-Cauchy",
+                                  "Student t", "half-Student t",
+                                  "Exponential", "flat (implicit)")),
+
+      # Specify link
+      link = switch(link, logit = 1, probit = 2, cloglog = 3)
+    )
+
+    stanargs <- purrr::list_modify(stanargs,
+                                   object = stanmodels$ordered_multinomial,
+                                   data = standat,
+                                   pars = c(pars, "cc"))
+
   } else {
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
   }
@@ -996,6 +1098,13 @@ nma.fit <- function(ipd_x, ipd_y,
   fnames_oi[grepl("^d\\[[0-9]+\\]$", fnames_oi)] <- paste0("d[", x_names_sub[col_trt], "]")
   fnames_oi[grepl("^beta\\[[0-9]+\\]$", fnames_oi)] <- paste0("beta[", x_names[col_reg], "]")
   fnames_oi <- gsub("tau[1]", "tau", fnames_oi, fixed = TRUE)
+
+  if (likelihood == "ordered") {
+    if (has_ipd) l_cat <- colnames(ipd_y$.r)[-1]
+    else if (has_agd_arm) l_cat <- colnames(agd_arm_y$.r)[-1]
+    fnames_oi[grepl("^cc\\[[0-9]+\\]$", fnames_oi)] <- paste0("cc[", l_cat, "]")
+  }
+
   stanfit@sim$fnames_oi <- fnames_oi
 
   return(stanfit)
@@ -1132,7 +1241,8 @@ check_likelihood <- function(x, outcome) {
   valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
                       count = c("binomial", "binomial2"),
                       rate = "poisson",
-                      continuous = "normal")
+                      continuous = "normal",
+                      ordered = "ordered")
 
   if (missing(outcome)) valid_lhood <- unlist(valid_lhood)
   else if (!is.na(outcome$ipd)) {
@@ -1174,7 +1284,8 @@ check_link <- function(x, lik) {
                      bernoulli2 = c("logit", "probit", "cloglog"),
                      binomial = c("logit", "probit", "cloglog"),
                      binomial2 = c("logit", "probit", "cloglog"),
-                     poisson = "log")[[lik]]
+                     poisson = "log",
+                     ordered = c("logit", "probit", "cloglog"))[[lik]]
 
   if (is.null(x)) {
     x <- valid_link[1]
@@ -1217,7 +1328,8 @@ inverse_link <- function(x, link = c("identity", "log", "logit", "probit", "clog
 #' @return String giving the scale name, e.g. "log Odds Ratio"
 #' @noRd
 get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
-                                          "binomial", "binomial2", "poisson"),
+                                          "binomial", "binomial2", "poisson",
+                                          "ordered"),
                            link = c("identity", "log", "logit", "probit", "cloglog"),
                            measure = c("relative", "absolute"),
                            type = c("link", "response")) {
@@ -1247,7 +1359,7 @@ get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
       }
     }
 
-  } else if (likelihood %in% c("bernoulli", "bernoulli2", "binomial", "binomial2")) {
+  } else if (likelihood %in% c("bernoulli", "bernoulli2", "binomial", "binomial2", "ordered")) {
 
     if (link == "logit") {
       if (measure == "relative") {
@@ -1305,7 +1417,8 @@ get_outcome_variables <- function(x, o_type) {
     binary = ".r",
     rate = c(".r", ".E"),
     count = c(".r", ".n"),
-    continuous = c(".y", ".se")
+    continuous = c(".y", ".se"),
+    ordered = ".r"
   )[[o_type]]
 
   return(
@@ -1773,6 +1886,7 @@ prior_standat <- function(x, par, valid){
                 glue::glue_collapse(valid, sep = ", ", last = ", or ")))
 
   distn <- switch(dist,
+                  `flat (implicit)` = 0,
                   Normal = , `half-Normal` = 1,
                   Cauchy = , `half-Cauchy` = 2,
                   `Student t` = , `half-Student t` = 3,

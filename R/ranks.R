@@ -39,8 +39,7 @@
 #'
 #' @examples
 #' ## Smoking cessation
-#' @template ex_smoking_network
-#' @template ex_smoking_nma_re
+#' @template ex_smoking_nma_re_example
 #' @examples \donttest{
 #' # Produce posterior ranks
 #' smk_rank_RE <- posterior_ranks(smk_fit_RE, lower_better = FALSE)
@@ -58,16 +57,14 @@
 #' smk_cumrankprob_RE
 #' plot(smk_cumrankprob_RE)
 #'
-#' #' # Further customisation is possible with ggplot commands
+#' # Further customisation is possible with ggplot commands
 #' plot(smk_cumrankprob_RE) +
 #'   ggplot2::facet_null() +
 #'   ggplot2::aes(colour = Treatment)
 #' }
 #'
 #' ## Plaque psoriasis ML-NMR
-#' @template ex_plaque_psoriasis_network
-#' @template ex_plaque_psoriasis_integration
-#' @template ex_plaque_psoriasis_mlnmr
+#' @template ex_plaque_psoriasis_mlnmr_example
 #' @examples \donttest{
 #' # Produce population-adjusted rankings for all study populations in
 #' # the network

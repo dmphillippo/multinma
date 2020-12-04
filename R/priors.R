@@ -39,6 +39,14 @@
 #' | \strong{Student t} `student_t()` | Yes | Yes | Yes | Yes | Yes |
 #' | \strong{half-Student t} `half_student_t()` | - | - | Yes | - | Yes |
 #' | \strong{Exponential} `exponential()` | - | - | Yes | - | Yes |
+#' | \strong{Flat} `flat()` | Yes | Yes | Yes | Yes | Yes |
+#'
+#' The `flat()` prior is a special case where no prior information is added to
+#' the model, resulting in an implicit flat uniform prior distribution over the
+#' entire support for a parameter. This will be an improper prior if the
+#' parameter is unbounded, and is not generally advised. See the
+#' [Stan user's guide](https://mc-stan.org/docs/stan-users-guide/some-differences-in-the-statistical-models-that-are-allowed.html)
+#' for more details.
 #'
 #' @return Object of class [nma_prior].
 #' @export
@@ -117,6 +125,12 @@ exponential <- function(scale = 1/rate, rate = 1/scale) {
   check_prior_scale(scale, type = "scale or rate")
 
   return(new_nma_prior("Exponential", scale = scale))
+}
+
+#' @rdname priors
+#' @export
+flat <- function() {
+  return(new_nma_prior("flat (implicit)"))
 }
 
 # #' @rdname priors
@@ -215,6 +229,11 @@ get_tidy_prior <- function(prior, trunc = NULL) {
     out <- tibble::tibble(dist_label = d,
                           dist = "exp",
                           args = list(list(rate = 1 / prior$scale)))
+  } else if (d == "flat (implicit)") {
+    out <- tibble::tibble(dist_label = d,
+                          dist = "unif",
+                          args = list(list(min = if (is_trunc) trunc[1] else -Inf,
+                                           max = if (is_trunc) trunc[2] else Inf)))
   }
 
   if (is_trunc && d %in% c("Normal", "Cauchy", "Student t", "Exponential", "log-Normal")) {
@@ -238,9 +257,13 @@ get_prior_call <- function(x) {
 
   prior_args <- purrr::list_modify(x, dist = purrr::zap(), fun = purrr::zap())
   prior_args <- prior_args[!is.na(prior_args)]
-  out <- paste0(x$fun, "(",
-                paste(names(prior_args), prior_args, sep = ' = ', collapse = ', '),
-                ")")
+  if (length(prior_args)) {
+    out <- paste0(x$fun, "(",
+                  paste(names(prior_args), prior_args, sep = ' = ', collapse = ', '),
+                  ")")
+  } else {
+    out <- paste0(x$fun, "()")
+  }
   return(out)
 }
 

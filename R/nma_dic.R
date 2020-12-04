@@ -12,9 +12,8 @@
 #'   producing plots of residual deviance contributions.
 #'
 #' @examples ## Smoking cessation
-#' @template ex_smoking_network
-#' @template ex_smoking_nma_fe
-#' @template ex_smoking_nma_re
+#' @template ex_smoking_nma_fe_example
+#' @template ex_smoking_nma_re_example
 #' @examples \donttest{
 #' # Compare DIC of FE and RE models
 #' (smk_dic_FE <- dic(smk_fit_FE))
@@ -25,7 +24,7 @@
 #'
 #' # Check for inconsistency using UME model
 #' }
-#' @template ex_smoking_nma_re_ume
+#' @template ex_smoking_nma_re_ume_example
 #' @examples \donttest{
 #' # Compare DIC
 #' smk_dic_RE
@@ -40,14 +39,13 @@ dic <- function(x, ...) {
   net <- x$network
 
   resdev <- colMeans(as.matrix(x, pars = "resdev"))
-  fitted <- colMeans(as.matrix(x, pars = "fitted"))
 
   resdev_array <- as.array(x, pars = "resdev")
 
   if (has_ipd(net)) {
     n_ipd <- nrow(net$ipd)
     resdev_ipd <- resdev[1:n_ipd]
-    fitted_ipd <- fitted[1:n_ipd]
+    fitted_ipd <- colMeans(as.matrix(x, pars = "fitted_ipd"))
   } else {
     n_ipd <- 0
   }
@@ -55,7 +53,7 @@ dic <- function(x, ...) {
   if (has_agd_arm(net)) {
     n_agd_arm <- nrow(net$agd_arm)
     resdev_agd_arm <- resdev[n_ipd + (1:n_agd_arm)]
-    fitted_agd_arm <- fitted[n_ipd + (1:n_agd_arm)]
+    fitted_agd_arm <- colMeans(as.matrix(x, pars = "fitted_agd_arm"))
   } else {
     n_agd_arm <- 0
   }
@@ -67,11 +65,12 @@ dic <- function(x, ...) {
     nf_agd_contrast <- nrow(dplyr::filter(net$agd_contrast, !is.na(.data$.y)))
 
     resdev_agd_contrast <- resdev[n_ipd + n_agd_arm + (1:nr_agd_contrast)]
-    fitted_agd_contrast <- fitted[n_ipd + n_agd_arm + (1:nf_agd_contrast)]
+    fitted_agd_contrast <- colMeans(as.matrix(x, pars = "fitted_agd_contrast"))
   } else {
     nr_agd_contrast <- nf_agd_contrast <- 0
   }
 
+  has_df <- FALSE
 
   if (x$likelihood %in% c("bernoulli", "bernoulli2", "binomial", "binomial2")) {
     if (has_ipd(net)) {
@@ -144,6 +143,45 @@ dic <- function(x, ...) {
       leverage_agd_arm <- NULL
     }
 
+  } else if (x$likelihood == "ordered") {
+    if (has_ipd(net)) {
+      ipd_r <- net$ipd$.r
+      m_fitted_ipd <- matrix(fitted_ipd, nrow = n_ipd)
+
+      resdevfit_ipd <- vector("double", n_ipd)
+      for (i in 1:n_ipd) {
+        resdevfit_ipd[i] <- 2 * sum((ipd_r[i,] * log(ipd_r[i,] / m_fitted_ipd[i,]))[!is.na(ipd_r[i,]) & ipd_r[i,] > 0])
+      }
+      leverage_ipd <- resdev_ipd - resdevfit_ipd
+
+      # Degrees of freedom is 1 - number of categories
+      df_ipd <- rowSums(!is.na(ipd_r)) - 1
+      has_df <- TRUE
+    } else {
+      leverage_ipd <- NULL
+    }
+
+    if (has_agd_arm(net)) {
+      agd_arm_r <- net$agd_arm$.r
+      m_fitted_agd_arm <- matrix(fitted_agd_arm, nrow = n_agd_arm)
+
+      resdevfit_agd_arm <- vector("double", n_agd_arm)
+      for (i in 1:n_agd_arm) {
+        resdevfit_agd_arm[i] <- 2 * sum((agd_arm_r[i,] * log(agd_arm_r[i,] / m_fitted_agd_arm[i,]))[!is.na(agd_arm_r[i,]) & agd_arm_r[i,] > 0])
+      }
+      leverage_agd_arm <- resdev_agd_arm - resdevfit_agd_arm
+
+      # Degrees of freedom is 1 - number of categories
+      df_agd_arm <- rowSums(!is.na(agd_arm_r)) - 1
+      has_df <- TRUE
+    } else {
+      leverage_agd_arm <- NULL
+    }
+
+    if (has_agd_contrast(net)) {
+      df_agd_contrast <- 1
+    }
+
   } else {
     abort(glue::glue("DIC not supported for likelihood of type '{x$likelihood}'."))
   }
@@ -184,6 +222,8 @@ dic <- function(x, ...) {
       resdev = resdev_ipd,
       leverage = leverage_ipd,
       dic = resdev_ipd + leverage_ipd)
+
+    if (has_df) pw$ipd$df <- df_ipd
   } else {
     pw$ipd <- NULL
   }
@@ -195,6 +235,8 @@ dic <- function(x, ...) {
       resdev = resdev_agd_arm,
       leverage = leverage_agd_arm,
       dic = resdev_agd_arm + leverage_agd_arm)
+
+    if (has_df) pw$agd_arm$df <- df_agd_arm
   } else {
     pw$agd_arm <- NULL
   }
@@ -206,6 +248,8 @@ dic <- function(x, ...) {
       resdev = resdev_agd_contrast,
       leverage = leverage_agd_contrast,
       dic = resdev_agd_contrast + leverage_agd_contrast)
+
+    if (has_df) pw$agd_contrast$df <- df_agd_contrast
   } else {
     pw$agd_contrast <- NULL
   }

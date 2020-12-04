@@ -4,17 +4,18 @@
 skip_on_cran()
 
 
+
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-----------------
 
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ---- eval = FALSE------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
-## ----setup, echo = FALSE--------------------------------------------------------------------------
+## ----setup, echo = FALSE------------------------------------------------------
 library(multinma)
 nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
              "true" =, "warn" = 2, 
@@ -22,11 +23,11 @@ nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
 options(mc.cores = nc)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 head(smoking)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 smknet <- set_agd_arm(smoking, 
                       study = studyn,
                       trt = trtc,
@@ -36,21 +37,21 @@ smknet <- set_agd_arm(smoking,
 smknet
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 ## plot(smknet, weight_edges = TRUE, weight_nodes = TRUE)
 
-## ----smoking_network_plot, echo=FALSE, fig.width=8, fig.height=6, out.width="100%"----------------
+## ----smoking_network_plot, echo=FALSE, fig.width=8, fig.height=6, out.width="100%"----
 plot(smknet, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(plot.margin = ggplot2::unit(c(1, 1, 1, 6), "lines"))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 summary(normal(scale = 100))
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 summary(half_normal(scale = 5))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 smkfit <- nma(smknet, 
               trt_effects = "random",
               prior_intercept = normal(scale = 100),
@@ -58,36 +59,36 @@ smkfit <- nma(smknet,
               prior_het = normal(scale = 5))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 smkfit
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 ## # Not run
 ## print(smkfit, pars = c("d", "tau", "mu", "delta"))
 
 
-## ----smoking_pp_plot, fig.width=8, fig.height=6, out.width="100%"---------------------------------
+## ----smoking_pp_plot, fig.width=8, fig.height=6, out.width="100%"-------------
 plot_prior_posterior(smkfit)
 
 
-## ----smoking_pp_plot_tau--------------------------------------------------------------------------
+## ----smoking_pp_plot_tau------------------------------------------------------
 plot_prior_posterior(smkfit, prior = "het")
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 (dic_consistency <- dic(smkfit))
 
 
-## ----smoking_resdev_plot, fig.width=8-------------------------------------------------------------
+## ----smoking_resdev_plot, fig.width=8-----------------------------------------
 plot(dic_consistency)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 smoking[smoking$r == 0, ]
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 smkfit_ume <- nma(smknet, 
                   consistency = "ume",
                   trt_effects = "random",
@@ -97,34 +98,34 @@ smkfit_ume <- nma(smknet,
 smkfit_ume
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 dic_consistency
 (dic_ume <- dic(smkfit_ume))
 
 
-## ----smoking_devdev_plot--------------------------------------------------------------------------
+## ----smoking_devdev_plot------------------------------------------------------
 plot(dic_consistency, dic_ume, point_alpha = 0.5, interval_alpha = 0.2)
 
 
-## ----smoking_releff, fig.height=4.5---------------------------------------------------------------
+## ----smoking_releff, fig.height=4.5-------------------------------------------
 (smk_releff <- relative_effects(smkfit, all_contrasts = TRUE))
 plot(smk_releff, ref_line = 0)
 
 
-## ----smoking_ranks, fig.height=3------------------------------------------------------------------
+## ----smoking_ranks, fig.height=3----------------------------------------------
 (smk_ranks <- posterior_ranks(smkfit, lower_better = FALSE))
 plot(smk_ranks)
 
-## ----smoking_rankprobs----------------------------------------------------------------------------
+## ----smoking_rankprobs--------------------------------------------------------
 (smk_rankprobs <- posterior_rank_probs(smkfit, lower_better = FALSE))
 plot(smk_rankprobs)
 
-## ----smoking_cumrankprobs-------------------------------------------------------------------------
+## ----smoking_cumrankprobs-----------------------------------------------------
 (smk_cumrankprobs <- posterior_rank_probs(smkfit, lower_better = FALSE, cumulative = TRUE))
 plot(smk_cumrankprobs)
 
 
-## ----smoking_tests, include=FALSE, eval=params$run_tests------------------------------------------
+## ----smoking_tests, include=FALSE, eval=params$run_tests----------------------
 #--- Test against TSD 4 results ---
 library(testthat)
 library(dplyr)
@@ -197,7 +198,8 @@ smkfit_ume2 <- nma(smknet2,
                    trt_effects = "random",
                    prior_intercept = normal(scale = 100),
                    prior_trt = normal(scale = 100),
-                   prior_het = normal(scale = 5))
+                   prior_het = normal(scale = 5),
+                   iter = 4000)
 
 # Results of modified TSD 4 model including multi-arm correction
 tsd_ume <- tribble(
@@ -264,5 +266,44 @@ test_that("UME DIC", {
   expect_equivalent(dic_ume2$resdev, 53.4, tolerance = tol_dic)
   expect_equivalent(dic_ume2$pd, 46.1, tolerance = tol_dic)
   expect_equivalent(dic_ume2$dic, 99.5, tolerance = tol_dic)
+})
+
+# Check that multinomial ordered model produces same results
+smknet3 <- set_agd_arm(smoking,
+                       studyn,
+                       trtc,
+                       r = multi(nonevent = n, event = r, inclusive = TRUE),
+                       trt_ref = "No intervention")
+smkfit_ord <- nma(smknet3,
+              trt_effects = "random",
+              link = "logit",
+              prior_intercept = normal(scale = 100),
+              prior_trt = normal(scale = 100),
+              prior_het = normal(scale = 5),
+              prior_aux = flat())
+
+
+smk_ord_releff <- relative_effects(smkfit_ord, all_contrasts = TRUE)
+test_that("Equivalent ordered multinomial RE relative effects", {
+  expect_equivalent(smk_ord_releff$summary$mean, tsd_re$est, tolerance = tol)
+  expect_equivalent(smk_ord_releff$summary$sd, tsd_re$sd, tolerance = tol)
+  expect_equivalent(smk_ord_releff$summary$`2.5%`, tsd_re$lower, tolerance = tol)
+  expect_equivalent(smk_ord_releff$summary$`97.5%`, tsd_re$upper, tolerance = tol)
+})
+
+smk_ord_tau <- summary(smkfit_ord, pars = "tau")
+test_that("Equivalent ordered multinomial RE heterogeneity SD", {
+  expect_equivalent(smk_ord_tau$summary$`50%`, 0.82, tolerance = tol)
+  expect_equivalent(smk_ord_tau$summary$sd, 0.19, tolerance = tol)
+  expect_equivalent(smk_ord_tau$summary$`2.5%`, 0.55, tolerance = tol)
+  expect_equivalent(smk_ord_tau$summary$`97.5%`, 1.27, tolerance = tol)
+})
+
+# DIC
+dic_ord <- dic(smkfit_ord)
+test_that("Equivalent ordered multinomial DIC", {
+  expect_equivalent(dic_ord$resdev, 54.0, tolerance = tol_dic)
+  expect_equivalent(dic_ord$pd, 45.0, tolerance = tol_dic)
+  expect_equivalent(dic_ord$dic, 99.0, tolerance = tol_dic)
 })
 

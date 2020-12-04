@@ -1,0 +1,73 @@
+on:
+  push:
+    branches:
+      - develop
+      - master
+
+name: pkgdown
+
+jobs:
+  pkgdown:
+    runs-on: macOS-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      CXX_OLEVEL: 2
+      CXX: g++
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@v1
+
+      - uses: r-lib/actions/setup-pandoc@v1
+
+      - name: Query dependencies
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
+          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
+        shell: Rscript {0}
+
+      - name: Cache R packages
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
+
+      - name: Install dependencies
+        run: |
+          remotes::install_deps(dependencies = TRUE)
+          install.packages("pkgdown", type = "binary")
+        shell: Rscript {0}
+
+      - name: Setup makevars
+        run: |
+          Sys.chmod("configure", mode = "0777")
+          dir.create("~/.R/")
+          if (Sys.info()[["sysname"]] == "Windows") {
+            mv <- "~/.R/Makevars.win"
+          } else {
+            mv <- "~/.R/Makevars"
+          }
+          file.create(mv)
+          CXX <- Sys.getenv("CXX")
+          cCXX <- system("R CMD config CXX", intern = TRUE)
+          if (CXX == "clang++") {
+            cCXX <- gsub(" g++", " clang++ -Qunused-arguments -fcolor-diagnostics", cCXX, fixed = TRUE)
+          }
+          cat("CXX =", cCXX, "\n", file = mv, append = TRUE)
+          cCXXFLAGS <- system("R CMD config CXXFLAGS", intern = TRUE)
+          cCXXFLAGS <- gsub("O[0-3]", paste0("O", Sys.getenv("CXX_OLEVEL")), cCXXFLAGS)
+          cat("CXXFLAGS =", cCXXFLAGS, "-pedantic -g0 -flto", "\n", file = mv, append = TRUE)
+          cat("LDFLAGS += -flto", "\n", file = mv, append = TRUE)
+          cat(readLines(mv), sep = "\n")
+        shell: Rscript {0}
+
+      - name: Install package
+        run: R CMD INSTALL .
+
+      - name: Deploy package
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          Rscript -e 'options(width = 100, mc.cores = parallel::detectCores(), rmarkdown.html_vignette.check_title = FALSE); pkgdown::deploy_to_branch(new_process = FALSE)'

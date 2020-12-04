@@ -69,7 +69,7 @@ precision \eqn{1/\tau^2} (\code{"prec"}).}
 coefficients (if \code{regression} formula specified)}
 
 \item{prior_aux}{Specification of prior distribution for the auxiliary
-parameter, if applicable}
+parameter, if applicable (see details)}
 
 \item{QR}{Logical scalar (default \code{FALSE}), whether to apply a QR
 decomposition to the model design matrix}
@@ -115,6 +115,28 @@ chosen prior distributions on the posterior distributions, and the
 \code{\link[multinma:summary.nma_prior]{summary()}} method for \code{nma_prior}
 objects prints prior intervals.
 }
+\section{Auxiliary parameters}{
+
+Auxiliary parameters are only present in the following models.
+\subsection{Normal likelihood with IPD}{
+
+When a Normal likelihood is fitted to IPD, the auxiliary parameters are the
+arm-level standard deviations \eqn{\sigma_{jk}} on treatment \eqn{k} in
+study \eqn{j}.
+}
+
+\subsection{Ordered multinomial likelihood}{
+
+When fitting a model to \eqn{M} ordered outcomes, the auxiliary parameters
+are the latent cutoffs between each category, \eqn{c_0 < c_1 < \dots <
+  c_M}. Only \eqn{c_2} to \eqn{c_{M-1}} are estimated; we fix \eqn{c_0 =
+  -\infty}, \eqn{c_1 = 0}, and \eqn{c_M = \infty}. When specifying priors for
+these latent cutoffs, we choose to specify priors on the \emph{differences}
+\eqn{c_{m+1} - c_m}. Stan automatically truncates any priors so that the
+ordering constraints are satisfied.
+}
+}
+
 \examples{
 ## Smoking cessation NMA
 # Set up network of smoking cessation data
@@ -132,17 +154,17 @@ smk_net
 
 \donttest{
 # Fitting a fixed effect model
-smk_fit_FE <- nma(smk_net,
-              trt_effects = "fixed",
-              prior_intercept = normal(scale = 100),
-              prior_trt = normal(scale = 100))
+smk_fit_FE <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+                  trt_effects = "fixed",
+                  prior_intercept = normal(scale = 100),
+                  prior_trt = normal(scale = 100))
 
 smk_fit_FE
 }
 
 \donttest{
 # Fitting a random effects model
-smk_fit_RE <- nma(smk_net,
+smk_fit_RE <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
                   trt_effects = "random",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 100),
@@ -153,7 +175,7 @@ smk_fit_RE
 
 \donttest{
 # Fitting an unrelated mean effects (inconsistency) model
-smk_fit_RE_UME <- nma(smk_net,
+smk_fit_RE_UME <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
                       consistency = "ume",
                       trt_effects = "random",
                       prior_intercept = normal(scale = 100),
@@ -247,7 +269,7 @@ pso_net <- add_integration(pso_net,
 # init_r = 0.1, since probit models in particular are often hard to initialise.
 # Using the QR decomposition greatly improves sampling efficiency here, as is
 # often the case for regression models.
-pso_fit <- nma(pso_net,
+pso_fit <- nma(pso_net, \dontshow{refresh = if (interactive()) 200 else 0,}
                trt_effects = "fixed",
                link = "probit",
                likelihood = "bernoulli2",
@@ -258,6 +280,7 @@ pso_fit <- nma(pso_net,
                prior_reg = normal(scale = 10),
                init_r = 0.1,
                QR = TRUE)
+pso_fit
 }
 
 }

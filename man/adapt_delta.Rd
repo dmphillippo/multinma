@@ -18,5 +18,5 @@ size, making sampling slower but more robust, and resulting in fewer
 divergent transitions.
 
 For more details see the Stan documentation available from
-https://mc-stan.org/users/documentation/.
+\url{https://mc-stan.org/users/documentation/}.
 }

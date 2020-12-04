@@ -169,12 +169,57 @@ test_that("combine_network error if mismatch outcomes across data types", {
 
   expect_error(combine_network(set_ipd(dat_a, study, trt, r = r),
                                set_agd_arm(dat_b, study, trt, y = y, se = se)), m)
+  expect_error(combine_network(set_ipd(dat_a, study, trt, r = multi(n, r, inclusive = TRUE)),
+                               set_agd_arm(dat_b, study, trt, y = y, se = se)), m)
+  expect_error(combine_network(set_ipd(dat_a, study, trt, r = multi(n, r, inclusive = TRUE)),
+                               set_agd_arm(dat_b, study, trt, r = r, n = n)), m)
   expect_error(combine_network(set_ipd(dat_a, study, trt, r = r, E = E),
                                set_agd_arm(dat_b, study, trt, y = y, se = se)), m)
   expect_error(combine_network(set_ipd(dat_a, study, trt, y = y),
                                set_agd_arm(dat_b, study, trt, r = r, n = n)), m)
   expect_error(combine_network(set_ipd(dat_a, study, trt, y = y),
+                               set_agd_arm(dat_b, study, trt, r = multi(n, r, inclusive = TRUE))), m)
+  expect_error(combine_network(set_ipd(dat_a, study, trt, r = r),
+                               set_agd_arm(dat_b, study, trt, r = multi(n, r, inclusive = TRUE))), m)
+  expect_error(combine_network(set_ipd(dat_a, study, trt, y = y),
                                set_agd_arm(dat_b, study, trt, r = r, E = E)), m)
+})
+
+test_that("combine_network error if multinomial outcomes mismatched", {
+  dat_a <- tibble(study = 1, trt = 1:2, a = 1, b = 1, c = 0)
+  dat_b <- tibble(study = 2, trt = 2:3, a = 1, b = 1, c = 0)
+
+  expect_error(combine_network(set_ipd(dat_a, study, trt, r = multi(a, b, c, inclusive = TRUE)),
+                               set_agd_arm(dat_b, study, trt, r = multi(a, b, inclusive = TRUE))),
+               "different numbers of categories")
+  expect_error(combine_network(set_ipd(dat_a, study, trt, r = multi(a, b, c, inclusive = TRUE)),
+                               set_agd_arm(dat_b, study, trt, r = multi(b, a, c, inclusive = TRUE))),
+               "different category labels")
+  expect_error(combine_network(set_ipd(dat_a, study, trt, r = multi(a, b, c, inclusive = TRUE)),
+                               set_agd_arm(dat_b, study, trt, r = multi(A = a, B = b, C = c, inclusive = TRUE))),
+               "different category labels")
+
+  expect_error(combine_network(set_ipd(dat_a, study, trt, r = multi(a, b, c, inclusive = TRUE)),
+                               set_ipd(dat_b, study, trt, r = multi(a, b, inclusive = TRUE))),
+               "different numbers of categories")
+  expect_error(combine_network(set_ipd(dat_a, study, trt, r = multi(a, b, c, inclusive = TRUE)),
+                               set_ipd(dat_b, study, trt, r = multi(b, a, c, inclusive = TRUE))),
+               "different category labels")
+  expect_error(combine_network(set_ipd(dat_a, study, trt, r = multi(a, b, c, inclusive = TRUE)),
+                               set_ipd(dat_b, study, trt, r = multi(A = a, B = b, C = c, inclusive = TRUE))),
+               "different category labels")
+
+  expect_error(combine_network(set_agd_arm(dat_a, study, trt, r = multi(a, b, c, inclusive = TRUE)),
+                               set_agd_arm(dat_b, study, trt, r = multi(a, b, inclusive = TRUE))),
+               "different numbers of categories")
+  expect_error(combine_network(set_agd_arm(dat_a, study, trt, r = multi(a, b, c, inclusive = TRUE)),
+                               set_agd_arm(dat_b, study, trt, r = multi(b, a, c, inclusive = TRUE))),
+               "different category labels")
+  expect_error(combine_network(set_agd_arm(dat_a, study, trt, r = multi(a, b, c, inclusive = TRUE)),
+                               set_agd_arm(dat_b, study, trt, r = multi(A = a, B = b, C = c, inclusive = TRUE))),
+               "different category labels")
+
+  # Check combining ordered and competing outcomes is disallowed, when competing are implemented
 })
 
 test_that("combine_network error if treatment classes do not match across sources", {

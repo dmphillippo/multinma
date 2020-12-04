@@ -1,0 +1,123 @@
+url: https://dmphillippo.github.io/multinma
+
+
+home:
+  title: Bayesian network meta-analysis of individual and aggregate data
+  description: >
+    multinma is an R package for network meta-analysis and (multilevel) network
+    meta-regression of aggregate data, individual patient data, and mixtures of
+    both. Models are estimated in a Bayesian framework using Stan.
+
+
+template:
+  params:
+    bootswatch: paper
+
+
+development:
+  mode: auto
+
+
+articles:
+- title: Overview of Examples
+  navbar: ~
+  contents:
+  - vignette_overview
+
+- title: Examples
+  navbar: Examples
+  contents: starts_with("example_")
+
+
+reference:
+- title: Package overview
+  contents:
+  - multinma-package
+
+- title: Defining a network
+  desc: Setting up a network from different data sources, creating network plots.
+  contents:
+  - starts_with("set_")
+  - combine_network
+  - multi
+  - print.nma_data
+  - plot.nma_data
+  - as.igraph.nma_data
+  - nma_data-class
+  - is_network_connected
+
+- title: Setting up numerical integration (ML-NMR only)
+  desc: >
+    Multilevel network meta-regression models require numerical integration
+    points to be specified for the distributions of covariates in each aggregate
+    data study in the network.
+  contents:
+  - add_integration
+  - unnest_integration
+  - distr
+  - matches("[pdq]bern")
+  - matches("[pdq]gamma")
+  - matches("[pdq]gent")
+  - matches("[pdq]logitnorm")
+
+- title: Prior distributions
+  desc: Specify and summarise prior distributions.
+  contents:
+  - priors
+  - summary.nma_prior
+  - nma_prior-class
+  - plot_prior_posterior
+
+- title: Model fitting
+  desc: Model specification and fitting is accomplished using the `nma()` function.
+  contents:
+  - nma
+  - print.stan_nma
+  - summary.stan_nma
+  - plot.stan_nma
+  - pairs.stan_nma
+  - stan_nma-class
+  - adapt_delta
+  - which_RE
+  - RE_cor
+  - .default
+
+- title: Model checking and comparison
+  desc: Checking model fit and comparing models.
+  contents:
+  - plot_prior_posterior
+  - plot_integration_error
+  - dic
+  - print.nma_dic
+  - plot.nma_dic
+  - nma_dic-class
+  - loo
+  - waic
+
+- title: Posterior summaries and working with fitted models
+  desc: >
+    Producing and plotting relative effects, absolute predictions, posterior ranks
+    and rank probabilities. Converting to MCMC arrays and matrices.
+  contents:
+  - relative_effects
+  - predict.stan_nma
+  - posterior_ranks
+  - posterior_rank_probs
+  - print.nma_summary
+  - plot.nma_summary
+  - nma_summary-class
+  - as.array.stan_nma
+  - mcmc_array-class
+  - as.matrix.stan_nma
+  - as.stanfit.stan_nma
+
+- title: ggplot theme
+  desc: Default plot theme used by all package plotting functions.
+  contents:
+  - theme_multinma
+
+- title: Datasets
+  desc: Datasets used for examples and vignettes.
+  contents:
+  - has_keyword("datasets")
+  - has_keyword("examples")

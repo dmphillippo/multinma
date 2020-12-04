@@ -4,6 +4,7 @@
 skip_on_cran()
 
 
+
 params <-
 list(run_tests = FALSE)
 
@@ -188,5 +189,93 @@ test_that("RE predicted probabilities", {
   expect_equivalent(blocker_pred_RE$`2.5%`, c(0.04, 0.03), tolerance = tol_dic)
   expect_equivalent(blocker_pred_RE$`50%`, c(0.10, 0.08), tolerance = tol_dic)
   expect_equivalent(blocker_pred_RE$`97.5%`, c(0.25, 0.20), tolerance = tol_dic)
+})
+
+# Test that ordered multinomial model is equivalent
+blocker_ord_net <- set_agd_arm(blocker, 
+                           study = studyn,
+                           trt = trtc,
+                           r = multi(nonevents = n, events = r, inclusive = TRUE),
+                           trt_ref = "Control")
+
+blocker_ord_fit_FE <-  nma(blocker_ord_net, 
+                       trt_effects = "fixed",
+                       link = "logit",
+                       prior_intercept = normal(scale = 100),
+                       prior_trt = normal(scale = 100),
+                       prior_aux = flat())
+
+blocker_ord_fit_RE <-  nma(blocker_ord_net, 
+                       trt_effects = "random",
+                       link = "logit",
+                       prior_intercept = normal(scale = 100),
+                       prior_trt = normal(scale = 100),
+                       prior_het = half_normal(scale = 5),
+                       prior_aux = flat())
+
+blocker_ord_FE_releff <- as.data.frame(relative_effects(blocker_ord_fit_FE))
+
+test_that("Equivalent ordered multinomial FE relative effects", {
+  expect_equivalent(blocker_ord_FE_releff$mean, -0.26, tolerance = tol)
+  expect_equivalent(blocker_ord_FE_releff$sd, 0.050, tolerance = tol)
+  expect_equivalent(blocker_ord_FE_releff$`2.5%`, -0.36, tolerance = tol)
+  expect_equivalent(blocker_ord_FE_releff$`50%`, -0.26, tolerance = tol)
+  expect_equivalent(blocker_ord_FE_releff$`97.5%`, -0.16, tolerance = tol)
+})
+
+blocker_ord_RE_releff <- as.data.frame(relative_effects(blocker_ord_fit_RE))
+
+test_that("Equivalent ordered multinomial RE relative effects", {
+  expect_equivalent(blocker_ord_RE_releff$mean, -0.25, tolerance = tol)
+  expect_equivalent(blocker_ord_RE_releff$sd, 0.066, tolerance = tol)
+  expect_equivalent(blocker_ord_RE_releff$`2.5%`, -0.38, tolerance = tol)
+  expect_equivalent(blocker_ord_RE_releff$`50%`, -0.25, tolerance = tol)
+  expect_equivalent(blocker_ord_RE_releff$`97.5%`, -0.12, tolerance = tol)
+})
+
+blocker_ord_RE_sd <- as.data.frame(summary(blocker_ord_fit_RE, pars = "tau"))
+
+test_that("Equivalent ordered multinomial RE heterogeneity SD", {
+  expect_equivalent(blocker_ord_RE_sd$mean, 0.14, tolerance = tol)
+  expect_equivalent(blocker_ord_RE_sd$sd, 0.082, tolerance = tol)
+  expect_equivalent(blocker_ord_RE_sd$`2.5%`, 0.01, tolerance = tol)
+  expect_equivalent(blocker_ord_RE_sd$`50%`, 0.13, tolerance = tol)
+  expect_equivalent(blocker_ord_RE_sd$`97.5%`, 0.32, tolerance = tol)
+})
+
+test_that("Equivalent ordered multinomial FE DIC", {
+  expect_equivalent(dic_FE$resdev, 46.8, tolerance = tol_dic)
+  expect_equivalent(dic_FE$pd, 23.0, tolerance = tol_dic)
+  expect_equivalent(dic_FE$dic, 69.8, tolerance = tol_dic)
+})
+
+test_that("Equivalent ordered multinomial RE DIC", {
+  expect_equivalent(dic_RE$resdev, 41.9, tolerance = tol_dic)
+  expect_equivalent(dic_RE$pd, 28.1, tolerance = tol_dic)
+  expect_equivalent(dic_RE$dic, 70.0, tolerance = tol_dic)
+})
+
+blocker_ord_pred_FE <- as.data.frame(predict(blocker_ord_fit_FE, 
+                                             baseline = distr(qnorm, mean = -2.2, sd = 3.3^-0.5),
+                                             type = "response"))
+
+test_that("Equivalent ordered multinomial FE predicted probabilities", {
+  expect_equivalent(blocker_ord_pred_FE$mean, c(0.11, 0.09), tolerance = tol_dic)
+  expect_equivalent(blocker_ord_pred_FE$sd, c(0.055, 0.045), tolerance = tol_dic)
+  expect_equivalent(blocker_ord_pred_FE$`2.5%`, c(0.04, 0.03), tolerance = tol_dic)
+  expect_equivalent(blocker_ord_pred_FE$`50%`, c(0.10, 0.08), tolerance = tol_dic)
+  expect_equivalent(blocker_ord_pred_FE$`97.5%`, c(0.25, 0.20), tolerance = tol_dic)
+})
+
+blocker_ord_pred_RE <- as.data.frame(predict(blocker_ord_fit_RE, 
+                                             baseline = distr(qnorm, mean = -2.2, sd = 3.3^-0.5),
+                                             type = "response"))
+
+test_that("Equivalent ordered multinomial RE predicted probabilities", {
+  expect_equivalent(blocker_ord_pred_RE$mean, c(0.11, 0.09), tolerance = tol_dic)
+  expect_equivalent(blocker_ord_pred_RE$sd, c(0.055, 0.046), tolerance = tol_dic)
+  expect_equivalent(blocker_ord_pred_RE$`2.5%`, c(0.04, 0.03), tolerance = tol_dic)
+  expect_equivalent(blocker_ord_pred_RE$`50%`, c(0.10, 0.08), tolerance = tol_dic)
+  expect_equivalent(blocker_ord_pred_RE$`97.5%`, c(0.25, 0.20), tolerance = tol_dic)
 })
 

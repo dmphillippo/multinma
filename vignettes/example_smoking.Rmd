@@ -1,5 +1,5 @@
 ---
-title: "Example: Smoking Cessation"
+title: "Example: Smoking cessation"
 output: rmarkdown::html_vignette
 bibliography: ../inst/REFERENCES.bib
 params:
@@ -234,7 +234,8 @@ smkfit_ume2 <- nma(smknet2,
                    trt_effects = "random",
                    prior_intercept = normal(scale = 100),
                    prior_trt = normal(scale = 100),
-                   prior_het = normal(scale = 5))
+                   prior_het = normal(scale = 5),
+                   iter = 4000)
 
 # Results of modified TSD 4 model including multi-arm correction
 tsd_ume <- tribble(
@@ -301,6 +302,45 @@ test_that("UME DIC", {
   expect_equivalent(dic_ume2$resdev, 53.4, tolerance = tol_dic)
   expect_equivalent(dic_ume2$pd, 46.1, tolerance = tol_dic)
   expect_equivalent(dic_ume2$dic, 99.5, tolerance = tol_dic)
+})
+
+# Check that multinomial ordered model produces same results
+smknet3 <- set_agd_arm(smoking,
+                       studyn,
+                       trtc,
+                       r = multi(nonevent = n, event = r, inclusive = TRUE),
+                       trt_ref = "No intervention")
+smkfit_ord <- nma(smknet3,
+              trt_effects = "random",
+              link = "logit",
+              prior_intercept = normal(scale = 100),
+              prior_trt = normal(scale = 100),
+              prior_het = normal(scale = 5),
+              prior_aux = flat())
+
+
+smk_ord_releff <- relative_effects(smkfit_ord, all_contrasts = TRUE)
+test_that("Equivalent ordered multinomial RE relative effects", {
+  expect_equivalent(smk_ord_releff$summary$mean, tsd_re$est, tolerance = tol)
+  expect_equivalent(smk_ord_releff$summary$sd, tsd_re$sd, tolerance = tol)
+  expect_equivalent(smk_ord_releff$summary$`2.5%`, tsd_re$lower, tolerance = tol)
+  expect_equivalent(smk_ord_releff$summary$`97.5%`, tsd_re$upper, tolerance = tol)
+})
+
+smk_ord_tau <- summary(smkfit_ord, pars = "tau")
+test_that("Equivalent ordered multinomial RE heterogeneity SD", {
+  expect_equivalent(smk_ord_tau$summary$`50%`, 0.82, tolerance = tol)
+  expect_equivalent(smk_ord_tau$summary$sd, 0.19, tolerance = tol)
+  expect_equivalent(smk_ord_tau$summary$`2.5%`, 0.55, tolerance = tol)
+  expect_equivalent(smk_ord_tau$summary$`97.5%`, 1.27, tolerance = tol)
+})
+
+# DIC
+dic_ord <- dic(smkfit_ord)
+test_that("Equivalent ordered multinomial DIC", {
+  expect_equivalent(dic_ord$resdev, 54.0, tolerance = tol_dic)
+  expect_equivalent(dic_ord$pd, 45.0, tolerance = tol_dic)
+  expect_equivalent(dic_ord$dic, 99.0, tolerance = tol_dic)
 })
 ```
 

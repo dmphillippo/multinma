@@ -1,0 +1,421 @@
+---
+title: "Example: Plaque psoriasis HTA report"
+output: rmarkdown::html_vignette
+bibliography: ../inst/REFERENCES.bib
+params:
+  run_tests: FALSE
+---
+
+```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
+```
+
+```{r, eval = FALSE}
+library(multinma)
+options(mc.cores = parallel::detectCores())
+```
+```{r setup, echo = FALSE}
+library(multinma)
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
+             "true" =, "warn" = 2, 
+             parallel::detectCores())
+options(mc.cores = nc)
+set.seed(65498431)
+```
+
+This vignette describes the analysis of treatments for moderate-to-severe plaque psoriasis from an HTA report [@Woolacott2006], replicating the analysis in NICE Technical Support Document 2 [@TSD2].
+The data are available in this package as `hta_psoriasis`:
+```{r}
+head(hta_psoriasis)
+```
+
+Outcomes are ordered multinomial success/failure to achieve 50%, 75%, or 90% reduction in symptoms on the Psoriasis Area and Severity Index (PASI) scale. 
+Some studies report ordered outcomes at all three cutpoints, others only one or two:
+```{r}
+dplyr::filter(hta_psoriasis, studyc %in% c("Elewski", "Gordon", "ACD2058g", "Altmeyer"))
+```
+
+Here, the outcome counts are given as "exclusive" counts. 
+That is, for a study reporting all outcomes (e.g. Elewski), the counts represent the categories 50 < PASI < 75, 75 < PASI < 90, and 90 < PASI < 100, and the corresponding columns are named by the lower end of the interval.
+\footnote{The alternative is "inclusive" counts, which would represent the overlapping categories PASI > 50, PASI > 70, and PASI > 90.}
+Missing values are used where studies only report a subset of the outcomes.
+For a study reporting only two outcomes, say PASI50 and PASI75 as in Gordon, the counts represent the categories 50 < PASI < 75 and 75 < PASI < 100.
+For a study reporting only one outcome, say PASI70 as in Altmeyer, the count represents 70 < PASI < 100.
+We also need the count for the lowest category (i.e. no higher outcomes achieved), which is equal to the sample size minus the counts in the other observed categories.
+
+### Setting up the network
+We begin by setting up the network.
+We have arm-level ordered multinomial count data, so we use the function `set_agd_arm()`.
+The function `multi()` helps us to specify the ordered outcomes correctly.
+```{r}
+pso_net <- set_agd_arm(hta_psoriasis, 
+                       study = paste(studyc, year), 
+                       trt = trtc, 
+                       r = multi(r0 = sample_size - rowSums(cbind(PASI50, PASI75, PASI90), na.rm = TRUE), 
+                                 PASI50, PASI75, PASI90,
+                                 inclusive = FALSE, 
+                                 type = "ordered"))
+pso_net
+```
+
+Plot the network structure.
+```{r hta_psoriasis_network_plot}
+plot(pso_net, weight_edges = TRUE, weight_nodes = TRUE) + 
+  # Nudge the legend over
+  ggplot2::theme(legend.box.spacing = ggplot2::unit(0.75, "in"),
+                 plot.margin = ggplot2::margin(0.1, 0, 0.1, 0.75, "in"))
+```
+
+### Meta-analysis models
+We fit both fixed effect (FE) and random effects (RE) models.
+
+#### Fixed effect meta-analysis
+First, we fit a fixed effect model using the `nma()` function with `trt_effects = "fixed"`, using a probit link function `link = "probit"`.
+We use $\mathrm{N}(0, 10^2)$ prior distributions for the treatment effects $d_k$, and $\mathrm{N}(0, 100^2)$ prior distributions for the study-specific intercepts $\mu_j$.
+We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
+```{r}
+summary(normal(scale = 10))
+summary(normal(scale = 100))
+```
+
+We also need to specify prior distributions for the latent cutpoints $c_\textrm{PASI75}$ and $c_\textrm{PASI90}$ on the underlying scale - here the PASI standardised mean difference due to the probit link (the cutpoint $c_\textrm{PASI50}=0$).
+To make these easier to reason about, we actually specify priors on the *differences* between adjacent cutpoints, e.g. $c_\textrm{PASI90} - c_\textrm{PASI75}$ and $c_\textrm{PASI75} - c_\textrm{PASI50}$.
+These can be given any positive-valued prior distribution, and Stan will automatically impose the necessary ordering constraints behind the scenes.
+We choose to give these implicit flat priors `flat()`.
+\footnote{The `flat()` prior is a special case where no prior information is added to the model, resulting in an implicit flat uniform prior distribution over the entire support for a parameter. This will be an improper prior if the parameter is unbounded, and is not generally advised unless the parameters are strongly identified. See the [Stan user's guide](https://mc-stan.org/docs/stan-users-guide/some-differences-in-the-statistical-models-that-are-allowed.html) for more details.}
+
+The model is fitted using the `nma()` function.
+```{r}
+pso_fit_FE <- nma(pso_net, 
+                  trt_effects = "fixed",
+                  link = "probit",
+                  prior_intercept = normal(scale = 100),
+                  prior_trt = normal(scale = 10),
+                  prior_aux = flat())
+```
+
+Basic parameter summaries are given by the `print()` method:
+```{r}
+pso_fit_FE
+```
+
+> **Note:** the treatment effects are the *opposite sign* to those in TSD 2 [@TSD2].
+> This is because we parameterise the linear predictor as $\mu_j + d_k + c_m$, rather than $\mu_j + d_k - c_m$.
+> The interpretation here thus follows that of a standard binomial probit (or logit) regression; SMDs (or log ORs) greater than zero mean that the treatment increases the probability of an event compared to the comparator (and less than zero mean a reduction in probability).
+> Here higher outcomes are positive, and all of the active treatments are estimated to increase the response (i.e. a greater reduction) on the PASI scale compared to the network reference (supportive care).
+
+By default, summaries of the study-specific intercepts $\mu_j$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(pso_fit_FE, pars = c("d", "mu", "cc"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r pso_FE_pp_plot}
+plot_prior_posterior(pso_fit_FE)
+```
+
+Focusing specifically on the cutpoints we see that these are highly identified by the data, which is why the implicit flat priors work for these parameters.
+```{r pso_FE_pp_cutpoint_plot}
+plot_prior_posterior(pso_fit_FE, prior = "aux")
+```
+
+#### Random effects meta-analysis
+We now fit a random effects model using the `nma()` function with `trt_effects = "random"`.
+Again, we use $\mathrm{N}(0, 10^2)$ prior distributions for the treatment effects $d_k$, $\mathrm{N}(0, 100^2)$ prior distributions for the study-specific intercepts $\mu_j$, implicit flat prior distributions for the latent cutpoints, and we additionally use a $\textrm{half-N}(2.5^2)$ prior for the heterogeneity standard deviation $\tau$.
+We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
+```{r}
+summary(normal(scale = 10))
+summary(normal(scale = 100))
+summary(half_normal(scale = 2.5))
+```
+
+Fitting the RE model
+```{r, eval = FALSE}
+pso_fit_RE <- nma(pso_net, 
+                  trt_effects = "random",
+                  link = "probit",
+                  prior_intercept = normal(scale = 100),
+                  prior_trt = normal(scale = 10),
+                  prior_aux = flat(),
+                  prior_het = half_normal(scale = 2.5),
+                  adapt_delta = 0.99)
+```
+```{r, echo = FALSE, warning = FALSE}
+pso_fit_RE <- nowarn_on_ci(nma(pso_net, 
+                  trt_effects = "random",
+                  link = "probit",
+                  prior_intercept = normal(scale = 100),
+                  prior_trt = normal(scale = 10),
+                  prior_aux = flat(),
+                  prior_het = half_normal(scale = 2.5),
+                  adapt_delta = 0.99,
+                  iter = if (isTRUE(as.logical(Sys.getenv("CI")))) 5000 else 2000,
+                  seed = 1713435794))
+```
+
+Basic parameter summaries are given by the `print()` method:
+```{r}
+pso_fit_RE
+```
+
+By default, summaries of the study-specific intercepts $\mu_j$ and study-specific relative effects $\delta_{jk}$ are hidden, but could be examined by changing the `pars` argument:
+```{r, eval=FALSE}
+# Not run
+print(pso_fit_RE, pars = c("d", "cc", "mu", "delta"))
+```
+
+The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
+```{r pso_RE_pp_plot}
+plot_prior_posterior(pso_fit_RE, prior = c("trt", "aux", "het"))
+```
+
+
+#### Model comparison
+Model fit can be checked using the `dic()` function:
+```{r}
+(dic_FE <- dic(pso_fit_FE))
+```
+```{r}
+(dic_RE <- dic(pso_fit_RE))
+```
+
+The random effects model has a lower DIC and the residual deviance is closer to the number of data points, so is preferred in this case.
+
+We can also examine the residual deviance contributions with the corresponding `plot()` method.
+```{r pso_FE_resdev_plot}
+plot(dic_FE)
+```
+
+```{r pso_RE_resdev_plot}
+plot(dic_RE)
+```
+
+Most data points are fit well, with posterior mean residual deviances close to the degrees of freedom.
+The Meffert 1997 study has a substantially higher residual deviance contribution, which could be investigated further to see why this study appears to be an outlier.
+
+### Further results
+@TSD2 produce absolute predictions of probability of achieving responses at each PASI cutoff, assuming a Normal distribution for the baseline probit probability of PASI50 response on supportive care with mean $-1.097$ and precision $123$.
+We can replicate these results using the `predict()` method.
+The `baseline` argument takes a `distr()` distribution object, with which we specify the corresponding Normal distribution.
+We set `type = "response"` to produce predicted probabilities (`type = "link"` would produce predicted probit probabilities).
+```{r pso_pred_FE, fig.height = 2}
+pred_FE <- predict(pso_fit_FE, 
+                   baseline = distr(qnorm, mean = -1.097, sd = 123^-0.5), 
+                   type = "response")
+pred_FE
+plot(pred_FE)
+```
+```{r pso_pred_RE, fig.height = 2}
+pred_RE <- predict(pso_fit_RE, 
+                   baseline = distr(qnorm, mean = -1.097, sd = 123^-0.5), 
+                   type = "response")
+pred_RE
+plot(pred_RE)
+```
+
+We can modify the plots using standard `ggplot2` functions.
+For example, to plot the cutpoints together with a colour coding (instead of split into facets):
+```{r pso_pred_RE_colour, fig.height = 3}
+library(ggplot2)
+plot(pred_RE, position = position_dodge(width = 0.75)) +
+  facet_null() +
+  aes(colour = Category) +
+  scale_colour_brewer(palette = "Blues")
+```
+
+If the `baseline` argument is omitted, predicted probabilities will be produced for every study in the network based on their estimated baseline probit probability $\mu_j$.
+
+Treatment rankings, rank probabilities, and cumulative rank probabilities can also be produced.
+We set `lower_better = FALSE` since higher outcome categories are better (the outcomes are positive).
+```{r hta_psoriasis_ranks, fig.height=3}
+(pso_ranks <- posterior_ranks(pso_fit_RE, lower_better = FALSE))
+plot(pso_ranks)
+```
+```{r hta_psoriasis_rankprobs}
+(pso_rankprobs <- posterior_rank_probs(pso_fit_RE, lower_better = FALSE))
+plot(pso_rankprobs)
+```
+```{r hta_psoriasis_cumrankprobs}
+(pso_cumrankprobs <- posterior_rank_probs(pso_fit_RE, lower_better = FALSE, cumulative = TRUE))
+plot(pso_cumrankprobs)
+```
+
+## References
+
+```{r hta_psoriasis_tests, include=FALSE, eval=params$run_tests}
+#--- Test against TSD 2 results ---
+library(testthat)
+library(dplyr)
+
+tol <- 0.05
+tol_dic <- 0.1
+
+trt_codes <- c(
+  "1"=  "Supportive care",
+  "2" = "Etanercept 25 mg",
+  "3"= "Etanercept 50 mg",
+  "4" =       "Efalizumab",
+  "5"=      "Ciclosporin",
+  "6" =         "Fumaderm",
+  "7"=       "Infliximab",
+  "8" =     "Methotrexate")
+
+# FE relative effects
+tsd_fe <- tribble(
+  ~contrast, ~est, ~sd, ~median, ~lower, ~upper,
+  "d12", -1.51, 0.10, -1.51, -1.70, -1.32,
+  "d13", -1.92, 0.10, -1.92, -2.12, -1.72,
+  "d14", -1.19, 0.06, -1.19, -1.30, -1.08,
+  "d15", -1.92, 0.34, -1.90, -2.62, -1.30,
+  "d16", -1.49, 0.49, -1.46, -2.55, -0.63,
+  "d17", -2.33, 0.26, -2.33, -2.87, -1.84,
+  "d18", -1.61, 0.44, -1.60, -2.50, -0.77) %>% 
+  mutate(trt = recode(substr(contrast, 3, 3), !!! trt_codes),
+         trt = ordered(trt, levels = levels(pso_net$treatments)),
+         # Parameter estimates are opposite sign
+         .l = lower, .u = upper,
+         est = -est, median = -median,
+         lower = -.u, upper = -.l) %>% 
+  arrange(trt)
+
+pso_releff_FE <- as.data.frame(relative_effects(pso_fit_FE))
+test_that("FE relative effects", {
+  expect_equivalent(pso_releff_FE$mean, tsd_fe$est, tolerance = tol)
+  expect_equivalent(pso_releff_FE$sd, tsd_fe$sd, tolerance = tol)
+  expect_equivalent(pso_releff_FE$`50%`, tsd_fe$median, tolerance = tol)
+  expect_equivalent(pso_releff_FE$`2.5%`, tsd_fe$lower, tolerance = tol)
+  expect_equivalent(pso_releff_FE$`97.5%`, tsd_fe$upper, tolerance = tol)
+})
+
+# FE predicted probabilities
+tsd_pred_fe <- tribble(
+  ~outcome, ~trt              , ~mean, ~sd , ~median, ~lower, ~upper,
+  50      , "Supportive care" , 0.14 , 0.02, 0.14   , 0.10  , 0.18  ,
+  50      , "Etanercept 25 mg", 0.66 , 0.05, 0.66   , 0.56  , 0.75  ,
+  50      , "Etanercept 50 mg", 0.79 , 0.04, 0.79   , 0.71  , 0.86  ,
+  50      , "Efalizumab"      , 0.54 , 0.04, 0.54   , 0.45  , 0.62  ,
+  50      , "Ciclosporin"     , 0.78 , 0.10, 0.79   , 0.57  , 0.94  ,
+  50      , "Fumaderm"        , 0.64 , 0.16, 0.64   , 0.31  , 0.93  ,
+  50      , "Infliximab"      , 0.88 , 0.05, 0.89   , 0.76  , 0.96  ,
+  50      , "Methotrexate"    , 0.68 , 0.15, 0.69   , 0.37  , 0.92  ,
+  75      , "Supportive care" , 0.03 , 0.01, 0.03   , 0.02  , 0.05  ,
+  75      , "Etanercept 25 mg", 0.37 , 0.05, 0.37   , 0.28  , 0.47  ,
+  75      , "Etanercept 50 mg", 0.53 , 0.05, 0.53   , 0.42  , 0.63  ,
+  75      , "Efalizumab"      , 0.25 , 0.03, 0.25   , 0.19  , 0.33  ,
+  75      , "Ciclosporin"     , 0.52 , 0.13, 0.52   , 0.28  , 0.79  ,
+  75      , "Fumaderm"        , 0.37 , 0.17, 0.35   , 0.11  , 0.76  ,
+  75      , "Infliximab"      , 0.68 , 0.10, 0.68   , 0.48  , 0.85  ,
+  75      , "Methotrexate"    , 0.41 , 0.16, 0.40   , 0.14  , 0.75  ,
+  90      , "Supportive care" , 0.00 , 0.00, 0.00   , 0.00  , 0.01  ,
+  90      , "Etanercept 25 mg", 0.13 , 0.03, 0.13   , 0.08  , 0.19  ,
+  90      , "Etanercept 50 mg", 0.23 , 0.04, 0.23   , 0.16  , 0.32  ,
+  90      , "Efalizumab"      , 0.07 , 0.02, 0.07   , 0.04  , 0.11  ,
+  90      , "Ciclosporin"     , 0.24 , 0.11, 0.22   , 0.08  , 0.49  ,
+  90      , "Fumaderm"        , 0.15 , 0.12, 0.11   , 0.02  , 0.46  ,
+  90      , "Infliximab"      , 0.38 , 0.10, 0.37   , 0.19  , 0.60  ,
+  90      , "Methotrexate"    , 0.17 , 0.11, 0.14   , 0.03  , 0.44  ) %>% 
+  mutate(trt = ordered(trt, levels = levels(pso_net$treatments))) %>% 
+  arrange(trt, outcome)
+
+pred_FE <- as.data.frame(pred_FE)
+test_that("FE predicted probabilities", {
+  expect_equivalent(pred_FE$mean, tsd_pred_fe$mean, tolerance = tol)
+  expect_equivalent(pred_FE$sd, tsd_pred_fe$sd, tolerance = tol)
+  expect_equivalent(pred_FE$`50%`, tsd_pred_fe$median, tolerance = tol)
+  expect_equivalent(pred_FE$`2.5%`, tsd_pred_fe$lower, tolerance = tol)
+  expect_equivalent(pred_FE$`97.5%`, tsd_pred_fe$upper, tolerance = tol)
+})
+
+# FE DIC
+test_that("FE DIC", {
+  expect_equivalent(dic_FE$resdev, 74.9, tolerance = tol_dic)
+  expect_equivalent(dic_FE$pd, 25.0, tolerance = tol_dic)
+  expect_equivalent(dic_FE$dic, 99.9, tolerance = tol_dic)
+})
+
+# RE relative effects
+tsd_re <- tribble(
+  ~contrast, ~est, ~sd, ~median, ~lower, ~upper,
+  "d12", -1.53, 0.24, -1.52, -2.05, -1.03,
+  "d13", -1.93, 0.28, -1.92, -2.51, -1.35,
+  "d14", -1.19, 0.18, -1.19, -1.56, -0.81,
+  "d15", -2.04, 0.43, -2.00, -3.02, -1.30,
+  "d16", -1.49, 0.62, -1.46, -2.81, -0.33,
+  "d17", -2.32, 0.38, -2.32, -3.06, -1.55,
+  "d18", -1.74, 0.64, -1.70, -3.14, -0.59) %>% 
+  mutate(trt = recode(substr(contrast, 3, 3), !!! trt_codes),
+         trt = ordered(trt, levels = levels(pso_net$treatments)),
+         # Parameter estimates are opposite sign
+         .l = lower, .u = upper,
+         est = -est, median = -median,
+         lower = -.u, upper = -.l) %>% 
+  arrange(trt)
+
+pso_releff_RE <- as.data.frame(relative_effects(pso_fit_RE))
+test_that("RE relative effects", {
+  expect_equivalent(pso_releff_RE$mean, tsd_re$est, tolerance = tol)
+  expect_equivalent(pso_releff_RE$sd, tsd_re$sd, tolerance = tol)
+  expect_equivalent(pso_releff_RE$`50%`, tsd_re$median, tolerance = tol)
+  expect_equivalent(pso_releff_RE$`2.5%`, tsd_re$lower, tolerance = tol)
+  expect_equivalent(pso_releff_RE$`97.5%`, tsd_re$upper, tolerance = tol)
+})
+
+# RE predicted probabilities
+tsd_pred_re <- tribble(
+  ~outcome, ~trt              , ~mean, ~sd , ~median, ~lower, ~upper,
+  50      , "Supportive care" , 0.14 , 0.02, 0.14   , 0.10  , 0.18,
+  50      , "Etanercept 25 mg", 0.66 , 0.09, 0.66   , 0.46  , 0.83,
+  50      , "Etanercept 50 mg", 0.79 , 0.08, 0.80   , 0.59  , 0.92,
+  50      , "Efalizumab"      , 0.54 , 0.08, 0.54   , 0.38  , 0.69,
+  50      , "Ciclosporin"     , 0.81 , 0.10, 0.82   , 0.57  , 0.97,
+  50      , "Fumaderm"        , 0.63 , 0.20, 0.64   , 0.22  , 0.96,
+  50      , "Infliximab"      , 0.87 , 0.08, 0.89   , 0.67  , 0.98,
+  50      , "Methotrexate"    , 0.70 , 0.18, 0.73   , 0.30  , 0.98,
+  75      , "Supportive care" , 0.03 , 0.01, 0.03   , 0.02  , 0.05,
+  75      , "Etanercept 25 mg", 0.38 , 0.09, 0.37   , 0.20  , 0.58,
+  75      , "Etanercept 50 mg", 0.53 , 0.11, 0.53   , 0.30  , 0.75,
+  75      , "Efalizumab"      , 0.26 , 0.06, 0.25   , 0.14  , 0.40,
+  75      , "Ciclosporin"     , 0.56 , 0.15, 0.56   , 0.28  , 0.88,
+  75      , "Fumaderm"        , 0.38 , 0.20, 0.35   , 0.06  , 0.83,
+  75      , "Infliximab"      , 0.67 , 0.13, 0.68   , 0.37  , 0.89,
+  75      , "Methotrexate"    , 0.46 , 0.21, 0.44   , 0.10  , 0.90,
+  90      , "Supportive care" , 0.00 , 0.00, 0.00   , 0.00  , 0.01,
+  90      , "Etanercept 25 mg", 0.14 , 0.06, 0.13   , 0.05  , 0.28,
+  90      , "Etanercept 50 mg", 0.24 , 0.09, 0.23   , 0.09  , 0.45,
+  90      , "Efalizumab"      , 0.07 , 0.03, 0.07   , 0.03  , 0.15,
+  90      , "Ciclosporin"     , 0.28 , 0.14, 0.26   , 0.08  , 0.65,
+  90      , "Fumaderm"        , 0.16 , 0.15, 0.12   , 0.01  , 0.57,
+  90      , "Infliximab"      , 0.37 , 0.14, 0.37   , 0.13  , 0.67,
+  90      , "Methotrexate"    , 0.21 , 0.17, 0.17   , 0.02  , 0.69) %>% 
+  mutate(trt = ordered(trt, levels = levels(pso_net$treatments))) %>% 
+  arrange(trt, outcome)
+
+pred_RE <- as.data.frame(pred_RE)
+test_that("RE predicted probabilities", {
+  expect_equivalent(pred_RE$mean, tsd_pred_re$mean, tolerance = tol)
+  expect_equivalent(pred_RE$sd, tsd_pred_re$sd, tolerance = tol)
+  expect_equivalent(pred_RE$`50%`, tsd_pred_re$median, tolerance = tol)
+  expect_equivalent(pred_RE$`2.5%`, tsd_pred_re$lower, tolerance = tol)
+  expect_equivalent(pred_RE$`97.5%`, tsd_pred_re$upper, tolerance = tol)
+})
+
+# Heterogeneity SD
+pso_tau <- summary(pso_fit_RE, pars = "tau")
+
+test_that("RE heterogeneity SD", {
+  expect_equivalent(pso_tau$summary$mean, 0.31, tolerance = tol)
+  expect_equivalent(pso_tau$summary$sd, 0.23, tolerance = tol)
+  expect_equivalent(pso_tau$summary$`50%`, 0.26, tolerance = tol)
+  skip_on_ci()
+  expect_equivalent(pso_tau$summary$`2.5%`, 0.01, tolerance = tol)
+  expect_equivalent(pso_tau$summary$`97.5%`, 0.88, tolerance = tol)
+})
+
+# RE DIC
+test_that("RE DIC", {
+  expect_equivalent(dic_RE$resdev, 63.0, tolerance = tol_dic)
+  expect_equivalent(dic_RE$pd, 33.3, tolerance = tol_dic)
+  expect_equivalent(dic_RE$dic, 96.2, tolerance = tol_dic)
+})
+```
+

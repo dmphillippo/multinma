@@ -2,31 +2,32 @@
 # Instead edit example_plaque_psoriasis.Rmd and then run precompile.R
 
 skip_on_cran()
-skip_on_travis()
+
+
 
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-----------------
 
 
-## ----setup----------------------------------------------------------------------------------------
+## ----setup--------------------------------------------------------------------
 library(multinma)
 library(dplyr)      # dplyr and tidyr for data manipulation
 library(tidyr)
 library(ggplot2)    # ggplot2 for plotting covariate distributions
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ---- eval = FALSE------------------------------------------------------------
 ## options(mc.cores = parallel::detectCores())
 
-## ---- echo = FALSE--------------------------------------------------------------------------------
+## ---- echo = FALSE------------------------------------------------------------
 nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
              "true" =, "warn" = 2, 
              parallel::detectCores())
 options(mc.cores = nc)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 pso_ipd <- filter(plaque_psoriasis_ipd,
                   studyc %in% c("UNCOVER-1", "UNCOVER-2", "UNCOVER-3"))
 
@@ -37,7 +38,7 @@ head(pso_ipd)
 head(pso_agd)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 pso_ipd <- pso_ipd %>% 
   mutate(# Variable transformations
          bsa = bsa / 100,
@@ -71,16 +72,16 @@ pso_agd <- pso_agd %>%
   )
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 sum(!pso_ipd$complete)
 mean(!pso_ipd$complete)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 pso_ipd <- filter(pso_ipd, complete)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 pso_net <- combine_network(
   set_ipd(pso_ipd, 
           study = studyc, 
@@ -98,12 +99,12 @@ pso_net <- combine_network(
 pso_net
 
 
-## ----pso_network_plot, fig.width=8, fig.height=6, out.width="100%"--------------------------------
+## ----pso_network_plot, fig.width=8, fig.height=6, out.width="100%"------------
 plot(pso_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) + 
   ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
 
 
-## ----pso_covariate_plot---------------------------------------------------------------------------
+## ----pso_covariate_plot-------------------------------------------------------
 # Get mean and sd of covariates in each study
 ipd_summary <- pso_ipd %>% 
   group_by(studyc) %>% 
@@ -136,7 +137,7 @@ ggplot(aes(x = value)) +
   theme_multinma()
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 pso_net <- add_integration(pso_net,
   durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
   prevsys = distr(qbern, prob = prevsys),
@@ -147,11 +148,11 @@ pso_net <- add_integration(pso_net,
 )
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 summary(normal(scale = 10))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 pso_fit_FE <- nma(pso_net, 
                   trt_effects = "fixed",
                   link = "probit", 
@@ -165,102 +166,105 @@ pso_fit_FE <- nma(pso_net,
                   QR = TRUE)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 print(pso_fit_FE)
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 ## # Not run
 ## print(pso_fit_FE, pars = c("d", "beta", "mu"))
 
 
-## ----pso_FE_pp_plot, fig.width=8, fig.height=6, out.width="100%"----------------------------------
+## ----pso_FE_pp_plot, fig.width=8, fig.height=6, out.width="100%"--------------
 plot_prior_posterior(pso_fit_FE, prior = c("intercept", "trt", "reg"))
 
 
-## ----pso_FE_cumint--------------------------------------------------------------------------------
+## ----pso_FE_cumint------------------------------------------------------------
 plot_integration_error(pso_fit_FE)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 summary(normal(scale = 10))
 summary(half_normal(scale = 2.5))
 
 
-## -------------------------------------------------------------------------------------------------
-pso_fit_RE <- nma(pso_net, 
-                  trt_effects = "random",
-                  link = "probit", 
-                  likelihood = "bernoulli2",
-                  regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
-                  class_interactions = "common",
-                  prior_intercept = normal(scale = 10),
-                  prior_trt = normal(scale = 10),
-                  prior_reg = normal(scale = 10),
-                  prior_het = half_normal(scale = 2.5),
-                  init_r = 0.1,
-                  QR = TRUE)
+## ---- eval=!params$run_tests--------------------------------------------------
+## pso_fit_RE <- nma(pso_net,
+##                   trt_effects = "random",
+##                   link = "probit",
+##                   likelihood = "bernoulli2",
+##                   regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
+##                   class_interactions = "common",
+##                   prior_intercept = normal(scale = 10),
+##                   prior_trt = normal(scale = 10),
+##                   prior_reg = normal(scale = 10),
+##                   prior_het = half_normal(scale = 2.5),
+##                   init_r = 0.1,
+##                   QR = TRUE)
 
 
-## -------------------------------------------------------------------------------------------------
-print(pso_fit_RE)
+## ---- eval=!params$run_tests--------------------------------------------------
+## print(pso_fit_RE)
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 ## # Not run
 ## print(pso_fit_RE, pars = c("d", "beta", "tau", "mu", "delta"))
 
 
-## ----pso_RE_pairs---------------------------------------------------------------------------------
-pairs(pso_fit_RE, pars = c("delta[UNCOVER-2: ETN]", "d[ETN]", "tau", "lp__"))
+## ----pso_RE_pairs, eval=!params$run_tests-------------------------------------
+## pairs(pso_fit_RE, pars = c("delta[UNCOVER-2: ETN]", "d[ETN]", "tau", "lp__"))
 
 
-## ----pso_RE_pp_plot, fig.width=8, fig.height=6, out.width="100%"----------------------------------
-plot_prior_posterior(pso_fit_RE, prior = c("intercept", "trt", "reg", "het"))
+## ----pso_RE_pp_plot, eval=!params$run_tests, fig.width=8, fig.height=6, out.width="100%"----
+## plot_prior_posterior(pso_fit_RE, prior = c("intercept", "trt", "reg", "het"))
 
 
-## ----pso_RE_cumint--------------------------------------------------------------------------------
-plot_integration_error(pso_fit_RE)
+## ----pso_RE_cumint, eval=!params$run_tests------------------------------------
+## plot_integration_error(pso_fit_RE)
 
 
-## -------------------------------------------------------------------------------------------------
+## ---- eval=!params$run_tests--------------------------------------------------
+## (pso_dic_FE <- dic(pso_fit_FE))
+## (pso_dic_RE <- dic(pso_fit_RE))
+
+## ---- eval=params$run_tests, echo=FALSE---------------------------------------
 (pso_dic_FE <- dic(pso_fit_FE))
-(pso_dic_RE <- dic(pso_fit_RE))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 plot(pso_fit_FE,
      pars = "beta",
      stat = "halfeye",
      ref_line = 0)
 
 
-## ----pso_releff_FE--------------------------------------------------------------------------------
+## ----pso_releff_FE------------------------------------------------------------
 (pso_releff_FE <- relative_effects(pso_fit_FE))
 plot(pso_releff_FE, ref_line = 0)
 
 
-## ----pso_pred_FE----------------------------------------------------------------------------------
+## ----pso_pred_FE--------------------------------------------------------------
 (pso_pred_FE <- predict(pso_fit_FE, type = "response"))
 plot(pso_pred_FE, ref_line = c(0, 1))
 
 
-## ----pso_ranks_FE---------------------------------------------------------------------------------
+## ----pso_ranks_FE-------------------------------------------------------------
 (pso_ranks_FE <- posterior_ranks(pso_fit_FE, lower_better = FALSE))
 plot(pso_ranks_FE)
 
 
-## ----pso_rankprobs_FE-----------------------------------------------------------------------------
+## ----pso_rankprobs_FE---------------------------------------------------------
 (pso_rankprobs_FE <- posterior_rank_probs(pso_fit_FE, lower_better = FALSE))
 plot(pso_rankprobs_FE)
 
 
-## ----pso_cumrankprobs_FE--------------------------------------------------------------------------
+## ----pso_cumrankprobs_FE------------------------------------------------------
 (pso_cumrankprobs_FE <- posterior_rank_probs(pso_fit_FE, lower_better = FALSE, cumulative = TRUE))
 plot(pso_cumrankprobs_FE)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 new_agd_means <- tibble(
   bsa = 0.6,
   prevsys = 0.1,
@@ -269,12 +273,12 @@ new_agd_means <- tibble(
   durnpso = 3)
 
 
-## ----pso_releff_FE_new----------------------------------------------------------------------------
+## ----pso_releff_FE_new--------------------------------------------------------
 (pso_releff_FE_new <- relative_effects(pso_fit_FE, newdata = new_agd_means))
 plot(pso_releff_FE_new, ref_line = 0)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 new_agd_int <- tibble(
   bsa_mean = 0.6,
   bsa_sd = 0.3,
@@ -287,7 +291,7 @@ new_agd_int <- tibble(
 )
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 new_agd_int <- add_integration(new_agd_int,
   durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
   prevsys = distr(qbern, prob = prevsys),
@@ -298,7 +302,7 @@ new_agd_int <- add_integration(new_agd_int,
   n_int = 1000)
 
 
-## ----pso_pred_FE_new------------------------------------------------------------------------------
+## ----pso_pred_FE_new----------------------------------------------------------
 (pso_pred_FE_new <- predict(pso_fit_FE, 
                             type = "response",
                             newdata = new_agd_int,
@@ -306,7 +310,84 @@ new_agd_int <- add_integration(new_agd_int,
 plot(pso_pred_FE_new, ref_line = c(0, 1))
 
 
-## ----pso_tests, include=FALSE, eval=params$run_tests----------------------------------------------
+## ----pso_tests, include=FALSE, eval=params$run_tests--------------------------
 library(testthat)
-skip("Run local tests")
+library(dplyr)
+
+tol <- 0.05
+tol_dic <- 0.1
+
+# FE model parameters
+test_fe <- tribble(
+  ~parameter                            , ~mean, ~sd , ~`2.5%`, ~`50%`, ~`97.5%`,
+  "beta[durnpso]"                       , 0.05 , 0.06, -0.08  , 0.05  , 0.17    ,
+  "beta[prevsys]"                       , -0.13, 0.16, -0.44  , -0.13 , 0.17    ,
+  "beta[bsa]"                           , -0.06, 0.45, -0.98  , -0.05 , 0.78    ,
+  "beta[weight]"                        , 0.04 , 0.03, -0.02  , 0.04  , 0.10    ,
+  "beta[psa]"                           , -0.08, 0.17, -0.42  , -0.08 , 0.25    ,
+  "beta[durnpso:.trtclassTNFa blocker]", -0.03, 0.08, -0.18  , -0.03 , 0.12    ,
+  "beta[durnpso:.trtclassIL blocker]"  , -0.01, 0.07, -0.15  , -0.01 , 0.12    ,
+  "beta[prevsys:.trtclassTNFa blocker]", 0.19 , 0.19, -0.19  , 0.19  , 0.56    ,
+  "beta[prevsys:.trtclassIL blocker]"  , 0.06 , 0.17, -0.28  , 0.06  , 0.40    ,
+  "beta[bsa:.trtclassTNFa blocker]"    , 0.05 , 0.52, -0.95  , 0.04  , 1.10    ,
+  "beta[bsa:.trtclassIL blocker]"      , 0.29 , 0.49, -0.64  , 0.29  , 1.27    ,
+  "beta[weight:.trtclassTNFa blocker]" , -0.17, 0.04, -0.23  , -0.17 , -0.10   ,
+  "beta[weight:.trtclassIL blocker]"   , -0.10, 0.03, -0.16  , -0.10 , -0.03   ,
+  "beta[psa:.trtclassTNFa blocker]"    , -0.06, 0.21, -0.46  , -0.06 , 0.37    ,
+  "beta[psa:.trtclassIL blocker]"      , 0.00 , 0.18, -0.35  , 0.00  , 0.37    ,
+  "d[ETN]"                              , 1.55 , 0.08, 1.39   , 1.55  , 1.72    ,
+  "d[IXE_Q2W]"                          , 2.95 , 0.09, 2.79   , 2.95  , 3.13    ,
+  "d[IXE_Q4W]"                          , 2.54 , 0.08, 2.38   , 2.54  , 2.71    ,
+  "d[SEC_150]"                          , 2.14 , 0.11, 1.93   , 2.14  , 2.37    ,
+  "d[SEC_300]"                          , 2.45 , 0.12, 2.22   , 2.45  , 2.69    )
+
+summary_fe <- summary(pso_fit_FE, pars = c("beta", "d")) %>% 
+  as_tibble() %>% 
+  select(parameter, mean, sd, `2.5%`, `50%`, `97.5%`)
+
+test_that("FE model parameters", {
+  expect_equal(summary_fe, test_fe, tolerance = tol, check.attributes = FALSE)
+})
+
+# FE DIC
+test_that("FE DIC", {
+  expect_equivalent(pso_dic_FE$resdev, 3129.4, tolerance = tol_dic)
+  expect_equivalent(pso_dic_FE$pd, 24.1, tolerance = tol_dic)
+  expect_equivalent(pso_dic_FE$dic, 3153.5, tolerance = tol_dic)
+})
+
+# Population average relative effects in target population
+test_releff_fe_new <- tribble(
+  ~parameter         , ~mean, ~sd , ~`2.5%`, ~`50%`, ~`97.5%`,
+  "d[New 1: ETN]"    , 1.25 , 0.24, 0.81 , 1.24, 1.73  ,
+  "d[New 1: IXE_Q2W]", 2.89 , 0.23, 2.46 , 2.88, 3.36  ,
+  "d[New 1: IXE_Q4W]", 2.48 , 0.23, 2.05 , 2.47, 2.94  ,
+  "d[New 1: SEC_150]", 2.08 , 0.23, 1.64 , 2.07, 2.55  ,
+  "d[New 1: SEC_300]", 2.39 , 0.23, 1.95 , 2.38, 2.86  )
+
+summary_releff_fe_new <- pso_releff_FE_new %>% 
+  as_tibble() %>% 
+  select(parameter, mean, sd, `2.5%`, `50%`, `97.5%`)
+
+test_that("FE PATE in target population", {
+  expect_equal(summary_releff_fe_new, test_releff_fe_new, tolerance = tol, check.attributes = FALSE)
+})
+
+# Population average relative effects in target population
+test_pred_fe_new <- tribble(
+  ~parameter            , ~mean, ~sd , ~`2.5%`, ~`50%`, ~`97.5%`,
+  "pred[New 1: PBO]"    , 0.06 , 0.03, 0.02   , 0.06  , 0.12    ,
+  "pred[New 1: ETN]"    , 0.37 , 0.06, 0.26   , 0.37  , 0.48    ,
+  "pred[New 1: IXE_Q2W]", 0.90 , 0.03, 0.84   , 0.90  , 0.94    , 
+  "pred[New 1: IXE_Q4W]", 0.81 , 0.04, 0.72   , 0.81  , 0.88    ,
+  "pred[New 1: SEC_150]", 0.68 , 0.06, 0.57   , 0.68  , 0.78    ,
+  "pred[New 1: SEC_300]", 0.78 , 0.05, 0.68   , 0.78  , 0.86    )
+
+summary_pred_fe_new <- pso_pred_FE_new %>% 
+  as_tibble() %>% 
+  select(parameter, mean, sd, `2.5%`, `50%`, `97.5%`)
+
+test_that("FE PATE in target population", {
+  expect_equal(summary_pred_fe_new, test_pred_fe_new, tolerance = tol, check.attributes = FALSE)
+})
 

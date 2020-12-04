@@ -1,5 +1,5 @@
 ---
-title: "Example: Thrombolytic Treatments"
+title: "Example: Thrombolytic treatments"
 output: rmarkdown::html_vignette
 bibliography: ../inst/REFERENCES.bib
 params:

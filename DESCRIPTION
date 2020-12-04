@@ -1,6 +1,6 @@
 Package: multinma
 Title: Bayesian Network Meta-Analysis of Individual and Aggregate Data
-Version: 0.1.3
+Version: 0.2.0
 Authors@R: 
     person(given = c("David", "M."),
            family = "Phillippo",
@@ -23,18 +23,19 @@ Imports:
     stats,
     graphics,
     Rcpp (>= 0.12.0),
+    RcppParallel (>= 5.0.1),
     rstan (>= 2.19.2),
     rstantools (>= 2.0.0),
     Rdpack (>= 0.7),
-    tibble,
-    dplyr (>= 0.8.1),
+    tibble (>= 2.1.3),
+    dplyr (>= 0.8.3),
     rlang,
     purrr,
     forcats,
     glue,
     randtoolbox,
     copula,
-    tidyr (>= 0.8.3),
+    tidyr (>= 1.0.0),
     stringr,
     Matrix,
     igraph,
@@ -47,10 +48,11 @@ LinkingTo:
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),
     RcppEigen (>= 0.3.3.3.0),
+    RcppParallel (>= 5.0.1),
     rstan (>= 2.18.1),
     StanHeaders (>= 2.18.0)
 SystemRequirements: GNU make
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 Suggests: 
     testthat (>= 2.1.0),
@@ -62,10 +64,11 @@ Suggests:
     loo (>= 2.0.0),
     logitnorm,
     crayon,
-    tidygraph
+    tidygraph,
+    pkgdown
 RdMacros: Rdpack
-URL: http://github.com/dmphillippo/multinma
-BugReports: http://github.com/dmphillippo/multinma/issues
+URL: https://dmphillippo.github.io/multinma/, https://github.com/dmphillippo/multinma
+BugReports: https://github.com/dmphillippo/multinma/issues
 VignetteBuilder: 
     knitr,
     R.rsp

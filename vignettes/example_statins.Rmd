@@ -94,7 +94,7 @@ summary(half_normal(scale = 5))
 
 Again, the model is fitted with the `nma()` function, now with `trt_effects = "random"`.
 We increase `adapt_delta` to 0.99 to remove a small number of divergent transition errors (the default for RE models is set to 0.95).
-```{r}
+```{r, eval=!params$run_tests}
 statin_fit_RE <- nma(statin_net, 
                      trt_effects = "random",
                      regression = ~.trt:prevention,
@@ -103,6 +103,16 @@ statin_fit_RE <- nma(statin_net,
                      prior_reg = normal(scale = 100),
                      prior_het = half_normal(scale = 5),
                      adapt_delta = 0.99)
+```
+```{r, eval=params$run_tests, echo=FALSE}
+statin_fit_RE <- nowarn_on_ci(nma(statin_net, 
+                     trt_effects = "random",
+                     regression = ~.trt:prevention,
+                     prior_intercept = normal(scale = 100),
+                     prior_trt = normal(scale = 100),
+                     prior_reg = normal(scale = 100),
+                     prior_het = half_normal(scale = 5),
+                     adapt_delta = 0.99))
 ```
 
 Basic parameter summaries are given by the `print()` method:
@@ -197,6 +207,7 @@ statin_RE_releff <- as.data.frame(summary(statin_fit_RE, pars = "d"))
 test_that("RE relative effects", {
   expect_equivalent(statin_RE_releff$mean, -0.07, tolerance = tol)
   expect_equivalent(statin_RE_releff$sd, 0.20, tolerance = tol)
+  skip_on_ci()
   expect_equivalent(statin_RE_releff$`2.5%`, -0.48, tolerance = tol)
   expect_equivalent(statin_RE_releff$`97.5%`, 0.36, tolerance = tol)
 })
@@ -216,6 +227,7 @@ statin_RE_beta <- as.data.frame(summary(statin_fit_RE, pars = "beta"))
 test_that("RE regression beta", {
   expect_equivalent(statin_RE_beta$mean, -0.29, tolerance = tol)
   expect_equivalent(statin_RE_beta$sd, 0.26, tolerance = tol)
+  skip_on_ci()
   expect_equivalent(statin_RE_beta$`2.5%`, -0.86, tolerance = tol)
   expect_equivalent(statin_RE_beta$`97.5%`, 0.20, tolerance = tol)
 })
@@ -226,6 +238,7 @@ statin_RE_sd <- as.data.frame(summary(statin_fit_RE, pars = "tau"))
 test_that("RE heterogeneity SD", {
   expect_equivalent(statin_RE_sd$`50%`, 0.19, tolerance = tol)
   expect_equivalent(statin_RE_sd$sd, 0.20, tolerance = tol)
+  skip_on_ci()
   expect_equivalent(statin_RE_sd$`2.5%`, 0.01, tolerance = tol)
   expect_equivalent(statin_RE_sd$`97.5%`, 0.76, tolerance = tol)
 })

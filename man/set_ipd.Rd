@@ -54,6 +54,13 @@ default reference treatment be used instead. Regardless of which treatment is
 used as the network reference at the model fitting stage, results can be
 transformed afterwards: see the \code{trt_ref} argument of
 \code{\link[=relative_effects]{relative_effects()}} and \code{\link[=predict.stan_nma]{predict.stan_nma()}}.
+
+All arguments specifying columns of \code{data} accept the following:
+\itemize{
+\item A column name as a character string, e.g. \code{study = "studyc"}
+\item A bare column name, e.g. \code{study = studyc}
+\item \code{dplyr::mutate()} style semantics for inline variable transformations, e.g. \code{study = paste(author, year)}
+}
 }
 \examples{
 # Set up network of plaque psoriasis IPD

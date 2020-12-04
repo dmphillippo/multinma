@@ -167,8 +167,7 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #' @export
 #' @examples
 #' ## Smoking cessation
-#' @template ex_smoking_network
-#' @template ex_smoking_nma_re
+#' @template ex_smoking_nma_re_example
 #' @examples \donttest{
 #' # Produce relative effects
 #' smk_releff_RE <- relative_effects(smk_fit_RE)
@@ -194,7 +193,7 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #'                                            cumulative = TRUE)
 #' plot(smk_cumrankprob_RE)
 #'
-#' #' # Further customisation is possible with ggplot commands
+#' # Further customisation is possible with ggplot commands
 #' plot(smk_cumrankprob_RE) +
 #'   ggplot2::facet_null() +
 #'   ggplot2::aes(colour = Treatment)
@@ -254,11 +253,26 @@ plot.nma_summary <- function(x, ...,
   if (has_studies <- rlang::has_name(as.data.frame(x), ".study")) {
     draws$Study <- forcats::fct_inorder(factor(
       stringr::str_extract(draws$parameter, "(?<=\\[).+(?=\\:)")))
-    draws$Treatment <- forcats::fct_inorder(factor(
-      stringr::str_extract(draws$parameter, "(?<=\\: ).+(?=\\])")))
+
+    if (inherits(x, "ordered_nma_summary")) {
+      draws$Treatment <- forcats::fct_inorder(factor(
+        stringr::str_extract(draws$parameter, "(?<=\\: ).+(?=, .+?\\])")))
+      draws$Category <- forcats::fct_inorder(factor(
+        stringr::str_extract(draws$parameter, "(?<=, ).+(?=\\])")))
+    } else {
+      draws$Treatment <- forcats::fct_inorder(factor(
+        stringr::str_extract(draws$parameter, "(?<=\\: ).+(?=\\])")))
+    }
   } else {
-    draws$Treatment <- forcats::fct_inorder(factor(
-      stringr::str_extract(draws$parameter, "(?<=\\[).+(?=\\])")))
+    if (inherits(x, "ordered_nma_summary")) {
+      draws$Treatment <- forcats::fct_inorder(factor(
+        stringr::str_extract(draws$parameter, "(?<=\\[).+(?=, .+?\\])")))
+      draws$Category <- forcats::fct_inorder(factor(
+        stringr::str_extract(draws$parameter, "(?<=, ).+(?=\\])")))
+    } else {
+      draws$Treatment <- forcats::fct_inorder(factor(
+        stringr::str_extract(draws$parameter, "(?<=\\[).+(?=\\])")))
+    }
   }
 
   if (horizontal) {
@@ -269,7 +283,15 @@ plot.nma_summary <- function(x, ...,
       ggplot2::geom_vline(xintercept = ref_line, na.rm = TRUE, colour = "grey60") +
       ggplot2::ylab(p_xlab)
 
-    if (has_studies) p <- p + ggplot2::facet_grid(Study~.)
+    if (has_studies) {
+      if (inherits(x, "ordered_nma_summary")) {
+        p <- p + ggplot2::facet_grid(Study~Category)
+      } else {
+        p <- p + ggplot2::facet_grid(Study~.)
+      }
+    } else if (inherits(x, "ordered_nma_summary")) {
+      p <- p + ggplot2::facet_grid(.~Category)
+    }
 
     if (is_ranks) {
       p <- p + ggplot2::scale_x_continuous(p_ylab, breaks = 1:ntrt, minor_breaks = NULL)
@@ -283,7 +305,16 @@ plot.nma_summary <- function(x, ...,
       ggplot2::geom_hline(yintercept = ref_line, na.rm = TRUE, colour = "grey60") +
       ggplot2::xlab(p_xlab)
 
-    if (has_studies) p <- p + ggplot2::facet_grid(.~Study)
+    if (has_studies) {
+      if (inherits(x, "ordered_nma_summary")) {
+        p <- p + ggplot2::facet_grid(Category~Study)
+      } else {
+        p <- p + ggplot2::facet_grid(.~Study)
+      }
+    } else if (inherits(x, "ordered_nma_summary")) {
+      p <- p + ggplot2::facet_grid(Category~.)
+    }
+
 
     if (is_ranks) {
       p <- p + ggplot2::scale_y_continuous(p_ylab, breaks = 1:ntrt, minor_breaks = NULL)

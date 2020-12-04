@@ -57,6 +57,13 @@ standard error of the mean outcome on the reference arm (this determines
 the covariance of the relative effects, when expressed as differences in
 mean outcomes between arms).
 
+All arguments specifying columns of \code{data} accept the following:
+\itemize{
+\item A column name as a character string, e.g. \code{study = "studyc"}
+\item A bare column name, e.g. \code{study = studyc}
+\item \code{dplyr::mutate()} style semantics for inline variable transformations, e.g. \code{study = paste(author, year)}
+}
+
 By default, \code{trt_ref = NULL} and a network reference treatment will be chosen
 that attempts to maximise computational efficiency and stability. If an
 alternative reference treatment is chosen and the model runs slowly or has

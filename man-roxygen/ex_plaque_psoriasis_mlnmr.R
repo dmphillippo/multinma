@@ -8,7 +8,7 @@
 #' # init_r = 0.1, since probit models in particular are often hard to initialise.
 #' # Using the QR decomposition greatly improves sampling efficiency here, as is
 #' # often the case for regression models.
-#' pso_fit <- nma(pso_net,
+#' pso_fit <- nma(pso_net, \dontshow{refresh = if (interactive()) 200 else 0,}
 #'                trt_effects = "fixed",
 #'                link = "probit",
 #'                likelihood = "bernoulli2",
@@ -19,5 +19,6 @@
 #'                prior_reg = normal(scale = 10),
 #'                init_r = 0.1,
 #'                QR = TRUE)
+#' pso_fit
 #' }
 #'

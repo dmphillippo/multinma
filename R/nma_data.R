@@ -14,6 +14,7 @@
 #' @export
 #'
 #' @template args-details_trt_ref
+#' @template args-details_mutate
 #'
 #' @seealso [set_agd_arm()] for arm-based aggregate data, [set_agd_contrast()]
 #'   for contrast-based aggregate data, and [combine_network()] for combining
@@ -67,12 +68,26 @@ set_ipd <- function(data,
 
   # Pull study and treatment columns
   if (missing(study)) abort("Specify `study`")
-  .study <- dplyr::pull(data, {{ study }})
-  if (any(is.na(.study))) abort("`study` cannot contain missing values")
+  .study <- pull_non_null(data, enquo(study))
+  if (is.null(.study)) abort("`study` cannot be NULL")
+  check_study(.study)
 
   if (missing(trt)) abort("Specify `trt`")
-  .trt <- dplyr::pull(data, {{ trt }})
-  if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
+  .trt <- pull_non_null(data, enquo(trt))
+  if (is.null(.trt)) abort("`trt` cannot be NULL")
+  check_trt(.trt)
+
+  # Check for single-arm studies
+  single_arm_studies <- tibble::tibble(.study, .trt) %>%
+    dplyr::distinct(.data$.study, .data$.trt) %>%
+    dplyr::group_by(.data$.study) %>%
+    dplyr::filter(dplyr::n() == 1) %>%
+    dplyr::pull(.data$.study)
+
+  if (length(single_arm_studies)) {
+    abort(glue::glue("Single-arm studies are not supported: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
+                     glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
+  }
 
   # Treatment classes
   .trtclass <- pull_non_null(data, enquo(trt_class))
@@ -87,7 +102,24 @@ set_ipd <- function(data,
   # .Surv <- ...
 
   check_outcome_continuous(.y, with_se = FALSE)
-  check_outcome_binary(.r, .E)
+
+  if (!is.null(.r) && inherits(.r, c("multi_ordered", "multi_competing"))) {
+    if (inherits(.r, "multi_competing")) abort("Competing multinomial outcomes are not yet supported.")
+
+    # Most checks are carried out by multi(), some additional checks here specific to IPD
+    if (any(! .r[!is.na(.r)] %in% c(0, 1))) abort("Multinomial outcome `r` must equal 0 or 1")
+    if (any(r_zero_rows <- rowSums(.r, na.rm = TRUE) == 0))
+      abort(glue::glue("Individual{if (sum(r_zero_rows) > 1) 's' else ''} without outcomes in any category, ",
+                       "row{if (sum(r_zero_rows) > 1) 's' else ''} ",
+                       glue::glue_collapse(which(r_zero_rows), sep = ", ", last = " and "), "."))
+    if (any(r_multi_rows <- rowSums(.r, na.rm = TRUE) > 1))
+      abort(glue::glue("Individual{if (sum(r_multi_rows) > 1) 's' else ''} with outcomes in more than one category, ",
+                       "row{if (sum(r_multi_rows) > 1) 's' else ''} ",
+                       glue::glue_collapse(which(r_multi_rows), sep = ", ", last = " and "), "."))
+  } else {
+    check_outcome_binary(.r, .E)
+  }
+
   # check_outcome_surv(.Surv)
 
   o_type <- get_outcome_type(y = .y, se = NULL,
@@ -128,13 +160,21 @@ set_ipd <- function(data,
     d <- tibble::add_column(d, .r = .r)
   } else if (o_type == "rate") {
     d <- tibble::add_column(d, .r = .r, .E = .E)
+  } else if (o_type %in% c("ordered", "competing")) {
+    # Store internally as a standard matrix (strip class attribute) as a simple
+    # work-around for dplyr/vctrs not using s3 inheritance to find matrix methods
+    .r <- unclass(.r)
+
+    d <- tibble::add_column(d, .r = .r)
   }
 
-  d <- dplyr::bind_cols(d, data)
+  drop_reserved <- setdiff(colnames(data), colnames(d))
+  d <- dplyr::bind_cols(d, data[, drop_reserved, drop = FALSE])
 
   # Drop original study and treatment columns
-  d <- dplyr::select(d, - {{ study }}, - {{ trt }})
-  if (!is.null(.trtclass)) d <- dplyr::select(d, - {{ trt_class }})
+  d <- drop_original(d, data, enquo(study))
+  d <- drop_original(d, data, enquo(trt))
+  if (!is.null(.trtclass)) d <- drop_original(d, data, enquo(trt_class))
 
   # Produce nma_data object
   out <- structure(
@@ -186,7 +226,11 @@ set_ipd <- function(data,
 #' @template args-details_sample_size
 #' @details
 #' If a Binomial outcome is specified and `sample_size` is omitted, `n` will be
-#' used as the sample size by default.
+#' used as the sample size by default. If a Multinomial outcome is specified and
+#' `sample_size` is omitted, the sample size will be determined automatically
+#' from the supplied counts by default.
+#'
+#' @template args-details_mutate
 #'
 #' @seealso [set_ipd()] for individual patient data, [set_agd_contrast()] for
 #'   contrast-based aggregate data, and [combine_network()] for combining
@@ -224,12 +268,25 @@ set_agd_arm <- function(data,
 
   # Pull study and treatment columns
   if (missing(study)) abort("Specify `study`")
-  .study <- dplyr::pull(data, {{ study }})
-  if (any(is.na(.study))) abort("`study` cannot contain missing values")
+  .study <- pull_non_null(data, enquo(study))
+  if (is.null(.study)) abort("`study` cannot be NULL")
+  check_study(.study)
 
   if (missing(trt)) abort("Specify `trt`")
-  .trt <- dplyr::pull(data, {{ trt }})
-  if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
+  .trt <- pull_non_null(data, enquo(trt))
+  if (is.null(.trt)) abort("`trt` cannot be NULL")
+  check_trt(.trt)
+
+  # Check for single-arm studies
+  single_arm_studies <- tibble::tibble(.study, .trt) %>%
+    dplyr::group_by(.data$.study) %>%
+    dplyr::filter(dplyr::n() == 1) %>%
+    dplyr::pull(.data$.study)
+
+  if (length(single_arm_studies)) {
+    abort(glue::glue("Single-arm studies are not supported: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
+                     glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
+  }
 
   # Treatment classes
   .trtclass <- pull_non_null(data, enquo(trt_class))
@@ -246,7 +303,14 @@ set_agd_arm <- function(data,
   # .Surv <- ...
 
   check_outcome_continuous(.y, .se, with_se = TRUE)
-  check_outcome_count(.r, .n, .E)
+
+  if (!is.null(.r) && inherits(.r, c("multi_ordered", "multi_competing"))) {
+    # Checks are carried out by multi()
+    if (inherits(.r, "multi_competing")) abort("Competing multinomial outcomes are not yet supported.")
+  } else {
+    check_outcome_count(.r, .n, .E)
+  }
+
   # check_outcome_surv(.Surv)
 
   o_type <- get_outcome_type(y = .y, se = .se,
@@ -254,8 +318,14 @@ set_agd_arm <- function(data,
 
   # Pull and check sample size
   .sample_size <- pull_non_null(data, enquo(sample_size))
-  if (!is.null(.sample_size)) check_sample_size(.sample_size)
-  else if (o_type == "count") .sample_size <- .n
+  if (!is.null(.sample_size)) {
+    check_sample_size(.sample_size)
+  } else if (o_type == "count") {
+    .sample_size <- .n
+  } else if (o_type %in% c("ordered", "competing")) {
+    # Always stored as exclusive counts
+    .sample_size <- rowSums(.r, na.rm = TRUE)
+  }
   else inform("Note: Optional argument `sample_size` not provided, some features may not be available (see ?set_agd_arm).")
 
   # Create tibble in standard format
@@ -293,16 +363,24 @@ set_agd_arm <- function(data,
     d <- tibble::add_column(d, .r = .r, .n = .n)
   } else if (o_type == "rate") {
     d <- tibble::add_column(d, .r = .r, .E = .E)
+  } else if (o_type %in% c("ordered", "competing")) {
+    # Store internally as a standard matrix (strip class attribute) as a simple
+    # work-around for dplyr/vctrs not using s3 inheritance to find matrix methods
+    .r <- unclass(.r)
+
+    d <- tibble::add_column(d, .r = .r)
   }
 
   if (!is.null(.sample_size)) d <- tibble::add_column(d, .sample_size = .sample_size)
 
   # Bind in original data
-  d <- dplyr::bind_cols(d, data)
+  drop_reserved <- setdiff(colnames(data), colnames(d))
+  d <- dplyr::bind_cols(d, data[, drop_reserved, drop = FALSE])
 
   # Drop original study and treatment columns
-  d <- dplyr::select(d, - {{ study }}, - {{ trt }})
-  if (!is.null(.trtclass)) d <- dplyr::select(d, - {{ trt_class }})
+  d <- drop_original(d, data, enquo(study))
+  d <- drop_original(d, data, enquo(trt))
+  if (!is.null(.trtclass)) d <- drop_original(d, data, enquo(trt_class))
 
   # Produce nma_data object
   out <- structure(
@@ -352,6 +430,8 @@ set_agd_arm <- function(data,
 #'   standard error of the mean outcome on the reference arm (this determines
 #'   the covariance of the relative effects, when expressed as differences in
 #'   mean outcomes between arms).
+#'
+#' @template args-details_mutate
 #'
 #' @template args-details_trt_ref
 #' @template args-details_sample_size
@@ -406,13 +486,25 @@ set_agd_contrast <- function(data,
 
   # Pull study and treatment columns
   if (missing(study)) abort("Specify `study`")
-  .study <- dplyr::pull(data, {{ study }})
-  if (any(is.na(.study))) abort("`study` cannot contain missing values")
+  .study <- pull_non_null(data, enquo(study))
+  if (is.null(.study)) abort("`study` cannot be NULL")
+  check_study(.study)
 
   if (missing(trt)) abort("Specify `trt`")
-  .trt <- dplyr::pull(data, {{ trt }})
-  if (any(is.na(.trt))) abort("`trt` cannot contain missing values")
+  .trt <- pull_non_null(data, enquo(trt))
+  if (is.null(.trt)) abort("`trt` cannot be NULL")
+  check_trt(.trt)
 
+  # Check for single-arm studies
+  single_arm_studies <- tibble::tibble(.study, .trt) %>%
+    dplyr::group_by(.data$.study) %>%
+    dplyr::filter(dplyr::n() == 1) %>%
+    dplyr::pull(.data$.study)
+
+  if (length(single_arm_studies)) {
+    abort(glue::glue("Single-arm studies are not supported: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
+                     glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
+  }
 
   # Treatment classes
   .trtclass <- pull_non_null(data, enquo(trt_class))
@@ -425,7 +517,12 @@ set_agd_contrast <- function(data,
   .se <- pull_non_null(data, enquo(se))
 
   if (is.null(.y)) abort("Specify continuous outcome `y`")
+  if (rlang::is_list(.y) || !is.null(dim(.y)))
+    abort("Continuous outcome `y` must be a regular column (not a list or matrix column)")
+
   if (is.null(.se)) abort("Specify standard error `se`")
+  if (rlang::is_list(.se) || !is.null(dim(.se)))
+    abort("Standard error `se` must be a regular column (not a list or matrix column)")
 
   # Pull and check sample size
   .sample_size <- pull_non_null(data, enquo(sample_size))
@@ -498,11 +595,13 @@ set_agd_contrast <- function(data,
   }
 
   # Bind in original data
-  d <- dplyr::bind_cols(d, data)
+  drop_reserved <- setdiff(colnames(data), colnames(d))
+  d <- dplyr::bind_cols(d, data[, drop_reserved, drop = FALSE])
 
   # Drop original study and treatment columns
-  d <- dplyr::select(d, - {{ study }}, - {{ trt }})
-  if (!is.null(.trtclass)) d <- dplyr::select(d, - {{ trt_class }})
+  d <- drop_original(d, data, enquo(study))
+  d <- drop_original(d, data, enquo(trt))
+  if (!is.null(.trtclass)) d <- drop_original(d, data, enquo(trt_class))
 
   # Make sure rows from each study are next to each other (required for Stan resdev/log_lik code)
   d <- dplyr::mutate(d, .study_inorder = forcats::fct_inorder(.data$.study)) %>%
@@ -653,7 +752,6 @@ combine_network <- function(..., trt_ref) {
       if (!is.null(classes)) ipd[[j]]$.trtclass <- forcats::lvls_expand(ipd[[j]]$.trtclass, class_lvls)
     }
   }
-  ipd <- dplyr::bind_rows(ipd)
 
   # Get agd_arm
   agd_arm <- purrr::map(s, "agd_arm")
@@ -666,7 +764,6 @@ combine_network <- function(..., trt_ref) {
         agd_arm[[j]]$.trtclass <- forcats::lvls_expand(agd_arm[[j]]$.trtclass, class_lvls)
     }
   }
-  agd_arm <- dplyr::bind_rows(agd_arm)
 
   # Get agd_contrast
   agd_contrast <- purrr::map(s, "agd_contrast")
@@ -679,7 +776,6 @@ combine_network <- function(..., trt_ref) {
         agd_contrast[[j]]$.trtclass <- forcats::lvls_expand(agd_contrast[[j]]$.trtclass, class_lvls)
     }
   }
-  agd_contrast <- dplyr::bind_rows(agd_contrast)
 
   # Get outcome type
   o_ipd <- unique(purrr::map_chr(purrr::map(s, "outcome"), "ipd"))
@@ -704,7 +800,19 @@ combine_network <- function(..., trt_ref) {
   # Check outcome combination
   check_outcome_combination(outcome)
 
+  # Additional checks when combining multinomial outcomes
+  if (o_ipd %in% c("ordered", "competing"))
+    check_multi_combine(purrr::map(ipd, ".r"))
+  if (o_agd_arm %in% c("ordered", "competing"))
+    check_multi_combine(purrr::map(agd_arm, ".r"))
+  if (o_ipd %in% c("ordered", "competing") && o_agd_arm %in% c("ordered", "competing"))
+    check_multi_combine(purrr::map(c(ipd, agd_arm), ".r"))
+
   # Produce nma_data object
+  ipd <- dplyr::bind_rows(ipd)
+  agd_arm <- dplyr::bind_rows(agd_arm)
+  agd_contrast <- dplyr::bind_rows(agd_contrast)
+
   out <- structure(
     list(agd_arm = agd_arm,
          agd_contrast = agd_contrast,
@@ -745,7 +853,175 @@ combine_network <- function(..., trt_ref) {
   return(out)
 }
 
+#' Multinomial outcome data
+#'
+#' This function aids the specification of multinomial outcome data when setting
+#' up a network with [set_agd_arm()] or [set_ipd()]. It takes a set of columns
+#' (or, more generally, numeric vectors of the same length) of outcome counts in
+#' each category, and binds these together to produce a matrix.
+#'
+#' @param ... Two or more numeric columns (or vectors) of category counts.
+#'   Argument names (optional) will be used to label the categories.
+#' @param inclusive Logical, are ordered category counts inclusive (`TRUE`) or
+#'   exclusive (`FALSE`)? Default `FALSE`. Only used when `ordered = TRUE`. See details.
+#' @param type String, indicating whether categories are `"ordered"` or
+#'   `"competing"`. Currently only ordered categorical outcomes are supported by
+#'   the modelling functions in this package.
+#'
+#' @details When specifying ordered categorical counts, these can either be
+#'   given as *exclusive* counts (`inclusive = FALSE`, the default) where
+#'   individuals are only counted in the highest category they achieve, or
+#'   *inclusive* counts (`inclusive = TRUE`) where individuals are counted in
+#'   every category up to and including the highest category achieved.
+#'   (Competing outcomes, by nature, are always specified as exclusive counts.)
+#'
+#'   `NA` values can be used to indicate categories/cutpoints that were not
+#'   measured.
+#'
+#' @return A matrix of (exclusive) category counts
+#' @export
+#'
+#' @examples
+#' # These two data sets specify the same ordered categorical data for outcomes
+#' # r0 < r1 < r2, but the first uses the "inclusive" format and the second the
+#' # "exclusive" format.
+#' df_inclusive <- tibble::tribble(~r0, ~r1, ~r2,
+#'                                 1, 1, 1,
+#'                                 5, 4, 1,
+#'                                 5, 2, 2,
+#'                                 10, 5, 0,
+#'                                 5, 5, 0,
+#'                                 7, NA, 6,   # Achieved r2 or not (no r1)
+#'                                 10, 4, NA)  # Achieved r1 or not (no r2)
+#'
+#' df_exclusive <- tibble::tribble(~r0, ~r1, ~r2,
+#'                                 0, 0, 1,
+#'                                 1, 3, 1,
+#'                                 3, 0, 2,
+#'                                 5, 5, 0,
+#'                                 0, 5, 0,
+#'                                 1, NA, 6,   # Achieved r2 or not (no r1)
+#'                                 6, 4, NA)   # Achieved r1 or not (no r2)
+#'
+#' (r_inclusive <- with(df_inclusive, multi(r0, r1, r2, inclusive = TRUE)))
+#' (r_exclusive <- with(df_exclusive, multi(r0, r1, r2, inclusive = FALSE)))
+#'
+#' # Counts are always stored in exclusive format
+#' stopifnot(isTRUE(all.equal(r_inclusive, r_exclusive)))
+#'
+#'
+#' ## HTA Plaque Psoriasis
+#' library(dplyr)
+#'
+#' # Ordered outcomes here are given as "exclusive" counts
+#' head(hta_psoriasis)
+#'
+#' # Calculate lowest category count (failure to achieve PASI 50)
+#' pso_dat <- hta_psoriasis %>%
+#'   mutate(`PASI<50` = sample_size - rowSums(cbind(PASI50, PASI75, PASI90), na.rm = TRUE))
+#'
+#' # Set up network
+#' pso_net <- set_agd_arm(pso_dat,
+#'                        study = paste(studyc, year),
+#'                        trt = trtc,
+#'                        r = multi(`PASI<50`, PASI50, PASI75, PASI90,
+#'                                  inclusive = FALSE,
+#'                                  type = "ordered"))
+#'
+#' pso_net
+#'
+multi <- function(..., inclusive = FALSE, type = c("ordered", "competing")) {
+  if (packageVersion("dplyr") < "1.0.0")
+    abort("Multinomial outcomes require `dplyr` package version 1.0.0 or later.")
+
+  # Argument checks
+  if (!rlang::is_bool(inclusive)) abort("`inclusive` must be a logical value TRUE/FALSE")
+  type <- rlang::arg_match(type)
+
+  if (type == "competing" && inclusive) {
+    warn("Ignoring inclusive = TRUE, competing outcomes are always given by exclusive counts.")
+    inclusive <- FALSE
+  }
+
+  # Collect dots
+  # We take this route via quosures to simplify automatic naming
+  q_dots <- rlang::enquos(..., .named = TRUE)
+
+  if (length(q_dots) < 2) abort("At least 2 outcomes must be specified in `...`")
+
+  if (anyDuplicated(names(q_dots))) {
+    dups <- unique(names(q_dots)[duplicated(names(q_dots))])
+    abort(glue::glue("Duplicate outcome category labels ",
+                     glue::glue_collapse(glue::double_quote(dups), sep = ", ", last = " and "),
+                     "."))
+  }
+
+  # Construct outcome matrix
+  dots <- purrr::map(q_dots, rlang::eval_tidy)
+
+  # Input vectors must be same length (or length 1 for recycling)
+  dots_lengths <- lengths(dots)
+  if (length(unique(dots_lengths[dots_lengths > 1])) > 1) abort("Input vectors in `...` must be the same length (or length 1).")
+
+  out <- do.call(cbind, dots)
+
+  # Check counts
+  if (!is.numeric(out)) abort("Categorical outcome count must be numeric")
+  if (any(is.nan(out))) abort("Categorical outcome count cannot be NaN")
+  if (any(is.infinite(out))) abort("Categorical outcome count cannot be Inf")
+  if (!rlang::is_integerish(out)) abort("Categorical outcome count must be integer-valued")
+  if (any(out < 0, na.rm = TRUE)) abort("Categorical outcome count must be non-negative")
+
+  if (type == "ordered") {
+    if (any(c1_na <- is.na(out[, 1]))) {
+      abort(glue::glue("Ordered outcome counts cannot be missing in the lowest category.\n",
+                       "NAs found in row{if (sum(c1_na) > 1) 's' else ''} ",
+                       glue::glue_collapse(which(c1_na), sep = ", ", width = 30, last = " and "), "."))
+    }
+  }
+
+
+  if (any(only1 <- apply(out, 1, function(x) sum(!is.na(x))) < 2)) {
+    abort(glue::glue("Outcome counts must be present for at least 2 categories.\n",
+                     "Issues in row{if (sum(only1) > 1) 's' else ''} ",
+                     glue::glue_collapse(which(only1), sep = ", ", width = 30, last = " and "), "."))
+  }
+
+  if (inclusive) {
+    if (any(non_decreasing <- apply(out, 1, function(x) max(diff(x[!is.na(x)]))) > 0)) {
+      abort(glue::glue("Inclusive ordered outcome counts must be decreasing or constant across increasing categories.\n",
+                       "Increasing counts found in row{if (sum(non_decreasing) > 1) 's' else ''} ",
+                       glue::glue_collapse(which(non_decreasing), sep = ", ", width = 30, last = " and "), "."))
+    }
+
+    # Store internally as exclusive counts
+    ncat <- ncol(out)
+    for (i in 1:nrow(out)) {
+      j <- 1L
+      k <- 2L
+      while (k <= ncat) {
+        if (is.na(out[i, k])) {
+          k <- k + 1L
+        } else {
+          out[i, j] <- out[i, j] - out[i, k]
+          j <- k
+          k <- k + 1L
+        }
+      }
+    }
+  }
+
+  class(out) <- c(switch(type,
+                         ordered = "multi_ordered",
+                         competing = "multi_competing"),
+                  class(out))
+  return(out)
+}
+
 #' Pull non-null variables from data
+#'
+#' Allows mutate syntax, e.g. factor(study) or sqrt(var)
+#' Uses pull for variable names as strings or integer positions
 #'
 #' @param data data frame
 #' @param var quosure (possibly NULL) for variable to pull
@@ -753,8 +1029,38 @@ combine_network <- function(..., trt_ref) {
 #' @noRd
 pull_non_null <- function(data, var) {
   var_null <- rlang::quo_is_missing(var) | rlang::quo_is_null(var)
-  if (!var_null) return(dplyr::pull(data, {{ var }}))
+  if (!var_null) {
+    if (rlang::is_symbolic(rlang::quo_get_expr(var))) return(dplyr::pull(dplyr::transmute(data, {{ var }})))
+    else return(dplyr::pull(data, {{ var }}))
+  }
   else return(NULL)
+}
+
+#' Drop variables from original data set
+#'
+#' Allows for combination of pull and mutate semantics - doesn't drop mutated
+#' results, handles integer column references
+#'
+#' @param data data frame after transformation
+#' @param orig_data original data frame
+#' @param var quosure for variable to drop
+#'
+#' @noRd
+drop_original <- function(data, orig_data, var) {
+  e_var <- rlang::quo_get_expr(var)
+  if (rlang::is_symbol(e_var)) {
+    # Character/bare column name, drop unless protected name (starts with dot)
+    if (stringr::str_starts(rlang::as_name(e_var), "\\.")) return(data)
+    else return(dplyr::select(data, - {{ var }}))
+  } else if (rlang::is_integerish(e_var)) {
+    # Integer column number, drop based on original location
+    orig_var <- colnames(orig_data)[e_var]
+    if (stringr::str_starts(orig_var, "\\.")) return(data)
+    else return(dplyr::select(data, - {{ orig_var }}))
+  } else {
+    # Mutate expression, don't drop
+    return(data)
+  }
 }
 
 #' Get outcome type
@@ -766,9 +1072,11 @@ get_outcome_type <- function(y, se, r, n, E) {
   o <- c()
   if (!is.null(y)) o <- c(o, "continuous")
   if (!is.null(r)) {
+    if (inherits(r, "multi_ordered")) o <- c(o, "ordered")
+    if (inherits(r, "multi_competing")) o <- c(o, "competing")
     if (!is.null(E)) o <- c(o, "rate")
     if (!is.null(n)) o <- c(o, "count")
-    if (is.null(n) && is.null(E)) o <- c(o, "binary")
+    if (!inherits(r, c("multi_ordered", "multi_competing")) && is.null(n) && is.null(E)) o <- c(o, "binary")
   }
   if (length(o) == 0) abort("Please specify one and only one outcome.")
   if (length(o) > 1) abort(glue::glue("Please specify one and only one outcome, instead of ",
@@ -791,6 +1099,10 @@ check_outcome_continuous <- function(y, se = NULL, with_se = TRUE, append = NULL
 
   if (with_se) {
     if (!null_y && !null_se) {
+      if (rlang::is_list(y) || !is.null(dim(y)))
+        abort("Continuous outcome `y` must be a regular column (not a list or matrix column)")
+      if (rlang::is_list(se) || !is.null(dim(se)))
+        abort("Standard error `se` must be a regular column (not a list or matrix column)")
       if (!is.numeric(y)) abort(paste0("Continuous outcome `y` must be numeric", append))
       if (!is.numeric(se)) abort(paste0("Standard error `se` must be numeric", append))
       if (any(is.nan(se))) abort(paste0("Standard error `se` cannot be NaN", append))
@@ -805,6 +1117,8 @@ check_outcome_continuous <- function(y, se = NULL, with_se = TRUE, append = NULL
     invisible(list(y = y, se = se))
   } else {
     if (!null_y) {
+      if (rlang::is_list(y) || !is.null(dim(y)))
+        abort("Continuous outcome `y` must be a regular column (not a list or matrix column)")
       if (any(is.na(y))) abort(paste0("Continuous outcome `y` contains missing values", append))
       if (!is.numeric(y)) abort(paste0("Continuous outcome `y` must be numeric", append))
     }
@@ -825,6 +1139,8 @@ check_outcome_count <- function(r, n, E) {
   null_E <- is.null(E)
 
   if (!null_n) {
+    if (rlang::is_list(n) || !is.null(dim(n)))
+      abort("Denominator `n` must be a regular column (not a list or matrix column)")
     if (!is.numeric(n)) abort("Denominator `n` must be numeric")
     if (any(is.na(n))) abort("Denominator `n` contains missing values")
     if (any(n != trunc(n))) abort("Denominator `n` must be integer-valued")
@@ -833,6 +1149,8 @@ check_outcome_count <- function(r, n, E) {
   }
 
   if (!null_E) {
+    if (rlang::is_list(E) || !is.null(dim(E)))
+      abort("Time at risk `E` must be a regular column (not a list or matrix column)")
     if (!is.numeric(E)) abort("Time at risk `E` must be numeric")
     if (any(is.na(E))) abort("Time at risk `E` contains missing values")
     if (any(E <= 0)) abort("Time at risk `E` must be positive")
@@ -840,6 +1158,8 @@ check_outcome_count <- function(r, n, E) {
   }
 
   if (!null_r) {
+    if (rlang::is_list(r) || !is.null(dim(r)))
+      abort("Outcome count `r` must be a regular column (not a list or matrix column)")
     if (null_n && null_E) abort("Specify denominator `n` (count outcome) or time at risk `E` (rate outcome)")
     if (!is.numeric(r)) abort("Outcome count `r` must be numeric")
     if (any(is.na(r))) abort("Outcome count `r` contains missing values")
@@ -865,6 +1185,10 @@ check_outcome_binary <- function(r, E) {
     if (null_r) {
       abort("Specify count `r` for rate outcome")
     } else {
+      if (rlang::is_list(r) || !is.null(dim(r)))
+        abort("Rate outcome count `r` must be a regular column (not a list or matrix column)")
+      if (rlang::is_list(E) || !is.null(dim(E)))
+        abort("Time at risk `E` must be a regular column (not a list or matrix column)")
       if (!is.numeric(E)) abort("Time at risk `E` must be numeric")
       if (any(is.na(E))) abort("Time at risk `E` contains missing values")
       if (any(E <= 0)) abort("Time at risk `E` must be positive")
@@ -874,6 +1198,8 @@ check_outcome_binary <- function(r, E) {
       if (any(r < 0)) abort("Rate outcome count `r` must be non-negative integer")
     }
   } else if (!null_r) {
+    if (rlang::is_list(r) || !is.null(dim(r)))
+      abort("Binary outcome `r` must be a regular column (not a list or matrix column)")
     if (!is.numeric(r)) abort("Binary outcome `r` must be numeric")
     if (any(is.na(r))) abort("Binary outcome `r` contains missing values")
     if (any(! r %in% c(0, 1))) abort("Binary outcome `r` must equal 0 or 1")
@@ -897,7 +1223,10 @@ check_outcome_combination <- function(outcomes) {
          ipd = c("rate", NA)),
     list(agd_arm = c("continuous", NA),
          agd_contrast = c("continuous", NA),
-         ipd = c("continuous", NA))
+         ipd = c("continuous", NA)),
+    list(agd_arm = c("ordered", NA),
+         agd_contrast = c("continuous", NA),
+         ipd = c("ordered", NA))
   )
 
   if (!any(purrr::map_lgl(valid,
@@ -916,19 +1245,46 @@ check_outcome_combination <- function(outcomes) {
 #'
 #' @noRd
 check_sample_size <- function(sample_size) {
-    if (!is.numeric(sample_size))
-      abort("Sample size `sample_size` must be numeric")
-    if (any(is.nan(sample_size)))
-      abort("Sample size `sample_size` cannot be NaN")
-    if (any(is.na(sample_size)))
-      abort("Sample size `sample_size` contains missing values")
-    if (any(sample_size != trunc(sample_size)))
-      abort("Sample size `sample_size` must be integer-valued")
-    if (any(sample_size <= 0))
-      abort("Sample size `sample_size` must be greater than zero")
-    if (any(is.infinite(sample_size)))
-      abort("Sample size `sample_size` cannot be infinite")
+  if (rlang::is_list(sample_size) || !is.null(dim(sample_size)))
+    abort("Sample size `sample_size` must be a regular column (not a list or matrix column)")
+  if (!is.numeric(sample_size))
+    abort("Sample size `sample_size` must be numeric")
+  if (any(is.nan(sample_size)))
+    abort("Sample size `sample_size` cannot be NaN")
+  if (any(is.na(sample_size)))
+    abort("Sample size `sample_size` contains missing values")
+  if (any(sample_size != trunc(sample_size)))
+    abort("Sample size `sample_size` must be integer-valued")
+  if (any(sample_size <= 0))
+    abort("Sample size `sample_size` must be greater than zero")
+  if (any(is.infinite(sample_size)))
+    abort("Sample size `sample_size` cannot be infinite")
 }
+
+#' Check treatment column
+#'
+#' @param trt Treatment vector
+#'
+#' @noRd
+check_trt <- function(trt) {
+  if (any(is.na(trt)))
+    abort("`trt` cannot contain missing values")
+  if (rlang::is_list(trt) || !is.null(dim(trt)))
+    abort("`trt` must be a regular column (not a list or matrix column)")
+}
+
+#' Check study column
+#'
+#' @param study Treatment vector
+#'
+#' @noRd
+check_study <- function(study) {
+  if (any(is.na(study)))
+    abort("`study` cannot contain missing values")
+  if (rlang::is_list(study) || !is.null(dim(study)))
+    abort("`study` must be a regular column (not a list or matrix column)")
+}
+
 
 #' Check treatment class coding
 #'
@@ -937,12 +1293,39 @@ check_sample_size <- function(sample_size) {
 #'
 #' @noRd
 check_trt_class <- function(trt_class, trt) {
+  if (rlang::is_list(trt_class) || !is.null(dim(trt_class)))
+    abort("`trt_class` must be a regular column (not a list or matrix column)")
   if (any(is.na(trt)))
     abort("`trt` cannot contain missing values")
   if (any(is.na(trt_class)))
     abort("`trt_class` cannot contain missing values")
   if (anyDuplicated(unique(cbind(trt, trt_class))[, "trt"]))
     abort("Treatment present in more than one class (check `trt` and `trt_class`)")
+}
+
+#' Checks for combining multinomial outcomes
+#'
+#' @param x List containing class `multi_*` outcome objects or the unclassed
+#'   matrices within
+#'
+#' @noRd
+check_multi_combine <- function(x) {
+  # Remove any NULL elements
+  x <- x[!purrr::map_lgl(x, is.null)]
+
+  is_ordered <- purrr::map_lgl(x, ~inherits(., "multi_ordered"))
+  is_competing <- purrr::map_lgl(x, ~inherits(., "multi_competing"))
+  if (any(is_ordered) && any(is_competing))
+    abort("Cannot combine ordered and competing multinomial outcomes.")
+
+  x_u <- purrr::map(x, unclass)
+  n_cat <- purrr::map_int(x_u, ncol)
+  if (any(n_cat != n_cat[1]))
+    abort("Cannot combine multinomial outcomes with different numbers of categories.")
+
+  l_cat <- purrr::map(x_u, colnames)
+  if (any(purrr::map_lgl(l_cat, ~any(. != l_cat[[1]]))))
+    abort("Cannot combine multinomial outcomes with different category labels.")
 }
 
 #' Check for IPD and AgD in network

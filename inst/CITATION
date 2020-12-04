@@ -4,7 +4,7 @@ bibentry(bibtype = "Manual",
          author = person(c("David", "M."), "Phillippo"),
          year = substr(meta$Date, 1, 4),
          note = sprintf("R package version %s", meta$Version),
-         url = "http://github.com/dmphillippo/multinma",
+         url = "https://dmphillippo.github.io/multinma/",
          doi = "10.5281/zenodo.3904454",
          header = "To cite multinma in publications use:")
 

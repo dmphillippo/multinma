@@ -73,30 +73,10 @@ usual \link{ggplot2} functions to add further aesthetics, geoms, themes, etc.
 }
 \examples{
 ## Smoking cessation
-# Set up network of smoking cessation data
-head(smoking)
-
-smk_net <- set_agd_arm(smoking,
-                       study = studyn,
-                       trt = trtc,
-                       r = r,
-                       n = n,
-                       trt_ref = "No intervention")
-
-# Print details
-smk_net
-
 \donttest{
-# Fitting a random effects model
-smk_fit_RE <- nma(smk_net,
-                  trt_effects = "random",
-                  prior_intercept = normal(scale = 100),
-                  prior_trt = normal(scale = 100),
-                  prior_het = normal(scale = 5))
-
-smk_fit_RE
+# Run smoking RE NMA example if not already available
+if (!exists("smk_fit_RE")) example("example_smk_re")
 }
-
 \donttest{
 # Produce relative effects
 smk_releff_RE <- relative_effects(smk_fit_RE)
@@ -122,7 +102,7 @@ smk_cumrankprob_RE <- posterior_rank_probs(smk_fit_RE, lower_better = FALSE,
                                            cumulative = TRUE)
 plot(smk_cumrankprob_RE)
 
-#' # Further customisation is possible with ggplot commands
+# Further customisation is possible with ggplot commands
 plot(smk_cumrankprob_RE) +
   ggplot2::facet_null() +
   ggplot2::aes(colour = Treatment)

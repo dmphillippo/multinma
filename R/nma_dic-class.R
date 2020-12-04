@@ -35,9 +35,9 @@ NULL
 print.nma_dic <- function(x, digits = 1, ...) {
   if (!rlang::is_scalar_integerish(digits)) abort("`digits` must be a single integer.")
 
-  n <- sum(nrow(x$pointwise$ipd),
-           nrow(x$pointwise$agd_arm),
-           x$pointwise$agd_contrast$n_contrast)
+  n <- sum(if (rlang::has_name(x$pointwise$ipd, "df")) x$pointwise$ipd$df else nrow(x$pointwise$ipd),
+           if (rlang::has_name(x$pointwise$agd_arm, "df")) x$pointwise$agd_arm$df else nrow(x$pointwise$agd_arm),
+           if (rlang::has_name(x$pointwise$agd_contrast, "df")) x$pointwise$agd_contrast$df else x$pointwise$agd_contrast$n_contrast)
 
   cglue("Residual deviance: {round(x$resdev, digits)}", subtle(" (on {n} data points)", sep = ""))
   cglue("               pD: {round(x$pd, digits)}")
@@ -92,9 +92,8 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #'   \insertAllCited{}
 #'
 #' @examples ## Smoking cessation
-#' @template ex_smoking_network
-#' @template ex_smoking_nma_fe
-#' @template ex_smoking_nma_re
+#' @template ex_smoking_nma_fe_example
+#' @template ex_smoking_nma_re_example
 #' @examples \donttest{
 #' # Compare DIC of FE and RE models
 #' (smk_dic_FE <- dic(smk_fit_FE))
@@ -102,9 +101,6 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #'
 #' # Plot residual deviance contributions under RE model
 #' plot(smk_dic_RE)
-#'
-#' # Changing the plot stat used
-#' plot(smk_dic_RE, stat = "interval", orientation = "horizontal")
 #'
 #' # Further customisation is possible using ggplot commands
 #' # For example, highlighting data points with residual deviance above a certain threshold
@@ -120,7 +116,7 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #'
 #' # Check for inconsistency using UME model
 #' }
-#' @template ex_smoking_nma_re_ume
+#' @template ex_smoking_nma_re_ume_example
 #' @examples \donttest{
 #' # Compare DIC
 #' smk_dic_RE
@@ -157,6 +153,9 @@ plot.nma_dic <- function(x, y, ...,
   resdev_post <- as.matrix.nma_summary(x$resdev_array) %>%
     tibble::as_tibble()
 
+  data_labels <- stringr::str_extract(colnames(resdev_post), "(?<=\\[).+(?=\\]$)")
+  colnames(resdev_post) <- data_labels
+
   if (packageVersion("tidyr") >= "1.0.0") {
     resdev_post <- tidyr::pivot_longer(resdev_post, cols = dplyr::everything(),
                                        names_to = "parameter", values_to = "resdev")
@@ -167,11 +166,10 @@ plot.nma_dic <- function(x, y, ...,
                                  dplyr::everything())
   }
 
-  resdev_post$.label <- forcats::fct_inorder(factor(
-    stringr::str_extract(resdev_post$parameter, "(?<=\\[).+(?=\\]$)")))
+  resdev_post$.label <- forcats::fct_inorder(factor(resdev_post$parameter))
 
   # Make sure rows for parameters are together - behaviour change between gather() and pivot_longer()
-  resdev_post$.ord <- factor(resdev_post$parameter, levels = dimnames(x$resdev_array)[[3]])
+  resdev_post$.ord <- factor(resdev_post$parameter, levels = data_labels)
   resdev_post <- dplyr::arrange(resdev_post, .data$.ord)
 
   Type <- c(rep("IPD", NROW(x$pointwise$ipd)),
@@ -180,21 +178,39 @@ plot.nma_dic <- function(x, y, ...,
 
   resdev_post$Type <- rep(Type, each = prod(dim(x$resdev_array)[1:2]))
 
+  # Some likelihoods have data points with >1 df, these are stored in `df` column
+  has_df_ipd <- rlang::has_name(x$pointwise$ipd, "df")
+  has_df_agd_arm <- rlang::has_name(x$pointwise$agd_arm, "df")
+  has_df_agd_contrast <- rlang::has_name(x$pointwise$agd_contrast, "df")
+
+  has_df <- has_df_ipd || has_df_agd_arm || has_df_agd_contrast
+
+  df <- c(if (has_df_ipd) x$pointwise$ipd$df else rep(1, NROW(x$pointwise$ipd)),
+          if (has_df_agd_arm) x$pointwise$agd_arm$df else rep(1, NROW(x$pointwise$agd_arm)),
+          if (has_df_agd_contrast) x$pointwise$agd_contrast$df else rep(1, NROW(x$pointwise$agd_contrast)))
+
+  resdev_post$df <- rep(df, each = prod(dim(x$resdev_array)[1:2]))
+  resdev_post$df_label <- paste0("df = ", resdev_post$df)
+
   if (!show_uncertainty) {
     resdev_post <- dplyr::group_by(resdev_post, .data$parameter,
-                                   .data$.label, .data$Type) %>%
+                                   .data$.label, .data$Type,
+                                   .data$df, .data$df_label) %>%
       dplyr::summarise(resdev = mean(.data$resdev))
   }
 
   if (has_y) { # Produce dev-dev plot
 
-    # Check resdev[] names match
-    if (isFALSE(all.equal(dimnames(x$resdev_array)[[3]], dimnames(y$resdev_array)[[3]])))
-      abort("Data points in `x` and `y` do not match")
-
     # Get y resdev samples from resdev_array
     y_resdev_post <- as.matrix.nma_summary(y$resdev_array) %>%
       tibble::as_tibble()
+
+    y_data_labels <- stringr::str_extract(colnames(y_resdev_post), "(?<=\\[).+(?=\\]$)")
+    colnames(y_resdev_post) <- y_data_labels
+
+    # Check resdev[] names match
+    if (any(data_labels != y_data_labels))
+      abort("Data points in `x` and `y` do not match")
 
     if (packageVersion("tidyr") >= "1.0.0") {
       y_resdev_post <- tidyr::pivot_longer(y_resdev_post, cols = dplyr::everything(),
@@ -206,11 +222,10 @@ plot.nma_dic <- function(x, y, ...,
                                      dplyr::everything())
     }
 
-    y_resdev_post$.label <- forcats::fct_inorder(factor(
-      stringr::str_extract(y_resdev_post$parameter, "(?<=\\[).+(?=\\]$)")))
+    y_resdev_post$.label <- forcats::fct_inorder(factor(y_resdev_post$parameter))
 
     # Make sure rows for parameters are together - behaviour change between gather() and pivot_longer()
-    y_resdev_post$.ord <- factor(y_resdev_post$parameter, levels = dimnames(y$resdev_array)[[3]])
+    y_resdev_post$.ord <- factor(y_resdev_post$parameter, levels = y_data_labels)
     y_resdev_post <- dplyr::arrange(y_resdev_post, .data$.ord)
 
     y_resdev_post$Type <- rep(Type, each = prod(dim(x$resdev_array)[1:2]))
@@ -223,7 +238,9 @@ plot.nma_dic <- function(x, y, ...,
       resdev_post <- dplyr::rename(resdev_post, resdev_x = .data$resdev)
 
       xy_resdev_post <- dplyr::left_join(resdev_post, y_resdev_post,
-                                         by = c("parameter", ".label", "Type"))
+                                         by = c("parameter", ".label", "Type")) %>%
+        # Plot IPD points underneath for better clarity
+        dplyr::arrange(dplyr::desc(.data$Type), .data$parameter, .data$.label)
     } else {
 
       if (!rlang::is_string(stat))
@@ -255,7 +272,8 @@ plot.nma_dic <- function(x, y, ...,
                                                      rlang::quo(.data$resdev),
                                                      .width = c(0.66, 0.95),
                                                      .point = mean,
-                                                     !!! int_dots)) %>%
+                                                     !!! int_dots,
+                                                     .homonyms = "last")) %>%
         dplyr::rename(resdev_x = .data$resdev,
                       x_lower = .data$.lower,
                       x_upper = .data$.upper)
@@ -266,7 +284,8 @@ plot.nma_dic <- function(x, y, ...,
                                                        rlang::quo(.data$resdev),
                                                        .width = c(0.66, 0.95),
                                                        .point = mean,
-                                                       !!! int_dots)) %>%
+                                                       !!! int_dots,
+                                                       .homonyms = "last")) %>%
         dplyr::rename(resdev_y = .data$resdev,
                       y_lower = .data$.lower,
                       y_upper = .data$.upper)
@@ -309,8 +328,13 @@ plot.nma_dic <- function(x, y, ...,
 
     if (show_uncertainty) {
       p <- p +
-        do.call(tb_geom, args = purrr::list_modify(geom_dots, orientation = "vertical")) +
-        do.call(tb_geom, args = purrr::list_modify(geom_dots, orientation = "horizontal"))
+        # Have to layer up by data type by hand, due to the dual vertical and horizontal geoms
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "IPD"), orientation = "vertical")) +
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "IPD"), orientation = "horizontal")) +
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "AgD (arm-based)"), orientation = "vertical")) +
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "AgD (arm-based)"), orientation = "horizontal")) +
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "AgD (contrast-based)"), orientation = "vertical")) +
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "AgD (contrast-based)"), orientation = "horizontal"))
     } else {
       p <- p + ggplot2::geom_point(...)
     }
@@ -342,21 +366,43 @@ plot.nma_dic <- function(x, y, ...,
       p <- ggplot2::ggplot(resdev_post,
                            ggplot2::aes(y = .data$.label,
                                         x = .data$resdev)) +
-        ggplot2::geom_vline(xintercept = 1, colour = "grey60") +
         ggplot2::labs(x = "Residual Deviance", y = "Data Point")
 
-      if (dplyr::n_distinct(resdev_post$Type) > 1)
-        p <- p + ggplot2::facet_grid(Type~., space = "free", scales = "free_y")
+      if (dplyr::n_distinct(resdev_post$df) > 1) {
+        if (dplyr::n_distinct(resdev_post$Type) > 1) {
+          p <- p + ggplot2::facet_grid(Type~df_label, space = "free", scales = "free_y") +
+            ggplot2::geom_vline(ggplot2::aes(xintercept = df), colour = "grey60")
+        } else {
+          p <- p + ggplot2::facet_grid(df_label~., space = "free", scales = "free_y") +
+            ggplot2::geom_vline(ggplot2::aes(xintercept = df), colour = "grey60")
+        }
+      } else {
+        p <- p + ggplot2::geom_vline(xintercept = 1, colour = "grey60")
+        if (dplyr::n_distinct(resdev_post$Type) > 1) {
+          p <- p + ggplot2::facet_grid(Type~., space = "free", scales = "free_y")
+        }
+      }
 
     } else {
       p <- ggplot2::ggplot(resdev_post,
                            ggplot2::aes(x = .data$.label,
                                         y = .data$resdev)) +
-        ggplot2::geom_hline(yintercept = 1, colour = "grey60") +
         ggplot2::labs(y = "Residual Deviance", x = "Data Point")
 
-      if (dplyr::n_distinct(resdev_post$Type) > 1)
-        p <- p + ggplot2::facet_grid(.~Type, space = "free", scales = "free_x")
+      if (dplyr::n_distinct(resdev_post$df) > 1) {
+        if (dplyr::n_distinct(resdev_post$Type) > 1) {
+          p <- p + ggplot2::facet_grid(df_label~Type, space = "free", scales = "free_x") +
+            ggplot2::geom_hline(ggplot2::aes(yintercept = df), colour = "grey60")
+        } else {
+          p <- p + ggplot2::facet_grid(.~df_label, space = "free", scales = "free_x") +
+            ggplot2::geom_hline(ggplot2::aes(yintercept = df), colour = "grey60")
+        }
+      } else {
+        p <- p + ggplot2::geom_hline(yintercept = 1, colour = "grey60")
+        if (dplyr::n_distinct(resdev_post$Type) > 1) {
+          p <- p + ggplot2::facet_grid(.~Type, space = "free", scales = "free_x")
+        }
+      }
     }
 
     if (show_uncertainty) {

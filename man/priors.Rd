@@ -10,6 +10,7 @@
 \alias{student_t}
 \alias{half_student_t}
 \alias{exponential}
+\alias{flat}
 \title{Prior distributions}
 \usage{
 normal(location = 0, scale)
@@ -27,6 +28,8 @@ student_t(location = 0, scale, df)
 half_student_t(scale, df)
 
 exponential(scale = 1/rate, rate = 1/scale)
+
+flat()
 }
 \arguments{
 \item{location}{Prior location. Typically prior mean (see details).}
@@ -69,8 +72,16 @@ will be truncated at 0 to be non-negative.\tabular{lccccc}{
    \strong{Student t} \code{student_t()} \tab Yes \tab Yes \tab Yes \tab Yes \tab Yes \cr
    \strong{half-Student t} \code{half_student_t()} \tab - \tab - \tab Yes \tab - \tab Yes \cr
    \strong{Exponential} \code{exponential()} \tab - \tab - \tab Yes \tab - \tab Yes \cr
+   \strong{Flat} \code{flat()} \tab Yes \tab Yes \tab Yes \tab Yes \tab Yes \cr
 }
 
+
+The \code{flat()} prior is a special case where no prior information is added to
+the model, resulting in an implicit flat uniform prior distribution over the
+entire support for a parameter. This will be an improper prior if the
+parameter is unbounded, and is not generally advised. See the
+\href{https://mc-stan.org/docs/stan-users-guide/some-differences-in-the-statistical-models-that-are-allowed.html}{Stan user's guide}
+for more details.
 }
 }
 \seealso{

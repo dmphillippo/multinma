@@ -1,10 +1,34 @@
+# multinma 0.2.0
+
+* Feature: The `set_*()` functions now accept `dplyr::mutate()` style semantics,
+allowing inline variable transformations.
+* Feature: Added ordered multinomial models, with helper function `multi()` for
+specifying the outcomes. Accompanied by a new data set `hta_psoriasis` and
+vignette.
+* Feature: Implicit flat priors can now be specified, on any parameter, using
+`flat()`.
+* Improvement: `as.array.stan_nma()` is now much more efficient, meaning that
+many post-estimation functions are also now much more efficient.
+* Improvement: `plot.nma_dic()` is now more efficient, particularly with large
+numbers of data points.
+* Improvement: The layering of points when producing "dev-dev" plots using
+`plot.nma_dic()` with multiple data types has been reversed for improved clarity
+(now AgD over the top of IPD).
+* Improvement: Aggregate-level predictions with `predict()` from ML-NMR / IPD
+regression models are now calculated in a much more memory-efficient manner.
+* Improvement: Added an overview of examples given in the vignettes.
+* Improvement: Network plots with `weight_edges = TRUE` no longer produce
+legends with non-integer values for the number of studies.
+* Fix: `plot.nma_dic()` no longer gives an error when attempting to specify
+`.width` argument when producing "dev-dev" plots.
+
 # multinma 0.1.3
 
 * Format DESCRIPTION to CRAN requirements
 
 # multinma 0.1.2
 
-* Wrapped long-running examples in \donttest{} instead of \dontrun{}
+* Wrapped long-running examples in `\donttest{}` instead of `\dontrun{}`
 
 # multinma 0.1.1
 

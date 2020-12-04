@@ -127,7 +127,8 @@ print.nma_data <- function(x, ..., n = 10) {
     print(s_ipd[1:min(n_ipd, n), ], right = FALSE, row.names = FALSE, max = 9999L)
     if (n_ipd > n) cglue(subtle(" ... plus {n_ipd - n} more studies"))
     cat("\n")
-    cglue(" Outcome type: {x$outcome$ipd}")
+    cglue(" Outcome type: {x$outcome$ipd}",
+          if (x$outcome$ipd == "ordered") " ({ncol(x$ipd$.r)} categories)" else "")
     # cat("\n")
   }
 
@@ -136,7 +137,8 @@ print.nma_data <- function(x, ..., n = 10) {
     print(s_agd_arm[1:min(n_agd_arm, n), ], right = FALSE, row.names = FALSE, max = 9999L)
     if (n_agd_arm > n) cglue(subtle(" ... plus {n_agd_arm - n} more studies"))
     cat("\n")
-    cglue(" Outcome type: {x$outcome$agd_arm}")
+    cglue(" Outcome type: {x$outcome$agd_arm}",
+          if (x$outcome$agd_arm == "ordered") " ({ncol(x$agd_arm$.r)} categories)" else "")
     # cat("\n")
   }
 
@@ -471,7 +473,7 @@ is_network_connected <- function(network) {
 #' # Setting up the network
 #' af_net <- set_agd_arm(atrial_fibrillation,
 #'                       study = studyc,
-#'                       trt = trtc,
+#'                       trt = abbreviate(trtc, minlength = 3),
 #'                       r = r,
 #'                       n = n,
 #'                       trt_class = trt_class)
@@ -492,11 +494,15 @@ is_network_connected <- function(network) {
 #' # Output may be customised using standard ggplot commands
 #' # For example, to display the legends below the plot:
 #' plot(af_net, weight_nodes = TRUE, show_trt_class = TRUE) +
-#'   ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
+#'   ggplot2::theme(legend.position = "bottom",
+#'                  legend.box = "vertical",
+#'                  legend.margin = ggplot2::margin(0, 0, 0, 0),
+#'                  legend.spacing = ggplot2::unit(0.5, "lines"))
 #'
-#' # Choosing a different ggraph layout
+#' # Choosing a different ggraph layout, hiding some legends
 #' plot(af_net, weight_nodes = TRUE, show_trt_class = TRUE,
-#'      layout = "star")
+#'      layout = "star") +
+#'   ggplot2::guides(edge_width = "none", size = "none")
 #'
 plot.nma_data <- function(x, ..., layout, circular,
                           weight_edges = TRUE, weight_nodes = FALSE,
@@ -535,7 +541,9 @@ plot.nma_data <- function(x, ..., layout, circular,
       ggraph::geom_edge_fan(ggplot2::aes(edge_width = .data$.nstudy,
                                        edge_colour = .data$.type),
                             lineend = "round") +
-      ggraph::scale_edge_width_continuous("Number of studies")
+      ggraph::scale_edge_width_continuous("Number of studies",
+                                          breaks = breaks_integer(positive = TRUE),
+                                          limits = function(x) range(breaks_integer(positive = TRUE)(x)))
   } else {
     g <- g +
       ggraph::geom_edge_fan(ggplot2::aes(edge_colour = .data$.type),
@@ -582,4 +590,64 @@ plot.nma_data <- function(x, ..., layout, circular,
     ggraph::theme_graph(base_family = "") +
     ggplot2::coord_fixed(clip = "off")
   return(g)
+}
+
+#' Automatic breaks for integer scales
+#'
+#' Compute automatic breaks for integer scales, making sure that the breaks are
+#' also integers.
+#'
+#' @param prefer_n Set of preferred numbers of break points.
+#' @param extend Extend the breaks beyond the range of the data? If `TRUE`
+#'   ensures that breaks are equally spaced. Default `TRUE`.
+#' @param positive Create breaks for strictly positive integers? Default `TRUE`.
+#' @param ... Unused.
+#'
+#' @details If `extend = TRUE` (the default), breaks may lie outside of the
+#'   range of the data, but are guaranteed to be equally spaced. If `extend =
+#'   FALSE`, the limits of the breaks are equal to the smallest and largest
+#'   values in the data, but within this range breaks may not be equally spaced.
+#'
+#' @return Returns a function to compute breaks, as required by the `breaks`
+#'   argument to the `scale_*_continuous` functions in `ggplot2`.
+#' @noRd
+#'
+#' @examples
+#' breaks_integer()(1:9)
+#' breaks_integer()(1:18) # extended, equally spaced
+#' breaks_integer(extend = FALSE)(1:18) # un-extended, unequally spaced
+#' breaks_integer(positive = FALSE)(-1:10) # allow negative values
+breaks_integer <- function(prefer_n = c(5, 4, 3, 6), extend = TRUE, positive = TRUE, ...) {
+  if (!rlang::is_integerish(prefer_n, finite = TRUE) || any(prefer_n < 2))
+    abort("`prefer_n` must be a vector of integers greater than 1.")
+  if (!rlang::is_bool(extend))
+    abort("`extend` must be a logical value TRUE or FALSE.")
+  if (!rlang::is_bool(positive))
+    abort("`positive` must be a logical value TRUE or FALSE.")
+
+  def_prefer_n <- prefer_n
+  def_extend <- extend
+  def_positive <- positive
+
+  function(x, prefer_n = def_prefer_n, extend = def_extend, positive = def_positive, ...) {
+    r <- range(x)
+    l <- diff(r)
+
+    if (l < max(prefer_n) - 1) {
+      return(seq.int(r[1], r[2]))
+    }
+
+    n <- prefer_n[which.min(l %% (prefer_n - 1))]
+    if (!extend || l %% (n - 1) == 0) {
+      return(unique(round(seq.int(r[1], r[2], length.out = n))))
+    } else {
+      remainders <- l %% (prefer_n - 1)
+      shifts <- prefer_n - 1 - remainders
+      n <- prefer_n[which.min(shifts)]
+      shift <- min(shifts)
+      s_l <- if (positive) min(floor(shift / 2), r[1] - 1) else floor(shift / 2)
+      s_u <- shift - s_l
+      return(seq.int(r[1] - s_l, r[2] + s_u, length.out = n))
+    }
+  }
 }

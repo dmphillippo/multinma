@@ -20,9 +20,13 @@ NULL
 #' @export
 #' @noRd
 print.nma_prior <- function(x, ...) {
-  p <- purrr::list_modify(x, dist = purrr::zap(), fun = purrr::zap())
-  p <- p[!is.na(p)]
-  cglue("A {x$dist} prior distribution: {paste(names(p), p, sep = ' = ', collapse = ', ')}.")
+  if (x$dist == "flat (implicit)") {
+    cglue("An implicit flat prior distribution over the entire parameter support.")
+  } else {
+    p <- purrr::list_modify(x, dist = purrr::zap(), fun = purrr::zap())
+    p <- p[!is.na(p)]
+    cglue("A{if (stringr::str_starts(x$dist, '[aeiouAEIOU]')) 'n' else ''} {x$dist} prior distribution: {paste(names(p), p, sep = ' = ', collapse = ', ')}.")
+  }
   invisible(x)
 }
 
@@ -58,21 +62,27 @@ summary.nma_prior <- function(object, ..., probs = c(0.5, 0.95), digits = 2, tru
   if (!is.null(trunc) && !rlang::is_double(trunc, n = 2) || any(is.na(trunc)))
     abort("`trunc` must be a length 2 numeric vector of truncation limits.")
 
-  prior <- get_tidy_prior(object, trunc = trunc) %>%
-    tidyr::expand_grid(probs = probs) %>%
-    dplyr::group_by(.data[["dist"]], .data[["probs"]]) %>%
-    {if (stringr::str_starts(object$dist, "half-|Exponential")) {
-      dplyr::summarise(., qfun = paste0("q", .data[["dist"]]),
-                       lower = 0,
-                       upper = do.call(.data[["qfun"]], args = rlang::list2(p = .data[["probs"]], !!! .[["args"]][[1]])))
-    } else {
-      dplyr::summarise(., qfun = paste0("q", .data[["dist"]]),
-                       lower = do.call(.data[["qfun"]], args = rlang::list2(p = (1 - .data[["probs"]]) / 2, !!! .[["args"]][[1]])),
-                       upper = do.call(.data[["qfun"]], args = rlang::list2(p = 1 - (1 - .data[["probs"]]) / 2, !!! .[["args"]][[1]])))
-    }}
+  if (object$dist == "flat (implicit)") {
+    if (is.null(trunc)) trunc <- c(-Inf, Inf)
+    cglue("A flat prior on the parameter support {round(trunc[1], digits)} to {round(trunc[2], digits)}.")
+    invisible(tibble::tibble(probs = 1, lower = trunc[1], upper = trunc[2]))
+  } else {
+    prior <- get_tidy_prior(object, trunc = trunc) %>%
+      tidyr::expand_grid(probs = probs) %>%
+      dplyr::group_by(.data[["dist"]], .data[["probs"]]) %>%
+      {if (stringr::str_starts(object$dist, "half-|Exponential")) {
+        dplyr::summarise(., qfun = paste0("q", .data[["dist"]]),
+                         lower = 0,
+                         upper = do.call(.data[["qfun"]], args = rlang::list2(p = .data[["probs"]], !!! .[["args"]][[1]])))
+      } else {
+        dplyr::summarise(., qfun = paste0("q", .data[["dist"]]),
+                         lower = do.call(.data[["qfun"]], args = rlang::list2(p = (1 - .data[["probs"]]) / 2, !!! .[["args"]][[1]])),
+                         upper = do.call(.data[["qfun"]], args = rlang::list2(p = 1 - (1 - .data[["probs"]]) / 2, !!! .[["args"]][[1]])))
+      }}
 
-  print(object)
-  cglue("{prior$probs*100}% of the prior density lies between {round(prior$lower, digits)} and {round(prior$upper, digits)}.")
+    print(object)
+    cglue("{prior$probs*100}% of the prior density lies between {round(prior$lower, digits)} and {round(prior$upper, digits)}.")
 
-  invisible(prior[ , c("probs", "lower", "upper")])
+    invisible(prior[ , c("probs", "lower", "upper")])
+  }
 }

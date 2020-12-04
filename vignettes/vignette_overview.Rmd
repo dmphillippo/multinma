@@ -1,0 +1,35 @@
+---
+title: "Overview of Examples"
+output: rmarkdown::html_vignette
+bibliography: ../inst/REFERENCES.bib
+vignette: >
+  %\VignetteIndexEntry{*Overview of Examples}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This package contains a number of vignettes, each one walking through an example analysis.
+The table below gives an overview.
+
+Many of these examples recreate analyses from the series of Technical Support Documents published by the NICE Decision Support Unit [@TSD_evsynth].
+The exceptions are atrial fibrillation [@Cooper2009], white blood cell transfusion [@Turner2012], and plaque psoriasis multilevel network meta-regression [@methods_paper].
+
+
+Title | Outcome type | Likelihood | Link function | Notable features
+:-----|:-------------|:-----------|:--------------|:----------------
+[Blocker](example_blocker.html) | Counts | Binomial | logit | Pairwise MA
+[Dietary fat](example_dietary_fat.html) | Rates | Poisson | log | Analysis of log rate ratios from rate data
+[Diabetes](example_diabetes.html) | Counts with time at risk | Binomial | cloglog | Analysis of log hazard ratios from count data with time at risk
+[Parkinson's](example_parkinsons.html) | Continuous | Normal | Identity | Analysis of arm-based data, contrast-based data, and a mixture of both
+[HTA plaque psoriasis](example_hta_psoriasis.html) | Ordered | Multinomial (ordered) | probit | Analysis of ordered categorical outcomes
+[Statins](example_statins.html) | Counts | Binomial | logit | Meta-regression with subgroups
+[BCG vaccine](example_bcg_vaccine.html) | Counts | Binomial | logit | Meta-regression with a continuous covariate
+[Smoking cessation](example_smoking.html) | Counts | Binomial | logit | UME inconsistency model
+[Thrombolytics](example_thrombolytics.html) | Counts | Binomial | logit | UME inconsistency model
+[Atrial fibrillation](example_atrial_fibrillation.html) | Counts | Binomial | logit | Meta-regression with shared class interactions
+[WBC transfusion](example_transfusion.html) | Counts | Binomial | logit | Informative log-Normal prior on $\tau^2$
+[ML-NMR plaque psoriasis](example_plaque_psoriasis.html) | Binary (IPD) and counts (AgD) | Bernoulli (IPD) and two-parameter Binomial (AgD) | probit | Multilevel network meta-regression combining IPD and AgD
+
+
+## References
+

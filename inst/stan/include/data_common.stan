@@ -39,7 +39,7 @@ matrix[QR ? nX : 0, QR ? nX : 0] R_inv;
 
 // -- Offsets --
 int<lower=0, upper=1> has_offset; // Offset flag (yes = 1)
-vector[has_offset ? ni_ipd + nint * (ni_agd_arm + ni_agd_contrast) : 0] offset; // Vector of offsets
+vector[has_offset ? ni_ipd + nint * (ni_agd_arm + ni_agd_contrast) : 0] offsets; // Vector of offsets
 
 // -- Random effects --
 int<lower=0, upper=1> RE; // Random effects flag (yes = 1)
@@ -47,23 +47,23 @@ int<lower=0> which_RE[RE ? narm_ipd + ni_agd_arm + ni_agd_contrast : 0]; // ID o
 corr_matrix[RE ? max(which_RE) : 1] RE_cor; // RE correlation matrix
 
 // -- Priors --
-int<lower=1,upper=3> prior_intercept_dist;
+int<lower=0,upper=3> prior_intercept_dist;
 real prior_intercept_location;
 real<lower=0> prior_intercept_scale;
 real<lower=0> prior_intercept_df;
 
-int<lower=1,upper=3> prior_trt_dist;
+int<lower=0,upper=3> prior_trt_dist;
 real prior_trt_location;
 real<lower=0> prior_trt_scale;
 real<lower=0> prior_trt_df;
 
-int<lower=1,upper=5> prior_het_dist;
+int<lower=0,upper=5> prior_het_dist;
 int<lower=1,upper=3> prior_het_type;
 real prior_het_location;
 real<lower=0> prior_het_scale;
 real<lower=0> prior_het_df;
 
-int<lower=1,upper=3> prior_reg_dist;
+int<lower=0,upper=3> prior_reg_dist;
 real prior_reg_location;
 real<lower=0> prior_reg_scale;
 real<lower=0> prior_reg_df;

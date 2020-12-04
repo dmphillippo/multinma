@@ -56,8 +56,13 @@ print.stan_nma <- function(x, ...) {
   dots <- list(...)
   include <- "pars" %in% names(dots)
   dots <- rlang::dots_list(x = sf,
-                           pars = c("log_lik", "resdev", "fitted",
-                                    "theta_bar_cum", "theta2_bar_cum",
+                           pars = c("log_lik", "resdev",
+                                    "fitted_ipd",
+                                    "fitted_agd_arm",
+                                    "fitted_agd_contrast",
+                                    "theta_bar_cum_agd_arm",
+                                    "theta_bar_cum_agd_contrast",
+                                    "theta2_bar_cum",
                                     "mu", "delta"),
                            include = include,
                            use_cache = FALSE,
@@ -93,8 +98,7 @@ print.stan_nma <- function(x, ...) {
 #'
 #' @examples
 #' ## Smoking cessation
-#' @template ex_smoking_network
-#' @template ex_smoking_nma_re
+#' @template ex_smoking_nma_re_example
 #' @examples \donttest{
 #' # Summary and plot of all model parameters
 #' summary(smk_fit_RE)
@@ -122,9 +126,17 @@ summary.stan_nma <- function(object, ...,
     if (!rlang::is_bool(include)) abort("`include` should be TRUE or FALSE")
   }
   if (missing(pars)) {
-    pars <- c("log_lik", "resdev", "fitted", "lp__")
-    if (inherits(object, "stan_mlnmr")) pars <- c(pars, "theta_bar_cum")
-    if (object$likelihood %in% c("bernoulli2", "binomial2")) pars <- c(pars, "theta2_bar_cum")
+    pars <- c("log_lik", "resdev", "lp__")
+    if (has_ipd(object$network)) pars <- c(pars, "fitted_ipd")
+    if (has_agd_arm(object$network)) pars <- c(pars, "fitted_agd_arm")
+    if (has_agd_contrast(object$network)) pars <- c(pars, "fitted_agd_contrast")
+    if (inherits(object, "stan_mlnmr")) {
+      if (has_agd_arm(object$network)) pars <- c(pars, "theta_bar_cum_agd_arm")
+      if (has_agd_contrast(object$network)) pars <- c(pars, "theta_bar_cum_agd_contrast")
+    }
+    if (object$likelihood %in% c("bernoulli2", "binomial2")) {
+      if (has_agd_arm(object$network)) pars <- c(pars, "theta2_bar_cum")
+    }
   } else {
     if (!is.character(pars)) abort("`pars` should be a character vector")
   }
@@ -191,8 +203,7 @@ plot.stan_nma <- function(x, ...,
 #'
 #' @examples
 #' ## Smoking cessation NMA
-#' @template ex_smoking_network
-#' @template ex_smoking_nma_re
+#' @template ex_smoking_nma_re_example
 #' @examples \donttest{
 #' # Plot prior vs. posterior, by default all parameters are plotted
 #' plot_prior_posterior(smk_fit_RE)
@@ -257,7 +268,7 @@ plot_prior_posterior <- function(x, ...,
                                            trt = "d",
                                            het = "tau",
                                            reg = "beta",
-                                           aux = "sigma"))
+                                           aux = switch(x$likelihood, normal = "sigma", ordered = "cc")))
 
 
   # Get parameter samples
@@ -276,6 +287,25 @@ plot_prior_posterior <- function(x, ...,
       draws <- dplyr::select(draws, -.data$tau)
       prior_dat$par_base <- dplyr::recode(prior_dat$par_base, tau = "prec")
     }
+  }
+
+  # For ordered likelihood, priors are specified on differences between cutoffs
+  if (x$likelihood == "ordered" && "aux" %in% prior) {
+    l_cat <- if (has_ipd(x$network)) colnames(x$network$ipd$.r) else colnames(x$network$agd_arm$.r)
+    n_cat <- length(l_cat)
+
+    if (n_cat <= 2) {
+      draws <- dplyr::select(draws, -dplyr::starts_with("cc["))
+      prior_dat <- dplyr::filter(prior_dat, prior != "aux")
+    } else {
+      for (i in 2:(n_cat-1)) {
+        draws <- dplyr::mutate(draws, !! paste0("diff_cc[", l_cat[i+1], " - ", l_cat[i], "]") :=
+                                        !! as.symbol(paste0("cc[", l_cat[i+1], "]")) - !! as.symbol(paste0("cc[", l_cat[i], "]")))
+      }
+      draws <- dplyr::select(draws, -dplyr::starts_with("cc["))
+    }
+
+    prior_dat <- dplyr::mutate(prior_dat, par_base = dplyr::recode(.data$par_base, cc = "diff_cc"))
   }
 
   if (packageVersion("tidyr") >= "1.0.0") {
@@ -313,12 +343,24 @@ plot_prior_posterior <- function(x, ...,
     dist <- prior_dat$dist[[i]]
     args <- prior_dat$args[[i]]
 
-    lower <- eval(rlang::call2(paste0("q", dist), p = p_limits[1], !!! args))
-    upper <- eval(rlang::call2(paste0("q", dist), p = p_limits[2], !!! args))
+    if (dist == "unif") {
+      # lower <- max(args$min, -1e12)
+      # upper <- min(args$max, 1e12)
 
-    xseq[[i]] <- seq(from = lower, to = upper, length.out = n)
+      xseq[[i]] <- c(args$min, args$max)
+      if (is.infinite(args$min) || is.infinite(args$max)) {
+        dens[[i]] <- c(0, 0)
+      } else {
+        dens[[i]] <- dunif(xseq[[i]], min = args$min, max = args$max)
+      }
+    } else {
+      lower <- eval(rlang::call2(paste0("q", dist), p = p_limits[1], !!! args))
+      upper <- eval(rlang::call2(paste0("q", dist), p = p_limits[2], !!! args))
 
-    dens[[i]] <- eval(rlang::call2(paste0("d", dist), x = xseq[[i]], !!! args))
+      xseq[[i]] <- seq(from = lower, to = upper, length.out = n)
+
+      dens[[i]] <- eval(rlang::call2(paste0("d", dist), x = xseq[[i]], !!! args))
+    }
   }
 
   prior_dat <- tibble::add_column(prior_dat, xseq = xseq, dens = dens)
@@ -400,9 +442,7 @@ plot_prior_posterior <- function(x, ...,
 #'
 #' @examples
 #' ## Plaque psoriasis ML-NMR
-#' @template ex_plaque_psoriasis_network
-#' @template ex_plaque_psoriasis_integration
-#' @template ex_plaque_psoriasis_mlnmr
+#' @template ex_plaque_psoriasis_mlnmr_example
 #' @examples \donttest{
 #' # Plot numerical integration error
 #' plot_integration_error(pso_fit)
@@ -442,13 +482,24 @@ plot_integration_error <- function(x, ...,
 
   # Get cumulative integration points
   twoparbin <- x$likelihood %in% c("binomial2", "bernoulli2")
-  ipars <- if (twoparbin) c("theta_bar_cum", "theta2_bar_cum") else "theta_bar_cum"
+  ipars <- c()
+  if (has_agd_arm(x$network)) {
+    ipars <- c(ipars, "theta_bar_cum_agd_arm")
+  }
+  if (has_agd_contrast(x$network)) {
+    ipars <- c(ipars, "theta_bar_cum_agd_contrast")
+  }
+  if (twoparbin) {
+    ipars <- c(ipars, "theta2_bar_cum")
+  }
   int_dat <- as.data.frame(x, pars = ipars) %>%
     dplyr::mutate(.draw = 1:dplyr::n())
 
+  colnames(int_dat) <- stringr::str_remove(colnames(int_dat), "_bar_cum(_agd_arm|_agd_contrast)?")
+
   n_int <- x$network$n_int
 
-  rx <- "^(theta2?)_bar_cum\\[(.+): (.+), ([0-9]+)\\]$"
+  rx <- "^(theta2?)\\[(.+): (.+), ([0-9]+)\\]$"
 
   if (packageVersion("tidyr") >= "1.1.0") {
     int_dat <- tidyr::pivot_longer(int_dat, cols = -dplyr::one_of(".draw"),
@@ -613,22 +664,23 @@ as.array.stan_nma <- function(x, ..., pars, include = TRUE) {
     if (length(badpars))
       abort(glue::glue("No parameter{if (length(badpars) > 1) 's' else ''} ",
                        glue::glue_collapse(glue::double_quote(badpars), sep = ", ", last = " or "), "."))
-  }
 
-  a <- as.array(as.stanfit(x), ...)
+    # Extract from stanfit only parameters represented in pars
+    if (include) {
+      par_base <- stringr::str_remove(pars, "\\[.*$")
+    } else {
+      par_base <- setdiff(x$stanfit@sim$pars_oi, pars)
+    }
+    a <- as.array(as.stanfit(x), pars = par_base, ...)
 
-  if (!missing(pars)) {
     # Get parameter indices, respecting order of `pars`
     par_regex <- paste0("^\\Q", pars, "\\E(\\[|$)")
-    par_select <- unlist(lapply(par_regex, grep, x = dimnames(a)[[3]], perl = TRUE))
+    par_select <- unique(unlist(lapply(par_regex, grep, x = dimnames(a)[[3]],
+                                       perl = TRUE, invert = !include)))
+    out <- a[ , , par_select, drop = FALSE]
 
-    if (include) {
-      out <- a[ , , par_select, drop = FALSE]
-    } else {
-      out <- a[ , , -par_select, drop = FALSE]
-    }
   } else {
-    out <- a
+    out <- as.array(as.stanfit(x), ...)
   }
 
   class(out) <- c("mcmc_array", "array")
