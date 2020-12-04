@@ -473,7 +473,7 @@ is_network_connected <- function(network) {
 #' # Setting up the network
 #' af_net <- set_agd_arm(atrial_fibrillation,
 #'                       study = studyc,
-#'                       trt = trtc,
+#'                       trt = abbreviate(trtc, minlength = 3),
 #'                       r = r,
 #'                       n = n,
 #'                       trt_class = trt_class)
@@ -494,11 +494,15 @@ is_network_connected <- function(network) {
 #' # Output may be customised using standard ggplot commands
 #' # For example, to display the legends below the plot:
 #' plot(af_net, weight_nodes = TRUE, show_trt_class = TRUE) +
-#'   ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
+#'   ggplot2::theme(legend.position = "bottom",
+#'                  legend.box = "vertical",
+#'                  legend.margin = ggplot2::margin(0, 0, 0, 0),
+#'                  legend.spacing = ggplot2::unit(0.5, "lines"))
 #'
-#' # Choosing a different ggraph layout
+#' # Choosing a different ggraph layout, hiding some legends
 #' plot(af_net, weight_nodes = TRUE, show_trt_class = TRUE,
-#'      layout = "star")
+#'      layout = "star") +
+#'   ggplot2::guides(edge_width = "none", size = "none")
 #'
 plot.nma_data <- function(x, ..., layout, circular,
                           weight_edges = TRUE, weight_nodes = FALSE,
