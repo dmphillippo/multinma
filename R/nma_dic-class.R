@@ -102,9 +102,6 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' # Plot residual deviance contributions under RE model
 #' plot(smk_dic_RE)
 #'
-#' # Changing the plot stat used
-#' plot(smk_dic_RE, stat = "interval", orientation = "horizontal")
-#'
 #' # Further customisation is possible using ggplot commands
 #' # For example, highlighting data points with residual deviance above a certain threshold
 #' plot(smk_dic_RE) +
