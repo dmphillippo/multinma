@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multinma</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.1.3.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.2.0.9000</span>
       </span>
     </div>
 
@@ -223,10 +223,10 @@
 <span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                     mean se_mean   sd     2.5%      25%      50%      75%    97.5% n_eff Rhat</span>
-<span class="co">#&gt; d[Beta Blocker]    -0.26    0.00 0.05    -0.36    -0.30    -0.26    -0.23    -0.16  3117    1</span>
-<span class="co">#&gt; lp__            -5960.43    0.08 3.40 -5967.82 -5962.56 -5960.07 -5957.97 -5954.77  1722    1</span>
+<span class="co">#&gt; d[Beta Blocker]    -0.26    0.00 0.05    -0.36    -0.30    -0.26    -0.23    -0.16  3638    1</span>
+<span class="co">#&gt; lp__            -5960.31    0.08 3.38 -5967.75 -5962.39 -5959.92 -5957.92 -5954.71  1615    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Dec  4 12:02:05 2020.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Dec  4 18:05:18 2020.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -268,11 +268,11 @@
 <span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                     mean se_mean   sd     2.5%      25%      50%      75%    97.5% n_eff Rhat</span>
-<span class="co">#&gt; d[Beta Blocker]    -0.25    0.00 0.07    -0.38    -0.29    -0.25    -0.21    -0.12  3212 1.00</span>
-<span class="co">#&gt; lp__            -5970.79    0.19 5.60 -5981.98 -5974.48 -5970.55 -5966.75 -5960.56   914 1.00</span>
-<span class="co">#&gt; tau                 0.13    0.00 0.08     0.01     0.07     0.13     0.18     0.32  1168 1.01</span>
+<span class="co">#&gt; d[Beta Blocker]    -0.25    0.00 0.06    -0.37    -0.29    -0.25    -0.21    -0.12  3303    1</span>
+<span class="co">#&gt; lp__            -5970.74    0.17 5.52 -5981.94 -5974.34 -5970.42 -5966.79 -5960.89  1064    1</span>
+<span class="co">#&gt; tau                 0.14    0.00 0.08     0.01     0.07     0.13     0.19     0.31  1056    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Dec  4 12:02:11 2020.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Dec  4 18:05:24 2020.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -291,14 +291,14 @@
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">blocker_fit_FE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 46.9 (on 44 data points)</span>
-<span class="co">#&gt;                pD: 23.2</span>
-<span class="co">#&gt;               DIC: 70.1</span></code></pre></div>
+<span class="co">#&gt; Residual deviance: 46.6 (on 44 data points)</span>
+<span class="co">#&gt;                pD: 23</span>
+<span class="co">#&gt;               DIC: 69.6</span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">blocker_fit_RE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 42 (on 44 data points)</span>
-<span class="co">#&gt;                pD: 28.4</span>
-<span class="co">#&gt;               DIC: 70.4</span></code></pre></div>
+<span class="co">#&gt; Residual deviance: 41.9 (on 44 data points)</span>
+<span class="co">#&gt;                pD: 28.3</span>
+<span class="co">#&gt;               DIC: 70.1</span></code></pre></div>
 <p>The residual deviance is lower under the RE model, which is to be expected as this model is more flexible. However, this comes with an increased effective number of parameters (note the increase in <span class="math inline">\(p_D\)</span>). As a result, the DIC of both models is very similar and the FE model may be preferred for parsimony.</p>
 <p>We can also examine the residual deviance contributions with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code> method.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
@@ -320,8 +320,8 @@
                    type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
 <span class="va">pred_FE</span>
 <span class="co">#&gt;                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[Control]      0.11 0.05 0.04 0.07 0.10 0.14  0.24     3948     3701    1</span>
-<span class="co">#&gt; pred[Beta Blocker] 0.09 0.05 0.03 0.06 0.08 0.11  0.20     3965     3871    1</span>
+<span class="co">#&gt; pred[Control]      0.11 0.06 0.04 0.07 0.10 0.14  0.25     4002     3776    1</span>
+<span class="co">#&gt; pred[Beta Blocker] 0.09 0.05 0.03 0.06 0.08 0.11  0.20     3984     3783    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">pred_FE</span><span class="op">)</span></code></pre></div>
 <p><img src="example_blocker_files/figure-html/blocker_pred_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
@@ -330,8 +330,8 @@
                    type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
 <span class="va">pred_RE</span>
 <span class="co">#&gt;                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[Control]      0.11 0.05 0.04 0.07 0.10 0.14  0.24     3765     3110    1</span>
-<span class="co">#&gt; pred[Beta Blocker] 0.09 0.05 0.03 0.06 0.08 0.11  0.20     3865     3218    1</span>
+<span class="co">#&gt; pred[Control]      0.11 0.05 0.04 0.07 0.10 0.14  0.24     3840     3572    1</span>
+<span class="co">#&gt; pred[Beta Blocker] 0.09 0.05 0.03 0.06 0.08 0.11  0.20     3852     3839    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">pred_RE</span><span class="op">)</span></code></pre></div>
 <p><img src="example_blocker_files/figure-html/blocker_pred_RE-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
