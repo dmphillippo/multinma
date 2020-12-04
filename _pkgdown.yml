@@ -14,6 +14,10 @@ template:
     bootswatch: paper
 
 
+development:
+  mode: auto
+
+
 articles:
 - title: Overview of Examples
   navbar: ~
