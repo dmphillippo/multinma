@@ -88,8 +88,17 @@ test_that("cor should be correlation matrix or NULL", {
 })
 
 test_that("cor must be specified if no IPD", {
-  expect_error(add_integration(smknet_agd, x1 = distr(qnorm, mean = 1, sd = 1), cor = NULL),
+  expect_error(add_integration(smknet_agd,
+                               x1 = distr(qnorm, mean = 1, sd = 1),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = NULL),
                "Specify a correlation matrix")
+               "Specify a correlation matrix")
+})
+
+test_that("cor is not required if only one covariate", {
+  expect_s3_class(add_integration(smknet_agd, x1 = distr(qnorm, mean = 1, sd = 1), cor = NULL),
+                  "mlnmr_data")
 })
 
 test_that("covariate arguments should be named distr", {
