@@ -260,18 +260,18 @@ one edge is produced for each comparison (by IPD or AgD study type) with a
 #&gt; Network is </span><span style='color: #00BB00;'>connected</span><span></div><div class='input'>
 <span class='co'># Convert to igraph object</span>
 <span class='fu'>igraph</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/igraph/man/as.igraph.html'>as.igraph</a></span><span class='op'>(</span><span class='va'>smk_net</span><span class='op'>)</span>  <span class='co'># Edges combined by default</span>
-</div><div class='output co'>#&gt; IGRAPH 17c3430 UN-- 4 6 -- 
+</div><div class='output co'>#&gt; IGRAPH f9f864f UN-- 4 6 -- 
 #&gt; + attr: name (v/c), .sample_size (v/n), .nstudy (e/n), .type (e/c)
-#&gt; + edges from 17c3430 (vertex names):
+#&gt; + edges from f9f864f (vertex names):
 #&gt; [1] No intervention       --Group counselling     
 #&gt; [2] No intervention       --Individual counselling
 #&gt; [3] Group counselling     --Individual counselling
 #&gt; [4] No intervention       --Self-help             
 #&gt; [5] Group counselling     --Self-help             
 #&gt; [6] Individual counselling--Self-help             </div><div class='input'><span class='fu'>igraph</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/igraph/man/as.igraph.html'>as.igraph</a></span><span class='op'>(</span><span class='va'>smk_net</span>, collapse <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>  <span class='co'># Without combining edges</span>
-</div><div class='output co'>#&gt; IGRAPH fb6715f UN-- 4 28 -- 
+</div><div class='output co'>#&gt; IGRAPH cc9c753 UN-- 4 28 -- 
 #&gt; + attr: name (v/c), .sample_size (v/n), .study (e/c), .type (e/c)
-#&gt; + edges from fb6715f (vertex names):
+#&gt; + edges from cc9c753 (vertex names):
 #&gt;  [1] No intervention       --Group counselling     
 #&gt;  [2] No intervention       --Individual counselling
 #&gt;  [3] Group counselling     --Individual counselling
