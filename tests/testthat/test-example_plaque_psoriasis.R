@@ -373,7 +373,47 @@ test_that("FE PATE in target population", {
   expect_equal(summary_releff_fe_new, test_releff_fe_new, tolerance = tol, check.attributes = FALSE)
 })
 
-# Population average relative effects in target population
+# Check construction of all contrasts
+pso_releff_FE_all_contr <- relative_effects(pso_fit_FE, all_contrasts = TRUE)
+
+# Reconstruct from basic contrasts in each study
+dk <- function(study, trt, sims = pso_releff_FE$sims) {
+  if (trt == "PBO") return(0)
+  else return(sims[ , , paste0("d[", study, ": ", trt, "]"), drop = FALSE])
+}
+
+test_all_contr <- tibble(
+  contr = pso_releff_FE_all_contr$summary$parameter,
+  study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
+  trtb = stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"),
+  trta = stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])")
+) %>% 
+  rowwise() %>% 
+  mutate(as_tibble(multinma:::summary.mcmc_array(dk(study, trtb) - dk(study, trta)))) %>% 
+  select(.study = study, parameter = contr, mean:Rhat)
+
+test_that("Construction of all contrasts is correct", {
+  expect_equal(pso_releff_FE_all_contr$summary, test_all_contr, check.attributes = FALSE)
+})
+
+# Check all contrasts in target population
+pso_releff_FE_all_contr_new <- relative_effects(pso_fit_FE, newdata = new_agd_means, all_contrasts = TRUE)
+
+test_all_contr_new <- tibble(
+  contr = pso_releff_FE_all_contr_new$summary$parameter,
+  study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
+  trtb = stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"),
+  trta = stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])")
+) %>% 
+  rowwise() %>% 
+  mutate(as_tibble(multinma:::summary.mcmc_array(dk(study, trtb, pso_releff_FE_new$sims) - dk(study, trta, pso_releff_FE_new$sims)))) %>% 
+  select(.study = study, parameter = contr, mean:Rhat)
+
+test_that("Construction of all contrasts in target population is correct", {
+  expect_equal(pso_releff_FE_all_contr_new$summary, test_all_contr_new, check.attributes = FALSE)
+})
+
+# Population average response probabilities in target population
 test_pred_fe_new <- tribble(
   ~parameter            , ~mean, ~sd , ~`2.5%`, ~`50%`, ~`97.5%`,
   "pred[New 1: PBO]"    , 0.06 , 0.03, 0.02   , 0.06  , 0.12    ,
@@ -387,7 +427,7 @@ summary_pred_fe_new <- pso_pred_FE_new %>%
   as_tibble() %>% 
   select(parameter, mean, sd, `2.5%`, `50%`, `97.5%`)
 
-test_that("FE PATE in target population", {
+test_that("FE average response probabilities in target population", {
   expect_equal(summary_pred_fe_new, test_pred_fe_new, tolerance = tol, check.attributes = FALSE)
 })
 
