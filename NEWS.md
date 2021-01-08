@@ -3,6 +3,8 @@
 * Fix: Producing relative effect estimates for all contrasts using
 `relative_effects()` with `all_contrasts = TRUE` no longer gives an error for
 regression models.
+* Fix: Specifying the covariate correlation matrix `cor` in `add_integration()`
+is not required when only one covariate is present.
 
 # multinma 0.2.0
 
