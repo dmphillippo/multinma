@@ -1,5 +1,9 @@
 # multinma 0.2.0.9000
 
+* Fix: Producing relative effect estimates for all contrasts using
+`relative_effects()` with `all_contrasts = TRUE` no longer gives an error for
+regression models.
+
 # multinma 0.2.0
 
 * Feature: The `set_*()` functions now accept `dplyr::mutate()` style semantics,
