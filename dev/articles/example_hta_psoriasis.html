@@ -48,7 +48,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -112,7 +112,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/dmphillippo/multinma/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -126,8 +126,7 @@
 
       
 
-      </header><script src="example_hta_psoriasis_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="example_hta_psoriasis_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="example_hta_psoriasis_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
+      </header><script src="example_hta_psoriasis_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Example: Plaque psoriasis HTA report</h1>
@@ -265,7 +264,7 @@
 <span class="co">#&gt; cc[PASI75]              0.76    0.00 0.03     0.70     0.74     0.76     0.78     0.82  5292    1</span>
 <span class="co">#&gt; cc[PASI90]              1.56    0.00 0.05     1.46     1.53     1.56     1.60     1.67  6220    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Dec  4 18:06:39 2020.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  8 13:03:00 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -335,7 +334,7 @@
 <span class="co">#&gt; cc[PASI75]              0.76    0.00 0.03     0.70     0.74     0.76     0.78     0.82 20555 1.00</span>
 <span class="co">#&gt; cc[PASI90]              1.56    0.00 0.05     1.46     1.53     1.56     1.60     1.67 23977 1.00</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Dec  4 18:07:32 2020.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  8 13:04:26 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -443,7 +442,7 @@
 <p><img src="example_hta_psoriasis_files/figure-html/pso_pred_RE-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>We can modify the plots using standard <code>ggplot2</code> functions. For example, to plot the cutpoints together with a colour coding (instead of split into facets):</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">pred_RE</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_dodge.html">position_dodge</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_null.html">facet_null</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="va">Category</span><span class="op">)</span> <span class="op">+</span>
