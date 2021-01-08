@@ -236,12 +236,12 @@ interactions are specified as <code>"common"</code>, <code>"exchangeable"</code>
     <tr>
       <th>likelihood</th>
       <td><p>Character string specifying a likelihood, if unspecified
-will be inferred from the data</p></td>
+will be inferred from the data (see details)</p></td>
     </tr>
     <tr>
       <th>link</th>
       <td><p>Character string specifying a link function, if unspecified will
-default to the canonical link</p></td>
+default to the canonical link (see details)</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -327,6 +327,35 @@ accounting for the scales of outcomes and covariates, etc. The function
 chosen prior distributions on the posterior distributions, and the
 <code><a href='summary.nma_prior.html'>summary()</a></code> method for <code>nma_prior</code>
 objects prints prior intervals.</p>
+    <h2 class="hasAnchor" id="likelihoods-and-link-functions"><a class="anchor" href="#likelihoods-and-link-functions"></a>Likelihoods and link functions</h2>
+
+    
+
+<p>Currently, the following likelihoods and link functions are supported for
+each data type:</p><table class='table'>
+<tr><td><strong>Data type</strong></td><td><strong>Likelihood</strong></td><td><strong>Link function</strong></td></tr>
+<tr><td><strong>Binary</strong></td><td><code>bernoulli</code>, <code>bernoulli2</code></td><td><code>logit</code>, <code>probit</code>, <code>cloglog</code></td></tr>
+<tr><td><strong>Count</strong></td><td><code>binomial</code>, <code>binomial2</code></td><td><code>logit</code>, <code>probit</code>, <code>cloglog</code></td></tr>
+<tr><td><strong>Rate</strong></td><td><code>poisson</code></td><td><code>log</code></td></tr>
+<tr><td><strong>Continuous</strong></td><td><code>normal</code></td><td><code>identity</code>, <code>log</code></td></tr>
+<tr><td><strong>Ordered</strong></td><td><code>ordered</code></td><td><code>logit</code>, <code>probit</code>, <code>cloglog</code></td></tr>
+</table>
+
+
+
+<p>The <code>bernoulli2</code> and <code>binomial2</code> likelihoods correspond to a two-parameter
+Binomial likelihood for arm-based AgD, which more closely matches the
+underlying Poisson Binomial distribution for the summarised aggregate
+outcomes in a ML-NMR model than the typical (one parameter) Binomial
+distribution (see Phillippo et al. 2020)
+.</p>
+<p>When a <code>cloglog</code> link is used, including an offset for log follow-up time
+(i.e. <code>regression = ~offset(log(time))</code>) results in a model on the log
+hazard (see Dias et al. 2011)
+.</p>
+<p>Further details on each likelihood and link function are given by
+Dias et al. (2011)
+.</p>
     <h2 class="hasAnchor" id="auxiliary-parameters"><a class="anchor" href="#auxiliary-parameters"></a>Auxiliary parameters</h2>
 
     
@@ -349,6 +378,16 @@ these latent cutoffs, we choose to specify priors on the <em>differences</em>
 \(c_{m+1} - c_m\). Stan automatically truncates any priors so that the
 ordering constraints are satisfied.</p>
 
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>Dias S, Welton NJ, Sutton AJ, Ades AE (2011).
+&#8220;NICE DSU Technical Support Document 2: A generalised linear modelling framework for pair-wise and network meta-analysis of randomised controlled trials.&#8221;
+National Institute for Health and Care Excellence.
+<a href='http://nicedsu.org.uk/'>http://nicedsu.org.uk/</a>.<br /><br /> Phillippo DM, Dias S, Ades AE, Belger M, Brnabic A, Schacht A, Saure D, Kadziola Z, Welton NJ (2020).
+&#8220;Multilevel Network Meta-Regression for population-adjusted treatment comparisons.&#8221;
+<em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em>, <b>183</b>(3), 1189--1210.
+doi: <a href='https://doi.org/10.1111/rssa.12579'>10.1111/rssa.12579</a>
+, <a href='https://doi.org/10.1111/rssa.12579'>https://doi.org/10.1111/rssa.12579</a>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>## Smoking cessation NMA</span>
@@ -416,7 +455,7 @@ ordering constraints are satisfied.</p>
 #&gt; d[Self-help]                  0.31     0.48  2190    1
 #&gt; lp__                      -5856.79 -5853.11  1862    1
 #&gt; 
-#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  8 14:35:08 2021.
+#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  8 15:56:38 2021.
 #&gt; For each parameter, n_eff is a crude measure of effective sample size,
 #&gt; and Rhat is the potential scale reduction factor on split chains (at 
 #&gt; convergence, Rhat=1).</div><div class='input'><span class='co'># }</span>
@@ -448,7 +487,7 @@ ordering constraints are satisfied.</p>
 #&gt; lp__                      -5763.49 -5756.41   978    1
 #&gt; tau                           0.95     1.29   916    1
 #&gt; 
-#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  8 14:35:21 2021.
+#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  8 15:56:51 2021.
 #&gt; For each parameter, n_eff is a crude measure of effective sample size,
 #&gt; and Rhat is the potential scale reduction factor on split chains (at 
 #&gt; convergence, Rhat=1).</div><div class='input'><span class='co'># }</span>
@@ -497,7 +536,7 @@ ordering constraints are satisfied.</p>
 #&gt; lp__                                            -5753.98  1118 1.00
 #&gt; tau                                                 1.47  1145 1.01
 #&gt; 
-#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  8 14:35:33 2021.
+#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  8 15:57:02 2021.
 #&gt; For each parameter, n_eff is a crude measure of effective sample size,
 #&gt; and Rhat is the potential scale reduction factor on split chains (at 
 #&gt; convergence, Rhat=1).</div><div class='input'><span class='co'># }</span>
@@ -702,7 +741,7 @@ ordering constraints are satisfied.</p>
 #&gt; d[SEC_300]                              2.45     2.54     2.68  6740    1
 #&gt; lp__                                -1575.99 -1573.80 -1570.49  1371    1
 #&gt; 
-#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  8 14:36:29 2021.
+#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  8 15:58:00 2021.
 #&gt; For each parameter, n_eff is a crude measure of effective sample size,
 #&gt; and Rhat is the potential scale reduction factor on split chains (at 
 #&gt; convergence, Rhat=1).</div><div class='input'><span class='co'># }</span>
