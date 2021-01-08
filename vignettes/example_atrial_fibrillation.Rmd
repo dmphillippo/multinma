@@ -448,6 +448,7 @@ test_that("DIC (common interaction)", {
 })
 
 # Check construction of all contrasts
+af_4b_releff <- relative_effects(af_fit_4b, trt_ref = "Placebo/Standard care")
 af_4b_releff_all_contr <- relative_effects(af_fit_4b, all_contrasts = TRUE)
 
 test_af_4b_all_contr <- tibble(
