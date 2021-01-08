@@ -5,6 +5,9 @@
 regression models.
 * Fix: Specifying the covariate correlation matrix `cor` in `add_integration()`
 is not required when only one covariate is present.
+* Improvement: Added more detailed documentation on the likelihoods and link
+functions available for each data type (`likelihood` and `link` arguments in
+`nma()`).
 
 # multinma 0.2.0
 
