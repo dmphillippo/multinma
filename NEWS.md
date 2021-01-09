@@ -1,4 +1,4 @@
-# multinma 0.2.0.9000
+# multinma 0.2.1
 
 * Fix: Producing relative effect estimates for all contrasts using
 `relative_effects()` with `all_contrasts = TRUE` no longer gives an error for
