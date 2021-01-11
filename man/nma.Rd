@@ -44,10 +44,10 @@ interactions are specified as \code{"common"}, \code{"exchangeable"}, or
 \code{"independent"}.}
 
 \item{likelihood}{Character string specifying a likelihood, if unspecified
-will be inferred from the data}
+will be inferred from the data (see details)}
 
 \item{link}{Character string specifying a link function, if unspecified will
-default to the canonical link}
+default to the canonical link (see details)}
 
 \item{...}{Further arguments passed to
 \code{\link[rstan:stanmodel-method-sampling]{sampling()}}, such as \code{iter},
@@ -115,6 +115,33 @@ chosen prior distributions on the posterior distributions, and the
 \code{\link[multinma:summary.nma_prior]{summary()}} method for \code{nma_prior}
 objects prints prior intervals.
 }
+\section{Likelihoods and link functions}{
+
+Currently, the following likelihoods and link functions are supported for
+each data type:\tabular{lll}{
+   \strong{Data type} \tab \strong{Likelihood} \tab \strong{Link function} \cr
+   \strong{Binary} \tab \code{bernoulli}, \code{bernoulli2} \tab \code{logit}, \code{probit}, \code{cloglog} \cr
+   \strong{Count} \tab \code{binomial}, \code{binomial2} \tab \code{logit}, \code{probit}, \code{cloglog} \cr
+   \strong{Rate} \tab \code{poisson} \tab \code{log} \cr
+   \strong{Continuous} \tab \code{normal} \tab \code{identity}, \code{log} \cr
+   \strong{Ordered} \tab \code{ordered} \tab \code{logit}, \code{probit}, \code{cloglog} \cr
+}
+
+
+The \code{bernoulli2} and \code{binomial2} likelihoods correspond to a two-parameter
+Binomial likelihood for arm-based AgD, which more closely matches the
+underlying Poisson Binomial distribution for the summarised aggregate
+outcomes in a ML-NMR model than the typical (one parameter) Binomial
+distribution \insertCite{@see @methods_paper}{multinma}.
+
+When a \code{cloglog} link is used, including an offset for log follow-up time
+(i.e. \code{regression = ~offset(log(time))}) results in a model on the log
+hazard \insertCite{@see @TSD2}{multinma}.
+
+Further details on each likelihood and link function are given by
+\insertCite{TSD2;textual}{multinma}.
+}
+
 \section{Auxiliary parameters}{
 
 Auxiliary parameters are only present in the following models.
@@ -283,4 +310,7 @@ pso_fit <- nma(pso_net, \dontshow{refresh = if (interactive()) 200 else 0,}
 pso_fit
 }
 
+}
+\references{
+\insertAllCited{}
 }

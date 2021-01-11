@@ -289,6 +289,35 @@ test_that("DIC (no covariates)", {
   expect_equivalent(af_dic_1$dic, 108.57, tolerance = tol_dic)
 })
 
+
+# Check construction of all contrasts
+af_1_releff_all_contr <- relative_effects(af_fit_1, all_contrasts = TRUE)
+
+# Reconstruct from basic contrasts in each study
+dk <- function(study, trt, sims) {
+  if (trt == "Placebo/Standard care") return(0)
+  else if (is.na(study)) {
+    return(sims[ , , paste0("d[", trt, "]"), drop = FALSE])
+  } else {
+    return(sims[ , , paste0("d[", study, ": ", trt, "]"), drop = FALSE])
+  }
+}
+
+test_af_1_all_contr <- tibble(
+  contr = af_1_releff_all_contr$summary$parameter,
+  trtb = stringr::str_extract(contr, "(?<=\\[)(.+)(?= vs\\.)"),
+  trta = stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])")
+) %>% 
+  rowwise() %>% 
+  mutate(as_tibble(multinma:::summary.mcmc_array(dk(NA, trtb, af_1_releff$sims) - dk(NA, trta, af_1_releff$sims)))) %>% 
+  select(parameter = contr, mean:Rhat)
+
+test_that("Construction of all contrasts is correct (no covariates)", {
+  expect_equal(select(af_1_releff_all_contr$summary, -Rhat), 
+               select(test_af_1_all_contr, -Rhat), 
+               check.attributes = FALSE)
+})
+
 # With stroke covariate, shared interactions
 
 Cooper_4b_releff <- tribble(
@@ -352,6 +381,46 @@ test_that("DIC (common interaction)", {
   expect_equivalent(af_dic_4b$resdev, 58.74, tolerance = tol_dic)
   expect_equivalent(af_dic_4b$pd, 48.25, tolerance = tol_dic)
   expect_equivalent(af_dic_4b$dic, 106.99, tolerance = tol_dic)
+})
+
+# Check construction of all contrasts
+af_4b_releff <- relative_effects(af_fit_4b, trt_ref = "Placebo/Standard care")
+af_4b_releff_all_contr <- relative_effects(af_fit_4b, all_contrasts = TRUE)
+
+test_af_4b_all_contr <- tibble(
+  contr = af_4b_releff_all_contr$summary$parameter,
+  study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
+  trtb = stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"),
+  trta = stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])")
+) %>% 
+  rowwise() %>% 
+  mutate(as_tibble(multinma:::summary.mcmc_array(dk(study, trtb, af_4b_releff$sims) - dk(study, trta, af_4b_releff$sims)))) %>% 
+  select(.study = study, parameter = contr, mean:Rhat)
+
+test_that("Construction of all contrasts is correct (common interaction)", {
+  expect_equal(select(af_4b_releff_all_contr$summary, -Rhat), 
+               select(test_af_4b_all_contr, -Rhat), 
+               check.attributes = FALSE)
+})
+
+# Check construction of all contrasts in target population
+af_4b_releff_new <- relative_effects(af_fit_4b, newdata = tibble(stroke = 0.27), trt_ref = "Placebo/Standard care")
+af_4b_releff_all_contr_new <- relative_effects(af_fit_4b, newdata = tibble(stroke = 0.27), all_contrasts = TRUE)
+
+test_af_4b_all_contr_new <- tibble(
+  contr = af_4b_releff_all_contr_new$summary$parameter,
+  study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
+  trtb = stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"),
+  trta = stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])")
+) %>% 
+  rowwise() %>% 
+  mutate(as_tibble(multinma:::summary.mcmc_array(dk(study, trtb, af_4b_releff_new$sims) - dk(study, trta, af_4b_releff_new$sims)))) %>% 
+  select(.study = study, parameter = contr, mean:Rhat)
+
+test_that("Construction of all contrasts in target population is correct (common interaction)", {
+  expect_equal(select(af_4b_releff_all_contr_new$summary, -Rhat), 
+               select(test_af_4b_all_contr_new, -Rhat), 
+               check.attributes = FALSE)
 })
 
 

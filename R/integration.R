@@ -195,22 +195,6 @@ add_integration.nma_data <- function(x, ...,
     abort("No aggregate data found in network.")
   }
 
-  # Check cor
-  if (!is.null(cor)) {
-    tryCatch(cor <- as.matrix(cor),
-             error = function(e) abort("`cor` should be a correlation matrix or NULL"))
-
-    if (!is.numeric(cor) ||
-        !isSymmetric(cor) ||
-        !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)), check.names = FALSE)) ||
-        !all(eigen(cor, symmetric = TRUE)$values > 0)) {
-      abort("`cor` should be a correlation matrix or NULL")
-    }
-  } else {
-    if (!has_ipd(network)) abort("Specify a correlation matrix using the `cor` argument, or provide IPD studies in the network.")
-  }
-
-
   # Covariate arguments
   ds <- list(...)
 
@@ -224,6 +208,21 @@ add_integration.nma_data <- function(x, ...,
 
   x_names <- names(ds)
   nx <- length(ds)
+
+  # Check cor
+  if (!is.null(cor)) {
+    tryCatch(cor <- as.matrix(cor),
+             error = function(e) abort("`cor` should be a correlation matrix or NULL"))
+
+    if (!is.numeric(cor) ||
+        !isSymmetric(cor) ||
+        !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)), check.names = FALSE)) ||
+        !all(eigen(cor, symmetric = TRUE)$values > 0)) {
+      abort("`cor` should be a correlation matrix or NULL")
+    }
+  } else if (nx > 1) {
+    if (!has_ipd(network)) abort("Specify a correlation matrix using the `cor` argument, or provide IPD studies in the network.")
+  }
 
   # If IPD is provided, check that covariate names match
   if (has_ipd(network) && any(! x_names %in% colnames(network$ipd))) {

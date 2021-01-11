@@ -1,3 +1,14 @@
+# multinma 0.2.1
+
+* Fix: Producing relative effect estimates for all contrasts using
+`relative_effects()` with `all_contrasts = TRUE` no longer gives an error for
+regression models.
+* Fix: Specifying the covariate correlation matrix `cor` in `add_integration()`
+is not required when only one covariate is present.
+* Improvement: Added more detailed documentation on the likelihoods and link
+functions available for each data type (`likelihood` and `link` arguments in
+`nma()`).
+
 # multinma 0.2.0
 
 * Feature: The `set_*()` functions now accept `dplyr::mutate()` style semantics,

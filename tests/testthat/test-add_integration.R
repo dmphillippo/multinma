@@ -53,23 +53,37 @@ smknet <- combine_network(smknet_agd, smknet_ipd)
 
 test_that("n_int should be a positive integer", {
   m <- "should be a positive integer"
+
   expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = "oh dear"), m)
   expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = 1.1), m)
   expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = -5), m)
   expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = 0), m)
   expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = 1:2), m)
+
+  expect_error(add_integration(smkdummy, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = "oh dear"), m)
+  expect_error(add_integration(smkdummy, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = 1.1), m)
+  expect_error(add_integration(smkdummy, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = -5), m)
+  expect_error(add_integration(smkdummy, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = 0), m)
+  expect_error(add_integration(smkdummy, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = 1:2), m)
 })
 
 test_that("int_args is named list", {
   m <- "should be a named list"
+
   expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = "oh dear"), m)
   expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = 1.1), m)
   expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = NULL), m)
   expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = list(a = 1, 2)), m)
+
+  expect_error(add_integration(smkdummy, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = "oh dear"), m)
+  expect_error(add_integration(smkdummy, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = 1.1), m)
+  expect_error(add_integration(smkdummy, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = NULL), m)
+  expect_error(add_integration(smkdummy, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), int_args = list(a = 1, 2)), m)
 })
 
 test_that("cor should be correlation matrix or NULL", {
   m <- "should be a correlation matrix or NULL"
+
   expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
                                x2 = distr(qbinom, 1, x2),
                                cor = "a"), m)
@@ -85,15 +99,50 @@ test_that("cor should be correlation matrix or NULL", {
   expect_error(add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
                                x2 = distr(qbinom, 1, x2),
                                cor = matrix(1:4, nrow = 2)), m)
+
+  expect_error(add_integration(smkdummy, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = "a"), m)
+  expect_error(add_integration(smkdummy, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = list()), m)
+  expect_error(add_integration(smkdummy, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = 2), m)
+  expect_error(add_integration(smkdummy, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = matrix(1:4)), m)
+  expect_error(add_integration(smkdummy, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = matrix(1:4, nrow = 2)), m)
 })
 
 test_that("cor must be specified if no IPD", {
-  expect_error(add_integration(smknet_agd, x1 = distr(qnorm, mean = 1, sd = 1), cor = NULL),
+  expect_error(add_integration(smknet_agd,
+                               x1 = distr(qnorm, mean = 1, sd = 1),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = NULL),
                "Specify a correlation matrix")
+
+  expect_error(add_integration(smkdummy,
+                               x1 = distr(qnorm, mean = 1, sd = 1),
+                               x2 = distr(qbinom, 1, x2),
+                               cor = NULL),
+               "Specify a correlation matrix")
+})
+
+test_that("cor is not required if only one covariate", {
+  expect_s3_class(add_integration(smknet_agd, x1 = distr(qnorm, mean = 1, sd = 1), cor = NULL),
+                  "mlnmr_data")
+
+  s <- add_integration(smkdummy, x1 = distr(qnorm, mean = 1, sd = 1), cor = NULL)
+  expect_s3_class(s, "data.frame")
+  expect_true(rlang::has_name(s, ".int_x1"))
 })
 
 test_that("covariate arguments should be named distr", {
   m <- "should be specified as named arguments using the function `distr`"
+
   expect_error(add_integration(smknet, cor = cormat, x1 = "a"), m)
   expect_error(add_integration(smknet, cor = cormat, x1 = list()), m)
   expect_error(add_integration(smknet, cor = cormat, "a"), m)
@@ -102,10 +151,20 @@ test_that("covariate arguments should be named distr", {
   expect_error(add_integration(smknet, cor = cormat,
                                x1 = distr(qnorm, mean = 1, sd = 1), distr(qnorm, mean = 1, sd = 1), m))
   expect_error(add_integration(smknet, cor = cormat), paste("No covariate distributions specified.+", m))
+
+  expect_error(add_integration(smkdummy, cor = cormat, x1 = "a"), m)
+  expect_error(add_integration(smkdummy, cor = cormat, x1 = list()), m)
+  expect_error(add_integration(smkdummy, cor = cormat, "a"), m)
+  expect_error(add_integration(smkdummy, cor = cormat,
+                               x1 = distr(qnorm, mean = 1, sd = 1), x2 = list(), m))
+  expect_error(add_integration(smkdummy, cor = cormat,
+                               x1 = distr(qnorm, mean = 1, sd = 1), distr(qnorm, mean = 1, sd = 1), m))
+  expect_error(add_integration(smkdummy, cor = cormat), paste("No covariate distributions specified.+", m))
 })
 
 test_that("covariate names must match IPD if provided", {
   m <- "Covariate name\\(s\\) not found in IPD: aaa"
+
   expect_error(add_integration(smknet, aaa = distr(qnorm, mean = x1_mean, sd = x1_sd)), m)
   expect_error(add_integration(smknet,
                                x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
@@ -132,6 +191,12 @@ test_that("replaces already present integration points with warning", {
 
   expect_warning(add_integration(smknet_int, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd)), m)
   expect_warning(add_integration(smknet_int, x3 = distr(qnorm, mean = x3_mean, sd = x3_sd)), m)
+
+  smkdummy_int <- add_integration(smkdummy, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd))
+  m2 <- "Replacing integration points already present in data frame"
+
+  expect_warning(add_integration(smkdummy_int, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd)), m2)
+  expect_warning(add_integration(smkdummy_int, x3 = distr(qnorm, mean = x3_mean, sd = x3_sd)), m2)
 })
 
 make_sub <- function(x, n, sub) {

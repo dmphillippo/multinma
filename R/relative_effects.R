@@ -332,8 +332,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       X_EM_d <- cbind(X_EM, X_d)
 
       # Name rows by treatment for now (required for make_all_contrasts)
-      rownames(X_EM_d) <- paste0("d[", rep(x$network$treatments[-1],
-                                           times = dplyr::n_distinct(dat_studies$.study)) , "]")
+      rownames(X_EM_d) <- paste0("d[", dat_studies$.trt , "]")
 
       # Linear combination with posterior MCMC array
       d_array <- as.array(x, pars = colnames(X_EM_d))
@@ -341,12 +340,29 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
 
       # Produce all contrasts, if required
       if (all_contrasts) {
-        re_array <- make_all_contrasts(re_array, trt_ref = nrt)
+        n_contr <- ntrt * (ntrt - 1) / 2
+        re_array_all <- array(dim = c(dim(re_array)[1:2],
+                                      dplyr::n_distinct(dat_studies$.study) * n_contr),
+                              dimnames = purrr::list_modify(dimnames(re_array),
+                                                            parameters = paste(rep(1:dplyr::n_distinct(dat_studies$.study), each = n_contr),
+                                                                               rep(1:n_contr, times = dplyr::n_distinct(dat_studies$.study)))))
+        for (j in unique(dat_studies$.study)) {
+          j_select <- dat_studies$.study == j
+          j_select_all <- rep(unique(dat_studies$.study) == j, each = n_contr)
+          j_contrs_all <- make_all_contrasts(re_array[ , , j_select, drop = FALSE], trt_ref = nrt)
+          re_array_all[ , , j_select_all] <- j_contrs_all
+          dimnames(re_array_all)[[3]][j_select_all] <- dimnames(j_contrs_all)[[3]]
+        }
+        re_array <- re_array_all
       }
 
       # Add in study names to parameters
       parnames <- stringr::str_extract(dimnames(re_array)[[3]], "(?<=^d\\[)(.+)(?=\\]$)")
-      study_parnames <- paste0("d[", dat_studies$.study, ": ", parnames, "]")
+      if (all_contrasts) {
+        study_parnames <- paste0("d[", rep(unique(dat_studies$.study), each = n_contr), ": ", parnames, "]")
+      } else {
+        study_parnames <- paste0("d[", dat_studies$.study, ": ", parnames, "]")
+      }
       dimnames(re_array)[[3]] <- study_parnames
 
       # Rebase against ref_trt if given
@@ -373,7 +389,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         re_summary <- summary_mcmc_array(re_array, probs = probs) %>%
           tibble::add_column(.study =
                                if (all_contrasts) {
-                                 rep(unique(dat_studies$.study), each = ntrt * (ntrt - 1) / 2)
+                                 rep(unique(dat_studies$.study), each = n_contr)
                                } else {
                                  dat_studies$.study
                                },

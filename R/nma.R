@@ -16,9 +16,9 @@
 #'   interactions are specified as `"common"`, `"exchangeable"`, or
 #'   `"independent"`.
 #' @param likelihood Character string specifying a likelihood, if unspecified
-#'   will be inferred from the data
+#'   will be inferred from the data (see details)
 #' @param link Character string specifying a link function, if unspecified will
-#'   default to the canonical link
+#'   default to the canonical link (see details)
 #' @param ... Further arguments passed to
 #'   \code{\link[rstan:stanmodel-method-sampling]{sampling()}}, such as `iter`,
 #'   `chains`, `cores`, etc.
@@ -66,6 +66,32 @@
 #'   \code{\link[multinma:summary.nma_prior]{summary()}} method for `nma_prior`
 #'   objects prints prior intervals.
 #'
+#' @section Likelihoods and link functions:
+#'   Currently, the following likelihoods and link functions are supported for
+#'   each data type:
+#'
+#'   | \strong{Data type} | \strong{Likelihood}   | \strong{Link function} |
+#'   |--------------------|-----------------------|------------------------|
+#'   | \strong{Binary}    | `bernoulli`, `bernoulli2`| `logit`, `probit`, `cloglog`
+#'   | \strong{Count}     | `binomial`, `binomial2`  | `logit`, `probit`, `cloglog`
+#'   | \strong{Rate}      | `poisson`    | `log`
+#'   | \strong{Continuous}| `normal`     | `identity`, `log`
+#'   | \strong{Ordered}   | `ordered`    | `logit`, `probit`, `cloglog`
+#'
+#'   The `bernoulli2` and `binomial2` likelihoods correspond to a two-parameter
+#'   Binomial likelihood for arm-based AgD, which more closely matches the
+#'   underlying Poisson Binomial distribution for the summarised aggregate
+#'   outcomes in a ML-NMR model than the typical (one parameter) Binomial
+#'   distribution \insertCite{@see @methods_paper}{multinma}.
+#'
+#'   When a `cloglog` link is used, including an offset for log follow-up time
+#'   (i.e. `regression = ~offset(log(time))`) results in a model on the log
+#'   hazard \insertCite{@see @TSD2}{multinma}.
+#'
+#'   Further details on each likelihood and link function are given by
+#'   \insertCite{TSD2;textual}{multinma}.
+#'
+#'
 #' @section Auxiliary parameters:
 #'   Auxiliary parameters are only present in the following models.
 #'
@@ -86,6 +112,9 @@
 #' @return `nma()` returns a [stan_nma] object, `nma.fit()` returns a [stanfit]
 #'   object.
 #' @export
+#'
+#' @references
+#'   \insertAllCited{}
 #'
 #' @examples
 #' ## Smoking cessation NMA
