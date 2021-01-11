@@ -39,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multinma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
       </span>
     </div>
 
@@ -47,7 +47,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -111,7 +111,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/dmphillippo/multinma/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -125,8 +125,7 @@
 
       
 
-      </header><script src="example_atrial_fibrillation_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="example_atrial_fibrillation_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="example_atrial_fibrillation_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
+      </header><script src="example_atrial_fibrillation_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Example: Atrial fibrillation</h1>
@@ -285,7 +284,7 @@
 <span class="co">#&gt; lp__                                         -4766.75 -4758.44  1056    1</span>
 <span class="co">#&gt; tau                                              0.37     0.59   696    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Dec  4 16:58:21 2020.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Jan 11 09:37:34 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -605,7 +604,7 @@
 <span class="co">#&gt; lp__                                         -4766.54 -4758.75  1248    1</span>
 <span class="co">#&gt; tau                                              0.26     0.47   455    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Dec  4 16:58:46 2020.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Jan 11 09:38:07 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -1035,7 +1034,7 @@
 <span class="co">#&gt; d[stroke = 1: Ximelagatran]                                    0.00       0.00</span>
 
 <span class="co"># Modify the default output with ggplot2 functionality</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">af_4b_rankprobs</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="va">Treatment</span><span class="op">~</span><span class="va">Study</span>, labeller <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labellers.html">label_wrap_gen</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>strip.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></code></pre></div>
