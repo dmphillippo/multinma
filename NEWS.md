@@ -1,3 +1,5 @@
+# multinma 0.2.1.9000
+
 # multinma 0.2.1
 
 * Fix: Producing relative effect estimates for all contrasts using
