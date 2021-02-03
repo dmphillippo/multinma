@@ -1347,6 +1347,26 @@ inverse_link <- function(x, link = c("identity", "log", "logit", "probit", "clog
   return(out)
 }
 
+#' Link functions
+#'
+#' @param x Linear predictor values
+#' @param link Character string specifying link function
+#' @param ... Other parameters passed to link function
+#'
+#' @noRd
+link_fun <- function(x, link = c("identity", "log", "logit", "probit", "cloglog"), ...) {
+  link <- rlang::arg_match(link)
+
+  out <-
+    if (link == "identity") x
+    else if (link == "log") log(x)
+    else if (link == "logit") qlogis(x, ...)
+    else if (link == "probit") qnorm(x, ...)
+    else if (link == "cloglog") log(-log(1 - x))
+
+  return(out)
+}
+
 #' Get scale of outcome / linear predictor for reporting and plotting
 #'
 #' @param likelihood String, giving likelihood
