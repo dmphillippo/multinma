@@ -13,6 +13,8 @@
   trt_ref = NULL,
   type = c("link", "response"),
   level = c("aggregate", "individual"),
+  baseline_type = c("link", "response"),
+  baseline_level = c("individual", "aggregate"),
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
   summary = TRUE
 )
@@ -23,11 +25,20 @@
 \item{...}{Additional arguments (not used).}
 
 \item{baseline}{An optional \code{\link[=distr]{distr()}} distribution for the baseline response
-(i.e. intercept) on the linear predictor scale, about which to produce
-absolute effects. For example, in a model with a logit link, this would be
-a distribution for the baseline log odds of an event. If \code{NULL},
+(i.e. intercept), about which to produce absolute effects. If \code{NULL},
 predictions are produced using the baseline response for each study in the
-network with IPD or arm-based AgD.}
+network with IPD or arm-based AgD.
+
+Use the \code{baseline_type} and \code{baseline_level} arguments to specify whether
+this distribution is on the response or linear predictor scale, and (for
+ML-NMR or models including IPD) whether this applies to an individual at
+the reference level of the covariates or over the entire \code{newdata}
+population, respectively. For example, in a model with a logit link with
+\code{baseline_type = "link"}, this would be a distribution for the baseline log
+odds of an event.
+
+Use the \code{trt_ref} argument to specify which treatment this distribution
+applies to.}
 
 \item{newdata}{Only required if a regression model is fitted and \code{baseline}
 is specified. A data frame of covariate details, for which to produce
@@ -62,6 +73,16 @@ default, e.g. log odds) or \code{"response"} scale (e.g. probabilities).}
 specified, predictions are produced for all IPD studies in the network if
 \code{type} is \code{"individual"} or \code{"aggregate"}, and for all arm-based AgD
 studies in the network if \code{type} is \code{"aggregate"}.}
+
+\item{baseline_type}{When a \code{baseline} distribution is given, specifies
+whether this corresponds to the \code{"link"} scale (the default, e.g. log odds)
+or \code{"response"} scale (e.g. probabilities).}
+
+\item{baseline_level}{When a \code{baseline} distribution is given, specifies
+whether this corresponds to an individual at the reference level of the
+covariates (\code{"individual"}, the default), or over the entire \code{newdata}
+population (\code{"aggregate"}). Ignored if the network contains only aggregate
+data, since the only option is \code{"aggregate"} in this instance.}
 
 \item{probs}{Numeric vector of quantiles of interest to present in computed
 summary, default \code{c(0.025, 0.25, 0.5, 0.75, 0.975)}}

@@ -7,11 +7,20 @@
 #' @param object A `stan_nma` object created by [nma()].
 #' @param ... Additional arguments (not used).
 #' @param baseline An optional [distr()] distribution for the baseline response
-#'   (i.e. intercept) on the linear predictor scale, about which to produce
-#'   absolute effects. For example, in a model with a logit link, this would be
-#'   a distribution for the baseline log odds of an event. If `NULL`,
+#'   (i.e. intercept), about which to produce absolute effects. If `NULL`,
 #'   predictions are produced using the baseline response for each study in the
 #'   network with IPD or arm-based AgD.
+#'
+#'   Use the `baseline_type` and `baseline_level` arguments to specify whether
+#'   this distribution is on the response or linear predictor scale, and (for
+#'   ML-NMR or models including IPD) whether this applies to an individual at
+#'   the reference level of the covariates or over the entire `newdata`
+#'   population, respectively. For example, in a model with a logit link with
+#'   `baseline_type = "link"`, this would be a distribution for the baseline log
+#'   odds of an event.
+#'
+#'   Use the `trt_ref` argument to specify which treatment this distribution
+#'   applies to.
 #' @param newdata Only required if a regression model is fitted and `baseline`
 #'   is specified. A data frame of covariate details, for which to produce
 #'   predictions. Column names must match variables in the regression model.
@@ -41,6 +50,14 @@
 #'   specified, predictions are produced for all IPD studies in the network if
 #'   `type` is `"individual"` or `"aggregate"`, and for all arm-based AgD
 #'   studies in the network if `type` is `"aggregate"`.
+#' @param baseline_type When a `baseline` distribution is given, specifies
+#'   whether this corresponds to the `"link"` scale (the default, e.g. log odds)
+#'   or `"response"` scale (e.g. probabilities).
+#' @param baseline_level When a `baseline` distribution is given, specifies
+#'   whether this corresponds to an individual at the reference level of the
+#'   covariates (`"individual"`, the default), or over the entire `newdata`
+#'   population (`"aggregate"`). Ignored if the network contains only aggregate
+#'   data, since the only option is `"aggregate"` in this instance.
 #' @param probs Numeric vector of quantiles of interest to present in computed
 #'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
@@ -114,6 +131,8 @@ predict.stan_nma <- function(object, ...,
                              baseline = NULL, newdata = NULL, study = NULL, trt_ref = NULL,
                              type = c("link", "response"),
                              level = c("aggregate", "individual"),
+                             baseline_type = c("link", "response"),
+                             baseline_level = c("individual", "aggregate"),
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
                              summary = TRUE) {
   # Checks
@@ -121,6 +140,9 @@ predict.stan_nma <- function(object, ...,
 
   type <- rlang::arg_match(type)
   level <- rlang::arg_match(level)
+
+  baseline_type <- rlang::arg_match(baseline_type)
+  baseline_level <- rlang::arg_match(baseline_level)
 
   if (!is.null(baseline)) {
     if (!inherits(baseline, "distr"))
@@ -250,6 +272,11 @@ predict.stan_nma <- function(object, ...,
       u <- runif(prod(dim_mu))
       mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
                   dim = dim_mu)
+
+      # Convert to linear predictor scale if baseline_type = "response"
+      if (baseline_type == "response") {
+        mu <- link_fun(mu, link = object$link)
+      }
 
       # Convert to samples on network ref trt if trt_ref given
       if (!is.null(trt_ref) && trt_ref != nrt) {
@@ -464,9 +491,95 @@ predict.stan_nma <- function(object, ...,
       mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
                   dim = dim_mu)
 
-      # Convert to samples on network ref trt if trt_ref given
-      if (!is.null(trt_ref) && trt_ref != nrt) {
-        mu <- sweep(mu, 1:2, post_temp[ , , paste0("d[", trt_ref, "]"), drop = FALSE], FUN = "-")
+      # Convert baseline samples as necessary
+
+      if (!inherits(object, "stan_mlnmr") && !has_ipd(object$network)) {
+        # AgD-only regression, ignore baseline_type = "individual"
+        if (baseline_type == "individual")
+          warn('Ignoring baseline_type = "individual", model intercepts are aggregate level.')
+
+        # Convert to linear predictor scale if baseline_type = "response"
+        if (baseline_type == "response") {
+          mu <- link_fun(mu, link = object$link)
+        }
+
+        # Convert to samples on network ref trt if trt_ref given
+        if (!is.null(trt_ref) && trt_ref != nrt) {
+          mu <- sweep(mu, 1:2, post_temp[ , , paste0("d[", trt_ref, "]"), drop = FALSE], FUN = "-")
+        }
+      } else { # ML-NMR or IPD NMR
+        if (baseline_type == "individual") {
+
+          # Convert to linear predictor scale if baseline_type = "response"
+          if (baseline_type == "response") {
+            mu <- link_fun(mu, link = object$link)
+          }
+
+          # Convert to samples on network ref trt if trt_ref given
+          if (!is.null(trt_ref) && trt_ref != nrt) {
+            mu <- sweep(mu, 1:2, post_temp[ , , paste0("d[", trt_ref, "]"), drop = FALSE], FUN = "-")
+          }
+
+        } else { # Aggregate baselines
+
+          mu0 <- mu
+          preddat_trt_ref <- dplyr::filter(preddat, .data$.trt == trt_ref)
+          studies <- unique(preddat_trt_ref$.study)
+          n_studies <- length(studies)
+
+          # Get posterior samples of betas and d[trt_ref]
+          post_beta <- as.array(object, pars = "beta")
+          if (trt_ref == levels(object$network$treatments)[1]) {
+            post_d <- 0
+          } else {
+            post_d <- as.array(object, pars = paste0("d[", trt_ref, "]"))
+          }
+
+          # Get design matrix for regression for trt_ref
+          X_trt_ref <- X_all[preddat$.trt == trt_ref, , drop = FALSE]
+          X_beta_trt_ref <- X_trt_ref[ , !grepl("^(\\.study|\\.trt|\\.contr)[^:]+$", colnames(X_trt_ref)), drop = FALSE]
+
+          if (!is.null(offset_all)) offset_trt_ref <- offset_all[preddat$.trt == trt_ref]
+
+          for (s in 1:n_studies) {
+            # Study select
+            ss <- preddat_trt_ref$.study == studies[s]
+
+            s_X_beta <- X_beta_trt_ref[ss, , drop = FALSE]
+            if (!is.null(offset_all)) s_offset <- offset_trt_ref[ss]
+
+            range_mu <- range(as.array(object, pars = "mu"))
+
+            if (baseline_type == "link" || object$link == "identity") {
+              # Aggregate response on linear predictor scale, solve explicitly
+              mu[ , , s] <- mu0[ , , s, drop = FALSE] - post_beta %*% colMeans(s_X_beta) - post_d
+              if (!is.null(offset_all)) mu[ , , s] <- sweep(mu[ , , s], 3, s_offset, FUN = "-")
+            } else {
+              # Aggregate response on natural scale, use numerical solver
+
+              # Define function to solve for mu
+              mu_solve <- function(mu, mu0, post_beta, post_d, X_beta, offset, link) {
+                lp <- mu + X_beta %*% post_beta + post_d + offset
+                ginv_lp <- inverse_link(lp, link = link)
+                return(mu0 - mean(ginv_lp))
+              }
+
+              for (i_iter in 1:dim_post_temp[1]) {
+                for (i_chain in 1:dim_post_temp[2]) {
+                  rtsolve <- uniroot(mu_solve, interval = range_mu, extendInt = "yes",
+                                     mu0 = mu0[i_iter, i_chain, s, drop = TRUE],
+                                     post_beta = post_beta[i_iter, i_chain, , drop = TRUE],
+                                     post_d = if (trt_ref == levels(object$network$treatments)[1]) 0 else post_d[i_iter, i_chain, , drop = TRUE],
+                                     X_beta = s_X_beta,
+                                     offset = if (!is.null(offset_all)) s_offset else 0,
+                                     link = object$link)
+                  mu[i_iter, i_chain, s] <- rtsolve$root
+                  # Catch failed convergence?
+                }
+              }
+            }
+          }
+        }
       }
 
       # Combine mu, d, and beta
