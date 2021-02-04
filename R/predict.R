@@ -500,7 +500,7 @@ predict.stan_nma <- function(object, ...,
       studies <- unique(preddat$.study)
       n_studies <- length(studies)
 
-      if (rlang::is_list(baseline)) {
+      if (!inherits(baseline, "distr")) {
         if (!length(baseline) %in% c(1, n_studies))
           abort(sprintf("`baseline` must be a single distr() distribution, or a list of length %d (number of `newdata` studies)", n_studies))
         if (length(baseline) == 1) {
@@ -528,7 +528,7 @@ predict.stan_nma <- function(object, ...,
       dim_post_temp <- dim(post_temp)
       dim_mu <- c(dim_post_temp[1:2], n_studies)
 
-      if (!rlang::is_list(baseline)) {
+      if (inherits(baseline, "distr")) {
         u <- runif(prod(dim_mu))
         mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
                     dim = dim_mu)
