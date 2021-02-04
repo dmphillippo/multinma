@@ -549,9 +549,9 @@ predict.stan_nma <- function(object, ...,
       # Convert baseline samples as necessary
 
       if (!inherits(object, "stan_mlnmr") && !has_ipd(object$network)) {
-        # AgD-only regression, ignore baseline_type = "individual"
-        if (baseline_type == "individual")
-          warn('Ignoring baseline_type = "individual", model intercepts are aggregate level.')
+        # AgD-only regression, ignore baseline_level = "individual"
+        if (baseline_level == "individual")
+          warn('Ignoring baseline_level = "individual", model intercepts are aggregate level.')
 
         # Convert to linear predictor scale if baseline_type = "response"
         if (baseline_type == "response") {
@@ -563,7 +563,7 @@ predict.stan_nma <- function(object, ...,
           mu <- sweep(mu, 1:2, post_temp[ , , paste0("d[", trt_ref, "]"), drop = FALSE], FUN = "-")
         }
       } else { # ML-NMR or IPD NMR
-        if (baseline_type == "individual") {
+        if (baseline_level == "individual") {
 
           # Convert to linear predictor scale if baseline_type = "response"
           if (baseline_type == "response") {
