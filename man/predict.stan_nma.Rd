@@ -22,7 +22,8 @@
 \arguments{
 \item{object}{A \code{stan_nma} object created by \code{\link[=nma]{nma()}}.}
 
-\item{...}{Additional arguments (not used).}
+\item{...}{Additional arguments, passed to \code{\link[=uniroot]{uniroot()}} for regression models
+if \code{baseline_level = "aggregate"}.}
 
 \item{baseline}{An optional \code{\link[=distr]{distr()}} distribution for the baseline response
 (i.e. intercept), about which to produce absolute effects. If \code{NULL},
@@ -81,8 +82,8 @@ or \code{"response"} scale (e.g. probabilities).}
 \item{baseline_level}{When a \code{baseline} distribution is given, specifies
 whether this corresponds to an individual at the reference level of the
 covariates (\code{"individual"}, the default), or over the entire \code{newdata}
-population (\code{"aggregate"}). Ignored if the network contains only aggregate
-data, since the only option is \code{"aggregate"} in this instance.}
+population (\code{"aggregate"}). Ignored for AgD NMA, since the only option is
+\code{"aggregate"} in this instance.}
 
 \item{probs}{Numeric vector of quantiles of interest to present in computed
 summary, default \code{c(0.025, 0.25, 0.5, 0.75, 0.975)}}

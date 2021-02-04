@@ -5,7 +5,8 @@
 #' outcome probabilities or log odds can be produced.
 #'
 #' @param object A `stan_nma` object created by [nma()].
-#' @param ... Additional arguments (not used).
+#' @param ... Additional arguments, passed to [uniroot()] for regression models
+#'   if `baseline_level = "aggregate"`.
 #' @param baseline An optional [distr()] distribution for the baseline response
 #'   (i.e. intercept), about which to produce absolute effects. If `NULL`,
 #'   predictions are produced using the baseline response for each study in the
@@ -56,8 +57,8 @@
 #' @param baseline_level When a `baseline` distribution is given, specifies
 #'   whether this corresponds to an individual at the reference level of the
 #'   covariates (`"individual"`, the default), or over the entire `newdata`
-#'   population (`"aggregate"`). Ignored if the network contains only aggregate
-#'   data, since the only option is `"aggregate"` in this instance.
+#'   population (`"aggregate"`). Ignored for AgD NMA, since the only option is
+#'   `"aggregate"` in this instance.
 #' @param probs Numeric vector of quantiles of interest to present in computed
 #'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
@@ -529,7 +530,7 @@ predict.stan_nma <- function(object, ...,
 
           # Get posterior samples of betas and d[trt_ref]
           post_beta <- as.array(object, pars = "beta")
-          if (trt_ref == levels(object$network$treatments)[1]) {
+          if (trt_ref == nrt) {
             post_d <- 0
           } else {
             post_d <- as.array(object, pars = paste0("d[", trt_ref, "]"))
@@ -540,6 +541,8 @@ predict.stan_nma <- function(object, ...,
           X_beta_trt_ref <- X_trt_ref[ , !grepl("^(\\.study|\\.trt|\\.contr)[^:]+$", colnames(X_trt_ref)), drop = FALSE]
 
           if (!is.null(offset_all)) offset_trt_ref <- offset_all[preddat$.trt == trt_ref]
+
+          range_mu <- range(as.array(object, pars = "mu"))
 
           for (s in 1:n_studies) {
             # Study select
