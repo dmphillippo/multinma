@@ -150,10 +150,14 @@ predict.stan_nma <- function(object, ...,
   baseline_type <- rlang::arg_match(baseline_type)
   baseline_level <- rlang::arg_match(baseline_level)
 
+
+  # Get network reference treatment
+  nrt <- levels(object$network$treatments)[1]
+
   if (!is.null(trt_ref)) {
     if (is.null(baseline)) {
       # warn("Ignoring `trt_ref` since `baseline` is not given.")
-      trt_ref <- NULL
+      trt_ref <- nrt
     } else {
       if (length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
       trt_ref <- as.character(trt_ref)
@@ -164,6 +168,9 @@ predict.stan_nma <- function(object, ...,
                              paste0(lvls_trt, collapse = ", "),
                              paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
     }
+  } else {
+    # Set trt_ref to network reference treatment if unset
+    trt_ref <- nrt
   }
 
   if (xor(is.null(newdata), is.null(baseline)) && !is.null(object$regression))
@@ -192,9 +199,6 @@ predict.stan_nma <- function(object, ...,
   # Cannot produce predictions for inconsistency models
   if (object$consistency != "consistency")
     abort(glue::glue("Cannot produce predictions under inconsistency '{x$consistency}' model."))
-
-  # Get network reference treatment
-  nrt <- levels(object$network$treatments)[1]
 
   # Get NMA formula
   nma_formula <- make_nma_formula(object$regression,
@@ -285,7 +289,7 @@ predict.stan_nma <- function(object, ...,
       }
 
       # Convert to samples on network ref trt if trt_ref given
-      if (!is.null(trt_ref) && trt_ref != nrt) {
+      if (trt_ref != nrt) {
         mu <- mu - d[ , , paste0("d[", trt_ref, "]"), drop = FALSE]
       }
 
@@ -555,7 +559,7 @@ predict.stan_nma <- function(object, ...,
         }
 
         # Convert to samples on network ref trt if trt_ref given
-        if (!is.null(trt_ref) && trt_ref != nrt) {
+        if (trt_ref != nrt) {
           mu <- sweep(mu, 1:2, post_temp[ , , paste0("d[", trt_ref, "]"), drop = FALSE], FUN = "-")
         }
       } else { # ML-NMR or IPD NMR
@@ -567,7 +571,7 @@ predict.stan_nma <- function(object, ...,
           }
 
           # Convert to samples on network ref trt if trt_ref given
-          if (!is.null(trt_ref) && trt_ref != nrt) {
+          if (trt_ref != nrt) {
             mu <- sweep(mu, 1:2, post_temp[ , , paste0("d[", trt_ref, "]"), drop = FALSE], FUN = "-")
           }
 
