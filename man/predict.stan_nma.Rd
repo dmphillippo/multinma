@@ -30,6 +30,10 @@ if \code{baseline_level = "aggregate"}.}
 predictions are produced using the baseline response for each study in the
 network with IPD or arm-based AgD.
 
+For regression models, this may be a list of \code{\link[=distr]{distr()}} distributions of the
+same length as the number of studies in \code{newdata} (possibly named by the
+study names, or otherwise in order of appearance in \code{newdata}).
+
 Use the \code{baseline_type} and \code{baseline_level} arguments to specify whether
 this distribution is on the response or linear predictor scale, and (for
 ML-NMR or models including IPD) whether this applies to an individual at

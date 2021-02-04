@@ -12,6 +12,10 @@
 #'   predictions are produced using the baseline response for each study in the
 #'   network with IPD or arm-based AgD.
 #'
+#'   For regression models, this may be a list of [distr()] distributions of the
+#'   same length as the number of studies in `newdata` (possibly named by the
+#'   study names, or otherwise in order of appearance in `newdata`).
+#'
 #'   Use the `baseline_type` and `baseline_level` arguments to specify whether
 #'   this distribution is on the response or linear predictor scale, and (for
 #'   ML-NMR or models including IPD) whether this applies to an individual at
@@ -145,11 +149,6 @@ predict.stan_nma <- function(object, ...,
   baseline_type <- rlang::arg_match(baseline_type)
   baseline_level <- rlang::arg_match(baseline_level)
 
-  if (!is.null(baseline)) {
-    if (!inherits(baseline, "distr"))
-      abort("Baseline response `baseline` should be specified using distr(), or NULL.")
-  }
-
   if (!is.null(trt_ref)) {
     if (is.null(baseline)) {
       # warn("Ignoring `trt_ref` since `baseline` is not given.")
@@ -204,6 +203,11 @@ predict.stan_nma <- function(object, ...,
 
   # Without regression model
   if (is.null(object$regression)) {
+
+    if (!is.null(baseline)) {
+      if (!inherits(baseline, "distr"))
+        abort("Baseline response `baseline` should be specified using distr(), or NULL.")
+    }
 
     if (level == "individual")
       abort("Cannot produce individual predictions without a regression model.")
@@ -342,6 +346,12 @@ predict.stan_nma <- function(object, ...,
 
   # With regression model
   } else {
+
+
+    if (!is.null(baseline)) {
+      if (!(inherits(baseline, "distr") || (rlang::is_list(baseline) && all(purrr::map_lgl(baseline, inherits, what = "distr")))))
+        abort("Baseline response `baseline` should be a single distr() specification, a list of distr() specifications, or NULL.")
+    }
 
     # Without baseline and newdata specified
     if (is.null(baseline) && is.null(newdata)) {
@@ -485,12 +495,51 @@ predict.stan_nma <- function(object, ...,
       # Get posterior samples
       post_temp <- as.array(object, pars = c("d", "beta"))
 
+      # Check baseline
+      studies <- unique(preddat$.study)
+      n_studies <- length(studies)
+
+      if (rlang::is_list(baseline)) {
+        if (!length(baseline) %in% c(1, n_studies))
+          abort(sprintf("`baseline` must be a single distr() distribution, or a list of length %d (number of `newdata` studies)", n_studies))
+        if (length(baseline) == 1) {
+          baseline <- baseline[[1]]
+        } else {
+          if (!rlang::is_named(baseline)) {
+            names(baseline) <- studies
+          } else {
+            bl_names <- names(baseline)
+            if (dplyr::n_distinct(bl_names) != n_studies)
+              abort("`baseline` list names must be distinct study names from `newdata`")
+            if (length(bad_bl_names <- setdiff(bl_names, studies)))
+              abort(glue::glue("`baseline` list names must match all study names from `newdata`.\n",
+                               "Unmatched list names: ",
+                               glue::glue_collapse(glue::double_quote(bad_bl_names), sep = ", ", width = 30),
+                               ".\n",
+                               "Unmatched `newdata` study names: ",
+                               glue::glue_collapse(glue::double_quote(setdiff(studies, bl_names)), sep = ", ", width = 30),
+                               ".\n"))
+          }
+        }
+      }
+
       # Generate baseline samples
       dim_post_temp <- dim(post_temp)
-      dim_mu <- c(dim_post_temp[1:2], dplyr::n_distinct(preddat$.study))
-      u <- runif(prod(dim_mu))
-      mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
-                  dim = dim_mu)
+      dim_mu <- c(dim_post_temp[1:2], n_studies)
+
+      if (!rlang::is_list(baseline)) {
+        u <- runif(prod(dim_mu))
+        mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
+                    dim = dim_mu)
+      } else {
+        u <- array(runif(prod(dim_mu)), dim = dim_mu)
+        mu <- array(NA_real_, dim = dim_mu)
+        for (s in 1:n_studies) {
+          ss <- studies[s]
+          mu[ , , s] <- array(rlang::eval_tidy(rlang::call2(baseline[[ss]]$qfun, p = u[ , , s], !!! baseline[[ss]]$args)),
+                              dim = c(dim_mu[1:2], 1))
+        }
+      }
 
       # Convert baseline samples as necessary
 
@@ -533,8 +582,6 @@ predict.stan_nma <- function(object, ...,
           }
 
           preddat_trt_ref <- dplyr::filter(preddat, .data$.trt == trt_ref)
-          studies <- unique(preddat_trt_ref$.study)
-          n_studies <- length(studies)
 
           # Get posterior samples of betas and d[trt_ref]
           post_beta <- as.array(object, pars = "beta")
