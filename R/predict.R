@@ -60,8 +60,9 @@
 #'   or `"response"` scale (e.g. probabilities).
 #' @param baseline_level When a `baseline` distribution is given, specifies
 #'   whether this corresponds to an individual at the reference level of the
-#'   covariates (`"individual"`, the default), or over the entire `newdata`
-#'   population (`"aggregate"`). Ignored for AgD NMA, since the only option is
+#'   covariates (`"individual"`, the default), or from an (unadjusted) average
+#'   outcome on the reference treatment in the `newdata` population
+#'   (`"aggregate"`). Ignored for AgD NMA, since the only option is
 #'   `"aggregate"` in this instance.
 #' @param probs Numeric vector of quantiles of interest to present in computed
 #'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`

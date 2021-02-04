@@ -85,8 +85,9 @@ or \code{"response"} scale (e.g. probabilities).}
 
 \item{baseline_level}{When a \code{baseline} distribution is given, specifies
 whether this corresponds to an individual at the reference level of the
-covariates (\code{"individual"}, the default), or over the entire \code{newdata}
-population (\code{"aggregate"}). Ignored for AgD NMA, since the only option is
+covariates (\code{"individual"}, the default), or from an (unadjusted) average
+outcome on the reference treatment in the \code{newdata} population
+(\code{"aggregate"}). Ignored for AgD NMA, since the only option is
 \code{"aggregate"} in this instance.}
 
 \item{probs}{Numeric vector of quantiles of interest to present in computed
