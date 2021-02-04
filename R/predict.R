@@ -523,7 +523,15 @@ predict.stan_nma <- function(object, ...,
 
         } else { # Aggregate baselines
 
-          mu0 <- mu
+          # Assume that aggregate baselines are *unadjusted*, ie. are crude poolings over reference arm outcomes
+          # In this case, we need to marginalise over the natural outcome scale
+
+          if (baseline_type == "link") {
+            mu0 <- inverse_link(mu, link = object$link)
+          } else {
+            mu0 <- mu
+          }
+
           preddat_trt_ref <- dplyr::filter(preddat, .data$.trt == trt_ref)
           studies <- unique(preddat_trt_ref$.study)
           n_studies <- length(studies)
@@ -544,6 +552,14 @@ predict.stan_nma <- function(object, ...,
 
           range_mu <- range(as.array(object, pars = "mu"))
 
+          # Aggregate response on natural scale, use numerical solver
+          # Define function to solve for mu
+          mu_solve <- function(mu, mu0, post_beta, post_d, X_beta, offset, link) {
+            lp <- mu + X_beta %*% post_beta + post_d + offset
+            ginv_lp <- inverse_link(lp, link = link)
+            return(mu0 - mean(ginv_lp))
+          }
+
           for (s in 1:n_studies) {
             # Study select
             ss <- preddat_trt_ref$.study == studies[s]
@@ -551,34 +567,16 @@ predict.stan_nma <- function(object, ...,
             s_X_beta <- X_beta_trt_ref[ss, , drop = FALSE]
             if (!is.null(offset_all)) s_offset <- offset_trt_ref[ss]
 
-            range_mu <- range(as.array(object, pars = "mu"))
-
-            if (baseline_type == "link" || object$link == "identity") {
-              # Aggregate response on linear predictor scale, solve explicitly
-              mu[ , , s] <- mu0[ , , s, drop = FALSE] - post_beta %*% colMeans(s_X_beta) - post_d
-              if (!is.null(offset_all)) mu[ , , s] <- sweep(mu[ , , s], 3, s_offset, FUN = "-")
-            } else {
-              # Aggregate response on natural scale, use numerical solver
-
-              # Define function to solve for mu
-              mu_solve <- function(mu, mu0, post_beta, post_d, X_beta, offset, link) {
-                lp <- mu + X_beta %*% post_beta + post_d + offset
-                ginv_lp <- inverse_link(lp, link = link)
-                return(mu0 - mean(ginv_lp))
-              }
-
-              for (i_iter in 1:dim_post_temp[1]) {
-                for (i_chain in 1:dim_post_temp[2]) {
-                  rtsolve <- uniroot(mu_solve, interval = range_mu, extendInt = "yes",
-                                     mu0 = mu0[i_iter, i_chain, s, drop = TRUE],
-                                     post_beta = post_beta[i_iter, i_chain, , drop = TRUE],
-                                     post_d = if (trt_ref == levels(object$network$treatments)[1]) 0 else post_d[i_iter, i_chain, , drop = TRUE],
-                                     X_beta = s_X_beta,
-                                     offset = if (!is.null(offset_all)) s_offset else 0,
-                                     link = object$link)
-                  mu[i_iter, i_chain, s] <- rtsolve$root
-                  # Catch failed convergence?
-                }
+            for (i_iter in 1:dim_post_temp[1]) {
+              for (i_chain in 1:dim_post_temp[2]) {
+                rtsolve <- uniroot(mu_solve, interval = range_mu, extendInt = "yes", ...,
+                                   mu0 = mu0[i_iter, i_chain, s, drop = TRUE],
+                                   post_beta = post_beta[i_iter, i_chain, , drop = TRUE],
+                                   post_d = if (trt_ref == nrt) 0 else post_d[i_iter, i_chain, , drop = TRUE],
+                                   X_beta = s_X_beta,
+                                   offset = if (!is.null(offset_all)) s_offset else 0,
+                                   link = object$link)
+                mu[i_iter, i_chain, s] <- rtsolve$root
               }
             }
           }
