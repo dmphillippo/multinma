@@ -540,7 +540,8 @@ predict.stan_nma <- function(object, ...,
         u <- array(runif(prod(dim_mu)), dim = dim_mu)
         mu <- array(NA_real_, dim = dim_mu)
         for (s in 1:n_studies) {
-          ss <- studies[s]
+          # NOTE: mu must be in *factor order* for later multiplication with design matrix, not observation order
+          ss <- levels(studies)[s]
           mu[ , , s] <- array(rlang::eval_tidy(rlang::call2(baseline[[ss]]$qfun, p = u[ , , s], !!! baseline[[ss]]$args)),
                               dim = c(dim_mu[1:2], 1))
         }
@@ -613,8 +614,10 @@ predict.stan_nma <- function(object, ...,
           }
 
           for (s in 1:n_studies) {
+            # NOTE: mu must be in *factor order* for later multiplication with design matrix, not observation order
+
             # Study select
-            ss <- preddat_trt_ref$.study == studies[s]
+            ss <- preddat_trt_ref$.study == levels(studies)[s]
 
             s_X_beta <- X_beta_trt_ref[ss, , drop = FALSE]
             if (!is.null(offset_all)) s_offset <- offset_trt_ref[ss]
