@@ -1,5 +1,7 @@
 # multinma 0.2.1.9000
 
+* Fix: Ensure CRAN additional checks with `--run-donttest` run correctly
+
 # multinma 0.2.1
 
 * Fix: Producing relative effect estimates for all contrasts using
