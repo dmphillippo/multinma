@@ -82,3 +82,68 @@ test_that("level argument", {
   expect_error(predict(smk_fit_RE, level = "individual"),
                "Cannot produce individual predictions without a regression model.")
 })
+
+test_that("baseline_type argument", {
+  m <- "must be one of"
+  expect_error(predict(smk_fit_RE, baseline_type = "a"), m)
+  expect_error(predict(smk_fit_RE, baseline_type = "lin"), m)
+
+  m2 <- "must be a character vector"
+  expect_error(predict(smk_fit_RE, baseline_type = 1), m2)
+  expect_error(predict(smk_fit_RE, baseline_type = list("a")), m2)
+  expect_error(predict(smk_fit_RE, baseline_type = NA), m2)
+})
+
+test_that("baseline_level argument", {
+  m <- "must be one of"
+  expect_error(predict(smk_fit_RE, baseline_level = "a"), m)
+  expect_error(predict(smk_fit_RE, baseline_level = "agg"), m)
+
+  m2 <- "must be a character vector"
+  expect_error(predict(smk_fit_RE, baseline_level = 1), m2)
+  expect_error(predict(smk_fit_RE, baseline_level = list("a")), m2)
+  expect_error(predict(smk_fit_RE, baseline_level = NA), m2)
+})
+
+
+pso_net <- set_ipd(plaque_psoriasis_ipd[complete.cases(plaque_psoriasis_ipd), ],
+                   studyc, trtc,
+                   r = pasi75)
+
+# Only small number of samples to test
+pso_fit <- suppressWarnings(nma(pso_net,
+               trt_effects = "fixed",
+               regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
+               prior_intercept = normal(scale = 10),
+               prior_trt = normal(scale = 10),
+               prior_reg = normal(scale = 10),
+               init_r = 0.1,
+               iter = 10))
+
+pso_new <- data.frame(durnpso = 10, prevsys = 0.5, bsa = 20, weight = 75, psa = 0.5, study = c("One", "Two"))
+
+test_that("baseline and newdata for regression models", {
+  m <- "Specify both `newdata` and `baseline`, or neither"
+  expect_error(predict(pso_fit, newdata = pso_new), m)
+  expect_error(predict(pso_fit, baseline = distr(qnorm, 1, 1)), m)
+})
+
+test_that("baseline argument", {
+  m <- "should be a single distr\\(\\) specification, a list of distr\\(\\) specifications, or NULL"
+  expect_error(predict(pso_fit, study = study, newdata = pso_new, baseline = "a"), m)
+  expect_error(predict(pso_fit, study = study, newdata = pso_new, baseline = 1), m)
+  expect_error(predict(pso_fit, study = study, newdata = pso_new, baseline = list("a")), m)
+  expect_error(predict(pso_fit, study = study, newdata = pso_new, baseline = NA), m)
+
+  m2 <- "or a list of length 2"
+  expect_error(predict(pso_fit, study = study, newdata = pso_new, baseline = list(distr(qnorm, 1, 1),
+                                                                                  distr(qnorm, 2, 1),
+                                                                                  distr(qnorm, 3, 1))), m2)
+  expect_error(predict(pso_fit, study = study, newdata = pso_new, baseline = list(One = distr(qnorm, 1, 1),
+                                                                                  Two = distr(qnorm, 2, 1),
+                                                                                  Three = distr(qnorm, 3, 1))), m2)
+
+  expect_error(predict(pso_fit, study = study, newdata = pso_new, baseline = list(One = distr(qnorm, 1, 1),
+                                                                                  Three = distr(qnorm, 3, 1))),
+               "must match all study names")
+})
