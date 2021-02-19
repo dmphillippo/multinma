@@ -160,6 +160,29 @@ pred_RE
 plot(pred_RE)
 ```
 
+If instead of information on the baseline logit-probability of mortality we have event counts, we can use these to construct a Beta distribution for the baseline probability of mortality.
+For example, if 4 out of 36 individuals died on control treatment in the target population of interest, the appropriate Beta distribution for the probability would be $\textrm{Beta}(4, 36-4)$.
+We can specify this Beta distribution for the baseline response using the `baseline_type = "reponse"` argument (the default is `"link"`, used above for the baseline logit-probability).
+```{r blocker_pred_FE_beta, fig.height = 2}
+pred_FE_beta <- predict(blocker_fit_FE, 
+                        baseline = distr(qbeta, 4, 36-4),
+                        baseline_type = "response",
+                        type = "response")
+pred_FE_beta
+plot(pred_FE_beta)
+```
+
+```{r blocker_pred_RE_beta, fig.height = 2}
+pred_RE_beta <- predict(blocker_fit_RE, 
+                        baseline = distr(qbeta, 4, 36-4),
+                        baseline_type = "response",
+                        type = "response")
+pred_RE_beta
+plot(pred_RE_beta)
+```
+
+Notice that these results are nearly equivalent to those calculated above using the Normal distribution for the baseline logit-probability, since these event counts correspond to approximately the same distribution on the logit-probability.
+
 
 ## References
 
@@ -235,6 +258,27 @@ test_that("RE predicted probabilities", {
   expect_equivalent(blocker_pred_RE$`2.5%`, c(0.04, 0.03), tolerance = tol_dic)
   expect_equivalent(blocker_pred_RE$`50%`, c(0.10, 0.08), tolerance = tol_dic)
   expect_equivalent(blocker_pred_RE$`97.5%`, c(0.25, 0.20), tolerance = tol_dic)
+})
+
+# Check predictions with Beta distribution on baseline probability
+blocker_predbeta_FE <- as.data.frame(pred_FE_beta)
+
+test_that("FE predicted probabilities (Beta distribution)", {
+  expect_equal(blocker_pred_FE$mean, blocker_predbeta_FE$mean, tolerance = tol)
+  expect_equal(blocker_pred_FE$sd, blocker_predbeta_FE$sd, tolerance = tol)
+  expect_equal(blocker_pred_FE$`2.5%`, blocker_predbeta_FE$`2.5%`, tolerance = tol)
+  expect_equal(blocker_pred_FE$`50%`, blocker_predbeta_FE$`50%`, tolerance = tol)
+  expect_equal(blocker_pred_FE$`97.5%`, blocker_predbeta_FE$`97.5%`, tolerance = tol)
+})
+
+blocker_predbeta_RE <- as.data.frame(pred_RE_beta)
+
+test_that("RE predicted probabilities (Beta distribution)", {
+  expect_equal(blocker_pred_RE$mean, blocker_predbeta_RE$mean, tolerance = tol)
+  expect_equal(blocker_pred_RE$sd, blocker_predbeta_RE$sd, tolerance = tol)
+  expect_equal(blocker_pred_RE$`2.5%`, blocker_predbeta_RE$`2.5%`, tolerance = tol)
+  expect_equal(blocker_pred_RE$`50%`, blocker_predbeta_RE$`50%`, tolerance = tol)
+  expect_equal(blocker_pred_RE$`97.5%`, blocker_predbeta_RE$`97.5%`, tolerance = tol)
 })
 
 # Test that ordered multinomial model is equivalent
@@ -323,5 +367,34 @@ test_that("Equivalent ordered multinomial RE predicted probabilities", {
   expect_equivalent(blocker_ord_pred_RE$`2.5%`, c(0.04, 0.03), tolerance = tol_dic)
   expect_equivalent(blocker_ord_pred_RE$`50%`, c(0.10, 0.08), tolerance = tol_dic)
   expect_equivalent(blocker_ord_pred_RE$`97.5%`, c(0.25, 0.20), tolerance = tol_dic)
+})
+
+# Check predictions with Beta distribution on baseline probability
+blocker_ord_predbeta_FE <- predict(blocker_ord_fit_FE, 
+                               baseline = distr(qbeta, 4, 36 - 4), #3.66565, 36.74819 - 3.66565), 
+                               baseline_type = "response",
+                               type = "response") %>% 
+  as.data.frame()
+
+test_that("FE ordered multinomial predicted probabilities (Beta distribution)", {
+  expect_equal(blocker_ord_pred_FE$mean, blocker_ord_predbeta_FE$mean, tolerance = tol)
+  expect_equal(blocker_ord_pred_FE$sd, blocker_ord_predbeta_FE$sd, tolerance = tol)
+  expect_equal(blocker_ord_pred_FE$`2.5%`, blocker_ord_predbeta_FE$`2.5%`, tolerance = tol)
+  expect_equal(blocker_ord_pred_FE$`50%`, blocker_ord_predbeta_FE$`50%`, tolerance = tol)
+  expect_equal(blocker_ord_pred_FE$`97.5%`, blocker_ord_predbeta_FE$`97.5%`, tolerance = tol)
+})
+
+blocker_ord_predbeta_RE <- predict(blocker_ord_fit_RE, 
+                               baseline = distr(qbeta, 4, 36 - 4), #3.66565, 36.74819 - 3.66565), 
+                               baseline_type = "response",
+                               type = "response") %>% 
+  as.data.frame()
+
+test_that("RE ordered multinomial predicted probabilities (Beta distribution)", {
+  expect_equal(blocker_ord_pred_RE$mean, blocker_ord_predbeta_RE$mean, tolerance = tol)
+  expect_equal(blocker_ord_pred_RE$sd, blocker_ord_predbeta_RE$sd, tolerance = tol)
+  expect_equal(blocker_ord_pred_RE$`2.5%`, blocker_ord_predbeta_RE$`2.5%`, tolerance = tol)
+  expect_equal(blocker_ord_pred_RE$`50%`, blocker_ord_predbeta_RE$`50%`, tolerance = tol)
+  expect_equal(blocker_ord_pred_RE$`97.5%`, blocker_ord_predbeta_RE$`97.5%`, tolerance = tol)
 })
 ```
