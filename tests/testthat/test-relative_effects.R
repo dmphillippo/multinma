@@ -62,6 +62,8 @@ test_that("newdata argument", {
 })
 
 
+skip_on_cran()  # Reduce CRAN check time
+
 pso_net <- set_ipd(plaque_psoriasis_ipd[complete.cases(plaque_psoriasis_ipd), ],
                    studyc, trtc,
                    r = pasi75)
