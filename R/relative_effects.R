@@ -221,6 +221,9 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       # Produce relative effects for all studies in newdata
 
       dat_studies <- newdata
+
+      # Check all variables are present
+      regdat <- get_model_data_columns(dat_studies, regression = x$regression, label = "`newdata`")
     }
 
     # Get number of treatments
@@ -246,7 +249,8 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
                                     dat_agd_arm = dat_studies,
                                     xbar = x$xbar,
                                     consistency = x$consistency,
-                                    classes = !is.null(x$network$classes))
+                                    classes = !is.null(x$network$classes),
+                                    newdata = TRUE)
     X_all <- X_list$X_agd_arm
 
     # Subset design matrix into EM columns and trt columns

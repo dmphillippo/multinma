@@ -242,7 +242,8 @@ predict.stan_nma <- function(object, ...,
                                         dat_agd_arm = preddat,
                                         xbar = object$xbar,
                                         consistency = object$consistency,
-                                        classes = !is.null(object$network$classes))
+                                        classes = !is.null(object$network$classes),
+                                        newdata = TRUE)
         X_all <- X_list$X_agd_arm
         rownames(X_all) <- paste0("pred[", preddat$.study, ": ", preddat$.trt, "]")
 
@@ -269,7 +270,8 @@ predict.stan_nma <- function(object, ...,
                                       dat_agd_arm = preddat,
                                       xbar = object$xbar,
                                       consistency = object$consistency,
-                                      classes = !is.null(object$network$classes))
+                                      classes = !is.null(object$network$classes),
+                                      newdata = TRUE)
       X_all <- X_list$X_agd_arm
       rownames(X_all) <- paste0("pred[", preddat$.trt, "]")
 
@@ -437,7 +439,8 @@ predict.stan_nma <- function(object, ...,
                                       dat_agd_contrast = dat_agd_contrast,
                                       xbar = object$xbar,
                                       consistency = object$consistency,
-                                      classes = !is.null(object$network$classes))
+                                      classes = !is.null(object$network$classes),
+                                      newdata = TRUE)
       X_all <- X_list$X_ipd
       rownames(X_all) <- paste0("pred[", preddat$.study, ": ", preddat$.trt, "]")
 
@@ -471,6 +474,9 @@ predict.stan_nma <- function(object, ...,
         }
       }
 
+      # Check all variables are present
+      predreg <- get_model_data_columns(preddat, regression = object$regression, label = "`newdata`")
+
       preddat$.sample_size <- 1
 
       # Make design matrix of all studies and all treatments
@@ -491,7 +497,8 @@ predict.stan_nma <- function(object, ...,
                                       dat_ipd = preddat,
                                       xbar = object$xbar,
                                       consistency = object$consistency,
-                                      classes = !is.null(object$network$classes))
+                                      classes = !is.null(object$network$classes),
+                                      newdata = TRUE)
       X_all <- X_list$X_ipd
       rownames(X_all) <- paste0("pred[", preddat$.study, ": ", preddat$.trt, "]")
 

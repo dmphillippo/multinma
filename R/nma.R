@@ -1541,6 +1541,7 @@ make_nma_formula <- function(regression,
 #' @param consistency Consistency/inconsistency model (character string)
 #' @param classes Classes present? TRUE / FALSE
 #' @param class_interactions Class interaction specification (character string)
+#' @param newdata Providing newdata post-fitting? TRUE / FALSE
 #'
 #' @return A named list of three matrices: X_ipd, X_agd_arm, X_agd_contrast; and
 #'   three vectors of offsets: offset_ipd, offset_agd_arm, offset_agd_contrast.
@@ -1552,7 +1553,8 @@ make_nma_model_matrix <- function(nma_formula,
                                   agd_contrast_bl = logical(),
                                   xbar = NULL,
                                   consistency = c("consistency", "nodesplit", "ume"),
-                                  classes = FALSE) {
+                                  classes = FALSE,
+                                  newdata = FALSE) {
   # Checks
   if (!rlang::is_formula(nma_formula)) abort("`nma_formula` is not a formula")
   stopifnot(is.data.frame(dat_ipd),
@@ -1671,7 +1673,8 @@ make_nma_model_matrix <- function(nma_formula,
   check_regression_data(nma_formula,
                         dat_ipd = dat_ipd,
                         dat_agd_arm = dat_agd_arm,
-                        dat_agd_contrast = dat_agd_contrast)
+                        dat_agd_contrast = dat_agd_contrast,
+                        newdata = newdata)
 
   # Center
   if (!is.null(xbar)) {
@@ -1861,12 +1864,14 @@ get_model_data_columns <- function(data, regression = NULL, label = NULL) {
 #'
 #' @param formula Model formula
 #' @param dat_ipd,dat_agd_arm,dat_agd_contrast Data frames
+#' @param newdata Providing newdata post-fitting? TRUE / FALSE
 #'
 #' @noRd
 check_regression_data <- function(formula,
                                   dat_ipd = tibble::tibble(),
                                   dat_agd_arm = tibble::tibble(),
-                                  dat_agd_contrast = tibble::tibble()) {
+                                  dat_agd_contrast = tibble::tibble(),
+                                  newdata = FALSE) {
 
   .has_ipd <- if (nrow(dat_ipd)) TRUE else FALSE
   .has_agd_arm <- if (nrow(dat_agd_arm)) TRUE else FALSE
@@ -1876,9 +1881,9 @@ check_regression_data <- function(formula,
   if (.has_ipd) {
     rlang::with_handlers(
       X_ipd_frame <- model.frame(formula, dat_ipd, na.action = NULL),
-      error = ~abort(paste0("Failed to construct design matrix for IPD.\n", .)))
+      error = ~abort(paste0(if (newdata) "Failed to construct design matrix for `newdata`.\n" else "Failed to construct design matrix for IPD.\n", .)))
 
-    X_ipd_has_na <- names(which(purrr::map_lgl(X_ipd_frame, ~any(is.na(.)))))
+    X_ipd_has_na <- names(which(purrr::map_lgl(X_ipd_frame, ~any(is.na(.) | is.infinite(.)))))
   } else {
     X_ipd_has_na <- character(0)
   }
@@ -1886,9 +1891,9 @@ check_regression_data <- function(formula,
   if (.has_agd_arm) {
     rlang::with_handlers(
       X_agd_arm_frame <- model.frame(formula, dat_agd_arm, na.action = NULL),
-      error = ~abort(paste0("Failed to construct design matrix for AgD (arm-based).\n", .)))
+      error = ~abort(paste0(if (newdata) "Failed to construct design matrix for `newdata`.\n" else "Failed to construct design matrix for AgD (arm-based).\n", .)))
 
-    X_agd_arm_has_na <- names(which(purrr::map_lgl(X_agd_arm_frame, ~any(is.na(.)))))
+    X_agd_arm_has_na <- names(which(purrr::map_lgl(X_agd_arm_frame, ~any(is.na(.) | is.infinite(.)))))
   } else {
     X_agd_arm_has_na <- character(0)
   }
@@ -1896,9 +1901,9 @@ check_regression_data <- function(formula,
   if (.has_agd_contrast) {
     rlang::with_handlers(
       X_agd_contrast_frame <- model.frame(formula, dat_agd_contrast, na.action = NULL),
-      error = ~abort(paste0("Failed to construct design matrix for AgD (contrast-based).\n", .)))
+      error = ~abort(paste0(if (newdata) "Failed to construct design matrix for `newdata`.\n" else "Failed to construct design matrix for AgD (contrast-based).\n", .)))
 
-    X_agd_contrast_has_na <- names(which(purrr::map_lgl(X_agd_contrast_frame, ~any(is.na(.)))))
+    X_agd_contrast_has_na <- names(which(purrr::map_lgl(X_agd_contrast_frame, ~any(is.na(.) | is.infinite(.)))))
   } else {
     X_agd_contrast_has_na <- character(0)
   }
@@ -1907,11 +1912,15 @@ check_regression_data <- function(formula,
                   length(X_agd_arm_has_na) > 0,
                   length(X_agd_contrast_has_na) > 0)
   if (any(dat_has_na)) {
-    abort(glue::glue(glue::glue_collapse(
-      c("Variables with missing values in IPD: {paste(X_ipd_has_na, collapse = ', ')}.",
-        "Variables with missing values in AgD (arm-based): {paste(X_agd_arm_has_na, collapse = ', ')}.",
-        "Variables with missing values in AgD (contrast-based): {paste(X_agd_contrast_has_na, collapse = ', ')}."
-      )[dat_has_na], sep = "\n")))
+    if (newdata) {
+      abort(glue::glue("Variables with missing or infinite values in `newdata`: {paste(c(X_ipd_has_na, X_agd_arm_has_na, X_agd_contrast_has_na), collapse = ', ')}."))
+    } else {
+      abort(glue::glue(glue::glue_collapse(
+        c("Variables with missing or infinite values in IPD: {paste(X_ipd_has_na, collapse = ', ')}.",
+          "Variables with missing or infinite values in AgD (arm-based): {paste(X_agd_arm_has_na, collapse = ', ')}.",
+          "Variables with missing or infinite values in AgD (contrast-based): {paste(X_agd_contrast_has_na, collapse = ', ')}."
+        )[dat_has_na], sep = "\n")))
+    }
   }
 
   invisible()

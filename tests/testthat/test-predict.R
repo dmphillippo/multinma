@@ -120,7 +120,7 @@ pso_fit <- suppressWarnings(nma(pso_net,
                init_r = 0.1,
                iter = 10))
 
-pso_new <- data.frame(durnpso = 10, prevsys = 0.5, bsa = 20, weight = 75, psa = 0.5, study = c("One", "Two"))
+pso_new <- data.frame(durnpso = 10, prevsys = TRUE, bsa = 20, weight = 75, psa = FALSE, study = c("One", "Two"))
 
 test_that("baseline and newdata for regression models", {
   m <- "Specify both `newdata` and `baseline`, or neither"
@@ -146,4 +146,31 @@ test_that("baseline argument", {
   expect_error(predict(pso_fit, study = study, newdata = pso_new, baseline = list(One = distr(qnorm, 1, 1),
                                                                                   Three = distr(qnorm, 3, 1))),
                "must match all study names")
+})
+
+test_that("newdata validation", {
+  expect_error(predict(pso_fit, newdata = pso_new[-1], study = study, baseline = distr(qnorm, 1, 1)),
+               'Regression variable "durnpso" not found in `newdata`')
+  expect_error(predict(pso_fit, newdata = pso_new[-(1:2)], study = study, baseline = distr(qnorm, 1, 1)),
+               'Regression variables "durnpso" and "prevsys" not found in `newdata`')
+
+  make_bad <- function(x, vars = "durnpso") {
+    bad <- pso_new
+    bad[vars] <- x
+    return(bad)
+  }
+
+  expect_error(predict(pso_fit, newdata = make_bad(NA), study = study, baseline = distr(qnorm, 1, 1)),
+               "missing or infinite values in `newdata`: durnpso")
+  expect_error(predict(pso_fit, newdata = make_bad(NaN), study = study, baseline = distr(qnorm, 1, 1)),
+               "missing or infinite values in `newdata`: durnpso")
+  expect_error(predict(pso_fit, newdata = make_bad(Inf), study = study, baseline = distr(qnorm, 1, 1)),
+               "missing or infinite values in `newdata`: durnpso")
+
+  expect_error(predict(pso_fit, newdata = make_bad(NA, c("durnpso", "psa")), study = study, baseline = distr(qnorm, 1, 1)),
+               "missing or infinite values in `newdata`: durnpso, psa")
+  expect_error(predict(pso_fit, newdata = make_bad(NaN, c("durnpso", "psa")), study = study, baseline = distr(qnorm, 1, 1)),
+               "missing or infinite values in `newdata`: durnpso, psa")
+  expect_error(predict(pso_fit, newdata = make_bad(Inf, c("durnpso", "psa")), study = study, baseline = distr(qnorm, 1, 1)),
+               "missing or infinite values in `newdata`: durnpso, psa")
 })
