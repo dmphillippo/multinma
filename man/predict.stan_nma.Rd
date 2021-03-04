@@ -118,13 +118,25 @@ predict(smk_fit_RE)
 # Predicted probabilities of success in each study in the network
 predict(smk_fit_RE, type = "response")
 
-# Predicted probabilities in a population with a baseline log odds of
-# response on No Intervention given a Normal distribution with mean -2
-# and SD 0.15
+# Predicted probabilities in a population with 67 observed events out of 566
+# individuals on No Intervention, corresponding to a Beta(67, 566 - 67)
+# distribution on the baseline probability of response, using
+# `baseline_type = "response"`
 (smk_pred_RE <- predict(smk_fit_RE,
-                        baseline = distr(qnorm, mean = -2, sd = 0.15),
+                        baseline = distr(qbeta, 67, 566 - 67),
+                        baseline_type = "response",
                         type = "response"))
 plot(smk_pred_RE, ref_line = c(0, 1))
+
+# Predicted probabilities in a population with a baseline log odds of
+# response on No Intervention given a Normal distribution with mean -2
+# and SD 0.13, using `baseline_type = "link"` (the default)
+# Note: this is approximately equivalent to the above Beta distribution on
+# the baseline probability
+(smk_pred_RE2 <- predict(smk_fit_RE,
+                         baseline = distr(qnorm, mean = -2, sd = 0.13),
+                         type = "response"))
+plot(smk_pred_RE2, ref_line = c(0, 1))
 }
 
 ## Plaque psoriasis ML-NMR
