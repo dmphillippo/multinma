@@ -1,6 +1,14 @@
 # multinma 0.2.1.9000
 
-* Fix: Ensure CRAN additional checks with `--run-donttest` run correctly
+* Feature: Added `baseline_type` and `baseline_level` arguments to
+`predict.stan_nma()`, which allow baseline distributions to be specified on the
+response or linear predictor scale, and at the individual or aggregate level.
+* Feature: The `baseline` argument to `predict.stan_nma()` can now accept a
+(named) list of baseline distributions if `newdata` contains multiple studies.
+* Improvement: Misspecified `newdata` arguments to functions like
+`relative_effects()` and `predict.stan_nma()` now give more informative error
+messages.
+* Fix: Ensure CRAN additional checks with `--run-donttest` run correctly.
 
 # multinma 0.2.1
 
