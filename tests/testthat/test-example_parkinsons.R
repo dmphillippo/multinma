@@ -824,3 +824,50 @@ test_that("RE DIC", {
   expect_equivalent(mix_dic_RE$dic, 18.1, tolerance = tol_dic)
 })
 
+# --- Check UME models ---
+arm_fit_FE_UME <- nma(arm_net, 
+                      trt_effects = "fixed",
+                      consistency = "ume",
+                      prior_intercept = normal(scale = 100),
+                      prior_trt = normal(scale = 10),
+                      iter = 10000)
+
+# NOTE: RE UME models are not really tractable - lots of divergences - not
+# enough data to estimate tau
+
+mix_fit_FE_UME <- nma(mix_net, 
+                      trt_effects = "fixed",
+                      consistency = "ume",
+                      prior_intercept = normal(scale = 100),
+                      prior_trt = normal(scale = 100),
+                      iter = 10000)
+
+test_that("Arm/Mixed UME results are the same", {
+  expect_equivalent_nma_summary(summary(arm_fit_FE_UME, pars = "d"), 
+                                summary(mix_fit_FE_UME, pars = "d"), 
+                                tolerance = tol)
+})
+
+# NOTE: Contrast (and reordered contrast) results are different, since the
+# choice of independent contrasts is based on the "observed" baseline arms in
+# the data rather than the treatment ordering
+
+contr_fit_FE_UME <- nma(contr_net, 
+                        trt_effects = "fixed",
+                        consistency = "ume",
+                        prior_trt = normal(scale = 100),
+                        iter = 10000)
+
+reorder_fit_FE_UME <- nma(reorder_net, 
+                          seed = 1878819627,
+                          trt_effects = "fixed",
+                          consistency = "ume",
+                          prior_trt = normal(scale = 100),
+                          iter = 10000)
+
+test_that("Contr/Reordered UME results are the same", {
+  expect_equivalent_nma_summary(summary(contr_fit_FE_UME, pars = "d"), 
+                                summary(reorder_fit_FE_UME, pars = "d"), 
+                                tolerance = tol)
+})
+
