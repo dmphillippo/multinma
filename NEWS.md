@@ -8,7 +8,9 @@ response or linear predictor scale, and at the individual or aggregate level.
 * Improvement: Misspecified `newdata` arguments to functions like
 `relative_effects()` and `predict.stan_nma()` now give more informative error
 messages.
-* Fix: Running UME models with contrast-based data gave an error.
+* Fix: Constructing models with contrast-based data previously gave errors in
+some scenarios (ML-NMR models, UME models, and in some cases AgD meta-regression
+models).
 * Fix: Ensure CRAN additional checks with `--run-donttest` run correctly.
 
 # multinma 0.2.1
