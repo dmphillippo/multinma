@@ -84,7 +84,7 @@ outcome probabilities or log odds can be produced." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multinma</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.2.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.2.1.9000</span>
       </span>
     </div>
 
@@ -194,6 +194,8 @@ outcome probabilities or log odds can be produced.</p>
   trt_ref <span class='op'>=</span> <span class='cn'>NULL</span>,
   type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"link"</span>, <span class='st'>"response"</span><span class='op'>)</span>,
   level <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"aggregate"</span>, <span class='st'>"individual"</span><span class='op'>)</span>,
+  baseline_type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"link"</span>, <span class='st'>"response"</span><span class='op'>)</span>,
+  baseline_level <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"individual"</span>, <span class='st'>"aggregate"</span><span class='op'>)</span>,
   probs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.025</span>, <span class='fl'>0.25</span>, <span class='fl'>0.5</span>, <span class='fl'>0.75</span>, <span class='fl'>0.975</span><span class='op'>)</span>,
   summary <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span></pre>
@@ -207,16 +209,27 @@ outcome probabilities or log odds can be produced.</p>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Additional arguments (not used).</p></td>
+      <td><p>Additional arguments, passed to <code><a href='https://rdrr.io/r/stats/uniroot.html'>uniroot()</a></code> for regression models
+if <code>baseline_level = "aggregate"</code>.</p></td>
     </tr>
     <tr>
       <th>baseline</th>
       <td><p>An optional <code><a href='distr.html'>distr()</a></code> distribution for the baseline response
-(i.e. intercept) on the linear predictor scale, about which to produce
-absolute effects. For example, in a model with a logit link, this would be
-a distribution for the baseline log odds of an event. If <code>NULL</code>,
+(i.e. intercept), about which to produce absolute effects. If <code>NULL</code>,
 predictions are produced using the baseline response for each study in the
-network with IPD or arm-based AgD.</p></td>
+network with IPD or arm-based AgD.</p>
+<p>For regression models, this may be a list of <code><a href='distr.html'>distr()</a></code> distributions of the
+same length as the number of studies in <code>newdata</code> (possibly named by the
+study names, or otherwise in order of appearance in <code>newdata</code>).</p>
+<p>Use the <code>baseline_type</code> and <code>baseline_level</code> arguments to specify whether
+this distribution is on the response or linear predictor scale, and (for
+ML-NMR or models including IPD) whether this applies to an individual at
+the reference level of the covariates or over the entire <code>newdata</code>
+population, respectively. For example, in a model with a logit link with
+<code>baseline_type = "link"</code>, this would be a distribution for the baseline log
+odds of an event.</p>
+<p>Use the <code>trt_ref</code> argument to specify which treatment this distribution
+applies to.</p></td>
     </tr>
     <tr>
       <th>newdata</th>
@@ -260,6 +273,21 @@ specified, predictions are produced for all IPD studies in the network if
 studies in the network if <code>type</code> is <code>"aggregate"</code>.</p></td>
     </tr>
     <tr>
+      <th>baseline_type</th>
+      <td><p>When a <code>baseline</code> distribution is given, specifies
+whether this corresponds to the <code>"link"</code> scale (the default, e.g. log odds)
+or <code>"response"</code> scale (e.g. probabilities).</p></td>
+    </tr>
+    <tr>
+      <th>baseline_level</th>
+      <td><p>When a <code>baseline</code> distribution is given, specifies
+whether this corresponds to an individual at the reference level of the
+covariates (<code>"individual"</code>, the default), or from an (unadjusted) average
+outcome on the reference treatment in the <code>newdata</code> population
+(<code>"aggregate"</code>). Ignored for AgD NMA, since the only option is
+<code>"aggregate"</code> in this instance.</p></td>
+    </tr>
+    <tr>
       <th>probs</th>
       <td><p>Numeric vector of quantiles of interest to present in computed
 summary, default <code><a href='https://rdrr.io/r/base/c.html'>c(0.025, 0.25, 0.5, 0.75, 0.975)</a></code></p></td>
@@ -283,7 +311,7 @@ frame of study information.</p>
     <pre class="examples"><div class='input'><span class='co'>## Smoking cessation</span>
 <span class='co'># \donttest{</span>
 <span class='co'># Run smoking RE NMA example if not already available</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/exists.html'>exists</a></span><span class='op'>(</span><span class='st'>"smk_fit_RE"</span><span class='op'>)</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/utils/example.html'>example</a></span><span class='op'>(</span><span class='st'>"example_smk_re"</span><span class='op'>)</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/exists.html'>exists</a></span><span class='op'>(</span><span class='st'>"smk_fit_RE"</span><span class='op'>)</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/utils/example.html'>example</a></span><span class='op'>(</span><span class='st'>"example_smk_re"</span>, run.donttest <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 <span class='co'># }</span>
 <span class='co'># \donttest{</span>
 <span class='co'># Predicted log odds of success in each study in the network</span>
@@ -914,28 +942,49 @@ frame of study information.</p>
 #&gt; pred[24: Individual counselling]     2729    1
 #&gt; pred[24: Self-help]                  2747    1
 #&gt; </div><div class='input'>
-<span class='co'># Predicted probabilities in a population with a baseline log odds of</span>
-<span class='co'># response on No Intervention given a Normal distribution with mean -2</span>
-<span class='co'># and SD 0.15</span>
+<span class='co'># Predicted probabilities in a population with 67 observed events out of 566</span>
+<span class='co'># individuals on No Intervention, corresponding to a Beta(67, 566 - 67)</span>
+<span class='co'># distribution on the baseline probability of response, using</span>
+<span class='co'># `baseline_type = "response"`</span>
 <span class='op'>(</span><span class='va'>smk_pred_RE</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>smk_fit_RE</span>,
-                        baseline <span class='op'>=</span> <span class='fu'><a href='distr.html'>distr</a></span><span class='op'>(</span><span class='va'>qnorm</span>, mean <span class='op'>=</span> <span class='op'>-</span><span class='fl'>2</span>, sd <span class='op'>=</span> <span class='fl'>0.15</span><span class='op'>)</span>,
+                        baseline <span class='op'>=</span> <span class='fu'><a href='distr.html'>distr</a></span><span class='op'>(</span><span class='va'>qbeta</span>, <span class='fl'>67</span>, <span class='fl'>566</span> <span class='op'>-</span> <span class='fl'>67</span><span class='op'>)</span>,
+                        baseline_type <span class='op'>=</span> <span class='st'>"response"</span>,
                         type <span class='op'>=</span> <span class='st'>"response"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;                              mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#&gt; pred[No intervention]        0.12 0.02 0.09 0.11 0.12 0.13  0.15     4201
-#&gt; pred[Group counselling]      0.30 0.10 0.14 0.23 0.29 0.35  0.54     1772
-#&gt; pred[Individual counselling] 0.24 0.05 0.15 0.20 0.24 0.27  0.36     1397
-#&gt; pred[Self-help]              0.19 0.07 0.09 0.14 0.18 0.22  0.34     1969
+#&gt; pred[No intervention]        0.12 0.01 0.09 0.11 0.12 0.13  0.15     4201
+#&gt; pred[Group counselling]      0.29 0.10 0.14 0.23 0.28 0.35  0.53     1745
+#&gt; pred[Individual counselling] 0.24 0.05 0.15 0.20 0.23 0.27  0.35     1336
+#&gt; pred[Self-help]              0.19 0.06 0.09 0.14 0.18 0.22  0.34     1932
 #&gt;                              Tail_ESS Rhat
 #&gt; pred[No intervention]            3923    1
-#&gt; pred[Group counselling]          2162    1
-#&gt; pred[Individual counselling]     2270    1
-#&gt; pred[Self-help]                  2392    1</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>smk_pred_RE</span>, ref_line <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='img'><img src='predict.stan_nma-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
+#&gt; pred[Group counselling]          2056    1
+#&gt; pred[Individual counselling]     2168    1
+#&gt; pred[Self-help]                  2284    1</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>smk_pred_RE</span>, ref_line <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='img'><img src='predict.stan_nma-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'># Predicted probabilities in a population with a baseline log odds of</span>
+<span class='co'># response on No Intervention given a Normal distribution with mean -2</span>
+<span class='co'># and SD 0.13, using `baseline_type = "link"` (the default)</span>
+<span class='co'># Note: this is approximately equivalent to the above Beta distribution on</span>
+<span class='co'># the baseline probability</span>
+<span class='op'>(</span><span class='va'>smk_pred_RE2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>smk_fit_RE</span>,
+                         baseline <span class='op'>=</span> <span class='fu'><a href='distr.html'>distr</a></span><span class='op'>(</span><span class='va'>qnorm</span>, mean <span class='op'>=</span> <span class='op'>-</span><span class='fl'>2</span>, sd <span class='op'>=</span> <span class='fl'>0.13</span><span class='op'>)</span>,
+                         type <span class='op'>=</span> <span class='st'>"response"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;                              mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
+#&gt; pred[No intervention]        0.12 0.01 0.09 0.11 0.12 0.13  0.15     4329
+#&gt; pred[Group counselling]      0.30 0.10 0.15 0.23 0.29 0.35  0.53     1778
+#&gt; pred[Individual counselling] 0.24 0.05 0.16 0.21 0.24 0.27  0.35     1434
+#&gt; pred[Self-help]              0.19 0.07 0.09 0.14 0.18 0.22  0.34     1958
+#&gt;                              Tail_ESS Rhat
+#&gt; pred[No intervention]            3598    1
+#&gt; pred[Group counselling]          2265    1
+#&gt; pred[Individual counselling]     2048    1
+#&gt; pred[Self-help]                  2390    1</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>smk_pred_RE2</span>, ref_line <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='img'><img src='predict.stan_nma-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 
 <span class='co'>## Plaque psoriasis ML-NMR</span>
 <span class='co'># \donttest{</span>
 <span class='co'># Run plaque psoriasis ML-NMR example if not already available</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/exists.html'>exists</a></span><span class='op'>(</span><span class='st'>"pso_fit"</span><span class='op'>)</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/utils/example.html'>example</a></span><span class='op'>(</span><span class='st'>"example_pso_mlnmr"</span><span class='op'>)</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/exists.html'>exists</a></span><span class='op'>(</span><span class='st'>"pso_fit"</span><span class='op'>)</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/utils/example.html'>example</a></span><span class='op'>(</span><span class='st'>"example_pso_mlnmr"</span>, run.donttest <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 <span class='co'># }</span>
 <span class='co'># \donttest{</span>
 <span class='co'># Predicted probabilities of response in each study in the network</span>
@@ -1008,7 +1057,7 @@ frame of study information.</p>
 #&gt; pred[UNCOVER-3: SEC_150]    1
 #&gt; pred[UNCOVER-3: SEC_300]    1
 #&gt; </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>pso_pred</span>, ref_line <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='img'><img src='predict.stan_nma-2.png' alt='' width='700' height='433' /></div><div class='input'>
+</div><div class='img'><img src='predict.stan_nma-3.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># Predicted probabilites of response in a new target population, with means</span>
 <span class='co'># and SDs or proportions given by</span>
 <span class='va'>new_agd_int</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>
@@ -1043,14 +1092,14 @@ frame of study information.</p>
 </div><div class='output co'>#&gt; </span><span style='color: #555555;'>------------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: New 1</span><span> </span><span style='color: #555555;'>----</span><span> 
 #&gt; 
 #&gt;                      mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#&gt; pred[New 1: PBO]     0.06 0.03 0.03 0.04 0.06 0.08  0.12     5962     3834    1
-#&gt; pred[New 1: ETN]     0.37 0.06 0.26 0.33 0.37 0.41  0.49     6739     3469    1
-#&gt; pred[New 1: IXE_Q2W] 0.90 0.02 0.84 0.88 0.90 0.92  0.94     6647     3259    1
-#&gt; pred[New 1: IXE_Q4W] 0.81 0.04 0.73 0.78 0.81 0.83  0.87     6199     3383    1
-#&gt; pred[New 1: SEC_150] 0.68 0.06 0.57 0.64 0.68 0.72  0.78     6154     3418    1
-#&gt; pred[New 1: SEC_300] 0.78 0.05 0.68 0.75 0.78 0.81  0.86     6367     3450    1
+#&gt; pred[New 1: PBO]     0.06 0.03 0.03 0.04 0.06 0.08  0.12     5892     3793    1
+#&gt; pred[New 1: ETN]     0.37 0.06 0.26 0.33 0.37 0.41  0.49     6512     3431    1
+#&gt; pred[New 1: IXE_Q2W] 0.90 0.03 0.84 0.88 0.90 0.92  0.94     5966     3039    1
+#&gt; pred[New 1: IXE_Q4W] 0.81 0.04 0.73 0.78 0.81 0.83  0.87     5625     3681    1
+#&gt; pred[New 1: SEC_150] 0.68 0.05 0.57 0.64 0.68 0.72  0.78     6073     3310    1
+#&gt; pred[New 1: SEC_300] 0.78 0.05 0.68 0.75 0.78 0.81  0.86     6375     3380    1
 #&gt; </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>pso_pred_new</span>, ref_line <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='img'><img src='predict.stan_nma-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
+</div><div class='img'><img src='predict.stan_nma-4.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

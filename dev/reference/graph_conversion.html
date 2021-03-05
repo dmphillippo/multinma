@@ -85,7 +85,7 @@ tidygraph packages." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multinma</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.2.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.2.1.9000</span>
       </span>
     </div>
 
@@ -260,18 +260,18 @@ one edge is produced for each comparison (by IPD or AgD study type) with a
 #&gt; Network is </span><span style='color: #00BB00;'>connected</span><span></div><div class='input'>
 <span class='co'># Convert to igraph object</span>
 <span class='fu'>igraph</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/igraph/man/as.igraph.html'>as.igraph</a></span><span class='op'>(</span><span class='va'>smk_net</span><span class='op'>)</span>  <span class='co'># Edges combined by default</span>
-</div><div class='output co'>#&gt; IGRAPH f9d8c70 UN-- 4 6 -- 
+</div><div class='output co'>#&gt; IGRAPH c69fa16 UN-- 4 6 -- 
 #&gt; + attr: name (v/c), .sample_size (v/n), .nstudy (e/n), .type (e/c)
-#&gt; + edges from f9d8c70 (vertex names):
+#&gt; + edges from c69fa16 (vertex names):
 #&gt; [1] No intervention       --Group counselling     
 #&gt; [2] No intervention       --Individual counselling
 #&gt; [3] Group counselling     --Individual counselling
 #&gt; [4] No intervention       --Self-help             
 #&gt; [5] Group counselling     --Self-help             
 #&gt; [6] Individual counselling--Self-help             </div><div class='input'><span class='fu'>igraph</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/igraph/man/as.igraph.html'>as.igraph</a></span><span class='op'>(</span><span class='va'>smk_net</span>, collapse <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>  <span class='co'># Without combining edges</span>
-</div><div class='output co'>#&gt; IGRAPH f00c7f9 UN-- 4 28 -- 
+</div><div class='output co'>#&gt; IGRAPH 02f53c9 UN-- 4 28 -- 
 #&gt; + attr: name (v/c), .sample_size (v/n), .study (e/c), .type (e/c)
-#&gt; + edges from f00c7f9 (vertex names):
+#&gt; + edges from 02f53c9 (vertex names):
 #&gt;  [1] No intervention       --Group counselling     
 #&gt;  [2] No intervention       --Individual counselling
 #&gt;  [3] Group counselling     --Individual counselling
@@ -283,44 +283,44 @@ one edge is produced for each comparison (by IPD or AgD study type) with a
 #&gt; + ... omitted several edges</div><div class='input'>
 <span class='co'># Convert to tbl_graph object</span>
 <span class='fu'>tidygraph</span><span class='fu'>::</span><span class='fu'><a href='https://tidygraph.data-imaginist.com/reference/tbl_graph.html'>as_tbl_graph</a></span><span class='op'>(</span><span class='va'>smk_net</span><span class='op'>)</span>  <span class='co'># Edges combined by default</span>
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tbl_graph: 4 nodes and 6 edges
+</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tbl_graph: 4 nodes and 6 edges
 #&gt; #
 #&gt; # An undirected simple graph with 1 component
 #&gt; #
 #&gt; # Node Data: 4 x 2 (active)</span><span>
 #&gt;   name                   .sample_size
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>                         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> No intervention                </span><span style='text-decoration: underline;'>7</span><span>231
-#&gt; </span><span style='color: #555555;'>2</span><span> Group counselling               555
-#&gt; </span><span style='color: #555555;'>3</span><span> Individual counselling         </span><span style='text-decoration: underline;'>7</span><span>383
-#&gt; </span><span style='color: #555555;'>4</span><span> Self-help                      </span><span style='text-decoration: underline;'>1</span><span>571
-#&gt; </span><span style='color: #555555;'>#
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>                         </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> No intervention                </span><span style='text-decoration: underline;'>7</span><span>231
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> Group counselling               555
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> Individual counselling         </span><span style='text-decoration: underline;'>7</span><span>383
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> Self-help                      </span><span style='text-decoration: underline;'>1</span><span>571
+#&gt; </span><span style='color: #949494;'>#
 #&gt; # Edge Data: 6 x 4</span><span>
 #&gt;    from    to .nstudy .type
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>     1     2       2 AgD  
-#&gt; </span><span style='color: #555555;'>2</span><span>     1     3      15 AgD  
-#&gt; </span><span style='color: #555555;'>3</span><span>     2     3       4 AgD  
-#&gt; </span><span style='color: #555555;'># … with 3 more rows</span><span></div><div class='input'><span class='fu'>tidygraph</span><span class='fu'>::</span><span class='fu'><a href='https://tidygraph.data-imaginist.com/reference/tbl_graph.html'>as_tbl_graph</a></span><span class='op'>(</span><span class='va'>smk_net</span>, collapse <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>  <span class='co'># Without combining edges</span>
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tbl_graph: 4 nodes and 28 edges
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span>     1     2       2 AgD  
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span>     1     3      15 AgD  
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span>     2     3       4 AgD  
+#&gt; </span><span style='color: #949494;'># … with 3 more rows</span><span></div><div class='input'><span class='fu'>tidygraph</span><span class='fu'>::</span><span class='fu'><a href='https://tidygraph.data-imaginist.com/reference/tbl_graph.html'>as_tbl_graph</a></span><span class='op'>(</span><span class='va'>smk_net</span>, collapse <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>  <span class='co'># Without combining edges</span>
+</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tbl_graph: 4 nodes and 28 edges
 #&gt; #
 #&gt; # An undirected multigraph with 1 component
 #&gt; #
 #&gt; # Node Data: 4 x 2 (active)</span><span>
 #&gt;   name                   .sample_size
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>                         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> No intervention                </span><span style='text-decoration: underline;'>7</span><span>231
-#&gt; </span><span style='color: #555555;'>2</span><span> Group counselling               555
-#&gt; </span><span style='color: #555555;'>3</span><span> Individual counselling         </span><span style='text-decoration: underline;'>7</span><span>383
-#&gt; </span><span style='color: #555555;'>4</span><span> Self-help                      </span><span style='text-decoration: underline;'>1</span><span>571
-#&gt; </span><span style='color: #555555;'>#
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>                         </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> No intervention                </span><span style='text-decoration: underline;'>7</span><span>231
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> Group counselling               555
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> Individual counselling         </span><span style='text-decoration: underline;'>7</span><span>383
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> Self-help                      </span><span style='text-decoration: underline;'>1</span><span>571
+#&gt; </span><span style='color: #949494;'>#
 #&gt; # Edge Data: 28 x 4</span><span>
 #&gt;    from    to .study .type
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>     1     2 1      AgD  
-#&gt; </span><span style='color: #555555;'>2</span><span>     1     3 1      AgD  
-#&gt; </span><span style='color: #555555;'>3</span><span>     2     3 1      AgD  
-#&gt; </span><span style='color: #555555;'># … with 25 more rows</span><span></div></span></pre>
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span>     1     2 1      AgD  
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span>     1     3 1      AgD  
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span>     2     3 1      AgD  
+#&gt; </span><span style='color: #949494;'># … with 25 more rows</span><span></div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
