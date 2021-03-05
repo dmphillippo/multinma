@@ -570,8 +570,8 @@ predict.stan_nma <- function(object, ...,
 
       if (!inherits(object, "stan_mlnmr") && !has_ipd(object$network)) {
         # AgD-only regression, ignore baseline_level = "individual"
-        if (baseline_level == "individual")
-          warn('Ignoring baseline_level = "individual", model intercepts are aggregate level.')
+        # if (baseline_level == "individual")
+        #   inform('Setting baseline_level = "aggregate", model intercepts are aggregate level for AgD meta-regression.')
 
         # Convert to linear predictor scale if baseline_type = "response"
         if (baseline_type == "response") {
