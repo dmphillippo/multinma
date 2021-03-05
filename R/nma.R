@@ -1591,12 +1591,6 @@ make_nma_model_matrix <- function(nma_formula,
     dat_agd_contrast <- dplyr::mutate_at(dat_agd_contrast,
                             .vars = if (classes) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
                             .funs = fct_sanitise)
-
-    # Split contrast-based data into baseline and non-baseline arms
-    dat_agd_contrast_bl <- dat_agd_contrast[agd_contrast_bl, ]
-    dat_agd_contrast_nonbl <- dat_agd_contrast[!agd_contrast_bl, ]
-  } else {
-    dat_agd_contrast_bl <- dat_agd_contrast_nonbl <- tibble::tibble()
   }
 
   # Define contrasts for UME model
@@ -1658,14 +1652,12 @@ make_nma_model_matrix <- function(nma_formula,
     }
     if (.has_agd_contrast) {
       dat_agd_contrast <- dplyr::left_join(dat_agd_contrast, contrs_all, by = c(".study", ".trt"))
-      dat_agd_contrast_bl <- dplyr::left_join(dat_agd_contrast_bl, contrs_all, by = c(".study", ".trt"))
-      dat_agd_contrast_nonbl <- dplyr::left_join(dat_agd_contrast_nonbl, contrs_all, by = c(".study", ".trt"))
     }
   }
 
   # Construct design matrix all together then split out, so that same dummy
   # coding is used everywhere
-  dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast_nonbl)
+  dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
 
   # Check that required variables are present in each data set, and non-missing
   check_regression_data(nma_formula,
@@ -1678,11 +1670,6 @@ make_nma_model_matrix <- function(nma_formula,
   if (!is.null(xbar)) {
     dat_all[, names(xbar)] <-
       purrr::map2(dat_all[, names(xbar)], xbar, ~.x - .y)
-
-    if (.has_agd_contrast) {
-      dat_agd_contrast_bl[, names(xbar)] <-
-        purrr::map2(dat_agd_contrast_bl[, names(xbar)], xbar, ~.x - .y)
-    }
   }
 
   # Drop study to factor to 1L if only one study (avoid contrasts need 2 or
@@ -1757,56 +1744,36 @@ make_nma_model_matrix <- function(nma_formula,
   }
 
   if (.has_agd_contrast) {
-    X_agd_contrast <- X_all[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast_nonbl), , drop = FALSE]
-    offset_agd_contrast <-
+    X_agd_contrast_all <- X_all[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast), , drop = FALSE]
+    offset_agd_contrast_all <-
       if (has_offset) {
-        offsets[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast_nonbl)]
+        offsets[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast)]
       } else {
         NULL
       }
 
-    # Fix up single study case
-    if (!is.null(single_study_label)) {
-      dat_agd_contrast_bl$.study_temp <- dat_agd_contrast_bl$.study
-      dat_agd_contrast_bl$.study <- 1L
-    }
-
     # Difference out the baseline arms
-    X_bl <- model.matrix(nma_formula, data = dat_agd_contrast_bl)
-    if (has_offset) offset_bl <- model.offset(model.frame(nma_formula, data = dat_agd_contrast_bl))
+    X_bl <- X_agd_contrast_all[agd_contrast_bl, ]
+    if (has_offset) offset_bl <- offset_agd_contrast_all[agd_contrast_bl]
 
-    if (!is.null(single_study_label)) {
-      # Restore single study label and .study column
-      colnames(X_bl) <- stringr::str_replace(colnames(X_bl),
-                                             "^\\.study$",
-                                             paste0(".study", single_study_label))
-      dat_agd_contrast_bl <- dat_agd_contrast_bl %>%
-        dplyr::mutate(.study = .data$.study_temp) %>%
-        dplyr::select(-.data$.study_temp)
-
-      # Drop intercept column from design matrix
-      X_bl <- X_bl[, -1, drop = FALSE]
-    }
-
-    # The factor levels should be the same between idat_all and
-    # idat_agd_contrast_bl, so the same columns should be present in both design
-    # matrices - but check anyway
-    if (any(colnames(X_agd_contrast) != colnames(X_bl)))
-      abort("Mismatch design matrices for baseline and non-baseline arms. Dropped factor levels?")
-
-    if (consistency == "ume") {
-      # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
-      X_bl[, contr_cols] <- sweep(X_bl[, contr_cols, drop = FALSE], MARGIN = 1,
-                                  STATS = dat_agd_contrast_bl$.contr_sign, FUN = "*")
-    }
+    X_agd_contrast <- X_agd_contrast_all[!agd_contrast_bl, ]
+    offset_agd_contrast <-
+      if (has_offset) {
+        offset_agd_contrast_all[!agd_contrast_bl]
+      } else {
+        NULL
+      }
 
     # Match non-baseline rows with baseline rows by study
-    bl_lookup <- vapply(dat_agd_contrast_nonbl$.study,
-                        FUN = function(x) which(x == dat_agd_contrast_bl$.study),
-                        FUN.VALUE = numeric(1))
+    for (s in unique(dat_agd_contrast$.study)) {
+      nonbl_id <- which(dat_agd_contrast$.study[!agd_contrast_bl] == s)
+      bl_id <- which(dat_agd_contrast$.study[agd_contrast_bl] == s)
 
-    X_agd_contrast <- X_agd_contrast - X_bl[bl_lookup, , drop = FALSE]
-    if (has_offset) offset_agd_contrast <- offset_agd_contrast - offset_bl[bl_lookup]
+      bl_id <- rep_len(bl_id, length(nonbl_id))
+
+      X_agd_contrast[nonbl_id, ] <- X_agd_contrast[nonbl_id, , drop = FALSE] - X_bl[bl_id, , drop = FALSE]
+      if (has_offset) offset_agd_contrast[nonbl_id] <- offset_agd_contrast[nonbl_id] - offset_bl[bl_id]
+    }
 
     # Remove columns for study baselines corresponding to contrast-based studies - not used
     s_contr <- unique(dat_agd_contrast$.study)
