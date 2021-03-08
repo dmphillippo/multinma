@@ -182,6 +182,7 @@
 <li>Feature: Added <code>baseline_type</code> and <code>baseline_level</code> arguments to <code><a href="../reference/predict.stan_nma.html">predict.stan_nma()</a></code>, which allow baseline distributions to be specified on the response or linear predictor scale, and at the individual or aggregate level.</li>
 <li>Feature: The <code>baseline</code> argument to <code><a href="../reference/predict.stan_nma.html">predict.stan_nma()</a></code> can now accept a (named) list of baseline distributions if <code>newdata</code> contains multiple studies.</li>
 <li>Improvement: Misspecified <code>newdata</code> arguments to functions like <code><a href="../reference/relative_effects.html">relative_effects()</a></code> and <code><a href="../reference/predict.stan_nma.html">predict.stan_nma()</a></code> now give more informative error messages.</li>
+<li>Fix: Constructing models with contrast-based data previously gave errors in some scenarios (ML-NMR models, UME models, and in some cases AgD meta-regression models).</li>
 <li>Fix: Ensure CRAN additional checks with <code>--run-donttest</code> run correctly.</li>
 </ul>
 </div>
