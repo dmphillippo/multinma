@@ -1618,7 +1618,8 @@ make_nma_model_matrix <- function(nma_formula,
     if (.has_agd_contrast) {
       contrs_contr <- dat_agd_contrast %>%
         dplyr::distinct(.data$.study, .data$.trt) %>%  # In case integration data passed
-        dplyr::left_join(dplyr::transmute(dat_agd_contrast_bl, .data$.study, .trt_b = .data$.trt), by = ".study") %>%
+        dplyr::left_join(dplyr::distinct(dat_agd_contrast[agd_contrast_bl, ], .data$.study, .data$.trt) %>%
+                           dplyr::transmute(.data$.study, .trt_b = .data$.trt), by = ".study") %>%
         dplyr::distinct(.data$.study, .data$.trt, .data$.trt_b) %>%
         dplyr::mutate(.contr_sign = dplyr::if_else(as.numeric(.data$.trt) < as.numeric(.data$.trt_b), -1, 1),
                       .contr = dplyr::if_else(.data$.trt == .data$.trt_b,
@@ -1753,10 +1754,10 @@ make_nma_model_matrix <- function(nma_formula,
       }
 
     # Difference out the baseline arms
-    X_bl <- X_agd_contrast_all[agd_contrast_bl, ]
+    X_bl <- X_agd_contrast_all[agd_contrast_bl, , drop = FALSE]
     if (has_offset) offset_bl <- offset_agd_contrast_all[agd_contrast_bl]
 
-    X_agd_contrast <- X_agd_contrast_all[!agd_contrast_bl, ]
+    X_agd_contrast <- X_agd_contrast_all[!agd_contrast_bl, , drop = FALSE]
     offset_agd_contrast <-
       if (has_offset) {
         offset_agd_contrast_all[!agd_contrast_bl]
