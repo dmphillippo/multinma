@@ -138,7 +138,7 @@ We now set up the numerical integration for the network.
 The five covariates that we will consider adjusting for are body surface area `bsa`, duration of psoriasis `durnpso`, previous systemic treatment `prevsys`, psoriatic arthritis `psa`, and weight `weight`.
 We need to choose suitable marginal distributions for these covariates to draw the integration points from.
 `prevsys` and `psa` are binary covariates, so these are given a Bernoulli distribution.
-`bsa` is a percentage, so we choose a logit-Normal distribution.
+`bsa` is a percentage, so we choose a logit-Normal distribution (note, this requires the `logitnorm` package to be installed).
 We choose Gamma distributions for `durnpso` and `weight` to account for skewness.
 These choices seem to match well the marginal distributions observed in the IPD:
 ```{r pso_covariate_plot}
@@ -158,7 +158,7 @@ ipd_summary <- pso_ipd %>%
                          list(seq(0, 1, length.out = 101)),
                          list(seq(min*0.8, max*1.2, length.out = 101)))) %>% 
   unnest(cols = value) %>% 
-  mutate(dens = do.call(first(dist), args = list(x = value, mean = first(mean), sd = first(sd))))
+  mutate(dens = eval(call(first(dist), x = value, mean = first(mean), sd = first(sd))))
 
 # Plot histograms and assumed densities
 pso_ipd %>% 
@@ -176,7 +176,6 @@ ggplot(aes(x = value)) +
 
 We add integration points to the AgD studies in the network using the `add_integration()` function.
 Marginal distributions for each covariate are specified using the `distr()` function, which takes a cumulative distribution function corresponding to the chosen marginal distribution, and arguments to that distribution as column names in the aggregate data.
-(Note: This package provides several convenience functions for specifying these distributions, including `qgamma()` which allows for a parameterisation of the Gamma distribution in terms of mean and standard deviation, `qbern()` which provides the Bernoulli distribution, and `qlogitnorm()` which provides the logit-Normal distribution allowing for a parameterisation in terms of mean and standard deviation.)
 Since we do not know the correlations between covariates in the AgD studies, we impute these with the weighted mean of the correlations in the IPD studies (the default option).
 ```{r}
 pso_net <- add_integration(pso_net,
@@ -188,6 +187,8 @@ pso_net <- add_integration(pso_net,
   n_int = 1000
 )
 ```
+
+> **Note:** This package provides several convenience functions for specifying these distributions, including `qgamma()` which allows for a parameterisation of the Gamma distribution in terms of mean and standard deviation, `qbern()` which provides the Bernoulli distribution, and `qlogitnorm()` which provides the logit-Normal distribution allowing for a parameterisation in terms of mean and standard deviation (requires the `logitnorm` package to be installed).
 
 # ML-NMR models
 We fit both fixed effect (FE) and random effects (RE) ML-NMR models.
