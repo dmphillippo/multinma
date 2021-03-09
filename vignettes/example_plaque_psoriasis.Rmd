@@ -333,7 +333,7 @@ The argument `type = "reponse"` specifies that we want predicted probabilities, 
 plot(pso_pred_FE, ref_line = c(0, 1))
 ```
 
-We can produce population-adjusted ranks, rank probabilities, and cumulative rank probabilities in each study population using the `posterior_ranks()` and `posterior_rank_probs()` functions.
+We can produce population-adjusted ranks, rank probabilities, and cumulative rank probabilities in each study population using the `posterior_ranks()` and `posterior_rank_probs()` functions (although here the ranks are unchanged between populations, as the distributions of effect modifiers are similar).
 We specify `lower_better = FALSE`, since a higher outcome is better (higher chance of achieving PASI 75).
 ```{r pso_ranks_FE}
 (pso_ranks_FE <- posterior_ranks(pso_fit_FE, lower_better = FALSE))
