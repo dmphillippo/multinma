@@ -1,3 +1,5 @@
+# multinma 0.3.0.9000
+
 # multinma 0.3.0
 
 * Feature: Added `baseline_type` and `baseline_level` arguments to
