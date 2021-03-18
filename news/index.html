@@ -81,7 +81,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">multinma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -174,6 +174,18 @@
       <small>Source: <a href='https://github.com/dmphillippo/multinma/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="multinma-030" class="section level1">
+<h1 class="page-header" data-toc-text="0.3.0">
+<a href="#multinma-030" class="anchor"></a>multinma 0.3.0<small> Unreleased </small>
+</h1>
+<ul>
+<li>Feature: Added <code>baseline_type</code> and <code>baseline_level</code> arguments to <code><a href="../reference/predict.stan_nma.html">predict.stan_nma()</a></code>, which allow baseline distributions to be specified on the response or linear predictor scale, and at the individual or aggregate level.</li>
+<li>Feature: The <code>baseline</code> argument to <code><a href="../reference/predict.stan_nma.html">predict.stan_nma()</a></code> can now accept a (named) list of baseline distributions if <code>newdata</code> contains multiple studies.</li>
+<li>Improvement: Misspecified <code>newdata</code> arguments to functions like <code><a href="../reference/relative_effects.html">relative_effects()</a></code> and <code><a href="../reference/predict.stan_nma.html">predict.stan_nma()</a></code> now give more informative error messages.</li>
+<li>Fix: Constructing models with contrast-based data previously gave errors in some scenarios (ML-NMR models, UME models, and in some cases AgD meta-regression models).</li>
+<li>Fix: Ensure CRAN additional checks with <code>--run-donttest</code> run correctly.</li>
+</ul>
+</div>
     <div id="multinma-021" class="section level1">
 <h1 class="page-header" data-toc-text="0.2.1">
 <a href="#multinma-021" class="anchor"></a>multinma 0.2.1<small> 2021-01-09 </small>
