@@ -1,4 +1,4 @@
-# multinma 0.2.1.9000
+# multinma 0.3.0
 
 * Feature: Added `baseline_type` and `baseline_level` arguments to
 `predict.stan_nma()`, which allow baseline distributions to be specified on the
