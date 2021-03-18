@@ -8,14 +8,14 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-----------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
 
 
-## ---- eval = FALSE------------------------------------------------------------
+## ---- eval = FALSE--------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
-## ----setup, echo = FALSE------------------------------------------------------
+## ----setup, echo = FALSE--------------------------------------------------------------------------
 library(multinma)
 nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
              "true" =, "warn" = 2, 
@@ -24,15 +24,15 @@ options(mc.cores = nc)
 set.seed(65498431)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 head(hta_psoriasis)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 dplyr::filter(hta_psoriasis, studyc %in% c("Elewski", "Gordon", "ACD2058g", "Altmeyer"))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 pso_net <- set_agd_arm(hta_psoriasis, 
                        study = paste(studyc, year), 
                        trt = trtc, 
@@ -43,19 +43,19 @@ pso_net <- set_agd_arm(hta_psoriasis,
 pso_net
 
 
-## ----hta_psoriasis_network_plot-----------------------------------------------
+## ----hta_psoriasis_network_plot-------------------------------------------------------------------
 plot(pso_net, weight_edges = TRUE, weight_nodes = TRUE) + 
   # Nudge the legend over
   ggplot2::theme(legend.box.spacing = ggplot2::unit(0.75, "in"),
                  plot.margin = ggplot2::margin(0.1, 0, 0.1, 0.75, "in"))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 10))
 summary(normal(scale = 100))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 pso_fit_FE <- nma(pso_net, 
                   trt_effects = "fixed",
                   link = "probit",
@@ -64,30 +64,30 @@ pso_fit_FE <- nma(pso_net,
                   prior_aux = flat())
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 pso_fit_FE
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(pso_fit_FE, pars = c("d", "mu", "cc"))
 
 
-## ----pso_FE_pp_plot-----------------------------------------------------------
+## ----pso_FE_pp_plot-------------------------------------------------------------------------------
 plot_prior_posterior(pso_fit_FE)
 
 
-## ----pso_FE_pp_cutpoint_plot--------------------------------------------------
+## ----pso_FE_pp_cutpoint_plot----------------------------------------------------------------------
 plot_prior_posterior(pso_fit_FE, prior = "aux")
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 10))
 summary(normal(scale = 100))
 summary(half_normal(scale = 2.5))
 
 
-## ---- eval = FALSE------------------------------------------------------------
+## ---- eval = FALSE--------------------------------------------------------------------------------
 ## pso_fit_RE <- nma(pso_net,
 ##                   trt_effects = "random",
 ##                   link = "probit",
@@ -97,7 +97,7 @@ summary(half_normal(scale = 2.5))
 ##                   prior_het = half_normal(scale = 2.5),
 ##                   adapt_delta = 0.99)
 
-## ---- echo = FALSE, warning = FALSE-------------------------------------------
+## ---- echo = FALSE, warning = FALSE---------------------------------------------------------------
 pso_fit_RE <- nowarn_on_ci(nma(pso_net, 
                   trt_effects = "random",
                   link = "probit",
@@ -110,42 +110,42 @@ pso_fit_RE <- nowarn_on_ci(nma(pso_net,
                   seed = 1713435794))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 pso_fit_RE
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(pso_fit_RE, pars = c("d", "cc", "mu", "delta"))
 
 
-## ----pso_RE_pp_plot-----------------------------------------------------------
+## ----pso_RE_pp_plot-------------------------------------------------------------------------------
 plot_prior_posterior(pso_fit_RE, prior = c("trt", "aux", "het"))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (dic_FE <- dic(pso_fit_FE))
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (dic_RE <- dic(pso_fit_RE))
 
 
-## ----pso_FE_resdev_plot-------------------------------------------------------
+## ----pso_FE_resdev_plot---------------------------------------------------------------------------
 plot(dic_FE)
 
 
-## ----pso_RE_resdev_plot-------------------------------------------------------
+## ----pso_RE_resdev_plot---------------------------------------------------------------------------
 plot(dic_RE)
 
 
-## ----pso_pred_FE, fig.height = 2----------------------------------------------
+## ----pso_pred_FE, fig.height = 2------------------------------------------------------------------
 pred_FE <- predict(pso_fit_FE, 
                    baseline = distr(qnorm, mean = -1.097, sd = 123^-0.5), 
                    type = "response")
 pred_FE
 plot(pred_FE)
 
-## ----pso_pred_RE, fig.height = 2----------------------------------------------
+## ----pso_pred_RE, fig.height = 2------------------------------------------------------------------
 pred_RE <- predict(pso_fit_RE, 
                    baseline = distr(qnorm, mean = -1.097, sd = 123^-0.5), 
                    type = "response")
@@ -153,7 +153,25 @@ pred_RE
 plot(pred_RE)
 
 
-## ----pso_pred_RE_colour, fig.height = 3---------------------------------------
+## ----pso_pred_FE_beta, fig.height = 2-------------------------------------------------------------
+pred_FE_beta <- predict(pso_fit_FE, 
+                        baseline = distr(qbeta, 56, 408-56),
+                        baseline_type = "response",
+                        type = "response")
+pred_FE_beta
+plot(pred_FE_beta)
+
+
+## ----pso_pred_RE_beta, fig.height = 2-------------------------------------------------------------
+pred_RE_beta <- predict(pso_fit_RE, 
+                        baseline = distr(qbeta, 56, 408-56),
+                        baseline_type = "response",
+                        type = "response")
+pred_RE_beta
+plot(pred_RE_beta)
+
+
+## ----pso_pred_RE_colour, fig.height = 3-----------------------------------------------------------
 library(ggplot2)
 plot(pred_RE, position = position_dodge(width = 0.75)) +
   facet_null() +
@@ -161,20 +179,20 @@ plot(pred_RE, position = position_dodge(width = 0.75)) +
   scale_colour_brewer(palette = "Blues")
 
 
-## ----hta_psoriasis_ranks, fig.height=3----------------------------------------
+## ----hta_psoriasis_ranks, fig.height=3------------------------------------------------------------
 (pso_ranks <- posterior_ranks(pso_fit_RE, lower_better = FALSE))
 plot(pso_ranks)
 
-## ----hta_psoriasis_rankprobs--------------------------------------------------
+## ----hta_psoriasis_rankprobs----------------------------------------------------------------------
 (pso_rankprobs <- posterior_rank_probs(pso_fit_RE, lower_better = FALSE))
 plot(pso_rankprobs)
 
-## ----hta_psoriasis_cumrankprobs-----------------------------------------------
+## ----hta_psoriasis_cumrankprobs-------------------------------------------------------------------
 (pso_cumrankprobs <- posterior_rank_probs(pso_fit_RE, lower_better = FALSE, cumulative = TRUE))
 plot(pso_cumrankprobs)
 
 
-## ----hta_psoriasis_tests, include=FALSE, eval=params$run_tests----------------
+## ----hta_psoriasis_tests, include=FALSE, eval=params$run_tests------------------------------------
 #--- Test against TSD 2 results ---
 library(testthat)
 library(dplyr)
@@ -348,5 +366,20 @@ test_that("RE DIC", {
   expect_equivalent(dic_RE$resdev, 63.0, tolerance = tol_dic)
   expect_equivalent(dic_RE$pd, 33.3, tolerance = tol_dic)
   expect_equivalent(dic_RE$dic, 96.2, tolerance = tol_dic)
+})
+
+# Check predictions with Beta distribution on baseline probability
+pred_FE_beta <- as.data.frame(pred_FE_beta)
+test_that("FE predicted probabilities (Beta distribution)", {
+  expect_equal(pred_FE[c("mean", "sd", "2.5%", "50%", "97.5%")],
+               pred_FE_beta[c("mean", "sd", "2.5%", "50%", "97.5%")],
+               tolerance = tol)
+})
+
+pred_RE_beta <- as.data.frame(pred_RE_beta)
+test_that("RE predicted probabilities (Beta distribution)", {
+  expect_equal(pred_RE[c("mean", "sd", "2.5%", "50%", "97.5%")],
+               pred_RE_beta[c("mean", "sd", "2.5%", "50%", "97.5%")],
+               tolerance = tol)
 })
 

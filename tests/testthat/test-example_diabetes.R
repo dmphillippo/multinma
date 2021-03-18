@@ -8,14 +8,14 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-----------------
 
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ---- eval = FALSE------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
-## ----setup, echo = FALSE--------------------------------------------------------------------------
+## ----setup, echo = FALSE------------------------------------------------------
 library(multinma)
 nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
              "true" =, "warn" = 2, 
@@ -23,11 +23,11 @@ nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
 options(mc.cores = nc)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 head(diabetes)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 db_net <- set_agd_arm(diabetes, 
                       study = studyc,
                       trt = trtc,
@@ -36,18 +36,18 @@ db_net <- set_agd_arm(diabetes,
 db_net
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 ## plot(db_net, weight_edges = TRUE, weight_nodes = TRUE)
 
-## ----diabetes_network_plot, echo=FALSE------------------------------------------------------------
+## ----diabetes_network_plot, echo=FALSE----------------------------------------
 plot(db_net, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(legend.box.margin = ggplot2::unit(c(0, 0, 0, 4), "lines"))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 summary(normal(scale = 100))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 db_fit_FE <- nma(db_net, 
                  trt_effects = "fixed",
                  link = "cloglog",
@@ -56,25 +56,25 @@ db_fit_FE <- nma(db_net,
                  prior_trt = normal(scale = 100))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 db_fit_FE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 ## # Not run
 ## print(db_fit_FE, pars = c("d", "mu"))
 
 
-## ----db_FE_pp_plot, fig.width=8, fig.height=6, out.width="100%"-----------------------------------
+## ----db_FE_pp_plot, fig.width=8, fig.height=6, out.width="100%"---------------
 plot_prior_posterior(db_fit_FE)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 db_fit_RE <- nma(db_net, 
                  trt_effects = "random",
                  link = "cloglog",
@@ -85,44 +85,44 @@ db_fit_RE <- nma(db_net,
                  init_r = 0.5)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 db_fit_RE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 ## # Not run
 ## print(db_fit_RE, pars = c("d", "mu", "delta"))
 
 
-## ----db_RE_pp_plot--------------------------------------------------------------------------------
+## ----db_RE_pp_plot------------------------------------------------------------
 plot_prior_posterior(db_fit_RE, prior = c("trt", "het"))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 (dic_FE <- dic(db_fit_FE))
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 (dic_RE <- dic(db_fit_RE))
 
 
-## ----db_FE_resdev_plot----------------------------------------------------------------------------
+## ----db_FE_resdev_plot--------------------------------------------------------
 plot(dic_FE)
 
 
-## ----db_RE_resdev_plot----------------------------------------------------------------------------
+## ----db_RE_resdev_plot--------------------------------------------------------
 plot(dic_RE)
 
 
-## ----diabetes_releff_FE, fig.height=3-------------------------------------------------------------
+## ----diabetes_releff_FE, fig.height=3-----------------------------------------
 (db_releff_FE <- relative_effects(db_fit_FE, trt_ref = "Diuretic"))
 plot(db_releff_FE, ref_line = 0)
 
-## ----diabetes_releff_RE, fig.height=3-------------------------------------------------------------
+## ----diabetes_releff_RE, fig.height=3-----------------------------------------
 (db_releff_RE <- relative_effects(db_fit_RE, trt_ref = "Diuretic"))
 plot(db_releff_RE, ref_line = 0)
 
 
-## ----db_pred_FE, fig.height = 2-------------------------------------------------------------------
+## ----db_pred_FE, fig.height = 2-----------------------------------------------
 db_pred_FE <- predict(db_fit_FE, 
                       newdata = data.frame(time = 3),
                       baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5), 
@@ -131,7 +131,7 @@ db_pred_FE <- predict(db_fit_FE,
 db_pred_FE
 plot(db_pred_FE)
 
-## ----db_pred_RE, fig.height = 2-------------------------------------------------------------------
+## ----db_pred_RE, fig.height = 2-----------------------------------------------
 db_pred_RE <- predict(db_fit_RE, 
                       newdata = data.frame(time = 3),
                       baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5), 
@@ -141,26 +141,26 @@ db_pred_RE
 plot(db_pred_RE)
 
 
-## ----db_pred_RE_all, fig.height=16----------------------------------------------------------------
+## ----db_pred_RE_all, fig.height=16--------------------------------------------
 db_pred_RE_studies <- predict(db_fit_RE, type = "response")
 db_pred_RE_studies
 plot(db_pred_RE_studies)
 
 
-## ----diabetes_ranks-------------------------------------------------------------------------------
+## ----diabetes_ranks-----------------------------------------------------------
 (db_ranks <- posterior_ranks(db_fit_RE))
 plot(db_ranks)
 
-## ----diabetes_rankprobs---------------------------------------------------------------------------
+## ----diabetes_rankprobs-------------------------------------------------------
 (db_rankprobs <- posterior_rank_probs(db_fit_RE))
 plot(db_rankprobs)
 
-## ----diabetes_cumrankprobs------------------------------------------------------------------------
+## ----diabetes_cumrankprobs----------------------------------------------------
 (db_cumrankprobs <- posterior_rank_probs(db_fit_RE, cumulative = TRUE))
 plot(db_cumrankprobs)
 
 
-## ----diabetes_tests, include=FALSE, eval=params$run_tests-----------------------------------------
+## ----diabetes_tests, include=FALSE, eval=params$run_tests---------------------
 #--- Test against TSD 2 results ---
 library(testthat)
 library(dplyr)
@@ -289,5 +289,108 @@ test_that("FE DIC", {
   expect_equivalent(dic_FE$resdev, 78.25, tolerance = tol_dic)
   expect_equivalent(dic_FE$pd, 27.0, tolerance = tol_dic)
   expect_equivalent(dic_FE$dic, 105.2, tolerance = tol_dic)
+})
+
+# Check that predictions for multiple studies works in any order
+times <- 1:3
+# Baselines named by time
+bls <- list("1" = distr(qnorm, mean = -4.2, sd = 1.11^-0.5),
+            "2" = distr(qnorm, mean = -4.2, sd = 1.11^-0.5),
+            "3" = distr(qnorm, mean = -4.2, sd = 1.11^-0.5))
+
+db_pred_FE_multi1 <- as.data.frame(predict(db_fit_FE, 
+                      newdata = data.frame(time = times),
+                      baseline = unname(bls), 
+                      study = time,
+                      trt_ref = "Diuretic",
+                      type = "response"))
+
+db_pred_RE_multi1 <- as.data.frame(predict(db_fit_RE, 
+                      newdata = data.frame(time = times),
+                      baseline = unname(bls), 
+                      study = time,
+                      trt_ref = "Diuretic",
+                      type = "response"))
+
+db_pred_FE_multi2 <- as.data.frame(predict(db_fit_FE, 
+                      newdata = data.frame(time = times),
+                      baseline = bls, 
+                      study = time,
+                      trt_ref = "Diuretic",
+                      type = "response"))
+
+db_pred_RE_multi2 <- as.data.frame(predict(db_fit_RE, 
+                      newdata = data.frame(time = times),
+                      baseline = bls, 
+                      study = time,
+                      trt_ref = "Diuretic",
+                      type = "response"))
+
+db_pred_FE_multi3 <- as.data.frame(predict(db_fit_FE, 
+                      newdata = data.frame(time = rev(times)),
+                      baseline = bls, 
+                      study = time,
+                      trt_ref = "Diuretic",
+                      type = "response")) %>% 
+  arrange(.study)
+
+db_pred_RE_multi3 <- as.data.frame(predict(db_fit_RE, 
+                      newdata = data.frame(time = rev(times)),
+                      baseline = bls, 
+                      study = time,
+                      trt_ref = "Diuretic",
+                      type = "response")) %>% 
+  arrange(.study)
+
+db_pred_FE_multi4 <- as.data.frame(predict(db_fit_FE, 
+                      newdata = data.frame(time = times),
+                      baseline = rev(bls), 
+                      study = time,
+                      trt_ref = "Diuretic",
+                      type = "response"))
+
+db_pred_RE_multi4 <- as.data.frame(predict(db_fit_RE, 
+                      newdata = data.frame(time = times),
+                      baseline = rev(bls), 
+                      study = time,
+                      trt_ref = "Diuretic",
+                      type = "response"))
+
+test_that("Predictions for reordered newdata/baselines works", {
+  expect_equivalent(db_pred_FE_multi1$mean,    db_pred_FE_multi2$mean, tolerance = tol)
+  expect_equivalent(db_pred_FE_multi1$sd,      db_pred_FE_multi2$sd, tolerance = tol)
+  expect_equivalent(db_pred_FE_multi1$`50%`,   db_pred_FE_multi2$`50%`, tolerance = tol)
+  expect_equivalent(db_pred_FE_multi1$`2.5%`,  db_pred_FE_multi2$`2.5%`, tolerance = tol)
+  expect_equivalent(db_pred_FE_multi1$`97.5%`, db_pred_FE_multi2$`97.5%`, tolerance = tol)
+  
+  expect_equivalent(db_pred_FE_multi1$mean,    db_pred_FE_multi3$mean, tolerance = tol)
+  expect_equivalent(db_pred_FE_multi1$sd,      db_pred_FE_multi3$sd, tolerance = tol)
+  expect_equivalent(db_pred_FE_multi1$`50%`,   db_pred_FE_multi3$`50%`, tolerance = tol)
+  expect_equivalent(db_pred_FE_multi1$`2.5%`,  db_pred_FE_multi3$`2.5%`, tolerance = tol)
+  expect_equivalent(db_pred_FE_multi1$`97.5%`, db_pred_FE_multi3$`97.5%`, tolerance = tol)
+  
+  expect_equivalent(db_pred_FE_multi1$mean,    db_pred_FE_multi4$mean, tolerance = tol)
+  expect_equivalent(db_pred_FE_multi1$sd,      db_pred_FE_multi4$sd, tolerance = tol)
+  expect_equivalent(db_pred_FE_multi1$`50%`,   db_pred_FE_multi4$`50%`, tolerance = tol)
+  expect_equivalent(db_pred_FE_multi1$`2.5%`,  db_pred_FE_multi4$`2.5%`, tolerance = tol)
+  expect_equivalent(db_pred_FE_multi1$`97.5%`, db_pred_FE_multi4$`97.5%`, tolerance = tol)
+  
+  expect_equivalent(db_pred_RE_multi1$mean,    db_pred_RE_multi2$mean, tolerance = tol)
+  expect_equivalent(db_pred_RE_multi1$sd,      db_pred_RE_multi2$sd, tolerance = tol)
+  expect_equivalent(db_pred_RE_multi1$`50%`,   db_pred_RE_multi2$`50%`, tolerance = tol)
+  expect_equivalent(db_pred_RE_multi1$`2.5%`,  db_pred_RE_multi2$`2.5%`, tolerance = tol)
+  expect_equivalent(db_pred_RE_multi1$`97.5%`, db_pred_RE_multi2$`97.5%`, tolerance = tol)
+  
+  expect_equivalent(db_pred_RE_multi1$mean,    db_pred_RE_multi3$mean, tolerance = tol)
+  expect_equivalent(db_pred_RE_multi1$sd,      db_pred_RE_multi3$sd, tolerance = tol)
+  expect_equivalent(db_pred_RE_multi1$`50%`,   db_pred_RE_multi3$`50%`, tolerance = tol)
+  expect_equivalent(db_pred_RE_multi1$`2.5%`,  db_pred_RE_multi3$`2.5%`, tolerance = tol)
+  expect_equivalent(db_pred_RE_multi1$`97.5%`, db_pred_RE_multi3$`97.5%`, tolerance = tol)
+  
+  expect_equivalent(db_pred_RE_multi1$mean,    db_pred_RE_multi4$mean, tolerance = tol)
+  expect_equivalent(db_pred_RE_multi1$sd,      db_pred_RE_multi4$sd, tolerance = tol)
+  expect_equivalent(db_pred_RE_multi1$`50%`,   db_pred_RE_multi4$`50%`, tolerance = tol)
+  expect_equivalent(db_pred_RE_multi1$`2.5%`,  db_pred_RE_multi4$`2.5%`, tolerance = tol)
+  expect_equivalent(db_pred_RE_multi1$`97.5%`, db_pred_RE_multi4$`97.5%`, tolerance = tol)
 })
 

@@ -74,7 +74,7 @@ aim to increase the rate of a positive outcome then \code{lower_better = FALSE}.
 ## Smoking cessation
 \donttest{
 # Run smoking RE NMA example if not already available
-if (!exists("smk_fit_RE")) example("example_smk_re")
+if (!exists("smk_fit_RE")) example("example_smk_re", run.donttest = TRUE)
 }
 \donttest{
 # Produce posterior ranks
@@ -102,7 +102,7 @@ plot(smk_cumrankprob_RE) +
 ## Plaque psoriasis ML-NMR
 \donttest{
 # Run plaque psoriasis ML-NMR example if not already available
-if (!exists("pso_fit")) example("example_pso_mlnmr")
+if (!exists("pso_fit")) example("example_pso_mlnmr", run.donttest = TRUE)
 }
 \donttest{
 # Produce population-adjusted rankings for all study populations in

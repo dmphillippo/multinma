@@ -40,7 +40,7 @@ methods applied to \code{stan_nma} or \code{nma_summary} objects.
 ## Smoking cessation
 \donttest{
 # Run smoking RE NMA example if not already available
-if (!exists("smk_fit_RE")) example("example_smk_re")
+if (!exists("smk_fit_RE")) example("example_smk_re", run.donttest = TRUE)
 }
 \donttest{
 # Working with arrays of posterior draws (as mcmc_array objects) is

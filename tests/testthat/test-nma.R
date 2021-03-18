@@ -140,7 +140,7 @@ smknet_ipd_missx <- ipddummy %>%
   set_ipd(studyn, trtn, r = r)
 
 test_that("nma() error if missing values in outcomes or predictors", {
-  m <- "missing values"
+  m <- "missing or infinite values"
   expect_error(nma(smknet_agd_missx, regression = ~x1_mean, center = FALSE,
                    prior_intercept = normal(0, 10),
                    prior_trt = normal(0, 10),

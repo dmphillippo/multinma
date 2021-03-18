@@ -824,3 +824,220 @@ test_that("RE DIC", {
   expect_equivalent(mix_dic_RE$dic, 18.1, tolerance = tol_dic)
 })
 
+# --- Check UME models ---
+arm_fit_FE_UME <- nma(arm_net, 
+                      trt_effects = "fixed",
+                      consistency = "ume",
+                      prior_intercept = normal(scale = 100),
+                      prior_trt = normal(scale = 10),
+                      iter = 10000)
+
+# NOTE: RE UME models are not really tractable - lots of divergences - not
+# enough data to estimate tau
+
+mix_fit_FE_UME <- nma(mix_net, 
+                      trt_effects = "fixed",
+                      consistency = "ume",
+                      prior_intercept = normal(scale = 100),
+                      prior_trt = normal(scale = 100),
+                      iter = 10000)
+
+test_that("Arm/Mixed UME results are the same", {
+  expect_equivalent_nma_summary(summary(arm_fit_FE_UME, pars = "d"), 
+                                summary(mix_fit_FE_UME, pars = "d"), 
+                                tolerance = tol)
+})
+
+# NOTE: Contrast (and reordered contrast) results are different, since the
+# choice of independent contrasts is based on the "observed" baseline arms in
+# the data rather than the treatment ordering
+
+contr_fit_FE_UME <- nma(contr_net, 
+                        trt_effects = "fixed",
+                        consistency = "ume",
+                        prior_trt = normal(scale = 100),
+                        iter = 10000)
+
+reorder_fit_FE_UME <- nma(reorder_net, 
+                          seed = 1878819627,
+                          trt_effects = "fixed",
+                          consistency = "ume",
+                          prior_trt = normal(scale = 100),
+                          iter = 10000)
+
+test_that("Contr/Reordered UME results are the same", {
+  expect_equivalent_nma_summary(summary(contr_fit_FE_UME, pars = "d"), 
+                                summary(reorder_fit_FE_UME, pars = "d"), 
+                                tolerance = tol)
+})
+
+# --- Test regression models with contrast data ---
+park_dummy <- dplyr::mutate(parkinsons, x1 = rnorm(dplyr::n(), 0, 1))
+
+arm_net_reg <- set_agd_arm(park_dummy, 
+                           study = studyn,
+                           trt = trtn,
+                           y = y, 
+                           se = se,
+                           sample_size = n)
+
+arm_fit_FE_reg <- nma(arm_net_reg, 
+                      trt_effects = "fixed",
+                      regression = ~x1:.trt,
+                      prior_intercept = normal(scale = 100),
+                      prior_trt = normal(scale = 10),
+                      prior_reg = normal(scale = 1),
+                      iter = 10000)
+
+contr_net_reg <- set_agd_contrast(park_dummy, 
+                                  study = studyn,
+                                  trt = trtn,
+                                  y = diff, 
+                                  se = se_diff,
+                                  sample_size = n)
+
+contr_fit_FE_reg <- nma(contr_net_reg, 
+                        trt_effects = "fixed",
+                        regression = ~x1:.trt,
+                        prior_trt = normal(scale = 100),
+                        prior_reg = normal(scale = 1),
+                        iter = 10000)
+
+mix_net_reg <- combine_network(set_agd_arm(park_dummy[studies %in% 1:3, ], 
+                                       study = studyn,
+                                       trt = trtn,
+                                       y = y, 
+                                       se = se,
+                                       sample_size = n), 
+                           set_agd_contrast(park_dummy[studies %in% 4:7, ], 
+                                  study = studyn,
+                                  trt = trtn,
+                                  y = diff, 
+                                  se = se_diff,
+                                  sample_size = n))
+
+mix_fit_FE_reg <- nma(mix_net_reg, 
+                      trt_effects = "fixed",
+                      regression = ~x1:.trt,
+                      prior_intercept = normal(scale = 100),
+                      prior_trt = normal(scale = 100),
+                      prior_reg = normal(scale = 1),
+                      iter = 10000)
+
+reorder_net_reg  <- set_agd_contrast(sample_frac(park_dummy, size = 1, replace = FALSE), 
+                                     study = studyn,
+                                     trt = trtn,
+                                     y = diff, 
+                                     se = se_diff,
+                                     sample_size = n)
+
+reorder_fit_FE_reg <- nma(reorder_net_reg, 
+                          seed = 1878819627,
+                          trt_effects = "fixed",
+                          regression = ~x1:.trt,
+                          prior_trt = normal(scale = 100),
+                          prior_reg = normal(scale = 1),
+                          iter = 10000)
+
+test_that("Regression models work with contrast data", {
+  expect_equivalent_nma_summary(summary(arm_fit_FE_reg, pars = c("d", "beta")), 
+                                summary(contr_fit_FE_reg, pars = c("d", "beta")), 
+                                tolerance = tol)
+  
+  expect_equivalent_nma_summary(summary(arm_fit_FE_reg, pars = c("d", "beta")), 
+                                summary(mix_fit_FE_reg, pars = c("d", "beta")), 
+                                tolerance = tol)
+  
+  expect_equivalent_nma_summary(summary(contr_fit_FE_reg, pars = c("d", "beta")), 
+                                summary(reorder_fit_FE_reg, pars = c("d", "beta")), 
+                                tolerance = tol)
+})
+
+# ML-NMR regression models too
+park_dummy_mlnmr <- dplyr::mutate(parkinsons, 
+                                  x1_mean = rnorm(dplyr::n(), 0, 1),
+                                  x1_sd = runif(dplyr::n(), 0.1, 1))
+
+arm_net_mlnmr <- set_agd_arm(park_dummy_mlnmr, 
+                             study = studyn,
+                             trt = trtn,
+                             y = y, 
+                             se = se,
+                             sample_size = n) %>% 
+  add_integration(x1 = distr(qnorm, x1_mean, x1_sd), n_int = 10)
+
+arm_fit_FE_mlnmr <- nma(arm_net_mlnmr, 
+                        trt_effects = "fixed",
+                        regression = ~x1:.trt,
+                        prior_intercept = normal(scale = 100),
+                        prior_trt = normal(scale = 10),
+                        prior_reg = normal(scale = 1),
+                        iter = 10000)
+
+contr_net_mlnmr <- set_agd_contrast(park_dummy_mlnmr, 
+                                  study = studyn,
+                                  trt = trtn,
+                                  y = diff, 
+                                  se = se_diff,
+                                  sample_size = n) %>% 
+  add_integration(x1 = distr(qnorm, x1_mean, x1_sd), n_int = 10)
+
+contr_fit_FE_mlnmr <- nma(contr_net_mlnmr, 
+                          trt_effects = "fixed",
+                          regression = ~x1:.trt,
+                          prior_trt = normal(scale = 100),
+                          prior_reg = normal(scale = 1),
+                          iter = 10000)
+
+mix_net_mlnmr <- combine_network(set_agd_arm(park_dummy_mlnmr[studies %in% 1:3, ], 
+                                       study = studyn,
+                                       trt = trtn,
+                                       y = y, 
+                                       se = se,
+                                       sample_size = n), 
+                           set_agd_contrast(park_dummy_mlnmr[studies %in% 4:7, ], 
+                                  study = studyn,
+                                  trt = trtn,
+                                  y = diff, 
+                                  se = se_diff,
+                                  sample_size = n)) %>% 
+  add_integration(x1 = distr(qnorm, x1_mean, x1_sd), n_int = 10)
+
+mix_fit_FE_mlnmr <- nma(mix_net_mlnmr, 
+                      trt_effects = "fixed",
+                      regression = ~x1:.trt,
+                      prior_intercept = normal(scale = 100),
+                      prior_trt = normal(scale = 100),
+                      prior_reg = normal(scale = 1),
+                      iter = 10000)
+
+reorder_net_mlnmr  <- set_agd_contrast(sample_frac(park_dummy_mlnmr, size = 1, replace = FALSE), 
+                                     study = studyn,
+                                     trt = trtn,
+                                     y = diff, 
+                                     se = se_diff,
+                                     sample_size = n) %>% 
+  add_integration(x1 = distr(qnorm, x1_mean, x1_sd), n_int = 10)
+
+reorder_fit_FE_mlnmr <- nma(reorder_net_mlnmr, 
+                          seed = 1878819627,
+                          trt_effects = "fixed",
+                          regression = ~x1:.trt,
+                          prior_trt = normal(scale = 100),
+                          prior_reg = normal(scale = 1),
+                          iter = 10000)
+
+test_that("ML-NMR models work with contrast data", {
+  expect_equivalent_nma_summary(summary(arm_fit_FE_mlnmr, pars = c("d", "beta")), 
+                                summary(contr_fit_FE_mlnmr, pars = c("d", "beta")), 
+                                tolerance = tol)
+  
+  expect_equivalent_nma_summary(summary(arm_fit_FE_mlnmr, pars = c("d", "beta")), 
+                                summary(mix_fit_FE_mlnmr, pars = c("d", "beta")), 
+                                tolerance = tol)
+  
+  expect_equivalent_nma_summary(summary(contr_fit_FE_mlnmr, pars = c("d", "beta")), 
+                                summary(reorder_fit_FE_mlnmr, pars = c("d", "beta")), 
+                                tolerance = tol)
+})
+

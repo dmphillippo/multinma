@@ -21,11 +21,11 @@ Calculate the DIC for a model fitted using the \code{\link[=nma]{nma()}} functio
 ## Smoking cessation
 \donttest{
 # Run smoking FE NMA example if not already available
-if (!exists("smk_fit_FE")) example("example_smk_fe")
+if (!exists("smk_fit_FE")) example("example_smk_fe", run.donttest = TRUE)
 }
 \donttest{
 # Run smoking RE NMA example if not already available
-if (!exists("smk_fit_RE")) example("example_smk_re")
+if (!exists("smk_fit_RE")) example("example_smk_re", run.donttest = TRUE)
 }
 \donttest{
 # Compare DIC of FE and RE models
@@ -39,7 +39,7 @@ plot(smk_dic_RE)
 }
 \donttest{
 # Run smoking UME NMA example if not already available
-if (!exists("smk_fit_RE_UME")) example("example_smk_ume")
+if (!exists("smk_fit_RE_UME")) example("example_smk_ume", run.donttest = TRUE)
 }
 \donttest{
 # Compare DIC

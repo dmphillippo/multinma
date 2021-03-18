@@ -13,6 +13,8 @@
   trt_ref = NULL,
   type = c("link", "response"),
   level = c("aggregate", "individual"),
+  baseline_type = c("link", "response"),
+  baseline_level = c("individual", "aggregate"),
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
   summary = TRUE
 )
@@ -20,14 +22,28 @@
 \arguments{
 \item{object}{A \code{stan_nma} object created by \code{\link[=nma]{nma()}}.}
 
-\item{...}{Additional arguments (not used).}
+\item{...}{Additional arguments, passed to \code{\link[=uniroot]{uniroot()}} for regression models
+if \code{baseline_level = "aggregate"}.}
 
 \item{baseline}{An optional \code{\link[=distr]{distr()}} distribution for the baseline response
-(i.e. intercept) on the linear predictor scale, about which to produce
-absolute effects. For example, in a model with a logit link, this would be
-a distribution for the baseline log odds of an event. If \code{NULL},
+(i.e. intercept), about which to produce absolute effects. If \code{NULL},
 predictions are produced using the baseline response for each study in the
-network with IPD or arm-based AgD.}
+network with IPD or arm-based AgD.
+
+For regression models, this may be a list of \code{\link[=distr]{distr()}} distributions of the
+same length as the number of studies in \code{newdata} (possibly named by the
+study names, or otherwise in order of appearance in \code{newdata}).
+
+Use the \code{baseline_type} and \code{baseline_level} arguments to specify whether
+this distribution is on the response or linear predictor scale, and (for
+ML-NMR or models including IPD) whether this applies to an individual at
+the reference level of the covariates or over the entire \code{newdata}
+population, respectively. For example, in a model with a logit link with
+\code{baseline_type = "link"}, this would be a distribution for the baseline log
+odds of an event.
+
+Use the \code{trt_ref} argument to specify which treatment this distribution
+applies to.}
 
 \item{newdata}{Only required if a regression model is fitted and \code{baseline}
 is specified. A data frame of covariate details, for which to produce
@@ -63,6 +79,17 @@ specified, predictions are produced for all IPD studies in the network if
 \code{type} is \code{"individual"} or \code{"aggregate"}, and for all arm-based AgD
 studies in the network if \code{type} is \code{"aggregate"}.}
 
+\item{baseline_type}{When a \code{baseline} distribution is given, specifies
+whether this corresponds to the \code{"link"} scale (the default, e.g. log odds)
+or \code{"response"} scale (e.g. probabilities).}
+
+\item{baseline_level}{When a \code{baseline} distribution is given, specifies
+whether this corresponds to an individual at the reference level of the
+covariates (\code{"individual"}, the default), or from an (unadjusted) average
+outcome on the reference treatment in the \code{newdata} population
+(\code{"aggregate"}). Ignored for AgD NMA, since the only option is
+\code{"aggregate"} in this instance.}
+
 \item{probs}{Numeric vector of quantiles of interest to present in computed
 summary, default \code{c(0.025, 0.25, 0.5, 0.75, 0.975)}}
 
@@ -82,7 +109,7 @@ outcome probabilities or log odds can be produced.
 ## Smoking cessation
 \donttest{
 # Run smoking RE NMA example if not already available
-if (!exists("smk_fit_RE")) example("example_smk_re")
+if (!exists("smk_fit_RE")) example("example_smk_re", run.donttest = TRUE)
 }
 \donttest{
 # Predicted log odds of success in each study in the network
@@ -91,19 +118,31 @@ predict(smk_fit_RE)
 # Predicted probabilities of success in each study in the network
 predict(smk_fit_RE, type = "response")
 
-# Predicted probabilities in a population with a baseline log odds of
-# response on No Intervention given a Normal distribution with mean -2
-# and SD 0.15
+# Predicted probabilities in a population with 67 observed events out of 566
+# individuals on No Intervention, corresponding to a Beta(67, 566 - 67)
+# distribution on the baseline probability of response, using
+# `baseline_type = "response"`
 (smk_pred_RE <- predict(smk_fit_RE,
-                        baseline = distr(qnorm, mean = -2, sd = 0.15),
+                        baseline = distr(qbeta, 67, 566 - 67),
+                        baseline_type = "response",
                         type = "response"))
 plot(smk_pred_RE, ref_line = c(0, 1))
+
+# Predicted probabilities in a population with a baseline log odds of
+# response on No Intervention given a Normal distribution with mean -2
+# and SD 0.13, using `baseline_type = "link"` (the default)
+# Note: this is approximately equivalent to the above Beta distribution on
+# the baseline probability
+(smk_pred_RE2 <- predict(smk_fit_RE,
+                         baseline = distr(qnorm, mean = -2, sd = 0.13),
+                         type = "response"))
+plot(smk_pred_RE2, ref_line = c(0, 1))
 }
 
 ## Plaque psoriasis ML-NMR
 \donttest{
 # Run plaque psoriasis ML-NMR example if not already available
-if (!exists("pso_fit")) example("example_pso_mlnmr")
+if (!exists("pso_fit")) example("example_pso_mlnmr", run.donttest = TRUE)
 }
 \donttest{
 # Predicted probabilities of response in each study in the network

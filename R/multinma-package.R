@@ -60,7 +60,7 @@
 #' @importFrom grDevices nclass.Sturges
 #' @importFrom stats complete.cases sd median quantile model.frame model.matrix
 #'   model.offset terms optim pbinom dbinom qbinom as.formula update.formula
-#'   weighted.mean runif dunif plogis pnorm
+#'   weighted.mean runif dunif plogis pnorm qlogis qnorm uniroot
 #' @importFrom utils packageVersion
 #'
 #' @references

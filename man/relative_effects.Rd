@@ -53,7 +53,7 @@ population.
 ## Smoking cessation
 \donttest{
 # Run smoking RE NMA example if not already available
-if (!exists("smk_fit_RE")) example("example_smk_re")
+if (!exists("smk_fit_RE")) example("example_smk_re", run.donttest = TRUE)
 }
 \donttest{
 # Produce relative effects
@@ -83,7 +83,7 @@ plot(smk_OR_RE, ref_line = 1)
 ## Plaque psoriasis ML-NMR
 \donttest{
 # Run plaque psoriasis ML-NMR example if not already available
-if (!exists("pso_fit")) example("example_pso_mlnmr")
+if (!exists("pso_fit")) example("example_pso_mlnmr", run.donttest = TRUE)
 }
 \donttest{
 # Produce population-adjusted relative effects for all study populations in

@@ -56,7 +56,7 @@ details of plotting options, see \code{\link[=plot.nma_summary]{plot.nma_summary
 ## Smoking cessation
 \donttest{
 # Run smoking RE NMA example if not already available
-if (!exists("smk_fit_RE")) example("example_smk_re")
+if (!exists("smk_fit_RE")) example("example_smk_re", run.donttest = TRUE)
 }
 \donttest{
 # Summary and plot of all model parameters

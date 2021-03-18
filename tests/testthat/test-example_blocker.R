@@ -17,8 +17,8 @@ list(run_tests = FALSE)
 
 ## ----setup, echo = FALSE--------------------------------------------------------------------------
 library(multinma)
-nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
-             "true" =, "warn" = 2, 
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
+             "true" =, "warn" = 2,
              parallel::detectCores())
 options(mc.cores = nc)
 
@@ -28,10 +28,10 @@ head(blocker)
 
 
 ## -------------------------------------------------------------------------------------------------
-blocker_net <- set_agd_arm(blocker, 
+blocker_net <- set_agd_arm(blocker,
                            study = studyn,
                            trt = trtc,
-                           r = r, 
+                           r = r,
                            n = n,
                            trt_ref = "Control")
 blocker_net
@@ -42,7 +42,7 @@ summary(normal(scale = 100))
 
 
 ## -------------------------------------------------------------------------------------------------
-blocker_fit_FE <- nma(blocker_net, 
+blocker_fit_FE <- nma(blocker_net,
                    trt_effects = "fixed",
                    prior_intercept = normal(scale = 100),
                    prior_trt = normal(scale = 100))
@@ -67,7 +67,7 @@ summary(half_normal(scale = 5))
 
 
 ## -------------------------------------------------------------------------------------------------
-blocker_fit_RE <- nma(blocker_net, 
+blocker_fit_RE <- nma(blocker_net,
                    trt_effects = "random",
                    prior_intercept = normal(scale = 100),
                    prior_trt = normal(scale = 100),
@@ -103,18 +103,36 @@ plot(dic_RE)
 
 
 ## ----blocker_pred_FE, fig.height = 2--------------------------------------------------------------
-pred_FE <- predict(blocker_fit_FE, 
-                   baseline = distr(qnorm, mean = -2.2, sd = 3.3^-0.5), 
+pred_FE <- predict(blocker_fit_FE,
+                   baseline = distr(qnorm, mean = -2.2, sd = 3.3^-0.5),
                    type = "response")
 pred_FE
 plot(pred_FE)
 
 ## ----blocker_pred_RE, fig.height = 2--------------------------------------------------------------
-pred_RE <- predict(blocker_fit_RE, 
-                   baseline = distr(qnorm, mean = -2.2, sd = 3.3^-0.5), 
+pred_RE <- predict(blocker_fit_RE,
+                   baseline = distr(qnorm, mean = -2.2, sd = 3.3^-0.5),
                    type = "response")
 pred_RE
 plot(pred_RE)
+
+
+## ----blocker_pred_FE_beta, fig.height = 2---------------------------------------------------------
+pred_FE_beta <- predict(blocker_fit_FE,
+                        baseline = distr(qbeta, 4, 36-4),
+                        baseline_type = "response",
+                        type = "response")
+pred_FE_beta
+plot(pred_FE_beta)
+
+
+## ----blocker_pred_RE_beta, fig.height = 2---------------------------------------------------------
+pred_RE_beta <- predict(blocker_fit_RE,
+                        baseline = distr(qbeta, 4, 36-4),
+                        baseline_type = "response",
+                        type = "response")
+pred_RE_beta
+plot(pred_RE_beta)
 
 
 ## ----blocker_tests, include=FALSE, eval=params$run_tests------------------------------------------
@@ -191,21 +209,42 @@ test_that("RE predicted probabilities", {
   expect_equivalent(blocker_pred_RE$`97.5%`, c(0.25, 0.20), tolerance = tol_dic)
 })
 
+# Check predictions with Beta distribution on baseline probability
+blocker_predbeta_FE <- as.data.frame(pred_FE_beta)
+
+test_that("FE predicted probabilities (Beta distribution)", {
+  expect_equal(blocker_pred_FE$mean, blocker_predbeta_FE$mean, tolerance = tol)
+  expect_equal(blocker_pred_FE$sd, blocker_predbeta_FE$sd, tolerance = tol)
+  expect_equal(blocker_pred_FE$`2.5%`, blocker_predbeta_FE$`2.5%`, tolerance = tol)
+  expect_equal(blocker_pred_FE$`50%`, blocker_predbeta_FE$`50%`, tolerance = tol)
+  expect_equal(blocker_pred_FE$`97.5%`, blocker_predbeta_FE$`97.5%`, tolerance = tol)
+})
+
+blocker_predbeta_RE <- as.data.frame(pred_RE_beta)
+
+test_that("RE predicted probabilities (Beta distribution)", {
+  expect_equal(blocker_pred_RE$mean, blocker_predbeta_RE$mean, tolerance = tol)
+  expect_equal(blocker_pred_RE$sd, blocker_predbeta_RE$sd, tolerance = tol)
+  expect_equal(blocker_pred_RE$`2.5%`, blocker_predbeta_RE$`2.5%`, tolerance = tol)
+  expect_equal(blocker_pred_RE$`50%`, blocker_predbeta_RE$`50%`, tolerance = tol)
+  expect_equal(blocker_pred_RE$`97.5%`, blocker_predbeta_RE$`97.5%`, tolerance = tol)
+})
+
 # Test that ordered multinomial model is equivalent
-blocker_ord_net <- set_agd_arm(blocker, 
+blocker_ord_net <- set_agd_arm(blocker,
                            study = studyn,
                            trt = trtc,
                            r = multi(nonevents = n, events = r, inclusive = TRUE),
                            trt_ref = "Control")
 
-blocker_ord_fit_FE <-  nma(blocker_ord_net, 
+blocker_ord_fit_FE <-  nma(blocker_ord_net,
                        trt_effects = "fixed",
                        link = "logit",
                        prior_intercept = normal(scale = 100),
                        prior_trt = normal(scale = 100),
                        prior_aux = flat())
 
-blocker_ord_fit_RE <-  nma(blocker_ord_net, 
+blocker_ord_fit_RE <-  nma(blocker_ord_net,
                        trt_effects = "random",
                        link = "logit",
                        prior_intercept = normal(scale = 100),
@@ -255,7 +294,7 @@ test_that("Equivalent ordered multinomial RE DIC", {
   expect_equivalent(dic_RE$dic, 70.0, tolerance = tol_dic)
 })
 
-blocker_ord_pred_FE <- as.data.frame(predict(blocker_ord_fit_FE, 
+blocker_ord_pred_FE <- as.data.frame(predict(blocker_ord_fit_FE,
                                              baseline = distr(qnorm, mean = -2.2, sd = 3.3^-0.5),
                                              type = "response"))
 
@@ -267,7 +306,7 @@ test_that("Equivalent ordered multinomial FE predicted probabilities", {
   expect_equivalent(blocker_ord_pred_FE$`97.5%`, c(0.25, 0.20), tolerance = tol_dic)
 })
 
-blocker_ord_pred_RE <- as.data.frame(predict(blocker_ord_fit_RE, 
+blocker_ord_pred_RE <- as.data.frame(predict(blocker_ord_fit_RE,
                                              baseline = distr(qnorm, mean = -2.2, sd = 3.3^-0.5),
                                              type = "response"))
 
@@ -277,5 +316,34 @@ test_that("Equivalent ordered multinomial RE predicted probabilities", {
   expect_equivalent(blocker_ord_pred_RE$`2.5%`, c(0.04, 0.03), tolerance = tol_dic)
   expect_equivalent(blocker_ord_pred_RE$`50%`, c(0.10, 0.08), tolerance = tol_dic)
   expect_equivalent(blocker_ord_pred_RE$`97.5%`, c(0.25, 0.20), tolerance = tol_dic)
+})
+
+# Check predictions with Beta distribution on baseline probability
+blocker_ord_predbeta_FE <- predict(blocker_ord_fit_FE,
+                               baseline = distr(qbeta, 4, 36 - 4), #3.66565, 36.74819 - 3.66565),
+                               baseline_type = "response",
+                               type = "response") %>%
+  as.data.frame()
+
+test_that("FE ordered multinomial predicted probabilities (Beta distribution)", {
+  expect_equal(blocker_ord_pred_FE$mean, blocker_ord_predbeta_FE$mean, tolerance = tol)
+  expect_equal(blocker_ord_pred_FE$sd, blocker_ord_predbeta_FE$sd, tolerance = tol)
+  expect_equal(blocker_ord_pred_FE$`2.5%`, blocker_ord_predbeta_FE$`2.5%`, tolerance = tol)
+  expect_equal(blocker_ord_pred_FE$`50%`, blocker_ord_predbeta_FE$`50%`, tolerance = tol)
+  expect_equal(blocker_ord_pred_FE$`97.5%`, blocker_ord_predbeta_FE$`97.5%`, tolerance = tol)
+})
+
+blocker_ord_predbeta_RE <- predict(blocker_ord_fit_RE,
+                               baseline = distr(qbeta, 4, 36 - 4), #3.66565, 36.74819 - 3.66565),
+                               baseline_type = "response",
+                               type = "response") %>%
+  as.data.frame()
+
+test_that("RE ordered multinomial predicted probabilities (Beta distribution)", {
+  expect_equal(blocker_ord_pred_RE$mean, blocker_ord_predbeta_RE$mean, tolerance = tol)
+  expect_equal(blocker_ord_pred_RE$sd, blocker_ord_predbeta_RE$sd, tolerance = tol)
+  expect_equal(blocker_ord_pred_RE$`2.5%`, blocker_ord_predbeta_RE$`2.5%`, tolerance = tol)
+  expect_equal(blocker_ord_pred_RE$`50%`, blocker_ord_predbeta_RE$`50%`, tolerance = tol)
+  expect_equal(blocker_ord_pred_RE$`97.5%`, blocker_ord_predbeta_RE$`97.5%`, tolerance = tol)
 })
 

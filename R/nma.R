@@ -1347,6 +1347,26 @@ inverse_link <- function(x, link = c("identity", "log", "logit", "probit", "clog
   return(out)
 }
 
+#' Link functions
+#'
+#' @param x Linear predictor values
+#' @param link Character string specifying link function
+#' @param ... Other parameters passed to link function
+#'
+#' @noRd
+link_fun <- function(x, link = c("identity", "log", "logit", "probit", "cloglog"), ...) {
+  link <- rlang::arg_match(link)
+
+  out <-
+    if (link == "identity") x
+    else if (link == "log") log(x)
+    else if (link == "logit") qlogis(x, ...)
+    else if (link == "probit") qnorm(x, ...)
+    else if (link == "cloglog") log(-log(1 - x))
+
+  return(out)
+}
+
 #' Get scale of outcome / linear predictor for reporting and plotting
 #'
 #' @param likelihood String, giving likelihood
@@ -1521,6 +1541,7 @@ make_nma_formula <- function(regression,
 #' @param consistency Consistency/inconsistency model (character string)
 #' @param classes Classes present? TRUE / FALSE
 #' @param class_interactions Class interaction specification (character string)
+#' @param newdata Providing newdata post-fitting? TRUE / FALSE
 #'
 #' @return A named list of three matrices: X_ipd, X_agd_arm, X_agd_contrast; and
 #'   three vectors of offsets: offset_ipd, offset_agd_arm, offset_agd_contrast.
@@ -1532,7 +1553,8 @@ make_nma_model_matrix <- function(nma_formula,
                                   agd_contrast_bl = logical(),
                                   xbar = NULL,
                                   consistency = c("consistency", "nodesplit", "ume"),
-                                  classes = FALSE) {
+                                  classes = FALSE,
+                                  newdata = FALSE) {
   # Checks
   if (!rlang::is_formula(nma_formula)) abort("`nma_formula` is not a formula")
   stopifnot(is.data.frame(dat_ipd),
@@ -1569,12 +1591,6 @@ make_nma_model_matrix <- function(nma_formula,
     dat_agd_contrast <- dplyr::mutate_at(dat_agd_contrast,
                             .vars = if (classes) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
                             .funs = fct_sanitise)
-
-    # Split contrast-based data into baseline and non-baseline arms
-    dat_agd_contrast_bl <- dat_agd_contrast[agd_contrast_bl, ]
-    dat_agd_contrast_nonbl <- dat_agd_contrast[!agd_contrast_bl, ]
-  } else {
-    dat_agd_contrast_bl <- dat_agd_contrast_nonbl <- tibble::tibble()
   }
 
   # Define contrasts for UME model
@@ -1602,9 +1618,8 @@ make_nma_model_matrix <- function(nma_formula,
     if (.has_agd_contrast) {
       contrs_contr <- dat_agd_contrast %>%
         dplyr::distinct(.data$.study, .data$.trt) %>%  # In case integration data passed
-        dplyr::group_by(.data$.study) %>%
-        dplyr::mutate(.trt_b = .data$.trt[which(is.na(.data$.y))]) %>%
-        dplyr::ungroup() %>%
+        dplyr::left_join(dplyr::distinct(dat_agd_contrast[agd_contrast_bl, ], .data$.study, .data$.trt) %>%
+                           dplyr::transmute(.data$.study, .trt_b = .data$.trt), by = ".study") %>%
         dplyr::distinct(.data$.study, .data$.trt, .data$.trt_b) %>%
         dplyr::mutate(.contr_sign = dplyr::if_else(as.numeric(.data$.trt) < as.numeric(.data$.trt_b), -1, 1),
                       .contr = dplyr::if_else(.data$.trt == .data$.trt_b,
@@ -1638,30 +1653,24 @@ make_nma_model_matrix <- function(nma_formula,
     }
     if (.has_agd_contrast) {
       dat_agd_contrast <- dplyr::left_join(dat_agd_contrast, contrs_all, by = c(".study", ".trt"))
-      dat_agd_contrast_bl <- dplyr::left_join(dat_agd_contrast_bl, contrs_all, by = c(".study", ".trt"))
-      dat_agd_contrast_nonbl <- dplyr::left_join(dat_agd_contrast_nonbl, contrs_all, by = c(".study", ".trt"))
     }
   }
 
   # Construct design matrix all together then split out, so that same dummy
   # coding is used everywhere
-  dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast_nonbl)
+  dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
 
   # Check that required variables are present in each data set, and non-missing
   check_regression_data(nma_formula,
                         dat_ipd = dat_ipd,
                         dat_agd_arm = dat_agd_arm,
-                        dat_agd_contrast = dat_agd_contrast)
+                        dat_agd_contrast = dat_agd_contrast,
+                        newdata = newdata)
 
   # Center
   if (!is.null(xbar)) {
     dat_all[, names(xbar)] <-
       purrr::map2(dat_all[, names(xbar)], xbar, ~.x - .y)
-
-    if (.has_agd_contrast) {
-      dat_agd_contrast_bl[, names(xbar)] <-
-        purrr::map2(dat_agd_contrast_bl[, names(xbar)], xbar, ~.x - .y)
-    }
   }
 
   # Drop study to factor to 1L if only one study (avoid contrasts need 2 or
@@ -1736,56 +1745,36 @@ make_nma_model_matrix <- function(nma_formula,
   }
 
   if (.has_agd_contrast) {
-    X_agd_contrast <- X_all[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast_nonbl), , drop = FALSE]
-    offset_agd_contrast <-
+    X_agd_contrast_all <- X_all[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast), , drop = FALSE]
+    offset_agd_contrast_all <-
       if (has_offset) {
-        offsets[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast_nonbl)]
+        offsets[nrow(dat_ipd) + nrow(dat_agd_arm) + 1:nrow(dat_agd_contrast)]
       } else {
         NULL
       }
 
-    # Fix up single study case
-    if (!is.null(single_study_label)) {
-      dat_agd_contrast_bl$.study_temp <- dat_agd_contrast_bl$.study
-      dat_agd_contrast_bl$.study <- 1L
-    }
-
     # Difference out the baseline arms
-    X_bl <- model.matrix(nma_formula, data = dat_agd_contrast_bl)
-    if (has_offset) offset_bl <- model.offset(model.frame(nma_formula, data = dat_agd_contrast_bl))
+    X_bl <- X_agd_contrast_all[agd_contrast_bl, , drop = FALSE]
+    if (has_offset) offset_bl <- offset_agd_contrast_all[agd_contrast_bl]
 
-    if (!is.null(single_study_label)) {
-      # Restore single study label and .study column
-      colnames(X_bl) <- stringr::str_replace(colnames(X_bl),
-                                             "^\\.study$",
-                                             paste0(".study", single_study_label))
-      dat_agd_contrast_bl <- dat_agd_contrast_bl %>%
-        dplyr::mutate(.study = .data$.study_temp) %>%
-        dplyr::select(-.data$.study_temp)
-
-      # Drop intercept column from design matrix
-      X_bl <- X_bl[, -1, drop = FALSE]
-    }
-
-    # The factor levels should be the same between idat_all and
-    # idat_agd_contrast_bl, so the same columns should be present in both design
-    # matrices - but check anyway
-    if (any(colnames(X_agd_contrast) != colnames(X_bl)))
-      abort("Mismatch design matrices for baseline and non-baseline arms. Dropped factor levels?")
-
-    if (consistency == "ume") {
-      # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
-      X_bl[, contr_cols] <- sweep(X_bl[, contr_cols, drop = FALSE], MARGIN = 1,
-                                  STATS = dat_agd_contrast_bl$.contr_sign, FUN = "*")
-    }
+    X_agd_contrast <- X_agd_contrast_all[!agd_contrast_bl, , drop = FALSE]
+    offset_agd_contrast <-
+      if (has_offset) {
+        offset_agd_contrast_all[!agd_contrast_bl]
+      } else {
+        NULL
+      }
 
     # Match non-baseline rows with baseline rows by study
-    bl_lookup <- vapply(dat_agd_contrast_nonbl$.study,
-                        FUN = function(x) which(x == dat_agd_contrast_bl$.study),
-                        FUN.VALUE = numeric(1))
+    for (s in unique(dat_agd_contrast$.study)) {
+      nonbl_id <- which(dat_agd_contrast$.study[!agd_contrast_bl] == s)
+      bl_id <- which(dat_agd_contrast$.study[agd_contrast_bl] == s)
 
-    X_agd_contrast <- X_agd_contrast - X_bl[bl_lookup, , drop = FALSE]
-    if (has_offset) offset_agd_contrast <- offset_agd_contrast - offset_bl[bl_lookup]
+      bl_id <- rep_len(bl_id, length(nonbl_id))
+
+      X_agd_contrast[nonbl_id, ] <- X_agd_contrast[nonbl_id, , drop = FALSE] - X_bl[bl_id, , drop = FALSE]
+      if (has_offset) offset_agd_contrast[nonbl_id] <- offset_agd_contrast[nonbl_id] - offset_bl[bl_id]
+    }
 
     # Remove columns for study baselines corresponding to contrast-based studies - not used
     s_contr <- unique(dat_agd_contrast$.study)
@@ -1841,12 +1830,14 @@ get_model_data_columns <- function(data, regression = NULL, label = NULL) {
 #'
 #' @param formula Model formula
 #' @param dat_ipd,dat_agd_arm,dat_agd_contrast Data frames
+#' @param newdata Providing newdata post-fitting? TRUE / FALSE
 #'
 #' @noRd
 check_regression_data <- function(formula,
                                   dat_ipd = tibble::tibble(),
                                   dat_agd_arm = tibble::tibble(),
-                                  dat_agd_contrast = tibble::tibble()) {
+                                  dat_agd_contrast = tibble::tibble(),
+                                  newdata = FALSE) {
 
   .has_ipd <- if (nrow(dat_ipd)) TRUE else FALSE
   .has_agd_arm <- if (nrow(dat_agd_arm)) TRUE else FALSE
@@ -1856,9 +1847,9 @@ check_regression_data <- function(formula,
   if (.has_ipd) {
     rlang::with_handlers(
       X_ipd_frame <- model.frame(formula, dat_ipd, na.action = NULL),
-      error = ~abort(paste0("Failed to construct design matrix for IPD.\n", .)))
+      error = ~abort(paste0(if (newdata) "Failed to construct design matrix for `newdata`.\n" else "Failed to construct design matrix for IPD.\n", .)))
 
-    X_ipd_has_na <- names(which(purrr::map_lgl(X_ipd_frame, ~any(is.na(.)))))
+    X_ipd_has_na <- names(which(purrr::map_lgl(X_ipd_frame, ~any(is.na(.) | is.infinite(.)))))
   } else {
     X_ipd_has_na <- character(0)
   }
@@ -1866,9 +1857,9 @@ check_regression_data <- function(formula,
   if (.has_agd_arm) {
     rlang::with_handlers(
       X_agd_arm_frame <- model.frame(formula, dat_agd_arm, na.action = NULL),
-      error = ~abort(paste0("Failed to construct design matrix for AgD (arm-based).\n", .)))
+      error = ~abort(paste0(if (newdata) "Failed to construct design matrix for `newdata`.\n" else "Failed to construct design matrix for AgD (arm-based).\n", .)))
 
-    X_agd_arm_has_na <- names(which(purrr::map_lgl(X_agd_arm_frame, ~any(is.na(.)))))
+    X_agd_arm_has_na <- names(which(purrr::map_lgl(X_agd_arm_frame, ~any(is.na(.) | is.infinite(.)))))
   } else {
     X_agd_arm_has_na <- character(0)
   }
@@ -1876,9 +1867,9 @@ check_regression_data <- function(formula,
   if (.has_agd_contrast) {
     rlang::with_handlers(
       X_agd_contrast_frame <- model.frame(formula, dat_agd_contrast, na.action = NULL),
-      error = ~abort(paste0("Failed to construct design matrix for AgD (contrast-based).\n", .)))
+      error = ~abort(paste0(if (newdata) "Failed to construct design matrix for `newdata`.\n" else "Failed to construct design matrix for AgD (contrast-based).\n", .)))
 
-    X_agd_contrast_has_na <- names(which(purrr::map_lgl(X_agd_contrast_frame, ~any(is.na(.)))))
+    X_agd_contrast_has_na <- names(which(purrr::map_lgl(X_agd_contrast_frame, ~any(is.na(.) | is.infinite(.)))))
   } else {
     X_agd_contrast_has_na <- character(0)
   }
@@ -1887,11 +1878,15 @@ check_regression_data <- function(formula,
                   length(X_agd_arm_has_na) > 0,
                   length(X_agd_contrast_has_na) > 0)
   if (any(dat_has_na)) {
-    abort(glue::glue(glue::glue_collapse(
-      c("Variables with missing values in IPD: {paste(X_ipd_has_na, collapse = ', ')}.",
-        "Variables with missing values in AgD (arm-based): {paste(X_agd_arm_has_na, collapse = ', ')}.",
-        "Variables with missing values in AgD (contrast-based): {paste(X_agd_contrast_has_na, collapse = ', ')}."
-      )[dat_has_na], sep = "\n")))
+    if (newdata) {
+      abort(glue::glue("Variables with missing or infinite values in `newdata`: {paste(c(X_ipd_has_na, X_agd_arm_has_na, X_agd_contrast_has_na), collapse = ', ')}."))
+    } else {
+      abort(glue::glue(glue::glue_collapse(
+        c("Variables with missing or infinite values in IPD: {paste(X_ipd_has_na, collapse = ', ')}.",
+          "Variables with missing or infinite values in AgD (arm-based): {paste(X_agd_arm_has_na, collapse = ', ')}.",
+          "Variables with missing or infinite values in AgD (contrast-based): {paste(X_agd_contrast_has_na, collapse = ', ')}."
+        )[dat_has_na], sep = "\n")))
+    }
   }
 
   invisible()

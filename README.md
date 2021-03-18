@@ -64,7 +64,7 @@ paper:
 The `multinma` package can be cited as follows:
 
 > Phillippo, D. M. (2021). *multinma: Network Meta-Analysis of
-> Individual and Aggregate Data in Stan*. R package version 0.2.1, doi:
+> Individual and Aggregate Data in Stan*. R package version 0.3.0, doi:
 > [10.5281/zenodo.3904454](https://doi.org/10.5281/zenodo.3904454).
 
 When fitting ML-NMR models, please cite the methods paper:
@@ -77,9 +77,9 @@ When fitting ML-NMR models, please cite the methods paper:
 
 ## References
 
-<div id="refs" class="references">
+<div id="refs" class="references csl-bib-body hanging-indent">
 
-<div id="ref-Carpenter2017">
+<div id="ref-Carpenter2017" class="csl-entry">
 
 Carpenter, B., A. Gelman, M. D. Hoffman, D. Lee, B. Goodrich, M.
 Betancourt, M. Brubaker, J. Guo, P. Li, and A. Riddell. 2017. “Stan: A
@@ -88,7 +88,7 @@ Probabilistic Programming Language.” *Journal of Statistical Software*
 
 </div>
 
-<div id="ref-Phillippo_thesis">
+<div id="ref-Phillippo_thesis" class="csl-entry">
 
 Phillippo, D. M. 2019. “Calibration of Treatment Effects in Network
 Meta-Analysis Using Individual Patient Data.” PhD thesis, University of
@@ -96,7 +96,7 @@ Bristol.
 
 </div>
 
-<div id="ref-methods_paper">
+<div id="ref-methods_paper" class="csl-entry">
 
 Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A.
 Schacht, D. Saure, Z. Kadziola, and N. J. Welton. 2020. “Multilevel
