@@ -1670,7 +1670,7 @@ make_nma_model_matrix <- function(nma_formula,
   # Center
   if (!is.null(xbar)) {
     dat_all[, names(xbar)] <-
-      purrr::map2(dat_all[, names(xbar)], xbar, ~.x - .y)
+      purrr::map2(dat_all[, names(xbar), drop = FALSE], xbar, ~.x - .y)
   }
 
   # Drop study to factor to 1L if only one study (avoid contrasts need 2 or
