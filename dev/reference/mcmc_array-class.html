@@ -223,45 +223,48 @@ vector of parameter names, and <code>names()&lt;-</code> returns the object with
 parameter names.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>## Smoking cessation</span>
-<span class='co'># \donttest{</span>
-<span class='co'># Run smoking RE NMA example if not already available</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/exists.html'>exists</a></span><span class='op'>(</span><span class='st'>"smk_fit_RE"</span><span class='op'>)</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/utils/example.html'>example</a></span><span class='op'>(</span><span class='st'>"example_smk_re"</span>, run.donttest <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-<span class='co'># }</span>
-<span class='co'># \donttest{</span>
-<span class='co'># Working with arrays of posterior draws (as mcmc_array objects) is</span>
-<span class='co'># convenient when transforming parameters</span>
-
-<span class='co'># Transforming log odds ratios to odds ratios</span>
-<span class='va'>LOR_array</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/array.html'>as.array</a></span><span class='op'>(</span><span class='fu'><a href='relative_effects.html'>relative_effects</a></span><span class='op'>(</span><span class='va'>smk_fit_RE</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>OR_array</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>LOR_array</span><span class='op'>)</span>
-
-<span class='co'># mcmc_array objects can be summarised to produce a nma_summary object</span>
-<span class='va'>smk_OR_RE</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>OR_array</span><span class='op'>)</span>
-
-<span class='co'># This can then be printed or plotted</span>
-<span class='va'>smk_OR_RE</span>
-</div><div class='output co'>#&gt;                           mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS
-#&gt; d[Group counselling]      3.36 1.78 1.29 2.24 2.97 3.94  7.93     1642     2079
-#&gt; d[Individual counselling] 2.37 0.60 1.47 1.96 2.29 2.69  3.81     1136     1797
-#&gt; d[Self-help]              1.77 0.79 0.75 1.25 1.63 2.11  3.74     1804     2167
-#&gt;                           Rhat
-#&gt; d[Group counselling]         1
-#&gt; d[Individual counselling]    1
-#&gt; d[Self-help]                 1</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>smk_OR_RE</span>, ref_line <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='img'><img src='mcmc_array-class-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Transforming heterogeneity SD to variance</span>
-<span class='va'>tau_array</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/array.html'>as.array</a></span><span class='op'>(</span><span class='va'>smk_fit_RE</span>, pars <span class='op'>=</span> <span class='st'>"tau"</span><span class='op'>)</span>
-<span class='va'>tausq_array</span> <span class='op'>&lt;-</span> <span class='va'>tau_array</span><span class='op'>^</span><span class='fl'>2</span>
-
-<span class='co'># Correct parameter names</span>
-<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>tausq_array</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='st'>"tausq"</span>
-
-<span class='co'># Summarise</span>
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>tausq_array</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;       mean   sd 2.5% 25%  50% 75% 97.5% Bulk_ESS Tail_ESS Rhat
-#&gt; tausq 0.74 0.34 0.29 0.5 0.67 0.9  1.58     1143     2309    1</div><div class='input'><span class='co'># }</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'>## Smoking cessation</span></span>
+<span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='co'># Run smoking RE NMA example if not already available</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/exists.html'>exists</a></span><span class='op'>(</span><span class='st'>"smk_fit_RE"</span><span class='op'>)</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/utils/example.html'>example</a></span><span class='op'>(</span><span class='st'>"example_smk_re"</span>, run.donttest <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='co'># Working with arrays of posterior draws (as mcmc_array objects) is</span></span>
+<span class='r-in'><span class='co'># convenient when transforming parameters</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Transforming log odds ratios to odds ratios</span></span>
+<span class='r-in'><span class='va'>LOR_array</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/array.html'>as.array</a></span><span class='op'>(</span><span class='fu'><a href='relative_effects.html'>relative_effects</a></span><span class='op'>(</span><span class='va'>smk_fit_RE</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>OR_array</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>LOR_array</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># mcmc_array objects can be summarised to produce a nma_summary object</span></span>
+<span class='r-in'><span class='va'>smk_OR_RE</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>OR_array</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># This can then be printed or plotted</span></span>
+<span class='r-in'><span class='va'>smk_OR_RE</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                           mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[Group counselling]      3.36 1.78 1.29 2.24 2.97 3.94  7.93     1642     2079</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[Individual counselling] 2.37 0.60 1.47 1.96 2.29 2.69  3.81     1136     1797</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[Self-help]              1.77 0.79 0.75 1.25 1.63 2.11  3.74     1804     2167</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                           Rhat</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[Group counselling]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[Individual counselling]    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[Self-help]                 1</span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>smk_OR_RE</span>, ref_line <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='mcmc_array-class-1.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Transforming heterogeneity SD to variance</span></span>
+<span class='r-in'><span class='va'>tau_array</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/array.html'>as.array</a></span><span class='op'>(</span><span class='va'>smk_fit_RE</span>, pars <span class='op'>=</span> <span class='st'>"tau"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>tausq_array</span> <span class='op'>&lt;-</span> <span class='va'>tau_array</span><span class='op'>^</span><span class='fl'>2</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Correct parameter names</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>tausq_array</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='st'>"tausq"</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Summarise</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>tausq_array</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       mean   sd 2.5% 25%  50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> tausq 0.74 0.34 0.29 0.5 0.67 0.9  1.58     1143     2309    1</span>
+<span class='r-in'><span class='co'># }</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

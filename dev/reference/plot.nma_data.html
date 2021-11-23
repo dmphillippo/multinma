@@ -241,63 +241,70 @@ any aggregate data in the network, using the <code>sample_size</code> option of
 <code>set_agd_*()</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>## Stroke prevention in atrial fibrillation</span>
-<span class='co'># Setting up the network</span>
-<span class='va'>af_net</span> <span class='op'>&lt;-</span> <span class='fu'><a href='set_agd_arm.html'>set_agd_arm</a></span><span class='op'>(</span><span class='va'>atrial_fibrillation</span>,
-                      study <span class='op'>=</span> <span class='va'>studyc</span>,
-                      trt <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/abbreviate.html'>abbreviate</a></span><span class='op'>(</span><span class='va'>trtc</span>, minlength <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>,
-                      r <span class='op'>=</span> <span class='va'>r</span>,
-                      n <span class='op'>=</span> <span class='va'>n</span>,
-                      trt_class <span class='op'>=</span> <span class='va'>trt_class</span><span class='op'>)</span>
-<span class='va'>af_net</span>
-</div><div class='output co'>#&gt; A network with 26 AgD studies (arm-based).
-#&gt; 
-#&gt; <span style='color: #555555;'>-------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>AgD studies (arm-based)</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt;  Study         Treatments                   
-#&gt;  ACTIVE-W      2: Sada | Lda+c              
-#&gt;  AFASAK 1      3: P/c | Sada | Lda          
-#&gt;  AFASAK 2      4: Sada | Fdw | Mda | Fdw+mda
-#&gt;  BAATAF        2: P/c | Lada                
-#&gt;  BAFTA         2: Sada | Lda                
-#&gt;  CAFA          2: P/c | Sada                
-#&gt;  Chinese ATAFS 2: Sada | Lda                
-#&gt;  EAFT          3: P/c | Sada | Mda          
-#&gt;  ESPS 2        4: P/c | Lda | Dpy | Lda+d   
-#&gt;  JAST          2: P/c | Lda                 
-#&gt; </span><span style='color: #555555;'> ... plus 16 more studies</span><span>
-#&gt; 
-#&gt;  Outcome type: count
-#&gt; </span><span style='color: #555555;'>------------------------------------------------------------------------------------</span><span>
-#&gt; Total number of treatments: 17, in 4 classes
-#&gt; Total number of studies: 26
-#&gt; Reference treatment is: Sada
-#&gt; Network is </span><span style='color: #00BB00;'>connected</span><span></div><div class='input'>
-<span class='co'># Basic plot</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>af_net</span><span class='op'>)</span>
-</div><div class='img'><img src='plot.nma_data-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Turn off weighting edges by number of studies</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>af_net</span>, weight_edges <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='img'><img src='plot.nma_data-2.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Turn on weighting nodes by sample size</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>af_net</span>, weight_nodes <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='img'><img src='plot.nma_data-3.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Colour treatment nodes by class</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>af_net</span>, weight_nodes <span class='op'>=</span> <span class='cn'>TRUE</span>, show_trt_class <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='img'><img src='plot.nma_data-4.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Output may be customised using standard ggplot commands</span>
-<span class='co'># For example, to display the legends below the plot:</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>af_net</span>, weight_nodes <span class='op'>=</span> <span class='cn'>TRUE</span>, show_trt_class <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>legend.position <span class='op'>=</span> <span class='st'>"bottom"</span>,
-                 legend.box <span class='op'>=</span> <span class='st'>"vertical"</span>,
-                 legend.margin <span class='op'>=</span> <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>margin</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span><span class='op'>)</span>,
-                 legend.spacing <span class='op'>=</span> <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/grid/unit.html'>unit</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='st'>"lines"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='img'><img src='plot.nma_data-5.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Choosing a different ggraph layout, hiding some legends</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>af_net</span>, weight_nodes <span class='op'>=</span> <span class='cn'>TRUE</span>, show_trt_class <span class='op'>=</span> <span class='cn'>TRUE</span>,
-     layout <span class='op'>=</span> <span class='st'>"star"</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/guides.html'>guides</a></span><span class='op'>(</span>edge_width <span class='op'>=</span> <span class='st'>"none"</span>, size <span class='op'>=</span> <span class='st'>"none"</span><span class='op'>)</span>
-</div><div class='img'><img src='plot.nma_data-6.png' alt='' width='700' height='433' /></div><div class='input'>
-</div></span></pre>
+    <pre class="examples"><span class='r-in'><span class='co'>## Stroke prevention in atrial fibrillation</span></span>
+<span class='r-in'><span class='co'># Setting up the network</span></span>
+<span class='r-in'><span class='va'>af_net</span> <span class='op'>&lt;-</span> <span class='fu'><a href='set_agd_arm.html'>set_agd_arm</a></span><span class='op'>(</span><span class='va'>atrial_fibrillation</span>,</span>
+<span class='r-in'>                      study <span class='op'>=</span> <span class='va'>studyc</span>,</span>
+<span class='r-in'>                      trt <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/abbreviate.html'>abbreviate</a></span><span class='op'>(</span><span class='va'>trtc</span>, minlength <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>,</span>
+<span class='r-in'>                      r <span class='op'>=</span> <span class='va'>r</span>,</span>
+<span class='r-in'>                      n <span class='op'>=</span> <span class='va'>n</span>,</span>
+<span class='r-in'>                      trt_class <span class='op'>=</span> <span class='va'>trt_class</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>af_net</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> A network with 26 AgD studies (arm-based).</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>-------------------------------------------------------</span> <span style='font-weight: bold;'>AgD studies (arm-based)</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  Study         Treatments                   </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  ACTIVE-W      2: Sada | Lda+c              </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  AFASAK 1      3: P/c | Sada | Lda          </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  AFASAK 2      4: Sada | Fdw | Mda | Fdw+mda</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  BAATAF        2: P/c | Lada                </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  BAFTA         2: Sada | Lda                </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  CAFA          2: P/c | Sada                </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  Chinese ATAFS 2: Sada | Lda                </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  EAFT          3: P/c | Sada | Mda          </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  ESPS 2        4: P/c | Lda | Dpy | Lda+d   </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  JAST          2: P/c | Lda                 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'> ... plus 16 more studies</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  Outcome type: count</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>------------------------------------------------------------------------------------</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Total number of treatments: 17, in 4 classes</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Total number of studies: 26</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Reference treatment is: Sada</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Network is <span style='color: #00BB00;'>connected</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Basic plot</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>af_net</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='plot.nma_data-1.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Turn off weighting edges by number of studies</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>af_net</span>, weight_edges <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='plot.nma_data-2.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Turn on weighting nodes by sample size</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>af_net</span>, weight_nodes <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='plot.nma_data-3.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Colour treatment nodes by class</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>af_net</span>, weight_nodes <span class='op'>=</span> <span class='cn'>TRUE</span>, show_trt_class <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='plot.nma_data-4.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Output may be customised using standard ggplot commands</span></span>
+<span class='r-in'><span class='co'># For example, to display the legends below the plot:</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>af_net</span>, weight_nodes <span class='op'>=</span> <span class='cn'>TRUE</span>, show_trt_class <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>  <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>legend.position <span class='op'>=</span> <span class='st'>"bottom"</span>,</span>
+<span class='r-in'>                 legend.box <span class='op'>=</span> <span class='st'>"vertical"</span>,</span>
+<span class='r-in'>                 legend.margin <span class='op'>=</span> <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>margin</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span><span class='op'>)</span>,</span>
+<span class='r-in'>                 legend.spacing <span class='op'>=</span> <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/grid/unit.html'>unit</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='st'>"lines"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='plot.nma_data-5.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Choosing a different ggraph layout, hiding some legends</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>af_net</span>, weight_nodes <span class='op'>=</span> <span class='cn'>TRUE</span>, show_trt_class <span class='op'>=</span> <span class='cn'>TRUE</span>,</span>
+<span class='r-in'>     layout <span class='op'>=</span> <span class='st'>"star"</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>  <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/guides.html'>guides</a></span><span class='op'>(</span>edge_width <span class='op'>=</span> <span class='st'>"none"</span>, size <span class='op'>=</span> <span class='st'>"none"</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='plot.nma_data-6.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

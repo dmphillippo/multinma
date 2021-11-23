@@ -217,41 +217,41 @@ default) or excluded (<code>FALSE</code>)?</p></td>
 <code><a href='https://mc-stan.org/bayesplot/reference/MCMC-scatterplots.html'>bayesplot::mcmc_pairs()</a></code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='co'>## Parkinson's mean off time reduction</span>
-<span class='va'>park_net</span> <span class='op'>&lt;-</span> <span class='fu'><a href='set_agd_arm.html'>set_agd_arm</a></span><span class='op'>(</span><span class='va'>parkinsons</span>,
-                        study <span class='op'>=</span> <span class='va'>studyn</span>,
-                        trt <span class='op'>=</span> <span class='va'>trtn</span>,
-                        y <span class='op'>=</span> <span class='va'>y</span>,
-                        se <span class='op'>=</span> <span class='va'>se</span>,
-                        sample_size <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
-
-<span class='co'># Fitting a RE model</span>
-<span class='va'>park_fit_RE</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nma.html'>nma</a></span><span class='op'>(</span><span class='va'>park_net</span>,
-                   trt_effects <span class='op'>=</span> <span class='st'>"random"</span>,
-                   prior_intercept <span class='op'>=</span> <span class='fu'><a href='priors.html'>normal</a></span><span class='op'>(</span>scale <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>,
-                   prior_trt <span class='op'>=</span> <span class='fu'><a href='priors.html'>normal</a></span><span class='op'>(</span>scale <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>,
-                   prior_het <span class='op'>=</span> <span class='fu'><a href='priors.html'>half_normal</a></span><span class='op'>(</span>scale <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>
-
-<span class='co'># We see a small number of divergent transition errors</span>
-<span class='co'># These do not go away entirely when adapt_delta is increased</span>
-
-<span class='co'># Try to diagnose with a pairs plot</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/pairs.html'>pairs</a></span><span class='op'>(</span><span class='va'>park_fit_RE</span>, pars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"mu[4]"</span>, <span class='st'>"d[3]"</span>, <span class='st'>"delta[4: 3]"</span>, <span class='st'>"tau"</span><span class='op'>)</span><span class='op'>)</span>
-
-<span class='co'># Transforming tau onto log scale</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/pairs.html'>pairs</a></span><span class='op'>(</span><span class='va'>park_fit_RE</span>, pars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"mu[4]"</span>, <span class='st'>"d[3]"</span>, <span class='st'>"delta[4: 3]"</span>, <span class='st'>"tau"</span><span class='op'>)</span>,
-      transformations <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>tau <span class='op'>=</span> <span class='st'>"log"</span><span class='op'>)</span><span class='op'>)</span>
-
-<span class='co'># The divergent transitions occur in the upper tail of the heterogeneity</span>
-<span class='co'># standard deviation. In this case, with only a small number of studies, there</span>
-<span class='co'># is not very much information to estimate the heterogeneity standard deviation</span>
-<span class='co'># and the prior distribution may be too heavy-tailed. We could consider a more</span>
-<span class='co'># informative prior distribution for the heterogeneity variance to aid</span>
-<span class='co'># estimation.</span>
-<span class='op'>}</span>
-
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'><span class='co'>## Parkinson's mean off time reduction</span></span>
+<span class='r-in'><span class='va'>park_net</span> <span class='op'>&lt;-</span> <span class='fu'><a href='set_agd_arm.html'>set_agd_arm</a></span><span class='op'>(</span><span class='va'>parkinsons</span>,</span>
+<span class='r-in'>                        study <span class='op'>=</span> <span class='va'>studyn</span>,</span>
+<span class='r-in'>                        trt <span class='op'>=</span> <span class='va'>trtn</span>,</span>
+<span class='r-in'>                        y <span class='op'>=</span> <span class='va'>y</span>,</span>
+<span class='r-in'>                        se <span class='op'>=</span> <span class='va'>se</span>,</span>
+<span class='r-in'>                        sample_size <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Fitting a RE model</span></span>
+<span class='r-in'><span class='va'>park_fit_RE</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nma.html'>nma</a></span><span class='op'>(</span><span class='va'>park_net</span>,</span>
+<span class='r-in'>                   trt_effects <span class='op'>=</span> <span class='st'>"random"</span>,</span>
+<span class='r-in'>                   prior_intercept <span class='op'>=</span> <span class='fu'><a href='priors.html'>normal</a></span><span class='op'>(</span>scale <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>,</span>
+<span class='r-in'>                   prior_trt <span class='op'>=</span> <span class='fu'><a href='priors.html'>normal</a></span><span class='op'>(</span>scale <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>,</span>
+<span class='r-in'>                   prior_het <span class='op'>=</span> <span class='fu'><a href='priors.html'>half_normal</a></span><span class='op'>(</span>scale <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># We see a small number of divergent transition errors</span></span>
+<span class='r-in'><span class='co'># These do not go away entirely when adapt_delta is increased</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Try to diagnose with a pairs plot</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/pairs.html'>pairs</a></span><span class='op'>(</span><span class='va'>park_fit_RE</span>, pars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"mu[4]"</span>, <span class='st'>"d[3]"</span>, <span class='st'>"delta[4: 3]"</span>, <span class='st'>"tau"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Transforming tau onto log scale</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/pairs.html'>pairs</a></span><span class='op'>(</span><span class='va'>park_fit_RE</span>, pars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"mu[4]"</span>, <span class='st'>"d[3]"</span>, <span class='st'>"delta[4: 3]"</span>, <span class='st'>"tau"</span><span class='op'>)</span>,</span>
+<span class='r-in'>      transformations <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>tau <span class='op'>=</span> <span class='st'>"log"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># The divergent transitions occur in the upper tail of the heterogeneity</span></span>
+<span class='r-in'><span class='co'># standard deviation. In this case, with only a small number of studies, there</span></span>
+<span class='r-in'><span class='co'># is not very much information to estimate the heterogeneity standard deviation</span></span>
+<span class='r-in'><span class='co'># and the prior distribution may be too heavy-tailed. We could consider a more</span></span>
+<span class='r-in'><span class='co'># informative prior distribution for the heterogeneity variance to aid</span></span>
+<span class='r-in'><span class='co'># estimation.</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

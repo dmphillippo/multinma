@@ -216,22 +216,26 @@ correct prior intervals. By default, truncation is not used.</p></td>
     <p>A data frame is returned invisibly, giving the prior intervals</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='fu'><a href='priors.html'>normal</a></span><span class='op'>(</span>location <span class='op'>=</span> <span class='fl'>0</span>, scale <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; A Normal prior distribution: location = 0, scale = 1.
-#&gt; 50% of the prior density lies between -0.67 and 0.67.
-#&gt; 95% of the prior density lies between -1.96 and 1.96.</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='fu'><a href='priors.html'>half_normal</a></span><span class='op'>(</span>scale <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; A half-Normal prior distribution: location = 0, scale = 1.
-#&gt; 50% of the prior density lies between 0 and 0.67.
-#&gt; 95% of the prior density lies between 0 and 1.96.</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='fu'><a href='priors.html'>log_normal</a></span><span class='op'>(</span>location <span class='op'>=</span> <span class='op'>-</span><span class='fl'>3.93</span>, scale <span class='op'>=</span> <span class='fl'>1.51</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; A log-Normal prior distribution: location = -3.93, scale = 1.51.
-#&gt; 50% of the prior density lies between 0.01 and 0.05.
-#&gt; 95% of the prior density lies between 0 and 0.38.</div><div class='input'>
-<span class='co'># Truncation limits may be set, for example to restrict a prior to positive values</span>
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='fu'><a href='priors.html'>normal</a></span><span class='op'>(</span>location <span class='op'>=</span> <span class='fl'>0.5</span>, scale <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>, trunc <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='cn'>Inf</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; A Normal prior distribution: location = 0.5, scale = 1.
-#&gt; 50% of the prior density lies between 0.45 and 1.44.
-#&gt; 95% of the prior density lies between 0.05 and 2.61.</div><div class='input'>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='fu'><a href='priors.html'>normal</a></span><span class='op'>(</span>location <span class='op'>=</span> <span class='fl'>0</span>, scale <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> A Normal prior distribution: location = 0, scale = 1.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 50% of the prior density lies between -0.67 and 0.67.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 95% of the prior density lies between -1.96 and 1.96.</span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='fu'><a href='priors.html'>half_normal</a></span><span class='op'>(</span>scale <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> A half-Normal prior distribution: location = 0, scale = 1.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 50% of the prior density lies between 0 and 0.67.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 95% of the prior density lies between 0 and 1.96.</span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='fu'><a href='priors.html'>log_normal</a></span><span class='op'>(</span>location <span class='op'>=</span> <span class='op'>-</span><span class='fl'>3.93</span>, scale <span class='op'>=</span> <span class='fl'>1.51</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> A log-Normal prior distribution: location = -3.93, scale = 1.51.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 50% of the prior density lies between 0.01 and 0.05.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 95% of the prior density lies between 0 and 0.38.</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Truncation limits may be set, for example to restrict a prior to positive values</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='fu'><a href='priors.html'>normal</a></span><span class='op'>(</span>location <span class='op'>=</span> <span class='fl'>0.5</span>, scale <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>, trunc <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='cn'>Inf</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> A Normal prior distribution: location = 0.5, scale = 1.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 50% of the prior density lies between 0.45 and 1.44.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 95% of the prior density lies between 0.05 and 2.61.</span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -219,20 +219,21 @@ distributions for covariates to integrate over, and <code><a href='predict.stan_
 where <code>distr()</code> is used to specify a distribution on the baseline response.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>## Specifying marginal distributions for integration</span>
-
-<span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x1_mean <span class='op'>=</span> <span class='fl'>2</span>, x1_sd <span class='op'>=</span> <span class='fl'>0.5</span>, x2 <span class='op'>=</span> <span class='fl'>0.8</span><span class='op'>)</span>
-
-<span class='co'># Distribution parameters are evaluated in the context of the data frame</span>
-<span class='fu'><a href='add_integration.html'>add_integration</a></span><span class='op'>(</span><span class='va'>df</span>,
-                x1 <span class='op'>=</span> <span class='fu'>distr</span><span class='op'>(</span><span class='va'>qnorm</span>, mean <span class='op'>=</span> <span class='va'>x1_mean</span>, sd <span class='op'>=</span> <span class='va'>x1_sd</span><span class='op'>)</span>,
-                x2 <span class='op'>=</span> <span class='fu'>distr</span><span class='op'>(</span><span class='va'>qbern</span>, prob <span class='op'>=</span> <span class='va'>x2</span><span class='op'>)</span>,
-                cor <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/diag.html'>diag</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 1 x 5</span><span>
-#&gt;   x1_mean x1_sd    x2 .int_x1       .int_x2      
-#&gt;     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;list&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;list&gt;</span><span>       
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span>       2   0.5   0.8 </span><span style='color: #949494;'>&lt;dbl [1,000]&gt;</span><span> </span><span style='color: #949494;'>&lt;dbl [1,000]&gt;</span><span></div><div class='input'>
-</div></span></pre>
+    <pre class="examples"><span class='r-in'><span class='co'>## Specifying marginal distributions for integration</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x1_mean <span class='op'>=</span> <span class='fl'>2</span>, x1_sd <span class='op'>=</span> <span class='fl'>0.5</span>, x2 <span class='op'>=</span> <span class='fl'>0.8</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Distribution parameters are evaluated in the context of the data frame</span></span>
+<span class='r-in'><span class='fu'><a href='add_integration.html'>add_integration</a></span><span class='op'>(</span><span class='va'>df</span>,</span>
+<span class='r-in'>                x1 <span class='op'>=</span> <span class='fu'>distr</span><span class='op'>(</span><span class='va'>qnorm</span>, mean <span class='op'>=</span> <span class='va'>x1_mean</span>, sd <span class='op'>=</span> <span class='va'>x1_sd</span><span class='op'>)</span>,</span>
+<span class='r-in'>                x2 <span class='op'>=</span> <span class='fu'>distr</span><span class='op'>(</span><span class='va'>qbern</span>, prob <span class='op'>=</span> <span class='va'>x2</span><span class='op'>)</span>,</span>
+<span class='r-in'>                cor <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/diag.html'>diag</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 1 × 5</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   x1_mean x1_sd    x2 .int_x1       .int_x2      </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;list&gt;</span>        <span style='color: #949494; font-style: italic;'>&lt;list&gt;</span>       </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span>       2   0.5   0.8 <span style='color: #949494;'>&lt;dbl [1,000]&gt;</span> <span style='color: #949494;'>&lt;dbl [1,000]&gt;</span></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

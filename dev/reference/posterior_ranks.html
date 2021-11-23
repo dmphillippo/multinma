@@ -229,7 +229,7 @@ default) or higher better (<code>FALSE</code>)? See details.</p></td>
     <tr>
       <th>probs</th>
       <td><p>Numeric vector of quantiles of interest to present in computed
-summary, default <code><a href='https://rdrr.io/r/base/c.html'>c(0.025, 0.25, 0.5, 0.75, 0.975)</a></code></p></td>
+summary, default <code>c(0.025, 0.25, 0.5, 0.75, 0.975)</code></p></td>
     </tr>
     <tr>
       <th>summary</th>
@@ -266,362 +266,378 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
     <div class='dont-index'><p><code><a href='plot.nma_summary.html'>plot.nma_summary()</a></code> for plotting the ranks and rank probabilities.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>## Smoking cessation</span>
-<span class='co'># \donttest{</span>
-<span class='co'># Run smoking RE NMA example if not already available</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/exists.html'>exists</a></span><span class='op'>(</span><span class='st'>"smk_fit_RE"</span><span class='op'>)</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/utils/example.html'>example</a></span><span class='op'>(</span><span class='st'>"example_smk_re"</span>, run.donttest <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-<span class='co'># }</span>
-<span class='co'># \donttest{</span>
-<span class='co'># Produce posterior ranks</span>
-<span class='va'>smk_rank_RE</span> <span class='op'>&lt;-</span> <span class='fu'>posterior_ranks</span><span class='op'>(</span><span class='va'>smk_fit_RE</span>, lower_better <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-<span class='va'>smk_rank_RE</span>
-</div><div class='output co'>#&gt;                              mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS
-#&gt; rank[No intervention]        3.89 0.33    3   4   4   4     4     2435       NA
-#&gt; rank[Group counselling]      1.37 0.62    1   1   1   2     3     2920     2994
-#&gt; rank[Individual counselling] 1.93 0.63    1   2   2   2     3     2630     2407
-#&gt; rank[Self-help]              2.81 0.69    1   3   3   3     4     2584       NA
-#&gt;                              Rhat
-#&gt; rank[No intervention]           1
-#&gt; rank[Group counselling]         1
-#&gt; rank[Individual counselling]    1
-#&gt; rank[Self-help]                 1</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>smk_rank_RE</span><span class='op'>)</span>
-</div><div class='img'><img src='posterior_ranks-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Produce rank probabilities</span>
-<span class='va'>smk_rankprob_RE</span> <span class='op'>&lt;-</span> <span class='fu'>posterior_rank_probs</span><span class='op'>(</span><span class='va'>smk_fit_RE</span>, lower_better <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-<span class='va'>smk_rankprob_RE</span>
-</div><div class='output co'>#&gt;                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]
-#&gt; d[No intervention]             0.00      0.00      0.11      0.89
-#&gt; d[Group counselling]           0.71      0.22      0.07      0.00
-#&gt; d[Individual counselling]      0.23      0.60      0.16      0.00
-#&gt; d[Self-help]                   0.06      0.18      0.66      0.11</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>smk_rankprob_RE</span><span class='op'>)</span>
-</div><div class='img'><img src='posterior_ranks-2.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Produce cumulative rank probabilities</span>
-<span class='va'>smk_cumrankprob_RE</span> <span class='op'>&lt;-</span> <span class='fu'>posterior_rank_probs</span><span class='op'>(</span><span class='va'>smk_fit_RE</span>, lower_better <span class='op'>=</span> <span class='cn'>FALSE</span>,
-                                           cumulative <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-<span class='va'>smk_cumrankprob_RE</span>
-</div><div class='output co'>#&gt;                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]
-#&gt; d[No intervention]             0.00      0.00      0.11         1
-#&gt; d[Group counselling]           0.71      0.93      1.00         1
-#&gt; d[Individual counselling]      0.23      0.83      1.00         1
-#&gt; d[Self-help]                   0.06      0.23      0.89         1</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>smk_cumrankprob_RE</span><span class='op'>)</span>
-</div><div class='img'><img src='posterior_ranks-3.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Further customisation is possible with ggplot commands</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>smk_cumrankprob_RE</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/facet_null.html'>facet_null</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>colour <span class='op'>=</span> <span class='va'>Treatment</span><span class='op'>)</span>
-</div><div class='img'><img src='posterior_ranks-4.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
-
-<span class='co'>## Plaque psoriasis ML-NMR</span>
-<span class='co'># \donttest{</span>
-<span class='co'># Run plaque psoriasis ML-NMR example if not already available</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/exists.html'>exists</a></span><span class='op'>(</span><span class='st'>"pso_fit"</span><span class='op'>)</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/utils/example.html'>example</a></span><span class='op'>(</span><span class='st'>"example_pso_mlnmr"</span>, run.donttest <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-<span class='co'># }</span>
-<span class='co'># \donttest{</span>
-<span class='co'># Produce population-adjusted rankings for all study populations in</span>
-<span class='co'># the network</span>
-
-<span class='co'># Ranks</span>
-<span class='va'>pso_rank</span> <span class='op'>&lt;-</span> <span class='fu'>posterior_ranks</span><span class='op'>(</span><span class='va'>pso_fit</span><span class='op'>)</span>
-<span class='va'>pso_rank</span>
-</div><div class='output co'>#&gt; <span style='color: #555555;'>----------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: FIXTURE</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt; 
-#&gt; Covariate values:
-#&gt;  durnpso prevsys  bsa weight  psa
-#&gt;     1.65    0.64 0.34   8.32 0.15
-#&gt; 
-#&gt;                        mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat
-#&gt; rank[FIXTURE: PBO]     1.00 0.00    1   1   1   1     1       NA       NA   NA
-#&gt; rank[FIXTURE: ETN]     2.00 0.00    2   2   2   2     2       NA       NA   NA
-#&gt; rank[FIXTURE: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA   NA
-#&gt; rank[FIXTURE: IXE_Q4W] 4.77 0.42    4   5   5   5     5     4177       NA    1
-#&gt; rank[FIXTURE: SEC_150] 3.00 0.04    3   3   3   3     3     4027     4027    1
-#&gt; rank[FIXTURE: SEC_300] 4.23 0.43    4   4   4   4     5     4176       NA    1
-#&gt; 
-#&gt; </span><span style='color: #555555;'>--------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: UNCOVER-1</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt; 
-#&gt; Covariate values:
-#&gt;  durnpso prevsys  bsa weight  psa
-#&gt;        2    0.73 0.28   9.24 0.28
-#&gt; 
-#&gt;                          mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS
-#&gt; rank[UNCOVER-1: PBO]     1.00 0.00    1   1   1   1     1       NA       NA
-#&gt; rank[UNCOVER-1: ETN]     2.00 0.00    2   2   2   2     2       NA       NA
-#&gt; rank[UNCOVER-1: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA
-#&gt; rank[UNCOVER-1: IXE_Q4W] 4.77 0.42    4   5   5   5     5     4177       NA
-#&gt; rank[UNCOVER-1: SEC_150] 3.00 0.04    3   3   3   3     3     4027     4027
-#&gt; rank[UNCOVER-1: SEC_300] 4.23 0.43    4   4   4   4     5     4176       NA
-#&gt;                          Rhat
-#&gt; rank[UNCOVER-1: PBO]       NA
-#&gt; rank[UNCOVER-1: ETN]       NA
-#&gt; rank[UNCOVER-1: IXE_Q2W]   NA
-#&gt; rank[UNCOVER-1: IXE_Q4W]    1
-#&gt; rank[UNCOVER-1: SEC_150]    1
-#&gt; rank[UNCOVER-1: SEC_300]    1
-#&gt; 
-#&gt; </span><span style='color: #555555;'>--------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: UNCOVER-2</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt; 
-#&gt; Covariate values:
-#&gt;  durnpso prevsys  bsa weight  psa
-#&gt;     1.87    0.64 0.27   9.17 0.24
-#&gt; 
-#&gt;                          mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS
-#&gt; rank[UNCOVER-2: PBO]     1.00 0.00    1   1   1   1     1       NA       NA
-#&gt; rank[UNCOVER-2: ETN]     2.00 0.00    2   2   2   2     2       NA       NA
-#&gt; rank[UNCOVER-2: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA
-#&gt; rank[UNCOVER-2: IXE_Q4W] 4.77 0.42    4   5   5   5     5     4177       NA
-#&gt; rank[UNCOVER-2: SEC_150] 3.00 0.04    3   3   3   3     3     4027     4027
-#&gt; rank[UNCOVER-2: SEC_300] 4.23 0.43    4   4   4   4     5     4176       NA
-#&gt;                          Rhat
-#&gt; rank[UNCOVER-2: PBO]       NA
-#&gt; rank[UNCOVER-2: ETN]       NA
-#&gt; rank[UNCOVER-2: IXE_Q2W]   NA
-#&gt; rank[UNCOVER-2: IXE_Q4W]    1
-#&gt; rank[UNCOVER-2: SEC_150]    1
-#&gt; rank[UNCOVER-2: SEC_300]    1
-#&gt; 
-#&gt; </span><span style='color: #555555;'>--------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: UNCOVER-3</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt; 
-#&gt; Covariate values:
-#&gt;  durnpso prevsys  bsa weight psa
-#&gt;     1.78    0.59 0.28   9.01 0.2
-#&gt; 
-#&gt;                          mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS
-#&gt; rank[UNCOVER-3: PBO]     1.00 0.00    1   1   1   1     1       NA       NA
-#&gt; rank[UNCOVER-3: ETN]     2.00 0.00    2   2   2   2     2       NA       NA
-#&gt; rank[UNCOVER-3: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA
-#&gt; rank[UNCOVER-3: IXE_Q4W] 4.77 0.42    4   5   5   5     5     4177       NA
-#&gt; rank[UNCOVER-3: SEC_150] 3.00 0.04    3   3   3   3     3     4027     4027
-#&gt; rank[UNCOVER-3: SEC_300] 4.23 0.43    4   4   4   4     5     4176       NA
-#&gt;                          Rhat
-#&gt; rank[UNCOVER-3: PBO]       NA
-#&gt; rank[UNCOVER-3: ETN]       NA
-#&gt; rank[UNCOVER-3: IXE_Q2W]   NA
-#&gt; rank[UNCOVER-3: IXE_Q4W]    1
-#&gt; rank[UNCOVER-3: SEC_150]    1
-#&gt; rank[UNCOVER-3: SEC_300]    1
-#&gt; </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>pso_rank</span><span class='op'>)</span>
-</div><div class='img'><img src='posterior_ranks-5.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Rank probabilities</span>
-<span class='va'>pso_rankprobs</span> <span class='op'>&lt;-</span> <span class='fu'>posterior_rank_probs</span><span class='op'>(</span><span class='va'>pso_fit</span><span class='op'>)</span>
-<span class='va'>pso_rankprobs</span>
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'>----------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: FIXTURE</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt; 
-#&gt; Covariate values:
-#&gt;  durnpso prevsys  bsa weight  psa
-#&gt;     1.65    0.64 0.34   8.32 0.15
-#&gt; 
-#&gt;                     p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6]
-#&gt; d[FIXTURE: PBO]             1         0         0      0.00      0.00         0
-#&gt; d[FIXTURE: ETN]             0         1         0      0.00      0.00         0
-#&gt; d[FIXTURE: IXE_Q2W]         0         0         0      0.00      0.00         1
-#&gt; d[FIXTURE: IXE_Q4W]         0         0         0      0.23      0.77         0
-#&gt; d[FIXTURE: SEC_150]         0         0         1      0.00      0.00         0
-#&gt; d[FIXTURE: SEC_300]         0         0         0      0.76      0.23         0
-#&gt; 
-#&gt; </span><span style='color: #555555;'>--------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: UNCOVER-1</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt; 
-#&gt; Covariate values:
-#&gt;  durnpso prevsys  bsa weight  psa
-#&gt;        2    0.73 0.28   9.24 0.28
-#&gt; 
-#&gt;                       p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]
-#&gt; d[UNCOVER-1: PBO]             1         0         0      0.00      0.00
-#&gt; d[UNCOVER-1: ETN]             0         1         0      0.00      0.00
-#&gt; d[UNCOVER-1: IXE_Q2W]         0         0         0      0.00      0.00
-#&gt; d[UNCOVER-1: IXE_Q4W]         0         0         0      0.23      0.77
-#&gt; d[UNCOVER-1: SEC_150]         0         0         1      0.00      0.00
-#&gt; d[UNCOVER-1: SEC_300]         0         0         0      0.76      0.23
-#&gt;                       p_rank[6]
-#&gt; d[UNCOVER-1: PBO]             0
-#&gt; d[UNCOVER-1: ETN]             0
-#&gt; d[UNCOVER-1: IXE_Q2W]         1
-#&gt; d[UNCOVER-1: IXE_Q4W]         0
-#&gt; d[UNCOVER-1: SEC_150]         0
-#&gt; d[UNCOVER-1: SEC_300]         0
-#&gt; 
-#&gt; </span><span style='color: #555555;'>--------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: UNCOVER-2</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt; 
-#&gt; Covariate values:
-#&gt;  durnpso prevsys  bsa weight  psa
-#&gt;     1.87    0.64 0.27   9.17 0.24
-#&gt; 
-#&gt;                       p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]
-#&gt; d[UNCOVER-2: PBO]             1         0         0      0.00      0.00
-#&gt; d[UNCOVER-2: ETN]             0         1         0      0.00      0.00
-#&gt; d[UNCOVER-2: IXE_Q2W]         0         0         0      0.00      0.00
-#&gt; d[UNCOVER-2: IXE_Q4W]         0         0         0      0.23      0.77
-#&gt; d[UNCOVER-2: SEC_150]         0         0         1      0.00      0.00
-#&gt; d[UNCOVER-2: SEC_300]         0         0         0      0.76      0.23
-#&gt;                       p_rank[6]
-#&gt; d[UNCOVER-2: PBO]             0
-#&gt; d[UNCOVER-2: ETN]             0
-#&gt; d[UNCOVER-2: IXE_Q2W]         1
-#&gt; d[UNCOVER-2: IXE_Q4W]         0
-#&gt; d[UNCOVER-2: SEC_150]         0
-#&gt; d[UNCOVER-2: SEC_300]         0
-#&gt; 
-#&gt; </span><span style='color: #555555;'>--------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: UNCOVER-3</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt; 
-#&gt; Covariate values:
-#&gt;  durnpso prevsys  bsa weight psa
-#&gt;     1.78    0.59 0.28   9.01 0.2
-#&gt; 
-#&gt;                       p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]
-#&gt; d[UNCOVER-3: PBO]             1         0         0      0.00      0.00
-#&gt; d[UNCOVER-3: ETN]             0         1         0      0.00      0.00
-#&gt; d[UNCOVER-3: IXE_Q2W]         0         0         0      0.00      0.00
-#&gt; d[UNCOVER-3: IXE_Q4W]         0         0         0      0.23      0.77
-#&gt; d[UNCOVER-3: SEC_150]         0         0         1      0.00      0.00
-#&gt; d[UNCOVER-3: SEC_300]         0         0         0      0.76      0.23
-#&gt;                       p_rank[6]
-#&gt; d[UNCOVER-3: PBO]             0
-#&gt; d[UNCOVER-3: ETN]             0
-#&gt; d[UNCOVER-3: IXE_Q2W]         1
-#&gt; d[UNCOVER-3: IXE_Q4W]         0
-#&gt; d[UNCOVER-3: SEC_150]         0
-#&gt; d[UNCOVER-3: SEC_300]         0
-#&gt; </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>pso_rankprobs</span><span class='op'>)</span>
-</div><div class='img'><img src='posterior_ranks-6.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Cumulative rank probabilities</span>
-<span class='va'>pso_cumrankprobs</span> <span class='op'>&lt;-</span> <span class='fu'>posterior_rank_probs</span><span class='op'>(</span><span class='va'>pso_fit</span>, cumulative <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-<span class='va'>pso_cumrankprobs</span>
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'>----------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: FIXTURE</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt; 
-#&gt; Covariate values:
-#&gt;  durnpso prevsys  bsa weight  psa
-#&gt;     1.65    0.64 0.34   8.32 0.15
-#&gt; 
-#&gt;                     p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6]
-#&gt; d[FIXTURE: PBO]             1         1         1      1.00         1         1
-#&gt; d[FIXTURE: ETN]             0         1         1      1.00         1         1
-#&gt; d[FIXTURE: IXE_Q2W]         0         0         0      0.00         0         1
-#&gt; d[FIXTURE: IXE_Q4W]         0         0         0      0.23         1         1
-#&gt; d[FIXTURE: SEC_150]         0         0         1      1.00         1         1
-#&gt; d[FIXTURE: SEC_300]         0         0         0      0.77         1         1
-#&gt; 
-#&gt; </span><span style='color: #555555;'>--------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: UNCOVER-1</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt; 
-#&gt; Covariate values:
-#&gt;  durnpso prevsys  bsa weight  psa
-#&gt;        2    0.73 0.28   9.24 0.28
-#&gt; 
-#&gt;                       p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]
-#&gt; d[UNCOVER-1: PBO]             1         1         1      1.00         1
-#&gt; d[UNCOVER-1: ETN]             0         1         1      1.00         1
-#&gt; d[UNCOVER-1: IXE_Q2W]         0         0         0      0.00         0
-#&gt; d[UNCOVER-1: IXE_Q4W]         0         0         0      0.23         1
-#&gt; d[UNCOVER-1: SEC_150]         0         0         1      1.00         1
-#&gt; d[UNCOVER-1: SEC_300]         0         0         0      0.77         1
-#&gt;                       p_rank[6]
-#&gt; d[UNCOVER-1: PBO]             1
-#&gt; d[UNCOVER-1: ETN]             1
-#&gt; d[UNCOVER-1: IXE_Q2W]         1
-#&gt; d[UNCOVER-1: IXE_Q4W]         1
-#&gt; d[UNCOVER-1: SEC_150]         1
-#&gt; d[UNCOVER-1: SEC_300]         1
-#&gt; 
-#&gt; </span><span style='color: #555555;'>--------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: UNCOVER-2</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt; 
-#&gt; Covariate values:
-#&gt;  durnpso prevsys  bsa weight  psa
-#&gt;     1.87    0.64 0.27   9.17 0.24
-#&gt; 
-#&gt;                       p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]
-#&gt; d[UNCOVER-2: PBO]             1         1         1      1.00         1
-#&gt; d[UNCOVER-2: ETN]             0         1         1      1.00         1
-#&gt; d[UNCOVER-2: IXE_Q2W]         0         0         0      0.00         0
-#&gt; d[UNCOVER-2: IXE_Q4W]         0         0         0      0.23         1
-#&gt; d[UNCOVER-2: SEC_150]         0         0         1      1.00         1
-#&gt; d[UNCOVER-2: SEC_300]         0         0         0      0.77         1
-#&gt;                       p_rank[6]
-#&gt; d[UNCOVER-2: PBO]             1
-#&gt; d[UNCOVER-2: ETN]             1
-#&gt; d[UNCOVER-2: IXE_Q2W]         1
-#&gt; d[UNCOVER-2: IXE_Q4W]         1
-#&gt; d[UNCOVER-2: SEC_150]         1
-#&gt; d[UNCOVER-2: SEC_300]         1
-#&gt; 
-#&gt; </span><span style='color: #555555;'>--------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: UNCOVER-3</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt; 
-#&gt; Covariate values:
-#&gt;  durnpso prevsys  bsa weight psa
-#&gt;     1.78    0.59 0.28   9.01 0.2
-#&gt; 
-#&gt;                       p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]
-#&gt; d[UNCOVER-3: PBO]             1         1         1      1.00         1
-#&gt; d[UNCOVER-3: ETN]             0         1         1      1.00         1
-#&gt; d[UNCOVER-3: IXE_Q2W]         0         0         0      0.00         0
-#&gt; d[UNCOVER-3: IXE_Q4W]         0         0         0      0.23         1
-#&gt; d[UNCOVER-3: SEC_150]         0         0         1      1.00         1
-#&gt; d[UNCOVER-3: SEC_300]         0         0         0      0.77         1
-#&gt;                       p_rank[6]
-#&gt; d[UNCOVER-3: PBO]             1
-#&gt; d[UNCOVER-3: ETN]             1
-#&gt; d[UNCOVER-3: IXE_Q2W]         1
-#&gt; d[UNCOVER-3: IXE_Q4W]         1
-#&gt; d[UNCOVER-3: SEC_150]         1
-#&gt; d[UNCOVER-3: SEC_300]         1
-#&gt; </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>pso_cumrankprobs</span><span class='op'>)</span>
-</div><div class='img'><img src='posterior_ranks-7.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Produce population-adjusted rankings for a different target</span>
-<span class='co'># population</span>
-<span class='va'>new_agd_means</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>
-  bsa <span class='op'>=</span> <span class='fl'>0.6</span>,
-  prevsys <span class='op'>=</span> <span class='fl'>0.1</span>,
-  psa <span class='op'>=</span> <span class='fl'>0.2</span>,
-  weight <span class='op'>=</span> <span class='fl'>10</span>,
-  durnpso <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
-
-<span class='co'># Ranks</span>
-<span class='fu'>posterior_ranks</span><span class='op'>(</span><span class='va'>pso_fit</span>, newdata <span class='op'>=</span> <span class='va'>new_agd_means</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'>------------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: New 1</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt; 
-#&gt; Covariate values:
-#&gt;  durnpso prevsys bsa weight psa
-#&gt;        3     0.1 0.6     10 0.2
-#&gt; 
-#&gt;                      mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat
-#&gt; rank[New 1: PBO]     1.00 0.00    1   1   1   1     1       NA       NA   NA
-#&gt; rank[New 1: ETN]     2.00 0.00    2   2   2   2     2       NA       NA   NA
-#&gt; rank[New 1: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA   NA
-#&gt; rank[New 1: IXE_Q4W] 4.77 0.42    4   5   5   5     5     4177       NA    1
-#&gt; rank[New 1: SEC_150] 3.00 0.04    3   3   3   3     3     4027     4027    1
-#&gt; rank[New 1: SEC_300] 4.23 0.43    4   4   4   4     5     4176       NA    1
-#&gt; </div><div class='input'>
-<span class='co'># Rank probabilities</span>
-<span class='fu'>posterior_rank_probs</span><span class='op'>(</span><span class='va'>pso_fit</span>, newdata <span class='op'>=</span> <span class='va'>new_agd_means</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'>------------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: New 1</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt; 
-#&gt; Covariate values:
-#&gt;  durnpso prevsys bsa weight psa
-#&gt;        3     0.1 0.6     10 0.2
-#&gt; 
-#&gt;                   p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6]
-#&gt; d[New 1: PBO]             1         0         0      0.00      0.00         0
-#&gt; d[New 1: ETN]             0         1         0      0.00      0.00         0
-#&gt; d[New 1: IXE_Q2W]         0         0         0      0.00      0.00         1
-#&gt; d[New 1: IXE_Q4W]         0         0         0      0.23      0.77         0
-#&gt; d[New 1: SEC_150]         0         0         1      0.00      0.00         0
-#&gt; d[New 1: SEC_300]         0         0         0      0.76      0.23         0
-#&gt; </div><div class='input'>
-<span class='co'># Cumulative rank probabilities</span>
-<span class='fu'>posterior_rank_probs</span><span class='op'>(</span><span class='va'>pso_fit</span>, newdata <span class='op'>=</span> <span class='va'>new_agd_means</span>,
-                     cumulative <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'>------------------------------------------------------------------</span><span> </span><span style='font-weight: bold;'>Study: New 1</span><span> </span><span style='color: #555555;'>----</span><span> 
-#&gt; 
-#&gt; Covariate values:
-#&gt;  durnpso prevsys bsa weight psa
-#&gt;        3     0.1 0.6     10 0.2
-#&gt; 
-#&gt;                   p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6]
-#&gt; d[New 1: PBO]             1         1         1      1.00         1         1
-#&gt; d[New 1: ETN]             0         1         1      1.00         1         1
-#&gt; d[New 1: IXE_Q2W]         0         0         0      0.00         0         1
-#&gt; d[New 1: IXE_Q4W]         0         0         0      0.23         1         1
-#&gt; d[New 1: SEC_150]         0         0         1      1.00         1         1
-#&gt; d[New 1: SEC_300]         0         0         0      0.77         1         1
-#&gt; </div><div class='input'><span class='co'># }</span>
-</div></span></pre>
+    <pre class="examples"><span class='r-in'><span class='co'>## Smoking cessation</span></span>
+<span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='co'># Run smoking RE NMA example if not already available</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/exists.html'>exists</a></span><span class='op'>(</span><span class='st'>"smk_fit_RE"</span><span class='op'>)</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/utils/example.html'>example</a></span><span class='op'>(</span><span class='st'>"example_smk_re"</span>, run.donttest <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='co'># Produce posterior ranks</span></span>
+<span class='r-in'><span class='va'>smk_rank_RE</span> <span class='op'>&lt;-</span> <span class='fu'>posterior_ranks</span><span class='op'>(</span><span class='va'>smk_fit_RE</span>, lower_better <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>smk_rank_RE</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                              mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[No intervention]        3.89 0.33    3   4   4   4     4     2435       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[Group counselling]      1.37 0.62    1   1   1   2     3     2920     2994</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[Individual counselling] 1.93 0.63    1   2   2   2     3     2630     2407</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[Self-help]              2.81 0.69    1   3   3   3     4     2584       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                              Rhat</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[No intervention]           1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[Group counselling]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[Individual counselling]    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[Self-help]                 1</span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>smk_rank_RE</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='posterior_ranks-1.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Produce rank probabilities</span></span>
+<span class='r-in'><span class='va'>smk_rankprob_RE</span> <span class='op'>&lt;-</span> <span class='fu'>posterior_rank_probs</span><span class='op'>(</span><span class='va'>smk_fit_RE</span>, lower_better <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>smk_rankprob_RE</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[No intervention]             0.00      0.00      0.11      0.89</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[Group counselling]           0.71      0.22      0.07      0.00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[Individual counselling]      0.23      0.60      0.16      0.00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[Self-help]                   0.06      0.18      0.66      0.11</span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>smk_rankprob_RE</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='posterior_ranks-2.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Produce cumulative rank probabilities</span></span>
+<span class='r-in'><span class='va'>smk_cumrankprob_RE</span> <span class='op'>&lt;-</span> <span class='fu'>posterior_rank_probs</span><span class='op'>(</span><span class='va'>smk_fit_RE</span>, lower_better <span class='op'>=</span> <span class='cn'>FALSE</span>,</span>
+<span class='r-in'>                                           cumulative <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>smk_cumrankprob_RE</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[No intervention]             0.00      0.00      0.11         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[Group counselling]           0.71      0.93      1.00         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[Individual counselling]      0.23      0.83      1.00         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[Self-help]                   0.06      0.23      0.89         1</span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>smk_cumrankprob_RE</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='posterior_ranks-3.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Further customisation is possible with ggplot commands</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>smk_cumrankprob_RE</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>  <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/facet_null.html'>facet_null</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span class='r-in'>  <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>colour <span class='op'>=</span> <span class='va'>Treatment</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='posterior_ranks-4.png' alt='' width='700' height='433' /></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Plaque psoriasis ML-NMR</span></span>
+<span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='co'># Run plaque psoriasis ML-NMR example if not already available</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/exists.html'>exists</a></span><span class='op'>(</span><span class='st'>"pso_fit"</span><span class='op'>)</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/utils/example.html'>example</a></span><span class='op'>(</span><span class='st'>"example_pso_mlnmr"</span>, run.donttest <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+<span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='co'># Produce population-adjusted rankings for all study populations in</span></span>
+<span class='r-in'><span class='co'># the network</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Ranks</span></span>
+<span class='r-in'><span class='va'>pso_rank</span> <span class='op'>&lt;-</span> <span class='fu'>posterior_ranks</span><span class='op'>(</span><span class='va'>pso_fit</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>pso_rank</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>----------------------------------------------------------------</span> <span style='font-weight: bold;'>Study: FIXTURE</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Covariate values:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  durnpso prevsys  bsa weight  psa</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     1.65    0.64 0.34   8.32 0.15</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                        mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[FIXTURE: PBO]     1.00 0.00    1   1   1   1     1       NA       NA   NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[FIXTURE: ETN]     2.00 0.00    2   2   2   2     2       NA       NA   NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[FIXTURE: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA   NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[FIXTURE: IXE_Q4W] 4.77 0.42    4   5   5   5     5     4177       NA    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[FIXTURE: SEC_150] 3.00 0.04    3   3   3   3     3     4027     4027    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[FIXTURE: SEC_300] 4.23 0.43    4   4   4   4     5     4176       NA    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>--------------------------------------------------------------</span> <span style='font-weight: bold;'>Study: UNCOVER-1</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Covariate values:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  durnpso prevsys  bsa weight  psa</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>        2    0.73 0.28   9.24 0.28</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                          mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-1: PBO]     1.00 0.00    1   1   1   1     1       NA       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-1: ETN]     2.00 0.00    2   2   2   2     2       NA       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-1: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-1: IXE_Q4W] 4.77 0.42    4   5   5   5     5     4177       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-1: SEC_150] 3.00 0.04    3   3   3   3     3     4027     4027</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-1: SEC_300] 4.23 0.43    4   4   4   4     5     4176       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                          Rhat</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-1: PBO]       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-1: ETN]       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-1: IXE_Q2W]   NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-1: IXE_Q4W]    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-1: SEC_150]    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-1: SEC_300]    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>--------------------------------------------------------------</span> <span style='font-weight: bold;'>Study: UNCOVER-2</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Covariate values:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  durnpso prevsys  bsa weight  psa</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     1.87    0.64 0.27   9.17 0.24</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                          mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-2: PBO]     1.00 0.00    1   1   1   1     1       NA       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-2: ETN]     2.00 0.00    2   2   2   2     2       NA       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-2: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-2: IXE_Q4W] 4.77 0.42    4   5   5   5     5     4177       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-2: SEC_150] 3.00 0.04    3   3   3   3     3     4027     4027</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-2: SEC_300] 4.23 0.43    4   4   4   4     5     4176       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                          Rhat</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-2: PBO]       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-2: ETN]       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-2: IXE_Q2W]   NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-2: IXE_Q4W]    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-2: SEC_150]    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-2: SEC_300]    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>--------------------------------------------------------------</span> <span style='font-weight: bold;'>Study: UNCOVER-3</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Covariate values:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  durnpso prevsys  bsa weight psa</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     1.78    0.59 0.28   9.01 0.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                          mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-3: PBO]     1.00 0.00    1   1   1   1     1       NA       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-3: ETN]     2.00 0.00    2   2   2   2     2       NA       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-3: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-3: IXE_Q4W] 4.77 0.42    4   5   5   5     5     4177       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-3: SEC_150] 3.00 0.04    3   3   3   3     3     4027     4027</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-3: SEC_300] 4.23 0.43    4   4   4   4     5     4176       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                          Rhat</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-3: PBO]       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-3: ETN]       NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-3: IXE_Q2W]   NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-3: IXE_Q4W]    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-3: SEC_150]    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[UNCOVER-3: SEC_300]    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>pso_rank</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='posterior_ranks-5.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Rank probabilities</span></span>
+<span class='r-in'><span class='va'>pso_rankprobs</span> <span class='op'>&lt;-</span> <span class='fu'>posterior_rank_probs</span><span class='op'>(</span><span class='va'>pso_fit</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>pso_rankprobs</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>----------------------------------------------------------------</span> <span style='font-weight: bold;'>Study: FIXTURE</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Covariate values:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  durnpso prevsys  bsa weight  psa</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     1.65    0.64 0.34   8.32 0.15</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                     p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[FIXTURE: PBO]             1         0         0      0.00      0.00         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[FIXTURE: ETN]             0         1         0      0.00      0.00         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[FIXTURE: IXE_Q2W]         0         0         0      0.00      0.00         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[FIXTURE: IXE_Q4W]         0         0         0      0.23      0.77         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[FIXTURE: SEC_150]         0         0         1      0.00      0.00         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[FIXTURE: SEC_300]         0         0         0      0.76      0.23         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>--------------------------------------------------------------</span> <span style='font-weight: bold;'>Study: UNCOVER-1</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Covariate values:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  durnpso prevsys  bsa weight  psa</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>        2    0.73 0.28   9.24 0.28</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: PBO]             1         0         0      0.00      0.00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: ETN]             0         1         0      0.00      0.00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: IXE_Q2W]         0         0         0      0.00      0.00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: IXE_Q4W]         0         0         0      0.23      0.77</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: SEC_150]         0         0         1      0.00      0.00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: SEC_300]         0         0         0      0.76      0.23</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       p_rank[6]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: PBO]             0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: ETN]             0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: IXE_Q2W]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: IXE_Q4W]         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: SEC_150]         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: SEC_300]         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>--------------------------------------------------------------</span> <span style='font-weight: bold;'>Study: UNCOVER-2</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Covariate values:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  durnpso prevsys  bsa weight  psa</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     1.87    0.64 0.27   9.17 0.24</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: PBO]             1         0         0      0.00      0.00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: ETN]             0         1         0      0.00      0.00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: IXE_Q2W]         0         0         0      0.00      0.00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: IXE_Q4W]         0         0         0      0.23      0.77</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: SEC_150]         0         0         1      0.00      0.00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: SEC_300]         0         0         0      0.76      0.23</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       p_rank[6]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: PBO]             0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: ETN]             0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: IXE_Q2W]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: IXE_Q4W]         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: SEC_150]         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: SEC_300]         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>--------------------------------------------------------------</span> <span style='font-weight: bold;'>Study: UNCOVER-3</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Covariate values:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  durnpso prevsys  bsa weight psa</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     1.78    0.59 0.28   9.01 0.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: PBO]             1         0         0      0.00      0.00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: ETN]             0         1         0      0.00      0.00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: IXE_Q2W]         0         0         0      0.00      0.00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: IXE_Q4W]         0         0         0      0.23      0.77</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: SEC_150]         0         0         1      0.00      0.00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: SEC_300]         0         0         0      0.76      0.23</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       p_rank[6]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: PBO]             0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: ETN]             0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: IXE_Q2W]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: IXE_Q4W]         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: SEC_150]         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: SEC_300]         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>pso_rankprobs</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='posterior_ranks-6.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Cumulative rank probabilities</span></span>
+<span class='r-in'><span class='va'>pso_cumrankprobs</span> <span class='op'>&lt;-</span> <span class='fu'>posterior_rank_probs</span><span class='op'>(</span><span class='va'>pso_fit</span>, cumulative <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>pso_cumrankprobs</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>----------------------------------------------------------------</span> <span style='font-weight: bold;'>Study: FIXTURE</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Covariate values:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  durnpso prevsys  bsa weight  psa</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     1.65    0.64 0.34   8.32 0.15</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                     p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[FIXTURE: PBO]             1         1         1      1.00         1         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[FIXTURE: ETN]             0         1         1      1.00         1         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[FIXTURE: IXE_Q2W]         0         0         0      0.00         0         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[FIXTURE: IXE_Q4W]         0         0         0      0.23         1         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[FIXTURE: SEC_150]         0         0         1      1.00         1         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[FIXTURE: SEC_300]         0         0         0      0.77         1         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>--------------------------------------------------------------</span> <span style='font-weight: bold;'>Study: UNCOVER-1</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Covariate values:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  durnpso prevsys  bsa weight  psa</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>        2    0.73 0.28   9.24 0.28</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: PBO]             1         1         1      1.00         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: ETN]             0         1         1      1.00         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: IXE_Q2W]         0         0         0      0.00         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: IXE_Q4W]         0         0         0      0.23         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: SEC_150]         0         0         1      1.00         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: SEC_300]         0         0         0      0.77         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       p_rank[6]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: PBO]             1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: ETN]             1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: IXE_Q2W]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: IXE_Q4W]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: SEC_150]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-1: SEC_300]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>--------------------------------------------------------------</span> <span style='font-weight: bold;'>Study: UNCOVER-2</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Covariate values:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  durnpso prevsys  bsa weight  psa</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     1.87    0.64 0.27   9.17 0.24</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: PBO]             1         1         1      1.00         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: ETN]             0         1         1      1.00         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: IXE_Q2W]         0         0         0      0.00         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: IXE_Q4W]         0         0         0      0.23         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: SEC_150]         0         0         1      1.00         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: SEC_300]         0         0         0      0.77         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       p_rank[6]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: PBO]             1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: ETN]             1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: IXE_Q2W]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: IXE_Q4W]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: SEC_150]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-2: SEC_300]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>--------------------------------------------------------------</span> <span style='font-weight: bold;'>Study: UNCOVER-3</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Covariate values:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  durnpso prevsys  bsa weight psa</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     1.78    0.59 0.28   9.01 0.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: PBO]             1         1         1      1.00         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: ETN]             0         1         1      1.00         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: IXE_Q2W]         0         0         0      0.00         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: IXE_Q4W]         0         0         0      0.23         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: SEC_150]         0         0         1      1.00         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: SEC_300]         0         0         0      0.77         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       p_rank[6]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: PBO]             1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: ETN]             1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: IXE_Q2W]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: IXE_Q4W]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: SEC_150]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[UNCOVER-3: SEC_300]         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>pso_cumrankprobs</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='posterior_ranks-7.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Produce population-adjusted rankings for a different target</span></span>
+<span class='r-in'><span class='co'># population</span></span>
+<span class='r-in'><span class='va'>new_agd_means</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span></span>
+<span class='r-in'>  bsa <span class='op'>=</span> <span class='fl'>0.6</span>,</span>
+<span class='r-in'>  prevsys <span class='op'>=</span> <span class='fl'>0.1</span>,</span>
+<span class='r-in'>  psa <span class='op'>=</span> <span class='fl'>0.2</span>,</span>
+<span class='r-in'>  weight <span class='op'>=</span> <span class='fl'>10</span>,</span>
+<span class='r-in'>  durnpso <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Ranks</span></span>
+<span class='r-in'><span class='fu'>posterior_ranks</span><span class='op'>(</span><span class='va'>pso_fit</span>, newdata <span class='op'>=</span> <span class='va'>new_agd_means</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>------------------------------------------------------------------</span> <span style='font-weight: bold;'>Study: New 1</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Covariate values:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  durnpso prevsys bsa weight psa</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>        3     0.1 0.6     10 0.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                      mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[New 1: PBO]     1.00 0.00    1   1   1   1     1       NA       NA   NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[New 1: ETN]     2.00 0.00    2   2   2   2     2       NA       NA   NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[New 1: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA   NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[New 1: IXE_Q4W] 4.77 0.42    4   5   5   5     5     4177       NA    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[New 1: SEC_150] 3.00 0.04    3   3   3   3     3     4027     4027    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> rank[New 1: SEC_300] 4.23 0.43    4   4   4   4     5     4176       NA    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Rank probabilities</span></span>
+<span class='r-in'><span class='fu'>posterior_rank_probs</span><span class='op'>(</span><span class='va'>pso_fit</span>, newdata <span class='op'>=</span> <span class='va'>new_agd_means</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>------------------------------------------------------------------</span> <span style='font-weight: bold;'>Study: New 1</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Covariate values:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  durnpso prevsys bsa weight psa</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>        3     0.1 0.6     10 0.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[New 1: PBO]             1         0         0      0.00      0.00         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[New 1: ETN]             0         1         0      0.00      0.00         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[New 1: IXE_Q2W]         0         0         0      0.00      0.00         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[New 1: IXE_Q4W]         0         0         0      0.23      0.77         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[New 1: SEC_150]         0         0         1      0.00      0.00         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[New 1: SEC_300]         0         0         0      0.76      0.23         0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Cumulative rank probabilities</span></span>
+<span class='r-in'><span class='fu'>posterior_rank_probs</span><span class='op'>(</span><span class='va'>pso_fit</span>, newdata <span class='op'>=</span> <span class='va'>new_agd_means</span>,</span>
+<span class='r-in'>                     cumulative <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #555555;'>------------------------------------------------------------------</span> <span style='font-weight: bold;'>Study: New 1</span> <span style='color: #555555;'>----</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Covariate values:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  durnpso prevsys bsa weight psa</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>        3     0.1 0.6     10 0.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[New 1: PBO]             1         1         1      1.00         1         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[New 1: ETN]             0         1         1      1.00         1         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[New 1: IXE_Q2W]         0         0         0      0.00         0         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[New 1: IXE_Q4W]         0         0         0      0.23         1         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[New 1: SEC_150]         0         0         1      1.00         1         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[New 1: SEC_300]         0         0         0      0.77         1         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='co'># }</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

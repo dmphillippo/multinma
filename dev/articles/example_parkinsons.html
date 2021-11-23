@@ -243,7 +243,7 @@
 <span class="co">#&gt; d[5] -0.30    0.00 0.21  -0.71 -0.44 -0.30 -0.17  0.10  2401    1</span>
 <span class="co">#&gt; lp__ -6.63    0.06 2.35 -12.04 -7.99 -6.28 -4.92 -3.10  1719    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Mar 18 15:02:17 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Nov 23 15:36:11 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -304,7 +304,7 @@
 <span class="co">#&gt; lp__ -12.88    0.10 3.62 -21.03 -15.18 -12.48 -10.28 -6.78  1268 1.00</span>
 <span class="co">#&gt; tau    0.38    0.01 0.38   0.01   0.12   0.27   0.51  1.43   776 1.01</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Mar 18 15:02:26 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Nov 23 15:36:21 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -567,7 +567,7 @@
 <span class="co">#&gt; d[5] -0.30    0.00 0.21 -0.70 -0.44 -0.30 -0.16  0.12  3772    1</span>
 <span class="co">#&gt; lp__ -3.16    0.04 1.41 -6.68 -3.86 -2.84 -2.11 -1.39  1572    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Mar 18 15:02:44 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Nov 23 15:36:41 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -619,7 +619,7 @@
 <span class="co">#&gt; lp__ -8.18    0.08 2.86 -14.57 -9.85 -7.85 -6.17 -3.55  1217    1</span>
 <span class="co">#&gt; tau   0.38    0.01 0.37   0.01  0.13  0.29  0.52  1.33   948    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Mar 18 15:02:51 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Nov 23 15:36:47 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -750,7 +750,7 @@
 <p>We now perform an analysis where some studies contribute arm-based data, and other contribute contrast-based data. Replicating <span class="citation">Dias et al. (2011)</span>, we consider arm-based data from studies 1-3, and contrast-based data from studies 4-7.</p>
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">studies</span> <span class="op">&lt;-</span> <span class="va">parkinsons</span><span class="op">$</span><span class="va">studyn</span>
-<span class="op">(</span><span class="va">parkinsons_arm</span> <span class="op">&lt;-</span> <span class="va">parkinsons</span><span class="op">[</span><span class="va">studies</span> <span class="op">%in%</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="op">]</span><span class="op">)</span>
+<span class="op">(</span><span class="va">parkinsons_arm</span> <span class="op">&lt;-</span> <span class="va">parkinsons</span><span class="op">[</span><span class="va">studies</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;   studyn trtn     y    se   n  diff se_diff</span>
 <span class="co">#&gt; 1      1    1 -1.22 0.504  54    NA   0.504</span>
 <span class="co">#&gt; 2      1    3 -1.53 0.439  95 -0.31   0.668</span>
@@ -759,7 +759,7 @@
 <span class="co">#&gt; 5      3    1 -0.30 0.505  76    NA   0.505</span>
 <span class="co">#&gt; 6      3    2 -2.60 0.510  71 -2.30   0.718</span>
 <span class="co">#&gt; 7      3    4 -1.20 0.478  81 -0.90   0.695</span>
-<span class="op">(</span><span class="va">parkinsons_contr</span> <span class="op">&lt;-</span> <span class="va">parkinsons</span><span class="op">[</span><span class="va">studies</span> <span class="op">%in%</span> <span class="fl">4</span><span class="op">:</span><span class="fl">7</span>, <span class="op">]</span><span class="op">)</span>
+<span class="op">(</span><span class="va">parkinsons_contr</span> <span class="op">&lt;-</span> <span class="va">parkinsons</span><span class="op">[</span><span class="va">studies</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fl">4</span><span class="op">:</span><span class="fl">7</span>, <span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    studyn trtn     y    se   n  diff se_diff</span>
 <span class="co">#&gt; 8       4    3 -0.24 0.265 128    NA   0.265</span>
 <span class="co">#&gt; 9       4    4 -0.59 0.354  72 -0.35   0.442</span>
@@ -853,7 +853,7 @@
 <span class="co">#&gt; d[5] -0.29    0.00 0.21 -0.70 -0.43 -0.30 -0.16  0.12  3097    1</span>
 <span class="co">#&gt; lp__ -4.54    0.04 1.87 -9.07 -5.58 -4.19 -3.16 -1.92  1807    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Mar 18 15:03:02 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Nov 23 15:36:59 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -914,7 +914,7 @@
 <span class="co">#&gt; lp__ -10.79    0.10 3.26 -17.96 -12.82 -10.48 -8.47 -5.21  1130 1.00</span>
 <span class="co">#&gt; tau    0.40    0.01 0.40   0.01   0.13   0.28  0.52  1.53   724 1.01</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Mar 18 15:03:12 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Nov 23 15:37:10 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
