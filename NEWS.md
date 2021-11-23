@@ -1,5 +1,7 @@
 # multinma 0.3.0.9000
 
+* Fix: `plot.nma_data()` no longer gives a ggplot deprecation warning.
+
 # multinma 0.3.0
 
 * Feature: Added `baseline_type` and `baseline_level` arguments to
