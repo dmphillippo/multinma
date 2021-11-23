@@ -304,4 +304,20 @@ test_that("Regression DIC", {
   expect_equivalent(bcg_dic_lat$pd, 21.1, tolerance = tol_dic)
   expect_equivalent(bcg_dic_lat$dic, 51.5, tolerance = tol_dic)
 })
+
+test_that("Relative effects and predict work with data.frame", {
+  new <- tibble::tibble(latitude = seq(10, 50, by = 10), label = paste0(latitude, "\u00B0 latitude"))
+  expect_identical(relative_effects(bcg_fit_lat, newdata = new, study = label),
+                   relative_effects(bcg_fit_lat, newdata = as.data.frame(new), study = label))
+  # For predict() we need to account for the random baseline sample
+  # expect_identical(withr::with_seed(predict(bcg_fit_lat, newdata = new, study = label,
+  #                                           baseline = distr(qnorm, mean = -2, sd = 0.1)), seed = 1234),
+  #                  withr::with_seed(predict(bcg_fit_lat, newdata = as.data.frame(new), study = label,
+  #                                           baseline = distr(qnorm, mean = -2, sd = 0.1)), seed = 1234))
+  qcons <- function(p, cons = 0) {cons}
+  expect_identical(predict(bcg_fit_lat, newdata = new, study = label,
+                           baseline = distr(qcons, -2)),
+                   predict(bcg_fit_lat, newdata = as.data.frame(new), study = label,
+                           baseline = distr(qcons, -2)))
+})
 ```
