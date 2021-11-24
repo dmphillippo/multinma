@@ -504,9 +504,11 @@ test_that("Robust to custom options(contrasts) settings", {
                  iter = 5000))
 
   expect_equal(as_tibble(summary(af_fit_4b_SAS))[, c("parameter", "mean", "sd")],
-               as_tibble(summary(af_fit_4b))[, c("parameter", "mean", "sd")])
+               as_tibble(summary(af_fit_4b))[, c("parameter", "mean", "sd")],
+               tolerance = tol)
   expect_equal(as_tibble(relative_effects(af_fit_4b_SAS))[, c("parameter", "mean", "sd")],
-               as_tibble(relative_effects(af_fit_4b))[, c("parameter", "mean", "sd")])
+               as_tibble(relative_effects(af_fit_4b))[, c("parameter", "mean", "sd")],
+               tolerance = tol)
 })
 
 ```

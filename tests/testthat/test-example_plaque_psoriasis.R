@@ -432,23 +432,24 @@ test_that("FE average response probabilities in target population", {
 })
 
 test_that("Robust to custom options(contrasts) settings", {
-  pso_fit_FE_SAS <- withr::with_options(list(contrasts = c(ordered = "contr.SAS",
-                                                       unordered = "contr.SAS")),
-                  nma(pso_net, 
-                      trt_effects = "fixed",
-                      link = "probit", 
-                      likelihood = "bernoulli2",
-                      regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
-                      class_interactions = "common",
-                      prior_intercept = normal(scale = 10),
-                      prior_trt = normal(scale = 10),
-                      prior_reg = normal(scale = 10),
-                      init_r = 0.1,
-                      QR = TRUE))
-
-  expect_equal(as_tibble(summary(pso_fit_FE_SAS))[, c("parameter", "mean", "sd")],
-               as_tibble(summary(pso_fit_FE))[, c("parameter", "mean", "sd")])
-  expect_equal(as_tibble(relative_effects(pso_fit_FE_SAS))[, c("parameter", "mean", "sd")],
-               as_tibble(relative_effects(pso_fit_FE))[, c("parameter", "mean", "sd")])
+  withr::with_options(list(contrasts = c(ordered = "contr.SAS", unordered = "contr.SAS")), {
+    pso_fit_FE_SAS <- nma(pso_net, 
+                          trt_effects = "fixed",
+                          link = "probit", 
+                          likelihood = "bernoulli2",
+                          regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
+                          class_interactions = "common",
+                          prior_intercept = normal(scale = 10),
+                          prior_trt = normal(scale = 10),
+                          prior_reg = normal(scale = 10),
+                          init_r = 0.1,
+                          QR = TRUE)
+    
+    pso_fit_FE_SAS_releff <- as_tibble(relative_effects(pso_fit_FE_SAS))[, c("parameter", "mean", "sd")]
+  })
+  
+  expect_equal(pso_fit_FE_SAS_releff,
+               as_tibble(relative_effects(pso_fit_FE))[, c("parameter", "mean", "sd")],
+               tolerance = tol)
 })
 
