@@ -1688,8 +1688,12 @@ make_nma_model_matrix <- function(nma_formula,
     single_study_label <- NULL
   }
 
+  # Explicitly set contrasts attribute for key variables
+  dotvars <- intersect(c(".trt", ".trtclass", ".study", ".contr"), colnames(dat_all))
+  fixcontr <- as.list(setNames(rep("contr.treatment", times = length(dotvars)), dotvars))
+
   # Apply NMA formula to get design matrix
-  X_all <- model.matrix(nma_formula, data = dat_all)
+  X_all <- model.matrix(nma_formula, data = dat_all, contrasts.arg = fixcontr)
   offsets <- model.offset(model.frame(nma_formula, data = dat_all))
   has_offset <- !is.null(offsets)
 
