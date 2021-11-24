@@ -352,3 +352,26 @@ test_that("nma() error with incompatible priors", {
   expect_error(nma(smknet, prior_intercept = half_normal(1), prior_trt = normal(0, 1)), m)
   expect_error(nma(smknet, prior_intercept = normal(0, 1), prior_trt = half_normal(1)), m)
 })
+
+test_that("Robust to custom options(contrasts) settings", {
+  skip_on_cran()
+
+  smkfit <- nma(smknet,
+                trt_effects = "random",
+                prior_intercept = normal(scale = 100),
+                prior_trt = normal(scale = 100),
+                prior_het = normal(scale = 5))
+
+  smkfit_SAS <- withr::with_options(list(contrasts = c(ordered = "contr.SAS",
+                                                       unordered = "contr.SAS")),
+                                    nma(smknet,
+                                        trt_effects = "random",
+                                        prior_intercept = normal(scale = 100),
+                                        prior_trt = normal(scale = 100),
+                                        prior_het = normal(scale = 5)))
+
+  expect_equal(as_tibble(summary(smkfit_SAS))[, c("parameter", "mean", "sd")],
+               as_tibble(summary(smkfit))[, c("parameter", "mean", "sd")])
+  expect_equal(as_tibble(relative_effects(smkfit_SAS))[, c("parameter", "mean", "sd")],
+               as_tibble(relative_effects(smkfit))[, c("parameter", "mean", "sd")])
+})

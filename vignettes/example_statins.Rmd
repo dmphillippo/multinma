@@ -256,5 +256,20 @@ test_that("RE DIC", {
   expect_equivalent(statin_dic_RE$dic, 66.8, tolerance = tol_dic)
 })
 
+test_that("Robust to custom options(contrasts) settings", {
+  statin_fit_FE_SAS <- withr::with_options(list(contrasts = c(ordered = "contr.SAS",
+                                                         unordered = "contr.SAS")),
+                     nma(statin_net, 
+                       trt_effects = "fixed",
+                       regression = ~.trt:prevention,
+                       prior_intercept = normal(scale = 100),
+                       prior_trt = normal(scale = 100),
+                       prior_reg = normal(scale = 100)))
+
+  expect_equal(as_tibble(summary(statin_fit_FE_SAS))[, c("parameter", "mean", "sd")],
+               as_tibble(summary(statin_fit_FE))[, c("parameter", "mean", "sd")])
+  expect_equal(as_tibble(relative_effects(statin_fit_FE_SAS))[, c("parameter", "mean", "sd")],
+               as_tibble(relative_effects(statin_fit_FE))[, c("parameter", "mean", "sd")])
+})
 
 ```

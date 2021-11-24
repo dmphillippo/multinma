@@ -1041,3 +1041,45 @@ test_that("ML-NMR models work with contrast data", {
                                 tolerance = tol)
 })
 
+test_that("Robust to custom options(contrasts) settings", {
+  arm_fit_FE_SAS <- withr::with_options(list(contrasts = c(ordered = "contr.SAS",
+                                                         unordered = "contr.SAS")),
+                  nma(arm_net, 
+                      trt_effects = "fixed",
+                      prior_intercept = normal(scale = 100),
+                      prior_trt = normal(scale = 10),
+                      iter = 10000))
+  
+    expect_equal(as_tibble(summary(arm_fit_FE_SAS))[, c("parameter", "mean", "sd")],
+                 as_tibble(summary(arm_fit_FE))[, c("parameter", "mean", "sd")])
+    expect_equal(as_tibble(relative_effects(arm_fit_FE_SAS))[, c("parameter", "mean", "sd")],
+                 as_tibble(relative_effects(arm_fit_FE))[, c("parameter", "mean", "sd")])
+  
+  contr_fit_FE_SAS <- withr::with_options(list(contrasts = c(ordered = "contr.SAS",
+                                                         unordered = "contr.SAS")),
+                  nma(contr_net, 
+                      trt_effects = "fixed",
+                      prior_intercept = normal(scale = 100),
+                      prior_trt = normal(scale = 10),
+                      iter = 10000))
+  
+    expect_equal(as_tibble(summary(contr_fit_FE_SAS))[, c("parameter", "mean", "sd")],
+                 as_tibble(summary(contr_fit_FE))[, c("parameter", "mean", "sd")])
+    expect_equal(as_tibble(relative_effects(contr_fit_FE_SAS))[, c("parameter", "mean", "sd")],
+                 as_tibble(relative_effects(contr_fit_FE))[, c("parameter", "mean", "sd")])
+    
+  mix_fit_FE_SAS <- withr::with_options(list(contrasts = c(ordered = "contr.SAS",
+                                                         unordered = "contr.SAS")),
+                  nma(mix_net, 
+                      trt_effects = "fixed",
+                      prior_intercept = normal(scale = 100),
+                      prior_trt = normal(scale = 10),
+                      iter = 10000))
+  
+    expect_equal(as_tibble(summary(mix_fit_FE_SAS))[, c("parameter", "mean", "sd")],
+                 as_tibble(summary(mix_fit_FE))[, c("parameter", "mean", "sd")])
+    expect_equal(as_tibble(relative_effects(mix_fit_FE_SAS))[, c("parameter", "mean", "sd")],
+                 as_tibble(relative_effects(mix_fit_FE))[, c("parameter", "mean", "sd")])
+
+})
+
