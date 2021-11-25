@@ -307,3 +307,43 @@ test_that("Equivalent ordered multinomial DIC", {
   expect_equivalent(dic_ord$dic, 99.0, tolerance = tol_dic)
 })
 
+test_that("Robust to custom options(contrasts) settings", {
+  skip_on_cran()
+  
+  withr::with_options(list(contrasts = c(ordered = "contr.SAS",
+                                                       unordered = "contr.SAS")), {
+    smkfit_SAS <- nma(smknet,
+                      trt_effects = "random",
+                      prior_intercept = normal(scale = 100),
+                      prior_trt = normal(scale = 100),
+                      prior_het = normal(scale = 5))
+    
+    smkfit_SAS_summary <- as_tibble(summary(smkfit_SAS))[, c("parameter", "mean", "sd")]
+    smkfit_SAS_releff <- as_tibble(relative_effects(smkfit_SAS))[, c("parameter", "mean", "sd")]
+    smkfit_SAS_pred <- as_tibble(predict(smkfit_SAS))[, c("parameter", "mean", "sd")]
+    
+    smkfit_ume_SAS <- nma(smknet,
+                      trt_effects = "random",
+                      consistency = "ume",
+                      prior_intercept = normal(scale = 100),
+                      prior_trt = normal(scale = 100),
+                      prior_het = normal(scale = 5))
+    
+    smkfit_ume_SAS_summary <- as_tibble(summary(smkfit_ume_SAS))[, c("parameter", "mean", "sd")]
+  })
+
+  expect_equal(smkfit_SAS_summary,
+               as_tibble(summary(smkfit))[, c("parameter", "mean", "sd")],
+               tolerance = tol)
+  expect_equal(smkfit_SAS_releff,
+               as_tibble(relative_effects(smkfit))[, c("parameter", "mean", "sd")],
+               tolerance = tol)
+  expect_equal(smkfit_SAS_pred,
+               as_tibble(predict(smkfit))[, c("parameter", "mean", "sd")],
+               tolerance = tol)
+  
+  expect_equal(smkfit_ume_SAS_summary,
+               as_tibble(summary(smkfit_ume))[, c("parameter", "mean", "sd")],
+               tolerance = tol)
+})
+
