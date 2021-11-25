@@ -210,7 +210,7 @@ predict.stan_nma <- function(object, ...,
 
   # Cannot produce predictions for inconsistency models
   if (object$consistency != "consistency")
-    abort(glue::glue("Cannot produce predictions under inconsistency '{x$consistency}' model."))
+    abort(glue::glue("Cannot produce predictions under inconsistency '{object$consistency}' model."))
 
   # Get NMA formula
   nma_formula <- make_nma_formula(object$regression,
