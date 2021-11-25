@@ -423,4 +423,28 @@ test_that("Construction of all contrasts in target population is correct (common
                check.attributes = FALSE)
 })
 
+test_that("Robust to custom options(contrasts) settings", {
+  af_fit_4b_SAS <- withr::with_options(list(contrasts = c(ordered = "contr.SAS",
+                                                       unordered = "contr.SAS")),
+             nma(af_net, 
+                 seed = 579212814,
+                 trt_effects = "random",
+                 regression = ~ .trt:stroke,
+                 class_interactions = "common",
+                 QR = TRUE,
+                 prior_intercept = normal(scale = 100),
+                 prior_trt = normal(scale = 100),
+                 prior_reg = normal(scale = 100),
+                 prior_het = half_normal(scale = 5),
+                 adapt_delta = 0.99,
+                 iter = 5000))
+
+  expect_equal(as_tibble(summary(af_fit_4b_SAS))[, c("parameter", "mean", "sd")],
+               as_tibble(summary(af_fit_4b))[, c("parameter", "mean", "sd")],
+               tolerance = tol)
+  expect_equal(as_tibble(relative_effects(af_fit_4b_SAS))[, c("parameter", "mean", "sd")],
+               as_tibble(relative_effects(af_fit_4b))[, c("parameter", "mean", "sd")],
+               tolerance = tol)
+})
+
 

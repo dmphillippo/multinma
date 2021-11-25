@@ -209,5 +209,24 @@ test_that("RE DIC", {
   expect_equivalent(statin_dic_RE$dic, 66.8, tolerance = tol_dic)
 })
 
+test_that("Robust to custom options(contrasts) settings", {
+  withr::with_options(list(contrasts = c(ordered = "contr.SAS",
+                                         unordered = "contr.SAS")), {
+    statin_fit_FE_SAS <- nma(statin_net, 
+                         trt_effects = "fixed",
+                         regression = ~.trt:prevention,
+                         prior_intercept = normal(scale = 100),
+                         prior_trt = normal(scale = 100),
+                         prior_reg = normal(scale = 100))
+    
+    # Model pars are different (reference level of prevention is different) but
+    # relative effects should still be calculated correctly
+    statin_fit_FE_SAS_releff <- as_tibble(relative_effects(statin_fit_FE_SAS))[, c("parameter", "mean", "sd")]
+  })
+
+  expect_equal(statin_fit_FE_SAS_releff,
+               as_tibble(relative_effects(statin_fit_FE))[, c("parameter", "mean", "sd")],
+               tolerance = tol)
+})
 
 

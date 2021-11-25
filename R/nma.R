@@ -1673,6 +1673,13 @@ make_nma_model_matrix <- function(nma_formula,
       purrr::map2(dat_all[, names(xbar), drop = FALSE], xbar, ~.x - .y)
   }
 
+  # Explicitly set contrasts attribute for key variables
+  fvars <- all.vars(nma_formula)
+  if (".trt" %in% fvars) stats::contrasts(dat_all$.trt) <- "contr.treatment"
+  if (".trtclass" %in% fvars) stats::contrasts(dat_all$.trtclass) <- "contr.treatment"
+  if (".contr" %in% fvars) stats::contrasts(dat_all$.contr) <- "contr.treatment"
+  # .study handled separately next (not always a factor)
+
   # Drop study to factor to 1L if only one study (avoid contrasts need 2 or
   # more levels error)
   if (dplyr::n_distinct(dat_all$.study) == 1) {
@@ -1686,6 +1693,7 @@ make_nma_model_matrix <- function(nma_formula,
     nma_formula <- update.formula(nma_formula, ~. + 1)
   } else {
     single_study_label <- NULL
+    if (".study" %in% fvars) stats::contrasts(dat_all$.study) <- "contr.treatment"
   }
 
   # Apply NMA formula to get design matrix

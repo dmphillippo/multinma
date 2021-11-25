@@ -1,5 +1,7 @@
 # multinma 0.3.0.9000
 
+* Fix: Model fitting is now robust to non-default settings of
+`options("contrasts")`.
 * Fix: `plot.nma_data()` no longer gives a ggplot deprecation warning (PR #6).
 * Fix: Bug in `predict.stan_nma()` with a single covariate when `newdata` is a
 `data.frame` (PR #7).
