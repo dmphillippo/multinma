@@ -35,6 +35,11 @@ Rows and columns should match the order of covariates specified in \code{...}.}
 
 \item{data}{Data frame with nested integration points, stored in list
 columns as \verb{.int_<variable name>}}
+
+\item{cor_adjust}{Adjustment to apply to the sample correlation matrix \code{cor}
+to obtain the Gaussian copula correlations, either \code{"spearman"},
+\code{"pearson"}, or \code{"none"}, see "Details". The default when \code{cor = NULL} is
+\code{"spearman"}, otherwise the default is \code{"pearson"}.}
 }
 \value{
 For the \code{nma_data} method, an object of class \link{nma_data}. For the
@@ -57,6 +62,31 @@ The arguments passed to \code{...} specify distributions for the
 covariates. Argument names specify the name of the covariate, which should
 match a covariate name in the IPD (if IPD are present). The required
 marginal distribution is then specified using the function \code{\link[=distr]{distr()}}.
+
+The argument \code{cor_adjust} specifies how the correlation matrix given by
+\code{cor} (or computed from the IPD if \code{cor = NULL}) is adjusted to obtain the
+correlation matrix for the Gaussian copula, using the formulae in
+\insertCite{Xiao2018;textual}{multinma}.
+\itemize{
+\item \code{cor_adjust = "spearman"} should be used when the correlations \code{cor} have
+been computed using Spearman's rank correlation. Correlations between
+continuous covariates will be reproduced exactly by the integration points.
+Correlations between discrete covariates will be reproduced approximately.
+This is the default when \code{cor = NULL} and correlations are calculated from
+the IPD studies.
+\item \code{cor_adjust = "pearson"} should be used when the correlations \code{cor} have
+been computed using Pearson's product-moment correlation. Correlations between
+Normal covariates will be reproduced exactly by the integration points, all
+others will be reproduced approximately. Correlations between discrete
+covariates will be reproduced approximately (and identically to \code{cor_adjust   = "spearman"}). This is the default when \code{cor} is provided by the user,
+since \code{cor()} defaults to \code{method = "pearson"}. However, we recommend
+providing Spearman correlations (e.g. from \code{cor(., method = "spearman")})
+and using \code{cor_adjust = "spearman"}.
+\item \code{cor_adjust = "none"} allows the user to specify the correlation matrix
+for the Gaussian copula directly; no adjustment is applied.
+\item \code{cor_adjust = "legacy"} is also available, which reproduces exactly the
+behaviour from version 0.3.0 and earlier. This is similar to \code{cor_adjust =   "none"}, but unadjusted Spearman correlations are used if \code{cor = NULL}.
+}
 }
 \examples{
 ## Plaque psoriasis ML-NMR - network setup and adding integration points

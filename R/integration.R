@@ -13,6 +13,10 @@
 #' @param cor Correlation matrix to use for generating the integration points.
 #'   By default, this takes a weighted correlation matrix from all IPD studies.
 #'   Rows and columns should match the order of covariates specified in `...`.
+#' @param cor_adjust Adjustment to apply to the sample correlation matrix `cor`
+#'   to obtain the Gaussian copula correlations, either `"spearman"`,
+#'   `"pearson"`, or `"none"`, see "Details". The default when `cor = NULL` is
+#'   `"spearman"`, otherwise the default is `"pearson"`.
 #' @param n_int Number of integration points to generate, default 1000
 #' @param int_args A named list of arguments to pass to
 #'   \code{\link[randtoolbox:quasiRNG]{sobol()}}
@@ -30,8 +34,36 @@
 #'   match a covariate name in the IPD (if IPD are present). The required
 #'   marginal distribution is then specified using the function [distr()].
 #'
-#' @references
-#'   \insertAllCited{}
+#'   The argument `cor_adjust` specifies how the correlation matrix given by
+#'   `cor` (or computed from the IPD if `cor = NULL`) is adjusted to obtain the
+#'   correlation matrix for the Gaussian copula, using the formulae in
+#'   \insertCite{Xiao2018;textual}{multinma}.
+#'
+#'   * `cor_adjust = "spearman"` should be used when the correlations `cor` have
+#'   been computed using Spearman's rank correlation. Correlations between
+#'   continuous covariates will be reproduced exactly by the integration points.
+#'   Correlations between discrete covariates will be reproduced approximately.
+#'   This is the default when `cor = NULL` and correlations are calculated from
+#'   the IPD studies.
+#'
+#'   * `cor_adjust = "pearson"` should be used when the correlations `cor` have
+#'   been computed using Pearson's product-moment correlation. Correlations between
+#'   Normal covariates will be reproduced exactly by the integration points, all
+#'   others will be reproduced approximately. Correlations between discrete
+#'   covariates will be reproduced approximately (and identically to `cor_adjust
+#'   = "spearman"`). This is the default when `cor` is provided by the user,
+#'   since `cor()` defaults to `method = "pearson"`. However, we recommend
+#'   providing Spearman correlations (e.g. from `cor(., method = "spearman")`)
+#'   and using `cor_adjust = "spearman"`.
+#'
+#'   * `cor_adjust = "none"` allows the user to specify the correlation matrix
+#'   for the Gaussian copula directly; no adjustment is applied.
+#'
+#'   * `cor_adjust = "legacy"` is also available, which reproduces exactly the
+#'   behaviour from version 0.3.0 and earlier. This is similar to `cor_adjust =
+#'   "none"`, but unadjusted Spearman correlations are used if `cor = NULL`.
+#'
+#' @references \insertAllCited{}
 #'
 #' @examples ## Plaque psoriasis ML-NMR - network setup and adding integration points
 #' @template ex_plaque_psoriasis_network
