@@ -14,7 +14,14 @@ add_integration(x, ...)
 
 \method{add_integration}{data.frame}(x, ..., cor = NULL, n_int = 1000L, int_args = list())
 
-\method{add_integration}{nma_data}(x, ..., cor = NULL, n_int = 1000L, int_args = list())
+\method{add_integration}{nma_data}(
+  x,
+  ...,
+  cor = NULL,
+  cor_adjust = NULL,
+  n_int = 1000L,
+  int_args = list()
+)
 
 unnest_integration(data)
 }
@@ -33,13 +40,13 @@ Rows and columns should match the order of covariates specified in \code{...}.}
 \item{int_args}{A named list of arguments to pass to
 \code{\link[randtoolbox:quasiRNG]{sobol()}}}
 
-\item{data}{Data frame with nested integration points, stored in list
-columns as \verb{.int_<variable name>}}
-
 \item{cor_adjust}{Adjustment to apply to the sample correlation matrix \code{cor}
 to obtain the Gaussian copula correlations, either \code{"spearman"},
 \code{"pearson"}, or \code{"none"}, see "Details". The default when \code{cor = NULL} is
 \code{"spearman"}, otherwise the default is \code{"pearson"}.}
+
+\item{data}{Data frame with nested integration points, stored in list
+columns as \verb{.int_<variable name>}}
 }
 \value{
 For the \code{nma_data} method, an object of class \link{nma_data}. For the
@@ -79,7 +86,7 @@ been computed using Pearson's product-moment correlation. Correlations between
 Normal covariates will be reproduced exactly by the integration points, all
 others will be reproduced approximately. Correlations between discrete
 covariates will be reproduced approximately (and identically to \code{cor_adjust   = "spearman"}). This is the default when \code{cor} is provided by the user,
-since \code{cor()} defaults to \code{method = "pearson"}. However, we recommend
+since \code{\link[=cor]{cor()}} defaults to \code{method = "pearson"}. However, we recommend
 providing Spearman correlations (e.g. from \code{cor(., method = "spearman")})
 and using \code{cor_adjust = "spearman"}.
 \item \code{cor_adjust = "none"} allows the user to specify the correlation matrix

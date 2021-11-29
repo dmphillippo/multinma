@@ -52,7 +52,7 @@
 #'   others will be reproduced approximately. Correlations between discrete
 #'   covariates will be reproduced approximately (and identically to `cor_adjust
 #'   = "spearman"`). This is the default when `cor` is provided by the user,
-#'   since `cor()` defaults to `method = "pearson"`. However, we recommend
+#'   since [cor()] defaults to `method = "pearson"`. However, we recommend
 #'   providing Spearman correlations (e.g. from `cor(., method = "spearman")`)
 #'   and using `cor_adjust = "spearman"`.
 #'
