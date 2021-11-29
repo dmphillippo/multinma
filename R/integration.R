@@ -136,8 +136,8 @@ add_integration.data.frame <- function(x, ...,
   x_names <- names(ds)  # Covariate names
   nx <- length(ds)      # Number of covariates
 
-  # Check cor
   if (nx > 1) {
+    # Check cor
     if (!is.null(cor)) {
       tryCatch(cor <- as.matrix(cor),
                error = function(e) abort("`cor` should be a correlation matrix or NULL"))
@@ -152,6 +152,17 @@ add_integration.data.frame <- function(x, ...,
         abort("Dimensions of correlation matrix `cor` and number of covariates specified in `...` do not match.")
     } else {
       abort("Specify a correlation matrix using the `cor` argument.")
+    }
+
+    # Check cor_adjust
+    # Use copula cor if present
+    if (!is.null(attr(cor, "copula_cor", exact = TRUE)))  {
+      cor_adjust <- attr(cor, "cor_adjust", exact = TRUE)
+    } else if (!is.null(cor_adjust)) {
+      cor_adjust <- rlang::arg_match(cor_adjust, values = c("spearman", "pearson", "none", "legacy"))
+    } else {
+      # Otherwise assume pearson cor (default for stats::cor)
+      cor_adjust <- "pearson"
     }
   }
 
@@ -208,7 +219,7 @@ add_integration.data.frame <- function(x, ...,
 #' @export
 #' @rdname add_integration
 add_integration.nma_data <- function(x, ...,
-                                     cor = NULL, n_int = 1000L, int_args = list()) {
+                                     cor = NULL, cor_adjust = NULL, n_int = 1000L, int_args = list()) {
 
   network <- x
 
@@ -256,6 +267,30 @@ add_integration.nma_data <- function(x, ...,
     if (!has_ipd(network)) abort("Specify a correlation matrix using the `cor` argument, or provide IPD studies in the network.")
   }
 
+  # Check cor_adjust
+
+  # If user provided cor
+  if (!is.null(cor)) {
+    if (!is.null(attr(cor, "copula_cor", exact = TRUE))) {
+      # Use copula cor if present
+      cor_adjust <- attr(cor, "cor_adjust", exact = TRUE)
+    } else if (!is.null(cor_adjust)) {
+      # Check cor_adjust when given
+      cor_adjust <- rlang::arg_match(cor_adjust, values = c("spearman", "pearson", "none", "legacy"))
+    } else {
+      # Otherwise assume pearson cor (default for stats::cor)
+      cor_adjust <- "pearson"
+    }
+  } else {
+    if (!is.null(cor_adjust)) {
+      # Check cor_adjust when given
+      cor_adjust <- rlang::arg_match(cor_adjust, values = c("spearman", "pearson", "none", "legacy"))
+    } else {
+      # No cor given, calculate from IPD with spearman
+      cor_adjust <- "spearman"
+    }
+  }
+
   # If IPD is provided, check that covariate names match
   if (has_ipd(network) && any(! x_names %in% colnames(network$ipd))) {
     abort(paste0("Covariate name(s) not found in IPD: ",
@@ -265,6 +300,7 @@ add_integration.nma_data <- function(x, ...,
   # Use weighted average correlation matrix from IPD, if cor = NULL
   if (is.null(cor) && nx > 1) {
     inform("Using weighted average correlation matrix computed from IPD studies.")
+    if (cor_adjust == "none") abort('Cannot specify cor_adjust = "none" when calculating correlations from IPD.')
 
 
     # Check for any missing covariates
@@ -311,7 +347,7 @@ add_integration.nma_data <- function(x, ...,
   if (has_agd_arm(network)) {
     out$agd_arm <- rlang::with_handlers(
       add_integration.data.frame(network$agd_arm, ...,
-                                 cor = cor, n_int = n_int, int_args = int_args),
+                                 cor = cor, cor_adjust = cor_adjust, n_int = n_int, int_args = int_args),
       int_col_present = rlang::calling(int_col_present),
       invalid_int_generated = invalid_int_generated)
   }
@@ -319,7 +355,7 @@ add_integration.nma_data <- function(x, ...,
   if (has_agd_contrast(network)) {
     out$agd_contrast <- rlang::with_handlers(
       add_integration.data.frame(network$agd_contrast, ...,
-                                 cor = cor, n_int = n_int, int_args = int_args),
+                                 cor = cor, cor_adjust = cor_adjust, n_int = n_int, int_args = int_args),
       int_col_present = rlang::calling(int_col_present),
       invalid_int_generated = invalid_int_generated)
   }
