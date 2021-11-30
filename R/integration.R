@@ -237,8 +237,10 @@ add_integration.data.frame <- function(x, ...,
           invalid_rows = invalid_rows)
 
   class(out) <- c("integration_tbl", class(out))
-  attr(out, "cor_adjust") <- cor_adjust
-  attr(out, "copula_cor") <- copula_cor
+  if (nx > 1) {
+    attr(out, "cor_adjust") <- cor_adjust
+    attr(out, "copula_cor") <- copula_cor
+  }
   return(out)
 }
 
