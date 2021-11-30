@@ -12,7 +12,14 @@ add_integration(x, ...)
 
 \method{add_integration}{default}(x, ...)
 
-\method{add_integration}{data.frame}(x, ..., cor = NULL, n_int = 1000L, int_args = list())
+\method{add_integration}{data.frame}(
+  x,
+  ...,
+  cor = NULL,
+  cor_adjust = NULL,
+  n_int = 1000L,
+  int_args = list()
+)
 
 \method{add_integration}{nma_data}(
   x,
@@ -35,15 +42,15 @@ unnest_integration(data)
 By default, this takes a weighted correlation matrix from all IPD studies.
 Rows and columns should match the order of covariates specified in \code{...}.}
 
-\item{n_int}{Number of integration points to generate, default 1000}
-
-\item{int_args}{A named list of arguments to pass to
-\code{\link[randtoolbox:quasiRNG]{sobol()}}}
-
 \item{cor_adjust}{Adjustment to apply to the sample correlation matrix \code{cor}
 to obtain the Gaussian copula correlations, either \code{"spearman"},
 \code{"pearson"}, or \code{"none"}, see "Details". The default when \code{cor = NULL} is
 \code{"spearman"}, otherwise the default is \code{"pearson"}.}
+
+\item{n_int}{Number of integration points to generate, default 1000}
+
+\item{int_args}{A named list of arguments to pass to
+\code{\link[randtoolbox:quasiRNG]{sobol()}}}
 
 \item{data}{Data frame with nested integration points, stored in list
 columns as \verb{.int_<variable name>}}

@@ -108,7 +108,8 @@ add_integration.default <- function(x, ...) {
 #' @export
 #' @rdname add_integration
 add_integration.data.frame <- function(x, ...,
-                                       cor = NULL, n_int = 1000L, int_args = list()) {
+                                       cor = NULL, cor_adjust = NULL,
+                                       n_int = 1000L, int_args = list()) {
 
   x <- tibble::as_tibble(x)
 
@@ -244,7 +245,8 @@ add_integration.data.frame <- function(x, ...,
 #' @export
 #' @rdname add_integration
 add_integration.nma_data <- function(x, ...,
-                                     cor = NULL, cor_adjust = NULL, n_int = 1000L, int_args = list()) {
+                                     cor = NULL, cor_adjust = NULL,
+                                     n_int = 1000L, int_args = list()) {
 
   network <- x
 
