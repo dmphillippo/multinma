@@ -171,6 +171,18 @@ add_integration.data.frame <- function(x, ...,
 
   # Correlate Sobol points with Gaussian copula
   if (nx > 1) {
+    if (!cor_adjust %in% c("none", "legacy")) {
+      # Apply adjustment to sample correlations to obtain copula correlations
+
+      dtypes <- get_distribution_type(..., data = head(x))
+
+      if (cor_adjust == "spearman") {
+        cor <- cor_adjust_spearman(cor, types = dtypes)
+      } else if (cor_adjust == "pearson") {
+        cor <- cor_adjust_pearson(cor, types = dtypes)
+      }
+    }
+
     cop <- copula::normalCopula(copula::P2p(cor), dim = nx, dispstr = "un")
     u_cor <- copula::cCopula(u, copula = cop, inverse = TRUE)
     # columns to list
