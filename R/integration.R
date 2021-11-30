@@ -454,8 +454,10 @@ unnest_integration <- function(data) {
 #'                 cor = diag(2))
 #'
 distr <- function(qfun, ...) {
+  qfun_quo <- rlang::enquo(qfun)
   d <- list(qfun = match.fun(qfun),
-            args = rlang::enquos(...))
+            args = rlang::enquos(...),
+            qfun_name = tryCatch(rlang::as_name(qfun_quo), error = function(e) "user_function"))
   if (! "p" %in% rlang::fn_fmls_names(qfun)) {
     abort("`qfun` should be an inverse CDF function (for example `qnorm`, `qgamma`, `qbinom`, ...) but does not appear to be (no formal argument `p`)")
   }
@@ -610,4 +612,67 @@ pars_logitnorm <- function(m, s) {
 
   return(as.data.frame(do.call(rbind, mapply(.lnopt, m, s, SIMPLIFY = FALSE))))
 
+}
+
+
+#' Get type of distribution
+#'
+#' @param ... distr() distributions
+#' @param data List-like sample data for the distr() distribution parameters
+#'
+#' @return Named string vector with elements "continuous", "discrete" or "binary"
+#'
+#' @noRd
+get_distribution_type <- function(..., data = list()) {
+  ds <- list(...)
+  dnames <- names(ds)
+
+  out <- vector("character", length  = length(ds))
+  names(out) <- dnames
+
+  # List of known continuous distributions
+  known_continuous <- c("qbeta", "qcauchy", "qchisq", "qexp", "qf", "qgamma",
+                        "qlnorm", "qnorm", "qt", "qunif", "qweibull", "qlogitnorm")
+
+  # List of known discrete distributions
+  known_discrete <- c("qgeom", "qnbinom", "qpois")
+  # Will handle qbinom and qhyper separately, since they have binary special cases
+
+  # List of known binary distributions
+  known_binary <- "qbern"
+
+  for (i in 1:length(ds)) {
+    di <- ds[[i]]
+    # Known distributions
+    if (di$qfun_name %in% known_continuous) {
+      out[i] <- "continuous"
+    } else if (di$qfun_name %in% known_discrete) {
+      out[i] <- "discrete"
+    } else if (di$qfun_name %in% known_binary) {
+      out[i] <- "binary"
+
+    # Handle discrete distributions with special binary cases
+    } else if (di$qfun_name == "qbinom") {
+      if (all(rlang::eval_tidy(di$args$size, data = data) == 1)) out[i] <- "binary"
+      else out[i] <- "discrete"
+    } else if (di$qfun_name == "qhyper") {
+      if (all(rlang::eval_tidy(di$args$k, data = data) == 1)) out[i] <- "binary"
+      else out[i] <- "discrete"
+
+    # Otherwise run qfun on grid of values and check with rlang::is_integerish
+    } else {
+      ps <- 1:99 / 100
+      support <- rlang::eval_tidy(rlang::call2(di$qfun, p = ps, !!! di$args),
+                                  data = data)
+
+      if (rlang::is_integerish(support)) {
+        if (all(dplyr::near(support, 0) | dplyr::near(support, 1))) out[i] <- "binary"
+        else out[i] <- "discrete"
+      } else {
+        out[i] <- "continuous"
+      }
+    }
+  }
+
+  return(out)
 }

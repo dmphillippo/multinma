@@ -257,6 +257,32 @@ test_that("error if qfun produces NaN, NA, NULL, Inf", {
 
 })
 
+test_that("Correctly assess type of marginal distributions", {
+  dtype <- get_distribution_type(
+             x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+             x2 = distr(qgamma, mean = x3_mean, sd = x3_sd),
+             x3 = distr(qbern, prob = x2),
+             x4 = distr(qbinom, size = 1, prob = x2),
+             x5 = distr(qbinom, size = n, prob = x2),
+             x6 = distr(qbinom, 1, x2),
+             x7 = distr(qpois, lambda = x3_sd),
+             x8 = distr(function(p, ...) qnorm(p, ...), mean = x1_mean, sd = x1_sd),
+             x9 = distr(function(p, ...) qpois(p, ...), lambda = 0.5),
+             x10 = distr(function(p, ...) qbern(p, ...), prob = x2),
+             data = smkdummy)
+  expect_identical(dtype,
+                   c(x1 = "continuous",
+                     x2 = "continuous",
+                     x3 = "binary",
+                     x4 = "binary",
+                     x5 = "discrete",
+                     x6 = "binary",
+                     x7 = "discrete",
+                     x8 = "continuous",
+                     x9 = "discrete",
+                     x10 = "binary"))
+})
+
 test_that("integration point marginals and correlations are correct", {
   skip_on_cran()
   tol <- 0.005
