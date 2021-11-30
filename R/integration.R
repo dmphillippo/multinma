@@ -181,6 +181,12 @@ add_integration.data.frame <- function(x, ...,
       } else if (cor_adjust == "pearson") {
         cor <- cor_adjust_pearson(cor, types = dtypes)
       }
+
+      # Check that adjustments still give a correlation matrix
+      if (!all(eigen(cor, symmetric = TRUE)$values > 0)) {
+        warn("Adjusted correlation matrix not positive definite; using Matrix::nearPD().")
+        cor <- Matrix::nearPD(cor, corr = TRUE)
+      }
     }
 
     cop <- copula::normalCopula(copula::P2p(cor), dim = nx, dispstr = "un")
