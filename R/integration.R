@@ -173,26 +173,28 @@ add_integration.data.frame <- function(x, ...,
   if (nx > 1) {
     # Use copula cor if present
     if (!is.null(attr(cor, "copula_cor", exact = TRUE)))  {
-      cor <- attr(cor, "copula_cor", exact = TRUE)
-    } else if (!cor_adjust %in% c("none", "legacy")) {
+      copula_cor <- attr(cor, "copula_cor", exact = TRUE)
+    } else if (cor_adjust %in% c("none", "legacy")) {
+      copula_cor <- cor
+    } else {
       # Apply adjustment to sample correlations to obtain copula correlations
 
       dtypes <- get_distribution_type(..., data = head(x))
 
       if (cor_adjust == "spearman") {
-        cor <- cor_adjust_spearman(cor, types = dtypes)
+        copula_cor <- cor_adjust_spearman(cor, types = dtypes)
       } else if (cor_adjust == "pearson") {
-        cor <- cor_adjust_pearson(cor, types = dtypes)
+        copula_cor <- cor_adjust_pearson(cor, types = dtypes)
       }
 
       # Check that adjustments still give a correlation matrix
-      if (!all(eigen(cor, symmetric = TRUE)$values > 0)) {
+      if (!all(eigen(copula_cor, symmetric = TRUE)$values > 0)) {
         warn("Adjusted correlation matrix not positive definite; using Matrix::nearPD().")
-        cor <- Matrix::nearPD(cor, corr = TRUE)
+        copula_cor <- Matrix::nearPD(copula_cor, corr = TRUE)
       }
     }
 
-    cop <- copula::normalCopula(copula::P2p(cor), dim = nx, dispstr = "un")
+    cop <- copula::normalCopula(copula::P2p(copula_cor), dim = nx, dispstr = "un")
     u_cor <- copula::cCopula(u, copula = cop, inverse = TRUE)
     # columns to list
     u_cor_l <- purrr::array_branch(u_cor, 2)
@@ -234,6 +236,8 @@ add_integration.data.frame <- function(x, ...,
           invalid_rows = invalid_rows)
 
   class(out) <- c("integration_tbl", class(out))
+  attr(out, "cor_adjust") <- cor_adjust
+  attr(out, "copula_cor") <- copula_cor
   return(out)
 }
 
@@ -373,6 +377,8 @@ add_integration.nma_data <- function(x, ...,
                                  cor = cor, cor_adjust = cor_adjust, n_int = n_int, int_args = int_args),
       int_col_present = rlang::calling(int_col_present),
       invalid_int_generated = invalid_int_generated)
+
+    copula_cor <- attr(out$agd_arm, "copula_cor")
   }
 
   if (has_agd_contrast(network)) {
@@ -381,6 +387,8 @@ add_integration.nma_data <- function(x, ...,
                                  cor = cor, cor_adjust = cor_adjust, n_int = n_int, int_args = int_args),
       int_col_present = rlang::calling(int_col_present),
       invalid_int_generated = invalid_int_generated)
+
+    copula_cor <- attr(out$agd_contrast, "copula_cor")
   }
 
   # Set as mlnmr_data class
@@ -391,6 +399,8 @@ add_integration.nma_data <- function(x, ...,
   colnames(cor) <- x_names
   rownames(cor) <- x_names
   out$int_cor <- cor
+  attr(out$int_cor, "cor_adjust") <- cor_adjust
+  attr(out$int_cor, "copula_cor") <- copula_cor
 
   class(out) <- c("mlnmr_data", "nma_data")
   return(out)
