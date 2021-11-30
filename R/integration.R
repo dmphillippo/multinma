@@ -676,3 +676,36 @@ get_distribution_type <- function(..., data = list()) {
 
   return(out)
 }
+
+# Convert Spearman correlations to underlying Gaussian copula correlations
+# using formulae in Xiao and Zhou (2018)
+cor_adjust_spearman <- function(X, types) {
+  bin <- types == "binary"
+  cont <- !bin   # Treat discrete as continuous
+
+  X[cont, cont] <- 2 * sin(pi * X[cont, cont] / 6)
+  X[bin, bin] <- sin(pi * X[bin, bin] / 2)
+  X[cont, bin] <- sqrt(2) * sin(pi * X[cont, bin] / (2 * sqrt(3)))
+  X[bin, cont] <- sqrt(2) * sin(pi * X[bin, cont] / (2 * sqrt(3)))
+
+  diag(X) <- 1
+
+  return(X)
+}
+
+# Convert Pearson correlations to underlying Gaussian copula correlations
+# using formulae in Xiao and Zhou (2018)
+cor_adjust_pearson <- function(X, types) {
+  bin <- types == "binary"
+  cont <- !bin   # Treat discrete as continuous
+
+  # No adjustment to cont-cont, assume that these are Normal
+  X[bin, bin] <- sin(pi * X[bin, bin] / 2)
+  # Use bin-cont formula assuming cont is Normal
+  X[cont, bin] <- sqrt(pi/2) * X[cont, bin]
+  X[bin, cont] <- sqrt(pi/2) * X[bin, cont]
+
+  diag(X) <- 1
+
+  return(X)
+}
