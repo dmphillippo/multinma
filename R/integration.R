@@ -171,7 +171,10 @@ add_integration.data.frame <- function(x, ...,
 
   # Correlate Sobol points with Gaussian copula
   if (nx > 1) {
-    if (!cor_adjust %in% c("none", "legacy")) {
+    # Use copula cor if present
+    if (!is.null(attr(cor, "copula_cor", exact = TRUE)))  {
+      cor <- attr(cor, "copula_cor", exact = TRUE)
+    } else if (!cor_adjust %in% c("none", "legacy")) {
       # Apply adjustment to sample correlations to obtain copula correlations
 
       dtypes <- get_distribution_type(..., data = head(x))
