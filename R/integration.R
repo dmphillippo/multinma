@@ -335,7 +335,9 @@ add_integration.nma_data <- function(x, ...,
       dplyr::group_by(.data$.study) %>%
       dplyr::group_modify(~tibble::tibble(
         w = nrow(.) - 3,
-        r = list(cor(dplyr::select(., !! x_names), method = "spearman", use = "complete.obs"))
+        r = list(cor(dplyr::select(., !! x_names),
+                     method = if (cor_adjust == "legacy") "spearman" else cor_adjust,
+                     use = "complete.obs"))
         )) %>%
       dplyr::mutate(z = purrr::map2(.data$w, .data$r, ~.x * log((1 + .y) / (1 - .y)) / 2))
 
