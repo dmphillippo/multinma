@@ -259,7 +259,7 @@ test_that("error if qfun produces NaN, NA, NULL, Inf", {
 
 })
 
-test_that("Correctly assess type of marginal distributions", {
+test_that("correctly assess type of marginal distributions", {
   dtype <- get_distribution_type(
              x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
              x2 = distr(qgamma, mean = x3_mean, sd = x3_sd),
@@ -283,6 +283,222 @@ test_that("Correctly assess type of marginal distributions", {
                      x8 = "continuous",
                      x9 = "discrete",
                      x10 = "binary"))
+})
+
+test_that("cor_adjust logic is correct", {
+  expect_error(add_integration(smknet,
+                               x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbern, x2),
+                               cor_adjust = "bad"),
+               "`cor_adjust` must be one of")
+
+  # Spearman should be the default for cor = NULL
+  expect_identical(attr(add_integration(smknet,
+                                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                        x2 = distr(qbern, x2))$int_cor, "cor_adjust"),
+                   "spearman")
+  expect_equal(attr(add_integration(smknet,
+                                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                    x2 = distr(qbern, x2),
+                                    cor_adjust = "spearman")$int_cor, "copula_cor"),
+               cor_adjust_spearman(
+                 add_integration(smknet,
+                                 x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                 x2 = distr(qbern, x2),
+                                 cor_adjust = "spearman")$int_cor,
+                 types = c("continuous", "binary")),
+               check.attributes = FALSE,
+               tolerance = 0)
+
+  expect_identical(attr(add_integration(smknet,
+                                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                        x2 = distr(qbern, x2),
+                                        cor_adjust = "pearson")$int_cor, "cor_adjust"),
+                   "pearson")
+  expect_equal(attr(add_integration(smknet,
+                                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                    x2 = distr(qbern, x2),
+                                    cor_adjust = "pearson")$int_cor, "copula_cor"),
+               cor_adjust_pearson(
+                 add_integration(smknet,
+                                 x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                 x2 = distr(qbern, x2),
+                                 cor_adjust = "pearson")$int_cor,
+                 types = c("continuous", "binary")),
+               check.attributes = FALSE,
+               tolerance = 0)
+
+  expect_identical(attr(add_integration(smknet,
+                                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                        x2 = distr(qbern, x2),
+                                        cor_adjust = "legacy")$int_cor, "cor_adjust"),
+                   "legacy")
+  # Check that "legacy" does the right (wrong) thing (Spearman cor with no adjustment)
+  expect_equal(attr(add_integration(smknet,
+                                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                        x2 = distr(qbern, x2),
+                                        cor_adjust = "legacy")$int_cor, "copula_cor"),
+               add_integration(smknet,
+                               x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbern, x2),
+                               cor_adjust = "spearman")$int_cor,
+               check.attributes = FALSE,
+               tolerance = 0)
+  expect_equal(attr(add_integration(smknet,
+                                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                    x2 = distr(qbern, x2),
+                                    cor_adjust = "legacy")$int_cor, "copula_cor"),
+               add_integration(smknet,
+                               x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbern, x2),
+                               cor_adjust = "legacy")$int_cor,
+               check.attributes = FALSE,
+               tolerance = 0)
+
+  expect_error(add_integration(smknet,
+                               x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbern, x2),
+                               cor_adjust = "none"),
+               'Cannot specify cor_adjust = "none"')
+
+  # Pearson should be the default for user-provided cor
+  cmat <- matrix(c(1, 0.4, 0.4, 1), nrow = 2)
+  expect_identical(attr(add_integration(smknet,
+                                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                        x2 = distr(qbern, x2),
+                                        cor = cmat)$int_cor, "cor_adjust"),
+                   "pearson")
+  expect_equal(attr(add_integration(smknet,
+                                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                    x2 = distr(qbern, x2),
+                                    cor = cmat)$int_cor, "copula_cor"),
+               cor_adjust_pearson(cmat, types = c("continuous", "binary")),
+               check.attributes = FALSE,
+               tolerance = 0)
+
+  expect_identical(attr(add_integration(smknet,
+                                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                        x2 = distr(qbern, x2),
+                                        cor_adjust = "spearman",
+                                        cor = cmat)$int_cor, "cor_adjust"),
+                   "spearman")
+  expect_equal(attr(add_integration(smknet,
+                                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                    x2 = distr(qbern, x2),
+                                    cor_adjust = "spearman",
+                                    cor = cmat)$int_cor, "copula_cor"),
+               cor_adjust_spearman(cmat, types = c("continuous", "binary")),
+               check.attributes = FALSE,
+               tolerance = 0)
+
+  expect_identical(attr(add_integration(smknet,
+                                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                        x2 = distr(qbern, x2),
+                                        cor_adjust = "none",
+                                        cor = cmat)$int_cor, "cor_adjust"),
+                   "none")
+  expect_equal(attr(add_integration(smknet,
+                                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                    x2 = distr(qbern, x2),
+                                    cor_adjust = "none",
+                                    cor = cmat)$int_cor, "copula_cor"),
+               add_integration(smknet,
+                               x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbern, x2),
+                               cor_adjust = "none",
+                               cor = cmat)$int_cor,
+               check.attributes = FALSE,
+               tolerance = 0)
+  expect_equal(add_integration(smknet,
+                               x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbern, x2),
+                               cor_adjust = "none",
+                               cor = cmat)$int_cor,
+               cmat,
+               check.attributes = FALSE,
+               tolerance = 0)
+
+  expect_identical(attr(add_integration(smknet,
+                                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                        x2 = distr(qbern, x2),
+                                        cor_adjust = "legacy",
+                                        cor = cmat)$int_cor, "cor_adjust"),
+                   "legacy")
+
+  # Check that "legacy" does the right thing - same as "none" with user cor
+  expect_equal(attr(add_integration(smknet,
+                                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                    x2 = distr(qbern, x2),
+                                    cor_adjust = "legacy",
+                                    cor = cmat)$int_cor, "copula_cor"),
+               add_integration(smknet,
+                               x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                               x2 = distr(qbern, x2),
+                               cor_adjust = "legacy",
+                               cor = cmat)$int_cor,
+               check.attributes = FALSE,
+               tolerance = 0)
+
+  # Pearson should be the default for user-provided cor
+  expect_identical(attr(add_integration(smkdummy,
+                                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                        x2 = distr(qbern, x2),
+                                        cor = cmat), "cor_adjust"),
+                   "pearson")
+  expect_equal(attr(add_integration(smkdummy,
+                                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                    x2 = distr(qbern, x2),
+                                    cor = cmat), "copula_cor"),
+               cor_adjust_pearson(cmat, types = c("continuous", "binary")),
+               check.attributes = FALSE,
+               tolerance = 0)
+
+  expect_identical(attr(add_integration(smkdummy,
+                                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                        x2 = distr(qbern, x2),
+                                        cor_adjust = "spearman",
+                                        cor = cmat), "cor_adjust"),
+                   "spearman")
+  expect_equal(attr(add_integration(smkdummy,
+                                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                    x2 = distr(qbern, x2),
+                                    cor = cmat,
+                                    cor_adjust = "spearman"), "copula_cor"),
+               cor_adjust_spearman(cmat, types = c("continuous", "binary")),
+               check.attributes = FALSE,
+               tolerance = 0)
+
+  expect_identical(attr(add_integration(smkdummy,
+                                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                        x2 = distr(qbern, x2),
+                                        cor_adjust = "none",
+                                        cor = cmat), "cor_adjust"),
+                   "none")
+  expect_equal(attr(add_integration(smkdummy,
+                                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                    x2 = distr(qbern, x2),
+                                    cor_adjust = "none",
+                                    cor = cmat), "copula_cor"),
+               cmat,
+               check.attributes = FALSE,
+               tolerance = 0)
+
+  expect_identical(attr(add_integration(smkdummy,
+                                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                        x2 = distr(qbern, x2),
+                                        cor_adjust = "legacy",
+                                        cor = cmat), "cor_adjust"),
+                   "legacy")
+
+  # Check that "legacy" does the right thing - same as "none" with user cor
+  expect_equal(attr(add_integration(smkdummy,
+                                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                    x2 = distr(qbern, x2),
+                                    cor_adjust = "legacy",
+                                    cor = cmat), "copula_cor"),
+               cmat,
+               check.attributes = FALSE,
+               tolerance = 0)
 })
 
 test_that("integration point marginals and correlations are correct", {
