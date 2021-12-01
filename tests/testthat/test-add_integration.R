@@ -20,8 +20,9 @@ smkdummy <-
   smoking %>%
   group_by(studyn) %>%
   mutate(x1_mean = rnorm(1), x1_sd = runif(1, 0.5, 2),
-         x2 = runif(1),
-         x3_mean = rnorm(1), x3_sd = runif(1, 0.5, 2)) %>%
+         x2 = rbeta(1, 5, 10),
+         x3_mean = rnorm(1), x3_sd = runif(1, 0.5, 2),
+         x4 = rbeta(1, 10, 5)) %>%
   ungroup()
 
 smkdummy_contrast <- smkdummy %>%  group_by(studyn) %>%
@@ -30,13 +31,13 @@ smkdummy_contrast <- smkdummy %>%  group_by(studyn) %>%
 
 ns_ipd <- 2
 
-x1_x2_cor <- 0.4
+xall_cor <- 0.25
 n_i <- 200
-cormat <- matrix(x1_x2_cor, nrow = 3, ncol = 3)
+cormat <- matrix(xall_cor, nrow = 4, ncol = 4)
 diag(cormat) <- 1
 
-cop <- copula::normalCopula(copula::P2p(cormat), dim = 3, dispstr = "un")
-u <- matrix(runif(n_i * 3 * ns_ipd), ncol = 3)
+cop <- copula::normalCopula(copula::P2p(cormat), dim = 4, dispstr = "un")
+u <- matrix(runif(n_i * 4 * ns_ipd), ncol = 4)
 u_cor <- as.data.frame(copula::cCopula(u, cop, inverse = TRUE))
 
 ipddummy <-
@@ -45,6 +46,7 @@ ipddummy <-
   mutate(x1 = qnorm(u_cor[,1]),
          x2 = qbinom(u_cor[,2], 1, 0.6),
          x3 = qnorm(u_cor[,3], 1, 0.5),
+         x4 = qbinom(u_cor[,4], 1, 0.4),
          r = rbinom(n(), 1, 0.2))
 
 smknet_agd <- set_agd_arm(smkdummy, studyn, trtn, r = r, n = n)
@@ -294,39 +296,111 @@ test_that("integration point marginals and correlations are correct", {
   expect_equal(map_dbl(s1$agd_arm$.int_x1, mean), s1$agd_arm$x1_mean, tolerance = tol)
   expect_equal(map_dbl(s1$agd_arm$.int_x1, sd), s1$agd_arm$x1_sd, tolerance = tol)
 
-  # 2 covariates, IPD cor matrix
-  s2 <- add_integration(smknet,
+  # Multiple covariates, IPD cor matrix
+  s2_spearman <- add_integration(smknet,
                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
                        x2 = distr(qbinom, size = 1, prob = x2),
                        x3 = distr(qnorm, mean = x3_mean, sd = x3_sd),
+                       x4 = distr(qbern, prob = x4),
                        n_int = n_int)
-  expect_equal(map_dbl(s2$agd_arm$.int_x1, mean), s2$agd_arm$x1_mean, tolerance = tol)
-  expect_equal(map_dbl(s2$agd_arm$.int_x1, sd), s2$agd_arm$x1_sd, tolerance = tol)
-  expect_equal(map_dbl(s2$agd_arm$.int_x2, mean), s2$agd_arm$x2, tolerance = tol)
-  # expect_equal(map2_dbl(s2$agd_arm$.int_x1, s2$agd_arm$.int_x3, cor, method = "spearman"),
-  #              rep(x1_x2_cor, nrow(s2$agd_arm)), tolerance = cor_tol)
-  expect_equal(map2_dbl(s2$agd_arm$.int_x1, s2$agd_arm$.int_x3, cor, method = "spearman"),
-               rep(s2$int_cor[1, 3], nrow(s2$agd_arm)), tolerance = cor_tol)
 
-  # 2 covariates, user cor matrix
-  s3 <- add_integration(smknet,
+  # Mean, SD, proportion should match
+  expect_equal(map_dbl(s2_spearman$agd_arm$.int_x1, mean), s2_spearman$agd_arm$x1_mean, tolerance = tol)
+  expect_equal(map_dbl(s2_spearman$agd_arm$.int_x1, sd), s2_spearman$agd_arm$x1_sd, tolerance = tol)
+  expect_equal(map_dbl(s2_spearman$agd_arm$.int_x2, mean), s2_spearman$agd_arm$x2, tolerance = tol)
+
+  # Cont-cont correlations should match exactly for Spearman correlation
+  expect_equal(map2_dbl(s2_spearman$agd_arm$.int_x1, s2_spearman$agd_arm$.int_x3, cor, method = "spearman"),
+               rep(s2_spearman$int_cor[1, 3], nrow(s2_spearman$agd_arm)), tolerance = tol)
+
+  # Other correlations should be approximate
+  int_cors <- s2_spearman$agd_arm %>% rowwise() %>%
+    mutate(int_cors = list(cor(cbind(.int_x1, .int_x2, .int_x3, .int_x4), method = "spearman"))) %>%
+    pull(int_cors)
+  # expect_equal(unlist(map(int_cors, ~.[upper.tri(.)])),
+  #              rep(s2_spearman$int_cor[upper.tri(s2_spearman$int_cor)], times = nrow(s2_spearman$agd_arm)),
+  #              tolerance = cor_tol)
+  expect_lt(median(abs(unlist(map(int_cors, ~.[upper.tri(.)])) -
+                   rep(s2_spearman$int_cor[upper.tri(s2_spearman$int_cor)], times = nrow(s2_spearman$agd_arm)))),
+            cor_tol)
+
+  s2_pearson <- add_integration(smknet,
+                                 x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                 x2 = distr(qbinom, size = 1, prob = x2),
+                                 x3 = distr(qnorm, mean = x3_mean, sd = x3_sd),
+                                x4 = distr(qbern, prob = x4),
+                                cor_adjust = "pearson",
+                                 n_int = n_int)
+  expect_equal(map_dbl(s2_pearson$agd_arm$.int_x1, mean), s2_pearson$agd_arm$x1_mean, tolerance = tol)
+  expect_equal(map_dbl(s2_pearson$agd_arm$.int_x1, sd), s2_pearson$agd_arm$x1_sd, tolerance = tol)
+  expect_equal(map_dbl(s2_pearson$agd_arm$.int_x2, mean), s2_pearson$agd_arm$x2, tolerance = tol)
+
+  # Normal-Normal correlations should match exactly for Pearson correlation
+  expect_equal(map2_dbl(s2_pearson$agd_arm$.int_x1, s2_pearson$agd_arm$.int_x3, cor, method = "pearson"),
+               rep(s2_pearson$int_cor[1, 3], nrow(s2_pearson$agd_arm)), tolerance = tol)
+
+  # Other correlations should be approximate
+  int_cors <- s2_pearson$agd_arm %>% rowwise() %>%
+    mutate(int_cors = list(cor(cbind(.int_x1, .int_x2, .int_x3, .int_x4), method = "pearson"))) %>%
+    pull(int_cors)
+  # expect_equal(unlist(map(int_cors, ~.[upper.tri(.)])),
+  #              rep(s2_pearson$int_cor[upper.tri(s2_pearson$int_cor)], times = nrow(s2_pearson$agd_arm)),
+  #              tolerance = cor_tol)
+  expect_lt(median(abs(unlist(map(int_cors, ~.[upper.tri(.)])) -
+                         rep(s2_pearson$int_cor[upper.tri(s2_pearson$int_cor)], times = nrow(s2_pearson$agd_arm)))),
+            cor_tol)
+
+  # Multiple covariates, user cor matrix
+  s3_pearson <- add_integration(smknet,
                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
                        x2 = distr(qbinom, size = 1, prob = x2),
                        x3 = distr(qnorm, mean = x3_mean, sd = x3_sd),
+                       x4 = distr(qbern, prob = x4),
                        cor = cormat,
                        n_int = n_int)
-  expect_equal(map_dbl(s3$agd_arm$.int_x1, mean), s3$agd_arm$x1_mean, tolerance = tol)
-  expect_equal(map_dbl(s3$agd_arm$.int_x1, sd), s3$agd_arm$x1_sd, tolerance = tol)
-  expect_equal(map_dbl(s3$agd_arm$.int_x2, mean), s3$agd_arm$x2, tolerance = tol)
-  expect_equal(map2_dbl(s3$agd_arm$.int_x1, s3$agd_arm$.int_x3, cor, method = "spearman"),
-               rep(x1_x2_cor, nrow(s3$agd_arm)), tolerance = cor_tol)
+  expect_equal(map_dbl(s3_pearson$agd_arm$.int_x1, mean), s3_pearson$agd_arm$x1_mean, tolerance = tol)
+  expect_equal(map_dbl(s3_pearson$agd_arm$.int_x1, sd), s3_pearson$agd_arm$x1_sd, tolerance = tol)
+  expect_equal(map_dbl(s3_pearson$agd_arm$.int_x2, mean), s3_pearson$agd_arm$x2, tolerance = tol)
 
-  # Correlations between continuous and discrete seem hard to produce from the copula
-  skip("Correlations between continuous and discrete covariates are difficult to recreate")
-  # expect_equal(map2_dbl(s2$agd_arm$.int_x1, s2$agd_arm$.int_x2, cor, method = "spearman"),
-  #              rep(x1_x2_cor, nrow(s2$agd_arm)), tolerance = cor_tol)
-  expect_equal(map2_dbl(s2$agd_arm$.int_x1, s2$agd_arm$.int_x2, cor, method = "spearman"),
-               rep(s2$int_cor[1, 2], nrow(s2$agd_arm)), tolerance = cor_tol)
-  expect_equal(map2_dbl(s3$agd_arm$.int_x1, s3$agd_arm$.int_x2, cor, method = "spearman"),
-               rep(x1_x2_cor, nrow(s3$agd_arm)), tolerance = cor_tol)
+  # Normal-Normal correlations should match exactly for Pearson correlation
+  expect_equal(map2_dbl(s3_pearson$agd_arm$.int_x1, s3_pearson$agd_arm$.int_x3, cor, method = "pearson"),
+               rep(cormat[1, 3], nrow(s3_pearson$agd_arm)), tolerance = tol)
+
+  # Other correlations should be approximate
+  int_cors <- s3_pearson$agd_arm %>% rowwise() %>%
+    mutate(int_cors = list(cor(cbind(.int_x1, .int_x2, .int_x3, .int_x4), method = "pearson"))) %>%
+    pull(int_cors)
+  # expect_equal(unlist(map(int_cors, ~.[upper.tri(.)])),
+  #              rep(s3_pearson$int_cor[upper.tri(s3_pearson$int_cor)], times = nrow(s3_pearson$agd_arm)),
+  #              tolerance = cor_tol)
+  expect_lt(median(abs(unlist(map(int_cors, ~.[upper.tri(.)])) -
+                         rep(s3_pearson$int_cor[upper.tri(s3_pearson$int_cor)], times = nrow(s3_pearson$agd_arm)))),
+            cor_tol)
+
+
+  s3_spearman <- add_integration(smknet,
+                                x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                x2 = distr(qbinom, size = 1, prob = x2),
+                                x3 = distr(qnorm, mean = x3_mean, sd = x3_sd),
+                                x4 = distr(qbern, prob = x4),
+                                cor = cormat, cor_adjust = "spearman",
+                                n_int = n_int)
+  expect_equal(map_dbl(s3_spearman$agd_arm$.int_x1, mean), s3_spearman$agd_arm$x1_mean, tolerance = tol)
+  expect_equal(map_dbl(s3_spearman$agd_arm$.int_x1, sd), s3_spearman$agd_arm$x1_sd, tolerance = tol)
+  expect_equal(map_dbl(s3_spearman$agd_arm$.int_x2, mean), s3_spearman$agd_arm$x2, tolerance = tol)
+
+  # Cont-cont correlations should match exactly for Spearman correlation
+  expect_equal(map2_dbl(s3_spearman$agd_arm$.int_x1, s3_spearman$agd_arm$.int_x3, cor, method = "spearman"),
+               rep(cormat[1, 3], nrow(s3_spearman$agd_arm)), tolerance = tol)
+
+  # Other correlations should be approximate
+  int_cors <- s3_spearman$agd_arm %>% rowwise() %>%
+    mutate(int_cors = list(cor(cbind(.int_x1, .int_x2, .int_x3, .int_x4), method = "spearman"))) %>%
+    pull(int_cors)
+  # expect_equal(unlist(map(int_cors, ~.[upper.tri(.)])),
+  #              rep(s3_spearman$int_cor[upper.tri(s3_spearman$int_cor)], times = nrow(s3_spearman$agd_arm)),
+  #              tolerance = cor_tol)
+  expect_lt(median(abs(unlist(map(int_cors, ~.[upper.tri(.)])) -
+                         rep(s3_spearman$int_cor[upper.tri(s3_spearman$int_cor)], times = nrow(s3_spearman$agd_arm)))),
+            cor_tol)
 })
