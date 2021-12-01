@@ -191,7 +191,7 @@ add_integration.data.frame <- function(x, ...,
       # Check that adjustments still give a correlation matrix
       if (!all(eigen(copula_cor, symmetric = TRUE)$values > 0)) {
         warn("Adjusted correlation matrix not positive definite; using Matrix::nearPD().")
-        copula_cor <- Matrix::nearPD(copula_cor, corr = TRUE)
+        copula_cor <- as.matrix(Matrix::nearPD(copula_cor, corr = TRUE)$mat)
       }
     }
 
