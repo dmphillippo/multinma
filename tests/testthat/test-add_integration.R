@@ -499,6 +499,36 @@ test_that("cor_adjust logic is correct", {
                cmat,
                check.attributes = FALSE,
                tolerance = 0)
+
+  # Check that reusing $int_cor from a network works automatically
+  s1 <- add_integration(smknet,
+                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                        x2 = distr(qbinom, size = 1, prob = x2),
+                        x3 = distr(qnorm, mean = x3_mean, sd = x3_sd),
+                        x4 = distr(qbern, prob = x4))
+
+  expect_identical(add_integration(smknet,
+                                   x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                   x2 = distr(qbinom, size = 1, prob = x2),
+                                   x3 = distr(qnorm, mean = x3_mean, sd = x3_sd),
+                                   x4 = distr(qbern, prob = x4),
+                                   cor = s1$int_cor),
+                   s1)
+
+  s2 <- add_integration(smknet,
+                        x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                        x2 = distr(qbinom, size = 1, prob = x2),
+                        x3 = distr(qnorm, mean = x3_mean, sd = x3_sd),
+                        x4 = distr(qbern, prob = x4),
+                        cor_adjust = "pearson")
+
+  expect_identical(add_integration(smknet,
+                                   x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                                   x2 = distr(qbinom, size = 1, prob = x2),
+                                   x3 = distr(qnorm, mean = x3_mean, sd = x3_sd),
+                                   x4 = distr(qbern, prob = x4),
+                                   cor = s2$int_cor),
+                   s2)
 })
 
 test_that("integration point marginals and correlations are correct", {
