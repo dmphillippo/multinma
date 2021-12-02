@@ -42,10 +42,11 @@ unnest_integration(data)
 By default, this takes a weighted correlation matrix from all IPD studies.
 Rows and columns should match the order of covariates specified in \code{...}.}
 
-\item{cor_adjust}{Adjustment to apply to the sample correlation matrix \code{cor}
-to obtain the Gaussian copula correlations, either \code{"spearman"},
-\code{"pearson"}, or \code{"none"}, see "Details". The default when \code{cor = NULL} is
-\code{"spearman"}, otherwise the default is \code{"pearson"}.}
+\item{cor_adjust}{Adjustment to apply to the correlation matrix given by
+\code{cor} (or computed from the IPD if \code{cor = NULL}) to obtain the Gaussian
+copula correlations, either \code{"spearman"}, \code{"pearson"}, or \code{"none"}, see
+"Details". The default when \code{cor = NULL} is \code{"spearman"}, otherwise the
+default is \code{"pearson"}.}
 
 \item{n_int}{Number of integration points to generate, default 1000}
 
@@ -93,14 +94,22 @@ been computed using Pearson's product-moment correlation. Correlations between
 Normal covariates will be reproduced exactly by the integration points, all
 others will be reproduced approximately. Correlations between discrete
 covariates will be reproduced approximately (and identically to \code{cor_adjust   = "spearman"}). This is the default when \code{cor} is provided by the user,
-since \code{\link[=cor]{cor()}} defaults to \code{method = "pearson"}. However, we recommend
-providing Spearman correlations (e.g. from \code{cor(., method = "spearman")})
-and using \code{cor_adjust = "spearman"}.
+since \code{\link[=cor]{cor()}} defaults to \code{method = "pearson"} and Pearson correlations are
+most likely reported in published data. However, we recommend providing
+Spearman correlations (e.g. from \code{cor(., method = "spearman")}) and using
+\code{cor_adjust = "spearman"} where possible.
 \item \code{cor_adjust = "none"} allows the user to specify the correlation matrix
 for the Gaussian copula directly; no adjustment is applied.
 \item \code{cor_adjust = "legacy"} is also available, which reproduces exactly the
 behaviour from version 0.3.0 and earlier. This is similar to \code{cor_adjust =   "none"}, but unadjusted Spearman correlations are used if \code{cor = NULL}.
 }
+
+When adding integration points to a network object the correlation matrix
+used is stored in \verb{$int_cor}, and the copula correlation matrix and
+adjustment used are stored as attributes of \verb{$int_cor}. If this correlation
+matrix is passed again to \code{add_integration()} (e.g. to reuse the
+correlations for an external target population) this will be detected, and
+the correct setting for \code{cor_adjust} will automatically be applied.
 }
 \examples{
 ## Plaque psoriasis ML-NMR - network setup and adding integration points
@@ -199,6 +208,10 @@ new_agd_int <- add_integration(new_agd_int,
   psa = distr(qbern, prob = psa),
   cor = pso_net$int_cor,
   n_int = 1000)
+
+# Here, since we reused the correlation matrix pso_net$int_cor from the
+# network, the correct setting of cor_adjust = "spearman" is automatically
+# applied
 
 new_agd_int
 

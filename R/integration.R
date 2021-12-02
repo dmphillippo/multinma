@@ -13,10 +13,11 @@
 #' @param cor Correlation matrix to use for generating the integration points.
 #'   By default, this takes a weighted correlation matrix from all IPD studies.
 #'   Rows and columns should match the order of covariates specified in `...`.
-#' @param cor_adjust Adjustment to apply to the sample correlation matrix `cor`
-#'   to obtain the Gaussian copula correlations, either `"spearman"`,
-#'   `"pearson"`, or `"none"`, see "Details". The default when `cor = NULL` is
-#'   `"spearman"`, otherwise the default is `"pearson"`.
+#' @param cor_adjust Adjustment to apply to the correlation matrix given by
+#'   `cor` (or computed from the IPD if `cor = NULL`) to obtain the Gaussian
+#'   copula correlations, either `"spearman"`, `"pearson"`, or `"none"`, see
+#'   "Details". The default when `cor = NULL` is `"spearman"`, otherwise the
+#'   default is `"pearson"`.
 #' @param n_int Number of integration points to generate, default 1000
 #' @param int_args A named list of arguments to pass to
 #'   \code{\link[randtoolbox:quasiRNG]{sobol()}}
@@ -52,9 +53,10 @@
 #'   others will be reproduced approximately. Correlations between discrete
 #'   covariates will be reproduced approximately (and identically to `cor_adjust
 #'   = "spearman"`). This is the default when `cor` is provided by the user,
-#'   since [cor()] defaults to `method = "pearson"`. However, we recommend
-#'   providing Spearman correlations (e.g. from `cor(., method = "spearman")`)
-#'   and using `cor_adjust = "spearman"`.
+#'   since [cor()] defaults to `method = "pearson"` and Pearson correlations are
+#'   most likely reported in published data. However, we recommend providing
+#'   Spearman correlations (e.g. from `cor(., method = "spearman")`) and using
+#'   `cor_adjust = "spearman"` where possible.
 #'
 #'   * `cor_adjust = "none"` allows the user to specify the correlation matrix
 #'   for the Gaussian copula directly; no adjustment is applied.
@@ -62,6 +64,13 @@
 #'   * `cor_adjust = "legacy"` is also available, which reproduces exactly the
 #'   behaviour from version 0.3.0 and earlier. This is similar to `cor_adjust =
 #'   "none"`, but unadjusted Spearman correlations are used if `cor = NULL`.
+#'
+#'   When adding integration points to a network object the correlation matrix
+#'   used is stored in `$int_cor`, and the copula correlation matrix and
+#'   adjustment used are stored as attributes of `$int_cor`. If this correlation
+#'   matrix is passed again to `add_integration()` (e.g. to reuse the
+#'   correlations for an external target population) this will be detected, and
+#'   the correct setting for `cor_adjust` will automatically be applied.
 #'
 #' @references \insertAllCited{}
 #'
@@ -92,6 +101,10 @@
 #'   psa = distr(qbern, prob = psa),
 #'   cor = pso_net$int_cor,
 #'   n_int = 1000)
+#'
+#' # Here, since we reused the correlation matrix pso_net$int_cor from the
+#' # network, the correct setting of cor_adjust = "spearman" is automatically
+#' # applied
 #'
 #' new_agd_int
 #'
