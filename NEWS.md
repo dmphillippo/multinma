@@ -1,5 +1,13 @@
 # multinma 0.3.0.9000
 
+* Feature: The correlation matrix for generating integration points with
+`add_integration()` for ML-NMR models is now adjusted to the underlying Gaussian
+copula, so that the output correlations of the integration points better match
+the requested input correlations. A new argument `cor_adjust` controls this
+behaviour, with options `"spearman"`, `"pearson"`, or `"none"`. Although these
+correlations typically have little impact on the results, for strict
+reproducibility the old behaviour from version 0.3.0 and below is available with
+`cor_adjust = "legacy"`.
 * Fix: Model fitting is now robust to non-default settings of
 `options("contrasts")`.
 * Fix: `plot.nma_data()` no longer gives a ggplot deprecation warning (PR #6).
