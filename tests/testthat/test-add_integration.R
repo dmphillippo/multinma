@@ -620,3 +620,30 @@ test_that("integration point marginals and correlations are correct", {
                          rep(s3_spearman$int_cor[upper.tri(s3_spearman$int_cor)], times = nrow(s3_spearman$agd_arm)))),
             cor_tol)
 })
+
+test_that("non positive definite cor matrices are fixed up", {
+  badcor <- matrix(0.99, nrow = 4, ncol = 4)
+  diag(badcor) <- 1
+
+  expect_warning(
+    add_integration(smknet,
+                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                    x2 = distr(qbinom, size = 1, prob = x2),
+                    x3 = distr(qnorm, mean = x3_mean, sd = x3_sd),
+                    x4 = distr(qbern, prob = x4),
+                    cor = badcor,
+                    n_int = 10),
+    "Adjusted correlation matrix not positive definite; using Matrix::nearPD()."
+  )
+
+  expect_warning(
+    add_integration(smknet,
+                    x1 = distr(qnorm, mean = x1_mean, sd = x1_sd),
+                    x2 = distr(qbinom, size = 1, prob = x2),
+                    x3 = distr(qnorm, mean = x3_mean, sd = x3_sd),
+                    x4 = distr(qbern, prob = x4),
+                    cor = badcor, cor_adjust = "spearman",
+                    n_int = 10),
+    "Adjusted correlation matrix not positive definite; using Matrix::nearPD()."
+  )
+})
