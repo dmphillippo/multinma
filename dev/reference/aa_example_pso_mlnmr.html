@@ -354,57 +354,57 @@ available in the global environment.</p>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Regression model: ~(durnpso + prevsys + bsa + weight + psa) * .trt.</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Centred covariates at the following overall mean values:</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>   durnpso   prevsys       bsa    weight       psa </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> 1.8259772 0.6495432 0.2917678 8.9328063 0.2172823 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1.8259772 0.6496080 0.2917665 8.9328237 0.2167777 </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Inference for Stan model: binomial_2par.</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> 4 chains, each with iter=2000; warmup=1000; thin=1; </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>                                         mean se_mean   sd     2.5%      25%</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[durnpso]                           0.05    0.00 0.06    -0.07     0.00</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[prevsys]                          -0.13    0.00 0.16    -0.44    -0.24</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[bsa]                              -0.07    0.01 0.45    -1.00    -0.36</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[durnpso]                           0.05    0.00 0.06    -0.08     0.00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[prevsys]                          -0.13    0.00 0.16    -0.45    -0.24</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[bsa]                              -0.07    0.01 0.45    -0.98    -0.36</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> beta[weight]                            0.04    0.00 0.03    -0.02     0.02</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[psa]                              -0.08    0.00 0.17    -0.42    -0.19</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03    0.00 0.07    -0.17    -0.08</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01    0.00 0.07    -0.14    -0.06</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.19    0.00 0.19    -0.19     0.06</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.06    0.00 0.18    -0.29    -0.06</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.06    0.01 0.53    -0.95    -0.30</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[bsa:.trtclassIL blocker]           0.29    0.01 0.49    -0.64    -0.05</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[psa]                              -0.08    0.00 0.17    -0.42    -0.20</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03    0.00 0.07    -0.18    -0.08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01    0.00 0.07    -0.15    -0.06</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.18    0.00 0.19    -0.20     0.05</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.06    0.00 0.18    -0.31    -0.06</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.05    0.01 0.53    -0.97    -0.30</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[bsa:.trtclassIL blocker]           0.28    0.01 0.48    -0.63    -0.05</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    0.00 0.04    -0.24    -0.19</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> beta[weight:.trtclassIL blocker]       -0.10    0.00 0.03    -0.16    -0.12</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.06    0.00 0.21    -0.47    -0.20</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[psa:.trtclassIL blocker]           0.00    0.00 0.19    -0.36    -0.12</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> d[ETN]                                  1.55    0.00 0.08     1.39     1.50</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> d[IXE_Q2W]                              2.96    0.00 0.09     2.79     2.89</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.05    0.00 0.21    -0.46    -0.19</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[psa:.trtclassIL blocker]           0.01    0.00 0.19    -0.35    -0.12</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[ETN]                                  1.55    0.00 0.08     1.40     1.50</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[IXE_Q2W]                              2.95    0.00 0.09     2.79     2.89</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> d[IXE_Q4W]                              2.54    0.00 0.08     2.39     2.49</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> d[SEC_150]                              2.14    0.00 0.12     1.92     2.06</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[SEC_150]                              2.15    0.00 0.11     1.93     2.07</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> d[SEC_300]                              2.45    0.00 0.12     2.22     2.37</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> lp__                                -1576.36    0.09 3.38 -1583.70 -1578.51</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> lp__                                -1576.51    0.09 3.44 -1584.13 -1578.63</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>                                          50%      75%    97.5% n_eff Rhat</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[durnpso]                           0.04     0.09     0.16  5973    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[prevsys]                          -0.14    -0.03     0.19  6078    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[bsa]                              -0.06     0.24     0.79  5279    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[weight]                            0.04     0.06     0.10  6192    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[psa]                              -0.07     0.04     0.25  5682    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03     0.02     0.11  6693    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01     0.03     0.11  7271    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.19     0.31     0.55  6739    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.06     0.18     0.39  7259    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.05     0.40     1.11  5496    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[bsa:.trtclassIL blocker]           0.28     0.62     1.29  5922    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    -0.14    -0.10  6609    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[weight:.trtclassIL blocker]       -0.10    -0.08    -0.04  7541    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.05     0.09     0.35  5739    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[psa:.trtclassIL blocker]           0.01     0.13     0.38  7176    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> d[ETN]                                  1.55     1.61     1.71  5962    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> d[IXE_Q2W]                              2.95     3.01     3.12  6711    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> d[IXE_Q4W]                              2.54     2.60     2.70  6106    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> d[SEC_150]                              2.14     2.22     2.38  6930    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> d[SEC_300]                              2.45     2.53     2.69  7808    1</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> lp__                                -1576.15 -1573.86 -1570.64  1424    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[durnpso]                           0.05     0.09     0.17  5755    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[prevsys]                          -0.13    -0.02     0.21  5755    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[bsa]                              -0.05     0.25     0.77  5052    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[weight]                            0.04     0.06     0.10  5267    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[psa]                              -0.08     0.03     0.25  4987    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03     0.02     0.12  5907    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01     0.03     0.12  6871    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.18     0.31     0.57  6112    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.06     0.18     0.40  7378    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.03     0.39     1.12  5167    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[bsa:.trtclassIL blocker]           0.27     0.60     1.28  5969    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    -0.14    -0.10  5834    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[weight:.trtclassIL blocker]       -0.10    -0.08    -0.04  6375    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.06     0.09     0.36  5762    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> beta[psa:.trtclassIL blocker]           0.01     0.14     0.38  6139    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[ETN]                                  1.55     1.60     1.71  4646    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[IXE_Q2W]                              2.95     3.01     3.12  4920    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[IXE_Q4W]                              2.54     2.59     2.70  5227    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[SEC_150]                              2.14     2.22     2.37  5975    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> d[SEC_300]                              2.45     2.53     2.69  6895    1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> lp__                                -1576.14 -1574.04 -1570.96  1550    1</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> Samples were drawn using NUTS(diag_e) at Thu Nov 25 16:35:29 2021.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Samples were drawn using NUTS(diag_e) at Thu Dec  2 13:44:43 2021.</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> convergence, Rhat=1).</span>

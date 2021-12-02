@@ -198,10 +198,24 @@ aid plotting or other exploration.</p>
 <span class='fu'>add_integration</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for data.frame</span>
-<span class='fu'>add_integration</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span>, cor <span class='op'>=</span> <span class='cn'>NULL</span>, n_int <span class='op'>=</span> <span class='fl'>1000L</span>, int_args <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>add_integration</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>...</span>,
+  cor <span class='op'>=</span> <span class='cn'>NULL</span>,
+  cor_adjust <span class='op'>=</span> <span class='cn'>NULL</span>,
+  n_int <span class='op'>=</span> <span class='fl'>1000L</span>,
+  int_args <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for nma_data</span>
-<span class='fu'>add_integration</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span>, cor <span class='op'>=</span> <span class='cn'>NULL</span>, n_int <span class='op'>=</span> <span class='fl'>1000L</span>, int_args <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>add_integration</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>...</span>,
+  cor <span class='op'>=</span> <span class='cn'>NULL</span>,
+  cor_adjust <span class='op'>=</span> <span class='cn'>NULL</span>,
+  n_int <span class='op'>=</span> <span class='fl'>1000L</span>,
+  int_args <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>)</span>
 
 <span class='fu'>unnest_integration</span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span></pre>
 
@@ -222,6 +236,14 @@ aid plotting or other exploration.</p>
       <td><p>Correlation matrix to use for generating the integration points.
 By default, this takes a weighted correlation matrix from all IPD studies.
 Rows and columns should match the order of covariates specified in <code>...</code>.</p></td>
+    </tr>
+    <tr>
+      <th>cor_adjust</th>
+      <td><p>Adjustment to apply to the correlation matrix given by
+<code>cor</code> (or computed from the IPD if <code>cor = NULL</code>) to obtain the Gaussian
+copula correlations, either <code>"spearman"</code>, <code>"pearson"</code>, or <code>"none"</code>, see
+"Details". The default when <code>cor = NULL</code> is <code>"spearman"</code>, otherwise the
+default is <code>"pearson"</code>.</p></td>
     </tr>
     <tr>
       <th>n_int</th>
@@ -253,12 +275,48 @@ unnested.</p>
 covariates. Argument names specify the name of the covariate, which should
 match a covariate name in the IPD (if IPD are present). The required
 marginal distribution is then specified using the function <code><a href='distr.html'>distr()</a></code>.</p>
+<p>The argument <code>cor_adjust</code> specifies how the correlation matrix given by
+<code>cor</code> (or computed from the IPD if <code>cor = NULL</code>) is adjusted to obtain the
+correlation matrix for the Gaussian copula, using the formulae in
+Xiao and Zhou (2018)
+.</p><ul>
+<li><p><code>cor_adjust = "spearman"</code> should be used when the correlations <code>cor</code> have
+been computed using Spearman's rank correlation. Correlations between
+continuous covariates will be reproduced exactly by the integration points.
+Correlations between discrete covariates will be reproduced approximately.
+This is the default when <code>cor = NULL</code> and correlations are calculated from
+the IPD studies.</p></li>
+<li><p><code>cor_adjust = "pearson"</code> should be used when the correlations <code>cor</code> have
+been computed using Pearson's product-moment correlation. Correlations between
+Normal covariates will be reproduced exactly by the integration points, all
+others will be reproduced approximately. Correlations between discrete
+covariates will be reproduced approximately (and identically to <code>cor_adjust   = "spearman"</code>). This is the default when <code>cor</code> is provided by the user,
+since <code><a href='https://rdrr.io/r/stats/cor.html'>cor()</a></code> defaults to <code>method = "pearson"</code> and Pearson correlations are
+most likely reported in published data. However, we recommend providing
+Spearman correlations (e.g. from <code>cor(., method = "spearman")</code>) and using
+<code>cor_adjust = "spearman"</code> where possible.</p></li>
+<li><p><code>cor_adjust = "none"</code> allows the user to specify the correlation matrix
+for the Gaussian copula directly; no adjustment is applied.</p></li>
+<li><p><code>cor_adjust = "legacy"</code> is also available, which reproduces exactly the
+behaviour from version 0.3.0 and earlier. This is similar to <code>cor_adjust =   "none"</code>, but unadjusted Spearman correlations are used if <code>cor = NULL</code>.</p></li>
+</ul>
+
+<p>When adding integration points to a network object the correlation matrix
+used is stored in <code>$int_cor</code>, and the copula correlation matrix and
+adjustment used are stored as attributes of <code>$int_cor</code>. If this correlation
+matrix is passed again to <code>add_integration()</code> (e.g. to reuse the
+correlations for an external target population) this will be detected, and
+the correct setting for <code>cor_adjust</code> will automatically be applied.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Phillippo DM, Dias S, Ades AE, Belger M, Brnabic A, Schacht A, Saure D, Kadziola Z, Welton NJ (2020).
 &#8220;Multilevel Network Meta-Regression for population-adjusted treatment comparisons.&#8221;
 <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em>, <b>183</b>(3), 1189--1210.
 doi: <a href='https://doi.org/10.1111/rssa.12579'>10.1111/rssa.12579</a>
+.<br /><br /> Xiao Q, Zhou S (2018).
+&#8220;Matching a correlation coefficient by a Gaussian copula.&#8221;
+<em>Communications in Statistics - Theory and Methods</em>, <b>48</b>(7), 1728--1747.
+doi: <a href='https://doi.org/10.1080/03610926.2018.1439962'>10.1080/03610926.2018.1439962</a>
 .</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -412,6 +470,10 @@ doi: <a href='https://doi.org/10.1111/rssa.12579'>10.1111/rssa.12579</a>
 <span class='r-in'>  psa <span class='op'>=</span> <span class='fu'><a href='distr.html'>distr</a></span><span class='op'>(</span><span class='va'>qbern</span>, prob <span class='op'>=</span> <span class='va'>psa</span><span class='op'>)</span>,</span>
 <span class='r-in'>  cor <span class='op'>=</span> <span class='va'>pso_net</span><span class='op'>$</span><span class='va'>int_cor</span>,</span>
 <span class='r-in'>  n_int <span class='op'>=</span> <span class='fl'>1000</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Here, since we reused the correlation matrix pso_net$int_cor from the</span></span>
+<span class='r-in'><span class='co'># network, the correct setting of cor_adjust = "spearman" is automatically</span></span>
+<span class='r-in'><span class='co'># applied</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='va'>new_agd_int</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 1 × 13</span></span>

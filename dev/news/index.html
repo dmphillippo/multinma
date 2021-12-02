@@ -179,6 +179,7 @@
 <a href="#multinma-0309000" class="anchor"></a>multinma 0.3.0.9000<small> Unreleased </small>
 </h1>
 <ul>
+<li>Feature: The correlation matrix for generating integration points with <code><a href="../reference/add_integration.html">add_integration()</a></code> for ML-NMR models is now adjusted to the underlying Gaussian copula, so that the output correlations of the integration points better match the requested input correlations. A new argument <code>cor_adjust</code> controls this behaviour, with options <code>"spearman"</code>, <code>"pearson"</code>, or <code>"none"</code>. Although these correlations typically have little impact on the results, for strict reproducibility the old behaviour from version 0.3.0 and below is available with <code>cor_adjust = "legacy"</code>.</li>
 <li>Fix: Model fitting is now robust to non-default settings of <code>options("contrasts")</code>.</li>
 <li>Fix: <code><a href="../reference/plot.nma_data.html">plot.nma_data()</a></code> no longer gives a ggplot deprecation warning (PR <a href='https://github.com/dmphillippo/multinma/issues/6'>#6</a>).</li>
 <li>Fix: Bug in <code><a href="../reference/predict.stan_nma.html">predict.stan_nma()</a></code> with a single covariate when <code>newdata</code> is a <code>data.frame</code> (PR <a href='https://github.com/dmphillippo/multinma/issues/7'>#7</a>).</li>
