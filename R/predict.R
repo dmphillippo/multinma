@@ -30,16 +30,16 @@
 #'   is specified. A data frame of covariate details, for which to produce
 #'   predictions. Column names must match variables in the regression model.
 #'
-#'   If `type = "aggregate"` this should either be a data frame with integration
+#'   If `level = "aggregate"` this should either be a data frame with integration
 #'   points as produced by [add_integration()] (one row per study), or a data
 #'   frame with individual covariate values (one row per individual) which are
 #'   summarised over.
 #'
-#'   If `type = "individual"` this should be a data frame of individual
+#'   If `level = "individual"` this should be a data frame of individual
 #'   covariate values, one row per individual.
 #'
 #'   If `NULL`, predictions are produced for all studies with IPD and/or
-#'   arm-based AgD in the network, depending on the value of `type`.
+#'   arm-based AgD in the network, depending on the value of `level`.
 #' @param study Column of `newdata` which specifies study names or IDs. When not
 #'   specified: if `newdata` contains integration points produced by
 #'   [add_integration()], studies will be labelled sequentially by row;
@@ -53,8 +53,8 @@
 #' @param level The level at which predictions are produced, either
 #'   `"aggregate"` (the default), or `"individual"`. If `baseline` is not
 #'   specified, predictions are produced for all IPD studies in the network if
-#'   `type` is `"individual"` or `"aggregate"`, and for all arm-based AgD
-#'   studies in the network if `type` is `"aggregate"`.
+#'   `level` is `"individual"` or `"aggregate"`, and for all arm-based AgD
+#'   studies in the network if `level` is `"aggregate"`.
 #' @param baseline_type When a `baseline` distribution is given, specifies
 #'   whether this corresponds to the `"link"` scale (the default, e.g. log odds)
 #'   or `"response"` scale (e.g. probabilities).
