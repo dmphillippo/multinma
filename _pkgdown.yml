@@ -12,6 +12,7 @@ home:
 template:
   params:
     bootswatch: paper
+  bootstrap: 5
 
 
 development:
