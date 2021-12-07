@@ -28,6 +28,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -47,12 +49,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -66,7 +62,8 @@
       <a href="../articles/vignette_overview.html">Overview of Examples</a>
     </li>
     <li class="divider">
-    <li class="dropdown-header">Examples</li>
+    </li>
+<li class="dropdown-header">Examples</li>
     <li>
       <a href="../articles/example_atrial_fibrillation.html">Example: Atrial fibrillation</a>
     </li>
@@ -111,7 +108,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/dmphillippo/multinma/">
+  <a href="https://github.com/dmphillippo/multinma/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -132,7 +129,7 @@
       <h1 data-toc-skip>Example: Smoking cessation</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/dmphillippo/multinma/blob/master/vignettes/example_smoking.Rmd"><code>vignettes/example_smoking.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/dmphillippo/multinma/blob/HEAD/vignettes/example_smoking.Rmd" class="external-link"><code>vignettes/example_smoking.Rmd</code></a></small>
       <div class="hidden name"><code>example_smoking.Rmd</code></div>
 
     </div>
@@ -140,18 +137,18 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dmphillippo.github.io/multinma/">multinma</a></span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html">detectCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt; For execution on a local, multicore CPU with excess RAM we recommend calling
-#&gt; options(mc.cores = parallel::detectCores())
-#&gt; 
-#&gt; Attaching package: 'multinma'
-#&gt; The following objects are masked from 'package:stats':
-#&gt; 
-#&gt;     dgamma, pgamma, qgamma</code></pre>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dmphillippo.github.io/multinma/">multinma</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">#&gt; For execution on a local, multicore CPU with excess RAM we recommend calling</span>
+<span class="co">#&gt; options(mc.cores = parallel::detectCores())</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'multinma'</span>
+<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     dgamma, pgamma, qgamma</span></code></pre>
 <p>This vignette describes the analysis of smoking cessation data <span class="citation">(Hasselblad 1998)</span>, replicating the analysis in NICE Technical Support Document 4 <span class="citation">(Dias et al. 2011)</span>. The data are available in this package as <code>smoking</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">smoking</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">smoking</span><span class="op">)</span>
 <span class="co">#&gt;   studyn trtn                   trtc  r   n</span>
 <span class="co">#&gt; 1      1    1        No intervention  9 140</span>
 <span class="co">#&gt; 2      1    3 Individual counselling 23 140</span>
@@ -159,9 +156,9 @@
 <span class="co">#&gt; 4      2    2              Self-help 11  78</span>
 <span class="co">#&gt; 5      2    3 Individual counselling 12  85</span>
 <span class="co">#&gt; 6      2    4      Group counselling 29 170</span></code></pre></div>
-<div id="setting-up-the-network" class="section level3">
-<h3 class="hasAnchor">
-<a href="#setting-up-the-network" class="anchor"></a>Setting up the network</h3>
+<div class="section level3">
+<h3 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
+</h3>
 <p>We begin by setting up the network. We have arm-level count data giving the number quitting smoking (<code>r</code>) out of the total (<code>n</code>) in each arm, so we use the function <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code>. Treatment “No intervention” is set as the network reference treatment.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">smknet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_agd_arm.html">set_agd_arm</a></span><span class="op">(</span><span class="va">smoking</span>, 
@@ -173,7 +170,7 @@
 <span class="va">smknet</span>
 <span class="co">#&gt; A network with 24 AgD studies (arm-based).</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ------------------------------------------------------- AgD studies (arm-based) ---- </span>
+<span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------</span> <span style="font-weight: bold;">AgD studies (arm-based)</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt;  Study Treatments                                                     </span>
 <span class="co">#&gt;  1     3: No intervention | Individual counselling | Group counselling</span>
 <span class="co">#&gt;  2     3: Self-help | Individual counselling | Group counselling      </span>
@@ -185,30 +182,30 @@
 <span class="co">#&gt;  8     2: No intervention | Individual counselling                    </span>
 <span class="co">#&gt;  9     2: No intervention | Individual counselling                    </span>
 <span class="co">#&gt;  10    2: No intervention | Self-help                                 </span>
-<span class="co">#&gt;  ... plus 14 more studies</span>
+<span class="co">#&gt; <span style="color: #555555;"> ... plus 14 more studies</span></span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;  Outcome type: count</span>
-<span class="co">#&gt; ------------------------------------------------------------------------------------</span>
+<span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------------------------</span></span>
 <span class="co">#&gt; Total number of treatments: 4</span>
 <span class="co">#&gt; Total number of studies: 24</span>
 <span class="co">#&gt; Reference treatment is: No intervention</span>
-<span class="co">#&gt; Network is connected</span></code></pre></div>
+<span class="co">#&gt; Network is <span style="color: #00BB00;">connected</span></span></code></pre></div>
 <p>Plot the network structure.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">smknet</span>, weight_edges <span class="op">=</span> <span class="cn">TRUE</span>, weight_nodes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smknet</span>, weight_edges <span class="op">=</span> <span class="cn">TRUE</span>, weight_nodes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="example_smoking_files/figure-html/smoking_network_plot-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
-<div id="random-effects-nma" class="section level3">
-<h3 class="hasAnchor">
-<a href="#random-effects-nma" class="anchor"></a>Random effects NMA</h3>
-<p>Following TSD 4, we fit a random effects NMA model, using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "random"</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span> and study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and a <span class="math inline">\(\textrm{half-N}(5^2)\)</span> prior distribution for the between-study heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> method:</p>
+<div class="section level3">
+<h3 id="random-effects-nma">Random effects NMA<a class="anchor" aria-label="anchor" href="#random-effects-nma"></a>
+</h3>
+<p>Following TSD 4, we fit a random effects NMA model, using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "random"</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span> and study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and a <span class="math inline">\(\textrm{half-N}(5^2)\)</span> prior distribution for the between-study heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span>
 <span class="co">#&gt; 50% of the prior density lies between -67.45 and 67.45.</span>
 <span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; A half-Normal prior distribution: location = 0, scale = 5.</span>
 <span class="co">#&gt; 50% of the prior density lies between 0 and 3.37.</span>
 <span class="co">#&gt; 95% of the prior density lies between 0 and 9.8.</span></code></pre></div>
@@ -219,7 +216,7 @@
               prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
               prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
               prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html">print()</a></code> method:</p>
+<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">smkfit</span>
 <span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span>
@@ -228,26 +225,26 @@
 <span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                               mean se_mean   sd     2.5%      25%      50%      75%    97.5% n_eff</span>
-<span class="co">#&gt; d[Group counselling]          1.11    0.01 0.43     0.31     0.81     1.09     1.38     2.03  1561</span>
-<span class="co">#&gt; d[Individual counselling]     0.85    0.01 0.23     0.40     0.69     0.84     0.99     1.34   940</span>
-<span class="co">#&gt; d[Self-help]                  0.50    0.01 0.41    -0.29     0.24     0.48     0.76     1.35  1498</span>
-<span class="co">#&gt; lp__                      -5768.15    0.21 6.72 -5781.77 -5772.44 -5767.96 -5763.39 -5756.12   991</span>
-<span class="co">#&gt; tau                           0.84    0.01 0.19     0.54     0.70     0.81     0.95     1.29  1032</span>
+<span class="co">#&gt; d[Group counselling]          1.11    0.01 0.43     0.28     0.81     1.09     1.39     2.00  2085</span>
+<span class="co">#&gt; d[Individual counselling]     0.84    0.01 0.23     0.39     0.69     0.84     0.99     1.32  1332</span>
+<span class="co">#&gt; d[Self-help]                  0.49    0.01 0.39    -0.27     0.23     0.47     0.74     1.30  1812</span>
+<span class="co">#&gt; lp__                      -5768.11    0.20 6.49 -5781.60 -5772.40 -5767.79 -5763.47 -5756.31  1027</span>
+<span class="co">#&gt; tau                           0.84    0.01 0.19     0.54     0.70     0.81     0.94     1.26  1056</span>
 <span class="co">#&gt;                           Rhat</span>
-<span class="co">#&gt; d[Group counselling]      1.00</span>
-<span class="co">#&gt; d[Individual counselling] 1.00</span>
-<span class="co">#&gt; d[Self-help]              1.00</span>
-<span class="co">#&gt; lp__                      1.01</span>
-<span class="co">#&gt; tau                       1.01</span>
+<span class="co">#&gt; d[Group counselling]         1</span>
+<span class="co">#&gt; d[Individual counselling]    1</span>
+<span class="co">#&gt; d[Self-help]                 1</span>
+<span class="co">#&gt; lp__                         1</span>
+<span class="co">#&gt; tau                          1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Dec  2 14:09:28 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Dec  7 11:12:36 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
 <p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects <span class="math inline">\(\delta_{jk}\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Not run</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">smkfit</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"tau"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">smkfit</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"tau"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">smkfit</span><span class="op">)</span></code></pre></div>
@@ -259,12 +256,12 @@
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">dic_consistency</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">smkfit</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 54.3 (on 50 data points)</span>
-<span class="co">#&gt;                pD: 44.1</span>
-<span class="co">#&gt;               DIC: 98.4</span></code></pre></div>
-<p>and the residual deviance contributions examined with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code> method</p>
+<span class="co">#&gt; Residual deviance: 54.1<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="co">#&gt;                pD: 43.9</span>
+<span class="co">#&gt;               DIC: 98</span></code></pre></div>
+<p>and the residual deviance contributions examined with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">dic_consistency</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dic_consistency</span><span class="op">)</span></code></pre></div>
 <p><img src="example_smoking_files/figure-html/smoking_resdev_plot-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>Overall model fit seems to be adequate, with almost all points showing good fit (mean residual deviance contribution of 1). The only two points with higher residual deviance (i.e. worse fit) correspond to the two zero counts in the data:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
@@ -273,9 +270,9 @@
 <span class="co">#&gt; 13      6    1 No intervention 0 33</span>
 <span class="co">#&gt; 31     15    1 No intervention 0 20</span></code></pre></div>
 </div>
-<div id="checking-for-inconsistency" class="section level3">
-<h3 class="hasAnchor">
-<a href="#checking-for-inconsistency" class="anchor"></a>Checking for inconsistency</h3>
+<div class="section level3">
+<h3 id="checking-for-inconsistency">Checking for inconsistency<a class="anchor" aria-label="anchor" href="#checking-for-inconsistency"></a>
+</h3>
 <p>We fit an unrelated mean effects (UME) model <span class="citation">(Dias et al. 2011)</span> to assess the consistency assumption. Again, we use the function <code><a href="../reference/nma.html">nma()</a></code>, but now with the argument <code>consistency = "ume"</code>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">smkfit_ume</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">smknet</span>, 
@@ -292,104 +289,104 @@
 <span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                                                     mean se_mean   sd     2.5%      25%      50%</span>
-<span class="co">#&gt; d[Group counselling vs. No intervention]            1.11    0.02 0.80    -0.42     0.58     1.09</span>
-<span class="co">#&gt; d[Individual counselling vs. No intervention]       0.91    0.01 0.28     0.36     0.72     0.90</span>
-<span class="co">#&gt; d[Self-help vs. No intervention]                    0.36    0.01 0.59    -0.80    -0.04     0.36</span>
-<span class="co">#&gt; d[Individual counselling vs. Group counselling]    -0.27    0.01 0.61    -1.42    -0.67    -0.29</span>
-<span class="co">#&gt; d[Self-help vs. Group counselling]                 -0.60    0.01 0.70    -1.97    -1.07    -0.60</span>
-<span class="co">#&gt; d[Self-help vs. Individual counselling]             0.14    0.02 1.05    -1.95    -0.52     0.13</span>
-<span class="co">#&gt; lp__                                            -5764.95    0.19 6.26 -5777.92 -5768.99 -5764.64</span>
-<span class="co">#&gt; tau                                                 0.94    0.01 0.22     0.59     0.78     0.91</span>
+<span class="co">#&gt; d[Group counselling vs. No intervention]            1.11    0.02 0.79    -0.30     0.58     1.07</span>
+<span class="co">#&gt; d[Individual counselling vs. No intervention]       0.89    0.01 0.27     0.39     0.71     0.88</span>
+<span class="co">#&gt; d[Self-help vs. No intervention]                    0.32    0.01 0.59    -0.83    -0.06     0.31</span>
+<span class="co">#&gt; d[Individual counselling vs. Group counselling]    -0.30    0.01 0.61    -1.46    -0.70    -0.31</span>
+<span class="co">#&gt; d[Self-help vs. Group counselling]                 -0.63    0.02 0.71    -2.01    -1.09    -0.61</span>
+<span class="co">#&gt; d[Self-help vs. Individual counselling]             0.14    0.02 1.05    -1.95    -0.52     0.10</span>
+<span class="co">#&gt; lp__                                            -5765.05    0.20 6.25 -5777.97 -5769.15 -5764.75</span>
+<span class="co">#&gt; tau                                                 0.94    0.01 0.23     0.59     0.78     0.90</span>
 <span class="co">#&gt;                                                      75%    97.5% n_eff Rhat</span>
-<span class="co">#&gt; d[Group counselling vs. No intervention]            1.63     2.78  2307    1</span>
-<span class="co">#&gt; d[Individual counselling vs. No intervention]       1.09     1.50   988    1</span>
-<span class="co">#&gt; d[Self-help vs. No intervention]                    0.74     1.54  1811    1</span>
-<span class="co">#&gt; d[Individual counselling vs. Group counselling]     0.11     1.00  1834    1</span>
-<span class="co">#&gt; d[Self-help vs. Group counselling]                 -0.15     0.79  2456    1</span>
-<span class="co">#&gt; d[Self-help vs. Individual counselling]             0.82     2.21  2733    1</span>
-<span class="co">#&gt; lp__                                            -5760.62 -5753.80  1085    1</span>
-<span class="co">#&gt; tau                                                 1.06     1.45   981    1</span>
+<span class="co">#&gt; d[Group counselling vs. No intervention]            1.61     2.77  2708    1</span>
+<span class="co">#&gt; d[Individual counselling vs. No intervention]       1.06     1.43   956    1</span>
+<span class="co">#&gt; d[Self-help vs. No intervention]                    0.68     1.53  1844    1</span>
+<span class="co">#&gt; d[Individual counselling vs. Group counselling]     0.09     0.92  2481    1</span>
+<span class="co">#&gt; d[Self-help vs. Group counselling]                 -0.17     0.80  2192    1</span>
+<span class="co">#&gt; d[Self-help vs. Individual counselling]             0.80     2.29  2957    1</span>
+<span class="co">#&gt; lp__                                            -5760.60 -5753.92   980    1</span>
+<span class="co">#&gt; tau                                                 1.06     1.48   908    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Dec  2 14:09:46 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Dec  7 11:12:55 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
 <p>Comparing the model fit statistics</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dic_consistency</span>
-<span class="co">#&gt; Residual deviance: 54.3 (on 50 data points)</span>
-<span class="co">#&gt;                pD: 44.1</span>
-<span class="co">#&gt;               DIC: 98.4</span>
+<span class="co">#&gt; Residual deviance: 54.1<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="co">#&gt;                pD: 43.9</span>
+<span class="co">#&gt;               DIC: 98</span>
 <span class="op">(</span><span class="va">dic_ume</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">smkfit_ume</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 53.3 (on 50 data points)</span>
-<span class="co">#&gt;                pD: 44.6</span>
-<span class="co">#&gt;               DIC: 97.8</span></code></pre></div>
-<p>We see that there is little to choose between the two models. However, it is also important to examine the individual contributions to model fit of each data point under the two models (a so-called “dev-dev” plot). Passing two <code>nma_dic</code> objects produced by the <code><a href="../reference/dic.html">dic()</a></code> function to the <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code> method produces this dev-dev plot:</p>
+<span class="co">#&gt; Residual deviance: 53.7<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="co">#&gt;                pD: 44.8</span>
+<span class="co">#&gt;               DIC: 98.4</span></code></pre></div>
+<p>We see that there is little to choose between the two models. However, it is also important to examine the individual contributions to model fit of each data point under the two models (a so-called “dev-dev” plot). Passing two <code>nma_dic</code> objects produced by the <code><a href="../reference/dic.html">dic()</a></code> function to the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method produces this dev-dev plot:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">dic_consistency</span>, <span class="va">dic_ume</span>, point_alpha <span class="op">=</span> <span class="fl">0.5</span>, interval_alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dic_consistency</span>, <span class="va">dic_ume</span>, point_alpha <span class="op">=</span> <span class="fl">0.5</span>, interval_alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></code></pre></div>
 <p><img src="example_smoking_files/figure-html/smoking_devdev_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>All points lie roughly on the line of equality, so there is no evidence for inconsistency here.</p>
 </div>
-<div id="further-results" class="section level3">
-<h3 class="hasAnchor">
-<a href="#further-results" class="anchor"></a>Further results</h3>
+<div class="section level3">
+<h3 id="further-results">Further results<a class="anchor" aria-label="anchor" href="#further-results"></a>
+</h3>
 <p>Pairwise relative effects, for all pairwise contrasts with <code>all_contrasts = TRUE</code>.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">smk_releff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">smkfit</span>, all_contrasts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;                                                  mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS</span>
-<span class="co">#&gt; d[Group counselling vs. No intervention]         1.11 0.43  0.31  0.81  1.09  1.38  2.03     1619</span>
-<span class="co">#&gt; d[Individual counselling vs. No intervention]    0.85 0.23  0.40  0.69  0.84  0.99  1.34      948</span>
-<span class="co">#&gt; d[Self-help vs. No intervention]                 0.50 0.41 -0.29  0.24  0.48  0.76  1.35     1530</span>
-<span class="co">#&gt; d[Individual counselling vs. Group counselling] -0.26 0.40 -1.08 -0.51 -0.25  0.00  0.51     2572</span>
-<span class="co">#&gt; d[Self-help vs. Group counselling]              -0.61 0.49 -1.60 -0.91 -0.60 -0.29  0.33     2375</span>
-<span class="co">#&gt; d[Self-help vs. Individual counselling]         -0.35 0.42 -1.18 -0.61 -0.35 -0.08  0.47     1838</span>
+<span class="co">#&gt; d[Group counselling vs. No intervention]         1.11 0.43  0.28  0.81  1.09  1.39  2.00     2131</span>
+<span class="co">#&gt; d[Individual counselling vs. No intervention]    0.84 0.23  0.39  0.69  0.84  0.99  1.32     1345</span>
+<span class="co">#&gt; d[Self-help vs. No intervention]                 0.49 0.39 -0.27  0.23  0.47  0.74  1.30     1837</span>
+<span class="co">#&gt; d[Individual counselling vs. Group counselling] -0.26 0.41 -1.07 -0.53 -0.26  0.01  0.56     2758</span>
+<span class="co">#&gt; d[Self-help vs. Group counselling]              -0.62 0.48 -1.60 -0.92 -0.61 -0.30  0.30     2787</span>
+<span class="co">#&gt; d[Self-help vs. Individual counselling]         -0.36 0.41 -1.17 -0.62 -0.35 -0.09  0.46     2134</span>
 <span class="co">#&gt;                                                 Tail_ESS Rhat</span>
-<span class="co">#&gt; d[Group counselling vs. No intervention]            2029    1</span>
-<span class="co">#&gt; d[Individual counselling vs. No intervention]       1675    1</span>
-<span class="co">#&gt; d[Self-help vs. No intervention]                    1644    1</span>
-<span class="co">#&gt; d[Individual counselling vs. Group counselling]     2773    1</span>
-<span class="co">#&gt; d[Self-help vs. Group counselling]                  2632    1</span>
-<span class="co">#&gt; d[Self-help vs. Individual counselling]             2172    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">smk_releff</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
+<span class="co">#&gt; d[Group counselling vs. No intervention]            2292    1</span>
+<span class="co">#&gt; d[Individual counselling vs. No intervention]       1826    1</span>
+<span class="co">#&gt; d[Self-help vs. No intervention]                    2356    1</span>
+<span class="co">#&gt; d[Individual counselling vs. Group counselling]     2808    1</span>
+<span class="co">#&gt; d[Self-help vs. Group counselling]                  2788    1</span>
+<span class="co">#&gt; d[Self-help vs. Individual counselling]             2717    1</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_releff</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_smoking_files/figure-html/smoking_releff-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>Treatment rankings, rank probabilities, and cumulative rank probabilities. We set <code>lower_better = FALSE</code> since a higher log odds of cessation is better (the outcome is positive).</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">smk_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">smkfit</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;                              mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; rank[No intervention]        3.90 0.31    3   4   4   4     4     2167       NA    1</span>
-<span class="co">#&gt; rank[Group counselling]      1.35 0.59    1   1   1   2     3     2922     3035    1</span>
-<span class="co">#&gt; rank[Individual counselling] 1.94 0.64    1   2   2   2     3     2344     2785    1</span>
-<span class="co">#&gt; rank[Self-help]              2.81 0.69    1   3   3   3     4     2169       NA    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">smk_ranks</span><span class="op">)</span></code></pre></div>
+<span class="co">#&gt; rank[No intervention]        3.89 0.31    3   4   4   4     4     2543       NA    1</span>
+<span class="co">#&gt; rank[Group counselling]      1.35 0.61    1   1   1   2     3     3126     2712    1</span>
+<span class="co">#&gt; rank[Individual counselling] 1.93 0.63    1   2   2   2     3     2758       NA    1</span>
+<span class="co">#&gt; rank[Self-help]              2.82 0.67    1   3   3   3     4     2473       NA    1</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_ranks</span><span class="op">)</span></code></pre></div>
 <p><img src="example_smoking_files/figure-html/smoking_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">smk_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">smkfit</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]</span>
-<span class="co">#&gt; d[No intervention]             0.00      0.00      0.10       0.9</span>
-<span class="co">#&gt; d[Group counselling]           0.71      0.23      0.06       0.0</span>
-<span class="co">#&gt; d[Individual counselling]      0.23      0.59      0.17       0.0</span>
-<span class="co">#&gt; d[Self-help]                   0.06      0.17      0.67       0.1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">smk_rankprobs</span><span class="op">)</span></code></pre></div>
+<span class="co">#&gt; d[No intervention]             0.00      0.00      0.10      0.89</span>
+<span class="co">#&gt; d[Group counselling]           0.71      0.22      0.06      0.00</span>
+<span class="co">#&gt; d[Individual counselling]      0.24      0.60      0.17      0.00</span>
+<span class="co">#&gt; d[Self-help]                   0.05      0.18      0.67      0.10</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_rankprobs</span><span class="op">)</span></code></pre></div>
 <p><img src="example_smoking_files/figure-html/smoking_rankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">smk_cumrankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">smkfit</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]</span>
-<span class="co">#&gt; d[No intervention]             0.00      0.00       0.1         1</span>
-<span class="co">#&gt; d[Group counselling]           0.71      0.94       1.0         1</span>
-<span class="co">#&gt; d[Individual counselling]      0.23      0.83       1.0         1</span>
-<span class="co">#&gt; d[Self-help]                   0.06      0.23       0.9         1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">smk_cumrankprobs</span><span class="op">)</span></code></pre></div>
+<span class="co">#&gt; d[No intervention]             0.00      0.00      0.11         1</span>
+<span class="co">#&gt; d[Group counselling]           0.71      0.94      1.00         1</span>
+<span class="co">#&gt; d[Individual counselling]      0.24      0.83      1.00         1</span>
+<span class="co">#&gt; d[Self-help]                   0.05      0.23      0.90         1</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_cumrankprobs</span><span class="op">)</span></code></pre></div>
 <p><img src="example_smoking_files/figure-html/smoking_cumrankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
-<div id="references" class="section level2 unnumbered">
-<h2 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h2>
+<div class="section level2 unnumbered">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
 <div id="refs" class="references">
 <div id="ref-TSD4">
-<p>Dias, S., N. J. Welton, A. J. Sutton, D. M. Caldwell, G. Lu, and A. E. Ades. 2011. “NICE DSU Technical Support Document 4: Inconsistency in Networks of Evidence Based on Randomised Controlled Trials.” National Institute for Health and Care Excellence. <a href="http://nicedsu.org.uk/">http://nicedsu.org.uk/</a>.</p>
+<p>Dias, S., N. J. Welton, A. J. Sutton, D. M. Caldwell, G. Lu, and A. E. Ades. 2011. “NICE DSU Technical Support Document 4: Inconsistency in Networks of Evidence Based on Randomised Controlled Trials.” National Institute for Health and Care Excellence. <a href="http://nicedsu.org.uk/" class="external-link">http://nicedsu.org.uk/</a>.</p>
 </div>
 <div id="ref-Hasselblad1998">
-<p>Hasselblad, V. 1998. “Meta-Analysis of Multitreatment Studies.” <em>Medical Decision Making</em> 18 (1): 37–43. <a href="https://doi.org/10.1177/0272989x9801800110">https://doi.org/10.1177/0272989x9801800110</a>.</p>
+<p>Hasselblad, V. 1998. “Meta-Analysis of Multitreatment Studies.” <em>Medical Decision Making</em> 18 (1): 37–43. <a href="https://doi.org/10.1177/0272989x9801800110" class="external-link">https://doi.org/10.1177/0272989x9801800110</a>.</p>
 </div>
 </div>
 </div>
@@ -406,11 +403,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by David M. Phillippo.</p>
+  <p></p>
+<p>Developed by David M. Phillippo.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -418,6 +417,8 @@
 
   
 
+
+  
 
   </body>
 </html>

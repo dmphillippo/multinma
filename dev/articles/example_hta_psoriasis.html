@@ -28,6 +28,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -47,12 +49,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -66,7 +62,8 @@
       <a href="../articles/vignette_overview.html">Overview of Examples</a>
     </li>
     <li class="divider">
-    <li class="dropdown-header">Examples</li>
+    </li>
+<li class="dropdown-header">Examples</li>
     <li>
       <a href="../articles/example_atrial_fibrillation.html">Example: Atrial fibrillation</a>
     </li>
@@ -111,7 +108,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/dmphillippo/multinma/">
+  <a href="https://github.com/dmphillippo/multinma/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -132,7 +129,7 @@
       <h1 data-toc-skip>Example: Plaque psoriasis HTA report</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/dmphillippo/multinma/blob/master/vignettes/example_hta_psoriasis.Rmd"><code>vignettes/example_hta_psoriasis.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/dmphillippo/multinma/blob/HEAD/vignettes/example_hta_psoriasis.Rmd" class="external-link"><code>vignettes/example_hta_psoriasis.Rmd</code></a></small>
       <div class="hidden name"><code>example_hta_psoriasis.Rmd</code></div>
 
     </div>
@@ -140,18 +137,18 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dmphillippo.github.io/multinma/">multinma</a></span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html">detectCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt; For execution on a local, multicore CPU with excess RAM we recommend calling
-#&gt; options(mc.cores = parallel::detectCores())
-#&gt; 
-#&gt; Attaching package: 'multinma'
-#&gt; The following objects are masked from 'package:stats':
-#&gt; 
-#&gt;     dgamma, pgamma, qgamma</code></pre>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dmphillippo.github.io/multinma/">multinma</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">#&gt; For execution on a local, multicore CPU with excess RAM we recommend calling</span>
+<span class="co">#&gt; options(mc.cores = parallel::detectCores())</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'multinma'</span>
+<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     dgamma, pgamma, qgamma</span></code></pre>
 <p>This vignette describes the analysis of treatments for moderate-to-severe plaque psoriasis from an HTA report <span class="citation">(Woolacott et al. 2006)</span>, replicating the analysis in NICE Technical Support Document 2 <span class="citation">(Dias et al. 2011)</span>. The data are available in this package as <code>hta_psoriasis</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">hta_psoriasis</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">hta_psoriasis</span><span class="op">)</span>
 <span class="co">#&gt;   studyn   studyc year trtn             trtc sample_size PASI50 PASI75 PASI90</span>
 <span class="co">#&gt; 1      1  Elewski 2004    1  Supportive care         193     12      5      1</span>
 <span class="co">#&gt; 2      1  Elewski 2004    2 Etanercept 25 mg         196     59     46     21</span>
@@ -161,7 +158,7 @@
 <span class="co">#&gt; 6      3  Lebwohl 2003    1  Supportive care         122     13      5      1</span></code></pre></div>
 <p>Outcomes are ordered multinomial success/failure to achieve 50%, 75%, or 90% reduction in symptoms on the Psoriasis Area and Severity Index (PASI) scale. Some studies report ordered outcomes at all three cutpoints, others only one or two:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">hta_psoriasis</span>, <span class="va">studyc</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Elewski"</span>, <span class="st">"Gordon"</span>, <span class="st">"ACD2058g"</span>, <span class="st">"Altmeyer"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">hta_psoriasis</span>, <span class="va">studyc</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Elewski"</span>, <span class="st">"Gordon"</span>, <span class="st">"ACD2058g"</span>, <span class="st">"Altmeyer"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;   studyn   studyc year trtn             trtc sample_size PASI50 PASI75 PASI90</span>
 <span class="co">#&gt; 1      1  Elewski 2004    1  Supportive care         193     12      5      1</span>
 <span class="co">#&gt; 2      1  Elewski 2004    2 Etanercept 25 mg         196     59     46     21</span>
@@ -173,22 +170,22 @@
 <span class="co">#&gt; 8     10 Altmeyer 1994    1  Supportive care          51     NA      1     NA</span>
 <span class="co">#&gt; 9     10 Altmeyer 1994    6         Fumaderm          49     NA     12     NA</span></code></pre></div>
 <p>Here, the outcome counts are given as “exclusive” counts. That is, for a study reporting all outcomes (e.g. Elewski), the counts represent the categories 50 &lt; PASI &lt; 75, 75 &lt; PASI &lt; 90, and 90 &lt; PASI &lt; 100, and the corresponding columns are named by the lower end of the interval.  Missing values are used where studies only report a subset of the outcomes. For a study reporting only two outcomes, say PASI50 and PASI75 as in Gordon, the counts represent the categories 50 &lt; PASI &lt; 75 and 75 &lt; PASI &lt; 100. For a study reporting only one outcome, say PASI70 as in Altmeyer, the count represents 70 &lt; PASI &lt; 100. We also need the count for the lowest category (i.e. no higher outcomes achieved), which is equal to the sample size minus the counts in the other observed categories.</p>
-<div id="setting-up-the-network" class="section level3">
-<h3 class="hasAnchor">
-<a href="#setting-up-the-network" class="anchor"></a>Setting up the network</h3>
+<div class="section level3">
+<h3 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
+</h3>
 <p>We begin by setting up the network. We have arm-level ordered multinomial count data, so we use the function <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code>. The function <code><a href="../reference/multi.html">multi()</a></code> helps us to specify the ordered outcomes correctly.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pso_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_agd_arm.html">set_agd_arm</a></span><span class="op">(</span><span class="va">hta_psoriasis</span>, 
-                       study <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="va">studyc</span>, <span class="va">year</span><span class="op">)</span>, 
+                       study <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">studyc</span>, <span class="va">year</span><span class="op">)</span>, 
                        trt <span class="op">=</span> <span class="va">trtc</span>, 
-                       r <span class="op">=</span> <span class="fu"><a href="../reference/multi.html">multi</a></span><span class="op">(</span>r0 <span class="op">=</span> <span class="va">sample_size</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">PASI50</span>, <span class="va">PASI75</span>, <span class="va">PASI90</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, 
+                       r <span class="op">=</span> <span class="fu"><a href="../reference/multi.html">multi</a></span><span class="op">(</span>r0 <span class="op">=</span> <span class="va">sample_size</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">PASI50</span>, <span class="va">PASI75</span>, <span class="va">PASI90</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, 
                                  <span class="va">PASI50</span>, <span class="va">PASI75</span>, <span class="va">PASI90</span>,
                                  inclusive <span class="op">=</span> <span class="cn">FALSE</span>, 
                                  type <span class="op">=</span> <span class="st">"ordered"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">pso_net</span>
 <span class="co">#&gt; A network with 16 AgD studies (arm-based).</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ------------------------------------------------------- AgD studies (arm-based) ---- </span>
+<span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------</span> <span style="font-weight: bold;">AgD studies (arm-based)</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt;  Study         Treatments                                              </span>
 <span class="co">#&gt;  ACD2058g 2004 2: Supportive care | Efalizumab                         </span>
 <span class="co">#&gt;  ACD2600g 2004 2: Supportive care | Efalizumab                         </span>
@@ -200,36 +197,36 @@
 <span class="co">#&gt;  Gottlieb 2003 2: Supportive care | Etanercept 25 mg                   </span>
 <span class="co">#&gt;  Gottlieb 2004 2: Supportive care | Infliximab                         </span>
 <span class="co">#&gt;  Guenther 1991 2: Supportive care | Ciclosporin                        </span>
-<span class="co">#&gt;  ... plus 6 more studies</span>
+<span class="co">#&gt; <span style="color: #555555;"> ... plus 6 more studies</span></span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;  Outcome type: ordered (4 categories)</span>
-<span class="co">#&gt; ------------------------------------------------------------------------------------</span>
+<span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------------------------</span></span>
 <span class="co">#&gt; Total number of treatments: 8</span>
 <span class="co">#&gt; Total number of studies: 16</span>
 <span class="co">#&gt; Reference treatment is: Supportive care</span>
-<span class="co">#&gt; Network is connected</span></code></pre></div>
+<span class="co">#&gt; Network is <span style="color: #00BB00;">connected</span></span></code></pre></div>
 <p>Plot the network structure.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">pso_net</span>, weight_edges <span class="op">=</span> <span class="cn">TRUE</span>, weight_nodes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> 
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_net</span>, weight_edges <span class="op">=</span> <span class="cn">TRUE</span>, weight_nodes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> 
   <span class="co"># Nudge the legend over</span>
-  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.box.spacing <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.75</span>, <span class="st">"in"</span><span class="op">)</span>,
-                 plot.margin <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0</span>, <span class="fl">0.1</span>, <span class="fl">0.75</span>, <span class="st">"in"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.box.spacing <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.75</span>, <span class="st">"in"</span><span class="op">)</span>,
+                 plot.margin <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">margin</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0</span>, <span class="fl">0.1</span>, <span class="fl">0.75</span>, <span class="st">"in"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/hta_psoriasis_network_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
-<div id="meta-analysis-models" class="section level3">
-<h3 class="hasAnchor">
-<a href="#meta-analysis-models" class="anchor"></a>Meta-analysis models</h3>
+<div class="section level3">
+<h3 id="meta-analysis-models">Meta-analysis models<a class="anchor" aria-label="anchor" href="#meta-analysis-models"></a>
+</h3>
 <p>We fit both fixed effect (FE) and random effects (RE) models.</p>
-<div id="fixed-effect-meta-analysis" class="section level4">
-<h4 class="hasAnchor">
-<a href="#fixed-effect-meta-analysis" class="anchor"></a>Fixed effect meta-analysis</h4>
-<p>First, we fit a fixed effect model using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "fixed"</code>, using a probit link function <code>link = "probit"</code>. We use <span class="math inline">\(\mathrm{N}(0, 10^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span>, and <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the study-specific intercepts <span class="math inline">\(\mu_j\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> method:</p>
+<div class="section level4">
+<h4 id="fixed-effect-meta-analysis">Fixed effect meta-analysis<a class="anchor" aria-label="anchor" href="#fixed-effect-meta-analysis"></a>
+</h4>
+<p>First, we fit a fixed effect model using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "fixed"</code>, using a probit link function <code>link = "probit"</code>. We use <span class="math inline">\(\mathrm{N}(0, 10^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span>, and <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the study-specific intercepts <span class="math inline">\(\mu_j\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; A Normal prior distribution: location = 0, scale = 10.</span>
 <span class="co">#&gt; 50% of the prior density lies between -6.74 and 6.74.</span>
 <span class="co">#&gt; 95% of the prior density lies between -19.6 and 19.6.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span>
 <span class="co">#&gt; 50% of the prior density lies between -67.45 and 67.45.</span>
 <span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span></code></pre></div>
@@ -243,7 +240,7 @@
                   prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,
                   prior_aux <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">flat</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; Note: Setting "Supportive care" as the network reference treatment.</span></code></pre></div>
-<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html">print()</a></code> method:</p>
+<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pso_fit_FE</span>
 <span class="co">#&gt; A fixed effects NMA with a ordered likelihood (probit link).</span>
@@ -264,7 +261,7 @@
 <span class="co">#&gt; cc[PASI75]              0.76    0.00 0.03     0.70     0.74     0.76     0.78     0.82  5292    1</span>
 <span class="co">#&gt; cc[PASI90]              1.56    0.00 0.05     1.46     1.53     1.56     1.60     1.67  6220    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Dec  2 13:54:08 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Dec  7 10:57:18 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -274,7 +271,7 @@
 <p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Not run</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"cc"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"cc"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">pso_fit_FE</span><span class="op">)</span></code></pre></div>
@@ -284,20 +281,20 @@
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, prior <span class="op">=</span> <span class="st">"aux"</span><span class="op">)</span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/pso_FE_pp_cutpoint_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
-<div id="random-effects-meta-analysis" class="section level4">
-<h4 class="hasAnchor">
-<a href="#random-effects-meta-analysis" class="anchor"></a>Random effects meta-analysis</h4>
-<p>We now fit a random effects model using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "random"</code>. Again, we use <span class="math inline">\(\mathrm{N}(0, 10^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span>, <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the study-specific intercepts <span class="math inline">\(\mu_j\)</span>, implicit flat prior distributions for the latent cutpoints, and we additionally use a <span class="math inline">\(\textrm{half-N}(2.5^2)\)</span> prior for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> method:</p>
+<div class="section level4">
+<h4 id="random-effects-meta-analysis">Random effects meta-analysis<a class="anchor" aria-label="anchor" href="#random-effects-meta-analysis"></a>
+</h4>
+<p>We now fit a random effects model using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "random"</code>. Again, we use <span class="math inline">\(\mathrm{N}(0, 10^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span>, <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the study-specific intercepts <span class="math inline">\(\mu_j\)</span>, implicit flat prior distributions for the latent cutpoints, and we additionally use a <span class="math inline">\(\textrm{half-N}(2.5^2)\)</span> prior for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; A Normal prior distribution: location = 0, scale = 10.</span>
 <span class="co">#&gt; 50% of the prior density lies between -6.74 and 6.74.</span>
 <span class="co">#&gt; 95% of the prior density lies between -19.6 and 19.6.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span>
 <span class="co">#&gt; 50% of the prior density lies between -67.45 and 67.45.</span>
 <span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; A half-Normal prior distribution: location = 0, scale = 2.5.</span>
 <span class="co">#&gt; 50% of the prior density lies between 0 and 1.69.</span>
 <span class="co">#&gt; 95% of the prior density lies between 0 and 4.9.</span></code></pre></div>
@@ -311,8 +308,8 @@
                   prior_aux <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">flat</a></span><span class="op">(</span><span class="op">)</span>,
                   prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span>,
                   adapt_delta <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt; Note: Setting "Supportive care" as the network reference treatment.</code></pre>
-<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html">print()</a></code> method:</p>
+<pre><code><span class="co">#&gt; Note: Setting "Supportive care" as the network reference treatment.</span></code></pre>
+<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pso_fit_RE</span>
 <span class="co">#&gt; A random effects NMA with a ordered likelihood (probit link).</span>
@@ -334,53 +331,53 @@
 <span class="co">#&gt; cc[PASI75]              0.76    0.00 0.03     0.70     0.74     0.76     0.78     0.82 20555 1.00</span>
 <span class="co">#&gt; cc[PASI90]              1.56    0.00 0.05     1.46     1.53     1.56     1.60     1.67 23977 1.00</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Dec  2 13:55:31 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Dec  7 10:58:42 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
 <p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects <span class="math inline">\(\delta_{jk}\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Not run</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"cc"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"cc"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"aux"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"aux"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/pso_RE_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
-<div id="model-comparison" class="section level4">
-<h4 class="hasAnchor">
-<a href="#model-comparison" class="anchor"></a>Model comparison</h4>
+<div class="section level4">
+<h4 id="model-comparison">Model comparison<a class="anchor" aria-label="anchor" href="#model-comparison"></a>
+</h4>
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">pso_fit_FE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 75 (on 58 data points)</span>
+<span class="co">#&gt; Residual deviance: 75<span style="color: #555555;"> (on 58 data points)</span></span>
 <span class="co">#&gt;                pD: 25.6</span>
 <span class="co">#&gt;               DIC: 100.5</span></code></pre></div>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">pso_fit_RE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 62.5 (on 58 data points)</span>
+<span class="co">#&gt; Residual deviance: 62.5<span style="color: #555555;"> (on 58 data points)</span></span>
 <span class="co">#&gt;                pD: 33.5</span>
 <span class="co">#&gt;               DIC: 96</span></code></pre></div>
 <p>The random effects model has a lower DIC and the residual deviance is closer to the number of data points, so is preferred in this case.</p>
-<p>We can also examine the residual deviance contributions with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code> method.</p>
+<p>We can also examine the residual deviance contributions with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">dic_FE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dic_FE</span><span class="op">)</span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/pso_FE_resdev_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">dic_RE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dic_RE</span><span class="op">)</span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/pso_RE_resdev_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>Most data points are fit well, with posterior mean residual deviances close to the degrees of freedom. The Meffert 1997 study has a substantially higher residual deviance contribution, which could be investigated further to see why this study appears to be an outlier.</p>
 </div>
 </div>
-<div id="further-results" class="section level3">
-<h3 class="hasAnchor">
-<a href="#further-results" class="anchor"></a>Further results</h3>
-<div id="predicted-probabilities-of-response" class="section level4">
-<h4 class="hasAnchor">
-<a href="#predicted-probabilities-of-response" class="anchor"></a>Predicted probabilities of response</h4>
-<p><span class="citation">Dias et al. (2011)</span> produce absolute predictions of probability of achieving responses at each PASI cutoff, assuming a Normal distribution for the baseline probit probability of PASI50 response on supportive care with mean <span class="math inline">\(-1.097\)</span> and precision <span class="math inline">\(123\)</span>. We can replicate these results using the <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> method. The <code>baseline</code> argument takes a <code><a href="../reference/distr.html">distr()</a></code> distribution object, with which we specify the corresponding Normal distribution. We set <code>type = "response"</code> to produce predicted probabilities (<code>type = "link"</code> would produce predicted probit probabilities).</p>
+<div class="section level3">
+<h3 id="further-results">Further results<a class="anchor" aria-label="anchor" href="#further-results"></a>
+</h3>
+<div class="section level4">
+<h4 id="predicted-probabilities-of-response">Predicted probabilities of response<a class="anchor" aria-label="anchor" href="#predicted-probabilities-of-response"></a>
+</h4>
+<p><span class="citation">Dias et al. (2011)</span> produce absolute predictions of probability of achieving responses at each PASI cutoff, assuming a Normal distribution for the baseline probit probability of PASI50 response on supportive care with mean <span class="math inline">\(-1.097\)</span> and precision <span class="math inline">\(123\)</span>. We can replicate these results using the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method. The <code>baseline</code> argument takes a <code><a href="../reference/distr.html">distr()</a></code> distribution object, with which we specify the corresponding Normal distribution. We set <code>type = "response"</code> to produce predicted probabilities (<code>type = "link"</code> would produce predicted probit probabilities).</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pred_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, 
+<code class="sourceCode R"><span class="va">pred_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, 
                    baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">1.097</span>, sd <span class="op">=</span> <span class="fl">123</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>, 
                    type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
 <span class="va">pred_FE</span>
@@ -409,10 +406,10 @@
 <span class="co">#&gt; pred[Methotrexate, PASI50]     0.68 0.15 0.37 0.58 0.70 0.79  0.92     1476     2231    1</span>
 <span class="co">#&gt; pred[Methotrexate, PASI75]     0.41 0.16 0.14 0.29 0.40 0.53  0.75     1489     2165    1</span>
 <span class="co">#&gt; pred[Methotrexate, PASI90]     0.17 0.11 0.03 0.09 0.15 0.23  0.45     1505     2128    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">pred_FE</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_FE</span><span class="op">)</span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/pso_pred_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pred_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, 
+<code class="sourceCode R"><span class="va">pred_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, 
                    baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">1.097</span>, sd <span class="op">=</span> <span class="fl">123</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>, 
                    type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
 <span class="va">pred_RE</span>
@@ -441,11 +438,11 @@
 <span class="co">#&gt; pred[Methotrexate, PASI50]     0.70 0.18 0.30 0.59 0.72 0.84  0.98     4024     3725    1</span>
 <span class="co">#&gt; pred[Methotrexate, PASI75]     0.45 0.21 0.10 0.30 0.44 0.60  0.90     4027     3803    1</span>
 <span class="co">#&gt; pred[Methotrexate, PASI90]     0.21 0.17 0.02 0.09 0.17 0.29  0.67     4076     3668    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">pred_RE</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_RE</span><span class="op">)</span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/pso_pred_RE-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>If instead of information on the baseline PASI 50 response probit probability we have PASI 50 event counts, we can use these to construct a Beta distribution for the baseline probability of PASI 50 response. For example, if 56 out of 408 individuals achieved PASI 50 response on supportive care in the target population of interest, the appropriate Beta distribution for the response probability would be <span class="math inline">\(\textrm{Beta}(56, 408-56)\)</span>. We can specify this Beta distribution for the baseline response using the <code>baseline_type = "reponse"</code> argument (the default is <code>"link"</code>, used above for the baseline probit probability).</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pred_FE_beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, 
+<code class="sourceCode R"><span class="va">pred_FE_beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, 
                         baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qbeta</span>, <span class="fl">56</span>, <span class="fl">408</span><span class="op">-</span><span class="fl">56</span><span class="op">)</span>,
                         baseline_type <span class="op">=</span> <span class="st">"response"</span>,
                         type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
@@ -475,10 +472,10 @@
 <span class="co">#&gt; pred[Methotrexate, PASI50]     0.68 0.15 0.38 0.58 0.69 0.80  0.92     1506     1720    1</span>
 <span class="co">#&gt; pred[Methotrexate, PASI75]     0.41 0.16 0.14 0.29 0.40 0.53  0.75     1512     1776    1</span>
 <span class="co">#&gt; pred[Methotrexate, PASI90]     0.17 0.11 0.03 0.09 0.14 0.23  0.45     1528     1650    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">pred_FE_beta</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_FE_beta</span><span class="op">)</span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/pso_pred_FE_beta-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pred_RE_beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, 
+<code class="sourceCode R"><span class="va">pred_RE_beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, 
                         baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qbeta</span>, <span class="fl">56</span>, <span class="fl">408</span><span class="op">-</span><span class="fl">56</span><span class="op">)</span>,
                         baseline_type <span class="op">=</span> <span class="st">"response"</span>,
                         type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
@@ -508,21 +505,21 @@
 <span class="co">#&gt; pred[Methotrexate, PASI50]     0.70 0.18 0.30 0.59 0.72 0.84  0.98     3981     3438    1</span>
 <span class="co">#&gt; pred[Methotrexate, PASI75]     0.45 0.21 0.10 0.30 0.44 0.60  0.89     3990     3536    1</span>
 <span class="co">#&gt; pred[Methotrexate, PASI90]     0.21 0.17 0.02 0.09 0.17 0.29  0.67     4036     3492    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">pred_RE_beta</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_RE_beta</span><span class="op">)</span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/pso_pred_RE_beta-1.png" width="700" style="display: block; margin: auto;"> (Notice that these results are equivalent to those calculated above using the Normal distribution for the baseline probit probability, since these event counts correspond to the same probit probability.)</p>
 <p>We can modify the plots using standard <code>ggplot2</code> functions. For example, to plot the cutpoints together with a colour coding (instead of split into facets):</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">pred_RE</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_dodge.html">position_dodge</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_null.html">facet_null</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="va">Category</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Blues"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_RE</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_dodge.html" class="external-link">position_dodge</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_null.html" class="external-link">facet_null</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="va">Category</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Blues"</span><span class="op">)</span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/pso_pred_RE_colour-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>If the <code>baseline</code> argument is omitted, predicted probabilities will be produced for every study in the network based on their estimated baseline probit probability <span class="math inline">\(\mu_j\)</span>.</p>
 </div>
-<div id="ranks-and-rank-probabilities" class="section level4">
-<h4 class="hasAnchor">
-<a href="#ranks-and-rank-probabilities" class="anchor"></a>Ranks and rank probabilities</h4>
+<div class="section level4">
+<h4 id="ranks-and-rank-probabilities">Ranks and rank probabilities<a class="anchor" aria-label="anchor" href="#ranks-and-rank-probabilities"></a>
+</h4>
 <p>Treatment rankings, rank probabilities, and cumulative rank probabilities can also be produced. We set <code>lower_better = FALSE</code> since higher outcome categories are better (the outcomes are positive).</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">pso_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
@@ -535,7 +532,7 @@
 <span class="co">#&gt; rank[Fumaderm]         4.92 1.94    1   3   5   7     7     8860     5862    1</span>
 <span class="co">#&gt; rank[Infliximab]       1.83 1.21    1   1   1   2     5     3118     3969    1</span>
 <span class="co">#&gt; rank[Methotrexate]     4.19 1.88    1   3   4   6     7     5827     5437    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">pso_ranks</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_ranks</span><span class="op">)</span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/hta_psoriasis_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">pso_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
@@ -548,7 +545,7 @@
 <span class="co">#&gt; d[Fumaderm]              0.07      0.09      0.09      0.11      0.16      0.19      0.27      0.01</span>
 <span class="co">#&gt; d[Infliximab]            0.58      0.18      0.13      0.07      0.03      0.01      0.00      0.00</span>
 <span class="co">#&gt; d[Methotrexate]          0.10      0.13      0.15      0.18      0.16      0.14      0.14      0.00</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">pso_rankprobs</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_rankprobs</span><span class="op">)</span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/hta_psoriasis_rankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">pso_cumrankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
@@ -561,19 +558,19 @@
 <span class="co">#&gt; d[Fumaderm]              0.07      0.16      0.25      0.37      0.53      0.72      0.99         1</span>
 <span class="co">#&gt; d[Infliximab]            0.58      0.76      0.89      0.96      0.99      1.00      1.00         1</span>
 <span class="co">#&gt; d[Methotrexate]          0.10      0.22      0.37      0.55      0.71      0.86      1.00         1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">pso_cumrankprobs</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_cumrankprobs</span><span class="op">)</span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/hta_psoriasis_cumrankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
 </div>
-<div id="references" class="section level2 unnumbered">
-<h2 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h2>
+<div class="section level2 unnumbered">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
 <div id="refs" class="references">
 <div id="ref-TSD2">
-<p>Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. “NICE DSU Technical Support Document 2: A Generalised Linear Modelling Framework for Pair-Wise and Network Meta-Analysis of Randomised Controlled Trials.” National Institute for Health and Care Excellence. <a href="http://nicedsu.org.uk/">http://nicedsu.org.uk/</a>.</p>
+<p>Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. “NICE DSU Technical Support Document 2: A Generalised Linear Modelling Framework for Pair-Wise and Network Meta-Analysis of Randomised Controlled Trials.” National Institute for Health and Care Excellence. <a href="http://nicedsu.org.uk/" class="external-link">http://nicedsu.org.uk/</a>.</p>
 </div>
 <div id="ref-Woolacott2006">
-<p>Woolacott, N., N. Hawkins, A. Mason, A. Kainth, Z. Khadjesari, Y. Bravo Vergel, K. Misso, et al. 2006. “Etanercept and Efalizumab for the Treatment of Psoriasis: A Systematic Review.” <em>Health Technology Assessment</em> 10 (46). <a href="https://doi.org/10.3310/hta10460">https://doi.org/10.3310/hta10460</a>.</p>
+<p>Woolacott, N., N. Hawkins, A. Mason, A. Kainth, Z. Khadjesari, Y. Bravo Vergel, K. Misso, et al. 2006. “Etanercept and Efalizumab for the Treatment of Psoriasis: A Systematic Review.” <em>Health Technology Assessment</em> 10 (46). <a href="https://doi.org/10.3310/hta10460" class="external-link">https://doi.org/10.3310/hta10460</a>.</p>
 </div>
 </div>
 </div>
@@ -590,11 +587,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by David M. Phillippo.</p>
+  <p></p>
+<p>Developed by David M. Phillippo.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -602,6 +601,8 @@
 
   
 
+
+  
 
   </body>
 </html>
