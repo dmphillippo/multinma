@@ -62,6 +62,8 @@
 #'   model.offset terms optim pbinom dbinom qbinom as.formula update.formula
 #'   weighted.mean runif dunif plogis pnorm qlogis qnorm uniroot
 #' @importFrom utils packageVersion
+#' @importFrom RcppParallel CxxFlags
+#' @importFrom rstantools rstan_config
 #'
 #' @references
 #'   \insertAllCited{}
