@@ -791,7 +791,7 @@ pairs.stan_nma <- function(x, ..., pars, include = TRUE) {
   post_array <- as.array(x, pars = pars, include = include)
 
   max_td <- sf@stan_args[[1]]$control$max_treedepth
-  if (is.null(max_td)) max_td <- NULL
+  if (is.null(max_td)) max_td <- 10
 
   args <- rlang::dots_list(x = post_array,
                            np = bayesplot::nuts_params(sf),
