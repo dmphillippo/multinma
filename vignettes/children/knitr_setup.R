@@ -5,7 +5,7 @@ if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) { # Se
     comment = "#>",
     fig.align = "center"
   )
-  options(width = 100)
+  options(width = 95)
 
 } else { # Setup for vignettes
   knitr::opts_chunk$set(

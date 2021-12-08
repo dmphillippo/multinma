@@ -10,8 +10,11 @@ home:
 
 
 template:
-  params:
-    bootswatch: paper
+  bootstrap: 5
+  bslib:
+    base_font: {google: "Source Sans Pro"}
+    heading_font: {google: "Source Sans Pro"}
+    #code_font: {google: "JetBrains Mono"}
 
 
 development:
