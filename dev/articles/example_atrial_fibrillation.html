@@ -4,7 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="multinma">
 <title>Example: Atrial fibrillation • multinma</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
@@ -12,12 +13,12 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/paper/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
-<script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><link href="../deps/_Source%20Sans%20Pro-0.4.0/font.css" rel="stylesheet">
+<!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Example: Atrial fibrillation">
 <meta property="og:description" content="multinma">
 <meta property="og:image" content="https://dmphillippo.github.io/multinma/logo.svg">
@@ -27,111 +28,74 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body data-spy="scroll" data-target="#toc">
+<body>
+    <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <div class="container template-article">
-      <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">multinma</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.3.0.9000</span>
-      </span>
-    </div>
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    
+    <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-<li>
-  <a href="../reference/index.html">Reference</a>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.3.0.9000</small>
+
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar" class="collapse navbar-collapse ms-2">
+      <ul class="navbar-nav me-auto">
+<li class="nav-item">
+  <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../articles/vignette_overview.html">Overview of Examples</a>
-    </li>
-    <li class="divider">
-    </li>
-<li class="dropdown-header">Examples</li>
-    <li>
-      <a href="../articles/example_atrial_fibrillation.html">Example: Atrial fibrillation</a>
-    </li>
-    <li>
-      <a href="../articles/example_bcg_vaccine.html">Example: BCG vaccine for tuberculosis</a>
-    </li>
-    <li>
-      <a href="../articles/example_blocker.html">Example: Beta blockers</a>
-    </li>
-    <li>
-      <a href="../articles/example_diabetes.html">Example: Diabetes</a>
-    </li>
-    <li>
-      <a href="../articles/example_dietary_fat.html">Example: Dietary fat</a>
-    </li>
-    <li>
-      <a href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a>
-    </li>
-    <li>
-      <a href="../articles/example_parkinsons.html">Example: Parkinson's disease</a>
-    </li>
-    <li>
-      <a href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a>
-    </li>
-    <li>
-      <a href="../articles/example_smoking.html">Example: Smoking cessation</a>
-    </li>
-    <li>
-      <a href="../articles/example_statins.html">Example: Statins for cholesterol lowering</a>
-    </li>
-    <li>
-      <a href="../articles/example_thrombolytics.html">Example: Thrombolytic treatments</a>
-    </li>
-    <li>
-      <a href="../articles/example_transfusion.html">Example: White blood cell transfusion</a>
-    </li>
-  </ul>
-</li>
-<li>
-  <a href="../news/index.html">Changelog</a>
-</li>
-      </ul>
-<ul class="nav navbar-nav navbar-right">
-<li>
-  <a href="https://github.com/dmphillippo/multinma/" class="external-link">
-    <span class="fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
-      </ul>
-</div>
-<!--/.nav-collapse -->
+<li class="active nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/vignette_overview.html">Overview of Examples</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Examples</h6>
+    <a class="dropdown-item" href="../articles/example_atrial_fibrillation.html">Example: Atrial fibrillation</a>
+    <a class="dropdown-item" href="../articles/example_bcg_vaccine.html">Example: BCG vaccine for tuberculosis</a>
+    <a class="dropdown-item" href="../articles/example_blocker.html">Example: Beta blockers</a>
+    <a class="dropdown-item" href="../articles/example_diabetes.html">Example: Diabetes</a>
+    <a class="dropdown-item" href="../articles/example_dietary_fat.html">Example: Dietary fat</a>
+    <a class="dropdown-item" href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a>
+    <a class="dropdown-item" href="../articles/example_parkinsons.html">Example: Parkinson's disease</a>
+    <a class="dropdown-item" href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a>
+    <a class="dropdown-item" href="../articles/example_smoking.html">Example: Smoking cessation</a>
+    <a class="dropdown-item" href="../articles/example_statins.html">Example: Statins for cholesterol lowering</a>
+    <a class="dropdown-item" href="../articles/example_thrombolytics.html">Example: Thrombolytic treatments</a>
+    <a class="dropdown-item" href="../articles/example_transfusion.html">Example: White blood cell transfusion</a>
   </div>
-<!--/.container -->
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
+</li>
+      </ul>
+<form class="form-inline my-2 my-lg-0" role="search">
+        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
+</form>
+
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/dmphillippo/multinma/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
-<!--/.navbar -->
 
-      
-
-      </header><script src="example_atrial_fibrillation_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
-  <div class="col-md-9 contents">
-    <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Example: Atrial fibrillation</h1>
+    
+  </div>
+</nav><div class="container template-article">
+<script src="example_atrial_fibrillation_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+  <main id="main"><div class="page-header">
+      <img src="../logo.svg" class="logo" alt=""><h1>Example: Atrial fibrillation</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/dmphillippo/multinma/blob/HEAD/vignettes/example_atrial_fibrillation.Rmd" class="external-link"><code>vignettes/example_atrial_fibrillation.Rmd</code></a></small>
-      <div class="hidden name"><code>example_atrial_fibrillation.Rmd</code></div>
-
+      <div class="d-none name"><code>example_atrial_fibrillation.Rmd</code></div>
     </div>
 
     
@@ -149,20 +113,20 @@
 <p>This vignette describes the analysis of 26 trials comparing 17 treatments in 4 classes for the prevention of stroke in patients with atrial fibrillation <span class="citation">(Cooper et al. 2009)</span>. The data are available in this package as <code>atrial_fibrillation</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">atrial_fibrillation</span><span class="op">)</span>
-<span class="co">#&gt;     studyc studyn                                  trtc trtn      trt_class   r    n    E stroke</span>
-<span class="co">#&gt; 1 ACTIVE-W      1 Standard adjusted dose anti-coagulant    3 Anti-coagulant  65 3371 4200   0.15</span>
-<span class="co">#&gt; 2 ACTIVE-W      1         Low dose aspirin + copidogrel   16  Anti-platelet 106 3335 4180   0.15</span>
-<span class="co">#&gt; 3 AFASAK 1      2                 Placebo/Standard care    1        Control  19  336  398   0.06</span>
-<span class="co">#&gt; 4 AFASAK 1      2 Standard adjusted dose anti-coagulant    3 Anti-coagulant   9  335  413   0.06</span>
-<span class="co">#&gt; 5 AFASAK 1      2                      Low dose aspirin    5  Anti-platelet  16  336  409   0.06</span>
-<span class="co">#&gt; 6 AFASAK 2      3 Standard adjusted dose anti-coagulant    3 Anti-coagulant  11  170  355   0.10</span>
-<span class="co">#&gt;   year followup</span>
-<span class="co">#&gt; 1 2006      1.3</span>
-<span class="co">#&gt; 2 2006      1.3</span>
-<span class="co">#&gt; 3 1989      1.2</span>
-<span class="co">#&gt; 4 1989      1.2</span>
-<span class="co">#&gt; 5 1989      1.2</span>
-<span class="co">#&gt; 6 1998      2.2</span></code></pre></div>
+<span class="co">#&gt;     studyc studyn                                  trtc trtn      trt_class   r    n    E</span>
+<span class="co">#&gt; 1 ACTIVE-W      1 Standard adjusted dose anti-coagulant    3 Anti-coagulant  65 3371 4200</span>
+<span class="co">#&gt; 2 ACTIVE-W      1         Low dose aspirin + copidogrel   16  Anti-platelet 106 3335 4180</span>
+<span class="co">#&gt; 3 AFASAK 1      2                 Placebo/Standard care    1        Control  19  336  398</span>
+<span class="co">#&gt; 4 AFASAK 1      2 Standard adjusted dose anti-coagulant    3 Anti-coagulant   9  335  413</span>
+<span class="co">#&gt; 5 AFASAK 1      2                      Low dose aspirin    5  Anti-platelet  16  336  409</span>
+<span class="co">#&gt; 6 AFASAK 2      3 Standard adjusted dose anti-coagulant    3 Anti-coagulant  11  170  355</span>
+<span class="co">#&gt;   stroke year followup</span>
+<span class="co">#&gt; 1   0.15 2006      1.3</span>
+<span class="co">#&gt; 2   0.15 2006      1.3</span>
+<span class="co">#&gt; 3   0.06 1989      1.2</span>
+<span class="co">#&gt; 4   0.06 1989      1.2</span>
+<span class="co">#&gt; 5   0.06 1989      1.2</span>
+<span class="co">#&gt; 6   0.10 1998      2.2</span></code></pre></div>
 <p><span class="citation">Cooper et al. (2009)</span> used this data to demonstrate meta-regression models, which we recreate here.</p>
 <div class="section level3">
 <h3 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
@@ -179,17 +143,17 @@
 <span class="co">#&gt; A network with 25 AgD studies (arm-based).</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------</span> <span style="font-weight: bold;">AgD studies (arm-based)</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt;  Study         Treatments                                                                         </span>
-<span class="co">#&gt;  ACTIVE-W      2: Standard adjusted dose anti-coagulant | Low dose aspirin + copidogrel           </span>
-<span class="co">#&gt;  AFASAK 1      3: Placebo/Standard care | Standard adjusted dose anti-coagulant | Low dose aspirin</span>
-<span class="co">#&gt;  AFASAK 2      4: Standard adjusted dose anti-coagulant | Fixed dose warfarin | Medium dose asp...</span>
-<span class="co">#&gt;  BAATAF        2: Placebo/Standard care | Low adjusted dose anti-coagulant                        </span>
-<span class="co">#&gt;  BAFTA         2: Standard adjusted dose anti-coagulant | Low dose aspirin                        </span>
-<span class="co">#&gt;  CAFA          2: Placebo/Standard care | Standard adjusted dose anti-coagulant                   </span>
-<span class="co">#&gt;  Chinese ATAFS 2: Standard adjusted dose anti-coagulant | Low dose aspirin                        </span>
-<span class="co">#&gt;  EAFT          3: Placebo/Standard care | Standard adjusted dose anti-coagulant | Medium dose a...</span>
-<span class="co">#&gt;  ESPS 2        4: Placebo/Standard care | Low dose aspirin | Dipyridamole | Low dose aspirin + ...</span>
-<span class="co">#&gt;  JAST          2: Placebo/Standard care | Low dose aspirin                                        </span>
+<span class="co">#&gt;  Study         Treatments                                                                     </span>
+<span class="co">#&gt;  ACTIVE-W      2: Standard adjusted dose anti-coagulant | Low dose aspirin + copidogrel       </span>
+<span class="co">#&gt;  AFASAK 1      3: Placebo/Standard care | Standard adjusted dose anti-coagulant | Low dose ...</span>
+<span class="co">#&gt;  AFASAK 2      4: Standard adjusted dose anti-coagulant | Fixed dose warfarin | Medium dose...</span>
+<span class="co">#&gt;  BAATAF        2: Placebo/Standard care | Low adjusted dose anti-coagulant                    </span>
+<span class="co">#&gt;  BAFTA         2: Standard adjusted dose anti-coagulant | Low dose aspirin                    </span>
+<span class="co">#&gt;  CAFA          2: Placebo/Standard care | Standard adjusted dose anti-coagulant               </span>
+<span class="co">#&gt;  Chinese ATAFS 2: Standard adjusted dose anti-coagulant | Low dose aspirin                    </span>
+<span class="co">#&gt;  EAFT          3: Placebo/Standard care | Standard adjusted dose anti-coagulant | Medium do...</span>
+<span class="co">#&gt;  ESPS 2        4: Placebo/Standard care | Low dose aspirin | Dipyridamole | Low dose aspiri...</span>
+<span class="co">#&gt;  JAST          2: Placebo/Standard care | Low dose aspirin                                    </span>
 <span class="co">#&gt; <span style="color: #555555;"> ... plus 15 more studies</span></span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;  Outcome type: count</span>
@@ -282,7 +246,7 @@
 <span class="co">#&gt; lp__                                         -4766.75 -4758.44  1056    1</span>
 <span class="co">#&gt; tau                                              0.37     0.59   696    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Dec  7 10:54:17 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Dec  8 13:54:33 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -338,42 +302,42 @@
 <p>We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">af_1_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">af_fit_1</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;                                                  mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="co">#&gt; rank[Standard adjusted dose anti-coagulant]      5.32 1.46 3.00   4   5   6     8     2196     2590</span>
-<span class="co">#&gt; rank[Acenocoumarol]                              2.93 2.97 1.00   1   2   3    13     3306     3095</span>
-<span class="co">#&gt; rank[Alternate day aspirin]                      3.81 4.27 1.00   1   2   5    16     4781     3443</span>
-<span class="co">#&gt; rank[Dipyridamole]                              11.26 3.92 3.00   8  12  15    17     3479       NA</span>
-<span class="co">#&gt; rank[Fixed dose warfarin]                       14.12 3.08 6.00  13  15  17    17     3379       NA</span>
-<span class="co">#&gt; rank[Fixed dose warfarin + low dose aspirin]    10.09 3.86 3.00   7  10  13    17     3529     3039</span>
-<span class="co">#&gt; rank[Fixed dose warfarin + medium dose aspirin] 14.09 2.62 8.00  13  15  16    17     2998       NA</span>
-<span class="co">#&gt; rank[High dose aspirin]                         10.27 5.24 1.00   6  11  15    17     4303       NA</span>
-<span class="co">#&gt; rank[Indobufen]                                  8.08 3.98 2.00   5   8  11    16     2851     2901</span>
-<span class="co">#&gt; rank[Low adjusted dose anti-coagulant]           3.79 2.21 1.00   2   3   5    10     3352     3479</span>
-<span class="co">#&gt; rank[Low dose aspirin]                          11.77 2.24 7.00  10  12  13    16     3625     3288</span>
-<span class="co">#&gt; rank[Low dose aspirin + copidogrel]             10.58 3.38 4.00   8  11  13    17     3043     2621</span>
-<span class="co">#&gt; rank[Low dose aspirin + dipyridamole]            8.16 3.99 2.00   5   8  11    16     3300     2781</span>
-<span class="co">#&gt; rank[Medium dose aspirin]                        9.10 2.17 5.00   8   9  10    14     3639     3071</span>
-<span class="co">#&gt; rank[Placebo/Standard care]                     13.37 1.86 9.00  12  13  15    17     2680     3229</span>
-<span class="co">#&gt; rank[Triflusal]                                 11.24 4.63 2.98   7  12  16    17     2797       NA</span>
-<span class="co">#&gt; rank[Ximelagatran]                               4.99 2.39 2.00   3   5   6    11     2650     1879</span>
-<span class="co">#&gt;                                                 Rhat</span>
-<span class="co">#&gt; rank[Standard adjusted dose anti-coagulant]        1</span>
-<span class="co">#&gt; rank[Acenocoumarol]                                1</span>
-<span class="co">#&gt; rank[Alternate day aspirin]                        1</span>
-<span class="co">#&gt; rank[Dipyridamole]                                 1</span>
-<span class="co">#&gt; rank[Fixed dose warfarin]                          1</span>
-<span class="co">#&gt; rank[Fixed dose warfarin + low dose aspirin]       1</span>
-<span class="co">#&gt; rank[Fixed dose warfarin + medium dose aspirin]    1</span>
-<span class="co">#&gt; rank[High dose aspirin]                            1</span>
-<span class="co">#&gt; rank[Indobufen]                                    1</span>
-<span class="co">#&gt; rank[Low adjusted dose anti-coagulant]             1</span>
-<span class="co">#&gt; rank[Low dose aspirin]                             1</span>
-<span class="co">#&gt; rank[Low dose aspirin + copidogrel]                1</span>
-<span class="co">#&gt; rank[Low dose aspirin + dipyridamole]              1</span>
-<span class="co">#&gt; rank[Medium dose aspirin]                          1</span>
-<span class="co">#&gt; rank[Placebo/Standard care]                        1</span>
-<span class="co">#&gt; rank[Triflusal]                                    1</span>
-<span class="co">#&gt; rank[Ximelagatran]                                 1</span>
+<span class="co">#&gt;                                                  mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS</span>
+<span class="co">#&gt; rank[Standard adjusted dose anti-coagulant]      5.32 1.46 3.00   4   5   6     8     2196</span>
+<span class="co">#&gt; rank[Acenocoumarol]                              2.93 2.97 1.00   1   2   3    13     3306</span>
+<span class="co">#&gt; rank[Alternate day aspirin]                      3.81 4.27 1.00   1   2   5    16     4781</span>
+<span class="co">#&gt; rank[Dipyridamole]                              11.26 3.92 3.00   8  12  15    17     3479</span>
+<span class="co">#&gt; rank[Fixed dose warfarin]                       14.12 3.08 6.00  13  15  17    17     3379</span>
+<span class="co">#&gt; rank[Fixed dose warfarin + low dose aspirin]    10.09 3.86 3.00   7  10  13    17     3529</span>
+<span class="co">#&gt; rank[Fixed dose warfarin + medium dose aspirin] 14.09 2.62 8.00  13  15  16    17     2998</span>
+<span class="co">#&gt; rank[High dose aspirin]                         10.27 5.24 1.00   6  11  15    17     4303</span>
+<span class="co">#&gt; rank[Indobufen]                                  8.08 3.98 2.00   5   8  11    16     2851</span>
+<span class="co">#&gt; rank[Low adjusted dose anti-coagulant]           3.79 2.21 1.00   2   3   5    10     3352</span>
+<span class="co">#&gt; rank[Low dose aspirin]                          11.77 2.24 7.00  10  12  13    16     3625</span>
+<span class="co">#&gt; rank[Low dose aspirin + copidogrel]             10.58 3.38 4.00   8  11  13    17     3043</span>
+<span class="co">#&gt; rank[Low dose aspirin + dipyridamole]            8.16 3.99 2.00   5   8  11    16     3300</span>
+<span class="co">#&gt; rank[Medium dose aspirin]                        9.10 2.17 5.00   8   9  10    14     3639</span>
+<span class="co">#&gt; rank[Placebo/Standard care]                     13.37 1.86 9.00  12  13  15    17     2680</span>
+<span class="co">#&gt; rank[Triflusal]                                 11.24 4.63 2.98   7  12  16    17     2797</span>
+<span class="co">#&gt; rank[Ximelagatran]                               4.99 2.39 2.00   3   5   6    11     2650</span>
+<span class="co">#&gt;                                                 Tail_ESS Rhat</span>
+<span class="co">#&gt; rank[Standard adjusted dose anti-coagulant]         2590    1</span>
+<span class="co">#&gt; rank[Acenocoumarol]                                 3095    1</span>
+<span class="co">#&gt; rank[Alternate day aspirin]                         3443    1</span>
+<span class="co">#&gt; rank[Dipyridamole]                                    NA    1</span>
+<span class="co">#&gt; rank[Fixed dose warfarin]                             NA    1</span>
+<span class="co">#&gt; rank[Fixed dose warfarin + low dose aspirin]        3039    1</span>
+<span class="co">#&gt; rank[Fixed dose warfarin + medium dose aspirin]       NA    1</span>
+<span class="co">#&gt; rank[High dose aspirin]                               NA    1</span>
+<span class="co">#&gt; rank[Indobufen]                                     2901    1</span>
+<span class="co">#&gt; rank[Low adjusted dose anti-coagulant]              3479    1</span>
+<span class="co">#&gt; rank[Low dose aspirin]                              3288    1</span>
+<span class="co">#&gt; rank[Low dose aspirin + copidogrel]                 2621    1</span>
+<span class="co">#&gt; rank[Low dose aspirin + dipyridamole]               2781    1</span>
+<span class="co">#&gt; rank[Medium dose aspirin]                           3071    1</span>
+<span class="co">#&gt; rank[Placebo/Standard care]                         3229    1</span>
+<span class="co">#&gt; rank[Triflusal]                                       NA    1</span>
+<span class="co">#&gt; rank[Ximelagatran]                                  1879    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_ranks</span><span class="op">)</span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
@@ -396,60 +360,60 @@
 <span class="co">#&gt; d[Placebo/Standard care]                          0.00      0.00      0.00      0.00      0.00</span>
 <span class="co">#&gt; d[Triflusal]                                      0.00      0.02      0.04      0.04      0.04</span>
 <span class="co">#&gt; d[Ximelagatran]                                   0.02      0.09      0.18      0.20      0.16</span>
-<span class="co">#&gt;                                              p_rank[6] p_rank[7] p_rank[8] p_rank[9] p_rank[10]</span>
-<span class="co">#&gt; d[Standard adjusted dose anti-coagulant]          0.22      0.13      0.05      0.02       0.00</span>
-<span class="co">#&gt; d[Acenocoumarol]                                  0.03      0.03      0.02      0.02       0.01</span>
-<span class="co">#&gt; d[Alternate day aspirin]                          0.03      0.03      0.02      0.02       0.02</span>
-<span class="co">#&gt; d[Dipyridamole]                                   0.04      0.06      0.07      0.08       0.08</span>
-<span class="co">#&gt; d[Fixed dose warfarin]                            0.01      0.02      0.03      0.03       0.04</span>
-<span class="co">#&gt; d[Fixed dose warfarin + low dose aspirin]         0.06      0.08      0.09      0.09       0.09</span>
-<span class="co">#&gt; d[Fixed dose warfarin + medium dose aspirin]      0.01      0.01      0.02      0.03       0.04</span>
-<span class="co">#&gt; d[High dose aspirin]                              0.05      0.05      0.06      0.06       0.04</span>
-<span class="co">#&gt; d[Indobufen]                                      0.09      0.10      0.09      0.08       0.06</span>
-<span class="co">#&gt; d[Low adjusted dose anti-coagulant]               0.07      0.04      0.03      0.02       0.01</span>
-<span class="co">#&gt; d[Low dose aspirin]                               0.01      0.02      0.04      0.08       0.12</span>
-<span class="co">#&gt; d[Low dose aspirin + copidogrel]                  0.05      0.07      0.09      0.11       0.11</span>
-<span class="co">#&gt; d[Low dose aspirin + dipyridamole]                0.08      0.10      0.09      0.08       0.08</span>
-<span class="co">#&gt; d[Medium dose aspirin]                            0.07      0.11      0.18      0.19       0.16</span>
-<span class="co">#&gt; d[Placebo/Standard care]                          0.00      0.00      0.01      0.02       0.04</span>
-<span class="co">#&gt; d[Triflusal]                                      0.05      0.06      0.06      0.06       0.06</span>
-<span class="co">#&gt; d[Ximelagatran]                                   0.13      0.09      0.05      0.03       0.02</span>
-<span class="co">#&gt;                                              p_rank[11] p_rank[12] p_rank[13] p_rank[14] p_rank[15]</span>
-<span class="co">#&gt; d[Standard adjusted dose anti-coagulant]           0.00       0.00       0.00       0.00       0.00</span>
-<span class="co">#&gt; d[Acenocoumarol]                                   0.01       0.01       0.01       0.01       0.01</span>
-<span class="co">#&gt; d[Alternate day aspirin]                           0.01       0.01       0.01       0.01       0.01</span>
-<span class="co">#&gt; d[Dipyridamole]                                    0.08       0.07       0.08       0.09       0.09</span>
-<span class="co">#&gt; d[Fixed dose warfarin]                             0.05       0.06       0.07       0.10       0.13</span>
-<span class="co">#&gt; d[Fixed dose warfarin + low dose aspirin]          0.08       0.07       0.07       0.06       0.06</span>
-<span class="co">#&gt; d[Fixed dose warfarin + medium dose aspirin]       0.06       0.07       0.09       0.12       0.17</span>
-<span class="co">#&gt; d[High dose aspirin]                               0.04       0.04       0.04       0.06       0.07</span>
-<span class="co">#&gt; d[Indobufen]                                       0.06       0.05       0.04       0.04       0.04</span>
-<span class="co">#&gt; d[Low adjusted dose anti-coagulant]                0.01       0.00       0.00       0.00       0.00</span>
-<span class="co">#&gt; d[Low dose aspirin]                                0.17       0.17       0.15       0.12       0.07</span>
-<span class="co">#&gt; d[Low dose aspirin + copidogrel]                   0.11       0.09       0.09       0.07       0.06</span>
-<span class="co">#&gt; d[Low dose aspirin + dipyridamole]                 0.06       0.06       0.04       0.04       0.03</span>
-<span class="co">#&gt; d[Medium dose aspirin]                             0.11       0.07       0.04       0.02       0.00</span>
-<span class="co">#&gt; d[Placebo/Standard care]                           0.09       0.14       0.20       0.21       0.17</span>
-<span class="co">#&gt; d[Triflusal]                                       0.06       0.06       0.05       0.06       0.08</span>
-<span class="co">#&gt; d[Ximelagatran]                                    0.01       0.01       0.00       0.00       0.00</span>
-<span class="co">#&gt;                                              p_rank[16] p_rank[17]</span>
-<span class="co">#&gt; d[Standard adjusted dose anti-coagulant]           0.00       0.00</span>
-<span class="co">#&gt; d[Acenocoumarol]                                   0.01       0.00</span>
-<span class="co">#&gt; d[Alternate day aspirin]                           0.02       0.02</span>
-<span class="co">#&gt; d[Dipyridamole]                                    0.09       0.08</span>
-<span class="co">#&gt; d[Fixed dose warfarin]                             0.20       0.26</span>
-<span class="co">#&gt; d[Fixed dose warfarin + low dose aspirin]          0.06       0.04</span>
-<span class="co">#&gt; d[Fixed dose warfarin + medium dose aspirin]       0.22       0.16</span>
-<span class="co">#&gt; d[High dose aspirin]                               0.08       0.16</span>
-<span class="co">#&gt; d[Indobufen]                                       0.03       0.02</span>
-<span class="co">#&gt; d[Low adjusted dose anti-coagulant]                0.00       0.00</span>
-<span class="co">#&gt; d[Low dose aspirin]                                0.03       0.01</span>
-<span class="co">#&gt; d[Low dose aspirin + copidogrel]                   0.05       0.03</span>
-<span class="co">#&gt; d[Low dose aspirin + dipyridamole]                 0.03       0.02</span>
-<span class="co">#&gt; d[Medium dose aspirin]                             0.00       0.00</span>
-<span class="co">#&gt; d[Placebo/Standard care]                           0.09       0.03</span>
-<span class="co">#&gt; d[Triflusal]                                       0.10       0.16</span>
-<span class="co">#&gt; d[Ximelagatran]                                    0.00       0.00</span>
+<span class="co">#&gt;                                              p_rank[6] p_rank[7] p_rank[8] p_rank[9]</span>
+<span class="co">#&gt; d[Standard adjusted dose anti-coagulant]          0.22      0.13      0.05      0.02</span>
+<span class="co">#&gt; d[Acenocoumarol]                                  0.03      0.03      0.02      0.02</span>
+<span class="co">#&gt; d[Alternate day aspirin]                          0.03      0.03      0.02      0.02</span>
+<span class="co">#&gt; d[Dipyridamole]                                   0.04      0.06      0.07      0.08</span>
+<span class="co">#&gt; d[Fixed dose warfarin]                            0.01      0.02      0.03      0.03</span>
+<span class="co">#&gt; d[Fixed dose warfarin + low dose aspirin]         0.06      0.08      0.09      0.09</span>
+<span class="co">#&gt; d[Fixed dose warfarin + medium dose aspirin]      0.01      0.01      0.02      0.03</span>
+<span class="co">#&gt; d[High dose aspirin]                              0.05      0.05      0.06      0.06</span>
+<span class="co">#&gt; d[Indobufen]                                      0.09      0.10      0.09      0.08</span>
+<span class="co">#&gt; d[Low adjusted dose anti-coagulant]               0.07      0.04      0.03      0.02</span>
+<span class="co">#&gt; d[Low dose aspirin]                               0.01      0.02      0.04      0.08</span>
+<span class="co">#&gt; d[Low dose aspirin + copidogrel]                  0.05      0.07      0.09      0.11</span>
+<span class="co">#&gt; d[Low dose aspirin + dipyridamole]                0.08      0.10      0.09      0.08</span>
+<span class="co">#&gt; d[Medium dose aspirin]                            0.07      0.11      0.18      0.19</span>
+<span class="co">#&gt; d[Placebo/Standard care]                          0.00      0.00      0.01      0.02</span>
+<span class="co">#&gt; d[Triflusal]                                      0.05      0.06      0.06      0.06</span>
+<span class="co">#&gt; d[Ximelagatran]                                   0.13      0.09      0.05      0.03</span>
+<span class="co">#&gt;                                              p_rank[10] p_rank[11] p_rank[12] p_rank[13]</span>
+<span class="co">#&gt; d[Standard adjusted dose anti-coagulant]           0.00       0.00       0.00       0.00</span>
+<span class="co">#&gt; d[Acenocoumarol]                                   0.01       0.01       0.01       0.01</span>
+<span class="co">#&gt; d[Alternate day aspirin]                           0.02       0.01       0.01       0.01</span>
+<span class="co">#&gt; d[Dipyridamole]                                    0.08       0.08       0.07       0.08</span>
+<span class="co">#&gt; d[Fixed dose warfarin]                             0.04       0.05       0.06       0.07</span>
+<span class="co">#&gt; d[Fixed dose warfarin + low dose aspirin]          0.09       0.08       0.07       0.07</span>
+<span class="co">#&gt; d[Fixed dose warfarin + medium dose aspirin]       0.04       0.06       0.07       0.09</span>
+<span class="co">#&gt; d[High dose aspirin]                               0.04       0.04       0.04       0.04</span>
+<span class="co">#&gt; d[Indobufen]                                       0.06       0.06       0.05       0.04</span>
+<span class="co">#&gt; d[Low adjusted dose anti-coagulant]                0.01       0.01       0.00       0.00</span>
+<span class="co">#&gt; d[Low dose aspirin]                                0.12       0.17       0.17       0.15</span>
+<span class="co">#&gt; d[Low dose aspirin + copidogrel]                   0.11       0.11       0.09       0.09</span>
+<span class="co">#&gt; d[Low dose aspirin + dipyridamole]                 0.08       0.06       0.06       0.04</span>
+<span class="co">#&gt; d[Medium dose aspirin]                             0.16       0.11       0.07       0.04</span>
+<span class="co">#&gt; d[Placebo/Standard care]                           0.04       0.09       0.14       0.20</span>
+<span class="co">#&gt; d[Triflusal]                                       0.06       0.06       0.06       0.05</span>
+<span class="co">#&gt; d[Ximelagatran]                                    0.02       0.01       0.01       0.00</span>
+<span class="co">#&gt;                                              p_rank[14] p_rank[15] p_rank[16] p_rank[17]</span>
+<span class="co">#&gt; d[Standard adjusted dose anti-coagulant]           0.00       0.00       0.00       0.00</span>
+<span class="co">#&gt; d[Acenocoumarol]                                   0.01       0.01       0.01       0.00</span>
+<span class="co">#&gt; d[Alternate day aspirin]                           0.01       0.01       0.02       0.02</span>
+<span class="co">#&gt; d[Dipyridamole]                                    0.09       0.09       0.09       0.08</span>
+<span class="co">#&gt; d[Fixed dose warfarin]                             0.10       0.13       0.20       0.26</span>
+<span class="co">#&gt; d[Fixed dose warfarin + low dose aspirin]          0.06       0.06       0.06       0.04</span>
+<span class="co">#&gt; d[Fixed dose warfarin + medium dose aspirin]       0.12       0.17       0.22       0.16</span>
+<span class="co">#&gt; d[High dose aspirin]                               0.06       0.07       0.08       0.16</span>
+<span class="co">#&gt; d[Indobufen]                                       0.04       0.04       0.03       0.02</span>
+<span class="co">#&gt; d[Low adjusted dose anti-coagulant]                0.00       0.00       0.00       0.00</span>
+<span class="co">#&gt; d[Low dose aspirin]                                0.12       0.07       0.03       0.01</span>
+<span class="co">#&gt; d[Low dose aspirin + copidogrel]                   0.07       0.06       0.05       0.03</span>
+<span class="co">#&gt; d[Low dose aspirin + dipyridamole]                 0.04       0.03       0.03       0.02</span>
+<span class="co">#&gt; d[Medium dose aspirin]                             0.02       0.00       0.00       0.00</span>
+<span class="co">#&gt; d[Placebo/Standard care]                           0.21       0.17       0.09       0.03</span>
+<span class="co">#&gt; d[Triflusal]                                       0.06       0.08       0.10       0.16</span>
+<span class="co">#&gt; d[Ximelagatran]                                    0.00       0.00       0.00       0.00</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_rankprobs</span><span class="op">)</span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_rankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
@@ -472,60 +436,60 @@
 <span class="co">#&gt; d[Placebo/Standard care]                          0.00      0.00      0.00      0.00      0.00</span>
 <span class="co">#&gt; d[Triflusal]                                      0.00      0.03      0.07      0.10      0.15</span>
 <span class="co">#&gt; d[Ximelagatran]                                   0.02      0.11      0.29      0.49      0.65</span>
-<span class="co">#&gt;                                              p_rank[6] p_rank[7] p_rank[8] p_rank[9] p_rank[10]</span>
-<span class="co">#&gt; d[Standard adjusted dose anti-coagulant]          0.80      0.93      0.98      1.00       1.00</span>
-<span class="co">#&gt; d[Acenocoumarol]                                  0.89      0.91      0.93      0.95       0.96</span>
-<span class="co">#&gt; d[Alternate day aspirin]                          0.80      0.83      0.86      0.88       0.90</span>
-<span class="co">#&gt; d[Dipyridamole]                                   0.13      0.19      0.26      0.33       0.41</span>
-<span class="co">#&gt; d[Fixed dose warfarin]                            0.03      0.04      0.07      0.10       0.14</span>
-<span class="co">#&gt; d[Fixed dose warfarin + low dose aspirin]         0.19      0.28      0.37      0.46       0.55</span>
-<span class="co">#&gt; d[Fixed dose warfarin + medium dose aspirin]      0.01      0.02      0.04      0.07       0.11</span>
-<span class="co">#&gt; d[High dose aspirin]                              0.29      0.34      0.40      0.46       0.50</span>
-<span class="co">#&gt; d[Indobufen]                                      0.39      0.49      0.58      0.67       0.73</span>
-<span class="co">#&gt; d[Low adjusted dose anti-coagulant]               0.88      0.93      0.96      0.97       0.98</span>
-<span class="co">#&gt; d[Low dose aspirin]                               0.01      0.03      0.08      0.15       0.28</span>
-<span class="co">#&gt; d[Low dose aspirin + copidogrel]                  0.12      0.19      0.28      0.38       0.49</span>
-<span class="co">#&gt; d[Low dose aspirin + dipyridamole]                0.37      0.47      0.56      0.64       0.72</span>
-<span class="co">#&gt; d[Medium dose aspirin]                            0.11      0.22      0.40      0.59       0.76</span>
-<span class="co">#&gt; d[Placebo/Standard care]                          0.00      0.00      0.01      0.03       0.07</span>
-<span class="co">#&gt; d[Triflusal]                                      0.19      0.25      0.31      0.37       0.43</span>
-<span class="co">#&gt; d[Ximelagatran]                                   0.78      0.87      0.92      0.95       0.97</span>
-<span class="co">#&gt;                                              p_rank[11] p_rank[12] p_rank[13] p_rank[14] p_rank[15]</span>
-<span class="co">#&gt; d[Standard adjusted dose anti-coagulant]           1.00       1.00       1.00       1.00       1.00</span>
-<span class="co">#&gt; d[Acenocoumarol]                                   0.97       0.97       0.98       0.99       0.99</span>
-<span class="co">#&gt; d[Alternate day aspirin]                           0.91       0.92       0.94       0.95       0.96</span>
-<span class="co">#&gt; d[Dipyridamole]                                    0.50       0.57       0.65       0.74       0.83</span>
-<span class="co">#&gt; d[Fixed dose warfarin]                             0.19       0.25       0.32       0.42       0.54</span>
-<span class="co">#&gt; d[Fixed dose warfarin + low dose aspirin]          0.63       0.71       0.78       0.84       0.90</span>
-<span class="co">#&gt; d[Fixed dose warfarin + medium dose aspirin]       0.17       0.24       0.33       0.45       0.62</span>
-<span class="co">#&gt; d[High dose aspirin]                               0.54       0.58       0.63       0.69       0.76</span>
-<span class="co">#&gt; d[Indobufen]                                       0.78       0.84       0.88       0.91       0.95</span>
-<span class="co">#&gt; d[Low adjusted dose anti-coagulant]                0.99       1.00       1.00       1.00       1.00</span>
-<span class="co">#&gt; d[Low dose aspirin]                                0.45       0.62       0.77       0.89       0.96</span>
-<span class="co">#&gt; d[Low dose aspirin + copidogrel]                   0.60       0.69       0.78       0.86       0.92</span>
-<span class="co">#&gt; d[Low dose aspirin + dipyridamole]                 0.78       0.84       0.88       0.92       0.95</span>
-<span class="co">#&gt; d[Medium dose aspirin]                             0.86       0.94       0.97       0.99       1.00</span>
-<span class="co">#&gt; d[Placebo/Standard care]                           0.16       0.30       0.50       0.71       0.88</span>
-<span class="co">#&gt; d[Triflusal]                                       0.49       0.54       0.60       0.66       0.73</span>
-<span class="co">#&gt; d[Ximelagatran]                                    0.98       0.99       0.99       1.00       1.00</span>
-<span class="co">#&gt;                                              p_rank[16] p_rank[17]</span>
-<span class="co">#&gt; d[Standard adjusted dose anti-coagulant]           1.00          1</span>
-<span class="co">#&gt; d[Acenocoumarol]                                   1.00          1</span>
-<span class="co">#&gt; d[Alternate day aspirin]                           0.98          1</span>
-<span class="co">#&gt; d[Dipyridamole]                                    0.92          1</span>
-<span class="co">#&gt; d[Fixed dose warfarin]                             0.74          1</span>
-<span class="co">#&gt; d[Fixed dose warfarin + low dose aspirin]          0.96          1</span>
-<span class="co">#&gt; d[Fixed dose warfarin + medium dose aspirin]       0.84          1</span>
-<span class="co">#&gt; d[High dose aspirin]                               0.84          1</span>
-<span class="co">#&gt; d[Indobufen]                                       0.98          1</span>
-<span class="co">#&gt; d[Low adjusted dose anti-coagulant]                1.00          1</span>
-<span class="co">#&gt; d[Low dose aspirin]                                0.99          1</span>
-<span class="co">#&gt; d[Low dose aspirin + copidogrel]                   0.97          1</span>
-<span class="co">#&gt; d[Low dose aspirin + dipyridamole]                 0.98          1</span>
-<span class="co">#&gt; d[Medium dose aspirin]                             1.00          1</span>
-<span class="co">#&gt; d[Placebo/Standard care]                           0.97          1</span>
-<span class="co">#&gt; d[Triflusal]                                       0.84          1</span>
-<span class="co">#&gt; d[Ximelagatran]                                    1.00          1</span>
+<span class="co">#&gt;                                              p_rank[6] p_rank[7] p_rank[8] p_rank[9]</span>
+<span class="co">#&gt; d[Standard adjusted dose anti-coagulant]          0.80      0.93      0.98      1.00</span>
+<span class="co">#&gt; d[Acenocoumarol]                                  0.89      0.91      0.93      0.95</span>
+<span class="co">#&gt; d[Alternate day aspirin]                          0.80      0.83      0.86      0.88</span>
+<span class="co">#&gt; d[Dipyridamole]                                   0.13      0.19      0.26      0.33</span>
+<span class="co">#&gt; d[Fixed dose warfarin]                            0.03      0.04      0.07      0.10</span>
+<span class="co">#&gt; d[Fixed dose warfarin + low dose aspirin]         0.19      0.28      0.37      0.46</span>
+<span class="co">#&gt; d[Fixed dose warfarin + medium dose aspirin]      0.01      0.02      0.04      0.07</span>
+<span class="co">#&gt; d[High dose aspirin]                              0.29      0.34      0.40      0.46</span>
+<span class="co">#&gt; d[Indobufen]                                      0.39      0.49      0.58      0.67</span>
+<span class="co">#&gt; d[Low adjusted dose anti-coagulant]               0.88      0.93      0.96      0.97</span>
+<span class="co">#&gt; d[Low dose aspirin]                               0.01      0.03      0.08      0.15</span>
+<span class="co">#&gt; d[Low dose aspirin + copidogrel]                  0.12      0.19      0.28      0.38</span>
+<span class="co">#&gt; d[Low dose aspirin + dipyridamole]                0.37      0.47      0.56      0.64</span>
+<span class="co">#&gt; d[Medium dose aspirin]                            0.11      0.22      0.40      0.59</span>
+<span class="co">#&gt; d[Placebo/Standard care]                          0.00      0.00      0.01      0.03</span>
+<span class="co">#&gt; d[Triflusal]                                      0.19      0.25      0.31      0.37</span>
+<span class="co">#&gt; d[Ximelagatran]                                   0.78      0.87      0.92      0.95</span>
+<span class="co">#&gt;                                              p_rank[10] p_rank[11] p_rank[12] p_rank[13]</span>
+<span class="co">#&gt; d[Standard adjusted dose anti-coagulant]           1.00       1.00       1.00       1.00</span>
+<span class="co">#&gt; d[Acenocoumarol]                                   0.96       0.97       0.97       0.98</span>
+<span class="co">#&gt; d[Alternate day aspirin]                           0.90       0.91       0.92       0.94</span>
+<span class="co">#&gt; d[Dipyridamole]                                    0.41       0.50       0.57       0.65</span>
+<span class="co">#&gt; d[Fixed dose warfarin]                             0.14       0.19       0.25       0.32</span>
+<span class="co">#&gt; d[Fixed dose warfarin + low dose aspirin]          0.55       0.63       0.71       0.78</span>
+<span class="co">#&gt; d[Fixed dose warfarin + medium dose aspirin]       0.11       0.17       0.24       0.33</span>
+<span class="co">#&gt; d[High dose aspirin]                               0.50       0.54       0.58       0.63</span>
+<span class="co">#&gt; d[Indobufen]                                       0.73       0.78       0.84       0.88</span>
+<span class="co">#&gt; d[Low adjusted dose anti-coagulant]                0.98       0.99       1.00       1.00</span>
+<span class="co">#&gt; d[Low dose aspirin]                                0.28       0.45       0.62       0.77</span>
+<span class="co">#&gt; d[Low dose aspirin + copidogrel]                   0.49       0.60       0.69       0.78</span>
+<span class="co">#&gt; d[Low dose aspirin + dipyridamole]                 0.72       0.78       0.84       0.88</span>
+<span class="co">#&gt; d[Medium dose aspirin]                             0.76       0.86       0.94       0.97</span>
+<span class="co">#&gt; d[Placebo/Standard care]                           0.07       0.16       0.30       0.50</span>
+<span class="co">#&gt; d[Triflusal]                                       0.43       0.49       0.54       0.60</span>
+<span class="co">#&gt; d[Ximelagatran]                                    0.97       0.98       0.99       0.99</span>
+<span class="co">#&gt;                                              p_rank[14] p_rank[15] p_rank[16] p_rank[17]</span>
+<span class="co">#&gt; d[Standard adjusted dose anti-coagulant]           1.00       1.00       1.00          1</span>
+<span class="co">#&gt; d[Acenocoumarol]                                   0.99       0.99       1.00          1</span>
+<span class="co">#&gt; d[Alternate day aspirin]                           0.95       0.96       0.98          1</span>
+<span class="co">#&gt; d[Dipyridamole]                                    0.74       0.83       0.92          1</span>
+<span class="co">#&gt; d[Fixed dose warfarin]                             0.42       0.54       0.74          1</span>
+<span class="co">#&gt; d[Fixed dose warfarin + low dose aspirin]          0.84       0.90       0.96          1</span>
+<span class="co">#&gt; d[Fixed dose warfarin + medium dose aspirin]       0.45       0.62       0.84          1</span>
+<span class="co">#&gt; d[High dose aspirin]                               0.69       0.76       0.84          1</span>
+<span class="co">#&gt; d[Indobufen]                                       0.91       0.95       0.98          1</span>
+<span class="co">#&gt; d[Low adjusted dose anti-coagulant]                1.00       1.00       1.00          1</span>
+<span class="co">#&gt; d[Low dose aspirin]                                0.89       0.96       0.99          1</span>
+<span class="co">#&gt; d[Low dose aspirin + copidogrel]                   0.86       0.92       0.97          1</span>
+<span class="co">#&gt; d[Low dose aspirin + dipyridamole]                 0.92       0.95       0.98          1</span>
+<span class="co">#&gt; d[Medium dose aspirin]                             0.99       1.00       1.00          1</span>
+<span class="co">#&gt; d[Placebo/Standard care]                           0.71       0.88       0.97          1</span>
+<span class="co">#&gt; d[Triflusal]                                       0.66       0.73       0.84          1</span>
+<span class="co">#&gt; d[Ximelagatran]                                    1.00       1.00       1.00          1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_cumrankprobs</span><span class="op">)</span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_cumrankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
@@ -602,7 +566,7 @@
 <span class="co">#&gt; lp__                                         -4766.54 -4758.75  1248    1</span>
 <span class="co">#&gt; tau                                              0.26     0.47   455    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Dec  7 10:54:51 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Dec  8 13:55:12 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -633,40 +597,40 @@
 <span class="co">#&gt;  stroke</span>
 <span class="co">#&gt;       0</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;                                                           mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]     -0.59 0.24 -1.06 -0.75 -0.59 -0.44 -0.10</span>
-<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                             -1.40 0.86 -3.14 -1.95 -1.36 -0.82  0.16</span>
-<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                     -1.78 1.38 -5.04 -2.50 -1.59 -0.83  0.37</span>
-<span class="co">#&gt; d[stroke = 0: Dipyridamole]                              -0.29 0.44 -1.13 -0.58 -0.28 -0.01  0.60</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                        0.05 0.46 -0.88 -0.24  0.05  0.35  0.96</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]    -0.28 0.34 -0.94 -0.50 -0.29 -0.08  0.40</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin] -0.76 0.66 -2.09 -1.19 -0.74 -0.33  0.55</span>
-<span class="co">#&gt; d[stroke = 0: High dose aspirin]                         -0.44 0.77 -2.02 -0.95 -0.43  0.07  1.01</span>
-<span class="co">#&gt; d[stroke = 0: Indobufen]                                 -1.28 0.57 -2.42 -1.66 -1.28 -0.92 -0.12</span>
-<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]          -1.01 0.33 -1.68 -1.24 -1.00 -0.79 -0.37</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                          -0.15 0.22 -0.58 -0.30 -0.15  0.00  0.29</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]             -0.22 0.36 -0.92 -0.44 -0.23  0.00  0.51</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]           -0.62 0.47 -1.56 -0.92 -0.61 -0.31  0.32</span>
-<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                       -0.52 0.26 -1.05 -0.69 -0.52 -0.35 -0.01</span>
-<span class="co">#&gt; d[stroke = 0: Triflusal]                                  0.05 0.63 -1.13 -0.37  0.04  0.47  1.32</span>
-<span class="co">#&gt; d[stroke = 0: Ximelagatran]                              -0.68 0.32 -1.31 -0.89 -0.69 -0.48 -0.04</span>
-<span class="co">#&gt;                                                          Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]         3731     2761    1</span>
-<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                 3944     2239    1</span>
-<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                         2907     1657    1</span>
-<span class="co">#&gt; d[stroke = 0: Dipyridamole]                                  4976     2964    1</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                           5272     2713    1</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]        4602     2231    1</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]     4448     2891    1</span>
-<span class="co">#&gt; d[stroke = 0: High dose aspirin]                             5838     3168    1</span>
-<span class="co">#&gt; d[stroke = 0: Indobufen]                                     4057     2750    1</span>
-<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]              5805     3309    1</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                              4592     3151    1</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]                 2876     2303    1</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]               4497     2453    1</span>
-<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                           4307     2974    1</span>
-<span class="co">#&gt; d[stroke = 0: Triflusal]                                     5213     3057    1</span>
-<span class="co">#&gt; d[stroke = 0: Ximelagatran]                                  3856     2662    1</span>
+<span class="co">#&gt;                                                           mean   sd  2.5%   25%   50%   75%</span>
+<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]     -0.59 0.24 -1.06 -0.75 -0.59 -0.44</span>
+<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                             -1.40 0.86 -3.14 -1.95 -1.36 -0.82</span>
+<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                     -1.78 1.38 -5.04 -2.50 -1.59 -0.83</span>
+<span class="co">#&gt; d[stroke = 0: Dipyridamole]                              -0.29 0.44 -1.13 -0.58 -0.28 -0.01</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                        0.05 0.46 -0.88 -0.24  0.05  0.35</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]    -0.28 0.34 -0.94 -0.50 -0.29 -0.08</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin] -0.76 0.66 -2.09 -1.19 -0.74 -0.33</span>
+<span class="co">#&gt; d[stroke = 0: High dose aspirin]                         -0.44 0.77 -2.02 -0.95 -0.43  0.07</span>
+<span class="co">#&gt; d[stroke = 0: Indobufen]                                 -1.28 0.57 -2.42 -1.66 -1.28 -0.92</span>
+<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]          -1.01 0.33 -1.68 -1.24 -1.00 -0.79</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                          -0.15 0.22 -0.58 -0.30 -0.15  0.00</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]             -0.22 0.36 -0.92 -0.44 -0.23  0.00</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]           -0.62 0.47 -1.56 -0.92 -0.61 -0.31</span>
+<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                       -0.52 0.26 -1.05 -0.69 -0.52 -0.35</span>
+<span class="co">#&gt; d[stroke = 0: Triflusal]                                  0.05 0.63 -1.13 -0.37  0.04  0.47</span>
+<span class="co">#&gt; d[stroke = 0: Ximelagatran]                              -0.68 0.32 -1.31 -0.89 -0.69 -0.48</span>
+<span class="co">#&gt;                                                          97.5% Bulk_ESS Tail_ESS Rhat</span>
+<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]     -0.10     3731     2761    1</span>
+<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                              0.16     3944     2239    1</span>
+<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                      0.37     2907     1657    1</span>
+<span class="co">#&gt; d[stroke = 0: Dipyridamole]                               0.60     4976     2964    1</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                        0.96     5272     2713    1</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]     0.40     4602     2231    1</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]  0.55     4448     2891    1</span>
+<span class="co">#&gt; d[stroke = 0: High dose aspirin]                          1.01     5838     3168    1</span>
+<span class="co">#&gt; d[stroke = 0: Indobufen]                                 -0.12     4057     2750    1</span>
+<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]          -0.37     5805     3309    1</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                           0.29     4592     3151    1</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]              0.51     2876     2303    1</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]            0.32     4497     2453    1</span>
+<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                       -0.01     4307     2974    1</span>
+<span class="co">#&gt; d[stroke = 0: Triflusal]                                  1.32     5213     3057    1</span>
+<span class="co">#&gt; d[stroke = 0: Ximelagatran]                              -0.04     3856     2662    1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------------</span> <span style="font-weight: bold;">Study: stroke = 1</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
@@ -674,40 +638,40 @@
 <span class="co">#&gt;  stroke</span>
 <span class="co">#&gt;       1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;                                                           mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]     -1.29 0.34 -1.97 -1.51 -1.28 -1.06 -0.63</span>
-<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                              1.85 2.35 -2.65  0.28  1.81  3.41  6.66</span>
-<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                     -1.54 1.41 -4.89 -2.31 -1.37 -0.55  0.66</span>
-<span class="co">#&gt; d[stroke = 1: Dipyridamole]                              -0.05 0.39 -0.81 -0.30 -0.05  0.21  0.69</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                       -0.65 0.53 -1.71 -1.00 -0.64 -0.31  0.42</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]     2.96 2.21 -1.25  1.50  2.92  4.40  7.50</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]  2.49 1.65 -0.76  1.40  2.46  3.54  5.81</span>
-<span class="co">#&gt; d[stroke = 1: High dose aspirin]                         -0.20 0.73 -1.69 -0.67 -0.21  0.29  1.21</span>
-<span class="co">#&gt; d[stroke = 1: Indobufen]                                 -1.04 0.53 -2.08 -1.38 -1.04 -0.70 -0.02</span>
-<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]          -1.71 0.50 -2.73 -2.03 -1.70 -1.38 -0.74</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                           0.09 0.29 -0.48 -0.09  0.09  0.29  0.63</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]              0.02 0.39 -0.76 -0.22  0.03  0.27  0.75</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]           -0.37 0.41 -1.21 -0.63 -0.36 -0.10  0.42</span>
-<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                       -0.28 0.24 -0.78 -0.43 -0.27 -0.13  0.19</span>
-<span class="co">#&gt; d[stroke = 1: Triflusal]                                  0.29 0.65 -0.96 -0.14  0.29  0.71  1.59</span>
-<span class="co">#&gt; d[stroke = 1: Ximelagatran]                              -1.38 0.41 -2.19 -1.64 -1.37 -1.12 -0.59</span>
-<span class="co">#&gt;                                                          Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]         5096     2688    1</span>
-<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                 3838     2633    1</span>
-<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                         2950     1678    1</span>
-<span class="co">#&gt; d[stroke = 1: Dipyridamole]                                  5404     3167    1</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                           5256     2675    1</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]        4569     3066    1</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]     4639     2997    1</span>
-<span class="co">#&gt; d[stroke = 1: High dose aspirin]                             5677     2789    1</span>
-<span class="co">#&gt; d[stroke = 1: Indobufen]                                     4699     2807    1</span>
-<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]              4797     2868    1</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                              4376     2680    1</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]                 3289     1922    1</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]               5673     2423    1</span>
-<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                           4543     2926    1</span>
-<span class="co">#&gt; d[stroke = 1: Triflusal]                                     5238     3009    1</span>
-<span class="co">#&gt; d[stroke = 1: Ximelagatran]                                  4265     2590    1</span>
+<span class="co">#&gt;                                                           mean   sd  2.5%   25%   50%   75%</span>
+<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]     -1.29 0.34 -1.97 -1.51 -1.28 -1.06</span>
+<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                              1.85 2.35 -2.65  0.28  1.81  3.41</span>
+<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                     -1.54 1.41 -4.89 -2.31 -1.37 -0.55</span>
+<span class="co">#&gt; d[stroke = 1: Dipyridamole]                              -0.05 0.39 -0.81 -0.30 -0.05  0.21</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                       -0.65 0.53 -1.71 -1.00 -0.64 -0.31</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]     2.96 2.21 -1.25  1.50  2.92  4.40</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]  2.49 1.65 -0.76  1.40  2.46  3.54</span>
+<span class="co">#&gt; d[stroke = 1: High dose aspirin]                         -0.20 0.73 -1.69 -0.67 -0.21  0.29</span>
+<span class="co">#&gt; d[stroke = 1: Indobufen]                                 -1.04 0.53 -2.08 -1.38 -1.04 -0.70</span>
+<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]          -1.71 0.50 -2.73 -2.03 -1.70 -1.38</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                           0.09 0.29 -0.48 -0.09  0.09  0.29</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]              0.02 0.39 -0.76 -0.22  0.03  0.27</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]           -0.37 0.41 -1.21 -0.63 -0.36 -0.10</span>
+<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                       -0.28 0.24 -0.78 -0.43 -0.27 -0.13</span>
+<span class="co">#&gt; d[stroke = 1: Triflusal]                                  0.29 0.65 -0.96 -0.14  0.29  0.71</span>
+<span class="co">#&gt; d[stroke = 1: Ximelagatran]                              -1.38 0.41 -2.19 -1.64 -1.37 -1.12</span>
+<span class="co">#&gt;                                                          97.5% Bulk_ESS Tail_ESS Rhat</span>
+<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]     -0.63     5096     2688    1</span>
+<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                              6.66     3838     2633    1</span>
+<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                      0.66     2950     1678    1</span>
+<span class="co">#&gt; d[stroke = 1: Dipyridamole]                               0.69     5404     3167    1</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                        0.42     5256     2675    1</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]     7.50     4569     3066    1</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]  5.81     4639     2997    1</span>
+<span class="co">#&gt; d[stroke = 1: High dose aspirin]                          1.21     5677     2789    1</span>
+<span class="co">#&gt; d[stroke = 1: Indobufen]                                 -0.02     4699     2807    1</span>
+<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]          -0.74     4797     2868    1</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                           0.63     4376     2680    1</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]              0.75     3289     1922    1</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]            0.42     5673     2423    1</span>
+<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                        0.19     4543     2926    1</span>
+<span class="co">#&gt; d[stroke = 1: Triflusal]                                  1.59     5238     3009    1</span>
+<span class="co">#&gt; d[stroke = 1: Ximelagatran]                              -0.59     4265     2590    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_releff_01</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_releff_01_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>The estimated class interactions (against the reference “Mixed” class) are very uncertain.</p>
@@ -728,14 +692,14 @@
 
 <span class="co"># Summarise</span>
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">af_4b_beta</span><span class="op">)</span>
-<span class="co">#&gt;                                       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="co">#&gt; beta[.trtclassMixed:stroke]           3.25 2.17 -0.89  1.80  3.24  4.61  7.68     4600     3036</span>
-<span class="co">#&gt; beta[.trtclassAnti-platelet:stroke]   0.24 0.33 -0.44  0.04  0.25  0.47  0.88     4069     3248</span>
-<span class="co">#&gt; beta[.trtclassAnti-coagulant:stroke] -0.70 0.43 -1.58 -0.98 -0.68 -0.41  0.14     4454     2652</span>
-<span class="co">#&gt;                                      Rhat</span>
-<span class="co">#&gt; beta[.trtclassMixed:stroke]             1</span>
-<span class="co">#&gt; beta[.trtclassAnti-platelet:stroke]     1</span>
-<span class="co">#&gt; beta[.trtclassAnti-coagulant:stroke]    1</span>
+<span class="co">#&gt;                                       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS</span>
+<span class="co">#&gt; beta[.trtclassMixed:stroke]           3.25 2.17 -0.89  1.80  3.24  4.61  7.68     4600</span>
+<span class="co">#&gt; beta[.trtclassAnti-platelet:stroke]   0.24 0.33 -0.44  0.04  0.25  0.47  0.88     4069</span>
+<span class="co">#&gt; beta[.trtclassAnti-coagulant:stroke] -0.70 0.43 -1.58 -0.98 -0.68 -0.41  0.14     4454</span>
+<span class="co">#&gt;                                      Tail_ESS Rhat</span>
+<span class="co">#&gt; beta[.trtclassMixed:stroke]              3036    1</span>
+<span class="co">#&gt; beta[.trtclassAnti-platelet:stroke]      3248    1</span>
+<span class="co">#&gt; beta[.trtclassAnti-coagulant:stroke]     2652    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">af_4b_beta</span><span class="op">)</span>, stat <span class="op">=</span> <span class="st">"halfeye"</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_betas_transformed-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>There is some evidence that the effect of anti-coagulants increases (compared to control) with prior stroke. There is little evidence the effect of anti-platelets reduces with prior stroke, although the point estimate represents a substantial reduction in effectiveness, and the 95% Credible Interval includes values that correspond to substantial increases in treatment effect. The interaction effect of stroke on mixed treatments is very uncertain, but potentially indicates a substantial reduction in treatment effects with prior stroke.</p>
@@ -751,42 +715,42 @@
 <span class="co">#&gt;  stroke</span>
 <span class="co">#&gt;       0</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;                                                              mean   sd 2.5%   25% 50% 75% 97.5%</span>
-<span class="co">#&gt; rank[stroke = 0: Standard adjusted dose anti-coagulant]      7.76 1.87    4  6.75   8   9    12</span>
-<span class="co">#&gt; rank[stroke = 0: Acenocoumarol]                              4.01 3.68    1  1.00   3   5    15</span>
-<span class="co">#&gt; rank[stroke = 0: Alternate day aspirin]                      3.99 4.41    1  1.00   2   5    16</span>
-<span class="co">#&gt; rank[stroke = 0: Dipyridamole]                              11.11 3.66    4  8.00  11  14    17</span>
-<span class="co">#&gt; rank[stroke = 0: Fixed dose warfarin]                       14.07 2.98    7 12.00  15  16    17</span>
-<span class="co">#&gt; rank[stroke = 0: Fixed dose warfarin + low dose aspirin]    11.08 3.68    4  8.00  11  14    17</span>
-<span class="co">#&gt; rank[stroke = 0: Fixed dose warfarin + medium dose aspirin]  7.16 4.53    1  3.00   6  11    16</span>
-<span class="co">#&gt; rank[stroke = 0: High dose aspirin]                          9.61 5.29    1  5.00  10  15    17</span>
-<span class="co">#&gt; rank[stroke = 0: Indobufen]                                  3.62 2.73    1  2.00   3   4    12</span>
-<span class="co">#&gt; rank[stroke = 0: Low adjusted dose anti-coagulant]           4.55 2.40    1  3.00   4   6    11</span>
-<span class="co">#&gt; rank[stroke = 0: Low dose aspirin]                          12.89 1.91    9 12.00  13  14    16</span>
-<span class="co">#&gt; rank[stroke = 0: Low dose aspirin + copidogrel]             12.01 2.95    5 10.00  12  14    17</span>
-<span class="co">#&gt; rank[stroke = 0: Low dose aspirin + dipyridamole]            7.89 3.74    2  5.00   8  10    16</span>
-<span class="co">#&gt; rank[stroke = 0: Medium dose aspirin]                        8.60 2.16    5  7.00   9  10    13</span>
-<span class="co">#&gt; rank[stroke = 0: Placebo/Standard care]                     14.33 1.91   10 13.00  15  16    17</span>
-<span class="co">#&gt; rank[stroke = 0: Triflusal]                                 13.41 3.99    4 11.00  15  17    17</span>
-<span class="co">#&gt; rank[stroke = 0: Ximelagatran]                               6.90 2.65    3  5.00   7   9    13</span>
-<span class="co">#&gt;                                                             Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; rank[stroke = 0: Standard adjusted dose anti-coagulant]         3714     2785    1</span>
-<span class="co">#&gt; rank[stroke = 0: Acenocoumarol]                                 4088     3183    1</span>
-<span class="co">#&gt; rank[stroke = 0: Alternate day aspirin]                         4643     3321    1</span>
-<span class="co">#&gt; rank[stroke = 0: Dipyridamole]                                  5152       NA    1</span>
-<span class="co">#&gt; rank[stroke = 0: Fixed dose warfarin]                           4738       NA    1</span>
-<span class="co">#&gt; rank[stroke = 0: Fixed dose warfarin + low dose aspirin]        4536       NA    1</span>
-<span class="co">#&gt; rank[stroke = 0: Fixed dose warfarin + medium dose aspirin]     4327     3084    1</span>
-<span class="co">#&gt; rank[stroke = 0: High dose aspirin]                             5789       NA    1</span>
-<span class="co">#&gt; rank[stroke = 0: Indobufen]                                     3759     2956    1</span>
-<span class="co">#&gt; rank[stroke = 0: Low adjusted dose anti-coagulant]              4945     3575    1</span>
-<span class="co">#&gt; rank[stroke = 0: Low dose aspirin]                              3743     3077    1</span>
-<span class="co">#&gt; rank[stroke = 0: Low dose aspirin + copidogrel]                 2673     2149    1</span>
-<span class="co">#&gt; rank[stroke = 0: Low dose aspirin + dipyridamole]               4510     3095    1</span>
-<span class="co">#&gt; rank[stroke = 0: Medium dose aspirin]                           4515     3421    1</span>
-<span class="co">#&gt; rank[stroke = 0: Placebo/Standard care]                         3432       NA    1</span>
-<span class="co">#&gt; rank[stroke = 0: Triflusal]                                     4714       NA    1</span>
-<span class="co">#&gt; rank[stroke = 0: Ximelagatran]                                  3749     3080    1</span>
+<span class="co">#&gt;                                                              mean   sd 2.5%   25% 50% 75%</span>
+<span class="co">#&gt; rank[stroke = 0: Standard adjusted dose anti-coagulant]      7.76 1.87    4  6.75   8   9</span>
+<span class="co">#&gt; rank[stroke = 0: Acenocoumarol]                              4.01 3.68    1  1.00   3   5</span>
+<span class="co">#&gt; rank[stroke = 0: Alternate day aspirin]                      3.99 4.41    1  1.00   2   5</span>
+<span class="co">#&gt; rank[stroke = 0: Dipyridamole]                              11.11 3.66    4  8.00  11  14</span>
+<span class="co">#&gt; rank[stroke = 0: Fixed dose warfarin]                       14.07 2.98    7 12.00  15  16</span>
+<span class="co">#&gt; rank[stroke = 0: Fixed dose warfarin + low dose aspirin]    11.08 3.68    4  8.00  11  14</span>
+<span class="co">#&gt; rank[stroke = 0: Fixed dose warfarin + medium dose aspirin]  7.16 4.53    1  3.00   6  11</span>
+<span class="co">#&gt; rank[stroke = 0: High dose aspirin]                          9.61 5.29    1  5.00  10  15</span>
+<span class="co">#&gt; rank[stroke = 0: Indobufen]                                  3.62 2.73    1  2.00   3   4</span>
+<span class="co">#&gt; rank[stroke = 0: Low adjusted dose anti-coagulant]           4.55 2.40    1  3.00   4   6</span>
+<span class="co">#&gt; rank[stroke = 0: Low dose aspirin]                          12.89 1.91    9 12.00  13  14</span>
+<span class="co">#&gt; rank[stroke = 0: Low dose aspirin + copidogrel]             12.01 2.95    5 10.00  12  14</span>
+<span class="co">#&gt; rank[stroke = 0: Low dose aspirin + dipyridamole]            7.89 3.74    2  5.00   8  10</span>
+<span class="co">#&gt; rank[stroke = 0: Medium dose aspirin]                        8.60 2.16    5  7.00   9  10</span>
+<span class="co">#&gt; rank[stroke = 0: Placebo/Standard care]                     14.33 1.91   10 13.00  15  16</span>
+<span class="co">#&gt; rank[stroke = 0: Triflusal]                                 13.41 3.99    4 11.00  15  17</span>
+<span class="co">#&gt; rank[stroke = 0: Ximelagatran]                               6.90 2.65    3  5.00   7   9</span>
+<span class="co">#&gt;                                                             97.5% Bulk_ESS Tail_ESS Rhat</span>
+<span class="co">#&gt; rank[stroke = 0: Standard adjusted dose anti-coagulant]        12     3714     2785    1</span>
+<span class="co">#&gt; rank[stroke = 0: Acenocoumarol]                                15     4088     3183    1</span>
+<span class="co">#&gt; rank[stroke = 0: Alternate day aspirin]                        16     4643     3321    1</span>
+<span class="co">#&gt; rank[stroke = 0: Dipyridamole]                                 17     5152       NA    1</span>
+<span class="co">#&gt; rank[stroke = 0: Fixed dose warfarin]                          17     4738       NA    1</span>
+<span class="co">#&gt; rank[stroke = 0: Fixed dose warfarin + low dose aspirin]       17     4536       NA    1</span>
+<span class="co">#&gt; rank[stroke = 0: Fixed dose warfarin + medium dose aspirin]    16     4327     3084    1</span>
+<span class="co">#&gt; rank[stroke = 0: High dose aspirin]                            17     5789       NA    1</span>
+<span class="co">#&gt; rank[stroke = 0: Indobufen]                                    12     3759     2956    1</span>
+<span class="co">#&gt; rank[stroke = 0: Low adjusted dose anti-coagulant]             11     4945     3575    1</span>
+<span class="co">#&gt; rank[stroke = 0: Low dose aspirin]                             16     3743     3077    1</span>
+<span class="co">#&gt; rank[stroke = 0: Low dose aspirin + copidogrel]                17     2673     2149    1</span>
+<span class="co">#&gt; rank[stroke = 0: Low dose aspirin + dipyridamole]              16     4510     3095    1</span>
+<span class="co">#&gt; rank[stroke = 0: Medium dose aspirin]                          13     4515     3421    1</span>
+<span class="co">#&gt; rank[stroke = 0: Placebo/Standard care]                        17     3432       NA    1</span>
+<span class="co">#&gt; rank[stroke = 0: Triflusal]                                    17     4714       NA    1</span>
+<span class="co">#&gt; rank[stroke = 0: Ximelagatran]                                 13     3749     3080    1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------------</span> <span style="font-weight: bold;">Study: stroke = 1</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
@@ -843,60 +807,78 @@
 <span class="co">#&gt;  stroke</span>
 <span class="co">#&gt;       0</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;                                                          p_rank[1] p_rank[2] p_rank[3] p_rank[4]</span>
-<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]          0.00      0.00      0.01      0.02</span>
-<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                  0.26      0.23      0.12      0.10</span>
-<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                          0.45      0.14      0.08      0.05</span>
-<span class="co">#&gt; d[stroke = 0: Dipyridamole]                                   0.00      0.00      0.01      0.03</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                            0.00      0.00      0.00      0.01</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]         0.00      0.00      0.01      0.03</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]      0.05      0.09      0.12      0.11</span>
-<span class="co">#&gt; d[stroke = 0: High dose aspirin]                              0.03      0.06      0.07      0.07</span>
-<span class="co">#&gt; d[stroke = 0: Indobufen]                                      0.15      0.28      0.21      0.12</span>
-<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]               0.04      0.12      0.22      0.21</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                               0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]                  0.00      0.00      0.00      0.01</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]                0.01      0.03      0.07      0.09</span>
-<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                            0.00      0.00      0.01      0.01</span>
-<span class="co">#&gt; d[stroke = 0: Placebo/Standard care]                          0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 0: Triflusal]                                      0.00      0.00      0.01      0.02</span>
-<span class="co">#&gt; d[stroke = 0: Ximelagatran]                                   0.00      0.02      0.05      0.11</span>
-<span class="co">#&gt;                                                          p_rank[5] p_rank[6] p_rank[7] p_rank[8]</span>
-<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]          0.08      0.14      0.21      0.20</span>
-<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                  0.06      0.04      0.03      0.02</span>
-<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                          0.04      0.03      0.03      0.02</span>
-<span class="co">#&gt; d[stroke = 0: Dipyridamole]                                   0.04      0.05      0.06      0.06</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                            0.01      0.01      0.01      0.02</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]         0.04      0.05      0.05      0.06</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]      0.09      0.07      0.05      0.05</span>
-<span class="co">#&gt; d[stroke = 0: High dose aspirin]                              0.07      0.05      0.04      0.04</span>
-<span class="co">#&gt; d[stroke = 0: Indobufen]                                      0.07      0.05      0.02      0.03</span>
-<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]               0.14      0.09      0.06      0.04</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                               0.00      0.00      0.00      0.01</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]                  0.01      0.02      0.03      0.04</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]                0.11      0.11      0.08      0.09</span>
-<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                            0.05      0.10      0.14      0.18</span>
-<span class="co">#&gt; d[stroke = 0: Placebo/Standard care]                          0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 0: Triflusal]                                      0.03      0.03      0.03      0.03</span>
-<span class="co">#&gt; d[stroke = 0: Ximelagatran]                                   0.15      0.16      0.14      0.11</span>
-<span class="co">#&gt;                                                          p_rank[9] p_rank[10] p_rank[11] p_rank[12]</span>
-<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]          0.16       0.10       0.05       0.02</span>
-<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                  0.02       0.02       0.02       0.01</span>
-<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                          0.02       0.02       0.02       0.01</span>
-<span class="co">#&gt; d[stroke = 0: Dipyridamole]                                   0.07       0.09       0.10       0.10</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                            0.03       0.04       0.06       0.07</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]         0.07       0.09       0.09       0.10</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]      0.05       0.05       0.05       0.04</span>
-<span class="co">#&gt; d[stroke = 0: High dose aspirin]                              0.04       0.05       0.05       0.04</span>
-<span class="co">#&gt; d[stroke = 0: Indobufen]                                      0.02       0.01       0.01       0.01</span>
-<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]               0.03       0.02       0.01       0.01</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                               0.03       0.06       0.11       0.17</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]                  0.06       0.09       0.12       0.15</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]                0.09       0.08       0.06       0.05</span>
-<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                            0.18       0.15       0.10       0.06</span>
-<span class="co">#&gt; d[stroke = 0: Placebo/Standard care]                          0.01       0.02       0.05       0.08</span>
-<span class="co">#&gt; d[stroke = 0: Triflusal]                                      0.04       0.04       0.05       0.06</span>
-<span class="co">#&gt; d[stroke = 0: Ximelagatran]                                   0.08       0.07       0.05       0.03</span>
+<span class="co">#&gt;                                                          p_rank[1] p_rank[2] p_rank[3]</span>
+<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]          0.00      0.00      0.01</span>
+<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                  0.26      0.23      0.12</span>
+<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                          0.45      0.14      0.08</span>
+<span class="co">#&gt; d[stroke = 0: Dipyridamole]                                   0.00      0.00      0.01</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                            0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]         0.00      0.00      0.01</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]      0.05      0.09      0.12</span>
+<span class="co">#&gt; d[stroke = 0: High dose aspirin]                              0.03      0.06      0.07</span>
+<span class="co">#&gt; d[stroke = 0: Indobufen]                                      0.15      0.28      0.21</span>
+<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]               0.04      0.12      0.22</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                               0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]                  0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]                0.01      0.03      0.07</span>
+<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                            0.00      0.00      0.01</span>
+<span class="co">#&gt; d[stroke = 0: Placebo/Standard care]                          0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 0: Triflusal]                                      0.00      0.00      0.01</span>
+<span class="co">#&gt; d[stroke = 0: Ximelagatran]                                   0.00      0.02      0.05</span>
+<span class="co">#&gt;                                                          p_rank[4] p_rank[5] p_rank[6]</span>
+<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]          0.02      0.08      0.14</span>
+<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                  0.10      0.06      0.04</span>
+<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                          0.05      0.04      0.03</span>
+<span class="co">#&gt; d[stroke = 0: Dipyridamole]                                   0.03      0.04      0.05</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                            0.01      0.01      0.01</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]         0.03      0.04      0.05</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]      0.11      0.09      0.07</span>
+<span class="co">#&gt; d[stroke = 0: High dose aspirin]                              0.07      0.07      0.05</span>
+<span class="co">#&gt; d[stroke = 0: Indobufen]                                      0.12      0.07      0.05</span>
+<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]               0.21      0.14      0.09</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                               0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]                  0.01      0.01      0.02</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]                0.09      0.11      0.11</span>
+<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                            0.01      0.05      0.10</span>
+<span class="co">#&gt; d[stroke = 0: Placebo/Standard care]                          0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 0: Triflusal]                                      0.02      0.03      0.03</span>
+<span class="co">#&gt; d[stroke = 0: Ximelagatran]                                   0.11      0.15      0.16</span>
+<span class="co">#&gt;                                                          p_rank[7] p_rank[8] p_rank[9]</span>
+<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]          0.21      0.20      0.16</span>
+<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                  0.03      0.02      0.02</span>
+<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                          0.03      0.02      0.02</span>
+<span class="co">#&gt; d[stroke = 0: Dipyridamole]                                   0.06      0.06      0.07</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                            0.01      0.02      0.03</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]         0.05      0.06      0.07</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]      0.05      0.05      0.05</span>
+<span class="co">#&gt; d[stroke = 0: High dose aspirin]                              0.04      0.04      0.04</span>
+<span class="co">#&gt; d[stroke = 0: Indobufen]                                      0.02      0.03      0.02</span>
+<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]               0.06      0.04      0.03</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                               0.00      0.01      0.03</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]                  0.03      0.04      0.06</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]                0.08      0.09      0.09</span>
+<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                            0.14      0.18      0.18</span>
+<span class="co">#&gt; d[stroke = 0: Placebo/Standard care]                          0.00      0.00      0.01</span>
+<span class="co">#&gt; d[stroke = 0: Triflusal]                                      0.03      0.03      0.04</span>
+<span class="co">#&gt; d[stroke = 0: Ximelagatran]                                   0.14      0.11      0.08</span>
+<span class="co">#&gt;                                                          p_rank[10] p_rank[11] p_rank[12]</span>
+<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]           0.10       0.05       0.02</span>
+<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                   0.02       0.02       0.01</span>
+<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                           0.02       0.02       0.01</span>
+<span class="co">#&gt; d[stroke = 0: Dipyridamole]                                    0.09       0.10       0.10</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                             0.04       0.06       0.07</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]          0.09       0.09       0.10</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]       0.05       0.05       0.04</span>
+<span class="co">#&gt; d[stroke = 0: High dose aspirin]                               0.05       0.05       0.04</span>
+<span class="co">#&gt; d[stroke = 0: Indobufen]                                       0.01       0.01       0.01</span>
+<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]                0.02       0.01       0.01</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                                0.06       0.11       0.17</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]                   0.09       0.12       0.15</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]                 0.08       0.06       0.05</span>
+<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                             0.15       0.10       0.06</span>
+<span class="co">#&gt; d[stroke = 0: Placebo/Standard care]                           0.02       0.05       0.08</span>
+<span class="co">#&gt; d[stroke = 0: Triflusal]                                       0.04       0.05       0.06</span>
+<span class="co">#&gt; d[stroke = 0: Ximelagatran]                                    0.07       0.05       0.03</span>
 <span class="co">#&gt;                                                          p_rank[13] p_rank[14] p_rank[15]</span>
 <span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]           0.01       0.00       0.00</span>
 <span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                   0.01       0.01       0.01</span>
@@ -940,60 +922,78 @@
 <span class="co">#&gt;  stroke</span>
 <span class="co">#&gt;       1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;                                                          p_rank[1] p_rank[2] p_rank[3] p_rank[4]</span>
-<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]          0.01      0.11      0.34      0.34</span>
-<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                  0.04      0.02      0.01      0.01</span>
-<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                          0.37      0.10      0.05      0.06</span>
-<span class="co">#&gt; d[stroke = 1: Dipyridamole]                                   0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                            0.00      0.02      0.02      0.06</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]         0.00      0.01      0.01      0.00</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]      0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 1: High dose aspirin]                              0.02      0.03      0.03      0.03</span>
-<span class="co">#&gt; d[stroke = 1: Indobufen]                                      0.03      0.09      0.11      0.18</span>
-<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]               0.43      0.33      0.12      0.07</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                               0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]                  0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]                0.00      0.01      0.01      0.03</span>
-<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                            0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                          0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 1: Triflusal]                                      0.00      0.00      0.00      0.01</span>
-<span class="co">#&gt; d[stroke = 1: Ximelagatran]                                   0.09      0.27      0.29      0.20</span>
-<span class="co">#&gt;                                                          p_rank[5] p_rank[6] p_rank[7] p_rank[8]</span>
-<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]          0.15      0.04      0.01      0.00</span>
-<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                  0.02      0.02      0.02      0.02</span>
-<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                          0.08      0.09      0.05      0.04</span>
-<span class="co">#&gt; d[stroke = 1: Dipyridamole]                                   0.01      0.04      0.07      0.10</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                            0.18      0.24      0.14      0.09</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]         0.01      0.01      0.01      0.01</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]      0.00      0.00      0.01      0.01</span>
-<span class="co">#&gt; d[stroke = 1: High dose aspirin]                              0.05      0.11      0.11      0.08</span>
-<span class="co">#&gt; d[stroke = 1: Indobufen]                                      0.25      0.16      0.07      0.04</span>
-<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]               0.03      0.01      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                               0.00      0.00      0.01      0.03</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]                  0.01      0.02      0.05      0.07</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]                0.07      0.13      0.19      0.15</span>
-<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                            0.01      0.07      0.18      0.26</span>
-<span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                          0.00      0.01      0.02      0.05</span>
-<span class="co">#&gt; d[stroke = 1: Triflusal]                                      0.01      0.03      0.05      0.05</span>
-<span class="co">#&gt; d[stroke = 1: Ximelagatran]                                   0.11      0.03      0.01      0.00</span>
-<span class="co">#&gt;                                                          p_rank[9] p_rank[10] p_rank[11] p_rank[12]</span>
-<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]          0.00       0.00       0.00       0.00</span>
-<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                  0.01       0.01       0.01       0.02</span>
-<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                          0.03       0.02       0.02       0.02</span>
-<span class="co">#&gt; d[stroke = 1: Dipyridamole]                                   0.12       0.13       0.12       0.13</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                            0.06       0.04       0.04       0.03</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]         0.01       0.01       0.01       0.01</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]      0.01       0.01       0.01       0.01</span>
-<span class="co">#&gt; d[stroke = 1: High dose aspirin]                              0.07       0.06       0.06       0.06</span>
-<span class="co">#&gt; d[stroke = 1: Indobufen]                                      0.03       0.02       0.01       0.01</span>
-<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]               0.00       0.00       0.00       0.00</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                               0.06       0.11       0.18       0.23</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]                  0.10       0.12       0.14       0.16</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]                0.12       0.09       0.07       0.05</span>
-<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                            0.22       0.14       0.08       0.03</span>
-<span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                          0.12       0.18       0.19       0.18</span>
-<span class="co">#&gt; d[stroke = 1: Triflusal]                                      0.05       0.06       0.06       0.08</span>
-<span class="co">#&gt; d[stroke = 1: Ximelagatran]                                   0.00       0.00       0.00       0.00</span>
+<span class="co">#&gt;                                                          p_rank[1] p_rank[2] p_rank[3]</span>
+<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]          0.01      0.11      0.34</span>
+<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                  0.04      0.02      0.01</span>
+<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                          0.37      0.10      0.05</span>
+<span class="co">#&gt; d[stroke = 1: Dipyridamole]                                   0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                            0.00      0.02      0.02</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]         0.00      0.01      0.01</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]      0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: High dose aspirin]                              0.02      0.03      0.03</span>
+<span class="co">#&gt; d[stroke = 1: Indobufen]                                      0.03      0.09      0.11</span>
+<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]               0.43      0.33      0.12</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                               0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]                  0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]                0.00      0.01      0.01</span>
+<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                            0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                          0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: Triflusal]                                      0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: Ximelagatran]                                   0.09      0.27      0.29</span>
+<span class="co">#&gt;                                                          p_rank[4] p_rank[5] p_rank[6]</span>
+<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]          0.34      0.15      0.04</span>
+<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                  0.01      0.02      0.02</span>
+<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                          0.06      0.08      0.09</span>
+<span class="co">#&gt; d[stroke = 1: Dipyridamole]                                   0.00      0.01      0.04</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                            0.06      0.18      0.24</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]         0.00      0.01      0.01</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]      0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: High dose aspirin]                              0.03      0.05      0.11</span>
+<span class="co">#&gt; d[stroke = 1: Indobufen]                                      0.18      0.25      0.16</span>
+<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]               0.07      0.03      0.01</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                               0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]                  0.00      0.01      0.02</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]                0.03      0.07      0.13</span>
+<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                            0.00      0.01      0.07</span>
+<span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                          0.00      0.00      0.01</span>
+<span class="co">#&gt; d[stroke = 1: Triflusal]                                      0.01      0.01      0.03</span>
+<span class="co">#&gt; d[stroke = 1: Ximelagatran]                                   0.20      0.11      0.03</span>
+<span class="co">#&gt;                                                          p_rank[7] p_rank[8] p_rank[9]</span>
+<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]          0.01      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                  0.02      0.02      0.01</span>
+<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                          0.05      0.04      0.03</span>
+<span class="co">#&gt; d[stroke = 1: Dipyridamole]                                   0.07      0.10      0.12</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                            0.14      0.09      0.06</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]         0.01      0.01      0.01</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]      0.01      0.01      0.01</span>
+<span class="co">#&gt; d[stroke = 1: High dose aspirin]                              0.11      0.08      0.07</span>
+<span class="co">#&gt; d[stroke = 1: Indobufen]                                      0.07      0.04      0.03</span>
+<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]               0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                               0.01      0.03      0.06</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]                  0.05      0.07      0.10</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]                0.19      0.15      0.12</span>
+<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                            0.18      0.26      0.22</span>
+<span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                          0.02      0.05      0.12</span>
+<span class="co">#&gt; d[stroke = 1: Triflusal]                                      0.05      0.05      0.05</span>
+<span class="co">#&gt; d[stroke = 1: Ximelagatran]                                   0.01      0.00      0.00</span>
+<span class="co">#&gt;                                                          p_rank[10] p_rank[11] p_rank[12]</span>
+<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]           0.00       0.00       0.00</span>
+<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                   0.01       0.01       0.02</span>
+<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                           0.02       0.02       0.02</span>
+<span class="co">#&gt; d[stroke = 1: Dipyridamole]                                    0.13       0.12       0.13</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                             0.04       0.04       0.03</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]          0.01       0.01       0.01</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]       0.01       0.01       0.01</span>
+<span class="co">#&gt; d[stroke = 1: High dose aspirin]                               0.06       0.06       0.06</span>
+<span class="co">#&gt; d[stroke = 1: Indobufen]                                       0.02       0.01       0.01</span>
+<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]                0.00       0.00       0.00</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                                0.11       0.18       0.23</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]                   0.12       0.14       0.16</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]                 0.09       0.07       0.05</span>
+<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                             0.14       0.08       0.03</span>
+<span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                           0.18       0.19       0.18</span>
+<span class="co">#&gt; d[stroke = 1: Triflusal]                                       0.06       0.06       0.08</span>
+<span class="co">#&gt; d[stroke = 1: Ximelagatran]                                    0.00       0.00       0.00</span>
 <span class="co">#&gt;                                                          p_rank[13] p_rank[14] p_rank[15]</span>
 <span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]           0.00       0.00       0.00</span>
 <span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                   0.02       0.04       0.43</span>
@@ -1048,60 +1048,78 @@
 <span class="co">#&gt;  stroke</span>
 <span class="co">#&gt;       0</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;                                                          p_rank[1] p_rank[2] p_rank[3] p_rank[4]</span>
-<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]          0.00      0.00      0.01      0.03</span>
-<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                  0.26      0.49      0.61      0.71</span>
-<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                          0.45      0.59      0.67      0.72</span>
-<span class="co">#&gt; d[stroke = 0: Dipyridamole]                                   0.00      0.00      0.02      0.04</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                            0.00      0.00      0.00      0.01</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]         0.00      0.00      0.02      0.05</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]      0.05      0.14      0.27      0.38</span>
-<span class="co">#&gt; d[stroke = 0: High dose aspirin]                              0.03      0.09      0.17      0.24</span>
-<span class="co">#&gt; d[stroke = 0: Indobufen]                                      0.15      0.43      0.64      0.76</span>
-<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]               0.04      0.17      0.38      0.59</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                               0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]                  0.00      0.00      0.00      0.01</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]                0.01      0.04      0.11      0.21</span>
-<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                            0.00      0.00      0.01      0.02</span>
-<span class="co">#&gt; d[stroke = 0: Placebo/Standard care]                          0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 0: Triflusal]                                      0.00      0.00      0.02      0.03</span>
-<span class="co">#&gt; d[stroke = 0: Ximelagatran]                                   0.00      0.02      0.07      0.18</span>
-<span class="co">#&gt;                                                          p_rank[5] p_rank[6] p_rank[7] p_rank[8]</span>
-<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]          0.11      0.25      0.46      0.67</span>
-<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                  0.78      0.82      0.85      0.87</span>
-<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                          0.76      0.79      0.82      0.84</span>
-<span class="co">#&gt; d[stroke = 0: Dipyridamole]                                   0.09      0.13      0.19      0.25</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                            0.02      0.02      0.04      0.06</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]         0.09      0.14      0.19      0.26</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]      0.47      0.54      0.59      0.64</span>
-<span class="co">#&gt; d[stroke = 0: High dose aspirin]                              0.31      0.36      0.41      0.45</span>
-<span class="co">#&gt; d[stroke = 0: Indobufen]                                      0.83      0.88      0.90      0.93</span>
-<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]               0.74      0.83      0.88      0.92</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                               0.00      0.00      0.01      0.02</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]                  0.03      0.05      0.08      0.12</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]                0.32      0.42      0.50      0.58</span>
-<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                            0.07      0.17      0.31      0.48</span>
-<span class="co">#&gt; d[stroke = 0: Placebo/Standard care]                          0.00      0.00      0.00      0.01</span>
-<span class="co">#&gt; d[stroke = 0: Triflusal]                                      0.06      0.09      0.12      0.15</span>
-<span class="co">#&gt; d[stroke = 0: Ximelagatran]                                   0.33      0.50      0.64      0.74</span>
-<span class="co">#&gt;                                                          p_rank[9] p_rank[10] p_rank[11] p_rank[12]</span>
-<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]          0.82       0.92       0.97       0.99</span>
-<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                  0.89       0.91       0.93       0.95</span>
-<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                          0.86       0.88       0.90       0.91</span>
-<span class="co">#&gt; d[stroke = 0: Dipyridamole]                                   0.32       0.41       0.51       0.61</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                            0.09       0.13       0.19       0.25</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]         0.32       0.41       0.51       0.61</span>
-<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]      0.69       0.75       0.79       0.83</span>
-<span class="co">#&gt; d[stroke = 0: High dose aspirin]                              0.49       0.54       0.59       0.63</span>
-<span class="co">#&gt; d[stroke = 0: Indobufen]                                      0.95       0.96       0.97       0.98</span>
-<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]               0.95       0.97       0.98       0.99</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                               0.04       0.11       0.22       0.39</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]                  0.19       0.28       0.39       0.54</span>
-<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]                0.67       0.75       0.82       0.87</span>
-<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                            0.66       0.81       0.91       0.96</span>
-<span class="co">#&gt; d[stroke = 0: Placebo/Standard care]                          0.02       0.04       0.08       0.16</span>
-<span class="co">#&gt; d[stroke = 0: Triflusal]                                      0.19       0.23       0.28       0.33</span>
-<span class="co">#&gt; d[stroke = 0: Ximelagatran]                                   0.83       0.90       0.94       0.97</span>
+<span class="co">#&gt;                                                          p_rank[1] p_rank[2] p_rank[3]</span>
+<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]          0.00      0.00      0.01</span>
+<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                  0.26      0.49      0.61</span>
+<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                          0.45      0.59      0.67</span>
+<span class="co">#&gt; d[stroke = 0: Dipyridamole]                                   0.00      0.00      0.02</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                            0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]         0.00      0.00      0.02</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]      0.05      0.14      0.27</span>
+<span class="co">#&gt; d[stroke = 0: High dose aspirin]                              0.03      0.09      0.17</span>
+<span class="co">#&gt; d[stroke = 0: Indobufen]                                      0.15      0.43      0.64</span>
+<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]               0.04      0.17      0.38</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                               0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]                  0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]                0.01      0.04      0.11</span>
+<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                            0.00      0.00      0.01</span>
+<span class="co">#&gt; d[stroke = 0: Placebo/Standard care]                          0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 0: Triflusal]                                      0.00      0.00      0.02</span>
+<span class="co">#&gt; d[stroke = 0: Ximelagatran]                                   0.00      0.02      0.07</span>
+<span class="co">#&gt;                                                          p_rank[4] p_rank[5] p_rank[6]</span>
+<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]          0.03      0.11      0.25</span>
+<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                  0.71      0.78      0.82</span>
+<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                          0.72      0.76      0.79</span>
+<span class="co">#&gt; d[stroke = 0: Dipyridamole]                                   0.04      0.09      0.13</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                            0.01      0.02      0.02</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]         0.05      0.09      0.14</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]      0.38      0.47      0.54</span>
+<span class="co">#&gt; d[stroke = 0: High dose aspirin]                              0.24      0.31      0.36</span>
+<span class="co">#&gt; d[stroke = 0: Indobufen]                                      0.76      0.83      0.88</span>
+<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]               0.59      0.74      0.83</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                               0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]                  0.01      0.03      0.05</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]                0.21      0.32      0.42</span>
+<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                            0.02      0.07      0.17</span>
+<span class="co">#&gt; d[stroke = 0: Placebo/Standard care]                          0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 0: Triflusal]                                      0.03      0.06      0.09</span>
+<span class="co">#&gt; d[stroke = 0: Ximelagatran]                                   0.18      0.33      0.50</span>
+<span class="co">#&gt;                                                          p_rank[7] p_rank[8] p_rank[9]</span>
+<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]          0.46      0.67      0.82</span>
+<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                  0.85      0.87      0.89</span>
+<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                          0.82      0.84      0.86</span>
+<span class="co">#&gt; d[stroke = 0: Dipyridamole]                                   0.19      0.25      0.32</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                            0.04      0.06      0.09</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]         0.19      0.26      0.32</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]      0.59      0.64      0.69</span>
+<span class="co">#&gt; d[stroke = 0: High dose aspirin]                              0.41      0.45      0.49</span>
+<span class="co">#&gt; d[stroke = 0: Indobufen]                                      0.90      0.93      0.95</span>
+<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]               0.88      0.92      0.95</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                               0.01      0.02      0.04</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]                  0.08      0.12      0.19</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]                0.50      0.58      0.67</span>
+<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                            0.31      0.48      0.66</span>
+<span class="co">#&gt; d[stroke = 0: Placebo/Standard care]                          0.00      0.01      0.02</span>
+<span class="co">#&gt; d[stroke = 0: Triflusal]                                      0.12      0.15      0.19</span>
+<span class="co">#&gt; d[stroke = 0: Ximelagatran]                                   0.64      0.74      0.83</span>
+<span class="co">#&gt;                                                          p_rank[10] p_rank[11] p_rank[12]</span>
+<span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]           0.92       0.97       0.99</span>
+<span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                   0.91       0.93       0.95</span>
+<span class="co">#&gt; d[stroke = 0: Alternate day aspirin]                           0.88       0.90       0.91</span>
+<span class="co">#&gt; d[stroke = 0: Dipyridamole]                                    0.41       0.51       0.61</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin]                             0.13       0.19       0.25</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + low dose aspirin]          0.41       0.51       0.61</span>
+<span class="co">#&gt; d[stroke = 0: Fixed dose warfarin + medium dose aspirin]       0.75       0.79       0.83</span>
+<span class="co">#&gt; d[stroke = 0: High dose aspirin]                               0.54       0.59       0.63</span>
+<span class="co">#&gt; d[stroke = 0: Indobufen]                                       0.96       0.97       0.98</span>
+<span class="co">#&gt; d[stroke = 0: Low adjusted dose anti-coagulant]                0.97       0.98       0.99</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin]                                0.11       0.22       0.39</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + copidogrel]                   0.28       0.39       0.54</span>
+<span class="co">#&gt; d[stroke = 0: Low dose aspirin + dipyridamole]                 0.75       0.82       0.87</span>
+<span class="co">#&gt; d[stroke = 0: Medium dose aspirin]                             0.81       0.91       0.96</span>
+<span class="co">#&gt; d[stroke = 0: Placebo/Standard care]                           0.04       0.08       0.16</span>
+<span class="co">#&gt; d[stroke = 0: Triflusal]                                       0.23       0.28       0.33</span>
+<span class="co">#&gt; d[stroke = 0: Ximelagatran]                                    0.90       0.94       0.97</span>
 <span class="co">#&gt;                                                          p_rank[13] p_rank[14] p_rank[15]</span>
 <span class="co">#&gt; d[stroke = 0: Standard adjusted dose anti-coagulant]           1.00       1.00       1.00</span>
 <span class="co">#&gt; d[stroke = 0: Acenocoumarol]                                   0.96       0.97       0.98</span>
@@ -1145,60 +1163,78 @@
 <span class="co">#&gt;  stroke</span>
 <span class="co">#&gt;       1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;                                                          p_rank[1] p_rank[2] p_rank[3] p_rank[4]</span>
-<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]          0.01      0.12      0.47      0.80</span>
-<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                  0.04      0.06      0.07      0.08</span>
-<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                          0.37      0.47      0.52      0.58</span>
-<span class="co">#&gt; d[stroke = 1: Dipyridamole]                                   0.00      0.00      0.00      0.01</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                            0.00      0.02      0.05      0.11</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]         0.00      0.01      0.02      0.02</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]      0.00      0.00      0.00      0.01</span>
-<span class="co">#&gt; d[stroke = 1: High dose aspirin]                              0.02      0.05      0.07      0.10</span>
-<span class="co">#&gt; d[stroke = 1: Indobufen]                                      0.03      0.12      0.23      0.42</span>
-<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]               0.43      0.76      0.88      0.95</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                               0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]                  0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]                0.00      0.01      0.02      0.06</span>
-<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                            0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                          0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[stroke = 1: Triflusal]                                      0.00      0.00      0.01      0.01</span>
-<span class="co">#&gt; d[stroke = 1: Ximelagatran]                                   0.09      0.36      0.65      0.84</span>
-<span class="co">#&gt;                                                          p_rank[5] p_rank[6] p_rank[7] p_rank[8]</span>
-<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]          0.95      0.99      1.00      1.00</span>
-<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                  0.10      0.13      0.15      0.17</span>
-<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                          0.66      0.75      0.80      0.84</span>
-<span class="co">#&gt; d[stroke = 1: Dipyridamole]                                   0.02      0.06      0.13      0.23</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                            0.29      0.54      0.68      0.77</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]         0.03      0.03      0.05      0.06</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]      0.01      0.01      0.02      0.03</span>
-<span class="co">#&gt; d[stroke = 1: High dose aspirin]                              0.16      0.26      0.37      0.45</span>
-<span class="co">#&gt; d[stroke = 1: Indobufen]                                      0.67      0.82      0.90      0.94</span>
-<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]               0.98      0.99      1.00      1.00</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                               0.00      0.00      0.01      0.04</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]                  0.01      0.04      0.08      0.15</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]                0.12      0.25      0.44      0.59</span>
-<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                            0.02      0.08      0.26      0.51</span>
-<span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                          0.00      0.01      0.03      0.08</span>
-<span class="co">#&gt; d[stroke = 1: Triflusal]                                      0.03      0.06      0.10      0.15</span>
-<span class="co">#&gt; d[stroke = 1: Ximelagatran]                                   0.95      0.98      0.99      1.00</span>
-<span class="co">#&gt;                                                          p_rank[9] p_rank[10] p_rank[11] p_rank[12]</span>
-<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]          1.00       1.00       1.00       1.00</span>
-<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                  0.18       0.20       0.21       0.23</span>
-<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                          0.87       0.89       0.91       0.93</span>
-<span class="co">#&gt; d[stroke = 1: Dipyridamole]                                   0.35       0.48       0.60       0.73</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                            0.83       0.87       0.91       0.94</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]         0.07       0.07       0.08       0.09</span>
-<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]      0.03       0.04       0.05       0.06</span>
-<span class="co">#&gt; d[stroke = 1: High dose aspirin]                              0.52       0.58       0.64       0.70</span>
-<span class="co">#&gt; d[stroke = 1: Indobufen]                                      0.96       0.98       0.99       0.99</span>
-<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]               1.00       1.00       1.00       1.00</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                               0.10       0.21       0.39       0.62</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]                  0.25       0.37       0.51       0.67</span>
-<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]                0.71       0.80       0.87       0.92</span>
-<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                            0.73       0.87       0.94       0.98</span>
-<span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                          0.20       0.38       0.57       0.75</span>
-<span class="co">#&gt; d[stroke = 1: Triflusal]                                      0.20       0.27       0.32       0.41</span>
-<span class="co">#&gt; d[stroke = 1: Ximelagatran]                                   1.00       1.00       1.00       1.00</span>
+<span class="co">#&gt;                                                          p_rank[1] p_rank[2] p_rank[3]</span>
+<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]          0.01      0.12      0.47</span>
+<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                  0.04      0.06      0.07</span>
+<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                          0.37      0.47      0.52</span>
+<span class="co">#&gt; d[stroke = 1: Dipyridamole]                                   0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                            0.00      0.02      0.05</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]         0.00      0.01      0.02</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]      0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: High dose aspirin]                              0.02      0.05      0.07</span>
+<span class="co">#&gt; d[stroke = 1: Indobufen]                                      0.03      0.12      0.23</span>
+<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]               0.43      0.76      0.88</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                               0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]                  0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]                0.00      0.01      0.02</span>
+<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                            0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                          0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: Triflusal]                                      0.00      0.00      0.01</span>
+<span class="co">#&gt; d[stroke = 1: Ximelagatran]                                   0.09      0.36      0.65</span>
+<span class="co">#&gt;                                                          p_rank[4] p_rank[5] p_rank[6]</span>
+<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]          0.80      0.95      0.99</span>
+<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                  0.08      0.10      0.13</span>
+<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                          0.58      0.66      0.75</span>
+<span class="co">#&gt; d[stroke = 1: Dipyridamole]                                   0.01      0.02      0.06</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                            0.11      0.29      0.54</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]         0.02      0.03      0.03</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]      0.01      0.01      0.01</span>
+<span class="co">#&gt; d[stroke = 1: High dose aspirin]                              0.10      0.16      0.26</span>
+<span class="co">#&gt; d[stroke = 1: Indobufen]                                      0.42      0.67      0.82</span>
+<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]               0.95      0.98      0.99</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                               0.00      0.00      0.00</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]                  0.00      0.01      0.04</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]                0.06      0.12      0.25</span>
+<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                            0.00      0.02      0.08</span>
+<span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                          0.00      0.00      0.01</span>
+<span class="co">#&gt; d[stroke = 1: Triflusal]                                      0.01      0.03      0.06</span>
+<span class="co">#&gt; d[stroke = 1: Ximelagatran]                                   0.84      0.95      0.98</span>
+<span class="co">#&gt;                                                          p_rank[7] p_rank[8] p_rank[9]</span>
+<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]          1.00      1.00      1.00</span>
+<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                  0.15      0.17      0.18</span>
+<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                          0.80      0.84      0.87</span>
+<span class="co">#&gt; d[stroke = 1: Dipyridamole]                                   0.13      0.23      0.35</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                            0.68      0.77      0.83</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]         0.05      0.06      0.07</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]      0.02      0.03      0.03</span>
+<span class="co">#&gt; d[stroke = 1: High dose aspirin]                              0.37      0.45      0.52</span>
+<span class="co">#&gt; d[stroke = 1: Indobufen]                                      0.90      0.94      0.96</span>
+<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]               1.00      1.00      1.00</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                               0.01      0.04      0.10</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]                  0.08      0.15      0.25</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]                0.44      0.59      0.71</span>
+<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                            0.26      0.51      0.73</span>
+<span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                          0.03      0.08      0.20</span>
+<span class="co">#&gt; d[stroke = 1: Triflusal]                                      0.10      0.15      0.20</span>
+<span class="co">#&gt; d[stroke = 1: Ximelagatran]                                   0.99      1.00      1.00</span>
+<span class="co">#&gt;                                                          p_rank[10] p_rank[11] p_rank[12]</span>
+<span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]           1.00       1.00       1.00</span>
+<span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                   0.20       0.21       0.23</span>
+<span class="co">#&gt; d[stroke = 1: Alternate day aspirin]                           0.89       0.91       0.93</span>
+<span class="co">#&gt; d[stroke = 1: Dipyridamole]                                    0.48       0.60       0.73</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin]                             0.87       0.91       0.94</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + low dose aspirin]          0.07       0.08       0.09</span>
+<span class="co">#&gt; d[stroke = 1: Fixed dose warfarin + medium dose aspirin]       0.04       0.05       0.06</span>
+<span class="co">#&gt; d[stroke = 1: High dose aspirin]                               0.58       0.64       0.70</span>
+<span class="co">#&gt; d[stroke = 1: Indobufen]                                       0.98       0.99       0.99</span>
+<span class="co">#&gt; d[stroke = 1: Low adjusted dose anti-coagulant]                1.00       1.00       1.00</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin]                                0.21       0.39       0.62</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + copidogrel]                   0.37       0.51       0.67</span>
+<span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]                 0.80       0.87       0.92</span>
+<span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                             0.87       0.94       0.98</span>
+<span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                           0.38       0.57       0.75</span>
+<span class="co">#&gt; d[stroke = 1: Triflusal]                                       0.27       0.32       0.41</span>
+<span class="co">#&gt; d[stroke = 1: Ximelagatran]                                    1.00       1.00       1.00</span>
 <span class="co">#&gt;                                                          p_rank[13] p_rank[14] p_rank[15]</span>
 <span class="co">#&gt; d[stroke = 1: Standard adjusted dose anti-coagulant]           1.00       1.00       1.00</span>
 <span class="co">#&gt; d[stroke = 1: Acenocoumarol]                                   0.25       0.29       0.72</span>
@@ -1274,33 +1310,26 @@
 </div>
 </div>
 </div>
-  </div>
-
-  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
-
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
 
-      <footer><div class="copyright">
+    <footer><div class="pkgdown-footer-left">
   <p></p>
 <p>Developed by David M. Phillippo.</p>
 </div>
 
-<div class="pkgdown">
+<div class="pkgdown-footer-right">
   <p></p>
 <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
-      </footer>
+    </footer>
 </div>
 
   
-
 
   
 

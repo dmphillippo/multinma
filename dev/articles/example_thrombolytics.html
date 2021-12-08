@@ -4,7 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="multinma">
 <title>Example: Thrombolytic treatments • multinma</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
@@ -12,12 +13,12 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/paper/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
-<script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><link href="../deps/_Source%20Sans%20Pro-0.4.0/font.css" rel="stylesheet">
+<!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Example: Thrombolytic treatments">
 <meta property="og:description" content="multinma">
 <meta property="og:image" content="https://dmphillippo.github.io/multinma/logo.svg">
@@ -27,111 +28,74 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body data-spy="scroll" data-target="#toc">
+<body>
+    <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <div class="container template-article">
-      <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">multinma</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.3.0.9000</span>
-      </span>
-    </div>
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    
+    <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-<li>
-  <a href="../reference/index.html">Reference</a>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.3.0.9000</small>
+
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar" class="collapse navbar-collapse ms-2">
+      <ul class="navbar-nav me-auto">
+<li class="nav-item">
+  <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../articles/vignette_overview.html">Overview of Examples</a>
-    </li>
-    <li class="divider">
-    </li>
-<li class="dropdown-header">Examples</li>
-    <li>
-      <a href="../articles/example_atrial_fibrillation.html">Example: Atrial fibrillation</a>
-    </li>
-    <li>
-      <a href="../articles/example_bcg_vaccine.html">Example: BCG vaccine for tuberculosis</a>
-    </li>
-    <li>
-      <a href="../articles/example_blocker.html">Example: Beta blockers</a>
-    </li>
-    <li>
-      <a href="../articles/example_diabetes.html">Example: Diabetes</a>
-    </li>
-    <li>
-      <a href="../articles/example_dietary_fat.html">Example: Dietary fat</a>
-    </li>
-    <li>
-      <a href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a>
-    </li>
-    <li>
-      <a href="../articles/example_parkinsons.html">Example: Parkinson's disease</a>
-    </li>
-    <li>
-      <a href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a>
-    </li>
-    <li>
-      <a href="../articles/example_smoking.html">Example: Smoking cessation</a>
-    </li>
-    <li>
-      <a href="../articles/example_statins.html">Example: Statins for cholesterol lowering</a>
-    </li>
-    <li>
-      <a href="../articles/example_thrombolytics.html">Example: Thrombolytic treatments</a>
-    </li>
-    <li>
-      <a href="../articles/example_transfusion.html">Example: White blood cell transfusion</a>
-    </li>
-  </ul>
-</li>
-<li>
-  <a href="../news/index.html">Changelog</a>
-</li>
-      </ul>
-<ul class="nav navbar-nav navbar-right">
-<li>
-  <a href="https://github.com/dmphillippo/multinma/" class="external-link">
-    <span class="fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
-      </ul>
-</div>
-<!--/.nav-collapse -->
+<li class="active nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/vignette_overview.html">Overview of Examples</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Examples</h6>
+    <a class="dropdown-item" href="../articles/example_atrial_fibrillation.html">Example: Atrial fibrillation</a>
+    <a class="dropdown-item" href="../articles/example_bcg_vaccine.html">Example: BCG vaccine for tuberculosis</a>
+    <a class="dropdown-item" href="../articles/example_blocker.html">Example: Beta blockers</a>
+    <a class="dropdown-item" href="../articles/example_diabetes.html">Example: Diabetes</a>
+    <a class="dropdown-item" href="../articles/example_dietary_fat.html">Example: Dietary fat</a>
+    <a class="dropdown-item" href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a>
+    <a class="dropdown-item" href="../articles/example_parkinsons.html">Example: Parkinson's disease</a>
+    <a class="dropdown-item" href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a>
+    <a class="dropdown-item" href="../articles/example_smoking.html">Example: Smoking cessation</a>
+    <a class="dropdown-item" href="../articles/example_statins.html">Example: Statins for cholesterol lowering</a>
+    <a class="dropdown-item" href="../articles/example_thrombolytics.html">Example: Thrombolytic treatments</a>
+    <a class="dropdown-item" href="../articles/example_transfusion.html">Example: White blood cell transfusion</a>
   </div>
-<!--/.container -->
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
+</li>
+      </ul>
+<form class="form-inline my-2 my-lg-0" role="search">
+        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
+</form>
+
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/dmphillippo/multinma/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
-<!--/.navbar -->
 
-      
-
-      </header><script src="example_thrombolytics_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
-  <div class="col-md-9 contents">
-    <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Example: Thrombolytic treatments</h1>
+    
+  </div>
+</nav><div class="container template-article">
+<script src="example_thrombolytics_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+  <main id="main"><div class="page-header">
+      <img src="../logo.svg" class="logo" alt=""><h1>Example: Thrombolytic treatments</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/dmphillippo/multinma/blob/HEAD/vignettes/example_thrombolytics.Rmd" class="external-link"><code>vignettes/example_thrombolytics.Rmd</code></a></small>
-      <div class="hidden name"><code>example_thrombolytics.Rmd</code></div>
-
+      <div class="d-none name"><code>example_thrombolytics.Rmd</code></div>
     </div>
 
     
@@ -218,18 +182,28 @@
 <span class="co">#&gt; 4 chains, each with iter=2000; warmup=1000; thin=1; </span>
 <span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;                   mean se_mean   sd      2.5%       25%       50%       75%     97.5% n_eff Rhat</span>
-<span class="co">#&gt; d[Acc t-PA]      -0.18    0.00 0.04     -0.26     -0.21     -0.18     -0.15     -0.09  2473    1</span>
-<span class="co">#&gt; d[ASPAC]          0.02    0.00 0.04     -0.06     -0.01      0.02      0.04      0.09  4088    1</span>
-<span class="co">#&gt; d[PTCA]          -0.47    0.00 0.10     -0.67     -0.54     -0.47     -0.41     -0.28  3691    1</span>
-<span class="co">#&gt; d[r-PA]          -0.12    0.00 0.06     -0.24     -0.16     -0.12     -0.08      0.00  3704    1</span>
-<span class="co">#&gt; d[SK + t-PA]     -0.05    0.00 0.05     -0.14     -0.08     -0.05     -0.02      0.04  5451    1</span>
-<span class="co">#&gt; d[t-PA]           0.00    0.00 0.03     -0.06     -0.02      0.00      0.02      0.06  4404    1</span>
-<span class="co">#&gt; d[TNK]           -0.17    0.00 0.08     -0.32     -0.22     -0.17     -0.12     -0.02  4047    1</span>
-<span class="co">#&gt; d[UK]            -0.20    0.00 0.22     -0.62     -0.35     -0.20     -0.05      0.22  4367    1</span>
-<span class="co">#&gt; lp__         -43042.79    0.13 5.35 -43054.22 -43046.27 -43042.37 -43038.99 -43033.31  1604    1</span>
+<span class="co">#&gt;                   mean se_mean   sd      2.5%       25%       50%       75%     97.5% n_eff</span>
+<span class="co">#&gt; d[Acc t-PA]      -0.18    0.00 0.04     -0.27     -0.21     -0.18     -0.15     -0.09  2102</span>
+<span class="co">#&gt; d[ASPAC]          0.02    0.00 0.04     -0.05     -0.01      0.02      0.04      0.09  5115</span>
+<span class="co">#&gt; d[PTCA]          -0.48    0.00 0.10     -0.68     -0.55     -0.48     -0.41     -0.29  3528</span>
+<span class="co">#&gt; d[r-PA]          -0.13    0.00 0.06     -0.24     -0.17     -0.13     -0.09     -0.01  2912</span>
+<span class="co">#&gt; d[SK + t-PA]     -0.05    0.00 0.05     -0.14     -0.08     -0.05     -0.02      0.04  4493</span>
+<span class="co">#&gt; d[t-PA]           0.00    0.00 0.03     -0.06     -0.02      0.00      0.02      0.06  4183</span>
+<span class="co">#&gt; d[TNK]           -0.17    0.00 0.08     -0.32     -0.23     -0.17     -0.12     -0.02  2992</span>
+<span class="co">#&gt; d[UK]            -0.20    0.00 0.22     -0.65     -0.35     -0.20     -0.05      0.24  4707</span>
+<span class="co">#&gt; lp__         -43043.08    0.15 5.55 -43054.79 -43046.53 -43042.77 -43039.15 -43033.37  1307</span>
+<span class="co">#&gt;              Rhat</span>
+<span class="co">#&gt; d[Acc t-PA]  1.00</span>
+<span class="co">#&gt; d[ASPAC]     1.00</span>
+<span class="co">#&gt; d[PTCA]      1.00</span>
+<span class="co">#&gt; d[r-PA]      1.00</span>
+<span class="co">#&gt; d[SK + t-PA] 1.00</span>
+<span class="co">#&gt; d[t-PA]      1.00</span>
+<span class="co">#&gt; d[TNK]       1.00</span>
+<span class="co">#&gt; d[UK]        1.00</span>
+<span class="co">#&gt; lp__         1.01</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Dec  7 11:13:42 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Dec  8 14:15:05 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -244,9 +218,9 @@
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">dic_consistency</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">thrombo_fit</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 105.8<span style="color: #555555;"> (on 102 data points)</span></span>
-<span class="co">#&gt;                pD: 58.6</span>
-<span class="co">#&gt;               DIC: 164.3</span></code></pre></div>
+<span class="co">#&gt; Residual deviance: 106.3<span style="color: #555555;"> (on 102 data points)</span></span>
+<span class="co">#&gt;                pD: 59.1</span>
+<span class="co">#&gt;               DIC: 165.5</span></code></pre></div>
 <p>and the residual deviance contributions examined with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dic_consistency</span><span class="op">)</span></code></pre></div>
@@ -273,53 +247,53 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                            mean se_mean   sd      2.5%       25%       50%       75%     97.5%</span>
 <span class="co">#&gt; d[Acc t-PA vs. SK]        -0.16    0.00 0.05     -0.25     -0.19     -0.16     -0.13     -0.06</span>
-<span class="co">#&gt; d[ASPAC vs. SK]            0.01    0.00 0.04     -0.07     -0.02      0.00      0.03      0.08</span>
-<span class="co">#&gt; d[PTCA vs. SK]            -0.66    0.00 0.18     -1.01     -0.79     -0.66     -0.54     -0.31</span>
-<span class="co">#&gt; d[r-PA vs. SK]            -0.06    0.00 0.09     -0.24     -0.12     -0.06      0.00      0.13</span>
-<span class="co">#&gt; d[SK + t-PA vs. SK]       -0.04    0.00 0.05     -0.13     -0.07     -0.04     -0.01      0.05</span>
-<span class="co">#&gt; d[t-PA vs. SK]             0.00    0.00 0.03     -0.06     -0.02      0.00      0.02      0.06</span>
-<span class="co">#&gt; d[UK vs. SK]              -0.36    0.01 0.54     -1.43     -0.71     -0.37      0.02      0.68</span>
-<span class="co">#&gt; d[ASPAC vs. Acc t-PA]      1.40    0.01 0.42      0.63      1.12      1.40      1.67      2.29</span>
-<span class="co">#&gt; d[PTCA vs. Acc t-PA]      -0.21    0.00 0.12     -0.44     -0.29     -0.21     -0.13      0.02</span>
-<span class="co">#&gt; d[r-PA vs. Acc t-PA]       0.02    0.00 0.07     -0.11     -0.03      0.02      0.06      0.15</span>
-<span class="co">#&gt; d[TNK vs. Acc t-PA]        0.01    0.00 0.06     -0.12     -0.04      0.01      0.05      0.12</span>
-<span class="co">#&gt; d[UK vs. Acc t-PA]         0.15    0.01 0.37     -0.55     -0.09      0.14      0.39      0.87</span>
-<span class="co">#&gt; d[t-PA vs. ASPAC]          0.29    0.01 0.35     -0.40      0.05      0.29      0.52      0.97</span>
-<span class="co">#&gt; d[t-PA vs. PTCA]           0.54    0.01 0.42     -0.25      0.25      0.54      0.83      1.37</span>
-<span class="co">#&gt; d[UK vs. t-PA]            -0.29    0.00 0.33     -0.94     -0.52     -0.29     -0.07      0.39</span>
-<span class="co">#&gt; lp__                  -43039.72    0.15 5.67 -43051.52 -43043.31 -43039.37 -43035.76 -43029.65</span>
+<span class="co">#&gt; d[ASPAC vs. SK]            0.00    0.00 0.04     -0.07     -0.02      0.00      0.03      0.07</span>
+<span class="co">#&gt; d[PTCA vs. SK]            -0.66    0.00 0.19     -1.03     -0.79     -0.66     -0.53     -0.30</span>
+<span class="co">#&gt; d[r-PA vs. SK]            -0.06    0.00 0.09     -0.24     -0.12     -0.06      0.00      0.12</span>
+<span class="co">#&gt; d[SK + t-PA vs. SK]       -0.04    0.00 0.05     -0.14     -0.08     -0.05     -0.01      0.05</span>
+<span class="co">#&gt; d[t-PA vs. SK]             0.00    0.00 0.03     -0.06     -0.02     -0.01      0.02      0.05</span>
+<span class="co">#&gt; d[UK vs. SK]              -0.39    0.01 0.52     -1.45     -0.72     -0.37     -0.04      0.62</span>
+<span class="co">#&gt; d[ASPAC vs. Acc t-PA]      1.40    0.01 0.41      0.64      1.12      1.38      1.67      2.24</span>
+<span class="co">#&gt; d[PTCA vs. Acc t-PA]      -0.22    0.00 0.12     -0.45     -0.30     -0.22     -0.14      0.02</span>
+<span class="co">#&gt; d[r-PA vs. Acc t-PA]       0.02    0.00 0.07     -0.10     -0.02      0.02      0.06      0.15</span>
+<span class="co">#&gt; d[TNK vs. Acc t-PA]        0.01    0.00 0.06     -0.12     -0.04      0.00      0.05      0.13</span>
+<span class="co">#&gt; d[UK vs. Acc t-PA]         0.14    0.01 0.36     -0.54     -0.10      0.14      0.38      0.86</span>
+<span class="co">#&gt; d[t-PA vs. ASPAC]          0.29    0.01 0.36     -0.40      0.04      0.29      0.53      1.00</span>
+<span class="co">#&gt; d[t-PA vs. PTCA]           0.54    0.01 0.44     -0.29      0.25      0.54      0.83      1.44</span>
+<span class="co">#&gt; d[UK vs. t-PA]            -0.31    0.00 0.35     -0.99     -0.54     -0.31     -0.07      0.35</span>
+<span class="co">#&gt; lp__                  -43039.67    0.14 5.73 -43051.69 -43043.44 -43039.34 -43035.58 -43029.29</span>
 <span class="co">#&gt;                       n_eff Rhat</span>
-<span class="co">#&gt; d[Acc t-PA vs. SK]     6611    1</span>
-<span class="co">#&gt; d[ASPAC vs. SK]        5616    1</span>
-<span class="co">#&gt; d[PTCA vs. SK]         5413    1</span>
-<span class="co">#&gt; d[r-PA vs. SK]         5405    1</span>
-<span class="co">#&gt; d[SK + t-PA vs. SK]    5628    1</span>
-<span class="co">#&gt; d[t-PA vs. SK]         4503    1</span>
-<span class="co">#&gt; d[UK vs. SK]           6389    1</span>
-<span class="co">#&gt; d[ASPAC vs. Acc t-PA]  3560    1</span>
-<span class="co">#&gt; d[PTCA vs. Acc t-PA]   4368    1</span>
-<span class="co">#&gt; d[r-PA vs. Acc t-PA]   5567    1</span>
-<span class="co">#&gt; d[TNK vs. Acc t-PA]    5955    1</span>
-<span class="co">#&gt; d[UK vs. Acc t-PA]     4259    1</span>
-<span class="co">#&gt; d[t-PA vs. ASPAC]      4025    1</span>
-<span class="co">#&gt; d[t-PA vs. PTCA]       4213    1</span>
-<span class="co">#&gt; d[UK vs. t-PA]         4806    1</span>
-<span class="co">#&gt; lp__                   1461    1</span>
+<span class="co">#&gt; d[Acc t-PA vs. SK]     5596    1</span>
+<span class="co">#&gt; d[ASPAC vs. SK]        5295    1</span>
+<span class="co">#&gt; d[PTCA vs. SK]         4758    1</span>
+<span class="co">#&gt; d[r-PA vs. SK]         5205    1</span>
+<span class="co">#&gt; d[SK + t-PA vs. SK]    5157    1</span>
+<span class="co">#&gt; d[t-PA vs. SK]         4335    1</span>
+<span class="co">#&gt; d[UK vs. SK]           5337    1</span>
+<span class="co">#&gt; d[ASPAC vs. Acc t-PA]  3801    1</span>
+<span class="co">#&gt; d[PTCA vs. Acc t-PA]   4653    1</span>
+<span class="co">#&gt; d[r-PA vs. Acc t-PA]   4396    1</span>
+<span class="co">#&gt; d[TNK vs. Acc t-PA]    5927    1</span>
+<span class="co">#&gt; d[UK vs. Acc t-PA]     4169    1</span>
+<span class="co">#&gt; d[t-PA vs. ASPAC]      4065    1</span>
+<span class="co">#&gt; d[t-PA vs. PTCA]       3526    1</span>
+<span class="co">#&gt; d[UK vs. t-PA]         5233    1</span>
+<span class="co">#&gt; lp__                   1592    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Dec  7 11:13:56 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Dec  8 14:15:18 2021.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
 <p>Comparing the model fit statistics</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dic_consistency</span>
-<span class="co">#&gt; Residual deviance: 105.8<span style="color: #555555;"> (on 102 data points)</span></span>
-<span class="co">#&gt;                pD: 58.6</span>
-<span class="co">#&gt;               DIC: 164.3</span>
+<span class="co">#&gt; Residual deviance: 106.3<span style="color: #555555;"> (on 102 data points)</span></span>
+<span class="co">#&gt;                pD: 59.1</span>
+<span class="co">#&gt;               DIC: 165.5</span>
 <span class="op">(</span><span class="va">dic_ume</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">thrombo_fit_ume</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 99.6<span style="color: #555555;"> (on 102 data points)</span></span>
-<span class="co">#&gt;                pD: 65.9</span>
-<span class="co">#&gt;               DIC: 165.5</span></code></pre></div>
+<span class="co">#&gt; Residual deviance: 99.5<span style="color: #555555;"> (on 102 data points)</span></span>
+<span class="co">#&gt;                pD: 65.7</span>
+<span class="co">#&gt;               DIC: 165.2</span></code></pre></div>
 <p>Whilst the UME model fits the data better, having a lower residual deviance, the additional parameters in the UME model mean that the DIC is very similar between both models. However, it is also important to examine the individual contributions to model fit of each data point under the two models (a so-called “dev-dev” plot). Passing two <code>nma_dic</code> objects produced by the <code><a href="../reference/dic.html">dic()</a></code> function to the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method produces this dev-dev plot:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dic_consistency</span>, <span class="va">dic_ume</span>, show_uncertainty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
@@ -333,95 +307,95 @@
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">thrombo_releff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">thrombo_fit</span>, all_contrasts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;                            mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[Acc t-PA vs. SK]        -0.18 0.04 -0.26 -0.21 -0.18 -0.15 -0.09     2502     3132    1</span>
-<span class="co">#&gt; d[ASPAC vs. SK]            0.02 0.04 -0.06 -0.01  0.02  0.04  0.09     4054     3511    1</span>
-<span class="co">#&gt; d[PTCA vs. SK]            -0.47 0.10 -0.67 -0.54 -0.47 -0.41 -0.28     3739     3304    1</span>
-<span class="co">#&gt; d[r-PA vs. SK]            -0.12 0.06 -0.24 -0.16 -0.12 -0.08  0.00     3742     3023    1</span>
-<span class="co">#&gt; d[SK + t-PA vs. SK]       -0.05 0.05 -0.14 -0.08 -0.05 -0.02  0.04     5384     3457    1</span>
-<span class="co">#&gt; d[t-PA vs. SK]             0.00 0.03 -0.06 -0.02  0.00  0.02  0.06     4441     3614    1</span>
-<span class="co">#&gt; d[TNK vs. SK]             -0.17 0.08 -0.32 -0.22 -0.17 -0.12 -0.02     4061     3543    1</span>
-<span class="co">#&gt; d[UK vs. SK]              -0.20 0.22 -0.62 -0.35 -0.20 -0.05  0.22     4377     3747    1</span>
-<span class="co">#&gt; d[ASPAC vs. Acc t-PA]      0.19 0.05  0.09  0.16  0.19  0.23  0.30     3411     3542    1</span>
-<span class="co">#&gt; d[PTCA vs. Acc t-PA]      -0.30 0.09 -0.49 -0.36 -0.29 -0.23 -0.11     4783     3521    1</span>
-<span class="co">#&gt; d[r-PA vs. Acc t-PA]       0.05 0.06 -0.05  0.02  0.05  0.09  0.16     5733     3487    1</span>
-<span class="co">#&gt; d[SK + t-PA vs. Acc t-PA]  0.13 0.05  0.02  0.09  0.13  0.16  0.23     5439     3336    1</span>
-<span class="co">#&gt; d[t-PA vs. Acc t-PA]       0.18 0.05  0.08  0.14  0.18  0.21  0.28     3091     3248    1</span>
-<span class="co">#&gt; d[TNK vs. Acc t-PA]        0.01 0.06 -0.12 -0.04  0.01  0.05  0.14     5684     3898    1</span>
-<span class="co">#&gt; d[UK vs. Acc t-PA]        -0.02 0.22 -0.43 -0.18 -0.02  0.12  0.40     4580     3685    1</span>
-<span class="co">#&gt; d[PTCA vs. ASPAC]         -0.49 0.10 -0.70 -0.56 -0.49 -0.42 -0.29     3868     3326    1</span>
-<span class="co">#&gt; d[r-PA vs. ASPAC]         -0.14 0.07 -0.28 -0.19 -0.14 -0.09  0.00     4257     3701    1</span>
-<span class="co">#&gt; d[SK + t-PA vs. ASPAC]    -0.07 0.06 -0.18 -0.10 -0.06 -0.03  0.05     4754     3612    1</span>
-<span class="co">#&gt; d[t-PA vs. ASPAC]         -0.01 0.04 -0.08 -0.04 -0.01  0.01  0.06     6399     3132    1</span>
-<span class="co">#&gt; d[TNK vs. ASPAC]          -0.19 0.08 -0.35 -0.24 -0.19 -0.13 -0.02     4167     3143    1</span>
-<span class="co">#&gt; d[UK vs. ASPAC]           -0.22 0.22 -0.64 -0.37 -0.21 -0.07  0.21     4572     3827    1</span>
-<span class="co">#&gt; d[r-PA vs. PTCA]           0.35 0.11  0.14  0.28  0.35  0.42  0.57     5152     3383    1</span>
-<span class="co">#&gt; d[SK + t-PA vs. PTCA]      0.42 0.10  0.23  0.35  0.42  0.49  0.63     4467     3370    1</span>
-<span class="co">#&gt; d[t-PA vs. PTCA]           0.48 0.10  0.28  0.41  0.47  0.55  0.68     3829     3273    1</span>
-<span class="co">#&gt; d[TNK vs. PTCA]            0.30 0.11  0.08  0.22  0.30  0.38  0.53     5718     3173    1</span>
-<span class="co">#&gt; d[UK vs. PTCA]             0.27 0.23 -0.18  0.11  0.27  0.43  0.73     4500     3212    1</span>
-<span class="co">#&gt; d[SK + t-PA vs. r-PA]      0.07 0.07 -0.07  0.03  0.07  0.12  0.22     5984     2537    1</span>
-<span class="co">#&gt; d[t-PA vs. r-PA]           0.13 0.07 -0.01  0.08  0.13  0.17  0.25     3941     3183    1</span>
-<span class="co">#&gt; d[TNK vs. r-PA]           -0.05 0.09 -0.22 -0.10 -0.05  0.01  0.12     6862     2926    1</span>
-<span class="co">#&gt; d[UK vs. r-PA]            -0.08 0.22 -0.50 -0.23 -0.08  0.08  0.36     4732     3677    1</span>
-<span class="co">#&gt; d[t-PA vs. SK + t-PA]      0.05 0.05 -0.05  0.02  0.05  0.09  0.16     5114     3677    1</span>
-<span class="co">#&gt; d[TNK vs. SK + t-PA]      -0.12 0.08 -0.28 -0.18 -0.12 -0.07  0.04     6365     3237    1</span>
-<span class="co">#&gt; d[UK vs. SK + t-PA]       -0.15 0.22 -0.58 -0.30 -0.15  0.00  0.27     4557     3576    1</span>
-<span class="co">#&gt; d[TNK vs. t-PA]           -0.17 0.08 -0.33 -0.23 -0.17 -0.12 -0.01     4253     3242    1</span>
-<span class="co">#&gt; d[UK vs. t-PA]            -0.20 0.22 -0.62 -0.35 -0.20 -0.06  0.23     4558     3746    1</span>
-<span class="co">#&gt; d[UK vs. TNK]             -0.03 0.23 -0.46 -0.19 -0.03  0.12  0.41     4548     3273    1</span>
+<span class="co">#&gt; d[Acc t-PA vs. SK]        -0.18 0.04 -0.27 -0.21 -0.18 -0.15 -0.09     2134     2792    1</span>
+<span class="co">#&gt; d[ASPAC vs. SK]            0.02 0.04 -0.05 -0.01  0.02  0.04  0.09     5161     3288    1</span>
+<span class="co">#&gt; d[PTCA vs. SK]            -0.48 0.10 -0.68 -0.55 -0.48 -0.41 -0.29     3567     3704    1</span>
+<span class="co">#&gt; d[r-PA vs. SK]            -0.13 0.06 -0.24 -0.17 -0.13 -0.09 -0.01     2933     3374    1</span>
+<span class="co">#&gt; d[SK + t-PA vs. SK]       -0.05 0.05 -0.14 -0.08 -0.05 -0.02  0.04     4503     3201    1</span>
+<span class="co">#&gt; d[t-PA vs. SK]             0.00 0.03 -0.06 -0.02  0.00  0.02  0.06     4212     3372    1</span>
+<span class="co">#&gt; d[TNK vs. SK]             -0.17 0.08 -0.32 -0.23 -0.17 -0.12 -0.02     3032     3217    1</span>
+<span class="co">#&gt; d[UK vs. SK]              -0.20 0.22 -0.65 -0.35 -0.20 -0.05  0.24     4757     3702    1</span>
+<span class="co">#&gt; d[ASPAC vs. Acc t-PA]      0.20 0.06  0.08  0.16  0.20  0.23  0.31     3158     3016    1</span>
+<span class="co">#&gt; d[PTCA vs. Acc t-PA]      -0.30 0.10 -0.49 -0.37 -0.30 -0.23 -0.12     5276     3540    1</span>
+<span class="co">#&gt; d[r-PA vs. Acc t-PA]       0.05 0.06 -0.05  0.02  0.05  0.09  0.17     5413     3569    1</span>
+<span class="co">#&gt; d[SK + t-PA vs. Acc t-PA]  0.13 0.05  0.02  0.09  0.13  0.17  0.23     5714     3619    1</span>
+<span class="co">#&gt; d[t-PA vs. Acc t-PA]       0.18 0.05  0.08  0.15  0.18  0.22  0.28     2847     2949    1</span>
+<span class="co">#&gt; d[TNK vs. Acc t-PA]        0.00 0.06 -0.12 -0.04  0.00  0.05  0.13     5184     3818    1</span>
+<span class="co">#&gt; d[UK vs. Acc t-PA]        -0.02 0.22 -0.46 -0.17 -0.02  0.13  0.42     4923     3463    1</span>
+<span class="co">#&gt; d[PTCA vs. ASPAC]         -0.49 0.11 -0.71 -0.57 -0.49 -0.42 -0.29     3823     3467    1</span>
+<span class="co">#&gt; d[r-PA vs. ASPAC]         -0.14 0.07 -0.28 -0.19 -0.14 -0.10 -0.01     3691     2726    1</span>
+<span class="co">#&gt; d[SK + t-PA vs. ASPAC]    -0.07 0.06 -0.18 -0.11 -0.07 -0.03  0.05     5084     3003    1</span>
+<span class="co">#&gt; d[t-PA vs. ASPAC]         -0.01 0.04 -0.09 -0.04 -0.01  0.01  0.06     7515     3385    1</span>
+<span class="co">#&gt; d[TNK vs. ASPAC]          -0.19 0.08 -0.35 -0.25 -0.19 -0.13 -0.02     3173     3108    1</span>
+<span class="co">#&gt; d[UK vs. ASPAC]           -0.22 0.23 -0.67 -0.37 -0.22 -0.07  0.23     4829     3787    1</span>
+<span class="co">#&gt; d[r-PA vs. PTCA]           0.35 0.11  0.14  0.28  0.35  0.43  0.57     5493     3642    1</span>
+<span class="co">#&gt; d[SK + t-PA vs. PTCA]      0.43 0.11  0.22  0.35  0.43  0.50  0.64     4642     3440    1</span>
+<span class="co">#&gt; d[t-PA vs. PTCA]           0.48 0.11  0.28  0.41  0.48  0.55  0.69     3802     3513    1</span>
+<span class="co">#&gt; d[TNK vs. PTCA]            0.30 0.12  0.08  0.22  0.30  0.39  0.54     6278     3607    1</span>
+<span class="co">#&gt; d[UK vs. PTCA]             0.28 0.24 -0.20  0.12  0.27  0.44  0.76     4882     3363    1</span>
+<span class="co">#&gt; d[SK + t-PA vs. r-PA]      0.08 0.07 -0.06  0.03  0.08  0.12  0.22     5232     2968    1</span>
+<span class="co">#&gt; d[t-PA vs. r-PA]           0.13 0.07  0.00  0.08  0.13  0.17  0.26     3424     3172    1</span>
+<span class="co">#&gt; d[TNK vs. r-PA]           -0.05 0.08 -0.21 -0.10 -0.05  0.01  0.11     6258     3215    1</span>
+<span class="co">#&gt; d[UK vs. r-PA]            -0.07 0.23 -0.53 -0.23 -0.08  0.08  0.37     4931     3588    1</span>
+<span class="co">#&gt; d[t-PA vs. SK + t-PA]      0.05 0.05 -0.05  0.02  0.05  0.09  0.16     4959     3427    1</span>
+<span class="co">#&gt; d[TNK vs. SK + t-PA]      -0.12 0.08 -0.28 -0.18 -0.12 -0.07  0.03     5157     3057    1</span>
+<span class="co">#&gt; d[UK vs. SK + t-PA]       -0.15 0.23 -0.60 -0.30 -0.15  0.00  0.29     4960     3721    1</span>
+<span class="co">#&gt; d[TNK vs. t-PA]           -0.18 0.08 -0.33 -0.23 -0.18 -0.12 -0.02     3321     3231    1</span>
+<span class="co">#&gt; d[UK vs. t-PA]            -0.20 0.22 -0.64 -0.35 -0.20 -0.06  0.24     4830     3849    1</span>
+<span class="co">#&gt; d[UK vs. TNK]             -0.03 0.23 -0.49 -0.18 -0.02  0.13  0.43     4793     3519    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">thrombo_releff</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_thrombolytics_files/figure-html/thrombo_releff-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>Treatment rankings, rank probabilities, and cumulative rank probabilities.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">thrombo_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">thrombo_fit</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;                 mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; rank[SK]        7.44 0.98    6   7   7   8     9     3173       NA    1</span>
-<span class="co">#&gt; rank[Acc t-PA]  3.18 0.80    2   3   3   4     5     4364     3875    1</span>
-<span class="co">#&gt; rank[ASPAC]     7.99 1.10    6   7   8   9     9     4511       NA    1</span>
-<span class="co">#&gt; rank[PTCA]      1.13 0.34    1   1   1   1     2     3991     3984    1</span>
-<span class="co">#&gt; rank[r-PA]      4.41 1.17    2   4   5   5     7     5286     3415    1</span>
-<span class="co">#&gt; rank[SK + t-PA] 5.97 1.23    4   5   6   6     9     4620       NA    1</span>
-<span class="co">#&gt; rank[t-PA]      7.48 1.10    5   7   8   8     9     4636       NA    1</span>
-<span class="co">#&gt; rank[TNK]       3.48 1.26    2   3   3   4     6     4551     3582    1</span>
-<span class="co">#&gt; rank[UK]        3.93 2.70    1   2   3   5     9     4520       NA    1</span>
+<span class="co">#&gt; rank[SK]        7.46 0.97    6   7   7   8     9     3696       NA    1</span>
+<span class="co">#&gt; rank[Acc t-PA]  3.19 0.82    2   3   3   4     5     4055     3075    1</span>
+<span class="co">#&gt; rank[ASPAC]     7.98 1.12    5   7   8   9     9     4764       NA    1</span>
+<span class="co">#&gt; rank[PTCA]      1.13 0.35    1   1   1   1     2     4147     4033    1</span>
+<span class="co">#&gt; rank[r-PA]      4.38 1.16    2   4   4   5     7     5051     3404    1</span>
+<span class="co">#&gt; rank[SK + t-PA] 5.96 1.20    4   5   6   6     9     4525       NA    1</span>
+<span class="co">#&gt; rank[t-PA]      7.50 1.09    5   7   8   8     9     4115       NA    1</span>
+<span class="co">#&gt; rank[TNK]       3.46 1.24    2   3   3   4     6     4673     3233    1</span>
+<span class="co">#&gt; rank[UK]        3.94 2.71    1   2   3   6     9     4562       NA    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">thrombo_ranks</span><span class="op">)</span></code></pre></div>
 <p><img src="example_thrombolytics_files/figure-html/thrombo_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">thrombo_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">thrombo_fit</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;              p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6] p_rank[7] p_rank[8]</span>
-<span class="co">#&gt; d[SK]             0.00      0.00      0.00      0.00      0.02      0.14      0.38      0.30</span>
-<span class="co">#&gt; d[Acc t-PA]       0.00      0.20      0.46      0.30      0.04      0.00      0.00      0.00</span>
+<span class="co">#&gt; d[SK]             0.00      0.00      0.00      0.00      0.02      0.13      0.39      0.31</span>
+<span class="co">#&gt; d[Acc t-PA]       0.00      0.21      0.44      0.30      0.05      0.00      0.00      0.00</span>
 <span class="co">#&gt; d[ASPAC]          0.00      0.00      0.00      0.00      0.02      0.09      0.19      0.26</span>
-<span class="co">#&gt; d[PTCA]           0.87      0.12      0.00      0.00      0.00      0.00      0.00      0.00</span>
-<span class="co">#&gt; d[r-PA]           0.00      0.06      0.13      0.30      0.39      0.08      0.02      0.01</span>
-<span class="co">#&gt; d[SK + t-PA]      0.00      0.00      0.01      0.06      0.25      0.46      0.09      0.06</span>
-<span class="co">#&gt; d[t-PA]           0.00      0.00      0.00      0.01      0.04      0.14      0.29      0.33</span>
-<span class="co">#&gt; d[TNK]            0.00      0.24      0.32      0.24      0.14      0.04      0.01      0.00</span>
-<span class="co">#&gt; d[UK]             0.12      0.37      0.07      0.09      0.10      0.05      0.02      0.03</span>
+<span class="co">#&gt; d[PTCA]           0.87      0.13      0.00      0.00      0.00      0.00      0.00      0.00</span>
+<span class="co">#&gt; d[r-PA]           0.00      0.06      0.15      0.31      0.38      0.08      0.01      0.01</span>
+<span class="co">#&gt; d[SK + t-PA]      0.00      0.00      0.01      0.06      0.25      0.46      0.10      0.06</span>
+<span class="co">#&gt; d[t-PA]           0.00      0.00      0.00      0.00      0.03      0.14      0.29      0.33</span>
+<span class="co">#&gt; d[TNK]            0.00      0.24      0.32      0.24      0.14      0.03      0.01      0.01</span>
+<span class="co">#&gt; d[UK]             0.13      0.37      0.07      0.07      0.11      0.06      0.02      0.03</span>
 <span class="co">#&gt;              p_rank[9]</span>
 <span class="co">#&gt; d[SK]             0.16</span>
 <span class="co">#&gt; d[Acc t-PA]       0.00</span>
 <span class="co">#&gt; d[ASPAC]          0.43</span>
 <span class="co">#&gt; d[PTCA]           0.00</span>
 <span class="co">#&gt; d[r-PA]           0.01</span>
-<span class="co">#&gt; d[SK + t-PA]      0.06</span>
-<span class="co">#&gt; d[t-PA]           0.19</span>
-<span class="co">#&gt; d[TNK]            0.01</span>
+<span class="co">#&gt; d[SK + t-PA]      0.05</span>
+<span class="co">#&gt; d[t-PA]           0.20</span>
+<span class="co">#&gt; d[TNK]            0.00</span>
 <span class="co">#&gt; d[UK]             0.15</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">thrombo_rankprobs</span><span class="op">)</span></code></pre></div>
 <p><img src="example_thrombolytics_files/figure-html/thrombo_rankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">thrombo_cumrankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">thrombo_fit</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;              p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6] p_rank[7] p_rank[8]</span>
-<span class="co">#&gt; d[SK]             0.00      0.00      0.00      0.00      0.02      0.16      0.54      0.84</span>
-<span class="co">#&gt; d[Acc t-PA]       0.00      0.20      0.66      0.96      1.00      1.00      1.00      1.00</span>
-<span class="co">#&gt; d[ASPAC]          0.00      0.00      0.00      0.00      0.02      0.11      0.31      0.57</span>
+<span class="co">#&gt; d[SK]             0.00      0.00      0.00      0.00      0.02      0.15      0.53      0.84</span>
+<span class="co">#&gt; d[Acc t-PA]       0.00      0.21      0.65      0.95      1.00      1.00      1.00      1.00</span>
+<span class="co">#&gt; d[ASPAC]          0.00      0.00      0.00      0.00      0.03      0.12      0.31      0.57</span>
 <span class="co">#&gt; d[PTCA]           0.87      1.00      1.00      1.00      1.00      1.00      1.00      1.00</span>
-<span class="co">#&gt; d[r-PA]           0.00      0.06      0.20      0.50      0.89      0.97      0.98      0.99</span>
-<span class="co">#&gt; d[SK + t-PA]      0.00      0.00      0.02      0.08      0.33      0.79      0.88      0.94</span>
-<span class="co">#&gt; d[t-PA]           0.00      0.00      0.00      0.01      0.04      0.19      0.47      0.81</span>
-<span class="co">#&gt; d[TNK]            0.00      0.24      0.56      0.80      0.94      0.98      0.99      0.99</span>
-<span class="co">#&gt; d[UK]             0.12      0.49      0.56      0.65      0.75      0.80      0.82      0.85</span>
+<span class="co">#&gt; d[r-PA]           0.00      0.06      0.21      0.52      0.89      0.97      0.98      0.99</span>
+<span class="co">#&gt; d[SK + t-PA]      0.00      0.00      0.01      0.08      0.33      0.79      0.89      0.95</span>
+<span class="co">#&gt; d[t-PA]           0.00      0.00      0.00      0.00      0.04      0.18      0.47      0.80</span>
+<span class="co">#&gt; d[TNK]            0.00      0.24      0.56      0.81      0.95      0.99      0.99      1.00</span>
+<span class="co">#&gt; d[UK]             0.13      0.49      0.57      0.64      0.75      0.80      0.83      0.85</span>
 <span class="co">#&gt;              p_rank[9]</span>
 <span class="co">#&gt; d[SK]                1</span>
 <span class="co">#&gt; d[Acc t-PA]          1</span>
@@ -450,33 +424,26 @@
 </div>
 </div>
 </div>
-  </div>
-
-  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
-
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
 
-      <footer><div class="copyright">
+    <footer><div class="pkgdown-footer-left">
   <p></p>
 <p>Developed by David M. Phillippo.</p>
 </div>
 
-<div class="pkgdown">
+<div class="pkgdown-footer-right">
   <p></p>
 <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
-      </footer>
+    </footer>
 </div>
 
   
-
 
   
 
