@@ -15,6 +15,9 @@ reproducibility the old behaviour from version 0.3.0 and below is available with
 * Fix: `plot.nma_data()` no longer gives a ggplot deprecation warning (PR #6).
 * Fix: Bug in `predict.stan_nma()` with a single covariate when `newdata` is a
 `data.frame` (PR #7).
+* Fix: Attempting to call `predict.stan_nma()` on a regression model with only
+contrast data and no `newdata` or `baseline` specified now throws a descriptive
+error message.
 
 # multinma 0.3.0
 
