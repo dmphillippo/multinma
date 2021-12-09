@@ -71,6 +71,7 @@
 <li>Fix: Model fitting is now robust to non-default settings of <code>options("contrasts")</code>.</li>
 <li>Fix: <code><a href="../reference/plot.nma_data.html">plot.nma_data()</a></code> no longer gives a ggplot deprecation warning (PR <a href="https://github.com/dmphillippo/multinma/issues/6" class="external-link">#6</a>).</li>
 <li>Fix: Bug in <code><a href="../reference/predict.stan_nma.html">predict.stan_nma()</a></code> with a single covariate when <code>newdata</code> is a <code>data.frame</code> (PR <a href="https://github.com/dmphillippo/multinma/issues/7" class="external-link">#7</a>).</li>
+<li>Fix: Attempting to call <code><a href="../reference/predict.stan_nma.html">predict.stan_nma()</a></code> on a regression model with only contrast data and no <code>newdata</code> or <code>baseline</code> specified now throws a descriptive error message.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="multinma-030">multinma 0.3.0<a class="anchor" aria-label="anchor" href="#multinma-030"></a></h2><p class="text-muted">CRAN release: 2021-03-18</p>

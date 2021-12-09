@@ -138,50 +138,50 @@ frame of study information.</p>
 <span class="r-in"><span class="va">smk_releff_RE</span> <span class="op">&lt;-</span> <span class="fu">relative_effects</span><span class="op">(</span><span class="va">smk_fit_RE</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">smk_releff_RE</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]      1.11 0.45  0.27 0.81 1.10 1.40  2.04     1714</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling] 0.84 0.25  0.37 0.68 0.84 0.99  1.37     1167</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]              0.51 0.41 -0.27 0.23 0.49 0.76  1.37     1770</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]      1.11 0.44  0.28 0.81 1.09 1.38  2.00     1842</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling] 0.84 0.24  0.38 0.69 0.84 1.00  1.34     1029</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]              0.49 0.40 -0.32 0.22 0.49 0.75  1.29     1794</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          1802    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     1618    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  2052    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          2374 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     1319 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  2295 1.01</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span class="r-plt img"><img src="relative_effects-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Relative effects for all pairwise comparisons</span></span>
 <span class="r-in"><span class="fu">relative_effects</span><span class="op">(</span><span class="va">smk_fit_RE</span>, all_contrasts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                  mean   sd  2.5%   25%   50%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]         1.11 0.45  0.27  0.81  1.10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]    0.84 0.25  0.37  0.68  0.84</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                 0.51 0.41 -0.27  0.23  0.49</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling] -0.27 0.42 -1.12 -0.55 -0.26</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]              -0.61 0.49 -1.59 -0.91 -0.60</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]         -0.34 0.42 -1.17 -0.60 -0.35</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]         1.11 0.44  0.28  0.81  1.09</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]    0.84 0.24  0.38  0.69  0.84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                 0.49 0.40 -0.32  0.22  0.49</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling] -0.26 0.41 -1.07 -0.53 -0.26</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]              -0.62 0.49 -1.60 -0.94 -0.61</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]         -0.36 0.41 -1.20 -0.62 -0.36</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                   75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]         1.40  2.04     1714     1802</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]    0.99  1.37     1167     1618</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                 0.76  1.37     1770     2052</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]  0.02  0.54     2532     2240</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]              -0.30  0.35     2855     2632</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]         -0.06  0.50     2228     2796</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]         1.38  2.00     1842     2374</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]    1.00  1.34     1029     1319</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                 0.75  1.29     1794     2295</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]  0.00  0.55     2389     2383</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]              -0.29  0.32     2824     2995</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]         -0.09  0.45     2254     2481</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                 Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]           1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]      1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                   1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]                 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]            1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]        1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]   1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                1.01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling] 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]              1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]         1.00</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Relative effects against a different reference treatment</span></span>
 <span class="r-in"><span class="fu">relative_effects</span><span class="op">(</span><span class="va">smk_fit_RE</span>, trt_ref <span class="op">=</span> <span class="st">"Self-help"</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                            mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[No intervention]        -0.51 0.41 -1.37 -0.76 -0.49 -0.23  0.27     1770</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]       0.61 0.49 -0.35  0.30  0.60  0.91  1.59     2855</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]  0.34 0.42 -0.50  0.06  0.35  0.60  1.17     2228</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[No intervention]        -0.49 0.40 -1.29 -0.75 -0.49 -0.22  0.32     1794</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]       0.62 0.49 -0.32  0.29  0.61  0.94  1.60     2824</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]  0.36 0.41 -0.45  0.09  0.36  0.62  1.20     2254</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[No intervention]            2052    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          2632    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     2796    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[No intervention]            2295 1.01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          2995 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     2481 1.00</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Transforming to odds ratios</span></span>
 <span class="r-in"><span class="co"># We work with the array of relative effects samples</span></span>
@@ -194,13 +194,13 @@ frame of study information.</p>
 <span class="r-in"><span class="co"># This can then be printed or plotted</span></span>
 <span class="r-in"><span class="va">smk_OR_RE</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]      3.37 1.73 1.30 2.25 3.00 4.04  7.66     1714     1802</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling] 2.39 0.62 1.45 1.97 2.31 2.69  3.92     1167     1618</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]              1.81 0.80 0.77 1.26 1.64 2.14  3.94     1770     2052</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]      3.33 1.58 1.33 2.26 2.98 3.99  7.39     1842     2374</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling] 2.39 0.58 1.46 1.99 2.31 2.71  3.81     1029     1319</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]              1.77 0.76 0.73 1.25 1.63 2.11  3.64     1794     2295</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]         1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]      1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling] 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]              1.01</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_OR_RE</span>, ref_line <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span class="r-plt img"><img src="relative_effects-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span class="co"># }</span></span>
@@ -222,11 +222,11 @@ frame of study information.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     1.65    0.64 0.34   8.32 0.15</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                     mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: ETN]     1.66 0.09 1.49 1.60 1.66 1.72  1.84     4483     3353    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: IXE_Q2W] 3.03 0.10 2.84 2.96 3.03 3.10  3.23     4984     3172    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: IXE_Q4W] 2.62 0.09 2.43 2.55 2.62 2.68  2.80     5047     3263    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: SEC_150] 2.22 0.11 2.00 2.15 2.22 2.30  2.45     5930     3514    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: SEC_300] 2.53 0.12 2.30 2.45 2.53 2.60  2.76     7677     3209    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: ETN]     1.66 0.09 1.49 1.60 1.66 1.73  1.84     4125     3327    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: IXE_Q2W] 3.03 0.10 2.84 2.97 3.03 3.10  3.23     5038     3296    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: IXE_Q4W] 2.62 0.10 2.43 2.55 2.62 2.68  2.81     5288     3370    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: SEC_150] 2.22 0.12 1.99 2.14 2.22 2.30  2.46     5593     3331    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: SEC_300] 2.53 0.12 2.29 2.45 2.53 2.61  2.77     5840     3138    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-1</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -235,11 +235,11 @@ frame of study information.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        2    0.73 0.28   9.24 0.28</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: ETN]     1.50 0.08 1.34 1.45 1.50 1.56  1.67     5903     3446</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: IXE_Q2W] 2.92 0.09 2.75 2.86 2.92 2.98  3.09     5455     3095</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: IXE_Q4W] 2.51 0.08 2.35 2.46 2.51 2.56  2.66     5919     3206</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: SEC_150] 2.11 0.11 1.89 2.03 2.11 2.19  2.34     7085     3311</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: SEC_300] 2.42 0.12 2.19 2.34 2.42 2.50  2.65     8487     3327</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: ETN]     1.51 0.08 1.34 1.45 1.51 1.56  1.67     5221     3361</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: IXE_Q2W] 2.92 0.09 2.76 2.86 2.92 2.98  3.09     5734     3077</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: IXE_Q4W] 2.51 0.08 2.36 2.45 2.51 2.56  2.67     5878     3003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: SEC_150] 2.11 0.12 1.88 2.04 2.11 2.19  2.34     6173     3126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: SEC_300] 2.42 0.12 2.18 2.34 2.42 2.51  2.66     6913     2959</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       Rhat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: ETN]        1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: IXE_Q2W]    1</span>
@@ -254,11 +254,11 @@ frame of study information.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     1.87    0.64 0.27   9.17 0.24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: ETN]     1.51 0.08 1.35 1.45 1.51 1.56  1.66     5950     3446</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: IXE_Q2W] 2.92 0.08 2.75 2.87 2.92 2.98  3.09     5479     3047</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: IXE_Q4W] 2.51 0.08 2.36 2.46 2.51 2.56  2.66     5829     3107</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: SEC_150] 2.11 0.11 1.89 2.04 2.11 2.19  2.33     7141     3605</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: SEC_300] 2.42 0.11 2.19 2.34 2.42 2.50  2.65     8769     3202</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: ETN]     1.51 0.08 1.35 1.45 1.51 1.56  1.67     5180     3483</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: IXE_Q2W] 2.92 0.09 2.76 2.86 2.92 2.98  3.09     6039     3162</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: IXE_Q4W] 2.51 0.08 2.36 2.46 2.51 2.56  2.67     6157     3183</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: SEC_150] 2.11 0.12 1.89 2.04 2.11 2.19  2.34     6375     2975</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: SEC_300] 2.42 0.12 2.18 2.34 2.42 2.50  2.66     7047     2993</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       Rhat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: ETN]        1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: IXE_Q2W]    1</span>
@@ -273,11 +273,11 @@ frame of study information.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     1.78    0.59 0.28   9.01 0.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: ETN]     1.53 0.08 1.38 1.47 1.53 1.58  1.68     5609     3205</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: IXE_Q2W] 2.94 0.09 2.77 2.88 2.94 3.00  3.11     5391     3079</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: IXE_Q4W] 2.53 0.08 2.37 2.47 2.53 2.58  2.68     5642     3167</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: SEC_150] 2.13 0.11 1.91 2.06 2.13 2.21  2.34     6948     3509</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: SEC_300] 2.44 0.11 2.21 2.36 2.44 2.51  2.66     8800     3209</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: ETN]     1.53 0.08 1.38 1.48 1.53 1.58  1.69     4927     3420</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: IXE_Q2W] 2.94 0.09 2.78 2.88 2.94 3.00  3.11     5973     3240</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: IXE_Q4W] 2.53 0.08 2.37 2.47 2.53 2.58  2.69     6067     3121</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: SEC_150] 2.13 0.12 1.90 2.06 2.13 2.21  2.36     6348     2950</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: SEC_300] 2.44 0.12 2.20 2.36 2.44 2.52  2.67     6778     3014</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       Rhat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: ETN]        1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: IXE_Q2W]    1</span>
@@ -305,11 +305,11 @@ frame of study information.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        3     0.1 0.6     10 0.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: ETN]     1.25 0.22 0.83 1.09 1.24 1.40  1.69     6812     3422    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: IXE_Q2W] 2.89 0.22 2.48 2.74 2.88 3.04  3.31     6828     3290    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: IXE_Q4W] 2.47 0.21 2.07 2.33 2.47 2.62  2.90     7133     3210    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: SEC_150] 2.08 0.22 1.67 1.93 2.08 2.22  2.51     6838     3415    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: SEC_300] 2.39 0.22 1.95 2.24 2.38 2.53  2.82     7275     3250    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: ETN]     1.26 0.23 0.82 1.10 1.26 1.41  1.72     5777     3005    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: IXE_Q2W] 2.89 0.22 2.47 2.74 2.89 3.04  3.34     6287     3203    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: IXE_Q4W] 2.48 0.22 2.06 2.33 2.47 2.63  2.93     6313     3418    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: SEC_150] 2.08 0.23 1.66 1.93 2.08 2.23  2.54     6273     3027    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: SEC_300] 2.39 0.23 1.96 2.24 2.38 2.54  2.86     6574     3328    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span class="co"># }</span></span>
 </code></pre></div>
