@@ -661,6 +661,11 @@ test_that("RE predicted probabilities at 3 years", {
   expect_equivalent(contr_pred_RE$`97.5%`, tsd_pred_RE$upper, tolerance = tol)
 })
 
+test_that("Error message when using predict() on only contrast data", {
+  expect_error(predict(contr_fit_FE),
+               "No arm-based data \\(IPD or AgD\\) in network")
+})
+
 # FE DIC
 test_that("FE DIC", {
   expect_equivalent(contr_dic_FE$resdev, 6.3, tolerance = tol_dic)
@@ -953,6 +958,11 @@ test_that("Regression models work with contrast data", {
                                 tolerance = tol)
 })
 
+test_that("Error message when using predict() on only contrast data", {
+  expect_error(predict(contr_fit_FE_reg),
+               "No arm-based data \\(IPD or AgD\\) in network")
+})
+
 # ML-NMR regression models too
 park_dummy_mlnmr <- dplyr::mutate(parkinsons, 
                                   x1_mean = rnorm(dplyr::n(), 0, 1),
@@ -1039,6 +1049,11 @@ test_that("ML-NMR models work with contrast data", {
   expect_equivalent_nma_summary(summary(contr_fit_FE_mlnmr, pars = c("d", "beta")), 
                                 summary(reorder_fit_FE_mlnmr, pars = c("d", "beta")), 
                                 tolerance = tol)
+})
+
+test_that("Error message when using predict() on only contrast data", {
+  expect_error(predict(contr_fit_FE_mlnmr),
+               "No arm-based data \\(IPD or AgD\\) in network")
 })
 
 test_that("Robust to custom options(contrasts) settings", {
