@@ -386,11 +386,16 @@ predict.stan_nma <- function(object, ...,
         preddat <- object$network$ipd
 
       } else {
+
+        if (!has_ipd(object$network) && !has_agd_arm(object$network)) {
+          abort("No arm-based data (IPD or AgD) in network. Specify `baseline` and `newdata` to produce predictions of absolute effects.")
+        }
+
         if ((has_agd_arm(object$network) || has_agd_contrast(object$network)) && !has_agd_sample_size(object$network))
           abort(
             paste("AgD study sample sizes not specified in network, cannot calculate aggregate predictions.",
                   "  - Specify `sample_size` in set_agd_*(), or",
-                  "  - Specify covariate values for relative effects using the `newdata` argument",
+                  "  - Specify covariate values using the `newdata` argument",
                   sep = "\n"))
 
         if (has_agd_arm(object$network)) {
