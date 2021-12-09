@@ -5,7 +5,7 @@
 \alias{hta_psoriasis}
 \title{HTA Plaque Psoriasis}
 \format{
-A data frame with 39 rows and 9 variables:
+A data frame with 36 rows and 9 variables:
 \describe{
 \item{studyn}{numeric study ID}
 \item{studyc}{study name}

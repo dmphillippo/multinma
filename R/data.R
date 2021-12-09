@@ -90,7 +90,7 @@
 #' \insertCite{Boland2003,Lu2006,TSD4}{multinma}. The number of
 #' deaths in 30 or 35 days following acute myocardial infarction are recorded.
 #'
-#' @format A data frame with 50 rows and 5 variables:
+#' @format A data frame with 102 rows and 5 variables:
 #' \describe{
 #'   \item{studyn}{numeric study ID}
 #'   \item{trtn}{numeric treatment code}
@@ -314,7 +314,7 @@
 #' (PASI) scale. Some studies report all three ordered outcomes, others only one
 #' or two. The latter are coded as missing values (see details).
 #'
-#' @format A data frame with 39 rows and 9 variables:
+#' @format A data frame with 36 rows and 9 variables:
 #' \describe{
 #'   \item{studyn}{numeric study ID}
 #'   \item{studyc}{study name}
