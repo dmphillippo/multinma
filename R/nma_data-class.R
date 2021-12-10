@@ -456,7 +456,7 @@ is_network_connected <- function(network) {
 #'   default.
 #'
 #' @details The list of comparisons for node-splitting is generated following
-#'   the algorithm of \insertCite{Valkenhoef2015;textual}{multinma}. A
+#'   the algorithm of \insertCite{Valkenhoef2016;textual}{multinma}. A
 #'   comparison between two treatments has the potential for inconsistency, and
 #'   is thus considered for node-splitting, if the comparison has both direct
 #'   evidence and *independent* indirect evidence.
