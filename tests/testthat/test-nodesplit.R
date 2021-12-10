@@ -42,7 +42,7 @@ test_that("has_direct and has_indirect outputs are correct", {
   expect_identical(has_indirect(thrombo_net2, 6, 2), TRUE)
 })
 
-test_that("get_nodesplits() produces correct output", {
+test_that("get_nodesplits() produces correct output for thombolytics network", {
   # Output from gemtc::mtc.nodesplit.comparisons() on thrombo network
   ns_gemtc <- tibble::tribble(
                 ~trt1, ~trt2,
@@ -79,4 +79,12 @@ test_that("get_nodesplits() returns an empty tibble if no splits to be done", {
   expect_identical(get_nodesplits(multi_net),
                    tibble(trt1 = factor(levels = levels(multi_net$treatments)),
                           trt2 = factor(levels = levels(multi_net$treatments))))
+})
+
+test_that("has_direct and has_indirect work with one study / pairwise MA", {
+  expect_identical(has_direct(pair_net, 1, 2), TRUE)
+  expect_identical(has_direct(multi_net, 1, 2), TRUE)
+
+  expect_identical(has_indirect(pair_net, 1, 2), FALSE)
+  expect_identical(has_indirect(multi_net, 1, 2), FALSE)
 })

@@ -618,6 +618,9 @@ has_indirect <- function(network, trt1, trt2) {
     dplyr::group_by(.data$.study) %>%
     dplyr::filter(! all(c(trt1, trt2) %in% .data$.trt))
 
+  # Catch case where the reduced network is empty
+  if (nrow(ind_studies) == 0) return(FALSE)
+
   ind_e <- dplyr::group_modify(ind_studies, ~make_contrasts(.x$.trt)) %>%
     dplyr::transmute(from = .data$.trt_b,
                      to = .data$.trt,
