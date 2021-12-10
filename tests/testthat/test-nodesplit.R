@@ -67,6 +67,23 @@ test_that("get_nodesplits() produces correct output for thombolytics network", {
   expect_identical(get_nodesplits(thrombo_net2), ns_gemtc)
 })
 
+test_that("get_nodesplits() produces correct output for parkinsons network", {
+  park_net <- set_agd_arm(parkinsons, studyn, trtn, y = y, se = se, trt_ref = 1)
+
+  # Compare to results in van Valkenhoef paper
+  ns_vv <- tibble::tribble(
+    ~trt1, ~trt2,
+    1, 3,
+    1, 4,
+    2, 4,
+    3, 4
+  ) %>%
+    mutate(trt1 = factor(trt1, levels = levels(park_net$treatments)),
+           trt2 = factor(trt2, levels = levels(park_net$treatments)))
+
+  expect_identical(get_nodesplits(park_net), ns_vv)
+})
+
 onestudy <- data.frame(study = 1, trt = 1:3, r = 1, n = 1)
 pair_net <- set_agd_arm(onestudy[1:2, ], study, trt, r = r, n = n)
 multi_net <- set_agd_arm(onestudy, study, trt, r = r, n = n)
