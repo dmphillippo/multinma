@@ -49,27 +49,33 @@ the two treatments are still connected by a path of evidence. This is the
 criterion considered by the \code{has_indirect()} function.
 }
 \examples{
-# Thrombolytic treatments example
-thrombo_net <- set_agd_arm(thrombolytics,
-                           study = studyn,
-                           trt = trtc,
-                           r = r,
-                           n = n)
+# Parkinsons example
+park_net <- set_agd_arm(parkinsons,
+                        study = studyn,
+                        trt = trtn,
+                        y = y,
+                        se = se,
+                        trt_ref = 1)
 
 # View the network plot
-plot(thrombo_net)
+plot(park_net)
 
-# The TNK vs. Acc t-PA comparison is a spur on the network
-has_direct(thrombo_net, "TNK", "Acc t-PA")
-has_indirect(thrombo_net, "TNK", "Acc t-PA")
+# The 4 vs. 5 comparison is a spur on the network
+has_direct(park_net, 4, 5)
+has_indirect(park_net, 4, 5)
 
-# TNK and t-PA are not directly connected
-has_direct(thrombo_net, "TNK", "t-PA")
-has_indirect(thrombo_net, "TNK", "t-PA")
+# 1 and 5 are not directly connected
+has_direct(park_net, 1, 5)
+has_indirect(park_net, 1, 5)
+
+# The 1 vs. 2 comparison does not have independent indirect evidence, since
+# the 1-2-4 loop is a multi-arm study
+has_indirect(park_net, 1, 2)
 
 # Get a list of comparisons with potential inconsistency for node-splitting
-get_nodesplits(thrombo_net)
+get_nodesplits(park_net)
 
+# See van Valkenhoef (2016) for a discussion of this example
 }
 \references{
 \insertAllCited{}
