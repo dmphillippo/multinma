@@ -48,6 +48,9 @@ reference:
   - as.igraph.nma_data
   - nma_data-class
   - is_network_connected
+  - has_direct
+  - has_indirect
+  - get_nodesplits
 
 - title: Setting up numerical integration (ML-NMR only)
   desc: >
