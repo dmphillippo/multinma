@@ -66,3 +66,17 @@ test_that("get_nodesplits() produces correct output", {
 
   expect_identical(get_nodesplits(thrombo_net2), ns_gemtc)
 })
+
+onestudy <- data.frame(study = 1, trt = 1:3, r = 1, n = 1)
+pair_net <- set_agd_arm(onestudy[1:2, ], study, trt, r = r, n = n)
+multi_net <- set_agd_arm(onestudy, study, trt, r = r, n = n)
+
+test_that("get_nodesplits() returns an empty tibble if no splits to be done", {
+  expect_identical(get_nodesplits(pair_net),
+                   tibble(trt1 = factor(levels = levels(pair_net$treatments)),
+                          trt2 = factor(levels = levels(pair_net$treatments))))
+
+  expect_identical(get_nodesplits(multi_net),
+                   tibble(trt1 = factor(levels = levels(multi_net$treatments)),
+                          trt2 = factor(levels = levels(multi_net$treatments))))
+})
