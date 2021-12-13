@@ -130,13 +130,14 @@
 #' @template ex_plaque_psoriasis_mlnmr
 #'
 nma <- function(network,
-                consistency = c("consistency", "ume"),
+                consistency = c("consistency", "ume", "nodesplit"),
                 trt_effects = c("fixed", "random"),
                 regression = NULL,
                 class_interactions = c("common", "exchangeable", "independent"),
                 likelihood = NULL,
                 link = NULL,
                 ...,
+                nodesplit = get_nodesplits(network, include_consistency = TRUE),
                 prior_intercept = .default(normal(scale = 100)),
                 prior_trt = .default(normal(scale = 10)),
                 prior_het = .default(half_normal(scale = 5)),
@@ -162,6 +163,98 @@ nma <- function(network,
   if (length(consistency) > 1) abort("`consistency` must be a single string.")
   trt_effects <- rlang::arg_match(trt_effects)
   if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
+
+  if (consistency == "nodesplit") {
+
+    lvls_trt <- levels(network$treatments)
+    nodesplit_include_consistency <- FALSE
+
+    if (is.data.frame(nodesplit)) { # Data frame listing comparisons to split
+      if (ncol(nodesplit) != 2)
+        abort("The data frame passed to `nodesplit` should have two columns.")
+
+      nodesplit <- tibble::as_tibble(nodesplit)
+      colnames(nodesplit) <- c("trt1", "trt2")
+
+      # NA rows indicate include_consistency = TRUE, filter these out
+      if (any(is.na(nodesplit[,1]) & is.na(nodesplit[,2]))) {
+        nodesplit_include_consistency <- TRUE
+        nodesplit <- dplyr::filter(nodesplit, !is.na(.data$trt1) & !is.na(.data$trt2))
+      }
+
+      if (nrow(nodesplit) == 0) {
+        abort("No comparisons to node-split.")
+      }
+
+      nodesplit[,1] <- as.character(nodesplit[,1])
+      nodesplit[,2] <- as.character(nodesplit[,2])
+
+      if (!all(unlist(nodesplit) %in% lvls_trt))
+        abort(sprintf("All comparisons in `nodesplit` should match two treatments in the network.\nSuitable values are: %s",
+                      ifelse(length(lvls_trt) <= 5,
+                             paste0(lvls_trt, collapse = ", "),
+                             paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
+
+      if (any(nodesplit[,1] == nodesplit[,2]))
+        abort("`nodesplit` comparison cannot be the same treatment against itself.")
+
+      # Check valid nodesplit - must have both direct and indirect evidence
+      ns_check <- dplyr::rowwise(nodesplit) %>%
+        mutate(direct = has_direct(network, .data$trt1, .data$trt2),
+               indirect = has_indirect(network, .data$trt1, .data$trt2),
+               valid = direct && indirect)
+
+      if (any(!ns_check$valid)) {
+        ns_valid <- dplyr::filter(ns_check, .data$valid) %>%
+          dplyr:ungroup() %>%
+          dplyr::select(.data$trt1, .data$trt2)
+
+        ns_invalid <- dplyr::filter(ns_check, !.data$valid) %>%
+          dplyr::mutate(comparison = paste(.data$trt1, .data$trt2, sep = " vs. "))
+
+        if (nrow(ns_valid)) {
+          warn(glue::glue(
+            "Ignoring node-split comparisons without both both direct and independent indirect evidence: ",
+            glue::glue_collapse(ns_invalid$comparison, sep = ", ", width = 100), "."
+            ))
+
+          nodesplit <- ns_valid
+        } else {
+          abort("No valid comparisons for node-splitting given in `nodesplit`.\n Comparisons must have both direct and independent indirect evidence for node-splitting.")
+        }
+
+      }
+
+      nodesplit[,1] <- as.factor(nodesplit[,1], levels = lvls_trt)
+      nodesplit[,2] <- as.factor(nodesplit[,2], levels = lvls_trt)
+
+    } else if (rlang::is_vector(nodesplit, n = 2)) { # Vector giving single comparison to split
+
+      nodesplit <- as.character(nodesplit)
+
+      if (!all(nodesplit %in% lvls_trt))
+        abort(sprintf("The `nodesplit` treatment comparison should match two treatments in the network.\nSuitable values are: %s",
+                      ifelse(length(lvls_trt) <= 5,
+                             paste0(lvls_trt, collapse = ", "),
+                             paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
+
+      if (nodesplit[1] == nodesplit[2])
+        abort("`nodesplit` comparison cannot be the same treatment against itself.")
+
+      # Check valid nodesplit - must have both direct and indirect evidence
+      if (!has_direct(network, nodesplit[1], nodesplit[2])) {
+        abort(glue::glue("Cannot node-split the {nodesplit[1]} vs. {nodesplit[2]} comparison, no direct evidence."))
+      }
+      if (!has_indirect(network, nodesplit[1], nodesplit[2])) {
+        abort(glue::glue("Cannot node-split the {nodesplit[1]} vs. {nodesplit[2]} comparison, no independent indirect evidence."))
+      }
+
+      nodesplit <- as.factor(nodesplit, levels = lvls_trt)
+
+    } else {
+      abort("`nodesplit` should either be a length 2 vector or a 2 column data frame, giving the comparison(s) to node-split.")
+    }
+  }
 
   if (!is.null(regression) && !rlang::is_formula(regression, lhs = FALSE)) {
     abort("`regression` should be a one-sided formula.")
@@ -451,7 +544,7 @@ nma <- function(network,
     contr <- rep(c(FALSE, FALSE, TRUE),
                  times = c(nrow(tdat_ipd_arm), nrow(tdat_agd_arm), nrow(tdat_agd_contrast_nonbl)))
 
-    if (consistency == "consistency") {
+    if (consistency %in% c("consistency", "nodesplit")) {
       .RE_cor <- RE_cor(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "reftrt")
       .which_RE <- which_RE(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "reftrt")
     } else if (consistency == "ume") {
