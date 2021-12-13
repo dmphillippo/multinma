@@ -556,6 +556,11 @@ has_direct <- function(network, trt1, trt2) {
   }
 
   # Check treatments
+  if (!rlang::is_scalar_atomic(trt1))
+    abort("`trt1` should be a single integer, string, or factor, naming a treatment.")
+  if (!rlang::is_scalar_atomic(trt2))
+    abort("`trt2` should be a single integer, string, or factor, naming a treatment.")
+
   trt1 <- as.character(trt1)
   trt2 <- as.character(trt2)
   lvls_trt <- levels(network$treatments)
@@ -593,6 +598,11 @@ has_indirect <- function(network, trt1, trt2) {
   }
 
   # Check treatments
+  if (!rlang::is_scalar_atomic(trt1))
+    abort("`trt1` should be a single integer, string, or factor, naming a treatment.")
+  if (!rlang::is_scalar_atomic(trt2))
+    abort("`trt2` should be a single integer, string, or factor, naming a treatment.")
+
   trt1 <- as.character(trt1)
   trt2 <- as.character(trt2)
   lvls_trt <- levels(network$treatments)

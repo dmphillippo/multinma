@@ -13,6 +13,15 @@ thrombo_net <- set_agd_arm(thrombolytics, studyn, trtc,
 thrombo_net2 <- set_agd_arm(thrombolytics, studyn, trtn,
                             r = r, n = n)
 
+test_that("treatments must be scalars", {
+  m <- "should be a single integer, string, or factor, naming a treatment"
+
+  expect_error(has_direct(thrombo_net, 1:2, "SK"), m)
+  expect_error(has_direct(thrombo_net, "SK", 1:2), m)
+  expect_error(has_indirect(thrombo_net, 1:2, "SK"), m)
+  expect_error(has_indirect(thrombo_net, "SK", 1:2), m)
+})
+
 test_that("treatments must be in network", {
   m1 <- "`trt1` does not match a treatment in the network"
   m2 <- "`trt2` does not match a treatment in the network"
