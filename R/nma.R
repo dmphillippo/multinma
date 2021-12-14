@@ -767,6 +767,7 @@ nma <- function(network,
 
   if (consistency == "nodesplit" && !is.data.frame(nodesplit)) {
     class(out) <- c("nma_nodesplit", class(out))
+    out$nodesplit <- nodesplit
   }
 
   return(out)

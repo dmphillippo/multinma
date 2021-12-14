@@ -8,7 +8,9 @@
 #' @aliases nma_nodesplit nma_nodesplit_df nma_nodesplit_df-class
 #'
 #' @details Objects of class `nma_nodesplit` inherit from the [stan_nma] class,
-#'   and contain the results of fitting a single node-split model.
+#'   and contain the results of fitting a single node-split model. They have one
+#'   additional component, `nodesplit`, which gives the comparison that was
+#'   node-split as a length 2 vector.
 #'
 #'   Objects of class `nma_nodesplit_df` are tibble data frames with one row
 #'   for each node-split comparison and columns:

@@ -12,7 +12,9 @@ running a node-splitting model with the function \code{\link[=nma]{nma()}}.
 }
 \details{
 Objects of class \code{nma_nodesplit} inherit from the \link{stan_nma} class,
-and contain the results of fitting a single node-split model.
+and contain the results of fitting a single node-split model. They have one
+additional component, \code{nodesplit}, which gives the comparison that was
+node-split as a length 2 vector.
 
 Objects of class \code{nma_nodesplit_df} are tibble data frames with one row
 for each node-split comparison and columns:
