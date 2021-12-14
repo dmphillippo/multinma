@@ -1663,12 +1663,16 @@ make_nma_formula <- function(regression,
 
     if (consistency == "ume") {
       nma_formula <- update.formula(nma_formula, ~-1 + .study + .contr + .)
+    } else if (consistency == "nodesplit") {
+      nma_formula <- update.formula(nma_formula, ~-1 + .study + .trt + .omega + .)
     } else {
       nma_formula <- update.formula(nma_formula, ~-1 + .study + .trt + .)
     }
   } else {
     if (consistency == "ume") {
       nma_formula <- ~-1 + .study + .contr
+    } else if (consistency == "nodesplit") {
+      nma_formula <- ~-1 + .study + .trt + .omega
     } else {
       nma_formula <- ~-1 + .study + .trt
     }
@@ -1683,6 +1687,7 @@ make_nma_formula <- function(regression,
 #'   data
 #' @param xbar Named numeric vector of centering values, or NULL
 #' @param consistency Consistency/inconsistency model (character string)
+#' @param nodesplit Length 2 character vector giving comparison to node-split
 #' @param classes Classes present? TRUE / FALSE
 #' @param class_interactions Class interaction specification (character string)
 #' @param newdata Providing newdata post-fitting? TRUE / FALSE
@@ -1697,6 +1702,7 @@ make_nma_model_matrix <- function(nma_formula,
                                   agd_contrast_bl = logical(),
                                   xbar = NULL,
                                   consistency = c("consistency", "nodesplit", "ume"),
+                                  nodesplit = NULL,
                                   classes = FALSE,
                                   newdata = FALSE) {
   # Checks
@@ -1712,8 +1718,13 @@ make_nma_model_matrix <- function(nma_formula,
         !(rlang::is_double(xbar) || rlang::is_integer(xbar)) || !rlang::is_named(xbar)))
     abort("`xbar` should be a named numeric vector")
 
-  if (!consistency %in% c("consistency", "ume")) {
+  if (!consistency %in% c("consistency", "ume", "nodesplit")) {
     abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
+  }
+
+  if (consistency == "nodesplit") {
+    if (!rlang::is_vector(nodesplit, 2))
+      abort("`nodesplit` should be a vector of length 2.")
   }
 
   .has_ipd <- if (nrow(dat_ipd)) TRUE else FALSE
@@ -1797,6 +1808,25 @@ make_nma_model_matrix <- function(nma_formula,
     }
     if (.has_agd_contrast) {
       dat_agd_contrast <- dplyr::left_join(dat_agd_contrast, contrs_all, by = c(".study", ".trt"))
+    }
+  }
+
+  # Derive .omega indicator for node-splitting model
+  if (consistency == "nodesplit") {
+    if (.has_ipd) {
+      dat_ipd <- dplyr::group_by(dat_ipd, .data$.study) %>%
+        dplyr::mutate(.omega = 1*(all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2])) %>%
+        dplyr::ungroup()
+    }
+    if (.has_agd_arm) {
+      dat_agd_arm <- dplyr::group_by(dat_agd_arm, .data$.study) %>%
+        dplyr::mutate(.omega = 1*(all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2])) %>%
+        dplyr::ungroup()
+    }
+    if (.has_agd_contrast) {
+      dat_agd_contrast <- dplyr::group_by(dat_agd_contrast, .data$.study) %>%
+        dplyr::mutate(.omega = 1*(all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2])) %>%
+        dplyr::ungroup()
     }
   }
 
