@@ -8,6 +8,9 @@ prior_select_lp(d, prior_trt_dist, prior_trt_location, prior_trt_scale, prior_tr
 // Regression parameters
 prior_select_lp(beta, prior_reg_dist, prior_reg_location, prior_reg_scale, prior_reg_df);
 
+// Node-splitting - just use prior for d
+prior_select_lp(omega, prior_trt_dist, prior_trt_location, prior_trt_scale, prior_trt_df);
+
 // Heterogeneity
 if (RE) {
   if (prior_het_type == 1) { // Prior on sd = tau

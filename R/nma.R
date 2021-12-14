@@ -558,6 +558,7 @@ nma <- function(network,
                                   agd_contrast_bl = is.na(idat_agd_contrast$.y),
                                   xbar = xbar,
                                   consistency = consistency,
+                                  nodesplit = nodesplit,
                                   classes = !is.null(network$classes))
 
   X_ipd <- X_list$X_ipd
@@ -623,6 +624,7 @@ nma <- function(network,
     which_RE = .which_RE,
     likelihood = likelihood,
     link = link,
+    consistency = consistency,
     ...,
     prior_intercept = prior_intercept,
     prior_trt = prior_trt,
@@ -786,6 +788,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     which_RE = NULL,
                     likelihood = NULL,
                     link = NULL,
+                    consistency = c("consistency", "ume", "nodesplit"),
                     ...,
                     prior_intercept,
                     prior_trt,
@@ -1055,6 +1058,8 @@ nma.fit <- function(ipd_x, ipd_y,
     RE = switch(trt_effects, fixed = 0, random = 1),
     RE_cor = RE_cor,
     which_RE = which_RE,
+    # Node splitting
+    nodesplit = consistency == "nodesplit",
     # Design matrix or QR decomposition
     QR = QR,
     X = if (QR) X_all_Q else X_all,
@@ -1094,6 +1099,12 @@ nma.fit <- function(ipd_x, ipd_y,
   if (trt_effects == "random") {
     pars <- c(pars, "tau", "delta")
   }
+
+  # Monitor omega for node-splitting model
+  if (consistency == "nodesplit") {
+    pars <- c(pars, "omega")
+  }
+
   # Monitor cumulative integration error if using numerical integration
   if (n_int > 1) {
     if (has_agd_arm) pars <- c(pars, "theta_bar_cum_agd_arm")
@@ -1271,6 +1282,7 @@ nma.fit <- function(ipd_x, ipd_y,
   fnames_oi[grepl("^d\\[[0-9]+\\]$", fnames_oi)] <- paste0("d[", x_names_sub[col_trt], "]")
   fnames_oi[grepl("^beta\\[[0-9]+\\]$", fnames_oi)] <- paste0("beta[", x_names[col_reg], "]")
   fnames_oi <- gsub("tau[1]", "tau", fnames_oi, fixed = TRUE)
+  fnames_oi <- gsub("omega[1]", "omega", fnames_oi, fixed = TRUE)
 
   if (likelihood == "ordered") {
     if (has_ipd) l_cat <- colnames(ipd_y$.r)[-1]
