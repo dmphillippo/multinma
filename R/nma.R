@@ -212,7 +212,7 @@ nma <- function(network,
 
       if (any(!ns_check$valid)) {
         ns_valid <- dplyr::filter(ns_check, .data$valid) %>%
-          dplyr:ungroup() %>%
+          dplyr::ungroup() %>%
           dplyr::select(.data$trt1, .data$trt2)
 
         ns_invalid <- dplyr::filter(ns_check, !.data$valid) %>%
