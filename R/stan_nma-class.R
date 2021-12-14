@@ -45,7 +45,7 @@ print.stan_nma <- function(x, ...) {
   cglue("A {x$trt_effects} effects {type} with a {x$likelihood} likelihood ({x$link} link).")
   if (x$consistency != "consistency") {
     if (x$consistency == "nodesplit")
-      cglue("An inconsistency model ('{x$consistency}') was fitted, splitting the comparison {x$nodesplit[1]} vs. {x$nodesplit[2]}.")
+      cglue("An inconsistency model ('{x$consistency}') was fitted, splitting the comparison {x$nodesplit[2]} vs. {x$nodesplit[1]}.")
     else
       cglue("An inconsistency model ('{x$consistency}') was fitted.")
   }

@@ -231,8 +231,15 @@ nma <- function(network,
 
       }
 
+      # Store comparisons as factors, in increasing order (i.e. trt1 < trt2)
       nodesplit$trt1 <- factor(nodesplit$trt1, levels = lvls_trt)
       nodesplit$trt2 <- factor(nodesplit$trt2, levels = lvls_trt)
+
+      for (i in 1:nrow(nodesplit)) {
+        if (as.numeric(nodesplit$trt1[i]) > as.numeric(nodesplit$trt2[i])) {
+          nodesplit[i, ] <- rev(nodesplit[i, ])
+        }
+      }
 
       # Iteratively call node-splitting models
       n_ns <- nrow(nodesplit) + nodesplit_include_consistency
@@ -306,7 +313,11 @@ nma <- function(network,
         abort(glue::glue("Cannot node-split the {nodesplit[1]} vs. {nodesplit[2]} comparison, no independent indirect evidence."))
       }
 
+      # Store comparison as factor, in increasing order (i.e. trt1 < trt2)
       nodesplit <- factor(nodesplit, levels = lvls_trt)
+      if (as.numeric(nodesplit[1]) > as.numeric(nodesplit[2])) {
+        nodesplit <- rev(nodesplit)
+      }
 
     } else {
       abort("`nodesplit` should either be a length 2 vector or a 2 column data frame, giving the comparison(s) to node-split.")
