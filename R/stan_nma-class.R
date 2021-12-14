@@ -275,6 +275,14 @@ plot_prior_posterior <- function(x, ...,
                                            reg = "beta",
                                            aux = switch(x$likelihood, normal = "sigma", ordered = "cc")))
 
+  # Add in omega parameter if node-splitting model, which uses prior_trt
+  if (inherits(x, "nma_nodesplit")) {
+    prior_dat <- dplyr::bind_rows(
+      prior_dat,
+      dplyr::filter(prior_dat, .data$prior == "trt") %>%
+        dplyr::mutate(par_base = "omega")
+    )
+  }
 
   # Get parameter samples
   pars <- unique(prior_dat$par_base)
