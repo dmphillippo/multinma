@@ -43,7 +43,12 @@ print.stan_nma <- function(x, ...) {
   if (inherits(x$network, "mlnmr_data")) type <- "ML-NMR"
   else type <- "NMA"
   cglue("A {x$trt_effects} effects {type} with a {x$likelihood} likelihood ({x$link} link).")
-  if (x$consistency != "consistency") cglue("An inconsistency model ('{x$consistency}') was fitted.")
+  if (x$consistency != "consistency") {
+    if (x$consistency == "nodesplit")
+      cglue("An inconsistency model ('{x$consistency}') was fitted, splitting the comparison {x$nodesplit[1]} vs. {x$nodesplit[2]}.")
+    else
+      cglue("An inconsistency model ('{x$consistency}') was fitted.")
+  }
   if (!is.null(x$regression)) {
     cglue("Regression model: {rlang::as_label(x$regression)}.")
     if (!is.null(x$xbar)) {
