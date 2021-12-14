@@ -90,8 +90,8 @@ decomposition to the model design matrix}
 cumulative estimates of integration error}
 }
 \value{
-\code{nma()} returns a \link{stan_nma} object, except when \code{consistency = "nodesplit"} when a \link{nma_nodesplit} object is returned. \code{nma.fit()} returns
-a \link{stanfit} object.
+\code{nma()} returns a \link{stan_nma} object, except when \code{consistency = "nodesplit"} when a \link{nma_nodesplit} or \link{nma_nodesplit_df} object is
+returned. \code{nma.fit()} returns a \link{stanfit} object.
 }
 \description{
 The \code{nma} function fits network meta-analysis and (multilevel) network

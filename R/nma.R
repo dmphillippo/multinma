@@ -115,8 +115,8 @@
 #'   ordering constraints are satisfied.
 #'
 #' @return `nma()` returns a [stan_nma] object, except when `consistency =
-#'   "nodesplit"` when a [nma_nodesplit] object is returned. `nma.fit()` returns
-#'   a [stanfit] object.
+#'   "nodesplit"` when a [nma_nodesplit] or [nma_nodesplit_df] object is
+#'   returned. `nma.fit()` returns a [stanfit] object.
 #' @export
 #'
 #' @references
@@ -281,8 +281,8 @@ nma <- function(network,
 
       nodesplit$model <- ns_fits
 
-      # Return a nma_nodesplit object
-      class(nodesplit) <- c("nma_nodesplit", class(nodesplit))
+      # Return a nma_nodesplit_df object
+      class(nodesplit) <- c("nma_nodesplit_df", class(nodesplit))
       return(nodesplit)
 
     } else if (rlang::is_vector(nodesplit, n = 2)) { # Vector giving single comparison to split
@@ -764,6 +764,10 @@ nma <- function(network,
 
   if (inherits(network, "mlnmr_data")) class(out) <- c("stan_mlnmr", "stan_nma")
   else class(out) <- "stan_nma"
+
+  if (consistency == "nodesplit" && !is.data.frame(nodesplit)) {
+    class(out) <- c("nma_nodesplit", class(out))
+  }
 
   return(out)
 }
