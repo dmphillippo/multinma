@@ -186,8 +186,8 @@ nma <- function(network,
         abort("No comparisons to node-split.")
       }
 
-      nodesplit[,1] <- as.character(nodesplit[,1])
-      nodesplit[,2] <- as.character(nodesplit[,2])
+      nodesplit$trt1 <- as.character(nodesplit$trt1)
+      nodesplit$trt2 <- as.character(nodesplit$trt2)
 
       if (!all(unlist(nodesplit) %in% lvls_trt))
         abort(sprintf("All comparisons in `nodesplit` should match two treatments in the network.\nSuitable values are: %s",
@@ -200,9 +200,9 @@ nma <- function(network,
 
       # Check valid nodesplit - must have both direct and indirect evidence
       ns_check <- dplyr::rowwise(nodesplit) %>%
-        mutate(direct = has_direct(network, .data$trt1, .data$trt2),
-               indirect = has_indirect(network, .data$trt1, .data$trt2),
-               valid = direct && indirect)
+        dplyr::mutate(direct = has_direct(network, .data$trt1, .data$trt2),
+                      indirect = has_indirect(network, .data$trt1, .data$trt2),
+                      valid = direct && indirect)
 
       if (any(!ns_check$valid)) {
         ns_valid <- dplyr::filter(ns_check, .data$valid) %>%
@@ -225,8 +225,59 @@ nma <- function(network,
 
       }
 
-      nodesplit[,1] <- as.factor(nodesplit[,1], levels = lvls_trt)
-      nodesplit[,2] <- as.factor(nodesplit[,2], levels = lvls_trt)
+      nodesplit$trt1 <- factor(nodesplit$trt1, levels = lvls_trt)
+      nodesplit$trt2 <- factor(nodesplit$trt2, levels = lvls_trt)
+
+      # Iteratively call node-splitting models
+      n_ns <- nrow(nodesplit) + nodesplit_include_consistency
+      ns_fits <- vector("list", n_ns)
+
+      ns_arglist <- list(network = network,
+                         consistency = "nodesplit",
+                         trt_effects = trt_effects,
+                         regression = regression,
+                         likelihood = likelihood,
+                         link = link,
+                         ...,
+                         prior_intercept = prior_intercept,
+                         prior_trt = prior_trt,
+                         prior_het = prior_het,
+                         prior_het_type = prior_het_type,
+                         prior_reg = prior_reg,
+                         prior_aux = prior_aux,
+                         QR = QR,
+                         center = center,
+                         adapt_delta = adapt_delta,
+                         int_thin = int_thin)
+
+      if (!missing(class_interactions)) ns_arglist$class_interactions <- class_interactions
+
+
+      for (i in 1:nrow(nodesplit)) {
+
+        inform(glue::glue("Fitting model {i} of {n_ns}, node-split: ",
+                          nodesplit$trt1[i], " vs. ", nodesplit$trt2[i]))
+
+        ns_arglist$nodesplit <- c(nodesplit$trt1[i], nodesplit$trt2[i])
+
+        ns_fits[[i + nodesplit_include_consistency]] <- do.call(nma, ns_arglist)
+      }
+
+      if (nodesplit_include_consistency) {
+        inform(glue::glue("Fitting model {n_ns} of {n_ns}, consistency model"))
+        nodesplit <- tibble::add_row(nodesplit, .before = 1)
+
+        ns_arglist$consistency <- "consistency"
+        ns_arglist$nodesplit <- NULL
+
+        ns_fits[[1]] <- do.call(nma, ns_arglist)
+      }
+
+      nodesplit$model <- ns_fits
+
+      # Return a nma_nodesplit object
+      class(nodesplit) <- c("nma_nodesplit", class(nodesplit))
+      return(nodesplit)
 
     } else if (rlang::is_vector(nodesplit, n = 2)) { # Vector giving single comparison to split
 
@@ -249,7 +300,7 @@ nma <- function(network,
         abort(glue::glue("Cannot node-split the {nodesplit[1]} vs. {nodesplit[2]} comparison, no independent indirect evidence."))
       }
 
-      nodesplit <- as.factor(nodesplit, levels = lvls_trt)
+      nodesplit <- factor(nodesplit, levels = lvls_trt)
 
     } else {
       abort("`nodesplit` should either be a length 2 vector or a 2 column data frame, giving the comparison(s) to node-split.")
