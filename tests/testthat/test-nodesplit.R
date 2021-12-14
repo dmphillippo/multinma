@@ -30,6 +30,14 @@ test_that("treatments must be in network", {
   expect_error(has_direct(thrombo_net, "SK", "bad"), m2)
   expect_error(has_indirect(thrombo_net, "bad", "SK"), m1)
   expect_error(has_indirect(thrombo_net, "SK", "bad"), m2)
+
+  expect_error(
+    nma(thrombo_net,
+        consistency = "nodesplit",
+        nodesplit = c("bad", "SK"),
+        prior_intercept = normal(scale = 10),
+        prior_trt = normal(scale = 10)),
+    "The `nodesplit` treatment comparison should match two treatments in the network")
 })
 
 test_that("trt1 and trt2 must be different", {
@@ -37,6 +45,14 @@ test_that("trt1 and trt2 must be different", {
 
   expect_error(has_direct(thrombo_net, "SK", "SK"), m)
   expect_error(has_indirect(thrombo_net, "SK", "SK"), m)
+
+  expect_error(
+    nma(thrombo_net,
+        consistency = "nodesplit",
+        nodesplit = c("SK", "SK"),
+        prior_intercept = normal(scale = 10),
+        prior_trt = normal(scale = 10)),
+    "`nodesplit` comparison cannot be the same treatment against itself")
 })
 
 test_that("has_direct and has_indirect outputs are correct", {
@@ -113,4 +129,56 @@ test_that("has_direct and has_indirect work with one study / pairwise MA", {
 
   expect_identical(has_indirect(pair_net, 1, 2), FALSE)
   expect_identical(has_indirect(multi_net, 1, 2), FALSE)
+})
+
+test_that("nma() nodesplit error if can't split given comparison", {
+  expect_error(
+    nma(thrombo_net,
+        consistency = "nodesplit",
+        nodesplit = c("TNK", "t-PA"),
+        prior_intercept = normal(scale = 10),
+        prior_trt = normal(scale = 10)),
+    "no direct evidence"
+  )
+
+  expect_error(
+    nma(thrombo_net,
+        consistency = "nodesplit",
+        nodesplit = c("TNK", "Acc t-PA"),
+        prior_intercept = normal(scale = 10),
+        prior_trt = normal(scale = 10)),
+    "no independent indirect evidence"
+  )
+})
+
+test_that("nma() nodesplit error if no comparisons to split", {
+  m <- "No comparisons to node-split"
+
+  expect_error(
+    nma(pair_net,
+        consistency = "nodesplit",
+        prior_intercept = normal(scale = 10),
+        prior_trt = normal(scale = 10)),
+    m
+  )
+
+  expect_error(
+    nma(multi_net,
+        consistency = "nodesplit",
+        prior_intercept = normal(scale = 10),
+        prior_trt = normal(scale = 10)),
+    m
+  )
+})
+
+test_that("nma() nodesplit warning about ignoring comparisons", {
+  expect_warning(
+    nma(thrombo_net,
+        consistency = "nodesplit",
+        nodesplit = data.frame(trt1 = "Acc t-PA", trt2 = c("TNK", "ASPAC")),
+        prior_intercept = normal(scale = 10),
+        prior_trt = normal(scale = 10),
+        test_grad = TRUE),
+    "Ignoring node-split comparisons.+Acc t-PA vs\\. TNK"
+  )
 })
