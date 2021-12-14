@@ -6,7 +6,7 @@
 #' @param network An `nma_data` object, as created by the functions `set_*()`,
 #'   `combine_network()`, or `add_integration()`
 #' @param consistency Character string specifying the type of (in)consistency
-#'   model to fit, currently either `"consistency"` or `"ume"`
+#'   model to fit, either `"consistency"`, `"ume"`, or `"nodesplit"`
 #' @param trt_effects Character string specifying either `"fixed"` or `"random"` effects
 #' @param regression A one-sided model formula, specifying the prognostic and
 #'   effect-modifying terms for a regression model. Any references to treatment
@@ -22,6 +22,11 @@
 #' @param ... Further arguments passed to
 #'   \code{\link[rstan:stanmodel-method-sampling]{sampling()}}, such as `iter`,
 #'   `chains`, `cores`, etc.
+#' @param nodesplit For `consistency = "nodesplit"`, the comparison(s) to split
+#'   in the node-splitting model(s). Either a length 2 vector giving the
+#'   treatments in a single comparison, or a 2 column data frame listing
+#'   multiple treatment comparisons to split in turn. By default, all possible
+#'   comparisons will be chosen (see [get_nodesplits()]).
 #' @param prior_intercept Specification of prior distribution for the intercept
 #' @param prior_trt Specification of prior distribution for the treatment effects
 #' @param prior_het Specification of prior distribution for the heterogeneity
@@ -109,8 +114,9 @@
 #'   \eqn{c_{m+1} - c_m}. Stan automatically truncates any priors so that the
 #'   ordering constraints are satisfied.
 #'
-#' @return `nma()` returns a [stan_nma] object, `nma.fit()` returns a [stanfit]
-#'   object.
+#' @return `nma()` returns a [stan_nma] object, except when `consistency =
+#'   "nodesplit"` when a [nma_nodesplit] object is returned. `nma.fit()` returns
+#'   a [stanfit] object.
 #' @export
 #'
 #' @references
