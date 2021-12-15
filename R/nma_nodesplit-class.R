@@ -53,6 +53,12 @@ print.nma_nodesplit_df <- function(x, ...) {
   invisible(x)
 }
 
+#' @export
+#' @rdname print.nma_nodesplit_df
+print.nma_nodesplit <- function(x, ...) {
+  NextMethod(...)
+}
+
 #' Summarise the results of node-splitting models
 #'
 #' Posterior summaries of node-splitting models (`nma_nodesplit` and

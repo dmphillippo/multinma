@@ -2,9 +2,12 @@
 % Please edit documentation in R/nma_nodesplit-class.R
 \name{print.nma_nodesplit_df}
 \alias{print.nma_nodesplit_df}
+\alias{print.nma_nodesplit}
 \title{Print \code{nma_nodesplit_df} objects}
 \usage{
 \method{print}{nma_nodesplit_df}(x, ...)
+
+\method{print}{nma_nodesplit}(x, ...)
 }
 \arguments{
 \item{x}{A \link{nma_nodesplit_df} object}
