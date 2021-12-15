@@ -109,6 +109,9 @@ summary.nma_nodesplit_df <- function(object, consistency = NULL, ...,
                                 ~2 * ifelse(median(.) > 0, mean(. < 0), mean(. > 0)))
   out$dic <- purrr::map(out$model, dic)
 
+  # Drop the model objects from the output
+  out$model <- NULL
+
   class(out) <- c("nodesplit_summary", class(out))
 
   return(out)
