@@ -28,7 +28,7 @@ if available}
 \item{\code{d_dir}}{Direct estimate from the node-splitting model}
 \item{\code{d_ind}}{Indirect estimate from the node-splitting model}
 \item{\code{omega}}{Inconsistency factor \eqn{\omega = d_\mathrm{dir} -
-  d_\mathrm{ind}}}
+  d_\mathrm{ind}}{\omega = d_dir - d_ind}}
 \item{\code{tau}}{Heterogeneity standard deviation from the node-splitting
 model, if a random effects model was fitted}
 \item{\code{tau_consistency}}{Heterogeneity standard deviation from the
