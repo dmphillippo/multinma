@@ -112,3 +112,167 @@ as.tibble.nodesplit_summary <- function(x, ..., nest = FALSE) {
 as.data.frame.nodesplit_summary <- function(x, ...) {
   return(as.data.frame(tibble::as_tibble(x, ..., nest = FALSE)))
 }
+
+
+#' Plots of node-splitting models
+#'
+#' Produce summary plots of node-splitting models
+#'
+#' @param x A `nodesplit_summary` object.
+#' @param ... Additional arguments passed on to the underlying `ggdist` plot
+#'   stat, see Details.
+#' @param pars Character vector specifying the parameters to include in the
+#'   plot, choices include `"d"` for the direct, indirect, and network estimates
+#'   of relative effects, `"omega"` for the inconsistency factor, and `"tau"`
+#'   for heterogeneity standard deviation in random effects models. Default is
+#'   `"d"`.
+#' @param stat Character string specifying the `ggdist` plot stat to use. The
+#'   default `"dens_overlay"` is a special case, producing an overlaid density
+#'   plot.
+#' @param orientation Whether the `ggdist` geom is drawn horizontally
+#'   (`"horizontal"`) or vertically (`"vertical"`), default `"horizontal"`.
+#' @param ref_line Numeric vector of positions for reference lines, by default
+#'   no reference lines are drawn.
+#'
+#' @details Plotting is handled by [ggplot2] and the stats and geoms provided in
+#'   the [ggdist] package. As a result, the output is very flexible. Any
+#'   plotting stats provided by `ggdist` may be used, via the argument `stat`.
+#'   The default `"dens_overlay"` uses
+#'   \code{\link[ggdist:stat_slab]{ggdist::stat_slab()}}, to plot overlaid
+#'   densities. Additional arguments in `...` are passed to the `ggdist` stat,
+#'   to customise the output.
+#'
+#'   Alternative stats can be specified to produce different summaries. For
+#'   example, specify `stat = "[half]eye"` to produce (half) eye plots, or `stat
+#'   = "pointinterval"` to produce point estimates and credible intervals.
+#'
+#'   A full list of options and examples is found in the `ggdist` vignette
+#'   `vignette("slabinterval", package = "ggdist")`.
+#'
+#'   A `ggplot` object is returned which can be further modified through the
+#'   usual [ggplot2] functions to add further aesthetics, geoms, themes, etc.
+#'
+#' @return A `ggplot` object.
+#'
+#' @export
+#'
+#' @examples
+plot.nodesplit_summary <- function(x, ...,
+                                   pars = "d",
+                                   stat = "dens_overlay",
+                                   orientation = c("horizontal", "vertical", "y", "x"),
+                                   ref_line = NA_real_) {
+  # Checks
+  if (!is.character(pars))
+    abort("`pars` must be a character vector of parameters to include.")
+
+  if (!rlang::is_string(stat))
+    abort("`stat` should be a character string specifying the name of a ggdist stat.")
+
+  if (stat == "dens_overlay") {
+    # Special case, for the classic overlaid density plot
+    tb_geom <- getExportedValue("ggdist", "stat_slab")
+  } else {
+    stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
+
+    tb_geom <- tryCatch(getExportedValue("ggdist", paste0("stat_", stat)),
+                        error = function(err) {
+                          abort(paste("`stat` should be a character string specifying the name of a ggdist stat:",
+                                      err, sep = "\n"))
+                        })
+  }
+
+
+  if (!is.numeric(ref_line) || !is.null(dim(ref_line)))
+    abort("`ref_line` should be a numeric vector.")
+
+  orientation <- rlang::arg_match(orientation)
+  if (orientation == "x") orientation <- "vertical"
+  else if (orientation == "y") orientation <- "horizontal"
+
+  # Is a horizontal geom specified?
+  horizontal <- orientation == "horizontal"
+
+  # Get draws
+  draws <- tibble::as_tibble(x, nest = TRUE)
+  draws$summary <- purrr::map(draws$summary, ~tibble::as_tibble(as.matrix(.)))
+
+  if (packageVersion("tidyr") >= "1.0.0") {
+    draws$summary <- purrr::map(draws$summary,
+                                ~tidyr::pivot_longer(., cols = dplyr::everything(),
+                                   names_to = "parameter", values_to = "value"))
+  } else {
+    draws$summary <- purrr::map(draws$summary,
+                                ~tidyr::gather(.,
+                                   key = "parameter",
+                                   value = "value",
+                                   dplyr::everything()))
+  }
+
+  draws <- dplyr::mutate(draws, comparison = paste0(.data$trt2, " vs. ", .data$trt1)) %>%
+    dplyr::select(.data$comparison, .data$summary) %>%
+    tidyr::unnest(cols = "summary") %>%
+    dplyr::mutate(parameter = stringr::str_remove(.data$parameter, "\\[.*\\]"))
+
+  # Filter out selected pars
+  # Allow selection with d instead of d_ind, d_dir, d_net
+  allpars <- c(unique(draws$parameter), "d")
+  badpars <- setdiff(pars, allpars)
+
+  if (length(badpars))
+    abort(glue::glue("No parameter{if (length(badpars) > 1) 's' else ''} ",
+                     glue::glue_collapse(glue::double_quote(badpars), sep = ", ", last = " or "), "."))
+
+  # Expand d and tau to include direct/indirect/network
+  if ("d" %in% pars) pars <- c(setdiff(pars, "d"), "d_dir", "d_ind", "d_net")
+  if ("tau" %in% pars) pars <- c(pars, "tau_consistency")
+
+  draws <- dplyr::filter(draws, parameter %in% pars)
+
+  draws$parameter <- nfactor(draws$parameter)
+
+  # Construct plot
+  if (horizontal) {
+
+    p <- ggplot2::ggplot(draws, ggplot2::aes(x = .data$value)) +
+      ggplot2::geom_vline(xintercept = ref_line, na.rm = TRUE, colour = "grey60") +
+      ggplot2::xlab("Value")
+
+    if (stat == "dens_overlay") {
+      p <- p + ggplot2::aes(colour = .data$parameter, fill = .data$parameter) +
+        ggplot2::ylab("Density")
+    } else {
+      p <- p + ggplot2::aes(y = .data$parameter) + ggplot2::ylab("Parameter")
+    }
+
+  } else {
+
+    p <- ggplot2::ggplot(draws, ggplot2::aes(y = .data$value)) +
+      ggplot2::geom_hline(yintercept = ref_line, na.rm = TRUE, colour = "grey60") +
+      ggplot2::ylab("Value")
+
+    if (stat == "dens_overlay") {
+      p <- p + ggplot2::aes(colour = .data$parameter, fill = .data$parameter) +
+        ggplot2::xlab("Density")
+    } else {
+      p <- p + ggplot2::aes(x = .data$parameter) + ggplot2::xlab("Parameter")
+    }
+
+  }
+
+  if (stat == "dens_overlay") {
+    p <- p + do.call(tb_geom, args = rlang::dots_list(orientation = orientation,
+                                                      ...,
+                                                      slab_alpha = 0.5,
+                                                      slab_size = 0.75,
+                                                      .homonyms = "first"))
+  } else {
+    p <- p + do.call(tb_geom, args = list(orientation = orientation, ...))
+  }
+
+  p <- p  +
+    ggplot2::facet_wrap(~comparison, scales = "free") +
+    theme_multinma()
+
+  return(p)
+}
