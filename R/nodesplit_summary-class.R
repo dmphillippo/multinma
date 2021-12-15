@@ -153,6 +153,7 @@ as.data.frame.nodesplit_summary <- function(x, ...) {
 #'   usual [ggplot2] functions to add further aesthetics, geoms, themes, etc.
 #'
 #' @return A `ggplot` object.
+#' @seealso [summary.nma_nodesplit_df()]
 #'
 #' @export
 #'

@@ -59,3 +59,6 @@ A full list of options and examples is found in the \code{ggdist} vignette
 A \code{ggplot} object is returned which can be further modified through the
 usual \link{ggplot2} functions to add further aesthetics, geoms, themes, etc.
 }
+\seealso{
+\code{\link[=summary.nma_nodesplit_df]{summary.nma_nodesplit_df()}}
+}

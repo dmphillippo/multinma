@@ -79,12 +79,12 @@ print.nma_nodesplit <- function(x, ...) {
 #'   `c(0.025, 0.25, 0.5, 0.75, 0.975)`
 #'
 #' @details The `plot()` method is a shortcut for `plot(summary(nma_nodesplit))`. For
-#'   details of plotting options, see [plot.nma_nodesplit()].
+#'   details of plotting options, see [plot.nodesplit_summary()].
 #'
 #' @return A [nodesplit_summary] object
 #' @export
 #'
-#' @seealso
+#' @seealso [plot.nodesplit_summary()]
 #'
 #' @examples
 summary.nma_nodesplit_df <- function(object, consistency = NULL, ...,

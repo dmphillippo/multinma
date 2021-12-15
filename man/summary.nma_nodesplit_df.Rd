@@ -49,8 +49,8 @@ plotted using the \code{plot()} method.
 }
 \details{
 The \code{plot()} method is a shortcut for \code{plot(summary(nma_nodesplit))}. For
-details of plotting options, see \code{\link[=plot.nma_nodesplit]{plot.nma_nodesplit()}}.
+details of plotting options, see \code{\link[=plot.nodesplit_summary]{plot.nodesplit_summary()}}.
 }
 \seealso{
-
+\code{\link[=plot.nodesplit_summary]{plot.nodesplit_summary()}}
 }
