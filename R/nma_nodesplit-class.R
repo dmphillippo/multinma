@@ -97,7 +97,7 @@ summary.nma_nodesplit_df <- function(object, consistency = NULL, ...,
                               ume = "UME inconsistency"),
                        " model."))
 
-    if (!all(consistency$stanfit@sim$fnames_oi == setdiff(object$model[[1]]$stanfit@sim$fnames_oi, "omega")))
+    if (!identical(consistency$stanfit@sim$fnames_oi, setdiff(object$model[[1]]$stanfit@sim$fnames_oi, "omega")))
       abort("The fitted consistency model `consistency` does not match the node-splitting model.")
 
   }
