@@ -30,6 +30,9 @@ NULL
 #' @param x A [nma_nodesplit_df] object
 #' @param ... Further arguments passed to [print.stanfit()]
 #'
+#' @seealso The summary method [summary.nma_nodesplit_df()] summarises the
+#'   node-splitting results.
+#'
 #' @export
 print.nma_nodesplit_df <- function(x, ...) {
   n_ns <- nrow(dplyr::filter(x, !is.na(.data$trt1) & !is.na(.data$trt2)))

@@ -17,3 +17,7 @@
 \description{
 Print \code{nma_nodesplit_df} objects
 }
+\seealso{
+The summary method \code{\link[=summary.nma_nodesplit_df]{summary.nma_nodesplit_df()}} summarises the
+node-splitting results.
+}
