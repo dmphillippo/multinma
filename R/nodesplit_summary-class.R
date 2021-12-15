@@ -36,3 +36,38 @@
 #'
 #'
 NULL
+
+#' Methods for `nodesplit_summary` objects
+#'
+#' @param x A `nma_summary` object
+#' @param ... Additional arguments passed on to other methods
+#' @param digits Integer number of digits to display
+#'
+#' @rdname nodesplit_summary-methods
+#'
+#' @seealso [plot.nodesplit_summary()]
+#'
+#' @export
+#'
+print.nodesplit_summary <- function(x, ..., digits = 2) {
+  if (!rlang::is_scalar_integerish(digits)) abort("`digits` must be a single integer")
+
+  n_ns <- nrow(x)
+
+  cglue("Node-splitting model{if (n_ns > 1) 's' else ''} fitted for {n_ns} comparison{if (n_ns > 1) 's' else ''}.")
+
+  for (i in 1:nrow(x)) {
+    cglue("")
+    if (n_ns > 1) {
+      sec_header(glue::glue("Node-split {x$trt2[i]} vs. {x$trt1[i]}"))
+      cglue("")
+    }
+    print(x$summary[[i]], ...)
+    cglue("")
+    print(x$dic[[i]])
+    cglue("")
+    cglue("Bayesian p-value: {format.pval(x$p_value[[i]], digits = digits, eps = 10^-digits)}")
+  }
+
+  invisible(x)
+}
