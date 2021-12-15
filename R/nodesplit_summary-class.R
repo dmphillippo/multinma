@@ -39,11 +39,19 @@ NULL
 
 #' Methods for `nodesplit_summary` objects
 #'
-#' @param x A `nma_summary` object
+#' The `as.data.frame()`, `as_tibble()`, and `as.tibble()` methods return the
+#' node-splitting summaries in a data frame or tibble.
+#'
+#' @param x A `nodesplit_summary` object
 #' @param ... Additional arguments passed on to other methods
 #' @param digits Integer number of digits to display
 #'
 #' @rdname nodesplit_summary-methods
+#'
+#' @return A `data.frame` for `as.data.frame()`, a `tbl_df` for `as.tibble()`
+#'   and `as_tibble()`.
+#'
+#'   The `print()` method returns `x` invisibly.
 #'
 #' @seealso [plot.nodesplit_summary()]
 #'

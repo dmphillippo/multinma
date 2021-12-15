@@ -16,7 +16,7 @@ as.tibble.nodesplit_summary(x, ..., nest = FALSE)
 \method{as.data.frame}{nodesplit_summary}(x, ...)
 }
 \arguments{
-\item{x}{A \code{nma_summary} object}
+\item{x}{A \code{nodesplit_summary} object}
 
 \item{...}{Additional arguments passed on to other methods}
 
@@ -25,8 +25,15 @@ as.tibble.nodesplit_summary(x, ..., nest = FALSE)
 \item{nest}{Whether to return a nested tibble, with the full \link{nma_summary}
 and \link{nma_dic} objects, or to unnest their summaries, default \code{FALSE}}
 }
+\value{
+A \code{data.frame} for \code{as.data.frame()}, a \code{tbl_df} for \code{as.tibble()}
+and \code{as_tibble()}.
+
+The \code{print()} method returns \code{x} invisibly.
+}
 \description{
-Methods for \code{nodesplit_summary} objects
+The \code{as.data.frame()}, \code{as_tibble()}, and \code{as.tibble()} methods return the
+node-splitting summaries in a data frame or tibble.
 }
 \seealso{
 \code{\link[=plot.nodesplit_summary]{plot.nodesplit_summary()}}
