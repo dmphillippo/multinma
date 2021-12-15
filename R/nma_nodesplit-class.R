@@ -131,7 +131,7 @@ summary.nma_nodesplit <- function(object, consistency = NULL, ...,
 
   class(df) <- c("nma_nodesplit_df", class(df))
 
-  summary(df)
+  summary(df, consistency = consistency, ..., probs = probs)
 }
 
 #' @export
