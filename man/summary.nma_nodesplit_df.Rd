@@ -51,6 +51,17 @@ plotted using the \code{plot()} method.
 The \code{plot()} method is a shortcut for \code{plot(summary(nma_nodesplit))}. For
 details of plotting options, see \code{\link[=plot.nodesplit_summary]{plot.nodesplit_summary()}}.
 }
+\examples{
+\donttest{
+# Run smoking node-splitting example if not already available
+if (!exists("smk_fit_RE_nodesplit")) example("example_smk_nodesplit", run.donttest = TRUE)
+}
+# Summarise the node-splitting results
+summary(smk_fit_RE_nodesplit)
+
+# Plot the node-splitting results
+plot(smk_fit_RE_nodesplit)
+}
 \seealso{
 \code{\link[=plot.nodesplit_summary]{plot.nodesplit_summary()}}
 }

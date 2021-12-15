@@ -128,7 +128,9 @@
 #' @template ex_smoking_nma_fe
 #' @template ex_smoking_nma_re
 #' @template ex_smoking_nma_re_ume
+#' @template ex_smoking_nma_re_nodesplit
 #' @examples
+#' summary(smk_fit_RE_nodesplit)
 #'
 #' ## Plaque psoriasis ML-NMR
 #' @template ex_plaque_psoriasis_network

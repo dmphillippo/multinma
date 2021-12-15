@@ -86,7 +86,13 @@ print.nma_nodesplit <- function(x, ...) {
 #'
 #' @seealso [plot.nodesplit_summary()]
 #'
+#' @template ex_smoking_nma_re_nodesplit_example
 #' @examples
+#' # Summarise the node-splitting results
+#' summary(smk_fit_RE_nodesplit)
+#'
+#' # Plot the node-splitting results
+#' plot(smk_fit_RE_nodesplit)
 summary.nma_nodesplit_df <- function(object, consistency = NULL, ...,
                                      probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
 

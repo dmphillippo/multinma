@@ -59,6 +59,25 @@ A full list of options and examples is found in the \code{ggdist} vignette
 A \code{ggplot} object is returned which can be further modified through the
 usual \link{ggplot2} functions to add further aesthetics, geoms, themes, etc.
 }
+\examples{
+\donttest{
+# Run smoking node-splitting example if not already available
+if (!exists("smk_fit_RE_nodesplit")) example("example_smk_nodesplit", run.donttest = TRUE)
+}
+# Summarise the node-splitting results
+(smk_nodesplit_summary <- summary(smk_fit_RE_nodesplit))
+
+# Plot the node-splitting results
+plot(smk_nodesplit_summary)
+
+# Plot the inconsistency factors instead, change the plot stat to half-eye,
+# and add a reference line at 0
+plot(smk_nodesplit_summary, pars = "omega", stat = "halfeye", ref_line = 0)
+
+# Plot a comparison of the heterogeneity under the node-split models vs.
+# the consistency model
+plot(smk_nodesplit_summary, pars = "tau")
+}
 \seealso{
 \code{\link[=summary.nma_nodesplit_df]{summary.nma_nodesplit_df()}}
 }

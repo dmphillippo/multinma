@@ -157,7 +157,21 @@ as.data.frame.nodesplit_summary <- function(x, ...) {
 #'
 #' @export
 #'
+#' @template ex_smoking_nma_re_nodesplit_example
 #' @examples
+#' # Summarise the node-splitting results
+#' (smk_nodesplit_summary <- summary(smk_fit_RE_nodesplit))
+#'
+#' # Plot the node-splitting results
+#' plot(smk_nodesplit_summary)
+#'
+#' # Plot the inconsistency factors instead, change the plot stat to half-eye,
+#' # and add a reference line at 0
+#' plot(smk_nodesplit_summary, pars = "omega", stat = "halfeye", ref_line = 0)
+#'
+#' # Plot a comparison of the heterogeneity under the node-split models vs.
+#' # the consistency model
+#' plot(smk_nodesplit_summary, pars = "tau")
 plot.nodesplit_summary <- function(x, ...,
                                    pars = "d",
                                    stat = "dens_overlay",

@@ -64,6 +64,28 @@ NULL
 #' }
 NULL
 
+#' Example smoking node-splitting
+#'
+#' Smoking node-splitting for use in examples.
+#'
+#' @name example_smk_nodesplit
+#' @rdname aa_example_smk_nodesplit
+#' @description Calling `example("example_smk_nodesplit")` will run
+#'   node-splitting models with the smoking cessation data, using the code in
+#'   the Examples section below. The resulting `nma_nodesplit_df` object
+#'   `smk_fit_RE_nodesplit` will then be available in the global environment.
+#'
+#' @keywords examples
+#' @template ex_smoking_network
+#' @template ex_smoking_nma_re_nodesplit
+#' @examples \dontshow{
+#' if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) {
+#'   assign("smk_net", smk_net, .GlobalEnv)
+#'   assign("smk_fit_RE_nodesplit", smk_fit_RE_nodesplit, .GlobalEnv)
+#' }
+#' }
+NULL
+
 #' Example plaque psoriasis ML-NMR
 #'
 #' Plaque psoriasis ML-NMR for use in examples.
