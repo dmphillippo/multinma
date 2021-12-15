@@ -34,17 +34,19 @@ NULL
 print.nma_nodesplit_df <- function(x, ...) {
   n_ns <- nrow(dplyr::filter(x, !is.na(.data$trt1) & !is.na(.data$trt2)))
 
-  cglue("Node-splitting models fitted for {n_ns} comparisons.")
+  cglue("Node-splitting model{if (n_ns > 1) 's' else ''} fitted for {n_ns} comparison{if (n_ns > 1) 's' else ''}.")
   cglue("To summarise these results, use `summary()`.")
 
   for (i in 1:nrow(x)) {
     cglue("")
-    if (is.na(x$trt1[i]) && is.na(x$trt2[i])) { # Consistency model
-      sec_header("Consistency model")
-    } else {
-      sec_header(glue::glue("Node-split {x$trt2[i]} vs. {x$trt1[i]}"))
+    if (n_ns > 1) {
+      if (is.na(x$trt1[i]) && is.na(x$trt2[i])) { # Consistency model
+        sec_header("Consistency model")
+      } else {
+        sec_header(glue::glue("Node-split {x$trt2[i]} vs. {x$trt1[i]}"))
+      }
+      cglue("")
     }
-    cglue("")
     print(x$model[[i]], ...)
   }
 
