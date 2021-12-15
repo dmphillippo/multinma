@@ -271,9 +271,9 @@ nma <- function(network,
       for (i in 1:nrow(nodesplit)) {
 
         inform(glue::glue("Fitting model {i} of {n_ns}, node-split: ",
-                          as.character(nodesplit$trt1[i]),
+                          as.character(nodesplit$trt2[i]),
                           " vs. ",
-                          as.character(nodesplit$trt2[i])))
+                          as.character(nodesplit$trt1[i])))
 
         ns_arglist$nodesplit <- c(nodesplit$trt1[i], nodesplit$trt2[i])
 
