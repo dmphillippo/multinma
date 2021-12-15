@@ -2,9 +2,18 @@
 % Please edit documentation in R/nodesplit_summary-class.R
 \name{print.nodesplit_summary}
 \alias{print.nodesplit_summary}
+\alias{as_tibble.nodesplit_summary}
+\alias{as.tibble.nodesplit_summary}
+\alias{as.data.frame.nodesplit_summary}
 \title{Methods for \code{nodesplit_summary} objects}
 \usage{
 \method{print}{nodesplit_summary}(x, ..., digits = 2)
+
+\method{as_tibble}{nodesplit_summary}(x, ..., nest = FALSE)
+
+as.tibble.nodesplit_summary(x, ..., nest = FALSE)
+
+\method{as.data.frame}{nodesplit_summary}(x, ...)
 }
 \arguments{
 \item{x}{A \code{nma_summary} object}
@@ -12,6 +21,9 @@
 \item{...}{Additional arguments passed on to other methods}
 
 \item{digits}{Integer number of digits to display}
+
+\item{nest}{Whether to return a nested tibble, with the full \link{nma_summary}
+and \link{nma_dic} objects, or to unnest their summaries, default \code{FALSE}}
 }
 \description{
 Methods for \code{nodesplit_summary} objects

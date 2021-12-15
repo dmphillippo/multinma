@@ -71,3 +71,34 @@ print.nodesplit_summary <- function(x, ..., digits = 2) {
 
   invisible(x)
 }
+
+#' @export
+#' @rdname nodesplit_summary-methods
+#' @param nest Whether to return a nested tibble, with the full [nma_summary]
+#'   and [nma_dic] objects, or to unnest their summaries, default `FALSE`
+as_tibble.nodesplit_summary <- function(x, ..., nest = FALSE) {
+  if (!rlang::is_bool(nest)) abort("`nest` must be a single logical value TRUE/FALSE.")
+
+  if (nest) { # Return underlying nested tibble
+    NextMethod(...)
+  } else { # Unnest summary results
+    out <- x
+    out$summary <- purrr::map(out$summary, tibble::as_tibble)
+    out <- tidyr::unnest(out, cols = "summary")
+    out$dic <- purrr::map_dbl(out$dic, "dic")
+    class(out) <- setdiff(class(out), "nodesplit_summary")
+    return(out)
+  }
+}
+
+#' @export
+#' @rdname nodesplit_summary-methods
+as.tibble.nodesplit_summary <- function(x, ..., nest = FALSE) {
+  return(tibble::as_tibble(x, ..., nest = nest))
+}
+
+#' @export
+#' @rdname nodesplit_summary-methods
+as.data.frame.nodesplit_summary <- function(x, ...) {
+  return(as.data.frame(tibble::as_tibble(x, ..., nest = FALSE)))
+}
