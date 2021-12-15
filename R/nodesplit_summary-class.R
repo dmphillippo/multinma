@@ -62,7 +62,14 @@ print.nodesplit_summary <- function(x, ..., digits = 2) {
 
   n_ns <- nrow(x)
 
-  cglue("Node-splitting model{if (n_ns > 1) 's' else ''} fitted for {n_ns} comparison{if (n_ns > 1) 's' else ''}.")
+  if (n_ns == 1) {
+    cglue("Node-splitting model fitted for 1 comparison: ",
+          as.character(x$trt2[1]),
+          " vs. ",
+          as.character(x$trt1[1]), ".")
+  } else {
+    cglue("Node-splitting models fitted for {n_ns} comparisons.")
+  }
 
   for (i in 1:nrow(x)) {
     cglue("")
@@ -70,7 +77,12 @@ print.nodesplit_summary <- function(x, ..., digits = 2) {
       sec_header(glue::glue("Node-split {x$trt2[i]} vs. {x$trt1[i]}"))
       cglue("")
     }
-    print(x$summary[[i]], ...)
+
+    # Omit comparison details from d[]
+    xsum <- x$summary[[i]]
+    xsum$summary$parameter <- stringr::str_remove(xsum$summary$parameter, "\\[.*\\]")
+
+    print(xsum, ...)
     cglue("")
     print(x$dic[[i]])
     cglue("")
