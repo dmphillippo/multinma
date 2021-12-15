@@ -93,6 +93,8 @@ as_tibble.nodesplit_summary <- function(x, ..., nest = FALSE) {
     out <- x
     out$summary <- purrr::map(out$summary, tibble::as_tibble)
     out <- tidyr::unnest(out, cols = "summary")
+    out$resdev <- purrr::map_dbl(out$dic, "resdev")
+    out$pd <- purrr::map_dbl(out$dic, "pd")
     out$dic <- purrr::map_dbl(out$dic, "dic")
     class(out) <- setdiff(class(out), "nodesplit_summary")
     return(out)
