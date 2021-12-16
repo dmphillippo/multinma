@@ -149,8 +149,8 @@ as.data.frame.nodesplit_summary <- function(x, ...) {
 #' @details Plotting is handled by [ggplot2] and the stats and geoms provided in
 #'   the [ggdist] package. As a result, the output is very flexible. Any
 #'   plotting stats provided by `ggdist` may be used, via the argument `stat`.
-#'   The default `"dens_overlay"` uses
-#'   \code{\link[ggdist:stat_slab]{ggdist::stat_slab()}}, to plot overlaid
+#'   The default `"dens_overlay"` is a special exception, which uses
+#'   \code{\link[ggplot2:geom_density]{ggplot2::geom_density()}}, to plot overlaid
 #'   densities. Additional arguments in `...` are passed to the `ggdist` stat,
 #'   to customise the output.
 #'
@@ -289,11 +289,12 @@ plot.nodesplit_summary <- function(x, ...,
   }
 
   if (stat == "dens_overlay") {
-    p <- p + do.call(tb_geom, args = rlang::dots_list(orientation = orientation,
-                                                      ...,
-                                                      slab_alpha = 0.5,
-                                                      slab_size = 0.75,
-                                                      .homonyms = "first"))
+    p <- p + do.call(ggplot2::geom_density,
+                     args = rlang::dots_list(orientation = if (horizontal) "x" else "y",
+                                             ...,
+                                             trim = TRUE,
+                                             alpha = 0.25,
+                                             .homonyms = "first"))
   } else {
     p <- p + do.call(tb_geom, args = list(orientation = orientation, ...))
   }

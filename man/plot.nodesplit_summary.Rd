@@ -45,8 +45,8 @@ Produce summary plots of node-splitting models
 Plotting is handled by \link{ggplot2} and the stats and geoms provided in
 the \link{ggdist} package. As a result, the output is very flexible. Any
 plotting stats provided by \code{ggdist} may be used, via the argument \code{stat}.
-The default \code{"dens_overlay"} uses
-\code{\link[ggdist:stat_slab]{ggdist::stat_slab()}}, to plot overlaid
+The default \code{"dens_overlay"} is a special exception, which uses
+\code{\link[ggplot2:geom_density]{ggplot2::geom_density()}}, to plot overlaid
 densities. Additional arguments in \code{...} are passed to the \code{ggdist} stat,
 to customise the output.
 
