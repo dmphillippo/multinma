@@ -229,7 +229,10 @@ smk_fit_RE_nodesplit <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 
                             prior_het = normal(scale = 5))
 }
 
+\donttest{
+# Summarise the node-splitting results
 summary(smk_fit_RE_nodesplit)
+}
 
 ## Plaque psoriasis ML-NMR
 # Set up plaque psoriasis network combining IPD and AgD

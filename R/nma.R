@@ -129,8 +129,10 @@
 #' @template ex_smoking_nma_re
 #' @template ex_smoking_nma_re_ume
 #' @template ex_smoking_nma_re_nodesplit
-#' @examples
+#' @examples \donttest{
+#' # Summarise the node-splitting results
 #' summary(smk_fit_RE_nodesplit)
+#' }
 #'
 #' ## Plaque psoriasis ML-NMR
 #' @template ex_plaque_psoriasis_network

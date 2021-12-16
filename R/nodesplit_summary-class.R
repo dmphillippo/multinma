@@ -170,7 +170,7 @@ as.data.frame.nodesplit_summary <- function(x, ...) {
 #' @export
 #'
 #' @template ex_smoking_nma_re_nodesplit_example
-#' @examples
+#' @examples \donttest{
 #' # Summarise the node-splitting results
 #' (smk_nodesplit_summary <- summary(smk_fit_RE_nodesplit))
 #'
@@ -184,6 +184,7 @@ as.data.frame.nodesplit_summary <- function(x, ...) {
 #' # Plot a comparison of the heterogeneity under the node-split models vs.
 #' # the consistency model
 #' plot(smk_nodesplit_summary, pars = "tau")
+#' }
 plot.nodesplit_summary <- function(x, ...,
                                    pars = "d",
                                    stat = "dens_overlay",

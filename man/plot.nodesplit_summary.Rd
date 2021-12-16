@@ -64,6 +64,7 @@ usual \link{ggplot2} functions to add further aesthetics, geoms, themes, etc.
 # Run smoking node-splitting example if not already available
 if (!exists("smk_fit_RE_nodesplit")) example("example_smk_nodesplit", run.donttest = TRUE)
 }
+\donttest{
 # Summarise the node-splitting results
 (smk_nodesplit_summary <- summary(smk_fit_RE_nodesplit))
 
@@ -77,6 +78,7 @@ plot(smk_nodesplit_summary, pars = "omega", stat = "halfeye", ref_line = 0)
 # Plot a comparison of the heterogeneity under the node-split models vs.
 # the consistency model
 plot(smk_nodesplit_summary, pars = "tau")
+}
 }
 \seealso{
 \code{\link[=summary.nma_nodesplit_df]{summary.nma_nodesplit_df()}}
