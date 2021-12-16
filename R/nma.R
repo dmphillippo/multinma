@@ -1855,17 +1855,17 @@ make_nma_model_matrix <- function(nma_formula,
   if (consistency == "nodesplit") {
     if (.has_ipd) {
       dat_ipd <- dplyr::group_by(dat_ipd, .data$.study) %>%
-        dplyr::mutate(.omega = 1*(all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2])) %>%
+        dplyr::mutate(.omega = all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2]) %>%
         dplyr::ungroup()
     }
     if (.has_agd_arm) {
       dat_agd_arm <- dplyr::group_by(dat_agd_arm, .data$.study) %>%
-        dplyr::mutate(.omega = 1*(all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2])) %>%
+        dplyr::mutate(.omega = all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2]) %>%
         dplyr::ungroup()
     }
     if (.has_agd_contrast) {
       dat_agd_contrast <- dplyr::group_by(dat_agd_contrast, .data$.study) %>%
-        dplyr::mutate(.omega = 1*(all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2])) %>%
+        dplyr::mutate(.omega = all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2]) %>%
         dplyr::ungroup()
     }
   }
@@ -1892,6 +1892,7 @@ make_nma_model_matrix <- function(nma_formula,
   if (".trt" %in% fvars) stats::contrasts(dat_all$.trt) <- "contr.treatment"
   if (".trtclass" %in% fvars) stats::contrasts(dat_all$.trtclass) <- "contr.treatment"
   if (".contr" %in% fvars) stats::contrasts(dat_all$.contr) <- "contr.treatment"
+  if (".omega" %in% fvars) stats::contrasts(dat_all$.omega) <- "contr.treatment"
   # .study handled separately next (not always a factor)
 
   # Drop study to factor to 1L if only one study (avoid contrasts need 2 or
@@ -2029,7 +2030,7 @@ make_nma_model_matrix <- function(nma_formula,
 get_model_data_columns <- function(data, regression = NULL, label = NULL) {
   if (!is.null(label)) label <- paste(" in", label)
   if (!is.null(regression)) {
-    regvars <- setdiff(all.vars(regression), c(".trt", ".trtclass", ".study"))
+    regvars <- setdiff(all.vars(regression), c(".trt", ".trtclass", ".study", ".contr", ".omega"))
     badvars <- setdiff(regvars, colnames(data))
     if (length(badvars)) {
       abort(
