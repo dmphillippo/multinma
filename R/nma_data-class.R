@@ -526,11 +526,12 @@ get_nodesplits <- function(network, include_consistency = FALSE) {
   colnames(comparisons) <- c("trt1", "trt2")
 
   out <- dplyr::as_tibble(comparisons) %>%
-    dplyr::mutate(trt1 = factor(trt1, levels = levels(network$treatments)),
-                  trt2 = factor(trt2, levels = levels(network$treatments))) %>%
-    dplyr::arrange(trt1, trt2) %>%
+    dplyr::mutate(trt1 = factor(.data$trt1, levels = levels(network$treatments)),
+                  trt2 = factor(.data$trt2, levels = levels(network$treatments))) %>%
+    dplyr::arrange(.data$trt1, .data$trt2) %>%
     dplyr::rowwise() %>%
-    dplyr::filter(has_direct(network, trt1, trt2) && has_indirect(network, trt1, trt2)) %>%
+    dplyr::filter(has_direct(network, .data$trt1, .data$trt2) &&
+                    has_indirect(network, .data$trt1, .data$trt2)) %>%
     dplyr::ungroup()
 
   # Add an NA row for the consistency model if include_consistency = TRUE

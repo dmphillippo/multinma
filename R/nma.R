@@ -212,7 +212,7 @@ nma <- function(network,
       ns_check <- dplyr::rowwise(nodesplit) %>%
         dplyr::mutate(direct = has_direct(network, .data$trt1, .data$trt2),
                       indirect = has_indirect(network, .data$trt1, .data$trt2),
-                      valid = direct && indirect)
+                      valid = .data$direct && .data$indirect)
 
       if (any(!ns_check$valid)) {
         ns_valid <- dplyr::filter(ns_check, .data$valid) %>%

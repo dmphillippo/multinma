@@ -255,7 +255,7 @@ plot.nodesplit_summary <- function(x, ...,
   if ("d" %in% pars) pars <- c(setdiff(pars, "d"), "d_dir", "d_ind", "d_net")
   if ("tau" %in% pars) pars <- c(pars, "tau_consistency")
 
-  draws <- dplyr::filter(draws, parameter %in% pars)
+  draws <- dplyr::filter(draws, .data$parameter %in% pars)
 
   draws$parameter <- nfactor(draws$parameter)
 
