@@ -957,7 +957,8 @@ nma.fit <- function(ipd_x, ipd_y,
 
   col_study <- grepl("^\\.study[^:]+$", x_names)
   col_trt <- grepl("^(\\.trt|\\.contr)[^:]+$", x_names)
-  col_reg <- !col_study & !col_trt
+  col_omega <- x_names == ".omegaTRUE"
+  col_reg <- !col_study & !col_trt & !col_omega
 
   n_trt <- sum(col_trt) + 1
 
@@ -1044,9 +1045,10 @@ nma.fit <- function(ipd_x, ipd_y,
   # Make full design matrix
   X_all <- rbind(ipd_x, agd_arm_x, agd_contrast_x)
 
-  # Make sure columns of X_all are in correct order (study, trt, regression terms)
+  # Make sure columns of X_all are in correct order (study, trt, omega (if nodesplit), regression terms)
   X_all <- cbind(X_all[, col_study, drop = FALSE],
                  X_all[, col_trt, drop = FALSE],
+                 X_all[, col_omega, drop = FALSE],
                  X_all[, col_reg, drop = FALSE])
 
   # Take thin QR decomposition if QR = TRUE
