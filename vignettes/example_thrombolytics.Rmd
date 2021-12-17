@@ -21,7 +21,7 @@ nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
 options(mc.cores = nc)
 ```
 
-This vignette describes the analysis of 50 trials of 8 thrombolytic drugs (streptokinase, SK; alteplase, t-PA; accelerated alteplase, Acc t-PA; streptokinase plus alteplase, SK+tPA; reteplase, r-PA; tenocteplase, TNK; urokinase, UK; anistreptilase, ASPAC) plus per-cutaneous transluminal coronary angioplasty (PTCA) [@Boland2003; @Lu2006; @TSD4].
+This vignette describes the analysis of 50 trials of 8 thrombolytic drugs (streptokinase, SK; alteplase, t-PA; accelerated alteplase, Acc t-PA; streptokinase plus alteplase, SK+tPA; reteplase, r-PA; tenocteplase, TNK; urokinase, UK; anistreptilase, ASPAC) plus per-cutaneous transluminal coronary angioplasty (PTCA) [@Boland2003; @Lu2006; @TSD4; @Dias2010].
 The number of deaths in 30 or 35 days following acute myocardial infarction are recorded.
 The data are available in this package as `thrombolytics`:
 ```{r}
@@ -98,14 +98,16 @@ There are a number of points which are not very well fit by the model, having po
 
 
 ### Checking for inconsistency
-We fit an unrelated mean effects (UME) model [@TSD4] to assess the consistency assumption.
+
+#### Unrelated mean effects model
+We first fit an unrelated mean effects (UME) model [@TSD4] to assess the consistency assumption.
 Again, we use the function `nma()`, but now with the argument `consistency = "ume"`.
 ```{r}
 thrombo_fit_ume <- nma(thrombo_net, 
-                  consistency = "ume",
-                  trt_effects = "fixed",
-                  prior_intercept = normal(scale = 100),
-                  prior_trt = normal(scale = 100))
+                       consistency = "ume",
+                       trt_effects = "fixed",
+                       prior_intercept = normal(scale = 100),
+                       prior_trt = normal(scale = 100))
 thrombo_fit_ume
 ```
 
@@ -125,6 +127,46 @@ plot(dic_consistency, dic_ume, show_uncertainty = FALSE)
 The four points lying in the lower right corner of the plot have much lower posterior mean residual deviance under the UME model, indicating that these data are potentially inconsistent.
 These points correspond to trials 44 and 45, the only two trials comparing Acc t-PA to ASPAC.
 The ASPAC vs. Acc t-PA estimates are very different under the consistency model and inconsistency (UME) model, suggesting that these two trials may be systematically different from the others in the network.
+
+#### Node-splitting
+Another method for assessing inconsistency is node-splitting [@TSD4; @Dias2010].
+Whereas the UME model assesses inconsistency globally, node-splitting assesses inconsistency locally for each potentially inconsistent comparison (those with both direct and indirect evidence) in turn.
+
+Node-splitting can be performed using the `nma()` function with the argument `consistency = "nodesplit"`.
+By default, all possible comparisons will be split (as determined by the `get_nodesplits()` function).
+Alternatively, a specific comparison or comparisons to split can be provided to the `nodesplit` argument.
+```{r}
+thrombo_nodesplit <- nma(thrombo_net, 
+                         consistency = "nodesplit",
+                         trt_effects = "fixed",
+                         prior_intercept = normal(scale = 100),
+                         prior_trt = normal(scale = 100))
+```
+
+The `summary()` method summarises the node-splitting results, displaying the direct and indirect estimates $d_\mathrm{dir}$ and $d_\mathrm{ind}$ from each node-split model, the network estimate $d_\mathrm{net}$ from the consistency model, the inconsistency factor $\omega = d_\mathrm{dir} - d_\mathrm{ind}$, and a Bayesian $p$-value for inconsistency on each comparison.
+The DIC model fit statistics are also provided.
+(If a random effects model was fitted, the heterogeneity standard deviation $tau$ under each node-split model and under the consistency model would also be displayed.)
+```{r}
+summary(thrombo_nodesplit)
+```
+
+Node-splitting the ASPAC vs. Acc t-PA comparison results the lowest DIC, and this is lower than the consistency model.
+The posterior distribution for the inconsistency factor $\omega$ for this comparison lies far from 0 and the Bayesian $p$-value for inconsistency is small (< 0.01), meaning that there is substantial disagreement between the direct and indirect evidence on this comparison.
+
+We can visually compare the direct, indirect, and network estimates using the `plot()` method.
+```{r thrombo_nodesplit}
+plot(thrombo_nodesplit)
+```
+
+We can also plot the posterior distributions of the inconsistency factors $\omega$, again using the `plot()` method.
+Here, we specify a "halfeye" plot of the posterior density with median and credible intervals, and customise the plot layout with standard `ggplot2` functions.
+```{r thrombo_nodesplit_omega, fig.height = 6}
+plot(thrombo_nodesplit, pars = "omega", stat = "halfeye", ref_line = 0) +
+  ggplot2::aes(y = comparison) +
+  ggplot2::facet_null()
+```
+
+Notice again that the posterior distribution of the inconsistency factor for the ASPAC vs. Acc t-PA comparison lies far from 0, indicating substantial inconsistency between the direct and indirect evidence on this comparison.
 
 ### Further results
 Relative effects for all pairwise contrasts between treatments can be produced using the `relative_effects()` function, with `all_contrasts = TRUE`.
