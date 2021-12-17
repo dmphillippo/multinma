@@ -294,13 +294,14 @@ plot.nodesplit_summary <- function(x, ...,
                                              ...,
                                              trim = TRUE,
                                              alpha = 0.25,
-                                             .homonyms = "first"))
+                                             .homonyms = "first")) +
+      ggplot2::facet_wrap(~comparison, scales = "free")
   } else {
-    p <- p + do.call(tb_geom, args = list(orientation = orientation, ...))
+    p <- p + do.call(tb_geom, args = list(orientation = orientation, ...)) +
+      ggplot2::facet_wrap(~comparison)
   }
 
-  p <- p  +
-    ggplot2::facet_wrap(~comparison, scales = "free") +
+  p <- p +
     theme_multinma()
 
   return(p)
