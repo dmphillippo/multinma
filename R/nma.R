@@ -58,7 +58,9 @@
 #'
 #'   For the advanced user, the additional specials `.study` and `.trtclass` are
 #'   also available, and refer to studies and (if specified) treatment classes
-#'   respectively.
+#'   respectively. When node-splitting models are fitted (`consistency =
+#'   "nodesplit"`) the special `.omega` is available, indicating the arms
+#'   to which the node-splitting inconsistency factor is added.
 #'
 #'   See \code{\link[multinma:priors]{?priors}} for details on prior
 #'   specification. Default prior distributions are available, but may not be
