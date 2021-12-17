@@ -182,3 +182,113 @@ test_that("nma() nodesplit warning about ignoring comparisons", {
     "Ignoring node-split comparisons.+Acc t-PA vs\\. TNK"
   )
 })
+
+test_that("nma() nodesplit argument validation", {
+  m1 <- "The data frame passed to `nodesplit` should have two columns"
+
+  expect_error(
+    nma(thrombo_net,
+        consistency = "nodesplit",
+        nodesplit = data.frame(),
+        prior_intercept = normal(scale = 10),
+        prior_trt = normal(scale = 10)),
+    m1
+  )
+
+  expect_error(
+    nma(thrombo_net,
+        consistency = "nodesplit",
+        nodesplit = data.frame(a = 1, b = 2, c = 3),
+        prior_intercept = normal(scale = 10),
+        prior_trt = normal(scale = 10)),
+    m1
+  )
+
+  m2 <- "`nodesplit` should either be a length 2 vector or a 2 column data frame"
+
+  expect_error(
+    nma(thrombo_net,
+        consistency = "nodesplit",
+        nodesplit = list(),
+        prior_intercept = normal(scale = 10),
+        prior_trt = normal(scale = 10)),
+    m2
+  )
+
+  expect_error(
+    nma(thrombo_net,
+        consistency = "nodesplit",
+        nodesplit = 1:3,
+        prior_intercept = normal(scale = 10),
+        prior_trt = normal(scale = 10)),
+    m2
+  )
+})
+
+thrombo_ns1 <- nma(thrombo_net,
+                   consistency = "nodesplit",
+                   nodesplit = c("SK", "t-PA"),
+                   prior_intercept = normal(scale = 10),
+                   prior_trt = normal(scale = 10),
+                   test_grad = TRUE)
+
+thrombo_ns2<- nma(thrombo_net,
+                  consistency = "nodesplit",
+                  nodesplit = data.frame(trt1 = "SK", trt2 = "t-PA"),
+                  prior_intercept = normal(scale = 10),
+                  prior_trt = normal(scale = 10),
+                  test_grad = TRUE)
+
+test_that("nma() nodesplit produces correct classes", {
+  expect_s3_class(thrombo_ns1, "nma_nodesplit")
+  expect_s3_class(thrombo_ns2, "nma_nodesplit_df")
+})
+
+test_that("summary method consistency argument requires consistency model", {
+  m <- "should be a fitted consistency model"
+  expect_error(summary(thrombo_ns1, consistency = thrombo_ns1), m)
+  expect_error(summary(thrombo_ns2, consistency = thrombo_ns1), m)
+  expect_error(summary(thrombo_ns1, consistency = "bad"), m)
+  expect_error(summary(thrombo_ns2, consistency = "bad"), m)
+})
+
+test_that("summary method checks nodesplit and consistency models are compatible", {
+  skip_on_cran()
+
+  m <- "does not match the node-splitting model"
+
+  suppressWarnings({
+    thrombo_ns1 <- nma(thrombo_net,
+                       consistency = "nodesplit",
+                       nodesplit = c("SK", "t-PA"),
+                       prior_intercept = normal(scale = 10),
+                       prior_trt = normal(scale = 10),
+                       iter = 1)
+
+    thrombo_ns2<- nma(thrombo_net,
+                      consistency = "nodesplit",
+                      nodesplit = data.frame(trt1 = "SK", trt2 = "t-PA"),
+                      prior_intercept = normal(scale = 10),
+                      prior_trt = normal(scale = 10),
+                      iter = 1)
+
+    thrombo_re <- nma(thrombo_net,
+                      trt_effects = "random",
+                      prior_intercept = normal(scale = 10),
+                      prior_trt = normal(scale = 10),
+                      prior_het = half_normal(2),
+                      iter = 1)
+
+    thrombo_reg <- nma(thrombo_net,
+                       regression = ~I(rnorm(102)),
+                       prior_intercept = normal(scale = 10),
+                       prior_trt = normal(scale = 10),
+                       prior_reg = normal(scale = 10),
+                       iter = 1)
+  })
+
+  expect_error(summary(thrombo_ns1, consistency = thrombo_re), m)
+  expect_error(summary(thrombo_ns2, consistency = thrombo_re), m)
+  expect_error(summary(thrombo_ns1, consistency = thrombo_reg), m)
+  expect_error(summary(thrombo_ns2, consistency = thrombo_reg), m)
+})
