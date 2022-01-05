@@ -29,7 +29,7 @@ head(smoking)
 ```
 
 
-### Setting up the network
+## Setting up the network
 We begin by setting up the network.
 We have arm-level count data giving the number quitting smoking (`r`) out of the total (`n`) in each arm, so we use the function `set_agd_arm()`.
 Treatment "No intervention" is set as the network reference treatment.
@@ -51,7 +51,7 @@ plot(smknet, weight_edges = TRUE, weight_nodes = TRUE)
 plot(smknet, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(plot.margin = ggplot2::unit(c(1, 1, 1, 6), "lines"))
 ```
 
-### Random effects NMA
+## Random effects NMA
 Following TSD 4, we fit a random effects NMA model, using the `nma()` function with `trt_effects = "random"`.
 We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and a $\textrm{half-N}(5^2)$ prior distribution for the between-study heterogeneity standard deviation $\tau$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
@@ -110,7 +110,7 @@ smoking[smoking$r == 0, ]
 ```
 
 
-### Checking for inconsistency
+## Checking for inconsistency
 We fit an unrelated mean effects (UME) model [@TSD4] to assess the consistency assumption.
 Again, we use the function `nma()`, but now with the argument `consistency = "ume"`.
 ```{r}
@@ -138,7 +138,7 @@ plot(dic_consistency, dic_ume, point_alpha = 0.5, interval_alpha = 0.2)
 
 All points lie roughly on the line of equality, so there is no evidence for inconsistency here.
 
-### Further results
+## Further results
 Pairwise relative effects, for all pairwise contrasts with `all_contrasts = TRUE`.
 ```{r smoking_releff, fig.height=4.5}
 (smk_releff <- relative_effects(smkfit, all_contrasts = TRUE))

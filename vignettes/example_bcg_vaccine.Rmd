@@ -33,7 +33,7 @@ head(bcg_vaccine)
 
 @TSD3 used these data to demonstrate meta-regression models adjusting for the continuous covariate `latitude`, the absolute degrees latitude at which the study was conducted, which we recreate here.
 
-### Setting up the network
+## Setting up the network
 We have data giving the number diagnosed with TB during trial follow-up (`r`) out of the total (`n`) in each arm, so we use the function `set_agd_arm()` to set up the network.
 We set "unvaccinated" as the network reference treatment.
 ```{r}
@@ -48,10 +48,10 @@ bcg_net
 
 The `latitude` variable in the `bcg_vaccine` data frame will automatically be available to use in a meta-regression model.
 
-### Meta-analysis models
+## Meta-analysis models
 We fit random effects (RE) models, firstly without any covariates, and then with a meta-regression on the continuous covariate `latitude`.
 
-#### RE meta-analysis (no covariate)
+### RE meta-analysis (no covariate)
 We start by fitting a standard RE model without any covariates.
 We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effect $d_\mathrm{Vaccine}$ and study-specific intercepts $\mu_j$, and a $\textrm{half-N}(0, 5^2)$ prior distribution for the heterogeneity standard deviation $\tau$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
@@ -93,7 +93,7 @@ The prior and posterior distributions can be compared visually using the `plot_p
 plot_prior_posterior(bcg_fit_unadj, prior = c("trt", "het"))
 ```
 
-#### RE meta-regression with covariate `latitude`
+### RE meta-regression with covariate `latitude`
 We now fit a RE meta-regression model, adjusting for `latitude`.
 We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effect $d_\mathrm{Vaccine}$, study-specific intercepts $\mu_j$, and regression coefficient $\beta$.
 We use a $\text{half-N}(0, 5^2)$ prior distribution for the heterogeneity standard deviation $\tau$.
@@ -148,7 +148,7 @@ The prior and posterior distributions can be compared visually using the `plot_p
 plot_prior_posterior(bcg_fit_lat, prior = c("trt", "reg", "het"))
 ```
 
-### Model fit and comparison
+## Model fit and comparison
 Model fit can be checked using the `dic()` function:
 ```{r}
 (bcg_dic_unadj <- dic(bcg_fit_unadj))
