@@ -1,6 +1,7 @@
 ---
 title: "Example: Dietary fat"
 output: rmarkdown::html_vignette
+link-citations: yes
 bibliography: ../inst/REFERENCES.bib
 params:
   run_tests: FALSE
