@@ -77,10 +77,10 @@ plot(dic_consistency)
 
 ## -------------------------------------------------------------------------------------------------
 thrombo_fit_ume <- nma(thrombo_net, 
-                  consistency = "ume",
-                  trt_effects = "fixed",
-                  prior_intercept = normal(scale = 100),
-                  prior_trt = normal(scale = 100))
+                       consistency = "ume",
+                       trt_effects = "fixed",
+                       prior_intercept = normal(scale = 100),
+                       prior_trt = normal(scale = 100))
 thrombo_fit_ume
 
 
@@ -91,6 +91,28 @@ dic_consistency
 
 ## ----thrombo_devdev_plot--------------------------------------------------------------------------
 plot(dic_consistency, dic_ume, show_uncertainty = FALSE)
+
+
+## -------------------------------------------------------------------------------------------------
+thrombo_nodesplit <- nma(thrombo_net, 
+                         consistency = "nodesplit",
+                         trt_effects = "fixed",
+                         prior_intercept = normal(scale = 100),
+                         prior_trt = normal(scale = 100))
+
+
+## -------------------------------------------------------------------------------------------------
+summary(thrombo_nodesplit)
+
+
+## ----thrombo_nodesplit, fig.width = 7-------------------------------------------------------------
+plot(thrombo_nodesplit)
+
+
+## ----thrombo_nodesplit_omega, fig.height = 6------------------------------------------------------
+plot(thrombo_nodesplit, pars = "omega", stat = "halfeye", ref_line = 0) +
+  ggplot2::aes(y = comparison) +
+  ggplot2::facet_null()
 
 
 ## ----thrombo_releff-------------------------------------------------------------------------------
@@ -216,5 +238,48 @@ test_that("UME DIC", {
   expect_equivalent(dic_ume$resdev, 99.7, tolerance = tol_dic)
   expect_equivalent(dic_ume$pd, 65, tolerance = tol_dic)
   expect_equivalent(dic_ume$dic, 164.7, tolerance = tol_dic)
+})
+
+
+# Node-splitting
+trt_code <- c("SK", "t-PA", "Acc t-PA", "SK + t-PA", "r-PA",
+              "TNK", "PTCA", "UK", "ASPAC")
+
+dias2010_nodesplit_dic <- tribble(
+  ~trt1, ~trt2, ~resdev,   ~pd,   ~dic,
+      1,     2,   106.4,  58.7,  165.1,
+      1,     3,   106.2,  58.7,  165.0,
+      1,     5,   106.1,  58.7,  164.8,
+      1,     7,   105.5,  58.7,  164.2,
+      1,     8,   106.9,  58.7,  165.6,
+      1,     9,   104.3,  58.7,  163.0,
+      2,     7,   106.9,  58.7,  165.6,
+      2,     8,   106.8,  58.7,  165.5,
+      2,     9,   103.3,  58.7,  162.0,
+      3,     4,   106.5,  58.7,  165.2,
+      3,     5,   106.1,  58.7,  164.8,
+      3,     7,   105.5,  58.7,  164.2,
+      3,     8,   106.6,  58.7,  165.3,
+      3,     9,    96.9,  58.7,  155.6) %>% 
+  mutate(trt1 = forcats::fct_relevel(factor(trt1, levels = 1:9, labels = trt_code), 
+                                     !! levels(thrombo_net$treatments)),
+         trt2 = forcats::fct_relevel(factor(trt2, levels = 1:9, labels = trt_code), 
+                                     !! levels(thrombo_net$treatments)))
+
+for (i in 1:nrow(dias2010_nodesplit_dic)) {
+  if (as.numeric(dias2010_nodesplit_dic$trt1[i]) > as.numeric(dias2010_nodesplit_dic$trt2[i])) {
+    dias2010_nodesplit_dic[i, c("trt1", "trt2")] <- dias2010_nodesplit_dic[i, c("trt2", "trt1")]
+  }
+}
+
+dias2010_nodesplit_dic <- arrange(dias2010_nodesplit_dic, trt1, trt2)
+
+thrombo_nodesplit_dic <- as_tibble(summary(thrombo_nodesplit), nest = FALSE) %>% 
+  distinct(trt1, trt2, resdev, pd, dic)
+
+test_that("Node-splitting DIC", {
+  expect_equal(thrombo_nodesplit_dic$dic, dias2010_nodesplit_dic$dic, tolerance = tol_dic)
+  expect_equal(thrombo_nodesplit_dic$resdev, dias2010_nodesplit_dic$resdev, tolerance = tol_dic)
+  expect_equal(thrombo_nodesplit_dic$pd, dias2010_nodesplit_dic$pd, tolerance = tol_dic)
 })
 
