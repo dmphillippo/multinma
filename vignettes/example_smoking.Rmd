@@ -111,7 +111,9 @@ smoking[smoking$r == 0, ]
 
 
 ## Checking for inconsistency
-We fit an unrelated mean effects (UME) model [@TSD4] to assess the consistency assumption.
+
+### Unrelated mean effects
+We first fit an unrelated mean effects (UME) model [@TSD4] to assess the consistency assumption.
 Again, we use the function `nma()`, but now with the argument `consistency = "ume"`.
 ```{r}
 smkfit_ume <- nma(smknet, 
@@ -137,6 +139,40 @@ plot(dic_consistency, dic_ume, point_alpha = 0.5, interval_alpha = 0.2)
 ```
 
 All points lie roughly on the line of equality, so there is no evidence for inconsistency here.
+
+### Node-splitting
+Another method for assessing inconsistency is node-splitting [@TSD4; @Dias2010].
+Whereas the UME model assesses inconsistency globally, node-splitting assesses inconsistency locally for each potentially inconsistent comparison (those with both direct and indirect evidence) in turn.
+
+Node-splitting can be performed using the `nma()` function with the argument `consistency = "nodesplit"`.
+By default, all possible comparisons will be split (as determined by the `get_nodesplits()` function).
+Alternatively, a specific comparison or comparisons to split can be provided to the `nodesplit` argument.
+```{r}
+smk_nodesplit <- nma(smknet, 
+                     consistency = "nodesplit",
+                     trt_effects = "random",
+                     prior_intercept = normal(scale = 100),
+                     prior_trt = normal(scale = 100),
+                     prior_het = normal(scale = 5))
+```
+
+The `summary()` method summarises the node-splitting results, displaying the direct and indirect estimates $d_\mathrm{dir}$ and $d_\mathrm{ind}$ from each node-split model, the network estimate $d_\mathrm{net}$ from the consistency model, the inconsistency factor $\omega = d_\mathrm{dir} - d_\mathrm{ind}$, and a Bayesian $p$-value for inconsistency on each comparison.
+Since random effects models are fitted, the heterogeneity standard deviation $tau$ under each node-split model and under the consistency model is also displayed.
+The DIC model fit statistics are also provided.
+```{r}
+summary(smk_nodesplit)
+```
+
+The DIC of each inconsistency model is unchanged from the consistency model, no node-splits result in reduced heterogeneity standard deviation $\tau$ compared to the consistency model, and the Bayesian $p$-values are all large.
+There is no evidence of inconsistency.
+
+We can visually compare the posterior distributions of the direct, indirect, and network estimates using the `plot()` method.
+These are all in agreement; the posterior densities of the direct and indirect estimates overlap.
+Notice that there is not much indirect information for the Individual counselling vs. No intervention comparison, so the network (consistency) estimate is very similar to the direct estimate for this comparison.
+```{r smk_nodesplit, fig.width = 7}
+plot(smk_nodesplit) +
+  ggplot2::theme(legend.position = "bottom", legend.direct = "horizontal")
+```
 
 ## Further results
 Pairwise relative effects, for all pairwise contrasts with `all_contrasts = TRUE`.

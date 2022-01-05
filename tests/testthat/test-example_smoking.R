@@ -107,6 +107,24 @@ dic_consistency
 plot(dic_consistency, dic_ume, point_alpha = 0.5, interval_alpha = 0.2)
 
 
+## -------------------------------------------------------------------------------------------------
+smk_nodesplit <- nma(smknet, 
+                     consistency = "nodesplit",
+                     trt_effects = "random",
+                     prior_intercept = normal(scale = 100),
+                     prior_trt = normal(scale = 100),
+                     prior_het = normal(scale = 5))
+
+
+## -------------------------------------------------------------------------------------------------
+summary(smk_nodesplit)
+
+
+## ----smk_nodesplit, fig.width = 7-----------------------------------------------------------------
+plot(smk_nodesplit) +
+  ggplot2::theme(legend.position = "bottom", legend.direct = "horizontal")
+
+
 ## ----smoking_releff, fig.height=4.5---------------------------------------------------------------
 (smk_releff <- relative_effects(smkfit, all_contrasts = TRUE))
 plot(smk_releff, ref_line = 0)
