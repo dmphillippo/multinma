@@ -112,6 +112,10 @@ smoking[smoking$r == 0, ]
 
 ## Checking for inconsistency
 
+> **Note:** The results of the inconsistency models here are slightly different to those of Dias et al. [-@Dias2010; -@TSD4], although the overall conclusions are the same.
+> This is due to the presence of multi-arm trials and a different ordering of treatments, meaning that inconsistency is parameterised differently within the multi-arm trials.
+> The same results as Dias et al. are obtained if the network is instead set up with `trtn` as the treatment variable.
+
 ### Unrelated mean effects
 We first fit an unrelated mean effects (UME) model [@TSD4] to assess the consistency assumption.
 Again, we use the function `nma()`, but now with the argument `consistency = "ume"`.
