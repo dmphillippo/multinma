@@ -29,7 +29,7 @@ head(thrombolytics)
 ```
 
 
-### Setting up the network
+## Setting up the network
 We begin by setting up the network.
 We have arm-level count data giving the number of deaths (`r`) out of the total (`n`) in each arm, so we use the function `set_agd_arm()`.
 By default, SK is set as the network reference treatment.
@@ -51,7 +51,7 @@ plot(thrombo_net, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(leg
 ```
 
 
-### Fixed effects NMA
+## Fixed effects NMA
 Following TSD 4 [@TSD4], we fit a fixed effects NMA model, using the `nma()` function with `trt_effects = "fixed"`.
 We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
@@ -97,9 +97,9 @@ plot(dic_consistency)
 There are a number of points which are not very well fit by the model, having posterior mean residual deviance contributions greater than 1.
 
 
-### Checking for inconsistency
+## Checking for inconsistency
 
-#### Unrelated mean effects model
+### Unrelated mean effects model
 We first fit an unrelated mean effects (UME) model [@TSD4] to assess the consistency assumption.
 Again, we use the function `nma()`, but now with the argument `consistency = "ume"`.
 ```{r}
@@ -128,7 +128,7 @@ The four points lying in the lower right corner of the plot have much lower post
 These points correspond to trials 44 and 45, the only two trials comparing Acc t-PA to ASPAC.
 The ASPAC vs. Acc t-PA estimates are very different under the consistency model and inconsistency (UME) model, suggesting that these two trials may be systematically different from the others in the network.
 
-#### Node-splitting
+### Node-splitting
 Another method for assessing inconsistency is node-splitting [@TSD4; @Dias2010].
 Whereas the UME model assesses inconsistency globally, node-splitting assesses inconsistency locally for each potentially inconsistent comparison (those with both direct and indirect evidence) in turn.
 
@@ -168,7 +168,7 @@ plot(thrombo_nodesplit, pars = "omega", stat = "halfeye", ref_line = 0) +
 
 Notice again that the posterior distribution of the inconsistency factor for the ASPAC vs. Acc t-PA comparison lies far from 0, indicating substantial inconsistency between the direct and indirect evidence on this comparison.
 
-### Further results
+## Further results
 Relative effects for all pairwise contrasts between treatments can be produced using the `relative_effects()` function, with `all_contrasts = TRUE`.
 ```{r thrombo_releff}
 (thrombo_releff <- relative_effects(thrombo_fit, all_contrasts = TRUE))
