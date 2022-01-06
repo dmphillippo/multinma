@@ -73,8 +73,10 @@ set_ipd <- function(data,
   check_study(.study)
 
   if (is.factor(.study)) {
-    attr(.study, "original_levels") <- levels(.study)
+    study_original_levels <- levels(.study)
     .study <- forcats::fct_drop(.study)
+  } else {
+    study_original_levels <- NULL
   }
 
   if (missing(trt)) abort("Specify `trt`")
@@ -83,8 +85,10 @@ set_ipd <- function(data,
   check_trt(.trt)
 
   if (is.factor(.trt)) {
-    attr(.trt, "original_levels") <- levels(.trt)
+    trt_original_levels <- levels(.trt)
     .trt <- forcats::fct_drop(.trt)
+  } else {
+    trt_original_levels <- NULL
   }
 
   # Check for single-arm studies
@@ -105,8 +109,10 @@ set_ipd <- function(data,
     check_trt_class(.trtclass, .trt)
 
     if (is.factor(.trtclass)) {
-      attr(.trtclass, "original_levels") <- levels(.trtclass)
+      trtclass_original_levels <- levels(.trtclass)
       .trtclass <- forcats::fct_drop(.trtclass)
+    } else {
+      trtclass_original_levels <- NULL
     }
   }
 
@@ -219,9 +225,9 @@ set_ipd <- function(data,
   }
 
   # Add original_levels attributes (if not NULL)
-  attr(out$treatments, "original_levels") <- attr(.trt, "original_levels")
-  attr(out$studies, "original_levels") <- attr(.study, "original_levels")
-  if (!is.null(.trtclass)) attr(out$classes, "original_levels") <- attr(.trtclass, "original_levels")
+  attr(out$treatments, "original_levels") <- trt_original_levels
+  attr(out$studies, "original_levels") <- study_original_levels
+  if (!is.null(.trtclass)) attr(out$classes, "original_levels") <- trtclass_original_levels
 
   return(out)
 }
@@ -295,8 +301,10 @@ set_agd_arm <- function(data,
   check_study(.study)
 
   if (is.factor(.study)) {
-    attr(.study, "original_levels") <- levels(.study)
+    study_original_levels <- levels(.study)
     .study <- forcats::fct_drop(.study)
+  } else {
+    study_original_levels <- NULL
   }
 
   if (missing(trt)) abort("Specify `trt`")
@@ -305,8 +313,10 @@ set_agd_arm <- function(data,
   check_trt(.trt)
 
   if (is.factor(.trt)) {
-    attr(.trt, "original_levels") <- levels(.trt)
+    trt_original_levels <- levels(.trt)
     .trt <- forcats::fct_drop(.trt)
+  } else {
+    trt_original_levels <- NULL
   }
 
   # Check for single-arm studies
@@ -326,8 +336,10 @@ set_agd_arm <- function(data,
     check_trt_class(.trtclass, .trt)
 
     if (is.factor(.trtclass)) {
-      attr(.trtclass, "original_levels") <- levels(.trtclass)
+      trtclass_original_levels <- levels(.trtclass)
       .trtclass <- forcats::fct_drop(.trtclass)
+    } else {
+      trtclass_original_levels <- NULL
     }
   }
 
@@ -447,9 +459,9 @@ set_agd_arm <- function(data,
   }
 
   # Add original_levels attributes (if not NULL)
-  attr(out$treatments, "original_levels") <- attr(.trt, "original_levels")
-  attr(out$studies, "original_levels") <- attr(.study, "original_levels")
-  if (!is.null(.trtclass)) attr(out$classes, "original_levels") <- attr(.trtclass, "original_levels")
+  attr(out$treatments, "original_levels") <- trt_original_levels
+  attr(out$studies, "original_levels") <- study_original_levels
+  if (!is.null(.trtclass)) attr(out$classes, "original_levels") <- trtclass_original_levels
 
   return(out)
 }
@@ -535,8 +547,10 @@ set_agd_contrast <- function(data,
   check_study(.study)
 
   if (is.factor(.study)) {
-    attr(.study, "original_levels") <- levels(.study)
+    study_original_levels <- levels(.study)
     .study <- forcats::fct_drop(.study)
+  } else {
+    study_original_levels <- NULL
   }
 
   if (missing(trt)) abort("Specify `trt`")
@@ -545,8 +559,10 @@ set_agd_contrast <- function(data,
   check_trt(.trt)
 
   if (is.factor(.trt)) {
-    attr(.trt, "original_levels") <- levels(.trt)
+    trt_original_levels <- levels(.trt)
     .trt <- forcats::fct_drop(.trt)
+  } else {
+    trt_original_levels <- NULL
   }
 
   # Check for single-arm studies
@@ -566,8 +582,10 @@ set_agd_contrast <- function(data,
     check_trt_class(.trtclass, .trt)
 
     if (is.factor(.trtclass)) {
-      attr(.trtclass, "original_levels") <- levels(.trtclass)
+      trtclass_original_levels <- levels(.trtclass)
       .trtclass <- forcats::fct_drop(.trtclass)
+    } else {
+      trtclass_original_levels <- NULL
     }
   }
 
@@ -695,9 +713,9 @@ set_agd_contrast <- function(data,
   }
 
   # Add original_levels attributes (if not NULL)
-  attr(out$treatments, "original_levels") <- attr(.trt, "original_levels")
-  attr(out$studies, "original_levels") <- attr(.study, "original_levels")
-  if (!is.null(.trtclass)) attr(out$classes, "original_levels") <- attr(.trtclass, "original_levels")
+  attr(out$treatments, "original_levels") <- trt_original_levels
+  attr(out$studies, "original_levels") <- study_original_levels
+  if (!is.null(.trtclass)) attr(out$classes, "original_levels") <- trtclass_original_levels
 
   return(out)
 }
@@ -768,7 +786,10 @@ combine_network <- function(..., trt_ref) {
   if (!any(purrr::map_lgl(trt_original_levels, is.null)) &&
       all(purrr::map_lgl(trt_original_levels, ~identical(., trt_original_levels[[1]])))) {
 
-    trts <- intersect(trt_original_levels[[1]], trts)
+    trt_original_levels <- trt_original_levels[[1]]
+    trts <- intersect(trt_original_levels, trts)
+  } else {
+    trt_original_levels <- NULL
   }
 
   if (!missing(trt_ref)) {
@@ -800,13 +821,16 @@ combine_network <- function(..., trt_ref) {
     if (!any(purrr::map_lgl(class_original_levels, is.null)) &&
         all(purrr::map_lgl(class_original_levels, ~identical(., class_original_levels[[1]])))) {
 
-      class_lvls <- intersect(class_original_levels[[1]], class_lvls)
+      class_original_levels <- class_original_levels[[1]]
+      class_lvls <- intersect(class_original_levels, class_lvls)
+    } else {
+      class_original_levels <- NULL
     }
 
     class_ref <- as.character(class_lookup[[1, ".trtclass"]])
     class_lvls <- c(class_ref, setdiff(class_lvls, class_ref))
 
-    class_lookup$.trtclass <- forcats::fct_relevel(class_lookup$.trtclass, class_ref)
+    class_lookup$.trtclass <- forcats::fct_relevel(class_lookup$.trtclass, class_lvls)
 
     classes <- class_lookup$.trtclass
   } else if (any(has_classes)) {
@@ -831,7 +855,10 @@ combine_network <- function(..., trt_ref) {
   if (!any(purrr::map_lgl(study_original_levels, is.null)) &&
       all(purrr::map_lgl(study_original_levels, ~identical(., study_original_levels[[1]])))) {
 
-    studs <- intersect(study_original_levels[[1]], studs)
+    study_original_levels <- study_original_levels[[1]]
+    studs <- intersect(study_original_levels, studs)
+  } else {
+    study_original_levels <- NULL
   }
 
   # Get ipd
@@ -941,6 +968,11 @@ combine_network <- function(..., trt_ref) {
         out$agd_contrast$.trtclass <- forcats::fct_relevel(out$agd_contrast$.trtclass, class_ref)
     }
   }
+
+  # Add original_levels attributes (if not NULL)
+  attr(out$treatments, "original_levels") <- trt_original_levels
+  attr(out$studies, "original_levels") <- study_original_levels
+  if (!is.null(classes)) attr(out$classes, "original_levels") <- class_original_levels
 
   return(out)
 }

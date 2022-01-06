@@ -517,6 +517,8 @@ test_that("set_* can set `trt_ref`", {
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_ref = factor("B"))$treatments,
                f_BAC)
 
+  # Using trtf sets original_levels attribute
+  attr(f_BAC, "original_levels") <- LETTERS[1:3]
   expect_equal(set_ipd(agd_arm, studyc, trtf, y = cont, trt_ref = "B")$treatments,
                f_BAC)
   expect_equal(set_agd_arm(agd_arm, studyc, trtf, y = cont, se = cont_pos, trt_ref = "B")$treatments,
@@ -539,6 +541,7 @@ test_that("set_* can set `trt_ref`", {
                f_213)
 
   f_BCA <- factor(LETTERS[c(2,3,1)], levels = LETTERS[c(2,3,1)])
+  attr(f_BCA, "original_levels") <- LETTERS[3:1]
   expect_equal(set_ipd(agd_arm, studyc, trtf2, y = cont, trt_ref = "B")$treatments,
                f_BCA)
   expect_equal(set_agd_arm(agd_arm, studyc, trtf2, y = cont, se = cont_pos, trt_ref = "B")$treatments,
@@ -679,6 +682,8 @@ test_that("set_* returns classes factor variable", {
   expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_class = tclassc))$classes,
                f_class)
 
+  # Using tclassf sets original_levels attribute
+  attr(f_class, "original_levels") <- c("a", "b")
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"))$classes,
                f_class)
@@ -718,6 +723,27 @@ test_that("set_* returns classes factor variable", {
                                 trt_class = tclassc), trt_ref = "B")$classes,
                f_class2)
 
+  # Checks when default trt_ref not first in sort order
+  expect_equal(set_ipd(aa, studyc, trtc, y = cont,
+                       trt_class = tclassc)$classes,
+               f_class2)
+  expect_equal(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = tclassc)$classes,
+               f_class2)
+  expect_equal(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = tclassc)$classes,
+               f_class2)
+  expect_equal(combine_network(set_ipd(aa, studyc, trtc, y = cont,
+                                       trt_class = tclassc))$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
+                                           trt_class = tclassc))$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
+                                                trt_class = tclassc))$classes,
+               f_class2)
+
+  attr(f_class2, "original_levels") <- c("a", "b")
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
                        trt_ref = "B")$classes,
@@ -743,7 +769,34 @@ test_that("set_* returns classes factor variable", {
                                trt_ref = "B")$classes,
                f_class2)
 
+  # Checks when default trt_ref not first in sort order
+  expect_equal(set_ipd(aa, studyc, trtc, y = cont,
+                       trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
+                       trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
+                           trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
+                                trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_ipd(aa, studyc, trtc, y = cont,
+                                       trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
+                               trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
+                                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
+                               trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
+                                                trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
+                               trt_ref = "B")$classes,
+               f_class2)
+
   f_class3 <- factor(c("B", "A", "C"), levels = c("B", "C", "A"))
+  attr(f_class3, "original_levels") <- c("C", "B", "A")
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = trtf2,
                        trt_ref = "B")$classes,
@@ -768,51 +821,6 @@ test_that("set_* returns classes factor variable", {
                                                 trt_class = trtf2),
                                trt_ref = "B")$classes,
                f_class3)
-
-  # Checks when default trt_ref not first in sort order
-  expect_equal(set_ipd(aa, studyc, trtc, y = cont,
-                       trt_class = tclassc)$classes,
-               f_class2)
-  expect_equal(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
-                           trt_class = tclassc)$classes,
-               f_class2)
-  expect_equal(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
-                                trt_class = tclassc)$classes,
-               f_class2)
-  expect_equal(combine_network(set_ipd(aa, studyc, trtc, y = cont,
-                       trt_class = tclassc))$classes,
-               f_class2)
-  expect_equal(combine_network(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
-                           trt_class = tclassc))$classes,
-               f_class2)
-  expect_equal(combine_network(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
-                                trt_class = tclassc))$classes,
-               f_class2)
-
-  expect_equal(set_ipd(aa, studyc, trtc, y = cont,
-                       trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
-                       trt_ref = "B")$classes,
-               f_class2)
-  expect_equal(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
-                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
-                           trt_ref = "B")$classes,
-               f_class2)
-  expect_equal(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
-                                trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
-                                trt_ref = "B")$classes,
-               f_class2)
-  expect_equal(combine_network(set_ipd(aa, studyc, trtc, y = cont,
-                                       trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
-                               trt_ref = "B")$classes,
-               f_class2)
-  expect_equal(combine_network(set_agd_arm(aa, studyc, trtc, y = cont, se = cont_pos,
-                                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
-                               trt_ref = "B")$classes,
-               f_class2)
-  expect_equal(combine_network(set_agd_contrast(ac, studyc, trtc, y = ydiff, se = sediff,
-                                                trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
-                               trt_ref = "B")$classes,
-               f_class2)
 })
 
 test_that("set_* checks for bad class variable work", {
