@@ -1367,6 +1367,10 @@ has_agd_sample_size <- function(network) {
 #' Produces factors with levels in natural sort order (i.e. 1 5 10 not 1 10 5)
 #'
 #' @noRd
-nfactor <- function(x, ..., numeric = TRUE) {
-  return(factor(x, levels = stringr::str_sort(unique(x), numeric = numeric), ...))
+nfactor <- function(x, ..., numeric = TRUE, resort = FALSE) {
+  if (is.factor(x) && !resort) {
+    return(x)
+  } else {
+    return(factor(x, levels = stringr::str_sort(unique(x), numeric = numeric), ...))
+  }
 }
