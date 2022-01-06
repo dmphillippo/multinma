@@ -127,10 +127,11 @@ test_that("combine_network produces combined treatment, class, and study factors
 
 test_that("combine_network produces combined treatment, class, and study factors from explicit factors", {
   c1 <- combine_network(net_a_a2, net_i2)
-  expect_equal(c1$treatments, .default(factor(LETTERS[c(1, 4:2)])))
+  expect_equal(c1$treatments, .default(factor(LETTERS[c(1, 4:2)],
+                                              levels = LETTERS[c(1, 4:2)])))
   expect_equal(levels(c1$agd_arm$.trt), LETTERS[c(1, 4:2)])
   expect_equal(levels(c1$ipd$.trt), LETTERS[c(1, 4:2)])
-  expect_equal(c1$studies, factor(letters[c(5, 4, 2, 1)]))
+  expect_equal(c1$studies, factor(letters[c(5, 4, 2, 1)], levels = letters[c(5, 4, 2, 1)]))
   expect_equal(levels(c1$agd_arm$.study), letters[c(5, 4, 2, 1)])
   expect_equal(levels(c1$ipd$.study), letters[c(5, 4, 2, 1)])
 
@@ -140,25 +141,26 @@ test_that("combine_network produces combined treatment, class, and study factors
   expect_equal(levels(c2$agd_arm$.trt), LETTERS[c(2, 4, 3, 1)])
   expect_equal(levels(c2$agd_contrast$.trt), LETTERS[c(2, 4, 3, 1)])
   expect_equal(levels(c2$ipd$.trt), LETTERS[c(2, 4, 3, 1)])
-  expect_equal(c2$studies, factor(letters[5:1]))
+  expect_equal(c2$studies, factor(letters[5:1], levels = letters[5:1]))
   expect_equal(levels(c2$agd_arm$.study), letters[5:1])
   expect_equal(levels(c2$agd_contrast$.study), letters[5:1])
   expect_equal(levels(c2$ipd$.study), letters[5:1])
 
   c1_classed <- combine_network(
-    set_agd_arm(agd_arm, studyf, trtf, y = y, se = se, trt_class = tclassc),
-    set_ipd(ipd, studyf, trtf, y = y, trt_class = tclassc)
+    set_agd_arm(agd_arm, studyf2, trtf2, y = y, se = se, trt_class = tclassf2),
+    set_ipd(ipd, studyf2, trtf2, y = y, trt_class = tclassf2)
   )
   # Reference trt is A
-  expect_equal(c1_classed$treatments, .default(factor(LETTERS[4:1])))
-  expect_equal(levels(c1_classed$agd_arm$.trt), LETTERS[4:1])
-  expect_equal(levels(c1_classed$ipd$.trt), LETTERS[4:1])
-  expect_equal(c1_classed$studies, factor(letters[c(5, 4, 2, 1)]))
+  expect_equal(c1_classed$treatments, .default(factor(LETTERS[c(1, 4:2)],
+                                                      levels = LETTERS[c(1, 4:2)])))
+  expect_equal(levels(c1_classed$agd_arm$.trt), LETTERS[c(1, 4:2)])
+  expect_equal(levels(c1_classed$ipd$.trt), LETTERS[c(1, 4:2)])
+  expect_equal(c1_classed$studies, factor(letters[c(5, 4, 2, 1)], levels = letters[c(5, 4, 2, 1)]))
   expect_equal(levels(c1_classed$agd_arm$.study), letters[c(5, 4, 2, 1)])
   expect_equal(levels(c1_classed$ipd$.study), letters[c(5, 4, 2, 1)])
-  expect_equal(c1_classed$classes, factor(letters[c(3, 2, 2, 1)]))
-  expect_equal(levels(c1_classed$agd_arm$.trtclass), letters[3:1])
-  expect_equal(levels(c1_classed$ipd$.trtclass), letters[3:1])
+  expect_equal(c1_classed$classes, factor(letters[c(1, 3, 2, 2)], levels = letters[c(1, 3, 2)]))
+  expect_equal(levels(c1_classed$agd_arm$.trtclass), letters[c(1, 3, 2)])
+  expect_equal(levels(c1_classed$ipd$.trtclass), letters[c(1, 3, 2)])
 
   c2_classed <- combine_network(
     set_agd_arm(agd_arm, studyf2, trtf2, y = y, se = se, trt_class = tclassf2),
@@ -171,7 +173,7 @@ test_that("combine_network produces combined treatment, class, and study factors
   expect_equal(levels(c2_classed$agd_arm$.trt), LETTERS[c(2, 4, 3, 1)])
   expect_equal(levels(c2_classed$agd_contrast$.trt), LETTERS[c(2, 4, 3, 1)])
   expect_equal(levels(c2_classed$ipd$.trt), LETTERS[c(2, 4, 3, 1)])
-  expect_equal(c2_classed$studies, factor(letters[5:1]))
+  expect_equal(c2_classed$studies, factor(letters[5:1], levels = letters[5:1]))
   expect_equal(levels(c2_classed$agd_arm$.study), letters[5:1])
   expect_equal(levels(c2_classed$agd_contrast$.study), letters[5:1])
   expect_equal(levels(c2_classed$ipd$.study), letters[5:1])
@@ -308,3 +310,4 @@ test_that("combine_network warns if not all sources have treatment classes", {
                                  set_ipd(ipd, studyf, trtf, y = y, trt_class = tclassc)),
                  "Not all data sources have defined treatment classes")
 })
+
