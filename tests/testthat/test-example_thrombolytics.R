@@ -8,14 +8,14 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------------------------------
 
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ---- eval = FALSE--------------------------------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
-## ----setup, echo = FALSE--------------------------------------------------------------------------
+## ----setup, echo = FALSE--------------------------------------------------------------------------------------------------
 library(multinma)
 nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
              "true" =, "warn" = 2, 
@@ -23,11 +23,11 @@ nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
 options(mc.cores = nc)
 
 
-## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------------------------------
 head(thrombolytics)
 
 
-## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------------------------------
 thrombo_net <- set_agd_arm(thrombolytics, 
                            study = studyn,
                            trt = trtc,
@@ -35,47 +35,59 @@ thrombo_net <- set_agd_arm(thrombolytics,
                            n = n)
 thrombo_net
 
+## ---- include=FALSE, eval=params$run_tests--------------------------------------------------------------------------------
+# Make trtf factor to order treatments in same way as Dias analysis - needed to
+# recreate inconsistency analyses
+trts <- dplyr::distinct(thrombolytics, trtn, trtc)
+trts <- dplyr::arrange(trts, trtn)
+thrombolytics$trtf <- factor(thrombolytics$trtn, levels = trts$trtn, labels = trts$trtc)
+thrombo_net2 <- set_agd_arm(thrombolytics, 
+                            study = studyn,
+                            trt = trtf,
+                            r = r, 
+                            n = n)
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+
+## ---- eval=FALSE----------------------------------------------------------------------------------------------------------
 ## plot(thrombo_net, weight_edges = TRUE, weight_nodes = TRUE)
 
-## ----thrombo_net_plot, echo=FALSE-----------------------------------------------------------------
+## ----thrombo_net_plot, echo=FALSE-----------------------------------------------------------------------------------------
 plot(thrombo_net, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(legend.margin = ggplot2::margin(l = 4, unit = "lines"))
 
 
-## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 
 
-## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------------------------------
 thrombo_fit <- nma(thrombo_net, 
                    trt_effects = "fixed",
                    prior_intercept = normal(scale = 100),
                    prior_trt = normal(scale = 100))
 
 
-## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------------------------------
 thrombo_fit
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------------------------------
 ## # Not run
 ## print(thrombo_fit, pars = c("d", "mu"))
 
 
-## ----thrombo_pp_plot------------------------------------------------------------------------------
+## ----thrombo_pp_plot------------------------------------------------------------------------------------------------------
 plot_prior_posterior(thrombo_fit, prior = "trt")
 
 
-## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------------------------------
 (dic_consistency <- dic(thrombo_fit))
 
 
-## ----thrombo_resdev_plot, fig.width=12------------------------------------------------------------
+## ----thrombo_resdev_plot, fig.width=12------------------------------------------------------------------------------------
 plot(dic_consistency)
 
 
-## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------------------------------
 thrombo_fit_ume <- nma(thrombo_net, 
                        consistency = "ume",
                        trt_effects = "fixed",
@@ -84,59 +96,68 @@ thrombo_fit_ume <- nma(thrombo_net,
 thrombo_fit_ume
 
 
-## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------------------------------
 dic_consistency
 (dic_ume <- dic(thrombo_fit_ume))
 
 
-## ----thrombo_devdev_plot--------------------------------------------------------------------------
+## ----thrombo_devdev_plot--------------------------------------------------------------------------------------------------
 plot(dic_consistency, dic_ume, show_uncertainty = FALSE)
 
 
-## -------------------------------------------------------------------------------------------------
-thrombo_nodesplit <- nma(thrombo_net, 
+## ---- eval=!params$run_tests----------------------------------------------------------------------------------------------
+## thrombo_nodesplit <- nma(thrombo_net,
+##                          consistency = "nodesplit",
+##                          trt_effects = "fixed",
+##                          prior_intercept = normal(scale = 100),
+##                          prior_trt = normal(scale = 100))
+
+## ---- include=FALSE, eval=params$run_tests--------------------------------------------------------------------------------
+# Run node-splits with treatments ordered as per Dias
+thrombo_nodesplit <- nma(thrombo_net2, 
                          consistency = "nodesplit",
                          trt_effects = "fixed",
                          prior_intercept = normal(scale = 100),
                          prior_trt = normal(scale = 100))
 
 
-## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------------------------------
 summary(thrombo_nodesplit)
 
 
-## ----thrombo_nodesplit, fig.width = 7-------------------------------------------------------------
+## ----thrombo_nodesplit, fig.width = 7-------------------------------------------------------------------------------------
 plot(thrombo_nodesplit)
 
 
-## ----thrombo_nodesplit_omega, fig.height = 6------------------------------------------------------
+## ----thrombo_nodesplit_omega, fig.height = 6------------------------------------------------------------------------------
 plot(thrombo_nodesplit, pars = "omega", stat = "halfeye", ref_line = 0) +
   ggplot2::aes(y = comparison) +
   ggplot2::facet_null()
 
 
-## ----thrombo_releff-------------------------------------------------------------------------------
+## ----thrombo_releff-------------------------------------------------------------------------------------------------------
 (thrombo_releff <- relative_effects(thrombo_fit, all_contrasts = TRUE))
 plot(thrombo_releff, ref_line = 0)
 
 
-## ----thrombo_ranks--------------------------------------------------------------------------------
+## ----thrombo_ranks--------------------------------------------------------------------------------------------------------
 (thrombo_ranks <- posterior_ranks(thrombo_fit))
 plot(thrombo_ranks)
 
-## ----thrombo_rankprobs----------------------------------------------------------------------------
+## ----thrombo_rankprobs----------------------------------------------------------------------------------------------------
 (thrombo_rankprobs <- posterior_rank_probs(thrombo_fit))
 plot(thrombo_rankprobs)
 
-## ----thrombo_cumrankprobs-------------------------------------------------------------------------
+## ----thrombo_cumrankprobs-------------------------------------------------------------------------------------------------
 (thrombo_cumrankprobs <- posterior_rank_probs(thrombo_fit, cumulative = TRUE))
 plot(thrombo_cumrankprobs)
 
 
-## ----thrombo_tests, include=FALSE, eval=params$run_tests------------------------------------------
+## ----thrombo_tests, include=FALSE, eval=params$run_tests------------------------------------------------------------------
 #--- Test against TSD 4 results ---
 library(testthat)
 library(dplyr)
+library(tidyr)
 
 test_that("Reference trt is SK", {
   expect_equivalent(levels(thrombo_net$treatments)[1], "SK")
@@ -244,6 +265,59 @@ test_that("UME DIC", {
 # Node-splitting
 trt_code <- c("SK", "t-PA", "Acc t-PA", "SK + t-PA", "r-PA",
               "TNK", "PTCA", "UK", "ASPAC")
+
+dias2010_nodesplit_est <- tribble(
+  ~trt1, ~trt2, ~net_mean, ~net_sd, ~dir_mean, ~dir_sd, ~ind_mean, ~ind_sd, ~omega_mean, ~omega_sd, ~p_value,
+ 1, 2,  0.002,  0.030,  0.000,  0.030,  0.189,  0.235, -0.190,  0.236,  0.42,
+ 1, 3, -0.177,  0.043, -0.158,  0.048, -0.247,  0.092,  0.088,  0.104,  0.39,
+ 1, 5, -0.124,  0.060, -0.060,  0.089, -0.175,  0.081,  0.115,  0.121,  0.34,
+ 1, 7, -0.475,  0.101, -0.666,  0.185, -0.393,  0.120, -0.272,  0.222,  0.22,
+ 1, 8, -0.203,  0.219, -0.369,  0.518, -0.168,  0.244, -0.207,  0.575,  0.73,
+ 1, 9,  0.016,  0.037,  0.009,  0.037,  0.424,  0.252, -0.413,  0.253,  0.10,
+ 2, 7, -0.477,  0.104, -0.545,  0.417, -0.475,  0.108, -0.073,  0.432,  0.88,
+ 2, 8, -0.205,  0.220, -0.295,  0.347, -0.144,  0.290, -0.155,  0.452,  0.74,
+ 2, 9,  0.014,  0.037,  0.006,  0.037,  0.471,  0.241, -0.468,  0.241,  0.05,
+ 3, 4,  0.128,  0.054,  0.126,  0.054,  0.630,  0.697, -0.506,  0.696,  0.47,
+ 3, 5,  0.053,  0.056,  0.019,  0.066,  0.135,  0.101, -0.116,  0.120,  0.34,
+ 3, 7, -0.298,  0.097, -0.216,  0.118, -0.477,  0.174,  0.260,  0.211,  0.21,
+ 3, 8, -0.026,  0.220,  0.143,  0.356, -0.136,  0.288,  0.277,  0.461,  0.55,
+ 3, 9,  0.193,  0.056,  1.409,  0.415,  0.165,  0.057,  1.239,  0.420,  0.001
+) %>% 
+  mutate(trt1 = forcats::fct_relevel(factor(trt1, levels = 1:9, labels = trt_code), 
+                                     !! levels(thrombo_net2$treatments)),
+         trt2 = forcats::fct_relevel(factor(trt2, levels = 1:9, labels = trt_code), 
+                                     !! levels(thrombo_net2$treatments)))
+
+for (i in 1:nrow(dias2010_nodesplit_est)) {
+  if (as.numeric(dias2010_nodesplit_est$trt1[i]) > as.numeric(dias2010_nodesplit_est$trt2[i])) {
+    dias2010_nodesplit_est[i, c("trt1", "trt2")] <- dias2010_nodesplit_est[i, c("trt2", "trt1")]
+    dias2010_nodesplit_est[i, c("net_mean", "dir_mean", "ind_mean")] <- -dias2010_nodesplit_est[i, c("net_mean", "dir_mean", "ind_mean")]
+  }
+}
+
+dias2010_nodesplit_est <- arrange(dias2010_nodesplit_est, trt1, trt2)
+
+thrombo_nodesplit_est <- as_tibble(summary(thrombo_nodesplit), nest = FALSE) %>% 
+  mutate(parameter = stringr::str_replace(parameter, "(^d_)?(.+)\\[.+\\]$", "\\2")) %>% 
+  pivot_wider(names_from = "parameter", 
+              values_from = c("mean", "sd"),
+              names_glue = "{parameter}_{.value}",
+              id_cols = c("trt1", "trt2", "p_value")) %>% 
+  mutate(across(where(is.numeric), unname)) %>% 
+  select(!!! colnames(dias2010_nodesplit_est))
+
+test_that("Node-splitting estimates", {
+  # expect_equal(thrombo_nodesplit_est, dias2010_nodesplit_est, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$net_mean, dias2010_nodesplit_est$net_mean, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$net_sd, dias2010_nodesplit_est$net_sd, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$ind_mean, dias2010_nodesplit_est$ind_mean, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$ind_sd, dias2010_nodesplit_est$ind_sd, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$dir_mean, dias2010_nodesplit_est$dir_mean, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$dir_sd, dias2010_nodesplit_est$dir_sd, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$omega_mean, dias2010_nodesplit_est$omega_mean, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$omega_sd, dias2010_nodesplit_est$omega_sd, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$p_value, dias2010_nodesplit_est$p_value, tolerance = tol)
+})
 
 dias2010_nodesplit_dic <- tribble(
   ~trt1, ~trt2, ~resdev,   ~pd,   ~dic,
