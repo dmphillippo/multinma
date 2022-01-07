@@ -279,7 +279,7 @@ nma <- function(network,
                           " vs. ",
                           as.character(nodesplit$trt1[i])))
 
-        ns_arglist$nodesplit <- c(nodesplit$trt1[i], nodesplit$trt2[i])
+        ns_arglist$nodesplit <- forcats::fct_c(nodesplit$trt1[i], nodesplit$trt2[i])
 
         ns_fits[[i + nodesplit_include_consistency]] <- do.call(nma, ns_arglist)
       }
