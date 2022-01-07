@@ -219,6 +219,10 @@ set_ipd <- function(data,
     out$ipd$.trt <- forcats::fct_relevel(out$ipd$.trt, trt_ref)
     if (!is.null(.trtclass)) {
       class_ref <- as.character(out$classes[trt_sort[1]])
+      if (!is.null(trtclass_original_levels))
+        class_ref <- c(class_ref,
+                       setdiff(intersect(trtclass_original_levels, levels(out$classes)),
+                               class_ref))
       out$ipd$.trtclass <- forcats::fct_relevel(out$ipd$.trtclass, class_ref)
       out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
     }
@@ -453,6 +457,10 @@ set_agd_arm <- function(data,
     out$agd_arm$.trt <- forcats::fct_relevel(out$agd_arm$.trt, trt_ref)
     if (!is.null(.trtclass)) {
       class_ref <- as.character(out$classes[trt_sort[1]])
+      if (!is.null(trtclass_original_levels))
+        class_ref <- c(class_ref,
+                       setdiff(intersect(trtclass_original_levels, levels(out$classes)),
+                               class_ref))
       out$agd_arm$.trtclass <- forcats::fct_relevel(out$agd_arm$.trtclass, class_ref)
       out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
     }
@@ -707,6 +715,10 @@ set_agd_contrast <- function(data,
     out$agd_contrast$.trt <- forcats::fct_relevel(out$agd_contrast$.trt, trt_ref)
     if (!is.null(.trtclass)) {
       class_ref <- as.character(out$classes[trt_sort[1]])
+      if (!is.null(trtclass_original_levels))
+        class_ref <- c(class_ref,
+                       setdiff(intersect(trtclass_original_levels, levels(out$classes)),
+                               class_ref))
       out$agd_contrast$.trtclass <- forcats::fct_relevel(out$agd_contrast$.trtclass, class_ref)
       out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
     }
