@@ -1,6 +1,7 @@
 ---
 title: "Example: Statins for cholesterol lowering"
 output: rmarkdown::html_vignette
+link-citations: yes
 bibliography: ../inst/REFERENCES.bib
 params:
   run_tests: FALSE
@@ -29,7 +30,7 @@ head(statins)
 
 @TSD3 used these data to demonstrate meta-regression models adjusting for the binary covariate `prevention` (primary or secondary prevention), which we recreate here.
 
-### Setting up the network
+## Setting up the network
 We have data giving the number of deaths (`r`) out of the total (`n`) in each arm, so we use the function `set_agd_arm()` to set up the network.
 We set placebo as the network reference treatment.
 ```{r}
@@ -44,10 +45,10 @@ statin_net
 
 The `prevention` variable in the `statins` data frame will automatically be available to use in a meta-regression model.
 
-### Meta-analysis models
+## Meta-analysis models
 We fit fixed effect (FE) and random effects (RE) models, with a meta-regression on the binary covariate `prevention`.
 
-#### Fixed effect meta-regression
+### Fixed effect meta-regression
 We start by fitting a FE model.
 We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effect $d_\mathrm{Statin}$, study-specific intercepts $\mu_j$, and regression coefficient $\beta$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
@@ -82,7 +83,7 @@ The prior and posterior distributions can be compared visually using the `plot_p
 plot_prior_posterior(statin_fit_FE, prior = c("trt", "reg"))
 ```
 
-#### Random effects meta-regression
+### Random effects meta-regression
 We now fit a RE model.
 We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effect $d_\mathrm{Statin}$, study-specific intercepts $\mu_j$, and regression coefficient $\beta$.
 We use a $\textrm{half-N}(0, 5^2)$ prior distribution for the heterogeneity standard deviation $\tau$.
@@ -131,7 +132,7 @@ The prior and posterior distributions can be compared visually using the `plot_p
 plot_prior_posterior(statin_fit_RE, prior = c("trt", "reg", "het"))
 ```
 
-### Model fit and comparison
+## Model fit and comparison
 Model fit can be checked using the `dic()` function:
 ```{r}
 (statin_dic_FE <- dic(statin_fit_FE))

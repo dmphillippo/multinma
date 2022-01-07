@@ -46,6 +46,9 @@ int<lower=0, upper=1> RE; // Random effects flag (yes = 1)
 int<lower=0> which_RE[RE ? narm_ipd + ni_agd_arm + ni_agd_contrast : 0]; // ID of RE delta for each arm (0 for no RE delta)
 corr_matrix[RE ? max(which_RE) : 1] RE_cor; // RE correlation matrix
 
+// -- Node-splitting --
+int<lower=0, upper=1> nodesplit; // Node-splitting flag (yes = 1)
+
 // -- Priors --
 int<lower=0,upper=3> prior_intercept_dist;
 real prior_intercept_location;

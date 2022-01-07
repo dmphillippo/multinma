@@ -1,6 +1,7 @@
 ---
 title: "Example: Beta blockers"
 output: rmarkdown::html_vignette
+link-citations: yes
 bibliography: ../inst/REFERENCES.bib
 params:
   run_tests: FALSE
@@ -28,7 +29,7 @@ head(blocker)
 ```
 
 
-### Setting up the network
+## Setting up the network
 We begin by setting up the network - here just a pairwise meta-analysis.
 We have arm-level count data giving the number of deaths (`r`) out of the total (`n`) in each arm, so we use the function `set_agd_arm()`.
 We set "Control" as the reference treatment.
@@ -43,10 +44,10 @@ blocker_net
 ```
 
 
-### Meta-analysis models
+## Meta-analysis models
 We fit both fixed effect (FE) and random effects (RE) models.
 
-#### Fixed effect meta-analysis
+### Fixed effect meta-analysis
 First, we fit a fixed effect model using the `nma()` function with `trt_effects = "fixed"`.
 We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
@@ -79,7 +80,7 @@ The prior and posterior distributions can be compared visually using the `plot_p
 plot_prior_posterior(blocker_fit_FE, prior = "trt")
 ```
 
-#### Random effects meta-analysis
+### Random effects meta-analysis
 We now fit a random effects model using the `nma()` function with `trt_effects = "random"`.
 Again, we use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and we additionally use a $\textrm{half-N}(5^2)$ prior for the heterogeneity standard deviation $\tau$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
@@ -114,7 +115,7 @@ plot_prior_posterior(blocker_fit_RE, prior = c("trt", "het"))
 ```
 
 
-#### Model comparison
+### Model comparison
 Model fit can be checked using the `dic()` function:
 ```{r}
 (dic_FE <- dic(blocker_fit_FE))
@@ -140,7 +141,7 @@ There are a number of points which are not very well fit by the FE model, having
 Study 14 is a particularly poor fit under the FE model, but its residual deviance is reduced (although still high) under the RE model.
 The evidence should be given further careful examination, and consideration given to other issues such as the potential for effect-modifying covariates [@TSD2].
 
-### Further results
+## Further results
 @TSD2 produce absolute predictions of the probability of mortality on beta blockers and control, assuming a Normal distribution on the baseline logit-probability of mortality with mean $-2.2$ and precision $3.3$.
 We can replicate these results using the `predict()` method.
 The `baseline` argument takes a `distr()` distribution object, with which we specify the corresponding Normal distribution.

@@ -1,6 +1,7 @@
 ---
 title: "Example: Atrial fibrillation"
 output: rmarkdown::html_vignette
+link-citations: yes
 bibliography: ../inst/REFERENCES.bib
 params:
   run_tests: FALSE
@@ -33,7 +34,7 @@ head(atrial_fibrillation)
 
 @Cooper2009 used this data to demonstrate meta-regression models, which we recreate here.
 
-### Setting up the network
+## Setting up the network
 Whilst we have data on the patient-years at risk in each study (`E`), we ignore this here to follow the analysis of @Cooper2009, instead analysing the number of patients with stroke (`r`) out of the total (`n`) in each arm.
 We use the function `set_agd_arm()` to set up the network, making sure to specify the treatment classes `trt_class`.
 We remove the WASPO study from the network as both arms had zero events, and this study therefore contributes no information.
@@ -57,13 +58,13 @@ plot(af_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) +
 ```
 
 
-### Meta-analysis models
+## Meta-analysis models
 We fit two (random effects) models:
 
 1. A standard NMA model without any covariates (model 1 of @Cooper2009);
 2. A meta-regression model adjusting for the proportion of individuals in each study with prior stroke, with shared interaction coefficients by treatment class (model 4b of @Cooper2009).
 
-#### NMA with no covariates
+### NMA with no covariates
 We fit a random effects model using the `nma()` function with `trt_effects = "random"`.
 We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and a $\textrm{half-N}(5^2)$ prior for the heterogeneity standard deviation $\tau$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
@@ -131,7 +132,7 @@ plot(af_1_rankprobs)
 plot(af_1_cumrankprobs)
 ```
 
-#### Network meta-regression adjusting for proportion of prior stroke
+### Network meta-regression adjusting for proportion of prior stroke
 We now consider a meta-regression model adjusting for the proportion of individuals in each study with prior stroke, with shared interaction coefficients by treatment class.
 The regression model is specified in the `nma()` function using a formula in the `regression` argument.
 The formula `~ .trt:stroke` means that interactions of prior stroke with treatment will be included; the `.trt` special variable indicates treatment, and `stroke` is in the original data set.
@@ -275,7 +276,7 @@ plot(af_4b_cumrankprobs) +
   theme(strip.text.y = element_text(angle = 0))
 ```
 
-### Model fit and comparison
+## Model fit and comparison
 Model fit can be checked using the `dic()` function:
 ```{r}
 (af_dic_1 <- dic(af_fit_1))

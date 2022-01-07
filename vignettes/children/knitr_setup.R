@@ -11,7 +11,7 @@ if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) { # Se
   knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>",
-    dev.args = list(type = "cairo-png", antialias = "subpixel"),
+    dev = "ragg_png",
     fig.width = 6,
     fig.height = 4.5,
     fig.align = "center"

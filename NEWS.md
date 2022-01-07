@@ -1,5 +1,10 @@
 # multinma 0.3.0.9000
 
+* Feature: Node-splitting models for assessing inconsistency are now available
+with `consistency = "nodesplit"` in `nma()`. Comparisons to split can be chosen
+using the `nodesplit` argument, by default all possibly inconsistent comparisons
+are chosen using `get_nodesplits()`. Node-splitting results can be summarised
+with `summary.nma_nodesplit()` and plotted with `plot.nodesplit_summary()`.
 * Feature: The correlation matrix for generating integration points with
 `add_integration()` for ML-NMR models is now adjusted to the underlying Gaussian
 copula, so that the output correlations of the integration points better match

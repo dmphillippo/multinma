@@ -8,17 +8,17 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-----------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
 
-## ---- include=FALSE-----------------------------------------------------------
+## ---- include=FALSE-------------------------------------------------------------------------------
 set.seed(4783982)
 
 
-## ---- eval = FALSE------------------------------------------------------------
+## ---- eval = FALSE--------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
-## ----setup, echo = FALSE------------------------------------------------------
+## ----setup, echo = FALSE--------------------------------------------------------------------------
 library(multinma)
 nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
              "true" =, "warn" = 2,
@@ -26,7 +26,7 @@ nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
 options(mc.cores = nc)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 head(atrial_fibrillation)
 
 
@@ -45,12 +45,12 @@ plot(af_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) +
   ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## af_fit_1 <- nma(af_net,
 ##                 trt_effects = "random",
 ##                 prior_intercept = normal(scale = 100),
@@ -68,41 +68,41 @@ af_fit_1 <- nma(af_net,
                 adapt_delta = 0.99)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 af_fit_1
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(af_fit_1, pars = c("d", "mu", "delta"))
 
 
-## ----af_1_pp_plot, fig.width=8, fig.height=6, out.width="100%"----------------
+## ----af_1_pp_plot, fig.width=8, fig.height=6, out.width="100%"------------------------------------
 plot_prior_posterior(af_fit_1, prior = c("trt", "het"))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (af_1_releff <- relative_effects(af_fit_1, trt_ref = "Placebo/Standard care"))
 
 
-## ----af_1_releff_plot---------------------------------------------------------
+## ----af_1_releff_plot-----------------------------------------------------------------------------
 plot(af_1_releff, ref_line = 0)
 
 
-## ----af_1_ranks---------------------------------------------------------------
+## ----af_1_ranks-----------------------------------------------------------------------------------
 (af_1_ranks <- posterior_ranks(af_fit_1))
 plot(af_1_ranks)
 
-## ----af_1_rankprobs-----------------------------------------------------------
+## ----af_1_rankprobs-------------------------------------------------------------------------------
 (af_1_rankprobs <- posterior_rank_probs(af_fit_1))
 plot(af_1_rankprobs)
 
-## ----af_1_cumrankprobs--------------------------------------------------------
+## ----af_1_cumrankprobs----------------------------------------------------------------------------
 (af_1_cumrankprobs <- posterior_rank_probs(af_fit_1, cumulative = TRUE))
 plot(af_1_cumrankprobs)
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## af_fit_4b <- nma(af_net,
 ##                  trt_effects = "random",
 ##                  regression = ~ .trt:stroke,
@@ -114,7 +114,7 @@ plot(af_1_cumrankprobs)
 ##                  prior_het = half_normal(scale = 5),
 ##                  adapt_delta = 0.99)
 
-## ---- echo=FALSE, eval=!params$run_tests--------------------------------------
+## ---- echo=FALSE, eval=!params$run_tests----------------------------------------------------------
 ## af_fit_4b <- nma(af_net,
 ##                  seed = 579212814,
 ##                  trt_effects = "random",
@@ -142,20 +142,20 @@ af_fit_4b <- nowarn_on_ci(nma(af_net,
                  iter = 5000))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 af_fit_4b
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(af_fit_4b, pars = c("d", "mu", "delta"))
 
 
-## ----af_4b_pp_plot------------------------------------------------------------
+## ----af_4b_pp_plot--------------------------------------------------------------------------------
 plot_prior_posterior(af_fit_4b, prior = c("reg", "het"))
 
 
-## ----af_4b_releff_plot, fig.height = 16, eval=FALSE---------------------------
+## ----af_4b_releff_plot, fig.height = 16, eval=FALSE-----------------------------------------------
 ## # Not run
 ## (af_4b_releff <- relative_effects(af_fit_4b, trt_ref = "Placebo/Standard care"))
 ## plot(af_4b_releff, ref_line = 0)
@@ -170,11 +170,11 @@ plot_prior_posterior(af_fit_4b, prior = c("reg", "het"))
 plot(af_4b_releff_01, ref_line = 0)
 
 
-## ----af_4b_betas--------------------------------------------------------------
+## ----af_4b_betas----------------------------------------------------------------------------------
 plot(af_fit_4b, pars = "beta", stat = "halfeye", ref_line = 0)
 
 
-## ----af_4b_betas_transformed--------------------------------------------------
+## ----af_4b_betas_transformed----------------------------------------------------------------------
 af_4b_beta <- as.array(af_fit_4b, pars = "beta")
 
 # Subtract beta[Control:stroke] from the other class interactions
@@ -190,14 +190,14 @@ summary(af_4b_beta)
 plot(summary(af_4b_beta), stat = "halfeye", ref_line = 0)
 
 
-## ----af_4b_ranks--------------------------------------------------------------
+## ----af_4b_ranks----------------------------------------------------------------------------------
 (af_4b_ranks <- posterior_ranks(af_fit_4b,
                                 newdata = data.frame(stroke = c(0, 1),
                                                      label = c("stroke = 0", "stroke = 1")),
                                 study = label))
 plot(af_4b_ranks)
 
-## ----af_4b_rankprobs, fig.height=12-------------------------------------------
+## ----af_4b_rankprobs, fig.height=12---------------------------------------------------------------
 (af_4b_rankprobs <- posterior_rank_probs(af_fit_4b,
                                          newdata = data.frame(stroke = c(0, 1),
                                                               label = c("stroke = 0", "stroke = 1")),
@@ -209,7 +209,7 @@ plot(af_4b_rankprobs) +
   facet_grid(Treatment~Study, labeller = label_wrap_gen(20)) +
   theme(strip.text.y = element_text(angle = 0))
 
-## ----af_4b_cumrankprobs, fig.height=12----------------------------------------
+## ----af_4b_cumrankprobs, fig.height=12------------------------------------------------------------
 (af_4b_cumrankprobs <- posterior_rank_probs(af_fit_4b, cumulative = TRUE,
                                             newdata = data.frame(stroke = c(0, 1),
                                                                  label = c("stroke = 0", "stroke = 1")),
@@ -220,22 +220,22 @@ plot(af_4b_cumrankprobs) +
   theme(strip.text.y = element_text(angle = 0))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (af_dic_1 <- dic(af_fit_1))
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (af_dic_4b <- dic(af_fit_4b))
 
 
-## ----af_1_resdev_plot---------------------------------------------------------
+## ----af_1_resdev_plot-----------------------------------------------------------------------------
 plot(af_dic_1)
 
 
-## ----af_4b_resdev_plot--------------------------------------------------------
+## ----af_4b_resdev_plot----------------------------------------------------------------------------
 plot(af_dic_4b)
 
 
-## ----atrial_fibrillation_tests, include=FALSE, eval=params$run_tests----------
+## ----atrial_fibrillation_tests, include=FALSE, eval=params$run_tests------------------------------
 #--- Test against TSD 2 results ---
 library(testthat)
 library(dplyr)

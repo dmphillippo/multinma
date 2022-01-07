@@ -97,6 +97,19 @@ reference:
   - loo
   - waic
 
+- title: Node-splitting
+  desc: Generate and summarise node-splitting models for assessing inconsistency.
+  contents:
+  - has_direct
+  - has_indirect
+  - get_nodesplits
+  - nma_nodesplit-class
+  - print.nma_nodesplit_df
+  - summary.nma_nodesplit_df
+  - nodesplit_summary-class
+  - print.nodesplit_summary
+  - plot.nodesplit_summary
+
 - title: Posterior summaries and working with fitted models
   desc: >
     Producing and plotting relative effects, absolute predictions, posterior ranks
