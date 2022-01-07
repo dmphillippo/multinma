@@ -64,6 +64,9 @@
     <loc>https://dmphillippo.github.io/multinma/dev/reference/aa_example_smk_fe.html</loc>
   </url>
   <url>
+    <loc>https://dmphillippo.github.io/multinma/dev/reference/aa_example_smk_nodesplit.html</loc>
+  </url>
+  <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/aa_example_smk_re.html</loc>
   </url>
   <url>
@@ -112,6 +115,9 @@
     <loc>https://dmphillippo.github.io/multinma/dev/reference/generalised_t.html</loc>
   </url>
   <url>
+    <loc>https://dmphillippo.github.io/multinma/dev/reference/get_nodesplits.html</loc>
+  </url>
+  <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/graph_conversion.html</loc>
   </url>
   <url>
@@ -148,6 +154,9 @@
     <loc>https://dmphillippo.github.io/multinma/dev/reference/nma_dic-class.html</loc>
   </url>
   <url>
+    <loc>https://dmphillippo.github.io/multinma/dev/reference/nma_nodesplit-class.html</loc>
+  </url>
+  <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/nma_prior-class.html</loc>
   </url>
   <url>
@@ -155,6 +164,12 @@
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/nma_summary-methods.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/dev/reference/nodesplit_summary-class.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/dev/reference/nodesplit_summary-methods.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/pairs.stan_nma.html</loc>
@@ -175,6 +190,9 @@
     <loc>https://dmphillippo.github.io/multinma/dev/reference/plot.nma_summary.html</loc>
   </url>
   <url>
+    <loc>https://dmphillippo.github.io/multinma/dev/reference/plot.nodesplit_summary.html</loc>
+  </url>
+  <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/plot_integration_error.html</loc>
   </url>
   <url>
@@ -191,6 +209,9 @@
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/print.nma_dic.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/dev/reference/print.nma_nodesplit_df.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/print.stan_nma.html</loc>
@@ -221,6 +242,9 @@
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/statins.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/dev/reference/summary.nma_nodesplit_df.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/summary.nma_prior.html</loc>

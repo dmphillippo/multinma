@@ -110,7 +110,7 @@
 <span class="co">#&gt; The following objects are masked from 'package:stats':</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     dgamma, pgamma, qgamma</span></code></pre>
-<p>This vignette describes the analysis of data on the mean off-time reduction in patients given dopamine agonists as adjunct therapy in Parkinson’s disease, in a network of 7 trials of 4 active drugs plus placebo <span class="citation">(Dias et al. 2011)</span>. The data are available in this package as <code>parkinsons</code>:</p>
+<p>This vignette describes the analysis of data on the mean off-time reduction in patients given dopamine agonists as adjunct therapy in Parkinson’s disease, in a network of 7 trials of 4 active drugs plus placebo <span class="citation">(Dias et al. <a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>. The data are available in this package as <code>parkinsons</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">parkinsons</span><span class="op">)</span>
 <span class="co">#&gt;   studyn trtn     y    se   n  diff se_diff</span>
@@ -204,7 +204,7 @@
 <span class="co">#&gt; d[5] -0.30    0.00 0.21  -0.71 -0.44 -0.30 -0.17  0.10  2401    1</span>
 <span class="co">#&gt; lp__ -6.63    0.06 2.35 -12.04 -7.99 -6.28 -4.92 -3.10  1719    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 11:33:17 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 17:31:43 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -265,7 +265,7 @@
 <span class="co">#&gt; lp__ -12.88    0.10 3.62 -21.03 -15.18 -12.48 -10.28 -6.78  1268 1.00</span>
 <span class="co">#&gt; tau    0.38    0.01 0.38   0.01   0.12   0.27   0.51  1.43   776 1.01</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 11:33:29 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 17:31:56 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -305,7 +305,7 @@
 <div class="section level3">
 <h3 id="further-results">Further results<a class="anchor" aria-label="anchor" href="#further-results"></a>
 </h3>
-<p>For comparison with <span class="citation">Dias et al. (2011)</span>, we can produce relative effects against placebo using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with <code>trt_ref = 1</code>:</p>
+<p>For comparison with <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we can produce relative effects against placebo using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with <code>trt_ref = 1</code>:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">arm_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">arm_fit_FE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
@@ -324,7 +324,7 @@
 <span class="co">#&gt; d[5] -0.85 0.77 -2.38 -1.26 -0.83 -0.41  0.62     1917     1749    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/arm_releff_RE-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>Following <span class="citation">Dias et al. (2011)</span>, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method, where the <code>baseline</code> argument takes a <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the corresponding Normal distribution, and we specify <code>trt_ref = 1</code> to indicate that the baseline distribution corresponds to treatment 1. (Strictly speaking, <code>type = "response"</code> is unnecessary here, since the identity link function was used.)</p>
+<p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method, where the <code>baseline</code> argument takes a <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the corresponding Normal distribution, and we specify <code>trt_ref = 1</code> to indicate that the baseline distribution corresponds to treatment 1. (Strictly speaking, <code>type = "response"</code> is unnecessary here, since the identity link function was used.)</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">arm_pred_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">arm_fit_FE</span>, 
                        baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">0.73</span>, sd <span class="op">=</span> <span class="fl">21</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>,
@@ -528,7 +528,7 @@
 <span class="co">#&gt; d[5] -0.30    0.00 0.21 -0.70 -0.44 -0.30 -0.16  0.12  3772    1</span>
 <span class="co">#&gt; lp__ -3.16    0.04 1.41 -6.68 -3.86 -2.84 -2.11 -1.39  1572    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 11:33:48 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 17:32:16 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -580,7 +580,7 @@
 <span class="co">#&gt; lp__ -8.18    0.08 2.86 -14.57 -9.85 -7.85 -6.17 -3.55  1217    1</span>
 <span class="co">#&gt; tau   0.38    0.01 0.37   0.01  0.13  0.29  0.52  1.33   948    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 11:33:55 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 17:32:23 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -620,7 +620,7 @@
 <div class="section level3">
 <h3 id="further-results-1">Further results<a class="anchor" aria-label="anchor" href="#further-results-1"></a>
 </h3>
-<p>For comparison with <span class="citation">Dias et al. (2011)</span>, we can produce relative effects against placebo using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with <code>trt_ref = 1</code>:</p>
+<p>For comparison with <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we can produce relative effects against placebo using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with <code>trt_ref = 1</code>:</p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">contr_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">contr_fit_FE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
@@ -639,7 +639,7 @@
 <span class="co">#&gt; d[5] -0.83 0.75 -2.27 -1.27 -0.81 -0.40  0.65     2150     1713    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/contr_releff_RE-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>Following <span class="citation">Dias et al. (2011)</span>, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method, where the <code>baseline</code> argument takes a <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the corresponding Normal distribution, and we specify <code>trt_ref = 1</code> to indicate that the baseline distribution corresponds to treatment 1. (Strictly speaking, <code>type = "response"</code> is unnecessary here, since the identity link function was used.)</p>
+<p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method, where the <code>baseline</code> argument takes a <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the corresponding Normal distribution, and we specify <code>trt_ref = 1</code> to indicate that the baseline distribution corresponds to treatment 1. (Strictly speaking, <code>type = "response"</code> is unnecessary here, since the identity link function was used.)</p>
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">contr_pred_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">contr_fit_FE</span>, 
                        baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">0.73</span>, sd <span class="op">=</span> <span class="fl">21</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>,
@@ -708,7 +708,7 @@
 <div class="section level2">
 <h2 id="analysis-of-mixed-arm-based-and-contrast-based-data">Analysis of mixed arm-based and contrast-based data<a class="anchor" aria-label="anchor" href="#analysis-of-mixed-arm-based-and-contrast-based-data"></a>
 </h2>
-<p>We now perform an analysis where some studies contribute arm-based data, and other contribute contrast-based data. Replicating <span class="citation">Dias et al. (2011)</span>, we consider arm-based data from studies 1-3, and contrast-based data from studies 4-7.</p>
+<p>We now perform an analysis where some studies contribute arm-based data, and other contribute contrast-based data. Replicating <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we consider arm-based data from studies 1-3, and contrast-based data from studies 4-7.</p>
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">studies</span> <span class="op">&lt;-</span> <span class="va">parkinsons</span><span class="op">$</span><span class="va">studyn</span>
 <span class="op">(</span><span class="va">parkinsons_arm</span> <span class="op">&lt;-</span> <span class="va">parkinsons</span><span class="op">[</span><span class="va">studies</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="op">]</span><span class="op">)</span>
@@ -814,7 +814,7 @@
 <span class="co">#&gt; d[5] -0.29    0.00 0.21 -0.70 -0.43 -0.30 -0.16  0.12  3097    1</span>
 <span class="co">#&gt; lp__ -4.54    0.04 1.87 -9.07 -5.58 -4.19 -3.16 -1.92  1807    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 11:34:06 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 17:32:35 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -875,7 +875,7 @@
 <span class="co">#&gt; lp__ -10.79    0.10 3.26 -17.96 -12.82 -10.48 -8.47 -5.21  1130 1.00</span>
 <span class="co">#&gt; tau    0.40    0.01 0.40   0.01   0.13   0.28  0.52  1.53   724 1.01</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 11:34:19 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 17:32:48 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -915,7 +915,7 @@
 <div class="section level3">
 <h3 id="further-results-2">Further results<a class="anchor" aria-label="anchor" href="#further-results-2"></a>
 </h3>
-<p>For comparison with <span class="citation">Dias et al. (2011)</span>, we can produce relative effects against placebo using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with <code>trt_ref = 1</code>:</p>
+<p>For comparison with <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we can produce relative effects against placebo using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with <code>trt_ref = 1</code>:</p>
 <div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">mix_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">mix_fit_FE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
@@ -934,7 +934,7 @@
 <span class="co">#&gt; d[5] -0.82 0.76 -2.27 -1.27 -0.83 -0.37  0.71     1513     1435    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_releff_RE-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>Following <span class="citation">Dias et al. (2011)</span>, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method, where the <code>baseline</code> argument takes a <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the corresponding Normal distribution, and we specify <code>trt_ref = 1</code> to indicate that the baseline distribution corresponds to treatment 1. (Strictly speaking, <code>type = "response"</code> is unnecessary here, since the identity link function was used.)</p>
+<p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method, where the <code>baseline</code> argument takes a <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the corresponding Normal distribution, and we specify <code>trt_ref = 1</code> to indicate that the baseline distribution corresponds to treatment 1. (Strictly speaking, <code>type = "response"</code> is unnecessary here, since the identity link function was used.)</p>
 <div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mix_pred_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mix_fit_FE</span>, 
                        baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">0.73</span>, sd <span class="op">=</span> <span class="fl">21</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>,

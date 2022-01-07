@@ -110,7 +110,7 @@
 <span class="co">#&gt; The following objects are masked from 'package:stats':</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     dgamma, pgamma, qgamma</span></code></pre>
-<p>This vignette describes the analysis of 19 trials comparing statins to placebo or usual care <span class="citation">(Dias et al. 2011)</span>. The data are available in this package as <code>statins</code>:</p>
+<p>This vignette describes the analysis of 19 trials comparing statins to placebo or usual care <span class="citation">(Dias et al. <a href="#ref-TSD3" role="doc-biblioref">2011</a>)</span>. The data are available in this package as <code>statins</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">statins</span><span class="op">)</span>
 <span class="co">#&gt;   studyn    studyc trtn    trtc prevention   r    n</span>
@@ -120,10 +120,10 @@
 <span class="co">#&gt; 4      2 Bestehorn    2  Statin  Secondary   1  129</span>
 <span class="co">#&gt; 5      3     Brown    1 Placebo  Secondary   0   52</span>
 <span class="co">#&gt; 6      3     Brown    2  Statin  Secondary   1   94</span></code></pre></div>
-<p><span class="citation">Dias et al. (2011)</span> used these data to demonstrate meta-regression models adjusting for the binary covariate <code>prevention</code> (primary or secondary prevention), which we recreate here.</p>
-<div class="section level3">
-<h3 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
-</h3>
+<p><span class="citation">Dias et al. (<a href="#ref-TSD3" role="doc-biblioref">2011</a>)</span> used these data to demonstrate meta-regression models adjusting for the binary covariate <code>prevention</code> (primary or secondary prevention), which we recreate here.</p>
+<div class="section level2">
+<h2 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
+</h2>
 <p>We have data giving the number of deaths (<code>r</code>) out of the total (<code>n</code>) in each arm, so we use the function <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code> to set up the network. We set placebo as the network reference treatment.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">statin_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_agd_arm.html">set_agd_arm</a></span><span class="op">(</span><span class="va">statins</span>, 
@@ -157,13 +157,13 @@
 <span class="co">#&gt; Network is <span style="color: #00BB00;">connected</span></span></code></pre></div>
 <p>The <code>prevention</code> variable in the <code>statins</code> data frame will automatically be available to use in a meta-regression model.</p>
 </div>
-<div class="section level3">
-<h3 id="meta-analysis-models">Meta-analysis models<a class="anchor" aria-label="anchor" href="#meta-analysis-models"></a>
-</h3>
+<div class="section level2">
+<h2 id="meta-analysis-models">Meta-analysis models<a class="anchor" aria-label="anchor" href="#meta-analysis-models"></a>
+</h2>
 <p>We fit fixed effect (FE) and random effects (RE) models, with a meta-regression on the binary covariate <code>prevention</code>.</p>
-<div class="section level4">
-<h4 id="fixed-effect-meta-regression">Fixed effect meta-regression<a class="anchor" aria-label="anchor" href="#fixed-effect-meta-regression"></a>
-</h4>
+<div class="section level3">
+<h3 id="fixed-effect-meta-regression">Fixed effect meta-regression<a class="anchor" aria-label="anchor" href="#fixed-effect-meta-regression"></a>
+</h3>
 <p>We start by fitting a FE model. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effect <span class="math inline">\(d_\mathrm{Statin}\)</span>, study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and regression coefficient <span class="math inline">\(\beta\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
@@ -190,15 +190,15 @@
 <span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                                          mean se_mean   sd     2.5%      25%      50%      75%</span>
-<span class="co">#&gt; beta[.trtStatin:preventionSecondary]    -0.21    0.00 0.11    -0.42    -0.29    -0.21    -0.14</span>
-<span class="co">#&gt; d[Statin]                               -0.10    0.00 0.10    -0.30    -0.17    -0.10    -0.04</span>
-<span class="co">#&gt; lp__                                 -7246.57    0.08 3.30 -7254.00 -7248.68 -7246.25 -7244.22</span>
+<span class="co">#&gt; beta[.trtStatin:preventionSecondary]    -0.21    0.00 0.11    -0.42    -0.28    -0.21    -0.13</span>
+<span class="co">#&gt; d[Statin]                               -0.10    0.00 0.10    -0.29    -0.17    -0.10    -0.04</span>
+<span class="co">#&gt; lp__                                 -7246.48    0.08 3.29 -7253.82 -7248.43 -7246.12 -7244.06</span>
 <span class="co">#&gt;                                         97.5% n_eff Rhat</span>
-<span class="co">#&gt; beta[.trtStatin:preventionSecondary]     0.01  1822    1</span>
-<span class="co">#&gt; d[Statin]                                0.09  1843    1</span>
-<span class="co">#&gt; lp__                                 -7241.11  1609    1</span>
+<span class="co">#&gt; beta[.trtStatin:preventionSecondary]     0.00  2139    1</span>
+<span class="co">#&gt; d[Statin]                                0.08  2137    1</span>
+<span class="co">#&gt; lp__                                 -7241.09  1619    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 11:49:16 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 17:50:30 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -211,9 +211,9 @@
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">statin_fit_FE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"reg"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="example_statins_files/figure-html/statin_FE_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
-<div class="section level4">
-<h4 id="random-effects-meta-regression">Random effects meta-regression<a class="anchor" aria-label="anchor" href="#random-effects-meta-regression"></a>
-</h4>
+<div class="section level3">
+<h3 id="random-effects-meta-regression">Random effects meta-regression<a class="anchor" aria-label="anchor" href="#random-effects-meta-regression"></a>
+</h3>
 <p>We now fit a RE model. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effect <span class="math inline">\(d_\mathrm{Statin}\)</span>, study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and regression coefficient <span class="math inline">\(\beta\)</span>. We use a <span class="math inline">\(\textrm{half-N}(0, 5^2)\)</span> prior distribution for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
@@ -246,17 +246,17 @@
 <span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                                          mean se_mean   sd     2.5%      25%      50%      75%</span>
-<span class="co">#&gt; beta[.trtStatin:preventionSecondary]    -0.29    0.01 0.25    -0.81    -0.43    -0.28    -0.15</span>
-<span class="co">#&gt; d[Statin]                               -0.07    0.01 0.20    -0.47    -0.19    -0.08     0.04</span>
-<span class="co">#&gt; lp__                                 -7255.82    0.16 5.29 -7266.19 -7259.38 -7255.79 -7252.04</span>
-<span class="co">#&gt; tau                                      0.24    0.01 0.20     0.01     0.09     0.19     0.34</span>
+<span class="co">#&gt; beta[.trtStatin:preventionSecondary]    -0.29    0.01 0.26    -0.87    -0.43    -0.28    -0.15</span>
+<span class="co">#&gt; d[Statin]                               -0.07    0.00 0.20    -0.49    -0.18    -0.07     0.04</span>
+<span class="co">#&gt; lp__                                 -7255.74    0.17 5.15 -7266.59 -7259.04 -7255.59 -7252.15</span>
+<span class="co">#&gt; tau                                      0.24    0.01 0.20     0.01     0.09     0.19     0.33</span>
 <span class="co">#&gt;                                         97.5% n_eff Rhat</span>
-<span class="co">#&gt; beta[.trtStatin:preventionSecondary]     0.17  1461 1.00</span>
-<span class="co">#&gt; d[Statin]                                0.32  1412 1.00</span>
-<span class="co">#&gt; lp__                                 -7246.02  1112 1.00</span>
-<span class="co">#&gt; tau                                      0.75   817 1.01</span>
+<span class="co">#&gt; beta[.trtStatin:preventionSecondary]     0.22  1728    1</span>
+<span class="co">#&gt; d[Statin]                                0.36  1872    1</span>
+<span class="co">#&gt; lp__                                 -7246.08   941    1</span>
+<span class="co">#&gt; tau                                      0.75   733    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 11:49:34 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 17:50:52 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -270,20 +270,20 @@
 <p><img src="example_statins_files/figure-html/statin_RE_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
 </div>
-<div class="section level3">
-<h3 id="model-fit-and-comparison">Model fit and comparison<a class="anchor" aria-label="anchor" href="#model-fit-and-comparison"></a>
-</h3>
+<div class="section level2">
+<h2 id="model-fit-and-comparison">Model fit and comparison<a class="anchor" aria-label="anchor" href="#model-fit-and-comparison"></a>
+</h2>
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">statin_dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">statin_fit_FE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 45.7<span style="color: #555555;"> (on 38 data points)</span></span>
-<span class="co">#&gt;                pD: 21.5</span>
-<span class="co">#&gt;               DIC: 67.2</span></code></pre></div>
+<span class="co">#&gt; Residual deviance: 45.6<span style="color: #555555;"> (on 38 data points)</span></span>
+<span class="co">#&gt;                pD: 21.3</span>
+<span class="co">#&gt;               DIC: 66.9</span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">statin_dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">statin_fit_RE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 42.7<span style="color: #555555;"> (on 38 data points)</span></span>
-<span class="co">#&gt;                pD: 25.3</span>
-<span class="co">#&gt;               DIC: 68</span></code></pre></div>
+<span class="co">#&gt; Residual deviance: 42.4<span style="color: #555555;"> (on 38 data points)</span></span>
+<span class="co">#&gt;                pD: 24.7</span>
+<span class="co">#&gt;               DIC: 67.1</span></code></pre></div>
 <p>The DIC is very similar between FE and RE models, so we might choose the FE model based on parsimony. The residual deviance statistics are larger than the number of data points, suggesting that some data points are not fit well.</p>
 <p>We can also examine the residual deviance contributions with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
@@ -310,8 +310,8 @@
 <span class="co">#&gt;  prevention</span>
 <span class="co">#&gt;     Primary</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;                    mean  sd 2.5%   25%  50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[Primary: Statin] -0.1 0.1 -0.3 -0.17 -0.1 -0.04  0.09     1866     2054    1</span>
+<span class="co">#&gt;                    mean  sd  2.5%   25%  50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
+<span class="co">#&gt; d[Primary: Statin] -0.1 0.1 -0.29 -0.17 -0.1 -0.04  0.08     2150     2360    1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: Secondary</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
@@ -320,7 +320,7 @@
 <span class="co">#&gt;   Secondary</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[Secondary: Statin] -0.31 0.05 -0.42 -0.35 -0.31 -0.28 -0.21     4162     3454    1</span></code></pre></div>
+<span class="co">#&gt; d[Secondary: Statin] -0.31 0.05 -0.41 -0.35 -0.31 -0.28 -0.21     4184     2907    1</span></code></pre></div>
 <p>The <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method may be used to visually compare these estimates:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">statin_releff_FE</span>, 

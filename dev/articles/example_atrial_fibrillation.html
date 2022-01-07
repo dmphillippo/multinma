@@ -110,7 +110,7 @@
 <span class="co">#&gt; The following objects are masked from 'package:stats':</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     dgamma, pgamma, qgamma</span></code></pre>
-<p>This vignette describes the analysis of 26 trials comparing 17 treatments in 4 classes for the prevention of stroke in patients with atrial fibrillation <span class="citation">(Cooper et al. 2009)</span>. The data are available in this package as <code>atrial_fibrillation</code>:</p>
+<p>This vignette describes the analysis of 26 trials comparing 17 treatments in 4 classes for the prevention of stroke in patients with atrial fibrillation <span class="citation">(Cooper et al. <a href="#ref-Cooper2009" role="doc-biblioref">2009</a>)</span>. The data are available in this package as <code>atrial_fibrillation</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">atrial_fibrillation</span><span class="op">)</span>
 <span class="co">#&gt;     studyc studyn                                  trtc trtn      trt_class   r    n    E</span>
@@ -127,11 +127,11 @@
 <span class="co">#&gt; 4   0.06 1989      1.2</span>
 <span class="co">#&gt; 5   0.06 1989      1.2</span>
 <span class="co">#&gt; 6   0.10 1998      2.2</span></code></pre></div>
-<p><span class="citation">Cooper et al. (2009)</span> used this data to demonstrate meta-regression models, which we recreate here.</p>
-<div class="section level3">
-<h3 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
-</h3>
-<p>Whilst we have data on the patient-years at risk in each study (<code>E</code>), we ignore this here to follow the analysis of <span class="citation">Cooper et al. (2009)</span>, instead analysing the number of patients with stroke (<code>r</code>) out of the total (<code>n</code>) in each arm. We use the function <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code> to set up the network, making sure to specify the treatment classes <code>trt_class</code>. We remove the WASPO study from the network as both arms had zero events, and this study therefore contributes no information.</p>
+<p><span class="citation">Cooper et al. (<a href="#ref-Cooper2009" role="doc-biblioref">2009</a>)</span> used this data to demonstrate meta-regression models, which we recreate here.</p>
+<div class="section level2">
+<h2 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
+</h2>
+<p>Whilst we have data on the patient-years at risk in each study (<code>E</code>), we ignore this here to follow the analysis of <span class="citation">Cooper et al. (<a href="#ref-Cooper2009" role="doc-biblioref">2009</a>)</span>, instead analysing the number of patients with stroke (<code>r</code>) out of the total (<code>n</code>) in each arm. We use the function <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code> to set up the network, making sure to specify the treatment classes <code>trt_class</code>. We remove the WASPO study from the network as both arms had zero events, and this study therefore contributes no information.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">af_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_agd_arm.html">set_agd_arm</a></span><span class="op">(</span><span class="va">atrial_fibrillation</span><span class="op">[</span><span class="va">atrial_fibrillation</span><span class="op">$</span><span class="va">studyc</span> <span class="op">!=</span> <span class="st">"WASPO"</span>, <span class="op">]</span>, 
                       study <span class="op">=</span> <span class="va">studyc</span>,
@@ -169,17 +169,17 @@
   <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.box <span class="op">=</span> <span class="st">"vertical"</span><span class="op">)</span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_network_plot-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
-<div class="section level3">
-<h3 id="meta-analysis-models">Meta-analysis models<a class="anchor" aria-label="anchor" href="#meta-analysis-models"></a>
-</h3>
+<div class="section level2">
+<h2 id="meta-analysis-models">Meta-analysis models<a class="anchor" aria-label="anchor" href="#meta-analysis-models"></a>
+</h2>
 <p>We fit two (random effects) models:</p>
 <ol style="list-style-type: decimal">
-<li>A standard NMA model without any covariates (model 1 of <span class="citation">Cooper et al. (2009)</span>);</li>
-<li>A meta-regression model adjusting for the proportion of individuals in each study with prior stroke, with shared interaction coefficients by treatment class (model 4b of <span class="citation">Cooper et al. (2009)</span>).</li>
+<li>A standard NMA model without any covariates (model 1 of <span class="citation">Cooper et al. (<a href="#ref-Cooper2009" role="doc-biblioref">2009</a>)</span>);</li>
+<li>A meta-regression model adjusting for the proportion of individuals in each study with prior stroke, with shared interaction coefficients by treatment class (model 4b of <span class="citation">Cooper et al. (<a href="#ref-Cooper2009" role="doc-biblioref">2009</a>)</span>).</li>
 </ol>
-<div class="section level4">
-<h4 id="nma-with-no-covariates">NMA with no covariates<a class="anchor" aria-label="anchor" href="#nma-with-no-covariates"></a>
-</h4>
+<div class="section level3">
+<h3 id="nma-with-no-covariates">NMA with no covariates<a class="anchor" aria-label="anchor" href="#nma-with-no-covariates"></a>
+</h3>
 <p>We fit a random effects model using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "random"</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span> and study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and a <span class="math inline">\(\textrm{half-N}(5^2)\)</span> prior for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
@@ -246,7 +246,7 @@
 <span class="co">#&gt; lp__                                         -4766.75 -4758.44  1056    1</span>
 <span class="co">#&gt; tau                                              0.37     0.59   696    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 11:27:02 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 17:25:12 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -493,10 +493,10 @@
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_cumrankprobs</span><span class="op">)</span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_cumrankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
-<div class="section level4">
-<h4 id="network-meta-regression-adjusting-for-proportion-of-prior-stroke">Network meta-regression adjusting for proportion of prior stroke<a class="anchor" aria-label="anchor" href="#network-meta-regression-adjusting-for-proportion-of-prior-stroke"></a>
-</h4>
-<p>We now consider a meta-regression model adjusting for the proportion of individuals in each study with prior stroke, with shared interaction coefficients by treatment class. The regression model is specified in the <code><a href="../reference/nma.html">nma()</a></code> function using a formula in the <code>regression</code> argument. The formula <code>~ .trt:stroke</code> means that interactions of prior stroke with treatment will be included; the <code>.trt</code> special variable indicates treatment, and <code>stroke</code> is in the original data set. We specify <code>class_interactions = "common"</code> to denote that the interaction parameters are to be common (i.e. shared) between treatments within each class. (Setting <code>class_interactions = "independent"</code> would fit model 2 of <span class="citation">Cooper et al. (2009)</span> with separate interactions for each treatment, data permitting.) We use the same prior distributions as above, but additionally require a prior distribution for the regression coefficients <code>prior_reg</code>; we use a <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distribution. The <a href="https://mc-stan.org/users/documentation/case-studies/qr_regression.html" class="external-link">QR decomposition</a> can greatly improve the efficiency of sampling for regression models by decorrelating the sampling space; we specify that this should be used with <code>QR = TRUE</code>, and increase the target acceptance rate <code>adapt_delta = 0.99</code> to minimise divergent transition warnings.</p>
+<div class="section level3">
+<h3 id="network-meta-regression-adjusting-for-proportion-of-prior-stroke">Network meta-regression adjusting for proportion of prior stroke<a class="anchor" aria-label="anchor" href="#network-meta-regression-adjusting-for-proportion-of-prior-stroke"></a>
+</h3>
+<p>We now consider a meta-regression model adjusting for the proportion of individuals in each study with prior stroke, with shared interaction coefficients by treatment class. The regression model is specified in the <code><a href="../reference/nma.html">nma()</a></code> function using a formula in the <code>regression</code> argument. The formula <code>~ .trt:stroke</code> means that interactions of prior stroke with treatment will be included; the <code>.trt</code> special variable indicates treatment, and <code>stroke</code> is in the original data set. We specify <code>class_interactions = "common"</code> to denote that the interaction parameters are to be common (i.e. shared) between treatments within each class. (Setting <code>class_interactions = "independent"</code> would fit model 2 of <span class="citation">Cooper et al. (<a href="#ref-Cooper2009" role="doc-biblioref">2009</a>)</span> with separate interactions for each treatment, data permitting.) We use the same prior distributions as above, but additionally require a prior distribution for the regression coefficients <code>prior_reg</code>; we use a <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distribution. The <a href="https://mc-stan.org/users/documentation/case-studies/qr_regression.html" class="external-link">QR decomposition</a> can greatly improve the efficiency of sampling for regression models by decorrelating the sampling space; we specify that this should be used with <code>QR = TRUE</code>, and increase the target acceptance rate <code>adapt_delta = 0.99</code> to minimise divergent transition warnings.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">af_fit_4b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">af_net</span>, 
                  trt_effects <span class="op">=</span> <span class="st">"random"</span>,
@@ -566,7 +566,7 @@
 <span class="co">#&gt; lp__                                         -4766.29 -4758.77  1191 1.00</span>
 <span class="co">#&gt; tau                                              0.26     0.50   368 1.01</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 11:27:43 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 17:25:56 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -1278,9 +1278,9 @@
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_cumrankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
 </div>
-<div class="section level3">
-<h3 id="model-fit-and-comparison">Model fit and comparison<a class="anchor" aria-label="anchor" href="#model-fit-and-comparison"></a>
-</h3>
+<div class="section level2">
+<h2 id="model-fit-and-comparison">Model fit and comparison<a class="anchor" aria-label="anchor" href="#model-fit-and-comparison"></a>
+</h2>
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">af_dic_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">af_fit_1</span><span class="op">)</span><span class="op">)</span>

@@ -110,7 +110,7 @@
 <span class="co">#&gt; The following objects are masked from 'package:stats':</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     dgamma, pgamma, qgamma</span></code></pre>
-<p>This vignette describes the analysis of 13 trials investigating BCG vaccination vs. no vaccination for prevention of Tuberculosis (TB) <span class="citation">(Dias et al. 2011; Berkey et al. 1995)</span>. The data are available in this package as <code>bcg_vaccine</code>:</p>
+<p>This vignette describes the analysis of 13 trials investigating BCG vaccination vs. no vaccination for prevention of Tuberculosis (TB) <span class="citation">(Dias et al. <a href="#ref-TSD3" role="doc-biblioref">2011</a>; Berkey et al. <a href="#ref-Berkey1995" role="doc-biblioref">1995</a>)</span>. The data are available in this package as <code>bcg_vaccine</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bcg_vaccine</span><span class="op">)</span>
 <span class="co">#&gt;   studyn trtn         trtc latitude  r   n</span>
@@ -120,10 +120,10 @@
 <span class="co">#&gt; 4      2    2   Vaccinated       55  6 306</span>
 <span class="co">#&gt; 5      3    1 Unvaccinated       42 11 220</span>
 <span class="co">#&gt; 6      3    2   Vaccinated       42  3 231</span></code></pre></div>
-<p><span class="citation">Dias et al. (2011)</span> used these data to demonstrate meta-regression models adjusting for the continuous covariate <code>latitude</code>, the absolute degrees latitude at which the study was conducted, which we recreate here.</p>
-<div class="section level3">
-<h3 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
-</h3>
+<p><span class="citation">Dias et al. (<a href="#ref-TSD3" role="doc-biblioref">2011</a>)</span> used these data to demonstrate meta-regression models adjusting for the continuous covariate <code>latitude</code>, the absolute degrees latitude at which the study was conducted, which we recreate here.</p>
+<div class="section level2">
+<h2 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
+</h2>
 <p>We have data giving the number diagnosed with TB during trial follow-up (<code>r</code>) out of the total (<code>n</code>) in each arm, so we use the function <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code> to set up the network. We set “unvaccinated” as the network reference treatment.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">bcg_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_agd_arm.html">set_agd_arm</a></span><span class="op">(</span><span class="va">bcg_vaccine</span>, 
@@ -157,13 +157,13 @@
 <span class="co">#&gt; Network is <span style="color: #00BB00;">connected</span></span></code></pre></div>
 <p>The <code>latitude</code> variable in the <code>bcg_vaccine</code> data frame will automatically be available to use in a meta-regression model.</p>
 </div>
-<div class="section level3">
-<h3 id="meta-analysis-models">Meta-analysis models<a class="anchor" aria-label="anchor" href="#meta-analysis-models"></a>
-</h3>
+<div class="section level2">
+<h2 id="meta-analysis-models">Meta-analysis models<a class="anchor" aria-label="anchor" href="#meta-analysis-models"></a>
+</h2>
 <p>We fit random effects (RE) models, firstly without any covariates, and then with a meta-regression on the continuous covariate <code>latitude</code>.</p>
-<div class="section level4">
-<h4 id="re-meta-analysis-no-covariate">RE meta-analysis (no covariate)<a class="anchor" aria-label="anchor" href="#re-meta-analysis-no-covariate"></a>
-</h4>
+<div class="section level3">
+<h3 id="re-meta-analysis-no-covariate">RE meta-analysis (no covariate)<a class="anchor" aria-label="anchor" href="#re-meta-analysis-no-covariate"></a>
+</h3>
 <p>We start by fitting a standard RE model without any covariates. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effect <span class="math inline">\(d_\mathrm{Vaccine}\)</span> and study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and a <span class="math inline">\(\textrm{half-N}(0, 5^2)\)</span> prior distribution for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
@@ -198,7 +198,7 @@
 <span class="co">#&gt; lp__             1</span>
 <span class="co">#&gt; tau              1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 11:28:14 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 17:26:29 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -211,9 +211,9 @@
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="example_bcg_vaccine_files/figure-html/bcg_unadj_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
-<div class="section level4">
-<h4 id="re-meta-regression-with-covariate-latitude">RE meta-regression with covariate <code>latitude</code><a class="anchor" aria-label="anchor" href="#re-meta-regression-with-covariate-latitude"></a>
-</h4>
+<div class="section level3">
+<h3 id="re-meta-regression-with-covariate-latitude">RE meta-regression with covariate <code>latitude</code><a class="anchor" aria-label="anchor" href="#re-meta-regression-with-covariate-latitude"></a>
+</h3>
 <p>We now fit a RE meta-regression model, adjusting for <code>latitude</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effect <span class="math inline">\(d_\mathrm{Vaccine}\)</span>, study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and regression coefficient <span class="math inline">\(\beta\)</span>. We use a <span class="math inline">\(\text{half-N}(0, 5^2)\)</span> prior distribution for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
@@ -259,7 +259,7 @@
 <span class="co">#&gt; lp__                          -13448.20   767    1</span>
 <span class="co">#&gt; tau                                0.74   816    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 11:28:30 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 17:26:45 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -274,9 +274,9 @@
 <p><img src="example_bcg_vaccine_files/figure-html/bcg_lat_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
 </div>
-<div class="section level3">
-<h3 id="model-fit-and-comparison">Model fit and comparison<a class="anchor" aria-label="anchor" href="#model-fit-and-comparison"></a>
-</h3>
+<div class="section level2">
+<h2 id="model-fit-and-comparison">Model fit and comparison<a class="anchor" aria-label="anchor" href="#model-fit-and-comparison"></a>
+</h2>
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">bcg_dic_unadj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span><span class="op">)</span><span class="op">)</span>
@@ -307,7 +307,7 @@
      ref_line <span class="op">=</span> <span class="fl">0</span>,
      stat <span class="op">=</span> <span class="st">"halfeye"</span><span class="op">)</span></code></pre></div>
 <p><img src="example_bcg_vaccine_files/figure-html/bcg_vaccine_beta_lat-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>Altogether, we might prefer the model with the adjustment for latitude. When considering covariates in random effects models it is important not to just look at the DIC <span class="citation">(Dias et al. 2011)</span>. We should also consider any reductions in heterogeneity, and the estimated regression coefficients and their standard error. The DIC is not sensitive to changes in the heterogeneity, as RE models are very flexible and can fit the data well whatever the level of heterogeneity.</p>
+<p>Altogether, we might prefer the model with the adjustment for latitude. When considering covariates in random effects models it is important not to just look at the DIC <span class="citation">(Dias et al. <a href="#ref-TSD3" role="doc-biblioref">2011</a>)</span>. We should also consider any reductions in heterogeneity, and the estimated regression coefficients and their standard error. The DIC is not sensitive to changes in the heterogeneity, as RE models are very flexible and can fit the data well whatever the level of heterogeneity.</p>
 </div>
 <div class="section level2">
 <h2 id="further-results">Further results<a class="anchor" aria-label="anchor" href="#further-results"></a>
