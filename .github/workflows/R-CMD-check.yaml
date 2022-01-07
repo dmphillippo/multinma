@@ -21,8 +21,6 @@ jobs:
           - {os: ubuntu-latest,   r: 'oldrel-1'}
 
     env:
-      # CXX: g++
-      # CXX_OLEVEL: 2
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
       _R_CHECK_CRAN_INCOMING_REMOTE_: false
@@ -43,29 +41,6 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
-
-      # - name: Setup makevars
-      #   run: |
-      #     Sys.chmod("configure", mode = "0777")
-      #     dir.create("~/.R/")
-      #     if (Sys.info()[["sysname"]] == "Windows") {
-      #       mv <- "~/.R/Makevars.win"
-      #     } else {
-      #       mv <- "~/.R/Makevars"
-      #     }
-      #     file.create(mv)
-      #     CXX <- Sys.getenv("CXX")
-      #     cCXX <- system("R CMD config CXX", intern = TRUE)
-      #     if (CXX == "clang++") {
-      #       cCXX <- gsub(" g++", " clang++ -Qunused-arguments -fcolor-diagnostics", cCXX, fixed = TRUE)
-      #     }
-      #     cat("CXX =", cCXX, "\n", file = mv, append = TRUE)
-      #     cCXXFLAGS <- system("R CMD config CXXFLAGS", intern = TRUE)
-      #     cCXXFLAGS <- gsub("O[0-3]", paste0("O", Sys.getenv("CXX_OLEVEL")), cCXXFLAGS)
-      #     cat("CXXFLAGS =", cCXXFLAGS, "-pedantic -g0 -flto", "\n", file = mv, append = TRUE)
-      #     cat("LDFLAGS += -flto", "\n", file = mv, append = TRUE)
-      #     cat(readLines(mv), sep = "\n")
-      #   shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
         with:

@@ -14,8 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      # CXX: g++
-      # CXX_OLEVEL: 2
     steps:
       - uses: actions/checkout@v2
 
@@ -29,29 +27,6 @@ jobs:
         with:
           extra-packages: any::pkgdown, local::.
           needs: website
-
-      # - name: Setup makevars
-      #   run: |
-      #     Sys.chmod("configure", mode = "0777")
-      #     dir.create("~/.R/")
-      #     if (Sys.info()[["sysname"]] == "Windows") {
-      #       mv <- "~/.R/Makevars.win"
-      #     } else {
-      #       mv <- "~/.R/Makevars"
-      #     }
-      #     file.create(mv)
-      #     CXX <- Sys.getenv("CXX")
-      #     cCXX <- system("R CMD config CXX", intern = TRUE)
-      #     if (CXX == "clang++") {
-      #       cCXX <- gsub(" g++", " clang++ -Qunused-arguments -fcolor-diagnostics", cCXX, fixed = TRUE)
-      #     }
-      #     cat("CXX =", cCXX, "\n", file = mv, append = TRUE)
-      #     cCXXFLAGS <- system("R CMD config CXXFLAGS", intern = TRUE)
-      #     cCXXFLAGS <- gsub("O[0-3]", paste0("O", Sys.getenv("CXX_OLEVEL")), cCXXFLAGS)
-      #     cat("CXXFLAGS =", cCXXFLAGS, "-pedantic -g0 -flto", "\n", file = mv, append = TRUE)
-      #     cat("LDFLAGS += -flto", "\n", file = mv, append = TRUE)
-      #     cat(readLines(mv), sep = "\n")
-      #   shell: Rscript {0}
 
       - name: Build site
         run: Rscript -e 'options(width = 100, mc.cores = parallel::detectCores(), rmarkdown.html_vignette.check_title = FALSE); pkgdown::build_site_github_pages(new_process = FALSE, install = TRUE)'
