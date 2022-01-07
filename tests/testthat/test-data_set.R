@@ -430,6 +430,21 @@ test_that("set_* `.trt` column is correct", {
                agd_arm$trtf2)
   expect_equal(set_agd_contrast(agd_contrast, studyf, trtf2, y = ydiff, se = sediff, trt_ref = "C")$agd_contrast$.trt,
                agd_contrast$trtf2)
+
+  # Check that unused factor levels are dropped
+  expect_equal(set_ipd(agd_arm, studyc, forcats::fct_expand(trtf, "zzz"), y = cont)$ipd$.trt,
+               agd_arm$trtf)
+  expect_equal(set_agd_arm(agd_arm, studyc, forcats::fct_expand(trtf, "zzz"), y = cont, se = cont_pos)$agd_arm$.trt,
+               agd_arm$trtf)
+  expect_equal(set_agd_contrast(agd_contrast, studyf, forcats::fct_expand(trtf, "zzz"), y = ydiff, se = sediff)$agd_contrast$.trt,
+               agd_contrast$trtf)
+
+  expect_equal(set_ipd(agd_arm, studyc, forcats::fct_expand(trtf2, "zzz"), y = cont, trt_ref = "C")$ipd$.trt,
+               agd_arm$trtf2)
+  expect_equal(set_agd_arm(agd_arm, studyc, forcats::fct_expand(trtf2, "zzz"), y = cont, se = cont_pos, trt_ref = "C")$agd_arm$.trt,
+               agd_arm$trtf2)
+  expect_equal(set_agd_contrast(agd_contrast, studyf, forcats::fct_expand(trtf2, "zzz"), y = ydiff, se = sediff, trt_ref = "C")$agd_contrast$.trt,
+               agd_contrast$trtf2)
 })
 
 test_that("set_* `.study` column is correct", {
@@ -473,6 +488,21 @@ test_that("set_* `.study` column is correct", {
   expect_equal(set_agd_arm(agd_arm, studyf2, trtc, y = cont, se = cont_pos)$agd_arm$.study,
                agd_arm$studyf2)
   expect_equal(set_agd_contrast(agd_contrast, studyf2, trtc, y = ydiff, se = sediff)$agd_contrast$.study,
+               agd_contrast$studyf2)
+
+  # Check that unused levels are dropped
+  expect_equal(set_ipd(agd_arm, forcats::fct_expand(studyf, "zzz"), trtc, y = cont)$ipd$.study,
+               agd_arm$studyf)
+  expect_equal(set_agd_arm(agd_arm, forcats::fct_expand(studyf, "zzz"), trtc, y = cont, se = cont_pos)$agd_arm$.study,
+               agd_arm$studyf)
+  expect_equal(set_agd_contrast(agd_contrast, forcats::fct_expand(studyf, "zzz"), trtc, y = ydiff, se = sediff)$agd_contrast$.study,
+               agd_contrast$studyf)
+
+  expect_equal(set_ipd(agd_arm, forcats::fct_expand(studyf2, "zzz"), trtc, y = cont)$ipd$.study,
+               agd_arm$studyf2)
+  expect_equal(set_agd_arm(agd_arm, forcats::fct_expand(studyf2, "zzz"), trtc, y = cont, se = cont_pos)$agd_arm$.study,
+               agd_arm$studyf2)
+  expect_equal(set_agd_contrast(agd_contrast, forcats::fct_expand(studyf2, "zzz"), trtc, y = ydiff, se = sediff)$agd_contrast$.study,
                agd_contrast$studyf2)
 
   # Check reserved column names handled correctly
@@ -554,6 +584,15 @@ test_that("set_* can set `trt_ref`", {
                f_BCA)
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtf2, y = ydiff, se = sediff, trt_ref = factor("B"))$treatments,
                f_BCA)
+
+  # Check that unused levels are dropped
+  attr(f_BAC, "original_levels") <- c("A", "B", "C", "zzz")
+  expect_equal(set_ipd(agd_arm, studyc, forcats::fct_expand(trtf, "zzz"), y = cont, trt_ref = "B")$treatments,
+               f_BAC)
+  expect_equal(set_agd_arm(agd_arm, studyc, forcats::fct_expand(trtf, "zzz"), y = cont, se = cont_pos, trt_ref = "B")$treatments,
+               f_BAC)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, forcats::fct_expand(trtf, "zzz"), y = ydiff, se = sediff, trt_ref = "B")$treatments,
+               f_BAC)
 
   m <- "`trt_ref` does not match a treatment in the data.+Suitable values are:"
   expect_error(set_ipd(agd_arm, studyc, trtc, y = cont, trt_ref = 2), m)
@@ -645,6 +684,26 @@ test_that("set_* returns correct .trtclass column", {
   expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
                                                 trt_class = tclassf2), trt_ref = "B")$agd_contrast$.trtclass,
                agd_contrast$tclassf2)
+
+  # Check that unused factor levels are dropped
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
+                       trt_class = forcats::fct_expand(tclassf, "zzz"))$ipd$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = forcats::fct_expand(tclassf, "zzz"))$agd_arm$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = forcats::fct_expand(tclassf, "zzz"))$agd_contrast$.trtclass,
+               agd_contrast$tclassf)
+  expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
+                                       trt_class = forcats::fct_expand(tclassf, "zzz")))$ipd$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(combine_network(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                                           trt_class = forcats::fct_expand(tclassf, "zzz")))$agd_arm$.trtclass,
+               agd_arm$tclassf)
+  expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                                trt_class = forcats::fct_expand(tclassf, "zzz")))$agd_contrast$.trtclass,
+               agd_contrast$tclassf)
 
   # Checks when default trt_ref not first in sort order
   expect_equal(set_ipd(aa, studyc, trtc, y = cont,
@@ -821,6 +880,27 @@ test_that("set_* returns classes factor variable", {
                                                 trt_class = trtf2),
                                trt_ref = "B")$classes,
                f_class3)
+
+  # Check that unused levels are dropped
+  attr(f_class, "original_levels") <- c("a", "b", "zzz")
+  expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
+                       trt_class = forcats::fct_expand(tclassf, "zzz"))$classes,
+               f_class)
+  expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                           trt_class = forcats::fct_expand(tclassf, "zzz"))$classes,
+               f_class)
+  expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                trt_class = forcats::fct_expand(tclassf, "zzz"))$classes,
+               f_class)
+  expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
+                                       trt_class = forcats::fct_expand(tclassf, "zzz")))$classes,
+               f_class)
+  expect_equal(combine_network(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
+                                           trt_class = forcats::fct_expand(tclassf, "zzz")))$classes,
+               f_class)
+  expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                                trt_class = forcats::fct_expand(tclassf, "zzz")))$classes,
+               f_class)
 })
 
 test_that("set_* checks for bad class variable work", {

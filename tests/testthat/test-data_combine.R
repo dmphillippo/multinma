@@ -193,6 +193,44 @@ test_that("combine_network produces combined treatment, class, and study factors
   expect_equal(levels(c2_classed$agd_arm$.trtclass), letters[c(2, 3, 1)])
   expect_equal(levels(c2_classed$ipd$.trtclass), letters[c(2, 3, 1)])
   expect_equal(levels(c2_classed$agd_contrast$.trtclass), letters[c(2, 3, 1)])
+
+  # Check that unused levels are dropped
+  c3_classed <- combine_network(
+    set_agd_arm(agd_arm,
+                forcats::fct_expand(studyf2, "xxx"),
+                forcats::fct_expand(trtf2, "yyy"),
+                y = y, se = se,
+                trt_class = forcats::fct_expand(tclassf2, "zzz")),
+    set_ipd(ipd,
+            forcats::fct_expand(studyf2, "xxx"),
+            forcats::fct_expand(trtf2, "yyy"),
+            y = y,
+            trt_class = forcats::fct_expand(tclassf2, "zzz")),
+    set_agd_contrast(agd_contrast,
+                     forcats::fct_expand(studyf2, "xxx"),
+                     forcats::fct_expand(trtf2, "yyy"),
+                     y = y, se = se,
+                     trt_class = forcats::fct_expand(tclassf2, "zzz")))
+
+  # Reference treatment is B
+  c3_trtf <- c2_trtf
+  attr(c3_trtf, "original_levels") <- c(attr(c3_trtf, "original_levels"), "yyy")
+  expect_equal(c3_classed$treatments, c3_trtf)
+  expect_equal(levels(c3_classed$agd_arm$.trt), LETTERS[c(2, 4, 3, 1)])
+  expect_equal(levels(c3_classed$agd_contrast$.trt), LETTERS[c(2, 4, 3, 1)])
+  expect_equal(levels(c3_classed$ipd$.trt), LETTERS[c(2, 4, 3, 1)])
+  c3_studyf <- c2_studyf
+  attr(c3_studyf, "original_levels") <- c(attr(c3_studyf, "original_levels"), "xxx")
+  expect_equal(c3_classed$studies, c3_studyf)
+  expect_equal(levels(c3_classed$agd_arm$.study), letters[5:1])
+  expect_equal(levels(c3_classed$agd_contrast$.study), letters[5:1])
+  expect_equal(levels(c3_classed$ipd$.study), letters[5:1])
+  c3_classf <- factor(letters[c(2, 3, 2, 1)], levels = c(letters[c(2, 3, 1)]))
+  attr(c3_classf, "original_levels") <- c(letters[3:1], "zzz")
+  expect_equal(c3_classed$classes, c3_classf)
+  expect_equal(levels(c3_classed$agd_arm$.trtclass), letters[c(2, 3, 1)])
+  expect_equal(levels(c3_classed$ipd$.trtclass), letters[c(2, 3, 1)])
+  expect_equal(levels(c3_classed$agd_contrast$.trtclass), letters[c(2, 3, 1)])
 })
 
 test_that("combine_network can set alternative trt_ref", {
