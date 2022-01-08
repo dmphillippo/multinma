@@ -191,15 +191,15 @@
 <span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                    mean se_mean   sd      2.5%       25%       50%       75%     97.5% n_eff</span>
-<span class="co">#&gt; d[Vaccinated]     -0.76    0.01 0.22     -1.20     -0.89     -0.75     -0.62     -0.35   931</span>
-<span class="co">#&gt; lp__          -13453.92    0.14 4.36 -13463.50 -13456.57 -13453.59 -13450.88 -13446.37  1004</span>
-<span class="co">#&gt; tau                0.68    0.01 0.19      0.39      0.54      0.65      0.78      1.15  1343</span>
+<span class="co">#&gt; d[Vaccinated]     -0.75    0.01 0.21     -1.17     -0.89     -0.75     -0.62     -0.34  1284</span>
+<span class="co">#&gt; lp__          -13453.94    0.13 4.44 -13463.44 -13456.69 -13453.65 -13450.86 -13446.31  1168</span>
+<span class="co">#&gt; tau                0.68    0.01 0.20      0.39      0.54      0.65      0.78      1.14  1408</span>
 <span class="co">#&gt;               Rhat</span>
 <span class="co">#&gt; d[Vaccinated]    1</span>
 <span class="co">#&gt; lp__             1</span>
 <span class="co">#&gt; tau              1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 20:43:38 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sat Jan  8 17:25:07 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -251,16 +251,16 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                                    mean se_mean   sd      2.5%       25%       50%       75%</span>
 <span class="co">#&gt; beta[.trtVaccinated:latitude]     -0.03    0.00 0.01     -0.05     -0.04     -0.03     -0.03</span>
-<span class="co">#&gt; d[Vaccinated]                     -0.76    0.00 0.12     -1.04     -0.83     -0.76     -0.69</span>
-<span class="co">#&gt; lp__                          -13457.18    0.20 5.06 -13467.74 -13460.37 -13456.80 -13453.54</span>
-<span class="co">#&gt; tau                                0.30    0.01 0.18      0.03      0.17      0.27      0.40</span>
+<span class="co">#&gt; d[Vaccinated]                     -0.76    0.00 0.12     -1.02     -0.83     -0.75     -0.69</span>
+<span class="co">#&gt; lp__                          -13457.10    0.18 5.08 -13467.75 -13460.31 -13456.75 -13453.42</span>
+<span class="co">#&gt; tau                                0.30    0.01 0.18      0.03      0.16      0.27      0.40</span>
 <span class="co">#&gt;                                   97.5% n_eff Rhat</span>
-<span class="co">#&gt; beta[.trtVaccinated:latitude]     -0.01  1684    1</span>
-<span class="co">#&gt; d[Vaccinated]                     -0.53  1558    1</span>
-<span class="co">#&gt; lp__                          -13448.28   664    1</span>
-<span class="co">#&gt; tau                                0.73   743    1</span>
+<span class="co">#&gt; beta[.trtVaccinated:latitude]     -0.02  2004    1</span>
+<span class="co">#&gt; d[Vaccinated]                     -0.52  1801    1</span>
+<span class="co">#&gt; lp__                          -13448.20   767    1</span>
+<span class="co">#&gt; tau                                0.74   816    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan  7 20:43:50 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sat Jan  8 17:25:23 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -281,27 +281,27 @@
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">bcg_dic_unadj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 26.1<span style="color: #555555;"> (on 26 data points)</span></span>
+<span class="co">#&gt; Residual deviance: 26<span style="color: #555555;"> (on 26 data points)</span></span>
 <span class="co">#&gt;                pD: 23.5</span>
-<span class="co">#&gt;               DIC: 49.6</span></code></pre></div>
+<span class="co">#&gt;               DIC: 49.5</span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">bcg_dic_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 30.5<span style="color: #555555;"> (on 26 data points)</span></span>
-<span class="co">#&gt;                pD: 21.5</span>
-<span class="co">#&gt;               DIC: 52</span></code></pre></div>
+<span class="co">#&gt; Residual deviance: 30.4<span style="color: #555555;"> (on 26 data points)</span></span>
+<span class="co">#&gt;                pD: 21.2</span>
+<span class="co">#&gt;               DIC: 51.6</span></code></pre></div>
 <p>The DIC is very similar between the two models, so we might at first choose the unadjusted model. The posterior mean residual deviance is larger for the model with the covariate, but this model also has a lower effective number of parameters <span class="math inline">\(p_D\)</span> so is allowing for more shrinkage of the random treatment effects. Moreover, the model with the covariate has a much lower estimated heterogeneity standard deviation:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span>
-<span class="co">#&gt;     mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; tau 0.68 0.19 0.39 0.54 0.65 0.78  1.15     1352     2150    1</span>
+<span class="co">#&gt;     mean  sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
+<span class="co">#&gt; tau 0.68 0.2 0.39 0.54 0.65 0.78  1.14     1417     2113    1</span>
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span>
 <span class="co">#&gt;     mean   sd 2.5%  25%  50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; tau  0.3 0.18 0.03 0.17 0.27 0.4  0.73      659      743    1</span></code></pre></div>
+<span class="co">#&gt; tau  0.3 0.18 0.03 0.16 0.27 0.4  0.74      755     1246    1</span></code></pre></div>
 <p>Adjusting for latitude is explaining a substantial amount of heterogeneity in the data. The 95% Credible Interval for the regression coefficient also excludes zero:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, pars <span class="op">=</span> <span class="st">"beta"</span><span class="op">)</span>
 <span class="co">#&gt;                                mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; beta[.trtVaccinated:latitude] -0.03 0.01 -0.05 -0.04 -0.03 -0.03 -0.01     1746     1894    1</span>
+<span class="co">#&gt; beta[.trtVaccinated:latitude] -0.03 0.01 -0.05 -0.04 -0.03 -0.03 -0.02     2059     2260    1</span>
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, 
      pars <span class="op">=</span> <span class="st">"beta"</span>, 
@@ -328,7 +328,7 @@
 <span class="co">#&gt;        10</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                              mean   sd  2.5%   25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[10° latitude: Vaccinated] -0.03 0.23 -0.53 -0.14   0 0.1  0.38     1550     1726    1</span>
+<span class="co">#&gt; d[10° latitude: Vaccinated] -0.02 0.21 -0.49 -0.13   0 0.1  0.39     2106     2085    1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 20° latitude</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
@@ -337,7 +337,7 @@
 <span class="co">#&gt;        20</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[20° latitude: Vaccinated] -0.34 0.16 -0.71 -0.42 -0.33 -0.25 -0.05     1523     1775    1</span>
+<span class="co">#&gt; d[20° latitude: Vaccinated] -0.33 0.16 -0.67 -0.42 -0.32 -0.25 -0.04     2119     1945    1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 30° latitude</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
@@ -346,7 +346,7 @@
 <span class="co">#&gt;        30</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[30° latitude: Vaccinated] -0.66 0.13 -0.93 -0.72 -0.65 -0.58 -0.42     1612     1638    1</span>
+<span class="co">#&gt; d[30° latitude: Vaccinated] -0.65 0.12 -0.91 -0.72 -0.64 -0.58 -0.41     2066     1826    1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 40° latitude</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
@@ -355,7 +355,7 @@
 <span class="co">#&gt;        40</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[40° latitude: Vaccinated] -0.97 0.14 -1.27 -1.05 -0.96 -0.89  -0.7     1827     1709    1</span>
+<span class="co">#&gt; d[40° latitude: Vaccinated] -0.97 0.14 -1.25 -1.05 -0.96 -0.89 -0.69     1793     1868    1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 50° latitude</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
@@ -364,7 +364,7 @@
 <span class="co">#&gt;        50</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[50° latitude: Vaccinated] -1.28 0.19 -1.69 -1.39 -1.28 -1.17 -0.89     1912     1914    1</span></code></pre></div>
+<span class="co">#&gt; d[50° latitude: Vaccinated] -1.28 0.18 -1.66 -1.39 -1.28 -1.18 -0.91     1766     2190    1</span></code></pre></div>
 <p>The <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method may be used to visually compare these estimates:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bcg_releff_lat</span>, 
