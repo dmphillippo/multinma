@@ -18,7 +18,7 @@
 #'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #' @param sucra Logical, calculate the surface under the cumulative ranking
-#'   curve (SUCRA) values? Default is `FALSE`.
+#'   curve (SUCRA) for each treatment? Default `FALSE`.
 #'
 #' @return A [nma_summary] object if `summary = TRUE`, otherwise a list
 #'   containing a 3D MCMC array of samples and (for regression models) a data

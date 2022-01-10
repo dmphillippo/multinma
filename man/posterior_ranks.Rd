@@ -43,7 +43,7 @@ default) or higher better (\code{FALSE})? See details.}
 summary, default \code{c(0.025, 0.25, 0.5, 0.75, 0.975)}}
 
 \item{sucra}{Logical, calculate the surface under the cumulative ranking
-curve (SUCRA) values? Default is \code{FALSE}.}
+curve (SUCRA) for each treatment? Default \code{FALSE}.}
 
 \item{summary}{Logical, calculate posterior summaries? Default \code{TRUE}.}
 
