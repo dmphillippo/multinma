@@ -11,6 +11,7 @@ posterior_ranks(
   study = NULL,
   lower_better = TRUE,
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
+  sucra = FALSE,
   summary = TRUE
 )
 
@@ -41,15 +42,15 @@ default) or higher better (\code{FALSE})? See details.}
 \item{probs}{Numeric vector of quantiles of interest to present in computed
 summary, default \code{c(0.025, 0.25, 0.5, 0.75, 0.975)}}
 
+\item{sucra}{Logical, calculate the surface under the cumulative ranking
+curve (SUCRA) values? Default is \code{FALSE}.}
+
 \item{summary}{Logical, calculate posterior summaries? Default \code{TRUE}.}
 
 \item{cumulative}{Logical, return cumulative rank probabilities? Default is
 \code{FALSE}, return posterior probabilities of each treatment having a given
 rank. If \code{TRUE}, cumulative posterior rank probabilities are returned for
 each treatment having a given rank or better.}
-
-\item{sucra}{Logical, calculate the surface under the cumulative ranking
-curve (SUCRA) values? Default is \code{FALSE}.}
 }
 \value{
 A \link{nma_summary} object if \code{summary = TRUE}, otherwise a list
