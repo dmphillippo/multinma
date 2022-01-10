@@ -103,14 +103,17 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the released version of <code>multinma</code> from <a href="https://CRAN.R-project.org" class="external-link">CRAN</a> with:</p>
+<p>You can install the released version of <code>multinma</code> from <a href="https://CRAN.R-project.org/package=multinma" class="external-link">CRAN</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"multinma"</span><span class="op">)</span></code></pre></div>
-<p>And the development version from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<p>The development version can be installed from <a href="https://dmphillippo.r-universe.dev" class="external-link">R-universe</a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"multinma"</span>, repos <span class="op">=</span> <span class="st">"https://dmphillippo.r-universe.dev"</span><span class="op">)</span></code></pre></div>
+<p>or from source on <a href="https://github.com/dmphillippo/multinma" class="external-link">GitHub</a> with:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"dmphillippo/multinma"</span><span class="op">)</span></code></pre></div>
-<p>Installing from source (either from CRAN or GitHub) requires that the <code>rstan</code> package is installed and configured. See the installation guide <a href="https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started" class="external-link">here</a>.</p>
+<p>Installing from source requires that the <code>rstan</code> package is installed and configured. See the installation guide <a href="https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started" class="external-link">here</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
@@ -129,7 +132,7 @@
 </h2>
 <p>The <code>multinma</code> package can be cited as follows:</p>
 <blockquote>
-<p>Phillippo, D. M. (2021). <em>multinma: Network Meta-Analysis of Individual and Aggregate Data in Stan</em>. R package version 0.3.0.9000, doi: <a href="https://doi.org/10.5281/zenodo.3904454" class="external-link">10.5281/zenodo.3904454</a>.</p>
+<p>Phillippo, D. M. (2022). <em>multinma: Network Meta-Analysis of Individual and Aggregate Data in Stan</em>. R package version 0.3.0.9000, doi: <a href="https://doi.org/10.5281/zenodo.3904454" class="external-link">10.5281/zenodo.3904454</a>.</p>
 </blockquote>
 <p>When fitting ML-NMR models, please cite the methods paper:</p>
 <blockquote>
@@ -187,6 +190,7 @@ Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A. Schacht, D. Sau
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://CRAN.R-project.org/package=multinma" class="external-link"><img src="https://www.r-pkg.org/badges/version/multinma" alt="CRAN status"></a></li>
+<li><a href="https://dmphillippo.r-universe.dev" class="external-link"><img src="https://dmphillippo.r-universe.dev/badges/multinma" alt="R-universe"></a></li>
 <li><a href="https://github.com/dmphillippo/multinma/actions" class="external-link"><img src="https://github.com/dmphillippo/multinma/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://doi.org/10.5281/zenodo.3904454" class="external-link"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3904454.svg" alt="DOI"></a></li>
 </ul>
