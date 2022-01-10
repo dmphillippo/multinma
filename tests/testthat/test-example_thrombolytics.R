@@ -206,6 +206,15 @@ test_that("FE relative effects", {
   expect_equivalent(thrombo_releff_summary$`97.5%`, tsd_releff$upper, tolerance = tol)
 })
 
+test_that("SUCRAs", {
+  thrombo_ranks <- posterior_ranks(thrombo_fit, sucra = TRUE)
+  thrombo_rankprobs <- posterior_rank_probs(thrombo_fit, sucra = TRUE)
+  thrombo_cumrankprobs <- posterior_rank_probs(thrombo_fit, cumulative = TRUE, sucra = TRUE)
+  
+  expect_equal(thrombo_ranks$summary$sucra, thrombo_rankprobs$summary$sucra)
+  expect_equal(thrombo_ranks$summary$sucra, thrombo_cumrankprobs$summary$sucra)
+})
+
 # DIC
 test_that("DIC", {
   expect_equivalent(dic_consistency$resdev, 105.9, tolerance = tol_dic)
