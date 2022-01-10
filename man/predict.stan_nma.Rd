@@ -49,16 +49,16 @@ applies to.}
 is specified. A data frame of covariate details, for which to produce
 predictions. Column names must match variables in the regression model.
 
-If \code{type = "aggregate"} this should either be a data frame with integration
+If \code{level = "aggregate"} this should either be a data frame with integration
 points as produced by \code{\link[=add_integration]{add_integration()}} (one row per study), or a data
 frame with individual covariate values (one row per individual) which are
 summarised over.
 
-If \code{type = "individual"} this should be a data frame of individual
+If \code{level = "individual"} this should be a data frame of individual
 covariate values, one row per individual.
 
 If \code{NULL}, predictions are produced for all studies with IPD and/or
-arm-based AgD in the network, depending on the value of \code{type}.}
+arm-based AgD in the network, depending on the value of \code{level}.}
 
 \item{study}{Column of \code{newdata} which specifies study names or IDs. When not
 specified: if \code{newdata} contains integration points produced by
@@ -76,8 +76,8 @@ default, e.g. log odds) or \code{"response"} scale (e.g. probabilities).}
 \item{level}{The level at which predictions are produced, either
 \code{"aggregate"} (the default), or \code{"individual"}. If \code{baseline} is not
 specified, predictions are produced for all IPD studies in the network if
-\code{type} is \code{"individual"} or \code{"aggregate"}, and for all arm-based AgD
-studies in the network if \code{type} is \code{"aggregate"}.}
+\code{level} is \code{"individual"} or \code{"aggregate"}, and for all arm-based AgD
+studies in the network if \code{level} is \code{"aggregate"}.}
 
 \item{baseline_type}{When a \code{baseline} distribution is given, specifies
 whether this corresponds to the \code{"link"} scale (the default, e.g. log odds)
