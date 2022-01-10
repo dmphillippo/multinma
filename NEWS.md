@@ -13,6 +13,9 @@ behaviour, with options `"spearman"`, `"pearson"`, or `"none"`. Although these
 correlations typically have little impact on the results, for strict
 reproducibility the old behaviour from version 0.3.0 and below is available with
 `cor_adjust = "legacy"`.
+* Feature: Added option to calculate SUCRA values when summarising the posterior
+treatment ranks with `posterior_ranks()` or `posterior_rank_probs()`, when
+argument `sucra = TRUE`.
 * Improvement: Factor order is now respected when `trt`, `study`, or `trt_class`
 are factors, previously the order of levels was reset into natural sort order.
 * Improvement: Update package website to Bootstrap 5 with release of pkgdown

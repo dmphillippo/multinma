@@ -11,6 +11,7 @@ posterior_ranks(
   study = NULL,
   lower_better = TRUE,
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
+  sucra = FALSE,
   summary = TRUE
 )
 
@@ -19,7 +20,8 @@ posterior_rank_probs(
   newdata = NULL,
   study = NULL,
   lower_better = TRUE,
-  cumulative = FALSE
+  cumulative = FALSE,
+  sucra = FALSE
 )
 }
 \arguments{
@@ -39,6 +41,9 @@ default) or higher better (\code{FALSE})? See details.}
 
 \item{probs}{Numeric vector of quantiles of interest to present in computed
 summary, default \code{c(0.025, 0.25, 0.5, 0.75, 0.975)}}
+
+\item{sucra}{Logical, calculate the surface under the cumulative ranking
+curve (SUCRA) for each treatment? Default \code{FALSE}.}
 
 \item{summary}{Logical, calculate posterior summaries? Default \code{TRUE}.}
 

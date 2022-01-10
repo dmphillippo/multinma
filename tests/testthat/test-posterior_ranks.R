@@ -35,6 +35,15 @@ test_that("summary argument", {
   expect_error(posterior_ranks(smk_fit_RE, summary = NULL), m)
 })
 
+test_that("sucra argument", {
+  m <- "should be TRUE or FALSE"
+  expect_error(posterior_ranks(smk_fit_RE, sucra = "a"), m)
+  expect_error(posterior_ranks(smk_fit_RE, sucra = 1), m)
+  expect_error(posterior_ranks(smk_fit_RE, sucra = list()), m)
+  expect_error(posterior_ranks(smk_fit_RE, sucra = NA), m)
+  expect_error(posterior_ranks(smk_fit_RE, sucra = NULL), m)
+})
+
 test_that("newdata argument", {
   m <- "not a data frame"
   expect_error(posterior_ranks(smk_fit_RE, newdata = "a"), m)
@@ -76,4 +85,13 @@ test_that("cumulative argument", {
   expect_error(posterior_rank_probs(smk_fit_RE, cumulative = list()), m)
   expect_error(posterior_rank_probs(smk_fit_RE, cumulative = NA), m)
   expect_error(posterior_rank_probs(smk_fit_RE, cumulative = NULL), m)
+})
+
+test_that("sucra argument", {
+  m <- "should be TRUE or FALSE"
+  expect_error(posterior_rank_probs(smk_fit_RE, sucra = "a"), m)
+  expect_error(posterior_rank_probs(smk_fit_RE, sucra = 1), m)
+  expect_error(posterior_rank_probs(smk_fit_RE, sucra = list()), m)
+  expect_error(posterior_rank_probs(smk_fit_RE, sucra = NA), m)
+  expect_error(posterior_rank_probs(smk_fit_RE, sucra = NULL), m)
 })

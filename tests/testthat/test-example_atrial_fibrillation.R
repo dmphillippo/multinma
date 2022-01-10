@@ -289,6 +289,15 @@ test_that("DIC (no covariates)", {
   expect_equivalent(af_dic_1$dic, 108.57, tolerance = tol_dic)
 })
 
+test_that("SUCRAs", {
+  af_ranks_1 <- posterior_ranks(af_fit_1, sucra = TRUE)
+  af_rankprobs_1 <- posterior_rank_probs(af_fit_1, sucra = TRUE)
+  af_cumrankprobs_1 <- posterior_rank_probs(af_fit_1, cumulative = TRUE, sucra = TRUE)
+  
+  expect_equal(af_ranks_1$summary$sucra, af_rankprobs_1$summary$sucra)
+  expect_equal(af_ranks_1$summary$sucra, af_cumrankprobs_1$summary$sucra)
+})
+
 
 # Check construction of all contrasts
 af_1_releff_all_contr <- relative_effects(af_fit_1, all_contrasts = TRUE)
@@ -381,6 +390,19 @@ test_that("DIC (common interaction)", {
   expect_equivalent(af_dic_4b$resdev, 58.74, tolerance = tol_dic)
   expect_equivalent(af_dic_4b$pd, 48.25, tolerance = tol_dic)
   expect_equivalent(af_dic_4b$dic, 106.99, tolerance = tol_dic)
+})
+
+test_that("SUCRAs", {
+  stroke_01 <- data.frame(stroke = c(0, 1), label = c("stroke = 0", "stroke = 1"))
+  af_ranks_4b <- posterior_ranks(af_fit_4b, newdata = stroke_01, 
+                                study = label, sucra = TRUE)
+  af_rankprobs_4b <- posterior_rank_probs(af_fit_4b, newdata = stroke_01, 
+                                           study = label, sucra = TRUE)
+  af_cumrankprobs_4b <- posterior_rank_probs(af_fit_4b, cumulative = TRUE, newdata = stroke_01,
+                                              study = label, sucra = TRUE)
+  
+  expect_equal(af_ranks_4b$summary$sucra, af_rankprobs_4b$summary$sucra)
+  expect_equal(af_ranks_4b$summary$sucra, af_cumrankprobs_4b$summary$sucra)
 })
 
 # Check construction of all contrasts
