@@ -221,13 +221,18 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
 #'   `FALSE`, return posterior probabilities of each treatment having a given
 #'   rank. If `TRUE`, cumulative posterior rank probabilities are returned for
 #'   each treatment having a given rank or better.
+#' @param sucra Logical, calculate the surface under the cumulative ranking
+#'   curve (SUCRA) values? Default is `FALSE`.
 #' @export
 #' @rdname posterior_ranks
 posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better = TRUE,
-                                 cumulative = FALSE) {
+                                 cumulative = FALSE, sucra = FALSE) {
   # Checks
   if (!rlang::is_bool(cumulative))
     abort("`cumulative` should be TRUE or FALSE.")
+
+  if (!rlang::is_bool(sucra))
+    abort("`sucra` should be TRUE or FALSE.")
 
   # All other checks handled by posterior_ranks()
   rk <- posterior_ranks(x = x, newdata = newdata, study = {{ study }},
@@ -241,9 +246,15 @@ posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better =
     p_rank <- apply(apply(rk$sims, 1:3, `==`, 1:ntrt), c(4, 1), mean)
     if (cumulative) p_rank <- t(apply(p_rank, 1, cumsum))
 
+    if (sucra) {
+      if (cumulative) sucras <- rowMeans(p_rank[, -ntrt, drop = FALSE])
+      else sucras <- rowMeans(t(apply(p_rank, 1, cumsum))[, -ntrt, drop = FALSE])
+    }
+
     rownames(p_rank) <- stringr::str_replace(rownames(p_rank), "^rank\\[", "d\\[")
     colnames(p_rank) <- paste0("p_rank[", 1:ntrt, "]")
     p_rank <- tibble::as_tibble(p_rank, rownames = "parameter")
+    if (sucra) p_rank$sucra <- sucras
     out <- list(summary = p_rank)
 
   } else { # Study-specific treatment effects
@@ -259,11 +270,17 @@ posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better =
 
     if (cumulative) p_rank <- t(apply(p_rank, 1, cumsum))
 
+    if (sucra) {
+      if (cumulative) sucras <- rowMeans(p_rank[, -ntrt, drop = FALSE])
+      else sucras <- rowMeans(t(apply(p_rank, 1, cumsum))[, -ntrt, drop = FALSE])
+    }
+
     rownames(p_rank) <- stringr::str_replace(dimnames(rk_sims)[[3]], "^rank\\[", "d\\[")
     colnames(p_rank) <- paste0("p_rank[", 1:ntrt, "]")
     p_rank <- tibble::as_tibble(p_rank, rownames = "parameter") %>%
       # Add in study info
       tibble::add_column(.study = rep(studies$.study, each = ntrt), .before = 1)
+    if (sucra) p_rank$sucra <- sucras
     out <- list(summary = p_rank, studies = studies)
 
   }

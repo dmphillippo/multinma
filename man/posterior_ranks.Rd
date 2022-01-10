@@ -19,7 +19,8 @@ posterior_rank_probs(
   newdata = NULL,
   study = NULL,
   lower_better = TRUE,
-  cumulative = FALSE
+  cumulative = FALSE,
+  sucra = FALSE
 )
 }
 \arguments{
@@ -46,6 +47,9 @@ summary, default \code{c(0.025, 0.25, 0.5, 0.75, 0.975)}}
 \code{FALSE}, return posterior probabilities of each treatment having a given
 rank. If \code{TRUE}, cumulative posterior rank probabilities are returned for
 each treatment having a given rank or better.}
+
+\item{sucra}{Logical, calculate the surface under the cumulative ranking
+curve (SUCRA) values? Default is \code{FALSE}.}
 }
 \value{
 A \link{nma_summary} object if \code{summary = TRUE}, otherwise a list
