@@ -66,6 +66,9 @@
 #'   `"aggregate"` in this instance.
 #' @param probs Numeric vector of quantiles of interest to present in computed
 #'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`
+#' @param predictive_interval Logical, when a random effects model has been
+#'   fitted, should predictive intervals for the absolute effects in a new study
+#'   be returned? Default `FALSE`.
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #'
 #' @return A [nma_summary] object if `summary = TRUE`, otherwise a list
@@ -152,6 +155,7 @@ predict.stan_nma <- function(object, ...,
                              baseline_type = c("link", "response"),
                              baseline_level = c("individual", "aggregate"),
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
+                             predictive_interval = FALSE,
                              summary = TRUE) {
   # Checks
   if (!inherits(object, "stan_nma")) abort("Expecting a `stan_nma` object, as returned by nma().")
@@ -261,6 +265,11 @@ predict.stan_nma <- function(object, ...,
 
         # Get posterior samples
         post <- as.array(object, pars = c("mu", "d"))
+        if (predictive_interval) {
+          # For predictive intervals, use delta_new instead of d
+          delta_new <- get_delta_new(object)
+          post[ , , dimnames(delta_new)[[3]]] <- delta_new
+        }
 
         # Get prediction array
         pred_array <- tcrossprod_mcmc_array(post, X_all)
@@ -311,7 +320,14 @@ predict.stan_nma <- function(object, ...,
       dim_post <- c(dim_d[1:2], dim_d[3] + 1)
       post <- array(NA_real_, dim = dim_post)
       post[ , , 1] <- mu
-      post[ , , 2:dim_post[3]] <- d
+      if (!predictive_interval) {
+        post[ , , 2:dim_post[3]] <- d
+      } else {
+        # For predictive intervals, use delta_new instead of d
+        post[ , , 2:dim_post[3]] <- get_delta_new(object)
+      }
+
+
 
       # Get prediction array
       pred_array <- tcrossprod_mcmc_array(post, X_all)
@@ -664,10 +680,17 @@ predict.stan_nma <- function(object, ...,
 
       # Combine mu, d, and beta
       dim_post <- c(dim_post_temp[1:2], dim_mu[3] + dim_post_temp[3])
-      post <- array(NA_real_, dim = dim_post)
+      dimnames_post <- c(dimnames(post_temp)[1:2], c(dimnames(mu)[3], dimnames(post_temp)[3]))
+      post <- array(NA_real_, dim = dim_post, dimnames = dimnames_post)
       post[ , , 1:dim_mu[3]] <- mu
       post[ , , dim_mu[3] + 1:dim_post_temp[3]] <- post_temp
 
+    }
+
+    # For predictive intervals, use delta_new instead of d
+    if (predictive_interval) {
+      delta_new <- get_delta_new(object)
+      post[ , , dimnames(delta_new)[[3]]] <- delta_new
     }
 
     # Get cutoffs for ordered models
