@@ -547,7 +547,7 @@ tcrossprod_mcmc_array <- function(a, x) {
 #' @param ...
 #'
 #' @return A 3D MCMC array
-#' @noRD
+#' @noRd
 get_delta_new <- function(x, ...) {
   ntrt <- nlevels(x$network$treatments)
 
