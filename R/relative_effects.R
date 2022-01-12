@@ -373,20 +373,10 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       # Name rows by treatment for now (required for make_all_contrasts)
       rownames(X_EM_d) <- paste0("d[", dat_studies$.trt , "]")
 
-      if (!predictive_interval) {
-        d_array <- as.array(x, pars = colnames(X_EM_d))
-      } else {
+      d_array <- as.array(x, pars = colnames(X_EM_d))
+      if (predictive_interval) {
         # For predictive intervals, use delta_new instead of d
-        em_array <- as.array(x, pars = colnames(X_EM))
-        delta_array <- get_delta_new(x)
-
-        d_dim <- dim(em_array)
-        d_dim[3] <- d_dim[3] + dim(delta_array)[3]
-        d_dn <- dimnames(em_array)
-        d_dn[[3]] <- c(d_dn[[3]], dimnames(delta_array)[[3]])
-        d_array <- array(dim = d_dim, dimnames = d_dn)
-        d_array[ , , 1:ncol(X_EM)] <- em_array
-        d_array[ , , ncol(X_EM) + (1:(ntrt - 1))] <- delta_array
+        d_array[ , , colnames(X_d)] <- get_delta_new(x)
       }
 
       # Linear combination with posterior MCMC array
