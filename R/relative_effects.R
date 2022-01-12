@@ -377,7 +377,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         d_array <- as.array(x, pars = colnames(X_EM_d))
       } else {
         # For predictive intervals, use delta_new instead of d
-        em_array <- as.array(x, pars = X_EM)
+        em_array <- as.array(x, pars = colnames(X_EM))
         delta_array <- get_delta_new(x)
 
         d_dim <- dim(em_array)
