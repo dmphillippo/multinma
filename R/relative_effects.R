@@ -558,13 +558,27 @@ get_delta_new <- function(x, ...) {
   # Need to make d[] index numeric for rstan::gqs
   colnames(draws)[1:(ntrt - 1)] <- paste0("d[", 1:(ntrt - 1), "]")
 
-  delta_new <- rstan::gqs(stanmodels$predict_delta_new,
-                          data = list(nt = ntrt,
-                                      RE_cor = RE_cor),
-                          draws = draws,
-                          seed = rstan::get_seed(x$stanfit))
+  if (ntrt == 2) {
+    # Work around rstan::gqs() bug when there is only d[1]
+    draws <- draws[, c("d[1]", "d[1]", "tau")]
+    colnames(draws) <- c("d[1]", "d[2]", "tau")
+    delta_new <- rstan::gqs(stanmodels$predict_delta_new,
+                            data = list(nt = 3,
+                                        RE_cor = diag(2)),
+                            draws = draws,
+                            seed = rstan::get_seed(x$stanfit))
 
-  delta_new <- as.array(delta_new)
+    delta_new <- as.array(delta_new)[ , , 1, drop = FALSE]
+  } else {
+    delta_new <- rstan::gqs(stanmodels$predict_delta_new,
+                            data = list(nt = ntrt,
+                                        RE_cor = RE_cor),
+                            draws = draws,
+                            seed = rstan::get_seed(x$stanfit))
+
+    delta_new <- as.array(delta_new)
+  }
+
   # Note: name these d instead of delta_new here so that they can be drop-in
   # replacements in relative_effects(), then fix up later
   dimnames(delta_new)[[3]] <- paste0("d[", levels(x$network$treatments)[-1], "]")
