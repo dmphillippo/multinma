@@ -20,8 +20,8 @@ set.seed(18284729)
 
 ## ----setup, echo = FALSE--------------------------------------------------------------------------------------------------
 library(multinma)
-nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
-             "true" =, "warn" = 2, 
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
+             "true" =, "warn" = 2,
              parallel::detectCores())
 options(mc.cores = nc)
 
@@ -31,10 +31,10 @@ head(bcg_vaccine)
 
 
 ## -------------------------------------------------------------------------------------------------------------------------
-bcg_net <- set_agd_arm(bcg_vaccine, 
+bcg_net <- set_agd_arm(bcg_vaccine,
                        study = studyn,
                        trt = trtc,
-                       r = r, 
+                       r = r,
                        n = n,
                        trt_ref = "Unvaccinated")
 bcg_net
@@ -53,7 +53,7 @@ summary(half_normal(scale = 5))
 ##                      prior_het = half_normal(scale = 5))
 
 ## ---- echo = FALSE--------------------------------------------------------------------------------------------------------
-bcg_fit_unadj <- nma(bcg_net, 
+bcg_fit_unadj <- nma(bcg_net,
                      seed = 14308133,
                      trt_effects = "random",
                      prior_intercept = normal(scale = 100),
@@ -91,7 +91,7 @@ summary(half_normal(scale = 5))
 
 ## ---- echo = FALSE--------------------------------------------------------------------------------------------------------
 bcg_fit_lat <- nowarn_on_ci(
-                 nma(bcg_net, 
+                 nma(bcg_net,
                      seed = 1932599147,
                      trt_effects = "random",
                      regression = ~.trt:latitude,
@@ -131,8 +131,8 @@ summary(bcg_fit_lat, pars = "tau")
 ## ----bcg_vaccine_beta_lat, fig.height = 4---------------------------------------------------------------------------------
 summary(bcg_fit_lat, pars = "beta")
 
-plot(bcg_fit_lat, 
-     pars = "beta", 
+plot(bcg_fit_lat,
+     pars = "beta",
      ref_line = 0,
      stat = "halfeye")
 
@@ -147,7 +147,7 @@ bcg_releff_lat
 
 
 ## ----bcg_vaccine_releff_lat, fig.height = 5-------------------------------------------------------------------------------
-plot(bcg_releff_lat, 
+plot(bcg_releff_lat,
      ref_line = 0)
 
 
@@ -159,16 +159,16 @@ library(ggplot2)
 lat_range <- range(bcg_vaccine$latitude)
 lat_dat <- tibble(latitude = seq(lat_range[1], lat_range[2], by = 1))
 
-bcg_lat_reg <- relative_effects(bcg_fit_lat, 
-                                newdata = lat_dat) %>% 
-  as_tibble() %>% 
+bcg_lat_reg <- relative_effects(bcg_fit_lat,
+                                newdata = lat_dat) %>%
+  as_tibble() %>%
   bind_cols(lat_dat)
 
 # Get study log odds ratios
-bcg_lor <- bcg_vaccine %>% 
-  group_by(studyn) %>% 
+bcg_lor <- bcg_vaccine %>%
+  group_by(studyn) %>%
   mutate(lor = log(r / (n - r)) - log(first(r) / (first(n) - first(r))),
-         sample_size = sum(n)) %>% 
+         sample_size = sum(n)) %>%
   slice(-1)
 
 # Plot
@@ -203,8 +203,8 @@ test_that("Unadjusted relative effects", {
   expect_equivalent(bcg_unadj_releff$`97.5%`, -0.34, tolerance = tol)
 })
 
-test_that("Unadjusted predictive interval", {
-  bcg_unadj_releff_pred <- as.data.frame(relative_effects(bcg_fit_unadj, predictive_interval = TRUE))
+test_that("Unadjusted predictive distribution", {
+  bcg_unadj_releff_pred <- as.data.frame(relative_effects(bcg_fit_unadj, predictive_distribution = TRUE))
   expect_equivalent(bcg_unadj_releff_pred$mean, -0.762, tolerance = tol)
   expect_equivalent(bcg_unadj_releff_pred$`2.5%`, -2.72, tolerance = tol)
   expect_equivalent(bcg_unadj_releff_pred$`97.5%`, -0.72, tolerance = tol)
@@ -223,7 +223,7 @@ test_that("Regression relative effects", {
 test_that("Regression predictive distribution", {
   bcg_lat_releff_pred <- relative_effects(bcg_fit_lat,
                                           newdata = data.frame(latitude = c(0, 13, 50)),
-                                          predictive_interval = TRUE)
+                                          predictive_distribution = TRUE)
   expect_equivalent(colMeans(as.matrix(bcg_lat_releff_pred) > 0), c(0.8, 0.35, 0.006), tolerance = tol)
 })
 

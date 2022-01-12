@@ -66,9 +66,9 @@
 #'   `"aggregate"` in this instance.
 #' @param probs Numeric vector of quantiles of interest to present in computed
 #'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`
-#' @param predictive_interval Logical, when a random effects model has been
-#'   fitted, should predictive intervals for the absolute effects in a new study
-#'   be returned? Default `FALSE`.
+#' @param predictive_distribution Logical, when a random effects model has been
+#'   fitted, should the predictive distribution for absolute effects in a new
+#'   study be returned? Default `FALSE`.
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #'
 #' @return A [nma_summary] object if `summary = TRUE`, otherwise a list
@@ -155,7 +155,7 @@ predict.stan_nma <- function(object, ...,
                              baseline_type = c("link", "response"),
                              baseline_level = c("individual", "aggregate"),
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
-                             predictive_interval = FALSE,
+                             predictive_distribution = FALSE,
                              summary = TRUE) {
   # Checks
   if (!inherits(object, "stan_nma")) abort("Expecting a `stan_nma` object, as returned by nma().")
@@ -265,8 +265,8 @@ predict.stan_nma <- function(object, ...,
 
         # Get posterior samples
         post <- as.array(object, pars = c("mu", "d"))
-        if (predictive_interval) {
-          # For predictive intervals, use delta_new instead of d
+        if (predictive_distribution) {
+          # For predictive distribution, use delta_new instead of d
           delta_new <- get_delta_new(object)
           post[ , , dimnames(delta_new)[[3]]] <- delta_new
         }
@@ -320,10 +320,10 @@ predict.stan_nma <- function(object, ...,
       dim_post <- c(dim_d[1:2], dim_d[3] + 1)
       post <- array(NA_real_, dim = dim_post)
       post[ , , 1] <- mu
-      if (!predictive_interval) {
+      if (!predictive_distribution) {
         post[ , , 2:dim_post[3]] <- d
       } else {
-        # For predictive intervals, use delta_new instead of d
+        # For predictive distribution, use delta_new instead of d
         post[ , , 2:dim_post[3]] <- get_delta_new(object)
       }
 
@@ -687,8 +687,8 @@ predict.stan_nma <- function(object, ...,
 
     }
 
-    # For predictive intervals, use delta_new instead of d
-    if (predictive_interval) {
+    # For predictive distribution, use delta_new instead of d
+    if (predictive_distribution) {
       delta_new <- get_delta_new(object)
       post[ , , dimnames(delta_new)[[3]]] <- delta_new
     }

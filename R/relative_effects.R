@@ -20,9 +20,9 @@
 #'   network reference treatment. Coerced to character string.
 #' @param probs Numeric vector of quantiles of interest to present in computed
 #'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`
-#' @param predictive_interval Logical, when a random effects model has been
-#'   fitted, should predictive intervals for the relative effects in a new study
-#'   be returned? Default `FALSE`.
+#' @param predictive_distribution Logical, when a random effects model has been
+#'   fitted, should the predictive distribution for relative effects in a new
+#'   study be returned? Default `FALSE`.
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #'
 #' @return A [nma_summary] object if `summary = TRUE`, otherwise a list
@@ -83,7 +83,7 @@
 relative_effects <- function(x, newdata = NULL, study = NULL,
                              all_contrasts = FALSE, trt_ref = NULL,
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
-                             predictive_interval = FALSE,
+                             predictive_distribution = FALSE,
                              summary = TRUE) {
 
   # Checks
@@ -128,9 +128,9 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
 
   check_probs(probs)
 
-  if(!rlang::is_bool(predictive_interval))
-    abort("`predictive_interval` should be TRUE or FALSE")
-  if (predictive_interval && x$trt_effects != "random") predictive_interval <- FALSE
+  if(!rlang::is_bool(predictive_distribution))
+    abort("`predictive_distribution` should be TRUE or FALSE")
+  if (predictive_distribution && x$trt_effects != "random") predictive_distribution <- FALSE
 
   # Cannot produce relative effects for inconsistency models
   if (x$consistency != "consistency")
@@ -143,10 +143,10 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
   if (is.null(x$regression) || is_only_offset(x$regression)) {
     # If no regression model, relative effects are just the d's
 
-    if (!predictive_interval) {
+    if (!predictive_distribution) {
       re_array <- as.array(as.stanfit(x), pars = "d")
     } else {
-      # For predictive intervals, use delta_new instead of d
+      # For predictive distribution, use delta_new instead of d
       re_array <- get_delta_new(x)
     }
 
@@ -167,8 +167,8 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       re_array <- re_array[ , , d_names, drop = FALSE]
     }
 
-    # Fix up parameter names for predictive_interval = TRUE
-    if (predictive_interval) {
+    # Fix up parameter names for predictive_distribution = TRUE
+    if (predictive_distribution) {
       dimnames(re_array)[[3]] <- gsub("^d\\[", "delta_new[", dimnames(re_array)[[3]])
     }
 
@@ -284,10 +284,10 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
     # just return the treatment effects (not study specific)
     if (ncol(X_EM) == 0) {
 
-      if (!predictive_interval) {
+      if (!predictive_distribution) {
         re_array <- as.array(as.stanfit(x), pars = "d")
       } else {
-        # For predictive intervals, use delta_new instead of d
+        # For predictive distribution, use delta_new instead of d
         re_array <- get_delta_new(x)
       }
 
@@ -308,8 +308,8 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         re_array <- re_array[ , , d_names, drop = FALSE]
       }
 
-      # Fix up parameter names for predictive_interval = TRUE
-      if (predictive_interval) {
+      # Fix up parameter names for predictive_distribution = TRUE
+      if (predictive_distribution) {
         dimnames(re_array)[[3]] <- gsub("^d\\[", "delta_new[", dimnames(re_array)[[3]])
       }
 
@@ -374,8 +374,8 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       rownames(X_EM_d) <- paste0("d[", dat_studies$.trt , "]")
 
       d_array <- as.array(x, pars = colnames(X_EM_d))
-      if (predictive_interval) {
-        # For predictive intervals, use delta_new instead of d
+      if (predictive_distribution) {
+        # For predictive distribution, use delta_new instead of d
         d_array[ , , colnames(X_d)] <- get_delta_new(x)
       }
 
@@ -428,8 +428,8 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         }
       }
 
-      # Fix up parameter names for predictive_interval = TRUE
-      if (predictive_interval) {
+      # Fix up parameter names for predictive_distribution = TRUE
+      if (predictive_distribution) {
         dimnames(re_array)[[3]] <- gsub("^d\\[", "delta_new[", dimnames(re_array)[[3]])
       }
 
