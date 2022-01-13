@@ -571,14 +571,15 @@ predict.stan_nma <- function(object, ...,
       # Generate baseline samples
       dim_post_temp <- dim(post_temp)
       dim_mu <- c(dim_post_temp[1:2], n_studies)
+      dimnames_mu <- c(dimnames(post_temp)[1:2], list(parameters = paste0("mu[", levels(studies), "]")))
 
       if (inherits(baseline, "distr")) {
         u <- runif(prod(dim_mu))
         mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
-                    dim = dim_mu)
+                    dim = dim_mu, dimnames = dimnames_mu)
       } else {
         u <- array(runif(prod(dim_mu)), dim = dim_mu)
-        mu <- array(NA_real_, dim = dim_mu)
+        mu <- array(NA_real_, dim = dim_mu, dimnames = dimnames_mu)
         for (s in 1:n_studies) {
           # NOTE: mu must be in *factor order* for later multiplication with design matrix, not observation order
           ss <- levels(studies)[s]
@@ -680,7 +681,7 @@ predict.stan_nma <- function(object, ...,
 
       # Combine mu, d, and beta
       dim_post <- c(dim_post_temp[1:2], dim_mu[3] + dim_post_temp[3])
-      dimnames_post <- c(dimnames(post_temp)[1:2], c(dimnames(mu)[3], dimnames(post_temp)[3]))
+      dimnames_post <- c(dimnames(post_temp)[1:2], list(parameters = c(dimnames(mu)[[3]], dimnames(post_temp)[[3]])))
       post <- array(NA_real_, dim = dim_post, dimnames = dimnames_post)
       post[ , , 1:dim_mu[3]] <- mu
       post[ , , dim_mu[3] + 1:dim_post_temp[3]] <- post_temp
