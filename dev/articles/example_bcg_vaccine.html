@@ -199,7 +199,7 @@
 <span class="co">#&gt; lp__             1</span>
 <span class="co">#&gt; tau              1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Jan 10 17:55:48 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Jan 13 15:31:18 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -260,7 +260,7 @@
 <span class="co">#&gt; lp__                          -13448.20   767    1</span>
 <span class="co">#&gt; tau                                0.74   816    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Jan 10 17:56:04 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Jan 13 15:31:33 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -412,6 +412,98 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_size.html" class="external-link">scale_size</a></span><span class="op">(</span><span class="st">"Sample Size"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="../reference/theme_multinma.html">theme_multinma</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="example_bcg_vaccine_files/figure-html/bcg_vaccine_reg_plot-1.png" width="700" style="display: block; margin: auto;"></p>
+<p>In the presence of heterogeneity, it has been argued that decision makers should consider the predictive distribution of relative effects in a new study, instead of the posterior distribution of the mean treatment effects, as this reflects uncertainty due to heterogeneity and may better represent uncertainty about a future roll-out of a treatment <span class="citation">(see <a href="#ref-TSD3" role="doc-biblioref">Dias et al. 2011</a>)</span>. We can produce predictive distributions using the <code>predictive_distribution = TRUE</code> argument to <code><a href="../reference/relative_effects.html">relative_effects()</a></code>. Dias et al. <span class="citation">(<a href="#ref-Dias2018" role="doc-biblioref">2018, sec. 8.3.2</a>)</span> consider the predictive distributions for this BCG vaccine analysis.</p>
+<p>In the unadjusted analysis, whilst there is substantial evidence that vaccination is effective on average and essentially zero probability of harm based on the mean effect, the predictive distribution for effectiveness in a new study is wide and covers a range of harmful effects:</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="op">(</span><span class="va">bcg_predeff_unadj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, predictive_distribution <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt;                        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
+<span class="co">#&gt; delta_new[Vaccinated] -0.76 0.73 -2.18 -1.21 -0.76 -0.31  0.71     3349     3327    1</span></code></pre></div>
+<p>The predictive probability of a new trial showing a harmful effect is:</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">bcg_predeff_unadj</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span>
+<span class="co">#&gt; [1] 0.13675</span></code></pre></div>
+<p>For the analysis adjusting for latitude, the predictive distribution of relative effects now depends on latitude; here we calculate these in increments of 10 degrees from the equator:</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">bcg_predeff_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>,
+                                   newdata <span class="op">=</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>latitude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">50</span>, by <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,
+                                                            label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">latitude</span>, <span class="st">"\u00B0 latitude"</span><span class="op">)</span><span class="op">)</span>,
+                                   study <span class="op">=</span> <span class="va">label</span>,
+                                   predictive_distribution <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+
+<span class="va">bcg_predeff_lat</span>
+<span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 0° latitude</span> <span style="color: #555555;">----</span> </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Covariate values:</span>
+<span class="co">#&gt;  latitude</span>
+<span class="co">#&gt;         0</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;                                    mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
+<span class="co">#&gt; delta_new[0° latitude: Vaccinated]  0.3 0.44 -0.66 0.08 0.32 0.51  1.22     3388     3065    1</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 10° latitude</span> <span style="color: #555555;">----</span> </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Covariate values:</span>
+<span class="co">#&gt;  latitude</span>
+<span class="co">#&gt;        10</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;                                      mean  sd  2.5%   25% 50%  75% 97.5% Bulk_ESS Tail_ESS</span>
+<span class="co">#&gt; delta_new[10° latitude: Vaccinated] -0.02 0.4 -0.89 -0.21   0 0.17  0.83     3678     3081</span>
+<span class="co">#&gt;                                     Rhat</span>
+<span class="co">#&gt; delta_new[10° latitude: Vaccinated]    1</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 20° latitude</span> <span style="color: #555555;">----</span> </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Covariate values:</span>
+<span class="co">#&gt;  latitude</span>
+<span class="co">#&gt;        20</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS</span>
+<span class="co">#&gt; delta_new[20° latitude: Vaccinated] -0.33 0.38 -1.15 -0.51 -0.31 -0.16  0.47     3824     3129</span>
+<span class="co">#&gt;                                     Rhat</span>
+<span class="co">#&gt; delta_new[20° latitude: Vaccinated]    1</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 30° latitude</span> <span style="color: #555555;">----</span> </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Covariate values:</span>
+<span class="co">#&gt;  latitude</span>
+<span class="co">#&gt;        30</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS</span>
+<span class="co">#&gt; delta_new[30° latitude: Vaccinated] -0.65 0.37 -1.43 -0.82 -0.64 -0.48  0.15     3871     3545</span>
+<span class="co">#&gt;                                     Rhat</span>
+<span class="co">#&gt; delta_new[30° latitude: Vaccinated]    1</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 40° latitude</span> <span style="color: #555555;">----</span> </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Covariate values:</span>
+<span class="co">#&gt;  latitude</span>
+<span class="co">#&gt;        40</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS</span>
+<span class="co">#&gt; delta_new[40° latitude: Vaccinated] -0.96 0.37 -1.74 -1.15 -0.96 -0.79 -0.17     3763     3505</span>
+<span class="co">#&gt;                                     Rhat</span>
+<span class="co">#&gt; delta_new[40° latitude: Vaccinated]    1</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 50° latitude</span> <span style="color: #555555;">----</span> </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Covariate values:</span>
+<span class="co">#&gt;  latitude</span>
+<span class="co">#&gt;        50</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;                                      mean  sd 2.5%   25%   50%  75% 97.5% Bulk_ESS Tail_ESS</span>
+<span class="co">#&gt; delta_new[50° latitude: Vaccinated] -1.28 0.4 -2.1 -1.47 -1.28 -1.1 -0.45     3395     3088</span>
+<span class="co">#&gt;                                     Rhat</span>
+<span class="co">#&gt; delta_new[50° latitude: Vaccinated]    1</span></code></pre></div>
+<p>The predictive probabilities of a new trial carried out at a given latitude showing a harmful effect can be calculated as:</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">bcg_predeff_lat</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span>
+<span class="co">#&gt;  delta_new[0° latitude: Vaccinated] delta_new[10° latitude: Vaccinated] </span>
+<span class="co">#&gt;                             0.80475                             0.50275 </span>
+<span class="co">#&gt; delta_new[20° latitude: Vaccinated] delta_new[30° latitude: Vaccinated] </span>
+<span class="co">#&gt;                             0.13275                             0.03900 </span>
+<span class="co">#&gt; delta_new[40° latitude: Vaccinated] delta_new[50° latitude: Vaccinated] </span>
+<span class="co">#&gt;                             0.01300                             0.00700</span></code></pre></div>
+<p>So the predictive probability that a new trial carried out at the equator shows a harmful effect is around 80%, whereas at 50 degrees latitude the predictive probability is only 0.7%.</p>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
@@ -419,6 +511,9 @@
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Berkey1995" class="csl-entry">
 Berkey, C. S., D. C. Hoaglin, F. Mosteller, and G. A. Colditz. 1995. <span>“A Random-Effects Regression Model for Meta-Analysis.”</span> <em>Statistics in Medicine</em> 14 (4): 395–411. <a href="https://doi.org/10.1002/sim.4780140406" class="external-link">https://doi.org/10.1002/sim.4780140406</a>.
+</div>
+<div id="ref-Dias2018" class="csl-entry">
+Dias, S., A. E. Ades, N. J. Welton, J. P. Jansen, and A. J. Sutton. 2018. <em>Network Meta-Analysis for Decision Making</em>. Statistics in Practice. John Wiley <span>&amp;</span> Sons, Ltd. <a href="https://doi.org/10.1002/9781118951651" class="external-link">https://doi.org/10.1002/9781118951651</a>.
 </div>
 <div id="ref-TSD3" class="csl-entry">
 Dias, S., A. J. Sutton, N. J. Welton, and A. E. Ades. 2011. <span>“<span>NICE DSU Technical Support Document</span> 3: Heterogeneity: Subgroups, Meta-Regression, Bias and Bias-Adjustment.”</span> <span>National Institute for Health and Care Excellence</span>. <a href="http://nicedsu.org.uk/" class="external-link">http://nicedsu.org.uk/</a>.
