@@ -16,6 +16,7 @@
   baseline_type = c("link", "response"),
   baseline_level = c("individual", "aggregate"),
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
+  predictive_distribution = FALSE,
   summary = TRUE
 )
 }
@@ -92,6 +93,10 @@ outcome on the reference treatment in the \code{newdata} population
 
 \item{probs}{Numeric vector of quantiles of interest to present in computed
 summary, default \code{c(0.025, 0.25, 0.5, 0.75, 0.975)}}
+
+\item{predictive_distribution}{Logical, when a random effects model has been
+fitted, should the predictive distribution for absolute effects in a new
+study be returned? Default \code{FALSE}.}
 
 \item{summary}{Logical, calculate posterior summaries? Default \code{TRUE}.}
 }

@@ -13,6 +13,10 @@ behaviour, with options `"spearman"`, `"pearson"`, or `"none"`. Although these
 correlations typically have little impact on the results, for strict
 reproducibility the old behaviour from version 0.3.0 and below is available with
 `cor_adjust = "legacy"`.
+* Feature: For random effects models, the predictive distribution of
+relative/absolute effects in a new study can now be obtained in
+`relative_effects()` and `predict.stan_nma()` respectively, using the new
+argument `predictive_distribution = TRUE`.
 * Feature: Added option to calculate SUCRA values when summarising the posterior
 treatment ranks with `posterior_ranks()` or `posterior_rank_probs()`, when
 argument `sucra = TRUE`.

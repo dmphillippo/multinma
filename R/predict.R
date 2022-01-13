@@ -66,6 +66,9 @@
 #'   `"aggregate"` in this instance.
 #' @param probs Numeric vector of quantiles of interest to present in computed
 #'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`
+#' @param predictive_distribution Logical, when a random effects model has been
+#'   fitted, should the predictive distribution for absolute effects in a new
+#'   study be returned? Default `FALSE`.
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #'
 #' @return A [nma_summary] object if `summary = TRUE`, otherwise a list
@@ -152,6 +155,7 @@ predict.stan_nma <- function(object, ...,
                              baseline_type = c("link", "response"),
                              baseline_level = c("individual", "aggregate"),
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
+                             predictive_distribution = FALSE,
                              summary = TRUE) {
   # Checks
   if (!inherits(object, "stan_nma")) abort("Expecting a `stan_nma` object, as returned by nma().")
@@ -261,6 +265,11 @@ predict.stan_nma <- function(object, ...,
 
         # Get posterior samples
         post <- as.array(object, pars = c("mu", "d"))
+        if (predictive_distribution) {
+          # For predictive distribution, use delta_new instead of d
+          delta_new <- get_delta_new(object)
+          post[ , , dimnames(delta_new)[[3]]] <- delta_new
+        }
 
         # Get prediction array
         pred_array <- tcrossprod_mcmc_array(post, X_all)
@@ -311,7 +320,14 @@ predict.stan_nma <- function(object, ...,
       dim_post <- c(dim_d[1:2], dim_d[3] + 1)
       post <- array(NA_real_, dim = dim_post)
       post[ , , 1] <- mu
-      post[ , , 2:dim_post[3]] <- d
+      if (!predictive_distribution) {
+        post[ , , 2:dim_post[3]] <- d
+      } else {
+        # For predictive distribution, use delta_new instead of d
+        post[ , , 2:dim_post[3]] <- get_delta_new(object)
+      }
+
+
 
       # Get prediction array
       pred_array <- tcrossprod_mcmc_array(post, X_all)
@@ -555,14 +571,15 @@ predict.stan_nma <- function(object, ...,
       # Generate baseline samples
       dim_post_temp <- dim(post_temp)
       dim_mu <- c(dim_post_temp[1:2], n_studies)
+      dimnames_mu <- c(dimnames(post_temp)[1:2], list(parameters = paste0("mu[", levels(studies), "]")))
 
       if (inherits(baseline, "distr")) {
         u <- runif(prod(dim_mu))
         mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
-                    dim = dim_mu)
+                    dim = dim_mu, dimnames = dimnames_mu)
       } else {
         u <- array(runif(prod(dim_mu)), dim = dim_mu)
-        mu <- array(NA_real_, dim = dim_mu)
+        mu <- array(NA_real_, dim = dim_mu, dimnames = dimnames_mu)
         for (s in 1:n_studies) {
           # NOTE: mu must be in *factor order* for later multiplication with design matrix, not observation order
           ss <- levels(studies)[s]
@@ -664,10 +681,17 @@ predict.stan_nma <- function(object, ...,
 
       # Combine mu, d, and beta
       dim_post <- c(dim_post_temp[1:2], dim_mu[3] + dim_post_temp[3])
-      post <- array(NA_real_, dim = dim_post)
+      dimnames_post <- c(dimnames(post_temp)[1:2], list(parameters = c(dimnames(mu)[[3]], dimnames(post_temp)[[3]])))
+      post <- array(NA_real_, dim = dim_post, dimnames = dimnames_post)
       post[ , , 1:dim_mu[3]] <- mu
       post[ , , dim_mu[3] + 1:dim_post_temp[3]] <- post_temp
 
+    }
+
+    # For predictive distribution, use delta_new instead of d
+    if (predictive_distribution) {
+      delta_new <- get_delta_new(object)
+      post[ , , dimnames(delta_new)[[3]]] <- delta_new
     }
 
     # Get cutoffs for ordered models

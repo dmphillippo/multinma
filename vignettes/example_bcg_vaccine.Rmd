@@ -235,6 +235,37 @@ ggplot(aes(x = latitude), data = bcg_lor) +
   theme_multinma()
 ```
 
+In the presence of heterogeneity, it has been argued that decision makers should consider the predictive distribution of relative effects in a new study, instead of the posterior distribution of the mean treatment effects, as this reflects uncertainty due to heterogeneity and may better represent uncertainty about a future roll-out of a treatment [see @TSD3].
+We can produce predictive distributions using the `predictive_distribution = TRUE` argument to `relative_effects()`.
+Dias et al. [-@Dias2018, section 8.3.2] consider the predictive distributions for this BCG vaccine analysis.
+
+In the unadjusted analysis, whilst there is substantial evidence that vaccination is effective on average and essentially zero probability of harm based on the mean effect, the predictive distribution for effectiveness in a new study is wide and covers a range of harmful effects:
+```{r bcg_vaccine_predictive_unadj}
+(bcg_predeff_unadj <- relative_effects(bcg_fit_unadj, predictive_distribution = TRUE))
+```
+
+The predictive probability of a new trial showing a harmful effect is:
+```{r}
+mean(as.matrix(bcg_predeff_unadj) > 0)
+```
+
+For the analysis adjusting for latitude, the predictive distribution of relative effects now depends on latitude; here we calculate these in increments of 10 degrees from the equator:
+```{r}
+bcg_predeff_lat <- relative_effects(bcg_fit_lat,
+                                   newdata = tibble::tibble(latitude = seq(0, 50, by = 10),
+                                                            label = paste0(latitude, "\u00B0 latitude")),
+                                   study = label,
+                                   predictive_distribution = TRUE)
+
+bcg_predeff_lat
+```
+
+The predictive probabilities of a new trial carried out at a given latitude showing a harmful effect can be calculated as:
+```{r}
+colMeans(as.matrix(bcg_predeff_lat) > 0)
+```
+So the predictive probability that a new trial carried out at the equator shows a harmful effect is around 80%, whereas at 50 degrees latitude the predictive probability is only 0.7%.
+
 ## References
 
 ```{r bcg_vaccine_tests, include=FALSE, eval=params$run_tests}
@@ -255,6 +286,13 @@ test_that("Unadjusted relative effects", {
   expect_equivalent(bcg_unadj_releff$`97.5%`, -0.34, tolerance = tol)
 })
 
+test_that("Unadjusted predictive distribution", {
+  bcg_unadj_releff_pred <- as.data.frame(relative_effects(bcg_fit_unadj, predictive_distribution = TRUE))
+  expect_equivalent(bcg_unadj_releff_pred$mean, -0.762, tolerance = tol)
+  expect_equivalent(bcg_unadj_releff_pred$`2.5%`, -2.27, tolerance = tol)
+  expect_equivalent(bcg_unadj_releff_pred$`97.5%`, 0.72, tolerance = tol)
+})
+
 bcg_lat_releff <- as.data.frame(summary(bcg_fit_lat, pars = "d"))
 
 test_that("Regression relative effects", {
@@ -262,6 +300,14 @@ test_that("Regression relative effects", {
   expect_equivalent(bcg_lat_releff$sd, 0.126, tolerance = tol)
   expect_equivalent(bcg_lat_releff$`2.5%`, -1.04, tolerance = tol)
   expect_equivalent(bcg_lat_releff$`97.5%`, -0.52, tolerance = tol)
+})
+
+
+test_that("Regression predictive distribution", {
+  bcg_lat_releff_pred <- relative_effects(bcg_fit_lat,
+                                          newdata = data.frame(latitude = c(0, 13, 50)),
+                                          predictive_distribution = TRUE)
+  expect_equivalent(colMeans(as.matrix(bcg_lat_releff_pred) > 0), c(0.8, 0.35, 0.006), tolerance = tol)
 })
 
 # Regression coefficients
