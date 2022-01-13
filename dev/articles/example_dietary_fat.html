@@ -185,10 +185,10 @@
 <span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                   mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat</span>
-<span class="co">#&gt; d[Reduced Fat]   -0.01    0.00 0.05   -0.11   -0.05   -0.01    0.03    0.10  3253    1</span>
-<span class="co">#&gt; lp__           5386.17    0.06 2.35 5380.75 5384.77 5386.47 5387.92 5389.74  1593    1</span>
+<span class="co">#&gt; d[Reduced Fat]   -0.01    0.00 0.05   -0.12   -0.05   -0.01    0.03    0.10  3880    1</span>
+<span class="co">#&gt; lp__           5386.12    0.05 2.38 5380.67 5384.69 5386.42 5387.86 5389.83  1912    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Jan 13 15:33:09 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Jan 13 17:47:48 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -230,11 +230,11 @@
 <span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                   mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat</span>
-<span class="co">#&gt; d[Reduced Fat]   -0.02    0.00 0.09   -0.20   -0.07   -0.01    0.03    0.16  1504    1</span>
-<span class="co">#&gt; lp__           5378.73    0.11 3.86 5370.39 5376.30 5379.03 5381.44 5385.45  1267    1</span>
-<span class="co">#&gt; tau               0.13    0.00 0.11    0.00    0.04    0.10    0.18    0.42   878    1</span>
+<span class="co">#&gt; d[Reduced Fat]   -0.02    0.00 0.09   -0.19   -0.07   -0.01    0.04    0.15  1336 1.00</span>
+<span class="co">#&gt; lp__           5378.82    0.12 4.01 5370.30 5376.24 5379.03 5381.57 5386.21  1090 1.00</span>
+<span class="co">#&gt; tau               0.14    0.00 0.12    0.00    0.05    0.11    0.19    0.45   980 1.01</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Jan 13 15:33:18 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Jan 13 17:47:56 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -253,14 +253,14 @@
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">diet_fit_FE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 22.5<span style="color: #555555;"> (on 21 data points)</span></span>
-<span class="co">#&gt;                pD: 11.2</span>
-<span class="co">#&gt;               DIC: 33.7</span></code></pre></div>
+<span class="co">#&gt; Residual deviance: 22.6<span style="color: #555555;"> (on 21 data points)</span></span>
+<span class="co">#&gt;                pD: 11.3</span>
+<span class="co">#&gt;               DIC: 33.9</span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">diet_fit_RE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 21.2<span style="color: #555555;"> (on 21 data points)</span></span>
-<span class="co">#&gt;                pD: 13.3</span>
-<span class="co">#&gt;               DIC: 34.5</span></code></pre></div>
+<span class="co">#&gt; Residual deviance: 21.4<span style="color: #555555;"> (on 21 data points)</span></span>
+<span class="co">#&gt;                pD: 13.7</span>
+<span class="co">#&gt;               DIC: 35.1</span></code></pre></div>
 <p>Both models appear to fit the data well, as the residual deviance is close to the number of data points. The DIC is very similar between models, so the FE model may be preferred for parsimony.</p>
 <p>We can also examine the residual deviance contributions with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
@@ -281,8 +281,8 @@
                    type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
 <span class="va">pred_FE</span>
 <span class="co">#&gt;                   mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[Control]     0.07 0.06 0.01 0.03 0.05 0.08  0.22     4001     3840    1</span>
-<span class="co">#&gt; pred[Reduced Fat] 0.07 0.06 0.01 0.03 0.05 0.08  0.22     3977     3810    1</span>
+<span class="co">#&gt; pred[Control]     0.07 0.06 0.01 0.03 0.05 0.08  0.21     4195     3852    1</span>
+<span class="co">#&gt; pred[Reduced Fat] 0.07 0.06 0.01 0.03 0.05 0.08  0.21     4190     3853    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_FE</span><span class="op">)</span></code></pre></div>
 <p><img src="example_dietary_fat_files/figure-html/diet_pred_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
@@ -291,8 +291,8 @@
                    type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
 <span class="va">pred_RE</span>
 <span class="co">#&gt;                   mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[Control]     0.07 0.06 0.01 0.03 0.05 0.08  0.22     3683     3760    1</span>
-<span class="co">#&gt; pred[Reduced Fat] 0.07 0.06 0.01 0.03 0.05 0.08  0.22     3659     3916    1</span>
+<span class="co">#&gt; pred[Control]     0.07 0.06 0.01 0.03 0.05 0.08  0.22     4014     4106    1</span>
+<span class="co">#&gt; pred[Reduced Fat] 0.06 0.06 0.01 0.03 0.05 0.08  0.23     4002     4040    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_RE</span><span class="op">)</span></code></pre></div>
 <p><img src="example_dietary_fat_files/figure-html/diet_pred_RE-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>If the <code>baseline</code> argument is omitted, predicted rates will be produced for every study in the network based on their estimated baseline log rate <span class="math inline">\(\mu_j\)</span>:</p>
@@ -302,14 +302,14 @@
 <span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: DART</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                         mean sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[DART: Control]     0.06  0 0.05 0.06 0.06 0.06  0.07     5156     2919    1</span>
-<span class="co">#&gt; pred[DART: Reduced Fat] 0.06  0 0.05 0.06 0.06 0.06  0.07     8426     3317    1</span>
+<span class="co">#&gt; pred[DART: Control]     0.06  0 0.05 0.06 0.06 0.06  0.07     6959     3413    1</span>
+<span class="co">#&gt; pred[DART: Reduced Fat] 0.06  0 0.05 0.06 0.06 0.06  0.07     7606     3236    1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------</span> <span style="font-weight: bold;">Study: London Corn/Olive</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                                      mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="co">#&gt; pred[London Corn/Olive: Control]     0.07 0.02 0.03 0.06 0.07 0.09  0.13     6756     3007</span>
-<span class="co">#&gt; pred[London Corn/Olive: Reduced Fat] 0.07 0.02 0.03 0.06 0.07 0.09  0.13     7036     3038</span>
+<span class="co">#&gt; pred[London Corn/Olive: Control]     0.07 0.02 0.03 0.06 0.07 0.09  0.13     7835     2970</span>
+<span class="co">#&gt; pred[London Corn/Olive: Reduced Fat] 0.07 0.02 0.03 0.05 0.07 0.09  0.13     7896     2943</span>
 <span class="co">#&gt;                                      Rhat</span>
 <span class="co">#&gt; pred[London Corn/Olive: Control]        1</span>
 <span class="co">#&gt; pred[London Corn/Olive: Reduced Fat]    1</span>
@@ -317,56 +317,56 @@
 <span class="co">#&gt; <span style="color: #555555;">---------------------------------------------------------</span> <span style="font-weight: bold;">Study: London Low Fat</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                                   mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[London Low Fat: Control]     0.06 0.01 0.04 0.05 0.06 0.06  0.08     5368     3163    1</span>
-<span class="co">#&gt; pred[London Low Fat: Reduced Fat] 0.06 0.01 0.04 0.05 0.06 0.06  0.08     5970     2856    1</span>
+<span class="co">#&gt; pred[London Low Fat: Control]     0.06 0.01 0.04 0.05 0.06 0.06  0.08     7657     3124    1</span>
+<span class="co">#&gt; pred[London Low Fat: Reduced Fat] 0.06 0.01 0.04 0.05 0.06 0.06  0.08     7376     3204    1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------</span> <span style="font-weight: bold;">Study: Minnesota Coronary</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                                       mean sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[Minnesota Coronary: Control]     0.05  0 0.05 0.05 0.05 0.06  0.06     4524     3578    1</span>
-<span class="co">#&gt; pred[Minnesota Coronary: Reduced Fat] 0.05  0 0.05 0.05 0.05 0.06  0.06     6462     3688    1</span>
+<span class="co">#&gt; pred[Minnesota Coronary: Control]     0.05  0 0.05 0.05 0.05 0.06  0.06     5267     3251    1</span>
+<span class="co">#&gt; pred[Minnesota Coronary: Reduced Fat] 0.05  0 0.05 0.05 0.05 0.06  0.06     6828     3380    1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">---------------------------------------------------------------</span> <span style="font-weight: bold;">Study: MRC Soya</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                             mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[MRC Soya: Control]     0.04 0.01 0.03 0.04 0.04 0.04  0.05     5414     3139    1</span>
-<span class="co">#&gt; pred[MRC Soya: Reduced Fat] 0.04 0.01 0.03 0.04 0.04 0.04  0.05     6364     2613    1</span>
+<span class="co">#&gt; pred[MRC Soya: Control]     0.04 0.01 0.03 0.04 0.04 0.04  0.05     7403     2783    1</span>
+<span class="co">#&gt; pred[MRC Soya: Reduced Fat] 0.04 0.01 0.03 0.04 0.04 0.04  0.05     8213     2667    1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------</span> <span style="font-weight: bold;">Study: Oslo Diet-Heart</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[Oslo Diet-Heart: Control]     0.06 0.01 0.05 0.06 0.06 0.07  0.08     5627     3011    1</span>
-<span class="co">#&gt; pred[Oslo Diet-Heart: Reduced Fat] 0.06 0.01 0.05 0.06 0.06 0.07  0.08     7105     3426    1</span>
+<span class="co">#&gt; pred[Oslo Diet-Heart: Control]     0.06 0.01 0.05 0.06 0.06 0.07  0.08     6484     3500    1</span>
+<span class="co">#&gt; pred[Oslo Diet-Heart: Reduced Fat] 0.06 0.01 0.05 0.06 0.06 0.07  0.08     8971     3727    1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: STARS</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                          mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[STARS: Control]     0.02 0.01 0.01 0.01 0.02 0.03  0.05     5537     2342    1</span>
-<span class="co">#&gt; pred[STARS: Reduced Fat] 0.02 0.01 0.01 0.01 0.02 0.03  0.05     5640     2313    1</span>
+<span class="co">#&gt; pred[STARS: Control]     0.02 0.01 0.01 0.01 0.02 0.03  0.05     7155     2536    1</span>
+<span class="co">#&gt; pred[STARS: Reduced Fat] 0.02 0.01 0.01 0.01 0.02 0.03  0.05     7250     2657    1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------</span> <span style="font-weight: bold;">Study: Sydney Diet-Heart</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                                      mean sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[Sydney Diet-Heart: Control]     0.03  0 0.03 0.03 0.03 0.04  0.04     5908     2713    1</span>
-<span class="co">#&gt; pred[Sydney Diet-Heart: Reduced Fat] 0.03  0 0.03 0.03 0.03 0.04  0.04     7351     2877    1</span>
+<span class="co">#&gt; pred[Sydney Diet-Heart: Control]     0.03  0 0.03 0.03 0.03 0.04  0.04     8099     2698    1</span>
+<span class="co">#&gt; pred[Sydney Diet-Heart: Reduced Fat] 0.03  0 0.03 0.03 0.03 0.04  0.04     8644     2828    1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">------------------------------------------------</span> <span style="font-weight: bold;">Study: Veterans Administration</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                                            mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="co">#&gt; pred[Veterans Administration: Control]     0.11 0.01  0.1 0.11 0.11 0.12  0.13     4524</span>
-<span class="co">#&gt; pred[Veterans Administration: Reduced Fat] 0.11 0.01  0.1 0.11 0.11 0.12  0.13     6298</span>
+<span class="co">#&gt; pred[Veterans Administration: Control]     0.11 0.01  0.1 0.11 0.11 0.12  0.13     5164</span>
+<span class="co">#&gt; pred[Veterans Administration: Reduced Fat] 0.11 0.01  0.1 0.11 0.11 0.12  0.13     7283</span>
 <span class="co">#&gt;                                            Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[Veterans Administration: Control]         3360    1</span>
-<span class="co">#&gt; pred[Veterans Administration: Reduced Fat]     3621    1</span>
+<span class="co">#&gt; pred[Veterans Administration: Control]         3256    1</span>
+<span class="co">#&gt; pred[Veterans Administration: Reduced Fat]     3792    1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; <span style="color: #555555;">------------------------------------------------</span> <span style="font-weight: bold;">Study: Veterans Diet &amp; Skin CA</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                                            mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="co">#&gt; pred[Veterans Diet &amp; Skin CA: Control]     0.01 0.01    0 0.01 0.01 0.02  0.03     4740</span>
-<span class="co">#&gt; pred[Veterans Diet &amp; Skin CA: Reduced Fat] 0.01 0.01    0 0.01 0.01 0.02  0.03     4823</span>
+<span class="co">#&gt; pred[Veterans Diet &amp; Skin CA: Control]     0.01 0.01    0 0.01 0.01 0.02  0.03     7525</span>
+<span class="co">#&gt; pred[Veterans Diet &amp; Skin CA: Reduced Fat] 0.01 0.01    0 0.01 0.01 0.02  0.03     7736</span>
 <span class="co">#&gt;                                            Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[Veterans Diet &amp; Skin CA: Control]         2370    1</span>
-<span class="co">#&gt; pred[Veterans Diet &amp; Skin CA: Reduced Fat]     2362    1</span>
+<span class="co">#&gt; pred[Veterans Diet &amp; Skin CA: Control]         2663    1</span>
+<span class="co">#&gt; pred[Veterans Diet &amp; Skin CA: Reduced Fat]     2618    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_FE_studies</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">Study</span><span class="op">~</span><span class="va">.</span>, labeller <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labellers.html" class="external-link">label_wrap_gen</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="example_dietary_fat_files/figure-html/diet_pred_FE_all-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
