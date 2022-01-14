@@ -32,8 +32,7 @@ The development version can be installed from
 [R-universe](https://dmphillippo.r-universe.dev) with:
 
 ``` r
-install.packages("multinma", repos = c("https://dmphillippo.r-universe.dev", 
-                                       "https://cloud.r-project.org"))
+install.packages("multinma", repos = c("https://dmphillippo.r-universe.dev", getOption("repos")))
 ```
 
 or from source on [GitHub](https://github.com/dmphillippo/multinma)
