@@ -72,8 +72,8 @@ paper:
 The `multinma` package can be cited as follows:
 
 > Phillippo, D. M. (2022). *multinma: Network Meta-Analysis of
-> Individual and Aggregate Data in Stan*. R package version 0.4.0, doi:
-> [10.5281/zenodo.3904454](https://doi.org/10.5281/zenodo.3904454).
+> Individual and Aggregate Data in Stan*. R package version 0.4.0.9000,
+> doi: [10.5281/zenodo.3904454](https://doi.org/10.5281/zenodo.3904454).
 
 When fitting ML-NMR models, please cite the methods paper:
 

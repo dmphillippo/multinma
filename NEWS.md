@@ -1,3 +1,5 @@
+# multinma 0.4.0.9000
+
 # multinma 0.4.0
 
 * Feature: Node-splitting models for assessing inconsistency are now available
