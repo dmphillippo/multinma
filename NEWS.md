@@ -1,4 +1,4 @@
-# multinma 0.3.0.9000
+# multinma 0.4.0
 
 * Feature: Node-splitting models for assessing inconsistency are now available
 with `consistency = "nodesplit"` in `nma()`. Comparisons to split can be chosen
