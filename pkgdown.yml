@@ -1,5 +1,5 @@
-pandoc: 2.7.3
-pkgdown: 1.6.1
+pandoc: 2.14.2
+pkgdown: 2.0.2
 pkgdown_sha: ~
 articles:
   example_atrial_fibrillation: example_atrial_fibrillation.html
@@ -15,7 +15,7 @@ articles:
   example_thrombolytics: example_thrombolytics.html
   example_transfusion: example_transfusion.html
   vignette_overview: vignette_overview.html
-last_built: 2021-03-19T10:51Z
+last_built: 2022-01-18T12:11Z
 urls:
   reference: https://dmphillippo.github.io/multinma/reference
   article: https://dmphillippo.github.io/multinma/articles

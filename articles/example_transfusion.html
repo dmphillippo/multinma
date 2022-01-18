@@ -4,7 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="multinma">
 <title>Example: White blood cell transfusion • multinma</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
@@ -12,12 +13,12 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/paper/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
-<script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><link href="../deps/_Source%20Sans%20Pro-0.4.0/font.css" rel="stylesheet">
+<!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Example: White blood cell transfusion">
 <meta property="og:description" content="multinma">
 <meta property="og:image" content="https://dmphillippo.github.io/multinma/logo.svg">
@@ -26,131 +27,95 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body data-spy="scroll" data-target="#toc">
-    <div class="container template-article">
-      <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">multinma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
-      </span>
-    </div>
+<body>
+    <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
+    
 
-    <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    
+    <a class="navbar-brand me-2" href="../index.html">multinma</a>
+
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.0</small>
+
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar" class="collapse navbar-collapse ms-3">
+      <ul class="navbar-nav me-auto">
+<li class="nav-item">
+  <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
-<li>
-  <a href="../reference/index.html">Reference</a>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../articles/vignette_overview.html">Overview of Examples</a>
-    </li>
-    <li class="divider">
-    <li class="dropdown-header">Examples</li>
-    <li>
-      <a href="../articles/example_atrial_fibrillation.html">Example: Atrial fibrillation</a>
-    </li>
-    <li>
-      <a href="../articles/example_bcg_vaccine.html">Example: BCG vaccine for tuberculosis</a>
-    </li>
-    <li>
-      <a href="../articles/example_blocker.html">Example: Beta blockers</a>
-    </li>
-    <li>
-      <a href="../articles/example_diabetes.html">Example: Diabetes</a>
-    </li>
-    <li>
-      <a href="../articles/example_dietary_fat.html">Example: Dietary fat</a>
-    </li>
-    <li>
-      <a href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a>
-    </li>
-    <li>
-      <a href="../articles/example_parkinsons.html">Example: Parkinson's disease</a>
-    </li>
-    <li>
-      <a href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a>
-    </li>
-    <li>
-      <a href="../articles/example_smoking.html">Example: Smoking cessation</a>
-    </li>
-    <li>
-      <a href="../articles/example_statins.html">Example: Statins for cholesterol lowering</a>
-    </li>
-    <li>
-      <a href="../articles/example_thrombolytics.html">Example: Thrombolytic treatments</a>
-    </li>
-    <li>
-      <a href="../articles/example_transfusion.html">Example: White blood cell transfusion</a>
-    </li>
-  </ul>
-</li>
-<li>
-  <a href="../news/index.html">Changelog</a>
-</li>
-      </ul>
-<ul class="nav navbar-nav navbar-right">
-<li>
-  <a href="https://github.com/dmphillippo/multinma/">
-    <span class="fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
-      </ul>
-</div>
-<!--/.nav-collapse -->
+<li class="active nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/vignette_overview.html">Overview of Examples</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Examples</h6>
+    <a class="dropdown-item" href="../articles/example_atrial_fibrillation.html">Example: Atrial fibrillation</a>
+    <a class="dropdown-item" href="../articles/example_bcg_vaccine.html">Example: BCG vaccine for tuberculosis</a>
+    <a class="dropdown-item" href="../articles/example_blocker.html">Example: Beta blockers</a>
+    <a class="dropdown-item" href="../articles/example_diabetes.html">Example: Diabetes</a>
+    <a class="dropdown-item" href="../articles/example_dietary_fat.html">Example: Dietary fat</a>
+    <a class="dropdown-item" href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a>
+    <a class="dropdown-item" href="../articles/example_parkinsons.html">Example: Parkinson's disease</a>
+    <a class="dropdown-item" href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a>
+    <a class="dropdown-item" href="../articles/example_smoking.html">Example: Smoking cessation</a>
+    <a class="dropdown-item" href="../articles/example_statins.html">Example: Statins for cholesterol lowering</a>
+    <a class="dropdown-item" href="../articles/example_thrombolytics.html">Example: Thrombolytic treatments</a>
+    <a class="dropdown-item" href="../articles/example_transfusion.html">Example: White blood cell transfusion</a>
   </div>
-<!--/.container -->
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
+</li>
+      </ul>
+<form class="form-inline my-2 my-lg-0" role="search">
+        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
+</form>
+
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/dmphillippo/multinma/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
-<!--/.navbar -->
 
-      
+    
+  </div>
+</nav><div class="container template-article">
 
-      </header><script src="example_transfusion_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
-  <div class="col-md-9 contents">
-    <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Example: White blood cell transfusion</h1>
+
+
+
+<div class="row">
+  <main id="main"><div class="page-header">
+      <img src="../logo.svg" class="logo" alt=""><h1>Example: White blood cell transfusion</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/dmphillippo/multinma/blob/master/vignettes/example_transfusion.Rmd"><code>vignettes/example_transfusion.Rmd</code></a></small>
-      <div class="hidden name"><code>example_transfusion.Rmd</code></div>
-
+      <small class="dont-index">Source: <a href="https://github.com/dmphillippo/multinma/blob/HEAD/vignettes/example_transfusion.Rmd" class="external-link"><code>vignettes/example_transfusion.Rmd</code></a></small>
+      <div class="d-none name"><code>example_transfusion.Rmd</code></div>
     </div>
 
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dmphillippo.github.io/multinma/">multinma</a></span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html">detectCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>#&gt; For execution on a local, multicore CPU with excess RAM we recommend calling
-#&gt; options(mc.cores = parallel::detectCores())
-#&gt; 
-#&gt; Attaching package: 'multinma'
-#&gt; The following objects are masked from 'package:stats':
-#&gt; 
-#&gt;     dgamma, pgamma, qgamma</code></pre>
-<p>This vignette describes the analysis of 6 trials comparing transfusion of granulocytes (white blood cells) to control for preventing mortality in patients with neutropenia or neutrophil dysfunction <span class="citation">(Stanworth et al. 2005; Turner et al. 2012)</span>. The data are available in this package as <code>transfusion</code>:</p>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dmphillippo.github.io/multinma/">multinma</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">#&gt; For execution on a local, multicore CPU with excess RAM we recommend calling</span>
+<span class="co">#&gt; options(mc.cores = parallel::detectCores())</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'multinma'</span>
+<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     dgamma, pgamma, qgamma</span></code></pre>
+<p>This vignette describes the analysis of 6 trials comparing transfusion of granulocytes (white blood cells) to control for preventing mortality in patients with neutropenia or neutrophil dysfunction <span class="citation">(<a href="#ref-Stanworth2005" role="doc-biblioref">Stanworth et al. 2005</a>; <a href="#ref-Turner2012" role="doc-biblioref">Turner et al. 2012</a>)</span>. The data are available in this package as <code>transfusion</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">transfusion</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">transfusion</span><span class="op">)</span>
 <span class="co">#&gt;        studyc        trtc  r  n</span>
 <span class="co">#&gt; 1    Bow 1984 Transfusion  5 13</span>
 <span class="co">#&gt; 2    Bow 1984     Control  4 11</span>
@@ -158,10 +123,10 @@
 <span class="co">#&gt; 4 Herzig 1977     Control  3 14</span>
 <span class="co">#&gt; 5  Higby 1975 Transfusion  2 17</span>
 <span class="co">#&gt; 6  Higby 1975     Control 14 19</span></code></pre></div>
-<p><span class="citation">Turner et al. (2012)</span> previously used this dataset to demonstrate the application of informative priors for heterogeneity, an analysis which we recreate here.</p>
-<div id="setting-up-the-network" class="section level3">
-<h3 class="hasAnchor">
-<a href="#setting-up-the-network" class="anchor"></a>Setting up the network</h3>
+<p><span class="citation">Turner et al. (<a href="#ref-Turner2012" role="doc-biblioref">2012</a>)</span> previously used this dataset to demonstrate the application of informative priors for heterogeneity, an analysis which we recreate here.</p>
+<div class="section level2">
+<h2 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
+</h2>
 <p>We begin by setting up the network - here just a pairwise meta-analysis. We have arm-level count data giving the number of deaths (<code>r</code>) out of the total (<code>n</code>) in each arm, so we use the function <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code>. We set “Control” as the reference treatment.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tr_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_agd_arm.html">set_agd_arm</a></span><span class="op">(</span><span class="va">transfusion</span>, 
@@ -173,7 +138,7 @@
 <span class="va">tr_net</span>
 <span class="co">#&gt; A network with 6 AgD studies (arm-based).</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ------------------------------------------------------- AgD studies (arm-based) ---- </span>
+<span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------</span> <span style="font-weight: bold;">AgD studies (arm-based)</span> <span style="color: #555555;">----</span> </span>
 <span class="co">#&gt;  Study         Treatments              </span>
 <span class="co">#&gt;  Bow 1984      2: Transfusion | Control</span>
 <span class="co">#&gt;  Herzig 1977   2: Transfusion | Control</span>
@@ -183,26 +148,26 @@
 <span class="co">#&gt;  Winston 1982a 2: Transfusion | Control</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;  Outcome type: count</span>
-<span class="co">#&gt; ------------------------------------------------------------------------------------</span>
+<span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------------------------</span></span>
 <span class="co">#&gt; Total number of treatments: 2</span>
 <span class="co">#&gt; Total number of studies: 6</span>
 <span class="co">#&gt; Reference treatment is: Control</span>
-<span class="co">#&gt; Network is connected</span></code></pre></div>
+<span class="co">#&gt; Network is <span style="color: #00BB00;">connected</span></span></code></pre></div>
 </div>
-<div id="meta-analysis-models" class="section level3">
-<h3 class="hasAnchor">
-<a href="#meta-analysis-models" class="anchor"></a>Meta-analysis models</h3>
-<p>We fit two random effects models, first with a non-informative prior for the heterogeneity, then using the informative prior described by <span class="citation">Turner et al. (2012)</span>.</p>
-<div id="random-effects-meta-analysis-with-non-informative-heterogeneity-prior" class="section level4">
-<h4 class="hasAnchor">
-<a href="#random-effects-meta-analysis-with-non-informative-heterogeneity-prior" class="anchor"></a>Random effects meta-analysis with non-informative heterogeneity prior</h4>
-<p>We fit a random effects model using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "random"</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span> and study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and a non-informative <span class="math inline">\(\textrm{half-N}(5^2)\)</span> prior for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> method:</p>
+<div class="section level2">
+<h2 id="meta-analysis-models">Meta-analysis models<a class="anchor" aria-label="anchor" href="#meta-analysis-models"></a>
+</h2>
+<p>We fit two random effects models, first with a non-informative prior for the heterogeneity, then using the informative prior described by <span class="citation">Turner et al. (<a href="#ref-Turner2012" role="doc-biblioref">2012</a>)</span>.</p>
+<div class="section level3">
+<h3 id="random-effects-meta-analysis-with-non-informative-heterogeneity-prior">Random effects meta-analysis with non-informative heterogeneity prior<a class="anchor" aria-label="anchor" href="#random-effects-meta-analysis-with-non-informative-heterogeneity-prior"></a>
+</h3>
+<p>We fit a random effects model using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "random"</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span> and study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and a non-informative <span class="math inline">\(\textrm{half-N}(5^2)\)</span> prior for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span>
 <span class="co">#&gt; 50% of the prior density lies between -67.45 and 67.45.</span>
 <span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; A half-Normal prior distribution: location = 0, scale = 5.</span>
 <span class="co">#&gt; 50% of the prior density lies between 0 and 3.37.</span>
 <span class="co">#&gt; 95% of the prior density lies between 0 and 9.8.</span></code></pre></div>
@@ -213,7 +178,7 @@
                         prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
                         prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
                         prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html">print()</a></code> method:</p>
+<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tr_fit_RE_noninf</span>
 <span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span>
@@ -226,33 +191,33 @@
 <span class="co">#&gt; lp__           -134.26    0.09 3.15 -141.56 -136.10 -133.90 -131.97 -129.13  1257 1.00</span>
 <span class="co">#&gt; tau               1.87    0.04 1.04    0.57    1.17    1.63    2.31    4.71   816 1.00</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Mar 19 11:24:14 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Jan 18 12:51:42 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
 <p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects <span class="math inline">\(\delta_{jk}\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Not run</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">tr_fit_RE_noninf</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">tr_fit_RE_noninf</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">tr_fit_RE_noninf</span>, prior <span class="op">=</span> <span class="st">"het"</span><span class="op">)</span></code></pre></div>
 <p><img src="example_transfusion_files/figure-html/tr_RE_noninf_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>The posterior distribution for the heterogeneity variance <span class="math inline">\(\tau^2\)</span> is summarised by</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">noninf_tau</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">as.array</a></span><span class="op">(</span><span class="va">tr_fit_RE_noninf</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">noninf_tau</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">as.array</a></span><span class="op">(</span><span class="va">tr_fit_RE_noninf</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span>
 <span class="va">noninf_tausq</span> <span class="op">&lt;-</span> <span class="va">noninf_tau</span><span class="op">^</span><span class="fl">2</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">noninf_tausq</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"tausq"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">noninf_tausq</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">noninf_tausq</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"tausq"</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">noninf_tausq</span><span class="op">)</span>
 <span class="co">#&gt;       mean sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
 <span class="co">#&gt; tausq  4.6  6 0.32 1.38 2.65 5.32 22.17     1091      879    1</span></code></pre></div>
 </div>
-<div id="random-effects-meta-analysis-with-informative-heterogeneity-prior" class="section level4">
-<h4 class="hasAnchor">
-<a href="#random-effects-meta-analysis-with-informative-heterogeneity-prior" class="anchor"></a>Random effects meta-analysis with informative heterogeneity prior</h4>
-<p>Keeping the rest of the model setup the same, we now use an informative <span class="math inline">\(\textrm{log-N}(-3.93, 1.51^2)\)</span> prior for the heterogeneity variance <span class="math inline">\(\tau^2\)</span>. We can examine the range of parameter values implied by this prior distribution with the <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> method:</p>
+<div class="section level3">
+<h3 id="random-effects-meta-analysis-with-informative-heterogeneity-prior">Random effects meta-analysis with informative heterogeneity prior<a class="anchor" aria-label="anchor" href="#random-effects-meta-analysis-with-informative-heterogeneity-prior"></a>
+</h3>
+<p>Keeping the rest of the model setup the same, we now use an informative <span class="math inline">\(\textrm{log-N}(-3.93, 1.51^2)\)</span> prior for the heterogeneity variance <span class="math inline">\(\tau^2\)</span>. We can examine the range of parameter values implied by this prior distribution with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">log_normal</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3.93</span>, <span class="fl">1.51</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">log_normal</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3.93</span>, <span class="fl">1.51</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; A log-Normal prior distribution: location = -3.93, scale = 1.51.</span>
 <span class="co">#&gt; 50% of the prior density lies between 0.01 and 0.05.</span>
 <span class="co">#&gt; 95% of the prior density lies between 0 and 0.38.</span></code></pre></div>
@@ -264,7 +229,7 @@
                      prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
                      prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">log_normal</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3.93</span>, <span class="fl">1.51</span><span class="op">)</span>,
                      prior_het_type <span class="op">=</span> <span class="st">"var"</span><span class="op">)</span></code></pre></div>
-<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html">print()</a></code> method:</p>
+<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">tr_fit_RE_inf</span>
 <span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span>
@@ -277,14 +242,14 @@
 <span class="co">#&gt; lp__           -140.27    0.08 2.88 -146.76 -141.90 -139.92 -138.22 -135.57  1378    1</span>
 <span class="co">#&gt; tau               0.48    0.01 0.35    0.05    0.21    0.41    0.68    1.31  1383    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Mar 19 11:24:19 2021.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Jan 18 12:51:48 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
 <p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects <span class="math inline">\(\delta_{jk}\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Not run</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">tr_fit_RE_inf</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">tr_fit_RE_inf</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">tr_fit_RE_inf</span>, prior <span class="op">=</span> <span class="st">"het"</span><span class="op">)</span></code></pre></div>
@@ -294,51 +259,48 @@
 </blockquote>
 <p>The posterior distribution for the heterogeneity variance <span class="math inline">\(\tau^2\)</span> is summarised by</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">inf_tau</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">as.array</a></span><span class="op">(</span><span class="va">tr_fit_RE_inf</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">inf_tau</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">as.array</a></span><span class="op">(</span><span class="va">tr_fit_RE_inf</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span>
 <span class="va">inf_tausq</span> <span class="op">&lt;-</span> <span class="va">inf_tau</span><span class="op">^</span><span class="fl">2</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">inf_tausq</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"tausq"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">inf_tausq</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">inf_tausq</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"tausq"</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">inf_tausq</span><span class="op">)</span>
 <span class="co">#&gt;       mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
 <span class="co">#&gt; tausq 0.35 0.51    0 0.04 0.17 0.46   1.7     1267     2474    1</span></code></pre></div>
 </div>
 </div>
-<div id="references" class="section level2 unnumbered">
-<h2 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h2>
-<div id="refs" class="references">
-<div id="ref-Stanworth2005">
-<p>Stanworth, S., E. Massey, C. Hyde, S. J. Brunskill, C. Navarette, G. Lucas, D. Marks, and U. Paulus. 2005. “Granulocyte Transfusions for Treating Infections in Patients with Neutropenia or Neutrophil Dysfunction.” <em>Cochrane Database of Systematic Reviews</em>, no. 3. <a href="https://doi.org/10.1002/14651858.CD005339">https://doi.org/10.1002/14651858.CD005339</a>.</p>
+<div class="section level2 unnumbered">
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Stanworth2005" class="csl-entry">
+Stanworth, S., E. Massey, C. Hyde, S. J. Brunskill, C. Navarette, G. Lucas, D. Marks, and U. Paulus. 2005. <span>“Granulocyte Transfusions for Treating Infections in Patients with Neutropenia or Neutrophil Dysfunction.”</span> <em>Cochrane Database of Systematic Reviews</em>, no. 3. <a href="https://doi.org/10.1002/14651858.CD005339" class="external-link">https://doi.org/10.1002/14651858.CD005339</a>.
 </div>
-<div id="ref-Turner2012">
-<p>Turner, R. M., J. Davey, M. J. Clarke, S. G. Thompson, and J. P. T. Higgins. 2012. “Predicting the Extent of Heterogeneity in Meta-Analysis, Using Empirical Data from the Cochrane Database of Systematic Reviews.” <em>International Journal of Epidemiology</em> 41 (3): 818–27. <a href="https://doi.org/10.1093/ije/dys041">https://doi.org/10.1093/ije/dys041</a>.</p>
+<div id="ref-Turner2012" class="csl-entry">
+Turner, R. M., J. Davey, M. J. Clarke, S. G. Thompson, and J. P. T. Higgins. 2012. <span>“Predicting the Extent of Heterogeneity in Meta-Analysis, Using Empirical Data from the Cochrane Database of Systematic Reviews.”</span> <em>International Journal of Epidemiology</em> 41 (3): 818–27. <a href="https://doi.org/10.1093/ije/dys041" class="external-link">https://doi.org/10.1093/ije/dys041</a>.
 </div>
 </div>
 </div>
-  </div>
-
-  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
-
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
 
-      <footer><div class="copyright">
-  <p>Developed by David M. Phillippo.</p>
+    <footer><div class="pkgdown-footer-left">
+  <p></p>
+<p>Developed by David M. Phillippo.</p>
 </div>
 
-<div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+<div class="pkgdown-footer-right">
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
-      </footer>
+    </footer>
 </div>
 
   
 
+  
 
   </body>
 </html>

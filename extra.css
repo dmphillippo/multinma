@@ -1,37 +1,44 @@
+
 body {
-  font-size: 14px;
+  font-size: var(--bs-body-font-size);
 }
 
-.navbar-brand {
-  font-size: 16px;
-  font-weight: bold;
+@media (min-width: 1200px) {
+  body {
+    font-size: 1rem;
+  }
 }
 
-.navbar-default .navbar-nav>li>a:hover,
-.navbar-default .navbar-nav>li>a:focus {
-  background-color: #eee;
+/*
+.row>main {
+  max-width: 55rem
 }
 
-blockquote {
-  font-size: 14px;
+@media (min-width: 768px) {
+  .col-md-3 {
+      flex: 0 0 auto;
+      -webkit-flex: 0 0 auto;
+      width: 25%;
+  }
+}
+*/
+
+pre code {
+  white-space: pre;
 }
 
-h1, .h1 {
-  font-size: 32px;
-  font-weight: bold;
+pre code a:any-link {
+  text-decoration: none;
 }
 
 h2, .h2 {
-  font-size: 28px;
-  font-weight: bold;
+  margin-top: 2rem;
 }
 
 h3, .h3 {
-  font-size: 20px;
-  font-weight: bold;
+  margin-top: 2rem;
 }
 
 h4, .h4 {
-  font-size: 20px;
-  font-weight: normal;
+  margin-top: 1.5rem;
 }

@@ -4,7 +4,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="multinma is an R package for network meta-analysis and (multilevel) network meta-regression of aggregate data, individual patient data, and mixtures of both. Models are estimated in a Bayesian framework using Stan.
+">
 <title>Bayesian network meta-analysis of individual and aggregate data • multinma</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -12,12 +14,12 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/paper/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
-<script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><link href="deps/_Source%20Sans%20Pro-0.4.0/font.css" rel="stylesheet">
+<!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
+<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
 <meta property="og:title" content="Bayesian network meta-analysis of individual and aggregate data">
 <meta property="og:description" content="multinma is an R package for network meta-analysis and (multilevel) network meta-regression of aggregate data, individual patient data, and mixtures of both. Models are estimated in a Bayesian framework using Stan.
 ">
@@ -27,224 +29,192 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body data-spy="scroll" data-target="#toc">
-    <div class="container template-home">
-      <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">multinma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
-      </span>
-    </div>
+<body>
+    <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
+    
 
-    <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    
+    <a class="navbar-brand me-2" href="index.html">multinma</a>
+
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.0</small>
+
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar" class="collapse navbar-collapse ms-3">
+      <ul class="navbar-nav me-auto">
+<li class="nav-item">
+  <a class="nav-link" href="reference/index.html">Reference</a>
 </li>
-<li>
-  <a href="reference/index.html">Reference</a>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="articles/vignette_overview.html">Overview of Examples</a>
-    </li>
-    <li class="divider">
-    <li class="dropdown-header">Examples</li>
-    <li>
-      <a href="articles/example_atrial_fibrillation.html">Example: Atrial fibrillation</a>
-    </li>
-    <li>
-      <a href="articles/example_bcg_vaccine.html">Example: BCG vaccine for tuberculosis</a>
-    </li>
-    <li>
-      <a href="articles/example_blocker.html">Example: Beta blockers</a>
-    </li>
-    <li>
-      <a href="articles/example_diabetes.html">Example: Diabetes</a>
-    </li>
-    <li>
-      <a href="articles/example_dietary_fat.html">Example: Dietary fat</a>
-    </li>
-    <li>
-      <a href="articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a>
-    </li>
-    <li>
-      <a href="articles/example_parkinsons.html">Example: Parkinson's disease</a>
-    </li>
-    <li>
-      <a href="articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a>
-    </li>
-    <li>
-      <a href="articles/example_smoking.html">Example: Smoking cessation</a>
-    </li>
-    <li>
-      <a href="articles/example_statins.html">Example: Statins for cholesterol lowering</a>
-    </li>
-    <li>
-      <a href="articles/example_thrombolytics.html">Example: Thrombolytic treatments</a>
-    </li>
-    <li>
-      <a href="articles/example_transfusion.html">Example: White blood cell transfusion</a>
-    </li>
-  </ul>
-</li>
-<li>
-  <a href="news/index.html">Changelog</a>
-</li>
-      </ul>
-<ul class="nav navbar-nav navbar-right">
-<li>
-  <a href="https://github.com/dmphillippo/multinma/">
-    <span class="fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
-      </ul>
-</div>
-<!--/.nav-collapse -->
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="articles/vignette_overview.html">Overview of Examples</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Examples</h6>
+    <a class="dropdown-item" href="articles/example_atrial_fibrillation.html">Example: Atrial fibrillation</a>
+    <a class="dropdown-item" href="articles/example_bcg_vaccine.html">Example: BCG vaccine for tuberculosis</a>
+    <a class="dropdown-item" href="articles/example_blocker.html">Example: Beta blockers</a>
+    <a class="dropdown-item" href="articles/example_diabetes.html">Example: Diabetes</a>
+    <a class="dropdown-item" href="articles/example_dietary_fat.html">Example: Dietary fat</a>
+    <a class="dropdown-item" href="articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a>
+    <a class="dropdown-item" href="articles/example_parkinsons.html">Example: Parkinson's disease</a>
+    <a class="dropdown-item" href="articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a>
+    <a class="dropdown-item" href="articles/example_smoking.html">Example: Smoking cessation</a>
+    <a class="dropdown-item" href="articles/example_statins.html">Example: Statins for cholesterol lowering</a>
+    <a class="dropdown-item" href="articles/example_thrombolytics.html">Example: Thrombolytic treatments</a>
+    <a class="dropdown-item" href="articles/example_transfusion.html">Example: White blood cell transfusion</a>
   </div>
-<!--/.container -->
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="news/index.html">Changelog</a>
+</li>
+      </ul>
+<form class="form-inline my-2 my-lg-0" role="search">
+        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="search.json" id="search-input" placeholder="Search for" autocomplete="off">
+</form>
+
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/dmphillippo/multinma/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
-<!--/.navbar -->
 
-      
-
-      </header><div class="row">
-  <div class="contents col-md-9">
-<div id="multinma-network-meta-analysis-of-individual-and-aggregate-data-in-stan-" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#multinma-network-meta-analysis-of-individual-and-aggregate-data-in-stan-" class="anchor"></a>multinma: Network Meta-Analysis of individual and aggregate data in Stan <img src="reference/figures/logo.svg" align="right" height="139">
-</h1></div>
+    
+  </div>
+</nav><div class="container template-home">
+<div class="row">
+  <main id="main" class="col-md-9"><div class="section level1">
+<div class="page-header">
+<img src="logo.svg" class="logo" alt=""><h1 id="multinma-network-meta-analysis-of-individual-and-aggregate-data-in-stan-">multinma: Network Meta-Analysis of individual and aggregate data in Stan <a class="anchor" aria-label="anchor" href="#multinma-network-meta-analysis-of-individual-and-aggregate-data-in-stan-"></a>
+</h1>
+</div>
 <!-- badges: start -->
 
 <p>The <code>multinma</code> package implements network meta-analysis, network meta-regression, and multilevel network meta-regression models which combine evidence from a network of studies and treatments using either aggregate data or individual patient data from each study (Phillippo et al. 2020; Phillippo 2019). Models are estimated in a Bayesian framework using Stan (Carpenter et al. 2017).</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p>You can install the released version of <code>multinma</code> from <a href="https://CRAN.R-project.org">CRAN</a> with:</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>You can install the released version of <code>multinma</code> from <a href="https://CRAN.R-project.org/package=multinma" class="external-link">CRAN</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"multinma"</span><span class="op">)</span></code></pre></div>
-<p>And the development version from <a href="https://github.com/">GitHub</a> with:</p>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"multinma"</span><span class="op">)</span></code></pre></div>
+<p>The development version can be installed from <a href="https://dmphillippo.r-universe.dev" class="external-link">R-universe</a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"multinma"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://dmphillippo.r-universe.dev"</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p>or from source on <a href="https://github.com/dmphillippo/multinma" class="external-link">GitHub</a> with:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"dmphillippo/multinma"</span><span class="op">)</span></code></pre></div>
-<p>Installing from source (either from CRAN or GitHub) requires that the <code>rstan</code> package is installed and configured. See the installation guide <a href="https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started">here</a>.</p>
+<p>Installing from source requires that the <code>rstan</code> package is installed and configured. See the installation guide <a href="https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started" class="external-link">here</a>.</p>
 </div>
-<div id="getting-started" class="section level2">
-<h2 class="hasAnchor">
-<a href="#getting-started" class="anchor"></a>Getting started</h2>
+<div class="section level2">
+<h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+</h2>
 <p>A good place to start is with the package vignettes which walk through example analyses, see <code><a href="articles/vignette_overview.html">vignette("vignette_overview")</a></code> for an overview. The series of NICE Technical Support Documents on evidence synthesis gives a detailed introduction to network meta-analysis:</p>
 <blockquote>
-<p>Dias, S. et al. (2011). “NICE DSU Technical Support Documents 1-7: Evidence Synthesis for Decision Making.” <em>National Institute for Health and Care Excellence.</em> Available from <a href="http://nicedsu.org.uk/" class="uri">http://nicedsu.org.uk/</a>.</p>
+<p>Dias, S. et al. (2011). “NICE DSU Technical Support Documents 1-7: Evidence Synthesis for Decision Making.” <em>National Institute for Health and Care Excellence.</em> Available from <a href="http://nicedsu.org.uk/" class="external-link uri">http://nicedsu.org.uk/</a>.</p>
 </blockquote>
 <p>Multilevel network meta-regression is set out in the following methods paper:</p>
 <blockquote>
-<p>Phillippo, D. M. et al. (2020). “Multilevel Network Meta-Regression for population-adjusted treatment comparisons.” <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em>, 183(3):1189-1210. doi: <a href="https://doi.org/10.1111/rssa.12579">10.1111/rssa.12579</a>.</p>
+<p>Phillippo, D. M. et al. (2020). “Multilevel Network Meta-Regression for population-adjusted treatment comparisons.” <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em>, 183(3):1189-1210. doi: <a href="https://doi.org/10.1111/rssa.12579" class="external-link">10.1111/rssa.12579</a>.</p>
 </blockquote>
 </div>
-<div id="citing-multinma" class="section level2">
-<h2 class="hasAnchor">
-<a href="#citing-multinma" class="anchor"></a>Citing multinma</h2>
+<div class="section level2">
+<h2 id="citing-multinma">Citing multinma<a class="anchor" aria-label="anchor" href="#citing-multinma"></a>
+</h2>
 <p>The <code>multinma</code> package can be cited as follows:</p>
 <blockquote>
-<p>Phillippo, D. M. (2021). <em>multinma: Network Meta-Analysis of Individual and Aggregate Data in Stan</em>. R package version 0.3.0, doi: <a href="https://doi.org/10.5281/zenodo.3904454">10.5281/zenodo.3904454</a>.</p>
+<p>Phillippo, D. M. (2022). <em>multinma: Network Meta-Analysis of Individual and Aggregate Data in Stan</em>. R package version 0.4.0, doi: <a href="https://doi.org/10.5281/zenodo.3904454" class="external-link">10.5281/zenodo.3904454</a>.</p>
 </blockquote>
 <p>When fitting ML-NMR models, please cite the methods paper:</p>
 <blockquote>
-<p>Phillippo, D. M. et al. (2020). “Multilevel Network Meta-Regression for population-adjusted treatment comparisons.” <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em>, 183(3):1189-1210. doi: <a href="https://doi.org/10.1111/rssa.12579">10.1111/rssa.12579</a>.</p>
+<p>Phillippo, D. M. et al. (2020). “Multilevel Network Meta-Regression for population-adjusted treatment comparisons.” <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em>, 183(3):1189-1210. doi: <a href="https://doi.org/10.1111/rssa.12579" class="external-link">10.1111/rssa.12579</a>.</p>
 </blockquote>
 </div>
-<div id="references" class="section level2">
-<h2 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h2>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Carpenter2017" class="csl-entry">
-<p>Carpenter, B., A. Gelman, M. D. Hoffman, D. Lee, B. Goodrich, M. Betancourt, M. Brubaker, J. Guo, P. Li, and A. Riddell. 2017. “Stan: A Probabilistic Programming Language.” <em>Journal of Statistical Software</em> 76 (1). <a href="https://doi.org/10.18637/jss.v076.i01" class="uri">https://doi.org/10.18637/jss.v076.i01</a>.</p>
+Carpenter, B., A. Gelman, M. D. Hoffman, D. Lee, B. Goodrich, M. Betancourt, M. Brubaker, J. Guo, P. Li, and A. Riddell. 2017. “Stan: A Probabilistic Programming Language.” <em>Journal of Statistical Software</em> 76 (1). <a href="https://doi.org/10.18637/jss.v076.i01" class="external-link uri">https://doi.org/10.18637/jss.v076.i01</a>.
 </div>
 <div id="ref-Phillippo_thesis" class="csl-entry">
-<p>Phillippo, D. M. 2019. “Calibration of Treatment Effects in Network Meta-Analysis Using Individual Patient Data.” PhD thesis, University of Bristol.</p>
+Phillippo, D. M. 2019. “Calibration of Treatment Effects in Network Meta-Analysis Using Individual Patient Data.” PhD thesis, University of Bristol.
 </div>
 <div id="ref-methods_paper" class="csl-entry">
-<p>Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A. Schacht, D. Saure, Z. Kadziola, and N. J. Welton. 2020. “Multilevel Network Meta-Regression for Population-Adjusted Treatment Comparisons.” <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em> 183 (3): 1189–1210. <a href="https://doi.org/10.1111/rssa.12579" class="uri">https://doi.org/10.1111/rssa.12579</a>.</p>
+Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A. Schacht, D. Saure, Z. Kadziola, and N. J. Welton. 2020. “Multilevel Network Meta-Regression for Population-Adjusted Treatment Comparisons.” <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em> 183 (3): 1189–1210. <a href="https://doi.org/10.1111/rssa.12579" class="external-link uri">https://doi.org/10.1111/rssa.12579</a>.
 </div>
 </div>
 </div>
 </div>
-  </div>
-
-  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <div class="links">
-<h2>Links</h2>
+  </main><aside class="col-md-3"><div class="links">
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=multinma">https://​cloud.r-project.org/​package=multinma</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/dmphillippo/multinma/">https://​github.com/​dmphillippo/​multinma/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/dmphillippo/multinma/issues">https://​github.com/​dmphillippo/​multinma/​issues</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=multinma" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/dmphillippo/multinma/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/dmphillippo/multinma/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a></li>
+<li><a href="https://www.r-project.org/Licenses/GPL-3" class="external-link">GPL-3</a></li>
 </ul>
 </div>
+
+
 <div class="citation">
-<h2>Citation</h2>
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html">Citing multinma</a></li>
+<li><a href="authors.html#citation">Citing multinma</a></li>
 </ul>
 </div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>David M. Phillippo <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-2672-7841" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>David M. Phillippo <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-2672-7841" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://CRAN.R-project.org/package=multinma"><img src="https://www.r-pkg.org/badges/version/multinma" alt="CRAN status"></a></li>
-<li><a href="https://github.com/dmphillippo/multinma/actions"><img src="https://github.com/dmphillippo/multinma/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
-<li><a href="https://doi.org/10.5281/zenodo.3904454"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3904454.svg" alt="DOI"></a></li>
+<li><a href="https://CRAN.R-project.org/package=multinma" class="external-link"><img src="https://www.r-pkg.org/badges/version/multinma" alt="CRAN status"></a></li>
+<li><a href="https://dmphillippo.r-universe.dev" class="external-link"><img src="https://dmphillippo.r-universe.dev/badges/multinma" alt="R-universe"></a></li>
+<li><a href="https://github.com/dmphillippo/multinma/actions" class="external-link"><img src="https://github.com/dmphillippo/multinma/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://doi.org/10.5281/zenodo.3904454" class="external-link"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3904454.svg" alt="DOI"></a></li>
 </ul>
 </div>
-</div>
-</div>
 
-
-      <footer><div class="copyright">
-  <p>Developed by David M. Phillippo.</p>
+  </aside>
 </div>
 
-<div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+
+    <footer><div class="pkgdown-footer-left">
+  <p></p>
+<p>Developed by David M. Phillippo.</p>
 </div>
 
-      </footer>
+<div class="pkgdown-footer-right">
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+</div>
+
+    </footer>
 </div>
 
   
 
+  
 
   </body>
 </html>

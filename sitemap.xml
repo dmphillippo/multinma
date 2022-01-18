@@ -1,7 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://dmphillippo.github.io/multinma/404.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/articles/example_atrial_fibrillation.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/articles/example_bcg_vaccine.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/articles/example_blocker.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/articles/example_diabetes.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/articles/example_dietary_fat.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/articles/example_hta_psoriasis.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/articles/example_parkinsons.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/articles/example_plaque_psoriasis.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/articles/example_smoking.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/articles/example_statins.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/articles/example_thrombolytics.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/articles/example_transfusion.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/articles/vignette_overview.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/authors.html</loc>
+  </url>
+  <url>
     <loc>https://dmphillippo.github.io/multinma/index.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/news/index.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/Bernoulli.html</loc>
@@ -14,6 +65,9 @@
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/aa_example_smk_fe.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/aa_example_smk_nodesplit.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/aa_example_smk_re.html</loc>
@@ -64,10 +118,16 @@
     <loc>https://dmphillippo.github.io/multinma/reference/generalised_t.html</loc>
   </url>
   <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/get_nodesplits.html</loc>
+  </url>
+  <url>
     <loc>https://dmphillippo.github.io/multinma/reference/graph_conversion.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/hta_psoriasis.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/index.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/is_network_connected.html</loc>
@@ -97,6 +157,9 @@
     <loc>https://dmphillippo.github.io/multinma/reference/nma_dic-class.html</loc>
   </url>
   <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/nma_nodesplit-class.html</loc>
+  </url>
+  <url>
     <loc>https://dmphillippo.github.io/multinma/reference/nma_prior-class.html</loc>
   </url>
   <url>
@@ -104,6 +167,12 @@
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/nma_summary-methods.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/nodesplit_summary-class.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/nodesplit_summary-methods.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/pairs.stan_nma.html</loc>
@@ -124,6 +193,9 @@
     <loc>https://dmphillippo.github.io/multinma/reference/plot.nma_summary.html</loc>
   </url>
   <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/plot.nodesplit_summary.html</loc>
+  </url>
+  <url>
     <loc>https://dmphillippo.github.io/multinma/reference/plot_integration_error.html</loc>
   </url>
   <url>
@@ -140,6 +212,9 @@
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/print.nma_dic.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/print.nma_nodesplit_df.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/print.stan_nma.html</loc>
@@ -172,6 +247,9 @@
     <loc>https://dmphillippo.github.io/multinma/reference/statins.html</loc>
   </url>
   <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/summary.nma_nodesplit_df.html</loc>
+  </url>
+  <url>
     <loc>https://dmphillippo.github.io/multinma/reference/summary.nma_prior.html</loc>
   </url>
   <url>
@@ -185,44 +263,5 @@
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/transfusion.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/articles/example_atrial_fibrillation.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/articles/example_bcg_vaccine.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/articles/example_blocker.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/articles/example_diabetes.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/articles/example_dietary_fat.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/articles/example_hta_psoriasis.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/articles/example_parkinsons.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/articles/example_plaque_psoriasis.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/articles/example_smoking.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/articles/example_statins.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/articles/example_thrombolytics.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/articles/example_transfusion.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/articles/vignette_overview.html</loc>
   </url>
 </urlset>
