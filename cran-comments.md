@@ -1,3 +1,7 @@
+## Resubmission
+This is a resubmission. I have reduced the size of the package tarball to 2.5 MB
+(by compressing images in the vignettes).
+
 ## Test environments
 * local R installation (Windows 10), R 4.1.2
 * win-builder (release, devel)
@@ -13,10 +17,9 @@
   Imports includes 22 non-default packages.
 
 * checking installed package size ... NOTE
-  installed size is 14.7Mb
+  installed size is 9.7Mb
   sub-directories of 1Mb or more:
-    R      1.1Mb
-    doc    7.1Mb
+    doc    3.7Mb
     libs   6.0Mb
 
 The docs directory contains 12 html vignettes demonstrating full analyses using
