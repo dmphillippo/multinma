@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.3.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.4.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,7 +65,10 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.3.0.9000" id="multinma-0309000">multinma 0.3.0.9000<a class="anchor" aria-label="anchor" href="#multinma-0309000"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.4.0.9000" id="multinma-0409000">multinma 0.4.0.9000<a class="anchor" aria-label="anchor" href="#multinma-0409000"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.0" id="multinma-040">multinma 0.4.0<a class="anchor" aria-label="anchor" href="#multinma-040"></a></h2><p class="text-muted">CRAN release: 2022-01-18</p>
 <ul><li>Feature: Node-splitting models for assessing inconsistency are now available with <code>consistency = "nodesplit"</code> in <code><a href="../reference/nma.html">nma()</a></code>. Comparisons to split can be chosen using the <code>nodesplit</code> argument, by default all possibly inconsistent comparisons are chosen using <code><a href="../reference/get_nodesplits.html">get_nodesplits()</a></code>. Node-splitting results can be summarised with <code><a href="../reference/summary.nma_nodesplit_df.html">summary.nma_nodesplit()</a></code> and plotted with <code><a href="../reference/plot.nodesplit_summary.html">plot.nodesplit_summary()</a></code>.</li>
 <li>Feature: The correlation matrix for generating integration points with <code><a href="../reference/add_integration.html">add_integration()</a></code> for ML-NMR models is now adjusted to the underlying Gaussian copula, so that the output correlations of the integration points better match the requested input correlations. A new argument <code>cor_adjust</code> controls this behaviour, with options <code>"spearman"</code>, <code>"pearson"</code>, or <code>"none"</code>. Although these correlations typically have little impact on the results, for strict reproducibility the old behaviour from version 0.3.0 and below is available with <code>cor_adjust = "legacy"</code>.</li>
 <li>Feature: For random effects models, the predictive distribution of relative/absolute effects in a new study can now be obtained in <code><a href="../reference/relative_effects.html">relative_effects()</a></code> and <code><a href="../reference/predict.stan_nma.html">predict.stan_nma()</a></code> respectively, using the new argument <code>predictive_distribution = TRUE</code>.</li>
