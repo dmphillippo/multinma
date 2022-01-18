@@ -14,9 +14,13 @@ if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) { # Se
     dev = "ragg_png",
     fig.width = 6,
     fig.height = 4.5,
-    fig.align = "center"
+    fig.align = "center",
+    pngquant = '--speed 4 --nofs'
   )
   options(width = 100)
+
+  # Compress PNG images - needs pngquant on path
+  knitr::knit_hooks$set(pngquant = knitr::hook_pngquant)
 
   # Write vignette details to asis file for precompiled vignettes
   if (!rlang::has_name(rmarkdown::metadata, "vignette")) {
