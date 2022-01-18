@@ -8,14 +8,14 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-----------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
 
 
-## ---- eval = FALSE------------------------------------------------------------
+## ---- eval = FALSE--------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
-## ----setup, echo = FALSE------------------------------------------------------
+## ----setup, echo = FALSE--------------------------------------------------------------------------
 library(multinma)
 nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
              "true" =, "warn" = 2, 
@@ -23,11 +23,11 @@ nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
 options(mc.cores = nc)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 head(statins)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 statin_net <- set_agd_arm(statins, 
                           study = studyc,
                           trt = trtc,
@@ -37,11 +37,11 @@ statin_net <- set_agd_arm(statins,
 statin_net
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 statin_fit_FE <- nma(statin_net, 
                      trt_effects = "fixed",
                      regression = ~.trt:prevention,
@@ -50,25 +50,25 @@ statin_fit_FE <- nma(statin_net,
                      prior_reg = normal(scale = 100))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 statin_fit_FE
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(statin_fit_FE, pars = c("d", "beta", "mu"))
 
 
-## ----statin_FE_pp_plot--------------------------------------------------------
+## ----statin_FE_pp_plot----------------------------------------------------------------------------
 plot_prior_posterior(statin_fit_FE, prior = c("trt", "reg"))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval=!params$run_tests--------------------------------------------------
+## ---- eval=!params$run_tests----------------------------------------------------------------------
 ## statin_fit_RE <- nma(statin_net,
 ##                      trt_effects = "random",
 ##                      regression = ~.trt:prevention,
@@ -78,7 +78,7 @@ summary(half_normal(scale = 5))
 ##                      prior_het = half_normal(scale = 5),
 ##                      adapt_delta = 0.99)
 
-## ---- eval=params$run_tests, echo=FALSE---------------------------------------
+## ---- eval=params$run_tests, echo=FALSE-----------------------------------------------------------
 statin_fit_RE <- nowarn_on_ci(nma(statin_net, 
                      trt_effects = "random",
                      regression = ~.trt:prevention,
@@ -89,35 +89,35 @@ statin_fit_RE <- nowarn_on_ci(nma(statin_net,
                      adapt_delta = 0.99))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 statin_fit_RE
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ---- eval=FALSE----------------------------------------------------------------------------------
 ## # Not run
 ## print(statin_fit_RE, pars = c("d", "beta", "mu", "delta"))
 
 
-## ----statin_RE_pp_plot--------------------------------------------------------
+## ----statin_RE_pp_plot----------------------------------------------------------------------------
 plot_prior_posterior(statin_fit_RE, prior = c("trt", "reg", "het"))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (statin_dic_FE <- dic(statin_fit_FE))
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (statin_dic_RE <- dic(statin_fit_RE))
 
 
-## ----statin_FE_resdev_plot----------------------------------------------------
+## ----statin_FE_resdev_plot------------------------------------------------------------------------
 plot(statin_dic_FE)
 
 
-## ----statin_RE_resdev_plot----------------------------------------------------
+## ----statin_RE_resdev_plot------------------------------------------------------------------------
 plot(statin_dic_RE)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 statin_releff_FE <- relative_effects(statin_fit_FE,
                                      newdata = data.frame(prevention = c("Primary", "Secondary")),
                                      study = prevention)
@@ -125,19 +125,19 @@ statin_releff_FE <- relative_effects(statin_fit_FE,
 statin_releff_FE
 
 
-## ----statins_releff_FE, fig.height = 2----------------------------------------
+## ----statins_releff_FE, fig.height = 2------------------------------------------------------------
 plot(statin_releff_FE, 
      ref_line = 0)
 
 
-## ----statins_beta_FE, fig.height = 4------------------------------------------
+## ----statins_beta_FE, fig.height = 4--------------------------------------------------------------
 plot(statin_fit_FE, 
      pars = "beta", 
      ref_line = 0,
      stat = "halfeye")
 
 
-## ----statins_tests, include=FALSE, eval=params$run_tests----------------------
+## ----statins_tests, include=FALSE, eval=params$run_tests------------------------------------------
 #--- Test against TSD 3 results ---
 library(testthat)
 library(dplyr)
@@ -209,5 +209,24 @@ test_that("RE DIC", {
   expect_equivalent(statin_dic_RE$dic, 66.8, tolerance = tol_dic)
 })
 
+test_that("Robust to custom options(contrasts) settings", {
+  withr::with_options(list(contrasts = c(ordered = "contr.SAS",
+                                         unordered = "contr.SAS")), {
+    statin_fit_FE_SAS <- nma(statin_net, 
+                         trt_effects = "fixed",
+                         regression = ~.trt:prevention,
+                         prior_intercept = normal(scale = 100),
+                         prior_trt = normal(scale = 100),
+                         prior_reg = normal(scale = 100))
+    
+    # Model pars are different (reference level of prevention is different) but
+    # relative effects should still be calculated correctly
+    statin_fit_FE_SAS_releff <- as_tibble(relative_effects(statin_fit_FE_SAS))[, c("parameter", "mean", "sd")]
+  })
+
+  expect_equal(statin_fit_FE_SAS_releff,
+               as_tibble(relative_effects(statin_fit_FE))[, c("parameter", "mean", "sd")],
+               tolerance = tol)
+})
 
 

@@ -1,6 +1,7 @@
 ---
 title: "Overview of Examples"
 output: rmarkdown::html_vignette
+link-citations: yes
 bibliography: ../inst/REFERENCES.bib
 vignette: >
   %\VignetteIndexEntry{*Overview of Examples}
@@ -23,9 +24,9 @@ Title | Outcome type | Likelihood | Link function | Notable features
 [Parkinson's](example_parkinsons.html) | Continuous | Normal | Identity | Analysis of arm-based data, contrast-based data, and a mixture of both
 [HTA plaque psoriasis](example_hta_psoriasis.html) | Ordered | Multinomial (ordered) | probit | Analysis of ordered categorical outcomes
 [Statins](example_statins.html) | Counts | Binomial | logit | Meta-regression with subgroups
-[BCG vaccine](example_bcg_vaccine.html) | Counts | Binomial | logit | Meta-regression with a continuous covariate
-[Smoking cessation](example_smoking.html) | Counts | Binomial | logit | UME inconsistency model
-[Thrombolytics](example_thrombolytics.html) | Counts | Binomial | logit | UME inconsistency model
+[BCG vaccine](example_bcg_vaccine.html) | Counts | Binomial | logit | Meta-regression with a continuous covariate, predictive distributions
+[Smoking cessation](example_smoking.html) | Counts | Binomial | logit | Assessing inconsistency with unrelated mean effects and node-splitting models
+[Thrombolytics](example_thrombolytics.html) | Counts | Binomial | logit | Assessing inconsistency with unrelated mean effects and node-splitting models
 [Atrial fibrillation](example_atrial_fibrillation.html) | Counts | Binomial | logit | Meta-regression with shared class interactions
 [WBC transfusion](example_transfusion.html) | Counts | Binomial | logit | Informative log-Normal prior on $\tau^2$
 [ML-NMR plaque psoriasis](example_plaque_psoriasis.html) | Binary (IPD) and counts (AgD) | Bernoulli (IPD) and two-parameter Binomial (AgD) | probit | Multilevel network meta-regression combining IPD and AgD

@@ -12,7 +12,6 @@ src/init.o
 vignettes/*.R
 !vignettes/*.Rmd
 vignettes/*_files
-inst/*.bib.bak
-inst/*.bib.sav
+inst/*.bib.*
 inst/doc
 docs

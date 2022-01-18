@@ -5,7 +5,7 @@
 \alias{thrombolytics}
 \title{Thrombolytic treatments data}
 \format{
-A data frame with 50 rows and 5 variables:
+A data frame with 102 rows and 5 variables:
 \describe{
 \item{studyn}{numeric study ID}
 \item{trtn}{numeric treatment code}

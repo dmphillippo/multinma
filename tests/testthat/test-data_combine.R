@@ -15,49 +15,63 @@ agd_arm <- tibble(
   studyn = c(1, 1, 2, 2, 2),
   studyc = letters[studyn],
   studyf = factor(studyc),
+  studyf2 = factor(studyc, levels = letters[5:1]),
   trtn = c(1, 2, 1, 2, 3),
   trtc = LETTERS[trtn],
   trtf = factor(trtc),
+  trtf2 = factor(trtc, levels = LETTERS[4:1]),
   tclassn = c(1, 2, 1, 2, 2),
   tclassc = letters[tclassn],
   tclassf = factor(tclassc, levels = letters[1:3]),
+  tclassf2 = factor(tclassc, levels = letters[3:1]),
   y = rnorm(5),
   se = runif(5)
 )
 net_a_a <- set_agd_arm(agd_arm, studyf, trtf, y = y, se = se)
+net_a_a2 <- set_agd_arm(agd_arm, studyf2, trtf2, y = y, se = se)
 
 agd_contrast <- tibble(
   studyn = c(3, 3, 3),
   studyc = letters[studyn],
   studyf = factor(studyc),
+  studyf2 = factor(studyc, levels = letters[5:1]),
   trtn = c(2, 3, 4),
   trtc = LETTERS[trtn],
   trtf = factor(trtc),
+  trtf2 = factor(trtc, levels = LETTERS[4:1]),
   tclassn = c(2, 2, 3),
   tclassc = letters[tclassn],
   tclassf = factor(tclassc, levels = letters[1:3]),
+  tclassf2 = factor(tclassc, levels = letters[3:1]),
   tclassn_bad = c(3, 3, 3),
   y = c(NA, rnorm(2)),
   se = runif(3)
 )
 net_a_c <- set_agd_contrast(agd_contrast, studyf, trtf, y = y, se = se)
+net_a_c2 <- set_agd_contrast(agd_contrast, studyf2, trtf2, y = y, se = se)
 
 ipd <- tibble(
   studyn = c(4, 4, 4, 5, 5),
   studyc = letters[studyn],
   studyf = factor(studyc),
+  studyf2 = factor(studyc, levels = letters[5:1]),
   trtn = c(1, 2, 3, 1, 4),
   trtc = LETTERS[trtn],
   trtf = factor(trtc),
+  trtf2 = factor(trtc, levels = LETTERS[4:1]),
   tclassn = c(1, 2, 2, 1, 3),
   tclassc = letters[tclassn],
   tclassf = factor(tclassc, levels = letters[1:3]),
+  tclassf2 = factor(tclassc, levels = letters[3:1]),
   tclassn_bad = c(1, 3, 3, 3, 4),
   y = rnorm(5)
 )
 net_i <- set_ipd(ipd, studyf, trtf, y = y)
+net_i2 <- set_ipd(ipd, studyf2, trtf2, y = y)
 
 test_that("combine_network produces combined treatment, class, and study factors", {
+  # Note: original_levels attribute unset because levels differ in sub-networks
+
   c1 <- combine_network(net_a_a, net_i)
   expect_equal(c1$treatments, .default(factor(LETTERS[1:4])))
   expect_equal(levels(c1$agd_arm$.trt), LETTERS[1:4])
@@ -111,6 +125,112 @@ test_that("combine_network produces combined treatment, class, and study factors
   expect_equal(levels(c2_classed$agd_arm$.trtclass), letters[c(2, 1, 3)])
   expect_equal(levels(c2_classed$ipd$.trtclass), letters[c(2, 1, 3)])
   expect_equal(levels(c2_classed$agd_contrast$.trtclass), letters[c(2, 1, 3)])
+})
+
+test_that("combine_network produces combined treatment, class, and study factors from explicit factors", {
+  # Note: original_levels attribute now set because levels are explicitly the same in sub-networks
+
+  c1 <- combine_network(net_a_a2, net_i2)
+  c1_trtf <- .default(factor(LETTERS[c(1, 4:2)], levels = LETTERS[c(1, 4:2)]))
+  attr(c1_trtf, "original_levels") <- LETTERS[4:1]
+  expect_equal(c1$treatments, c1_trtf)
+  expect_equal(levels(c1$agd_arm$.trt), LETTERS[c(1, 4:2)])
+  expect_equal(levels(c1$ipd$.trt), LETTERS[c(1, 4:2)])
+  c1_studyf <- factor(letters[c(5, 4, 2, 1)], levels = letters[c(5, 4, 2, 1)])
+  attr(c1_studyf, "original_levels") <- letters[5:1]
+  expect_equal(c1$studies, c1_studyf)
+  expect_equal(levels(c1$agd_arm$.study), letters[c(5, 4, 2, 1)])
+  expect_equal(levels(c1$ipd$.study), letters[c(5, 4, 2, 1)])
+
+  c2 <- combine_network(net_a_a2, net_i2, net_a_c2)
+  c2_trtf <- .default(factor(LETTERS[c(2, 4, 3, 1)], levels = LETTERS[c(2, 4, 3, 1)]))
+  attr(c2_trtf, "original_levels") <- LETTERS[4:1]
+  expect_equal(c2$treatments, c2_trtf)
+  expect_equal(levels(c2$agd_arm$.trt), LETTERS[c(2, 4, 3, 1)])
+  expect_equal(levels(c2$agd_contrast$.trt), LETTERS[c(2, 4, 3, 1)])
+  expect_equal(levels(c2$ipd$.trt), LETTERS[c(2, 4, 3, 1)])
+  c2_studyf <- factor(letters[5:1], levels = letters[5:1])
+  attr(c2_studyf, "original_levels") <- letters[5:1]
+  expect_equal(c2$studies, c2_studyf)
+  expect_equal(levels(c2$agd_arm$.study), letters[5:1])
+  expect_equal(levels(c2$agd_contrast$.study), letters[5:1])
+  expect_equal(levels(c2$ipd$.study), letters[5:1])
+
+  c1_classed <- combine_network(
+    set_agd_arm(agd_arm, studyf2, trtf2, y = y, se = se, trt_class = tclassf2),
+    set_ipd(ipd, studyf2, trtf2, y = y, trt_class = tclassf2)
+  )
+  # Reference trt is A
+  expect_equal(c1_classed$treatments, c1_trtf)
+  expect_equal(levels(c1_classed$agd_arm$.trt), LETTERS[c(1, 4:2)])
+  expect_equal(levels(c1_classed$ipd$.trt), LETTERS[c(1, 4:2)])
+  expect_equal(c1_classed$studies, c1_studyf)
+  expect_equal(levels(c1_classed$agd_arm$.study), letters[c(5, 4, 2, 1)])
+  expect_equal(levels(c1_classed$ipd$.study), letters[c(5, 4, 2, 1)])
+  c1_classf <- factor(letters[c(1, 3, 2, 2)], levels = letters[c(1, 3, 2)])
+  attr(c1_classf, "original_levels") <- letters[3:1]
+  expect_equal(c1_classed$classes, c1_classf)
+  expect_equal(levels(c1_classed$agd_arm$.trtclass), letters[c(1, 3, 2)])
+  expect_equal(levels(c1_classed$ipd$.trtclass), letters[c(1, 3, 2)])
+
+  c2_classed <- combine_network(
+    set_agd_arm(agd_arm, studyf2, trtf2, y = y, se = se, trt_class = tclassf2),
+    set_ipd(ipd, studyf2, trtf2, y = y, trt_class = tclassf2),
+    set_agd_contrast(agd_contrast, studyf2, trtf2, y = y, se = se, trt_class = tclassf2)
+  )
+  # Reference treatment is B
+  expect_equal(c2_classed$treatments, c2_trtf)
+  expect_equal(levels(c2_classed$agd_arm$.trt), LETTERS[c(2, 4, 3, 1)])
+  expect_equal(levels(c2_classed$agd_contrast$.trt), LETTERS[c(2, 4, 3, 1)])
+  expect_equal(levels(c2_classed$ipd$.trt), LETTERS[c(2, 4, 3, 1)])
+  expect_equal(c2_classed$studies, c2_studyf)
+  expect_equal(levels(c2_classed$agd_arm$.study), letters[5:1])
+  expect_equal(levels(c2_classed$agd_contrast$.study), letters[5:1])
+  expect_equal(levels(c2_classed$ipd$.study), letters[5:1])
+  c2_classf <- factor(letters[c(2, 3, 2, 1)], levels = c(letters[c(2, 3, 1)]))
+  attr(c2_classf, "original_levels") <- letters[3:1]
+  expect_equal(c2_classed$classes, c2_classf)
+  expect_equal(levels(c2_classed$agd_arm$.trtclass), letters[c(2, 3, 1)])
+  expect_equal(levels(c2_classed$ipd$.trtclass), letters[c(2, 3, 1)])
+  expect_equal(levels(c2_classed$agd_contrast$.trtclass), letters[c(2, 3, 1)])
+
+  # Check that unused levels are dropped
+  c3_classed <- combine_network(
+    set_agd_arm(agd_arm,
+                forcats::fct_expand(studyf2, "xxx"),
+                forcats::fct_expand(trtf2, "yyy"),
+                y = y, se = se,
+                trt_class = forcats::fct_expand(tclassf2, "zzz")),
+    set_ipd(ipd,
+            forcats::fct_expand(studyf2, "xxx"),
+            forcats::fct_expand(trtf2, "yyy"),
+            y = y,
+            trt_class = forcats::fct_expand(tclassf2, "zzz")),
+    set_agd_contrast(agd_contrast,
+                     forcats::fct_expand(studyf2, "xxx"),
+                     forcats::fct_expand(trtf2, "yyy"),
+                     y = y, se = se,
+                     trt_class = forcats::fct_expand(tclassf2, "zzz")))
+
+  # Reference treatment is B
+  c3_trtf <- c2_trtf
+  attr(c3_trtf, "original_levels") <- c(attr(c3_trtf, "original_levels"), "yyy")
+  expect_equal(c3_classed$treatments, c3_trtf)
+  expect_equal(levels(c3_classed$agd_arm$.trt), LETTERS[c(2, 4, 3, 1)])
+  expect_equal(levels(c3_classed$agd_contrast$.trt), LETTERS[c(2, 4, 3, 1)])
+  expect_equal(levels(c3_classed$ipd$.trt), LETTERS[c(2, 4, 3, 1)])
+  c3_studyf <- c2_studyf
+  attr(c3_studyf, "original_levels") <- c(attr(c3_studyf, "original_levels"), "xxx")
+  expect_equal(c3_classed$studies, c3_studyf)
+  expect_equal(levels(c3_classed$agd_arm$.study), letters[5:1])
+  expect_equal(levels(c3_classed$agd_contrast$.study), letters[5:1])
+  expect_equal(levels(c3_classed$ipd$.study), letters[5:1])
+  c3_classf <- factor(letters[c(2, 3, 2, 1)], levels = c(letters[c(2, 3, 1)]))
+  attr(c3_classf, "original_levels") <- c(letters[3:1], "zzz")
+  expect_equal(c3_classed$classes, c3_classf)
+  expect_equal(levels(c3_classed$agd_arm$.trtclass), letters[c(2, 3, 1)])
+  expect_equal(levels(c3_classed$ipd$.trtclass), letters[c(2, 3, 1)])
+  expect_equal(levels(c3_classed$agd_contrast$.trtclass), letters[c(2, 3, 1)])
 })
 
 test_that("combine_network can set alternative trt_ref", {
@@ -240,3 +360,4 @@ test_that("combine_network warns if not all sources have treatment classes", {
                                  set_ipd(ipd, studyf, trtf, y = y, trt_class = tclassc)),
                  "Not all data sources have defined treatment classes")
 })
+

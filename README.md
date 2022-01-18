@@ -7,8 +7,8 @@
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/multinma)](https://CRAN.R-project.org/package=multinma)
-[![R build
-status](https://github.com/dmphillippo/multinma/workflows/R-CMD-check/badge.svg)](https://github.com/dmphillippo/multinma/actions)
+[![R-universe](https://dmphillippo.r-universe.dev/badges/multinma)](https://dmphillippo.r-universe.dev)
+[![R-CMD-check](https://github.com/dmphillippo/multinma/workflows/R-CMD-check/badge.svg)](https://github.com/dmphillippo/multinma/actions)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3904454.svg)](https://doi.org/10.5281/zenodo.3904454)
 <!-- badges: end -->
 
@@ -22,21 +22,29 @@ using Stan (Carpenter et al. 2017).
 ## Installation
 
 You can install the released version of `multinma` from
-[CRAN](https://CRAN.R-project.org) with:
+[CRAN](https://CRAN.R-project.org/package=multinma) with:
 
 ``` r
 install.packages("multinma")
 ```
 
-And the development version from [GitHub](https://github.com/) with:
+The development version can be installed from
+[R-universe](https://dmphillippo.r-universe.dev) with:
+
+``` r
+install.packages("multinma", repos = c("https://dmphillippo.r-universe.dev", getOption("repos")))
+```
+
+or from source on [GitHub](https://github.com/dmphillippo/multinma)
+with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("dmphillippo/multinma")
 ```
 
-Installing from source (either from CRAN or GitHub) requires that the
-`rstan` package is installed and configured. See the installation guide
+Installing from source requires that the `rstan` package is installed
+and configured. See the installation guide
 [here](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started).
 
 ## Getting started
@@ -63,8 +71,8 @@ paper:
 
 The `multinma` package can be cited as follows:
 
-> Phillippo, D. M. (2021). *multinma: Network Meta-Analysis of
-> Individual and Aggregate Data in Stan*. R package version 0.3.0, doi:
+> Phillippo, D. M. (2022). *multinma: Network Meta-Analysis of
+> Individual and Aggregate Data in Stan*. R package version 0.4.0, doi:
 > [10.5281/zenodo.3904454](https://doi.org/10.5281/zenodo.3904454).
 
 When fitting ML-NMR models, please cite the methods paper:

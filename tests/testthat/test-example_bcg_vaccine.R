@@ -185,6 +185,28 @@ ggplot(aes(x = latitude), data = bcg_lor) +
   theme_multinma()
 
 
+## ----bcg_vaccine_predictive_unadj-----------------------------------------------------------------
+(bcg_predeff_unadj <- relative_effects(bcg_fit_unadj, predictive_distribution = TRUE))
+
+
+## -------------------------------------------------------------------------------------------------
+mean(as.matrix(bcg_predeff_unadj) > 0)
+
+
+## -------------------------------------------------------------------------------------------------
+bcg_predeff_lat <- relative_effects(bcg_fit_lat,
+                                   newdata = tibble::tibble(latitude = seq(0, 50, by = 10),
+                                                            label = paste0(latitude, "\u00B0 latitude")),
+                                   study = label,
+                                   predictive_distribution = TRUE)
+
+bcg_predeff_lat
+
+
+## -------------------------------------------------------------------------------------------------
+colMeans(as.matrix(bcg_predeff_lat) > 0)
+
+
 ## ----bcg_vaccine_tests, include=FALSE, eval=params$run_tests--------------------------------------
 #--- Test against TSD 3 results ---
 library(testthat)
@@ -203,6 +225,13 @@ test_that("Unadjusted relative effects", {
   expect_equivalent(bcg_unadj_releff$`97.5%`, -0.34, tolerance = tol)
 })
 
+test_that("Unadjusted predictive distribution", {
+  bcg_unadj_releff_pred <- as.data.frame(relative_effects(bcg_fit_unadj, predictive_distribution = TRUE))
+  expect_equivalent(bcg_unadj_releff_pred$mean, -0.762, tolerance = tol)
+  expect_equivalent(bcg_unadj_releff_pred$`2.5%`, -2.27, tolerance = tol)
+  expect_equivalent(bcg_unadj_releff_pred$`97.5%`, 0.72, tolerance = tol)
+})
+
 bcg_lat_releff <- as.data.frame(summary(bcg_fit_lat, pars = "d"))
 
 test_that("Regression relative effects", {
@@ -210,6 +239,14 @@ test_that("Regression relative effects", {
   expect_equivalent(bcg_lat_releff$sd, 0.126, tolerance = tol)
   expect_equivalent(bcg_lat_releff$`2.5%`, -1.04, tolerance = tol)
   expect_equivalent(bcg_lat_releff$`97.5%`, -0.52, tolerance = tol)
+})
+
+
+test_that("Regression predictive distribution", {
+  bcg_lat_releff_pred <- relative_effects(bcg_fit_lat,
+                                          newdata = data.frame(latitude = c(0, 13, 50)),
+                                          predictive_distribution = TRUE)
+  expect_equivalent(colMeans(as.matrix(bcg_lat_releff_pred) > 0), c(0.8, 0.35, 0.006), tolerance = tol)
 })
 
 # Regression coefficients
@@ -252,5 +289,21 @@ test_that("Regression DIC", {
   expect_equivalent(bcg_dic_lat$resdev, 30.4, tolerance = tol_dic)
   expect_equivalent(bcg_dic_lat$pd, 21.1, tolerance = tol_dic)
   expect_equivalent(bcg_dic_lat$dic, 51.5, tolerance = tol_dic)
+})
+
+test_that("Relative effects and predict work with data.frame", {
+  new <- tibble::tibble(latitude = seq(10, 50, by = 10), label = paste0(latitude, "\u00B0 latitude"))
+  expect_identical(relative_effects(bcg_fit_lat, newdata = new, study = label),
+                   relative_effects(bcg_fit_lat, newdata = as.data.frame(new), study = label))
+  # For predict() we need to account for the random baseline sample
+  # expect_identical(withr::with_seed(predict(bcg_fit_lat, newdata = new, study = label,
+  #                                           baseline = distr(qnorm, mean = -2, sd = 0.1)), seed = 1234),
+  #                  withr::with_seed(predict(bcg_fit_lat, newdata = as.data.frame(new), study = label,
+  #                                           baseline = distr(qnorm, mean = -2, sd = 0.1)), seed = 1234))
+  qcons <- function(p, cons = 0) {cons}
+  expect_identical(predict(bcg_fit_lat, newdata = new, study = label,
+                           baseline = distr(qcons, -2)),
+                   predict(bcg_fit_lat, newdata = as.data.frame(new), study = label,
+                           baseline = distr(qcons, -2)))
 })
 

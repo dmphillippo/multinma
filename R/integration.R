@@ -13,6 +13,11 @@
 #' @param cor Correlation matrix to use for generating the integration points.
 #'   By default, this takes a weighted correlation matrix from all IPD studies.
 #'   Rows and columns should match the order of covariates specified in `...`.
+#' @param cor_adjust Adjustment to apply to the correlation matrix given by
+#'   `cor` (or computed from the IPD if `cor = NULL`) to obtain the Gaussian
+#'   copula correlations, either `"spearman"`, `"pearson"`, or `"none"`, see
+#'   "Details". The default when `cor = NULL` is `"spearman"`, otherwise the
+#'   default is `"pearson"`.
 #' @param n_int Number of integration points to generate, default 1000
 #' @param int_args A named list of arguments to pass to
 #'   \code{\link[randtoolbox:quasiRNG]{sobol()}}
@@ -30,8 +35,44 @@
 #'   match a covariate name in the IPD (if IPD are present). The required
 #'   marginal distribution is then specified using the function [distr()].
 #'
-#' @references
-#'   \insertAllCited{}
+#'   The argument `cor_adjust` specifies how the correlation matrix given by
+#'   `cor` (or computed from the IPD if `cor = NULL`) is adjusted to obtain the
+#'   correlation matrix for the Gaussian copula, using the formulae in
+#'   \insertCite{Xiao2018;textual}{multinma}.
+#'
+#'   * `cor_adjust = "spearman"` should be used when the correlations `cor` have
+#'   been computed using Spearman's rank correlation. Correlations between
+#'   continuous covariates will be reproduced exactly by the integration points.
+#'   Correlations between discrete covariates will be reproduced approximately.
+#'   This is the default when `cor = NULL` and correlations are calculated from
+#'   the IPD studies.
+#'
+#'   * `cor_adjust = "pearson"` should be used when the correlations `cor` have
+#'   been computed using Pearson's product-moment correlation. Correlations between
+#'   Normal covariates will be reproduced exactly by the integration points, all
+#'   others will be reproduced approximately. Correlations between discrete
+#'   covariates will be reproduced approximately (and identically to `cor_adjust
+#'   = "spearman"`). This is the default when `cor` is provided by the user,
+#'   since [cor()] defaults to `method = "pearson"` and Pearson correlations are
+#'   most likely reported in published data. However, we recommend providing
+#'   Spearman correlations (e.g. from `cor(., method = "spearman")`) and using
+#'   `cor_adjust = "spearman"` where possible.
+#'
+#'   * `cor_adjust = "none"` allows the user to specify the correlation matrix
+#'   for the Gaussian copula directly; no adjustment is applied.
+#'
+#'   * `cor_adjust = "legacy"` is also available, which reproduces exactly the
+#'   behaviour from version 0.3.0 and earlier. This is similar to `cor_adjust =
+#'   "none"`, but unadjusted Spearman correlations are used if `cor = NULL`.
+#'
+#'   When adding integration points to a network object the correlation matrix
+#'   used is stored in `$int_cor`, and the copula correlation matrix and
+#'   adjustment used are stored as attributes of `$int_cor`. If this correlation
+#'   matrix is passed again to `add_integration()` (e.g. to reuse the
+#'   correlations for an external target population) this will be detected, and
+#'   the correct setting for `cor_adjust` will automatically be applied.
+#'
+#' @references \insertAllCited{}
 #'
 #' @examples ## Plaque psoriasis ML-NMR - network setup and adding integration points
 #' @template ex_plaque_psoriasis_network
@@ -61,6 +102,10 @@
 #'   cor = pso_net$int_cor,
 #'   n_int = 1000)
 #'
+#' # Here, since we reused the correlation matrix pso_net$int_cor from the
+#' # network, the correct setting of cor_adjust = "spearman" is automatically
+#' # applied
+#'
 #' new_agd_int
 #'
 add_integration <- function(x, ...) {
@@ -76,7 +121,8 @@ add_integration.default <- function(x, ...) {
 #' @export
 #' @rdname add_integration
 add_integration.data.frame <- function(x, ...,
-                                       cor = NULL, n_int = 1000L, int_args = list()) {
+                                       cor = NULL, cor_adjust = NULL,
+                                       n_int = 1000L, int_args = list()) {
 
   x <- tibble::as_tibble(x)
 
@@ -104,8 +150,8 @@ add_integration.data.frame <- function(x, ...,
   x_names <- names(ds)  # Covariate names
   nx <- length(ds)      # Number of covariates
 
-  # Check cor
   if (nx > 1) {
+    # Check cor
     if (!is.null(cor)) {
       tryCatch(cor <- as.matrix(cor),
                error = function(e) abort("`cor` should be a correlation matrix or NULL"))
@@ -121,6 +167,17 @@ add_integration.data.frame <- function(x, ...,
     } else {
       abort("Specify a correlation matrix using the `cor` argument.")
     }
+
+    # Check cor_adjust
+    # Use copula cor if present
+    if (!is.null(attr(cor, "copula_cor", exact = TRUE)))  {
+      cor_adjust <- attr(cor, "cor_adjust", exact = TRUE)
+    } else if (!is.null(cor_adjust)) {
+      cor_adjust <- rlang::arg_match(cor_adjust, values = c("spearman", "pearson", "none", "legacy"))
+    } else {
+      # Otherwise assume pearson cor (default for stats::cor)
+      cor_adjust <- "pearson"
+    }
   }
 
   # Generate Sobol points
@@ -128,7 +185,30 @@ add_integration.data.frame <- function(x, ...,
 
   # Correlate Sobol points with Gaussian copula
   if (nx > 1) {
-    cop <- copula::normalCopula(copula::P2p(cor), dim = nx, dispstr = "un")
+    # Use copula cor if present
+    if (!is.null(attr(cor, "copula_cor", exact = TRUE)))  {
+      copula_cor <- attr(cor, "copula_cor", exact = TRUE)
+    } else if (cor_adjust %in% c("none", "legacy")) {
+      copula_cor <- cor
+    } else {
+      # Apply adjustment to sample correlations to obtain copula correlations
+
+      dtypes <- get_distribution_type(..., data = head(x))
+
+      if (cor_adjust == "spearman") {
+        copula_cor <- cor_adjust_spearman(cor, types = dtypes)
+      } else if (cor_adjust == "pearson") {
+        copula_cor <- cor_adjust_pearson(cor, types = dtypes)
+      }
+
+      # Check that adjustments still give a correlation matrix
+      if (!all(eigen(copula_cor, symmetric = TRUE)$values > 0)) {
+        warn("Adjusted correlation matrix not positive definite; using Matrix::nearPD().")
+        copula_cor <- as.matrix(Matrix::nearPD(copula_cor, corr = TRUE)$mat)
+      }
+    }
+
+    cop <- copula::normalCopula(copula::P2p(copula_cor), dim = nx, dispstr = "un")
     u_cor <- copula::cCopula(u, copula = cop, inverse = TRUE)
     # columns to list
     u_cor_l <- purrr::array_branch(u_cor, 2)
@@ -170,13 +250,18 @@ add_integration.data.frame <- function(x, ...,
           invalid_rows = invalid_rows)
 
   class(out) <- c("integration_tbl", class(out))
+  if (nx > 1) {
+    attr(out, "cor_adjust") <- cor_adjust
+    attr(out, "copula_cor") <- copula_cor
+  }
   return(out)
 }
 
 #' @export
 #' @rdname add_integration
 add_integration.nma_data <- function(x, ...,
-                                     cor = NULL, n_int = 1000L, int_args = list()) {
+                                     cor = NULL, cor_adjust = NULL,
+                                     n_int = 1000L, int_args = list()) {
 
   network <- x
 
@@ -224,6 +309,30 @@ add_integration.nma_data <- function(x, ...,
     if (!has_ipd(network)) abort("Specify a correlation matrix using the `cor` argument, or provide IPD studies in the network.")
   }
 
+  # Check cor_adjust
+
+  # If user provided cor
+  if (!is.null(cor)) {
+    if (!is.null(attr(cor, "copula_cor", exact = TRUE))) {
+      # Use copula cor if present
+      cor_adjust <- attr(cor, "cor_adjust", exact = TRUE)
+    } else if (!is.null(cor_adjust)) {
+      # Check cor_adjust when given
+      cor_adjust <- rlang::arg_match(cor_adjust, values = c("spearman", "pearson", "none", "legacy"))
+    } else {
+      # Otherwise assume pearson cor (default for stats::cor)
+      cor_adjust <- "pearson"
+    }
+  } else {
+    if (!is.null(cor_adjust)) {
+      # Check cor_adjust when given
+      cor_adjust <- rlang::arg_match(cor_adjust, values = c("spearman", "pearson", "none", "legacy"))
+    } else {
+      # No cor given, calculate from IPD with spearman
+      cor_adjust <- "spearman"
+    }
+  }
+
   # If IPD is provided, check that covariate names match
   if (has_ipd(network) && any(! x_names %in% colnames(network$ipd))) {
     abort(paste0("Covariate name(s) not found in IPD: ",
@@ -233,6 +342,7 @@ add_integration.nma_data <- function(x, ...,
   # Use weighted average correlation matrix from IPD, if cor = NULL
   if (is.null(cor) && nx > 1) {
     inform("Using weighted average correlation matrix computed from IPD studies.")
+    if (cor_adjust == "none") abort('Cannot specify cor_adjust = "none" when calculating correlations from IPD.')
 
 
     # Check for any missing covariates
@@ -246,7 +356,9 @@ add_integration.nma_data <- function(x, ...,
       dplyr::group_by(.data$.study) %>%
       dplyr::group_modify(~tibble::tibble(
         w = nrow(.) - 3,
-        r = list(cor(dplyr::select(., !! x_names), method = "spearman", use = "complete.obs"))
+        r = list(cor(dplyr::select(., !! x_names),
+                     method = if (cor_adjust == "legacy") "spearman" else cor_adjust,
+                     use = "complete.obs"))
         )) %>%
       dplyr::mutate(z = purrr::map2(.data$w, .data$r, ~.x * log((1 + .y) / (1 - .y)) / 2))
 
@@ -279,17 +391,21 @@ add_integration.nma_data <- function(x, ...,
   if (has_agd_arm(network)) {
     out$agd_arm <- rlang::with_handlers(
       add_integration.data.frame(network$agd_arm, ...,
-                                 cor = cor, n_int = n_int, int_args = int_args),
+                                 cor = cor, cor_adjust = cor_adjust, n_int = n_int, int_args = int_args),
       int_col_present = rlang::calling(int_col_present),
       invalid_int_generated = invalid_int_generated)
+
+    copula_cor <- attr(out$agd_arm, "copula_cor")
   }
 
   if (has_agd_contrast(network)) {
     out$agd_contrast <- rlang::with_handlers(
       add_integration.data.frame(network$agd_contrast, ...,
-                                 cor = cor, n_int = n_int, int_args = int_args),
+                                 cor = cor, cor_adjust = cor_adjust, n_int = n_int, int_args = int_args),
       int_col_present = rlang::calling(int_col_present),
       invalid_int_generated = invalid_int_generated)
+
+    copula_cor <- attr(out$agd_contrast, "copula_cor")
   }
 
   # Set as mlnmr_data class
@@ -300,6 +416,8 @@ add_integration.nma_data <- function(x, ...,
   colnames(cor) <- x_names
   rownames(cor) <- x_names
   out$int_cor <- cor
+  attr(out$int_cor, "cor_adjust") <- cor_adjust
+  attr(out$int_cor, "copula_cor") <- copula_cor
 
   class(out) <- c("mlnmr_data", "nma_data")
   return(out)
@@ -386,8 +504,10 @@ unnest_integration <- function(data) {
 #'                 cor = diag(2))
 #'
 distr <- function(qfun, ...) {
+  qfun_quo <- rlang::enquo(qfun)
   d <- list(qfun = match.fun(qfun),
-            args = rlang::enquos(...))
+            args = rlang::enquos(...),
+            qfun_name = tryCatch(rlang::as_name(qfun_quo), error = function(e) "user_function"))
   if (! "p" %in% rlang::fn_fmls_names(qfun)) {
     abort("`qfun` should be an inverse CDF function (for example `qnorm`, `qgamma`, `qbinom`, ...) but does not appear to be (no formal argument `p`)")
   }
@@ -542,4 +662,100 @@ pars_logitnorm <- function(m, s) {
 
   return(as.data.frame(do.call(rbind, mapply(.lnopt, m, s, SIMPLIFY = FALSE))))
 
+}
+
+
+#' Get type of distribution
+#'
+#' @param ... distr() distributions
+#' @param data List-like sample data for the distr() distribution parameters
+#'
+#' @return Named string vector with elements "continuous", "discrete" or "binary"
+#'
+#' @noRd
+get_distribution_type <- function(..., data = list()) {
+  ds <- list(...)
+  dnames <- names(ds)
+
+  out <- vector("character", length  = length(ds))
+  names(out) <- dnames
+
+  # List of known continuous distributions
+  known_continuous <- c("qbeta", "qcauchy", "qchisq", "qexp", "qf", "qgamma",
+                        "qlnorm", "qnorm", "qt", "qunif", "qweibull", "qlogitnorm")
+
+  # List of known discrete distributions
+  known_discrete <- c("qgeom", "qnbinom", "qpois")
+  # Will handle qbinom and qhyper separately, since they have binary special cases
+
+  # List of known binary distributions
+  known_binary <- "qbern"
+
+  for (i in 1:length(ds)) {
+    di <- ds[[i]]
+    # Known distributions
+    if (di$qfun_name %in% known_continuous) {
+      out[i] <- "continuous"
+    } else if (di$qfun_name %in% known_discrete) {
+      out[i] <- "discrete"
+    } else if (di$qfun_name %in% known_binary) {
+      out[i] <- "binary"
+
+    # Handle discrete distributions with special binary cases
+    } else if (di$qfun_name == "qbinom") {
+      if (all(rlang::eval_tidy(di$args$size, data = data) == 1)) out[i] <- "binary"
+      else out[i] <- "discrete"
+    } else if (di$qfun_name == "qhyper") {
+      if (all(rlang::eval_tidy(di$args$k, data = data) == 1)) out[i] <- "binary"
+      else out[i] <- "discrete"
+
+    # Otherwise run qfun on grid of values and check with rlang::is_integerish
+    } else {
+      ps <- 1:99 / 100
+      support <- rlang::eval_tidy(rlang::call2(di$qfun, p = ps, !!! di$args),
+                                  data = data)
+
+      if (rlang::is_integerish(support)) {
+        if (all(dplyr::near(support, 0) | dplyr::near(support, 1))) out[i] <- "binary"
+        else out[i] <- "discrete"
+      } else {
+        out[i] <- "continuous"
+      }
+    }
+  }
+
+  return(out)
+}
+
+# Convert Spearman correlations to underlying Gaussian copula correlations
+# using formulae in Xiao and Zhou (2018)
+cor_adjust_spearman <- function(X, types) {
+  bin <- types == "binary"
+  cont <- !bin   # Treat discrete as continuous
+
+  X[cont, cont] <- 2 * sin(pi * X[cont, cont] / 6)
+  X[bin, bin] <- sin(pi * X[bin, bin] / 2)
+  X[cont, bin] <- sqrt(2) * sin(pi * X[cont, bin] / (2 * sqrt(3)))
+  X[bin, cont] <- sqrt(2) * sin(pi * X[bin, cont] / (2 * sqrt(3)))
+
+  diag(X) <- 1
+
+  return(X)
+}
+
+# Convert Pearson correlations to underlying Gaussian copula correlations
+# using formulae in Xiao and Zhou (2018)
+cor_adjust_pearson <- function(X, types) {
+  bin <- types == "binary"
+  cont <- !bin   # Treat discrete as continuous
+
+  # No adjustment to cont-cont, assume that these are Normal
+  X[bin, bin] <- sin(pi * X[bin, bin] / 2)
+  # Use bin-cont formula assuming cont is Normal
+  X[cont, bin] <- sqrt(pi/2) * X[cont, bin]
+  X[bin, cont] <- sqrt(pi/2) * X[bin, cont]
+
+  diag(X) <- 1
+
+  return(X)
 }

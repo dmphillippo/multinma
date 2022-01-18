@@ -1,6 +1,7 @@
 ---
 title: "Example: Parkinson's disease"
 output: rmarkdown::html_vignette
+link-citations: yes
 bibliography: ../inst/REFERENCES.bib
 params:
   run_tests: FALSE
@@ -821,6 +822,11 @@ test_that("RE predicted probabilities at 3 years", {
   expect_equivalent(contr_pred_RE$`97.5%`, tsd_pred_RE$upper, tolerance = tol)
 })
 
+test_that("Error message when using predict() on only contrast data", {
+  expect_error(predict(contr_fit_FE),
+               "No arm-based data \\(IPD or AgD\\) in network")
+})
+
 # FE DIC
 test_that("FE DIC", {
   expect_equivalent(contr_dic_FE$resdev, 6.3, tolerance = tol_dic)
@@ -1113,6 +1119,11 @@ test_that("Regression models work with contrast data", {
                                 tolerance = tol)
 })
 
+test_that("Error message when using predict() on only contrast data", {
+  expect_error(predict(contr_fit_FE_reg),
+               "No arm-based data \\(IPD or AgD\\) in network")
+})
+
 # ML-NMR regression models too
 park_dummy_mlnmr <- dplyr::mutate(parkinsons, 
                                   x1_mean = rnorm(dplyr::n(), 0, 1),
@@ -1199,5 +1210,52 @@ test_that("ML-NMR models work with contrast data", {
   expect_equivalent_nma_summary(summary(contr_fit_FE_mlnmr, pars = c("d", "beta")), 
                                 summary(reorder_fit_FE_mlnmr, pars = c("d", "beta")), 
                                 tolerance = tol)
+})
+
+test_that("Error message when using predict() on only contrast data", {
+  expect_error(predict(contr_fit_FE_mlnmr),
+               "No arm-based data \\(IPD or AgD\\) in network")
+})
+
+test_that("Robust to custom options(contrasts) settings", {
+  arm_fit_FE_SAS <- withr::with_options(list(contrasts = c(ordered = "contr.SAS",
+                                                         unordered = "contr.SAS")),
+                  nma(arm_net, 
+                      trt_effects = "fixed",
+                      prior_intercept = normal(scale = 100),
+                      prior_trt = normal(scale = 10),
+                      iter = 10000))
+  
+    expect_equivalent_nma_summary(summary(arm_fit_FE_SAS), summary(arm_fit_FE),
+                                  tolerance = tol)
+    expect_equivalent_nma_summary(relative_effects(arm_fit_FE_SAS), relative_effects(arm_fit_FE),
+                                  tolerance = tol)
+  
+  contr_fit_FE_SAS <- withr::with_options(list(contrasts = c(ordered = "contr.SAS",
+                                                         unordered = "contr.SAS")),
+                  nma(contr_net, 
+                      trt_effects = "fixed",
+                      prior_intercept = normal(scale = 100),
+                      prior_trt = normal(scale = 10),
+                      iter = 10000))
+  
+    expect_equivalent_nma_summary(summary(contr_fit_FE_SAS), summary(contr_fit_FE),
+                                  tolerance = tol)
+    expect_equivalent_nma_summary(relative_effects(contr_fit_FE_SAS), relative_effects(contr_fit_FE),
+                                  tolerance = tol)
+    
+  mix_fit_FE_SAS <- withr::with_options(list(contrasts = c(ordered = "contr.SAS",
+                                                         unordered = "contr.SAS")),
+                  nma(mix_net, 
+                      trt_effects = "fixed",
+                      prior_intercept = normal(scale = 100),
+                      prior_trt = normal(scale = 10),
+                      iter = 10000))
+  
+    expect_equivalent_nma_summary(summary(mix_fit_FE_SAS), summary(mix_fit_FE),
+                                  tolerance = tol)
+    expect_equivalent_nma_summary(relative_effects(mix_fit_FE_SAS), relative_effects(mix_fit_FE),
+                                  tolerance = tol)
+
 })
 ```

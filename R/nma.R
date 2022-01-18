@@ -6,7 +6,7 @@
 #' @param network An `nma_data` object, as created by the functions `set_*()`,
 #'   `combine_network()`, or `add_integration()`
 #' @param consistency Character string specifying the type of (in)consistency
-#'   model to fit, currently either `"consistency"` or `"ume"`
+#'   model to fit, either `"consistency"`, `"ume"`, or `"nodesplit"`
 #' @param trt_effects Character string specifying either `"fixed"` or `"random"` effects
 #' @param regression A one-sided model formula, specifying the prognostic and
 #'   effect-modifying terms for a regression model. Any references to treatment
@@ -22,6 +22,11 @@
 #' @param ... Further arguments passed to
 #'   \code{\link[rstan:stanmodel-method-sampling]{sampling()}}, such as `iter`,
 #'   `chains`, `cores`, etc.
+#' @param nodesplit For `consistency = "nodesplit"`, the comparison(s) to split
+#'   in the node-splitting model(s). Either a length 2 vector giving the
+#'   treatments in a single comparison, or a 2 column data frame listing
+#'   multiple treatment comparisons to split in turn. By default, all possible
+#'   comparisons will be chosen (see [get_nodesplits()]).
 #' @param prior_intercept Specification of prior distribution for the intercept
 #' @param prior_trt Specification of prior distribution for the treatment effects
 #' @param prior_het Specification of prior distribution for the heterogeneity
@@ -53,7 +58,9 @@
 #'
 #'   For the advanced user, the additional specials `.study` and `.trtclass` are
 #'   also available, and refer to studies and (if specified) treatment classes
-#'   respectively.
+#'   respectively. When node-splitting models are fitted (`consistency =
+#'   "nodesplit"`) the special `.omega` is available, indicating the arms
+#'   to which the node-splitting inconsistency factor is added.
 #'
 #'   See \code{\link[multinma:priors]{?priors}} for details on prior
 #'   specification. Default prior distributions are available, but may not be
@@ -109,8 +116,9 @@
 #'   \eqn{c_{m+1} - c_m}. Stan automatically truncates any priors so that the
 #'   ordering constraints are satisfied.
 #'
-#' @return `nma()` returns a [stan_nma] object, `nma.fit()` returns a [stanfit]
-#'   object.
+#' @return `nma()` returns a [stan_nma] object, except when `consistency =
+#'   "nodesplit"` when a [nma_nodesplit] or [nma_nodesplit_df] object is
+#'   returned. `nma.fit()` returns a [stanfit] object.
 #' @export
 #'
 #' @references
@@ -122,7 +130,11 @@
 #' @template ex_smoking_nma_fe
 #' @template ex_smoking_nma_re
 #' @template ex_smoking_nma_re_ume
-#' @examples
+#' @template ex_smoking_nma_re_nodesplit
+#' @examples \donttest{
+#' # Summarise the node-splitting results
+#' summary(smk_fit_RE_nodesplit)
+#' }
 #'
 #' ## Plaque psoriasis ML-NMR
 #' @template ex_plaque_psoriasis_network
@@ -130,13 +142,14 @@
 #' @template ex_plaque_psoriasis_mlnmr
 #'
 nma <- function(network,
-                consistency = c("consistency", "ume"),
+                consistency = c("consistency", "ume", "nodesplit"),
                 trt_effects = c("fixed", "random"),
                 regression = NULL,
                 class_interactions = c("common", "exchangeable", "independent"),
                 likelihood = NULL,
                 link = NULL,
                 ...,
+                nodesplit = get_nodesplits(network, include_consistency = TRUE),
                 prior_intercept = .default(normal(scale = 100)),
                 prior_trt = .default(normal(scale = 10)),
                 prior_het = .default(half_normal(scale = 5)),
@@ -162,6 +175,162 @@ nma <- function(network,
   if (length(consistency) > 1) abort("`consistency` must be a single string.")
   trt_effects <- rlang::arg_match(trt_effects)
   if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
+
+  if (consistency == "nodesplit") {
+
+    lvls_trt <- levels(network$treatments)
+    nodesplit_include_consistency <- FALSE
+
+    if (is.data.frame(nodesplit)) { # Data frame listing comparisons to split
+      if (ncol(nodesplit) != 2)
+        abort("The data frame passed to `nodesplit` should have two columns.")
+
+      nodesplit <- tibble::as_tibble(nodesplit)
+      colnames(nodesplit) <- c("trt1", "trt2")
+
+      # NA rows indicate include_consistency = TRUE, filter these out
+      if (any(is.na(nodesplit[,1]) & is.na(nodesplit[,2]))) {
+        nodesplit_include_consistency <- TRUE
+        nodesplit <- dplyr::filter(nodesplit, !is.na(.data$trt1) & !is.na(.data$trt2))
+      }
+
+      if (nrow(nodesplit) == 0) {
+        abort("No comparisons to node-split.")
+      }
+
+      nodesplit$trt1 <- as.character(nodesplit$trt1)
+      nodesplit$trt2 <- as.character(nodesplit$trt2)
+
+      if (!all(unlist(nodesplit) %in% lvls_trt))
+        abort(sprintf("All comparisons in `nodesplit` should match two treatments in the network.\nSuitable values are: %s",
+                      ifelse(length(lvls_trt) <= 5,
+                             paste0(lvls_trt, collapse = ", "),
+                             paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
+
+      if (any(nodesplit[,1] == nodesplit[,2]))
+        abort("`nodesplit` comparison cannot be the same treatment against itself.")
+
+      # Check valid nodesplit - must have both direct and indirect evidence
+      ns_check <- dplyr::rowwise(nodesplit) %>%
+        dplyr::mutate(direct = has_direct(network, .data$trt1, .data$trt2),
+                      indirect = has_indirect(network, .data$trt1, .data$trt2),
+                      valid = .data$direct && .data$indirect)
+
+      if (any(!ns_check$valid)) {
+        ns_valid <- dplyr::filter(ns_check, .data$valid) %>%
+          dplyr::ungroup() %>%
+          dplyr::select(.data$trt1, .data$trt2)
+
+        ns_invalid <- dplyr::filter(ns_check, !.data$valid) %>%
+          dplyr::mutate(comparison = paste(.data$trt1, .data$trt2, sep = " vs. "))
+
+        if (nrow(ns_valid)) {
+          warn(glue::glue(
+            "Ignoring node-split comparisons without both both direct and independent indirect evidence: ",
+            glue::glue_collapse(ns_invalid$comparison, sep = ", ", width = 100), "."
+            ))
+
+          nodesplit <- ns_valid
+        } else {
+          abort("No valid comparisons for node-splitting given in `nodesplit`.\n Comparisons must have both direct and independent indirect evidence for node-splitting.")
+        }
+
+      }
+
+      # Store comparisons as factors, in increasing order (i.e. trt1 < trt2)
+      nodesplit$trt1 <- factor(nodesplit$trt1, levels = lvls_trt)
+      nodesplit$trt2 <- factor(nodesplit$trt2, levels = lvls_trt)
+
+      for (i in 1:nrow(nodesplit)) {
+        if (as.numeric(nodesplit$trt1[i]) > as.numeric(nodesplit$trt2[i])) {
+          nodesplit[i, ] <- rev(nodesplit[i, ])
+        }
+      }
+
+      # Iteratively call node-splitting models
+      n_ns <- nrow(nodesplit) + nodesplit_include_consistency
+      ns_fits <- vector("list", n_ns)
+
+      ns_arglist <- list(network = network,
+                         consistency = "nodesplit",
+                         trt_effects = trt_effects,
+                         regression = regression,
+                         likelihood = likelihood,
+                         link = link,
+                         ...,
+                         prior_intercept = prior_intercept,
+                         prior_trt = prior_trt,
+                         prior_het = prior_het,
+                         prior_het_type = prior_het_type,
+                         prior_reg = prior_reg,
+                         prior_aux = prior_aux,
+                         QR = QR,
+                         center = center,
+                         adapt_delta = adapt_delta,
+                         int_thin = int_thin)
+
+      if (!missing(class_interactions)) ns_arglist$class_interactions <- class_interactions
+
+
+      for (i in 1:nrow(nodesplit)) {
+
+        inform(glue::glue("Fitting model {i} of {n_ns}, node-split: ",
+                          as.character(nodesplit$trt2[i]),
+                          " vs. ",
+                          as.character(nodesplit$trt1[i])))
+
+        ns_arglist$nodesplit <- forcats::fct_c(nodesplit$trt1[i], nodesplit$trt2[i])
+
+        ns_fits[[i + nodesplit_include_consistency]] <- do.call(nma, ns_arglist)
+      }
+
+      if (nodesplit_include_consistency) {
+        inform(glue::glue("Fitting model {n_ns} of {n_ns}, consistency model"))
+        nodesplit <- tibble::add_row(nodesplit, .before = 1)
+
+        ns_arglist$consistency <- "consistency"
+        ns_arglist$nodesplit <- NULL
+
+        ns_fits[[1]] <- do.call(nma, ns_arglist)
+      }
+
+      nodesplit$model <- ns_fits
+
+      # Return a nma_nodesplit_df object
+      class(nodesplit) <- c("nma_nodesplit_df", class(nodesplit))
+      return(nodesplit)
+
+    } else if (rlang::is_vector(nodesplit, n = 2)) { # Vector giving single comparison to split
+
+      nodesplit <- as.character(nodesplit)
+
+      if (!all(nodesplit %in% lvls_trt))
+        abort(sprintf("The `nodesplit` treatment comparison should match two treatments in the network.\nSuitable values are: %s",
+                      ifelse(length(lvls_trt) <= 5,
+                             paste0(lvls_trt, collapse = ", "),
+                             paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
+
+      if (nodesplit[1] == nodesplit[2])
+        abort("`nodesplit` comparison cannot be the same treatment against itself.")
+
+      # Check valid nodesplit - must have both direct and indirect evidence
+      if (!has_direct(network, nodesplit[1], nodesplit[2])) {
+        abort(glue::glue("Cannot node-split the {nodesplit[1]} vs. {nodesplit[2]} comparison, no direct evidence."))
+      }
+      if (!has_indirect(network, nodesplit[1], nodesplit[2])) {
+        abort(glue::glue("Cannot node-split the {nodesplit[1]} vs. {nodesplit[2]} comparison, no independent indirect evidence."))
+      }
+
+      # Store comparison as factor, in increasing order (i.e. trt1 < trt2)
+      nodesplit <- factor(nodesplit, levels = lvls_trt)
+      if (as.numeric(nodesplit[1]) > as.numeric(nodesplit[2])) {
+        nodesplit <- rev(nodesplit)
+      }
+
+    } else {
+      abort("`nodesplit` should either be a length 2 vector or a 2 column data frame, giving the comparison(s) to node-split.")
+    }
+  }
 
   if (!is.null(regression) && !rlang::is_formula(regression, lhs = FALSE)) {
     abort("`regression` should be a one-sided formula.")
@@ -414,6 +583,7 @@ nma <- function(network,
                                   agd_contrast_bl = is.na(idat_agd_contrast$.y),
                                   xbar = xbar,
                                   consistency = consistency,
+                                  nodesplit = nodesplit,
                                   classes = !is.null(network$classes))
 
   X_ipd <- X_list$X_ipd
@@ -451,7 +621,7 @@ nma <- function(network,
     contr <- rep(c(FALSE, FALSE, TRUE),
                  times = c(nrow(tdat_ipd_arm), nrow(tdat_agd_arm), nrow(tdat_agd_contrast_nonbl)))
 
-    if (consistency == "consistency") {
+    if (consistency %in% c("consistency", "nodesplit")) {
       .RE_cor <- RE_cor(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "reftrt")
       .which_RE <- which_RE(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "reftrt")
     } else if (consistency == "ume") {
@@ -479,6 +649,7 @@ nma <- function(network,
     which_RE = .which_RE,
     likelihood = likelihood,
     link = link,
+    consistency = consistency,
     ...,
     prior_intercept = prior_intercept,
     prior_trt = prior_trt,
@@ -613,6 +784,11 @@ nma <- function(network,
   if (inherits(network, "mlnmr_data")) class(out) <- c("stan_mlnmr", "stan_nma")
   else class(out) <- "stan_nma"
 
+  if (consistency == "nodesplit" && !is.data.frame(nodesplit)) {
+    class(out) <- c("nma_nodesplit", class(out))
+    out$nodesplit <- nodesplit
+  }
+
   return(out)
 }
 
@@ -642,6 +818,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     which_RE = NULL,
                     likelihood = NULL,
                     link = NULL,
+                    consistency = c("consistency", "ume", "nodesplit"),
                     ...,
                     prior_intercept,
                     prior_trt,
@@ -782,7 +959,8 @@ nma.fit <- function(ipd_x, ipd_y,
 
   col_study <- grepl("^\\.study[^:]+$", x_names)
   col_trt <- grepl("^(\\.trt|\\.contr)[^:]+$", x_names)
-  col_reg <- !col_study & !col_trt
+  col_omega <- x_names == ".omegaTRUE"
+  col_reg <- !col_study & !col_trt & !col_omega
 
   n_trt <- sum(col_trt) + 1
 
@@ -869,9 +1047,10 @@ nma.fit <- function(ipd_x, ipd_y,
   # Make full design matrix
   X_all <- rbind(ipd_x, agd_arm_x, agd_contrast_x)
 
-  # Make sure columns of X_all are in correct order (study, trt, regression terms)
+  # Make sure columns of X_all are in correct order (study, trt, omega (if nodesplit), regression terms)
   X_all <- cbind(X_all[, col_study, drop = FALSE],
                  X_all[, col_trt, drop = FALSE],
+                 X_all[, col_omega, drop = FALSE],
                  X_all[, col_reg, drop = FALSE])
 
   # Take thin QR decomposition if QR = TRUE
@@ -911,6 +1090,8 @@ nma.fit <- function(ipd_x, ipd_y,
     RE = switch(trt_effects, fixed = 0, random = 1),
     RE_cor = RE_cor,
     which_RE = which_RE,
+    # Node splitting
+    nodesplit = consistency == "nodesplit",
     # Design matrix or QR decomposition
     QR = QR,
     X = if (QR) X_all_Q else X_all,
@@ -950,6 +1131,12 @@ nma.fit <- function(ipd_x, ipd_y,
   if (trt_effects == "random") {
     pars <- c(pars, "tau", "delta")
   }
+
+  # Monitor omega for node-splitting model
+  if (consistency == "nodesplit") {
+    pars <- c(pars, "omega")
+  }
+
   # Monitor cumulative integration error if using numerical integration
   if (n_int > 1) {
     if (has_agd_arm) pars <- c(pars, "theta_bar_cum_agd_arm")
@@ -1127,6 +1314,7 @@ nma.fit <- function(ipd_x, ipd_y,
   fnames_oi[grepl("^d\\[[0-9]+\\]$", fnames_oi)] <- paste0("d[", x_names_sub[col_trt], "]")
   fnames_oi[grepl("^beta\\[[0-9]+\\]$", fnames_oi)] <- paste0("beta[", x_names[col_reg], "]")
   fnames_oi <- gsub("tau[1]", "tau", fnames_oi, fixed = TRUE)
+  fnames_oi <- gsub("omega[1]", "omega", fnames_oi, fixed = TRUE)
 
   if (likelihood == "ordered") {
     if (has_ipd) l_cat <- colnames(ipd_y$.r)[-1]
@@ -1519,12 +1707,16 @@ make_nma_formula <- function(regression,
 
     if (consistency == "ume") {
       nma_formula <- update.formula(nma_formula, ~-1 + .study + .contr + .)
+    } else if (consistency == "nodesplit") {
+      nma_formula <- update.formula(nma_formula, ~-1 + .study + .trt + .omega + .)
     } else {
       nma_formula <- update.formula(nma_formula, ~-1 + .study + .trt + .)
     }
   } else {
     if (consistency == "ume") {
       nma_formula <- ~-1 + .study + .contr
+    } else if (consistency == "nodesplit") {
+      nma_formula <- ~-1 + .study + .trt + .omega
     } else {
       nma_formula <- ~-1 + .study + .trt
     }
@@ -1539,6 +1731,7 @@ make_nma_formula <- function(regression,
 #'   data
 #' @param xbar Named numeric vector of centering values, or NULL
 #' @param consistency Consistency/inconsistency model (character string)
+#' @param nodesplit Length 2 character vector giving comparison to node-split
 #' @param classes Classes present? TRUE / FALSE
 #' @param class_interactions Class interaction specification (character string)
 #' @param newdata Providing newdata post-fitting? TRUE / FALSE
@@ -1553,6 +1746,7 @@ make_nma_model_matrix <- function(nma_formula,
                                   agd_contrast_bl = logical(),
                                   xbar = NULL,
                                   consistency = c("consistency", "nodesplit", "ume"),
+                                  nodesplit = NULL,
                                   classes = FALSE,
                                   newdata = FALSE) {
   # Checks
@@ -1568,8 +1762,13 @@ make_nma_model_matrix <- function(nma_formula,
         !(rlang::is_double(xbar) || rlang::is_integer(xbar)) || !rlang::is_named(xbar)))
     abort("`xbar` should be a named numeric vector")
 
-  if (!consistency %in% c("consistency", "ume")) {
+  if (!consistency %in% c("consistency", "ume", "nodesplit")) {
     abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
+  }
+
+  if (consistency == "nodesplit") {
+    if (!rlang::is_vector(nodesplit, 2))
+      abort("`nodesplit` should be a vector of length 2.")
   }
 
   .has_ipd <- if (nrow(dat_ipd)) TRUE else FALSE
@@ -1656,6 +1855,25 @@ make_nma_model_matrix <- function(nma_formula,
     }
   }
 
+  # Derive .omega indicator for node-splitting model
+  if (consistency == "nodesplit") {
+    if (.has_ipd) {
+      dat_ipd <- dplyr::group_by(dat_ipd, .data$.study) %>%
+        dplyr::mutate(.omega = all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2]) %>%
+        dplyr::ungroup()
+    }
+    if (.has_agd_arm) {
+      dat_agd_arm <- dplyr::group_by(dat_agd_arm, .data$.study) %>%
+        dplyr::mutate(.omega = all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2]) %>%
+        dplyr::ungroup()
+    }
+    if (.has_agd_contrast) {
+      dat_agd_contrast <- dplyr::group_by(dat_agd_contrast, .data$.study) %>%
+        dplyr::mutate(.omega = all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2]) %>%
+        dplyr::ungroup()
+    }
+  }
+
   # Construct design matrix all together then split out, so that same dummy
   # coding is used everywhere
   dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
@@ -1670,8 +1888,16 @@ make_nma_model_matrix <- function(nma_formula,
   # Center
   if (!is.null(xbar)) {
     dat_all[, names(xbar)] <-
-      purrr::map2(dat_all[, names(xbar)], xbar, ~.x - .y)
+      purrr::map2(dat_all[, names(xbar), drop = FALSE], xbar, ~.x - .y)
   }
+
+  # Explicitly set contrasts attribute for key variables
+  fvars <- all.vars(nma_formula)
+  if (".trt" %in% fvars) stats::contrasts(dat_all$.trt) <- "contr.treatment"
+  if (".trtclass" %in% fvars) stats::contrasts(dat_all$.trtclass) <- "contr.treatment"
+  if (".contr" %in% fvars) stats::contrasts(dat_all$.contr) <- "contr.treatment"
+  if (".omega" %in% fvars) stats::contrasts(dat_all$.omega) <- "contr.treatment"
+  # .study handled separately next (not always a factor)
 
   # Drop study to factor to 1L if only one study (avoid contrasts need 2 or
   # more levels error)
@@ -1686,6 +1912,7 @@ make_nma_model_matrix <- function(nma_formula,
     nma_formula <- update.formula(nma_formula, ~. + 1)
   } else {
     single_study_label <- NULL
+    if (".study" %in% fvars) stats::contrasts(dat_all$.study) <- "contr.treatment"
   }
 
   # Apply NMA formula to get design matrix
@@ -1807,7 +2034,7 @@ make_nma_model_matrix <- function(nma_formula,
 get_model_data_columns <- function(data, regression = NULL, label = NULL) {
   if (!is.null(label)) label <- paste(" in", label)
   if (!is.null(regression)) {
-    regvars <- setdiff(all.vars(regression), c(".trt", ".trtclass", ".study"))
+    regvars <- setdiff(all.vars(regression), c(".trt", ".trtclass", ".study", ".contr", ".omega"))
     badvars <- setdiff(regvars, colnames(data))
     if (length(badvars)) {
       abort(

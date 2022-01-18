@@ -72,10 +72,24 @@ set_ipd <- function(data,
   if (is.null(.study)) abort("`study` cannot be NULL")
   check_study(.study)
 
+  if (is.factor(.study)) {
+    study_original_levels <- levels(.study)
+    .study <- forcats::fct_drop(.study)
+  } else {
+    study_original_levels <- NULL
+  }
+
   if (missing(trt)) abort("Specify `trt`")
   .trt <- pull_non_null(data, enquo(trt))
   if (is.null(.trt)) abort("`trt` cannot be NULL")
   check_trt(.trt)
+
+  if (is.factor(.trt)) {
+    trt_original_levels <- levels(.trt)
+    .trt <- forcats::fct_drop(.trt)
+  } else {
+    trt_original_levels <- NULL
+  }
 
   # Check for single-arm studies
   single_arm_studies <- tibble::tibble(.study, .trt) %>%
@@ -91,7 +105,16 @@ set_ipd <- function(data,
 
   # Treatment classes
   .trtclass <- pull_non_null(data, enquo(trt_class))
-  if (!is.null(.trtclass)) check_trt_class(.trtclass, .trt)
+  if (!is.null(.trtclass)) {
+    check_trt_class(.trtclass, .trt)
+
+    if (is.factor(.trtclass)) {
+      trtclass_original_levels <- levels(.trtclass)
+      .trtclass <- forcats::fct_drop(.trtclass)
+    } else {
+      trtclass_original_levels <- NULL
+    }
+  }
 
   if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
 
@@ -196,10 +219,19 @@ set_ipd <- function(data,
     out$ipd$.trt <- forcats::fct_relevel(out$ipd$.trt, trt_ref)
     if (!is.null(.trtclass)) {
       class_ref <- as.character(out$classes[trt_sort[1]])
+      if (!is.null(trtclass_original_levels))
+        class_ref <- c(class_ref,
+                       setdiff(intersect(trtclass_original_levels, levels(out$classes)),
+                               class_ref))
       out$ipd$.trtclass <- forcats::fct_relevel(out$ipd$.trtclass, class_ref)
       out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
     }
   }
+
+  # Add original_levels attributes (if not NULL)
+  attr(out$treatments, "original_levels") <- trt_original_levels
+  attr(out$studies, "original_levels") <- study_original_levels
+  if (!is.null(.trtclass)) attr(out$classes, "original_levels") <- trtclass_original_levels
 
   return(out)
 }
@@ -272,10 +304,24 @@ set_agd_arm <- function(data,
   if (is.null(.study)) abort("`study` cannot be NULL")
   check_study(.study)
 
+  if (is.factor(.study)) {
+    study_original_levels <- levels(.study)
+    .study <- forcats::fct_drop(.study)
+  } else {
+    study_original_levels <- NULL
+  }
+
   if (missing(trt)) abort("Specify `trt`")
   .trt <- pull_non_null(data, enquo(trt))
   if (is.null(.trt)) abort("`trt` cannot be NULL")
   check_trt(.trt)
+
+  if (is.factor(.trt)) {
+    trt_original_levels <- levels(.trt)
+    .trt <- forcats::fct_drop(.trt)
+  } else {
+    trt_original_levels <- NULL
+  }
 
   # Check for single-arm studies
   single_arm_studies <- tibble::tibble(.study, .trt) %>%
@@ -290,7 +336,16 @@ set_agd_arm <- function(data,
 
   # Treatment classes
   .trtclass <- pull_non_null(data, enquo(trt_class))
-  if (!is.null(.trtclass)) check_trt_class(.trtclass, .trt)
+  if (!is.null(.trtclass)) {
+    check_trt_class(.trtclass, .trt)
+
+    if (is.factor(.trtclass)) {
+      trtclass_original_levels <- levels(.trtclass)
+      .trtclass <- forcats::fct_drop(.trtclass)
+    } else {
+      trtclass_original_levels <- NULL
+    }
+  }
 
   if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
 
@@ -402,10 +457,19 @@ set_agd_arm <- function(data,
     out$agd_arm$.trt <- forcats::fct_relevel(out$agd_arm$.trt, trt_ref)
     if (!is.null(.trtclass)) {
       class_ref <- as.character(out$classes[trt_sort[1]])
+      if (!is.null(trtclass_original_levels))
+        class_ref <- c(class_ref,
+                       setdiff(intersect(trtclass_original_levels, levels(out$classes)),
+                               class_ref))
       out$agd_arm$.trtclass <- forcats::fct_relevel(out$agd_arm$.trtclass, class_ref)
       out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
     }
   }
+
+  # Add original_levels attributes (if not NULL)
+  attr(out$treatments, "original_levels") <- trt_original_levels
+  attr(out$studies, "original_levels") <- study_original_levels
+  if (!is.null(.trtclass)) attr(out$classes, "original_levels") <- trtclass_original_levels
 
   return(out)
 }
@@ -490,10 +554,24 @@ set_agd_contrast <- function(data,
   if (is.null(.study)) abort("`study` cannot be NULL")
   check_study(.study)
 
+  if (is.factor(.study)) {
+    study_original_levels <- levels(.study)
+    .study <- forcats::fct_drop(.study)
+  } else {
+    study_original_levels <- NULL
+  }
+
   if (missing(trt)) abort("Specify `trt`")
   .trt <- pull_non_null(data, enquo(trt))
   if (is.null(.trt)) abort("`trt` cannot be NULL")
   check_trt(.trt)
+
+  if (is.factor(.trt)) {
+    trt_original_levels <- levels(.trt)
+    .trt <- forcats::fct_drop(.trt)
+  } else {
+    trt_original_levels <- NULL
+  }
 
   # Check for single-arm studies
   single_arm_studies <- tibble::tibble(.study, .trt) %>%
@@ -508,7 +586,16 @@ set_agd_contrast <- function(data,
 
   # Treatment classes
   .trtclass <- pull_non_null(data, enquo(trt_class))
-  if (!is.null(.trtclass)) check_trt_class(.trtclass, .trt)
+  if (!is.null(.trtclass)) {
+    check_trt_class(.trtclass, .trt)
+
+    if (is.factor(.trtclass)) {
+      trtclass_original_levels <- levels(.trtclass)
+      .trtclass <- forcats::fct_drop(.trtclass)
+    } else {
+      trtclass_original_levels <- NULL
+    }
+  }
 
   if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
 
@@ -628,10 +715,19 @@ set_agd_contrast <- function(data,
     out$agd_contrast$.trt <- forcats::fct_relevel(out$agd_contrast$.trt, trt_ref)
     if (!is.null(.trtclass)) {
       class_ref <- as.character(out$classes[trt_sort[1]])
+      if (!is.null(trtclass_original_levels))
+        class_ref <- c(class_ref,
+                       setdiff(intersect(trtclass_original_levels, levels(out$classes)),
+                               class_ref))
       out$agd_contrast$.trtclass <- forcats::fct_relevel(out$agd_contrast$.trtclass, class_ref)
       out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
     }
   }
+
+  # Add original_levels attributes (if not NULL)
+  attr(out$treatments, "original_levels") <- trt_original_levels
+  attr(out$studies, "original_levels") <- study_original_levels
+  if (!is.null(.trtclass)) attr(out$classes, "original_levels") <- trtclass_original_levels
 
   return(out)
 }
@@ -696,6 +792,18 @@ combine_network <- function(..., trt_ref) {
 
   # Combine treatment code factor
   trts <- stringr::str_sort(forcats::lvls_union(purrr::map(s, "treatments")), numeric = TRUE)
+
+  # Use original factor order (possibly with more levels) if available
+  trt_original_levels <- purrr::map(purrr::map(s, "treatments"), attr, which = "original_levels")
+  if (!any(purrr::map_lgl(trt_original_levels, is.null)) &&
+      all(purrr::map_lgl(trt_original_levels, ~identical(., trt_original_levels[[1]])))) {
+
+    trt_original_levels <- trt_original_levels[[1]]
+    trts <- intersect(trt_original_levels, trts)
+  } else {
+    trt_original_levels <- NULL
+  }
+
   if (!missing(trt_ref)) {
     if (! trt_ref %in% trts) {
       abort(sprintf("`trt_ref` does not match a treatment in the network.\nSuitable values are: %s",
@@ -719,10 +827,22 @@ combine_network <- function(..., trt_ref) {
     check_trt_class(class_lookup$.trtclass, class_lookup$.trt)
 
     class_lvls <- stringr::str_sort(levels(class_lookup$.trtclass), numeric = TRUE)
+
+    # Use original factor order (possibly with more levels) if available
+    class_original_levels <- purrr::map(purrr::map(s, "classes"), attr, which = "original_levels")
+    if (!any(purrr::map_lgl(class_original_levels, is.null)) &&
+        all(purrr::map_lgl(class_original_levels, ~identical(., class_original_levels[[1]])))) {
+
+      class_original_levels <- class_original_levels[[1]]
+      class_lvls <- intersect(class_original_levels, class_lvls)
+    } else {
+      class_original_levels <- NULL
+    }
+
     class_ref <- as.character(class_lookup[[1, ".trtclass"]])
     class_lvls <- c(class_ref, setdiff(class_lvls, class_ref))
 
-    class_lookup$.trtclass <- forcats::fct_relevel(class_lookup$.trtclass, class_ref)
+    class_lookup$.trtclass <- forcats::fct_relevel(class_lookup$.trtclass, class_lvls)
 
     classes <- class_lookup$.trtclass
   } else if (any(has_classes)) {
@@ -741,6 +861,17 @@ combine_network <- function(..., trt_ref) {
 
   # Combine study code factor
   studs <- stringr::str_sort(forcats::lvls_union(purrr::map(s, "studies")), numeric = TRUE)
+
+  # Use original factor order (possibly with more levels) if available
+  study_original_levels <- purrr::map(purrr::map(s, "studies"), attr, which = "original_levels")
+  if (!any(purrr::map_lgl(study_original_levels, is.null)) &&
+      all(purrr::map_lgl(study_original_levels, ~identical(., study_original_levels[[1]])))) {
+
+    study_original_levels <- study_original_levels[[1]]
+    studs <- intersect(study_original_levels, studs)
+  } else {
+    study_original_levels <- NULL
+  }
 
   # Get ipd
   ipd <- purrr::map(s, "ipd")
@@ -849,6 +980,11 @@ combine_network <- function(..., trt_ref) {
         out$agd_contrast$.trtclass <- forcats::fct_relevel(out$agd_contrast$.trtclass, class_ref)
     }
   }
+
+  # Add original_levels attributes (if not NULL)
+  attr(out$treatments, "original_levels") <- trt_original_levels
+  attr(out$studies, "original_levels") <- study_original_levels
+  if (!is.null(classes)) attr(out$classes, "original_levels") <- class_original_levels
 
   return(out)
 }
@@ -1367,6 +1503,10 @@ has_agd_sample_size <- function(network) {
 #' Produces factors with levels in natural sort order (i.e. 1 5 10 not 1 10 5)
 #'
 #' @noRd
-nfactor <- function(x, ..., numeric = TRUE) {
-  return(factor(x, levels = stringr::str_sort(unique(x), numeric = numeric), ...))
+nfactor <- function(x, ..., numeric = TRUE, resort = FALSE) {
+  if (is.factor(x) && !resort) {
+    return(x)
+  } else {
+    return(factor(x, levels = stringr::str_sort(unique(x), numeric = numeric), ...))
+  }
 }

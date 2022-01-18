@@ -441,6 +441,217 @@ is_network_connected <- function(network) {
   return(igraph::is_connected(igraph::as.igraph(network)))
 }
 
+#' Direct and indirect evidence
+#'
+#' Determine whether two treatments in a network are connected by direct and/or
+#' indirect evidence, and generate a list of comparisons with both direct and
+#' indirect evidence (i.e. potential inconsistency) for node-splitting.
+#'
+#' @param network An `nma_data` object, as created by the functions `set_*()` or
+#'   `combine_network()`.
+#' @param include_consistency Logical, whether to include a row of `NA`s to
+#'   indicate that a consistency model (i.e. a model with no node-splitting)
+#'   should also be fitted by the [nma()] function. Default is `FALSE` when
+#'   calling `get_nodesplits()` by hand, and [nma()] sets this to `TRUE` by
+#'   default.
+#'
+#' @details The list of comparisons for node-splitting is generated following
+#'   the algorithm of \insertCite{Valkenhoef2016;textual}{multinma}. A
+#'   comparison between two treatments has the potential for inconsistency, and
+#'   is thus considered for node-splitting, if the comparison has both direct
+#'   evidence and *independent* indirect evidence.
+#'
+#'   The notion of independent indirect evidence is necessary when multi-arm
+#'   trials are present, since by design these trials are internally consistent.
+#'   A comparison between two treatments has independent indirect evidence if,
+#'   after removing all studies comparing the two treatments from the network,
+#'   the two treatments are still connected by a path of evidence. This is the
+#'   criterion considered by the `has_indirect()` function.
+#'
+#' @return For `has_direct()` and `has_indirect()`, a single logical value. For
+#'   `get_nodesplits()`, a data frame with two columns giving the comparisons
+#'   for node-splitting.
+#' @export
+#'
+#' @references
+#'   \insertAllCited{}
+#'
+#' @examples
+#' # Parkinsons example
+#' park_net <- set_agd_arm(parkinsons,
+#'                         study = studyn,
+#'                         trt = trtn,
+#'                         y = y,
+#'                         se = se,
+#'                         trt_ref = 1)
+#'
+#' # View the network plot
+#' plot(park_net)
+#'
+#' # The 4 vs. 5 comparison is a spur on the network
+#' has_direct(park_net, 4, 5)
+#' has_indirect(park_net, 4, 5)
+#'
+#' # 1 and 5 are not directly connected
+#' has_direct(park_net, 1, 5)
+#' has_indirect(park_net, 1, 5)
+#'
+#' # The 1 vs. 2 comparison does not have independent indirect evidence, since
+#' # the 1-2-4 loop is a multi-arm study
+#' has_indirect(park_net, 1, 2)
+#'
+#' # Get a list of comparisons with potential inconsistency for node-splitting
+#' get_nodesplits(park_net)
+#'
+#' # See van Valkenhoef (2016) for a discussion of this example
+
+get_nodesplits <- function(network, include_consistency = FALSE) {
+
+  # Check network
+  if (!inherits(network, "nma_data")) {
+    abort("`network` must be an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
+  }
+
+  if (all(purrr::map_lgl(network, is.null))) {
+    abort("Empty network.")
+  }
+
+  # Check other arguments
+  if (!rlang::is_bool(include_consistency))
+    abort("`include_consistency` must be a logical value (TRUE or FALSE).")
+
+  # Determine which contrasts to split using algorithm of van Valkenhoef,
+  # i.e. having both direct and *independent* indirect evidence
+  comparisons <- igraph::as_edgelist(igraph::as.igraph(network))
+  colnames(comparisons) <- c("trt1", "trt2")
+
+  out <- dplyr::as_tibble(comparisons) %>%
+    dplyr::mutate(trt1 = factor(.data$trt1, levels = levels(network$treatments)),
+                  trt2 = factor(.data$trt2, levels = levels(network$treatments))) %>%
+    dplyr::arrange(.data$trt1, .data$trt2) %>%
+    dplyr::rowwise() %>%
+    dplyr::filter(has_direct(network, .data$trt1, .data$trt2) &&
+                    has_indirect(network, .data$trt1, .data$trt2)) %>%
+    dplyr::ungroup()
+
+  # Add an NA row for the consistency model if include_consistency = TRUE
+  if (include_consistency) {
+    out <- dplyr::add_row(out, trt1 = NA, trt2 = NA, .before = 1)
+  }
+
+  return(out)
+}
+
+#' @param trt1,trt2 Treatments, each as a single integer, string, or factor
+#' @export
+#' @rdname get_nodesplits
+has_direct <- function(network, trt1, trt2) {
+
+  # Check network
+  if (!inherits(network, "nma_data")) {
+    abort("`network` must be an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
+  }
+
+  if (all(purrr::map_lgl(network, is.null))) {
+    abort("Empty network.")
+  }
+
+  # Check treatments
+  if (!rlang::is_scalar_atomic(trt1))
+    abort("`trt1` should be a single integer, string, or factor, naming a treatment.")
+  if (!rlang::is_scalar_atomic(trt2))
+    abort("`trt2` should be a single integer, string, or factor, naming a treatment.")
+
+  trt1 <- as.character(trt1)
+  trt2 <- as.character(trt2)
+  lvls_trt <- levels(network$treatments)
+
+  if (! trt1 %in% lvls_trt)
+    abort(sprintf("`trt1` does not match a treatment in the network.\nSuitable values are: %s",
+                  ifelse(length(lvls_trt) <= 5,
+                         paste0(lvls_trt, collapse = ", "),
+                         paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
+
+  if (! trt2 %in% lvls_trt)
+    abort(sprintf("`trt2` does not match a treatment in the network.\nSuitable values are: %s",
+                  ifelse(length(lvls_trt) <= 5,
+                         paste0(lvls_trt, collapse = ", "),
+                         paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
+
+  if (trt1 == trt2)
+    abort("`trt1` and `trt2` cannot be the same treatment.")
+
+  # Convert to igraph and return whether adjacent nodes or not
+  return(igraph::are_adjacent(igraph::as.igraph(network), trt1, trt2))
+}
+
+#' @rdname get_nodesplits
+#' @export
+has_indirect <- function(network, trt1, trt2) {
+
+  # Check network
+  if (!inherits(network, "nma_data")) {
+    abort("`network` must be an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
+  }
+
+  if (all(purrr::map_lgl(network, is.null))) {
+    abort("Empty network.")
+  }
+
+  # Check treatments
+  if (!rlang::is_scalar_atomic(trt1))
+    abort("`trt1` should be a single integer, string, or factor, naming a treatment.")
+  if (!rlang::is_scalar_atomic(trt2))
+    abort("`trt2` should be a single integer, string, or factor, naming a treatment.")
+
+  trt1 <- as.character(trt1)
+  trt2 <- as.character(trt2)
+  lvls_trt <- levels(network$treatments)
+
+  if (! trt1 %in% lvls_trt)
+    abort(sprintf("`trt1` does not match a treatment in the network.\nSuitable values are: %s",
+                  ifelse(length(lvls_trt) <= 5,
+                         paste0(lvls_trt, collapse = ", "),
+                         paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
+
+  if (! trt2 %in% lvls_trt)
+    abort(sprintf("`trt2` does not match a treatment in the network.\nSuitable values are: %s",
+                  ifelse(length(lvls_trt) <= 5,
+                         paste0(lvls_trt, collapse = ", "),
+                         paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
+
+  if (trt1 == trt2)
+    abort("`trt1` and `trt2` cannot be the same treatment.")
+
+
+  # Create network with studies on both trt1 and trt2 removed
+  studies <- dplyr::bind_rows(
+    network$agd_arm,
+    network$agd_contrast,
+    network$ipd
+  ) %>%
+    dplyr::distinct(.data$.study, .data$.trt)
+
+  ind_studies <- studies %>%
+    dplyr::group_by(.data$.study) %>%
+    dplyr::filter(! all(c(trt1, trt2) %in% .data$.trt))
+
+  # Catch case where the reduced network is empty
+  if (nrow(ind_studies) == 0) return(FALSE)
+
+  ind_e <- dplyr::group_modify(ind_studies, ~make_contrasts(.x$.trt)) %>%
+    dplyr::transmute(from = .data$.trt_b,
+                     to = .data$.trt,
+                     .data$.study)
+  ind_v <- dplyr::ungroup(studies) %>% dplyr::distinct(.data$.trt)
+
+  g <- igraph::graph_from_data_frame(ind_e, directed = FALSE, vertices = ind_v)
+
+  # There is indirect evidence if the treatments are still connected in this
+  # reduced network
+  return(!is.infinite(igraph::distances(g, trt1, trt2)[1, 1]))
+}
+
 #' Network plots
 #'
 #' Create a network plot from a `nma_data` network object.
@@ -586,7 +797,7 @@ plot.nma_data <- function(x, ..., layout, circular,
 
   g <- g +
     ggraph::scale_edge_colour_manual("Data", values = c(AgD = "#113259", IPD = "#55A480"),
-                                     guide = if (dat_mixed) "legend" else FALSE) +
+                                     guide = if (dat_mixed) "legend" else "none") +
     ggraph::theme_graph(base_family = "") +
     ggplot2::coord_fixed(clip = "off")
   return(g)

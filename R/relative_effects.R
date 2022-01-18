@@ -20,6 +20,9 @@
 #'   network reference treatment. Coerced to character string.
 #' @param probs Numeric vector of quantiles of interest to present in computed
 #'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`
+#' @param predictive_distribution Logical, when a random effects model has been
+#'   fitted, should the predictive distribution for relative effects in a new
+#'   study be returned? Default `FALSE`.
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #'
 #' @return A [nma_summary] object if `summary = TRUE`, otherwise a list
@@ -80,6 +83,7 @@
 relative_effects <- function(x, newdata = NULL, study = NULL,
                              all_contrasts = FALSE, trt_ref = NULL,
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
+                             predictive_distribution = FALSE,
                              summary = TRUE) {
 
   # Checks
@@ -124,6 +128,10 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
 
   check_probs(probs)
 
+  if(!rlang::is_bool(predictive_distribution))
+    abort("`predictive_distribution` should be TRUE or FALSE")
+  if (predictive_distribution && x$trt_effects != "random") predictive_distribution <- FALSE
+
   # Cannot produce relative effects for inconsistency models
   if (x$consistency != "consistency")
     abort(glue::glue("Cannot produce relative effects under inconsistency '{x$consistency}' model."))
@@ -134,7 +142,14 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
   # Produce relative effects
   if (is.null(x$regression) || is_only_offset(x$regression)) {
     # If no regression model, relative effects are just the d's
-    re_array <- as.array(as.stanfit(x), pars = "d")
+
+    if (!predictive_distribution) {
+      re_array <- as.array(as.stanfit(x), pars = "d")
+    } else {
+      # For predictive distribution, use delta_new instead of d
+      re_array <- get_delta_new(x)
+    }
+
     if (all_contrasts) {
       re_array <- make_all_contrasts(re_array, trt_ref = nrt)
     } else if (!is.null(trt_ref) && trt_ref != nrt) {
@@ -151,6 +166,12 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       d_names <- c(paste0("d[", nrt, "]"), d_names[d_names != paste0("d[", nrt, "]")])
       re_array <- re_array[ , , d_names, drop = FALSE]
     }
+
+    # Fix up parameter names for predictive_distribution = TRUE
+    if (predictive_distribution) {
+      dimnames(re_array)[[3]] <- gsub("^d\\[", "delta_new[", dimnames(re_array)[[3]])
+    }
+
     if (summary) {
       re_summary <- summary_mcmc_array(re_array, probs = probs)
       out <- list(summary = re_summary, sims = re_array)
@@ -226,6 +247,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       regdat <- get_model_data_columns(dat_studies, regression = x$regression, label = "`newdata`")
     }
 
+
     # Get number of treatments
     ntrt <- nlevels(x$network$treatments)
 
@@ -261,7 +283,14 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
     # If there are no EMs (regression model had no interactions with .trt) then
     # just return the treatment effects (not study specific)
     if (ncol(X_EM) == 0) {
-      re_array <- as.array(as.stanfit(x), pars = "d")
+
+      if (!predictive_distribution) {
+        re_array <- as.array(as.stanfit(x), pars = "d")
+      } else {
+        # For predictive distribution, use delta_new instead of d
+        re_array <- get_delta_new(x)
+      }
+
       if (all_contrasts) {
         re_array <- make_all_contrasts(re_array, trt_ref = nrt)
       } else if (!is.null(trt_ref) && trt_ref != nrt) {
@@ -278,6 +307,12 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         d_names <- c(paste0("d[", nrt, "]"), d_names[d_names != paste0("d[", nrt, "]")])
         re_array <- re_array[ , , d_names, drop = FALSE]
       }
+
+      # Fix up parameter names for predictive_distribution = TRUE
+      if (predictive_distribution) {
+        dimnames(re_array)[[3]] <- gsub("^d\\[", "delta_new[", dimnames(re_array)[[3]])
+      }
+
       if (summary) {
         re_summary <- summary_mcmc_array(re_array, probs = probs)
         out <- list(summary = re_summary, sims = re_array)
@@ -338,8 +373,13 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       # Name rows by treatment for now (required for make_all_contrasts)
       rownames(X_EM_d) <- paste0("d[", dat_studies$.trt , "]")
 
-      # Linear combination with posterior MCMC array
       d_array <- as.array(x, pars = colnames(X_EM_d))
+      if (predictive_distribution) {
+        # For predictive distribution, use delta_new instead of d
+        d_array[ , , colnames(X_d)] <- get_delta_new(x)
+      }
+
+      # Linear combination with posterior MCMC array
       re_array <- tcrossprod_mcmc_array(d_array, X_EM_d)
 
       # Produce all contrasts, if required
@@ -386,6 +426,11 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
           d_names[j_pars] <- c(paste0("d[", j, ": ", nrt, "]"), d_names[j_pars & d_names != paste0("d[", j, ": ", nrt, "]")])
           re_array <- re_array[ , , d_names, drop = FALSE]
         }
+      }
+
+      # Fix up parameter names for predictive_distribution = TRUE
+      if (predictive_distribution) {
+        dimnames(re_array)[[3]] <- gsub("^d\\[", "delta_new[", dimnames(re_array)[[3]])
       }
 
       # Create summary stats
@@ -494,4 +539,50 @@ tcrossprod_mcmc_array <- function(a, x) {
   dimnames(out) <- dimnames_out
 
   return(out)
+}
+
+#' Sample predictive distribution of deltas for new study
+#'
+#' @param x Fitted RE stan_nma object
+#' @param ...
+#'
+#' @return A 3D MCMC array
+#' @noRd
+get_delta_new <- function(x, ...) {
+  ntrt <- nlevels(x$network$treatments)
+
+  RE_cor <- matrix(0.5, nrow = ntrt - 1, ncol = ntrt - 1)
+  diag(RE_cor) <- 1
+
+  draws <- as.matrix(x, pars = c("d", "tau"))
+  # Need to make d[] index numeric for rstan::gqs
+  colnames(draws)[1:(ntrt - 1)] <- paste0("d[", 1:(ntrt - 1), "]")
+
+  if (ntrt == 2) {
+    # Work around rstan::gqs() bug when there is only d[1]
+    draws <- draws[, c("d[1]", "d[1]", "tau")]
+    colnames(draws) <- c("d[1]", "d[2]", "tau")
+    delta_new <- rstan::gqs(stanmodels$predict_delta_new,
+                            data = list(nt = 3,
+                                        RE_cor = diag(2)),
+                            draws = draws,
+                            seed = rstan::get_seed(x$stanfit))
+
+    delta_new <- as.array(delta_new)[ , , 1, drop = FALSE]
+  } else {
+    delta_new <- rstan::gqs(stanmodels$predict_delta_new,
+                            data = list(nt = ntrt,
+                                        RE_cor = RE_cor),
+                            draws = draws,
+                            seed = rstan::get_seed(x$stanfit))
+
+    delta_new <- as.array(delta_new)
+  }
+
+  # Note: name these d instead of delta_new here so that they can be drop-in
+  # replacements in relative_effects(), then fix up later
+  dimnames(delta_new)[[3]] <- paste0("d[", levels(x$network$treatments)[-1], "]")
+  class(delta_new) <- c("mcmc_array", class(delta_new))
+
+  return(delta_new)
 }

@@ -19,14 +19,22 @@ vector[nX] allbeta = QR ? R_inv * beta_tilde : beta_tilde;
 vector[totns] mu = allbeta[1:totns];
 // Treatment effects
 vector[nt - 1] d = allbeta[(totns +1):(totns + nt - 1)];
+// Node-splitting omega ()
+vector[nodesplit] omega; // nodesplit ? allbeta[totns + ns] : vector(0);
 // Regression predictors
-vector[nX - totns - (nt - 1)] beta = allbeta[(totns + nt):];
+vector[nX - totns - (nt - 1) - nodesplit] beta = allbeta[(totns + nt + nodesplit):];
 
 // -- AgD integration --
 // vector[nint > 1 ? nint * ni_agd_arm : 0] theta_agd_arm_ii;
 // vector[ni_agd_arm] theta_agd_arm_bar;
 vector[nint > 1 ? nint * ni_agd_contrast : 0] eta_agd_contrast_ii;
 vector[ni_agd_contrast] eta_agd_contrast_bar;
+
+// -- Node-splitting --
+// Pull out omega from allbeta
+if (nodesplit) {
+  omega[1] = allbeta[totns + nt];
+}
 
 // -- IPD model --
 // We define the IPD and AgD models here in the transformed parameters block,

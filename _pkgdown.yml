@@ -10,8 +10,11 @@ home:
 
 
 template:
-  params:
-    bootswatch: paper
+  bootstrap: 5
+  bslib:
+    base_font: {google: "Source Sans Pro"}
+    heading_font: {google: "Source Sans Pro"}
+    #code_font: {google: "JetBrains Mono"}
 
 
 development:
@@ -93,6 +96,19 @@ reference:
   - nma_dic-class
   - loo
   - waic
+
+- title: Node-splitting
+  desc: Generate and summarise node-splitting models for assessing inconsistency.
+  contents:
+  - has_direct
+  - has_indirect
+  - get_nodesplits
+  - nma_nodesplit-class
+  - print.nma_nodesplit_df
+  - summary.nma_nodesplit_df
+  - nodesplit_summary-class
+  - print.nodesplit_summary
+  - plot.nodesplit_summary
 
 - title: Posterior summaries and working with fitted models
   desc: >

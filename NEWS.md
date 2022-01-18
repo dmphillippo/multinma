@@ -1,3 +1,38 @@
+# multinma 0.4.0
+
+* Feature: Node-splitting models for assessing inconsistency are now available
+with `consistency = "nodesplit"` in `nma()`. Comparisons to split can be chosen
+using the `nodesplit` argument, by default all possibly inconsistent comparisons
+are chosen using `get_nodesplits()`. Node-splitting results can be summarised
+with `summary.nma_nodesplit()` and plotted with `plot.nodesplit_summary()`.
+* Feature: The correlation matrix for generating integration points with
+`add_integration()` for ML-NMR models is now adjusted to the underlying Gaussian
+copula, so that the output correlations of the integration points better match
+the requested input correlations. A new argument `cor_adjust` controls this
+behaviour, with options `"spearman"`, `"pearson"`, or `"none"`. Although these
+correlations typically have little impact on the results, for strict
+reproducibility the old behaviour from version 0.3.0 and below is available with
+`cor_adjust = "legacy"`.
+* Feature: For random effects models, the predictive distribution of
+relative/absolute effects in a new study can now be obtained in
+`relative_effects()` and `predict.stan_nma()` respectively, using the new
+argument `predictive_distribution = TRUE`.
+* Feature: Added option to calculate SUCRA values when summarising the posterior
+treatment ranks with `posterior_ranks()` or `posterior_rank_probs()`, when
+argument `sucra = TRUE`.
+* Improvement: Factor order is now respected when `trt`, `study`, or `trt_class`
+are factors, previously the order of levels was reset into natural sort order.
+* Improvement: Update package website to Bootstrap 5 with release of pkgdown
+2.0.0
+* Fix: Model fitting is now robust to non-default settings of
+`options("contrasts")`.
+* Fix: `plot.nma_data()` no longer gives a ggplot deprecation warning (PR #6).
+* Fix: Bug in `predict.stan_nma()` with a single covariate when `newdata` is a
+`data.frame` (PR #7).
+* Fix: Attempting to call `predict.stan_nma()` on a regression model with only
+contrast data and no `newdata` or `baseline` specified now throws a descriptive
+error message.
+
 # multinma 0.3.0
 
 * Feature: Added `baseline_type` and `baseline_level` arguments to

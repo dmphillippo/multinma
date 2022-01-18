@@ -43,7 +43,12 @@ print.stan_nma <- function(x, ...) {
   if (inherits(x$network, "mlnmr_data")) type <- "ML-NMR"
   else type <- "NMA"
   cglue("A {x$trt_effects} effects {type} with a {x$likelihood} likelihood ({x$link} link).")
-  if (x$consistency != "consistency") cglue("An inconsistency model ('{x$consistency}') was fitted.")
+  if (x$consistency != "consistency") {
+    if (x$consistency == "nodesplit")
+      cglue("An inconsistency model ('{x$consistency}') was fitted, splitting the comparison {x$nodesplit[2]} vs. {x$nodesplit[1]}.")
+    else
+      cglue("An inconsistency model ('{x$consistency}') was fitted.")
+  }
   if (!is.null(x$regression)) {
     cglue("Regression model: {rlang::as_label(x$regression)}.")
     if (!is.null(x$xbar)) {
@@ -270,6 +275,14 @@ plot_prior_posterior <- function(x, ...,
                                            reg = "beta",
                                            aux = switch(x$likelihood, normal = "sigma", ordered = "cc")))
 
+  # Add in omega parameter if node-splitting model, which uses prior_trt
+  if (inherits(x, "nma_nodesplit")) {
+    prior_dat <- dplyr::bind_rows(
+      prior_dat,
+      dplyr::filter(prior_dat, .data$prior == "trt") %>%
+        dplyr::mutate(par_base = "omega")
+    )
+  }
 
   # Get parameter samples
   pars <- unique(prior_dat$par_base)
@@ -791,7 +804,7 @@ pairs.stan_nma <- function(x, ..., pars, include = TRUE) {
   post_array <- as.array(x, pars = pars, include = include)
 
   max_td <- sf@stan_args[[1]]$control$max_treedepth
-  if (is.null(max_td)) max_td <- NULL
+  if (is.null(max_td)) max_td <- 10
 
   args <- rlang::dots_list(x = post_array,
                            np = bayesplot::nuts_params(sf),

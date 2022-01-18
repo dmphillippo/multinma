@@ -6,13 +6,14 @@
 \usage{
 nma(
   network,
-  consistency = c("consistency", "ume"),
+  consistency = c("consistency", "ume", "nodesplit"),
   trt_effects = c("fixed", "random"),
   regression = NULL,
   class_interactions = c("common", "exchangeable", "independent"),
   likelihood = NULL,
   link = NULL,
   ...,
+  nodesplit = get_nodesplits(network, include_consistency = TRUE),
   prior_intercept = .default(normal(scale = 100)),
   prior_trt = .default(normal(scale = 10)),
   prior_het = .default(half_normal(scale = 5)),
@@ -30,7 +31,7 @@ nma(
 \code{combine_network()}, or \code{add_integration()}}
 
 \item{consistency}{Character string specifying the type of (in)consistency
-model to fit, currently either \code{"consistency"} or \code{"ume"}}
+model to fit, either \code{"consistency"}, \code{"ume"}, or \code{"nodesplit"}}
 
 \item{trt_effects}{Character string specifying either \code{"fixed"} or \code{"random"} effects}
 
@@ -52,6 +53,12 @@ default to the canonical link (see details)}
 \item{...}{Further arguments passed to
 \code{\link[rstan:stanmodel-method-sampling]{sampling()}}, such as \code{iter},
 \code{chains}, \code{cores}, etc.}
+
+\item{nodesplit}{For \code{consistency = "nodesplit"}, the comparison(s) to split
+in the node-splitting model(s). Either a length 2 vector giving the
+treatments in a single comparison, or a 2 column data frame listing
+multiple treatment comparisons to split in turn. By default, all possible
+comparisons will be chosen (see \code{\link[=get_nodesplits]{get_nodesplits()}}).}
 
 \item{prior_intercept}{Specification of prior distribution for the intercept}
 
@@ -83,8 +90,8 @@ decomposition to the model design matrix}
 cumulative estimates of integration error}
 }
 \value{
-\code{nma()} returns a \link{stan_nma} object, \code{nma.fit()} returns a \link{stanfit}
-object.
+\code{nma()} returns a \link{stan_nma} object, except when \code{consistency = "nodesplit"} when a \link{nma_nodesplit} or \link{nma_nodesplit_df} object is
+returned. \code{nma.fit()} returns a \link{stanfit} object.
 }
 \description{
 The \code{nma} function fits network meta-analysis and (multilevel) network
@@ -102,7 +109,8 @@ NMA model).
 
 For the advanced user, the additional specials \code{.study} and \code{.trtclass} are
 also available, and refer to studies and (if specified) treatment classes
-respectively.
+respectively. When node-splitting models are fitted (\code{consistency = "nodesplit"}) the special \code{.omega} is available, indicating the arms
+to which the node-splitting inconsistency factor is added.
 
 See \code{\link[multinma:priors]{?priors}} for details on prior
 specification. Default prior distributions are available, but may not be
@@ -212,6 +220,20 @@ smk_fit_RE_UME <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0
 smk_fit_RE_UME
 }
 
+\donttest{
+# Fitting all possible node-splitting models
+smk_fit_RE_nodesplit <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+                            consistency = "nodesplit",
+                            trt_effects = "random",
+                            prior_intercept = normal(scale = 100),
+                            prior_trt = normal(scale = 100),
+                            prior_het = normal(scale = 5))
+}
+
+\donttest{
+# Summarise the node-splitting results
+summary(smk_fit_RE_nodesplit)
+}
 
 ## Plaque psoriasis ML-NMR
 # Set up plaque psoriasis network combining IPD and AgD

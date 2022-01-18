@@ -1,6 +1,7 @@
 ---
 title: "Example: Atrial fibrillation"
 output: rmarkdown::html_vignette
+link-citations: yes
 bibliography: ../inst/REFERENCES.bib
 params:
   run_tests: FALSE
@@ -33,7 +34,7 @@ head(atrial_fibrillation)
 
 @Cooper2009 used this data to demonstrate meta-regression models, which we recreate here.
 
-### Setting up the network
+## Setting up the network
 Whilst we have data on the patient-years at risk in each study (`E`), we ignore this here to follow the analysis of @Cooper2009, instead analysing the number of patients with stroke (`r`) out of the total (`n`) in each arm.
 We use the function `set_agd_arm()` to set up the network, making sure to specify the treatment classes `trt_class`.
 We remove the WASPO study from the network as both arms had zero events, and this study therefore contributes no information.
@@ -57,13 +58,13 @@ plot(af_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) +
 ```
 
 
-### Meta-analysis models
+## Meta-analysis models
 We fit two (random effects) models:
 
 1. A standard NMA model without any covariates (model 1 of @Cooper2009);
 2. A meta-regression model adjusting for the proportion of individuals in each study with prior stroke, with shared interaction coefficients by treatment class (model 4b of @Cooper2009).
 
-#### NMA with no covariates
+### NMA with no covariates
 We fit a random effects model using the `nma()` function with `trt_effects = "random"`.
 We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and a $\textrm{half-N}(5^2)$ prior for the heterogeneity standard deviation $\tau$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
@@ -131,7 +132,7 @@ plot(af_1_rankprobs)
 plot(af_1_cumrankprobs)
 ```
 
-#### Network meta-regression adjusting for proportion of prior stroke
+### Network meta-regression adjusting for proportion of prior stroke
 We now consider a meta-regression model adjusting for the proportion of individuals in each study with prior stroke, with shared interaction coefficients by treatment class.
 The regression model is specified in the `nma()` function using a formula in the `regression` argument.
 The formula `~ .trt:stroke` means that interactions of prior stroke with treatment will be included; the `.trt` special variable indicates treatment, and `stroke` is in the original data set.
@@ -165,7 +166,7 @@ af_fit_4b <- nma(af_net,
                  adapt_delta = 0.99)
 ```
 ```{r, echo=FALSE, eval=params$run_tests}
-af_fit_4b <- nma(af_net, 
+af_fit_4b <- nowarn_on_ci(nma(af_net, 
                  seed = 579212814,
                  trt_effects = "random",
                  regression = ~ .trt:stroke,
@@ -176,7 +177,7 @@ af_fit_4b <- nma(af_net,
                  prior_reg = normal(scale = 100),
                  prior_het = half_normal(scale = 5),
                  adapt_delta = 0.99,
-                 iter = 5000)
+                 iter = 5000))
 ```
 
 Basic parameter summaries are given by the `print()` method:
@@ -226,12 +227,12 @@ The interactions are more straightforward to interpret if we transform the inter
 af_4b_beta <- as.array(af_fit_4b, pars = "beta")
 
 # Subtract beta[Control:stroke] from the other class interactions
-af_4b_beta[ , , 1:2] <- sweep(af_4b_beta[ , , 1:2], 1:2, 
+af_4b_beta[ , , 2:3] <- sweep(af_4b_beta[ , , 2:3], 1:2, 
                               af_4b_beta[ , , "beta[.trtclassControl:stroke]"], FUN = "-")
 
 # Set beta[Anti-coagulant:stroke] = -beta[Control:stroke]
 af_4b_beta[ , , "beta[.trtclassControl:stroke]"] <- -af_4b_beta[ , , "beta[.trtclassControl:stroke]"]
-names(af_4b_beta)[3] <- "beta[.trtclassAnti-coagulant:stroke]"
+names(af_4b_beta)[1] <- "beta[.trtclassAnti-coagulant:stroke]"
 
 # Summarise
 summary(af_4b_beta)
@@ -275,7 +276,7 @@ plot(af_4b_cumrankprobs) +
   theme(strip.text.y = element_text(angle = 0))
 ```
 
-### Model fit and comparison
+## Model fit and comparison
 Model fit can be checked using the `dic()` function:
 ```{r}
 (af_dic_1 <- dic(af_fit_1))
@@ -353,6 +354,15 @@ test_that("DIC (no covariates)", {
   expect_equivalent(af_dic_1$dic, 108.57, tolerance = tol_dic)
 })
 
+test_that("SUCRAs", {
+  af_ranks_1 <- posterior_ranks(af_fit_1, sucra = TRUE)
+  af_rankprobs_1 <- posterior_rank_probs(af_fit_1, sucra = TRUE)
+  af_cumrankprobs_1 <- posterior_rank_probs(af_fit_1, cumulative = TRUE, sucra = TRUE)
+  
+  expect_equal(af_ranks_1$summary$sucra, af_rankprobs_1$summary$sucra)
+  expect_equal(af_ranks_1$summary$sucra, af_cumrankprobs_1$summary$sucra)
+})
+
 
 # Check construction of all contrasts
 af_1_releff_all_contr <- relative_effects(af_fit_1, all_contrasts = TRUE)
@@ -418,10 +428,10 @@ test_that("Relative effects (common interaction)", {
 
 Cooper_4b_beta <- tribble(
 ~trt_class       , ~est , ~lower, ~upper,
+"Anti-coagulant", -0.71,-1.58  , 0.15  ,
+"Anti-platelet" , 0.23 ,-0.45  , 0.93  ,
 #"Mixed"          , 3.05 ,-1.26  , 7.30  ,
 "Mixed"          , 3.05 ,-0.91  , 7.30  ,
-"Anti-platelet" , 0.23 ,-0.45  , 0.93  ,
-"Anti-coagulant", -0.71,-1.58  , 0.15  ,
 )
 
 af_4b_beta_df <- as.data.frame(summary(af_4b_beta))
@@ -445,6 +455,19 @@ test_that("DIC (common interaction)", {
   expect_equivalent(af_dic_4b$resdev, 58.74, tolerance = tol_dic)
   expect_equivalent(af_dic_4b$pd, 48.25, tolerance = tol_dic)
   expect_equivalent(af_dic_4b$dic, 106.99, tolerance = tol_dic)
+})
+
+test_that("SUCRAs", {
+  stroke_01 <- data.frame(stroke = c(0, 1), label = c("stroke = 0", "stroke = 1"))
+  af_ranks_4b <- posterior_ranks(af_fit_4b, newdata = stroke_01, 
+                                study = label, sucra = TRUE)
+  af_rankprobs_4b <- posterior_rank_probs(af_fit_4b, newdata = stroke_01, 
+                                           study = label, sucra = TRUE)
+  af_cumrankprobs_4b <- posterior_rank_probs(af_fit_4b, cumulative = TRUE, newdata = stroke_01,
+                                              study = label, sucra = TRUE)
+  
+  expect_equal(af_ranks_4b$summary$sucra, af_rankprobs_4b$summary$sucra)
+  expect_equal(af_ranks_4b$summary$sucra, af_cumrankprobs_4b$summary$sucra)
 })
 
 # Check construction of all contrasts
@@ -485,6 +508,30 @@ test_that("Construction of all contrasts in target population is correct (common
   expect_equal(select(af_4b_releff_all_contr_new$summary, -Rhat), 
                select(test_af_4b_all_contr_new, -Rhat), 
                check.attributes = FALSE)
+})
+
+test_that("Robust to custom options(contrasts) settings", {
+  af_fit_4b_SAS <- withr::with_options(list(contrasts = c(ordered = "contr.SAS",
+                                                       unordered = "contr.SAS")),
+             nowarn_on_ci(nma(af_net, 
+                 seed = 579212814,
+                 trt_effects = "random",
+                 regression = ~ .trt:stroke,
+                 class_interactions = "common",
+                 QR = TRUE,
+                 prior_intercept = normal(scale = 100),
+                 prior_trt = normal(scale = 100),
+                 prior_reg = normal(scale = 100),
+                 prior_het = half_normal(scale = 5),
+                 adapt_delta = 0.99,
+                 iter = 5000)))
+
+  expect_equal(as_tibble(summary(af_fit_4b_SAS))[, c("parameter", "mean", "sd")],
+               as_tibble(summary(af_fit_4b))[, c("parameter", "mean", "sd")],
+               tolerance = tol)
+  expect_equal(as_tibble(relative_effects(af_fit_4b_SAS))[, c("parameter", "mean", "sd")],
+               as_tibble(relative_effects(af_fit_4b))[, c("parameter", "mean", "sd")],
+               tolerance = tol)
 })
 
 ```

@@ -1,6 +1,7 @@
 ---
 title: "Example: Thrombolytic treatments"
 output: rmarkdown::html_vignette
+link-citations: yes
 bibliography: ../inst/REFERENCES.bib
 params:
   run_tests: FALSE
@@ -21,7 +22,7 @@ nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
 options(mc.cores = nc)
 ```
 
-This vignette describes the analysis of 50 trials of 8 thrombolytic drugs (streptokinase, SK; alteplase, t-PA; accelerated alteplase, Acc t-PA; streptokinase plus alteplase, SK+tPA; reteplase, r-PA; tenocteplase, TNK; urokinase, UK; anistreptilase, ASPAC) plus per-cutaneous transluminal coronary angioplasty (PTCA) [@Boland2003; @Lu2006; @TSD4].
+This vignette describes the analysis of 50 trials of 8 thrombolytic drugs (streptokinase, SK; alteplase, t-PA; accelerated alteplase, Acc t-PA; streptokinase plus alteplase, SK+tPA; reteplase, r-PA; tenocteplase, TNK; urokinase, UK; anistreptilase, ASPAC) plus per-cutaneous transluminal coronary angioplasty (PTCA) [@Boland2003; @Lu2006; @TSD4; @Dias2010].
 The number of deaths in 30 or 35 days following acute myocardial infarction are recorded.
 The data are available in this package as `thrombolytics`:
 ```{r}
@@ -29,7 +30,7 @@ head(thrombolytics)
 ```
 
 
-### Setting up the network
+## Setting up the network
 We begin by setting up the network.
 We have arm-level count data giving the number of deaths (`r`) out of the total (`n`) in each arm, so we use the function `set_agd_arm()`.
 By default, SK is set as the network reference treatment.
@@ -41,6 +42,18 @@ thrombo_net <- set_agd_arm(thrombolytics,
                            n = n)
 thrombo_net
 ```
+```{r, include=FALSE, eval=params$run_tests}
+# Make trtf factor to order treatments in same way as Dias analysis - needed to
+# recreate inconsistency analyses
+trts <- dplyr::distinct(thrombolytics, trtn, trtc)
+trts <- dplyr::arrange(trts, trtn)
+thrombolytics$trtf <- factor(thrombolytics$trtn, levels = trts$trtn, labels = trts$trtc)
+thrombo_net2 <- set_agd_arm(thrombolytics, 
+                            study = studyn,
+                            trt = trtf,
+                            r = r, 
+                            n = n)
+```
 
 Plot the network structure.
 ```{r, eval=FALSE}
@@ -51,7 +64,7 @@ plot(thrombo_net, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(leg
 ```
 
 
-### Fixed effects NMA
+## Fixed effects NMA
 Following TSD 4 [@TSD4], we fit a fixed effects NMA model, using the `nma()` function with `trt_effects = "fixed"`.
 We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$.
 We can examine the range of parameter values implied by these prior distributions with the `summary()` method:
@@ -97,15 +110,21 @@ plot(dic_consistency)
 There are a number of points which are not very well fit by the model, having posterior mean residual deviance contributions greater than 1.
 
 
-### Checking for inconsistency
-We fit an unrelated mean effects (UME) model [@TSD4] to assess the consistency assumption.
+## Checking for inconsistency
+
+> **Note:** The results of the inconsistency models here are slightly different to those of Dias et al. [-@Dias2010; -@TSD4], although the overall conclusions are the same.
+> This is due to the presence of multi-arm trials and a different ordering of treatments, meaning that inconsistency is parameterised differently within the multi-arm trials.
+> The same results as Dias et al. are obtained if the network is instead set up with `trtn` as the treatment variable.
+
+### Unrelated mean effects model
+We first fit an unrelated mean effects (UME) model [@TSD4] to assess the consistency assumption.
 Again, we use the function `nma()`, but now with the argument `consistency = "ume"`.
 ```{r}
 thrombo_fit_ume <- nma(thrombo_net, 
-                  consistency = "ume",
-                  trt_effects = "fixed",
-                  prior_intercept = normal(scale = 100),
-                  prior_trt = normal(scale = 100))
+                       consistency = "ume",
+                       trt_effects = "fixed",
+                       prior_intercept = normal(scale = 100),
+                       prior_trt = normal(scale = 100))
 thrombo_fit_ume
 ```
 
@@ -126,7 +145,55 @@ The four points lying in the lower right corner of the plot have much lower post
 These points correspond to trials 44 and 45, the only two trials comparing Acc t-PA to ASPAC.
 The ASPAC vs. Acc t-PA estimates are very different under the consistency model and inconsistency (UME) model, suggesting that these two trials may be systematically different from the others in the network.
 
-### Further results
+### Node-splitting
+Another method for assessing inconsistency is node-splitting [@TSD4; @Dias2010].
+Whereas the UME model assesses inconsistency globally, node-splitting assesses inconsistency locally for each potentially inconsistent comparison (those with both direct and indirect evidence) in turn.
+
+Node-splitting can be performed using the `nma()` function with the argument `consistency = "nodesplit"`.
+By default, all possible comparisons will be split (as determined by the `get_nodesplits()` function).
+Alternatively, a specific comparison or comparisons to split can be provided to the `nodesplit` argument.
+```{r, eval=!params$run_tests}
+thrombo_nodesplit <- nma(thrombo_net, 
+                         consistency = "nodesplit",
+                         trt_effects = "fixed",
+                         prior_intercept = normal(scale = 100),
+                         prior_trt = normal(scale = 100))
+```
+```{r, include=FALSE, eval=params$run_tests}
+# Run node-splits with treatments ordered as per Dias
+thrombo_nodesplit <- nma(thrombo_net2, 
+                         consistency = "nodesplit",
+                         trt_effects = "fixed",
+                         prior_intercept = normal(scale = 100),
+                         prior_trt = normal(scale = 100))
+```
+
+The `summary()` method summarises the node-splitting results, displaying the direct and indirect estimates $d_\mathrm{dir}$ and $d_\mathrm{ind}$ from each node-split model, the network estimate $d_\mathrm{net}$ from the consistency model, the inconsistency factor $\omega = d_\mathrm{dir} - d_\mathrm{ind}$, and a Bayesian $p$-value for inconsistency on each comparison.
+The DIC model fit statistics are also provided.
+(If a random effects model was fitted, the heterogeneity standard deviation $tau$ under each node-split model and under the consistency model would also be displayed.)
+```{r}
+summary(thrombo_nodesplit)
+```
+
+Node-splitting the ASPAC vs. Acc t-PA comparison results the lowest DIC, and this is lower than the consistency model.
+The posterior distribution for the inconsistency factor $\omega$ for this comparison lies far from 0 and the Bayesian $p$-value for inconsistency is small (< 0.01), meaning that there is substantial disagreement between the direct and indirect evidence on this comparison.
+
+We can visually compare the direct, indirect, and network estimates using the `plot()` method.
+```{r thrombo_nodesplit, fig.width = 7}
+plot(thrombo_nodesplit)
+```
+
+We can also plot the posterior distributions of the inconsistency factors $\omega$, again using the `plot()` method.
+Here, we specify a "halfeye" plot of the posterior density with median and credible intervals, and customise the plot layout with standard `ggplot2` functions.
+```{r thrombo_nodesplit_omega, fig.height = 6}
+plot(thrombo_nodesplit, pars = "omega", stat = "halfeye", ref_line = 0) +
+  ggplot2::aes(y = comparison) +
+  ggplot2::facet_null()
+```
+
+Notice again that the posterior distribution of the inconsistency factor for the ASPAC vs. Acc t-PA comparison lies far from 0, indicating substantial inconsistency between the direct and indirect evidence on this comparison.
+
+## Further results
 Relative effects for all pairwise contrasts between treatments can be produced using the `relative_effects()` function, with `all_contrasts = TRUE`.
 ```{r thrombo_releff}
 (thrombo_releff <- relative_effects(thrombo_fit, all_contrasts = TRUE))
@@ -153,6 +220,7 @@ plot(thrombo_cumrankprobs)
 #--- Test against TSD 4 results ---
 library(testthat)
 library(dplyr)
+library(tidyr)
 
 test_that("Reference trt is SK", {
   expect_equivalent(levels(thrombo_net$treatments)[1], "SK")
@@ -199,6 +267,15 @@ test_that("FE relative effects", {
   expect_equivalent(thrombo_releff_summary$sd, tsd_releff$sd, tolerance = tol)
   expect_equivalent(thrombo_releff_summary$`2.5%`, tsd_releff$lower, tolerance = tol)
   expect_equivalent(thrombo_releff_summary$`97.5%`, tsd_releff$upper, tolerance = tol)
+})
+
+test_that("SUCRAs", {
+  thrombo_ranks <- posterior_ranks(thrombo_fit, sucra = TRUE)
+  thrombo_rankprobs <- posterior_rank_probs(thrombo_fit, sucra = TRUE)
+  thrombo_cumrankprobs <- posterior_rank_probs(thrombo_fit, cumulative = TRUE, sucra = TRUE)
+  
+  expect_equal(thrombo_ranks$summary$sucra, thrombo_rankprobs$summary$sucra)
+  expect_equal(thrombo_ranks$summary$sucra, thrombo_cumrankprobs$summary$sucra)
 })
 
 # DIC
@@ -254,6 +331,102 @@ test_that("UME DIC", {
   expect_equivalent(dic_ume$resdev, 99.7, tolerance = tol_dic)
   expect_equivalent(dic_ume$pd, 65, tolerance = tol_dic)
   expect_equivalent(dic_ume$dic, 164.7, tolerance = tol_dic)
+})
+
+
+# Node-splitting
+trt_code <- c("SK", "t-PA", "Acc t-PA", "SK + t-PA", "r-PA",
+              "TNK", "PTCA", "UK", "ASPAC")
+
+dias2010_nodesplit_est <- tribble(
+  ~trt1, ~trt2, ~net_mean, ~net_sd, ~dir_mean, ~dir_sd, ~ind_mean, ~ind_sd, ~omega_mean, ~omega_sd, ~p_value,
+ 1, 2,  0.002,  0.030,  0.000,  0.030,  0.189,  0.235, -0.190,  0.236,  0.42,
+ 1, 3, -0.177,  0.043, -0.158,  0.048, -0.247,  0.092,  0.088,  0.104,  0.39,
+ 1, 5, -0.124,  0.060, -0.060,  0.089, -0.175,  0.081,  0.115,  0.121,  0.34,
+ 1, 7, -0.475,  0.101, -0.666,  0.185, -0.393,  0.120, -0.272,  0.222,  0.22,
+ 1, 8, -0.203,  0.219, -0.369,  0.518, -0.168,  0.244, -0.207,  0.575,  0.73,
+ 1, 9,  0.016,  0.037,  0.009,  0.037,  0.424,  0.252, -0.413,  0.253,  0.10,
+ 2, 7, -0.477,  0.104, -0.545,  0.417, -0.475,  0.108, -0.073,  0.432,  0.88,
+ 2, 8, -0.205,  0.220, -0.295,  0.347, -0.144,  0.290, -0.155,  0.452,  0.74,
+ 2, 9,  0.014,  0.037,  0.006,  0.037,  0.471,  0.241, -0.468,  0.241,  0.05,
+ 3, 4,  0.128,  0.054,  0.126,  0.054,  0.630,  0.697, -0.506,  0.696,  0.47,
+ 3, 5,  0.053,  0.056,  0.019,  0.066,  0.135,  0.101, -0.116,  0.120,  0.34,
+ 3, 7, -0.298,  0.097, -0.216,  0.118, -0.477,  0.174,  0.260,  0.211,  0.21,
+ 3, 8, -0.026,  0.220,  0.143,  0.356, -0.136,  0.288,  0.277,  0.461,  0.55,
+ 3, 9,  0.193,  0.056,  1.409,  0.415,  0.165,  0.057,  1.239,  0.420,  0.001
+) %>% 
+  mutate(trt1 = forcats::fct_relevel(factor(trt1, levels = 1:9, labels = trt_code), 
+                                     !! levels(thrombo_net2$treatments)),
+         trt2 = forcats::fct_relevel(factor(trt2, levels = 1:9, labels = trt_code), 
+                                     !! levels(thrombo_net2$treatments)))
+
+for (i in 1:nrow(dias2010_nodesplit_est)) {
+  if (as.numeric(dias2010_nodesplit_est$trt1[i]) > as.numeric(dias2010_nodesplit_est$trt2[i])) {
+    dias2010_nodesplit_est[i, c("trt1", "trt2")] <- dias2010_nodesplit_est[i, c("trt2", "trt1")]
+    dias2010_nodesplit_est[i, c("net_mean", "dir_mean", "ind_mean")] <- -dias2010_nodesplit_est[i, c("net_mean", "dir_mean", "ind_mean")]
+  }
+}
+
+dias2010_nodesplit_est <- arrange(dias2010_nodesplit_est, trt1, trt2)
+
+thrombo_nodesplit_est <- as_tibble(summary(thrombo_nodesplit), nest = FALSE) %>% 
+  mutate(parameter = stringr::str_replace(parameter, "(^d_)?(.+)\\[.+\\]$", "\\2")) %>% 
+  pivot_wider(names_from = "parameter", 
+              values_from = c("mean", "sd"),
+              names_glue = "{parameter}_{.value}",
+              id_cols = c("trt1", "trt2", "p_value")) %>% 
+  mutate(across(where(is.numeric), unname)) %>% 
+  select(!!! colnames(dias2010_nodesplit_est))
+
+test_that("Node-splitting estimates", {
+  # expect_equal(thrombo_nodesplit_est, dias2010_nodesplit_est, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$net_mean, dias2010_nodesplit_est$net_mean, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$net_sd, dias2010_nodesplit_est$net_sd, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$ind_mean, dias2010_nodesplit_est$ind_mean, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$ind_sd, dias2010_nodesplit_est$ind_sd, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$dir_mean, dias2010_nodesplit_est$dir_mean, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$dir_sd, dias2010_nodesplit_est$dir_sd, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$omega_mean, dias2010_nodesplit_est$omega_mean, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$omega_sd, dias2010_nodesplit_est$omega_sd, tolerance = tol)
+  expect_equal(thrombo_nodesplit_est$p_value, dias2010_nodesplit_est$p_value, tolerance = tol)
+})
+
+dias2010_nodesplit_dic <- tribble(
+  ~trt1, ~trt2, ~resdev,   ~pd,   ~dic,
+      1,     2,   106.4,  58.7,  165.1,
+      1,     3,   106.2,  58.7,  165.0,
+      1,     5,   106.1,  58.7,  164.8,
+      1,     7,   105.5,  58.7,  164.2,
+      1,     8,   106.9,  58.7,  165.6,
+      1,     9,   104.3,  58.7,  163.0,
+      2,     7,   106.9,  58.7,  165.6,
+      2,     8,   106.8,  58.7,  165.5,
+      2,     9,   103.3,  58.7,  162.0,
+      3,     4,   106.5,  58.7,  165.2,
+      3,     5,   106.1,  58.7,  164.8,
+      3,     7,   105.5,  58.7,  164.2,
+      3,     8,   106.6,  58.7,  165.3,
+      3,     9,    96.9,  58.7,  155.6) %>% 
+  mutate(trt1 = forcats::fct_relevel(factor(trt1, levels = 1:9, labels = trt_code), 
+                                     !! levels(thrombo_net$treatments)),
+         trt2 = forcats::fct_relevel(factor(trt2, levels = 1:9, labels = trt_code), 
+                                     !! levels(thrombo_net$treatments)))
+
+for (i in 1:nrow(dias2010_nodesplit_dic)) {
+  if (as.numeric(dias2010_nodesplit_dic$trt1[i]) > as.numeric(dias2010_nodesplit_dic$trt2[i])) {
+    dias2010_nodesplit_dic[i, c("trt1", "trt2")] <- dias2010_nodesplit_dic[i, c("trt2", "trt1")]
+  }
+}
+
+dias2010_nodesplit_dic <- arrange(dias2010_nodesplit_dic, trt1, trt2)
+
+thrombo_nodesplit_dic <- as_tibble(summary(thrombo_nodesplit), nest = FALSE) %>% 
+  distinct(trt1, trt2, resdev, pd, dic)
+
+test_that("Node-splitting DIC", {
+  expect_equal(thrombo_nodesplit_dic$dic, dias2010_nodesplit_dic$dic, tolerance = tol_dic)
+  expect_equal(thrombo_nodesplit_dic$resdev, dias2010_nodesplit_dic$resdev, tolerance = tol_dic)
+  expect_equal(thrombo_nodesplit_dic$pd, dias2010_nodesplit_dic$pd, tolerance = tol_dic)
 })
 ```
 
