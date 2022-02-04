@@ -1,3 +1,9 @@
+# multinma 0.4.1
+
+* Fix: tidyr v1.2.0 breaks ordered multinomial models when some studies do not
+report all categories (i.e. some multinomial category outcomes are `NA` in
+`multi()`) (PR #11)
+
 # multinma 0.4.0
 
 * Feature: Node-splitting models for assessing inconsistency are now available
