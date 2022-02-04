@@ -1,3 +1,5 @@
+# multinma 0.4.1.9000
+
 # multinma 0.4.1
 
 * Fix: tidyr v1.2.0 breaks ordered multinomial models when some studies do not
