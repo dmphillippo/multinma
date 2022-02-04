@@ -1,4 +1,4 @@
-# multinma 0.4.0.9000
+# multinma 0.4.1
 
 * Fix: tidyr v1.2.0 breaks ordered multinomial models when some studies do not
 report all categories (i.e. some multinomial category outcomes are `NA` in
