@@ -1263,7 +1263,8 @@ nma.fit <- function(ipd_x, ipd_y,
                          }))
       agd_arm_ncat <- rowSums(agd_arm_cat > 0)
       # Replace missing category counts with 0 (these will drop out of the likelihood)
-      agd_arm_r <- tidyr::replace_na(agd_arm_y$.r, 0)
+      agd_arm_r <- agd_arm_y$.r
+      agd_arm_r[is.na(agd_arm_r)] <- 0
       agd_arm_n <- rowSums(agd_arm_y$.r, na.rm = TRUE)
     }
 
