@@ -1,6 +1,4 @@
-## Resubmission
-This is a resubmission. I have reduced the size of the package tarball to 2.5 MB
-(by compressing images in the vignettes).
+This update fixes a bug introduced with tidyr 1.2.0
 
 ## Test environments
 * local R installation (Windows 10), R 4.1.2
