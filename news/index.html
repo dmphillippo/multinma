@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,6 +64,10 @@
       <small>Source: <a href="https://github.com/dmphillippo/multinma/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.1" id="multinma-041">multinma 0.4.1<a class="anchor" aria-label="anchor" href="#multinma-041"></a></h2>
+<ul><li>Fix: tidyr v1.2.0 breaks ordered multinomial models when some studies do not report all categories (i.e. some multinomial category outcomes are <code>NA</code> in <code><a href="../reference/multi.html">multi()</a></code>) (PR <a href="https://github.com/dmphillippo/multinma/issues/11" class="external-link">#11</a>)</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0" id="multinma-040">multinma 0.4.0<a class="anchor" aria-label="anchor" href="#multinma-040"></a></h2><p class="text-muted">CRAN release: 2022-01-18</p>
 <ul><li>Feature: Node-splitting models for assessing inconsistency are now available with <code>consistency = "nodesplit"</code> in <code><a href="../reference/nma.html">nma()</a></code>. Comparisons to split can be chosen using the <code>nodesplit</code> argument, by default all possibly inconsistent comparisons are chosen using <code><a href="../reference/get_nodesplits.html">get_nodesplits()</a></code>. Node-splitting results can be summarised with <code><a href="../reference/summary.nma_nodesplit_df.html">summary.nma_nodesplit()</a></code> and plotted with <code><a href="../reference/plot.nodesplit_summary.html">plot.nodesplit_summary()</a></code>.</li>

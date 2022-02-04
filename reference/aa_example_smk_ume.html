@@ -16,7 +16,7 @@ smk_fit_RE_UME will then be available in the global environment.'><meta property
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -145,34 +145,34 @@ code in the Examples section below. The resulting <code>stan_nma</code> object
 <span class="r-out co"><span class="r-pr">#&gt;</span> post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                     mean se_mean   sd     2.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]            1.13    0.02 0.82    -0.44</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]       0.91    0.01 0.28     0.39</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                    0.35    0.01 0.60    -0.85</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]    -0.30    0.01 0.63    -1.56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]                 -0.63    0.02 0.71    -2.07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]             0.14    0.02 1.05    -1.93</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                            -5765.23    0.22 6.42 -5778.63</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                                 0.94    0.01 0.24     0.58</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]            1.13    0.02 0.78    -0.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]       0.92    0.01 0.28     0.36</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                    0.34    0.01 0.58    -0.79</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]    -0.29    0.01 0.63    -1.51</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]                 -0.62    0.02 0.72    -2.02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]             0.15    0.02 1.07    -2.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                            -5764.78    0.20 6.28 -5778.14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                                 0.95    0.01 0.23     0.61</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                      25%      50%      75%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]            0.62     1.09     1.63</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]       0.74     0.90     1.08</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                   -0.03     0.36     0.73</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]    -0.71    -0.31     0.10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]                 -1.08    -0.62    -0.17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]            -0.52     0.15     0.82</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                            -5769.57 -5765.08 -5760.65</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                                 0.78     0.91     1.07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]            0.63     1.10     1.63</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]       0.74     0.92     1.09</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                   -0.04     0.34     0.71</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]    -0.71    -0.30     0.12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]                 -1.09    -0.62    -0.16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]            -0.50     0.17     0.81</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                            -5768.72 -5764.47 -5760.49</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                                 0.79     0.92     1.08</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                    97.5% n_eff Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]            2.76  1986 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]       1.46   865 1.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                    1.56  1792 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]     0.99  2462 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]                  0.76  2241 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]             2.20  3408 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                            -5753.44   857 1.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                                 1.50   677 1.01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]            2.71  2210    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]       1.50  1088    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                    1.47  1774    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]     0.96  2357    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]                  0.81  2122    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]             2.32  2779    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                            -5753.47   977    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                                 1.49  1072    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Tue Jan 18 15:05:22 2022.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Fri Feb  4 13:51:05 2022.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
