@@ -161,7 +161,7 @@ smk_nodesplit <- nma(smknet,
 ```
 
 The `summary()` method summarises the node-splitting results, displaying the direct and indirect estimates $d_\mathrm{dir}$ and $d_\mathrm{ind}$ from each node-split model, the network estimate $d_\mathrm{net}$ from the consistency model, the inconsistency factor $\omega = d_\mathrm{dir} - d_\mathrm{ind}$, and a Bayesian $p$-value for inconsistency on each comparison.
-Since random effects models are fitted, the heterogeneity standard deviation $tau$ under each node-split model and under the consistency model is also displayed.
+Since random effects models are fitted, the heterogeneity standard deviation $\tau$ under each node-split model and under the consistency model is also displayed.
 The DIC model fit statistics are also provided.
 ```{r}
 summary(smk_nodesplit)
