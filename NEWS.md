@@ -1,5 +1,8 @@
 # multinma 0.4.1.9000
 
+* Fix: Error in `get_nodesplits()` when studies have multiple arms of the same
+treatment.
+
 # multinma 0.4.1
 
 * Fix: tidyr v1.2.0 breaks ordered multinomial models when some studies do not

@@ -526,6 +526,8 @@ get_nodesplits <- function(network, include_consistency = FALSE) {
   colnames(comparisons) <- c("trt1", "trt2")
 
   out <- dplyr::as_tibble(comparisons) %>%
+    # Remove edges of treatment against itself (from studies with multiple arms of the same treatment)
+    dplyr::filter(.data$trt1 != .data$trt2) %>%
     dplyr::mutate(trt1 = factor(.data$trt1, levels = levels(network$treatments)),
                   trt2 = factor(.data$trt2, levels = levels(network$treatments))) %>%
     dplyr::arrange(.data$trt1, .data$trt2) %>%
