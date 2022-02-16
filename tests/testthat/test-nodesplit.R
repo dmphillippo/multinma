@@ -67,46 +67,54 @@ test_that("has_direct and has_indirect outputs are correct", {
   expect_identical(has_indirect(thrombo_net2, 6, 2), TRUE)
 })
 
-test_that("get_nodesplits() produces correct output for thombolytics network", {
-  # Output from gemtc::mtc.nodesplit.comparisons() on thrombo network
-  ns_gemtc <- tibble::tribble(
-                ~trt1, ~trt2,
-                    1,     2,
-                    1,     3,
-                    1,     5,
-                    1,     7,
-                    1,     8,
-                    1,     9,
-                    2,     7,
-                    2,     8,
-                    2,     9,
-                    3,     4,
-                    3,     5,
-                    3,     7,
-                    3,     8,
-                    3,     9
-                ) %>%
-    mutate(trt1 = factor(trt1, levels = levels(thrombo_net2$treatments)),
-           trt2 = factor(trt2, levels = levels(thrombo_net2$treatments)))
+# Output from gemtc::mtc.nodesplit.comparisons() on thrombo network
+ns_thrombo_gemtc <- tibble::tribble(
+  ~trt1, ~trt2,
+  1,     2,
+  1,     3,
+  1,     5,
+  1,     7,
+  1,     8,
+  1,     9,
+  2,     7,
+  2,     8,
+  2,     9,
+  3,     4,
+  3,     5,
+  3,     7,
+  3,     8,
+  3,     9
+) %>%
+  mutate(trt1 = factor(trt1, levels = levels(thrombo_net2$treatments)),
+         trt2 = factor(trt2, levels = levels(thrombo_net2$treatments)))
 
-  expect_identical(get_nodesplits(thrombo_net2), ns_gemtc)
+test_that("get_nodesplits() produces correct output for thombolytics network", {
+  expect_identical(get_nodesplits(thrombo_net2), ns_thrombo_gemtc)
 })
 
+park_net <- set_agd_arm(parkinsons, studyn, trtn, y = y, se = se, trt_ref = 1)
+
+# Compare to results in van Valkenhoef paper
+ns_park_vv <- tibble::tribble(
+  ~trt1, ~trt2,
+  1, 3,
+  1, 4,
+  2, 4,
+  3, 4
+) %>%
+  mutate(trt1 = factor(trt1, levels = levels(park_net$treatments)),
+         trt2 = factor(trt2, levels = levels(park_net$treatments)))
+
 test_that("get_nodesplits() produces correct output for parkinsons network", {
-  park_net <- set_agd_arm(parkinsons, studyn, trtn, y = y, se = se, trt_ref = 1)
+  expect_identical(get_nodesplits(park_net), ns_park_vv)
+})
 
-  # Compare to results in van Valkenhoef paper
-  ns_vv <- tibble::tribble(
-    ~trt1, ~trt2,
-    1, 3,
-    1, 4,
-    2, 4,
-    3, 4
-  ) %>%
-    mutate(trt1 = factor(trt1, levels = levels(park_net$treatments)),
-           trt2 = factor(trt2, levels = levels(park_net$treatments)))
+test_that("get_nodesplits() handles repeated treatment arms", {
+  thrombo_net_rep <- set_agd_arm(rbind(thrombolytics, thrombolytics[c(2, 5), ]),
+                                 studyn, trtn,
+                                 r = r, n = n)
 
-  expect_identical(get_nodesplits(park_net), ns_vv)
+  expect_identical(get_nodesplits(thrombo_net_rep), ns_thrombo_gemtc)
 })
 
 onestudy <- data.frame(study = 1, trt = 1:3, r = 1, n = 1)
