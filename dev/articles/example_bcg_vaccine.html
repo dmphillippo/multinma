@@ -202,7 +202,7 @@
 <span class="co">#&gt; lp__             1</span>
 <span class="co">#&gt; tau              1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Feb  7 17:01:29 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Feb 16 13:53:58 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -263,7 +263,7 @@
 <span class="co">#&gt; lp__                          -13448.20   767    1</span>
 <span class="co">#&gt; tau                                0.74   816    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Feb  7 17:01:47 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Feb 16 13:54:13 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -309,7 +309,9 @@
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, 
      pars <span class="op">=</span> <span class="st">"beta"</span>, 
      ref_line <span class="op">=</span> <span class="fl">0</span>,
-     stat <span class="op">=</span> <span class="st">"halfeye"</span><span class="op">)</span></code></pre></div>
+     stat <span class="op">=</span> <span class="st">"halfeye"</span><span class="op">)</span>
+<span class="co">#&gt; Warning: Computation failed in `stat_slabinterval()`:</span>
+<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
 <p><img src="example_bcg_vaccine_files/figure-html/bcg_vaccine_beta_lat-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>Altogether, we might prefer the model with the adjustment for latitude. When considering covariates in random effects models it is important not to just look at the DIC <span class="citation">(<a href="#ref-TSD3" role="doc-biblioref">Dias et al. 2011</a>)</span>. We should also consider any reductions in heterogeneity, and the estimated regression coefficients and their standard error. The DIC is not sensitive to changes in the heterogeneity, as RE models are very flexible and can fit the data well whatever the level of heterogeneity.</p>
 </div>
@@ -371,7 +373,17 @@
 <p>The <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method may be used to visually compare these estimates:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bcg_releff_lat</span>, 
-     ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
+     ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
+<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
+<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
+<span class="co">#&gt; Computation failed in `stat_pointinterval()`:</span>
+<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
+<span class="co">#&gt; Computation failed in `stat_pointinterval()`:</span>
+<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
+<span class="co">#&gt; Computation failed in `stat_pointinterval()`:</span>
+<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
+<span class="co">#&gt; Computation failed in `stat_pointinterval()`:</span>
+<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
 <p><img src="example_bcg_vaccine_files/figure-html/bcg_vaccine_releff_lat-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>A more sophisticated plot shows the regression line and confidence band for the effect of latitude, overlaid on the observed log odds ratios in each study:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
