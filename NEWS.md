@@ -2,6 +2,7 @@
 
 * Fix: Error in `get_nodesplits()` when studies have multiple arms of the same
 treatment.
+* Fix: CRAN warning regarding invalid img tag height attribute in documentation.
 
 # multinma 0.4.1
 
