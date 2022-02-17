@@ -75,7 +75,7 @@ print.nma_data <- function(x, ..., n = 10) {
     s_ipd <- x$ipd %>%
       dplyr::distinct(.data$.study, .data$.trt) %>%
       dplyr::group_by(.data$.study) %>%
-      dplyr::summarise(Treatments = glue::glue("{dplyr::n()}: ",
+      dplyr::summarise("Treatment arms" = glue::glue("{dplyr::n()}: ",
                                               glue::glue_collapse(.data$.trt, sep = " | ", width = 0.8*cwidth))) %>%
       dplyr::rename(Study = .data$.study) %>%
       as.data.frame()
@@ -86,9 +86,9 @@ print.nma_data <- function(x, ..., n = 10) {
 
   if (has_agd_arm(x)) {
     s_agd_arm <- x$agd_arm %>%
-      dplyr::distinct(.data$.study, .data$.trt) %>%
+      dplyr::arrange(.data$.study, .data$.trt) %>%
       dplyr::group_by(.data$.study) %>%
-      dplyr::summarise(Treatments = glue::glue("{dplyr::n()}: ",
+      dplyr::summarise("Treatment arms" = glue::glue("{dplyr::n()}: ",
                                               glue::glue_collapse(.data$.trt, sep = " | ", width = 0.8*cwidth))) %>%
       dplyr::rename(Study = .data$.study) %>%
       as.data.frame()
@@ -99,9 +99,9 @@ print.nma_data <- function(x, ..., n = 10) {
 
   if (has_agd_contrast(x)) {
     s_agd_contrast <- x$agd_contrast %>%
-      dplyr::distinct(.data$.study, .data$.trt) %>%
+      dplyr::arrange(.data$.study, .data$.trt) %>%
       dplyr::group_by(.data$.study) %>%
-      dplyr::summarise(Treatments = glue::glue("{dplyr::n()}: ",
+      dplyr::summarise("Treatment arms" = glue::glue("{dplyr::n()}: ",
                                                glue::glue_collapse(.data$.trt, sep = " | ", width = 0.8*cwidth))) %>%
       dplyr::rename(Study = .data$.study) %>%
       as.data.frame()
