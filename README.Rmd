@@ -62,7 +62,7 @@ Multilevel network meta-regression is set out in the following methods paper:
 ## Citing multinma
 The `multinma` package can be cited as follows:
 
-> Phillippo, D. M. (`r format(Sys.Date(), "%Y")`). _multinma: Network Meta-Analysis of Individual and Aggregate Data in Stan_. R package version `r getNamespaceVersion("multinma")`, doi: [10.5281/zenodo.3904454](https://doi.org/10.5281/zenodo.3904454).
+> Phillippo, D. M. (`r format(Sys.Date(), "%Y")`). _multinma: Bayesian Network Meta-Analysis of Individual and Aggregate Data_. R package version `r getNamespaceVersion("multinma")`, doi: [10.5281/zenodo.3904454](https://doi.org/10.5281/zenodo.3904454).
 
 When fitting ML-NMR models, please cite the methods paper:
 
