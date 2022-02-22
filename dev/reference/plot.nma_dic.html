@@ -160,13 +160,13 @@ National Institute for Health and Care Excellence.
 <span class="r-in"><span class="co"># \donttest{</span></span>
 <span class="r-in"><span class="co"># Compare DIC of FE and RE models</span></span>
 <span class="r-in"><span class="op">(</span><span class="va">smk_dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="dic.html">dic</a></span><span class="op">(</span><span class="va">smk_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 267.2<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 267.3<span style="color: #555555;"> (on 50 data points)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 27.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 294.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 294.4</span>
 <span class="r-in"><span class="op">(</span><span class="va">smk_dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="dic.html">dic</a></span><span class="op">(</span><span class="va">smk_fit_RE</span><span class="op">)</span><span class="op">)</span>   <span class="co"># substantially better fit</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 43.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 97.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54.1<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.1</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Plot residual deviance contributions under RE model</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_dic_RE</span><span class="op">)</span></span>
@@ -195,13 +195,13 @@ National Institute for Health and Care Excellence.
 <span class="r-in"><span class="co"># \donttest{</span></span>
 <span class="r-in"><span class="co"># Compare DIC</span></span>
 <span class="r-in"><span class="va">smk_dic_RE</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 43.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 97.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54.1<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.1</span>
 <span class="r-in"><span class="op">(</span><span class="va">smk_dic_RE_UME</span> <span class="op">&lt;-</span> <span class="fu"><a href="dic.html">dic</a></span><span class="op">(</span><span class="va">smk_fit_RE_UME</span><span class="op">)</span><span class="op">)</span>  <span class="co"># no difference in fit</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.9<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54<span style="color: #555555;"> (on 50 data points)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 45.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 99.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 99.2</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Compare residual deviance contributions with a "dev-dev" plot</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_dic_RE</span>, <span class="va">smk_dic_RE_UME</span><span class="op">)</span></span>

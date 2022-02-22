@@ -126,13 +126,13 @@ parameter names.</p>
 <span class="r-in"><span class="co"># This can then be printed or plotted</span></span>
 <span class="r-in"><span class="va">smk_OR_RE</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]      3.35 1.73 1.33 2.25 2.98 4.03  7.69     1644     1670</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling] 2.40 0.63 1.49 1.99 2.32 2.70  3.82     1126     1729</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]              1.80 0.78 0.78 1.27 1.64 2.14  3.79     1931     2222</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]      3.42 1.83 1.30 2.26 3.02 4.06  8.15     1957     2263</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling] 2.44 0.67 1.50 2.02 2.35 2.74  3.99     1160     1667</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]              1.81 0.82 0.75 1.27 1.64 2.17  3.97     1717     1886</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]      1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling] 1.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]              1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]         1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                 1</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_OR_RE</span>, ref_line <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Computation failed in `stat_pointinterval()`:</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> object 'median_qi' of mode 'function' was not found</span>
@@ -148,7 +148,7 @@ parameter names.</p>
 <span class="r-in"><span class="co"># Summarise</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">tausq_array</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       mean   sd 2.5% 25%  50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tausq 0.75 0.35 0.31 0.5 0.67 0.9  1.63     1189     1559    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tausq 0.74 0.36 0.29 0.5 0.67 0.9  1.65     1068     1846    1</span>
 <span class="r-in"><span class="co"># }</span></span>
 </code></pre></div>
     </div>
