@@ -1,4 +1,5 @@
-This update fixes a bug introduced with tidyr 1.2.0
+This update fixes an invalid img tag height attribute in the documentation, as
+per email from CRAN.
 
 ## Test environments
 * local R installation (Windows 10), R 4.1.2
