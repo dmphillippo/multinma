@@ -53,7 +53,7 @@ See the installation guide [here](https://github.com/stan-dev/rstan/wiki/RStan-G
 A good place to start is with the package vignettes which walk through example analyses, see `vignette("vignette_overview")` for an overview.
 The series of NICE Technical Support Documents on evidence synthesis gives a detailed introduction to network meta-analysis:
 
-> Dias, S. et al. (2011). "NICE DSU Technical Support Documents 1-7: Evidence Synthesis for Decision Making." _National Institute for Health and Care Excellence._ Available from http://nicedsu.org.uk/.
+> Dias, S. et al. (2011). "NICE DSU Technical Support Documents 1-7: Evidence Synthesis for Decision Making." _National Institute for Health and Care Excellence._ Available from https://nicedsu.sites.sheffield.ac.uk.
 
 Multilevel network meta-regression is set out in the following methods paper:
 

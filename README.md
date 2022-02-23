@@ -56,7 +56,8 @@ gives a detailed introduction to network meta-analysis:
 
 > Dias, S. et al. (2011). “NICE DSU Technical Support Documents 1-7:
 > Evidence Synthesis for Decision Making.” *National Institute for
-> Health and Care Excellence.* Available from <http://nicedsu.org.uk/>.
+> Health and Care Excellence.* Available from
+> <https://nicedsu.sites.sheffield.ac.uk>.
 
 Multilevel network meta-regression is set out in the following methods
 paper:
