@@ -187,10 +187,10 @@
 <span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                     mean se_mean   sd     2.5%      25%      50%      75%    97.5% n_eff Rhat</span>
-<span class="co">#&gt; d[Beta Blocker]    -0.26    0.00 0.05    -0.36    -0.29    -0.26    -0.23    -0.16  3155    1</span>
-<span class="co">#&gt; lp__            -5960.33    0.08 3.33 -5967.88 -5962.38 -5959.97 -5957.90 -5954.79  1581    1</span>
+<span class="co">#&gt; d[Beta Blocker]    -0.26    0.00 0.05    -0.36    -0.30    -0.26    -0.23    -0.16  3390    1</span>
+<span class="co">#&gt; lp__            -5960.29    0.08 3.43 -5968.13 -5962.42 -5959.95 -5957.80 -5954.64  1703    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Feb 22 13:55:26 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sun Feb 27 11:50:48 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -232,11 +232,11 @@
 <span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;                     mean se_mean   sd     2.5%      25%      50%      75%    97.5% n_eff Rhat</span>
-<span class="co">#&gt; d[Beta Blocker]    -0.25    0.00 0.06    -0.37    -0.29    -0.25    -0.21    -0.12  3208    1</span>
-<span class="co">#&gt; lp__            -5970.85    0.17 5.67 -5982.60 -5974.60 -5970.55 -5966.82 -5960.64  1080    1</span>
-<span class="co">#&gt; tau                 0.13    0.00 0.08     0.01     0.07     0.12     0.18     0.32  1046    1</span>
+<span class="co">#&gt; d[Beta Blocker]    -0.25    0.00 0.07    -0.38    -0.29    -0.25    -0.20    -0.11  2542    1</span>
+<span class="co">#&gt; lp__            -5970.83    0.18 5.56 -5982.26 -5974.41 -5970.66 -5966.97 -5960.67   993    1</span>
+<span class="co">#&gt; tau                 0.14    0.00 0.08     0.01     0.08     0.13     0.19     0.33   830    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Feb 22 13:55:36 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sun Feb 27 11:50:57 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -255,14 +255,14 @@
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">blocker_fit_FE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 46.7<span style="color: #555555;"> (on 44 data points)</span></span>
-<span class="co">#&gt;                pD: 23</span>
-<span class="co">#&gt;               DIC: 69.7</span></code></pre></div>
+<span class="co">#&gt; Residual deviance: 46.6<span style="color: #555555;"> (on 44 data points)</span></span>
+<span class="co">#&gt;                pD: 22.9</span>
+<span class="co">#&gt;               DIC: 69.5</span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">blocker_fit_RE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; Residual deviance: 42<span style="color: #555555;"> (on 44 data points)</span></span>
-<span class="co">#&gt;                pD: 28.1</span>
-<span class="co">#&gt;               DIC: 70.1</span></code></pre></div>
+<span class="co">#&gt;                pD: 28.5</span>
+<span class="co">#&gt;               DIC: 70.5</span></code></pre></div>
 <p>The residual deviance is lower under the RE model, which is to be expected as this model is more flexible. However, this comes with an increased effective number of parameters (note the increase in <span class="math inline">\(p_D\)</span>). As a result, the DIC of both models is very similar and the FE model may be preferred for parsimony.</p>
 <p>We can also examine the residual deviance contributions with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
@@ -284,8 +284,8 @@
                    type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
 <span class="va">pred_FE</span>
 <span class="co">#&gt;                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[Control]      0.11 0.06 0.04 0.07 0.10 0.14  0.25     3431     3390    1</span>
-<span class="co">#&gt; pred[Beta Blocker] 0.09 0.05 0.03 0.06 0.08 0.11  0.20     3500     3581    1</span>
+<span class="co">#&gt; pred[Control]      0.11 0.05 0.04 0.07 0.10 0.14  0.24     4117     3760    1</span>
+<span class="co">#&gt; pred[Beta Blocker] 0.09 0.04 0.03 0.06 0.08 0.11  0.19     4130     3799    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_FE</span><span class="op">)</span>
 <span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
 <span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
@@ -296,8 +296,8 @@
                    type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
 <span class="va">pred_RE</span>
 <span class="co">#&gt;                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[Control]      0.11 0.05 0.04 0.07 0.10 0.14  0.25     3932     3775    1</span>
-<span class="co">#&gt; pred[Beta Blocker] 0.09 0.05 0.03 0.06 0.08 0.11  0.20     3911     3892    1</span>
+<span class="co">#&gt; pred[Control]      0.11 0.05 0.04 0.07 0.10 0.14  0.24     4122     3729    1</span>
+<span class="co">#&gt; pred[Beta Blocker] 0.09 0.05 0.03 0.06 0.08 0.11  0.20     4059     3721    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_RE</span><span class="op">)</span>
 <span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
 <span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
@@ -310,8 +310,8 @@
                         type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
 <span class="va">pred_FE_beta</span>
 <span class="co">#&gt;                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[Control]      0.11 0.05 0.03 0.07 0.10 0.14  0.23     3798     3922    1</span>
-<span class="co">#&gt; pred[Beta Blocker] 0.09 0.04 0.02 0.06 0.08 0.11  0.19     3802     3883    1</span>
+<span class="co">#&gt; pred[Control]      0.11 0.05 0.03 0.07 0.10 0.14  0.24     3969     3830    1</span>
+<span class="co">#&gt; pred[Beta Blocker] 0.09 0.04 0.03 0.06 0.08 0.11  0.19     3975     3847    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_FE_beta</span><span class="op">)</span>
 <span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
 <span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
@@ -323,8 +323,8 @@
                         type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
 <span class="va">pred_RE_beta</span>
 <span class="co">#&gt;                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; pred[Control]      0.11 0.05 0.03 0.07 0.10 0.14  0.23     3888     3862    1</span>
-<span class="co">#&gt; pred[Beta Blocker] 0.09 0.04 0.03 0.06 0.08 0.11  0.19     3877     3760    1</span>
+<span class="co">#&gt; pred[Control]      0.11 0.05 0.03 0.07 0.11 0.14  0.23     4082     3707    1</span>
+<span class="co">#&gt; pred[Beta Blocker] 0.09 0.04 0.03 0.06 0.08 0.12  0.20     4054     3725    1</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_RE_beta</span><span class="op">)</span>
 <span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
 <span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
