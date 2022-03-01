@@ -208,7 +208,7 @@
 <span class="co">#&gt; d[5] -0.30    0.00 0.21  -0.71 -0.44 -0.30 -0.17  0.10  2401    1</span>
 <span class="co">#&gt; lp__ -6.63    0.06 2.35 -12.04 -7.99 -6.28 -4.92 -3.10  1719    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sun Feb 27 11:55:00 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Mar  1 00:38:44 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -269,7 +269,7 @@
 <span class="co">#&gt; lp__ -12.88    0.10 3.62 -21.03 -15.18 -12.48 -10.28 -6.78  1268 1.00</span>
 <span class="co">#&gt; tau    0.38    0.01 0.38   0.01   0.12   0.27   0.51  1.43   776 1.01</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sun Feb 27 11:55:11 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Mar  1 00:38:55 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -317,9 +317,7 @@
 <span class="co">#&gt; d[2] -1.81 0.34 -2.49 -2.04 -1.81 -1.59 -1.15     5966     2868    1</span>
 <span class="co">#&gt; d[3] -0.49 0.48 -1.41 -0.82 -0.50 -0.18  0.44     2452     2664    1</span>
 <span class="co">#&gt; d[5] -0.83 0.51 -1.83 -1.17 -0.83 -0.48  0.16     1727     2595    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_releff_FE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_releff_FE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/arm_releff_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">arm_releff_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">arm_fit_RE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
@@ -328,9 +326,7 @@
 <span class="co">#&gt; d[2] -1.84 0.51 -2.87 -2.12 -1.83 -1.54 -0.88     4112     2809    1</span>
 <span class="co">#&gt; d[3] -0.51 0.63 -1.75 -0.89 -0.50 -0.12  0.73     3255     2872    1</span>
 <span class="co">#&gt; d[5] -0.85 0.77 -2.38 -1.26 -0.83 -0.41  0.62     1917     1749    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/arm_releff_RE-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method, where the <code>baseline</code> argument takes a <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the corresponding Normal distribution, and we specify <code>trt_ref = 1</code> to indicate that the baseline distribution corresponds to treatment 1. (Strictly speaking, <code>type = "response"</code> is unnecessary here, since the identity link function was used.)</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
@@ -345,9 +341,7 @@
 <span class="co">#&gt; pred[2] -2.54 0.40 -3.32 -2.82 -2.53 -2.27 -1.77     4862     3580    1</span>
 <span class="co">#&gt; pred[3] -1.22 0.53 -2.24 -1.58 -1.23 -0.87 -0.17     2583     3165    1</span>
 <span class="co">#&gt; pred[5] -1.56 0.56 -2.65 -1.94 -1.56 -1.18 -0.48     1862     2737    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_pred_FE</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_pred_FE</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/arm_pred_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">arm_pred_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">arm_fit_RE</span>, 
@@ -361,9 +355,7 @@
 <span class="co">#&gt; pred[2] -2.57 0.56 -3.65 -2.90 -2.56 -2.22 -1.50     4130     2500    1</span>
 <span class="co">#&gt; pred[3] -1.24 0.67 -2.53 -1.64 -1.23 -0.82  0.02     3426     3011    1</span>
 <span class="co">#&gt; pred[5] -1.57 0.80 -3.17 -2.03 -1.57 -1.10 -0.09     2004     1893    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_pred_RE</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_pred_RE</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/arm_pred_RE-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>If the <code>baseline</code> argument is omitted, predictions of mean off-time reduction will be produced for every study in the network based on their estimated baseline response <span class="math inline">\(\mu_j\)</span>:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
@@ -431,21 +423,7 @@
 <span class="co">#&gt; pred[7: 2] -3.09 0.53 -4.13 -3.44 -3.09 -2.72 -2.03     1833     2704    1</span>
 <span class="co">#&gt; pred[7: 3] -1.77 0.36 -2.47 -2.00 -1.77 -1.53 -1.04     2388     2556    1</span>
 <span class="co">#&gt; pred[7: 5] -2.10 0.20 -2.49 -2.24 -2.10 -1.97 -1.72     4280     3521    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_pred_FE_studies</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
-<span class="co">#&gt; Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
-<span class="co">#&gt; Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
-<span class="co">#&gt; Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
-<span class="co">#&gt; Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
-<span class="co">#&gt; Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
-<span class="co">#&gt; Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_pred_FE_studies</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/arm_pred_RE_all-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
@@ -456,11 +434,7 @@
 <span class="co">#&gt; rank[2] 1.05 0.25    1   1   1   1     2     3106     3099    1</span>
 <span class="co">#&gt; rank[3] 3.51 0.91    2   3   4   4     5     2884       NA    1</span>
 <span class="co">#&gt; rank[5] 2.26 0.65    1   2   2   2     4     2386     2538    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_ranks</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
-<span class="co">#&gt; Warning: Position guide is perpendicular to the intended axis. Did you mean to specify a</span>
-<span class="co">#&gt; different guide `position`?</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_ranks</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/parkinsons_arm_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">arm_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">arm_fit_FE</span><span class="op">)</span><span class="op">)</span>
@@ -558,7 +532,7 @@
 <span class="co">#&gt; d[5] -0.30    0.00 0.21 -0.70 -0.44 -0.30 -0.16  0.12  3772    1</span>
 <span class="co">#&gt; lp__ -3.16    0.04 1.41 -6.68 -3.86 -2.84 -2.11 -1.39  1572    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sun Feb 27 11:55:28 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Mar  1 00:39:14 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -610,7 +584,7 @@
 <span class="co">#&gt; lp__ -8.18    0.08 2.86 -14.57 -9.85 -7.85 -6.17 -3.55  1217    1</span>
 <span class="co">#&gt; tau   0.38    0.01 0.37   0.01  0.13  0.29  0.52  1.33   948    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sun Feb 27 11:55:35 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Mar  1 00:39:21 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -658,9 +632,7 @@
 <span class="co">#&gt; d[2] -1.81 0.33 -2.46 -2.03 -1.81 -1.59 -1.17     5439     2816    1</span>
 <span class="co">#&gt; d[3] -0.47 0.50 -1.48 -0.78 -0.46 -0.15  0.51     3016     2726    1</span>
 <span class="co">#&gt; d[5] -0.81 0.53 -1.89 -1.16 -0.81 -0.46  0.21     2455     2499    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_releff_FE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_releff_FE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/contr_releff_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">contr_releff_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">contr_fit_RE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
@@ -669,9 +641,7 @@
 <span class="co">#&gt; d[2] -1.84 0.49 -2.86 -2.12 -1.83 -1.56 -0.90     3458     2342    1</span>
 <span class="co">#&gt; d[3] -0.50 0.63 -1.72 -0.89 -0.49 -0.11  0.74     3265     2484    1</span>
 <span class="co">#&gt; d[5] -0.83 0.75 -2.27 -1.27 -0.81 -0.40  0.65     2150     1713    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/contr_releff_RE-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method, where the <code>baseline</code> argument takes a <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the corresponding Normal distribution, and we specify <code>trt_ref = 1</code> to indicate that the baseline distribution corresponds to treatment 1. (Strictly speaking, <code>type = "response"</code> is unnecessary here, since the identity link function was used.)</p>
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
@@ -686,9 +656,7 @@
 <span class="co">#&gt; pred[2] -2.54 0.40 -3.30 -2.81 -2.54 -2.28 -1.75     4680     3602    1</span>
 <span class="co">#&gt; pred[3] -1.20 0.55 -2.29 -1.57 -1.18 -0.82 -0.14     3202     3030    1</span>
 <span class="co">#&gt; pred[5] -1.54 0.57 -2.68 -1.92 -1.54 -1.14 -0.44     2550     2990    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_pred_FE</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_pred_FE</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/contr_pred_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">contr_pred_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">contr_fit_RE</span>, 
@@ -702,9 +670,7 @@
 <span class="co">#&gt; pred[2] -2.57 0.54 -3.70 -2.89 -2.56 -2.25 -1.55     3441     2438    1</span>
 <span class="co">#&gt; pred[3] -1.23 0.67 -2.53 -1.65 -1.22 -0.82  0.05     3349     2601    1</span>
 <span class="co">#&gt; pred[5] -1.56 0.78 -3.06 -2.03 -1.56 -1.10 -0.01     2166     1880    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_pred_RE</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_pred_RE</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/contr_pred_RE-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>If the <code>baseline</code> argument is omitted an error will be raised, as there are no study baselines estimated in this network.</p>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
@@ -719,11 +685,7 @@
 <span class="co">#&gt; rank[2] 1.05 0.29    1   1   1   1     2     2698     2751    1</span>
 <span class="co">#&gt; rank[3] 3.51 0.92    2   3   4   4     5     3706       NA    1</span>
 <span class="co">#&gt; rank[5] 2.28 0.67    1   2   2   2     4     2916     2847    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_ranks</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
-<span class="co">#&gt; Warning: Position guide is perpendicular to the intended axis. Did you mean to specify a</span>
-<span class="co">#&gt; different guide `position`?</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_ranks</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/parkinsons_contr_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">contr_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">contr_fit_FE</span><span class="op">)</span><span class="op">)</span>
@@ -856,7 +818,7 @@
 <span class="co">#&gt; d[5] -0.29    0.00 0.21 -0.70 -0.43 -0.30 -0.16  0.12  3097    1</span>
 <span class="co">#&gt; lp__ -4.54    0.04 1.87 -9.07 -5.58 -4.19 -3.16 -1.92  1807    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sun Feb 27 11:55:46 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Mar  1 00:39:34 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -917,7 +879,7 @@
 <span class="co">#&gt; lp__ -10.79    0.10 3.26 -17.96 -12.82 -10.48 -8.47 -5.21  1130 1.00</span>
 <span class="co">#&gt; tau    0.40    0.01 0.40   0.01   0.13   0.28  0.52  1.53   724 1.01</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sun Feb 27 11:55:58 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Mar  1 00:39:46 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -965,9 +927,7 @@
 <span class="co">#&gt; d[2] -1.82 0.33 -2.46 -2.04 -1.82 -1.59 -1.15     5684     3358    1</span>
 <span class="co">#&gt; d[3] -0.46 0.47 -1.40 -0.78 -0.47 -0.15  0.49     2261     2677    1</span>
 <span class="co">#&gt; d[5] -0.79 0.52 -1.80 -1.15 -0.80 -0.44  0.22     1470     2371    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_releff_FE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_releff_FE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_releff_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">mix_releff_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">mix_fit_RE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
@@ -976,9 +936,7 @@
 <span class="co">#&gt; d[2] -1.83 0.51 -2.87 -2.13 -1.84 -1.54 -0.84     4042     2535    1</span>
 <span class="co">#&gt; d[3] -0.48 0.66 -1.74 -0.88 -0.49 -0.07  0.78     2691     2108    1</span>
 <span class="co">#&gt; d[5] -0.82 0.76 -2.27 -1.27 -0.83 -0.37  0.71     1513     1435    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_releff_RE-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method, where the <code>baseline</code> argument takes a <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the corresponding Normal distribution, and we specify <code>trt_ref = 1</code> to indicate that the baseline distribution corresponds to treatment 1. (Strictly speaking, <code>type = "response"</code> is unnecessary here, since the identity link function was used.)</p>
 <div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
@@ -993,9 +951,7 @@
 <span class="co">#&gt; pred[2] -2.54 0.39 -3.30 -2.80 -2.54 -2.28 -1.76     4755     3768    1</span>
 <span class="co">#&gt; pred[3] -1.18 0.52 -2.19 -1.54 -1.19 -0.83 -0.17     2371     2548    1</span>
 <span class="co">#&gt; pred[5] -1.51 0.56 -2.61 -1.89 -1.52 -1.14 -0.40     1612     2458    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_pred_FE</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_pred_FE</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_pred_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mix_pred_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mix_fit_RE</span>, 
@@ -1009,9 +965,7 @@
 <span class="co">#&gt; pred[2] -2.56 0.55 -3.69 -2.91 -2.56 -2.23 -1.48     4009     2874    1</span>
 <span class="co">#&gt; pred[3] -1.21 0.70 -2.57 -1.65 -1.21 -0.77  0.10     2651     2137    1</span>
 <span class="co">#&gt; pred[5] -1.55 0.79 -3.08 -2.03 -1.56 -1.08  0.00     1605     1368    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_pred_RE</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_pred_RE</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_pred_RE-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>If the <code>baseline</code> argument is omitted, predictions of mean off-time reduction will be produced for every <em>arm-based</em> study in the network based on their estimated baseline response <span class="math inline">\(\mu_j\)</span>:</p>
 <div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
@@ -1043,13 +997,7 @@
 <span class="co">#&gt; pred[3: 2] -2.42 0.38 -3.17 -2.66 -2.41 -2.16 -1.68     3626     2831    1</span>
 <span class="co">#&gt; pred[3: 3] -1.06 0.46 -1.95 -1.37 -1.06 -0.74 -0.17     2744     2788    1</span>
 <span class="co">#&gt; pred[3: 5] -1.39 0.47 -2.30 -1.71 -1.40 -1.07 -0.47     1920     2547    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_pred_FE_studies</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
-<span class="co">#&gt; Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
-<span class="co">#&gt; Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_pred_FE_studies</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_pred_FE_all-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.</p>
 <div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
@@ -1060,11 +1008,7 @@
 <span class="co">#&gt; rank[2] 1.04 0.24    1   1   1   1     2     2359     2422    1</span>
 <span class="co">#&gt; rank[3] 3.52 0.91    2   3   4   4     5     2879       NA    1</span>
 <span class="co">#&gt; rank[5] 2.29 0.68    1   2   2   2     4     2311     2581    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_ranks</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
-<span class="co">#&gt; Warning: Position guide is perpendicular to the intended axis. Did you mean to specify a</span>
-<span class="co">#&gt; different guide `position`?</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_ranks</span><span class="op">)</span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/parkinsons_mix_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">mix_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">mix_fit_FE</span><span class="op">)</span><span class="op">)</span>

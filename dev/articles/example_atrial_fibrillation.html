@@ -250,7 +250,7 @@
 <span class="co">#&gt; lp__                                         -4766.75 -4758.44  1056    1</span>
 <span class="co">#&gt; tau                                              0.37     0.59   696    1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sun Feb 27 11:49:10 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Mar  1 00:32:36 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -301,9 +301,7 @@
 <span class="co">#&gt; d[Ximelagatran]                                  1993    1</span></code></pre></div>
 <p>These estimates can easily be plotted with the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_releff</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_releff</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_releff_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -344,11 +342,7 @@
 <span class="co">#&gt; rank[Placebo/Standard care]                         3229    1</span>
 <span class="co">#&gt; rank[Triflusal]                                       NA    1</span>
 <span class="co">#&gt; rank[Ximelagatran]                                  1879    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_ranks</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
-<span class="co">#&gt; Warning: Position guide is perpendicular to the intended axis. Did you mean to specify a</span>
-<span class="co">#&gt; different guide `position`?</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_ranks</span><span class="op">)</span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">af_1_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">af_fit_1</span><span class="op">)</span><span class="op">)</span>
@@ -576,7 +570,7 @@
 <span class="co">#&gt; lp__                                         -4766.29 -4758.77  1191 1.00</span>
 <span class="co">#&gt; tau                                              0.26     0.50   368 1.01</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sun Feb 27 11:49:49 2022.</span>
+<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Mar  1 00:33:17 2022.</span>
 <span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
@@ -682,17 +676,11 @@
 <span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                        0.20     4906     2727    1</span>
 <span class="co">#&gt; d[stroke = 1: Triflusal]                                  1.67     6141     2917    1</span>
 <span class="co">#&gt; d[stroke = 1: Ximelagatran]                              -0.55     4177     2573    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_releff_01</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
-<span class="co">#&gt; Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_releff_01</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_releff_01_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>The estimated class interactions (against the reference “Mixed” class) are very uncertain.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, pars <span class="op">=</span> <span class="st">"beta"</span>, stat <span class="op">=</span> <span class="st">"halfeye"</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_slabinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, pars <span class="op">=</span> <span class="st">"beta"</span>, stat <span class="op">=</span> <span class="st">"halfeye"</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_betas-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>The interactions are more straightforward to interpret if we transform the interaction coefficients (using the consistency equations) so that they are against the control class:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
@@ -716,9 +704,7 @@
 <span class="co">#&gt; beta[.trtclassAnti-coagulant:stroke]     2302    1</span>
 <span class="co">#&gt; beta[.trtclassAnti-platelet:stroke]      2948    1</span>
 <span class="co">#&gt; beta[.trtclassMixed:stroke]              2977    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">af_4b_beta</span><span class="op">)</span>, stat <span class="op">=</span> <span class="st">"halfeye"</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_slabinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">af_4b_beta</span><span class="op">)</span>, stat <span class="op">=</span> <span class="st">"halfeye"</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_betas_transformed-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>There is some evidence that the effect of anti-coagulants increases (compared to control) with prior stroke. There is little evidence the effect of anti-platelets reduces with prior stroke, although the point estimate represents a substantial reduction in effectiveness, and the 95% Credible Interval includes values that correspond to substantial increases in treatment effect. The interaction effect of stroke on mixed treatments is very uncertain, but potentially indicates a substantial reduction in treatment effects with prior stroke.</p>
 <p>We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities. By default (without the <code>newdata</code> argument specified), these are produced at the value of <code>stroke</code> for each study in the network in turn. To instead produce rankings for when no individuals or all individuals have prior stroke, we specify the <code>newdata</code> argument.</p>
@@ -812,13 +798,7 @@
 <span class="co">#&gt; rank[stroke = 1: Placebo/Standard care]                         4775     2668    1</span>
 <span class="co">#&gt; rank[stroke = 1: Triflusal]                                     4711     2930    1</span>
 <span class="co">#&gt; rank[stroke = 1: Ximelagatran]                                  3077     2593    1</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_ranks</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
-<span class="co">#&gt; Computation failed in `stat_pointinterval()`:</span>
-<span class="co">#&gt; object 'median_qi' of mode 'function' was not found</span>
-<span class="co">#&gt; Warning: Position guide is perpendicular to the intended axis. Did you mean to specify a different guide `position`?</span>
-<span class="co">#&gt; Position guide is perpendicular to the intended axis. Did you mean to specify a different guide `position`?</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_ranks</span><span class="op">)</span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">(</span><span class="va">af_4b_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">af_fit_4b</span>,
