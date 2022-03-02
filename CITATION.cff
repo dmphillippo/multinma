@@ -8,7 +8,7 @@ message: 'To cite package "multinma" in publications use:'
 type: software
 license: GPL-3.0-only
 title: 'multinma: Bayesian Network Meta-Analysis of Individual and Aggregate Data'
-version: 0.4.1.9000
+version: 0.4.2
 doi: 10.5281/zenodo.3904454
 abstract: Network meta-analysis and network meta-regression models for aggregate data,
   individual patient data, and mixtures of both individual and aggregate data using
@@ -28,7 +28,7 @@ preferred-citation:
     email: david.phillippo@bristol.ac.uk
     orcid: https://orcid.org/0000-0003-2672-7841
   year: '2022'
-  notes: R package version 0.4.1.9000
+  notes: R package version 0.4.2
   url: https://dmphillippo.github.io/multinma/
   doi: 10.5281/zenodo.3904454
 repository: https://CRAN.R-project.org/package=multinma
@@ -442,6 +442,7 @@ references:
     given-names: Matthew
     email: mjskay@northwestern.edu
   year: '2022'
+  url: https://CRAN.R-project.org/package=ggdist
   version: '>= 2.1.1'
 - type: software
   title: truncdist

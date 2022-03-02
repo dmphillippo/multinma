@@ -1,4 +1,4 @@
-# multinma 0.4.1.9000
+# multinma 0.4.2
 
 * Fix: Error in `get_nodesplits()` when studies have multiple arms of the same
 treatment.
