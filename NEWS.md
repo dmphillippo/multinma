@@ -1,3 +1,11 @@
+# multinma 0.4.2
+
+* Fix: Error in `get_nodesplits()` when studies have multiple arms of the same
+treatment.
+* Fix: `print.nma_data()` now prints the repeated arms when studies have
+multiple arms of the same treatment.
+* Fix: CRAN warning regarding invalid img tag height attribute in documentation.
+
 # multinma 0.4.1
 
 * Fix: tidyr v1.2.0 breaks ordered multinomial models when some studies do not

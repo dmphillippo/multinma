@@ -170,7 +170,7 @@ thrombo_nodesplit <- nma(thrombo_net2,
 
 The `summary()` method summarises the node-splitting results, displaying the direct and indirect estimates $d_\mathrm{dir}$ and $d_\mathrm{ind}$ from each node-split model, the network estimate $d_\mathrm{net}$ from the consistency model, the inconsistency factor $\omega = d_\mathrm{dir} - d_\mathrm{ind}$, and a Bayesian $p$-value for inconsistency on each comparison.
 The DIC model fit statistics are also provided.
-(If a random effects model was fitted, the heterogeneity standard deviation $tau$ under each node-split model and under the consistency model would also be displayed.)
+(If a random effects model was fitted, the heterogeneity standard deviation $\tau$ under each node-split model and under the consistency model would also be displayed.)
 ```{r}
 summary(thrombo_nodesplit)
 ```

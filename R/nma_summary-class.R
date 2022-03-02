@@ -149,7 +149,7 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #'   produce medians and 95% Credible Intervals with 66% inner bands.
 #'   Additional arguments in `...` are passed to the `ggdist` stat, to
 #'   customise the output. For example, to produce means and Credible Intervals,
-#'   specify `point_interval = mean_qi`. To produce an 80% Credible Interval
+#'   specify `point_interval = "mean_qi"`. To produce an 80% Credible Interval
 #'   with no inner band, specify `.width = c(0, 0.8)`.
 #'
 #'   Alternative stats can be specified to produce different summaries. For

@@ -1,8 +1,8 @@
 
 bibentry(bibtype = "Manual",
-         title = "multinma: Network Meta-Analysis of Individual and Aggregate Data in Stan",
+         title = "multinma: Bayesian Network Meta-Analysis of Individual and Aggregate Data",
          author = person(c("David", "M."), "Phillippo"),
-         year = substr(meta$Date, 1, 4),
+         year = ifelse(is.null(meta$Date), "2022", substr(meta$Date, 1, 4)),
          note = sprintf("R package version %s", meta$Version),
          url = "https://dmphillippo.github.io/multinma/",
          doi = "10.5281/zenodo.3904454",
