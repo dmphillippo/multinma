@@ -20,7 +20,7 @@ posterior_ranks() or posterior_rank_probs())."><meta property="og:image" content
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -139,7 +139,7 @@ plotting stats provided by <code>ggdist</code> may be used, via the argument
 produce medians and 95% Credible Intervals with 66% inner bands.
 Additional arguments in <code>...</code> are passed to the <code>ggdist</code> stat, to
 customise the output. For example, to produce means and Credible Intervals,
-specify <code>point_interval = mean_qi</code>. To produce an 80% Credible Interval
+specify <code>point_interval = "mean_qi"</code>. To produce an 80% Credible Interval
 with no inner band, specify <code>.width = c(0, 0.8)</code>.</p>
 <p>Alternative stats can be specified to produce different summaries. For
 example, specify <code>stat = "[half]eye"</code> to produce (half) eye plots, or <code>stat = "histinterval"</code> to produce histograms with intervals.</p>

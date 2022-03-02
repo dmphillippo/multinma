@@ -16,7 +16,7 @@ available in the global environment.'><meta property="og:image" content="https:/
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -108,9 +108,9 @@ available in the global environment.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> A network with 24 AgD studies (arm-based).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">-------------------------------------------------------</span> <span style="font-weight: bold;">AgD studies (arm-based)</span> <span style="color: #555555;">----</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Study Treatments                                                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1     3: No intervention | Individual counselling | Group counselling</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2     3: Self-help | Individual counselling | Group counselling      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Study Treatment arms                                                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1     3: No intervention | Group counselling | Individual counselling</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2     3: Group counselling | Individual counselling | Self-help      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  3     2: No intervention | Individual counselling                    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  4     2: No intervention | Individual counselling                    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  5     2: No intervention | Individual counselling                    </span>
@@ -143,19 +143,19 @@ available in the global environment.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                               mean se_mean   sd     2.5%      25%      50%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          1.10    0.01 0.43     0.24     0.82     1.10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     0.85    0.01 0.25     0.40     0.68     0.84</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  0.50    0.01 0.42    -0.31     0.23     0.49</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -5768.08    0.21 6.61 -5781.59 -5772.50 -5767.83</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau                           0.84    0.01 0.19     0.55     0.71     0.81</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          1.09    0.01 0.44     0.26     0.80     1.08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     0.84    0.01 0.24     0.39     0.68     0.84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  0.50    0.01 0.40    -0.27     0.23     0.49</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -5768.29    0.21 6.53 -5782.00 -5772.53 -5767.99</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau                           0.84    0.01 0.19     0.54     0.71     0.81</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                75%    97.5% n_eff Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          1.39     1.95  1504    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     1.01     1.37   887    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  0.75     1.33  1188    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -5763.29 -5756.04   990    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau                           0.94     1.28  1159    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          1.37     2.01  2005    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     1.00     1.34  1256    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  0.76     1.27  1773    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -5763.70 -5756.23   930    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau                           0.94     1.26   936    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Fri Feb  4 17:00:57 2022.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Wed Mar  2 15:23:33 2022.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
