@@ -668,6 +668,9 @@ has_indirect <- function(network, trt1, trt2) {
 #' @param weight_nodes Weight nodes by the total sample size? Default is `FALSE`.
 #' @param show_trt_class Colour treatment nodes by class, if `trt_class` is set?
 #'   Default is `FALSE`.
+#' @param nudge Numeric value to nudge the treatment labels away from the nodes
+#'   when `weight_nodes = TRUE`. Default is `0` (no adjustment to label
+#'   position). A small value like `0.1` is usually sufficient.
 #'
 #' @details The default is equivalent to `layout = "linear"` and `circular =
 #'   TRUE`, which places the treatment nodes on a circle in the order defined by
@@ -704,6 +707,9 @@ has_indirect <- function(network, trt1, trt2) {
 #' # Colour treatment nodes by class
 #' plot(af_net, weight_nodes = TRUE, show_trt_class = TRUE)
 #'
+#' # Nudge the treatment labels away from the nodes
+#' plot(af_net, weight_nodes = TRUE, show_trt_class = TRUE, nudge = 0.1)
+#'
 #' # Output may be customised using standard ggplot commands
 #' # For example, to display the legends below the plot:
 #' plot(af_net, weight_nodes = TRUE, show_trt_class = TRUE) +
@@ -719,7 +725,7 @@ has_indirect <- function(network, trt1, trt2) {
 #'
 plot.nma_data <- function(x, ..., layout, circular,
                           weight_edges = TRUE, weight_nodes = FALSE,
-                          show_trt_class = FALSE) {
+                          show_trt_class = FALSE, nudge = 0) {
   if (missing(layout) && missing(circular)) {
     layout <- "linear"
     circular <- TRUE
@@ -745,6 +751,9 @@ plot.nma_data <- function(x, ..., layout, circular,
   if (show_trt_class && is.null(x$classes))
     abort(paste("Treatment classes not specified in network.",
                 "Specify `trt_class` in set_*(), or set show_trt_class = FALSE.", sep = "\n"))
+
+  if (!rlang::is_double(nudge, n = 1, finite = TRUE))
+    abort("`nudge` must be a single numeric value")
 
   dat_mixed <- has_ipd(x) && (has_agd_arm(x) || has_agd_contrast(x))
   g <- ggraph::ggraph(igraph::as.igraph(x), layout = layout, circular = circular, ...)
@@ -777,10 +786,26 @@ plot.nma_data <- function(x, ..., layout, circular,
                                 fill = "grey90", colour = "grey60",
                                 shape = 21)
     }
+
+    # Calculate nudge positions
+    if (nudge == 0) {
+      pos <- ggplot2::position_identity()
+    } else {
+      if (circular || layout %in% c("circle", "star")) {
+        pos <- ggplot2::position_nudge(x = nudge * g$data$x,
+                                       y = nudge * g$data$y)
+      } else {
+        pos <- ggplot2::position_nudge(x = nudge * sign(g$data$x - mean(g$data$x)),
+                                       y = nudge * sign(g$data$y - mean(g$data$y)))
+      }
+    }
+
     g <- g +
       ggraph::geom_node_text(ggplot2::aes(label = .data$name),
-                             hjust = "outward", vjust = "outward") +
+                             hjust = "outward", vjust = "outward",
+                             position = pos) +
       ggplot2::scale_size_area("Total sample size", max_size = 12)
+
   } else {
     if (show_trt_class) {
       g <- g +
