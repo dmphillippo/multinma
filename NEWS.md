@@ -1,5 +1,9 @@
 # multinma 0.4.2.9000
 
+* Feature: Treatment labels in network plots can now be nudged away from the
+nodes when `weight_nodes = TRUE`, using the new `nudge` argument to
+`plot.nma_data()` (#15).
+
 # multinma 0.4.2
 
 * Fix: Error in `get_nodesplits()` when studies have multiple arms of the same
