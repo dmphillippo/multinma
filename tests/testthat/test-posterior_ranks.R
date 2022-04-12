@@ -95,3 +95,48 @@ test_that("sucra argument", {
   expect_error(posterior_rank_probs(smk_fit_RE, sucra = NA), m)
   expect_error(posterior_rank_probs(smk_fit_RE, sucra = NULL), m)
 })
+
+skip_on_cran()  # Reduce CRAN check time
+
+# Only small number of samples to test
+smk_fit_RE <- suppressWarnings(nma(smk_net,
+                                   trt_effects = "random",
+                                   prior_intercept = normal(scale = 100),
+                                   prior_trt = normal(scale = 100),
+                                   prior_het = normal(scale = 5),
+                                   iter = 10))
+
+test_that(".trt column is correct", {
+  rk <- tibble::as_tibble(posterior_ranks(smk_fit_RE))
+  expect_identical(paste0("rank[", rk$.trt, "]"),
+                   rk$parameter)
+
+  rp <- tibble::as_tibble(posterior_rank_probs(smk_fit_RE))
+  expect_identical(paste0("d[", rp$.trt, "]"),
+                   rp$parameter)
+})
+
+
+pso_net <- set_ipd(plaque_psoriasis_ipd[complete.cases(plaque_psoriasis_ipd), ],
+                   studyc, trtc,
+                   r = pasi75)
+
+# Only small number of samples to test
+pso_fit <- suppressWarnings(nma(pso_net,
+                                trt_effects = "fixed",
+                                regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
+                                prior_intercept = normal(scale = 10),
+                                prior_trt = normal(scale = 10),
+                                prior_reg = normal(scale = 10),
+                                init_r = 0.1,
+                                iter = 10))
+
+test_that(".study, .trt columns are correct", {
+  rk <- tibble::as_tibble(posterior_ranks(pso_fit))
+  expect_identical(paste0("rank[", rk$.study, ": ", rk$.trt, "]"),
+                   rk$parameter)
+
+  rp <- tibble::as_tibble(posterior_rank_probs(pso_fit))
+  expect_identical(paste0("d[", rp$.study, ": ", rp$.trt, "]"),
+                   rp$parameter)
+})
