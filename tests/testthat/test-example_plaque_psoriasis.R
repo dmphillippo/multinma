@@ -384,15 +384,18 @@ dk <- function(study, trt, sims = pso_releff_FE$sims) {
 
 test_all_contr <- tibble(
   contr = pso_releff_FE_all_contr$summary$parameter,
-  study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
-  trtb = stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"),
-  trta = stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])")
-) %>% 
-  rowwise() %>% 
-  mutate(as_tibble(multinma:::summary.mcmc_array(dk(study, trtb) - dk(study, trta)))) %>% 
-  select(.study = study, parameter = contr, mean:Rhat)
+  .study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
+  .trtb = factor(stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"), levels = levels(pso_net$treatments)),
+  .trta = factor(stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])"), levels = levels(pso_net$treatments))
+) %>%
+  rowwise() %>%
+  mutate(as_tibble(multinma:::summary.mcmc_array(dk(.study, .trtb) - dk(.study, .trta)))) %>%
+  select(.study, .trtb, .trta, parameter = contr, mean:Rhat)
 
 test_that("Construction of all contrasts is correct", {
+  ntrt <- nlevels(pso_net$treatments)
+  nstudy <- nlevels(test_all_contr$.study)
+  expect_equal(nrow(pso_releff_FE_all_contr$summary), nstudy * ntrt * (ntrt - 1) / 2)
   expect_equal(pso_releff_FE_all_contr$summary, test_all_contr, check.attributes = FALSE)
 })
 
@@ -401,15 +404,18 @@ pso_releff_FE_all_contr_new <- relative_effects(pso_fit_FE, newdata = new_agd_me
 
 test_all_contr_new <- tibble(
   contr = pso_releff_FE_all_contr_new$summary$parameter,
-  study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
-  trtb = stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"),
-  trta = stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])")
-) %>% 
-  rowwise() %>% 
-  mutate(as_tibble(multinma:::summary.mcmc_array(dk(study, trtb, pso_releff_FE_new$sims) - dk(study, trta, pso_releff_FE_new$sims)))) %>% 
-  select(.study = study, parameter = contr, mean:Rhat)
+  .study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
+  .trtb = factor(stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"), levels = levels(pso_net$treatments)),
+  .trta = factor(stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])"), levels = levels(pso_net$treatments))
+) %>%
+  rowwise() %>%
+  mutate(as_tibble(multinma:::summary.mcmc_array(dk(.study, .trtb, pso_releff_FE_new$sims) - dk(.study, .trta, pso_releff_FE_new$sims)))) %>%
+  select(.study, .trtb, .trta, parameter = contr, mean:Rhat)
 
 test_that("Construction of all contrasts in target population is correct", {
+  ntrt <- nlevels(pso_net$treatments)
+  nstudy <- nlevels(test_all_contr_new$.study)
+  expect_equal(nrow(pso_releff_FE_all_contr_new$summary), nstudy * ntrt * (ntrt - 1) / 2)
   expect_equal(pso_releff_FE_all_contr_new$summary, test_all_contr_new, check.attributes = FALSE)
 })
 

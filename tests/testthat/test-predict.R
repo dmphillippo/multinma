@@ -108,6 +108,24 @@ test_that("baseline_level argument", {
 
 skip_on_cran()  # Reduce CRAN check time
 
+# Only small number of samples to test
+smk_fit_RE <- suppressWarnings(nma(smk_net,
+                                   trt_effects = "random",
+                                   prior_intercept = normal(scale = 100),
+                                   prior_trt = normal(scale = 100),
+                                   prior_het = normal(scale = 5),
+                                   iter = 10))
+
+test_that(".study, .trt columns are correct", {
+  pred1 <- tibble::as_tibble(predict(smk_fit_RE))
+  expect_identical(paste0("pred[", pred1$.study, ": ", pred1$.trt, "]"),
+                   pred1$parameter)
+
+  pred2 <- tibble::as_tibble(predict(smk_fit_RE, baseline = distr(qnorm, 0, 1)))
+  expect_identical(paste0("pred[", pred2$.trt, "]"),
+                   pred2$parameter)
+})
+
 pso_net <- set_ipd(plaque_psoriasis_ipd[complete.cases(plaque_psoriasis_ipd), ],
                    studyc, trtc,
                    r = pasi75)
@@ -175,4 +193,41 @@ test_that("newdata validation", {
                "missing or infinite values in `newdata`: durnpso, psa")
   expect_error(predict(pso_fit, newdata = make_bad(Inf, c("durnpso", "psa")), study = study, baseline = distr(qnorm, 1, 1)),
                "missing or infinite values in `newdata`: durnpso, psa")
+})
+
+test_that(".study, .trt columns are correct", {
+  pred1 <- tibble::as_tibble(predict(pso_fit))
+  expect_identical(paste0("pred[", pred1$.study, ": ", pred1$.trt, "]"),
+                   pred1$parameter)
+
+  pred2 <- tibble::as_tibble(predict(pso_fit, newdata = pso_new, study = study, baseline = distr(qnorm, 1, 1)))
+  expect_identical(paste0("pred[", pred2$.study, ": ", pred2$.trt, "]"),
+                   pred2$parameter)
+})
+
+hta_net <- set_agd_arm(hta_psoriasis,
+                       study = paste(studyc, year),
+                       trt = trtc,
+                       r = multi(r0 = sample_size - rowSums(cbind(PASI50, PASI75, PASI90), na.rm = TRUE),
+                                 PASI50, PASI75, PASI90,
+                                 inclusive = FALSE,
+                                 type = "ordered"))
+
+# Only small number of samples to test
+hta_fit_FE <- suppressWarnings(nma(hta_net,
+                               trt_effects = "fixed",
+                               link = "probit",
+                               prior_intercept = normal(scale = 100),
+                               prior_trt = normal(scale = 10),
+                               prior_aux = flat(),
+                               iter = 10))
+
+test_that(".study, .trt, .category columns are correct", {
+  pred1 <- tibble::as_tibble(predict(hta_fit_FE))
+  expect_identical(paste0("pred[", pred1$.study, ": ", pred1$.trt, ", ", pred1$.category, "]"),
+                   pred1$parameter)
+
+  pred2 <- tibble::as_tibble(predict(hta_fit_FE, baseline = distr(qnorm, 0, 1)))
+  expect_identical(paste0("pred[", pred2$.trt, ", ", pred2$.category, "]"),
+                   pred2$parameter)
 })

@@ -150,8 +150,17 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       re_array <- get_delta_new(x)
     }
 
+    # Set treatments vector
+    trtb <- x$network$treatments[-1]
+    trta <- x$network$treatments[1]
+
     if (all_contrasts) {
       re_array <- make_all_contrasts(re_array, trt_ref = nrt)
+
+      contrs <- utils::combn(x$network$treatments, 2)
+      trtb <- contrs[2, ]
+      trta <- contrs[1, ]
+
     } else if (!is.null(trt_ref) && trt_ref != nrt) {
       d_ref <- re_array[ , , paste0("d[", trt_ref, "]"), drop = FALSE]
       re_array <- sweep(re_array, 1:2, d_ref, FUN = "-")
@@ -165,6 +174,10 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       # Reorder parameters
       d_names <- c(paste0("d[", nrt, "]"), d_names[d_names != paste0("d[", nrt, "]")])
       re_array <- re_array[ , , d_names, drop = FALSE]
+
+      trt_reorder <- sort(forcats::fct_relevel(x$network$treatments, trt_ref))
+      trtb <- trt_reorder[-1]
+      trta <- trt_reorder[1]
     }
 
     # Fix up parameter names for predictive_distribution = TRUE
@@ -173,7 +186,9 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
     }
 
     if (summary) {
-      re_summary <- summary_mcmc_array(re_array, probs = probs)
+      re_summary <- summary_mcmc_array(re_array, probs = probs) %>%
+        tibble::add_column(.trtb = trtb, .trta = trta, .before = 1)
+
       out <- list(summary = re_summary, sims = re_array)
     } else {
       out <- list(sims = re_array)
@@ -248,8 +263,9 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
     }
 
 
-    # Get number of treatments
+    # Get number of treatments, number of studies
     ntrt <- nlevels(x$network$treatments)
+    nstudy <- nrow(dat_studies)
 
     # Expand rows for every treatment
     all_trts <- tidyr::expand_grid(.study = dat_studies$.study, .trt = x$network$treatments[-1])
@@ -291,8 +307,17 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         re_array <- get_delta_new(x)
       }
 
+      # Set treatments vector
+      trtb <- x$network$treatments[-1]
+      trta <- x$network$treatments[1]
+
       if (all_contrasts) {
         re_array <- make_all_contrasts(re_array, trt_ref = nrt)
+
+        contrs <- utils::combn(x$network$treatments, 2)
+        trtb <- contrs[2, ]
+        trta <- contrs[1, ]
+
       } else if (!is.null(trt_ref) && trt_ref != nrt) {
         d_ref <- re_array[ , , paste0("d[", trt_ref, "]"), drop = FALSE]
         re_array <- sweep(re_array, 1:2, d_ref, FUN = "-")
@@ -306,6 +331,10 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         # Reorder parameters
         d_names <- c(paste0("d[", nrt, "]"), d_names[d_names != paste0("d[", nrt, "]")])
         re_array <- re_array[ , , d_names, drop = FALSE]
+
+        trt_reorder <- sort(forcats::fct_relevel(x$network$treatments, trt_ref))
+        trtb <- trt_reorder[-1]
+        trta <- trt_reorder[1]
       }
 
       # Fix up parameter names for predictive_distribution = TRUE
@@ -314,7 +343,9 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       }
 
       if (summary) {
-        re_summary <- summary_mcmc_array(re_array, probs = probs)
+        re_summary <- summary_mcmc_array(re_array, probs = probs)  %>%
+          tibble::add_column(.trtb = trtb, .trta = trta, .before = 1)
+
         out <- list(summary = re_summary, sims = re_array)
       } else {
         out <- list(sims = re_array)
@@ -382,6 +413,10 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       # Linear combination with posterior MCMC array
       re_array <- tcrossprod_mcmc_array(d_array, X_EM_d)
 
+      # Set treatments vector
+      trtb <- x$network$treatments[-1]
+      trta <- rep(x$network$treatments[1], times = ntrt - 1)
+
       # Produce all contrasts, if required
       if (all_contrasts) {
         n_contr <- ntrt * (ntrt - 1) / 2
@@ -398,6 +433,10 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
           dimnames(re_array_all)[[3]][j_select_all] <- dimnames(j_contrs_all)[[3]]
         }
         re_array <- re_array_all
+
+        contrs <- utils::combn(x$network$treatments, 2)
+        trtb <- contrs[2, ]
+        trta <- contrs[1, ]
       }
 
       # Add in study names to parameters
@@ -425,6 +464,10 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
           # Reorder parameters
           d_names[j_pars] <- c(paste0("d[", j, ": ", nrt, "]"), d_names[j_pars & d_names != paste0("d[", j, ": ", nrt, "]")])
           re_array <- re_array[ , , d_names, drop = FALSE]
+
+          trt_reorder <- sort(forcats::fct_relevel(x$network$treatments, trt_ref))
+          trtb <- trt_reorder[-1]
+          trta <- rep(trt_reorder[1], times = ntrt - 1)
         }
       }
 
@@ -442,6 +485,8 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
                                } else {
                                  dat_studies$.study
                                },
+                             .trtb = rep(trtb, times = nstudy),
+                             .trta = rep(trta, times = nstudy),
                              .before = 1)
       }
 

@@ -10,10 +10,14 @@
 #'
 #' @details Objects of class `nma_summary` have the following components:
 #'   \describe{
-#'   \item{summary}{A data frame containing the computed summary statistics. If
-#'   a regression model was fitted with effect modifier interactions with
+#'   \item{summary}{A data frame containing the computed summary statistics.
+#'   Column `.trt` indicates the corresponding treatment, or columns `.trta` and
+#'   `.trtb` indicate the corresponding contrast (`.trtb` vs. `.trta`). If a
+#'   regression model was fitted with effect modifier interactions with
 #'   treatment, these summaries will be study-specific. In this case, the
-#'   corresponding study population is indicated in a column named `.study`.}
+#'   corresponding study population is indicated in the `.study` column. If a
+#'   multinomial model was fitted, the `.category` column indicates the
+#'   corresponding category.}
 #'   \item{sims}{A 3D array \[Iteration, Chain, Parameter\] of MCMC
 #'   simulations}
 #'   \item{studies}{(Optional) A data frame containing study information,
@@ -94,6 +98,9 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
   if (rlang::has_name(x_sum, "Rhat")) x_sum$Rhat <- round(x_sum$Rhat, max(2, digits))
 
   x_sum <- tibble::column_to_rownames(x_sum, "parameter")
+
+  # Drop dot columns (.trta, .trtb, .trt, .category) from the output, except .study
+  x_sum <- dplyr::select(x_sum, -dplyr::matches("^\\.(?!study)", perl = TRUE))
 
   # Format summaries nicely by study, if given
   print_study_block <- function(s, info = NULL, ...) {
