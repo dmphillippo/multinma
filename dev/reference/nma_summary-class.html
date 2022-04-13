@@ -14,7 +14,7 @@ these statistics."><meta property="og:image" content="https://dmphillippo.github
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.4.2.9001</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.4.2.9002</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,10 +79,14 @@ these statistics.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Objects of class <code>nma_summary</code> have the following components:</p><dl><dt>summary</dt>
-<dd><p>A data frame containing the computed summary statistics. If
-a regression model was fitted with effect modifier interactions with
+<dd><p>A data frame containing the computed summary statistics.
+Column <code>.trt</code> indicates the corresponding treatment, or columns <code>.trta</code> and
+<code>.trtb</code> indicate the corresponding contrast (<code>.trtb</code> vs. <code>.trta</code>). If a
+regression model was fitted with effect modifier interactions with
 treatment, these summaries will be study-specific. In this case, the
-corresponding study population is indicated in a column named <code>.study</code>.</p></dd>
+corresponding study population is indicated in the <code>.study</code> column. If a
+multinomial model was fitted, the <code>.category</code> column indicates the
+corresponding category.</p></dd>
 
 <dt>sims</dt>
 <dd><p>A 3D array [Iteration, Chain, Parameter] of MCMC
