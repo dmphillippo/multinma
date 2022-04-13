@@ -3,6 +3,11 @@
 * Feature: Treatment labels in network plots can now be nudged away from the
 nodes when `weight_nodes = TRUE`, using the new `nudge` argument to
 `plot.nma_data()` (#15).
+* Feature: The data frame returned by calling `as_tibble()` or `as.data.frame()`
+on an `nma_summary` object (such as relative effects or predictions) now
+includes columns for the corresponding treatment (`.trt`) or contrast (`.trta`
+and `.trtb`), and a `.category` column may be included for multinomial models.
+Previously these details were only present as part of the `parameter` column.
 
 # multinma 0.4.2
 
