@@ -25,8 +25,14 @@ smkdummy <-
          x4 = rbeta(1, 10, 5)) %>%
   ungroup()
 
-smkdummy_contrast <- smkdummy %>%  group_by(studyn) %>%
-  mutate(arm = 1:n(), r = if_else(arm == 1, NA_real_, r)) %>%
+smkdummy_contrast <- smkdummy %>%
+  group_by(studyn) %>%
+  mutate(arm = 1:n(),
+         cc = if_else(any(r == 0), 0.5, 0),
+         r = r + cc,
+         n = n + cc,
+         lor = if_else(arm == 1, NA_real_, log(r * (first(n) - first(r)) / ((n - r) * first(r)))),
+         se = sqrt(if_else(arm == 1, 1 / r + 1 / (n - r), 1 / r + 1 / (n - r) + 1 / first(r) + 1 / (first(n) - first(r))))) %>%
   ungroup()
 
 ns_ipd <- 2
@@ -217,7 +223,7 @@ test_that("error if qfun produces NaN, NA, NULL, Inf", {
 
   smknet_miss <- set_agd_arm(smkdummy_miss, studyn, trtn, r = r, n = n) %>%
     combine_network(smknet_ipd)
-  smknet_missc <- set_agd_contrast(smkdummy_miss_contrast, studyn, trtn, y = r, se = n) %>%
+  smknet_missc <- set_agd_contrast(smkdummy_miss_contrast, studyn, trtn, y = lor, se = se) %>%
     combine_network(smknet_ipd)
 
   expect_error(suppressWarnings(
@@ -242,7 +248,7 @@ test_that("error if qfun produces NaN, NA, NULL, Inf", {
 
   smknet_bad <- set_agd_arm(smkdummy_bad, studyn, trtn, r = r, n = n) %>%
     combine_network(smknet_ipd)
-  smknet_badc <- set_agd_contrast(smkdummy_bad_contrast, studyn, trtn, y = r, se = n) %>%
+  smknet_badc <- set_agd_contrast(smkdummy_bad_contrast, studyn, trtn, y = lor, se = se) %>%
     combine_network(smknet_ipd)
 
   expect_error(suppressWarnings(
