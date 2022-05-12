@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.4.2.9002</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.4.2.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,7 +67,8 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.2.9000" id="multinma-0429000">multinma 0.4.2.9000<a class="anchor" aria-label="anchor" href="#multinma-0429000"></a></h2>
 <ul><li>Feature: Treatment labels in network plots can now be nudged away from the nodes when <code>weight_nodes = TRUE</code>, using the new <code>nudge</code> argument to <code><a href="../reference/plot.nma_data.html">plot.nma_data()</a></code> (<a href="https://github.com/dmphillippo/multinma/issues/15" class="external-link">#15</a>).</li>
-<li>Feature: The data frame returned by calling <code><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble()</a></code> or <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> on an <code>nma_summary</code> object (such as relative effects or predictions) now includes columns for the corresponding treatment (<code>.trt</code>) or contrast (<code>.trta</code> and <code>.trtb</code>), and a <code>.category</code> column may be included for multinomial models. Previously these details were only present as part of the <code>parameter</code> column.</li>
+<li>Feature: The data frame returned by calling <code><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble()</a></code> or <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> on an <code>nma_summary</code> object (such as relative effects or predictions) now includes columns for the corresponding treatment (<code>.trt</code>) or contrast (<code>.trta</code> and <code>.trtb</code>), and a <code>.category</code> column may be included for multinomial models. Previously these details were only present as part of the <code>parameter</code> column</li>
+<li>Improvement: <code><a href="../reference/set_agd_contrast.html">set_agd_contrast()</a></code> now produces an informative error message when the covariance matrix implied by the <code>se</code> column is not positive definite. Previously this was only checked by Stan after calling the <code><a href="../reference/nma.html">nma()</a></code> function.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.2" id="multinma-042">multinma 0.4.2<a class="anchor" aria-label="anchor" href="#multinma-042"></a></h2><p class="text-muted">CRAN release: 2022-03-02</p>
@@ -77,8 +78,7 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.1" id="multinma-041">multinma 0.4.1<a class="anchor" aria-label="anchor" href="#multinma-041"></a></h2><p class="text-muted">CRAN release: 2022-02-04</p>
-<ul><li>Fix: tidyr v1.2.0 breaks ordered multinomial models when some studies do not report all categories (i.e. some multinomial category outcomes are <code>NA</code> in <code><a href="../reference/multi.html">multi()</a></code>) (PR <a href="https://github.com/dmphillippo/multinma/issues/11" class="external-link">#11</a>)</li>
-</ul></div>
+<ul><li>Fix: tidyr v1.2.0 breaks ordered multinomial models when some studies do not report all categories (i.e. some multinomial category outcomes are <code>NA</code> in <code><a href="../reference/multi.html">multi()</a></code>) (PR <a href="https://github.com/dmphillippo/multinma/issues/11" class="external-link">#11</a>)</li></ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0" id="multinma-040">multinma 0.4.0<a class="anchor" aria-label="anchor" href="#multinma-040"></a></h2><p class="text-muted">CRAN release: 2022-01-18</p>
 <ul><li>Feature: Node-splitting models for assessing inconsistency are now available with <code>consistency = "nodesplit"</code> in <code><a href="../reference/nma.html">nma()</a></code>. Comparisons to split can be chosen using the <code>nodesplit</code> argument, by default all possibly inconsistent comparisons are chosen using <code><a href="../reference/get_nodesplits.html">get_nodesplits()</a></code>. Node-splitting results can be summarised with <code><a href="../reference/summary.nma_nodesplit_df.html">summary.nma_nodesplit()</a></code> and plotted with <code><a href="../reference/plot.nodesplit_summary.html">plot.nodesplit_summary()</a></code>.</li>
@@ -121,13 +121,11 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.3" id="multinma-013">multinma 0.1.3<a class="anchor" aria-label="anchor" href="#multinma-013"></a></h2><p class="text-muted">CRAN release: 2020-06-30</p>
-<ul><li>Format DESCRIPTION to CRAN requirements</li>
-</ul></div>
+<ul><li>Format DESCRIPTION to CRAN requirements</li></ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.2" id="multinma-012">multinma 0.1.2<a class="anchor" aria-label="anchor" href="#multinma-012"></a></h2>
 <ul><li>Wrapped long-running examples in <code>\donttest{}</code> instead of <code>\dontrun{}</code>
-</li>
-</ul></div>
+</li></ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.1" id="multinma-011">multinma 0.1.1<a class="anchor" aria-label="anchor" href="#multinma-011"></a></h2>
 <ul><li>Reduced size of vignettes</li>
@@ -141,8 +139,7 @@
 <li>Feature: Produce relative effect estimates with <code><a href="../reference/relative_effects.html">relative_effects()</a></code>, posterior ranks with <code><a href="../reference/posterior_ranks.html">posterior_ranks()</a></code>, and posterior rank probabilities with <code><a href="../reference/posterior_ranks.html">posterior_rank_probs()</a></code>. These will be study-specific when a regression model is given.</li>
 <li>Feature: Produce predictions of absolute effects with a <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method for <code>stan_nma</code> objects.</li>
 <li>Feature: Plots of relative effects, ranks, predictions, and parameter estimates via <code><a href="../reference/plot.nma_summary.html">plot.nma_summary()</a></code>.</li>
-<li>Feature: Optional <code>sample_size</code> argument for <code>set_agd_*()</code> that:
-<ul><li>Enables centering of predictors (<code>center = TRUE</code>) in <code><a href="../reference/nma.html">nma()</a></code> when a regression model is given, replacing the <code>agd_sample_size</code> argument of <code><a href="../reference/nma.html">nma()</a></code>
+<li>Feature: Optional <code>sample_size</code> argument for <code>set_agd_*()</code> that:<ul><li>Enables centering of predictors (<code>center = TRUE</code>) in <code><a href="../reference/nma.html">nma()</a></code> when a regression model is given, replacing the <code>agd_sample_size</code> argument of <code><a href="../reference/nma.html">nma()</a></code>
 </li>
 <li>Enables production of study-specific relative effects, rank probabilities, etc. for studies in the network when a regression model is given</li>
 <li>Allows nodes in network plots to be weighted by sample size</li>
@@ -158,8 +155,7 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.1" id="multinma-001">multinma 0.0.1<a class="anchor" aria-label="anchor" href="#multinma-001"></a></h2>
-<ul><li>Initial release.</li>
-</ul></div>
+<ul><li>Initial release.</li></ul></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
@@ -169,7 +165,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
     </footer></div>

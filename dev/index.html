@@ -38,7 +38,7 @@
     
     <a class="navbar-brand me-2" href="index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.4.2.9002</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.4.2.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -98,7 +98,6 @@
 </h1>
 </div>
 <!-- badges: start -->
-
 <p>The <code>multinma</code> package implements network meta-analysis, network meta-regression, and multilevel network meta-regression models which combine evidence from a network of studies and treatments using either aggregate data or individual patient data from each study (Phillippo et al. 2020; Phillippo 2019). Models are estimated in a Bayesian framework using Stan (Carpenter et al. 2017).</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -119,39 +118,25 @@
 <h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
 <p>A good place to start is with the package vignettes which walk through example analyses, see <code><a href="articles/vignette_overview.html">vignette("vignette_overview")</a></code> for an overview. The series of NICE Technical Support Documents on evidence synthesis gives a detailed introduction to network meta-analysis:</p>
-<blockquote>
-<p>Dias, S. et al. (2011). “NICE DSU Technical Support Documents 1-7: Evidence Synthesis for Decision Making.” <em>National Institute for Health and Care Excellence.</em> Available from <a href="https://nicedsu.sites.sheffield.ac.uk" class="external-link uri">https://nicedsu.sites.sheffield.ac.uk</a>.</p>
-</blockquote>
+<blockquote><p>Dias, S. et al. (2011). “NICE DSU Technical Support Documents 1-7: Evidence Synthesis for Decision Making.” <em>National Institute for Health and Care Excellence.</em> Available from <a href="https://nicedsu.sites.sheffield.ac.uk" class="external-link uri">https://nicedsu.sites.sheffield.ac.uk</a>.</p></blockquote>
 <p>Multilevel network meta-regression is set out in the following methods paper:</p>
-<blockquote>
-<p>Phillippo, D. M. et al. (2020). “Multilevel Network Meta-Regression for population-adjusted treatment comparisons.” <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em>, 183(3):1189-1210. doi: <a href="https://doi.org/10.1111/rssa.12579" class="external-link">10.1111/rssa.12579</a>.</p>
-</blockquote>
+<blockquote><p>Phillippo, D. M. et al. (2020). “Multilevel Network Meta-Regression for population-adjusted treatment comparisons.” <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em>, 183(3):1189-1210. doi: <a href="https://doi.org/10.1111/rssa.12579" class="external-link">10.1111/rssa.12579</a>.</p></blockquote>
 </div>
 <div class="section level2">
 <h2 id="citing-multinma">Citing multinma<a class="anchor" aria-label="anchor" href="#citing-multinma"></a>
 </h2>
 <p>The <code>multinma</code> package can be cited as follows:</p>
-<blockquote>
-<p>Phillippo, D. M. (2022). <em>multinma: Bayesian Network Meta-Analysis of Individual and Aggregate Data</em>. R package version 0.4.2.9000, doi: <a href="https://doi.org/10.5281/zenodo.3904454" class="external-link">10.5281/zenodo.3904454</a>.</p>
-</blockquote>
+<blockquote><p>Phillippo, D. M. (2022). <em>multinma: Bayesian Network Meta-Analysis of Individual and Aggregate Data</em>. R package version 0.4.2.9000, doi: <a href="https://doi.org/10.5281/zenodo.3904454" class="external-link">10.5281/zenodo.3904454</a>.</p></blockquote>
 <p>When fitting ML-NMR models, please cite the methods paper:</p>
-<blockquote>
-<p>Phillippo, D. M. et al. (2020). “Multilevel Network Meta-Regression for population-adjusted treatment comparisons.” <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em>, 183(3):1189-1210. doi: <a href="https://doi.org/10.1111/rssa.12579" class="external-link">10.1111/rssa.12579</a>.</p>
-</blockquote>
+<blockquote><p>Phillippo, D. M. et al. (2020). “Multilevel Network Meta-Regression for population-adjusted treatment comparisons.” <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em>, 183(3):1189-1210. doi: <a href="https://doi.org/10.1111/rssa.12579" class="external-link">10.1111/rssa.12579</a>.</p></blockquote>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-Carpenter2017" class="csl-entry">
-Carpenter, B., A. Gelman, M. D. Hoffman, D. Lee, B. Goodrich, M. Betancourt, M. Brubaker, J. Guo, P. Li, and A. Riddell. 2017. “Stan: A Probabilistic Programming Language.” <em>Journal of Statistical Software</em> 76 (1). <a href="https://doi.org/10.18637/jss.v076.i01" class="external-link uri">https://doi.org/10.18637/jss.v076.i01</a>.
-</div>
-<div id="ref-Phillippo_thesis" class="csl-entry">
-Phillippo, D. M. 2019. “Calibration of Treatment Effects in Network Meta-Analysis Using Individual Patient Data.” PhD thesis, University of Bristol.
-</div>
-<div id="ref-methods_paper" class="csl-entry">
-Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A. Schacht, D. Saure, Z. Kadziola, and N. J. Welton. 2020. “Multilevel Network Meta-Regression for Population-Adjusted Treatment Comparisons.” <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em> 183 (3): 1189–1210. <a href="https://doi.org/10.1111/rssa.12579" class="external-link uri">https://doi.org/10.1111/rssa.12579</a>.
-</div>
+<div id="ref-Carpenter2017" class="csl-entry">Carpenter, B., A. Gelman, M. D. Hoffman, D. Lee, B. Goodrich, M. Betancourt, M. Brubaker, J. Guo, P. Li, and A. Riddell. 2017. “Stan: A Probabilistic Programming Language.” <em>Journal of Statistical Software</em> 76 (1). <a href="https://doi.org/10.18637/jss.v076.i01" class="external-link uri">https://doi.org/10.18637/jss.v076.i01</a>.</div>
+<div id="ref-Phillippo_thesis" class="csl-entry">Phillippo, D. M. 2019. “Calibration of Treatment Effects in Network Meta-Analysis Using Individual Patient Data.” PhD thesis, University of Bristol.</div>
+<div id="ref-methods_paper" class="csl-entry">Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A. Schacht, D. Saure, Z. Kadziola, and N. J. Welton. 2020. “Multilevel Network Meta-Regression for Population-Adjusted Treatment Comparisons.” <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em> 183 (3): 1189–1210. <a href="https://doi.org/10.1111/rssa.12579" class="external-link uri">https://doi.org/10.1111/rssa.12579</a>.</div>
 </div>
 </div>
 </div>
@@ -207,7 +192,7 @@ Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A. Schacht, D. Sau
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
     </footer>
