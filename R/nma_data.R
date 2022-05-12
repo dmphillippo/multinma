@@ -700,8 +700,8 @@ set_agd_contrast <- function(data,
   posdef <- purrr::map_lgl(agd_Sigma, ~all(eigen(., only.values = TRUE)$values > sqrt(.Machine$double.eps)))
 
   if (any(!posdef)) {
-    abort(glue::glue("Contrast covariance matrix not positive definite for stud{if (sum(!posdef) > 1) 'ies' else 'y'}: ",
-                     glue::glue_collapse(glue::double_quote(which(!posdef)), sep = ", "), ".\n",
+    abort(glue::glue("Contrast covariance matrix not positive definite for stud{if (sum(!posdef) > 1) 'ies' else 'y'} ",
+                     glue::glue_collapse(glue::double_quote(names(posdef[!posdef])), sep = ", ", last = " and "), ".\n",
                      "Check the `se` column."))
   }
 
