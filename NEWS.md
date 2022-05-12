@@ -7,7 +7,10 @@ nodes when `weight_nodes = TRUE`, using the new `nudge` argument to
 on an `nma_summary` object (such as relative effects or predictions) now
 includes columns for the corresponding treatment (`.trt`) or contrast (`.trta`
 and `.trtb`), and a `.category` column may be included for multinomial models.
-Previously these details were only present as part of the `parameter` column.
+Previously these details were only present as part of the `parameter` column
+* Improvement: `set_agd_contrast()` now produces an informative error message
+when the covariance matrix implied by the `se` column is not positive definite.
+Previously this was only checked by Stan after calling the `nma()` function.
 
 # multinma 0.4.2
 
