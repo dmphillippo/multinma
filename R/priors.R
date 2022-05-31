@@ -116,6 +116,16 @@ half_student_t <- function(scale, df) {
 
 #' @rdname priors
 #' @export
+log_student_t <- function(location, scale, df) {
+  check_prior_location(location)
+  check_prior_scale(scale)
+  check_prior_scale(df, type = "degrees of freedom")
+
+  return(new_nma_prior("log-Student t", location = location, scale = scale, df = df))
+}
+
+#' @rdname priors
+#' @export
 exponential <- function(scale = 1/rate, rate = 1/scale) {
   if (missing(scale) && missing(rate))
     abort("Missing argument. Specify either `rate` or `scale`.")
@@ -225,6 +235,10 @@ get_tidy_prior <- function(prior, trunc = NULL) {
                                            a = if (is_trunc) max(0, trunc[1]) else 0,
                                            b = if (is_trunc) trunc[2] else Inf,
                                            location = prior$location, scale = prior$scale, df = prior$df)))
+  } else if (d == "log-Student t") {
+    out <- tibble::tibble(dist_label = d,
+                          dist = "logt",
+                          args = list(list(location = prior$location, scale = prior$scale, df = prior$df)))
   } else if (d == "Exponential") {
     out <- tibble::tibble(dist_label = d,
                           dist = "exp",
@@ -236,7 +250,7 @@ get_tidy_prior <- function(prior, trunc = NULL) {
                                            max = if (is_trunc) trunc[2] else Inf)))
   }
 
-  if (is_trunc && d %in% c("Normal", "Cauchy", "Student t", "Exponential", "log-Normal")) {
+  if (is_trunc && d %in% c("Normal", "Cauchy", "Student t", "Exponential", "log-Normal", "log-Student t")) {
     out$args <- list(rlang::list2(spec = out$dist, a = trunc[1], b = trunc[2], !!! out$args[[1]]))
     out$dist <- "trunc"
   }
@@ -353,4 +367,64 @@ qgent <- function(p, df, location = 0, scale = 1) {
     abort("`scale` must be numeric, greater than zero.")
 
   return(location + scale * stats::qt(p, df))
+}
+
+#' Log Student's t distribution
+#'
+#' Density, distribution, and quantile function for the log t distribution,
+#' whose logarithm has degrees of freedom `df`, mean `location`, and standard
+#' deviation `scale`.
+#'
+#' @param x,q Vector of quantiles
+#' @param p Vector of probabilities
+#' @param df Degrees of freedom, greater than zero
+#' @param location Location parameter
+#' @param scale Scale parameter, greater than zero
+#'
+#' @details If \eqn{\log(Y) \sim t_\nu(\mu, \sigma^2)}, then \eqn{Y} has a log t
+#'   distribution with `location` \eqn{\mu}, `scale` \eqn{\sigma}, and `df`
+#'   \eqn{\nu}.
+#'
+#'   The mean and all higher moments of the log t distribution are undefined or
+#'   infinite.
+#'
+#'   If `df = 1` then the distribution is a log Cauchy distribution. As `df`
+#'   tends to infinity, this approaches a log Normal distribution.
+#'
+#' @return `dlogt()` gives the density, `plogt()` gives the distribution
+#'   function, `qlogt()` gives the quantile function.
+#' @export
+#' @rdname log_t
+#'
+dlogt <- function(x, df, location = 0, scale = 1) {
+  if (!is.numeric(location))
+    abort("`location` must be numeric.")
+  if (!is.numeric(scale) || any(scale <= 0))
+    abort("`scale` must be numeric, greater than zero.")
+  if (!is.numeric(df) || any(df <= 0))
+    abort("`df` must be numeric, greater than zero.")
+
+  return(dgent(log(x), df = df, location = location, scale = scale) / x)
+}
+
+#' @export
+#' @rdname log_t
+plogt <- function(q, df, location = 0, scale = 1) {
+  if (!is.numeric(location))
+    abort("`location` must be numeric.")
+  if (!is.numeric(scale) || any(scale <= 0))
+    abort("`scale` must be numeric, greater than zero.")
+
+  return(pgent(q = log(q), df = df, location = location, scale = scale))
+}
+
+#' @export
+#' @rdname log_t
+qlogt <- function(p, df, location = 0, scale = 1) {
+  if (!is.numeric(location))
+    abort("`location` must be numeric.")
+  if (!is.numeric(scale) || any(scale <= 0))
+    abort("`scale` must be numeric, greater than zero.")
+
+  return(exp(qgent(p = p, df = df, location = location, scale = scale)))
 }
