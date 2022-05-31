@@ -38,6 +38,7 @@
 #' | \strong{half-Cauchy} `half_cauchy()` | - | - | Yes | - | Yes |
 #' | \strong{Student t} `student_t()` | Yes | Yes | Yes | Yes | Yes |
 #' | \strong{half-Student t} `half_student_t()` | - | - | Yes | - | Yes |
+#' | \strong{log-Student t} `log_student_t()` | - | - | Yes | - | Yes |
 #' | \strong{Exponential} `exponential()` | - | - | Yes | - | Yes |
 #' | \strong{Flat} `flat()` | Yes | Yes | Yes | Yes | Yes |
 #'
