@@ -61,6 +61,7 @@ reference:
   - matches("[pdq]bern")
   - matches("[pdq]gamma")
   - matches("[pdq]gent")
+  - matches("[pdq]logt")
   - matches("[pdq]logitnorm")
 
 - title: Prior distributions
@@ -70,6 +71,8 @@ reference:
   - summary.nma_prior
   - nma_prior-class
   - plot_prior_posterior
+  - matches("[pdq]gent")
+  - matches("[pdq]logt")
 
 - title: Model fitting
   desc: Model specification and fitting is accomplished using the `nma()` function.
