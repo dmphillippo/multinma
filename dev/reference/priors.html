@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.4.2.9003</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.4.2.9004</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,6 +85,8 @@
 
 <span class="fu">half_student_t</span><span class="op">(</span><span class="va">scale</span>, <span class="va">df</span><span class="op">)</span>
 
+<span class="fu">log_student_t</span><span class="op">(</span><span class="va">location</span>, <span class="va">scale</span>, <span class="va">df</span><span class="op">)</span>
+
 <span class="fu">exponential</span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="va">rate</span>, rate <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="va">scale</span><span class="op">)</span>
 
 <span class="fu">flat</span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -121,7 +123,7 @@ which model parameters. Essentially, priors that take only non-negative
 values (e.g. half-Normal) may only be used for non-negative parameters
 (heterogeneity SD/variance/precision, and any auxiliary parameter). If a
 real-valued prior distribution is specified for a non-negative parameter, it
-will be truncated at 0 to be non-negative.</p><table class="table table"><tr><td></td><td><strong>Intercept</strong> <code>prior_intercept</code></td><td><strong>Treatment effects</strong> <code>prior_trt</code></td><td><strong>Heterogeneity</strong> <code>prior_het</code></td><td><strong>Regression coefficients</strong> <code>prior_reg</code></td><td><strong>Auxiliary parameter</strong> <code>prior_aux</code></td></tr><tr><td><strong>Normal</strong> <code>normal()</code></td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr><tr><td><strong>half-Normal</strong> <code>half_normal()</code></td><td>-</td><td>-</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td><strong>log-Normal</strong> <code>log_normal()</code></td><td>-</td><td>-</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td><strong>Cauchy </strong><code>cauchy()</code></td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr><tr><td><strong>half-Cauchy</strong> <code>half_cauchy()</code></td><td>-</td><td>-</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td><strong>Student t</strong> <code>student_t()</code></td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr><tr><td><strong>half-Student t</strong> <code>half_student_t()</code></td><td>-</td><td>-</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td><strong>Exponential</strong> <code>exponential()</code></td><td>-</td><td>-</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td><strong>Flat</strong> <code>flat()</code></td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr></table><p>The <code>flat()</code> prior is a special case where no prior information is added to
+will be truncated at 0 to be non-negative.</p><table class="table table"><tr><td></td><td><strong>Intercept</strong> <code>prior_intercept</code></td><td><strong>Treatment effects</strong> <code>prior_trt</code></td><td><strong>Heterogeneity</strong> <code>prior_het</code></td><td><strong>Regression coefficients</strong> <code>prior_reg</code></td><td><strong>Auxiliary parameter</strong> <code>prior_aux</code></td></tr><tr><td><strong>Normal</strong> <code>normal()</code></td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr><tr><td><strong>half-Normal</strong> <code>half_normal()</code></td><td>-</td><td>-</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td><strong>log-Normal</strong> <code>log_normal()</code></td><td>-</td><td>-</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td><strong>Cauchy </strong><code>cauchy()</code></td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr><tr><td><strong>half-Cauchy</strong> <code>half_cauchy()</code></td><td>-</td><td>-</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td><strong>Student t</strong> <code>student_t()</code></td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr><tr><td><strong>half-Student t</strong> <code>half_student_t()</code></td><td>-</td><td>-</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td><strong>log-Student t</strong> <code>log_student_t()</code></td><td>-</td><td>-</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td><strong>Exponential</strong> <code>exponential()</code></td><td>-</td><td>-</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td><strong>Flat</strong> <code>flat()</code></td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr></table><p>The <code>flat()</code> prior is a special case where no prior information is added to
 the model, resulting in an implicit flat uniform prior distribution over the
 entire support for a parameter. This will be an improper prior if the
 parameter is unbounded, and is not generally advised. See the
