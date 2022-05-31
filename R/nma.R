@@ -1112,7 +1112,7 @@ nma.fit <- function(ipd_x, ipd_y,
     !!! prior_standat(prior_het, "prior_het",
                       valid = c("Normal", "half-Normal", "log-Normal",
                                 "Cauchy",  "half-Cauchy",
-                                "Student t", "half-Student t",
+                                "Student t", "half-Student t", "log-Student t",
                                 "Exponential", "flat (implicit)")),
     prior_het_type = switch(prior_het_type,
                             sd = 1, var = 2, prec = 3)
@@ -1168,7 +1168,7 @@ nma.fit <- function(ipd_x, ipd_y,
       !!! prior_standat(prior_aux, "prior_aux",
                         valid = c("Normal", "half-Normal", "log-Normal",
                                   "Cauchy",  "half-Cauchy",
-                                  "Student t", "half-Student t",
+                                  "Student t", "half-Student t", "log-Student t",
                                   "Exponential", "flat (implicit)")),
 
       # Specify link
@@ -1289,7 +1289,7 @@ nma.fit <- function(ipd_x, ipd_y,
       !!! prior_standat(prior_aux, "prior_aux",
                         valid = c("Normal", "half-Normal", "log-Normal",
                                   "Cauchy",  "half-Cauchy",
-                                  "Student t", "half-Student t",
+                                  "Student t", "half-Student t", "log-Student t",
                                   "Exponential", "flat (implicit)")),
 
       # Specify link
@@ -2143,7 +2143,8 @@ prior_standat <- function(x, par, valid){
                   Cauchy = , `half-Cauchy` = 2,
                   `Student t` = , `half-Student t` = 3,
                   Exponential = 4,
-                  `log-Normal` = 5)
+                  `log-Normal` = 5,
+                  `log-Student t` = 6)
 
   out <- purrr::list_modify(c(x), dist = distn, fun = purrr::zap())
   # Set unnecessary (NA) parameters to zero. These will be ignored by Stan, but

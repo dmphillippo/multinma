@@ -12,6 +12,9 @@ void prior_select_lp(vector y, int dist, real location, real scale, real df) {
     y ~ exponential(1/scale);
   } else if (dist == 5) { // log-Normal
     y ~ lognormal(location, scale);
+  } else if (dist == 6) { // log-Student t
+    log(y) ~ student_t(df, location, scale);
+    target += -log(y);
   } else {
     reject("Not a supported prior dist.");
   }

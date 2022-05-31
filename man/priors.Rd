@@ -9,6 +9,7 @@
 \alias{half_cauchy}
 \alias{student_t}
 \alias{half_student_t}
+\alias{log_student_t}
 \alias{exponential}
 \alias{flat}
 \title{Prior distributions}
@@ -26,6 +27,8 @@ half_cauchy(scale)
 student_t(location = 0, scale, df)
 
 half_student_t(scale, df)
+
+log_student_t(location, scale, df)
 
 exponential(scale = 1/rate, rate = 1/scale)
 
@@ -71,6 +74,7 @@ will be truncated at 0 to be non-negative.\tabular{lccccc}{
    \strong{half-Cauchy} \code{half_cauchy()} \tab - \tab - \tab Yes \tab - \tab Yes \cr
    \strong{Student t} \code{student_t()} \tab Yes \tab Yes \tab Yes \tab Yes \tab Yes \cr
    \strong{half-Student t} \code{half_student_t()} \tab - \tab - \tab Yes \tab - \tab Yes \cr
+   \strong{log-Student t} \code{log_student_t()} \tab - \tab - \tab Yes \tab - \tab Yes \cr
    \strong{Exponential} \code{exponential()} \tab - \tab - \tab Yes \tab - \tab Yes \cr
    \strong{Flat} \code{flat()} \tab Yes \tab Yes \tab Yes \tab Yes \tab Yes \cr
 }
