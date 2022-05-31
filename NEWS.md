@@ -8,6 +8,8 @@ on an `nma_summary` object (such as relative effects or predictions) now
 includes columns for the corresponding treatment (`.trt`) or contrast (`.trta`
 and `.trtb`), and a `.category` column may be included for multinomial models.
 Previously these details were only present as part of the `parameter` column
+* Feature: Added log t prior distribution `log_student_t()`, which can be used
+for positive-valued parameters (e.g. heterogeneity variance).
 * Improvement: `set_agd_contrast()` now produces an informative error message
 when the covariance matrix implied by the `se` column is not positive definite.
 Previously this was only checked by Stan after calling the `nma()` function.
