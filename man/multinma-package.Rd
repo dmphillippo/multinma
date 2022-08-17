@@ -7,7 +7,7 @@
 \title{multinma: A Package for Network Meta-Analysis of Individual and Aggregate
 Data in Stan}
 \description{
-\if{html}{\figure{logo.svg}{options: width="120" align="right" alt="multinma logo"}}
+\if{html}{\figure{logo.svg}{options: width="120" style="float: right;" alt="multinma logo"}}
 An R package for performing network meta-analysis and network meta-regression
 with aggregate data, individual patient data, or mixtures of both.
 }
