@@ -13,6 +13,7 @@ for positive-valued parameters (e.g. heterogeneity variance).
 * Improvement: `set_agd_contrast()` now produces an informative error message
 when the covariance matrix implied by the `se` column is not positive definite.
 Previously this was only checked by Stan after calling the `nma()` function.
+* Fix: CRAN check note for manual HTML5 compatibility.
 
 # multinma 0.4.2
 
