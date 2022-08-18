@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><link href="../deps/_Source%20Sans%20Pro-0.4.1/font.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.2/font.css" rel="stylesheet">
 <!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
@@ -94,7 +94,7 @@
 
 
 <div class="row">
-  <main id="main"><div class="page-header">
+  <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.svg" class="logo" alt=""><h1>Example: Statins for cholesterol lowering</h1>
             
       
@@ -105,60 +105,60 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dmphillippo.github.io/multinma/">multinma</a></span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">#&gt; For execution on a local, multicore CPU with excess RAM we recommend calling</span>
-<span class="co">#&gt; options(mc.cores = parallel::detectCores())</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attaching package: 'multinma'</span>
-<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     dgamma, pgamma, qgamma</span></code></pre>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dmphillippo.github.io/multinma/">multinma</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; For execution on a local, multicore CPU with excess RAM we recommend calling</span></span>
+<span><span class="co">#&gt; options(mc.cores = parallel::detectCores())</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'multinma'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     dgamma, pgamma, qgamma</span></span></code></pre>
 <p>This vignette describes the analysis of 19 trials comparing statins to placebo or usual care <span class="citation">(<a href="#ref-TSD3" role="doc-biblioref">Dias et al. 2011</a>)</span>. The data are available in this package as <code>statins</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">statins</span><span class="op">)</span>
-<span class="co">#&gt;   studyn    studyc trtn    trtc prevention   r    n</span>
-<span class="co">#&gt; 1      1        4S    1 Placebo  Secondary 256 2223</span>
-<span class="co">#&gt; 2      1        4S    2  Statin  Secondary 182 2221</span>
-<span class="co">#&gt; 3      2 Bestehorn    1 Placebo  Secondary   4  125</span>
-<span class="co">#&gt; 4      2 Bestehorn    2  Statin  Secondary   1  129</span>
-<span class="co">#&gt; 5      3     Brown    1 Placebo  Secondary   0   52</span>
-<span class="co">#&gt; 6      3     Brown    2  Statin  Secondary   1   94</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">statins</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   studyn    studyc trtn    trtc prevention   r    n</span></span>
+<span><span class="co">#&gt; 1      1        4S    1 Placebo  Secondary 256 2223</span></span>
+<span><span class="co">#&gt; 2      1        4S    2  Statin  Secondary 182 2221</span></span>
+<span><span class="co">#&gt; 3      2 Bestehorn    1 Placebo  Secondary   4  125</span></span>
+<span><span class="co">#&gt; 4      2 Bestehorn    2  Statin  Secondary   1  129</span></span>
+<span><span class="co">#&gt; 5      3     Brown    1 Placebo  Secondary   0   52</span></span>
+<span><span class="co">#&gt; 6      3     Brown    2  Statin  Secondary   1   94</span></span></code></pre></div>
 <p><span class="citation">Dias et al. (<a href="#ref-TSD3" role="doc-biblioref">2011</a>)</span> used these data to demonstrate meta-regression models adjusting for the binary covariate <code>prevention</code> (primary or secondary prevention), which we recreate here.</p>
 <div class="section level2">
 <h2 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
 </h2>
 <p>We have data giving the number of deaths (<code>r</code>) out of the total (<code>n</code>) in each arm, so we use the function <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code> to set up the network. We set placebo as the network reference treatment.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">statin_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_agd_arm.html">set_agd_arm</a></span><span class="op">(</span><span class="va">statins</span>, 
-                          study <span class="op">=</span> <span class="va">studyc</span>,
-                          trt <span class="op">=</span> <span class="va">trtc</span>,
-                          r <span class="op">=</span> <span class="va">r</span>, 
-                          n <span class="op">=</span> <span class="va">n</span>,
-                          trt_ref <span class="op">=</span> <span class="st">"Placebo"</span><span class="op">)</span>
-<span class="va">statin_net</span>
-<span class="co">#&gt; A network with 19 AgD studies (arm-based).</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------</span> <span style="font-weight: bold;">AgD studies (arm-based)</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt;  Study     Treatment arms     </span>
-<span class="co">#&gt;  4S        2: Placebo | Statin</span>
-<span class="co">#&gt;  Bestehorn 2: Placebo | Statin</span>
-<span class="co">#&gt;  Brown     2: Placebo | Statin</span>
-<span class="co">#&gt;  CCAIT     2: Placebo | Statin</span>
-<span class="co">#&gt;  Downs     2: Placebo | Statin</span>
-<span class="co">#&gt;  EXCEL     2: Placebo | Statin</span>
-<span class="co">#&gt;  Furberg   2: Placebo | Statin</span>
-<span class="co">#&gt;  Haskell   2: Placebo | Statin</span>
-<span class="co">#&gt;  Jones     2: Placebo | Statin</span>
-<span class="co">#&gt;  KAPS      2: Placebo | Statin</span>
-<span class="co">#&gt; <span style="color: #555555;"> ... plus 9 more studies</span></span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;  Outcome type: count</span>
-<span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------------------------</span></span>
-<span class="co">#&gt; Total number of treatments: 2</span>
-<span class="co">#&gt; Total number of studies: 19</span>
-<span class="co">#&gt; Reference treatment is: Placebo</span>
-<span class="co">#&gt; Network is <span style="color: #00BB00;">connected</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">statin_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_agd_arm.html">set_agd_arm</a></span><span class="op">(</span><span class="va">statins</span>, </span>
+<span>                          study <span class="op">=</span> <span class="va">studyc</span>,</span>
+<span>                          trt <span class="op">=</span> <span class="va">trtc</span>,</span>
+<span>                          r <span class="op">=</span> <span class="va">r</span>, </span>
+<span>                          n <span class="op">=</span> <span class="va">n</span>,</span>
+<span>                          trt_ref <span class="op">=</span> <span class="st">"Placebo"</span><span class="op">)</span></span>
+<span><span class="va">statin_net</span></span>
+<span><span class="co">#&gt; A network with 19 AgD studies (arm-based).</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------</span> <span style="font-weight: bold;">AgD studies (arm-based)</span> <span style="color: #555555;">----</span> </span></span>
+<span><span class="co">#&gt;  Study     Treatment arms     </span></span>
+<span><span class="co">#&gt;  4S        2: Placebo | Statin</span></span>
+<span><span class="co">#&gt;  Bestehorn 2: Placebo | Statin</span></span>
+<span><span class="co">#&gt;  Brown     2: Placebo | Statin</span></span>
+<span><span class="co">#&gt;  CCAIT     2: Placebo | Statin</span></span>
+<span><span class="co">#&gt;  Downs     2: Placebo | Statin</span></span>
+<span><span class="co">#&gt;  EXCEL     2: Placebo | Statin</span></span>
+<span><span class="co">#&gt;  Furberg   2: Placebo | Statin</span></span>
+<span><span class="co">#&gt;  Haskell   2: Placebo | Statin</span></span>
+<span><span class="co">#&gt;  Jones     2: Placebo | Statin</span></span>
+<span><span class="co">#&gt;  KAPS      2: Placebo | Statin</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;"> ... plus 9 more studies</span></span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Outcome type: count</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------------------------</span></span></span>
+<span><span class="co">#&gt; Total number of treatments: 2</span></span>
+<span><span class="co">#&gt; Total number of studies: 19</span></span>
+<span><span class="co">#&gt; Reference treatment is: Placebo</span></span>
+<span><span class="co">#&gt; Network is <span style="color: #00BB00;">connected</span></span></span></code></pre></div>
 <p>The <code>prevention</code> variable in the <code>statins</code> data frame will automatically be available to use in a meta-regression model.</p>
 </div>
 <div class="section level2">
@@ -170,49 +170,49 @@
 </h3>
 <p>We start by fitting a FE model. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effect <span class="math inline">\(d_\mathrm{Statin}\)</span>, study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and regression coefficient <span class="math inline">\(\beta\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span>
-<span class="co">#&gt; 50% of the prior density lies between -67.45 and 67.45.</span>
-<span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span></span>
+<span><span class="co">#&gt; 50% of the prior density lies between -67.45 and 67.45.</span></span>
+<span><span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span></span></code></pre></div>
 <p>The model is fitted with the <code><a href="../reference/nma.html">nma()</a></code> function, with a fixed effect model specified by <code>trt_effects = "fixed"</code>. The <code>regression</code> formula <code>~ .trt:prevention</code> means that interaction of primary/secondary prevention with treatment will be included; the <code>.trt</code> special variable indicates treatment, and <code>prevention</code> is in the original data set.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">statin_fit_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">statin_net</span>, 
-                     trt_effects <span class="op">=</span> <span class="st">"fixed"</span>,
-                     regression <span class="op">=</span> <span class="op">~</span><span class="va">.trt</span><span class="op">:</span><span class="va">prevention</span>,
-                     prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
-                     prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
-                     prior_reg <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Note: No treatment classes specified in network, any interactions in `regression` formula will be separate (independent) for each treatment.</span>
-<span class="co">#&gt; Use set_*() argument `trt_class` and nma() argument `class_interactions` to change this.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">statin_fit_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">statin_net</span>, </span>
+<span>                     trt_effects <span class="op">=</span> <span class="st">"fixed"</span>,</span>
+<span>                     regression <span class="op">=</span> <span class="op">~</span><span class="va">.trt</span><span class="op">:</span><span class="va">prevention</span>,</span>
+<span>                     prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span>                     prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span>                     prior_reg <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Note: No treatment classes specified in network, any interactions in `regression` formula will be separate (independent) for each treatment.</span></span>
+<span><span class="co">#&gt; Use set_*() argument `trt_class` and nma() argument `class_interactions` to change this.</span></span></code></pre></div>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">statin_fit_FE</span>
-<span class="co">#&gt; A fixed effects NMA with a binomial likelihood (logit link).</span>
-<span class="co">#&gt; Regression model: ~.trt:prevention.</span>
-<span class="co">#&gt; Inference for Stan model: binomial_1par.</span>
-<span class="co">#&gt; 4 chains, each with iter=2000; warmup=1000; thin=1; </span>
-<span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                                          mean se_mean   sd     2.5%      25%      50%      75%</span>
-<span class="co">#&gt; beta[.trtStatin:preventionSecondary]    -0.21    0.00 0.11    -0.43    -0.29    -0.21    -0.14</span>
-<span class="co">#&gt; d[Statin]                               -0.10    0.00 0.10    -0.29    -0.17    -0.10    -0.04</span>
-<span class="co">#&gt; lp__                                 -7246.72    0.08 3.31 -7254.07 -7248.79 -7246.39 -7244.38</span>
-<span class="co">#&gt;                                         97.5% n_eff Rhat</span>
-<span class="co">#&gt; beta[.trtStatin:preventionSecondary]     0.01  2021    1</span>
-<span class="co">#&gt; d[Statin]                                0.09  1942    1</span>
-<span class="co">#&gt; lp__                                 -7241.18  1645    1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue May 31 17:52:42 2022.</span>
-<span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
-<span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
-<span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">statin_fit_FE</span></span>
+<span><span class="co">#&gt; A fixed effects NMA with a binomial likelihood (logit link).</span></span>
+<span><span class="co">#&gt; Regression model: ~.trt:prevention.</span></span>
+<span><span class="co">#&gt; Inference for Stan model: binomial_1par.</span></span>
+<span><span class="co">#&gt; 4 chains, each with iter=2000; warmup=1000; thin=1; </span></span>
+<span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                                          mean se_mean   sd     2.5%      25%      50%      75%</span></span>
+<span><span class="co">#&gt; beta[.trtStatin:preventionSecondary]    -0.20    0.00 0.11    -0.42    -0.28    -0.20    -0.13</span></span>
+<span><span class="co">#&gt; d[Statin]                               -0.11    0.00 0.10    -0.30    -0.17    -0.11    -0.04</span></span>
+<span><span class="co">#&gt; lp__                                 -7246.66    0.08 3.35 -7254.18 -7248.69 -7246.39 -7244.25</span></span>
+<span><span class="co">#&gt;                                         97.5% n_eff Rhat</span></span>
+<span><span class="co">#&gt; beta[.trtStatin:preventionSecondary]     0.01  2603    1</span></span>
+<span><span class="co">#&gt; d[Statin]                                0.09  2512    1</span></span>
+<span><span class="co">#&gt; lp__                                 -7241.12  1561    1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Aug 18 19:04:13 2022.</span></span>
+<span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
+<span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
+<span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
 <p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Not run</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">statin_fit_FE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"beta"</span>, <span class="st">"mu"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Not run</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">statin_fit_FE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"beta"</span>, <span class="st">"mu"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">statin_fit_FE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"reg"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">statin_fit_FE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"reg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_statins_files/figure-html/statin_FE_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -220,61 +220,57 @@
 </h3>
 <p>We now fit a RE model. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effect <span class="math inline">\(d_\mathrm{Statin}\)</span>, study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and regression coefficient <span class="math inline">\(\beta\)</span>. We use a <span class="math inline">\(\textrm{half-N}(0, 5^2)\)</span> prior distribution for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span>
-<span class="co">#&gt; 50% of the prior density lies between -67.45 and 67.45.</span>
-<span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; A half-Normal prior distribution: location = 0, scale = 5.</span>
-<span class="co">#&gt; 50% of the prior density lies between 0 and 3.37.</span>
-<span class="co">#&gt; 95% of the prior density lies between 0 and 9.8.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span></span>
+<span><span class="co">#&gt; 50% of the prior density lies between -67.45 and 67.45.</span></span>
+<span><span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; A half-Normal prior distribution: location = 0, scale = 5.</span></span>
+<span><span class="co">#&gt; 50% of the prior density lies between 0 and 3.37.</span></span>
+<span><span class="co">#&gt; 95% of the prior density lies between 0 and 9.8.</span></span></code></pre></div>
 <p>Again, the model is fitted with the <code><a href="../reference/nma.html">nma()</a></code> function, now with <code>trt_effects = "random"</code>. We increase <code>adapt_delta</code> to 0.99 to remove a small number of divergent transition errors (the default for RE models is set to 0.95).</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">statin_fit_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">statin_net</span>, 
-                     trt_effects <span class="op">=</span> <span class="st">"random"</span>,
-                     regression <span class="op">=</span> <span class="op">~</span><span class="va">.trt</span><span class="op">:</span><span class="va">prevention</span>,
-                     prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
-                     prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
-                     prior_reg <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
-                     prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,
-                     adapt_delta <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span>
-<span class="co">#&gt; Note: No treatment classes specified in network, any interactions in `regression` formula will be separate (independent) for each treatment.</span>
-<span class="co">#&gt; Use set_*() argument `trt_class` and nma() argument `class_interactions` to change this.</span>
-<span class="co">#&gt; Warning: There were 1 divergent transitions after warmup. See</span>
-<span class="co">#&gt; https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</span>
-<span class="co">#&gt; to find out why this is a problem and how to eliminate them.</span>
-<span class="co">#&gt; Warning: Examine the pairs() plot to diagnose sampling problems</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">statin_fit_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">statin_net</span>, </span>
+<span>                     trt_effects <span class="op">=</span> <span class="st">"random"</span>,</span>
+<span>                     regression <span class="op">=</span> <span class="op">~</span><span class="va">.trt</span><span class="op">:</span><span class="va">prevention</span>,</span>
+<span>                     prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span>                     prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span>                     prior_reg <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span>                     prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
+<span>                     adapt_delta <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Note: No treatment classes specified in network, any interactions in `regression` formula will be separate (independent) for each treatment.</span></span>
+<span><span class="co">#&gt; Use set_*() argument `trt_class` and nma() argument `class_interactions` to change this.</span></span></code></pre></div>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">statin_fit_RE</span>
-<span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span>
-<span class="co">#&gt; Regression model: ~.trt:prevention.</span>
-<span class="co">#&gt; Inference for Stan model: binomial_1par.</span>
-<span class="co">#&gt; 4 chains, each with iter=2000; warmup=1000; thin=1; </span>
-<span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                                          mean se_mean   sd     2.5%      25%      50%      75%</span>
-<span class="co">#&gt; beta[.trtStatin:preventionSecondary]    -0.29    0.01 0.25    -0.85    -0.42    -0.27    -0.14</span>
-<span class="co">#&gt; d[Statin]                               -0.07    0.00 0.19    -0.44    -0.18    -0.08     0.03</span>
-<span class="co">#&gt; lp__                                 -7256.16    0.20 5.50 -7267.44 -7259.73 -7256.13 -7252.34</span>
-<span class="co">#&gt; tau                                      0.23    0.01 0.20     0.01     0.08     0.18     0.33</span>
-<span class="co">#&gt;                                         97.5% n_eff Rhat</span>
-<span class="co">#&gt; beta[.trtStatin:preventionSecondary]     0.18  1694 1.00</span>
-<span class="co">#&gt; d[Statin]                                0.36  1739 1.00</span>
-<span class="co">#&gt; lp__                                 -7245.78   789 1.01</span>
-<span class="co">#&gt; tau                                      0.76   645 1.01</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue May 31 17:52:59 2022.</span>
-<span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
-<span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
-<span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">statin_fit_RE</span></span>
+<span><span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span></span>
+<span><span class="co">#&gt; Regression model: ~.trt:prevention.</span></span>
+<span><span class="co">#&gt; Inference for Stan model: binomial_1par.</span></span>
+<span><span class="co">#&gt; 4 chains, each with iter=2000; warmup=1000; thin=1; </span></span>
+<span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                                          mean se_mean   sd     2.5%      25%      50%      75%</span></span>
+<span><span class="co">#&gt; beta[.trtStatin:preventionSecondary]    -0.29    0.01 0.28    -0.90    -0.43    -0.27    -0.14</span></span>
+<span><span class="co">#&gt; d[Statin]                               -0.08    0.01 0.22    -0.51    -0.19    -0.08     0.03</span></span>
+<span><span class="co">#&gt; lp__                                 -7255.92    0.19 5.39 -7267.42 -7259.37 -7255.74 -7252.41</span></span>
+<span><span class="co">#&gt; tau                                      0.25    0.01 0.22     0.01     0.10     0.19     0.35</span></span>
+<span><span class="co">#&gt;                                         97.5% n_eff Rhat</span></span>
+<span><span class="co">#&gt; beta[.trtStatin:preventionSecondary]     0.24   966 1.00</span></span>
+<span><span class="co">#&gt; d[Statin]                                0.38   975 1.00</span></span>
+<span><span class="co">#&gt; lp__                                 -7245.92   841 1.00</span></span>
+<span><span class="co">#&gt; tau                                      0.80   589 1.01</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Aug 18 19:04:32 2022.</span></span>
+<span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
+<span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
+<span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
 <p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects <span class="math inline">\(\delta_{jk}\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Not run</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">statin_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"beta"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Not run</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">statin_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"beta"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">statin_fit_RE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"reg"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">statin_fit_RE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"reg"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_statins_files/figure-html/statin_RE_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -283,22 +279,22 @@
 </h2>
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">(</span><span class="va">statin_dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">statin_fit_FE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 46<span style="color: #555555;"> (on 38 data points)</span></span>
-<span class="co">#&gt;                pD: 21.8</span>
-<span class="co">#&gt;               DIC: 67.8</span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">statin_dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">statin_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Residual deviance: 45.9<span style="color: #555555;"> (on 38 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 21.7</span></span>
+<span><span class="co">#&gt;               DIC: 67.6</span></span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">(</span><span class="va">statin_dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">statin_fit_RE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 42.8<span style="color: #555555;"> (on 38 data points)</span></span>
-<span class="co">#&gt;                pD: 25</span>
-<span class="co">#&gt;               DIC: 67.8</span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">statin_dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">statin_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Residual deviance: 42.8<span style="color: #555555;"> (on 38 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 25.3</span></span>
+<span><span class="co">#&gt;               DIC: 68.1</span></span></code></pre></div>
 <p>The DIC is very similar between FE and RE models, so we might choose the FE model based on parsimony. The residual deviance statistics are larger than the number of data points, suggesting that some data points are not fit well.</p>
 <p>We can also examine the residual deviance contributions with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">statin_dic_FE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">statin_dic_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_statins_files/figure-html/statin_FE_resdev_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">statin_dic_RE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">statin_dic_RE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_statins_files/figure-html/statin_RE_resdev_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>There are a number of studies which are not fit well under either model, having posterior mean residual deviance contributions greater than 1, and should be investigated to see if there are further substantive differences between studies.</p>
 </div>
@@ -307,39 +303,39 @@
 </h2>
 <p>We can produce estimates of the relative effect of statins vs. placebo for either primary or secondary prevention, using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function. The <code>newdata</code> argument specifies a data frame containing the levels of the covariate <code>prevention</code> that we are interested in, and the <code>study</code> argument is used to specify a column of <code>newdata</code> for an informative label.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">statin_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">statin_fit_FE</span>,
-                                     newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>prevention <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Primary"</span>, <span class="st">"Secondary"</span><span class="op">)</span><span class="op">)</span>,
-                                     study <span class="op">=</span> <span class="va">prevention</span><span class="op">)</span>
-
-<span class="va">statin_releff_FE</span>
-<span class="co">#&gt; <span style="color: #555555;">----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: Primary</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Covariate values:</span>
-<span class="co">#&gt;  prevention</span>
-<span class="co">#&gt;     Primary</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                    mean  sd  2.5%   25%  50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[Primary: Statin] -0.1 0.1 -0.29 -0.17 -0.1 -0.04  0.09     1968     2280    1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: Secondary</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Covariate values:</span>
-<span class="co">#&gt;  prevention</span>
-<span class="co">#&gt;   Secondary</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[Secondary: Statin] -0.31 0.05 -0.41 -0.35 -0.32 -0.28 -0.21     4068     3375    1</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">statin_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">statin_fit_FE</span>,</span>
+<span>                                     newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>prevention <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Primary"</span>, <span class="st">"Secondary"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                                     study <span class="op">=</span> <span class="va">prevention</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">statin_releff_FE</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: Primary</span> <span style="color: #555555;">----</span> </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Covariate values:</span></span>
+<span><span class="co">#&gt;  prevention</span></span>
+<span><span class="co">#&gt;     Primary</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                     mean  sd 2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; d[Primary: Statin] -0.11 0.1 -0.3 -0.17 -0.11 -0.04  0.09     2529     2969    1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: Secondary</span> <span style="color: #555555;">----</span> </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Covariate values:</span></span>
+<span><span class="co">#&gt;  prevention</span></span>
+<span><span class="co">#&gt;   Secondary</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; d[Secondary: Statin] -0.31 0.05 -0.42 -0.35 -0.31 -0.28 -0.21     4483     2821    1</span></span></code></pre></div>
 <p>The <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method may be used to visually compare these estimates:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">statin_releff_FE</span>, 
-     ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">statin_releff_FE</span>, </span>
+<span>     ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_statins_files/figure-html/statins_releff_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>Model parameters may be plotted with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">statin_fit_FE</span>, 
-     pars <span class="op">=</span> <span class="st">"beta"</span>, 
-     ref_line <span class="op">=</span> <span class="fl">0</span>,
-     stat <span class="op">=</span> <span class="st">"halfeye"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">statin_fit_FE</span>, </span>
+<span>     pars <span class="op">=</span> <span class="st">"beta"</span>, </span>
+<span>     ref_line <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>     stat <span class="op">=</span> <span class="st">"halfeye"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_statins_files/figure-html/statins_beta_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>Whilst the 95% Credible Interval includes zero, there is a suggestion that statins are more effective for secondary prevention.</p>
 </div>
@@ -365,7 +361,7 @@ Dias, S., A. J. Sutton, N. J. Welton, and A. E. Ades. 2011. <span>“<span>NICE 
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
     </footer>
@@ -373,7 +369,6 @@ Dias, S., A. J. Sutton, N. J. Welton, and A. E. Ades. 2011. <span>“<span>NICE 
 
   
 
-  
-
-  </body>
+  <script data-goatcounter="https://multinma.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
 </html>

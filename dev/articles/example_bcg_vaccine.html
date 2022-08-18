@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><link href="../deps/_Source%20Sans%20Pro-0.4.1/font.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.2/font.css" rel="stylesheet">
 <!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
@@ -94,7 +94,7 @@
 
 
 <div class="row">
-  <main id="main"><div class="page-header">
+  <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.svg" class="logo" alt=""><h1>Example: BCG vaccine for tuberculosis</h1>
             
       
@@ -105,60 +105,60 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dmphillippo.github.io/multinma/">multinma</a></span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">#&gt; For execution on a local, multicore CPU with excess RAM we recommend calling</span>
-<span class="co">#&gt; options(mc.cores = parallel::detectCores())</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attaching package: 'multinma'</span>
-<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     dgamma, pgamma, qgamma</span></code></pre>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dmphillippo.github.io/multinma/">multinma</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; For execution on a local, multicore CPU with excess RAM we recommend calling</span></span>
+<span><span class="co">#&gt; options(mc.cores = parallel::detectCores())</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'multinma'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     dgamma, pgamma, qgamma</span></span></code></pre>
 <p>This vignette describes the analysis of 13 trials investigating BCG vaccination vs. no vaccination for prevention of Tuberculosis (TB) <span class="citation">(<a href="#ref-TSD3" role="doc-biblioref">Dias et al. 2011</a>; <a href="#ref-Berkey1995" role="doc-biblioref">Berkey et al. 1995</a>)</span>. The data are available in this package as <code>bcg_vaccine</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bcg_vaccine</span><span class="op">)</span>
-<span class="co">#&gt;   studyn trtn         trtc latitude  r   n</span>
-<span class="co">#&gt; 1      1    1 Unvaccinated       44 11 139</span>
-<span class="co">#&gt; 2      1    2   Vaccinated       44  4 123</span>
-<span class="co">#&gt; 3      2    1 Unvaccinated       55 29 303</span>
-<span class="co">#&gt; 4      2    2   Vaccinated       55  6 306</span>
-<span class="co">#&gt; 5      3    1 Unvaccinated       42 11 220</span>
-<span class="co">#&gt; 6      3    2   Vaccinated       42  3 231</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bcg_vaccine</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   studyn trtn         trtc latitude  r   n</span></span>
+<span><span class="co">#&gt; 1      1    1 Unvaccinated       44 11 139</span></span>
+<span><span class="co">#&gt; 2      1    2   Vaccinated       44  4 123</span></span>
+<span><span class="co">#&gt; 3      2    1 Unvaccinated       55 29 303</span></span>
+<span><span class="co">#&gt; 4      2    2   Vaccinated       55  6 306</span></span>
+<span><span class="co">#&gt; 5      3    1 Unvaccinated       42 11 220</span></span>
+<span><span class="co">#&gt; 6      3    2   Vaccinated       42  3 231</span></span></code></pre></div>
 <p><span class="citation">Dias et al. (<a href="#ref-TSD3" role="doc-biblioref">2011</a>)</span> used these data to demonstrate meta-regression models adjusting for the continuous covariate <code>latitude</code>, the absolute degrees latitude at which the study was conducted, which we recreate here.</p>
 <div class="section level2">
 <h2 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
 </h2>
 <p>We have data giving the number diagnosed with TB during trial follow-up (<code>r</code>) out of the total (<code>n</code>) in each arm, so we use the function <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code> to set up the network. We set “unvaccinated” as the network reference treatment.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">bcg_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_agd_arm.html">set_agd_arm</a></span><span class="op">(</span><span class="va">bcg_vaccine</span>, 
-                       study <span class="op">=</span> <span class="va">studyn</span>,
-                       trt <span class="op">=</span> <span class="va">trtc</span>,
-                       r <span class="op">=</span> <span class="va">r</span>, 
-                       n <span class="op">=</span> <span class="va">n</span>,
-                       trt_ref <span class="op">=</span> <span class="st">"Unvaccinated"</span><span class="op">)</span>
-<span class="va">bcg_net</span>
-<span class="co">#&gt; A network with 13 AgD studies (arm-based).</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------</span> <span style="font-weight: bold;">AgD studies (arm-based)</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt;  Study Treatment arms              </span>
-<span class="co">#&gt;  1     2: Unvaccinated | Vaccinated</span>
-<span class="co">#&gt;  2     2: Unvaccinated | Vaccinated</span>
-<span class="co">#&gt;  3     2: Unvaccinated | Vaccinated</span>
-<span class="co">#&gt;  4     2: Unvaccinated | Vaccinated</span>
-<span class="co">#&gt;  5     2: Unvaccinated | Vaccinated</span>
-<span class="co">#&gt;  6     2: Unvaccinated | Vaccinated</span>
-<span class="co">#&gt;  7     2: Unvaccinated | Vaccinated</span>
-<span class="co">#&gt;  8     2: Unvaccinated | Vaccinated</span>
-<span class="co">#&gt;  9     2: Unvaccinated | Vaccinated</span>
-<span class="co">#&gt;  10    2: Unvaccinated | Vaccinated</span>
-<span class="co">#&gt; <span style="color: #555555;"> ... plus 3 more studies</span></span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;  Outcome type: count</span>
-<span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------------------------</span></span>
-<span class="co">#&gt; Total number of treatments: 2</span>
-<span class="co">#&gt; Total number of studies: 13</span>
-<span class="co">#&gt; Reference treatment is: Unvaccinated</span>
-<span class="co">#&gt; Network is <span style="color: #00BB00;">connected</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">bcg_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_agd_arm.html">set_agd_arm</a></span><span class="op">(</span><span class="va">bcg_vaccine</span>, </span>
+<span>                       study <span class="op">=</span> <span class="va">studyn</span>,</span>
+<span>                       trt <span class="op">=</span> <span class="va">trtc</span>,</span>
+<span>                       r <span class="op">=</span> <span class="va">r</span>, </span>
+<span>                       n <span class="op">=</span> <span class="va">n</span>,</span>
+<span>                       trt_ref <span class="op">=</span> <span class="st">"Unvaccinated"</span><span class="op">)</span></span>
+<span><span class="va">bcg_net</span></span>
+<span><span class="co">#&gt; A network with 13 AgD studies (arm-based).</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------</span> <span style="font-weight: bold;">AgD studies (arm-based)</span> <span style="color: #555555;">----</span> </span></span>
+<span><span class="co">#&gt;  Study Treatment arms              </span></span>
+<span><span class="co">#&gt;  1     2: Unvaccinated | Vaccinated</span></span>
+<span><span class="co">#&gt;  2     2: Unvaccinated | Vaccinated</span></span>
+<span><span class="co">#&gt;  3     2: Unvaccinated | Vaccinated</span></span>
+<span><span class="co">#&gt;  4     2: Unvaccinated | Vaccinated</span></span>
+<span><span class="co">#&gt;  5     2: Unvaccinated | Vaccinated</span></span>
+<span><span class="co">#&gt;  6     2: Unvaccinated | Vaccinated</span></span>
+<span><span class="co">#&gt;  7     2: Unvaccinated | Vaccinated</span></span>
+<span><span class="co">#&gt;  8     2: Unvaccinated | Vaccinated</span></span>
+<span><span class="co">#&gt;  9     2: Unvaccinated | Vaccinated</span></span>
+<span><span class="co">#&gt;  10    2: Unvaccinated | Vaccinated</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;"> ... plus 3 more studies</span></span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Outcome type: count</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------------------------</span></span></span>
+<span><span class="co">#&gt; Total number of treatments: 2</span></span>
+<span><span class="co">#&gt; Total number of studies: 13</span></span>
+<span><span class="co">#&gt; Reference treatment is: Unvaccinated</span></span>
+<span><span class="co">#&gt; Network is <span style="color: #00BB00;">connected</span></span></span></code></pre></div>
 <p>The <code>latitude</code> variable in the <code>bcg_vaccine</code> data frame will automatically be available to use in a meta-regression model.</p>
 </div>
 <div class="section level2">
@@ -170,49 +170,49 @@
 </h3>
 <p>We start by fitting a standard RE model without any covariates. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effect <span class="math inline">\(d_\mathrm{Vaccine}\)</span> and study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and a <span class="math inline">\(\textrm{half-N}(0, 5^2)\)</span> prior distribution for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span>
-<span class="co">#&gt; 50% of the prior density lies between -67.45 and 67.45.</span>
-<span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; A half-Normal prior distribution: location = 0, scale = 5.</span>
-<span class="co">#&gt; 50% of the prior density lies between 0 and 3.37.</span>
-<span class="co">#&gt; 95% of the prior density lies between 0 and 9.8.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span></span>
+<span><span class="co">#&gt; 50% of the prior density lies between -67.45 and 67.45.</span></span>
+<span><span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; A half-Normal prior distribution: location = 0, scale = 5.</span></span>
+<span><span class="co">#&gt; 50% of the prior density lies between 0 and 3.37.</span></span>
+<span><span class="co">#&gt; 95% of the prior density lies between 0 and 9.8.</span></span></code></pre></div>
 <p>The model is fitted with the <code><a href="../reference/nma.html">nma()</a></code> function, with a random effects model specified by <code>trt_effects = "random"</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">bcg_fit_unadj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">bcg_net</span>, 
-                     trt_effects <span class="op">=</span> <span class="st">"random"</span>,
-                     prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
-                     prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
-                     prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">bcg_fit_unadj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">bcg_net</span>, </span>
+<span>                     trt_effects <span class="op">=</span> <span class="st">"random"</span>,</span>
+<span>                     prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span>                     prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span>                     prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">bcg_fit_unadj</span>
-<span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span>
-<span class="co">#&gt; Inference for Stan model: binomial_1par.</span>
-<span class="co">#&gt; 4 chains, each with iter=2000; warmup=1000; thin=1; </span>
-<span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                    mean se_mean   sd      2.5%       25%       50%       75%     97.5% n_eff</span>
-<span class="co">#&gt; d[Vaccinated]     -0.75    0.01 0.21     -1.17     -0.89     -0.75     -0.62     -0.34  1284</span>
-<span class="co">#&gt; lp__          -13453.94    0.13 4.44 -13463.44 -13456.69 -13453.65 -13450.86 -13446.31  1168</span>
-<span class="co">#&gt; tau                0.68    0.01 0.20      0.39      0.54      0.65      0.78      1.14  1408</span>
-<span class="co">#&gt;               Rhat</span>
-<span class="co">#&gt; d[Vaccinated]    1</span>
-<span class="co">#&gt; lp__             1</span>
-<span class="co">#&gt; tau              1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue May 31 17:29:17 2022.</span>
-<span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
-<span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
-<span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">bcg_fit_unadj</span></span>
+<span><span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span></span>
+<span><span class="co">#&gt; Inference for Stan model: binomial_1par.</span></span>
+<span><span class="co">#&gt; 4 chains, each with iter=2000; warmup=1000; thin=1; </span></span>
+<span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                    mean se_mean   sd      2.5%       25%       50%       75%     97.5% n_eff</span></span>
+<span><span class="co">#&gt; d[Vaccinated]     -0.75    0.01 0.21     -1.17     -0.89     -0.75     -0.62     -0.34  1284</span></span>
+<span><span class="co">#&gt; lp__          -13453.94    0.13 4.44 -13463.44 -13456.69 -13453.65 -13450.86 -13446.31  1168</span></span>
+<span><span class="co">#&gt; tau                0.68    0.01 0.20      0.39      0.54      0.65      0.78      1.14  1408</span></span>
+<span><span class="co">#&gt;               Rhat</span></span>
+<span><span class="co">#&gt; d[Vaccinated]    1</span></span>
+<span><span class="co">#&gt; lp__             1</span></span>
+<span><span class="co">#&gt; tau              1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Aug 18 18:41:38 2022.</span></span>
+<span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
+<span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
+<span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
 <p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and random effects <span class="math inline">\(\delta_j\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Not run</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span>, <span class="st">"tau"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Not run</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span>, <span class="st">"tau"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_bcg_vaccine_files/figure-html/bcg_unadj_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -220,61 +220,61 @@
 </h3>
 <p>We now fit a RE meta-regression model, adjusting for <code>latitude</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effect <span class="math inline">\(d_\mathrm{Vaccine}\)</span>, study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and regression coefficient <span class="math inline">\(\beta\)</span>. We use a <span class="math inline">\(\text{half-N}(0, 5^2)\)</span> prior distribution for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span>
-<span class="co">#&gt; 50% of the prior density lies between -67.45 and 67.45.</span>
-<span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; A half-Normal prior distribution: location = 0, scale = 5.</span>
-<span class="co">#&gt; 50% of the prior density lies between 0 and 3.37.</span>
-<span class="co">#&gt; 95% of the prior density lies between 0 and 9.8.</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span></span>
+<span><span class="co">#&gt; 50% of the prior density lies between -67.45 and 67.45.</span></span>
+<span><span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; A half-Normal prior distribution: location = 0, scale = 5.</span></span>
+<span><span class="co">#&gt; 50% of the prior density lies between 0 and 3.37.</span></span>
+<span><span class="co">#&gt; 95% of the prior density lies between 0 and 9.8.</span></span></code></pre></div>
 <p>Again, the model is fitted with the <code><a href="../reference/nma.html">nma()</a></code> function. The <code>regression</code> formula <code>~ .trt:latitude</code> means that the interaction of latitude with treatment will be included; the <code>.trt</code> special variable indicates treatment, and <code>latitude</code> is in the original data set. We increase <code>adapt_delta</code> to 0.99 to remove a small number of divergent transition errors (the default for RE models is set to 0.95).</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">bcg_fit_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">bcg_net</span>, 
-                   trt_effects <span class="op">=</span> <span class="st">"random"</span>,
-                   regression <span class="op">=</span> <span class="op">~</span><span class="va">.trt</span><span class="op">:</span><span class="va">latitude</span>,
-                   prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
-                   prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
-                   prior_reg <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
-                   prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,
-                   adapt_delta <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">#&gt; Note: No treatment classes specified in network, any interactions in `regression` formula will be separate (independent) for each treatment.</span>
-<span class="co">#&gt; Use set_*() argument `trt_class` and nma() argument `class_interactions` to change this.</span></code></pre>
+<code class="sourceCode R"><span><span class="va">bcg_fit_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">bcg_net</span>, </span>
+<span>                   trt_effects <span class="op">=</span> <span class="st">"random"</span>,</span>
+<span>                   regression <span class="op">=</span> <span class="op">~</span><span class="va">.trt</span><span class="op">:</span><span class="va">latitude</span>,</span>
+<span>                   prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span>                   prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span>                   prior_reg <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span>                   prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
+<span>                   adapt_delta <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; Note: No treatment classes specified in network, any interactions in `regression` formula will be separate (independent) for each treatment.</span></span>
+<span><span class="co">#&gt; Use set_*() argument `trt_class` and nma() argument `class_interactions` to change this.</span></span></code></pre>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">bcg_fit_lat</span>
-<span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span>
-<span class="co">#&gt; Regression model: ~.trt:latitude.</span>
-<span class="co">#&gt; Centred covariates at the following overall mean values:</span>
-<span class="co">#&gt; latitude </span>
-<span class="co">#&gt; 33.46154 </span>
-<span class="co">#&gt; Inference for Stan model: binomial_1par.</span>
-<span class="co">#&gt; 4 chains, each with iter=2000; warmup=1000; thin=1; </span>
-<span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                                    mean se_mean   sd      2.5%       25%       50%       75%</span>
-<span class="co">#&gt; beta[.trtVaccinated:latitude]     -0.03    0.00 0.01     -0.05     -0.04     -0.03     -0.03</span>
-<span class="co">#&gt; d[Vaccinated]                     -0.76    0.00 0.12     -1.02     -0.83     -0.75     -0.69</span>
-<span class="co">#&gt; lp__                          -13457.10    0.18 5.08 -13467.75 -13460.31 -13456.75 -13453.42</span>
-<span class="co">#&gt; tau                                0.30    0.01 0.18      0.03      0.16      0.27      0.40</span>
-<span class="co">#&gt;                                   97.5% n_eff Rhat</span>
-<span class="co">#&gt; beta[.trtVaccinated:latitude]     -0.02  2004    1</span>
-<span class="co">#&gt; d[Vaccinated]                     -0.52  1801    1</span>
-<span class="co">#&gt; lp__                          -13448.20   767    1</span>
-<span class="co">#&gt; tau                                0.74   816    1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue May 31 17:29:32 2022.</span>
-<span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span>
-<span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span>
-<span class="co">#&gt; convergence, Rhat=1).</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">bcg_fit_lat</span></span>
+<span><span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span></span>
+<span><span class="co">#&gt; Regression model: ~.trt:latitude.</span></span>
+<span><span class="co">#&gt; Centred covariates at the following overall mean values:</span></span>
+<span><span class="co">#&gt; latitude </span></span>
+<span><span class="co">#&gt; 33.46154 </span></span>
+<span><span class="co">#&gt; Inference for Stan model: binomial_1par.</span></span>
+<span><span class="co">#&gt; 4 chains, each with iter=2000; warmup=1000; thin=1; </span></span>
+<span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                                    mean se_mean   sd      2.5%       25%       50%       75%</span></span>
+<span><span class="co">#&gt; beta[.trtVaccinated:latitude]     -0.03    0.00 0.01     -0.05     -0.04     -0.03     -0.03</span></span>
+<span><span class="co">#&gt; d[Vaccinated]                     -0.76    0.00 0.12     -1.02     -0.83     -0.75     -0.69</span></span>
+<span><span class="co">#&gt; lp__                          -13457.10    0.18 5.08 -13467.75 -13460.31 -13456.75 -13453.42</span></span>
+<span><span class="co">#&gt; tau                                0.30    0.01 0.18      0.03      0.16      0.27      0.40</span></span>
+<span><span class="co">#&gt;                                   97.5% n_eff Rhat</span></span>
+<span><span class="co">#&gt; beta[.trtVaccinated:latitude]     -0.02  2004    1</span></span>
+<span><span class="co">#&gt; d[Vaccinated]                     -0.52  1801    1</span></span>
+<span><span class="co">#&gt; lp__                          -13448.20   767    1</span></span>
+<span><span class="co">#&gt; tau                                0.74   816    1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Aug 18 18:41:52 2022.</span></span>
+<span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
+<span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
+<span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
 <p>Note that <code>latitude</code> has automatically been centered at 33.46, the mean value for the studies in the network.</p>
 <p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects <span class="math inline">\(\delta_{jk}\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Not run</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"beta"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span>, <span class="st">"tau"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Not run</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"beta"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span>, <span class="st">"tau"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"reg"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"reg"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_bcg_vaccine_files/figure-html/bcg_lat_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -283,33 +283,33 @@
 </h2>
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">(</span><span class="va">bcg_dic_unadj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 26<span style="color: #555555;"> (on 26 data points)</span></span>
-<span class="co">#&gt;                pD: 23.5</span>
-<span class="co">#&gt;               DIC: 49.5</span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">bcg_dic_unadj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Residual deviance: 26<span style="color: #555555;"> (on 26 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 23.5</span></span>
+<span><span class="co">#&gt;               DIC: 49.5</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">(</span><span class="va">bcg_dic_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Residual deviance: 30.4<span style="color: #555555;"> (on 26 data points)</span></span>
-<span class="co">#&gt;                pD: 21.2</span>
-<span class="co">#&gt;               DIC: 51.6</span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">bcg_dic_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Residual deviance: 30.4<span style="color: #555555;"> (on 26 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 21.2</span></span>
+<span><span class="co">#&gt;               DIC: 51.6</span></span></code></pre></div>
 <p>The DIC is very similar between the two models, so we might at first choose the unadjusted model. The posterior mean residual deviance is larger for the model with the covariate, but this model also has a lower effective number of parameters <span class="math inline">\(p_D\)</span> so is allowing for more shrinkage of the random treatment effects. Moreover, the model with the covariate has a much lower estimated heterogeneity standard deviation:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span>
-<span class="co">#&gt;     mean  sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; tau 0.68 0.2 0.39 0.54 0.65 0.78  1.14     1417     2113    1</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span>
-<span class="co">#&gt;     mean   sd 2.5%  25%  50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; tau  0.3 0.18 0.03 0.16 0.27 0.4  0.74      755     1246    1</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     mean  sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; tau 0.68 0.2 0.39 0.54 0.65 0.78  1.14     1417     2113    1</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     mean   sd 2.5%  25%  50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; tau  0.3 0.18 0.03 0.16 0.27 0.4  0.74      755     1246    1</span></span></code></pre></div>
 <p>Adjusting for latitude is explaining a substantial amount of heterogeneity in the data. The 95% Credible Interval for the regression coefficient also excludes zero:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, pars <span class="op">=</span> <span class="st">"beta"</span><span class="op">)</span>
-<span class="co">#&gt;                                mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; beta[.trtVaccinated:latitude] -0.03 0.01 -0.05 -0.04 -0.03 -0.03 -0.02     2059     2260    1</span>
-
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, 
-     pars <span class="op">=</span> <span class="st">"beta"</span>, 
-     ref_line <span class="op">=</span> <span class="fl">0</span>,
-     stat <span class="op">=</span> <span class="st">"halfeye"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, pars <span class="op">=</span> <span class="st">"beta"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                                mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; beta[.trtVaccinated:latitude] -0.03 0.01 -0.05 -0.04 -0.03 -0.03 -0.02     2059     2260    1</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, </span>
+<span>     pars <span class="op">=</span> <span class="st">"beta"</span>, </span>
+<span>     ref_line <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>     stat <span class="op">=</span> <span class="st">"halfeye"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_bcg_vaccine_files/figure-html/bcg_vaccine_beta_lat-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>Altogether, we might prefer the model with the adjustment for latitude. When considering covariates in random effects models it is important not to just look at the DIC <span class="citation">(<a href="#ref-TSD3" role="doc-biblioref">Dias et al. 2011</a>)</span>. We should also consider any reductions in heterogeneity, and the estimated regression coefficients and their standard error. The DIC is not sensitive to changes in the heterogeneity, as RE models are very flexible and can fit the data well whatever the level of heterogeneity.</p>
 </div>
@@ -318,194 +318,194 @@
 </h2>
 <p>We can produce estimates of the relative effect of vaccination at any latitude using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function. The <code>newdata</code> argument specifies a data frame containing the values of the covariate <code>latitude</code> that we are interested in, and the <code>study</code> argument is used to specify a column of <code>newdata</code> for an informative label.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">bcg_releff_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>,
-                                   newdata <span class="op">=</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>latitude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span>, by <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,
-                                                            label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">latitude</span>, <span class="st">"\u00B0 latitude"</span><span class="op">)</span><span class="op">)</span>,
-                                   study <span class="op">=</span> <span class="va">label</span><span class="op">)</span>
-
-<span class="va">bcg_releff_lat</span>
-<span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 10° latitude</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Covariate values:</span>
-<span class="co">#&gt;  latitude</span>
-<span class="co">#&gt;        10</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                              mean   sd  2.5%   25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[10° latitude: Vaccinated] -0.02 0.21 -0.49 -0.13   0 0.1  0.39     2106     2085    1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 20° latitude</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Covariate values:</span>
-<span class="co">#&gt;  latitude</span>
-<span class="co">#&gt;        20</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[20° latitude: Vaccinated] -0.33 0.16 -0.67 -0.42 -0.32 -0.25 -0.04     2119     1945    1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 30° latitude</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Covariate values:</span>
-<span class="co">#&gt;  latitude</span>
-<span class="co">#&gt;        30</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[30° latitude: Vaccinated] -0.65 0.12 -0.91 -0.72 -0.64 -0.58 -0.41     2066     1826    1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 40° latitude</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Covariate values:</span>
-<span class="co">#&gt;  latitude</span>
-<span class="co">#&gt;        40</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[40° latitude: Vaccinated] -0.97 0.14 -1.25 -1.05 -0.96 -0.89 -0.69     1793     1868    1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 50° latitude</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Covariate values:</span>
-<span class="co">#&gt;  latitude</span>
-<span class="co">#&gt;        50</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; d[50° latitude: Vaccinated] -1.28 0.18 -1.66 -1.39 -1.28 -1.18 -0.91     1766     2190    1</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">bcg_releff_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>,</span>
+<span>                                   newdata <span class="op">=</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>latitude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span>, by <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
+<span>                                                            label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">latitude</span>, <span class="st">"\u00B0 latitude"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                                   study <span class="op">=</span> <span class="va">label</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">bcg_releff_lat</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 10° latitude</span> <span style="color: #555555;">----</span> </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Covariate values:</span></span>
+<span><span class="co">#&gt;  latitude</span></span>
+<span><span class="co">#&gt;        10</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                              mean   sd  2.5%   25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; d[10° latitude: Vaccinated] -0.02 0.21 -0.49 -0.13   0 0.1  0.39     2106     2085    1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 20° latitude</span> <span style="color: #555555;">----</span> </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Covariate values:</span></span>
+<span><span class="co">#&gt;  latitude</span></span>
+<span><span class="co">#&gt;        20</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; d[20° latitude: Vaccinated] -0.33 0.16 -0.67 -0.42 -0.32 -0.25 -0.04     2119     1945    1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 30° latitude</span> <span style="color: #555555;">----</span> </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Covariate values:</span></span>
+<span><span class="co">#&gt;  latitude</span></span>
+<span><span class="co">#&gt;        30</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; d[30° latitude: Vaccinated] -0.65 0.12 -0.91 -0.72 -0.64 -0.58 -0.41     2066     1826    1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 40° latitude</span> <span style="color: #555555;">----</span> </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Covariate values:</span></span>
+<span><span class="co">#&gt;  latitude</span></span>
+<span><span class="co">#&gt;        40</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; d[40° latitude: Vaccinated] -0.97 0.14 -1.25 -1.05 -0.96 -0.89 -0.69     1793     1868    1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 50° latitude</span> <span style="color: #555555;">----</span> </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Covariate values:</span></span>
+<span><span class="co">#&gt;  latitude</span></span>
+<span><span class="co">#&gt;        50</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; d[50° latitude: Vaccinated] -1.28 0.18 -1.66 -1.39 -1.28 -1.18 -0.91     1766     2190    1</span></span></code></pre></div>
 <p>The <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method may be used to visually compare these estimates:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bcg_releff_lat</span>, 
-     ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bcg_releff_lat</span>, </span>
+<span>     ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_bcg_vaccine_files/figure-html/bcg_vaccine_releff_lat-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>A more sophisticated plot shows the regression line and confidence band for the effect of latitude, overlaid on the observed log odds ratios in each study:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attaching package: 'dplyr'</span>
-<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     filter, lag</span>
-<span class="co">#&gt; The following objects are masked from 'package:base':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     intersect, setdiff, setequal, union</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
-
-<span class="co"># Get data for regression line</span>
-<span class="va">lat_range</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">bcg_vaccine</span><span class="op">$</span><span class="va">latitude</span><span class="op">)</span>
-<span class="va">lat_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>latitude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="va">lat_range</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">lat_range</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
-
-<span class="va">bcg_lat_reg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, 
-                                newdata <span class="op">=</span> <span class="va">lat_dat</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_cols</a></span><span class="op">(</span><span class="va">lat_dat</span><span class="op">)</span>
-
-<span class="co"># Get study log odds ratios</span>
-<span class="va">bcg_lor</span> <span class="op">&lt;-</span> <span class="va">bcg_vaccine</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">studyn</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>lor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">r</span> <span class="op">/</span> <span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="va">r</span><span class="op">)</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
-         sample_size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span>
-
-<span class="co"># Plot</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">latitude</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">bcg_lor</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span>, colour <span class="op">=</span> <span class="st">"grey60"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">`2.5%`</span>, ymax <span class="op">=</span> <span class="va">`97.5%`</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">bcg_lat_reg</span>,
-              fill <span class="op">=</span> <span class="st">"darkred"</span>, alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">mean</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">bcg_lat_reg</span>,
-            colour <span class="op">=</span> <span class="st">"darkred"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">lor</span>, size <span class="op">=</span> <span class="va">sample_size</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">60</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Degrees Latitude"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"log Odds Ratio"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_size.html" class="external-link">scale_size</a></span><span class="op">(</span><span class="st">"Sample Size"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="../reference/theme_multinma.html">theme_multinma</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     filter, lag</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get data for regression line</span></span>
+<span><span class="va">lat_range</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">bcg_vaccine</span><span class="op">$</span><span class="va">latitude</span><span class="op">)</span></span>
+<span><span class="va">lat_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>latitude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="va">lat_range</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">lat_range</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">bcg_lat_reg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, </span>
+<span>                                newdata <span class="op">=</span> <span class="va">lat_dat</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_cols</a></span><span class="op">(</span><span class="va">lat_dat</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get study log odds ratios</span></span>
+<span><span class="va">bcg_lor</span> <span class="op">&lt;-</span> <span class="va">bcg_vaccine</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">studyn</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>lor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">r</span> <span class="op">/</span> <span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="va">r</span><span class="op">)</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>         sample_size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Plot</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">latitude</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">bcg_lor</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span>, colour <span class="op">=</span> <span class="st">"grey60"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">`2.5%`</span>, ymax <span class="op">=</span> <span class="va">`97.5%`</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">bcg_lat_reg</span>,</span>
+<span>              fill <span class="op">=</span> <span class="st">"darkred"</span>, alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">mean</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">bcg_lat_reg</span>,</span>
+<span>            colour <span class="op">=</span> <span class="st">"darkred"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">lor</span>, size <span class="op">=</span> <span class="va">sample_size</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">60</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Degrees Latitude"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"log Odds Ratio"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_size.html" class="external-link">scale_size</a></span><span class="op">(</span><span class="st">"Sample Size"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_multinma.html">theme_multinma</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_bcg_vaccine_files/figure-html/bcg_vaccine_reg_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>In the presence of heterogeneity, it has been argued that decision makers should consider the predictive distribution of relative effects in a new study, instead of the posterior distribution of the mean treatment effects, as this reflects uncertainty due to heterogeneity and may better represent uncertainty about a future roll-out of a treatment <span class="citation">(see <a href="#ref-TSD3" role="doc-biblioref">Dias et al. 2011</a>)</span>. We can produce predictive distributions using the <code>predictive_distribution = TRUE</code> argument to <code><a href="../reference/relative_effects.html">relative_effects()</a></code>. Dias et al. <span class="citation">(<a href="#ref-Dias2018" role="doc-biblioref">2018, sec. 8.3.2</a>)</span> consider the predictive distributions for this BCG vaccine analysis.</p>
 <p>In the unadjusted analysis, whilst there is substantial evidence that vaccination is effective on average and essentially zero probability of harm based on the mean effect, the predictive distribution for effectiveness in a new study is wide and covers a range of harmful effects:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">(</span><span class="va">bcg_predeff_unadj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, predictive_distribution <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;                        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; delta_new[Vaccinated] -0.76 0.73 -2.18 -1.21 -0.76 -0.31  0.71     3349     3327    1</span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">bcg_predeff_unadj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, predictive_distribution <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; delta_new[Vaccinated] -0.76 0.73 -2.18 -1.21 -0.76 -0.31  0.71     3349     3327    1</span></span></code></pre></div>
 <p>The predictive probability of a new trial showing a harmful effect is:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">bcg_predeff_unadj</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span>
-<span class="co">#&gt; [1] 0.13675</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">bcg_predeff_unadj</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.13675</span></span></code></pre></div>
 <p>For the analysis adjusting for latitude, the predictive distribution of relative effects now depends on latitude; here we calculate these in increments of 10 degrees from the equator:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">bcg_predeff_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>,
-                                   newdata <span class="op">=</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>latitude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">50</span>, by <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,
-                                                            label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">latitude</span>, <span class="st">"\u00B0 latitude"</span><span class="op">)</span><span class="op">)</span>,
-                                   study <span class="op">=</span> <span class="va">label</span>,
-                                   predictive_distribution <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="va">bcg_predeff_lat</span>
-<span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 0° latitude</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Covariate values:</span>
-<span class="co">#&gt;  latitude</span>
-<span class="co">#&gt;         0</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                                    mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="co">#&gt; delta_new[0° latitude: Vaccinated]  0.3 0.44 -0.66 0.08 0.32 0.51  1.22     3388     3065    1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 10° latitude</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Covariate values:</span>
-<span class="co">#&gt;  latitude</span>
-<span class="co">#&gt;        10</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                                      mean  sd  2.5%   25% 50%  75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="co">#&gt; delta_new[10° latitude: Vaccinated] -0.02 0.4 -0.89 -0.21   0 0.17  0.83     3678     3081</span>
-<span class="co">#&gt;                                     Rhat</span>
-<span class="co">#&gt; delta_new[10° latitude: Vaccinated]    1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 20° latitude</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Covariate values:</span>
-<span class="co">#&gt;  latitude</span>
-<span class="co">#&gt;        20</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="co">#&gt; delta_new[20° latitude: Vaccinated] -0.33 0.38 -1.15 -0.51 -0.31 -0.16  0.47     3824     3129</span>
-<span class="co">#&gt;                                     Rhat</span>
-<span class="co">#&gt; delta_new[20° latitude: Vaccinated]    1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 30° latitude</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Covariate values:</span>
-<span class="co">#&gt;  latitude</span>
-<span class="co">#&gt;        30</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="co">#&gt; delta_new[30° latitude: Vaccinated] -0.65 0.37 -1.43 -0.82 -0.64 -0.48  0.15     3871     3545</span>
-<span class="co">#&gt;                                     Rhat</span>
-<span class="co">#&gt; delta_new[30° latitude: Vaccinated]    1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 40° latitude</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Covariate values:</span>
-<span class="co">#&gt;  latitude</span>
-<span class="co">#&gt;        40</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="co">#&gt; delta_new[40° latitude: Vaccinated] -0.96 0.37 -1.74 -1.15 -0.96 -0.79 -0.17     3763     3505</span>
-<span class="co">#&gt;                                     Rhat</span>
-<span class="co">#&gt; delta_new[40° latitude: Vaccinated]    1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 50° latitude</span> <span style="color: #555555;">----</span> </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Covariate values:</span>
-<span class="co">#&gt;  latitude</span>
-<span class="co">#&gt;        50</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;                                      mean  sd 2.5%   25%   50%  75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="co">#&gt; delta_new[50° latitude: Vaccinated] -1.28 0.4 -2.1 -1.47 -1.28 -1.1 -0.45     3395     3088</span>
-<span class="co">#&gt;                                     Rhat</span>
-<span class="co">#&gt; delta_new[50° latitude: Vaccinated]    1</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">bcg_predeff_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>,</span>
+<span>                                   newdata <span class="op">=</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>latitude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">50</span>, by <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
+<span>                                                            label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">latitude</span>, <span class="st">"\u00B0 latitude"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                                   study <span class="op">=</span> <span class="va">label</span>,</span>
+<span>                                   predictive_distribution <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">bcg_predeff_lat</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 0° latitude</span> <span style="color: #555555;">----</span> </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Covariate values:</span></span>
+<span><span class="co">#&gt;  latitude</span></span>
+<span><span class="co">#&gt;         0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                                    mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; delta_new[0° latitude: Vaccinated]  0.3 0.44 -0.66 0.08 0.32 0.51  1.22     3388     3065    1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 10° latitude</span> <span style="color: #555555;">----</span> </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Covariate values:</span></span>
+<span><span class="co">#&gt;  latitude</span></span>
+<span><span class="co">#&gt;        10</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                                      mean  sd  2.5%   25% 50%  75% 97.5% Bulk_ESS Tail_ESS</span></span>
+<span><span class="co">#&gt; delta_new[10° latitude: Vaccinated] -0.02 0.4 -0.89 -0.21   0 0.17  0.83     3678     3081</span></span>
+<span><span class="co">#&gt;                                     Rhat</span></span>
+<span><span class="co">#&gt; delta_new[10° latitude: Vaccinated]    1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 20° latitude</span> <span style="color: #555555;">----</span> </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Covariate values:</span></span>
+<span><span class="co">#&gt;  latitude</span></span>
+<span><span class="co">#&gt;        20</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS</span></span>
+<span><span class="co">#&gt; delta_new[20° latitude: Vaccinated] -0.33 0.38 -1.15 -0.51 -0.31 -0.16  0.47     3824     3129</span></span>
+<span><span class="co">#&gt;                                     Rhat</span></span>
+<span><span class="co">#&gt; delta_new[20° latitude: Vaccinated]    1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 30° latitude</span> <span style="color: #555555;">----</span> </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Covariate values:</span></span>
+<span><span class="co">#&gt;  latitude</span></span>
+<span><span class="co">#&gt;        30</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS</span></span>
+<span><span class="co">#&gt; delta_new[30° latitude: Vaccinated] -0.65 0.37 -1.43 -0.82 -0.64 -0.48  0.15     3871     3545</span></span>
+<span><span class="co">#&gt;                                     Rhat</span></span>
+<span><span class="co">#&gt; delta_new[30° latitude: Vaccinated]    1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 40° latitude</span> <span style="color: #555555;">----</span> </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Covariate values:</span></span>
+<span><span class="co">#&gt;  latitude</span></span>
+<span><span class="co">#&gt;        40</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS</span></span>
+<span><span class="co">#&gt; delta_new[40° latitude: Vaccinated] -0.96 0.37 -1.74 -1.15 -0.96 -0.79 -0.17     3763     3505</span></span>
+<span><span class="co">#&gt;                                     Rhat</span></span>
+<span><span class="co">#&gt; delta_new[40° latitude: Vaccinated]    1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 50° latitude</span> <span style="color: #555555;">----</span> </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Covariate values:</span></span>
+<span><span class="co">#&gt;  latitude</span></span>
+<span><span class="co">#&gt;        50</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                                      mean  sd 2.5%   25%   50%  75% 97.5% Bulk_ESS Tail_ESS</span></span>
+<span><span class="co">#&gt; delta_new[50° latitude: Vaccinated] -1.28 0.4 -2.1 -1.47 -1.28 -1.1 -0.45     3395     3088</span></span>
+<span><span class="co">#&gt;                                     Rhat</span></span>
+<span><span class="co">#&gt; delta_new[50° latitude: Vaccinated]    1</span></span></code></pre></div>
 <p>The predictive probabilities of a new trial carried out at a given latitude showing a harmful effect can be calculated as:</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">bcg_predeff_lat</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span>
-<span class="co">#&gt;  delta_new[0° latitude: Vaccinated] delta_new[10° latitude: Vaccinated] </span>
-<span class="co">#&gt;                             0.80475                             0.50275 </span>
-<span class="co">#&gt; delta_new[20° latitude: Vaccinated] delta_new[30° latitude: Vaccinated] </span>
-<span class="co">#&gt;                             0.13275                             0.03900 </span>
-<span class="co">#&gt; delta_new[40° latitude: Vaccinated] delta_new[50° latitude: Vaccinated] </span>
-<span class="co">#&gt;                             0.01300                             0.00700</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">bcg_predeff_lat</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  delta_new[0° latitude: Vaccinated] delta_new[10° latitude: Vaccinated] </span></span>
+<span><span class="co">#&gt;                             0.80475                             0.50275 </span></span>
+<span><span class="co">#&gt; delta_new[20° latitude: Vaccinated] delta_new[30° latitude: Vaccinated] </span></span>
+<span><span class="co">#&gt;                             0.13275                             0.03900 </span></span>
+<span><span class="co">#&gt; delta_new[40° latitude: Vaccinated] delta_new[50° latitude: Vaccinated] </span></span>
+<span><span class="co">#&gt;                             0.01300                             0.00700</span></span></code></pre></div>
 <p>So the predictive probability that a new trial carried out at the equator shows a harmful effect is around 80%, whereas at 50 degrees latitude the predictive probability is only 0.7%.</p>
 </div>
 <div class="section level2 unnumbered">
@@ -536,7 +536,7 @@ Dias, S., A. J. Sutton, N. J. Welton, and A. E. Ades. 2011. <span>“<span>NICE 
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
     </footer>
@@ -544,7 +544,6 @@ Dias, S., A. J. Sutton, N. J. Welton, and A. E. Ades. 2011. <span>“<span>NICE 
 
   
 
-  
-
-  </body>
+  <script data-goatcounter="https://multinma.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
 </html>
