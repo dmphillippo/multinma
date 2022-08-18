@@ -15,6 +15,9 @@ template:
     base_font: {google: "Source Sans Pro"}
     heading_font: {google: "Source Sans Pro"}
     #code_font: {google: "JetBrains Mono"}
+  includes:
+    after_body: >
+      <script data-goatcounter="https://multinma.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
 
 development:
