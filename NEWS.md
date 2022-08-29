@@ -13,6 +13,14 @@ for positive-valued parameters (e.g. heterogeneity variance).
 * Improvement: `set_agd_contrast()` now produces an informative error message
 when the covariance matrix implied by the `se` column is not positive definite.
 Previously this was only checked by Stan after calling the `nma()` function.
+* Improvement: Updated plaque psoriasis ML-NMR vignette to include new analyses,
+including assessing the assumptions of population adjustment and synthesising
+multinomial outcomes.
+* Improvement: Improved behaviour of the `.trtclass` special in regression
+formulas, now main effects of `.trtclass` are always removed since these are
+collinear with `.trt`. This allows expansion of interactions with `*` to work
+properly, e.g. `~variable*.trtclass`, whereas previously this resulted in an
+over-parametrised model.
 * Fix: CRAN check note for manual HTML5 compatibility.
 
 # multinma 0.4.2
