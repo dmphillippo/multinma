@@ -6,7 +6,7 @@ data {
 #include /include/data_common.stan
 
   // Prior on IPD variance
-  int<lower=0,upper=5> prior_aux_dist;
+  int<lower=0,upper=6> prior_aux_dist;
   real prior_aux_location;
   real<lower=0> prior_aux_scale;
   real<lower=0> prior_aux_df;

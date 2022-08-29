@@ -12,6 +12,7 @@ if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) { # Se
     collapse = TRUE,
     comment = "#>",
     dev = "ragg_png",
+    dpi = 96,
     fig.width = 6,
     fig.height = 4.5,
     fig.align = "center",

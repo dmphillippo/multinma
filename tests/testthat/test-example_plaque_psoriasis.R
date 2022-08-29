@@ -6,7 +6,7 @@ skip_on_cran()
 
 
 params <-
-list(run_tests = FALSE)
+list(run_tests = FALSE, eval_multinomial = FALSE)
 
 ## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
 
@@ -99,7 +99,7 @@ pso_net <- combine_network(
 pso_net
 
 
-## ----pso_network_plot, fig.width=8, fig.height=6, out.width="100%"--------------------------------
+## ----pso_network_plot, fig.width=8, fig.height=6--------------------------------------------------
 plot(pso_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) + 
   ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
 
@@ -175,7 +175,7 @@ print(pso_fit_FE)
 ## print(pso_fit_FE, pars = c("d", "beta", "mu"))
 
 
-## ----pso_FE_pp_plot, fig.width=8, fig.height=6, out.width="100%"----------------------------------
+## ----pso_FE_pp_plot, fig.width=8, fig.height=6----------------------------------------------------
 plot_prior_posterior(pso_fit_FE, prior = c("intercept", "trt", "reg"))
 
 
@@ -216,7 +216,7 @@ summary(half_normal(scale = 2.5))
 ## pairs(pso_fit_RE, pars = c("delta[UNCOVER-2: ETN]", "d[ETN]", "tau", "lp__"))
 
 
-## ----pso_RE_pp_plot, eval=!params$run_tests, fig.width=8, fig.height=6, out.width="100%"----------
+## ----pso_RE_pp_plot, eval=!params$run_tests, fig.width=8, fig.height=6----------------------------
 ## plot_prior_posterior(pso_fit_RE, prior = c("intercept", "trt", "reg", "het"))
 
 
@@ -310,6 +310,375 @@ new_agd_int <- add_integration(new_agd_int,
 plot(pso_pred_FE_new, ref_line = c(0, 1))
 
 
+## ---- eval=!params$run_tests----------------------------------------------------------------------
+## # IPD studies
+## pso_ipd <- plaque_psoriasis_ipd %>%
+##   mutate(
+##     # Variable transformations
+##     bsa = bsa / 100,
+##     weight = weight / 10,
+##     durnpso = durnpso / 10,
+##     prevsys = as.numeric(prevsys),
+##     psa = as.numeric(psa),
+##     # Treatment classes
+##     trtclass = case_when(trtn == 1 ~ "Placebo",
+##                          trtn %in% c(2, 3, 5, 6) ~ "IL-17 blocker",
+##                          trtn == 4 ~ "TNFa blocker",
+##                          trtn == 7 ~ "IL-12/23 blocker"),
+##     # Check complete cases for covariates of interest
+##     is_complete = complete.cases(durnpso, prevsys, bsa, weight, psa)
+##   ) %>%
+##   arrange(studyc, trtn)
+## 
+## # AgD studies
+## pso_agd <- plaque_psoriasis_agd %>%
+##   mutate(
+##     # Variable transformations
+##     bsa_mean = bsa_mean / 100,
+##     bsa_sd = bsa_sd / 100,
+##     weight_mean = weight_mean / 10,
+##     weight_sd = weight_sd / 10,
+##     durnpso_mean = durnpso_mean / 10,
+##     durnpso_sd = durnpso_sd / 10,
+##     prevsys = prevsys / 100,
+##     psa = psa / 100,
+##     # Treatment classes
+##     trtclass = case_when(trtn == 1 ~ "Placebo",
+##                          trtn %in% c(2, 3, 5, 6) ~ "IL-17 blocker",
+##                          trtn == 4 ~ "TNFa blocker",
+##                          trtn == 7 ~ "IL-12/23 blocker")
+##     ) %>%
+##   arrange(studyc, trtn)
+
+
+## ---- eval=!params$run_tests----------------------------------------------------------------------
+## pso_ipd %>%
+##   group_by(studyc) %>%
+##   summarise(n_total = n(),
+##             n_missing = sum(!is_complete),
+##             pct_missing = mean(!is_complete) * 100)
+## 
+## pso_ipd <- filter(pso_ipd, is_complete)
+
+
+## ---- eval=!params$run_tests----------------------------------------------------------------------
+## pso_net <- combine_network(
+##   set_ipd(pso_ipd,
+##     study = studyc,
+##     trt = trtc,
+##     r = multi(r0 = 1,
+##               PASI75 = pasi75,
+##               PASI90 = pasi90,
+##               PASI100 = pasi100,
+##               type = "ordered", inclusive = TRUE),
+##     trt_class = trtclass),
+##   set_agd_arm(pso_agd,
+##     study = studyc,
+##     trt = trtc,
+##     r = multi(r0 = pasi75_n,
+##               PASI75 = pasi75_r,
+##               PASI90 = pasi90_r,
+##               PASI100 = pasi100_r,
+##               type = "ordered", inclusive = TRUE),
+##     trt_class = trtclass)
+## )
+## 
+## pso_net
+
+
+## ----pso-full-network, eval=!params$run_tests, fig.width=8, fig.height=6--------------------------
+## class_pal <- c("#D95F02", "#7570B3", "#E7298A", "#E6AB02")
+## 
+## plot(pso_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE, nudge = 0.1) +
+##   ggraph::scale_edge_colour_manual("Data",
+##                                    values = c(AgD = "#113259", IPD = "#55A480"),
+##                                    guide = guide_legend(override.aes = list(edge_width = 2))) +
+##   scale_fill_manual("Treatment class",
+##                     values = class_pal,
+##                     aesthetics = c("fill", "colour"),
+##                     guide = guide_legend(override.aes = list(size = 2)))
+
+
+## ---- eval=!params$run_tests----------------------------------------------------------------------
+## pso_net <- add_integration(pso_net,
+##   durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+##   prevsys = distr(qbern, prob = prevsys),
+##   bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+##   weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
+##   psa = distr(qbern, prob = psa),
+##   n_int = 1000)
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## pso_fit_FE <- nma(pso_net,
+##                   trt_effects = "fixed",
+##                   link = "probit",
+##                   regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
+##                   class_interactions = "common",
+##                   prior_intercept = normal(scale = 10),
+##                   prior_trt = normal(scale = 10),
+##                   prior_reg = normal(scale = 10),
+##                   prior_aux = flat(),
+##                   QR = TRUE,
+##                   init_r = 0.5)
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## pso_fit_FE
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## pso_fit_RE <- nma(pso_net,
+##                   trt_effects = "random",
+##                   link = "probit",
+##                   regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
+##                   class_interactions = "common",
+##                   prior_intercept = normal(scale = 10),
+##                   prior_trt = normal(scale = 10),
+##                   prior_reg = normal(scale = 10),
+##                   prior_aux = flat(),
+##                   prior_het = half_normal(scale = 2.5),
+##                   QR = TRUE,
+##                   init_r = 0.5)
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## pso_fit_RE
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## (pso_dic_FE <- dic(pso_fit_FE))
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## (pso_dic_RE <- dic(pso_fit_RE))
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## pso_fit_UME <- nma(pso_net,
+##                    trt_effects = "fixed",
+##                    consistency = "ume",
+##                    link = "probit",
+##                    regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
+##                    class_interactions = "common",
+##                    prior_intercept = normal(scale = 10),
+##                    prior_trt = normal(scale = 10),
+##                    prior_reg = normal(scale = 10),
+##                    prior_aux = flat(),
+##                    QR = TRUE,
+##                    init_r = 0.5)
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## pso_fit_UME
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## pso_dic_FE
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## (pso_dic_UME <- dic(pso_fit_UME))
+
+
+## ----pso-full-dev-dev, eval=!params$run_tests && params$eval_multinomial--------------------------
+## plot(pso_dic_FE, pso_dic_UME, show_uncertainty = FALSE) +
+##   xlab("Residual deviance - consistency model") +
+##   ylab("Residual deviance - inconsistency (UME) model")
+
+
+## ---- eval=!params$run_tests----------------------------------------------------------------------
+## data.frame(classes = pso_net$classes, treatments = pso_net$treatments)
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## noSEM_mods <- list(
+##   durnpso = ~(prevsys + bsa + weight + psa)*.trtclass + durnpso*.trt,
+##   prevsys = ~(durnpso + bsa + weight + psa)*.trtclass + prevsys*.trt,
+##   bsa = ~(durnpso + prevsys + weight + psa)*.trtclass + bsa*.trt,
+##   weight = ~(durnpso + prevsys + bsa + psa)*.trtclass + weight*.trt,
+##   psa = ~(durnpso + prevsys + bsa + weight)*.trtclass + psa*.trt
+##   )
+## 
+## noSEM_fits <- noSEM_mods
+## 
+## for (m in 1:length(noSEM_mods)) {
+##   cat("Fitting model with independent interactions for", names(noSEM_mods)[m], "\n")
+## 
+##   noSEM_fits[[m]] <-
+##     nma(pso_net,
+##         trt_effects = "fixed",
+##         link = "probit",
+##         regression = noSEM_mods[[m]],
+##         class_interactions = "independent",
+##         prior_intercept = normal(scale = 10),
+##         prior_trt = normal(scale = 10),
+##         prior_reg = normal(scale = 10),
+##         prior_aux = flat(),
+##         QR = TRUE,
+##         init_r = 0.5,
+##         # Using save_warmup = FALSE reduces memory footprint when
+##         # fitting many models in one session
+##         save_warmup = FALSE)
+## }
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## pso_dic_FE
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## lapply(noSEM_fits, dic)
+
+
+## ----pso-full-relaxing-SEM, eval=!params$run_tests && params$eval_multinomial, fig.height=6, fig.width=8----
+## library(purrr)
+## library(stringr)
+## library(forcats)
+## 
+## # Extract draws from relaxed models
+## imap_dfr(noSEM_fits,
+##         ~as_tibble(as.matrix(.x, pars = "beta")) %>%
+##            pivot_longer(cols = everything(), names_to = "parameter", values_to = "value") %>%
+##            filter(str_detect(parameter, paste0("(IXE|SEC).+:", .y))) %>%
+##            mutate(model = .y)) %>%
+## 
+##   # Add in draws from the original model
+##   bind_rows(
+##     as_tibble(as.matrix(pso_fit_FE, pars = "beta")) %>%
+##     pivot_longer(cols = everything(), names_to = "parameter", values_to = "value") %>%
+##     filter(str_detect(parameter, ":.+IL\\-17 blocker")) %>%
+##     mutate(model = "all")
+##   ) %>%
+## 
+##   mutate(
+##     # Rescale BSA to per 10%
+##     value = if_else(str_detect(parameter, "bsa"), value / 10, value),
+##     # Create labels
+##     covariate = str_extract(parameter, "durnpso|prevsys|bsa|weight|psa"),
+##     covariatef = recode_factor(covariate,
+##                                durnpso = "Duration of psoriasis, per 10 years",
+##                                prevsys = "Previous systemic use",
+##                                bsa = "Body surface area, per 10%",
+##                                weight = "Weight, per 10 kg",
+##                                psa = "Psoriatic arthritis"),
+##     treatment = str_remove(str_extract(parameter, "\\.trt(class)?.+?(?=[\\]:])"),
+##                            "\\.trt(class)?"),
+##     Interactions = fct_collapse(factor(model),
+##                                 Common = "all",
+##                                 other_level = "Independent")) %>%
+## 
+## # Plot
+## ggplot(aes(x = value, y = fct_rev(treatment), colour = Interactions, fill = Interactions)) +
+##   geom_vline(xintercept = 0, colour = "grey70") +
+##   ggdist::stat_halfeye(normalize = "panels", slab_alpha = 0.3, .width = c(0, 0.95)) +
+##   facet_wrap("covariatef", scales = "free") +
+##   xlab("Interaction effect (SMD)") +
+##   ylab("Treatment / Class") +
+##   scale_colour_manual(values = c(Common = "#7B3294", Independent = "#91D388"),
+##                       aesthetics = c("colour", "fill")) +
+##   theme_multinma() +
+##   theme(legend.position = c(0.85, 0.2))
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## (pso_releff_FE <- relative_effects(pso_fit_FE))
+
+
+## ----pso-full-releff, eval=!params$run_tests && params$eval_multinomial, fig.height=8, fig.width=6----
+## plot(pso_releff_FE, ref_line = 0)
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## (pso_pred_FE <- predict(pso_fit_FE, type = "response"))
+
+
+## ----pso-full-pred, eval=!params$run_tests && params$eval_multinomial, fig.width=6, fig.height=8----
+## plot(pso_pred_FE, ref_line = c(0, 1))
+
+
+## ---- eval=!params$run_tests----------------------------------------------------------------------
+## new_agd_means <- tibble::tribble(
+##              ~study, ~covariate,  ~mean,   ~sd,
+##           "PsoBest",      "bsa",     24,  20.5,
+##           "PsoBest",  "durnpso",   18.2,  14.1,
+##           "PsoBest",  "prevsys",   0.54,    NA,
+##           "PsoBest",      "psa",  0.207,    NA,
+##           "PsoBest",   "weight",     85,  19.1,
+##          "PROSPECT",      "bsa",   18.7,  18.4,
+##          "PROSPECT",  "durnpso",   19.6,  13.5,
+##          "PROSPECT",  "prevsys", 0.9095,    NA,
+##          "PROSPECT",      "psa",  0.202,    NA,
+##          "PROSPECT",   "weight",   87.5,  20.3,
+##   "Chiricozzi 2019",      "bsa",     23, 16.79,
+##   "Chiricozzi 2019",  "durnpso",  16.93, 10.82,
+##   "Chiricozzi 2019",  "prevsys", 0.9061,    NA,
+##   "Chiricozzi 2019",      "psa", 0.2152,    NA,
+##   "Chiricozzi 2019",   "weight",   78.3, 15.87
+##   ) %>%
+##   # Tidy up
+##   pivot_wider(id_cols = study,
+##               names_from = covariate,
+##               values_from = c(mean, sd),
+##               names_glue = "{covariate}_{.value}") %>%
+##   # Rescale as per analysis
+##   transmute(study,
+##             bsa_mean = bsa_mean / 100,
+##             bsa_sd = bsa_sd / 100,
+##             weight_mean = weight_mean / 10,
+##             weight_sd = weight_sd / 10,
+##             durnpso_mean = durnpso_mean / 10,
+##             durnpso_sd = durnpso_sd / 10,
+##             prevsys = prevsys_mean,
+##             psa = psa_mean)
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## (pso_releff_FE_new <- relative_effects(pso_fit_FE,
+##                                        newdata = transmute(new_agd_means,
+##                                                            study,
+##                                                            bsa = bsa_mean,
+##                                                            weight = weight_mean,
+##                                                            durnpso = durnpso_mean,
+##                                                            prevsys,
+##                                                            psa),
+##                                        study = study))
+
+
+## ----pso-full-releff-new, eval=!params$run_tests && params$eval_multinomial-----------------------
+## plot(pso_releff_FE_new, ref_line = 0) + facet_wrap("Study")
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## new_agd_int <- add_integration(filter(new_agd_means, study != "PsoBest"),
+##                                durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+##                                prevsys = distr(qbern, prob = prevsys),
+##                                bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+##                                weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
+##                                psa = distr(qbern, prob = psa),
+##                                n_int = 1000,
+##                                cor = pso_net$int_cor)
+
+
+## ---- eval=!params$run_tests && params$eval_multinomial-------------------------------------------
+## (pso_pred_FE_new <- predict(pso_fit_FE,
+##         type = "response",
+##         newdata = new_agd_int,
+##         study = study,
+##         baseline = list(PROSPECT = distr(qbeta, 1156, 1509-1156),
+##                         "Chiricozzi 2019" = distr(qbeta, 243, 330-243)),
+##         baseline_type = "response",
+##         baseline_level = "aggregate",
+##         trt_ref = "SEC_300"))
+
+
+## ----pso-full-pred-new, eval=!params$run_tests && params$eval_multinomial-------------------------
+## plot(pso_pred_FE_new, ref_line = c(0, 1)) +
+##   facet_grid(rows = "Study") +
+##   aes(colour = Category) +
+##   scale_colour_brewer(palette = "Blues")
+
+
 ## ----pso_tests, include=FALSE, eval=params$run_tests----------------------------------------------
 library(testthat)
 library(dplyr)
@@ -384,15 +753,18 @@ dk <- function(study, trt, sims = pso_releff_FE$sims) {
 
 test_all_contr <- tibble(
   contr = pso_releff_FE_all_contr$summary$parameter,
-  study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
-  trtb = stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"),
-  trta = stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])")
+  .study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
+  .trtb = factor(stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"), levels = levels(pso_net$treatments)),
+  .trta = factor(stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])"), levels = levels(pso_net$treatments))
 ) %>% 
   rowwise() %>% 
-  mutate(as_tibble(multinma:::summary.mcmc_array(dk(study, trtb) - dk(study, trta)))) %>% 
-  select(.study = study, parameter = contr, mean:Rhat)
+  mutate(as_tibble(multinma:::summary.mcmc_array(dk(.study, .trtb) - dk(.study, .trta)))) %>% 
+  select(.study, .trtb, .trta, parameter = contr, mean:Rhat)
 
 test_that("Construction of all contrasts is correct", {
+  ntrt <- nlevels(pso_net$treatments)
+  nstudy <- nlevels(test_all_contr$.study)
+  expect_equal(nrow(pso_releff_FE_all_contr$summary), nstudy * ntrt * (ntrt - 1) / 2)
   expect_equal(pso_releff_FE_all_contr$summary, test_all_contr, check.attributes = FALSE)
 })
 
@@ -401,15 +773,18 @@ pso_releff_FE_all_contr_new <- relative_effects(pso_fit_FE, newdata = new_agd_me
 
 test_all_contr_new <- tibble(
   contr = pso_releff_FE_all_contr_new$summary$parameter,
-  study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
-  trtb = stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"),
-  trta = stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])")
+  .study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
+  .trtb = factor(stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"), levels = levels(pso_net$treatments)),
+  .trta = factor(stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])"), levels = levels(pso_net$treatments))
 ) %>% 
   rowwise() %>% 
-  mutate(as_tibble(multinma:::summary.mcmc_array(dk(study, trtb, pso_releff_FE_new$sims) - dk(study, trta, pso_releff_FE_new$sims)))) %>% 
-  select(.study = study, parameter = contr, mean:Rhat)
+  mutate(as_tibble(multinma:::summary.mcmc_array(dk(.study, .trtb, pso_releff_FE_new$sims) - dk(.study, .trta, pso_releff_FE_new$sims)))) %>% 
+  select(.study, .trtb, .trta, parameter = contr, mean:Rhat)
 
 test_that("Construction of all contrasts in target population is correct", {
+  ntrt <- nlevels(pso_net$treatments)
+  nstudy <- nlevels(test_all_contr_new$.study)
+  expect_equal(nrow(pso_releff_FE_all_contr_new$summary), nstudy * ntrt * (ntrt - 1) / 2)
   expect_equal(pso_releff_FE_all_contr_new$summary, test_all_contr_new, check.attributes = FALSE)
 })
 

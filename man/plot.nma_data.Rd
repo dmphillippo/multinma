@@ -11,7 +11,8 @@
   circular,
   weight_edges = TRUE,
   weight_nodes = FALSE,
-  show_trt_class = FALSE
+  show_trt_class = FALSE,
+  nudge = 0
 )
 }
 \arguments{
@@ -31,6 +32,10 @@ may be used, including all of the layout functions provided by \link{igraph}.}
 
 \item{show_trt_class}{Colour treatment nodes by class, if \code{trt_class} is set?
 Default is \code{FALSE}.}
+
+\item{nudge}{Numeric value to nudge the treatment labels away from the nodes
+when \code{weight_nodes = TRUE}. Default is \code{0} (no adjustment to label
+position). A small value like \code{0.1} is usually sufficient.}
 }
 \value{
 A \code{ggplot} object, as produced by \code{\link[=ggraph]{ggraph()}}.
@@ -70,6 +75,9 @@ plot(af_net, weight_nodes = TRUE)
 
 # Colour treatment nodes by class
 plot(af_net, weight_nodes = TRUE, show_trt_class = TRUE)
+
+# Nudge the treatment labels away from the nodes
+plot(af_net, weight_nodes = TRUE, show_trt_class = TRUE, nudge = 0.1)
 
 # Output may be customised using standard ggplot commands
 # For example, to display the legends below the plot:

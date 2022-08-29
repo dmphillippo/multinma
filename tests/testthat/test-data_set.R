@@ -381,6 +381,26 @@ test_that("set_agd_contrast - sample size checks work", {
   expect_message(set_agd_contrast(agd_contrast, studyn, trtc, y = ydiff, se = sediff), "`sample_size` not provided")
 })
 
+test_that("set_agd_contrast - positive definite check", {
+  agd_contrast_nonpd <- agd_contrast %>%
+    group_by(studyn) %>%
+    mutate(sediff = if_else(arm == 1, max(cont_pos)*2, sqrt(cont_pos^2 + first(cont_pos)^2))) %>%
+    ungroup()
+
+  expect_error(set_agd_contrast(agd_contrast_nonpd, studyn, trtc, y = ydiff, se = sediff),
+               'not positive definite for study "2"')
+  expect_error(set_agd_contrast(agd_contrast_nonpd, studyc, trtc, y = ydiff, se = sediff),
+               'not positive definite for study "b"')
+
+  agd_contrast_nonpd2 <- bind_rows(agd_contrast_nonpd,
+                                   filter(agd_contrast_nonpd, studyn == 2) %>% mutate(studyn = 3, studyc = "c"))
+
+  expect_error(set_agd_contrast(agd_contrast_nonpd2, studyn, trtc, y = ydiff, se = sediff),
+               'not positive definite for studies "2" and "3"')
+  expect_error(set_agd_contrast(agd_contrast_nonpd2, studyc, trtc, y = ydiff, se = sediff),
+               'not positive definite for studies "b" and "c"')
+})
+
 test_that("set_* - take one and only one outcome", {
   m <- "specify one and only one outcome"
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, y = cont), m)

@@ -1,6 +1,6 @@
 Package: multinma
 Title: Bayesian Network Meta-Analysis of Individual and Aggregate Data
-Version: 0.4.2
+Version: 0.5.0
 Authors@R: 
     person(given = c("David", "M."),
            family = "Phillippo",
@@ -52,7 +52,7 @@ LinkingTo:
     rstan (>= 2.18.1),
     StanHeaders (>= 2.18.0)
 SystemRequirements: GNU make
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 Roxygen: list(markdown = TRUE)
 Suggests: 
     testthat (>= 2.1.0),

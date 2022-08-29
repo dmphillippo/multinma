@@ -158,7 +158,8 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
 
     # Get summaries
     if (summary) {
-      rk_summary <- summary_mcmc_array(rk, probs = probs)
+      rk_summary <- summary_mcmc_array(rk, probs = probs) %>%
+        tibble::add_column(.trt = x$network$treatments, .before = 1)
 
       if (sucra) {
         # Calculate SUCRA using scaled mean rank relation of Rucker and Schwarzer (2015)
@@ -214,7 +215,9 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
     if (summary) {
       rk_summary <- summary_mcmc_array(rk, probs = probs) %>%
         # Add in study info
-        tibble::add_column(.study = rep(studies$.study, each = ntrt), .before = 1)
+        tibble::add_column(.study = rep(studies$.study, each = ntrt),
+                           .trt = rep(x$network$treatments, times = nstudy),
+                           .before = 1)
 
       if (sucra) {
         # Calculate SUCRA using scaled mean rank relation of Rucker and Schwarzer (2015)
@@ -270,8 +273,12 @@ posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better =
 
     rownames(p_rank) <- stringr::str_replace(rownames(p_rank), "^rank\\[", "d\\[")
     colnames(p_rank) <- paste0("p_rank[", 1:ntrt, "]")
-    p_rank <- tibble::as_tibble(p_rank, rownames = "parameter")
+
+    p_rank <- tibble::as_tibble(p_rank, rownames = "parameter") %>%
+      tibble::add_column(.trt = x$network$treatments, .before = 1)
+
     if (sucra) p_rank$sucra <- unname(sucras)
+
     out <- list(summary = p_rank)
 
   } else { # Study-specific treatment effects
@@ -294,10 +301,15 @@ posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better =
 
     rownames(p_rank) <- stringr::str_replace(dimnames(rk_sims)[[3]], "^rank\\[", "d\\[")
     colnames(p_rank) <- paste0("p_rank[", 1:ntrt, "]")
+
     p_rank <- tibble::as_tibble(p_rank, rownames = "parameter") %>%
       # Add in study info
-      tibble::add_column(.study = rep(studies$.study, each = ntrt), .before = 1)
+      tibble::add_column(.study = rep(studies$.study, each = ntrt),
+                         .trt = rep(x$network$treatments, times = nstudy),
+                         .before = 1)
+
     if (sucra) p_rank$sucra <- unname(sucras)
+
     out <- list(summary = p_rank, studies = studies)
 
   }

@@ -735,7 +735,7 @@ nma <- function(network,
   # Labels for log_lik, resdev (only one entry per AgD contrast study)
   dev_labels <- c(ipd_data_labels,
                   agd_arm_data_labels,
-                  if (has_agd_contrast(network)) dat_agd_contrast_bl$.study else NULL)
+                  if (has_agd_contrast(network)) as.character(dat_agd_contrast_bl$.study) else NULL)
 
   fnames_oi[grepl("^log_lik\\[[0-9]+\\]$", fnames_oi)] <- paste0("log_lik[", dev_labels, "]")
   fnames_oi[grepl("^resdev\\[[0-9]+\\]$", fnames_oi)] <- paste0("resdev[", dev_labels, "]")
@@ -1112,7 +1112,7 @@ nma.fit <- function(ipd_x, ipd_y,
     !!! prior_standat(prior_het, "prior_het",
                       valid = c("Normal", "half-Normal", "log-Normal",
                                 "Cauchy",  "half-Cauchy",
-                                "Student t", "half-Student t",
+                                "Student t", "half-Student t", "log-Student t",
                                 "Exponential", "flat (implicit)")),
     prior_het_type = switch(prior_het_type,
                             sd = 1, var = 2, prec = 3)
@@ -1168,7 +1168,7 @@ nma.fit <- function(ipd_x, ipd_y,
       !!! prior_standat(prior_aux, "prior_aux",
                         valid = c("Normal", "half-Normal", "log-Normal",
                                   "Cauchy",  "half-Cauchy",
-                                  "Student t", "half-Student t",
+                                  "Student t", "half-Student t", "log-Student t",
                                   "Exponential", "flat (implicit)")),
 
       # Specify link
@@ -1289,7 +1289,7 @@ nma.fit <- function(ipd_x, ipd_y,
       !!! prior_standat(prior_aux, "prior_aux",
                         valid = c("Normal", "half-Normal", "log-Normal",
                                   "Cauchy",  "half-Cauchy",
-                                  "Student t", "half-Student t",
+                                  "Student t", "half-Student t", "log-Student t",
                                   "Exponential", "flat (implicit)")),
 
       # Specify link
@@ -1694,14 +1694,16 @@ make_nma_formula <- function(regression,
                                list(regression,
                                     list(.trt = quote(.trtclass))))
 
-        # Remove any main effect of .trtclass, e.g. if user specified var*.trt
-        nma_formula <- update.formula(nma_formula, ~. - .trtclass)
-
       } else if (class_interactions == "exchangeable") {
         abort('Exchangeable treatment class interactions (class_interactions = "exchangeable") not yet supported.')
       } else {
         nma_formula <- regression
       }
+
+      # Remove any main effect of .trtclass, e.g. if user specified var*.trt
+      # with common interactions, or used the .trtclass special
+      nma_formula <- update.formula(nma_formula, ~. - .trtclass)
+
     } else {
       nma_formula <- regression
     }
@@ -2143,7 +2145,8 @@ prior_standat <- function(x, par, valid){
                   Cauchy = , `half-Cauchy` = 2,
                   `Student t` = , `half-Student t` = 3,
                   Exponential = 4,
-                  `log-Normal` = 5)
+                  `log-Normal` = 5,
+                  `log-Student t` = 6)
 
   out <- purrr::list_modify(c(x), dist = distn, fun = purrr::zap())
   # Set unnecessary (NA) parameters to zero. These will be ignored by Stan, but

@@ -45,7 +45,7 @@ agd_contrast <- tibble(
   tclassf2 = factor(tclassc, levels = letters[3:1]),
   tclassn_bad = c(3, 3, 3),
   y = c(NA, rnorm(2)),
-  se = runif(3)
+  se = c(0.5, 1, 1)
 )
 net_a_c <- set_agd_contrast(agd_contrast, studyf, trtf, y = y, se = se)
 net_a_c2 <- set_agd_contrast(agd_contrast, studyf2, trtf2, y = y, se = se)

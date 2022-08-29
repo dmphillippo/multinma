@@ -1,3 +1,30 @@
+# multinma 0.5.0
+
+* Feature: Treatment labels in network plots can now be nudged away from the
+nodes when `weight_nodes = TRUE`, using the new `nudge` argument to
+`plot.nma_data()` (#15).
+* Feature: The data frame returned by calling `as_tibble()` or `as.data.frame()`
+on an `nma_summary` object (such as relative effects or predictions) now
+includes columns for the corresponding treatment (`.trt`) or contrast (`.trta`
+and `.trtb`), and a `.category` column may be included for multinomial models.
+Previously these details were only present as part of the `parameter` column
+* Feature: Added log t prior distribution `log_student_t()`, which can be used
+for positive-valued parameters (e.g. heterogeneity variance).
+* Improvement: `set_agd_contrast()` now produces an informative error message
+when the covariance matrix implied by the `se` column is not positive definite.
+Previously this was only checked by Stan after calling the `nma()` function.
+* Improvement: Updated plaque psoriasis ML-NMR vignette to include new analyses,
+including assessing the assumptions of population adjustment and synthesising
+multinomial outcomes.
+* Improvement: Improved behaviour of the `.trtclass` special in regression
+formulas, now main effects of `.trtclass` are always removed since these are
+collinear with `.trt`. This allows expansion of interactions with `*` to work
+properly, e.g. `~variable*.trtclass`, whereas previously this resulted in an
+over-parametrised model.
+* Fix: CRAN check note for manual HTML5 compatibility.
+* Fix: Residual deviance and log likelihood parameters are now named correctly
+when only contrast-based aggregate data is present (PR #19).
+
 # multinma 0.4.2
 
 * Fix: Error in `get_nodesplits()` when studies have multiple arms of the same

@@ -13,10 +13,14 @@ these statistics.
 \details{
 Objects of class \code{nma_summary} have the following components:
 \describe{
-\item{summary}{A data frame containing the computed summary statistics. If
-a regression model was fitted with effect modifier interactions with
+\item{summary}{A data frame containing the computed summary statistics.
+Column \code{.trt} indicates the corresponding treatment, or columns \code{.trta} and
+\code{.trtb} indicate the corresponding contrast (\code{.trtb} vs. \code{.trta}). If a
+regression model was fitted with effect modifier interactions with
 treatment, these summaries will be study-specific. In this case, the
-corresponding study population is indicated in a column named \code{.study}.}
+corresponding study population is indicated in the \code{.study} column. If a
+multinomial model was fitted, the \code{.category} column indicates the
+corresponding category.}
 \item{sims}{A 3D array [Iteration, Chain, Parameter] of MCMC
 simulations}
 \item{studies}{(Optional) A data frame containing study information,

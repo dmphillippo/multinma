@@ -64,6 +64,30 @@ test_that("newdata argument", {
 
 skip_on_cran()  # Reduce CRAN check time
 
+# Only small number of samples to test
+smk_fit_RE <- suppressWarnings(nma(smk_net,
+                                   trt_effects = "random",
+                                   prior_intercept = normal(scale = 100),
+                                   prior_trt = normal(scale = 100),
+                                   prior_het = normal(scale = 5),
+                                   iter = 10))
+
+test_that(".trta, .trtb columns are correct", {
+  re1 <- tibble::as_tibble(relative_effects(smk_fit_RE))
+  expect_identical(paste0("d[", re1$.trtb, "]"),
+                   re1$parameter)
+  expect_identical(as.character(re1$.trta), rep("No intervention", times = nrow(re1)))
+
+  re2 <- tibble::as_tibble(relative_effects(smk_fit_RE, all_contrasts = TRUE))
+  expect_identical(paste0("d[", re2$.trtb, " vs. ", re2$.trta, "]"),
+                   re2$parameter)
+
+  re3 <- tibble::as_tibble(relative_effects(smk_fit_RE, trt_ref = "Self-help"))
+  expect_identical(paste0("d[", re3$.trtb, "]"),
+                   re3$parameter)
+  expect_identical(as.character(re3$.trta), rep("Self-help", times = nrow(re3)))
+})
+
 pso_net <- set_ipd(plaque_psoriasis_ipd[complete.cases(plaque_psoriasis_ipd), ],
                    studyc, trtc,
                    r = pasi75)
@@ -105,4 +129,34 @@ test_that("newdata validation", {
                "missing or infinite values in `newdata`: durnpso, psa")
   expect_error(relative_effects(pso_fit, newdata = make_bad(Inf, c("durnpso", "psa")), study = study),
                "missing or infinite values in `newdata`: durnpso, psa")
+})
+
+test_that(".study, .trta, .trtb columns are correct", {
+  re1 <- tibble::as_tibble(relative_effects(pso_fit))
+  expect_identical(paste0("d[", re1$.study, ": ", re1$.trtb, "]"),
+                   re1$parameter)
+  expect_identical(as.character(re1$.trta), rep(levels(pso_net$treatments)[1], times = nrow(re1)))
+
+  re2 <- tibble::as_tibble(relative_effects(pso_fit, all_contrasts = TRUE))
+  expect_identical(paste0("d[", re2$.study, ": ", re2$.trtb, " vs. ", re2$.trta, "]"),
+                   re2$parameter)
+
+  re3 <- tibble::as_tibble(relative_effects(pso_fit, trt_ref = "ETN"))
+  expect_identical(paste0("d[", re3$.study, ": ", re3$.trtb, "]"),
+                   re3$parameter)
+  expect_identical(as.character(re3$.trta), rep("ETN", times = nrow(re3)))
+
+  re4 <- tibble::as_tibble(relative_effects(pso_fit, newdata = pso_new, study = study))
+  expect_identical(paste0("d[", re4$.study, ": ", re4$.trtb, "]"),
+                   re4$parameter)
+  expect_identical(as.character(re4$.trta), rep(levels(pso_net$treatments)[1], times = nrow(re4)))
+
+  re5 <- tibble::as_tibble(relative_effects(pso_fit, all_contrasts = TRUE, newdata = pso_new, study = study))
+  expect_identical(paste0("d[", re5$.study, ": ", re5$.trtb, " vs. ", re5$.trta, "]"),
+                   re5$parameter)
+
+  re6 <- tibble::as_tibble(relative_effects(pso_fit, trt_ref = "ETN", newdata = pso_new, study = study))
+  expect_identical(paste0("d[", re6$.study, ": ", re6$.trtb, "]"),
+                   re6$parameter)
+  expect_identical(as.character(re6$.trta), rep("ETN", times = nrow(re6)))
 })

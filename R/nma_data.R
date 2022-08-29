@@ -695,6 +695,16 @@ set_agd_contrast <- function(data,
     dplyr::arrange(.data$.study_inorder) %>%
     dplyr::select(-.data$.study_inorder)
 
+  # Check covariance matrices are positive definite
+  agd_Sigma <- make_Sigma(d)
+  posdef <- purrr::map_lgl(agd_Sigma, ~all(eigen(., only.values = TRUE)$values > sqrt(.Machine$double.eps)))
+
+  if (any(!posdef)) {
+    abort(glue::glue("Contrast covariance matrix not positive definite for stud{if (sum(!posdef) > 1) 'ies' else 'y'} ",
+                     glue::glue_collapse(glue::double_quote(names(posdef[!posdef])), sep = ", ", last = " and "), ".\n",
+                     "Check the `se` column."))
+  }
+
   # Produce nma_data object
   out <- structure(
     list(agd_arm = NULL,

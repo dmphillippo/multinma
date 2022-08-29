@@ -15,6 +15,9 @@ template:
     base_font: {google: "Source Sans Pro"}
     heading_font: {google: "Source Sans Pro"}
     #code_font: {google: "JetBrains Mono"}
+  includes:
+    after_body: >
+      <script data-goatcounter="https://multinma.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
 
 development:
@@ -61,6 +64,7 @@ reference:
   - matches("[pdq]bern")
   - matches("[pdq]gamma")
   - matches("[pdq]gent")
+  - matches("[pdq]logt")
   - matches("[pdq]logitnorm")
 
 - title: Prior distributions
@@ -70,6 +74,8 @@ reference:
   - summary.nma_prior
   - nma_prior-class
   - plot_prior_posterior
+  - matches("[pdq]gent")
+  - matches("[pdq]logt")
 
 - title: Model fitting
   desc: Model specification and fitting is accomplished using the `nma()` function.

@@ -314,16 +314,18 @@ dk <- function(study, trt, sims) {
 
 test_af_1_all_contr <- tibble(
   contr = af_1_releff_all_contr$summary$parameter,
-  trtb = stringr::str_extract(contr, "(?<=\\[)(.+)(?= vs\\.)"),
-  trta = stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])")
-) %>% 
-  rowwise() %>% 
-  mutate(as_tibble(multinma:::summary.mcmc_array(dk(NA, trtb, af_1_releff$sims) - dk(NA, trta, af_1_releff$sims)))) %>% 
-  select(parameter = contr, mean:Rhat)
+  .trtb = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?= vs\\.)"), levels = levels(af_net$treatments)),
+  .trta = factor(stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])"), levels = levels(af_net$treatments))
+) %>%
+  rowwise() %>%
+  mutate(as_tibble(multinma:::summary.mcmc_array(dk(NA, .trtb, af_1_releff$sims) - dk(NA, .trta, af_1_releff$sims)))) %>%
+  select(.trtb, .trta, parameter = contr, mean:Rhat)
 
 test_that("Construction of all contrasts is correct (no covariates)", {
-  expect_equal(select(af_1_releff_all_contr$summary, -Rhat), 
-               select(test_af_1_all_contr, -Rhat), 
+  ntrt <- nlevels(af_net$treatments)
+  expect_equal(nrow(af_1_releff_all_contr$summary), ntrt * (ntrt - 1) / 2)
+  expect_equal(select(af_1_releff_all_contr$summary, -Rhat),
+               select(test_af_1_all_contr, -Rhat),
                check.attributes = FALSE)
 })
 
@@ -411,15 +413,18 @@ af_4b_releff_all_contr <- relative_effects(af_fit_4b, all_contrasts = TRUE)
 
 test_af_4b_all_contr <- tibble(
   contr = af_4b_releff_all_contr$summary$parameter,
-  study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
-  trtb = stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"),
-  trta = stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])")
+  .study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
+  .trtb = factor(stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"), levels = levels(af_net$treatments)),
+  .trta = factor(stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])"), levels = levels(af_net$treatments))
 ) %>% 
   rowwise() %>% 
-  mutate(as_tibble(multinma:::summary.mcmc_array(dk(study, trtb, af_4b_releff$sims) - dk(study, trta, af_4b_releff$sims)))) %>% 
-  select(.study = study, parameter = contr, mean:Rhat)
+  mutate(as_tibble(multinma:::summary.mcmc_array(dk(.study, .trtb, af_4b_releff$sims) - dk(.study, .trta, af_4b_releff$sims)))) %>% 
+  select(.study, .trtb, .trta, parameter = contr, mean:Rhat)
 
 test_that("Construction of all contrasts is correct (common interaction)", {
+  ntrt <- nlevels(af_net$treatments)
+  nstudy <- nlevels(test_af_4b_all_contr$.study)
+  expect_equal(nrow(af_4b_releff_all_contr$summary), nstudy * ntrt * (ntrt - 1) / 2)
   expect_equal(select(af_4b_releff_all_contr$summary, -Rhat), 
                select(test_af_4b_all_contr, -Rhat), 
                check.attributes = FALSE)
@@ -431,15 +436,18 @@ af_4b_releff_all_contr_new <- relative_effects(af_fit_4b, newdata = tibble(strok
 
 test_af_4b_all_contr_new <- tibble(
   contr = af_4b_releff_all_contr_new$summary$parameter,
-  study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
-  trtb = stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"),
-  trta = stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])")
+  .study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
+  .trtb = factor(stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"), levels = levels(af_net$treatments)),
+  .trta = factor(stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])"), levels = levels(af_net$treatments))
 ) %>% 
   rowwise() %>% 
-  mutate(as_tibble(multinma:::summary.mcmc_array(dk(study, trtb, af_4b_releff_new$sims) - dk(study, trta, af_4b_releff_new$sims)))) %>% 
-  select(.study = study, parameter = contr, mean:Rhat)
+  mutate(as_tibble(multinma:::summary.mcmc_array(dk(.study, .trtb, af_4b_releff_new$sims) - dk(.study, .trta, af_4b_releff_new$sims)))) %>% 
+  select(.study, .trtb, .trta, parameter = contr, mean:Rhat)
 
 test_that("Construction of all contrasts in target population is correct (common interaction)", {
+  ntrt <- nlevels(af_net$treatments)
+  nstudy <- nlevels(test_af_4b_all_contr_new$.study)
+  expect_equal(nrow(af_4b_releff_all_contr_new$summary), nstudy * ntrt * (ntrt - 1) / 2)
   expect_equal(select(af_4b_releff_all_contr_new$summary, -Rhat), 
                select(test_af_4b_all_contr_new, -Rhat), 
                check.attributes = FALSE)

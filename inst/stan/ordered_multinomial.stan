@@ -18,7 +18,7 @@ data {
   int<lower=2, upper=ncat> agd_arm_ncat[ni_agd_arm];  // Number of categories observed
 
   // Prior on differences between cutpoints
-  int<lower=0,upper=5> prior_aux_dist;
+  int<lower=0,upper=6> prior_aux_dist;
   real prior_aux_location;
   real<lower=0> prior_aux_scale;
   real<lower=0> prior_aux_df;

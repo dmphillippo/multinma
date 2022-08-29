@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# multinma: Network Meta-Analysis of individual and aggregate data in Stan <img src='man/figures/logo.svg' align="right" height="139" />
+# multinma: Network Meta-Analysis of individual and aggregate data in Stan <img src='man/figures/logo.svg' style="float:right" height="139" />
 
 <!-- badges: start -->
 
@@ -73,7 +73,7 @@ paper:
 The `multinma` package can be cited as follows:
 
 > Phillippo, D. M. (2022). *multinma: Bayesian Network Meta-Analysis of
-> Individual and Aggregate Data*. R package version 0.4.2, doi:
+> Individual and Aggregate Data*. R package version 0.5.0, doi:
 > [10.5281/zenodo.3904454](https://doi.org/10.5281/zenodo.3904454).
 
 When fitting ML-NMR models, please cite the methods paper:
