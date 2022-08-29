@@ -497,7 +497,7 @@ plot(pso_pred_FE_new, ref_line = c(0, 1))
 ##   prevsys = ~(durnpso + bsa + weight + psa)*.trtclass + prevsys*.trt,
 ##   bsa = ~(durnpso + prevsys + weight + psa)*.trtclass + bsa*.trt,
 ##   weight = ~(durnpso + prevsys + bsa + psa)*.trtclass + weight*.trt,
-##   psa = ~(durnpso + prevsys + bsa + weight)*.trtclass + ps*:.trt
+##   psa = ~(durnpso + prevsys + bsa + weight)*.trtclass + psa*.trt
 ##   )
 ## 
 ## noSEM_fits <- noSEM_mods
