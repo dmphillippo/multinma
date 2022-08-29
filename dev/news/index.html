@@ -73,6 +73,7 @@
 <li>Improvement: Updated plaque psoriasis ML-NMR vignette to include new analyses, including assessing the assumptions of population adjustment and synthesising multinomial outcomes.</li>
 <li>Improvement: Improved behaviour of the <code>.trtclass</code> special in regression formulas, now main effects of <code>.trtclass</code> are always removed since these are collinear with <code>.trt</code>. This allows expansion of interactions with <code>*</code> to work properly, e.g. <code>~variable*.trtclass</code>, whereas previously this resulted in an over-parametrised model.</li>
 <li>Fix: CRAN check note for manual HTML5 compatibility.</li>
+<li>Fix: Residual deviance and log likelihood parameters are now named correctly when only contrast-based aggregate data is present (PR <a href="https://github.com/dmphillippo/multinma/issues/19" class="external-link">#19</a>).</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.2" id="multinma-042">multinma 0.4.2<a class="anchor" aria-label="anchor" href="#multinma-042"></a></h2><p class="text-muted">CRAN release: 2022-03-02</p>
