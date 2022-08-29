@@ -1,3 +1,5 @@
+# multinma 0.5.0.9000
+
 # multinma 0.5.0
 
 * Feature: Treatment labels in network plots can now be nudged away from the
