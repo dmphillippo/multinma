@@ -8,6 +8,7 @@
 ^data-raw$
 ^\.travis\.yml$
 ^vignettes/example_.*\.Rmd$
+^vignettes/.*\.png$
 ^vignettes/precompile\.R$
 ^vignettes/children/*$
 ^cran-comments\.md$

@@ -1694,14 +1694,16 @@ make_nma_formula <- function(regression,
                                list(regression,
                                     list(.trt = quote(.trtclass))))
 
-        # Remove any main effect of .trtclass, e.g. if user specified var*.trt
-        nma_formula <- update.formula(nma_formula, ~. - .trtclass)
-
       } else if (class_interactions == "exchangeable") {
         abort('Exchangeable treatment class interactions (class_interactions = "exchangeable") not yet supported.')
       } else {
         nma_formula <- regression
       }
+
+      # Remove any main effect of .trtclass, e.g. if user specified var*.trt
+      # with common interactions, or used the .trtclass special
+      nma_formula <- update.formula(nma_formula, ~. - .trtclass)
+
     } else {
       nma_formula <- regression
     }
