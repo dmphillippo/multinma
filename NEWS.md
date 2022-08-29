@@ -22,6 +22,8 @@ collinear with `.trt`. This allows expansion of interactions with `*` to work
 properly, e.g. `~variable*.trtclass`, whereas previously this resulted in an
 over-parametrised model.
 * Fix: CRAN check note for manual HTML5 compatibility.
+* Fix: Residual deviance and log likelihood parameters are now named correctly
+when only contrast-based aggregate data is present (PR #19).
 
 # multinma 0.4.2
 
