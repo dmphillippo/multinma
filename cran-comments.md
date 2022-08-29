@@ -1,13 +1,12 @@
-## Resubmission
-This is a resubmission. I have fixed the redirected URLs. The remaining DOI URL
-503 errors are false-positives, these DOIs are all valid and load in a browser.
+This update fixes NOTEs due to HTML5 checks on the manual, as per email from
+CRAN.
 
 ## Test environments
-* local R installation (Windows 10), R 4.1.2
+* local R installation (Windows 10), R 4.2.1
 * win-builder (release, devel)
-* Ubuntu 20.04.3 on GitHub Actions (release, devel, oldrel)
-* Mac OS 11.6.2 on GitHub Actions (release)
-* Windows Server 2019 10.0.17763 on GitHub Actions (release)
+* Ubuntu 20.04.4 on GitHub Actions (release, devel, oldrel)
+* Mac OS 11.6.8 on GitHub Actions (release)
+* Windows Server 2022 10.0.20348 on GitHub Actions (release)
 
 ## R CMD check results
 
@@ -38,15 +37,17 @@ errors:
 10.1002/sim.4780140406
 10.1002/jrsm.1167
 10.1002/sim.3767
+10.1177/0272989X221117162
 
 * checking package dependencies ... NOTE
   Imports includes 22 non-default packages.
 
 * checking installed package size ... NOTE
-  installed size is 9.7Mb
+  installed size is 12.3Mb
   sub-directories of 1Mb or more:
-    doc    3.7Mb
-    libs   6.0Mb
+    R      1.1Mb
+    doc    4.0Mb
+    libs   6.7Mb
 
 The docs directory contains 12 html vignettes demonstrating full analyses using
 the package.

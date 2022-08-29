@@ -1,4 +1,4 @@
-# multinma 0.4.2.9000
+# multinma 0.5.0
 
 * Feature: Treatment labels in network plots can now be nudged away from the
 nodes when `weight_nodes = TRUE`, using the new `nudge` argument to
