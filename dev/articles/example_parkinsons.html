@@ -114,7 +114,11 @@
 <span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     dgamma, pgamma, qgamma</span></span></code></pre>
-<p>This vignette describes the analysis of data on the mean off-time reduction in patients given dopamine agonists as adjunct therapy in Parkinson’s disease, in a network of 7 trials of 4 active drugs plus placebo <span class="citation">(<a href="#ref-TSD2" role="doc-biblioref">Dias et al. 2011</a>)</span>. The data are available in this package as <code>parkinsons</code>:</p>
+<p>This vignette describes the analysis of data on the mean off-time
+reduction in patients given dopamine agonists as adjunct therapy in
+Parkinson’s disease, in a network of 7 trials of 4 active drugs plus
+placebo <span class="citation">(<a href="#ref-TSD2" role="doc-biblioref">Dias et al. 2011</a>)</span>. The data are
+available in this package as <code>parkinsons</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">parkinsons</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   studyn trtn     y    se   n  diff se_diff</span></span>
@@ -126,21 +130,37 @@
 <span><span class="co">#&gt; 6      3    2 -2.60 0.510  71 -2.30   0.718</span></span></code></pre></div>
 <p>We consider analysing these data in three separate ways:</p>
 <ol style="list-style-type: decimal">
-<li>Using arm-based data (means <code>y</code> and corresponding standard errors <code>se</code>);</li>
-<li>Using contrast-based data (mean differences <code>diff</code> and corresponding standard errors <code>se_diff</code>);</li>
-<li>A combination of the two, where some studies contribute arm-based data, and other contribute contrast-based data.</li>
+<li>Using arm-based data (means <code>y</code> and corresponding
+standard errors <code>se</code>);</li>
+<li>Using contrast-based data (mean differences <code>diff</code> and
+corresponding standard errors <code>se_diff</code>);</li>
+<li>A combination of the two, where some studies contribute arm-based
+data, and other contribute contrast-based data.</li>
 </ol>
 <blockquote>
-<p><strong>Note:</strong> In this case, with Normal likelihoods for both arms and contrasts, we will see that the three analyses give identical results. In general, unless the arm-based likelihood is Normal, results from a model using a contrast-based likelihood will not exactly match those from a model using an arm-based likelihood, since the contrast-based Normal likelihood is only an approximation. Similarity of results depends on the suitability of the Normal approximation, which may not always be appropriate - e.g. with a small number of events or small sample size for a binary outcome. The use of an arm-based likelihood (sometimes called an “exact” likelihood) is therefore preferable where possible in general.</p>
+<p><strong>Note:</strong> In this case, with Normal likelihoods for both
+arms and contrasts, we will see that the three analyses give identical
+results. In general, unless the arm-based likelihood is Normal, results
+from a model using a contrast-based likelihood will not exactly match
+those from a model using an arm-based likelihood, since the
+contrast-based Normal likelihood is only an approximation. Similarity of
+results depends on the suitability of the Normal approximation, which
+may not always be appropriate - e.g. with a small number of events or
+small sample size for a binary outcome. The use of an arm-based
+likelihood (sometimes called an “exact” likelihood) is therefore
+preferable where possible in general.</p>
 </blockquote>
 <div class="section level2">
 <h2 id="analysis-of-arm-based-data">Analysis of arm-based data<a class="anchor" aria-label="anchor" href="#analysis-of-arm-based-data"></a>
 </h2>
-<p>We begin with an analysis of the arm-based data - means and standard errors.</p>
+<p>We begin with an analysis of the arm-based data - means and standard
+errors.</p>
 <div class="section level3">
 <h3 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
 </h3>
-<p>We have arm-level continuous data giving the mean off-time reduction (<code>y</code>) and standard error (<code>se</code>) in each arm. We use the function <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code> to set up the network.</p>
+<p>We have arm-level continuous data giving the mean off-time reduction
+(<code>y</code>) and standard error (<code>se</code>) in each arm. We
+use the function <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code> to set up the network.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">arm_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_agd_arm.html">set_agd_arm</a></span><span class="op">(</span><span class="va">parkinsons</span>, </span>
 <span>                      study <span class="op">=</span> <span class="va">studyn</span>,</span>
@@ -167,7 +187,11 @@
 <span><span class="co">#&gt; Total number of studies: 7</span></span>
 <span><span class="co">#&gt; Reference treatment is: 4</span></span>
 <span><span class="co">#&gt; Network is <span style="color: #00BB00;">connected</span></span></span></code></pre></div>
-<p>We let treatment 4 be set by default as the network reference treatment, since this results in considerably improved sampling efficiency over choosing treatment 1 as the network reference. The <code>sample_size</code> argument is optional, but enables the nodes to be weighted by sample size in the network plot.</p>
+<p>We let treatment 4 be set by default as the network reference
+treatment, since this results in considerably improved sampling
+efficiency over choosing treatment 1 as the network reference. The
+<code>sample_size</code> argument is optional, but enables the nodes to
+be weighted by sample size in the network plot.</p>
 <p>Plot the network structure.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_net</span>, weight_edges <span class="op">=</span> <span class="cn">TRUE</span>, weight_nodes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -180,7 +204,12 @@
 <div class="section level4">
 <h4 id="fixed-effect-meta-analysis">Fixed effect meta-analysis<a class="anchor" aria-label="anchor" href="#fixed-effect-meta-analysis"></a>
 </h4>
-<p>First, we fit a fixed effect model using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "fixed"</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span> and study-specific intercepts <span class="math inline">\(\mu_j\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
+<p>First, we fit a fixed effect model using the <code><a href="../reference/nma.html">nma()</a></code>
+function with <code>trt_effects = "fixed"</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions
+for the treatment effects <span class="math inline">\(d_k\)</span> and
+study-specific intercepts <span class="math inline">\(\mu_j\)</span>. We
+can examine the range of parameter values implied by these prior
+distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span></span>
@@ -193,7 +222,8 @@
 <span>                  prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                  prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: Setting "4" as the network reference treatment.</span></span></code></pre></div>
-<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
+<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
+method:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">arm_fit_FE</span></span>
 <span><span class="co">#&gt; A fixed effects NMA with a normal likelihood (identity link).</span></span>
@@ -208,15 +238,17 @@
 <span><span class="co">#&gt; d[5] -0.30    0.00 0.21  -0.71 -0.44 -0.30 -0.17  0.10  2401    1</span></span>
 <span><span class="co">#&gt; lp__ -6.63    0.06 2.35 -12.04 -7.99 -6.28 -4.92 -3.10  1719    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Aug 29 23:28:39 2022.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Nov  3 09:28:51 2022.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
-<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
+<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> are hidden, but could be examined
+by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">arm_fit_FE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
+<p>The prior and posterior distributions can be compared visually using
+the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">arm_fit_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/arm_FE_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
@@ -224,7 +256,14 @@
 <div class="section level4">
 <h4 id="random-effects-meta-analysis">Random effects meta-analysis<a class="anchor" aria-label="anchor" href="#random-effects-meta-analysis"></a>
 </h4>
-<p>We now fit a random effects model using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "random"</code>. Again, we use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span> and study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and we additionally use a <span class="math inline">\(\textrm{half-N}(5^2)\)</span> prior for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
+<p>We now fit a random effects model using the <code><a href="../reference/nma.html">nma()</a></code>
+function with <code>trt_effects = "random"</code>. Again, we use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions
+for the treatment effects <span class="math inline">\(d_k\)</span> and
+study-specific intercepts <span class="math inline">\(\mu_j\)</span>,
+and we additionally use a <span class="math inline">\(\textrm{half-N}(5^2)\)</span> prior for the
+heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of
+parameter values implied by these prior distributions with the
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span></span>
@@ -248,12 +287,23 @@
 <span><span class="co">#&gt; https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</span></span>
 <span><span class="co">#&gt; to find out why this is a problem and how to eliminate them.</span></span>
 <span><span class="co">#&gt; Warning: Examine the pairs() plot to diagnose sampling problems</span></span></code></pre></div>
-<p>We do see a small number of divergent transition errors, which cannot simply be removed by increasing the value of the <code>adapt_delta</code> argument (by default set to <code>0.95</code> for RE models). To diagnose, we use the <code><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs()</a></code> method to investigate where in the posterior distribution these divergences are happening (indicated by red crosses):</p>
+<p>We do see a small number of divergent transition errors, which cannot
+simply be removed by increasing the value of the
+<code>adapt_delta</code> argument (by default set to <code>0.95</code>
+for RE models). To diagnose, we use the <code><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs()</a></code> method to
+investigate where in the posterior distribution these divergences are
+happening (indicated by red crosses):</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs</a></span><span class="op">(</span><span class="va">arm_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mu[4]"</span>, <span class="st">"d[3]"</span>, <span class="st">"delta[4: 3]"</span>, <span class="st">"tau"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/plot_arm_RE_pairs-1.png" width="576" style="display: block; margin: auto;"></p>
-<p>The divergent transitions occur in the upper tail of the heterogeneity standard deviation. In this case, with only a small number of studies, there is not very much information to estimate the heterogeneity standard deviation and the prior distribution may be too heavy-tailed. We could consider a more informative prior distribution for the heterogeneity variance to aid estimation.</p>
-<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
+<p>The divergent transitions occur in the upper tail of the
+heterogeneity standard deviation. In this case, with only a small number
+of studies, there is not very much information to estimate the
+heterogeneity standard deviation and the prior distribution may be too
+heavy-tailed. We could consider a more informative prior distribution
+for the heterogeneity variance to aid estimation.</p>
+<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
+method:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">arm_fit_RE</span></span>
 <span><span class="co">#&gt; A random effects NMA with a normal likelihood (identity link).</span></span>
@@ -269,15 +319,18 @@
 <span><span class="co">#&gt; lp__ -12.88    0.10 3.62 -21.03 -15.18 -12.48 -10.28 -6.78  1268 1.00</span></span>
 <span><span class="co">#&gt; tau    0.38    0.01 0.38   0.01   0.12   0.27   0.51  1.43   776 1.01</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Aug 29 23:28:50 2022.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Nov  3 09:29:03 2022.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
-<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects <span class="math inline">\(\delta_{jk}\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
+<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects
+<span class="math inline">\(\delta_{jk}\)</span> are hidden, but could
+be examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">arm_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
+<p>The prior and posterior distributions can be compared visually using
+the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">arm_fit_RE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/arm_RE_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
@@ -296,8 +349,11 @@
 <span><span class="co">#&gt; Residual deviance: 13.6<span style="color: #555555;"> (on 15 data points)</span></span></span>
 <span><span class="co">#&gt;                pD: 12.4</span></span>
 <span><span class="co">#&gt;               DIC: 26</span></span></code></pre></div>
-<p>Both models fit the data well, having posterior mean residual deviance close to the number of data points. The DIC is similar between models, so we choose the FE model based on parsimony.</p>
-<p>We can also examine the residual deviance contributions with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
+<p>Both models fit the data well, having posterior mean residual
+deviance close to the number of data points. The DIC is similar between
+models, so we choose the FE model based on parsimony.</p>
+<p>We can also examine the residual deviance contributions with the
+corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_dic_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/arm_FE_resdev_plot-1.png" width="700" style="display: block; margin: auto;"></p>
@@ -309,7 +365,10 @@
 <div class="section level3">
 <h3 id="further-results">Further results<a class="anchor" aria-label="anchor" href="#further-results"></a>
 </h3>
-<p>For comparison with <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we can produce relative effects against placebo using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with <code>trt_ref = 1</code>:</p>
+<p>For comparison with <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we can produce
+relative effects against placebo using the
+<code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with
+<code>trt_ref = 1</code>:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">arm_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">arm_fit_FE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
@@ -328,7 +387,16 @@
 <span><span class="co">#&gt; d[5] -0.85 0.77 -2.38 -1.26 -0.83 -0.41  0.62     1917     1749    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/arm_releff_RE-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method, where the <code>baseline</code> argument takes a <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the corresponding Normal distribution, and we specify <code>trt_ref = 1</code> to indicate that the baseline distribution corresponds to treatment 1. (Strictly speaking, <code>type = "response"</code> is unnecessary here, since the identity link function was used.)</p>
+<p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we produce absolute predictions
+of the mean off-time reduction on each treatment assuming a Normal
+distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>
+method, where the <code>baseline</code> argument takes a
+<code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the
+corresponding Normal distribution, and we specify
+<code>trt_ref = 1</code> to indicate that the baseline distribution
+corresponds to treatment 1. (Strictly speaking,
+<code>type = "response"</code> is unnecessary here, since the identity
+link function was used.)</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">arm_pred_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">arm_fit_FE</span>, </span>
 <span>                       baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">0.73</span>, sd <span class="op">=</span> <span class="fl">21</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>,</span>
@@ -357,7 +425,9 @@
 <span><span class="co">#&gt; pred[5] -1.57 0.80 -3.17 -2.03 -1.57 -1.10 -0.09     2004     1893    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_pred_RE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/arm_pred_RE-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>If the <code>baseline</code> argument is omitted, predictions of mean off-time reduction will be produced for every study in the network based on their estimated baseline response <span class="math inline">\(\mu_j\)</span>:</p>
+<p>If the <code>baseline</code> argument is omitted, predictions of mean
+off-time reduction will be produced for every study in the network based
+on their estimated baseline response <span class="math inline">\(\mu_j\)</span>:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">arm_pred_FE_studies</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">arm_fit_FE</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
 <span><span class="va">arm_pred_FE_studies</span></span>
@@ -425,7 +495,8 @@
 <span><span class="co">#&gt; pred[7: 5] -2.10 0.20 -2.49 -2.24 -2.10 -1.97 -1.72     4280     3521    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_pred_FE_studies</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/arm_pred_RE_all-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.</p>
+<p>We can also produce treatment rankings, rank probabilities, and
+cumulative rank probabilities.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">arm_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">arm_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
@@ -461,11 +532,15 @@
 <div class="section level2">
 <h2 id="analysis-of-contrast-based-data">Analysis of contrast-based data<a class="anchor" aria-label="anchor" href="#analysis-of-contrast-based-data"></a>
 </h2>
-<p>We now perform an analysis using the contrast-based data (mean differences and standard errors).</p>
+<p>We now perform an analysis using the contrast-based data (mean
+differences and standard errors).</p>
 <div class="section level3">
 <h3 id="setting-up-the-network-1">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network-1"></a>
 </h3>
-<p>With contrast-level data giving the mean difference in off-time reduction (<code>diff</code>) and standard error (<code>se_diff</code>), we use the function <code><a href="../reference/set_agd_contrast.html">set_agd_contrast()</a></code> to set up the network.</p>
+<p>With contrast-level data giving the mean difference in off-time
+reduction (<code>diff</code>) and standard error (<code>se_diff</code>),
+we use the function <code><a href="../reference/set_agd_contrast.html">set_agd_contrast()</a></code> to set up the
+network.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">contr_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_agd_contrast.html">set_agd_contrast</a></span><span class="op">(</span><span class="va">parkinsons</span>, </span>
 <span>                              study <span class="op">=</span> <span class="va">studyn</span>,</span>
@@ -492,7 +567,8 @@
 <span><span class="co">#&gt; Total number of studies: 7</span></span>
 <span><span class="co">#&gt; Reference treatment is: 4</span></span>
 <span><span class="co">#&gt; Network is <span style="color: #00BB00;">connected</span></span></span></code></pre></div>
-<p>The <code>sample_size</code> argument is optional, but enables the nodes to be weighted by sample size in the network plot.</p>
+<p>The <code>sample_size</code> argument is optional, but enables the
+nodes to be weighted by sample size in the network plot.</p>
 <p>Plot the network structure.</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_net</span>, weight_edges <span class="op">=</span> <span class="cn">TRUE</span>, weight_nodes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -505,7 +581,11 @@
 <div class="section level4">
 <h4 id="fixed-effect-meta-analysis-1">Fixed effect meta-analysis<a class="anchor" aria-label="anchor" href="#fixed-effect-meta-analysis-1"></a>
 </h4>
-<p>First, we fit a fixed effect model using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "fixed"</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
+<p>First, we fit a fixed effect model using the <code><a href="../reference/nma.html">nma()</a></code>
+function with <code>trt_effects = "fixed"</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions
+for the treatment effects <span class="math inline">\(d_k\)</span>. We
+can examine the range of parameter values implied by these prior
+distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span></span>
@@ -517,7 +597,8 @@
 <span>                    trt_effects <span class="op">=</span> <span class="st">"fixed"</span>,</span>
 <span>                    prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: Setting "4" as the network reference treatment.</span></span></code></pre></div>
-<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
+<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
+method:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">contr_fit_FE</span></span>
 <span><span class="co">#&gt; A fixed effects NMA with a normal likelihood (identity link).</span></span>
@@ -532,11 +613,12 @@
 <span><span class="co">#&gt; d[5] -0.30    0.00 0.21 -0.70 -0.44 -0.30 -0.16  0.12  3772    1</span></span>
 <span><span class="co">#&gt; lp__ -3.16    0.04 1.41 -6.68 -3.86 -2.84 -2.11 -1.39  1572    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Aug 29 23:29:12 2022.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Nov  3 09:29:26 2022.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
-<p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
+<p>The prior and posterior distributions can be compared visually using
+the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">contr_fit_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/contr_FE_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
@@ -544,7 +626,13 @@
 <div class="section level4">
 <h4 id="random-effects-meta-analysis-1">Random effects meta-analysis<a class="anchor" aria-label="anchor" href="#random-effects-meta-analysis-1"></a>
 </h4>
-<p>We now fit a random effects model using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "random"</code>. Again, we use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span>, and we additionally use a <span class="math inline">\(\textrm{half-N}(5^2)\)</span> prior for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
+<p>We now fit a random effects model using the <code><a href="../reference/nma.html">nma()</a></code>
+function with <code>trt_effects = "random"</code>. Again, we use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions
+for the treatment effects <span class="math inline">\(d_k\)</span>, and
+we additionally use a <span class="math inline">\(\textrm{half-N}(5^2)\)</span> prior for the
+heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of
+parameter values implied by these prior distributions with the
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span></span>
@@ -563,12 +651,23 @@
 <span>                    prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
 <span>                    adapt_delta <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: Setting "4" as the network reference treatment.</span></span></code></pre></div>
-<p>We do see a small number of divergent transition errors, which cannot simply be removed by increasing the value of the <code>adapt_delta</code> argument (by default set to <code>0.95</code> for RE models). To diagnose, we use the <code><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs()</a></code> method to investigate where in the posterior distribution these divergences are happening (indicated by red crosses):</p>
+<p>We do see a small number of divergent transition errors, which cannot
+simply be removed by increasing the value of the
+<code>adapt_delta</code> argument (by default set to <code>0.95</code>
+for RE models). To diagnose, we use the <code><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs()</a></code> method to
+investigate where in the posterior distribution these divergences are
+happening (indicated by red crosses):</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs</a></span><span class="op">(</span><span class="va">contr_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d[3]"</span>, <span class="st">"delta[4: 4 vs. 3]"</span>, <span class="st">"tau"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/plot_contr_RE_pairs-1.png" width="576" style="display: block; margin: auto;"></p>
-<p>The divergent transitions occur in the upper tail of the heterogeneity standard deviation. In this case, with only a small number of studies, there is not very much information to estimate the heterogeneity standard deviation and the prior distribution may be too heavy-tailed. We could consider a more informative prior distribution for the heterogeneity variance to aid estimation.</p>
-<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
+<p>The divergent transitions occur in the upper tail of the
+heterogeneity standard deviation. In this case, with only a small number
+of studies, there is not very much information to estimate the
+heterogeneity standard deviation and the prior distribution may be too
+heavy-tailed. We could consider a more informative prior distribution
+for the heterogeneity variance to aid estimation.</p>
+<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
+method:</p>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">contr_fit_RE</span></span>
 <span><span class="co">#&gt; A random effects NMA with a normal likelihood (identity link).</span></span>
@@ -584,15 +683,17 @@
 <span><span class="co">#&gt; lp__ -8.18    0.08 2.86 -14.57 -9.85 -7.85 -6.17 -3.55  1217    1</span></span>
 <span><span class="co">#&gt; tau   0.38    0.01 0.37   0.01  0.13  0.29  0.52  1.33   948    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Aug 29 23:29:19 2022.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Nov  3 09:29:34 2022.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
-<p>By default, summaries of the study-specific relative effects <span class="math inline">\(\delta_{jk}\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
+<p>By default, summaries of the study-specific relative effects <span class="math inline">\(\delta_{jk}\)</span> are hidden, but could be
+examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">contr_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
+<p>The prior and posterior distributions can be compared visually using
+the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">contr_fit_RE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/contr_RE_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
@@ -611,8 +712,11 @@
 <span><span class="co">#&gt; Residual deviance: 6.6<span style="color: #555555;"> (on 8 data points)</span></span></span>
 <span><span class="co">#&gt;                pD: 5.4</span></span>
 <span><span class="co">#&gt;               DIC: 12</span></span></code></pre></div>
-<p>Both models fit the data well, having posterior mean residual deviance close to the number of data points. The DIC is similar between models, so we choose the FE model based on parsimony.</p>
-<p>We can also examine the residual deviance contributions with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
+<p>Both models fit the data well, having posterior mean residual
+deviance close to the number of data points. The DIC is similar between
+models, so we choose the FE model based on parsimony.</p>
+<p>We can also examine the residual deviance contributions with the
+corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_dic_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/contr_FE_resdev_plot-1.png" width="700" style="display: block; margin: auto;"></p>
@@ -624,7 +728,10 @@
 <div class="section level3">
 <h3 id="further-results-1">Further results<a class="anchor" aria-label="anchor" href="#further-results-1"></a>
 </h3>
-<p>For comparison with <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we can produce relative effects against placebo using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with <code>trt_ref = 1</code>:</p>
+<p>For comparison with <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we can produce
+relative effects against placebo using the
+<code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with
+<code>trt_ref = 1</code>:</p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">contr_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">contr_fit_FE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
@@ -643,7 +750,16 @@
 <span><span class="co">#&gt; d[5] -0.83 0.75 -2.27 -1.27 -0.81 -0.40  0.65     2150     1713    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/contr_releff_RE-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method, where the <code>baseline</code> argument takes a <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the corresponding Normal distribution, and we specify <code>trt_ref = 1</code> to indicate that the baseline distribution corresponds to treatment 1. (Strictly speaking, <code>type = "response"</code> is unnecessary here, since the identity link function was used.)</p>
+<p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we produce absolute predictions
+of the mean off-time reduction on each treatment assuming a Normal
+distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>
+method, where the <code>baseline</code> argument takes a
+<code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the
+corresponding Normal distribution, and we specify
+<code>trt_ref = 1</code> to indicate that the baseline distribution
+corresponds to treatment 1. (Strictly speaking,
+<code>type = "response"</code> is unnecessary here, since the identity
+link function was used.)</p>
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">contr_pred_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">contr_fit_FE</span>, </span>
 <span>                       baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">0.73</span>, sd <span class="op">=</span> <span class="fl">21</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>,</span>
@@ -672,11 +788,13 @@
 <span><span class="co">#&gt; pred[5] -1.56 0.78 -3.06 -2.03 -1.56 -1.10 -0.01     2166     1880    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_pred_RE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/contr_pred_RE-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>If the <code>baseline</code> argument is omitted an error will be raised, as there are no study baselines estimated in this network.</p>
+<p>If the <code>baseline</code> argument is omitted an error will be
+raised, as there are no study baselines estimated in this network.</p>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">contr_fit_FE</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span></code></pre></div>
-<p>We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.</p>
+<p>We can also produce treatment rankings, rank probabilities, and
+cumulative rank probabilities.</p>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">contr_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">contr_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
@@ -712,7 +830,9 @@
 <div class="section level2">
 <h2 id="analysis-of-mixed-arm-based-and-contrast-based-data">Analysis of mixed arm-based and contrast-based data<a class="anchor" aria-label="anchor" href="#analysis-of-mixed-arm-based-and-contrast-based-data"></a>
 </h2>
-<p>We now perform an analysis where some studies contribute arm-based data, and other contribute contrast-based data. Replicating <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we consider arm-based data from studies 1-3, and contrast-based data from studies 4-7.</p>
+<p>We now perform an analysis where some studies contribute arm-based
+data, and other contribute contrast-based data. Replicating <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we consider arm-based data from
+studies 1-3, and contrast-based data from studies 4-7.</p>
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">studies</span> <span class="op">&lt;-</span> <span class="va">parkinsons</span><span class="op">$</span><span class="va">studyn</span></span>
 <span><span class="op">(</span><span class="va">parkinsons_arm</span> <span class="op">&lt;-</span> <span class="va">parkinsons</span><span class="op">[</span><span class="va">studies</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="op">]</span><span class="op">)</span></span>
@@ -737,7 +857,10 @@
 <div class="section level3">
 <h3 id="setting-up-the-network-2">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network-2"></a>
 </h3>
-<p>We use the functions <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code> and <code><a href="../reference/set_agd_contrast.html">set_agd_contrast()</a></code> to set up the respective data sources within the network, and then combine together with <code><a href="../reference/combine_network.html">combine_network()</a></code>.</p>
+<p>We use the functions <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code> and
+<code><a href="../reference/set_agd_contrast.html">set_agd_contrast()</a></code> to set up the respective data sources
+within the network, and then combine together with
+<code><a href="../reference/combine_network.html">combine_network()</a></code>.</p>
 <div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mix_arm_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_agd_arm.html">set_agd_arm</a></span><span class="op">(</span><span class="va">parkinsons_arm</span>, </span>
 <span>                           study <span class="op">=</span> <span class="va">studyn</span>,</span>
@@ -777,7 +900,8 @@
 <span><span class="co">#&gt; Total number of studies: 7</span></span>
 <span><span class="co">#&gt; Reference treatment is: 4</span></span>
 <span><span class="co">#&gt; Network is <span style="color: #00BB00;">connected</span></span></span></code></pre></div>
-<p>The <code>sample_size</code> argument is optional, but enables the nodes to be weighted by sample size in the network plot.</p>
+<p>The <code>sample_size</code> argument is optional, but enables the
+nodes to be weighted by sample size in the network plot.</p>
 <p>Plot the network structure.</p>
 <div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_net</span>, weight_edges <span class="op">=</span> <span class="cn">TRUE</span>, weight_nodes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -790,7 +914,12 @@
 <div class="section level4">
 <h4 id="fixed-effect-meta-analysis-2">Fixed effect meta-analysis<a class="anchor" aria-label="anchor" href="#fixed-effect-meta-analysis-2"></a>
 </h4>
-<p>First, we fit a fixed effect model using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "fixed"</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span> and study-specific intercepts <span class="math inline">\(\mu_j\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
+<p>First, we fit a fixed effect model using the <code><a href="../reference/nma.html">nma()</a></code>
+function with <code>trt_effects = "fixed"</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions
+for the treatment effects <span class="math inline">\(d_k\)</span> and
+study-specific intercepts <span class="math inline">\(\mu_j\)</span>. We
+can examine the range of parameter values implied by these prior
+distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span></span>
@@ -803,7 +932,8 @@
 <span>                  prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                  prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: Setting "4" as the network reference treatment.</span></span></code></pre></div>
-<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
+<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
+method:</p>
 <div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mix_fit_FE</span></span>
 <span><span class="co">#&gt; A fixed effects NMA with a normal likelihood (identity link).</span></span>
@@ -818,15 +948,17 @@
 <span><span class="co">#&gt; d[5] -0.29    0.00 0.21 -0.70 -0.43 -0.30 -0.16  0.12  3097    1</span></span>
 <span><span class="co">#&gt; lp__ -4.54    0.04 1.87 -9.07 -5.58 -4.19 -3.16 -1.92  1807    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Aug 29 23:29:32 2022.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Nov  3 09:29:47 2022.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
-<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
+<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> are hidden, but could be examined
+by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mix_fit_FE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
+<p>The prior and posterior distributions can be compared visually using
+the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">mix_fit_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_FE_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
@@ -834,7 +966,14 @@
 <div class="section level4">
 <h4 id="random-effects-meta-analysis-2">Random effects meta-analysis<a class="anchor" aria-label="anchor" href="#random-effects-meta-analysis-2"></a>
 </h4>
-<p>We now fit a random effects model using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "random"</code>. Again, we use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span> and study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and we additionally use a <span class="math inline">\(\textrm{half-N}(5^2)\)</span> prior for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
+<p>We now fit a random effects model using the <code><a href="../reference/nma.html">nma()</a></code>
+function with <code>trt_effects = "random"</code>. Again, we use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions
+for the treatment effects <span class="math inline">\(d_k\)</span> and
+study-specific intercepts <span class="math inline">\(\mu_j\)</span>,
+and we additionally use a <span class="math inline">\(\textrm{half-N}(5^2)\)</span> prior for the
+heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of
+parameter values implied by these prior distributions with the
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span></span>
@@ -858,12 +997,23 @@
 <span><span class="co">#&gt; https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</span></span>
 <span><span class="co">#&gt; to find out why this is a problem and how to eliminate them.</span></span>
 <span><span class="co">#&gt; Warning: Examine the pairs() plot to diagnose sampling problems</span></span></code></pre></div>
-<p>We do see a small number of divergent transition errors, which cannot simply be removed by increasing the value of the <code>adapt_delta</code> argument (by default set to <code>0.95</code> for RE models). To diagnose, we use the <code><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs()</a></code> method to investigate where in the posterior distribution these divergences are happening (indicated by red crosses):</p>
+<p>We do see a small number of divergent transition errors, which cannot
+simply be removed by increasing the value of the
+<code>adapt_delta</code> argument (by default set to <code>0.95</code>
+for RE models). To diagnose, we use the <code><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs()</a></code> method to
+investigate where in the posterior distribution these divergences are
+happening (indicated by red crosses):</p>
 <div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs</a></span><span class="op">(</span><span class="va">mix_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d[3]"</span>, <span class="st">"delta[4: 4 vs. 3]"</span>, <span class="st">"tau"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/plot_mix_RE_pairs-1.png" width="576" style="display: block; margin: auto;"></p>
-<p>The divergent transitions occur in the upper tail of the heterogeneity standard deviation. In this case, with only a small number of studies, there is not very much information to estimate the heterogeneity standard deviation and the prior distribution may be too heavy-tailed. We could consider a more informative prior distribution for the heterogeneity variance to aid estimation.</p>
-<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
+<p>The divergent transitions occur in the upper tail of the
+heterogeneity standard deviation. In this case, with only a small number
+of studies, there is not very much information to estimate the
+heterogeneity standard deviation and the prior distribution may be too
+heavy-tailed. We could consider a more informative prior distribution
+for the heterogeneity variance to aid estimation.</p>
+<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
+method:</p>
 <div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mix_fit_RE</span></span>
 <span><span class="co">#&gt; A random effects NMA with a normal likelihood (identity link).</span></span>
@@ -879,15 +1029,18 @@
 <span><span class="co">#&gt; lp__ -10.79    0.10 3.26 -17.96 -12.82 -10.48 -8.47 -5.21  1130 1.00</span></span>
 <span><span class="co">#&gt; tau    0.40    0.01 0.40   0.01   0.13   0.28  0.52  1.53   724 1.01</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Aug 29 23:29:44 2022.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Nov  3 09:30:00 2022.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
-<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects <span class="math inline">\(\delta_{jk}\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
+<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects
+<span class="math inline">\(\delta_{jk}\)</span> are hidden, but could
+be examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mix_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
+<p>The prior and posterior distributions can be compared visually using
+the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">mix_fit_RE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_RE_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
@@ -906,8 +1059,11 @@
 <span><span class="co">#&gt; Residual deviance: 9.7<span style="color: #555555;"> (on 11 data points)</span></span></span>
 <span><span class="co">#&gt;                pD: 8.5</span></span>
 <span><span class="co">#&gt;               DIC: 18.2</span></span></code></pre></div>
-<p>Both models fit the data well, having posterior mean residual deviance close to the number of data points. The DIC is similar between models, so we choose the FE model based on parsimony.</p>
-<p>We can also examine the residual deviance contributions with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
+<p>Both models fit the data well, having posterior mean residual
+deviance close to the number of data points. The DIC is similar between
+models, so we choose the FE model based on parsimony.</p>
+<p>We can also examine the residual deviance contributions with the
+corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
 <div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_dic_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_FE_resdev_plot-1.png" width="700" style="display: block; margin: auto;"></p>
@@ -919,7 +1075,10 @@
 <div class="section level3">
 <h3 id="further-results-2">Further results<a class="anchor" aria-label="anchor" href="#further-results-2"></a>
 </h3>
-<p>For comparison with <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we can produce relative effects against placebo using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with <code>trt_ref = 1</code>:</p>
+<p>For comparison with <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we can produce
+relative effects against placebo using the
+<code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with
+<code>trt_ref = 1</code>:</p>
 <div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">mix_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">mix_fit_FE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
@@ -938,7 +1097,16 @@
 <span><span class="co">#&gt; d[5] -0.82 0.76 -2.27 -1.27 -0.83 -0.37  0.71     1513     1435    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_releff_RE-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method, where the <code>baseline</code> argument takes a <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the corresponding Normal distribution, and we specify <code>trt_ref = 1</code> to indicate that the baseline distribution corresponds to treatment 1. (Strictly speaking, <code>type = "response"</code> is unnecessary here, since the identity link function was used.)</p>
+<p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we produce absolute predictions
+of the mean off-time reduction on each treatment assuming a Normal
+distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>
+method, where the <code>baseline</code> argument takes a
+<code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the
+corresponding Normal distribution, and we specify
+<code>trt_ref = 1</code> to indicate that the baseline distribution
+corresponds to treatment 1. (Strictly speaking,
+<code>type = "response"</code> is unnecessary here, since the identity
+link function was used.)</p>
 <div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mix_pred_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mix_fit_FE</span>, </span>
 <span>                       baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">0.73</span>, sd <span class="op">=</span> <span class="fl">21</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>,</span>
@@ -967,7 +1135,9 @@
 <span><span class="co">#&gt; pred[5] -1.55 0.79 -3.08 -2.03 -1.56 -1.08  0.00     1605     1368    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_pred_RE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_pred_RE-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>If the <code>baseline</code> argument is omitted, predictions of mean off-time reduction will be produced for every <em>arm-based</em> study in the network based on their estimated baseline response <span class="math inline">\(\mu_j\)</span>:</p>
+<p>If the <code>baseline</code> argument is omitted, predictions of mean
+off-time reduction will be produced for every <em>arm-based</em> study
+in the network based on their estimated baseline response <span class="math inline">\(\mu_j\)</span>:</p>
 <div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mix_pred_FE_studies</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mix_fit_FE</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
 <span><span class="va">mix_pred_FE_studies</span></span>
@@ -999,7 +1169,8 @@
 <span><span class="co">#&gt; pred[3: 5] -1.39 0.47 -2.30 -1.71 -1.40 -1.07 -0.47     1920     2547    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_pred_FE_studies</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_pred_FE_all-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.</p>
+<p>We can also produce treatment rankings, rank probabilities, and
+cumulative rank probabilities.</p>
 <div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">mix_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">mix_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
@@ -1037,7 +1208,11 @@
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-TSD2" class="csl-entry">
-Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. <span>“<span>NICE DSU Technical Support Document</span> 2: A Generalised Linear Modelling Framework for Pair-Wise and Network Meta-Analysis of Randomised Controlled Trials.”</span> <span>National Institute for Health and Care Excellence</span>. <a href="https://nicedsu.sites.sheffield.ac.uk" class="external-link">https://nicedsu.sites.sheffield.ac.uk</a>.
+Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011.
+<span>“<span>NICE DSU Technical Support Document</span> 2: A Generalised
+Linear Modelling Framework for Pair-Wise and Network Meta-Analysis of
+Randomised Controlled Trials.”</span> <span>National Institute for
+Health and Care Excellence</span>. <a href="https://nicedsu.sites.sheffield.ac.uk" class="external-link">https://nicedsu.sites.sheffield.ac.uk</a>.
 </div>
 </div>
 </div>

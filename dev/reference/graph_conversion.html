@@ -158,9 +158,9 @@ one edge is produced for each comparison (by IPD or AgD study type) with a
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Convert to igraph object</span></span></span>
 <span class="r-in"><span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/as.igraph.html" class="external-link">as.igraph</a></span><span class="op">(</span><span class="va">smk_net</span><span class="op">)</span>  <span class="co"># Edges combined by default</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH aca79e1 UN-- 4 6 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH d70b1fb UN-- 4 6 -- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> + attr: name (v/c), .sample_size (v/n), .nstudy (e/n), .type (e/c)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from aca79e1 (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from d70b1fb (vertex names):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] No intervention       --Group counselling     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] No intervention       --Individual counselling</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3] Group counselling     --Individual counselling</span>
@@ -168,9 +168,9 @@ one edge is produced for each comparison (by IPD or AgD study type) with a
 <span class="r-out co"><span class="r-pr">#&gt;</span> [5] Group counselling     --Self-help             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [6] Individual counselling--Self-help             </span>
 <span class="r-in"><span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/as.igraph.html" class="external-link">as.igraph</a></span><span class="op">(</span><span class="va">smk_net</span>, collapse <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># Without combining edges</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 5c3059d UN-- 4 28 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 5f4bed1 UN-- 4 28 -- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> + attr: name (v/c), .sample_size (v/n), .study (e/c), .type (e/c)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 5c3059d (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 5f4bed1 (vertex names):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] No intervention       --Group counselling     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [2] No intervention       --Individual counselling</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [3] Group counselling     --Individual counselling</span>

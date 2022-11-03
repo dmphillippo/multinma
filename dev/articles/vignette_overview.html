@@ -104,8 +104,14 @@
 
     
     
-<p>This package contains a number of vignettes, each one walking through an example analysis. The table below gives an overview.</p>
-<p>Many of these examples recreate analyses from the series of Technical Support Documents published by the NICE Decision Support Unit <span class="citation">(<a href="#ref-TSD_evsynth" role="doc-biblioref">Dias et al. 2011</a>)</span>. The exceptions are atrial fibrillation <span class="citation">(<a href="#ref-Cooper2009" role="doc-biblioref">Cooper et al. 2009</a>)</span>, white blood cell transfusion <span class="citation">(<a href="#ref-Turner2012" role="doc-biblioref">Turner et al. 2012</a>)</span>, and plaque psoriasis multilevel network meta-regression <span class="citation">(<a href="#ref-methods_paper" role="doc-biblioref">Phillippo et al. 2020</a>, <a href="#ref-Phillippo2022" role="doc-biblioref">2022</a>)</span>.</p>
+<p>This package contains a number of vignettes, each one walking through
+an example analysis. The table below gives an overview.</p>
+<p>Many of these examples recreate analyses from the series of Technical
+Support Documents published by the NICE Decision Support Unit <span class="citation">(<a href="#ref-TSD_evsynth" role="doc-biblioref">Dias
+et al. 2011</a>)</span>. The exceptions are atrial fibrillation <span class="citation">(<a href="#ref-Cooper2009" role="doc-biblioref">Cooper
+et al. 2009</a>)</span>, white blood cell transfusion <span class="citation">(<a href="#ref-Turner2012" role="doc-biblioref">Turner
+et al. 2012</a>)</span>, and plaque psoriasis multilevel network
+meta-regression <span class="citation">(<a href="#ref-methods_paper" role="doc-biblioref">Phillippo et al. 2020</a>, <a href="#ref-Phillippo2022" role="doc-biblioref">2022</a>)</span>.</p>
 <table class="table">
 <colgroup>
 <col width="9%">
@@ -141,17 +147,20 @@
 <td align="left">Counts with time at risk</td>
 <td align="left">Binomial</td>
 <td align="left">cloglog</td>
-<td align="left">Analysis of log hazard ratios from count data with time at risk</td>
+<td align="left">Analysis of log hazard ratios from count data with time
+at risk</td>
 </tr>
 <tr class="even">
 <td align="left"><a href="example_parkinsons.html">Parkinson’s</a></td>
 <td align="left">Continuous</td>
 <td align="left">Normal</td>
 <td align="left">Identity</td>
-<td align="left">Analysis of arm-based data, contrast-based data, and a mixture of both</td>
+<td align="left">Analysis of arm-based data, contrast-based data, and a
+mixture of both</td>
 </tr>
 <tr class="odd">
-<td align="left"><a href="example_hta_psoriasis.html">HTA plaque psoriasis</a></td>
+<td align="left"><a href="example_hta_psoriasis.html">HTA plaque
+psoriasis</a></td>
 <td align="left">Ordered</td>
 <td align="left">Multinomial (ordered)</td>
 <td align="left">probit</td>
@@ -169,31 +178,37 @@
 <td align="left">Counts</td>
 <td align="left">Binomial</td>
 <td align="left">logit</td>
-<td align="left">Meta-regression with a continuous covariate, predictive distributions</td>
+<td align="left">Meta-regression with a continuous covariate, predictive
+distributions</td>
 </tr>
 <tr class="even">
-<td align="left"><a href="example_smoking.html">Smoking cessation</a></td>
+<td align="left"><a href="example_smoking.html">Smoking
+cessation</a></td>
 <td align="left">Counts</td>
 <td align="left">Binomial</td>
 <td align="left">logit</td>
-<td align="left">Assessing inconsistency with unrelated mean effects and node-splitting models</td>
+<td align="left">Assessing inconsistency with unrelated mean effects and
+node-splitting models</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href="example_thrombolytics.html">Thrombolytics</a></td>
 <td align="left">Counts</td>
 <td align="left">Binomial</td>
 <td align="left">logit</td>
-<td align="left">Assessing inconsistency with unrelated mean effects and node-splitting models</td>
+<td align="left">Assessing inconsistency with unrelated mean effects and
+node-splitting models</td>
 </tr>
 <tr class="even">
-<td align="left"><a href="example_atrial_fibrillation.html">Atrial fibrillation</a></td>
+<td align="left"><a href="example_atrial_fibrillation.html">Atrial
+fibrillation</a></td>
 <td align="left">Counts</td>
 <td align="left">Binomial</td>
 <td align="left">logit</td>
 <td align="left">Meta-regression with shared class interactions</td>
 </tr>
 <tr class="odd">
-<td align="left"><a href="example_transfusion.html">WBC transfusion</a></td>
+<td align="left"><a href="example_transfusion.html">WBC
+transfusion</a></td>
 <td align="left">Counts</td>
 <td align="left">Binomial</td>
 <td align="left">logit</td>
@@ -201,11 +216,15 @@
 </td>
 </tr>
 <tr class="even">
-<td align="left"><a href="example_plaque_psoriasis.html">ML-NMR plaque psoriasis</a></td>
-<td align="left">Binary (IPD) and counts (AgD), and ordered categorical</td>
-<td align="left">Bernoulli (IPD) and two-parameter Binomial (AgD), and ordered multinomial</td>
+<td align="left"><a href="example_plaque_psoriasis.html">ML-NMR plaque
+psoriasis</a></td>
+<td align="left">Binary (IPD) and counts (AgD), and ordered
+categorical</td>
+<td align="left">Bernoulli (IPD) and two-parameter Binomial (AgD), and
+ordered multinomial</td>
 <td align="left">probit</td>
-<td align="left">Multilevel network meta-regression combining IPD and AgD</td>
+<td align="left">Multilevel network meta-regression combining IPD and
+AgD</td>
 </tr>
 </tbody>
 </table>
@@ -214,19 +233,38 @@
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Cooper2009" class="csl-entry">
-Cooper, N. J., A. J. Sutton, D. Morris, A. E. Ades, and N. J. Welton. 2009. <span>“Addressing Between-Study Heterogeneity and Inconsistency in Mixed Treatment Comparisons: Application to Stroke Prevention Treatments in Individuals with Non-Rheumatic Atrial Fibrillation.”</span> <em>Statistics in Medicine</em> 28 (14): 1861–81. <a href="https://doi.org/10.1002/sim.3594" class="external-link">https://doi.org/10.1002/sim.3594</a>.
+Cooper, N. J., A. J. Sutton, D. Morris, A. E. Ades, and N. J. Welton.
+2009. <span>“Addressing Between-Study Heterogeneity and Inconsistency in
+Mixed Treatment Comparisons: Application to Stroke Prevention Treatments
+in Individuals with Non-Rheumatic Atrial Fibrillation.”</span>
+<em>Statistics in Medicine</em> 28 (14): 1861–81. <a href="https://doi.org/10.1002/sim.3594" class="external-link">https://doi.org/10.1002/sim.3594</a>.
 </div>
 <div id="ref-TSD_evsynth" class="csl-entry">
-Dias, S., N. J. Welton, A. J. Sutton, D. M. Caldwell, G. Lu, S. Reken, and A. E. Ades. 2011. <span>“<span>NICE DSU Technical Support Documents</span> 1-7: Evidence Synthesis for Decision Making.”</span> <span>National Institute for Health and Care Excellence</span>. <a href="https://nicedsu.sites.sheffield.ac.uk" class="external-link">https://nicedsu.sites.sheffield.ac.uk</a>.
+Dias, S., N. J. Welton, A. J. Sutton, D. M. Caldwell, G. Lu, S. Reken,
+and A. E. Ades. 2011. <span>“<span>NICE DSU Technical Support
+Documents</span> 1-7: Evidence Synthesis for Decision Making.”</span>
+<span>National Institute for Health and Care Excellence</span>. <a href="https://nicedsu.sites.sheffield.ac.uk" class="external-link">https://nicedsu.sites.sheffield.ac.uk</a>.
 </div>
 <div id="ref-Phillippo2022" class="csl-entry">
-Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, D. Saure, Y. Schymura, and N. J. Welton. 2022. <span>“Validating the Assumptions of Population Adjustment: Application of Multilevel Network Meta-Regression to a Network of Treatments for Plaque Psoriasis.”</span> <em>Medical Decision Making</em>. <a href="https://doi.org/10.1177/0272989X221117162" class="external-link">https://doi.org/10.1177/0272989X221117162</a>.
+Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, D. Saure,
+Y. Schymura, and N. J. Welton. 2022. <span>“Validating the Assumptions
+of Population Adjustment: Application of Multilevel Network
+Meta-Regression to a Network of Treatments for Plaque Psoriasis.”</span>
+<em>Medical Decision Making</em>. <a href="https://doi.org/10.1177/0272989X221117162" class="external-link">https://doi.org/10.1177/0272989X221117162</a>.
 </div>
 <div id="ref-methods_paper" class="csl-entry">
-Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A. Schacht, D. Saure, Z. Kadziola, and N. J. Welton. 2020. <span>“Multilevel Network Meta-Regression for Population-Adjusted Treatment Comparisons.”</span> <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em> 183 (3): 1189–1210. <a href="https://doi.org/10.1111/rssa.12579" class="external-link">https://doi.org/10.1111/rssa.12579</a>.
+Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A.
+Schacht, D. Saure, Z. Kadziola, and N. J. Welton. 2020.
+<span>“Multilevel Network Meta-Regression for Population-Adjusted
+Treatment Comparisons.”</span> <em>Journal of the Royal Statistical
+Society: Series A (Statistics in Society)</em> 183 (3): 1189–1210. <a href="https://doi.org/10.1111/rssa.12579" class="external-link">https://doi.org/10.1111/rssa.12579</a>.
 </div>
 <div id="ref-Turner2012" class="csl-entry">
-Turner, R. M., J. Davey, M. J. Clarke, S. G. Thompson, and J. P. T. Higgins. 2012. <span>“Predicting the Extent of Heterogeneity in Meta-Analysis, Using Empirical Data from the Cochrane Database of Systematic Reviews.”</span> <em>International Journal of Epidemiology</em> 41 (3): 818–27. <a href="https://doi.org/10.1093/ije/dys041" class="external-link">https://doi.org/10.1093/ije/dys041</a>.
+Turner, R. M., J. Davey, M. J. Clarke, S. G. Thompson, and J. P. T.
+Higgins. 2012. <span>“Predicting the Extent of Heterogeneity in
+Meta-Analysis, Using Empirical Data from the Cochrane Database of
+Systematic Reviews.”</span> <em>International Journal of
+Epidemiology</em> 41 (3): 818–27. <a href="https://doi.org/10.1093/ije/dys041" class="external-link">https://doi.org/10.1093/ije/dys041</a>.
 </div>
 </div>
 </div>

@@ -114,7 +114,10 @@
 <span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     dgamma, pgamma, qgamma</span></span></code></pre>
-<p>This vignette describes the analysis of 26 trials comparing 17 treatments in 4 classes for the prevention of stroke in patients with atrial fibrillation <span class="citation">(<a href="#ref-Cooper2009" role="doc-biblioref">Cooper et al. 2009</a>)</span>. The data are available in this package as <code>atrial_fibrillation</code>:</p>
+<p>This vignette describes the analysis of 26 trials comparing 17
+treatments in 4 classes for the prevention of stroke in patients with
+atrial fibrillation <span class="citation">(<a href="#ref-Cooper2009" role="doc-biblioref">Cooper et al. 2009</a>)</span>. The data are
+available in this package as <code>atrial_fibrillation</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">atrial_fibrillation</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     studyc studyn                                  trtc trtn      trt_class   r    n    E</span></span>
@@ -131,11 +134,19 @@
 <span><span class="co">#&gt; 4   0.06 1989      1.2</span></span>
 <span><span class="co">#&gt; 5   0.06 1989      1.2</span></span>
 <span><span class="co">#&gt; 6   0.10 1998      2.2</span></span></code></pre></div>
-<p><span class="citation">Cooper et al. (<a href="#ref-Cooper2009" role="doc-biblioref">2009</a>)</span> used this data to demonstrate meta-regression models, which we recreate here.</p>
+<p><span class="citation">Cooper et al. (<a href="#ref-Cooper2009" role="doc-biblioref">2009</a>)</span> used this data to demonstrate
+meta-regression models, which we recreate here.</p>
 <div class="section level2">
 <h2 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
 </h2>
-<p>Whilst we have data on the patient-years at risk in each study (<code>E</code>), we ignore this here to follow the analysis of <span class="citation">Cooper et al. (<a href="#ref-Cooper2009" role="doc-biblioref">2009</a>)</span>, instead analysing the number of patients with stroke (<code>r</code>) out of the total (<code>n</code>) in each arm. We use the function <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code> to set up the network, making sure to specify the treatment classes <code>trt_class</code>. We remove the WASPO study from the network as both arms had zero events, and this study therefore contributes no information.</p>
+<p>Whilst we have data on the patient-years at risk in each study
+(<code>E</code>), we ignore this here to follow the analysis of <span class="citation">Cooper et al. (<a href="#ref-Cooper2009" role="doc-biblioref">2009</a>)</span>, instead analysing the number of
+patients with stroke (<code>r</code>) out of the total (<code>n</code>)
+in each arm. We use the function <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code> to set up
+the network, making sure to specify the treatment classes
+<code>trt_class</code>. We remove the WASPO study from the network as
+both arms had zero events, and this study therefore contributes no
+information.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">af_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_agd_arm.html">set_agd_arm</a></span><span class="op">(</span><span class="va">atrial_fibrillation</span><span class="op">[</span><span class="va">atrial_fibrillation</span><span class="op">$</span><span class="va">studyc</span> <span class="op">!=</span> <span class="st">"WASPO"</span>, <span class="op">]</span>, </span>
 <span>                      study <span class="op">=</span> <span class="va">studyc</span>,</span>
@@ -166,7 +177,10 @@
 <span><span class="co">#&gt; Total number of studies: 25</span></span>
 <span><span class="co">#&gt; Reference treatment is: Standard adjusted dose anti-coagulant</span></span>
 <span><span class="co">#&gt; Network is <span style="color: #00BB00;">connected</span></span></span></code></pre></div>
-<p>(A better analysis, accounting for differences in the patient-years at risk between studies, can be performed by specifying a rate outcome with <code>r</code> and <code>E</code> in <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code> above. The following code remains identical.)</p>
+<p>(A better analysis, accounting for differences in the patient-years
+at risk between studies, can be performed by specifying a rate outcome
+with <code>r</code> and <code>E</code> in <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code>
+above. The following code remains identical.)</p>
 <p>Plot the network with the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_net</span>, weight_nodes <span class="op">=</span> <span class="cn">TRUE</span>, weight_edges <span class="op">=</span> <span class="cn">TRUE</span>, show_trt_class <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> </span>
@@ -179,12 +193,21 @@
 <p>We fit two (random effects) models:</p>
 <ol style="list-style-type: decimal">
 <li>A standard NMA model without any covariates (model 1 of <span class="citation">Cooper et al. (<a href="#ref-Cooper2009" role="doc-biblioref">2009</a>)</span>);</li>
-<li>A meta-regression model adjusting for the proportion of individuals in each study with prior stroke, with shared interaction coefficients by treatment class (model 4b of <span class="citation">Cooper et al. (<a href="#ref-Cooper2009" role="doc-biblioref">2009</a>)</span>).</li>
+<li>A meta-regression model adjusting for the proportion of individuals
+in each study with prior stroke, with shared interaction coefficients by
+treatment class (model 4b of <span class="citation">Cooper et al. (<a href="#ref-Cooper2009" role="doc-biblioref">2009</a>)</span>).</li>
 </ol>
 <div class="section level3">
 <h3 id="nma-with-no-covariates">NMA with no covariates<a class="anchor" aria-label="anchor" href="#nma-with-no-covariates"></a>
 </h3>
-<p>We fit a random effects model using the <code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "random"</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions for the treatment effects <span class="math inline">\(d_k\)</span> and study-specific intercepts <span class="math inline">\(\mu_j\)</span>, and a <span class="math inline">\(\textrm{half-N}(5^2)\)</span> prior for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of parameter values implied by these prior distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
+<p>We fit a random effects model using the <code><a href="../reference/nma.html">nma()</a></code> function
+with <code>trt_effects = "random"</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions
+for the treatment effects <span class="math inline">\(d_k\)</span> and
+study-specific intercepts <span class="math inline">\(\mu_j\)</span>,
+and a <span class="math inline">\(\textrm{half-N}(5^2)\)</span> prior
+for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. We can examine the range of
+parameter values implied by these prior distributions with the
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span></span>
@@ -194,7 +217,9 @@
 <span><span class="co">#&gt; A half-Normal prior distribution: location = 0, scale = 5.</span></span>
 <span><span class="co">#&gt; 50% of the prior density lies between 0 and 3.37.</span></span>
 <span><span class="co">#&gt; 95% of the prior density lies between 0 and 9.8.</span></span></code></pre></div>
-<p>Fitting the model with the <code><a href="../reference/nma.html">nma()</a></code> function. We increase the target acceptance rate <code>adapt_delta = 0.99</code> to minimise divergent transition warnings.</p>
+<p>Fitting the model with the <code><a href="../reference/nma.html">nma()</a></code> function. We increase
+the target acceptance rate <code>adapt_delta = 0.99</code> to minimise
+divergent transition warnings.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">af_fit_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">af_net</span>, </span>
 <span>                trt_effects <span class="op">=</span> <span class="st">"random"</span>,</span>
@@ -203,7 +228,8 @@
 <span>                prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
 <span>                adapt_delta <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Note: Setting "Standard adjusted dose anti-coagulant" as the network reference treatment.</span></span></code></pre>
-<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
+<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
+method:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">af_fit_1</span></span>
 <span><span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span></span>
@@ -250,19 +276,24 @@
 <span><span class="co">#&gt; lp__                                         -4766.75 -4758.44  1056    1</span></span>
 <span><span class="co">#&gt; tau                                              0.37     0.59   696    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Aug 29 23:22:35 2022.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Nov  3 09:22:14 2022.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
-<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects <span class="math inline">\(\delta_{jk}\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
+<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects
+<span class="math inline">\(\delta_{jk}\)</span> are hidden, but could
+be examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">af_fit_1</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
+<p>The prior and posterior distributions can be compared visually using
+the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">af_fit_1</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_pp_plot-1.png" width="100%" style="display: block; margin: auto;"></p>
-<p>We can compute relative effects against placebo/standard care with the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with the <code>trt_ref</code> argument:</p>
+<p>We can compute relative effects against placebo/standard care with
+the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with the
+<code>trt_ref</code> argument:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_1_releff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">af_fit_1</span>, trt_ref <span class="op">=</span> <span class="st">"Placebo/Standard care"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                               mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS</span></span>
@@ -299,11 +330,13 @@
 <span><span class="co">#&gt; d[Medium dose aspirin]                           2653    1</span></span>
 <span><span class="co">#&gt; d[Triflusal]                                     2451    1</span></span>
 <span><span class="co">#&gt; d[Ximelagatran]                                  1993    1</span></span></code></pre></div>
-<p>These estimates can easily be plotted with the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method:</p>
+<p>These estimates can easily be plotted with the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>
+method:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_releff</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_releff_plot-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.</p>
+<p>We can also produce treatment rankings, rank probabilities, and
+cumulative rank probabilities.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_1_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">af_fit_1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                                  mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS</span></span>
@@ -498,9 +531,31 @@
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_cumrankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
-<h3 id="network-meta-regression-adjusting-for-proportion-of-prior-stroke">Network meta-regression adjusting for proportion of prior stroke<a class="anchor" aria-label="anchor" href="#network-meta-regression-adjusting-for-proportion-of-prior-stroke"></a>
+<h3 id="network-meta-regression-adjusting-for-proportion-of-prior-stroke">Network meta-regression adjusting for proportion of prior
+stroke<a class="anchor" aria-label="anchor" href="#network-meta-regression-adjusting-for-proportion-of-prior-stroke"></a>
 </h3>
-<p>We now consider a meta-regression model adjusting for the proportion of individuals in each study with prior stroke, with shared interaction coefficients by treatment class. The regression model is specified in the <code><a href="../reference/nma.html">nma()</a></code> function using a formula in the <code>regression</code> argument. The formula <code>~ .trt:stroke</code> means that interactions of prior stroke with treatment will be included; the <code>.trt</code> special variable indicates treatment, and <code>stroke</code> is in the original data set. We specify <code>class_interactions = "common"</code> to denote that the interaction parameters are to be common (i.e. shared) between treatments within each class. (Setting <code>class_interactions = "independent"</code> would fit model 2 of <span class="citation">Cooper et al. (<a href="#ref-Cooper2009" role="doc-biblioref">2009</a>)</span> with separate interactions for each treatment, data permitting.) We use the same prior distributions as above, but additionally require a prior distribution for the regression coefficients <code>prior_reg</code>; we use a <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distribution. The <a href="https://mc-stan.org/users/documentation/case-studies/qr_regression.html" class="external-link">QR decomposition</a> can greatly improve the efficiency of sampling for regression models by decorrelating the sampling space; we specify that this should be used with <code>QR = TRUE</code>, and increase the target acceptance rate <code>adapt_delta = 0.99</code> to minimise divergent transition warnings.</p>
+<p>We now consider a meta-regression model adjusting for the proportion
+of individuals in each study with prior stroke, with shared interaction
+coefficients by treatment class. The regression model is specified in
+the <code><a href="../reference/nma.html">nma()</a></code> function using a formula in the
+<code>regression</code> argument. The formula <code>~ .trt:stroke</code>
+means that interactions of prior stroke with treatment will be included;
+the <code>.trt</code> special variable indicates treatment, and
+<code>stroke</code> is in the original data set. We specify
+<code>class_interactions = "common"</code> to denote that the
+interaction parameters are to be common (i.e. shared) between treatments
+within each class. (Setting
+<code>class_interactions = "independent"</code> would fit model 2 of
+<span class="citation">Cooper et al. (<a href="#ref-Cooper2009" role="doc-biblioref">2009</a>)</span> with separate interactions for
+each treatment, data permitting.) We use the same prior distributions as
+above, but additionally require a prior distribution for the regression
+coefficients <code>prior_reg</code>; we use a <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distribution.
+The <a href="https://mc-stan.org/users/documentation/case-studies/qr_regression.html" class="external-link">QR
+decomposition</a> can greatly improve the efficiency of sampling for
+regression models by decorrelating the sampling space; we specify that
+this should be used with <code>QR = TRUE</code>, and increase the target
+acceptance rate <code>adapt_delta = 0.99</code> to minimise divergent
+transition warnings.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">af_fit_4b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">af_net</span>, </span>
 <span>                 trt_effects <span class="op">=</span> <span class="st">"random"</span>,</span>
@@ -513,7 +568,8 @@
 <span>                 prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
 <span>                 adapt_delta <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Note: Setting "Standard adjusted dose anti-coagulant" as the network reference treatment.</span></span></code></pre>
-<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
+<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
+method:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">af_fit_4b</span></span>
 <span><span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span></span>
@@ -570,25 +626,37 @@
 <span><span class="co">#&gt; lp__                                         -4766.29 -4758.77  1191 1.00</span></span>
 <span><span class="co">#&gt; tau                                              0.26     0.50   368 1.01</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Aug 29 23:23:15 2022.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Nov  3 09:22:58 2022.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
-<p>The estimated treatment effects <code>d[]</code> shown here correspond to relative effects at the reference level of the covariate, here proportion of prior stroke centered at the network mean value 0.296.</p>
-<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects <span class="math inline">\(\delta_{jk}\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
+<p>The estimated treatment effects <code>d[]</code> shown here
+correspond to relative effects at the reference level of the covariate,
+here proportion of prior stroke centered at the network mean value
+0.296.</p>
+<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects
+<span class="math inline">\(\delta_{jk}\)</span> are hidden, but could
+be examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
+<p>The prior and posterior distributions can be compared visually using
+the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"reg"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>We can compute relative effects against placebo/standard care with the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with the <code>trt_ref</code> argument, which by default produces relative effects for the observed proportions of prior stroke in each study:</p>
+<p>We can compute relative effects against placebo/standard care with
+the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with the
+<code>trt_ref</code> argument, which by default produces relative
+effects for the observed proportions of prior stroke in each study:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="op">(</span><span class="va">af_4b_releff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, trt_ref <span class="op">=</span> <span class="st">"Placebo/Standard care"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_releff</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p>We can produce estimated treatment effects for particular covariate values using the <code>newdata</code> argument. For example, treatment effects when no individuals or all individuals have prior stroke are produced by</p>
+<p>We can produce estimated treatment effects for particular covariate
+values using the <code>newdata</code> argument. For example, treatment
+effects when no individuals or all individuals have prior stroke are
+produced by</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_4b_releff_01</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, </span>
 <span>                                     trt_ref <span class="op">=</span> <span class="st">"Placebo/Standard care"</span>,</span>
@@ -678,11 +746,14 @@
 <span><span class="co">#&gt; d[stroke = 1: Ximelagatran]                              -0.55     4177     2573    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_releff_01</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_releff_01_plot-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>The estimated class interactions (against the reference “Mixed” class) are very uncertain.</p>
+<p>The estimated class interactions (against the reference “Mixed”
+class) are very uncertain.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, pars <span class="op">=</span> <span class="st">"beta"</span>, stat <span class="op">=</span> <span class="st">"halfeye"</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_betas-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>The interactions are more straightforward to interpret if we transform the interaction coefficients (using the consistency equations) so that they are against the control class:</p>
+<p>The interactions are more straightforward to interpret if we
+transform the interaction coefficients (using the consistency equations)
+so that they are against the control class:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">af_4b_beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">as.array</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, pars <span class="op">=</span> <span class="st">"beta"</span><span class="op">)</span></span>
 <span></span>
@@ -706,8 +777,20 @@
 <span><span class="co">#&gt; beta[.trtclassMixed:stroke]              2977    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">af_4b_beta</span><span class="op">)</span>, stat <span class="op">=</span> <span class="st">"halfeye"</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_betas_transformed-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>There is some evidence that the effect of anti-coagulants increases (compared to control) with prior stroke. There is little evidence the effect of anti-platelets reduces with prior stroke, although the point estimate represents a substantial reduction in effectiveness, and the 95% Credible Interval includes values that correspond to substantial increases in treatment effect. The interaction effect of stroke on mixed treatments is very uncertain, but potentially indicates a substantial reduction in treatment effects with prior stroke.</p>
-<p>We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities. By default (without the <code>newdata</code> argument specified), these are produced at the value of <code>stroke</code> for each study in the network in turn. To instead produce rankings for when no individuals or all individuals have prior stroke, we specify the <code>newdata</code> argument.</p>
+<p>There is some evidence that the effect of anti-coagulants increases
+(compared to control) with prior stroke. There is little evidence the
+effect of anti-platelets reduces with prior stroke, although the point
+estimate represents a substantial reduction in effectiveness, and the
+95% Credible Interval includes values that correspond to substantial
+increases in treatment effect. The interaction effect of stroke on mixed
+treatments is very uncertain, but potentially indicates a substantial
+reduction in treatment effects with prior stroke.</p>
+<p>We can also produce treatment rankings, rank probabilities, and
+cumulative rank probabilities. By default (without the
+<code>newdata</code> argument specified), these are produced at the
+value of <code>stroke</code> for each study in the network in turn. To
+instead produce rankings for when no individuals or all individuals have
+prior stroke, we specify the <code>newdata</code> argument.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_4b_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">af_fit_4b</span>,</span>
 <span>                                newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>stroke <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, </span>
@@ -1296,8 +1379,16 @@
 <span><span class="co">#&gt; Residual deviance: 58.2<span style="color: #555555;"> (on 61 data points)</span></span></span>
 <span><span class="co">#&gt;                pD: 48.3</span></span>
 <span><span class="co">#&gt;               DIC: 106.4</span></span></code></pre></div>
-<p>Both models fit the data well, having posterior mean residual deviance close to the number of data points. The DIC is slightly lower for the meta-regression model, although only by a couple of points (substantial differences are usually considered 3-5 points). The estimated heterogeneity standard deviation is much lower for the meta-regression model, suggesting that adjusting for the proportion of patients with prior stroke is explaining some of the heterogeneity in the data.</p>
-<p>We can also examine the residual deviance contributions with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
+<p>Both models fit the data well, having posterior mean residual
+deviance close to the number of data points. The DIC is slightly lower
+for the meta-regression model, although only by a couple of points
+(substantial differences are usually considered 3-5 points). The
+estimated heterogeneity standard deviation is much lower for the
+meta-regression model, suggesting that adjusting for the proportion of
+patients with prior stroke is explaining some of the heterogeneity in
+the data.</p>
+<p>We can also examine the residual deviance contributions with the
+corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_dic_1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_resdev_plot-1.png" width="700" style="display: block; margin: auto;"></p>
@@ -1310,7 +1401,11 @@
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Cooper2009" class="csl-entry">
-Cooper, N. J., A. J. Sutton, D. Morris, A. E. Ades, and N. J. Welton. 2009. <span>“Addressing Between-Study Heterogeneity and Inconsistency in Mixed Treatment Comparisons: Application to Stroke Prevention Treatments in Individuals with Non-Rheumatic Atrial Fibrillation.”</span> <em>Statistics in Medicine</em> 28 (14): 1861–81. <a href="https://doi.org/10.1002/sim.3594" class="external-link">https://doi.org/10.1002/sim.3594</a>.
+Cooper, N. J., A. J. Sutton, D. Morris, A. E. Ades, and N. J. Welton.
+2009. <span>“Addressing Between-Study Heterogeneity and Inconsistency in
+Mixed Treatment Comparisons: Application to Stroke Prevention Treatments
+in Individuals with Non-Rheumatic Atrial Fibrillation.”</span>
+<em>Statistics in Medicine</em> 28 (14): 1861–81. <a href="https://doi.org/10.1002/sim.3594" class="external-link">https://doi.org/10.1002/sim.3594</a>.
 </div>
 </div>
 </div>

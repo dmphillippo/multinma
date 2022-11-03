@@ -126,13 +126,29 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>    <span class="co"># ggplot2 for plotting covariate distributions</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Simulated individual patient data (IPD) from trials comparing treatments for plaque psoriasis are found in the data set <code>plaque_psoriasis_ipd</code>. Aggregate data (AgD) are available on a further set of trials, found in the data set <code>plaque_psoriasis_agd</code>. In this vignette, we recreate the multilevel network meta-regression (ML-NMR) analyses performed by <span class="citation">Phillippo et al. (<a href="#ref-methods_paper" role="doc-biblioref">2020</a>)</span> and <span class="citation">Phillippo et al. (<a href="#ref-Phillippo2022" role="doc-biblioref">2022</a>; see also <a href="#ref-Phillippo_thesis" role="doc-biblioref">Phillippo 2019</a>)</span>.</p>
-<p>In the <a href="#initial_analysis">first analysis</a> <span class="citation">(<a href="#ref-methods_paper" role="doc-biblioref">Phillippo et al. 2020</a>)</span>, we consider a network of four studies with a binary outcome (success/failure to achieve a 75% reduction on the psoriasis area and severity index, PASI 75).</p>
-<p>In the <a href="#extended_analysis">second analysis</a> <span class="citation">(<a href="#ref-Phillippo2022" role="doc-biblioref">Phillippo et al. 2022</a>)</span>, we extend this network with a further five studies and demonstrate how the key assumptions of population adjustment can be assessed in this larger network. We also demonstrate how to produce estimates for three external target populations, and fit a multinomial model to incorporate ordered categorical outcomes (PASI 75, PASI 90, and PASI 100).</p>
+<p>Simulated individual patient data (IPD) from trials comparing
+treatments for plaque psoriasis are found in the data set
+<code>plaque_psoriasis_ipd</code>. Aggregate data (AgD) are available on
+a further set of trials, found in the data set
+<code>plaque_psoriasis_agd</code>. In this vignette, we recreate the
+multilevel network meta-regression (ML-NMR) analyses performed by <span class="citation">Phillippo et al. (<a href="#ref-methods_paper" role="doc-biblioref">2020</a>)</span> and <span class="citation">Phillippo et al. (<a href="#ref-Phillippo2022" role="doc-biblioref">2022</a>; see also <a href="#ref-Phillippo_thesis" role="doc-biblioref">Phillippo 2019</a>)</span>.</p>
+<p>In the <a href="#initial_analysis">first analysis</a> <span class="citation">(<a href="#ref-methods_paper" role="doc-biblioref">Phillippo et al. 2020</a>)</span>, we consider a
+network of four studies with a binary outcome (success/failure to
+achieve a 75% reduction on the psoriasis area and severity index, PASI
+75).</p>
+<p>In the <a href="#extended_analysis">second analysis</a> <span class="citation">(<a href="#ref-Phillippo2022" role="doc-biblioref">Phillippo et al. 2022</a>)</span>, we extend this
+network with a further five studies and demonstrate how the key
+assumptions of population adjustment can be assessed in this larger
+network. We also demonstrate how to produce estimates for three external
+target populations, and fit a multinomial model to incorporate ordered
+categorical outcomes (PASI 75, PASI 90, and PASI 100).</p>
 <div class="section level2">
 <h2 id="initial_analysis">Initial analysis<a class="anchor" aria-label="anchor" href="#initial_analysis"></a>
 </h2>
-<p>We start by recreating the analysis presented by <span class="citation">Phillippo et al. (<a href="#ref-methods_paper" role="doc-biblioref">2020</a>)</span>. We will analyse IPD from three studies, UNCOVER-1, UNCOVER-2, and UNCOVER-3 <span class="citation">(<a href="#ref-Griffiths2015" role="doc-biblioref">Griffiths et al. 2015</a>; <a href="#ref-Gordon2016" role="doc-biblioref">Gordon et al. 2016</a>)</span>, and AgD from one study, FIXTURE <span class="citation">(<a href="#ref-Langley2014" role="doc-biblioref">Langley et al. 2014</a>)</span>.</p>
+<p>We start by recreating the analysis presented by <span class="citation">Phillippo et al. (<a href="#ref-methods_paper" role="doc-biblioref">2020</a>)</span>. We will analyse IPD from three
+studies, UNCOVER-1, UNCOVER-2, and UNCOVER-3 <span class="citation">(<a href="#ref-Griffiths2015" role="doc-biblioref">Griffiths et al.
+2015</a>; <a href="#ref-Gordon2016" role="doc-biblioref">Gordon et al.
+2016</a>)</span>, and AgD from one study, FIXTURE <span class="citation">(<a href="#ref-Langley2014" role="doc-biblioref">Langley et al. 2014</a>)</span>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_ipd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">plaque_psoriasis_ipd</span>,</span>
 <span>                  <span class="va">studyc</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"UNCOVER-1"</span>, <span class="st">"UNCOVER-2"</span>, <span class="st">"UNCOVER-3"</span><span class="op">)</span><span class="op">)</span></span>
@@ -171,14 +187,33 @@
 <span><span class="co">#&gt; 2     35.2   19.1        82.0      20.4         16.6       11.6    62.6 15.0</span></span>
 <span><span class="co">#&gt; 3     34.5   19.4        83.6      20.8         17.3       12.2    64.8 15.0</span></span>
 <span><span class="co">#&gt; 4     34.3   19.2        83.0      21.6         15.8       12.3    63.0 15.3</span></span></code></pre></div>
-<p>We consider running a ML-NMR adjusting for five potential effect-modifying covariates: duration of psoriasis <code>durnpso</code>, weight <code>weight</code>, previous systemic treatment <code>prevsys</code>, body surface area <code>bsa</code>, and psoriatic arthritis <code>psa</code>.</p>
+<p>We consider running a ML-NMR adjusting for five potential
+effect-modifying covariates: duration of psoriasis <code>durnpso</code>,
+weight <code>weight</code>, previous systemic treatment
+<code>prevsys</code>, body surface area <code>bsa</code>, and psoriatic
+arthritis <code>psa</code>.</p>
 <div class="section level3">
 <h3 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
 </h3>
 <div class="section level4">
 <h4 id="preparing-the-data">Preparing the data<a class="anchor" aria-label="anchor" href="#preparing-the-data"></a>
 </h4>
-<p>We need to prepare the data so that it is in an acceptable format to run a ML-NMR model. Firstly, we need to handle the binary covariates <code>prevsys</code> and <code>psa</code>. In the IPD, these are coded as <code>TRUE</code> or <code>FALSE</code>, but in the AgD these are coded as percentages (out of 100). We need these to transform both of these sets of variables so that they are numeric and lie in the interval <span class="math inline">\([0,1]\)</span>, so that the variables are compatible across the data sources. Whilst we are here, we also transform body surface area <code>bsa</code> (a percentage) to lie in <span class="math inline">\([0,1]\)</span>, since that will make specifying an appropriate marginal distribution easier later, and rescale <code>weight</code> and <code>duration</code> to aid interpretation of the regression coefficients (in terms of 10 kilos and 10 years respectively). We also add in a <code>trtclass</code> variable, indicating which treatments belong to which classes. Finally, we check for missing values in the IPD.</p>
+<p>We need to prepare the data so that it is in an acceptable format to
+run a ML-NMR model. Firstly, we need to handle the binary covariates
+<code>prevsys</code> and <code>psa</code>. In the IPD, these are coded
+as <code>TRUE</code> or <code>FALSE</code>, but in the AgD these are
+coded as percentages (out of 100). We need these to transform both of
+these sets of variables so that they are numeric and lie in the interval
+<span class="math inline">\([0,1]\)</span>, so that the variables are
+compatible across the data sources. Whilst we are here, we also
+transform body surface area <code>bsa</code> (a percentage) to lie in
+<span class="math inline">\([0,1]\)</span>, since that will make
+specifying an appropriate marginal distribution easier later, and
+rescale <code>weight</code> and <code>duration</code> to aid
+interpretation of the regression coefficients (in terms of 10 kilos and
+10 years respectively). We also add in a <code>trtclass</code> variable,
+indicating which treatments belong to which classes. Finally, we check
+for missing values in the IPD.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_ipd</span> <span class="op">&lt;-</span> <span class="va">pso_ipd</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="co"># Variable transformations</span></span>
@@ -217,14 +252,21 @@
 <span><span class="co">#&gt; [1] 4</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">!</span><span class="va">pso_ipd</span><span class="op">$</span><span class="va">complete</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.001036807</span></span></code></pre></div>
-<p>Since the proportion of missing data is so small, we will simply exclude these individuals from the analysis.</p>
+<p>Since the proportion of missing data is so small, we will simply
+exclude these individuals from the analysis.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_ipd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pso_ipd</span>, <span class="va">complete</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="creating-the-network">Creating the network<a class="anchor" aria-label="anchor" href="#creating-the-network"></a>
 </h4>
-<p>Set up the network, setting the IPD with <code><a href="../reference/set_ipd.html">set_ipd()</a></code>, AgD (arm-based) with <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code>, and combining together using <code><a href="../reference/combine_network.html">combine_network()</a></code>. We specify the binary <code>pasi75</code> outcome as <code>r</code> in the IPD, and the count outcome <code>pasi75_r</code> and denominator <code>pasi75_n</code> as <code>r</code> and <code>n</code> in the AgD. We specify the treatment classes with <code>trt_class = trtclass</code>.</p>
+<p>Set up the network, setting the IPD with <code><a href="../reference/set_ipd.html">set_ipd()</a></code>, AgD
+(arm-based) with <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code>, and combining together
+using <code><a href="../reference/combine_network.html">combine_network()</a></code>. We specify the binary
+<code>pasi75</code> outcome as <code>r</code> in the IPD, and the count
+outcome <code>pasi75_r</code> and denominator <code>pasi75_n</code> as
+<code>r</code> and <code>n</code> in the AgD. We specify the treatment
+classes with <code>trt_class = trtclass</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combine_network.html">combine_network</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/set_ipd.html">set_ipd</a></span><span class="op">(</span><span class="va">pso_ipd</span>, </span>
@@ -260,7 +302,8 @@
 <span><span class="co">#&gt; Total number of studies: 4</span></span>
 <span><span class="co">#&gt; Reference treatment is: PBO</span></span>
 <span><span class="co">#&gt; Network is <span style="color: #00BB00;">connected</span></span></span></code></pre></div>
-<p>We can produce a network plot with the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method:</p>
+<p>We can produce a network plot with the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>
+method:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_net</span>, weight_nodes <span class="op">=</span> <span class="cn">TRUE</span>, weight_edges <span class="op">=</span> <span class="cn">TRUE</span>, show_trt_class <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.box <span class="op">=</span> <span class="st">"vertical"</span><span class="op">)</span></span></code></pre></div>
@@ -269,9 +312,37 @@
 <div class="section level4">
 <h4 id="numerical-integration-for-ml-nmr">Numerical integration for ML-NMR<a class="anchor" aria-label="anchor" href="#numerical-integration-for-ml-nmr"></a>
 </h4>
-<p>ML-NMR models define the meta-regression model at the individual level, in exactly the same manner as a full-IPD meta-regression. ML-NMR then incorporates the AgD into the model by integrating this individual-level model over the covariate distribution in each AgD study <span class="citation">(<a href="#ref-methods_paper" role="doc-biblioref">Phillippo et al. 2020</a>; <a href="#ref-Phillippo_thesis" role="doc-biblioref">Phillippo 2019</a>)</span>. Using integration, instead of simply “plugging-in” mean covariate values for the AgD studies, avoids aggregation bias when the link function is not the identity function.</p>
-<p>This package utilises numerical integration to incorporate the aggregate data - specifically, quasi-Monte Carlo (QMC) integration with a Gaussian copula <span class="citation">(<a href="#ref-methods_paper" role="doc-biblioref">Phillippo et al. 2020</a>; <a href="#ref-Phillippo_thesis" role="doc-biblioref">Phillippo 2019</a>)</span>. QMC integration is a very general and flexible integration approach, which typically requires far fewer integration points than standard (pseudo-random) Monte-Carlo integration to achieve the same numerical accuracy.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;The convergence rate of QMC is typically &lt;span class="math inline"&gt;\(\mathcal{O}(1/n)\)&lt;/span&gt;, whereas the expected convergence rate of standard MC is &lt;span class="math inline"&gt;\(\mathcal{O}(1/n^\frac{1}{2})\)&lt;/span&gt; &lt;span class="citation"&gt;(&lt;a href="#ref-Caflisch1998" role="doc-biblioref"&gt;Caflisch 1998&lt;/a&gt;; &lt;a href="#ref-Niederreiter1978" role="doc-biblioref"&gt;Niederreiter 1978&lt;/a&gt;)&lt;/span&gt;.&lt;/p&gt;'><sup>1</sup></a> A Gaussian copula allows us to account for correlations between covariates, which may have any specified marginal distributions.</p>
-<p>We now set up the numerical integration for the network. The five covariates that we will consider adjusting for are body surface area <code>bsa</code>, duration of psoriasis <code>durnpso</code>, previous systemic treatment <code>prevsys</code>, psoriatic arthritis <code>psa</code>, and weight <code>weight</code>. We need to choose suitable marginal distributions for these covariates to draw the integration points from. <code>prevsys</code> and <code>psa</code> are binary covariates, so these are given a Bernoulli distribution. <code>bsa</code> is a percentage, so we choose a logit-Normal distribution (note, this requires the <code>logitnorm</code> package to be installed). We choose Gamma distributions for <code>durnpso</code> and <code>weight</code> to account for skewness. These choices seem to match well the marginal distributions observed in the IPD:</p>
+<p>ML-NMR models define the meta-regression model at the individual
+level, in exactly the same manner as a full-IPD meta-regression. ML-NMR
+then incorporates the AgD into the model by integrating this
+individual-level model over the covariate distribution in each AgD study
+<span class="citation">(<a href="#ref-methods_paper" role="doc-biblioref">Phillippo et al. 2020</a>; <a href="#ref-Phillippo_thesis" role="doc-biblioref">Phillippo
+2019</a>)</span>. Using integration, instead of simply “plugging-in”
+mean covariate values for the AgD studies, avoids aggregation bias when
+the link function is not the identity function.</p>
+<p>This package utilises numerical integration to incorporate the
+aggregate data - specifically, quasi-Monte Carlo (QMC) integration with
+a Gaussian copula <span class="citation">(<a href="#ref-methods_paper" role="doc-biblioref">Phillippo et al. 2020</a>; <a href="#ref-Phillippo_thesis" role="doc-biblioref">Phillippo
+2019</a>)</span>. QMC integration is a very general and flexible
+integration approach, which typically requires far fewer integration
+points than standard (pseudo-random) Monte-Carlo integration to achieve
+the same numerical accuracy.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;The convergence rate of QMC is typically &lt;span class="math inline"&gt;\(\mathcal{O}(1/n)\)&lt;/span&gt;, whereas the expected
+convergence rate of standard MC is &lt;span class="math inline"&gt;\(\mathcal{O}(1/n^\frac{1}{2})\)&lt;/span&gt; &lt;span class="citation"&gt;(&lt;a href="#ref-Caflisch1998" role="doc-biblioref"&gt;Caflisch 1998&lt;/a&gt;; &lt;a href="#ref-Niederreiter1978" role="doc-biblioref"&gt;Niederreiter 1978&lt;/a&gt;)&lt;/span&gt;.&lt;/p&gt;'><sup>1</sup></a> A Gaussian copula allows us to account for
+correlations between covariates, which may have any specified marginal
+distributions.</p>
+<p>We now set up the numerical integration for the network. The five
+covariates that we will consider adjusting for are body surface area
+<code>bsa</code>, duration of psoriasis <code>durnpso</code>, previous
+systemic treatment <code>prevsys</code>, psoriatic arthritis
+<code>psa</code>, and weight <code>weight</code>. We need to choose
+suitable marginal distributions for these covariates to draw the
+integration points from. <code>prevsys</code> and <code>psa</code> are
+binary covariates, so these are given a Bernoulli distribution.
+<code>bsa</code> is a percentage, so we choose a logit-Normal
+distribution (note, this requires the <code>logitnorm</code> package to
+be installed). We choose Gamma distributions for <code>durnpso</code>
+and <code>weight</code> to account for skewness. These choices seem to
+match well the marginal distributions observed in the IPD:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get mean and sd of covariates in each study</span></span>
 <span><span class="va">ipd_summary</span> <span class="op">&lt;-</span> <span class="va">pso_ipd</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
@@ -304,7 +375,14 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">studyc</span> <span class="op">+</span> <span class="va">covariate</span>, scales <span class="op">=</span> <span class="st">"free"</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_multinma.html">theme_multinma</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_plaque_psoriasis_files/figure-html/pso_covariate_plot-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>We add integration points to the AgD studies in the network using the <code><a href="../reference/add_integration.html">add_integration()</a></code> function. Marginal distributions for each covariate are specified using the <code><a href="../reference/distr.html">distr()</a></code> function, which takes a cumulative distribution function corresponding to the chosen marginal distribution, and arguments to that distribution as column names in the aggregate data. Since we do not know the correlations between covariates in the AgD studies, we impute these with the weighted mean of the correlations in the IPD studies (the default option).</p>
+<p>We add integration points to the AgD studies in the network using the
+<code><a href="../reference/add_integration.html">add_integration()</a></code> function. Marginal distributions for each
+covariate are specified using the <code><a href="../reference/distr.html">distr()</a></code> function, which
+takes a cumulative distribution function corresponding to the chosen
+marginal distribution, and arguments to that distribution as column
+names in the aggregate data. Since we do not know the correlations
+between covariates in the AgD studies, we impute these with the weighted
+mean of the correlations in the IPD studies (the default option).</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_integration.html">add_integration</a></span><span class="op">(</span><span class="va">pso_net</span>,</span>
 <span>  durnpso <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qgamma</span>, mean <span class="op">=</span> <span class="va">durnpso_mean</span>, sd <span class="op">=</span> <span class="va">durnpso_sd</span><span class="op">)</span>,</span>
@@ -316,24 +394,52 @@
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using weighted average correlation matrix computed from IPD studies.</span></span></code></pre></div>
 <blockquote>
-<p><strong>Note:</strong> This package provides several convenience functions for specifying these distributions, including <code><a href="../reference/GammaDist.html">qgamma()</a></code> which allows for a parameterisation of the Gamma distribution in terms of mean and standard deviation, <code><a href="../reference/Bernoulli.html">qbern()</a></code> which provides the Bernoulli distribution, and <code><a href="../reference/logitNormal.html">qlogitnorm()</a></code> which provides the logit-Normal distribution allowing for a parameterisation in terms of mean and standard deviation (requires the <code>logitnorm</code> package to be installed).</p>
+<p><strong>Note:</strong> This package provides several convenience
+functions for specifying these distributions, including
+<code><a href="../reference/GammaDist.html">qgamma()</a></code> which allows for a parameterisation of the Gamma
+distribution in terms of mean and standard deviation,
+<code><a href="../reference/Bernoulli.html">qbern()</a></code> which provides the Bernoulli distribution, and
+<code><a href="../reference/logitNormal.html">qlogitnorm()</a></code> which provides the logit-Normal distribution
+allowing for a parameterisation in terms of mean and standard deviation
+(requires the <code>logitnorm</code> package to be installed).</p>
 </blockquote>
 </div>
 </div>
 <div class="section level3">
 <h3 id="ml-nmr-models">ML-NMR models<a class="anchor" aria-label="anchor" href="#ml-nmr-models"></a>
 </h3>
-<p>We fit both fixed effect (FE) and random effects (RE) ML-NMR models.</p>
+<p>We fit both fixed effect (FE) and random effects (RE) ML-NMR
+models.</p>
 <div class="section level4">
 <h4 id="fixed-effect-ml-nmr">Fixed effect ML-NMR<a class="anchor" aria-label="anchor" href="#fixed-effect-ml-nmr"></a>
 </h4>
-<p>First, we fit a FE ML-NMR model using the function <code><a href="../reference/nma.html">nma()</a></code>. Following <span class="citation">(<a href="#ref-methods_paper" role="doc-biblioref">Phillippo et al. 2020</a>)</span> we specify weakly-informative <span class="math inline">\(N(0, 10^2)\)</span> priors on each parameter. The range of parameter values implied by these prior distributions can be checked using the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
+<p>First, we fit a FE ML-NMR model using the function
+<code><a href="../reference/nma.html">nma()</a></code>. Following <span class="citation">(<a href="#ref-methods_paper" role="doc-biblioref">Phillippo et al.
+2020</a>)</span> we specify weakly-informative <span class="math inline">\(N(0, 10^2)\)</span> priors on each parameter. The
+range of parameter values implied by these prior distributions can be
+checked using the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 10.</span></span>
 <span><span class="co">#&gt; 50% of the prior density lies between -6.74 and 6.74.</span></span>
 <span><span class="co">#&gt; 95% of the prior density lies between -19.6 and 19.6.</span></span></code></pre></div>
-<p>The regression model is specified with <code>regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt</code>, which will include the main (prognostic) effects of each covariate as well as interactions with treatment. We use a probit link function (<code>link = "probit"</code>), and specify that the two-parameter Binomial approximation for the aggregate-level likelihood should be used (<code>likelihood = "bernoulli2"</code>, where “bernoulli” refers to the individual-level likelihood, and “2” denotes the two-parameter adjustment to the aggregate-level likelihood) <span class="citation">(<a href="#ref-methods_paper" role="doc-biblioref">Phillippo et al. 2020</a>)</span>. We utilise the shared effect modifier assumption to help identify the model, setting treatment-covariate interactions to be equal within each class (<code>class_interactions = "common"</code>). We narrow the possible range for random initial values with <code>init_r = 0.1</code> (the default is <code>init_r = 2</code>), since probit models in particular are often hard to initialise. Using the QR decomposition (<code>QR = TRUE</code>) greatly improves sampling efficiency here, as is often the case for regression models.</p>
+<p>The regression model is specified with
+<code>regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt</code>,
+which will include the main (prognostic) effects of each covariate as
+well as interactions with treatment. We use a probit link function
+(<code>link = "probit"</code>), and specify that the two-parameter
+Binomial approximation for the aggregate-level likelihood should be used
+(<code>likelihood = "bernoulli2"</code>, where “bernoulli” refers to the
+individual-level likelihood, and “2” denotes the two-parameter
+adjustment to the aggregate-level likelihood) <span class="citation">(<a href="#ref-methods_paper" role="doc-biblioref">Phillippo et al.
+2020</a>)</span>. We utilise the shared effect modifier assumption to
+help identify the model, setting treatment-covariate interactions to be
+equal within each class (<code>class_interactions = "common"</code>). We
+narrow the possible range for random initial values with
+<code>init_r = 0.1</code> (the default is <code>init_r = 2</code>),
+since probit models in particular are often hard to initialise. Using
+the QR decomposition (<code>QR = TRUE</code>) greatly improves sampling
+efficiency here, as is often the case for regression models.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_fit_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">pso_net</span>, </span>
 <span>                  trt_effects <span class="op">=</span> <span class="st">"fixed"</span>,</span>
@@ -347,7 +453,8 @@
 <span>                  init_r <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>                  QR <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: Setting "PBO" as the network reference treatment.</span></span></code></pre></div>
-<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
+<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
+method:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pso_fit_FE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A fixed effects ML-NMR with a bernoulli2 likelihood (probit link).</span></span>
@@ -360,63 +467,66 @@
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                                         mean se_mean   sd     2.5%      25%      50%      75%</span></span>
-<span><span class="co">#&gt; beta[durnpso]                           0.04    0.00 0.06    -0.07     0.00     0.04     0.09</span></span>
-<span><span class="co">#&gt; beta[prevsys]                          -0.13    0.00 0.16    -0.44    -0.24    -0.14    -0.02</span></span>
-<span><span class="co">#&gt; beta[bsa]                              -0.07    0.01 0.44    -0.97    -0.35    -0.06     0.23</span></span>
-<span><span class="co">#&gt; beta[weight]                            0.04    0.00 0.03    -0.02     0.02     0.04     0.06</span></span>
-<span><span class="co">#&gt; beta[psa]                              -0.07    0.00 0.17    -0.41    -0.19    -0.07     0.04</span></span>
-<span><span class="co">#&gt; beta[durnpso:.trtclassTNFa blocker]    -0.03    0.00 0.08    -0.18    -0.08    -0.03     0.02</span></span>
-<span><span class="co">#&gt; beta[durnpso:.trtclassIL blocker]      -0.01    0.00 0.07    -0.14    -0.06    -0.01     0.03</span></span>
-<span><span class="co">#&gt; beta[prevsys:.trtclassTNFa blocker]     0.18    0.00 0.19    -0.20     0.06     0.19     0.32</span></span>
-<span><span class="co">#&gt; beta[prevsys:.trtclassIL blocker]       0.06    0.00 0.18    -0.30    -0.06     0.06     0.18</span></span>
-<span><span class="co">#&gt; beta[bsa:.trtclassTNFa blocker]         0.05    0.01 0.52    -0.93    -0.30     0.04     0.40</span></span>
+<span><span class="co">#&gt; beta[durnpso]                           0.05    0.00 0.06    -0.08     0.01     0.04     0.09</span></span>
+<span><span class="co">#&gt; beta[prevsys]                          -0.13    0.00 0.16    -0.45    -0.25    -0.14    -0.02</span></span>
+<span><span class="co">#&gt; beta[bsa]                              -0.07    0.01 0.45    -0.95    -0.37    -0.06     0.24</span></span>
+<span><span class="co">#&gt; beta[weight]                            0.04    0.00 0.03    -0.01     0.02     0.04     0.06</span></span>
+<span><span class="co">#&gt; beta[psa]                              -0.08    0.00 0.17    -0.43    -0.19    -0.08     0.03</span></span>
+<span><span class="co">#&gt; beta[durnpso:.trtclassTNFa blocker]    -0.03    0.00 0.07    -0.18    -0.08    -0.03     0.02</span></span>
+<span><span class="co">#&gt; beta[durnpso:.trtclassIL blocker]      -0.01    0.00 0.07    -0.15    -0.06    -0.01     0.03</span></span>
+<span><span class="co">#&gt; beta[prevsys:.trtclassTNFa blocker]     0.19    0.00 0.19    -0.19     0.06     0.19     0.32</span></span>
+<span><span class="co">#&gt; beta[prevsys:.trtclassIL blocker]       0.06    0.00 0.18    -0.29    -0.06     0.07     0.19</span></span>
+<span><span class="co">#&gt; beta[bsa:.trtclassTNFa blocker]         0.05    0.01 0.52    -0.94    -0.31     0.05     0.41</span></span>
 <span><span class="co">#&gt; beta[bsa:.trtclassIL blocker]           0.29    0.01 0.48    -0.62    -0.04     0.28     0.60</span></span>
 <span><span class="co">#&gt; beta[weight:.trtclassTNFa blocker]     -0.17    0.00 0.04    -0.24    -0.19    -0.17    -0.14</span></span>
 <span><span class="co">#&gt; beta[weight:.trtclassIL blocker]       -0.10    0.00 0.03    -0.16    -0.12    -0.10    -0.08</span></span>
-<span><span class="co">#&gt; beta[psa:.trtclassTNFa blocker]        -0.06    0.00 0.21    -0.46    -0.20    -0.06     0.08</span></span>
-<span><span class="co">#&gt; beta[psa:.trtclassIL blocker]           0.00    0.00 0.19    -0.37    -0.12     0.00     0.13</span></span>
+<span><span class="co">#&gt; beta[psa:.trtclassTNFa blocker]        -0.05    0.00 0.21    -0.46    -0.20    -0.05     0.09</span></span>
+<span><span class="co">#&gt; beta[psa:.trtclassIL blocker]           0.01    0.00 0.19    -0.34    -0.12     0.01     0.13</span></span>
 <span><span class="co">#&gt; d[ETN]                                  1.55    0.00 0.08     1.40     1.50     1.55     1.61</span></span>
-<span><span class="co">#&gt; d[IXE_Q2W]                              2.96    0.00 0.09     2.79     2.90     2.95     3.01</span></span>
-<span><span class="co">#&gt; d[IXE_Q4W]                              2.54    0.00 0.08     2.38     2.49     2.54     2.59</span></span>
-<span><span class="co">#&gt; d[SEC_150]                              2.15    0.00 0.11     1.93     2.07     2.15     2.22</span></span>
+<span><span class="co">#&gt; d[IXE_Q2W]                              2.96    0.00 0.09     2.79     2.90     2.96     3.02</span></span>
+<span><span class="co">#&gt; d[IXE_Q4W]                              2.54    0.00 0.08     2.39     2.48     2.54     2.60</span></span>
+<span><span class="co">#&gt; d[SEC_150]                              2.15    0.00 0.12     1.91     2.07     2.14     2.23</span></span>
 <span><span class="co">#&gt; d[SEC_300]                              2.45    0.00 0.12     2.22     2.37     2.45     2.53</span></span>
-<span><span class="co">#&gt; lp__                                -1576.48    0.09 3.39 -1583.79 -1578.58 -1576.21 -1574.03</span></span>
+<span><span class="co">#&gt; lp__                                -1576.51    0.09 3.48 -1584.23 -1578.66 -1576.22 -1573.99</span></span>
 <span><span class="co">#&gt;                                        97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; beta[durnpso]                           0.17  6178    1</span></span>
-<span><span class="co">#&gt; beta[prevsys]                           0.19  6569    1</span></span>
-<span><span class="co">#&gt; beta[bsa]                               0.76  5378    1</span></span>
-<span><span class="co">#&gt; beta[weight]                            0.10  6227    1</span></span>
-<span><span class="co">#&gt; beta[psa]                               0.26  6900    1</span></span>
-<span><span class="co">#&gt; beta[durnpso:.trtclassTNFa blocker]     0.12  6735    1</span></span>
-<span><span class="co">#&gt; beta[durnpso:.trtclassIL blocker]       0.12  7325    1</span></span>
-<span><span class="co">#&gt; beta[prevsys:.trtclassTNFa blocker]     0.55  6191    1</span></span>
-<span><span class="co">#&gt; beta[prevsys:.trtclassIL blocker]       0.40  7353    1</span></span>
-<span><span class="co">#&gt; beta[bsa:.trtclassTNFa blocker]         1.09  5818    1</span></span>
-<span><span class="co">#&gt; beta[bsa:.trtclassIL blocker]           1.25  5904    1</span></span>
-<span><span class="co">#&gt; beta[weight:.trtclassTNFa blocker]     -0.10  6354    1</span></span>
-<span><span class="co">#&gt; beta[weight:.trtclassIL blocker]       -0.03  7915    1</span></span>
-<span><span class="co">#&gt; beta[psa:.trtclassTNFa blocker]         0.36  7872    1</span></span>
-<span><span class="co">#&gt; beta[psa:.trtclassIL blocker]           0.38  8741    1</span></span>
-<span><span class="co">#&gt; d[ETN]                                  1.71  4608    1</span></span>
-<span><span class="co">#&gt; d[IXE_Q2W]                              3.12  5624    1</span></span>
-<span><span class="co">#&gt; d[IXE_Q4W]                              2.70  5089    1</span></span>
-<span><span class="co">#&gt; d[SEC_150]                              2.38  6111    1</span></span>
-<span><span class="co">#&gt; d[SEC_300]                              2.69  6578    1</span></span>
-<span><span class="co">#&gt; lp__                                -1570.71  1555    1</span></span>
+<span><span class="co">#&gt; beta[durnpso]                           0.17  6677    1</span></span>
+<span><span class="co">#&gt; beta[prevsys]                           0.19  5427    1</span></span>
+<span><span class="co">#&gt; beta[bsa]                               0.76  5796    1</span></span>
+<span><span class="co">#&gt; beta[weight]                            0.10  5693    1</span></span>
+<span><span class="co">#&gt; beta[psa]                               0.25  6027    1</span></span>
+<span><span class="co">#&gt; beta[durnpso:.trtclassTNFa blocker]     0.12  7111    1</span></span>
+<span><span class="co">#&gt; beta[durnpso:.trtclassIL blocker]       0.12  7048    1</span></span>
+<span><span class="co">#&gt; beta[prevsys:.trtclassTNFa blocker]     0.56  5694    1</span></span>
+<span><span class="co">#&gt; beta[prevsys:.trtclassIL blocker]       0.40  7686    1</span></span>
+<span><span class="co">#&gt; beta[bsa:.trtclassTNFa blocker]         1.06  5916    1</span></span>
+<span><span class="co">#&gt; beta[bsa:.trtclassIL blocker]           1.26  6612    1</span></span>
+<span><span class="co">#&gt; beta[weight:.trtclassTNFa blocker]     -0.10  6813    1</span></span>
+<span><span class="co">#&gt; beta[weight:.trtclassIL blocker]       -0.04  6496    1</span></span>
+<span><span class="co">#&gt; beta[psa:.trtclassTNFa blocker]         0.36  6415    1</span></span>
+<span><span class="co">#&gt; beta[psa:.trtclassIL blocker]           0.38  6508    1</span></span>
+<span><span class="co">#&gt; d[ETN]                                  1.72  5256    1</span></span>
+<span><span class="co">#&gt; d[IXE_Q2W]                              3.13  6474    1</span></span>
+<span><span class="co">#&gt; d[IXE_Q4W]                              2.70  5426    1</span></span>
+<span><span class="co">#&gt; d[SEC_150]                              2.38  6095    1</span></span>
+<span><span class="co">#&gt; d[SEC_300]                              2.69  6831    1</span></span>
+<span><span class="co">#&gt; lp__                                -1570.70  1601    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Aug 29 23:31:17 2022.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Nov  3 09:31:33 2022.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
-<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
+<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> are hidden, but could be examined
+by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"beta"</span>, <span class="st">"mu"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
+<p>The prior and posterior distributions can be compared visually using
+the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"intercept"</span>, <span class="st">"trt"</span>, <span class="st">"reg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_plaque_psoriasis_files/figure-html/pso_FE_pp_plot-1.png" width="768" style="display: block; margin: auto;"></p>
-<p>Plots of estimated numerical integration error are produced using the <code><a href="../reference/plot_integration_error.html">plot_integration_error()</a></code> function:</p>
+<p>Plots of estimated numerical integration error are produced using the
+<code><a href="../reference/plot_integration_error.html">plot_integration_error()</a></code> function:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_integration_error.html">plot_integration_error</a></span><span class="op">(</span><span class="va">pso_fit_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_plaque_psoriasis_files/figure-html/pso_FE_cumint-1.png" width="700" style="display: block; margin: auto;"></p>
@@ -424,7 +534,11 @@
 <div class="section level4">
 <h4 id="random-effects-ml-nmr">Random effects ML-NMR<a class="anchor" aria-label="anchor" href="#random-effects-ml-nmr"></a>
 </h4>
-<p>We now fit a RE model. Again, we specify weakly-informative <span class="math inline">\(N(0, 10^2)\)</span> priors on each parameter, and now specify a <span class="math inline">\(\textrm{half-N}(0, 2.5^2)\)</span> prior for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. The range of parameter values implied by these prior distributions can be checked using the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
+<p>We now fit a RE model. Again, we specify weakly-informative <span class="math inline">\(N(0, 10^2)\)</span> priors on each parameter, and
+now specify a <span class="math inline">\(\textrm{half-N}(0,
+2.5^2)\)</span> prior for the heterogeneity standard deviation <span class="math inline">\(\tau\)</span>. The range of parameter values
+implied by these prior distributions can be checked using the
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 10.</span></span>
@@ -434,7 +548,8 @@
 <span><span class="co">#&gt; A half-Normal prior distribution: location = 0, scale = 2.5.</span></span>
 <span><span class="co">#&gt; 50% of the prior density lies between 0 and 1.69.</span></span>
 <span><span class="co">#&gt; 95% of the prior density lies between 0 and 4.9.</span></span></code></pre></div>
-<p>Fitting the model uses the same call to <code><a href="../reference/nma.html">nma()</a></code> as before, except now with <code>trt_effects = "random"</code>.</p>
+<p>Fitting the model uses the same call to <code><a href="../reference/nma.html">nma()</a></code> as before,
+except now with <code>trt_effects = "random"</code>.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_fit_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">pso_net</span>, </span>
 <span>                  trt_effects <span class="op">=</span> <span class="st">"random"</span>,</span>
@@ -449,11 +564,12 @@
 <span>                  init_r <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>                  QR <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: Setting "PBO" as the network reference treatment.</span></span>
-<span><span class="co">#&gt; Warning: There were 27 divergent transitions after warmup. See</span></span>
+<span><span class="co">#&gt; Warning: There were 3 divergent transitions after warmup. See</span></span>
 <span><span class="co">#&gt; https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</span></span>
 <span><span class="co">#&gt; to find out why this is a problem and how to eliminate them.</span></span>
 <span><span class="co">#&gt; Warning: Examine the pairs() plot to diagnose sampling problems</span></span></code></pre></div>
-<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method:</p>
+<p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
+method:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pso_fit_RE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A random effects ML-NMR with a bernoulli2 likelihood (probit link).</span></span>
@@ -467,69 +583,78 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                                         mean se_mean   sd     2.5%      25%      50%      75%</span></span>
 <span><span class="co">#&gt; beta[durnpso]                           0.05    0.00 0.06    -0.08     0.01     0.05     0.09</span></span>
-<span><span class="co">#&gt; beta[prevsys]                          -0.12    0.00 0.16    -0.43    -0.23    -0.13    -0.02</span></span>
-<span><span class="co">#&gt; beta[bsa]                              -0.11    0.01 0.45    -1.01    -0.40    -0.09     0.20</span></span>
+<span><span class="co">#&gt; beta[prevsys]                          -0.12    0.00 0.16    -0.44    -0.23    -0.12    -0.02</span></span>
+<span><span class="co">#&gt; beta[bsa]                              -0.09    0.01 0.45    -1.01    -0.39    -0.08     0.23</span></span>
 <span><span class="co">#&gt; beta[weight]                            0.04    0.00 0.03    -0.01     0.02     0.04     0.06</span></span>
-<span><span class="co">#&gt; beta[psa]                              -0.06    0.00 0.17    -0.40    -0.18    -0.06     0.05</span></span>
-<span><span class="co">#&gt; beta[durnpso:.trtclassTNFa blocker]    -0.04    0.00 0.08    -0.18    -0.09    -0.04     0.01</span></span>
+<span><span class="co">#&gt; beta[psa]                              -0.06    0.00 0.17    -0.39    -0.17    -0.06     0.06</span></span>
+<span><span class="co">#&gt; beta[durnpso:.trtclassTNFa blocker]    -0.03    0.00 0.07    -0.18    -0.08    -0.03     0.02</span></span>
 <span><span class="co">#&gt; beta[durnpso:.trtclassIL blocker]      -0.02    0.00 0.07    -0.15    -0.06    -0.02     0.03</span></span>
-<span><span class="co">#&gt; beta[prevsys:.trtclassTNFa blocker]     0.18    0.00 0.19    -0.19     0.06     0.18     0.31</span></span>
-<span><span class="co">#&gt; beta[prevsys:.trtclassIL blocker]       0.05    0.00 0.18    -0.31    -0.07     0.05     0.17</span></span>
-<span><span class="co">#&gt; beta[bsa:.trtclassTNFa blocker]         0.10    0.01 0.52    -0.91    -0.25     0.08     0.44</span></span>
-<span><span class="co">#&gt; beta[bsa:.trtclassIL blocker]           0.34    0.01 0.49    -0.57     0.01     0.33     0.66</span></span>
+<span><span class="co">#&gt; beta[prevsys:.trtclassTNFa blocker]     0.18    0.00 0.19    -0.20     0.05     0.18     0.31</span></span>
+<span><span class="co">#&gt; beta[prevsys:.trtclassIL blocker]       0.05    0.00 0.18    -0.30    -0.07     0.04     0.17</span></span>
+<span><span class="co">#&gt; beta[bsa:.trtclassTNFa blocker]         0.07    0.01 0.51    -0.89    -0.28     0.06     0.42</span></span>
+<span><span class="co">#&gt; beta[bsa:.trtclassIL blocker]           0.32    0.01 0.49    -0.60    -0.02     0.31     0.65</span></span>
 <span><span class="co">#&gt; beta[weight:.trtclassTNFa blocker]     -0.17    0.00 0.04    -0.24    -0.20    -0.17    -0.15</span></span>
-<span><span class="co">#&gt; beta[weight:.trtclassIL blocker]       -0.10    0.00 0.03    -0.17    -0.12    -0.10    -0.08</span></span>
-<span><span class="co">#&gt; beta[psa:.trtclassTNFa blocker]        -0.07    0.00 0.21    -0.47    -0.21    -0.07     0.07</span></span>
-<span><span class="co">#&gt; beta[psa:.trtclassIL blocker]          -0.01    0.00 0.19    -0.38    -0.14    -0.01     0.12</span></span>
-<span><span class="co">#&gt; d[ETN]                                  1.56    0.00 0.15     1.26     1.48     1.56     1.65</span></span>
-<span><span class="co">#&gt; d[IXE_Q2W]                              2.98    0.00 0.16     2.68     2.89     2.97     3.07</span></span>
-<span><span class="co">#&gt; d[IXE_Q4W]                              2.57    0.00 0.15     2.29     2.48     2.56     2.65</span></span>
-<span><span class="co">#&gt; d[SEC_150]                              2.13    0.01 0.23     1.63     2.00     2.14     2.26</span></span>
-<span><span class="co">#&gt; d[SEC_300]                              2.43    0.01 0.26     1.87     2.30     2.44     2.57</span></span>
-<span><span class="co">#&gt; lp__                                -1580.16    0.14 4.64 -1589.81 -1583.14 -1579.90 -1576.91</span></span>
-<span><span class="co">#&gt; tau                                     0.19    0.01 0.13     0.02     0.11     0.17     0.25</span></span>
+<span><span class="co">#&gt; beta[weight:.trtclassIL blocker]       -0.10    0.00 0.03    -0.16    -0.13    -0.10    -0.08</span></span>
+<span><span class="co">#&gt; beta[psa:.trtclassTNFa blocker]        -0.08    0.00 0.21    -0.47    -0.22    -0.07     0.07</span></span>
+<span><span class="co">#&gt; beta[psa:.trtclassIL blocker]          -0.01    0.00 0.19    -0.38    -0.14    -0.01     0.11</span></span>
+<span><span class="co">#&gt; d[ETN]                                  1.56    0.00 0.14     1.30     1.47     1.55     1.64</span></span>
+<span><span class="co">#&gt; d[IXE_Q2W]                              2.97    0.00 0.15     2.69     2.88     2.97     3.05</span></span>
+<span><span class="co">#&gt; d[IXE_Q4W]                              2.56    0.00 0.14     2.30     2.48     2.56     2.64</span></span>
+<span><span class="co">#&gt; d[SEC_150]                              2.13    0.01 0.22     1.68     2.00     2.13     2.26</span></span>
+<span><span class="co">#&gt; d[SEC_300]                              2.44    0.01 0.22     2.00     2.31     2.44     2.57</span></span>
+<span><span class="co">#&gt; lp__                                -1580.41    0.17 4.97 -1590.93 -1583.44 -1580.09 -1576.97</span></span>
+<span><span class="co">#&gt; tau                                     0.18    0.00 0.12     0.01     0.10     0.16     0.24</span></span>
 <span><span class="co">#&gt;                                        97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; beta[durnpso]                           0.17  4719 1.00</span></span>
-<span><span class="co">#&gt; beta[prevsys]                           0.20  4633 1.00</span></span>
-<span><span class="co">#&gt; beta[bsa]                               0.73  4140 1.00</span></span>
-<span><span class="co">#&gt; beta[weight]                            0.10  3561 1.00</span></span>
-<span><span class="co">#&gt; beta[psa]                               0.28  3709 1.00</span></span>
-<span><span class="co">#&gt; beta[durnpso:.trtclassTNFa blocker]     0.12  4778 1.00</span></span>
-<span><span class="co">#&gt; beta[durnpso:.trtclassIL blocker]       0.12  5589 1.00</span></span>
-<span><span class="co">#&gt; beta[prevsys:.trtclassTNFa blocker]     0.55  4598 1.00</span></span>
-<span><span class="co">#&gt; beta[prevsys:.trtclassIL blocker]       0.40  5005 1.00</span></span>
-<span><span class="co">#&gt; beta[bsa:.trtclassTNFa blocker]         1.16  4641 1.00</span></span>
-<span><span class="co">#&gt; beta[bsa:.trtclassIL blocker]           1.33  4849 1.00</span></span>
-<span><span class="co">#&gt; beta[weight:.trtclassTNFa blocker]     -0.10  4249 1.00</span></span>
-<span><span class="co">#&gt; beta[weight:.trtclassIL blocker]       -0.04  3951 1.00</span></span>
-<span><span class="co">#&gt; beta[psa:.trtclassTNFa blocker]         0.34  3457 1.00</span></span>
-<span><span class="co">#&gt; beta[psa:.trtclassIL blocker]           0.37  4370 1.00</span></span>
-<span><span class="co">#&gt; d[ETN]                                  1.87  1851 1.00</span></span>
-<span><span class="co">#&gt; d[IXE_Q2W]                              3.33  1473 1.00</span></span>
-<span><span class="co">#&gt; d[IXE_Q4W]                              2.88  1639 1.00</span></span>
-<span><span class="co">#&gt; d[SEC_150]                              2.59  1655 1.00</span></span>
-<span><span class="co">#&gt; d[SEC_300]                              2.95   923 1.00</span></span>
-<span><span class="co">#&gt; lp__                                -1571.80  1143 1.01</span></span>
-<span><span class="co">#&gt; tau                                     0.54   481 1.01</span></span>
+<span><span class="co">#&gt; beta[durnpso]                           0.17  5197    1</span></span>
+<span><span class="co">#&gt; beta[prevsys]                           0.19  5891    1</span></span>
+<span><span class="co">#&gt; beta[bsa]                               0.73  4692    1</span></span>
+<span><span class="co">#&gt; beta[weight]                            0.10  4802    1</span></span>
+<span><span class="co">#&gt; beta[psa]                               0.27  5545    1</span></span>
+<span><span class="co">#&gt; beta[durnpso:.trtclassTNFa blocker]     0.11  5338    1</span></span>
+<span><span class="co">#&gt; beta[durnpso:.trtclassIL blocker]       0.12  5563    1</span></span>
+<span><span class="co">#&gt; beta[prevsys:.trtclassTNFa blocker]     0.56  5801    1</span></span>
+<span><span class="co">#&gt; beta[prevsys:.trtclassIL blocker]       0.39  6554    1</span></span>
+<span><span class="co">#&gt; beta[bsa:.trtclassTNFa blocker]         1.10  4880    1</span></span>
+<span><span class="co">#&gt; beta[bsa:.trtclassIL blocker]           1.32  5473    1</span></span>
+<span><span class="co">#&gt; beta[weight:.trtclassTNFa blocker]     -0.10  5659    1</span></span>
+<span><span class="co">#&gt; beta[weight:.trtclassIL blocker]       -0.04  5951    1</span></span>
+<span><span class="co">#&gt; beta[psa:.trtclassTNFa blocker]         0.33  5620    1</span></span>
+<span><span class="co">#&gt; beta[psa:.trtclassIL blocker]           0.36  5790    1</span></span>
+<span><span class="co">#&gt; d[ETN]                                  1.85  1790    1</span></span>
+<span><span class="co">#&gt; d[IXE_Q2W]                              3.28  1693    1</span></span>
+<span><span class="co">#&gt; d[IXE_Q4W]                              2.86  1879    1</span></span>
+<span><span class="co">#&gt; d[SEC_150]                              2.56  1874    1</span></span>
+<span><span class="co">#&gt; d[SEC_300]                              2.92  1793    1</span></span>
+<span><span class="co">#&gt; lp__                                -1571.53   819    1</span></span>
+<span><span class="co">#&gt; tau                                     0.47   600    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Aug 29 23:41:03 2022.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Nov  3 09:41:37 2022.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
-<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects <span class="math inline">\(\delta_{jk}\)</span> are hidden, but could be examined by changing the <code>pars</code> argument:</p>
+<p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects
+<span class="math inline">\(\delta_{jk}\)</span> are hidden, but could
+be examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"beta"</span>, <span class="st">"tau"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>There are a number of divergent transitions, which we can investigate using the <code><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs()</a></code> method:</p>
+<p>There are a number of divergent transitions, which we can investigate
+using the <code><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs()</a></code> method:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"delta[UNCOVER-2: ETN]"</span>, <span class="st">"d[ETN]"</span>, <span class="st">"tau"</span>, <span class="st">"lp__"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_plaque_psoriasis_files/figure-html/pso_RE_pairs-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>The divergent transition errors (red crosses) seem to be concentrated in the upper tail of the heterogeneity standard deviation parameter. This suggests that the information to identify the heterogeneity parameter is weak - we have only four studies in the network - and that a more informative prior distribution might aid estimation.</p>
-<p>The prior and posterior distributions can be compared visually using the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
+<p>The divergent transition errors (red crosses) seem to be concentrated
+in the upper tail of the heterogeneity standard deviation parameter.
+This suggests that the information to identify the heterogeneity
+parameter is weak - we have only four studies in the network - and that
+a more informative prior distribution might aid estimation.</p>
+<p>The prior and posterior distributions can be compared visually using
+the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"intercept"</span>, <span class="st">"trt"</span>, <span class="st">"reg"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_plaque_psoriasis_files/figure-html/pso_RE_pp_plot-1.png" width="768" style="display: block; margin: auto;"></p>
-<p>Plots of estimated numerical integration error are produced using the <code><a href="../reference/plot_integration_error.html">plot_integration_error()</a></code> function:</p>
+<p>Plots of estimated numerical integration error are produced using the
+<code><a href="../reference/plot_integration_error.html">plot_integration_error()</a></code> function:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_integration_error.html">plot_integration_error</a></span><span class="op">(</span><span class="va">pso_fit_RE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_plaque_psoriasis_files/figure-html/pso_RE_cumint-1.png" width="700" style="display: block; margin: auto;"></p>
@@ -538,30 +663,42 @@
 <div class="section level3">
 <h3 id="model-comparison">Model comparison<a class="anchor" aria-label="anchor" href="#model-comparison"></a>
 </h3>
-<p>The model fit under the FE and RE models can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function.</p>
+<p>The model fit under the FE and RE models can be checked using the
+<code><a href="../reference/dic.html">dic()</a></code> function.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">pso_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Residual deviance: 3129.8<span style="color: #555555;"> (on 3858 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 24.4</span></span>
-<span><span class="co">#&gt;               DIC: 3154.1</span></span>
+<span><span class="co">#&gt;                pD: 24.5</span></span>
+<span><span class="co">#&gt;               DIC: 3154.3</span></span>
 <span><span class="op">(</span><span class="va">pso_dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">pso_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 3123.5<span style="color: #555555;"> (on 3858 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 28.2</span></span>
-<span><span class="co">#&gt;               DIC: 3151.7</span></span></code></pre></div>
-<p>The DIC is similar between the FE and RE models, suggesting that there is little evidence for any residual heterogeneity.</p>
+<span><span class="co">#&gt; Residual deviance: 3123.7<span style="color: #555555;"> (on 3858 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 28.1</span></span>
+<span><span class="co">#&gt;               DIC: 3151.8</span></span></code></pre></div>
+<p>The DIC is similar between the FE and RE models, suggesting that
+there is little evidence for any residual heterogeneity.</p>
 </div>
 <div class="section level3">
 <h3 id="producing-relative-effects-and-event-probabilities">Producing relative effects and event probabilities<a class="anchor" aria-label="anchor" href="#producing-relative-effects-and-event-probabilities"></a>
 </h3>
-<p>Parameter estimates can be plotted using the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method, for example to examine the estimated regression coefficients:</p>
+<p>Parameter estimates can be plotted using the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>
+method, for example to examine the estimated regression
+coefficients:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>,</span>
 <span>     pars <span class="op">=</span> <span class="st">"beta"</span>,</span>
 <span>     stat <span class="op">=</span> <span class="st">"halfeye"</span>,</span>
 <span>     ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_plaque_psoriasis_files/figure-html/unnamed-chunk-20-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>Plots of posterior summaries are based on the <code>ggdist</code> package, which allows a great degree of flexibility, and can be further customised using <code>ggplot2</code> commands. In the above command we specify a <code>"halfeye"</code> plot, which shows the posterior density along with posterior medians (points) and 95% Credible Intervals (thin line) with 66% inner bands (thicker line) by default. For more details on the plotting options see <code><a href="../reference/plot.nma_summary.html">?plot.nma_summary</a></code>.</p>
-<p>We can produce population-adjusted relative effects for each study population in the network using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function.</p>
+<p>Plots of posterior summaries are based on the <code>ggdist</code>
+package, which allows a great degree of flexibility, and can be further
+customised using <code>ggplot2</code> commands. In the above command we
+specify a <code>"halfeye"</code> plot, which shows the posterior density
+along with posterior medians (points) and 95% Credible Intervals (thin
+line) with 66% inner bands (thicker line) by default. For more details
+on the plotting options see <code><a href="../reference/plot.nma_summary.html">?plot.nma_summary</a></code>.</p>
+<p>We can produce population-adjusted relative effects for each study
+population in the network using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code>
+function.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">pso_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: FIXTURE</span> <span style="color: #555555;">----</span> </span></span>
@@ -571,11 +708,11 @@
 <span><span class="co">#&gt;     1.65    0.64 0.34   8.32 0.15</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                     mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[FIXTURE: ETN]     1.67 0.09 1.49 1.60 1.67 1.72  1.84     4068     2965    1</span></span>
-<span><span class="co">#&gt; d[FIXTURE: IXE_Q2W] 3.03 0.10 2.84 2.97 3.03 3.10  3.23     5126     3087    1</span></span>
-<span><span class="co">#&gt; d[FIXTURE: IXE_Q4W] 2.62 0.09 2.44 2.56 2.62 2.68  2.81     4818     3003    1</span></span>
-<span><span class="co">#&gt; d[FIXTURE: SEC_150] 2.22 0.12 2.00 2.14 2.22 2.30  2.46     5542     3408    1</span></span>
-<span><span class="co">#&gt; d[FIXTURE: SEC_300] 2.53 0.12 2.30 2.45 2.53 2.61  2.77     6152     3059    1</span></span>
+<span><span class="co">#&gt; d[FIXTURE: ETN]     1.67 0.09 1.49 1.60 1.67 1.73  1.85     4467     3058    1</span></span>
+<span><span class="co">#&gt; d[FIXTURE: IXE_Q2W] 3.03 0.10 2.84 2.96 3.03 3.10  3.24     5818     3093    1</span></span>
+<span><span class="co">#&gt; d[FIXTURE: IXE_Q4W] 2.62 0.10 2.44 2.55 2.62 2.69  2.82     5136     3240    1</span></span>
+<span><span class="co">#&gt; d[FIXTURE: SEC_150] 2.22 0.12 1.99 2.14 2.22 2.30  2.47     5343     2782    1</span></span>
+<span><span class="co">#&gt; d[FIXTURE: SEC_300] 2.53 0.12 2.30 2.45 2.53 2.61  2.77     6263     3424    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-1</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -584,11 +721,11 @@
 <span><span class="co">#&gt;        2    0.73 0.28   9.24 0.28</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                       mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[UNCOVER-1: ETN]     1.51 0.09 1.34 1.45 1.51 1.56  1.67     5374     3204    1</span></span>
-<span><span class="co">#&gt; d[UNCOVER-1: IXE_Q2W] 2.92 0.09 2.76 2.86 2.92 2.98  3.09     6036     2809    1</span></span>
-<span><span class="co">#&gt; d[UNCOVER-1: IXE_Q4W] 2.51 0.08 2.35 2.46 2.51 2.56  2.67     5436     2966    1</span></span>
-<span><span class="co">#&gt; d[UNCOVER-1: SEC_150] 2.11 0.12 1.88 2.04 2.11 2.19  2.35     6434     3411    1</span></span>
-<span><span class="co">#&gt; d[UNCOVER-1: SEC_300] 2.42 0.12 2.19 2.34 2.42 2.50  2.66     6928     2772    1</span></span>
+<span><span class="co">#&gt; d[UNCOVER-1: ETN]     1.51 0.08 1.34 1.45 1.51 1.56  1.68     6192     3648    1</span></span>
+<span><span class="co">#&gt; d[UNCOVER-1: IXE_Q2W] 2.92 0.09 2.75 2.86 2.92 2.98  3.10     7124     3304    1</span></span>
+<span><span class="co">#&gt; d[UNCOVER-1: IXE_Q4W] 2.51 0.08 2.36 2.45 2.51 2.57  2.68     5864     2957    1</span></span>
+<span><span class="co">#&gt; d[UNCOVER-1: SEC_150] 2.11 0.12 1.88 2.03 2.11 2.20  2.35     6284     3080    1</span></span>
+<span><span class="co">#&gt; d[UNCOVER-1: SEC_300] 2.42 0.12 2.18 2.34 2.42 2.50  2.67     7230     3529    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-2</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -597,11 +734,11 @@
 <span><span class="co">#&gt;     1.87    0.64 0.27   9.17 0.24</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                       mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[UNCOVER-2: ETN]     1.51 0.08 1.35 1.45 1.51 1.56  1.67     5177     3368    1</span></span>
-<span><span class="co">#&gt; d[UNCOVER-2: IXE_Q2W] 2.92 0.09 2.76 2.87 2.92 2.98  3.09     6276     2592    1</span></span>
-<span><span class="co">#&gt; d[UNCOVER-2: IXE_Q4W] 2.51 0.08 2.35 2.46 2.51 2.56  2.67     5557     3054    1</span></span>
-<span><span class="co">#&gt; d[UNCOVER-2: SEC_150] 2.11 0.12 1.89 2.04 2.11 2.19  2.34     6485     3332    1</span></span>
-<span><span class="co">#&gt; d[UNCOVER-2: SEC_300] 2.42 0.12 2.19 2.34 2.42 2.50  2.65     6864     2812    1</span></span>
+<span><span class="co">#&gt; d[UNCOVER-2: ETN]     1.51 0.08 1.35 1.45 1.51 1.56  1.67     6112     3610 1.00</span></span>
+<span><span class="co">#&gt; d[UNCOVER-2: IXE_Q2W] 2.92 0.09 2.76 2.86 2.92 2.98  3.09     7067     2763 1.00</span></span>
+<span><span class="co">#&gt; d[UNCOVER-2: IXE_Q4W] 2.51 0.08 2.36 2.46 2.51 2.57  2.67     5832     3143 1.00</span></span>
+<span><span class="co">#&gt; d[UNCOVER-2: SEC_150] 2.11 0.12 1.88 2.03 2.11 2.19  2.35     6251     3364 1.00</span></span>
+<span><span class="co">#&gt; d[UNCOVER-2: SEC_300] 2.42 0.12 2.18 2.34 2.42 2.50  2.66     7341     3412 1.01</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-3</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -610,58 +747,67 @@
 <span><span class="co">#&gt;     1.78    0.59 0.28   9.01 0.2</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                       mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[UNCOVER-3: ETN]     1.53 0.08 1.37 1.48 1.53 1.58  1.68     4936     3300    1</span></span>
-<span><span class="co">#&gt; d[UNCOVER-3: IXE_Q2W] 2.94 0.09 2.77 2.88 2.94 3.00  3.11     6322     2883    1</span></span>
-<span><span class="co">#&gt; d[UNCOVER-3: IXE_Q4W] 2.53 0.08 2.37 2.47 2.53 2.58  2.69     5554     3120    1</span></span>
-<span><span class="co">#&gt; d[UNCOVER-3: SEC_150] 2.13 0.11 1.91 2.06 2.13 2.20  2.36     6429     3191    1</span></span>
-<span><span class="co">#&gt; d[UNCOVER-3: SEC_300] 2.44 0.12 2.21 2.36 2.44 2.52  2.67     6841     2776    1</span></span>
+<span><span class="co">#&gt; d[UNCOVER-3: ETN]     1.53 0.08 1.37 1.48 1.53 1.59  1.69     5621     3557 1.00</span></span>
+<span><span class="co">#&gt; d[UNCOVER-3: IXE_Q2W] 2.94 0.09 2.77 2.88 2.94 3.00  3.11     6781     2906 1.00</span></span>
+<span><span class="co">#&gt; d[UNCOVER-3: IXE_Q4W] 2.53 0.08 2.37 2.47 2.53 2.59  2.69     5621     2909 1.00</span></span>
+<span><span class="co">#&gt; d[UNCOVER-3: SEC_150] 2.13 0.12 1.90 2.05 2.13 2.21  2.36     6209     3089 1.00</span></span>
+<span><span class="co">#&gt; d[UNCOVER-3: SEC_300] 2.44 0.12 2.21 2.36 2.44 2.52  2.68     7197     3331 1.01</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_releff_FE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_plaque_psoriasis_files/figure-html/pso_releff_FE-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>Predicted probabilities of achieving PASI 75 in each study population on each treatment are produced using the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method. The argument <code>type = "reponse"</code> specifies that we want predicted probabilities, rather than probit probabilities.</p>
+<p>Predicted probabilities of achieving PASI 75 in each study population
+on each treatment are produced using the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method.
+The argument <code>type = "reponse"</code> specifies that we want
+predicted probabilities, rather than probit probabilities.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_pred_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: FIXTURE</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                        mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[FIXTURE: PBO]     0.04 0.01 0.03 0.04 0.04 0.05  0.06     5253     2930    1</span></span>
-<span><span class="co">#&gt; pred[FIXTURE: ETN]     0.46 0.03 0.41 0.44 0.46 0.47  0.51     7018     3092    1</span></span>
-<span><span class="co">#&gt; pred[FIXTURE: IXE_Q2W] 0.89 0.02 0.85 0.88 0.89 0.90  0.92     8320     3516    1</span></span>
-<span><span class="co">#&gt; pred[FIXTURE: IXE_Q4W] 0.80 0.03 0.74 0.78 0.80 0.81  0.84     8042     3326    1</span></span>
-<span><span class="co">#&gt; pred[FIXTURE: SEC_150] 0.67 0.03 0.62 0.65 0.67 0.69  0.72     8639     2957    1</span></span>
-<span><span class="co">#&gt; pred[FIXTURE: SEC_300] 0.77 0.02 0.73 0.76 0.77 0.79  0.82     9293     2768    1</span></span>
+<span><span class="co">#&gt; pred[FIXTURE: PBO]     0.04 0.01 0.03 0.04 0.04 0.05  0.06     5043     3287    1</span></span>
+<span><span class="co">#&gt; pred[FIXTURE: ETN]     0.46 0.03 0.41 0.44 0.46 0.47  0.51     7799     3365    1</span></span>
+<span><span class="co">#&gt; pred[FIXTURE: IXE_Q2W] 0.89 0.02 0.85 0.88 0.89 0.90  0.92     7627     3469    1</span></span>
+<span><span class="co">#&gt; pred[FIXTURE: IXE_Q4W] 0.80 0.03 0.74 0.78 0.80 0.81  0.84     8152     3585    1</span></span>
+<span><span class="co">#&gt; pred[FIXTURE: SEC_150] 0.67 0.03 0.62 0.65 0.67 0.69  0.72     8305     2983    1</span></span>
+<span><span class="co">#&gt; pred[FIXTURE: SEC_300] 0.77 0.02 0.72 0.76 0.77 0.79  0.81     9310     2867    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-1</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                          mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-1: PBO]     0.06 0.01 0.04 0.05 0.06 0.06  0.08     6155     3130    1</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-1: ETN]     0.46 0.03 0.41 0.44 0.46 0.48  0.52     8738     3214    1</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-1: IXE_Q2W] 0.90 0.01 0.88 0.89 0.90 0.91  0.92     9746     3138    1</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-1: IXE_Q4W] 0.81 0.02 0.78 0.80 0.81 0.82  0.84    10355     2890    1</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-1: SEC_150] 0.69 0.04 0.60 0.66 0.69 0.72  0.76     7631     2843    1</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-1: SEC_300] 0.78 0.04 0.71 0.76 0.79 0.81  0.85     7760     2900    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-1: PBO]     0.06 0.01 0.04 0.05 0.06 0.06  0.08     7104     3253    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-1: ETN]     0.46 0.03 0.41 0.44 0.46 0.48  0.52     8911     3494    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-1: IXE_Q2W] 0.90 0.01 0.88 0.89 0.90 0.91  0.92     9470     3391    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-1: IXE_Q4W] 0.81 0.02 0.78 0.80 0.81 0.82  0.84     8871     2981    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-1: SEC_150] 0.69 0.04 0.60 0.66 0.69 0.72  0.76     7312     3639    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-1: SEC_300] 0.79 0.03 0.71 0.76 0.79 0.81  0.85     7545     3423    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-2</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                          mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-2: PBO]     0.05 0.01 0.03 0.04 0.05 0.05  0.06     6693     3223    1</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-2: ETN]     0.42 0.02 0.38 0.41 0.42 0.43  0.46     8002     3141    1</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-2: IXE_Q2W] 0.88 0.01 0.86 0.87 0.88 0.89  0.90     9838     2871    1</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-2: IXE_Q4W] 0.78 0.02 0.75 0.77 0.78 0.79  0.81     9008     3041    1</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-2: SEC_150] 0.65 0.04 0.57 0.62 0.65 0.68  0.73     7431     3484    1</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-2: SEC_300] 0.75 0.04 0.68 0.73 0.75 0.78  0.82     7893     2805    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-2: PBO]     0.05 0.01 0.03 0.04 0.05 0.05  0.06     6161     2922    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-2: ETN]     0.42 0.02 0.38 0.41 0.42 0.43  0.46     9901     2535    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-2: IXE_Q2W] 0.88 0.01 0.86 0.87 0.88 0.89  0.90     8403     3324    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-2: IXE_Q4W] 0.78 0.02 0.75 0.77 0.78 0.79  0.81     8814     2978    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-2: SEC_150] 0.65 0.04 0.57 0.62 0.65 0.68  0.73     7607     3168    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-2: SEC_300] 0.75 0.04 0.68 0.73 0.76 0.78  0.82     7964     3362    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-3</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                          mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-3: PBO]     0.08 0.01 0.06 0.07 0.08 0.08  0.10     6198     2736    1</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-3: ETN]     0.53 0.02 0.49 0.52 0.53 0.54  0.57     8465     3132    1</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-3: IXE_Q2W] 0.93 0.01 0.91 0.92 0.93 0.93  0.94    10401     2731    1</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-3: IXE_Q4W] 0.85 0.01 0.83 0.85 0.85 0.86  0.88     8678     2890    1</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-3: SEC_150] 0.75 0.03 0.68 0.72 0.75 0.77  0.81     6836     3141    1</span></span>
-<span><span class="co">#&gt; pred[UNCOVER-3: SEC_300] 0.83 0.03 0.77 0.81 0.83 0.85  0.88     7170     2993    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-3: PBO]     0.08 0.01 0.06 0.07 0.08 0.08  0.10     6033     3236    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-3: ETN]     0.53 0.02 0.49 0.52 0.53 0.54  0.57     9509     3173    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-3: IXE_Q2W] 0.93 0.01 0.91 0.92 0.93 0.93  0.94     8191     2833    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-3: IXE_Q4W] 0.85 0.01 0.83 0.85 0.85 0.86  0.88     9748     2589    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-3: SEC_150] 0.75 0.04 0.67 0.72 0.75 0.77  0.81     7625     3335    1</span></span>
+<span><span class="co">#&gt; pred[UNCOVER-3: SEC_300] 0.83 0.03 0.77 0.81 0.83 0.85  0.88     7999     3110    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_pred_FE</span>, ref_line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_plaque_psoriasis_files/figure-html/pso_pred_FE-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>We can produce population-adjusted ranks, rank probabilities, and cumulative rank probabilities in each study population using the <code><a href="../reference/posterior_ranks.html">posterior_ranks()</a></code> and <code><a href="../reference/posterior_ranks.html">posterior_rank_probs()</a></code> functions (although here the ranks are unchanged between populations, as the distributions of effect modifiers are similar). We specify <code>lower_better = FALSE</code>, since a higher outcome is better (higher chance of achieving PASI 75).</p>
+<p>We can produce population-adjusted ranks, rank probabilities, and
+cumulative rank probabilities in each study population using the
+<code><a href="../reference/posterior_ranks.html">posterior_ranks()</a></code> and <code><a href="../reference/posterior_ranks.html">posterior_rank_probs()</a></code>
+functions (although here the ranks are unchanged between populations, as
+the distributions of effect modifiers are similar). We specify
+<code>lower_better = FALSE</code>, since a higher outcome is better
+(higher chance of achieving PASI 75).</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_ranks_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: FIXTURE</span> <span style="color: #555555;">----</span> </span></span>
@@ -674,9 +820,9 @@
 <span><span class="co">#&gt; rank[FIXTURE: PBO]     6.00 0.00    6   6   6   6     6       NA       NA   NA</span></span>
 <span><span class="co">#&gt; rank[FIXTURE: ETN]     5.00 0.00    5   5   5   5     5       NA       NA   NA</span></span>
 <span><span class="co">#&gt; rank[FIXTURE: IXE_Q2W] 1.00 0.00    1   1   1   1     1       NA       NA   NA</span></span>
-<span><span class="co">#&gt; rank[FIXTURE: IXE_Q4W] 2.23 0.42    2   2   2   2     3     4670     4018    1</span></span>
-<span><span class="co">#&gt; rank[FIXTURE: SEC_150] 4.00 0.05    4   4   4   4     4     4037       NA    1</span></span>
-<span><span class="co">#&gt; rank[FIXTURE: SEC_300] 2.77 0.42    2   3   3   3     3     4882     4033    1</span></span>
+<span><span class="co">#&gt; rank[FIXTURE: IXE_Q4W] 2.23 0.42    2   2   2   2     3     4087       NA    1</span></span>
+<span><span class="co">#&gt; rank[FIXTURE: SEC_150] 4.00 0.04    4   4   4   4     4     4024       NA    1</span></span>
+<span><span class="co">#&gt; rank[FIXTURE: SEC_300] 2.77 0.43    2   3   3   3     3     4164     4024    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-1</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -688,9 +834,9 @@
 <span><span class="co">#&gt; rank[UNCOVER-1: PBO]     6.00 0.00    6   6   6   6     6       NA       NA   NA</span></span>
 <span><span class="co">#&gt; rank[UNCOVER-1: ETN]     5.00 0.00    5   5   5   5     5       NA       NA   NA</span></span>
 <span><span class="co">#&gt; rank[UNCOVER-1: IXE_Q2W] 1.00 0.00    1   1   1   1     1       NA       NA   NA</span></span>
-<span><span class="co">#&gt; rank[UNCOVER-1: IXE_Q4W] 2.23 0.42    2   2   2   2     3     4670     4018    1</span></span>
-<span><span class="co">#&gt; rank[UNCOVER-1: SEC_150] 4.00 0.05    4   4   4   4     4     4037       NA    1</span></span>
-<span><span class="co">#&gt; rank[UNCOVER-1: SEC_300] 2.77 0.42    2   3   3   3     3     4882     4033    1</span></span>
+<span><span class="co">#&gt; rank[UNCOVER-1: IXE_Q4W] 2.23 0.42    2   2   2   2     3     4087       NA    1</span></span>
+<span><span class="co">#&gt; rank[UNCOVER-1: SEC_150] 4.00 0.04    4   4   4   4     4     4024       NA    1</span></span>
+<span><span class="co">#&gt; rank[UNCOVER-1: SEC_300] 2.77 0.43    2   3   3   3     3     4164     4024    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-2</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -702,9 +848,9 @@
 <span><span class="co">#&gt; rank[UNCOVER-2: PBO]     6.00 0.00    6   6   6   6     6       NA       NA   NA</span></span>
 <span><span class="co">#&gt; rank[UNCOVER-2: ETN]     5.00 0.00    5   5   5   5     5       NA       NA   NA</span></span>
 <span><span class="co">#&gt; rank[UNCOVER-2: IXE_Q2W] 1.00 0.00    1   1   1   1     1       NA       NA   NA</span></span>
-<span><span class="co">#&gt; rank[UNCOVER-2: IXE_Q4W] 2.23 0.42    2   2   2   2     3     4670     4018    1</span></span>
-<span><span class="co">#&gt; rank[UNCOVER-2: SEC_150] 4.00 0.05    4   4   4   4     4     4037       NA    1</span></span>
-<span><span class="co">#&gt; rank[UNCOVER-2: SEC_300] 2.77 0.42    2   3   3   3     3     4882     4033    1</span></span>
+<span><span class="co">#&gt; rank[UNCOVER-2: IXE_Q4W] 2.23 0.42    2   2   2   2     3     4087       NA    1</span></span>
+<span><span class="co">#&gt; rank[UNCOVER-2: SEC_150] 4.00 0.04    4   4   4   4     4     4024       NA    1</span></span>
+<span><span class="co">#&gt; rank[UNCOVER-2: SEC_300] 2.77 0.43    2   3   3   3     3     4164     4024    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-3</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -716,9 +862,9 @@
 <span><span class="co">#&gt; rank[UNCOVER-3: PBO]     6.00 0.00    6   6   6   6     6       NA       NA   NA</span></span>
 <span><span class="co">#&gt; rank[UNCOVER-3: ETN]     5.00 0.00    5   5   5   5     5       NA       NA   NA</span></span>
 <span><span class="co">#&gt; rank[UNCOVER-3: IXE_Q2W] 1.00 0.00    1   1   1   1     1       NA       NA   NA</span></span>
-<span><span class="co">#&gt; rank[UNCOVER-3: IXE_Q4W] 2.23 0.42    2   2   2   2     3     4670     4018    1</span></span>
-<span><span class="co">#&gt; rank[UNCOVER-3: SEC_150] 4.00 0.05    4   4   4   4     4     4037       NA    1</span></span>
-<span><span class="co">#&gt; rank[UNCOVER-3: SEC_300] 2.77 0.42    2   3   3   3     3     4882     4033    1</span></span>
+<span><span class="co">#&gt; rank[UNCOVER-3: IXE_Q4W] 2.23 0.42    2   2   2   2     3     4087       NA    1</span></span>
+<span><span class="co">#&gt; rank[UNCOVER-3: SEC_150] 4.00 0.04    4   4   4   4     4     4024       NA    1</span></span>
+<span><span class="co">#&gt; rank[UNCOVER-3: SEC_300] 2.77 0.43    2   3   3   3     3     4164     4024    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_ranks_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_plaque_psoriasis_files/figure-html/pso_ranks_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
@@ -735,7 +881,7 @@
 <span><span class="co">#&gt; d[FIXTURE: IXE_Q2W]         1      0.00      0.00         0         0         0</span></span>
 <span><span class="co">#&gt; d[FIXTURE: IXE_Q4W]         0      0.77      0.23         0         0         0</span></span>
 <span><span class="co">#&gt; d[FIXTURE: SEC_150]         0      0.00      0.00         1         0         0</span></span>
-<span><span class="co">#&gt; d[FIXTURE: SEC_300]         0      0.23      0.77         0         0         0</span></span>
+<span><span class="co">#&gt; d[FIXTURE: SEC_300]         0      0.23      0.76         0         0         0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-1</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -749,7 +895,7 @@
 <span><span class="co">#&gt; d[UNCOVER-1: IXE_Q2W]         1      0.00      0.00         0         0         0</span></span>
 <span><span class="co">#&gt; d[UNCOVER-1: IXE_Q4W]         0      0.77      0.23         0         0         0</span></span>
 <span><span class="co">#&gt; d[UNCOVER-1: SEC_150]         0      0.00      0.00         1         0         0</span></span>
-<span><span class="co">#&gt; d[UNCOVER-1: SEC_300]         0      0.23      0.77         0         0         0</span></span>
+<span><span class="co">#&gt; d[UNCOVER-1: SEC_300]         0      0.23      0.76         0         0         0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-2</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -763,7 +909,7 @@
 <span><span class="co">#&gt; d[UNCOVER-2: IXE_Q2W]         1      0.00      0.00         0         0         0</span></span>
 <span><span class="co">#&gt; d[UNCOVER-2: IXE_Q4W]         0      0.77      0.23         0         0         0</span></span>
 <span><span class="co">#&gt; d[UNCOVER-2: SEC_150]         0      0.00      0.00         1         0         0</span></span>
-<span><span class="co">#&gt; d[UNCOVER-2: SEC_300]         0      0.23      0.77         0         0         0</span></span>
+<span><span class="co">#&gt; d[UNCOVER-2: SEC_300]         0      0.23      0.76         0         0         0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-3</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -777,7 +923,7 @@
 <span><span class="co">#&gt; d[UNCOVER-3: IXE_Q2W]         1      0.00      0.00         0         0         0</span></span>
 <span><span class="co">#&gt; d[UNCOVER-3: IXE_Q4W]         0      0.77      0.23         0         0         0</span></span>
 <span><span class="co">#&gt; d[UNCOVER-3: SEC_150]         0      0.00      0.00         1         0         0</span></span>
-<span><span class="co">#&gt; d[UNCOVER-3: SEC_300]         0      0.23      0.77         0         0         0</span></span>
+<span><span class="co">#&gt; d[UNCOVER-3: SEC_300]         0      0.23      0.76         0         0         0</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_rankprobs_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_plaque_psoriasis_files/figure-html/pso_rankprobs_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
@@ -839,8 +985,14 @@
 <span><span class="co">#&gt; d[UNCOVER-3: SEC_300]         0      0.23         1         1         1         1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_cumrankprobs_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_plaque_psoriasis_files/figure-html/pso_cumrankprobs_FE-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>All of the above estimates (relative effects, predictions, rankings) can also be produced for a specific target population or populations by providing a suitable <code>newdata</code> argument to for function (and a <code>baseline</code> distribution for <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>).</p>
-<p>To produce population-adjusted relative effects (and corresponding rankings) for a chosen target population, we require only the mean covariate values in that population. For example, <code>newdata</code> could provide the following mean covariate values:</p>
+<p>All of the above estimates (relative effects, predictions, rankings)
+can also be produced for a specific target population or populations by
+providing a suitable <code>newdata</code> argument to for function (and
+a <code>baseline</code> distribution for <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>).</p>
+<p>To produce population-adjusted relative effects (and corresponding
+rankings) for a chosen target population, we require only the mean
+covariate values in that population. For example, <code>newdata</code>
+could provide the following mean covariate values:</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">new_agd_means</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>  bsa <span class="op">=</span> <span class="fl">0.6</span>,</span>
@@ -848,7 +1000,9 @@
 <span>  psa <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>  weight <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  durnpso <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<p>Population-adjusted relative effects in this target population are then calculated using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function, and can be plotted with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method:</p>
+<p>Population-adjusted relative effects in this target population are
+then calculated using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function, and
+can be plotted with the corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method:</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_releff_FE_new</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, newdata <span class="op">=</span> <span class="va">new_agd_means</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: New 1</span> <span style="color: #555555;">----</span> </span></span>
@@ -858,15 +1012,23 @@
 <span><span class="co">#&gt;        3     0.1 0.6     10 0.2</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                   mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[New 1: ETN]     1.26 0.23 0.81 1.10 1.25 1.41  1.72     6670     3370    1</span></span>
-<span><span class="co">#&gt; d[New 1: IXE_Q2W] 2.89 0.22 2.48 2.74 2.89 3.04  3.32     7176     3332    1</span></span>
-<span><span class="co">#&gt; d[New 1: IXE_Q4W] 2.48 0.21 2.06 2.34 2.48 2.62  2.91     7034     3295    1</span></span>
-<span><span class="co">#&gt; d[New 1: SEC_150] 2.08 0.22 1.65 1.93 2.08 2.23  2.53     7617     3090    1</span></span>
-<span><span class="co">#&gt; d[New 1: SEC_300] 2.39 0.22 1.96 2.23 2.38 2.54  2.84     7677     3299    1</span></span>
+<span><span class="co">#&gt; d[New 1: ETN]     1.25 0.23 0.81 1.10 1.25 1.42  1.72     5522     3204    1</span></span>
+<span><span class="co">#&gt; d[New 1: IXE_Q2W] 2.89 0.23 2.46 2.73 2.88 3.04  3.33     6898     3462    1</span></span>
+<span><span class="co">#&gt; d[New 1: IXE_Q4W] 2.47 0.23 2.04 2.32 2.47 2.63  2.92     6810     3374    1</span></span>
+<span><span class="co">#&gt; d[New 1: SEC_150] 2.08 0.23 1.62 1.91 2.08 2.24  2.54     6428     3215    1</span></span>
+<span><span class="co">#&gt; d[New 1: SEC_300] 2.39 0.23 1.94 2.23 2.38 2.54  2.84     7471     3222    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_releff_FE_new</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_plaque_psoriasis_files/figure-html/pso_releff_FE_new-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>For absolute predictions, we require information about the full covariate distribution in the target population, not just the mean values. If IPD are available for the target population, <code>newdata</code> is simply a data frame of the IPD. If AgD are available for the target population, <code>newdata</code> must be a data frame with added integration points created using the <code><a href="../reference/add_integration.html">add_integration()</a></code> function.</p>
-<p>For example, suppose the aggregate target population introduced above had the following covariate means and standard deviations (for continuous covariates) or proportions (for discrete covariates):</p>
+<p>For absolute predictions, we require information about the full
+covariate distribution in the target population, not just the mean
+values. If IPD are available for the target population,
+<code>newdata</code> is simply a data frame of the IPD. If AgD are
+available for the target population, <code>newdata</code> must be a data
+frame with added integration points created using the
+<code><a href="../reference/add_integration.html">add_integration()</a></code> function.</p>
+<p>For example, suppose the aggregate target population introduced above
+had the following covariate means and standard deviations (for
+continuous covariates) or proportions (for discrete covariates):</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">new_agd_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>  bsa_mean <span class="op">=</span> <span class="fl">0.6</span>,</span>
@@ -878,7 +1040,11 @@
 <span>  durnpso_mean <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  durnpso_sd <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>We add integration points to this data frame in a similar manner to before. Again, we need to supply a correlation matrix for the joint covariate distribution; we use the same weighted mean correlation matrix computed earlier from the IPD in the network, which is stored in the network object as <code>int_cor</code>.</p>
+<p>We add integration points to this data frame in a similar manner to
+before. Again, we need to supply a correlation matrix for the joint
+covariate distribution; we use the same weighted mean correlation matrix
+computed earlier from the IPD in the network, which is stored in the
+network object as <code>int_cor</code>.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">new_agd_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_integration.html">add_integration</a></span><span class="op">(</span><span class="va">new_agd_int</span>,</span>
 <span>  durnpso <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qgamma</span>, mean <span class="op">=</span> <span class="va">durnpso_mean</span>, sd <span class="op">=</span> <span class="va">durnpso_sd</span><span class="op">)</span>,</span>
@@ -888,7 +1054,11 @@
 <span>  psa <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qbern</span>, prob <span class="op">=</span> <span class="va">psa</span><span class="op">)</span>,</span>
 <span>  cor <span class="op">=</span> <span class="va">pso_net</span><span class="op">$</span><span class="va">int_cor</span>,</span>
 <span>  n_int <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
-<p>Predicted probabilities of achieving PASI 75 in this target population, given a <span class="math inline">\(N(-1.75, 0.08^2)\)</span> distribution on the baseline probit-probability of response on Placebo (at the reference levels of the covariates), are then produced using the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method:</p>
+<p>Predicted probabilities of achieving PASI 75 in this target
+population, given a <span class="math inline">\(N(-1.75,
+0.08^2)\)</span> distribution on the baseline probit-probability of
+response on Placebo (at the reference levels of the covariates), are
+then produced using the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method:</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_pred_FE_new</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, </span>
 <span>                            type <span class="op">=</span> <span class="st">"response"</span>,</span>
@@ -897,12 +1067,12 @@
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: New 1</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                      mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[New 1: PBO]     0.06 0.02 0.03 0.04 0.06 0.07  0.12     5761     3676    1</span></span>
-<span><span class="co">#&gt; pred[New 1: ETN]     0.37 0.06 0.26 0.33 0.37 0.41  0.49     6320     3878    1</span></span>
-<span><span class="co">#&gt; pred[New 1: IXE_Q2W] 0.90 0.03 0.84 0.88 0.90 0.92  0.94     5182     3397    1</span></span>
-<span><span class="co">#&gt; pred[New 1: IXE_Q4W] 0.81 0.04 0.72 0.78 0.81 0.83  0.87     5132     3223    1</span></span>
-<span><span class="co">#&gt; pred[New 1: SEC_150] 0.68 0.06 0.57 0.64 0.68 0.72  0.79     5829     3182    1</span></span>
-<span><span class="co">#&gt; pred[New 1: SEC_300] 0.78 0.05 0.68 0.75 0.78 0.81  0.86     5545     3619    1</span></span>
+<span><span class="co">#&gt; pred[New 1: PBO]     0.06 0.03 0.03 0.04 0.06 0.08  0.12     5247     3014    1</span></span>
+<span><span class="co">#&gt; pred[New 1: ETN]     0.37 0.06 0.26 0.33 0.37 0.41  0.49     6130     3438    1</span></span>
+<span><span class="co">#&gt; pred[New 1: IXE_Q2W] 0.90 0.03 0.84 0.88 0.90 0.92  0.94     5962     3276    1</span></span>
+<span><span class="co">#&gt; pred[New 1: IXE_Q4W] 0.81 0.04 0.73 0.78 0.81 0.83  0.87     5788     3417    1</span></span>
+<span><span class="co">#&gt; pred[New 1: SEC_150] 0.68 0.06 0.57 0.64 0.68 0.72  0.78     5920     3576    1</span></span>
+<span><span class="co">#&gt; pred[New 1: SEC_300] 0.78 0.05 0.68 0.75 0.78 0.81  0.86     6536     3453    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_pred_FE_new</span>, ref_line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_plaque_psoriasis_files/figure-html/pso_pred_FE_new-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
@@ -910,14 +1080,18 @@
 <div class="section level2">
 <h2 id="extended_analysis">Extended analysis<a class="anchor" aria-label="anchor" href="#extended_analysis"></a>
 </h2>
-<p>We now extend the network to include a further five studies (four AgD and one IPD), recreating the analysis of <span class="citation">Phillippo et al. (<a href="#ref-Phillippo2022" role="doc-biblioref">2022</a>)</span>. This larger network allows us to assess the key assumptions underlying population adjustment.</p>
+<p>We now extend the network to include a further five studies (four AgD
+and one IPD), recreating the analysis of <span class="citation">Phillippo et al. (<a href="#ref-Phillippo2022" role="doc-biblioref">2022</a>)</span>. This larger network allows us to
+assess the key assumptions underlying population adjustment.</p>
 <div class="section level3">
 <h3 id="setup-1">Setup<a class="anchor" aria-label="anchor" href="#setup-1"></a>
 </h3>
 <div class="section level4">
 <h4 id="preparing-the-data-1">Preparing the data<a class="anchor" aria-label="anchor" href="#preparing-the-data-1"></a>
 </h4>
-<p>We begin, as before, with some data transformations for each of the covariates and set up a treatment class variable <code>trtclass</code>.</p>
+<p>We begin, as before, with some data transformations for each of the
+covariates and set up a treatment class variable
+<code>trtclass</code>.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># IPD studies</span></span>
 <span><span class="va">pso_ipd</span> <span class="op">&lt;-</span> <span class="va">plaque_psoriasis_ipd</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
@@ -957,7 +1131,8 @@
 <span>                         <span class="va">trtn</span> <span class="op">==</span> <span class="fl">7</span> <span class="op">~</span> <span class="st">"IL-12/23 blocker"</span><span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">studyc</span>, <span class="va">trtn</span><span class="op">)</span></span></code></pre></div>
-<p>There are a very small number of individuals with missing values in the IPD, which we simply exclude from the analysis.</p>
+<p>There are a very small number of individuals with missing values in
+the IPD, which we simply exclude from the analysis.</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_ipd</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">studyc</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
@@ -977,7 +1152,25 @@
 <div class="section level4">
 <h4 id="creating-the-network-1">Creating the network<a class="anchor" aria-label="anchor" href="#creating-the-network-1"></a>
 </h4>
-<p>Next we set up the network. We set the IPD with <code><a href="../reference/set_ipd.html">set_ipd()</a></code> and AgD (arm-based) with <code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code>, and combine these together using <code><a href="../reference/combine_network.html">combine_network()</a></code>. We specify an ordered categorical (multinomial) outcome using the <code><a href="../reference/multi.html">multi()</a></code> helper function. The outcome data are in “inclusive” format, i.e. the lowest category is the sample size (or 1 for IPD), the second category counts those achieving PASI 75 <em>or greater</em> (<span class="math inline">\(\ge 75\%\)</span> reduction in symptoms), the third counts those achieving PASI 90 <em>or greater</em> (<span class="math inline">\(\ge 90\%\)</span> reduction), and the final category counts those achieving PASI 100 (<span class="math inline">\(100\%\)</span> reduction).<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;The alternative is “exclusive” format, where the lowest category counts those not achieving any higher outcomes (i.e. failure to achieve PASI 75, &lt;span class="math inline"&gt;\(&amp;lt;75\%\)&lt;/span&gt; reduction in symptoms), the second counts those achieving PASI 75 &lt;em&gt;but not PASI 90 or 100&lt;/em&gt; (&lt;span class="math inline"&gt;\(\ge 75\%\)&lt;/span&gt; and &lt;span class="math inline"&gt;\(&amp;lt;90\%\)&lt;/span&gt; reduction), the third counts those achieving PASI 90 &lt;em&gt;but not PASI 100&lt;/em&gt; (&lt;span class="math inline"&gt;\(\ge 90\%\)&lt;/span&gt; and &lt;span class="math inline"&gt;\(&amp;lt;100\%\)&lt;/span&gt; reduction), and the final category counts those achieving PASI 100 (&lt;span class="math inline"&gt;\(100\%\)&lt;/span&gt; reduction).&lt;/p&gt;'><sup>2</sup></a> We specify the treatment classes with <code>trt_class = trtclass</code>.</p>
+<p>Next we set up the network. We set the IPD with
+<code><a href="../reference/set_ipd.html">set_ipd()</a></code> and AgD (arm-based) with
+<code><a href="../reference/set_agd_arm.html">set_agd_arm()</a></code>, and combine these together using
+<code><a href="../reference/combine_network.html">combine_network()</a></code>. We specify an ordered categorical
+(multinomial) outcome using the <code><a href="../reference/multi.html">multi()</a></code> helper function.
+The outcome data are in “inclusive” format, i.e. the lowest category is
+the sample size (or 1 for IPD), the second category counts those
+achieving PASI 75 <em>or greater</em> (<span class="math inline">\(\ge
+75\%\)</span> reduction in symptoms), the third counts those achieving
+PASI 90 <em>or greater</em> (<span class="math inline">\(\ge
+90\%\)</span> reduction), and the final category counts those achieving
+PASI 100 (<span class="math inline">\(100\%\)</span> reduction).<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;The alternative is “exclusive” format, where the lowest
+category counts those not achieving any higher outcomes (i.e. failure to
+achieve PASI 75, &lt;span class="math inline"&gt;\(&amp;lt;75\%\)&lt;/span&gt; reduction
+in symptoms), the second counts those achieving PASI 75 &lt;em&gt;but not PASI
+90 or 100&lt;/em&gt; (&lt;span class="math inline"&gt;\(\ge 75\%\)&lt;/span&gt; and &lt;span class="math inline"&gt;\(&amp;lt;90\%\)&lt;/span&gt; reduction), the third counts
+those achieving PASI 90 &lt;em&gt;but not PASI 100&lt;/em&gt; (&lt;span class="math inline"&gt;\(\ge 90\%\)&lt;/span&gt; and &lt;span class="math inline"&gt;\(&amp;lt;100\%\)&lt;/span&gt; reduction), and the final
+category counts those achieving PASI 100 (&lt;span class="math inline"&gt;\(100\%\)&lt;/span&gt; reduction).&lt;/p&gt;'><sup>2</sup></a> We specify
+the treatment classes with <code>trt_class = trtclass</code>.</p>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combine_network.html">combine_network</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/set_ipd.html">set_ipd</a></span><span class="op">(</span><span class="va">pso_ipd</span>,</span>
@@ -1025,7 +1218,14 @@
 <span><span class="co">#&gt; Total number of studies: 9</span></span>
 <span><span class="co">#&gt; Reference treatment is: PBO</span></span>
 <span><span class="co">#&gt; Network is <span style="color: #00BB00;">connected</span></span></span></code></pre></div>
-<p>We create a network plot using the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> function applied to the <code>pso_net</code> network object, choosing to scale the edges and nodes by the number of studies/sample size (<code>weight_edges</code> and <code>weight_nodes = TRUE</code>), colour the treatment nodes by class (<code>show_trt_class = TRUE</code>), and nudge the treatment names away from the nodes (<code>nudge = 0.1</code>). We further customise the plot using ggplot syntax to alter the colour scheme.</p>
+<p>We create a network plot using the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> function
+applied to the <code>pso_net</code> network object, choosing to scale
+the edges and nodes by the number of studies/sample size
+(<code>weight_edges</code> and <code>weight_nodes = TRUE</code>), colour
+the treatment nodes by class (<code>show_trt_class = TRUE</code>), and
+nudge the treatment names away from the nodes
+(<code>nudge = 0.1</code>). We further customise the plot using ggplot
+syntax to alter the colour scheme.</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">class_pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#D95F02"</span>, <span class="st">"#7570B3"</span>, <span class="st">"#E7298A"</span>, <span class="st">"#E6AB02"</span><span class="op">)</span></span>
 <span></span>
@@ -1047,7 +1247,16 @@
 <div class="section level4">
 <h4 id="numerical-integration-for-ml-nmr-models">Numerical integration for ML-NMR models<a class="anchor" aria-label="anchor" href="#numerical-integration-for-ml-nmr-models"></a>
 </h4>
-<p>We add integration points to the AgD studies in the network using the <code><a href="../reference/add_integration.html">add_integration()</a></code> function, specifying the chosen marginal distribution for each covariate using the <code><a href="../reference/distr.html">distr()</a></code> function. As before, we specify Gamma distributions for weight and duration of psoriasis, a logit-Normal distribution for body surface area, and Bernoulli distributions for previous systemic treatment and psoriatic arthritis as binary covariates. Since we do not know the correlations between covariates in the AgD studies, we once again impute these with the weighted mean of the correlations in the IPD studies (the default option).</p>
+<p>We add integration points to the AgD studies in the network using the
+<code><a href="../reference/add_integration.html">add_integration()</a></code> function, specifying the chosen marginal
+distribution for each covariate using the <code><a href="../reference/distr.html">distr()</a></code> function.
+As before, we specify Gamma distributions for weight and duration of
+psoriasis, a logit-Normal distribution for body surface area, and
+Bernoulli distributions for previous systemic treatment and psoriatic
+arthritis as binary covariates. Since we do not know the correlations
+between covariates in the AgD studies, we once again impute these with
+the weighted mean of the correlations in the IPD studies (the default
+option).</p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_integration.html">add_integration</a></span><span class="op">(</span><span class="va">pso_net</span>,</span>
 <span>  durnpso <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qgamma</span>, mean <span class="op">=</span> <span class="va">durnpso_mean</span>, sd <span class="op">=</span> <span class="va">durnpso_sd</span><span class="op">)</span>,</span>
@@ -1062,7 +1271,25 @@
 <div class="section level3">
 <h3 id="ml-nmr-model">ML-NMR model<a class="anchor" aria-label="anchor" href="#ml-nmr-model"></a>
 </h3>
-<p>Using the <code><a href="../reference/nma.html">nma()</a></code> function, we fit a (fixed effect) ML-NMR model which includes main effects (prognostic terms) and covariate-treatment interactions (effect-modifying terms) for each of the five covariates. Ideally, we would fit independent interaction terms for each treatment; however, this requires either IPD or several AgD studies at a range of covariate values on each treatment. The data here are insufficient to fit independent interaction terms for each treatment, so we make the shared effect modifier assumption within each class of treatments <span class="citation">(<a href="#ref-TSD18" role="doc-biblioref">Phillippo et al. 2016</a>)</span> and specify common interaction terms within each treatment class (<code>class_interactions = "common"</code>). As before, we specify <span class="math inline">\(\mathrm{N}(0, 10^2)\)</span> prior distributions on the study-specific intercepts, treatment effects, and regression parameters. However, since we now have an ordered multinomial likelihood we also need to specify priors for the differences between the latent cutoffs for each outcome category; we choose an improper flat prior <span class="math inline">\(\mathrm{U}(-\infty,\infty)\)</span> which will automatically be truncated to meet the ordering constraints (<code>prior_aux = flat()</code>).</p>
+<p>Using the <code><a href="../reference/nma.html">nma()</a></code> function, we fit a (fixed effect) ML-NMR
+model which includes main effects (prognostic terms) and
+covariate-treatment interactions (effect-modifying terms) for each of
+the five covariates. Ideally, we would fit independent interaction terms
+for each treatment; however, this requires either IPD or several AgD
+studies at a range of covariate values on each treatment. The data here
+are insufficient to fit independent interaction terms for each
+treatment, so we make the shared effect modifier assumption within each
+class of treatments <span class="citation">(<a href="#ref-TSD18" role="doc-biblioref">Phillippo et al. 2016</a>)</span> and specify
+common interaction terms within each treatment class
+(<code>class_interactions = "common"</code>). As before, we specify
+<span class="math inline">\(\mathrm{N}(0, 10^2)\)</span> prior
+distributions on the study-specific intercepts, treatment effects, and
+regression parameters. However, since we now have an ordered multinomial
+likelihood we also need to specify priors for the differences between
+the latent cutoffs for each outcome category; we choose an improper flat
+prior <span class="math inline">\(\mathrm{U}(-\infty,\infty)\)</span>
+which will automatically be truncated to meet the ordering constraints
+(<code>prior_aux = flat()</code>).</p>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_fit_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">pso_net</span>, </span>
 <span>                  trt_effects <span class="op">=</span> <span class="st">"fixed"</span>,</span>
@@ -1160,12 +1387,28 @@
 <div class="section level3">
 <h3 id="assessing-assumptions">Assessing assumptions<a class="anchor" aria-label="anchor" href="#assessing-assumptions"></a>
 </h3>
-<p>In the first analysis, the small network made assessing assumptions difficult. With this larger network (although still only nine studies) we have greater opportunity to assess the key assumptions.</p>
-<p>The key assumption made by ML-NMR (and indeed all population adjustment methods in connected networks) is the conditional constancy of relative effects assumption <span class="citation">(<a href="#ref-TSD18" role="doc-biblioref">Phillippo et al. 2016</a>)</span>. This means that there are no unobserved effect modifiers, so that the relative effects are constant given the included effect-modifying covariates. This assumption implies that there is no residual heterogeneity or inconsistency, which can be assessed using standard network meta-analysis techniques. We assess residual heterogeneity using a random effects model, and residual inconsistency using an unrelated mean effects (UME) model.</p>
+<p>In the first analysis, the small network made assessing assumptions
+difficult. With this larger network (although still only nine studies)
+we have greater opportunity to assess the key assumptions.</p>
+<p>The key assumption made by ML-NMR (and indeed all population
+adjustment methods in connected networks) is the conditional constancy
+of relative effects assumption <span class="citation">(<a href="#ref-TSD18" role="doc-biblioref">Phillippo et al.
+2016</a>)</span>. This means that there are no unobserved effect
+modifiers, so that the relative effects are constant given the included
+effect-modifying covariates. This assumption implies that there is no
+residual heterogeneity or inconsistency, which can be assessed using
+standard network meta-analysis techniques. We assess residual
+heterogeneity using a random effects model, and residual inconsistency
+using an unrelated mean effects (UME) model.</p>
 <div class="section level4">
 <h4 id="assessing-residual-heterogeneity-with-a-random-effects-ml-nmr">Assessing residual heterogeneity with a random effects ML-NMR<a class="anchor" aria-label="anchor" href="#assessing-residual-heterogeneity-with-a-random-effects-ml-nmr"></a>
 </h4>
-<p>First, we fit a random effects model to assess residual heterogeneity. The call to the <code><a href="../reference/nma.html">nma()</a></code> function is identical to the fixed effect model above, except that now we specify <code>trt_effects = "random"</code> and need to provide a prior for the between-study heterogeneity (we choose a <span class="math inline">\(\textrm{half-N}(0, 2.5^2)\)</span> prior with <code>prior_het = half_normal(scale = 2.5)</code>.</p>
+<p>First, we fit a random effects model to assess residual
+heterogeneity. The call to the <code><a href="../reference/nma.html">nma()</a></code> function is identical
+to the fixed effect model above, except that now we specify
+<code>trt_effects = "random"</code> and need to provide a prior for the
+between-study heterogeneity (we choose a <span class="math inline">\(\textrm{half-N}(0, 2.5^2)\)</span> prior with
+<code>prior_het = half_normal(scale = 2.5)</code>.</p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_fit_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">pso_net</span>, </span>
 <span>                  trt_effects <span class="op">=</span> <span class="st">"random"</span>,</span>
@@ -1266,7 +1509,9 @@
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
-<p>The estimated between-study heterogeneity standard deviation <code>tau</code> is small compared to the relative treatment effects. We compare the model fit using the DIC:</p>
+<p>The estimated between-study heterogeneity standard deviation
+<code>tau</code> is small compared to the relative treatment effects. We
+compare the model fit using the DIC:</p>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">pso_fit_FE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
@@ -1279,12 +1524,31 @@
 <code class="sourceCode R"><span><span class="co">#&gt; Residual deviance: 8800.1 (on 12387 data points)</span></span>
 <span><span class="co">#&gt;                pD: 42.3</span></span>
 <span><span class="co">#&gt;               DIC: 8842.4</span></span></code></pre></div>
-<p>The DIC is lower for the RE model, indicating that there may be residual heterogeneity in the network and that the conditional constancy of relative effects assumption may be invalid—there may be additional effect modifiers that we have not accounted for. This result is different to the actual analysis reported by <span class="citation">Phillippo et al. (<a href="#ref-Phillippo2022" role="doc-biblioref">2022</a>)</span>, since here we are using synthetic IPD that have been simulated to closely resemble the original IPD. In the actual analysis the DIC was similar between the FE and RE models, so we might choose the more parsimonious FE model based on DIC alone, and there was no evidence for residual heterogeneity in this network.</p>
+<p>The DIC is lower for the RE model, indicating that there may be
+residual heterogeneity in the network and that the conditional constancy
+of relative effects assumption may be invalid—there may be additional
+effect modifiers that we have not accounted for. This result is
+different to the actual analysis reported by <span class="citation">Phillippo et al. (<a href="#ref-Phillippo2022" role="doc-biblioref">2022</a>)</span>, since here we are using synthetic
+IPD that have been simulated to closely resemble the original IPD. In
+the actual analysis the DIC was similar between the FE and RE models, so
+we might choose the more parsimonious FE model based on DIC alone, and
+there was no evidence for residual heterogeneity in this network.</p>
 </div>
 <div class="section level4">
-<h4 id="assessing-residual-inconsistency-with-an-unrelated-mean-effects-ml-nmr">Assessing residual inconsistency with an unrelated mean effects ML-NMR<a class="anchor" aria-label="anchor" href="#assessing-residual-inconsistency-with-an-unrelated-mean-effects-ml-nmr"></a>
+<h4 id="assessing-residual-inconsistency-with-an-unrelated-mean-effects-ml-nmr">Assessing residual inconsistency with an unrelated mean effects
+ML-NMR<a class="anchor" aria-label="anchor" href="#assessing-residual-inconsistency-with-an-unrelated-mean-effects-ml-nmr"></a>
 </h4>
-<p>We assess residual inconsistency using an unrelated mean effects model <span class="citation">(<a href="#ref-TSD4" role="doc-biblioref">Dias et al. 2011</a>)</span>. Again, the call to the <code><a href="../reference/nma.html">nma()</a></code> function is identical, except this time we specify <code>consistency = "ume"</code>. Node-splitting is also a possibility (with <code>consistency = "nodesplit"</code>), but this takes substantially longer since the model is re-run for each node-split comparison. Here we will proceed as in the analysis of <span class="citation">Phillippo et al. (<a href="#ref-Phillippo2022" role="doc-biblioref">2022</a>)</span> and fit a fixed effect UME model (since there was no evidence for heterogeneity in the actual analysis); however, in our recreated analysis using synthetic IPD there was evidence of heterogeneity and we should really fit a random effects UME model instead.</p>
+<p>We assess residual inconsistency using an unrelated mean effects
+model <span class="citation">(<a href="#ref-TSD4" role="doc-biblioref">Dias et al. 2011</a>)</span>. Again, the call to
+the <code><a href="../reference/nma.html">nma()</a></code> function is identical, except this time we
+specify <code>consistency = "ume"</code>. Node-splitting is also a
+possibility (with <code>consistency = "nodesplit"</code>), but this
+takes substantially longer since the model is re-run for each node-split
+comparison. Here we will proceed as in the analysis of <span class="citation">Phillippo et al. (<a href="#ref-Phillippo2022" role="doc-biblioref">2022</a>)</span> and fit a fixed effect UME model
+(since there was no evidence for heterogeneity in the actual analysis);
+however, in our recreated analysis using synthetic IPD there was
+evidence of heterogeneity and we should really fit a random effects UME
+model instead.</p>
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_fit_UME</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">pso_net</span>, </span>
 <span>                   trt_effects <span class="op">=</span> <span class="st">"fixed"</span>,</span>
@@ -1395,13 +1659,23 @@
 <code class="sourceCode R"><span><span class="co">#&gt; Residual deviance: 8811.7 (on 12387 data points)</span></span>
 <span><span class="co">#&gt;                pD: 36.3</span></span>
 <span><span class="co">#&gt;               DIC: 8848</span></span></code></pre></div>
-<p>The DIC values are similar between the FE model (assuming consistency) and the UME (inconsistency) model, which suggests no evidence for inconsistency overall. It is also important to compare the residual deviance contributions under each model to see whether there are any points that fit better under the UME model, as this can also indicate inconsistency. Using the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> function produces a “dev-dev” plot of the residual deviance contributions under either model.</p>
+<p>The DIC values are similar between the FE model (assuming
+consistency) and the UME (inconsistency) model, which suggests no
+evidence for inconsistency overall. It is also important to compare the
+residual deviance contributions under each model to see whether there
+are any points that fit better under the UME model, as this can also
+indicate inconsistency. Using the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> function produces
+a “dev-dev” plot of the residual deviance contributions under either
+model.</p>
 <div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_dic_FE</span>, <span class="va">pso_dic_UME</span>, show_uncertainty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Residual deviance - consistency model"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Residual deviance - inconsistency (UME) model"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="pso-full-dev-dev-1.png" title="plot of pso-full-dev-dev" alt="plot of chunk pso-full-dev-dev" style="display: block; margin: auto;"></p>
-<p>All points lie on the line of equality, so there is no evidence of inconsistency. If random effects models had been fitted then the heterogeneity estimates should also be compared as a drop in <code>tau</code> for the UME model can also indicate inconsistency.</p>
+<p>All points lie on the line of equality, so there is no evidence of
+inconsistency. If random effects models had been fitted then the
+heterogeneity estimates should also be compared as a drop in
+<code>tau</code> for the UME model can also indicate inconsistency.</p>
 </div>
 <div class="section level4">
 <h4 id="relaxing-the-shared-effect-modifier-assumption">Relaxing the shared effect modifier assumption<a class="anchor" aria-label="anchor" href="#relaxing-the-shared-effect-modifier-assumption"></a>
@@ -1417,17 +1691,46 @@
 <span><span class="co">#&gt; 5    IL-17 blocker    SEC_150</span></span>
 <span><span class="co">#&gt; 6    IL-17 blocker    SEC_300</span></span>
 <span><span class="co">#&gt; 7 IL-12/23 blocker        UST</span></span></code></pre></div>
-<p>We fitted common interaction terms within each treatment class, under the shared effect modifier assumption, in order to make the model estimable with the available data. Note that only the interleukin-17 blocker class has more than one treatment; etanercept and ustekinumab are in classes of their own and so are unaffected by specifying <code>class_interactions = "common"</code>. To assess this assumption we cannot simply fit independent interaction terms for all treatments and all effect modifiers at once as we do not have sufficient data. Instead, we relax this assumption one covariate at a time, estimating independent interactions for one covariate whilst keeping the shared effect modifier assumption (common interactions within each treatment class) for the other covariates.</p>
-<p>To specify these relaxed models, we need to somehow mix <code>class_interactions = "common"</code> and <code>class_interactions = "independent"</code> for different covariates. The way we do this is with the <code>.trt</code> and <code>.trtclass</code> specials when specifying the regression model. To see how this works, first note that the model making the shared effect modifiers assumption</p>
+<p>We fitted common interaction terms within each treatment class, under
+the shared effect modifier assumption, in order to make the model
+estimable with the available data. Note that only the interleukin-17
+blocker class has more than one treatment; etanercept and ustekinumab
+are in classes of their own and so are unaffected by specifying
+<code>class_interactions = "common"</code>. To assess this assumption we
+cannot simply fit independent interaction terms for all treatments and
+all effect modifiers at once as we do not have sufficient data. Instead,
+we relax this assumption one covariate at a time, estimating independent
+interactions for one covariate whilst keeping the shared effect modifier
+assumption (common interactions within each treatment class) for the
+other covariates.</p>
+<p>To specify these relaxed models, we need to somehow mix
+<code>class_interactions = "common"</code> and
+<code>class_interactions = "independent"</code> for different
+covariates. The way we do this is with the <code>.trt</code> and
+<code>.trtclass</code> specials when specifying the regression model. To
+see how this works, first note that the model making the shared effect
+modifiers assumption</p>
 <div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>regression <span class="ot">=</span> <span class="er">~</span>(durnpso <span class="sc">+</span> prevsys <span class="sc">+</span> bsa <span class="sc">+</span> weight <span class="sc">+</span> psa)<span class="sc">*</span>.trt,</span>
 <span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>class_interactions <span class="ot">=</span> <span class="st">"common"</span></span></code></pre></div>
-<p>can be written equivalently using the <code>.trtclass</code> special as</p>
+<p>can be written equivalently using the <code>.trtclass</code> special
+as</p>
 <div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">regression</span> <span class="op">=</span> <span class="op">~</span><span class="op">(</span><span class="va">durnpso</span> <span class="op">+</span> <span class="va">prevsys</span> <span class="op">+</span> <span class="va">bsa</span> <span class="op">+</span> <span class="va">weight</span> <span class="op">+</span> <span class="va">psa</span><span class="op">)</span><span class="op">*</span><span class="va">.trtclass</span></span></code></pre></div>
-<p>The <code>.trtclass</code> special is essentially a factor variable containing the treatment classes, and is available any time treatment classes have been specified in the network; this regression formula therefore has a single interaction term for each covariate within each treatment class (the same result as specifying <code>class_interactions = "common"</code> above). Finally, to fit independent interactions for a single covariate, say <code>durnpso</code>, we split these out using the <code>.trt</code> special with <code>class_interactions = "independent"</code> (i.e. telling the model not to combine interactions for <code>.trt</code> within classes):</p>
+<p>The <code>.trtclass</code> special is essentially a factor variable
+containing the treatment classes, and is available any time treatment
+classes have been specified in the network; this regression formula
+therefore has a single interaction term for each covariate within each
+treatment class (the same result as specifying
+<code>class_interactions = "common"</code> above). Finally, to fit
+independent interactions for a single covariate, say
+<code>durnpso</code>, we split these out using the <code>.trt</code>
+special with <code>class_interactions = "independent"</code>
+(i.e. telling the model not to combine interactions for
+<code>.trt</code> within classes):</p>
 <div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>regression <span class="ot">=</span> <span class="er">~</span>(prevsys <span class="sc">+</span> bsa <span class="sc">+</span> weight <span class="sc">+</span> psa)<span class="sc">*</span>.trtclass <span class="sc">+</span> durnpso<span class="sc">*</span>.trt,</span>
 <span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>class_interactions <span class="ot">=</span> <span class="st">"independent"</span></span></code></pre></div>
-<p>Since we are fitting several of these models, let us set up a list of model specifications and iterate over these.</p>
+<p>Since we are fitting several of these models, let us set up a list of
+model specifications and iterate over these.</p>
 <div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">noSEM_mods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  durnpso <span class="op">=</span> <span class="op">~</span><span class="op">(</span><span class="va">prevsys</span> <span class="op">+</span> <span class="va">bsa</span> <span class="op">+</span> <span class="va">weight</span> <span class="op">+</span> <span class="va">psa</span><span class="op">)</span><span class="op">*</span><span class="va">.trtclass</span> <span class="op">+</span> <span class="va">durnpso</span><span class="op">*</span><span class="va">.trt</span>,</span>
@@ -1503,10 +1806,16 @@
 <span><span class="co">#&gt; Residual deviance: 8812.2 (on 12387 data points)</span></span>
 <span><span class="co">#&gt;                pD: 37.8</span></span>
 <span><span class="co">#&gt;               DIC: 8850</span></span></code></pre></div>
-<p>All of the models have similar or higher DIC to the original model making the shared effect modifier assumption for all covariates, with the only exception being the model with independent interactions for <code>weight</code> which has slightly lower DIC.</p>
-<p>We also visually examine the differences between the estimated interaction terms under the original model (shared effect modifier assumption for all covariates) and the relaxed models (independent interactions, one covariate at a time).</p>
+<p>All of the models have similar or higher DIC to the original model
+making the shared effect modifier assumption for all covariates, with
+the only exception being the model with independent interactions for
+<code>weight</code> which has slightly lower DIC.</p>
+<p>We also visually examine the differences between the estimated
+interaction terms under the original model (shared effect modifier
+assumption for all covariates) and the relaxed models (independent
+interactions, one covariate at a time).</p>
 <div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://purrr.tidyverse.org" class="external-link">purrr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org/" class="external-link">forcats</a></span><span class="op">)</span></span>
 <span></span>
@@ -1554,7 +1863,23 @@
 <span>  <span class="fu"><a href="../reference/theme_multinma.html">theme_multinma</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.85</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="pso-full-relaxing-SEM-1.png" title="plot of chunk pso-full-relaxing-SEM" alt="plot of chunk pso-full-relaxing-SEM" style="display: block; margin: auto;"></p>
-<p>The independent interaction estimates are very similar to the common interaction estimates, but with much more uncertainty—particularly for the secukinumab regimens which are estimated only from aggregate data. The only exception is for weight, where there is some suggestion that this covariate may interact differently with the secukinumab treatment regimens to the ixekizumab regimens. However, the credible intervals for the secukinumab interactions are wide and overlap those for the ixekizumab regimens and the common interaction. Overall, there is some weak evidence that the shared effect modifier assumption (for the class of interleukin-17 blockers) may be invalid for weight. Since we are fitting multiple models here we should be mindful of multiple testing and the possibility that such differences have occurred by chance. On the other hand, this approach is likely to have low power to detect violations of the shared effect modifier assumption, particularly when the data are lacking. In this case, results from the model relaxing the shared effect modifier assumption for weight are very similar to the original model <span class="citation">(see <a href="#ref-Phillippo2022" role="doc-biblioref">Phillippo et al. 2022</a>)</span>.</p>
+<p>The independent interaction estimates are very similar to the common
+interaction estimates, but with much more uncertainty—particularly for
+the secukinumab regimens which are estimated only from aggregate data.
+The only exception is for weight, where there is some suggestion that
+this covariate may interact differently with the secukinumab treatment
+regimens to the ixekizumab regimens. However, the credible intervals for
+the secukinumab interactions are wide and overlap those for the
+ixekizumab regimens and the common interaction. Overall, there is some
+weak evidence that the shared effect modifier assumption (for the class
+of interleukin-17 blockers) may be invalid for weight. Since we are
+fitting multiple models here we should be mindful of multiple testing
+and the possibility that such differences have occurred by chance. On
+the other hand, this approach is likely to have low power to detect
+violations of the shared effect modifier assumption, particularly when
+the data are lacking. In this case, results from the model relaxing the
+shared effect modifier assumption for weight are very similar to the
+original model <span class="citation">(see <a href="#ref-Phillippo2022" role="doc-biblioref">Phillippo et al. 2022</a>)</span>.</p>
 </div>
 </div>
 <div class="section level3">
@@ -1563,17 +1888,25 @@
 <div class="section level4">
 <h4 id="study-populations-included-in-the-network">Study populations included in the network<a class="anchor" aria-label="anchor" href="#study-populations-included-in-the-network"></a>
 </h4>
-<p>Population-average treatment effects can be produced for all the study populations represented in the network using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function.</p>
+<p>Population-average treatment effects can be produced for all the
+study populations represented in the network using the
+<code><a href="../reference/relative_effects.html">relative_effects()</a></code> function.</p>
 <div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">pso_fit_FE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>These relative effects can then be plotted using the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> function.</p>
+<p>These relative effects can then be plotted using the
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> function.</p>
 <div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_releff_FE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="pso-full-releff-1.png" title="plot of chunk pso-full-releff" alt="plot of chunk pso-full-releff" style="display: block; margin: auto;"></p>
-<p>Similarly, average response probabilities on each treatment, in each study population, at each PASI cutoff can be produced using the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> function. We specify <code>type = "response"</code> to produce predicted probabilities (rather than probit-probabilities).</p>
+<p>Similarly, average response probabilities on each treatment, in each
+study population, at each PASI cutoff can be produced using the
+<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> function. We specify
+<code>type = "response"</code> to produce predicted probabilities
+(rather than probit-probabilities).</p>
 <div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_pred_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Again, these can be plotted using the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> function.</p>
+<p>Again, these can be plotted using the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>
+function.</p>
 <div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_pred_FE</span>, ref_line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="pso-full-pred-1.png" title="plot of chunk pso-full-pred" alt="plot of chunk pso-full-pred" style="display: block; margin: auto;"></p>
@@ -1581,8 +1914,19 @@
 <div class="section level4">
 <h4 id="external-target-populations">External target populations<a class="anchor" aria-label="anchor" href="#external-target-populations"></a>
 </h4>
-<p>For the purposes of decision-making it is crucial that population-average estimates are produced for the decision target population of interest. The decision target population may not be represented by any of the study populations in the network, indeed it is likely best represented by an external registry or cohort study, or perhaps expert knowledge <span class="citation">(<a href="#ref-TSD18" role="doc-biblioref">Phillippo et al. 2016</a>)</span>.</p>
-<p>As an example, <span class="citation">Phillippo et al. (<a href="#ref-Phillippo2022" role="doc-biblioref">2022</a>)</span> produce estimates for three external target populations represented by the PsoBest registry <span class="citation">(<a href="#ref-Reich2015" role="doc-biblioref">Reich et al. 2015</a>; <a href="#ref-Augustin2014" role="doc-biblioref">Augustin et al. 2014</a>)</span>, and the PROSPECT <span class="citation">(<a href="#ref-Thaci2019" role="doc-biblioref">Thaçi et al. 2019</a>)</span> and Chiricozzi 2019 <span class="citation">(<a href="#ref-Chiricozzi2019" role="doc-biblioref">Chiricozzi et al. 2019</a>)</span> cohort studies. First of all, we need the covariate means and standard deviations in each of these populations:</p>
+<p>For the purposes of decision-making it is crucial that
+population-average estimates are produced for the decision target
+population of interest. The decision target population may not be
+represented by any of the study populations in the network, indeed it is
+likely best represented by an external registry or cohort study, or
+perhaps expert knowledge <span class="citation">(<a href="#ref-TSD18" role="doc-biblioref">Phillippo et al. 2016</a>)</span>.</p>
+<p>As an example, <span class="citation">Phillippo et al. (<a href="#ref-Phillippo2022" role="doc-biblioref">2022</a>)</span> produce
+estimates for three external target populations represented by the
+PsoBest registry <span class="citation">(<a href="#ref-Reich2015" role="doc-biblioref">Reich et al. 2015</a>; <a href="#ref-Augustin2014" role="doc-biblioref">Augustin et al. 2014</a>)</span>, and the PROSPECT
+<span class="citation">(<a href="#ref-Thaci2019" role="doc-biblioref">Thaçi et al. 2019</a>)</span> and Chiricozzi 2019
+<span class="citation">(<a href="#ref-Chiricozzi2019" role="doc-biblioref">Chiricozzi et al. 2019</a>)</span> cohort studies.
+First of all, we need the covariate means and standard deviations in
+each of these populations:</p>
 <div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">new_agd_means</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span>
 <span>             <span class="op">~</span><span class="va">study</span>, <span class="op">~</span><span class="va">covariate</span>,  <span class="op">~</span><span class="va">mean</span>,   <span class="op">~</span><span class="va">sd</span>,</span>
@@ -1617,7 +1961,11 @@
 <span>            durnpso_sd <span class="op">=</span> <span class="va">durnpso_sd</span> <span class="op">/</span> <span class="fl">10</span>,</span>
 <span>            prevsys <span class="op">=</span> <span class="va">prevsys_mean</span>,</span>
 <span>            psa <span class="op">=</span> <span class="va">psa_mean</span><span class="op">)</span></span></code></pre></div>
-<p>To produce estimates of population-average treatment effects, we use the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with the data frame of covariate means in the target populations as the <code>newdata</code> argument. We only need the covariate means, with variable names matching those in the regression.</p>
+<p>To produce estimates of population-average treatment effects, we use
+the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with the data frame of
+covariate means in the target populations as the <code>newdata</code>
+argument. We only need the covariate means, with variable names matching
+those in the regression.</p>
 <div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_releff_FE_new</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, </span>
 <span>                                       newdata <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">transmute</a></span><span class="op">(</span><span class="va">new_agd_means</span>,</span>
@@ -1671,11 +2019,20 @@
 <span><span class="co">#&gt; d[PsoBest: SEC_300] 2.62 0.09 2.45 2.56 2.62 2.67  2.79     2016     2919    1</span></span>
 <span><span class="co">#&gt; d[PsoBest: UST]     2.08 0.13 1.82 1.99 2.08 2.17  2.34     2852     3123    1</span></span>
 <span><span class="co">#&gt; </span></span></code></pre></div>
-<p>These estimates are plotted using the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> function.</p>
+<p>These estimates are plotted using the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>
+function.</p>
 <div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_releff_FE_new</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="st">"Study"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="pso-full-releff-new-1.png" title="plot of chunk pso-full-releff-new" alt="plot of chunk pso-full-releff-new" style="display: block; margin: auto;"></p>
-<p>Estimates of average event probabilities are produced by integrating predictions over the joint covariate distribution in each population. Since we have marginal summary statistics available, rather than full IPD, we create integration points using the <code><a href="../reference/add_integration.html">add_integration()</a></code> function by specifying the forms of the marginal distributions and the correlation matrix. We choose to use the same forms of the marginal distributions that we used when specifying integration points for the AgD studies in the network, and the weighted correlation matrix from the IPD studies.</p>
+<p>Estimates of average event probabilities are produced by integrating
+predictions over the joint covariate distribution in each population.
+Since we have marginal summary statistics available, rather than full
+IPD, we create integration points using the
+<code><a href="../reference/add_integration.html">add_integration()</a></code> function by specifying the forms of the
+marginal distributions and the correlation matrix. We choose to use the
+same forms of the marginal distributions that we used when specifying
+integration points for the AgD studies in the network, and the weighted
+correlation matrix from the IPD studies.</p>
 <div class="sourceCode" id="cb81"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">new_agd_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_integration.html">add_integration</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">new_agd_means</span>, <span class="va">study</span> <span class="op">!=</span> <span class="st">"PsoBest"</span><span class="op">)</span>,</span>
 <span>                               durnpso <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qgamma</span>, mean <span class="op">=</span> <span class="va">durnpso_mean</span>, sd <span class="op">=</span> <span class="va">durnpso_sd</span><span class="op">)</span>,</span>
@@ -1685,7 +2042,22 @@
 <span>                               psa <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qbern</span>, prob <span class="op">=</span> <span class="va">psa</span><span class="op">)</span>,</span>
 <span>                               n_int <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>                               cor <span class="op">=</span> <span class="va">pso_net</span><span class="op">$</span><span class="va">int_cor</span><span class="op">)</span></span></code></pre></div>
-<p>We then use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> function to produce the average event probabilities (<code>type = "response"</code>, and <code>level = "aggregate"</code> which is the default) in each of the target populations. To do so, we also need to specify a distribution for the baseline event probabilities (i.e. probability of achieving PASI 75 response) in each of the target populations. PASI 75 event counts for individuals receiving secukinumab 300 mg treatment were available from PROSPECT (1156 achieved PASI 75 out of 1509) and Chiricozzi 2019 (243 out of 330), which we use to construct beta distributions on the baseline average response probabilities (we specify <code>baseline_level = "aggregate"</code> as these are population averages, rather than specific to a reference individual, and <code>baseline_type = "response"</code> as these are probabilities rather than transformed probit probabilities). No information on baseline response was available from PsoBest, so no predictions of absolute response rates could be made.</p>
+<p>We then use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> function to produce the
+average event probabilities (<code>type = "response"</code>, and
+<code>level = "aggregate"</code> which is the default) in each of the
+target populations. To do so, we also need to specify a distribution for
+the baseline event probabilities (i.e. probability of achieving PASI 75
+response) in each of the target populations. PASI 75 event counts for
+individuals receiving secukinumab 300 mg treatment were available from
+PROSPECT (1156 achieved PASI 75 out of 1509) and Chiricozzi 2019 (243
+out of 330), which we use to construct beta distributions on the
+baseline average response probabilities (we specify
+<code>baseline_level = "aggregate"</code> as these are population
+averages, rather than specific to a reference individual, and
+<code>baseline_type = "response"</code> as these are probabilities
+rather than transformed probit probabilities). No information on
+baseline response was available from PsoBest, so no predictions of
+absolute response rates could be made.</p>
 <div class="sourceCode" id="cb82"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_pred_FE_new</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, </span>
 <span>        type <span class="op">=</span> <span class="st">"response"</span>, </span>
@@ -1746,7 +2118,8 @@
 <span><span class="co">#&gt; pred[PROSPECT: UST, PASI75]      0.61 0.05 0.52 0.58 0.61 0.64  0.70     5992     3337    1</span></span>
 <span><span class="co">#&gt; pred[PROSPECT: UST, PASI90]      0.35 0.04 0.27 0.32 0.35 0.38  0.44     6096     3471    1</span></span>
 <span><span class="co">#&gt; pred[PROSPECT: UST, PASI100]     0.12 0.02 0.08 0.10 0.11 0.13  0.17     5841     3581    1</span></span></code></pre></div>
-<p>Again, we then plot these estimates using the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> function, here with some customisation using ggplot syntax.</p>
+<p>Again, we then plot these estimates using the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>
+function, here with some customisation using ggplot syntax.</p>
 <div class="sourceCode" id="cb84"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_pred_FE_new</span>, ref_line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span>rows <span class="op">=</span> <span class="st">"Study"</span><span class="op">)</span> <span class="op">+</span> </span>
@@ -1761,46 +2134,97 @@
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Augustin2014" class="csl-entry">
-Augustin, Matthias, Christina Spehr, Marc A. Radtke, Wolf-Henning Boehncke, Thomas Luger, Ulrich Mrowietz, Michael Reusch, et al. 2014. <span>“German Psoriasis Registry <span>PsoBest</span>: Objectives, Methodology and Baseline Data.”</span> <em><span>JDDG</span>: Journal Der Deutschen Dermatologischen Gesellschaft</em> 12 (1): 48–57. <a href="https://doi.org/10.1111/ddg.12233" class="external-link">https://doi.org/10.1111/ddg.12233</a>.
+Augustin, Matthias, Christina Spehr, Marc A. Radtke, Wolf-Henning
+Boehncke, Thomas Luger, Ulrich Mrowietz, Michael Reusch, et al. 2014.
+<span>“German Psoriasis Registry <span>PsoBest</span>: Objectives,
+Methodology and Baseline Data.”</span> <em><span>JDDG</span>: Journal
+Der Deutschen Dermatologischen Gesellschaft</em> 12 (1): 48–57. <a href="https://doi.org/10.1111/ddg.12233" class="external-link">https://doi.org/10.1111/ddg.12233</a>.
 </div>
 <div id="ref-Caflisch1998" class="csl-entry">
-Caflisch, R. E. 1998. <span>“Monte Carlo and Quasi-Monte Carlo Methods.”</span> <em>Acta Numerica</em> 7: 1–49. <a href="https://doi.org/10.1017/S0962492900002804" class="external-link">https://doi.org/10.1017/S0962492900002804</a>.
+Caflisch, R. E. 1998. <span>“Monte Carlo and Quasi-Monte Carlo
+Methods.”</span> <em>Acta Numerica</em> 7: 1–49. <a href="https://doi.org/10.1017/S0962492900002804" class="external-link">https://doi.org/10.1017/S0962492900002804</a>.
 </div>
 <div id="ref-Chiricozzi2019" class="csl-entry">
-Chiricozzi, Andrea, Anna Balato, Curdin Conrad, Andrea Conti, Paolo Dapavo, Paulo Ferreira, Francesca Maria Gaiani, et al. 2019. <span>“Secukinumab Demonstrates Improvements in Absolute and Relative Psoriasis Area Severity Indices in Moderate-to-Severe Plaque Psoriasis: Results from a European, Multicentric, Retrospective, Real-World Study.”</span> <em>Journal of Dermatological Treatment</em> 31 (5): 476–83. <a href="https://doi.org/10.1080/09546634.2019.1671577" class="external-link">https://doi.org/10.1080/09546634.2019.1671577</a>.
+Chiricozzi, Andrea, Anna Balato, Curdin Conrad, Andrea Conti, Paolo
+Dapavo, Paulo Ferreira, Francesca Maria Gaiani, et al. 2019.
+<span>“Secukinumab Demonstrates Improvements in Absolute and Relative
+Psoriasis Area Severity Indices in Moderate-to-Severe Plaque Psoriasis:
+Results from a European, Multicentric, Retrospective, Real-World
+Study.”</span> <em>Journal of Dermatological Treatment</em> 31 (5):
+476–83. <a href="https://doi.org/10.1080/09546634.2019.1671577" class="external-link">https://doi.org/10.1080/09546634.2019.1671577</a>.
 </div>
 <div id="ref-TSD4" class="csl-entry">
-Dias, S., N. J. Welton, A. J. Sutton, D. M. Caldwell, G. Lu, and A. E. Ades. 2011. <span>“<span>NICE DSU Technical Support Document</span> 4: Inconsistency in Networks of Evidence Based on Randomised Controlled Trials.”</span> <span>National Institute for Health and Care Excellence</span>. <a href="https://nicedsu.sites.sheffield.ac.uk" class="external-link">https://nicedsu.sites.sheffield.ac.uk</a>.
+Dias, S., N. J. Welton, A. J. Sutton, D. M. Caldwell, G. Lu, and A. E.
+Ades. 2011. <span>“<span>NICE DSU Technical Support Document</span> 4:
+Inconsistency in Networks of Evidence Based on Randomised Controlled
+Trials.”</span> <span>National Institute for Health and Care
+Excellence</span>. <a href="https://nicedsu.sites.sheffield.ac.uk" class="external-link">https://nicedsu.sites.sheffield.ac.uk</a>.
 </div>
 <div id="ref-Gordon2016" class="csl-entry">
-Gordon, K. B., A. Blauvelt, K. A. Papp, R. G. Langley, T. Luger, M. Ohtsuki, K. Reich, et al. 2016. <span>“Phase 3 Trials of Ixekizumab in Moderate-to-Severe Plaque Psoriasis.”</span> <em>New England Journal of Medicine</em> 375 (4): 345–56. <a href="https://doi.org/10.1056/nejmoa1512711" class="external-link">https://doi.org/10.1056/nejmoa1512711</a>.
+Gordon, K. B., A. Blauvelt, K. A. Papp, R. G. Langley, T. Luger, M.
+Ohtsuki, K. Reich, et al. 2016. <span>“Phase 3 Trials of Ixekizumab in
+Moderate-to-Severe Plaque Psoriasis.”</span> <em>New England Journal of
+Medicine</em> 375 (4): 345–56. <a href="https://doi.org/10.1056/nejmoa1512711" class="external-link">https://doi.org/10.1056/nejmoa1512711</a>.
 </div>
 <div id="ref-Griffiths2015" class="csl-entry">
-Griffiths, C. E. M., K. Reich, M. Lebwohl, P. van de Kerkhof, C. Paul, A. Menter, G. S. Cameron, et al. 2015. <span>“Comparison of Ixekizumab with Etanercept or Placebo in Moderate-to-Severe Psoriasis (<span>UNCOVER</span>-2 and <span>UNCOVER</span>-3): Results from Two Phase 3 Randomised Trials.”</span> <em>The Lancet</em> 386 (9993): 541–51. <a href="https://doi.org/10.1016/s0140-6736(15)60125-8" class="external-link">https://doi.org/10.1016/s0140-6736(15)60125-8</a>.
+Griffiths, C. E. M., K. Reich, M. Lebwohl, P. van de Kerkhof, C. Paul,
+A. Menter, G. S. Cameron, et al. 2015. <span>“Comparison of Ixekizumab
+with Etanercept or Placebo in Moderate-to-Severe Psoriasis
+(<span>UNCOVER</span>-2 and <span>UNCOVER</span>-3): Results from Two
+Phase 3 Randomised Trials.”</span> <em>The Lancet</em> 386 (9993):
+541–51. <a href="https://doi.org/10.1016/s0140-6736(15)60125-8" class="external-link">https://doi.org/10.1016/s0140-6736(15)60125-8</a>.
 </div>
 <div id="ref-Langley2014" class="csl-entry">
-Langley, R. G., B. E. Elewski, M. Lebwohl, K. Reich, C. E. M. Griffiths, K. Papp, L. Puig, et al. 2014. <span>“Secukinumab in Plaque Psoriasis — Results of Two Phase 3 Trials.”</span> <em>New England Journal of Medicine</em> 371 (4): 326–38. <a href="https://doi.org/10.1056/nejmoa1314258" class="external-link">https://doi.org/10.1056/nejmoa1314258</a>.
+Langley, R. G., B. E. Elewski, M. Lebwohl, K. Reich, C. E. M. Griffiths,
+K. Papp, L. Puig, et al. 2014. <span>“Secukinumab in Plaque Psoriasis —
+Results of Two Phase 3 Trials.”</span> <em>New England Journal of
+Medicine</em> 371 (4): 326–38. <a href="https://doi.org/10.1056/nejmoa1314258" class="external-link">https://doi.org/10.1056/nejmoa1314258</a>.
 </div>
 <div id="ref-Niederreiter1978" class="csl-entry">
-Niederreiter, H. 1978. <span>“Quasi-Monte Carlo Methods and Pseudo-Random Numbers.”</span> <em>Bulletin of the American Mathematical Society</em> 84 (6): 957–1041. <a href="https://doi.org/10.1090/S0002-9904-1978-14532-7" class="external-link">https://doi.org/10.1090/S0002-9904-1978-14532-7</a>.
+Niederreiter, H. 1978. <span>“Quasi-Monte Carlo Methods and
+Pseudo-Random Numbers.”</span> <em>Bulletin of the American Mathematical
+Society</em> 84 (6): 957–1041. <a href="https://doi.org/10.1090/S0002-9904-1978-14532-7" class="external-link">https://doi.org/10.1090/S0002-9904-1978-14532-7</a>.
 </div>
 <div id="ref-Phillippo_thesis" class="csl-entry">
-Phillippo, D. M. 2019. <span>“Calibration of Treatment Effects in Network Meta-Analysis Using Individual Patient Data.”</span> PhD thesis, University of Bristol.
+Phillippo, D. M. 2019. <span>“Calibration of Treatment Effects in
+Network Meta-Analysis Using Individual Patient Data.”</span> PhD thesis,
+University of Bristol.
 </div>
 <div id="ref-TSD18" class="csl-entry">
-Phillippo, D. M., A. E. Ades, S. Dias, S. Palmer, K. R. Abrams, and N. J. Welton. 2016. <span>“<span>NICE DSU Technical Support Document</span> 18: Methods for Population-Adjusted Indirect Comparisons in Submission to <span>NICE</span>.”</span> <span>National Institute for Health and Care Excellence</span>. <a href="https://nicedsu.sites.sheffield.ac.uk" class="external-link">https://nicedsu.sites.sheffield.ac.uk</a>.
+Phillippo, D. M., A. E. Ades, S. Dias, S. Palmer, K. R. Abrams, and N.
+J. Welton. 2016. <span>“<span>NICE DSU Technical Support Document</span>
+18: Methods for Population-Adjusted Indirect Comparisons in Submission
+to <span>NICE</span>.”</span> <span>National Institute for Health and
+Care Excellence</span>. <a href="https://nicedsu.sites.sheffield.ac.uk" class="external-link">https://nicedsu.sites.sheffield.ac.uk</a>.
 </div>
 <div id="ref-Phillippo2022" class="csl-entry">
-Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, D. Saure, Y. Schymura, and N. J. Welton. 2022. <span>“Validating the Assumptions of Population Adjustment: Application of Multilevel Network Meta-Regression to a Network of Treatments for Plaque Psoriasis.”</span> <em>Medical Decision Making</em>. <a href="https://doi.org/10.1177/0272989X221117162" class="external-link">https://doi.org/10.1177/0272989X221117162</a>.
+Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, D. Saure,
+Y. Schymura, and N. J. Welton. 2022. <span>“Validating the Assumptions
+of Population Adjustment: Application of Multilevel Network
+Meta-Regression to a Network of Treatments for Plaque Psoriasis.”</span>
+<em>Medical Decision Making</em>. <a href="https://doi.org/10.1177/0272989X221117162" class="external-link">https://doi.org/10.1177/0272989X221117162</a>.
 </div>
 <div id="ref-methods_paper" class="csl-entry">
-Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A. Schacht, D. Saure, Z. Kadziola, and N. J. Welton. 2020. <span>“Multilevel Network Meta-Regression for Population-Adjusted Treatment Comparisons.”</span> <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em> 183 (3): 1189–1210. <a href="https://doi.org/10.1111/rssa.12579" class="external-link">https://doi.org/10.1111/rssa.12579</a>.
+Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A.
+Schacht, D. Saure, Z. Kadziola, and N. J. Welton. 2020.
+<span>“Multilevel Network Meta-Regression for Population-Adjusted
+Treatment Comparisons.”</span> <em>Journal of the Royal Statistical
+Society: Series A (Statistics in Society)</em> 183 (3): 1189–1210. <a href="https://doi.org/10.1111/rssa.12579" class="external-link">https://doi.org/10.1111/rssa.12579</a>.
 </div>
 <div id="ref-Reich2015" class="csl-entry">
-Reich, K., U. Mrowietz, M. A. Radtke, D. Thaci, S. J. Rustenbach, C. Spehr, and M. Augustin. 2015. <span>“Drug Safety of Systemic Treatments for Psoriasis: Results from the German Psoriasis Registry <span>PsoBest</span>.”</span> <em>Archives of Dermatological Research</em> 307 (10): 875–83. <a href="https://doi.org/10.1007/s00403-015-1593-8" class="external-link">https://doi.org/10.1007/s00403-015-1593-8</a>.
+Reich, K., U. Mrowietz, M. A. Radtke, D. Thaci, S. J. Rustenbach, C.
+Spehr, and M. Augustin. 2015. <span>“Drug Safety of Systemic Treatments
+for Psoriasis: Results from the German Psoriasis Registry
+<span>PsoBest</span>.”</span> <em>Archives of Dermatological
+Research</em> 307 (10): 875–83. <a href="https://doi.org/10.1007/s00403-015-1593-8" class="external-link">https://doi.org/10.1007/s00403-015-1593-8</a>.
 </div>
 <div id="ref-Thaci2019" class="csl-entry">
-Thaçi, D., A. Körber, R. Kiedrowski, T. Bachhuber, N. Melzer, T. Kasparek, E. Duetting, G. Kraehn-Senftleben, U. Amon, and M. Augustin. 2019. <span>“Secukinumab Is Effective in Treatment of Moderate-to-Severe Plaque Psoriasis: Real-Life Effectiveness and Safety from the <span>PROSPECT</span> Study.”</span> <em>Journal of the European Academy of Dermatology and Venereology</em> 34 (2): 310–18. <a href="https://doi.org/10.1111/jdv.15962" class="external-link">https://doi.org/10.1111/jdv.15962</a>.
+Thaçi, D., A. Körber, R. Kiedrowski, T. Bachhuber, N. Melzer, T.
+Kasparek, E. Duetting, G. Kraehn-Senftleben, U. Amon, and M. Augustin.
+2019. <span>“Secukinumab Is Effective in Treatment of Moderate-to-Severe
+Plaque Psoriasis: Real-Life Effectiveness and Safety from the
+<span>PROSPECT</span> Study.”</span> <em>Journal of the European Academy
+of Dermatology and Venereology</em> 34 (2): 310–18. <a href="https://doi.org/10.1111/jdv.15962" class="external-link">https://doi.org/10.1111/jdv.15962</a>.
 </div>
 </div>
 </div>
