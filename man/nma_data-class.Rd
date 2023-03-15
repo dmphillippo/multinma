@@ -38,7 +38,7 @@ tibbles with the following columns:
 \item{\code{.r}}{event count (discrete)}
 \item{\code{.n}}{event count denominator (discrete, \code{agd_arm} only)}
 \item{\code{.E}}{time at risk (discrete)}
-\item{\code{.surv}}{event/censoring time, of type \code{Surv} (time-to-event)}
+\item{\code{.Surv}}{survival outcome, of type \code{\link[survival:Surv]{survival::Surv}} (time-to-event)}
 \item{\code{.sample_size}}{sample size (\verb{agd_*} only)}
 \item{\code{...}}{other columns (typically covariates) from the original data
 frame}

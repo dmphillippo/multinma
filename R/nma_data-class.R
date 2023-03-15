@@ -34,7 +34,7 @@
 #'   \item{`.r`}{event count (discrete)}
 #'   \item{`.n`}{event count denominator (discrete, `agd_arm` only)}
 #'   \item{`.E`}{time at risk (discrete)}
-##'   \item{`.surv`}{event/censoring time, of type `Surv` (time-to-event)}
+#'   \item{`.Surv`}{survival outcome, of type [`survival::Surv`] (time-to-event)}
 #'   \item{`.sample_size`}{sample size (`agd_*` only)}
 #'   \item{`...`}{other columns (typically covariates) from the original data
 #'   frame}

@@ -8,7 +8,7 @@
 #' @param r column of `data` specifying a binary outcome or Poisson outcome count
 #' @param E column of `data` specifying the total time at risk for Poisson
 #'   outcomes
-# #' @template args-data_Surv
+#' @template args-data_Surv
 #'
 #' @return An object of class [nma_data]
 #' @export
@@ -47,7 +47,7 @@ set_ipd <- function(data,
                     trt,
                     y = NULL,
                     r = NULL, E = NULL,
-                    # Surv = NULL,
+                    Surv = NULL,
                     trt_ref = NULL,
                     trt_class = NULL) {
 
@@ -122,7 +122,7 @@ set_ipd <- function(data,
   .y <- pull_non_null(data, enquo(y))
   .r <- pull_non_null(data, enquo(r))
   .E <- pull_non_null(data, enquo(E))
-  # .Surv <- ...
+  .Surv <- pull_non_null(data, enquo(Surv))
 
   check_outcome_continuous(.y, with_se = FALSE)
 
@@ -143,10 +143,11 @@ set_ipd <- function(data,
     check_outcome_binary(.r, .E)
   }
 
-  # check_outcome_surv(.Surv)
+  check_outcome_survival(.Surv)
 
   o_type <- get_outcome_type(y = .y, se = NULL,
-                             r = .r, n = NULL, E = .E)
+                             r = .r, n = NULL, E = .E,
+                             Surv = .Surv)
 
   # Create tibble in standard format
   d <- tibble::tibble(
@@ -189,6 +190,8 @@ set_ipd <- function(data,
     .r <- unclass(.r)
 
     d <- tibble::add_column(d, .r = .r)
+  } else if (o_type == "survival") {
+    d <- tibble::add_column(d, .Surv = .Surv)
   }
 
   drop_reserved <- setdiff(colnames(data), colnames(d))
@@ -246,7 +249,6 @@ set_ipd <- function(data,
 #' @template args-data_common
 #' @template args-data_se
 #' @template args-data_rE
-# #' @template args-data_Surv
 #' @param n column of `data` specifying Binomial outcome numerator
 #' @param sample_size column of `data` giving the sample size in each arm.
 #'   Optional, see details.
@@ -278,7 +280,6 @@ set_agd_arm <- function(data,
                         trt,
                         y = NULL, se = NULL,
                         r = NULL, n = NULL, E = NULL,
-                        # Surv = NULL,
                         sample_size = NULL,
                         trt_ref = NULL,
                         trt_class = NULL) {
@@ -355,7 +356,6 @@ set_agd_arm <- function(data,
   .r <- pull_non_null(data, enquo(r))
   .n <- pull_non_null(data, enquo(n))
   .E <- pull_non_null(data, enquo(E))
-  # .Surv <- ...
 
   check_outcome_continuous(.y, .se, with_se = TRUE)
 
@@ -366,10 +366,9 @@ set_agd_arm <- function(data,
     check_outcome_count(.r, .n, .E)
   }
 
-  # check_outcome_surv(.Surv)
-
   o_type <- get_outcome_type(y = .y, se = .se,
-                             r = .r, n = .n, E = .E)
+                             r = .r, n = .n, E = .E,
+                             Surv = NULL)
 
   # Pull and check sample size
   .sample_size <- pull_non_null(data, enquo(sample_size))
@@ -645,7 +644,7 @@ set_agd_contrast <- function(data,
     append = " for non-baseline rows (i.e. those specifying contrasts against baseline).")
 
   o_type <- get_outcome_type(y = .y[!bl], se = .se[!bl],
-                             r = NULL, n = NULL, E = NULL)
+                             r = NULL, n = NULL, E = NULL, Surv = NULL)
 
   # Create tibble in standard format
   d <- tibble::tibble(
@@ -1214,7 +1213,7 @@ drop_original <- function(data, orig_data, var) {
 #' Determines outcome type based on which inputs are NA
 #'
 #' @noRd
-get_outcome_type <- function(y, se, r, n, E) {
+get_outcome_type <- function(y, se, r, n, E, Surv) {
   o <- c()
   if (!is.null(y)) o <- c(o, "continuous")
   if (!is.null(r)) {
@@ -1224,6 +1223,7 @@ get_outcome_type <- function(y, se, r, n, E) {
     if (!is.null(n)) o <- c(o, "count")
     if (!inherits(r, c("multi_ordered", "multi_competing")) && is.null(n) && is.null(E)) o <- c(o, "binary")
   }
+  if (!is.null(Surv)) o <- c(o, "survival")
   if (length(o) == 0) abort("Please specify one and only one outcome.")
   if (length(o) > 1) abort(glue::glue("Please specify one and only one outcome, instead of ",
                                       glue::glue_collapse(o, sep = ", ", last = " and "), "."))
@@ -1354,6 +1354,38 @@ check_outcome_binary <- function(r, E) {
   invisible(list(r = r, E = E))
 }
 
+#' Check survival outcomes
+#'
+#' @param Surv vector
+#'
+#' @noRd
+check_outcome_survival <- function(Surv) {
+  if (!is.null(Surv)) {
+
+    if (!survival::is.Surv(Surv)) abort("Survival outcome `Surv` must be a `Surv` object created using `Surv()`")
+
+    stype <- attr(Surv, "type")
+    allowed_stypes <- c("right", "left", "interval", "interval2", "counting")
+    if (!stype %in% allowed_stypes)
+      abort(glue::glue('Survival outcome `Surv` of type "{stype}" is not supported.\n',
+                       "Supported types are ",
+                       glue::glue_collapse(allowed_stypes, sep = ", ", last = " and "), "."))
+
+    status <- Surv[, "status"]
+    times <- Surv[, -ncol(Surv)]
+
+    if (any(is.na(times))) abort("Survival outcome `Surv` contains missing times")
+    if (any(is.infinite(times))) abort("Survival outcome `Surv` contains infinite times")
+    if (any(times <= 0)) abort("Survival outcome `Surv` must have strictly positive outcome times")
+
+    if (any(is.na(status))) abort("Survival outcome `Surv` contains missing event status values")
+    if (!all(status %in% 0:3)) abort("Survival outcome `Surv` event status values must be 0, 1, 2, or 3")
+
+  }
+
+  invisible(list(Surv = Surv))
+}
+
 #' Check valid outcome combination across data sources
 #'
 #' @param outcomes outcome list, see nma_data-class
@@ -1372,7 +1404,10 @@ check_outcome_combination <- function(outcomes) {
          ipd = c("continuous", NA)),
     list(agd_arm = c("ordered", NA),
          agd_contrast = c("continuous", NA),
-         ipd = c("ordered", NA))
+         ipd = c("ordered", NA)),
+    list(agd_arm = c("survival", NA),
+         agd_contrast = c("continuous", NA),
+         ipd = c("survival", NA))
   )
 
   if (!any(purrr::map_lgl(valid,
