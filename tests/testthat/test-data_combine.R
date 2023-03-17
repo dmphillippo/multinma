@@ -361,3 +361,21 @@ test_that("combine_network warns if not all sources have treatment classes", {
                  "Not all data sources have defined treatment classes")
 })
 
+test_that("combine_network works combining survival outcomes from same type of ipd/agd source", {
+  expect_equivalent(combine_network(set_agd_surv(filter(ndmm_agd, study == "Morgan2012"), studyf, trtf,
+                                                 Surv = Surv(eventtime, status),
+                                                 covariates = ndmm_agd_covs),
+                                    set_agd_surv(filter(ndmm_agd, study != "Morgan2012"), studyf, trtf,
+                                                 Surv = Surv(eventtime, status),
+                                                 covariates = ndmm_agd_covs))$agd_arm,
+                    set_agd_surv(ndmm_agd, studyf, trtf,
+                                 Surv = Surv(eventtime, status),
+                                 covariates = ndmm_agd_covs)$agd_arm)
+
+  expect_equivalent(combine_network(set_ipd(filter(ndmm_agd, study == "Morgan2012"), studyf, trtf,
+                                                 Surv = Surv(eventtime, status)),
+                                    set_ipd(filter(ndmm_agd, study != "Morgan2012"), studyf, trtf,
+                                                 Surv = Surv(eventtime, status)))$ipd,
+                    set_ipd(ndmm_agd, studyf, trtf,
+                                 Surv = Surv(eventtime, status))$ipd)
+})
