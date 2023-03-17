@@ -751,7 +751,7 @@ set_agd_contrast <- function(data,
 #'
 #' @template args-data_common
 #' @template args-data_Surv
-#' @param covariates Data frame of covariate summary statistics for each study
+#' @param covariates data frame of covariate summary statistics for each study
 #'   or study arm, with corresponding `study` and `trt` columns to match to
 #'   those in `data`
 #'
