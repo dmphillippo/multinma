@@ -940,6 +940,10 @@ set_agd_surv <- function(data,
                             multiple = "first",
                             unmatched = c("error", "drop")),
           error = function(e) abort("Not all study arms in `data` have matching rows in `covariates`", parent = e))
+
+    # Re-drop factors, in case extra unneeded trt/study rows included in covariate data
+    d$.trt <- forcats::fct_drop(d$.trt)
+    d$.study <- forcats::fct_drop(d$.study)
   }
 
   # Produce nma_data object
