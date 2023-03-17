@@ -351,6 +351,49 @@ test_that("set_ipd - survival outcome checks work", {
   expect_error(suppressWarnings(set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, cont_pos*2, bin*5, type = "interval"))), "missing event status values")
 })
 
+test_that("set_agd_surv - survival outcome checks work", {
+  expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = trtc), "must be a `Surv` object")
+  expect_equivalent(
+    tidyr::unnest(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, bin))$agd_arm, ".Surv")$.Surv,
+    with(agd_arm, Surv(cont_pos, bin)))
+
+  expect_equivalent(
+    tidyr::unnest(set_agd_surv(ndmm_agd, studyf, trtf, Surv = Surv(eventtime, status))$agd_arm, ".Surv")$.Surv,
+    with(ndmm_agd, Surv(eventtime, status)))
+  expect_equivalent(
+    tidyr::unnest(set_agd_surv(ndmm_agd, studyf, trtf,
+                               Surv = Surv(eventtime, status),
+                               covariates = ndmm_agd_covs)$agd_arm, ".Surv")$.Surv,
+    with(ndmm_agd, Surv(eventtime, status)))
+
+  expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, bin, type = "mstate")), 'type "mright" is not supported')
+
+  expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_neg, bin)), "must have strictly positive outcome times")
+  expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_inf, bin)), "infinite times")
+  expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_nan, bin)), "missing times")
+
+  expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, rep_len(c(0, 1, NA), nrow(agd_arm)))), "missing event status values")
+  expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv("a", bin)), "not numeric")
+  expect_error(suppressWarnings(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, cont_pos/2, bin))), "missing times")
+  expect_error(suppressWarnings(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, cont_pos*2, bin*5, type = "interval"))), "missing event status values")
+})
+
+test_that("set_agd_surv - covariate checks work", {
+  expect_error(set_agd_surv(ndmm_agd, studyf, trtf, Surv = Surv(eventtime, status), covariates = list()), "should be a data frame")
+
+  expect_equivalent(
+    dplyr::select(set_agd_surv(ndmm_agd, studyf, trtf, Surv = Surv(eventtime, status),
+                                  covariates = ndmm_agd_covs)$agd_arm,
+                     study, trt, sample_size = .sample_size,
+                     age_min:male) %>%
+      dplyr::arrange(study, trt),
+    dplyr::select(ndmm_agd_covs, -studyf, -trtf))
+
+  expect_error(set_agd_surv(ndmm_agd, studyf, trtf, Surv = Surv(eventtime, status),
+                            covariates = ndmm_agd_covs[-1,]),
+               "Not all study arms in `data` have matching rows in `covariates`")
+})
+
 # Dummy contrast data
 agd_contrast <- agd_arm %>%
   group_by(studyn) %>%
