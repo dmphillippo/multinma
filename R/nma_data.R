@@ -4,6 +4,7 @@
 #' sources may be combined once created using [combine_network()].
 #'
 #' @template args-data_common
+#' @template args-data_y
 # #' @template args-data_rE
 #' @param r column of `data` specifying a binary outcome or Poisson outcome count
 #' @param E column of `data` specifying the total time at risk for Poisson
@@ -247,6 +248,7 @@ set_ipd <- function(data,
 #' once created using [combine_network()].
 #'
 #' @template args-data_common
+#' @template args-data_y
 #' @template args-data_se
 #' @template args-data_rE
 #' @param n column of `data` specifying Binomial outcome numerator
@@ -481,6 +483,7 @@ set_agd_arm <- function(data,
 #' Multiple data sources may be combined once created using [combine_network()].
 #'
 #' @template args-data_common
+#' @template args-data_y
 #' @template args-data_se
 #' @param sample_size column of `data` giving the sample size in each arm.
 #'   Optional, see details.

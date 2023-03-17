@@ -27,7 +27,7 @@ strings, or factors}
 using the \code{\link[=Surv]{Surv()}} function. Right/left/interval censoring and left
 truncation (delayed entry) are supported.}
 
-\item{covariates}{Data frame of covariate summary statistics for each study
+\item{covariates}{data frame of covariate summary statistics for each study
 or study arm, with corresponding \code{study} and \code{trt} columns to match to
 those in \code{data}}
 
@@ -37,8 +37,6 @@ will be chosen (see details).}
 
 \item{trt_class}{column of \code{data} specifying treatment classes, coded using
 integers, strings, or factors. By default, no classes are specified.}
-
-\item{y}{column of \code{data} specifying a continuous outcome}
 }
 \value{
 An object of class \link{nma_data}
