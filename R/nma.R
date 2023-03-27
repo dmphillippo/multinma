@@ -451,11 +451,33 @@ nma <- function(network,
 
     y_agd_arm <- get_outcome_variables(dat_agd_arm, network$outcome$agd_arm)
 
+    # Unnest survival data
+    if (network$outcome$agd_arm == "survival") {
+      y_agd_arm <- tidyr::unnest(y_agd_arm, cols = ".Surv")
+    }
+
     # Set up integration variables if present
     if (use_int) {
-      idat_agd_arm <- .unnest_integration(dat_agd_arm)
+      if (network$outcome$agd_arm == "survival") {
+        idat_agd_arm <- dat_agd_arm %>%
+          # Drop duplicated names in outer dataset from .data_orig before unnesting
+          dplyr::mutate(.data_orig = purrr::map(.data_orig, ~ dplyr::select(., -dplyr::any_of(names(dat_agd_arm))))) %>%
+          # Unnest - should have n_int contiguous rows for each survival time
+          tidyr::unnest(cols = c(".Surv", ".data_orig")) %>%
+          .unnest_integration()
+      } else {
+        idat_agd_arm <- .unnest_integration(dat_agd_arm)
+      }
     } else {
-      idat_agd_arm <- dat_agd_arm
+      if (network$outcome$agd_arm == "survival") {
+        idat_agd_arm <- dat_agd_arm %>%
+          # Drop duplicated names in outer dataset from .data_orig before unnesting
+          dplyr::mutate(.data_orig = purrr::map(.data_orig, ~ dplyr::select(., -dplyr::any_of(names(dat_agd_arm))))) %>%
+          # Unnest - should have one row for each survival time
+          tidyr::unnest(cols = c(".Surv", ".data_orig"))
+      } else {
+        idat_agd_arm <- dat_agd_arm
+      }
     }
 
     # Only take necessary columns
@@ -1669,7 +1691,8 @@ get_outcome_variables <- function(x, o_type) {
     rate = c(".r", ".E"),
     count = c(".r", ".n"),
     continuous = c(".y", ".se"),
-    ordered = ".r"
+    ordered = ".r",
+    survival = ".Surv"
   )[[o_type]]
 
   return(
