@@ -563,9 +563,15 @@ nma <- function(network,
     }
 
     # Apply weights across integration points
-    wts <- c(rep(1, nrow(dat_ipd)),
-             rep(N_agd_arm / n_int, each = n_int),
-             rep(N_agd_contrast / n_int, each = n_int))
+    if (network$outcome$agd_arm == "survival") {
+      wts <- c(rep(1, nrow(dat_ipd)),
+               rep(1 / n_int, nrow(idat_agd_arm)),
+               rep(N_agd_contrast / n_int, each = n_int))
+    } else {
+      wts <- c(rep(1, nrow(dat_ipd)),
+               rep(N_agd_arm / n_int, each = n_int),
+               rep(N_agd_contrast / n_int, each = n_int))
+    }
 
     # Center numeric columns used in regression model
     reg_names <- all.vars(regression)
