@@ -84,6 +84,7 @@
 #'   | \strong{Rate}      | `poisson`    | `log`
 #'   | \strong{Continuous}| `normal`     | `identity`, `log`
 #'   | \strong{Ordered}   | `ordered`    | `logit`, `probit`, `cloglog`
+#'   | \strong{Survival}  | `exponential`, `weibull`, `gompertz`, `mspline`, `pexp` | `log`
 #'
 #'   The `bernoulli2` and `binomial2` likelihoods correspond to a two-parameter
 #'   Binomial likelihood for arm-based AgD, which more closely matches the

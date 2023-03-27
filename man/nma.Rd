@@ -133,6 +133,7 @@ each data type:\tabular{lll}{
    \strong{Rate} \tab \code{poisson} \tab \code{log} \cr
    \strong{Continuous} \tab \code{normal} \tab \code{identity}, \code{log} \cr
    \strong{Ordered} \tab \code{ordered} \tab \code{logit}, \code{probit}, \code{cloglog} \cr
+   \strong{Survival} \tab \code{exponential}, \code{weibull}, \code{gompertz}, \code{mspline}, \code{pexp} \tab \code{log} \cr
 }
 
 
