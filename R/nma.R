@@ -1460,7 +1460,9 @@ check_likelihood <- function(x, outcome) {
                       count = c("binomial", "binomial2"),
                       rate = "poisson",
                       continuous = "normal",
-                      ordered = "ordered")
+                      ordered = "ordered",
+                      survival = c("exponential", "weibull", "gompertz",
+                                   "mspline", "pexp"))
 
   if (missing(outcome)) valid_lhood <- unlist(valid_lhood)
   else if (!is.na(outcome$ipd)) {
@@ -1503,7 +1505,8 @@ check_link <- function(x, lik) {
                      binomial = c("logit", "probit", "cloglog"),
                      binomial2 = c("logit", "probit", "cloglog"),
                      poisson = "log",
-                     ordered = c("logit", "probit", "cloglog"))[[lik]]
+                     ordered = c("logit", "probit", "cloglog"),
+                     survival = "log")[[lik]]
 
   if (is.null(x)) {
     x <- valid_link[1]
@@ -1567,7 +1570,7 @@ link_fun <- function(x, link = c("identity", "log", "logit", "probit", "cloglog"
 #' @noRd
 get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
                                           "binomial", "binomial2", "poisson",
-                                          "ordered"),
+                                          "ordered", "survival"),
                            link = c("identity", "log", "logit", "probit", "cloglog"),
                            measure = c("relative", "absolute"),
                            type = c("link", "response")) {
@@ -1635,6 +1638,15 @@ get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
         if (type == "link") out <- "log Rate"
         else out <- "Rate"
       }
+    }
+
+  } else if (likelihood %in% c("exponential", "weibull", "gompertz", "mspline", "pexp")) {
+
+    if (measure == "relative") {
+      out <- "log Hazard Ratio"
+    } else if (measure == "absolute") {
+      if (type == "link") out <- "log Hazard"
+      else out <- "Hazard"
     }
 
   } else {
