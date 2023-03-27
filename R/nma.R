@@ -1535,7 +1535,11 @@ check_link <- function(x, lik) {
                      binomial2 = c("logit", "probit", "cloglog"),
                      poisson = "log",
                      ordered = c("logit", "probit", "cloglog"),
-                     survival = "log")[[lik]]
+                     exponential = "log",
+                     weibull = "log",
+                     gompertz = "log",
+                     mspline = "log",
+                     pexp = "log")[[lik]]
 
   if (is.null(x)) {
     x <- valid_link[1]
