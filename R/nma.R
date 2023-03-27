@@ -2092,6 +2092,10 @@ get_model_data_columns <- function(data, regression = NULL, label = NULL) {
   } else {
     out <- dplyr::select(data, dplyr::starts_with("."))
   }
+
+  # Work around dplyr::bind_rows() bug - convert .Surv column to bare matrix if present
+  if (rlang::has_name(out, ".Surv")) out$.Surv <- as.matrix(out$.Surv)
+
   return(out)
 }
 
