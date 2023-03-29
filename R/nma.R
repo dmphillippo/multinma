@@ -981,6 +981,9 @@ nma.fit <- function(ipd_x, ipd_y,
              length(adapt_delta) > 1 ||
              adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
+  # Is this a survival outcome?
+  is_survival <- likelihood %in% valid_lhood$survival
+
   # Pull study and treatment details from *_x
   if (has_ipd) x_names <- colnames(ipd_x)
   else if (has_agd_arm) x_names <- colnames(agd_arm_x)
@@ -1016,9 +1019,19 @@ nma.fit <- function(ipd_x, ipd_y,
     aa1 <- 0:(ni_agd_arm - 1)*n_int + 1
     agd_arm_study <- apply(agd_arm_x[aa1, col_study, drop = FALSE], 1, get_study)
     agd_arm_trt <- apply(agd_arm_x[aa1, col_trt, drop = FALSE], 1, get_trt)
+
+    if (!is_survival) {
+      narm_agd_arm <- ni_agd_arm
+    } else {
+      agd_arm_s_t_all <- dplyr::tibble(.study = agd_arm_study, .trt = agd_arm_trt)
+      agd_arm_s_t <- dplyr::distinct(agd_arm_s_t_all) %>% dplyr::mutate(.arm = 1:dplyr::n())
+      agd_arm_arm <-  dplyr::left_join(agd_arm_s_t_all, agd_arm_s_t, by = c(".study", ".trt")) %>% dplyr::pull(.data$.arm)
+      narm_agd_arm <- max(agd_arm_arm)
+    }
+
   } else {
     agd_arm_study <- agd_arm_trt <- numeric()
-    ni_agd_arm <- 0
+    ni_agd_arm <- narm_agd_arm <- 0
   }
 
   if (has_agd_contrast) {
@@ -1107,6 +1120,7 @@ nma.fit <- function(ipd_x, ipd_y,
     narm_ipd = narm_ipd,
     ipd_arm = ipd_arm,
     ipd_trt = ipd_trt,
+    narm_agd_arm = narm_agd_arm,
     agd_arm_trt = agd_arm_trt,
     agd_contrast_trt = as.array(agd_contrast_trt),
     agd_contrast_trt_b = as.array(agd_contrast_trt_b),
@@ -1478,6 +1492,16 @@ which_RE <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
   return(id)
 }
 
+#' List of valid likelihoods for different outcomes
+#' @noRd
+valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
+                    count = c("binomial", "binomial2"),
+                    rate = "poisson",
+                    continuous = "normal",
+                    ordered = "ordered",
+                    survival = c("exponential", "weibull", "gompertz",
+                                 "mspline", "pexp"))
+
 #' Check likelihood function, or provide default value
 #'
 #' @param x likelihood type as string
@@ -1485,14 +1509,6 @@ which_RE <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
 #'
 #' @noRd
 check_likelihood <- function(x, outcome) {
-  valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
-                      count = c("binomial", "binomial2"),
-                      rate = "poisson",
-                      continuous = "normal",
-                      ordered = "ordered",
-                      survival = c("exponential", "weibull", "gompertz",
-                                   "mspline", "pexp"))
-
   if (missing(outcome)) valid_lhood <- unlist(valid_lhood)
   else if (!is.na(outcome$ipd)) {
     valid_lhood <- valid_lhood[[outcome$ipd]]

@@ -83,9 +83,9 @@ if (nint > 1) {
       X_agd_contrast * beta_tilde;
 
     for (i in 1:ni_agd_contrast) {
-      if (which_RE[narm_ipd + ni_agd_arm + i])
+      if (which_RE[narm_ipd + narm_agd_arm + i])
         eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] =
-          eta_agd_contrast_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + ni_agd_arm + i]];
+          eta_agd_contrast_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + narm_agd_arm + i]];
       else
         eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] =
           eta_agd_contrast_noRE[(1 + (i-1)*nint):(i*nint)];
@@ -108,8 +108,8 @@ if (nint > 1) {
       X_agd_contrast * beta_tilde;
 
     for (i in 1:ni_agd_contrast) {
-      if (which_RE[narm_ipd + ni_agd_arm + i])
-        eta_agd_contrast_bar[i] = eta_agd_contrast_noRE[i] + f_delta[which_RE[narm_ipd + ni_agd_arm + i]];
+      if (which_RE[narm_ipd + narm_agd_arm + i])
+        eta_agd_contrast_bar[i] = eta_agd_contrast_noRE[i] + f_delta[which_RE[narm_ipd + narm_agd_arm + i]];
     else
       eta_agd_contrast_bar[i] = eta_agd_contrast_noRE[i];
     }

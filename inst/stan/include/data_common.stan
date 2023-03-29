@@ -12,7 +12,8 @@ int<lower=0> ni_agd_contrast; // total number of AgD (contrast-based) data point
 int<lower=0> narm_ipd; // Number of IPD arms
 int<lower=1> ipd_arm[ni_ipd]; // Arm indicator for IPD (i.e. picking element of which_RE)
 int<lower=1> ipd_trt[narm_ipd];
-int<lower=1> agd_arm_trt[ni_agd_arm];
+int<lower=0> narm_agd_arm;
+int<lower=1> agd_arm_trt[narm_agd_arm];
 int<lower=1> agd_contrast_trt[ni_agd_contrast];
 int<lower=1> agd_contrast_trt_b[ni_agd_contrast];
 
@@ -43,7 +44,7 @@ vector[has_offset ? ni_ipd + nint * (ni_agd_arm + ni_agd_contrast) : 0] offsets;
 
 // -- Random effects --
 int<lower=0, upper=1> RE; // Random effects flag (yes = 1)
-int<lower=0> which_RE[RE ? narm_ipd + ni_agd_arm + ni_agd_contrast : 0]; // ID of RE delta for each arm (0 for no RE delta)
+int<lower=0> which_RE[RE ? narm_ipd + narm_agd_arm + ni_agd_contrast : 0]; // ID of RE delta for each arm (0 for no RE delta)
 corr_matrix[RE ? max(which_RE) : 1] RE_cor; // RE correlation matrix
 
 // -- Node-splitting --
