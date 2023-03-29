@@ -440,7 +440,7 @@ nma <- function(network,
                                       regression = regression,
                                       label = "IPD")
 
-    y_ipd <- get_outcome_variables(dat_ipd, network$outcome$ipd)
+    y_ipd <- get_outcome_variables(network$ipd, network$outcome$ipd)
   } else {
     dat_ipd <- tibble::tibble()
     y_ipd <- NULL
@@ -1343,6 +1343,132 @@ nma.fit <- function(ipd_x, ipd_y,
                                    object = stanmodels$ordered_multinomial,
                                    data = standat,
                                    pars = c(pars, "cc"))
+
+  # -- Parametric survival likelihoods
+  } else if (likelihood %in% setdiff(valid_lhood$survival, c("mspline", "pexp"))) {
+
+    # Pull out Surv data
+    if (has_ipd) {
+
+      ipd_surv_type <- attr(ipd_y$.Surv, "type")
+
+      ipd_status <- ipd_y$.Surv[, "status"]
+
+      if (ipd_surv_type == "right") {
+        # Right censored
+        ipd_time <- ipd_y$.Surv[, "time"]
+        ipd_start_time <- ipd_delay_time <- rep(0, length(ipd_time))
+
+      } else if (ipd_surv_type == "left") {
+        # Left censored
+        ipd_time <- ipd_y$.Surv[, "time"]
+        ipd_start_time <- ipd_delay_time <- rep(0, length(ipd_time))
+
+        # Make status indicator consistent with other types (i.e. left censored = 2)
+        ipd_status[ipd_status == 0] <- 2
+
+      } else if (ipd_surv_type %in% c("interval", "interval2")) {
+        # Interval censored
+        ipd_time <- ipd_start_time <- rep(0, length(ipd_time))
+
+        # time1 is used unless status = 3 (interval censored)
+        ipd_time[ipd_status < 3] <- ipd_y$.Surv[, "time1"]
+        ipd_time[ipd_status == 3] <- ipd_y$.Surv[, "time2"]
+        ipd_start_time[ipd_status == 3] <- ipd_y$.Surv[, "time1"]
+
+        ipd_delay_time <- rep(0, length(ipd_time))
+
+      } else if (ipd_surv_type == "counting") {
+        # Delayed entry
+        ipd_time <- ipd_y$.Surv[, "stop"]
+        ipd_delay_time <- ipd_y$.Surv[, "start"]
+        ipd_start_time <- rep(0, length(ipd_time))
+      }
+    } else {
+      ipd_time <- ipd_start_time <- ipd_delay_time <- numeric()
+      ipd_status <- integer()
+    }
+
+    if (has_agd_arm) {
+
+      agd_arm_surv_type <- attr(agd_arm_y$.Surv, "type")
+
+      agd_arm_status <- agd_arm_y$.Surv[, "status"]
+
+      if (agd_arm_surv_type == "right") {
+        # Right censored
+        agd_arm_time <- agd_arm_y$.Surv[, "time"]
+        agd_arm_start_time <- agd_arm_delay_time <- rep(0, length(agd_arm_time))
+
+      } else if (agd_arm_surv_type == "left") {
+        # Left censored
+        agd_arm_time <- agd_arm_y$.Surv[, "time"]
+        agd_arm_start_time <- agd_arm_delay_time <- rep(0, length(agd_arm_time))
+
+        # Make status indicator consistent with other types (i.e. left censored = 2)
+        agd_arm_status[agd_arm_status == 0] <- 2
+
+      } else if (agd_arm_surv_type %in% c("interval", "interval2")) {
+        # Interval censored
+        agd_arm_time <- agd_arm_start_time <- rep(0, length(agd_arm_time))
+
+        # time1 is used unless status = 3 (interval censored)
+        agd_arm_time[agd_arm_status < 3] <- agd_arm_y$.Surv[, "time1"]
+        agd_arm_time[agd_arm_status == 3] <- agd_arm_y$.Surv[, "time2"]
+        agd_arm_start_time[agd_arm_status == 3] <- agd_arm_y$.Surv[, "time1"]
+
+        agd_arm_delay_time <- rep(0, length(agd_arm_time))
+
+      } else if (agd_arm_surv_type == "counting") {
+        # Delayed entry
+        agd_arm_time <- agd_arm_y$.Surv[, "stop"]
+        agd_arm_delay_time <- agd_arm_y$.Surv[, "start"]
+        agd_arm_start_time <- rep(0, length(agd_arm_time))
+      }
+    } else {
+      agd_arm_time <- agd_arm_start_time <- agd_arm_delay_time <- numeric()
+      agd_arm_status <- integer()
+    }
+
+    standat <- purrr::list_modify(standat,
+                                  # AgD arm IDs
+                                  agd_arm_arm = agd_arm_arm,
+
+                                  # Study IDs for shape parameters
+                                  study = c(ipd_study, agd_arm_study),
+
+                                  # Add outcomes
+                                  ipd_time = ipd_time,
+                                  ipd_start_time = ipd_start_time,
+                                  ipd_delay_time = ipd_delay_time,
+                                  ipd_status = ipd_status,
+
+                                  agd_arm_time = agd_arm_time,
+                                  agd_arm_start_time = agd_arm_start_time,
+                                  agd_arm_delay_time = agd_arm_delay_time,
+                                  agd_arm_status = agd_arm_status,
+
+                                  # Specify survival distribution
+                                  dist = switch(likelihood,
+                                                exponential = 1,
+                                                weibull = 2,
+                                                gompertz = 3),
+
+                                  # Specify link
+                                  link = switch(link, log = 1),
+
+                                  # Specify prior on shape parameters
+                                  !!! prior_standat(prior_aux, "prior_aux",
+                                                    valid = c("Normal", "half-Normal", "log-Normal",
+                                                              "Cauchy",  "half-Cauchy",
+                                                              "Student t", "half-Student t", "log-Student t",
+                                                              "Exponential", "flat (implicit)"))
+    )
+
+    stanargs <- purrr::list_modify(stanargs,
+                                   object = stanmodels$survival_param,
+                                   data = standat,
+                                   pars = pars)
 
   } else {
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
