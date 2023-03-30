@@ -1026,6 +1026,8 @@ nma.fit <- function(ipd_x, ipd_y,
       agd_arm_s_t_all <- dplyr::tibble(.study = agd_arm_study, .trt = agd_arm_trt)
       agd_arm_s_t <- dplyr::distinct(agd_arm_s_t_all) %>% dplyr::mutate(.arm = 1:dplyr::n())
       agd_arm_arm <-  dplyr::left_join(agd_arm_s_t_all, agd_arm_s_t, by = c(".study", ".trt")) %>% dplyr::pull(.data$.arm)
+      agd_arm_study <- agd_arm_s_t$.study
+      agd_arm_trt <- agd_arm_s_t$.trt
       narm_agd_arm <- max(agd_arm_arm)
     }
 

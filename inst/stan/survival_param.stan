@@ -125,7 +125,7 @@ data {
   int<lower=0, upper=3> agd_arm_status[ni_agd_arm];
 
   // Study IDs for independent shape parameters
-  int<lower=1> study[ni_ipd + ni_agd_arm];
+  int<lower=1> study[narm_ipd + narm_agd_arm];
 }
 transformed data {
   // Exponential model indicator, 0 = exponential
@@ -157,7 +157,7 @@ transformed parameters {
 #include /include/transformed_parameters_common.stan
 
   // -- IPD model --
-  if (dist == 2) eta_ipd = eta_ipd ./ shape[study[1:ni_ipd]]; // Weibull linear predictor
+  if (dist == 2) eta_ipd = eta_ipd ./ shape[study[ipd_arm]]; // Weibull linear predictor
 
   // Evaluate log likelihood
   for (i in 1:ni_ipd) {
@@ -167,7 +167,7 @@ transformed parameters {
                           ipd_delay_time[i],
                           ipd_status[i],
                           exp(eta_ipd[i]),
-                          shape[study[i]]);
+                          shape[study[ipd_arm[i]]]);
   }
 
   // -- AgD model (arm-based) --
@@ -189,7 +189,7 @@ transformed parameters {
         if (RE && which_RE[narm_ipd + agd_arm_arm[i]]) eta_agd_arm_ii += f_delta[which_RE[narm_ipd + agd_arm_arm[i]]];
 
         // Weibull linear predictor
-        if (dist == 2) eta_agd_arm_ii = eta_agd_arm_ii / shape[study[ni_ipd + i]];
+        if (dist == 2) eta_agd_arm_ii = eta_agd_arm_ii / shape[study[narm_ipd + agd_arm_arm[i]]];
 
         // Average likelihood over integration points
         // NOTE: Normalising term (dividing by nint) omitted as this is constant
@@ -200,7 +200,7 @@ transformed parameters {
                                agd_arm_delay_time[i],
                                agd_arm_status[i],
                                exp(eta_agd_arm_ii[j]),
-                               shape[study[ni_ipd + i]]);
+                               shape[study[narm_ipd + agd_arm_arm[i]]]);
         }
 
         log_L_agd_arm[i] = log_sum_exp(log_L_ii);
@@ -213,7 +213,7 @@ transformed parameters {
         if (RE && which_RE[narm_ipd + agd_arm_arm[i]]) eta_agd_arm += f_delta[which_RE[narm_ipd + agd_arm_arm[i]]];
 
         // Weibull linear predictor
-        if (dist == 2) eta_agd_arm = eta_agd_arm / shape[study[ni_ipd + i]];
+        if (dist == 2) eta_agd_arm = eta_agd_arm / shape[study[narm_ipd + agd_arm_arm[i]]];
 
         log_L_agd_arm[i] = loglik(dist,
                                   agd_arm_time[i],
@@ -221,7 +221,7 @@ transformed parameters {
                                   agd_arm_delay_time[i],
                                   agd_arm_status[i],
                                   exp(eta_agd_arm),
-                                  shape[study[ni_ipd + i]]);
+                                  shape[study[narm_ipd + agd_arm_arm[i]]]);
       }
     }
   }
