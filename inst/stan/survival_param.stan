@@ -167,7 +167,7 @@ transformed parameters {
                           ipd_delay_time[i],
                           ipd_status[i],
                           exp(eta_ipd[i]),
-                          shape[study[ipd_arm[i]]]);
+                          nonexp ? shape[study[ipd_arm[i]]] : 0);
   }
 
   // -- AgD model (arm-based) --
@@ -200,7 +200,7 @@ transformed parameters {
                                agd_arm_delay_time[i],
                                agd_arm_status[i],
                                exp(eta_agd_arm_ii[j]),
-                               shape[study[narm_ipd + agd_arm_arm[i]]]);
+                               nonexp ? shape[study[narm_ipd + agd_arm_arm[i]]] : 0);
         }
 
         log_L_agd_arm[i] = log_sum_exp(log_L_ii);
@@ -221,7 +221,7 @@ transformed parameters {
                                   agd_arm_delay_time[i],
                                   agd_arm_status[i],
                                   exp(eta_agd_arm),
-                                  shape[study[narm_ipd + agd_arm_arm[i]]]);
+                                  nonexp ? shape[study[narm_ipd + agd_arm_arm[i]]] : 0);
       }
     }
   }
