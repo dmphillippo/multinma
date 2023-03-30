@@ -1183,7 +1183,7 @@ nma.fit <- function(ipd_x, ipd_y,
   }
 
   # Monitor cumulative integration error if using numerical integration
-  if (n_int > 1) {
+  if (n_int > 1 && !is_survival) {
     if (has_agd_arm) pars <- c(pars, "theta_bar_cum_agd_arm")
     if (has_agd_contrast) pars <- c(pars, "theta_bar_cum_agd_contrast")
   }
