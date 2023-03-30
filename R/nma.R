@@ -1032,7 +1032,7 @@ nma.fit <- function(ipd_x, ipd_y,
     }
 
   } else {
-    agd_arm_study <- agd_arm_trt <- numeric()
+    agd_arm_study <- agd_arm_trt <- agd_arm_arm <- numeric()
     ni_agd_arm <- narm_agd_arm <- 0
   }
 
