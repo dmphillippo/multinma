@@ -242,19 +242,15 @@ generated quantities {
   // Transform intercepts back to scales
   vector[ns_ipd + ns_agd_arm] scale = exp(mu);
 
-#include /include/generated_quantities_theta_fitted.stan
 #include /include/generated_quantities_common.stan
 
   // Log likelihood
   log_lik[1:ni_ipd] = log_L_ipd;
   log_lik[(ni_ipd + 1):(ni_ipd + ni_agd_arm)] = log_L_agd_arm - log(nint);
 
-  // Residual deviance and fitted values
+  // Residual deviance
+  // NOTE: This is actually just the deviance, which is fine for relative fit model comparison
+  resdev[1:(ni_ipd + ni_agd_arm)] = -2 * log_lik[1:(ni_ipd + ni_agd_arm)];
 
-  // resdev[1:ni_ipd]
-  // resdev[(ni_ipd + 1):(ni_ipd + ni_agd)]
-  // fitted_ipd
-  // fitted_agd_arm
-
-
+  // Fitted values not implemented
 }
