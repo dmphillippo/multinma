@@ -1470,7 +1470,7 @@ nma.fit <- function(ipd_x, ipd_y,
     stanargs <- purrr::list_modify(stanargs,
                                    object = stanmodels$survival_param,
                                    data = standat,
-                                   pars = pars)
+                                   pars = c(pars, "shape", "scale"))
 
   } else {
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
@@ -1492,6 +1492,11 @@ nma.fit <- function(ipd_x, ipd_y,
     if (has_ipd) l_cat <- colnames(ipd_y$.r)[-1]
     else if (has_agd_arm) l_cat <- colnames(agd_arm_y$.r)[-1]
     fnames_oi[grepl("^cc\\[[0-9]+\\]$", fnames_oi)] <- paste0("cc[", l_cat, "]")
+  } else if (likelihood %in% c("weibull", "gompertz")) {
+    fnames_oi[grepl("^shape\\[[0-9]+\\]$", fnames_oi)] <- paste0("shape[", x_names_sub[col_study], "]")
+    fnames_oi[grepl("^scale\\[[0-9]+\\]$", fnames_oi)] <- paste0("scale[", x_names_sub[col_study], "]")
+  } else if (likelihood == "exponential") {
+    fnames_oi[grepl("^scale\\[[0-9]+\\]$", fnames_oi)] <- paste0("scale[", x_names_sub[col_study], "]")
   }
 
   stanfit@sim$fnames_oi <- fnames_oi
