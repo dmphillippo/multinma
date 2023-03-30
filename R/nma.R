@@ -1168,8 +1168,8 @@ nma.fit <- function(ipd_x, ipd_y,
             "log_lik", "resdev",
             "lp__")
 
-  if (has_ipd) pars <- c(pars, "fitted_ipd")
-  if (has_agd_arm) pars <- c(pars, "fitted_agd_arm")
+  if (has_ipd && !is_survival) pars <- c(pars, "fitted_ipd")
+  if (has_agd_arm && !is_survival) pars <- c(pars, "fitted_agd_arm")
   if (has_agd_contrast) pars <- c(pars, "fitted_agd_contrast")
 
   # Monitor heterogeneity SD and study deltas if RE model
