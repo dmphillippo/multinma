@@ -353,7 +353,8 @@ nma <- function(network,
   link <- check_link(link, likelihood)
 
   # When are priors on auxiliary parameters required?
-  has_aux <- (likelihood == "normal" && has_ipd(network)) || likelihood == "ordered"
+  has_aux <- (likelihood == "normal" && has_ipd(network)) ||
+              likelihood %in% c("ordered", "weibull", "gompertz")
 
   # Are study intercepts present? Not if only contrast data
   has_intercepts <- has_agd_arm(network) || has_ipd(network)
@@ -382,6 +383,8 @@ nma <- function(network,
     if (likelihood == "normal" && has_ipd(network)) {
       prior_aux <- .default(half_normal(scale = 5))
     } else if (likelihood == "ordered") {
+      prior_aux <- .default(flat())
+    } else if (likelihood %in% c("weibull", "gompertz")) {
       prior_aux <- .default(flat())
     }
     prior_defaults$prior_aux <- get_prior_call(prior_aux)
