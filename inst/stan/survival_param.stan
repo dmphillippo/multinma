@@ -12,9 +12,9 @@ functions {
 
     } else if (dist == 2) { // Weibull
       if (log_ == 0) {
-        S = exp(-pow(y * rate, shape));
+        S = exp(-pow(y, shape) * rate);
       } else {
-        S = -pow(y * rate, shape);
+        S = -pow(y, shape) * rate;
       }
 
     } else if (dist == 3) { // Gompertz
@@ -38,9 +38,9 @@ functions {
 
     } else if (dist == 2) { // Weibull
       if (log_ == 0) {
-        h = shape * rate * pow(y * rate, shape - 1);
+        h = shape * rate * pow(y, shape - 1);
       } else {
-        h = log(shape) + log(rate) + lmultiply(y * rate, shape - 1);
+        h = log(shape) + log(rate) + lmultiply(y, shape - 1);
       }
     } else if (dist == 3) { // Gompertz
       if (log_ == 0) h = rate * exp(shape * y);
@@ -156,9 +156,6 @@ transformed parameters {
 
 #include /include/transformed_parameters_common.stan
 
-  // -- IPD model --
-  if (dist == 2) eta_ipd = eta_ipd ./ shape[study[ipd_arm]]; // Weibull linear predictor
-
   // Evaluate log likelihood
   for (i in 1:ni_ipd) {
     log_L_ipd[i] = loglik(dist,
@@ -188,9 +185,6 @@ transformed parameters {
         // Random effects
         if (RE && which_RE[narm_ipd + agd_arm_arm[i]]) eta_agd_arm_ii += f_delta[which_RE[narm_ipd + agd_arm_arm[i]]];
 
-        // Weibull linear predictor
-        if (dist == 2) eta_agd_arm_ii = eta_agd_arm_ii / shape[study[narm_ipd + agd_arm_arm[i]]];
-
         // Average likelihood over integration points
         // NOTE: Normalising term (dividing by nint) omitted as this is constant
         for (j in 1:nint) {
@@ -211,9 +205,6 @@ transformed parameters {
 
         // Random effects
         if (RE && which_RE[narm_ipd + agd_arm_arm[i]]) eta_agd_arm += f_delta[which_RE[narm_ipd + agd_arm_arm[i]]];
-
-        // Weibull linear predictor
-        if (dist == 2) eta_agd_arm = eta_agd_arm / shape[study[narm_ipd + agd_arm_arm[i]]];
 
         log_L_agd_arm[i] = loglik(dist,
                                   agd_arm_time[i],
