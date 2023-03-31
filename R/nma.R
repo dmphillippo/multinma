@@ -695,7 +695,17 @@ nma <- function(network,
 
   # Labels for fitted values
   ipd_data_labels <- if (has_ipd(network)) make_data_labels(dat_ipd$.study, dat_ipd$.trt) else NULL
-  agd_arm_data_labels <- if (has_agd_arm(network)) make_data_labels(dat_agd_arm$.study, dat_agd_arm$.trt) else NULL
+
+  if (has_agd_arm(network)) {
+    if (network$outcome$agd_arm != "survival") {
+      agd_arm_data_labels <-  make_data_labels(dat_agd_arm$.study, dat_agd_arm$.trt)
+    } else {
+      agd_arm_data_labels <-  make_data_labels(rep(dat_agd_arm$.study, times = dat_agd_arm$.sample_size),
+                                               rep(dat_agd_arm$.trt, times = dat_agd_arm$.sample_size))
+    }
+  } else {
+    agd_arm_data_labels <- NULL
+  }
 
   if (has_agd_contrast(network)) {
     dat_agd_contrast_nonbl <-
@@ -749,7 +759,7 @@ nma <- function(network,
       } else {
         ipd_delta_labels <- NULL
       }
-      agd_arm_delta_labels <- agd_arm_data_labels
+      agd_arm_delta_labels <- make_data_labels(dat_agd_arm$.study, dat_agd_arm$.trt)
     }
 
     agd_contrast_delta_labels <- agd_contrast_data_labels
