@@ -273,7 +273,11 @@ plot_prior_posterior <- function(x, ...,
                                            trt = "d",
                                            het = "tau",
                                            reg = "beta",
-                                           aux = switch(x$likelihood, normal = "sigma", ordered = "cc")))
+                                           aux = switch(x$likelihood,
+                                                        normal = "sigma",
+                                                        ordered = "cc",
+                                                        weibull = "shape",
+                                                        gompertz = "shape")))
 
   # Add in omega parameter if node-splitting model, which uses prior_trt
   if (inherits(x, "nma_nodesplit")) {
