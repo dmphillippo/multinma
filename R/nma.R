@@ -1432,6 +1432,9 @@ nma.fit <- function(ipd_x, ipd_y,
       agd_arm_status <- integer()
     }
 
+    # Add in dummy prior_aux for exponential model - not used, but requested by Stan data
+    if (likelihood == "exponential") prior_aux <- flat()
+
     standat <- purrr::list_modify(standat,
                                   # AgD arm IDs
                                   agd_arm_arm = agd_arm_arm,
