@@ -3,25 +3,25 @@ functions {
 #include /include/count_nonzero.stan
 
   //-- (log) Survival functions --
-  real S(int dist, real y, real rate, real shape, int log_) {
+  real S(int dist, real y, real eta, real shape, int log_) {
     real S;
 
     if (dist == 1) { // Exponential
-      if (log_ == 0) S = exp(-y * rate);
-      else S = -y * rate;
+      if (log_ == 0) S = exp(-y * exp(eta));
+      else S = -y * exp(eta);
 
     } else if (dist == 2) { // Weibull
       if (log_ == 0) {
-        S = exp(-pow(y, shape) * rate);
+        S = exp(-pow(y, shape) * exp(eta));
       } else {
-        S = -pow(y, shape) * rate;
+        S = -pow(y, shape) * exp(eta);
       }
 
     } else if (dist == 3) { // Gompertz
       if (log_ == 0) {
-        S = exp(-rate/shape * expm1(shape * y));
+        S = exp(-exp(eta)/shape * expm1(shape * y));
       } else {
-        S = -rate/shape * expm1(shape * y);
+        S = -exp(eta)/shape * expm1(shape * y);
       }
     }
 
@@ -29,22 +29,22 @@ functions {
   }
 
   // -- (log) Hazard functions --
-  real h(int dist, real y, real rate, real shape, int log_) {
+  real h(int dist, real y, real eta, real shape, int log_) {
     real h;
 
     if (dist == 1) { // Exponential
-      if (log_ == 0) h = rate;
-      else h = log(rate);
+      if (log_ == 0) h = exp(eta);
+      else h = eta;
 
     } else if (dist == 2) { // Weibull
       if (log_ == 0) {
-        h = shape * rate * pow(y, shape - 1);
+        h = shape * exp(eta) * pow(y, shape - 1);
       } else {
-        h = log(shape) + log(rate) + lmultiply(y, shape - 1);
+        h = log(shape) + eta + lmultiply(y, shape - 1);
       }
     } else if (dist == 3) { // Gompertz
-      if (log_ == 0) h = rate * exp(shape * y);
-      else h = log(rate) + (shape * y);
+      if (log_ == 0) h = exp(eta) * exp(shape * y);
+      else h = eta + (shape * y);
     }
 
     return h;
@@ -73,22 +73,22 @@ functions {
   // }
 
   // -- Log likelihood with censoring and truncation --
-  real loglik(int dist, real time, real start_time, real delay_time, int status, real rate, real shape) {
+  real loglik(int dist, real time, real start_time, real delay_time, int status, real eta, real shape) {
     real l;
 
     if (status == 0) { // Right censored
-      l = S(dist, time, rate, shape, 1);
+      l = S(dist, time, eta, shape, 1);
     } else if (status == 1) { // Observed
-      l = S(dist, time, rate, shape, 1) + h(dist, time, rate, shape, 1);
+      l = S(dist, time, eta, shape, 1) + h(dist, time, eta, shape, 1);
     } else if (status == 2) { // Left censored
-      l = log1m(S(dist, time, rate, shape, 0));
+      l = log1m(S(dist, time, eta, shape, 0));
     } else if (status == 3) { // Interval censored
-      l = log(S(dist, start_time, rate, shape, 0) - S(dist, time, rate, shape, 0));
+      l = log(S(dist, start_time, eta, shape, 0) - S(dist, time, eta, shape, 0));
     }
 
     // Left truncation
     if (delay_time > 0) {
-      l -= S(dist, delay_time, rate, shape, 1);
+      l -= S(dist, delay_time, eta, shape, 1);
     }
 
     return l;
@@ -163,7 +163,7 @@ transformed parameters {
                           ipd_start_time[i],
                           ipd_delay_time[i],
                           ipd_status[i],
-                          exp(eta_ipd[i]),
+                          eta_ipd[i],
                           nonexp ? shape[study[ipd_arm[i]]] : 0);
   }
 
@@ -193,7 +193,7 @@ transformed parameters {
                                agd_arm_start_time[i],
                                agd_arm_delay_time[i],
                                agd_arm_status[i],
-                               exp(eta_agd_arm_ii[j]),
+                               eta_agd_arm_ii[j],
                                nonexp ? shape[study[narm_ipd + agd_arm_arm[i]]] : 0);
         }
 
@@ -211,7 +211,7 @@ transformed parameters {
                                   agd_arm_start_time[i],
                                   agd_arm_delay_time[i],
                                   agd_arm_status[i],
-                                  exp(eta_agd_arm),
+                                  eta_agd_arm,
                                   nonexp ? shape[study[narm_ipd + agd_arm_arm[i]]] : 0);
       }
     }
