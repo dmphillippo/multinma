@@ -566,7 +566,7 @@ nma <- function(network,
     }
 
     # Apply weights across integration points
-    if (network$outcome$agd_arm == "survival") {
+    if (has_agd_arm(network) && network$outcome$agd_arm == "survival") {
       wts <- c(rep(1, nrow(dat_ipd)),
                rep(1 / n_int, nrow(idat_agd_arm)),
                rep(N_agd_contrast / n_int, each = n_int))
