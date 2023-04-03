@@ -1768,7 +1768,8 @@ link_fun <- function(x, link = c("identity", "log", "logit", "probit", "cloglog"
 #' @noRd
 get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
                                           "binomial", "binomial2", "poisson",
-                                          "ordered", "survival"),
+                                          "ordered",
+                                          "exponential", "weibull", "gompertz"),
                            link = c("identity", "log", "logit", "probit", "cloglog"),
                            measure = c("relative", "absolute"),
                            type = c("link", "response")) {
