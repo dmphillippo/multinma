@@ -23,6 +23,39 @@ functions {
       } else {
         S = -exp(eta)/shape * expm1(shape * y);
       }
+
+    } else if (dist == 4) { // Exponential AFT
+      if (log_ == 0) S = exp(-y * exp(-eta));
+      else S = -y * exp(-eta);
+
+    } else if (dist == 5) { // Weibull AFT
+      if (log_ == 0) {
+        S = exp(-pow(y, shape) * exp(-shape * eta));
+      } else {
+        S = -pow(y, shape) * exp(-shape * eta);
+      }
+
+    } else if (dist == 6) { // log Normal
+      // aux is sdlog
+      if (log_ == 0) {
+        S = 1 - Phi((log(y) - eta) / shape);
+      } else {
+        S = log1m(Phi((log(y) - eta) / shape));
+      }
+
+    } else if (dist == 7) { // log logistic
+      if (log_ == 0) {
+        S = 1 / (1 + pow(y / exp(eta), shape));
+      } else {
+        S = -log1p(pow(y / exp(eta), shape));
+      }
+
+    } else if (dist == 8) { // Gamma
+      if (log_ == 0) {
+        S = exp(gamma_lccdf(y | shape, exp(eta)));
+      } else {
+        S = gamma_lccdf(y | shape, exp(eta));
+      }
     }
 
     return S;
@@ -42,10 +75,44 @@ functions {
       } else {
         h = log(shape) + eta + lmultiply(y, shape - 1);
       }
+
     } else if (dist == 3) { // Gompertz
       if (log_ == 0) h = exp(eta) * exp(shape * y);
       else h = eta + (shape * y);
+
+    } else if (dist == 4) { // Exponential AFT
+      if (log_ == 0) h = exp(-eta);
+      else h = -eta;
+
+    } else if (dist == 5) { // Weibull AFT
+      if (log_ == 0) {
+        h = shape * exp(- shape * eta) * pow(y, shape - 1);
+      } else {
+        h = log(shape) - (shape * eta) + lmultiply(y, shape - 1);
+      }
+
+    } else if (dist == 6) { // log Normal
+      if (log_ == 0) {
+        h = exp(lognormal_lpdf(y | eta, shape)) / (1 - Phi((log(y) - eta) / shape));
+      } else {
+        h = lognormal_lpdf(y | eta, shape) - log1m(Phi((log(y) - eta) / shape));
+      }
+
+    } else if (dist == 7) { // log logistic
+      if (log_ == 0) {
+        h = (shape / exp(eta)) * pow(y / exp(eta), shape - 1) / (1 + pow(y / exp(eta), shape));
+      } else {
+        h = log(shape) - eta + (shape - 1)*(log(y) - eta) - log1p(pow(y / exp(eta), shape));
+      }
+
+    } else if (dist == 8) { // Gamma
+      if (log_ == 0) {
+        h = exp(gamma_lpdf(y | shape, exp(eta)) - gamma_lccdf(y | shape, exp(eta)));
+      } else {
+        h = gamma_lpdf(y | shape, exp(eta)) - gamma_lccdf(y | shape, exp(eta));
+      }
     }
+
 
     return h;
   }
@@ -104,10 +171,16 @@ data {
   real<lower=0> prior_aux_df;
 
   // Select distribution
-  int<lower=1, upper=3> dist;
-  // 1 = Exponential
-  // 2 = Weibull
-  // 3 = Gompertz
+  int<lower=1, upper=9> dist;
+  // 1 = Exponential PH
+  // 2 = Weibull PH
+  // 3 = Gompertz PH
+  // 4 = Exponential AFT
+  // 5 = Weibull AFT
+  // 6 = log Normal AFT
+  // 7 = log logistic AFT
+  // 8 = Gamma AFT
+  // 9 = Generalised Gamma AFT
 
   // AgD arm-based
   // int<lower=0> narm_agd_arm; // Number of arm-based AgD arms
@@ -129,7 +202,7 @@ data {
 }
 transformed data {
   // Exponential model indicator, 0 = exponential
-  int<lower=0, upper=1> nonexp = dist == 1 ? 0 : 1;
+  int<lower=0, upper=1> nonexp = (dist == 1 || dist == 4) ? 0 : 1;
 
   // // Study ID for IPD studies
   // int<lower=1> ipd_study[ni_ipd] = study[1:ni_ipd];
@@ -231,7 +304,7 @@ model {
 }
 generated quantities {
   // Transform intercepts back to scales
-  vector[ns_ipd + ns_agd_arm] scale = exp(mu);
+  // vector[ns_ipd + ns_agd_arm] scale = exp(mu);
 
 #include /include/generated_quantities_common.stan
 

@@ -354,7 +354,9 @@ nma <- function(network,
 
   # When are priors on auxiliary parameters required?
   has_aux <- (likelihood == "normal" && has_ipd(network)) ||
-              likelihood %in% c("ordered", "weibull", "gompertz")
+              likelihood %in% c("ordered", "weibull", "gompertz",
+                                "weibull-aft", "lognormal", "loglogistic",
+                                "gamma")
 
   # Are study intercepts present? Not if only contrast data
   has_intercepts <- has_agd_arm(network) || has_ipd(network)
@@ -384,8 +386,9 @@ nma <- function(network,
       prior_aux <- .default(half_normal(scale = 5))
     } else if (likelihood == "ordered") {
       prior_aux <- .default(flat())
-    } else if (likelihood %in% c("weibull", "gompertz")) {
-      prior_aux <- .default(flat())
+    } else if (likelihood %in% c("weibull", "gompertz", "weibull-aft",
+                                 "lognormal", "loglogistic", "gamma")) {
+      prior_aux <- .default(half_normal(scale = 10))
     }
     prior_defaults$prior_aux <- get_prior_call(prior_aux)
   }
@@ -1446,7 +1449,7 @@ nma.fit <- function(ipd_x, ipd_y,
     }
 
     # Add in dummy prior_aux for exponential model - not used, but requested by Stan data
-    if (likelihood == "exponential") prior_aux <- flat()
+    if (likelihood %in% c("exponential", "exponential-aft")) prior_aux <- flat()
 
     standat <- purrr::list_modify(standat,
                                   # AgD arm IDs
@@ -1470,7 +1473,13 @@ nma.fit <- function(ipd_x, ipd_y,
                                   dist = switch(likelihood,
                                                 exponential = 1,
                                                 weibull = 2,
-                                                gompertz = 3),
+                                                gompertz = 3,
+                                                `exponential-aft` = 4,
+                                                `weibull-aft` = 5,
+                                                lognormal = 6,
+                                                loglogistic = 7,
+                                                gamma = 8,
+                                                gengamma = 9),
 
                                   # Specify link
                                   link = switch(link, log = 1),
@@ -1486,7 +1495,7 @@ nma.fit <- function(ipd_x, ipd_y,
     stanargs <- purrr::list_modify(stanargs,
                                    object = stanmodels$survival_param,
                                    data = standat,
-                                   pars = c(pars, "shape", "scale"))
+                                   pars = c(pars, "shape"))
 
   } else {
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
@@ -1649,6 +1658,8 @@ valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
                     continuous = "normal",
                     ordered = "ordered",
                     survival = c("exponential", "weibull", "gompertz",
+                                 "exponential-aft", "weibull-aft",
+                                 "lognormal", "loglogistic", "gamma", "gengamma",
                                  "mspline", "pexp"))
 
 #' Check likelihood function, or provide default value
@@ -1703,6 +1714,12 @@ check_link <- function(x, lik) {
                      exponential = "log",
                      weibull = "log",
                      gompertz = "log",
+                     `exponential-aft` = "log",
+                     `weibull-aft` = "log",
+                     lognormal = "log",
+                     loglogistic = "log",
+                     gamma = "log",
+                     gengamma = "log",
                      mspline = "log",
                      pexp = "log")[[lik]]
 
@@ -1769,7 +1786,11 @@ link_fun <- function(x, link = c("identity", "log", "logit", "probit", "cloglog"
 get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
                                           "binomial", "binomial2", "poisson",
                                           "ordered",
-                                          "exponential", "weibull", "gompertz"),
+                                          "exponential", "weibull", "gompertz",
+                                          "exponential-aft", "weibull-aft",
+                                          "lognormal", "loglogistic", "gamma",
+                                          "gengamma",
+                                          "mspline", "pexp"),
                            link = c("identity", "log", "logit", "probit", "cloglog"),
                            measure = c("relative", "absolute"),
                            type = c("link", "response")) {
@@ -1846,6 +1867,15 @@ get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
     } else if (measure == "absolute") {
       if (type == "link") out <- "log Hazard"
       else out <- "Hazard"
+    }
+
+  } else if (likelihood %in% c("exponential-aft", "weibull-aft", "lognormal", "loglogistic", "gamma", "gengamma")) {
+
+    if (measure == "relative") {
+      out <- "log Acceleration Factor"
+    } else if (measure == "absolute") {
+      if (type == "link") out <- "log Survival"
+      else out <- "Survival"
     }
 
   } else {

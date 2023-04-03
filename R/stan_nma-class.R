@@ -68,8 +68,7 @@ print.stan_nma <- function(x, ...) {
                                     "theta_bar_cum_agd_arm",
                                     "theta_bar_cum_agd_contrast",
                                     "theta2_bar_cum",
-                                    "mu", "delta",
-                                    "scale"),
+                                    "mu", "delta"),
                            include = include,
                            use_cache = FALSE,
                            !!! dots,
@@ -278,7 +277,11 @@ plot_prior_posterior <- function(x, ...,
                                                         normal = "sigma",
                                                         ordered = "cc",
                                                         weibull = "shape",
-                                                        gompertz = "shape")))
+                                                        gompertz = "shape",
+                                                        `weibull-aft` = "shape",
+                                                        lognormal = "shape",
+                                                        loglogistic = "shape",
+                                                        gamma = "shape")))
 
   # Add in omega parameter if node-splitting model, which uses prior_trt
   if (inherits(x, "nma_nodesplit")) {
