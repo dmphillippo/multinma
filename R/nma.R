@@ -84,7 +84,7 @@
 #'   | \strong{Rate}      | `poisson`    | `log`
 #'   | \strong{Continuous}| `normal`     | `identity`, `log`
 #'   | \strong{Ordered}   | `ordered`    | `logit`, `probit`, `cloglog`
-#'   | \strong{Survival}  | `exponential`, `weibull`, `gompertz`, `mspline`, `pexp` | `log`
+#'   | \strong{Survival}  | `exponential`, `weibull`, `gompertz`, `exponential-aft`, `weibull-aft`, `lognormal`, `loglogistic`, `gamma`, `gengamma`, `mspline`, `pexp` | `log`
 #'
 #'   The `bernoulli2` and `binomial2` likelihoods correspond to a two-parameter
 #'   Binomial likelihood for arm-based AgD, which more closely matches the
@@ -95,6 +95,15 @@
 #'   When a `cloglog` link is used, including an offset for log follow-up time
 #'   (i.e. `regression = ~offset(log(time))`) results in a model on the log
 #'   hazard \insertCite{@see @TSD2}{multinma}.
+#'
+#'   For survival data, all accelerated failure time models (`exponential-aft`,
+#'   `weibull-aft`, `lognormal`, `loglogistic`, `gamma`, `gengamma`) are
+#'   parameterised so that the treatment effects and any regression parameters
+#'   are log Survival Time Ratios (i.e. a coefficient of \eqn{\log(2)} means
+#'   that the treatment or covariate is associated with a doubling of expected
+#'   survival time). These can be converted to log Acceleration Factors using
+#'   the relation \eqn{\log(\mathrm{AF}) = -\log(\mathrm{STR})} (or equivalently
+#'   \eqn{\mathrm{AF} = 1/\mathrm{STR}}).
 #'
 #'   Further details on each likelihood and link function are given by
 #'   \insertCite{TSD2;textual}{multinma}.
@@ -116,6 +125,15 @@
 #'   these latent cutoffs, we choose to specify priors on the *differences*
 #'   \eqn{c_{m+1} - c_m}. Stan automatically truncates any priors so that the
 #'   ordering constraints are satisfied.
+#'
+#'   ## Survival (time-to-event) likelihoods
+#'   All survival likelihoods except the `exponential` and `exponential-aft`
+#'   likelihoods have auxiliary parameters. These are typically study-specific
+#'   shape parameters \eqn{\gamma_j>0}, except for the `lognormal` likelihood
+#'   where the auxiliary parameters are study-specific standard deviations on
+#'   the log scale \eqn{\sigma_j>0}. The `gengamma` likelihood has two sets of
+#'   auxiliary parameters, study-specific scale parameters \eqn{\sigma_j>0} and
+#'   shape parameters \eqn{Q_j}.
 #'
 #' @return `nma()` returns a [stan_nma] object, except when `consistency =
 #'   "nodesplit"` when a [nma_nodesplit] or [nma_nodesplit_df] object is
@@ -1872,7 +1890,7 @@ get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
   } else if (likelihood %in% c("exponential-aft", "weibull-aft", "lognormal", "loglogistic", "gamma", "gengamma")) {
 
     if (measure == "relative") {
-      out <- "log Acceleration Factor"
+      out <- "log Survival Time Ratio"
     } else if (measure == "absolute") {
       if (type == "link") out <- "log Survival"
       else out <- "Survival"
