@@ -2,165 +2,80 @@ functions {
 #include /include/prior_select.stan
 #include /include/count_nonzero.stan
 
-  //-- (log) Survival functions --
-  real S(int dist, real y, real eta, real shape, int log_) {
-    real S;
+  //-- log Survival functions --
+  real lS(int dist, real y, real eta, real shape) {
+    real lS;
 
     if (dist == 1) { // Exponential
-      if (log_ == 0) S = exp(-y * exp(eta));
-      else S = -y * exp(eta);
-
+      lS = -y * exp(eta);
     } else if (dist == 2) { // Weibull
-      if (log_ == 0) {
-        S = exp(-pow(y, shape) * exp(eta));
-      } else {
-        S = -pow(y, shape) * exp(eta);
-      }
-
+      lS = -pow(y, shape) * exp(eta);
     } else if (dist == 3) { // Gompertz
-      if (log_ == 0) {
-        S = exp(-exp(eta)/shape * expm1(shape * y));
-      } else {
-        S = -exp(eta)/shape * expm1(shape * y);
-      }
-
+      lS = -exp(eta)/shape * expm1(shape * y);
     } else if (dist == 4) { // Exponential AFT
-      if (log_ == 0) S = exp(-y * exp(-eta));
-      else S = -y * exp(-eta);
-
+      lS = -y * exp(-eta);
     } else if (dist == 5) { // Weibull AFT
-      if (log_ == 0) {
-        S = exp(-pow(y, shape) * exp(-shape * eta));
-      } else {
-        S = -pow(y, shape) * exp(-shape * eta);
-      }
-
+      lS = -pow(y, shape) * exp(-shape * eta);
     } else if (dist == 6) { // log Normal
       // aux is sdlog
-      if (log_ == 0) {
-        S = 1 - Phi((log(y) - eta) / shape);
-      } else {
-        S = log1m(Phi((log(y) - eta) / shape));
-      }
-
+      lS = log1m(Phi((log(y) - eta) / shape));
     } else if (dist == 7) { // log logistic
-      if (log_ == 0) {
-        S = 1 / (1 + pow(y / exp(eta), shape));
-      } else {
-        S = -log1p(pow(y / exp(eta), shape));
-      }
-
+      lS = -log1p(pow(y / exp(eta), shape));
     } else if (dist == 8) { // Gamma
-      if (log_ == 0) {
-        S = exp(gamma_lccdf(y | shape, exp(-eta)));
-      } else {
-        S = gamma_lccdf(y | shape, exp(-eta));
-      }
+      lS = gamma_lccdf(y | shape, exp(-eta));
     }
 
-    return S;
+    return lS;
   }
 
-  // -- (log) Hazard functions --
-  real h(int dist, real y, real eta, real shape, int log_) {
-    real h;
+  // -- log Hazard functions --
+  real lh(int dist, real y, real eta, real shape) {
+    real lh;
 
     if (dist == 1) { // Exponential
-      if (log_ == 0) h = exp(eta);
-      else h = eta;
-
+      lh = eta;
     } else if (dist == 2) { // Weibull
-      if (log_ == 0) {
-        h = shape * exp(eta) * pow(y, shape - 1);
-      } else {
-        h = log(shape) + eta + lmultiply(y, shape - 1);
-      }
-
+      lh = log(shape) + eta + lmultiply(y, shape - 1);
     } else if (dist == 3) { // Gompertz
-      if (log_ == 0) h = exp(eta) * exp(shape * y);
-      else h = eta + (shape * y);
-
+      lh = eta + (shape * y);
     } else if (dist == 4) { // Exponential AFT
-      if (log_ == 0) h = exp(-eta);
-      else h = -eta;
-
+      lh = -eta;
     } else if (dist == 5) { // Weibull AFT
-      if (log_ == 0) {
-        h = shape * exp(- shape * eta) * pow(y, shape - 1);
-      } else {
-        h = log(shape) - (shape * eta) + lmultiply(y, shape - 1);
-      }
-
+      lh = log(shape) - (shape * eta) + lmultiply(y, shape - 1);
     } else if (dist == 6) { // log Normal
-      if (log_ == 0) {
-        h = exp(lognormal_lpdf(y | eta, shape)) / (1 - Phi((log(y) - eta) / shape));
-      } else {
-        h = lognormal_lpdf(y | eta, shape) - log1m(Phi((log(y) - eta) / shape));
-      }
-
+      // aux is sdlog
+      lh = lognormal_lpdf(y | eta, shape) - log1m(Phi((log(y) - eta) / shape));
     } else if (dist == 7) { // log logistic
-      if (log_ == 0) {
-        h = (shape / exp(eta)) * pow(y / exp(eta), shape - 1) / (1 + pow(y / exp(eta), shape));
-      } else {
-        h = log(shape) - eta + (shape - 1)*(log(y) - eta) - log1p(pow(y / exp(eta), shape));
-      }
-
+      lh = log(shape) - eta + (shape - 1)*(log(y) - eta) - log1p(pow(y / exp(eta), shape));
     } else if (dist == 8) { // Gamma
-      if (log_ == 0) {
-        h = exp(gamma_lpdf(y | shape, exp(-eta)) - gamma_lccdf(y | shape, exp(-eta)));
-      } else {
-        h = gamma_lpdf(y | shape, exp(-eta)) - gamma_lccdf(y | shape, exp(-eta));
-      }
+      lh = gamma_lpdf(y | shape, exp(-eta)) - gamma_lccdf(y | shape, exp(-eta));
     }
 
-
-    return h;
+    return lh;
   }
-
-  // -- Likelihood with censoring and truncation --
-  // vector lik(int dist, real time, real start_time, real delay_time, int status, vector rate, real shape) {
-  //   vector[num_elements(rate)] l;
-  //
-  //   if (status == 0) { // Right censored
-  //     l = S(dist, time, rate, shape, 0);
-  //   } else if (status == 1) { // Observed
-  //     l = S(dist, time, rate, shape, 0) .* h(dist, time, rate, shape, 0);
-  //   } else if (status == 2) { // Left censored
-  //     l = 1 - S(dist, time, rate, shape, 0);
-  //   } else if (status == 3) { // Interval censored
-  //     l = S(dist, start_time, rate, shape, 0) - S(dist, time, rate, shape, 0);
-  //   }
-  //
-  //   // Left truncation
-  //   if (delay_time > 0) {
-  //     l = l ./ S(dist, delay_time, rate, shape, 0);
-  //   }
-  //
-  //   return l;
-  // }
 
   // -- Log likelihood with censoring and truncation --
   real loglik(int dist, real time, real start_time, real delay_time, int status, real eta, real shape) {
     real l;
 
     if (status == 0) { // Right censored
-      l = S(dist, time, eta, shape, 1);
+      l = lS(dist, time, eta, shape);
     } else if (status == 1) { // Observed
       if (dist == 8) {
         // Make Gamma model more efficient by using ldpf directly
         l = gamma_lpdf(time | shape, exp(-eta));
       } else {
-        l = S(dist, time, eta, shape, 1) + h(dist, time, eta, shape, 1);
+        l = lS(dist, time, eta, shape) + lh(dist, time, eta, shape);
       }
     } else if (status == 2) { // Left censored
-      l = log1m(S(dist, time, eta, shape, 0));
+      l = log1m_exp(lS(dist, time, eta, shape));
     } else if (status == 3) { // Interval censored
-      l = log(S(dist, start_time, eta, shape, 0) - S(dist, time, eta, shape, 0));
+      l = log_diff_exp(lS(dist, start_time, eta, shape), lS(dist, time, eta, shape));
     }
 
     // Left truncation
     if (delay_time > 0) {
-      l -= S(dist, delay_time, eta, shape, 1);
+      l -= lS(dist, delay_time, eta, shape);
     }
 
     return l;
