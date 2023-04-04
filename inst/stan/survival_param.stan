@@ -52,9 +52,9 @@ functions {
 
     } else if (dist == 8) { // Gamma
       if (log_ == 0) {
-        S = exp(gamma_lccdf(y | shape, exp(eta)));
+        S = exp(gamma_lccdf(y | shape, exp(-eta)));
       } else {
-        S = gamma_lccdf(y | shape, exp(eta));
+        S = gamma_lccdf(y | shape, exp(-eta));
       }
     }
 
@@ -107,9 +107,9 @@ functions {
 
     } else if (dist == 8) { // Gamma
       if (log_ == 0) {
-        h = exp(gamma_lpdf(y | shape, exp(eta)) - gamma_lccdf(y | shape, exp(eta)));
+        h = exp(gamma_lpdf(y | shape, exp(-eta)) - gamma_lccdf(y | shape, exp(-eta)));
       } else {
-        h = gamma_lpdf(y | shape, exp(eta)) - gamma_lccdf(y | shape, exp(eta));
+        h = gamma_lpdf(y | shape, exp(-eta)) - gamma_lccdf(y | shape, exp(-eta));
       }
     }
 
