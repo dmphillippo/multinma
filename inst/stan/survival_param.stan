@@ -146,7 +146,12 @@ functions {
     if (status == 0) { // Right censored
       l = S(dist, time, eta, shape, 1);
     } else if (status == 1) { // Observed
-      l = S(dist, time, eta, shape, 1) + h(dist, time, eta, shape, 1);
+      if (dist == 8) {
+        // Make Gamma model more efficient by using ldpf directly
+        l = gamma_lpdf(time | shape, exp(-eta));
+      } else {
+        l = S(dist, time, eta, shape, 1) + h(dist, time, eta, shape, 1);
+      }
     } else if (status == 2) { // Left censored
       l = log1m(S(dist, time, eta, shape, 0));
     } else if (status == 3) { // Interval censored
