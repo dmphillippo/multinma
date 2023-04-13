@@ -1510,10 +1510,24 @@ nma.fit <- function(ipd_x, ipd_y,
                                                               "Exponential", "flat (implicit)"))
     )
 
-    stanargs <- purrr::list_modify(stanargs,
-                                   object = stanmodels$survival_param,
-                                   data = standat,
-                                   pars = c(pars, "shape"))
+    if (! likelihood %in% c(6, 9)) {
+      stanargs <- purrr::list_modify(stanargs,
+                                     object = stanmodels$survival_param,
+                                     data = standat,
+                                     pars = c(pars, "shape"))
+    } else if (likelihood == 6) {
+      # lognormal parameter sdlog
+      stanargs <- purrr::list_modify(stanargs,
+                                     object = stanmodels$survival_param,
+                                     data = standat,
+                                     pars = c(pars, "sdlog"))
+    } else if (likelihood == 9) {
+      # gengamma parameters sigma, k
+      stanargs <- purrr::list_modify(stanargs,
+                                     object = stanmodels$survival_param,
+                                     data = standat,
+                                     pars = c(pars, "sigma", "k"))
+    }
 
   } else {
     abort(glue::glue('"{likelihood}" likelihood not supported.'))

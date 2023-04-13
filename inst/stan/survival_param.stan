@@ -2,80 +2,102 @@ functions {
 #include /include/prior_select.stan
 #include /include/count_nonzero.stan
 
+  // -- Generalised Gamma ldpf --
+  real gengamma_lpdf(real y, real mu, real sigma, real k) {
+    // Parameterisation of Lawless
+	  real Q = pow(k, -0.5);
+	  real w = Q * (log(y) - mu) / sigma;
+	  return -log(sigma) - log(y) - 0.5 * log(k) * (1 - 2 * k) + k * (w - exp(w)) - lgamma(k);
+  }
+
   //-- log Survival functions --
-  real lS(int dist, real y, real eta, real shape) {
+  real lS(int dist, real y, real eta, real aux, real aux2) {
+    // aux is shape, except for lognormal sdlog, gengamma sigma
+    // aux2 is only for gengamma k
+
     real lS;
 
     if (dist == 1) { // Exponential
       lS = -y * exp(eta);
     } else if (dist == 2) { // Weibull
-      lS = -pow(y, shape) * exp(eta);
+      lS = -pow(y, aux) * exp(eta);
     } else if (dist == 3) { // Gompertz
-      lS = -exp(eta)/shape * expm1(shape * y);
+      lS = -exp(eta)/aux * expm1(aux * y);
     } else if (dist == 4) { // Exponential AFT
       lS = -y * exp(-eta);
     } else if (dist == 5) { // Weibull AFT
-      lS = -pow(y, shape) * exp(-shape * eta);
+      lS = -pow(y, aux) * exp(-aux * eta);
     } else if (dist == 6) { // log Normal
       // aux is sdlog
-      lS = log1m(Phi((log(y) - eta) / shape));
+      lS = log1m(Phi((log(y) - eta) / aux));
     } else if (dist == 7) { // log logistic
-      lS = -log1p(pow(y / exp(eta), shape));
+      lS = -log1p(pow(y / exp(eta), aux));
     } else if (dist == 8) { // Gamma
-      lS = gamma_lccdf(y | shape, exp(-eta));
+      lS = gamma_lccdf(y | aux, exp(-eta));
+    } else if (dist == 9) { // Generalised Gamma
+      real Q = pow(aux2, -0.5);
+      real w = exp(Q * (log(y) - eta) / aux) * aux2;
+      lS = log1m(gamma_p(aux2, w));
     }
 
     return lS;
   }
 
   // -- log Hazard functions --
-  real lh(int dist, real y, real eta, real shape) {
+  real lh(int dist, real y, real eta, real aux, real aux2) {
+    // aux is shape, except for lognormal sdlog, gengamma scale
+    // aux2 is only for gengamma shape
+
     real lh;
 
     if (dist == 1) { // Exponential
       lh = eta;
     } else if (dist == 2) { // Weibull
-      lh = log(shape) + eta + lmultiply(y, shape - 1);
+      lh = log(aux) + eta + lmultiply(y, aux - 1);
     } else if (dist == 3) { // Gompertz
-      lh = eta + (shape * y);
+      lh = eta + (aux * y);
     } else if (dist == 4) { // Exponential AFT
       lh = -eta;
     } else if (dist == 5) { // Weibull AFT
-      lh = log(shape) - (shape * eta) + lmultiply(y, shape - 1);
+      lh = log(aux) - (aux * eta) + lmultiply(y, aux - 1);
     } else if (dist == 6) { // log Normal
       // aux is sdlog
-      lh = lognormal_lpdf(y | eta, shape) - log1m(Phi((log(y) - eta) / shape));
+      lh = lognormal_lpdf(y | eta, aux) - log1m(Phi((log(y) - eta) / aux));
     } else if (dist == 7) { // log logistic
-      lh = log(shape) - eta + (shape - 1)*(log(y) - eta) - log1p(pow(y / exp(eta), shape));
+      lh = log(aux) - eta + (aux - 1)*(log(y) - eta) - log1p(pow(y / exp(eta), aux));
     } else if (dist == 8) { // Gamma
-      lh = gamma_lpdf(y | shape, exp(-eta)) - gamma_lccdf(y | shape, exp(-eta));
+      lh = gamma_lpdf(y | aux, exp(-eta)) - gamma_lccdf(y | aux, exp(-eta));
+    } else if (dist == 9) { // Generalised Gamma
+      // Not used, lpdf used directly
     }
 
     return lh;
   }
 
   // -- Log likelihood with censoring and truncation --
-  real loglik(int dist, real time, real start_time, real delay_time, int status, real eta, real shape) {
+  real loglik(int dist, real time, real start_time, real delay_time, int status, real eta, real aux, real aux2) {
     real l;
 
     if (status == 0) { // Right censored
-      l = lS(dist, time, eta, shape);
+      l = lS(dist, time, eta, aux, aux2);
     } else if (status == 1) { // Observed
-      if (dist == 8) {
-        // Make Gamma model more efficient by using ldpf directly
-        l = gamma_lpdf(time | shape, exp(-eta));
+      // Make (generalised) Gamma models more efficient by using ldpf directly
+      if (dist == 8) { // Gamma
+        l = gamma_lpdf(time | aux, exp(-eta));
+      } if (dist == 9) { // Gen Gamma
+        l = gengamma_lpdf(time | eta, aux, aux2);
       } else {
-        l = lS(dist, time, eta, shape) + lh(dist, time, eta, shape);
+        l = lS(dist, time, eta, aux, aux2) + lh(dist, time, eta, aux, aux2);
       }
     } else if (status == 2) { // Left censored
-      l = log1m_exp(lS(dist, time, eta, shape));
+      l = log1m_exp(lS(dist, time, eta, aux, aux2));
     } else if (status == 3) { // Interval censored
-      l = log_diff_exp(lS(dist, start_time, eta, shape), lS(dist, time, eta, shape));
+      l = log_diff_exp(lS(dist, start_time, eta, aux, aux2), lS(dist, time, eta, aux, aux2));
     }
 
     // Left truncation
     if (delay_time > 0) {
-      l -= lS(dist, delay_time, eta, shape);
+      l -= lS(dist, delay_time, eta, aux, aux2);
     }
 
     return l;
@@ -84,14 +106,20 @@ functions {
 data {
 #include /include/data_common.stan
 
-  // Prior on shape parameter
+  // Prior on aux parameter (usually shape)
   int<lower=0,upper=6> prior_aux_dist;
   real prior_aux_location;
   real<lower=0> prior_aux_scale;
   real<lower=0> prior_aux_df;
 
+  // Prior on aux2 parameter for gengamma
+  int<lower=0,upper=6> prior_aux2_dist;
+  real prior_aux2_location;
+  real<lower=0> prior_aux2_scale;
+  real<lower=0> prior_aux2_df;
+
   // Select distribution
-  int<lower=1, upper=9> dist;
+  int<lower=1> dist;
   // 1 = Exponential PH
   // 2 = Weibull PH
   // 3 = Gompertz PH
@@ -123,6 +151,8 @@ data {
 transformed data {
   // Exponential model indicator, 0 = exponential
   int<lower=0, upper=1> nonexp = (dist == 1 || dist == 4) ? 0 : 1;
+  // Generalised Gamma model indicator, 1 = gengamma
+  int<lower=0, upper=1> gengamma = dist >= 9 ? 1 : 0;
 
   // // Study ID for IPD studies
   // int<lower=1> ipd_study[ni_ipd] = study[1:ni_ipd];
@@ -138,9 +168,11 @@ transformed data {
 parameters {
 #include /include/parameters_common.stan
 
-  // Shape for parametric model
+  // Auxiliary parameters for parametric model (typically shape)
   // Exponential model has shape = 1 so parameter is removed (zero dim)
-  vector<lower=0>[(ns_ipd + ns_agd_arm)*nonexp] shape;
+  vector<lower=0>[(ns_ipd + ns_agd_arm)*nonexp] aux;
+  // Second auxiliary parameter for generalised gamma
+  vector<lower=0>[(ns_ipd + ns_agd_arm)*gengamma] aux2;
 }
 transformed parameters {
   // Log likelihood contributions
@@ -148,6 +180,7 @@ transformed parameters {
   vector[ni_agd_arm] log_L_agd_arm;
 
 #include /include/transformed_parameters_common.stan
+
 
   // Evaluate log likelihood
   for (i in 1:ni_ipd) {
@@ -157,7 +190,8 @@ transformed parameters {
                           ipd_delay_time[i],
                           ipd_status[i],
                           eta_ipd[i],
-                          nonexp ? shape[study[ipd_arm[i]]] : 0);
+                          nonexp ? aux[study[ipd_arm[i]]] : 0,
+                          gengamma ? aux2[study[ipd_arm[i]]] : 0);
   }
 
   // -- AgD model (arm-based) --
@@ -187,7 +221,8 @@ transformed parameters {
                                agd_arm_delay_time[i],
                                agd_arm_status[i],
                                eta_agd_arm_ii[j],
-                               nonexp ? shape[study[narm_ipd + agd_arm_arm[i]]] : 0);
+                               nonexp ? aux[study[narm_ipd + agd_arm_arm[i]]] : 0,
+                               gengamma ? aux2[study[narm_ipd + agd_arm_arm[i]]] : 0);
         }
 
         log_L_agd_arm[i] = log_sum_exp(log_L_ii);
@@ -205,7 +240,8 @@ transformed parameters {
                                   agd_arm_delay_time[i],
                                   agd_arm_status[i],
                                   eta_agd_arm,
-                                  nonexp ? shape[study[narm_ipd + agd_arm_arm[i]]] : 0);
+                                  nonexp ? aux[study[narm_ipd + agd_arm_arm[i]]] : 0,
+                                  gengamma ? aux2[study[narm_ipd + agd_arm_arm[i]]] : 0);
       }
     }
   }
@@ -213,18 +249,25 @@ transformed parameters {
 model {
 #include /include/model_common.stan
 
-  // -- Prior on shapes --
-  if (nonexp) prior_select_lp(shape, prior_aux_dist, prior_aux_location, prior_aux_scale, prior_aux_df);
+  // -- Prior on auxiliary parameters --
+  if (nonexp) prior_select_lp(aux, prior_aux_dist, prior_aux_location, prior_aux_scale, prior_aux_df);
+  if (gengamma) prior_select_lp(aux2, prior_aux2_dist, prior_aux2_location, prior_aux2_scale, prior_aux2_df);
 
   // -- IPD likelihood --
   target += log_L_ipd;
 
   // -- AgD likelihood (arm-based) --
   target += log_L_agd_arm;
+
 }
 generated quantities {
   // Transform intercepts back to scales
   // vector[ns_ipd + ns_agd_arm] scale = exp(mu);
+
+  vector[(dist != 1 || dist != 4 || dist != 6 || dist != 9) ? ns_ipd + ns_agd_arm : 0] shape;
+  vector[dist == 6 ? ns_ipd + ns_agd_arm : 0] sdlog;  // lognormal sdlog
+  vector[dist == 9 ? ns_ipd + ns_agd_arm : 0] sigma; // gengamma sigma
+  vector[dist == 9 ? ns_ipd + ns_agd_arm : 0] k;  // gengamma k
 
 #include /include/generated_quantities_common.stan
 
@@ -237,4 +280,13 @@ generated quantities {
   resdev[1:(ni_ipd + ni_agd_arm)] = -2 * log_lik[1:(ni_ipd + ni_agd_arm)];
 
   // Fitted values not implemented
+
+  // Rename parameters
+  if (dist != 1 || dist != 4 || dist != 6 || dist != 9) shape = aux;
+  if (dist == 6) sdlog = aux;
+  if (dist == 9) {
+    sigma = aux;
+    k = aux2;
+  }
+
 }
