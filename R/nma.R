@@ -38,7 +38,8 @@
 #' @param prior_reg Specification of prior distribution for the regression
 #'   coefficients (if `regression` formula specified)
 #' @param prior_aux Specification of prior distribution for the auxiliary
-#'   parameter, if applicable (see details)
+#'   parameter, if applicable (see details). For `likelihood = "gengamma"` this
+#'   should be a list of prior distributions with elements `sigma` and `k`.
 #' @param QR Logical scalar (default `FALSE`), whether to apply a QR
 #'   decomposition to the model design matrix
 #' @param center Logical scalar (default `TRUE`), whether to center the
@@ -133,7 +134,7 @@
 #'   where the auxiliary parameters are study-specific standard deviations on
 #'   the log scale \eqn{\sigma_j>0}. The `gengamma` likelihood has two sets of
 #'   auxiliary parameters, study-specific scale parameters \eqn{\sigma_j>0} and
-#'   shape parameters \eqn{Q_j}.
+#'   shape parameters \eqn{k_j}.
 #'
 #' @return `nma()` returns a [stan_nma] object, except when `consistency =
 #'   "nodesplit"` when a [nma_nodesplit] or [nma_nodesplit_df] object is
@@ -374,17 +375,20 @@ nma <- function(network,
   has_aux <- (likelihood == "normal" && has_ipd(network)) ||
               likelihood %in% c("ordered", "weibull", "gompertz",
                                 "weibull-aft", "lognormal", "loglogistic",
-                                "gamma")
+                                "gamma", "gengamma")
 
   # Are study intercepts present? Not if only contrast data
   has_intercepts <- has_agd_arm(network) || has_ipd(network)
 
   # Check priors
-  if (!inherits(prior_intercept, "nma_prior")) abort("`prior_intercept` should be a prior distribution, see ?priors.")
-  if (!inherits(prior_trt, "nma_prior")) abort("`prior_trt` should be a prior distribution, see ?priors.")
-  if (!inherits(prior_het, "nma_prior")) abort("`prior_het` should be a prior distribution, see ?priors.")
-  if (!inherits(prior_reg, "nma_prior")) abort("`prior_reg` should be a prior distribution, see ?priors.")
-  if (!.is_default(prior_aux) && !inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
+  check_prior(prior_intercept)
+  check_prior(prior_trt)
+  check_prior(prior_het)
+  check_prior(prior_reg)
+  if (!.is_default(prior_aux)) {
+    if (likelihood == "gengamma") check_prior(prior_aux, c("sigma", "k"))
+    else check_prior(prior_aux)
+  }
 
   prior_het_type <- rlang::arg_match(prior_het_type)
 
@@ -407,6 +411,9 @@ nma <- function(network,
     } else if (likelihood %in% c("weibull", "gompertz", "weibull-aft",
                                  "lognormal", "loglogistic", "gamma")) {
       prior_aux <- .default(half_normal(scale = 10))
+    } else if (likelihood == "gengamma") {
+      prior_aux <- .default(list(sigma = half_normal(scale = 10),
+                                 k = half_normal(scale = 10)))
     }
     prior_defaults$prior_aux <- get_prior_call(prior_aux)
   }
@@ -992,11 +999,14 @@ nma.fit <- function(ipd_x, ipd_y,
   has_aux <- (likelihood == "normal" && has_ipd) || likelihood == "ordered"
 
   # Check priors
-  if (!inherits(prior_intercept, "nma_prior")) abort("`prior_intercept` should be a prior distribution, see ?priors.")
-  if (!inherits(prior_trt, "nma_prior")) abort("`prior_trt` should be a prior distribution, see ?priors.")
-  if (trt_effects == "random" && !inherits(prior_het, "nma_prior")) abort("`prior_het` should be a prior distribution, see ?priors.")
-  if (!inherits(prior_reg, "nma_prior")) abort("`prior_reg` should be a prior distribution, see ?priors.")
-  if (has_aux && !inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
+  check_prior(prior_intercept)
+  check_prior(prior_trt)
+  if (trt_effects == "random") check_prior(prior_het)
+  check_prior(prior_reg)
+  if (has_aux) {
+    if (likelihood == "gengamma") check_prior(prior_aux, c("sigma", "k"))
+    else check_prior(prior_aux)
+  }
 
   prior_het_type <- rlang::arg_match(prior_het_type)
 
@@ -1469,6 +1479,9 @@ nma.fit <- function(ipd_x, ipd_y,
     # Add in dummy prior_aux for exponential model - not used, but requested by Stan data
     if (likelihood %in% c("exponential", "exponential-aft")) prior_aux <- flat()
 
+    # Add in dummy prior_aux2 if not gengamma - not used, but requested by Stan data
+    if (likelihood != "gengamma") prior_aux2 <- flat()
+
     standat <- purrr::list_modify(standat,
                                   # AgD arm IDs
                                   agd_arm_arm = agd_arm_arm,
@@ -1500,28 +1513,52 @@ nma.fit <- function(ipd_x, ipd_y,
                                                 gengamma = 9),
 
                                   # Specify link
-                                  link = switch(link, log = 1),
-
-                                  # Specify prior on shape parameters
-                                  !!! prior_standat(prior_aux, "prior_aux",
-                                                    valid = c("Normal", "half-Normal", "log-Normal",
-                                                              "Cauchy",  "half-Cauchy",
-                                                              "Student t", "half-Student t", "log-Student t",
-                                                              "Exponential", "flat (implicit)"))
+                                  link = switch(link, log = 1)
     )
 
-    if (! likelihood %in% c(6, 9)) {
+    # Add in priors for auxiliary parameters
+    if (likelihood != "gengamma") {
+      standat <- purrr::list_modify(standat,
+                                     # Specify prior on shape parameters
+                                     !!! prior_standat(prior_aux, "prior_aux",
+                                                       valid = c("Normal", "half-Normal", "log-Normal",
+                                                                 "Cauchy",  "half-Cauchy",
+                                                                 "Student t", "half-Student t", "log-Student t",
+                                                                 "Exponential", "flat (implicit)")),
+
+                                    # Dummy prior details for aux2
+                                    !!! prior_standat(prior_aux2, "prior_aux2",
+                                                      valid = "flat (implicit)"))
+    } else {
+      standat <- purrr::list_modify(standat,
+                                     # Specify prior on sigma parameters
+                                     !!! prior_standat(prior_aux$sigma, "prior_aux",
+                                                       valid = c("Normal", "half-Normal", "log-Normal",
+                                                                 "Cauchy",  "half-Cauchy",
+                                                                 "Student t", "half-Student t", "log-Student t",
+                                                                 "Exponential", "flat (implicit)")),
+
+                                     # Specify prior on k parameters
+                                     !!! prior_standat(prior_aux$k, "prior_aux2",
+                                                       valid = c("Normal", "half-Normal", "log-Normal",
+                                                                 "Cauchy",  "half-Cauchy",
+                                                                 "Student t", "half-Student t", "log-Student t",
+                                                                 "Exponential", "flat (implicit)")))
+    }
+
+    # Monitor auxiliary parameters
+    if (! likelihood %in% c("lognormal", "gengamma", "exponential", "exponential-aft")) {
       stanargs <- purrr::list_modify(stanargs,
                                      object = stanmodels$survival_param,
                                      data = standat,
                                      pars = c(pars, "shape"))
-    } else if (likelihood == 6) {
+    } else if (likelihood == "lognormal") {
       # lognormal parameter sdlog
       stanargs <- purrr::list_modify(stanargs,
                                      object = stanmodels$survival_param,
                                      data = standat,
                                      pars = c(pars, "sdlog"))
-    } else if (likelihood == 9) {
+    } else if (likelihood == "gengamma") {
       # gengamma parameters sigma, k
       stanargs <- purrr::list_modify(stanargs,
                                      object = stanmodels$survival_param,
@@ -1549,11 +1586,13 @@ nma.fit <- function(ipd_x, ipd_y,
     if (has_ipd) l_cat <- colnames(ipd_y$.r)[-1]
     else if (has_agd_arm) l_cat <- colnames(agd_arm_y$.r)[-1]
     fnames_oi[grepl("^cc\\[[0-9]+\\]$", fnames_oi)] <- paste0("cc[", l_cat, "]")
-  } else if (likelihood %in% c("weibull", "gompertz")) {
+  } else if (! likelihood %in% c("lognormal", "gengamma", "exponential", "exponential-aft")) {
     fnames_oi[grepl("^shape\\[[0-9]+\\]$", fnames_oi)] <- paste0("shape[", x_names_sub[col_study], "]")
-    fnames_oi[grepl("^scale\\[[0-9]+\\]$", fnames_oi)] <- paste0("scale[", x_names_sub[col_study], "]")
-  } else if (likelihood == "exponential") {
-    fnames_oi[grepl("^scale\\[[0-9]+\\]$", fnames_oi)] <- paste0("scale[", x_names_sub[col_study], "]")
+  } else if (likelihood == "lognormal") {
+    fnames_oi[grepl("^sdlog\\[[0-9]+\\]$", fnames_oi)] <- paste0("sdlog[", x_names_sub[col_study], "]")
+  } else if (likelihood == "gengamma") {
+    fnames_oi[grepl("^sigma\\[[0-9]+\\]$", fnames_oi)] <- paste0("sigma[", x_names_sub[col_study], "]")
+    fnames_oi[grepl("^k\\[[0-9]+\\]$", fnames_oi)] <- paste0("k[", x_names_sub[col_study], "]")
   }
 
   stanfit@sim$fnames_oi <- fnames_oi
@@ -1680,6 +1719,34 @@ which_RE <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
   }
 
   return(id)
+}
+
+#' Check provided prior distributions
+#'
+#' @param x Input to check. Usually a `nma_prior` object.
+#' @param list_names If `x` can be a named list of priors, the names we expect.
+#'
+#' @noRd
+check_prior <- function(x, list_names) {
+  arg <- rlang::caller_arg(x)
+  if (missing(list_names)) {
+    if (!inherits(x, "nma_prior"))
+      abort(glue::glue("`{arg}` must be a prior distribution, see ?priors."),
+            call = rlang::caller_env())
+  } else {
+    if (any(purrr::map_lgl(x, ~!inherits(., "nma_prior"))))
+      abort(glue::glue("`{arg}` must be a named list of prior distributions, see ?priors.\n",
+                       "Expecting named elements with priors for ",
+                       glue::glue_collapse(list_names, sep = ", ", last = " and ", width = 30), "."),
+            call = rlang::caller_env())
+
+    nm <- setdiff(list_names, names(x))
+    if (length(nm) > 0)
+      abort(glue::glue("`{arg}` must be a named list of prior distributions.\n",
+                       "Missing named elements with priors for ",
+                       glue::glue_collapse(nm, sep = ", ", last = " and ", width = 30), "."),
+            call = rlang::caller_env())
+  }
 }
 
 #' List of valid likelihoods for different outcomes
