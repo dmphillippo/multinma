@@ -76,7 +76,8 @@ precision \eqn{1/\tau^2} (\code{"prec"}).}
 coefficients (if \code{regression} formula specified)}
 
 \item{prior_aux}{Specification of prior distribution for the auxiliary
-parameter, if applicable (see details)}
+parameter, if applicable (see details). For \code{likelihood = "gengamma"} this
+should be a list of prior distributions with elements \code{sigma} and \code{k}.}
 
 \item{QR}{Logical scalar (default \code{FALSE}), whether to apply a QR
 decomposition to the model design matrix}
@@ -187,9 +188,23 @@ All survival likelihoods except the \code{exponential} and \code{exponential-aft
 likelihoods have auxiliary parameters. These are typically study-specific
 shape parameters \eqn{\gamma_j>0}, except for the \code{lognormal} likelihood
 where the auxiliary parameters are study-specific standard deviations on
-the log scale \eqn{\sigma_j>0}. The \code{gengamma} likelihood has two sets of
-auxiliary parameters, study-specific scale parameters \eqn{\sigma_j>0} and
-shape parameters \eqn{Q_j}.
+the log scale \eqn{\sigma_j>0}.
+
+The \code{gengamma} likelihood has two sets of auxiliary parameters,
+study-specific scale parameters \eqn{\sigma_j>0} and shape parameters
+\eqn{k_j}, following the parameterisation of
+\insertCite{Lawless1980;textual}{multinma}, which permits a range of
+behaviours for the baseline hazard including increasing, decreasing,
+bathtub and arc-shaped hazards. This parameterisation is related to that
+discussed by \insertCite{Cox2007;textual}{multinma} and implemented in the
+\code{flexsurv} package with \eqn{Q = k^{-0.5}}. The parameterisation used here
+effectively bounds the shape parameter \eqn{k} away from numerical
+instabilities as \eqn{k \rightarrow \infty} (i.e. away from \eqn{Q
+  \rightarrow 0}, the log-Normal distribution) via the prior distribution.
+Implicitly, this parameterisation is restricted to \eqn{Q > 0} and so
+certain survival distributions like the inverse-Gamma and inverse-Weibull
+are not part of the parameter space; however, \eqn{Q > 0} still encompasses
+the other survival distributions implemented in this package.
 }
 }
 
