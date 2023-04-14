@@ -263,8 +263,17 @@ plot_prior_posterior <- function(x, ...,
   for (i in seq_along(prior)) {
     if (prior[i] %in% c("het", "aux")) trunc <- c(0, Inf)
     else trunc <- NULL
-    prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc) %>%
-      tibble::add_column(prior = prior[i])
+
+    if (x$likelihood == "gengamma" && prior[i] == "aux") {
+      prior_dat[[i]] <-
+        dplyr::bind_rows(get_tidy_prior(x$priors$prior_aux$sigma, trunc = trunc),
+                         get_tidy_prior(x$priors$prior_aux$k, trunc = trunc)) %>%
+        tibble::add_column(prior = c("aux", "aux2"))
+
+    } else {
+      prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc) %>%
+        tibble::add_column(prior = prior[i])
+    }
   }
 
   prior_dat <- dplyr::bind_rows(prior_dat) %>%
@@ -279,9 +288,12 @@ plot_prior_posterior <- function(x, ...,
                                                         weibull = "shape",
                                                         gompertz = "shape",
                                                         `weibull-aft` = "shape",
-                                                        lognormal = "shape",
+                                                        lognormal = "sdlog",
                                                         loglogistic = "shape",
-                                                        gamma = "shape")))
+                                                        gamma = "shape",
+                                                        gengamma = "sigma"),
+                                           aux2 = switch(x$likelihood,
+                                                         gengamma = "k")))
 
   # Add in omega parameter if node-splitting model, which uses prior_trt
   if (inherits(x, "nma_nodesplit")) {
