@@ -180,6 +180,34 @@ new_nma_prior <- function(dist, location = NA_real_, scale = NA_real_, df = NA_r
   return(o)
 }
 
+#' Check provided prior distributions
+#'
+#' @param x Input to check. Usually a `nma_prior` object.
+#' @param list_names If `x` can be a named list of priors, the names we expect.
+#'
+#' @noRd
+check_prior <- function(x, list_names) {
+  arg <- rlang::caller_arg(x)
+  if (missing(list_names)) {
+    if (!inherits(x, "nma_prior"))
+      abort(glue::glue("`{arg}` must be a prior distribution, see ?priors."),
+            call = rlang::caller_env())
+  } else {
+    if (any(purrr::map_lgl(x, ~!inherits(., "nma_prior"))))
+      abort(glue::glue("`{arg}` must be a named list of prior distributions, see ?priors.\n",
+                       "Expecting named elements with priors for ",
+                       glue::glue_collapse(list_names, sep = ", ", last = " and ", width = 30), "."),
+            call = rlang::caller_env())
+
+    nm <- setdiff(list_names, names(x))
+    if (length(nm) > 0)
+      abort(glue::glue("`{arg}` must be a named list of prior distributions.\n",
+                       "Missing named elements with priors for ",
+                       glue::glue_collapse(nm, sep = ", ", last = " and ", width = 30), "."),
+            call = rlang::caller_env())
+  }
+}
+
 #' Produce tidy prior details
 #'
 #' Produces prior details in a data frame, in a suitable format for
@@ -267,6 +295,13 @@ get_tidy_prior <- function(prior, trunc = NULL) {
 #' @return String giving call to construct x
 #' @noRd
 get_prior_call <- function(x) {
+  # Deal with lists of priors
+  if (all(purrr::map_lgl(x, ~inherits(., "nma_prior")))) {
+    out <- purrr::imap_chr(x, ~paste0(.y, " = ", get_prior_call(.x)))
+    out <- paste0("list(", paste(out, collapse = ", "), ")")
+    return(out)
+  }
+
   if (!inherits(x, "nma_prior"))
     abort("Not a `nma_prior` object.")
 

@@ -1721,34 +1721,6 @@ which_RE <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
   return(id)
 }
 
-#' Check provided prior distributions
-#'
-#' @param x Input to check. Usually a `nma_prior` object.
-#' @param list_names If `x` can be a named list of priors, the names we expect.
-#'
-#' @noRd
-check_prior <- function(x, list_names) {
-  arg <- rlang::caller_arg(x)
-  if (missing(list_names)) {
-    if (!inherits(x, "nma_prior"))
-      abort(glue::glue("`{arg}` must be a prior distribution, see ?priors."),
-            call = rlang::caller_env())
-  } else {
-    if (any(purrr::map_lgl(x, ~!inherits(., "nma_prior"))))
-      abort(glue::glue("`{arg}` must be a named list of prior distributions, see ?priors.\n",
-                       "Expecting named elements with priors for ",
-                       glue::glue_collapse(list_names, sep = ", ", last = " and ", width = 30), "."),
-            call = rlang::caller_env())
-
-    nm <- setdiff(list_names, names(x))
-    if (length(nm) > 0)
-      abort(glue::glue("`{arg}` must be a named list of prior distributions.\n",
-                       "Missing named elements with priors for ",
-                       glue::glue_collapse(nm, sep = ", ", last = " and ", width = 30), "."),
-            call = rlang::caller_env())
-  }
-}
-
 #' List of valid likelihoods for different outcomes
 #' @noRd
 valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
