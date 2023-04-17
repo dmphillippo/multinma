@@ -804,7 +804,7 @@ nma <- function(network,
       } else {
         ipd_delta_labels <- NULL
       }
-      agd_arm_delta_labels <- make_data_labels(dat_agd_arm$.study, dat_agd_arm$.trt)
+      agd_arm_delta_labels <- if (has_agd_arm(network)) make_data_labels(dat_agd_arm$.study, dat_agd_arm$.trt) else NULL
     }
 
     agd_contrast_delta_labels <- agd_contrast_data_labels
