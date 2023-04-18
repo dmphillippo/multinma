@@ -1408,87 +1408,8 @@ nma.fit <- function(ipd_x, ipd_y,
   } else if (likelihood %in% setdiff(valid_lhood$survival, c("mspline", "pexp"))) {
 
     # Pull out Surv data
-    if (has_ipd) {
-
-      ipd_surv_type <- attr(ipd_y$.Surv, "type")
-
-      ipd_status <- ipd_y$.Surv[, "status"]
-
-      if (ipd_surv_type == "right") {
-        # Right censored
-        ipd_time <- ipd_y$.Surv[, "time"]
-        ipd_start_time <- ipd_delay_time <- rep(0, length(ipd_time))
-
-      } else if (ipd_surv_type == "left") {
-        # Left censored
-        ipd_time <- ipd_y$.Surv[, "time"]
-        ipd_start_time <- ipd_delay_time <- rep(0, length(ipd_time))
-
-        # Make status indicator consistent with other types (i.e. left censored = 2)
-        ipd_status[ipd_status == 0] <- 2
-
-      } else if (ipd_surv_type %in% c("interval", "interval2")) {
-        # Interval censored
-        ipd_time <- ipd_start_time <- rep(0, length(ipd_time))
-
-        # time1 is used unless status = 3 (interval censored)
-        ipd_time[ipd_status < 3] <- ipd_y$.Surv[, "time1"]
-        ipd_time[ipd_status == 3] <- ipd_y$.Surv[, "time2"]
-        ipd_start_time[ipd_status == 3] <- ipd_y$.Surv[, "time1"]
-
-        ipd_delay_time <- rep(0, length(ipd_time))
-
-      } else if (ipd_surv_type == "counting") {
-        # Delayed entry
-        ipd_time <- ipd_y$.Surv[, "stop"]
-        ipd_delay_time <- ipd_y$.Surv[, "start"]
-        ipd_start_time <- rep(0, length(ipd_time))
-      }
-    } else {
-      ipd_time <- ipd_start_time <- ipd_delay_time <- numeric()
-      ipd_status <- integer()
-    }
-
-    if (has_agd_arm) {
-
-      agd_arm_surv_type <- attr(agd_arm_y$.Surv, "type")
-
-      agd_arm_status <- agd_arm_y$.Surv[, "status"]
-
-      if (agd_arm_surv_type == "right") {
-        # Right censored
-        agd_arm_time <- agd_arm_y$.Surv[, "time"]
-        agd_arm_start_time <- agd_arm_delay_time <- rep(0, length(agd_arm_time))
-
-      } else if (agd_arm_surv_type == "left") {
-        # Left censored
-        agd_arm_time <- agd_arm_y$.Surv[, "time"]
-        agd_arm_start_time <- agd_arm_delay_time <- rep(0, length(agd_arm_time))
-
-        # Make status indicator consistent with other types (i.e. left censored = 2)
-        agd_arm_status[agd_arm_status == 0] <- 2
-
-      } else if (agd_arm_surv_type %in% c("interval", "interval2")) {
-        # Interval censored
-        agd_arm_time <- agd_arm_start_time <- rep(0, length(agd_arm_time))
-
-        # time1 is used unless status = 3 (interval censored)
-        agd_arm_time[agd_arm_status < 3] <- agd_arm_y$.Surv[, "time1"]
-        agd_arm_time[agd_arm_status == 3] <- agd_arm_y$.Surv[, "time2"]
-        agd_arm_start_time[agd_arm_status == 3] <- agd_arm_y$.Surv[, "time1"]
-
-        agd_arm_delay_time <- rep(0, length(agd_arm_time))
-
-      } else if (agd_arm_surv_type == "counting") {
-        # Delayed entry
-        agd_arm_time <- agd_arm_y$.Surv[, "stop"]
-        agd_arm_delay_time <- agd_arm_y$.Surv[, "start"]
-        agd_arm_start_time <- rep(0, length(agd_arm_time))
-      }
-    } else {
-      agd_arm_time <- agd_arm_start_time <- agd_arm_delay_time <- numeric()
-      agd_arm_status <- integer()
-    }
+    ipd_surv <- get_Surv_data(ipd_y$.Surv)
+    agd_arm_surv <- get_Surv_data(agd_arm_y$.Surv)
 
     # Add in dummy prior_aux for exponential model - not used, but requested by Stan data
     if (likelihood %in% c("exponential", "exponential-aft")) prior_aux <- flat()
@@ -1504,15 +1425,15 @@ nma.fit <- function(ipd_x, ipd_y,
                                   study = c(ipd_study, agd_arm_study),
 
                                   # Add outcomes
-                                  ipd_time = ipd_time,
-                                  ipd_start_time = ipd_start_time,
-                                  ipd_delay_time = ipd_delay_time,
-                                  ipd_status = ipd_status,
+                                  ipd_time = ipd_surv$time,
+                                  ipd_start_time = ipd_surv$start_time,
+                                  ipd_delay_time = ipd_surv$delay_time,
+                                  ipd_status = ipd_surv$status,
 
-                                  agd_arm_time = agd_arm_time,
-                                  agd_arm_start_time = agd_arm_start_time,
-                                  agd_arm_delay_time = agd_arm_delay_time,
-                                  agd_arm_status = agd_arm_status,
+                                  agd_arm_time = agd_arm_surv$time,
+                                  agd_arm_start_time = agd_arm_surv$start_time,
+                                  agd_arm_delay_time = agd_arm_surv$delay_time,
+                                  agd_arm_status = agd_arm_surv$status,
 
                                   # Specify survival distribution
                                   dist = switch(likelihood,
@@ -2508,6 +2429,62 @@ make_Sigma_block <- function(x) {
   S <- matrix(s_ij, nrow = narm, ncol = narm)
   diag(S) <- s_ii
   return(S)
+}
+
+#' Get survival Surv data in consistent format
+#'
+#' @param x a Surv() object
+#'
+#' @return a list with elements time, start_time (for interval censored),
+#'   delay_time (for delayed entry), and status
+#' @noRd
+get_Surv_data <- function(x) {
+  if (!missing(x) && !is.null(x)) {
+
+    surv_type <- attr(x, "type")
+
+    status <- x[, "status"]
+
+    if (surv_type == "right") {
+      # Right censored
+      time <- x[, "time"]
+      start_time <- delay_time <- rep(0, length(time))
+
+    } else if (surv_type == "left") {
+      # Left censored
+      time <- x[, "time"]
+      start_time <- delay_time <- rep(0, length(time))
+
+      # Make status indicator consistent with other types (i.e. left censored = 2)
+      status[status == 0] <- 2
+
+    } else if (surv_type %in% c("interval", "interval2")) {
+      # Interval censored
+      time <- start_time <- rep(0, length(time))
+
+      # time1 is used unless status = 3 (interval censored)
+      time[status < 3] <- x[, "time1"]
+      time[status == 3] <- x[, "time2"]
+      start_time[status == 3] <- x[, "time1"]
+
+      delay_time <- rep(0, length(time))
+
+    } else if (surv_type == "counting") {
+      # Delayed entry
+      time <- x[, "stop"]
+      delay_time <- x[, "start"]
+      start_time <- rep(0, length(time))
+    }
+
+  } else {
+    time <- start_time <- delay_time <- numeric()
+    status <- integer()
+  }
+
+  return(list(time = time,
+              start_time = start_time,
+              delay_time = delay_time,
+              status = status))
 }
 
 #' Sanitise factor labels
