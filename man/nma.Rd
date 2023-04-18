@@ -23,7 +23,10 @@ nma(
   QR = FALSE,
   center = TRUE,
   adapt_delta = NULL,
-  int_thin = max(network$n_int\%/\%10, 1)
+  int_thin = max(network$n_int\%/\%10, 1),
+  mspline_degree = switch(likelihood, mspline = 3, pexp = 0),
+  n_knots = 3,
+  knots
 )
 }
 \arguments{
@@ -89,6 +92,25 @@ decomposition to the model design matrix}
 
 \item{int_thin}{A single integer value, the thinning factor for returning
 cumulative estimates of integration error}
+
+\item{mspline_degree}{Non-negative integer giving the degree of the M-spline
+polynomial for \code{likelihood = "mspline"}. Piecewise exponential hazards
+(\code{likelihood = "pexp"}) are a special case with \code{mpline_degree = 0}.}
+
+\item{n_knots}{For \code{mspline} and \code{pexp} likelihoods, a non-negative integer
+giving the number of internal knots for partitioning the baseline hazard
+into intervals. The knot locations within each study will be determined by
+the corresponding quantiles of the observed event times, plus boundary
+knots at the earliest entry time (0 with no delayed entry) and the maximum
+event/censoring time. For example, with the default \code{n_knots = 3}, the
+internal knot locations will be at the 25\%, 50\%, and 75\% quantiles of the
+observed event times. Ignored when \code{knots} is specified.}
+
+\item{knots}{For \code{mspline} and \code{pexp} likelihoods, a named list of numeric
+vectors of internal knot locations for each of the studies in the network.
+Currently, each vector must have the same length (i.e. each study must use
+the same number of knots). If unspecified (the default), the knots will be
+chosen based on \code{n_knots} as described above.}
 }
 \value{
 \code{nma()} returns a \link{stan_nma} object, except when \code{consistency = "nodesplit"} when a \link{nma_nodesplit} or \link{nma_nodesplit_df} object is
@@ -205,6 +227,11 @@ Implicitly, this parameterisation is restricted to \eqn{Q > 0} and so
 certain survival distributions like the inverse-Gamma and inverse-Weibull
 are not part of the parameter space; however, \eqn{Q > 0} still encompasses
 the other survival distributions implemented in this package.
+
+For the \code{mspline} and \code{pexp} likelihoods, the auxiliary parameters are the
+spline coefficients for each study. These form a unit simplex (i.e. lie
+between 0 and 1, and sum to 1), and are given a \code{\link[=dirichlet]{dirichlet()}} prior
+distribution.
 }
 }
 

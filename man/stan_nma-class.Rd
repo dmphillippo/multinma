@@ -29,6 +29,8 @@ exchangeable, or independent)}
 \item{\code{likelihood}}{The likelihood used (character string)}
 \item{\code{link}}{The link function used (character string)}
 \item{\code{priors}}{A list containing the priors used (as \link{nma_prior} objects)}
+\item{\code{basis}}{For \code{mspline} and \code{pexp} models, a named list of spline
+bases for each study}
 }
 
 The \code{stan_mlnmr} sub-class inherits from \code{stan_nma}, and differs only in the

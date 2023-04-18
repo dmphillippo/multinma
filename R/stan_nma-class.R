@@ -26,6 +26,8 @@
 #'   \item{`likelihood`}{The likelihood used (character string)}
 #'   \item{`link`}{The link function used (character string)}
 #'   \item{`priors`}{A list containing the priors used (as [nma_prior] objects)}
+#'   \item{`basis`}{For `mspline` and `pexp` models, a named list of spline
+#'    bases for each study}
 #'   }
 #'
 #' The `stan_mlnmr` sub-class inherits from `stan_nma`, and differs only in the

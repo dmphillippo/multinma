@@ -47,6 +47,22 @@
 #' @param adapt_delta See [adapt_delta] for details
 #' @param int_thin A single integer value, the thinning factor for returning
 #'   cumulative estimates of integration error
+#' @param mspline_degree Non-negative integer giving the degree of the M-spline
+#'   polynomial for `likelihood = "mspline"`. Piecewise exponential hazards
+#'   (`likelihood = "pexp"`) are a special case with `mpline_degree = 0`.
+#' @param n_knots For `mspline` and `pexp` likelihoods, a non-negative integer
+#'   giving the number of internal knots for partitioning the baseline hazard
+#'   into intervals. The knot locations within each study will be determined by
+#'   the corresponding quantiles of the observed event times, plus boundary
+#'   knots at the earliest entry time (0 with no delayed entry) and the maximum
+#'   event/censoring time. For example, with the default `n_knots = 3`, the
+#'   internal knot locations will be at the 25%, 50%, and 75% quantiles of the
+#'   observed event times. Ignored when `knots` is specified.
+#' @param knots For `mspline` and `pexp` likelihoods, a named list of numeric
+#'   vectors of internal knot locations for each of the studies in the network.
+#'   Currently, each vector must have the same length (i.e. each study must use
+#'   the same number of knots). If unspecified (the default), the knots will be
+#'   chosen based on `n_knots` as described above.
 #'
 #' @details When specifying a model formula in the `regression` argument, the
 #'   usual formula syntax is available (as interpreted by [model.matrix()]). The
@@ -150,6 +166,11 @@
 #'   are not part of the parameter space; however, \eqn{Q > 0} still encompasses
 #'   the other survival distributions implemented in this package.
 #'
+#'   For the `mspline` and `pexp` likelihoods, the auxiliary parameters are the
+#'   spline coefficients for each study. These form a unit simplex (i.e. lie
+#'   between 0 and 1, and sum to 1), and are given a [dirichlet()] prior
+#'   distribution.
+#'
 #' @return `nma()` returns a [stan_nma] object, except when `consistency =
 #'   "nodesplit"` when a [nma_nodesplit] or [nma_nodesplit_df] object is
 #'   returned. `nma.fit()` returns a [stanfit] object.
@@ -193,7 +214,10 @@ nma <- function(network,
                 QR = FALSE,
                 center = TRUE,
                 adapt_delta = NULL,
-                int_thin = max(network$n_int %/% 10, 1)) {
+                int_thin = max(network$n_int %/% 10, 1),
+                mspline_degree = switch(likelihood, mspline = 3, pexp = 0),
+                n_knots = 3,
+                knots) {
 
   # Check network
   if (!inherits(network, "nma_data")) {
@@ -301,7 +325,10 @@ nma <- function(network,
                          QR = QR,
                          center = center,
                          adapt_delta = adapt_delta,
-                         int_thin = int_thin)
+                         int_thin = int_thin,
+                         mspline_degree = mspline_degree,
+                         n_knots = n_knots,
+                         knots = knots)
 
       if (!missing(class_interactions)) ns_arglist$class_interactions <- class_interactions
 
@@ -389,7 +416,7 @@ nma <- function(network,
   has_aux <- (likelihood == "normal" && has_ipd(network)) ||
               likelihood %in% c("ordered", "weibull", "gompertz",
                                 "weibull-aft", "lognormal", "loglogistic",
-                                "gamma", "gengamma")
+                                "gamma", "gengamma", "mspline", "pexp")
 
   # Are study intercepts present? Not if only contrast data
   has_intercepts <- has_agd_arm(network) || has_ipd(network)
@@ -428,6 +455,8 @@ nma <- function(network,
     } else if (likelihood == "gengamma") {
       prior_aux <- .default(list(sigma = half_normal(scale = 10),
                                  k = half_normal(scale = 10)))
+    } else if (likelihood %in% c("mspline", "pexp")) {
+      prior_aux <- .default(dirichlet(1))
     }
     prior_defaults$prior_aux <- get_prior_call(prior_aux)
   }
@@ -709,6 +738,72 @@ nma <- function(network,
     .which_RE <- NULL
   }
 
+  # Set up spline basis for mspline and pexp models
+  if (likelihood %in% c("mspline", "pexp") && (has_ipd(network) || has_agd_arm(network))) {
+    require_pkg("splines2")
+
+    if (likelihood == "pexp") mspline_degree <- 0
+
+    if (!rlang::is_scalar_integerish(mspline_degree, finite = TRUE) || mspline_degree < 0)
+      abort("`mspline_degree` must be a single non-negative integer.")
+
+    # Calculate boundary knots
+    survdat <- dplyr::tibble(.Surv = if (!has_ipd(network)) y_agd_arm$.Surv else c(y_ipd$.Surv, y_agd_arm$.Surv),  # Take care with dispatch of c() to pick up c.Surv()
+                             .study = forcats::fct_drop(c(dat_ipd$.study, rep(dat_agd_arm$.study, times = dat_agd_arm$.sample_size))),
+                             observed = .Surv[, "status"]  == 1)
+
+    stype <- attr(survdat$.Surv, "type")
+    survdat <- dplyr::mutate(survdat, !!! get_Surv_data(survdat$.Surv))
+
+    # Boundary knots at earliest entry time (0 with no delayed entry) and latest event/censoring time
+    b_knots <- by(survdat, survdat$.study, function(x) c(min(x$delay_time), max(x$time)),
+                  simplify = FALSE)
+
+    if (missing(knots)) {  # Calculate internal knots based on quantiles
+      if (!rlang::is_scalar_integerish(n_knots, finite = TRUE) || n_knots <= 0)
+        abort("`n_knots` must be a single positive integer (or specify `knots` directly)")
+
+      observed_survdat <- dplyr::filter(survdat, .data$observed)
+      knots <- by(observed_survdat, observed_survdat$.study,
+                  function(x) quantile(x$time, probs = seq(1, n_knots) / (n_knots + 1)),
+                  simplify = FALSE)
+
+    } else {  # User-provided internal knots
+      # Check required format
+      if (!is.list(knots) || any(!purrr::map_lgl(knots, is.numeric)))
+        abort("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.")
+
+      missing_names <- setdiff(levels(survdat$.study), names(knots))
+      if (length(missing_names) > 0)
+        abort(glue::glue("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.\n",
+                         "Missing knot location vector{if (length(missing_names > 1) 's' else ''} for stud{if (length(missing_names > 1) 'ies' else 'y'} ",
+                         glue::glue_collapse(glue::double_quote(missing_names), sep = ", ", last = " and ", width = 30), "."))
+
+      if (!all(purrr::map_int(knots, length) == length(knots[[1]])))
+        abort("Each element of `knots` must currently be the same length (each study must have the same number of knots).")
+    }
+
+    # Set up basis
+    # Only evaluate at first boundary knot for now to save time/memory
+    basis <- purrr::imap(b_knots,
+                         ~tryCatch(splines2::mSpline(.x[1],
+                                                     knots = knots[[.y]],
+                                                     Boundary.knots = .x,
+                                                     degree = mspline_degree,
+                                                     intercept = TRUE),
+                                   error = function(e) abort(glue::glue("Could not create spline basis for study {glue::double_quote(.y)}."),
+                                                             parent = e),
+                                   warning = function(w) warn(glue::glue("Warning while creating spline basis for study {glue::double_quote(.y)}."),
+                                                              parent = e))
+                         )
+
+    # Ensure list is in factor order
+    basis <- basis[levels(survdat$.study)]
+
+  } else {
+    basis <- NULL
+  }
+
   # Fit using nma.fit
   stanfit <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
     agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
@@ -733,7 +828,8 @@ nma <- function(network,
     prior_aux = prior_aux,
     QR = QR,
     adapt_delta = adapt_delta,
-    int_thin = int_thin)
+    int_thin = int_thin,
+    basis = basis)
 
   # Make readable parameter names for generated quantities
   fnames_oi <- stanfit@sim$fnames_oi
@@ -865,6 +961,8 @@ nma <- function(network,
                             prior_reg = if (!is.null(regression) && !is_only_offset(regression)) prior_reg else NULL,
                             prior_aux = if (has_aux) prior_aux else NULL))
 
+  if (likelihood %in% c("mspline", "pexp")) out$basis <- basis
+
   if (inherits(network, "mlnmr_data")) class(out) <- c("stan_mlnmr", "stan_nma")
   else class(out) <- "stan_nma"
 
@@ -890,6 +988,7 @@ nma <- function(network,
 #' @param agd_contrast_offset Vector of offset values for AgD (contrast-based)
 #' @param RE_cor Random effects correlation matrix, when `trt_effects = "random"`
 #' @param which_RE Random effects design vector, when `trt_effects = "random"`
+#' @param basis Spline basis for `mspline` and `pexp` models
 #'
 #' @noRd
 nma.fit <- function(ipd_x, ipd_y,
@@ -912,7 +1011,8 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_aux,
                     QR = FALSE,
                     adapt_delta = NULL,
-                    int_thin = 100L) {
+                    int_thin = 100L,
+                    basis) {
 
   if (missing(ipd_x)) ipd_x <- NULL
   if (missing(ipd_y)) ipd_y <- NULL
@@ -1481,25 +1581,96 @@ nma.fit <- function(ipd_x, ipd_y,
                                                                  "Exponential", "flat (implicit)")))
     }
 
-    # Monitor auxiliary parameters
-    if (! likelihood %in% c("lognormal", "gengamma", "exponential", "exponential-aft")) {
-      stanargs <- purrr::list_modify(stanargs,
-                                     object = stanmodels$survival_param,
-                                     data = standat,
-                                     pars = c(pars, "shape"))
-    } else if (likelihood == "lognormal") {
-      # lognormal parameter sdlog
-      stanargs <- purrr::list_modify(stanargs,
-                                     object = stanmodels$survival_param,
-                                     data = standat,
-                                     pars = c(pars, "sdlog"))
-    } else if (likelihood == "gengamma") {
-      # gengamma parameters sigma, k
-      stanargs <- purrr::list_modify(stanargs,
-                                     object = stanmodels$survival_param,
-                                     data = standat,
-                                     pars = c(pars, "sigma", "k"))
+
+
+    stanargs <- purrr::list_modify(stanargs,
+                                   object = stanmodels$survival_param,
+                                   data = standat,
+                                   # Monitor auxiliary parameters
+                                   pars =
+                                     if (! likelihood %in% c("lognormal", "gengamma", "exponential", "exponential-aft")) c(pars, "shape")
+                                     else if (likelihood == "lognormal") c(pars, "sdlog")
+                                     else if (likelihood == "gengamma") c(pars, "sigma", "k")
+                                   )
+
+
+  # -- Flexible parametric survival likelihoods (splines, piecewise exponential)
+  } else if (likelihood %in% c("mspline", "pexp")) {
+
+    # Pull out Surv data
+    ipd_surv <- get_Surv_data(ipd_y$.Surv)
+    agd_arm_surv <- get_Surv_data(agd_arm_y$.Surv)
+
+    # Number of spline coefficients
+    n_scoef <- ncol(basis[[1]])
+
+    # Evaluate splines
+    if (has_ipd) {
+      ipd_time <- ipd_itime <- ipd_start_itime <- ipd_delay_itime <- matrix(nrow = length(ipd_surv$time), ncol = n_scoef)
+
+      for (s in unique(ipd_s_t_all$.study)) {
+        ipd_time[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s])
+        ipd_itime[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s], integral = TRUE)
+        ipd_start_itime[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$start_time[ipd_s_t_all$.study == s], integral = TRUE)
+        ipd_delay_itime[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$delay_time[ipd_s_t_all$.study == s], integral = TRUE)
+      }
+
+    } else {
+      ipd_time <- ipd_itime <- ipd_start_itime <- ipd_delay_itime <- matrix(nrow = 0, ncol = n_scoef)
     }
+
+    if (has_agd_arm) {
+      agd_arm_time <- agd_arm_itime <- agd_arm_start_itime <- agd_arm_delay_itime <- matrix(nrow = length(agd_arm_surv$time), ncol = n_scoef)
+
+      for (s in unique(agd_arm_s_t_all$.study)) {
+        agd_arm_time[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s])
+        agd_arm_itime[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s], integral = TRUE)
+        agd_arm_start_itime[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$start_time[agd_arm_s_t_all$.study == s], integral = TRUE)
+        agd_arm_delay_itime[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$delay_time[agd_arm_s_t_all$.study == s], integral = TRUE)
+      }
+
+    } else {
+      agd_arm_time <- agd_arm_itime <- agd_arm_start_itime <- agd_arm_delay_itime <- matrix(nrow = 0, ncol = n_scoef)
+    }
+
+    standat <- purrr::list_modify(standat,
+                                  # AgD arm IDs
+                                  agd_arm_arm = agd_arm_arm,
+
+                                  # Study IDs
+                                  study = c(ipd_study, agd_arm_study),
+
+                                  # Number of spline coefficients
+                                  n_scoef = n_scoef,
+
+                                  # Add outcomes
+                                  ipd_time = ipd_time,
+                                  ipd_itime = ipd_itime,
+                                  ipd_start_itime = ipd_start_itime,
+                                  ipd_delay_itime = ipd_delay_itime,
+                                  ipd_delayed = ipd_surv$delay_time > 0,
+                                  ipd_status = ipd_surv$status,
+
+                                  agd_arm_time = agd_arm_time,
+                                  agd_arm_itime = agd_arm_itime,
+                                  agd_arm_start_itime = agd_arm_start_itime,
+                                  agd_arm_delay_itime = agd_arm_delay_itime,
+                                  agd_arm_delayed = agd_arm_surv$delay_time > 0,
+                                  agd_arm_status = agd_arm_surv$status,
+
+                                  # Specify link
+                                  link = switch(link, log = 1),
+
+                                  # Add priors for spline coefficients
+                                  !!! prior_standat(prior_aux, "prior_aux",
+                                                    valid = "Dirichlet")
+    )
+
+    # Monitor spline coefficients
+    stanargs <- purrr::list_modify(stanargs,
+                                   object = stanmodels$survival_mspline,
+                                   data = standat,
+                                   pars = c(pars, "scoef"))
 
   } else {
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
@@ -1521,13 +1692,16 @@ nma.fit <- function(ipd_x, ipd_y,
     if (has_ipd) l_cat <- colnames(ipd_y$.r)[-1]
     else if (has_agd_arm) l_cat <- colnames(agd_arm_y$.r)[-1]
     fnames_oi[grepl("^cc\\[[0-9]+\\]$", fnames_oi)] <- paste0("cc[", l_cat, "]")
-  } else if (! likelihood %in% c("lognormal", "gengamma", "exponential", "exponential-aft")) {
-    fnames_oi[grepl("^shape\\[[0-9]+\\]$", fnames_oi)] <- paste0("shape[", x_names_sub[col_study], "]")
-  } else if (likelihood == "lognormal") {
-    fnames_oi[grepl("^sdlog\\[[0-9]+\\]$", fnames_oi)] <- paste0("sdlog[", x_names_sub[col_study], "]")
-  } else if (likelihood == "gengamma") {
-    fnames_oi[grepl("^sigma\\[[0-9]+\\]$", fnames_oi)] <- paste0("sigma[", x_names_sub[col_study], "]")
-    fnames_oi[grepl("^k\\[[0-9]+\\]$", fnames_oi)] <- paste0("k[", x_names_sub[col_study], "]")
+  }
+
+  fnames_oi[grepl("^shape\\[[0-9]+\\]$", fnames_oi)] <- paste0("shape[", x_names_sub[col_study], "]")
+  fnames_oi[grepl("^sdlog\\[[0-9]+\\]$", fnames_oi)] <- paste0("sdlog[", x_names_sub[col_study], "]")
+  fnames_oi[grepl("^sigma\\[[0-9]+\\]$", fnames_oi)] <- paste0("sigma[", x_names_sub[col_study], "]")
+  fnames_oi[grepl("^k\\[[0-9]+\\]$", fnames_oi)] <- paste0("k[", x_names_sub[col_study], "]")
+
+  if (likelihood %in% c("mspline", "pexp")) {
+    fnames_oi[grepl("^scoef\\[[0-9]+,[0-9]+\\]$", fnames_oi)] <-
+      paste0("scoef[", rep(x_names_sub[col_study], times = n_scoef), ", ", rep(1:n_scoef, each = sum(col_study)), "]")
   }
 
   stanfit@sim$fnames_oi <- fnames_oi
@@ -2372,6 +2546,34 @@ check_regression_data <- function(formula,
   }
 
   invisible()
+}
+
+#' Check provided prior distributions
+#'
+#' @param x Input to check. Usually a `nma_prior` object.
+#' @param list_names If `x` can be a named list of priors, the names we expect.
+#'
+#' @noRd
+check_prior <- function(x, list_names) {
+  arg <- rlang::caller_arg(x)
+  if (missing(list_names)) {
+    if (!inherits(x, "nma_prior"))
+      abort(glue::glue("`{arg}` must be a prior distribution, see ?priors."),
+            call = rlang::caller_env())
+  } else {
+    if (any(purrr::map_lgl(x, ~!inherits(., "nma_prior"))))
+      abort(glue::glue("`{arg}` must be a named list of prior distributions, see ?priors.\n",
+                       "Expecting named elements with priors for ",
+                       glue::glue_collapse(list_names, sep = ", ", last = " and ", width = 30), "."),
+            call = rlang::caller_env())
+
+    nm <- setdiff(list_names, names(x))
+    if (length(nm) > 0)
+      abort(glue::glue("`{arg}` must be a named list of prior distributions.\n",
+                       "Missing named elements with priors for ",
+                       glue::glue_collapse(nm, sep = ", ", last = " and ", width = 30), "."),
+            call = rlang::caller_env())
+  }
 }
 
 #' Set prior details for Stan models
