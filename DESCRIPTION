@@ -67,7 +67,8 @@ Suggests:
     logitnorm,
     crayon,
     tidygraph,
-    pkgdown
+    pkgdown,
+    splines2
 RdMacros: Rdpack
 URL: https://dmphillippo.github.io/multinma/, https://github.com/dmphillippo/multinma
 BugReports: https://github.com/dmphillippo/multinma/issues
