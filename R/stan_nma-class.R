@@ -260,6 +260,8 @@ plot_prior_posterior <- function(x, ...,
   if (!is.numeric(ref_line) || !is.null(dim(ref_line)))
     abort("`ref_line` should be a numeric vector.")
 
+  if (x$likelihood %in% c("mspline", "pexp")) n_scoef <- ncol(x$basis[[1]])
+
   # Get prior details
   prior_dat <- vector("list", length(prior))
   for (i in seq_along(prior)) {
@@ -271,6 +273,10 @@ plot_prior_posterior <- function(x, ...,
         dplyr::bind_rows(get_tidy_prior(x$priors$prior_aux$sigma, trunc = trunc),
                          get_tidy_prior(x$priors$prior_aux$k, trunc = trunc)) %>%
         tibble::add_column(prior = c("aux", "aux2"))
+
+    } else if (x$likelihood %in% c("mspline", "pexp") && prior[i] == "aux") {
+      prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc, n_dim = n_scoef) %>%
+        tibble::add_column(prior = prior[i])
 
     } else {
       prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc) %>%
@@ -293,7 +299,9 @@ plot_prior_posterior <- function(x, ...,
                                                         lognormal = "sdlog",
                                                         loglogistic = "shape",
                                                         gamma = "shape",
-                                                        gengamma = "sigma"),
+                                                        gengamma = "sigma",
+                                                        mspline = "scoef",
+                                                        pexp = "scoef"),
                                            aux2 = switch(x$likelihood,
                                                          gengamma = "k")))
 
