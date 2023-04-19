@@ -221,7 +221,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
           if (any(rlang::has_name(x$agd_arm$.data_orig, all.vars(x$regression)))) {
             dat_agd_arm <- x$network$agd_arm %>%
               # Drop duplicated names in outer dataset from .data_orig before unnesting
-              dplyr::mutate(.data_orig = purrr::map(.data_orig, ~ dplyr::select(., -dplyr::any_of(names(x$network$agd_arm)))),
+              dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(x$network$agd_arm)))),
                             # Reset sample size for weighted mean later
                             .sample_size = 1) %>%
               # Unnest .data_orig

@@ -535,7 +535,7 @@ nma <- function(network,
       if (network$outcome$agd_arm == "survival") {
         idat_agd_arm <- dat_agd_arm %>%
           # Drop duplicated names in outer dataset from .data_orig before unnesting
-          dplyr::mutate(.data_orig = purrr::map(.data_orig, ~ dplyr::select(., -dplyr::any_of(names(dat_agd_arm))))) %>%
+          dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(dat_agd_arm))))) %>%
           # Unnest - should have n_int contiguous rows for each survival time
           tidyr::unnest(cols = c(".Surv", ".data_orig")) %>%
           .unnest_integration()
@@ -546,7 +546,7 @@ nma <- function(network,
       if (network$outcome$agd_arm == "survival") {
         idat_agd_arm <- dat_agd_arm %>%
           # Drop duplicated names in outer dataset from .data_orig before unnesting
-          dplyr::mutate(.data_orig = purrr::map(.data_orig, ~ dplyr::select(., -dplyr::any_of(names(dat_agd_arm))))) %>%
+          dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(dat_agd_arm))))) %>%
           # Unnest - should have one row for each survival time
           tidyr::unnest(cols = c(".Surv", ".data_orig"))
       } else {
@@ -752,15 +752,15 @@ nma <- function(network,
       if (!has_agd_arm(network)) {
         dplyr::tibble(.Surv = y_ipd$.Surv,
                       .study = forcats::fct_drop(dat_ipd$.study),
-                      observed = .Surv[, "status"]  == 1)
+                      observed = .data$.Surv[, "status"]  == 1)
       } else if (!has_ipd(network)) {
         dplyr::tibble(.Surv = y_agd_arm$.Surv,
                       .study = forcats::fct_drop(rep(dat_agd_arm$.study, times = dat_agd_arm$.sample_size)),
-                      observed = .Surv[, "status"]  == 1)
+                      observed = .data$.Surv[, "status"]  == 1)
       } else {
         dplyr::tibble(.Surv = c(y_ipd$.Surv, y_agd_arm$.Surv),
                       .study = forcats::fct_drop(c(dat_ipd$.study, rep(dat_agd_arm$.study, times = dat_agd_arm$.sample_size))),
-                      observed = .Surv[, "status"]  == 1)
+                      observed = .data$.Surv[, "status"]  == 1)
       }
 
     stype <- attr(survdat$.Surv, "type")
