@@ -26,7 +26,7 @@ nma(
   int_thin = max(network$n_int\%/\%10, 1),
   mspline_degree = 3,
   n_knots = 3,
-  knots
+  knots = NULL
 )
 }
 \arguments{

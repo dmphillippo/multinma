@@ -217,7 +217,7 @@ nma <- function(network,
                 int_thin = max(network$n_int %/% 10, 1),
                 mspline_degree = 3,
                 n_knots = 3,
-                knots) {
+                knots = NULL) {
 
   # Check network
   if (!inherits(network, "nma_data")) {
@@ -770,7 +770,7 @@ nma <- function(network,
     b_knots <- by(survdat, survdat$.study, function(x) c(min(x$delay_time), max(x$time)),
                   simplify = FALSE)
 
-    if (missing(knots)) {  # Calculate internal knots based on quantiles
+    if (is.null(knots)) {  # Calculate internal knots based on quantiles
       if (!rlang::is_scalar_integerish(n_knots, finite = TRUE) || n_knots <= 0)
         abort("`n_knots` must be a single positive integer (or specify `knots` directly)")
 
