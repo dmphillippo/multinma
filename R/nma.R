@@ -215,7 +215,7 @@ nma <- function(network,
                 center = TRUE,
                 adapt_delta = NULL,
                 int_thin = max(network$n_int %/% 10, 1),
-                mspline_degree = switch(likelihood, mspline = 3, pexp = 0),
+                mspline_degree = 3,
                 n_knots = 3,
                 knots) {
 
