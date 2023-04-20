@@ -1599,9 +1599,10 @@ nma.fit <- function(ipd_x, ipd_y,
                                    data = standat,
                                    # Monitor auxiliary parameters
                                    pars =
-                                     if (! likelihood %in% c("lognormal", "gengamma", "exponential", "exponential-aft")) c(pars, "shape")
+                                     if (likelihood %in% c("exponential", "exponential-aft")) pars
                                      else if (likelihood == "lognormal") c(pars, "sdlog")
                                      else if (likelihood == "gengamma") c(pars, "sigma", "k")
+                                     else c(pars, "shape")
                                    )
 
 
