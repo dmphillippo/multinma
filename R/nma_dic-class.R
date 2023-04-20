@@ -10,7 +10,7 @@
 #' @details Objects of class `nma_dic` have the following components:
 #'   \describe{
 #'   \item{`dic`}{The DIC value}
-#'   \item{`pd`}{The effective number of parameters}
+#'   \item{`pd`, `pv`}{The effective number of parameters}
 #'   \item{`resdev`}{The total residual deviance}
 #'   \item{`pointwise`}{A list of data frames containing the pointwise
 #'   contributions for the IPD and AgD.}
@@ -35,12 +35,17 @@ NULL
 print.nma_dic <- function(x, digits = 1, ...) {
   if (!rlang::is_scalar_integerish(digits)) abort("`digits` must be a single integer.")
 
+  penalty <- attr(x, "penalty")
+
   n <- sum(if (rlang::has_name(x$pointwise$ipd, "df")) x$pointwise$ipd$df else nrow(x$pointwise$ipd),
            if (rlang::has_name(x$pointwise$agd_arm, "df")) x$pointwise$agd_arm$df else nrow(x$pointwise$agd_arm),
            if (rlang::has_name(x$pointwise$agd_contrast, "df")) x$pointwise$agd_contrast$df else x$pointwise$agd_contrast$n_contrast)
 
   cglue("Residual deviance: {round(x$resdev, digits)}", subtle(" (on {n} data points)", sep = ""))
-  cglue("               pD: {round(x$pd, digits)}")
+  if (penalty == "pD")
+    cglue("               pD: {round(x$pd, digits)}")
+  else if (penalty == "pV")
+    cglue("               pV: {round(x$pv, digits)}")
   cglue("              DIC: {round(x$dic, digits)}")
 
   invisible(x)
