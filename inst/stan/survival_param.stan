@@ -264,7 +264,7 @@ generated quantities {
   // Transform intercepts back to scales
   // vector[ns_ipd + ns_agd_arm] scale = exp(mu);
 
-  vector[(dist != 1 || dist != 4 || dist != 6 || dist != 9) ? ns_ipd + ns_agd_arm : 0] shape;
+  vector[(dist != 1 && dist != 4 && dist != 6 && dist != 9) ? ns_ipd + ns_agd_arm : 0] shape;
   vector[dist == 6 ? ns_ipd + ns_agd_arm : 0] sdlog;  // lognormal sdlog
   vector[dist == 9 ? ns_ipd + ns_agd_arm : 0] sigma; // gengamma sigma
   vector[dist == 9 ? ns_ipd + ns_agd_arm : 0] k;  // gengamma k
@@ -282,7 +282,7 @@ generated quantities {
   // Fitted values not implemented
 
   // Rename parameters
-  if (dist != 1 || dist != 4 || dist != 6 || dist != 9) shape = aux;
+  if (dist != 1 && dist != 4 && dist != 6 && dist != 9) shape = aux;
   if (dist == 6) sdlog = aux;
   if (dist == 9) {
     sigma = aux;
