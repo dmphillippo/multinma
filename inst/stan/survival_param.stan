@@ -53,13 +53,13 @@ functions {
     if (dist == 1) { // Exponential
       lh = eta;
     } else if (dist == 2) { // Weibull
-      lh = log(aux) + eta + lmultiply(y, aux - 1);
+      lh = log(aux) + eta + lmultiply(aux - 1, y);
     } else if (dist == 3) { // Gompertz
       lh = eta + (aux * y);
     } else if (dist == 4) { // Exponential AFT
       lh = -eta;
     } else if (dist == 5) { // Weibull AFT
-      lh = log(aux) - (aux * eta) + lmultiply(y, aux - 1);
+      lh = log(aux) - (aux * eta) + lmultiply(aux - 1, y);
     } else if (dist == 6) { // log Normal
       // aux is sdlog
       lh = lognormal_lpdf(y | eta, aux) - log1m(Phi((log(y) - eta) / aux));
