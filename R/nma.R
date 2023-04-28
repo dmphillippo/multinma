@@ -1987,7 +1987,8 @@ get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
                                           "mspline", "pexp"),
                            link = c("identity", "log", "logit", "probit", "cloglog"),
                            measure = c("relative", "absolute"),
-                           type = c("link", "response")) {
+                           type = c("link", "response",
+                                    "survival", "hazard", "cumhaz", "mean", "median", "quantile", "rmst")) {
 
   likelihood <- rlang::arg_match(likelihood)
   link <- rlang::arg_match(link)
@@ -2057,19 +2058,35 @@ get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
   } else if (likelihood %in% c("exponential", "weibull", "gompertz", "mspline", "pexp")) {
 
     if (measure == "relative") {
-      out <- "log Hazard Ratio"
+      if (type == "link") out <- "log Hazard Ratio"
+      else out <- ""
     } else if (measure == "absolute") {
-      if (type == "link") out <- "log Hazard"
-      else out <- "Hazard"
+      out <- switch(type,
+                    survival = "Survival Probability",
+                    hazard = "Hazard",
+                    cumhaz = "Cumulative Hazard",
+                    mean = "Mean Survival Time",
+                    median = "Median Survival Time",
+                    quantile = "Survival Time",
+                    rmst = "Restricted Mean Survival Time",
+                    link = "Linear Predictor")
     }
 
   } else if (likelihood %in% c("exponential-aft", "weibull-aft", "lognormal", "loglogistic", "gamma", "gengamma")) {
 
     if (measure == "relative") {
-      out <- "log Survival Time Ratio"
+      if (type == "link") out <- "log Survival Time Ratio"
+      else out <- ""
     } else if (measure == "absolute") {
-      if (type == "link") out <- "log Survival"
-      else out <- "Survival"
+      out <- switch(type,
+                    survival = "Survival Probability",
+                    hazard = "Hazard",
+                    cumhaz = "Cumulative Hazard",
+                    mean = "Mean Survival Time",
+                    median = "Median Survival Time",
+                    quantile = "Survival Time",
+                    rmst = "Restricted Mean Survival Time",
+                    link = "Linear Predictor")
     }
 
   } else {

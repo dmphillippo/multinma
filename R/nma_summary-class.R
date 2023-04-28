@@ -142,7 +142,9 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #' @param ... Additional arguments passed on to the underlying `ggdist` plot
 #'   stat, see Details
 #' @param stat Character string specifying the `ggdist` plot stat to use,
-#'   default `"pointinterval"`
+#'   default `"pointinterval"`, except when plotting estimated
+#'   survival/hazard/cumulative hazard curves from survival models where the
+#'   default is `"lineribbon"`
 #' @param orientation Whether the `ggdist` geom is drawn horizontally
 #'   (`"horizontal"`) or vertically (`"vertical"`), default `"horizontal"`
 #' @param ref_line Numeric vector of positions for reference lines, by default
@@ -151,13 +153,15 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #' @details Plotting is handled by [ggplot2] and the stats and geoms provided in
 #'   the [ggdist] package. As a result, the output is very flexible. Any
 #'   plotting stats provided by `ggdist` may be used, via the argument
-#'   `stat`. The default uses
+#'   `stat`.
+#'
+#'   The default uses
 #'   \code{\link[ggdist:stat_pointinterval]{ggdist::stat_pointinterval()}}, to
-#'   produce medians and 95% Credible Intervals with 66% inner bands.
-#'   Additional arguments in `...` are passed to the `ggdist` stat, to
-#'   customise the output. For example, to produce means and Credible Intervals,
-#'   specify `point_interval = "mean_qi"`. To produce an 80% Credible Interval
-#'   with no inner band, specify `.width = c(0, 0.8)`.
+#'   produce medians and 95% Credible Intervals with 66% inner bands. Additional
+#'   arguments in `...` are passed to the `ggdist` stat, to customise the
+#'   output. For example, to produce means and Credible Intervals, specify
+#'   `point_interval = "mean_qi"`. To produce an 80% Credible Interval with no
+#'   inner band, specify `.width = c(0, 0.8)`.
 #'
 #'   Alternative stats can be specified to produce different summaries. For
 #'   example, specify `stat = "[half]eye"` to produce (half) eye plots, or `stat
@@ -165,6 +169,14 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #'
 #'   A full list of options and examples is found in the `ggdist` vignette
 #'   `vignette("slabinterval", package = "ggdist")`.
+#'
+#'   For survival/hazard/cumulative hazard curves estimated from survival
+#'   models, the default uses
+#'   \code{\link[ggdist:stat_lineribbon]{ggdist::stat_lineribbon()}} which
+#'   produces curves of posterior medians with 50%, 80%, and 95% Credible
+#'   Interval bands. Again, additional arguments in `...` are passed to the
+#'   `ggdist` stat. For example, to produce posterior means and 95% Credible
+#'   bands, specify `point_interval = "mean_qi"` and `.width = 0.95`.
 #'
 #'   A `ggplot` object is returned which can be further modified through the
 #'   usual [ggplot2] functions to add further aesthetics, geoms, themes, etc.
@@ -444,6 +456,59 @@ plot.nma_rank_probs <- function(x, ...) {
   } else {
     p <- p + ggplot2::facet_wrap(~Treatment)
   }
+
+  return(p)
+}
+
+#' @rdname plot.nma_summary
+#' @export
+plot.surv_nma_summary <- function(x, ..., stat = "lineribbon") {
+  # Checks
+  if (!rlang::is_string(stat))
+    abort("`stat` should be a character string specifying the name of a ggdist stat")
+
+  stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
+
+  tb_geom <- tryCatch(getExportedValue("ggdist", paste0("stat_", stat)),
+                      error = function(err) {
+                        abort(paste("`stat` should be a character string specifying the name of a ggdist stat:",
+                                    err, sep = "\n"))
+                      })
+
+  # Get axis labels from attributes, if available
+  p_xlab <- attr(x, "xlab", TRUE)
+  if (is.null(p_xlab)) p_xlab <- ""
+
+  p_ylab <- attr(x, "ylab", TRUE)
+  if (is.null(p_ylab)) p_ylab <- ""
+
+  # Get draws
+  draws <- as.data.frame(x) %>%
+    dplyr::select(dplyr::starts_with(".")) %>%
+    dplyr::mutate(value = purrr::array_branch(as.matrix(x), 2)) %>%
+    tidyr::unnest(cols = "value")
+
+  if (has_studies <- rlang::has_name(draws, ".study")) {
+    draws$Study <- draws$.study
+  }
+  draws$Treatment <- draws$.trt
+  draws$Time <- draws$.time
+
+  p <- ggplot2::ggplot(draws, ggplot2::aes(x = .data$Time, y = .data$value,
+                                           colour = .data$Treatment,
+                                           fill = .data$Treatment)) +
+    ggplot2::ylab(p_ylab) +
+    ggplot2::xlab(p_xlab)
+
+  if (has_studies) {
+      p <- p + ggplot2::facet_grid(.~Study)
+  }
+
+  p <- p +
+    # Draw lines and intervals separately for better clarity
+    do.call(tb_geom, args = rlang::dots_list(linewidth = 0, ..., alpha = 0.15, .homonyms = "first")) +
+    do.call(tb_geom, args = rlang::dots_list(.width = 0, alpha = 1, ..., linewidth = 0.5, .homonyms = "first")) +
+    theme_multinma()
 
   return(p)
 }
