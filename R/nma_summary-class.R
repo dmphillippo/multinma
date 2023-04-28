@@ -99,8 +99,8 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 
   x_sum <- tibble::column_to_rownames(x_sum, "parameter")
 
-  # Drop dot columns (.trta, .trtb, .trt, .category) from the output, except .study
-  x_sum <- dplyr::select(x_sum, -dplyr::matches("^\\.(?!study)", perl = TRUE))
+  # Drop dot columns (.trta, .trtb, .trt, .category) from the output, except .study and .time
+  x_sum <- dplyr::select(x_sum, -dplyr::matches("^\\.(?!study|time)", perl = TRUE))
 
   # Format summaries nicely by study, if given
   print_study_block <- function(s, info = NULL, ...) {
