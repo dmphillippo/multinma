@@ -2,6 +2,7 @@
 % Please edit documentation in R/predict.R
 \name{predict.stan_nma}
 \alias{predict.stan_nma}
+\alias{predict.stan_nma_surv}
 \title{Predictions of absolute effects from NMA models}
 \usage{
 \method{predict}{stan_nma}(
@@ -15,6 +16,23 @@
   level = c("aggregate", "individual"),
   baseline_type = c("link", "response"),
   baseline_level = c("individual", "aggregate"),
+  probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
+  predictive_distribution = FALSE,
+  summary = TRUE
+)
+
+\method{predict}{stan_nma_surv}(
+  object,
+  ...,
+  times = NULL,
+  baseline = NULL,
+  aux = NULL,
+  newdata = NULL,
+  study = NULL,
+  trt_ref = NULL,
+  type = c("survival", "hazard", "cumhaz", "mean", "median", "quantile", "rmst", "link"),
+  quantiles = c(0.25, 0.5, 0.75),
+  level = c("aggregate", "individual"),
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
   predictive_distribution = FALSE,
   summary = TRUE
@@ -41,7 +59,10 @@ ML-NMR or models including IPD) whether this applies to an individual at
 the reference level of the covariates or over the entire \code{newdata}
 population, respectively. For example, in a model with a logit link with
 \code{baseline_type = "link"}, this would be a distribution for the baseline log
-odds of an event.
+odds of an event. For survival models, \code{baseline} always corresponds to the
+intercept parameters in the linear predictor (i.e. \code{baseline_type} is
+always \code{"link"}, and \code{baseline_level} is \code{"individual"} for IPD NMA or
+ML-NMR, and \code{"aggregate"} for AgD NMA).
 
 Use the \code{trt_ref} argument to specify which treatment this distribution
 applies to.}
@@ -72,7 +93,19 @@ distribution will refer to the network reference treatment. Coerced to
 character string.}
 
 \item{type}{Whether to produce predictions on the \code{"link"} scale (the
-default, e.g. log odds) or \code{"response"} scale (e.g. probabilities).}
+default, e.g. log odds) or \code{"response"} scale (e.g. probabilities).
+
+For survival models, the options are \code{"survival"} for survival
+probabilities (the default), \code{"hazard"} for hazards, \code{"cumhaz"} for
+cumulative hazards, \code{"mean"} for mean survival times, \code{"quantile"} for
+quantiles of the survival time distribution, \code{"median"} for median survival
+times (equivalent to \code{type = "quantile"} with \code{quantiles = 0.5}), \code{"rmst"}
+for restricted mean survival times, or \code{"link"} for the linear predictor.
+For \code{type = "survival"}, \code{"hazard"} or \code{"cumhaz"}, predictions are given at
+the times specified by \code{times} or at the event/censoring times in the
+network if \code{times = NULL}. For \code{type = "rmst"}, the restricted time horizon
+is specified by \code{times}, or if \code{times = NULL} the earliest last follow-up
+time amongst the studies in the network is used.}
 
 \item{level}{The level at which predictions are produced, either
 \code{"aggregate"} (the default), or \code{"individual"}. If \code{baseline} is not
@@ -82,14 +115,19 @@ studies in the network if \code{level} is \code{"aggregate"}.}
 
 \item{baseline_type}{When a \code{baseline} distribution is given, specifies
 whether this corresponds to the \code{"link"} scale (the default, e.g. log odds)
-or \code{"response"} scale (e.g. probabilities).}
+or \code{"response"} scale (e.g. probabilities). For survival models, \code{baseline}
+always corresponds to the intercept parameters in the linear predictor
+(i.e. \code{baseline_type} is always \code{"link"}).}
 
 \item{baseline_level}{When a \code{baseline} distribution is given, specifies
 whether this corresponds to an individual at the reference level of the
 covariates (\code{"individual"}, the default), or from an (unadjusted) average
 outcome on the reference treatment in the \code{newdata} population
 (\code{"aggregate"}). Ignored for AgD NMA, since the only option is
-\code{"aggregate"} in this instance.}
+\code{"aggregate"} in this instance. For survival models, \code{baseline} always
+corresponds to the intercept parameters in the linear predictor (i.e.
+\code{baseline_level} is \code{"individual"} for IPD NMA or ML-NMR, and \code{"aggregate"}
+for AgD NMA).}
 
 \item{probs}{Numeric vector of quantiles of interest to present in computed
 summary, default \code{c(0.025, 0.25, 0.5, 0.75, 0.975)}}
@@ -99,6 +137,25 @@ fitted, should the predictive distribution for absolute effects in a new
 study be returned? Default \code{FALSE}.}
 
 \item{summary}{Logical, calculate posterior summaries? Default \code{TRUE}.}
+
+\item{times}{A numeric vector of times to evaluate predictions at.
+Alternatively, if \code{newdata} is specified, \code{times} can be the name of a
+column in \code{newdata} which contains the times. If \code{NULL} (the default) then
+predictions are made at the event/censoring times from the studies included
+in the network. Only used if \code{type} is \code{"survival"}, \code{"hazard"}, \code{"cumhaz"}
+or \code{"rmst"}.}
+
+\item{aux}{An optional \code{\link[=distr]{distr()}} distribution for the auxiliary parameter(s)
+in the baseline hazard (e.g. shapes). If \code{NULL}, predictions are produced
+using the parameter estimates for each study in the network with IPD or
+arm-based AgD.
+
+For regression models, this may be a list of \code{\link[=distr]{distr()}} distributions of the
+same length as the number of studies in \code{newdata} (possibly named by the
+study names, or otherwise in order of appearance in \code{newdata}).}
+
+\item{quantiles}{A numeric vector of quantiles of the survival time
+distribution to produce estimates for when \code{type = "quantile"}.}
 }
 \value{
 A \link{nma_summary} object if \code{summary = TRUE}, otherwise a list

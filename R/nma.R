@@ -977,6 +977,8 @@ nma <- function(network,
   if (inherits(network, "mlnmr_data")) class(out) <- c("stan_mlnmr", "stan_nma")
   else class(out) <- "stan_nma"
 
+  if (likelihood %in% valid_lhood$survival) class(out) <- c("stan_nma_surv", class(out))
+
   if (consistency == "nodesplit" && !is.data.frame(nodesplit)) {
     class(out) <- c("nma_nodesplit", class(out))
     out$nodesplit <- nodesplit

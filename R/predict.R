@@ -22,7 +22,10 @@
 #'   the reference level of the covariates or over the entire `newdata`
 #'   population, respectively. For example, in a model with a logit link with
 #'   `baseline_type = "link"`, this would be a distribution for the baseline log
-#'   odds of an event.
+#'   odds of an event. For survival models, `baseline` always corresponds to the
+#'   intercept parameters in the linear predictor (i.e. `baseline_type` is
+#'   always `"link"`, and `baseline_level` is `"individual"` for IPD NMA or
+#'   ML-NMR, and `"aggregate"` for AgD NMA).
 #'
 #'   Use the `trt_ref` argument to specify which treatment this distribution
 #'   applies to.
@@ -50,6 +53,18 @@
 #'   character string.
 #' @param type Whether to produce predictions on the `"link"` scale (the
 #'   default, e.g. log odds) or `"response"` scale (e.g. probabilities).
+#'
+#'   For survival models, the options are `"survival"` for survival
+#'   probabilities (the default), `"hazard"` for hazards, `"cumhaz"` for
+#'   cumulative hazards, `"mean"` for mean survival times, `"quantile"` for
+#'   quantiles of the survival time distribution, `"median"` for median survival
+#'   times (equivalent to `type = "quantile"` with `quantiles = 0.5`), `"rmst"`
+#'   for restricted mean survival times, or `"link"` for the linear predictor.
+#'   For `type = "survival"`, `"hazard"` or `"cumhaz"`, predictions are given at
+#'   the times specified by `times` or at the event/censoring times in the
+#'   network if `times = NULL`. For `type = "rmst"`, the restricted time horizon
+#'   is specified by `times`, or if `times = NULL` the earliest last follow-up
+#'   time amongst the studies in the network is used.
 #' @param level The level at which predictions are produced, either
 #'   `"aggregate"` (the default), or `"individual"`. If `baseline` is not
 #'   specified, predictions are produced for all IPD studies in the network if
@@ -57,13 +72,18 @@
 #'   studies in the network if `level` is `"aggregate"`.
 #' @param baseline_type When a `baseline` distribution is given, specifies
 #'   whether this corresponds to the `"link"` scale (the default, e.g. log odds)
-#'   or `"response"` scale (e.g. probabilities).
+#'   or `"response"` scale (e.g. probabilities). For survival models, `baseline`
+#'   always corresponds to the intercept parameters in the linear predictor
+#'   (i.e. `baseline_type` is always `"link"`).
 #' @param baseline_level When a `baseline` distribution is given, specifies
 #'   whether this corresponds to an individual at the reference level of the
 #'   covariates (`"individual"`, the default), or from an (unadjusted) average
 #'   outcome on the reference treatment in the `newdata` population
 #'   (`"aggregate"`). Ignored for AgD NMA, since the only option is
-#'   `"aggregate"` in this instance.
+#'   `"aggregate"` in this instance. For survival models, `baseline` always
+#'   corresponds to the intercept parameters in the linear predictor (i.e.
+#'   `baseline_level` is `"individual"` for IPD NMA or ML-NMR, and `"aggregate"`
+#'   for AgD NMA).
 #' @param probs Numeric vector of quantiles of interest to present in computed
 #'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`
 #' @param predictive_distribution Logical, when a random effects model has been
@@ -160,11 +180,22 @@ predict.stan_nma <- function(object, ...,
   # Checks
   if (!inherits(object, "stan_nma")) abort("Expecting a `stan_nma` object, as returned by nma().")
 
-  type <- rlang::arg_match(type)
+  is_surv <- inherits(object, "stan_nma_surv")  # Survival flag
+
+  if (!is_surv) type <- rlang::arg_match(type)
   level <- rlang::arg_match(level)
 
   baseline_type <- rlang::arg_match(baseline_type)
   baseline_level <- rlang::arg_match(baseline_level)
+
+
+  # Get additional survival arguments passed from NextMethod()
+  if (is_surv) {
+    dlist <- list(...)
+    times <- dlist$times
+    aux <- dlist$aux
+    quantiles <- dlist$quantiles
+  }
 
 
   # Get network reference treatment
@@ -189,8 +220,27 @@ predict.stan_nma <- function(object, ...,
     trt_ref <- nrt
   }
 
-  if (xor(is.null(newdata), is.null(baseline)) && !is.null(object$regression))
-    abort("Specify both `newdata` and `baseline`, or neither.")
+  # Define auxiliary parameters for survival models
+  if (is_surv) {
+    aux_pars <- switch(object$likelihood,
+                       exponential = NULL,
+                       `exponential-aft` = NULL,
+                       lognormal = "sdlog",
+                       gengamma = c("sigma", "k"),
+                       mspline = "scoef",
+                       pexp = "scoef",
+                       "shape")
+  } else {
+    aux_pars <- NULL
+  }
+
+  if (!is_surv || is.null(aux_pars)) {
+    if (xor(is.null(newdata), is.null(baseline)) && !is.null(object$regression))
+      abort("Specify both `newdata` and `baseline`, or neither.")
+  } else {
+    if (xor(is.null(newdata), is.null(baseline)) && xor(is.null(newdata), is.null(aux)) && !is.null(object$regression))
+      abort("Specify all of `newdata`, `baseline` and `aux`, or none.")
+  }
 
   if (!is.null(newdata)) {
     if (!is.data.frame(newdata)) abort("`newdata` is not a data frame.")
@@ -222,6 +272,7 @@ predict.stan_nma <- function(object, ...,
                                   classes = !is.null(object$network$classes),
                                   class_interactions = object$class_interactions)
 
+
   # Without regression model
   if (is.null(object$regression)) {
 
@@ -246,6 +297,16 @@ predict.stan_nma <- function(object, ...,
           if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor()
           )))
         preddat <- tidyr::expand_grid(.study = studies, .trt = object$network$treatments)
+
+        if (type %in% c("survival", "hazard", "cumhaz") && is.null(times)) {
+          n_all_arms <- nrow(preddat)
+
+          # Make design matrix of only observed treatment arms
+          preddat <- dplyr::bind_rows(object$network$ipd[, c(".study", ".trt")],
+                                      object$network$agd_arm[, c(".study", ".trt")]) %>%
+            dplyr::distinct(.data$.study, .data$.trt) %>%
+            dplyr::mutate(.study = forcats::fct_drop(.data$.study))
+        }
 
 
         # Add in .trtclass if defined in network
@@ -273,6 +334,66 @@ predict.stan_nma <- function(object, ...,
 
         # Get prediction array
         pred_array <- tcrossprod_mcmc_array(post, X_all)
+
+        # Get aux parameters for survival models
+        if (is_surv) {
+          if (!is.null(aux)) abort("Specify both `aux` and `baseline` or neither.")
+
+          if (is.null(aux_pars)) {
+            aux_array <- NULL
+          } else {
+            aux_array <- as.array(object, pars = aux_pars)
+          }
+        }
+
+        # Deal with times argument
+        if (type %in% c("survival", "hazard", "cumhaz")) {
+          if (is.null(times)) {
+            # Take times from network
+            surv_all <- dplyr::bind_rows(object$network$ipd,
+                                         tidyr::unnest(object$network$agd_arm, cols = ".Surv"))
+            surv_all <- dplyr::mutate(surv_all, !!! get_Surv_data(surv_all$.Surv))
+
+            # Note about missing arms
+            if (nrow(dplyr::distinct(surv_all, .data$.study, .data$.trt)) < n_all_arms)
+              inform("Specify `times` to produce predictions for unobserved treatment arms in each study population.")
+
+            # Add times vector to preddat
+            preddat <- dplyr::left_join(preddat,
+                                        dplyr::group_by(surv_all, .data$.study, .data$.trt) %>%
+                                          dplyr::summarise(time = list(.data$time)),
+                                        by = c(".study", ".trt"))
+
+          } else {
+            # Use provided vector of times
+            if (!is.numeric(times))
+              abort("`times` must be a numeric vector of times to predict at.")
+
+            preddat <- dplyr::mutate(preddat, time = list(times))
+          }
+        } else if (type == "rmst") {
+          if (is.null(times)) {
+            # Take time horizon from network
+            surv_all <- dplyr::bind_rows(object$network$ipd,
+                                         tidyr::unnest(object$network$agd_arm, cols = ".Surv"))
+            surv_all <- dplyr::mutate(surv_all, !!! get_Surv_data(surv_all$.Surv))
+
+            # Time horizon is earliest last follow-up time amongst the studies
+            last_times <- surv_all %>%
+              dplyr::group_by(.data$.study) %>%
+              dplyr::summarise(time = max(time))
+
+            times <- min(last_times$time)
+            preddat$time <- times
+
+          } else {
+            # Use provided time
+            if (!is.numeric(times) && length(times) > 1)
+              abort("`times` must be a scalar numeric value giving the restricted time horizon.")
+
+            preddat$time <- times
+          }
+        }
 
       }
     # With baseline specified
@@ -327,10 +448,67 @@ predict.stan_nma <- function(object, ...,
         post[ , , 2:dim_post[3]] <- get_delta_new(object)
       }
 
-
-
       # Get prediction array
       pred_array <- tcrossprod_mcmc_array(post, X_all)
+
+      # Get aux parameters for survival models
+      if (is_surv) {
+        if (is.null(aux)) abort("Specify both `aux` and `baseline` or neither.")
+
+        if (object$likelihood == "gengamma")
+
+        if (is.null(aux_pars)) {
+          aux_array <- NULL
+        } else {
+
+          if (object$likelihood %in% c("mspline", "pexp")) {
+            n_aux <- length(object$basis[[1]])
+            aux_names <- paste0(aux_pars, "[..dummy.., ", 1:n_aux, "]")
+          } else {
+            n_aux <- length(aux_pars)
+            aux_names <- paste0(aux_pars, "[..dummy..]")
+          }
+
+          dim_aux <- c(dim_mu[1:2], n_aux)
+          u <- array(runif(prod(dim_aux)), dim = dim_aux)
+          aux_array <- array(NA_real_,
+                             dim = dim_aux,
+                             dimnames = list(iterations = NULL,
+                                             chains = NULL,
+                                             parameters = aux_names))
+
+          if (object$likelihood %in% c("mspline", "pexp")) {
+            # Generate spline coefficients as a vector
+            for (i in 1:dim_aux[1]) {
+              for (j in 1:dim_aux[2]) {
+                aux_array[i, j, ] <- rlang::eval_tidy(rlang::call2(aux$qfun, p = u[i, j, , drop = TRUE], !!! aux$args))
+              }
+            }
+          } else {
+            # All other aux pars generate one by one
+            for (i in 1:n_aux) {
+              aux_array[, , i] <- rlang::eval_tidy(rlang::call2(aux$qfun, p = u[ , , i, drop = TRUE], !!! aux$args))
+            }
+          }
+        }
+
+        # Check times argument
+        if (is.null(times) && type %in% c("survival", "hazard", "cumhaz", "rmst"))
+          abort("`times` must be specified when `baseline` and `aux` are provided")
+
+        if (type %in% c("survival", "hazard", "cumhaz") && !is.numeric(times))
+          abort("`times` must be a numeric vector of times to predict at.")
+
+        if (type == "rmst" && (!is.numeric(times) && length(times) > 1))
+          abort("`times` must be a scalar numeric value giving the restricted time horizon.")
+
+        # Add times vector in to preddat
+        if (type %in% c("survival", "hazard", "cumhaz")) {
+          preddat <- dplyr::mutate(preddat, time = list(times))
+        } else if (type == "rmst") {
+          preddat$time <- times
+        }
+      }
 
     }
 
@@ -357,6 +535,50 @@ predict.stan_nma <- function(object, ...,
       pred_array <- pred_temp
     }
 
+    # Get predictions for survival models
+    if (inherits(object, "stan_nma_surv")) {
+
+      pred_temp <- pred_array
+
+      d_p <- dim(pred_temp)
+      dn_p <- dimnames(pred_temp)
+
+      if (type %in% c("survival", "hazard", "cumhaz")) {
+        d_p[3] <- sum(lengths(preddat$time))
+        dn_p[[3]] <- paste0(rep(stringr::str_sub(dn_p[[3]], start = 1, end = -2), times = lengths(preddat$time)),
+                            ", ", unlist(purrr::map(preddat$time, seq_along)), "]")
+      }
+
+      pred_array <- array(NA_real_, dim = d_p, dimnames = dn_p)
+
+      aux_names <- dimnames(aux_array)[[3]]
+
+      j <- 0
+      for (i in 1:nrow(preddat)) {
+        if (type %in% c("survival", "hazard", "cumhaz", "rmst")) {
+          tt <- preddat$time[[i]]
+          lentt <- length(tt)
+        } else {
+          tt <- NA
+          lentt <- 1
+        }
+        s <- preddat$.study[i]
+
+        aux_s <- grepl(paste0("[", s, if (object$likelihood %in% c("mspline", "pexp")) "," else "]"),
+                       aux_names, fixed = TRUE)
+
+        pred_array[ , , (j+1):(j+lentt)] <-
+          make_surv_predict(eta = pred_temp[ , , i, drop = FALSE],
+                            aux = aux_array[ , , aux_s, drop = FALSE],
+                            times = tt,
+                            quantiles = quantiles,
+                            likelihood = object$likelihood,
+                            type = type)
+
+        j <- j + lentt
+      }
+    }
+
     # Transform predictions if type = "response"
     if (type == "response") {
       pred_array <- inverse_link(pred_array, link = object$link)
@@ -371,6 +593,25 @@ predict.stan_nma <- function(object, ...,
                                            .trt = rep(preddat$.trt, each = n_cc),
                                            .category = rep(l_cc, times = nrow(preddat)),
                                            .before = 1)
+
+      } else if (object$likelihood %in% valid_lhood$survival) {
+        if (type %in% c("survival", "hazard", "cumhaz")) {
+          preddat <- tidyr::unnest(preddat, cols = "time")
+          pred_summary <- tibble::add_column(pred_summary,
+                                             .trt = preddat$.trt,
+                                             .time = preddat$time,
+                                             .before = 1)
+        } else if (type == "rmst") {
+          pred_summary <- tibble::add_column(pred_summary,
+                                             .trt = preddat$.trt,
+                                             .time = preddat$time,
+                                             .before = 1)
+        } else {
+          pred_summary <- tibble::add_column(pred_summary,
+                                             .trt = preddat$.trt,
+                                             .before = 1)
+        }
+
       } else {
         pred_summary <- tibble::add_column(pred_summary,
                                            .trt = preddat$.trt,
@@ -890,15 +1131,150 @@ predict.stan_nma <- function(object, ...,
   }
 
   if (summary) {
-    if (object$likelihood == "ordered")
-      class(out) <- c("ordered_nma_summary", "nma_summary")
-    else
-      class(out) <- "nma_summary"
     attr(out, "xlab") <- "Treatment"
     attr(out, "ylab") <- get_scale_name(likelihood = object$likelihood,
                                         link = object$link,
                                         measure = "absolute",
                                         type = type)
+    if (object$likelihood == "ordered") {
+      class(out) <- c("ordered_nma_summary", "nma_summary")
+    } else if (type %in% c("survival", "hazard", "cumhaz")) {
+      class(out) <- c("surv_nma_summary", "nma_summary")
+      attr(out, "xlab") <- "Time"
+    } else {
+      class(out) <- "nma_summary"
+    }
   }
   return(out)
+}
+
+
+#' @param times A numeric vector of times to evaluate predictions at.
+#'   Alternatively, if `newdata` is specified, `times` can be the name of a
+#'   column in `newdata` which contains the times. If `NULL` (the default) then
+#'   predictions are made at the event/censoring times from the studies included
+#'   in the network. Only used if `type` is `"survival"`, `"hazard"`, `"cumhaz"`
+#'   or `"rmst"`.
+#' @param aux An optional [distr()] distribution for the auxiliary parameter(s)
+#'   in the baseline hazard (e.g. shapes). If `NULL`, predictions are produced
+#'   using the parameter estimates for each study in the network with IPD or
+#'   arm-based AgD.
+#'
+#'   For regression models, this may be a list of [distr()] distributions of the
+#'   same length as the number of studies in `newdata` (possibly named by the
+#'   study names, or otherwise in order of appearance in `newdata`).
+#' @param quantiles A numeric vector of quantiles of the survival time
+#'   distribution to produce estimates for when `type = "quantile"`.
+#'
+#' @export
+#' @rdname predict.stan_nma
+predict.stan_nma_surv <- function(object, ...,
+                                  times = NULL,
+                                  baseline = NULL,
+                                  aux = NULL,
+                                  newdata = NULL, study = NULL, trt_ref = NULL,
+                                  type = c("survival", "hazard", "cumhaz", "mean", "median", "quantile", "rmst", "link"),
+                                  quantiles = c(0.25, 0.5, 0.75),
+                                  level = c("aggregate", "individual"),
+                                  probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
+                                  predictive_distribution = FALSE,
+                                  summary = TRUE) {
+
+  type <- rlang::arg_match(type)
+
+  if (!rlang::is_double(quantiles, finite = TRUE) || any(quantiles < 0) || any(quantiles > 1))
+    rlang::abort("`quantiles` must be a numeric vector of quantiles between 0 and 1.")
+
+  # Other checks (including times, aux) in predict.stan_nma()
+  # Need to pass stan_nma_surv-specific args directly, otherwise these aren't picked up by NextMethod()
+  NextMethod(times = times,
+             aux = aux,
+             type = type,
+             quantiles = quantiles,
+             baseline_level = "individual",
+             baseline_type = "link")
+}
+
+#' Produce survival predictions from arrays of linear predictors and auxiliary parameters
+#'
+#' Designed to work with a single arm at a time
+#'
+#' @param eta Array of samples from the linear predictor
+#' @param aux Array of samples of auxiliary parameters
+#' @param times Vector of evaluation times, or time horizon for type = "rmst"
+#' @param likelihood Likelihood function to use
+#' @param type Type of prediction to create
+#' @param quantiles Quantiles for type = "quantile"
+#'
+#' @noRd
+make_surv_predict <- function(eta, aux, times, likelihood,
+                              type = c("survival", "hazard", "cumhaz", "mean", "median", "quantile", "rmst", "link"),
+                              quantiles = c(0.25, 0.5, 0.75)) {
+
+  if (type == "link") return(eta)
+
+  d_out <- dim(eta)
+  dn_out <- dimnames(eta)
+
+  if (type %in% c("survival", "hazard", "cumhaz")) {
+    dn_out[[3]] <- paste0(rep(stringr::str_sub(dn_out[[3]], start = 1, end = -2), each = length(times)),
+                          ", ", rep(seq_along(times), times = d_out[3]), "]")
+    d_out[3] <- d_out[3] * length(times)
+  }
+
+  out <- array(NA_real_, dim = d_out, dimnames = dn_out)
+
+  for (i in 1:d_out[1]) {
+    for (j in 1:d_out[2]) {
+      out[i, j, ] <- do.call(surv_predfun(likelihood, type),
+                             args = list(times = times,
+                                         eta = eta[i, j, ],
+                                         aux = aux[i, j, ],
+                                         quantiles = quantiles))
+    }
+  }
+
+  return(out)
+}
+
+#' Return prediction functions for survival likelihoods
+#' @noRd
+surv_predfun <- function(likelihood, type) {
+  if (likelihood == "exponential") {
+    if      (type == "survival") function(times, eta, ...) stats::dexp(times, rate = exp(eta))
+    else if (type == "hazard") function(times, eta, ...) flexsurv::hexp(times, rate = exp(eta))
+    else if (type == "cumhaz") function(times, eta, ...) flexsurv::Hexp(times, rate = exp(eta))
+    else if (type == "mean") function(eta, ...) flexsurv::mean_exp(rate = exp(eta))
+    else if (type == "median") function(eta, ...) stats::qexp(0.5, rate = exp(eta))
+    else if (type == "quantile") function(quantiles, eta, ...) stats::qexp(quantiles, rate = exp(eta))
+    else if (type == "rmst") function(times, eta, ...) flexsurv::rmst_exp(times, rate = exp(eta))
+
+  } else if (likelihood == "exponential-aft") {
+    if      (type == "survival") function(times, eta, ...) stats::dexp(times, rate = exp(-eta))
+    else if (type == "hazard") function(times, eta, ...) flexsurv::hexp(times, rate = exp(-eta))
+    else if (type == "cumhaz") function(times, eta, ...) flexsurv::Hexp(times, rate = exp(-eta))
+    else if (type == "mean") function(eta, ...) flexsurv::mean_exp(rate = exp(-eta))
+    else if (type == "median") function(eta, ...) stats::qexp(0.5, rate = exp(-eta))
+    else if (type == "quantile") function(quantiles, eta, ...) stats::qexp(quantiles, rate = exp(-eta))
+    else if (type == "rmst") function(times, eta, ...) flexsurv::rmst_exp(times, rate = exp(-eta))
+
+  } else if (likelihood == "weibull") {
+    if      (type == "survival") function(times, eta, aux, ...) flexsurv::dweibullPH(times, shape = aux, scale = exp(eta))
+    else if (type == "hazard") function(times, eta, aux, ...) flexsurv::hweibullPH(times, shape = aux, scale = exp(eta))
+    else if (type == "cumhaz") function(times, eta, aux, ...) flexsurv::HweibullPH(times, shape = aux, scale = exp(eta))
+    else if (type == "mean") function(eta, aux, ...) flexsurv::mean_weibullPH(shape = aux, scale = exp(eta))
+    else if (type == "median") function(eta, aux, ...) flexsurv::qweibullPH(0.5, shape = aux, scale = exp(eta))
+    else if (type == "quantile") function(quantiles, eta, aux, ...) flexsurv::qweibullPH(quantiles, shape = aux, scale = exp(eta))
+    else if (type == "rmst") function(times, eta, aux, ...) flexsurv::rmst_weibullPH(times, shape = aux, scale = exp(eta))
+
+  } else if (likelihood == "weibull-aft") {
+    if      (type == "survival") function(times, eta, aux, ...) stats::dweibull(times, shape = aux, scale = exp(eta))
+    else if (type == "hazard") function(times, eta, aux, ...) flexsurv::hweibull(times, shape = aux, scale = exp(eta))
+    else if (type == "cumhaz") function(times, eta, aux, ...) flexsurv::Hweibull(times, shape = aux, scale = exp(eta))
+    else if (type == "mean") function(eta, aux, ...) flexsurv::mean_weibull(shape = aux, scale = exp(eta))
+    else if (type == "median") function(eta, aux, ...) stats::qweibull(0.5, shape = aux, scale = exp(eta))
+    else if (type == "quantile") function(quantiles, eta, aux, ...) stats::qweibull(quantiles, shape = aux, scale = exp(eta))
+    else if (type == "rmst") function(times, eta, aux, ...) flexsurv::rmst_weibull(times, shape = aux, scale = exp(eta))
+
+  }
 }
