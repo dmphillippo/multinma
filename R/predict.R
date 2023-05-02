@@ -1241,40 +1241,74 @@ make_surv_predict <- function(eta, aux, times, likelihood,
 #' @noRd
 surv_predfun <- function(likelihood, type) {
   if (likelihood == "exponential") {
-    if      (type == "survival") function(times, eta, ...) stats::dexp(times, rate = exp(eta))
-    else if (type == "hazard") function(times, eta, ...) flexsurv::hexp(times, rate = exp(eta))
-    else if (type == "cumhaz") function(times, eta, ...) flexsurv::Hexp(times, rate = exp(eta))
-    else if (type == "mean") function(eta, ...) flexsurv::mean_exp(rate = exp(eta))
-    else if (type == "median") function(eta, ...) stats::qexp(0.5, rate = exp(eta))
-    else if (type == "quantile") function(quantiles, eta, ...) stats::qexp(quantiles, rate = exp(eta))
-    else if (type == "rmst") function(times, eta, ...) flexsurv::rmst_exp(times, rate = exp(eta))
-
-  } else if (likelihood == "exponential-aft") {
-    if      (type == "survival") function(times, eta, ...) stats::dexp(times, rate = exp(-eta))
-    else if (type == "hazard") function(times, eta, ...) flexsurv::hexp(times, rate = exp(-eta))
-    else if (type == "cumhaz") function(times, eta, ...) flexsurv::Hexp(times, rate = exp(-eta))
-    else if (type == "mean") function(eta, ...) flexsurv::mean_exp(rate = exp(-eta))
-    else if (type == "median") function(eta, ...) stats::qexp(0.5, rate = exp(-eta))
-    else if (type == "quantile") function(quantiles, eta, ...) stats::qexp(quantiles, rate = exp(-eta))
-    else if (type == "rmst") function(times, eta, ...) flexsurv::rmst_exp(times, rate = exp(-eta))
+    make_predfun(base = "exp", type = type,
+                 rate = exp(eta),
+                 .ns = list(survival = "stats", median = "stats", quantile = "stats"))
 
   } else if (likelihood == "weibull") {
-    if      (type == "survival") function(times, eta, aux, ...) flexsurv::dweibullPH(times, shape = aux, scale = exp(eta))
-    else if (type == "hazard") function(times, eta, aux, ...) flexsurv::hweibullPH(times, shape = aux, scale = exp(eta))
-    else if (type == "cumhaz") function(times, eta, aux, ...) flexsurv::HweibullPH(times, shape = aux, scale = exp(eta))
-    else if (type == "mean") function(eta, aux, ...) flexsurv::mean_weibullPH(shape = aux, scale = exp(eta))
-    else if (type == "median") function(eta, aux, ...) flexsurv::qweibullPH(0.5, shape = aux, scale = exp(eta))
-    else if (type == "quantile") function(quantiles, eta, aux, ...) flexsurv::qweibullPH(quantiles, shape = aux, scale = exp(eta))
-    else if (type == "rmst") function(times, eta, aux, ...) flexsurv::rmst_weibullPH(times, shape = aux, scale = exp(eta))
+    make_predfun(base = "weibullPH", type = type,
+                 shape = aux, scale = exp(eta))
+
+  } else if (likelihood == "gompertz") {
+    make_predfun(base = "gompertz", type = type,
+                 shape = aux, rate = exp(eta))
+
+  } else if (likelihood == "exponential-aft") {
+    make_predfun(base = "exp", type = type,
+                 rate = exp(-eta),
+                 .ns = list(survival = "stats", median = "stats", quantile = "stats"))
 
   } else if (likelihood == "weibull-aft") {
-    if      (type == "survival") function(times, eta, aux, ...) stats::dweibull(times, shape = aux, scale = exp(eta))
-    else if (type == "hazard") function(times, eta, aux, ...) flexsurv::hweibull(times, shape = aux, scale = exp(eta))
-    else if (type == "cumhaz") function(times, eta, aux, ...) flexsurv::Hweibull(times, shape = aux, scale = exp(eta))
-    else if (type == "mean") function(eta, aux, ...) flexsurv::mean_weibull(shape = aux, scale = exp(eta))
-    else if (type == "median") function(eta, aux, ...) stats::qweibull(0.5, shape = aux, scale = exp(eta))
-    else if (type == "quantile") function(quantiles, eta, aux, ...) stats::qweibull(quantiles, shape = aux, scale = exp(eta))
-    else if (type == "rmst") function(times, eta, aux, ...) flexsurv::rmst_weibull(times, shape = aux, scale = exp(eta))
+    make_predfun(base = "weibullPH", type = type,
+                 shape = aux, scale = exp(-aux * eta))
+
+  } else if (likelihood == "lognormal") {
+    make_predfun(base = "lnorm", type = type,
+                 meanlog = eta, sdlog = aux,
+                 .ns = list(survival = "stats", median = "stats", quantile = "stats"))
+
+  } else if (likelihood == "loglogistic") {
+    make_predfun(base = "llogis", type = type,
+                 shape = aux, scale = exp(eta))
+
+  } else if (likelihood == "gamma") {
+    make_predfun(base = "gamma", type = type,
+                 rate = exp(-eta), shape = aux,
+                 .ns = list(survival = "stats", median = "stats", quantile = "stats"))
+
+  } else if (likelihood == "gengamma") {
+    make_predfun(base = "gengamma", type = type,
+                 mu = eta,
+                 sigma = aux[grepl("^sigma\\[", names(aux))],
+                 Q = 1 / sqrt(aux[grepl("^k\\[", names(aux))]))
+
+  } else if (likelihood == "mspline") {
+
+  } else if (likelihood == "pexp") {
 
   }
+}
+
+make_predfun <- function(base, type, ..., .ns = list()) {
+  if (rlang::has_name(.ns, type)) .ns <- .ns$type
+  else .ns <- "flexsurv"
+
+  fn <- paste0(switch(type,
+                      survival = "p",
+                      hazard = "h",
+                      cumhaz = "H",
+                      mean  = "mean_",
+                      median = "q",
+                      quantile = "q",
+                      rmst = "rmst_"),
+               base)
+
+  dots <- rlang::enexprs(...)
+
+  if (type == "survival") function(times, eta, aux, quantiles) rlang::eval_tidy(rlang::call2(fn, q = times, lower.tail = FALSE, !!! dots, .ns = .ns))
+  else if (type %in% c("hazard", "cumhaz")) function(times, eta, aux, quantiles) rlang::eval_tidy(rlang::call2(fn, x = times, !!! dots, .ns = .ns))
+  else if (type == "mean") function(times, eta, aux, quantiles) rlang::eval_tidy(rlang::call2(fn, !!! dots, .ns = .ns))
+  else if (type == "median") function(times, eta, aux, quantiles) rlang::eval_tidy(rlang::call2(fn, p = 0.5, !!! dots, .ns = .ns))
+  else if (type == "quantile") function(times, eta, aux, quantiles) rlang::eval_tidy(rlang::call2(fn, p = quantiles, !!! dots, .ns = .ns))
+  else if (type == "rmst") function(times, eta, aux, quantiles) rlang::eval_tidy(rlang::call2(fn, t = times, !!! dots, .ns = .ns))
 }
