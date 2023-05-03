@@ -547,6 +547,10 @@ predict.stan_nma <- function(object, ...,
         d_p[3] <- sum(lengths(preddat$time))
         dn_p[[3]] <- paste0(rep(stringr::str_sub(dn_p[[3]], start = 1, end = -2), times = lengths(preddat$time)),
                             ", ", unlist(purrr::map(preddat$time, seq_along)), "]")
+      } else if (type == "quantile") {
+        dn_p[[3]] <- paste0(rep(stringr::str_sub(dn_p[[3]], start = 1, end = -2), each = length(quantiles)),
+                            ", ", rep(quantiles, times = d_p[3]), "]")
+        d_p[3] <- d_p[3]*length(quantiles)
       }
 
       pred_array <- array(NA_real_, dim = d_p, dimnames = dn_p)
@@ -557,17 +561,20 @@ predict.stan_nma <- function(object, ...,
       for (i in 1:nrow(preddat)) {
         if (type %in% c("survival", "hazard", "cumhaz", "rmst")) {
           tt <- preddat$time[[i]]
-          lentt <- length(tt)
+          jinc <- length(tt)
+        } else if (type == "quantile") {
+          tt <- NA
+          jinc <- length(quantiles)
         } else {
           tt <- NA
-          lentt <- 1
+          jinc <- 1
         }
         s <- preddat$.study[i]
 
         aux_s <- grepl(paste0("[", s, if (object$likelihood %in% c("mspline", "pexp")) "," else "]"),
                        aux_names, fixed = TRUE)
 
-        pred_array[ , , (j+1):(j+lentt)] <-
+        pred_array[ , , (j+1):(j+jinc)] <-
           make_surv_predict(eta = pred_temp[ , , i, drop = FALSE],
                             aux = aux_array[ , , aux_s, drop = FALSE],
                             times = tt,
@@ -575,7 +582,7 @@ predict.stan_nma <- function(object, ...,
                             likelihood = object$likelihood,
                             type = type)
 
-        j <- j + lentt
+        j <- j + jinc
       }
     }
 
@@ -606,6 +613,11 @@ predict.stan_nma <- function(object, ...,
                                              .trt = preddat$.trt,
                                              .time = preddat$time,
                                              .before = 1)
+        } else if (type == "quantile") {
+          pred_summary <- tibble::add_column(pred_summary,
+                                             .trt = rep(preddat$.trt, each = length(quantiles)),
+                                             .quantile = rep(quantiles, times = nrow(preddat)),
+                                             .before = 1)
         } else {
           pred_summary <- tibble::add_column(pred_summary,
                                              .trt = preddat$.trt,
@@ -622,6 +634,10 @@ predict.stan_nma <- function(object, ...,
         if (object$likelihood == "ordered") {
           pred_summary <- tibble::add_column(pred_summary,
                                              .study = rep(preddat$.study, each = n_cc),
+                                             .before = 1)
+        } else if (type == "quantile") {
+          pred_summary <- tibble::add_column(pred_summary,
+                                             .study = rep(preddat$.study, each = length(quantiles)),
                                              .before = 1)
         } else {
           pred_summary <- tibble::add_column(pred_summary,
@@ -1220,6 +1236,12 @@ make_surv_predict <- function(eta, aux, times, likelihood,
     dn_out[[3]] <- paste0(rep(stringr::str_sub(dn_out[[3]], start = 1, end = -2), each = length(times)),
                           ", ", rep(seq_along(times), times = d_out[3]), "]")
     d_out[3] <- d_out[3] * length(times)
+  }
+
+  if (type == "quantile") {
+    dn_out[[3]] <- paste0(rep(stringr::str_sub(dn_out[[3]], start = 1, end = -2), each = length(quantiles)),
+                          ", ", rep(quantiles, times = d_out[3]), "]")
+    d_out[3] <- d_out[3] * length(quantiles)
   }
 
   out <- array(NA_real_, dim = d_out, dimnames = dn_out)
