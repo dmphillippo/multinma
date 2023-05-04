@@ -49,7 +49,7 @@
 #'   cumulative estimates of integration error
 #' @param mspline_degree Non-negative integer giving the degree of the M-spline
 #'   polynomial for `likelihood = "mspline"`. Piecewise exponential hazards
-#'   (`likelihood = "pexp"`) are a special case with `mpline_degree = 0`.
+#'   (`likelihood = "pexp"`) are a special case with `mspline_degree = 0`.
 #' @param n_knots For `mspline` and `pexp` likelihoods, a non-negative integer
 #'   giving the number of internal knots for partitioning the baseline hazard
 #'   into intervals. The knot locations within each study will be determined by

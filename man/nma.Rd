@@ -95,7 +95,7 @@ cumulative estimates of integration error}
 
 \item{mspline_degree}{Non-negative integer giving the degree of the M-spline
 polynomial for \code{likelihood = "mspline"}. Piecewise exponential hazards
-(\code{likelihood = "pexp"}) are a special case with \code{mpline_degree = 0}.}
+(\code{likelihood = "pexp"}) are a special case with \code{mspline_degree = 0}.}
 
 \item{n_knots}{For \code{mspline} and \code{pexp} likelihoods, a non-negative integer
 giving the number of internal knots for partitioning the baseline hazard
