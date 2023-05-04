@@ -87,12 +87,17 @@ hmspline <- function(x, basis, scoef, rate, log = FALSE) {
   if (!inherits(basis, "mSpline")) abort("`basis` must be an M-spline basis produced by splines2::mSpline() or splines2::iSpline()")
   if (!rlang::is_bool(log)) abort("`log` must be a logical value (TRUE or FALSE).")
 
-  if (is.matrix(scoef)) {
-    if (missing(x)) out <- mapply(crossprod, asplit(update(basis, integral = FALSE), 1), asplit(scoef, 1)) * rate
-    else  out <- mapply(crossprod, asplit(update(basis, x = x, integral = FALSE), 1), asplit(scoef, 1)) * rate
+  xb <- if (missing(x)) update(basis, integral = FALSE)
+  else update(basis, x = x, integral = FALSE)
+
+  if (is.matrix(scoef) && nrow(scoef) > 1 && nrow(xb) > 1) {
+    out <- rowSums(xb * scoef) * rate
+  } else if (nrow(xb) == 1) {
+    out <- scoef %*% xb[1,] * rate
+  } else if (is.matrix(scoef) && nrow(scoef) == 1) {
+    out <- xb %*% scoef[1,] * rate
   } else {
-    if (missing(x)) out <- update(basis, integral = FALSE) %*% scoef * rate
-    else  out <- update(basis, x = x, integral = FALSE) %*% scoef * rate
+    out <- xb %*% scoef * rate
   }
 
   # Return 0 for x < 0
@@ -110,12 +115,17 @@ Hmspline <- function(x, basis, scoef, rate, log = FALSE) {
   if (!inherits(basis, "mSpline")) abort("`basis` must be an M-spline basis produced by splines2::mSpline() or splines2::iSpline()")
   if (!rlang::is_bool(log)) abort("`log` must be a logical value (TRUE or FALSE).")
 
-  if (is.matrix(scoef)) {
-    if (missing(x)) out <- mapply(crossprod, asplit(update(basis, integral = TRUE), 1), asplit(scoef, 1)) * rate
-    else  out <- mapply(crossprod, asplit(update(basis, x = x, integral = TRUE), 1), asplit(scoef, 1)) * rate
+  xb <- if (missing(x)) update(basis, integral = TRUE)
+        else update(basis, x = x, integral = TRUE)
+
+  if (is.matrix(scoef) && nrow(scoef) > 1 && nrow(xb) > 1) {
+    out <- rowSums(xb * scoef) * rate
+  } else if (nrow(xb) == 1) {
+    out <- scoef %*% xb[1,] * rate
+  } else if (is.matrix(scoef) && nrow(scoef) == 1) {
+    out <- xb %*% scoef[1,] * rate
   } else {
-    if (missing(x)) out <- update(basis, integral = TRUE) %*% scoef * rate
-    else  out <- update(basis, x = x, integral = TRUE) %*% scoef * rate
+    out <- xb %*% scoef * rate
   }
 
   # Return 0 for x < 0

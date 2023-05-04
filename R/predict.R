@@ -1253,15 +1253,35 @@ make_surv_predict <- function(eta, aux, times, likelihood,
 
   out <- array(NA_real_, dim = d_out, dimnames = dn_out)
 
-  for (i in 1:d_out[1]) {
-    for (j in 1:d_out[2]) {
-      out[i, j, ] <- do.call(surv_predfun(likelihood, type),
-                             args = list(times = times,
-                                         eta = eta[i, j, ],
-                                         aux = aux[i, j, ],
+  # for (i in 1:d_out[1]) {
+  #   for (j in 1:d_out[2]) {
+  #     out[i, j, ] <- do.call(surv_predfun(likelihood, type),
+  #                            args = list(times = times,
+  #                                        eta = eta[i, j, ],
+  #                                        aux = aux[i, j, ],
+  #                                        quantiles = quantiles,
+  #                                        basis = basis))
+  #   }
+  # }
+
+  if (type %in% c("survival", "hazard", "cumhaz")) {
+    out <- array(NA_real_, dim = d_out, dimnames = dn_out)
+    for (i in 1:length(times)) {
+      out[, , i] <- do.call(surv_predfun(likelihood, type),
+                             args = list(times = times[i],
+                                         eta = as.vector(eta),
+                                         aux = matrix(aux, ncol = dim(aux)[3]),
                                          quantiles = quantiles,
                                          basis = basis))
     }
+  } else {
+    out <- array(do.call(surv_predfun(likelihood, type),
+                         args = list(times = times,
+                                     eta = as.vector(eta),
+                                     aux = matrix(aux, ncol = dim(aux)[3]),
+                                     quantiles = quantiles,
+                                     basis = basis)),
+                 dim = d_out, dimnames = dn_out)
   }
 
   return(out)
