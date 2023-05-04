@@ -455,7 +455,6 @@ predict.stan_nma <- function(object, ...,
       if (is_surv) {
         if (is.null(aux)) abort("Specify both `aux` and `baseline` or neither.")
 
-        if (object$likelihood == "gengamma")
 
         if (is.null(aux_pars)) {
           aux_array <- NULL
@@ -574,13 +573,20 @@ predict.stan_nma <- function(object, ...,
         aux_s <- grepl(paste0("[", s, if (object$likelihood %in% c("mspline", "pexp")) "," else "]"),
                        aux_names, fixed = TRUE)
 
+        if (object$likelihood %in% c("mspline", "pexp")) {
+          basis <- object$basis[[s]]
+        } else {
+          basis <- NULL
+        }
+
         pred_array[ , , (j+1):(j+jinc)] <-
           make_surv_predict(eta = pred_temp[ , , i, drop = FALSE],
                             aux = aux_array[ , , aux_s, drop = FALSE],
                             times = tt,
                             quantiles = quantiles,
                             likelihood = object$likelihood,
-                            type = type)
+                            type = type,
+                            basis = basis)
 
         j <- j + jinc
       }
@@ -1225,7 +1231,8 @@ predict.stan_nma_surv <- function(object, ...,
 #' @noRd
 make_surv_predict <- function(eta, aux, times, likelihood,
                               type = c("survival", "hazard", "cumhaz", "mean", "median", "quantile", "rmst", "link"),
-                              quantiles = c(0.25, 0.5, 0.75)) {
+                              quantiles = c(0.25, 0.5, 0.75),
+                              basis = NULL) {
 
   if (type == "link") return(eta)
 
@@ -1252,7 +1259,8 @@ make_surv_predict <- function(eta, aux, times, likelihood,
                              args = list(times = times,
                                          eta = eta[i, j, ],
                                          aux = aux[i, j, ],
-                                         quantiles = quantiles))
+                                         quantiles = quantiles,
+                                         basis = basis))
     }
   }
 
@@ -1304,16 +1312,18 @@ surv_predfun <- function(likelihood, type) {
                  sigma = aux[grepl("^sigma\\[", names(aux))],
                  Q = 1 / sqrt(aux[grepl("^k\\[", names(aux))]))
 
-  } else if (likelihood == "mspline") {
-
-  } else if (likelihood == "pexp") {
-
+  } else if (likelihood %in% c("mspline", "pexp")) {
+    make_predfun(base = "mspline", type = type,
+                 rate = exp(eta), scoef = aux, basis = basis,
+                 .ns = NULL)
   }
 }
 
+#' Construct prediction functions programmatically
+#' @noRd
 make_predfun <- function(base, type, ..., .ns = list()) {
   if (rlang::has_name(.ns, type)) .ns <- .ns$type
-  else .ns <- "flexsurv"
+  else if (!is.null(.ns)) .ns <- "flexsurv"
 
   fn <- paste0(switch(type,
                       survival = "p",
@@ -1327,10 +1337,10 @@ make_predfun <- function(base, type, ..., .ns = list()) {
 
   dots <- rlang::enexprs(...)
 
-  if (type == "survival") function(times, eta, aux, quantiles) rlang::eval_tidy(rlang::call2(fn, q = times, lower.tail = FALSE, !!! dots, .ns = .ns))
-  else if (type %in% c("hazard", "cumhaz")) function(times, eta, aux, quantiles) rlang::eval_tidy(rlang::call2(fn, x = times, !!! dots, .ns = .ns))
-  else if (type == "mean") function(times, eta, aux, quantiles) rlang::eval_tidy(rlang::call2(fn, !!! dots, .ns = .ns))
-  else if (type == "median") function(times, eta, aux, quantiles) rlang::eval_tidy(rlang::call2(fn, p = 0.5, !!! dots, .ns = .ns))
-  else if (type == "quantile") function(times, eta, aux, quantiles) rlang::eval_tidy(rlang::call2(fn, p = quantiles, !!! dots, .ns = .ns))
-  else if (type == "rmst") function(times, eta, aux, quantiles) rlang::eval_tidy(rlang::call2(fn, t = times, !!! dots, .ns = .ns))
+  if (type == "survival") function(times, eta, aux, quantiles, basis) rlang::eval_tidy(rlang::call2(fn, q = times, lower.tail = FALSE, !!! dots, .ns = .ns))
+  else if (type %in% c("hazard", "cumhaz")) function(times, eta, aux, quantiles, basis) rlang::eval_tidy(rlang::call2(fn, x = times, !!! dots, .ns = .ns))
+  else if (type == "mean") function(times, eta, aux, quantiles, basis) rlang::eval_tidy(rlang::call2(fn, !!! dots, .ns = .ns))
+  else if (type == "median") function(times, eta, aux, quantiles, basis) rlang::eval_tidy(rlang::call2(fn, p = 0.5, !!! dots, .ns = .ns))
+  else if (type == "quantile") function(times, eta, aux, quantiles, basis) rlang::eval_tidy(rlang::call2(fn, p = quantiles, !!! dots, .ns = .ns))
+  else if (type == "rmst") function(times, eta, aux, quantiles, basis) rlang::eval_tidy(rlang::call2(fn, t = times, !!! dots, .ns = .ns))
 }
