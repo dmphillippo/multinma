@@ -1,8 +1,7 @@
 #' Distribution functions for M-spline baseline hazards
 #'
-#' Density, distribution, quantile, hazard, cumulative hazard, restricted mean
-#' survival time and mean survival time functions for the M-spline baseline
-#' hazards model.
+#' Density, distribution, quantile, hazard, cumulative hazard, and restricted
+#' mean survival time functions for the M-spline baseline hazards model.
 #'
 #' @param x,q Vector of quantiles
 #' @param basis M-spline basis produced by [splines2::mSpline()] or
@@ -26,14 +25,13 @@
 #'   polynomial is 0.
 #'
 #'   The d/p/h/H functions are calculated from their definitions. `qmspline()`
-#'   uses numerical inversion via [flexsurv::qgeneric()]. `rmst_mspline()` and
-#'   `mean_mspline()` use numerical integration via [flexsurv::rmst_generic()].
+#'   uses numerical inversion via [flexsurv::qgeneric()]. `rmst_mspline()`uses
+#'   numerical integration via [flexsurv::rmst_generic()].
 #'
 #' @return `dmspline()` gives the density, `pmspline()` gives the distribution
 #'   function (CDF), `qmspline()` gives the quantile function (inverse-CDF),
 #'   `hmspline()` gives the hazard function, `Hmspline()` gives the cumulative
-#'   hazard function, `rmst_mspline()` gives restricted mean survival times, and
-#'   `mean_mspline()` gives mean survival times.
+#'   hazard function, and `rmst_mspline()` gives restricted mean survival times.
 #'
 #' @rdname mspline
 #' @export
@@ -145,8 +143,10 @@ rmst_mspline <- function(t, basis, scoef, rate, start = 0) {
                          scalarargs = "basis", matargs = "scoef")
 }
 
-#' @rdname mspline
-#' @export
+# Don't export mean_mspline - this is a bad idea in general due to degeneracy
+# of the spline functions beyond the boundary knots.
+# Keep for internal use to calculate mean survival time for pexp model
+#' @noRd
 mean_mspline <- function(basis, scoef, rate, ...) {
   rmst_mspline(t = Inf, basis, scoef, rate)
 }

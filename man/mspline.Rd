@@ -7,7 +7,6 @@
 \alias{hmspline}
 \alias{Hmspline}
 \alias{rmst_mspline}
-\alias{mean_mspline}
 \title{Distribution functions for M-spline baseline hazards}
 \usage{
 dmspline(x, basis, scoef, rate, log = FALSE)
@@ -21,8 +20,6 @@ hmspline(x, basis, scoef, rate, log = FALSE)
 Hmspline(x, basis, scoef, rate, log = FALSE)
 
 rmst_mspline(t, basis, scoef, rate, start = 0)
-
-mean_mspline(basis, scoef, rate, ...)
 }
 \arguments{
 \item{x, q}{Vector of quantiles}
@@ -53,13 +50,11 @@ mean survival will be conditioned on survival up to this time}
 \code{dmspline()} gives the density, \code{pmspline()} gives the distribution
 function (CDF), \code{qmspline()} gives the quantile function (inverse-CDF),
 \code{hmspline()} gives the hazard function, \code{Hmspline()} gives the cumulative
-hazard function, \code{rmst_mspline()} gives restricted mean survival times, and
-\code{mean_mspline()} gives mean survival times.
+hazard function, and \code{rmst_mspline()} gives restricted mean survival times.
 }
 \description{
-Density, distribution, quantile, hazard, cumulative hazard, restricted mean
-survival time and mean survival time functions for the M-spline baseline
-hazards model.
+Density, distribution, quantile, hazard, cumulative hazard, and restricted
+mean survival time functions for the M-spline baseline hazards model.
 }
 \details{
 Survival models with a flexible M-spline on the baseline hazard are
@@ -68,8 +63,8 @@ baseline hazards are a special case where the degree of the M-spline
 polynomial is 0.
 
 The d/p/h/H functions are calculated from their definitions. \code{qmspline()}
-uses numerical inversion via \code{\link[flexsurv:qgeneric]{flexsurv::qgeneric()}}. \code{rmst_mspline()} and
-\code{mean_mspline()} use numerical integration via \code{\link[flexsurv:rmst_generic]{flexsurv::rmst_generic()}}.
+uses numerical inversion via \code{\link[flexsurv:qgeneric]{flexsurv::qgeneric()}}. \code{rmst_mspline()}uses
+numerical integration via \code{\link[flexsurv:rmst_generic]{flexsurv::rmst_generic()}}.
 }
 \references{
 \insertAllCited{}

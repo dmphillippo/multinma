@@ -1333,6 +1333,8 @@ surv_predfun <- function(likelihood, type) {
                  Q = 1 / sqrt(aux[grepl("^k\\[", names(aux))]))
 
   } else if (likelihood %in% c("mspline", "pexp")) {
+    if (likelihood == "mspline" && type == "mean")
+      abort("Calculating mean survival time for M-spline models is not supported; basis functions are ill-conditioned past the boundary knots.")
     make_predfun(base = "mspline", type = type,
                  rate = exp(eta), scoef = aux, basis = basis,
                  .ns = NULL)
