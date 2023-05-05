@@ -58,13 +58,26 @@ mean survival time functions for the M-spline baseline hazards model.
 }
 \details{
 Survival models with a flexible M-spline on the baseline hazard are
-described by \insertRef{Brilleman2020}{multinma}. Piecewise-exponential
-baseline hazards are a special case where the degree of the M-spline
-polynomial is 0.
+described by \insertCite{Brilleman2020;textual}{multinma}.
+Piecewise-exponential baseline hazards are a special case where the degree
+of the M-spline polynomial is 0.
 
 The d/p/h/H functions are calculated from their definitions. \code{qmspline()}
 uses numerical inversion via \code{\link[flexsurv:qgeneric]{flexsurv::qgeneric()}}. \code{rmst_mspline()}uses
-numerical integration via \code{\link[flexsurv:rmst_generic]{flexsurv::rmst_generic()}}.
+numerical integration via \code{\link[flexsurv:rmst_generic]{flexsurv::rmst_generic()}}, except for the
+special case of the piecewise-exponential hazard (i.e. degree 0 M-splines)
+which uses the explicit formula from
+\insertCite{Royston2013;textual}{multinma}.
+
+Care should be taken when evaluating the spline basis at times beyond the
+boundary knots (either directly through the d/p/h/H/rmst functions, or
+indirectly by requesting quantiles with \code{qmspline()} that correspond to
+times beyond the boundary knots), as these can become unstable. The
+underlying calls to \code{\link[splines2:mSpline]{splines2::mSpline()}} will raise warnings when this
+happens. For this reason evaluating the (unrestricted) mean survival time
+is not generally recommended as this requires integrating over an infinite
+time horizon (i.e. \code{rmst_mspline()} with \code{t = Inf}), except for the special
+case of the piecewise-exponential hazard.
 }
 \references{
 \insertAllCited{}

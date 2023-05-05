@@ -20,13 +20,26 @@
 #'   mean survival will be conditioned on survival up to this time
 #'
 #' @details Survival models with a flexible M-spline on the baseline hazard are
-#'   described by \insertRef{Brilleman2020}{multinma}. Piecewise-exponential
-#'   baseline hazards are a special case where the degree of the M-spline
-#'   polynomial is 0.
+#'   described by \insertCite{Brilleman2020;textual}{multinma}.
+#'   Piecewise-exponential baseline hazards are a special case where the degree
+#'   of the M-spline polynomial is 0.
 #'
 #'   The d/p/h/H functions are calculated from their definitions. `qmspline()`
 #'   uses numerical inversion via [flexsurv::qgeneric()]. `rmst_mspline()`uses
-#'   numerical integration via [flexsurv::rmst_generic()].
+#'   numerical integration via [flexsurv::rmst_generic()], except for the
+#'   special case of the piecewise-exponential hazard (i.e. degree 0 M-splines)
+#'   which uses the explicit formula from
+#'   \insertCite{Royston2013;textual}{multinma}.
+#'
+#'   Care should be taken when evaluating the spline basis at times beyond the
+#'   boundary knots (either directly through the d/p/h/H/rmst functions, or
+#'   indirectly by requesting quantiles with `qmspline()` that correspond to
+#'   times beyond the boundary knots), as these can become unstable. The
+#'   underlying calls to [splines2::mSpline()] will raise warnings when this
+#'   happens. For this reason evaluating the (unrestricted) mean survival time
+#'   is not generally recommended as this requires integrating over an infinite
+#'   time horizon (i.e. `rmst_mspline()` with `t = Inf`), except for the special
+#'   case of the piecewise-exponential hazard.
 #'
 #' @return `dmspline()` gives the density, `pmspline()` gives the distribution
 #'   function (CDF), `qmspline()` gives the quantile function (inverse-CDF),
@@ -138,9 +151,29 @@ Hmspline <- function(x, basis, scoef, rate, log = FALSE) {
 #' @rdname mspline
 #' @export
 rmst_mspline <- function(t, basis, scoef, rate, start = 0) {
-  flexsurv::rmst_generic(pmspline, t, start = start,
-                         basis = basis, scoef = scoef, rate = rate,
-                         scalarargs = "basis", matargs = "scoef")
+  if (attr(basis, "degree") == 0) {
+    # Piecewise exponential has explicit formula (Royston and Parmar 2013)
+    nr <- max(length(t), if (is.matrix(scoef)) nrow(scoef) else 1, length(rate))
+
+    knots <- c(attr(basis, "Boundary.knots")[1], attr(basis, "knots"))
+    knots <- matrix(knots, nrow = nr, ncol = length(knots), byrow = TRUE)
+
+    h <- apply(knots, 2, hmspline, basis = basis, scoef = scoef, rate = rate)
+
+    delta <- t(apply(pmax(pmin(cbind(knots, Inf), t) - start, 0), 1, diff))
+
+    hd <- h * delta
+
+    H <- t(apply(cbind(0, hd[, -ncol(knots), drop = FALSE]), 1, cumsum))
+
+    rowSums(exp(-H) / h * (1 - exp(-hd)))
+
+  } else {
+    # General M-splines require numerical integration
+    flexsurv::rmst_generic(pmspline, t, start = start,
+                           basis = basis, scoef = scoef, rate = rate,
+                           scalarargs = "basis", matargs = "scoef")
+  }
 }
 
 # Don't export mean_mspline - this is a bad idea in general due to degeneracy
