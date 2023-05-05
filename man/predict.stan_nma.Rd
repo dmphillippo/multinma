@@ -23,8 +23,8 @@
 
 \method{predict}{stan_nma_surv}(
   object,
-  ...,
   times = NULL,
+  ...,
   baseline = NULL,
   aux = NULL,
   newdata = NULL,

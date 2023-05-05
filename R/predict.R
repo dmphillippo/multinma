@@ -1190,8 +1190,8 @@ predict.stan_nma <- function(object, ...,
 #'
 #' @export
 #' @rdname predict.stan_nma
-predict.stan_nma_surv <- function(object, ...,
-                                  times = NULL,
+predict.stan_nma_surv <- function(object, times = NULL,
+                                  ...,
                                   baseline = NULL,
                                   aux = NULL,
                                   newdata = NULL, study = NULL, trt_ref = NULL,
