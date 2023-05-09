@@ -1347,6 +1347,8 @@ make_predfun <- function(base, type, ..., .ns = list()) {
   if (rlang::has_name(.ns, type)) .ns <- .ns$type
   else if (!is.null(.ns)) .ns <- "flexsurv"
 
+  if (any(.ns == "flexsurv")) require_pkg("flexsurv")
+
   fn <- paste0(switch(type,
                       survival = "p",
                       hazard = "h",

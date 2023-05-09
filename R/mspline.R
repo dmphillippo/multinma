@@ -84,6 +84,7 @@ pmspline <- function(q, basis, scoef, rate, lower.tail = TRUE, log.p = FALSE) {
 #' @export
 qmspline <- function(p, basis, scoef, rate, lower.tail = TRUE, log.p = FALSE) {
   if (!is.numeric(p)) abort("`p` must be a numeric vector of quantiles.")
+  require_pkg("flexsurv")
 
   flexsurv::qgeneric(pmspline, p = p,
                      scalarargs = "basis", matargs = "scoef",
@@ -170,6 +171,7 @@ rmst_mspline <- function(t, basis, scoef, rate, start = 0) {
 
   } else {
     # General M-splines require numerical integration
+    require_pkg("flexsurv")
     flexsurv::rmst_generic(pmspline, t, start = start,
                            basis = basis, scoef = scoef, rate = rate,
                            scalarargs = "basis", matargs = "scoef")

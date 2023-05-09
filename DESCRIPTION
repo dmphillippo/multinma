@@ -68,7 +68,8 @@ Suggests:
     crayon,
     tidygraph,
     pkgdown,
-    splines2
+    splines2,
+    flexsurv
 RdMacros: Rdpack
 URL: https://dmphillippo.github.io/multinma/, https://github.com/dmphillippo/multinma
 BugReports: https://github.com/dmphillippo/multinma/issues
