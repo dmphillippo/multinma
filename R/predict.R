@@ -298,17 +298,6 @@ predict.stan_nma <- function(object, ...,
           )))
         preddat <- tidyr::expand_grid(.study = studies, .trt = object$network$treatments)
 
-        if (type %in% c("survival", "hazard", "cumhaz") && is.null(times)) {
-          n_all_arms <- nrow(preddat)
-
-          # Make design matrix of only observed treatment arms
-          preddat <- dplyr::bind_rows(object$network$ipd[, c(".study", ".trt")],
-                                      object$network$agd_arm[, c(".study", ".trt")]) %>%
-            dplyr::distinct(.data$.study, .data$.trt) %>%
-            dplyr::mutate(.study = forcats::fct_drop(.data$.study))
-        }
-
-
         # Add in .trtclass if defined in network
         if (!is.null(object$network$classes)) {
           preddat$.trtclass <- object$network$classes[as.numeric(preddat$.trt)]
@@ -354,15 +343,11 @@ predict.stan_nma <- function(object, ...,
                                          tidyr::unnest(object$network$agd_arm, cols = ".Surv"))
             surv_all <- dplyr::mutate(surv_all, !!! get_Surv_data(surv_all$.Surv))
 
-            # Note about missing arms
-            if (nrow(dplyr::distinct(surv_all, .data$.study, .data$.trt)) < n_all_arms)
-              inform("Specify `times` to produce predictions for unobserved treatment arms in each study population.")
-
             # Add times vector to preddat
             preddat <- dplyr::left_join(preddat,
-                                        dplyr::group_by(surv_all, .data$.study, .data$.trt) %>%
+                                        dplyr::group_by(surv_all, .data$.study) %>%
                                           dplyr::summarise(time = list(.data$time)),
-                                        by = c(".study", ".trt"))
+                                        by = ".study")
 
           } else {
             # Use provided vector of times
