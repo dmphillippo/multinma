@@ -520,7 +520,7 @@ predict.stan_nma <- function(object, ...,
     }
 
     # Get predictions for survival models
-    if (inherits(object, "stan_nma_surv")) {
+    if (is_surv) {
 
       pred_temp <- pred_array
 
@@ -662,7 +662,41 @@ predict.stan_nma <- function(object, ...,
                       '  - Produce aggregate predictions with level = "aggregate"',
                       sep = "\n"))
 
-        preddat <- object$network$ipd
+        preddat <- get_model_data_columns(object$network$ipd, regression = object$regression)
+
+        if (is_surv) {
+          # Deal with times argument
+          if (type %in% c("survival", "hazard", "cumhaz")) {
+            if (is.null(times)) {
+              # Take times from network
+              preddat$time <- get_Surv_data(object$network$ipd$.Surv)$time
+
+            } else {
+              abort('Cannot specify `times` with `level = "individual"` and `newdata = NULL`')
+            }
+          } else if (type == "rmst") {
+            if (is.null(times)) {
+              # Take time horizon from network
+              surv_all <- object$network$ipd %>%
+                dplyr::mutate(!!! get_Surv_data(object$network$ipd$.Surv))
+
+              # Time horizon is earliest last follow-up time amongst the studies
+              last_times <- surv_all %>%
+                dplyr::group_by(.data$.study) %>%
+                dplyr::summarise(time = max(time))
+
+              times <- min(last_times$time)
+              preddat$time <- times
+
+            } else {
+              # Use provided time
+              if (!is.numeric(times) && length(times) > 1)
+                abort("`times` must be a scalar numeric value giving the restricted time horizon.")
+
+              preddat$time <- times
+            }
+          }
+        }
 
       } else {
 
@@ -677,16 +711,79 @@ predict.stan_nma <- function(object, ...,
                   "  - Specify covariate values using the `newdata` argument",
                   sep = "\n"))
 
-        if (has_agd_arm(object$network)) {
-          if (inherits(object$network, "mlnmr_data")) {
-            dat_agd_arm <- .unnest_integration(object$network$agd_arm) %>%
-              dplyr::mutate(.sample_size = .data$.sample_size / object$network$n_int)
+        # Deal with times argument for type = "rmst"
+        if (is_surv && type == "rmst") {
+          if (is.null(times)) {
+            # Take time horizon from network
+            surv_all <- dplyr::bind_rows(object$network$ipd,
+                                         tidyr::unnest(object$network$agd_arm, cols = ".Surv"))
+            surv_all <- dplyr::mutate(surv_all, !!! get_Surv_data(surv_all$.Surv))
+
+            # Time horizon is earliest last follow-up time amongst the studies
+            last_times <- surv_all %>%
+              dplyr::group_by(.data$.study) %>%
+              dplyr::summarise(time = max(time))
+
+            times <- min(last_times$time)
           } else {
-            dat_agd_arm <- object$network$agd_arm
+            # Use provided time
+            if (!is.numeric(times) && length(times) > 1)
+              abort("`times` must be a scalar numeric value giving the restricted time horizon.")
+          }
+        } else if (is_surv && type %in% c("survival", "hazard", "cumhaz")) {
+          # Checks for survival/hazard/cumhaz times
+          if (!is.null(times) && !is.numeric(times))
+            abort("`times` must be a numeric vector of times to predict at.")
+        }
+
+        if (has_agd_arm(object$network)) {
+          if (!is_surv) {
+            if (inherits(object$network, "mlnmr_data")) {
+              dat_agd_arm <- .unnest_integration(object$network$agd_arm) %>%
+                dplyr::mutate(.sample_size = .data$.sample_size / object$network$n_int)
+            } else {
+              dat_agd_arm <- object$network$agd_arm
+            }
+          } else {
+
+            if (type %in% c("survival", "hazard", "cumhaz") && is.null(times)) {
+                # Use times from network, unnest
+                dat_agd_arm <- object$network$agd_arm %>%
+                  # Drop duplicated names in outer dataset from .data_orig before unnesting
+                  dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm)))),
+                                # Reset sample size for weighted mean later
+                                .sample_size = 1) %>%
+                  tidyr::unnest(cols = c(".Surv", ".data_orig"))
+                dat_agd_arm <- dplyr::mutate(dat_agd_arm, !!! get_Surv_data(dat_agd_arm$.Surv))
+            } else {
+              # Use provided times
+              dat_agd_arm <- object$network$agd_arm %>%
+                # Drop duplicated names in outer dataset from .data_orig before unnesting
+                # Take only one row of .data_orig (all duplicated anyway)
+                dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm)))[1,]),
+                              # Use provided time vector
+                              time = if (type == "rmst") list(times) else NA,
+                              # Reset sample size for weighted mean later
+                              .sample_size = 1) %>%
+                tidyr::unnest(cols = c("time", ".data_orig"))
+            }
+
+            # Unnest integration points if present
+            if (inherits(object, "stan_mlnmr")) {
+              dat_agd_arm <- dplyr::group_by(dat_agd_arm, .data$.study, .data$.trt) %>%
+                # Add in ID variable for each observation, needed later for aggregating
+                dplyr::mutate(.obs_id = 1:dplyr::n()) %>%
+                dplyr::ungroup() %>%
+                .unnest_integration() %>%
+                dplyr::mutate(.sample_size = .data$.sample_size / object$network$n_int)
+            }
+
+            # Drop .Surv column, not needed
+            dat_agd_arm <- dplyr::select(dat_agd_arm, -.data$.Surv)
           }
 
           # Only take necessary columns
-          dat_agd_arm <- get_model_data_columns(dat_agd_arm, regression = object$regression, label = "AgD (arm-based)")
+          dat_agd_arm <- get_model_data_columns(dat_agd_arm, regression = object$regression, label = "AgD (arm-based)", keep = "time")
         } else {
           dat_agd_arm <- tibble::tibble()
         }
@@ -694,8 +791,34 @@ predict.stan_nma <- function(object, ...,
         if (has_ipd(object$network)) {
           dat_ipd <- object$network$ipd
 
+          if (is_surv) {
+            # For aggregate survival predictions we average the entire survival
+            # curve over the population (i.e. over every individual), so we need
+            # to expand out every time for every individual
+
+            if (type %in% c("survival", "hazard", "cumhaz") && is.null(times)) {
+              # Use times from network
+              ipd_times <- dplyr::mutate(dat_ipd, !!! get_Surv_data(dat_ipd$.Surv)) %>%
+                dplyr::group_by(".study", ".trt") %>%
+                # Add in ID variable for each observation, needed later for aggregating
+                dplyr::mutate(.obs_id = 1:dplyr::n()) %>%
+                tidyr::nest(cols = c("time", ".obs_id"))
+
+              dat_ipd <- dplyr::left_join(dat_ipd,
+                                          ipd_times,
+                                          by = c(".study", ".trt")) %>%
+                tidyr::unnest(cols = c("time", ".obs_id"))
+            } else {
+              # Use provided times
+              dat_ipd$time <- if (type == "rmst") times else NA
+            }
+
+            # Drop .Surv column, not needed
+            dat_ipd <- dplyr::select(dat_ipd, -.data$.Surv)
+          }
+
           # Only take necessary columns
-          dat_ipd <- get_model_data_columns(dat_ipd, regression = object$regression, label = "IPD")
+          dat_ipd <- get_model_data_columns(dat_ipd, regression = object$regression, label = "IPD", keep = "time")
 
           dat_ipd$.sample_size <- 1
         } else {
@@ -755,6 +878,20 @@ predict.stan_nma <- function(object, ...,
       # Get posterior samples
       post <- as.array(object, pars = c("mu", "d", "beta"))
 
+      # Get prediction array
+      pred_array <- tcrossprod_mcmc_array(post, X_all)
+
+      # Get aux parameters for survival models
+      if (is_surv) {
+        if (!is.null(aux)) abort("Specify all of `aux`, `baseline`, and `newdata`, or none.")
+
+        if (is.null(aux_pars)) {
+          aux_array <- NULL
+        } else {
+          aux_array <- as.array(object, pars = aux_pars)
+        }
+      }
+
     # With baseline and newdata specified
     } else {
 
@@ -784,6 +921,41 @@ predict.stan_nma <- function(object, ...,
       predreg <- get_model_data_columns(preddat, regression = object$regression, label = "`newdata`")
 
       preddat$.sample_size <- 1
+
+      # Check times argument
+      times <- rlang::enquo(times)
+      if (rlang::quo_is_null(times) && type %in% c("survival", "hazard", "cumhaz", "rmst"))
+        abort("`times` must be specified when `newdata`, `baseline` and `aux` are provided")
+
+      if (rlang::quo_is_symbol(times)) {
+        preddat <- dplyr::mutate(preddat, time = !! times)
+
+        if (level == "aggregate" && type %in% c("survival", "hazard", "cumhaz")) {
+          # Need to average survival curve over all covariate values at every time
+          p_times <- dplyr::group_by(preddat, .data$.study) %>%
+            tidyr::nest(time = list(time), .obs_id = list(1:dplyr::n()))
+
+          preddat <- dplyr::left_join(preddat, p_times, by = ".study") %>%
+            tidyr::unnest(cols = c("time", ".obs_id"))
+        }
+
+      } else {
+        times <- eval(times)
+
+        if (type %in% c("survival", "hazard", "cumhaz") && !is.numeric(times))
+          abort("`times` must be a numeric vector of times to predict at.")
+
+        if (type == "rmst" && (!is.numeric(times) && length(times) > 1))
+          abort("`times` must be a scalar numeric value giving the restricted time horizon.")
+
+        # Add times vector in to preddat
+        if (type %in% c("survival", "hazard", "cumhaz")) {
+          preddat <- dplyr::mutate(preddat, time = list(times), .obs_id = list(1:length(times))) %>%
+            tidyr::unnest(cols = c("time", ".obs_id"))
+        } else if (type == "rmst") {
+          preddat$time <- times
+        }
+      }
 
       # Make design matrix of all studies and all treatments
       if (rlang::has_name(preddat, ".trt")) preddat <- dplyr::select(preddat, -".trt")
@@ -968,6 +1140,79 @@ predict.stan_nma <- function(object, ...,
       post[ , , 1:dim_mu[3]] <- mu
       post[ , , dim_mu[3] + 1:dim_post_temp[3]] <- post_temp
 
+
+      # Get aux parameters for survival models
+      if (is_surv) {
+        if (is.null(aux)) abort("Specify both `aux` and `baseline` or neither.")
+
+        if (is.null(aux_pars)) {
+          aux_array <- NULL
+        } else {
+
+          # Check aux spec
+          if (!inherits(aux, "distr")) {
+            if (!length(aux) %in% c(1, n_studies))
+              abort(sprintf("`aux` must be a single distr() distribution, or a list of length %d (number of `newdata` studies)", n_studies))
+            if (length(aux) == 1) {
+              aux <- rep(aux, times = n_studies)
+              names(aux) <- studies
+            } else {
+              if (!rlang::is_named(aux)) {
+                names(aux) <- studies
+              } else {
+                aux_names <- names(aux)
+                if (dplyr::n_distinct(aux_names) != n_studies)
+                  abort("`aux` list names must be distinct study names from `newdata`")
+                if (length(bad_aux_names <- setdiff(aux_names, studies)))
+                  abort(glue::glue("`aux` list names must match all study names from `newdata`.\n",
+                                   "Unmatched list names: ",
+                                   glue::glue_collapse(glue::double_quote(bad_aux_names), sep = ", ", width = 30),
+                                   ".\n",
+                                   "Unmatched `newdata` study names: ",
+                                   glue::glue_collapse(glue::double_quote(setdiff(studies, aux_names)), sep = ", ", width = 30),
+                                   ".\n"))
+              }
+            }
+          } else {
+            aux <- rep(list(aux), times = n_studies)
+            names(aux) <- studies
+          }
+
+          if (object$likelihood %in% c("mspline", "pexp")) {
+            n_aux <- length(object$basis[[1]])
+            aux_names <- paste0(rep(aux_pars, each = n_aux * n_studies), "[", rep(studies, each = n_aux) , rep(1:n_aux, times = n_studies), "]")
+          } else {
+            n_aux <- length(aux_pars)
+            aux_names <- paste0(rep(aux_pars, each = n_studies), "[", rep(studies, times = n_aux) , "]")
+          }
+
+          dim_aux <- c(dim_mu[1:2], n_aux * n_studies)
+          u <- array(runif(prod(dim_aux)), dim = dim_aux)
+          aux_array <- array(NA_real_,
+                             dim = dim_aux,
+                             dimnames = list(iterations = NULL,
+                                             chains = NULL,
+                                             parameters = aux_names))
+
+          if (object$likelihood %in% c("mspline", "pexp")) {
+            # Generate spline coefficients as a vector
+            for (i in 1:dim_aux[1]) {
+              for (j in 1:dim_aux[2]) {
+                for (s in 1:n_studies) {
+                  aux_array[i, j, ((s-1)*n_aux + 1):(s*n_aux)] <- rlang::eval_tidy(rlang::call2(aux$qfun, p = u[i, j, ((s-1)*n_aux + 1):(s*n_aux), drop = TRUE], !!! aux$args))
+                }
+              }
+            }
+          } else {
+            # All other aux pars generate one by one
+            for (s in studies) {
+              for (i in 1:n_aux) {
+                aux_array[, , (s-1)*n_studies + i] <- rlang::eval_tidy(rlang::call2(aux[[s]]$qfun, p = u[ , , (s-1)*n_studies + i, drop = TRUE], !!! aux[[s]]$args))
+              }
+            }
+          }
+        }
+      }
     }
 
     # For predictive distribution, use delta_new instead of d
