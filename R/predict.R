@@ -1340,6 +1340,10 @@ predict.stan_nma <- function(object, ...,
 
           if (type %in% c("survival", "hazard", "cumhaz")) {
             s_preddat <- dplyr::group_by(s_preddat, .data$.study, .data$.trt, .data$.obs_id)
+          } else if (type == "quantile") {
+            s_preddat <- dplyr::cross_join(s_preddat,
+                                           data.frame(.quantile = quantiles)) %>%
+              dplyr::group_by(.data$.study, .data$.trt, .data$.quantile)
           } else {
             s_preddat <- dplyr::group_by(s_preddat, .data$.study, .data$.trt)
           }
@@ -1504,8 +1508,11 @@ predict.stan_nma <- function(object, ...,
                                            .study = outdat$.study,
                                            .trt = outdat$.trt,
                                            .before = 1)
-        if (type %in% c("survival", "hazard", "cumhaz", "rmst"))
+        if (type %in% c("survival", "hazard", "cumhaz", "rmst")) {
           pred_summary <- tibble::add_column(pred_summary, .time = outdat$.time, .after = ".trt")
+        } else if (type == "quantile") {
+          pred_summary <- tibble::add_column(pred_summary, .quantile = outdat$.quantile, .after = ".trt")
+        }
       } else {
         pred_summary <- tibble::add_column(pred_summary,
                                            .study = preddat$.study,
@@ -1622,16 +1629,6 @@ make_surv_predict <- function(eta, aux, times, likelihood,
 
   out <- array(NA_real_, dim = d_out, dimnames = dn_out)
 
-  # ta <- matrix(times, nrow = n_eta, ncol = prod(d_out[1:2]), byrow = TRUE)
-  # auxm <- matrix(aux, ncol = dim(aux)[3])
-  # out <- array(do.call(surv_predfun(likelihood, type),
-  #                      args = list(times = as.vector(ta),
-  #                                  eta = as.vector(eta),
-  #                                  aux = auxm[rep(1:nrow(auxm), times = n_eta),],
-  #                                  quantiles = quantiles,
-  #                                  basis = basis)),
-  #              dim = d_out, dimnames = dn_out)
-
   if (type %in% c("survival", "hazard", "cumhaz") && n_eta == 1) { # Multiple times, single linear predictor
     for (i in 1:length(times)) {
       out[, , i] <- do.call(surv_predfun(likelihood, type),
@@ -1642,16 +1639,24 @@ make_surv_predict <- function(eta, aux, times, likelihood,
                                          basis = basis))
     }
   } else if (n_eta > 1) { # Single/multiple times, multiple linear predictors
+    if (type == "quantile") {
+      iinc <- length(quantiles)
+      quantiles <- rep(quantiles, each = length(eta[ , , 1]))
+    } else {
+      iinc <- 1
+    }
     for (i in 1:n_eta) {
       ti <- if (length(times) == 1) times else times[i]
-      out[ , , i] <- do.call(surv_predfun(likelihood, type),
-                            args = list(times = ti,
-                                        eta = as.vector(eta[ , , i]),
-                                        aux = matrix(aux, ncol = dim(aux)[3]),
-                                        quantiles = quantiles,
-                                        basis = basis))
+      out[ , , ((i-1)*iinc+1):(i*iinc)] <-
+        do.call(surv_predfun(likelihood, type),
+                args = list(times = ti,
+                            eta = as.vector(eta[ , , i]),
+                            aux = matrix(aux, ncol = dim(aux)[3]),
+                            quantiles = quantiles,
+                            basis = basis))
     }
   } else { # Single time, single linear predictor
+    if (type == "quantile") quantiles <- rep(quantiles, each = length(eta))
     out <- array(do.call(surv_predfun(likelihood, type),
                          args = list(times = times,
                                      eta = as.vector(eta),
