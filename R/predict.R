@@ -346,7 +346,7 @@ predict.stan_nma <- function(object, ...,
             # Add times vector to preddat
             preddat <- dplyr::left_join(preddat,
                                         dplyr::group_by(surv_all, .data$.study) %>%
-                                          dplyr::summarise(time = list(.data$time)),
+                                          dplyr::summarise(.time = list(.data$time)),
                                         by = ".study")
 
           } else {
@@ -354,7 +354,7 @@ predict.stan_nma <- function(object, ...,
             if (!is.numeric(times))
               abort("`times` must be a numeric vector of times to predict at.")
 
-            preddat <- dplyr::mutate(preddat, time = list(times))
+            preddat <- dplyr::mutate(preddat, .time = list(times))
           }
         } else if (type == "rmst") {
           if (is.null(times)) {
@@ -369,14 +369,14 @@ predict.stan_nma <- function(object, ...,
               dplyr::summarise(time = max(time))
 
             times <- min(last_times$time)
-            preddat$time <- times
+            preddat$.time <- times
 
           } else {
             # Use provided time
             if (!is.numeric(times) && length(times) > 1)
               abort("`times` must be a scalar numeric value giving the restricted time horizon.")
 
-            preddat$time <- times
+            preddat$.time <- times
           }
         }
 
@@ -488,9 +488,9 @@ predict.stan_nma <- function(object, ...,
 
         # Add times vector in to preddat
         if (type %in% c("survival", "hazard", "cumhaz")) {
-          preddat <- dplyr::mutate(preddat, time = list(times))
+          preddat <- dplyr::mutate(preddat, .time = list(times))
         } else if (type == "rmst") {
-          preddat$time <- times
+          preddat$.time <- times
         }
       }
 
@@ -528,9 +528,9 @@ predict.stan_nma <- function(object, ...,
       dn_p <- dimnames(pred_temp)
 
       if (type %in% c("survival", "hazard", "cumhaz")) {
-        d_p[3] <- sum(lengths(preddat$time))
-        dn_p[[3]] <- paste0(rep(stringr::str_sub(dn_p[[3]], start = 1, end = -2), times = lengths(preddat$time)),
-                            ", ", unlist(purrr::map(preddat$time, seq_along)), "]")
+        d_p[3] <- sum(lengths(preddat$.time))
+        dn_p[[3]] <- paste0(rep(stringr::str_sub(dn_p[[3]], start = 1, end = -2), times = lengths(preddat$.time)),
+                            ", ", unlist(purrr::map(preddat$.time, seq_along)), "]")
       } else if (type == "quantile") {
         dn_p[[3]] <- paste0(rep(stringr::str_sub(dn_p[[3]], start = 1, end = -2), each = length(quantiles)),
                             ", ", rep(quantiles, times = d_p[3]), "]")
@@ -544,7 +544,7 @@ predict.stan_nma <- function(object, ...,
       j <- 0
       for (i in 1:nrow(preddat)) {
         if (type %in% c("survival", "hazard", "cumhaz", "rmst")) {
-          tt <- preddat$time[[i]]
+          tt <- preddat$.time[[i]]
           jinc <- length(tt)
         } else if (type == "quantile") {
           tt <- NA
@@ -594,15 +594,15 @@ predict.stan_nma <- function(object, ...,
 
       } else if (object$likelihood %in% valid_lhood$survival) {
         if (type %in% c("survival", "hazard", "cumhaz")) {
-          preddat <- tidyr::unnest(preddat, cols = "time")
+          preddat <- tidyr::unnest(preddat, cols = ".time")
           pred_summary <- tibble::add_column(pred_summary,
                                              .trt = preddat$.trt,
-                                             .time = preddat$time,
+                                             .time = preddat$.time,
                                              .before = 1)
         } else if (type == "rmst") {
           pred_summary <- tibble::add_column(pred_summary,
                                              .trt = preddat$.trt,
-                                             .time = preddat$time,
+                                             .time = preddat$.time,
                                              .before = 1)
         } else if (type == "quantile") {
           pred_summary <- tibble::add_column(pred_summary,
@@ -669,8 +669,7 @@ predict.stan_nma <- function(object, ...,
           if (type %in% c("survival", "hazard", "cumhaz")) {
             if (is.null(times)) {
               # Take times from network
-              preddat$time <- get_Surv_data(object$network$ipd$.Surv)$time
-
+              preddat$.time <- get_Surv_data(object$network$ipd$.Surv)$time
             } else {
               abort('Cannot specify `times` with `level = "individual"` and `newdata = NULL`')
             }
@@ -686,16 +685,20 @@ predict.stan_nma <- function(object, ...,
                 dplyr::summarise(time = max(time))
 
               times <- min(last_times$time)
-              preddat$time <- times
+              preddat$.time <- times
 
             } else {
               # Use provided time
               if (!is.numeric(times) && length(times) > 1)
                 abort("`times` must be a scalar numeric value giving the restricted time horizon.")
 
-              preddat$time <- times
+              preddat$.time <- times
             }
           }
+
+          preddat <- dplyr::group_by(preddat, .data$.study) %>%
+            dplyr::mutate(.obs_id = 1:dplyr::n()) %>%
+            dplyr::ungroup()
         }
 
       } else {
@@ -753,8 +756,13 @@ predict.stan_nma <- function(object, ...,
                   dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm)))),
                                 # Reset sample size for weighted mean later
                                 .sample_size = 1) %>%
-                  tidyr::unnest(cols = c(".Surv", ".data_orig"))
-                dat_agd_arm <- dplyr::mutate(dat_agd_arm, !!! get_Surv_data(dat_agd_arm$.Surv))
+                  tidyr::unnest(cols = c(".Surv", ".data_orig")) %>%
+                  dplyr::mutate(dat_agd_arm, !!! get_Surv_data(.$.Surv),
+                                .time = .data$time) %>%
+                  # Add in ID variable for each observation
+                  dplyr::group_by(.data$.study) %>%
+                  dplyr::mutate(.obs_id = 1:dplyr::n()) %>%
+                  dplyr::ungroup()
             } else {
               # Use provided times
               dat_agd_arm <- object$network$agd_arm %>%
@@ -762,19 +770,16 @@ predict.stan_nma <- function(object, ...,
                 # Take only one row of .data_orig (all duplicated anyway)
                 dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm)))[1,]),
                               # Use provided time vector
-                              time = if (type == "rmst") list(times) else NA,
+                              .time = if (type %in% c("survival", "hazard", "cumhaz", "rmst")) list(times) else NA,
+                              .obs_id = if (type %in% c("survival", "hazard", "cumhaz", "rmst")) list(1:length(times)) else NA,
                               # Reset sample size for weighted mean later
                               .sample_size = 1) %>%
-                tidyr::unnest(cols = c("time", ".data_orig"))
+                tidyr::unnest(cols = c(".time", ".obs_id", ".data_orig"))
             }
 
             # Unnest integration points if present
             if (inherits(object, "stan_mlnmr")) {
-              dat_agd_arm <- dplyr::group_by(dat_agd_arm, .data$.study, .data$.trt) %>%
-                # Add in ID variable for each observation, needed later for aggregating
-                dplyr::mutate(.obs_id = 1:dplyr::n()) %>%
-                dplyr::ungroup() %>%
-                .unnest_integration() %>%
+              dat_agd_arm <- .unnest_integration(dat_agd_arm) %>%
                 dplyr::mutate(.sample_size = .data$.sample_size / object$network$n_int)
             }
 
@@ -783,7 +788,7 @@ predict.stan_nma <- function(object, ...,
           }
 
           # Only take necessary columns
-          dat_agd_arm <- get_model_data_columns(dat_agd_arm, regression = object$regression, label = "AgD (arm-based)", keep = "time")
+          dat_agd_arm <- get_model_data_columns(dat_agd_arm, regression = object$regression, label = "AgD (arm-based)")
         } else {
           dat_agd_arm <- tibble::tibble()
         }
@@ -798,19 +803,25 @@ predict.stan_nma <- function(object, ...,
 
             if (type %in% c("survival", "hazard", "cumhaz") && is.null(times)) {
               # Use times from network
-              ipd_times <- dplyr::mutate(dat_ipd, !!! get_Surv_data(dat_ipd$.Surv)) %>%
-                dplyr::group_by(".study", ".trt") %>%
+              ipd_times <- dplyr::mutate(dat_ipd, !!! get_Surv_data(dat_ipd$.Surv), .time = .data$time) %>%
                 # Add in ID variable for each observation, needed later for aggregating
+                dplyr::group_by(".study") %>%
                 dplyr::mutate(.obs_id = 1:dplyr::n()) %>%
-                tidyr::nest(cols = c("time", ".obs_id"))
+                dplyr::group_by(".study", ".trt") %>%
+                tidyr::nest(cols = c(".time", ".obs_id"))
 
               dat_ipd <- dplyr::left_join(dat_ipd,
                                           ipd_times,
                                           by = c(".study", ".trt")) %>%
-                tidyr::unnest(cols = c("time", ".obs_id"))
+                tidyr::unnest(cols = c(".time", ".obs_id"))
             } else {
               # Use provided times
-              dat_ipd$time <- if (type == "rmst") times else NA
+              if (type %in% c("survival", "hazard", "cumhaz", "rmst")) {
+                dat_ipd <- dplyr::mutate(dat_ipd,
+                                         .time = list(times),
+                                         .obs_id = list(1:length(times))) %>%
+                  tidyr::unnest(cols = c(".time", ".obs_id"))
+              }
             }
 
             # Drop .Surv column, not needed
@@ -818,7 +829,7 @@ predict.stan_nma <- function(object, ...,
           }
 
           # Only take necessary columns
-          dat_ipd <- get_model_data_columns(dat_ipd, regression = object$regression, label = "IPD", keep = "time")
+          dat_ipd <- get_model_data_columns(dat_ipd, regression = object$regression, label = "IPD")
 
           dat_ipd$.sample_size <- 1
         } else {
@@ -878,9 +889,6 @@ predict.stan_nma <- function(object, ...,
       # Get posterior samples
       post <- as.array(object, pars = c("mu", "d", "beta"))
 
-      # Get prediction array
-      pred_array <- tcrossprod_mcmc_array(post, X_all)
-
       # Get aux parameters for survival models
       if (is_surv) {
         if (!is.null(aux)) abort("Specify all of `aux`, `baseline`, and `newdata`, or none.")
@@ -928,15 +936,15 @@ predict.stan_nma <- function(object, ...,
         abort("`times` must be specified when `newdata`, `baseline` and `aux` are provided")
 
       if (rlang::quo_is_symbol(times)) {
-        preddat <- dplyr::mutate(preddat, time = !! times)
+        preddat <- dplyr::mutate(preddat, .time = !! times)
 
         if (level == "aggregate" && type %in% c("survival", "hazard", "cumhaz")) {
           # Need to average survival curve over all covariate values at every time
           p_times <- dplyr::group_by(preddat, .data$.study) %>%
-            tidyr::nest(time = list(time), .obs_id = list(1:dplyr::n()))
+            tidyr::nest(.time = list(time), .obs_id = list(1:dplyr::n()))
 
           preddat <- dplyr::left_join(preddat, p_times, by = ".study") %>%
-            tidyr::unnest(cols = c("time", ".obs_id"))
+            tidyr::unnest(cols = c(".time", ".obs_id"))
         }
 
       } else {
@@ -950,10 +958,13 @@ predict.stan_nma <- function(object, ...,
 
         # Add times vector in to preddat
         if (type %in% c("survival", "hazard", "cumhaz")) {
-          preddat <- dplyr::mutate(preddat, time = list(times), .obs_id = list(1:length(times))) %>%
-            tidyr::unnest(cols = c("time", ".obs_id"))
+          preddat <- dplyr::mutate(preddat, .time = list(times), .obs_id = list(1:length(times))) %>%
+            tidyr::unnest(cols = c(".time", ".obs_id"))
         } else if (type == "rmst") {
-          preddat$time <- times
+          preddat <- dplyr::group_by(.data$.study) %>%
+            dplyr::mutate(.time = times,
+                          .obs_id = 1:dplyr::n()) %>%
+            dplyr::ungroup()
         }
       }
 
@@ -1228,7 +1239,126 @@ predict.stan_nma <- function(object, ...,
       l_cc <- stringr::str_replace(dimnames(cc)[[3]], "^cc\\[(.+)\\]$", "\\1")
     }
 
-    if (level == "individual") {
+    # Make prediction arrays
+    if (is_surv) {
+      # Handle survival models separately - produce predictions study by study
+
+      if (level == "individual") {
+        if (type %in% c("survival", "hazard", "cumhaz", "rmst")) {
+          outdat <- dplyr::select(preddat, .data$.study, .data$.trt, .data$.obs_id, .data$.time)
+        } else {
+          outdat <- dplyr::select(preddat, .data$.study, .data$.trt, .data$.obs_id)
+        }
+      } else {
+        if (type %in% c("survival", "hazard", "cumhaz")) {
+          outdat <- dplyr::distinct(preddat, .data$.study, .data$.trt, .data$.obs_id, .data$.time)
+        } else if (type == "rmst") {
+          outdat <- dplyr::distinct(preddat, .data$.study, .data$.trt, .data$.time)
+        } else {
+          outdat <- dplyr::distinct(preddat, .data$.study, .data$.trt)
+        }
+      }
+
+      if (type == "quantile") {
+        outdat <- dplyr::cross_join(outdat,
+                                    data.frame(.quantile = quantiles))
+      }
+
+      studies <- unique(outdat$.study)
+      n_studies <- length(studies)
+      treatments <- unique(outdat$.trt)
+      n_trt <- length(treatments)
+
+      dim_pred_array <- dim(post)
+      dim_pred_array[3] <- nrow(outdat)
+      dimnames_pred_array <- dimnames(post)
+
+      if (level == "individual") {
+        if (type == "quantile") {
+          dimnames_pred_array[[3]] <- paste0("pred[", outdat$.study, ": ", outdat$.trt, ", ", outdat$.obs_id, ", ", outdat$.quantile, "]")
+        } else {
+          dimnames_pred_array[[3]] <- paste0("pred[", outdat$.study, ": ", outdat$.trt, ", ", outdat$.obs_id, "]")
+        }
+      } else if (type %in% c("survival", "hazard", "cumhaz")) {
+        dimnames_pred_array[[3]] <- paste0("pred[", outdat$.study, ": ", outdat$.trt, ", ", outdat$.obs_id, "]")
+      } else if (type == "quantile") {
+        dimnames_pred_array[[3]] <- paste0("pred[", outdat$.study, ": ", outdat$.trt, ", ", outdat$.quantile, "]")
+      } else {
+        dimnames_pred_array[[3]] <- paste0("pred[", outdat$.study, ": ", outdat$.trt, "]")
+      }
+
+      pred_array <- array(NA_real_,
+                          dim = dim_pred_array,
+                          dimnames = dimnames_pred_array)
+
+      for (s in 1:n_studies) {
+        # Study select
+        ss <- preddat$.study == studies[s]
+
+        # Aux select
+        aux_s <- grepl(paste0("[", studies[s], if (object$likelihood %in% c("mspline", "pexp")) "," else "]"),
+                       dimnames(aux_array)[[3]], fixed = TRUE)
+
+        # Linear predictor array for this study
+        eta_pred_array <- tcrossprod_mcmc_array(post, X_all[ss, , drop = FALSE])
+
+        if (!is.null(offset_all))
+          eta_pred_array <- sweep(eta_pred_array, 3, offset_all[ss], FUN = "+")
+
+        # Basis for mspline models
+        if (object$likelihood %in% c("mspline", "pexp")) {
+          basis <- object$basis[[s]]
+        } else {
+          basis <- NULL
+        }
+
+        if (type %in% c("survival", "hazard", "cumhaz")) {
+          s_time <- preddat$.time[ss]
+        } else if (type == "rmst") {
+          # Same restriction time for all obs, take the first
+          s_time <- preddat$.time[ss][1]
+        } else {
+          s_time <- NULL
+        }
+
+        s_pred_array <-
+          make_surv_predict(eta = eta_pred_array,
+                            aux = aux_array[ , , aux_s, drop = FALSE],
+                            times = s_time,
+                            quantiles = quantiles,
+                            likelihood = object$likelihood,
+                            type = type,
+                            basis = basis)
+
+        # Aggregate predictions when level = "aggregate"
+        if (level == "aggregate") {
+          s_preddat <-
+            dplyr::select(preddat, ".study", ".trt", ".sample_size", if (type %in% c("survival", "hazard", "cumhaz")) ".obs_id" else NULL) %>%
+            dplyr::filter(ss) %>%
+            dplyr::mutate(.study = forcats::fct_inorder(forcats::fct_drop(.data$.study)),
+                          .trt = forcats::fct_inorder(.data$.trt))
+
+          if (type %in% c("survival", "hazard", "cumhaz")) {
+            s_preddat <- dplyr::group_by(s_preddat, .data$.study, .data$.trt, .data$.obs_id)
+          } else {
+            s_preddat <- dplyr::group_by(s_preddat, .data$.study, .data$.trt)
+          }
+
+          s_preddat <- dplyr::mutate(s_preddat, .weights = .data$.sample_size / sum(.data$.sample_size))
+
+          X_weighted_mean <- Matrix::Matrix(0, ncol = dim(s_pred_array)[3], nrow = dplyr::n_groups(s_preddat))
+
+          X_weighted_mean[cbind(dplyr::group_indices(s_preddat),
+                                1:dim(s_pred_array)[3])] <- s_preddat$.weights
+
+          pred_array[ , , outdat$.study == studies[s]] <- tcrossprod_mcmc_array(s_pred_array, X_weighted_mean)
+        } else {
+          pred_array[ , , outdat$.study == studies[s]] <- s_pred_array
+        }
+
+      }
+
+    } else if (level == "individual") {
 
       # Get prediction array
       pred_array <- tcrossprod_mcmc_array(post, X_all)
@@ -1336,7 +1466,7 @@ predict.stan_nma <- function(object, ...,
             dplyr::group_by(.data$.study, .data$.trt, .data$.cc) %>%
             dplyr::mutate(.weights = .data$.sample_size / sum(.data$.sample_size))
 
-          X_weighted_mean <- matrix(0, ncol = dim(s_pred_array)[3], nrow = n_trt * n_cc)
+          X_weighted_mean <- Matrix::Matrix(0, ncol = dim(s_pred_array)[3], nrow = n_trt * n_cc)
 
           X_weighted_mean[cbind(dplyr::group_indices(s_preddat),
                                 1:dim(s_pred_array)[3])] <- s_preddat$.weights
@@ -1347,7 +1477,7 @@ predict.stan_nma <- function(object, ...,
             dplyr::group_by(.data$.study, .data$.trt) %>%
             dplyr::mutate(.weights = .data$.sample_size / sum(.data$.sample_size))
 
-          X_weighted_mean <- matrix(0, ncol = dim(s_pred_array)[3], nrow = n_trt)
+          X_weighted_mean <- Matrix::Matrix(0, ncol = dim(s_pred_array)[3], nrow = n_trt)
 
           X_weighted_mean[cbind(dplyr::group_indices(s_preddat),
                                 1:dim(s_pred_array)[3])] <- s_preddat$.weights
@@ -1369,6 +1499,13 @@ predict.stan_nma <- function(object, ...,
                                            .trt = rep(preddat$.trt, each = n_cc),
                                            .category = rep(l_cc, times = nrow(preddat)),
                                            .before = 1)
+      } else if (is_surv) {
+        pred_summary <- tibble::add_column(pred_summary,
+                                           .study = outdat$.study,
+                                           .trt = outdat$.trt,
+                                           .before = 1)
+        if (type %in% c("survival", "hazard", "cumhaz", "rmst"))
+          pred_summary <- tibble::add_column(pred_summary, .time = outdat$.time, .after = ".trt")
       } else {
         pred_summary <- tibble::add_column(pred_summary,
                                            .study = preddat$.study,
@@ -1469,7 +1606,9 @@ make_surv_predict <- function(eta, aux, times, likelihood,
   d_out <- dim(eta)
   dn_out <- dimnames(eta)
 
-  if (type %in% c("survival", "hazard", "cumhaz")) {
+  n_eta <- dim(eta)[3]
+
+  if (type %in% c("survival", "hazard", "cumhaz") && n_eta == 1) {
     dn_out[[3]] <- paste0(rep(stringr::str_sub(dn_out[[3]], start = 1, end = -2), each = length(times)),
                           ", ", rep(seq_along(times), times = d_out[3]), "]")
     d_out[3] <- d_out[3] * length(times)
@@ -1483,19 +1622,17 @@ make_surv_predict <- function(eta, aux, times, likelihood,
 
   out <- array(NA_real_, dim = d_out, dimnames = dn_out)
 
-  # for (i in 1:d_out[1]) {
-  #   for (j in 1:d_out[2]) {
-  #     out[i, j, ] <- do.call(surv_predfun(likelihood, type),
-  #                            args = list(times = times,
-  #                                        eta = eta[i, j, ],
-  #                                        aux = aux[i, j, ],
-  #                                        quantiles = quantiles,
-  #                                        basis = basis))
-  #   }
-  # }
+  # ta <- matrix(times, nrow = n_eta, ncol = prod(d_out[1:2]), byrow = TRUE)
+  # auxm <- matrix(aux, ncol = dim(aux)[3])
+  # out <- array(do.call(surv_predfun(likelihood, type),
+  #                      args = list(times = as.vector(ta),
+  #                                  eta = as.vector(eta),
+  #                                  aux = auxm[rep(1:nrow(auxm), times = n_eta),],
+  #                                  quantiles = quantiles,
+  #                                  basis = basis)),
+  #              dim = d_out, dimnames = dn_out)
 
-  if (type %in% c("survival", "hazard", "cumhaz")) {
-    out <- array(NA_real_, dim = d_out, dimnames = dn_out)
+  if (type %in% c("survival", "hazard", "cumhaz") && n_eta == 1) { # Multiple times, single linear predictor
     for (i in 1:length(times)) {
       out[, , i] <- do.call(surv_predfun(likelihood, type),
                              args = list(times = times[i],
@@ -1504,7 +1641,17 @@ make_surv_predict <- function(eta, aux, times, likelihood,
                                          quantiles = quantiles,
                                          basis = basis))
     }
-  } else {
+  } else if (n_eta > 1) { # Single/multiple times, multiple linear predictors
+    for (i in 1:n_eta) {
+      ti <- if (length(times) == 1) times else times[i]
+      out[ , , i] <- do.call(surv_predfun(likelihood, type),
+                            args = list(times = ti,
+                                        eta = as.vector(eta[ , , i]),
+                                        aux = matrix(aux, ncol = dim(aux)[3]),
+                                        quantiles = quantiles,
+                                        basis = basis))
+    }
+  } else { # Single time, single linear predictor
     out <- array(do.call(surv_predfun(likelihood, type),
                          args = list(times = times,
                                      eta = as.vector(eta),

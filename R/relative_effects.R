@@ -599,8 +599,14 @@ tcrossprod_mcmc_array <- function(a, x) {
 
   nchains <- dim(a)[2]
 
-  for (i in 1:nchains) {
-    out[ , i, ] <- tcrossprod(a[ , i, ], x)
+  if (inherits(x, "Matrix")) {
+    for (i in 1:nchains) {
+      out[ , i, ] <- as.matrix(Matrix::tcrossprod(a[ , i, ], x))
+    }
+  } else {
+    for (i in 1:nchains) {
+      out[ , i, ] <- tcrossprod(a[ , i, ], x)
+    }
   }
 
   dimnames(out) <- dimnames_out
