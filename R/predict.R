@@ -931,40 +931,42 @@ predict.stan_nma <- function(object, ...,
       preddat$.sample_size <- 1
 
       # Check times argument
-      times <- rlang::enquo(times)
-      if (rlang::quo_is_null(times) && type %in% c("survival", "hazard", "cumhaz", "rmst"))
-        abort("`times` must be specified when `newdata`, `baseline` and `aux` are provided")
+      if (is_surv) {
+        times <- rlang::enquo(times)
+        if (rlang::quo_is_null(times) && type %in% c("survival", "hazard", "cumhaz", "rmst"))
+          abort("`times` must be specified when `newdata`, `baseline` and `aux` are provided")
 
-      if (rlang::quo_is_symbol(times)) {
-        preddat <- dplyr::mutate(preddat, .time = !! times)
+        if (rlang::quo_is_symbol(times)) {
+          preddat <- dplyr::mutate(preddat, .time = !! times)
 
-        if (level == "aggregate" && type %in% c("survival", "hazard", "cumhaz")) {
-          # Need to average survival curve over all covariate values at every time
-          p_times <- dplyr::group_by(preddat, .data$.study) %>%
-            tidyr::nest(.time = list(time), .obs_id = list(1:dplyr::n()))
+          if (level == "aggregate" && type %in% c("survival", "hazard", "cumhaz")) {
+            # Need to average survival curve over all covariate values at every time
+            p_times <- dplyr::group_by(preddat, .data$.study) %>%
+              tidyr::nest(.time = list(time), .obs_id = list(1:dplyr::n()))
 
-          preddat <- dplyr::left_join(preddat, p_times, by = ".study") %>%
-            tidyr::unnest(cols = c(".time", ".obs_id"))
-        }
+            preddat <- dplyr::left_join(preddat, p_times, by = ".study") %>%
+              tidyr::unnest(cols = c(".time", ".obs_id"))
+          }
 
-      } else {
-        times <- eval(times)
+        } else {
+          times <- eval(times)
 
-        if (type %in% c("survival", "hazard", "cumhaz") && !is.numeric(times))
-          abort("`times` must be a numeric vector of times to predict at.")
+          if (type %in% c("survival", "hazard", "cumhaz") && !is.numeric(times))
+            abort("`times` must be a numeric vector of times to predict at.")
 
-        if (type == "rmst" && (!is.numeric(times) && length(times) > 1))
-          abort("`times` must be a scalar numeric value giving the restricted time horizon.")
+          if (type == "rmst" && (!is.numeric(times) && length(times) > 1))
+            abort("`times` must be a scalar numeric value giving the restricted time horizon.")
 
-        # Add times vector in to preddat
-        if (type %in% c("survival", "hazard", "cumhaz")) {
-          preddat <- dplyr::mutate(preddat, .time = list(times), .obs_id = list(1:length(times))) %>%
-            tidyr::unnest(cols = c(".time", ".obs_id"))
-        } else if (type == "rmst") {
-          preddat <- dplyr::group_by(.data$.study) %>%
-            dplyr::mutate(.time = times,
-                          .obs_id = 1:dplyr::n()) %>%
-            dplyr::ungroup()
+          # Add times vector in to preddat
+          if (type %in% c("survival", "hazard", "cumhaz")) {
+            preddat <- dplyr::mutate(preddat, .time = list(times), .obs_id = list(1:length(times))) %>%
+              tidyr::unnest(cols = c(".time", ".obs_id"))
+          } else if (type == "rmst") {
+            preddat <- dplyr::group_by(.data$.study) %>%
+              dplyr::mutate(.time = times,
+                            .obs_id = 1:dplyr::n()) %>%
+              dplyr::ungroup()
+          }
         }
       }
 
