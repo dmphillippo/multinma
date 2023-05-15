@@ -748,7 +748,6 @@ predict.stan_nma <- function(object, ...,
               dat_agd_arm <- object$network$agd_arm
             }
           } else {
-
             if (type %in% c("survival", "hazard", "cumhaz") && is.null(times)) {
                 # Use times from network, unnest
                 dat_agd_arm <- object$network$agd_arm %>%
@@ -757,7 +756,7 @@ predict.stan_nma <- function(object, ...,
                                 # Reset sample size for weighted mean later
                                 .sample_size = 1) %>%
                   tidyr::unnest(cols = c(".Surv", ".data_orig")) %>%
-                  dplyr::mutate(dat_agd_arm, !!! get_Surv_data(.$.Surv),
+                  dplyr::mutate(!!! get_Surv_data(.$.Surv),
                                 .time = .data$time) %>%
                   # Add in ID variable for each observation
                   dplyr::group_by(.data$.study) %>%
@@ -800,15 +799,15 @@ predict.stan_nma <- function(object, ...,
             # For aggregate survival predictions we average the entire survival
             # curve over the population (i.e. over every individual), so we need
             # to expand out every time for every individual
-
             if (type %in% c("survival", "hazard", "cumhaz") && is.null(times)) {
               # Use times from network
               ipd_times <- dplyr::mutate(dat_ipd, !!! get_Surv_data(dat_ipd$.Surv), .time = .data$time) %>%
+                dplyr::select(".study", ".trt", ".time") %>%
                 # Add in ID variable for each observation, needed later for aggregating
-                dplyr::group_by(".study") %>%
+                dplyr::group_by(.data$.study) %>%
                 dplyr::mutate(.obs_id = 1:dplyr::n()) %>%
-                dplyr::group_by(".study", ".trt") %>%
-                tidyr::nest(cols = c(".time", ".obs_id"))
+                dplyr::group_by(.data$.study, .data$.trt) %>%
+                tidyr::nest(.time = .data$.time, .obs_id = .data$.obs_id)
 
               dat_ipd <- dplyr::left_join(dat_ipd,
                                           ipd_times,
