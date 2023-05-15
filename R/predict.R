@@ -276,6 +276,8 @@ predict.stan_nma <- function(object, ...,
   # Without regression model
   if (is.null(object$regression)) {
 
+    times <- rlang::eval_tidy(times)
+
     if (!is.null(baseline)) {
       if (!inherits(baseline, "distr"))
         abort("Baseline response `baseline` should be specified using distr(), or NULL.")
@@ -931,30 +933,32 @@ predict.stan_nma <- function(object, ...,
 
       # Check times argument
       if (is_surv) {
-        times <- rlang::enquo(times)
+        if (!rlang::is_quosure(times)) times <- rlang::enquo(times)
         if (rlang::quo_is_null(times) && type %in% c("survival", "hazard", "cumhaz", "rmst"))
           abort("`times` must be specified when `newdata`, `baseline` and `aux` are provided")
 
-        if (rlang::quo_is_symbol(times)) {
-          preddat <- dplyr::mutate(preddat, .time = !! times)
+        if (rlang::quo_is_symbol(times) || rlang::is_scalar_character(rlang::eval_tidy(times))) {
+          preddat <- dplyr::rename(preddat, .time = !! times)
 
           if (level == "aggregate" && type %in% c("survival", "hazard", "cumhaz")) {
             # Need to average survival curve over all covariate values at every time
             p_times <- dplyr::group_by(preddat, .data$.study) %>%
-              tidyr::nest(.time = list(time), .obs_id = list(1:dplyr::n()))
+              dplyr::transmute(.data$.study, .data$.time, .obs_id = 1:dplyr::n()) %>%
+              tidyr::nest(.time = .data$.time, .obs_id = .data$.obs_id)
 
-            preddat <- dplyr::left_join(preddat, p_times, by = ".study") %>%
+            preddat <- dplyr::select(preddat, -.data$.time) %>%
+              dplyr::left_join(p_times, by = ".study") %>%
               tidyr::unnest(cols = c(".time", ".obs_id"))
           }
 
         } else {
-          times <- eval(times)
+          times <- rlang::eval_tidy(times)
 
           if (type %in% c("survival", "hazard", "cumhaz") && !is.numeric(times))
-            abort("`times` must be a numeric vector of times to predict at.")
+            abort("`times` must be a numeric vector or column of `newdata` giving times to predict at.")
 
           if (type == "rmst" && (!is.numeric(times) && length(times) > 1))
-            abort("`times` must be a scalar numeric value giving the restricted time horizon.")
+            abort("`times` must be a scalar numeric value or column of `newdata` giving the restricted time horizon.")
 
           # Add times vector in to preddat
           if (type %in% c("survival", "hazard", "cumhaz")) {
@@ -1578,6 +1582,7 @@ predict.stan_nma_surv <- function(object, times = NULL,
                                   summary = TRUE) {
 
   type <- rlang::arg_match(type)
+  times <- rlang::enquo(times)
 
   if (!rlang::is_double(quantiles, finite = TRUE) || any(quantiles < 0) || any(quantiles > 1))
     rlang::abort("`quantiles` must be a numeric vector of quantiles between 0 and 1.")
