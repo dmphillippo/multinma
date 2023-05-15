@@ -904,6 +904,17 @@ predict.stan_nma <- function(object, ...,
     # With baseline and newdata specified
     } else {
 
+      if (is_surv) {
+        has_int <- inherits(newdata, "integration_tbl")
+
+        newdata <- dplyr::group_by(newdata, .data$.study) %>%
+          dplyr::mutate(.obs_id = 1:dplyr::n()) %>%
+          dplyr::ungroup()
+
+        # Restore class
+        if (has_int) class(newdata) <- c("integration_tbl", class(newdata))
+      }
+
       if (level == "individual") {
         if (!has_ipd(object$network))
           warn("Producing individual predictions from an aggregate-level regression. Interpret with great caution!")
@@ -943,10 +954,10 @@ predict.stan_nma <- function(object, ...,
           if (level == "aggregate" && type %in% c("survival", "hazard", "cumhaz")) {
             # Need to average survival curve over all covariate values at every time
             p_times <- dplyr::group_by(preddat, .data$.study) %>%
-              dplyr::transmute(.data$.study, .data$.time, .obs_id = 1:dplyr::n()) %>%
+              dplyr::select(.data$.study, .data$.time, .data$.obs_id) %>%
               tidyr::nest(.time = .data$.time, .obs_id = .data$.obs_id)
 
-            preddat <- dplyr::select(preddat, -.data$.time) %>%
+            preddat <- dplyr::select(preddat, -.data$.time, -.data$.obs_id) %>%
               dplyr::left_join(p_times, by = ".study") %>%
               tidyr::unnest(cols = c(".time", ".obs_id"))
           }
@@ -965,10 +976,7 @@ predict.stan_nma <- function(object, ...,
             preddat <- dplyr::mutate(preddat, .time = list(times), .obs_id = list(1:length(times))) %>%
               tidyr::unnest(cols = c(".time", ".obs_id"))
           } else if (type == "rmst") {
-            preddat <- dplyr::group_by(.data$.study) %>%
-              dplyr::mutate(.time = times,
-                            .obs_id = 1:dplyr::n()) %>%
-              dplyr::ungroup()
+            preddat$.time <- times
           }
         }
       }
