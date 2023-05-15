@@ -1217,9 +1217,9 @@ predict.stan_nma <- function(object, ...,
             }
           } else {
             # All other aux pars generate one by one
-            for (s in studies) {
+            for (s in 1:n_studies) {
               for (i in 1:n_aux) {
-                aux_array[, , (s-1)*n_studies + i] <- rlang::eval_tidy(rlang::call2(aux[[s]]$qfun, p = u[ , , (s-1)*n_studies + i, drop = TRUE], !!! aux[[s]]$args))
+                aux_array[, , (s-1)*n_studies + i] <- rlang::eval_tidy(rlang::call2(aux[[studies[s]]]$qfun, p = u[ , , (s-1)*n_studies + i, drop = TRUE], !!! aux[[studies[s]]]$args))
               }
             }
           }
