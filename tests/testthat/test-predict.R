@@ -231,3 +231,692 @@ test_that(".study, .trt, .category columns are correct", {
   expect_identical(paste0("pred[", pred2$.trt, ", ", pred2$.category, "]"),
                    pred2$parameter)
 })
+
+ndmm_net <- combine_network(
+  set_ipd(dplyr::slice_sample(ndmm_ipd, n = 10, by = c("study", "trt")),
+          study, trt,
+          Surv = Surv(eventtime/7, status),
+          trt_class = trt != "Pbo"),
+  set_agd_surv(dplyr::slice_sample(ndmm_agd, n= 10, by = c("study", "trt")),
+               study, trt,
+               Surv = Surv(eventtime/7, status),
+               covariates = ndmm_agd_covs,
+               trt_class = trt != "Pbo")
+) %>%
+  add_integration(age = distr(qnorm, age_mean, age_sd),
+                  n_int = 5)
+
+# Only small number of samples to test
+ndmm_fit_weib <- suppressWarnings(nma(ndmm_net,
+                                  likelihood = "weibull-aft",
+                                  prior_intercept = normal(0, 100),
+                                  prior_trt = normal(0, 10),
+                                  prior_aux = half_normal(10),
+                                  iter = 10))
+
+ndmm_preddat <- dplyr::bind_rows(
+  dplyr::transmute(ndmm_net$ipd, .study, .trt, .time = .Surv[, "time"]),
+  tidyr::unnest(ndmm_net$agd_arm, cols = ".Surv") %>% dplyr::transmute(.study, .trt, .time = .Surv[, "time"]),
+)
+
+test_that(".study, .trt, .time columns are correct (no regression, network data)", {
+  # Prediction format for observed times
+  preddat1 <- ndmm_preddat %>%
+    dplyr::group_by(.study) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(-.trt) %>%
+    dplyr::cross_join(dplyr::distinct(ndmm_preddat, .trt)) %>%
+    dplyr::arrange(.study, .trt)
+
+  pred1.1 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "survival"))
+  expect_equivalent(pred1.1[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.2 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "hazard"))
+  expect_equivalent(pred1.2[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.2$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.3 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "cumhaz"))
+  expect_equivalent(pred1.3[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.3$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  # Prediction format for provided times
+  times <- 0:5
+  preddat2 <- dplyr::distinct(ndmm_preddat, .study, .trt) %>%
+    tidyr::expand(.study, .trt) %>%
+    dplyr::mutate(.time = list(times), id = list(seq_along(times))) %>%
+    tidyr::unnest(cols = c(".time", "id"))
+
+  pred2.1 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "survival", times = times))
+  expect_equivalent(pred2.1[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred2.1$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
+  pred2.2 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "hazard", times = times))
+  expect_equivalent(pred2.2[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred2.2$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
+  pred2.3 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "cumhaz", times = times))
+  expect_equivalent(pred2.3[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred2.3$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
+  # Prediction format for single summaries
+  preddat3 <- dplyr::distinct(ndmm_preddat, .study, .trt) %>%
+    tidyr::expand(.study, .trt)
+
+  pred3.1 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "mean"))
+  expect_equivalent(pred3.1[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.1$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  pred3.2 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "median"))
+  expect_equivalent(pred3.2[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.2$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  pred3.3 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "rmst"))
+  expect_equivalent(pred3.3[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.3$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  pred3.4 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "link"))
+  expect_equivalent(pred3.4[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.4$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  # Prediction format for quantiles
+  qs <- c(0.2, 0.4, 0.6, 0.8)
+  preddat4 <- dplyr::distinct(ndmm_preddat, .study, .trt) %>%
+    tidyr::expand(.study, .trt, .quantile = qs)
+
+  pred4.1 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "quantile", quantiles = qs))
+  expect_equivalent(pred4.1[, c(".study", ".trt")],
+                    preddat4[, c(".study", ".trt")])
+  expect_identical(pred4.1$parameter,
+                   paste0("pred[", preddat4$.study, ": ", preddat4$.trt, ", ", preddat4$.quantile, "]"))
+})
+
+test_that("Survival predictions for new studies require correct args", {
+  m <- "Specify both `baseline` and `aux`, or neither"
+
+  expect_error(predict(ndmm_fit_weib, type = "survival",
+                       times = 0:5,
+                       baseline = distr(qnorm, 0, 1)),
+               m)
+  expect_error(predict(ndmm_fit_weib, type = "survival",
+                       times = 0:5,
+                       aux = distr(qnorm, 0, 1)),
+               m)
+  expect_error(predict(ndmm_fit_weib, type = "survival",
+                       baseline = distr(qnorm, 0, 1),
+                       aux = distr(qnorm, 0, 1)),
+               "`times` must be specified")
+})
+
+test_that(".study, .trt, .time columns are correct (no regression, new data)", {
+
+  time <- 0:5
+
+  # Prediction format new times
+  preddat1 <- tidyr::expand_grid(.study = "New 1",
+                                 .trt = unique(ndmm_preddat$.trt),
+                                 .time = time) %>%
+    dplyr::group_by(.trt) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup()
+
+  pred1.1 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "survival",
+                                       times = time,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred1.1[, c(".trt", ".time")],
+                    preddat1[, c(".trt", ".time")])
+  expect_identical(pred1.1$parameter,
+                   paste0("pred[", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.2 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "hazard",
+                                       times = time,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred1.2[, c(".trt", ".time")],
+                    preddat1[, c(".trt", ".time")])
+  expect_identical(pred1.2$parameter,
+                   paste0("pred[", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.3 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "cumhaz",
+                                       times = time,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred1.3[, c(".trt", ".time")],
+                    preddat1[, c(".trt", ".time")])
+  expect_identical(pred1.3$parameter,
+                   paste0("pred[", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  # Prediction format for single summaries
+  preddat3 <- tibble::tibble(.trt = unique(ndmm_preddat$.trt))
+
+  pred3.1 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "mean",
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred3.1[, ".trt"],
+                    preddat3)
+  expect_identical(pred3.1$parameter,
+                   paste0("pred[", preddat3$.trt, "]"))
+
+  pred3.2 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "median",
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred3.2[, ".trt"],
+                    preddat3)
+  expect_identical(pred3.2$parameter,
+                   paste0("pred[", preddat3$.trt, "]"))
+
+  pred3.3 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "rmst",
+                                       time = 3,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred3.3[, c(".trt", ".time")],
+                    dplyr::mutate(preddat3, .time = 3))
+  expect_identical(pred3.3$parameter,
+                   paste0("pred[", preddat3$.trt, "]"))
+
+  pred3.4 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "link",
+                                       time = 3,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred3.4[, ".trt"],
+                    preddat3)
+  expect_identical(pred3.4$parameter,
+                   paste0("pred[", preddat3$.trt, "]"))
+
+  # Prediction format for quantiles
+  qs <- c(0.2, 0.4, 0.6, 0.8)
+  preddat4 <- tidyr::expand_grid(.trt = unique(ndmm_preddat$.trt),
+                                 .quantile = qs)
+
+  pred4.1 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "quantile", quantiles = qs,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred4.1[, c(".trt", ".quantile")],
+                    preddat4[, c(".trt", ".quantile")])
+  expect_identical(pred4.1$parameter,
+                   paste0("pred[", preddat4$.trt, ", ", preddat4$.quantile, "]"))
+})
+
+ndmm_fit_weib_reg <- suppressWarnings(nma(ndmm_net,
+                                          likelihood = "weibull-aft",
+                                          regression = ~age*.trt,
+                                          prior_intercept = normal(0, 100),
+                                          prior_trt = normal(0, 10),
+                                          prior_reg = normal(0, 10),
+                                          prior_aux = half_normal(10),
+                                          iter = 10,
+                                          seed = 42))
+
+test_that("Survival predictions for new studies require correct args", {
+  m <- "Specify all of `newdata`, `baseline`, and `aux`, or none"
+
+  expect_error(predict(ndmm_fit_weib_reg, type = "survival",
+                       baseline = distr(qnorm, 0, 1)),
+               m)
+  expect_error(predict(ndmm_fit_weib_reg, type = "survival",
+                       times = 0:5,
+                       aux = distr(qnorm, 0, 1)),
+               m)
+  expect_error(predict(ndmm_fit_weib_reg, type = "survival",
+                       baseline = distr(qnorm, 0, 1),
+                       aux = distr(qnorm, 0, 1)),
+               m)
+})
+
+test_that(".study, .trt, .time columns are correct (regression, individual, network data)", {
+  # Prediction format for level = "individual", observed times
+  preddat1 <- dplyr::filter(ndmm_preddat, .study %in% unique(ndmm_ipd$study)) %>%
+    dplyr::group_by(.study) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(-.trt) %>%
+    dplyr::cross_join(dplyr::distinct(ndmm_preddat, .trt))
+
+  pred1.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "survival", level = "individual"))
+  expect_equivalent(pred1.1[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "hazard", level = "individual"))
+  expect_equivalent(pred1.2[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.2$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "cumhaz", level = "individual"))
+  expect_equivalent(pred1.3[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.3$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  # Single summaries, also at individual times
+  pred3.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "mean", level = "individual"))
+  expect_equivalent(pred3.1[, c(".study", ".trt")],
+                    preddat1[, c(".study", ".trt")])
+  expect_identical(pred3.1$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred3.2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "median", level = "individual"))
+  expect_equivalent(pred3.2[, c(".study", ".trt")],
+                    preddat1[, c(".study", ".trt")])
+  expect_identical(pred3.2$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  # pred3.3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "rmst", level = "individual"))
+  # expect_equivalent(pred3.3[, c(".study", ".trt")],
+  #                   preddat1[, c(".study", ".trt")])
+  # expect_identical(pred3.3$parameter,
+  #                  paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred3.4 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "link", level = "individual"))
+  expect_equivalent(pred3.4[, c(".study", ".trt")],
+                    preddat1[, c(".study", ".trt")])
+  expect_identical(pred3.4$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  # Prediction format for quantiles
+  qs <- c(0.2, 0.4, 0.6, 0.8)
+  preddat4 <- dplyr::cross_join(preddat1, tibble::tibble(.quantile = qs))
+
+  pred4.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "quantile", quantiles = qs,
+                                       level = "individual"))
+  expect_equivalent(pred4.1[, c(".trt", ".quantile")],
+                    preddat4[, c(".trt", ".quantile")])
+  expect_identical(pred4.1$parameter,
+                   paste0("pred[", preddat4$.study, ": ", preddat4$.trt, ", ", preddat4$id, ", ", preddat4$.quantile, "]"))
+})
+
+test_that(".study, .trt, .time columns are correct (regression, aggregate, network data)", {
+  # Prediction format for observed times
+  preddat1 <- ndmm_preddat %>%
+    dplyr::group_by(.study) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(-.trt) %>%
+    dplyr::cross_join(dplyr::distinct(ndmm_preddat, .trt)) %>%
+    dplyr::arrange(.study, .trt)
+
+  pred1.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "survival"))
+  expect_equivalent(pred1.1[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "hazard"))
+  expect_equivalent(pred1.2[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.2$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "cumhaz"))
+  expect_equivalent(pred1.3[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.3$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  # Prediction format for provided times
+  times <- 0:5
+  preddat2 <- dplyr::distinct(ndmm_preddat, .study, .trt) %>%
+    tidyr::expand(.study, .trt) %>%
+    dplyr::mutate(.time = list(times), id = list(seq_along(times))) %>%
+    tidyr::unnest(cols = c(".time", "id"))
+
+  pred2.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "survival", times = times))
+  expect_equivalent(pred2.1[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred2.1$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
+  pred2.2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "hazard", times = times))
+  expect_equivalent(pred2.2[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred2.2$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
+  pred2.3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "cumhaz", times = times))
+  expect_equivalent(pred2.3[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred2.3$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
+  # Prediction format for single summaries
+  preddat3 <- dplyr::distinct(ndmm_preddat, .study, .trt) %>%
+    tidyr::expand(.study, .trt)
+
+  pred3.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "mean"))
+  expect_equivalent(pred3.1[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.1$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  pred3.2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "median"))
+  expect_equivalent(pred3.2[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.2$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  # pred3.3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "rmst"))
+  # expect_equivalent(pred3.3[, c(".study", ".trt")],
+  #                   preddat3[, c(".study", ".trt")])
+  # expect_identical(pred3.3$parameter,
+  #                  paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  pred3.4 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "link"))
+  expect_equivalent(pred3.4[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.4$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  # Prediction format for quantiles
+  qs <- c(0.2, 0.4, 0.6, 0.8)
+  preddat4 <- dplyr::distinct(ndmm_preddat, .study, .trt) %>%
+    tidyr::expand(.study, .trt, .quantile = qs)
+
+  pred4.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "quantile", quantiles = qs))
+  expect_equivalent(pred4.1[, c(".study", ".trt")],
+                    preddat4[, c(".study", ".trt")])
+  expect_identical(pred4.1$parameter,
+                   paste0("pred[", preddat4$.study, ": ", preddat4$.trt, ", ", preddat4$.quantile, "]"))
+})
+
+test_that(".study, .trt, .time columns are correct (regression, aggregate, new data)", {
+
+  tm <- 0:5
+
+  newdata <- dplyr::tibble(study = "Test", time = tm) %>%
+    add_integration(age = distr(qlnorm, meanlog = log(4.5), sdlog = 1), n_int = 5)
+
+  # Prediction format new times
+  preddat1 <- dplyr::mutate(newdata, .study = factor(study), .time = tm, id = 1:dplyr::n()) %>%
+    dplyr::cross_join(dplyr::tibble(.trt = unique(ndmm_preddat$.trt)))
+
+  # Times from newdata column
+  pred1.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "survival", time = time,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred1.1[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "hazard", time = time,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred1.2[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.2$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "cumhaz", time = time,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred1.3[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.3$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  # Times from global env
+  pred1.4 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "survival", time = tm,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred1.4[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.4$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.5 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "hazard", time = tm,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred1.5[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.5$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.6 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "cumhaz", time = tm,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred1.6[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.6$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  # Prediction format for single summaries
+  preddat3 <- tidyr::expand_grid(.study = unique(factor(newdata$study)),
+                                 .trt = unique(ndmm_preddat$.trt))
+
+  pred3.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "mean",
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred3.1[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.1$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  pred3.2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "median",
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred3.2[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.2$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  pred3.3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "rmst", time = 3,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred3.3[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.3$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  pred3.4 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "link",
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred3.4[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.4$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  # Prediction format for quantiles
+  qs <- c(0.2, 0.4, 0.6, 0.8)
+  preddat4 <- preddat3 %>% tidyr::expand(.study, .trt, .quantile = qs)
+
+  pred4.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "quantile", quantiles = qs,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred4.1[, c(".study", ".trt")],
+                    preddat4[, c(".study", ".trt")])
+  expect_identical(pred4.1$parameter,
+                   paste0("pred[", preddat4$.study, ": ", preddat4$.trt, ", ", preddat4$.quantile, "]"))
+})
+
+test_that(".study, .trt, .time columns are correct (regression, individual, new data)", {
+
+  tm <- 0:5
+
+  newdata <- dplyr::tibble(study = "Test", time = tm, age = rlnorm(length(tm), log(4.5), 0.25))
+
+  # Prediction format new times
+  preddat1 <- dplyr::mutate(newdata, .study = factor(study), .time = tm, id = 1:dplyr::n()) %>%
+    dplyr::cross_join(dplyr::tibble(.trt = unique(ndmm_preddat$.trt)))
+
+  # Times from newdata column
+  pred1.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "survival", level = "individual",
+                                       time = time,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred1.1[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "hazard", level = "individual",
+                                       time = time,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred1.2[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.2$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "cumhaz", level = "individual",
+                                       time = time,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred1.3[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.3$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  # Times from global env
+  # With external times vector, evaluate every time and every treatment for every new individual
+  preddat2 <- dplyr::mutate(newdata, .study = factor(study)) %>%
+    dplyr::cross_join(
+      dplyr::cross_join(dplyr::tibble(.time = tm, id = 1:length(tm)),
+                        dplyr::tibble(.trt = unique(ndmm_preddat$.trt))))
+  pred2.4 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "survival", level = "individual",
+                                       time = tm,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred2.4[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred2.4$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
+  pred2.5 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "hazard", level = "individual",
+                                       time = tm,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred2.5[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred2.5$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
+  pred2.6 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "cumhaz", level = "individual",
+                                       time = tm,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred2.6[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred2.6$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
+  # Prediction format for single summaries
+  preddat3 <- preddat1
+
+  pred3.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, level = "individual",
+                                       type = "mean",
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred3.1[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.1$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, ", ", preddat3$id, "]"))
+
+  pred3.2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, level = "individual",
+                                       type = "median",
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred3.2[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.2$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, ", ", preddat3$id, "]"))
+
+  pred3.3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, level = "individual",
+                                       type = "rmst", time = 3,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred3.3[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.3$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, ", ", preddat3$id, "]"))
+
+  pred3.4 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, level = "individual",
+                                       type = "link",
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred3.4[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.4$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, ", ", preddat3$id, "]"))
+
+  # Prediction format for quantiles
+  qs <- c(0.2, 0.4, 0.6, 0.8)
+  preddat4 <- dplyr::cross_join(preddat3, dplyr::tibble(.quantile = qs))
+
+  pred4.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "quantile", level = "individual",
+                                       quantiles = qs,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred4.1[, c(".study", ".trt")],
+                    preddat4[, c(".study", ".trt")])
+  expect_identical(pred4.1$parameter,
+                   paste0("pred[", preddat4$.study, ": ", preddat4$.trt, ", ", preddat4$id, ", ", preddat4$.quantile, "]"))
+})
+
