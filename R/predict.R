@@ -234,14 +234,6 @@ predict.stan_nma <- function(object, ...,
     aux_pars <- NULL
   }
 
-  if (!is_surv || is.null(aux_pars)) {
-    if (xor(is.null(newdata), is.null(baseline)) && !is.null(object$regression))
-      abort("Specify both `newdata` and `baseline`, or neither.")
-  } else {
-    if (xor(is.null(newdata), is.null(baseline)) && xor(is.null(newdata), is.null(aux)) && !is.null(object$regression))
-      abort("Specify all of `newdata`, `baseline` and `aux`, or none.")
-  }
-
   if (!is.null(newdata)) {
     if (!is.data.frame(newdata)) abort("`newdata` is not a data frame.")
 
@@ -276,7 +268,11 @@ predict.stan_nma <- function(object, ...,
   # Without regression model ---------------------------------------------------
   if (is.null(object$regression)) {
 
-    times <- rlang::eval_tidy(times)
+    if (is_surv && !is.null(aux_pars) && xor(is.null(baseline), is.null(aux))) {
+        abort("Specify both `baseline` and `aux`, or neither")
+    }
+
+    if (is_surv) times <- rlang::eval_tidy(times)
 
     if (!is.null(baseline)) {
       if (!inherits(baseline, "distr"))
@@ -647,6 +643,14 @@ predict.stan_nma <- function(object, ...,
   # With regression model ------------------------------------------------------
   } else {
 
+    if (!is_surv || is.null(aux_pars)) {
+      if (xor(is.null(newdata), is.null(baseline)))
+        abort("Specify both `newdata` and `baseline`, or neither.")
+    } else {
+      if (xor(is.null(newdata), is.null(baseline)) || xor(is.null(newdata), is.null(aux)))
+        abort("Specify all of `newdata`, `baseline`, and `aux`, or none.")
+    }
+
     if (!is.null(baseline)) {
       if (!(inherits(baseline, "distr") || (rlang::is_list(baseline) && all(purrr::map_lgl(baseline, inherits, what = "distr")))))
         abort("Baseline response `baseline` should be a single distr() specification, a list of distr() specifications, or NULL.")
@@ -655,7 +659,7 @@ predict.stan_nma <- function(object, ...,
     ## Without baseline and newdata specified ----------------------------------
     if (is.null(baseline) && is.null(newdata)) {
 
-      times <- rlang::eval_tidy(times)
+      if (is_surv) times <- rlang::eval_tidy(times)
 
       # Get data for prediction
       if (level == "individual") {
