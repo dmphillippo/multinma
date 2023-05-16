@@ -273,7 +273,7 @@ predict.stan_nma <- function(object, ...,
                                   class_interactions = object$class_interactions)
 
 
-  # Without regression model
+  # Without regression model ---------------------------------------------------
   if (is.null(object$regression)) {
 
     times <- rlang::eval_tidy(times)
@@ -286,7 +286,7 @@ predict.stan_nma <- function(object, ...,
     if (level == "individual")
       abort("Cannot produce individual predictions without a regression model.")
 
-    # Without baseline specified
+    ## Without baseline specified ----------------------------------------------
     if (is.null(baseline)) {
 
       if (!has_ipd(object$network) && !has_agd_arm(object$network)) {
@@ -383,7 +383,7 @@ predict.stan_nma <- function(object, ...,
         }
 
       }
-    # With baseline specified
+    ## With baseline specified -------------------------------------------------
     } else {
 
       # Make design matrix of SINGLE study, and all treatments
@@ -644,17 +644,18 @@ predict.stan_nma <- function(object, ...,
       out <- list(sims = pred_array)
     }
 
-  # With regression model
+  # With regression model ------------------------------------------------------
   } else {
-
 
     if (!is.null(baseline)) {
       if (!(inherits(baseline, "distr") || (rlang::is_list(baseline) && all(purrr::map_lgl(baseline, inherits, what = "distr")))))
         abort("Baseline response `baseline` should be a single distr() specification, a list of distr() specifications, or NULL.")
     }
 
-    # Without baseline and newdata specified
+    ## Without baseline and newdata specified ----------------------------------
     if (is.null(baseline) && is.null(newdata)) {
+
+      times <- rlang::eval_tidy(times)
 
       # Get data for prediction
       if (level == "individual") {
@@ -901,7 +902,7 @@ predict.stan_nma <- function(object, ...,
         }
       }
 
-    # With baseline and newdata specified
+    ## With baseline and newdata specified -------------------------------------
     } else {
 
       if (is_surv) {
