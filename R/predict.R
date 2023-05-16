@@ -944,7 +944,6 @@ predict.stan_nma <- function(object, ...,
       preddat$.sample_size <- 1
 
       # Check times argument
-      if (is_surv) {
       if (is_surv && type %in% c("survival", "hazard", "cumhaz", "rmst")) {
         if (!rlang::is_quosure(times)) times <- rlang::enquo(times)
         if (rlang::quo_is_null(times))
@@ -1339,8 +1338,11 @@ predict.stan_nma <- function(object, ...,
         if (type %in% c("survival", "hazard", "cumhaz")) {
           s_time <- preddat$.time[ss]
         } else if (type == "rmst") {
-          # Same restriction time for all obs, take the first
-          s_time <- preddat$.time[ss][1]
+          s_time <- preddat$.time[ss]
+          if (length(unique(s_time)) == 1) {
+            # Same restriction time for all obs, just take the first (faster)
+            s_time <- s_time[1]
+          }
         } else {
           s_time <- NULL
         }
