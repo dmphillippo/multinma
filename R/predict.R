@@ -944,12 +944,23 @@ predict.stan_nma <- function(object, ...,
 
       # Check times argument
       if (is_surv) {
+      if (is_surv && type %in% c("survival", "hazard", "cumhaz", "rmst")) {
         if (!rlang::is_quosure(times)) times <- rlang::enquo(times)
-        if (rlang::quo_is_null(times) && type %in% c("survival", "hazard", "cumhaz", "rmst"))
+        if (rlang::quo_is_null(times))
           abort("`times` must be specified when `newdata`, `baseline` and `aux` are provided")
 
-        if (rlang::quo_is_symbol(times) || rlang::is_scalar_character(rlang::eval_tidy(times))) {
-          preddat <- dplyr::rename(preddat, .time = !! times)
+
+        teval <- rlang::eval_tidy(times, data = preddat)
+
+        if ((rlang::quo_is_symbol(times) || rlang::is_scalar_character(rlang::eval_tidy(times))) && rlang::has_name(preddat, rlang::as_name(times))) {
+          # times is a column of newdata
+          preddat$.time <- teval
+
+          if (type %in% c("survival", "hazard", "cumhaz") && !is.numeric(teval))
+            abort("`times` must be a numeric vector or column of `newdata` giving times to predict at.")
+
+          if (type == "rmst" && !is.numeric(teval))
+            abort("`times` must be a scalar numeric value or column of `newdata` giving the restricted time horizon.")
 
           if (level == "aggregate" && type %in% c("survival", "hazard", "cumhaz")) {
             # Need to average survival curve over all covariate values at every time
@@ -963,20 +974,19 @@ predict.stan_nma <- function(object, ...,
           }
 
         } else {
-          times <- rlang::eval_tidy(times)
-
-          if (type %in% c("survival", "hazard", "cumhaz") && !is.numeric(times))
+          # times is a vector in global env
+          if (type %in% c("survival", "hazard", "cumhaz") && !is.numeric(teval))
             abort("`times` must be a numeric vector or column of `newdata` giving times to predict at.")
 
-          if (type == "rmst" && (!is.numeric(times) && length(times) > 1))
+          if (type == "rmst" && (!is.numeric(teval) || length(teval) > 1))
             abort("`times` must be a scalar numeric value or column of `newdata` giving the restricted time horizon.")
 
           # Add times vector in to preddat
           if (type %in% c("survival", "hazard", "cumhaz")) {
-            preddat <- dplyr::mutate(preddat, .time = list(times), .obs_id = list(1:length(times))) %>%
+            preddat <- dplyr::mutate(preddat, .time = list(teval), .obs_id = list(1:length(teval))) %>%
               tidyr::unnest(cols = c(".time", ".obs_id"))
           } else if (type == "rmst") {
-            preddat$.time <- times
+            preddat$.time <- teval
           }
         }
       }
