@@ -1658,7 +1658,7 @@ make_surv_predict <- function(eta, aux, times, likelihood,
     d_out[3] <- d_out[3] * length(quantiles)
   }
 
-  if (!is.null(aux)) aux <- matrix(aux, ncol = dim(aux)[3])
+  if (!is.null(aux)) aux <- matrix(aux, ncol = dim(aux)[3], dimnames = list(NULL, dimnames(aux)[[3]]))
 
   out <- array(NA_real_, dim = d_out, dimnames = dn_out)
 
@@ -1744,8 +1744,8 @@ surv_predfun <- function(likelihood, type) {
   } else if (likelihood == "gengamma") {
     make_predfun(base = "gengamma", type = type,
                  mu = eta,
-                 sigma = aux[grepl("^sigma\\[", names(aux))],
-                 Q = 1 / sqrt(aux[grepl("^k\\[", names(aux))]))
+                 sigma = aux[, grepl("^sigma\\[", colnames(aux))],
+                 Q = 1 / sqrt(aux[, grepl("^k\\[", colnames(aux))]))
 
   } else if (likelihood %in% c("mspline", "pexp")) {
     if (likelihood == "mspline" && type == "mean")
