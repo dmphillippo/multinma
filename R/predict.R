@@ -1658,6 +1658,8 @@ make_surv_predict <- function(eta, aux, times, likelihood,
     d_out[3] <- d_out[3] * length(quantiles)
   }
 
+  if (!is.null(aux)) aux <- matrix(aux, ncol = dim(aux)[3])
+
   out <- array(NA_real_, dim = d_out, dimnames = dn_out)
 
   if (type %in% c("survival", "hazard", "cumhaz") && n_eta == 1) { # Multiple times, single linear predictor
@@ -1665,7 +1667,7 @@ make_surv_predict <- function(eta, aux, times, likelihood,
       out[, , i] <- do.call(surv_predfun(likelihood, type),
                              args = list(times = times[i],
                                          eta = as.vector(eta),
-                                         aux = matrix(aux, ncol = dim(aux)[3]),
+                                         aux = aux,
                                          quantiles = quantiles,
                                          basis = basis))
     }
@@ -1682,7 +1684,7 @@ make_surv_predict <- function(eta, aux, times, likelihood,
         do.call(surv_predfun(likelihood, type),
                 args = list(times = ti,
                             eta = as.vector(eta[ , , i]),
-                            aux = matrix(aux, ncol = dim(aux)[3]),
+                            aux = aux,
                             quantiles = quantiles,
                             basis = basis))
     }
@@ -1691,7 +1693,7 @@ make_surv_predict <- function(eta, aux, times, likelihood,
     out <- array(do.call(surv_predfun(likelihood, type),
                          args = list(times = times,
                                      eta = as.vector(eta),
-                                     aux = matrix(aux, ncol = dim(aux)[3]),
+                                     aux = aux,
                                      quantiles = quantiles,
                                      basis = basis)),
                  dim = d_out, dimnames = dn_out)
