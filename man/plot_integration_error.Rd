@@ -47,6 +47,12 @@ estimated for each point in the posterior distribution by subtracting the
 final estimate (using all \code{n_int} points) from the estimate using only the
 first \eqn{N_\mathrm{thin}}{N_thin} points.
 }
+\section{Note for survival models}{
+This function is not supported for survival/time-to-event models. These do
+not save cumulative integration points for efficiency reasons (both time and
+memory).
+}
+
 \examples{
 ## Plaque psoriasis ML-NMR
 \donttest{

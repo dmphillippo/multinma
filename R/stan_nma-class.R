@@ -476,6 +476,11 @@ plot_prior_posterior <- function(x, ...,
 #'   final estimate (using all `n_int` points) from the estimate using only the
 #'   first \eqn{N_\mathrm{thin}}{N_thin} points.
 #'
+#' # Note for survival models
+#' This function is not supported for survival/time-to-event models. These do
+#' not save cumulative integration points for efficiency reasons (both time and
+#' memory).
+#'
 #' @return A `ggplot` object.
 #' @export
 #'
@@ -493,6 +498,9 @@ plot_integration_error <- function(x, ...,
   # Checks
   if (!inherits(x, "stan_mlnmr"))
     abort("Expecting a `stan_mlnmr` object, created by fitting a ML-NMR model with numerical integration using the `nma()` function.")
+
+  if (inherits(x, "stan_nma_surv"))
+    abort("Not supported for survival models; cumulative integration points are not saved for efficiency reasons.")
 
   if (!rlang::is_bool(show_expected_rate))
     abort("`show_expected_rate` must be a logical value, TRUE or FALSE.")
