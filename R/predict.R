@@ -436,8 +436,6 @@ predict.stan_nma <- function(object, ...,
 
       # Get aux parameters for survival models
       if (is_surv) {
-        if (is.null(aux)) abort("Specify both `aux` and `baseline` or neither.")
-
 
         if (is.null(aux_pars)) {
           aux_array <- NULL
@@ -1181,7 +1179,6 @@ predict.stan_nma <- function(object, ...,
 
       # Get aux parameters for survival models
       if (is_surv) {
-        if (is.null(aux)) abort("Specify both `aux` and `baseline` or neither.")
 
         if (is.null(aux_pars)) {
           aux_array <- NULL
