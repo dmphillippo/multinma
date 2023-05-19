@@ -442,32 +442,40 @@ predict.stan_nma <- function(object, ...,
         } else {
 
           if (object$likelihood %in% c("mspline", "pexp")) {
-            n_aux <- length(object$basis[[1]])
-            aux_names <- paste0(aux_pars, "[..dummy.., ", 1:n_aux, "]")
+            abort(glue::glue('Producing predictions for external populations is not currently supported for "{object$likelihood}" models.'))
           } else {
             n_aux <- length(aux_pars)
             aux_names <- paste0(aux_pars, "[..dummy..]")
           }
 
+          if (n_aux > 1) {
+            if (!rlang::is_bare_list(aux, n = n_aux) ||
+                !setequal(names(aux), aux_pars) ||
+                any(purrr::map_lgl(aux, ~!inherits(., "distr"))))
+              abort(glue::glue("`aux` must be a named list of distr() specifications for ",
+                               glue::glue_collapse(aux_pars, sep = ", ", last = " and "), "."))
+          } else {
+            if (!inherits(aux, "distr"))
+              abort("`aux` must be specified using distr().")
+          }
+
           dim_aux <- c(dim_mu[1:2], n_aux)
           u <- array(runif(prod(dim_aux)), dim = dim_aux)
-          aux_array <- array(NA_real_,
-                             dim = dim_aux,
-                             dimnames = list(iterations = NULL,
-                                             chains = NULL,
-                                             parameters = aux_names))
 
-          if (object$likelihood %in% c("mspline", "pexp")) {
-            # Generate spline coefficients as a vector
-            for (i in 1:dim_aux[1]) {
-              for (j in 1:dim_aux[2]) {
-                aux_array[i, j, ] <- rlang::eval_tidy(rlang::call2(aux$qfun, p = u[i, j, , drop = TRUE], !!! aux$args))
-              }
-            }
+          if (n_aux == 1) {
+            aux_array <- array(rlang::eval_tidy(rlang::call2(aux$qfun, p = u, !!! aux$args)),
+                               dim = dim_aux,
+                               dimnames = list(iterations = NULL,
+                                               chains = NULL,
+                                               parameters = aux_names))
           } else {
-            # All other aux pars generate one by one
+            aux_array <- array(NA_real_,
+                               dim = dim_aux,
+                               dimnames = list(iterations = NULL,
+                                               chains = NULL,
+                                               parameters = aux_names))
             for (i in 1:n_aux) {
-              aux_array[, , i] <- rlang::eval_tidy(rlang::call2(aux$qfun, p = u[ , , i, drop = TRUE], !!! aux$args))
+              aux_array[, , i] <- rlang::eval_tidy(rlang::call2(aux[[aux_pars[i]]]$qfun, p = u[ , , i, drop = TRUE], !!! aux[[aux_pars[i]]]$args))
             }
           }
         }
@@ -1185,23 +1193,25 @@ predict.stan_nma <- function(object, ...,
         } else {
 
           # Check aux spec
-          if (!inherits(aux, "distr")) {
-            if (!length(aux) %in% c(1, n_studies))
-              abort(sprintf("`aux` must be a single distr() distribution, or a list of length %d (number of `newdata` studies)", n_studies))
-            if (length(aux) == 1) {
-              aux <- rep(aux, times = n_studies)
+          n_aux <- length(aux_pars)
+
+          if (n_aux == 1) {
+            if (!inherits(aux, "distr") && length(aux) != n_studies)
+              abort(sprintf("`aux` must be a single distr() specification, or a list of length %d (number of `newdata` studies)", n_studies))
+            if (inherits(aux, "distr")) {
+              aux <- rep(list(aux), times = n_studies)
               names(aux) <- studies
             } else {
+              if (any(purrr::map_lgl(aux, ~!inherits(., "distr"))))
+                  abort(sprintf("`aux` must be a single distr() specification, or a list of length %d (number of `newdata` studies)", n_studies))
               if (!rlang::is_named(aux)) {
                 names(aux) <- studies
               } else {
                 aux_names <- names(aux)
-                if (dplyr::n_distinct(aux_names) != n_studies)
-                  abort("`aux` list names must be distinct study names from `newdata`")
-                if (length(bad_aux_names <- setdiff(aux_names, studies)))
+                if (!setequal(aux_names, studies))
                   abort(glue::glue("`aux` list names must match all study names from `newdata`.\n",
                                    "Unmatched list names: ",
-                                   glue::glue_collapse(glue::double_quote(bad_aux_names), sep = ", ", width = 30),
+                                   glue::glue_collapse(glue::double_quote(setdiff(aux_names, studies)), sep = ", ", width = 30),
                                    ".\n",
                                    "Unmatched `newdata` study names: ",
                                    glue::glue_collapse(glue::double_quote(setdiff(studies, aux_names)), sep = ", ", width = 30),
@@ -1209,13 +1219,25 @@ predict.stan_nma <- function(object, ...,
               }
             }
           } else {
-            aux <- rep(list(aux), times = n_studies)
-            names(aux) <- studies
+            aux_names <- names(aux)
+            if (!rlang::is_bare_list(aux) ||
+                !length(aux) %in% c(n_aux, n_studies) ||
+                (!setequal(aux_names, aux_pars) && !setequal(aux_names, aux_pars)) ||
+                any(purrr::map_lgl(purrr::list_flatten(aux), ~!inherits(., "distr")))) {
+              abort(glue::glue("`aux` must be a single named list of distr() specifications for {glue::glue_collapse(aux_pars, sep = ', ', last = ' and ')}, ",
+                               "or a list of length {n_studies} (number of `newdata` studies) of such lists."))
+            }
+
+            if (setequal(aux_names, aux_pars)) {
+              aux <- rep(list(aux), times = n_studies)
+              names(aux) <- studies
+            } else if (!rlang::is_named(aux)) {
+              names(aux) <- studies
+            }
           }
 
           if (object$likelihood %in% c("mspline", "pexp")) {
-            n_aux <- length(object$basis[[1]])
-            aux_names <- paste0(rep(aux_pars, each = n_aux * n_studies), "[", rep(studies, each = n_aux) , rep(1:n_aux, times = n_studies), "]")
+            abort(glue::glue('Producing predictions for external populations is not currently supported for "{object$likelihood}" models.'))
           } else {
             n_aux <- length(aux_pars)
             aux_names <- paste0(rep(aux_pars, each = n_studies), "[", rep(studies, times = n_aux) , "]")
@@ -1229,20 +1251,14 @@ predict.stan_nma <- function(object, ...,
                                              chains = NULL,
                                              parameters = aux_names))
 
-          if (object$likelihood %in% c("mspline", "pexp")) {
-            # Generate spline coefficients as a vector
-            for (i in 1:dim_aux[1]) {
-              for (j in 1:dim_aux[2]) {
-                for (s in 1:n_studies) {
-                  aux_array[i, j, ((s-1)*n_aux + 1):(s*n_aux)] <- rlang::eval_tidy(rlang::call2(aux$qfun, p = u[i, j, ((s-1)*n_aux + 1):(s*n_aux), drop = TRUE], !!! aux$args))
-                }
-              }
+          if (n_aux == 1) {
+            for (s in 1:n_studies) {
+              aux_array[, , s] <- rlang::eval_tidy(rlang::call2(aux[[studies[s]]]$qfun, p = u[ , , s, drop = TRUE], !!! aux[[studies[s]]]$args))
             }
           } else {
-            # All other aux pars generate one by one
             for (s in 1:n_studies) {
               for (i in 1:n_aux) {
-                aux_array[, , (s-1)*n_studies + i] <- rlang::eval_tidy(rlang::call2(aux[[studies[s]]]$qfun, p = u[ , , (s-1)*n_studies + i, drop = TRUE], !!! aux[[studies[s]]]$args))
+                aux_array[, , (s-1)*n_studies + i] <- rlang::eval_tidy(rlang::call2(aux[[studies[s]]][[i]]$qfun, p = u[ , , (s-1)*n_studies + i, drop = TRUE], !!! aux[[studies[s]]][[i]]$args))
               }
             }
           }
