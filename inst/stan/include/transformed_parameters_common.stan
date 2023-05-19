@@ -16,7 +16,7 @@ vector[n_delta] f_delta =
 // -- Back-transformed parameters --
 vector[nX] allbeta = QR ? R_inv * beta_tilde : beta_tilde;
 // Study baselines
-vector[totns] mu = allbeta[1:totns];
+vector[totns] mu;
 // Treatment effects
 vector[nt - 1] d = allbeta[(totns +1):(totns + nt - 1)];
 // Node-splitting omega ()
@@ -29,6 +29,12 @@ vector[nX - totns - (nt - 1) - nodesplit] beta;
 // vector[ni_agd_arm] theta_agd_arm_bar;
 vector[nint > 1 ? nint * ni_agd_contrast : 0] eta_agd_contrast_ii;
 vector[ni_agd_contrast] eta_agd_contrast_bar;
+
+// -- Study baselines --
+// Pull out mu from allbeta
+if (totns) {
+  mu = allbeta[1:totns];
+}
 
 // -- Regression predictors --
 // Pull out beta from allbeta

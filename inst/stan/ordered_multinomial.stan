@@ -49,7 +49,7 @@ transformed parameters {
 #include /include/transformed_parameters_common.stan
 
   cc[1] = 0;
-  cc[2:] = f_cc;
+  if (ncat > 2) cc[2:] = f_cc;
 
   // Set predictors to zero for all missing categories (will drop out of likelihood)
   theta_ipd = theta_ipd0;
