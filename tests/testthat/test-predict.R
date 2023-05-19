@@ -459,6 +459,108 @@ test_that(".study, .trt, .time columns are correct (no regression, new data)", {
                    paste0("pred[", preddat4$.trt, ", ", preddat4$.quantile, "]"))
 })
 
+ndmm_fit_exp <- suppressWarnings(nma(ndmm_net,
+                                     likelihood = "exponential",
+                                     prior_intercept = normal(0, 100),
+                                     prior_trt = normal(0, 10),
+                                     iter = 10))
+
+ndmm_fit_gengamma <- suppressWarnings(nma(ndmm_net,
+                                     likelihood = "gengamma",
+                                     prior_intercept = normal(0, 100),
+                                     prior_trt = normal(0, 10),
+                                     prior_aux = list(sigma = half_normal(5), k = half_normal(5)),
+                                     iter = 10))
+
+ndmm_fit_mspline <- suppressWarnings(nma(ndmm_net,
+                                         likelihood = "mspline",
+                                         prior_intercept = normal(0, 100),
+                                         prior_trt = normal(0, 10),
+                                         prior_aux = dirichlet(1),
+                                         iter = 10))
+
+test_that("survival predictions for models with different numbers of aux pars (no regression, network data)", {
+  # Prediction format for observed times
+  preddat1 <- ndmm_preddat %>%
+    dplyr::group_by(.study) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(-.trt) %>%
+    dplyr::cross_join(dplyr::distinct(ndmm_preddat, .trt)) %>%
+    dplyr::arrange(.study, .trt)
+
+  pred1_exp <- tibble::as_tibble(predict(ndmm_fit_exp, type = "survival"))
+  expect_equivalent(pred1_exp[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1_exp$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1_gengamma <- tibble::as_tibble(predict(ndmm_fit_gengamma, type = "survival"))
+  expect_equivalent(pred1_gengamma[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1_gengamma$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1_mspline <- tibble::as_tibble(predict(ndmm_fit_mspline, type = "survival"))
+  expect_equivalent(pred1_mspline[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1_mspline$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+})
+
+test_that("survival predictions for models with different numbers of aux pars (no regression, new data)", {
+
+  time <- 0:5
+
+  # Prediction format new times
+  preddat1 <- tidyr::expand_grid(.study = "New 1",
+                                 .trt = unique(ndmm_preddat$.trt),
+                                 .time = time) %>%
+    dplyr::group_by(.trt) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup()
+
+  pred1_exp <- tibble::as_tibble(predict(ndmm_fit_exp, type = "survival",
+                                       times = time,
+                                       baseline = distr(qnorm, 0, 1)))
+  expect_equivalent(pred1_exp[, c(".trt", ".time")],
+                    preddat1[, c(".trt", ".time")])
+  expect_identical(pred1_exp$parameter,
+                   paste0("pred[", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1_gengamma <- tibble::as_tibble(predict(ndmm_fit_gengamma, type = "survival",
+                                         times = time,
+                                         baseline = distr(qnorm, 0, 1),
+                                         aux = list(sigma = distr(qlnorm, 0, 0.1),
+                                                    k = distr(qlnorm, 0, 0.1))))
+  expect_equivalent(pred1_gengamma[, c(".trt", ".time")],
+                    preddat1[, c(".trt", ".time")])
+  expect_identical(pred1_gengamma$parameter,
+                   paste0("pred[", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  expect_error(predict(ndmm_fit_gengamma, type = "survival",
+                       times = time,
+                       baseline = distr(qnorm, 0, 1),
+                       aux = list(k = distr(qlnorm, 0, 0.1))),
+               "`aux` must be a named list of distr\\(\\) specifications for sigma and k")
+  expect_error(predict(ndmm_fit_gengamma, type = "survival",
+                       times = time,
+                       baseline = distr(qnorm, 0, 1),
+                       aux = list(sigma = distr(qlnorm, 0, 0.1))),
+               "`aux` must be a named list of distr\\(\\) specifications for sigma and k")
+  expect_error(predict(ndmm_fit_gengamma, type = "survival",
+                       times = time,
+                       baseline = distr(qnorm, 0, 1),
+                       aux = distr(qlnorm, 0, 0.1)),
+               "`aux` must be a named list of distr\\(\\) specifications for sigma and k")
+
+  expect_error(predict(ndmm_fit_mspline, type = "survival",
+                       times = time,
+                       baseline = distr(qnorm, 0, 1),
+                       aux = distr(qnorm, 0, 0.1)),
+               'Producing predictions for external populations is not currently supported for "mspline" models.')
+})
+
 ndmm_fit_weib_reg <- suppressWarnings(nma(ndmm_net,
                                           likelihood = "weibull-aft",
                                           regression = ~age*.trt,
@@ -920,3 +1022,209 @@ test_that(".study, .trt, .time columns are correct (regression, individual, new 
                    paste0("pred[", preddat4$.study, ": ", preddat4$.trt, ", ", preddat4$id, ", ", preddat4$.quantile, "]"))
 })
 
+ndmm_fit_exp_reg <- suppressWarnings(nma(ndmm_net,
+                                     likelihood = "exponential",
+                                     reg = ~age*.trt,
+                                     prior_intercept = normal(0, 100),
+                                     prior_trt = normal(0, 10),
+                                     prior_reg = normal(0, 10),
+                                     iter = 10))
+
+ndmm_fit_gengamma_reg <- suppressWarnings(nma(ndmm_net,
+                                          likelihood = "gengamma",
+                                          reg = ~age*.trt,
+                                          prior_intercept = normal(0, 100),
+                                          prior_trt = normal(0, 10),
+                                          prior_reg = normal(0, 10),
+                                          prior_aux = list(sigma = half_normal(5), k = half_normal(5)),
+                                          init_r = 1,
+                                          iter = 10))
+
+ndmm_fit_mspline_reg <- suppressWarnings(nma(ndmm_net,
+                                         likelihood = "mspline",
+                                         reg = ~age*.trt,
+                                         prior_intercept = normal(0, 100),
+                                         prior_trt = normal(0, 10),
+                                         prior_reg = normal(0, 10),
+                                         prior_aux = dirichlet(1),
+                                         iter = 10))
+
+test_that("survival predictions for models with different numbers of aux pars (regression, network data)", {
+  # Prediction format for observed times
+  preddat1 <- ndmm_preddat %>%
+    dplyr::group_by(.study) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(-.trt) %>%
+    dplyr::cross_join(dplyr::distinct(ndmm_preddat, .trt)) %>%
+    dplyr::arrange(.study, .trt)
+
+  pred1_exp <- tibble::as_tibble(predict(ndmm_fit_exp_reg, type = "survival"))
+  expect_equivalent(pred1_exp[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1_exp$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1_gengamma <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg, type = "survival"))
+  expect_equivalent(pred1_gengamma[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1_gengamma$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1_mspline <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "survival"))
+  expect_equivalent(pred1_mspline[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1_mspline$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+})
+
+test_that("survival predictions for models with different numbers of aux pars (regression, new data)", {
+  tm <- 0:5
+
+  newdata <- dplyr::tibble(study = "Test", time = tm) %>%
+    add_integration(age = distr(qlnorm, meanlog = log(4.5), sdlog = 1), n_int = 5)
+
+  # Prediction format new times
+  preddat1 <- dplyr::mutate(newdata, .study = factor(study), .time = tm, id = 1:dplyr::n()) %>%
+    dplyr::cross_join(dplyr::tibble(.trt = unique(ndmm_preddat$.trt)))
+
+  pred1_exp <- tibble::as_tibble(predict(ndmm_fit_exp_reg, type = "survival",
+                                         newdata = newdata, times = time, study = study,
+                                         baseline = distr(qnorm, 0, 1)))
+  expect_equivalent(pred1_exp[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1_exp$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1_gengamma <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg, type = "survival",
+                                              newdata = newdata, times = time, study = study,
+                                              baseline = distr(qnorm, 0, 1),
+                                              aux = list(sigma = distr(qlnorm, 0, 0.1),
+                                                         k = distr(qlnorm, 0, 0.1))))
+  expect_equivalent(pred1_gengamma[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1_gengamma$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  expect_error(predict(ndmm_fit_gengamma_reg, type = "survival",
+                       newdata = newdata, times = time, study = study,
+                       baseline = distr(qnorm, 0, 1),
+                       aux = list(k = distr(qlnorm, 0, 0.1))),
+               "`aux` must be a single named list of distr\\(\\) specifications for sigma and k")
+  expect_error(predict(ndmm_fit_gengamma_reg, type = "survival",
+                       newdata = newdata, times = time,
+                       baseline = distr(qnorm, 0, 1),
+                       aux = list(sigma = distr(qlnorm, 0, 0.1))),
+               "`aux` must be a single named list of distr\\(\\) specifications for sigma and k")
+  expect_error(predict(ndmm_fit_gengamma_reg, type = "survival",
+                       newdata = newdata, times = time,
+                       baseline = distr(qnorm, 0, 1),
+                       aux = distr(qlnorm, 0, 0.1)),
+               "`aux` must be a single named list of distr\\(\\) specifications for sigma and k")
+
+  expect_error(predict(ndmm_fit_mspline_reg, type = "survival",
+                       newdata = newdata, times = time,
+                       baseline = distr(qnorm, 0, 1),
+                       aux = distr(qnorm, 0, 0.1)),
+               'Producing predictions for external populations is not currently supported for "mspline" models')
+})
+
+test_that("aux argument", {
+  newdata <- tibble::tibble(study = c("a", "b"), age = 4, time = 1)
+
+  # Single aux parameter, no regression
+  m <- "`aux` must be specified using distr\\(\\)"
+  expect_error(predict(ndmm_fit_weib, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = "a"), m)
+  expect_error(predict(ndmm_fit_weib, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = 1), m)
+  expect_error(predict(ndmm_fit_weib, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = list("a")), m)
+  expect_error(predict(ndmm_fit_weib, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = NA), m)
+
+  # Single aux parameter, regression
+  m2 <- "`aux` must be a single distr\\(\\) specification, or a list of length 2 \\(number of `newdata` studies\\)"
+  expect_error(predict(ndmm_fit_weib_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = "a"), m2)
+  expect_error(predict(ndmm_fit_weib_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = 1), m2)
+  expect_error(predict(ndmm_fit_weib_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = list("a")), m2)
+  expect_error(predict(ndmm_fit_weib_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = NA), m2)
+
+  expect_error(predict(ndmm_fit_weib_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
+                       aux = list(a = distr(qnorm, 1, 1),
+                                  c = distr(qnorm, 1, 1))),
+               "must match all study names from `newdata`")
+  expect_error(predict(ndmm_fit_weib_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
+                       aux = list(a = distr(qnorm, 1, 1),
+                                  b = "bad")),
+               m2)
+
+  # Multiple aux parameters, no regression
+  m3 <- "`aux` must be a named list of distr\\(\\) specifications for sigma and k"
+
+  expect_error(predict(ndmm_fit_gengamma, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = "a"), m3)
+  expect_error(predict(ndmm_fit_gengamma, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = 1), m3)
+  expect_error(predict(ndmm_fit_gengamma, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = list("a")), m3)
+  expect_error(predict(ndmm_fit_gengamma, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = NA), m3)
+
+  expect_error(predict(ndmm_fit_gengamma, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
+                       aux = list(sigma = distr(qlnorm, 0, 1))), m3)
+  expect_error(predict(ndmm_fit_gengamma, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
+                       aux = list(k = distr(qlnorm, 0, 1))), m3)
+  expect_error(predict(ndmm_fit_gengamma, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
+                       aux = list(k = distr(qlnorm, 0, 1),
+                                  sigma = "bad")), m3)
+  expect_error(predict(ndmm_fit_gengamma, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
+                       aux = list(sigma = distr(qlnorm, 0, 1),
+                                  k = distr(qlnorm, 0, 1),
+                                  bad = distr(qlnorm, 0, 1))), m3)
+
+  # Multiple aux parameters, regression
+  m4 <- "`aux` must be a single named list of distr\\(\\) specifications for sigma and k, or a list of length 2 \\(number of `newdata` studies\\) of such lists"
+  expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = "a"), m4)
+  expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = 1), m4)
+  expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = list("a")), m4)
+  expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = NA), m4)
+
+  expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
+                       aux = list(sigma = distr(qlnorm, 0, 1))), m4)
+  expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
+                       aux = list(k = distr(qlnorm, 0, 1))), m4)
+  expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
+                       aux = list(sigma = distr(qlnorm, 0, 1),
+                                  k = distr(qlnorm, 0, 1),
+                                  bad = distr(qlnorm, 0, 1))), m4)
+  expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
+                       aux = list(
+                                  a = list(sigma = distr(qlnorm, 0, 1),
+                                           k = distr(qlnorm, 0, 1))
+                                 )), m4)
+  expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
+                       aux = list(
+                                  a = list(sigma = distr(qlnorm, 0, 1),
+                                           k = distr(qlnorm, 0, 1)),
+                                  b = list(sigma = distr(qlnorm, 0, 1))
+                                 )), m4)
+  expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
+                       aux = list(
+                                  a = list(sigma = distr(qlnorm, 0, 1),
+                                           k = distr(qlnorm, 0, 1)),
+                                  b = list(sigma = distr(qlnorm, 0, 1),
+                                           k = distr(qlnorm, 0, 1)),
+                                  c = list(sigma = distr(qlnorm, 0, 1),
+                                           k = distr(qlnorm, 0, 1))
+                       )), m4)
+  expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
+                       aux = list(sigma = distr(qlnorm, 0, 1),
+                                  k = "bad")), m4)
+  expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
+                       aux = list(
+                         a = list(sigma = distr(qlnorm, 0, 1),
+                                  k = distr(qlnorm, 0, 1)),
+                         b = list(sigma = distr(qlnorm, 0, 1),
+                                  k = "bad")
+                       )), m4)
+  expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
+                       aux = list(
+                         a = list(sigma = distr(qlnorm, 0, 1),
+                                  k = distr(qlnorm, 0, 1)),
+                         b = "bad")
+                       ), m4)
+
+})
