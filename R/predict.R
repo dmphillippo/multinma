@@ -934,7 +934,9 @@ predict.stan_nma <- function(object, ...,
       } else {
         if (inherits(object, "stan_mlnmr")) {
           if (!inherits(newdata, "integration_tbl")) {
-            abort("No integration points found in `newdata`. Specify integration points using add_integration().")
+            inform(paste0("No integration points found in `newdata`, averaging over individuals provided in `newdata`.\n",
+                          "To set up integration points, use add_integration()."))
+            preddat <- newdata
           } else {
             preddat <- .unnest_integration(newdata)
           }
