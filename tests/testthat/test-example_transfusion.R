@@ -8,84 +8,94 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
+## ---- code=readLines("children/knitr_setup.R"), include=FALSE-----------------
 
-## ---- include=FALSE-------------------------------------------------------------------------------
+## ---- include=FALSE-----------------------------------------------------------
 set.seed(2684319)
 
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ---- eval = FALSE------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
-## ----setup, echo = FALSE--------------------------------------------------------------------------
+## ----setup, echo = FALSE------------------------------------------------------
 library(multinma)
-nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
-             "true" =, "warn" = 2, 
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
+             "true" =, "warn" = 2,
              parallel::detectCores())
 options(mc.cores = nc)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 head(transfusion)
 
 
-## -------------------------------------------------------------------------------------------------
-tr_net <- set_agd_arm(transfusion, 
+## -----------------------------------------------------------------------------
+tr_net <- set_agd_arm(transfusion,
                            study = studyc,
                            trt = trtc,
-                           r = r, 
+                           r = r,
                            n = n,
                            trt_ref = "Control")
 tr_net
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval=FALSE, echo=TRUE-----------------------------------------------------------------------
+## ---- eval=FALSE, echo=TRUE---------------------------------------------------
 ## tr_fit_RE_noninf <- nma(tr_net,
 ##                         trt_effects = "random",
 ##                         prior_intercept = normal(scale = 100),
 ##                         prior_trt = normal(scale = 100),
 ##                         prior_het = half_normal(scale = 5))
 
-## ---- echo=FALSE----------------------------------------------------------------------------------
-tr_fit_RE_noninf <- nma(tr_net, 
+## ---- echo=FALSE, eval=!params$run_tests--------------------------------------
+## tr_fit_RE_noninf <- nma(tr_net,
+##                         seed = 857369814,
+##                         trt_effects = "random",
+##                         prior_intercept = normal(scale = 100),
+##                         prior_trt = normal(scale = 100),
+##                         prior_het = half_normal(scale = 5))
+
+## ---- echo=FALSE, eval=params$run_tests---------------------------------------
+tr_fit_RE_noninf <- suppressWarnings(nma(tr_net,
                         seed = 857369814,
                         trt_effects = "random",
                         prior_intercept = normal(scale = 100),
                         prior_trt = normal(scale = 100),
-                        prior_het = half_normal(scale = 5))
+                        prior_het = half_normal(scale = 5),
+                        iter = 10000,
+                        save_warmup = FALSE))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 tr_fit_RE_noninf
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 ## # Not run
 ## print(tr_fit_RE_noninf, pars = c("d", "mu", "delta"))
 
 
-## ----tr_RE_noninf_pp_plot-------------------------------------------------------------------------
+## ----tr_RE_noninf_pp_plot-----------------------------------------------------
 plot_prior_posterior(tr_fit_RE_noninf, prior = "het")
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 noninf_tau <- as.array(tr_fit_RE_noninf, pars = "tau")
 noninf_tausq <- noninf_tau^2
 names(noninf_tausq) <- "tausq"
 summary(noninf_tausq)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 summary(log_normal(-3.93, 1.51))
 
 
-## ---- echo=TRUE, eval=FALSE-----------------------------------------------------------------------
+## ---- echo=TRUE, eval=FALSE---------------------------------------------------
 ## tr_fit_RE_inf <- nma(tr_net,
 ##                      trt_effects = "random",
 ##                      prior_intercept = normal(scale = 100),
@@ -93,37 +103,47 @@ summary(log_normal(-3.93, 1.51))
 ##                      prior_het = log_normal(-3.93, 1.51),
 ##                      prior_het_type = "var")
 
-## ---- echo=FALSE----------------------------------------------------------------------------------
-tr_fit_RE_inf <- nma(tr_net, 
+## ---- echo=FALSE, eval=!params$run_tests--------------------------------------
+## tr_fit_RE_inf <- nma(tr_net,
+##                      seed = 1803772660,
+##                      trt_effects = "random",
+##                      prior_intercept = normal(scale = 100),
+##                      prior_trt = normal(scale = 100),
+##                      prior_het = log_normal(-3.93, 1.51),
+##                      prior_het_type = "var")
+
+## ---- echo=FALSE, eval=params$run_tests---------------------------------------
+tr_fit_RE_inf <- suppressWarnings(nma(tr_net,
                      seed = 1803772660,
                      trt_effects = "random",
                      prior_intercept = normal(scale = 100),
                      prior_trt = normal(scale = 100),
                      prior_het = log_normal(-3.93, 1.51),
-                     prior_het_type = "var")
+                     prior_het_type = "var",
+                     iter = 10000, save_warmup = FALSE))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 tr_fit_RE_inf
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 ## # Not run
 ## print(tr_fit_RE_inf, pars = c("d", "mu", "delta"))
 
 
-## ----tr_RE_inf_pp_plot----------------------------------------------------------------------------
+## ----tr_RE_inf_pp_plot--------------------------------------------------------
 plot_prior_posterior(tr_fit_RE_inf, prior = "het")
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 inf_tau <- as.array(tr_fit_RE_inf, pars = "tau")
 inf_tausq <- inf_tau^2
 names(inf_tausq) <- "tausq"
 summary(inf_tausq)
 
 
-## ----transfusion_tests, include=FALSE, eval=params$run_tests--------------------------------------
+## ----transfusion_tests, include=FALSE, eval=params$run_tests------------------
 #--- Test against TSD 2 results ---
 library(testthat)
 
