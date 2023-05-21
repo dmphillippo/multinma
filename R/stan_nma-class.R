@@ -377,11 +377,7 @@ plot_prior_posterior <- function(x, ...,
   }
 
   prior_dat <- tibble::add_column(prior_dat, xseq = xseq, dens = dens)
-  if (getNamespaceVersion("tidyr") < "1.0.0") {
-    prior_dat <- tidyr::unnest(prior_dat, .data$xseq, .data$dens)
-  } else {
-    prior_dat <- tidyr::unnest(prior_dat, c(.data$xseq, .data$dens))
-  }
+  prior_dat <- tidyr::unnest(prior_dat, c("xseq", "dens"))
 
   # Repeat rows of prior_dat for each corresponding parameter
   prior_dat <- dplyr::left_join(prior_dat,
