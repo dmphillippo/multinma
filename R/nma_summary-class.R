@@ -247,15 +247,8 @@ plot.nma_summary <- function(x, ...,
   # Get draws
   draws <- tibble::as_tibble(as.matrix(x))
 
-  if (packageVersion("tidyr") >= "1.0.0") {
-    draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
-                                 names_to = "parameter", values_to = "value")
-  } else {
-    draws <- tidyr::gather(draws,
-                           key = "parameter",
-                           value = "value",
-                           dplyr::everything())
-  }
+  draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
+                               names_to = "parameter", values_to = "value")
 
   if (has_studies <- rlang::has_name(as.data.frame(x), ".study")) {
     draws$Study <- forcats::fct_inorder(factor(
@@ -377,15 +370,8 @@ plot.nma_parameter_summary <- function(x, ...,
   # Get draws
   draws <- tibble::as_tibble(as.matrix(x))
 
-  if (packageVersion("tidyr") >= "1.0.0") {
-    draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
-                                 names_to = "parameter", values_to = "value")
-  } else {
-    draws <- tidyr::gather(draws,
-                           key = "parameter",
-                           value = "value",
-                           dplyr::everything())
-  }
+  draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
+                               names_to = "parameter", values_to = "value")
 
   draws$par_base <- forcats::fct_inorder(factor(
     stringr::str_remove(draws$parameter, "\\[.*\\]")))
@@ -439,18 +425,10 @@ plot.nma_rank_probs <- function(x, ...) {
       stringr::str_extract(dat$parameter, "(?<=\\[).+(?=\\])")))
   }
 
-  if (packageVersion("tidyr") >= "1.1.0") {
-    dat <- tidyr::pivot_longer(dat, cols = dplyr::starts_with("p_rank"),
-                                 names_to = "rank", values_to = "probability",
-                                 names_pattern = "^p_rank\\[([0-9]+)\\]$",
-                                 names_transform = list(rank = as.integer))
-  } else {
-    dat <-
-      tidyr::gather(dat, key = "rank",
-                    value = "probability",
-                    dplyr::starts_with("p_rank")) %>%
-      tidyr::extract(.data$rank, "rank", "^p_rank\\[([0-9]+)\\]$", convert = TRUE)
-  }
+  dat <- tidyr::pivot_longer(dat, cols = dplyr::starts_with("p_rank"),
+                               names_to = "rank", values_to = "probability",
+                               names_pattern = "^p_rank\\[([0-9]+)\\]$",
+                               names_transform = list(rank = as.integer))
 
 
   p <- ggplot2::ggplot(dat,

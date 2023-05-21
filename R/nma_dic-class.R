@@ -156,15 +156,8 @@ plot.nma_dic <- function(x, y, ...,
   data_labels <- stringr::str_extract(colnames(resdev_post), "(?<=\\[).+(?=\\]$)")
   colnames(resdev_post) <- data_labels
 
-  if (packageVersion("tidyr") >= "1.0.0") {
-    resdev_post <- tidyr::pivot_longer(resdev_post, cols = dplyr::everything(),
-                                       names_to = "parameter", values_to = "resdev")
-  } else {
-    resdev_post <- tidyr::gather(resdev_post,
-                                 key = "parameter",
-                                 value = "resdev",
-                                 dplyr::everything())
-  }
+  resdev_post <- tidyr::pivot_longer(resdev_post, cols = dplyr::everything(),
+                                     names_to = "parameter", values_to = "resdev")
 
   resdev_post$.label <- forcats::fct_inorder(factor(resdev_post$parameter))
 
@@ -212,15 +205,8 @@ plot.nma_dic <- function(x, y, ...,
     if (any(data_labels != y_data_labels))
       abort("Data points in `x` and `y` do not match")
 
-    if (packageVersion("tidyr") >= "1.0.0") {
-      y_resdev_post <- tidyr::pivot_longer(y_resdev_post, cols = dplyr::everything(),
-                                           names_to = "parameter", values_to = "resdev")
-    } else {
-      y_resdev_post <- tidyr::gather(y_resdev_post,
-                                     key = "parameter",
-                                     value = "resdev",
-                                     dplyr::everything())
-    }
+    y_resdev_post <- tidyr::pivot_longer(y_resdev_post, cols = dplyr::everything(),
+                                         names_to = "parameter", values_to = "resdev")
 
     y_resdev_post$.label <- forcats::fct_inorder(factor(y_resdev_post$parameter))
 

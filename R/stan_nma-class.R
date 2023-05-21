@@ -321,15 +321,8 @@ plot_prior_posterior <- function(x, ...,
     prior_dat <- dplyr::mutate(prior_dat, par_base = dplyr::recode(.data$par_base, cc = "diff_cc"))
   }
 
-  if (packageVersion("tidyr") >= "1.0.0") {
-    draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
-                                 names_to = "parameter", values_to = "value")
-  } else {
-    draws <- tidyr::gather(draws,
-                           key = "parameter",
-                           value = "value",
-                           dplyr::everything())
-  }
+  draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
+                               names_to = "parameter", values_to = "value")
 
   draws$par_base <- stringr::str_remove(draws$parameter, "\\[.*\\]")
   draws$parameter <- forcats::fct_inorder(factor(draws$parameter))
@@ -510,22 +503,11 @@ plot_integration_error <- function(x, ...,
 
   rx <- "^(theta2?)\\[(.+): (.+), ([0-9]+)\\]$"
 
-  if (packageVersion("tidyr") >= "1.1.0") {
-    int_dat <- tidyr::pivot_longer(int_dat, cols = -dplyr::one_of(".draw"),
-                                   names_pattern = rx,
-                                   names_to = c("parameter", "study", "treatment", "n_int"),
-                                   names_transform = list(n_int = as.integer),
-                                   values_to = "value")
-  } else {
-    int_dat <- tidyr::gather(int_dat,
-                           key = "parameter",
-                           value = "value",
-                           -dplyr::one_of(".draw")) %>%
-      tidyr::extract(.data$parameter,
-                     into = c("parameter", "study", "treatment", "n_int"),
-                     regex = rx,
-                     convert = TRUE)
-  }
+  int_dat <- tidyr::pivot_longer(int_dat, cols = -dplyr::one_of(".draw"),
+                                 names_pattern = rx,
+                                 names_to = c("parameter", "study", "treatment", "n_int"),
+                                 names_transform = list(n_int = as.integer),
+                                 values_to = "value")
 
   int_dat$study <- factor(int_dat$study, levels = levels(x$network$studies))
   int_dat$treatment <- factor(int_dat$treatment, levels = levels(x$network$treatments))
