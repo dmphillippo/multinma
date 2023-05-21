@@ -185,7 +185,7 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #'
 #' # Further customisation is possible with ggplot commands
 #' plot(smk_releff_RE, ref_line = 0, stat = "halfeye", slab_alpha = 0.6) +
-#'   ggplot2::aes(slab_fill = ifelse(..x.. < 0, "darkred", "grey60"))
+#'   ggplot2::aes(slab_fill = ggplot2::after_stat(ifelse(x < 0, "darkred", "grey60")))
 #'
 #' # Produce posterior ranks
 #' smk_rank_RE <- posterior_ranks(smk_fit_RE, lower_better = FALSE)

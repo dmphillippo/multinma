@@ -391,7 +391,7 @@ plot_prior_posterior <- function(x, ...,
                                                .homonyms = "last"))
 
   g_post <- rlang::call2(ggplot2::geom_histogram,
-                         !!! rlang::dots_list(mapping = ggplot2::aes_(y = ~..density.., x = ~value, group = ~parameter),
+                         !!! rlang::dots_list(mapping = ggplot2::aes(y = ggplot2::after_stat(.data$density), x = .data$value, group = .data$parameter),
                                               data = draws,
                                               binwidth = function(x) diff(range(x)) / nclass.Sturges(x),
                                               boundary = 0,

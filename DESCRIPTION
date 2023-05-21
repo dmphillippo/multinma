@@ -40,7 +40,7 @@ Imports:
     Matrix,
     igraph,
     ggraph,
-    ggplot2,
+    ggplot2 (>= 3.3.0),
     ggdist (>= 2.1.1),
     truncdist,
     bayesplot
@@ -52,7 +52,7 @@ LinkingTo:
     rstan (>= 2.18.1),
     StanHeaders (>= 2.18.0)
 SystemRequirements: GNU make
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Suggests: 
     testthat (>= 2.1.0),

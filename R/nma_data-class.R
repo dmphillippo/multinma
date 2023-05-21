@@ -353,7 +353,6 @@ as_tbl_graph.nma_data <- function(x, ...) {
 #'
 #' @param trt Vector of treatment codes
 #'
-#' @return
 #' @noRd
 make_contrasts <- function(trt) {
   contrs <- utils::combn(sort(trt), 2)
