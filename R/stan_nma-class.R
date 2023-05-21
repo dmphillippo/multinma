@@ -373,9 +373,16 @@ plot_prior_posterior <- function(x, ...,
   prior_dat <- tidyr::unnest(prior_dat, c("xseq", "dens"))
 
   # Repeat rows of prior_dat for each corresponding parameter
-  prior_dat <- dplyr::left_join(prior_dat,
-                                dplyr::distinct(draws, .data$par_base, .data$parameter),
-                                by = "par_base")
+  if (packageVersion("dplyr") >= "1.1.1") {
+    prior_dat <- dplyr::left_join(prior_dat,
+                                  dplyr::distinct(draws, .data$par_base, .data$parameter),
+                                  by = "par_base",
+                                  relationship = "many-to-many")
+  } else {
+    prior_dat <- dplyr::left_join(prior_dat,
+                                  dplyr::distinct(draws, .data$par_base, .data$parameter),
+                                  by = "par_base")
+  }
 
   # Construct plot
   xlim <- c(min(draws$value, 0), max(draws$value))
