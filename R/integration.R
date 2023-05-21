@@ -450,11 +450,7 @@ unnest_integration <- function(data) {
   out <- data %>%
     dplyr::select(-dplyr::one_of(x_names[name_conflicts])) %>%
     dplyr::rename_at(x_int_names, ~stringr::str_remove(., "^\\.int_")) %>%
-    {if (getNamespaceVersion("tidyr") < "1.0.0") {
-      tidyr::unnest(., !!! rlang::syms(x_names))
-    } else {
-      tidyr::unnest(., x_names)
-    }}
+    tidyr::unnest(x_names)
 
   return(out)
 }
