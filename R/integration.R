@@ -346,7 +346,7 @@ add_integration.nma_data <- function(x, ...,
 
 
     # Check for any missing covariates
-    if (!all(complete.cases(dplyr::select(network$ipd, !! x_names)))) {
+    if (!all(complete.cases(dplyr::select(network$ipd, dplyr::all_of(x_names))))) {
       warn("Missing values found for some covariates in IPD. Calculating correlations using complete cases.")
     }
 
@@ -356,7 +356,7 @@ add_integration.nma_data <- function(x, ...,
       dplyr::group_by(.data$.study) %>%
       dplyr::group_modify(~tibble::tibble(
         w = nrow(.) - 3,
-        r = list(cor(dplyr::select(., !! x_names),
+        r = list(cor(dplyr::select(., dplyr::all_of(x_names)),
                      method = if (cor_adjust == "legacy") "spearman" else cor_adjust,
                      use = "complete.obs"))
         )) %>%
