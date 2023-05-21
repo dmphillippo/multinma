@@ -458,7 +458,7 @@ predict.stan_nma <- function(object, ...,
       }
 
       preddat <- preddat %>%
-        dplyr::rename(.trt_old = .data$.trt) %>%
+        dplyr::rename(.trt_old = ".trt") %>%
         dplyr::left_join(tidyr::expand(., .study = .data$.study,
                                           .trt = .data$.trt_old),
                          by = ".study")
@@ -528,7 +528,7 @@ predict.stan_nma <- function(object, ...,
       preddat$.sample_size <- 1
 
       # Make design matrix of all studies and all treatments
-      if (rlang::has_name(preddat, ".trt")) preddat <- dplyr::select(preddat, -.data$.trt)
+      if (rlang::has_name(preddat, ".trt")) preddat <- dplyr::select(preddat, -".trt")
       preddat <- dplyr::left_join(preddat,
                                   tidyr::expand(preddat,
                                                 .study = .data$.study,

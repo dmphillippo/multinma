@@ -293,11 +293,11 @@ plot_prior_posterior <- function(x, ...,
   if ("het" %in% prior) {
     if (x$priors$prior_het_type == "var") {
       draws$tausq <- draws$tau^2
-      draws <- dplyr::select(draws, -.data$tau)
+      draws <- dplyr::select(draws, -"tau")
       prior_dat$par_base <- dplyr::recode(prior_dat$par_base, tau = "tausq")
     } else if (x$priors$prior_het_type == "prec") {
       draws$prec <- draws$tau^-2
-      draws <- dplyr::select(draws, -.data$tau)
+      draws <- dplyr::select(draws, -"tau")
       prior_dat$par_base <- dplyr::recode(prior_dat$par_base, tau = "prec")
     }
   }
@@ -537,8 +537,8 @@ plot_integration_error <- function(x, ...,
   # Estimate integration error by subtracting final value
   int_dat <- dplyr::left_join(dplyr::filter(int_dat, .data$n_int != max(.data$n_int)),
                               dplyr::filter(int_dat, .data$n_int == max(.data$n_int)) %>%
-                                dplyr::rename(final_value = .data$value) %>%
-                                dplyr::select(-.data$n_int),
+                                dplyr::rename(final_value = "value") %>%
+                                dplyr::select(-"n_int"),
                               by = c("parameter", "study", "treatment", ".draw")) %>%
     dplyr::mutate(diff = .data$value - .data$final_value)
 

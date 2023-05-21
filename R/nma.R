@@ -219,7 +219,7 @@ nma <- function(network,
       if (any(!ns_check$valid)) {
         ns_valid <- dplyr::filter(ns_check, .data$valid) %>%
           dplyr::ungroup() %>%
-          dplyr::select(.data$trt1, .data$trt2)
+          dplyr::select("trt1", "trt2")
 
         ns_invalid <- dplyr::filter(ns_check, !.data$valid) %>%
           dplyr::mutate(comparison = paste(.data$trt1, .data$trt2, sep = " vs. "))
@@ -605,13 +605,13 @@ nma <- function(network,
     }
 
     if (has_agd_arm(network)) {
-      tdat_agd_arm <- dplyr::select(dat_agd_arm, .data$.study, .data$.trt)
+      tdat_agd_arm <- dplyr::select(dat_agd_arm, ".study", ".trt")
     } else {
       tdat_agd_arm <- tibble::tibble()
     }
 
     if (has_agd_contrast(network)) {
-      tdat_agd_contrast_nonbl <- dplyr::select(dat_agd_contrast_nonbl, .data$.study, .data$.trt)
+      tdat_agd_contrast_nonbl <- dplyr::select(dat_agd_contrast_nonbl, ".study", ".trt")
     } else {
       tdat_agd_contrast_nonbl <- tibble::tibble()
     }
@@ -1930,7 +1930,7 @@ make_nma_model_matrix <- function(nma_formula,
                                             paste0(".study", single_study_label))
     dat_all <- dat_all %>%
       dplyr::mutate(.study = .data$.study_temp) %>%
-      dplyr::select(-.data$.study_temp)
+      dplyr::select(-".study_temp")
 
     # Drop intercept column from design matrix
     X_all <- X_all[, -1, drop = FALSE]

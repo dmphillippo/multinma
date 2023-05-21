@@ -111,13 +111,13 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
       cat("Covariate values:\n")
       info %>%
         dplyr::filter(.data$.study == this_study) %>%
-        dplyr::select(-.data$.study) %>%
+        dplyr::select(-".study") %>%
         dplyr::mutate_if(is.numeric, round, digits = digits) %>%
         as.data.frame() %>%
         print(..., row.names = FALSE)
       cat("\n")
     }
-    s %>% dplyr::select(-.data$.study) %>% print(...)
+    s %>% dplyr::select(-".study") %>% print(...)
     cat("\n")
   }
 
@@ -524,7 +524,7 @@ as.array.nma_rank_probs <- function(x, ...) {
 #' @export
 as.matrix.nma_rank_probs <- function(x, ...){
   df_summary <- tibble::as_tibble(x, ...)
-  if (rlang::has_name(df_summary, ".study")) df_summary <- dplyr::select(df_summary, -.data$.study)
+  if (rlang::has_name(df_summary, ".study")) df_summary <- dplyr::select(df_summary, -".study")
   m <- as.matrix(tibble::column_to_rownames(df_summary, "parameter"))
   return(m)
 }

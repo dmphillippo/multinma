@@ -235,7 +235,7 @@ plot.nma_dic <- function(x, y, ...,
                                        .data$.label, .data$Type) %>%
         dplyr::summarise(resdev_y = mean(.data$resdev))
 
-      resdev_post <- dplyr::rename(resdev_post, resdev_x = .data$resdev)
+      resdev_post <- dplyr::rename(resdev_post, resdev_x = "resdev")
 
       xy_resdev_post <- dplyr::left_join(resdev_post, y_resdev_post,
                                          by = c("parameter", ".label", "Type")) %>%
@@ -274,9 +274,9 @@ plot.nma_dic <- function(x, y, ...,
                                                      .point = mean,
                                                      !!! int_dots,
                                                      .homonyms = "last")) %>%
-        dplyr::rename(resdev_x = .data$resdev,
-                      x_lower = .data$.lower,
-                      x_upper = .data$.upper)
+        dplyr::rename(resdev_x = "resdev",
+                      x_lower = ".lower",
+                      x_upper = ".upper")
 
       y_resdev_post <- dplyr::group_by(y_resdev_post, .data$parameter, .data$.label, .data$Type)
       y_resdev_post <- do.call(ggdist::point_interval,
@@ -286,9 +286,9 @@ plot.nma_dic <- function(x, y, ...,
                                                        .point = mean,
                                                        !!! int_dots,
                                                        .homonyms = "last")) %>%
-        dplyr::rename(resdev_y = .data$resdev,
-                      y_lower = .data$.lower,
-                      y_upper = .data$.upper)
+        dplyr::rename(resdev_y = "resdev",
+                      y_lower = ".lower",
+                      y_upper = ".upper")
 
       xy_resdev_post <- dplyr::left_join(resdev_post, y_resdev_post,
                                          by = c("parameter", ".label", "Type",

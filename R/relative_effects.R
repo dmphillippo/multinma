@@ -269,7 +269,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
 
     # Expand rows for every treatment
     all_trts <- tidyr::expand_grid(.study = dat_studies$.study, .trt = x$network$treatments[-1])
-    if (rlang::has_name(dat_studies, ".trt")) dat_studies <- dplyr::select(dat_studies, -.data$.trt)
+    if (rlang::has_name(dat_studies, ".trt")) dat_studies <- dplyr::select(dat_studies, -".trt")
     dat_studies <- dplyr::left_join(all_trts, dat_studies, by = ".study")
 
     # Add in .trtclass if defined in network

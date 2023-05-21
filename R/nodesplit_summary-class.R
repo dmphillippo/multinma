@@ -238,7 +238,7 @@ plot.nodesplit_summary <- function(x, ...,
   }
 
   draws <- dplyr::mutate(draws, comparison = paste0(.data$trt2, " vs. ", .data$trt1)) %>%
-    dplyr::select(.data$comparison, .data$summary) %>%
+    dplyr::select("comparison", "summary") %>%
     tidyr::unnest(cols = "summary") %>%
     dplyr::mutate(parameter = stringr::str_remove(.data$parameter, "\\[.*\\]"))
 
