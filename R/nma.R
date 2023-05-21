@@ -2075,7 +2075,7 @@ check_regression_data <- function(formula,
 
   # Check that required variables are present in each data set, and non-missing
   if (.has_ipd) {
-    rlang::with_handlers(
+    withCallingHandlers(
       X_ipd_frame <- model.frame(formula, dat_ipd, na.action = NULL),
       error = ~abort(paste0(if (newdata) "Failed to construct design matrix for `newdata`.\n" else "Failed to construct design matrix for IPD.\n", .)))
 
@@ -2085,7 +2085,7 @@ check_regression_data <- function(formula,
   }
 
   if (.has_agd_arm) {
-    rlang::with_handlers(
+    withCallingHandlers(
       X_agd_arm_frame <- model.frame(formula, dat_agd_arm, na.action = NULL),
       error = ~abort(paste0(if (newdata) "Failed to construct design matrix for `newdata`.\n" else "Failed to construct design matrix for AgD (arm-based).\n", .)))
 
@@ -2095,7 +2095,7 @@ check_regression_data <- function(formula,
   }
 
   if (.has_agd_contrast) {
-    rlang::with_handlers(
+    withCallingHandlers(
       X_agd_contrast_frame <- model.frame(formula, dat_agd_contrast, na.action = NULL),
       error = ~abort(paste0(if (newdata) "Failed to construct design matrix for `newdata`.\n" else "Failed to construct design matrix for AgD (contrast-based).\n", .)))
 

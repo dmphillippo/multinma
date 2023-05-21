@@ -389,20 +389,20 @@ add_integration.nma_data <- function(x, ...,
   }
 
   if (has_agd_arm(network)) {
-    out$agd_arm <- rlang::with_handlers(
+    out$agd_arm <- withCallingHandlers(
       add_integration.data.frame(network$agd_arm, ...,
                                  cor = cor, cor_adjust = cor_adjust, n_int = n_int, int_args = int_args),
-      int_col_present = rlang::calling(int_col_present),
+      int_col_present = int_col_present,
       invalid_int_generated = invalid_int_generated)
 
     copula_cor <- attr(out$agd_arm, "copula_cor")
   }
 
   if (has_agd_contrast(network)) {
-    out$agd_contrast <- rlang::with_handlers(
+    out$agd_contrast <- withCallingHandlers(
       add_integration.data.frame(network$agd_contrast, ...,
                                  cor = cor, cor_adjust = cor_adjust, n_int = n_int, int_args = int_args),
-      int_col_present = rlang::calling(int_col_present),
+      int_col_present = int_col_present,
       invalid_int_generated = invalid_int_generated)
 
     copula_cor <- attr(out$agd_contrast, "copula_cor")
@@ -464,8 +464,8 @@ unnest_integration <- function(data) {
 #' @noRd
 .unnest_integration <- function(data) {
   ignore <- function(wrn) rlang::cnd_muffle(wrn)
-  out <- rlang::with_handlers(unnest_integration(data),
-                              unnest_name_conflict = rlang::calling(ignore))
+  out <- withCallingHandlers(unnest_integration(data),
+                              unnest_name_conflict = ignore)
   return(out)
 }
 
