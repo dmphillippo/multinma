@@ -81,13 +81,13 @@ plot(smk_dic_RE)
 # Further customisation is possible using ggplot commands
 # For example, highlighting data points with residual deviance above a certain threshold
 plot(smk_dic_RE) +
-  ggplot2::aes(colour = ifelse(..y.. > 1.5, "darkorange", "black")) +
+  ggplot2::aes(colour = ggplot2::after_stat(ifelse(y > 1.5, "darkorange", "black"))) +
   ggplot2::scale_colour_identity()
 
 # Or by posterior probability, for example here a central probability of 0.6
 # corresponds to a lower tail probability of (1 - 0.6)/2 = 0.2
 plot(smk_dic_RE, .width = c(0.6, 0.95)) +
-  ggplot2::aes(colour = ifelse(..ymin.. > 1, "darkorange", "black")) +
+  ggplot2::aes(colour = ggplot2::after_stat(ifelse(ymin > 1, "darkorange", "black"))) +
   ggplot2::scale_colour_identity()
 
 # Check for inconsistency using UME model

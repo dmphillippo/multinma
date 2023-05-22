@@ -225,20 +225,12 @@ plot.nodesplit_summary <- function(x, ...,
   draws <- tibble::as_tibble(x, nest = TRUE)
   draws$summary <- purrr::map(draws$summary, ~tibble::as_tibble(as.matrix(.)))
 
-  if (packageVersion("tidyr") >= "1.0.0") {
-    draws$summary <- purrr::map(draws$summary,
-                                ~tidyr::pivot_longer(., cols = dplyr::everything(),
-                                   names_to = "parameter", values_to = "value"))
-  } else {
-    draws$summary <- purrr::map(draws$summary,
-                                ~tidyr::gather(.,
-                                   key = "parameter",
-                                   value = "value",
-                                   dplyr::everything()))
-  }
+  draws$summary <- purrr::map(draws$summary,
+                              ~tidyr::pivot_longer(., cols = dplyr::everything(),
+                                 names_to = "parameter", values_to = "value"))
 
   draws <- dplyr::mutate(draws, comparison = paste0(.data$trt2, " vs. ", .data$trt1)) %>%
-    dplyr::select(.data$comparison, .data$summary) %>%
+    dplyr::select("comparison", "summary") %>%
     tidyr::unnest(cols = "summary") %>%
     dplyr::mutate(parameter = stringr::str_remove(.data$parameter, "\\[.*\\]"))
 

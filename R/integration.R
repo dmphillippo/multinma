@@ -346,7 +346,7 @@ add_integration.nma_data <- function(x, ...,
 
 
     # Check for any missing covariates
-    if (!all(complete.cases(dplyr::select(network$ipd, !! x_names)))) {
+    if (!all(complete.cases(dplyr::select(network$ipd, dplyr::all_of(x_names))))) {
       warn("Missing values found for some covariates in IPD. Calculating correlations using complete cases.")
     }
 
@@ -356,7 +356,7 @@ add_integration.nma_data <- function(x, ...,
       dplyr::group_by(.data$.study) %>%
       dplyr::group_modify(~tibble::tibble(
         w = nrow(.) - 3,
-        r = list(cor(dplyr::select(., !! x_names),
+        r = list(cor(dplyr::select(., dplyr::all_of(x_names)),
                      method = if (cor_adjust == "legacy") "spearman" else cor_adjust,
                      use = "complete.obs"))
         )) %>%
@@ -389,20 +389,20 @@ add_integration.nma_data <- function(x, ...,
   }
 
   if (has_agd_arm(network)) {
-    out$agd_arm <- rlang::with_handlers(
+    out$agd_arm <- withCallingHandlers(
       add_integration.data.frame(network$agd_arm, ...,
                                  cor = cor, cor_adjust = cor_adjust, n_int = n_int, int_args = int_args),
-      int_col_present = rlang::calling(int_col_present),
+      int_col_present = int_col_present,
       invalid_int_generated = invalid_int_generated)
 
     copula_cor <- attr(out$agd_arm, "copula_cor")
   }
 
   if (has_agd_contrast(network)) {
-    out$agd_contrast <- rlang::with_handlers(
+    out$agd_contrast <- withCallingHandlers(
       add_integration.data.frame(network$agd_contrast, ...,
                                  cor = cor, cor_adjust = cor_adjust, n_int = n_int, int_args = int_args),
-      int_col_present = rlang::calling(int_col_present),
+      int_col_present = int_col_present,
       invalid_int_generated = invalid_int_generated)
 
     copula_cor <- attr(out$agd_contrast, "copula_cor")
@@ -450,11 +450,7 @@ unnest_integration <- function(data) {
   out <- data %>%
     dplyr::select(-dplyr::one_of(x_names[name_conflicts])) %>%
     dplyr::rename_at(x_int_names, ~stringr::str_remove(., "^\\.int_")) %>%
-    {if (getNamespaceVersion("tidyr") < "1.0.0") {
-      tidyr::unnest(., !!! rlang::syms(x_names))
-    } else {
-      tidyr::unnest(., x_names)
-    }}
+    tidyr::unnest(dplyr::all_of(x_names))
 
   return(out)
 }
@@ -464,8 +460,8 @@ unnest_integration <- function(data) {
 #' @noRd
 .unnest_integration <- function(data) {
   ignore <- function(wrn) rlang::cnd_muffle(wrn)
-  out <- rlang::with_handlers(unnest_integration(data),
-                              unnest_name_conflict = rlang::calling(ignore))
+  out <- withCallingHandlers(unnest_integration(data),
+                              unnest_name_conflict = ignore)
   return(out)
 }
 

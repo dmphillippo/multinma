@@ -457,11 +457,21 @@ predict.stan_nma <- function(object, ...,
         preddat <- dplyr::bind_rows(dat_ipd, dat_agd_arm)
       }
 
-      preddat <- preddat %>%
-        dplyr::rename(.trt_old = .data$.trt) %>%
-        dplyr::left_join(tidyr::expand(., .study = .data$.study,
-                                          .trt = .data$.trt_old),
-                         by = ".study")
+      # Produce predictions on every treatment for each observed arm/individual
+      if (packageVersion("dplyr") >= "1.1.1") {
+        preddat <- preddat %>%
+          dplyr::rename(.trt_old = ".trt") %>%
+          dplyr::left_join(tidyr::expand(., .study = .data$.study,
+                                            .trt = .data$.trt_old),
+                           by = ".study",
+                           relationship = "many-to-many")
+      } else {
+        preddat <- preddat %>%
+          dplyr::rename(.trt_old = ".trt") %>%
+          dplyr::left_join(tidyr::expand(., .study = .data$.study,
+                                         .trt = .data$.trt_old),
+                           by = ".study")
+      }
 
       # If producing aggregate-level predictions, output these in factor order
       # Individual-level predictions will be in the order of the input data
@@ -528,12 +538,21 @@ predict.stan_nma <- function(object, ...,
       preddat$.sample_size <- 1
 
       # Make design matrix of all studies and all treatments
-      if (rlang::has_name(preddat, ".trt")) preddat <- dplyr::select(preddat, -.data$.trt)
-      preddat <- dplyr::left_join(preddat,
-                                  tidyr::expand(preddat,
-                                                .study = .data$.study,
-                                                .trt = object$network$treatments),
-                                  by = ".study")
+      if (rlang::has_name(preddat, ".trt")) preddat <- dplyr::select(preddat, -".trt")
+      if (packageVersion("dplyr") >= "1.1.1") {
+        preddat <- dplyr::left_join(preddat,
+                                    tidyr::expand(preddat,
+                                                  .study = .data$.study,
+                                                  .trt = object$network$treatments),
+                                    by = ".study",
+                                    relationship = "many-to-many")
+      } else {
+        preddat <- dplyr::left_join(preddat,
+                                    tidyr::expand(preddat,
+                                                  .study = .data$.study,
+                                                  .trt = object$network$treatments),
+                                    by = ".study")
+      }
 
       # Add in .trtclass if defined in network
       if (!is.null(object$network$classes)) {

@@ -1,5 +1,8 @@
 # multinma 0.5.0.9000
 
+* Fix: Now compatible with latest StanHeaders v2.26.25 (fixes #23)
+* Fix: Dealt with various tidyverse deprecations
+
 # multinma 0.5.0
 
 * Feature: Treatment labels in network plots can now be nudged away from the
