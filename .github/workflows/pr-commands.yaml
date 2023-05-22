@@ -4,7 +4,7 @@ on:
   issue_comment:
     types: [created]
 
-name: PR Commands
+name: PR commands
 
 jobs:
   document:
@@ -33,7 +33,7 @@ jobs:
         run: roxygen2::roxygenise()
         shell: Rscript {0}
 
-      - name: commit
+      - name: Commit
         run: |
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
@@ -57,6 +57,8 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - uses: r-lib/actions/setup-pandoc@v2
+
       - uses: r-lib/actions/setup-r@v2
 
       - uses: r-lib/actions/setup-r-dependencies@v2
@@ -66,7 +68,7 @@ jobs:
       - name: Build pre-compiled vignettes
         run: Rscript ./vignettes/precompile.R
 
-      - name: commit
+      - name: Commit
         run: |
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
