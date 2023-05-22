@@ -539,11 +539,20 @@ predict.stan_nma <- function(object, ...,
 
       # Make design matrix of all studies and all treatments
       if (rlang::has_name(preddat, ".trt")) preddat <- dplyr::select(preddat, -".trt")
-      preddat <- dplyr::left_join(preddat,
-                                  tidyr::expand(preddat,
-                                                .study = .data$.study,
-                                                .trt = object$network$treatments),
-                                  by = ".study")
+      if (packageVersion("dplyr") >= "1.1.1") {
+        preddat <- dplyr::left_join(preddat,
+                                    tidyr::expand(preddat,
+                                                  .study = .data$.study,
+                                                  .trt = object$network$treatments),
+                                    by = ".study",
+                                    relationship = "many-to-many")
+      } else {
+        preddat <- dplyr::left_join(preddat,
+                                    tidyr::expand(preddat,
+                                                  .study = .data$.study,
+                                                  .trt = object$network$treatments),
+                                    by = ".study")
+      }
 
       # Add in .trtclass if defined in network
       if (!is.null(object$network$classes)) {
