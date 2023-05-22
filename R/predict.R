@@ -457,11 +457,21 @@ predict.stan_nma <- function(object, ...,
         preddat <- dplyr::bind_rows(dat_ipd, dat_agd_arm)
       }
 
-      preddat <- preddat %>%
-        dplyr::rename(.trt_old = ".trt") %>%
-        dplyr::left_join(tidyr::expand(., .study = .data$.study,
-                                          .trt = .data$.trt_old),
-                         by = ".study")
+      # Produce predictions on every treatment for each observed arm/individual
+      if (packageVersion("dplyr") >= "1.1.1") {
+        preddat <- preddat %>%
+          dplyr::rename(.trt_old = ".trt") %>%
+          dplyr::left_join(tidyr::expand(., .study = .data$.study,
+                                            .trt = .data$.trt_old),
+                           by = ".study",
+                           relationship = "many-to-many")
+      } else {
+        preddat <- preddat %>%
+          dplyr::rename(.trt_old = ".trt") %>%
+          dplyr::left_join(tidyr::expand(., .study = .data$.study,
+                                         .trt = .data$.trt_old),
+                           by = ".study")
+      }
 
       # If producing aggregate-level predictions, output these in factor order
       # Individual-level predictions will be in the order of the input data
