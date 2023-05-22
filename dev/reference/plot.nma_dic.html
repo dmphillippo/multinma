@@ -174,12 +174,12 @@ National Institute for Health and Care Excellence.
 <span class="r-in"><span><span class="co"># Compare DIC of FE and RE models</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="va">smk_dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="dic.html">dic</a></span><span class="op">(</span><span class="va">smk_fit_FE</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 266.8<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 26.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 293.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 26.7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 293.5</span>
 <span class="r-in"><span><span class="op">(</span><span class="va">smk_dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="dic.html">dic</a></span><span class="op">(</span><span class="va">smk_fit_RE</span><span class="op">)</span><span class="op">)</span>   <span class="co"># substantially better fit</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 43.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 97.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54.3<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.4</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot residual deviance contributions under RE model</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_dic_RE</span><span class="op">)</span></span></span>
@@ -188,18 +188,14 @@ National Institute for Health and Care Excellence.
 <span class="r-in"><span><span class="co"># Further customisation is possible using ggplot commands</span></span></span>
 <span class="r-in"><span><span class="co"># For example, highlighting data points with residual deviance above a certain threshold</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_dic_RE</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">..y..</span> <span class="op">&gt;</span> <span class="fl">1.5</span>, <span class="st">"darkorange"</span>, <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html" class="external-link">after_stat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">y</span> <span class="op">&gt;</span> <span class="fl">1.5</span>, <span class="st">"darkorange"</span>, <span class="st">"black"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_identity.html" class="external-link">scale_colour_identity</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>The dot-dot notation (`..y..`) was deprecated in ggplot2 3.4.0.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use `after_stat(y)` instead.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">multinma</span> package.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>   Please report the issue at <span style="color: #0000BB; font-style: italic;">&lt;https://github.com/dmphillippo/multinma/issues&gt;</span>.</span>
 <span class="r-plt img"><img src="plot.nma_dic-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Or by posterior probability, for example here a central probability of 0.6</span></span></span>
 <span class="r-in"><span><span class="co"># corresponds to a lower tail probability of (1 - 0.6)/2 = 0.2</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_dic_RE</span>, .width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.6</span>, <span class="fl">0.95</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">..ymin..</span> <span class="op">&gt;</span> <span class="fl">1</span>, <span class="st">"darkorange"</span>, <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html" class="external-link">after_stat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">ymin</span> <span class="op">&gt;</span> <span class="fl">1</span>, <span class="st">"darkorange"</span>, <span class="st">"black"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_identity.html" class="external-link">scale_colour_identity</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot.nma_dic-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
@@ -212,13 +208,13 @@ National Institute for Health and Care Excellence.
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Compare DIC</span></span></span>
 <span class="r-in"><span><span class="va">smk_dic_RE</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 43.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 97.8</span>
-<span class="r-in"><span><span class="op">(</span><span class="va">smk_dic_RE_UME</span> <span class="op">&lt;-</span> <span class="fu"><a href="dic.html">dic</a></span><span class="op">(</span><span class="va">smk_fit_RE_UME</span><span class="op">)</span><span class="op">)</span>  <span class="co"># no difference in fit</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.6<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54.3<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.4</span>
+<span class="r-in"><span><span class="op">(</span><span class="va">smk_dic_RE_UME</span> <span class="op">&lt;-</span> <span class="fu"><a href="dic.html">dic</a></span><span class="op">(</span><span class="va">smk_fit_RE_UME</span><span class="op">)</span><span class="op">)</span>  <span class="co"># no difference in fit</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.7<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 45</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.7</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Compare residual deviance contributions with a "dev-dev" plot</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_dic_RE</span>, <span class="va">smk_dic_RE_UME</span><span class="op">)</span></span></span>

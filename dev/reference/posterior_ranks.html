@@ -180,10 +180,10 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-in"><span><span class="va">smk_rank_RE</span> <span class="op">&lt;-</span> <span class="fu">posterior_ranks</span><span class="op">(</span><span class="va">smk_fit_RE</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">smk_rank_RE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                              mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[No intervention]        3.89 0.32    3   4   4   4     4     2259       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[Group counselling]      1.38 0.63    1   1   1   2     3     2713     3002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[Individual counselling] 1.92 0.63    1   2   2   2     3     2655       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[Self-help]              2.81 0.70    1   3   3   3     4     2161       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[No intervention]        3.89 0.32    3   4   4   4     4     2251       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[Group counselling]      1.37 0.62    1   1   1   2     3     2944     2716</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[Individual counselling] 1.93 0.63    1   2   2   2     3     2556     3041</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[Self-help]              2.81 0.69    1   3   3   3     4     2308       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                              Rhat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[No intervention]           1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[Group counselling]         1</span>
@@ -197,9 +197,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-in"><span><span class="va">smk_rankprob_RE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[No intervention]             0.00      0.00      0.11      0.89</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]           0.70      0.23      0.07      0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]      0.24      0.59      0.17      0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                   0.06      0.17      0.66      0.10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]           0.70      0.22      0.07      0.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]      0.24      0.60      0.16      0.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                   0.06      0.18      0.66      0.11</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_rankprob_RE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="posterior_ranks-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
@@ -210,8 +210,8 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[No intervention]             0.00      0.00      0.11         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]           0.70      0.93      1.00         1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]      0.24      0.83      1.00         1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                   0.06      0.23      0.90         1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]      0.24      0.84      1.00         1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                   0.06      0.23      0.89         1</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_cumrankprob_RE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="posterior_ranks-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
@@ -244,9 +244,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[FIXTURE: PBO]     1.00 0.00    1   1   1   1     1       NA       NA   NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[FIXTURE: ETN]     2.00 0.00    2   2   2   2     2       NA       NA   NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[FIXTURE: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA   NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[FIXTURE: IXE_Q4W] 4.77 0.42    4   5   5   5     5     3603       NA    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[FIXTURE: SEC_150] 3.00 0.04    3   3   3   3     3     4026     4026    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[FIXTURE: SEC_300] 4.23 0.42    4   4   4   4     5     3625       NA    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[FIXTURE: IXE_Q4W] 4.76 0.43    4   5   5   5     5     4419       NA    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[FIXTURE: SEC_150] 3.00 0.05    3   3   3   3     3     4036     4036    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[FIXTURE: SEC_300] 4.24 0.43    4   4   4   4     5     4579       NA    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-1</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -258,9 +258,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-1: PBO]     1.00 0.00    1   1   1   1     1       NA       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-1: ETN]     2.00 0.00    2   2   2   2     2       NA       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-1: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-1: IXE_Q4W] 4.77 0.42    4   5   5   5     5     3603       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-1: SEC_150] 3.00 0.04    3   3   3   3     3     4026     4026</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-1: SEC_300] 4.23 0.42    4   4   4   4     5     3625       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-1: IXE_Q4W] 4.76 0.43    4   5   5   5     5     4419       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-1: SEC_150] 3.00 0.05    3   3   3   3     3     4036     4036</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-1: SEC_300] 4.24 0.43    4   4   4   4     5     4579       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                          Rhat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-1: PBO]       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-1: ETN]       NA</span>
@@ -279,9 +279,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-2: PBO]     1.00 0.00    1   1   1   1     1       NA       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-2: ETN]     2.00 0.00    2   2   2   2     2       NA       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-2: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-2: IXE_Q4W] 4.77 0.42    4   5   5   5     5     3603       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-2: SEC_150] 3.00 0.04    3   3   3   3     3     4026     4026</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-2: SEC_300] 4.23 0.42    4   4   4   4     5     3625       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-2: IXE_Q4W] 4.76 0.43    4   5   5   5     5     4419       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-2: SEC_150] 3.00 0.05    3   3   3   3     3     4036     4036</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-2: SEC_300] 4.24 0.43    4   4   4   4     5     4579       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                          Rhat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-2: PBO]       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-2: ETN]       NA</span>
@@ -300,9 +300,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-3: PBO]     1.00 0.00    1   1   1   1     1       NA       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-3: ETN]     2.00 0.00    2   2   2   2     2       NA       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-3: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-3: IXE_Q4W] 4.77 0.42    4   5   5   5     5     3603       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-3: SEC_150] 3.00 0.04    3   3   3   3     3     4026     4026</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-3: SEC_300] 4.23 0.42    4   4   4   4     5     3625       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-3: IXE_Q4W] 4.76 0.43    4   5   5   5     5     4419       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-3: SEC_150] 3.00 0.05    3   3   3   3     3     4036     4036</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-3: SEC_300] 4.24 0.43    4   4   4   4     5     4579       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                          Rhat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-3: PBO]       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[UNCOVER-3: ETN]       NA</span>
@@ -327,9 +327,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: PBO]             1         0         0      0.00      0.00         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: ETN]             0         1         0      0.00      0.00         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: IXE_Q2W]         0         0         0      0.00      0.00         1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: IXE_Q4W]         0         0         0      0.23      0.77         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: IXE_Q4W]         0         0         0      0.24      0.76         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: SEC_150]         0         0         1      0.00      0.00         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: SEC_300]         0         0         0      0.77      0.23         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: SEC_300]         0         0         0      0.76      0.24         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-1</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -341,9 +341,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: PBO]             1         0         0      0.00      0.00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: ETN]             0         1         0      0.00      0.00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: IXE_Q2W]         0         0         0      0.00      0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: IXE_Q4W]         0         0         0      0.23      0.77</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: IXE_Q4W]         0         0         0      0.24      0.76</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: SEC_150]         0         0         1      0.00      0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: SEC_300]         0         0         0      0.77      0.23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: SEC_300]         0         0         0      0.76      0.24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       p_rank[6]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: PBO]             0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: ETN]             0</span>
@@ -362,9 +362,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: PBO]             1         0         0      0.00      0.00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: ETN]             0         1         0      0.00      0.00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: IXE_Q2W]         0         0         0      0.00      0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: IXE_Q4W]         0         0         0      0.23      0.77</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: IXE_Q4W]         0         0         0      0.24      0.76</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: SEC_150]         0         0         1      0.00      0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: SEC_300]         0         0         0      0.77      0.23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: SEC_300]         0         0         0      0.76      0.24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       p_rank[6]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: PBO]             0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: ETN]             0</span>
@@ -383,9 +383,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: PBO]             1         0         0      0.00      0.00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: ETN]             0         1         0      0.00      0.00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: IXE_Q2W]         0         0         0      0.00      0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: IXE_Q4W]         0         0         0      0.23      0.77</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: IXE_Q4W]         0         0         0      0.24      0.76</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: SEC_150]         0         0         1      0.00      0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: SEC_300]         0         0         0      0.77      0.23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: SEC_300]         0         0         0      0.76      0.24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       p_rank[6]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: PBO]             0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: ETN]             0</span>
@@ -410,9 +410,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: PBO]             1         1         1      1.00         1         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: ETN]             0         1         1      1.00         1         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: IXE_Q2W]         0         0         0      0.00         0         1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: IXE_Q4W]         0         0         0      0.23         1         1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: IXE_Q4W]         0         0         0      0.24         1         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: SEC_150]         0         0         1      1.00         1         1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: SEC_300]         0         0         0      0.77         1         1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[FIXTURE: SEC_300]         0         0         0      0.76         1         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-1</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -424,9 +424,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: PBO]             1         1         1      1.00         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: ETN]             0         1         1      1.00         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: IXE_Q2W]         0         0         0      0.00         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: IXE_Q4W]         0         0         0      0.23         1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: IXE_Q4W]         0         0         0      0.24         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: SEC_150]         0         0         1      1.00         1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: SEC_300]         0         0         0      0.77         1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: SEC_300]         0         0         0      0.76         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       p_rank[6]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: PBO]             1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-1: ETN]             1</span>
@@ -445,9 +445,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: PBO]             1         1         1      1.00         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: ETN]             0         1         1      1.00         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: IXE_Q2W]         0         0         0      0.00         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: IXE_Q4W]         0         0         0      0.23         1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: IXE_Q4W]         0         0         0      0.24         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: SEC_150]         0         0         1      1.00         1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: SEC_300]         0         0         0      0.77         1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: SEC_300]         0         0         0      0.76         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       p_rank[6]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: PBO]             1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-2: ETN]             1</span>
@@ -466,9 +466,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: PBO]             1         1         1      1.00         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: ETN]             0         1         1      1.00         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: IXE_Q2W]         0         0         0      0.00         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: IXE_Q4W]         0         0         0      0.23         1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: IXE_Q4W]         0         0         0      0.24         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: SEC_150]         0         0         1      1.00         1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: SEC_300]         0         0         0      0.77         1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: SEC_300]         0         0         0      0.76         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       p_rank[6]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: PBO]             1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[UNCOVER-3: ETN]             1</span>
@@ -501,9 +501,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[New 1: PBO]     1.00 0.00    1   1   1   1     1       NA       NA   NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[New 1: ETN]     2.00 0.00    2   2   2   2     2       NA       NA   NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rank[New 1: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA   NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[New 1: IXE_Q4W] 4.77 0.42    4   5   5   5     5     3603       NA    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[New 1: SEC_150] 3.00 0.04    3   3   3   3     3     4026     4026    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank[New 1: SEC_300] 4.23 0.42    4   4   4   4     5     3625       NA    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[New 1: IXE_Q4W] 4.76 0.43    4   5   5   5     5     4419       NA    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[New 1: SEC_150] 3.00 0.05    3   3   3   3     3     4036     4036    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank[New 1: SEC_300] 4.24 0.43    4   4   4   4     5     4579       NA    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Rank probabilities</span></span></span>
@@ -518,9 +518,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: PBO]             1         0         0      0.00      0.00         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: ETN]             0         1         0      0.00      0.00         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: IXE_Q2W]         0         0         0      0.00      0.00         1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: IXE_Q4W]         0         0         0      0.23      0.77         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: IXE_Q4W]         0         0         0      0.24      0.76         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: SEC_150]         0         0         1      0.00      0.00         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: SEC_300]         0         0         0      0.77      0.23         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: SEC_300]         0         0         0      0.76      0.24         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Cumulative rank probabilities</span></span></span>
@@ -536,9 +536,9 @@ aim to increase the rate of a positive outcome then <code>lower_better = FALSE</
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: PBO]             1         1         1      1.00         1         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: ETN]             0         1         1      1.00         1         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: IXE_Q2W]         0         0         0      0.00         0         1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: IXE_Q4W]         0         0         0      0.23         1         1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: IXE_Q4W]         0         0         0      0.24         1         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: SEC_150]         0         0         1      1.00         1         1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: SEC_300]         0         0         0      0.77         1         1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[New 1: SEC_300]         0         0         0      0.76         1         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
