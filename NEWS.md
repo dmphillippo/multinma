@@ -2,6 +2,7 @@
 
 * Fix: Now compatible with latest StanHeaders v2.26.25 (fixes #23)
 * Fix: Dealt with various tidyverse deprecations
+* Fix: Updated TSD URLs again (thanks to @ndunnewind)
 
 # multinma 0.5.0
 
