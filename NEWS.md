@@ -1,4 +1,4 @@
-# multinma 0.5.0.9000
+# multinma 0.5.1
 
 * Fix: Now compatible with latest StanHeaders v2.26.25 (fixes #23)
 * Fix: Dealt with various tidyverse deprecations
