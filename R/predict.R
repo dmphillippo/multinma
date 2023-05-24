@@ -364,7 +364,7 @@ predict.stan_nma <- function(object, ...,
             # Time horizon is earliest last follow-up time amongst the studies
             last_times <- surv_all %>%
               dplyr::group_by(.data$.study) %>%
-              dplyr::summarise(time = max(time))
+              dplyr::summarise(time = max(.data$time))
 
             times <- min(last_times$time)
             preddat$.time <- times
@@ -695,7 +695,7 @@ predict.stan_nma <- function(object, ...,
               # Time horizon is earliest last follow-up time amongst the studies
               last_times <- surv_all %>%
                 dplyr::group_by(.data$.study) %>%
-                dplyr::summarise(time = max(time))
+                dplyr::summarise(time = max(.data$time))
 
               times <- min(last_times$time)
               preddat$.time <- times
@@ -738,7 +738,7 @@ predict.stan_nma <- function(object, ...,
             # Time horizon is earliest last follow-up time amongst the studies
             last_times <- surv_all %>%
               dplyr::group_by(.data$.study) %>%
-              dplyr::summarise(time = max(time))
+              dplyr::summarise(time = max(.data$time))
 
             times <- min(last_times$time)
           } else {
@@ -1720,6 +1720,9 @@ make_surv_predict <- function(eta, aux, times, likelihood,
 #' Return prediction functions for survival likelihoods
 #' @noRd
 surv_predfun <- function(likelihood, type) {
+  # Not used: avoid R CMD CHECK global variables warning
+  eta <- aux <- basis <- NULL
+
   if (likelihood == "exponential") {
     make_predfun(base = "exp", type = type,
                  rate = exp(eta),
