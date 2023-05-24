@@ -693,7 +693,7 @@ set_agd_contrast <- function(data,
   # Make sure rows from each study are next to each other (required for Stan resdev/log_lik code)
   d <- dplyr::mutate(d, .study_inorder = forcats::fct_inorder(.data$.study)) %>%
     dplyr::arrange(.data$.study_inorder) %>%
-    dplyr::select(-.data$.study_inorder)
+    dplyr::select(-".study_inorder")
 
   # Check covariance matrices are positive definite
   agd_Sigma <- make_Sigma(d)

@@ -111,13 +111,13 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
       cat("Covariate values:\n")
       info %>%
         dplyr::filter(.data$.study == this_study) %>%
-        dplyr::select(-.data$.study) %>%
+        dplyr::select(-".study") %>%
         dplyr::mutate_if(is.numeric, round, digits = digits) %>%
         as.data.frame() %>%
         print(..., row.names = FALSE)
       cat("\n")
     }
-    s %>% dplyr::select(-.data$.study) %>% print(...)
+    s %>% dplyr::select(-".study") %>% print(...)
     cat("\n")
   }
 
@@ -185,7 +185,7 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #'
 #' # Further customisation is possible with ggplot commands
 #' plot(smk_releff_RE, ref_line = 0, stat = "halfeye", slab_alpha = 0.6) +
-#'   ggplot2::aes(slab_fill = ifelse(..x.. < 0, "darkred", "grey60"))
+#'   ggplot2::aes(slab_fill = ggplot2::after_stat(ifelse(x < 0, "darkred", "grey60")))
 #'
 #' # Produce posterior ranks
 #' smk_rank_RE <- posterior_ranks(smk_fit_RE, lower_better = FALSE)
@@ -247,15 +247,8 @@ plot.nma_summary <- function(x, ...,
   # Get draws
   draws <- tibble::as_tibble(as.matrix(x))
 
-  if (packageVersion("tidyr") >= "1.0.0") {
-    draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
-                                 names_to = "parameter", values_to = "value")
-  } else {
-    draws <- tidyr::gather(draws,
-                           key = "parameter",
-                           value = "value",
-                           dplyr::everything())
-  }
+  draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
+                               names_to = "parameter", values_to = "value")
 
   if (has_studies <- rlang::has_name(as.data.frame(x), ".study")) {
     draws$Study <- forcats::fct_inorder(factor(
@@ -377,15 +370,8 @@ plot.nma_parameter_summary <- function(x, ...,
   # Get draws
   draws <- tibble::as_tibble(as.matrix(x))
 
-  if (packageVersion("tidyr") >= "1.0.0") {
-    draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
-                                 names_to = "parameter", values_to = "value")
-  } else {
-    draws <- tidyr::gather(draws,
-                           key = "parameter",
-                           value = "value",
-                           dplyr::everything())
-  }
+  draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
+                               names_to = "parameter", values_to = "value")
 
   draws$par_base <- forcats::fct_inorder(factor(
     stringr::str_remove(draws$parameter, "\\[.*\\]")))
@@ -439,18 +425,10 @@ plot.nma_rank_probs <- function(x, ...) {
       stringr::str_extract(dat$parameter, "(?<=\\[).+(?=\\])")))
   }
 
-  if (packageVersion("tidyr") >= "1.1.0") {
-    dat <- tidyr::pivot_longer(dat, cols = dplyr::starts_with("p_rank"),
-                                 names_to = "rank", values_to = "probability",
-                                 names_pattern = "^p_rank\\[([0-9]+)\\]$",
-                                 names_transform = list(rank = as.integer))
-  } else {
-    dat <-
-      tidyr::gather(dat, key = "rank",
-                    value = "probability",
-                    dplyr::starts_with("p_rank")) %>%
-      tidyr::extract(.data$rank, "rank", "^p_rank\\[([0-9]+)\\]$", convert = TRUE)
-  }
+  dat <- tidyr::pivot_longer(dat, cols = dplyr::starts_with("p_rank"),
+                               names_to = "rank", values_to = "probability",
+                               names_pattern = "^p_rank\\[([0-9]+)\\]$",
+                               names_transform = list(rank = as.integer))
 
 
   p <- ggplot2::ggplot(dat,
@@ -524,7 +502,7 @@ as.array.nma_rank_probs <- function(x, ...) {
 #' @export
 as.matrix.nma_rank_probs <- function(x, ...){
   df_summary <- tibble::as_tibble(x, ...)
-  if (rlang::has_name(df_summary, ".study")) df_summary <- dplyr::select(df_summary, -.data$.study)
+  if (rlang::has_name(df_summary, ".study")) df_summary <- dplyr::select(df_summary, -".study")
   m <- as.matrix(tibble::column_to_rownames(df_summary, "parameter"))
   return(m)
 }

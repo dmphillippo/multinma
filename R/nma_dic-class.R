@@ -105,13 +105,13 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' # Further customisation is possible using ggplot commands
 #' # For example, highlighting data points with residual deviance above a certain threshold
 #' plot(smk_dic_RE) +
-#'   ggplot2::aes(colour = ifelse(..y.. > 1.5, "darkorange", "black")) +
+#'   ggplot2::aes(colour = ggplot2::after_stat(ifelse(y > 1.5, "darkorange", "black"))) +
 #'   ggplot2::scale_colour_identity()
 #'
 #' # Or by posterior probability, for example here a central probability of 0.6
 #' # corresponds to a lower tail probability of (1 - 0.6)/2 = 0.2
 #' plot(smk_dic_RE, .width = c(0.6, 0.95)) +
-#'   ggplot2::aes(colour = ifelse(..ymin.. > 1, "darkorange", "black")) +
+#'   ggplot2::aes(colour = ggplot2::after_stat(ifelse(ymin > 1, "darkorange", "black"))) +
 #'   ggplot2::scale_colour_identity()
 #'
 #' # Check for inconsistency using UME model
@@ -156,15 +156,8 @@ plot.nma_dic <- function(x, y, ...,
   data_labels <- stringr::str_extract(colnames(resdev_post), "(?<=\\[).+(?=\\]$)")
   colnames(resdev_post) <- data_labels
 
-  if (packageVersion("tidyr") >= "1.0.0") {
-    resdev_post <- tidyr::pivot_longer(resdev_post, cols = dplyr::everything(),
-                                       names_to = "parameter", values_to = "resdev")
-  } else {
-    resdev_post <- tidyr::gather(resdev_post,
-                                 key = "parameter",
-                                 value = "resdev",
-                                 dplyr::everything())
-  }
+  resdev_post <- tidyr::pivot_longer(resdev_post, cols = dplyr::everything(),
+                                     names_to = "parameter", values_to = "resdev")
 
   resdev_post$.label <- forcats::fct_inorder(factor(resdev_post$parameter))
 
@@ -212,15 +205,8 @@ plot.nma_dic <- function(x, y, ...,
     if (any(data_labels != y_data_labels))
       abort("Data points in `x` and `y` do not match")
 
-    if (packageVersion("tidyr") >= "1.0.0") {
-      y_resdev_post <- tidyr::pivot_longer(y_resdev_post, cols = dplyr::everything(),
-                                           names_to = "parameter", values_to = "resdev")
-    } else {
-      y_resdev_post <- tidyr::gather(y_resdev_post,
-                                     key = "parameter",
-                                     value = "resdev",
-                                     dplyr::everything())
-    }
+    y_resdev_post <- tidyr::pivot_longer(y_resdev_post, cols = dplyr::everything(),
+                                         names_to = "parameter", values_to = "resdev")
 
     y_resdev_post$.label <- forcats::fct_inorder(factor(y_resdev_post$parameter))
 
@@ -235,7 +221,7 @@ plot.nma_dic <- function(x, y, ...,
                                        .data$.label, .data$Type) %>%
         dplyr::summarise(resdev_y = mean(.data$resdev))
 
-      resdev_post <- dplyr::rename(resdev_post, resdev_x = .data$resdev)
+      resdev_post <- dplyr::rename(resdev_post, resdev_x = "resdev")
 
       xy_resdev_post <- dplyr::left_join(resdev_post, y_resdev_post,
                                          by = c("parameter", ".label", "Type")) %>%
@@ -274,9 +260,9 @@ plot.nma_dic <- function(x, y, ...,
                                                      .point = mean,
                                                      !!! int_dots,
                                                      .homonyms = "last")) %>%
-        dplyr::rename(resdev_x = .data$resdev,
-                      x_lower = .data$.lower,
-                      x_upper = .data$.upper)
+        dplyr::rename(resdev_x = "resdev",
+                      x_lower = ".lower",
+                      x_upper = ".upper")
 
       y_resdev_post <- dplyr::group_by(y_resdev_post, .data$parameter, .data$.label, .data$Type)
       y_resdev_post <- do.call(ggdist::point_interval,
@@ -286,9 +272,9 @@ plot.nma_dic <- function(x, y, ...,
                                                        .point = mean,
                                                        !!! int_dots,
                                                        .homonyms = "last")) %>%
-        dplyr::rename(resdev_y = .data$resdev,
-                      y_lower = .data$.lower,
-                      y_upper = .data$.upper)
+        dplyr::rename(resdev_y = "resdev",
+                      y_lower = ".lower",
+                      y_upper = ".upper")
 
       xy_resdev_post <- dplyr::left_join(resdev_post, y_resdev_post,
                                          by = c("parameter", ".label", "Type",

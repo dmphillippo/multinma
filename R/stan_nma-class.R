@@ -293,11 +293,11 @@ plot_prior_posterior <- function(x, ...,
   if ("het" %in% prior) {
     if (x$priors$prior_het_type == "var") {
       draws$tausq <- draws$tau^2
-      draws <- dplyr::select(draws, -.data$tau)
+      draws <- dplyr::select(draws, -"tau")
       prior_dat$par_base <- dplyr::recode(prior_dat$par_base, tau = "tausq")
     } else if (x$priors$prior_het_type == "prec") {
       draws$prec <- draws$tau^-2
-      draws <- dplyr::select(draws, -.data$tau)
+      draws <- dplyr::select(draws, -"tau")
       prior_dat$par_base <- dplyr::recode(prior_dat$par_base, tau = "prec")
     }
   }
@@ -321,15 +321,8 @@ plot_prior_posterior <- function(x, ...,
     prior_dat <- dplyr::mutate(prior_dat, par_base = dplyr::recode(.data$par_base, cc = "diff_cc"))
   }
 
-  if (packageVersion("tidyr") >= "1.0.0") {
-    draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
-                                 names_to = "parameter", values_to = "value")
-  } else {
-    draws <- tidyr::gather(draws,
-                           key = "parameter",
-                           value = "value",
-                           dplyr::everything())
-  }
+  draws <- tidyr::pivot_longer(draws, cols = dplyr::everything(),
+                               names_to = "parameter", values_to = "value")
 
   draws$par_base <- stringr::str_remove(draws$parameter, "\\[.*\\]")
   draws$parameter <- forcats::fct_inorder(factor(draws$parameter))
@@ -377,16 +370,19 @@ plot_prior_posterior <- function(x, ...,
   }
 
   prior_dat <- tibble::add_column(prior_dat, xseq = xseq, dens = dens)
-  if (getNamespaceVersion("tidyr") < "1.0.0") {
-    prior_dat <- tidyr::unnest(prior_dat, .data$xseq, .data$dens)
-  } else {
-    prior_dat <- tidyr::unnest(prior_dat, c(.data$xseq, .data$dens))
-  }
+  prior_dat <- tidyr::unnest(prior_dat, c("xseq", "dens"))
 
   # Repeat rows of prior_dat for each corresponding parameter
-  prior_dat <- dplyr::left_join(prior_dat,
-                                dplyr::distinct(draws, .data$par_base, .data$parameter),
-                                by = "par_base")
+  if (packageVersion("dplyr") >= "1.1.1") {
+    prior_dat <- dplyr::left_join(prior_dat,
+                                  dplyr::distinct(draws, .data$par_base, .data$parameter),
+                                  by = "par_base",
+                                  relationship = "many-to-many")
+  } else {
+    prior_dat <- dplyr::left_join(prior_dat,
+                                  dplyr::distinct(draws, .data$par_base, .data$parameter),
+                                  by = "par_base")
+  }
 
   # Construct plot
   xlim <- c(min(draws$value, 0), max(draws$value))
@@ -402,7 +398,7 @@ plot_prior_posterior <- function(x, ...,
                                                .homonyms = "last"))
 
   g_post <- rlang::call2(ggplot2::geom_histogram,
-                         !!! rlang::dots_list(mapping = ggplot2::aes_(y = ~..density.., x = ~value, group = ~parameter),
+                         !!! rlang::dots_list(mapping = ggplot2::aes(y = ggplot2::after_stat(.data$density), x = .data$value, group = .data$parameter),
                                               data = draws,
                                               binwidth = function(x) diff(range(x)) / nclass.Sturges(x),
                                               boundary = 0,
@@ -514,22 +510,11 @@ plot_integration_error <- function(x, ...,
 
   rx <- "^(theta2?)\\[(.+): (.+), ([0-9]+)\\]$"
 
-  if (packageVersion("tidyr") >= "1.1.0") {
-    int_dat <- tidyr::pivot_longer(int_dat, cols = -dplyr::one_of(".draw"),
-                                   names_pattern = rx,
-                                   names_to = c("parameter", "study", "treatment", "n_int"),
-                                   names_transform = list(n_int = as.integer),
-                                   values_to = "value")
-  } else {
-    int_dat <- tidyr::gather(int_dat,
-                           key = "parameter",
-                           value = "value",
-                           -dplyr::one_of(".draw")) %>%
-      tidyr::extract(.data$parameter,
-                     into = c("parameter", "study", "treatment", "n_int"),
-                     regex = rx,
-                     convert = TRUE)
-  }
+  int_dat <- tidyr::pivot_longer(int_dat, cols = -dplyr::one_of(".draw"),
+                                 names_pattern = rx,
+                                 names_to = c("parameter", "study", "treatment", "n_int"),
+                                 names_transform = list(n_int = as.integer),
+                                 values_to = "value")
 
   int_dat$study <- factor(int_dat$study, levels = levels(x$network$studies))
   int_dat$treatment <- factor(int_dat$treatment, levels = levels(x$network$treatments))
@@ -537,8 +522,8 @@ plot_integration_error <- function(x, ...,
   # Estimate integration error by subtracting final value
   int_dat <- dplyr::left_join(dplyr::filter(int_dat, .data$n_int != max(.data$n_int)),
                               dplyr::filter(int_dat, .data$n_int == max(.data$n_int)) %>%
-                                dplyr::rename(final_value = .data$value) %>%
-                                dplyr::select(-.data$n_int),
+                                dplyr::rename(final_value = "value") %>%
+                                dplyr::select(-"n_int"),
                               by = c("parameter", "study", "treatment", ".draw")) %>%
     dplyr::mutate(diff = .data$value - .data$final_value)
 

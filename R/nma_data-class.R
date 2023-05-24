@@ -77,7 +77,7 @@ print.nma_data <- function(x, ..., n = 10) {
       dplyr::group_by(.data$.study) %>%
       dplyr::summarise("Treatment arms" = glue::glue("{dplyr::n()}: ",
                                               glue::glue_collapse(.data$.trt, sep = " | ", width = 0.8*cwidth))) %>%
-      dplyr::rename(Study = .data$.study) %>%
+      dplyr::rename(Study = ".study") %>%
       as.data.frame()
     n_ipd <- nrow(s_ipd)
   } else {
@@ -90,7 +90,7 @@ print.nma_data <- function(x, ..., n = 10) {
       dplyr::group_by(.data$.study) %>%
       dplyr::summarise("Treatment arms" = glue::glue("{dplyr::n()}: ",
                                               glue::glue_collapse(.data$.trt, sep = " | ", width = 0.8*cwidth))) %>%
-      dplyr::rename(Study = .data$.study) %>%
+      dplyr::rename(Study = ".study") %>%
       as.data.frame()
     n_agd_arm <- nrow(s_agd_arm)
   } else {
@@ -103,7 +103,7 @@ print.nma_data <- function(x, ..., n = 10) {
       dplyr::group_by(.data$.study) %>%
       dplyr::summarise("Treatment arms" = glue::glue("{dplyr::n()}: ",
                                                glue::glue_collapse(.data$.trt, sep = " | ", width = 0.8*cwidth))) %>%
-      dplyr::rename(Study = .data$.study) %>%
+      dplyr::rename(Study = ".study") %>%
       as.data.frame()
     n_agd_contrast <- nrow(s_agd_contrast)
   } else {
@@ -313,8 +313,8 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
   }
 
   e_all <- dplyr::bind_rows(e_ipd, e_agd) %>%
-    dplyr::rename(from = .data$.trt_b, to = .data$.trt) %>%
-    dplyr::select(.data$from, .data$to, dplyr::everything())
+    dplyr::rename(from = ".trt_b", to = ".trt") %>%
+    dplyr::select("from", "to", dplyr::everything())
 
   if (collapse) {
     e_all <- e_all %>%
@@ -353,7 +353,6 @@ as_tbl_graph.nma_data <- function(x, ...) {
 #'
 #' @param trt Vector of treatment codes
 #'
-#' @return
 #' @noRd
 make_contrasts <- function(trt) {
   contrs <- utils::combn(sort(trt), 2)

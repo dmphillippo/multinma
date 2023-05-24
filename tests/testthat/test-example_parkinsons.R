@@ -982,7 +982,7 @@ arm_fit_FE_mlnmr <- nma(arm_net_mlnmr,
                         prior_intercept = normal(scale = 100),
                         prior_trt = normal(scale = 10),
                         prior_reg = normal(scale = 1),
-                        iter = 10000)
+                        iter = 20000, save_warmup = FALSE)
 
 contr_net_mlnmr <- set_agd_contrast(park_dummy_mlnmr, 
                                   study = studyn,
@@ -997,7 +997,7 @@ contr_fit_FE_mlnmr <- nma(contr_net_mlnmr,
                           regression = ~x1:.trt,
                           prior_trt = normal(scale = 100),
                           prior_reg = normal(scale = 1),
-                          iter = 10000)
+                          iter = 20000, save_warmup = FALSE)
 
 mix_net_mlnmr <- combine_network(set_agd_arm(park_dummy_mlnmr[studies %in% 1:3, ], 
                                        study = studyn,
@@ -1019,7 +1019,7 @@ mix_fit_FE_mlnmr <- nma(mix_net_mlnmr,
                       prior_intercept = normal(scale = 100),
                       prior_trt = normal(scale = 100),
                       prior_reg = normal(scale = 1),
-                      iter = 10000)
+                      iter = 20000, save_warmup = FALSE)
 
 reorder_net_mlnmr  <- set_agd_contrast(sample_frac(park_dummy_mlnmr, size = 1, replace = FALSE), 
                                      study = studyn,
@@ -1035,7 +1035,7 @@ reorder_fit_FE_mlnmr <- nma(reorder_net_mlnmr,
                           regression = ~x1:.trt,
                           prior_trt = normal(scale = 100),
                           prior_reg = normal(scale = 1),
-                          iter = 10000)
+                          iter = 20000, save_warmup = FALSE)
 
 test_that("ML-NMR models work with contrast data", {
   expect_equivalent_nma_summary(summary(arm_fit_FE_mlnmr, pars = c("d", "beta")), 

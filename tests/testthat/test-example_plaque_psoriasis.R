@@ -127,12 +127,12 @@ ipd_summary <- pso_ipd %>%
 pso_ipd %>% 
   pivot_longer(c(weight, durnpso, bsa), names_to = "covariate", values_to = "value") %>% 
 ggplot(aes(x = value)) +
-  geom_histogram(aes(y = stat(density)), 
+  geom_histogram(aes(y = after_stat(density)), 
                  binwidth = function(x) diff(range(x)) / nclass.Sturges(x),
                  boundary = 0,
                  fill = "grey50") +
   geom_line(aes(y = dens), data = ipd_summary,
-            colour = "darkred", size = 0.5) +
+            colour = "darkred", linewidth = 0.5) +
   facet_wrap(~studyc + covariate, scales = "free", ncol = 3) +
   theme_multinma()
 

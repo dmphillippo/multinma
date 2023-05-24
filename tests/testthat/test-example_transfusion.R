@@ -52,13 +52,23 @@ summary(half_normal(scale = 5))
 ##                         prior_trt = normal(scale = 100),
 ##                         prior_het = half_normal(scale = 5))
 
-## ---- echo=FALSE----------------------------------------------------------------------------------
-tr_fit_RE_noninf <- nma(tr_net, 
+## ---- echo=FALSE, eval=!params$run_tests----------------------------------------------------------
+## tr_fit_RE_noninf <- nma(tr_net,
+##                         seed = 857369814,
+##                         trt_effects = "random",
+##                         prior_intercept = normal(scale = 100),
+##                         prior_trt = normal(scale = 100),
+##                         prior_het = half_normal(scale = 5))
+
+## ---- echo=FALSE, eval=params$run_tests-----------------------------------------------------------
+tr_fit_RE_noninf <- suppressWarnings(nma(tr_net, 
                         seed = 857369814,
                         trt_effects = "random",
                         prior_intercept = normal(scale = 100),
                         prior_trt = normal(scale = 100),
-                        prior_het = half_normal(scale = 5))
+                        prior_het = half_normal(scale = 5),
+                        iter = 10000,
+                        save_warmup = FALSE))
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -93,14 +103,24 @@ summary(log_normal(-3.93, 1.51))
 ##                      prior_het = log_normal(-3.93, 1.51),
 ##                      prior_het_type = "var")
 
-## ---- echo=FALSE----------------------------------------------------------------------------------
-tr_fit_RE_inf <- nma(tr_net, 
+## ---- echo=FALSE, eval=!params$run_tests----------------------------------------------------------
+## tr_fit_RE_inf <- nma(tr_net,
+##                      seed = 1803772660,
+##                      trt_effects = "random",
+##                      prior_intercept = normal(scale = 100),
+##                      prior_trt = normal(scale = 100),
+##                      prior_het = log_normal(-3.93, 1.51),
+##                      prior_het_type = "var")
+
+## ---- echo=FALSE, eval=params$run_tests-----------------------------------------------------------
+tr_fit_RE_inf <- suppressWarnings(nma(tr_net, 
                      seed = 1803772660,
                      trt_effects = "random",
                      prior_intercept = normal(scale = 100),
                      prior_trt = normal(scale = 100),
                      prior_het = log_normal(-3.93, 1.51),
-                     prior_het_type = "var")
+                     prior_het_type = "var",
+                     iter = 10000, save_warmup = FALSE))
 
 
 ## -------------------------------------------------------------------------------------------------
