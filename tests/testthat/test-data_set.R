@@ -338,12 +338,21 @@ test_that("set_ipd - survival outcome checks work", {
   expect_equivalent(
     set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, bin))$ipd[[".Surv"]],
     with(agd_arm, Surv(cont_pos, bin)))
+  expect_equivalent(
+    set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, cont_pos + 1, bin))$ipd[[".Surv"]],
+    with(agd_arm, Surv(cont_pos, cont_pos + 1, bin)))
+  expect_equivalent(
+    set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, cont_pos + 1, c(0, 1, 3, 3, 3), type = "interval"))$ipd[[".Surv"]],
+    with(agd_arm, Surv(cont_pos, cont_pos + 1, c(0, 1, 3, 3, 3), type = "interval")))
 
   expect_error(set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, bin, type = "mstate")), 'type "mright" is not supported')
 
   expect_error(set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_neg, bin)), "must have strictly positive outcome times")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_inf, bin)), "infinite times")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_nan, bin)), "missing times")
+
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_neg, cont_pos, bin)), "must have non-negative start times")
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_neg, cont_pos, c(3, 3, 3, 3, 3), type = "interval")), "must have non-negative start times")
 
   expect_error(set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, rep_len(c(0, 1, NA), nrow(agd_arm)))), "missing event status values")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", Surv = Surv("a", bin)), "not numeric")
@@ -356,6 +365,13 @@ test_that("set_agd_surv - survival outcome checks work", {
   expect_equivalent(
     tidyr::unnest(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, bin))$agd_arm, ".Surv")$.Surv,
     with(agd_arm, Surv(cont_pos, bin)))
+
+  expect_equivalent(
+    tidyr::unnest(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, cont_pos + 1, bin))$agd_arm, ".Surv")$.Surv,
+    with(agd_arm, Surv(cont_pos, cont_pos + 1, bin)))
+  expect_equivalent(
+    tidyr::unnest(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, cont_pos + 1, c(0, 1, 3, 3, 3), type = "interval"))$agd_arm, ".Surv")$.Surv,
+    with(agd_arm, Surv(cont_pos, cont_pos + 1, c(0, 1, 3, 3, 3), type = "interval")))
 
   expect_equivalent(
     tidyr::unnest(set_agd_surv(ndmm_agd, studyf, trtf, Surv = Surv(eventtime, status))$agd_arm, ".Surv")$.Surv,
@@ -371,6 +387,9 @@ test_that("set_agd_surv - survival outcome checks work", {
   expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_neg, bin)), "must have strictly positive outcome times")
   expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_inf, bin)), "infinite times")
   expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_nan, bin)), "missing times")
+
+  expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_neg, cont_pos, bin)), "must have non-negative start times")
+  expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_neg, cont_pos, c(3, 3, 3, 3, 3), type = "interval")), "must have non-negative start times")
 
   expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, rep_len(c(0, 1, NA), nrow(agd_arm)))), "missing event status values")
   expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv("a", bin)), "not numeric")

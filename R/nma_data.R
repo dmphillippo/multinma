@@ -1618,14 +1618,14 @@ check_outcome_survival <- function(Surv) {
                        glue::glue_collapse(allowed_stypes, sep = ", ", last = " and "), "."))
 
     status <- Surv[, "status"]
-    times <- Surv[, -ncol(Surv)]
-
-    if (any(is.na(times))) abort("Survival outcome `Surv` contains missing times")
-    if (any(is.infinite(times))) abort("Survival outcome `Surv` contains infinite times")
-    if (any(times <= 0)) abort("Survival outcome `Surv` must have strictly positive outcome times")
-
     if (any(is.na(status))) abort("Survival outcome `Surv` contains missing event status values")
     if (!all(status %in% 0:3)) abort("Survival outcome `Surv` event status values must be 0, 1, 2, or 3")
+
+    S <- get_Surv_data(Surv)
+    if (any(is.na(S$time), is.na(S$start_time), is.na(S$delay_time))) abort("Survival outcome `Surv` contains missing times")
+    if (any(is.infinite(S$time), is.infinite(S$start_time), is.infinite(S$delay_time))) abort("Survival outcome `Surv` contains infinite times")
+    if (any(S$time <= 0)) abort("Survival outcome `Surv` must have strictly positive outcome times")
+    if (any(S$start_time < 0, S$delay_time < 0)) abort("Survival outcome `Surv` must have non-negative start times")
 
   }
 
