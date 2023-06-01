@@ -2694,12 +2694,12 @@ get_Surv_data <- function(x) {
 
     } else if (surv_type %in% c("interval", "interval2")) {
       # Interval censored
-      time <- start_time <- rep(0, length(time))
+      time <- start_time <- rep(0, length(x))
 
       # time1 is used unless status = 3 (interval censored)
-      time[status < 3] <- x[, "time1"]
-      time[status == 3] <- x[, "time2"]
-      start_time[status == 3] <- x[, "time1"]
+      time[status < 3] <- x[status < 3, "time1"]
+      time[status == 3] <- x[status == 3, "time2"]
+      start_time[status == 3] <- x[status == 3, "time1"]
 
       delay_time <- rep(0, length(time))
 
