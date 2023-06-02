@@ -1,5 +1,32 @@
 # multinma 0.5.1.9000
 
+## Feature: Survival/time-to-event models are now supported
+
+* `set_ipd()` now has a `Surv` argument for specifying survival outcomes using 
+`survival::Surv()`, and a new function `set_agd_surv()` sets up aggregate data 
+in the form of event/censoring times (e.g. from digitized Kaplan-Meier curves) 
+and overall covariate summaries.
+* Left, right, and interval censoring as well as left truncation (delayed entry)
+are all supported.
+* The available likelihoods are Exponential (PH and AFT forms), Weibull (PH and 
+AFT forms), Gompertz, log-Normal, log-Logistic, Gamma, Generalised Gamma, 
+flexible M-splines on the baseline hazard, and piecewise exponential hazards.
+* The `predict()` method produces estimates of survival probabilities, hazards, 
+cumulative hazards, mean survival times, restricted mean survival times, 
+quantiles of the survival time distribution, and median survival times. All of
+these predictions can be plotted using the `plot()` method.
+* A new vignette demonstrates ML-NMR survival analysis with an example of 
+progression-free survival after autologous stem cell transplant for newly 
+diagnosed multiple myeloma, with corresponding datasets `ndmm_ipd`, `ndmm_agd`,
+and `ndmm_agd_covs`.
+
+## Other updates
+
+* Feature: `dic()` now includes an option to use the pV penalty instead of pD.
+* Improvement: `predict()` will now produce aggregate-level predictions over a
+sample of individuals in `newdata` for ML-NMR models (previously `newdata` had
+to include integration points).
+
 # multinma 0.5.1
 
 * Fix: Now compatible with latest StanHeaders v2.26.25 (fixes #23)
