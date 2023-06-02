@@ -116,10 +116,10 @@ ipd_surv <- ipd_all %>% filter(!studyf %in% c("Morgan2012", "Jackson2019")) %>%
   rename(trt = treatment) %>%
   ungroup()
 
-# Name final datasets
-ndmm_ipd <- ipd_surv
-ndmm_agd <- agd_surv
-ndmm_agd_covs <- agd_covs
+# Name final datasets and store as standard data.frame
+ndmm_ipd <- data.frame(ipd_surv)
+ndmm_agd <- data.frame(agd_surv)
+ndmm_agd_covs <- data.frame(agd_covs)
 
 # Write datasets
 usethis::use_data(ndmm_ipd, overwrite = TRUE)
