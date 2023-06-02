@@ -133,6 +133,12 @@ reference:
   - as.matrix.stan_nma
   - as.stanfit.stan_nma
 
+- title: M-spline hazards
+  desc: Functions for flexibile M-splines on the baseline hazard.
+  contents:
+  - matches("[pdqhH]mspline")
+  - rmst_mspline
+
 - title: ggplot theme
   desc: Default plot theme used by all package plotting functions.
   contents:
