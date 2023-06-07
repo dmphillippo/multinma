@@ -225,7 +225,7 @@ transformed parameters {
                                gengamma ? aux2[study[narm_ipd + agd_arm_arm[i]]] : 0);
         }
 
-        log_L_agd_arm[i] = log_sum_exp(log_L_ii);
+        log_L_agd_arm[i] = log_sum_exp(log_L_ii) - log(nint);
       }
     } else { // -- If no integration --
       for (i in 1:ni_agd_arm) {
@@ -273,7 +273,7 @@ generated quantities {
 
   // Log likelihood
   if (ni_ipd) log_lik[1:ni_ipd] = log_L_ipd;
-  if (ni_agd_arm) log_lik[(ni_ipd + 1):(ni_ipd + ni_agd_arm)] = log_L_agd_arm - log(nint);
+  if (ni_agd_arm) log_lik[(ni_ipd + 1):(ni_ipd + ni_agd_arm)] = log_L_agd_arm;
 
   // Residual deviance
   // NOTE: This is actually just the deviance, which is fine for relative fit model comparison
