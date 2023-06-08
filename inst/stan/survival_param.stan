@@ -1,6 +1,37 @@
 functions {
 #include /include/prior_select.stan
 #include /include/count_nonzero.stan
+#include /include/which.stan
+
+  // -- Vector functions --
+  vector pow_vec (vector x, vector y) {
+    // (Not needed past Stan 2.26)
+    int n = num_elements(x);
+    vector[n] out;
+    for (i in 1:n) out[i] = pow(x[i], y[i]);
+    return out;
+  }
+
+  vector lmultiply_vec (vector x, vector y) {
+    int n = num_elements(x);
+    vector[n] out;
+    for (i in 1:n) out[i] = lmultiply(x[i], y[i]);
+    return out;
+  }
+
+  // Which entries are greater than 0
+  int[] which_gt0(vector x) {
+    int n = num_elements(x);
+    int w[n]; // Over-allocate w and then truncate later
+    int c = 1;
+    for (i in 1:n) {
+      if (x[i] > 0) {
+        w[c] = i;
+        c += 1;
+      }
+    }
+    return w[1:(c-1)];
+  }
 
   // -- Generalised Gamma ldpf --
   real gengamma_lpdf(real y, real mu, real sigma, real k) {
@@ -11,62 +42,66 @@ functions {
   }
 
   //-- log Survival functions --
-  real lS(int dist, real y, real eta, real aux, real aux2) {
+  vector lS(int dist, vector y, vector eta, vector aux, vector aux2) {
     // aux is shape, except for lognormal sdlog, gengamma sigma
     // aux2 is only for gengamma k
 
-    real lS;
+    int n = num_elements(y);
+    vector[n] lS;
 
     if (dist == 1) { // Exponential
-      lS = -y * exp(eta);
+      lS = -y .* exp(eta);
     } else if (dist == 2) { // Weibull
-      lS = -pow(y, aux) * exp(eta);
+      lS = -pow_vec(y, aux) .* exp(eta);
     } else if (dist == 3) { // Gompertz
-      lS = -exp(eta)/aux * expm1(aux * y);
+      lS = -exp(eta)./aux .* expm1(aux .* y);
     } else if (dist == 4) { // Exponential AFT
-      lS = -y * exp(-eta);
+      lS = -y .* exp(-eta);
     } else if (dist == 5) { // Weibull AFT
-      lS = -pow(y, aux) * exp(-aux * eta);
+      lS = -pow_vec(y, aux) .* exp(-aux .* eta);
     } else if (dist == 6) { // log Normal
       // aux is sdlog
-      lS = log1m(Phi((log(y) - eta) / aux));
+      // lS = log1m(Phi((log(y) - eta) ./ aux));
+      for (i in 1:n) lS[i] = lognormal_lccdf(y[i] | eta[i], aux[i]);
     } else if (dist == 7) { // log logistic
-      lS = -log1p(pow(y / exp(eta), aux));
+      lS = -log1p(pow_vec(y ./ exp(eta), aux));
     } else if (dist == 8) { // Gamma
-      lS = gamma_lccdf(y | aux, exp(-eta));
+      for (i in 1:n) lS[i] = gamma_lccdf(y[i] | aux[i], exp(-eta[i]));
     } else if (dist == 9) { // Generalised Gamma
-      real Q = pow(aux2, -0.5);
-      real w = exp(Q * (log(y) - eta) / aux) * aux2;
-      lS = log1m(gamma_p(aux2, w));
+      vector[n] Q = inv(sqrt(aux2));
+      vector[n] w = exp(Q .* (log(y) - eta) ./ aux) .* aux2;
+      for (i in 1:n) lS[i] = log1m(gamma_p(aux2[i], w[i]));
     }
 
     return lS;
   }
 
   // -- log Hazard functions --
-  real lh(int dist, real y, real eta, real aux, real aux2) {
+  vector lh(int dist, vector y, vector eta, vector aux, vector aux2) {
     // aux is shape, except for lognormal sdlog, gengamma scale
     // aux2 is only for gengamma shape
 
-    real lh;
+    int n = num_elements(y);
+    vector[n] lh;
 
     if (dist == 1) { // Exponential
       lh = eta;
     } else if (dist == 2) { // Weibull
-      lh = log(aux) + eta + lmultiply(aux - 1, y);
+      lh = log(aux) + eta + lmultiply_vec(aux - 1, y);
     } else if (dist == 3) { // Gompertz
-      lh = eta + (aux * y);
+      lh = eta + (aux .* y);
     } else if (dist == 4) { // Exponential AFT
       lh = -eta;
     } else if (dist == 5) { // Weibull AFT
-      lh = log(aux) - (aux * eta) + lmultiply(aux - 1, y);
+      lh = log(aux) - (aux .* eta) + lmultiply_vec(aux - 1, y);
     } else if (dist == 6) { // log Normal
       // aux is sdlog
-      lh = lognormal_lpdf(y | eta, aux) - log1m(Phi((log(y) - eta) / aux));
+      // lh = lognormal_lpdf(y | eta, aux) - log1m(Phi((log(y) - eta) ./ aux));
+      for (i in 1:n) lh[i] = lognormal_lpdf(y[i] | eta[i], aux[i]) - lognormal_lccdf(y[i] | eta[i], aux[i]);
     } else if (dist == 7) { // log logistic
-      lh = log(aux) - eta + (aux - 1)*(log(y) - eta) - log1p(pow(y / exp(eta), aux));
+      lh = log(aux) - eta + (aux - 1).*(log(y) - eta) - log1p(pow_vec(y ./ exp(eta), aux));
     } else if (dist == 8) { // Gamma
-      lh = gamma_lpdf(y | aux, exp(-eta)) - gamma_lccdf(y | aux, exp(-eta));
+      for (i in 1:n) lh[i] = gamma_lpdf(y[i] | aux[i], exp(-eta[i])) - gamma_lccdf(y[i] | aux[i], exp(-eta[i]));
     } else if (dist == 9) { // Generalised Gamma
       // Not used, lpdf used directly
     }
@@ -75,29 +110,75 @@ functions {
   }
 
   // -- Log likelihood with censoring and truncation --
-  real loglik(int dist, real time, real start_time, real delay_time, int status, real eta, real aux, real aux2) {
-    real l;
+  vector loglik(int dist, vector time, vector start_time, vector delay_time, int[] status, vector eta, vector aux, vector aux2) {
+    int n = num_elements(eta);
+    vector[n] l;
 
-    if (status == 0) { // Right censored
-      l = lS(dist, time, eta, aux, aux2);
-    } else if (status == 1) { // Observed
-      // Make (generalised) Gamma models more efficient by using ldpf directly
-      if (dist == 8) { // Gamma
-        l = gamma_lpdf(time | aux, exp(-eta));
-      } if (dist == 9) { // Gen Gamma
-        l = gengamma_lpdf(time | eta, aux, aux2);
-      } else {
-        l = lS(dist, time, eta, aux, aux2) + lh(dist, time, eta, aux, aux2);
+//     if (status == 0) { // Right censored
+//       l = lS(dist, time, eta, aux, aux2);
+//     } else if (status == 1) { // Observed
+//       // Make (generalised) Gamma models more efficient by using ldpf directly
+//       if (dist == 8) { // Gamma
+//         l = gamma_lpdf(time | aux, exp(-eta));
+//       } if (dist == 9) { // Gen Gamma
+//         l = gengamma_lpdf(time | eta, aux, aux2);
+//       } else {
+//         l = lS(dist, time, eta, aux, aux2) + lh(dist, time, eta, aux, aux2);
+//       }
+//     } else if (status == 2) { // Left censored
+//       l = log1m_exp(lS(dist, time, eta, aux, aux2));
+//     } else if (status == 3) { // Interval censored
+//       l = log_diff_exp(lS(dist, start_time, eta, aux, aux2), lS(dist, time, eta, aux, aux2));
+//     }
+//
+//     // Left truncation
+//     if (delay_time > 0) {
+//       l -= lS(dist, delay_time, eta, aux, aux2);
+//     }
+
+    // Make certain models more efficient by using ldpf directly
+    if (dist == 6 || dist == 8 || dist == 9) {
+      // Right censored
+      {
+        int nwhich0 = num_elements(which(status, 0));
+        int which0[nwhich0] = which(status, 0);
+        l[which0] = lS(dist, time[which0], eta[which0], aux[which0], aux2[which0]);
       }
-    } else if (status == 2) { // Left censored
-      l = log1m_exp(lS(dist, time, eta, aux, aux2));
-    } else if (status == 3) { // Interval censored
-      l = log_diff_exp(lS(dist, start_time, eta, aux, aux2), lS(dist, time, eta, aux, aux2));
+
+      // Observed
+      if (dist == 6) for (i in 1:n) if (status[i] == 1) l[i] = lognormal_lpdf(time[i] | eta[i], aux[i]);
+      if (dist == 8) for (i in 1:n) if (status[i] == 1) l[i] = gamma_lpdf(time[i] | aux[i], exp(-eta[i]));
+      if (dist == 9) for (i in 1:n) if (status[i] == 1) l[i] = gengamma_lpdf(time[i] | eta[i], aux[i], aux2[i]);
+
+    } else {
+
+      // Right censored
+      l = lS(dist, time, eta, aux, aux2);
+
+      // Observed
+      {
+        int nwhich1 = num_elements(which(status, 1));
+        int which1[nwhich1] = which(status, 1);
+        l[which1] += lh(dist, time[which1], eta[which1], aux[which1], aux2[which1]);
+      }
+    }
+
+    // Left censored
+    l[which(status, 2)] = log1m_exp(l[which(status, 2)]);
+
+    // Interval censored
+    // l = log_diff_exp(lS(dist, start_time, eta, aux, aux2), lS(dist, time, eta, aux, aux2));
+    {
+      int nwhich3 = num_elements(which(status, 3));
+      int which3[nwhich3] = which(status, 3);
+      l[which3] = log(exp(l[which3]) - exp(lS(dist, time[which3], eta[which3], aux[which3], aux2[which3])));
     }
 
     // Left truncation
-    if (delay_time > 0) {
-      l -= lS(dist, delay_time, eta, aux, aux2);
+    {
+      int nwhichd = num_elements(which_gt0(delay_time));
+      int whichd[nwhichd] = which_gt0(delay_time);
+      l[whichd] -= lS(dist, delay_time[whichd], eta[whichd], aux[whichd], aux2[whichd]);
     }
 
     return l;
@@ -135,14 +216,14 @@ data {
   int<lower=1> agd_arm_arm[ni_agd_arm]; // Arm indicator for AgD (arm-based) (i.e. picking element of which_RE)
 
   // Outcomes
-  real<lower=0> ipd_time[ni_ipd];
-  real<lower=0> ipd_start_time[ni_ipd];
-  real<lower=0> ipd_delay_time[ni_ipd];
+  vector[ni_ipd] ipd_time;
+  vector[ni_ipd] ipd_start_time;
+  vector[ni_ipd] ipd_delay_time;
   int<lower=0, upper=3> ipd_status[ni_ipd];
 
-  real<lower=0> agd_arm_time[ni_agd_arm];
-  real<lower=0> agd_arm_start_time[ni_agd_arm];
-  real<lower=0> agd_arm_delay_time[ni_agd_arm];
+  vector[ni_agd_arm] agd_arm_time;
+  vector[ni_agd_arm] agd_arm_start_time;
+  vector[ni_agd_arm] agd_arm_delay_time;
   int<lower=0, upper=3> agd_arm_status[ni_agd_arm];
 
   // Study IDs for independent shape parameters
@@ -183,16 +264,14 @@ transformed parameters {
 
 
   // Evaluate log likelihood
-  for (i in 1:ni_ipd) {
-    log_L_ipd[i] = loglik(dist,
-                          ipd_time[i],
-                          ipd_start_time[i],
-                          ipd_delay_time[i],
-                          ipd_status[i],
-                          eta_ipd[i],
-                          nonexp ? aux[study[ipd_arm[i]]] : 0,
-                          gengamma ? aux2[study[ipd_arm[i]]] : 0);
-  }
+  log_L_ipd = loglik(dist,
+                     ipd_time,
+                     ipd_start_time,
+                     ipd_delay_time,
+                     ipd_status,
+                     eta_ipd,
+                     nonexp ? aux[study[ipd_arm]] : rep_vector(0, ni_ipd),
+                     gengamma ? aux2[study[ipd_arm]] : rep_vector(0, ni_ipd));
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
@@ -213,17 +292,14 @@ transformed parameters {
         if (RE && which_RE[narm_ipd + agd_arm_arm[i]]) eta_agd_arm_ii += f_delta[which_RE[narm_ipd + agd_arm_arm[i]]];
 
         // Average likelihood over integration points
-        // NOTE: Normalising term (dividing by nint) omitted as this is constant
-        for (j in 1:nint) {
-          log_L_ii[j] = loglik(dist,
-                               agd_arm_time[i],
-                               agd_arm_start_time[i],
-                               agd_arm_delay_time[i],
-                               agd_arm_status[i],
-                               eta_agd_arm_ii[j],
-                               nonexp ? aux[study[narm_ipd + agd_arm_arm[i]]] : 0,
-                               gengamma ? aux2[study[narm_ipd + agd_arm_arm[i]]] : 0);
-        }
+        log_L_ii = loglik(dist,
+                          agd_arm_time[i],
+                          agd_arm_start_time[i],
+                          agd_arm_delay_time[i],
+                          agd_arm_status[i],
+                          eta_agd_arm_ii,
+                          nonexp ? aux[study[narm_ipd + agd_arm_arm[i]]] : 0,
+                          gengamma ? aux2[study[narm_ipd + agd_arm_arm[i]]] : 0);
 
         log_L_agd_arm[i] = log_sum_exp(log_L_ii) - log(nint);
       }
