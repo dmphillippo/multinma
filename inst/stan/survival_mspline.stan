@@ -17,6 +17,21 @@ functions {
     return log(basis * scoef) + eta;
   }
 
+  // AgD versions with integration points
+  vector lS_a (row_vector ibasis, vector eta, vector scoef) {
+    // ibasis = integrated basis evaluated at event/censoring time
+    // scoef = row_vector of spline coefficients
+    // eta = log rate (linear predictor)
+    return - ibasis * scoef * exp(eta);
+  }
+
+  vector lh_a (row_vector basis, vector eta, vector scoef) {
+    // basis = basis evaluated at event/censoring time
+    // scoef = row_vector of spline coefficients
+    // eta = log rate (linear predictor)
+    return log(basis * scoef) + eta;
+  }
+
   // -- Log likelihood with censoring and truncation --
   real loglik(row_vector time,         // Basis evaluated at event/cens time
               row_vector itime,        // Integrated basis evaluated at event/cens time
@@ -41,6 +56,36 @@ functions {
     // Left truncation
     if (delayed) {
       l -= lS(delay_itime, eta, scoef);
+    }
+
+    return l;
+  }
+
+  // AgD version with integration points
+  vector loglik_a(row_vector time,         // Basis evaluated at event/cens time
+                  row_vector itime,        // Integrated basis evaluated at event/cens time
+                  row_vector start_itime,  // Integrated basis evaluated at left interval time
+                  row_vector delay_itime,  // Integrated basis evaluated at delayed entry time
+                  int delayed,             // Delayed entry flag (1=delay)
+                  int status,              // Censoring status
+                  vector eta,              // Linear predictor
+                  vector scoef) {          // Spline coefficients
+    vector[num_elements(eta)] l;
+
+    if (status == 0) { // Right censored
+      l = lS_a(itime, eta, scoef);
+    } else if (status == 1) { // Observed
+      l = lS_a(itime, eta, scoef) + lh_a(time, eta, scoef);
+    } else if (status == 2) { // Left censored
+      l = log1m_exp(lS_a(itime, eta, scoef));
+    } else if (status == 3) { // Interval censored
+      // l = log_diff_exp(lS_a(start_itime, eta, scoef), lS_a(itime, eta, scoef));
+      l = log(exp(lS_a(start_itime, eta, scoef)) - exp(lS_a(itime, eta, scoef)));
+    }
+
+    // Left truncation
+    if (delayed) {
+      l -= lS_a(delay_itime, eta, scoef);
     }
 
     return l;
@@ -129,16 +174,14 @@ transformed parameters {
 
         // Average likelihood over integration points
         // NOTE: Normalising term (dividing by nint) omitted as this is constant
-        for (j in 1:nint) {
-          log_L_ii[j] = loglik(agd_arm_time[i],
-                               agd_arm_itime[i],
-                               agd_arm_start_itime[i],
-                               agd_arm_delay_itime[i],
-                               agd_arm_delayed[i],
-                               agd_arm_status[i],
-                               eta_agd_arm_ii[j],
-                               scoef[study[narm_ipd + agd_arm_arm[i]]]);
-        }
+        log_L_ii = loglik_a(agd_arm_time[i],
+                            agd_arm_itime[i],
+                            agd_arm_start_itime[i],
+                            agd_arm_delay_itime[i],
+                            agd_arm_delayed[i],
+                            agd_arm_status[i],
+                            eta_agd_arm_ii,
+                            scoef[study[narm_ipd + agd_arm_arm[i]]]);
 
         log_L_agd_arm[i] = log_sum_exp(log_L_ii) - log(nint);
       }
