@@ -1,45 +1,7 @@
 functions {
 #include /include/prior_select.stan
 #include /include/count_nonzero.stan
-#include /include/which.stan
-
-  // -- Vector functions --
-  vector pow_vec (vector x, vector y) {
-    // (Not needed past Stan 2.26)
-    int n = num_elements(x);
-    vector[n] out;
-    for (i in 1:n) out[i] = pow(x[i], y[i]);
-    return out;
-  }
-
-  vector pow_vec2 (vector x, real y) {
-    // (Not needed past Stan 2.26)
-    int n = num_elements(x);
-    vector[n] out;
-    for (i in 1:n) out[i] = pow(x[i], y);
-    return out;
-  }
-
-  vector lmultiply_vec (vector x, vector y) {
-    int n = num_elements(x);
-    vector[n] out;
-    for (i in 1:n) out[i] = lmultiply(x[i], y[i]);
-    return out;
-  }
-
-  // Which entries are greater than 0
-  int[] which_gt0(vector x) {
-    int n = num_elements(x);
-    int w[n]; // Over-allocate w and then truncate later
-    int c = 1;
-    for (i in 1:n) {
-      if (x[i] > 0) {
-        w[c] = i;
-        c += 1;
-      }
-    }
-    return w[1:(c-1)];
-  }
+#include /include/vector_functions.stan
 
   // -- Generalised Gamma ldpf --
   real gengamma_lpdf(real y, real mu, real sigma, real k) {
@@ -85,6 +47,7 @@ functions {
     return lS;
   }
 
+  // AgD version with integration points
   vector lS_a(int dist, real y, vector eta, real aux, real aux2) {
     // aux is shape, except for lognormal sdlog, gengamma sigma
     // aux2 is only for gengamma k
@@ -154,6 +117,7 @@ functions {
     return lh;
   }
 
+  // AgD version with integration points
   vector lh_a(int dist, real y, vector eta, real aux, real aux2) {
     // aux is shape, except for lognormal sdlog, gengamma scale
     // aux2 is only for gengamma shape

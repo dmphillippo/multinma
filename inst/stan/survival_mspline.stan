@@ -173,7 +173,6 @@ transformed parameters {
         if (RE && which_RE[narm_ipd + agd_arm_arm[i]]) eta_agd_arm_ii += f_delta[which_RE[narm_ipd + agd_arm_arm[i]]];
 
         // Average likelihood over integration points
-        // NOTE: Normalising term (dividing by nint) omitted as this is constant
         log_L_ii = loglik_a(agd_arm_time[i],
                             agd_arm_itime[i],
                             agd_arm_start_itime[i],
