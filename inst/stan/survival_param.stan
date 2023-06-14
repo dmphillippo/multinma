@@ -156,14 +156,27 @@ functions {
     int n = num_elements(eta);
     vector[n] l;
 
+    // Status indicators
+    int nwhich0 = (dist == 6 || dist == 8 || dist == 9) ? num_elements(which(status, 0)) : 0;
+    int nwhich1 = !(dist == 6 || dist == 8 || dist == 9) ? num_elements(which(status, 1)) : 0;
+    int nwhich2 = num_elements(which(status, 2));
+    int nwhich3 = num_elements(which(status, 3));
+    int nwhichd = num_elements(which_gt0(delay_time));
+    int which0[nwhich0];
+    int which1[nwhich1];
+    int which2[nwhich2];
+    int which3[nwhich3];
+    int whichd[nwhichd];
+    if (nwhich0) which0 = which(status, 0);
+    if (nwhich1) which1 = which(status, 1);
+    if (nwhich2) which2 = which(status, 2);
+    if (nwhich3) which3 = which(status, 3);
+    if (nwhichd) whichd = which_gt0(delay_time);
+
     // Make certain models more efficient by using ldpf directly
     if (dist == 6 || dist == 8 || dist == 9) {
       // Right censored
-      {
-        int nwhich0 = num_elements(which(status, 0));
-        int which0[nwhich0] = which(status, 0);
-        l[which0] = lS(dist, time[which0], eta[which0], aux[which0], aux2[which0]);
-      }
+      l[which0] = lS(dist, time[which0], eta[which0], aux[which0], aux2[which0]);
 
       // Observed
       if (dist == 6) for (i in 1:n) if (status[i] == 1) l[i] = lognormal_lpdf(time[i] | eta[i], aux[i]);
@@ -176,30 +189,18 @@ functions {
       l = lS(dist, time, eta, aux, aux2);
 
       // Observed
-      {
-        int nwhich1 = num_elements(which(status, 1));
-        int which1[nwhich1] = which(status, 1);
-        l[which1] += lh(dist, time[which1], eta[which1], aux[which1], aux2[which1]);
-      }
+      l[which1] += lh(dist, time[which1], eta[which1], aux[which1], aux2[which1]);
     }
 
     // Left censored
-    l[which(status, 2)] = log1m_exp(l[which(status, 2)]);
+    l[which2] = log1m_exp(l[which2]);
 
     // Interval censored
     // l = log_diff_exp(lS(dist, start_time, eta, aux, aux2), lS(dist, time, eta, aux, aux2));
-    {
-      int nwhich3 = num_elements(which(status, 3));
-      int which3[nwhich3] = which(status, 3);
-      l[which3] = log(exp(lS(dist, start_time[which3], eta[which3], aux[which3], aux2[which3])) - exp(l[which3]));
-    }
+    l[which3] = log(exp(lS(dist, start_time[which3], eta[which3], aux[which3], aux2[which3])) - exp(l[which3]));
 
     // Left truncation
-    {
-      int nwhichd = num_elements(which_gt0(delay_time));
-      int whichd[nwhichd] = which_gt0(delay_time);
-      l[whichd] -= lS(dist, delay_time[whichd], eta[whichd], aux[whichd], aux2[whichd]);
-    }
+    l[whichd] -= lS(dist, delay_time[whichd], eta[whichd], aux[whichd], aux2[whichd]);
 
     return l;
   }
@@ -225,6 +226,7 @@ functions {
     } else if (status == 2) { // Left censored
       l = log1m_exp(lS_a(dist, time, eta, aux, aux2));
     } else if (status == 3) { // Interval censored
+      // l = log_diff_exp(lS_a(dist, start_time, eta, aux, aux2), lS_a(dist, time, eta, aux, aux2));
       l = log(exp(lS_a(dist, start_time, eta, aux, aux2)) - exp(lS_a(dist, time, eta, aux, aux2)));
     }
 
