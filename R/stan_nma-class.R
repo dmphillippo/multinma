@@ -539,6 +539,11 @@ plot_integration_error <- function(x, ...,
   if (twoparbin) {
     ipars <- c(ipars, "theta2_bar_cum")
   }
+
+  if (!all(ipars %in% x$stanfit@sim$pars_oi))
+    abort(paste0("Cumulative integration points not saved.\n",
+                 "Re-run model with `int_thin > 0` and `int_check = FALSE` to use this feature."))
+
   int_dat <- as.data.frame(x, pars = ipars) %>%
     dplyr::mutate(.draw = 1:dplyr::n())
 
