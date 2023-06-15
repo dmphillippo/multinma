@@ -26,6 +26,7 @@ int<lower=1> nt; // number of treatments
 int<lower=0> nX; // number of columns of design matrix
 int<lower=1> nint; // number of samples for numerical integration (1 = no integration)
 int<lower=1> int_thin; // thinning factor for saved integration points
+int<lower=0> int_thin; // thinning factor for saved integration points
 
 int<lower=1> link; // link function
 

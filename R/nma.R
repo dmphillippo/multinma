@@ -46,7 +46,8 @@
 #'   (numeric) regression terms about the overall means
 #' @param adapt_delta See [adapt_delta] for details
 #' @param int_thin A single integer value, the thinning factor for returning
-#'   cumulative estimates of integration error
+#'   cumulative estimates of integration error. Saving cumulative estimates is
+#'   disabled by `int_thin = 0`, and when `int_check = TRUE`.
 #' @param mspline_degree Non-negative integer giving the degree of the M-spline
 #'   polynomial for `likelihood = "mspline"`. Piecewise exponential hazards
 #'   (`likelihood = "pexp"`) are a special case with `mspline_degree = 0`.
@@ -474,7 +475,7 @@ nma <- function(network,
   if (!rlang::is_bool(QR)) abort("`QR` should be a logical scalar (TRUE or FALSE).")
   if (!rlang::is_bool(center)) abort("`center` should be a logical scalar (TRUE or FALSE).")
   if (!rlang::is_scalar_integerish(int_thin) ||
-      int_thin < 1) abort("`int_thin` should be an integer >= 1.")
+      int_thin < 0) abort("`int_thin` should be an integer >= 0.")
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
@@ -932,7 +933,7 @@ nma <- function(network,
   fnames_oi[grepl("^resdev\\[[0-9]+\\]$", fnames_oi)] <- paste0("resdev[", dev_labels, "]")
 
   # Labels for cumulative integration points
-  if (inherits(network, "mlnmr_data") && (has_agd_arm(network) || has_agd_contrast(network))) {
+  if (inherits(network, "mlnmr_data") && (has_agd_arm(network) || has_agd_contrast(network)) && int_thin > 0) {
     n_int_thin <- n_int %/% int_thin
 
     if (has_agd_arm(network)) {
@@ -1143,7 +1144,7 @@ nma.fit <- function(ipd_x, ipd_y,
   # Check other args
   if (!rlang::is_bool(QR)) abort("`QR` should be a logical scalar (TRUE or FALSE).")
   if (!rlang::is_scalar_integerish(int_thin) ||
-      int_thin < 1) abort("`int_thin` should be an integer >= 1.")
+      int_thin < 0) abort("`int_thin` should be an integer >= 0.")
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
@@ -1354,7 +1355,7 @@ nma.fit <- function(ipd_x, ipd_y,
   }
 
   # Monitor cumulative integration error if using numerical integration
-  if (n_int > 1 && !is_survival) {
+  if (n_int > 1 && !is_survival && int_thin > 0) {
     if (has_agd_arm) pars <- c(pars, "theta_bar_cum_agd_arm")
     if (has_agd_contrast) pars <- c(pars, "theta_bar_cum_agd_contrast")
   }
@@ -1430,7 +1431,7 @@ nma.fit <- function(ipd_x, ipd_y,
     stanargs <- purrr::list_modify(stanargs,
                                    object = stanmodels$binomial_2par,
                                    data = standat,
-                                   pars = c(pars, "theta2_bar_cum"))
+                                   pars = if (n_int > 1 && int_thin > 0) c(pars, "theta2_bar_cum") else pars)
 
   # -- Poisson likelihood
   } else if (likelihood == "poisson") {
