@@ -78,17 +78,17 @@ if (RE) {
 if (ni_agd_contrast) {
 if (nint > 1) {
   if (RE) {
-    vector[nint * ni_agd_contrast] eta_agd_contrast_noRE = has_offset ?
+    vector[nint_max * ni_agd_contrast] eta_agd_contrast_noRE = has_offset ?
       X_agd_contrast * beta_tilde + offset_agd_contrast :
       X_agd_contrast * beta_tilde;
 
     for (i in 1:ni_agd_contrast) {
       if (which_RE[narm_ipd + narm_agd_arm + i])
         eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] =
-          eta_agd_contrast_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + narm_agd_arm + i]];
+          eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] + f_delta[which_RE[narm_ipd + narm_agd_arm + i]];
       else
         eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] =
-          eta_agd_contrast_noRE[(1 + (i-1)*nint):(i*nint)];
+          eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
 
       eta_agd_contrast_bar[i] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)]);
     }

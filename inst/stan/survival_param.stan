@@ -290,6 +290,7 @@ transformed data {
   int<lower=0, upper=1> gengamma = dist >= 9 ? 1 : 0;
   // AgD arm indicator - shifted
   int agd_arm_arm2[ni_agd_arm];
+  // Number of integration points
 
 #include /include/transformed_data_common.stan
 
@@ -324,7 +325,7 @@ transformed parameters {
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
-    vector[nint * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+    vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
               X_agd_arm * beta_tilde + offset_agd_arm :
               X_agd_arm * beta_tilde;
 
@@ -335,7 +336,7 @@ transformed parameters {
       vector[nint] log_L_ii;
 
       for (i in 1:ni_agd_arm) {
-        eta_agd_arm_ii = eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)];
+        eta_agd_arm_ii = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
 
         // Random effects
         if (RE && which_RE[agd_arm_arm2[i]]) eta_agd_arm_ii += f_delta[which_RE[agd_arm_arm2[i]]];

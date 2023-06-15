@@ -1,5 +1,9 @@
 // Common definitions for the transformed data block
 
+// -- Integration --
+// Set nint by chain
+int<lower=1,upper=nint_max> nint = nint_vec[CHAIN_ID];
+
 // -- Random effects --
 // number of random effects
 int<lower=0> n_delta = RE ? max(which_RE) : 0;
@@ -18,7 +22,7 @@ int RE_L_v[RE_sparse ? RE_L_nz : 0] = RE_sparse ? csr_extract_v(RE_L): vudummy; 
 int RE_L_u[RE_sparse ? n_delta + 1 : 0] = RE_sparse ? csr_extract_u(RE_L) : vudummy; // u sparse component
 
 // Total number of data points
-int totni = ni_ipd + nint * (ni_agd_arm + ni_agd_contrast);
+// int totni = ni_ipd + nint * (ni_agd_arm + ni_agd_contrast);
 
 // Total number of study intercepts (none for contrast-based data)
 int totns = ns_ipd + ns_agd_arm; // + ns_agd_contrast;
@@ -32,14 +36,14 @@ int<lower=1> trt[narm_ipd + narm_agd_arm + ni_agd_contrast] = append_array(appen
 // Split Q matrix or X matrix into IPD and AgD rows
 matrix[0, nX] Xdummy;
 matrix[ni_ipd, nX] X_ipd = ni_ipd ? X[1:ni_ipd] : Xdummy;
-matrix[nint * ni_agd_arm, nX] X_agd_arm = ni_agd_arm ? X[(ni_ipd + 1):(ni_ipd + nint * ni_agd_arm)] : Xdummy;
-matrix[nint * ni_agd_contrast, nX] X_agd_contrast = ni_agd_contrast ? X[(ni_ipd + nint * ni_agd_arm + 1):(ni_ipd + nint * (ni_agd_arm + ni_agd_contrast))] : Xdummy;
+matrix[nint_max * ni_agd_arm, nX] X_agd_arm = ni_agd_arm ? X[(ni_ipd + 1):(ni_ipd + nint_max * ni_agd_arm)] : Xdummy;
+matrix[nint_max * ni_agd_contrast, nX] X_agd_contrast = ni_agd_contrast ? X[(ni_ipd + nint_max * ni_agd_arm + 1):(ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast))] : Xdummy;
 
 // Split offsets into IPD and AgD rows
 vector[0] odummy;
 vector[has_offset && ni_ipd ? ni_ipd : 0] offset_ipd = has_offset && ni_ipd ? offsets[1:ni_ipd] : odummy;
-vector[has_offset && ni_agd_arm ? nint * ni_agd_arm : 0] offset_agd_arm = has_offset && ni_agd_arm ? offsets[(ni_ipd + 1):(ni_ipd + nint * ni_agd_arm)] : odummy;
-vector[has_offset && ni_agd_contrast ? nint * ni_agd_contrast : 0] offset_agd_contrast = has_offset && ni_agd_contrast ? offsets[(ni_ipd + nint * ni_agd_arm + 1):(ni_ipd + nint * (ni_agd_arm + ni_agd_contrast))] : odummy;
+vector[has_offset && ni_agd_arm ? nint_max * ni_agd_arm : 0] offset_agd_arm = has_offset && ni_agd_arm ? offsets[(ni_ipd + 1):(ni_ipd + nint_max * ni_agd_arm)] : odummy;
+vector[has_offset && ni_agd_contrast ? nint_max * ni_agd_contrast : 0] offset_agd_contrast = has_offset && ni_agd_contrast ? offsets[(ni_ipd + nint_max * ni_agd_arm + 1):(ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast))] : odummy;
 
 // nint/int_thin for numerical integration checks
 int n_int_thin = (nint > 1 && int_thin > 0) ? nint / int_thin : 0;

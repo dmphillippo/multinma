@@ -48,6 +48,8 @@
 #' @param int_thin A single integer value, the thinning factor for returning
 #'   cumulative estimates of integration error. Saving cumulative estimates is
 #'   disabled by `int_thin = 0`, and when `int_check = TRUE`.
+#' @param int_check Logical, check sufficient accuracy of numerical integration
+#'   by fitting half of the chains with `n_int/2`?
 #' @param mspline_degree Non-negative integer giving the degree of the M-spline
 #'   polynomial for `likelihood = "mspline"`. Piecewise exponential hazards
 #'   (`likelihood = "pexp"`) are a special case with `mspline_degree = 0`.
@@ -216,6 +218,7 @@ nma <- function(network,
                 center = TRUE,
                 adapt_delta = NULL,
                 int_thin = max(network$n_int %/% 10, 1),
+                int_check = FALSE,
                 mspline_degree = 3,
                 n_knots = 3,
                 knots = NULL) {
@@ -476,6 +479,8 @@ nma <- function(network,
   if (!rlang::is_bool(center)) abort("`center` should be a logical scalar (TRUE or FALSE).")
   if (!rlang::is_scalar_integerish(int_thin) ||
       int_thin < 0) abort("`int_thin` should be an integer >= 0.")
+  if (!rlang::is_bool(int_check)) abort("`int_check` should be a logical scalar (TRUE or FALSE).")
+  if (int_check) int_thin <- 0
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
@@ -841,6 +846,7 @@ nma <- function(network,
     QR = QR,
     adapt_delta = adapt_delta,
     int_thin = int_thin,
+    int_check = int_check,
     basis = basis)
 
   # Make readable parameter names for generated quantities
@@ -1026,6 +1032,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     QR = FALSE,
                     adapt_delta = NULL,
                     int_thin = 100L,
+                    int_check = FALSE,
                     basis) {
 
   if (missing(ipd_x)) ipd_x <- NULL
@@ -1145,6 +1152,8 @@ nma.fit <- function(ipd_x, ipd_y,
   if (!rlang::is_bool(QR)) abort("`QR` should be a logical scalar (TRUE or FALSE).")
   if (!rlang::is_scalar_integerish(int_thin) ||
       int_thin < 0) abort("`int_thin` should be an integer >= 0.")
+  if (!rlang::is_bool(int_check)) abort("`int_check` should be a logical scalar (TRUE or FALSE).")
+  if (int_check) int_thin <- 0
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
@@ -1277,6 +1286,21 @@ nma.fit <- function(ipd_x, ipd_y,
     X_all_R_inv <- solve(X_all_R)
   }
 
+  # Handle integration points
+  dots <- list(...)
+  nchains <- dots$chains
+  if (is.null(nchains)) nchains <- 4
+  if (nchains < 2) {
+    warn("At least 2 chains are required to check integration convergence with int_check = TRUE.")
+    int_check <- FALSE
+  }
+  nint_max <- n_int
+  if (int_check && n_int > 1) {
+    nint_vec <- c(rep(n_int, ceiling(nchains / 2)), rep(n_int %/% 2, floor(nchains / 2)))
+  } else {
+    nint_vec <- rep(n_int, nchains)
+  }
+
   # Set common Stan data
   standat <- list(
     # Constants
@@ -1287,7 +1311,9 @@ nma.fit <- function(ipd_x, ipd_y,
     ns_agd_contrast = ns_agd_contrast,
     ni_agd_contrast = ni_agd_contrast,
     nt = n_trt,
-    nint = n_int,
+    nchains = nchains,
+    nint_max = nint_max,
+    nint_vec = nint_vec,
     nX = ncol(X_all),
     int_thin = int_thin,
     # Study and treatment details
@@ -1366,6 +1392,9 @@ nma.fit <- function(ipd_x, ipd_y,
     stanargs$control <- purrr::list_modify(stanargs$control, adapt_delta = adapt_delta)
   else
     stanargs$control <- list(adapt_delta = adapt_delta)
+
+  # Set chain_id to make CHAIN_ID available in data block
+  stanargs$chain_id <- 1L
 
   # Call Stan model for given likelihood
 
@@ -1691,7 +1720,87 @@ nma.fit <- function(ipd_x, ipd_y,
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
   }
 
-  stanfit <- do.call(rstan::sampling, stanargs)
+  # Call sampling, managing warnings for integration checks if required
+  if (n_int > 1 && int_check) {
+    rhat_warn_a <- FALSE
+    bulk_ess_warn_a <- FALSE
+    tail_ess_warn_a <- FALSE
+    stanfit <- withCallingHandlers(do.call(rstan::sampling, stanargs),
+                                   warning = function(w) {
+                                     m <- conditionMessage(w)
+                                     if (grepl("The largest R-hat is", w, fixed = TRUE)) {
+                                       rhat_warn_a <<- TRUE
+                                       rlang::cnd_muffle(w)
+                                     }
+                                     if (grepl("Bulk Effective Samples Size (ESS) is too low", w, fixed = TRUE)) {
+                                       bulk_ess_warn_a <<- TRUE
+                                       rlang::cnd_muffle(w)
+                                     }
+                                     if (grepl("Tail Effective Samples Size (ESS) is too low", w, fixed = TRUE)) {
+                                       tail_ess_warn_a <<- TRUE
+                                       rlang::cnd_muffle(w)
+                                     }
+                                   })
+
+    # Check Rhat, neff within chains with same n_int
+    sims <- as.array(stanfit)
+    sims_nint1 <- sims[ , nint_vec == unique(n_int)[1], , drop = FALSE]
+    sims_nint2 <- sims[ , nint_vec == unique(n_int)[2], , drop = FALSE]
+
+    rhat_1 <- apply(sims_nint1, 3, rstan::Rhat)
+    rhat_2 <- apply(sims_nint2, 3, rstan::Rhat)
+    rhat_w <- pmax(rhat_1, rhat_2, na.rm = TRUE)
+    rhat_warn_w <- any(rhat_w > 1.05, na.rm = TRUE)
+
+    bulk_ess_1 <- apply(sims_nint1, 3, rstan::ess_bulk)
+    bulk_ess_2 <- apply(sims_nint2, 3, rstan::ess_bulk)
+    bulk_ess_w <- pmin(bulk_ess_1, bulk_ess_2, na.rm = TRUE)
+    bulk_ess_warn_w <- any(bulk_ess_w < 100 * ncol(sims), na.rm = TRUE)
+
+    tail_ess_1 <- apply(sims_nint1, 3, rstan::ess_tail)
+    tail_ess_2 <- apply(sims_nint2, 3, rstan::ess_tail)
+    tail_ess_w <- pmin(tail_ess_1, tail_ess_2, na.rm = TRUE)
+    tail_ess_warn_w <- any(tail_ess_w < 100 * ncol(sims), na.rm = TRUE)
+
+    # Warnings within chains with same n_int are due to low iter
+    if (rhat_warn_w) {
+      warning("The largest R-hat is ", round(max(rhat_w), digits = 2),
+              ", indicating chains have not mixed.\n", "Running the chains for more iterations may help. See\n",
+              "https://mc-stan.org/misc/warnings.html#r-hat",
+              call. = FALSE)
+    } else if (rhat_warn_a) {
+      # Otherwise, if rhats within chains with same n_int are good, warnings across all chains are low n_int
+      rhat_a <- apply(sims, 3, rstan::Rhat)
+      warn(paste0("The largest R-hat is ", round(max(rhat_a), digits = 2),
+                  ", indicating that integration has not converged.\n",
+                  "Increase the number of integration points `n_int` in add_integration()."))
+    }
+
+    if (bulk_ess_warn_w) {
+      warning("Bulk Effective Sample Size (ESS) is too low, ",
+              "indicating posterior means and medians may be unreliable.\n",
+              "Running the chains for more iterations may help. See\n",
+              "https://mc-stan.org/misc/warnings.html#bulk-ess",
+              call. = FALSE)
+    } else if (bulk_ess_warn_a) {
+      warn(paste0("Bulk Effective Sample Size (ESS) is too low, indicating that integration has not converged.\n",
+                  "Increase the number of integration points `n_int` in add_integration()."))
+    }
+
+    if (tail_ess_warn_w) {
+      warning("Tail Effective Sample Size (ESS) is too low, indicating ",
+              "posterior variances and tail quantiles may be unreliable.\n",
+              "Running the chains for more iterations may help. See\n",
+              "https://mc-stan.org/misc/warnings.html#tail-ess",
+              call. = FALSE)
+    } else if (tail_ess_warn_a) {
+      warn(paste0("Tail Effective Sample Size (ESS) is too low, indicating that integration has not converged.\n",
+                  "Increase the number of integration points `n_int` in add_integration()."))
+    }
+
+  } else {
+    stanfit <- do.call(rstan::sampling, stanargs)
+  }
 
   # Set readable parameter names in the stanfit object
   fnames_oi <- stanfit@sim$fnames_oi

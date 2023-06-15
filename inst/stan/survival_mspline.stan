@@ -156,7 +156,7 @@ transformed parameters {
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
-    vector[nint * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+    vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
               X_agd_arm * beta_tilde + offset_agd_arm :
               X_agd_arm * beta_tilde;
 
@@ -167,7 +167,7 @@ transformed parameters {
       vector[nint] log_L_ii;
 
       for (i in 1:ni_agd_arm) {
-        eta_agd_arm_ii = eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)];
+        eta_agd_arm_ii = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
 
         // Random effects
         if (RE && which_RE[narm_ipd + agd_arm_arm[i]]) eta_agd_arm_ii += f_delta[which_RE[narm_ipd + agd_arm_arm[i]]];
