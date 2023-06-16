@@ -233,7 +233,7 @@ new_agd_int <- add_integration(new_agd_int,
                                weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
                                psa = distr(qbern, prob = psa),
                                cor = pso_net$int_cor,
-                               n_int = 1000)
+                               n_int = 64)
 
 # Predicted probabilities of achieving PASI 75 in this target population, given
 # a Normal(-1.75, 0.08^2) distribution on the baseline probit-probability of

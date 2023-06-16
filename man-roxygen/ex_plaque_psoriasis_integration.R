@@ -6,5 +6,5 @@
 #'   bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
 #'   weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
 #'   psa = distr(qbern, prob = psa),
-#'   n_int = 1000)
+#'   n_int = 64)
 #'
