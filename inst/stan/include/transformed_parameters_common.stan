@@ -77,11 +77,11 @@ if (RE) {
 // -- AgD model (contrast-based) --
 if (ni_agd_contrast) {
 if (nint > 1) {
-  if (RE) {
-    vector[nint_max * ni_agd_contrast] eta_agd_contrast_noRE = has_offset ?
-      X_agd_contrast * beta_tilde + offset_agd_contrast :
-      X_agd_contrast * beta_tilde;
+  vector[nint_max * ni_agd_contrast] eta_agd_contrast_noRE = has_offset ?
+    X_agd_contrast * beta_tilde + offset_agd_contrast :
+    X_agd_contrast * beta_tilde;
 
+  if (RE) {
     for (i in 1:ni_agd_contrast) {
       if (which_RE[narm_ipd + narm_agd_arm + i])
         eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] =
@@ -93,9 +93,10 @@ if (nint > 1) {
       eta_agd_contrast_bar[i] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)]);
     }
   } else {
-    eta_agd_contrast_ii = has_offset ?
-      X_agd_contrast * beta_tilde + offset_agd_contrast :
-      X_agd_contrast * beta_tilde;
+    if (nint == nint_max) eta_agd_contrast_ii = eta_agd_contrast_noRE;
+    else for (i in 1:ni_agd_contrast) {
+      eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
+    }
 
     for (i in 1:ni_agd_contrast) {
       eta_agd_contrast_bar[i] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)]);
