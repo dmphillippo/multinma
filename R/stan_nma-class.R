@@ -486,8 +486,26 @@ plot_prior_posterior <- function(x, ...,
 #'
 #' @examples
 #' ## Plaque psoriasis ML-NMR
-#' @template ex_plaque_psoriasis_mlnmr_example
+#' @template ex_plaque_psoriasis_network
+#' @template ex_plaque_psoriasis_integration
 #' @examples \donttest{
+#' # Fit the ML-NMR model
+#' pso_fit <- nma(pso_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+#'                trt_effects = "fixed",
+#'                link = "probit",
+#'                likelihood = "bernoulli2",
+#'                regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
+#'                class_interactions = "common",
+#'                prior_intercept = normal(scale = 10),
+#'                prior_trt = normal(scale = 10),
+#'                prior_reg = normal(scale = 10),
+#'                init_r = 0.1,
+#'                QR = TRUE,
+#'                # Set the thinning factor for saving the cumulative results
+#'                # (This also sets int_check = FALSE)
+#'                int_thin = 8)
+#' pso_fit
+#'
 #' # Plot numerical integration error
 #' plot_integration_error(pso_fit)
 #' }

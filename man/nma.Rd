@@ -23,7 +23,8 @@ nma(
   QR = FALSE,
   center = TRUE,
   adapt_delta = NULL,
-  int_thin = max(network$n_int\%/\%10, 1),
+  int_thin = 0,
+  int_check = TRUE,
   mspline_degree = 3,
   n_knots = 3,
   knots = NULL
@@ -91,7 +92,15 @@ decomposition to the model design matrix}
 \item{adapt_delta}{See \link{adapt_delta} for details}
 
 \item{int_thin}{A single integer value, the thinning factor for returning
-cumulative estimates of integration error}
+cumulative estimates of integration error. Saving cumulative estimates is
+disabled by \code{int_thin = 0}, which is the default.}
+
+\item{int_check}{Logical, check sufficient accuracy of numerical integration
+by fitting half of the chains with \code{n_int/2}? When \code{TRUE}, \code{Rhat} and
+\code{n_eff} diagnostic warnings will be given if numerical integration has not
+sufficiently converged (suggesting increasing \code{n_int} in
+\code{\link[=add_integration]{add_integration()}}). Default \code{TRUE}, but disabled (\code{FALSE}) when
+\code{int_thin > 0}.}
 
 \item{mspline_degree}{Non-negative integer giving the degree of the M-spline
 polynomial for \code{likelihood = "mspline"}. Piecewise exponential hazards

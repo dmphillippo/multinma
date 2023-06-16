@@ -47,9 +47,13 @@
 #' @param adapt_delta See [adapt_delta] for details
 #' @param int_thin A single integer value, the thinning factor for returning
 #'   cumulative estimates of integration error. Saving cumulative estimates is
-#'   disabled by `int_thin = 0`, and when `int_check = TRUE`.
+#'   disabled by `int_thin = 0`, which is the default.
 #' @param int_check Logical, check sufficient accuracy of numerical integration
-#'   by fitting half of the chains with `n_int/2`?
+#'   by fitting half of the chains with `n_int/2`? When `TRUE`, `Rhat` and
+#'   `n_eff` diagnostic warnings will be given if numerical integration has not
+#'   sufficiently converged (suggesting increasing `n_int` in
+#'   [add_integration()]). Default `TRUE`, but disabled (`FALSE`) when
+#'   `int_thin > 0`.
 #' @param mspline_degree Non-negative integer giving the degree of the M-spline
 #'   polynomial for `likelihood = "mspline"`. Piecewise exponential hazards
 #'   (`likelihood = "pexp"`) are a special case with `mspline_degree = 0`.
@@ -217,8 +221,8 @@ nma <- function(network,
                 QR = FALSE,
                 center = TRUE,
                 adapt_delta = NULL,
-                int_thin = max(network$n_int %/% 10, 1),
-                int_check = FALSE,
+                int_thin = 0,
+                int_check = TRUE,
                 mspline_degree = 3,
                 n_knots = 3,
                 knots = NULL) {
@@ -480,7 +484,7 @@ nma <- function(network,
   if (!rlang::is_scalar_integerish(int_thin) ||
       int_thin < 0) abort("`int_thin` should be an integer >= 0.")
   if (!rlang::is_bool(int_check)) abort("`int_check` should be a logical scalar (TRUE or FALSE).")
-  if (int_check) int_thin <- 0
+  if (int_thin > 0) int_check <- FALSE
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
@@ -1031,8 +1035,8 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_aux,
                     QR = FALSE,
                     adapt_delta = NULL,
-                    int_thin = 100L,
-                    int_check = FALSE,
+                    int_thin = 0,
+                    int_check = TRUE,
                     basis) {
 
   if (missing(ipd_x)) ipd_x <- NULL
@@ -1153,7 +1157,7 @@ nma.fit <- function(ipd_x, ipd_y,
   if (!rlang::is_scalar_integerish(int_thin) ||
       int_thin < 0) abort("`int_thin` should be an integer >= 0.")
   if (!rlang::is_bool(int_check)) abort("`int_check` should be a logical scalar (TRUE or FALSE).")
-  if (int_check) int_thin <- 0
+  if (int_thin > 0) int_check <- FALSE
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
@@ -1783,7 +1787,7 @@ nma.fit <- function(ipd_x, ipd_y,
               "https://mc-stan.org/misc/warnings.html#bulk-ess",
               call. = FALSE)
     } else if (bulk_ess_warn_a) {
-      warn(paste0("Bulk Effective Sample Size (ESS) is too low, indicating that integration has not converged.\n",
+      warn(paste0("Bulk Effective Sample Size (ESS) is too low, indicating that integration may not have converged.\n",
                   "Increase the number of integration points `n_int` in add_integration()."))
     }
 
@@ -1794,7 +1798,7 @@ nma.fit <- function(ipd_x, ipd_y,
               "https://mc-stan.org/misc/warnings.html#tail-ess",
               call. = FALSE)
     } else if (tail_ess_warn_a) {
-      warn(paste0("Tail Effective Sample Size (ESS) is too low, indicating that integration has not converged.\n",
+      warn(paste0("Tail Effective Sample Size (ESS) is too low, indicating that integration may not have converged.\n",
                   "Increase the number of integration points `n_int` in add_integration()."))
     }
 
