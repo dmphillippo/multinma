@@ -17,7 +17,7 @@ add_integration(x, ...)
   ...,
   cor = NULL,
   cor_adjust = NULL,
-  n_int = 1000L,
+  n_int = 64L,
   int_args = list()
 )
 
@@ -26,7 +26,7 @@ add_integration(x, ...)
   ...,
   cor = NULL,
   cor_adjust = NULL,
-  n_int = 1000L,
+  n_int = 64L,
   int_args = list()
 )
 
@@ -48,7 +48,9 @@ copula correlations, either \code{"spearman"}, \code{"pearson"}, or \code{"none"
 "Details". The default when \code{cor = NULL} is \code{"spearman"}, otherwise the
 default is \code{"pearson"}.}
 
-\item{n_int}{Number of integration points to generate, default 1000}
+\item{n_int}{Number of integration points to generate, default 64. Powers of
+2 are recommended, as these are expected to be particularly efficient for
+QMC integration.}
 
 \item{int_args}{A named list of arguments to pass to
 \code{\link[randtoolbox:quasiRNG]{sobol()}}}
@@ -65,9 +67,9 @@ row. For \code{unnest_integration()}, a data frame with integration points
 unnested.
 }
 \description{
-The \code{add_integration()} generic creates numerical integration points using a
-Gaussian copula approach, as described in
-\insertCite{methods_paper;textual}{multinma}. Methods are available for
+The \code{add_integration()} generic creates Quasi-Monte Carlo numerical
+integration points using a Gaussian copula and Sobol' sequences, as described
+in \insertCite{methods_paper;textual}{multinma}. Methods are available for
 networks stored in \code{nma_data} objects, and for data frames. The function
 \code{unnest_integration()} unnests integration points stored in a data frame, to
 aid plotting or other exploration.
@@ -183,7 +185,7 @@ pso_net <- add_integration(pso_net,
   bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
   weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
   psa = distr(qbern, prob = psa),
-  n_int = 1000)
+  n_int = 64)
 
 
 ## Adding integration points to a data frame, e.g. for prediction
@@ -207,7 +209,7 @@ new_agd_int <- add_integration(new_agd_int,
   weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
   psa = distr(qbern, prob = psa),
   cor = pso_net$int_cor,
-  n_int = 1000)
+  n_int = 64)
 
 # Here, since we reused the correlation matrix pso_net$int_cor from the
 # network, the correct setting of cor_adjust = "spearman" is automatically

@@ -541,7 +541,7 @@ test_that("integration point marginals and correlations are correct", {
   skip_on_cran()
   tol <- 0.005
   cor_tol <- 0.05
-  n_int <- 10000
+  n_int <- 2^14
 
   # 1 covariate
   s1 <- add_integration(smknet, x1 = distr(qnorm, mean = x1_mean, sd = x1_sd), n_int = n_int)
