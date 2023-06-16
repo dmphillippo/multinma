@@ -4,8 +4,7 @@
 #' mean survival time functions for the M-spline baseline hazards model.
 #'
 #' @param x,q Vector of quantiles
-#' @param basis M-spline basis produced by [splines2::mSpline()] or
-#'   [splines2::iSpline()]
+#' @param basis M-spline basis produced by [splines2::mSpline()]
 #' @param scoef Vector (or matrix) of spline coefficients with length (or number
 #'   of columns) equal to the dimension of `basis`
 #' @param rate Vector of rate parameters
@@ -53,7 +52,7 @@
 #'   \insertAllCited{}
 #'
 dmspline <- function(x, basis, scoef, rate, log = FALSE) {
-  if (!inherits(basis, "mSpline")) abort("`basis` must be an M-spline basis produced by splines2::mSpline() or splines2::iSpline()")
+  if (!is_mspline(basis)) abort("`basis` must be an M-spline basis produced by splines2::mSpline() or splines2::iSpline()")
   if (!rlang::is_bool(log)) abort("`log` must be a logical value (TRUE or FALSE).")
 
   if (missing(x)) out <- hmspline(basis = basis, scoef = scoef, rate = rate) * pmspline(basis = basis, scoef = scoef, rate = rate, lower.tail = FALSE)
@@ -67,7 +66,7 @@ dmspline <- function(x, basis, scoef, rate, log = FALSE) {
 #' @rdname mspline
 #' @export
 pmspline <- function(q, basis, scoef, rate, lower.tail = TRUE, log.p = FALSE) {
-  if (!inherits(basis, "mSpline")) abort("`basis` must be an M-spline basis produced by splines2::mSpline() or splines2::iSpline()")
+  if (!is_mspline(basis)) abort("`basis` must be an M-spline basis produced by splines2::mSpline() or splines2::iSpline()")
   if (!rlang::is_bool(lower.tail)) abort("`lower.tail` must be a logical value (TRUE or FALSE).")
   if (!rlang::is_bool(log.p)) abort("`log.p` must be a logical value (TRUE or FALSE).")
 
@@ -96,7 +95,7 @@ qmspline <- function(p, basis, scoef, rate, lower.tail = TRUE, log.p = FALSE) {
 #' @rdname mspline
 #' @export
 hmspline <- function(x, basis, scoef, rate, log = FALSE) {
-  if (!inherits(basis, "mSpline")) abort("`basis` must be an M-spline basis produced by splines2::mSpline() or splines2::iSpline()")
+  if (!is_mspline(basis)) abort("`basis` must be an M-spline basis produced by splines2::mSpline() or splines2::iSpline()")
   if (!rlang::is_bool(log)) abort("`log` must be a logical value (TRUE or FALSE).")
 
   xb <- if (missing(x)) update(basis, integral = FALSE)
@@ -124,7 +123,7 @@ hmspline <- function(x, basis, scoef, rate, log = FALSE) {
 #' @rdname mspline
 #' @export
 Hmspline <- function(x, basis, scoef, rate, log = FALSE) {
-  if (!inherits(basis, "mSpline")) abort("`basis` must be an M-spline basis produced by splines2::mSpline() or splines2::iSpline()")
+  if (!is_mspline(basis)) abort("`basis` must be an M-spline basis produced by splines2::mSpline() or splines2::iSpline()")
   if (!rlang::is_bool(log)) abort("`log` must be a logical value (TRUE or FALSE).")
 
   xb <- if (missing(x)) update(basis, integral = TRUE)
@@ -184,4 +183,13 @@ rmst_mspline <- function(t, basis, scoef, rate, start = 0) {
 #' @noRd
 mean_mspline <- function(basis, scoef, rate, ...) {
   rmst_mspline(t = Inf, basis, scoef, rate)
+}
+
+# Function to check for mspline/ispline objects
+is_mspline <- function(x) {
+  if (packageVersion("splines2") >= "5.0.0") {
+    inherits(x, "MSpline")
+  } else {
+    inherits(x, "mSpline")
+  }
 }

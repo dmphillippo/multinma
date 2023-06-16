@@ -24,8 +24,7 @@ rmst_mspline(t, basis, scoef, rate, start = 0)
 \arguments{
 \item{x, q}{Vector of quantiles}
 
-\item{basis}{M-spline basis produced by \code{\link[splines2:mSpline]{splines2::mSpline()}} or
-\code{\link[splines2:iSpline]{splines2::iSpline()}}}
+\item{basis}{M-spline basis produced by \code{\link[splines2:mSpline]{splines2::mSpline()}}}
 
 \item{scoef}{Vector (or matrix) of spline coefficients with length (or number
 of columns) equal to the dimension of \code{basis}}
