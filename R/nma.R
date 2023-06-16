@@ -2594,7 +2594,6 @@ make_nma_model_matrix <- function(nma_formula,
 #' @param data Data frame
 #' @param regression Regression formula or NULL
 #' @param label Label for data source or NULL, used for informative errors
-#' @param keep Additional variables to keep
 #'
 #' @return Data frame with required columns
 #' @noRd
@@ -2610,9 +2609,9 @@ get_model_data_columns <- function(data, regression = NULL, label = NULL, keep =
                    " not found", label, ".")
       )
     }
-    out <- dplyr::select(data, dplyr::starts_with("."), !! regvars, keep)
+    out <- dplyr::select(data, dplyr::starts_with("."), !! regvars)
   } else {
-    out <- dplyr::select(data, dplyr::starts_with("."), keep)
+    out <- dplyr::select(data, dplyr::starts_with("."))
   }
 
   # Work around dplyr::bind_rows() bug - convert .Surv column to bare matrix if present
