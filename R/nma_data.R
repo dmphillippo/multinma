@@ -914,7 +914,7 @@ set_agd_surv <- function(data,
 
   # Nest survival data, keeping original data nested for later too
   d <- tidyr::nest(d,
-                   .Surv = .data$.Surv,
+                   .Surv = ".Surv",
                    .data_orig = !dplyr::any_of(c(".study", ".trt", ".trtclass", ".sample_size", ".Surv")),
                    .by = dplyr::any_of(c(".study", ".trt", ".trtclass", ".sample_size")))
 

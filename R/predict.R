@@ -796,7 +796,7 @@ predict.stan_nma <- function(object, ...,
             }
 
             # Drop .Surv column, not needed
-            dat_agd_arm <- dplyr::select(dat_agd_arm, -.data$.Surv)
+            dat_agd_arm <- dplyr::select(dat_agd_arm, -".Surv")
           }
 
           # Only take necessary columns
@@ -820,7 +820,7 @@ predict.stan_nma <- function(object, ...,
                 dplyr::group_by(.data$.study) %>%
                 dplyr::mutate(.obs_id = 1:dplyr::n()) %>%
                 dplyr::group_by(.data$.study, .data$.trt) %>%
-                tidyr::nest(.time = .data$.time, .obs_id = .data$.obs_id)
+                tidyr::nest(.time = ".time", .obs_id = ".obs_id")
 
               dat_ipd <- dplyr::left_join(dat_ipd,
                                           ipd_times,
@@ -837,7 +837,7 @@ predict.stan_nma <- function(object, ...,
             }
 
             # Drop .Surv column, not needed
-            dat_ipd <- dplyr::select(dat_ipd, -.data$.Surv)
+            dat_ipd <- dplyr::select(dat_ipd, -".Surv")
           }
 
           # Only take necessary columns
@@ -977,10 +977,10 @@ predict.stan_nma <- function(object, ...,
           if (level == "aggregate" && type %in% c("survival", "hazard", "cumhaz")) {
             # Need to average survival curve over all covariate values at every time
             p_times <- dplyr::group_by(preddat, .data$.study) %>%
-              dplyr::select(.data$.study, .data$.time, .data$.obs_id) %>%
-              tidyr::nest(.time = .data$.time, .obs_id = .data$.obs_id)
+              dplyr::select(".study", ".time", ".obs_id") %>%
+              tidyr::nest(.time = ".time", .obs_id = ".obs_id")
 
-            preddat <- dplyr::select(preddat, -.data$.time, -.data$.obs_id) %>%
+            preddat <- dplyr::select(preddat, -".time", -".obs_id") %>%
               dplyr::left_join(p_times, by = ".study") %>%
               tidyr::unnest(cols = c(".time", ".obs_id"))
           }
@@ -1287,9 +1287,9 @@ predict.stan_nma <- function(object, ...,
 
       if (level == "individual") {
         if (type %in% c("survival", "hazard", "cumhaz", "rmst")) {
-          outdat <- dplyr::select(preddat, .data$.study, .data$.trt, .data$.obs_id, .data$.time)
+          outdat <- dplyr::select(preddat, ".study", ".trt", ".obs_id", ".time")
         } else {
-          outdat <- dplyr::select(preddat, .data$.study, .data$.trt, .data$.obs_id)
+          outdat <- dplyr::select(preddat, ".study", ".trt", ".obs_id")
         }
       } else {
         if (type %in% c("survival", "hazard", "cumhaz")) {
