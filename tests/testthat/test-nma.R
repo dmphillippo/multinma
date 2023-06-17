@@ -382,3 +382,21 @@ test_that("nma() prior checks work", {
                    prior_aux = list(k = normal(0, 1))),
                "Missing named elements with priors for sigma")
 })
+
+test_that("rstan R-hat and ESS warnings are captured correctly", {
+  # Need to capture these for numerical integration checks, but fragile since warning text may change
+  local_edition(3)
+
+  expect_warning(
+  expect_warning(
+  expect_warning(
+    nma(smknet,
+        prior_intercept = normal(0, 100),
+        prior_trt = normal(0, 100),
+        iter = 100,
+        seed = 1234,
+        init = 0),
+    "The largest R-hat is"),
+    "Bulk Effective Sample(s?) Size \\(ESS\\) is too low"),
+    "Tail Effective Sample(s?) Size \\(ESS\\) is too low")
+})
