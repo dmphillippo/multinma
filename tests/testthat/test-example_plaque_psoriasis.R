@@ -820,3 +820,35 @@ test_that("Robust to custom options(contrasts) settings", {
                tolerance = tol)
 })
 
+test_that("Integration checks with int_check throw expected warnings", {
+  local_edition(3)
+  
+  pso_net_lownint <- 
+    suppressWarnings(add_integration(pso_net,
+                    durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+                    prevsys = distr(qbern, prob = prevsys),
+                    bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+                    weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
+                    psa = distr(qbern, prob = psa),
+                    n_int = 2))
+
+  expect_warning(
+  expect_warning(
+  expect_warning(
+    nma(pso_net_lownint,
+        trt_effects = "fixed",
+        link = "probit", 
+        likelihood = "bernoulli2",
+        regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
+        class_interactions = "common",
+        prior_intercept = normal(scale = 10),
+        prior_trt = normal(scale = 10),
+        prior_reg = normal(scale = 10),
+        init_r = 0.1,
+        QR = TRUE,
+        ),
+    class = "int_check_rhat"),
+    class = "int_check_essb"),
+    class = "int_check_esst")
+})
+
