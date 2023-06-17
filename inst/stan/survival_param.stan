@@ -329,7 +329,7 @@ transformed parameters {
               X_agd_arm * beta_tilde + offset_agd_arm :
               X_agd_arm * beta_tilde;
 
-    if (nint > 1) { // -- If integration points are used --
+    if (nint_max > 1) { // -- If integration points are used --
 
       // Integration points are local variable only for efficiency
       vector[nint] eta_agd_arm_ii;

@@ -25,9 +25,9 @@ vector[nodesplit] omega; // nodesplit ? allbeta[totns + ns] : vector(0);
 vector[nX - totns - (nt - 1) - nodesplit] beta;
 
 // -- AgD integration --
-// vector[nint > 1 ? nint * ni_agd_arm : 0] theta_agd_arm_ii;
+// vector[nint_max > 1 ? nint * ni_agd_arm : 0] theta_agd_arm_ii;
 // vector[ni_agd_arm] theta_agd_arm_bar;
-vector[nint > 1 ? nint * ni_agd_contrast : 0] eta_agd_contrast_ii;
+vector[nint_max > 1 ? nint * ni_agd_contrast : 0] eta_agd_contrast_ii;
 vector[ni_agd_contrast] eta_agd_contrast_bar;
 
 // -- Study baselines --
@@ -76,7 +76,7 @@ if (RE) {
 
 // -- AgD model (contrast-based) --
 if (ni_agd_contrast) {
-if (nint > 1) {
+if (nint_max > 1) {
   vector[nint_max * ni_agd_contrast] eta_agd_contrast_noRE = has_offset ?
     X_agd_contrast * beta_tilde + offset_agd_contrast :
     X_agd_contrast * beta_tilde;

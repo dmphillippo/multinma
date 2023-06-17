@@ -35,7 +35,7 @@ transformed parameters {
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
-    if (nint > 1) { // -- If integration points are used --
+    if (nint_max > 1) { // -- If integration points are used --
       vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
         X_agd_arm * beta_tilde + offset_agd_arm :
         X_agd_arm * beta_tilde;

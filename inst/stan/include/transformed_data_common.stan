@@ -46,7 +46,7 @@ vector[has_offset && ni_agd_arm ? nint_max * ni_agd_arm : 0] offset_agd_arm = ha
 vector[has_offset && ni_agd_contrast ? nint_max * ni_agd_contrast : 0] offset_agd_contrast = has_offset && ni_agd_contrast ? offsets[(ni_ipd + nint_max * ni_agd_arm + 1):(ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast))] : odummy;
 
 // nint/int_thin for numerical integration checks
-int n_int_thin = (nint > 1 && int_thin > 0) ? nint / int_thin : 0;
+int n_int_thin = (nint_max > 1 && int_thin > 0) ? nint / int_thin : 0;
 
 // Inverse covariance matrix for contrasts
 matrix[ni_agd_contrast ? ni_agd_contrast : 1, ni_agd_contrast ? ni_agd_contrast : 1] inv_Sigma = inverse_spd(agd_contrast_Sigma);

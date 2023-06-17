@@ -42,7 +42,7 @@ transformed parameters {
 
   vector[ncat] theta_ipd[ni_ipd]; // IPD transformed predictor
 
-  matrix[nint > 1 ? nint * ni_agd_arm : 0, nint > 1 ? ncat - 1 : 0] theta_agd_arm_ii; // Use these as q_ii intermediates
+  matrix[nint_max > 1 ? nint * ni_agd_arm : 0, nint_max > 1 ? ncat - 1 : 0] theta_agd_arm_ii; // Use these as q_ii intermediates
   vector[ncat] q_agd_arm_bar[ni_agd_arm]; // AgD arm transformed predictor
   vector[ncat] theta_agd_arm_bar[ni_agd_arm]; // AgD arm transformed predictor
 
@@ -93,7 +93,7 @@ transformed parameters {
           X_agd_arm * beta_tilde + offset_agd_arm :
           X_agd_arm * beta_tilde;
 
-    if (nint > 1) { // -- If integration points are used --
+    if (nint_max > 1) { // -- If integration points are used --
 
       if (RE) {
 
