@@ -1736,11 +1736,11 @@ nma.fit <- function(ipd_x, ipd_y,
                                        rhat_warn_a <<- TRUE
                                        rlang::cnd_muffle(w)
                                      }
-                                     if (grepl("Bulk Effective Samples Size (ESS) is too low", w, fixed = TRUE)) {
+                                     if (grepl("Bulk Effective Sample(s?) Size \\(ESS\\) is too low", w)) {
                                        bulk_ess_warn_a <<- TRUE
                                        rlang::cnd_muffle(w)
                                      }
-                                     if (grepl("Tail Effective Samples Size (ESS) is too low", w, fixed = TRUE)) {
+                                     if (grepl("Tail Effective Sample(s?) Size \\(ESS\\) is too low", w)) {
                                        tail_ess_warn_a <<- TRUE
                                        rlang::cnd_muffle(w)
                                      }
@@ -1782,6 +1782,7 @@ nma.fit <- function(ipd_x, ipd_y,
           warn(paste0("The largest R-hat is ", round(max(rhat_a), digits = 2),
                       ", indicating that integration has not converged.\n",
                       "Increase the number of integration points `n_int` in add_integration()."),
+               class = "int_check_rhat")
         }
 
         if (bulk_ess_warn_w) {
@@ -1793,6 +1794,7 @@ nma.fit <- function(ipd_x, ipd_y,
         } else if (bulk_ess_warn_a) {
           warn(paste0("Bulk Effective Sample Size (ESS) is too low, indicating that integration may not have converged.\n",
                       "Increase the number of integration points `n_int` in add_integration()."),
+               class = "int_check_essb")
         }
 
         if (tail_ess_warn_w) {
@@ -1804,6 +1806,7 @@ nma.fit <- function(ipd_x, ipd_y,
         } else if (tail_ess_warn_a) {
           warn(paste0("Tail Effective Sample Size (ESS) is too low, indicating that integration may not have converged.\n",
                       "Increase the number of integration points `n_int` in add_integration()."),
+               class = "int_check_esst")
         }
       }
     }
