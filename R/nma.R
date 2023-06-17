@@ -1747,59 +1747,65 @@ nma.fit <- function(ipd_x, ipd_y,
                                    })
 
     # Check Rhat, neff within chains with same n_int
-    sims <- as.array(stanfit)
-    sims_nint1 <- sims[ , nint_vec == unique(n_int)[1], , drop = FALSE]
-    sims_nint2 <- sims[ , nint_vec == unique(n_int)[2], , drop = FALSE]
+    if (stanfit@mode == 0) {
+      if (stanfit@sim$chains < nchains) {
+        warn("Cannot check integration error, some chains failed to return samples.")
+      } else {
+        sims <- as.array(stanfit)
+        sims_nint1 <- sims[ , nint_vec == unique(n_int)[1], , drop = FALSE]
+        sims_nint2 <- sims[ , nint_vec == unique(n_int)[2], , drop = FALSE]
 
-    rhat_1 <- apply(sims_nint1, 3, rstan::Rhat)
-    rhat_2 <- apply(sims_nint2, 3, rstan::Rhat)
-    rhat_w <- pmax(rhat_1, rhat_2, na.rm = TRUE)
-    rhat_warn_w <- any(rhat_w > 1.05, na.rm = TRUE)
+        rhat_1 <- apply(sims_nint1, 3, rstan::Rhat)
+        rhat_2 <- apply(sims_nint2, 3, rstan::Rhat)
+        rhat_w <- pmax(rhat_1, rhat_2, na.rm = TRUE)
+        rhat_warn_w <- any(rhat_w > 1.05, na.rm = TRUE)
 
-    bulk_ess_1 <- apply(sims_nint1, 3, rstan::ess_bulk)
-    bulk_ess_2 <- apply(sims_nint2, 3, rstan::ess_bulk)
-    bulk_ess_w <- pmin(bulk_ess_1, bulk_ess_2, na.rm = TRUE)
-    bulk_ess_warn_w <- any(bulk_ess_w < 100 * ncol(sims), na.rm = TRUE)
+        bulk_ess_1 <- apply(sims_nint1, 3, rstan::ess_bulk)
+        bulk_ess_2 <- apply(sims_nint2, 3, rstan::ess_bulk)
+        bulk_ess_w <- pmin(bulk_ess_1, bulk_ess_2, na.rm = TRUE)
+        bulk_ess_warn_w <- any(bulk_ess_w < 100 * ncol(sims), na.rm = TRUE)
 
-    tail_ess_1 <- apply(sims_nint1, 3, rstan::ess_tail)
-    tail_ess_2 <- apply(sims_nint2, 3, rstan::ess_tail)
-    tail_ess_w <- pmin(tail_ess_1, tail_ess_2, na.rm = TRUE)
-    tail_ess_warn_w <- any(tail_ess_w < 100 * ncol(sims), na.rm = TRUE)
+        tail_ess_1 <- apply(sims_nint1, 3, rstan::ess_tail)
+        tail_ess_2 <- apply(sims_nint2, 3, rstan::ess_tail)
+        tail_ess_w <- pmin(tail_ess_1, tail_ess_2, na.rm = TRUE)
+        tail_ess_warn_w <- any(tail_ess_w < 100 * ncol(sims), na.rm = TRUE)
 
-    # Warnings within chains with same n_int are due to low iter
-    if (rhat_warn_w) {
-      warning("The largest R-hat is ", round(max(rhat_w), digits = 2),
-              ", indicating chains have not mixed.\n", "Running the chains for more iterations may help. See\n",
-              "https://mc-stan.org/misc/warnings.html#r-hat",
-              call. = FALSE)
-    } else if (rhat_warn_a) {
-      # Otherwise, if rhats within chains with same n_int are good, warnings across all chains are low n_int
-      rhat_a <- apply(sims, 3, rstan::Rhat)
-      warn(paste0("The largest R-hat is ", round(max(rhat_a), digits = 2),
-                  ", indicating that integration has not converged.\n",
-                  "Increase the number of integration points `n_int` in add_integration()."))
-    }
+        # Warnings within chains with same n_int are due to low iter
+        if (rhat_warn_w) {
+          warning("The largest R-hat is ", round(max(rhat_w), digits = 2),
+                  ", indicating chains have not mixed.\n", "Running the chains for more iterations may help. See\n",
+                  "https://mc-stan.org/misc/warnings.html#r-hat",
+                  call. = FALSE)
+        } else if (rhat_warn_a) {
+          # Otherwise, if rhats within chains with same n_int are good, warnings across all chains are low n_int
+          rhat_a <- apply(sims, 3, rstan::Rhat)
+          warn(paste0("The largest R-hat is ", round(max(rhat_a), digits = 2),
+                      ", indicating that integration has not converged.\n",
+                      "Increase the number of integration points `n_int` in add_integration()."),
+        }
 
-    if (bulk_ess_warn_w) {
-      warning("Bulk Effective Sample Size (ESS) is too low, ",
-              "indicating posterior means and medians may be unreliable.\n",
-              "Running the chains for more iterations may help. See\n",
-              "https://mc-stan.org/misc/warnings.html#bulk-ess",
-              call. = FALSE)
-    } else if (bulk_ess_warn_a) {
-      warn(paste0("Bulk Effective Sample Size (ESS) is too low, indicating that integration may not have converged.\n",
-                  "Increase the number of integration points `n_int` in add_integration()."))
-    }
+        if (bulk_ess_warn_w) {
+          warning("Bulk Effective Sample Size (ESS) is too low, ",
+                  "indicating posterior means and medians may be unreliable.\n",
+                  "Running the chains for more iterations may help. See\n",
+                  "https://mc-stan.org/misc/warnings.html#bulk-ess",
+                  call. = FALSE)
+        } else if (bulk_ess_warn_a) {
+          warn(paste0("Bulk Effective Sample Size (ESS) is too low, indicating that integration may not have converged.\n",
+                      "Increase the number of integration points `n_int` in add_integration()."),
+        }
 
-    if (tail_ess_warn_w) {
-      warning("Tail Effective Sample Size (ESS) is too low, indicating ",
-              "posterior variances and tail quantiles may be unreliable.\n",
-              "Running the chains for more iterations may help. See\n",
-              "https://mc-stan.org/misc/warnings.html#tail-ess",
-              call. = FALSE)
-    } else if (tail_ess_warn_a) {
-      warn(paste0("Tail Effective Sample Size (ESS) is too low, indicating that integration may not have converged.\n",
-                  "Increase the number of integration points `n_int` in add_integration()."))
+        if (tail_ess_warn_w) {
+          warning("Tail Effective Sample Size (ESS) is too low, indicating ",
+                  "posterior variances and tail quantiles may be unreliable.\n",
+                  "Running the chains for more iterations may help. See\n",
+                  "https://mc-stan.org/misc/warnings.html#tail-ess",
+                  call. = FALSE)
+        } else if (tail_ess_warn_a) {
+          warn(paste0("Tail Effective Sample Size (ESS) is too low, indicating that integration may not have converged.\n",
+                      "Increase the number of integration points `n_int` in add_integration()."),
+        }
+      }
     }
 
   } else {
