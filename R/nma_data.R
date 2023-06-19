@@ -920,6 +920,8 @@ set_agd_surv <- function(data,
 
   # Join covariate details
   if (!is.null(covariates)) {
+    covariates <- dplyr::ungroup(covariates)
+
     .cov_study <- pull_non_null(covariates, enquo(study))
     if (is.null(.cov_study)) abort("`study` cannot be NULL")
     check_study(.cov_study)
