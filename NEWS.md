@@ -20,6 +20,28 @@ progression-free survival after autologous stem cell transplant for newly
 diagnosed multiple myeloma, with corresponding datasets `ndmm_ipd`, `ndmm_agd`,
 and `ndmm_agd_covs`.
 
+## Feature: Automatic checking of numerical integration for ML-NMR models
+
+* The accuracy of numerical integration for ML-NMR models can now be checked 
+automatically, and is by default. To do so, half of the chains are run with 
+`n_int` and half with `n_int/2` integration points. Any Rhat or effective sample 
+size warnings can then be ascribed to either: non-convergence of the MCMC 
+chains, requiring increased number of iterations `iter` in `nma()`, or; 
+insufficient accuracy of numerical integration, requiring increased number of 
+integration points `n_int` in `add_integration()`. Descriptive warning messages 
+indicate which is the case.
+* This feature is controlled by a new `int_check` argument to `nma()`, which is 
+enabled (`TRUE`) by default.
+* Saving thinned cumulative integration points can now be disabled with 
+`int_thin = 0`, and is now disabled by default. The previous default was
+`int_thin = max(n_int %/% 10, 1)`.
+* Because we can now check sufficient accuracy automatically, the default number 
+of integration points `n_int` in `add_integration()` has been lowered to 64.
+This is still a conservative choice, and will be sufficient in many cases; the 
+previous default of 1000 was excessive.
+* As a result, ML-NMR models are now much faster to run by default, both due to 
+lower `n_int` and disabling saving cumulative integration points.
+
 ## Other updates
 
 * Feature: `dic()` now includes an option to use the pV penalty instead of pD.
