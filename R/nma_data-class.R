@@ -792,7 +792,7 @@ plot.nma_data <- function(x, ..., layout, circular,
     if (nudge == 0) {
       pos <- ggplot2::position_identity()
     } else {
-      if (circular || layout %in% c("circle", "star")) {
+      if (circular || (rlang::is_string(layout) && layout %in% c("circle", "star"))) {
         pos <- ggplot2::position_nudge(x = nudge * g$data$x,
                                        y = nudge * g$data$y)
       } else {
