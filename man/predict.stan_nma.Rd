@@ -33,6 +33,7 @@
   type = c("survival", "hazard", "cumhaz", "mean", "median", "quantile", "rmst", "link"),
   quantiles = c(0.25, 0.5, 0.75),
   level = c("aggregate", "individual"),
+  times_seq = NULL,
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
   predictive_distribution = FALSE,
   summary = TRUE
@@ -142,8 +143,8 @@ study be returned? Default \code{FALSE}.}
 Alternatively, if \code{newdata} is specified, \code{times} can be the name of a
 column in \code{newdata} which contains the times. If \code{NULL} (the default) then
 predictions are made at the event/censoring times from the studies included
-in the network. Only used if \code{type} is \code{"survival"}, \code{"hazard"}, \code{"cumhaz"}
-or \code{"rmst"}.}
+in the network (or according to \code{times_seq}). Only used if \code{type} is
+\code{"survival"}, \code{"hazard"}, \code{"cumhaz"} or \code{"rmst"}.}
 
 \item{aux}{An optional \code{\link[=distr]{distr()}} distribution for the auxiliary parameter(s)
 in the baseline hazard (e.g. shapes). If \code{NULL}, predictions are produced
@@ -156,6 +157,13 @@ study names, or otherwise in order of appearance in \code{newdata}).}
 
 \item{quantiles}{A numeric vector of quantiles of the survival time
 distribution to produce estimates for when \code{type = "quantile"}.}
+
+\item{times_seq}{A positive integer, when specified evaluate predictions at
+this many evenly-spaced event times between 0 and the latest follow-up time
+in each study, instead of every observed event/censoring time. Only used if
+\code{newdata = NULL} and \code{type} is \code{"survival"}, \code{"hazard"} or \code{"cumhaz"}. This
+can be useful for plotting survival or (cumulative) hazard curves, where
+prediction at every observed even/censoring time is unnecessary and slow.}
 }
 \value{
 A \link{nma_summary} object if \code{summary = TRUE}, otherwise a list

@@ -195,6 +195,7 @@ predict.stan_nma <- function(object, ...,
     times <- dlist$times
     aux <- dlist$aux
     quantiles <- dlist$quantiles
+    times_seq <- dlist$times_seq
   }
 
 
@@ -340,6 +341,14 @@ predict.stan_nma <- function(object, ...,
             surv_all <- dplyr::bind_rows(object$network$ipd,
                                          tidyr::unnest(object$network$agd_arm, cols = ".Surv"))
             surv_all <- dplyr::mutate(surv_all, !!! get_Surv_data(surv_all$.Surv))
+
+            # Calculate times sequence if times_seq specified
+            if (!is.null(times_seq)) {
+              surv_all <- dplyr::group_by(surv_all, .data$.study) %>%
+                dplyr::summarise(time = list(seq(from = 0, to = max(.data$time), by = (max(.data$time) + 1)/times_seq))) %>%
+                tidyr::unnest(cols = "time") %>%
+                dplyr::ungroup()
+            }
 
             # Add times vector to preddat
             preddat <- dplyr::left_join(preddat,
@@ -762,6 +771,7 @@ predict.stan_nma <- function(object, ...,
             }
           } else {
             if (type %in% c("survival", "hazard", "cumhaz") && is.null(times)) {
+              if (is.null(times_seq)) {
                 # Use times from network, unnest
                 dat_agd_arm <- object$network$agd_arm %>%
                   # Drop duplicated names in outer dataset from .data_orig before unnesting
@@ -775,6 +785,25 @@ predict.stan_nma <- function(object, ...,
                   dplyr::group_by(.data$.study) %>%
                   dplyr::mutate(.obs_id = 1:dplyr::n()) %>%
                   dplyr::ungroup()
+
+              } else {
+                # Calculate times sequence if times_seq specified
+                agd_times <- object$network$agd_arm %>%
+                  tidyr::unnest(cols = ".Surv") %>%
+                  dplyr::mutate(!!! get_Surv_data(.$.Surv), .time = .data$time) %>%
+                  dplyr::group_by(.data$.study) %>%
+                  dplyr::summarise(.time = list(seq(from = 0, to = max(.data$.time), by = (max(.data$.time) + 1)/times_seq)),
+                                   .obs_id = list(1:times_seq))
+
+                dat_agd_arm <- object$network$agd_arm %>%
+                  # Drop duplicated names in outer dataset from .data_orig before unnesting
+                  # Take only one row of .data_orig (all duplicated anyway)
+                  dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm)))[1,]),
+                                # Reset sample size for weighted mean later
+                                .sample_size = 1) %>%
+                  dplyr::left_join(agd_times, by = ".study") %>%
+                  tidyr::unnest(cols = c(".time", ".obs_id", ".data_orig"))
+              }
             } else {
               # Use provided times
               dat_agd_arm <- object$network$agd_arm %>%
@@ -813,19 +842,35 @@ predict.stan_nma <- function(object, ...,
             # curve over the population (i.e. over every individual), so we need
             # to expand out every time for every individual
             if (type %in% c("survival", "hazard", "cumhaz") && is.null(times)) {
-              # Use times from network
-              ipd_times <- dplyr::mutate(dat_ipd, !!! get_Surv_data(dat_ipd$.Surv), .time = .data$time) %>%
-                dplyr::select(".study", ".trt", ".time") %>%
-                # Add in ID variable for each observation, needed later for aggregating
-                dplyr::group_by(.data$.study) %>%
-                dplyr::mutate(.obs_id = 1:dplyr::n()) %>%
-                dplyr::group_by(.data$.study, .data$.trt) %>%
-                tidyr::nest(.time = ".time", .obs_id = ".obs_id")
+              if (is.null(times_seq)) {
+                # Use times from network
+                ipd_times <- dplyr::mutate(dat_ipd, !!! get_Surv_data(dat_ipd$.Surv), .time = .data$time) %>%
+                  dplyr::select(".study", ".trt", ".time") %>%
+                  # Add in ID variable for each observation, needed later for aggregating
+                  dplyr::group_by(.data$.study) %>%
+                  dplyr::mutate(.obs_id = 1:dplyr::n()) %>%
+                  dplyr::group_by(.data$.study, .data$.trt) %>%
+                  tidyr::nest(.time = ".time", .obs_id = ".obs_id")
 
-              dat_ipd <- dplyr::left_join(dat_ipd,
-                                          ipd_times,
-                                          by = c(".study", ".trt")) %>%
-                tidyr::unnest(cols = c(".time", ".obs_id"))
+                dat_ipd <- dplyr::left_join(dat_ipd,
+                                            ipd_times,
+                                            by = c(".study", ".trt")) %>%
+                  tidyr::unnest(cols = c(".time", ".obs_id"))
+
+              } else {
+                # Calculate times sequence if times_seq specified
+                ipd_times <- dplyr::mutate(dat_ipd, !!! get_Surv_data(dat_ipd$.Surv), .time = .data$time) %>%
+                  dplyr::group_by(.data$.study) %>%
+                  dplyr::summarise(.time = list(seq(from = 0, to = max(.data$.time), by = (max(.data$.time) + 1)/times_seq)),
+                                   .obs_id = list(1:times_seq)) %>%
+                  dplyr::ungroup()
+
+                dat_ipd <- dplyr::left_join(dat_ipd,
+                                            ipd_times,
+                                            by = ".study") %>%
+                  tidyr::unnest(cols = c(".time", ".obs_id"))
+              }
+
             } else {
               # Use provided times
               if (type %in% c("survival", "hazard", "cumhaz", "rmst")) {
@@ -1594,8 +1639,8 @@ predict.stan_nma <- function(object, ...,
 #'   Alternatively, if `newdata` is specified, `times` can be the name of a
 #'   column in `newdata` which contains the times. If `NULL` (the default) then
 #'   predictions are made at the event/censoring times from the studies included
-#'   in the network. Only used if `type` is `"survival"`, `"hazard"`, `"cumhaz"`
-#'   or `"rmst"`.
+#'   in the network (or according to `times_seq`). Only used if `type` is
+#'   `"survival"`, `"hazard"`, `"cumhaz"` or `"rmst"`.
 #' @param aux An optional [distr()] distribution for the auxiliary parameter(s)
 #'   in the baseline hazard (e.g. shapes). If `NULL`, predictions are produced
 #'   using the parameter estimates for each study in the network with IPD or
@@ -1606,6 +1651,13 @@ predict.stan_nma <- function(object, ...,
 #'   study names, or otherwise in order of appearance in `newdata`).
 #' @param quantiles A numeric vector of quantiles of the survival time
 #'   distribution to produce estimates for when `type = "quantile"`.
+#' @param times_seq A positive integer, when specified evaluate predictions at
+#'   this many evenly-spaced event times between 0 and the latest follow-up time
+#'   in each study, instead of every observed event/censoring time. Only used if
+#'   `newdata = NULL` and `type` is `"survival"`, `"hazard"` or `"cumhaz"`. This
+#'   can be useful for plotting survival or (cumulative) hazard curves, where
+#'   prediction at every observed even/censoring time is unnecessary and can be
+#'   slow.
 #'
 #' @export
 #' @rdname predict.stan_nma
@@ -1617,6 +1669,7 @@ predict.stan_nma_surv <- function(object, times = NULL,
                                   type = c("survival", "hazard", "cumhaz", "mean", "median", "quantile", "rmst", "link"),
                                   quantiles = c(0.25, 0.5, 0.75),
                                   level = c("aggregate", "individual"),
+                                  times_seq = NULL,
                                   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
                                   predictive_distribution = FALSE,
                                   summary = TRUE) {
@@ -1625,7 +1678,13 @@ predict.stan_nma_surv <- function(object, times = NULL,
   times <- rlang::enquo(times)
 
   if (!rlang::is_double(quantiles, finite = TRUE) || any(quantiles < 0) || any(quantiles > 1))
-    rlang::abort("`quantiles` must be a numeric vector of quantiles between 0 and 1.")
+    abort("`quantiles` must be a numeric vector of quantiles between 0 and 1.")
+
+  if (!is.null(times_seq) && (!rlang::is_integerish(times_seq, n = 1, finite = TRUE) || times_seq <= 0))
+    abort("`times_seq` must be a single positive integer.")
+
+  # Set times_seq by default if called from plot()
+
 
   # Other checks (including times, aux) in predict.stan_nma()
   # Need to pass stan_nma_surv-specific args directly, otherwise these aren't picked up by NextMethod()
@@ -1633,6 +1692,7 @@ predict.stan_nma_surv <- function(object, times = NULL,
              aux = aux,
              type = type,
              quantiles = quantiles,
+             times_seq = times_seq,
              baseline_level = "individual",
              baseline_type = "link")
 }
