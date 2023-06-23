@@ -345,7 +345,7 @@ predict.stan_nma <- function(object, ...,
             # Calculate times sequence if times_seq specified
             if (!is.null(times_seq)) {
               surv_all <- dplyr::group_by(surv_all, .data$.study) %>%
-                dplyr::summarise(time = list(seq(from = 0, to = max(.data$time), by = (max(.data$time) + 1)/times_seq))) %>%
+                dplyr::summarise(time = list(seq(from = 0, to = max(.data$time), length.out = times_seq))) %>%
                 tidyr::unnest(cols = "time") %>%
                 dplyr::ungroup()
             }
@@ -792,7 +792,7 @@ predict.stan_nma <- function(object, ...,
                   tidyr::unnest(cols = ".Surv") %>%
                   dplyr::mutate(!!! get_Surv_data(.$.Surv), .time = .data$time) %>%
                   dplyr::group_by(.data$.study) %>%
-                  dplyr::summarise(.time = list(seq(from = 0, to = max(.data$.time), by = (max(.data$.time) + 1)/times_seq)),
+                  dplyr::summarise(.time = list(seq(from = 0, to = max(.data$.time), length.out = times_seq)),
                                    .obs_id = list(1:times_seq))
 
                 dat_agd_arm <- object$network$agd_arm %>%
@@ -861,7 +861,7 @@ predict.stan_nma <- function(object, ...,
                 # Calculate times sequence if times_seq specified
                 ipd_times <- dplyr::mutate(dat_ipd, !!! get_Surv_data(dat_ipd$.Surv), .time = .data$time) %>%
                   dplyr::group_by(.data$.study) %>%
-                  dplyr::summarise(.time = list(seq(from = 0, to = max(.data$.time), by = (max(.data$.time) + 1)/times_seq)),
+                  dplyr::summarise(.time = list(seq(from = 0, to = max(.data$.time), length.out = times_seq)),
                                    .obs_id = list(1:times_seq)) %>%
                   dplyr::ungroup()
 
