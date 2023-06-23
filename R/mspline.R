@@ -189,9 +189,5 @@ mean_mspline <- function(basis, scoef, rate, ...) {
 
 # Function to check for mspline/ispline objects
 is_mspline <- function(x) {
-  if (packageVersion("splines2") >= "0.5.0") {
-    inherits(x, "MSpline")
-  } else {
-    inherits(x, "mSpline")
-  }
+  inherits(x, "MSpline")
 }
