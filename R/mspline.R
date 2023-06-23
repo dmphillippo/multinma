@@ -95,6 +95,7 @@ qmspline <- function(p, basis, scoef, rate, lower.tail = TRUE, log.p = FALSE) {
 #' @rdname mspline
 #' @export
 hmspline <- function(x, basis, scoef, rate, log = FALSE) {
+  require_pkg("splines2")
   if (!is_mspline(basis)) abort("`basis` must be an M-spline basis produced by splines2::mSpline()")
   if (!rlang::is_bool(log)) abort("`log` must be a logical value (TRUE or FALSE).")
 
@@ -123,6 +124,7 @@ hmspline <- function(x, basis, scoef, rate, log = FALSE) {
 #' @rdname mspline
 #' @export
 Hmspline <- function(x, basis, scoef, rate, log = FALSE) {
+  require_pkg("splines2")
   if (!is_mspline(basis)) abort("`basis` must be an M-spline basis produced by splines2::mSpline()")
   if (!rlang::is_bool(log)) abort("`log` must be a logical value (TRUE or FALSE).")
 
