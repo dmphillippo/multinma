@@ -1657,7 +1657,8 @@ predict.stan_nma <- function(object, ...,
 #'   `newdata = NULL` and `type` is `"survival"`, `"hazard"` or `"cumhaz"`. This
 #'   can be useful for plotting survival or (cumulative) hazard curves, where
 #'   prediction at every observed even/censoring time is unnecessary and can be
-#'   slow.
+#'   slow. When a call from within `plot()` is detected, e.g. like
+#'   `plot(predict(fit, type = "survival"))`, `times_seq` will default to 50.
 #'
 #' @export
 #' @rdname predict.stan_nma
@@ -1683,8 +1684,9 @@ predict.stan_nma_surv <- function(object, times = NULL,
   if (!is.null(times_seq) && (!rlang::is_integerish(times_seq, n = 1, finite = TRUE) || times_seq <= 0))
     abort("`times_seq` must be a single positive integer.")
 
-  # Set times_seq by default if called from plot()
-
+  # Set times_seq by default if called within plot()
+  if (is.null(times_seq) && type %in% c("survival", "hazard", "cumhaz") && deparse(sys.call(-2)[[1]]) == "plot")
+    times_seq <- 50
 
   # Other checks (including times, aux) in predict.stan_nma()
   # Need to pass stan_nma_surv-specific args directly, otherwise these aren't picked up by NextMethod()

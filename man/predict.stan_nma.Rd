@@ -163,7 +163,9 @@ this many evenly-spaced event times between 0 and the latest follow-up time
 in each study, instead of every observed event/censoring time. Only used if
 \code{newdata = NULL} and \code{type} is \code{"survival"}, \code{"hazard"} or \code{"cumhaz"}. This
 can be useful for plotting survival or (cumulative) hazard curves, where
-prediction at every observed even/censoring time is unnecessary and slow.}
+prediction at every observed even/censoring time is unnecessary and can be
+slow. When a call from within \code{plot()} is detected, e.g. like
+\code{plot(predict(fit, type = "survival"))}, \code{times_seq} will default to 50.}
 }
 \value{
 A \link{nma_summary} object if \code{summary = TRUE}, otherwise a list
