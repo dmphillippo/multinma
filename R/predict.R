@@ -1718,6 +1718,9 @@ make_surv_predict <- function(eta, aux, times, likelihood,
 
   if (type == "link") return(eta)
 
+  if (likelihood == "mspline" && type == "mean")
+    abort("Calculating mean survival time for M-spline models is not supported; basis functions are ill-conditioned past the boundary knots.")
+
   d_out <- dim(eta)
   dn_out <- dimnames(eta)
 
@@ -1741,12 +1744,12 @@ make_surv_predict <- function(eta, aux, times, likelihood,
 
   if (type %in% c("survival", "hazard", "cumhaz") && n_eta == 1) { # Multiple times, single linear predictor
     for (i in 1:length(times)) {
-      out[, , i] <- do.call(surv_predfun(likelihood, type),
-                             args = list(times = times[i],
-                                         eta = as.vector(eta),
-                                         aux = aux,
-                                         quantiles = quantiles,
-                                         basis = basis))
+      out[, , i] <- do.call(surv_predfuns[[likelihood]][[type]],
+                            args = list(times = times[i],
+                                        eta = as.vector(eta),
+                                        aux = aux,
+                                        quantiles = quantiles,
+                                        basis = basis))
     }
   } else if (n_eta > 1) { # Single/multiple times, multiple linear predictors
     if (type == "quantile") {
@@ -1758,7 +1761,7 @@ make_surv_predict <- function(eta, aux, times, likelihood,
     for (i in 1:n_eta) {
       ti <- if (length(times) == 1) times else times[i]
       out[ , , ((i-1)*iinc+1):(i*iinc)] <-
-        do.call(surv_predfun(likelihood, type),
+        do.call(surv_predfuns[[likelihood]][[type]],
                 args = list(times = ti,
                             eta = as.vector(eta[ , , i]),
                             aux = aux,
@@ -1767,7 +1770,7 @@ make_surv_predict <- function(eta, aux, times, likelihood,
     }
   } else { # Single time, single linear predictor
     if (type == "quantile") quantiles <- rep(quantiles, each = length(eta))
-    out <- array(do.call(surv_predfun(likelihood, type),
+    out <- array(do.call(surv_predfuns[[likelihood]][[type]],
                          args = list(times = times,
                                      eta = as.vector(eta),
                                      aux = aux,
@@ -1779,87 +1782,90 @@ make_surv_predict <- function(eta, aux, times, likelihood,
   return(out)
 }
 
-#' Return prediction functions for survival likelihoods
-#' @noRd
-surv_predfun <- function(likelihood, type) {
-  # Not used: avoid R CMD CHECK global variables warning
-  eta <- aux <- basis <- NULL
-
-  if (likelihood == "exponential") {
-    make_predfun(base = "exp", type = type,
-                 rate = exp(eta),
-                 .ns = list(survival = "stats", median = "stats", quantile = "stats"))
-
-  } else if (likelihood == "weibull") {
-    make_predfun(base = "weibullPH", type = type,
-                 shape = aux, scale = exp(eta))
-
-  } else if (likelihood == "gompertz") {
-    make_predfun(base = "gompertz", type = type,
-                 shape = aux, rate = exp(eta))
-
-  } else if (likelihood == "exponential-aft") {
-    make_predfun(base = "exp", type = type,
-                 rate = exp(-eta),
-                 .ns = list(survival = "stats", median = "stats", quantile = "stats"))
-
-  } else if (likelihood == "weibull-aft") {
-    make_predfun(base = "weibullPH", type = type,
-                 shape = aux, scale = exp(-aux * eta))
-
-  } else if (likelihood == "lognormal") {
-    make_predfun(base = "lnorm", type = type,
-                 meanlog = eta, sdlog = aux,
-                 .ns = list(survival = "stats", median = "stats", quantile = "stats"))
-
-  } else if (likelihood == "loglogistic") {
-    make_predfun(base = "llogis", type = type,
-                 shape = aux, scale = exp(eta))
-
-  } else if (likelihood == "gamma") {
-    make_predfun(base = "gamma", type = type,
-                 rate = exp(-eta), shape = aux,
-                 .ns = list(survival = "stats", median = "stats", quantile = "stats"))
-
-  } else if (likelihood == "gengamma") {
-    make_predfun(base = "gengamma", type = type,
-                 mu = eta,
-                 sigma = aux[, grepl("^sigma\\[", colnames(aux))],
-                 Q = 1 / sqrt(aux[, grepl("^k\\[", colnames(aux))]))
-
-  } else if (likelihood %in% c("mspline", "pexp")) {
-    if (likelihood == "mspline" && type == "mean")
-      abort("Calculating mean survival time for M-spline models is not supported; basis functions are ill-conditioned past the boundary knots.")
-    make_predfun(base = "mspline", type = type,
-                 rate = exp(eta), scoef = aux, basis = basis,
-                 .ns = NULL)
-  }
-}
-
 #' Construct prediction functions programmatically
 #' @noRd
 make_predfun <- function(base, type, ..., .ns = list()) {
-  if (rlang::has_name(.ns, type)) .ns <- .ns$type
-  else if (!is.null(.ns)) .ns <- "flexsurv"
-
-  if (any(.ns == "flexsurv")) require_pkg("flexsurv")
-
-  fn <- paste0(switch(type,
-                      survival = "p",
-                      hazard = "h",
-                      cumhaz = "H",
-                      mean  = "mean_",
-                      median = "q",
-                      quantile = "q",
-                      rmst = "rmst_"),
-               base)
 
   dots <- rlang::enexprs(...)
 
-  if (type == "survival") function(times, eta, aux, quantiles, basis) rlang::eval_tidy(rlang::call2(fn, q = times, lower.tail = FALSE, !!! dots, .ns = .ns))
-  else if (type %in% c("hazard", "cumhaz")) function(times, eta, aux, quantiles, basis) rlang::eval_tidy(rlang::call2(fn, x = times, !!! dots, .ns = .ns))
-  else if (type == "mean") function(times, eta, aux, quantiles, basis) rlang::eval_tidy(rlang::call2(fn, !!! dots, .ns = .ns))
-  else if (type == "median") function(times, eta, aux, quantiles, basis) rlang::eval_tidy(rlang::call2(fn, p = 0.5, !!! dots, .ns = .ns))
-  else if (type == "quantile") function(times, eta, aux, quantiles, basis) rlang::eval_tidy(rlang::call2(fn, p = quantiles, !!! dots, .ns = .ns))
-  else if (type == "rmst") function(times, eta, aux, quantiles, basis) rlang::eval_tidy(rlang::call2(fn, t = times, !!! dots, .ns = .ns))
+  if (!is.null(.ns)) {
+    .ns <- purrr::list_modify(list(survival = "flexsurv", hazard = "flexsurv", cumhaz = "flexsurv",
+                                   mean = "flexsurv", quantile = "flexsurv", rmst = "flexsurv"),
+                              !!! .ns)
+  }
+
+  list(
+    survival = rlang::new_function(rlang::pairlist2(times=, eta=, aux=, quantiles=, basis=), rlang::expr({
+      !! if (!is.null(.ns) && .ns$survival == "flexsurv") quote(require_pkg("flexsurv"))
+      !! rlang::call2(paste0("p", base), q = quote(times), lower.tail = FALSE, !!! dots, .ns = .ns$survival)
+      })),
+    hazard = rlang::new_function(rlang::pairlist2(times=, eta=, aux=, quantiles=, basis=), rlang::expr({
+      !! if (!is.null(.ns) && .ns$hazard == "flexsurv") quote(require_pkg("flexsurv"))
+      !! rlang::call2(paste0("h", base), x = quote(times), !!! dots, .ns = .ns$hazard)
+      })),
+    cumhaz = rlang::new_function(rlang::pairlist2(times=, eta=, aux=, quantiles=, basis=), rlang::expr({
+      !! if (!is.null(.ns) && .ns$cumhaz == "flexsurv") quote(require_pkg("flexsurv"))
+        !! rlang::call2(paste0("H", base), x = quote(times), !!! dots, .ns = .ns$cumhaz)
+      })),
+    mean = rlang::new_function(rlang::pairlist2(times=, eta=, aux=, quantiles=, basis=), rlang::expr({
+      !! if (!is.null(.ns) && .ns$mean == "flexsurv") quote(require_pkg("flexsurv"))
+      !! rlang::call2(paste0("mean_", base), !!! dots, .ns = .ns$mean)
+      })),
+    median = rlang::new_function(rlang::pairlist2(times=, eta=, aux=, quantiles=, basis=), rlang::expr({
+      !! if (!is.null(.ns) && .ns$quantile == "flexsurv") quote(require_pkg("flexsurv"))
+      !! rlang::call2(paste0("q", base), p = 0.5, !!! dots, .ns = .ns$quantile)
+      })),
+    quantile = rlang::new_function(rlang::pairlist2(times=, eta=, aux=, quantiles=, basis=), rlang::expr({
+      !! if (!is.null(.ns) && .ns$quantile == "flexsurv") quote(require_pkg("flexsurv"))
+      !! rlang::call2(paste0("q", base), p = quote(quantiles), !!! dots, .ns = .ns$quantile)
+      })),
+    rmst = rlang::new_function(rlang::pairlist2(times=, eta=, aux=, quantiles=, basis=), rlang::expr({
+      !! if (!is.null(.ns) && .ns$rmst == "flexsurv") quote(require_pkg("flexsurv"))
+      !! rlang::call2(paste0("rmst_", base), t = quote(times), !!! dots, .ns = .ns$rmst)
+      }))
+  )
+
 }
+
+surv_predfuns <- list(
+  exponential = make_predfun(base = "exp",
+                             rate = exp(eta),
+                             .ns = list(survival = "stats", median = "stats", quantile = "stats")),
+
+  weibull = make_predfun(base = "weibullPH",
+                         shape = aux, scale = exp(eta)),
+
+  gompertz = make_predfun(base = "gompertz",
+                          shape = aux, rate = exp(eta)),
+
+  `exponential-aft` = make_predfun(base = "exp",
+                                   rate = exp(-eta),
+                                   .ns = list(survival = "stats", median = "stats", quantile = "stats")),
+
+  `weibull-aft` = make_predfun(base = "weibullPH",
+                               shape = aux, scale = exp(-aux * eta)),
+
+  lognormal = make_predfun(base = "lnorm",
+                           meanlog = eta, sdlog = aux,
+                           .ns = list(survival = "stats", median = "stats", quantile = "stats")),
+
+  loglogistic = make_predfun(base = "llogis",
+                             shape = aux, scale = exp(eta)),
+
+  gamma = make_predfun(base = "gamma",
+                       rate = exp(-eta), shape = aux,
+                       .ns = list(survival = "stats", median = "stats", quantile = "stats")),
+
+  gengamma = make_predfun(base = "gengamma",
+                          mu = eta,
+                          sigma = aux[, grepl("^sigma\\[", colnames(aux))],
+                          Q = 1 / sqrt(aux[, grepl("^k\\[", colnames(aux))])),
+
+  mspline = make_predfun(base = "mspline",
+                         rate = exp(eta), scoef = aux, basis = basis,
+                         .ns = NULL),
+
+  pexp = make_predfun(base = "mspline",
+                      rate = exp(eta), scoef = aux, basis = basis,
+                      .ns = NULL)
+)
