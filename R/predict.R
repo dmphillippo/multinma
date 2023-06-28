@@ -1718,8 +1718,12 @@ make_surv_predict <- function(eta, aux, times, likelihood,
 
   if (type == "link") return(eta)
 
-  if (likelihood == "mspline" && type == "mean")
-    abort("Calculating mean survival time for M-spline models is not supported; basis functions are ill-conditioned past the boundary knots.")
+  # Check for times beyond mspline boundary knots
+  if (likelihood == "mspline") {
+    lower <- attr(basis, "Boundary.knots")[1]
+    upper <- attr(basis, "Boundary.knots")[2]
+    if (type == "mean" || any(times < lower) || any(times > upper)) warn("Evaluating M-spline at times beyond the boundary knots.")
+  }
 
   d_out <- dim(eta)
   dn_out <- dimnames(eta)
@@ -1777,6 +1781,11 @@ make_surv_predict <- function(eta, aux, times, likelihood,
                                      quantiles = quantiles,
                                      basis = basis)),
                  dim = d_out, dimnames = dn_out)
+  }
+
+  # Check for times beyond mspline boundary knots
+  if (likelihood == "mspline" && type %in% c("median", "quantile")) {
+    if (any(out < lower) || any(out > upper)) warn("Evaluating M-spline at times beyond the boundary knots.")
   }
 
   return(out)
