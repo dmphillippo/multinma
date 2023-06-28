@@ -30,15 +30,17 @@
 #'   which uses the explicit formula from
 #'   \insertCite{Royston2013;textual}{multinma}.
 #'
-#'   Care should be taken when evaluating the spline basis at times beyond the
-#'   boundary knots (either directly through the d/p/h/H/rmst functions, or
-#'   indirectly by requesting quantiles with `qmspline()` that correspond to
-#'   times beyond the boundary knots), as these can become unstable. The
-#'   underlying calls to [splines2::mSpline()] will raise warnings when this
-#'   happens. For this reason evaluating the (unrestricted) mean survival time
-#'   is not generally recommended as this requires integrating over an infinite
-#'   time horizon (i.e. `rmst_mspline()` with `t = Inf`), except for the special
-#'   case of the piecewise-exponential hazard.
+#'   Beyond the boundary knots, the hazard is assumed to be constant. (This
+#'   differs from the approach in [splines2::mSpline()] that extrapolates the
+#'   polynomial basis functions, which is numerically unstable and highly
+#'   dependent on the data just before the boundary knots.) As with all
+#'   extrapolation, care should be taken when evaluating the splines at times
+#'   beyond the boundary knots (either directly through the d/p/h/H/rmst
+#'   functions, or indirectly by requesting quantiles with `qmspline()` that
+#'   correspond to times beyond the boundary knots). For this reason evaluating
+#'   the (unrestricted) mean survival time is not generally recommended as this
+#'   requires integrating over an infinite time horizon (i.e. `rmst_mspline()`
+#'   with `t = Inf`).
 #'
 #' @return `dmspline()` gives the density, `pmspline()` gives the distribution
 #'   function (CDF), `qmspline()` gives the quantile function (inverse-CDF),
@@ -99,6 +101,12 @@ hmspline <- function(x, basis, scoef, rate, log = FALSE) {
   if (!is_mspline(basis)) abort("`basis` must be an M-spline basis produced by splines2::mSpline()")
   if (!rlang::is_bool(log)) abort("`log` must be a logical value (TRUE or FALSE).")
 
+  # Extrapolate with constant hazard beyond boundary knots
+  if (!missing(x)) {
+    x <- pmax(x, attr(basis, "Boundary.knots")[1])
+    x <- pmin(x, attr(basis, "Boundary.knots")[2])
+  }
+
   xb <- if (missing(x)) update(basis, integral = FALSE)
   else update(basis, x = x, integral = FALSE)
 
@@ -128,6 +136,24 @@ Hmspline <- function(x, basis, scoef, rate, log = FALSE) {
   if (!is_mspline(basis)) abort("`basis` must be an M-spline basis produced by splines2::mSpline()")
   if (!rlang::is_bool(log)) abort("`log` must be a logical value (TRUE or FALSE).")
 
+  # Extrapolate with constant hazard beyond boundary knots
+  if (!missing(x)) {
+    lower <- attr(basis, "Boundary.knots")[1]
+    upper <- attr(basis, "Boundary.knots")[2]
+
+    ex_lo <- x < lower & x > 0
+    ex_up <- x > upper
+
+    ex_time_lo <- x[ex_lo]
+    ex_time_up <- x[ex_up] - upper
+
+    xorig <- x
+    x <- pmax(x, lower)
+    x <- pmin(x, upper)
+  } else {
+    ex_lo <- ex_up <- FALSE
+  }
+
   xb <- if (missing(x)) update(basis, integral = TRUE)
         else update(basis, x = x, integral = TRUE)
 
@@ -139,6 +165,20 @@ Hmspline <- function(x, basis, scoef, rate, log = FALSE) {
     out <- xb %*% scoef[1,] * rate
   } else {
     out <- xb %*% scoef * rate
+  }
+
+  if (any(ex_up)) {
+    ex_up_rate <- if (length(rate) == 1) rate else rate[ex_up]
+    ex_up_scoef <- if (nrow(scoef) == 1) scoef else scoef[ex_up, , drop = FALSE]
+    h_up <- hmspline(xorig[ex_up], basis = basis, scoef = ex_up_scoef, rate = ex_up_rate)
+    out[ex_up] <- out[ex_up] + h_up * ex_time_up
+  }
+
+  if (any(ex_lo)) {
+    ex_lo_rate <- if (length(rate) == 1) rate else rate[ex_lo]
+    ex_lo_scoef <- if (nrow(scoef) == 1) scoef else scoef[ex_lo, , drop = FALSE]
+    h_lo <- hmspline(xorig[ex_lo], basis = basis, scoef = ex_lo_scoef, rate = ex_lo_rate)
+    out[ex_lo] <- h_lo * ex_time_lo
   }
 
   # Return 0 for x < 0
@@ -179,9 +219,7 @@ rmst_mspline <- function(t, basis, scoef, rate, start = 0) {
   }
 }
 
-# Don't export mean_mspline - this is a bad idea in general due to degeneracy
-# of the spline functions beyond the boundary knots.
-# Keep for internal use to calculate mean survival time for pexp model
+# Don't export mean_mspline - this is a bad idea in general
 #' @noRd
 mean_mspline <- function(basis, scoef, rate, ...) {
   rmst_mspline(t = Inf, basis, scoef, rate)

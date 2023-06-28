@@ -68,15 +68,17 @@ special case of the piecewise-exponential hazard (i.e. degree 0 M-splines)
 which uses the explicit formula from
 \insertCite{Royston2013;textual}{multinma}.
 
-Care should be taken when evaluating the spline basis at times beyond the
-boundary knots (either directly through the d/p/h/H/rmst functions, or
-indirectly by requesting quantiles with \code{qmspline()} that correspond to
-times beyond the boundary knots), as these can become unstable. The
-underlying calls to \code{\link[splines2:mSpline]{splines2::mSpline()}} will raise warnings when this
-happens. For this reason evaluating the (unrestricted) mean survival time
-is not generally recommended as this requires integrating over an infinite
-time horizon (i.e. \code{rmst_mspline()} with \code{t = Inf}), except for the special
-case of the piecewise-exponential hazard.
+Beyond the boundary knots, the hazard is assumed to be constant. (This
+differs from the approach in \code{\link[splines2:mSpline]{splines2::mSpline()}} that extrapolates the
+polynomial basis functions, which is numerically unstable and highly
+dependent on the data just before the boundary knots.) As with all
+extrapolation, care should be taken when evaluating the splines at times
+beyond the boundary knots (either directly through the d/p/h/H/rmst
+functions, or indirectly by requesting quantiles with \code{qmspline()} that
+correspond to times beyond the boundary knots). For this reason evaluating
+the (unrestricted) mean survival time is not generally recommended as this
+requires integrating over an infinite time horizon (i.e. \code{rmst_mspline()}
+with \code{t = Inf}).
 }
 \references{
 \insertAllCited{}
