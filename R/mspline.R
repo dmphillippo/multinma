@@ -110,7 +110,9 @@ hmspline <- function(x, basis, scoef, rate, log = FALSE) {
   xb <- if (missing(x)) update(basis, integral = FALSE)
   else update(basis, x = x, integral = FALSE)
 
-  if (is.matrix(scoef) && nrow(scoef) > 1 && nrow(xb) > 1) {
+  if (!is.matrix(scoef)) scoef <- matrix(scoef, nrow = 1)
+
+  if (is.matrix(scoef) && nrow(scoef) == nrow(xb)) {
     out <- rowSums(xb * scoef) * rate
   } else if (nrow(xb) == 1) {
     out <- scoef %*% xb[1,] * rate
@@ -157,7 +159,9 @@ Hmspline <- function(x, basis, scoef, rate, log = FALSE) {
   xb <- if (missing(x)) update(basis, integral = TRUE)
         else update(basis, x = x, integral = TRUE)
 
-  if (is.matrix(scoef) && nrow(scoef) > 1 && nrow(xb) > 1) {
+  if (!is.matrix(scoef)) scoef <- matrix(scoef, nrow = 1)
+
+  if (is.matrix(scoef) && nrow(scoef) == nrow(xb)) {
     out <- rowSums(xb * scoef) * rate
   } else if (nrow(xb) == 1) {
     out <- scoef %*% xb[1,] * rate
