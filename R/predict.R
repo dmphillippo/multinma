@@ -406,7 +406,7 @@ predict.stan_nma <- function(object, ...,
           if (is.null(times)) {
             # Take times from network
             surv_all <- dplyr::bind_rows(object$network$ipd,
-                                         tidyr::unnest(object$network$agd_arm, cols = ".Surv"))
+                                         if (has_agd_arm(object$network)) tidyr::unnest(object$network$agd_arm, cols = ".Surv") else NULL)
             surv_all <- dplyr::mutate(surv_all, !!! get_Surv_data(surv_all$.Surv))
 
             # Calculate times sequence if times_seq specified
@@ -434,7 +434,7 @@ predict.stan_nma <- function(object, ...,
           if (is.null(times)) {
             # Take time horizon from network
             surv_all <- dplyr::bind_rows(object$network$ipd,
-                                         tidyr::unnest(object$network$agd_arm, cols = ".Surv"))
+                                         if (has_agd_arm(object$network)) tidyr::unnest(object$network$agd_arm, cols = ".Surv") else NULL)
             surv_all <- dplyr::mutate(surv_all, !!! get_Surv_data(surv_all$.Surv))
 
             # Time horizon is earliest last follow-up time amongst the studies
@@ -808,7 +808,8 @@ predict.stan_nma <- function(object, ...,
           if (is.null(times)) {
             # Take time horizon from network
             surv_all <- dplyr::bind_rows(object$network$ipd,
-                                         tidyr::unnest(object$network$agd_arm, cols = ".Surv"))
+                                         if (has_agd_arm(object$network)) tidyr::unnest(object$network$agd_arm, cols = ".Surv") else NULL
+                                         )
             surv_all <- dplyr::mutate(surv_all, !!! get_Surv_data(surv_all$.Surv))
 
             # Time horizon is earliest last follow-up time amongst the studies
