@@ -1964,6 +1964,13 @@ make_agsurv_predict <- function(eta, aux, times, likelihood,
     }
   }
 
+  # Check for times beyond mspline boundary knots
+  if (likelihood == "mspline") {
+    lower <- attr(basis, "Boundary.knots")[1]
+    upper <- attr(basis, "Boundary.knots")[2]
+    if (type == "mean" || any(out < lower) || any(out > upper)) warn("Evaluating M-spline at times beyond the boundary knots.")
+  }
+
   return(out)
 }
 
