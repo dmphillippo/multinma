@@ -1932,7 +1932,13 @@ make_agsurv_predict <- function(eta, aux, times, likelihood,
                         type = "hazard",
                         basis = basis)
 
-    out <- tcrossprod_mcmc_array(S_array * h_array, X_weighted_mean) / tcrossprod_mcmc_array(S_array, X_weighted_mean)
+    Shbar <- tcrossprod_mcmc_array(S_array * h_array, X_weighted_mean)
+    Sbar <- tcrossprod_mcmc_array(S_array, X_weighted_mean)
+    out <- Shbar / Sbar
+
+    # Fix up edge case with all S=0
+    S0 <- which(Shbar == 0 & Sbar == 0)
+    out[S0] <- 0
 
   } else if (type %in% c("median", "quantile")) {
 
