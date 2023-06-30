@@ -2037,12 +2037,14 @@ quantile_Sbar <- function(p, eta, weights, aux, likelihood, basis) {
 }
 
 qSbar <- function(times, p, eta, weights, aux, likelihood, basis) {
-  S <- array(do.call(surv_predfuns[[likelihood]][["survival"]],
-                     args = list(times = times,
-                                 eta = as.vector(eta),
-                                 aux = matrix(aux, ncol = dim(aux)[3]),
-                                 basis = basis)),
-             dim = dim(eta))
+  S <- array(NA_real_, dim = dim(eta))
+  for (i in 1:dim(eta)[3]) {
+    S[ , , i] <- do.call(surv_predfuns[[likelihood]][["survival"]],
+                         args = list(times = times,
+                                     eta = as.vector(eta[ , , i]),
+                                     aux = matrix(aux, ncol = dim(aux)[3]),
+                                     basis = basis))
+  }
 
   Sbar <- apply(S, MARGIN = 1:2, FUN = weighted.mean, w = weights)
 
