@@ -2,7 +2,16 @@
 #'
 #' Obtain predictions of absolute effects from NMA models fitted with [nma()].
 #' For example, if a model is fitted to binary data with a logit link, predicted
-#' outcome probabilities or log odds can be produced.
+#' outcome probabilities or log odds can be produced. For survival models,
+#' predictions can be made for survival probabilities, (cumulative) hazards,
+#' (restricted) mean survival times, and quantiles including median survival
+#' times.
+#' When an IPD NMA or ML-NMR model has been fitted, predictions can be
+#' produced either at an individual level or at an aggregate level.
+#' Aggregate-level predictions are population-average absolute effects; these
+#' are marginalised or standardised over a population. For example, average
+#' event probabilities from a logistic regression, or marginal (standardised)
+#' survival probabilities from a survival model.
 #'
 #' @param object A `stan_nma` object created by [nma()].
 #' @param ... Additional arguments, passed to [uniroot()] for regression models
@@ -64,7 +73,9 @@
 #'   the times specified by `times` or at the event/censoring times in the
 #'   network if `times = NULL`. For `type = "rmst"`, the restricted time horizon
 #'   is specified by `times`, or if `times = NULL` the earliest last follow-up
-#'   time amongst the studies in the network is used.
+#'   time amongst the studies in the network is used. When `level =
+#'   "aggregate"`, these all correspond to the standardised survival function
+#'   (see details).
 #' @param level The level at which predictions are produced, either
 #'   `"aggregate"` (the default), or `"individual"`. If `baseline` is not
 #'   specified, predictions are produced for all IPD studies in the network if
@@ -90,6 +101,62 @@
 #'   fitted, should the predictive distribution for absolute effects in a new
 #'   study be returned? Default `FALSE`.
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
+#'
+#' @details
+#' # Aggregate-level predictions from IPD NMA and ML-NMR models
+#' Population-average absolute effects can be produced from IPD NMA and ML-NMR
+#' models with `level = "aggregate"`. Predictions are averaged over the target
+#' population (i.e. standardised/marginalised), either by (numerical)
+#' integration over the joint covariate distribution (for AgD studies in the
+#' network for ML-NMR, or AgD `newdata` with integration points created by
+#' [add_integration()]), or by averaging predictions for a sample of individuals
+#' (for IPD studies in the network for IPD NMA/ML-NMR, or IPD `newdata`).
+#'
+#' For example, with a binary outcome, the population-average event
+#' probabilities on treatment \eqn{k} in study/population \eqn{j} are
+#' \deqn{\bar{p}_{jk} = \int_\mathfrak{X} p_{jk}(\mathbf{x}) f_{jk}(\mathbf{x})
+#' d\mathbf{x}}
+#' for a joint covariate distribution \eqn{f_{jk}(\mathbf{x})} with
+#' support \eqn{\mathfrak{X}} or
+#' \deqn{\bar{p}_{jk} = \sum_i p_{jk}(\mathbf{x}_i)}
+#' for a sample of individuals with covariates \eqn{\mathbf{x}_i}.
+#'
+#' Population-average absolute predictions follow similarly for other types of
+#' outcomes, however for survival outcomes there are specific considerations.
+#'
+#' ## Standardised survival predictions
+#' Different types of population-average survival predictions, often called
+#' standardised survival predictions, follow from the **standardised survival
+#' function** created by integrating (or equivalently averaging) the
+#' individual-level survival functions at each time \eqn{t}:
+#' \deqn{\bar{S}_{jk}(t) = \int_\mathfrak{X} S_{jk}(t | \mathbf{x}) f_{jk}(\mathbf{x})
+#' d\mathbf{x}}
+#' which is itself produced using `type = "survival"`.
+#'
+#' The **standardised hazard function** corresponding to this standardised
+#' survival function is a weighted average of the individual-level hazard
+#' functions
+#' \deqn{\bar{h}_{jk}(t) = \frac{\int_\mathfrak{X} S_{jk}(t | \mathbf{x}) h_{jk}(t | \mathbf{x}) f_{jk}(\mathbf{x})
+#' d\mathbf{x} }{\bar{S}_{jk}(t)}}
+#' weighted by the probability of surviving to time \eqn{t}. This is produced
+#' using `type = "hazard"`.
+#'
+#' The corresponding **standardised cumulative hazard function** is
+#' \deqn{\bar{H}_{jk}(t) = -\log(\bar{S}_{jk}(t))}
+#' and is produced using `type = "cumhaz"`.
+#'
+#' **Quantiles and medians** of the standardised survival times are found by
+#' solving
+#' \deqn{\bar{S}_{jk}(t) = 1-\alpha}
+#' for the \eqn{\alpha\%} quantile, using numerical root finding. These are
+#' produced using `type = "quantile"` or `"median"`.
+#'
+#' **(Restricted) means** of the standardised survival times are found by
+#' integrating
+#' \deqn{\mathrm{RMST}_{jk}(t^*) = \int_0^{t^*} \bar{S}_{jk}(t) dt}
+#' up to the restricted time horizon \eqn{t^*}, with \eqn{t^*=\infty} for mean
+#' standardised survial time. These are produced using `type = "rmst"` or
+#' `"mean"`.
 #'
 #' @return A [nma_summary] object if `summary = TRUE`, otherwise a list
 #'   containing a 3D MCMC array of samples and (for regression models) a data
@@ -1379,18 +1446,12 @@ predict.stan_nma <- function(object, ...,
                           dimnames = dimnames_pred_array)
 
       for (s in 1:n_studies) {
-        # Study select
-        ss <- preddat$.study == studies[s]
 
         # Aux select
         aux_s <- grepl(paste0("[", studies[s], if (object$likelihood %in% c("mspline", "pexp")) "," else "]"),
                        dimnames(aux_array)[[3]], fixed = TRUE)
 
-        # Linear predictor array for this study
-        eta_pred_array <- tcrossprod_mcmc_array(post, X_all[ss, , drop = FALSE])
-
-        if (!is.null(offset_all))
-          eta_pred_array <- sweep(eta_pred_array, 3, offset_all[ss], FUN = "+")
+        aux_array_s <- aux_array[ , , aux_s, drop = FALSE]
 
         # Basis for mspline models
         if (object$likelihood %in% c("mspline", "pexp")) {
@@ -1399,57 +1460,72 @@ predict.stan_nma <- function(object, ...,
           basis <- NULL
         }
 
-        if (type %in% c("survival", "hazard", "cumhaz")) {
-          s_time <- preddat$.time[ss]
-        } else if (type == "rmst") {
-          s_time <- preddat$.time[ss]
-          if (length(unique(s_time)) == 1) {
-            # Same restriction time for all obs, just take the first (faster)
-            s_time <- s_time[1]
-          }
-        } else {
-          s_time <- NULL
-        }
+        for (trt in 1:n_trt) {
 
-        s_pred_array <-
-          make_surv_predict(eta = eta_pred_array,
-                            aux = aux_array[ , , aux_s, drop = FALSE],
-                            times = s_time,
-                            quantiles = quantiles,
-                            likelihood = object$likelihood,
-                            type = type,
-                            basis = basis)
+          # Select corresponding rows
+          ss <- preddat$.study == studies[s] & preddat$.trt == treatments[trt]
 
-        # Aggregate predictions when level = "aggregate"
-        if (level == "aggregate") {
-          s_preddat <-
-            dplyr::select(preddat, ".study", ".trt", ".sample_size", if (type %in% c("survival", "hazard", "cumhaz")) ".obs_id" else NULL) %>%
-            dplyr::filter(ss) %>%
-            dplyr::mutate(.study = forcats::fct_inorder(forcats::fct_drop(.data$.study)),
-                          .trt = forcats::fct_inorder(.data$.trt))
+          # Linear predictor array for this study
+          eta_pred_array <- tcrossprod_mcmc_array(post, X_all[ss, , drop = FALSE])
+
+          if (!is.null(offset_all))
+            eta_pred_array <- sweep(eta_pred_array, 3, offset_all[ss], FUN = "+")
+
 
           if (type %in% c("survival", "hazard", "cumhaz")) {
-            s_preddat <- dplyr::group_by(s_preddat, .data$.study, .data$.trt, .data$.obs_id)
-          } else if (type == "quantile") {
-            s_preddat <- dplyr::cross_join(s_preddat,
-                                           data.frame(.quantile = quantiles)) %>%
-              dplyr::group_by(.data$.study, .data$.trt, .data$.quantile)
+            s_time <- preddat$.time[ss]
+          } else if (type == "rmst") {
+            s_time <- preddat$.time[ss]
+            if (length(unique(s_time)) == 1) {
+              # Same restriction time for all obs, just take the first (faster)
+              s_time <- s_time[1]
+            }
           } else {
-            s_preddat <- dplyr::group_by(s_preddat, .data$.study, .data$.trt)
+            s_time <- NULL
           }
 
-          s_preddat <- dplyr::mutate(s_preddat, .weights = .data$.sample_size / sum(.data$.sample_size))
+          # Aggregate predictions when level = "aggregate"
+          if (level == "aggregate") {
+            s_preddat <-
+              dplyr::select(preddat, ".study", ".trt", ".sample_size", if (type %in% c("survival", "hazard", "cumhaz")) ".obs_id" else NULL) %>%
+              dplyr::filter(ss) %>%
+              dplyr::mutate(.study = forcats::fct_inorder(forcats::fct_drop(.data$.study)),
+                            .trt = forcats::fct_inorder(forcats::fct_drop(.data$.trt)))
 
-          X_weighted_mean <- Matrix::Matrix(0, ncol = dim(s_pred_array)[3], nrow = dplyr::n_groups(s_preddat))
+            if (type %in% c("survival", "hazard", "cumhaz")) {
+              s_preddat <- dplyr::group_by(s_preddat, .data$.study, .data$.trt, .data$.obs_id)
+            } else {
+              s_preddat <- dplyr::group_by(s_preddat, .data$.study, .data$.trt)
+            }
 
-          X_weighted_mean[cbind(dplyr::group_indices(s_preddat),
-                                1:dim(s_pred_array)[3])] <- s_preddat$.weights
+            s_preddat <- dplyr::mutate(s_preddat, .weights = .data$.sample_size / sum(.data$.sample_size))
 
-          pred_array[ , , outdat$.study == studies[s]] <- tcrossprod_mcmc_array(s_pred_array, X_weighted_mean)
-        } else {
-          pred_array[ , , outdat$.study == studies[s]] <- s_pred_array
+            pred_array[ , , outdat$.study == studies[s] & outdat$.trt == treatments[trt]] <-
+              make_agsurv_predict(eta = eta_pred_array,
+                                  aux = aux_array_s,
+                                  times = s_time,
+                                  quantiles = quantiles,
+                                  likelihood = object$likelihood,
+                                  type = type,
+                                  basis = basis,
+                                  weights = s_preddat$.weights,
+                                  id = dplyr::group_indices(s_preddat))
+
+
+          } else { # Individual predictions
+            s_pred_array <-
+              make_surv_predict(eta = eta_pred_array,
+                                aux = aux_array_s,
+                                times = s_time,
+                                quantiles = quantiles,
+                                likelihood = object$likelihood,
+                                type = type,
+                                basis = basis)
+
+            pred_array[ , , outdat$.study == studies[s] & outdat$.trt == treatments[trt]] <- s_pred_array
+          }
+
         }
-
       }
 
     } else if (level == "individual") {
@@ -1709,6 +1785,7 @@ predict.stan_nma_surv <- function(object, times = NULL,
 #' @param likelihood Likelihood function to use
 #' @param type Type of prediction to create
 #' @param quantiles Quantiles for type = "quantile"
+#' @param basis M-spline basis
 #'
 #' @noRd
 make_surv_predict <- function(eta, aux, times, likelihood,
@@ -1790,6 +1867,181 @@ make_surv_predict <- function(eta, aux, times, likelihood,
 
   return(out)
 }
+
+#' Produce aggregate (standardised) survival predictions from arrays of linear predictors and auxiliary parameters
+#'
+#' Designed to work with a single arm at a time
+#'
+#' @param eta Array of samples from the linear predictor
+#' @param aux Array of samples of auxiliary parameters
+#' @param times Vector of evaluation times, or time horizon for type = "rmst"
+#' @param likelihood Likelihood function to use
+#' @param type Type of prediction to create
+#' @param quantiles Quantiles for type = "quantile"
+#' @param basis M-spline basis
+#' @param weights Weights for weighted mean over the population
+#' @param id Time ID for survival/hazard predictions
+#'
+#' @noRd
+make_agsurv_predict <- function(eta, aux, times, likelihood,
+                                type = c("survival", "hazard", "cumhaz", "mean", "median", "quantile", "rmst", "link"),
+                                quantiles = c(0.25, 0.5, 0.75),
+                                basis = NULL, weights, id) {
+
+  if (type %in% c("survival", "cumhaz", "link")) {
+
+    X_weighted_mean <- Matrix::Matrix(0, ncol = dim(eta)[3], nrow = max(id))
+
+    X_weighted_mean[cbind(id, 1:dim(eta)[3])] <- weights
+
+    pred_array <-
+      make_surv_predict(eta = eta,
+                        aux = aux,
+                        times = times,
+                        quantiles = quantiles,
+                        likelihood = likelihood,
+                        type = if (type == "cumhaz") "survival" else type,
+                        basis = basis)
+
+    out <- tcrossprod_mcmc_array(pred_array, X_weighted_mean)
+
+    if (type == "cumhaz") out <- -log(out)
+
+  } else if (type == "hazard") {
+
+    X_weighted_mean <- Matrix::Matrix(0, ncol = dim(eta)[3], nrow = max(id))
+
+    X_weighted_mean[cbind(id, 1:dim(eta)[3])] <- weights
+
+    S_array <-
+      make_surv_predict(eta = eta,
+                        aux = aux,
+                        times = times,
+                        quantiles = quantiles,
+                        likelihood = likelihood,
+                        type = "survival",
+                        basis = basis)
+
+    h_array <-
+      make_surv_predict(eta = eta,
+                        aux = aux,
+                        times = times,
+                        quantiles = quantiles,
+                        likelihood = likelihood,
+                        type = "hazard",
+                        basis = basis)
+
+    out <- tcrossprod_mcmc_array(S_array * h_array, X_weighted_mean) / tcrossprod_mcmc_array(S_array, X_weighted_mean)
+
+  } else if (type %in% c("median", "quantile")) {
+
+    if (type == "median") quantiles <- 0.5
+
+    out <- array(NA_real_, dim = c(dim(eta)[1:2], length(quantiles)))
+
+    for (i in 1:length(quantiles)) {
+      out[ , , i] <- quantile_Sbar(p = quantiles[i],
+                           eta = eta,
+                           weights = weights,
+                           aux = aux,
+                           likelihood = likelihood,
+                           basis = basis)
+    }
+
+  } else if (type %in% c("mean", "rmst")) {
+
+    if (type == "mean") times <- Inf
+
+    out <- array(NA_real_, dim = c(dim(eta)[1:2], length(times)))
+
+    for (i in 1:dim(out)[1]) for (j in 1:dim(out)[2]) {
+      out[i, j, ] <- rmst_Sbar(times = times,
+                               eta = eta[i, j, ],
+                               weights = weights,
+                               aux = aux[i, j, ],
+                               likelihood = likelihood,
+                               basis = basis)
+    }
+  }
+
+  return(out)
+}
+
+#' Restricted mean survival times for marginal survival curves
+#' Given linear predictor vector evaluated over the population and associated weights
+#' @noRd
+rmst_Sbar <- function(times, eta, weights, aux, likelihood, basis, start = 0) {
+  require_pkg("flexsurv")
+
+  flexsurv::rmst_generic(pSbar, t = times, start = start,
+                         eta = eta, weights = weights, aux = aux,
+                         likelihood = likelihood, basis = basis,
+                         scalarargs = c("basis", "likelihood", "eta", "aux", "weights"))
+}
+
+pSbar <- function(times, eta, weights, aux, likelihood, basis) {
+  Sbar <- numeric(length(times))
+  for (i in 1:length(times)) {
+    S <- do.call(surv_predfuns[[likelihood]][["survival"]],
+                       args = list(times = times[i],
+                                   eta = eta,
+                                   aux = aux,
+                                   basis = basis))
+
+    Sbar[i] <- weighted.mean(S, weights)
+  }
+  return(1 - Sbar)
+}
+
+
+#' Quantile function for marginal survival curves
+#' Given linear predictor array evaluated over the population and associated weights
+#' @noRd
+quantile_Sbar <- function(p, eta, weights, aux, likelihood, basis) {
+  # require_pkg("flexsurv")
+  #
+  # q <- flexsurv::qgeneric(Sbar, p = rep(p, each = prod(dim(eta)[1:2])),
+  #                         eta = eta, weights = weights, aux = aux,
+  #                         likelihood = likelihood, basis = basis,
+  #                         scalarargs = c("basis", "likelihood", "eta", "aux", "weights"),
+  #                         lbound = 0)
+  #
+  # return(q)
+
+  # Faster to call rstpm2::vuniroot directly
+
+  require_pkg("rstpm2")
+
+  upper <- if (!is.null(basis)) attr(basis, "Boundary.knots")[2] else 1
+
+  rstpm2::vuniroot(qSbar,
+                   lower = 0,
+                   upper = upper,
+                   extendInt = "downX",
+                   n = prod(dim(eta)[1:2]),
+                   p = 1 - p,
+                   eta = eta,
+                   weights = weights,
+                   aux = aux,
+                   likelihood = likelihood,
+                   basis = basis,
+                   tol = .Machine$double.eps)$root
+
+}
+
+qSbar <- function(times, p, eta, weights, aux, likelihood, basis) {
+  S <- array(do.call(surv_predfuns[[likelihood]][["survival"]],
+                     args = list(times = times,
+                                 eta = as.vector(eta),
+                                 aux = matrix(aux, ncol = dim(aux)[3]),
+                                 basis = basis)),
+             dim = dim(eta))
+
+  Sbar <- apply(S, MARGIN = 1:2, FUN = weighted.mean, w = weights)
+
+  Sbar - p
+}
+
 
 #' Construct prediction functions programmatically
 #' @noRd

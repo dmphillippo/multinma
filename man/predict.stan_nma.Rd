@@ -106,7 +106,8 @@ For \code{type = "survival"}, \code{"hazard"} or \code{"cumhaz"}, predictions ar
 the times specified by \code{times} or at the event/censoring times in the
 network if \code{times = NULL}. For \code{type = "rmst"}, the restricted time horizon
 is specified by \code{times}, or if \code{times = NULL} the earliest last follow-up
-time amongst the studies in the network is used.}
+time amongst the studies in the network is used. When \code{level = "aggregate"}, these all correspond to the standardised survival function
+(see details).}
 
 \item{level}{The level at which predictions are produced, either
 \code{"aggregate"} (the default), or \code{"individual"}. If \code{baseline} is not
@@ -175,8 +176,74 @@ frame of study information.
 \description{
 Obtain predictions of absolute effects from NMA models fitted with \code{\link[=nma]{nma()}}.
 For example, if a model is fitted to binary data with a logit link, predicted
-outcome probabilities or log odds can be produced.
+outcome probabilities or log odds can be produced. For survival models,
+predictions can be made for survival probabilities, (cumulative) hazards,
+(restricted) mean survival times, and quantiles including median survival
+times.
+When an IPD NMA or ML-NMR model has been fitted, predictions can be
+produced either at an individual level or at an aggregate level.
+Aggregate-level predictions are population-average absolute effects; these
+are marginalised or standardised over a population. For example, average
+event probabilities from a logistic regression, or marginal (standardised)
+survival probabilities from a survival model.
 }
+\section{Aggregate-level predictions from IPD NMA and ML-NMR models}{
+Population-average absolute effects can be produced from IPD NMA and ML-NMR
+models with \code{level = "aggregate"}. Predictions are averaged over the target
+population (i.e. standardised/marginalised), either by (numerical)
+integration over the joint covariate distribution (for AgD studies in the
+network for ML-NMR, or AgD \code{newdata} with integration points created by
+\code{\link[=add_integration]{add_integration()}}), or by averaging predictions for a sample of individuals
+(for IPD studies in the network for IPD NMA/ML-NMR, or IPD \code{newdata}).
+
+For example, with a binary outcome, the population-average event
+probabilities on treatment \eqn{k} in study/population \eqn{j} are
+\deqn{\bar{p}_{jk} = \int_\mathfrak{X} p_{jk}(\mathbf{x}) f_{jk}(\mathbf{x})
+d\mathbf{x}}
+for a joint covariate distribution \eqn{f_{jk}(\mathbf{x})} with
+support \eqn{\mathfrak{X}} or
+\deqn{\bar{p}_{jk} = \sum_i p_{jk}(\mathbf{x}_i)}
+for a sample of individuals with covariates \eqn{\mathbf{x}_i}.
+
+Population-average absolute predictions follow similarly for other types of
+outcomes, however for survival outcomes there are specific considerations.
+\subsection{Standardised survival predictions}{
+
+Different types of population-average survival predictions, often called
+standardised survival predictions, follow from the \strong{standardised survival
+function} created by integrating (or equivalently averaging) the
+individual-level survival functions at each time \eqn{t}:
+\deqn{\bar{S}_{jk}(t) = \int_\mathfrak{X} S_{jk}(t | \mathbf{x}) f_{jk}(\mathbf{x})
+d\mathbf{x}}
+which is itself produced using \code{type = "survival"}.
+
+The \strong{standardised hazard function} corresponding to this standardised
+survival function is a weighted average of the individual-level hazard
+functions
+\deqn{\bar{h}_{jk}(t) = \frac{\int_\mathfrak{X} S_{jk}(t | \mathbf{x}) h_{jk}(t | \mathbf{x}) f_{jk}(\mathbf{x})
+d\mathbf{x} }{\bar{S}_{jk}(t)}}
+weighted by the probability of surviving to time \eqn{t}. This is produced
+using \code{type = "hazard"}.
+
+The corresponding \strong{standardised cumulative hazard function} is
+\deqn{\bar{H}_{jk}(t) = -\log(\bar{S}_{jk}(t))}
+and is produced using \code{type = "cumhaz"}.
+
+\strong{Quantiles and medians} of the standardised survival times are found by
+solving
+\deqn{\bar{S}_{jk}(t) = 1-\alpha}
+for the \eqn{\alpha\%} quantile, using numerical root finding. These are
+produced using \code{type = "quantile"} or \code{"median"}.
+
+\strong{(Restricted) means} of the standardised survival times are found by
+integrating
+\deqn{\mathrm{RMST}_{jk}(t^*) = \int_0^{t^*} \bar{S}_{jk}(t) dt}
+up to the restricted time horizon \eqn{t^*}, with \eqn{t^*=\infty} for mean
+standardised survial time. These are produced using \code{type = "rmst"} or
+\code{"mean"}.
+}
+}
+
 \examples{
 ## Smoking cessation
 \donttest{
