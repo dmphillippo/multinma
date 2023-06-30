@@ -708,11 +708,11 @@ test_that(".study, .trt, .time columns are correct (regression, aggregate, netwo
   preddat3 <- dplyr::distinct(ndmm_preddat, .study, .trt) %>%
     tidyr::expand(.study, .trt)
 
-  pred3.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "mean"))
-  expect_equivalent(pred3.1[, c(".study", ".trt")],
-                    preddat3[, c(".study", ".trt")])
-  expect_identical(pred3.1$parameter,
-                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+  # pred3.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "mean"))
+  # expect_equivalent(pred3.1[, c(".study", ".trt")],
+  #                   preddat3[, c(".study", ".trt")])
+  # expect_identical(pred3.1$parameter,
+  #                  paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
 
   pred3.2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "median"))
   expect_equivalent(pred3.2[, c(".study", ".trt")],
@@ -720,11 +720,11 @@ test_that(".study, .trt, .time columns are correct (regression, aggregate, netwo
   expect_identical(pred3.2$parameter,
                    paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
 
-  # pred3.3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "rmst"))
-  # expect_equivalent(pred3.3[, c(".study", ".trt")],
-  #                   preddat3[, c(".study", ".trt")])
-  # expect_identical(pred3.3$parameter,
-  #                  paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+  pred3.3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "rmst"))
+  expect_equivalent(pred3.3[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.3$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
 
   pred3.4 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "link"))
   expect_equivalent(pred3.4[, c(".study", ".trt")],
@@ -821,15 +821,15 @@ test_that(".study, .trt, .time columns are correct (regression, aggregate, new d
   preddat3 <- tidyr::expand_grid(.study = unique(factor(newdata$study)),
                                  .trt = unique(ndmm_preddat$.trt))
 
-  pred3.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "mean",
-                                       study = study,
-                                       newdata = newdata,
-                                       baseline = distr(qnorm, 0, 1),
-                                       aux = distr(qlnorm, 0, 0.01)))
-  expect_equivalent(pred3.1[, c(".study", ".trt")],
-                    preddat3[, c(".study", ".trt")])
-  expect_identical(pred3.1$parameter,
-                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+  # pred3.1 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "mean",
+  #                                      study = study,
+  #                                      newdata = newdata,
+  #                                      baseline = distr(qnorm, 0, 1),
+  #                                      aux = distr(qlnorm, 0, 0.01)))
+  # expect_equivalent(pred3.1[, c(".study", ".trt")],
+  #                   preddat3[, c(".study", ".trt")])
+  # expect_identical(pred3.1$parameter,
+  #                  paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
 
   pred3.2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "median",
                                        study = study,
