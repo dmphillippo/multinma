@@ -155,7 +155,7 @@
 #' integrating
 #' \deqn{\mathrm{RMST}_{jk}(t^*) = \int_0^{t^*} \bar{S}_{jk}(t) dt}
 #' up to the restricted time horizon \eqn{t^*}, with \eqn{t^*=\infty} for mean
-#' standardised survial time. These are produced using `type = "rmst"` or
+#' standardised survival time. These are produced using `type = "rmst"` or
 #' `"mean"`.
 #'
 #' @return A [nma_summary] object if `summary = TRUE`, otherwise a list
