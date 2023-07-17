@@ -235,6 +235,14 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
     leverage_agd_contrast <- NULL
   }
 
+  # Get pointwise contributions for pV
+  if (penalty == "pV") {
+    leverage <- colSums(cov(matrix(resdev_array, ncol = dim(resdev_array)[3])))/2
+    if (has_ipd(net)) leverage_ipd <- leverage[1:n_ipd]
+    if (has_agd_arm(net)) leverage_agd_arm <- leverage[n_ipd + (1:n_agd_arm)]
+    if (has_agd_contrast(net)) leverage_agd_contrast <- leverage[n_ipd + n_agd_arm + (1:nr_agd_contrast)]
+  }
+
   # Set pointwise contributions
   pw <- list()
   if (has_ipd(net)) {
@@ -242,8 +250,8 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
       .study = net$ipd$.study,
       .trt = net$ipd$.trt,
       resdev = resdev_ipd,
-      leverage = if (penalty == "pD") leverage_ipd else NA,
-      dic = if (penalty == "pD") resdev_ipd + leverage_ipd else NA)
+      leverage = leverage_ipd,
+      dic = resdev_ipd + leverage_ipd)
 
     if (has_df) pw$ipd$df <- df_ipd
   } else {
@@ -258,8 +266,8 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
       .study = aa$.study,
       .trt = aa$.trt,
       resdev = resdev_agd_arm,
-      leverage = if (penalty == "pD") leverage_agd_arm else NA,
-      dic = if (penalty == "pD") resdev_agd_arm + leverage_agd_arm else NA)
+      leverage = leverage_agd_arm,
+      dic = resdev_agd_arm + leverage_agd_arm)
 
     if (has_df) pw$agd_arm$df <- df_agd_arm
   } else {
@@ -271,8 +279,8 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
       .study = agd_contrast_resdev_dat$.study,
       n_contrast = agd_contrast_resdev_dat$n_contrast,
       resdev = resdev_agd_contrast,
-      leverage = if (penalty == "pD") leverage_agd_contrast else NA,
-      dic = if (penalty == "pD") resdev_agd_contrast + leverage_agd_contrast else NA)
+      leverage = leverage_agd_contrast,
+      dic = resdev_agd_contrast + leverage_agd_contrast)
 
     if (has_df) pw$agd_contrast$df <- df_agd_contrast
   } else {
