@@ -334,7 +334,7 @@ predict.stan_nma <- function(object, ...,
 
 
   # Without regression model ---------------------------------------------------
-  if (is.null(object$regression)) {
+  if (is.null(object$regression) && (is.null(object$aux_by) || length(setdiff(object$aux_by, c(".study", ".trt"))) == 0)) {
 
     if (is_surv && !is.null(aux_pars) && xor(is.null(baseline), is.null(aux))) {
         abort("Specify both `baseline` and `aux`, or neither")
@@ -358,11 +358,19 @@ predict.stan_nma <- function(object, ...,
       } else {
 
         # Make design matrix of all studies with baselines, and all treatments
-        studies <- forcats::fct_unique(forcats::fct_drop(forcats::fct_c(
-          if (has_ipd(object$network)) object$network$ipd$.study else factor(),
-          if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor()
-          )))
-        preddat <- tidyr::expand_grid(.study = studies, .trt = object$network$treatments)
+        if (is.null(object$aux_by) || !".trt" %in% object$aux_by) {
+          studies <- forcats::fct_unique(forcats::fct_drop(forcats::fct_c(
+            if (has_ipd(object$network)) object$network$ipd$.study else factor(),
+            if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor()
+            )))
+          preddat <- tidyr::expand_grid(.study = studies, .trt = object$network$treatments)
+        } else {
+          # If aux_by stratifies by .trt too, then we can only predict for observed treatment arms
+          preddat <- dplyr::bind_rows(
+            if (has_ipd(object$network)) dplyr::distinct(object$network$ipd, .data$.study, .data$.trt) else dplyr::tibble(),
+            if (has_agd_arm(object$network)) dplyr::distinct(object$network$agd_arm, .data$.study, .data$.trt) else dplyr::tibble()
+          )
+        }
 
         # Add in .trtclass if defined in network
         if (!is.null(object$network$classes)) {
@@ -633,13 +641,14 @@ predict.stan_nma <- function(object, ...,
           tt <- NA
           jinc <- 1
         }
-        s <- preddat$.study[i]
+
+        s <- get_aux_labels(preddat[i, ], by = object$aux_by)
 
         aux_s <- grepl(paste0("[", s, if (object$likelihood %in% c("mspline", "pexp")) "," else "]"),
                        aux_names, fixed = TRUE)
 
         if (object$likelihood %in% c("mspline", "pexp")) {
-          basis <- object$basis[[s]]
+          basis <- object$basis[[preddat$.study[i]]]
         } else {
           basis <- NULL
         }
