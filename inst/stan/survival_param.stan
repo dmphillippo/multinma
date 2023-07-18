@@ -280,14 +280,17 @@ data {
   vector[ni_agd_arm] agd_arm_delay_time;
   int<lower=0, upper=3> agd_arm_status[ni_agd_arm];
 
-  // Study IDs for independent shape parameters
-  int<lower=1> study[narm_ipd + narm_agd_arm];
+  // Aux IDs for independent shape parameters
+  int<lower=0, upper=1> aux_by; // Flag subgroup aux parameters within each arm (1 = yes)
+  int<lower=1> aux_id[ni_ipd + ni_agd_arm * (aux_by ? nint_max : 1)];
 }
 transformed data {
   // Exponential model indicator, 0 = exponential
   int<lower=0, upper=1> nonexp = (dist == 1 || dist == 4) ? 0 : 1;
   // Generalised Gamma model indicator, 1 = gengamma
   int<lower=0, upper=1> gengamma = dist >= 9 ? 1 : 0;
+  // Number of auxiliary parameters
+  int n_aux = nonexp ? max(aux_id) : 0;
   // AgD arm indicator - shifted
   int agd_arm_arm2[ni_agd_arm];
   // Number of integration points
@@ -301,9 +304,9 @@ parameters {
 
   // Auxiliary parameters for parametric model (typically shape)
   // Exponential model has shape = 1 so parameter is removed (zero dim)
-  vector<lower=0>[(ns_ipd + ns_agd_arm)*nonexp] aux;
+  vector<lower=0>[n_aux] aux;
   // Second auxiliary parameter for generalised gamma
-  vector<lower=0>[(ns_ipd + ns_agd_arm)*gengamma] aux2;
+  vector<lower=0>[n_aux*gengamma] aux2;
 }
 transformed parameters {
   // Log likelihood contributions
@@ -320,8 +323,8 @@ transformed parameters {
                      ipd_delay_time,
                      ipd_status,
                      eta_ipd,
-                     nonexp ? aux[study[ipd_arm]] : rep_vector(0, ni_ipd),
-                     gengamma ? aux2[study[ipd_arm]] : rep_vector(0, ni_ipd));
+                     nonexp ? aux[aux_id[1:ni_ipd]] : rep_vector(0, ni_ipd),
+                     gengamma ? aux2[aux_id[1:ni_ipd]] : rep_vector(0, ni_ipd));
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
@@ -342,14 +345,25 @@ transformed parameters {
         if (RE && which_RE[agd_arm_arm2[i]]) eta_agd_arm_ii += f_delta[which_RE[agd_arm_arm2[i]]];
 
         // Average likelihood over integration points
-        log_L_ii = loglik_a(dist,
-                          agd_arm_time[i],
-                          agd_arm_start_time[i],
-                          agd_arm_delay_time[i],
-                          agd_arm_status[i],
-                          eta_agd_arm_ii,
-                          nonexp ? aux[study[agd_arm_arm2[i]]] : 0,
-                          gengamma ? aux2[study[agd_arm_arm2[i]]] : 0);
+        if (aux_by) {
+          log_L_ii = loglik(dist,
+                            rep_vector(agd_arm_time[i], nint),
+                            rep_vector(agd_arm_start_time[i], nint),
+                            rep_vector(agd_arm_delay_time[i], nint),
+                            rep_array(agd_arm_status[i], nint),
+                            eta_agd_arm_ii,
+                            nonexp ? aux[aux_id[(ni_ipd + 1 + (i-1)*nint_max):(ni_ipd + (i-1)*nint_max + nint)]] : rep_vector(0, nint),
+                            gengamma ? aux2[aux_id[(ni_ipd + 1 + (i-1)*nint_max):(ni_ipd + (i-1)*nint_max + nint)]] : rep_vector(0, nint));
+        } else {
+          log_L_ii = loglik_a(dist,
+                              agd_arm_time[i],
+                              agd_arm_start_time[i],
+                              agd_arm_delay_time[i],
+                              agd_arm_status[i],
+                              eta_agd_arm_ii,
+                              nonexp ? aux[aux_id[ni_ipd + i]] : 0,
+                              gengamma ? aux2[aux_id[ni_ipd + i]] : 0);
+        }
 
         log_L_agd_arm[i] = log_sum_exp(log_L_ii) - log(nint);
       }
@@ -365,8 +379,8 @@ transformed parameters {
                              agd_arm_delay_time,
                              agd_arm_status,
                              eta_agd_arm,
-                             nonexp ? aux[study[agd_arm_arm2]] : rep_vector(0, ni_agd_arm),
-                             gengamma ? aux2[study[agd_arm_arm2]] : rep_vector(0, ni_agd_arm));
+                             nonexp ? aux[aux_id[(ni_ipd + 1):(ni_ipd + ni_agd_arm)]] : rep_vector(0, ni_agd_arm),
+                             gengamma ? aux2[aux_id[(ni_ipd + 1):(ni_ipd + ni_agd_arm)]] : rep_vector(0, ni_agd_arm));
     }
   }
 }
@@ -388,10 +402,10 @@ generated quantities {
   // Transform intercepts back to scales
   // vector[ns_ipd + ns_agd_arm] scale = exp(mu);
 
-  vector[(dist != 1 && dist != 4 && dist != 6 && dist != 9) ? ns_ipd + ns_agd_arm : 0] shape;
-  vector[dist == 6 ? ns_ipd + ns_agd_arm : 0] sdlog;  // lognormal sdlog
-  vector[dist == 9 ? ns_ipd + ns_agd_arm : 0] sigma; // gengamma sigma
-  vector[dist == 9 ? ns_ipd + ns_agd_arm : 0] k;  // gengamma k
+  vector[(dist != 1 && dist != 4 && dist != 6 && dist != 9) ? n_aux : 0] shape;
+  vector[dist == 6 ? n_aux : 0] sdlog;  // lognormal sdlog
+  vector[dist == 9 ? n_aux : 0] sigma; // gengamma sigma
+  vector[dist == 9 ? n_aux : 0] k;  // gengamma k
 
 #include /include/generated_quantities_common.stan
 

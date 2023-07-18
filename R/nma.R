@@ -40,6 +40,9 @@
 #' @param prior_aux Specification of prior distribution for the auxiliary
 #'   parameter, if applicable (see details). For `likelihood = "gengamma"` this
 #'   should be a list of prior distributions with elements `sigma` and `k`.
+#' @param aux_by Vector of variable names listing the variables to stratify the
+#'   auxiliary parameters by. Currently only used for survival models, see
+#'   details.
 #' @param QR Logical scalar (default `FALSE`), whether to apply a QR
 #'   decomposition to the model design matrix
 #' @param center Logical scalar (default `TRUE`), whether to center the
@@ -178,6 +181,16 @@
 #'   between 0 and 1, and sum to 1), and are given a [dirichlet()] prior
 #'   distribution.
 #'
+#'   The auxiliary parameters can be stratified by additional factors through
+#'   the `aux_by` argument. For example, to allow the shape of the baseline
+#'   hazard to vary between treatment arms as well as studies, use `aux_by =
+#'   c(".study", ".trt")`. (Technically, `.study` is always included in the
+#'   stratification even if omitted from `aux_by`, but we choose here to make
+#'   the stratification explicit.) This is a common way of relaxing the
+#'   proportional hazards assumption. The default is equivalent to `aux_by =
+#'   ".study"` which stratifies the auxiliary parameters by study, as described
+#'   above.
+#'
 #' @return `nma()` returns a [stan_nma] object, except when `consistency =
 #'   "nodesplit"` when a [nma_nodesplit] or [nma_nodesplit_df] object is
 #'   returned. `nma.fit()` returns a [stanfit] object.
@@ -218,6 +231,7 @@ nma <- function(network,
                 prior_het_type = c("sd", "var", "prec"),
                 prior_reg = .default(normal(scale = 10)),
                 prior_aux = .default(),
+                aux_by = NULL,
                 QR = FALSE,
                 center = TRUE,
                 adapt_delta = NULL,
@@ -330,6 +344,7 @@ nma <- function(network,
                          prior_het_type = prior_het_type,
                          prior_reg = prior_reg,
                          prior_aux = prior_aux,
+                         aux_by = aux_by,
                          QR = QR,
                          center = center,
                          adapt_delta = adapt_delta,
@@ -492,9 +507,35 @@ nma <- function(network,
   } else if (!rlang::is_scalar_double(adapt_delta) ||
       adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
+  # Set up aux_by
+  has_aux_by <- FALSE
+  if (likelihood %in% valid_lhood$survival &&
+      likelihood != "exponential" &&
+      (has_ipd(network) || has_agd_arm(network))) {
+
+    has_aux_by <- TRUE
+    aux_by <- rlang::enquo(aux_by)
+    if (rlang::quo_is_null(aux_by)) aux_by <- ".study"
+
+    aux_dat <- dplyr::bind_rows(if (has_ipd(network)) dplyr::select(network$ipd, -".Surv") else NULL,
+                                if (has_agd_arm(network)) {
+                                  if (inherits(network, "mlnmr_data")) {
+                                    .unnest_integration(network$agd_arm) %>% dplyr::select(-".Surv")
+                                  } else {
+                                    dplyr::select(network$agd_arm, -".Surv")
+                                  }
+                                } else NULL)
+
+    # Check specs and translate into string column names
+    aux_by <- colnames(get_aux_by_data(aux_dat, by = aux_by))
+  }
+
+
   # Use numerical integration? TRUE if class mlnmr_data and regression is not NULL
   # (Avoids unnecessary use of integration points if regression formula not specified)
-  use_int <- inherits(network, "mlnmr_data") && !is.null(regression)
+  use_int <- inherits(network, "mlnmr_data") &&
+               (!is.null(regression) ||
+                  (has_aux_by && length(setdiff(aux_by, c(".study", ".trt"))) > 0))
 
   # Number of numerical integration points
   # Set to 1 if no numerical integration, so that regression on summary data is possible
@@ -522,7 +563,8 @@ nma <- function(network,
     # Only take necessary columns
     dat_ipd <- get_model_data_columns(dat_ipd,
                                       regression = regression,
-                                      label = "IPD")
+                                      label = "IPD",
+                                      keep = if (has_aux_by) aux_by else NULL)
 
     y_ipd <- get_outcome_variables(network$ipd, network$outcome$ipd)
   } else {
@@ -567,7 +609,8 @@ nma <- function(network,
     # Only take necessary columns
     idat_agd_arm <- get_model_data_columns(idat_agd_arm,
                                            regression = regression,
-                                           label = "AgD (arm-based)")
+                                           label = "AgD (arm-based)",
+                                           keep = if (has_aux_by) aux_by else NULL)
 
   } else {
     dat_agd_arm <- idat_agd_arm <- tibble::tibble()
@@ -825,6 +868,19 @@ nma <- function(network,
     basis <- NULL
   }
 
+  # Set up aux_by design vector
+  if (has_aux_by) {
+    if (length(setdiff(aux_by, c(".study", ".trt"))) > 0) {
+      aux_dat <- dplyr::bind_rows(dat_ipd, idat_agd_arm)
+    } else {
+      aux_dat <- dplyr::bind_rows(dat_ipd,
+                                  if (has_agd_arm(network)) dplyr::select(tidyr::unnest(dat_agd_arm, cols = ".Surv"), -".Surv") else NULL)
+    }
+    aux_id <- get_aux_id(aux_dat, aux_by)
+  } else {
+    aux_id <- integer()
+  }
+
   # Fit using nma.fit
   stanfit <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
     agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
@@ -847,6 +903,7 @@ nma <- function(network,
     prior_het_type = prior_het_type,
     prior_reg = prior_reg,
     prior_aux = prior_aux,
+    aux_id = aux_id,
     QR = QR,
     adapt_delta = adapt_delta,
     int_thin = int_thin,
@@ -964,6 +1021,24 @@ nma <- function(network,
 
   }
 
+  # Labels for survival aux pars
+  if (likelihood %in% valid_lhood$survival) {
+    aux_labels <- get_aux_labels(aux_dat, by = aux_by)
+
+    fnames_oi[grepl("^shape\\[[0-9]+\\]$", fnames_oi)] <- paste0("shape[", aux_labels, "]")
+    fnames_oi[grepl("^sdlog\\[[0-9]+\\]$", fnames_oi)] <- paste0("sdlog[", aux_labels, "]")
+    fnames_oi[grepl("^sigma\\[[0-9]+\\]$", fnames_oi)] <- paste0("sigma[", aux_labels, "]")
+    fnames_oi[grepl("^k\\[[0-9]+\\]$", fnames_oi)] <- paste0("k[", aux_labels, "]")
+
+    if (likelihood %in% c("mspline", "pexp")) {
+      # Number of spline coefficients
+      n_scoef <- ncol(basis[[1]])
+
+      fnames_oi[grepl("^scoef\\[[0-9]+,[0-9]+\\]$", fnames_oi)] <-
+        paste0("scoef[", rep(aux_labels, times = n_scoef), ", ", rep(1:n_scoef, each = length(aux_labels)), "]")
+    }
+  }
+
   stanfit@sim$fnames_oi <- fnames_oi
 
   # Create stan_nma object
@@ -976,6 +1051,7 @@ nma <- function(network,
               xbar = xbar,
               likelihood = likelihood,
               link = link,
+              aux_by = if (has_aux_by) colnames(get_aux_by_data(aux_dat, by = aux_by)) else NULL,
               priors = list(prior_intercept = if (has_intercepts) prior_intercept else NULL,
                             prior_trt = prior_trt,
                             prior_het = if (trt_effects == "random") prior_het else NULL,
@@ -1033,6 +1109,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_het_type = c("sd", "var", "prec"),
                     prior_reg,
                     prior_aux,
+                    aux_id = integer(),
                     QR = FALSE,
                     adapt_delta = NULL,
                     int_thin = 0,
@@ -1564,12 +1641,24 @@ nma.fit <- function(ipd_x, ipd_y,
     # Add in dummy prior_aux2 if not gengamma - not used, but requested by Stan data
     if (likelihood != "gengamma") prior_aux2 <- flat()
 
+    # Check aux IDs
+    if (!(has_ipd || has_agd_arm)) {
+      aux_id <- integer()
+    } else {
+      if (likelihood == "exponential") {
+        aux_id <- rep_len(0, ni_ipd + ni_agd_arm)
+      } else if (!rlang::is_integerish(aux_id, finite = TRUE)) {
+        abort("`aux_id` must be an integer vector identifying the auxiliary parameter for each observation in IPD and AgD (arm-based) data.")
+      }
+    }
+
     standat <- purrr::list_modify(standat,
                                   # AgD arm IDs
                                   agd_arm_arm = agd_arm_arm,
 
-                                  # Study IDs for shape parameters
-                                  study = c(ipd_study, agd_arm_study),
+                                  # Auxiliary IDs for shape parameters
+                                  aux_by = length(aux_id) == ni_ipd + ni_agd_arm*n_int,
+                                  aux_id = aux_id,
 
                                   # Add outcomes
                                   ipd_time = ipd_surv$time,
@@ -1681,12 +1770,21 @@ nma.fit <- function(ipd_x, ipd_y,
       agd_arm_time <- agd_arm_itime <- agd_arm_start_itime <- agd_arm_delay_itime <- matrix(nrow = 0, ncol = n_scoef)
     }
 
+    # Check aux IDs
+    if (!(has_ipd || has_agd_arm)) {
+      aux_id <- integer()
+    } else {
+      if (!rlang::is_integerish(aux_id, finite = TRUE))
+        abort("`aux_id` must be an integer vector identifying the auxiliary parameter for each observation in IPD and AgD (arm-based) data.")
+    }
+
     standat <- purrr::list_modify(standat,
                                   # AgD arm IDs
                                   agd_arm_arm = agd_arm_arm,
 
-                                  # Study IDs
-                                  study = c(ipd_study, agd_arm_study),
+                                  # Aux IDs
+                                  aux_by = length(aux_id) == ni_ipd + ni_agd_arm*n_int,
+                                  aux_id = aux_id,
 
                                   # Number of spline coefficients
                                   n_scoef = n_scoef,
@@ -1839,16 +1937,6 @@ nma.fit <- function(ipd_x, ipd_y,
     if (has_ipd) l_cat <- colnames(ipd_y$.r)[-1]
     else if (has_agd_arm) l_cat <- colnames(agd_arm_y$.r)[-1]
     fnames_oi[grepl("^cc\\[[0-9]+\\]$", fnames_oi)] <- paste0("cc[", l_cat, "]")
-  }
-
-  fnames_oi[grepl("^shape\\[[0-9]+\\]$", fnames_oi)] <- paste0("shape[", x_names_sub[col_study], "]")
-  fnames_oi[grepl("^sdlog\\[[0-9]+\\]$", fnames_oi)] <- paste0("sdlog[", x_names_sub[col_study], "]")
-  fnames_oi[grepl("^sigma\\[[0-9]+\\]$", fnames_oi)] <- paste0("sigma[", x_names_sub[col_study], "]")
-  fnames_oi[grepl("^k\\[[0-9]+\\]$", fnames_oi)] <- paste0("k[", x_names_sub[col_study], "]")
-
-  if (likelihood %in% c("mspline", "pexp")) {
-    fnames_oi[grepl("^scoef\\[[0-9]+,[0-9]+\\]$", fnames_oi)] <-
-      paste0("scoef[", rep(x_names_sub[col_study], times = n_scoef), ", ", rep(1:n_scoef, each = sum(col_study)), "]")
   }
 
   stanfit@sim$fnames_oi <- fnames_oi
@@ -2617,6 +2705,7 @@ make_nma_model_matrix <- function(nma_formula,
 #' @param data Data frame
 #' @param regression Regression formula or NULL
 #' @param label Label for data source or NULL, used for informative errors
+#' @param keep Additional variables to keep in data
 #'
 #' @return Data frame with required columns
 #' @noRd
@@ -2632,9 +2721,9 @@ get_model_data_columns <- function(data, regression = NULL, label = NULL, keep =
                    " not found", label, ".")
       )
     }
-    out <- dplyr::select(data, dplyr::starts_with("."), !! regvars)
+    out <- dplyr::select(data, dplyr::starts_with("."), !! regvars, !! keep)
   } else {
-    out <- dplyr::select(data, dplyr::starts_with("."))
+    out <- dplyr::select(data, dplyr::starts_with("."), !! keep)
   }
 
   # Work around dplyr::bind_rows() bug - convert .Surv column to bare matrix if present
@@ -2920,3 +3009,45 @@ make_data_labels <- function(study, trt, trt_b = NA) {
     ) %>%
     dplyr::pull(.data$label)
 }
+
+#' Get design vector for auxiliary parameters
+#' Currently only used for survival models, to allow the user to specify shapes
+#' that vary by group (e.g. by arm) as well as study
+#'
+#' @param data Data frame
+#' @param by Vector of variables to stratify by (character or bare column names)
+#' @param add_study Add in .study factor, even if not specified?
+#'
+#' @noRd
+get_aux_id <- function(data, by, add_study = TRUE) {
+  grouped <- get_aux_by_data(data = data, by = by, add_study = add_study)
+  dplyr::group_indices(grouped)
+}
+
+#' Get auxiliary parameter labels based on aux_by
+#' @noRd
+get_aux_labels <- function(data, by, add_study = TRUE) {
+  groupdat <- get_aux_by_data(data = data, by = by, add_study = add_study) %>%
+    dplyr::group_data() %>%
+    dplyr::select(-".rows")
+
+  if (ncol(groupdat) == 1) {
+    paste(groupdat[[1]])
+  } else if (rlang::has_name(groupdat, ".study")) {
+    paste0(groupdat$.study, ": ", do.call(paste, c(dplyr::select(groupdat, -".study"), sep = ", ")))
+  } else {
+    do.call(paste, c(groupdat, sep = ", "))
+  }
+}
+
+#' Get auxiliary group data defined by aux_by
+#' @noRd
+get_aux_by_data <- function(data, by, add_study = TRUE) {
+  tryCatch(
+    dplyr::ungroup(data) %>%
+      dplyr::select(if (add_study) ".study" else NULL, !! by) %>%
+      dplyr::group_by_all(),
+    error = function(x) abort("`aux_by` must be a vector of variable names to stratify auxiliary parameters by.", parent = x)
+  )
+}
+

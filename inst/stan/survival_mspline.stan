@@ -119,12 +119,16 @@ data {
   int<lower=0, upper=1> agd_arm_delayed[ni_agd_arm];
   int<lower=0, upper=3> agd_arm_status[ni_agd_arm];
 
-  // Study IDs for independent spline coefficients parameters
-  int<lower=1> study[narm_ipd + narm_agd_arm];
+  // aux IDs for independent spline coefficients parameters
+  int<lower=0, upper=1> aux_by; // Flag subgroup aux parameters within each arm (1 = yes)
+  int<lower=1> aux_id[ni_ipd + ni_agd_arm*(aux_by ? nint_max : 1)];
 }
 transformed data {
   // Dirichlet prior vector
   vector[n_scoef] prior_aux_shapes = rep_vector(prior_aux_shape, n_scoef);
+
+  // Number of aux coefficient vectors
+  int n_aux = max(aux_id);
 
 #include /include/transformed_data_common.stan
 }
@@ -132,7 +136,7 @@ parameters {
 #include /include/parameters_common.stan
 
   // Spline coefficients
-  simplex[n_scoef] scoef[ns_ipd + ns_agd_arm];
+  simplex[n_scoef] scoef[n_aux];
 }
 transformed parameters {
   // Log likelihood contributions
@@ -151,7 +155,7 @@ transformed parameters {
                           ipd_delayed[i],
                           ipd_status[i],
                           eta_ipd[i],
-                          scoef[study[ipd_arm[i]]]);
+                          scoef[aux_id[i]]);
   }
 
   // -- AgD model (arm-based) --
@@ -173,14 +177,25 @@ transformed parameters {
         if (RE && which_RE[narm_ipd + agd_arm_arm[i]]) eta_agd_arm_ii += f_delta[which_RE[narm_ipd + agd_arm_arm[i]]];
 
         // Average likelihood over integration points
-        log_L_ii = loglik_a(agd_arm_time[i],
-                            agd_arm_itime[i],
-                            agd_arm_start_itime[i],
-                            agd_arm_delay_itime[i],
-                            agd_arm_delayed[i],
-                            agd_arm_status[i],
-                            eta_agd_arm_ii,
-                            scoef[study[narm_ipd + agd_arm_arm[i]]]);
+        if (aux_by) for (j in 1:nint) {
+          log_L_ii[j] = loglik(agd_arm_time[i],
+                               agd_arm_itime[i],
+                               agd_arm_start_itime[i],
+                               agd_arm_delay_itime[i],
+                               agd_arm_delayed[i],
+                               agd_arm_status[i],
+                               eta_agd_arm_ii[j],
+                               scoef[aux_id[ni_ipd + (i-1)*nint_max + j]]);
+        } else {
+          log_L_ii = loglik_a(agd_arm_time[i],
+                              agd_arm_itime[i],
+                              agd_arm_start_itime[i],
+                              agd_arm_delay_itime[i],
+                              agd_arm_delayed[i],
+                              agd_arm_status[i],
+                              eta_agd_arm_ii,
+                              scoef[aux_id[ni_ipd + i]]);
+        }
 
         log_L_agd_arm[i] = log_sum_exp(log_L_ii) - log(nint);
       }
@@ -198,7 +213,7 @@ transformed parameters {
                                   agd_arm_delayed[i],
                                   agd_arm_status[i],
                                   eta_agd_arm,
-                                  scoef[study[narm_ipd + agd_arm_arm[i]]]);
+                                  scoef[aux_id[ni_ipd + i]]);
       }
     }
   }
@@ -207,7 +222,7 @@ model {
 #include /include/model_common.stan
 
   // -- Prior on spline coefficients --
-  for (s in 1:(ns_ipd + ns_agd_arm)) {
+  for (s in 1:(n_aux)) {
     scoef[s] ~ dirichlet(prior_aux_shapes);
   }
 
