@@ -760,7 +760,7 @@ predict.stan_nma <- function(object, ...,
                       '  - Produce aggregate predictions with level = "aggregate"',
                       sep = "\n"))
 
-        preddat <- get_model_data_columns(object$network$ipd, regression = object$regression)
+        preddat <- get_model_data_columns(object$network$ipd, regression = object$regression, keep = object$aux_by, keep = object$aux_by)
 
         if (is_surv) {
           # Deal with times argument
@@ -906,7 +906,7 @@ predict.stan_nma <- function(object, ...,
           }
 
           # Only take necessary columns
-          dat_agd_arm <- get_model_data_columns(dat_agd_arm, regression = object$regression, label = "AgD (arm-based)")
+          dat_agd_arm <- get_model_data_columns(dat_agd_arm, regression = object$regression, keep = object$aux_by, label = "AgD (arm-based)")
         } else {
           dat_agd_arm <- tibble::tibble()
         }
@@ -963,7 +963,7 @@ predict.stan_nma <- function(object, ...,
           }
 
           # Only take necessary columns
-          dat_ipd <- get_model_data_columns(dat_ipd, regression = object$regression, label = "IPD")
+          dat_ipd <- get_model_data_columns(dat_ipd, regression = object$regression, keep = object$aux_by, label = "IPD")
 
           dat_ipd$.sample_size <- 1
         } else {
@@ -974,19 +974,21 @@ predict.stan_nma <- function(object, ...,
       }
 
       # Produce predictions on every treatment for each observed arm/individual
-      if (packageVersion("dplyr") >= "1.1.1") {
-        preddat <- preddat %>%
-          dplyr::rename(.trt_old = ".trt") %>%
-          dplyr::left_join(tidyr::expand(., .study = .data$.study,
-                                            .trt = .data$.trt_old),
-                           by = ".study",
-                           relationship = "many-to-many")
-      } else {
-        preddat <- preddat %>%
-          dplyr::rename(.trt_old = ".trt") %>%
-          dplyr::left_join(tidyr::expand(., .study = .data$.study,
-                                         .trt = .data$.trt_old),
-                           by = ".study")
+      if (is.null(object$aux_by) || ! ".trt" %in% object$aux_by) {
+        if (packageVersion("dplyr") >= "1.1.1") {
+          preddat <- preddat %>%
+            dplyr::rename(.trt_old = ".trt") %>%
+            dplyr::left_join(tidyr::expand(., .study = .data$.study,
+                                              .trt = .data$.trt_old),
+                             by = ".study",
+                             relationship = "many-to-many")
+        } else {
+          preddat <- preddat %>%
+            dplyr::rename(.trt_old = ".trt") %>%
+            dplyr::left_join(tidyr::expand(., .study = .data$.study,
+                                           .trt = .data$.trt_old),
+                             by = ".study")
+        }
       }
 
       # If producing aggregate-level predictions, output these in factor order
@@ -1073,7 +1075,7 @@ predict.stan_nma <- function(object, ...,
       }
 
       # Check all variables are present
-      predreg <- get_model_data_columns(preddat, regression = object$regression, label = "`newdata`")
+      predreg <- get_model_data_columns(preddat, regression = object$regression, keep = object$aux_by, label = "`newdata`")
 
       preddat$.sample_size <- 1
 
