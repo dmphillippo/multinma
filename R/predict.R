@@ -1886,9 +1886,12 @@ make_surv_predict <- function(eta, aux, times, likelihood,
       if (!is.null(aux)) {
         if (length(dim(aux)) == 4) {
           auxi <- matrix(aux[ , , i, ], ncol = dim(aux)[4], dimnames = list(NULL, dimnames(aux)[[4]]))
+        } else if (likelihood %in% c("gengamma", "mspline", "pexp")) {
+          auxi <- matrix(aux, ncol = dim(aux)[3], dimnames = list(NULL, dimnames(aux)[[3]]))
+        } else if (dim(aux)[3] == 1) {
+          auxi <- as.vector(aux)
         } else {
-          if (dim(aux)[3] == 1) auxi <- as.vector(aux)
-          else auxi <- as.vector(aux[ , , i])
+          auxi <- as.vector(aux[ , , i])
         }
       }
       out[ , , ((i-1)*iinc+1):(i*iinc)] <-
@@ -2015,7 +2018,7 @@ make_agsurv_predict <- function(eta, aux, times, likelihood,
       out[i, j, ] <- rmst_Sbar(times = times,
                                eta = eta[i, j, ],
                                weights = weights,
-                               aux = if (length(dim(aux)) == 3) aux[i, j, ] else aux[i, j, , ],
+                               aux = if (length(dim(aux)) == 3) matrix(aux[i, j, ], ncol = dim(aux)[3], dimnames = list(NULL, dimnames(aux)[[3]])) else aux[i, j, , ],
                                likelihood = likelihood,
                                basis = basis)
     }
@@ -2100,9 +2103,12 @@ qSbar <- function(times, p, eta, weights, aux, likelihood, basis) {
     if (!is.null(aux)) {
       if (length(dim(aux)) == 4) {
         auxi <- matrix(aux[ , , i, ], ncol = dim(aux)[4], dimnames = list(NULL, dimnames(aux)[[4]]))
+      } else if (likelihood %in% c("gengamma", "mspline", "pexp")) {
+        auxi <- matrix(aux, ncol = dim(aux)[3], dimnames = list(NULL, dimnames(aux)[[3]]))
+      } else if (dim(aux)[3] == 1) {
+        auxi <- as.vector(aux)
       } else {
-        if (dim(aux)[3] == 1) auxi <- matrix(aux, ncol = 1)
-        else auxi <- matrix(aux[ , , i], ncol = 1)
+        auxi <- as.vector(aux[ , , i])
       }
     }
     S[ , , i] <- do.call(surv_predfuns[[likelihood]][["survival"]],
