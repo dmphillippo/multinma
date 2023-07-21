@@ -510,7 +510,7 @@ nma <- function(network,
   # Set up aux_by
   has_aux_by <- FALSE
   if (likelihood %in% valid_lhood$survival &&
-      likelihood != "exponential" &&
+      has_aux &&
       (has_ipd(network) || has_agd_arm(network))) {
 
     has_aux_by <- TRUE
@@ -1022,7 +1022,7 @@ nma <- function(network,
   }
 
   # Labels for survival aux pars
-  if (likelihood %in% valid_lhood$survival) {
+  if (likelihood %in% valid_lhood$survival && has_aux) {
     aux_labels <- get_aux_labels(aux_dat, by = aux_by)
 
     fnames_oi[grepl("^shape\\[[0-9]+\\]$", fnames_oi)] <- paste0("shape[", aux_labels, "]")
@@ -1645,8 +1645,8 @@ nma.fit <- function(ipd_x, ipd_y,
     if (!(has_ipd || has_agd_arm)) {
       aux_id <- integer()
     } else {
-      if (likelihood == "exponential") {
-        aux_id <- rep_len(0, ni_ipd + ni_agd_arm)
+      if (likelihood %in% c("exponential", "exponential-aft")) {
+        aux_id <- rep_len(1, ni_ipd + ni_agd_arm)  # Not used (no aux pars)
       } else if (!rlang::is_integerish(aux_id, finite = TRUE)) {
         abort("`aux_id` must be an integer vector identifying the auxiliary parameter for each observation in IPD and AgD (arm-based) data.")
       }
