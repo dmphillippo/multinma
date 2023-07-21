@@ -760,7 +760,7 @@ predict.stan_nma <- function(object, ...,
                       '  - Produce aggregate predictions with level = "aggregate"',
                       sep = "\n"))
 
-        preddat <- get_model_data_columns(object$network$ipd, regression = object$regression, keep = object$aux_by, keep = object$aux_by)
+        preddat <- get_model_data_columns(object$network$ipd, regression = object$regression, keep = object$aux_by)
 
         if (is_surv) {
           # Deal with times argument
