@@ -1459,12 +1459,6 @@ predict.stan_nma <- function(object, ...,
 
       for (s in 1:n_studies) {
 
-        # Aux select
-        aux_s <- grepl(paste0("[", studies[s], if (object$likelihood %in% c("mspline", "pexp")) "," else "]"),
-                       dimnames(aux_array)[[3]], fixed = TRUE)
-
-        aux_array_s <- aux_array[ , , aux_s, drop = FALSE]
-
         # Basis for mspline models
         if (object$likelihood %in% c("mspline", "pexp")) {
           basis <- object$basis[[s]]
@@ -1482,6 +1476,42 @@ predict.stan_nma <- function(object, ...,
 
           if (!is.null(offset_all))
             eta_pred_array <- sweep(eta_pred_array, 3, offset_all[ss], FUN = "+")
+
+          # Aux select
+          aux_l <- get_aux_labels(preddat[ss, ], by = object$aux_by)
+          aux_id <- get_aux_id(preddat[ss, ], by = object$aux_by)
+
+          if (length(setdiff(object$aux_by, c(".study", ".trt"))) == 0) {
+            aux_s <- grepl(paste0("\\[(", paste(aux_l, collapse = "|"), if (object$likelihood %in% c("mspline", "pexp")) ")," else ")\\]"),
+                           dimnames(aux_array)[[3]])
+            aux_array_s <- aux_array[ , , aux_s, drop = FALSE]
+
+          } else {
+            # Stratified aux pars within arm, need to expand these out over the individuals/integration points
+
+            if (object$likelihood %in% c("mspline", "pexp")) {
+              aux_array_s <- array(NA_real_, dim = c(dim(eta_pred_array), length(basis)))
+              for (i in 1:length(basis)) {
+                aux_s <- grep(paste0("\\[(", paste(aux_l, collapse = "|"), "), ", i, "\\]"),
+                              dimnames(aux_array)[[3]])
+                aux_array_s[ , , , i] <- aux_array[ , , aux_s[aux_id]]
+              }
+            } else if (object$likelihood == "gengamma") {
+              aux_array_s <- array(NA_real_, dim = c(dim(eta_pred_array), 2),
+                                   dimnames = list(iterations = NULL, chains = NULL, parameters = NULL, aux = c("sigma[]", "k[]")))
+              sigma_s <- grep(paste0("^sigma\\[(", paste(aux_l, collapse = "|"), ")", "\\]"),
+                            dimnames(aux_array)[[3]])
+              k_s <- grep(paste0("^k\\[(", paste(aux_l, collapse = "|"), ")", "\\]"),
+                              dimnames(aux_array)[[3]])
+              aux_array_s[ , , , "sigma[]"] <- aux_array[ , , sigma_s[aux_id]]
+              aux_array_s[ , , , "k[]"] <- aux_array[ , , k_s[aux_id]]
+
+            } else {
+              aux_s <- grep(paste0("\\[(", paste(aux_l, collapse = "|"), ")\\]"),
+                            dimnames(aux_array)[[3]])
+              aux_array_s <- aux_array[ , , aux_s[aux_id], drop = FALSE]
+            }
+          }
 
 
           if (type %in% c("survival", "hazard", "cumhaz")) {
@@ -1811,7 +1841,7 @@ make_surv_predict <- function(eta, aux, times, likelihood,
   if (likelihood == "mspline") {
     lower <- attr(basis, "Boundary.knots")[1]
     upper <- attr(basis, "Boundary.knots")[2]
-    if (type == "mean" || any(times < lower) || any(times > upper)) warn("Evaluating M-spline at times beyond the boundary knots.")
+    if (! type %in% c("median", "quantile") && (type == "mean" || any(times < lower) || any(times > upper))) warn("Evaluating M-spline at times beyond the boundary knots.")
   }
 
   d_out <- dim(eta)
@@ -1831,11 +1861,10 @@ make_surv_predict <- function(eta, aux, times, likelihood,
     d_out[3] <- d_out[3] * length(quantiles)
   }
 
-  if (!is.null(aux)) aux <- matrix(aux, ncol = dim(aux)[3], dimnames = list(NULL, dimnames(aux)[[3]]))
-
   out <- array(NA_real_, dim = d_out, dimnames = dn_out)
 
   if (type %in% c("survival", "hazard", "cumhaz") && n_eta == 1) { # Multiple times, single linear predictor
+    if (!is.null(aux)) aux <- matrix(aux, ncol = dim(aux)[3], dimnames = list(NULL, dimnames(aux)[[3]]))
     for (i in 1:length(times)) {
       out[, , i] <- do.call(surv_predfuns[[likelihood]][[type]],
                             args = list(times = times[i],
@@ -1853,15 +1882,25 @@ make_surv_predict <- function(eta, aux, times, likelihood,
     }
     for (i in 1:n_eta) {
       ti <- if (length(times) == 1) times else times[i]
+      auxi <- NULL
+      if (!is.null(aux)) {
+        if (length(dim(aux)) == 4) {
+          auxi <- matrix(aux[ , , i, ], ncol = dim(aux)[4], dimnames = list(NULL, dimnames(aux)[[4]]))
+        } else {
+          if (dim(aux)[3] == 1) auxi <- as.vector(aux)
+          else auxi <- as.vector(aux[ , , i])
+        }
+      }
       out[ , , ((i-1)*iinc+1):(i*iinc)] <-
         do.call(surv_predfuns[[likelihood]][[type]],
                 args = list(times = ti,
                             eta = as.vector(eta[ , , i]),
-                            aux = aux,
+                            aux = auxi,
                             quantiles = quantiles,
                             basis = basis))
     }
   } else { # Single time, single linear predictor
+    if (!is.null(aux)) aux <- matrix(aux, ncol = dim(aux)[3], dimnames = list(NULL, dimnames(aux)[[3]]))
     if (type == "quantile") quantiles <- rep(quantiles, each = length(eta))
     out <- array(do.call(surv_predfuns[[likelihood]][[type]],
                          args = list(times = times,
@@ -1976,7 +2015,7 @@ make_agsurv_predict <- function(eta, aux, times, likelihood,
       out[i, j, ] <- rmst_Sbar(times = times,
                                eta = eta[i, j, ],
                                weights = weights,
-                               aux = aux[i, j, ],
+                               aux = if (length(dim(aux)) == 3) aux[i, j, ] else aux[i, j, , ],
                                likelihood = likelihood,
                                basis = basis)
     }
@@ -2056,11 +2095,20 @@ quantile_Sbar <- function(p, eta, weights, aux, likelihood, basis) {
 
 qSbar <- function(times, p, eta, weights, aux, likelihood, basis) {
   S <- array(NA_real_, dim = dim(eta))
+  auxi <- NULL
   for (i in 1:dim(eta)[3]) {
+    if (!is.null(aux)) {
+      if (length(dim(aux)) == 4) {
+        auxi <- matrix(aux[ , , i, ], ncol = dim(aux)[4], dimnames = list(NULL, dimnames(aux)[[4]]))
+      } else {
+        if (dim(aux)[3] == 1) auxi <- matrix(aux, ncol = 1)
+        else auxi <- matrix(aux[ , , i], ncol = 1)
+      }
+    }
     S[ , , i] <- do.call(surv_predfuns[[likelihood]][["survival"]],
                          args = list(times = times,
                                      eta = as.vector(eta[ , , i]),
-                                     aux = matrix(aux, ncol = dim(aux)[3]),
+                                     aux = auxi,
                                      basis = basis))
   }
 
