@@ -15,6 +15,14 @@
 #' @param class_interactions Character string specifying whether effect modifier
 #'   interactions are specified as `"common"`, `"exchangeable"`, or
 #'   `"independent"`.
+#' @param class_effects Character string specifying a model for treatment class effects,
+#'   either `"independent"` (the default), `"exchangeable"`, or `"common"`.
+#' @param class_sd Character string specifying whether the class standard deviations in a
+#'   class effects model should be `"independent"` (i.e. separate for each class, the default),
+#'   or `"common"` (i.e. shared across all classes). Alternatively this can be a list of
+#'   character vectors, each of which describe a set classes for which to share a common class SD;
+#'   any list names will be used to name the output parameters, otherwise the name will be taken
+#'   from the first class in each set.
 #' @param likelihood Character string specifying a likelihood, if unspecified
 #'   will be inferred from the data (see details)
 #' @param link Character string specifying a link function, if unspecified will
@@ -43,6 +51,10 @@
 #' @param aux_by Vector of variable names listing the variables to stratify the
 #'   auxiliary parameters by. Currently only used for survival models, see
 #'   details.
+#' @param prior_class_mean Specification of prior distribution for the
+#'   treatment class means (if `class_effects = "exchangeable"`).
+#' @param prior_class_sd Specification of prior distribution for the
+#'   treatment class standard deviations (if `class_effects = "exchangeable"`).
 #' @param QR Logical scalar (default `FALSE`), whether to apply a QR
 #'   decomposition to the model design matrix
 #' @param center Logical scalar (default `TRUE`), whether to center the
