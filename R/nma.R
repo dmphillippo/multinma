@@ -539,6 +539,16 @@ nma <- function(network,
     prior_defaults$prior_aux <- get_prior_call(prior_aux)
   }
 
+  # Check if class_effects is "exchangeable" and if prior_class_mean or prior_class_sd are at their default values
+  if (class_effects == "exchangeable") {
+    if (.is_default(prior_class_mean)) {
+      warning("`prior_class_mean` is at its default value while `class_effects` is 'exchangeable'.")
+    }
+    if (.is_default(prior_class_sd)) {
+      warning("`prior_class_sd` is at its default value while `class_effects` is 'exchangeable'.")
+    }
+  }
+
   # Warn where default priors are used
   if (!rlang::is_empty(prior_defaults)) {
     warn(glue::glue(
