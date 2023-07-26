@@ -379,6 +379,8 @@ nma <- function(network,
       ns_arglist <- list(network = network,
                          consistency = "nodesplit",
                          trt_effects = trt_effects,
+                         class_effects = class_effects,
+                         class_sd = class_sd,
                          regression = regression,
                          likelihood = likelihood,
                          link = link,
@@ -390,6 +392,8 @@ nma <- function(network,
                          prior_reg = prior_reg,
                          prior_aux = prior_aux,
                          aux_by = aux_by,
+                         prior_class_mean = prior_class_mean,
+                         prior_class_sd = prior_class_sd,
                          QR = QR,
                          center = center,
                          adapt_delta = adapt_delta,
@@ -500,7 +504,6 @@ nma <- function(network,
   }
 
   prior_het_type <- rlang::arg_match(prior_het_type)
-
 
   # Prior defaults
   prior_defaults <- list()
