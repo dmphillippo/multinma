@@ -520,6 +520,9 @@ nma <- function(network,
     prior_defaults$prior_trt <- get_prior_call(prior_trt)
   if (trt_effects == "random" && .is_default(prior_het))
     prior_defaults$prior_het <- get_prior_call(prior_het)
+  if (class_effects == "exchangeable" && .is_default(prior_class_mean))
+    prior_defaults$prior_class_mean <- get_prior_call(prior_class_mean)
+    prior_defaults$prior_class_sd <- get_prior_call(prior_class_sd)
   if (!is.null(regression) && !is_only_offset(regression) && .is_default(prior_reg))
     prior_defaults$prior_reg <- get_prior_call(prior_reg)
   if (has_aux && .is_default(prior_aux)) {
