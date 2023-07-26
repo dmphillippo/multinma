@@ -271,6 +271,35 @@ nma <- function(network,
   if (length(consistency) > 1) abort("`consistency` must be a single string.")
   trt_effects <- rlang::arg_match(trt_effects)
   if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
+  class_effects <- rlang::arg_match(class_effects)
+  if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
+
+  # Check class_sd
+  if (is.list(class_sd)) {
+    # Check if all elements of the list are vectors
+    if (!all(purrr::map_lgl(class_sd, is.vector))) {
+      abort("`class_sd` list elements should be vectors.")
+    }
+
+    # Get the network classes
+    network_classes <- levels(network$classes)
+
+    # Check that all elements in the vectors match classes in the network
+    if (!all(purrr::map_lgl(class_sd, function(x) all(x %in% network_classes)))) {
+      abort("All elements in the `class_sd` vectors should match classes in the network.")
+    }
+
+    # Check that there are no repetitions between vectors
+    flattened_class_sd <- unlist(class_sd)
+    if (length(flattened_class_sd) != length(unique(flattened_class_sd))) {
+      abort("There should be no repetitions between vectors in `class_sd`.")
+    }
+  } else {
+    class_sd <- rlang::arg_match(class_sd)
+    if (length(class_sd) > 1) abort("`class_sd` must be a single string.")
+  }
+
+
 
   if (consistency == "nodesplit") {
 
