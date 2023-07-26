@@ -484,6 +484,13 @@ nma <- function(network,
   likelihood <- check_likelihood(likelihood, network$outcome)
   link <- check_link(link, likelihood)
 
+  # Check class_effects and network classes
+  if (class_effects != "independent") {
+    if (is.null(network$classes)) {
+      abort("`network$classes` should not be NULL when `class_effects` is not 'independent'.")
+    }
+  }
+
   # When are priors on auxiliary parameters required?
   has_aux <- (likelihood == "normal" && has_ipd(network)) ||
               likelihood %in% c("ordered", "weibull", "gompertz",
