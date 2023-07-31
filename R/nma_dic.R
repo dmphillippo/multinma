@@ -237,7 +237,7 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
 
   # Get pointwise contributions for pV
   if (penalty == "pV") {
-    leverage <- colSums(cov(matrix(resdev_array, ncol = dim(resdev_array)[3])))/2
+    leverage <- colSums(var(matrix(resdev_array, ncol = dim(resdev_array)[3])))/2
     if (has_ipd(net)) leverage_ipd <- leverage[1:n_ipd]
     if (has_agd_arm(net)) leverage_agd_arm <- leverage[n_ipd + (1:n_agd_arm)]
     if (has_agd_contrast(net)) leverage_agd_contrast <- leverage[n_ipd + n_agd_arm + (1:nr_agd_contrast)]
