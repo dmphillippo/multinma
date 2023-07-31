@@ -2015,10 +2015,17 @@ make_agsurv_predict <- function(eta, aux, times, likelihood,
     out <- array(NA_real_, dim = c(dim(eta)[1:2], length(times)))
 
     for (i in 1:dim(out)[1]) for (j in 1:dim(out)[2]) {
+      if (length(dim(aux)) == 4) {
+        auxi <- aux[i, j, , ]
+      } else if (dim(aux)[[3]] > 1) {
+        auxi <- matrix(aux[i, j, ], nrow = 1, dimnames = list(NULL, dimnames(aux)[[3]]))
+      } else {
+        auxi <- aux[i, j, ]
+      }
       out[i, j, ] <- rmst_Sbar(times = times,
                                eta = eta[i, j, ],
                                weights = weights,
-                               aux = if (length(dim(aux)) == 3) matrix(aux[i, j, ], ncol = dim(aux)[3], dimnames = list(NULL, dimnames(aux)[[3]])) else aux[i, j, , ],
+                               aux = auxi,
                                likelihood = likelihood,
                                basis = basis)
     }
