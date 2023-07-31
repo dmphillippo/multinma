@@ -239,7 +239,7 @@ produced using \code{type = "quantile"} or \code{"median"}.
 integrating
 \deqn{\mathrm{RMST}_{jk}(t^*) = \int_0^{t^*} \bar{S}_{jk}(t) dt}
 up to the restricted time horizon \eqn{t^*}, with \eqn{t^*=\infty} for mean
-standardised survial time. These are produced using \code{type = "rmst"} or
+standardised survival time. These are produced using \code{type = "rmst"} or
 \code{"mean"}.
 }
 }

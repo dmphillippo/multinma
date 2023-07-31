@@ -20,6 +20,7 @@ nma(
   prior_het_type = c("sd", "var", "prec"),
   prior_reg = .default(normal(scale = 10)),
   prior_aux = .default(),
+  aux_by = NULL,
   QR = FALSE,
   center = TRUE,
   adapt_delta = NULL,
@@ -82,6 +83,10 @@ coefficients (if \code{regression} formula specified)}
 \item{prior_aux}{Specification of prior distribution for the auxiliary
 parameter, if applicable (see details). For \code{likelihood = "gengamma"} this
 should be a list of prior distributions with elements \code{sigma} and \code{k}.}
+
+\item{aux_by}{Vector of variable names listing the variables to stratify the
+auxiliary parameters by. Currently only used for survival models, see
+details.}
 
 \item{QR}{Logical scalar (default \code{FALSE}), whether to apply a QR
 decomposition to the model design matrix}
@@ -241,6 +246,14 @@ For the \code{mspline} and \code{pexp} likelihoods, the auxiliary parameters are
 spline coefficients for each study. These form a unit simplex (i.e. lie
 between 0 and 1, and sum to 1), and are given a \code{\link[=dirichlet]{dirichlet()}} prior
 distribution.
+
+The auxiliary parameters can be stratified by additional factors through
+the \code{aux_by} argument. For example, to allow the shape of the baseline
+hazard to vary between treatment arms as well as studies, use \code{aux_by = c(".study", ".trt")}. (Technically, \code{.study} is always included in the
+stratification even if omitted from \code{aux_by}, but we choose here to make
+the stratification explicit.) This is a common way of relaxing the
+proportional hazards assumption. The default is equivalent to \code{aux_by = ".study"} which stratifies the auxiliary parameters by study, as described
+above.
 }
 }
 
