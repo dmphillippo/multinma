@@ -204,7 +204,7 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
   } else if (x$likelihood %in% valid_lhood$survival) {
     # Nothing to do, pV only
 
-  } else {
+  } else if (penalty != "pV") {
     abort(glue::glue("DIC not supported for likelihood of type '{x$likelihood}'."))
   }
 
