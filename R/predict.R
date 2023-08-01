@@ -2015,7 +2015,9 @@ make_agsurv_predict <- function(eta, aux, times, likelihood,
     out <- array(NA_real_, dim = c(dim(eta)[1:2], length(times)))
 
     for (i in 1:dim(out)[1]) for (j in 1:dim(out)[2]) {
-      if (length(dim(aux)) == 4) {
+      if (is.null(aux)) {
+        auxi <- NULL
+      } else if (length(dim(aux)) == 4) {
         auxi <- aux[i, j, , ]
       } else if (dim(aux)[[3]] > 1) {
         auxi <- matrix(aux[i, j, ], nrow = 1, dimnames = list(NULL, dimnames(aux)[[3]]))
