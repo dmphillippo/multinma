@@ -1461,7 +1461,7 @@ predict.stan_nma <- function(object, ...,
 
         # Basis for mspline models
         if (object$likelihood %in% c("mspline", "pexp")) {
-          basis <- object$basis[[s]]
+          basis <- object$basis[[studies[s]]]
         } else {
           basis <- NULL
         }
