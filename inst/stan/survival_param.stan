@@ -17,34 +17,34 @@ functions {
     // aux2 is only for gengamma k
 
     int n = num_elements(y);
-    vector[n] lS;
+    vector[n] out;
 
     if (dist == 1) { // Exponential
-      lS = -y .* exp(eta);
+      out = -y .* exp(eta);
     } else if (dist == 2) { // Weibull
-      lS = -pow_vec(y, aux) .* exp(eta);
+      out = -pow_vec(y, aux) .* exp(eta);
     } else if (dist == 3) { // Gompertz
-      lS = -exp(eta)./aux .* expm1(aux .* y);
+      out = -exp(eta)./aux .* expm1(aux .* y);
     } else if (dist == 4) { // Exponential AFT
-      lS = -y .* exp(-eta);
+      out = -y .* exp(-eta);
     } else if (dist == 5) { // Weibull AFT
-      lS = -pow_vec(y, aux) .* exp(-aux .* eta);
+      out = -pow_vec(y, aux) .* exp(-aux .* eta);
     } else if (dist == 6) { // log Normal
       // aux is sdlog
-      // lS = log1m(Phi((log(y) - eta) ./ aux));
-      for (i in 1:n) lS[i] = lognormal_lccdf(y[i] | eta[i], aux[i]);
+      // out = log1m(Phi((log(y) - eta) ./ aux));
+      for (i in 1:n) out[i] = lognormal_lccdf(y[i] | eta[i], aux[i]);
     } else if (dist == 7) { // log logistic
-      lS = -log1p(pow_vec(y ./ exp(eta), aux));
+      out = -log1p(pow_vec(y ./ exp(eta), aux));
     } else if (dist == 8) { // Gamma
       vector[n] eeta = exp(-eta);
-      for (i in 1:n) lS[i] = gamma_lccdf(y[i] | aux[i], eeta[i]);
+      for (i in 1:n) out[i] = gamma_lccdf(y[i] | aux[i], eeta[i]);
     } else if (dist == 9) { // Generalised Gamma
       vector[n] Q = inv(sqrt(aux2));
       vector[n] w = exp(Q .* (log(y) - eta) ./ aux) .* aux2;
-      for (i in 1:n) lS[i] = log1m(gamma_p(aux2[i], w[i]));
+      for (i in 1:n) out[i] = log1m(gamma_p(aux2[i], w[i]));
     }
 
-    return lS;
+    return out;
   }
 
   // AgD version with integration points
@@ -89,32 +89,32 @@ functions {
     // aux2 is only for gengamma shape
 
     int n = num_elements(y);
-    vector[n] lh;
+    vector[n] out;
 
     if (dist == 1) { // Exponential
-      lh = eta;
+      out = eta;
     } else if (dist == 2) { // Weibull
-      lh = log(aux) + eta + lmultiply_vec(aux - 1, y);
+      out = log(aux) + eta + lmultiply_vec(aux - 1, y);
     } else if (dist == 3) { // Gompertz
-      lh = eta + (aux .* y);
+      out = eta + (aux .* y);
     } else if (dist == 4) { // Exponential AFT
-      lh = -eta;
+      out = -eta;
     } else if (dist == 5) { // Weibull AFT
-      lh = log(aux) - (aux .* eta) + lmultiply_vec(aux - 1, y);
+      out = log(aux) - (aux .* eta) + lmultiply_vec(aux - 1, y);
     } else if (dist == 6) { // log Normal
       // aux is sdlog
-      // lh = lognormal_lpdf(y | eta, aux) - log1m(Phi((log(y) - eta) ./ aux));
-      for (i in 1:n) lh[i] = lognormal_lpdf(y[i] | eta[i], aux[i]) - lognormal_lccdf(y[i] | eta[i], aux[i]);
+      // out = lognormal_lpdf(y | eta, aux) - log1m(Phi((log(y) - eta) ./ aux));
+      for (i in 1:n) out[i] = lognormal_lpdf(y[i] | eta[i], aux[i]) - lognormal_lccdf(y[i] | eta[i], aux[i]);
     } else if (dist == 7) { // log logistic
-      lh = log(aux) - eta + (aux - 1).*(log(y) - eta) - log1p(pow_vec(y ./ exp(eta), aux));
+      out = log(aux) - eta + (aux - 1).*(log(y) - eta) - log1p(pow_vec(y ./ exp(eta), aux));
     } else if (dist == 8) { // Gamma
       vector[n] eeta = exp(-eta);
-      for (i in 1:n) lh[i] = gamma_lpdf(y[i] | aux[i], eeta[i]) - gamma_lccdf(y[i] | aux[i], eeta[i]);
+      for (i in 1:n) out[i] = gamma_lpdf(y[i] | aux[i], eeta[i]) - gamma_lccdf(y[i] | aux[i], eeta[i]);
     } else if (dist == 9) { // Generalised Gamma
       // Not used, lpdf used directly
     }
 
-    return lh;
+    return out;
   }
 
   // AgD version with integration points
