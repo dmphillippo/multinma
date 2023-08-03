@@ -61,6 +61,7 @@
 #' @importFrom stats complete.cases sd median quantile model.frame model.matrix
 #'   model.offset terms optim pbinom dbinom qbinom as.formula update.formula
 #'   weighted.mean runif dunif plogis pnorm qlogis qnorm uniroot update var
+#'   setNames
 #' @importFrom utils packageVersion head
 #' @importFrom RcppParallel CxxFlags
 #' @importFrom rstantools rstan_config
