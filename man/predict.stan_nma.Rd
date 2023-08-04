@@ -46,13 +46,16 @@
 if \code{baseline_level = "aggregate"}.}
 
 \item{baseline}{An optional \code{\link[=distr]{distr()}} distribution for the baseline response
-(i.e. intercept), about which to produce absolute effects. If \code{NULL},
-predictions are produced using the baseline response for each study in the
-network with IPD or arm-based AgD.
+(i.e. intercept), about which to produce absolute effects. Can also be a
+character string naming a study in the network to take the estimated
+baseline response distribution from. If \code{NULL}, predictions are produced
+using the baseline response for each study in the network with IPD or
+arm-based AgD.
 
-For regression models, this may be a list of \code{\link[=distr]{distr()}} distributions of the
-same length as the number of studies in \code{newdata} (possibly named by the
-study names, or otherwise in order of appearance in \code{newdata}).
+For regression models, this may be a list of \code{\link[=distr]{distr()}} distributions (or
+study names in the network to use the baseline distributions from) of the
+same length as the number of studies in \code{newdata}, possibly named by the
+studies in \code{newdata} or otherwise in order of appearance in \code{newdata}.
 
 Use the \code{baseline_type} and \code{baseline_level} arguments to specify whether
 this distribution is on the response or linear predictor scale, and (for
@@ -148,13 +151,15 @@ in the network (or according to \code{times_seq}). Only used if \code{type} is
 \code{"survival"}, \code{"hazard"}, \code{"cumhaz"} or \code{"rmst"}.}
 
 \item{aux}{An optional \code{\link[=distr]{distr()}} distribution for the auxiliary parameter(s)
-in the baseline hazard (e.g. shapes). If \code{NULL}, predictions are produced
-using the parameter estimates for each study in the network with IPD or
-arm-based AgD.
+in the baseline hazard (e.g. shapes). Can also be a character string naming
+a study in the network to take the estimated auxiliary parameter
+distribution from. If \code{NULL}, predictions are produced using the parameter
+estimates for each study in the network with IPD or arm-based AgD.
 
-For regression models, this may be a list of \code{\link[=distr]{distr()}} distributions of the
-same length as the number of studies in \code{newdata} (possibly named by the
-study names, or otherwise in order of appearance in \code{newdata}).}
+For regression models, this may be a list of \code{\link[=distr]{distr()}} distributions (or
+study names in the network to use the auxiliary parameters from) of the
+same length as the number of studies in \code{newdata}, possibly named by the
+study names or otherwise in order of appearance in \code{newdata}.}
 
 \item{quantiles}{A numeric vector of quantiles of the survival time
 distribution to produce estimates for when \code{type = "quantile"}.}

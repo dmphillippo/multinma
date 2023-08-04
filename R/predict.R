@@ -17,13 +17,16 @@
 #' @param ... Additional arguments, passed to [uniroot()] for regression models
 #'   if `baseline_level = "aggregate"`.
 #' @param baseline An optional [distr()] distribution for the baseline response
-#'   (i.e. intercept), about which to produce absolute effects. If `NULL`,
-#'   predictions are produced using the baseline response for each study in the
-#'   network with IPD or arm-based AgD.
+#'   (i.e. intercept), about which to produce absolute effects. Can also be a
+#'   character string naming a study in the network to take the estimated
+#'   baseline response distribution from. If `NULL`, predictions are produced
+#'   using the baseline response for each study in the network with IPD or
+#'   arm-based AgD.
 #'
-#'   For regression models, this may be a list of [distr()] distributions of the
-#'   same length as the number of studies in `newdata` (possibly named by the
-#'   study names, or otherwise in order of appearance in `newdata`).
+#'   For regression models, this may be a list of [distr()] distributions (or
+#'   study names in the network to use the baseline distributions from) of the
+#'   same length as the number of studies in `newdata`, possibly named by the
+#'   studies in `newdata` or otherwise in order of appearance in `newdata`.
 #'
 #'   Use the `baseline_type` and `baseline_level` arguments to specify whether
 #'   this distribution is on the response or linear predictor scale, and (for
@@ -343,8 +346,8 @@ predict.stan_nma <- function(object, ...,
     if (is_surv) times <- rlang::eval_tidy(times)
 
     if (!is.null(baseline)) {
-      if (!inherits(baseline, "distr"))
-        abort("Baseline response `baseline` should be specified using distr(), or NULL.")
+      if (!inherits(baseline, "distr") && !rlang::is_string(baseline))
+        abort("Baseline response `baseline` should be specified using distr(), a character string naming a study in the network, or NULL.")
     }
 
     if (level == "individual")
@@ -486,13 +489,26 @@ predict.stan_nma <- function(object, ...,
 
       # Get posterior samples
       d <- as.array(object, pars = "d")
-
-      # Generate baseline samples
       dim_d <- dim(d)
-      dim_mu <- c(dim_d[1:2], 1)
-      u <- runif(prod(dim_mu))
-      mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
-                  dim = dim_mu)
+
+      if (rlang::is_string(baseline)) {
+        # Using the baseline from a study in the network
+        if (! baseline %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
+                                                  if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
+          abort("`baseline` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
+
+        mu <- as.array(object, pars = "mu")
+        mu <- mu[ , , grep(paste0("\\[", baseline, "[\\:,\\]]"), dimnames(mu)[[3]], perl = TRUE), drop = FALSE]
+
+        baseline_type <- "link"
+        baseline_level <- "individual"
+      } else {
+        # Generate baseline samples
+        dim_mu <- c(dim_d[1:2], 1)
+        u <- runif(prod(dim_mu))
+        mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
+                    dim = dim_mu)
+      }
 
       # Convert to linear predictor scale if baseline_type = "response"
       if (baseline_type == "response") {
@@ -525,41 +541,56 @@ predict.stan_nma <- function(object, ...,
           aux_array <- NULL
         } else {
 
-          if (object$likelihood %in% c("mspline", "pexp")) {
-            abort(glue::glue('Producing predictions for external populations is not currently supported for "{object$likelihood}" models.'))
-          } else {
-            n_aux <- length(aux_pars)
-            aux_names <- paste0(aux_pars, "[..dummy..]")
-          }
+          if (rlang::is_string(aux)) {
+            # Using the aux from a study in the network
 
-          if (n_aux > 1) {
-            if (!rlang::is_bare_list(aux, n = n_aux) ||
-                !setequal(names(aux), aux_pars) ||
-                any(purrr::map_lgl(aux, ~!inherits(., "distr"))))
-              abort(glue::glue("`aux` must be a named list of distr() specifications for ",
-                               glue::glue_collapse(aux_pars, sep = ", ", last = " and "), "."))
-          } else {
-            if (!inherits(aux, "distr"))
-              abort("`aux` must be specified using distr().")
-          }
+            if (! aux %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
+                                                      if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
+              abort("`aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
 
-          dim_aux <- c(dim_mu[1:2], n_aux)
-          u <- array(runif(prod(dim_aux)), dim = dim_aux)
+            aux_array <- as.array(object, pars = aux_pars)
+            aux_array <- aux_array[ , , grep(paste0("\\[", aux, "[\\:,\\]]"), dimnames(aux_array)[[3]], perl = TRUE), drop = FALSE]
 
-          if (n_aux == 1) {
-            aux_array <- array(rlang::eval_tidy(rlang::call2(aux$qfun, p = u, !!! aux$args)),
-                               dim = dim_aux,
-                               dimnames = list(iterations = NULL,
-                                               chains = NULL,
-                                               parameters = aux_names))
+            # Set preddat .study to use this aux par (and basis, for mspline/pexp)
+            preddat$.study <- aux
+
           } else {
-            aux_array <- array(NA_real_,
-                               dim = dim_aux,
-                               dimnames = list(iterations = NULL,
-                                               chains = NULL,
-                                               parameters = aux_names))
-            for (i in 1:n_aux) {
-              aux_array[, , i] <- rlang::eval_tidy(rlang::call2(aux[[aux_pars[i]]]$qfun, p = u[ , , i, drop = TRUE], !!! aux[[aux_pars[i]]]$args))
+            if (object$likelihood %in% c("mspline", "pexp")) {
+              abort(glue::glue('Producing predictions with external baselines is not currently supported for "{object$likelihood}" models.'))
+            } else {
+              n_aux <- length(aux_pars)
+              aux_names <- paste0(aux_pars, "[..dummy..]")
+            }
+
+            if (n_aux > 1) {
+              if (!rlang::is_bare_list(aux, n = n_aux) ||
+                  !setequal(names(aux), aux_pars) ||
+                  any(purrr::map_lgl(aux, ~!inherits(., "distr"))))
+                abort(glue::glue("`aux` must be a named list of distr() specifications for ",
+                                 glue::glue_collapse(aux_pars, sep = ", ", last = " and "), "."))
+            } else {
+              if (!inherits(aux, "distr"))
+                abort("`aux` must be specified using distr().")
+            }
+
+            dim_aux <- c(dim_mu[1:2], n_aux)
+            u <- array(runif(prod(dim_aux)), dim = dim_aux)
+
+            if (n_aux == 1) {
+              aux_array <- array(rlang::eval_tidy(rlang::call2(aux$qfun, p = u, !!! aux$args)),
+                                 dim = dim_aux,
+                                 dimnames = list(iterations = NULL,
+                                                 chains = NULL,
+                                                 parameters = aux_names))
+            } else {
+              aux_array <- array(NA_real_,
+                                 dim = dim_aux,
+                                 dimnames = list(iterations = NULL,
+                                                 chains = NULL,
+                                                 parameters = aux_names))
+              for (i in 1:n_aux) {
+                aux_array[, , i] <- rlang::eval_tidy(rlang::call2(aux[[aux_pars[i]]]$qfun, p = u[ , , i, drop = TRUE], !!! aux[[aux_pars[i]]]$args))
+              }
             }
           }
         }
@@ -743,8 +774,10 @@ predict.stan_nma <- function(object, ...,
     }
 
     if (!is.null(baseline)) {
-      if (!(inherits(baseline, "distr") || (rlang::is_list(baseline) && all(purrr::map_lgl(baseline, inherits, what = "distr")))))
-        abort("Baseline response `baseline` should be a single distr() specification, a list of distr() specifications, or NULL.")
+      if (!(inherits(baseline, "distr") ||
+            rlang::is_string(baseline) ||
+            (rlang::is_list(baseline) && all(purrr::map_lgl(baseline, ~inherits(., what = "distr") || rlang::is_string(.))))))
+        abort("Baseline response `baseline` should be a single distr() specification or character string naming a study in the network, a list of such specifications, or NULL.")
     }
 
     ## Without baseline and newdata specified ----------------------------------
@@ -1170,7 +1203,7 @@ predict.stan_nma <- function(object, ...,
 
       if (!inherits(baseline, "distr")) {
         if (!length(baseline) %in% c(1, n_studies))
-          abort(sprintf("`baseline` must be a single distr() distribution, or a list of length %d (number of `newdata` studies)", n_studies))
+          abort(sprintf("`baseline` must be a single distr() distribution or character string, or a list of length %d (number of `newdata` studies)", n_studies))
         if (length(baseline) == 1) {
           baseline <- baseline[[1]]
         } else {
@@ -1201,18 +1234,51 @@ predict.stan_nma <- function(object, ...,
         u <- runif(prod(dim_mu))
         mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
                     dim = dim_mu, dimnames = dimnames_mu)
+      } else if (rlang::is_string(baseline)) {
+        # Using the baseline from a study in the network
+        if (! baseline %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
+                                                  if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
+          abort("`baseline` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
+
+        mu <- as.array(object, pars = "mu")
+        mu <- mu[ , , grep(paste0("\\[", baseline, "[\\:,\\]]"), dimnames(mu)[[3]], perl = TRUE), drop = FALSE]
+
+        baseline_type <- "link"
+        baseline_level <- "individual"
       } else {
         u <- array(runif(prod(dim_mu)), dim = dim_mu)
         mu <- array(NA_real_, dim = dim_mu, dimnames = dimnames_mu)
+
+        if (any(purrr::map_lgl(baseline, rlang::is_string))) mu_temp <- as.array(object, pars = "mu")
+
+        baseline_type <- rep_len(baseline_type, n_studies)
+        baseline_level <- rep_len(baseline_level, n_studies)
+
         for (s in 1:n_studies) {
           # NOTE: mu must be in *factor order* for later multiplication with design matrix, not observation order
           ss <- levels(studies)[s]
-          mu[ , , s] <- array(rlang::eval_tidy(rlang::call2(baseline[[ss]]$qfun, p = u[ , , s], !!! baseline[[ss]]$args)),
-                              dim = c(dim_mu[1:2], 1))
+
+          if (inherits(baseline[[ss]], "distr")) {
+            mu[ , , s] <- array(rlang::eval_tidy(rlang::call2(baseline[[ss]]$qfun, p = u[ , , s], !!! baseline[[ss]]$args)),
+                                dim = c(dim_mu[1:2], 1))
+          } else if (rlang::is_string(baseline[[ss]])) {
+            # Using the baseline from a study in the network
+            if (! baseline[[ss]] %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
+                                                      if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
+              abort("All elements of `baseline` must be strings matching the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
+
+            mu[ , , s] <- mu_temp[ , , grep(paste0("\\[", baseline[[ss]], "[\\:,\\]]"), dimnames(mu_temp)[[3]], perl = TRUE), drop = FALSE]
+
+            baseline_type[s] <- "link"
+            baseline_level[s] <- "individual"
+          }
         }
       }
 
       # Convert baseline samples as necessary
+
+      if (length(baseline_type) == 1) baseline_type <- rep_len(baseline_type, n_studies)
+      if (length(baseline_level) == 1) baseline_level <- rep_len(baseline_level, n_studies)
 
       if (!inherits(object, "stan_mlnmr") && !has_ipd(object$network)) {
         # AgD-only regression, ignore baseline_level = "individual"
@@ -1220,8 +1286,8 @@ predict.stan_nma <- function(object, ...,
         #   inform('Setting baseline_level = "aggregate", model intercepts are aggregate level for AgD meta-regression.')
 
         # Convert to linear predictor scale if baseline_type = "response"
-        if (baseline_type == "response") {
-          mu <- link_fun(mu, link = object$link)
+        if (any(baseline_type == "response")) {
+          mu[ , , baseline_type == "response"] <- link_fun(mu[ , , baseline_type = "response"], link = object$link)
         }
 
         # Convert to samples on network ref trt if trt_ref given
@@ -1229,27 +1295,28 @@ predict.stan_nma <- function(object, ...,
           mu <- sweep(mu, 1:2, post_temp[ , , paste0("d[", trt_ref, "]"), drop = FALSE], FUN = "-")
         }
       } else { # ML-NMR or IPD NMR
-        if (baseline_level == "individual") {
+        if (any(baseline_level == "individual")) {
 
           # Convert to linear predictor scale if baseline_type = "response"
-          if (baseline_type == "response") {
-            mu <- link_fun(mu, link = object$link)
+          if (any(baseline_type == "response")) {
+            mu[ , , baseline_level == "individual" & baseline_type == "response"] <- link_fun(mu[ , , baseline_level == "individual" & baseline_type == "response"], link = object$link)
           }
 
           # Convert to samples on network ref trt if trt_ref given
           if (trt_ref != nrt) {
-            mu <- sweep(mu, 1:2, post_temp[ , , paste0("d[", trt_ref, "]"), drop = FALSE], FUN = "-")
+            mu[ , , baseline_level == "individual" & baseline_level == "individual"] <- sweep(mu[ , , baseline_level == "individual" & baseline_level == "individual", drop = FALSE], 1:2, post_temp[ , , paste0("d[", trt_ref, "]"), drop = FALSE], FUN = "-")
           }
 
-        } else { # Aggregate baselines
+        }
+
+        if (any(baseline_level == "aggregate")) {
 
           # Assume that aggregate baselines are *unadjusted*, ie. are crude poolings over reference arm outcomes
           # In this case, we need to marginalise over the natural outcome scale
 
-          if (baseline_type == "link") {
-            mu0 <- inverse_link(mu, link = object$link)
-          } else {
-            mu0 <- mu
+          mu0 <- mu
+          if (any(baseline_type == "link")) {
+            mu0[ , , baseline_level == "aggregate" & baseline_type == "link"] <- inverse_link(mu[ , , baseline_level == "aggregate" & baseline_type == "link"], link = object$link)
           }
 
           preddat_trt_ref <- dplyr::filter(preddat, .data$.trt == trt_ref)
@@ -1280,6 +1347,8 @@ predict.stan_nma <- function(object, ...,
 
           for (s in 1:n_studies) {
             # NOTE: mu must be in *factor order* for later multiplication with design matrix, not observation order
+
+            if (baseline_level[s] != "aggregate") next;
 
             # Study select
             ss <- preddat_trt_ref$.study == levels(studies)[s]
@@ -1322,14 +1391,14 @@ predict.stan_nma <- function(object, ...,
           n_aux <- length(aux_pars)
 
           if (n_aux == 1) {
-            if (!inherits(aux, "distr") && length(aux) != n_studies)
-              abort(sprintf("`aux` must be a single distr() specification, or a list of length %d (number of `newdata` studies)", n_studies))
-            if (inherits(aux, "distr")) {
+            if (!inherits(aux, "distr") && !rlang::is_string(aux) && length(aux) != n_studies)
+              abort(sprintf("`aux` must be a single distr() specification or study name, or a list of length %d (number of `newdata` studies)", n_studies))
+            if (inherits(aux, "distr") || rlang::is_string(aux)) {
               aux <- rep(list(aux), times = n_studies)
               names(aux) <- studies
             } else {
-              if (any(purrr::map_lgl(aux, ~!inherits(., "distr"))))
-                  abort(sprintf("`aux` must be a single distr() specification, or a list of length %d (number of `newdata` studies)", n_studies))
+              if (any(purrr::map_lgl(aux, ~!inherits(., "distr") && !rlang::is_string(.))))
+                  abort(sprintf("`aux` must be a single distr() specification or study name, or a list of length %d (number of `newdata` studies)", n_studies))
               if (!rlang::is_named(aux)) {
                 names(aux) <- studies
               } else {
@@ -1346,12 +1415,13 @@ predict.stan_nma <- function(object, ...,
             }
           } else {
             aux_names <- names(aux)
-            if (!rlang::is_bare_list(aux) ||
-                !length(aux) %in% c(n_aux, n_studies) ||
-                (!setequal(aux_names, aux_pars) && !setequal(aux_names, aux_pars)) ||
-                any(purrr::map_lgl(purrr::list_flatten(aux), ~!inherits(., "distr")))) {
+            if (!(rlang::is_string(aux) || (
+                    rlang::is_bare_list(aux) &&
+                    length(aux) %in% c(n_aux, n_studies) &&
+                    (setequal(aux_names, aux_pars) || setequal(aux_names, levels(studies))) &&
+                    all(purrr::map_lgl(purrr::list_flatten(aux), ~inherits(., "distr") || rlang::is_string(.)))))) {
               abort(glue::glue("`aux` must be a single named list of distr() specifications for {glue::glue_collapse(aux_pars, sep = ', ', last = ' and ')}, ",
-                               "or a list of length {n_studies} (number of `newdata` studies) of such lists."))
+                               "a study name, or a list of length {n_studies} (number of `newdata` studies) of such lists."))
             }
 
             if (setequal(aux_names, aux_pars)) {
@@ -1363,10 +1433,13 @@ predict.stan_nma <- function(object, ...,
           }
 
           if (object$likelihood %in% c("mspline", "pexp")) {
-            abort(glue::glue('Producing predictions for external populations is not currently supported for "{object$likelihood}" models.'))
+            if (!all(purrr::map_lgl(aux, rlang::is_string)))
+              abort(glue::glue('Producing predictions with external baselines is not currently supported for "{object$likelihood}" models.'))
+            n_aux <- length(object$basis[[1]])
+            aux_names <- paste0(rep(aux_pars, times = n_studies), "[", rep(studies, each = n_aux), ", ", rep(1:n_aux, times = n_studies), "]")
           } else {
             n_aux <- length(aux_pars)
-            aux_names <- paste0(rep(aux_pars, each = n_studies), "[", rep(studies, times = n_aux) , "]")
+            aux_names <- paste0(rep(aux_pars, times = n_studies), "[", rep(studies, each = n_aux) , "]")
           }
 
           dim_aux <- c(dim_mu[1:2], n_aux * n_studies)
@@ -1377,14 +1450,33 @@ predict.stan_nma <- function(object, ...,
                                              chains = NULL,
                                              parameters = aux_names))
 
+          if (any(purrr::map_lgl(aux, rlang::is_string))) aux_temp <- as.array(object, pars = aux_pars)
           if (n_aux == 1) {
             for (s in 1:n_studies) {
-              aux_array[, , s] <- rlang::eval_tidy(rlang::call2(aux[[studies[s]]]$qfun, p = u[ , , s, drop = TRUE], !!! aux[[studies[s]]]$args))
+              ss <- as.character(studies[s])
+              if (inherits(aux[[ss]], "distr")) {
+                aux_array[, , s] <- rlang::eval_tidy(rlang::call2(aux[[ss]]$qfun, p = u[ , , s, drop = TRUE], !!! aux[[ss]]$args))
+              } else {
+                if (! aux[[ss]] %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
+                                                     if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
+                  abort("All elements of `aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
+
+                aux_array[ , , s] <- aux_temp[ , , grep(paste0("\\[", aux[[ss]], "[\\:,\\]]"), dimnames(aux_temp)[[3]], perl = TRUE), drop = FALSE]
+              }
             }
           } else {
             for (s in 1:n_studies) {
-              for (i in 1:n_aux) {
-                aux_array[, , (s-1)*n_studies + i] <- rlang::eval_tidy(rlang::call2(aux[[studies[s]]][[i]]$qfun, p = u[ , , (s-1)*n_studies + i, drop = TRUE], !!! aux[[studies[s]]][[i]]$args))
+              ss <- as.character(studies[s])
+              if (!rlang::is_string(aux[[ss]])) {
+                for (i in 1:n_aux) {
+                  aux_array[, , (s-1)*n_aux + i] <- rlang::eval_tidy(rlang::call2(aux[[ss]][[aux_pars[i]]]$qfun, p = u[ , , (s-1)*n_aux + i, drop = TRUE], !!! aux[[ss]][[aux_pars[i]]]$args))
+                }
+              } else {
+                if (! aux[[ss]] %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
+                                                                   if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
+                  abort("All elements of `aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a list of distr() distributions.")
+
+                aux_array[ , , (s-1)*n_aux + (1:n_aux)] <- aux_temp[ , , grep(paste0("\\[", aux[[ss]], "[\\:,\\]]"), dimnames(aux_temp)[[3]], perl = TRUE), drop = FALSE]
               }
             }
           }
@@ -1760,13 +1852,15 @@ predict.stan_nma <- function(object, ...,
 #'   in the network (or according to `times_seq`). Only used if `type` is
 #'   `"survival"`, `"hazard"`, `"cumhaz"` or `"rmst"`.
 #' @param aux An optional [distr()] distribution for the auxiliary parameter(s)
-#'   in the baseline hazard (e.g. shapes). If `NULL`, predictions are produced
-#'   using the parameter estimates for each study in the network with IPD or
-#'   arm-based AgD.
+#'   in the baseline hazard (e.g. shapes). Can also be a character string naming
+#'   a study in the network to take the estimated auxiliary parameter
+#'   distribution from. If `NULL`, predictions are produced using the parameter
+#'   estimates for each study in the network with IPD or arm-based AgD.
 #'
-#'   For regression models, this may be a list of [distr()] distributions of the
-#'   same length as the number of studies in `newdata` (possibly named by the
-#'   study names, or otherwise in order of appearance in `newdata`).
+#'   For regression models, this may be a list of [distr()] distributions (or
+#'   study names in the network to use the auxiliary parameters from) of the
+#'   same length as the number of studies in `newdata`, possibly named by the
+#'   study names or otherwise in order of appearance in `newdata`.
 #' @param quantiles A numeric vector of quantiles of the survival time
 #'   distribution to produce estimates for when `type = "quantile"`.
 #' @param times_seq A positive integer, when specified evaluate predictions at
