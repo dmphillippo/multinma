@@ -307,6 +307,17 @@ test_that("Relative effects and predict work with data.frame", {
                            baseline = distr(qcons, -2)))
 })
 
+test_that("Predictions using network baselines are correct", {
+  pred_all <- predict(bcg_fit_lat, type = "response")
+  pred_12 <- predict(bcg_fit_lat, type = "response", 
+                     baseline = list("1" = "1", "2" = "2"),
+                     newdata = subset(bcg_vaccine, studyn %in% 1:2),
+                     study = studyn)
+  
+  expect_equal(unclass(as.array(pred_12)),
+               as.array(pred_all)[ , , 1:4])
+})
+
 
 # Force clean up
 rm(list = ls())

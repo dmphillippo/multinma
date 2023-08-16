@@ -207,6 +207,13 @@ test_that("RE predicted probabilities", {
   expect_equivalent(diet_pred_RE$`97.5%`, c(0.18, 0.18), tolerance = tol_dic)
 })
 
+# Predictions specifying study for baseline
+test_that("Specifying study for baseline gives correct result", {
+  pred_FE_DART <- predict(diet_fit_FE, type = "response", baseline = "DART")
+  expect_identical(c(as.array(pred_FE_DART)),
+                   c(as.array(pred_FE_studies)[ , , 1:2]))
+})
+
 
 # Force clean up
 rm(list = ls())

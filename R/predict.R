@@ -522,7 +522,7 @@ predict.stan_nma <- function(object, ...,
 
       # Combine mu and d
       dim_post <- c(dim_d[1:2], dim_d[3] + 1)
-      post <- array(NA_real_, dim = dim_post)
+      post <- array(NA_real_, dim = dim_post, dimnames = c(dimnames(d)[1:2], list(parameters = NULL)))
       post[ , , 1] <- mu
       if (!predictive_distribution) {
         post[ , , 2:dim_post[3]] <- d
@@ -541,12 +541,20 @@ predict.stan_nma <- function(object, ...,
           aux_array <- NULL
         } else {
 
+          n_aux <- length(aux_pars)
+
           if (rlang::is_string(aux)) {
             # Using the aux from a study in the network
 
             if (! aux %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
-                                                      if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
-              abort("`aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
+                                                      if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor()))) {
+              if (n_aux == 1) {
+                abort("`aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
+              } else {
+                abort(glue::glue("`aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a named list of distr() specifications for ",
+                                 glue::glue_collapse(aux_pars, sep = ", ", last = " and "), "."))
+              }
+            }
 
             aux_array <- as.array(object, pars = aux_pars)
             aux_array <- aux_array[ , , grep(paste0("\\[", aux, "[\\:,\\]]"), dimnames(aux_array)[[3]], perl = TRUE), drop = FALSE]
@@ -556,9 +564,8 @@ predict.stan_nma <- function(object, ...,
 
           } else {
             if (object$likelihood %in% c("mspline", "pexp")) {
-              abort(glue::glue('Producing predictions with external baselines is not currently supported for "{object$likelihood}" models.'))
+              abort(glue::glue('Producing predictions with external `aux` spline coefficients is not currently supported for "{object$likelihood}" models.'))
             } else {
-              n_aux <- length(aux_pars)
               aux_names <- paste0(aux_pars, "[..dummy..]")
             }
 
@@ -567,10 +574,10 @@ predict.stan_nma <- function(object, ...,
                   !setequal(names(aux), aux_pars) ||
                   any(purrr::map_lgl(aux, ~!inherits(., "distr"))))
                 abort(glue::glue("`aux` must be a named list of distr() specifications for ",
-                                 glue::glue_collapse(aux_pars, sep = ", ", last = " and "), "."))
+                                 glue::glue_collapse(aux_pars, sep = ", ", last = " and "), ", or a study name."))
             } else {
               if (!inherits(aux, "distr"))
-                abort("`aux` must be specified using distr().")
+                abort("`aux` must be specified using distr(), or the name of an IPD or AgD (arm-based) study in the network.")
             }
 
             dim_aux <- c(dim_mu[1:2], n_aux)
@@ -1424,7 +1431,7 @@ predict.stan_nma <- function(object, ...,
                                "a study name, or a list of length {n_studies} (number of `newdata` studies) of such lists."))
             }
 
-            if (setequal(aux_names, aux_pars)) {
+            if (setequal(aux_names, aux_pars) || rlang::is_string(aux)) {
               aux <- rep(list(aux), times = n_studies)
               names(aux) <- studies
             } else if (!rlang::is_named(aux)) {
@@ -1434,7 +1441,7 @@ predict.stan_nma <- function(object, ...,
 
           if (object$likelihood %in% c("mspline", "pexp")) {
             if (!all(purrr::map_lgl(aux, rlang::is_string)))
-              abort(glue::glue('Producing predictions with external baselines is not currently supported for "{object$likelihood}" models.'))
+              abort(glue::glue('Producing predictions with external `aux` spline coefficients is not currently supported for "{object$likelihood}" models.'))
             n_aux <- length(object$basis[[1]])
             aux_names <- paste0(rep(aux_pars, times = n_studies), "[", rep(studies, each = n_aux), ", ", rep(1:n_aux, times = n_studies), "]")
           } else {
@@ -1468,6 +1475,9 @@ predict.stan_nma <- function(object, ...,
             for (s in 1:n_studies) {
               ss <- as.character(studies[s])
               if (!rlang::is_string(aux[[ss]])) {
+                if (!setequal(names(aux[[ss]]), aux_pars) || !all(purrr::map_lgl(aux[[ss]], inherits, "distr")))
+                  abort(glue::glue("`aux` must be a single named list of distr() specifications for {glue::glue_collapse(aux_pars, sep = ', ', last = ' and ')}, ",
+                                   "a study name, or a list of length {n_studies} (number of `newdata` studies) of such lists."))
                 for (i in 1:n_aux) {
                   aux_array[, , (s-1)*n_aux + i] <- rlang::eval_tidy(rlang::call2(aux[[ss]][[aux_pars[i]]]$qfun, p = u[ , , (s-1)*n_aux + i, drop = TRUE], !!! aux[[ss]][[aux_pars[i]]]$args))
                 }

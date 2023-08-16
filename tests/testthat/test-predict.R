@@ -7,19 +7,20 @@ smk_net <- set_agd_arm(smoking,
                        trt_ref = "No intervention")
 
 # Only test gradients, no sampling
-smk_fit_RE <- nma(smk_net,
+smk_fit_RE <- suppressWarnings(nma(smk_net,
                   trt_effects = "random",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 100),
                   prior_het = normal(scale = 5),
-                  test_grad = TRUE)
+                  iter = 10))
 
 test_that("baseline argument", {
   m <- "should be specified using distr"
-  expect_error(predict(smk_fit_RE, baseline = "a"), m)
   expect_error(predict(smk_fit_RE, baseline = 1), m)
   expect_error(predict(smk_fit_RE, baseline = list("a")), m)
   expect_error(predict(smk_fit_RE, baseline = NA), m)
+
+  expect_error(predict(smk_fit_RE, baseline = "a"), "`baseline` must match the name of an IPD or AgD \\(arm-based\\) study in the network")
 })
 
 test_that("trt_ref argument", {
@@ -108,14 +109,6 @@ test_that("baseline_level argument", {
 
 skip_on_cran()  # Reduce CRAN check time
 
-# Only small number of samples to test
-smk_fit_RE <- suppressWarnings(nma(smk_net,
-                                   trt_effects = "random",
-                                   prior_intercept = normal(scale = 100),
-                                   prior_trt = normal(scale = 100),
-                                   prior_het = normal(scale = 5),
-                                   iter = 10))
-
 test_that(".study, .trt columns are correct", {
   pred1 <- tibble::as_tibble(predict(smk_fit_RE))
   expect_identical(paste0("pred[", pred1$.study, ": ", pred1$.trt, "]"),
@@ -149,10 +142,8 @@ test_that("baseline and newdata for regression models", {
 })
 
 test_that("baseline argument", {
-  m <- "should be a single distr\\(\\) specification, a list of distr\\(\\) specifications, or NULL"
-  expect_error(predict(pso_fit, study = study, newdata = pso_new, baseline = "a"), m)
+  m <- "should be a single distr\\(\\) specification or character string naming a study in the network, a list of such specifications, or NULL"
   expect_error(predict(pso_fit, study = study, newdata = pso_new, baseline = 1), m)
-  expect_error(predict(pso_fit, study = study, newdata = pso_new, baseline = list("a")), m)
   expect_error(predict(pso_fit, study = study, newdata = pso_new, baseline = NA), m)
 
   m2 <- "or a list of length 2"
@@ -166,6 +157,10 @@ test_that("baseline argument", {
   expect_error(predict(pso_fit, study = study, newdata = pso_new, baseline = list(One = distr(qnorm, 1, 1),
                                                                                   Three = distr(qnorm, 3, 1))),
                "must match all study names")
+
+  m3 <- "must match the name of an IPD or AgD \\(arm-based\\) study in the network"
+  expect_error(predict(pso_fit, study = study, newdata = pso_new, baseline = "a"), m3)
+  expect_error(predict(pso_fit, study = study, newdata = pso_new, baseline = list("a")), m3)
 })
 
 test_that("newdata validation", {
@@ -971,7 +966,7 @@ test_that(".study, .trt, .time columns are correct (mspline, no regression, new 
                        times = time,
                        baseline = distr(qnorm, 0, 1),
                        aux = distr(qnorm, 0, 1)),
-               'Producing predictions for external populations is not currently supported for "mspline" models.')
+               'Producing predictions with external `aux` spline coefficients is not currently supported for "mspline" models.')
 
 })
 
@@ -2081,7 +2076,145 @@ test_that(".study, .trt, .time columns are correct (mspline, regression, aggrega
                        newdata = newdata,
                        baseline = distr(qnorm, 0, 1),
                        aux = distr(qlnorm, 0, 0.01)),
-               'Producing predictions for external populations is not currently supported for "mspline" models.')
+               'Producing predictions with external `aux` spline coefficients is not currently supported for "mspline" models.')
+
+  # Prediction format new times
+  preddat1 <- dplyr::mutate(newdata, .study = factor(study), .time = tm, id = 1:dplyr::n()) %>%
+    dplyr::cross_join(dplyr::tibble(.trt = unique(ndmm_preddat$.trt)))
+
+  # Times from newdata column
+  pred1.1 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "survival", time = time,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred1.1[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.1b <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "survival", time = time,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = "Attal2012",
+                                       aux = "Attal2012"))
+  expect_equivalent(pred1.1b[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1b$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.2 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "hazard", time = time,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred1.2[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.2$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.3 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "cumhaz", time = time,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred1.3[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.3$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  # Times from global env
+  pred1.4 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "survival", time = tm,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred1.4[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.4$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.5 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "hazard", time = tm,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred1.5[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.5$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.6 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "cumhaz", time = tm,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred1.6[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.6$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  # Prediction format for single summaries
+  preddat3 <- tidyr::expand_grid(.study = unique(factor(newdata$study)),
+                                 .trt = unique(ndmm_preddat$.trt))
+
+  # pred3.1 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "mean",
+  #                                      study = study,
+  #                                      newdata = newdata,
+  #                                      baseline = distr(qnorm, 0, 1),
+  #                                      aux = "Attal2012"))
+  # expect_equivalent(pred3.1[, c(".study", ".trt")],
+  #                   preddat3[, c(".study", ".trt")])
+  # expect_identical(pred3.1$parameter,
+  #                  paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  expect_warning(
+    pred3.2 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "median",
+                                         study = study,
+                                         newdata = newdata,
+                                         baseline = distr(qnorm, 0, 1),
+                                         aux = "Attal2012")),
+    "Evaluating M-spline at times beyond the boundary knots")
+  expect_equivalent(pred3.2[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.2$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  pred3.3 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "rmst", time = 3,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred3.3[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.3$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  pred3.4 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "link",
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred3.4[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.4$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+
+  # Prediction format for quantiles
+  qs <- c(0.2, 0.4, 0.6, 0.8)
+  preddat4 <- preddat3 %>% tidyr::expand(.study, .trt, .quantile = qs)
+
+  expect_warning(
+    pred4.1 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "quantile", quantiles = qs,
+                                         study = study,
+                                         newdata = newdata,
+                                         baseline = distr(qnorm, 0, 1),
+                                         aux = "Attal2012")),
+    "Evaluating M-spline at times beyond the boundary knots")
+  expect_equivalent(pred4.1[, c(".study", ".trt")],
+                    preddat4[, c(".study", ".trt")])
+  expect_identical(pred4.1$parameter,
+                   paste0("pred[", preddat4$.study, ": ", preddat4$.trt, ", ", preddat4$.quantile, "]"))
 })
 
 test_that(".study, .trt, .time columns are correct (weibull, regression, individual, new data)", {
@@ -2533,7 +2666,161 @@ test_that(".study, .trt, .time columns are correct (mspline, regression, individ
                        newdata = newdata,
                        baseline = distr(qnorm, 0, 1),
                        aux = distr(qlnorm, 0, 0.01)),
-               'Producing predictions for external populations is not currently supported for "mspline" models.')
+               'Producing predictions with external `aux` spline coefficients is not currently supported for "mspline" models.')
+
+  # Prediction format new times
+  preddat1 <- dplyr::mutate(newdata, .study = factor(study), .time = tm, id = 1:dplyr::n()) %>%
+    dplyr::cross_join(dplyr::tibble(.trt = unique(ndmm_preddat$.trt)))
+
+  # Times from newdata column
+  pred1.1 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "survival", level = "individual",
+                                       time = time,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred1.1[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.1b <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "survival", level = "individual",
+                                       time = time,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = "Attal2012",
+                                       aux = "Attal2012"))
+  expect_equivalent(pred1.1b[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1b$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.2 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "hazard", level = "individual",
+                                       time = time,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred1.2[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.2$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.3 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "cumhaz", level = "individual",
+                                       time = time,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred1.3[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.3$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  # Times from global env
+  # With external times vector, evaluate every time and every treatment for every new individual
+  preddat2 <- dplyr::mutate(newdata, .study = factor(study)) %>%
+    dplyr::cross_join(
+      dplyr::cross_join(dplyr::tibble(.time = tm, id = 1:length(tm)),
+                        dplyr::tibble(.trt = unique(ndmm_preddat$.trt))))
+  pred2.4 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "survival", level = "individual",
+                                       time = tm,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred2.4[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred2.4$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
+  pred2.5 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "hazard", level = "individual",
+                                       time = tm,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred2.5[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred2.5$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
+  pred2.6 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "cumhaz", level = "individual",
+                                       time = tm,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred2.6[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred2.6$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
+  # Prediction format for single summaries
+  preddat3 <- preddat1
+
+  # pred3.1 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, level = "individual",
+  #                                      type = "mean",
+  #                                      study = study,
+  #                                      newdata = newdata,
+  #                                      baseline = distr(qnorm, 0, 1),
+  #                                      aux = "Attal2012"))
+  # expect_equivalent(pred3.1[, c(".study", ".trt")],
+  #                   preddat3[, c(".study", ".trt")])
+  # expect_identical(pred3.1$parameter,
+  #                  paste0("pred[", preddat3$.study, ": ", preddat3$.trt, ", ", preddat3$id, "]"))
+
+  expect_warning(
+    pred3.2 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, level = "individual",
+                                         type = "median",
+                                         study = study,
+                                         newdata = newdata,
+                                         baseline = distr(qnorm, 0, 1),
+                                         aux = "Attal2012")),
+    "Evaluating M-spline at times beyond the boundary knots")
+  expect_equivalent(pred3.2[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.2$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, ", ", preddat3$id, "]"))
+
+  pred3.3 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, level = "individual",
+                                       type = "rmst", time = 3,
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred3.3[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.3$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, ", ", preddat3$id, "]"))
+
+  pred3.4 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, level = "individual",
+                                       type = "link",
+                                       study = study,
+                                       newdata = newdata,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = "Attal2012"))
+  expect_equivalent(pred3.4[, c(".study", ".trt")],
+                    preddat3[, c(".study", ".trt")])
+  expect_identical(pred3.4$parameter,
+                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, ", ", preddat3$id, "]"))
+
+  # Prediction format for quantiles
+  qs <- c(0.2, 0.4, 0.6, 0.8)
+  preddat4 <- dplyr::cross_join(preddat3, dplyr::tibble(.quantile = qs))
+
+  expect_warning(
+    pred4.1 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "quantile", level = "individual",
+                                         quantiles = qs,
+                                         study = study,
+                                         newdata = newdata,
+                                         baseline = distr(qnorm, 0, 1),
+                                         aux = "Attal2012")),
+    "Evaluating M-spline at times beyond the boundary knots")
+  expect_equivalent(pred4.1[, c(".study", ".trt")],
+                    preddat4[, c(".study", ".trt")])
+  expect_identical(pred4.1$parameter,
+                   paste0("pred[", preddat4$.study, ": ", preddat4$.trt, ", ", preddat4$id, ", ", preddat4$.quantile, "]"))
 })
 
 test_that("errors for aux lists (regression, new data)", {
@@ -2563,18 +2850,22 @@ test_that("aux argument", {
   newdata <- tibble::tibble(study = c("a", "b"), age = 4, time = 1)
 
   # Single aux parameter, no regression
-  m <- "`aux` must be specified using distr\\(\\)"
-  expect_error(predict(ndmm_fit_weib, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = "a"), m)
+  m <- "`aux` must be specified using distr\\(\\), or the name of an IPD or AgD \\(arm-based\\) study in the network"
   expect_error(predict(ndmm_fit_weib, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = 1), m)
   expect_error(predict(ndmm_fit_weib, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = list("a")), m)
   expect_error(predict(ndmm_fit_weib, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = NA), m)
 
+  expect_error(predict(ndmm_fit_weib, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = "a"),
+               "`aux` must match the name of an IPD or AgD \\(arm-based\\) study in the network, or be a distr\\(\\) distribution")
+
   # Single aux parameter, regression
-  m2 <- "`aux` must be a single distr\\(\\) specification, or a list of length 2 \\(number of `newdata` studies\\)"
-  expect_error(predict(ndmm_fit_weib_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = "a"), m2)
+  m2 <- "`aux` must be a single distr\\(\\) specification or study name, or a list of length 2 \\(number of `newdata` studies\\)"
   expect_error(predict(ndmm_fit_weib_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = 1), m2)
   expect_error(predict(ndmm_fit_weib_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = list("a")), m2)
   expect_error(predict(ndmm_fit_weib_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = NA), m2)
+
+  expect_error(predict(ndmm_fit_weib_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = "a"),
+               "All elements of `aux` must match the name of an IPD or AgD \\(arm-based\\) study in the network, or be a distr\\(\\) distribution")
 
   expect_error(predict(ndmm_fit_weib_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
                        aux = list(a = distr(qnorm, 1, 1),
@@ -2583,15 +2874,17 @@ test_that("aux argument", {
   expect_error(predict(ndmm_fit_weib_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
                        aux = list(a = distr(qnorm, 1, 1),
                                   b = "bad")),
-               m2)
+               "All elements of `aux` must match the name of an IPD or AgD \\(arm-based\\) study in the network, or be a distr\\(\\) distribution")
 
   # Multiple aux parameters, no regression
-  m3 <- "`aux` must be a named list of distr\\(\\) specifications for sigma and k"
+  m3 <- "`aux` must be a named list of distr\\(\\) specifications for sigma and k, or a study name"
 
-  expect_error(predict(ndmm_fit_gengamma, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = "a"), m3)
   expect_error(predict(ndmm_fit_gengamma, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = 1), m3)
   expect_error(predict(ndmm_fit_gengamma, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = list("a")), m3)
   expect_error(predict(ndmm_fit_gengamma, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = NA), m3)
+
+  expect_error(predict(ndmm_fit_gengamma, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = "a"),
+               "`aux` must match the name of an IPD or AgD \\(arm-based\\) study in the network, or be a named list of distr\\(\\) specifications for sigma and k")
 
   expect_error(predict(ndmm_fit_gengamma, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
                        aux = list(sigma = distr(qlnorm, 0, 1))), m3)
@@ -2606,11 +2899,13 @@ test_that("aux argument", {
                                   bad = distr(qlnorm, 0, 1))), m3)
 
   # Multiple aux parameters, regression
-  m4 <- "`aux` must be a single named list of distr\\(\\) specifications for sigma and k, or a list of length 2 \\(number of `newdata` studies\\) of such lists"
-  expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = "a"), m4)
+  m4 <- "`aux` must be a single named list of distr\\(\\) specifications for sigma and k, a study name, or a list of length 2 \\(number of `newdata` studies\\) of such lists"
   expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = 1), m4)
   expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = list("a")), m4)
   expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = NA), m4)
+
+  expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1), aux = "a"),
+               "All elements of `aux` must match the name of an IPD or AgD \\(arm-based\\) study in the network, or be a list of distr\\(\\) distributions")
 
   expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
                        aux = list(sigma = distr(qlnorm, 0, 1))), m4)
@@ -2650,11 +2945,12 @@ test_that("aux argument", {
                          b = list(sigma = distr(qlnorm, 0, 1),
                                   k = "bad")
                        )), m4)
+
   expect_error(predict(ndmm_fit_gengamma_reg, times = 1, study = study, newdata = newdata, baseline = distr(qnorm, 0, 1),
                        aux = list(
                          a = list(sigma = distr(qlnorm, 0, 1),
                                   k = distr(qlnorm, 0, 1)),
                          b = "bad")
-                       ), m4)
+                       ), "All elements of `aux` must match the name of an IPD or AgD \\(arm-based\\) study in the network, or be a list of distr\\(\\) distributions")
 
 })
