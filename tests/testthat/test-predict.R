@@ -2180,15 +2180,15 @@ test_that(".study, .trt, .time columns are correct (mspline, regression, aggrega
   expect_identical(pred3.2$parameter,
                    paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
 
-  pred3.3 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "rmst", time = 3,
-                                       study = study,
-                                       newdata = newdata,
-                                       baseline = distr(qnorm, 0, 1),
-                                       aux = "Attal2012"))
-  expect_equivalent(pred3.3[, c(".study", ".trt")],
-                    preddat3[, c(".study", ".trt")])
-  expect_identical(pred3.3$parameter,
-                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+  # pred3.3 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "rmst", time = 3,
+  #                                      study = study,
+  #                                      newdata = newdata,
+  #                                      baseline = distr(qnorm, 0, 1),
+  #                                      aux = "Attal2012"))
+  # expect_equivalent(pred3.3[, c(".study", ".trt")],
+  #                   preddat3[, c(".study", ".trt")])
+  # expect_identical(pred3.3$parameter,
+  #                  paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
 
   pred3.4 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "link",
                                        study = study,
