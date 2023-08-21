@@ -686,7 +686,7 @@ predict.stan_nma <- function(object, ...,
                        aux_names, fixed = TRUE)
 
         if (object$likelihood %in% c("mspline", "pexp")) {
-          basis <- object$basis[[preddat$.study[i]]]
+          basis <- object$basis[[as.character(preddat$.study[i])]]
         } else {
           basis <- NULL
         }
@@ -1460,7 +1460,7 @@ predict.stan_nma <- function(object, ...,
           if (any(purrr::map_lgl(aux, rlang::is_string))) aux_temp <- as.array(object, pars = aux_pars)
           if (n_aux == 1) {
             for (s in 1:n_studies) {
-              ss <- as.character(studies[s])
+              ss <- studies[s]
               if (inherits(aux[[ss]], "distr")) {
                 aux_array[, , s] <- rlang::eval_tidy(rlang::call2(aux[[ss]]$qfun, p = u[ , , s, drop = TRUE], !!! aux[[ss]]$args))
               } else {
@@ -1473,7 +1473,7 @@ predict.stan_nma <- function(object, ...,
             }
           } else {
             for (s in 1:n_studies) {
-              ss <- as.character(studies[s])
+              ss <- studies[s]
               if (!rlang::is_string(aux[[ss]])) {
                 if (!setequal(names(aux[[ss]]), aux_pars) || !all(purrr::map_lgl(aux[[ss]], inherits, "distr")))
                   abort(glue::glue("`aux` must be a single named list of distr() specifications for {glue::glue_collapse(aux_pars, sep = ', ', last = ' and ')}, ",
@@ -1532,9 +1532,9 @@ predict.stan_nma <- function(object, ...,
                                     data.frame(.quantile = quantiles))
       }
 
-      studies <- unique(outdat$.study)
+      studies <- levels(forcats::fct_drop(outdat$.study))
       n_studies <- length(studies)
-      treatments <- unique(outdat$.trt)
+      treatments <- levels(forcats::fct_drop(outdat$.trt))
       n_trt <- length(treatments)
 
       dim_pred_array <- dim(post)
@@ -1563,7 +1563,11 @@ predict.stan_nma <- function(object, ...,
 
         # Basis for mspline models
         if (object$likelihood %in% c("mspline", "pexp")) {
-          basis <- object$basis[[studies[s]]]
+          if (!is.null(aux)) {
+            basis <- object$basis[[aux[[studies[s]]]]]
+          } else {
+            basis <- object$basis[[studies[s]]]
+          }
         } else {
           basis <- NULL
         }
@@ -1715,9 +1719,9 @@ predict.stan_nma <- function(object, ...,
                                  .cc = rep(l_cc, times = nrow(outdat)))
       }
 
-      studies <- unique(outdat$.study)
+      studies <- levels(forcats::fct_drop(outdat$.study))
       n_studies <- length(studies)
-      treatments <- unique(outdat$.trt)
+      treatments <- levels(forcats::fct_drop(outdat$.trt))
       n_trt <- length(treatments)
 
       dim_pred_array <- dim(post)
