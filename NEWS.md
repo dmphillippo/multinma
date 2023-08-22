@@ -49,6 +49,9 @@ lower `n_int` and disabling saving cumulative integration points.
 ## Other updates
 
 * Feature: `dic()` now includes an option to use the pV penalty instead of pD.
+* Feature: The `baseline` and `aux` arguments to `predict()` can now be 
+specified as the name of a study in the network, to use the parameter estimates 
+from that study for prediction.
 * Improvement: `predict()` will now produce aggregate-level predictions over a
 sample of individuals in `newdata` for ML-NMR models (previously `newdata` had
 to include integration points).
