@@ -26,6 +26,8 @@
 #'   \item{`likelihood`}{The likelihood used (character string)}
 #'   \item{`link`}{The link function used (character string)}
 #'   \item{`priors`}{A list containing the priors used (as [nma_prior] objects)}
+#'   \item{`basis`}{For `mspline` and `pexp` models, a named list of spline
+#'    bases for each study}
 #'   }
 #'
 #' The `stan_mlnmr` sub-class inherits from `stan_nma`, and differs only in the
@@ -258,13 +260,28 @@ plot_prior_posterior <- function(x, ...,
   if (!is.numeric(ref_line) || !is.null(dim(ref_line)))
     abort("`ref_line` should be a numeric vector.")
 
+  if (x$likelihood %in% c("mspline", "pexp")) n_scoef <- ncol(x$basis[[1]])
+
   # Get prior details
   prior_dat <- vector("list", length(prior))
   for (i in seq_along(prior)) {
     if (prior[i] %in% c("het", "aux")) trunc <- c(0, Inf)
     else trunc <- NULL
-    prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc) %>%
-      tibble::add_column(prior = prior[i])
+
+    if (x$likelihood == "gengamma" && prior[i] == "aux") {
+      prior_dat[[i]] <-
+        dplyr::bind_rows(get_tidy_prior(x$priors$prior_aux$sigma, trunc = trunc),
+                         get_tidy_prior(x$priors$prior_aux$k, trunc = trunc)) %>%
+        tibble::add_column(prior = c("aux", "aux2"))
+
+    } else if (x$likelihood %in% c("mspline", "pexp") && prior[i] == "aux") {
+      prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc, n_dim = n_scoef) %>%
+        tibble::add_column(prior = prior[i])
+
+    } else {
+      prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc) %>%
+        tibble::add_column(prior = prior[i])
+    }
   }
 
   prior_dat <- dplyr::bind_rows(prior_dat) %>%
@@ -273,7 +290,20 @@ plot_prior_posterior <- function(x, ...,
                                            trt = "d",
                                            het = "tau",
                                            reg = "beta",
-                                           aux = switch(x$likelihood, normal = "sigma", ordered = "cc")))
+                                           aux = switch(x$likelihood,
+                                                        normal = "sigma",
+                                                        ordered = "cc",
+                                                        weibull = "shape",
+                                                        gompertz = "shape",
+                                                        `weibull-aft` = "shape",
+                                                        lognormal = "sdlog",
+                                                        loglogistic = "shape",
+                                                        gamma = "shape",
+                                                        gengamma = "sigma",
+                                                        mspline = "scoef",
+                                                        pexp = "scoef"),
+                                           aux2 = switch(x$likelihood,
+                                                         gengamma = "k")))
 
   # Add in omega parameter if node-splitting model, which uses prior_trt
   if (inherits(x, "nma_nodesplit")) {
@@ -446,13 +476,36 @@ plot_prior_posterior <- function(x, ...,
 #'   final estimate (using all `n_int` points) from the estimate using only the
 #'   first \eqn{N_\mathrm{thin}}{N_thin} points.
 #'
+#' # Note for survival models
+#' This function is not supported for survival/time-to-event models. These do
+#' not save cumulative integration points for efficiency reasons (both time and
+#' memory).
+#'
 #' @return A `ggplot` object.
 #' @export
 #'
 #' @examples
 #' ## Plaque psoriasis ML-NMR
-#' @template ex_plaque_psoriasis_mlnmr_example
+#' @template ex_plaque_psoriasis_network
+#' @template ex_plaque_psoriasis_integration
 #' @examples \donttest{
+#' # Fit the ML-NMR model
+#' pso_fit <- nma(pso_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+#'                trt_effects = "fixed",
+#'                link = "probit",
+#'                likelihood = "bernoulli2",
+#'                regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
+#'                class_interactions = "common",
+#'                prior_intercept = normal(scale = 10),
+#'                prior_trt = normal(scale = 10),
+#'                prior_reg = normal(scale = 10),
+#'                init_r = 0.1,
+#'                QR = TRUE,
+#'                # Set the thinning factor for saving the cumulative results
+#'                # (This also sets int_check = FALSE)
+#'                int_thin = 8)
+#' pso_fit
+#'
 #' # Plot numerical integration error
 #' plot_integration_error(pso_fit)
 #' }
@@ -463,6 +516,9 @@ plot_integration_error <- function(x, ...,
   # Checks
   if (!inherits(x, "stan_mlnmr"))
     abort("Expecting a `stan_mlnmr` object, created by fitting a ML-NMR model with numerical integration using the `nma()` function.")
+
+  if (inherits(x, "stan_nma_surv"))
+    abort("Not supported for survival models; cumulative integration points are not saved for efficiency reasons.")
 
   if (!rlang::is_bool(show_expected_rate))
     abort("`show_expected_rate` must be a logical value, TRUE or FALSE.")
@@ -501,6 +557,11 @@ plot_integration_error <- function(x, ...,
   if (twoparbin) {
     ipars <- c(ipars, "theta2_bar_cum")
   }
+
+  if (!all(ipars %in% x$stanfit@sim$pars_oi))
+    abort(paste0("Cumulative integration points not saved.\n",
+                 "Re-run model with `int_thin > 0` and `int_check = FALSE` to use this feature."))
+
   int_dat <- as.data.frame(x, pars = ipars) %>%
     dplyr::mutate(.draw = 1:dplyr::n())
 

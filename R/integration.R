@@ -1,8 +1,8 @@
 #' Add numerical integration points to aggregate data
 #'
-#' The `add_integration()` generic creates numerical integration points using a
-#' Gaussian copula approach, as described in
-#' \insertCite{methods_paper;textual}{multinma}. Methods are available for
+#' The `add_integration()` generic creates Quasi-Monte Carlo numerical
+#' integration points using a Gaussian copula and Sobol' sequences, as described
+#' in \insertCite{methods_paper;textual}{multinma}. Methods are available for
 #' networks stored in `nma_data` objects, and for data frames. The function
 #' `unnest_integration()` unnests integration points stored in a data frame, to
 #' aid plotting or other exploration.
@@ -18,7 +18,9 @@
 #'   copula correlations, either `"spearman"`, `"pearson"`, or `"none"`, see
 #'   "Details". The default when `cor = NULL` is `"spearman"`, otherwise the
 #'   default is `"pearson"`.
-#' @param n_int Number of integration points to generate, default 1000
+#' @param n_int Number of integration points to generate, default 64. Powers of
+#'   2 are recommended, as these are expected to be particularly efficient for
+#'   QMC integration.
 #' @param int_args A named list of arguments to pass to
 #'   \code{\link[randtoolbox:quasiRNG]{sobol()}}
 #'
@@ -100,7 +102,7 @@
 #'   weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
 #'   psa = distr(qbern, prob = psa),
 #'   cor = pso_net$int_cor,
-#'   n_int = 1000)
+#'   n_int = 64)
 #'
 #' # Here, since we reused the correlation matrix pso_net$int_cor from the
 #' # network, the correct setting of cor_adjust = "spearman" is automatically
@@ -122,7 +124,7 @@ add_integration.default <- function(x, ...) {
 #' @rdname add_integration
 add_integration.data.frame <- function(x, ...,
                                        cor = NULL, cor_adjust = NULL,
-                                       n_int = 1000L, int_args = list()) {
+                                       n_int = 64L, int_args = list()) {
 
   x <- tibble::as_tibble(x)
 
@@ -261,7 +263,7 @@ add_integration.data.frame <- function(x, ...,
 #' @rdname add_integration
 add_integration.nma_data <- function(x, ...,
                                      cor = NULL, cor_adjust = NULL,
-                                     n_int = 1000L, int_args = list()) {
+                                     n_int = 64L, int_args = list()) {
 
   network <- x
 

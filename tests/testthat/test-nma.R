@@ -352,3 +352,51 @@ test_that("nma() error with incompatible priors", {
   expect_error(nma(smknet, prior_intercept = half_normal(1), prior_trt = normal(0, 1)), m)
   expect_error(nma(smknet, prior_intercept = normal(0, 1), prior_trt = half_normal(1)), m)
 })
+
+test_that("nma() prior checks work", {
+  expect_error(nma(smknet, prior_intercept = "bad"),
+               "`prior_intercept` must be a prior distribution")
+  expect_error(nma(smknet, prior_intercept = list(normal(0, 1))),
+               "`prior_intercept` must be a prior distribution")
+
+  ndmm_net <- set_ipd(ndmm_ipd, studyf, trtf, Surv = Surv(eventtime, status))
+
+  expect_error(nma(ndmm_net,
+                   likelihood = "gengamma",
+                   prior_intercept = normal(0, 100),
+                   prior_trt = normal(0, 100),
+                   prior_aux = letters),
+               "`prior_aux` must be a named list of prior distributions")
+
+  expect_error(nma(ndmm_net,
+                   likelihood = "gengamma",
+                   prior_intercept = normal(0, 100),
+                   prior_trt = normal(0, 100),
+                   prior_aux = list(a = normal(0, 1))),
+               "Missing named elements with priors for sigma and k")
+
+  expect_error(nma(ndmm_net,
+                   likelihood = "gengamma",
+                   prior_intercept = normal(0, 100),
+                   prior_trt = normal(0, 100),
+                   prior_aux = list(k = normal(0, 1))),
+               "Missing named elements with priors for sigma")
+})
+
+test_that("rstan R-hat and ESS warnings are captured correctly", {
+  # Need to capture these for numerical integration checks, but fragile since warning text may change
+  local_edition(3)
+
+  expect_warning(
+  expect_warning(
+  expect_warning(
+    nma(smknet,
+        prior_intercept = normal(0, 100),
+        prior_trt = normal(0, 100),
+        iter = 100,
+        seed = 1234,
+        init = 0),
+    "The largest R-hat is"),
+    "Bulk Effective Sample(s?) Size \\(ESS\\) is too low"),
+    "Tail Effective Sample(s?) Size \\(ESS\\) is too low")
+})

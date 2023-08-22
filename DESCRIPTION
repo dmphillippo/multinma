@@ -22,6 +22,7 @@ Imports:
     methods,
     stats,
     graphics,
+    survival,
     Rcpp (>= 0.12.0),
     RcppParallel (>= 5.0.1),
     rstan (>= 2.19.2),
@@ -66,7 +67,10 @@ Suggests:
     logitnorm,
     crayon,
     tidygraph,
-    pkgdown
+    pkgdown,
+    splines2 (>= 0.5.0),
+    flexsurv,
+    rstpm2
 RdMacros: Rdpack
 URL: https://dmphillippo.github.io/multinma/, https://github.com/dmphillippo/multinma
 BugReports: https://github.com/dmphillippo/multinma/issues

@@ -194,7 +194,7 @@ pso_net <- add_integration(pso_net,
   bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
   weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
   psa = distr(qbern, prob = psa),
-  n_int = 1000
+  n_int = 64
 )
 ```
 
@@ -246,10 +246,12 @@ The prior and posterior distributions can be compared visually using the `plot_p
 plot_prior_posterior(pso_fit_FE, prior = c("intercept", "trt", "reg"))
 ```
 
-Plots of estimated numerical integration error are produced using the `plot_integration_error()` function:
-```{r pso_FE_cumint}
-plot_integration_error(pso_fit_FE)
-```
+We now recommend assessing sufficient accuracy of the numerical integration by running half of the chains with `n_int / 2` integration points and half with the full `n_int`.
+Any `Rhat` or `n_eff` diagnostic warnings can then either be attributed to insufficient MCMC iterations (argument `iter` in `nma()`) or to insufficient integration points (`n_int` in `add_integration()`), depending on whether they occur within the two groups of chains or for all chains combined.
+This feature is enabled by default (`int_check = TRUE`).
+In this case, there are no warnings and so we are content with both the number of iterations and with the number of integration points.
+
+(@methods_paper used an alternative approach based on saving cumulative integration points and plotting the empirical integration error, which can be achieved by setting `int_thin` in `nma()` and using the `plot_integration_error()` function.)
 
 ### Random effects ML-NMR
 We now fit a RE model.
@@ -298,11 +300,6 @@ This suggests that the information to identify the heterogeneity parameter is we
 The prior and posterior distributions can be compared visually using the `plot_prior_posterior()` function:
 ```{r pso_RE_pp_plot, eval=!params$run_tests, fig.width=8, fig.height=6}
 plot_prior_posterior(pso_fit_RE, prior = c("intercept", "trt", "reg", "het"))
-```
-
-Plots of estimated numerical integration error are produced using the `plot_integration_error()` function:
-```{r pso_RE_cumint, eval=!params$run_tests}
-plot_integration_error(pso_fit_RE)
 ```
 
 ## Model comparison
@@ -407,7 +404,7 @@ new_agd_int <- add_integration(new_agd_int,
   weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
   psa = distr(qbern, prob = psa),
   cor = pso_net$int_cor,
-  n_int = 1000)
+  n_int = 64)
 ```
 
 Predicted probabilities of achieving PASI 75 in this target population, given a $N(-1.75, 0.08^2)$ distribution on the baseline probit-probability of response on Placebo (at the reference levels of the covariates), are then produced using the `predict()` method:
@@ -540,7 +537,7 @@ pso_net <- add_integration(pso_net,
   bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
   weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
   psa = distr(qbern, prob = psa),
-  n_int = 1000)
+  n_int = 64)
 ```
 
 ## ML-NMR model
@@ -1259,7 +1256,7 @@ new_agd_int <- add_integration(filter(new_agd_means, study != "PsoBest"),
                                bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
                                weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
                                psa = distr(qbern, prob = psa),
-                               n_int = 1000,
+                               n_int = 64,
                                cor = pso_net$int_cor)
 ```
 
@@ -1493,5 +1490,37 @@ test_that("Robust to custom options(contrasts) settings", {
   expect_equal(pso_fit_FE_SAS_releff,
                as_tibble(relative_effects(pso_fit_FE))[, c("parameter", "mean", "sd")],
                tolerance = tol)
+})
+
+test_that("Integration checks with int_check throw expected warnings", {
+  local_edition(3)
+  
+  pso_net_lownint <- 
+    suppressWarnings(add_integration(pso_net,
+                    durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+                    prevsys = distr(qbern, prob = prevsys),
+                    bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+                    weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
+                    psa = distr(qbern, prob = psa),
+                    n_int = 2))
+
+  expect_warning(
+  expect_warning(
+  expect_warning(
+    nma(pso_net_lownint,
+        trt_effects = "fixed",
+        link = "probit", 
+        likelihood = "bernoulli2",
+        regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
+        class_interactions = "common",
+        prior_intercept = normal(scale = 10),
+        prior_trt = normal(scale = 10),
+        prior_reg = normal(scale = 10),
+        init_r = 0.1,
+        QR = TRUE,
+        ),
+    class = "int_check_rhat"),
+    class = "int_check_essb"),
+    class = "int_check_esst")
 })
 ```

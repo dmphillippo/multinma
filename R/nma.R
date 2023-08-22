@@ -38,14 +38,41 @@
 #' @param prior_reg Specification of prior distribution for the regression
 #'   coefficients (if `regression` formula specified)
 #' @param prior_aux Specification of prior distribution for the auxiliary
-#'   parameter, if applicable (see details)
+#'   parameter, if applicable (see details). For `likelihood = "gengamma"` this
+#'   should be a list of prior distributions with elements `sigma` and `k`.
+#' @param aux_by Vector of variable names listing the variables to stratify the
+#'   auxiliary parameters by. Currently only used for survival models, see
+#'   details.
 #' @param QR Logical scalar (default `FALSE`), whether to apply a QR
 #'   decomposition to the model design matrix
 #' @param center Logical scalar (default `TRUE`), whether to center the
 #'   (numeric) regression terms about the overall means
 #' @param adapt_delta See [adapt_delta] for details
 #' @param int_thin A single integer value, the thinning factor for returning
-#'   cumulative estimates of integration error
+#'   cumulative estimates of integration error. Saving cumulative estimates is
+#'   disabled by `int_thin = 0`, which is the default.
+#' @param int_check Logical, check sufficient accuracy of numerical integration
+#'   by fitting half of the chains with `n_int/2`? When `TRUE`, `Rhat` and
+#'   `n_eff` diagnostic warnings will be given if numerical integration has not
+#'   sufficiently converged (suggesting increasing `n_int` in
+#'   [add_integration()]). Default `TRUE`, but disabled (`FALSE`) when
+#'   `int_thin > 0`.
+#' @param mspline_degree Non-negative integer giving the degree of the M-spline
+#'   polynomial for `likelihood = "mspline"`. Piecewise exponential hazards
+#'   (`likelihood = "pexp"`) are a special case with `mspline_degree = 0`.
+#' @param n_knots For `mspline` and `pexp` likelihoods, a non-negative integer
+#'   giving the number of internal knots for partitioning the baseline hazard
+#'   into intervals. The knot locations within each study will be determined by
+#'   the corresponding quantiles of the observed event times, plus boundary
+#'   knots at the earliest entry time (0 with no delayed entry) and the maximum
+#'   event/censoring time. For example, with the default `n_knots = 3`, the
+#'   internal knot locations will be at the 25%, 50%, and 75% quantiles of the
+#'   observed event times. Ignored when `knots` is specified.
+#' @param knots For `mspline` and `pexp` likelihoods, a named list of numeric
+#'   vectors of internal knot locations for each of the studies in the network.
+#'   Currently, each vector must have the same length (i.e. each study must use
+#'   the same number of knots). If unspecified (the default), the knots will be
+#'   chosen based on `n_knots` as described above.
 #'
 #' @details When specifying a model formula in the `regression` argument, the
 #'   usual formula syntax is available (as interpreted by [model.matrix()]). The
@@ -84,6 +111,7 @@
 #'   | \strong{Rate}      | `poisson`    | `log`
 #'   | \strong{Continuous}| `normal`     | `identity`, `log`
 #'   | \strong{Ordered}   | `ordered`    | `logit`, `probit`, `cloglog`
+#'   | \strong{Survival}  | `exponential`, `weibull`, `gompertz`, `exponential-aft`, `weibull-aft`, `lognormal`, `loglogistic`, `gamma`, `gengamma`, `mspline`, `pexp` | `log`
 #'
 #'   The `bernoulli2` and `binomial2` likelihoods correspond to a two-parameter
 #'   Binomial likelihood for arm-based AgD, which more closely matches the
@@ -94,6 +122,15 @@
 #'   When a `cloglog` link is used, including an offset for log follow-up time
 #'   (i.e. `regression = ~offset(log(time))`) results in a model on the log
 #'   hazard \insertCite{@see @TSD2}{multinma}.
+#'
+#'   For survival data, all accelerated failure time models (`exponential-aft`,
+#'   `weibull-aft`, `lognormal`, `loglogistic`, `gamma`, `gengamma`) are
+#'   parameterised so that the treatment effects and any regression parameters
+#'   are log Survival Time Ratios (i.e. a coefficient of \eqn{\log(2)} means
+#'   that the treatment or covariate is associated with a doubling of expected
+#'   survival time). These can be converted to log Acceleration Factors using
+#'   the relation \eqn{\log(\mathrm{AF}) = -\log(\mathrm{STR})} (or equivalently
+#'   \eqn{\mathrm{AF} = 1/\mathrm{STR}}).
 #'
 #'   Further details on each likelihood and link function are given by
 #'   \insertCite{TSD2;textual}{multinma}.
@@ -115,6 +152,44 @@
 #'   these latent cutoffs, we choose to specify priors on the *differences*
 #'   \eqn{c_{m+1} - c_m}. Stan automatically truncates any priors so that the
 #'   ordering constraints are satisfied.
+#'
+#'   ## Survival (time-to-event) likelihoods
+#'   All survival likelihoods except the `exponential` and `exponential-aft`
+#'   likelihoods have auxiliary parameters. These are typically study-specific
+#'   shape parameters \eqn{\gamma_j>0}, except for the `lognormal` likelihood
+#'   where the auxiliary parameters are study-specific standard deviations on
+#'   the log scale \eqn{\sigma_j>0}.
+#'
+#'   The `gengamma` likelihood has two sets of auxiliary parameters,
+#'   study-specific scale parameters \eqn{\sigma_j>0} and shape parameters
+#'   \eqn{k_j}, following the parameterisation of
+#'   \insertCite{Lawless1980;textual}{multinma}, which permits a range of
+#'   behaviours for the baseline hazard including increasing, decreasing,
+#'   bathtub and arc-shaped hazards. This parameterisation is related to that
+#'   discussed by \insertCite{Cox2007;textual}{multinma} and implemented in the
+#'   `flexsurv` package with \eqn{Q = k^{-0.5}}. The parameterisation used here
+#'   effectively bounds the shape parameter \eqn{k} away from numerical
+#'   instabilities as \eqn{k \rightarrow \infty} (i.e. away from \eqn{Q
+#'   \rightarrow 0}, the log-Normal distribution) via the prior distribution.
+#'   Implicitly, this parameterisation is restricted to \eqn{Q > 0} and so
+#'   certain survival distributions like the inverse-Gamma and inverse-Weibull
+#'   are not part of the parameter space; however, \eqn{Q > 0} still encompasses
+#'   the other survival distributions implemented in this package.
+#'
+#'   For the `mspline` and `pexp` likelihoods, the auxiliary parameters are the
+#'   spline coefficients for each study. These form a unit simplex (i.e. lie
+#'   between 0 and 1, and sum to 1), and are given a [dirichlet()] prior
+#'   distribution.
+#'
+#'   The auxiliary parameters can be stratified by additional factors through
+#'   the `aux_by` argument. For example, to allow the shape of the baseline
+#'   hazard to vary between treatment arms as well as studies, use `aux_by =
+#'   c(".study", ".trt")`. (Technically, `.study` is always included in the
+#'   stratification even if omitted from `aux_by`, but we choose here to make
+#'   the stratification explicit.) This is a common way of relaxing the
+#'   proportional hazards assumption. The default is equivalent to `aux_by =
+#'   ".study"` which stratifies the auxiliary parameters by study, as described
+#'   above.
 #'
 #' @return `nma()` returns a [stan_nma] object, except when `consistency =
 #'   "nodesplit"` when a [nma_nodesplit] or [nma_nodesplit_df] object is
@@ -156,10 +231,15 @@ nma <- function(network,
                 prior_het_type = c("sd", "var", "prec"),
                 prior_reg = .default(normal(scale = 10)),
                 prior_aux = .default(),
+                aux_by = NULL,
                 QR = FALSE,
                 center = TRUE,
                 adapt_delta = NULL,
-                int_thin = max(network$n_int %/% 10, 1)) {
+                int_thin = 0,
+                int_check = TRUE,
+                mspline_degree = 3,
+                n_knots = 3,
+                knots = NULL) {
 
   # Check network
   if (!inherits(network, "nma_data")) {
@@ -264,10 +344,14 @@ nma <- function(network,
                          prior_het_type = prior_het_type,
                          prior_reg = prior_reg,
                          prior_aux = prior_aux,
+                         aux_by = aux_by,
                          QR = QR,
                          center = center,
                          adapt_delta = adapt_delta,
-                         int_thin = int_thin)
+                         int_thin = int_thin,
+                         mspline_degree = mspline_degree,
+                         n_knots = n_knots,
+                         knots = knots)
 
       if (!missing(class_interactions)) ns_arglist$class_interactions <- class_interactions
 
@@ -352,17 +436,23 @@ nma <- function(network,
   link <- check_link(link, likelihood)
 
   # When are priors on auxiliary parameters required?
-  has_aux <- (likelihood == "normal" && has_ipd(network)) || likelihood == "ordered"
+  has_aux <- (likelihood == "normal" && has_ipd(network)) ||
+              likelihood %in% c("ordered", "weibull", "gompertz",
+                                "weibull-aft", "lognormal", "loglogistic",
+                                "gamma", "gengamma", "mspline", "pexp")
 
   # Are study intercepts present? Not if only contrast data
   has_intercepts <- has_agd_arm(network) || has_ipd(network)
 
   # Check priors
-  if (!inherits(prior_intercept, "nma_prior")) abort("`prior_intercept` should be a prior distribution, see ?priors.")
-  if (!inherits(prior_trt, "nma_prior")) abort("`prior_trt` should be a prior distribution, see ?priors.")
-  if (!inherits(prior_het, "nma_prior")) abort("`prior_het` should be a prior distribution, see ?priors.")
-  if (!inherits(prior_reg, "nma_prior")) abort("`prior_reg` should be a prior distribution, see ?priors.")
-  if (!.is_default(prior_aux) && !inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
+  check_prior(prior_intercept)
+  check_prior(prior_trt)
+  check_prior(prior_het)
+  check_prior(prior_reg)
+  if (!.is_default(prior_aux)) {
+    if (likelihood == "gengamma") check_prior(prior_aux, c("sigma", "k"))
+    else check_prior(prior_aux)
+  }
 
   prior_het_type <- rlang::arg_match(prior_het_type)
 
@@ -382,6 +472,14 @@ nma <- function(network,
       prior_aux <- .default(half_normal(scale = 5))
     } else if (likelihood == "ordered") {
       prior_aux <- .default(flat())
+    } else if (likelihood %in% c("weibull", "gompertz", "weibull-aft",
+                                 "lognormal", "loglogistic", "gamma")) {
+      prior_aux <- .default(half_normal(scale = 10))
+    } else if (likelihood == "gengamma") {
+      prior_aux <- .default(list(sigma = half_normal(scale = 10),
+                                 k = half_normal(scale = 10)))
+    } else if (likelihood %in% c("mspline", "pexp")) {
+      prior_aux <- .default(dirichlet(1))
     }
     prior_defaults$prior_aux <- get_prior_call(prior_aux)
   }
@@ -399,7 +497,9 @@ nma <- function(network,
   if (!rlang::is_bool(QR)) abort("`QR` should be a logical scalar (TRUE or FALSE).")
   if (!rlang::is_bool(center)) abort("`center` should be a logical scalar (TRUE or FALSE).")
   if (!rlang::is_scalar_integerish(int_thin) ||
-      int_thin < 1) abort("`int_thin` should be an integer >= 1.")
+      int_thin < 0) abort("`int_thin` should be an integer >= 0.")
+  if (!rlang::is_bool(int_check)) abort("`int_check` should be a logical scalar (TRUE or FALSE).")
+  if (int_thin > 0) int_check <- FALSE
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
@@ -407,9 +507,35 @@ nma <- function(network,
   } else if (!rlang::is_scalar_double(adapt_delta) ||
       adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
+  # Set up aux_by
+  has_aux_by <- FALSE
+  if (likelihood %in% valid_lhood$survival &&
+      has_aux &&
+      (has_ipd(network) || has_agd_arm(network))) {
+
+    has_aux_by <- TRUE
+    aux_by <- rlang::enquo(aux_by)
+    if (rlang::quo_is_null(aux_by)) aux_by <- ".study"
+
+    aux_dat <- dplyr::bind_rows(if (has_ipd(network)) dplyr::select(network$ipd, -".Surv") else NULL,
+                                if (has_agd_arm(network)) {
+                                  if (inherits(network, "mlnmr_data")) {
+                                    .unnest_integration(network$agd_arm) %>% dplyr::select(-".Surv")
+                                  } else {
+                                    dplyr::select(network$agd_arm, -".Surv")
+                                  }
+                                } else NULL)
+
+    # Check specs and translate into string column names
+    aux_by <- colnames(get_aux_by_data(aux_dat, by = aux_by))
+  }
+
+
   # Use numerical integration? TRUE if class mlnmr_data and regression is not NULL
   # (Avoids unnecessary use of integration points if regression formula not specified)
-  use_int <- inherits(network, "mlnmr_data") && !is.null(regression)
+  use_int <- inherits(network, "mlnmr_data") &&
+               (!is.null(regression) ||
+                  (has_aux_by && length(setdiff(aux_by, c(".study", ".trt"))) > 0))
 
   # Number of numerical integration points
   # Set to 1 if no numerical integration, so that regression on summary data is possible
@@ -437,9 +563,10 @@ nma <- function(network,
     # Only take necessary columns
     dat_ipd <- get_model_data_columns(dat_ipd,
                                       regression = regression,
-                                      label = "IPD")
+                                      label = "IPD",
+                                      keep = if (has_aux_by) aux_by else NULL)
 
-    y_ipd <- get_outcome_variables(dat_ipd, network$outcome$ipd)
+    y_ipd <- get_outcome_variables(network$ipd, network$outcome$ipd)
   } else {
     dat_ipd <- tibble::tibble()
     y_ipd <- NULL
@@ -450,17 +577,40 @@ nma <- function(network,
 
     y_agd_arm <- get_outcome_variables(dat_agd_arm, network$outcome$agd_arm)
 
+    # Unnest survival data
+    if (network$outcome$agd_arm == "survival") {
+      y_agd_arm <- tidyr::unnest(y_agd_arm, cols = ".Surv")
+    }
+
     # Set up integration variables if present
     if (use_int) {
-      idat_agd_arm <- .unnest_integration(dat_agd_arm)
+      if (network$outcome$agd_arm == "survival") {
+        idat_agd_arm <- dat_agd_arm %>%
+          # Drop duplicated names in outer dataset from .data_orig before unnesting
+          dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(dat_agd_arm))))) %>%
+          # Unnest - should have n_int contiguous rows for each survival time
+          tidyr::unnest(cols = c(".Surv", ".data_orig")) %>%
+          .unnest_integration()
+      } else {
+        idat_agd_arm <- .unnest_integration(dat_agd_arm)
+      }
     } else {
-      idat_agd_arm <- dat_agd_arm
+      if (network$outcome$agd_arm == "survival") {
+        idat_agd_arm <- dat_agd_arm %>%
+          # Drop duplicated names in outer dataset from .data_orig before unnesting
+          dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(dat_agd_arm))))) %>%
+          # Unnest - should have one row for each survival time
+          tidyr::unnest(cols = c(".Surv", ".data_orig"))
+      } else {
+        idat_agd_arm <- dat_agd_arm
+      }
     }
 
     # Only take necessary columns
     idat_agd_arm <- get_model_data_columns(idat_agd_arm,
                                            regression = regression,
-                                           label = "AgD (arm-based)")
+                                           label = "AgD (arm-based)",
+                                           keep = if (has_aux_by) aux_by else NULL)
 
   } else {
     dat_agd_arm <- idat_agd_arm <- tibble::tibble()
@@ -540,9 +690,15 @@ nma <- function(network,
     }
 
     # Apply weights across integration points
-    wts <- c(rep(1, nrow(dat_ipd)),
-             rep(N_agd_arm / n_int, each = n_int),
-             rep(N_agd_contrast / n_int, each = n_int))
+    if (has_agd_arm(network) && network$outcome$agd_arm == "survival") {
+      wts <- c(rep(1, nrow(dat_ipd)),
+               rep(1 / n_int, nrow(idat_agd_arm)),
+               rep(N_agd_contrast / n_int, each = n_int))
+    } else {
+      wts <- c(rep(1, nrow(dat_ipd)),
+               rep(N_agd_arm / n_int, each = n_int),
+               rep(N_agd_contrast / n_int, each = n_int))
+    }
 
     # Center numeric columns used in regression model
     reg_names <- all.vars(regression)
@@ -635,6 +791,96 @@ nma <- function(network,
     .which_RE <- NULL
   }
 
+  # Set up spline basis for mspline and pexp models
+  if (likelihood %in% c("mspline", "pexp") && (has_ipd(network) || has_agd_arm(network))) {
+    require_pkg("splines2")
+
+    if (likelihood == "pexp") mspline_degree <- 0
+
+    if (!rlang::is_scalar_integerish(mspline_degree, finite = TRUE) || mspline_degree < 0)
+      abort("`mspline_degree` must be a single non-negative integer.")
+
+    # Calculate boundary knots
+    survdat <-
+      if (!has_agd_arm(network)) {
+        dplyr::tibble(.Surv = y_ipd$.Surv,
+                      .study = forcats::fct_drop(dat_ipd$.study),
+                      observed = .data$.Surv[, "status"]  == 1)
+      } else if (!has_ipd(network)) {
+        dplyr::tibble(.Surv = y_agd_arm$.Surv,
+                      .study = forcats::fct_drop(rep(dat_agd_arm$.study, times = dat_agd_arm$.sample_size)),
+                      observed = .data$.Surv[, "status"]  == 1)
+      } else {
+        dplyr::tibble(.Surv = c(y_ipd$.Surv, y_agd_arm$.Surv),
+                      .study = forcats::fct_drop(c(dat_ipd$.study, rep(dat_agd_arm$.study, times = dat_agd_arm$.sample_size))),
+                      observed = .data$.Surv[, "status"]  == 1)
+      }
+
+    stype <- attr(survdat$.Surv, "type")
+    survdat <- dplyr::mutate(survdat, !!! get_Surv_data(survdat$.Surv))
+
+    # Boundary knots at earliest entry time (0 with no delayed entry) and latest event/censoring time
+    b_knots <- by(survdat, survdat$.study, function(x) c(min(x$delay_time), max(x$time)),
+                  simplify = FALSE)
+
+    if (is.null(knots)) {  # Calculate internal knots based on quantiles
+      if (!rlang::is_scalar_integerish(n_knots, finite = TRUE) || n_knots <= 0)
+        abort("`n_knots` must be a single positive integer (or specify `knots` directly)")
+
+      observed_survdat <- dplyr::filter(survdat, .data$observed)
+      knots <- by(observed_survdat, observed_survdat$.study,
+                  function(x) quantile(x$time, probs = seq(1, n_knots) / (n_knots + 1)),
+                  simplify = FALSE)
+
+    } else {  # User-provided internal knots
+      # Check required format
+      if (!is.list(knots) || any(!purrr::map_lgl(knots, is.numeric)))
+        abort("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.")
+
+      missing_names <- setdiff(levels(survdat$.study), names(knots))
+      if (length(missing_names) > 0)
+        abort(glue::glue("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.\n",
+                         "Missing knot location vector{if (length(missing_names > 1) 's' else ''} for stud{if (length(missing_names > 1) 'ies' else 'y'} ",
+                         glue::glue_collapse(glue::double_quote(missing_names), sep = ", ", last = " and ", width = 30), "."))
+
+      if (!all(purrr::map_int(knots, length) == length(knots[[1]])))
+        abort("Each element of `knots` must currently be the same length (each study must have the same number of knots).")
+    }
+
+    # Set up basis
+    # Only evaluate at first boundary knot for now to save time/memory
+    basis <- purrr::imap(b_knots,
+                         ~tryCatch(splines2::mSpline(.x[1],
+                                                     knots = knots[[.y]],
+                                                     Boundary.knots = .x,
+                                                     degree = mspline_degree,
+                                                     intercept = TRUE),
+                                   error = function(e) abort(glue::glue("Could not create spline basis for study {glue::double_quote(.y)}."),
+                                                             parent = e),
+                                   warning = function(w) warn(glue::glue("Warning while creating spline basis for study {glue::double_quote(.y)}."),
+                                                              parent = e))
+                         )
+
+    # Ensure list is in factor order
+    basis <- basis[levels(survdat$.study)]
+
+  } else {
+    basis <- NULL
+  }
+
+  # Set up aux_by design vector
+  if (has_aux_by) {
+    if (length(setdiff(aux_by, c(".study", ".trt"))) > 0) {
+      aux_dat <- dplyr::bind_rows(dat_ipd, idat_agd_arm)
+    } else {
+      aux_dat <- dplyr::bind_rows(dat_ipd,
+                                  if (has_agd_arm(network)) dplyr::select(tidyr::unnest(dat_agd_arm, cols = ".Surv"), -".Surv") else NULL)
+    }
+    aux_id <- get_aux_id(aux_dat, aux_by)
+  } else {
+    aux_id <- integer()
+  }
+
   # Fit using nma.fit
   stanfit <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
     agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
@@ -657,16 +903,29 @@ nma <- function(network,
     prior_het_type = prior_het_type,
     prior_reg = prior_reg,
     prior_aux = prior_aux,
+    aux_id = aux_id,
     QR = QR,
     adapt_delta = adapt_delta,
-    int_thin = int_thin)
+    int_thin = int_thin,
+    int_check = int_check,
+    basis = basis)
 
   # Make readable parameter names for generated quantities
   fnames_oi <- stanfit@sim$fnames_oi
 
   # Labels for fitted values
   ipd_data_labels <- if (has_ipd(network)) make_data_labels(dat_ipd$.study, dat_ipd$.trt) else NULL
-  agd_arm_data_labels <- if (has_agd_arm(network)) make_data_labels(dat_agd_arm$.study, dat_agd_arm$.trt) else NULL
+
+  if (has_agd_arm(network)) {
+    if (network$outcome$agd_arm != "survival") {
+      agd_arm_data_labels <-  make_data_labels(dat_agd_arm$.study, dat_agd_arm$.trt)
+    } else {
+      agd_arm_data_labels <-  make_data_labels(rep(dat_agd_arm$.study, times = dat_agd_arm$.sample_size),
+                                               rep(dat_agd_arm$.trt, times = dat_agd_arm$.sample_size))
+    }
+  } else {
+    agd_arm_data_labels <- NULL
+  }
 
   if (has_agd_contrast(network)) {
     dat_agd_contrast_nonbl <-
@@ -720,7 +979,7 @@ nma <- function(network,
       } else {
         ipd_delta_labels <- NULL
       }
-      agd_arm_delta_labels <- agd_arm_data_labels
+      agd_arm_delta_labels <- if (has_agd_arm(network)) make_data_labels(dat_agd_arm$.study, dat_agd_arm$.trt) else NULL
     }
 
     agd_contrast_delta_labels <- agd_contrast_data_labels
@@ -741,7 +1000,7 @@ nma <- function(network,
   fnames_oi[grepl("^resdev\\[[0-9]+\\]$", fnames_oi)] <- paste0("resdev[", dev_labels, "]")
 
   # Labels for cumulative integration points
-  if (inherits(network, "mlnmr_data") && (has_agd_arm(network) || has_agd_contrast(network))) {
+  if (inherits(network, "mlnmr_data") && (has_agd_arm(network) || has_agd_contrast(network)) && int_thin > 0) {
     n_int_thin <- n_int %/% int_thin
 
     if (has_agd_arm(network)) {
@@ -762,6 +1021,24 @@ nma <- function(network,
 
   }
 
+  # Labels for survival aux pars
+  if (likelihood %in% valid_lhood$survival && has_aux) {
+    aux_labels <- get_aux_labels(aux_dat, by = aux_by)
+
+    fnames_oi[grepl("^shape\\[[0-9]+\\]$", fnames_oi)] <- paste0("shape[", aux_labels, "]")
+    fnames_oi[grepl("^sdlog\\[[0-9]+\\]$", fnames_oi)] <- paste0("sdlog[", aux_labels, "]")
+    fnames_oi[grepl("^sigma\\[[0-9]+\\]$", fnames_oi)] <- paste0("sigma[", aux_labels, "]")
+    fnames_oi[grepl("^k\\[[0-9]+\\]$", fnames_oi)] <- paste0("k[", aux_labels, "]")
+
+    if (likelihood %in% c("mspline", "pexp")) {
+      # Number of spline coefficients
+      n_scoef <- ncol(basis[[1]])
+
+      fnames_oi[grepl("^scoef\\[[0-9]+,[0-9]+\\]$", fnames_oi)] <-
+        paste0("scoef[", rep(aux_labels, times = n_scoef), ", ", rep(1:n_scoef, each = length(aux_labels)), "]")
+    }
+  }
+
   stanfit@sim$fnames_oi <- fnames_oi
 
   # Create stan_nma object
@@ -774,6 +1051,7 @@ nma <- function(network,
               xbar = xbar,
               likelihood = likelihood,
               link = link,
+              aux_by = if (has_aux_by) colnames(get_aux_by_data(aux_dat, by = aux_by)) else NULL,
               priors = list(prior_intercept = if (has_intercepts) prior_intercept else NULL,
                             prior_trt = prior_trt,
                             prior_het = if (trt_effects == "random") prior_het else NULL,
@@ -781,8 +1059,12 @@ nma <- function(network,
                             prior_reg = if (!is.null(regression) && !is_only_offset(regression)) prior_reg else NULL,
                             prior_aux = if (has_aux) prior_aux else NULL))
 
+  if (likelihood %in% c("mspline", "pexp")) out$basis <- basis
+
   if (inherits(network, "mlnmr_data")) class(out) <- c("stan_mlnmr", "stan_nma")
   else class(out) <- "stan_nma"
+
+  if (likelihood %in% valid_lhood$survival) class(out) <- c("stan_nma_surv", class(out))
 
   if (consistency == "nodesplit" && !is.data.frame(nodesplit)) {
     class(out) <- c("nma_nodesplit", class(out))
@@ -806,6 +1088,7 @@ nma <- function(network,
 #' @param agd_contrast_offset Vector of offset values for AgD (contrast-based)
 #' @param RE_cor Random effects correlation matrix, when `trt_effects = "random"`
 #' @param which_RE Random effects design vector, when `trt_effects = "random"`
+#' @param basis Spline basis for `mspline` and `pexp` models
 #'
 #' @noRd
 nma.fit <- function(ipd_x, ipd_y,
@@ -826,9 +1109,12 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_het_type = c("sd", "var", "prec"),
                     prior_reg,
                     prior_aux,
+                    aux_id = integer(),
                     QR = FALSE,
                     adapt_delta = NULL,
-                    int_thin = 100L) {
+                    int_thin = 0,
+                    int_check = TRUE,
+                    basis) {
 
   if (missing(ipd_x)) ipd_x <- NULL
   if (missing(ipd_y)) ipd_y <- NULL
@@ -929,11 +1215,14 @@ nma.fit <- function(ipd_x, ipd_y,
   has_aux <- (likelihood == "normal" && has_ipd) || likelihood == "ordered"
 
   # Check priors
-  if (!inherits(prior_intercept, "nma_prior")) abort("`prior_intercept` should be a prior distribution, see ?priors.")
-  if (!inherits(prior_trt, "nma_prior")) abort("`prior_trt` should be a prior distribution, see ?priors.")
-  if (trt_effects == "random" && !inherits(prior_het, "nma_prior")) abort("`prior_het` should be a prior distribution, see ?priors.")
-  if (!inherits(prior_reg, "nma_prior")) abort("`prior_reg` should be a prior distribution, see ?priors.")
-  if (has_aux && !inherits(prior_aux, "nma_prior")) abort("`prior_aux` should be a prior distribution, see ?priors.")
+  check_prior(prior_intercept)
+  check_prior(prior_trt)
+  if (trt_effects == "random") check_prior(prior_het)
+  check_prior(prior_reg)
+  if (has_aux) {
+    if (likelihood == "gengamma") check_prior(prior_aux, c("sigma", "k"))
+    else check_prior(prior_aux)
+  }
 
   prior_het_type <- rlang::arg_match(prior_het_type)
 
@@ -943,7 +1232,9 @@ nma.fit <- function(ipd_x, ipd_y,
   # Check other args
   if (!rlang::is_bool(QR)) abort("`QR` should be a logical scalar (TRUE or FALSE).")
   if (!rlang::is_scalar_integerish(int_thin) ||
-      int_thin < 1) abort("`int_thin` should be an integer >= 1.")
+      int_thin < 0) abort("`int_thin` should be an integer >= 0.")
+  if (!rlang::is_bool(int_check)) abort("`int_check` should be a logical scalar (TRUE or FALSE).")
+  if (int_thin > 0) int_check <- FALSE
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
@@ -951,6 +1242,9 @@ nma.fit <- function(ipd_x, ipd_y,
   } else if (!is.numeric(adapt_delta) ||
              length(adapt_delta) > 1 ||
              adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
+
+  # Is this a survival outcome?
+  is_survival <- likelihood %in% valid_lhood$survival
 
   # Pull study and treatment details from *_x
   if (has_ipd) x_names <- colnames(ipd_x)
@@ -987,9 +1281,21 @@ nma.fit <- function(ipd_x, ipd_y,
     aa1 <- 0:(ni_agd_arm - 1)*n_int + 1
     agd_arm_study <- apply(agd_arm_x[aa1, col_study, drop = FALSE], 1, get_study)
     agd_arm_trt <- apply(agd_arm_x[aa1, col_trt, drop = FALSE], 1, get_trt)
+
+    if (!is_survival) {
+      narm_agd_arm <- ni_agd_arm
+    } else {
+      agd_arm_s_t_all <- dplyr::tibble(.study = agd_arm_study, .trt = agd_arm_trt)
+      agd_arm_s_t <- dplyr::distinct(agd_arm_s_t_all) %>% dplyr::mutate(.arm = 1:dplyr::n())
+      agd_arm_arm <-  dplyr::left_join(agd_arm_s_t_all, agd_arm_s_t, by = c(".study", ".trt")) %>% dplyr::pull(.data$.arm)
+      agd_arm_study <- agd_arm_s_t$.study
+      agd_arm_trt <- agd_arm_s_t$.trt
+      narm_agd_arm <- max(agd_arm_arm)
+    }
+
   } else {
-    agd_arm_study <- agd_arm_trt <- numeric()
-    ni_agd_arm <- 0
+    agd_arm_study <- agd_arm_trt <- agd_arm_arm <- numeric()
+    ni_agd_arm <- narm_agd_arm <- 0
   }
 
   if (has_agd_contrast) {
@@ -1061,6 +1367,21 @@ nma.fit <- function(ipd_x, ipd_y,
     X_all_R_inv <- solve(X_all_R)
   }
 
+  # Handle integration points
+  dots <- list(...)
+  nchains <- dots$chains
+  if (is.null(nchains)) nchains <- 4
+  if (nchains < 2) {
+    warn("At least 2 chains are required to check integration convergence with int_check = TRUE.")
+    int_check <- FALSE
+  }
+  nint_max <- n_int
+  if (int_check && n_int > 1) {
+    nint_vec <- c(rep(n_int, ceiling(nchains / 2)), rep(n_int %/% 2, floor(nchains / 2)))
+  } else {
+    nint_vec <- rep(n_int, nchains)
+  }
+
   # Set common Stan data
   standat <- list(
     # Constants
@@ -1071,13 +1392,16 @@ nma.fit <- function(ipd_x, ipd_y,
     ns_agd_contrast = ns_agd_contrast,
     ni_agd_contrast = ni_agd_contrast,
     nt = n_trt,
-    nint = n_int,
+    nchains = nchains,
+    nint_max = nint_max,
+    nint_vec = nint_vec,
     nX = ncol(X_all),
     int_thin = int_thin,
     # Study and treatment details
     narm_ipd = narm_ipd,
     ipd_arm = ipd_arm,
     ipd_trt = ipd_trt,
+    narm_agd_arm = narm_agd_arm,
     agd_arm_trt = agd_arm_trt,
     agd_contrast_trt = as.array(agd_contrast_trt),
     agd_contrast_trt_b = as.array(agd_contrast_trt_b),
@@ -1123,8 +1447,8 @@ nma.fit <- function(ipd_x, ipd_y,
             "log_lik", "resdev",
             "lp__")
 
-  if (has_ipd) pars <- c(pars, "fitted_ipd")
-  if (has_agd_arm) pars <- c(pars, "fitted_agd_arm")
+  if (has_ipd && !is_survival) pars <- c(pars, "fitted_ipd")
+  if (has_agd_arm && !is_survival) pars <- c(pars, "fitted_agd_arm")
   if (has_agd_contrast) pars <- c(pars, "fitted_agd_contrast")
 
   # Monitor heterogeneity SD and study deltas if RE model
@@ -1138,7 +1462,7 @@ nma.fit <- function(ipd_x, ipd_y,
   }
 
   # Monitor cumulative integration error if using numerical integration
-  if (n_int > 1) {
+  if (n_int > 1 && !is_survival && int_thin > 0) {
     if (has_agd_arm) pars <- c(pars, "theta_bar_cum_agd_arm")
     if (has_agd_contrast) pars <- c(pars, "theta_bar_cum_agd_contrast")
   }
@@ -1149,6 +1473,9 @@ nma.fit <- function(ipd_x, ipd_y,
     stanargs$control <- purrr::list_modify(stanargs$control, adapt_delta = adapt_delta)
   else
     stanargs$control <- list(adapt_delta = adapt_delta)
+
+  # Set chain_id to make CHAIN_ID available in data block
+  stanargs$chain_id <- 1L
 
   # Call Stan model for given likelihood
 
@@ -1214,7 +1541,7 @@ nma.fit <- function(ipd_x, ipd_y,
     stanargs <- purrr::list_modify(stanargs,
                                    object = stanmodels$binomial_2par,
                                    data = standat,
-                                   pars = c(pars, "theta2_bar_cum"))
+                                   pars = if (n_int > 1 && int_thin > 0) c(pars, "theta2_bar_cum") else pars)
 
   # -- Poisson likelihood
   } else if (likelihood == "poisson") {
@@ -1301,11 +1628,300 @@ nma.fit <- function(ipd_x, ipd_y,
                                    data = standat,
                                    pars = c(pars, "cc"))
 
+  # -- Parametric survival likelihoods
+  } else if (likelihood %in% setdiff(valid_lhood$survival, c("mspline", "pexp"))) {
+
+    # Pull out Surv data
+    ipd_surv <- get_Surv_data(ipd_y$.Surv)
+    agd_arm_surv <- get_Surv_data(agd_arm_y$.Surv)
+
+    # Add in dummy prior_aux for exponential model - not used, but requested by Stan data
+    if (likelihood %in% c("exponential", "exponential-aft")) prior_aux <- flat()
+
+    # Add in dummy prior_aux2 if not gengamma - not used, but requested by Stan data
+    if (likelihood != "gengamma") prior_aux2 <- flat()
+
+    # Check aux IDs
+    if (!(has_ipd || has_agd_arm)) {
+      aux_id <- integer()
+    } else {
+      if (likelihood %in% c("exponential", "exponential-aft")) {
+        aux_id <- rep_len(1, ni_ipd + ni_agd_arm)  # Not used (no aux pars)
+      } else if (!rlang::is_integerish(aux_id, finite = TRUE)) {
+        abort("`aux_id` must be an integer vector identifying the auxiliary parameter for each observation in IPD and AgD (arm-based) data.")
+      }
+    }
+
+    standat <- purrr::list_modify(standat,
+                                  # AgD arm IDs
+                                  agd_arm_arm = agd_arm_arm,
+
+                                  # Auxiliary IDs for shape parameters
+                                  aux_by = length(aux_id) == ni_ipd + ni_agd_arm*n_int,
+                                  aux_id = aux_id,
+
+                                  # Add outcomes
+                                  ipd_time = ipd_surv$time,
+                                  ipd_start_time = ipd_surv$start_time,
+                                  ipd_delay_time = ipd_surv$delay_time,
+                                  ipd_status = ipd_surv$status,
+
+                                  agd_arm_time = agd_arm_surv$time,
+                                  agd_arm_start_time = agd_arm_surv$start_time,
+                                  agd_arm_delay_time = agd_arm_surv$delay_time,
+                                  agd_arm_status = agd_arm_surv$status,
+
+                                  # Specify survival distribution
+                                  dist = switch(likelihood,
+                                                exponential = 1,
+                                                weibull = 2,
+                                                gompertz = 3,
+                                                `exponential-aft` = 4,
+                                                `weibull-aft` = 5,
+                                                lognormal = 6,
+                                                loglogistic = 7,
+                                                gamma = 8,
+                                                gengamma = 9),
+
+                                  # Specify link
+                                  link = switch(link, log = 1)
+    )
+
+    # Add in priors for auxiliary parameters
+    if (likelihood != "gengamma") {
+      standat <- purrr::list_modify(standat,
+                                     # Specify prior on shape parameters
+                                     !!! prior_standat(prior_aux, "prior_aux",
+                                                       valid = c("Normal", "half-Normal", "log-Normal",
+                                                                 "Cauchy",  "half-Cauchy",
+                                                                 "Student t", "half-Student t", "log-Student t",
+                                                                 "Exponential", "flat (implicit)")),
+
+                                    # Dummy prior details for aux2
+                                    !!! prior_standat(prior_aux2, "prior_aux2",
+                                                      valid = "flat (implicit)"))
+    } else {
+      standat <- purrr::list_modify(standat,
+                                     # Specify prior on sigma parameters
+                                     !!! prior_standat(prior_aux$sigma, "prior_aux",
+                                                       valid = c("Normal", "half-Normal", "log-Normal",
+                                                                 "Cauchy",  "half-Cauchy",
+                                                                 "Student t", "half-Student t", "log-Student t",
+                                                                 "Exponential", "flat (implicit)")),
+
+                                     # Specify prior on k parameters
+                                     !!! prior_standat(prior_aux$k, "prior_aux2",
+                                                       valid = c("Normal", "half-Normal", "log-Normal",
+                                                                 "Cauchy",  "half-Cauchy",
+                                                                 "Student t", "half-Student t", "log-Student t",
+                                                                 "Exponential", "flat (implicit)")))
+    }
+
+
+
+    stanargs <- purrr::list_modify(stanargs,
+                                   object = stanmodels$survival_param,
+                                   data = standat,
+                                   # Monitor auxiliary parameters
+                                   pars =
+                                     if (likelihood %in% c("exponential", "exponential-aft")) pars
+                                     else if (likelihood == "lognormal") c(pars, "sdlog")
+                                     else if (likelihood == "gengamma") c(pars, "sigma", "k")
+                                     else c(pars, "shape")
+                                   )
+
+
+  # -- Flexible parametric survival likelihoods (splines, piecewise exponential)
+  } else if (likelihood %in% c("mspline", "pexp")) {
+
+    # Pull out Surv data
+    ipd_surv <- get_Surv_data(ipd_y$.Surv)
+    agd_arm_surv <- get_Surv_data(agd_arm_y$.Surv)
+
+    # Number of spline coefficients
+    n_scoef <- ncol(basis[[1]])
+
+    # Evaluate splines
+    if (has_ipd) {
+      ipd_time <- ipd_itime <- ipd_start_itime <- ipd_delay_itime <- matrix(nrow = length(ipd_surv$time), ncol = n_scoef)
+
+      for (s in unique(ipd_s_t_all$.study)) {
+        ipd_time[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s])
+        ipd_itime[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s], integral = TRUE)
+        ipd_start_itime[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$start_time[ipd_s_t_all$.study == s], integral = TRUE)
+        ipd_delay_itime[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$delay_time[ipd_s_t_all$.study == s], integral = TRUE)
+      }
+
+    } else {
+      ipd_time <- ipd_itime <- ipd_start_itime <- ipd_delay_itime <- matrix(nrow = 0, ncol = n_scoef)
+    }
+
+    if (has_agd_arm) {
+      agd_arm_time <- agd_arm_itime <- agd_arm_start_itime <- agd_arm_delay_itime <- matrix(nrow = length(agd_arm_surv$time), ncol = n_scoef)
+
+      for (s in unique(agd_arm_s_t_all$.study)) {
+        agd_arm_time[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s])
+        agd_arm_itime[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s], integral = TRUE)
+        agd_arm_start_itime[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$start_time[agd_arm_s_t_all$.study == s], integral = TRUE)
+        agd_arm_delay_itime[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$delay_time[agd_arm_s_t_all$.study == s], integral = TRUE)
+      }
+
+    } else {
+      agd_arm_time <- agd_arm_itime <- agd_arm_start_itime <- agd_arm_delay_itime <- matrix(nrow = 0, ncol = n_scoef)
+    }
+
+    # Check aux IDs
+    if (!(has_ipd || has_agd_arm)) {
+      aux_id <- integer()
+    } else {
+      if (!rlang::is_integerish(aux_id, finite = TRUE))
+        abort("`aux_id` must be an integer vector identifying the auxiliary parameter for each observation in IPD and AgD (arm-based) data.")
+    }
+
+    standat <- purrr::list_modify(standat,
+                                  # AgD arm IDs
+                                  agd_arm_arm = agd_arm_arm,
+
+                                  # Aux IDs
+                                  aux_by = length(aux_id) == ni_ipd + ni_agd_arm*n_int,
+                                  aux_id = aux_id,
+
+                                  # Number of spline coefficients
+                                  n_scoef = n_scoef,
+
+                                  # Add outcomes
+                                  ipd_time = ipd_time,
+                                  ipd_itime = ipd_itime,
+                                  ipd_start_itime = ipd_start_itime,
+                                  ipd_delay_itime = ipd_delay_itime,
+                                  ipd_delayed = ipd_surv$delay_time > 0,
+                                  ipd_status = ipd_surv$status,
+
+                                  agd_arm_time = agd_arm_time,
+                                  agd_arm_itime = agd_arm_itime,
+                                  agd_arm_start_itime = agd_arm_start_itime,
+                                  agd_arm_delay_itime = agd_arm_delay_itime,
+                                  agd_arm_delayed = agd_arm_surv$delay_time > 0,
+                                  agd_arm_status = agd_arm_surv$status,
+
+                                  # Specify link
+                                  link = switch(link, log = 1),
+
+                                  # Add priors for spline coefficients
+                                  !!! prior_standat(prior_aux, "prior_aux",
+                                                    valid = "Dirichlet")
+    )
+
+    # Monitor spline coefficients
+    stanargs <- purrr::list_modify(stanargs,
+                                   object = stanmodels$survival_mspline,
+                                   data = standat,
+                                   pars = c(pars, "scoef"))
+
   } else {
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
   }
 
-  stanfit <- do.call(rstan::sampling, stanargs)
+  # Call sampling, managing warnings for integration checks if required
+  if (n_int > 1 && int_check) {
+    rhat_warn_a <- FALSE
+    bulk_ess_warn_a <- FALSE
+    tail_ess_warn_a <- FALSE
+    stanfit <- withCallingHandlers(do.call(rstan::sampling, stanargs),
+                                   warning = function(w) {
+                                     m <- conditionMessage(w)
+                                     if (grepl("The largest R-hat is", w, fixed = TRUE)) {
+                                       rhat_warn_a <<- TRUE
+                                       rlang::cnd_muffle(w)
+                                     }
+                                     if (grepl("Bulk Effective Sample(s?) Size \\(ESS\\) is too low", w)) {
+                                       bulk_ess_warn_a <<- TRUE
+                                       rlang::cnd_muffle(w)
+                                     }
+                                     if (grepl("Tail Effective Sample(s?) Size \\(ESS\\) is too low", w)) {
+                                       tail_ess_warn_a <<- TRUE
+                                       rlang::cnd_muffle(w)
+                                     }
+                                   })
+
+    # Check Rhat, neff within chains with same n_int
+    if (stanfit@mode == 0) {
+      if (stanfit@sim$chains < nchains) {
+        warn("Cannot check integration error, some chains failed to return samples.")
+      } else if (any(rhat_warn_a, bulk_ess_warn_a, tail_ess_warn_a)) {
+        # Only do these checks if Rhat/ESS warnings are thrown for all chains
+        # combined, since these are only needed to disambiguate between low
+        # iters and low n_int, and computation takes time
+
+        sims <- as.array(stanfit)
+        sims_nint1 <- sims[ , nint_vec == unique(n_int)[1], , drop = FALSE]
+        sims_nint2 <- sims[ , nint_vec == unique(n_int)[2], , drop = FALSE]
+
+        if (rhat_warn_a) {
+          rhat_1 <- apply(sims_nint1, 3, rstan::Rhat)
+          rhat_2 <- apply(sims_nint2, 3, rstan::Rhat)
+          rhat_w <- pmax(rhat_1, rhat_2, na.rm = TRUE)
+          rhat_warn_w <- any(rhat_w > 1.05, na.rm = TRUE)
+
+          # Warnings within chains with same n_int are due to low iter
+          if (rhat_warn_w) {
+            warning("The largest R-hat is ", round(max(rhat_w), digits = 2),
+                    ", indicating chains have not mixed.\n", "Running the chains for more iterations may help. See\n",
+                    "https://mc-stan.org/misc/warnings.html#r-hat",
+                    call. = FALSE)
+          } else {
+            # Otherwise warnings across all chains are low n_int
+            rhat_a <- apply(sims, 3, rstan::Rhat)
+            warn(paste0("The largest R-hat is ", round(max(rhat_a), digits = 2),
+                        ", indicating that integration has not converged.\n",
+                        "Increase the number of integration points `n_int` in add_integration()."),
+                 class = "int_check_rhat")
+          }
+        }
+
+        if (bulk_ess_warn_a) {
+          bulk_ess_1 <- apply(sims_nint1, 3, rstan::ess_bulk)
+          bulk_ess_2 <- apply(sims_nint2, 3, rstan::ess_bulk)
+          bulk_ess_w <- pmin(bulk_ess_1, bulk_ess_2, na.rm = TRUE)
+          bulk_ess_warn_w <- any(bulk_ess_w < 100 * ncol(sims), na.rm = TRUE)
+
+          if (bulk_ess_warn_w) {
+            warning("Bulk Effective Sample Size (ESS) is too low, ",
+                    "indicating posterior means and medians may be unreliable.\n",
+                    "Running the chains for more iterations may help. See\n",
+                    "https://mc-stan.org/misc/warnings.html#bulk-ess",
+                    call. = FALSE)
+          } else {
+            warn(paste0("Bulk Effective Sample Size (ESS) is too low, indicating that integration may not have converged.\n",
+                        "Increase the number of integration points `n_int` in add_integration()."),
+                 class = "int_check_essb")
+          }
+        }
+
+        if (tail_ess_warn_a) {
+          tail_ess_1 <- apply(sims_nint1, 3, rstan::ess_tail)
+          tail_ess_2 <- apply(sims_nint2, 3, rstan::ess_tail)
+          tail_ess_w <- pmin(tail_ess_1, tail_ess_2, na.rm = TRUE)
+          tail_ess_warn_w <- any(tail_ess_w < 100 * ncol(sims), na.rm = TRUE)
+
+          if (tail_ess_warn_w) {
+            warning("Tail Effective Sample Size (ESS) is too low, indicating ",
+                    "posterior variances and tail quantiles may be unreliable.\n",
+                    "Running the chains for more iterations may help. See\n",
+                    "https://mc-stan.org/misc/warnings.html#tail-ess",
+                    call. = FALSE)
+          } else {
+            warn(paste0("Tail Effective Sample Size (ESS) is too low, indicating that integration may not have converged.\n",
+                        "Increase the number of integration points `n_int` in add_integration()."),
+                 class = "int_check_esst")
+          }
+        }
+      }
+    }
+
+  } else {
+    stanfit <- do.call(rstan::sampling, stanargs)
+  }
 
   # Set readable parameter names in the stanfit object
   fnames_oi <- stanfit@sim$fnames_oi
@@ -1449,6 +2065,18 @@ which_RE <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
   return(id)
 }
 
+#' List of valid likelihoods for different outcomes
+#' @noRd
+valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
+                    count = c("binomial", "binomial2"),
+                    rate = "poisson",
+                    continuous = "normal",
+                    ordered = "ordered",
+                    survival = c("exponential", "weibull", "gompertz",
+                                 "exponential-aft", "weibull-aft",
+                                 "lognormal", "loglogistic", "gamma", "gengamma",
+                                 "mspline", "pexp"))
+
 #' Check likelihood function, or provide default value
 #'
 #' @param x likelihood type as string
@@ -1456,12 +2084,6 @@ which_RE <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
 #'
 #' @noRd
 check_likelihood <- function(x, outcome) {
-  valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
-                      count = c("binomial", "binomial2"),
-                      rate = "poisson",
-                      continuous = "normal",
-                      ordered = "ordered")
-
   if (missing(outcome)) valid_lhood <- unlist(valid_lhood)
   else if (!is.na(outcome$ipd)) {
     valid_lhood <- valid_lhood[[outcome$ipd]]
@@ -1503,7 +2125,18 @@ check_link <- function(x, lik) {
                      binomial = c("logit", "probit", "cloglog"),
                      binomial2 = c("logit", "probit", "cloglog"),
                      poisson = "log",
-                     ordered = c("logit", "probit", "cloglog"))[[lik]]
+                     ordered = c("logit", "probit", "cloglog"),
+                     exponential = "log",
+                     weibull = "log",
+                     gompertz = "log",
+                     `exponential-aft` = "log",
+                     `weibull-aft` = "log",
+                     lognormal = "log",
+                     loglogistic = "log",
+                     gamma = "log",
+                     gengamma = "log",
+                     mspline = "log",
+                     pexp = "log")[[lik]]
 
   if (is.null(x)) {
     x <- valid_link[1]
@@ -1567,10 +2200,16 @@ link_fun <- function(x, link = c("identity", "log", "logit", "probit", "cloglog"
 #' @noRd
 get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
                                           "binomial", "binomial2", "poisson",
-                                          "ordered"),
+                                          "ordered",
+                                          "exponential", "weibull", "gompertz",
+                                          "exponential-aft", "weibull-aft",
+                                          "lognormal", "loglogistic", "gamma",
+                                          "gengamma",
+                                          "mspline", "pexp"),
                            link = c("identity", "log", "logit", "probit", "cloglog"),
                            measure = c("relative", "absolute"),
-                           type = c("link", "response")) {
+                           type = c("link", "response",
+                                    "survival", "hazard", "cumhaz", "mean", "median", "quantile", "rmst")) {
 
   likelihood <- rlang::arg_match(likelihood)
   link <- rlang::arg_match(link)
@@ -1637,6 +2276,40 @@ get_scale_name <- function(likelihood = c("normal", "bernoulli", "bernoulli2",
       }
     }
 
+  } else if (likelihood %in% c("exponential", "weibull", "gompertz", "mspline", "pexp")) {
+
+    if (measure == "relative") {
+      if (type == "link") out <- "log Hazard Ratio"
+      else out <- ""
+    } else if (measure == "absolute") {
+      out <- switch(type,
+                    survival = "Survival Probability",
+                    hazard = "Hazard",
+                    cumhaz = "Cumulative Hazard",
+                    mean = "Mean Survival Time",
+                    median = "Median Survival Time",
+                    quantile = "Survival Time",
+                    rmst = "Restricted Mean Survival Time",
+                    link = "Linear Predictor")
+    }
+
+  } else if (likelihood %in% c("exponential-aft", "weibull-aft", "lognormal", "loglogistic", "gamma", "gengamma")) {
+
+    if (measure == "relative") {
+      if (type == "link") out <- "log Survival Time Ratio"
+      else out <- ""
+    } else if (measure == "absolute") {
+      out <- switch(type,
+                    survival = "Survival Probability",
+                    hazard = "Hazard",
+                    cumhaz = "Cumulative Hazard",
+                    mean = "Mean Survival Time",
+                    median = "Median Survival Time",
+                    quantile = "Survival Time",
+                    rmst = "Restricted Mean Survival Time",
+                    link = "Linear Predictor")
+    }
+
   } else {
     out <- ""
   }
@@ -1656,7 +2329,8 @@ get_outcome_variables <- function(x, o_type) {
     rate = c(".r", ".E"),
     count = c(".r", ".n"),
     continuous = c(".y", ".se"),
-    ordered = ".r"
+    ordered = ".r",
+    survival = ".Surv"
   )[[o_type]]
 
   return(
@@ -2031,10 +2705,11 @@ make_nma_model_matrix <- function(nma_formula,
 #' @param data Data frame
 #' @param regression Regression formula or NULL
 #' @param label Label for data source or NULL, used for informative errors
+#' @param keep Additional variables to keep in data
 #'
 #' @return Data frame with required columns
 #' @noRd
-get_model_data_columns <- function(data, regression = NULL, label = NULL) {
+get_model_data_columns <- function(data, regression = NULL, label = NULL, keep = NULL) {
   if (!is.null(label)) label <- paste(" in", label)
   if (!is.null(regression)) {
     regvars <- setdiff(all.vars(regression), c(".trt", ".trtclass", ".study", ".contr", ".omega"))
@@ -2046,10 +2721,14 @@ get_model_data_columns <- function(data, regression = NULL, label = NULL) {
                    " not found", label, ".")
       )
     }
-    out <- dplyr::select(data, dplyr::starts_with("."), !! regvars)
+    out <- dplyr::select(data, dplyr::starts_with("."), !! regvars, !! keep)
   } else {
-    out <- dplyr::select(data, dplyr::starts_with("."))
+    out <- dplyr::select(data, dplyr::starts_with("."), !! keep)
   }
+
+  # Work around dplyr::bind_rows() bug - convert .Surv column to bare matrix if present
+  if (rlang::has_name(out, ".Surv")) out$.Surv <- as.matrix(out$.Surv)
+
   return(out)
 }
 
@@ -2122,6 +2801,34 @@ check_regression_data <- function(formula,
   invisible()
 }
 
+#' Check provided prior distributions
+#'
+#' @param x Input to check. Usually a `nma_prior` object.
+#' @param list_names If `x` can be a named list of priors, the names we expect.
+#'
+#' @noRd
+check_prior <- function(x, list_names) {
+  arg <- rlang::caller_arg(x)
+  if (missing(list_names)) {
+    if (!inherits(x, "nma_prior"))
+      abort(glue::glue("`{arg}` must be a prior distribution, see ?priors."),
+            call = rlang::caller_env())
+  } else {
+    if (any(purrr::map_lgl(x, ~!inherits(., "nma_prior"))))
+      abort(glue::glue("`{arg}` must be a named list of prior distributions, see ?priors.\n",
+                       "Expecting named elements with priors for ",
+                       glue::glue_collapse(list_names, sep = ", ", last = " and ", width = 30), "."),
+            call = rlang::caller_env())
+
+    nm <- setdiff(list_names, names(x))
+    if (length(nm) > 0)
+      abort(glue::glue("`{arg}` must be a named list of prior distributions.\n",
+                       "Missing named elements with priors for ",
+                       glue::glue_collapse(nm, sep = ", ", last = " and ", width = 30), "."),
+            call = rlang::caller_env())
+  }
+}
+
 #' Set prior details for Stan models
 #'
 #' @param x a `nma_prior` object
@@ -2177,6 +2884,62 @@ make_Sigma_block <- function(x) {
   S <- matrix(s_ij, nrow = narm, ncol = narm)
   diag(S) <- s_ii
   return(S)
+}
+
+#' Get survival Surv data in consistent format
+#'
+#' @param x a Surv() object
+#'
+#' @return a list with elements time, start_time (for interval censored),
+#'   delay_time (for delayed entry), and status
+#' @noRd
+get_Surv_data <- function(x) {
+  if (!missing(x) && !is.null(x)) {
+
+    surv_type <- attr(x, "type")
+
+    status <- x[, "status"]
+
+    if (surv_type == "right") {
+      # Right censored
+      time <- x[, "time"]
+      start_time <- delay_time <- rep(0, length(time))
+
+    } else if (surv_type == "left") {
+      # Left censored
+      time <- x[, "time"]
+      start_time <- delay_time <- rep(0, length(time))
+
+      # Make status indicator consistent with other types (i.e. left censored = 2)
+      status[status == 0] <- 2
+
+    } else if (surv_type %in% c("interval", "interval2")) {
+      # Interval censored
+      time <- start_time <- rep(0, length(x))
+
+      # time1 is used unless status = 3 (interval censored)
+      time[status < 3] <- x[status < 3, "time1"]
+      time[status == 3] <- x[status == 3, "time2"]
+      start_time[status == 3] <- x[status == 3, "time1"]
+
+      delay_time <- rep(0, length(time))
+
+    } else if (surv_type == "counting") {
+      # Delayed entry
+      time <- x[, "stop"]
+      delay_time <- x[, "start"]
+      start_time <- rep(0, length(time))
+    }
+
+  } else {
+    time <- start_time <- delay_time <- numeric()
+    status <- integer()
+  }
+
+  return(list(time = time,
+              start_time = start_time,
+              delay_time = delay_time,
+              status = status))
 }
 
 #' Sanitise factor labels
@@ -2246,3 +3009,45 @@ make_data_labels <- function(study, trt, trt_b = NA) {
     ) %>%
     dplyr::pull(.data$label)
 }
+
+#' Get design vector for auxiliary parameters
+#' Currently only used for survival models, to allow the user to specify shapes
+#' that vary by group (e.g. by arm) as well as study
+#'
+#' @param data Data frame
+#' @param by Vector of variables to stratify by (character or bare column names)
+#' @param add_study Add in .study factor, even if not specified?
+#'
+#' @noRd
+get_aux_id <- function(data, by, add_study = TRUE) {
+  grouped <- get_aux_by_data(data = data, by = by, add_study = add_study)
+  dplyr::group_indices(grouped)
+}
+
+#' Get auxiliary parameter labels based on aux_by
+#' @noRd
+get_aux_labels <- function(data, by, add_study = TRUE) {
+  groupdat <- get_aux_by_data(data = data, by = by, add_study = add_study) %>%
+    dplyr::group_data() %>%
+    dplyr::select(-".rows")
+
+  if (ncol(groupdat) == 1) {
+    paste(groupdat[[1]])
+  } else if (rlang::has_name(groupdat, ".study")) {
+    paste0(groupdat$.study, ": ", do.call(paste, c(dplyr::select(groupdat, -".study"), sep = ", ")))
+  } else {
+    do.call(paste, c(groupdat, sep = ", "))
+  }
+}
+
+#' Get auxiliary group data defined by aux_by
+#' @noRd
+get_aux_by_data <- function(data, by, add_study = TRUE) {
+  tryCatch(
+    dplyr::ungroup(data) %>%
+      dplyr::select(if (add_study) ".study" else NULL, !! by) %>%
+      dplyr::group_by_all(),
+    error = function(x) abort("`aux_by` must be a vector of variable names to stratify auxiliary parameters by.", parent = x)
+  )
+}
+

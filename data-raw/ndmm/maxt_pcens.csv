@@ -1,0 +1,11 @@
+study,treatment,max_time,p_cens
+Attal2012,Pbo,48.17390927,0.15
+Attal2012,Len,48.11969815,0.15
+Jackson2019,Pbo,73.33678756,0.02
+Jackson2019,Len,76.49222798,0.02
+McCarthy2012,Pbo,57.4,0.15
+McCarthy2012,Len,70,0.15
+Morgan2012,Pbo,63.36,0.15
+Morgan2012,Thal,64.8,0.15
+Palumbo2014,Pbo,54.526717555,0.05
+Palumbo2014,Len,51,0.05

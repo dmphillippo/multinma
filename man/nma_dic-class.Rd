@@ -12,7 +12,7 @@ The \code{nma_dic} class contains details of the Deviance Information Criterion
 Objects of class \code{nma_dic} have the following components:
 \describe{
 \item{\code{dic}}{The DIC value}
-\item{\code{pd}}{The effective number of parameters}
+\item{\code{pd}, \code{pv}}{The effective number of parameters}
 \item{\code{resdev}}{The total residual deviance}
 \item{\code{pointwise}}{A list of data frames containing the pointwise
 contributions for the IPD and AgD.}

@@ -30,7 +30,12 @@ precompile <- function(vignette,
         if (skip_on_ci) "skip_on_ci()" else "",
         if (skip_on_travis) "skip_on_travis()" else "",
         "",
-        readLines(r_out)
+        readLines(r_out),
+        "",
+        "# Force clean up",
+        "rm(list = ls())",
+        "gc()",
+        ""
       ),
       r_out
     )

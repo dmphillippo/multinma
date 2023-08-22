@@ -2,9 +2,9 @@
 #'
 #' The `nma_data` class contains the data for a NMA in a standard format,
 #' created using the functions [set_ipd()], [set_agd_arm()],
-#' [set_agd_contrast()], or [combine_network()]. The sub-class `mlnmr_data` is
-#' created by the function [add_integration()], and further contains numerical
-#' integration points for the aggregate data.
+#' [set_agd_contrast()], [set_agd_surv()], or [combine_network()]. The sub-class
+#' `mlnmr_data` is created by the function [add_integration()], and further
+#' contains numerical integration points for the aggregate data.
 #'
 #' @rdname nma_data-class
 #' @name nma_data-class
@@ -34,7 +34,8 @@
 #'   \item{`.r`}{event count (discrete)}
 #'   \item{`.n`}{event count denominator (discrete, `agd_arm` only)}
 #'   \item{`.E`}{time at risk (discrete)}
-##'   \item{`.surv`}{event/censoring time, of type `Surv` (time-to-event)}
+#'   \item{`.Surv`}{survival outcome of type [`Surv`] (time-to-event), nested by
+#'   study arm}
 #'   \item{`.sample_size`}{sample size (`agd_*` only)}
 #'   \item{`...`}{other columns (typically covariates) from the original data
 #'   frame}
@@ -58,7 +59,8 @@ NULL
 #' Print `nma_data` objects
 #'
 #' Print details of networks stored as [nma_data] objects, as created by
-#' [set_ipd()], [set_agd_arm()], [set_agd_contrast()], or [combine_network()].
+#' [set_ipd()], [set_agd_arm()], [set_agd_contrast()], [set_agd_surv()], or
+#' [combine_network()].
 #'
 #' @param x `nma_data` object
 #' @param ... other options (not used)
@@ -790,7 +792,7 @@ plot.nma_data <- function(x, ..., layout, circular,
     if (nudge == 0) {
       pos <- ggplot2::position_identity()
     } else {
-      if (circular || layout %in% c("circle", "star")) {
+      if (circular || (rlang::is_string(layout) && layout %in% c("circle", "star"))) {
         pos <- ggplot2::position_nudge(x = nudge * g$data$x,
                                        y = nudge * g$data$y)
       } else {

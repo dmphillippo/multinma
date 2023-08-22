@@ -33,47 +33,45 @@ transformed parameters {
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
-    if (nint > 1) { // -- If integration points are used --
+    if (nint_max > 1) { // -- If integration points are used --
+      vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+          X_agd_arm * beta_tilde + offset_agd_arm :
+          X_agd_arm * beta_tilde;
+
       if (RE) {
-        vector[nint * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
-            X_agd_arm * beta_tilde + offset_agd_arm :
-            X_agd_arm * beta_tilde;
 
         if (link == 1) { // logit link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] + f_delta[which_RE[narm_ipd + i]]);
             else
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]);
           }
         } else if (link == 2) { // probit link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] + f_delta[which_RE[narm_ipd + i]]);
             else
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]);
           }
         } else if (link == 3) { // cloglog link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_cloglog(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_cloglog(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] + f_delta[which_RE[narm_ipd + i]]);
             else
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_cloglog(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_cloglog(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]);
           }
         }
       } else {
         if (link == 1) { // logit link
-          theta_agd_arm_ii = has_offset ?
-            inv_logit(X_agd_arm * beta_tilde + offset_agd_arm) :
-            inv_logit(X_agd_arm * beta_tilde);
+          if (nint == nint_max) theta_agd_arm_ii = inv_logit(eta_agd_arm_noRE);
+          else for (i in 1:ni_agd_arm) theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]);
         } else if (link == 2) { // probit link
-          theta_agd_arm_ii = has_offset ?
-            Phi(X_agd_arm * beta_tilde + offset_agd_arm) :
-            Phi(X_agd_arm * beta_tilde);
+          if (nint == nint_max) theta_agd_arm_ii = Phi(eta_agd_arm_noRE);
+          else for (i in 1:ni_agd_arm) theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]);
         } else if (link == 3) { // cloglog link
-          theta_agd_arm_ii = has_offset ?
-            inv_cloglog(X_agd_arm * beta_tilde + offset_agd_arm) :
-            inv_cloglog(X_agd_arm * beta_tilde);
+          if (nint == nint_max) theta_agd_arm_ii = inv_cloglog(eta_agd_arm_noRE);
+          else for (i in 1:ni_agd_arm) theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = inv_cloglog(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]);
         }
       }
 

@@ -8,4 +8,3 @@
 #'   integers, strings, or factors. By default, no classes are specified.
 #' @param study column of `data` specifying the studies, coded using integers,
 #'   strings, or factors
-#' @param y column of `data` specifying a continuous outcome

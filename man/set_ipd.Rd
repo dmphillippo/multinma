@@ -11,6 +11,7 @@ set_ipd(
   y = NULL,
   r = NULL,
   E = NULL,
+  Surv = NULL,
   trt_ref = NULL,
   trt_class = NULL
 )
@@ -30,6 +31,10 @@ strings, or factors}
 
 \item{E}{column of \code{data} specifying the total time at risk for Poisson
 outcomes}
+
+\item{Surv}{column of \code{data} specifying a survival or time-to-event outcome,
+using the \code{\link[=Surv]{Surv()}} function. Right/left/interval censoring and left
+truncation (delayed entry) are supported.}
 
 \item{trt_ref}{reference treatment for the network, as a single integer,
 string, or factor. If not specified, a reasonable well-connected default

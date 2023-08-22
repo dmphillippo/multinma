@@ -20,10 +20,15 @@ nma(
   prior_het_type = c("sd", "var", "prec"),
   prior_reg = .default(normal(scale = 10)),
   prior_aux = .default(),
+  aux_by = NULL,
   QR = FALSE,
   center = TRUE,
   adapt_delta = NULL,
-  int_thin = max(network$n_int\%/\%10, 1)
+  int_thin = 0,
+  int_check = TRUE,
+  mspline_degree = 3,
+  n_knots = 3,
+  knots = NULL
 )
 }
 \arguments{
@@ -76,7 +81,12 @@ precision \eqn{1/\tau^2} (\code{"prec"}).}
 coefficients (if \code{regression} formula specified)}
 
 \item{prior_aux}{Specification of prior distribution for the auxiliary
-parameter, if applicable (see details)}
+parameter, if applicable (see details). For \code{likelihood = "gengamma"} this
+should be a list of prior distributions with elements \code{sigma} and \code{k}.}
+
+\item{aux_by}{Vector of variable names listing the variables to stratify the
+auxiliary parameters by. Currently only used for survival models, see
+details.}
 
 \item{QR}{Logical scalar (default \code{FALSE}), whether to apply a QR
 decomposition to the model design matrix}
@@ -87,7 +97,34 @@ decomposition to the model design matrix}
 \item{adapt_delta}{See \link{adapt_delta} for details}
 
 \item{int_thin}{A single integer value, the thinning factor for returning
-cumulative estimates of integration error}
+cumulative estimates of integration error. Saving cumulative estimates is
+disabled by \code{int_thin = 0}, which is the default.}
+
+\item{int_check}{Logical, check sufficient accuracy of numerical integration
+by fitting half of the chains with \code{n_int/2}? When \code{TRUE}, \code{Rhat} and
+\code{n_eff} diagnostic warnings will be given if numerical integration has not
+sufficiently converged (suggesting increasing \code{n_int} in
+\code{\link[=add_integration]{add_integration()}}). Default \code{TRUE}, but disabled (\code{FALSE}) when
+\code{int_thin > 0}.}
+
+\item{mspline_degree}{Non-negative integer giving the degree of the M-spline
+polynomial for \code{likelihood = "mspline"}. Piecewise exponential hazards
+(\code{likelihood = "pexp"}) are a special case with \code{mspline_degree = 0}.}
+
+\item{n_knots}{For \code{mspline} and \code{pexp} likelihoods, a non-negative integer
+giving the number of internal knots for partitioning the baseline hazard
+into intervals. The knot locations within each study will be determined by
+the corresponding quantiles of the observed event times, plus boundary
+knots at the earliest entry time (0 with no delayed entry) and the maximum
+event/censoring time. For example, with the default \code{n_knots = 3}, the
+internal knot locations will be at the 25\%, 50\%, and 75\% quantiles of the
+observed event times. Ignored when \code{knots} is specified.}
+
+\item{knots}{For \code{mspline} and \code{pexp} likelihoods, a named list of numeric
+vectors of internal knot locations for each of the studies in the network.
+Currently, each vector must have the same length (i.e. each study must use
+the same number of knots). If unspecified (the default), the knots will be
+chosen based on \code{n_knots} as described above.}
 }
 \value{
 \code{nma()} returns a \link{stan_nma} object, except when \code{consistency = "nodesplit"} when a \link{nma_nodesplit} or \link{nma_nodesplit_df} object is
@@ -133,6 +170,7 @@ each data type:\tabular{lll}{
    \strong{Rate} \tab \code{poisson} \tab \code{log} \cr
    \strong{Continuous} \tab \code{normal} \tab \code{identity}, \code{log} \cr
    \strong{Ordered} \tab \code{ordered} \tab \code{logit}, \code{probit}, \code{cloglog} \cr
+   \strong{Survival} \tab \code{exponential}, \code{weibull}, \code{gompertz}, \code{exponential-aft}, \code{weibull-aft}, \code{lognormal}, \code{loglogistic}, \code{gamma}, \code{gengamma}, \code{mspline}, \code{pexp} \tab \code{log} \cr
 }
 
 
@@ -145,6 +183,15 @@ distribution \insertCite{@see @methods_paper}{multinma}.
 When a \code{cloglog} link is used, including an offset for log follow-up time
 (i.e. \code{regression = ~offset(log(time))}) results in a model on the log
 hazard \insertCite{@see @TSD2}{multinma}.
+
+For survival data, all accelerated failure time models (\code{exponential-aft},
+\code{weibull-aft}, \code{lognormal}, \code{loglogistic}, \code{gamma}, \code{gengamma}) are
+parameterised so that the treatment effects and any regression parameters
+are log Survival Time Ratios (i.e. a coefficient of \eqn{\log(2)} means
+that the treatment or covariate is associated with a doubling of expected
+survival time). These can be converted to log Acceleration Factors using
+the relation \eqn{\log(\mathrm{AF}) = -\log(\mathrm{STR})} (or equivalently
+\eqn{\mathrm{AF} = 1/\mathrm{STR}}).
 
 Further details on each likelihood and link function are given by
 \insertCite{TSD2;textual}{multinma}.
@@ -169,6 +216,44 @@ are the latent cutoffs between each category, \eqn{c_0 < c_1 < \dots <
 these latent cutoffs, we choose to specify priors on the \emph{differences}
 \eqn{c_{m+1} - c_m}. Stan automatically truncates any priors so that the
 ordering constraints are satisfied.
+}
+
+\subsection{Survival (time-to-event) likelihoods}{
+
+All survival likelihoods except the \code{exponential} and \code{exponential-aft}
+likelihoods have auxiliary parameters. These are typically study-specific
+shape parameters \eqn{\gamma_j>0}, except for the \code{lognormal} likelihood
+where the auxiliary parameters are study-specific standard deviations on
+the log scale \eqn{\sigma_j>0}.
+
+The \code{gengamma} likelihood has two sets of auxiliary parameters,
+study-specific scale parameters \eqn{\sigma_j>0} and shape parameters
+\eqn{k_j}, following the parameterisation of
+\insertCite{Lawless1980;textual}{multinma}, which permits a range of
+behaviours for the baseline hazard including increasing, decreasing,
+bathtub and arc-shaped hazards. This parameterisation is related to that
+discussed by \insertCite{Cox2007;textual}{multinma} and implemented in the
+\code{flexsurv} package with \eqn{Q = k^{-0.5}}. The parameterisation used here
+effectively bounds the shape parameter \eqn{k} away from numerical
+instabilities as \eqn{k \rightarrow \infty} (i.e. away from \eqn{Q
+  \rightarrow 0}, the log-Normal distribution) via the prior distribution.
+Implicitly, this parameterisation is restricted to \eqn{Q > 0} and so
+certain survival distributions like the inverse-Gamma and inverse-Weibull
+are not part of the parameter space; however, \eqn{Q > 0} still encompasses
+the other survival distributions implemented in this package.
+
+For the \code{mspline} and \code{pexp} likelihoods, the auxiliary parameters are the
+spline coefficients for each study. These form a unit simplex (i.e. lie
+between 0 and 1, and sum to 1), and are given a \code{\link[=dirichlet]{dirichlet()}} prior
+distribution.
+
+The auxiliary parameters can be stratified by additional factors through
+the \code{aux_by} argument. For example, to allow the shape of the baseline
+hazard to vary between treatment arms as well as studies, use \code{aux_by = c(".study", ".trt")}. (Technically, \code{.study} is always included in the
+stratification even if omitted from \code{aux_by}, but we choose here to make
+the stratification explicit.) This is a common way of relaxing the
+proportional hazards assumption. The default is equivalent to \code{aux_by = ".study"} which stratifies the auxiliary parameters by study, as described
+above.
 }
 }
 
@@ -306,7 +391,7 @@ pso_net <- add_integration(pso_net,
   bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
   weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
   psa = distr(qbern, prob = psa),
-  n_int = 1000)
+  n_int = 64)
 
 \donttest{
 # Fitting a ML-NMR model.

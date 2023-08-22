@@ -4,10 +4,14 @@
 \alias{dic}
 \title{Deviance Information Criterion (DIC)}
 \usage{
-dic(x, ...)
+dic(x, penalty = c("pD", "pV"), ...)
 }
 \arguments{
 \item{x}{A fitted model object, inheriting class \link{stan_nma}}
+
+\item{penalty}{The method for estimating the effective number of parameters,
+used to penalise model fit in the DIC. Either \code{"pD"} (the default), or
+\code{"pV"}. For survival likelihoods only \code{"pV"} is currently available.}
 
 \item{...}{Other arguments (not used)}
 }
