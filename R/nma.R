@@ -951,6 +951,7 @@ nma <- function(network,
 
 # Creating design Vector for class effects
   # Ensure classes are factors
+if (class_effects != "independant") {
   network$classes <- as.factor(network$classes)
 
   # Convert the treatment classes into integers
@@ -960,7 +961,7 @@ nma <- function(network,
   int_counts <- table(CE_vector)
   unique_integers <- as.integer(names(int_counts[int_counts == 1]))
   CE_vector[ CE_vector %in% unique_integers ] <- 0
-
+}
   # Fit using nma.fit
   stanfit <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
     agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
