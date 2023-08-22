@@ -142,10 +142,16 @@
     <loc>https://dmphillippo.github.io/multinma/dev/reference/mcmc_array-class.html</loc>
   </url>
   <url>
+    <loc>https://dmphillippo.github.io/multinma/dev/reference/mspline.html</loc>
+  </url>
+  <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/multi.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/multinma-package.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/dev/reference/ndmm.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/nma.html</loc>
@@ -226,6 +232,9 @@
     <loc>https://dmphillippo.github.io/multinma/dev/reference/random_effects.html</loc>
   </url>
   <url>
+    <loc>https://dmphillippo.github.io/multinma/dev/reference/reexports.html</loc>
+  </url>
+  <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/relative_effects.html</loc>
   </url>
   <url>
@@ -233,6 +242,9 @@
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/set_agd_contrast.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/dev/reference/set_agd_surv.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/dev/reference/set_ipd.html</loc>
