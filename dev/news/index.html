@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,6 +87,7 @@
 <div class="section level3">
 <h3 id="other-updates-0-5-1-9000">Other updates<a class="anchor" aria-label="anchor" href="#other-updates-0-5-1-9000"></a></h3>
 <ul><li>Feature: <code><a href="../reference/dic.html">dic()</a></code> now includes an option to use the pV penalty instead of pD.</li>
+<li>Feature: The <code>baseline</code> and <code>aux</code> arguments to <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> can now be specified as the name of a study in the network, to use the parameter estimates from that study for prediction.</li>
 <li>Improvement: <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> will now produce aggregate-level predictions over a sample of individuals in <code>newdata</code> for ML-NMR models (previously <code>newdata</code> had to include integration points).</li>
 <li>Fix: In <code><a href="../reference/plot.nma_data.html">plot.nma_data()</a></code>, using a custom <code>layout</code> that is not a string (e.g.  a data frame of layout coordinates) now works as expected when <code>nudge &gt; 0</code>.</li>
 </ul></div>
