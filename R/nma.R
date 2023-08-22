@@ -949,19 +949,17 @@ nma <- function(network,
     aux_id <- integer()
   }
 
-  # 1. Ensure classes are factors
+# Creating design Vector for class effects
+  # Ensure classes are factors
   network$classes <- as.factor(network$classes)
 
-  # 2. Convert factors to numeric/dummy variables
-  class_effects_matrix <- model.matrix(~ network$classes - 1) # -1 to drop the intercept
+  # Convert the treatment classes into integers
+  CE_vector <- as.integer(as.factor(network$classes))
 
-  # 3. Create design matrix based on class effects
-  design_matrix <- ifelse(network$class_effects != "independent", class_effects_matrix, 0)
-
-  # 4. Collapse class SDs based on the `class_sd` list
-  class_sd <- forcats::fct_collapse(network$classes, !!!class_sd)
-  class_sd_matrix <- model.matrix(~ class_sd - 1)
-
+  # Identify unique integers and relabel them as zero
+  int_counts <- table(CE_vector)
+  unique_integers <- as.integer(names(int_counts[int_counts == 1]))
+  CE_vector[ CE_vector %in% unique_integers ] <- 0
 
   # Fit using nma.fit
   stanfit <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
