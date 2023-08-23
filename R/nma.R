@@ -962,6 +962,9 @@ if (class_effects != "independant") {
   unique_integers <- as.integer(names(int_counts[int_counts == 1]))
   CE_vector[ CE_vector %in% unique_integers ] <- 0
 }
+  # Rank the non-zero numbers and keep zeros as is
+  CE_vector <- ifelse(CE_vector != 0, match(CE_vector, unique(CE_vector))-1, CE_vector)
+
   # Fit using nma.fit
   stanfit <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
     agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
