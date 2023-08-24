@@ -234,7 +234,7 @@ nma <- function(network,
                 regression = NULL,
                 class_interactions = c("common", "exchangeable", "independent"),
                 class_effects = c("independent","common", "exchangeable"),
-                class_sd =  c("independent", "common"),
+                class_sd = list(),
                 likelihood = NULL,
                 link = NULL,
                 ...,
@@ -257,6 +257,7 @@ nma <- function(network,
                 n_knots = 3,
                 knots = NULL) {
 
+
   # Check network
   if (!inherits(network, "nma_data")) {
     abort("Expecting an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
@@ -273,6 +274,18 @@ nma <- function(network,
   if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
   class_effects <- rlang::arg_match(class_effects)
   if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
+
+  # 'classes' is a vector of class names within 'network'
+  classes <- network$classes
+
+  # Set default values for all classes as "independent"
+  class_sd_values <- rep("independent", length(classes))
+  names(class_sd_values) <- classes
+
+  # Update the values for classes specified in the 'class_sd' list
+  for (class_name in names(class_sd)) {
+    class_sd_values[class_name] <- class_sd[[class_name]]
+  }
 
   # Check class_sd
   if (is.list(class_sd)) {
@@ -952,7 +965,7 @@ nma <- function(network,
 # Creating design Vector for class effects
   # Ensure classes are factors
 if (class_effects != "independant") {
-
+  which_class(network)
 }
 
   # Create class_effects_sd design vectors
