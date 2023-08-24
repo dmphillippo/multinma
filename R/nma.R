@@ -952,18 +952,7 @@ nma <- function(network,
 # Creating design Vector for class effects
   # Ensure classes are factors
 if (class_effects != "independant") {
-  network$classes <- as.factor(network$classes)
 
-  # Convert the treatment classes into integers
-  CE_vector <- as.integer(as.factor(network$classes))
-
-  # Identify unique integers and relabel them as zero
-  int_counts <- table(CE_vector)
-  unique_integers <- as.integer(names(int_counts[int_counts == 1]))
-  CE_vector[ CE_vector %in% unique_integers ] <- 0
-
-  # Rank the non-zero numbers and keep zeros as is
-  CE_vector <- ifelse(CE_vector != 0, match(CE_vector, unique(CE_vector))-1, CE_vector)
 }
 
   # Create class_effects_sd design vectors
@@ -2177,6 +2166,25 @@ valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
                                  "exponential-aft", "weibull-aft",
                                  "lognormal", "loglogistic", "gamma", "gengamma",
                                  "mspline", "pexp"))
+
+
+#' @rdname class_effects
+#' @aliases which_class
+#' @export
+#' @examples
+#'
+
+which_class <- function(network) {
+  classes <- network$classes
+  class_tab <- table(classes)
+  solo_classes <- classes %in% names(class_tab[class_tab == 1])
+  CE_vector <- as.integer(classes)
+  CE_vector[solo_classes] <- 0
+  CE_vector[!solo_classes] <- match(classes[!solo_classes], unique(classes[!solo_classes]))
+
+  return(CE_vector)
+}
+
 
 #' Check likelihood function, or provide default value
 #'
