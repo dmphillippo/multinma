@@ -949,13 +949,15 @@ if (class_effects != "independant") {
 }
 
   # Create class_effects_sd design vectors
-if (class_effects != "independant") {
+  if (is.list(class_sd)) {
+    CEsd_vector <- which_class(forcats::fct_collapse(network$classes, !!! class_sd))
+  } else {
   if (class_sd == "common") {
-    CEsd_vector <- rep(1, length(CE_vector))}
+    CEsd_vector <- CE_vector # Copy the original vector
+    CEsd_vector[CEsd_vector != 0] <- 1}
   if (class_sd == "independant") {
     CEsd_vector <- CE_vector}
-}
-
+    }
 
   # Fit using nma.fit
   stanfit <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
