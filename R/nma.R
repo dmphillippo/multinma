@@ -234,7 +234,7 @@ nma <- function(network,
                 regression = NULL,
                 class_interactions = c("common", "exchangeable", "independent"),
                 class_effects = c("independent","common", "exchangeable"),
-                class_sd = list(),
+                class_sd =  c("independent", "common"),
                 likelihood = NULL,
                 link = NULL,
                 ...,
@@ -275,37 +275,17 @@ nma <- function(network,
   class_effects <- rlang::arg_match(class_effects)
   if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
 
-  # 'classes' is a vector of class names within 'network'
-  classes <- network$classes
-
-  # Set default values for all classes as "independent"
-  class_sd_values <- rep("independent", length(classes))
-  names(class_sd_values) <- classes
-
-  # Update the values for classes specified in the 'class_sd' list
-  for (class_name in names(class_sd)) {
-    class_sd_values[class_name] <- class_sd[[class_name]]
-  }
-
   # Check class_sd
   if (is.list(class_sd)) {
-    # Check if all elements of the list are vectors
-    if (!all(purrr::map_lgl(class_sd, is.vector))) {
-      abort("`class_sd` list elements should be vectors.")
+    # Check that all classes listed in 'class_sd' are in 'network$classes'
+    if (!all(purrr::list_flatten(class_sd) %in% network$classes)) {
+      stop("Some classes listed in 'class_sd' are not found in 'network$classes'")
     }
 
-    # Get the network classes
-    network_classes <- levels(network$classes)
-
-    # Check that all elements in the vectors match classes in the network
-    if (!all(purrr::map_lgl(class_sd, function(x) all(x %in% network_classes)))) {
-      abort("All elements in the `class_sd` vectors should match classes in the network.")
-    }
-
-    # Check that there are no repetitions between vectors
-    flattened_class_sd <- unlist(class_sd)
-    if (length(flattened_class_sd) != length(unique(flattened_class_sd))) {
-      abort("There should be no repetitions between vectors in `class_sd`.")
+    # Check that all the collapsed classes are distinct and don't share a class
+    flattened_classes <- purrr::list_flatten(class_sd)
+    if (length(flattened_classes) != length(unique(flattened_classes))) {
+      stop("Some classes are listed in more than one shared standard deviation group in 'class_sd'")
     }
   } else {
     class_sd <- rlang::arg_match(class_sd)
@@ -970,9 +950,9 @@ if (class_effects != "independant") {
 
   # Create class_effects_sd design vectors
 if (class_effects != "independant") {
-  if (class_sd = "common") {
+  if (class_sd == "common") {
     CEsd_vector <- rep(1, length(CE_vector))}
-  if (class_sd = "independant") {
+  if (class_sd == "independant") {
     CEsd_vector <- CE_vector}
 }
 
