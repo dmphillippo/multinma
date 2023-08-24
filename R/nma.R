@@ -961,9 +961,19 @@ if (class_effects != "independant") {
   int_counts <- table(CE_vector)
   unique_integers <- as.integer(names(int_counts[int_counts == 1]))
   CE_vector[ CE_vector %in% unique_integers ] <- 0
-}
+
   # Rank the non-zero numbers and keep zeros as is
   CE_vector <- ifelse(CE_vector != 0, match(CE_vector, unique(CE_vector))-1, CE_vector)
+}
+
+  # Create class_effects_sd design vectors
+if (class_effects != "independant") {
+  if (class_sd = "common") {
+    CEsd_vector <- rep(1, length(CE_vector))}
+  if (class_sd = "independant") {
+    CEsd_vector <- CE_vector}
+}
+
 
   # Fit using nma.fit
   stanfit <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
@@ -1307,6 +1317,8 @@ nma.fit <- function(ipd_x, ipd_y,
     if (likelihood == "gengamma") check_prior(prior_aux, c("sigma", "k"))
     else check_prior(prior_aux)
   }
+  check_prior(prior_class_mean)
+  check_prior(prior_class_sd)
 
   prior_het_type <- rlang::arg_match(prior_het_type)
 
