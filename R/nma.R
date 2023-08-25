@@ -945,7 +945,7 @@ nma <- function(network,
 # Creating design Vector for class effects
   # Ensure classes are factors
 if (class_effects != "independant") {
-  which_class(network)
+  which_class(network$classes) -> CE_vector
 }
 
   # Create class_effects_sd design vectors
@@ -1182,6 +1182,9 @@ nma.fit <- function(ipd_x, ipd_y,
                     trt_effects = c("fixed", "random"),
                     RE_cor = NULL,
                     which_RE = NULL,
+                    class_effects = c("independent", "exchangeable", "common"),
+                    CE_vector = NULL,
+                    CEsd_vector = NULL,
                     likelihood = NULL,
                     link = NULL,
                     consistency = c("consistency", "ume", "nodesplit"),
@@ -1192,6 +1195,8 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_het_type = c("sd", "var", "prec"),
                     prior_reg,
                     prior_aux,
+                    prior_class_mean,
+                    prior_class_sd,
                     aux_id = integer(),
                     QR = FALSE,
                     adapt_delta = NULL,
@@ -1291,6 +1296,10 @@ nma.fit <- function(ipd_x, ipd_y,
   trt_effects <- rlang::arg_match(trt_effects)
   if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
 
+  # Check class effect arguments
+  class_effects <- rlang::arg_match(class_effects)
+  if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
+
   likelihood <- check_likelihood(likelihood)
   link <- check_link(link, likelihood)
 
@@ -1306,9 +1315,10 @@ nma.fit <- function(ipd_x, ipd_y,
     if (likelihood == "gengamma") check_prior(prior_aux, c("sigma", "k"))
     else check_prior(prior_aux)
   }
+  if (class_effects != "independent"){
   check_prior(prior_class_mean)
   check_prior(prior_class_sd)
-
+}
   prior_het_type <- rlang::arg_match(prior_het_type)
 
   # Dummy RE prior for FE model, not used but requested by Stan data
@@ -2169,8 +2179,7 @@ valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
 #' @examples
 #'
 
-which_class <- function(network) {
-  classes <- network$classes
+which_class <- function(classes) {
   class_tab <- table(classes)
   solo_classes <- classes %in% names(class_tab[class_tab == 1])
   CE_vector <- as.integer(classes)
