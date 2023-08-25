@@ -1,0 +1,479 @@
+---
+title: "Example: Newly diagnosed multiple myeloma"
+output: rmarkdown::html_vignette
+link-citations: yes
+bibliography: ../inst/REFERENCES.bib
+params:
+  run_tests: FALSE
+---
+
+```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
+```
+
+```{r setup}
+library(multinma)
+library(survival)
+library(dplyr)
+library(ggplot2)
+library(patchwork)
+library(loo)
+```
+```{r, eval = FALSE}
+options(mc.cores = parallel::detectCores())
+```
+```{r, echo = FALSE}
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
+             "true" =, "warn" = 2,
+             parallel::detectCores())
+options(mc.cores = nc)
+```
+
+@Leahy2019 present a network of five trials comparing lenalidomide and thalidomide to placebo for newly diagnosed multiple myeloma (NDMM) after autologous stem cell transplant (ASCT).
+The outcome of interest is progression free survival (PFS).
+Simulated individual patient data (IPD) from three trials are found in the data set `ndmm_ipd`.
+These include outcome times, censoring indicators, and covariates for each individual:
+```{r}
+head(ndmm_ipd)
+```
+
+Aggregate data (AgD) consisting of reconstructed event/censoring times from digitized Kaplan-Meier curves and covariate summaries are available on a further two trials, found in the data sets `ndmm_agd` and `ndmm_agd_covs`.
+```{r}
+head(ndmm_agd)
+
+ndmm_agd_covs
+```
+
+@Phillippo_survival analysed these data using multilevel network meta-regression (ML-NMR), and we recreate these analyses here.
+
+# Study data
+First, let us look at Kaplan-Meier plots of the data from each study:
+```{r ndmm-km-data}
+kmdat <- bind_rows(ndmm_ipd, ndmm_agd) %>%
+  group_by(studyf, trtf) %>%
+  # KM estimate within each study
+  group_modify(~with(survfit(Surv(eventtime, event = status) ~ 1, data = .),
+                     tibble(time, n.censor, estimate = surv, std.err, upper, lower))) %>%
+  # Add S(0) = 1
+  group_modify(~add_row(., time = 0, n.censor = 0, estimate = 1, std.err = 0, upper = 1, lower = 1, .before = 0)) %>%
+  arrange(studyf, trtf, time)
+
+ggplot(kmdat, aes(x = time, y = estimate, colour = trtf)) +
+  geom_step() +
+  geom_point(shape = 3, data = function(x) filter(x, n.censor >= 1)) +
+  facet_wrap(~studyf) +
+  labs(y = "Survival probability", x = "Time") +
+  coord_cartesian(ylim = c(0, 1)) +
+  theme_multinma() +
+  theme(legend.position = "top", legend.box.spacing = unit(0, "lines"))
+```
+
+We consider adjustment for the following covariates:
+
+ * Age
+ * Sex
+ * ISS stage, I-II vs. III
+ * Response post-ASCT, complete or very good partial response vs. lesser response
+
+The summary distributions of these characteristics in each study are as follows:
+```{r}
+bind_rows(
+  summarise(ndmm_ipd,
+            N = n(),
+            age_mean = mean(age), age_sd = sd(age),
+            iss_stage3 = mean(iss_stage3),
+            response_cr_vgpr = mean(response_cr_vgpr),
+            male = mean(male),
+            .by = c(studyf, trtf)),
+  transmute(ndmm_agd_covs,
+            studyf, trtf,
+            N = sample_size,
+            age_mean, age_sd, iss_stage3, response_cr_vgpr, male)
+) %>%
+  mutate(across(where(is.double), ~round(., digits = 2)))
+```
+
+# Setup
+## Preparing treatment classes
+We start by setting up the network for the analysis.
+Since we only have IPD on the placebo vs. lenalidomide comparison, and only one AgD study on the placebo vs. thalidomide comparison, we make the shared effect modifier assumption between the two active treatments in order to estimate the effect modifying treatment-covariate interactions for thalidomide [@TSD18,@methods_paper].
+Since lenalidomide and thalidomide are both in the same class of treatments, this assumption may be reasonable.
+
+To impose this assumption, we create a treatment class variable for active treatments vs. placebo.
+```{r}
+ndmm_ipd$trtclass <- case_match(ndmm_ipd$trtf,
+                                "Pbo" ~ "Placebo",
+                                c("Len", "Thal") ~ "Active")
+
+ndmm_agd$trtclass <- case_match(ndmm_agd$trtf,
+                                "Pbo" ~ "Placebo",
+                                c("Len", "Thal") ~ "Active")
+```
+
+
+## Setting up the network
+We then set up the network using the `set_ipd()`, `set_agd_surv()`, and `combine_network()` functions.
+Since we have survival data in the form of event/censoring times and censoring indicators, we use the `Surv` argument to the `set_*()` functions to set up the outcome data using the usual `survival::Surv()` function.
+The AgD are set up in a similar fashion to the IPD, except that we only have summary covariate information (in the data frame `ndmm_agd_covs`) which is included using the `covariates` argument.
+The data frame passed to `covariates` must have matching study and treatment columns to the outcome data set (`ndmm_agd`), in this case `studyf` and `trtf` respectively, one row per arm, so that the covariate information can be matched to the corresponding arms in the outcome data.
+The IPD and AgD are then combined into a single network using `combine_network()`.
+```{r}
+ndmm_net <- combine_network(
+  set_ipd(ndmm_ipd,
+          study = studyf,
+          trt = trtf,
+          trt_class = trtclass,
+          Surv = Surv(eventtime, status)),
+  set_agd_surv(ndmm_agd,
+               study = studyf,
+               trt = trtf,
+               trt_class = trtclass,
+               Surv = Surv(eventtime, status),
+               covariates = ndmm_agd_covs)
+)
+```
+
+## Adding numerical integration for ML-NMR
+To perform ML-NMR, we need to create numerical integration points for the joint covariate distributions in each AgD study.
+These are used to integrate (i.e. average) the individual-level model over the joint covariate distribution to form the aggregate-level model.
+This is done using the `add_integration()` function, and for each covariate we specify the marginal distribution using the `distr()` function.
+Since age is skewed, we use a gamma distribution for this covariate; the remaining covariates are all binary and so are given Bernoulli distributions.
+This procedure also requires information on the correlations between covariates.
+If known, these can be specified using the `cor` argument.
+However, by default the weighted average correlations from the IPD studies will be used.
+```{r}
+ndmm_net <- add_integration(ndmm_net,
+                            age = distr(qgamma, mean = age_mean, sd = age_sd),
+                            iss_stage3 = distr(qbern, iss_stage3),
+                            response_cr_vgpr = distr(qbern, response_cr_vgpr),
+                            male = distr(qbern, male))
+
+ndmm_net
+```
+
+## Network plot
+We can plot the network diagram using the `plot()` method.
+```{r ndmm-network}
+plot(ndmm_net,
+    weight_nodes = TRUE,
+    weight_edges = TRUE,
+    # Nudge treatment labels away from nodes
+    nudge = 0.1,
+    # Manual layout
+    layout = data.frame(x = c(0, -1, 1),
+                        y = c(-0.5, 0, 0))) +
+  guides(edge_colour = guide_legend(override.aes = list(edge_width = 2))) +
+  theme(legend.position = "bottom", legend.direction = "vertical")
+```
+
+# ML-NMR models with M-spline baseline hazards
+We fit a proportional hazards survival model with cubic M-splines on the baseline hazard [@Brilleman2020,@Phillippo_survival].
+This allows the baseline hazard to flexibly follow any shape that the baseline hazard may take.
+
+## Choosing the number of knots
+ML-NMR models are fit using the `nma()` function, and we specify that a M-spline baseline hazard should be used with `likelihood = "mspline"`.
+
+Fitting spline models requires the user to specify the number and location of the knots.
+By default, three internal knots are used (`n_knots = 3`) which are placed at evenly spaced quantiles on the observed event times within each study (i.e. at the 25%, 50%, and 75% quantiles with 3 internal knots).
+The number of knots can be changed using the `n_knots` argument, or custom knot locations can be specified using the `knots` argument.
+The `nma()` function will always place boundary knots at the earliest entry time into the study (0 with no delayed entry) and at the maximum event/censoring time.
+
+By default, the `nma()` function will fit a cubic M-spline (`mspline_degree = 3`).
+Piecewise-constant hazards (i.e. piecewise exponential hazards) are a special case with degree 0 splines, specified using `likelihood = "pexp"` (which is equivalent to `mspline_degree = 0`).
+
+We specify a regression model using the `regression` argument which includes main effects of covariates (prognostic effects)  and treatment-covariate interactions (effect modifier interactions) for each covariate.
+We place vague $\operatorname{N}(0, 100^2)$ priors on each of the parameters in the linear predictor, and a $\operatorname{Dirichlet}(1)$ prior distribution for the spline coefficients which is uniform over the unit simplex.
+Using the QR decomposition (`QR = TRUE`) can greatly increase sampling efficiency for regression models, and we also reduce the `max_treedepth` of the Stan sampler to speed up warm-up time.
+
+We fit models with 1, 2, and 3 internal knots, and we will then choose the number of knots using the leave-one-out information criterion (LOOIC).
+
+```{r}
+ndmm_fit_1kt <- nma(ndmm_net,
+                    regression = ~(age + iss_stage3 + response_cr_vgpr + male)*.trt,
+                    likelihood = "mspline",
+                    n_knots = 1,
+                    prior_intercept = normal(0, 100),
+                    prior_trt = normal(0, 100),
+                    prior_reg = normal(0, 100),
+                    prior_aux = dirichlet(1),
+                    QR = TRUE,
+                    # Reducing max_treedepth can speed up warm-up, but
+                    # increase if max_treedepth errors occur
+                    control = list(max_treedepth = 6))
+
+ndmm_fit_1kt
+
+ndmm_fit_2kt <- nma(ndmm_net,
+                    regression = ~(age + iss_stage3 + response_cr_vgpr + male)*.trt,
+                    likelihood = "mspline",
+                    n_knots = 2,
+                    prior_intercept = normal(0, 100),
+                    prior_trt = normal(0, 100),
+                    prior_reg = normal(0, 100),
+                    prior_aux = dirichlet(1),
+                    QR = TRUE,
+                    # Reducing max_treedepth can speed up warm-up, but
+                    # increase if max_treedepth errors occur
+                    control = list(max_treedepth = 6))
+
+ndmm_fit_2kt
+
+ndmm_fit_3kt <- nma(ndmm_net,
+                    regression = ~(age + iss_stage3 + response_cr_vgpr + male)*.trt,
+                    likelihood = "mspline",
+                    n_knots = 3,
+                    prior_intercept = normal(0, 100),
+                    prior_trt = normal(0, 100),
+                    prior_reg = normal(0, 100),
+                    prior_aux = dirichlet(1),
+                    QR = TRUE,
+                    # Reducing max_treedepth can speed up warm-up, but
+                    # increase if max_treedepth errors occur
+                    control = list(max_treedepth = 6))
+
+ndmm_fit_3kt
+```
+
+We then compare the LOOIC, using the `loo` package.
+```{r}
+(ndmm_fit_1kt_loo <- loo(ndmm_fit_1kt))
+
+(ndmm_fit_2kt_loo <- loo(ndmm_fit_2kt))
+
+(ndmm_fit_3kt_loo <- loo(ndmm_fit_3kt))
+
+loo_compare(list("1 knot" = ndmm_fit_1kt_loo,
+                 "2 knots" = ndmm_fit_2kt_loo,
+                 "3 knots" = ndmm_fit_3kt_loo))
+```
+
+The model with a single internal knot at the median uncensored survival time has the lowest LOOIC (highest ELPD).
+Increasing the number of knots does not improve overall model fit in this case.
+
+It is also important to check the model fit within each study, to check that no single study has a better fit with a larger number of knots which could be washed out by the increased model complexity in other studies.
+```{r}
+studies_all <- c(ndmm_ipd$study, ndmm_agd$study)
+cbind(
+  `1 knot` = by(ndmm_fit_1kt_loo$pointwise[, "looic"], studies_all, sum),
+  `2 knots` = by(ndmm_fit_2kt_loo$pointwise[, "looic"], studies_all, sum),
+  `3 knots` = by(ndmm_fit_3kt_loo$pointwise[, "looic"], studies_all, sum)
+)
+```
+
+We conclude that 1 knot is sufficient for all studies.
+
+
+## Ploting hazards
+Let us look at the estimated hazard functions under each model with increasing numbers of knots.
+
+By default, the `predict()` function with `type = "hazard"` will produce plots of the population-average marginal hazards (`level = "aggregate"`, which is the default).
+These can then be plotted using the `plot()` function.
+We combine the plots into one grid using the `patchwork` package.
+```{r marginal-hazards, fig.height=6}
+mhp1 <- plot(predict(ndmm_fit_1kt, type = "hazard", level = "aggregate"))
+
+mhp2 <- plot(predict(ndmm_fit_2kt, type = "hazard", level = "aggregate"))
+
+mhp3 <- plot(predict(ndmm_fit_3kt, type = "hazard", level = "aggregate"))
+
+# Combining these into a single plot using patchwork
+mhp1 + facet_grid(rows = vars("1 knot"), cols = vars(Study)) +
+  mhp2 + facet_grid(rows = vars("2 knots"), cols = vars(Study)) +
+  mhp3 + facet_grid(rows = vars("3 knots"), cols = vars(Study)) +
+  plot_layout(ncol = 1, guides = "collect") &
+  theme(legend.position = "top", legend.box.spacing = unit(0, "lines"))
+```
+
+We see that with increasing numbers of knots the marginal hazards become increasingly "wiggly", which in this case is overfitting.
+
+We can also look at the individual-level baseline hazards.
+This is again possible using the `predict()` function, this time with `level = "individual"`.
+Since we want to show the baseline hazard for the reference level of the covariates, we'll create a data frame to pass to `predict()` as `newdata`.
+```{r}
+refdat <- tibble(study = ndmm_net$studies,
+                 age = ndmm_fit_1kt$xbar["age"],
+                 iss_stage3 = 0,
+                 response_cr_vgpr = 0,
+                 male = 0)
+```
+
+Since we are providing a new data frame for prediction, we also need to provide the times to predict at and the distributions of the baseline (intercept) and auxiliary (spline coefficient) parameters.
+We will predict at evenly spaced times between time 0 and the last event/censoring time in each study.
+We specify a named list of the study names for both `baseline` and `aux`, to use the posterior distributions from each study for these parameters.
+```{r}
+# At evenly spaced times between the boundary knots
+tdat <- purrr::imap_dfr(ndmm_fit_1kt$basis,
+                        ~tibble(study = factor(.y, levels = ndmm_net$studies),
+                                lower = attr(.x, "Boundary.knots")[1],
+                                upper = attr(.x, "Boundary.knots")[2],
+                                times = seq(lower, upper, length = 50)))
+
+refdat <- left_join(refdat, tdat, by = "study")
+
+studies <- as.list(setNames(nm = levels(ndmm_net$studies)))
+```
+
+Then we produce the predictions, plot and combine using `patchwork`.
+```{r baseline-hazards, fig.height=6}
+bhp1 <- plot(predict(ndmm_fit_1kt, type = "hazard", level = "individual",
+                    newdata = refdat, study = study, times = times,
+                    baseline = studies, aux = studies))
+
+bhp2 <- plot(predict(ndmm_fit_2kt, type = "hazard", level = "individual",
+                    newdata = refdat, study = study, times = times,
+                    baseline = studies, aux = studies))
+
+bhp3 <- plot(predict(ndmm_fit_3kt, type = "hazard", level = "individual",
+                    newdata = refdat, study = study, times = times,
+                    baseline = studies, aux = studies))
+
+# Combining these into a single plot using patchwork
+bhp1 + facet_grid(rows = vars("1 knot"), cols = vars(Study)) +
+  bhp2 + facet_grid(rows = vars("2 knots"), cols = vars(Study)) +
+  bhp3 + facet_grid(rows = vars("3 knots"), cols = vars(Study)) +
+  plot_layout(ncol = 1, guides = "collect") &
+  theme(legend.position = "top", legend.box.spacing = unit(0, "lines"))
+```
+
+Again, we see that as the number of knots increases the baseline hazards get more "wiggly".
+As noted above, based on LOOIC the model with 1 internal knot is sufficient here.
+
+# Assessing the proportional hazards assumption
+
+We can relax and assess the proportional hazards (PH) assumption by allowing the spline coefficients to vary between treatment arms within each study.
+This is achieved using the `aux_by` argument, with `aux_by = c(.study, .trt)`.
+Technically, `aux_by = .study` is always assumed in order to respect randomisation (analogous to stratifying the intercept terms in a NMA by study), and we could simply write `aux_by = .trt`; but we choose to make the stratification by study explicit in this instance.
+```{r}
+ndmm_fit_nph <- nma(ndmm_net,
+                    regression = ~(age + iss_stage3 + response_cr_vgpr + male)*.trt,
+                    likelihood = "mspline",
+                    n_knots = 1,
+                    prior_intercept = normal(0, 100),
+                    prior_trt = normal(0, 100),
+                    prior_reg = normal(0, 100),
+                    prior_aux = dirichlet(1),
+                    aux_by = c(.study, .trt),
+                    QR = TRUE,
+                    # Reducing max_treedepth can speed up warm-up, but
+                    # increase if max_treedepth errors occur
+                    control = list(max_treedepth = 6))
+
+ndmm_fit_nph
+```
+
+We then compare model fit between models with and without PH using the LOOIC.
+```{r}
+(ndmm_fit_nph_loo <- loo(ndmm_fit_nph))
+
+# Compare to PH model
+loo_compare(ndmm_fit_1kt_loo, ndmm_fit_nph_loo)
+```
+The overall fit for the proportional hazards model is better (but not substantially).
+
+Again, we should check that no single study has a better fit with the non-PH model.
+```{r}
+cbind(
+  PH = by(ndmm_fit_1kt_loo$pointwise[, "looic"], studies_all, sum),
+  `non-PH` = by(ndmm_fit_nph_loo$pointwise[, "looic"], studies_all, sum)
+)
+```
+The LOOIC is slightly lower for the non-PH model in the Jackson2019 and Palumbo2014 studies, but not substantially so.
+For the other studies the LOOIC is lower for the PH model.
+Overall, there is little evidence to suggest that the proportional hazards assumption is invalid here.
+
+## Comparison to unadjusted NMA
+For comparison, we also fit NMA models without any covariate adjustment, both with and without the proportional hazards assumption.
+```{r}
+ndmm_fit_nma <- nma(ndmm_net,
+                    likelihood = "mspline",
+                    n_knots = 1,
+                    prior_intercept = normal(0, 100),
+                    prior_trt = normal(0, 100),
+                    prior_aux = dirichlet(1))
+
+ndmm_fit_nma
+
+ndmm_fit_nma_nph <- nma(ndmm_net,
+                        likelihood = "mspline",
+                        n_knots = 1,
+                        prior_intercept = normal(0, 100),
+                        prior_trt = normal(0, 100),
+                        prior_aux = dirichlet(1),
+                        aux_by = c(.study, .trt))
+
+ndmm_fit_nma_nph
+```
+
+Again, we compare the model fit using the LOOIC, both overall and within each study.
+```{r}
+# Compare overall model fit
+(ndmm_fit_nma_loo <- loo(ndmm_fit_nma))
+
+(ndmm_fit_nma_nph_loo <- loo(ndmm_fit_nma_nph))
+
+loo_compare(ndmm_fit_nma_loo, ndmm_fit_nma_nph_loo)
+
+# Compare model fit by study
+cbind(
+  PH = by(ndmm_fit_nma_loo$pointwise[, "looic"], studies_all, sum),
+  `non-PH` = by(ndmm_fit_nma_nph_loo$pointwise[, "looic"], studies_all, sum)
+)
+```
+Whilst there is little difference in overall model fit, the non-PH model is preferred in the Jackson2019 study with a substantially lower LOOIC.
+Including the covariates in the ML-NMR model is sufficient to remove this PH violation, even though the covariates are fixed and not time-varying, and the ML-NMR model is a much better fit overall.
+
+# Producing population-average estimates
+We now produce population-average estimates for several different quantities of interest.
+The usual array of posterior summary functions is available, including `relative_effects()`, `predict()`, `posterior_ranks()` and `posterior_rank_probs()`.
+The `predict()` function in particular has numerous options when working with survival models, selected using the `type` argument:
+
+* `"survival"` for survival probabilities
+* `"hazard"` for hazards
+* `"cumhaz"` for cumulative hazards
+* `"rmst"` for restricted mean survival times
+* `"mean"` for mean survival times (equivalent to `type = "rmst"` with `time = Inf`)
+* `"quantile"` for quantiles of the survival time distribution
+* `"median"` for median survival times (equivalent to `type = "quantile"` with `quantiles = 0.5`)
+* `"link"` for the linear predictor
+
+When producing population-average predictions (which is the default with `level = "aggregate"`), each of these quantities corresponds to the population-average marginal survival function; see `?predict.stan_nma` for more details.
+
+## Population-average survival probabilities
+To produce population-average survival curves we use the `predict()` function with `type = "survival"`.
+These are marginal or standardised survival curves.
+```{r ndmm-survival}
+sp <- plot(predict(ndmm_fit_1kt, type = "survival"))
+
+# Overlay the KM data
+kmdat <- bind_rows(ndmm_ipd, ndmm_agd) %>%
+  group_by(studyf, trtf) %>%
+  group_modify(~with(survfit(Surv(eventtime, event = status) ~ 1, data = .),
+                     tibble(time, n.censor, estimate = surv, std.err, upper, lower))) %>%
+  # Add S(0) = 1
+  group_modify(~add_row(., time = 0, n.censor = 0, estimate = 1, std.err = 0, upper = 1, lower = 1, .before = 0)) %>%
+  mutate(Treatment = trtf, Study = studyf)
+
+sp +
+  geom_step(aes(x = time, y = estimate, colour = Treatment), linewidth = 0.15, data = kmdat) +
+  geom_point(aes(x = time, y = estimate, colour = Treatment), stroke = 0.15, shape = 3,
+             data = filter(kmdat, n.censor >= 1)) +
+  theme(legend.position = "top", legend.box.spacing = unit(0, "lines"))
+```
+
+## Population-average median survival times
+The `predict()` function can produce a range of other absolute effect summaries, for example population-average median survival times:
+```{r ndmm-median-survival}
+(medsurv <- predict(ndmm_fit_1kt, type = "median"))
+
+plot(medsurv)
+```
+
+## Population-average conditional log hazard ratios
+Relative effects are produced using the `relative_effects()` function.
+With a ML-NMR model (or an IPD meta-regression), these are population-average conditional log hazard ratios (or log survival time ratios for AFT models).
+```{r ndmm-loghr}
+(loghr <- relative_effects(ndmm_fit_1kt, all_contrasts = TRUE))
+
+plot(loghr)
+```
+
+# References

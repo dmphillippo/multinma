@@ -8,6 +8,7 @@
 ^data-raw$
 ^\.travis\.yml$
 ^vignettes/example_.*\.Rmd$
+^vignettes/example_.*\.Rmd\.orig$
 ^vignettes/.*\.png$
 ^vignettes/precompile\.R$
 ^vignettes/children/*$
