@@ -913,10 +913,10 @@ set_agd_surv <- function(data,
   if (!is.null(.trtclass)) d <- drop_original(d, data, enquo(trt_class))
 
   # Nest survival data, keeping original data nested for later too
-  d <- tidyr::nest(d,
-                   .Surv = ".Surv",
-                   .data_orig = !dplyr::any_of(c(".study", ".trt", ".trtclass", ".sample_size", ".Surv")),
-                   .by = dplyr::any_of(c(".study", ".trt", ".trtclass", ".sample_size")))
+  d <- dplyr::group_by(d, dplyr::across(dplyr::any_of(c(".study", ".trt", ".trtclass", ".sample_size")))) %>%
+    tidyr::nest(.Surv = ".Surv",
+                .data_orig = !dplyr::any_of(c(".study", ".trt", ".trtclass", ".sample_size", ".Surv"))) %>%
+    dplyr::ungroup()
 
   # Join covariate details
   if (!is.null(covariates)) {
