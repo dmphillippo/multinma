@@ -989,21 +989,54 @@ choose the number of knots using the leave-one-out information criterion
 <span id="cb11-341"><a href="#cb11-341" tabindex="-1"></a><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
 <p>We then compare the LOOIC, using the <code>loo</code> package.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>(ndmm_fit_1kt_loo <span class="ot">&lt;-</span> <span class="fu">loo</span>(ndmm_fit_1kt))</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co">#&gt; Error in serialize(data, node$con): error writing to connection</span></span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&gt; Error in serialize(data, node$con): error writing to connection</span></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a></span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>(ndmm_fit_2kt_loo <span class="ot">&lt;-</span> <span class="fu">loo</span>(ndmm_fit_2kt))</span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; Error in serialize(data, node$con): error writing to connection</span></span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; Error in serialize(data, node$con): error writing to connection</span></span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a></span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>(ndmm_fit_3kt_loo <span class="ot">&lt;-</span> <span class="fu">loo</span>(ndmm_fit_3kt))</span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt; Error in serialize(data, node$con): error writing to connection</span></span>
-<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt; Error in serialize(data, node$con): error writing to connection</span></span>
-<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a></span>
-<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="fu">loo_compare</span>(<span class="fu">list</span>(<span class="st">&quot;1 knot&quot;</span> <span class="ot">=</span> ndmm_fit_1kt_loo,</span>
-<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>                 <span class="st">&quot;2 knots&quot;</span> <span class="ot">=</span> ndmm_fit_2kt_loo,</span>
-<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>                 <span class="st">&quot;3 knots&quot;</span> <span class="ot">=</span> ndmm_fit_3kt_loo))</span>
-<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="co">#&gt; Error in eval(expr, envir, enclos): object &#39;ndmm_fit_1kt_loo&#39; not found</span></span></code></pre></div>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&gt; Computed from 4000 by 4144 log-likelihood matrix</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt;          Estimate    SE</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; elpd_loo -12385.5 116.2</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; p_loo        31.8   0.8</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt; looic     24770.9 232.5</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co">#&gt; ------</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt; Monte Carlo SE of elpd_loo is 0.1.</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&gt; All Pareto k estimates are good (k &lt; 0.5).</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt; See help(&#39;pareto-k-diagnostic&#39;) for details.</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>(ndmm_fit_2kt_loo <span class="ot">&lt;-</span> <span class="fu">loo</span>(ndmm_fit_2kt))</span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a><span class="co">#&gt; Computed from 4000 by 4144 log-likelihood matrix</span></span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a><span class="co">#&gt;          Estimate    SE</span></span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a><span class="co">#&gt; elpd_loo -12386.1 116.2</span></span>
+<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a><span class="co">#&gt; p_loo        35.9   0.9</span></span>
+<span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a><span class="co">#&gt; looic     24772.2 232.4</span></span>
+<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a><span class="co">#&gt; ------</span></span>
+<span id="cb12-24"><a href="#cb12-24" tabindex="-1"></a><span class="co">#&gt; Monte Carlo SE of elpd_loo is 0.1.</span></span>
+<span id="cb12-25"><a href="#cb12-25" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-26"><a href="#cb12-26" tabindex="-1"></a><span class="co">#&gt; All Pareto k estimates are good (k &lt; 0.5).</span></span>
+<span id="cb12-27"><a href="#cb12-27" tabindex="-1"></a><span class="co">#&gt; See help(&#39;pareto-k-diagnostic&#39;) for details.</span></span>
+<span id="cb12-28"><a href="#cb12-28" tabindex="-1"></a></span>
+<span id="cb12-29"><a href="#cb12-29" tabindex="-1"></a>(ndmm_fit_3kt_loo <span class="ot">&lt;-</span> <span class="fu">loo</span>(ndmm_fit_3kt))</span>
+<span id="cb12-30"><a href="#cb12-30" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-31"><a href="#cb12-31" tabindex="-1"></a><span class="co">#&gt; Computed from 4000 by 4144 log-likelihood matrix</span></span>
+<span id="cb12-32"><a href="#cb12-32" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-33"><a href="#cb12-33" tabindex="-1"></a><span class="co">#&gt;          Estimate    SE</span></span>
+<span id="cb12-34"><a href="#cb12-34" tabindex="-1"></a><span class="co">#&gt; elpd_loo -12388.2 116.2</span></span>
+<span id="cb12-35"><a href="#cb12-35" tabindex="-1"></a><span class="co">#&gt; p_loo        40.1   0.9</span></span>
+<span id="cb12-36"><a href="#cb12-36" tabindex="-1"></a><span class="co">#&gt; looic     24776.3 232.5</span></span>
+<span id="cb12-37"><a href="#cb12-37" tabindex="-1"></a><span class="co">#&gt; ------</span></span>
+<span id="cb12-38"><a href="#cb12-38" tabindex="-1"></a><span class="co">#&gt; Monte Carlo SE of elpd_loo is 0.1.</span></span>
+<span id="cb12-39"><a href="#cb12-39" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-40"><a href="#cb12-40" tabindex="-1"></a><span class="co">#&gt; All Pareto k estimates are good (k &lt; 0.5).</span></span>
+<span id="cb12-41"><a href="#cb12-41" tabindex="-1"></a><span class="co">#&gt; See help(&#39;pareto-k-diagnostic&#39;) for details.</span></span>
+<span id="cb12-42"><a href="#cb12-42" tabindex="-1"></a></span>
+<span id="cb12-43"><a href="#cb12-43" tabindex="-1"></a><span class="fu">loo_compare</span>(<span class="fu">list</span>(<span class="st">&quot;1 knot&quot;</span> <span class="ot">=</span> ndmm_fit_1kt_loo,</span>
+<span id="cb12-44"><a href="#cb12-44" tabindex="-1"></a>                 <span class="st">&quot;2 knots&quot;</span> <span class="ot">=</span> ndmm_fit_2kt_loo,</span>
+<span id="cb12-45"><a href="#cb12-45" tabindex="-1"></a>                 <span class="st">&quot;3 knots&quot;</span> <span class="ot">=</span> ndmm_fit_3kt_loo))</span>
+<span id="cb12-46"><a href="#cb12-46" tabindex="-1"></a><span class="co">#&gt;         elpd_diff se_diff</span></span>
+<span id="cb12-47"><a href="#cb12-47" tabindex="-1"></a><span class="co">#&gt; 1 knot   0.0       0.0   </span></span>
+<span id="cb12-48"><a href="#cb12-48" tabindex="-1"></a><span class="co">#&gt; 2 knots -0.7       2.1   </span></span>
+<span id="cb12-49"><a href="#cb12-49" tabindex="-1"></a><span class="co">#&gt; 3 knots -2.7       2.7   </span></span></code></pre></div>
 <p>The model with a single internal knot at the median uncensored
 survival time has the lowest LOOIC (highest ELPD). Increasing the number
 of knots does not improve overall model fit in this case.</p>
@@ -1017,7 +1050,12 @@ other studies.</p>
 <span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="st">`</span><span class="at">2 knots</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">by</span>(ndmm_fit_2kt_loo<span class="sc">$</span>pointwise[, <span class="st">&quot;looic&quot;</span>], studies_all, sum),</span>
 <span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  <span class="st">`</span><span class="at">3 knots</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">by</span>(ndmm_fit_3kt_loo<span class="sc">$</span>pointwise[, <span class="st">&quot;looic&quot;</span>], studies_all, sum)</span>
 <span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>)</span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt; Error in eval(expr, envir, enclos): object &#39;ndmm_fit_1kt_loo&#39; not found</span></span></code></pre></div>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt;                 1 knot   2 knots   3 knots</span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="co">#&gt; Attal2012     3342.043  3341.188  3342.966</span></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="co">#&gt; Jackson2019  12394.107 12395.073 12396.222</span></span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co">#&gt; McCarthy2012  2723.239  2724.039  2723.232</span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#&gt; Morgan2012    4981.445  4981.976  4983.157</span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="co">#&gt; Palumbo2014   1330.072  1329.954  1330.747</span></span></code></pre></div>
 <p>We conclude that 1 knot is sufficient for all studies.</p>
 </div>
 <div id="ploting-hazards" class="section level2">
@@ -1266,12 +1304,24 @@ instance.</p>
 <p>We then compare model fit between models with and without PH using
 the LOOIC.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>(ndmm_fit_nph_loo <span class="ot">&lt;-</span> <span class="fu">loo</span>(ndmm_fit_nph))</span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a><span class="co">#&gt; Error in serialize(data, node$con): error writing to connection</span></span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a><span class="co">#&gt; Error in serialize(data, node$con): error writing to connection</span></span>
-<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a></span>
-<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a><span class="co"># Compare to PH model</span></span>
-<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a><span class="fu">loo_compare</span>(ndmm_fit_1kt_loo, ndmm_fit_nph_loo)</span>
-<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a><span class="co">#&gt; Error in eval(expr, envir, enclos): object &#39;ndmm_fit_1kt_loo&#39; not found</span></span></code></pre></div>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a><span class="co">#&gt; Computed from 4000 by 4144 log-likelihood matrix</span></span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a><span class="co">#&gt;          Estimate    SE</span></span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a><span class="co">#&gt; elpd_loo -12389.4 116.2</span></span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a><span class="co">#&gt; p_loo        44.5   1.1</span></span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a><span class="co">#&gt; looic     24778.8 232.5</span></span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a><span class="co">#&gt; ------</span></span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a><span class="co">#&gt; Monte Carlo SE of elpd_loo is 0.1.</span></span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a><span class="co">#&gt; All Pareto k estimates are good (k &lt; 0.5).</span></span>
+<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a><span class="co">#&gt; See help(&#39;pareto-k-diagnostic&#39;) for details.</span></span>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a></span>
+<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a><span class="co"># Compare to PH model</span></span>
+<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a><span class="fu">loo_compare</span>(ndmm_fit_1kt_loo, ndmm_fit_nph_loo)</span>
+<span id="cb19-17"><a href="#cb19-17" tabindex="-1"></a><span class="co">#&gt;        elpd_diff se_diff</span></span>
+<span id="cb19-18"><a href="#cb19-18" tabindex="-1"></a><span class="co">#&gt; model1  0.0       0.0   </span></span>
+<span id="cb19-19"><a href="#cb19-19" tabindex="-1"></a><span class="co">#&gt; model2 -3.9       4.4   </span></span></code></pre></div>
 <p>The overall fit for the proportional hazards model is better (but not
 substantially).</p>
 <p>Again, we should check that no single study has a better fit with the
@@ -1280,7 +1330,12 @@ non-PH model.</p>
 <span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>  <span class="at">PH =</span> <span class="fu">by</span>(ndmm_fit_1kt_loo<span class="sc">$</span>pointwise[, <span class="st">&quot;looic&quot;</span>], studies_all, sum),</span>
 <span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>  <span class="st">`</span><span class="at">non-PH</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">by</span>(ndmm_fit_nph_loo<span class="sc">$</span>pointwise[, <span class="st">&quot;looic&quot;</span>], studies_all, sum)</span>
 <span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>)</span>
-<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="co">#&gt; Error in eval(expr, envir, enclos): object &#39;ndmm_fit_1kt_loo&#39; not found</span></span></code></pre></div>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="co">#&gt;                     PH    non-PH</span></span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a><span class="co">#&gt; Attal2012     3342.043  3344.800</span></span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a><span class="co">#&gt; Jackson2019  12394.107 12391.884</span></span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a><span class="co">#&gt; McCarthy2012  2723.239  2728.845</span></span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a><span class="co">#&gt; Morgan2012    4981.445  4984.381</span></span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a><span class="co">#&gt; Palumbo2014   1330.072  1328.877</span></span></code></pre></div>
 <p>The LOOIC is slightly lower for the non-PH model in the Jackson2019
 and Palumbo2014 studies, but not substantially so. For the other studies
 the LOOIC is lower for the PH model. Overall, there is little evidence
@@ -1500,22 +1555,49 @@ assumption.</p>
 within each study.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co"># Compare overall model fit</span></span>
 <span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>(ndmm_fit_nma_loo <span class="ot">&lt;-</span> <span class="fu">loo</span>(ndmm_fit_nma))</span>
-<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a><span class="co">#&gt; Error in serialize(data, node$con): error writing to connection</span></span>
-<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a><span class="co">#&gt; Error in serialize(data, node$con): error writing to connection</span></span>
-<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a></span>
-<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a>(ndmm_fit_nma_nph_loo <span class="ot">&lt;-</span> <span class="fu">loo</span>(ndmm_fit_nma_nph))</span>
-<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a><span class="co">#&gt; Error in serialize(data, node$con): error writing to connection</span></span>
-<span id="cb22-8"><a href="#cb22-8" tabindex="-1"></a><span class="co">#&gt; Error in serialize(data, node$con): error writing to connection</span></span>
-<span id="cb22-9"><a href="#cb22-9" tabindex="-1"></a></span>
-<span id="cb22-10"><a href="#cb22-10" tabindex="-1"></a><span class="fu">loo_compare</span>(ndmm_fit_nma_loo, ndmm_fit_nma_nph_loo)</span>
-<span id="cb22-11"><a href="#cb22-11" tabindex="-1"></a><span class="co">#&gt; Error in eval(expr, envir, enclos): object &#39;ndmm_fit_nma_loo&#39; not found</span></span>
-<span id="cb22-12"><a href="#cb22-12" tabindex="-1"></a></span>
-<span id="cb22-13"><a href="#cb22-13" tabindex="-1"></a><span class="co"># Compare model fit by study</span></span>
-<span id="cb22-14"><a href="#cb22-14" tabindex="-1"></a><span class="fu">cbind</span>(</span>
-<span id="cb22-15"><a href="#cb22-15" tabindex="-1"></a>  <span class="at">PH =</span> <span class="fu">by</span>(ndmm_fit_nma_loo<span class="sc">$</span>pointwise[, <span class="st">&quot;looic&quot;</span>], studies_all, sum),</span>
-<span id="cb22-16"><a href="#cb22-16" tabindex="-1"></a>  <span class="st">`</span><span class="at">non-PH</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">by</span>(ndmm_fit_nma_nph_loo<span class="sc">$</span>pointwise[, <span class="st">&quot;looic&quot;</span>], studies_all, sum)</span>
-<span id="cb22-17"><a href="#cb22-17" tabindex="-1"></a>)</span>
-<span id="cb22-18"><a href="#cb22-18" tabindex="-1"></a><span class="co">#&gt; Error in eval(expr, envir, enclos): object &#39;ndmm_fit_nma_loo&#39; not found</span></span></code></pre></div>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a><span class="co">#&gt; Computed from 4000 by 4144 log-likelihood matrix</span></span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a><span class="co">#&gt;          Estimate    SE</span></span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a><span class="co">#&gt; elpd_loo -12461.3 115.4</span></span>
+<span id="cb22-8"><a href="#cb22-8" tabindex="-1"></a><span class="co">#&gt; p_loo        22.6   0.6</span></span>
+<span id="cb22-9"><a href="#cb22-9" tabindex="-1"></a><span class="co">#&gt; looic     24922.7 230.8</span></span>
+<span id="cb22-10"><a href="#cb22-10" tabindex="-1"></a><span class="co">#&gt; ------</span></span>
+<span id="cb22-11"><a href="#cb22-11" tabindex="-1"></a><span class="co">#&gt; Monte Carlo SE of elpd_loo is 0.1.</span></span>
+<span id="cb22-12"><a href="#cb22-12" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb22-13"><a href="#cb22-13" tabindex="-1"></a><span class="co">#&gt; All Pareto k estimates are good (k &lt; 0.5).</span></span>
+<span id="cb22-14"><a href="#cb22-14" tabindex="-1"></a><span class="co">#&gt; See help(&#39;pareto-k-diagnostic&#39;) for details.</span></span>
+<span id="cb22-15"><a href="#cb22-15" tabindex="-1"></a></span>
+<span id="cb22-16"><a href="#cb22-16" tabindex="-1"></a>(ndmm_fit_nma_nph_loo <span class="ot">&lt;-</span> <span class="fu">loo</span>(ndmm_fit_nma_nph))</span>
+<span id="cb22-17"><a href="#cb22-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb22-18"><a href="#cb22-18" tabindex="-1"></a><span class="co">#&gt; Computed from 4000 by 4144 log-likelihood matrix</span></span>
+<span id="cb22-19"><a href="#cb22-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb22-20"><a href="#cb22-20" tabindex="-1"></a><span class="co">#&gt;          Estimate    SE</span></span>
+<span id="cb22-21"><a href="#cb22-21" tabindex="-1"></a><span class="co">#&gt; elpd_loo -12460.3 115.4</span></span>
+<span id="cb22-22"><a href="#cb22-22" tabindex="-1"></a><span class="co">#&gt; p_loo        35.1   1.0</span></span>
+<span id="cb22-23"><a href="#cb22-23" tabindex="-1"></a><span class="co">#&gt; looic     24920.5 230.9</span></span>
+<span id="cb22-24"><a href="#cb22-24" tabindex="-1"></a><span class="co">#&gt; ------</span></span>
+<span id="cb22-25"><a href="#cb22-25" tabindex="-1"></a><span class="co">#&gt; Monte Carlo SE of elpd_loo is 0.1.</span></span>
+<span id="cb22-26"><a href="#cb22-26" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb22-27"><a href="#cb22-27" tabindex="-1"></a><span class="co">#&gt; All Pareto k estimates are good (k &lt; 0.5).</span></span>
+<span id="cb22-28"><a href="#cb22-28" tabindex="-1"></a><span class="co">#&gt; See help(&#39;pareto-k-diagnostic&#39;) for details.</span></span>
+<span id="cb22-29"><a href="#cb22-29" tabindex="-1"></a></span>
+<span id="cb22-30"><a href="#cb22-30" tabindex="-1"></a><span class="fu">loo_compare</span>(ndmm_fit_nma_loo, ndmm_fit_nma_nph_loo)</span>
+<span id="cb22-31"><a href="#cb22-31" tabindex="-1"></a><span class="co">#&gt;        elpd_diff se_diff</span></span>
+<span id="cb22-32"><a href="#cb22-32" tabindex="-1"></a><span class="co">#&gt; model2  0.0       0.0   </span></span>
+<span id="cb22-33"><a href="#cb22-33" tabindex="-1"></a><span class="co">#&gt; model1 -1.1       5.3   </span></span>
+<span id="cb22-34"><a href="#cb22-34" tabindex="-1"></a></span>
+<span id="cb22-35"><a href="#cb22-35" tabindex="-1"></a><span class="co"># Compare model fit by study</span></span>
+<span id="cb22-36"><a href="#cb22-36" tabindex="-1"></a><span class="fu">cbind</span>(</span>
+<span id="cb22-37"><a href="#cb22-37" tabindex="-1"></a>  <span class="at">PH =</span> <span class="fu">by</span>(ndmm_fit_nma_loo<span class="sc">$</span>pointwise[, <span class="st">&quot;looic&quot;</span>], studies_all, sum),</span>
+<span id="cb22-38"><a href="#cb22-38" tabindex="-1"></a>  <span class="st">`</span><span class="at">non-PH</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">by</span>(ndmm_fit_nma_nph_loo<span class="sc">$</span>pointwise[, <span class="st">&quot;looic&quot;</span>], studies_all, sum)</span>
+<span id="cb22-39"><a href="#cb22-39" tabindex="-1"></a>)</span>
+<span id="cb22-40"><a href="#cb22-40" tabindex="-1"></a><span class="co">#&gt;                     PH    non-PH</span></span>
+<span id="cb22-41"><a href="#cb22-41" tabindex="-1"></a><span class="co">#&gt; Attal2012     3406.395  3408.744</span></span>
+<span id="cb22-42"><a href="#cb22-42" tabindex="-1"></a><span class="co">#&gt; Jackson2019  12401.491 12391.276</span></span>
+<span id="cb22-43"><a href="#cb22-43" tabindex="-1"></a><span class="co">#&gt; McCarthy2012  2766.946  2771.886</span></span>
+<span id="cb22-44"><a href="#cb22-44" tabindex="-1"></a><span class="co">#&gt; Morgan2012    4981.328  4984.390</span></span>
+<span id="cb22-45"><a href="#cb22-45" tabindex="-1"></a><span class="co">#&gt; Palumbo2014   1366.513  1364.247</span></span></code></pre></div>
 <p>Whilst there is little difference in overall model fit, the non-PH
 model is preferred in the Jackson2019 study with a substantially lower
 LOOIC. Including the covariates in the ML-NMR model is sufficient to
