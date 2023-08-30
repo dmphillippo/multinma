@@ -268,7 +268,7 @@ Let us look at the estimated hazard functions under each model with increasing n
 By default, the `predict()` function with `type = "hazard"` will produce plots of the population-average marginal hazards (`level = "aggregate"`, which is the default).
 These can then be plotted using the `plot()` function.
 We combine the plots into one grid using the `patchwork` package.
-```{r marginal-hazards, fig.height=6}
+```{r ndmm-marginal-hazards, fig.height=6}
 mhp1 <- plot(predict(ndmm_fit_1kt, type = "hazard", level = "aggregate"))
 
 mhp2 <- plot(predict(ndmm_fit_2kt, type = "hazard", level = "aggregate"))
@@ -313,7 +313,7 @@ studies <- as.list(setNames(nm = levels(ndmm_net$studies)))
 ```
 
 Then we produce the predictions, plot and combine using `patchwork`.
-```{r baseline-hazards, fig.height=6}
+```{r ndmm-baseline-hazards, fig.height=6}
 bhp1 <- plot(predict(ndmm_fit_1kt, type = "hazard", level = "individual",
                     newdata = refdat, study = study, times = times,
                     baseline = studies, aux = studies))
