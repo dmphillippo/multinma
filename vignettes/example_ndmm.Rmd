@@ -623,21 +623,54 @@ We then compare the LOOIC, using the `loo` package.
 
 ```r
 (ndmm_fit_1kt_loo <- loo(ndmm_fit_1kt))
-#> Error in serialize(data, node$con): error writing to connection
-#> Error in serialize(data, node$con): error writing to connection
+#> 
+#> Computed from 4000 by 4144 log-likelihood matrix
+#> 
+#>          Estimate    SE
+#> elpd_loo -12385.5 116.2
+#> p_loo        31.8   0.8
+#> looic     24770.9 232.5
+#> ------
+#> Monte Carlo SE of elpd_loo is 0.1.
+#> 
+#> All Pareto k estimates are good (k < 0.5).
+#> See help('pareto-k-diagnostic') for details.
 
 (ndmm_fit_2kt_loo <- loo(ndmm_fit_2kt))
-#> Error in serialize(data, node$con): error writing to connection
-#> Error in serialize(data, node$con): error writing to connection
+#> 
+#> Computed from 4000 by 4144 log-likelihood matrix
+#> 
+#>          Estimate    SE
+#> elpd_loo -12386.1 116.2
+#> p_loo        35.9   0.9
+#> looic     24772.2 232.4
+#> ------
+#> Monte Carlo SE of elpd_loo is 0.1.
+#> 
+#> All Pareto k estimates are good (k < 0.5).
+#> See help('pareto-k-diagnostic') for details.
 
 (ndmm_fit_3kt_loo <- loo(ndmm_fit_3kt))
-#> Error in serialize(data, node$con): error writing to connection
-#> Error in serialize(data, node$con): error writing to connection
+#> 
+#> Computed from 4000 by 4144 log-likelihood matrix
+#> 
+#>          Estimate    SE
+#> elpd_loo -12388.2 116.2
+#> p_loo        40.1   0.9
+#> looic     24776.3 232.5
+#> ------
+#> Monte Carlo SE of elpd_loo is 0.1.
+#> 
+#> All Pareto k estimates are good (k < 0.5).
+#> See help('pareto-k-diagnostic') for details.
 
 loo_compare(list("1 knot" = ndmm_fit_1kt_loo,
                  "2 knots" = ndmm_fit_2kt_loo,
                  "3 knots" = ndmm_fit_3kt_loo))
-#> Error in eval(expr, envir, enclos): object 'ndmm_fit_1kt_loo' not found
+#>         elpd_diff se_diff
+#> 1 knot   0.0       0.0   
+#> 2 knots -0.7       2.1   
+#> 3 knots -2.7       2.7   
 ```
 
 The model with a single internal knot at the median uncensored survival time has the lowest LOOIC (highest ELPD).
@@ -652,7 +685,12 @@ cbind(
   `2 knots` = by(ndmm_fit_2kt_loo$pointwise[, "looic"], studies_all, sum),
   `3 knots` = by(ndmm_fit_3kt_loo$pointwise[, "looic"], studies_all, sum)
 )
-#> Error in eval(expr, envir, enclos): object 'ndmm_fit_1kt_loo' not found
+#>                 1 knot   2 knots   3 knots
+#> Attal2012     3342.043  3341.188  3342.966
+#> Jackson2019  12394.107 12395.073 12396.222
+#> McCarthy2012  2723.239  2724.039  2723.232
+#> Morgan2012    4981.445  4981.976  4983.157
+#> Palumbo2014   1330.072  1329.954  1330.747
 ```
 
 We conclude that 1 knot is sufficient for all studies.
@@ -908,12 +946,24 @@ We then compare model fit between models with and without PH using the LOOIC.
 
 ```r
 (ndmm_fit_nph_loo <- loo(ndmm_fit_nph))
-#> Error in serialize(data, node$con): error writing to connection
-#> Error in serialize(data, node$con): error writing to connection
+#> 
+#> Computed from 4000 by 4144 log-likelihood matrix
+#> 
+#>          Estimate    SE
+#> elpd_loo -12389.4 116.2
+#> p_loo        44.5   1.1
+#> looic     24778.8 232.5
+#> ------
+#> Monte Carlo SE of elpd_loo is 0.1.
+#> 
+#> All Pareto k estimates are good (k < 0.5).
+#> See help('pareto-k-diagnostic') for details.
 
 # Compare to PH model
 loo_compare(ndmm_fit_1kt_loo, ndmm_fit_nph_loo)
-#> Error in eval(expr, envir, enclos): object 'ndmm_fit_1kt_loo' not found
+#>        elpd_diff se_diff
+#> model1  0.0       0.0   
+#> model2 -3.9       4.4   
 ```
 The overall fit for the proportional hazards model is better (but not substantially).
 
@@ -924,7 +974,12 @@ cbind(
   PH = by(ndmm_fit_1kt_loo$pointwise[, "looic"], studies_all, sum),
   `non-PH` = by(ndmm_fit_nph_loo$pointwise[, "looic"], studies_all, sum)
 )
-#> Error in eval(expr, envir, enclos): object 'ndmm_fit_1kt_loo' not found
+#>                     PH    non-PH
+#> Attal2012     3342.043  3344.800
+#> Jackson2019  12394.107 12391.884
+#> McCarthy2012  2723.239  2728.845
+#> Morgan2012    4981.445  4984.381
+#> Palumbo2014   1330.072  1328.877
 ```
 The LOOIC is slightly lower for the non-PH model in the Jackson2019 and Palumbo2014 studies, but not substantially so.
 For the other studies the LOOIC is lower for the PH model.
@@ -1147,22 +1202,49 @@ Again, we compare the model fit using the LOOIC, both overall and within each st
 ```r
 # Compare overall model fit
 (ndmm_fit_nma_loo <- loo(ndmm_fit_nma))
-#> Error in serialize(data, node$con): error writing to connection
-#> Error in serialize(data, node$con): error writing to connection
+#> 
+#> Computed from 4000 by 4144 log-likelihood matrix
+#> 
+#>          Estimate    SE
+#> elpd_loo -12461.3 115.4
+#> p_loo        22.6   0.6
+#> looic     24922.7 230.8
+#> ------
+#> Monte Carlo SE of elpd_loo is 0.1.
+#> 
+#> All Pareto k estimates are good (k < 0.5).
+#> See help('pareto-k-diagnostic') for details.
 
 (ndmm_fit_nma_nph_loo <- loo(ndmm_fit_nma_nph))
-#> Error in serialize(data, node$con): error writing to connection
-#> Error in serialize(data, node$con): error writing to connection
+#> 
+#> Computed from 4000 by 4144 log-likelihood matrix
+#> 
+#>          Estimate    SE
+#> elpd_loo -12460.3 115.4
+#> p_loo        35.1   1.0
+#> looic     24920.5 230.9
+#> ------
+#> Monte Carlo SE of elpd_loo is 0.1.
+#> 
+#> All Pareto k estimates are good (k < 0.5).
+#> See help('pareto-k-diagnostic') for details.
 
 loo_compare(ndmm_fit_nma_loo, ndmm_fit_nma_nph_loo)
-#> Error in eval(expr, envir, enclos): object 'ndmm_fit_nma_loo' not found
+#>        elpd_diff se_diff
+#> model2  0.0       0.0   
+#> model1 -1.1       5.3   
 
 # Compare model fit by study
 cbind(
   PH = by(ndmm_fit_nma_loo$pointwise[, "looic"], studies_all, sum),
   `non-PH` = by(ndmm_fit_nma_nph_loo$pointwise[, "looic"], studies_all, sum)
 )
-#> Error in eval(expr, envir, enclos): object 'ndmm_fit_nma_loo' not found
+#>                     PH    non-PH
+#> Attal2012     3406.395  3408.744
+#> Jackson2019  12401.491 12391.276
+#> McCarthy2012  2766.946  2771.886
+#> Morgan2012    4981.328  4984.390
+#> Palumbo2014   1366.513  1364.247
 ```
 Whilst there is little difference in overall model fit, the non-PH model is preferred in the Jackson2019 study with a substantially lower LOOIC.
 Including the covariates in the ML-NMR model is sufficient to remove this PH violation, even though the covariates are fixed and not time-varying, and the ML-NMR model is a much better fit overall.
