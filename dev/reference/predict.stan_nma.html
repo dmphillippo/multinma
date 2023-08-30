@@ -55,6 +55,7 @@ survival probabilities from a survival model."><meta property="og:image" content
     <a class="dropdown-item" href="../articles/example_diabetes.html">Example: Diabetes</a>
     <a class="dropdown-item" href="../articles/example_dietary_fat.html">Example: Dietary fat</a>
     <a class="dropdown-item" href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a>
+    <a class="dropdown-item" href="../articles/example_ndmm.html">Example: Newly diagnosed multiple myeloma</a>
     <a class="dropdown-item" href="../articles/example_parkinsons.html">Example: Parkinson's disease</a>
     <a class="dropdown-item" href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a>
     <a class="dropdown-item" href="../articles/example_smoking.html">Example: Smoking cessation</a>
@@ -381,314 +382,314 @@ standardised survival time. These are produced using <code>type = "rmst"</code> 
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 1</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: No intervention]        -2.79 0.33 -3.45 -3.00 -2.77 -2.57 -2.19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Group counselling]      -1.68 0.51 -2.65 -2.01 -1.69 -1.37 -0.62</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Individual counselling] -1.94 0.38 -2.68 -2.19 -1.94 -1.68 -1.20</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Self-help]              -2.30 0.51 -3.29 -2.63 -2.30 -1.96 -1.28</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: No intervention]        -2.79 0.34 -3.48 -3.01 -2.77 -2.55 -2.16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Group counselling]      -1.68 0.51 -2.67 -2.01 -1.68 -1.34 -0.68</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Individual counselling] -1.94 0.39 -2.71 -2.19 -1.94 -1.68 -1.18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Self-help]              -2.30 0.51 -3.30 -2.62 -2.30 -1.98 -1.30</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: No intervention]            4714     2770    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Group counselling]          2253     2890    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Individual counselling]     1962     2810    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Self-help]                  2354     2628    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: No intervention]            4728     2792    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Group counselling]          2337     2481    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Individual counselling]     2425     2609    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Self-help]                  2297     2287    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 2</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: No intervention]        -2.57 0.79 -4.19 -3.07 -2.56 -2.06 -1.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Group counselling]      -1.47 0.77 -3.01 -1.95 -1.46 -0.97  0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Individual counselling] -1.73 0.77 -3.21 -2.22 -1.73 -1.23 -0.21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Self-help]              -2.08 0.79 -3.64 -2.58 -2.06 -1.60 -0.51</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: No intervention]        -2.54 0.76 -4.06 -3.05 -2.55 -2.07 -1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Group counselling]      -1.44 0.77 -2.93 -1.94 -1.46 -0.95  0.11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Individual counselling] -1.70 0.75 -3.12 -2.20 -1.70 -1.22 -0.19</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Self-help]              -2.06 0.76 -3.52 -2.56 -2.07 -1.57 -0.50</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: No intervention]            2372     2395    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Group counselling]          2770     2610    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Individual counselling]     2543     2332    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Self-help]                  2959     2417    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: No intervention]            2442     2506    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Group counselling]          3049     2830    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Individual counselling]     2891     2738    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Self-help]                  3534     2662    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 3</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: No intervention]        -2.14 0.12 -2.38 -2.22 -2.14 -2.06 -1.92</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Group counselling]      -1.04 0.45 -1.91 -1.33 -1.04 -0.75 -0.13</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Individual counselling] -1.30 0.25 -1.79 -1.47 -1.29 -1.14 -0.77</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Self-help]              -1.65 0.43 -2.51 -1.94 -1.65 -1.36 -0.84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: No intervention]        -2.15 0.12 -2.38 -2.22 -2.14 -2.06 -1.92</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Group counselling]      -1.04 0.43 -1.89 -1.33 -1.05 -0.75 -0.15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Individual counselling] -1.30 0.25 -1.79 -1.47 -1.29 -1.13 -0.80</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Self-help]              -1.66 0.42 -2.50 -1.93 -1.67 -1.38 -0.82</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: No intervention]            7855     3184    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Group counselling]          1970     2601    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Individual counselling]     1231     2110    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Self-help]                  1900     2359    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: No intervention]            6748     2555    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Group counselling]          2050     2197    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Individual counselling]     1531     2153    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Self-help]                  1954     1929    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 4</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: No intervention]        -4.06 0.58 -5.34 -4.41 -4.02 -3.67 -3.04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Group counselling]      -2.96 0.71 -4.37 -3.41 -2.96 -2.48 -1.61</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Individual counselling] -3.22 0.59 -4.48 -3.59 -3.19 -2.82 -2.13</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Self-help]              -3.57 0.70 -5.04 -4.02 -3.55 -3.09 -2.28</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: No intervention]        -4.06 0.59 -5.34 -4.43 -4.03 -3.65 -3.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Group counselling]      -2.95 0.71 -4.33 -3.40 -2.93 -2.48 -1.61</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Individual counselling] -3.21 0.60 -4.49 -3.58 -3.17 -2.81 -2.11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Self-help]              -3.57 0.70 -5.02 -4.01 -3.55 -3.11 -2.21</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: No intervention]            3635     2626    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Group counselling]          3007     2747    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Individual counselling]     3333     2671    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Self-help]                  2804     2475    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: No intervention]            4159     2362    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Group counselling]          3361     2686    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Individual counselling]     3768     2356    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Self-help]                  3395     2547    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 5</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: No intervention]        -2.16 0.14 -2.43 -2.25 -2.16 -2.06 -1.89</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Group counselling]      -1.05 0.45 -1.94 -1.35 -1.05 -0.76 -0.11</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Individual counselling] -1.31 0.27 -1.83 -1.49 -1.32 -1.13 -0.77</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Self-help]              -1.67 0.43 -2.55 -1.94 -1.66 -1.38 -0.84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: No intervention]        -2.15 0.14 -2.44 -2.25 -2.15 -2.06 -1.90</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Group counselling]      -1.05 0.44 -1.89 -1.35 -1.05 -0.76 -0.14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Individual counselling] -1.31 0.27 -1.85 -1.49 -1.31 -1.13 -0.77</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Self-help]              -1.67 0.43 -2.50 -1.95 -1.68 -1.39 -0.81</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: No intervention]            6381     2729    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Group counselling]          1923     2583    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Individual counselling]     1267     1756    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Self-help]                  1865     2634    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: No intervention]            8454     2496    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Group counselling]          1993     2416    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Individual counselling]     1546     2133    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Self-help]                  1970     2145    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 6</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: No intervention]        -3.44 0.73 -5.04 -3.87 -3.38 -2.93 -2.21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Group counselling]      -2.33 0.80 -4.03 -2.83 -2.30 -1.79 -0.90</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Individual counselling] -2.59 0.72 -4.12 -3.01 -2.54 -2.10 -1.34</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Self-help]              -2.95 0.82 -4.70 -3.44 -2.89 -2.40 -1.47</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: No intervention]        -3.41 0.73 -5.04 -3.85 -3.35 -2.89 -2.18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Group counselling]      -2.30 0.82 -4.06 -2.82 -2.24 -1.74 -0.80</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Individual counselling] -2.56 0.72 -4.13 -3.00 -2.52 -2.06 -1.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Self-help]              -2.92 0.82 -4.75 -3.42 -2.87 -2.35 -1.43</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: No intervention]            2707     2379    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Group counselling]          3492     2903    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Individual counselling]     3238     2500    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Self-help]                  2764     2400    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: No intervention]            3715     2591    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Group counselling]          3460     2421    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Individual counselling]     3544     2718    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Self-help]                  3354     2465    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 7</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: No intervention]        -3.03 0.45 -4.02 -3.31 -3.00 -2.71 -2.23</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Group counselling]      -1.92 0.60 -3.19 -2.30 -1.90 -1.54 -0.78</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Individual counselling] -2.18 0.48 -3.21 -2.49 -2.16 -1.85 -1.32</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Self-help]              -2.54 0.59 -3.75 -2.90 -2.51 -2.14 -1.46</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: No intervention]        -3.02 0.44 -3.95 -3.29 -2.99 -2.71 -2.25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Group counselling]      -1.91 0.58 -3.11 -2.27 -1.90 -1.52 -0.76</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Individual counselling] -2.17 0.46 -3.12 -2.47 -2.14 -1.85 -1.32</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Self-help]              -2.53 0.58 -3.76 -2.89 -2.51 -2.13 -1.43</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: No intervention]            4302     2483    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Group counselling]          3082     3009    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Individual counselling]     3009     2862    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Self-help]                  2829     3035    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: No intervention]            4485     2985    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Group counselling]          2750     2176    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Individual counselling]     3040     2797    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Self-help]                  2703     2663    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 8</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: No intervention]        -2.72 0.59 -3.98 -3.10 -2.68 -2.30 -1.68</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Group counselling]      -1.62 0.70 -3.07 -2.07 -1.60 -1.14 -0.34</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Individual counselling] -1.88 0.58 -3.11 -2.25 -1.84 -1.48 -0.81</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Self-help]              -2.23 0.70 -3.72 -2.67 -2.21 -1.75 -0.97</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: No intervention]        -2.70 0.58 -3.98 -3.04 -2.66 -2.30 -1.66</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Group counselling]      -1.59 0.69 -3.03 -2.03 -1.56 -1.11 -0.32</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Individual counselling] -1.85 0.58 -3.08 -2.20 -1.81 -1.46 -0.81</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Self-help]              -2.21 0.69 -3.69 -2.63 -2.17 -1.75 -0.96</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: No intervention]            3767     2900    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Group counselling]          3348     3169    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Individual counselling]     4032     2792    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Self-help]                  3197     2626    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: No intervention]            3204     2196    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Group counselling]          2943     2553    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Individual counselling]     3167     2283    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Self-help]                  2880     2505    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 9</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: No intervention]        -1.84 0.42 -2.70 -2.11 -1.83 -1.56 -1.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Group counselling]      -0.73 0.60 -1.91 -1.12 -0.74 -0.35  0.48</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Individual counselling] -0.99 0.45 -1.91 -1.28 -0.99 -0.69 -0.09</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Self-help]              -1.35 0.58 -2.49 -1.72 -1.34 -0.97 -0.25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: No intervention]        -1.84 0.41 -2.71 -2.11 -1.83 -1.55 -1.08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Group counselling]      -0.74 0.58 -1.90 -1.12 -0.73 -0.35  0.36</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Individual counselling] -1.00 0.45 -1.88 -1.30 -1.00 -0.69 -0.13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Self-help]              -1.36 0.58 -2.50 -1.73 -1.36 -0.96 -0.24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: No intervention]            4476     3217    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Group counselling]          2723     3009    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Individual counselling]     3036     2970    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Self-help]                  2529     2737    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: No intervention]            5440     3079    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Group counselling]          2856     3164    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Individual counselling]     3391     2791    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Self-help]                  2927     2859    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 10</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: No intervention]        -2.08 0.12 -2.32 -2.16 -2.08 -2.00 -1.85</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Group counselling]      -0.97 0.45 -1.84 -1.27 -0.99 -0.69 -0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Individual counselling] -1.23 0.26 -1.73 -1.41 -1.23 -1.07 -0.72</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Self-help]              -1.59 0.42 -2.42 -1.87 -1.59 -1.31 -0.76</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: No intervention]        -2.08 0.12 -2.31 -2.16 -2.08 -2.00 -1.86</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Group counselling]      -0.97 0.44 -1.82 -1.26 -0.99 -0.69 -0.07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Individual counselling] -1.23 0.26 -1.75 -1.40 -1.24 -1.06 -0.70</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Self-help]              -1.59 0.41 -2.40 -1.86 -1.60 -1.33 -0.76</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: No intervention]            7280     2574    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Group counselling]          1950     2489    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Individual counselling]     1292     2399    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Self-help]                  1807     2742    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: No intervention]            7484     3332    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Group counselling]          1962     2269    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Individual counselling]     1514     2068    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Self-help]                  1849     2124    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 11</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: No intervention]        -3.62 0.23 -4.09 -3.77 -3.61 -3.46 -3.19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Group counselling]      -2.51 0.49 -3.44 -2.84 -2.53 -2.19 -1.54</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Individual counselling] -2.77 0.32 -3.44 -2.98 -2.77 -2.56 -2.14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Self-help]              -3.13 0.45 -4.03 -3.43 -3.13 -2.82 -2.26</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: No intervention]        -3.62 0.24 -4.12 -3.77 -3.62 -3.46 -3.18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Group counselling]      -2.52 0.47 -3.41 -2.82 -2.53 -2.20 -1.57</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Individual counselling] -2.77 0.33 -3.41 -2.99 -2.77 -2.56 -2.15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Self-help]              -3.14 0.44 -3.99 -3.42 -3.14 -2.85 -2.24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: No intervention]            6572     3087    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Group counselling]          2122     2598    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Individual counselling]     1756     2544    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Self-help]                  1941     2515    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: No intervention]            5889     3213    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Group counselling]          2246     2413    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Individual counselling]     2292     2639    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Self-help]                  2040     2309    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 12</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: No intervention]        -2.22 0.13 -2.48 -2.31 -2.21 -2.13 -1.97</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Group counselling]      -1.11 0.45 -1.98 -1.41 -1.13 -0.83 -0.18</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Individual counselling] -1.37 0.26 -1.89 -1.55 -1.38 -1.20 -0.85</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Self-help]              -1.73 0.43 -2.57 -2.00 -1.73 -1.45 -0.91</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: No intervention]        -2.22 0.13 -2.47 -2.30 -2.22 -2.13 -1.97</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Group counselling]      -1.11 0.44 -1.97 -1.40 -1.11 -0.83 -0.18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Individual counselling] -1.37 0.27 -1.87 -1.55 -1.37 -1.20 -0.84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Self-help]              -1.73 0.42 -2.54 -2.00 -1.74 -1.46 -0.87</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: No intervention]            7192     3041    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Group counselling]          1948     2639    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Individual counselling]     1209     2201    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Self-help]                  1840     2555    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: No intervention]            6792     3242    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Group counselling]          2029     2451    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Individual counselling]     1425     2313    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Self-help]                  1870     2110    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 13</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: No intervention]        -2.67 0.45 -3.63 -2.95 -2.64 -2.35 -1.87</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Group counselling]      -1.56 0.61 -2.79 -1.96 -1.57 -1.15 -0.35</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Individual counselling] -1.82 0.48 -2.83 -2.13 -1.80 -1.50 -0.91</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Self-help]              -2.18 0.60 -3.39 -2.57 -2.17 -1.77 -1.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: No intervention]        -2.68 0.45 -3.62 -2.97 -2.66 -2.37 -1.86</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Group counselling]      -1.57 0.61 -2.81 -1.99 -1.57 -1.15 -0.40</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Individual counselling] -1.83 0.49 -2.83 -2.15 -1.82 -1.49 -0.89</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Self-help]              -2.19 0.60 -3.37 -2.60 -2.20 -1.78 -1.03</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: No intervention]            4329     3181    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Group counselling]          2702     2926    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Individual counselling]     2761     3022    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Self-help]                  2653     3005    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: No intervention]            4641     2740    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Group counselling]          3161     2333    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Individual counselling]     2995     2962    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Self-help]                  3053     2974    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 14</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: No intervention]        -2.41 0.22 -2.87 -2.56 -2.40 -2.26 -2.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Group counselling]      -1.31 0.49 -2.27 -1.62 -1.31 -0.99 -0.33</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Individual counselling] -1.57 0.31 -2.17 -1.77 -1.56 -1.36 -0.94</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Self-help]              -1.92 0.46 -2.87 -2.23 -1.92 -1.61 -1.03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: No intervention]        -2.41 0.23 -2.88 -2.56 -2.40 -2.25 -1.98</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Group counselling]      -1.30 0.47 -2.19 -1.62 -1.31 -0.99 -0.37</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Individual counselling] -1.56 0.32 -2.19 -1.77 -1.57 -1.35 -0.92</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Self-help]              -1.92 0.46 -2.79 -2.23 -1.93 -1.63 -0.99</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: No intervention]            5148     2728    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Group counselling]          2116     2658    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Individual counselling]     1589     2519    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Self-help]                  2043     2747    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: No intervention]            6856     3232    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Group counselling]          2221     2506    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Individual counselling]     2105     2514    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Self-help]                  2093     2668    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 15</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: No intervention]        -2.70 0.73 -4.30 -3.14 -2.65 -2.20 -1.44</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Group counselling]      -1.60 0.75 -3.18 -2.05 -1.57 -1.08 -0.27</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Individual counselling] -1.86 0.74 -3.45 -2.31 -1.81 -1.34 -0.56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Self-help]              -2.22 0.81 -3.90 -2.72 -2.19 -1.64 -0.78</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: No intervention]        -2.70 0.74 -4.27 -3.16 -2.65 -2.18 -1.43</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Group counselling]      -1.59 0.73 -3.09 -2.06 -1.55 -1.09 -0.28</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Individual counselling] -1.85 0.74 -3.42 -2.31 -1.81 -1.33 -0.56</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Self-help]              -2.21 0.81 -3.98 -2.71 -2.17 -1.65 -0.77</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: No intervention]            3252     2583    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Group counselling]          3355     2763    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Individual counselling]     3465     2660    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Self-help]                  2789     2672    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: No intervention]            3738     2987    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Group counselling]          3397     3214    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Individual counselling]     3406     2897    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Self-help]                  3359     2332    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 16</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: No intervention]        -2.62 0.35 -3.37 -2.84 -2.60 -2.38 -1.97</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Group counselling]      -1.51 0.55 -2.58 -1.86 -1.51 -1.14 -0.47</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Individual counselling] -1.77 0.41 -2.63 -2.03 -1.77 -1.50 -0.99</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Self-help]              -2.13 0.49 -3.10 -2.47 -2.12 -1.80 -1.17</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: No intervention]        -2.62 0.35 -3.36 -2.84 -2.60 -2.38 -1.99</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Group counselling]      -1.51 0.54 -2.57 -1.86 -1.51 -1.17 -0.44</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Individual counselling] -1.77 0.41 -2.60 -2.04 -1.76 -1.50 -0.99</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Self-help]              -2.13 0.49 -3.08 -2.47 -2.12 -1.81 -1.15</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: No intervention]            5323     2722    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Group counselling]          2739     2780    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Individual counselling]     2845     2691    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Self-help]                  2664     2864    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: No intervention]            5973     2885    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Group counselling]          2575     2934    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Individual counselling]     2567     2894    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Self-help]                  2514     2604    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 17</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: No intervention]        -2.37 0.10 -2.58 -2.44 -2.37 -2.30 -2.17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Group counselling]      -1.27 0.45 -2.14 -1.56 -1.28 -0.98 -0.35</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Individual counselling] -1.53 0.25 -2.01 -1.70 -1.53 -1.37 -1.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Self-help]              -1.89 0.43 -2.74 -2.17 -1.89 -1.60 -1.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: No intervention]        -2.38 0.11 -2.59 -2.44 -2.37 -2.30 -2.17</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Group counselling]      -1.27 0.43 -2.10 -1.55 -1.28 -0.99 -0.38</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Individual counselling] -1.53 0.26 -2.01 -1.70 -1.53 -1.36 -1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Self-help]              -1.89 0.42 -2.69 -2.16 -1.89 -1.63 -1.06</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: No intervention]            7001     3074    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Group counselling]          1889     2530    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Individual counselling]     1165     1804    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Self-help]                  1753     2260    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: No intervention]            6228     2256    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Group counselling]          1924     2122    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Individual counselling]     1427     2002    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Self-help]                  1860     1850    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 18</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: No intervention]        -2.57 0.27 -3.11 -2.75 -2.56 -2.38 -2.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Group counselling]      -1.46 0.51 -2.42 -1.81 -1.47 -1.14 -0.40</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Individual counselling] -1.72 0.35 -2.40 -1.96 -1.72 -1.48 -1.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Self-help]              -2.08 0.49 -3.02 -2.42 -2.08 -1.75 -1.11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: No intervention]        -2.56 0.28 -3.13 -2.75 -2.55 -2.37 -2.04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Group counselling]      -1.46 0.51 -2.44 -1.80 -1.47 -1.12 -0.42</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Individual counselling] -1.72 0.35 -2.43 -1.95 -1.72 -1.48 -1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Self-help]              -2.08 0.49 -3.02 -2.41 -2.08 -1.76 -1.09</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: No intervention]            5194     3199    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Group counselling]          2246     2710    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Individual counselling]     1746     2708    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Self-help]                  1990     2962    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: No intervention]            5785     2731    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Group counselling]          2487     2630    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Individual counselling]     2427     2556    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Self-help]                  2328     2394    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 19</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: No intervention]        -1.90 0.12 -2.14 -1.98 -1.90 -1.82 -1.67</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Group counselling]      -0.79 0.45 -1.65 -1.09 -0.81 -0.51  0.14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Individual counselling] -1.05 0.26 -1.56 -1.23 -1.06 -0.89 -0.52</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Self-help]              -1.41 0.43 -2.27 -1.69 -1.41 -1.13 -0.57</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: No intervention]        -1.90 0.12 -2.14 -1.98 -1.90 -1.82 -1.66</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Group counselling]      -0.79 0.44 -1.64 -1.08 -0.79 -0.51  0.12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Individual counselling] -1.05 0.27 -1.56 -1.22 -1.06 -0.88 -0.51</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Self-help]              -1.41 0.42 -2.22 -1.69 -1.42 -1.15 -0.55</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: No intervention]            7382     3065    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Group counselling]          1966     2655    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Individual counselling]     1223     1997    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Self-help]                  1869     2523    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: No intervention]            7765     2956    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Group counselling]          2046     2583    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Individual counselling]     1602     2286    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Self-help]                  1967     2247    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 20</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   mean   sd  2.5%   25%   50%   75% 97.5%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: No intervention]        -2.80 0.12 -3.05 -2.88 -2.80 -2.72 -2.57</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Group counselling]      -1.70 0.45 -2.56 -1.99 -1.71 -1.41 -0.77</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Individual counselling] -1.96 0.26 -2.44 -2.13 -1.96 -1.78 -1.42</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Self-help]              -2.31 0.43 -3.16 -2.60 -2.31 -2.02 -1.49</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Group counselling]      -1.69 0.44 -2.52 -2.00 -1.71 -1.41 -0.78</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Individual counselling] -1.95 0.26 -2.45 -2.13 -1.96 -1.78 -1.42</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Self-help]              -2.31 0.42 -3.14 -2.60 -2.32 -2.04 -1.47</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: No intervention]            7709     2830    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Group counselling]          1912     2566    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Individual counselling]     1210     1923    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Self-help]                  1834     2351    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: No intervention]            7154     2756    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Group counselling]          2048     2359    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Individual counselling]     1415     2151    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Self-help]                  1905     2292    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 21</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: No intervention]        -1.13 0.85 -2.78 -1.70 -1.12 -0.58  0.55</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Group counselling]      -0.02 0.91 -1.82 -0.61 -0.04  0.55  1.81</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Individual counselling] -0.28 0.83 -1.87 -0.83 -0.28  0.24  1.34</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Self-help]              -0.64 0.83 -2.25 -1.18 -0.64 -0.11  1.01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: No intervention]        -1.16 0.80 -2.80 -1.66 -1.14 -0.63  0.37</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Group counselling]      -0.05 0.86 -1.76 -0.60 -0.04  0.51  1.61</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Individual counselling] -0.31 0.79 -1.87 -0.81 -0.30  0.19  1.23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Self-help]              -0.67 0.80 -2.31 -1.16 -0.65 -0.15  0.85</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: No intervention]            2834     2432    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Group counselling]          3204     2929    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Individual counselling]     3289     2855    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Self-help]                  3623     2748    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: No intervention]            2404     2268    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Group counselling]          3085     2544    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Individual counselling]     2905     2583    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Self-help]                  3459     2872    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 22</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: No intervention]        -2.41 0.85 -4.12 -2.95 -2.39 -1.87 -0.78</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Group counselling]      -1.31 0.80 -2.95 -1.82 -1.30 -0.81  0.27</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Individual counselling] -1.57 0.84 -3.24 -2.10 -1.56 -1.03  0.11</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Self-help]              -1.92 0.82 -3.59 -2.44 -1.91 -1.39 -0.38</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: No intervention]        -2.39 0.84 -4.13 -2.91 -2.38 -1.85 -0.77</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Group counselling]      -1.28 0.79 -2.89 -1.77 -1.27 -0.79  0.28</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Individual counselling] -1.54 0.84 -3.23 -2.06 -1.53 -1.01  0.13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Self-help]              -1.90 0.81 -3.59 -2.41 -1.91 -1.40 -0.27</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: No intervention]            2750     2839    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Group counselling]          3076     2513    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Individual counselling]     3109     3104    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Self-help]                  3755     2805    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: No intervention]            2456     2311    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Group counselling]          3066     2742    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Individual counselling]     2749     2546    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Self-help]                  3133     2487    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 23</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: No intervention]        -2.32 0.85 -4.00 -2.85 -2.29 -1.78 -0.70</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Group counselling]      -1.21 0.81 -2.79 -1.72 -1.21 -0.70  0.37</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Individual counselling] -1.47 0.83 -3.09 -1.99 -1.46 -0.95  0.16</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Self-help]              -1.83 0.90 -3.66 -2.40 -1.81 -1.27 -0.08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: No intervention]        -2.35 0.82 -4.05 -2.89 -2.33 -1.83 -0.72</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Group counselling]      -1.24 0.80 -2.86 -1.76 -1.24 -0.72  0.34</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Individual counselling] -1.50 0.80 -3.08 -2.03 -1.49 -0.98  0.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Self-help]              -1.86 0.88 -3.62 -2.42 -1.86 -1.30 -0.11</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: No intervention]            2714     2445    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Group counselling]          3213     2428    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Individual counselling]     3174     2641    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Self-help]                  2796     2220    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: No intervention]            2574     2661    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Group counselling]          3301     2864    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Individual counselling]     2772     2707    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Self-help]                  2652     2552    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 24</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: No intervention]        -2.82 0.86 -4.54 -3.37 -2.79 -2.26 -1.16</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Group counselling]      -1.72 0.87 -3.40 -2.30 -1.71 -1.15  0.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Individual counselling] -1.98 0.84 -3.61 -2.51 -1.97 -1.45 -0.32</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Self-help]              -2.33 0.92 -4.18 -2.92 -2.32 -1.74 -0.49</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: No intervention]        -2.79 0.84 -4.46 -3.31 -2.79 -2.26 -1.15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Group counselling]      -1.69 0.85 -3.31 -2.24 -1.70 -1.14  0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Individual counselling] -1.95 0.82 -3.55 -2.47 -1.94 -1.43 -0.24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Self-help]              -2.31 0.88 -4.06 -2.86 -2.32 -1.75 -0.53</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: No intervention]            3105     2663    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Group counselling]          3599     2502    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Individual counselling]     3568     2454    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Self-help]                  3227     2442    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: No intervention]            3066     3030    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Group counselling]          3463     3170    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Individual counselling]     3565     3103    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Self-help]                  3104     3010    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Predicted probabilities of success in each study in the network</span></span></span>
@@ -696,314 +697,314 @@ standardised survival time. These are produced using <code>type = "rmst"</code> 
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 1</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: No intervention]        0.06 0.02 0.03 0.05 0.06 0.07  0.10     4714</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Group counselling]      0.17 0.07 0.07 0.12 0.16 0.20  0.35     2253</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Individual counselling] 0.13 0.04 0.06 0.10 0.13 0.16  0.23     1962</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Self-help]              0.10 0.05 0.04 0.07 0.09 0.12  0.22     2354</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: No intervention]        0.06 0.02 0.03 0.05 0.06 0.07  0.10     4728</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Group counselling]      0.17 0.07 0.06 0.12 0.16 0.21  0.34     2337</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Individual counselling] 0.13 0.04 0.06 0.10 0.13 0.16  0.24     2425</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Self-help]              0.10 0.05 0.04 0.07 0.09 0.12  0.21     2297</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: No intervention]            2770    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Group counselling]          2890    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Individual counselling]     2810    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Self-help]                  2628    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: No intervention]            2792    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Group counselling]          2481    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Individual counselling]     2609    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[1: Self-help]                  2287    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 2</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: No intervention]        0.09 0.06 0.01 0.04 0.07 0.11  0.26     2372</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Group counselling]      0.21 0.12 0.05 0.12 0.19 0.27  0.51     2770</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Individual counselling] 0.18 0.11 0.04 0.10 0.15 0.23  0.45     2543</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Self-help]              0.13 0.09 0.03 0.07 0.11 0.17  0.37     2959</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: No intervention]        0.09 0.07 0.02 0.05 0.07 0.11  0.27     2442</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Group counselling]      0.22 0.12 0.05 0.13 0.19 0.28  0.53     3049</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Individual counselling] 0.18 0.11 0.04 0.10 0.15 0.23  0.45     2891</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Self-help]              0.13 0.09 0.03 0.07 0.11 0.17  0.38     3534</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: No intervention]            2395    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Group counselling]          2610    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Individual counselling]     2332    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Self-help]                  2417    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: No intervention]            2506    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Group counselling]          2830    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Individual counselling]     2738    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[2: Self-help]                  2662    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 3</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: No intervention]        0.11 0.01 0.08 0.10 0.11 0.11  0.13     7855</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Group counselling]      0.27 0.09 0.13 0.21 0.26 0.32  0.47     1970</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Individual counselling] 0.22 0.04 0.14 0.19 0.22 0.24  0.32     1231</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Self-help]              0.17 0.06 0.08 0.13 0.16 0.20  0.30     1900</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: No intervention]        0.11 0.01 0.08 0.10 0.10 0.11  0.13     6748</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Group counselling]      0.27 0.08 0.13 0.21 0.26 0.32  0.46     2050</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Individual counselling] 0.22 0.04 0.14 0.19 0.22 0.24  0.31     1531</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Self-help]              0.17 0.06 0.08 0.13 0.16 0.20  0.31     1954</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: No intervention]            3184    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Group counselling]          2601    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Individual counselling]     2110    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Self-help]                  2359    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: No intervention]            2555    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Group counselling]          2197    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Individual counselling]     2153    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[3: Self-help]                  1929    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 4</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: No intervention]        0.02 0.01 0.00 0.01 0.02 0.02  0.05     3635</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Group counselling]      0.06 0.04 0.01 0.03 0.05 0.08  0.17     3007</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Individual counselling] 0.04 0.02 0.01 0.03 0.04 0.06  0.11     3333</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Self-help]              0.03 0.02 0.01 0.02 0.03 0.04  0.09     2804</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: No intervention]        0.02 0.01 0.00 0.01 0.02 0.03  0.05     4159</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Group counselling]      0.06 0.04 0.01 0.03 0.05 0.08  0.17     3361</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Individual counselling] 0.05 0.03 0.01 0.03 0.04 0.06  0.11     3768</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Self-help]              0.03 0.02 0.01 0.02 0.03 0.04  0.10     3395</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: No intervention]            2626    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Group counselling]          2747    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Individual counselling]     2671    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Self-help]                  2475    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: No intervention]            2362    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Group counselling]          2686    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Individual counselling]     2356    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[4: Self-help]                  2547    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 5</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: No intervention]        0.10 0.01 0.08 0.10 0.10 0.11  0.13     6381</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Group counselling]      0.27 0.09 0.13 0.21 0.26 0.32  0.47     1923</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Individual counselling] 0.22 0.05 0.14 0.18 0.21 0.24  0.32     1267</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Self-help]              0.17 0.06 0.07 0.13 0.16 0.20  0.30     1865</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: No intervention]        0.10 0.01 0.08 0.10 0.10 0.11  0.13     8454</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Group counselling]      0.27 0.09 0.13 0.21 0.26 0.32  0.46     1993</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Individual counselling] 0.22 0.05 0.14 0.18 0.21 0.24  0.32     1546</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Self-help]              0.17 0.06 0.08 0.12 0.16 0.20  0.31     1970</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: No intervention]            2729    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Group counselling]          2583    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Individual counselling]     1756    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Self-help]                  2634    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: No intervention]            2496    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Group counselling]          2416    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Individual counselling]     2133    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[5: Self-help]                  2145    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 6</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: No intervention]        0.04 0.02 0.01 0.02 0.03 0.05  0.10     2707</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Group counselling]      0.11 0.07 0.02 0.06 0.09 0.14  0.29     3492</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Individual counselling] 0.08 0.05 0.02 0.05 0.07 0.11  0.21     3238</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Self-help]              0.06 0.05 0.01 0.03 0.05 0.08  0.19     2764</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: No intervention]        0.04 0.03 0.01 0.02 0.03 0.05  0.10     3715</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Group counselling]      0.11 0.08 0.02 0.06 0.10 0.15  0.31     3460</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Individual counselling] 0.09 0.05 0.02 0.05 0.07 0.11  0.21     3544</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Self-help]              0.07 0.05 0.01 0.03 0.05 0.09  0.19     3354</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: No intervention]            2379    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Group counselling]          2903    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Individual counselling]     2500    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Self-help]                  2400    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: No intervention]            2591    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Group counselling]          2421    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Individual counselling]     2718    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[6: Self-help]                  2465    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 7</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: No intervention]        0.05 0.02 0.02 0.04 0.05 0.06  0.10     4302</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Group counselling]      0.14 0.07 0.04 0.09 0.13 0.18  0.31     3082</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Individual counselling] 0.11 0.04 0.04 0.08 0.10 0.14  0.21     3009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Self-help]              0.08 0.04 0.02 0.05 0.08 0.11  0.19     2829</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: No intervention]        0.05 0.02 0.02 0.04 0.05 0.06  0.10     4485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Group counselling]      0.14 0.07 0.04 0.09 0.13 0.18  0.32     2750</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Individual counselling] 0.11 0.04 0.04 0.08 0.11 0.14  0.21     3040</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Self-help]              0.08 0.04 0.02 0.05 0.08 0.11  0.19     2703</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: No intervention]            2483    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Group counselling]          3009    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Individual counselling]     2862    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Self-help]                  3035    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: No intervention]            2985    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Group counselling]          2176    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Individual counselling]     2797    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[7: Self-help]                  2663    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 8</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: No intervention]        0.07 0.04 0.02 0.04 0.06 0.09  0.16     3767</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Group counselling]      0.19 0.10 0.04 0.11 0.17 0.24  0.42     3348</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Individual counselling] 0.15 0.07 0.04 0.10 0.14 0.19  0.31     4032</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Self-help]              0.11 0.07 0.02 0.06 0.10 0.15  0.28     3197</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: No intervention]        0.07 0.04 0.02 0.05 0.07 0.09  0.16     3204</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Group counselling]      0.19 0.10 0.05 0.12 0.17 0.25  0.42     2943</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Individual counselling] 0.15 0.07 0.04 0.10 0.14 0.19  0.31     3167</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Self-help]              0.12 0.07 0.02 0.07 0.10 0.15  0.28     2880</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: No intervention]            2900    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Group counselling]          3169    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Individual counselling]     2792    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Self-help]                  2626    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: No intervention]            2196    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Group counselling]          2553    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Individual counselling]     2283    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[8: Self-help]                  2505    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 9</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: No intervention]        0.14 0.05 0.06 0.11 0.14 0.17  0.26     4476</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Group counselling]      0.34 0.12 0.13 0.25 0.32 0.41  0.62     2723</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Individual counselling] 0.28 0.09 0.13 0.22 0.27 0.33  0.48     3036</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Self-help]              0.22 0.09 0.08 0.15 0.21 0.28  0.44     2529</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: No intervention]        0.14 0.05 0.06 0.11 0.14 0.17  0.25     5440</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Group counselling]      0.34 0.12 0.13 0.25 0.33 0.41  0.59     2856</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Individual counselling] 0.28 0.09 0.13 0.21 0.27 0.33  0.47     3391</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Self-help]              0.22 0.09 0.08 0.15 0.20 0.28  0.44     2927</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                 Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: No intervention]            3217    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Group counselling]          3009    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Individual counselling]     2970    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Self-help]                  2737    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: No intervention]            3079    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Group counselling]          3164    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Individual counselling]     2791    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[9: Self-help]                  2859    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 10</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: No intervention]        0.11 0.01 0.09 0.10 0.11 0.12  0.14     7280</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Group counselling]      0.28 0.09 0.14 0.22 0.27 0.33  0.49     1950</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Individual counselling] 0.23 0.05 0.15 0.20 0.23 0.26  0.33     1292</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Self-help]              0.18 0.06 0.08 0.13 0.17 0.21  0.32     1807</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: No intervention]        0.11 0.01 0.09 0.10 0.11 0.12  0.14     7484</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Group counselling]      0.28 0.09 0.14 0.22 0.27 0.33  0.48     1962</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Individual counselling] 0.23 0.05 0.15 0.20 0.22 0.26  0.33     1514</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Self-help]              0.18 0.06 0.08 0.13 0.17 0.21  0.32     1849</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: No intervention]            2574    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Group counselling]          2489    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Individual counselling]     2399    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Self-help]                  2742    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: No intervention]            3332    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Group counselling]          2269    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Individual counselling]     2068    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[10: Self-help]                  2124    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 11</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: No intervention]        0.03 0.01 0.02 0.02 0.03 0.03  0.04     6572</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Group counselling]      0.08 0.04 0.03 0.06 0.07 0.10  0.18     2122</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Individual counselling] 0.06 0.02 0.03 0.05 0.06 0.07  0.11     1756</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Self-help]              0.05 0.02 0.02 0.03 0.04 0.06  0.09     1941</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: No intervention]        0.03 0.01 0.02 0.02 0.03 0.03  0.04     5889</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Group counselling]      0.08 0.04 0.03 0.06 0.07 0.10  0.17     2246</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Individual counselling] 0.06 0.02 0.03 0.05 0.06 0.07  0.10     2292</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Self-help]              0.05 0.02 0.02 0.03 0.04 0.05  0.10     2040</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: No intervention]            3087    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Group counselling]          2598    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Individual counselling]     2544    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Self-help]                  2515    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: No intervention]            3213    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Group counselling]          2413    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Individual counselling]     2639    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[11: Self-help]                  2309    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 12</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: No intervention]        0.10 0.01 0.08 0.09 0.10 0.11  0.12     7192</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Group counselling]      0.26 0.08 0.12 0.20 0.24 0.30  0.46     1948</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Individual counselling] 0.21 0.04 0.13 0.18 0.20 0.23  0.30     1209</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Self-help]              0.16 0.06 0.07 0.12 0.15 0.19  0.29     1840</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: No intervention]        0.10 0.01 0.08 0.09 0.10 0.11  0.12     6792</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Group counselling]      0.26 0.08 0.12 0.20 0.25 0.30  0.45     2029</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Individual counselling] 0.21 0.04 0.13 0.18 0.20 0.23  0.30     1425</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Self-help]              0.16 0.06 0.07 0.12 0.15 0.19  0.30     1870</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: No intervention]            3041    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Group counselling]          2639    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Individual counselling]     2201    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Self-help]                  2555    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: No intervention]            3242    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Group counselling]          2451    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Individual counselling]     2313    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[12: Self-help]                  2110    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 13</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: No intervention]        0.07 0.03 0.03 0.05 0.07 0.09  0.13     4329</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Group counselling]      0.19 0.09 0.06 0.12 0.17 0.24  0.41     2702</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Individual counselling] 0.15 0.06 0.06 0.11 0.14 0.18  0.29     2761</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Self-help]              0.11 0.06 0.03 0.07 0.10 0.15  0.26     2653</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: No intervention]        0.07 0.03 0.03 0.05 0.07 0.09  0.13     4641</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Group counselling]      0.19 0.09 0.06 0.12 0.17 0.24  0.40     3161</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Individual counselling] 0.15 0.06 0.06 0.10 0.14 0.18  0.29     2995</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Self-help]              0.11 0.06 0.03 0.07 0.10 0.14  0.26     3053</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: No intervention]            3181    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Group counselling]          2926    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Individual counselling]     3022    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Self-help]                  3005    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: No intervention]            2740    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Group counselling]          2333    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Individual counselling]     2962    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[13: Self-help]                  2974    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 14</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: No intervention]        0.08 0.02 0.05 0.07 0.08 0.09  0.12     5148</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Group counselling]      0.22 0.08 0.09 0.16 0.21 0.27  0.42     2116</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Individual counselling] 0.18 0.05 0.10 0.15 0.17 0.20  0.28     1589</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Self-help]              0.14 0.05 0.05 0.10 0.13 0.17  0.26     2043</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: No intervention]        0.08 0.02 0.05 0.07 0.08 0.10  0.12     6856</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Group counselling]      0.22 0.08 0.10 0.16 0.21 0.27  0.41     2221</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Individual counselling] 0.18 0.05 0.10 0.15 0.17 0.21  0.28     2105</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Self-help]              0.14 0.06 0.06 0.10 0.13 0.16  0.27     2093</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: No intervention]            2728    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Group counselling]          2658    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Individual counselling]     2519    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Self-help]                  2747    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: No intervention]            3232    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Group counselling]          2506    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Individual counselling]     2514    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[14: Self-help]                  2668    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 15</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: No intervention]        0.08 0.05 0.01 0.04 0.07 0.10  0.19     3252</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Group counselling]      0.19 0.10 0.04 0.11 0.17 0.25  0.43     3355</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Individual counselling] 0.16 0.09 0.03 0.09 0.14 0.21  0.36     3465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Self-help]              0.12 0.08 0.02 0.06 0.10 0.16  0.31     2789</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: No intervention]        0.08 0.05 0.01 0.04 0.07 0.10  0.19     3738</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Group counselling]      0.19 0.10 0.04 0.11 0.17 0.25  0.43     3397</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Individual counselling] 0.16 0.09 0.03 0.09 0.14 0.21  0.36     3406</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Self-help]              0.12 0.08 0.02 0.06 0.10 0.16  0.32     3359</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: No intervention]            2583    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Group counselling]          2763    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Individual counselling]     2660    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Self-help]                  2672    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: No intervention]            2987    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Group counselling]          3214    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Individual counselling]     2897    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[15: Self-help]                  2332    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 16</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: No intervention]        0.07 0.02 0.03 0.06 0.07 0.08  0.12     5323</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Group counselling]      0.19 0.08 0.07 0.13 0.18 0.24  0.38     2739</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Individual counselling] 0.15 0.05 0.07 0.12 0.15 0.18  0.27     2845</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Self-help]              0.12 0.05 0.04 0.08 0.11 0.14  0.24     2664</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: No intervention]        0.07 0.02 0.03 0.06 0.07 0.09  0.12     5973</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Group counselling]      0.19 0.08 0.07 0.13 0.18 0.24  0.39     2575</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Individual counselling] 0.15 0.05 0.07 0.12 0.15 0.18  0.27     2567</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Self-help]              0.12 0.05 0.04 0.08 0.11 0.14  0.24     2514</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: No intervention]            2722    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Group counselling]          2780    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Individual counselling]     2691    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Self-help]                  2864    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: No intervention]            2885    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Group counselling]          2934    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Individual counselling]     2894    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[16: Self-help]                  2604    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 17</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: No intervention]        0.09 0.01 0.07 0.08 0.09 0.09  0.10     7001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Group counselling]      0.23 0.08 0.11 0.17 0.22 0.27  0.41     1889</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Individual counselling] 0.18 0.04 0.12 0.15 0.18 0.20  0.27     1165</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Self-help]              0.14 0.05 0.06 0.10 0.13 0.17  0.26     1753</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: No intervention]        0.09 0.01 0.07 0.08 0.09 0.09  0.10     6228</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Group counselling]      0.23 0.08 0.11 0.17 0.22 0.27  0.41     1924</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Individual counselling] 0.18 0.04 0.12 0.15 0.18 0.20  0.27     1427</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Self-help]              0.14 0.05 0.06 0.10 0.13 0.16  0.26     1860</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: No intervention]            3074    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Group counselling]          2530    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Individual counselling]     1804    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Self-help]                  2260    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: No intervention]            2256    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Group counselling]          2122    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Individual counselling]     2002    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[17: Self-help]                  1850    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 18</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: No intervention]        0.07 0.02 0.04 0.06 0.07 0.09  0.11     5194</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Group counselling]      0.20 0.08 0.08 0.14 0.19 0.24  0.40     2246</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Individual counselling] 0.16 0.05 0.08 0.12 0.15 0.19  0.26     1746</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Self-help]              0.12 0.05 0.05 0.08 0.11 0.15  0.25     1990</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: No intervention]        0.07 0.02 0.04 0.06 0.07 0.09  0.11     5785</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Group counselling]      0.20 0.08 0.08 0.14 0.19 0.25  0.40     2487</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Individual counselling] 0.16 0.05 0.08 0.12 0.15 0.19  0.27     2427</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Self-help]              0.12 0.05 0.05 0.08 0.11 0.15  0.25     2328</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: No intervention]            3199    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Group counselling]          2710    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Individual counselling]     2708    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Self-help]                  2962    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: No intervention]            2731    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Group counselling]          2630    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Individual counselling]     2556    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[18: Self-help]                  2394    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 19</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: No intervention]        0.13 0.01 0.11 0.12 0.13 0.14  0.16     7382</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Group counselling]      0.32 0.10 0.16 0.25 0.31 0.38  0.53     1966</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Individual counselling] 0.26 0.05 0.17 0.23 0.26 0.29  0.37     1223</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Self-help]              0.20 0.07 0.09 0.16 0.20 0.24  0.36     1869</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: No intervention]        0.13 0.01 0.10 0.12 0.13 0.14  0.16     7765</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Group counselling]      0.32 0.09 0.16 0.25 0.31 0.38  0.53     2046</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Individual counselling] 0.26 0.05 0.17 0.23 0.26 0.29  0.38     1602</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Self-help]              0.20 0.07 0.10 0.16 0.19 0.24  0.37     1967</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: No intervention]            3065    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Group counselling]          2655    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Individual counselling]     1997    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Self-help]                  2523    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: No intervention]            2956    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Group counselling]          2583    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Individual counselling]     2286    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[19: Self-help]                  2247    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 20</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: No intervention]        0.06 0.01 0.05 0.05 0.06 0.06  0.07     7709</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Group counselling]      0.16 0.06 0.07 0.12 0.15 0.20  0.32     1912</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Individual counselling] 0.13 0.03 0.08 0.11 0.12 0.14  0.20     1210</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Self-help]              0.10 0.04 0.04 0.07 0.09 0.12  0.18     1834</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: No intervention]        0.06 0.01 0.05 0.05 0.06 0.06  0.07     7154</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Group counselling]      0.16 0.06 0.07 0.12 0.15 0.20  0.31     2048</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Individual counselling] 0.13 0.03 0.08 0.11 0.12 0.14  0.19     1415</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Self-help]              0.10 0.04 0.04 0.07 0.09 0.11  0.19     1905</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: No intervention]            2830    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Group counselling]          2566    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Individual counselling]     1923    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Self-help]                  2351    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: No intervention]            2756    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Group counselling]          2359    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Individual counselling]     2151    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[20: Self-help]                  2292    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 21</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: No intervention]        0.27 0.15 0.06 0.15 0.25 0.36  0.63     2834</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Group counselling]      0.49 0.19 0.14 0.35 0.49 0.63  0.86     3204</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Individual counselling] 0.44 0.18 0.13 0.30 0.43 0.56  0.79     3289</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Self-help]              0.36 0.17 0.10 0.23 0.35 0.47  0.73     3623</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: No intervention]        0.26 0.14 0.06 0.16 0.24 0.35  0.59     2404</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Group counselling]      0.49 0.18 0.15 0.35 0.49 0.63  0.83     3085</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Individual counselling] 0.43 0.17 0.13 0.31 0.43 0.55  0.77     2905</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Self-help]              0.36 0.16 0.09 0.24 0.34 0.46  0.70     3459</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: No intervention]            2432    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Group counselling]          2929    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Individual counselling]     2855    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Self-help]                  2748    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: No intervention]            2268    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Group counselling]          2544    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Individual counselling]     2583    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[21: Self-help]                  2872    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 22</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: No intervention]        0.10 0.08 0.02 0.05 0.08 0.13  0.31     2750</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Group counselling]      0.24 0.13 0.05 0.14 0.21 0.31  0.57     3076</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Individual counselling] 0.20 0.13 0.04 0.11 0.17 0.26  0.53     3109</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Self-help]              0.15 0.10 0.03 0.08 0.13 0.20  0.40     3755</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: No intervention]        0.11 0.08 0.02 0.05 0.08 0.14  0.32     2456</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Group counselling]      0.24 0.13 0.05 0.15 0.22 0.31  0.57     3066</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Individual counselling] 0.20 0.13 0.04 0.11 0.18 0.27  0.53     2749</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Self-help]              0.16 0.10 0.03 0.08 0.13 0.20  0.43     3133</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: No intervention]            2839    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Group counselling]          2513    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Individual counselling]     3104    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Self-help]                  2805    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: No intervention]            2311    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Group counselling]          2742    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Individual counselling]     2546    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[22: Self-help]                  2487    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 23</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: No intervention]        0.11 0.09 0.02 0.05 0.09 0.14  0.33     2714</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Group counselling]      0.26 0.14 0.06 0.15 0.23 0.33  0.59     3213</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Individual counselling] 0.21 0.13 0.04 0.12 0.19 0.28  0.54     3174</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Self-help]              0.17 0.12 0.03 0.08 0.14 0.22  0.48     2796</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: No intervention]        0.11 0.08 0.02 0.05 0.09 0.14  0.33     2574</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Group counselling]      0.25 0.14 0.05 0.15 0.22 0.33  0.58     3301</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Individual counselling] 0.21 0.12 0.04 0.12 0.18 0.27  0.52     2772</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Self-help]              0.16 0.12 0.03 0.08 0.14 0.21  0.47     2652</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: No intervention]            2445    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Group counselling]          2428    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Individual counselling]     2641    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Self-help]                  2220    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: No intervention]            2661    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Group counselling]          2864    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Individual counselling]     2707    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[23: Self-help]                  2552    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">---------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 24</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: No intervention]        0.07 0.06 0.01 0.03 0.06 0.09  0.24     3105</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Group counselling]      0.18 0.12 0.03 0.09 0.15 0.24  0.50     3599</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Individual counselling] 0.15 0.10 0.03 0.07 0.12 0.19  0.42     3568</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Self-help]              0.12 0.09 0.02 0.05 0.09 0.15  0.38     3227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: No intervention]        0.07 0.06 0.01 0.04 0.06 0.09  0.24     3066</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Group counselling]      0.18 0.12 0.04 0.10 0.15 0.24  0.51     3463</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Individual counselling] 0.15 0.10 0.03 0.08 0.13 0.19  0.44     3565</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Self-help]              0.12 0.09 0.02 0.05 0.09 0.15  0.37     3104</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: No intervention]            2663    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Group counselling]          2502    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Individual counselling]     2454    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Self-help]                  2442    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: No intervention]            3030    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Group counselling]          3170    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Individual counselling]     3103    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[24: Self-help]                  3010    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Predicted probabilities in a population with 67 observed events out of 566</span></span></span>
@@ -1015,15 +1016,15 @@ standardised survival time. These are produced using <code>type = "rmst"</code> 
 <span class="r-in"><span>                        baseline_type <span class="op">=</span> <span class="st">"response"</span>,</span></span>
 <span class="r-in"><span>                        type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                              mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[No intervention]        0.12 0.01 0.09 0.11 0.12 0.13  0.15     3581</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Group counselling]      0.30 0.09 0.14 0.23 0.29 0.35  0.51     1982</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Individual counselling] 0.24 0.05 0.16 0.21 0.24 0.27  0.35     1238</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Self-help]              0.19 0.07 0.08 0.14 0.18 0.22  0.34     1946</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[No intervention]        0.12 0.01 0.09 0.11 0.12 0.13  0.15     4126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Group counselling]      0.30 0.09 0.15 0.23 0.28 0.35  0.50     2031</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Individual counselling] 0.24 0.05 0.16 0.21 0.24 0.27  0.35     1462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Self-help]              0.19 0.06 0.09 0.14 0.18 0.22  0.34     1943</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                              Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[No intervention]            3614    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Group counselling]          2749    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Individual counselling]     2039    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Self-help]                  2416    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[No intervention]            3737    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Group counselling]          2297    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Individual counselling]     2310    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Self-help]                  1880    1</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_pred_RE</span>, ref_line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="predict.stan_nma-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
@@ -1036,15 +1037,15 @@ standardised survival time. These are produced using <code>type = "rmst"</code> 
 <span class="r-in"><span>                         baseline <span class="op">=</span> <span class="fu"><a href="distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">2</span>, sd <span class="op">=</span> <span class="fl">0.13</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                         type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                              mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[No intervention]        0.12 0.01 0.10 0.11 0.12 0.13  0.15     3988</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Group counselling]      0.30 0.09 0.15 0.23 0.29 0.35  0.51     1908</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Individual counselling] 0.24 0.05 0.16 0.21 0.24 0.27  0.35     1256</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Self-help]              0.19 0.07 0.09 0.14 0.18 0.23  0.34     1733</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[No intervention]        0.12 0.01 0.10 0.11 0.12 0.13  0.15     3975</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Group counselling]      0.30 0.09 0.15 0.23 0.29 0.35  0.50     1874</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Individual counselling] 0.24 0.05 0.16 0.21 0.24 0.27  0.35     1447</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Self-help]              0.19 0.06 0.09 0.14 0.18 0.22  0.34     1750</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                              Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[No intervention]            3930    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Group counselling]          2456    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Individual counselling]     1986    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Self-help]                  2487    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[No intervention]            3863    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Group counselling]          2331    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Individual counselling]     2371    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[Self-help]                  2408    1</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_pred_RE2</span>, ref_line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="predict.stan_nma-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
@@ -1060,12 +1061,12 @@ standardised survival time. These are produced using <code>type = "rmst"</code> 
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: FIXTURE</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                        mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[FIXTURE: PBO]     0.04 0.01 0.03 0.04 0.04 0.05  0.06     4982     3404</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[FIXTURE: ETN]     0.46 0.03 0.41 0.44 0.46 0.47  0.51     7198     3286</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[FIXTURE: IXE_Q2W] 0.89 0.02 0.85 0.88 0.89 0.90  0.92     7959     3586</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[FIXTURE: IXE_Q4W] 0.80 0.03 0.74 0.78 0.80 0.81  0.84     7998     3226</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[FIXTURE: SEC_150] 0.67 0.03 0.62 0.65 0.67 0.69  0.72     9519     3159</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[FIXTURE: SEC_300] 0.77 0.02 0.72 0.75 0.77 0.79  0.81     7773     2779</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[FIXTURE: PBO]     0.04 0.01 0.03 0.04 0.04 0.05  0.06     4113     3127</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[FIXTURE: ETN]     0.46 0.02 0.41 0.44 0.46 0.47  0.51     7939     3088</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[FIXTURE: IXE_Q2W] 0.89 0.02 0.85 0.88 0.89 0.90  0.92     5609     2977</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[FIXTURE: IXE_Q4W] 0.80 0.03 0.74 0.78 0.80 0.82  0.84     6619     3233</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[FIXTURE: SEC_150] 0.67 0.03 0.62 0.65 0.67 0.69  0.72     7828     3096</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[FIXTURE: SEC_300] 0.77 0.02 0.72 0.75 0.77 0.79  0.81     9303     2852</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                        Rhat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> pred[FIXTURE: PBO]        1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> pred[FIXTURE: ETN]        1</span>
@@ -1077,12 +1078,12 @@ standardised survival time. These are produced using <code>type = "rmst"</code> 
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-1</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                          mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-1: PBO]     0.06 0.01 0.04 0.05 0.06 0.06  0.07     5163     2987</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-1: ETN]     0.46 0.03 0.41 0.44 0.46 0.48  0.52     7725     3524</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-1: IXE_Q2W] 0.90 0.01 0.88 0.89 0.90 0.91  0.92     9552     3033</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-1: IXE_Q4W] 0.81 0.02 0.78 0.80 0.81 0.82  0.84    10335     3192</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-1: SEC_150] 0.69 0.04 0.60 0.66 0.69 0.72  0.77     8013     3309</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-1: SEC_300] 0.78 0.04 0.71 0.76 0.79 0.81  0.85     6973     3221</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-1: PBO]     0.06 0.01 0.04 0.05 0.06 0.06  0.08     5196     3452</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-1: ETN]     0.46 0.03 0.40 0.44 0.46 0.48  0.52     5977     2874</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-1: IXE_Q2W] 0.90 0.01 0.88 0.89 0.90 0.91  0.92     7511     2885</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-1: IXE_Q4W] 0.81 0.02 0.78 0.80 0.81 0.82  0.84     8402     3238</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-1: SEC_150] 0.69 0.04 0.60 0.66 0.69 0.72  0.77     6457     3357</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-1: SEC_300] 0.78 0.04 0.71 0.76 0.78 0.81  0.85     6560     3265</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                          Rhat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-1: PBO]        1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-1: ETN]        1</span>
@@ -1094,12 +1095,12 @@ standardised survival time. These are produced using <code>type = "rmst"</code> 
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-2</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                          mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-2: PBO]     0.05 0.01 0.03 0.04 0.05 0.05  0.06     5752     3244</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-2: ETN]     0.42 0.02 0.38 0.41 0.42 0.43  0.46     8619     2549</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-2: IXE_Q2W] 0.88 0.01 0.86 0.87 0.88 0.89  0.90     8782     3008</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-2: IXE_Q4W] 0.78 0.02 0.75 0.77 0.78 0.79  0.81     9534     2686</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-2: SEC_150] 0.65 0.04 0.57 0.62 0.65 0.68  0.73     8286     3211</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-2: SEC_300] 0.75 0.04 0.68 0.73 0.75 0.78  0.82     7070     3077</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-2: PBO]     0.05 0.01 0.03 0.04 0.05 0.05  0.06     5163     3394</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-2: ETN]     0.42 0.02 0.38 0.40 0.42 0.43  0.46     7186     3261</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-2: IXE_Q2W] 0.88 0.01 0.86 0.87 0.88 0.89  0.91     5899     2629</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-2: IXE_Q4W] 0.78 0.02 0.75 0.77 0.78 0.79  0.81     7896     3091</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-2: SEC_150] 0.65 0.04 0.57 0.62 0.65 0.68  0.73     7222     3220</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-2: SEC_300] 0.75 0.04 0.68 0.73 0.75 0.78  0.82     6902     3244</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                          Rhat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-2: PBO]        1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-2: ETN]        1</span>
@@ -1111,12 +1112,12 @@ standardised survival time. These are produced using <code>type = "rmst"</code> 
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: UNCOVER-3</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                          mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-3: PBO]     0.08 0.01 0.06 0.07 0.08 0.08  0.10     6026     3607</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-3: ETN]     0.53 0.02 0.49 0.51 0.53 0.54  0.57     9707     2950</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-3: IXE_Q2W] 0.93 0.01 0.91 0.92 0.93 0.93  0.94     7754     2801</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-3: IXE_Q4W] 0.85 0.01 0.83 0.85 0.85 0.86  0.88     7705     2765</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-3: SEC_150] 0.75 0.04 0.67 0.72 0.75 0.77  0.81     8238     3371</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-3: SEC_300] 0.83 0.03 0.77 0.81 0.83 0.85  0.88     7317     3208</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-3: PBO]     0.08 0.01 0.06 0.07 0.08 0.08  0.10     5715     2856</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-3: ETN]     0.53 0.02 0.49 0.51 0.53 0.54  0.57     7520     2911</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-3: IXE_Q2W] 0.93 0.01 0.91 0.92 0.93 0.93  0.94     4684     2775</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-3: IXE_Q4W] 0.85 0.01 0.83 0.85 0.85 0.86  0.88     8420     2739</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-3: SEC_150] 0.75 0.04 0.67 0.72 0.75 0.77  0.81     6764     3095</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-3: SEC_300] 0.83 0.03 0.77 0.81 0.83 0.85  0.88     7398     3338</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                          Rhat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-3: PBO]        1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> pred[UNCOVER-3: ETN]        1</span>
@@ -1162,12 +1163,12 @@ standardised survival time. These are produced using <code>type = "rmst"</code> 
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: New 1</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                      mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[New 1: PBO]     0.06 0.03 0.02 0.04 0.06 0.07  0.12     6297     3623    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[New 1: ETN]     0.37 0.06 0.26 0.33 0.37 0.41  0.48     6052     3780    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[New 1: IXE_Q2W] 0.90 0.03 0.84 0.88 0.90 0.92  0.94     5869     3783    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[New 1: IXE_Q4W] 0.81 0.04 0.72 0.78 0.81 0.83  0.87     5489     3903    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[New 1: SEC_150] 0.68 0.06 0.57 0.65 0.68 0.72  0.78     5652     3795    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> pred[New 1: SEC_300] 0.78 0.05 0.68 0.75 0.78 0.81  0.86     5883     3815    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[New 1: PBO]     0.06 0.02 0.03 0.04 0.06 0.07  0.12     5242     2992    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[New 1: ETN]     0.37 0.06 0.26 0.33 0.37 0.41  0.49     5678     3585    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[New 1: IXE_Q2W] 0.90 0.03 0.84 0.88 0.90 0.92  0.94     4627     3703    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[New 1: IXE_Q4W] 0.80 0.04 0.72 0.78 0.81 0.83  0.87     4981     3660    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[New 1: SEC_150] 0.68 0.06 0.56 0.64 0.68 0.72  0.78     4585     3325    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> pred[New 1: SEC_300] 0.78 0.05 0.68 0.75 0.78 0.81  0.86     4815     3514    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_pred_new</span>, ref_line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="predict.stan_nma-4.png" alt="" width="700" height="433"></span>

@@ -33,6 +33,7 @@
     <a class="dropdown-item" href="../articles/example_diabetes.html">Example: Diabetes</a>
     <a class="dropdown-item" href="../articles/example_dietary_fat.html">Example: Dietary fat</a>
     <a class="dropdown-item" href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a>
+    <a class="dropdown-item" href="../articles/example_ndmm.html">Example: Newly diagnosed multiple myeloma</a>
     <a class="dropdown-item" href="../articles/example_parkinsons.html">Example: Parkinson's disease</a>
     <a class="dropdown-item" href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a>
     <a class="dropdown-item" href="../articles/example_smoking.html">Example: Smoking cessation</a>
@@ -158,44 +159,44 @@ usual ggplot2 functions to add further aesthetics, geoms, themes, etc.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">------------------------------</span> <span style="font-weight: bold;">Node-split Group counselling vs. No intervention</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  mean   sd  2.5%   25%   50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_net            1.12 0.44  0.28  0.82  1.11 1.39  2.03     1645     1681    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir            1.08 0.75 -0.30  0.57  1.04 1.54  2.68     3390     2527    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind            1.13 0.55  0.07  0.77  1.12 1.49  2.24     1860     2173    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> omega           -0.05 0.93 -1.81 -0.66 -0.08 0.54  1.89     2279     2112    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.87 0.20  0.55  0.72  0.84 0.98  1.34     1103     1579    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.84 0.19  0.55  0.71  0.82 0.95  1.28     1151     1476    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_net            1.09 0.46  0.23  0.79  1.07 1.38  2.04     1679     2116    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir            1.06 0.75 -0.32  0.57  1.03 1.54  2.64     3489     3026    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind            1.15 0.55  0.08  0.78  1.14 1.50  2.24     1788     2248    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> omega           -0.08 0.91 -1.85 -0.67 -0.08 0.49  1.77     2467     2399    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.86 0.19  0.56  0.72  0.83 0.96  1.30     1184     1824    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.84 0.19  0.55  0.71  0.82 0.95  1.30     1139     1900    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54.6<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 99.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.93</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">-------------------------</span> <span style="font-weight: bold;">Node-split Individual counselling vs. No intervention</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 mean   sd  2.5%   25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           0.86 0.23  0.43  0.70 0.85 1.00  1.35      904     1497 1.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir           0.88 0.25  0.39  0.71 0.87 1.04  1.39     2489     2715 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           0.56 0.67 -0.70  0.12 0.54 0.98  1.95     2246     2533 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> omega           0.31 0.70 -1.11 -0.13 0.31 0.79  1.65     2265     2499 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau             0.86 0.20  0.55  0.72 0.83 0.97  1.30     1297     1922 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency 0.84 0.19  0.55  0.71 0.82 0.95  1.28     1151     1476 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           0.84 0.24  0.38  0.67 0.82 0.99  1.35      844     1162    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir           0.89 0.26  0.41  0.71 0.88 1.05  1.42     2016     2549    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           0.58 0.66 -0.68  0.13 0.59 1.01  1.92     1786     1915    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> omega           0.30 0.69 -1.07 -0.13 0.30 0.76  1.68     1779     1984    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau             0.86 0.20  0.55  0.72 0.83 0.98  1.34      999     2034    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency 0.84 0.19  0.55  0.71 0.82 0.95  1.30     1139     1900    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54.7<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 99.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.6<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 43.7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 97.3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.64</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">--------------------------------------</span> <span style="font-weight: bold;">Node-split Self-help vs. No intervention</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  mean   sd  2.5%   25%   50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_net            0.49 0.40 -0.27  0.23  0.49 0.75  1.30     1757     2250 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir            0.33 0.56 -0.81 -0.03  0.33 0.68  1.43     3503     2653 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind            0.69 0.64 -0.58  0.29  0.69 1.11  1.96     2401     2444 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> omega           -0.37 0.85 -2.12 -0.90 -0.37 0.18  1.29     2437     2260 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.88 0.20  0.57  0.74  0.85 0.98  1.32     1165     2015 1.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.84 0.19  0.55  0.71  0.82 0.95  1.28     1151     1476 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_net            0.49 0.42 -0.30  0.22  0.48 0.75  1.30     1480     1710    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir            0.34 0.55 -0.75 -0.03  0.35 0.69  1.39     3160     2792    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind            0.70 0.62 -0.51  0.29  0.69 1.10  1.98     2459     2474    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> omega           -0.36 0.84 -2.01 -0.88 -0.36 0.19  1.27     2449     2251    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.87 0.19  0.58  0.74  0.84 0.97  1.32     1478     2268    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.84 0.19  0.55  0.71  0.82 0.95  1.30     1139     1900    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.6<span style="color: #555555;"> (on 50 data points)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.1</span>
@@ -206,50 +207,50 @@ usual ggplot2 functions to add further aesthetics, geoms, themes, etc.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">-----------------------</span> <span style="font-weight: bold;">Node-split Individual counselling vs. Group counselling</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           -0.26 0.41 -1.10 -0.53 -0.26  0.01  0.54     2238     2428    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir           -0.10 0.48 -1.08 -0.41 -0.10  0.22  0.83     3224     3015    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           -0.54 0.62 -1.79 -0.93 -0.52 -0.14  0.65     1427     2141    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> omega            0.44 0.67 -0.90  0.00  0.44  0.90  1.75     1574     2024    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.86 0.20  0.56  0.72  0.83  0.97  1.34     1043     1647    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.84 0.19  0.55  0.71  0.82  0.95  1.28     1151     1476    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           -0.25 0.43 -1.14 -0.53 -0.25  0.02  0.57     2577     2380    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir           -0.09 0.48 -1.04 -0.41 -0.09  0.21  0.86     3540     2715    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           -0.56 0.61 -1.77 -0.96 -0.55 -0.15  0.64     1576     2060    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> omega            0.47 0.66 -0.80  0.03  0.45  0.90  1.81     1603     2031    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.87 0.20  0.55  0.72  0.84  0.98  1.33     1007     1632    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.84 0.19  0.55  0.71  0.82  0.95  1.30     1139     1900    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54.1<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.4<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 43.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 97.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.47</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">------------------------------------</span> <span style="font-weight: bold;">Node-split Self-help vs. Group counselling</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           -0.62 0.49 -1.59 -0.95 -0.61 -0.30  0.30     2510     2294    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir           -0.61 0.67 -1.94 -1.03 -0.60 -0.17  0.73     4253     3190    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           -0.62 0.67 -1.99 -1.06 -0.61 -0.18  0.73     1595     2264    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> omega            0.01 0.88 -1.73 -0.57  0.02  0.58  1.76     1928     2407    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.88 0.21  0.56  0.73  0.85  0.99  1.36     1166     1344    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.84 0.19  0.55  0.71  0.82  0.95  1.28     1151     1476    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           -0.60 0.49 -1.58 -0.92 -0.59 -0.28  0.33     2538     2572    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir           -0.62 0.68 -2.02 -1.06 -0.61 -0.18  0.69     3385     2490    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           -0.62 0.68 -1.99 -1.05 -0.60 -0.18  0.72     1874     2220    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> omega            0.00 0.91 -1.85 -0.58 -0.01  0.57  1.82     2120     1866    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.88 0.21  0.57  0.73  0.85  0.99  1.39     1063     1226    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.84 0.19  0.55  0.71  0.82  0.95  1.30     1139     1900    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.9<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.97</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.99</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">-------------------------------</span> <span style="font-weight: bold;">Node-split Self-help vs. Individual counselling</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           -0.36 0.41 -1.18 -0.63 -0.36 -0.09  0.44     2045     2433 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir            0.05 0.66 -1.26 -0.39  0.04  0.48  1.39     3724     2962 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           -0.63 0.51 -1.65 -0.96 -0.63 -0.30  0.34     2018     2477 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> omega            0.69 0.82 -0.88  0.13  0.70  1.23  2.29     2365     2504 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.86 0.19  0.56  0.73  0.84  0.97  1.31     1044     1460 1.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.84 0.19  0.55  0.71  0.82  0.95  1.28     1151     1476 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           -0.35 0.42 -1.19 -0.62 -0.35 -0.07  0.48     1959     2404    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir            0.07 0.67 -1.23 -0.38  0.05  0.49  1.44     3714     3194    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           -0.59 0.52 -1.66 -0.92 -0.59 -0.25  0.40     1670     2061    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> omega            0.66 0.81 -0.96  0.14  0.64  1.15  2.36     2105     2456    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.86 0.19  0.56  0.72  0.83  0.97  1.30     1009     2014    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.84 0.19  0.55  0.71  0.82  0.95  1.30     1139     1900    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.3<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 43.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 97.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.7<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 97.7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.41</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.39</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot the node-splitting results</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_nodesplit_summary</span><span class="op">)</span></span></span>

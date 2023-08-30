@@ -39,6 +39,7 @@ tidygraph packages."><meta property="og:image" content="https://dmphillippo.gith
     <a class="dropdown-item" href="../articles/example_diabetes.html">Example: Diabetes</a>
     <a class="dropdown-item" href="../articles/example_dietary_fat.html">Example: Dietary fat</a>
     <a class="dropdown-item" href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a>
+    <a class="dropdown-item" href="../articles/example_ndmm.html">Example: Newly diagnosed multiple myeloma</a>
     <a class="dropdown-item" href="../articles/example_parkinsons.html">Example: Parkinson's disease</a>
     <a class="dropdown-item" href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a>
     <a class="dropdown-item" href="../articles/example_smoking.html">Example: Smoking cessation</a>
@@ -158,9 +159,9 @@ one edge is produced for each comparison (by IPD or AgD study type) with a
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Convert to igraph object</span></span></span>
 <span class="r-in"><span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/as.igraph.html" class="external-link">as.igraph</a></span><span class="op">(</span><span class="va">smk_net</span><span class="op">)</span>  <span class="co"># Edges combined by default</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 8aa62f4 UN-- 4 6 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 7c2ff29 UN-- 4 6 -- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> + attr: name (v/c), .sample_size (v/n), .nstudy (e/n), .type (e/c)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 8aa62f4 (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 7c2ff29 (vertex names):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] No intervention       --Group counselling     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2] No intervention       --Individual counselling</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3] Group counselling     --Individual counselling</span>
@@ -168,9 +169,9 @@ one edge is produced for each comparison (by IPD or AgD study type) with a
 <span class="r-out co"><span class="r-pr">#&gt;</span> [5] Group counselling     --Self-help             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [6] Individual counselling--Self-help             </span>
 <span class="r-in"><span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/as.igraph.html" class="external-link">as.igraph</a></span><span class="op">(</span><span class="va">smk_net</span>, collapse <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># Without combining edges</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 48ec789 UN-- 4 28 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH 28c069a UN-- 4 28 -- </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> + attr: name (v/c), .sample_size (v/n), .study (e/c), .type (e/c)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 48ec789 (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from 28c069a (vertex names):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] No intervention       --Group counselling     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [2] No intervention       --Individual counselling</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [3] Group counselling     --Individual counselling</span>
