@@ -49,17 +49,17 @@ functions {
     l = lS(itime, eta, scoef);
 
     // Observed
-    l[which(status, 1)] += lh(time[which(status, 1)], eta[which(status, 1)], scoef);
+    l[which(status, 1)] += lh(time[which(status, 1)], eta[which(status, 1)], scoef[which(status, 1)]);
 
     // Left censored
     l[which(status, 2)] = log1m_exp(l[which(status, 2)]);
 
     // Interval censored
     // l = log_diff_exp(lS(start_itime, eta, scoef), lS(itime, eta, scoef));
-    l[which(status, 3)] = log(exp(lS(start_itime[which(status, 3)], eta[which(status, 3)], scoef)) - exp(l[which(status, 3)]));
+    l[which(status, 3)] = log(exp(lS(start_itime[which(status, 3)], eta[which(status, 3)], scoef[which(status, 3)])) - exp(l[which(status, 3)]));
 
     // Left truncation
-    l[which(delayed, 1)] -= lS(delay_itime[which(delayed, 1)], eta[which(delayed, 1)], scoef);
+    l[which(delayed, 1)] -= lS(delay_itime[which(delayed, 1)], eta[which(delayed, 1)], scoef[which(delayed, 1)]);
 
     return l;
   }
@@ -100,11 +100,6 @@ data {
   // Number of spline coefficients
   int<lower=2> n_scoef;
 
-  // Hierarchical logistic prior on spline coefficients
-  real<lower=0> prior_aux_a;  // hyperprior on logistic sd sigma ~ Gamma(a, b)
-  real<lower=0> prior_aux_b;
-  vector[n_scoef-1] prior_aux_mu;  // prior logistic mean
-
   // AgD arm-based
   // int<lower=0> narm_agd_arm; // Number of arm-based AgD arms
   array[ni_agd_arm] int<lower=1> agd_arm_arm; // Arm indicator for AgD (arm-based) (i.e. picking element of which_RE)
@@ -127,12 +122,18 @@ data {
   // aux IDs for independent spline coefficients parameters
   // int<lower=0, upper=1> aux_by; // Flag subgroup aux parameters within each arm (1 = yes)
   // int<lower=0, upper=1> aux_reg; // Flag regression on aux pars (1 = yes)
-  int<lower=1> aux_id[ni_ipd + ni_agd_arm*nint_max]; //aux_id[ni_ipd + ni_agd_arm*(aux_by || aux_reg ? nint_max : 1)];
+  int<lower=0, upper=1> aux_int; // Flag aux regression needs integration (1 = yes)
+  int<lower=1> aux_id[ni_ipd + ni_agd_arm*(aux_int ? nint_max : 1)];
 
   // auxiliary design matrix
   int<lower=0> nX_aux;
-  matrix[ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast), nX_aux] X_aux; // X_aux is Q from QR decomposition if QR = 1
+  matrix[ni_ipd + (aux_int ? nint_max : 1) * (ni_agd_arm + ni_agd_contrast), nX_aux] X_aux; // X_aux is Q from QR decomposition if QR = 1
   matrix[QR ? nX_aux : 0, QR ? nX_aux : 0] R_inv_aux;
+
+  // Hierarchical logistic prior on spline coefficients
+  real<lower=0> prior_aux_a;  // hyperprior on logistic sd sigma ~ Gamma(a, b)
+  real<lower=0> prior_aux_b;
+  vector[n_scoef-1] prior_aux_location[max(aux_id)];  // prior logistic mean
 }
 transformed data {
   // Dirichlet prior vector
@@ -144,7 +145,7 @@ transformed data {
   // Split spline Q matrix or X matrix into IPD and AgD rows
   matrix[0, nX_aux] Xauxdummy;
   matrix[ni_ipd, nX_aux] X_aux_ipd = ni_ipd ? X_aux[1:ni_ipd] : Xauxdummy;
-  matrix[nint_max * ni_agd_arm, nX_aux] X_aux_agd_arm = ni_agd_arm ? X_aux[(ni_ipd + 1):(ni_ipd + nint_max * ni_agd_arm)] : Xauxdummy;
+  matrix[(aux_int ? nint_max : 1) * ni_agd_arm, nX_aux] X_aux_agd_arm = ni_agd_arm ? X_aux[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)] : Xauxdummy;
 
 #include /include/transformed_data_common.stan
 }
@@ -168,7 +169,7 @@ transformed parameters {
 
   // Spline coefficients
   matrix[ni_ipd, n_scoef] scoef_ipd;
-  matrix[nint_max * ni_agd_arm, n_scoef] scoef_agd_arm;
+  matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef] scoef_agd_arm;
 
 #include /include/transformed_parameters_common.stan
 
@@ -176,14 +177,14 @@ transformed parameters {
   if (ni_ipd) {
     matrix[ni_ipd, n_scoef-1] Xb_aux = X_aux_ipd * beta_aux_tilde;
     for (i in 1:ni_ipd) {
-      scoef_ipd[i, ] = to_row_vector(softmax(append_row(0, prior_aux_mu + to_vector(Xb_aux[i, ]) + u_aux[aux_id[i]] * sigma[aux_id[i]])));
+      scoef_ipd[i, ] = to_row_vector(softmax(append_row(0, prior_aux_location[aux_id[i]] + to_vector(Xb_aux[i, ]) + u_aux[aux_id[i]] * sigma[aux_id[i]])));
     }
   }
 
   if (ni_agd_arm) {
-    matrix[ni_agd_arm * nint_max, n_scoef-1] Xb_aux = X_aux_agd_arm * beta_aux_tilde;
-    for (i in 1:(ni_agd_arm * nint_max)) {
-      scoef_agd_arm[i, ] = to_row_vector(softmax(append_row(0, prior_aux_mu + to_vector(Xb_aux[i, ]) + u_aux[aux_id[ni_ipd + i]] * sigma[aux_id[ni_ipd + i]])));
+    matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef-1] Xb_aux = X_aux_agd_arm * beta_aux_tilde;
+    for (i in 1:((aux_int ? nint_max : 1) * ni_agd_arm)) {
+      scoef_agd_arm[i, ] = to_row_vector(softmax(append_row(0, prior_aux_location[aux_id[i]] + to_vector(Xb_aux[i, ]) + u_aux[aux_id[ni_ipd + i]] * sigma[aux_id[ni_ipd + i]])));
     }
   }
 
@@ -219,7 +220,7 @@ transformed parameters {
         if (RE && which_RE[narm_ipd + agd_arm_arm[i]]) eta_agd_arm_ii += f_delta[which_RE[narm_ipd + agd_arm_arm[i]]];
 
         // Average likelihood over integration points
-        // if (aux_by) for (j in 1:nint) {
+        if (aux_int) { //for (j in 1:nint) {
           log_L_ii = loglik_a(agd_arm_time[i],
                                agd_arm_itime[i],
                                agd_arm_start_itime[i],
@@ -228,16 +229,16 @@ transformed parameters {
                                agd_arm_status[i],
                                eta_agd_arm_ii,
                                scoef_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ]);
-        // } else {
-        //   log_L_ii = loglik_a(agd_arm_time[i],
-        //                       agd_arm_itime[i],
-        //                       agd_arm_start_itime[i],
-        //                       agd_arm_delay_itime[i],
-        //                       agd_arm_delayed[i],
-        //                       agd_arm_status[i],
-        //                       eta_agd_arm_ii,
-        //                       scoef_agd_arm[aux_id[ni_ipd + i]]);
-        // }
+        } else {
+          log_L_ii = loglik_a(agd_arm_time[i],
+                              agd_arm_itime[i],
+                              agd_arm_start_itime[i],
+                              agd_arm_delay_itime[i],
+                              agd_arm_delayed[i],
+                              agd_arm_status[i],
+                              eta_agd_arm_ii,
+                              to_matrix(scoef_agd_arm[aux_id[ni_ipd + i], ]));
+        }
 
         log_L_agd_arm[i] = log_sum_exp(log_L_ii) - log(nint);
       }
@@ -288,7 +289,7 @@ generated quantities {
 
   // Baseline spline coefficients
   for (i in 1:n_aux) {
-    scoef[i] = softmax(append_row(0, prior_aux_mu + u_aux[i] * sigma[i]));
+    scoef[i] = softmax(append_row(0, prior_aux_location[i] + u_aux[i] * sigma[i]));
   }
 
   // Log likelihood
