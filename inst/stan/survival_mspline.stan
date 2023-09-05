@@ -174,9 +174,12 @@ data {
   matrix[QR ? nX_aux : 0, QR ? nX_aux : 0] R_inv_aux;
 
   // Hierarchical logistic prior on spline coefficients
-  real<lower=0> prior_aux_a;  // hyperprior on logistic sd sigma ~ Gamma(a, b)
-  real<lower=0> prior_aux_b;
-  vector[n_scoef-1] prior_aux_location[max(aux_id)];  // prior logistic mean
+  int<lower=0,upper=7> prior_hyper_dist;
+  real<lower=0> prior_hyper_location;
+  real<lower=0> prior_hyper_scale;
+  real<lower=0> prior_hyper_df;
+  real<lower=0> prior_hyper_shape;
+  matrix[max(aux_id), n_scoef-1] prior_aux_location;  // prior logistic mean
 }
 transformed data {
   // Dirichlet prior vector
@@ -315,9 +318,15 @@ model {
 #include /include/model_common.stan
 
   // -- Prior on spline coefficients --
-  for (i in 1:n_aux) u_aux[i] ~ logistic(0, 1);
-  sigma ~ gamma(prior_aux_a, prior_aux_b);
+  for (i in 1:(n_scoef-1)) u_aux[, i] ~ logistic(0, 1);
   for (i in 1:(n_scoef-1)) prior_select_lp(beta_aux_tilde[, i], prior_reg_dist, prior_reg_location, prior_reg_scale, prior_reg_df);
+
+  // Hyperprior on spline sd
+  if (prior_hyper_dist < 7) {
+    prior_select_lp(sigma, prior_hyper_dist, prior_hyper_location, prior_hyper_scale, prior_hyper_df);
+  } else if (prior_hyper_dist == 7) { // Gamma prior
+    sigma ~ gamma(prior_hyper_shape, 1/prior_hyper_scale);
+  }
 
   // -- IPD likelihood --
   target += log_L_ipd;
