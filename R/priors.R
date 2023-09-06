@@ -41,7 +41,7 @@
 #' | \strong{half-Student t} `half_student_t()` | - | - | Yes | - | Yes |
 #' | \strong{log-Student t} `log_student_t()` | - | - | Yes | - | Yes |
 #' | \strong{Exponential} `exponential()` | - | - | Yes | - | Yes |
-#' | \strong{Dirichlet} `dirichlet()` | - | - | - | - | Yes |
+#' | \strong{Gamma} `gamma()` | - | - | - | - | Yes |
 #' | \strong{Flat} `flat()` | Yes | Yes | Yes | Yes | Yes |
 #'
 #' The `flat()` prior is a special case where no prior information is added to
@@ -51,14 +51,10 @@
 #' [Stan user's guide](https://mc-stan.org/docs/stan-users-guide/some-differences-in-the-statistical-models-that-are-allowed.html)
 #' for more details.
 #'
-#' The `dirichlet()` prior is currently only used as a prior distribution for
-#' the spline coefficients in `mspline` or `pexp` models, which form an
-#' \eqn{L}-dimensional unit simplex (i.e. lie between 0 and 1, and sum to 1).
-#' The `shape` parameter controls the concentration, with `shape=1`
-#' corresponding to a uniform prior over all simplexes. Values of `shape`
-#' \eqn{<1} concentrate the prior mass into the corners of the simplex, with one
-#' dimension close to 1 and the rest close to zero; values of `shape` \eqn{>1}
-#' increasingly concentrate all dimensions towards the prior mean \eqn{1/L}.
+#' The `gamma()` prior is currently only used as a prior distribution for
+#' the smoothing standard deviation hyperparameter \eqn{sigma} in `mspline` or
+#' `pexp` models. This controls the smoothness of the baseline hazard spline,
+#' with \eqn{sigma = 0} being a constant hazard.
 #'
 #' @return Object of class [nma_prior].
 #' @export
@@ -157,11 +153,27 @@ flat <- function() {
 
 #' @rdname priors
 #' @export
-dirichlet <- function(shape = 1) {
-  check_prior_scale(shape, type = "shape")
+gamma <- function(shape, rate = 1/scale, scale = 1/rate) {
+  if (missing(scale) && missing(rate))
+    abort("Missing argument. Specify either `rate` or `scale`.")
+  if (!missing(rate) && !missing(scale))
+    warn("Both `rate` and `scale` provided, only `scale` will be used")
 
-  return(new_nma_prior("Dirichlet", shape = shape))
+  check_prior_scale(shape, "shape")
+  check_prior_scale(rate, "rate")
+
+  return(new_nma_prior("Gamma",
+                       shape = shape,
+                       scale = scale))
 }
+
+# #' @rdname priors
+# #' @export
+# dirichlet <- function(shape = 1) {
+#   check_prior_scale(shape, type = "shape")
+#
+#   return(new_nma_prior("Dirichlet", shape = shape))
+# }
 
 # #' @rdname priors
 # #' @export
@@ -267,11 +279,15 @@ get_tidy_prior <- function(prior, trunc = NULL, ..., n_dim) {
     out <- tibble::tibble(dist_label = d,
                           dist = "exp",
                           args = list(list(rate = 1 / prior$scale)))
-  } else if (d == "Dirichlet") {
-    if (missing(n_dim)) abort("Provide `n_dim`, the number of dimensions for the Dirichlet prior.")
+  # } else if (d == "Dirichlet") {
+  #   if (missing(n_dim)) abort("Provide `n_dim`, the number of dimensions for the Dirichlet prior.")
+  #   out <- tibble::tibble(dist_label = d,
+  #                         dist = "beta",
+  #                         args = list(list(shape1 = prior$shape, shape2 = (n_dim - 1)*prior$shape)))
+  } else if (d == "Gamma") {
     out <- tibble::tibble(dist_label = d,
-                          dist = "beta",
-                          args = list(list(shape1 = prior$shape, shape2 = (n_dim - 1)*prior$shape)))
+                          dist = "gamma",
+                          args = list(list(shape = prior$shape, scale = prior$scale)))
   } else if (d == "flat (implicit)") {
     out <- tibble::tibble(dist_label = d,
                           dist = "unif",
