@@ -21,6 +21,7 @@ nma(
   prior_reg = .default(normal(scale = 10)),
   prior_aux = .default(),
   aux_by = NULL,
+  aux_regression = NULL,
   QR = FALSE,
   center = TRUE,
   adapt_delta = NULL,
@@ -86,7 +87,11 @@ should be a list of prior distributions with elements \code{sigma} and \code{k}.
 
 \item{aux_by}{Vector of variable names listing the variables to stratify the
 auxiliary parameters by. Currently only used for survival models, see
-details.}
+details. Cannot be used with \code{aux_regression}.}
+
+\item{aux_regression}{A one-sided model formula giving a regression model for
+the auxiliary parameters. Currently only used for survival models, see
+details. Cannot be used with \code{aux_by}.}
 
 \item{QR}{Logical scalar (default \code{FALSE}), whether to apply a QR
 decomposition to the model design matrix}

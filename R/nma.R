@@ -42,7 +42,10 @@
 #'   should be a list of prior distributions with elements `sigma` and `k`.
 #' @param aux_by Vector of variable names listing the variables to stratify the
 #'   auxiliary parameters by. Currently only used for survival models, see
-#'   details.
+#'   details. Cannot be used with `aux_regression`.
+#' @param aux_regression A one-sided model formula giving a regression model for
+#'   the auxiliary parameters. Currently only used for survival models, see
+#'   details. Cannot be used with `aux_by`.
 #' @param QR Logical scalar (default `FALSE`), whether to apply a QR
 #'   decomposition to the model design matrix
 #' @param center Logical scalar (default `TRUE`), whether to center the
@@ -232,6 +235,7 @@ nma <- function(network,
                 prior_reg = .default(normal(scale = 10)),
                 prior_aux = .default(),
                 aux_by = NULL,
+                aux_regression = NULL,
                 QR = FALSE,
                 center = TRUE,
                 adapt_delta = NULL,
@@ -479,7 +483,7 @@ nma <- function(network,
       prior_aux <- .default(list(sigma = half_normal(scale = 10),
                                  k = half_normal(scale = 10)))
     } else if (likelihood %in% c("mspline", "pexp")) {
-      prior_aux <- .default(dirichlet(1))
+      prior_aux <- .default(gamma(shape = 2, rate = 1))
     }
     prior_defaults$prior_aux <- get_prior_call(prior_aux)
   }
@@ -503,9 +507,27 @@ nma <- function(network,
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
-    adapt_delta <- switch(trt_effects, fixed = 0.8, random = 0.95)
+    if (likelihood %in% c("mspline", "pexp")) adapt_delta <- 0.95
+    else adapt_delta <- switch(trt_effects, fixed = 0.8, random = 0.95)
   } else if (!rlang::is_scalar_double(adapt_delta) ||
       adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
+
+  if (!is.null(aux_by) && !is.null(aux_regression)) {
+    abort("Cannot specify both `aux_by` and `aux_regression`.")
+  }
+
+  # Set up aux_regression
+  has_aux_regression <- FALSE
+  if (!is.null(aux_regression) && likelihood %in% valid_lhood$survival &&
+      has_aux &&
+      (has_ipd(network) || has_agd_arm(network))) {
+    if (!rlang::is_formula(aux_regression, lhs = FALSE)) abort("`aux_regression` should be a one-sided formula.")
+    if (!is.null(attr(aux_regression, "offset"))) abort("Offset terms not allowed in `aux_regression`.")
+
+    # Remove main effect of study if specified, and ensure an intercept column (removed from model matrix later)
+    aux_regression <- update.formula(aux_regression, ~. -.study +1)
+    has_aux_regression <- TRUE
+  }
 
   # Set up aux_by
   has_aux_by <- FALSE
@@ -870,7 +892,11 @@ nma <- function(network,
 
   # Set up aux_by design vector
   if (has_aux_by) {
-    if (length(setdiff(aux_by, c(".study", ".trt"))) > 0) {
+    # Determine whether we need to integrate over the aux regression too
+    aux_int <- length(setdiff(aux_by, c(".study", ".trt"))) > 0 ||
+      (!is.null(aux_regression) && length(setdiff(colnames(attr(terms(aux_regression), "factor")), c(".study", ".trt"))) > 0)
+
+    if (aux_int) {
       aux_dat <- dplyr::bind_rows(dat_ipd, idat_agd_arm)
     } else {
       aux_dat <- dplyr::bind_rows(dat_ipd,
@@ -879,6 +905,15 @@ nma <- function(network,
     aux_id <- get_aux_id(aux_dat, aux_by)
   } else {
     aux_id <- integer()
+    aux_int <- FALSE
+  }
+
+  # Set up aux_regression design matrix
+  if (has_aux_regression) {
+    X_aux <- model.matrix(aux_regression, data = aux_dat)
+    X_aux <- X_aux[, colnames(X_aux) != "(Intercept)", drop = FALSE]
+  } else {
+    X_aux <- NULL
   }
 
   # Fit using nma.fit
@@ -904,6 +939,7 @@ nma <- function(network,
     prior_reg = prior_reg,
     prior_aux = prior_aux,
     aux_id = aux_id,
+    X_aux = X_aux,
     QR = QR,
     adapt_delta = adapt_delta,
     int_thin = int_thin,
@@ -1047,6 +1083,7 @@ nma <- function(network,
               trt_effects = trt_effects,
               consistency = consistency,
               regression = regression,
+              aux_regression = aux_regression,
               class_interactions = if (!is.null(regression) && !is.null(network$classes)) class_interactions else NULL,
               xbar = xbar,
               likelihood = likelihood,
@@ -1110,6 +1147,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_reg,
                     prior_aux,
                     aux_id = integer(),
+                    X_aux = NULL,
                     QR = FALSE,
                     adapt_delta = NULL,
                     int_thin = 0,
@@ -1365,6 +1403,13 @@ nma.fit <- function(ipd_x, ipd_y,
     X_all_Q <- qr.Q(X_all_qr) * sqrt(nrow(X_all) - 1)
     X_all_R <- qr.R(X_all_qr)[, sort.list(X_all_qr$pivot)] / sqrt(nrow(X_all) - 1)
     X_all_R_inv <- solve(X_all_R)
+
+    if (!is.null(X_aux)) {
+      X_aux_qr <- qr(X_aux)
+      X_aux_Q <- qr.Q(X_aux_qr) * sqrt(nrow(X_aux) - 1)
+      X_aux_R <- qr.R(X_aux_qr)[, sort.list(X_aux_qr$pivot)] / sqrt(nrow(X_aux) - 1)
+      X_aux_R_inv <- solve(X_aux_R)
+    }
   }
 
   # Handle integration points
@@ -1778,13 +1823,29 @@ nma.fit <- function(ipd_x, ipd_y,
         abort("`aux_id` must be an integer vector identifying the auxiliary parameter for each observation in IPD and AgD (arm-based) data.")
     }
 
+    # Set aux_int
+    if (n_int > 1) {
+      aux_int <- length(aux_id) == nrow(X_all)
+    } else {
+      aux_int <- FALSE
+    }
+
+    # Get scoef prior means
+    prior_aux_location <- purrr::map(basis, mspline_constant_hazard)
+
     standat <- purrr::list_modify(standat,
                                   # AgD arm IDs
                                   agd_arm_arm = agd_arm_arm,
 
                                   # Aux IDs
-                                  aux_by = length(aux_id) == ni_ipd + ni_agd_arm*n_int,
+                                  #aux_by = length(aux_id) == ni_ipd + ni_agd_arm*n_int,
+                                  aux_int = aux_int,
                                   aux_id = aux_id,
+
+                                  # Aux regression
+                                  nX_aux = if (!is.null(X_aux)) ncol(X_aux) else 0,
+                                  X_aux = if (!is.null(X_aux)) { if (QR) X_aux_Q else X_aux } else matrix(0, length(aux_id), 0),
+                                  R_inv_aux = if (!is.null(X_aux) && QR) X_aux_R_inv else matrix(0, 0, 0),
 
                                   # Number of spline coefficients
                                   n_scoef = n_scoef,
@@ -1807,16 +1868,28 @@ nma.fit <- function(ipd_x, ipd_y,
                                   # Specify link
                                   link = switch(link, log = 1),
 
-                                  # Add priors for spline coefficients
-                                  !!! prior_standat(prior_aux, "prior_aux",
-                                                    valid = "Dirichlet")
+                                  # Add prior for spline smoothing
+                                  !!! prior_standat(prior_aux, "prior_hyper",
+                                                    valid = c("Normal", "half-Normal", "log-Normal",
+                                                              "Cauchy",  "half-Cauchy",
+                                                              "Student t", "half-Student t", "log-Student t",
+                                                              "Exponential", "flat (implicit)",
+                                                              "Gamma"))
     )
+
+    # Add prior mean for spline coefficients
+    standat$prior_aux_location <- prior_aux_location
+
+    # Add dummy prior_hyper_shape for hyperpriors other than Gamma
+    if (!rlang::has_name(standat, "prior_hyper_shape")) standat$prior_hyper_shape <- 0
 
     # Monitor spline coefficients
     stanargs <- purrr::list_modify(stanargs,
                                    object = stanmodels$survival_mspline,
                                    data = standat,
-                                   pars = c(pars, "scoef"))
+                                   pars = c(pars,
+                                            # "lscoef", "u_aux",
+                                            "scoef", "beta_aux", "sigma"))
 
   } else {
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
@@ -2853,7 +2926,8 @@ prior_standat <- function(x, par, valid){
                   `Student t` = , `half-Student t` = 3,
                   Exponential = 4,
                   `log-Normal` = 5,
-                  `log-Student t` = 6)
+                  `log-Student t` = 6,
+                  Gamma = 7)
 
   out <- purrr::list_modify(c(x), dist = distn, fun = purrr::zap())
   # Set unnecessary (NA) parameters to zero. These will be ignored by Stan, but
