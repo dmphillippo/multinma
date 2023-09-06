@@ -349,6 +349,7 @@ nma <- function(network,
                          prior_reg = prior_reg,
                          prior_aux = prior_aux,
                          aux_by = aux_by,
+                         aux_regression = aux_regression,
                          QR = QR,
                          center = center,
                          adapt_delta = adapt_delta,
@@ -512,7 +513,9 @@ nma <- function(network,
   } else if (!rlang::is_scalar_double(adapt_delta) ||
       adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
-  if (!is.null(aux_by) && !is.null(aux_regression)) {
+  # Check aux_by / aux_regression combination
+  aux_by <- rlang::enquo(aux_by)
+  if (!rlang::quo_is_null(aux_by) && !is.null(aux_regression)) {
     abort("Cannot specify both `aux_by` and `aux_regression`.")
   }
 
@@ -536,7 +539,6 @@ nma <- function(network,
       (has_ipd(network) || has_agd_arm(network))) {
 
     has_aux_by <- TRUE
-    aux_by <- rlang::enquo(aux_by)
     if (rlang::quo_is_null(aux_by)) aux_by <- ".study"
 
     aux_dat <- dplyr::bind_rows(if (has_ipd(network)) dplyr::select(network$ipd, -".Surv") else NULL,
@@ -1309,6 +1311,7 @@ nma.fit <- function(ipd_x, ipd_y,
     narm_ipd <- max(ipd_arm)
     ni_ipd <- nrow(ipd_x)
   } else {
+    ipd_s_t_all <- dplyr::tibble(.study = integer(), .trt = integer())
     ipd_study <- ipd_trt <- ipd_arm <- numeric()
     ni_ipd <- 0
     narm_ipd <- 0
@@ -1332,6 +1335,7 @@ nma.fit <- function(ipd_x, ipd_y,
     }
 
   } else {
+    agd_arm_s_t_all <- dplyr::tibble(.study = integer(), .trt = integer())
     agd_arm_study <- agd_arm_trt <- agd_arm_arm <- numeric()
     ni_agd_arm <- narm_agd_arm <- 0
   }
@@ -1831,7 +1835,7 @@ nma.fit <- function(ipd_x, ipd_y,
     }
 
     # Get scoef prior means
-    prior_aux_location <- purrr::map(basis, mspline_constant_hazard)
+    prior_aux_location <- purrr::map(basis[unique(cbind(aux_id, study = c(ipd_s_t_all$.study, agd_arm_s_t_all$.study)))[, "study"]], mspline_constant_hazard)
 
     standat <- purrr::list_modify(standat,
                                   # AgD arm IDs
