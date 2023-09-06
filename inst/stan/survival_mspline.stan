@@ -37,14 +37,14 @@ functions {
     // ibasis = integrated basis evaluated at event/censoring time
     // scoef = row_vector of spline coefficients
     // eta = log rate (linear predictor)
-    return - (scoef * ibasis') * exp(eta);
+    return - (dot_product(scoef, ibasis)) * exp(eta);
   }
 
   vector lh_a2 (row_vector basis, vector eta, row_vector scoef) {
     // basis = basis evaluated at event/censoring time
     // scoef = row_vector of spline coefficients
     // eta = log rate (linear predictor)
-    return log(scoef * basis') + eta;
+    return log(dot_product(scoef, basis)) + eta;
   }
 
   // -- Log likelihood with censoring and truncation --
@@ -215,6 +215,7 @@ transformed parameters {
 
   // Spline coefficients
   matrix[n_aux, n_scoef-1] lscoef; // logit baseline spline coefficients
+  matrix[nX_aux ? 0 : n_aux, n_scoef] scoef_temp;
   matrix[ni_ipd, n_scoef] scoef_ipd;
   matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef] scoef_agd_arm;
 
@@ -225,17 +226,29 @@ transformed parameters {
     lscoef[, i] = prior_aux_location[, i] + u_aux[, i] .* sigma;
   }
 
+  if (nX_aux == 0) for (i in 1:n_aux) {
+    scoef_temp[i, ] = to_row_vector(softmax(append_row(0, to_vector(lscoef[i, ]))));
+  }
+
   if (ni_ipd) {
-    matrix[ni_ipd, n_scoef-1] Xb_aux = nX_aux ? X_aux_ipd * beta_aux_tilde + lscoef[aux_id[1:ni_ipd], ] : lscoef[aux_id[1:ni_ipd], ];
-    for (i in 1:ni_ipd) {
-      scoef_ipd[i, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[i, ]))));
+    if (nX_aux) {
+      matrix[ni_ipd, n_scoef-1] Xb_aux = lscoef[aux_id[1:ni_ipd], ] + X_aux_ipd * beta_aux_tilde;
+      for (i in 1:ni_ipd) {
+        scoef_ipd[i, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[i, ]))));
+      }
+    } else {
+      scoef_ipd = scoef_temp[aux_id[1:ni_ipd], ];
     }
   }
 
   if (ni_agd_arm) {
-    matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef-1] Xb_aux = nX_aux ? X_aux_agd_arm * beta_aux_tilde + lscoef[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)], ] : lscoef[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)], ];
-    for (i in 1:((aux_int ? nint_max : 1) * ni_agd_arm)) {
-      scoef_agd_arm[i, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[i, ]))));
+    if (nX_aux) {
+      matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef-1] Xb_aux = lscoef[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)], ] + X_aux_agd_arm * beta_aux_tilde;
+      for (i in 1:((aux_int ? nint_max : 1) * ni_agd_arm)) {
+        scoef_agd_arm[i, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[i, ]))));
+      }
+    } else {
+      scoef_agd_arm = scoef_temp[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)]];
     }
   }
 
