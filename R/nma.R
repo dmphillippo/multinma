@@ -1880,6 +1880,13 @@ nma.fit <- function(ipd_x, ipd_y,
                                                     valid = c("Normal", "half-Normal", "log-Normal",
                                                               "Cauchy",  "half-Cauchy",
                                                               "Student t", "half-Student t", "log-Student t",
+                                                              "Exponential", "flat (implicit)")),
+
+                                  # Add prior for aux_regression smoothing
+                                  !!! prior_standat(prior_aux, "prior_reg_hyper",
+                                                    valid = c("Normal", "half-Normal", "log-Normal",
+                                                              "Cauchy",  "half-Cauchy",
+                                                              "Student t", "half-Student t", "log-Student t",
                                                               "Exponential", "flat (implicit)"))
     )
 
@@ -1892,7 +1899,7 @@ nma.fit <- function(ipd_x, ipd_y,
                                    data = standat,
                                    pars = c(pars,
                                             # "lscoef", "u_aux",
-                                            "scoef", "beta_aux", "sigma"))
+                                            "scoef", "beta_aux", "sigma", "sigma_beta"))
 
   } else {
     abort(glue::glue('"{likelihood}" likelihood not supported.'))

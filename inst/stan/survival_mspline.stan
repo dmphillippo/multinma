@@ -174,12 +174,18 @@ data {
   matrix[QR ? nX_aux : 0, QR ? nX_aux : 0] R_inv_aux;
 
   // Hierarchical logistic prior on spline coefficients
-  int<lower=0,upper=7> prior_hyper_dist;
+  int<lower=0,upper=6> prior_hyper_dist;
   real<lower=0> prior_hyper_location;
   real<lower=0> prior_hyper_scale;
   real<lower=0> prior_hyper_df;
   // real<lower=0> prior_hyper_shape;
   matrix[nX_aux ? 1 : max(aux_id), n_scoef-1] prior_aux_location;  // prior logistic mean
+
+  // Hyperprior on aux regression smooths
+  int<lower=0,upper=6> prior_reg_hyper_dist;
+  real<lower=0> prior_reg_hyper_location;
+  real<lower=0> prior_reg_hyper_scale;
+  real<lower=0> prior_reg_hyper_df;
 }
 transformed data {
   // Dirichlet prior vector
@@ -201,8 +207,9 @@ parameters {
   // Spline coefficients
   // simplex[n_scoef] scoef[n_aux];
 
-  // Spline coefficient regression
-  matrix[nX_aux, n_scoef-1] beta_aux_tilde;
+  // Spline coefficient regression with shrinkage over time
+  matrix[nX_aux, n_scoef-1] u_beta_aux;
+  vector<lower=0>[nX_aux] sigma_beta;
 
   // Spline shrinkage SDs and non-centered parameterisation smoothing
   vector<lower=0>[n_aux] sigma;
@@ -217,7 +224,19 @@ transformed parameters {
   matrix[n_aux, n_scoef-1] lscoef; // logit baseline spline coefficients
   matrix[nX_aux ? 0 : n_aux, n_scoef] scoef_temp;
 
+  // Spline coefficient regression
+  matrix[nX_aux, n_scoef-1] beta_aux;
+
 #include /include/transformed_parameters_common.stan
+
+  // Shrinkage regression on aux pars
+  for (i in 1:nX_aux) beta_aux[i, ] = u_beta_aux[i, ] * sigma_beta[i];
+
+  // Shrinkage regression on aux pars with random walk prior
+  //   for (i in 1:nX_aux) {
+  //   beta_aux[i, 1] = u_beta_aux[i, 1] * sigma_beta[i];
+  //   for (j in 2:(n_scoef-1)) beta_aux[i, j] = u_beta_aux[i, j-1] + u_beta_aux[i, j] * sigma_beta[i];
+  // }
 
   // Construct spline coefficients
   // for (i in 1:(n_scoef-1)) {
@@ -245,7 +264,7 @@ transformed parameters {
 
     matrix[ni_ipd, n_scoef] scoef_ipd;
     if (nX_aux) {
-      matrix[ni_ipd, n_scoef-1] Xb_aux = lscoef[aux_id[1:ni_ipd], ] + X_aux_ipd * beta_aux_tilde;
+      matrix[ni_ipd, n_scoef-1] Xb_aux = lscoef[aux_id[1:ni_ipd], ] + X_aux_ipd * beta_aux;
       for (i in 1:ni_ipd) {
         scoef_ipd[i, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[i, ]))));
       }
@@ -271,12 +290,12 @@ transformed parameters {
               X_agd_arm * beta_tilde;
 
     if (nX_aux) {
-      matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef-1] Xb_aux = lscoef[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)], ] + X_aux_agd_arm * beta_aux_tilde;
+      matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef-1] Xb_aux = lscoef[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)], ] + X_aux_agd_arm * beta_aux;
       for (i in 1:((aux_int ? nint_max : 1) * ni_agd_arm)) {
         scoef_agd_arm[i, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[i, ]))));
       }
     } else {
-      scoef_agd_arm = scoef_temp[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)]];
+      scoef_agd_arm = scoef_temp[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)], ];
     }
 
     if (nint_max > 1) { // -- If integration points are used --
@@ -340,7 +359,6 @@ model {
 
   // -- Prior on spline coefficients --
   for (i in 1:(n_scoef-1)) u_aux[, i] ~ logistic(0, 1);
-  for (i in 1:(n_scoef-1)) prior_select_lp(beta_aux_tilde[, i], prior_reg_dist, prior_reg_location, prior_reg_scale, prior_reg_df);
 
   // -- Hyperprior on spline sd --
   // if (prior_hyper_dist < 7) {
@@ -348,6 +366,11 @@ model {
   // } else if (prior_hyper_dist == 7) { // Gamma prior
   //   sigma ~ gamma(prior_hyper_shape, 1/prior_hyper_scale);
   // }
+
+  // -- Smoothing prior on aux regression beta --
+  // for (i in 1:(n_scoef-1)) prior_select_lp(beta_aux_tilde[, i], prior_reg_dist, prior_reg_location, prior_reg_scale, prior_reg_df);
+  for (i in 1:(n_scoef -1)) u_beta_aux[, i] ~ std_normal();
+  prior_select_lp(sigma_beta, prior_reg_hyper_dist, prior_reg_hyper_location, prior_reg_hyper_scale, prior_reg_hyper_df);
 
   // -- IPD likelihood --
   target += log_L_ipd;
@@ -361,7 +384,7 @@ generated quantities {
   vector[n_scoef] scoef[n_aux];
 
   // Regression on spline coefficients
-  matrix[nX_aux, n_scoef-1] beta_aux = QR ? R_inv_aux * beta_aux_tilde : beta_aux_tilde;
+  // matrix[nX_aux, n_scoef-1] beta_aux = QR ? R_inv_aux * beta_aux_tilde : beta_aux_tilde;
 
 #include /include/generated_quantities_common.stan
 
