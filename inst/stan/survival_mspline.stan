@@ -216,8 +216,6 @@ transformed parameters {
   // Spline coefficients
   matrix[n_aux, n_scoef-1] lscoef; // logit baseline spline coefficients
   matrix[nX_aux ? 0 : n_aux, n_scoef] scoef_temp;
-  matrix[ni_ipd, n_scoef] scoef_ipd;
-  matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef] scoef_agd_arm;
 
 #include /include/transformed_parameters_common.stan
 
@@ -241,7 +239,11 @@ transformed parameters {
     scoef_temp[i, ] = to_row_vector(softmax(append_row(0, to_vector(lscoef[i, ]))));
   }
 
+
+  // Evaluate log likelihood
   if (ni_ipd) {
+
+    matrix[ni_ipd, n_scoef] scoef_ipd;
     if (nX_aux) {
       matrix[ni_ipd, n_scoef-1] Xb_aux = lscoef[aux_id[1:ni_ipd], ] + X_aux_ipd * beta_aux_tilde;
       for (i in 1:ni_ipd) {
@@ -250,22 +252,7 @@ transformed parameters {
     } else {
       scoef_ipd = scoef_temp[aux_id[1:ni_ipd], ];
     }
-  }
 
-  if (ni_agd_arm) {
-    if (nX_aux) {
-      matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef-1] Xb_aux = lscoef[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)], ] + X_aux_agd_arm * beta_aux_tilde;
-      for (i in 1:((aux_int ? nint_max : 1) * ni_agd_arm)) {
-        scoef_agd_arm[i, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[i, ]))));
-      }
-    } else {
-      scoef_agd_arm = scoef_temp[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)]];
-    }
-  }
-
-
-  // Evaluate log likelihood
-  if (ni_ipd) {
     log_L_ipd = loglik(ipd_time,
                        ipd_itime,
                        ipd_start_itime,
@@ -278,9 +265,19 @@ transformed parameters {
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
+    matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef] scoef_agd_arm;
     vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
               X_agd_arm * beta_tilde + offset_agd_arm :
               X_agd_arm * beta_tilde;
+
+    if (nX_aux) {
+      matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef-1] Xb_aux = lscoef[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)], ] + X_aux_agd_arm * beta_aux_tilde;
+      for (i in 1:((aux_int ? nint_max : 1) * ni_agd_arm)) {
+        scoef_agd_arm[i, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[i, ]))));
+      }
+    } else {
+      scoef_agd_arm = scoef_temp[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)]];
+    }
 
     if (nint_max > 1) { // -- If integration points are used --
 
