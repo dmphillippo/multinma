@@ -249,8 +249,11 @@ the other survival distributions implemented in this package.
 
 For the \code{mspline} and \code{pexp} likelihoods, the auxiliary parameters are the
 spline coefficients for each study. These form a unit simplex (i.e. lie
-between 0 and 1, and sum to 1), and are given a \code{\link[=dirichlet]{dirichlet()}} prior
-distribution.
+between 0 and 1, and sum to 1), and are given a logistic random walk prior
+distribution. \code{prior_aux} specifies the hyperprior on the random walk
+standard deviation \eqn{\sigma} which controls the level of smoothing of
+the baseline hazard, with \eqn{\sigma = 0} corresponding to a constant
+baseline hazard.
 
 The auxiliary parameters can be stratified by additional factors through
 the \code{aux_by} argument. For example, to allow the shape of the baseline

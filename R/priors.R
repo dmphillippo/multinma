@@ -41,7 +41,6 @@
 #' | \strong{half-Student t} `half_student_t()` | - | - | Yes | - | Yes |
 #' | \strong{log-Student t} `log_student_t()` | - | - | Yes | - | Yes |
 #' | \strong{Exponential} `exponential()` | - | - | Yes | - | Yes |
-#' | \strong{Gamma} `gamma()` | - | - | - | - | Yes |
 #' | \strong{Flat} `flat()` | Yes | Yes | Yes | Yes | Yes |
 #'
 #' The `flat()` prior is a special case where no prior information is added to
@@ -50,11 +49,6 @@
 #' parameter is unbounded, and is not generally advised. See the
 #' [Stan user's guide](https://mc-stan.org/docs/stan-users-guide/some-differences-in-the-statistical-models-that-are-allowed.html)
 #' for more details.
-#'
-#' The `gamma()` prior is currently only used as a prior distribution for
-#' the smoothing standard deviation hyperparameter \eqn{sigma} in `mspline` or
-#' `pexp` models. This controls the smoothness of the baseline hazard spline,
-#' with \eqn{sigma = 0} being a constant hazard.
 #'
 #' @return Object of class [nma_prior].
 #' @export
@@ -151,21 +145,21 @@ flat <- function() {
   return(new_nma_prior("flat (implicit)"))
 }
 
-#' @rdname priors
-#' @export
-gamma <- function(shape, rate = 1/scale, scale = 1/rate) {
-  if (missing(scale) && missing(rate))
-    abort("Missing argument. Specify either `rate` or `scale`.")
-  if (!missing(rate) && !missing(scale))
-    warn("Both `rate` and `scale` provided, only `scale` will be used")
-
-  check_prior_scale(shape, "shape")
-  check_prior_scale(rate, "rate")
-
-  return(new_nma_prior("Gamma",
-                       shape = shape,
-                       scale = scale))
-}
+# #' @rdname priors
+# #' @export
+# gamma <- function(shape, rate = 1/scale, scale = 1/rate) {
+#   if (missing(scale) && missing(rate))
+#     abort("Missing argument. Specify either `rate` or `scale`.")
+#   if (!missing(rate) && !missing(scale))
+#     warn("Both `rate` and `scale` provided, only `scale` will be used")
+#
+#   check_prior_scale(shape, "shape")
+#   check_prior_scale(rate, "rate")
+#
+#   return(new_nma_prior("Gamma",
+#                        shape = shape,
+#                        scale = scale))
+# }
 
 # #' @rdname priors
 # #' @export

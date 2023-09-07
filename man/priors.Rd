@@ -12,7 +12,6 @@
 \alias{log_student_t}
 \alias{exponential}
 \alias{flat}
-\alias{gamma}
 \title{Prior distributions}
 \usage{
 normal(location = 0, scale)
@@ -34,8 +33,6 @@ log_student_t(location, scale, df)
 exponential(scale = 1/rate, rate = 1/scale)
 
 flat()
-
-gamma(shape, rate = 1/scale, scale = 1/rate)
 }
 \arguments{
 \item{location}{Prior location. Typically prior mean (see details).}
@@ -81,7 +78,6 @@ will be truncated at 0 to be non-negative.\tabular{lccccc}{
    \strong{half-Student t} \code{half_student_t()} \tab - \tab - \tab Yes \tab - \tab Yes \cr
    \strong{log-Student t} \code{log_student_t()} \tab - \tab - \tab Yes \tab - \tab Yes \cr
    \strong{Exponential} \code{exponential()} \tab - \tab - \tab Yes \tab - \tab Yes \cr
-   \strong{Gamma} \code{gamma()} \tab - \tab - \tab - \tab - \tab Yes \cr
    \strong{Flat} \code{flat()} \tab Yes \tab Yes \tab Yes \tab Yes \tab Yes \cr
 }
 
@@ -92,11 +88,6 @@ entire support for a parameter. This will be an improper prior if the
 parameter is unbounded, and is not generally advised. See the
 \href{https://mc-stan.org/docs/stan-users-guide/some-differences-in-the-statistical-models-that-are-allowed.html}{Stan user's guide}
 for more details.
-
-The \code{gamma()} prior is currently only used as a prior distribution for
-the smoothing standard deviation hyperparameter \eqn{sigma} in \code{mspline} or
-\code{pexp} models. This controls the smoothness of the baseline hazard spline,
-with \eqn{sigma = 0} being a constant hazard.
 }
 }
 \seealso{

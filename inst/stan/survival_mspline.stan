@@ -178,8 +178,8 @@ data {
   real<lower=0> prior_hyper_location;
   real<lower=0> prior_hyper_scale;
   real<lower=0> prior_hyper_df;
-  real<lower=0> prior_hyper_shape;
-  matrix[max(aux_id), n_scoef-1] prior_aux_location;  // prior logistic mean
+  // real<lower=0> prior_hyper_shape;
+  matrix[nX_aux ? 1 : max(aux_id), n_scoef-1] prior_aux_location;  // prior logistic mean
 }
 transformed data {
   // Dirichlet prior vector
@@ -222,8 +222,19 @@ transformed parameters {
 #include /include/transformed_parameters_common.stan
 
   // Construct spline coefficients
-  for (i in 1:(n_scoef-1)) {
-    lscoef[, i] = prior_aux_location[, i] + u_aux[, i] .* sigma;
+  // for (i in 1:(n_scoef-1)) {
+  //   // With aux regression, knot locations are the same across all studies
+  //   if (nX_aux) lscoef[, i] = prior_aux_location[1, i] + u_aux[, i] .* sigma;
+  //   else lscoef[, i] = prior_aux_location[, i] + u_aux[, i] .* sigma;
+  // }
+
+  // Construct spline coefficients with random walk prior around constant hazard
+  if (nX_aux) lscoef[, 1] = prior_aux_location[1, 1] + u_aux[, 1] .* sigma;
+  else lscoef[, 1] = prior_aux_location[, 1] + u_aux[, 1] .* sigma;
+  for (i in 2:(n_scoef-1)) {
+    // With aux regression, knot locations are the same across all studies
+    if (nX_aux) lscoef[, i] = lscoef[, i-1] - prior_aux_location[1, i-1] + prior_aux_location[1, i] + u_aux[, i] .* sigma;
+    else lscoef[, i] = lscoef[, i-1] - prior_aux_location[, i-1] + prior_aux_location[, i] + u_aux[, i] .* sigma;
   }
 
   if (nX_aux == 0) for (i in 1:n_aux) {
@@ -301,7 +312,7 @@ transformed parameters {
                               agd_arm_delayed[i],
                               agd_arm_status[i],
                               eta_agd_arm_ii,
-                              scoef_agd_arm[aux_id[ni_ipd + i], ]);
+                              scoef_agd_arm[i, ]);
         }
 
         log_L_agd_arm[i] = log_sum_exp(log_L_ii) - log(nint);
@@ -334,12 +345,12 @@ model {
   for (i in 1:(n_scoef-1)) u_aux[, i] ~ logistic(0, 1);
   for (i in 1:(n_scoef-1)) prior_select_lp(beta_aux_tilde[, i], prior_reg_dist, prior_reg_location, prior_reg_scale, prior_reg_df);
 
-  // Hyperprior on spline sd
-  if (prior_hyper_dist < 7) {
+  // -- Hyperprior on spline sd --
+  // if (prior_hyper_dist < 7) {
     prior_select_lp(sigma, prior_hyper_dist, prior_hyper_location, prior_hyper_scale, prior_hyper_df);
-  } else if (prior_hyper_dist == 7) { // Gamma prior
-    sigma ~ gamma(prior_hyper_shape, 1/prior_hyper_scale);
-  }
+  // } else if (prior_hyper_dist == 7) { // Gamma prior
+  //   sigma ~ gamma(prior_hyper_shape, 1/prior_hyper_scale);
+  // }
 
   // -- IPD likelihood --
   target += log_L_ipd;
@@ -359,7 +370,7 @@ generated quantities {
 
   // Baseline spline coefficients
   for (i in 1:n_aux) {
-    scoef[i] = softmax(append_row(0, to_vector(lscoef[i, ])));
+    scoef[i] = nX_aux ? softmax(append_row(0, to_vector(lscoef[i, ]))) : to_vector(scoef_temp[i, ]);
   }
 
   // Log likelihood

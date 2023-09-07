@@ -181,8 +181,11 @@
 #'
 #'   For the `mspline` and `pexp` likelihoods, the auxiliary parameters are the
 #'   spline coefficients for each study. These form a unit simplex (i.e. lie
-#'   between 0 and 1, and sum to 1), and are given a [dirichlet()] prior
-#'   distribution.
+#'   between 0 and 1, and sum to 1), and are given a logistic random walk prior
+#'   distribution. `prior_aux` specifies the hyperprior on the random walk
+#'   standard deviation \eqn{\sigma} which controls the level of smoothing of
+#'   the baseline hazard, with \eqn{\sigma = 0} corresponding to a constant
+#'   baseline hazard.
 #'
 #'   The auxiliary parameters can be stratified by additional factors through
 #'   the `aux_by` argument. For example, to allow the shape of the baseline
@@ -484,7 +487,7 @@ nma <- function(network,
       prior_aux <- .default(list(sigma = half_normal(scale = 10),
                                  k = half_normal(scale = 10)))
     } else if (likelihood %in% c("mspline", "pexp")) {
-      prior_aux <- .default(gamma(shape = 2, rate = 1))
+      prior_aux <- .default(half_normal(scale = 1))
     }
     prior_defaults$prior_aux <- get_prior_call(prior_aux)
   }
@@ -1877,15 +1880,11 @@ nma.fit <- function(ipd_x, ipd_y,
                                                     valid = c("Normal", "half-Normal", "log-Normal",
                                                               "Cauchy",  "half-Cauchy",
                                                               "Student t", "half-Student t", "log-Student t",
-                                                              "Exponential", "flat (implicit)",
-                                                              "Gamma"))
+                                                              "Exponential", "flat (implicit)"))
     )
 
     # Add prior mean for spline coefficients
     standat$prior_aux_location <- prior_aux_location
-
-    # Add dummy prior_hyper_shape for hyperpriors other than Gamma
-    if (!rlang::has_name(standat, "prior_hyper_shape")) standat$prior_hyper_shape <- 0
 
     # Monitor spline coefficients
     stanargs <- purrr::list_modify(stanargs,
