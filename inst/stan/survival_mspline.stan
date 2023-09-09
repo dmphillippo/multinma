@@ -102,26 +102,26 @@ data {
 
   // AgD arm-based
   // int<lower=0> narm_agd_arm; // Number of arm-based AgD arms
-  int<lower=1> agd_arm_arm[ni_agd_arm]; // Arm indicator for AgD (arm-based) (i.e. picking element of which_RE)
+  array[ni_agd_arm] int<lower=1> agd_arm_arm; // Arm indicator for AgD (arm-based) (i.e. picking element of which_RE)
 
   // Outcomes
-  row_vector[n_scoef] ipd_time[ni_ipd];
-  row_vector[n_scoef] ipd_itime[ni_ipd];
-  row_vector[n_scoef] ipd_start_itime[ni_ipd];
-  row_vector[n_scoef] ipd_delay_itime[ni_ipd];
-  int<lower=0, upper=1> ipd_delayed[ni_ipd];
-  int<lower=0, upper=3> ipd_status[ni_ipd];
+  array[ni_ipd] row_vector[n_scoef] ipd_time;
+  array[ni_ipd] row_vector[n_scoef] ipd_itime;
+  array[ni_ipd] row_vector[n_scoef] ipd_start_itime;
+  array[ni_ipd] row_vector[n_scoef] ipd_delay_itime;
+  array[ni_ipd] int<lower=0, upper=1> ipd_delayed;
+  array[ni_ipd] int<lower=0, upper=3> ipd_status;
 
-  row_vector[n_scoef] agd_arm_time[ni_agd_arm];
-  row_vector[n_scoef] agd_arm_itime[ni_agd_arm];
-  row_vector[n_scoef] agd_arm_start_itime[ni_agd_arm];
-  row_vector[n_scoef] agd_arm_delay_itime[ni_agd_arm];
-  int<lower=0, upper=1> agd_arm_delayed[ni_agd_arm];
-  int<lower=0, upper=3> agd_arm_status[ni_agd_arm];
+  array[ni_agd_arm] row_vector[n_scoef] agd_arm_time;
+  array[ni_agd_arm] row_vector[n_scoef] agd_arm_itime;
+  array[ni_agd_arm] row_vector[n_scoef] agd_arm_start_itime;
+  array[ni_agd_arm] row_vector[n_scoef] agd_arm_delay_itime;
+  array[ni_agd_arm] int<lower=0, upper=1> agd_arm_delayed;
+  array[ni_agd_arm] int<lower=0, upper=3> agd_arm_status;
 
   // aux IDs for independent spline coefficients parameters
   int<lower=0, upper=1> aux_by; // Flag subgroup aux parameters within each arm (1 = yes)
-  int<lower=1> aux_id[ni_ipd + ni_agd_arm*(aux_by ? nint_max : 1)];
+  array[ni_ipd + ni_agd_arm*(aux_by ? nint_max : 1)] int<lower=1> aux_id;
 }
 transformed data {
   // Dirichlet prior vector
@@ -136,7 +136,7 @@ parameters {
 #include /include/parameters_common.stan
 
   // Spline coefficients
-  simplex[n_scoef] scoef[n_aux];
+  array[n_aux] simplex[n_scoef] scoef;
 }
 transformed parameters {
   // Log likelihood contributions

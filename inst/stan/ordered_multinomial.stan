@@ -8,14 +8,14 @@ data {
   // Outcomes
   int<lower=2> ncat;
 
-  int<lower=1, upper=ncat> ipd_r[ni_ipd];
-  int<lower=0, upper=ncat> ipd_cat[ni_ipd, ncat];  // Category specs, left-aligned, padded with zeros
-  int<lower=2, upper=ncat> ipd_ncat[ni_ipd];  // Number of categories observed
+  array[ni_ipd] int<lower=1, upper=ncat> ipd_r;
+  array[ni_ipd, ncat] int<lower=0, upper=ncat> ipd_cat;  // Category specs, left-aligned, padded with zeros
+  array[ni_ipd] int<lower=2, upper=ncat> ipd_ncat;  // Number of categories observed
 
-  int<lower=0> agd_arm_r[ni_agd_arm, ncat];
+  array[ni_agd_arm, ncat] int<lower=0> agd_arm_r;
   vector[ni_agd_arm] agd_arm_n; // AgD arm sample sizes
-  int<lower=0, upper=ncat> agd_arm_cat[ni_agd_arm, ncat];  // Category specs, left-aligned, padded with zeros
-  int<lower=2, upper=ncat> agd_arm_ncat[ni_agd_arm];  // Number of categories observed
+  array[ni_agd_arm, ncat] int<lower=0, upper=ncat> agd_arm_cat;  // Category specs, left-aligned, padded with zeros
+  array[ni_agd_arm] int<lower=2, upper=ncat> agd_arm_ncat;  // Number of categories observed
 
   // Prior on differences between cutpoints
   int<lower=0,upper=6> prior_aux_dist;
@@ -25,8 +25,8 @@ data {
 
 }
 transformed data {
-  vector[ncat] theta_ipd0[ni_ipd] = rep_array(rep_vector(0, ncat), ni_ipd);
-  vector[ncat] theta_agd_arm_bar0[ni_agd_arm] = rep_array(rep_vector(0, ncat), ni_agd_arm);
+  array[ni_ipd] vector[ncat] theta_ipd0 = rep_array(rep_vector(0, ncat), ni_ipd);
+  array[ni_agd_arm] vector[ncat] theta_agd_arm_bar0 = rep_array(rep_vector(0, ncat), ni_agd_arm);
   // matrix[ni_agd_arm * n_int_thin, ncat] theta_bar_cum_agd_arm0 = rep_matrix(0, ni_agd_arm * n_int_thin, ncat);
 #include /include/transformed_data_common.stan
 }
@@ -40,11 +40,11 @@ parameters {
 transformed parameters {
   vector[ncat - 1] cc;
 
-  vector[ncat] theta_ipd[ni_ipd]; // IPD transformed predictor
+  array[ni_ipd] vector[ncat] theta_ipd; // IPD transformed predictor
 
   matrix[nint_max > 1 ? nint * ni_agd_arm : 0, nint_max > 1 ? ncat - 1 : 0] theta_agd_arm_ii; // Use these as q_ii intermediates
-  vector[ncat] q_agd_arm_bar[ni_agd_arm]; // AgD arm transformed predictor
-  vector[ncat] theta_agd_arm_bar[ni_agd_arm]; // AgD arm transformed predictor
+  array[ni_agd_arm] vector[ncat] q_agd_arm_bar; // AgD arm transformed predictor
+  array[ni_agd_arm] vector[ncat] theta_agd_arm_bar; // AgD arm transformed predictor
 
 #include /include/transformed_parameters_common.stan
 
@@ -271,8 +271,8 @@ model {
 }
 generated quantities {
   // Note: fitted values and theta_bar_cum_agd_arm will be 0 for missing categories
-  vector[ncat] fitted_ipd[ni_ipd];
-  vector[ncat] fitted_agd_arm[ni_agd_arm];
+  array[ni_ipd] vector[ncat] fitted_ipd;
+  array[ni_agd_arm] vector[ncat] fitted_agd_arm;
   matrix[ni_agd_arm * n_int_thin, ncat] theta_bar_cum_agd_arm = rep_matrix(0, ni_agd_arm * n_int_thin, ncat);
 
 #include /include/generated_quantities_common.stan
@@ -286,7 +286,7 @@ generated quantities {
 
   // AgD (arm-based) log likelihood and residual deviance
   {
-    vector[ncat] dv[ni_agd_arm];
+    array[ni_agd_arm] vector[ncat] dv;
     for (i in 1:ni_agd_arm) {
       log_lik[ni_ipd + i] = multinomial_lpmf(agd_arm_r[i] | theta_agd_arm_bar[i]);
       fitted_agd_arm[i] = agd_arm_n[i] * theta_agd_arm_bar[i];
