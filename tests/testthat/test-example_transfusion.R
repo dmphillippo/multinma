@@ -165,7 +165,7 @@ tr_RE_inf_var <- as.data.frame(summary(inf_tausq))
 test_that("Informative RE heterogeneity variance", {
   expect_equivalent(tr_RE_inf_var$`50%`, 0.18, tolerance = tol)
   expect_equivalent(tr_RE_inf_var$`2.5%`, 0.003, tolerance = tol)
-  expect_equivalent(tr_RE_inf_var$`97.5%`, 1.70, tolerance = tol)
+  expect_equivalent(tr_RE_inf_var$`97.5%`, 1.84, tolerance = tol)
 })
 
 

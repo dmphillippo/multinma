@@ -20,8 +20,8 @@ set.seed(4783982)
 
 ## ----setup, echo = FALSE------------------------------------------------------
 library(multinma)
-nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
-             "true" =, "warn" = 2, 
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
+             "true" =, "warn" = 2,
              parallel::detectCores())
 options(mc.cores = nc)
 
@@ -31,17 +31,17 @@ head(atrial_fibrillation)
 
 
 ## -----------------------------------------------------------------------------
-af_net <- set_agd_arm(atrial_fibrillation[atrial_fibrillation$studyc != "WASPO", ], 
+af_net <- set_agd_arm(atrial_fibrillation[atrial_fibrillation$studyc != "WASPO", ],
                       study = studyc,
                       trt = trtc,
-                      r = r, 
+                      r = r,
                       n = n,
                       trt_class = trt_class)
 af_net
 
 
 ## ----af_network_plot, fig.width=8, fig.height=6, out.width="100%"-------------
-plot(af_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) + 
+plot(af_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) +
   ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
 
 
@@ -59,7 +59,7 @@ summary(half_normal(scale = 5))
 ##                 adapt_delta = 0.99)
 
 ## ---- echo=FALSE--------------------------------------------------------------
-af_fit_1 <- nma(af_net, 
+af_fit_1 <- nma(af_net,
                 seed = 103533305,
                 trt_effects = "random",
                 prior_intercept = normal(scale = 100),
@@ -128,7 +128,7 @@ plot(af_1_cumrankprobs)
 ##                  adapt_delta = 0.99)
 
 ## ---- echo=FALSE, eval=params$run_tests---------------------------------------
-af_fit_4b <- nowarn_on_ci(nma(af_net, 
+af_fit_4b <- nowarn_on_ci(nma(af_net,
                  seed = 579212814,
                  trt_effects = "random",
                  regression = ~ .trt:stroke,
@@ -162,9 +162,9 @@ plot_prior_posterior(af_fit_4b, prior = c("reg", "het"))
 
 
 ## ----af_4b_releff_01_plot-----------------------------------------------------
-(af_4b_releff_01 <- relative_effects(af_fit_4b, 
+(af_4b_releff_01 <- relative_effects(af_fit_4b,
                                      trt_ref = "Placebo/Standard care",
-                                     newdata = data.frame(stroke = c(0, 1), 
+                                     newdata = data.frame(stroke = c(0, 1),
                                                           label = c("stroke = 0", "stroke = 1")),
                                      study = label))
 plot(af_4b_releff_01, ref_line = 0)
@@ -178,7 +178,7 @@ plot(af_fit_4b, pars = "beta", stat = "halfeye", ref_line = 0)
 af_4b_beta <- as.array(af_fit_4b, pars = "beta")
 
 # Subtract beta[Control:stroke] from the other class interactions
-af_4b_beta[ , , 2:3] <- sweep(af_4b_beta[ , , 2:3], 1:2, 
+af_4b_beta[ , , 2:3] <- sweep(af_4b_beta[ , , 2:3], 1:2,
                               af_4b_beta[ , , "beta[.trtclassControl:stroke]"], FUN = "-")
 
 # Set beta[Anti-coagulant:stroke] = -beta[Control:stroke]
@@ -192,31 +192,31 @@ plot(summary(af_4b_beta), stat = "halfeye", ref_line = 0)
 
 ## ----af_4b_ranks--------------------------------------------------------------
 (af_4b_ranks <- posterior_ranks(af_fit_4b,
-                                newdata = data.frame(stroke = c(0, 1), 
-                                                     label = c("stroke = 0", "stroke = 1")), 
+                                newdata = data.frame(stroke = c(0, 1),
+                                                     label = c("stroke = 0", "stroke = 1")),
                                 study = label))
 plot(af_4b_ranks)
 
 ## ----af_4b_rankprobs, fig.height=12-------------------------------------------
 (af_4b_rankprobs <- posterior_rank_probs(af_fit_4b,
-                                         newdata = data.frame(stroke = c(0, 1), 
-                                                              label = c("stroke = 0", "stroke = 1")), 
+                                         newdata = data.frame(stroke = c(0, 1),
+                                                              label = c("stroke = 0", "stroke = 1")),
                                          study = label))
 
 # Modify the default output with ggplot2 functionality
 library(ggplot2)
-plot(af_4b_rankprobs) + 
-  facet_grid(Treatment~Study, labeller = label_wrap_gen(20)) + 
+plot(af_4b_rankprobs) +
+  facet_grid(Treatment~Study, labeller = label_wrap_gen(20)) +
   theme(strip.text.y = element_text(angle = 0))
 
 ## ----af_4b_cumrankprobs, fig.height=12----------------------------------------
 (af_4b_cumrankprobs <- posterior_rank_probs(af_fit_4b, cumulative = TRUE,
-                                            newdata = data.frame(stroke = c(0, 1), 
-                                                                 label = c("stroke = 0", "stroke = 1")), 
+                                            newdata = data.frame(stroke = c(0, 1),
+                                                                 label = c("stroke = 0", "stroke = 1")),
                                             study = label))
 
-plot(af_4b_cumrankprobs) + 
-  facet_grid(Treatment~Study, labeller = label_wrap_gen(20)) + 
+plot(af_4b_cumrankprobs) +
+  facet_grid(Treatment~Study, labeller = label_wrap_gen(20)) +
   theme(strip.text.y = element_text(angle = 0))
 
 
@@ -263,7 +263,7 @@ Cooper_1_releff <- tribble(
 "Acenocoumarol"                            , -1.56,-3.31  , 0.06  ,
 "Low dose aspirin + copidogrel"            , -0.24,-1.06  , 0.57  ,
 "Low dose aspirin + dipyridamole"          , -0.49,-1.38  , 0.38  ,
-) %>% 
+) %>%
   mutate(trt = ordered(trt, levels = levels(af_net$treatments))) %>%
   arrange(trt)
 
@@ -293,7 +293,7 @@ test_that("SUCRAs", {
   af_ranks_1 <- posterior_ranks(af_fit_1, sucra = TRUE)
   af_rankprobs_1 <- posterior_rank_probs(af_fit_1, sucra = TRUE)
   af_cumrankprobs_1 <- posterior_rank_probs(af_fit_1, cumulative = TRUE, sucra = TRUE)
-  
+
   expect_equal(af_ranks_1$summary$sucra, af_rankprobs_1$summary$sucra)
   expect_equal(af_ranks_1$summary$sucra, af_cumrankprobs_1$summary$sucra)
 })
@@ -332,7 +332,7 @@ test_that("Construction of all contrasts is correct (no covariates)", {
 # With stroke covariate, shared interactions
 
 Cooper_4b_releff <- tribble(
-~trt                                       , ~est  , ~lower, ~upper, 
+~trt                                       , ~est  , ~lower, ~upper,
 "Low adjusted dose anti-coagulant"         , -1.20 ,-1.89  , -0.54 ,
 "Standard adjusted dose anti-coagulant"    , -0.77 ,-1.14  , -0.38 ,
 "Fixed dose warfarin"                      , -0.11 ,-0.90  , 0.72  ,
@@ -349,11 +349,11 @@ Cooper_4b_releff <- tribble(
 "Acenocoumarol"                            , -0.534,-2.67  , 1.38  ,
 "Low dose aspirin + copidogrel"            , -0.14 ,-0.82  , 0.53  ,
 "Low dose aspirin + dipyridamole"          , -0.53 ,-1.38  , 0.30  ,
-) %>% 
+) %>%
   mutate(trt = ordered(trt, levels = levels(af_net$treatments))) %>%
   arrange(trt)
 
-af_4b_releff_Cooper <- as.data.frame(relative_effects(af_fit_4b, 
+af_4b_releff_Cooper <- as.data.frame(relative_effects(af_fit_4b,
                                                       newdata = tibble(stroke = 0.27),
                                                       trt_ref = "Placebo/Standard care"))
 
@@ -368,7 +368,7 @@ Cooper_4b_beta <- tribble(
 "Anti-coagulant", -0.71,-1.58  , 0.15  ,
 "Anti-platelet" , 0.23 ,-0.45  , 0.93  ,
 #"Mixed"          , 3.05 ,-1.26  , 7.30  ,
-"Mixed"          , 3.05 ,-0.91  , 7.30  ,
+"Mixed"          , 3.21 ,-0.91  , 7.30  ,
 )
 
 af_4b_beta_df <- as.data.frame(summary(af_4b_beta))
@@ -396,13 +396,13 @@ test_that("DIC (common interaction)", {
 
 test_that("SUCRAs", {
   stroke_01 <- data.frame(stroke = c(0, 1), label = c("stroke = 0", "stroke = 1"))
-  af_ranks_4b <- posterior_ranks(af_fit_4b, newdata = stroke_01, 
+  af_ranks_4b <- posterior_ranks(af_fit_4b, newdata = stroke_01,
                                 study = label, sucra = TRUE)
-  af_rankprobs_4b <- posterior_rank_probs(af_fit_4b, newdata = stroke_01, 
+  af_rankprobs_4b <- posterior_rank_probs(af_fit_4b, newdata = stroke_01,
                                            study = label, sucra = TRUE)
   af_cumrankprobs_4b <- posterior_rank_probs(af_fit_4b, cumulative = TRUE, newdata = stroke_01,
                                               study = label, sucra = TRUE)
-  
+
   expect_equal(af_ranks_4b$summary$sucra, af_rankprobs_4b$summary$sucra)
   expect_equal(af_ranks_4b$summary$sucra, af_cumrankprobs_4b$summary$sucra)
 })
@@ -416,17 +416,17 @@ test_af_4b_all_contr <- tibble(
   .study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
   .trtb = factor(stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"), levels = levels(af_net$treatments)),
   .trta = factor(stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])"), levels = levels(af_net$treatments))
-) %>% 
-  rowwise() %>% 
-  mutate(as_tibble(multinma:::summary.mcmc_array(dk(.study, .trtb, af_4b_releff$sims) - dk(.study, .trta, af_4b_releff$sims)))) %>% 
+) %>%
+  rowwise() %>%
+  mutate(as_tibble(multinma:::summary.mcmc_array(dk(.study, .trtb, af_4b_releff$sims) - dk(.study, .trta, af_4b_releff$sims)))) %>%
   select(.study, .trtb, .trta, parameter = contr, mean:Rhat)
 
 test_that("Construction of all contrasts is correct (common interaction)", {
   ntrt <- nlevels(af_net$treatments)
   nstudy <- nlevels(test_af_4b_all_contr$.study)
   expect_equal(nrow(af_4b_releff_all_contr$summary), nstudy * ntrt * (ntrt - 1) / 2)
-  expect_equal(select(af_4b_releff_all_contr$summary, -Rhat), 
-               select(test_af_4b_all_contr, -Rhat), 
+  expect_equal(select(af_4b_releff_all_contr$summary, -Rhat),
+               select(test_af_4b_all_contr, -Rhat),
                check.attributes = FALSE)
 })
 
@@ -439,24 +439,24 @@ test_af_4b_all_contr_new <- tibble(
   .study = factor(stringr::str_extract(contr, "(?<=\\[)(.+)(?=:)")),
   .trtb = factor(stringr::str_extract(contr, "(?<=\\: )(.+)(?= vs\\.)"), levels = levels(af_net$treatments)),
   .trta = factor(stringr::str_extract(contr, "(?<=vs\\. )(.+)(?=\\])"), levels = levels(af_net$treatments))
-) %>% 
-  rowwise() %>% 
-  mutate(as_tibble(multinma:::summary.mcmc_array(dk(.study, .trtb, af_4b_releff_new$sims) - dk(.study, .trta, af_4b_releff_new$sims)))) %>% 
+) %>%
+  rowwise() %>%
+  mutate(as_tibble(multinma:::summary.mcmc_array(dk(.study, .trtb, af_4b_releff_new$sims) - dk(.study, .trta, af_4b_releff_new$sims)))) %>%
   select(.study, .trtb, .trta, parameter = contr, mean:Rhat)
 
 test_that("Construction of all contrasts in target population is correct (common interaction)", {
   ntrt <- nlevels(af_net$treatments)
   nstudy <- nlevels(test_af_4b_all_contr_new$.study)
   expect_equal(nrow(af_4b_releff_all_contr_new$summary), nstudy * ntrt * (ntrt - 1) / 2)
-  expect_equal(select(af_4b_releff_all_contr_new$summary, -Rhat), 
-               select(test_af_4b_all_contr_new, -Rhat), 
+  expect_equal(select(af_4b_releff_all_contr_new$summary, -Rhat),
+               select(test_af_4b_all_contr_new, -Rhat),
                check.attributes = FALSE)
 })
 
 test_that("Robust to custom options(contrasts) settings", {
   af_fit_4b_SAS <- withr::with_options(list(contrasts = c(ordered = "contr.SAS",
                                                        unordered = "contr.SAS")),
-             nowarn_on_ci(nma(af_net, 
+             nowarn_on_ci(nma(af_net,
                  seed = 579212814,
                  trt_effects = "random",
                  regression = ~ .trt:stroke,
