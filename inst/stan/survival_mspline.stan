@@ -166,7 +166,7 @@ data {
   // int<lower=0, upper=1> aux_by; // Flag subgroup aux parameters within each arm (1 = yes)
   // int<lower=0, upper=1> aux_reg; // Flag regression on aux pars (1 = yes)
   int<lower=0, upper=1> aux_int; // Flag aux regression needs integration (1 = yes)
-  int<lower=1> aux_id[ni_ipd + ni_agd_arm*(aux_int ? nint_max : 1)];
+  array[ni_ipd + ni_agd_arm*(aux_int ? nint_max : 1)] int<lower=1> aux_id;
 
   // auxiliary design matrix
   int<lower=0> nX_aux;
@@ -381,7 +381,7 @@ model {
 }
 generated quantities {
   // Baseline spline coefficients
-  vector[n_scoef] scoef[n_aux];
+  array[n_aux] vector[n_scoef] scoef;
 
   // Regression on spline coefficients
   // matrix[nX_aux, n_scoef-1] beta_aux = QR ? R_inv_aux * beta_aux_tilde : beta_aux_tilde;
