@@ -1256,7 +1256,8 @@ combine_network <- function(..., trt_ref) {
 #' @param ... Two or more numeric columns (or vectors) of category counts.
 #'   Argument names (optional) will be used to label the categories.
 #' @param inclusive Logical, are ordered category counts inclusive (`TRUE`) or
-#'   exclusive (`FALSE`)? Default `FALSE`. Only used when `ordered = TRUE`. See details.
+#'   exclusive (`FALSE`)? Default `FALSE`. Only used when `type = "ordered"`.
+#'   See details.
 #' @param type String, indicating whether categories are `"ordered"` or
 #'   `"competing"`. Currently only ordered categorical outcomes are supported by
 #'   the modelling functions in this package.
