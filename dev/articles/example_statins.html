@@ -36,7 +36,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.9001</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.9002</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -217,15 +217,15 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                                          mean se_mean   sd     2.5%      25%      50%      75%</span></span>
-<span><span class="co">#&gt; beta[.trtStatin:preventionSecondary]    -0.21    0.00 0.11    -0.42    -0.28    -0.21    -0.13</span></span>
-<span><span class="co">#&gt; d[Statin]                               -0.11    0.00 0.10    -0.30    -0.17    -0.11    -0.04</span></span>
-<span><span class="co">#&gt; lp__                                 -7362.70    0.09 3.33 -7369.76 -7364.79 -7362.32 -7360.30</span></span>
+<span><span class="co">#&gt; beta[.trtStatin:preventionSecondary]    -0.21    0.00 0.11    -0.42    -0.28    -0.21    -0.14</span></span>
+<span><span class="co">#&gt; d[Statin]                               -0.10    0.00 0.10    -0.29    -0.17    -0.10    -0.04</span></span>
+<span><span class="co">#&gt; lp__                                 -7362.78    0.09 3.43 -7370.38 -7364.84 -7362.44 -7360.31</span></span>
 <span><span class="co">#&gt;                                         97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; beta[.trtStatin:preventionSecondary]     0.02  2282    1</span></span>
-<span><span class="co">#&gt; d[Statin]                                0.09  2185    1</span></span>
-<span><span class="co">#&gt; lp__                                 -7357.21  1479    1</span></span>
+<span><span class="co">#&gt; beta[.trtStatin:preventionSecondary]     0.01  2385    1</span></span>
+<span><span class="co">#&gt; d[Statin]                                0.08  2342    1</span></span>
+<span><span class="co">#&gt; lp__                                 -7357.16  1312    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Sep 11 13:10:28 2023.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Sep 11 15:24:15 2023.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -273,7 +273,11 @@ transition errors (the default for RE models is set to 0.95).</p>
 <span>                     prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
 <span>                     adapt_delta <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: No treatment classes specified in network, any interactions in `regression` formula will be separate (independent) for each treatment.</span></span>
-<span><span class="co">#&gt; Use set_*() argument `trt_class` and nma() argument `class_interactions` to change this.</span></span></code></pre></div>
+<span><span class="co">#&gt; Use set_*() argument `trt_class` and nma() argument `class_interactions` to change this.</span></span>
+<span><span class="co">#&gt; Warning: There were 7 divergent transitions after warmup. See</span></span>
+<span><span class="co">#&gt; https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</span></span>
+<span><span class="co">#&gt; to find out why this is a problem and how to eliminate them.</span></span>
+<span><span class="co">#&gt; Warning: Examine the pairs() plot to diagnose sampling problems</span></span></code></pre></div>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -285,17 +289,17 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                                          mean se_mean   sd     2.5%      25%      50%      75%</span></span>
-<span><span class="co">#&gt; beta[.trtStatin:preventionSecondary]    -0.31    0.01 0.27    -0.91    -0.45    -0.29    -0.15</span></span>
-<span><span class="co">#&gt; d[Statin]                               -0.07    0.01 0.22    -0.48    -0.18    -0.07     0.05</span></span>
-<span><span class="co">#&gt; lp__                                 -7374.49    0.16 5.32 -7385.32 -7377.90 -7374.23 -7370.80</span></span>
-<span><span class="co">#&gt; tau                                      0.25    0.01 0.20     0.01     0.10     0.20     0.34</span></span>
+<span><span class="co">#&gt; beta[.trtStatin:preventionSecondary]    -0.28    0.02 0.33    -0.89    -0.42    -0.28    -0.15</span></span>
+<span><span class="co">#&gt; d[Statin]                               -0.08    0.01 0.26    -0.51    -0.18    -0.08     0.03</span></span>
+<span><span class="co">#&gt; lp__                                 -7374.31    0.17 5.21 -7385.36 -7377.62 -7374.19 -7370.70</span></span>
+<span><span class="co">#&gt; tau                                      0.25    0.01 0.23     0.01     0.09     0.19     0.34</span></span>
 <span><span class="co">#&gt;                                         97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; beta[.trtStatin:preventionSecondary]     0.20  1009 1.00</span></span>
-<span><span class="co">#&gt; d[Statin]                                0.37  1024 1.00</span></span>
-<span><span class="co">#&gt; lp__                                 -7364.71  1069 1.00</span></span>
-<span><span class="co">#&gt; tau                                      0.77   712 1.01</span></span>
+<span><span class="co">#&gt; beta[.trtStatin:preventionSecondary]     0.22   433 1.01</span></span>
+<span><span class="co">#&gt; d[Statin]                                0.38   425 1.01</span></span>
+<span><span class="co">#&gt; lp__                                 -7364.76   980 1.01</span></span>
+<span><span class="co">#&gt; tau                                      0.81   460 1.01</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Sep 11 13:10:44 2023.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Sep 11 15:24:31 2023.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -318,14 +322,14 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">statin_dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">statin_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 46<span style="color: #555555;"> (on 38 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 21.7</span></span>
-<span><span class="co">#&gt;               DIC: 67.7</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 46.1<span style="color: #555555;"> (on 38 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 21.9</span></span>
+<span><span class="co">#&gt;               DIC: 68</span></span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">statin_dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">statin_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 42.7<span style="color: #555555;"> (on 38 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 25.3</span></span>
-<span><span class="co">#&gt;               DIC: 68</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 42.5<span style="color: #555555;"> (on 38 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 25.1</span></span>
+<span><span class="co">#&gt;               DIC: 67.6</span></span></code></pre></div>
 <p>The DIC is very similar between FE and RE models, so we might choose
 the FE model based on parsimony. The residual deviance statistics are
 larger than the number of data points, suggesting that some data points
@@ -365,8 +369,8 @@ argument specifies a data frame containing the levels of the covariate
 <span><span class="co">#&gt;  prevention</span></span>
 <span><span class="co">#&gt;     Primary</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                     mean  sd 2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[Primary: Statin] -0.11 0.1 -0.3 -0.17 -0.11 -0.04  0.09     2191     2646    1</span></span>
+<span><span class="co">#&gt;                    mean  sd  2.5%   25%  50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; d[Primary: Statin] -0.1 0.1 -0.29 -0.17 -0.1 -0.04  0.08     2357     3067    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------------</span> <span style="font-weight: bold;">Study: Secondary</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -375,7 +379,7 @@ argument specifies a data frame containing the levels of the covariate
 <span><span class="co">#&gt;   Secondary</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[Secondary: Statin] -0.31 0.05 -0.42 -0.35 -0.31 -0.28 -0.21     4249     3505    1</span></span></code></pre></div>
+<span><span class="co">#&gt; d[Secondary: Statin] -0.31 0.05 -0.42 -0.35 -0.31 -0.28 -0.21     4102     3193    1</span></span></code></pre></div>
 <p>The <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method may be used to visually compare these
 estimates:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
