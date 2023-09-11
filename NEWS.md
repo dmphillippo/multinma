@@ -55,8 +55,10 @@ from that study for prediction.
 * Improvement: `predict()` will now produce aggregate-level predictions over a
 sample of individuals in `newdata` for ML-NMR models (previously `newdata` had
 to include integration points).
+* Improvement: Compatibility with future rstan versions (PR #25).
 * Fix: In `plot.nma_data()`, using a custom `layout` that is not a string (e.g. 
 a data frame of layout coordinates) now works as expected when `nudge > 0`.
+* Fix: Documentation corrections (PR #24).
 
 # multinma 0.5.1
 
