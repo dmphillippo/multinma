@@ -1,9 +1,9 @@
 // -- Vector functions --
 
 // Which entries are equal to a given value
-int[] which(int[] x, int y) {
+array[] int which(array[] int x, int y) {
   int n = num_elements(x);
-  int w[n]; // Over-allocate w and then truncate later
+  array[n] int w; // Over-allocate w and then truncate later
   int c = 1;
   for (i in 1:n) {
     if (x[i] == y) {
@@ -15,9 +15,9 @@ int[] which(int[] x, int y) {
 }
 
 // Which entries are greater than 0
-int[] which_gt0(vector x) {
+array[] int which_gt0(vector x) {
   int n = num_elements(x);
-  int w[n]; // Over-allocate w and then truncate later
+  array[n] int w; // Over-allocate w and then truncate later
   int c = 1;
   for (i in 1:n) {
     if (x[i] > 0) {

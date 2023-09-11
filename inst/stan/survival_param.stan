@@ -152,7 +152,7 @@ functions {
   }
 
   // -- Log likelihood with censoring and truncation --
-  vector loglik(int dist, vector time, vector start_time, vector delay_time, int[] status, vector eta, vector aux, vector aux2) {
+  vector loglik(int dist, vector time, vector start_time, vector delay_time, array[] int status, vector eta, vector aux, vector aux2) {
     int n = num_elements(eta);
     vector[n] l;
 
@@ -162,11 +162,11 @@ functions {
     int nwhich2 = num_elements(which(status, 2));
     int nwhich3 = num_elements(which(status, 3));
     int nwhichd = num_elements(which_gt0(delay_time));
-    int which0[nwhich0];
-    int which1[nwhich1];
-    int which2[nwhich2];
-    int which3[nwhich3];
-    int whichd[nwhichd];
+    array[nwhich0] int which0;
+    array[nwhich1] int which1;
+    array[nwhich2] int which2;
+    array[nwhich3] int which3;
+    array[nwhichd] int whichd;
     if (nwhich0) which0 = which(status, 0);
     if (nwhich1) which1 = which(status, 1);
     if (nwhich2) which2 = which(status, 2);
@@ -267,22 +267,22 @@ data {
 
   // AgD arm-based
   // int<lower=0> narm_agd_arm; // Number of arm-based AgD arms
-  int<lower=1> agd_arm_arm[ni_agd_arm]; // Arm indicator for AgD (arm-based) (i.e. picking element of which_RE)
+  array[ni_agd_arm] int<lower=1> agd_arm_arm; // Arm indicator for AgD (arm-based) (i.e. picking element of which_RE)
 
   // Outcomes
   vector[ni_ipd] ipd_time;
   vector[ni_ipd] ipd_start_time;
   vector[ni_ipd] ipd_delay_time;
-  int<lower=0, upper=3> ipd_status[ni_ipd];
+  array[ni_ipd] int<lower=0, upper=3> ipd_status;
 
   vector[ni_agd_arm] agd_arm_time;
   vector[ni_agd_arm] agd_arm_start_time;
   vector[ni_agd_arm] agd_arm_delay_time;
-  int<lower=0, upper=3> agd_arm_status[ni_agd_arm];
+  array[ni_agd_arm] int<lower=0, upper=3> agd_arm_status;
 
   // Aux IDs for independent shape parameters
   int<lower=0, upper=1> aux_by; // Flag subgroup aux parameters within each arm (1 = yes)
-  int<lower=1> aux_id[ni_ipd + ni_agd_arm * (aux_by ? nint_max : 1)];
+  array[ni_ipd + ni_agd_arm * (aux_by ? nint_max : 1)] int<lower=1> aux_id;
 }
 transformed data {
   // Exponential model indicator, 0 = exponential
@@ -292,7 +292,7 @@ transformed data {
   // Number of auxiliary parameters
   int n_aux = nonexp ? max(aux_id) : 0;
   // AgD arm indicator - shifted
-  int agd_arm_arm2[ni_agd_arm];
+  array[ni_agd_arm] int agd_arm_arm2;
   // Number of integration points
 
 #include /include/transformed_data_common.stan
