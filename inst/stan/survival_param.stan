@@ -157,10 +157,10 @@ functions {
     vector[n] l;
 
     // Status indicators
-    int nwhich0 = (dist == 6 || dist == 8 || dist == 9) ? num_elements(which(status, 0)) : 0;
-    int nwhich1 = !(dist == 6 || dist == 8 || dist == 9) ? num_elements(which(status, 1)) : 0;
-    int nwhich2 = num_elements(which(status, 2));
-    int nwhich3 = num_elements(which(status, 3));
+    int nwhich0 = (dist == 6 || dist == 8 || dist == 9) ? nwhich(status, 0) : 0;
+    int nwhich1 = !(dist == 6 || dist == 8 || dist == 9) ? nwhich(status, 1) : 0;
+    int nwhich2 = nwhich(status, 2);
+    int nwhich3 = nwhich(status, 3);
     int nwhichd = num_elements(which_gt0(delay_time));
     array[nwhich0] int which0;
     array[nwhich1] int which1;

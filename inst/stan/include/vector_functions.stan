@@ -14,6 +14,26 @@ array[] int which(array[] int x, int y) {
   return w[1:(c-1)];
 }
 
+// Which entry is first equal to a given value
+int first(array[] int x, int y) {
+  int w = 0;
+  int i = 1;
+  while (i <= num_elements(x) && w == 0) {
+    if (x[i] == y) w = i;
+    i += 1;
+  }
+  return w;
+}
+
+// How many entries are equal to a given value
+int nwhich(array[] int x, int y) {
+  int w = 0;
+  for (i in 1:num_elements(x)) {
+    if (x[i] == y) w += 1;
+  }
+  return w;
+}
+
 // Which entries are greater than 0
 array[] int which_gt0(vector x) {
   int n = num_elements(x);
