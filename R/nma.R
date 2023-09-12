@@ -590,6 +590,7 @@ nma <- function(network,
     # Only take necessary columns
     dat_ipd <- get_model_data_columns(dat_ipd,
                                       regression = regression,
+                                      aux_regression = aux_regression,
                                       label = "IPD",
                                       keep = if (has_aux_by) aux_by else NULL)
 
@@ -636,6 +637,7 @@ nma <- function(network,
     # Only take necessary columns
     idat_agd_arm <- get_model_data_columns(idat_agd_arm,
                                            regression = regression,
+                                           aux_regression = aux_regression,
                                            label = "AgD (arm-based)",
                                            keep = if (has_aux_by) aux_by else NULL)
 
@@ -683,12 +685,21 @@ nma <- function(network,
   idat_all_plus_bl <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast)
 
   # Get sample sizes for centering
-  if (!is.null(regression) && !is_only_offset(regression) && center) {
+  if (((!is.null(regression) && !is_only_offset(regression)) || has_aux_regression) && center) {
     # Check that required variables are present in each data set, and non-missing
-    check_regression_data(regression,
-                          dat_ipd = dat_ipd,
-                          dat_agd_arm = idat_agd_arm,
-                          dat_agd_contrast = idat_agd_contrast)
+    if (!is.null(regression)) {
+      check_regression_data(regression,
+                            dat_ipd = dat_ipd,
+                            dat_agd_arm = idat_agd_arm,
+                            dat_agd_contrast = idat_agd_contrast)
+    }
+
+    if (has_aux_regression) {
+      check_regression_data(aux_regression,
+                            dat_ipd = dat_ipd,
+                            dat_agd_arm = idat_agd_arm,
+                            dat_agd_contrast = idat_agd_contrast)
+    }
 
     # If IPD or IPD+AgD use weighted means for centering, otherwise with only AgD use raw mean
 
@@ -728,15 +739,24 @@ nma <- function(network,
     }
 
     # Center numeric columns used in regression model
-    reg_names <- all.vars(regression)
 
-    # Ignore any variable(s) used as offset(s)
-    reg_terms <- terms(regression)
+    if (!is.null(regression)) {
+      reg_names <- all.vars(regression)
 
-    if (length(attr(reg_terms, "offset"))) {
-      off_terms <- rownames(attr(reg_terms, "factors"))[attr(reg_terms, "offset")]
-      off_names <- all.vars(as.formula(paste("~", off_terms, sep = "+")))
-      reg_names <- setdiff(reg_names, off_names)
+      # Ignore any variable(s) used as offset(s)
+      reg_terms <- terms(regression)
+
+      if (length(attr(reg_terms, "offset"))) {
+        off_terms <- rownames(attr(reg_terms, "factors"))[attr(reg_terms, "offset")]
+        off_names <- all.vars(as.formula(paste("~", off_terms, sep = "+")))
+        reg_names <- setdiff(reg_names, off_names)
+      }
+    } else {
+      reg_names <- character()
+    }
+
+    if (has_aux_regression) {
+      reg_names <- unique(c(reg_names, all.vars(aux_regression)))
     }
 
     reg_numeric <- purrr::map_lgl(idat_all[, reg_names], is.numeric)
@@ -915,8 +935,11 @@ nma <- function(network,
 
   # Set up aux_regression design matrix
   if (has_aux_regression) {
-    X_aux <- model.matrix(aux_regression, data = aux_dat)
-    X_aux <- X_aux[, colnames(X_aux) != "(Intercept)", drop = FALSE]
+    X_aux_list <- make_nma_model_matrix(aux_regression,
+                                        dat_ipd = dat_ipd,
+                                        dat_agd_arm = dat_agd_arm,
+                                        xbar = xbar)
+    X_aux <- rbind(X_aux_list$X_ipd, X_aux_list$X_agd_arm)
   } else {
     X_aux <- NULL
   }
@@ -2710,6 +2733,9 @@ make_nma_model_matrix <- function(nma_formula,
   col_int_ref <- grepl(regex_int_ref, colnames(X_all), perl = TRUE)
   X_all <- X_all[, !col_int_ref, drop = FALSE]
 
+  # Remove global intercept column (present for aux_regression)
+  X_all <- X_all[, colnames(X_all) != "(Intercept)", drop = FALSE]
+
   if (consistency == "ume") {
     # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
     contr_cols <- grepl("^\\.contr", colnames(X_all))
@@ -2787,13 +2813,17 @@ make_nma_model_matrix <- function(nma_formula,
 #'
 #' @param data Data frame
 #' @param regression Regression formula or NULL
+#' @param aux_regression Regression formula or NULL
 #' @param label Label for data source or NULL, used for informative errors
 #' @param keep Additional variables to keep in data
 #'
 #' @return Data frame with required columns
 #' @noRd
-get_model_data_columns <- function(data, regression = NULL, label = NULL, keep = NULL) {
+get_model_data_columns <- function(data, regression = NULL, aux_regression = NULL, label = NULL, keep = NULL) {
   if (!is.null(label)) label <- paste(" in", label)
+  regvars <- NULL
+  auxregvars <- NULL
+
   if (!is.null(regression)) {
     regvars <- setdiff(all.vars(regression), c(".trt", ".trtclass", ".study", ".contr", ".omega"))
     badvars <- setdiff(regvars, colnames(data))
@@ -2804,10 +2834,21 @@ get_model_data_columns <- function(data, regression = NULL, label = NULL, keep =
                    " not found", label, ".")
       )
     }
-    out <- dplyr::select(data, dplyr::starts_with("."), !! regvars, !! keep)
-  } else {
-    out <- dplyr::select(data, dplyr::starts_with("."), !! keep)
   }
+
+  if (!is.null(aux_regression)) {
+    auxregvars <- setdiff(all.vars(aux_regression), c(".trt", ".trtclass", ".study", ".contr", ".omega"))
+    badvars <- setdiff(auxregvars, colnames(data))
+    if (length(badvars)) {
+      abort(
+        glue::glue("Auxiliary regression variable{if (length(badvars) > 1) 's' else ''} ",
+                   glue::glue_collapse(glue::double_quote(badvars), sep = ", ", last = " and "),
+                   " not found", label, ".")
+      )
+    }
+  }
+
+  out <- dplyr::select(data, dplyr::starts_with("."), !! regvars, !! auxregvars, !! keep)
 
   # Work around dplyr::bind_rows() bug - convert .Surv column to bare matrix if present
   if (rlang::has_name(out, ".Surv")) out$.Surv <- as.matrix(out$.Surv)
