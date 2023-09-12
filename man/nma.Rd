@@ -28,7 +28,7 @@ nma(
   int_thin = 0,
   int_check = TRUE,
   mspline_degree = 3,
-  n_knots = 3,
+  n_knots = 7,
   knots = NULL
 )
 }
@@ -121,15 +121,21 @@ giving the number of internal knots for partitioning the baseline hazard
 into intervals. The knot locations within each study will be determined by
 the corresponding quantiles of the observed event times, plus boundary
 knots at the earliest entry time (0 with no delayed entry) and the maximum
-event/censoring time. For example, with the default \code{n_knots = 3}, the
-internal knot locations will be at the 25\%, 50\%, and 75\% quantiles of the
-observed event times. Ignored when \code{knots} is specified.}
+event/censoring time. For example, with \code{n_knots = 3}, the internal knot
+locations will be at the 25\%, 50\%, and 75\% quantiles of the observed event
+times. The default is \code{n_knots = 7}; overfitting is avoided by shrinking
+towards a constant hazard with a random walk prior (see details). If
+\code{aux_regression} is specified then a single set of knot locations will be
+calculated across all studies in the network. Ignored when \code{knots} is
+specified.}
 
 \item{knots}{For \code{mspline} and \code{pexp} likelihoods, a named list of numeric
 vectors of internal knot locations for each of the studies in the network.
 Currently, each vector must have the same length (i.e. each study must use
 the same number of knots). If unspecified (the default), the knots will be
-chosen based on \code{n_knots} as described above.}
+chosen based on \code{n_knots} as described above. If \code{aux_regression} is
+specified then \code{knots} should be a single numeric vector of knot locations
+which will be shared across all studies in the network.}
 }
 \value{
 \code{nma()} returns a \link{stan_nma} object, except when \code{consistency = "nodesplit"} when a \link{nma_nodesplit} or \link{nma_nodesplit_df} object is

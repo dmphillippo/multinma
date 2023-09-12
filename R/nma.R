@@ -68,14 +68,20 @@
 #'   into intervals. The knot locations within each study will be determined by
 #'   the corresponding quantiles of the observed event times, plus boundary
 #'   knots at the earliest entry time (0 with no delayed entry) and the maximum
-#'   event/censoring time. For example, with the default `n_knots = 3`, the
-#'   internal knot locations will be at the 25%, 50%, and 75% quantiles of the
-#'   observed event times. Ignored when `knots` is specified.
+#'   event/censoring time. For example, with `n_knots = 3`, the internal knot
+#'   locations will be at the 25%, 50%, and 75% quantiles of the observed event
+#'   times. The default is `n_knots = 7`; overfitting is avoided by shrinking
+#'   towards a constant hazard with a random walk prior (see details). If
+#'   `aux_regression` is specified then a single set of knot locations will be
+#'   calculated across all studies in the network. Ignored when `knots` is
+#'   specified.
 #' @param knots For `mspline` and `pexp` likelihoods, a named list of numeric
 #'   vectors of internal knot locations for each of the studies in the network.
 #'   Currently, each vector must have the same length (i.e. each study must use
 #'   the same number of knots). If unspecified (the default), the knots will be
-#'   chosen based on `n_knots` as described above.
+#'   chosen based on `n_knots` as described above. If `aux_regression` is
+#'   specified then `knots` should be a single numeric vector of knot locations
+#'   which will be shared across all studies in the network.
 #'
 #' @details When specifying a model formula in the `regression` argument, the
 #'   usual formula syntax is available (as interpreted by [model.matrix()]). The
@@ -245,7 +251,7 @@ nma <- function(network,
                 int_thin = 0,
                 int_check = TRUE,
                 mspline_degree = 3,
-                n_knots = 3,
+                n_knots = 7,
                 knots = NULL) {
 
   # Check network
@@ -867,31 +873,55 @@ nma <- function(network,
     survdat <- dplyr::mutate(survdat, !!! get_Surv_data(survdat$.Surv))
 
     # Boundary knots at earliest entry time (0 with no delayed entry) and latest event/censoring time
-    b_knots <- by(survdat, survdat$.study, function(x) c(min(x$delay_time), max(x$time)),
-                  simplify = FALSE)
+    if (!has_aux_regression) {
+      b_knots <- by(survdat, survdat$.study, function(x) c(min(x$delay_time), max(x$time)),
+                    simplify = FALSE)
+    } else {
+      # With aux_regression, need same spline knots across all studies
+      b_knots <- c(min(survdat$delay_time), max(survdat$time))
+      b_knots <- rep_len(list(b_knots), dplyr::n_distinct(survdat$.study))
+      names(b_knots) <- unique(survdat$.study)
+    }
 
     if (is.null(knots)) {  # Calculate internal knots based on quantiles
       if (!rlang::is_scalar_integerish(n_knots, finite = TRUE) || n_knots <= 0)
         abort("`n_knots` must be a single positive integer (or specify `knots` directly)")
 
       observed_survdat <- dplyr::filter(survdat, .data$observed)
-      knots <- by(observed_survdat, observed_survdat$.study,
-                  function(x) quantile(x$time, probs = seq(1, n_knots) / (n_knots + 1)),
-                  simplify = FALSE)
+
+      if (!has_aux_regression) {
+        knots <- by(observed_survdat, observed_survdat$.study,
+                    function(x) quantile(x$time, probs = seq(1, n_knots) / (n_knots + 1)),
+                    simplify = FALSE)
+      } else {
+        # With aux_regression, need same spline knots across all studies
+        knots <- quantile(observed_survdat$time, probs = seq(1, n_knots) / (n_knots + 1))
+        knots <- rep_len(list(knots), dplyr::n_distinct(survdat$.study))
+        names(knots) <- unique(survdat$.study)
+      }
 
     } else {  # User-provided internal knots
       # Check required format
-      if (!is.list(knots) || any(!purrr::map_lgl(knots, is.numeric)))
-        abort("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.")
+      if (!has_aux_regression) {
+        if (!is.list(knots) || any(!purrr::map_lgl(knots, is.numeric)))
+          abort("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.")
 
-      missing_names <- setdiff(levels(survdat$.study), names(knots))
-      if (length(missing_names) > 0)
-        abort(glue::glue("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.\n",
-                         "Missing knot location vector{if (length(missing_names > 1) 's' else ''} for stud{if (length(missing_names > 1) 'ies' else 'y'} ",
-                         glue::glue_collapse(glue::double_quote(missing_names), sep = ", ", last = " and ", width = 30), "."))
+        missing_names <- setdiff(levels(survdat$.study), names(knots))
+        if (length(missing_names) > 0)
+          abort(glue::glue("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.\n",
+                           "Missing knot location vector{if (length(missing_names > 1) 's' else ''} for stud{if (length(missing_names > 1) 'ies' else 'y'} ",
+                           glue::glue_collapse(glue::double_quote(missing_names), sep = ", ", last = " and ", width = 30), "."))
 
-      if (!all(purrr::map_int(knots, length) == length(knots[[1]])))
-        abort("Each element of `knots` must currently be the same length (each study must have the same number of knots).")
+        if (!all(purrr::map_int(knots, length) == length(knots[[1]])))
+          abort("Each element of `knots` must currently be the same length (each study must have the same number of knots).")
+      } else {
+        # With aux_regression, only a single vector of knot locations is allowed
+        if (!rlang::is_bare_numeric(knots))
+          abort("`knots` must be a single numeric vector of knot locations, shared for all studies, when `aux_regression` is specified.")
+
+        knots <- rep_len(list(knots), dplyr::n_distinct(survdat$.study))
+        names(knots) <- unique(survdat$.study)
+      }
     }
 
     # Set up basis
@@ -1861,7 +1891,12 @@ nma.fit <- function(ipd_x, ipd_y,
     }
 
     # Get scoef prior means
-    prior_aux_location <- purrr::map(basis[unique(cbind(aux_id, study = c(ipd_s_t_all$.study, agd_arm_s_t_all$.study)))[, "study"]], mspline_constant_hazard)
+    if (!is.null(X_aux)) {
+      # If aux_regression specified, single spline basis shared across network
+      prior_aux_location <- list(mspline_constant_hazard(basis[[1]]))
+    } else {
+      prior_aux_location <- purrr::map(basis[unique(cbind(aux_id, study = c(ipd_s_t_all$.study, agd_arm_s_t_all$.study)))[, "study"]], mspline_constant_hazard)
+    }
 
     standat <- purrr::list_modify(standat,
                                   # AgD arm IDs
