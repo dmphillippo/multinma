@@ -48,18 +48,18 @@ functions {
     return log(scoef * basis') + eta;
   }
 
-  vector lS_a2 (row_vector ibasis, vector eta, row_vector scoef) {
+  vector lS_a2 (row_vector ibasis, vector eta, vector scoef) {
     // ibasis = integrated basis evaluated at event/censoring time
     // scoef = row_vector of spline coefficients
     // eta = log rate (linear predictor)
-    return - (dot_product(scoef, ibasis)) * exp(eta);
+    return - (ibasis * scoef) * exp(eta);
   }
 
-  vector lh_a2 (row_vector basis, vector eta, row_vector scoef) {
+  vector lh_a2 (row_vector basis, vector eta, vector scoef) {
     // basis = basis evaluated at event/censoring time
     // scoef = row_vector of spline coefficients
     // eta = log rate (linear predictor)
-    return log(dot_product(scoef, basis)) + eta;
+    return log(basis * scoef) + eta;
   }
 
   // -- Log likelihood with censoring and truncation --
@@ -161,7 +161,7 @@ functions {
                   int delayed,             // Delayed entry flag (1=delay)
                   int status,              // Censoring status
                   vector eta,              // Linear predictor
-                  row_vector scoef) {          // Spline coefficients
+                  vector scoef) {          // Spline coefficients
     vector[num_elements(eta)] l;
 
     if (status == 0) { // Right censored
@@ -272,7 +272,7 @@ transformed parameters {
 
   // Spline coefficients
   matrix[n_aux, n_scoef-1] lscoef; // logit baseline spline coefficients
-  matrix[nX_aux ? 0 : n_aux, n_scoef] scoef_temp;
+  array[nX_aux ? 0 : n_aux] vector[n_scoef] scoef_temp;
 
   // Spline coefficient regression
   matrix[nX_aux, n_scoef-1] beta_aux;
@@ -305,7 +305,7 @@ transformed parameters {
   }
 
   if (nX_aux == 0) for (i in 1:n_aux) {
-    scoef_temp[i, ] = to_row_vector(softmax(append_row(0, to_vector(lscoef[i, ]))));
+    scoef_temp[i] = softmax(append_row(0, to_vector(lscoef[i, ])));
   }
 
 
@@ -353,7 +353,7 @@ transformed parameters {
                                ipd_delayed[wi],
                                ipd_status[wi],
                                eta_ipd[wi],
-                               to_vector(scoef_temp[i, ]));
+                               scoef_temp[i]);
                                //to_row_vector(softmax(append_row(0, lscoef[i, ])));
           }
         }
@@ -363,19 +363,17 @@ transformed parameters {
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
-    matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef] scoef_agd_arm;
+    // matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef] scoef_agd_arm;
     vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
               X_agd_arm * beta_tilde + offset_agd_arm :
               X_agd_arm * beta_tilde;
 
-    if (nX_aux) {
-      matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef-1] Xb_aux = lscoef[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)], ] + X_aux_agd_arm * beta_aux;
-      for (i in 1:((aux_int ? nint_max : 1) * ni_agd_arm)) {
-        scoef_agd_arm[i, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[i, ]))));
-      }
-    } else {
-      scoef_agd_arm = scoef_temp[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)], ];
-    }
+    // if (nX_aux) {
+    //   matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef-1] Xb_aux = lscoef[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)], ] + X_aux_agd_arm * beta_aux;
+    //   for (i in 1:((aux_int ? nint_max : 1) * ni_agd_arm)) {
+    //     scoef_agd_arm[i, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[i, ]))));
+    //   }
+    // }
 
     if (nint_max > 1) { // -- If integration points are used --
 
@@ -390,7 +388,12 @@ transformed parameters {
         if (RE && which_RE[narm_ipd + agd_arm_arm[i]]) eta_agd_arm_ii += f_delta[which_RE[narm_ipd + agd_arm_arm[i]]];
 
         // Average likelihood over integration points
-        if (aux_int) { //for (j in 1:nint) {
+        if (aux_int) {
+          matrix[nint, n_scoef-1] Xb_aux = lscoef[aux_id_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)], ] + X_aux_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ] * beta_aux;
+          matrix[nint, n_scoef] scoef_agd_arm;
+          for (j in 1:nint) {
+            scoef_agd_arm[j, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[j, ]))));
+          }
           log_L_ii = loglik_a(agd_arm_time[i],
                                agd_arm_itime[i],
                                agd_arm_start_itime[i],
@@ -398,7 +401,17 @@ transformed parameters {
                                agd_arm_delayed[i],
                                agd_arm_status[i],
                                eta_agd_arm_ii,
-                               scoef_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ]);
+                               scoef_agd_arm);
+        } else if (nX_aux) {
+          row_vector[n_scoef-1] Xb_auxi = lscoef[aux_id_agd_arm[i], ] + X_aux_agd_arm[i, ] * beta_aux;
+          log_L_ii = loglik_a2(agd_arm_time[i],
+                               agd_arm_itime[i],
+                               agd_arm_start_itime[i],
+                               agd_arm_delay_itime[i],
+                               agd_arm_delayed[i],
+                               agd_arm_status[i],
+                               eta_agd_arm_ii,
+                               softmax(append_row(0, to_vector(Xb_auxi))));
         } else {
           log_L_ii = loglik_a2(agd_arm_time[i],
                               agd_arm_itime[i],
@@ -407,29 +420,66 @@ transformed parameters {
                               agd_arm_delayed[i],
                               agd_arm_status[i],
                               eta_agd_arm_ii,
-                              scoef_agd_arm[i, ]);
+                              scoef_temp[aux_id_agd_arm[i]]);
         }
 
         log_L_agd_arm[i] = log_sum_exp(log_L_ii) - log(nint);
       }
     } else { // -- If no integration --
-      // for (i in 1:ni_agd_arm) {
-        vector[ni_agd_arm] eta_agd_arm = eta_agd_arm_noRE;
+      vector[ni_agd_arm] eta_agd_arm = eta_agd_arm_noRE;
 
-        // Random effects
-        if (RE) for (i in 1:ni_agd_arm) {
-          if (which_RE[narm_ipd + agd_arm_arm[i]]) eta_agd_arm[i] += f_delta[which_RE[narm_ipd + agd_arm_arm[i]]];
+      // Random effects
+      if (RE) for (i in 1:ni_agd_arm) {
+        if (which_RE[narm_ipd + agd_arm_arm[i]]) eta_agd_arm[i] += f_delta[which_RE[narm_ipd + agd_arm_arm[i]]];
+      }
+
+      if (aux_int) {
+        matrix[ni_agd_arm, n_scoef] scoef_agd_arm;
+        matrix[ni_agd_arm, n_scoef-1] Xb_aux = lscoef[aux_id_agd_arm, ] + X_aux_agd_arm * beta_aux;
+        for (i in 1:ni_agd_arm) {
+          scoef_agd_arm[i, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[i, ]))));
         }
 
         log_L_agd_arm = loglik(agd_arm_time,
-                                  agd_arm_itime,
-                                  agd_arm_start_itime,
-                                  agd_arm_delay_itime,
-                                  agd_arm_delayed,
-                                  agd_arm_status,
-                                  eta_agd_arm,
-                                  scoef_agd_arm);
-      // }
+                               agd_arm_itime,
+                               agd_arm_start_itime,
+                               agd_arm_delay_itime,
+                               agd_arm_delayed,
+                               agd_arm_status,
+                               eta_agd_arm,
+                               scoef_agd_arm);
+      } else {
+        // Loop over aux parameters (i.e. by study, possibly further stratified by aux_by)
+        for (i in 1:n_aux) {
+          int ni = nwhich(aux_id_agd_arm, i);
+
+          if (ni) {
+            array[ni] int wi = which(aux_id_agd_arm, i);
+
+            if (nX_aux) {
+              row_vector[n_scoef-1] Xb_auxi = lscoef[i, ] + X_aux_agd_arm[first(aux_id_agd_arm, i), ] * beta_aux;
+              log_L_agd_arm[wi] = loglik2(agd_arm_time[wi],
+                                          agd_arm_itime[wi],
+                                          agd_arm_start_itime[wi],
+                                          agd_arm_delay_itime[wi],
+                                          agd_arm_delayed[wi],
+                                          agd_arm_status[wi],
+                                          eta_agd_arm[wi],
+                                          softmax(append_row(0, to_vector(Xb_auxi))));
+            } else {
+              log_L_agd_arm[wi] = loglik2(agd_arm_time[wi],
+                                          agd_arm_itime[wi],
+                                          agd_arm_start_itime[wi],
+                                          agd_arm_delay_itime[wi],
+                                          agd_arm_delayed[wi],
+                                          agd_arm_status[wi],
+                                          eta_agd_arm[wi],
+                                          to_vector(scoef_temp[i, ]));
+                                          //to_row_vector(softmax(append_row(0, lscoef[i, ])));
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -469,7 +519,7 @@ generated quantities {
 
   // Baseline spline coefficients
   for (i in 1:n_aux) {
-    scoef[i] = nX_aux ? softmax(append_row(0, to_vector(lscoef[i, ]))) : to_vector(scoef_temp[i, ]);
+    scoef[i] = nX_aux ? softmax(append_row(0, to_vector(lscoef[i, ]))) : scoef_temp[i];
   }
 
   // Log likelihood
