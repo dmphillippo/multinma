@@ -967,7 +967,7 @@ nma <- function(network,
   if (has_aux_regression) {
     X_aux_list <- make_nma_model_matrix(aux_regression,
                                         dat_ipd = dat_ipd,
-                                        dat_agd_arm = dat_agd_arm,
+                                        dat_agd_arm = if (has_agd_arm(network)) dplyr::select(tidyr::unnest(dat_agd_arm, cols = ".Surv"), -".Surv") else NULL,
                                         xbar = xbar)
     X_aux <- rbind(X_aux_list$X_ipd, X_aux_list$X_agd_arm)
   } else {
