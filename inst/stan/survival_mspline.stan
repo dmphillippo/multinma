@@ -78,17 +78,33 @@ functions {
     l = lS(itime, eta, scoef);
 
     // Observed
-    l[which(status, 1)] += lh(time[which(status, 1)], eta[which(status, 1)], scoef[which(status, 1)]);
+    int n1 = nwhich(status, 1);
+    if (n1) {
+      array[n1] int w1 = which(status, 1);
+      l[w1] += lh(time[w1], eta[w1], scoef[w1]);
+    }
 
     // Left censored
-    l[which(status, 2)] = log1m_exp(l[which(status, 2)]);
+    int n2 = nwhich(status, 2);
+    if (n2) {
+      array[n2] int w2 = which(status, 2);
+      l[w2] = log1m_exp(l[w2]);
+    }
 
     // Interval censored
     // l = log_diff_exp(lS(start_itime, eta, scoef), lS(itime, eta, scoef));
-    l[which(status, 3)] = log(exp(lS(start_itime[which(status, 3)], eta[which(status, 3)], scoef[which(status, 3)])) - exp(l[which(status, 3)]));
+    int n3 = nwhich(status, 3);
+    if (n3) {
+      array[n3] int w3 = which(status, 3);
+      l[w3] = log(exp(lS(start_itime[w3], eta[w3], scoef[w3])) - exp(l[w3]));
+    }
 
     // Left truncation
-    l[which(delayed, 1)] -= lS(delay_itime[which(delayed, 1)], eta[which(delayed, 1)], scoef[which(delayed, 1)]);
+    int nd = nwhich(delayed, 1);
+    if (nd) {
+      array[nd] int wd = which(delayed, 1);
+      l[wd] -= lS(delay_itime[wd], eta[wd], scoef[wd]);
+    }
 
     return l;
   }
@@ -109,17 +125,33 @@ functions {
     l = lS2(itime, eta, scoef);
 
     // Observed
-    l[which(status, 1)] += lh2(time[which(status, 1)], eta[which(status, 1)], scoef);
+    int n1 = nwhich(status, 1);
+    if (n1) {
+      array[n1] int w1 = which(status, 1);
+      l[w1] += lh2(time[w1], eta[w1], scoef);
+    }
 
     // Left censored
-    l[which(status, 2)] = log1m_exp(l[which(status, 2)]);
+    int n2 = nwhich(status, 2);
+    if (n2) {
+      array[n2] int w2 = which(status, 2);
+      l[w2] = log1m_exp(l[w2]);
+    }
 
     // Interval censored
     // l = log_diff_exp(lS(start_itime, eta, scoef), lS(itime, eta, scoef));
-    l[which(status, 3)] = log(exp(lS2(start_itime[which(status, 3)], eta[which(status, 3)], scoef)) - exp(l[which(status, 3)]));
+    int n3 = nwhich(status, 3);
+    if (n3) {
+      array[n3] int w3 = which(status, 3);
+      l[w3] = log(exp(lS2(start_itime[w3], eta[w3], scoef)) - exp(l[w3]));
+    }
 
     // Left truncation
-    l[which(delayed, 1)] -= lS2(delay_itime[which(delayed, 1)], eta[which(delayed, 1)], scoef);
+    int nd = nwhich(delayed, 1);
+    if (nd) {
+      array[nd] int wd = which(delayed, 1);
+      l[wd] -= lS2(delay_itime[wd], eta[wd], scoef);
+    }
 
     return l;
   }
@@ -474,7 +506,7 @@ transformed parameters {
                                           agd_arm_delayed[wi],
                                           agd_arm_status[wi],
                                           eta_agd_arm[wi],
-                                          to_vector(scoef_temp[i, ]));
+                                          scoef_temp[i]);
                                           //to_row_vector(softmax(append_row(0, lscoef[i, ])));
             }
           }
