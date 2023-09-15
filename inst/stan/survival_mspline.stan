@@ -73,19 +73,21 @@ functions {
               matrix scoef) {          // Spline coefficients
 
     vector[num_elements(eta)] l;
+    int n1 = nwhich(status, 1);
+    int n2 = nwhich(status, 2);
+    int n3 = nwhich(status, 3);
+    int nd = nwhich(delayed, 1);
 
     // Right censored
     l = lS(itime, eta, scoef);
 
     // Observed
-    int n1 = nwhich(status, 1);
     if (n1) {
       array[n1] int w1 = which(status, 1);
       l[w1] += lh(time[w1], eta[w1], scoef[w1]);
     }
 
     // Left censored
-    int n2 = nwhich(status, 2);
     if (n2) {
       array[n2] int w2 = which(status, 2);
       l[w2] = log1m_exp(l[w2]);
@@ -93,14 +95,12 @@ functions {
 
     // Interval censored
     // l = log_diff_exp(lS(start_itime, eta, scoef), lS(itime, eta, scoef));
-    int n3 = nwhich(status, 3);
     if (n3) {
       array[n3] int w3 = which(status, 3);
       l[w3] = log(exp(lS(start_itime[w3], eta[w3], scoef[w3])) - exp(l[w3]));
     }
 
     // Left truncation
-    int nd = nwhich(delayed, 1);
     if (nd) {
       array[nd] int wd = which(delayed, 1);
       l[wd] -= lS(delay_itime[wd], eta[wd], scoef[wd]);
@@ -120,19 +120,21 @@ functions {
               vector scoef) {          // Spline coefficients
 
     vector[num_elements(eta)] l;
+    int n1 = nwhich(status, 1);
+    int n2 = nwhich(status, 2);
+    int n3 = nwhich(status, 3);
+    int nd = nwhich(delayed, 1);
 
     // Right censored
     l = lS2(itime, eta, scoef);
 
     // Observed
-    int n1 = nwhich(status, 1);
     if (n1) {
       array[n1] int w1 = which(status, 1);
       l[w1] += lh2(time[w1], eta[w1], scoef);
     }
 
     // Left censored
-    int n2 = nwhich(status, 2);
     if (n2) {
       array[n2] int w2 = which(status, 2);
       l[w2] = log1m_exp(l[w2]);
@@ -140,14 +142,12 @@ functions {
 
     // Interval censored
     // l = log_diff_exp(lS(start_itime, eta, scoef), lS(itime, eta, scoef));
-    int n3 = nwhich(status, 3);
     if (n3) {
       array[n3] int w3 = which(status, 3);
       l[w3] = log(exp(lS2(start_itime[w3], eta[w3], scoef)) - exp(l[w3]));
     }
 
     // Left truncation
-    int nd = nwhich(delayed, 1);
     if (nd) {
       array[nd] int wd = which(delayed, 1);
       l[wd] -= lS2(delay_itime[wd], eta[wd], scoef);
@@ -214,6 +214,17 @@ functions {
 
     return l;
   }
+
+  // vector stickbreak(vector x) {
+  //   int n = num_elements(x)+1;
+  //   vector[n-1] y = inv_logit(x);
+  //   vector[n-1] c1my = exp(cumulative_sum(log1m(y)));
+  //   vector[n] p;
+  //   p[1] = y[1];
+  //   p[2:(n-1)] = y[2:(n-1)] .* c1my[1:(n-2)];
+  //   p[n] = c1my[n-1];
+  //   return p;
+  // }
 }
 data {
 #include /include/data_common.stan
@@ -338,6 +349,7 @@ transformed parameters {
 
   if (nX_aux == 0) for (i in 1:n_aux) {
     scoef_temp[i] = softmax(append_row(0, to_vector(lscoef[i, ])));
+    // scoef_temp[i] = stickbreak(to_vector(lscoef[i, ]));
   }
 
 
@@ -409,11 +421,11 @@ transformed parameters {
 
     if (nint_max > 1) { // -- If integration points are used --
 
-      // Integration points are local variable only for efficiency
-      vector[nint] eta_agd_arm_ii;
-      vector[nint] log_L_ii;
-
       for (i in 1:ni_agd_arm) {
+
+        vector[nint] eta_agd_arm_ii;
+        vector[nint] log_L_ii;
+
         eta_agd_arm_ii = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
 
         // Random effects
