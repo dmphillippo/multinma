@@ -62,6 +62,29 @@ functions {
     return log(basis * scoef) + eta;
   }
 
+  matrix lS_a3 (matrix ibasis, matrix eta, vector scoef) {
+    // ibasis = integrated basis evaluated at event/censoring time
+    // scoef = row_vector of spline coefficients
+    // eta = log rate (linear predictor)
+    int n = rows(ibasis);
+    vector[n] ibs = - ibasis * scoef;
+    matrix[rows(eta), n] eeta = exp(eta);
+    matrix[rows(eta), n] l;
+    for (i in 1:n) l[,i] = ibs[i] * eeta[,i];
+    return l;
+  }
+
+  matrix lh_a3 (matrix basis, matrix eta, vector scoef) {
+    // basis = basis evaluated at event/censoring time
+    // scoef = row_vector of spline coefficients
+    // eta = log rate (linear predictor)
+    int n = rows(basis);
+    vector[n] lbs = log(basis * scoef);
+    matrix[rows(eta), n] l;
+    for (i in 1:n) l[,i] = lbs[i] + eta[,i];
+    return l;
+  }
+
   // -- Log likelihood with censoring and truncation --
   vector loglik(matrix time,         // Basis evaluated at event/cens time
               matrix itime,        // Integrated basis evaluated at event/cens time
@@ -210,6 +233,53 @@ functions {
     // Left truncation
     if (delayed) {
       l -= lS_a2(delay_itime, eta, scoef);
+    }
+
+    return l;
+  }
+
+  // Version with single scoef vector for all individuals
+  matrix loglik_a3(matrix time,         // Basis evaluated at event/cens time
+              matrix itime,        // Integrated basis evaluated at event/cens time
+              matrix start_itime,  // Integrated basis evaluated at left interval time
+              matrix delay_itime,  // Integrated basis evaluated at delayed entry time
+              int[] delayed,             // Delayed entry flag (1=delay)
+              int[] status,              // Censoring status
+              matrix eta,                // Linear predictor
+              vector scoef) {          // Spline coefficients
+
+    matrix[rows(eta), cols(eta)] l;
+    int n1 = nwhich(status, 1);
+    int n2 = nwhich(status, 2);
+    int n3 = nwhich(status, 3);
+    int nd = nwhich(delayed, 1);
+
+    // Right censored
+    l = lS_a3(itime, eta, scoef);
+
+    // Observed
+    if (n1) {
+      array[n1] int w1 = which(status, 1);
+      l[,w1] += lh_a3(time[w1], eta[,w1], scoef);
+    }
+
+    // Left censored
+    if (n2) {
+      array[n2] int w2 = which(status, 2);
+      l[,w2] = log1m_exp(l[,w2]);
+    }
+
+    // Interval censored
+    // l = log_diff_exp(lS(start_itime, eta, scoef), lS(itime, eta, scoef));
+    if (n3) {
+      array[n3] int w3 = which(status, 3);
+      l[,w3] = log(exp(lS_a3(start_itime[w3], eta[,w3], scoef)) - exp(l[,w3]));
+    }
+
+    // Left truncation
+    if (nd) {
+      array[nd] int wd = which(delayed, 1);
+      l[,wd] -= lS_a3(delay_itime[wd], eta[,wd], scoef);
     }
 
     return l;
@@ -421,54 +491,77 @@ transformed parameters {
 
     if (nint_max > 1) { // -- If integration points are used --
 
-      for (i in 1:ni_agd_arm) {
+      if (nX_aux) {
+        for (i in 1:ni_agd_arm) {
 
-        vector[nint] eta_agd_arm_ii;
-        vector[nint] log_L_ii;
+          vector[nint] eta_agd_arm_ii;
+          vector[nint] log_L_ii;
 
-        eta_agd_arm_ii = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
+          eta_agd_arm_ii = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
 
-        // Random effects
-        if (RE && which_RE[narm_ipd + agd_arm_arm[i]]) eta_agd_arm_ii += f_delta[which_RE[narm_ipd + agd_arm_arm[i]]];
+          // Random effects
+          if (RE && which_RE[narm_ipd + agd_arm_arm[i]]) eta_agd_arm_ii += f_delta[which_RE[narm_ipd + agd_arm_arm[i]]];
 
-        // Average likelihood over integration points
-        if (aux_int) {
-          matrix[nint, n_scoef-1] Xb_aux = lscoef[aux_id_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)], ] + X_aux_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ] * beta_aux;
-          matrix[nint, n_scoef] scoef_agd_arm;
-          for (j in 1:nint) {
-            scoef_agd_arm[j, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[j, ]))));
+          // Average likelihood over integration points
+          if (aux_int) {
+            matrix[nint, n_scoef-1] Xb_aux = lscoef[aux_id_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)], ] + X_aux_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ] * beta_aux;
+            matrix[nint, n_scoef] scoef_agd_arm;
+            for (j in 1:nint) {
+              scoef_agd_arm[j, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[j, ]))));
+            }
+            log_L_ii = loglik_a(agd_arm_time[i],
+                                 agd_arm_itime[i],
+                                 agd_arm_start_itime[i],
+                                 agd_arm_delay_itime[i],
+                                 agd_arm_delayed[i],
+                                 agd_arm_status[i],
+                                 eta_agd_arm_ii,
+                                 scoef_agd_arm);
+          } else {
+            row_vector[n_scoef-1] Xb_auxi = lscoef[aux_id_agd_arm[i], ] + X_aux_agd_arm[i, ] * beta_aux;
+            log_L_ii = loglik_a2(agd_arm_time[i],
+                                 agd_arm_itime[i],
+                                 agd_arm_start_itime[i],
+                                 agd_arm_delay_itime[i],
+                                 agd_arm_delayed[i],
+                                 agd_arm_status[i],
+                                 eta_agd_arm_ii,
+                                 softmax(append_row(0, to_vector(Xb_auxi))));
           }
-          log_L_ii = loglik_a(agd_arm_time[i],
-                               agd_arm_itime[i],
-                               agd_arm_start_itime[i],
-                               agd_arm_delay_itime[i],
-                               agd_arm_delayed[i],
-                               agd_arm_status[i],
-                               eta_agd_arm_ii,
-                               scoef_agd_arm);
-        } else if (nX_aux) {
-          row_vector[n_scoef-1] Xb_auxi = lscoef[aux_id_agd_arm[i], ] + X_aux_agd_arm[i, ] * beta_aux;
-          log_L_ii = loglik_a2(agd_arm_time[i],
-                               agd_arm_itime[i],
-                               agd_arm_start_itime[i],
-                               agd_arm_delay_itime[i],
-                               agd_arm_delayed[i],
-                               agd_arm_status[i],
-                               eta_agd_arm_ii,
-                               softmax(append_row(0, to_vector(Xb_auxi))));
-        } else {
-          log_L_ii = loglik_a2(agd_arm_time[i],
-                              agd_arm_itime[i],
-                              agd_arm_start_itime[i],
-                              agd_arm_delay_itime[i],
-                              agd_arm_delayed[i],
-                              agd_arm_status[i],
-                              eta_agd_arm_ii,
-                              scoef_temp[aux_id_agd_arm[i]]);
-        }
 
-        log_L_agd_arm[i] = log_sum_exp(log_L_ii) - log(nint);
+          log_L_agd_arm[i] = log_sum_exp(log_L_ii) - log(nint);
+
+        }
+      } else {
+        // Loop over aux parameters first (i.e. by study, possibly further stratified by aux_by) for efficiency
+        for (i in 1:n_aux) {
+          int ni = nwhich(aux_id_agd_arm, i);
+
+          if (ni) {
+            array[ni] int wi = which(aux_id_agd_arm, i);
+            matrix[nint, ni] eta_agd_arm_iim;
+            matrix[nint, ni] log_L_iim;
+
+            for (j in 1:ni) {
+              eta_agd_arm_iim[, j] = eta_agd_arm_noRE[(1 + (wi[j]-1)*nint_max):((wi[j]-1)*nint_max + nint)];
+              if (RE && which_RE[narm_ipd + agd_arm_arm[wi[j]]]) eta_agd_arm_iim[, j] += f_delta[which_RE[narm_ipd + agd_arm_arm[wi[j]]]];
+            }
+
+            log_L_iim = loglik_a3(agd_arm_time[wi],
+                                agd_arm_itime[wi],
+                                agd_arm_start_itime[wi],
+                                agd_arm_delay_itime[wi],
+                                agd_arm_delayed[wi],
+                                agd_arm_status[wi],
+                                eta_agd_arm_iim,
+                                scoef_temp[i]);
+            for (j in 1:ni) {
+              log_L_agd_arm[wi[j]] = log_sum_exp(log_L_iim[, j]) - log(nint);
+            }
+          }
+        }
       }
+
     } else { // -- If no integration --
       vector[ni_agd_arm] eta_agd_arm = eta_agd_arm_noRE;
 
