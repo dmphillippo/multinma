@@ -82,30 +82,28 @@ functions {
               matrix scoef) {          // Spline coefficients
 
     vector[num_elements(eta)] l;
-    int n1 = nwhich(status, 1);
-    int n2 = nwhich(status, 2);
-    int n3 = nwhich(status, 3);
+    array[3] int nw = nwhich_all(status, 3);
     int nd = nwhich(delayed, 1);
 
     // Right censored
     l = lS(itime, eta, scoef);
 
     // Observed
-    if (n1) {
-      array[n1] int w1 = which(status, 1);
+    if (nw[1]) {
+      array[nw[1]] int w1 = which(status, 1);
       l[w1] += lh(time[w1], eta[w1], scoef[w1]);
     }
 
     // Left censored
-    if (n2) {
-      array[n2] int w2 = which(status, 2);
+    if (nw[2]) {
+      array[nw[2]] int w2 = which(status, 2);
       l[w2] = log1m_exp(l[w2]);
     }
 
     // Interval censored
     // l = log_diff_exp(lS(start_itime, eta, scoef), lS(itime, eta, scoef));
-    if (n3) {
-      array[n3] int w3 = which(status, 3);
+    if (nw[3]) {
+      array[nw[3]] int w3 = which(status, 3);
       l[w3] = log(exp(lS(start_itime[w3], eta[w3], scoef[w3])) - exp(l[w3]));
     }
 
@@ -129,30 +127,28 @@ functions {
               vector scoef) {          // Spline coefficients
 
     vector[num_elements(eta)] l;
-    int n1 = nwhich(status, 1);
-    int n2 = nwhich(status, 2);
-    int n3 = nwhich(status, 3);
+    array[3] int nw = nwhich_all(status, 3);
     int nd = nwhich(delayed, 1);
 
     // Right censored
     l = lS2(itime, eta, scoef);
 
     // Observed
-    if (n1) {
-      array[n1] int w1 = which(status, 1);
+    if (nw[1]) {
+      array[nw[1]] int w1 = which(status, 1);
       l[w1] += lh2(time[w1], eta[w1], scoef);
     }
 
     // Left censored
-    if (n2) {
-      array[n2] int w2 = which(status, 2);
+    if (nw[2]) {
+      array[nw[2]] int w2 = which(status, 2);
       l[w2] = log1m_exp(l[w2]);
     }
 
     // Interval censored
     // l = log_diff_exp(lS(start_itime, eta, scoef), lS(itime, eta, scoef));
-    if (n3) {
-      array[n3] int w3 = which(status, 3);
+    if (nw[3]) {
+      array[nw[3]] int w3 = which(status, 3);
       l[w3] = log(exp(lS2(start_itime[w3], eta[w3], scoef)) - exp(l[w3]));
     }
 
@@ -206,30 +202,28 @@ functions {
               vector scoef) {          // Spline coefficients
 
     matrix[rows(eta), cols(eta)] l;
-    int n1 = nwhich(status, 1);
-    int n2 = nwhich(status, 2);
-    int n3 = nwhich(status, 3);
+    array[3] int nw = nwhich_all(status, 3);
     int nd = nwhich(delayed, 1);
 
     // Right censored
     l = lS_a2(itime, eta, scoef);
 
     // Observed
-    if (n1) {
-      array[n1] int w1 = which(status, 1);
+    if (nw[1]) {
+      array[nw[1]] int w1 = which(status, 1);
       l[,w1] += lh_a2(time[w1], eta[,w1], scoef);
     }
 
     // Left censored
-    if (n2) {
-      array[n2] int w2 = which(status, 2);
+    if (nw[2]) {
+      array[nw[2]] int w2 = which(status, 2);
       l[,w2] = log1m_exp(l[,w2]);
     }
 
     // Interval censored
     // l = log_diff_exp(lS(start_itime, eta, scoef), lS(itime, eta, scoef));
-    if (n3) {
-      array[n3] int w3 = which(status, 3);
+    if (nw[3]) {
+      array[nw[3]] int w3 = which(status, 3);
       l[,w3] = log(exp(lS_a2(start_itime[w3], eta[,w3], scoef)) - exp(l[,w3]));
     }
 
@@ -317,12 +311,23 @@ transformed data {
   array[ni_ipd] int<lower=1> aux_id_ipd = aux_id[1:ni_ipd];
   array[ni_agd_arm*(aux_int ? nint_max : 1)] int<lower=1> aux_id_agd_arm = aux_id[(ni_ipd + 1):(ni_ipd + ni_agd_arm*(aux_int ? nint_max : 1))];
 
+  // Aux ID indexing arrays
+  array[aux_int == 0 ? n_aux : 0] int ni_aux_id_ipd = nwhich_all(aux_id_ipd, n_aux);
+  array[aux_int == 0 ? n_aux : 0, max(ni_aux_id_ipd)] int wi_aux_id_ipd;
+  array[aux_int == 0 ? n_aux : 0] int ni_aux_id_agd_arm = nwhich_all(aux_id_agd_arm, n_aux);
+  array[aux_int == 0 ? n_aux : 0, max(ni_aux_id_agd_arm)] int wi_aux_id_agd_arm;
+
   // Split spline Q matrix or X matrix into IPD and AgD rows
   matrix[0, nX_aux] Xauxdummy;
   matrix[ni_ipd, nX_aux] X_aux_ipd = ni_ipd ? X_aux[1:ni_ipd] : Xauxdummy;
   matrix[(aux_int ? nint_max : 1) * ni_agd_arm, nX_aux] X_aux_agd_arm = ni_agd_arm ? X_aux[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)] : Xauxdummy;
 
 #include /include/transformed_data_common.stan
+
+  if (aux_int == 0) for (i in 1:n_aux) {
+    if (ni_aux_id_ipd[i]) wi_aux_id_ipd[i, 1:ni_aux_id_ipd[i]] = which(aux_id_ipd, i);
+    if (ni_aux_id_agd_arm[i]) wi_aux_id_agd_arm[i, 1:ni_aux_id_agd_arm[i]] = which(aux_id_agd_arm, i);
+  }
 }
 parameters {
 #include /include/parameters_common.stan
@@ -404,10 +409,10 @@ transformed parameters {
     } else {
       // Loop over aux parameters (i.e. by study, possibly further stratified by aux_by)
       for (i in 1:n_aux) {
-        int ni = nwhich(aux_id_ipd, i);
+        int ni = ni_aux_id_ipd[i];
 
         if (ni) {
-          array[ni] int wi = which(aux_id_ipd, i);
+          array[ni] int wi = wi_aux_id_ipd[i, 1:ni];
 
           if (nX_aux) {
             row_vector[n_scoef-1] Xb_auxi = lscoef[i, ] + X_aux_ipd[first(aux_id_ipd, i), ] * beta_aux;
@@ -468,11 +473,11 @@ transformed parameters {
           for (j in 1:nint) {
             scoef_agd_arm[j, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[j, ]))));
           }
-            log_L_ii = loglik_a(agd_arm_time[i],
-                                 agd_arm_itime[i],
-                                 agd_arm_start_itime[i],
-                                 agd_arm_delay_itime[i],
-                                 agd_arm_delayed[i],
+          log_L_ii = loglik_a(agd_arm_time[i],
+                               agd_arm_itime[i],
+                               agd_arm_start_itime[i],
+                               agd_arm_delay_itime[i],
+                               agd_arm_delayed[i],
                                agd_arm_status[i],
                                eta_agd_arm_ii,
                                scoef_agd_arm);
@@ -483,10 +488,10 @@ transformed parameters {
       } else {
         // Loop over aux parameters first (i.e. by study, possibly further stratified by aux_by) for efficiency
         for (i in 1:n_aux) {
-          int ni = nwhich(aux_id_agd_arm, i);
+          int ni = ni_aux_id_agd_arm[i];
 
           if (ni) {
-            array[ni] int wi = which(aux_id_agd_arm, i);
+            array[ni] int wi = wi_aux_id_agd_arm[i, 1:ni];
             matrix[nint, ni] eta_agd_arm_iim;
             matrix[nint, ni] log_L_iim;
 
@@ -549,10 +554,10 @@ transformed parameters {
       } else {
         // Loop over aux parameters (i.e. by study, possibly further stratified by aux_by)
         for (i in 1:n_aux) {
-          int ni = nwhich(aux_id_agd_arm, i);
+          int ni = ni_aux_id_agd_arm[i];
 
           if (ni) {
-            array[ni] int wi = which(aux_id_agd_arm, i);
+            array[ni] int wi = wi_aux_id_agd_arm[i, 1:ni];
 
             if (nX_aux) {
               row_vector[n_scoef-1] Xb_auxi = lscoef[i, ] + X_aux_agd_arm[first(aux_id_agd_arm, i), ] * beta_aux;

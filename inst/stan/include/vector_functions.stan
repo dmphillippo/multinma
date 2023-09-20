@@ -34,6 +34,14 @@ int nwhich(array[] int x, int y) {
   return w;
 }
 
+array[] int nwhich_all(array[] int x, int max_id) {
+  array[max_id] int w = rep_array(0, max_id);
+  for (i in 1:num_elements(x)) {
+    if (x[i]) w[x[i]] += 1;
+  }
+  return w;
+}
+
 // Which entries are greater than 0
 array[] int which_gt0(vector x) {
   int n = num_elements(x);
