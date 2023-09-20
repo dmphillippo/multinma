@@ -310,6 +310,9 @@ transformed data {
   // Number of aux coefficient vectors
   int n_aux = max(aux_id);
 
+  // Scaling for spline random walk SD sigma
+  real sigma_scale = sqrt(n_scoef-1);
+
   // Split aux_id by IPD and AgD rows
   array[ni_ipd] int<lower=1> aux_id_ipd = aux_id[1:ni_ipd];
   array[ni_agd_arm*(aux_int ? nint_max : 1)] int<lower=1> aux_id_agd_arm = aux_id[(ni_ipd + 1):(ni_ipd + ni_agd_arm*(aux_int ? nint_max : 1))];
@@ -366,12 +369,12 @@ transformed parameters {
   // }
 
   // Construct spline coefficients with random walk prior around constant hazard
-  if (nX_aux) lscoef[, 1] = prior_aux_location[1, 1] + u_aux[, 1] .* sigma;
-  else lscoef[, 1] = prior_aux_location[, 1] + u_aux[, 1] .* sigma;
+  if (nX_aux) lscoef[, 1] = prior_aux_location[1, 1] + u_aux[, 1] .* sigma / sigma_scale;
+  else lscoef[, 1] = prior_aux_location[, 1] + u_aux[, 1] .* sigma / sigma_scale;
   for (i in 2:(n_scoef-1)) {
     // With aux regression, knot locations are the same across all studies
-    if (nX_aux) lscoef[, i] = lscoef[, i-1] - prior_aux_location[1, i-1] + prior_aux_location[1, i] + u_aux[, i] .* sigma;
-    else lscoef[, i] = lscoef[, i-1] - prior_aux_location[, i-1] + prior_aux_location[, i] + u_aux[, i] .* sigma;
+    if (nX_aux) lscoef[, i] = lscoef[, i-1] - prior_aux_location[1, i-1] + prior_aux_location[1, i] + u_aux[, i] .* sigma / sigma_scale;
+    else lscoef[, i] = lscoef[, i-1] - prior_aux_location[, i-1] + prior_aux_location[, i] + u_aux[, i] .* sigma / sigma_scale;
   }
 
   if (nX_aux == 0) for (i in 1:n_aux) {
