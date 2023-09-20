@@ -2021,10 +2021,10 @@ nma.fit <- function(ipd_x, ipd_y,
         }
 
         if (bulk_ess_warn_a) {
-          bulk_ess_1 <- apply(sims_nint1, 3, rstan::ess_bulk)
-          bulk_ess_2 <- apply(sims_nint2, 3, rstan::ess_bulk)
+          bulk_ess_1 <- apply(sims_nint1, 3, rstan::ess_bulk) / ncol(sims_nint1)
+          bulk_ess_2 <- apply(sims_nint2, 3, rstan::ess_bulk) / ncol(sims_nint2)
           bulk_ess_w <- pmin(bulk_ess_1, bulk_ess_2, na.rm = TRUE)
-          bulk_ess_warn_w <- any(bulk_ess_w < 100 * ncol(sims), na.rm = TRUE)
+          bulk_ess_warn_w <- any(bulk_ess_w < 100, na.rm = TRUE)
 
           if (bulk_ess_warn_w) {
             warning("Bulk Effective Sample Size (ESS) is too low, ",
@@ -2040,10 +2040,10 @@ nma.fit <- function(ipd_x, ipd_y,
         }
 
         if (tail_ess_warn_a) {
-          tail_ess_1 <- apply(sims_nint1, 3, rstan::ess_tail)
-          tail_ess_2 <- apply(sims_nint2, 3, rstan::ess_tail)
+          tail_ess_1 <- apply(sims_nint1, 3, rstan::ess_tail) / ncol(sims_nint1)
+          tail_ess_2 <- apply(sims_nint2, 3, rstan::ess_tail) / ncol(sims_nint2)
           tail_ess_w <- pmin(tail_ess_1, tail_ess_2, na.rm = TRUE)
-          tail_ess_warn_w <- any(tail_ess_w < 100 * ncol(sims), na.rm = TRUE)
+          tail_ess_warn_w <- any(tail_ess_w < 100, na.rm = TRUE)
 
           if (tail_ess_warn_w) {
             warning("Tail Effective Sample Size (ESS) is too low, indicating ",
