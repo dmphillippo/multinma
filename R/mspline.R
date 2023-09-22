@@ -229,7 +229,31 @@ mean_mspline <- function(basis, scoef, rate, ...) {
   rmst_mspline(t = Inf, basis, scoef, rate)
 }
 
-# Function to check for mspline/ispline objects
+# Check for mspline/ispline objects
+#' @param x Object to check is MSpline class
+#' @return logical
+#' @noRd
 is_mspline <- function(x) {
   inherits(x, "MSpline")
 }
+
+# Create a (logit scale) coefficient vector corresponding to a constant hazard
+#' @param basis A M-spline basis created using splines2::mSpline()
+#' @return
+mspline_constant_hazard <- function(basis) {
+  if (!is_mspline(basis)) abort("`basis` must be an M-spline basis created using splines2::mSpline()")
+
+  df <- ncol(basis)
+  ord <- attr(basis, "degree") + 1
+  iknots <- attr(basis, "knots")
+  bknots <- attr(basis, "Boundary.knots")
+
+  # Using approach of Jackson arXiv:2306.03957
+  knots <- c(rep(bknots[1], ord), iknots, rep(bknots[2], ord))
+  coefs <- (knots[(1:df) + ord] - knots[1:df]) / (ord * (diff(bknots)))
+
+  # inverse softmax transform
+  log(coefs[-1]) - log(coefs[1])
+}
+
+
