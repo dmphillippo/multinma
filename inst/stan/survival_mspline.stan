@@ -289,7 +289,7 @@ data {
   real<lower=0> prior_hyper_scale;
   real<lower=0> prior_hyper_df;
   // real<lower=0> prior_hyper_shape;
-  matrix[nX_aux ? 1 : max(aux_id), n_scoef-1] prior_aux_location;  // prior logistic mean
+  array[nX_aux ? 1 : max(aux_id)] vector[n_scoef-1] prior_aux_location;  // prior logistic mean
 
   // Hyperprior on aux regression smooths
   int<lower=0,upper=6> prior_reg_hyper_dist;
@@ -341,7 +341,7 @@ parameters {
 
   // Spline shrinkage SDs and non-centered parameterisation smoothing
   vector<lower=0>[n_aux] sigma;
-  matrix[n_aux, n_scoef-1] u_aux;
+  array[n_aux] vector[n_scoef-1] u_aux;
 }
 transformed parameters {
   // Log likelihood contributions
@@ -349,7 +349,7 @@ transformed parameters {
   vector[ni_agd_arm] log_L_agd_arm;
 
   // Spline coefficients
-  matrix[n_aux, n_scoef-1] lscoef; // logit baseline spline coefficients
+  array[n_aux] vector[n_scoef-1] lscoef; // logit baseline spline coefficients
   array[nX_aux ? 0 : n_aux] vector[n_scoef] scoef_temp;
 
   // Spline coefficient regression
@@ -373,18 +373,30 @@ transformed parameters {
   //   else lscoef[, i] = prior_aux_location[, i] + u_aux[, i] .* sigma;
   // }
 
-  // Construct spline coefficients with random walk prior around constant hazard
-  if (nX_aux) lscoef[, 1] = prior_aux_location[1, 1] + u_aux[, 1] .* sigma / sigma_scale;
-  else lscoef[, 1] = prior_aux_location[, 1] + u_aux[, 1] .* sigma / sigma_scale;
-  for (i in 2:(n_scoef-1)) {
-    // With aux regression, knot locations are the same across all studies
-    if (nX_aux) lscoef[, i] = lscoef[, i-1] - prior_aux_location[1, i-1] + prior_aux_location[1, i] + u_aux[, i] .* sigma / sigma_scale;
-    else lscoef[, i] = lscoef[, i-1] - prior_aux_location[, i-1] + prior_aux_location[, i] + u_aux[, i] .* sigma / sigma_scale;
-  }
+  // // Construct spline coefficients with random walk prior around constant hazard
+  // if (nX_aux) lscoef[, 1] = prior_aux_location[1, 1] + u_aux[, 1] .* sigma / sigma_scale;
+  // else lscoef[, 1] = prior_aux_location[, 1] + u_aux[, 1] .* sigma / sigma_scale;
+  // for (i in 2:(n_scoef-1)) {
+  //   // With aux regression, knot locations are the same across all studies
+  //   if (nX_aux) lscoef[, i] = lscoef[, i-1] - prior_aux_location[1, i-1] + prior_aux_location[1, i] + u_aux[, i] .* sigma / sigma_scale;
+  //   else lscoef[, i] = lscoef[, i-1] - prior_aux_location[, i-1] + prior_aux_location[, i] + u_aux[, i] .* sigma / sigma_scale;
+  // }
+  //
+  // if (nX_aux == 0) for (i in 1:n_aux) {
+  //   scoef_temp[i] = softmax(append_row(0, to_vector(lscoef[i, ])));
+  //   // scoef_temp[i] = stickbreak(to_vector(lscoef[i, ]));
+  // }
 
-  if (nX_aux == 0) for (i in 1:n_aux) {
-    scoef_temp[i] = softmax(append_row(0, to_vector(lscoef[i, ])));
-    // scoef_temp[i] = stickbreak(to_vector(lscoef[i, ]));
+  // Construct spline coefficients with random walk prior around constant hazard
+  if (nX_aux) {
+    for (i in 1:n_aux) {
+      lscoef[i] = cumulative_sum(u_aux[i]) * sigma[i] / sigma_scale + prior_aux_location[1];
+    }
+  } else {
+    for (i in 1:n_aux) {
+      lscoef[i] = cumulative_sum(u_aux[i]) * sigma[i] / sigma_scale + prior_aux_location[i];
+      scoef_temp[i] = softmax(append_row(0, lscoef[i]));
+    }
   }
 
 
@@ -393,9 +405,9 @@ transformed parameters {
 
     if (aux_int) {
       matrix[ni_ipd, n_scoef] scoef_ipd;
-      matrix[ni_ipd, n_scoef-1] Xb_aux = lscoef[aux_id_ipd, ] + X_aux_ipd * beta_aux;
+      matrix[ni_ipd, n_scoef-1] Xb_aux = X_aux_ipd * beta_aux;
       for (i in 1:ni_ipd) {
-        scoef_ipd[i, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[i, ]))));
+        scoef_ipd[i, ] = to_row_vector(softmax(append_row(0, lscoef[aux_id_ipd[i]] + to_vector(Xb_aux[i, ]))));
       }
 
       log_L_ipd = loglik(ipd_time,
@@ -415,7 +427,7 @@ transformed parameters {
           array[ni] int wi = wi_aux_id_ipd[i, 1:ni];
 
           if (nX_aux) {
-            row_vector[n_scoef-1] Xb_auxi = lscoef[i, ] + X_aux_ipd[first(aux_id_ipd, i), ] * beta_aux;
+            row_vector[n_scoef-1] Xb_auxi = X_aux_ipd[first(aux_id_ipd, i), ] * beta_aux;
             log_L_ipd[wi] = loglik2(ipd_time[wi],
                                ipd_itime[wi],
                                ipd_start_itime[wi],
@@ -423,7 +435,7 @@ transformed parameters {
                                ipd_delayed[wi],
                                ipd_status[wi],
                                eta_ipd[wi],
-                               softmax(append_row(0, to_vector(Xb_auxi))));
+                               softmax(append_row(0, lscoef[i] + to_vector(Xb_auxi))));
           } else {
             log_L_ipd[wi] = loglik2(ipd_time[wi],
                                ipd_itime[wi],
@@ -461,7 +473,7 @@ transformed parameters {
 
           vector[nint] eta_agd_arm_ii;
           vector[nint] log_L_ii;
-          matrix[nint, n_scoef-1] Xb_aux = lscoef[aux_id_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)], ] + X_aux_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ] * beta_aux;
+          matrix[nint, n_scoef-1] Xb_aux = X_aux_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ] * beta_aux;
           matrix[nint, n_scoef] scoef_agd_arm;
 
           eta_agd_arm_ii = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
@@ -471,7 +483,7 @@ transformed parameters {
 
           // Average likelihood over integration points
           for (j in 1:nint) {
-            scoef_agd_arm[j, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[j, ]))));
+            scoef_agd_arm[j, ] = to_row_vector(softmax(append_row(0, lscoef[aux_id_agd_arm[(i-1)*nint_max + j]] + to_vector(Xb_aux[j, ]))));
           }
           log_L_ii = loglik_a(agd_arm_time[i],
                                agd_arm_itime[i],
@@ -501,7 +513,7 @@ transformed parameters {
             }
 
             if (nX_aux) {
-              row_vector[n_scoef-1] Xb_auxi = lscoef[i, ] + X_aux_agd_arm[first(aux_id_agd_arm, i), ] * beta_aux;
+              row_vector[n_scoef-1] Xb_auxi = X_aux_agd_arm[first(aux_id_agd_arm, i), ] * beta_aux;
               log_L_iim = loglik_a2(agd_arm_time[wi],
                                    agd_arm_itime[wi],
                                    agd_arm_start_itime[wi],
@@ -509,7 +521,7 @@ transformed parameters {
                                    agd_arm_delayed[wi],
                                    agd_arm_status[wi],
                                    eta_agd_arm_iim,
-                                   softmax(append_row(0, to_vector(Xb_auxi))));
+                                   softmax(append_row(0, lscoef[i] + to_vector(Xb_auxi))));
             } else {
               log_L_iim = loglik_a2(agd_arm_time[wi],
                                   agd_arm_itime[wi],
@@ -538,9 +550,9 @@ transformed parameters {
 
       if (aux_int) {
         matrix[ni_agd_arm, n_scoef] scoef_agd_arm;
-        matrix[ni_agd_arm, n_scoef-1] Xb_aux = lscoef[aux_id_agd_arm, ] + X_aux_agd_arm * beta_aux;
+        matrix[ni_agd_arm, n_scoef-1] Xb_aux = X_aux_agd_arm * beta_aux;
         for (i in 1:ni_agd_arm) {
-          scoef_agd_arm[i, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[i, ]))));
+          scoef_agd_arm[i, ] = to_row_vector(softmax(append_row(0, lscoef[aux_id_agd_arm[i]] + to_vector(Xb_aux[i, ]))));
         }
 
         log_L_agd_arm = loglik(agd_arm_time,
@@ -560,7 +572,7 @@ transformed parameters {
             array[ni] int wi = wi_aux_id_agd_arm[i, 1:ni];
 
             if (nX_aux) {
-              row_vector[n_scoef-1] Xb_auxi = lscoef[i, ] + X_aux_agd_arm[first(aux_id_agd_arm, i), ] * beta_aux;
+              row_vector[n_scoef-1] Xb_auxi = X_aux_agd_arm[first(aux_id_agd_arm, i), ] * beta_aux;
               log_L_agd_arm[wi] = loglik2(agd_arm_time[wi],
                                           agd_arm_itime[wi],
                                           agd_arm_start_itime[wi],
@@ -568,7 +580,7 @@ transformed parameters {
                                           agd_arm_delayed[wi],
                                           agd_arm_status[wi],
                                           eta_agd_arm[wi],
-                                          softmax(append_row(0, to_vector(Xb_auxi))));
+                                          softmax(append_row(0, lscoef[i] + to_vector(Xb_auxi))));
             } else {
               log_L_agd_arm[wi] = loglik2(agd_arm_time[wi],
                                           agd_arm_itime[wi],
@@ -590,7 +602,7 @@ model {
 #include /include/model_common.stan
 
   // -- Prior on spline coefficients --
-  for (i in 1:(n_scoef-1)) u_aux[, i] ~ logistic(0, 1);
+  for (i in 1:n_aux) u_aux[i] ~ logistic(0, 1);
 
   // -- Hyperprior on spline sd --
   // if (prior_hyper_dist < 7) {
@@ -622,7 +634,7 @@ generated quantities {
 
   // Baseline spline coefficients
   for (i in 1:n_aux) {
-    scoef[i] = nX_aux ? softmax(append_row(0, to_vector(lscoef[i, ]))) : scoef_temp[i];
+    scoef[i] = nX_aux ? softmax(append_row(0, lscoef[i])) : scoef_temp[i];
   }
 
   // Log likelihood
