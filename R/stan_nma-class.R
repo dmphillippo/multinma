@@ -274,10 +274,6 @@ plot_prior_posterior <- function(x, ...,
                          get_tidy_prior(x$priors$prior_aux$k, trunc = trunc)) %>%
         tibble::add_column(prior = c("aux", "aux2"))
 
-    } else if (x$likelihood %in% c("mspline", "pexp") && prior[i] == "aux") {
-      prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc, n_dim = n_scoef) %>%
-        tibble::add_column(prior = prior[i])
-
     } else {
       prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc) %>%
         tibble::add_column(prior = prior[i])
@@ -300,8 +296,8 @@ plot_prior_posterior <- function(x, ...,
                                                         loglogistic = "shape",
                                                         gamma = "shape",
                                                         gengamma = "sigma",
-                                                        mspline = "scoef",
-                                                        pexp = "scoef"),
+                                                        mspline = "sigma",
+                                                        pexp = "sigma"),
                                            aux2 = switch(x$likelihood,
                                                          gengamma = "k")))
 
