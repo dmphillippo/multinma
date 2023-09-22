@@ -240,6 +240,7 @@ is_mspline <- function(x) {
 # Create a (logit scale) coefficient vector corresponding to a constant hazard
 #' @param basis A M-spline basis created using splines2::mSpline()
 #' @return
+#' @noRd
 mspline_constant_hazard <- function(basis) {
   if (!is_mspline(basis)) abort("`basis` must be an M-spline basis created using splines2::mSpline()")
 
@@ -253,7 +254,27 @@ mspline_constant_hazard <- function(basis) {
   coefs <- (knots[(1:df) + ord] - knots[1:df]) / (ord * (diff(bknots)))
 
   # inverse softmax transform
-  log(coefs[-1]) - log(coefs[1])
+  inv_softmax(coefs)
 }
 
+#' softmax transform
+#' @param x K-1 vector of reals
+#' @return K vector simplex
+#' @noRd
+softmax <- function(x) {
+  x0 <- c(0, x)
+  exp(x0 - logsumexp(x0))
+}
 
+logsumexp <- function(x) {
+  maxx <- max(x)
+  max(x) + log(sum(exp(x - maxx)))
+}
+
+#' inverse softmax transform
+#' @param p K vector simplex
+#' @return K-1 vector of reals
+#' @noRd
+inv_softmax <- function(p) {
+  log(p[-1]) - log(p[1])
+}
