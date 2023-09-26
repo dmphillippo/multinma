@@ -52,12 +52,13 @@ functions {
     // ibasis = integrated basis evaluated at event/censoring time
     // scoef = row_vector of spline coefficients
     // eta = log rate (linear predictor)
-    int n = rows(ibasis);
-    vector[n] ibs = - ibasis * scoef;
-    matrix[rows(eta), n] eeta = exp(eta);
-    matrix[rows(eta), n] l;
-    for (i in 1:n) l[,i] = ibs[i] * eeta[,i];
-    return l;
+    return diag_post_multiply(exp(eta), -ibasis*scoef);
+    // int n = rows(ibasis);
+    // vector[n] ibs = - ibasis * scoef;
+    // matrix[rows(eta), n] eeta = exp(eta);
+    // matrix[rows(eta), n] l;
+    // for (i in 1:n) l[,i] = ibs[i] * eeta[,i];
+    // return l;
   }
 
   matrix lh_a2 (matrix basis, matrix eta, vector scoef) {
@@ -340,7 +341,8 @@ transformed parameters {
 #include /include/transformed_parameters_common.stan
 
   // Shrinkage regression on aux pars
-  for (i in 1:nX_aux) beta_aux[i, ] = u_beta_aux[i, ] * sigma_beta[i];
+  // for (i in 1:nX_aux) beta_aux[i, ] = u_beta_aux[i, ] * sigma_beta[i];
+  beta_aux = diag_pre_multiply(sigma_beta, u_beta_aux);
 
   // Construct spline coefficients with random walk prior around constant hazard
   if (nX_aux) {
