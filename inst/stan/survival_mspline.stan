@@ -269,8 +269,7 @@ data {
 
   // auxiliary design matrix
   int<lower=0> nX_aux;
-  matrix[ni_ipd + (aux_int ? nint_max : 1) * (ni_agd_arm + ni_agd_contrast), nX_aux] X_aux; // X_aux is Q from QR decomposition if QR = 1
-  matrix[QR ? nX_aux : 0, QR ? nX_aux : 0] R_inv_aux;
+  matrix[ni_ipd + (aux_int ? nint_max : 1) * (ni_agd_arm + ni_agd_contrast), nX_aux] X_aux;
 
   // Hierarchical logistic prior on spline coefficients
   int<lower=0,upper=6> prior_hyper_dist;
@@ -569,9 +568,6 @@ model {
 generated quantities {
   // Baseline spline coefficients
   array[n_aux] vector[n_scoef] scoef;
-
-  // Regression on spline coefficients
-  // matrix[nX_aux, n_scoef-1] beta_aux = QR ? R_inv_aux * beta_aux_tilde : beta_aux_tilde;
 
 #include /include/generated_quantities_common.stan
 

@@ -1463,13 +1463,6 @@ nma.fit <- function(ipd_x, ipd_y,
     X_all_Q <- qr.Q(X_all_qr) * sqrt(nrow(X_all) - 1)
     X_all_R <- qr.R(X_all_qr)[, sort.list(X_all_qr$pivot)] / sqrt(nrow(X_all) - 1)
     X_all_R_inv <- solve(X_all_R)
-
-    if (!is.null(X_aux)) {
-      X_aux_qr <- qr(X_aux)
-      X_aux_Q <- qr.Q(X_aux_qr) * sqrt(nrow(X_aux) - 1)
-      X_aux_R <- qr.R(X_aux_qr)[, sort.list(X_aux_qr$pivot)] / sqrt(nrow(X_aux) - 1)
-      X_aux_R_inv <- solve(X_aux_R)
-    }
   }
 
   # Handle integration points
@@ -1909,8 +1902,7 @@ nma.fit <- function(ipd_x, ipd_y,
 
                                   # Aux regression
                                   nX_aux = if (!is.null(X_aux)) ncol(X_aux) else 0,
-                                  X_aux = if (!is.null(X_aux)) { if (QR) X_aux_Q else X_aux } else matrix(0, length(aux_id), 0),
-                                  R_inv_aux = if (!is.null(X_aux) && QR) X_aux_R_inv else matrix(0, 0, 0),
+                                  X_aux = if (!is.null(X_aux))  X_aux else matrix(0, length(aux_id), 0),
 
                                   # Number of spline coefficients
                                   n_scoef = n_scoef,
