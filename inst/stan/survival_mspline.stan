@@ -101,10 +101,10 @@ functions {
     }
 
     // Interval censored
-    // l = log_diff_exp(lS(start_itime, eta, scoef), lS(itime, eta, scoef));
     if (nw[3]) {
       array[nw[3]] int w3 = which(status, 3);
-      l[w3] = log(exp(lS(start_itime[w3], eta[w3], scoef[w3])) - exp(l[w3]));
+      // l[w3] = log(exp(lS(start_itime[w3], eta[w3], scoef[w3])) - exp(l[w3]));
+      l[w3] = log_diff_exp(lS(start_itime[w3], eta[w3], scoef[w3]), l[w3]);
     }
 
     // Left truncation
@@ -146,10 +146,10 @@ functions {
     }
 
     // Interval censored
-    // l = log_diff_exp(lS(start_itime, eta, scoef), lS(itime, eta, scoef));
     if (nw[3]) {
       array[nw[3]] int w3 = which(status, 3);
-      l[w3] = log(exp(lS2(start_itime[w3], eta[w3], scoef)) - exp(l[w3]));
+      // l[w3] = log(exp(lS2(start_itime[w3], eta[w3], scoef)) - exp(l[w3]));
+      l[w3] = log_diff_exp(lS2(start_itime[w3], eta[w3], scoef), l[w3]);
     }
 
     // Left truncation
@@ -179,8 +179,8 @@ functions {
     } else if (status == 2) { // Left censored
       l = log1m_exp(lS_a(itime, eta, scoef));
     } else if (status == 3) { // Interval censored
-      // l = log_diff_exp(lS_a(start_itime, eta, scoef), lS_a(itime, eta, scoef));
-      l = log(exp(lS_a(start_itime, eta, scoef)) - exp(lS_a(itime, eta, scoef)));
+      l = log_diff_exp(lS_a(start_itime, eta, scoef), lS_a(itime, eta, scoef));
+      // l = log(exp(lS_a(start_itime, eta, scoef)) - exp(lS_a(itime, eta, scoef)));
     }
 
     // Left truncation
@@ -221,10 +221,10 @@ functions {
     }
 
     // Interval censored
-    // l = log_diff_exp(lS(start_itime, eta, scoef), lS(itime, eta, scoef));
     if (nw[3]) {
       array[nw[3]] int w3 = which(status, 3);
-      l[,w3] = log(exp(lS_a2(start_itime[w3], eta[,w3], scoef)) - exp(l[,w3]));
+      // l[,w3] = log(exp(lS_a2(start_itime[w3], eta[,w3], scoef)) - exp(l[,w3]));
+      l[,w3] = log_diff_exp(lS_a2(start_itime[w3], eta[,w3], scoef), l[,w3]);
     }
 
     // Left truncation
