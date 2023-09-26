@@ -236,16 +236,6 @@ functions {
     return l;
   }
 
-  // vector stickbreak(vector x) {
-  //   int n = num_elements(x)+1;
-  //   vector[n-1] y = inv_logit(x);
-  //   vector[n-1] c1my = exp(cumulative_sum(log1m(y)));
-  //   vector[n] p;
-  //   p[1] = y[1];
-  //   p[2:(n-1)] = y[2:(n-1)] .* c1my[1:(n-2)];
-  //   p[n] = c1my[n-1];
-  //   return p;
-  // }
 }
 data {
 #include /include/data_common.stan
@@ -273,8 +263,6 @@ data {
   array[ni_agd_arm] int<lower=0, upper=3> agd_arm_status;
 
   // aux IDs for independent spline coefficients parameters
-  // int<lower=0, upper=1> aux_by; // Flag subgroup aux parameters within each arm (1 = yes)
-  // int<lower=0, upper=1> aux_reg; // Flag regression on aux pars (1 = yes)
   int<lower=0, upper=1> aux_int; // Flag aux regression needs integration (1 = yes)
   array[ni_ipd + ni_agd_arm*(aux_int ? nint_max : 1)] int<lower=1> aux_id;
 
@@ -298,9 +286,6 @@ data {
   real<lower=0> prior_reg_hyper_df;
 }
 transformed data {
-  // Dirichlet prior vector
-  // vector[n_scoef] prior_aux_shapes = rep_vector(prior_aux_shape, n_scoef);
-
   // Number of aux coefficient vectors
   int n_aux = max(aux_id);
 
@@ -332,9 +317,6 @@ transformed data {
 parameters {
 #include /include/parameters_common.stan
 
-  // Spline coefficients
-  // simplex[n_scoef] scoef[n_aux];
-
   // Spline coefficient regression with shrinkage over time
   matrix[nX_aux, n_scoef-1] u_beta_aux;
   vector<lower=0>[nX_aux] sigma_beta;
@@ -359,33 +341,6 @@ transformed parameters {
 
   // Shrinkage regression on aux pars
   for (i in 1:nX_aux) beta_aux[i, ] = u_beta_aux[i, ] * sigma_beta[i];
-
-  // Shrinkage regression on aux pars with random walk prior
-  //   for (i in 1:nX_aux) {
-  //   beta_aux[i, 1] = u_beta_aux[i, 1] * sigma_beta[i];
-  //   for (j in 2:(n_scoef-1)) beta_aux[i, j] = u_beta_aux[i, j-1] + u_beta_aux[i, j] * sigma_beta[i];
-  // }
-
-  // Construct spline coefficients
-  // for (i in 1:(n_scoef-1)) {
-  //   // With aux regression, knot locations are the same across all studies
-  //   if (nX_aux) lscoef[, i] = prior_aux_location[1, i] + u_aux[, i] .* sigma;
-  //   else lscoef[, i] = prior_aux_location[, i] + u_aux[, i] .* sigma;
-  // }
-
-  // // Construct spline coefficients with random walk prior around constant hazard
-  // if (nX_aux) lscoef[, 1] = prior_aux_location[1, 1] + u_aux[, 1] .* sigma / sigma_scale;
-  // else lscoef[, 1] = prior_aux_location[, 1] + u_aux[, 1] .* sigma / sigma_scale;
-  // for (i in 2:(n_scoef-1)) {
-  //   // With aux regression, knot locations are the same across all studies
-  //   if (nX_aux) lscoef[, i] = lscoef[, i-1] - prior_aux_location[1, i-1] + prior_aux_location[1, i] + u_aux[, i] .* sigma / sigma_scale;
-  //   else lscoef[, i] = lscoef[, i-1] - prior_aux_location[, i-1] + prior_aux_location[, i] + u_aux[, i] .* sigma / sigma_scale;
-  // }
-  //
-  // if (nX_aux == 0) for (i in 1:n_aux) {
-  //   scoef_temp[i] = softmax(append_row(0, to_vector(lscoef[i, ])));
-  //   // scoef_temp[i] = stickbreak(to_vector(lscoef[i, ]));
-  // }
 
   // Construct spline coefficients with random walk prior around constant hazard
   if (nX_aux) {
@@ -445,7 +400,6 @@ transformed parameters {
                                ipd_status[wi],
                                eta_ipd[wi],
                                scoef_temp[i]);
-                               //to_row_vector(softmax(append_row(0, lscoef[i, ])));
           }
         }
       }
@@ -454,17 +408,10 @@ transformed parameters {
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
-    // matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef] scoef_agd_arm;
     vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
               X_agd_arm * beta_tilde + offset_agd_arm :
               X_agd_arm * beta_tilde;
 
-    // if (nX_aux) {
-    //   matrix[(aux_int ? nint_max : 1) * ni_agd_arm, n_scoef-1] Xb_aux = lscoef[aux_id[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)], ] + X_aux_agd_arm * beta_aux;
-    //   for (i in 1:((aux_int ? nint_max : 1) * ni_agd_arm)) {
-    //     scoef_agd_arm[i, ] = to_row_vector(softmax(append_row(0, to_vector(Xb_aux[i, ]))));
-    //   }
-    // }
 
     if (nint_max > 1) { // -- If integration points are used --
 
@@ -590,7 +537,6 @@ transformed parameters {
                                           agd_arm_status[wi],
                                           eta_agd_arm[wi],
                                           scoef_temp[i]);
-                                          //to_row_vector(softmax(append_row(0, lscoef[i, ])));
             }
           }
         }
@@ -605,14 +551,9 @@ model {
   for (i in 1:n_aux) u_aux[i] ~ logistic(0, 1);
 
   // -- Hyperprior on spline sd --
-  // if (prior_hyper_dist < 7) {
     prior_select_lp(sigma, prior_hyper_dist, prior_hyper_location, prior_hyper_scale, prior_hyper_df);
-  // } else if (prior_hyper_dist == 7) { // Gamma prior
-  //   sigma ~ gamma(prior_hyper_shape, 1/prior_hyper_scale);
-  // }
 
   // -- Smoothing prior on aux regression beta --
-  // for (i in 1:(n_scoef-1)) prior_select_lp(beta_aux_tilde[, i], prior_reg_dist, prior_reg_location, prior_reg_scale, prior_reg_df);
   for (i in 1:(n_scoef -1)) u_beta_aux[, i] ~ std_normal();
   prior_select_lp(sigma_beta, prior_reg_hyper_dist, prior_reg_hyper_location, prior_reg_hyper_scale, prior_reg_hyper_df);
 
