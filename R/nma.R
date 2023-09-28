@@ -544,8 +544,7 @@ nma <- function(network,
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
-    if (likelihood %in% c("mspline", "pexp")) adapt_delta <- 0.95
-    else adapt_delta <- switch(trt_effects, fixed = 0.8, random = 0.95)
+    adapt_delta <- switch(trt_effects, fixed = 0.8, random = 0.95)
   } else if (!rlang::is_scalar_double(adapt_delta) ||
       adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
