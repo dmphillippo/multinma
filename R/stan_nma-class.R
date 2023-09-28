@@ -45,19 +45,28 @@ print.stan_nma <- function(x, ...) {
   if (inherits(x$network, "mlnmr_data")) type <- "ML-NMR"
   else type <- "NMA"
   cglue("A {x$trt_effects} effects {type} with a {x$likelihood} likelihood ({x$link} link).")
+  if (x$likelihood %in% c("mspline", "pexp"))
+    deg <- switch(x$likelihood,
+                  mspline = switch(attr(x$basis[[1]], 'degree'),
+                                   "1" = "Piecewise constant",
+                                   "2" = "Quadratic M-spline",
+                                   "3" = "Cubic M-spline",
+                                   paste('Degree', attr(x$basis[[1]], 'degree'), 'M-spline')),
+                  pexp = 'Piecewise constant')
+    cglue("{deg} baseline hazard with {length(attr(x$basis[[1]], 'knots'))} internal knots.")
   if (x$consistency != "consistency") {
     if (x$consistency == "nodesplit")
       cglue("An inconsistency model ('{x$consistency}') was fitted, splitting the comparison {x$nodesplit[2]} vs. {x$nodesplit[1]}.")
     else
       cglue("An inconsistency model ('{x$consistency}') was fitted.")
   }
-  if (!is.null(x$regression)) {
-    cglue("Regression model: {rlang::as_label(x$regression)}.")
-    if (!is.null(x$xbar)) {
-      cglue("Centred covariates at the following overall mean values:")
-      print(x$xbar)
-    }
+  if (!is.null(x$regression)) cglue("Regression model: {rlang::as_label(x$regression)}.")
+  if (!is.null(x$aux_regression)) cglue("Auxiliary regression model: {rlang::as_label(x$aux_regression)}.")
+  if ((!is.null(x$regression) || !is.null(x$aux_regression)) && !is.null(x$xbar)) {
+    cglue("Centred covariates at the following overall mean values:")
+    print(x$xbar)
   }
+  if (length(setdiff(x$aux_by, ".study"))) cglue("Stratified baseline hazards by {glue::glue_collapse(x$aux_by, sep = ', ', last = ' and ')}.")
 
   sf <- as.stanfit(x)
   dots <- list(...)
