@@ -1921,7 +1921,7 @@ nma.fit <- function(ipd_x, ipd_y,
 
     # Set aux_int
     if (n_int > 1) {
-      aux_int <- nrow(X_aux) == nrow(X_all)
+      aux_int <- length(aux_id) == ni_ipd + ni_agd_arm * n_int
     } else {
       aux_int <- FALSE
     }
@@ -1931,7 +1931,8 @@ nma.fit <- function(ipd_x, ipd_y,
       # If aux_regression specified, single spline basis shared across network
       prior_aux_location <- list(mspline_constant_hazard(basis[[1]]))
     } else {
-      prior_aux_location <- purrr::map(basis[unique(cbind(aux_id, study = c(ipd_s_t_all$.study, agd_arm_s_t_all$.study)))[, "study"]], mspline_constant_hazard)
+      prior_aux_location <- purrr::map(basis[unique(cbind(aux_id, study = c(ipd_s_t_all$.study, rep(agd_arm_s_t_all$.study, each = if (aux_int) n_int else 1))))[, "study"]],
+                                       mspline_constant_hazard)
 
       # Dummy prior for aux regression smoothing sd (not used)
       prior_aux_reg <- flat()
@@ -2110,11 +2111,13 @@ nma.fit <- function(ipd_x, ipd_y,
   fnames_oi[grepl("^mu\\[[0-9]+\\]$", fnames_oi)] <- paste0("mu[", x_names_sub[col_study], "]")
   fnames_oi[grepl("^d\\[[0-9]+\\]$", fnames_oi)] <- paste0("d[", x_names_sub[col_trt], "]")
   fnames_oi[grepl("^beta\\[[0-9]+\\]$", fnames_oi)] <- paste0("beta[", x_names[col_reg], "]")
-  if (likelihood %in% c("mspline", "pexp")) {
-    fnames_oi[grepl("^beta_aux\\[", fnames_oi)] <- paste0("beta_aux[", rep(colnames(X_aux), times = n_scoef-1), ", ", rep(1:(n_scoef-1), each = ncol(X_aux)), "]")
-    fnames_oi[grepl("^sigma_beta\\[", fnames_oi)] <- paste0("sigma_beta[", colnames(X_aux), "]")
-  } else {
-    fnames_oi[grepl("^beta_aux\\[", fnames_oi)] <- paste0("beta_aux[", colnames(X_aux), "]")
+  if (!is.null(X_aux)) {
+    if (likelihood %in% c("mspline", "pexp")) {
+      fnames_oi[grepl("^beta_aux\\[", fnames_oi)] <- paste0("beta_aux[", rep(colnames(X_aux), times = n_scoef-1), ", ", rep(1:(n_scoef-1), each = ncol(X_aux)), "]")
+      fnames_oi[grepl("^sigma_beta\\[", fnames_oi)] <- paste0("sigma_beta[", colnames(X_aux), "]")
+    } else {
+      fnames_oi[grepl("^beta_aux\\[", fnames_oi)] <- paste0("beta_aux[", colnames(X_aux), "]")
+    }
   }
   fnames_oi <- gsub("tau[1]", "tau", fnames_oi, fixed = TRUE)
   fnames_oi <- gsub("omega[1]", "omega", fnames_oi, fixed = TRUE)
