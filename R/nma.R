@@ -594,6 +594,7 @@ nma <- function(network,
   # (Avoids unnecessary use of integration points if regression formula not specified)
   use_int <- inherits(network, "mlnmr_data") &&
                (!is.null(regression) ||
+                  (!is.null(aux_regression) && length(setdiff(colnames(attr(terms(aux_regression), "factor")), c(".study", ".trt", ".trtclass"))) > 0) ||
                   (has_aux_by && length(setdiff(aux_by, c(".study", ".trt", ".trtclass"))) > 0))
 
   # Number of numerical integration points
