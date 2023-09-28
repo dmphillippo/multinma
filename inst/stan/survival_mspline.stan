@@ -266,6 +266,7 @@ data {
   // aux IDs for independent spline coefficients parameters
   int<lower=0, upper=1> aux_int; // Flag aux regression needs integration (1 = yes)
   array[ni_ipd + ni_agd_arm*(aux_int ? nint_max : 1)] int<lower=1> aux_id;
+  array[ni_ipd + ni_agd_arm*(aux_int ? nint_max : 1)] int<lower=1> aux_group;
 
   // auxiliary design matrix
   int<lower=0> nX_aux;
@@ -276,7 +277,6 @@ data {
   real<lower=0> prior_hyper_location;
   real<lower=0> prior_hyper_scale;
   real<lower=0> prior_hyper_df;
-  // real<lower=0> prior_hyper_shape;
   array[nX_aux ? 1 : max(aux_id)] vector[n_scoef-1] prior_aux_location;  // prior logistic mean
 
   // Hyperprior on aux regression smooths
@@ -288,6 +288,7 @@ data {
 transformed data {
   // Number of aux coefficient vectors
   int n_aux = max(aux_id);
+  int n_aux_group = max(aux_group);
 
   // Scaling for spline random walk SD sigma
   real sigma_scale = sqrt(n_scoef-1);
@@ -296,11 +297,14 @@ transformed data {
   array[ni_ipd] int<lower=1> aux_id_ipd = aux_id[1:ni_ipd];
   array[ni_agd_arm*(aux_int ? nint_max : 1)] int<lower=1> aux_id_agd_arm = aux_id[(ni_ipd + 1):(ni_ipd + ni_agd_arm*(aux_int ? nint_max : 1))];
 
+  array[ni_ipd] int<lower=1> aux_group_ipd = aux_group[1:ni_ipd];
+  array[ni_agd_arm*(aux_int ? nint_max : 1)] int<lower=1> aux_group_agd_arm = aux_group[(ni_ipd + 1):(ni_ipd + ni_agd_arm*(aux_int ? nint_max : 1))];
+
   // Aux ID indexing arrays
-  array[aux_int == 0 ? n_aux : 0] int ni_aux_id_ipd = nwhich_all(aux_id_ipd, n_aux);
-  array[aux_int == 0 ? n_aux : 0, max(ni_aux_id_ipd)] int wi_aux_id_ipd;
-  array[aux_int == 0 ? n_aux : 0] int ni_aux_id_agd_arm = nwhich_all(aux_id_agd_arm, n_aux);
-  array[aux_int == 0 ? n_aux : 0, max(ni_aux_id_agd_arm)] int wi_aux_id_agd_arm;
+  array[aux_int == 0 ? n_aux_group : 0] int ni_aux_group_ipd = nwhich_all(aux_group_ipd, n_aux_group);
+  array[aux_int == 0 ? n_aux_group : 0, max(ni_aux_group_ipd)] int wi_aux_group_ipd;
+  array[aux_int == 0 ? n_aux_group : 0] int ni_aux_group_agd_arm = nwhich_all(aux_group_agd_arm, n_aux_group);
+  array[aux_int == 0 ? n_aux_group : 0, max(ni_aux_group_agd_arm)] int wi_aux_group_agd_arm;
 
   // Split spline Q matrix or X matrix into IPD and AgD rows
   matrix[0, nX_aux] Xauxdummy;
@@ -309,9 +313,9 @@ transformed data {
 
 #include /include/transformed_data_common.stan
 
-  if (aux_int == 0) for (i in 1:n_aux) {
-    if (ni_aux_id_ipd[i]) wi_aux_id_ipd[i, 1:ni_aux_id_ipd[i]] = which(aux_id_ipd, i);
-    if (ni_aux_id_agd_arm[i]) wi_aux_id_agd_arm[i, 1:ni_aux_id_agd_arm[i]] = which(aux_id_agd_arm, i);
+  if (aux_int == 0) for (i in 1:n_aux_group) {
+    if (ni_aux_group_ipd[i]) wi_aux_group_ipd[i, 1:ni_aux_group_ipd[i]] = which(aux_group_ipd, i);
+    if (ni_aux_group_agd_arm[i]) wi_aux_group_agd_arm[i, 1:ni_aux_group_agd_arm[i]] = which(aux_group_agd_arm, i);
   }
 }
 parameters {
@@ -376,14 +380,14 @@ transformed parameters {
                          scoef_ipd);
     } else {
       // Loop over aux parameters (i.e. by study, possibly further stratified by aux_by)
-      for (i in 1:n_aux) {
-        int ni = ni_aux_id_ipd[i];
+      for (i in 1:n_aux_group) {
+        int ni = ni_aux_group_ipd[i];
 
         if (ni) {
-          array[ni] int wi = wi_aux_id_ipd[i, 1:ni];
+          array[ni] int wi = wi_aux_group_ipd[i, 1:ni];
 
           if (nX_aux) {
-            row_vector[n_scoef-1] Xb_auxi = X_aux_ipd[first(aux_id_ipd, i), ] * beta_aux;
+            row_vector[n_scoef-1] Xb_auxi = X_aux_ipd[wi[1], ] * beta_aux;
             log_L_ipd[wi] = loglik2(ipd_time[wi],
                                ipd_itime[wi],
                                ipd_start_itime[wi],
@@ -391,7 +395,7 @@ transformed parameters {
                                ipd_delayed[wi],
                                ipd_status[wi],
                                eta_ipd[wi],
-                               softmax(append_row(0, lscoef[i] + to_vector(Xb_auxi))));
+                               softmax(append_row(0, lscoef[aux_id_ipd[wi[1]]] + to_vector(Xb_auxi))));
           } else {
             log_L_ipd[wi] = loglik2(ipd_time[wi],
                                ipd_itime[wi],
@@ -400,7 +404,7 @@ transformed parameters {
                                ipd_delayed[wi],
                                ipd_status[wi],
                                eta_ipd[wi],
-                               scoef_temp[i]);
+                               scoef_temp[i]);  // If no X_aux, aux_id = aux_group
           }
         }
       }
@@ -447,11 +451,11 @@ transformed parameters {
         }
       } else {
         // Loop over aux parameters first (i.e. by study, possibly further stratified by aux_by) for efficiency
-        for (i in 1:n_aux) {
-          int ni = ni_aux_id_agd_arm[i];
+        for (i in 1:n_aux_group) {
+          int ni = ni_aux_group_agd_arm[i];
 
           if (ni) {
-            array[ni] int wi = wi_aux_id_agd_arm[i, 1:ni];
+            array[ni] int wi = wi_aux_group_agd_arm[i, 1:ni];
             matrix[nint, ni] eta_agd_arm_iim;
             matrix[nint, ni] log_L_iim;
 
@@ -461,7 +465,7 @@ transformed parameters {
             }
 
             if (nX_aux) {
-              row_vector[n_scoef-1] Xb_auxi = X_aux_agd_arm[first(aux_id_agd_arm, i), ] * beta_aux;
+              row_vector[n_scoef-1] Xb_auxi = X_aux_agd_arm[wi[1], ] * beta_aux;
               log_L_iim = loglik_a2(agd_arm_time[wi],
                                    agd_arm_itime[wi],
                                    agd_arm_start_itime[wi],
@@ -469,7 +473,7 @@ transformed parameters {
                                    agd_arm_delayed[wi],
                                    agd_arm_status[wi],
                                    eta_agd_arm_iim,
-                                   softmax(append_row(0, lscoef[i] + to_vector(Xb_auxi))));
+                                   softmax(append_row(0, lscoef[aux_id_agd_arm[wi[1]]] + to_vector(Xb_auxi))));
             } else {
               log_L_iim = loglik_a2(agd_arm_time[wi],
                                   agd_arm_itime[wi],
@@ -478,7 +482,7 @@ transformed parameters {
                                   agd_arm_delayed[wi],
                                   agd_arm_status[wi],
                                   eta_agd_arm_iim,
-                                  scoef_temp[i]);
+                                  scoef_temp[i]);  // If no X_aux, aux_id = aux_group
             }
 
             for (j in 1:ni) {
@@ -513,14 +517,14 @@ transformed parameters {
                                scoef_agd_arm);
       } else {
         // Loop over aux parameters (i.e. by study, possibly further stratified by aux_by)
-        for (i in 1:n_aux) {
-          int ni = ni_aux_id_agd_arm[i];
+        for (i in 1:n_aux_group) {
+          int ni = ni_aux_group_agd_arm[i];
 
           if (ni) {
-            array[ni] int wi = wi_aux_id_agd_arm[i, 1:ni];
+            array[ni] int wi = wi_aux_group_agd_arm[i, 1:ni];
 
             if (nX_aux) {
-              row_vector[n_scoef-1] Xb_auxi = X_aux_agd_arm[first(aux_id_agd_arm, i), ] * beta_aux;
+              row_vector[n_scoef-1] Xb_auxi = X_aux_agd_arm[wi[1], ] * beta_aux;
               log_L_agd_arm[wi] = loglik2(agd_arm_time[wi],
                                           agd_arm_itime[wi],
                                           agd_arm_start_itime[wi],
@@ -528,7 +532,7 @@ transformed parameters {
                                           agd_arm_delayed[wi],
                                           agd_arm_status[wi],
                                           eta_agd_arm[wi],
-                                          softmax(append_row(0, lscoef[i] + to_vector(Xb_auxi))));
+                                          softmax(append_row(0, lscoef[aux_id_agd_arm[wi[1]]] + to_vector(Xb_auxi))));
             } else {
               log_L_agd_arm[wi] = loglik2(agd_arm_time[wi],
                                           agd_arm_itime[wi],
@@ -537,7 +541,7 @@ transformed parameters {
                                           agd_arm_delayed[wi],
                                           agd_arm_status[wi],
                                           eta_agd_arm[wi],
-                                          scoef_temp[i]);
+                                          scoef_temp[i]);  // If no X_aux, aux_id = aux_group
             }
           }
         }

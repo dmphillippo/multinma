@@ -594,7 +594,7 @@ nma <- function(network,
   # (Avoids unnecessary use of integration points if regression formula not specified)
   use_int <- inherits(network, "mlnmr_data") &&
                (!is.null(regression) ||
-                  (has_aux_by && length(setdiff(aux_by, c(".study", ".trt"))) > 0))
+                  (has_aux_by && length(setdiff(aux_by, c(".study", ".trt", ".trtclass"))) > 0))
 
   # Number of numerical integration points
   # Set to 1 if no numerical integration, so that regression on summary data is possible
@@ -974,8 +974,8 @@ nma <- function(network,
   # Set up aux_by design vector
   if (has_aux_by) {
     # Determine whether we need to integrate over the aux regression too
-    aux_int <- length(setdiff(aux_by, c(".study", ".trt"))) > 0 ||
-      (!is.null(aux_regression) && length(setdiff(colnames(attr(terms(aux_regression), "factor")), c(".study", ".trt"))) > 0)
+    aux_int <- length(setdiff(aux_by, c(".study", ".trt", ".trtclass"))) > 0 ||
+      (!is.null(aux_regression) && length(setdiff(colnames(attr(terms(aux_regression), "factor")), c(".study", ".trt", ".trtclass"))) > 0)
 
     if (aux_int) {
       aux_dat <- dplyr::bind_rows(dat_ipd, idat_agd_arm)
@@ -991,13 +991,21 @@ nma <- function(network,
 
   # Set up aux_regression design matrix
   if (has_aux_regression) {
-    X_aux_list <- make_nma_model_matrix(aux_regression,
-                                        dat_ipd = dat_ipd,
-                                        dat_agd_arm = if (has_agd_arm(network)) dplyr::select(tidyr::unnest(dat_agd_arm, cols = ".Surv"), -".Surv") else NULL,
-                                        xbar = xbar)
-    X_aux <- rbind(X_aux_list$X_ipd, X_aux_list$X_agd_arm)
+    X_aux <- make_nma_model_matrix(aux_regression,
+                                   dat_ipd = aux_dat,
+                                   xbar = xbar)$X_ipd
+
+    # Group common rows of X_aux for efficiency if possible
+    if (aux_int) {
+      aux_group <- aux_id
+    } else {
+      X_aux_dat <- as.data.frame(X_aux)
+      if (!rlang::has_name(X_aux_dat, ".study")) X_aux_dat$.study <- aux_dat$.study  # Always group within study
+      aux_group <- dplyr::group_indices(dplyr::group_by_all(X_aux_dat))
+    }
   } else {
     X_aux <- NULL
+    aux_group <- aux_id
   }
 
   # Fit using nma.fit
@@ -1024,6 +1032,7 @@ nma <- function(network,
     prior_aux = prior_aux,
     prior_aux_reg = prior_aux_reg,
     aux_id = aux_id,
+    aux_group = aux_group,
     X_aux = X_aux,
     QR = QR,
     adapt_delta = adapt_delta,
@@ -1234,6 +1243,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_aux,
                     prior_aux_reg,
                     aux_id = integer(),
+                    aux_group = integer(),
                     X_aux = NULL,
                     QR = FALSE,
                     adapt_delta = NULL,
@@ -1911,7 +1921,7 @@ nma.fit <- function(ipd_x, ipd_y,
 
     # Set aux_int
     if (n_int > 1) {
-      aux_int <- length(aux_id) == nrow(X_all)
+      aux_int <- nrow(X_aux) == nrow(X_all)
     } else {
       aux_int <- FALSE
     }
@@ -1935,6 +1945,7 @@ nma.fit <- function(ipd_x, ipd_y,
                                   #aux_by = length(aux_id) == ni_ipd + ni_agd_arm*n_int,
                                   aux_int = aux_int,
                                   aux_id = aux_id,
+                                  aux_group = aux_group,
 
                                   # Aux regression
                                   nX_aux = if (!is.null(X_aux)) ncol(X_aux) else 0,
