@@ -40,6 +40,8 @@
 #' @param prior_aux Specification of prior distribution for the auxiliary
 #'   parameter, if applicable (see details). For `likelihood = "gengamma"` this
 #'   should be a list of prior distributions with elements `sigma` and `k`.
+#' @param prior_aux_reg Specification of prior distribution for the auxiliary
+#'   regression parameters, if `aux_regression` is specified (see details).
 #' @param aux_by Vector of variable names listing the variables to stratify the
 #'   auxiliary parameters by. Currently only used for survival models, see
 #'   details. Cannot be used with `aux_regression`.
@@ -203,6 +205,21 @@
 #'   ".study"` which stratifies the auxiliary parameters by study, as described
 #'   above.
 #'
+#'   A regression model may be specified on the auxiliary parameters using
+#'   `aux_regression`. This is useful if we wish to model departures from
+#'   non-proportionality, rather than allowing the baseline hazards to be
+#'   completely independent using `aux_by`. This is necessary if absolute
+#'   predictions (e.g. survival curves) are required in a population for
+#'   unobserved combinations of covariates; for example, if `aux_by = .trt` then
+#'   absolute predictions may only be produced for the observed treatment arms
+#'   in each study population, whereas if `aux_regression = ~.trt` then absolute
+#'   predictions can be produced for all treatments in any population. For
+#'   `mspline` and `pexp` likelihoods, the regression coefficients are smoothed
+#'   over time using a random effect to avoid overfitting: `prior_aux_reg`
+#'   specifies the hyperprior for this smoothing random effect. For other
+#'   parametric likelihoods, `prior_aux_reg` specifies the prior for the
+#'   auxiliary regression coefficients.
+#'
 #' @return `nma()` returns a [stan_nma] object, except when `consistency =
 #'   "nodesplit"` when a [nma_nodesplit] or [nma_nodesplit_df] object is
 #'   returned. `nma.fit()` returns a [stanfit] object.
@@ -243,6 +260,7 @@ nma <- function(network,
                 prior_het_type = c("sd", "var", "prec"),
                 prior_reg = .default(normal(scale = 10)),
                 prior_aux = .default(),
+                prior_aux_reg = .default(),
                 aux_by = NULL,
                 aux_regression = NULL,
                 QR = FALSE,
@@ -357,6 +375,7 @@ nma <- function(network,
                          prior_het_type = prior_het_type,
                          prior_reg = prior_reg,
                          prior_aux = prior_aux,
+                         prior_aux_reg = prior_aux_reg,
                          aux_by = aux_by,
                          aux_regression = aux_regression,
                          QR = QR,
@@ -494,6 +513,14 @@ nma <- function(network,
                                  k = half_normal(scale = 10)))
     } else if (likelihood %in% c("mspline", "pexp")) {
       prior_aux <- .default(half_normal(scale = 1))
+    }
+    prior_defaults$prior_aux <- get_prior_call(prior_aux)
+  }
+  if (has_aux && !is.null(aux_regression) && .is_default(prior_aux_reg)) {
+    if (likelihood %in% c("mspline", "pexp")) {
+      prior_aux_reg <- .default(half_normal(scale = 1))
+    } else if (likelihood %in% valid_lhood$survival) {
+      prior_aux_reg <- .default(normal(scale = 10))
     }
     prior_defaults$prior_aux <- get_prior_call(prior_aux)
   }
@@ -996,6 +1023,7 @@ nma <- function(network,
     prior_het_type = prior_het_type,
     prior_reg = prior_reg,
     prior_aux = prior_aux,
+    prior_aux_reg = prior_aux_reg,
     aux_id = aux_id,
     X_aux = X_aux,
     QR = QR,
@@ -1152,7 +1180,8 @@ nma <- function(network,
                             prior_het = if (trt_effects == "random") prior_het else NULL,
                             prior_het_type = if (trt_effects == "random") prior_het_type else NULL,
                             prior_reg = if (!is.null(regression) && !is_only_offset(regression)) prior_reg else NULL,
-                            prior_aux = if (has_aux) prior_aux else NULL))
+                            prior_aux = if (has_aux) prior_aux else NULL,
+                            prior_aux_reg = if (has_aux_regression) prior_aux_reg else NULL))
 
   if (likelihood %in% c("mspline", "pexp")) out$basis <- basis
 
@@ -1204,6 +1233,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_het_type = c("sd", "var", "prec"),
                     prior_reg,
                     prior_aux,
+                    prior_aux_reg,
                     aux_id = integer(),
                     X_aux = NULL,
                     QR = FALSE,
@@ -1308,7 +1338,9 @@ nma.fit <- function(ipd_x, ipd_y,
   link <- check_link(link, likelihood)
 
   # When are priors on auxiliary parameters required?
-  has_aux <- (likelihood == "normal" && has_ipd) || likelihood == "ordered"
+  has_aux <- (likelihood == "normal" && has_ipd) ||
+    (likelihood %in% c("ordered", setdiff(valid_lhood$survival, c("exponential", "exponential-aft"))) &&
+       (has_ipd || has_agd_arm))
 
   # Check priors
   check_prior(prior_intercept)
@@ -1318,6 +1350,8 @@ nma.fit <- function(ipd_x, ipd_y,
   if (has_aux) {
     if (likelihood == "gengamma") check_prior(prior_aux, c("sigma", "k"))
     else check_prior(prior_aux)
+
+    if (!is.null(X_aux)) check_prior(prior_aux_reg)
   }
 
   prior_het_type <- rlang::arg_match(prior_het_type)
@@ -1889,6 +1923,9 @@ nma.fit <- function(ipd_x, ipd_y,
       prior_aux_location <- list(mspline_constant_hazard(basis[[1]]))
     } else {
       prior_aux_location <- purrr::map(basis[unique(cbind(aux_id, study = c(ipd_s_t_all$.study, agd_arm_s_t_all$.study)))[, "study"]], mspline_constant_hazard)
+
+      # Dummy prior for aux regression smoothing sd (not used)
+      prior_aux_reg <- flat()
     }
 
     standat <- purrr::list_modify(standat,
@@ -1925,15 +1962,15 @@ nma.fit <- function(ipd_x, ipd_y,
                                   # Specify link
                                   link = switch(link, log = 1),
 
-                                  # Add prior for spline smoothing
+                                  # Add prior for spline smoothing sd
                                   !!! prior_standat(prior_aux, "prior_hyper",
                                                     valid = c("Normal", "half-Normal", "log-Normal",
                                                               "Cauchy",  "half-Cauchy",
                                                               "Student t", "half-Student t", "log-Student t",
                                                               "Exponential", "flat (implicit)")),
 
-                                  # Add prior for aux_regression smoothing
-                                  !!! prior_standat(prior_aux, "prior_reg_hyper",
+                                  # Add prior for aux_regression smoothing sd
+                                  !!! prior_standat(prior_aux_reg, "prior_reg_hyper",
                                                     valid = c("Normal", "half-Normal", "log-Normal",
                                                               "Cauchy",  "half-Cauchy",
                                                               "Student t", "half-Student t", "log-Student t",

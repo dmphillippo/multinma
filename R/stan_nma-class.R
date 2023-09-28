@@ -240,7 +240,8 @@ plot_prior_posterior <- function(x, ...,
       "trt"[!is.null(x$priors$prior_trt)],
       "het"[!is.null(x$priors$prior_het)],
       "reg"[!is.null(x$priors$prior_reg)],
-      "aux"[!is.null(x$priors$prior_aux)])
+      "aux"[!is.null(x$priors$prior_aux)],
+      "aux_reg"[!is.null(x$priors$prior_aux_reg)])
 
   if (is.null(prior)) {
     prior <- priors_used
@@ -299,7 +300,12 @@ plot_prior_posterior <- function(x, ...,
                                                         mspline = "sigma",
                                                         pexp = "sigma"),
                                            aux2 = switch(x$likelihood,
-                                                         gengamma = "k")))
+                                                         gengamma = "k"),
+                                           aux_reg = switch(x$likelihood,
+                                                            pexp =, mspline = "sigma_beta",
+                                                            weibull =, gompertz =, `weibull-aft` =,
+                                                            lognormal =, loglogistic =, gamma =,
+                                                            gengamma = "beta_aux")))
 
   # Add in omega parameter if node-splitting model, which uses prior_trt
   if (inherits(x, "nma_nodesplit")) {

@@ -20,6 +20,7 @@ nma(
   prior_het_type = c("sd", "var", "prec"),
   prior_reg = .default(normal(scale = 10)),
   prior_aux = .default(),
+  prior_aux_reg = .default(),
   aux_by = NULL,
   aux_regression = NULL,
   QR = FALSE,
@@ -84,6 +85,9 @@ coefficients (if \code{regression} formula specified)}
 \item{prior_aux}{Specification of prior distribution for the auxiliary
 parameter, if applicable (see details). For \code{likelihood = "gengamma"} this
 should be a list of prior distributions with elements \code{sigma} and \code{k}.}
+
+\item{prior_aux_reg}{Specification of prior distribution for the auxiliary
+regression parameters, if \code{aux_regression} is specified (see details).}
 
 \item{aux_by}{Vector of variable names listing the variables to stratify the
 auxiliary parameters by. Currently only used for survival models, see
@@ -268,6 +272,21 @@ stratification even if omitted from \code{aux_by}, but we choose here to make
 the stratification explicit.) This is a common way of relaxing the
 proportional hazards assumption. The default is equivalent to \code{aux_by = ".study"} which stratifies the auxiliary parameters by study, as described
 above.
+
+A regression model may be specified on the auxiliary parameters using
+\code{aux_regression}. This is useful if we wish to model departures from
+non-proportionality, rather than allowing the baseline hazards to be
+completely independent using \code{aux_by}. This is necessary if absolute
+predictions (e.g. survival curves) are required in a population for
+unobserved combinations of covariates; for example, if \code{aux_by = .trt} then
+absolute predictions may only be produced for the observed treatment arms
+in each study population, whereas if \code{aux_regression = ~.trt} then absolute
+predictions can be produced for all treatments in any population. For
+\code{mspline} and \code{pexp} likelihoods, the regression coefficients are smoothed
+over time using a random effect to avoid overfitting: \code{prior_aux_reg}
+specifies the hyperprior for this smoothing random effect. For other
+parametric likelihoods, \code{prior_aux_reg} specifies the prior for the
+auxiliary regression coefficients.
 }
 }
 

@@ -239,7 +239,7 @@ is_mspline <- function(x) {
 
 # Create a (logit scale) coefficient vector corresponding to a constant hazard
 #' @param basis A M-spline basis created using splines2::mSpline()
-#' @return
+#' @return Coefficient vector
 #' @noRd
 mspline_constant_hazard <- function(basis) {
   if (!is_mspline(basis)) abort("`basis` must be an M-spline basis created using splines2::mSpline()")
