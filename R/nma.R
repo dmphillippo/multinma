@@ -522,7 +522,7 @@ nma <- function(network,
     } else if (likelihood %in% valid_lhood$survival) {
       prior_aux_reg <- .default(normal(scale = 10))
     }
-    prior_defaults$prior_aux <- get_prior_call(prior_aux)
+    prior_defaults$prior_aux_reg <- get_prior_call(prior_aux_reg)
   }
 
   # Warn where default priors are used
