@@ -337,7 +337,7 @@ predict.stan_nma <- function(object, ...,
 
 
   # Without regression model ---------------------------------------------------
-  if (is.null(object$regression) && (is.null(object$aux_by) || length(setdiff(object$aux_by, c(".study", ".trt"))) == 0)) {
+  if (is.null(object$regression) && !aux_needs_integration(aux_regression = object$aux_regression, aux_by = object$aux_by)) {
 
     if (is_surv && !is.null(aux_pars) && xor(is.null(baseline), is.null(aux))) {
         abort("Specify both `baseline` and `aux`, or neither")
@@ -663,6 +663,12 @@ predict.stan_nma <- function(object, ...,
         d_p[3] <- d_p[3]*length(quantiles)
       }
 
+      if (!is.null(object$aux_regression)) {
+        X_aux <- make_nma_model_matrix(object$aux_regression,
+                                       dat_ipd = preddat)$X_ipd
+        beta_aux <- as.array(object, pars = "beta_aux")
+      }
+
       pred_array <- array(NA_real_, dim = d_p, dimnames = dn_p)
 
       aux_names <- dimnames(aux_array)[[3]]
@@ -691,9 +697,18 @@ predict.stan_nma <- function(object, ...,
           basis <- NULL
         }
 
+        if (!is.null(object$aux_regression)) {
+          auxi <- make_aux_predict(aux = aux_array[ , , aux_s, drop = FALSE],
+                                   beta_aux = beta_aux,
+                                   X_aux = X_aux[i, , drop = FALSE],
+                                   likelihood = object$likelihood)
+        } else {
+          auxi <- aux_array[ , , aux_s, drop = FALSE]
+        }
+
         pred_array[ , , (j+1):(j+jinc)] <-
           make_surv_predict(eta = pred_temp[ , , i, drop = FALSE],
-                            aux = aux_array[ , , aux_s, drop = FALSE],
+                            aux = auxi,
                             times = tt,
                             quantiles = quantiles,
                             likelihood = object$likelihood,
@@ -2331,3 +2346,30 @@ surv_predfuns <- list(
                       rate = exp(eta), scoef = aux, basis = basis,
                       .ns = NULL)
 )
+
+#' Produce auxiliary parameters when aux_regression is used
+#' @noRd
+make_aux_predict <- function(aux, beta_aux, X_aux, likelihood) {
+
+  if (likelihood %in% c("mspline", "pexp")) {
+
+    nX <- ncol(X_aux)
+    lscoef <- aperm(apply(aux, 1:2, inv_softmax), c(2, 3, 1))
+    lscoef_reg <- lscoef
+
+    for (i in 1:dim(lscoef_reg)[[3]]) {
+      lscoef_reg[ , , i] <- lscoef[ , , i, drop = FALSE] + tcrossprod_mcmc_array(beta_aux[ , , ((i-1)*nX + 1):(i*nX), drop = FALSE], X_aux)
+    }
+
+    out <- aperm(apply(lscoef_reg, 1:2, softmax), c(2, 3, 1))
+
+  } else if (likelihood == "gengamma") {
+    abort("Not implemented yet!")
+
+  } else {
+    out <- exp(log(aux) + tcrossprod_mcmc_array(beta_aux, X_aux))
+  }
+
+  dimnames(out) <- dimnames(aux)
+  return(out)
+}

@@ -592,10 +592,7 @@ nma <- function(network,
 
   # Use numerical integration? TRUE if class mlnmr_data and regression is not NULL
   # (Avoids unnecessary use of integration points if regression formula not specified)
-  use_int <- inherits(network, "mlnmr_data") &&
-               (!is.null(regression) ||
-                  (!is.null(aux_regression) && length(setdiff(colnames(attr(terms(aux_regression), "factor")), c(".study", ".trt", ".trtclass"))) > 0) ||
-                  (has_aux_by && length(setdiff(aux_by, c(".study", ".trt", ".trtclass"))) > 0))
+  use_int <- inherits(network, "mlnmr_data") && (!is.null(regression) || aux_needs_integration(aux_regression = aux_regression, aux_by = aux_by))
 
   # Number of numerical integration points
   # Set to 1 if no numerical integration, so that regression on summary data is possible
@@ -975,8 +972,7 @@ nma <- function(network,
   # Set up aux_by design vector
   if (has_aux_by) {
     # Determine whether we need to integrate over the aux regression too
-    aux_int <- length(setdiff(aux_by, c(".study", ".trt", ".trtclass"))) > 0 ||
-      (!is.null(aux_regression) && length(setdiff(colnames(attr(terms(aux_regression), "factor")), c(".study", ".trt", ".trtclass"))) > 0)
+    aux_int <- aux_needs_integration(aux_regression = aux_regression, aux_by = aux_by)
 
     if (aux_int) {
       aux_dat <- dplyr::bind_rows(dat_ipd, idat_agd_arm)
@@ -3260,3 +3256,10 @@ get_aux_by_data <- function(data, by, add_study = TRUE) {
   )
 }
 
+#' Determine whether auxiliary parameters need to be integrated over based on
+#' aux_regression and aux_by
+#' @noRd
+aux_needs_integration <- function(aux_regression, aux_by) {
+  (!is.null(aux_regression) && length(setdiff(colnames(attr(terms(aux_regression), "factor")), c(".study", ".trt", ".trtclass"))) > 0) ||
+    (!is.null(aux_by) && length(setdiff(aux_by, c(".study", ".trt", ".trtclass"))) > 0)
+}
