@@ -993,11 +993,11 @@ nma <- function(network,
                                    xbar = xbar)$X_ipd
 
     # Group common rows of X_aux for efficiency if possible
-    if (aux_int) {
-      aux_group <- aux_id
+    if (aux_int && has_agd_arm(network)) {
+      aux_group <- 1:nrow(X_aux)
     } else {
       X_aux_dat <- as.data.frame(X_aux)
-      if (!rlang::has_name(X_aux_dat, ".study")) X_aux_dat$.study <- aux_dat$.study  # Always group within study
+      if (!rlang::has_name(X_aux_dat, ".study")) X_aux_dat <- dplyr::mutate(X_aux_dat, aux_dat$.study, .before = 0)  # Always group within study
       aux_group <- dplyr::group_indices(dplyr::group_by_all(X_aux_dat))
     }
   } else {
@@ -1917,11 +1917,7 @@ nma.fit <- function(ipd_x, ipd_y,
     }
 
     # Set aux_int
-    if (n_int > 1) {
-      aux_int <- length(aux_id) == ni_ipd + ni_agd_arm * n_int
-    } else {
-      aux_int <- FALSE
-    }
+    aux_int <- !is.null(X_aux) && max(aux_group) == nrow(X_aux)
 
     # Get scoef prior means
     if (!is.null(X_aux)) {
