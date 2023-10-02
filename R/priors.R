@@ -214,12 +214,10 @@ new_nma_prior <- function(dist, location = NA_real_, scale = NA_real_, df = NA_r
 #' @param prior A nma_prior object
 #' @param trunc Optional vector of truncation limits
 #' @param ... Not used
-#' @param n_dim Prior dimension. Currently only used for Dirichlet priors to
-#'   construct the marginal distributions.
 #'
 #' @return A data frame
 #' @noRd
-get_tidy_prior <- function(prior, trunc = NULL, ..., n_dim) {
+get_tidy_prior <- function(prior, trunc = NULL, ...) {
   if (!inherits(prior, "nma_prior"))
     abort("Not a `nma_prior` object.")
   if (!is.null(trunc) && (!rlang::is_double(trunc, n = 2) || trunc[2] <= trunc[1]))

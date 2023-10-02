@@ -275,7 +275,7 @@ plot_prior_posterior <- function(x, ...,
   # Get prior details
   prior_dat <- vector("list", length(prior))
   for (i in seq_along(prior)) {
-    if (prior[i] %in% c("het", "aux")) trunc <- c(0, Inf)
+    if (prior[i] %in% c("het", "aux") || (prior[i] == "aux_reg" && x$likelihood %in% c("mspline", "pexp"))) trunc <- c(0, Inf)
     else trunc <- NULL
 
     if (x$likelihood == "gengamma" && prior[i] == "aux") {
