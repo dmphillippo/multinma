@@ -815,7 +815,10 @@ predict.stan_nma <- function(object, ...,
                       '  - Produce aggregate predictions with level = "aggregate"',
                       sep = "\n"))
 
-        preddat <- get_model_data_columns(object$network$ipd, regression = object$regression, keep = object$aux_by)
+        preddat <- get_model_data_columns(object$network$ipd,
+                                          regression = object$regression,
+                                          aux_regression = object$aux_regression,
+                                          keep = object$aux_by)
 
         if (is_surv) {
           # Deal with times argument
@@ -961,7 +964,11 @@ predict.stan_nma <- function(object, ...,
           }
 
           # Only take necessary columns
-          dat_agd_arm <- get_model_data_columns(dat_agd_arm, regression = object$regression, keep = object$aux_by, label = "AgD (arm-based)")
+          dat_agd_arm <- get_model_data_columns(dat_agd_arm,
+                                                regression = object$regression,
+                                                aux_regression = object$aux_regression,
+                                                keep = object$aux_by,
+                                                label = "AgD (arm-based)")
         } else {
           dat_agd_arm <- tibble::tibble()
         }
@@ -1018,7 +1025,11 @@ predict.stan_nma <- function(object, ...,
           }
 
           # Only take necessary columns
-          dat_ipd <- get_model_data_columns(dat_ipd, regression = object$regression, keep = object$aux_by, label = "IPD")
+          dat_ipd <- get_model_data_columns(dat_ipd,
+                                            regression = object$regression,
+                                            aux_regression = object$aux_regression,
+                                            keep = object$aux_by,
+                                            label = "IPD")
 
           dat_ipd$.sample_size <- 1
         } else {
@@ -1130,7 +1141,11 @@ predict.stan_nma <- function(object, ...,
       }
 
       # Check all variables are present
-      predreg <- get_model_data_columns(preddat, regression = object$regression, keep = object$aux_by, label = "`newdata`")
+      predreg <- get_model_data_columns(preddat,
+                                        regression = object$regression,
+                                        aux_regression = object$aux_regression,
+                                        keep = object$aux_by,
+                                        label = "`newdata`")
 
       preddat$.sample_size <- 1
 
@@ -1552,6 +1567,12 @@ predict.stan_nma <- function(object, ...,
       treatments <- levels(forcats::fct_drop(outdat$.trt))
       n_trt <- length(treatments)
 
+      if (!is.null(object$aux_regression)) {
+        X_aux <- make_nma_model_matrix(object$aux_regression,
+                                       dat_ipd = preddat)$X_ipd
+        beta_aux <- as.array(object, pars = "beta_aux")
+      }
+
       dim_pred_array <- dim(post)
       dim_pred_array[3] <- nrow(outdat)
       dimnames_pred_array <- dimnames(post)
@@ -1590,7 +1611,7 @@ predict.stan_nma <- function(object, ...,
         for (trt in 1:n_trt) {
 
           # Select corresponding rows
-          ss <- preddat$.study == studies[s] & preddat$.trt == treatments[trt]
+          ss <- which(preddat$.study == studies[s] & preddat$.trt == treatments[trt])
 
           # Linear predictor array for this study
           eta_pred_array <- tcrossprod_mcmc_array(post, X_all[ss, , drop = FALSE])
@@ -1602,13 +1623,13 @@ predict.stan_nma <- function(object, ...,
           aux_l <- get_aux_labels(preddat[ss, ], by = object$aux_by)
           aux_id <- get_aux_id(preddat[ss, ], by = object$aux_by)
 
-          if (length(setdiff(object$aux_by, c(".study", ".trt"))) == 0) {
+          if (!aux_needs_integration(aux_regression = object$aux_regression, aux_by = object$aux_by)) { #(length(setdiff(object$aux_by, c(".study", ".trt"))) == 0) {
             aux_s <- grepl(paste0("\\[(", paste(aux_l, collapse = "|"), if (object$likelihood %in% c("mspline", "pexp")) ")," else ")\\]"),
                            dimnames(aux_array)[[3]])
             aux_array_s <- aux_array[ , , aux_s, drop = FALSE]
 
           } else {
-            # Stratified aux pars within arm, need to expand these out over the individuals/integration points
+            # Aux regression or stratified aux pars within arm, need to expand these out over the individuals/integration points
 
             if (object$likelihood %in% c("mspline", "pexp")) {
               aux_array_s <- array(NA_real_, dim = c(dim(eta_pred_array), length(basis)))
@@ -1632,6 +1653,26 @@ predict.stan_nma <- function(object, ...,
                             dimnames(aux_array)[[3]])
               aux_array_s <- aux_array[ , , aux_s[aux_id], drop = FALSE]
             }
+
+            # Deal with aux regression
+            if (!is.null(object$aux_regression)) {
+              if (object$likelihood %in% c("mspline", "pexp", "gengamma")) for (i in 1:length(ss)) {
+                aux_array_s[ , , ss[i], ] <- make_aux_predict(aux = aux_array_s[ , , ss[i], , drop = TRUE],
+                                                              beta_aux = beta_aux,
+                                                              X_aux = X_aux[ss[i], , drop = FALSE],
+                                                              likelihood = object$likelihood)
+              # } else if (object$likelihood == "gengamma") for (i in 1:length(ss)) {
+              #   aux_array_s[ , , ss[i], ] <- make_aux_predict(aux = aux_array_s[ , , ss[i], , drop = TRUE],
+              #                                                 beta_aux = beta_aux,
+              #                                                 X_aux = X_aux[ss[i], , drop = FALSE],
+              #                                                 likelihood = object$likelihood)
+              } else for (i in 1:length(ss)) {
+                aux_array_s[ , , ss[i]] <- make_aux_predict(aux = aux_array_s[ , , ss[i], drop = FALSE],
+                                                            beta_aux = beta_aux,
+                                                            X_aux = X_aux[ss[i], , drop = FALSE],
+                                                            likelihood = object$likelihood)
+              }
+            }
           }
 
 
@@ -1650,8 +1691,7 @@ predict.stan_nma <- function(object, ...,
           # Aggregate predictions when level = "aggregate"
           if (level == "aggregate") {
             s_preddat <-
-              dplyr::select(preddat, ".study", ".trt", ".sample_size", if (type %in% c("survival", "hazard", "cumhaz")) ".obs_id" else NULL) %>%
-              dplyr::filter(ss) %>%
+              dplyr::select(preddat[ss, ], ".study", ".trt", ".sample_size", if (type %in% c("survival", "hazard", "cumhaz")) ".obs_id" else NULL) %>%
               dplyr::mutate(.study = forcats::fct_inorder(forcats::fct_drop(.data$.study)),
                             .trt = forcats::fct_inorder(forcats::fct_drop(.data$.trt)))
 
