@@ -975,7 +975,6 @@ predict.stan_nma <- function(object, ...,
 
         if (has_ipd(object$network)) {
           dat_ipd <- object$network$ipd
-
           if (is_surv) {
             # For aggregate survival predictions we average the entire survival
             # curve over the population (i.e. over every individual), so we need
@@ -1609,9 +1608,18 @@ predict.stan_nma <- function(object, ...,
         }
 
         for (trt in 1:n_trt) {
+          # Collapse preddat by unique rows for efficiency
+          pd_col <- dplyr::filter(preddat, .data$.study == studies[s], .data$.trt == treatments[trt]) %>%
+            tidyr::nest(.time = c(.time, .obs_id)) %>%
+            dplyr::mutate(.dup_id = 1:dplyr::n()) %>%
+            tidyr::unnest(cols = .data$.time) %>%
+            dplyr::group_by(.data$.dup_id) %>%
+            dplyr::mutate(.undup = 1 == 1:dplyr::n()) %>%
+            dplyr::ungroup()
 
           # Select corresponding rows
-          ss <- which(preddat$.study == studies[s] & preddat$.trt == treatments[trt])
+          ss_uncol <- which(preddat$.study == studies[s] & preddat$.trt == treatments[trt])
+          ss <- ss_uncol[pd_col$.undup]
 
           # Linear predictor array for this study
           eta_pred_array <- tcrossprod_mcmc_array(post, X_all[ss, , drop = FALSE])
@@ -1657,17 +1665,12 @@ predict.stan_nma <- function(object, ...,
             # Deal with aux regression
             if (!is.null(object$aux_regression)) {
               if (object$likelihood %in% c("mspline", "pexp", "gengamma")) for (i in 1:length(ss)) {
-                aux_array_s[ , , ss[i], ] <- make_aux_predict(aux = aux_array_s[ , , ss[i], , drop = TRUE],
+                aux_array_s[ , , i, ] <- make_aux_predict(aux = aux_array_s[ , , i, , drop = TRUE],
                                                               beta_aux = beta_aux,
                                                               X_aux = X_aux[ss[i], , drop = FALSE],
                                                               likelihood = object$likelihood)
-              # } else if (object$likelihood == "gengamma") for (i in 1:length(ss)) {
-              #   aux_array_s[ , , ss[i], ] <- make_aux_predict(aux = aux_array_s[ , , ss[i], , drop = TRUE],
-              #                                                 beta_aux = beta_aux,
-              #                                                 X_aux = X_aux[ss[i], , drop = FALSE],
-              #                                                 likelihood = object$likelihood)
               } else for (i in 1:length(ss)) {
-                aux_array_s[ , , ss[i]] <- make_aux_predict(aux = aux_array_s[ , , ss[i], drop = FALSE],
+                aux_array_s[ , , i] <- make_aux_predict(aux = aux_array_s[ , , i, drop = FALSE],
                                                             beta_aux = beta_aux,
                                                             X_aux = X_aux[ss[i], , drop = FALSE],
                                                             likelihood = object$likelihood)
@@ -1677,9 +1680,9 @@ predict.stan_nma <- function(object, ...,
 
 
           if (type %in% c("survival", "hazard", "cumhaz")) {
-            s_time <- preddat$.time[ss]
+            s_time <- preddat$.time[ss_uncol]
           } else if (type == "rmst") {
-            s_time <- preddat$.time[ss]
+            s_time <- preddat$.time[ss_uncol]
             if (length(unique(s_time)) == 1) {
               # Same restriction time for all obs, just take the first (faster)
               s_time <- s_time[1]
@@ -1691,7 +1694,7 @@ predict.stan_nma <- function(object, ...,
           # Aggregate predictions when level = "aggregate"
           if (level == "aggregate") {
             s_preddat <-
-              dplyr::select(preddat[ss, ], ".study", ".trt", ".sample_size", if (type %in% c("survival", "hazard", "cumhaz")) ".obs_id" else NULL) %>%
+              dplyr::select(preddat[ss_uncol, ], ".study", ".trt", ".sample_size", if (type %in% c("survival", "hazard", "cumhaz")) ".obs_id" else NULL) %>%
               dplyr::mutate(.study = forcats::fct_inorder(forcats::fct_drop(.data$.study)),
                             .trt = forcats::fct_inorder(forcats::fct_drop(.data$.trt)))
 
@@ -1704,8 +1707,8 @@ predict.stan_nma <- function(object, ...,
             s_preddat <- dplyr::mutate(s_preddat, .weights = .data$.sample_size / sum(.data$.sample_size))
 
             pred_array[ , , outdat$.study == studies[s] & outdat$.trt == treatments[trt]] <-
-              make_agsurv_predict(eta = eta_pred_array,
-                                  aux = aux_array_s,
+              make_agsurv_predict(eta = eta_pred_array[, , pd_col$.dup_id, drop = FALSE],
+                                  aux = if (object$likelihood %in% c("mspline", "pexp", "gengamma")) aux_array_s[, , pd_col$.dup_id, , drop = FALSE] else aux_array_s[, , pd_col$.dup_id, drop = FALSE],
                                   times = s_time,
                                   quantiles = quantiles,
                                   likelihood = object$likelihood,
@@ -1717,8 +1720,8 @@ predict.stan_nma <- function(object, ...,
 
           } else { # Individual predictions
             s_pred_array <-
-              make_surv_predict(eta = eta_pred_array,
-                                aux = aux_array_s,
+              make_surv_predict(eta = eta_pred_array[, , pd_col$.dup_id, drop = FALSE],
+                                aux = if (object$likelihood %in% c("mspline", "pexp", "gengamma")) aux_array_s[, , pd_col$.dup_id, , drop = FALSE] else aux_array_s[, , pd_col$.dup_id, drop = FALSE],
                                 times = s_time,
                                 quantiles = quantiles,
                                 likelihood = object$likelihood,
