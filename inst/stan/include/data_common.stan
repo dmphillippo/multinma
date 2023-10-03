@@ -79,7 +79,8 @@ real<lower=0> prior_reg_df;
 
 // New variables for class effects model
 int<lower=0, upper=1> class_effects; // Flag for whether a class model is used (1) or not (0)
-matrix design_vector_class_means; // Design vector for class means
-matrix design_vector_class_sds; // Design vector for class standard deviations
+int<lower=0> which_class[class_effects ? narm_ipd + narm_agd_arm + ni_agd_contrast : 0]; // ID of class for each arm (0 for no RE delta)
+int<lower=0> which_class_sd[class_effects ? narm_ipd + narm_agd_arm + ni_agd_contrast : 0]; // Design vector for class standard deviations
+
 real<lower=0> prior_class_mean; // Prior specifications for class means
 real<lower=0> prior_class_sd; // Prior specifications for class standard deviations
