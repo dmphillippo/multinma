@@ -76,3 +76,10 @@ int<lower=0,upper=3> prior_reg_dist;
 real prior_reg_location;
 real<lower=0> prior_reg_scale;
 real<lower=0> prior_reg_df;
+
+// New variables for class effects model
+int<lower=0, upper=1> class_effects; // Flag for whether a class model is used (1) or not (0)
+matrix design_vector_class_means; // Design vector for class means
+matrix design_vector_class_sds; // Design vector for class standard deviations
+real<lower=0> prior_class_mean; // Prior specifications for class means
+real<lower=0> prior_class_sd; // Prior specifications for class standard deviations
