@@ -22,26 +22,26 @@ functions {
     if (dist == 1) { // Exponential
       out = -y .* exp(eta);
     } else if (dist == 2) { // Weibull
-      out = -pow_vec(y, aux) .* exp(eta);
+      out = -pow(y, aux) .* exp(eta);
     } else if (dist == 3) { // Gompertz
       out = -exp(eta)./aux .* expm1(aux .* y);
     } else if (dist == 4) { // Exponential AFT
       out = -y .* exp(-eta);
     } else if (dist == 5) { // Weibull AFT
-      out = -pow_vec(y, aux) .* exp(-aux .* eta);
+      out = -pow(y, aux) .* exp(-aux .* eta);
     } else if (dist == 6) { // log Normal
       // aux is sdlog
       // out = log1m(Phi((log(y) - eta) ./ aux));
       for (i in 1:n) out[i] = lognormal_lccdf(y[i] | eta[i], aux[i]);
     } else if (dist == 7) { // log logistic
-      out = -log1p(pow_vec(y ./ exp(eta), aux));
+      out = -log1p(pow(y ./ exp(eta), aux));
     } else if (dist == 8) { // Gamma
       vector[n] eeta = exp(-eta);
       for (i in 1:n) out[i] = gamma_lccdf(y[i] | aux[i], eeta[i]);
     } else if (dist == 9) { // Generalised Gamma
       vector[n] Q = inv(sqrt(aux2));
       vector[n] w = exp(Q .* (log(y) - eta) ./ aux) .* aux2;
-      for (i in 1:n) out[i] = log1m(gamma_p(aux2[i], w[i]));
+      out = log1m(gamma_p(aux2, w));
     }
 
     return out;
@@ -70,14 +70,14 @@ functions {
       // lS = log1m(Phi((log(y) - eta) / aux));
       for (i in 1:n) out[i] = lognormal_lccdf(y | eta[i], aux);
     } else if (dist == 7) { // log logistic
-      out = -log1p(pow_vec2(y ./ exp(eta), aux));
+      out = -log1p(pow(y ./ exp(eta), aux));
     } else if (dist == 8) { // Gamma
       vector[n] eeta = exp(-eta);
       for (i in 1:n) out[i] = gamma_lccdf(y | aux, eeta[i]);
     } else if (dist == 9) { // Generalised Gamma
       real Q = pow(aux2, -0.5);
       vector[n] w = exp(Q * (log(y) - eta) / aux) * aux2;
-      for (i in 1:n) out[i] = log1m(gamma_p(aux2, w[i]));
+      out = log1m(gamma_p(aux2, w));
     }
 
     return out;
@@ -94,19 +94,19 @@ functions {
     if (dist == 1) { // Exponential
       out = eta;
     } else if (dist == 2) { // Weibull
-      out = log(aux) + eta + lmultiply_vec(aux - 1, y);
+      out = log(aux) + eta + lmultiply(aux - 1, y);
     } else if (dist == 3) { // Gompertz
       out = eta + (aux .* y);
     } else if (dist == 4) { // Exponential AFT
       out = -eta;
     } else if (dist == 5) { // Weibull AFT
-      out = log(aux) - (aux .* eta) + lmultiply_vec(aux - 1, y);
+      out = log(aux) - (aux .* eta) + lmultiply(aux - 1, y);
     } else if (dist == 6) { // log Normal
       // aux is sdlog
       // out = lognormal_lpdf(y | eta, aux) - log1m(Phi((log(y) - eta) ./ aux));
       for (i in 1:n) out[i] = lognormal_lpdf(y[i] | eta[i], aux[i]) - lognormal_lccdf(y[i] | eta[i], aux[i]);
     } else if (dist == 7) { // log logistic
-      out = log(aux) - eta + (aux - 1).*(log(y) - eta) - log1p(pow_vec(y ./ exp(eta), aux));
+      out = log(aux) - eta + (aux - 1).*(log(y) - eta) - log1p(pow(y ./ exp(eta), aux));
     } else if (dist == 8) { // Gamma
       vector[n] eeta = exp(-eta);
       for (i in 1:n) out[i] = gamma_lpdf(y[i] | aux[i], eeta[i]) - gamma_lccdf(y[i] | aux[i], eeta[i]);
@@ -140,7 +140,7 @@ functions {
       // out = lognormal_lpdf(y | eta, aux) - log1m(Phi((log(y) - eta) ./ aux));
       for (i in 1:n) out[i] = lognormal_lpdf(y| eta[i], aux) - lognormal_lccdf(y | eta[i], aux);
     } else if (dist == 7) { // log logistic
-      out = log(aux) - eta + (aux - 1)*(log(y) - eta) - log1p(pow_vec2(y ./ exp(eta), aux));
+      out = log(aux) - eta + (aux - 1)*(log(y) - eta) - log1p(pow(y ./ exp(eta), aux));
     } else if (dist == 8) { // Gamma
       vector[n] eeta = exp(-eta);
       for (i in 1:n) out[i] = gamma_lpdf(y | aux, eeta[i]) - gamma_lccdf(y | aux, eeta[i]);
@@ -157,26 +157,24 @@ functions {
     vector[n] l;
 
     // Status indicators
-    int nwhich0 = (dist == 6 || dist == 8 || dist == 9) ? nwhich(status, 0) : 0;
-    int nwhich1 = !(dist == 6 || dist == 8 || dist == 9) ? nwhich(status, 1) : 0;
-    int nwhich2 = nwhich(status, 2);
-    int nwhich3 = nwhich(status, 3);
-    int nwhichd = num_elements(which_gt0(delay_time));
-    array[nwhich0] int which0;
-    array[nwhich1] int which1;
-    array[nwhich2] int which2;
-    array[nwhich3] int which3;
-    array[nwhichd] int whichd;
-    if (nwhich0) which0 = which(status, 0);
-    if (nwhich1) which1 = which(status, 1);
-    if (nwhich2) which2 = which(status, 2);
-    if (nwhich3) which3 = which(status, 3);
-    if (nwhichd) whichd = which_gt0(delay_time);
+    array[3] int nw = nwhich_all(status, 3);
+    int nw0 = (dist == 6 || dist == 8 || dist == 9) ? n - sum(nw) : 0;
+    array[nw0] int w0;
+    array[nw[1]] int w1;
+    array[nw[2]] int w2;
+    array[nw[3]] int w3;
+    int nd = num_elements(which_gt0(delay_time));
+    array[nd] int wd;
+    if (nw0) w0 = which(status, 0);
+    if (nw[1]) w1 = which(status, 1);
+    if (nw[2]) w2 = which(status, 2);
+    if (nw[3]) w3 = which(status, 3);
+    if (nd) wd = which_gt0(delay_time);
 
     // Make certain models more efficient by using ldpf directly
     if (dist == 6 || dist == 8 || dist == 9) {
       // Right censored
-      l[which0] = lS(dist, time[which0], eta[which0], aux[which0], aux2[which0]);
+      l[w0] = lS(dist, time[w0], eta[w0], aux[w0], aux2[w0]);
 
       // Observed
       if (dist == 6) for (i in 1:n) if (status[i] == 1) l[i] = lognormal_lpdf(time[i] | eta[i], aux[i]);
@@ -189,18 +187,18 @@ functions {
       l = lS(dist, time, eta, aux, aux2);
 
       // Observed
-      l[which1] += lh(dist, time[which1], eta[which1], aux[which1], aux2[which1]);
+      l[w1] += lh(dist, time[w1], eta[w1], aux[w1], aux2[w1]);
     }
 
     // Left censored
-    l[which2] = log1m_exp(l[which2]);
+    l[w2] = log1m_exp(l[w2]);
 
     // Interval censored
     // l = log_diff_exp(lS(dist, start_time, eta, aux, aux2), lS(dist, time, eta, aux, aux2));
-    l[which3] = log(exp(lS(dist, start_time[which3], eta[which3], aux[which3], aux2[which3])) - exp(l[which3]));
+    l[w3] = log(exp(lS(dist, start_time[w3], eta[w3], aux[w3], aux2[w3])) - exp(l[w3]));
 
     // Left truncation
-    l[whichd] -= lS(dist, delay_time[whichd], eta[whichd], aux[whichd], aux2[whichd]);
+    l[wd] -= lS(dist, delay_time[wd], eta[wd], aux[wd], aux2[wd]);
 
     return l;
   }

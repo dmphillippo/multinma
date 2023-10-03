@@ -14,17 +14,6 @@ array[] int which(array[] int x, int y) {
   return w[1:(c-1)];
 }
 
-// Which entry is first equal to a given value
-int first(array[] int x, int y) {
-  int w = 0;
-  int i = 1;
-  while (i <= num_elements(x) && w == 0) {
-    if (x[i] == y) w = i;
-    i += 1;
-  }
-  return w;
-}
-
 // How many entries are equal to a given value
 int nwhich(array[] int x, int y) {
   int w = 0;
@@ -54,29 +43,4 @@ array[] int which_gt0(vector x) {
     }
   }
   return w[1:(c-1)];
-}
-
-// pow
-vector pow_vec (vector x, vector y) {
-  // (Not needed past Stan 2.26)
-  int n = num_elements(x);
-  vector[n] out;
-  for (i in 1:n) out[i] = pow(x[i], y[i]);
-  return out;
-}
-
-vector pow_vec2 (vector x, real y) {
-  // (Not needed past Stan 2.26)
-  int n = num_elements(x);
-  vector[n] out;
-  for (i in 1:n) out[i] = pow(x[i], y);
-  return out;
-}
-
-// lmultiply
-vector lmultiply_vec (vector x, vector y) {
-  int n = num_elements(x);
-  vector[n] out;
-  for (i in 1:n) out[i] = lmultiply(x[i], y[i]);
-  return out;
 }

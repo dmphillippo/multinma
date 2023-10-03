@@ -306,7 +306,7 @@ transformed data {
   array[aux_int == 0 ? n_aux_group : 0] int ni_aux_group_agd_arm = nwhich_all(aux_group_agd_arm, n_aux_group);
   array[aux_int == 0 ? n_aux_group : 0, max(ni_aux_group_agd_arm)] int wi_aux_group_agd_arm;
 
-  // Split spline Q matrix or X matrix into IPD and AgD rows
+  // Split spline X matrix into IPD and AgD rows
   matrix[0, nX_aux] Xauxdummy;
   matrix[ni_ipd, nX_aux] X_aux_ipd = ni_ipd ? X_aux[1:ni_ipd] : Xauxdummy;
   matrix[(aux_int ? nint_max : 1) * ni_agd_arm, nX_aux] X_aux_agd_arm = ni_agd_arm ? X_aux[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)] : Xauxdummy;
