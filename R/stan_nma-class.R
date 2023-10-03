@@ -45,7 +45,7 @@ print.stan_nma <- function(x, ...) {
   if (inherits(x$network, "mlnmr_data")) type <- "ML-NMR"
   else type <- "NMA"
   cglue("A {x$trt_effects} effects {type} with a {x$likelihood} likelihood ({x$link} link).")
-  if (x$likelihood %in% c("mspline", "pexp"))
+  if (x$likelihood %in% c("mspline", "pexp")) {
     deg <- switch(x$likelihood,
                   mspline = switch(attr(x$basis[[1]], 'degree'),
                                    "1" = "Piecewise constant",
@@ -54,6 +54,7 @@ print.stan_nma <- function(x, ...) {
                                    paste('Degree', attr(x$basis[[1]], 'degree'), 'M-spline')),
                   pexp = 'Piecewise constant')
     cglue("{deg} baseline hazard with {length(attr(x$basis[[1]], 'knots'))} internal knots.")
+  }
   if (x$consistency != "consistency") {
     if (x$consistency == "nodesplit")
       cglue("An inconsistency model ('{x$consistency}') was fitted, splitting the comparison {x$nodesplit[2]} vs. {x$nodesplit[1]}.")
