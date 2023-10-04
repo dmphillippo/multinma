@@ -1779,6 +1779,9 @@ nma.fit <- function(ipd_x, ipd_y,
     # Add in dummy prior_aux2 if not gengamma - not used, but requested by Stan data
     if (likelihood != "gengamma") prior_aux2 <- flat()
 
+    # Add in dummy prior_aux_reg if no aux_regression
+    if (is.null(X_aux)) prior_aux_reg <- flat()
+
     # Check aux IDs
     if (!(has_ipd || has_agd_arm)) {
       aux_id <- integer()
@@ -1790,13 +1793,22 @@ nma.fit <- function(ipd_x, ipd_y,
       }
     }
 
+    # Set aux_int
+    aux_int <- !is.null(X_aux) && max(aux_group) == nrow(X_aux)
+
     standat <- purrr::list_modify(standat,
                                   # AgD arm IDs
                                   agd_arm_arm = agd_arm_arm,
 
                                   # Auxiliary IDs for shape parameters
-                                  aux_by = length(aux_id) == ni_ipd + ni_agd_arm*n_int,
+                                  #aux_by = length(aux_id) == ni_ipd + ni_agd_arm*n_int,
+                                  aux_int = aux_int,
                                   aux_id = aux_id,
+                                  aux_group = aux_group,
+
+                                  # Aux regression
+                                  nX_aux = if (!is.null(X_aux)) ncol(X_aux) else 0,
+                                  X_aux = if (!is.null(X_aux))  X_aux else matrix(0, length(aux_id), 0),
 
                                   # Add outcomes
                                   ipd_time = ipd_surv$time,
@@ -1822,7 +1834,14 @@ nma.fit <- function(ipd_x, ipd_y,
                                                 gengamma = 9),
 
                                   # Specify link
-                                  link = switch(link, log = 1)
+                                  link = switch(link, log = 1),
+
+                                  # Add prior for aux_regression coefs
+                                  !!! prior_standat(prior_aux_reg, "prior_aux_reg",
+                                                    valid = c("Normal", "half-Normal", "log-Normal",
+                                                              "Cauchy",  "half-Cauchy",
+                                                              "Student t", "half-Student t", "log-Student t",
+                                                              "Exponential", "flat (implicit)"))
     )
 
     # Add in priors for auxiliary parameters
@@ -1863,9 +1882,9 @@ nma.fit <- function(ipd_x, ipd_y,
                                    # Monitor auxiliary parameters
                                    pars =
                                      if (likelihood %in% c("exponential", "exponential-aft")) pars
-                                     else if (likelihood == "lognormal") c(pars, "sdlog")
-                                     else if (likelihood == "gengamma") c(pars, "sigma", "k")
-                                     else c(pars, "shape")
+                                     else if (likelihood == "lognormal") c(pars, "sdlog", "beta_aux")
+                                     else if (likelihood == "gengamma") c(pars, "sigma", "k", "beta_aux", "beta_aux2")
+                                     else c(pars, "shape", "beta_aux")
                                    )
 
 
