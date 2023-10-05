@@ -910,9 +910,7 @@ predict.stan_nma <- function(object, ...,
                 # Use times from network, unnest
                 dat_agd_arm <- object$network$agd_arm %>%
                   # Drop duplicated names in outer dataset from .data_orig before unnesting
-                  dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm)))),
-                                # Reset sample size for weighted mean later
-                                .sample_size = 1) %>%
+                  dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm))))) %>%
                   tidyr::unnest(cols = c(".Surv", ".data_orig")) %>%
                   dplyr::mutate(!!! get_Surv_data(.$.Surv),
                                 .time = .data$time) %>%
@@ -933,9 +931,7 @@ predict.stan_nma <- function(object, ...,
                 dat_agd_arm <- object$network$agd_arm %>%
                   # Drop duplicated names in outer dataset from .data_orig before unnesting
                   # Take only one row of .data_orig (all duplicated anyway)
-                  dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm)))[1,]),
-                                # Reset sample size for weighted mean later
-                                .sample_size = 1) %>%
+                  dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm)))[1,])) %>%
                   dplyr::left_join(agd_times, by = ".study") %>%
                   tidyr::unnest(cols = c(".time", ".obs_id", ".data_orig"))
               }
@@ -947,9 +943,7 @@ predict.stan_nma <- function(object, ...,
                 dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm)))[1,]),
                               # Use provided time vector
                               .time = if (type %in% c("survival", "hazard", "cumhaz", "rmst")) list(times) else NA,
-                              .obs_id = if (type %in% c("survival", "hazard", "cumhaz", "rmst")) list(1:length(times)) else NA,
-                              # Reset sample size for weighted mean later
-                              .sample_size = 1) %>%
+                              .obs_id = if (type %in% c("survival", "hazard", "cumhaz", "rmst")) list(1:length(times)) else NA) %>%
                 tidyr::unnest(cols = c(".time", ".obs_id", ".data_orig"))
             }
 
