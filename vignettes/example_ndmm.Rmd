@@ -1268,23 +1268,10 @@ When producing population-average predictions (which is the default with `level 
 ## Population-average survival probabilities
 To produce population-average survival curves we use the `predict()` function with `type = "survival"`.
 These are marginal or standardised survival curves.
-
+We also overlay the "raw" Kaplan-Meier curves using the `geom_km()` helper function.
 ```r
-sp <- plot(predict(ndmm_fit_1kt, type = "survival"))
-
-# Overlay the KM data
-kmdat <- bind_rows(ndmm_ipd, ndmm_agd) %>%
-  group_by(studyf, trtf) %>%
-  group_modify(~with(survfit(Surv(eventtime, event = status) ~ 1, data = .),
-                     tibble(time, n.censor, estimate = surv, std.err, upper, lower))) %>%
-  # Add S(0) = 1
-  group_modify(~add_row(., time = 0, n.censor = 0, estimate = 1, std.err = 0, upper = 1, lower = 1, .before = 0)) %>%
-  mutate(Treatment = trtf, Study = studyf)
-
-sp +
-  geom_step(aes(x = time, y = estimate, colour = Treatment), linewidth = 0.15, data = kmdat) +
-  geom_point(aes(x = time, y = estimate, colour = Treatment), stroke = 0.15, shape = 3,
-             data = filter(kmdat, n.censor >= 1)) +
+plot(predict(ndmm_fit_1kt, type = "survival")) + 
+  geom_km(ndmm_net) +
   theme(legend.position = "top", legend.box.spacing = unit(0, "lines"))
 ```
 
