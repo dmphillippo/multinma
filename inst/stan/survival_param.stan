@@ -571,8 +571,7 @@ parameters {
   vector<lower=0>[n_aux*gengamma] aux2;
 
   // Auxiliary regression
-  vector[nX_aux] beta_aux;
-  vector[nX_aux*gengamma] beta_aux2;
+  matrix[nX_aux, nonexp + gengamma] beta_aux;
 }
 transformed parameters {
   // Log likelihood contributions
@@ -587,8 +586,9 @@ transformed parameters {
     if (aux_int) {
       vector[ni_ipd] auxi;
       vector[ni_ipd] aux2i;
-      if (nonexp) auxi = aux[aux_id_ipd] .* exp(X_aux_ipd * beta_aux);
-      if (gengamma) aux2i = aux2[aux_id_ipd] .* exp(X_aux_ipd * beta_aux2);
+      matrix[ni_ipd, nonexp + gengamma] eXbeta = exp(X_aux_ipd * beta_aux);
+      if (nonexp) auxi = aux[aux_id_ipd] .* eXbeta[,1];
+      if (gengamma) aux2i = aux2[aux_id_ipd] .* eXbeta[,2];
 
       log_L_ipd = loglik(dist,
                          ipd_time,
@@ -606,10 +606,11 @@ transformed parameters {
           array[ni] int wi = wi_aux_group_ipd[i, 1:ni];
           real auxi;
           real aux2i;
+          row_vector[nonexp + gengamma] eXbeta = exp(X_aux_ipd[wi[1],] * beta_aux);
 
           if (nX_aux) {
-            auxi = nonexp ? aux[aux_id_ipd[wi[1]]] * exp(X_aux_ipd[wi[1],] * beta_aux) : 0;
-            aux2i = gengamma ? aux2[aux_id_ipd[wi[1]]] * exp(X_aux_ipd[wi[1],] * beta_aux2) : 0;
+            auxi = nonexp ? aux[aux_id_ipd[wi[1]]] * eXbeta[1] : 0;
+            aux2i = gengamma ? aux2[aux_id_ipd[wi[1]]] * eXbeta[2] : 0;
           } else {
             // If no X_aux then aux_id = aux_group
             auxi = nonexp ? aux[i] : 0;
@@ -643,9 +644,10 @@ transformed parameters {
           vector[nint] log_L_ii;
           vector[nint] auxi;
           vector[nint] aux2i;
+          matrix[nint, nonexp + gengamma] eXbeta = exp(X_aux_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ] * beta_aux);
 
-          if (nonexp) auxi = aux[aux_id_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]] .* exp(X_aux_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ] * beta_aux);
-          if (gengamma) aux2i = aux2[aux_id_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]] .* exp(X_aux_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ] * beta_aux2);
+          if (nonexp) auxi = aux[aux_id_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]] .* eXbeta[,1];
+          if (gengamma) aux2i = aux2[aux_id_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]] .* eXbeta[,2];
 
           eta_agd_arm_ii = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
 
@@ -673,10 +675,11 @@ transformed parameters {
             array[ni] int wi = wi_aux_group_agd_arm[i, 1:ni];
             real auxi;
             real aux2i;
+            row_vector[nonexp + gengamma] eXbeta = exp(X_aux_agd_arm[wi[1],] * beta_aux);
 
             if (nX_aux) {
-              auxi = nonexp ? aux[aux_id_agd_arm[wi[1]]] * exp(X_aux_agd_arm[wi[1],] * beta_aux) : 0;
-              aux2i = gengamma ? aux2[aux_id_agd_arm[wi[1]]] * exp(X_aux_agd_arm[wi[1],] * beta_aux2) : 0;
+              auxi = nonexp ? aux[aux_id_agd_arm[wi[1]]] * eXbeta[1] : 0;
+              aux2i = gengamma ? aux2[aux_id_agd_arm[wi[1]]] * eXbeta[2] : 0;
             } else {
               // If no X_aux then aux_id = aux_group
               auxi = nonexp ? aux[i] : 0;
@@ -717,10 +720,11 @@ transformed parameters {
           array[ni] int wi = wi_aux_group_agd_arm[i, 1:ni];
           real auxi;
           real aux2i;
+          row_vector[nonexp + gengamma] eXbeta = exp(X_aux_agd_arm[wi[1],] * beta_aux);
 
           if (nX_aux) {
-            auxi = nonexp ? aux[aux_id_agd_arm[wi[1]]] * exp(X_aux_agd_arm[wi[1],] * beta_aux) : 0;
-            aux2i = gengamma ? aux2[aux_id_agd_arm[wi[1]]] * exp(X_aux_agd_arm[wi[1],] * beta_aux2) : 0;
+            auxi = nonexp ? aux[aux_id_agd_arm[wi[1]]] * eXbeta[1] : 0;
+            aux2i = gengamma ? aux2[aux_id_agd_arm[wi[1]]] * eXbeta[2] : 0;
           } else {
             // If no X_aux then aux_id = aux_group
             auxi = nonexp ? aux[i] : 0;
@@ -748,8 +752,8 @@ model {
   if (gengamma) prior_select_lp(aux2, prior_aux2_dist, prior_aux2_location, prior_aux2_scale, prior_aux2_df);
 
   // -- Prior on aux regression --
-  if (nonexp && nX_aux) prior_select_lp(beta_aux, prior_aux_reg_dist, prior_aux_reg_location, prior_aux_reg_scale, prior_aux_reg_df);
-  if (gengamma && nX_aux) prior_select_lp(beta_aux2, prior_aux_reg_dist, prior_aux_reg_location, prior_aux_reg_scale, prior_aux_reg_df);
+  if (nonexp && nX_aux) prior_select_lp(beta_aux[,1], prior_aux_reg_dist, prior_aux_reg_location, prior_aux_reg_scale, prior_aux_reg_df);
+  if (gengamma && nX_aux) prior_select_lp(beta_aux[,2], prior_aux_reg_dist, prior_aux_reg_location, prior_aux_reg_scale, prior_aux_reg_df);
 
   // -- IPD likelihood --
   target += log_L_ipd;

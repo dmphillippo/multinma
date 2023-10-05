@@ -1883,7 +1883,7 @@ nma.fit <- function(ipd_x, ipd_y,
                                    pars =
                                      if (likelihood %in% c("exponential", "exponential-aft")) pars
                                      else if (likelihood == "lognormal") c(pars, "sdlog", "beta_aux")
-                                     else if (likelihood == "gengamma") c(pars, "sigma", "k", "beta_aux", "beta_aux2")
+                                     else if (likelihood == "gengamma") c(pars, "sigma", "k", "beta_aux")
                                      else c(pars, "shape", "beta_aux")
                                    )
 
@@ -2127,6 +2127,8 @@ nma.fit <- function(ipd_x, ipd_y,
     if (likelihood %in% c("mspline", "pexp")) {
       fnames_oi[grepl("^beta_aux\\[", fnames_oi)] <- paste0("beta_aux[", rep(colnames(X_aux), times = n_scoef-1), ", ", rep(1:(n_scoef-1), each = ncol(X_aux)), "]")
       fnames_oi[grepl("^sigma_beta\\[", fnames_oi)] <- paste0("sigma_beta[", colnames(X_aux), "]")
+    } else if (likelihood == "gengamma") {
+      fnames_oi[grepl("^beta_aux\\[", fnames_oi)] <- paste0("beta_aux[", rep(colnames(X_aux), times = 2), ", ", rep(c("sigma", "k"), each = ncol(X_aux)), "]")
     } else {
       fnames_oi[grepl("^beta_aux\\[", fnames_oi)] <- paste0("beta_aux[", colnames(X_aux), "]")
     }
