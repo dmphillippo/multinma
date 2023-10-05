@@ -2419,7 +2419,9 @@ make_aux_predict <- function(aux, beta_aux, X_aux, likelihood) {
     out <- aperm(apply(lscoef_reg, 1:2, softmax), c(2, 3, 1))
 
   } else if (likelihood == "gengamma") {
-    abort("Not implemented yet!")
+    out <- aux
+    out[ , , 1] <- exp(log(aux[ , , 1, drop = FALSE]) + tcrossprod_mcmc_array(beta_aux[ , , 1, drop = FALSE], X_aux))
+    out[ , , 2] <- exp(log(aux[ , , 2, drop = FALSE]) + tcrossprod_mcmc_array(beta_aux[ , , 2, drop = FALSE], X_aux))
 
   } else {
     out <- exp(log(aux) + tcrossprod_mcmc_array(beta_aux, X_aux))
