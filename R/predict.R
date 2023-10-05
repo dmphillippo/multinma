@@ -1610,13 +1610,30 @@ predict.stan_nma <- function(object, ...,
 
         for (trt in 1:n_trt) {
           # Collapse preddat by unique rows for efficiency
-          pd_col <- dplyr::filter(preddat, .data$.study == studies[s], .data$.trt == treatments[trt]) %>%
-            tidyr::nest(.time = c(.time, .obs_id)) %>%
-            dplyr::mutate(.dup_id = 1:dplyr::n()) %>%
-            tidyr::unnest(cols = .data$.time) %>%
-            dplyr::group_by(.data$.dup_id) %>%
-            dplyr::mutate(.undup = 1 == 1:dplyr::n()) %>%
-            dplyr::ungroup()
+          collapse_by <- setdiff(colnames(preddat), c(".time", ".obs_id", ".sample_size"))
+
+          if (packageVersion("dplyr") > "1.1.0") {
+            pd_undups <- dplyr::filter(preddat, .data$.study == studies[s], .data$.trt == treatments[trt]) %>%
+              dplyr::distinct(dplyr::pick(dplyr::all_of(collapse_by))) %>%
+              dplyr::mutate(.dup_id = 1:dplyr::n())
+
+            pd_col <- dplyr::filter(preddat, .data$.study == studies[s], .data$.trt == treatments[trt]) %>%
+              dplyr::left_join(pd_undups, by = collapse_by) %>%
+              dplyr::group_by(dplyr::pick(dplyr::all_of(collapse_by))) %>%
+              dplyr::mutate(.ndup = dplyr::n(),
+                            .undup = dplyr::if_else(.data$.ndup > 1, 1 == 1:dplyr::n(), rep(TRUE, times = dplyr::n())))
+          } else {
+            pd_undups <- dplyr::filter(preddat, .data$.study == studies[s], .data$.trt == treatments[trt]) %>%
+              dplyr::distinct(dplyr::across(dplyr::all_of(collapse_by))) %>%
+              dplyr::mutate(.dup_id = 1:dplyr::n())
+
+            pd_col <- dplyr::filter(preddat, .data$.study == studies[s], .data$.trt == treatments[trt]) %>%
+              dplyr::left_join(pd_undups, by = collapse_by) %>%
+              dplyr::group_by(dplyr::across(dplyr::all_of(collapse_by))) %>%
+              dplyr::mutate(.ndup = dplyr::n(),
+                            .undup = dplyr::if_else(.data$.ndup > 1, 1 == 1:dplyr::n(), rep(TRUE, times = dplyr::n())))
+          }
+
 
           # Select corresponding rows
           ss_uncol <- which(preddat$.study == studies[s] & preddat$.trt == treatments[trt])
