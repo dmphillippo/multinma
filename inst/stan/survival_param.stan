@@ -511,7 +511,7 @@ data {
   int<lower=0, upper=1> aux_int; // Flag aux regression needs integration (1 = yes)
   //int<lower=0, upper=1> aux_by; // Flag subgroup aux parameters within each arm (1 = yes)
   array[ni_ipd + ni_agd_arm * (aux_int ? nint_max : 1)] int<lower=1> aux_id;
-  array[ni_ipd + ni_agd_arm*(aux_int ? nint_max : 1)] int<lower=1> aux_group;
+  array[ni_ipd + ni_agd_arm * (aux_int ? nint_max : 1)] int<lower=1> aux_group;
 
   // auxiliary design matrix
   int<lower=0> nX_aux;
@@ -587,8 +587,8 @@ transformed parameters {
     if (aux_int) {
       vector[ni_ipd] auxi;
       vector[ni_ipd] aux2i;
-      if (nonexp) auxi = exp(log(aux[aux_id_ipd]) + X_aux_ipd * beta_aux);
-      if (gengamma) aux2i = exp(log(aux2[aux_id_ipd]) + X_aux_ipd * beta_aux2);
+      if (nonexp) auxi = aux[aux_id_ipd] .* exp(X_aux_ipd * beta_aux);
+      if (gengamma) aux2i = aux2[aux_id_ipd] .* exp(X_aux_ipd * beta_aux2);
 
       log_L_ipd = loglik(dist,
                          ipd_time,
@@ -608,8 +608,8 @@ transformed parameters {
           real aux2i;
 
           if (nX_aux) {
-            auxi = nonexp ? exp(log(aux[aux_id_ipd[wi[1]]]) + X_aux_ipd[wi[1],] * beta_aux) : 0;
-            aux2i = gengamma ? exp(log(aux2[aux_id_ipd[wi[1]]]) + X_aux_ipd[wi[1],] * beta_aux2) : 0;
+            auxi = nonexp ? aux[aux_id_ipd[wi[1]]] * exp(X_aux_ipd[wi[1],] * beta_aux) : 0;
+            aux2i = gengamma ? aux2[aux_id_ipd[wi[1]]] * exp(X_aux_ipd[wi[1],] * beta_aux2) : 0;
           } else {
             // If no X_aux then aux_id = aux_group
             auxi = nonexp ? aux[i] : 0;
@@ -643,8 +643,9 @@ transformed parameters {
           vector[nint] log_L_ii;
           vector[nint] auxi;
           vector[nint] aux2i;
-          if (nonexp) auxi = exp(log(aux[aux_id_agd_arm[i]]) + X_aux_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ] * beta_aux);
-          if (gengamma) aux2i = exp(log(aux2[aux_id_agd_arm[i]]) + X_aux_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ] * beta_aux2);
+
+          if (nonexp) auxi = aux[aux_id_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]] .* exp(X_aux_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ] * beta_aux);
+          if (gengamma) aux2i = aux2[aux_id_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]] .* exp(X_aux_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ] * beta_aux2);
 
           eta_agd_arm_ii = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
 
@@ -674,8 +675,8 @@ transformed parameters {
             real aux2i;
 
             if (nX_aux) {
-              auxi = nonexp ? exp(log(aux[aux_id_agd_arm[wi[1]]]) + X_aux_agd_arm[wi[1],] * beta_aux) : 0;
-              aux2i = gengamma ? exp(log(aux2[aux_id_agd_arm[wi[1]]]) + X_aux_agd_arm[wi[1],] * beta_aux2) : 0;
+              auxi = nonexp ? aux[aux_id_agd_arm[wi[1]]] * exp(X_aux_agd_arm[wi[1],] * beta_aux) : 0;
+              aux2i = gengamma ? aux2[aux_id_agd_arm[wi[1]]] * exp(X_aux_agd_arm[wi[1],] * beta_aux2) : 0;
             } else {
               // If no X_aux then aux_id = aux_group
               auxi = nonexp ? aux[i] : 0;
@@ -718,8 +719,8 @@ transformed parameters {
           real aux2i;
 
           if (nX_aux) {
-            auxi = nonexp ? exp(log(aux[aux_id_agd_arm[wi[1]]]) + X_aux_agd_arm[wi[1],] * beta_aux) : 0;
-            aux2i = gengamma ? exp(log(aux2[aux_id_agd_arm[wi[1]]]) + X_aux_agd_arm[wi[1],] * beta_aux2) : 0;
+            auxi = nonexp ? aux[aux_id_agd_arm[wi[1]]] * exp(X_aux_agd_arm[wi[1],] * beta_aux) : 0;
+            aux2i = gengamma ? aux2[aux_id_agd_arm[wi[1]]] * exp(X_aux_agd_arm[wi[1],] * beta_aux2) : 0;
           } else {
             // If no X_aux then aux_id = aux_group
             auxi = nonexp ? aux[i] : 0;
