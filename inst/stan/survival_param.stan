@@ -542,10 +542,10 @@ transformed data {
   array[ni_agd_arm*(aux_int ? nint_max : 1)] int<lower=1> aux_group_agd_arm = aux_group[(ni_ipd + 1):(ni_ipd + ni_agd_arm*(aux_int ? nint_max : 1))];
 
   // Aux ID indexing arrays
-  array[aux_int == 0 ? n_aux_group : 0] int ni_aux_group_ipd = nwhich_all(aux_group_ipd, n_aux_group);
-  array[aux_int == 0 ? n_aux_group : 0, max(ni_aux_group_ipd)] int wi_aux_group_ipd;
-  array[aux_int == 0 ? n_aux_group : 0] int ni_aux_group_agd_arm = nwhich_all(aux_group_agd_arm, n_aux_group);
-  array[aux_int == 0 ? n_aux_group : 0, max(ni_aux_group_agd_arm)] int wi_aux_group_agd_arm;
+  array[(nonexp && aux_int == 0) ? n_aux_group : 1] int ni_aux_group_ipd = (nonexp && aux_int == 0) ? nwhich_all(aux_group_ipd, n_aux_group) : {0};
+  array[(nonexp && aux_int == 0) ? n_aux_group : 0, (nonexp && aux_int == 0) ? max(ni_aux_group_ipd) : 0] int wi_aux_group_ipd;
+  array[(nonexp && aux_int == 0) ? n_aux_group : 1] int ni_aux_group_agd_arm = (nonexp && aux_int == 0) ? nwhich_all(aux_group_agd_arm, n_aux_group) : {0};
+  array[(nonexp && aux_int == 0) ? n_aux_group : 0, (nonexp && aux_int == 0) ? max(ni_aux_group_agd_arm) : 0] int wi_aux_group_agd_arm;
 
   // Split auxiliary design matrix into IPD and AgD rows
   matrix[0, nX_aux] Xauxdummy;
@@ -556,7 +556,7 @@ transformed data {
 
   for (i in 1:ni_agd_arm) agd_arm_arm2[i] = narm_ipd + agd_arm_arm[i];
 
-  if (aux_int == 0) for (i in 1:n_aux_group) {
+  if (nonexp && aux_int == 0) for (i in 1:n_aux_group) {
     if (ni_aux_group_ipd[i]) wi_aux_group_ipd[i, 1:ni_aux_group_ipd[i]] = which(aux_group_ipd, i);
     if (ni_aux_group_agd_arm[i]) wi_aux_group_agd_arm[i, 1:ni_aux_group_agd_arm[i]] = which(aux_group_agd_arm, i);
   }
@@ -571,7 +571,7 @@ parameters {
   vector<lower=0>[n_aux*gengamma] aux2;
 
   // Auxiliary regression
-  matrix[nX_aux, nonexp + gengamma] beta_aux;
+  matrix[nonexp ? nX_aux : 0, nonexp + gengamma] beta_aux;
 }
 transformed parameters {
   // Log likelihood contributions
@@ -583,10 +583,11 @@ transformed parameters {
 
   // Evaluate log likelihood
   if (ni_ipd) {
-    if (aux_int) {
+    if (nonexp == 0 || aux_int) {
       vector[ni_ipd] auxi;
       vector[ni_ipd] aux2i;
-      matrix[ni_ipd, nonexp + gengamma] eXbeta = exp(X_aux_ipd * beta_aux);
+      matrix[nonexp ? ni_ipd : 0, nonexp + gengamma] eXbeta;
+      if (nonexp) eXbeta = exp(X_aux_ipd * beta_aux);
       if (nonexp) auxi = aux[aux_id_ipd] .* eXbeta[,1];
       if (gengamma) aux2i = aux2[aux_id_ipd] .* eXbeta[,2];
 
@@ -606,15 +607,16 @@ transformed parameters {
           array[ni] int wi = wi_aux_group_ipd[i, 1:ni];
           real auxi;
           real aux2i;
-          row_vector[nonexp + gengamma] eXbeta = exp(X_aux_ipd[wi[1],] * beta_aux);
+          row_vector[nonexp + gengamma] eXbeta;
+          if (nonexp) eXbeta = exp(X_aux_ipd[wi[1],] * beta_aux);
 
           if (nX_aux) {
-            auxi = nonexp ? aux[aux_id_ipd[wi[1]]] * eXbeta[1] : 0;
-            aux2i = gengamma ? aux2[aux_id_ipd[wi[1]]] * eXbeta[2] : 0;
+            if (nonexp) auxi = aux[aux_id_ipd[wi[1]]] * eXbeta[1];
+            if (gengamma) aux2i = aux2[aux_id_ipd[wi[1]]] * eXbeta[2];
           } else {
             // If no X_aux then aux_id = aux_group
-            auxi = nonexp ? aux[i] : 0;
-            aux2i = gengamma ? aux2[i] : 0;
+            if (nonexp) auxi = aux[i];
+            if (gengamma) aux2i = aux2[i];
           }
 
           log_L_ipd[wi] = loglik2(dist,
@@ -638,14 +640,15 @@ transformed parameters {
 
     if (nint_max > 1) { // -- If integration points are used --
 
-      if (aux_int) {
+      if (nonexp == 0 || aux_int) {
         for (i in 1:ni_agd_arm) {
           vector[nint] eta_agd_arm_ii;
           vector[nint] log_L_ii;
           vector[nint] auxi;
           vector[nint] aux2i;
-          matrix[nint, nonexp + gengamma] eXbeta = exp(X_aux_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ] * beta_aux);
+          matrix[nonexp ? nint : 0, nonexp + gengamma] eXbeta;
 
+          if (nonexp) eXbeta = exp(X_aux_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint), ] * beta_aux);
           if (nonexp) auxi = aux[aux_id_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]] .* eXbeta[,1];
           if (gengamma) aux2i = aux2[aux_id_agd_arm[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]] .* eXbeta[,2];
 
@@ -675,7 +678,9 @@ transformed parameters {
             array[ni] int wi = wi_aux_group_agd_arm[i, 1:ni];
             real auxi;
             real aux2i;
-            row_vector[nonexp + gengamma] eXbeta = exp(X_aux_agd_arm[wi[1],] * beta_aux);
+            row_vector[nonexp + gengamma] eXbeta;
+
+            if (nonexp) eXbeta = exp(X_aux_agd_arm[wi[1],] * beta_aux);
 
             if (nX_aux) {
               auxi = nonexp ? aux[aux_id_agd_arm[wi[1]]] * eXbeta[1] : 0;
@@ -713,32 +718,52 @@ transformed parameters {
       // Random effects
       if (RE) for (i in 1:ni_agd_arm) if (which_RE[agd_arm_arm2[i]]) eta_agd_arm[i] += f_delta[which_RE[agd_arm_arm2[i]]];
 
-      for (i in 1:n_aux_group) {
-        int ni = ni_aux_group_agd_arm[i];
+      if (nonexp == 0 || aux_int) {
+        vector[ni_agd_arm] auxi;
+        vector[ni_agd_arm] aux2i;
+        matrix[ni_agd_arm, nonexp + gengamma] eXbeta;
+        if (nonexp) eXbeta = exp(X_aux_agd_arm * beta_aux);
+        if (nonexp) auxi = aux[aux_id_agd_arm] .* eXbeta[,1];
+        if (gengamma) aux2i = aux2[aux_id_agd_arm] .* eXbeta[,2];
 
-        if (ni) {
-          array[ni] int wi = wi_aux_group_agd_arm[i, 1:ni];
-          real auxi;
-          real aux2i;
-          row_vector[nonexp + gengamma] eXbeta = exp(X_aux_agd_arm[wi[1],] * beta_aux);
+        log_L_agd_arm = loglik(dist,
+                               agd_arm_time,
+                               agd_arm_start_time,
+                               agd_arm_delay_time,
+                               agd_arm_status,
+                               eta_agd_arm,
+                               auxi,
+                               aux2i);
+      } else {
+        for (i in 1:n_aux_group) {
+          int ni = ni_aux_group_agd_arm[i];
 
-          if (nX_aux) {
-            auxi = nonexp ? aux[aux_id_agd_arm[wi[1]]] * eXbeta[1] : 0;
-            aux2i = gengamma ? aux2[aux_id_agd_arm[wi[1]]] * eXbeta[2] : 0;
-          } else {
-            // If no X_aux then aux_id = aux_group
-            auxi = nonexp ? aux[i] : 0;
-            aux2i = gengamma ? aux2[i] : 0;
+          if (ni) {
+            array[ni] int wi = wi_aux_group_agd_arm[i, 1:ni];
+            real auxi;
+            real aux2i;
+            row_vector[nonexp + gengamma] eXbeta;
+
+            if (nonexp) eXbeta = exp(X_aux_agd_arm[wi[1],] * beta_aux);
+
+            if (nX_aux) {
+              if (nonexp) auxi = aux[aux_id_agd_arm[wi[1]]] * eXbeta[1];
+              if (gengamma) aux2i = aux2[aux_id_agd_arm[wi[1]]] * eXbeta[2];
+            } else {
+              // If no X_aux then aux_id = aux_group
+              if (nonexp) auxi = aux[i];
+              if (gengamma) aux2i = aux2[i];
+            }
+
+            log_L_agd_arm[wi] = loglik2(dist,
+                                        agd_arm_time[wi],
+                                        agd_arm_start_time[wi],
+                                        agd_arm_delay_time[wi],
+                                        agd_arm_status[wi],
+                                        eta_agd_arm[wi],
+                                        auxi,
+                                        aux2i);
           }
-
-          log_L_agd_arm[wi] = loglik2(dist,
-                                      agd_arm_time[wi],
-                                      agd_arm_start_time[wi],
-                                      agd_arm_delay_time[wi],
-                                      agd_arm_status[wi],
-                                      eta_agd_arm[wi],
-                                      auxi,
-                                      aux2i);
         }
       }
     }
