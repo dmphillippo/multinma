@@ -39,3 +39,15 @@ u_delta ~ std_normal();
 if (ni_agd_contrast) {
   agd_contrast_y ~ multi_normal(eta_agd_contrast_bar, agd_contrast_Sigma);
 }
+
+// Class effects model for the d's
+if (class_effects) {
+  for (t in 1:nt) {
+    if (which_class[t] != 0) {
+      d[t] ~ normal(trt_class[which_class[t]], class_sd[which_class[t]]);
+    } else {
+      // Priors for treatments without a class effect or in a single-occupancy class
+      d[t] ~ normal(prior_d_location, prior_d_scale);
+    }
+  }
+}
