@@ -1459,7 +1459,7 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Set up random effects
   if (trt_effects == "random") {
-    narm <- narm_ipd + ni_agd_arm + ni_agd_contrast
+    narm <- narm_ipd + narm_agd_arm + ni_agd_contrast
     if (!is.null(which_RE)) {
       if (!rlang::is_integerish(which_RE) ||
           any(which_RE < 0) ||
