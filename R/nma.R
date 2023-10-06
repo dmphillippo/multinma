@@ -1538,6 +1538,10 @@ nma.fit <- function(ipd_x, ipd_y,
                                 "Cauchy",  "half-Cauchy",
                                 "Student t", "half-Student t", "log-Student t",
                                 "Exponential", "flat (implicit)")),
+    !!! prior_standat(prior_class_mean, "prior_class_mean",
+                      valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
+    !!! prior_standat(prior_class_sd, "prior_class_sd",
+                      valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
     prior_het_type = switch(prior_het_type,
                             sd = 1, var = 2, prec = 3)
     )
