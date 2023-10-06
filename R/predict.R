@@ -238,6 +238,41 @@
 #'                          baseline = distr(qnorm, -1.75, 0.08)))
 #' plot(pso_pred_new, ref_line = c(0, 1))
 #' }
+#'
+#' ## Progression free survival with newly-diagnosed multiple myeloma
+#' @template ex_ndmm_example
+#' @examples \donttest{
+#' # We can produce a range of predictions from models with survival outcomes,
+#' # chosen with the type argument to predict
+#'
+#' # Predicted survival probabilities at 5 years
+#' predict(ndmm_fit, type = "survival", times = 5)
+#'
+#' # Survival curves
+#' plot(predict(ndmm_fit, type = "survival"))
+#'
+#' # Hazard curves
+#' # Here we specify a vector of times to avoid attempting to plot infinite
+#' # hazards for some studies at t=0
+#' plot(predict(ndmm_fit, type = "hazard", times = seq(0.001, 6, length.out = 50)))
+#'
+#' # Cumulative hazard curves
+#' plot(predict(ndmm_fit, type = "cumhaz"))
+#'
+#' # Survival time quantiles and median survival
+#' predict(ndmm_fit, type = "quantile", quantiles = c(0.2, 0.5, 0.8))
+#' plot(predict(ndmm_fit, type = "median"))
+#'
+#' # Mean survival time
+#' predict(ndmm_fit, type = "mean")
+#'
+#' # Restricted mean survival time
+#' # By default, the time horizon is the shortest follow-up time in the network
+#' predict(ndmm_fit, type = "rmst")
+#'
+#' # An alternative restriction time can be set using the times argument
+#' predict(ndmm_fit, type = "rmst", times = 5)  # 5-year RMST
+#' }
 predict.stan_nma <- function(object, ...,
                              baseline = NULL, newdata = NULL, study = NULL, trt_ref = NULL,
                              type = c("link", "response"),

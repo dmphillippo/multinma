@@ -450,6 +450,30 @@ pso_fit <- nma(pso_net, \dontshow{refresh = if (interactive()) 200 else 0,}
 pso_fit
 }
 
+## Newly-diagnosed multiple myeloma NMA
+# Set up newly-diagnosed multiple myeloma network
+
+head(ndmm_ipd)
+head(ndmm_agd)
+
+ndmm_net <- combine_network(
+  set_ipd(ndmm_ipd,
+          study, trt,
+          Surv = Surv(eventtime / 12, status)),
+  set_agd_surv(ndmm_agd,
+               study, trt,
+               Surv = Surv(eventtime / 12, status),
+               covariates = ndmm_agd_covs))
+\donttest{
+# Fit Weibull (PH) model
+ndmm_fit <- nma(ndmm_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+                likelihood = "weibull",
+                prior_intercept = normal(scale = 100),
+                prior_trt = normal(scale = 10),
+                prior_aux = half_normal(scale = 10))
+
+ndmm_fit
+}
 }
 \references{
 \insertAllCited{}

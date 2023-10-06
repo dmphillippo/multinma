@@ -28,16 +28,19 @@ created with plotted with \code{\link[=plot.surv_nma_summary]{plot.surv_nma_summ
 standalone to plot Kaplan-Meier curves before fitting a model.
 }
 \examples{
-# NDMM network
+# Set up newly-diagnosed multiple myeloma network
+
+head(ndmm_ipd)
+head(ndmm_agd)
+
 ndmm_net <- combine_network(
   set_ipd(ndmm_ipd,
           study, trt,
-          Surv = Surv(eventtime, status)),
+          Surv = Surv(eventtime / 12, status)),
   set_agd_surv(ndmm_agd,
                study, trt,
-               Surv = Surv(eventtime, status),
+               Surv = Surv(eventtime / 12, status),
                covariates = ndmm_agd_covs))
-
 # Plot KM curves using ggplot2
 library(ggplot2)
 
@@ -54,11 +57,13 @@ ggplot(mapping = aes(colour = Treatment)) +
   theme_multinma()
 
 # This function can also be used to add KM data to plots of estimated survival
-# curves from a fitted model in a similar manner, for example:
-#
-#   plot(predict(ndmm_fit, type = "survival")) + geom_km(ndmm_net)
-#
-# See the newly-diagnosed multiple myeloma vignette for an example of this in
-# practice.
-
+# curves from a fitted model, in a similar manner
+\donttest{
+# Run newly-diagnosed multiple myeloma example if not already available
+if (!exists("ndmm_fit")) example("example_ndmm", run.donttest = TRUE)
+}
+# Plot estimated survival curves, and overlay the KM data
+\donttest{
+plot(predict(ndmm_fit, type = "survival")) + geom_km(ndmm_net)
+}
 }

@@ -16,17 +16,8 @@
 #' @return A ggplot2 geom list that can be added to a ggplot2 plot object
 #' @export
 #'
+#' @template ex_ndmm_network
 #' @examples
-#' # NDMM network
-#' ndmm_net <- combine_network(
-#'   set_ipd(ndmm_ipd,
-#'           study, trt,
-#'           Surv = Surv(eventtime, status)),
-#'   set_agd_surv(ndmm_agd,
-#'                study, trt,
-#'                Surv = Surv(eventtime, status),
-#'                covariates = ndmm_agd_covs))
-#'
 #' # Plot KM curves using ggplot2
 #' library(ggplot2)
 #'
@@ -43,13 +34,13 @@
 #'   theme_multinma()
 #'
 #' # This function can also be used to add KM data to plots of estimated survival
-#' # curves from a fitted model in a similar manner, for example:
-#' #
-#' #   plot(predict(ndmm_fit, type = "survival")) + geom_km(ndmm_net)
-#' #
-#' # See the newly-diagnosed multiple myeloma vignette for an example of this in
-#' # practice.
-#'
+#' # curves from a fitted model, in a similar manner
+#' @template ex_ndmm_example
+#' @examples
+#' # Plot estimated survival curves, and overlay the KM data
+#' \donttest{
+#' plot(predict(ndmm_fit, type = "survival")) + geom_km(ndmm_net)
+#' }
 geom_km <- function(network, ..., curve_args = list(), cens_args = list()) {
   if (!inherits(network, "nma_data"))
     abort("`network` must be an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")

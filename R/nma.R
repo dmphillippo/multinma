@@ -245,6 +245,10 @@
 #' @template ex_plaque_psoriasis_integration
 #' @template ex_plaque_psoriasis_mlnmr
 #'
+#' @examples
+#' ## Newly-diagnosed multiple myeloma NMA
+#' @template ex_ndmm_network
+#' @template ex_ndmm
 nma <- function(network,
                 consistency = c("consistency", "ume", "nodesplit"),
                 trt_effects = c("fixed", "random"),
