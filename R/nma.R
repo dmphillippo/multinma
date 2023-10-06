@@ -1787,7 +1787,7 @@ nma.fit <- function(ipd_x, ipd_y,
       aux_id <- integer()
     } else {
       if (likelihood %in% c("exponential", "exponential-aft")) {
-        aux_id <- rep_len(1, ni_ipd + ni_agd_arm)  # Not used (no aux pars)
+        aux_id <- aux_group <- rep_len(1, ni_ipd + ni_agd_arm)  # Not used (no aux pars)
       } else if (!rlang::is_integerish(aux_id, finite = TRUE)) {
         abort("`aux_id` must be an integer vector identifying the auxiliary parameter for each observation in IPD and AgD (arm-based) data.")
       }
