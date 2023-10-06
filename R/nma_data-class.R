@@ -629,9 +629,9 @@ has_indirect <- function(network, trt1, trt2) {
 
   # Create network with studies on both trt1 and trt2 removed
   studies <- dplyr::bind_rows(
-    network$agd_arm,
+    if (identical(network$outcome$agd_arm, "survival")) dplyr::select(network$agd_arm, -.data$.Surv) else network$agd_arm,
     network$agd_contrast,
-    network$ipd
+    if (identical(network$outcome$ipd, "survival")) dplyr::select(network$ipd, -.data$.Surv) else network$ipd
   ) %>%
     dplyr::distinct(.data$.study, .data$.trt)
 
