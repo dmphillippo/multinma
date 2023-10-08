@@ -1602,6 +1602,8 @@ predict.stan_nma <- function(object, ...,
         beta_aux <- as.array(object, pars = "beta_aux")
       }
 
+      aux_int <- aux_needs_integration(aux_regression = object$aux_regression, aux_by = object$aux_by)
+
       dim_pred_array <- dim(post)
       dim_pred_array[3] <- nrow(outdat)
       dimnames_pred_array <- dimnames(post)
@@ -1678,7 +1680,7 @@ predict.stan_nma <- function(object, ...,
           aux_l <- get_aux_labels(preddat[ss, ], by = object$aux_by)
           aux_id <- get_aux_id(preddat[ss, ], by = object$aux_by)
 
-          if (!aux_needs_integration(aux_regression = object$aux_regression, aux_by = object$aux_by)) { #(length(setdiff(object$aux_by, c(".study", ".trt"))) == 0) {
+          if (!aux_int) { #(length(setdiff(object$aux_by, c(".study", ".trt"))) == 0) {
             aux_s <- grepl(paste0("\\[(", paste(aux_l, collapse = "|"), if (object$likelihood %in% c("mspline", "pexp")) ")," else ")\\]"),
                            dimnames(aux_array)[[3]])
             aux_array_s <- aux_array[ , , aux_s, drop = FALSE]
@@ -1755,7 +1757,9 @@ predict.stan_nma <- function(object, ...,
 
             pred_array[ , , outdat$.study == studies[s] & outdat$.trt == treatments[trt]] <-
               make_agsurv_predict(eta = eta_pred_array[, , pd_col$.dup_id, drop = FALSE],
-                                  aux = if (object$likelihood %in% c("mspline", "pexp", "gengamma")) aux_array_s[, , pd_col$.dup_id, , drop = FALSE] else aux_array_s[, , pd_col$.dup_id, drop = FALSE],
+                                  aux = if (!aux_int) aux_array_s
+                                        else if (object$likelihood %in% c("mspline", "pexp", "gengamma")) aux_array_s[ , , pd_col$.dup_id, , drop = FALSE]
+                                        else aux_array_s[ , , pd_col$.dup_id, drop = FALSE],
                                   times = s_time,
                                   quantiles = quantiles,
                                   likelihood = object$likelihood,
@@ -1768,7 +1772,9 @@ predict.stan_nma <- function(object, ...,
           } else { # Individual predictions
             s_pred_array <-
               make_surv_predict(eta = eta_pred_array[, , pd_col$.dup_id, drop = FALSE],
-                                aux = if (object$likelihood %in% c("mspline", "pexp", "gengamma")) aux_array_s[, , pd_col$.dup_id, , drop = FALSE] else aux_array_s[, , pd_col$.dup_id, drop = FALSE],
+                                aux = if (!aux_int) aux_array_s
+                                      else if (object$likelihood %in% c("mspline", "pexp", "gengamma")) aux_array_s[ , , pd_col$.dup_id, , drop = FALSE]
+                                      else aux_array_s[ , , pd_col$.dup_id, drop = FALSE],
                                 times = s_time,
                                 quantiles = quantiles,
                                 likelihood = object$likelihood,
