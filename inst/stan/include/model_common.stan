@@ -4,12 +4,18 @@
 // Study-specific baselines
 prior_select_lp(mu, prior_intercept_dist, prior_intercept_location, prior_intercept_scale, prior_intercept_df);
 // Treatment effects
-prior_select_lp(d, prior_trt_dist, prior_trt_location, prior_trt_scale, prior_trt_df);
+  if (class_effects == 0) {
+    prior_select_lp(d, prior_trt_dist, prior_trt_location, prior_trt_scale, prior_trt_df);
+  } else
 // Regression parameters
 prior_select_lp(beta, prior_reg_dist, prior_reg_location, prior_reg_scale, prior_reg_df);
 
 // Node-splitting - just use prior for d
 prior_select_lp(omega, prior_trt_dist, prior_trt_location, prior_trt_scale, prior_trt_df);
+
+// Class effect mean & sd parameters
+prior_select_lp(class_mean, prior_class_mean_dist, prior_class_mean_location, prior_class_mean_scale, prior_class_mean_df);
+prior_select_lp(class_sd, prior_class_sd_dist, prior_class_sd_location, prior_class_sd_scale, prior_class_sd_df);
 
 // Heterogeneity
 if (RE) {
