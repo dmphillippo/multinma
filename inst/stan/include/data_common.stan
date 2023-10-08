@@ -77,7 +77,7 @@ real prior_reg_location;
 real<lower=0> prior_reg_scale;
 real<lower=0> prior_reg_df;
 
-// New variables for class effects model
+// -- class effects model --
 int<lower=0, upper=1> class_effects; // Flag for whether a class model is used (1) or not (0)
 int<lower=0> which_class[class_effects ? narm_ipd + narm_agd_arm + ni_agd_contrast : 0]; // ID of class for each arm (0 for no RE delta)
 int<lower=0> which_class_sd[class_effects ? narm_ipd + narm_agd_arm + ni_agd_contrast : 0]; // Design vector for class standard deviations
