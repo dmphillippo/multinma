@@ -1083,7 +1083,7 @@ predict.stan_nma <- function(object, ...,
                                            .trt = .data$.trt_old),
                              by = ".study")
         }
-        preddat <- dplyr::select(preddat, -.data$.trt_old)
+        preddat <- dplyr::select(preddat, -".trt_old")
       }
 
       # If producing aggregate-level predictions, output these in factor order
