@@ -147,30 +147,6 @@ flat <- function() {
 
 # #' @rdname priors
 # #' @export
-# gamma <- function(shape, rate = 1/scale, scale = 1/rate) {
-#   if (missing(scale) && missing(rate))
-#     abort("Missing argument. Specify either `rate` or `scale`.")
-#   if (!missing(rate) && !missing(scale))
-#     warn("Both `rate` and `scale` provided, only `scale` will be used")
-#
-#   check_prior_scale(shape, "shape")
-#   check_prior_scale(rate, "rate")
-#
-#   return(new_nma_prior("Gamma",
-#                        shape = shape,
-#                        scale = scale))
-# }
-
-# #' @rdname priors
-# #' @export
-# dirichlet <- function(shape = 1) {
-#   check_prior_scale(shape, type = "shape")
-#
-#   return(new_nma_prior("Dirichlet", shape = shape))
-# }
-
-# #' @rdname priors
-# #' @export
 # uniform <- function(lower, upper) {
 #   check_prior_location(lower, type = "lower limit")
 #   check_prior_location(lower, type = "upper limit")
@@ -271,11 +247,6 @@ get_tidy_prior <- function(prior, trunc = NULL, ...) {
     out <- tibble::tibble(dist_label = d,
                           dist = "exp",
                           args = list(list(rate = 1 / prior$scale)))
-  # } else if (d == "Dirichlet") {
-  #   if (missing(n_dim)) abort("Provide `n_dim`, the number of dimensions for the Dirichlet prior.")
-  #   out <- tibble::tibble(dist_label = d,
-  #                         dist = "beta",
-  #                         args = list(list(shape1 = prior$shape, shape2 = (n_dim - 1)*prior$shape)))
   } else if (d == "Gamma") {
     out <- tibble::tibble(dist_label = d,
                           dist = "gamma",
