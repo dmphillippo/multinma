@@ -172,7 +172,7 @@ Piecewise-constant hazards (i.e. piecewise exponential hazards) are a special ca
 We specify a regression model using the `regression` argument which includes main effects of covariates (prognostic effects)  and treatment-covariate interactions (effect modifier interactions) for each covariate.
 We place vague $\operatorname{N}(0, 100^2)$ priors on each of the parameters in the linear predictor.
 We give the standard deviation for the random walk prior for the spline coefficients a $\operatorname{half-N}(0, 1^2)$ prior distribution.
-Using the QR decomposition (`QR = TRUE`) can greatly increase sampling efficiency for regression models.
+We also set `QR = TRUE`, as using the QR decomposition can greatly increase sampling efficiency for regression models.
 
 ```{r}
 ndmm_fit <- nma(ndmm_net,
@@ -272,9 +272,8 @@ cbind(
   `non-PH` = by(ndmm_fit_nph_loo$pointwise[, "looic"], studies_all, sum)
 )
 ```
-The LOOIC is slightly lower for the non-PH model in the Jackson2019 and Palumbo2014 studies, but not substantially so.
-For the other studies the LOOIC is lower for the PH model.
-Overall, there is little evidence to suggest that the proportional hazards assumption is invalid here.
+The LOOIC is similar or lower for the proportional hazards model compared to the non-proportional hazards model in all studies.
+There is no evidence to suggest that the proportional hazards assumption is invalid here.
 
 # Comparison to unadjusted NMA
 For comparison, we also fit NMA models without any covariate adjustment, both with and without the proportional hazards assumption.
@@ -334,7 +333,7 @@ When producing population-average predictions (which is the default with `level 
 ## Population-average survival probabilities
 To produce population-average survival curves we use the `predict()` function with `type = "survival"`.
 These are marginal or standardised survival curves.
-We also overlay the "raw" Kaplan-Meier curves using the `geom_km()` helper function.
+We also overlay the unadjusted Kaplan-Meier curves from the data using the `geom_km()` helper function.
 ```{r ndmm-survival}
 plot(predict(ndmm_fit, type = "survival")) + 
   geom_km(ndmm_net) +

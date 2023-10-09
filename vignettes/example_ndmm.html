@@ -633,8 +633,9 @@ and treatment-covariate interactions (effect modifier interactions) for
 each covariate. We place vague <span class="math inline">\(\operatorname{N}(0, 100^2)\)</span> priors on each
 of the parameters in the linear predictor. We give the standard
 deviation for the random walk prior for the spline coefficients a <span class="math inline">\(\operatorname{half-N}(0, 1^2)\)</span> prior
-distribution. Using the QR decomposition (<code>QR = TRUE</code>) can
-greatly increase sampling efficiency for regression models.</p>
+distribution. We also set <code>QR = TRUE</code>, as using the QR
+decomposition can greatly increase sampling efficiency for regression
+models.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>ndmm_fit <span class="ot">&lt;-</span> <span class="fu">nma</span>(ndmm_net,</span>
 <span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>                <span class="at">regression =</span> <span class="sc">~</span>(age <span class="sc">+</span> iss_stage3 <span class="sc">+</span> response_cr_vgpr <span class="sc">+</span> male)<span class="sc">*</span>.trt,</span>
 <span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>                <span class="at">likelihood =</span> <span class="st">&quot;mspline&quot;</span>,</span>
@@ -939,10 +940,10 @@ increased complexity in others.</p>
 <span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a><span class="co">#&gt; McCarthy2012  2721.665  2732.816</span></span>
 <span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a><span class="co">#&gt; Morgan2012    4985.991  4987.442</span></span>
 <span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a><span class="co">#&gt; Palumbo2014   1332.731  1333.240</span></span></code></pre></div>
-<p>The LOOIC is slightly lower for the non-PH model in the Jackson2019
-and Palumbo2014 studies, but not substantially so. For the other studies
-the LOOIC is lower for the PH model. Overall, there is little evidence
-to suggest that the proportional hazards assumption is invalid here.</p>
+<p>The LOOIC is similar or lower for the proportional hazards model
+compared to the non-proportional hazards model in all studies. There is
+no evidence to suggest that the proportional hazards assumption is
+invalid here.</p>
 </div>
 <div id="comparison-to-unadjusted-nma" class="section level1">
 <h1>Comparison to unadjusted NMA</h1>
@@ -1129,8 +1130,8 @@ corresponds to the population-average marginal survival function; see
 <p>To produce population-average survival curves we use the
 <code>predict()</code> function with <code>type = &quot;survival&quot;</code>.
 These are marginal or standardised survival curves. We also overlay the
-“raw” Kaplan-Meier curves using the <code>geom_km()</code> helper
-function.</p>
+unadjusted Kaplan-Meier curves from the data using the
+<code>geom_km()</code> helper function.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">predict</span>(ndmm_fit, <span class="at">type =</span> <span class="st">&quot;survival&quot;</span>)) <span class="sc">+</span> </span>
 <span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>  <span class="fu">geom_km</span>(ndmm_net) <span class="sc">+</span></span>
 <span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;top&quot;</span>, <span class="at">legend.box.spacing =</span> <span class="fu">unit</span>(<span class="dv">0</span>, <span class="st">&quot;lines&quot;</span>))</span></code></pre></div>
