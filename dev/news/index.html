@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.9002</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,6 +74,7 @@
 <li>Left, right, and interval censoring as well as left truncation (delayed entry) are all supported.</li>
 <li>The available likelihoods are Exponential (PH and AFT forms), Weibull (PH and AFT forms), Gompertz, log-Normal, log-Logistic, Gamma, Generalised Gamma, flexible M-splines on the baseline hazard, and piecewise exponential hazards.</li>
 <li>Auxiliary parameters (e.g. shapes, spline coefficients) are always stratified by study to respect randomisation, and may be further stratified by treatment (e.g. to relax the proportional hazards assumption) and/or by additional factors using the <code>aux_by</code> argument to <code><a href="../reference/nma.html">nma()</a></code>.</li>
+<li>A regression model may be defined for the auxiliary parameters using the <code>aux_regression</code> argument to <code><a href="../reference/nma.html">nma()</a></code>, allowing non-proportionality to be modelled by treatment and/or covariate effects on the shapes or spline coefficients.</li>
 <li>The <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method produces estimates of survival probabilities, hazards, cumulative hazards, mean survival times, restricted mean survival times, quantiles of the survival time distribution, and median survival times. All of these predictions can be plotted using the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</li>
 <li>A new vignette demonstrates ML-NMR survival analysis with an example of progression-free survival after autologous stem cell transplant for newly diagnosed multiple myeloma, with corresponding datasets <code>ndmm_ipd</code>, <code>ndmm_agd</code>, and <code>ndmm_agd_covs</code>.</li>
 </ul></div>
