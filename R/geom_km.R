@@ -60,23 +60,22 @@ geom_km <- function(network, ..., curve_args = list(), cens_args = list()) {
   kmdat <- dplyr::bind_rows(network$ipd,
                             if (has_agd_arm(network)) tidyr::unnest(network$agd_arm, cols = ".Surv") else NULL) %>%
     dplyr::group_by(.data$.study, .data$.trt) %>%
-    dplyr::group_modify(~with(do.call(survival::survfit,
-                                      rlang::dots_list(formula = .Surv ~ 1, !!! dots,  data = .,
-                                                       .homonyms = "last")),
-                              dplyr::tibble(time, n.censor, surv, std.err, upper, lower))) %>%
+    dplyr::group_modify(~dplyr::as_tibble(unclass(
+      do.call(survival::survfit, rlang::dots_list(formula = .Surv ~ 1, !!! dots,  data = ., .homonyms = "last"))
+      )[c("time", "n.censor", "surv", "std.err", "upper", "lower")])) %>%
     # Add S(0) = 1
     dplyr::group_modify(~dplyr::add_row(., time = 0, n.censor = 0, surv = 1, std.err = 0, upper = 1, lower = 1, .before = 0)) %>%
     dplyr::mutate(Treatment = .data$.trt, Study = .data$.study)
 
   # Set geom args
-  curve_args <- rlang::dots_list(ggplot2::aes(x = time, y = surv, colour = Treatment, group = interaction(Study, Treatment)),
+  curve_args <- rlang::dots_list(ggplot2::aes(x = .data$time, y = .data$surv, colour = .data$Treatment, group = interaction(.data$Study, .data$Treatment)),
                                  data = kmdat,
                                  !!! curve_args,
                                  linewidth = 0.25,
                                  .homonyms = "first")
 
-  cens_args <- rlang::dots_list(ggplot2::aes(x = time, y = surv, colour = Treatment, group = interaction(Study, Treatment)),
-                                data = dplyr::filter(kmdat, n.censor >= 1),
+  cens_args <- rlang::dots_list(ggplot2::aes(x = .data$time, y = .data$surv, colour = .data$Treatment, group = interaction(.data$Study, .data$Treatment)),
+                                data = dplyr::filter(kmdat, .data$n.censor >= 1),
                                 !!! cens_args,
                                 stroke = 0.25, shape = 3,
                                 .homonyms = "first")
