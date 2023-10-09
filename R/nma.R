@@ -1519,8 +1519,8 @@ nma.fit <- function(ipd_x, ipd_y,
     has_offset = has_offsets,
     offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric(),
     # Class effects
-    design_vector_class_means = design_vector_class_means,
-    design_vector_class_sds = design_vector_class_sds,
+    CE_vector = CE_vector,
+    CEsd_vector = CEsd_vector,
     prior_class_mean = prior_class_mean,
     prior_class_sd = prior_class_sd
     )
