@@ -6,7 +6,6 @@
 #' @param scale Prior scale. Typically prior standard deviation (see details).
 #' @param df Prior degrees of freedom.
 #' @param rate Prior rate.
-#' @param shape Prior shape.
 # #' @param lower,upper Lower and upper bounds for a uniform prior distribution.
 #'
 #' @rdname priors
@@ -247,10 +246,6 @@ get_tidy_prior <- function(prior, trunc = NULL, ...) {
     out <- tibble::tibble(dist_label = d,
                           dist = "exp",
                           args = list(list(rate = 1 / prior$scale)))
-  } else if (d == "Gamma") {
-    out <- tibble::tibble(dist_label = d,
-                          dist = "gamma",
-                          args = list(list(shape = prior$shape, scale = prior$scale)))
   } else if (d == "flat (implicit)") {
     out <- tibble::tibble(dist_label = d,
                           dist = "unif",

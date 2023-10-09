@@ -42,8 +42,6 @@ flat()
 \item{df}{Prior degrees of freedom.}
 
 \item{rate}{Prior rate.}
-
-\item{shape}{Prior shape.}
 }
 \value{
 Object of class \link{nma_prior}.
