@@ -238,6 +238,41 @@
 #'                          baseline = distr(qnorm, -1.75, 0.08)))
 #' plot(pso_pred_new, ref_line = c(0, 1))
 #' }
+#'
+#' ## Progression free survival with newly-diagnosed multiple myeloma
+#' @template ex_ndmm_example
+#' @examples \donttest{
+#' # We can produce a range of predictions from models with survival outcomes,
+#' # chosen with the type argument to predict
+#'
+#' # Predicted survival probabilities at 5 years
+#' predict(ndmm_fit, type = "survival", times = 5)
+#'
+#' # Survival curves
+#' plot(predict(ndmm_fit, type = "survival"))
+#'
+#' # Hazard curves
+#' # Here we specify a vector of times to avoid attempting to plot infinite
+#' # hazards for some studies at t=0
+#' plot(predict(ndmm_fit, type = "hazard", times = seq(0.001, 6, length.out = 50)))
+#'
+#' # Cumulative hazard curves
+#' plot(predict(ndmm_fit, type = "cumhaz"))
+#'
+#' # Survival time quantiles and median survival
+#' predict(ndmm_fit, type = "quantile", quantiles = c(0.2, 0.5, 0.8))
+#' plot(predict(ndmm_fit, type = "median"))
+#'
+#' # Mean survival time
+#' predict(ndmm_fit, type = "mean")
+#'
+#' # Restricted mean survival time
+#' # By default, the time horizon is the shortest follow-up time in the network
+#' predict(ndmm_fit, type = "rmst")
+#'
+#' # An alternative restriction time can be set using the times argument
+#' predict(ndmm_fit, type = "rmst", times = 5)  # 5-year RMST
+#' }
 predict.stan_nma <- function(object, ...,
                              baseline = NULL, newdata = NULL, study = NULL, trt_ref = NULL,
                              type = c("link", "response"),
@@ -337,7 +372,7 @@ predict.stan_nma <- function(object, ...,
 
 
   # Without regression model ---------------------------------------------------
-  if (is.null(object$regression) && (is.null(object$aux_by) || length(setdiff(object$aux_by, c(".study", ".trt"))) == 0)) {
+  if (is.null(object$regression) && !aux_needs_integration(aux_regression = object$aux_regression, aux_by = object$aux_by)) {
 
     if (is_surv && !is.null(aux_pars) && xor(is.null(baseline), is.null(aux))) {
         abort("Specify both `baseline` and `aux`, or neither")
@@ -663,6 +698,12 @@ predict.stan_nma <- function(object, ...,
         d_p[3] <- d_p[3]*length(quantiles)
       }
 
+      if (!is.null(object$aux_regression)) {
+        X_aux <- make_nma_model_matrix(object$aux_regression,
+                                       dat_ipd = preddat)$X_ipd
+        beta_aux <- as.array(object, pars = "beta_aux")
+      }
+
       pred_array <- array(NA_real_, dim = d_p, dimnames = dn_p)
 
       aux_names <- dimnames(aux_array)[[3]]
@@ -691,9 +732,18 @@ predict.stan_nma <- function(object, ...,
           basis <- NULL
         }
 
+        if (!is.null(object$aux_regression)) {
+          auxi <- make_aux_predict(aux = aux_array[ , , aux_s, drop = FALSE],
+                                   beta_aux = beta_aux,
+                                   X_aux = X_aux[i, , drop = FALSE],
+                                   likelihood = object$likelihood)
+        } else {
+          auxi <- aux_array[ , , aux_s, drop = FALSE]
+        }
+
         pred_array[ , , (j+1):(j+jinc)] <-
           make_surv_predict(eta = pred_temp[ , , i, drop = FALSE],
-                            aux = aux_array[ , , aux_s, drop = FALSE],
+                            aux = auxi,
                             times = tt,
                             quantiles = quantiles,
                             likelihood = object$likelihood,
@@ -800,7 +850,10 @@ predict.stan_nma <- function(object, ...,
                       '  - Produce aggregate predictions with level = "aggregate"',
                       sep = "\n"))
 
-        preddat <- get_model_data_columns(object$network$ipd, regression = object$regression, keep = object$aux_by)
+        preddat <- get_model_data_columns(object$network$ipd,
+                                          regression = object$regression,
+                                          aux_regression = object$aux_regression,
+                                          keep = object$aux_by)
 
         if (is_surv) {
           # Deal with times argument
@@ -892,9 +945,7 @@ predict.stan_nma <- function(object, ...,
                 # Use times from network, unnest
                 dat_agd_arm <- object$network$agd_arm %>%
                   # Drop duplicated names in outer dataset from .data_orig before unnesting
-                  dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm)))),
-                                # Reset sample size for weighted mean later
-                                .sample_size = 1) %>%
+                  dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm))))) %>%
                   tidyr::unnest(cols = c(".Surv", ".data_orig")) %>%
                   dplyr::mutate(!!! get_Surv_data(.$.Surv),
                                 .time = .data$time) %>%
@@ -915,9 +966,7 @@ predict.stan_nma <- function(object, ...,
                 dat_agd_arm <- object$network$agd_arm %>%
                   # Drop duplicated names in outer dataset from .data_orig before unnesting
                   # Take only one row of .data_orig (all duplicated anyway)
-                  dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm)))[1,]),
-                                # Reset sample size for weighted mean later
-                                .sample_size = 1) %>%
+                  dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm)))[1,])) %>%
                   dplyr::left_join(agd_times, by = ".study") %>%
                   tidyr::unnest(cols = c(".time", ".obs_id", ".data_orig"))
               }
@@ -929,9 +978,7 @@ predict.stan_nma <- function(object, ...,
                 dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm)))[1,]),
                               # Use provided time vector
                               .time = if (type %in% c("survival", "hazard", "cumhaz", "rmst")) list(times) else NA,
-                              .obs_id = if (type %in% c("survival", "hazard", "cumhaz", "rmst")) list(1:length(times)) else NA,
-                              # Reset sample size for weighted mean later
-                              .sample_size = 1) %>%
+                              .obs_id = if (type %in% c("survival", "hazard", "cumhaz", "rmst")) list(1:length(times)) else NA) %>%
                 tidyr::unnest(cols = c(".time", ".obs_id", ".data_orig"))
             }
 
@@ -946,14 +993,17 @@ predict.stan_nma <- function(object, ...,
           }
 
           # Only take necessary columns
-          dat_agd_arm <- get_model_data_columns(dat_agd_arm, regression = object$regression, keep = object$aux_by, label = "AgD (arm-based)")
+          dat_agd_arm <- get_model_data_columns(dat_agd_arm,
+                                                regression = object$regression,
+                                                aux_regression = object$aux_regression,
+                                                keep = object$aux_by,
+                                                label = "AgD (arm-based)")
         } else {
           dat_agd_arm <- tibble::tibble()
         }
 
         if (has_ipd(object$network)) {
           dat_ipd <- object$network$ipd
-
           if (is_surv) {
             # For aggregate survival predictions we average the entire survival
             # curve over the population (i.e. over every individual), so we need
@@ -1003,7 +1053,11 @@ predict.stan_nma <- function(object, ...,
           }
 
           # Only take necessary columns
-          dat_ipd <- get_model_data_columns(dat_ipd, regression = object$regression, keep = object$aux_by, label = "IPD")
+          dat_ipd <- get_model_data_columns(dat_ipd,
+                                            regression = object$regression,
+                                            aux_regression = object$aux_regression,
+                                            keep = object$aux_by,
+                                            label = "IPD")
 
           dat_ipd$.sample_size <- 1
         } else {
@@ -1029,6 +1083,7 @@ predict.stan_nma <- function(object, ...,
                                            .trt = .data$.trt_old),
                              by = ".study")
         }
+        preddat <- dplyr::select(preddat, -".trt_old")
       }
 
       # If producing aggregate-level predictions, output these in factor order
@@ -1115,7 +1170,11 @@ predict.stan_nma <- function(object, ...,
       }
 
       # Check all variables are present
-      predreg <- get_model_data_columns(preddat, regression = object$regression, keep = object$aux_by, label = "`newdata`")
+      predreg <- get_model_data_columns(preddat,
+                                        regression = object$regression,
+                                        aux_regression = object$aux_regression,
+                                        keep = object$aux_by,
+                                        label = "`newdata`")
 
       preddat$.sample_size <- 1
 
@@ -1537,6 +1596,14 @@ predict.stan_nma <- function(object, ...,
       treatments <- levels(forcats::fct_drop(outdat$.trt))
       n_trt <- length(treatments)
 
+      if (!is.null(object$aux_regression)) {
+        X_aux <- make_nma_model_matrix(object$aux_regression,
+                                       dat_ipd = preddat)$X_ipd
+        beta_aux <- as.array(object, pars = "beta_aux")
+      }
+
+      aux_int <- aux_needs_integration(aux_regression = object$aux_regression, aux_by = object$aux_by)
+
       dim_pred_array <- dim(post)
       dim_pred_array[3] <- nrow(outdat)
       dimnames_pred_array <- dimnames(post)
@@ -1573,9 +1640,35 @@ predict.stan_nma <- function(object, ...,
         }
 
         for (trt in 1:n_trt) {
+          # Collapse preddat by unique rows for efficiency
+          collapse_by <- setdiff(colnames(preddat), c(".time", ".obs_id", ".sample_size"))
+
+          if (packageVersion("dplyr") > "1.1.0") {
+            pd_undups <- dplyr::filter(preddat, .data$.study == studies[s], .data$.trt == treatments[trt]) %>%
+              dplyr::distinct(dplyr::pick(dplyr::all_of(collapse_by))) %>%
+              dplyr::mutate(.dup_id = 1:dplyr::n())
+
+            pd_col <- dplyr::filter(preddat, .data$.study == studies[s], .data$.trt == treatments[trt]) %>%
+              dplyr::left_join(pd_undups, by = collapse_by) %>%
+              dplyr::group_by(dplyr::pick(dplyr::all_of(collapse_by))) %>%
+              dplyr::mutate(.ndup = dplyr::n(),
+                            .undup = dplyr::if_else(.data$.ndup > 1, 1 == 1:dplyr::n(), rep(TRUE, times = dplyr::n())))
+          } else {
+            pd_undups <- dplyr::filter(preddat, .data$.study == studies[s], .data$.trt == treatments[trt]) %>%
+              dplyr::distinct(dplyr::across(dplyr::all_of(collapse_by))) %>%
+              dplyr::mutate(.dup_id = 1:dplyr::n())
+
+            pd_col <- dplyr::filter(preddat, .data$.study == studies[s], .data$.trt == treatments[trt]) %>%
+              dplyr::left_join(pd_undups, by = collapse_by) %>%
+              dplyr::group_by(dplyr::across(dplyr::all_of(collapse_by))) %>%
+              dplyr::mutate(.ndup = dplyr::n(),
+                            .undup = dplyr::if_else(.data$.ndup > 1, 1 == 1:dplyr::n(), rep(TRUE, times = dplyr::n())))
+          }
+
 
           # Select corresponding rows
-          ss <- preddat$.study == studies[s] & preddat$.trt == treatments[trt]
+          ss_uncol <- which(preddat$.study == studies[s] & preddat$.trt == treatments[trt])
+          ss <- ss_uncol[pd_col$.undup]
 
           # Linear predictor array for this study
           eta_pred_array <- tcrossprod_mcmc_array(post, X_all[ss, , drop = FALSE])
@@ -1587,13 +1680,13 @@ predict.stan_nma <- function(object, ...,
           aux_l <- get_aux_labels(preddat[ss, ], by = object$aux_by)
           aux_id <- get_aux_id(preddat[ss, ], by = object$aux_by)
 
-          if (length(setdiff(object$aux_by, c(".study", ".trt"))) == 0) {
+          if (!aux_int) { #(length(setdiff(object$aux_by, c(".study", ".trt"))) == 0) {
             aux_s <- grepl(paste0("\\[(", paste(aux_l, collapse = "|"), if (object$likelihood %in% c("mspline", "pexp")) ")," else ")\\]"),
                            dimnames(aux_array)[[3]])
             aux_array_s <- aux_array[ , , aux_s, drop = FALSE]
 
           } else {
-            # Stratified aux pars within arm, need to expand these out over the individuals/integration points
+            # Aux regression or stratified aux pars within arm, need to expand these out over the individuals/integration points
 
             if (object$likelihood %in% c("mspline", "pexp")) {
               aux_array_s <- array(NA_real_, dim = c(dim(eta_pred_array), length(basis)))
@@ -1617,13 +1710,28 @@ predict.stan_nma <- function(object, ...,
                             dimnames(aux_array)[[3]])
               aux_array_s <- aux_array[ , , aux_s[aux_id], drop = FALSE]
             }
+
+            # Deal with aux regression
+            if (!is.null(object$aux_regression)) {
+              if (object$likelihood %in% c("mspline", "pexp", "gengamma")) for (i in 1:length(ss)) {
+                aux_array_s[ , , i, ] <- make_aux_predict(aux = aux_array_s[ , , i, , drop = TRUE],
+                                                              beta_aux = beta_aux,
+                                                              X_aux = X_aux[ss[i], , drop = FALSE],
+                                                              likelihood = object$likelihood)
+              } else for (i in 1:length(ss)) {
+                aux_array_s[ , , i] <- make_aux_predict(aux = aux_array_s[ , , i, drop = FALSE],
+                                                            beta_aux = beta_aux,
+                                                            X_aux = X_aux[ss[i], , drop = FALSE],
+                                                            likelihood = object$likelihood)
+              }
+            }
           }
 
 
           if (type %in% c("survival", "hazard", "cumhaz")) {
-            s_time <- preddat$.time[ss]
+            s_time <- preddat$.time[ss_uncol]
           } else if (type == "rmst") {
-            s_time <- preddat$.time[ss]
+            s_time <- preddat$.time[ss_uncol]
             if (length(unique(s_time)) == 1) {
               # Same restriction time for all obs, just take the first (faster)
               s_time <- s_time[1]
@@ -1635,8 +1743,7 @@ predict.stan_nma <- function(object, ...,
           # Aggregate predictions when level = "aggregate"
           if (level == "aggregate") {
             s_preddat <-
-              dplyr::select(preddat, ".study", ".trt", ".sample_size", if (type %in% c("survival", "hazard", "cumhaz")) ".obs_id" else NULL) %>%
-              dplyr::filter(ss) %>%
+              dplyr::select(preddat[ss_uncol, ], ".study", ".trt", ".sample_size", if (type %in% c("survival", "hazard", "cumhaz")) ".obs_id" else NULL) %>%
               dplyr::mutate(.study = forcats::fct_inorder(forcats::fct_drop(.data$.study)),
                             .trt = forcats::fct_inorder(forcats::fct_drop(.data$.trt)))
 
@@ -1649,8 +1756,10 @@ predict.stan_nma <- function(object, ...,
             s_preddat <- dplyr::mutate(s_preddat, .weights = .data$.sample_size / sum(.data$.sample_size))
 
             pred_array[ , , outdat$.study == studies[s] & outdat$.trt == treatments[trt]] <-
-              make_agsurv_predict(eta = eta_pred_array,
-                                  aux = aux_array_s,
+              make_agsurv_predict(eta = eta_pred_array[, , pd_col$.dup_id, drop = FALSE],
+                                  aux = if (!aux_int) aux_array_s
+                                        else if (object$likelihood %in% c("mspline", "pexp", "gengamma")) aux_array_s[ , , pd_col$.dup_id, , drop = FALSE]
+                                        else aux_array_s[ , , pd_col$.dup_id, drop = FALSE],
                                   times = s_time,
                                   quantiles = quantiles,
                                   likelihood = object$likelihood,
@@ -1662,8 +1771,10 @@ predict.stan_nma <- function(object, ...,
 
           } else { # Individual predictions
             s_pred_array <-
-              make_surv_predict(eta = eta_pred_array,
-                                aux = aux_array_s,
+              make_surv_predict(eta = eta_pred_array[, , pd_col$.dup_id, drop = FALSE],
+                                aux = if (!aux_int) aux_array_s
+                                      else if (object$likelihood %in% c("mspline", "pexp", "gengamma")) aux_array_s[ , , pd_col$.dup_id, , drop = FALSE]
+                                      else aux_array_s[ , , pd_col$.dup_id, drop = FALSE],
                                 times = s_time,
                                 quantiles = quantiles,
                                 likelihood = object$likelihood,
@@ -2331,3 +2442,32 @@ surv_predfuns <- list(
                       rate = exp(eta), scoef = aux, basis = basis,
                       .ns = NULL)
 )
+
+#' Produce auxiliary parameters when aux_regression is used
+#' @noRd
+make_aux_predict <- function(aux, beta_aux, X_aux, likelihood) {
+
+  if (likelihood %in% c("mspline", "pexp")) {
+
+    nX <- ncol(X_aux)
+    lscoef <- aperm(apply(aux, 1:2, inv_softmax), c(2, 3, 1))
+    lscoef_reg <- lscoef
+
+    for (i in 1:dim(lscoef_reg)[[3]]) {
+      lscoef_reg[ , , i] <- lscoef[ , , i, drop = FALSE] + tcrossprod_mcmc_array(beta_aux[ , , ((i-1)*nX + 1):(i*nX), drop = FALSE], X_aux)
+    }
+
+    out <- aperm(apply(lscoef_reg, 1:2, softmax), c(2, 3, 1))
+
+  } else if (likelihood == "gengamma") {
+    out <- aux
+    out[ , , 1] <- exp(log(aux[ , , 1, drop = FALSE]) + tcrossprod_mcmc_array(beta_aux[ , , 1, drop = FALSE], X_aux))
+    out[ , , 2] <- exp(log(aux[ , , 2, drop = FALSE]) + tcrossprod_mcmc_array(beta_aux[ , , 2, drop = FALSE], X_aux))
+
+  } else {
+    out <- exp(log(aux) + tcrossprod_mcmc_array(beta_aux, X_aux))
+  }
+
+  dimnames(out) <- dimnames(aux)
+  return(out)
+}

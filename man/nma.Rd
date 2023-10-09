@@ -20,14 +20,16 @@ nma(
   prior_het_type = c("sd", "var", "prec"),
   prior_reg = .default(normal(scale = 10)),
   prior_aux = .default(),
+  prior_aux_reg = .default(),
   aux_by = NULL,
+  aux_regression = NULL,
   QR = FALSE,
   center = TRUE,
   adapt_delta = NULL,
   int_thin = 0,
   int_check = TRUE,
   mspline_degree = 3,
-  n_knots = 3,
+  n_knots = 7,
   knots = NULL
 )
 }
@@ -84,9 +86,16 @@ coefficients (if \code{regression} formula specified)}
 parameter, if applicable (see details). For \code{likelihood = "gengamma"} this
 should be a list of prior distributions with elements \code{sigma} and \code{k}.}
 
+\item{prior_aux_reg}{Specification of prior distribution for the auxiliary
+regression parameters, if \code{aux_regression} is specified (see details).}
+
 \item{aux_by}{Vector of variable names listing the variables to stratify the
 auxiliary parameters by. Currently only used for survival models, see
-details.}
+details. Cannot be used with \code{aux_regression}.}
+
+\item{aux_regression}{A one-sided model formula giving a regression model for
+the auxiliary parameters. Currently only used for survival models, see
+details. Cannot be used with \code{aux_by}.}
 
 \item{QR}{Logical scalar (default \code{FALSE}), whether to apply a QR
 decomposition to the model design matrix}
@@ -116,15 +125,21 @@ giving the number of internal knots for partitioning the baseline hazard
 into intervals. The knot locations within each study will be determined by
 the corresponding quantiles of the observed event times, plus boundary
 knots at the earliest entry time (0 with no delayed entry) and the maximum
-event/censoring time. For example, with the default \code{n_knots = 3}, the
-internal knot locations will be at the 25\%, 50\%, and 75\% quantiles of the
-observed event times. Ignored when \code{knots} is specified.}
+event/censoring time. For example, with \code{n_knots = 3}, the internal knot
+locations will be at the 25\%, 50\%, and 75\% quantiles of the observed event
+times. The default is \code{n_knots = 7}; overfitting is avoided by shrinking
+towards a constant hazard with a random walk prior (see details). If
+\code{aux_regression} is specified then a single set of knot locations will be
+calculated across all studies in the network. Ignored when \code{knots} is
+specified.}
 
 \item{knots}{For \code{mspline} and \code{pexp} likelihoods, a named list of numeric
 vectors of internal knot locations for each of the studies in the network.
 Currently, each vector must have the same length (i.e. each study must use
 the same number of knots). If unspecified (the default), the knots will be
-chosen based on \code{n_knots} as described above.}
+chosen based on \code{n_knots} as described above. If \code{aux_regression} is
+specified then \code{knots} should be a single numeric vector of knot locations
+which will be shared across all studies in the network.}
 }
 \value{
 \code{nma()} returns a \link{stan_nma} object, except when \code{consistency = "nodesplit"} when a \link{nma_nodesplit} or \link{nma_nodesplit_df} object is
@@ -244,8 +259,11 @@ the other survival distributions implemented in this package.
 
 For the \code{mspline} and \code{pexp} likelihoods, the auxiliary parameters are the
 spline coefficients for each study. These form a unit simplex (i.e. lie
-between 0 and 1, and sum to 1), and are given a \code{\link[=dirichlet]{dirichlet()}} prior
-distribution.
+between 0 and 1, and sum to 1), and are given a logistic random walk prior
+distribution. \code{prior_aux} specifies the hyperprior on the random walk
+standard deviation \eqn{\sigma} which controls the level of smoothing of
+the baseline hazard, with \eqn{\sigma = 0} corresponding to a constant
+baseline hazard.
 
 The auxiliary parameters can be stratified by additional factors through
 the \code{aux_by} argument. For example, to allow the shape of the baseline
@@ -254,6 +272,21 @@ stratification even if omitted from \code{aux_by}, but we choose here to make
 the stratification explicit.) This is a common way of relaxing the
 proportional hazards assumption. The default is equivalent to \code{aux_by = ".study"} which stratifies the auxiliary parameters by study, as described
 above.
+
+A regression model may be specified on the auxiliary parameters using
+\code{aux_regression}. This is useful if we wish to model departures from
+non-proportionality, rather than allowing the baseline hazards to be
+completely independent using \code{aux_by}. This is necessary if absolute
+predictions (e.g. survival curves) are required in a population for
+unobserved combinations of covariates; for example, if \code{aux_by = .trt} then
+absolute predictions may only be produced for the observed treatment arms
+in each study population, whereas if \code{aux_regression = ~.trt} then absolute
+predictions can be produced for all treatments in any population. For
+\code{mspline} and \code{pexp} likelihoods, the regression coefficients are smoothed
+over time using a random effect to avoid overfitting: \code{prior_aux_reg}
+specifies the hyperprior for this smoothing random effect. For other
+parametric likelihoods, \code{prior_aux_reg} specifies the prior for the
+auxiliary regression coefficients.
 }
 }
 
@@ -417,6 +450,30 @@ pso_fit <- nma(pso_net, \dontshow{refresh = if (interactive()) 200 else 0,}
 pso_fit
 }
 
+## Newly-diagnosed multiple myeloma NMA
+# Set up newly-diagnosed multiple myeloma network
+
+head(ndmm_ipd)
+head(ndmm_agd)
+
+ndmm_net <- combine_network(
+  set_ipd(ndmm_ipd,
+          study, trt,
+          Surv = Surv(eventtime / 12, status)),
+  set_agd_surv(ndmm_agd,
+               study, trt,
+               Surv = Surv(eventtime / 12, status),
+               covariates = ndmm_agd_covs))
+\donttest{
+# Fit Weibull (PH) model
+ndmm_fit <- nma(ndmm_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+                likelihood = "weibull",
+                prior_intercept = normal(scale = 100),
+                prior_trt = normal(scale = 10),
+                prior_aux = half_normal(scale = 10))
+
+ndmm_fit
+}
 }
 \references{
 \insertAllCited{}

@@ -229,7 +229,52 @@ mean_mspline <- function(basis, scoef, rate, ...) {
   rmst_mspline(t = Inf, basis, scoef, rate)
 }
 
-# Function to check for mspline/ispline objects
+# Check for mspline/ispline objects
+#' @param x Object to check is MSpline class
+#' @return logical
+#' @noRd
 is_mspline <- function(x) {
   inherits(x, "MSpline")
+}
+
+# Create a (logit scale) coefficient vector corresponding to a constant hazard
+#' @param basis A M-spline basis created using splines2::mSpline()
+#' @return Coefficient vector
+#' @noRd
+mspline_constant_hazard <- function(basis) {
+  if (!is_mspline(basis)) abort("`basis` must be an M-spline basis created using splines2::mSpline()")
+
+  df <- ncol(basis)
+  ord <- attr(basis, "degree") + 1
+  iknots <- attr(basis, "knots")
+  bknots <- attr(basis, "Boundary.knots")
+
+  # Using approach of Jackson arXiv:2306.03957
+  knots <- c(rep(bknots[1], ord), iknots, rep(bknots[2], ord))
+  coefs <- (knots[(1:df) + ord] - knots[1:df]) / (ord * (diff(bknots)))
+
+  # inverse softmax transform
+  inv_softmax(coefs)
+}
+
+#' softmax transform
+#' @param x K-1 vector of reals
+#' @return K vector simplex
+#' @noRd
+softmax <- function(x) {
+  x0 <- c(0, x)
+  exp(x0 - logsumexp(x0))
+}
+
+logsumexp <- function(x) {
+  maxx <- max(x)
+  max(x) + log(sum(exp(x - maxx)))
+}
+
+#' inverse softmax transform
+#' @param p K vector simplex
+#' @return K-1 vector of reals
+#' @noRd
+inv_softmax <- function(p) {
+  log(p[-1]) - log(p[1])
 }

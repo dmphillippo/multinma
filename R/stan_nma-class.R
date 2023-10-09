@@ -45,19 +45,29 @@ print.stan_nma <- function(x, ...) {
   if (inherits(x$network, "mlnmr_data")) type <- "ML-NMR"
   else type <- "NMA"
   cglue("A {x$trt_effects} effects {type} with a {x$likelihood} likelihood ({x$link} link).")
+  if (x$likelihood %in% c("mspline", "pexp")) {
+    deg <- switch(x$likelihood,
+                  mspline = switch(attr(x$basis[[1]], 'degree'),
+                                   "1" = "Piecewise constant",
+                                   "2" = "Quadratic M-spline",
+                                   "3" = "Cubic M-spline",
+                                   paste('Degree', attr(x$basis[[1]], 'degree'), 'M-spline')),
+                  pexp = 'Piecewise constant')
+    cglue("{deg} baseline hazard with {length(attr(x$basis[[1]], 'knots'))} internal knots.")
+  }
   if (x$consistency != "consistency") {
     if (x$consistency == "nodesplit")
       cglue("An inconsistency model ('{x$consistency}') was fitted, splitting the comparison {x$nodesplit[2]} vs. {x$nodesplit[1]}.")
     else
       cglue("An inconsistency model ('{x$consistency}') was fitted.")
   }
-  if (!is.null(x$regression)) {
-    cglue("Regression model: {rlang::as_label(x$regression)}.")
-    if (!is.null(x$xbar)) {
-      cglue("Centred covariates at the following overall mean values:")
-      print(x$xbar)
-    }
+  if (!is.null(x$regression)) cglue("Regression model: {rlang::as_label(x$regression)}.")
+  if (!is.null(x$aux_regression)) cglue("Auxiliary regression model: {rlang::as_label(x$aux_regression)}.")
+  if ((!is.null(x$regression) || !is.null(x$aux_regression)) && !is.null(x$xbar)) {
+    cglue("Centred covariates at the following overall mean values:")
+    print(x$xbar)
   }
+  if (length(setdiff(x$aux_by, ".study"))) cglue("Stratified baseline hazards by {glue::glue_collapse(x$aux_by, sep = ', ', last = ' and ')}.")
 
   sf <- as.stanfit(x)
   dots <- list(...)
@@ -70,7 +80,8 @@ print.stan_nma <- function(x, ...) {
                                     "theta_bar_cum_agd_arm",
                                     "theta_bar_cum_agd_contrast",
                                     "theta2_bar_cum",
-                                    "mu", "delta"),
+                                    "mu", "delta",
+                                    "scoef"),
                            include = include,
                            use_cache = FALSE,
                            !!! dots,
@@ -240,7 +251,8 @@ plot_prior_posterior <- function(x, ...,
       "trt"[!is.null(x$priors$prior_trt)],
       "het"[!is.null(x$priors$prior_het)],
       "reg"[!is.null(x$priors$prior_reg)],
-      "aux"[!is.null(x$priors$prior_aux)])
+      "aux"[!is.null(x$priors$prior_aux)],
+      "aux_reg"[!is.null(x$priors$prior_aux_reg)])
 
   if (is.null(prior)) {
     prior <- priors_used
@@ -265,7 +277,7 @@ plot_prior_posterior <- function(x, ...,
   # Get prior details
   prior_dat <- vector("list", length(prior))
   for (i in seq_along(prior)) {
-    if (prior[i] %in% c("het", "aux")) trunc <- c(0, Inf)
+    if (prior[i] %in% c("het", "aux") || (prior[i] == "aux_reg" && x$likelihood %in% c("mspline", "pexp"))) trunc <- c(0, Inf)
     else trunc <- NULL
 
     if (x$likelihood == "gengamma" && prior[i] == "aux") {
@@ -273,10 +285,6 @@ plot_prior_posterior <- function(x, ...,
         dplyr::bind_rows(get_tidy_prior(x$priors$prior_aux$sigma, trunc = trunc),
                          get_tidy_prior(x$priors$prior_aux$k, trunc = trunc)) %>%
         tibble::add_column(prior = c("aux", "aux2"))
-
-    } else if (x$likelihood %in% c("mspline", "pexp") && prior[i] == "aux") {
-      prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc, n_dim = n_scoef) %>%
-        tibble::add_column(prior = prior[i])
 
     } else {
       prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc) %>%
@@ -300,10 +308,15 @@ plot_prior_posterior <- function(x, ...,
                                                         loglogistic = "shape",
                                                         gamma = "shape",
                                                         gengamma = "sigma",
-                                                        mspline = "scoef",
-                                                        pexp = "scoef"),
+                                                        mspline = "sigma",
+                                                        pexp = "sigma"),
                                            aux2 = switch(x$likelihood,
-                                                         gengamma = "k")))
+                                                         gengamma = "k"),
+                                           aux_reg = switch(x$likelihood,
+                                                            pexp =, mspline = "sigma_beta",
+                                                            weibull =, gompertz =, `weibull-aft` =,
+                                                            lognormal =, loglogistic =, gamma =,
+                                                            gengamma = "beta_aux")))
 
   # Add in omega parameter if node-splitting model, which uses prior_trt
   if (inherits(x, "nma_nodesplit")) {

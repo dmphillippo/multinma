@@ -12,7 +12,6 @@
 \alias{log_student_t}
 \alias{exponential}
 \alias{flat}
-\alias{dirichlet}
 \title{Prior distributions}
 \usage{
 normal(location = 0, scale)
@@ -34,8 +33,6 @@ log_student_t(location, scale, df)
 exponential(scale = 1/rate, rate = 1/scale)
 
 flat()
-
-dirichlet(shape = 1)
 }
 \arguments{
 \item{location}{Prior location. Typically prior mean (see details).}
@@ -45,8 +42,6 @@ dirichlet(shape = 1)
 \item{df}{Prior degrees of freedom.}
 
 \item{rate}{Prior rate.}
-
-\item{shape}{Prior shape.}
 }
 \value{
 Object of class \link{nma_prior}.
@@ -81,7 +76,6 @@ will be truncated at 0 to be non-negative.\tabular{lccccc}{
    \strong{half-Student t} \code{half_student_t()} \tab - \tab - \tab Yes \tab - \tab Yes \cr
    \strong{log-Student t} \code{log_student_t()} \tab - \tab - \tab Yes \tab - \tab Yes \cr
    \strong{Exponential} \code{exponential()} \tab - \tab - \tab Yes \tab - \tab Yes \cr
-   \strong{Dirichlet} \code{dirichlet()} \tab - \tab - \tab - \tab - \tab Yes \cr
    \strong{Flat} \code{flat()} \tab Yes \tab Yes \tab Yes \tab Yes \tab Yes \cr
 }
 
@@ -92,15 +86,6 @@ entire support for a parameter. This will be an improper prior if the
 parameter is unbounded, and is not generally advised. See the
 \href{https://mc-stan.org/docs/stan-users-guide/some-differences-in-the-statistical-models-that-are-allowed.html}{Stan user's guide}
 for more details.
-
-The \code{dirichlet()} prior is currently only used as a prior distribution for
-the spline coefficients in \code{mspline} or \code{pexp} models, which form an
-\eqn{L}-dimensional unit simplex (i.e. lie between 0 and 1, and sum to 1).
-The \code{shape} parameter controls the concentration, with \code{shape=1}
-corresponding to a uniform prior over all simplexes. Values of \code{shape}
-\eqn{<1} concentrate the prior mass into the corners of the simplex, with one
-dimension close to 1 and the rest close to zero; values of \code{shape} \eqn{>1}
-increasingly concentrate all dimensions towards the prior mean \eqn{1/L}.
 }
 }
 \seealso{

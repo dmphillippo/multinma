@@ -139,10 +139,11 @@ reference:
   - matches("[pdqhH]mspline")
   - rmst_mspline
 
-- title: ggplot theme
-  desc: Default plot theme used by all package plotting functions.
+- title: ggplot functions
+  desc: Functions for creating or customising ggplot outputs.
   contents:
   - theme_multinma
+  - geom_km
 
 - title: Datasets
   desc: Datasets used for examples and vignettes.

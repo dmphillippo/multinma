@@ -15,6 +15,10 @@ flexible M-splines on the baseline hazard, and piecewise exponential hazards.
 by study to respect randomisation, and may be further stratified by treatment
 (e.g. to relax the proportional hazards assumption) and/or by additional factors
 using the `aux_by` argument to `nma()`.
+* A regression model may be defined for the auxiliary parameters using the 
+`aux_regression` argument to `nma()`, allowing non-proportionality to be 
+modelled by treatment and/or covariate effects on the shapes or spline 
+coefficients.
 * The `predict()` method produces estimates of survival probabilities, hazards, 
 cumulative hazards, mean survival times, restricted mean survival times, 
 quantiles of the survival time distribution, and median survival times. All of

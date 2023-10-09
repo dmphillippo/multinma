@@ -326,6 +326,44 @@ new_agd_int <- add_integration(new_agd_int,
                          baseline = distr(qnorm, -1.75, 0.08)))
 plot(pso_pred_new, ref_line = c(0, 1))
 }
+
+## Progression free survival with newly-diagnosed multiple myeloma
+\donttest{
+# Run newly-diagnosed multiple myeloma example if not already available
+if (!exists("ndmm_fit")) example("example_ndmm", run.donttest = TRUE)
+}
+\donttest{
+# We can produce a range of predictions from models with survival outcomes,
+# chosen with the type argument to predict
+
+# Predicted survival probabilities at 5 years
+predict(ndmm_fit, type = "survival", times = 5)
+
+# Survival curves
+plot(predict(ndmm_fit, type = "survival"))
+
+# Hazard curves
+# Here we specify a vector of times to avoid attempting to plot infinite
+# hazards for some studies at t=0
+plot(predict(ndmm_fit, type = "hazard", times = seq(0.001, 6, length.out = 50)))
+
+# Cumulative hazard curves
+plot(predict(ndmm_fit, type = "cumhaz"))
+
+# Survival time quantiles and median survival
+predict(ndmm_fit, type = "quantile", quantiles = c(0.2, 0.5, 0.8))
+plot(predict(ndmm_fit, type = "median"))
+
+# Mean survival time
+predict(ndmm_fit, type = "mean")
+
+# Restricted mean survival time
+# By default, the time horizon is the shortest follow-up time in the network
+predict(ndmm_fit, type = "rmst")
+
+# An alternative restriction time can be set using the times argument
+predict(ndmm_fit, type = "rmst", times = 5)  # 5-year RMST
+}
 }
 \seealso{
 \code{\link[=plot.nma_summary]{plot.nma_summary()}} for plotting the predictions.
