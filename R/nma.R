@@ -572,7 +572,6 @@ nma <- function(network,
   }
 
   # Set up aux_by
-  has_aux_by <- FALSE
   if (likelihood %in% valid_lhood$survival &&
       has_aux &&
       (has_ipd(network) || has_agd_arm(network))) {
@@ -591,6 +590,9 @@ nma <- function(network,
 
     # Check specs and translate into string column names
     aux_by <- colnames(get_aux_by_data(aux_dat, by = aux_by))
+  } else {
+    has_aux_by <- FALSE
+    aux_by <- NULL
   }
 
 
