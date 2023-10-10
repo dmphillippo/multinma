@@ -1550,7 +1550,7 @@ nma.fit <- function(ipd_x, ipd_y,
   # Standard pars to monitor
   pars <- c("mu", "beta", "d",
             "log_lik", "resdev",
-            "lp__")
+            "lp__", "trt_class_mean", "trt_class_sd")
 
   if (has_ipd && !is_survival) pars <- c(pars, "fitted_ipd")
   if (has_agd_arm && !is_survival) pars <- c(pars, "fitted_agd_arm")
@@ -2037,6 +2037,10 @@ nma.fit <- function(ipd_x, ipd_y,
   fnames_oi[grepl("^beta\\[[0-9]+\\]$", fnames_oi)] <- paste0("beta[", x_names[col_reg], "]")
   fnames_oi <- gsub("tau[1]", "tau", fnames_oi, fixed = TRUE)
   fnames_oi <- gsub("omega[1]", "omega", fnames_oi, fixed = TRUE)
+
+  # Class effect readable parameter names
+  fnames_oi[grepl("^trt_class_mean\\[[0-9]+\\]$", fnames_oi)] <- paste0("trt_class_mean[", col_class, "]")
+  fnames_oi[grepl("^trt_class_sd\\[[0-9]+\\]$", fnames_oi)] <- paste0("trt_class_sd[", col_class, "]")
 
   if (likelihood == "ordered") {
     if (has_ipd) l_cat <- colnames(ipd_y$.r)[-1]
