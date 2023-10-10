@@ -999,7 +999,7 @@ nma <- function(network,
                                    xbar = xbar)$X_ipd
 
     # Group common rows of X_aux for efficiency if possible
-    if (aux_int && has_agd_arm(network)) {
+    if (aux_int && use_int && has_agd_arm(network)) {
       aux_group <- 1:nrow(X_aux)
     } else {
       X_aux_dat <- as.data.frame(X_aux)
