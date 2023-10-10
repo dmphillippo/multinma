@@ -919,13 +919,14 @@ nma <- function(network,
 
       observed_survdat <- dplyr::filter(survdat, .data$observed)
 
-      if (!has_aux_regression) {
-        knots <- by(observed_survdat, observed_survdat$.study,
-                    function(x) quantile(x$time, probs = seq(1, n_knots) / (n_knots + 1)),
-                    simplify = FALSE)
-      } else {
+      knots <- by(observed_survdat, observed_survdat$.study,
+                  function(x) quantile(x$time, probs = seq(1, n_knots) / (n_knots + 1)),
+                  simplify = FALSE)
+
+      if (has_aux_regression) {
         # With aux_regression, need same spline knots across all studies
-        knots <- quantile(observed_survdat$time, probs = seq(1, n_knots) / (n_knots + 1))
+        # Take quantiles of knots in individual studies
+        knots <- quantile(unlist(knots), probs = seq(0, 1, length.out = n_knots))
         knots <- rep_len(list(knots), dplyr::n_distinct(survdat$.study))
         names(knots) <- unique(survdat$.study)
       }
