@@ -295,7 +295,7 @@ parameters {
 #include /include/parameters_common.stan
 
   // Spline coefficient regression with shrinkage over time
-  matrix[nX_aux, n_scoef-1] u_beta_aux;
+  array[nX_aux] vector[n_scoef-1] u_beta_aux;
   vector<lower=0>[nX_aux] sigma_beta;
 
   // Spline shrinkage SDs and non-centered parameterisation smoothing
@@ -316,9 +316,10 @@ transformed parameters {
 
 #include /include/transformed_parameters_common.stan
 
-  // Shrinkage regression on aux pars
-  // for (i in 1:nX_aux) beta_aux[i, ] = u_beta_aux[i, ] * sigma_beta[i];
-  beta_aux = diag_pre_multiply(sigma_beta, u_beta_aux);
+  // Random walk prior on aux regression
+  if (nX_aux) for (i in 1:nX_aux) {
+    beta_aux[i, ] = to_row_vector(cumulative_sum(u_beta_aux[i, ] .* lscoef_weight[1]) * sigma_beta[i]);
+  }
 
   // Construct spline coefficients with random walk prior around constant hazard
   if (nX_aux) {
@@ -519,10 +520,10 @@ model {
 
   // -- RW1 prior on spline coefficients --
   for (i in 1:n_aux) u_aux[i] ~ std_normal(); //logistic(0, 1);
-    prior_select_lp(sigma, prior_hyper_dist, prior_hyper_location, prior_hyper_scale, prior_hyper_df);
+  prior_select_lp(sigma, prior_hyper_dist, prior_hyper_location, prior_hyper_scale, prior_hyper_df);
 
   // -- Smoothing prior on aux regression beta --
-  for (i in 1:(n_scoef -1)) u_beta_aux[, i] ~ std_normal();
+  for (i in 1:nX_aux) u_beta_aux[i] ~ std_normal();
   prior_select_lp(sigma_beta, prior_reg_hyper_dist, prior_reg_hyper_location, prior_reg_hyper_scale, prior_reg_hyper_df);
 
   // -- IPD likelihood --
