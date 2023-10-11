@@ -951,8 +951,10 @@ nma <- function(network,
 
         if (has_aux_regression) {
           # With aux_regression, need same spline knots across all studies
-          # Take quantiles of knots in individual studies
-          knots <- quantile(unlist(knots), probs = seq(0, 1, length.out = n_knots))
+          # Take quantiles of knots and boundary knots in individual studies
+          temp_b_knots <- by(survdat, survdat$.study, function(x) c(min(x$delay_time), max(x$time)),
+                             simplify = FALSE)
+          knots <- quantile(c(unlist(knots), unlist(temp_b_knots)), probs = seq(0, 1, length.out = n_knots+2))[2:(n_knots+1)]
           knots <- rep_len(list(knots), dplyr::n_distinct(survdat$.study))
           names(knots) <- unique(survdat$.study)
         }
