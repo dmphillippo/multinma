@@ -253,6 +253,7 @@ data {
   real<lower=0> prior_hyper_scale;
   real<lower=0> prior_hyper_df;
   array[nX_aux ? 1 : max(aux_id)] vector[n_scoef-1] prior_aux_location;  // prior logistic mean
+  array[nX_aux ? 1 : max(aux_id)] vector[n_scoef-1] lscoef_weight;  // rw1 prior weights
 
   // Hyperprior on aux regression smooths
   int<lower=0,upper=6> prior_reg_hyper_dist;
@@ -264,9 +265,6 @@ transformed data {
   // Number of aux coefficient vectors
   int n_aux = max(aux_id);
   int n_aux_group = max(aux_group);
-
-  // Scaling for spline random walk SD sigma
-  real sigma_scale = sqrt(n_scoef-1);
 
   // Split aux_id by IPD and AgD rows
   array[ni_ipd] int<lower=1> aux_id_ipd = aux_id[1:ni_ipd];
@@ -325,11 +323,11 @@ transformed parameters {
   // Construct spline coefficients with random walk prior around constant hazard
   if (nX_aux) {
     for (i in 1:n_aux) {
-      lscoef[i] = cumulative_sum(u_aux[i]) * sigma[i] / sigma_scale + prior_aux_location[1];
+      lscoef[i] = cumulative_sum(u_aux[i] .* lscoef_weight[1]) * sigma[i] + prior_aux_location[1];
     }
   } else {
     for (i in 1:n_aux) {
-      lscoef[i] = cumulative_sum(u_aux[i]) * sigma[i] / sigma_scale + prior_aux_location[i];
+      lscoef[i] = cumulative_sum(u_aux[i] .* lscoef_weight[i]) * sigma[i] + prior_aux_location[i];
       scoef_temp[i] = softmax(append_row(0, lscoef[i]));
     }
   }
