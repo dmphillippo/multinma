@@ -30,7 +30,8 @@ nma(
   int_check = TRUE,
   mspline_degree = 3,
   n_knots = 7,
-  knots = NULL
+  knots = NULL,
+  mspline_basis = NULL
 )
 }
 \arguments{
@@ -140,6 +141,11 @@ the same number of knots). If unspecified (the default), the knots will be
 chosen based on \code{n_knots} as described above. If \code{aux_regression} is
 specified then \code{knots} should be a single numeric vector of knot locations
 which will be shared across all studies in the network.}
+
+\item{mspline_basis}{Instead of specifying \code{mspline_degree} and \code{n_knots} or
+\code{knots}, a named list of M-spline bases (one for each study) can be
+provided with \code{mspline_basis} which will be used directly. In this case,
+all other M-spline options will be ignored.}
 }
 \value{
 \code{nma()} returns a \link{stan_nma} object, except when \code{consistency = "nodesplit"} when a \link{nma_nodesplit} or \link{nma_nodesplit_df} object is
