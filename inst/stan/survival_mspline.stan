@@ -517,10 +517,8 @@ transformed parameters {
 model {
 #include /include/model_common.stan
 
-  // -- Prior on spline coefficients --
-  for (i in 1:n_aux) u_aux[i] ~ logistic(0, 1);
-
-  // -- Hyperprior on spline sd --
+  // -- RW1 prior on spline coefficients --
+  for (i in 1:n_aux) u_aux[i] ~ std_normal(); //logistic(0, 1);
     prior_select_lp(sigma, prior_hyper_dist, prior_hyper_location, prior_hyper_scale, prior_hyper_df);
 
   // -- Smoothing prior on aux regression beta --
