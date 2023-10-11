@@ -257,6 +257,21 @@ mspline_constant_hazard <- function(basis) {
   inv_softmax(coefs)
 }
 
+#' Create a vector of (normalised) weights for a RW(1) prior on an M-spline with
+#' unequally spaced knots
+#' @param basis M-spline basis created using splines2::mSpline()
+#' @return Vector of normalised weights
+#' @noRd
+rw1_prior_weights <- function(basis) {
+  nscoef <- ncol(basis)
+  ord <- attr(basis, "degree") + 1
+  iknots <- attr(basis, "knots")
+  bknots <- attr(basis, "Boundary.knots")
+  knots <- c(rep(bknots[1], ord), iknots, rep(bknots[2], ord))
+  wts <- 1/(ord - 1) * (knots[(ord + 1):(nscoef + ord - 1)] - knots[2:nscoef])
+  return(wts / sum(wts))
+}
+
 #' softmax transform
 #' @param x K-1 vector of reals
 #' @return K vector simplex

@@ -1945,13 +1945,19 @@ nma.fit <- function(ipd_x, ipd_y,
     # Set aux_int
     aux_int <- !is.null(X_aux) && max(aux_group) == nrow(X_aux)
 
-    # Get scoef prior means
+    # Get scoef prior means and weights for RW(1) prior with non-equally spaced knots
     if (!is.null(X_aux)) {
       # If aux_regression specified, single spline basis shared across network
       prior_aux_location <- list(mspline_constant_hazard(basis[[1]]))
+
+      lscoef_weight <- list(rw1_prior_weights(basis[[1]]))
+
     } else {
       prior_aux_location <- purrr::map(basis[unique(cbind(aux_id, study = c(ipd_s_t_all$.study, rep(agd_arm_s_t_all$.study, each = if (aux_int) n_int else 1))))[, "study"]],
                                        mspline_constant_hazard)
+
+      lscoef_weight <- purrr::map(basis[unique(cbind(aux_id, study = c(ipd_s_t_all$.study, rep(agd_arm_s_t_all$.study, each = if (aux_int) n_int else 1))))[, "study"]],
+                                  rw1_prior_weights)
 
       # Dummy prior for aux regression smoothing sd (not used)
       prior_aux_reg <- flat()
@@ -1973,6 +1979,9 @@ nma.fit <- function(ipd_x, ipd_y,
 
                                   # Number of spline coefficients
                                   n_scoef = n_scoef,
+
+                                  # RW1 prior weights
+                                  lscoef_weight = lscoef_weight,
 
                                   # Add outcomes
                                   ipd_time = ipd_time,
