@@ -30,7 +30,8 @@ nma(
   int_check = TRUE,
   mspline_degree = 3,
   n_knots = 7,
-  knots = NULL
+  knots = NULL,
+  mspline_basis = NULL
 )
 }
 \arguments{
@@ -140,6 +141,11 @@ the same number of knots). If unspecified (the default), the knots will be
 chosen based on \code{n_knots} as described above. If \code{aux_regression} is
 specified then \code{knots} should be a single numeric vector of knot locations
 which will be shared across all studies in the network.}
+
+\item{mspline_basis}{Instead of specifying \code{mspline_degree} and \code{n_knots} or
+\code{knots}, a named list of M-spline bases (one for each study) can be
+provided with \code{mspline_basis} which will be used directly. In this case,
+all other M-spline options will be ignored.}
 }
 \value{
 \code{nma()} returns a \link{stan_nma} object, except when \code{consistency = "nodesplit"} when a \link{nma_nodesplit} or \link{nma_nodesplit_df} object is
@@ -259,7 +265,7 @@ the other survival distributions implemented in this package.
 
 For the \code{mspline} and \code{pexp} likelihoods, the auxiliary parameters are the
 spline coefficients for each study. These form a unit simplex (i.e. lie
-between 0 and 1, and sum to 1), and are given a logistic random walk prior
+between 0 and 1, and sum to 1), and are given a random walk prior
 distribution. \code{prior_aux} specifies the hyperprior on the random walk
 standard deviation \eqn{\sigma} which controls the level of smoothing of
 the baseline hazard, with \eqn{\sigma = 0} corresponding to a constant
@@ -283,8 +289,8 @@ absolute predictions may only be produced for the observed treatment arms
 in each study population, whereas if \code{aux_regression = ~.trt} then absolute
 predictions can be produced for all treatments in any population. For
 \code{mspline} and \code{pexp} likelihoods, the regression coefficients are smoothed
-over time using a random effect to avoid overfitting: \code{prior_aux_reg}
-specifies the hyperprior for this smoothing random effect. For other
+over time using a random walk prior to avoid overfitting: \code{prior_aux_reg}
+specifies the hyperprior for the random walk standard deviation. For other
 parametric likelihoods, \code{prior_aux_reg} specifies the prior for the
 auxiliary regression coefficients.
 }

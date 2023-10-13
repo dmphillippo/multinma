@@ -4,12 +4,24 @@
 \alias{geom_km}
 \title{Kaplan-Meier curves of survival data}
 \usage{
-geom_km(network, ..., curve_args = list(), cens_args = list())
+geom_km(
+  network,
+  ...,
+  transform = c("identity", "cloglog", "log", "cumhaz"),
+  curve_args = list(),
+  cens_args = list()
+)
 }
 \arguments{
 \item{network}{A \code{nma_data} network object containing survival outcomes}
 
 \item{...}{Additional arguments passed to \code{\link[survival:survfit]{survival::survfit()}}}
+
+\item{transform}{Character string giving the transformation to apply to the
+KM curves before plotting. The default is \code{"identity"} for no
+transformation; other options are \code{"cloglog"} for \eqn{\log(-\log(S))},
+\code{"log"} for \eqn{\log(S)}, or \code{"cumhaz"} for the cumulative hazard
+\eqn{-\log(S)}.}
 
 \item{curve_args}{Optional list of arguments to customise the curves plotted
 with \code{\link[ggplot2:geom_path]{ggplot2::geom_step()}}}
@@ -48,12 +60,25 @@ library(ggplot2)
 ggplot() + geom_km(ndmm_net)
 
 # Adding plotting options, facets, axis labels, and a plot theme
-ggplot(mapping = aes(colour = Treatment)) +
+ggplot() +
   geom_km(ndmm_net,
           curve_args = list(linewidth = 0.5),
           cens_args = list(size = 3, shape = 124)) +
   facet_wrap(vars(Study)) +
   labs(xlab = "Time", ylab = "Survival Probability") +
+  theme_multinma()
+
+# Using the transform argument to produce log-log plots (e.g. to assess the
+# proportional hazards assumption)
+ggplot() +
+  geom_km(ndmm_net, transform = "cloglog") +
+  facet_wrap(vars(Study)) +
+  theme_multinma()
+
+# Using the transform argument to produce cumulative hazard plots
+ggplot() +
+  geom_km(ndmm_net, transform = "cumhaz") +
+  facet_wrap(vars(Study)) +
   theme_multinma()
 
 # This function can also be used to add KM data to plots of estimated survival

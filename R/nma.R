@@ -84,6 +84,10 @@
 #'   chosen based on `n_knots` as described above. If `aux_regression` is
 #'   specified then `knots` should be a single numeric vector of knot locations
 #'   which will be shared across all studies in the network.
+#' @param mspline_basis Instead of specifying `mspline_degree` and `n_knots` or
+#'   `knots`, a named list of M-spline bases (one for each study) can be
+#'   provided with `mspline_basis` which will be used directly. In this case,
+#'   all other M-spline options will be ignored.
 #'
 #' @details When specifying a model formula in the `regression` argument, the
 #'   usual formula syntax is available (as interpreted by [model.matrix()]). The
@@ -189,7 +193,7 @@
 #'
 #'   For the `mspline` and `pexp` likelihoods, the auxiliary parameters are the
 #'   spline coefficients for each study. These form a unit simplex (i.e. lie
-#'   between 0 and 1, and sum to 1), and are given a logistic random walk prior
+#'   between 0 and 1, and sum to 1), and are given a random walk prior
 #'   distribution. `prior_aux` specifies the hyperprior on the random walk
 #'   standard deviation \eqn{\sigma} which controls the level of smoothing of
 #'   the baseline hazard, with \eqn{\sigma = 0} corresponding to a constant
@@ -215,8 +219,8 @@
 #'   in each study population, whereas if `aux_regression = ~.trt` then absolute
 #'   predictions can be produced for all treatments in any population. For
 #'   `mspline` and `pexp` likelihoods, the regression coefficients are smoothed
-#'   over time using a random effect to avoid overfitting: `prior_aux_reg`
-#'   specifies the hyperprior for this smoothing random effect. For other
+#'   over time using a random walk prior to avoid overfitting: `prior_aux_reg`
+#'   specifies the hyperprior for the random walk standard deviation. For other
 #'   parametric likelihoods, `prior_aux_reg` specifies the prior for the
 #'   auxiliary regression coefficients.
 #'
@@ -274,7 +278,8 @@ nma <- function(network,
                 int_check = TRUE,
                 mspline_degree = 3,
                 n_knots = 7,
-                knots = NULL) {
+                knots = NULL,
+                mspline_basis = NULL) {
 
   # Check network
   if (!inherits(network, "nma_data")) {
@@ -388,7 +393,8 @@ nma <- function(network,
                          int_thin = int_thin,
                          mspline_degree = mspline_degree,
                          n_knots = n_knots,
-                         knots = knots)
+                         knots = knots,
+                         mspline_basis = mspline_basis)
 
       if (!missing(class_interactions)) ns_arglist$class_interactions <- class_interactions
 
@@ -878,12 +884,6 @@ nma <- function(network,
   if (likelihood %in% c("mspline", "pexp") && (has_ipd(network) || has_agd_arm(network))) {
     require_pkg("splines2")
 
-    if (likelihood == "pexp") mspline_degree <- 0
-
-    if (!rlang::is_scalar_integerish(mspline_degree, finite = TRUE) || mspline_degree < 0)
-      abort("`mspline_degree` must be a single non-negative integer.")
-
-    # Calculate boundary knots
     survdat <-
       if (!has_agd_arm(network)) {
         dplyr::tibble(.Surv = y_ipd$.Surv,
@@ -899,74 +899,105 @@ nma <- function(network,
                       observed = .data$.Surv[, "status"]  == 1)
       }
 
-    stype <- attr(survdat$.Surv, "type")
     survdat <- dplyr::mutate(survdat, !!! get_Surv_data(survdat$.Surv))
 
-    # Boundary knots at earliest entry time (0 with no delayed entry) and latest event/censoring time
-    if (!has_aux_regression) {
-      b_knots <- by(survdat, survdat$.study, function(x) c(min(x$delay_time), max(x$time)),
-                    simplify = FALSE)
+
+    if (!is.null(mspline_basis)) {
+
+      if (!is.list(mspline_basis) || any(!purrr::map_lgl(mspline_basis, is_mspline)))
+        abort("`mspline_basis` must be a named list of M-spline bases created using splines2::mSpline().")
+
+      missing_names <- setdiff(levels(survdat$.study), names(mspline_basis))
+      if (length(missing_names) > 0)
+        abort(glue::glue("`mspline_basis` must be a named list of M-spline basis for each study.\n",
+                         "Missing {if (length(missing_names) > 1) 'bases' else 'basis'} for stud{if (length(missing_names) > 1) 'ies' else 'y'} ",
+                         glue::glue_collapse(glue::double_quote(missing_names), sep = ", ", last = " and ", width = 30), "."))
+
+      if (!all(purrr::map_int(mspline_basis, ncol) == ncol(mspline_basis[[1]])))
+        abort("Each basis in `mspline_basis` must currently have the same number of knots.")
+
+      if (likelihood == "pexp" && any(purrr::map_lgl(mspline_basis, ~attr(., "degree") != 0)))
+        abort("`mspline_basis` for piecewise exponential model must all have degree = 0.")
+
+      basis <- mspline_basis
+
     } else {
-      # With aux_regression, need same spline knots across all studies
-      b_knots <- c(min(survdat$delay_time), max(survdat$time))
-      b_knots <- rep_len(list(b_knots), dplyr::n_distinct(survdat$.study))
-      names(b_knots) <- unique(survdat$.study)
-    }
 
-    if (is.null(knots)) {  # Calculate internal knots based on quantiles
-      if (!rlang::is_scalar_integerish(n_knots, finite = TRUE) || n_knots <= 0)
-        abort("`n_knots` must be a single positive integer (or specify `knots` directly)")
+      if (likelihood == "pexp") mspline_degree <- 0
 
-      observed_survdat <- dplyr::filter(survdat, .data$observed)
+      if (!rlang::is_scalar_integerish(mspline_degree, finite = TRUE) || mspline_degree < 0)
+        abort("`mspline_degree` must be a single non-negative integer.")
 
+      # Boundary knots at earliest entry time (0 with no delayed entry) and latest event/censoring time
       if (!has_aux_regression) {
+        b_knots <- by(survdat, survdat$.study, function(x) c(min(x$delay_time), max(x$time)),
+                      simplify = FALSE)
+      } else {
+        # With aux_regression, need same spline knots across all studies
+        b_knots <- c(min(survdat$delay_time), max(survdat$time))
+        b_knots <- rep_len(list(b_knots), dplyr::n_distinct(survdat$.study))
+        names(b_knots) <- unique(survdat$.study)
+      }
+
+      if (is.null(knots)) {  # Calculate internal knots based on quantiles
+        if (!rlang::is_scalar_integerish(n_knots, finite = TRUE) || n_knots <= 0)
+          abort("`n_knots` must be a single positive integer (or specify `knots` directly)")
+
+        observed_survdat <- dplyr::filter(survdat, .data$observed)
+
         knots <- by(observed_survdat, observed_survdat$.study,
                     function(x) quantile(x$time, probs = seq(1, n_knots) / (n_knots + 1)),
                     simplify = FALSE)
-      } else {
-        # With aux_regression, need same spline knots across all studies
-        knots <- quantile(observed_survdat$time, probs = seq(1, n_knots) / (n_knots + 1))
-        knots <- rep_len(list(knots), dplyr::n_distinct(survdat$.study))
-        names(knots) <- unique(survdat$.study)
+
+        if (has_aux_regression) {
+          # With aux_regression, need same spline knots across all studies
+          # Take quantiles of knots and boundary knots in individual studies
+          temp_b_knots <- by(survdat, survdat$.study, function(x) c(min(x$delay_time), max(x$time)),
+                             simplify = FALSE)
+          knots <- quantile(c(unlist(knots), unlist(temp_b_knots)), probs = seq(0, 1, length.out = n_knots+2))[2:(n_knots+1)]
+          knots <- rep_len(list(knots), dplyr::n_distinct(survdat$.study))
+          names(knots) <- unique(survdat$.study)
+        }
+
+      } else {  # User-provided internal knots
+        # Check required format
+        if (!has_aux_regression) {
+          if (!is.list(knots) || any(!purrr::map_lgl(knots, is.numeric)))
+            abort("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.")
+
+          missing_names <- setdiff(levels(survdat$.study), names(knots))
+          if (length(missing_names) > 0)
+            abort(glue::glue("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.\n",
+                             "Missing knot location vector{if (length(missing_names) > 1) 's' else ''} for stud{if (length(missing_names) > 1) 'ies' else 'y'} ",
+                             glue::glue_collapse(glue::double_quote(missing_names), sep = ", ", last = " and ", width = 30), "."))
+
+          if (!all(purrr::map_int(knots, length) == length(knots[[1]])))
+            abort("Each element of `knots` must currently be the same length (each study must have the same number of knots).")
+        } else {
+          # With aux_regression, only a single vector of knot locations is allowed
+          if (!rlang::is_bare_numeric(knots))
+            abort("`knots` must be a single numeric vector of knot locations, shared for all studies, when `aux_regression` is specified.")
+
+          knots <- rep_len(list(knots), dplyr::n_distinct(survdat$.study))
+          names(knots) <- unique(survdat$.study)
+        }
       }
 
-    } else {  # User-provided internal knots
-      # Check required format
-      if (!has_aux_regression) {
-        if (!is.list(knots) || any(!purrr::map_lgl(knots, is.numeric)))
-          abort("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.")
+      # Set up basis
+      # Only evaluate at first boundary knot for now to save time/memory
+      basis <- purrr::imap(b_knots,
+                           ~tryCatch(splines2::mSpline(.x[1],
+                                                       knots = knots[[.y]],
+                                                       Boundary.knots = .x,
+                                                       degree = mspline_degree,
+                                                       intercept = TRUE),
+                                     error = function(e) abort(glue::glue("Could not create spline basis for study {glue::double_quote(.y)}."),
+                                                               parent = e),
+                                     warning = function(w) warn(glue::glue("Warning while creating spline basis for study {glue::double_quote(.y)}."),
+                                                                parent = e))
+                           )
 
-        missing_names <- setdiff(levels(survdat$.study), names(knots))
-        if (length(missing_names) > 0)
-          abort(glue::glue("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.\n",
-                           "Missing knot location vector{if (length(missing_names > 1) 's' else ''} for stud{if (length(missing_names > 1) 'ies' else 'y'} ",
-                           glue::glue_collapse(glue::double_quote(missing_names), sep = ", ", last = " and ", width = 30), "."))
-
-        if (!all(purrr::map_int(knots, length) == length(knots[[1]])))
-          abort("Each element of `knots` must currently be the same length (each study must have the same number of knots).")
-      } else {
-        # With aux_regression, only a single vector of knot locations is allowed
-        if (!rlang::is_bare_numeric(knots))
-          abort("`knots` must be a single numeric vector of knot locations, shared for all studies, when `aux_regression` is specified.")
-
-        knots <- rep_len(list(knots), dplyr::n_distinct(survdat$.study))
-        names(knots) <- unique(survdat$.study)
-      }
     }
-
-    # Set up basis
-    # Only evaluate at first boundary knot for now to save time/memory
-    basis <- purrr::imap(b_knots,
-                         ~tryCatch(splines2::mSpline(.x[1],
-                                                     knots = knots[[.y]],
-                                                     Boundary.knots = .x,
-                                                     degree = mspline_degree,
-                                                     intercept = TRUE),
-                                   error = function(e) abort(glue::glue("Could not create spline basis for study {glue::double_quote(.y)}."),
-                                                             parent = e),
-                                   warning = function(w) warn(glue::glue("Warning while creating spline basis for study {glue::double_quote(.y)}."),
-                                                              parent = e))
-                         )
 
     # Ensure list is in factor order
     basis <- basis[levels(survdat$.study)]
@@ -999,7 +1030,7 @@ nma <- function(network,
                                    xbar = xbar)$X_ipd
 
     # Group common rows of X_aux for efficiency if possible
-    if (aux_int && has_agd_arm(network)) {
+    if (aux_int && use_int && has_agd_arm(network)) {
       aux_group <- 1:nrow(X_aux)
     } else {
       X_aux_dat <- as.data.frame(X_aux)
@@ -1944,13 +1975,19 @@ nma.fit <- function(ipd_x, ipd_y,
     # Set aux_int
     aux_int <- !is.null(X_aux) && max(aux_group) == nrow(X_aux)
 
-    # Get scoef prior means
+    # Get scoef prior means and weights for RW(1) prior with non-equally spaced knots
     if (!is.null(X_aux)) {
       # If aux_regression specified, single spline basis shared across network
       prior_aux_location <- list(mspline_constant_hazard(basis[[1]]))
+
+      lscoef_weight <- list(rw1_prior_weights(basis[[1]]))
+
     } else {
       prior_aux_location <- purrr::map(basis[unique(cbind(aux_id, study = c(ipd_s_t_all$.study, rep(agd_arm_s_t_all$.study, each = if (aux_int) n_int else 1))))[, "study"]],
                                        mspline_constant_hazard)
+
+      lscoef_weight <- purrr::map(basis[unique(cbind(aux_id, study = c(ipd_s_t_all$.study, rep(agd_arm_s_t_all$.study, each = if (aux_int) n_int else 1))))[, "study"]],
+                                  rw1_prior_weights)
 
       # Dummy prior for aux regression smoothing sd (not used)
       prior_aux_reg <- flat()
@@ -1972,6 +2009,9 @@ nma.fit <- function(ipd_x, ipd_y,
 
                                   # Number of spline coefficients
                                   n_scoef = n_scoef,
+
+                                  # RW1 prior weights
+                                  lscoef_weight = lscoef_weight,
 
                                   # Add outcomes
                                   ipd_time = ipd_time,

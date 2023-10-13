@@ -253,6 +253,7 @@ data {
   real<lower=0> prior_hyper_scale;
   real<lower=0> prior_hyper_df;
   array[nX_aux ? 1 : max(aux_id)] vector[n_scoef-1] prior_aux_location;  // prior logistic mean
+  array[nX_aux ? 1 : max(aux_id)] vector[n_scoef-1] lscoef_weight;  // rw1 prior weights
 
   // Hyperprior on aux regression smooths
   int<lower=0,upper=6> prior_reg_hyper_dist;
@@ -264,9 +265,6 @@ transformed data {
   // Number of aux coefficient vectors
   int n_aux = max(aux_id);
   int n_aux_group = max(aux_group);
-
-  // Scaling for spline random walk SD sigma
-  real sigma_scale = sqrt(n_scoef-1);
 
   // Split aux_id by IPD and AgD rows
   array[ni_ipd] int<lower=1> aux_id_ipd = aux_id[1:ni_ipd];
@@ -297,7 +295,7 @@ parameters {
 #include /include/parameters_common.stan
 
   // Spline coefficient regression with shrinkage over time
-  matrix[nX_aux, n_scoef-1] u_beta_aux;
+  array[nX_aux] vector[n_scoef-1] u_beta_aux;
   vector<lower=0>[nX_aux] sigma_beta;
 
   // Spline shrinkage SDs and non-centered parameterisation smoothing
@@ -318,18 +316,19 @@ transformed parameters {
 
 #include /include/transformed_parameters_common.stan
 
-  // Shrinkage regression on aux pars
-  // for (i in 1:nX_aux) beta_aux[i, ] = u_beta_aux[i, ] * sigma_beta[i];
-  beta_aux = diag_pre_multiply(sigma_beta, u_beta_aux);
+  // Random walk prior on aux regression
+  if (nX_aux) for (i in 1:nX_aux) {
+    beta_aux[i, ] = to_row_vector(cumulative_sum(u_beta_aux[i, ] .* lscoef_weight[1]) * sigma_beta[i]);
+  }
 
   // Construct spline coefficients with random walk prior around constant hazard
   if (nX_aux) {
     for (i in 1:n_aux) {
-      lscoef[i] = cumulative_sum(u_aux[i]) * sigma[i] / sigma_scale + prior_aux_location[1];
+      lscoef[i] = cumulative_sum(u_aux[i] .* lscoef_weight[1]) * sigma[i] + prior_aux_location[1];
     }
   } else {
     for (i in 1:n_aux) {
-      lscoef[i] = cumulative_sum(u_aux[i]) * sigma[i] / sigma_scale + prior_aux_location[i];
+      lscoef[i] = cumulative_sum(u_aux[i] .* lscoef_weight[i]) * sigma[i] + prior_aux_location[i];
       scoef_temp[i] = softmax(append_row(0, lscoef[i]));
     }
   }
@@ -519,14 +518,12 @@ transformed parameters {
 model {
 #include /include/model_common.stan
 
-  // -- Prior on spline coefficients --
-  for (i in 1:n_aux) u_aux[i] ~ logistic(0, 1);
-
-  // -- Hyperprior on spline sd --
-    prior_select_lp(sigma, prior_hyper_dist, prior_hyper_location, prior_hyper_scale, prior_hyper_df);
+  // -- RW1 prior on spline coefficients --
+  for (i in 1:n_aux) u_aux[i] ~ std_normal(); //logistic(0, 1);
+  prior_select_lp(sigma, prior_hyper_dist, prior_hyper_location, prior_hyper_scale, prior_hyper_df);
 
   // -- Smoothing prior on aux regression beta --
-  for (i in 1:(n_scoef -1)) u_beta_aux[, i] ~ std_normal();
+  for (i in 1:nX_aux) u_beta_aux[i] ~ std_normal();
   prior_select_lp(sigma_beta, prior_reg_hyper_dist, prior_reg_hyper_location, prior_reg_hyper_scale, prior_reg_hyper_df);
 
   // -- IPD likelihood --

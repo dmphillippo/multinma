@@ -23,6 +23,11 @@ coefficients.
 cumulative hazards, mean survival times, restricted mean survival times, 
 quantiles of the survival time distribution, and median survival times. All of
 these predictions can be plotted using the `plot()` method.
+* The `geom_km()` function assists in plotting Kaplan-Meier curves from a 
+network object, for example to overlay these on estimated survival curves. The 
+`transform` argument can be used to produce log-log plots for assessing the 
+proportional hazards assumption, along with cumulative hazards or log survival 
+curves.
 * A new vignette demonstrates ML-NMR survival analysis with an example of 
 progression-free survival after autologous stem cell transplant for newly 
 diagnosed multiple myeloma, with corresponding datasets `ndmm_ipd`, `ndmm_agd`,
