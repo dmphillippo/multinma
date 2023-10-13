@@ -12,7 +12,7 @@ meta-regression models in Stan."><meta property="og:image" content="https://dmph
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.9003</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.9004</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,7 +101,8 @@ meta-regression models in Stan.</p>
 <span>  int_check <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  mspline_degree <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  n_knots <span class="op">=</span> <span class="fl">7</span>,</span>
-<span>  knots <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  knots <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  mspline_basis <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -265,6 +266,13 @@ chosen based on <code>n_knots</code> as described above. If <code>aux_regression
 specified then <code>knots</code> should be a single numeric vector of knot locations
 which will be shared across all studies in the network.</p></dd>
 
+
+<dt>mspline_basis</dt>
+<dd><p>Instead of specifying <code>mspline_degree</code> and <code>n_knots</code> or
+<code>knots</code>, a named list of M-spline bases (one for each study) can be
+provided with <code>mspline_basis</code> which will be used directly. In this case,
+all other M-spline options will be ignored.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -379,7 +387,7 @@ are not part of the parameter space; however, \(Q &gt; 0\) still encompasses
 the other survival distributions implemented in this package.</p>
 <p>For the <code>mspline</code> and <code>pexp</code> likelihoods, the auxiliary parameters are the
 spline coefficients for each study. These form a unit simplex (i.e. lie
-between 0 and 1, and sum to 1), and are given a logistic random walk prior
+between 0 and 1, and sum to 1), and are given a random walk prior
 distribution. <code>prior_aux</code> specifies the hyperprior on the random walk
 standard deviation \(\sigma\) which controls the level of smoothing of
 the baseline hazard, with \(\sigma = 0\) corresponding to a constant
@@ -401,8 +409,8 @@ absolute predictions may only be produced for the observed treatment arms
 in each study population, whereas if <code>aux_regression = ~.trt</code> then absolute
 predictions can be produced for all treatments in any population. For
 <code>mspline</code> and <code>pexp</code> likelihoods, the regression coefficients are smoothed
-over time using a random effect to avoid overfitting: <code>prior_aux_reg</code>
-specifies the hyperprior for this smoothing random effect. For other
+over time using a random walk prior to avoid overfitting: <code>prior_aux_reg</code>
+specifies the hyperprior for the random walk standard deviation. For other
 parametric likelihoods, <code>prior_aux_reg</code> specifies the prior for the
 auxiliary regression coefficients.</p>
 </div>
@@ -487,17 +495,17 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                               mean se_mean   sd     2.5%      25%      50%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          0.84    0.00 0.18     0.49     0.72     0.84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          0.84    0.00 0.18     0.49     0.72     0.85</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     0.77    0.00 0.06     0.65     0.73     0.77</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  0.22    0.00 0.12    -0.02     0.14     0.23</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -6008.35    0.09 3.69 -6016.54 -6010.56 -6008.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  0.23    0.00 0.13    -0.03     0.14     0.23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -6008.29    0.08 3.65 -6016.22 -6010.48 -6007.97</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                75%    97.5% n_eff Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          0.96     1.19  1702    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     0.81     0.88  1428    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  0.31     0.47  2200    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -6005.68 -6002.26  1520    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          0.96     1.18  2031    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     0.81     0.89  1753    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  0.31     0.47  2477    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -6005.75 -6002.11  1877    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Mon Oct  9 13:27:59 2023.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Fri Oct 13 12:21:35 2023.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
@@ -518,19 +526,19 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                               mean se_mean   sd     2.5%      25%      50%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          1.09    0.01 0.43     0.28     0.81     1.08</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     0.84    0.01 0.23     0.40     0.68     0.83</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  0.48    0.01 0.39    -0.25     0.22     0.48</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -5920.25    0.18 6.38 -5933.54 -5924.31 -5919.90</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau                           0.82    0.00 0.18     0.55     0.70     0.80</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          1.10    0.01 0.43     0.24     0.82     1.09</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     0.84    0.01 0.23     0.38     0.69     0.84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  0.51    0.01 0.40    -0.26     0.23     0.51</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -5920.03    0.21 6.58 -5933.67 -5924.50 -5919.68</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau                           0.83    0.01 0.19     0.54     0.70     0.81</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                75%    97.5% n_eff Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          1.36     1.96  2259    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     0.98     1.29  1419    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  0.74     1.26  1670    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -5915.78 -5908.89  1265    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau                           0.93     1.23  1533    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          1.37     1.98  2103 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     0.99     1.31  1197 1.01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  0.77     1.32  1748 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -5915.39 -5907.86  1015 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau                           0.94     1.26  1298 1.00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Mon Oct  9 13:28:11 2023.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Fri Oct 13 12:21:47 2023.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
@@ -553,34 +561,34 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                     mean se_mean   sd     2.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]            1.15    0.01 0.81    -0.36</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]       0.90    0.01 0.28     0.34</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                    0.33    0.01 0.58    -0.83</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]    -0.30    0.01 0.60    -1.49</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]                 -0.61    0.01 0.71    -1.96</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]             0.15    0.02 1.06    -1.96</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                            -5933.49    0.18 6.28 -5946.60</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                                 0.93    0.01 0.22     0.59</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]            1.13    0.02 0.79    -0.36</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]       0.90    0.01 0.27     0.41</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                    0.34    0.01 0.58    -0.79</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]    -0.29    0.01 0.59    -1.40</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]                 -0.66    0.01 0.71    -2.09</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]             0.16    0.02 1.04    -1.86</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                            -5933.58    0.20 6.38 -5946.70</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                                 0.93    0.01 0.21     0.59</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                      25%      50%      75%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]            0.58     1.12     1.67</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]       0.72     0.89     1.08</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                   -0.05     0.33     0.70</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]            0.59     1.12     1.62</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]       0.73     0.89     1.07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                   -0.04     0.34     0.70</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]    -0.70    -0.31     0.09</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]                 -1.07    -0.62    -0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]            -0.54     0.14     0.83</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                            -5937.52 -5933.05 -5929.07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                                 0.78     0.90     1.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]                 -1.11    -0.65    -0.20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]            -0.52     0.15     0.83</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                            -5937.76 -5933.13 -5929.13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                                 0.78     0.90     1.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                    97.5% n_eff Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]            2.83  2946    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]       1.46  1231    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                    1.49  2117    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]     0.90  2214    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]                  0.81  2275    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]             2.26  4064    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                            -5922.00  1255    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                                 1.45  1065    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]            2.78  2582 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]       1.45  1067 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                    1.55  1753 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]     0.91  2627 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]                  0.75  2645 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]             2.18  4172 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                            -5921.84  1048 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                                 1.41  1082 1.01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Mon Oct  9 13:28:24 2023.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Fri Oct 13 12:22:00 2023.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
@@ -611,96 +619,96 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">------------------------------</span> <span style="font-weight: bold;">Node-split Group counselling vs. No intervention</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  mean   sd  2.5%   25%   50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_net            1.09 0.45  0.22  0.81  1.08 1.37  2.00     1904     1893    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir            1.07 0.75 -0.41  0.58  1.03 1.54  2.62     3260     2534    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind            1.14 0.55  0.03  0.78  1.15 1.50  2.20     1854     1767    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> omega           -0.07 0.92 -1.85 -0.70 -0.11 0.51  1.80     2566     2181    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.86 0.19  0.55  0.72  0.84 0.98  1.30     1041     2080    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.83 0.18  0.54  0.70  0.80 0.93  1.26     1183     1708    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_net            1.10 0.44  0.26  0.81  1.08 1.38  2.02     1991     2299    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir            1.05 0.74 -0.31  0.57  1.03 1.52  2.55     3298     2479    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind            1.14 0.56  0.05  0.78  1.13 1.49  2.26     1506     1740    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> omega           -0.08 0.90 -1.80 -0.65 -0.10 0.48  1.64     2439     2515    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.86 0.20  0.55  0.73  0.83 0.97  1.34     1180     2024    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.84 0.18  0.55  0.71  0.82 0.94  1.25     1324     1977    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54.7<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 99.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54.9<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 99.7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.91</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">-------------------------</span> <span style="font-weight: bold;">Node-split Individual counselling vs. No intervention</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 mean   sd  2.5%   25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           0.85 0.23  0.39  0.69 0.84 1.00  1.34     1248     1773    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir           0.88 0.25  0.42  0.73 0.88 1.03  1.40     2149     2595    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           0.58 0.66 -0.73  0.15 0.58 1.01  1.87     1827     2132    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> omega           0.30 0.68 -1.02 -0.14 0.31 0.75  1.64     1829     2295    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau             0.86 0.20  0.55  0.73 0.84 0.97  1.30     1397     1843    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency 0.83 0.18  0.54  0.70 0.80 0.93  1.26     1183     1708    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           0.84 0.24  0.41  0.68 0.84 0.99  1.33     1179     1661    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir           0.88 0.25  0.41  0.71 0.87 1.03  1.38     1751     2285    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           0.57 0.68 -0.73  0.13 0.54 1.00  1.93     1494     2080    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> omega           0.31 0.70 -1.09 -0.16 0.32 0.77  1.68     1472     1772    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau             0.86 0.19  0.56  0.72 0.84 0.98  1.30     1208     1651    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency 0.84 0.18  0.55  0.71 0.82 0.94  1.25     1324     1977    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 43.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 97.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.64</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">--------------------------------------</span> <span style="font-weight: bold;">Node-split Self-help vs. No intervention</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  mean   sd  2.5%   25%   50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_net            0.49 0.41 -0.28  0.22  0.48 0.74  1.32     1515     2036    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir            0.34 0.55 -0.71 -0.03  0.33 0.71  1.47     3324     2786    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind            0.69 0.62 -0.53  0.29  0.68 1.10  1.91     2279     2673    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> omega           -0.35 0.84 -2.00 -0.90 -0.35 0.21  1.33     2252     2302    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.87 0.20  0.56  0.73  0.84 0.98  1.34     1405     1876    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.83 0.18  0.54  0.70  0.80 0.93  1.26     1183     1708    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_net            0.49 0.40 -0.28  0.23  0.48 0.74  1.31     1900     2357    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir            0.32 0.55 -0.76 -0.04  0.31 0.66  1.43     2979     2574    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind            0.72 0.64 -0.53  0.29  0.70 1.13  2.01     1790     2306    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> omega           -0.40 0.85 -2.14 -0.94 -0.38 0.16  1.22     1944     1936    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.87 0.20  0.57  0.73  0.84 0.98  1.34     1096     1738    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.84 0.18  0.55  0.71  0.82 0.94  1.25     1324     1977    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.9<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.66</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.64</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">-----------------------</span> <span style="font-weight: bold;">Node-split Individual counselling vs. Group counselling</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           -0.25 0.42 -1.08 -0.52 -0.24  0.02  0.57     2632     2595    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir           -0.11 0.48 -1.09 -0.41 -0.11  0.20  0.85     3696     2970    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           -0.52 0.62 -1.75 -0.93 -0.51 -0.11  0.71     1538     1822    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> omega            0.42 0.69 -0.94 -0.02  0.42  0.86  1.76     1515     1882    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.86 0.20  0.56  0.72  0.83  0.97  1.33     1197     2118    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.83 0.18  0.54  0.70  0.80  0.93  1.26     1183     1708    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           -0.26 0.41 -1.11 -0.53 -0.25  0.02  0.54     2579     2347    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir           -0.11 0.48 -1.05 -0.43 -0.11  0.21  0.86     4055     3165    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           -0.54 0.61 -1.82 -0.93 -0.52 -0.14  0.64     1490     2115    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> omega            0.43 0.67 -0.91  0.00  0.44  0.88  1.77     1479     1967    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.85 0.19  0.55  0.72  0.83  0.96  1.30     1277     1929    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.84 0.18  0.55  0.71  0.82  0.94  1.25     1324     1977    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.8<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 97.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54.2<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.52</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">------------------------------------</span> <span style="font-weight: bold;">Node-split Self-help vs. Group counselling</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           -0.60 0.50 -1.58 -0.93 -0.60 -0.29  0.40     2596     2533    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir           -0.62 0.66 -1.93 -1.05 -0.62 -0.18  0.67     3177     2883    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           -0.63 0.68 -2.04 -1.07 -0.62 -0.19  0.71     1978     2173    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> omega            0.01 0.90 -1.75 -0.57  0.01  0.58  1.82     1928     2294    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.88 0.21  0.56  0.74  0.85  0.99  1.36     1099     1369    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.83 0.18  0.54  0.70  0.80  0.93  1.26     1183     1708    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           -0.61 0.49 -1.60 -0.93 -0.60 -0.29  0.34     2901     2833 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir           -0.61 0.65 -1.91 -1.04 -0.59 -0.18  0.67     4111     2929 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           -0.65 0.67 -1.97 -1.07 -0.64 -0.21  0.62     2052     2067 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> omega            0.04 0.88 -1.63 -0.54  0.01  0.60  1.84     2149     2439 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.88 0.21  0.57  0.73  0.85  0.99  1.36     1173     1993 1.01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.84 0.18  0.55  0.71  0.82  0.94  1.25     1324     1977 1.00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.9<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.8<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.99</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">-------------------------------</span> <span style="font-weight: bold;">Node-split Self-help vs. Individual counselling</span> <span style="color: #555555;">----</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           -0.36 0.42 -1.20 -0.63 -0.36 -0.08  0.46     2059     2140    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir            0.05 0.65 -1.25 -0.36  0.06  0.47  1.34     3362     3258    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           -0.60 0.53 -1.63 -0.94 -0.61 -0.26  0.44     1795     2353    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> omega            0.66 0.81 -0.97  0.14  0.65  1.17  2.27     2247     2391    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.85 0.19  0.55  0.71  0.83  0.95  1.31     1043     1616    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.83 0.18  0.54  0.70  0.80  0.93  1.26     1183     1708    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_net           -0.36 0.41 -1.15 -0.61 -0.35 -0.10  0.44     2275     2489    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_dir            0.07 0.67 -1.29 -0.36  0.06  0.50  1.40     3098     2655    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d_ind           -0.63 0.54 -1.76 -0.97 -0.62 -0.29  0.42     1876     2188    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> omega            0.70 0.85 -0.99  0.14  0.69  1.23  2.47     1995     2187    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau              0.86 0.21  0.54  0.72  0.83  0.97  1.32     1083     1380    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau_consistency  0.84 0.18  0.55  0.71  0.82  0.94  1.25     1324     1977    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.9<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.7<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 97.8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bayesian p-value: 0.4</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
@@ -866,50 +874,50 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                         mean se_mean   sd     2.5%      25%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso]                           0.04    0.00 0.06    -0.08     0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys]                          -0.14    0.00 0.16    -0.45    -0.24</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa]                              -0.07    0.01 0.44    -0.98    -0.37</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys]                          -0.14    0.00 0.16    -0.44    -0.24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa]                              -0.07    0.01 0.44    -1.00    -0.36</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight]                            0.04    0.00 0.03    -0.02     0.02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa]                              -0.08    0.00 0.17    -0.42    -0.19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03    0.00 0.08    -0.18    -0.08</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01    0.00 0.07    -0.15    -0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.19    0.00 0.19    -0.19     0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.06    0.00 0.18    -0.29    -0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03    0.00 0.07    -0.17    -0.08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01    0.00 0.07    -0.14    -0.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.19    0.00 0.18    -0.17     0.07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.06    0.00 0.17    -0.27    -0.06</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.06    0.01 0.52    -0.93    -0.29</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassIL blocker]           0.29    0.01 0.48    -0.61    -0.04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    0.00 0.03    -0.23    -0.19</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassIL blocker]           0.29    0.01 0.49    -0.64    -0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    0.00 0.03    -0.24    -0.19</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassIL blocker]       -0.10    0.00 0.03    -0.16    -0.12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.06    0.00 0.21    -0.45    -0.20</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassIL blocker]           0.01    0.00 0.19    -0.36    -0.12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[ETN]                                  1.55    0.00 0.08     1.39     1.50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q2W]                              2.95    0.00 0.08     2.79     2.90</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.06    0.00 0.21    -0.48    -0.20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassIL blocker]           0.01    0.00 0.19    -0.35    -0.12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[ETN]                                  1.55    0.00 0.08     1.40     1.50</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q2W]                              2.95    0.00 0.09     2.79     2.89</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q4W]                              2.54    0.00 0.08     2.39     2.49</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_150]                              2.15    0.00 0.12     1.91     2.07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45    0.00 0.12     2.21     2.37</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1653.74    0.09 3.55 -1661.86 -1655.88</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_150]                              2.15    0.00 0.12     1.92     2.07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45    0.00 0.12     2.22     2.37</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1653.65    0.09 3.56 -1661.40 -1655.79</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                          50%      75%    97.5% n_eff Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso]                           0.04     0.08     0.16  6720    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys]                          -0.14    -0.03     0.19  5822    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa]                              -0.07     0.23     0.77  5931    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight]                            0.04     0.06     0.09  5660    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa]                              -0.07     0.04     0.25  6830    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03     0.02     0.12  7200    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01     0.04     0.12  8418    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.19     0.32     0.56  5847    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.07     0.18     0.40  7168    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.05     0.41     1.09  6543    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassIL blocker]           0.29     0.62     1.25  7581    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    -0.14    -0.10  6029    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassIL blocker]       -0.10    -0.08    -0.03  6519    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.05     0.08     0.36  6879    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassIL blocker]           0.00     0.13     0.39  8211    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[ETN]                                  1.55     1.61     1.71  4099    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q2W]                              2.96     3.01     3.12  4977    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q4W]                              2.54     2.59     2.69  5848    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_150]                              2.14     2.22     2.38  4637    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45     2.53     2.68  5763    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1653.41 -1651.16 -1647.93  1696    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso]                           0.04     0.09     0.16  5940    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys]                          -0.14    -0.03     0.17  5461    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa]                              -0.06     0.23     0.75  5448    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight]                            0.04     0.06     0.10  5671    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa]                              -0.07     0.04     0.24  5144    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03     0.02     0.12  6072    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01     0.03     0.12  6969    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.19     0.31     0.54  5249    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.06     0.18     0.40  6469    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.05     0.40     1.09  6195    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassIL blocker]           0.28     0.61     1.27  7162    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    -0.14    -0.10  6095    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassIL blocker]       -0.10    -0.08    -0.04  6446    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.06     0.09     0.36  5825    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassIL blocker]           0.01     0.13     0.38  6109    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[ETN]                                  1.55     1.61     1.71  4239    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q2W]                              2.95     3.01     3.12  4800    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q4W]                              2.54     2.59     2.70  5544    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_150]                              2.15     2.22     2.38  4956    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45     2.53     2.69  5411    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1653.30 -1651.11 -1647.79  1494    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Mon Oct  9 13:30:55 2023.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Fri Oct 13 12:24:24 2023.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
@@ -966,25 +974,25 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                         mean se_mean   sd     2.5%      25%      50%      75%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Len]                 -0.54    0.00 0.04    -0.62    -0.57    -0.54    -0.51</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Thal]                -0.11    0.00 0.09    -0.29    -0.17    -0.11    -0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                -6280.03    0.06 2.40 -6285.60 -6281.39 -6279.73 -6278.32</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> shape[Attal2012]        1.30    0.00 0.06     1.19     1.26     1.30     1.34</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Len]                 -0.54    0.00 0.04    -0.63    -0.57    -0.54    -0.51</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Thal]                -0.11    0.00 0.09    -0.28    -0.17    -0.11    -0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                -6280.16    0.06 2.44 -6285.76 -6281.57 -6279.83 -6278.39</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> shape[Attal2012]        1.30    0.00 0.06     1.18     1.25     1.30     1.34</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> shape[Jackson2019]      0.93    0.00 0.02     0.89     0.92     0.93     0.95</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> shape[McCarthy2012]     1.29    0.00 0.07     1.17     1.25     1.29     1.34</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> shape[Morgan2012]       0.88    0.00 0.03     0.82     0.86     0.88     0.90</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> shape[Palumbo2014]      1.02    0.00 0.07     0.88     0.97     1.01     1.06</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                        97.5% n_eff Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Len]                 -0.45  5288    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Thal]                 0.06  5636    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                -6276.35  1761    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> shape[Attal2012]        1.42  4723    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> shape[Jackson2019]      0.98  4993    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> shape[McCarthy2012]     1.42  4337    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> shape[Morgan2012]       0.95  5256    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> shape[Palumbo2014]      1.17  4569    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Len]                 -0.45  6122    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Thal]                 0.06  5072    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                -6276.32  1769    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> shape[Attal2012]        1.42  5217    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> shape[Jackson2019]      0.98  4605    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> shape[McCarthy2012]     1.43  4892    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> shape[Morgan2012]       0.94  5711    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> shape[Palumbo2014]      1.16  4957    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Mon Oct  9 13:33:36 2023.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Fri Oct 13 12:26:59 2023.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>

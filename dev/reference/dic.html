@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.9003</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.9004</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -117,13 +117,13 @@ producing plots of residual deviance contributions.</p></div>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Compare DIC of FE and RE models</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="va">smk_dic_FE</span> <span class="op">&lt;-</span> <span class="fu">dic</span><span class="op">(</span><span class="va">smk_fit_FE</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 267.1<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 27</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 294.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 267.2<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 27.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 294.3</span>
 <span class="r-in"><span><span class="op">(</span><span class="va">smk_dic_RE</span> <span class="op">&lt;-</span> <span class="fu">dic</span><span class="op">(</span><span class="va">smk_fit_RE</span><span class="op">)</span><span class="op">)</span>   <span class="co"># substantially better fit</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54.1<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 43.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54.3<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.5</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot residual deviance contributions under RE model</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_dic_RE</span><span class="op">)</span></span></span>
@@ -138,13 +138,13 @@ producing plots of residual deviance contributions.</p></div>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Compare DIC</span></span></span>
 <span class="r-in"><span><span class="va">smk_dic_RE</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54.1<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 43.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 54.3<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.5</span>
 <span class="r-in"><span><span class="op">(</span><span class="va">smk_dic_RE_UME</span> <span class="op">&lt;-</span> <span class="fu">dic</span><span class="op">(</span><span class="va">smk_fit_RE_UME</span><span class="op">)</span><span class="op">)</span>  <span class="co"># no difference in fit</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.5<span style="color: #555555;"> (on 50 data points)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 44.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 53.7<span style="color: #555555;"> (on 50 data points)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                pD: 45</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               DIC: 98.7</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Compare residual deviance contributions</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_dic_RE</span>, <span class="va">smk_dic_RE_UME</span>, show_uncertainty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
