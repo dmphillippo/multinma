@@ -155,6 +155,8 @@ ggplot() +
   theme(legend.position = "top", legend.box.spacing = unit(0, "lines"))
 ```
 
+The `transform` argument to `geom_km()` can be used to transform the Kaplan-Meier curves prior to plotting, for example `transform = "cloglog"` to assess proportional hazards with a log-log plot.
+
 # ML-NMR models with M-spline baseline hazards
 We fit a proportional hazards survival model with cubic M-splines on the baseline hazard [@Brilleman2020,@Phillippo_survival].
 This allows the baseline hazard to flexibly follow any shape that the baseline hazard may take.
@@ -162,7 +164,7 @@ ML-NMR models are fit using the `nma()` function, and we specify that a M-spline
 
 Fitting spline models requires the user to specify the number and location of the knots.
 By default, seven internal knots are used (`n_knots = 7`) which are placed at evenly spaced quantiles on the observed event times within each study.
-Overfitting is avoided by the use of a logistic random walk prior distribution on the (multivariate logit transformed) spline coefficients that penalises complexity and shrinks towards a constant baseline hazard [@Phillippo_survival]; in practice this means that the number of knots can be set to a sufficiently large number and left to shrink to a suitable level of complexity controlled by the standard deviation of the random walk. 
+Overfitting is avoided by the use of a random walk prior distribution on the (inverse softmax transformed) spline coefficients that penalises complexity and shrinks towards a constant baseline hazard [@Phillippo_survival]; in practice this means that the number of knots can be set to a sufficiently large number and left to shrink to a suitable level of complexity controlled by the standard deviation of the random walk.
 The number of knots can be changed using the `n_knots` argument, or custom knot locations can be specified using the `knots` argument.
 The `nma()` function will always place boundary knots at the earliest entry time into the study (0 with no delayed entry) and at the maximum event/censoring time.
 
@@ -238,8 +240,9 @@ plot(predict(ndmm_fit, type = "hazard", level = "individual",
 # Assessing the proportional hazards assumption
 
 We can relax and assess the proportional hazards (PH) assumption by allowing the spline coefficients to vary between treatment arms within each study.
-This is achieved using the `aux_by` argument, with `aux_by = c(.study, .trt)`.
+This may be achieved using the `aux_by` argument, with `aux_by = c(.study, .trt)`.
 Technically, `aux_by = .study` is always assumed in order to respect randomisation (analogous to stratifying the intercept terms in a NMA by study), and we could simply write `aux_by = .trt`; but we choose to make the stratification by study explicit in this instance.
+
 ```{r}
 ndmm_fit_nph <- nma(ndmm_net,
                     regression = ~(age + iss_stage3 + response_cr_vgpr + male)*.trt,
@@ -273,7 +276,13 @@ cbind(
 )
 ```
 The LOOIC is similar or lower for the proportional hazards model compared to the non-proportional hazards model in all studies.
-There is no evidence to suggest that the proportional hazards assumption is invalid here.
+Based on LOOIC alone, there is no evidence to suggest that the proportional hazards assumption is invalid here.
+Later, visual inspection of the estimated survival curves also suggests that the model is a good fit to the data.
+
+Stratifying the baseline hazards by treatment arm (as well as by study) results in a model that cannot produce absolute predictions for treatments in populations where they have not already been observed; e.g. an estimated survival curve for thalidomide can only be produced in the Morgan2012 study population (the only study with a thalidomide arm), and a survival curve for lenalidomide cannot be produced in this population.
+Instead, if the proportional hazards assumption is deemed inappropriate, we might consider instead modelling departures from proportional hazards using the `aux_regression` argument to `nma()` which places a model on the (inverse softmax transformed) spline coefficients, or on the shape parameters in a parametric model.
+For example, we can allow the baseline hazard to vary smoothly by treatment arm (`aux_regression = ~.trt`) and/or by other covariates (e.g. `aux_regression = ~.trt + iss_stage3`).
+This further relaxes the proportional hazards assumption (which is already relaxed by the inclusion of patient-level covariates), whilst still allowing predictions to be produced on every treatment in any population of interest.
 
 # Comparison to unadjusted NMA
 For comparison, we also fit NMA models without any covariate adjustment, both with and without the proportional hazards assumption.
@@ -314,6 +323,8 @@ cbind(
 Whilst there is little difference in overall model fit, the non-PH model is preferred in the Jackson2019 study with a substantially lower LOOIC.
 Including the covariates in the ML-NMR model is sufficient to remove this PH violation, even though the covariates are fixed and not time-varying, and the ML-NMR model is a much better fit overall.
 
+> **Note:** This test is likely to have low power, and is not a substitute for the usual inspection of proportional hazards prior to analysis. Using `transform = "cloglog"` in `geom_km()` to produce log-log plots is one option to assess proportionality.
+
 # Producing population-average estimates
 We now produce population-average estimates for several different quantities of interest.
 The usual array of posterior summary functions is available, including `relative_effects()`, `predict()`, `posterior_ranks()` and `posterior_rank_probs()`.
@@ -335,10 +346,13 @@ To produce population-average survival curves we use the `predict()` function wi
 These are marginal or standardised survival curves.
 We also overlay the unadjusted Kaplan-Meier curves from the data using the `geom_km()` helper function.
 ```{r ndmm-survival}
-plot(predict(ndmm_fit, type = "survival")) + 
+plot(predict(ndmm_fit, type = "survival")) +
   geom_km(ndmm_net) +
   theme(legend.position = "top", legend.box.spacing = unit(0, "lines"))
 ```
+
+Whilst the adjusted and unadjusted curves are not exactly comparable (although these are both marginal survival estimates, the adjusted curves account for differences in covariate distributions between arms and are relevant to the overall population of each study), the estimated survival curves are a good fit to the data.
+The baseline imbalance in sex in Palumbo2014 study has been accounted for in the model, which explains the slight differences against the Kaplan-Meier curves there.
 
 ## Population-average median survival times
 The `predict()` function can produce a range of other absolute effect summaries, for example population-average median survival times:
