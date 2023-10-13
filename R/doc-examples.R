@@ -122,6 +122,7 @@ NULL
 #'   object `ndmm_fit` will then be available in the global environment.
 #'
 #' @keywords examples
+#' @template ex_ndmm_network
 #' @template ex_ndmm
 #' @examples \dontshow{
 #' if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) {

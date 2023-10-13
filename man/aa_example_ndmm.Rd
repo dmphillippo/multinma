@@ -10,6 +10,19 @@ using the code in the Examples section below. The resulting \code{stan_nma}
 object \code{ndmm_fit} will then be available in the global environment.
 }
 \examples{
+# Set up newly-diagnosed multiple myeloma network
+
+head(ndmm_ipd)
+head(ndmm_agd)
+
+ndmm_net <- combine_network(
+  set_ipd(ndmm_ipd,
+          study, trt,
+          Surv = Surv(eventtime / 12, status)),
+  set_agd_surv(ndmm_agd,
+               study, trt,
+               Surv = Surv(eventtime / 12, status),
+               covariates = ndmm_agd_covs))
 \donttest{
 # Fit Weibull (PH) model
 ndmm_fit <- nma(ndmm_net, \dontshow{refresh = if (interactive()) 200 else 0,}
