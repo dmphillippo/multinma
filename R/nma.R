@@ -946,6 +946,10 @@ nma <- function(network,
   # Ensure classes are factors
 if (class_effects != "independant") {
   which_class(network$classes) -> CE_vector
+
+  # Convert CE_vector to a factor and set its levels to the unique class names
+  CE_vector <- as.factor(CE_vector)
+  levels(CE_vector) <- levels(network$classes)
 }
 
   # Create class_effects_sd design vectors
@@ -957,7 +961,7 @@ if (class_effects != "independant") {
     CEsd_vector[CEsd_vector != 0] <- 1}
   if (class_sd == "independant") {
     CEsd_vector <- CE_vector}
-    }
+  }
 
   # Fit using nma.fit
   stanfit <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
