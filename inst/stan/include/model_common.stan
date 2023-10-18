@@ -51,16 +51,12 @@ if (ni_agd_contrast) {
 
 // Class effects model for the d's
 if (class_effects) {
-  for (t in 1:nt) {  # for every treatment
-    if (which_class[t] != 0) {   # if there is more then 1 of this treatment class then it wont be zero
-      d[t] ~ normal(trt_class_mean[which_class[t]], trt_class_sd[which_class[t]]); # apply the trt_class_mean on that treatment
+  for (t in 1:nt) {  // for every treatment
+    if (which_class[t] != 0) {   // if there is more then 1 of this treatment class then it wont be zero
+      d[t] ~ normal(trt_class_mean[which_class[t]], trt_class_sd[which_class[t]]); // apply the trt_class_mean on that treatment
     } else {
+      prior_select2_lp(d[t], prior_trt_dist, prior_trt_location, prior_trt_scale, prior_trt_df);
       // Priors for treatments without a class effect or in a single-occupancy class
-      d[t] ~ normal(prior_trt_location, prior_trt_scale); # Those not within a class or are the only treatment of their class.
-    }
-    // Conditionally apply priors on d based on which class it belongs to
-    if (which_class[t] > 0) {
-        prior_select_lp(d, prior_class_mean_dist, prior_class_mean_location, prior_class_mean_scale, prior_class_mean_df);
     }
   }
 }
