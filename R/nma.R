@@ -955,7 +955,6 @@ if (class_effects != "independant") {
   # Create class_effects_sd design vectors
   if (is.list(class_sd)) {
     CEsd_vector <- which_class(forcats::fct_collapse(network$classes, !!! class_sd))
-    CEsd_vector <- factor(CEsd_vector, levels = names(class_sd))
   } else {
   if (class_sd == "common") {
     CEsd_vector <- CE_vector # Copy the original vector
