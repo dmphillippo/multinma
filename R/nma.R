@@ -1523,7 +1523,7 @@ nma.fit <- function(ipd_x, ipd_y,
     offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric(),
     # Class effects
     CE_vector = CE_vector,
-    CEsd_vector = CEsd_vector,
+    CEsd_vector = CEsd_vector
     )
 
   # Add priors
