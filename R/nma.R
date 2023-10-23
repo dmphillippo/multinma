@@ -946,10 +946,6 @@ nma <- function(network,
   # Ensure classes are factors
 if (class_effects != "independant") {
   which_class(network$classes) -> CE_vector
-
-  # Convert CE_vector to a factor and set its levels to the unique class names
-  CE_vector <- as.factor(CE_vector)
-  levels(CE_vector) <- levels(network$classes)
 }
 
   # Create class_effects_sd design vectors
@@ -2041,6 +2037,10 @@ nma.fit <- function(ipd_x, ipd_y,
   } else {
     stanfit <- do.call(rstan::sampling, stanargs)
   }
+
+  # Convert CE_vector to a factor and set its levels to the unique class names
+  CE_vector <- as.factor(CE_vector)
+  levels(CE_vector) <- levels(network$classes)
 
   # Set readable parameter names in the stanfit object
   fnames_oi <- stanfit@sim$fnames_oi
