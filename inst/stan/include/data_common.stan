@@ -82,14 +82,10 @@ int<lower=0, upper=1> class_effects; // Flag for whether a class model is used (
 int<lower=0> which_class[class_effects ? nt : 0]; // ID of class for each arm (0 for no RE delta)
 int<lower=0> which_class_sd[class_effects ? nt : 0]; // Design vector for class standard deviations
 
-real class_mean; // Mean for the class effect
-
 int<lower=0,upper=3> prior_class_mean_dist; // Prior specifications for class means
 real prior_class_mean_location;
 real<lower=0> prior_class_mean_scale;
 real<lower=0> prior_class_mean_df;
-
-real<lower=0> class_sd; // Standard deviation for the class effect
 
 int<lower=0,upper=6> prior_class_sd_dist; // Prior specifications for class standard deviations
 real prior_class_sd_location;
