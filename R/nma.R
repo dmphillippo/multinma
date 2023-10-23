@@ -1839,6 +1839,9 @@ nma.fit <- function(ipd_x, ipd_y,
     # Set aux_int
     aux_int <- !is.null(X_aux) && max(aux_group) == nrow(X_aux)
 
+    # Set flag for aux regression including main treatment effects
+    aux_reg_trt <- any(grepl("^\\.trt[^:]", colnames(X_aux)))
+
     standat <- purrr::list_modify(standat,
                                   # AgD arm IDs
                                   agd_arm_arm = agd_arm_arm,
@@ -1852,6 +1855,7 @@ nma.fit <- function(ipd_x, ipd_y,
                                   # Aux regression
                                   nX_aux = if (!is.null(X_aux)) ncol(X_aux) else 0,
                                   X_aux = if (!is.null(X_aux))  X_aux else matrix(0, length(aux_id), 0),
+                                  aux_reg_trt = aux_reg_trt,
 
                                   # Add outcomes
                                   ipd_time = ipd_surv$time,
@@ -1925,9 +1929,9 @@ nma.fit <- function(ipd_x, ipd_y,
                                    # Monitor auxiliary parameters
                                    pars =
                                      if (likelihood %in% c("exponential", "exponential-aft")) pars
-                                     else if (likelihood == "lognormal") c(pars, "sdlog", "beta_aux")
-                                     else if (likelihood == "gengamma") c(pars, "sigma", "k", "beta_aux")
-                                     else c(pars, "shape", "beta_aux")
+                                     else if (likelihood == "lognormal") c(pars, "sdlog", "beta_aux", "d_aux")
+                                     else if (likelihood == "gengamma") c(pars, "sigma", "k", "beta_aux", "d_aux")
+                                     else c(pars, "shape", "beta_aux", "d_aux")
                                    )
 
 
@@ -2193,8 +2197,10 @@ nma.fit <- function(ipd_x, ipd_y,
       }
     } else if (likelihood == "gengamma") {
       fnames_oi[grepl("^beta_aux\\[", fnames_oi)] <- paste0("beta_aux[", rep(colnames(X_aux), times = 2), ", ", rep(c("sigma", "k"), each = ncol(X_aux)), "]")
+      if (aux_reg_trt) fnames_oi[grepl("^d_aux\\[", fnames_oi)] <- paste0("d_aux[", rep(x_names_sub[col_trt], times = 2), ", ", rep(c("sigma", "k"), each = n_trt-1), "]")
     } else {
       fnames_oi[grepl("^beta_aux\\[", fnames_oi)] <- paste0("beta_aux[", colnames(X_aux), "]")
+      if (aux_reg_trt) fnames_oi[grepl("^d_aux\\[", fnames_oi)] <- paste0("d_aux[", x_names_sub[col_trt], "]")
     }
   }
   fnames_oi <- gsub("tau[1]", "tau", fnames_oi, fixed = TRUE)
