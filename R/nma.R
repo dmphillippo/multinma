@@ -572,8 +572,14 @@ nma <- function(network,
     if (!rlang::is_formula(aux_regression, lhs = FALSE)) abort("`aux_regression` should be a one-sided formula.")
     if (!is.null(attr(aux_regression, "offset"))) abort("Offset terms not allowed in `aux_regression`.")
 
-    # Remove main effect of study if specified, and ensure an intercept column (removed from model matrix later)
-    aux_regression <- update.formula(aux_regression, ~. -.study +1)
+    # Remove main effect of study if specified, and make sure treatment handled properly (first, no intercept for M-spline model with symmetric RW prior)
+    if (".trt" %in% colnames(attr(terms(aux_regression), "factor"))) {
+      aux_regression <- update.formula(aux_regression, ~. -.study -.trt +1)
+      if (likelihood %in% c("mspline", "pexp")) aux_regression <- update.formula(aux_regression, ~.trt + . -1)
+      else aux_regression <- update.formula(aux_regression, ~.trt + . +1)
+    } else {
+      aux_regression <- update.formula(aux_regression, ~. -.study +1)
+    }
     has_aux_regression <- TRUE
   }
 
@@ -1982,6 +1988,8 @@ nma.fit <- function(ipd_x, ipd_y,
 
       lscoef_weight <- list(rw1_prior_weights(basis[[1]]))
 
+      aux_reg_trt <- any(grepl("^\\.trt[^:]", colnames(X_aux)))
+
     } else {
       prior_aux_location <- purrr::map(basis[unique(cbind(aux_id, study = c(ipd_s_t_all$.study, rep(agd_arm_s_t_all$.study, each = if (aux_int) n_int else 1))))[, "study"]],
                                        mspline_constant_hazard)
@@ -1991,6 +1999,8 @@ nma.fit <- function(ipd_x, ipd_y,
 
       # Dummy prior for aux regression smoothing sd (not used)
       prior_aux_reg <- flat()
+
+      aux_reg_trt <- FALSE
     }
 
     standat <- purrr::list_modify(standat,
@@ -2006,6 +2016,7 @@ nma.fit <- function(ipd_x, ipd_y,
                                   # Aux regression
                                   nX_aux = if (!is.null(X_aux)) ncol(X_aux) else 0,
                                   X_aux = if (!is.null(X_aux))  X_aux else matrix(0, length(aux_id), 0),
+                                  aux_reg_trt = aux_reg_trt,
 
                                   # Number of spline coefficients
                                   n_scoef = n_scoef,
@@ -2054,8 +2065,8 @@ nma.fit <- function(ipd_x, ipd_y,
                                    object = stanmodels$survival_mspline,
                                    data = standat,
                                    pars = c(pars,
-                                            # "lscoef", "u_aux",
-                                            "scoef", "beta_aux", "sigma", "sigma_beta"))
+                                            # "lscoef", "u_aux"
+                                            "scoef", "beta_aux", "d_aux", "sigma", "sigma_beta"))
 
   } else {
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
@@ -2172,7 +2183,14 @@ nma.fit <- function(ipd_x, ipd_y,
   if (!is.null(X_aux)) {
     if (likelihood %in% c("mspline", "pexp")) {
       fnames_oi[grepl("^beta_aux\\[", fnames_oi)] <- paste0("beta_aux[", rep(colnames(X_aux), times = n_scoef-1), ", ", rep(1:(n_scoef-1), each = ncol(X_aux)), "]")
-      fnames_oi[grepl("^sigma_beta\\[", fnames_oi)] <- paste0("sigma_beta[", colnames(X_aux), "]")
+      if (aux_reg_trt) {
+        fnames_oi[grepl("^sigma_beta\\[", fnames_oi)] <- c("sigma_beta[.trt]",
+                                                           if (ncol(X_aux) > n_trt) paste0("sigma_beta[", colnames(X_aux[, -(1:n_trt), drop = FALSE]), "]")
+                                                           else NULL)
+        fnames_oi[grepl("^d_aux\\[", fnames_oi)] <- paste0("d_aux[", rep(x_names_sub[col_trt], times = n_scoef-1), ", ", rep(1:(n_scoef-1), each = n_trt-1), "]")
+      } else {
+        fnames_oi[grepl("^sigma_beta\\[", fnames_oi)] <- paste0("sigma_beta[", colnames(X_aux), "]")
+      }
     } else if (likelihood == "gengamma") {
       fnames_oi[grepl("^beta_aux\\[", fnames_oi)] <- paste0("beta_aux[", rep(colnames(X_aux), times = 2), ", ", rep(c("sigma", "k"), each = ncol(X_aux)), "]")
     } else {
