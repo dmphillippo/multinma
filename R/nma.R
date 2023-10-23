@@ -1524,8 +1524,6 @@ nma.fit <- function(ipd_x, ipd_y,
     # Class effects
     CE_vector = CE_vector,
     CEsd_vector = CEsd_vector,
-    prior_class_mean = prior_class_mean,
-    prior_class_sd = prior_class_sd
     )
 
   # Add priors
