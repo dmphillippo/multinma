@@ -945,13 +945,14 @@ nma <- function(network,
 # Creating design Vector for class effects
   # Ensure classes are factors
 if (class_effects != "independant") {
-  which_class(network$classes) -> CE_vector
-  CE_vector[1] <- 0  # Set the reference treatment to 0
+  which_class(network$classes) -> temp_CE_vector
+  CE_vector <- temp_CE_vector[-1]  # Exclude the first element
 }
 
   # Create class_effects_sd design vectors
   if (is.list(class_sd)) {
-    CEsd_vector <- which_class(forcats::fct_collapse(network$classes, !!! class_sd))
+    temp_CEsd_vector <- which_class(forcats::fct_collapse(network$classes, !!! class_sd))
+    CEsd_vector <- temp_CEsd_vector[-1]  # Exclude the first element
   } else {
   if (class_sd == "common") {
     CEsd_vector <- CE_vector # Copy the original vector
