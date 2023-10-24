@@ -68,7 +68,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: local::.
+          extra-packages: any::v8, local::.
 
       - name: Build pre-compiled vignettes
         run: Rscript ./vignettes/precompile.R
