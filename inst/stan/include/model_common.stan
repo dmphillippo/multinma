@@ -59,5 +59,4 @@ if (class_effects) {
       // Priors for treatments without a class effect or in a single-occupancy class
     }
   }
-  // Additional code to handle the reference treatment, if needed
 }
