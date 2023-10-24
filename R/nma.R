@@ -946,6 +946,7 @@ nma <- function(network,
   # Ensure classes are factors
 if (class_effects != "independant") {
   which_class(network$classes) -> CE_vector
+  CE_vector[1] <- 0  # Set the reference treatment to 0
 }
 
   # Create class_effects_sd design vectors
