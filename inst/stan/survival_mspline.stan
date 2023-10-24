@@ -338,11 +338,15 @@ transformed parameters {
       for (i in 1:nt) {
         beta_aux[i, ] = cumulative_sum(ucorr_beta_aux[i, ] .* to_row_vector(lscoef_weight[1])) * sigma_beta[1];
       }
-    }
-
-    // Random walk prior on remaining aux regression pars
-    for (i in (aux_reg_trt ? nt + 1 : 1):nX_aux) {
-      beta_aux[i, ] = cumulative_sum(u_beta_aux[i, ] .* to_row_vector(lscoef_weight[1])) * sigma_beta[i];
+      // Random walk prior on remaining aux regression pars
+      for (i in (nt + 1):nX_aux) {
+        beta_aux[i, ] = cumulative_sum(u_beta_aux[i, ] .* to_row_vector(lscoef_weight[1])) * sigma_beta[1 + i - nt];
+      }
+    } else {
+      // Random walk prior on aux regression pars
+      for (i in 1:nX_aux) {
+        beta_aux[i, ] = cumulative_sum(u_beta_aux[i, ] .* to_row_vector(lscoef_weight[1])) * sigma_beta[i];
+      }
     }
   }
 
