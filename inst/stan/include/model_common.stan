@@ -51,7 +51,7 @@ if (ni_agd_contrast) {
 
 // Class effects model for the d's
 if (class_effects) {
-  for (t in 1:nt) {  // for every treatment
+  for (t in 1:(nt-1)) {  // for every treatment
     if (CE_vector[t] != 0) {   // if there is more then 1 of this treatment class then it wont be zero
       d[t] ~ normal(trt_class_mean[CE_vector[t]], trt_class_sd[CEsd_vector[t]]); // apply the trt_class_mean on that treatment
     } else {
@@ -59,4 +59,5 @@ if (class_effects) {
       // Priors for treatments without a class effect or in a single-occupancy class
     }
   }
+  // Additional code to handle the reference treatment, if needed
 }
