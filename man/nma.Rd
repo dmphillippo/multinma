@@ -135,12 +135,13 @@ calculated across all studies in the network. Ignored when \code{knots} is
 specified.}
 
 \item{knots}{For \code{mspline} and \code{pexp} likelihoods, a named list of numeric
-vectors of internal knot locations for each of the studies in the network.
-Currently, each vector must have the same length (i.e. each study must use
-the same number of knots). If unspecified (the default), the knots will be
-chosen based on \code{n_knots} as described above. If \code{aux_regression} is
-specified then \code{knots} should be a single numeric vector of knot locations
-which will be shared across all studies in the network.}
+vectors of knot locations (including boundary knots) for each of the
+studies in the network. Currently, each vector must have the same length
+(i.e. each study must use the same number of knots). If unspecified (the
+default), the knots will be chosen based on \code{n_knots} as described above.
+If \code{aux_regression} is specified then \code{knots} should be a single numeric
+vector of knot locations which will be shared across all studies in the
+network.}
 
 \item{mspline_basis}{Instead of specifying \code{mspline_degree} and \code{n_knots} or
 \code{knots}, a named list of M-spline bases (one for each study) can be

@@ -78,12 +78,13 @@
 #'   calculated across all studies in the network. Ignored when `knots` is
 #'   specified.
 #' @param knots For `mspline` and `pexp` likelihoods, a named list of numeric
-#'   vectors of internal knot locations for each of the studies in the network.
-#'   Currently, each vector must have the same length (i.e. each study must use
-#'   the same number of knots). If unspecified (the default), the knots will be
-#'   chosen based on `n_knots` as described above. If `aux_regression` is
-#'   specified then `knots` should be a single numeric vector of knot locations
-#'   which will be shared across all studies in the network.
+#'   vectors of knot locations (including boundary knots) for each of the
+#'   studies in the network. Currently, each vector must have the same length
+#'   (i.e. each study must use the same number of knots). If unspecified (the
+#'   default), the knots will be chosen based on `n_knots` as described above.
+#'   If `aux_regression` is specified then `knots` should be a single numeric
+#'   vector of knot locations which will be shared across all studies in the
+#'   network.
 #' @param mspline_basis Instead of specifying `mspline_degree` and `n_knots` or
 #'   `knots`, a named list of M-spline bases (one for each study) can be
 #'   provided with `mspline_basis` which will be used directly. In this case,
@@ -934,55 +935,34 @@ nma <- function(network,
       if (!rlang::is_scalar_integerish(mspline_degree, finite = TRUE) || mspline_degree < 0)
         abort("`mspline_degree` must be a single non-negative integer.")
 
-      # Boundary knots at earliest entry time (0 with no delayed entry) and latest event/censoring time
-      if (!has_aux_regression) {
-        b_knots <- by(survdat, survdat$.study, function(x) c(min(x$delay_time), max(x$time)),
-                      simplify = FALSE)
-      } else {
-        # With aux_regression, need same spline knots across all studies
-        b_knots <- c(min(survdat$delay_time), max(survdat$time))
-        b_knots <- rep_len(list(b_knots), dplyr::n_distinct(survdat$.study))
-        names(b_knots) <- unique(survdat$.study)
-      }
+      if (is.null(knots)) {
 
-      if (is.null(knots)) {  # Calculate internal knots based on quantiles
-        if (!rlang::is_scalar_integerish(n_knots, finite = TRUE) || n_knots <= 0)
-          abort("`n_knots` must be a single positive integer (or specify `knots` directly)")
+        knots <- make_knots(network, n_knots = n_knots, type = if (!is.null(aux_regression)) "quantile_common" else "quantile")
 
-        observed_survdat <- dplyr::filter(survdat, .data$observed)
-
-        knots <- by(observed_survdat, observed_survdat$.study,
-                    function(x) quantile(x$time, probs = seq(1, n_knots) / (n_knots + 1)),
-                    simplify = FALSE)
-
-        if (has_aux_regression) {
-          # With aux_regression, need same spline knots across all studies
-          # Take quantiles of knots and boundary knots in individual studies
-          temp_b_knots <- by(survdat, survdat$.study, function(x) c(min(x$delay_time), max(x$time)),
-                             simplify = FALSE)
-          knots <- quantile(c(unlist(knots), unlist(temp_b_knots)), probs = seq(0, 1, length.out = n_knots+2))[2:(n_knots+1)]
-          knots <- rep_len(list(knots), dplyr::n_distinct(survdat$.study))
-          names(knots) <- unique(survdat$.study)
-        }
-
-      } else {  # User-provided internal knots
+      } else {  # User-provided knots
         # Check required format
         if (!has_aux_regression) {
           if (!is.list(knots) || any(!purrr::map_lgl(knots, is.numeric)))
-            abort("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.")
+            abort("`knots` must be a named list of numeric vectors giving the knot locations for each study.")
 
           missing_names <- setdiff(levels(survdat$.study), names(knots))
           if (length(missing_names) > 0)
-            abort(glue::glue("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.\n",
+            abort(glue::glue("`knots` must be a named list of numeric vectors giving the knot locations for each study.\n",
                              "Missing knot location vector{if (length(missing_names) > 1) 's' else ''} for stud{if (length(missing_names) > 1) 'ies' else 'y'} ",
                              glue::glue_collapse(glue::double_quote(missing_names), sep = ", ", last = " and ", width = 30), "."))
 
           if (!all(purrr::map_int(knots, length) == length(knots[[1]])))
-            abort("Each element of `knots` must currently be the same length (each study must have the same number of knots).")
+            abort("Each vector in `knots` must currently be the same length (each study must have the same number of knots).")
+
+          if (length(knots[[1]]) < 3)
+            abort("Each vector in `knots` must be at least length 3 (boundary knots and one internal knot).")
         } else {
           # With aux_regression, only a single vector of knot locations is allowed
           if (!rlang::is_bare_numeric(knots))
             abort("`knots` must be a single numeric vector of knot locations, shared for all studies, when `aux_regression` is specified.")
+
+          if (length(knots) < 3)
+            abort("`knots` must be at least length 3 (boundary knots and one internal knot).")
 
           knots <- rep_len(list(knots), dplyr::n_distinct(survdat$.study))
           names(knots) <- unique(survdat$.study)
@@ -991,9 +971,11 @@ nma <- function(network,
 
       # Set up basis
       # Only evaluate at first boundary knot for now to save time/memory
+      b_knots <- purrr::map(knots, ~.[c(1, length(.))])
+      i_knots <- purrr::map(knots, ~.[2:(length(.)-1)])
       basis <- purrr::imap(b_knots,
                            ~tryCatch(splines2::mSpline(.x[1],
-                                                       knots = knots[[.y]],
+                                                       knots = i_knots[[.y]],
                                                        Boundary.knots = .x,
                                                        degree = mspline_degree,
                                                        intercept = TRUE),
