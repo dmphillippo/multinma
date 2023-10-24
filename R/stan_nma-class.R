@@ -81,6 +81,12 @@ print.stan_nma <- function(x, ...) {
                                     "theta_bar_cum_agd_contrast",
                                     "theta2_bar_cum",
                                     "mu", "delta",
+                                    if (!is.null(x$aux_regression) &&
+                                        length(setdiff(colnames(attr(terms(x$aux_regression), "factor")), ".trt")) > 0) {
+                                      if (x$likelihood %in% c("mspline", "pexp")) NULL else "d_aux"
+                                    } else {
+                                      "beta_aux"
+                                    },
                                     "scoef"),
                            include = include,
                            use_cache = FALSE,
