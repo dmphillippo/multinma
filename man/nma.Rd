@@ -131,17 +131,21 @@ locations will be at the 25\%, 50\%, and 75\% quantiles of the observed event
 times. The default is \code{n_knots = 7}; overfitting is avoided by shrinking
 towards a constant hazard with a random walk prior (see details). If
 \code{aux_regression} is specified then a single set of knot locations will be
-calculated across all studies in the network. Ignored when \code{knots} is
+calculated across all studies in the network. See \code{\link[=make_knots]{make_knots()}} for more
+details on the knot positioning algorithms. Ignored when \code{knots} is
 specified.}
 
 \item{knots}{For \code{mspline} and \code{pexp} likelihoods, a named list of numeric
 vectors of knot locations (including boundary knots) for each of the
 studies in the network. Currently, each vector must have the same length
-(i.e. each study must use the same number of knots). If unspecified (the
-default), the knots will be chosen based on \code{n_knots} as described above.
-If \code{aux_regression} is specified then \code{knots} should be a single numeric
+(i.e. each study must use the same number of knots). Alternatively, a
+single numeric vector of knot locations can be provided which will be
+shared across all studies in the network. If unspecified (the default), the
+knots will be chosen based on \code{n_knots} as described above. If
+\code{aux_regression} is specified then \code{knots} should be a single numeric
 vector of knot locations which will be shared across all studies in the
-network.}
+network. \code{\link[=make_knots]{make_knots()}} can be used to help specify \code{knots} directly, or to
+investigate knot placement prior to model fitting.}
 
 \item{mspline_basis}{Instead of specifying \code{mspline_degree} and \code{n_knots} or
 \code{knots}, a named list of M-spline bases (one for each study) can be

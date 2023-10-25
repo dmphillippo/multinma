@@ -75,16 +75,20 @@
 #'   times. The default is `n_knots = 7`; overfitting is avoided by shrinking
 #'   towards a constant hazard with a random walk prior (see details). If
 #'   `aux_regression` is specified then a single set of knot locations will be
-#'   calculated across all studies in the network. Ignored when `knots` is
+#'   calculated across all studies in the network. See [make_knots()] for more
+#'   details on the knot positioning algorithms. Ignored when `knots` is
 #'   specified.
 #' @param knots For `mspline` and `pexp` likelihoods, a named list of numeric
 #'   vectors of knot locations (including boundary knots) for each of the
 #'   studies in the network. Currently, each vector must have the same length
-#'   (i.e. each study must use the same number of knots). If unspecified (the
-#'   default), the knots will be chosen based on `n_knots` as described above.
-#'   If `aux_regression` is specified then `knots` should be a single numeric
+#'   (i.e. each study must use the same number of knots). Alternatively, a
+#'   single numeric vector of knot locations can be provided which will be
+#'   shared across all studies in the network. If unspecified (the default), the
+#'   knots will be chosen based on `n_knots` as described above. If
+#'   `aux_regression` is specified then `knots` should be a single numeric
 #'   vector of knot locations which will be shared across all studies in the
-#'   network.
+#'   network. [make_knots()] can be used to help specify `knots` directly, or to
+#'   investigate knot placement prior to model fitting.
 #' @param mspline_basis Instead of specifying `mspline_degree` and `n_knots` or
 #'   `knots`, a named list of M-spline bases (one for each study) can be
 #'   provided with `mspline_basis` which will be used directly. In this case,
@@ -942,8 +946,13 @@ nma <- function(network,
       } else {  # User-provided knots
         # Check required format
         if (!has_aux_regression) {
-          if (!is.list(knots) || any(!purrr::map_lgl(knots, is.numeric)))
-            abort("`knots` must be a named list of numeric vectors giving the knot locations for each study.")
+          if ((!is.list(knots) || any(!purrr::map_lgl(knots, is.numeric))) && !is.vector(knots, mode = "numeric"))
+            abort("`knots` must be a named list of numeric vectors giving the knot locations for each study, or a single numeric vector of knot locations to use for all studies.")
+
+          if (is.vector(knots, mode = "numeric")) {
+            knots <- rep_len(list(knots), dplyr::n_distinct(survdat$.study))
+            names(knots) <- unique(survdat$.study)
+          }
 
           missing_names <- setdiff(levels(survdat$.study), names(knots))
           if (length(missing_names) > 0)
@@ -958,7 +967,7 @@ nma <- function(network,
             abort("Each vector in `knots` must be at least length 3 (boundary knots and one internal knot).")
         } else {
           # With aux_regression, only a single vector of knot locations is allowed
-          if (!rlang::is_bare_numeric(knots))
+          if (!is.vector(knots, mode = "numeric"))
             abort("`knots` must be a single numeric vector of knot locations, shared for all studies, when `aux_regression` is specified.")
 
           if (length(knots) < 3)
@@ -971,8 +980,10 @@ nma <- function(network,
 
       # Set up basis
       # Only evaluate at first boundary knot for now to save time/memory
-      b_knots <- purrr::map(knots, ~.[c(1, length(.))])
-      i_knots <- purrr::map(knots, ~.[2:(length(.)-1)])
+      knots <- purrr::map(knots, sort)
+      knots <- as.data.frame(knots)
+      b_knots <- knots[c(1, nrow(knots)), ]
+      i_knots <- knots[-c(1, nrow(knots)), ]
       basis <- purrr::imap(b_knots,
                            ~tryCatch(splines2::mSpline(.x[1],
                                                        knots = i_knots[[.y]],
