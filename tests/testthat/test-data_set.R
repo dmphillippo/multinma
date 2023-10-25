@@ -499,6 +499,9 @@ test_that("set_* - take one and only one outcome", {
   # expect_error(set_agd_contrast(agd_contrast, "studyn", "trtc"), m)
 })
 
+# Reference treatment for survival outcomes tie-breaks by longest follow-up
+bmax <- max(subset(agd_arm$cont_pos, agd_arm$trtf == "B")) > max(subset(agd_arm$cont_pos, agd_arm$trtf == "A"))
+
 test_that("set_* `.trt` column is correct", {
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont)$ipd$.trt,
                agd_arm$trtf)
@@ -507,7 +510,7 @@ test_that("set_* `.trt` column is correct", {
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff)$agd_contrast$.trt,
                agd_contrast$trtf)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin))$agd_arm$.trt,
-               agd_arm$trtf)
+               if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
 
   expect_equal(set_ipd(agd_arm, studyc, 6, y = cont)$ipd$.trt,
                agd_arm$trtf)
@@ -516,7 +519,7 @@ test_that("set_* `.trt` column is correct", {
   expect_equal(set_agd_contrast(agd_contrast, studyc, 6, y = ydiff, se = sediff)$agd_contrast$.trt,
                agd_contrast$trtf)
   expect_equal(set_agd_surv(agd_arm, studyc, 6, Surv = Surv(cont_pos, bin))$agd_arm$.trt,
-               agd_arm$trtf)
+               if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
 
   expect_equal(set_ipd(agd_arm, studyc, "trtc", y = cont)$ipd$.trt,
                agd_arm$trtf)
@@ -525,7 +528,7 @@ test_that("set_* `.trt` column is correct", {
   expect_equal(set_agd_contrast(agd_contrast, studyc, "trtc", y = ydiff, se = sediff)$agd_contrast$.trt,
                agd_contrast$trtf)
   expect_equal(set_agd_surv(agd_arm, studyc, "trtc", Surv = Surv(cont_pos, bin))$agd_arm$.trt,
-               agd_arm$trtf)
+               if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
 
   expect_equal(set_ipd(agd_arm, studyc, factor(trtc), y = cont)$ipd$.trt,
                agd_arm$trtf)
@@ -534,7 +537,7 @@ test_that("set_* `.trt` column is correct", {
   expect_equal(set_agd_contrast(agd_contrast, studyc, factor(trtc), y = ydiff, se = sediff)$agd_contrast$.trt,
                agd_contrast$trtf)
   expect_equal(set_agd_surv(agd_arm, studyc, factor(trtc), Surv = Surv(cont_pos, bin))$agd_arm$.trt,
-               agd_arm$trtf)
+               if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
 
 
   expect_equal(set_ipd(agd_arm, studyc, trtf, y = cont)$ipd$.trt,
@@ -544,7 +547,7 @@ test_that("set_* `.trt` column is correct", {
   expect_equal(set_agd_contrast(agd_contrast, studyf, trtf, y = ydiff, se = sediff)$agd_contrast$.trt,
                agd_contrast$trtf)
   expect_equal(set_agd_surv(agd_arm, studyc, trtf, Surv = Surv(cont_pos, bin))$agd_arm$.trt,
-               agd_arm$trtf)
+               if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
 
   expect_equal(set_ipd(agd_arm, studyc, trtf2, y = cont, trt_ref = "C")$ipd$.trt,
                agd_arm$trtf2)
@@ -563,7 +566,7 @@ test_that("set_* `.trt` column is correct", {
   expect_equal(set_agd_contrast(agd_contrast, studyf, forcats::fct_expand(trtf, "zzz"), y = ydiff, se = sediff)$agd_contrast$.trt,
                agd_contrast$trtf)
   expect_equal(set_agd_surv(agd_arm, studyc, forcats::fct_expand(trtf, "zzz"), Surv = Surv(cont_pos, bin))$agd_arm$.trt,
-               agd_arm$trtf)
+               if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
 
   expect_equal(set_ipd(agd_arm, studyc, forcats::fct_expand(trtf2, "zzz"), y = cont, trt_ref = "C")$ipd$.trt,
                agd_arm$trtf2)
@@ -571,8 +574,8 @@ test_that("set_* `.trt` column is correct", {
                agd_arm$trtf2)
   expect_equal(set_agd_contrast(agd_contrast, studyf, forcats::fct_expand(trtf2, "zzz"), y = ydiff, se = sediff, trt_ref = "C")$agd_contrast$.trt,
                agd_contrast$trtf2)
-  expect_equal(set_agd_surv(agd_arm, studyc, forcats::fct_expand(trtf, "zzz"), Surv = Surv(cont_pos, bin))$agd_arm$.trt,
-               agd_arm$trtf)
+  expect_equal(set_agd_surv(agd_arm, studyc, forcats::fct_expand(trtf2, "zzz"), Surv = Surv(cont_pos, bin), trt_ref = "C")$agd_arm$.trt,
+               agd_arm$trtf2)
 })
 
 test_that("set_* `.study` column is correct", {
@@ -683,7 +686,7 @@ test_that("set_* return default `treatments` factor", {
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff)$treatments,
                .default(factor(LETTERS[1:3])))
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin))$treatments,
-               .default(factor(LETTERS[1:3])))
+               if (bmax) .default(factor(c("B", "A", "C"), levels = c("B", "A", "C"))) else .default(factor(LETTERS[1:3])))
 })
 
 test_that("set_* can set `trt_ref`", {
@@ -791,7 +794,7 @@ test_that("set_* returns correct .trtclass column", {
                agd_contrast$tclassf)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                            trt_class = tclassc)$agd_arm$.trtclass,
-               agd_arm$tclassf)
+               if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = tclassc))$ipd$.trtclass,
                agd_arm$tclassf)
@@ -803,7 +806,7 @@ test_that("set_* returns correct .trtclass column", {
                agd_contrast$tclassf)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                                            trt_class = tclassc))$agd_arm$.trtclass,
-               agd_arm$tclassf)
+               if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
 
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = 11)$ipd$.trtclass,
@@ -816,7 +819,7 @@ test_that("set_* returns correct .trtclass column", {
                agd_contrast$tclassf)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                            trt_class = 11)$agd_arm$.trtclass,
-               agd_arm$tclassf)
+               if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = 11))$ipd$.trtclass,
                agd_arm$tclassf)
@@ -828,7 +831,7 @@ test_that("set_* returns correct .trtclass column", {
                agd_contrast$tclassf)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                                            trt_class = 11))$agd_arm$.trtclass,
-               agd_arm$tclassf)
+               if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
 
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = tclassf)$ipd$.trtclass,
@@ -841,7 +844,7 @@ test_that("set_* returns correct .trtclass column", {
                agd_contrast$tclassf)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                            trt_class = tclassf)$agd_arm$.trtclass,
-               agd_arm$tclassf)
+               if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = tclassf))$ipd$.trtclass,
                agd_arm$tclassf)
@@ -853,7 +856,7 @@ test_that("set_* returns correct .trtclass column", {
                agd_contrast$tclassf)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                                            trt_class = tclassf))$agd_arm$.trtclass,
-               agd_arm$tclassf)
+               if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
 
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont, trt_ref = "B",
                        trt_class = tclassf2)$ipd$.trtclass,
@@ -892,7 +895,7 @@ test_that("set_* returns correct .trtclass column", {
                agd_contrast$tclassf)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                            trt_class = forcats::fct_expand(tclassf, "zzz"))$agd_arm$.trtclass,
-               agd_arm$tclassf)
+               if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = forcats::fct_expand(tclassf, "zzz")))$ipd$.trtclass,
                agd_arm$tclassf)
@@ -904,7 +907,7 @@ test_that("set_* returns correct .trtclass column", {
                agd_contrast$tclassf)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                                            trt_class = forcats::fct_expand(tclassf, "zzz")))$agd_arm$.trtclass,
-               agd_arm$tclassf)
+               if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
 
   # Checks when default trt_ref not first in sort order
   expect_equal(set_ipd(aa, studyc, trtc, y = cont,
@@ -942,7 +945,7 @@ test_that("set_* returns classes factor variable", {
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_class = tclassc)$classes,
                f_class)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin), trt_class = tclassc)$classes,
-               f_class)
+               if (bmax) factor(c("b", "a", "b"), levels = c("b", "a")) else f_class)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont, trt_class = tclassc))$classes,
                f_class)
   expect_equal(combine_network(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_class = tclassc))$classes,
@@ -950,10 +953,14 @@ test_that("set_* returns classes factor variable", {
   expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_class = tclassc))$classes,
                f_class)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin), trt_class = tclassc))$classes,
-               f_class)
+               if (bmax) factor(c("b", "a", "b"), levels = c("b", "a")) else f_class)
 
   # Using tclassf sets original_levels attribute
   attr(f_class, "original_levels") <- c("a", "b")
+  if (bmax) {
+    f_classs <- factor(c("b", "a", "b"), levels = c("b", "a"))
+    attr(f_classs, "original_levels") <- c("a", "b")
+  }
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"))$classes,
                f_class)
@@ -965,7 +972,7 @@ test_that("set_* returns classes factor variable", {
                f_class)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                            trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"))$classes,
-               f_class)
+               if (bmax) f_classs else f_class)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")))$classes,
                f_class)
@@ -977,7 +984,7 @@ test_that("set_* returns classes factor variable", {
                f_class)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                                            trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")))$classes,
-               f_class)
+               if (bmax) f_classs else f_class)
 
   f_class2 <- factor(c("b", "a", "b"), levels = c("b", "a"))
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
@@ -1136,6 +1143,7 @@ test_that("set_* returns classes factor variable", {
 
   # Check that unused levels are dropped
   attr(f_class, "original_levels") <- c("a", "b", "zzz")
+  if (bmax) attr(f_classs, "original_levels") <- c("a", "b", "zzz")
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = forcats::fct_expand(tclassf, "zzz"))$classes,
                f_class)
@@ -1147,7 +1155,7 @@ test_that("set_* returns classes factor variable", {
                f_class)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                            trt_class = forcats::fct_expand(tclassf, "zzz"))$classes,
-               f_class)
+               if (bmax) f_classs else f_class)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = forcats::fct_expand(tclassf, "zzz")))$classes,
                f_class)
@@ -1159,7 +1167,7 @@ test_that("set_* returns classes factor variable", {
                f_class)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                                            trt_class = forcats::fct_expand(tclassf, "zzz")))$classes,
-               f_class)
+               if (bmax) f_classs else f_class)
 })
 
 test_that("set_* checks for bad class variable work", {
