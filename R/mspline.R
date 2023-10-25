@@ -371,7 +371,8 @@ inv_softmax <- function(p) {
 #'   ggplot2::ggplot() +
 #'     geom_km(network) +
 #'     ggplot2::geom_vline(ggplot2::aes(xintercept = .data$knot),
-#'                         data = purrr::imap_dfr(knots, ~data.frame(Study = .y, knot = .x)),
+#'                         data = tidyr::pivot_longer(as.data.frame(knots), cols = dplyr::everything(),
+#'                                                    names_to = "Study", values_to = "knot"),
 #'                         linetype = 2, colour = "grey60") +
 #'     ggplot2::facet_wrap(~Study) +
 #'     theme_multinma()
