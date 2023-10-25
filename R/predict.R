@@ -700,6 +700,7 @@ predict.stan_nma <- function(object, ...,
 
       if (!is.null(object$aux_regression)) {
         X_aux <- make_nma_model_matrix(object$aux_regression,
+                                       xbar = object$xbar,
                                        dat_ipd = preddat)$X_ipd
         beta_aux <- as.array(object, pars = "beta_aux")
       }
@@ -1598,6 +1599,7 @@ predict.stan_nma <- function(object, ...,
 
       if (!is.null(object$aux_regression)) {
         X_aux <- make_nma_model_matrix(object$aux_regression,
+                                       xbar = object$xbar,
                                        dat_ipd = preddat)$X_ipd
         beta_aux <- as.array(object, pars = "beta_aux")
       }
