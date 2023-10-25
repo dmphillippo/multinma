@@ -39,7 +39,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::v8, any::rcmdcheck
+          extra-packages: any::V8, any::rcmdcheck
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
