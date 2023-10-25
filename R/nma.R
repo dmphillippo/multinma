@@ -2851,8 +2851,8 @@ make_nma_model_matrix <- function(nma_formula,
     dat_all$.study_temp <- dat_all$.study
     dat_all$.study <- 1L
 
-    # Fix up model formula with an intercept
-    nma_formula <- update.formula(nma_formula, ~. + 1)
+    # Fix up model formula with an intercept (if .study is main effect, which is not usually the case for aux_regression)
+    if (".study" %in% colnames(attr(terms(nma_formula), "factors"))) nma_formula <- update.formula(nma_formula, ~. + 1)
   } else {
     single_study_label <- NULL
     if (".study" %in% fvars) stats::contrasts(dat_all$.study) <- "contr.treatment"
@@ -2873,7 +2873,7 @@ make_nma_model_matrix <- function(nma_formula,
       dplyr::select(-".study_temp")
 
     # Drop intercept column from design matrix
-    X_all <- X_all[, -1, drop = FALSE]
+    if ("(Intercept)" %in% colnames(X_all)) X_all <- X_all[, -1, drop = FALSE]
   }
 
   # Remove columns for reference level of .trtclass
