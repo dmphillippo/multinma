@@ -381,17 +381,33 @@ get_default_trt_ref <- function(network, ...) {
     abort("Empty network.")
   }
 
-  # g_c <- igraph::as.igraph(x)
+  # Prefer longer follow-up for survival outcomes
+  surv_dat <- dplyr::bind_rows(
+    if (identical(network$outcome$ipd, "survival")) dplyr::select(network$ipd, ".trt", ".Surv") else NULL,
+    if (identical(network$outcome$agd_arm, "survival")) tidyr::unnest(network$agd_arm, cols = ".Surv") %>% dplyr::select(".trt", ".Surv") else NULL
+  )
+
+  if (nrow(surv_dat) < 1) {
+    max_fu <- 0
+  } else {
+    max_fu <- dplyr::mutate(surv_dat, !!! get_Surv_data(surv_dat$.Surv)) %>%
+      dplyr::group_by(.data$.trt) %>%
+      dplyr::summarise(max_fu = max(.data$time)) %>%
+      dplyr::pull("max_fu")
+  }
+
   g_nc <- igraph::as.igraph(network, collapse = FALSE)
 
   nodes <-
     tibble::tibble(
       .trt = network$treatments,
       degree = igraph::degree(g_nc),
-      betweenness = igraph::betweenness(g_nc)
+      betweenness = igraph::betweenness(g_nc),
+      max_fu = max_fu
     ) %>%
     dplyr::arrange(dplyr::desc(.data$degree),
                    dplyr::desc(.data$betweenness),
+                   dplyr::desc(.data$max_fu),
                    .data$.trt)
 
   return(as.character(nodes[[1, ".trt"]]))

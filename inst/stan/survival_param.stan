@@ -516,6 +516,7 @@ data {
   // auxiliary design matrix
   int<lower=0> nX_aux;
   matrix[ni_ipd + (aux_int ? nint_max : 1) * (ni_agd_arm + ni_agd_contrast), nX_aux] X_aux;
+  int<lower=0, upper=1> aux_reg_trt; // Flag aux regression includes main treatment effects (1 = yes)
 
   // Prior on aux regression coefficients
   int<lower=0,upper=6> prior_aux_reg_dist;
@@ -796,6 +797,9 @@ generated quantities {
   vector[dist == 9 ? n_aux : 0] sigma; // gengamma sigma
   vector[dist == 9 ? n_aux : 0] k;  // gengamma k
 
+  // aux regression treatment effects
+  matrix[aux_reg_trt ? nt-1 : 0,  nonexp + gengamma] d_aux;
+
 #include /include/generated_quantities_common.stan
 
   // Log likelihood
@@ -815,5 +819,8 @@ generated quantities {
     sigma = aux;
     k = aux2;
   }
+
+  // aux regression treatment effects
+  if (aux_reg_trt) d_aux = beta_aux[1:(nt-1), ];
 
 }

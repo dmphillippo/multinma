@@ -212,6 +212,16 @@ functions {
     return l;
   }
 
+  // Compound symmetry correlation matrix
+  matrix cs(real rho, int N) {
+    matrix[N, N] out;
+    for (j in 1:N) for (i in 1:N) {
+      if (i == j) out[i, j] = 1;
+      else out[i, j] = rho;
+    }
+    return out;
+  }
+
 }
 data {
 #include /include/data_common.stan
@@ -246,6 +256,7 @@ data {
   // auxiliary design matrix
   int<lower=0> nX_aux;
   matrix[ni_ipd + (aux_int ? nint_max : 1) * (ni_agd_arm + ni_agd_contrast), nX_aux] X_aux;
+  int<lower=0, upper=1> aux_reg_trt; // Flag aux regression includes main treatment effects (1 = yes)
 
   // Hierarchical logistic prior on spline coefficients
   int<lower=0,upper=6> prior_hyper_dist;
@@ -284,19 +295,23 @@ transformed data {
   matrix[ni_ipd, nX_aux] X_aux_ipd = ni_ipd ? X_aux[1:ni_ipd] : Xauxdummy;
   matrix[(aux_int ? nint_max : 1) * ni_agd_arm, nX_aux] X_aux_agd_arm = ni_agd_arm ? X_aux[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)] : Xauxdummy;
 
+  cholesky_factor_corr[aux_reg_trt ? nt : 0] sigma_beta_L;
+
 #include /include/transformed_data_common.stan
 
   if (aux_int == 0) for (i in 1:n_aux_group) {
     if (ni_aux_group_ipd[i]) wi_aux_group_ipd[i, 1:ni_aux_group_ipd[i]] = which(aux_group_ipd, i);
     if (ni_aux_group_agd_arm[i]) wi_aux_group_agd_arm[i, 1:ni_aux_group_agd_arm[i]] = which(aux_group_agd_arm, i);
   }
+
+  if (aux_reg_trt) sigma_beta_L = cholesky_decompose(cs(0.5, nt));
 }
 parameters {
 #include /include/parameters_common.stan
 
   // Spline coefficient regression with shrinkage over time
-  array[nX_aux] vector[n_scoef-1] u_beta_aux;
-  vector<lower=0>[nX_aux] sigma_beta;
+  matrix[nX_aux, n_scoef-1] u_beta_aux;
+  vector<lower=0>[aux_reg_trt ? nX_aux - (nt - 1) : nX_aux] sigma_beta;
 
   // Spline shrinkage SDs and non-centered parameterisation smoothing
   vector<lower=0>[n_aux] sigma;
@@ -316,9 +331,23 @@ transformed parameters {
 
 #include /include/transformed_parameters_common.stan
 
-  // Random walk prior on aux regression
-  if (nX_aux) for (i in 1:nX_aux) {
-    beta_aux[i, ] = to_row_vector(cumulative_sum(u_beta_aux[i, ] .* lscoef_weight[1]) * sigma_beta[i]);
+  if (nX_aux) {
+    // Compound symetric random walk prior on aux regression treatment effects
+    if (aux_reg_trt) {
+      matrix[nt, n_scoef-1] ucorr_beta_aux = sigma_beta_L * u_beta_aux[1:nt, ];
+      for (i in 1:nt) {
+        beta_aux[i, ] = cumulative_sum(ucorr_beta_aux[i, ] .* to_row_vector(lscoef_weight[1])) * sigma_beta[1];
+      }
+      // Random walk prior on remaining aux regression pars
+      for (i in (nt + 1):nX_aux) {
+        beta_aux[i, ] = cumulative_sum(u_beta_aux[i, ] .* to_row_vector(lscoef_weight[1])) * sigma_beta[1 + i - nt];
+      }
+    } else {
+      // Random walk prior on aux regression pars
+      for (i in 1:nX_aux) {
+        beta_aux[i, ] = cumulative_sum(u_beta_aux[i, ] .* to_row_vector(lscoef_weight[1])) * sigma_beta[i];
+      }
+    }
   }
 
   // Construct spline coefficients with random walk prior around constant hazard
@@ -537,11 +566,19 @@ generated quantities {
   // Baseline spline coefficients
   array[n_aux] vector[n_scoef] scoef;
 
+  // aux regression treatment effects
+  matrix[aux_reg_trt ? nt-1 : 0, n_scoef-1] d_aux;
+
 #include /include/generated_quantities_common.stan
 
   // Baseline spline coefficients
   for (i in 1:n_aux) {
     scoef[i] = nX_aux ? softmax(append_row(0, lscoef[i])) : scoef_temp[i];
+  }
+
+  // aux regression treatment effects
+  if (aux_reg_trt) for (i in 1:(nt-1)) {
+    d_aux[i, ] = beta_aux[i+1, ] - beta_aux[1, ];
   }
 
   // Log likelihood
