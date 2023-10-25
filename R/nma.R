@@ -2844,7 +2844,7 @@ make_nma_model_matrix <- function(nma_formula,
 
   # Drop study to factor to 1L if only one study (avoid contrasts need 2 or
   # more levels error)
-  if (dplyr::n_distinct(dat_all$.study) == 1) {
+  if (".study" %in% fvars && dplyr::n_distinct(dat_all$.study) == 1) {
 
     # Save study label to restore
     single_study_label <- unique(dat_all$.study)
