@@ -944,21 +944,51 @@ nma <- function(network,
 
 # Creating design Vector for class effects
   # Ensure classes are factors
-if (class_effects != "independant") {
-  which_class(network$classes) -> temp_CE_vector
-  CE_vector <- temp_CE_vector[-1]  # Exclude the first element
-}
+  # Initialize lengths and other frequently used values
+  n_treatments_minus_one <- length(network$treatments) - 1
 
-  # Create class_effects_sd design vectors
-  if (is.list(class_sd)) {
-    temp_CEsd_vector <- which_class(forcats::fct_collapse(network$classes, !!! class_sd))
-    CEsd_vector <- temp_CEsd_vector[-1]  # Exclude the first element
+  # Create CE_vector and CE_vector_num
+  if (class_effects != "independent") {
+    temp_CE_vector <- which_class(network$classes)
+    CE_vector_num <- temp_CE_vector$CE_vector_num
+    CE_vector_num <- CE_vector_num[-1]
+    CE_vector <- temp_CE_vector$CE_vector
+    CE_vector <- CE_vector[-1]
   } else {
-  if (class_sd == "common") {
-    CEsd_vector <- CE_vector # Copy the original vector
-    CEsd_vector[CEsd_vector != 0] <- 1}
-  if (class_sd == "independant") {
-    CEsd_vector <- CE_vector}
+    CE_vector <- rep(0, n_treatments_minus_one)
+  }
+
+  # Check if CE_vector is a factor with a "0" level
+  #if(is.factor(CE_vector) && "0" %in% levels(CE_vector)) {
+    # Find the positions where the label is "0"
+    #zero_positions <- which(as.character(CE_vector) == "0")
+
+    # Set the corresponding positions in CE_vector_num to numerical 0
+    #CE_vector_num[zero_positions] <- 0
+
+  # Create CEsd_vector and CEsd_vector_num
+  if (is.list(class_sd)) {
+    temp_CEsd_vector <- which_class(forcats::fct_collapse(network$classes, !!!class_sd))
+    CEsd_vector <- temp_CEsd_vector$CE_vector[-1]
+    CEsd_vector_num <- temp_CEsd_vector$CE_vector_num[-1]
+  } else {
+    if (class_sd == "common") {
+      # For the numeric vector
+      CEsd_vector_num <- CE_vector_num  # Initialize with CE_vector_num
+      CEsd_vector_num[CEsd_vector_num != 0] <- 1  # Change non-zero values to 1
+
+      # For the factor
+      CEsd_vector <- c(1)
+      CEsd_vector <- factor(CEsd_vector)
+      levels(CEsd_vector) <- "All Classes"
+
+  } else if (class_sd == "independent") {
+      # For the numeric vector
+      CEsd_vector_num <- CE_vector_num  # Assign CE_vector_num to CEsd_vector_num
+
+      # For the factor
+      CEsd_vector <- CE_vector  # Assign CE_vector to CEsd_vector
+    }
   }
 
   # Fit using nma.fit
@@ -974,8 +1004,10 @@ if (class_effects != "independant") {
     RE_cor = .RE_cor,
     which_RE = .which_RE,
     class_effects = class_effects,
-    CE_vector = CE_vector,
-    CEsd_vector = CEsd_vector,
+    CE_vector_num = CE_vector_num,
+    CEsd_vector_num = CEsd_vector_num,
+    #CE_lvl = CE_vector,
+    #CEsd_lvl = CEsd_vector,
     likelihood = likelihood,
     link = link,
     consistency = consistency,
@@ -1124,7 +1156,27 @@ if (class_effects != "independant") {
     }
   }
 
-  # Class naming code
+
+  # Class effect readable parameter names
+  #fnames_oi[grepl("^trt_class_mean\\[[0-9]+\\]$", fnames_oi)] <- paste0("trt_class_mean[", col_trt, "]")
+  #fnames_oi[grepl("^trt_class_sd\\[[0-9]+\\]$", fnames_oi)] <- paste0("trt_class_sd[", col_trt, "]")
+
+  CE_lvl_labels <- levels(CE_vector)
+  CEsd_lvl_labels <- levels(CEsd_vector)
+  # For trt_class_mean
+  matched_indices_mean <- grepl("^trt_class_mean\\[[0-9]+\\]$", fnames_oi)
+  extracted_numbers_mean <- gsub("^trt_class_mean\\[([0-9]+)\\]$", "\\1", fnames_oi[matched_indices_mean])
+  new_labels_mean <- CE_lvl_labels[as.numeric(extracted_numbers_mean)]
+  fnames_oi[matched_indices_mean] <- paste0("trt_class_mean[", new_labels_mean, "]")
+
+  # For trt_class_sd
+  matched_indices_sd <- grepl("^trt_class_sd\\[[0-9]+\\]$", fnames_oi)
+  extracted_numbers_sd <- gsub("^trt_class_sd\\[([0-9]+)\\]$", "\\1", fnames_oi[matched_indices_sd])
+  new_labels_sd <- CEsd_lvl_labels[as.numeric(extracted_numbers_sd)]
+  fnames_oi[matched_indices_sd] <- paste0("trt_class_sd[", new_labels_sd, "]")
+
+
+
 
 
   stanfit@sim$fnames_oi <- fnames_oi
@@ -1188,8 +1240,10 @@ nma.fit <- function(ipd_x, ipd_y,
                     RE_cor = NULL,
                     which_RE = NULL,
                     class_effects = c("independent", "exchangeable", "common"),
-                    CE_vector = NULL,
-                    CEsd_vector = NULL,
+                    CE_vector_num = NULL,
+                    CEsd_vector_num = NULL,
+                    #CE_lvl = NULL,
+                    #CEsd_lvl = NULL,
                     likelihood = NULL,
                     link = NULL,
                     consistency = c("consistency", "ume", "nodesplit"),
@@ -1524,9 +1578,11 @@ nma.fit <- function(ipd_x, ipd_y,
     has_offset = has_offsets,
     offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric(),
     # Class effects
-    CE_vector = CE_vector,
-    CEsd_vector = CEsd_vector,
+    CE_vector_num = if (exists("CE_vector_num")) CE_vector_num else rep(0, n_trt - 1),
+    CEsd_vector_num = if (exists("CEsd_vector_num")) CEsd_vector_num else rep(0, n_trt - 1),
     class_effects = ifelse(class_effects == "independent", 0, 1)
+    #CE_lvl = if (exists("CE_lvl")) CE_lvl else rep(0, n_trt - 1),
+    #CEsd_lvl = if (exists("CEsd_lvl")) CEsd_lvl else rep(0, n_trt - 1)
     )
 
   # Add priors
@@ -2040,8 +2096,8 @@ nma.fit <- function(ipd_x, ipd_y,
   }
 
   # Convert CE_vector to a factor and set its levels to the unique class names
-  CE_vector <- as.factor(CE_vector)
-  levels(CE_vector) <- levels(network$classes)
+  #CE_vector <- as.factor(CE_vector)
+  #levels(CE_vector) <- levels(network$classes)
 
   # Set readable parameter names in the stanfit object
   fnames_oi <- stanfit@sim$fnames_oi
@@ -2053,9 +2109,6 @@ nma.fit <- function(ipd_x, ipd_y,
   fnames_oi <- gsub("tau[1]", "tau", fnames_oi, fixed = TRUE)
   fnames_oi <- gsub("omega[1]", "omega", fnames_oi, fixed = TRUE)
 
-  # Class effect readable parameter names
-  fnames_oi[grepl("^trt_class_mean\\[[0-9]+\\]$", fnames_oi)] <- paste0("trt_class_mean[", col_trt, "]")
-  fnames_oi[grepl("^trt_class_sd\\[[0-9]+\\]$", fnames_oi)] <- paste0("trt_class_sd[", col_trt, "]")
 
   if (likelihood == "ordered") {
     if (has_ipd) l_cat <- colnames(ipd_y$.r)[-1]
@@ -2209,13 +2262,33 @@ valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
 #'
 
 which_class <- function(classes) {
+  # Count the frequency of each class
   class_tab <- table(classes)
-  solo_classes <- classes %in% names(class_tab[class_tab == 1])
-  CE_vector <- as.integer(classes)
-  CE_vector[solo_classes] <- 0
-  CE_vector[!solo_classes] <- match(classes[!solo_classes], unique(classes[!solo_classes]))
 
-  return(CE_vector)
+  # Identify classes that appear only once
+  solo_classes <- names(class_tab[class_tab == 1])
+
+  # Create CE_vector as a copy of classes
+  CE_vector <- classes
+
+  # Create CE_vector_num as a numeric copy of classes
+  CE_vector_num <- as.integer(classes)
+
+  # Set the corresponding positions in CE_vector and CE_vector_num to zero for solo classes
+  zero_positions <- which(classes %in% solo_classes)
+  CE_vector_num[zero_positions] <- 0  # Setting the actual number to 0
+
+  # Re-level CE_vector_num
+  remaining_classes <- unique(CE_vector_num[CE_vector_num != 0])
+  new_values <- 1:length(remaining_classes)
+  mapping <- setNames(new_values, remaining_classes)
+  CE_vector_num[CE_vector_num != 0] <- mapping[as.character(CE_vector_num[CE_vector_num != 0])]
+
+  # Update CE_vector to remove levels that have turned into zeros in CE_vector_num
+  CE_vector <- droplevels(CE_vector, exclude = solo_classes)
+
+
+  return(list(CE_vector = CE_vector, CE_vector_num = CE_vector_num))
 }
 
 
@@ -3191,5 +3264,24 @@ get_aux_by_data <- function(data, by, add_study = TRUE) {
       dplyr::group_by_all(),
     error = function(x) abort("`aux_by` must be a vector of variable names to stratify auxiliary parameters by.", parent = x)
   )
+}
+
+rename_trt_class <- function(fnames, pattern, vector_levels) {
+  # Find the names in fnames that match the pattern
+  matching_indices <- grep(pattern, fnames)
+
+  # Extract the numerical indices from those names
+  extracted_indices <- as.numeric(gsub(".*\\[([0-9]+)\\]", "\\1", fnames[matching_indices]))
+
+  # Look up the corresponding levels from the vector_levels
+  corresponding_levels <- levels(vector_levels)[extracted_indices]
+
+  # Construct the new names
+  new_names <- paste0(gsub("\\[.*\\]", "", pattern), "[", corresponding_levels, "]")
+
+  # Update fnames
+  fnames[matching_indices] <- new_names
+
+  return(fnames)
 }
 
