@@ -282,6 +282,25 @@ nma <- function(network,
       stop("Some classes listed in 'class_sd' are not found in 'network$classes'")
     }
 
+    if (class_effects == "common") {
+      # Overwrite treatments with class variables for individual patient data (IPD)
+      if (has_ipd(network)) {
+        network$ipd$.trt <- network$ipd$.trtclass
+      }
+
+      # Add similar code for aggregated data (AGD) - arm and contrast
+      if (has_agd_arm(network)) {
+        network$agd_arm$.trt <- network$agd_arm$.trtclass
+      }
+      if (has_agd_contrast(network)) {
+        network$agd_contrast$.trt <- network$agd_contrast$.trtclass
+      }
+
+      # Update the treatments based on the classes
+      # Assuming '.default()' is a function that processes classes into treatments
+      network$treatments <- .default(network$classes)
+    }
+
     # Check that all the collapsed classes are distinct and don't share a class
     flattened_classes <- unlist(class_sd)
     if (length(flattened_classes) != length(unique(flattened_classes))) {
@@ -956,6 +975,7 @@ nma <- function(network,
     CE_vector <- CE_vector[-1]
   } else {
     CE_vector <- rep(0, n_treatments_minus_one)
+    CE_vector_num <- rep(0, n_treatments_minus_one)
   }
 
   # Check if CE_vector is a factor with a "0" level
