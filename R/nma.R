@@ -275,6 +275,25 @@ nma <- function(network,
   class_effects <- rlang::arg_match(class_effects)
   if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
 
+  if (class_effects == "common") {
+    # Overwrite treatments with class variables for individual patient data (IPD)
+    if (has_ipd(network)) {
+      network$ipd$.trt <- network$ipd$.trtclass
+    }
+
+    # Add similar code for aggregated data (AGD) - arm and contrast
+    if (has_agd_arm(network)) {
+      network$agd_arm$.trt <- network$agd_arm$.trtclass
+    }
+    if (has_agd_contrast(network)) {
+      network$agd_contrast$.trt <- network$agd_contrast$.trtclass
+    }
+
+    # Update the treatments based on the classes
+    # Assuming '.default()' is a function that processes classes into treatments
+    network$treatments <- .default(network$classes)
+  }
+
   # Check class_sd
   if (is.list(class_sd)) {
     # Check that all classes listed in 'class_sd' are in 'network$classes'
@@ -282,24 +301,6 @@ nma <- function(network,
       stop("Some classes listed in 'class_sd' are not found in 'network$classes'")
     }
 
-    if (class_effects == "common") {
-      # Overwrite treatments with class variables for individual patient data (IPD)
-      if (has_ipd(network)) {
-        network$ipd$.trt <- network$ipd$.trtclass
-      }
-
-      # Add similar code for aggregated data (AGD) - arm and contrast
-      if (has_agd_arm(network)) {
-        network$agd_arm$.trt <- network$agd_arm$.trtclass
-      }
-      if (has_agd_contrast(network)) {
-        network$agd_contrast$.trt <- network$agd_contrast$.trtclass
-      }
-
-      # Update the treatments based on the classes
-      # Assuming '.default()' is a function that processes classes into treatments
-      network$treatments <- .default(network$classes)
-    }
 
     # Check that all the collapsed classes are distinct and don't share a class
     flattened_classes <- unlist(class_sd)
@@ -632,9 +633,9 @@ nma <- function(network,
   if (.is_default(network$treatments))
     inform(glue::glue('Note: Setting "{levels(network$treatments)[1]}" as the network reference treatment.'))
 
-  # Notify if network is disconnected
-  if (!is_network_connected(network))
+  if (class_effects != "common" && !is_network_connected(network)) {
     inform("Note: Network is disconnected. See ?is_network_connected for more details.")
+  }
 
   # Get data for design matrices and outcomes
   if (has_ipd(network)) {
@@ -965,15 +966,21 @@ nma <- function(network,
   # Ensure classes are factors
   # Initialize lengths and other frequently used values
   n_treatments_minus_one <- length(network$treatments) - 1
+  n_classes_minus_one <- length(unique(network$treatments)) - 1
 
   # Create CE_vector and CE_vector_num
-  if (class_effects != "independent") {
+  if (class_effects == "exchangeable") {
     temp_CE_vector <- which_class(network$classes)
     CE_vector_num <- temp_CE_vector$CE_vector_num
     CE_vector_num <- CE_vector_num[-1]
     CE_vector <- temp_CE_vector$CE_vector
     CE_vector <- CE_vector[-1]
-  } else {
+  }
+  if (class_effects == "common") {
+    CE_vector <- rep(0, n_classes_minus_one)
+    CE_vector_num <- rep(0, n_classes_minus_one)
+  }
+  else {
     CE_vector <- rep(0, n_treatments_minus_one)
     CE_vector_num <- rep(0, n_treatments_minus_one)
   }
@@ -1655,7 +1662,7 @@ nma.fit <- function(ipd_x, ipd_y,
   }
 
   # Monitor class effects if class effects in use
-  if (class_effects != "independent") {
+  if (class_effects == "exchangeable") {
     pars <- c(pars, "trt_class_mean", "trt_class_sd")
   }
 
