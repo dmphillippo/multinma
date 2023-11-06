@@ -633,7 +633,11 @@ nma <- function(network,
   if (.is_default(network$treatments))
     inform(glue::glue('Note: Setting "{levels(network$treatments)[1]}" as the network reference treatment.'))
 
-  if (class_effects != "common" && !is_network_connected(network)) {
+ # if (class_effects != "common" && !is_network_connected(network)) {
+   # inform("Note: Network is disconnected. See ?is_network_connected for more details.")
+ # }
+
+  if (!is_network_connected(network)) {
     inform("Note: Network is disconnected. See ?is_network_connected for more details.")
   }
 
@@ -968,53 +972,53 @@ nma <- function(network,
   n_treatments_minus_one <- length(network$treatments) - 1
   n_classes_minus_one <- length(unique(network$treatments)) - 1
 
-  # Create CE_vector and CE_vector_num
+  # Create which_ce and which_ce_num
   if (class_effects == "exchangeable") {
-    temp_CE_vector <- which_class(network$classes)
-    CE_vector_num <- temp_CE_vector$CE_vector_num
-    CE_vector_num <- CE_vector_num[-1]
-    CE_vector <- temp_CE_vector$CE_vector
-    CE_vector <- CE_vector[-1]
+    temp_which_ce <- which_ce(network$classes)
+    which_ce_num <- temp_which_ce$which_ce_num
+    which_ce_num <- which_ce_num[-1]
+    which_ce <- temp_which_ce$which_ce
+    which_ce <- which_ce[-1]
   }
   if (class_effects == "common") {
-    CE_vector <- rep(0, n_classes_minus_one)
-    CE_vector_num <- rep(0, n_classes_minus_one)
+    which_ce <- rep(0, n_classes_minus_one)
+    which_ce_num <- rep(0, n_classes_minus_one)
   }
-  else {
-    CE_vector <- rep(0, n_treatments_minus_one)
-    CE_vector_num <- rep(0, n_treatments_minus_one)
+  if (class_effects == "independent"){
+    which_ce <- rep(0, n_treatments_minus_one)
+    which_ce_num <- rep(0, n_treatments_minus_one)
   }
 
-  # Check if CE_vector is a factor with a "0" level
-  #if(is.factor(CE_vector) && "0" %in% levels(CE_vector)) {
+  # Check if which_ce is a factor with a "0" level
+  #if(is.factor(which_ce) && "0" %in% levels(which_ce)) {
     # Find the positions where the label is "0"
-    #zero_positions <- which(as.character(CE_vector) == "0")
+    #zero_positions <- which(as.character(which_ce) == "0")
 
-    # Set the corresponding positions in CE_vector_num to numerical 0
-    #CE_vector_num[zero_positions] <- 0
+    # Set the corresponding positions in which_ce_num to numerical 0
+    #which_ce_num[zero_positions] <- 0
 
-  # Create CEsd_vector and CEsd_vector_num
+  # Create which_ce_sd and which_ce_sd_num
   if (is.list(class_sd)) {
-    temp_CEsd_vector <- which_class(forcats::fct_collapse(network$classes, !!!class_sd))
-    CEsd_vector <- temp_CEsd_vector$CE_vector[-1]
-    CEsd_vector_num <- temp_CEsd_vector$CE_vector_num[-1]
+    temp_which_ce_sd <- which_ce(forcats::fct_collapse(network$classes, !!!class_sd))
+    which_ce_sd <- temp_which_ce_sd$which_ce[-1]
+    which_ce_sd_num <- temp_which_ce_sd$which_ce_num[-1]
   } else {
     if (class_sd == "common") {
       # For the numeric vector
-      CEsd_vector_num <- CE_vector_num  # Initialize with CE_vector_num
-      CEsd_vector_num[CEsd_vector_num != 0] <- 1  # Change non-zero values to 1
+      which_ce_sd_num <- which_ce_num  # Initialize with which_ce_num
+      which_ce_sd_num[which_ce_sd_num != 0] <- 1  # Change non-zero values to 1
 
       # For the factor
-      CEsd_vector <- c(1)
-      CEsd_vector <- factor(CEsd_vector)
-      levels(CEsd_vector) <- "All Classes"
+      which_ce_sd <- c(1)
+      which_ce_sd <- factor(which_ce_sd)
+      levels(which_ce_sd) <- "All Classes"
 
   } else if (class_sd == "independent") {
       # For the numeric vector
-      CEsd_vector_num <- CE_vector_num  # Assign CE_vector_num to CEsd_vector_num
+      which_ce_sd_num <- which_ce_num  # Assign which_ce_num to which_ce_sd_num
 
       # For the factor
-      CEsd_vector <- CE_vector  # Assign CE_vector to CEsd_vector
+      which_ce_sd <- which_ce  # Assign which_ce to which_ce_sd
     }
   }
 
@@ -1031,10 +1035,8 @@ nma <- function(network,
     RE_cor = .RE_cor,
     which_RE = .which_RE,
     class_effects = class_effects,
-    CE_vector_num = CE_vector_num,
-    CEsd_vector_num = CEsd_vector_num,
-    #CE_lvl = CE_vector,
-    #CEsd_lvl = CEsd_vector,
+    which_ce_num = which_ce_num,
+    which_ce_sd_num = which_ce_sd_num,
     likelihood = likelihood,
     link = link,
     consistency = consistency,
@@ -1188,8 +1190,8 @@ nma <- function(network,
   #fnames_oi[grepl("^trt_class_mean\\[[0-9]+\\]$", fnames_oi)] <- paste0("trt_class_mean[", col_trt, "]")
   #fnames_oi[grepl("^trt_class_sd\\[[0-9]+\\]$", fnames_oi)] <- paste0("trt_class_sd[", col_trt, "]")
 
-  CE_lvl_labels <- levels(CE_vector)
-  CEsd_lvl_labels <- levels(CEsd_vector)
+  CE_lvl_labels <- levels(which_ce)
+  CEsd_lvl_labels <- levels(which_ce_sd)
   # For trt_class_mean
   matched_indices_mean <- grepl("^trt_class_mean\\[[0-9]+\\]$", fnames_oi)
   extracted_numbers_mean <- gsub("^trt_class_mean\\[([0-9]+)\\]$", "\\1", fnames_oi[matched_indices_mean])
@@ -1267,8 +1269,8 @@ nma.fit <- function(ipd_x, ipd_y,
                     RE_cor = NULL,
                     which_RE = NULL,
                     class_effects = c("independent", "exchangeable", "common"),
-                    CE_vector_num = NULL,
-                    CEsd_vector_num = NULL,
+                    which_ce_num = NULL,
+                    which_ce_sd_num = NULL,
                     #CE_lvl = NULL,
                     #CEsd_lvl = NULL,
                     likelihood = NULL,
@@ -1605,11 +1607,9 @@ nma.fit <- function(ipd_x, ipd_y,
     has_offset = has_offsets,
     offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric(),
     # Class effects
-    CE_vector_num = if (exists("CE_vector_num")) CE_vector_num else rep(0, n_trt - 1),
-    CEsd_vector_num = if (exists("CEsd_vector_num")) CEsd_vector_num else rep(0, n_trt - 1),
+    which_ce_num = if (exists("which_ce_num")) which_ce_num else rep(0, n_trt - 1),
+    which_ce_sd_num = if (exists("which_ce_sd_num")) which_ce_sd_num else rep(0, n_trt - 1),
     class_effects = ifelse(class_effects == "independent", 0, 1)
-    #CE_lvl = if (exists("CE_lvl")) CE_lvl else rep(0, n_trt - 1),
-    #CEsd_lvl = if (exists("CEsd_lvl")) CEsd_lvl else rep(0, n_trt - 1)
     )
 
   # Add priors
@@ -2122,9 +2122,9 @@ nma.fit <- function(ipd_x, ipd_y,
     stanfit <- do.call(rstan::sampling, stanargs)
   }
 
-  # Convert CE_vector to a factor and set its levels to the unique class names
-  #CE_vector <- as.factor(CE_vector)
-  #levels(CE_vector) <- levels(network$classes)
+  # Convert which_ce to a factor and set its levels to the unique class names
+  #which_ce <- as.factor(which_ce)
+  #levels(which_ce) <- levels(network$classes)
 
   # Set readable parameter names in the stanfit object
   fnames_oi <- stanfit@sim$fnames_oi
@@ -2283,39 +2283,39 @@ valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
 
 
 #' @rdname class_effects
-#' @aliases which_class
+#' @aliases which_ce
 #' @export
 #' @examples
 #'
 
-which_class <- function(classes) {
+which_ce <- function(classes) {
   # Count the frequency of each class
   class_tab <- table(classes)
 
   # Identify classes that appear only once
   solo_classes <- names(class_tab[class_tab == 1])
 
-  # Create CE_vector as a copy of classes
-  CE_vector <- classes
+  # Create which_ce as a copy of classes
+  which_ce <- classes
 
-  # Create CE_vector_num as a numeric copy of classes
-  CE_vector_num <- as.integer(classes)
+  # Create which_ce_num as a numeric copy of classes
+  which_ce_num <- as.integer(classes)
 
-  # Set the corresponding positions in CE_vector and CE_vector_num to zero for solo classes
+  # Set the corresponding positions in which_ce and which_ce_num to zero for solo classes
   zero_positions <- which(classes %in% solo_classes)
-  CE_vector_num[zero_positions] <- 0  # Setting the actual number to 0
+  which_ce_num[zero_positions] <- 0  # Setting the actual number to 0
 
-  # Re-level CE_vector_num
-  remaining_classes <- unique(CE_vector_num[CE_vector_num != 0])
+  # Re-level which_ce_num
+  remaining_classes <- unique(which_ce_num[which_ce_num != 0])
   new_values <- 1:length(remaining_classes)
   mapping <- setNames(new_values, remaining_classes)
-  CE_vector_num[CE_vector_num != 0] <- mapping[as.character(CE_vector_num[CE_vector_num != 0])]
+  which_ce_num[which_ce_num != 0] <- mapping[as.character(which_ce_num[which_ce_num != 0])]
 
-  # Update CE_vector to remove levels that have turned into zeros in CE_vector_num
-  CE_vector <- droplevels(CE_vector, exclude = solo_classes)
+  # Update which_ce to remove levels that have turned into zeros in which_ce_num
+  which_ce <- droplevels(which_ce, exclude = solo_classes)
 
 
-  return(list(CE_vector = CE_vector, CE_vector_num = CE_vector_num))
+  return(list(which_ce = which_ce, which_ce_num = which_ce_num))
 }
 
 
