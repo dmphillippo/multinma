@@ -79,8 +79,8 @@ real<lower=0> prior_reg_df;
 
 // -- class effects model --
 int<lower=0, upper=1> class_effects; // Flag for whether a class model is used (1) or not (0)
-int<lower=0> CE_vector_num[nt-1]; // ID of class for each arm (0 for no RE delta)
-int<lower=0> CEsd_vector_num[nt-1]; // Design vector for class standard deviations
+int<lower=0> which_ce_num[nt-1]; // ID of class for each arm (0 for no RE delta)
+int<lower=0> which_ce_sd_num[nt-1]; // Design vector for class standard deviations
 
 int<lower=0,upper=3> prior_class_mean_dist; // Prior specifications for class means
 real prior_class_mean_location;
