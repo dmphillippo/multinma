@@ -8,10 +8,10 @@ prior_select_lp(mu, prior_intercept_dist, prior_intercept_location, prior_interc
     prior_select_lp(d, prior_trt_dist, prior_trt_location, prior_trt_scale, prior_trt_df);
 } else {
     // Priors for class mean parameters
-    prior_select_lp(trt_class_mean, prior_class_mean_dist, prior_class_mean_location, prior_class_mean_scale, prior_class_mean_df);
+    prior_select_lp(class_mean, prior_class_mean_dist, prior_class_mean_location, prior_class_mean_scale, prior_class_mean_df);
 
     // Priors for class standard deviation parameters
-    prior_select_lp(trt_class_sd, prior_class_sd_dist, prior_class_sd_location, prior_class_sd_scale, prior_class_sd_df);
+    prior_select_lp(class_sd, prior_class_sd_dist, prior_class_sd_location, prior_class_sd_scale, prior_class_sd_df);
 }
 
 // Regression parameters
@@ -53,7 +53,7 @@ if (ni_agd_contrast) {
 if (class_effects) {
   for (t in 1:(nt-1)) {  // for every treatment
     if (which_ce_num[t] != 0) {   // if there is more then 1 of this treatment class then it wont be zero
-      d[t] ~ normal(trt_class_mean[which_ce_num[t]], trt_class_sd[which_ce_sd_num[t]]); // apply the trt_class_mean on that treatment
+      d[t] ~ normal(class_mean[which_ce_num[t]], class_sd[which_ce_sd_num[t]]); // apply the class_mean on that treatment
     } else {
       prior_select2_lp(d[t], prior_trt_dist, prior_trt_location, prior_trt_scale, prior_trt_df);
       // Priors for treatments without a class effect or in a single-occupancy class
