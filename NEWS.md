@@ -65,6 +65,8 @@ from that study for prediction.
 sample of individuals in `newdata` for ML-NMR models (previously `newdata` had
 to include integration points).
 * Improvement: Compatibility with future rstan versions (PR #25).
+* Improvement: Added a `plot.mcmc_array()` method, as a shortcut for 
+`plot(summary(x), ...)`.
 * Fix: In `plot.nma_data()`, using a custom `layout` that is not a string (e.g. 
 a data frame of layout coordinates) now works as expected when `nudge > 0`.
 * Fix: Documentation corrections (PR #24).
