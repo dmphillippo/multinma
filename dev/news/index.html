@@ -93,8 +93,10 @@
 <li>Feature: The <code>baseline</code> and <code>aux</code> arguments to <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> can now be specified as the name of a study in the network, to use the parameter estimates from that study for prediction.</li>
 <li>Improvement: <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> will now produce aggregate-level predictions over a sample of individuals in <code>newdata</code> for ML-NMR models (previously <code>newdata</code> had to include integration points).</li>
 <li>Improvement: Compatibility with future rstan versions (PR <a href="https://github.com/dmphillippo/multinma/issues/25" class="external-link">#25</a>).</li>
+<li>Improvement: Added a <code><a href="../reference/mcmc_array-class.html">plot.mcmc_array()</a></code> method, as a shortcut for <code>plot(summary(x), ...)</code>.</li>
 <li>Fix: In <code><a href="../reference/plot.nma_data.html">plot.nma_data()</a></code>, using a custom <code>layout</code> that is not a string (e.g.  a data frame of layout coordinates) now works as expected when <code>nudge &gt; 0</code>.</li>
 <li>Fix: Documentation corrections (PR <a href="https://github.com/dmphillippo/multinma/issues/24" class="external-link">#24</a>).</li>
+<li>Fix: Added missing <code><a href="../reference/as.array.stan_nma.html">as.tibble.stan_nma()</a></code> and <code><a href="../reference/as.array.stan_nma.html">as_tibble.stan_nma()</a></code> methods, to complement the existing <code><a href="../reference/as.array.stan_nma.html">as.data.frame.stan_nma()</a></code>.</li>
 </ul></div>
 </div>
     <div class="section level2">

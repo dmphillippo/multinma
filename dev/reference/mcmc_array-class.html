@@ -82,6 +82,9 @@ methods applied to <code>stan_nma</code> or <code>nma_summary</code> objects.</p
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for mcmc_array</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for mcmc_array</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for mcmc_array</span></span>
@@ -115,7 +118,8 @@ methods applied to <code>stan_nma</code> or <code>nma_summary</code> objects.</p
 
 <p>method returns <code>x</code> invisibly. The <code><a href="https://rdrr.io/r/base/names.html" class="external-link">names()</a></code> method returns a character
 vector of parameter names, and <code>names()&lt;-</code> returns the object with updated
-parameter names.</p>
+parameter names. The <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method is a shortcut for
+<code>plot(summary(x), ...)</code>, passing all arguments on to <code><a href="plot.nma_summary.html">plot.nma_summary()</a></code>.</p>
     </div>
 
     <div class="section level2">
@@ -139,9 +143,9 @@ parameter names.</p>
 <span class="r-in"><span><span class="co"># This can then be printed or plotted</span></span></span>
 <span class="r-in"><span><span class="va">smk_OR_RE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]      3.31 1.65 1.31 2.21 2.99 3.95  7.34     1701     2140</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling] 2.42 0.64 1.50 1.98 2.32 2.72  3.95     1270     1814</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]              1.79 0.82 0.75 1.26 1.63 2.13  3.76     1683     2045</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]      3.38 1.63 1.33 2.29 3.02 4.06  7.61     1957     2332</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling] 2.39 0.61 1.47 1.97 2.31 2.71  3.80     1215     1540</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]              1.80 0.77 0.78 1.27 1.65 2.15  3.74     1666     2361</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           Rhat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]    1</span>
@@ -159,7 +163,7 @@ parameter names.</p>
 <span class="r-in"><span><span class="co"># Summarise</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">tausq_array</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       mean   sd 2.5% 25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tausq 0.74 0.36  0.3 0.5 0.66 0.89  1.68     1250     1901    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tausq 0.74 0.34  0.3 0.5 0.67 0.89  1.58     1324     2189    1</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
