@@ -2289,12 +2289,20 @@ which_CE <- function(classes) {
   # Create which_CE as a copy of classes
   which_CE <- classes
 
-  # Create which_CE_num as a numeric copy of classes
-  which_CE_num <- as.integer(classes)
+  # Identify unique values
+  unique_values <- levels(which_CE)[table(which_CE) == 1]
 
-  # Set the corresponding positions in which_CE and which_CE_num to zero for solo classes
-  zero_positions <- which(classes %in% solo_classes)
-  which_CE_num[zero_positions] <- 0  # Setting the actual number to 0
+  # Replace unique values with NA
+  which_CE[which_CE %in% unique_values] <- NA
+
+  # Optionally, drop levels that no longer have any data
+  which_CE <- droplevels(which_CE)
+
+  # Check the result
+  which_CE_num <- as.numeric(which_CE)
+
+  # Replace NA values with 0
+  which_CE_num[is.na(which_CE_num)] <- 0
 
   # Re-level which_CE_num
   #remaining_classes <- unique(which_CE_num[which_CE_num != 0])
