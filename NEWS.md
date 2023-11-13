@@ -68,6 +68,8 @@ to include integration points).
 * Fix: In `plot.nma_data()`, using a custom `layout` that is not a string (e.g. 
 a data frame of layout coordinates) now works as expected when `nudge > 0`.
 * Fix: Documentation corrections (PR #24).
+* Fix: Added missing `as.tibble.stan_nma()` and `as_tibble.stan_nma()` methods, 
+to complement the existing `as.data.frame.stan_nma()`.
 
 # multinma 0.5.1
 

@@ -774,6 +774,19 @@ as.data.frame.stan_nma <- function(x, ..., pars, include = TRUE) {
 
 #' @rdname as.array.stan_nma
 #' @export
+as_tibble.stan_nma <- function(x, ..., pars, include = TRUE) {
+  return(tibble::as_tibble(as.matrix(x, ..., pars = pars, include = include)))
+}
+
+#' @rdname as.array.stan_nma
+#' @method as.tibble stan_nma
+#' @export
+as.tibble.stan_nma <- function(x, ..., pars, include = TRUE) {
+  return(tibble::as_tibble(as.matrix(x, ..., pars = pars, include = include)))
+}
+
+#' @rdname as.array.stan_nma
+#' @export
 as.matrix.stan_nma <- function(x, ..., pars, include = TRUE) {
   a <- as.array(x, ..., pars = pars, include = include)
   names_a <- dimnames(a)
