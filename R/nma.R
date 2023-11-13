@@ -1185,6 +1185,7 @@ nma <- function(network,
     }
   }
 
+  if (class_effects != "independent"){
   which_CE_labels <- levels(which_CE)
   which_CE_sd_labels <- levels(which_CE_sd)
   # For class_mean
@@ -1198,7 +1199,7 @@ nma <- function(network,
   extracted_numbers_sd <- gsub("^class_sd\\[([0-9]+)\\]$", "\\1", fnames_oi[matched_indices_sd])
   new_labels_sd <- which_CE_sd_labels[as.numeric(extracted_numbers_sd)]
   fnames_oi[matched_indices_sd] <- paste0("class_sd[", new_labels_sd, "]")
-
+}
   stanfit@sim$fnames_oi <- fnames_oi
 
   # Create stan_nma object
@@ -2296,13 +2297,13 @@ which_CE <- function(classes) {
   which_CE_num[zero_positions] <- 0  # Setting the actual number to 0
 
   # Re-level which_CE_num
-  remaining_classes <- unique(which_CE_num[which_CE_num != 0])
-  new_values <- 1:length(remaining_classes)
-  mapping <- setNames(new_values, remaining_classes)
-  which_CE_num[which_CE_num != 0] <- mapping[as.character(which_CE_num[which_CE_num != 0])]
+  #remaining_classes <- unique(which_CE_num[which_CE_num != 0])
+  #new_values <- 1:length(remaining_classes)
+  #mapping <- setNames(new_values, remaining_classes)
+  #which_CE_num[which_CE_num != 0] <- mapping[as.character(which_CE_num[which_CE_num != 0])]
 
   # Update which_CE to remove levels that have turned into zeros in which_CE_num
-  which_CE <- droplevels(which_CE, exclude = solo_classes)
+  #which_CE <- droplevels(which_CE, exclude = solo_classes)
 
 
   return(list(which_CE = which_CE, which_CE_num = which_CE_num))
