@@ -55,6 +55,7 @@ summary(half_normal(scale = 5))
 ## ---- echo = FALSE------------------------------------------------------------
 bcg_fit_unadj <- nma(bcg_net, 
                      seed = 14308133,
+                     iter = 5000,
                      trt_effects = "random",
                      prior_intercept = normal(scale = 100),
                      prior_trt = normal(scale = 100),
@@ -93,6 +94,7 @@ summary(half_normal(scale = 5))
 bcg_fit_lat <- nowarn_on_ci(
                  nma(bcg_net, 
                      seed = 1932599147,
+                     iter = 5000,
                      trt_effects = "random",
                      regression = ~.trt:latitude,
                      prior_intercept = normal(scale = 100),
