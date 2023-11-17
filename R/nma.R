@@ -993,7 +993,7 @@ nma <- function(network,
                                      error = function(e) abort(glue::glue("Could not create spline basis for study {glue::double_quote(.y)}."),
                                                                parent = e),
                                      warning = function(w) warn(glue::glue("Warning while creating spline basis for study {glue::double_quote(.y)}."),
-                                                                parent = e))
+                                                                parent = w))
                            )
 
     }
