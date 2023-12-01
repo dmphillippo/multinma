@@ -92,18 +92,6 @@ set_ipd <- function(data,
     trt_original_levels <- NULL
   }
 
-  # Check for single-arm studies
-  single_arm_studies <- tibble::tibble(.study, .trt) %>%
-    dplyr::distinct(.data$.study, .data$.trt) %>%
-    dplyr::group_by(.data$.study) %>%
-    dplyr::filter(dplyr::n() == 1) %>%
-    dplyr::pull(.data$.study)
-
-  if (length(single_arm_studies)) {
-    abort(glue::glue("Single-arm studies are not supported: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
-                     glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
-  }
-
   # Treatment classes
   .trtclass <- pull_non_null(data, enquo(trt_class))
   if (!is.null(.trtclass)) {
@@ -149,6 +137,23 @@ set_ipd <- function(data,
   o_type <- get_outcome_type(y = .y, se = NULL,
                              r = .r, n = NULL, E = .E,
                              Surv = .Surv)
+
+  # Check for single-arm studies
+  single_arm_studies <- tibble::tibble(.study, .trt) %>%
+    dplyr::distinct(.data$.study, .data$.trt) %>%
+    dplyr::group_by(.data$.study) %>%
+    dplyr::filter(dplyr::n() == 1) %>%
+    dplyr::pull(.data$.study)
+
+  if (length(single_arm_studies)) {
+    if (o_type == "survival") {
+      inform(glue::glue("Single-arm stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} present in the network: ",
+                        glue::glue_collapse(glue::double_quote(as.character(single_arm_studies)), sep = ", ", last = " and "), "."))
+    } else {
+      abort(glue::glue("Single-arm studies are not supported: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
+                       glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
+    }
+  }
 
   # Create tibble in standard format
   d <- tibble::tibble(
@@ -834,13 +839,14 @@ set_agd_surv <- function(data,
 
   # Check for single-arm studies
   single_arm_studies <- tibble::tibble(.study, .trt) %>%
+    dplyr::distinct(.data$.study, .data$.trt) %>%
     dplyr::group_by(.data$.study) %>%
     dplyr::filter(dplyr::n() == 1) %>%
     dplyr::pull(.data$.study)
 
   if (length(single_arm_studies)) {
-    abort(glue::glue("Single-arm studies are not supported: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
-                     glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
+    inform(glue::glue("Single-arm stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} present in the network: ",
+                      glue::glue_collapse(glue::double_quote(as.character(single_arm_studies)), sep = ", ", last = " and "), "."))
   }
 
   # Treatment classes

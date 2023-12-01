@@ -52,11 +52,14 @@ test_that("set_* error if study not given, missing values, or not regular 1D col
 test_that("set_* error if single-arm studies included", {
   m <- "Single-arm studies are not supported"
 
-  s <- tibble(study = c("a", "b", "b", "c"), trt = c("A", "A", "A", "B"), r = 1, n = 2)
+  s <- tibble(study = c("a", "b", "b", "c"), trt = c("A", "A", "A", "B"), r = 1, n = 2, time = 1, status = 1)
   expect_error(set_ipd(s, study, trt, r = r), paste0(m, '.+studies "a", "b" and "c"'))
   expect_error(set_agd_arm(s, study, trt, r = r, n = n), paste0(m, '.+studies "a" and "c"'))
   expect_error(set_agd_contrast(s, study, trt, y = r, se = n), paste0(m, '.+studies "a" and "c"'))
-  expect_error(set_agd_surv(s, study, trt, Surv = Surv(cont_pos, bin)), paste0(m, '.+studies "a" and "c"'))
+
+  # Allowed with message for survival outcomes
+  expect_message(set_ipd(s, study, trt, Surv = Surv(time, status)), 'Single-arm studies present in the network: "a", "b" and "c"')
+  expect_message(set_agd_surv(s, study, trt, Surv = Surv(time, status)), 'Single-arm studies present in the network: "a", "b" and "c"')
 })
 
 test_that("set_* error if trt not given, missing values, or not regular 1D column", {
