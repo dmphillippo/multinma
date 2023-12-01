@@ -1170,13 +1170,6 @@ predict.stan_nma <- function(object, ...,
         }
       }
 
-      # Check all variables are present
-      predreg <- get_model_data_columns(preddat,
-                                        regression = object$regression,
-                                        aux_regression = object$aux_regression,
-                                        keep = object$aux_by,
-                                        label = "`newdata`")
-
       preddat$.sample_size <- 1
 
       # Check times argument
@@ -1226,6 +1219,13 @@ predict.stan_nma <- function(object, ...,
           }
         }
       }
+
+      # Check all variables are present
+      preddat <- get_model_data_columns(preddat,
+                                        regression = object$regression,
+                                        aux_regression = object$aux_regression,
+                                        keep = object$aux_by,
+                                        label = "`newdata`")
 
       # Make design matrix of all studies and all treatments
       if (rlang::has_name(preddat, ".trt")) preddat <- dplyr::select(preddat, -".trt")
