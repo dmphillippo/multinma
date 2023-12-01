@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.7/font.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.7/font.css" rel="stylesheet">
 <!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
@@ -214,19 +214,19 @@ method:</p>
 <code class="sourceCode R"><span><span class="va">bcg_fit_unadj</span></span>
 <span><span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span></span>
 <span><span class="co">#&gt; Inference for Stan model: binomial_1par.</span></span>
-<span><span class="co">#&gt; 4 chains, each with iter=2000; warmup=1000; thin=1; </span></span>
-<span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
+<span><span class="co">#&gt; 4 chains, each with iter=5000; warmup=2500; thin=1; </span></span>
+<span><span class="co">#&gt; post-warmup draws per chain=2500, total post-warmup draws=10000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                    mean se_mean   sd      2.5%       25%       50%       75%     97.5% n_eff</span></span>
-<span><span class="co">#&gt; d[Vaccinated]     -0.77    0.01 0.22     -1.23     -0.90     -0.77     -0.63     -0.36   984</span></span>
-<span><span class="co">#&gt; lp__          -13533.58    0.15 4.47 -13542.90 -13536.48 -13533.39 -13530.40 -13525.66   931</span></span>
-<span><span class="co">#&gt; tau                0.69    0.01 0.21      0.39      0.54      0.65      0.79      1.17  1106</span></span>
+<span><span class="co">#&gt; d[Vaccinated]     -0.76    0.00 0.21     -1.19     -0.89     -0.76     -0.62     -0.34  3260</span></span>
+<span><span class="co">#&gt; lp__          -13533.78    0.09 4.46 -13543.34 -13536.65 -13533.53 -13530.61 -13525.93  2260</span></span>
+<span><span class="co">#&gt; tau                0.68    0.00 0.20      0.39      0.54      0.64      0.78      1.16  2848</span></span>
 <span><span class="co">#&gt;               Rhat</span></span>
-<span><span class="co">#&gt; d[Vaccinated] 1.00</span></span>
-<span><span class="co">#&gt; lp__          1.01</span></span>
-<span><span class="co">#&gt; tau           1.00</span></span>
+<span><span class="co">#&gt; d[Vaccinated]    1</span></span>
+<span><span class="co">#&gt; lp__             1</span></span>
+<span><span class="co">#&gt; tau              1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Nov 17 16:09:45 2023.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Dec  1 18:09:46 2023.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -289,21 +289,21 @@ method:</p>
 <span><span class="co">#&gt; latitude </span></span>
 <span><span class="co">#&gt; 33.46154 </span></span>
 <span><span class="co">#&gt; Inference for Stan model: binomial_1par.</span></span>
-<span><span class="co">#&gt; 4 chains, each with iter=2000; warmup=1000; thin=1; </span></span>
-<span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
+<span><span class="co">#&gt; 4 chains, each with iter=5000; warmup=2500; thin=1; </span></span>
+<span><span class="co">#&gt; post-warmup draws per chain=2500, total post-warmup draws=10000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                                    mean se_mean   sd      2.5%       25%       50%       75%</span></span>
 <span><span class="co">#&gt; beta[.trtVaccinated:latitude]     -0.03    0.00 0.01     -0.05     -0.04     -0.03     -0.03</span></span>
-<span><span class="co">#&gt; d[Vaccinated]                     -0.76    0.00 0.12     -1.01     -0.82     -0.75     -0.69</span></span>
-<span><span class="co">#&gt; lp__                          -13542.71    0.18 4.98 -13552.83 -13546.04 -13542.52 -13539.19</span></span>
-<span><span class="co">#&gt; tau                                0.29    0.01 0.18      0.03      0.16      0.26      0.39</span></span>
+<span><span class="co">#&gt; d[Vaccinated]                     -0.76    0.00 0.12     -1.03     -0.83     -0.75     -0.69</span></span>
+<span><span class="co">#&gt; lp__                          -13542.46    0.11 5.12 -13553.05 -13545.79 -13542.22 -13538.78</span></span>
+<span><span class="co">#&gt; tau                                0.30    0.00 0.19      0.03      0.16      0.27      0.40</span></span>
 <span><span class="co">#&gt;                                   97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; beta[.trtVaccinated:latitude]     -0.01  1950    1</span></span>
-<span><span class="co">#&gt; d[Vaccinated]                     -0.53  1974    1</span></span>
-<span><span class="co">#&gt; lp__                          -13533.59   771    1</span></span>
-<span><span class="co">#&gt; tau                                0.70   876    1</span></span>
+<span><span class="co">#&gt; beta[.trtVaccinated:latitude]     -0.01  4090    1</span></span>
+<span><span class="co">#&gt; d[Vaccinated]                     -0.53  3929    1</span></span>
+<span><span class="co">#&gt; lp__                          -13533.33  2009    1</span></span>
+<span><span class="co">#&gt; tau                                0.74  1938    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Nov 17 16:10:00 2023.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Dec  1 18:10:09 2023.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -328,14 +328,14 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">bcg_dic_unadj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 25.8<span style="color: #555555;"> (on 26 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 23.3</span></span>
-<span><span class="co">#&gt;               DIC: 49.1</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 26<span style="color: #555555;"> (on 26 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 23.5</span></span>
+<span><span class="co">#&gt;               DIC: 49.5</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">bcg_dic_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 30.7<span style="color: #555555;"> (on 26 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 21.3</span></span>
-<span><span class="co">#&gt;               DIC: 52.1</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 30.4<span style="color: #555555;"> (on 26 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 21.4</span></span>
+<span><span class="co">#&gt;               DIC: 51.8</span></span></code></pre></div>
 <p>The DIC is very similar between the two models, so we might at first
 choose the unadjusted model. The posterior mean residual deviance is
 larger for the model with the covariate, but this model also has a lower
@@ -345,18 +345,18 @@ Moreover, the model with the covariate has a much lower estimated
 heterogeneity standard deviation:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;     mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; tau 0.69 0.21 0.39 0.54 0.65 0.79  1.17     1110     1720    1</span></span>
+<span><span class="co">#&gt;     mean  sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; tau 0.68 0.2 0.39 0.54 0.64 0.78  1.16     2701     4486    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;     mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; tau 0.29 0.18 0.03 0.16 0.26 0.39   0.7      785     1201    1</span></span></code></pre></div>
+<span><span class="co">#&gt;     mean   sd 2.5%  25%  50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; tau  0.3 0.19 0.03 0.16 0.27 0.4  0.74     1756     2575    1</span></span></code></pre></div>
 <p>Adjusting for latitude is explaining a substantial amount of
 heterogeneity in the data. The 95% Credible Interval for the regression
 coefficient also excludes zero:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, pars <span class="op">=</span> <span class="st">"beta"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; beta[.trtVaccinated:latitude] -0.03 0.01 -0.05 -0.04 -0.03 -0.03 -0.01     2007     2047    1</span></span>
+<span><span class="co">#&gt; beta[.trtVaccinated:latitude] -0.03 0.01 -0.05 -0.04 -0.03 -0.03 -0.01     4303     4360    1</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, </span>
 <span>     pars <span class="op">=</span> <span class="st">"beta"</span>, </span>
@@ -394,8 +394,8 @@ and the <code>study</code> argument is used to specify a column of
 <span><span class="co">#&gt;  latitude</span></span>
 <span><span class="co">#&gt;        10</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                              mean   sd  2.5%   25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[10° latitude: Vaccinated] -0.01 0.21 -0.46 -0.12 0.01 0.11  0.38     1925     1977    1</span></span>
+<span><span class="co">#&gt;                              mean   sd  2.5%   25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; d[10° latitude: Vaccinated] -0.02 0.22 -0.51 -0.13   0 0.1  0.39     4036     4198    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 20° latitude</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -403,8 +403,8 @@ and the <code>study</code> argument is used to specify a column of
 <span><span class="co">#&gt;  latitude</span></span>
 <span><span class="co">#&gt;        20</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                              mean   sd  2.5%  25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[20° latitude: Vaccinated] -0.33 0.15 -0.65 -0.4 -0.32 -0.24 -0.06     1927     2103    1</span></span>
+<span><span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; d[20° latitude: Vaccinated] -0.34 0.16 -0.69 -0.41 -0.32 -0.25 -0.05     3982     4297    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 30° latitude</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -413,7 +413,7 @@ and the <code>study</code> argument is used to specify a column of
 <span><span class="co">#&gt;        30</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[30° latitude: Vaccinated] -0.65 0.12 -0.91 -0.71 -0.64 -0.58 -0.43     2002     2155    1</span></span>
+<span><span class="co">#&gt; d[30° latitude: Vaccinated] -0.65 0.12 -0.92 -0.72 -0.64 -0.58 -0.42     4088     4199    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 40° latitude</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -422,7 +422,7 @@ and the <code>study</code> argument is used to specify a column of
 <span><span class="co">#&gt;        40</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[40° latitude: Vaccinated] -0.97 0.13 -1.25 -1.04 -0.96 -0.89  -0.7     2122     2097    1</span></span>
+<span><span class="co">#&gt; d[40° latitude: Vaccinated] -0.97 0.14 -1.27 -1.05 -0.96 -0.88 -0.69     4306     4916    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 50° latitude</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -430,8 +430,8 @@ and the <code>study</code> argument is used to specify a column of
 <span><span class="co">#&gt;  latitude</span></span>
 <span><span class="co">#&gt;        50</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[50° latitude: Vaccinated] -1.28 0.19 -1.66 -1.39 -1.28 -1.18 -0.91     2128     2153    1</span></span></code></pre></div>
+<span><span class="co">#&gt;                              mean  sd 2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; d[50° latitude: Vaccinated] -1.28 0.2 -1.7 -1.39 -1.28 -1.17 -0.88     4376     5002    1</span></span></code></pre></div>
 <p>The <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method may be used to visually compare these
 estimates:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
@@ -499,13 +499,13 @@ effectiveness in a new study is wide and covers a range of harmful
 effects:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">bcg_predeff_unadj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, predictive_distribution <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; delta_new[Vaccinated] -0.78 0.75 -2.32 -1.22 -0.78 -0.31  0.72     3378     3143    1</span></span></code></pre></div>
+<span><span class="co">#&gt;                        mean   sd  2.5%   25%   50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; delta_new[Vaccinated] -0.76 0.74 -2.24 -1.21 -0.76 -0.3  0.74     8387     8695    1</span></span></code></pre></div>
 <p>The predictive probability of a new trial showing a harmful effect
 is:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">bcg_predeff_unadj</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.128</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 0.1327</span></span></code></pre></div>
 <p>For the analysis adjusting for latitude, the predictive distribution
 of relative effects now depends on latitude; here we calculate these in
 increments of 10 degrees from the equator:</p>
@@ -523,8 +523,8 @@ increments of 10 degrees from the equator:</p>
 <span><span class="co">#&gt;  latitude</span></span>
 <span><span class="co">#&gt;         0</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                                    mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; delta_new[0° latitude: Vaccinated]  0.3 0.44 -0.68 0.09 0.33 0.53  1.19     2971     2904    1</span></span>
+<span><span class="co">#&gt;                                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; delta_new[0° latitude: Vaccinated] 0.29 0.46 -0.7 0.08 0.32 0.52  1.17     6031     6086    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------</span> <span style="font-weight: bold;">Study: 10° latitude</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -532,8 +532,8 @@ increments of 10 degrees from the equator:</p>
 <span><span class="co">#&gt;  latitude</span></span>
 <span><span class="co">#&gt;        10</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                                      mean  sd  2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS</span></span>
-<span><span class="co">#&gt; delta_new[10° latitude: Vaccinated] -0.01 0.4 -0.89 -0.2 0.01 0.19  0.78     3260     3093</span></span>
+<span><span class="co">#&gt;                                      mean   sd  2.5%   25%  50%  75% 97.5% Bulk_ESS Tail_ESS</span></span>
+<span><span class="co">#&gt; delta_new[10° latitude: Vaccinated] -0.02 0.42 -0.92 -0.21 0.01 0.18   0.8     6775     6876</span></span>
 <span><span class="co">#&gt;                                     Rhat</span></span>
 <span><span class="co">#&gt; delta_new[10° latitude: Vaccinated]    1</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -544,7 +544,7 @@ increments of 10 degrees from the equator:</p>
 <span><span class="co">#&gt;        20</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS</span></span>
-<span><span class="co">#&gt; delta_new[20° latitude: Vaccinated] -0.33 0.37 -1.16 -0.51 -0.31 -0.15   0.4     3556     3350</span></span>
+<span><span class="co">#&gt; delta_new[20° latitude: Vaccinated] -0.34 0.39 -1.18 -0.51 -0.31 -0.16  0.44     7619     7071</span></span>
 <span><span class="co">#&gt;                                     Rhat</span></span>
 <span><span class="co">#&gt; delta_new[20° latitude: Vaccinated]    1</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -555,7 +555,7 @@ increments of 10 degrees from the equator:</p>
 <span><span class="co">#&gt;        30</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS</span></span>
-<span><span class="co">#&gt; delta_new[30° latitude: Vaccinated] -0.65 0.35 -1.43 -0.82 -0.63 -0.48  0.07     3727     3353</span></span>
+<span><span class="co">#&gt; delta_new[30° latitude: Vaccinated] -0.65 0.38 -1.47 -0.82 -0.64 -0.48  0.11     8156     7102</span></span>
 <span><span class="co">#&gt;                                     Rhat</span></span>
 <span><span class="co">#&gt; delta_new[30° latitude: Vaccinated]    1</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -565,8 +565,8 @@ increments of 10 degrees from the equator:</p>
 <span><span class="co">#&gt;  latitude</span></span>
 <span><span class="co">#&gt;        40</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS</span></span>
-<span><span class="co">#&gt; delta_new[40° latitude: Vaccinated] -0.97 0.35 -1.73 -1.14 -0.95 -0.79 -0.23     3638     3533</span></span>
+<span><span class="co">#&gt;                                      mean   sd 2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS</span></span>
+<span><span class="co">#&gt; delta_new[40° latitude: Vaccinated] -0.97 0.38 -1.8 -1.15 -0.96 -0.79 -0.18     8159     7202</span></span>
 <span><span class="co">#&gt;                                     Rhat</span></span>
 <span><span class="co">#&gt; delta_new[40° latitude: Vaccinated]    1</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -576,8 +576,8 @@ increments of 10 degrees from the equator:</p>
 <span><span class="co">#&gt;  latitude</span></span>
 <span><span class="co">#&gt;        50</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                                      mean   sd 2.5%   25%   50%  75% 97.5% Bulk_ESS Tail_ESS</span></span>
-<span><span class="co">#&gt; delta_new[50° latitude: Vaccinated] -1.29 0.38 -2.1 -1.47 -1.28 -1.1 -0.52     3313     3132</span></span>
+<span><span class="co">#&gt;                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS</span></span>
+<span><span class="co">#&gt; delta_new[50° latitude: Vaccinated] -1.28 0.41 -2.15 -1.48 -1.28 -1.09 -0.43     7609     7391</span></span>
 <span><span class="co">#&gt;                                     Rhat</span></span>
 <span><span class="co">#&gt; delta_new[50° latitude: Vaccinated]    1</span></span></code></pre></div>
 <p>The predictive probabilities of a new trial carried out at a given
@@ -585,11 +585,11 @@ latitude showing a harmful effect can be calculated as:</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">bcg_predeff_lat</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  delta_new[0° latitude: Vaccinated] delta_new[10° latitude: Vaccinated] </span></span>
-<span><span class="co">#&gt;                             0.81200                             0.51925 </span></span>
+<span><span class="co">#&gt;                              0.8050                              0.5097 </span></span>
 <span><span class="co">#&gt; delta_new[20° latitude: Vaccinated] delta_new[30° latitude: Vaccinated] </span></span>
-<span><span class="co">#&gt;                             0.12950                             0.03075 </span></span>
+<span><span class="co">#&gt;                              0.1298                              0.0363 </span></span>
 <span><span class="co">#&gt; delta_new[40° latitude: Vaccinated] delta_new[50° latitude: Vaccinated] </span></span>
-<span><span class="co">#&gt;                             0.01075                             0.00500</span></span></code></pre></div>
+<span><span class="co">#&gt;                              0.0137                              0.0070</span></span></code></pre></div>
 <p>So the predictive probability that a new trial carried out at the
 equator shows a harmful effect is around 80%, whereas at 50 degrees
 latitude the predictive probability is only 0.7%.</p>

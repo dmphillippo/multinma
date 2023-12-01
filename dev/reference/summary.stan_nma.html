@@ -3,7 +3,7 @@
 using the summary() method and plotted with the plot() method. NOTE: To
 produce relative effects, absolute predictions, or posterior ranks, see
 relative_effects(), predict.stan_nma(), posterior_ranks(),
-posterior_rank_probs()."><title>Posterior summaries from stan_nma objects — summary.stan_nma • multinma</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.7/font.css" rel="stylesheet"><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet"><meta property="og:title" content="Posterior summaries from stan_nma objects — summary.stan_nma"><meta property="og:description" content="Posterior summaries of model parameters in stan_nma objects may be produced
+posterior_rank_probs()."><title>Posterior summaries from stan_nma objects — summary.stan_nma • multinma</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.7/font.css" rel="stylesheet"><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet"><meta property="og:title" content="Posterior summaries from stan_nma objects — summary.stan_nma"><meta property="og:description" content="Posterior summaries of model parameters in stan_nma objects may be produced
 using the summary() method and plotted with the plot() method. NOTE: To
 produce relative effects, absolute predictions, or posterior ranks, see
 relative_effects(), predict.stan_nma(), posterior_ranks(),
@@ -165,132 +165,132 @@ details of plotting options, see <code><a href="plot.nma_summary.html">plot.nma_
 <span class="r-in"><span><span class="co"># Summary and plot of all model parameters</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">smk_fit_RE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                    mean   sd  2.5%   25%   50%   75% 97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[1]                             -2.78 0.32 -3.44 -2.99 -2.78 -2.56 -2.17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[2]                             -2.60 0.78 -4.16 -3.11 -2.60 -2.09 -1.02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[3]                             -2.14 0.12 -2.38 -2.22 -2.14 -2.06 -1.92</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[4]                             -4.06 0.59 -5.33 -4.41 -4.03 -3.64 -3.02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[5]                             -2.16 0.14 -2.44 -2.25 -2.15 -2.06 -1.90</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[6]                             -3.44 0.74 -5.10 -3.88 -3.37 -2.92 -2.19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[7]                             -3.03 0.46 -4.01 -3.31 -2.99 -2.70 -2.24</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[8]                             -2.71 0.61 -4.04 -3.08 -2.66 -2.27 -1.66</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[9]                             -1.84 0.41 -2.68 -2.12 -1.84 -1.55 -1.08</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[10]                            -2.09 0.12 -2.33 -2.17 -2.08 -2.00 -1.85</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[11]                            -3.62 0.23 -4.07 -3.78 -3.62 -3.46 -3.19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[12]                            -2.22 0.13 -2.47 -2.31 -2.22 -2.13 -1.97</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[13]                            -2.67 0.46 -3.63 -2.97 -2.65 -2.36 -1.84</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[14]                            -2.41 0.22 -2.86 -2.55 -2.40 -2.26 -1.99</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[15]                            -2.69 0.75 -4.36 -3.13 -2.63 -2.17 -1.39</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[16]                            -2.62 0.34 -3.32 -2.84 -2.61 -2.39 -1.98</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[17]                            -2.38 0.11 -2.59 -2.45 -2.37 -2.30 -2.17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[18]                            -2.57 0.28 -3.14 -2.75 -2.56 -2.38 -2.03</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[19]                            -1.90 0.12 -2.15 -1.98 -1.90 -1.82 -1.66</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[20]                            -2.80 0.12 -3.05 -2.88 -2.80 -2.72 -2.56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[21]                            -1.13 0.79 -2.70 -1.61 -1.12 -0.62  0.45</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[22]                            -2.43 0.85 -4.21 -2.96 -2.41 -1.89 -0.74</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[23]                            -2.33 0.83 -4.06 -2.84 -2.32 -1.79 -0.68</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[24]                            -2.82 0.87 -4.53 -3.39 -2.82 -2.25 -1.12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]               1.10 0.44  0.28  0.80  1.09  1.38  2.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]          0.85 0.24  0.41  0.69  0.84  1.01  1.36</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                       0.48 0.41 -0.34  0.23  0.49  0.74  1.28</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                0.84 0.19  0.55  0.71  0.82  0.95  1.29</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[1: Individual counselling]   1.08 0.38  0.35  0.82  1.07  1.33  1.85</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[1: Group counselling]        0.37 0.42 -0.47  0.09  0.37  0.66  1.22</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[2: Self-help]                0.70 0.80 -0.89  0.20  0.69  1.20  2.30</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[2: Individual counselling]   0.78 0.79 -0.78  0.28  0.78  1.27  2.35</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[2: Group counselling]        1.02 0.79 -0.59  0.52  1.02  1.52  2.60</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[3: Individual counselling]   2.16 0.14  1.90  2.07  2.16  2.26  2.44</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[4: Individual counselling]   0.92 0.60 -0.20  0.51  0.90  1.30  2.14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[5: Individual counselling]   0.44 0.15  0.14  0.33  0.43  0.54  0.74</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[6: Individual counselling]   1.72 0.74  0.44  1.21  1.67  2.18  3.36</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[7: Individual counselling]   2.15 0.49  1.26  1.82  2.12  2.47  3.21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[8: Individual counselling]   1.65 0.62  0.59  1.21  1.60  2.04  2.96</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[9: Individual counselling]   0.59 0.45 -0.28  0.29  0.59  0.89  1.51</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[10: Self-help]               0.01 0.17 -0.34 -0.11  0.01  0.13  0.33</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[11: Self-help]               0.41 0.30 -0.18  0.20  0.41  0.61  0.99</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[1]                             -2.78 0.33 -3.47 -2.99 -2.76 -2.56 -2.17</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[2]                             -2.59 0.77 -4.11 -3.08 -2.57 -2.08 -1.10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[3]                             -2.14 0.12 -2.38 -2.23 -2.14 -2.06 -1.92</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[4]                             -4.04 0.57 -5.27 -4.40 -4.03 -3.64 -3.03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[5]                             -2.16 0.14 -2.43 -2.25 -2.16 -2.06 -1.90</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[6]                             -3.41 0.73 -5.01 -3.86 -3.35 -2.90 -2.14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[7]                             -3.02 0.44 -3.99 -3.31 -2.99 -2.71 -2.24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[8]                             -2.69 0.59 -3.98 -3.06 -2.65 -2.27 -1.67</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[9]                             -1.84 0.41 -2.66 -2.10 -1.82 -1.56 -1.08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[10]                            -2.08 0.12 -2.31 -2.16 -2.08 -2.00 -1.85</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[11]                            -3.62 0.23 -4.10 -3.77 -3.61 -3.46 -3.19</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[12]                            -2.22 0.13 -2.48 -2.30 -2.22 -2.13 -1.97</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[13]                            -2.68 0.45 -3.61 -2.98 -2.66 -2.37 -1.86</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[14]                            -2.41 0.24 -2.91 -2.57 -2.41 -2.25 -1.95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[15]                            -2.68 0.74 -4.30 -3.13 -2.62 -2.17 -1.43</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[16]                            -2.61 0.34 -3.34 -2.83 -2.60 -2.39 -1.97</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[17]                            -2.38 0.11 -2.60 -2.45 -2.38 -2.31 -2.17</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[18]                            -2.57 0.27 -3.12 -2.74 -2.56 -2.39 -2.08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[19]                            -1.90 0.12 -2.14 -1.98 -1.90 -1.82 -1.67</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[20]                            -2.80 0.12 -3.05 -2.88 -2.80 -2.72 -2.57</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[21]                            -1.10 0.80 -2.72 -1.64 -1.10 -0.57  0.48</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[22]                            -2.40 0.81 -3.98 -2.92 -2.38 -1.87 -0.89</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[23]                            -2.30 0.84 -3.95 -2.84 -2.31 -1.76 -0.59</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[24]                            -2.80 0.84 -4.52 -3.33 -2.78 -2.27 -1.17</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]               1.09 0.43  0.25  0.81  1.09  1.37  1.96</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]          0.84 0.24  0.40  0.68  0.83  0.99  1.34</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                       0.49 0.40 -0.26  0.22  0.48  0.75  1.30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                0.83 0.18  0.54  0.70  0.81  0.94  1.25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[1: Individual counselling]   1.06 0.39  0.34  0.80  1.05  1.32  1.84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[1: Group counselling]        0.36 0.42 -0.47  0.10  0.36  0.65  1.19</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[2: Self-help]                0.69 0.78 -0.82  0.18  0.68  1.20  2.25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[2: Individual counselling]   0.78 0.78 -0.72  0.27  0.76  1.28  2.32</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[2: Group counselling]        1.01 0.78 -0.49  0.50  1.00  1.52  2.56</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[3: Individual counselling]   2.17 0.14  1.90  2.07  2.16  2.26  2.45</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[4: Individual counselling]   0.90 0.57 -0.16  0.51  0.88  1.27  2.10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[5: Individual counselling]   0.44 0.15  0.14  0.34  0.44  0.54  0.74</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[6: Individual counselling]   1.70 0.72  0.42  1.21  1.65  2.13  3.33</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[7: Individual counselling]   2.14 0.48  1.28  1.81  2.10  2.45  3.18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[8: Individual counselling]   1.65 0.61  0.58  1.23  1.61  2.01  2.94</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[9: Individual counselling]   0.59 0.45 -0.29  0.27  0.59  0.88  1.50</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[10: Self-help]               0.01 0.17 -0.34 -0.11  0.01  0.12  0.34</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[11: Self-help]               0.41 0.31 -0.20  0.20  0.41  0.62  1.00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> delta[12: Individual counselling]  0.41 0.16  0.09  0.30  0.41  0.52  0.74</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[13: Individual counselling]  0.39 0.52 -0.59  0.04  0.38  0.73  1.43</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[14: Individual counselling]  0.62 0.28  0.09  0.43  0.62  0.81  1.19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[15: Group counselling]       2.16 0.77  0.85  1.63  2.10  2.61  3.91</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[16: Self-help]               0.66 0.40 -0.10  0.39  0.66  0.93  1.47</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[17: Individual counselling]  0.55 0.14  0.27  0.46  0.55  0.64  0.82</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[18: Individual counselling]  0.03 0.32 -0.58 -0.19  0.03  0.25  0.66</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[19: Individual counselling] -0.20 0.17 -0.53 -0.31 -0.20 -0.09  0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[20: Individual counselling]  0.08 0.18 -0.28 -0.04  0.08  0.20  0.43</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[21: Self-help]               0.70 0.79 -0.89  0.20  0.68  1.19  2.31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[21: Individual counselling]  0.66 0.77 -0.90  0.17  0.64  1.14  2.19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[22: Self-help]               0.33 0.85 -1.35 -0.22  0.34  0.86  2.09</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[22: Group counselling]       1.31 0.85 -0.34  0.75  1.30  1.84  3.10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[23: Individual counselling]  0.68 0.82 -0.94  0.15  0.67  1.19  2.33</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[23: Group counselling]       1.28 0.83 -0.34  0.76  1.27  1.81  2.95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[24: Individual counselling]  1.06 0.83 -0.59  0.51  1.06  1.61  2.72</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[24: Group counselling]       0.90 0.87 -0.82  0.34  0.92  1.48  2.65</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[13: Individual counselling]  0.40 0.50 -0.61  0.07  0.39  0.74  1.40</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[14: Individual counselling]  0.62 0.29  0.06  0.43  0.62  0.82  1.21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[15: Group counselling]       2.14 0.76  0.79  1.61  2.08  2.62  3.78</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[16: Self-help]               0.65 0.40 -0.11  0.38  0.65  0.91  1.47</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[17: Individual counselling]  0.55 0.14  0.28  0.45  0.55  0.64  0.83</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[18: Individual counselling]  0.03 0.31 -0.55 -0.17  0.02  0.23  0.66</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[19: Individual counselling] -0.19 0.17 -0.53 -0.31 -0.19 -0.07  0.15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[20: Individual counselling]  0.08 0.18 -0.28 -0.04  0.08  0.20  0.44</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[21: Self-help]               0.67 0.80 -0.90  0.15  0.66  1.18  2.30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[21: Individual counselling]  0.63 0.79 -0.92  0.12  0.62  1.15  2.22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[22: Self-help]               0.31 0.81 -1.23 -0.23  0.29  0.83  1.91</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[22: Group counselling]       1.28 0.81 -0.21  0.74  1.25  1.79  2.89</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[23: Individual counselling]  0.65 0.83 -1.06  0.13  0.67  1.18  2.28</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[23: Group counselling]       1.25 0.84 -0.43  0.71  1.25  1.80  2.91</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[24: Individual counselling]  1.04 0.81 -0.52  0.52  1.02  1.56  2.71</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[24: Group counselling]       0.89 0.84 -0.79  0.34  0.89  1.42  2.54</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[1]                                 5177     2697 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[2]                                 2064     2344 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[3]                                 7437     3092 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[4]                                 4885     3214 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[5]                                 6935     2778 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[6]                                 3267     2398 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[7]                                 3450     2363 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[8]                                 3331     2673 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[9]                                 5023     3249 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[10]                                8936     2728 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[11]                                7298     2725 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[12]                                6565     2925 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[13]                                4619     2652 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[14]                                5605     2974 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[15]                                3055     2419 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[16]                                6130     3041 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[17]                                9418     3092 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[18]                                5470     2559 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[19]                                9211     3038 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[20]                                7392     3144 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[21]                                2614     2473 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[22]                                2691     2644 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[23]                                2514     2344 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu[24]                                2767     2770 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]                  1865     2415 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]             1123     1707 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                          1613     2081 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                   1323     1950 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[1: Individual counselling]      5226     3412 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[1: Group counselling]           4395     3408 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[2: Self-help]                   2272     2548 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[2: Individual counselling]      2290     2193 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[2: Group counselling]           2084     2466 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[3: Individual counselling]      5671     3376 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[4: Individual counselling]      4520     3424 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[5: Individual counselling]      6272     2874 1.01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[6: Individual counselling]      3088     2381 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[7: Individual counselling]      3262     2571 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[8: Individual counselling]      3186     2336 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[9: Individual counselling]      4827     3013 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[10: Self-help]                  5794     3451 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[11: Self-help]                  5138     2866 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[12: Individual counselling]     5317     3547 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[13: Individual counselling]     4255     2525 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[14: Individual counselling]     5222     3238 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[15: Group counselling]          2626     2638 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[16: Self-help]                  5055     3092 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[17: Individual counselling]     6765     3471 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[18: Individual counselling]     4816     2972 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[19: Individual counselling]     5830     3674 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[20: Individual counselling]     5580     3581 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[21: Self-help]                  2721     2635 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[21: Individual counselling]     2656     2570 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[22: Self-help]                  2617     2644 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[22: Group counselling]          2676     2405 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[23: Individual counselling]     2679     2570 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[23: Group counselling]          2583     2338 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[24: Individual counselling]     3005     2953 1.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> delta[24: Group counselling]          3223     3106 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[1]                                 4901     2951 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[2]                                 2917     2531 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[3]                                 7989     2897 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[4]                                 5324     2839 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[5]                                 8376     2907 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[6]                                 3542     2538 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[7]                                 4414     2727 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[8]                                 3761     2833 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[9]                                 5290     2828 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[10]                                8479     3166 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[11]                                8054     2953 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[12]                                7080     3004 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[13]                                5193     3068 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[14]                                6339     2588 1.01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[15]                                3352     2655 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[16]                                6013     2996 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[17]                                9061     2651 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[18]                                6724     2930 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[19]                                7957     2725 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[20]                                8292     2652 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[21]                                3801     2953 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[22]                                3053     2514 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[23]                                2974     2412 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu[24]                                3045     2697 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]                  2259     2636 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]             1512     1967 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                          2211     2645 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau                                   1060     2142 1.01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[1: Individual counselling]      5782     3493 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[1: Group counselling]           4561     3346 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[2: Self-help]                   2945     2555 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[2: Individual counselling]      2881     2403 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[2: Group counselling]           2795     2487 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[3: Individual counselling]      6309     3126 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[4: Individual counselling]      4829     3110 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[5: Individual counselling]      7237     2827 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[6: Individual counselling]      3075     2317 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[7: Individual counselling]      3885     2559 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[8: Individual counselling]      3552     2896 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[9: Individual counselling]      4680     3048 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[10: Self-help]                  5835     3634 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[11: Self-help]                  5753     3051 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[12: Individual counselling]     6603     3117 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[13: Individual counselling]     4992     2905 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[14: Individual counselling]     7107     2697 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[15: Group counselling]          3082     2532 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[16: Self-help]                  5759     3190 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[17: Individual counselling]     7026     3405 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[18: Individual counselling]     5727     3325 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[19: Individual counselling]     5688     3214 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[20: Individual counselling]     5575     3318 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[21: Self-help]                  3811     3009 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[21: Individual counselling]     3723     2781 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[22: Self-help]                  3138     2841 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[22: Group counselling]          3086     2451 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[23: Individual counselling]     3128     2366 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[23: Group counselling]          3019     2536 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[24: Individual counselling]     3144     2941 1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta[24: Group counselling]          3351     2714 1.00</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_fit_RE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="summary.stan_nma-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Summary and plot of heterogeneity tau only</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">smk_fit_RE</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> tau 0.84 0.19 0.55 0.71 0.82 0.95  1.29     1323     1950    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     mean   sd 2.5% 25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> tau 0.83 0.18 0.54 0.7 0.81 0.94  1.25     1060     2142 1.01</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_fit_RE</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="summary.stan_nma-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
