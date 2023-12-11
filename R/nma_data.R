@@ -3,6 +3,7 @@
 #' Set up a network containing individual patient data (IPD). Multiple data
 #' sources may be combined once created using [combine_network()].
 #'
+#' @param data a data frame
 #' @template args-data_common
 #' @template args-data_y
 # #' @template args-data_rE
@@ -252,6 +253,7 @@ set_ipd <- function(data,
 #' counts or mean outcomes on each arm. Multiple data sources may be combined
 #' once created using [combine_network()].
 #'
+#' @param data a data frame
 #' @template args-data_common
 #' @template args-data_y
 #' @template args-data_se
@@ -487,6 +489,7 @@ set_agd_arm <- function(data,
 #' summaries of relative effects between treatments such as log Odds Ratios.
 #' Multiple data sources may be combined once created using [combine_network()].
 #'
+#' @param data a data frame
 #' @template args-data_common
 #' @template args-data_y
 #' @template args-data_se
@@ -757,6 +760,7 @@ set_agd_contrast <- function(data,
 #' and covariate summary statistics from each study. Multiple data sources may be
 #' combined once created using [combine_network()].
 #'
+#' @param data a data frame
 #' @template args-data_common
 #' @template args-data_Surv
 #' @param covariates data frame of covariate summary statistics for each study
@@ -992,6 +996,54 @@ set_agd_surv <- function(data,
   if (!is.null(.trtclass)) attr(out$classes, "original_levels") <- trtclass_original_levels
 
   return(out)
+
+}
+
+
+#' Set up data reported from regression models
+#'
+#' Set up a network containing data reported from regression models. These are
+#' in the form of regression coefficients, their standard errors, and
+#' covariance/correlation matrices. Data are specified in *long* format, with
+#' one row per coefficient estimate. Multiple data sources may be combined once
+#' created using [combine_network()].
+#'
+#' @param data A data frame. In addition to columns for study, treatment, and
+#'   the regression estimates and their standard errors, `data` should also
+#'   contain columns corresponding to the covariates in the regression model.
+#'   The covariate columns should either be set to the reference level to which
+#'   the estimate corresponds (commonly 0, or perhaps the mean value in that
+#'   study), or to `NA` if the covariate is not present in this term.
+#' @template args-data_common
+#' @param estimate column of `data` containing regression coefficient estimates
+#' @param se column of `data` containing regression coefficient standard errors
+#' @param cor Named list of correlation matrices for the regression coefficients in each study. Each
+#' @param cov
+#' @param covariates **NOT USED YET** data frame of covariate summary statistics
+#'   for each study or study arm, with corresponding `study` and `trt` columns
+#'   to match to those in `data`
+#' @param regression **NOT USED YET** named list of regression formulae used in each study
+#'
+#' @return An object of class [nma_data]
+#' @export
+#'
+#' @template args-details_trt_ref
+#' @template args-details_mutate
+#'
+#' @seealso [set_ipd()] for individual patient data, [set_agd_contrast()] for
+#'   contrast-based aggregate data, and [combine_network()] for combining
+#'   several data sources in one network.
+#' @template seealso_nma_data
+#' @examples
+set_agd_regression <- function(data,
+                               study,
+                               trt,
+                               estimate, se, cor, cov,
+                               covariates = NULL,
+                               regression = NULL,
+                               trt_ref = NULL,
+                               trt_class = NULL) {
+
 
 }
 
