@@ -56,16 +56,7 @@ set_ipd <- function(data,
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
   if (nrow(data) == 0) {
-    return(
-      structure(
-        list(agd_arm = NULL,
-             agd_contrast = NULL,
-             ipd = NULL,
-             treatments = NULL,
-             classes = NULL,
-             studies = NULL),
-        class = "nma_data")
-    )
+    return(make_nma_data())
   }
 
   # Pull study and treatment columns
@@ -210,15 +201,12 @@ set_ipd <- function(data,
   if (!is.null(.trtclass)) d <- drop_original(d, data, enquo(trt_class))
 
   # Produce nma_data object
-  out <- structure(
-    list(agd_arm = NULL,
-         agd_contrast = NULL,
-         ipd = d,
-         treatments = forcats::fct_unique(d$.trt),
-         classes = classes,
-         studies = forcats::fct_unique(d$.study),
-         outcome = list(agd_arm = NA, agd_contrast = NA, ipd = o_type)),
-    class = "nma_data")
+  out <- make_nma_data(
+    ipd = d,
+    treatments = forcats::fct_unique(d$.trt),
+    classes = classes,
+    studies = forcats::fct_unique(d$.study),
+    outcome = list(agd_arm = NA, agd_contrast = NA, ipd = o_type))
 
   # If trt_ref not specified, mark treatments factor as default, calculate
   # current reference trt
@@ -296,16 +284,7 @@ set_agd_arm <- function(data,
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
   if (nrow(data) == 0) {
-    return(
-      structure(
-        list(agd_arm = NULL,
-             agd_contrast = NULL,
-             ipd = NULL,
-             treatments = NULL,
-             classes = NULL,
-             studies = NULL),
-        class = "nma_data")
-    )
+    return(make_nma_data())
   }
 
   # Pull study and treatment columns
@@ -446,15 +425,12 @@ set_agd_arm <- function(data,
   if (!is.null(.trtclass)) d <- drop_original(d, data, enquo(trt_class))
 
   # Produce nma_data object
-  out <- structure(
-    list(agd_arm = d,
-         agd_contrast = NULL,
-         ipd = NULL,
-         treatments = forcats::fct_unique(d$.trt),
-         classes = classes,
-         studies = forcats::fct_unique(d$.study),
-         outcome = list(agd_arm = o_type, agd_contrast = NA, ipd = NA)),
-    class = "nma_data")
+  out <- make_nma_data(
+    agd_arm = d,
+    treatments = forcats::fct_unique(d$.trt),
+    classes = classes,
+    studies = forcats::fct_unique(d$.study),
+    outcome = list(agd_arm = o_type, agd_contrast = NA, ipd = NA))
 
   # If trt_ref not specified, mark treatments factor as default, calculate
   # current reference trt
@@ -533,7 +509,6 @@ set_agd_arm <- function(data,
 #'
 #' # Plot network
 #' plot(park_net)
-
 set_agd_contrast <- function(data,
                              study,
                              trt,
@@ -545,16 +520,7 @@ set_agd_contrast <- function(data,
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
   if (nrow(data) == 0) {
-    return(
-      structure(
-        list(agd_arm = NULL,
-             agd_contrast = NULL,
-             ipd = NULL,
-             treatments = NULL,
-             classes = NULL,
-             studies = NULL),
-        class = "nma_data")
-    )
+    return(make_nma_data())
   }
 
 
@@ -716,15 +682,12 @@ set_agd_contrast <- function(data,
   }
 
   # Produce nma_data object
-  out <- structure(
-    list(agd_arm = NULL,
-         agd_contrast = d,
-         ipd = NULL,
-         treatments = forcats::fct_unique(d$.trt),
-         classes = classes,
-         studies = forcats::fct_unique(d$.study),
-         outcome = list(agd_arm = NA, agd_contrast = o_type, ipd = NA)),
-    class = "nma_data")
+  out <- make_nma_data(
+    agd_contrast = d,
+    treatments = forcats::fct_unique(d$.trt),
+    classes = classes,
+    studies = forcats::fct_unique(d$.study),
+    outcome = list(agd_arm = NA, agd_contrast = o_type, ipd = NA))
 
   # If trt_ref not specified, mark treatments factor as default, calculate
   # current reference trt
@@ -800,16 +763,7 @@ set_agd_surv <- function(data,
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
   if (nrow(data) == 0) {
-    return(
-      structure(
-        list(agd_arm = NULL,
-             agd_contrast = NULL,
-             ipd = NULL,
-             treatments = NULL,
-             classes = NULL,
-             studies = NULL),
-        class = "nma_data")
-    )
+    return(make_nma_data())
   }
 
   if (!is.null(covariates)) {
@@ -962,15 +916,12 @@ set_agd_surv <- function(data,
   }
 
   # Produce nma_data object
-  out <- structure(
-    list(agd_arm = d,
-         agd_contrast = NULL,
-         ipd = NULL,
-         treatments = forcats::fct_unique(d$.trt),
-         classes = classes,
-         studies = forcats::fct_unique(d$.study),
-         outcome = list(agd_arm = o_type, agd_contrast = NA, ipd = NA)),
-    class = "nma_data")
+  out <- make_nma_data(
+    agd_arm = d,
+    treatments = forcats::fct_unique(d$.trt),
+    classes = classes,
+    studies = forcats::fct_unique(d$.study),
+    outcome = list(agd_arm = o_type, agd_contrast = NA, ipd = NA))
 
   # If trt_ref not specified, mark treatments factor as default, calculate
   # current reference trt
@@ -1259,15 +1210,14 @@ combine_network <- function(..., trt_ref) {
   agd_arm <- dplyr::bind_rows(agd_arm)
   agd_contrast <- dplyr::bind_rows(agd_contrast)
 
-  out <- structure(
-    list(agd_arm = agd_arm,
-         agd_contrast = agd_contrast,
-         ipd = ipd,
-         treatments = factor(trts, levels = trts),
-         classes = classes,
-         studies = factor(studs, levels = studs),
-         outcome = outcome),
-    class = "nma_data")
+  out <- make_nma_data(
+    agd_arm = agd_arm,
+    agd_contrast = agd_contrast,
+    ipd = ipd,
+    treatments = factor(trts, levels = trts),
+    classes = classes,
+    studies = factor(studs, levels = studs),
+    outcome = outcome)
 
   # If trt_ref not specified, mark treatments factor as default, calculate
   # current reference trt
@@ -1861,4 +1811,33 @@ nfactor <- function(x, ..., numeric = TRUE, resort = FALSE) {
   } else {
     return(factor(x, levels = stringr::str_sort(unique(x), numeric = numeric), ...))
   }
+}
+
+#' Construct `nma_data` network objects
+#'
+#' @param agd_arm AgD arm data frame
+#' @param agd_contrast AgD contrast data frame
+#' @param ipd IPD data frame
+#' @param treatments treatments factor
+#' @param classes classes factor
+#' @param studies studies factor
+#' @param outcome outcome type list for each data source
+#'
+#' @nord
+make_nma_data <- function(agd_arm = NULL,
+                          agd_contrast = NULL,
+                          ipd = NULL,
+                          treatments = NULL,
+                          classes = NULL,
+                          studies = NULL,
+                          outcome = NULL) {
+ structure(
+    list(agd_arm = agd_arm,
+         agd_contrast = agd_contrast,
+         ipd = ipd,
+         treatments = treatments,
+         classes = classes,
+         studies = studies,
+         outcome = outcome),
+    class = "nma_data")
 }
