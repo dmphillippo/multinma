@@ -1598,8 +1598,8 @@ nma.fit <- function(ipd_x, ipd_y,
     has_offset = has_offsets,
     offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric(),
     # Class effects
-    which_CE_num = if (exists("which_CE_num")) which_CE_num else rep(0, n_trt - 1),
-    which_CE_sd_num = if (exists("which_CE_sd_num")) which_CE_sd_num else rep(0, n_trt - 1),
+    which_CE_num = if (class_effects != "independent") which_CE_num else numeric(0),
+    which_CE_sd_num = if (class_effects != "independent") which_CE_sd_num else numeric(0),
     class_effects = ifelse(class_effects == "independent", 0, 1)
     )
 
