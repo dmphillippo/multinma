@@ -962,18 +962,25 @@ set_agd_surv <- function(data,
 #' @param data A data frame. In addition to columns for study, treatment, and
 #'   the regression estimates and their standard errors, `data` should also
 #'   contain columns corresponding to the covariates in the regression model.
-#'   The covariate columns should either be set to the reference level to which
-#'   the estimate corresponds (commonly 0, or perhaps the mean value in that
-#'   study), or to `NA` if the covariate is not present in this term.
+#'   The covariate columns should either be set to level to which
+#'   the estimate corresponds, or to `NA` if the covariate is not present in
+#'   this term. An additional row with `estimate=NA` defines the reference
+#'   treatment and reference levels of the covariates in each study.
 #' @template args-data_common
-#' @param estimate column of `data` containing regression coefficient estimates
-#' @param se column of `data` containing regression coefficient standard errors
-#' @param cor Named list of correlation matrices for the regression coefficients in each study. Each
-#' @param cov
+#' @param estimate Column of `data` containing regression coefficient estimates
+#' @param se Column of `data` containing regression coefficient standard errors.
+#'   Currently either `se` and `cor`, or `cov` must be specified.
+#' @param cor Named list of correlation matrices for the regression coefficients
+#'   in each study. Currently either `se` and `cor`, or `cov` must be specified.
+#' @param cov Named list of covariance matrices for the regression coefficients
+#'   in each study. Currently either `se` and `cor`, or `cov` must be specified.
+#' @param regression Regression formula. Currently this must be a single formula
+#'   which all studies have estimated, and must then match the regression model
+#'   specified when fitting the model with `nma()`. Specify terms involving
+#'   treatment with the `.trt` special.
 #' @param covariates **NOT USED YET** data frame of covariate summary statistics
 #'   for each study or study arm, with corresponding `study` and `trt` columns
 #'   to match to those in `data`
-#' @param regression **NOT USED YET** named list of regression formulae used in each study
 #'
 #' @return An object of class [nma_data]
 #' @export
@@ -981,20 +988,282 @@ set_agd_surv <- function(data,
 #' @template args-details_trt_ref
 #' @template args-details_mutate
 #'
-#' @seealso [set_ipd()] for individual patient data, [set_agd_contrast()] for
-#'   contrast-based aggregate data, and [combine_network()] for combining
-#'   several data sources in one network.
+#' @seealso [set_ipd()] for individual patient data, [set_agd_arm()] and
+#'   [set_agd_contrast()] for arm- and contrast-based aggregate data, and
+#'   [combine_network()] for combining several data sources in one network.
 #' @template seealso_nma_data
 #' @examples
 set_agd_regression <- function(data,
                                study,
                                trt,
                                estimate, se, cor, cov,
+                               regression,
                                covariates = NULL,
-                               regression = NULL,
                                trt_ref = NULL,
                                trt_class = NULL) {
 
+  # Check data is data frame
+  if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
+  if (nrow(data) == 0) {
+    return(make_nma_data())
+  }
+
+
+  # Pull study and treatment columns
+  if (missing(study)) abort("Specify `study`")
+  .study <- pull_non_null(data, enquo(study))
+  if (is.null(.study)) abort("`study` cannot be NULL")
+  check_study(.study)
+
+  if (is.factor(.study)) {
+    study_original_levels <- levels(.study)
+    .study <- forcats::fct_drop(.study)
+  } else {
+    study_original_levels <- NULL
+  }
+
+  if (missing(trt)) abort("Specify `trt`")
+  .trt <- pull_non_null(data, enquo(trt))
+  if (is.null(.trt)) abort("`trt` cannot be NULL")
+  if (rlang::is_list(.trt) || !is.null(dim(.trt)))
+    abort("`trt` must be a regular column (not a list or matrix column)")
+
+  if (is.factor(.trt)) {
+    trt_original_levels <- levels(.trt)
+    .trt <- forcats::fct_drop(.trt)
+  } else {
+    trt_original_levels <- NULL
+  }
+
+  # Check for single-arm studies
+  single_arm_studies <- tibble::tibble(.study, .trt) %>%
+    dplyr::group_by(.data$.study) %>%
+    dplyr::filter(dplyr::n() == 1) %>%
+    dplyr::pull(.data$.study)
+
+  if (length(single_arm_studies)) {
+    abort(glue::glue("Single-arm studies are not supported: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
+                     glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
+  }
+
+  # Treatment classes
+  .trtclass <- pull_non_null(data, enquo(trt_class))
+  if (!is.null(.trtclass)) {
+    if (rlang::is_list(.trtclass) || !is.null(dim(.trtclass)))
+      abort("`trt_class` must be a regular column (not a list or matrix column)")
+    if (anyDuplicated(unique(cbind(.trt, .trtclass))[, ".trt"]))
+      abort("Treatment present in more than one class (check `trt` and `trt_class`)")
+
+    if (is.factor(.trtclass)) {
+      trtclass_original_levels <- levels(.trtclass)
+      .trtclass <- forcats::fct_drop(.trtclass)
+    } else {
+      trtclass_original_levels <- NULL
+    }
+  }
+
+  if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
+
+  # Pull and check estimates
+  .estimate <- pull_non_null(data, enquo(estimate))
+  .se <- pull_non_null(data, enquo(se))
+
+  if (is.null(.estimate)) abort("Specify `estimates` column of regression coefficient estimates.")
+  if (rlang::is_list(.estimate) || !is.null(dim(.estimate)))
+    abort("Estimates column `estimates` must be a regular column (not a list or matrix column).")
+
+  if ((is.null(.se) || missing(cor)) && missing(cov))
+    abort("Specify regression coefficient standard errors `se` and correlation matrix `cor`, or covariance matrix `cov`.")
+  if (rlang::is_list(.se) || !is.null(dim(.se)))
+    abort("Standard error `se` must be a regular column (not a list or matrix column)")
+
+  # Pull and check sample size
+  # .sample_size <- pull_non_null(data, enquo(sample_size))
+  # if (!is.null(.sample_size)) {
+  #   check_sample_size(.sample_size)
+  # } else {
+  #   inform("Note: Optional argument `sample_size` not provided, some features may not be available (see ?set_agd_contrast).")
+  # }
+
+  # Determine reference treatment and reference levels for covariates
+  bl <- is.na(.estimate)
+
+  bl_check <-
+  tibble::tibble(.study, .trt, bl, .se) %>%
+    dplyr::group_by(.data$.study) %>%
+    dplyr::mutate(n_arms = dplyr::n(),
+                  n_bl = sum(.data$bl))
+
+  if (any(bl_check$n_bl > 1))
+    abort("Multiple reference rows (where estimate = NA) in a study or studies.")
+  else if (any(bl_check$n_bl == 0))
+    abort("Study or studies without a reference row (where y = NA).")
+
+  # Create tibble in standard format
+  d <- tibble::tibble(
+    .study = nfactor(.study),
+    .trt = nfactor(.trt),
+    .estimate = .estimate,
+    .se = .se)
+
+  # Network reference treatment
+  if (!is.null(trt_ref)) {
+    trt_ref <- as.character(trt_ref)
+    lvls_trt <- levels(d$.trt)
+    if (! trt_ref %in% lvls_trt)
+      abort(sprintf("`trt_ref` does not match a treatment in the data.\nSuitable values are: %s",
+                    ifelse(length(lvls_trt) <= 5,
+                           paste0(lvls_trt, collapse = ", "),
+                           paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
+    d$.trt <- forcats::fct_relevel(d$.trt, trt_ref)
+  }
+
+  if (!is.null(.trtclass)) {
+    d <- tibble::add_column(d, .trtclass = nfactor(.trtclass))
+    class_lookup <- d %>%
+      dplyr::distinct(.data$.trt, .data$.trtclass) %>%
+      dplyr::arrange(.data$.trt)
+    class_ref <- as.character(class_lookup[[1, ".trtclass"]])
+    d$.trtclass <- forcats::fct_relevel(d$.trtclass, class_ref)
+    classes <- forcats::fct_relevel(nfactor(class_lookup$.trtclass), class_ref)
+  } else {
+    classes <- NULL
+  }
+
+  # if (!is.null(.sample_size)) {
+  #   d <- tibble::add_column(d, .sample_size = .sample_size)
+  # }
+
+  # Bind in original data
+  drop_reserved <- setdiff(colnames(data), colnames(d))
+  d <- dplyr::bind_cols(d, data[, drop_reserved, drop = FALSE])
+
+  # Drop original study and treatment columns
+  d <- drop_original(d, data, enquo(study))
+  d <- drop_original(d, data, enquo(trt))
+  if (!is.null(.trtclass)) d <- drop_original(d, data, enquo(trt_class))
+
+  # Ensure data is in study order
+  d <- dplyr::arrange(d, .data$.study)
+
+
+  # Check regression
+  if (missing(regression) || !rlang::is_formula(regression, lhs = FALSE))
+    abort("`regression` must be a one-sided regression formula specifying the model for which estimates are given.")
+
+  regression <- rep_len(list(regression), nlevels(d$.study))
+  names(regression) <- levels(d$.study)
+
+  reg_vars <- unique(unlist(purrr::map(regression, all.vars)))
+  if (!all(reg_vars %in% colnames(d)))
+    abort(glue::glue("Regression variables not present in `data`: ", glue::glue_collapse(setdiff(reg_vars, colnames(d)), sep = ", ", last = " and ")))
+
+  # Check covariance/correlation matrices
+  if (!missing(cov)) {
+    cmat <- cov
+    ctype = "covariance"
+  } else {
+    cmat <- cor
+    ctype = "correlation"
+  }
+
+  # Can't have missing SEs for correlation matrix
+  if (ctype == "correlation") {
+    if (any(is.na(filter(d, !is.na(.data$.estimate))$.se)))
+      abort("Missing standard errors `se` are not allowed with a correlation matrix `cor`.")
+  }
+
+  n_studies <- nlevels(d$.study)
+
+  # Check for a list of matrices
+  if (!is.list(cmat) || !all(purrr::map_lgl(cmat, is.matrix)) || length(cmat) != n_studies || (n_studies > 1 && !rlang::is_named(cmat)))
+    abort(glue::glue("`{substr(ctype, 1, 3)}` must be a named list of {ctype} matrices for each study."))
+
+  if (n_studies == 1 && !rlang::is_named(cmat)) names(cmat) <- levels(d$.study)
+
+  # Check all studies have covariance matrix
+  cnames <- names(cmat)
+  if (length(bad_cnames <- setdiff(cnames, levels(d$.study)))) {
+    abort(glue::glue("`{substr(ctype, 1, 3)}` list names must match all study names in `data`.\n",
+                     "Study names in `{substr(ctype, 1, 3)}` not in `data`: ",
+                     glue::glue_collapse(glue::double_quote(bad_cnames), sep = ", ", width = 30),
+                     ".\n",
+                     "Study names in `data` not in `{substr(ctype, 1, 3)}`: ",
+                     glue::glue_collapse(glue::double_quote(setdiff(levels(d$.study), cnames)), sep = ", ", width = 30),
+                     ".\n"))
+  }
+
+  cmat_dim_err <- NULL
+  cmat_cor_err <- NULL
+  cmat_pd_err <- NULL
+  for (i in 1:n_studies) {
+    cmati <- cmat[[i]]
+    si <- names(cmat)[i]
+    # Check dimensions match rows of data
+    if (nrow(cmati) != ncol(cmati) ||
+        nrow(cmati) != nrow(dplyr::filter(d, .data$.study == si, !is.na(.data$.estimate)))) {
+      cmat_dim_err <- c(cmat_dim_err, si)
+    }
+
+    # Turn correlation matrix into covariance matrix
+    if (ctype == "correlation") {
+      if (!all(diag(cmati) == 1) || !all(cmati <= 1) || !all(cmati >= -1))
+        cmat_cor_err <- c(cmat_cor_err, si)
+
+      sei <- dplyr::filter(d, .data$.study == si, !is.na(.data$.estimate))$.se
+      cmati <- (sei %o% sei) * cmati
+      cmat[[i]] <- cmati
+    }
+
+    # Check covariance matrices are symmetric positive definite
+    if (length(cmat_dim_err) == 0 && length(cmat_cor_err) == 0) { # Skip test if we already have other errors
+      if (!isSymmetric(cmati, check.attributes = FALSE) || !all(eigen(cmati, only.values = TRUE)$values > sqrt(.Machine$double.eps)))
+        cmat_pd_err <- c(cmat_pd_err, si)
+    }
+  }
+
+  if (length(cmat_dim_err)) abort(glue::glue("Dimensions of {ctype} matrix `{substr(ctype, 1, 3)}` do not match the number of coefficients in `data` for stud{if (length(cmat_dim_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_dim_err), sep = ", ", width = 30, last = " and")))
+  if (length(cmat_cor_err)) abort(glue::glue("`cor` is not a proper correlation matrix for stud{if (length(cmat_cor_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_cor_err), sep = ", ", width = 30, last = " and")))
+  if (length(cmat_pd_err)) abort(glue::glue("{ctype} matrix `{substr(ctype, 1, 3)}` is not symmetric positive definite for stud{if (length(cmat_pd_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_pd_err), sep = ", ", width = 30, last = " and")))
+
+  # Store covariance matrix in compact lower triangular form
+  cmat <- cmat[as.character(unique(d$.study))]
+  d$.cov <- NA_real_
+  d$.cov[!is.na(d$.estimate)] <- purrr::list_flatten(purrr::map(cmat, pack_tri))
+
+  # Produce nma_data object
+  out <- structure(
+    list(agd_regression = d,
+         treatments = forcats::fct_unique(d$.trt),
+         classes = classes,
+         studies = forcats::fct_unique(d$.study),
+         outcome = list(agd_arm = NA, agd_contrast = NA, ipd = NA)),
+    class = "nma_data")
+
+  # If trt_ref not specified, mark treatments factor as default, calculate
+  # current reference trt
+  if (is.null(trt_ref)) {
+    trt_ref <- get_default_trt_ref(out)
+    trt_sort <- order(forcats::fct_relevel(out$treatments, trt_ref))
+    out$treatments <- .default(forcats::fct_relevel(out$treatments, trt_ref)[trt_sort])
+    out$agd_contrast$.trt <- forcats::fct_relevel(out$agd_contrast$.trt, trt_ref)
+    if (!is.null(.trtclass)) {
+      class_ref <- as.character(out$classes[trt_sort[1]])
+      if (!is.null(trtclass_original_levels))
+        class_ref <- c(class_ref,
+                       setdiff(intersect(trtclass_original_levels, levels(out$classes)),
+                               class_ref))
+      out$agd_contrast$.trtclass <- forcats::fct_relevel(out$agd_contrast$.trtclass, class_ref)
+      out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
+    }
+  }
+
+  # Add original_levels attributes (if not NULL)
+  attr(out$treatments, "original_levels") <- trt_original_levels
+  attr(out$studies, "original_levels") <- study_original_levels
+  if (!is.null(.trtclass)) attr(out$classes, "original_levels") <- trtclass_original_levels
+
+  return(out)
 
 }
 
@@ -1817,6 +2086,7 @@ nfactor <- function(x, ..., numeric = TRUE, resort = FALSE) {
 #'
 #' @param agd_arm AgD arm data frame
 #' @param agd_contrast AgD contrast data frame
+#' @param agd_regression AgD regression estimates data frame
 #' @param ipd IPD data frame
 #' @param treatments treatments factor
 #' @param classes classes factor
@@ -1826,6 +2096,7 @@ nfactor <- function(x, ..., numeric = TRUE, resort = FALSE) {
 #' @nord
 make_nma_data <- function(agd_arm = NULL,
                           agd_contrast = NULL,
+                          agd_regression = NULL,
                           ipd = NULL,
                           treatments = NULL,
                           classes = NULL,
@@ -1834,10 +2105,34 @@ make_nma_data <- function(agd_arm = NULL,
  structure(
     list(agd_arm = agd_arm,
          agd_contrast = agd_contrast,
+         agd_regression = agd_regression,
          ipd = ipd,
          treatments = treatments,
          classes = classes,
          studies = studies,
          outcome = outcome),
     class = "nma_data")
+}
+
+#' Pack and unpack a symmetric matrix into a list of vectors from the lower triangular part
+#' @noRd
+pack_tri <- function(x) {
+  n <- ncol(x)
+  l <- lower.tri(x, diag = TRUE)
+  out <- vector("list", length = n)
+  for (i in 1:n) out[[i]] <- x[l[, i, drop = TRUE], i, drop = TRUE]
+  names(out) <- colnames(x)
+  return(out)
+}
+
+unpack_tri <- function(x) {
+  n <- length(x)
+  out <- matrix(NA_real_, nrow = n, ncol = n, dimnames = list(names(x), names(x)))
+  l <- lower.tri(out, diag = TRUE)
+  u <- upper.tri(out, diag = FALSE)
+  for (i in 1:n) {
+    out[l[, i, drop = TRUE], i] <- x[[i]]
+    if (i < n) out[i, u[i, , drop = TRUE]] <- x[[i]][-1]
+  }
+  return(out)
 }
