@@ -981,6 +981,8 @@ set_agd_surv <- function(data,
 #' @param covariates **NOT USED YET** data frame of covariate summary statistics
 #'   for each study or study arm, with corresponding `study` and `trt` columns
 #'   to match to those in `data`
+#' @param sample_size **NOT USED YET** column of `covariates` giving the sample
+#'   size in each arm (optional).
 #'
 #' @return An object of class [nma_data]
 #' @export
@@ -1000,7 +1002,8 @@ set_agd_regression <- function(data,
                                regression,
                                covariates = NULL,
                                trt_ref = NULL,
-                               trt_class = NULL) {
+                               trt_class = NULL,
+                               sample_size = NULL) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -1037,13 +1040,14 @@ set_agd_regression <- function(data,
 
   # Check for single-arm studies
   single_arm_studies <- tibble::tibble(.study, .trt) %>%
+    dplyr::distinct(.data$.study, .data$.trt) %>%
     dplyr::group_by(.data$.study) %>%
     dplyr::filter(dplyr::n() == 1) %>%
     dplyr::pull(.data$.study)
 
   if (length(single_arm_studies)) {
-    abort(glue::glue("Single-arm studies are not supported: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
-                     glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
+    inform(glue::glue("Single-arm stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} present in the network: ",
+                      glue::glue_collapse(glue::double_quote(as.character(single_arm_studies)), sep = ", ", last = " and "), "."))
   }
 
   # Treatment classes
@@ -1094,10 +1098,15 @@ set_agd_regression <- function(data,
     dplyr::mutate(n_arms = dplyr::n(),
                   n_bl = sum(.data$bl))
 
-  if (any(bl_check$n_bl > 1))
-    abort("Multiple reference rows (where estimate = NA) in a study or studies.")
-  else if (any(bl_check$n_bl == 0))
-    abort("Study or studies without a reference row (where y = NA).")
+  if (any(bl_check$n_bl > 1)) {
+    s_err <- glue::double_quote(unique(dplyr::filter(bl_check, .data$n_bl > 1)$.study))
+    abort(glue::glue("Multiple reference rows (where estimate = NA) for stud{if (length(s_err)>1) 'ies' else 'y'} ",
+                     glue::glue_collapse(s_err, sep = ", ", last = " and ")))
+  } else if (any(bl_check$n_bl == 0)) {
+    s_err <- glue::double_quote(unique(dplyr::filter(bl_check, .data$n_bl == 0)$.study))
+    abort(glue::glue("No reference row (where estimate = NA) for stud{if (length(s_err)>1) 'ies' else 'y'} ",
+          glue::glue_collapse(s_err, sep = ", ", last = " and ")))
+  }
 
   # Create tibble in standard format
   d <- tibble::tibble(
@@ -1122,6 +1131,7 @@ set_agd_regression <- function(data,
     d <- tibble::add_column(d, .trtclass = nfactor(.trtclass))
     class_lookup <- d %>%
       dplyr::distinct(.data$.trt, .data$.trtclass) %>%
+      dplyr::filter(!is.na(.data$.trt), !is.na(.data$.trtclass)) %>%
       dplyr::arrange(.data$.trt)
     class_ref <- as.character(class_lookup[[1, ".trtclass"]])
     d$.trtclass <- forcats::fct_relevel(d$.trtclass, class_ref)
@@ -1171,27 +1181,28 @@ set_agd_regression <- function(data,
   if (ctype == "correlation") {
     if (any(is.na(filter(d, !is.na(.data$.estimate))$.se)))
       abort("Missing standard errors `se` are not allowed with a correlation matrix `cor`.")
+    if (any(filter(d, !is.na(.data$.estimate))$.se <= 0))
+      abort("Standard errors `se` must be greater than zero.")
   }
 
   n_studies <- nlevels(d$.study)
 
   # Check for a list of matrices
-  if (!is.list(cmat) || !all(purrr::map_lgl(cmat, is.matrix)) || length(cmat) != n_studies || (n_studies > 1 && !rlang::is_named(cmat)))
+  if (!is.list(cmat) || !all(purrr::map_lgl(cmat, is.matrix)) || !all(purrr::map_lgl(cmat, is.numeric)) || (n_studies > 1 && !rlang::is_named(cmat)))
     abort(glue::glue("`{substr(ctype, 1, 3)}` must be a named list of {ctype} matrices for each study."))
 
-  if (n_studies == 1 && !rlang::is_named(cmat)) names(cmat) <- levels(d$.study)
+  if (n_studies == 1 && length(cmat) == 1 && !rlang::is_named(cmat)) names(cmat) <- levels(d$.study)
 
-  # Check all studies have covariance matrix
+  # Check all studies in data have covariance/correlation matrix
   cnames <- names(cmat)
-  if (length(bad_cnames <- setdiff(cnames, levels(d$.study)))) {
+  if (length(miss_names <- setdiff(levels(d$.study), cnames))) {
     abort(glue::glue("`{substr(ctype, 1, 3)}` list names must match all study names in `data`.\n",
-                     "Study names in `{substr(ctype, 1, 3)}` not in `data`: ",
-                     glue::glue_collapse(glue::double_quote(bad_cnames), sep = ", ", width = 30),
-                     ".\n",
-                     "Study names in `data` not in `{substr(ctype, 1, 3)}`: ",
-                     glue::glue_collapse(glue::double_quote(setdiff(levels(d$.study), cnames)), sep = ", ", width = 30),
+                     "Missing {ctype} matri{if (length(miss_names)>1) 'ces' else 'x'} for stud{if (length(miss_names)>1) 'ies' else 'y'} ",
+                     glue::glue_collapse(glue::double_quote(miss_names), sep = ", ", last = " and ", width = 30),
                      ".\n"))
   }
+
+  cmat <- cmat[levels(d$.study)]
 
   cmat_dim_err <- NULL
   cmat_cor_err <- NULL
@@ -1206,7 +1217,7 @@ set_agd_regression <- function(data,
     }
 
     # Turn correlation matrix into covariance matrix
-    if (ctype == "correlation") {
+    if (ctype == "correlation" && length(cmat_dim_err) == 0) { # Skip test if we already have other errors
       if (!all(diag(cmati) == 1) || !all(cmati <= 1) || !all(cmati >= -1))
         cmat_cor_err <- c(cmat_cor_err, si)
 
@@ -1222,19 +1233,18 @@ set_agd_regression <- function(data,
     }
   }
 
-  if (length(cmat_dim_err)) abort(glue::glue("Dimensions of {ctype} matrix `{substr(ctype, 1, 3)}` do not match the number of coefficients in `data` for stud{if (length(cmat_dim_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_dim_err), sep = ", ", width = 30, last = " and")))
-  if (length(cmat_cor_err)) abort(glue::glue("`cor` is not a proper correlation matrix for stud{if (length(cmat_cor_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_cor_err), sep = ", ", width = 30, last = " and")))
-  if (length(cmat_pd_err)) abort(glue::glue("{ctype} matrix `{substr(ctype, 1, 3)}` is not symmetric positive definite for stud{if (length(cmat_pd_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_pd_err), sep = ", ", width = 30, last = " and")))
+  if (length(cmat_dim_err)) abort(glue::glue("Dimensions of {ctype} matrix `{substr(ctype, 1, 3)}` do not match the number of coefficients in `data` for stud{if (length(cmat_dim_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_dim_err), sep = ", ", width = 30, last = " and ")))
+  if (length(cmat_cor_err)) abort(glue::glue("`cor` is not a proper correlation matrix for stud{if (length(cmat_cor_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_cor_err), sep = ", ", width = 30, last = " and ")))
+  if (length(cmat_pd_err)) abort(glue::glue("Covariance matrix {if (ctype=='covariance') '`cov`' else 'constructed from `cor` and `se`'} is not symmetric positive definite for stud{if (length(cmat_pd_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_pd_err), sep = ", ", width = 30, last = " and ")))
 
   # Store covariance matrix in compact lower triangular form
-  cmat <- cmat[as.character(unique(d$.study))]
   d$.cov <- NA_real_
   d$.cov[!is.na(d$.estimate)] <- purrr::list_flatten(purrr::map(cmat, pack_tri))
 
   # Produce nma_data object
   out <- structure(
     list(agd_regression = d,
-         treatments = forcats::fct_unique(d$.trt),
+         treatments = purrr::discard(forcats::fct_unique(d$.trt), is.na),
          classes = classes,
          studies = forcats::fct_unique(d$.study),
          outcome = list(agd_arm = NA, agd_contrast = NA, ipd = NA)),
@@ -1246,14 +1256,14 @@ set_agd_regression <- function(data,
     trt_ref <- get_default_trt_ref(out)
     trt_sort <- order(forcats::fct_relevel(out$treatments, trt_ref))
     out$treatments <- .default(forcats::fct_relevel(out$treatments, trt_ref)[trt_sort])
-    out$agd_contrast$.trt <- forcats::fct_relevel(out$agd_contrast$.trt, trt_ref)
+    out$agd_regression$.trt <- forcats::fct_relevel(out$agd_regression$.trt, trt_ref)
     if (!is.null(.trtclass)) {
       class_ref <- as.character(out$classes[trt_sort[1]])
       if (!is.null(trtclass_original_levels))
         class_ref <- c(class_ref,
                        setdiff(intersect(trtclass_original_levels, levels(out$classes)),
                                class_ref))
-      out$agd_contrast$.trtclass <- forcats::fct_relevel(out$agd_contrast$.trtclass, class_ref)
+      out$agd_regression$.trtclass <- forcats::fct_relevel(out$agd_regression$.trtclass, class_ref)
       out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
     }
   }
@@ -2056,6 +2066,11 @@ has_agd_contrast <- function(network) {
   return(!rlang::is_empty(network$agd_contrast))
 }
 
+has_agd_regression <- function(network) {
+  if (!inherits(network, "nma_data")) abort("Not nma_data object.")
+  return(!rlang::is_empty(network$agd_regression))
+}
+
 #' Check whether AgD sample size columns are available
 #'
 #' @param network nma_data object
@@ -2066,7 +2081,8 @@ has_agd_sample_size <- function(network) {
   if (!inherits(network, "nma_data")) abort("Not nma_data object.")
   ss_a <- !has_agd_arm(network) || tibble::has_name(network$agd_arm, ".sample_size")
   ss_c <- !has_agd_contrast(network) || tibble::has_name(network$agd_contrast, ".sample_size")
-  return(ss_a && ss_c)
+  ss_r <- !has_agd_regression(network) || tibble::has_name(network$agd_regression, ".sample_size")
+  return(ss_a && ss_c && ss_r)
 }
 
 #' Natural-order factors
