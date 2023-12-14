@@ -841,7 +841,7 @@ test_that("set_* `.study` column is correct", {
                agd_arm$studyf)
   expect_equal(set_agd_surv(aa, 26, trtc, Surv = Surv(cont_pos, bin), covariates = aa)$agd_arm$.study,
                agd_arm$studyf)
-  expect_equal(set_agd_regression(ar, 12, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.study,
+  expect_equal(set_agd_regression(ar, 16, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.study,
                agd_reg$studyf)
 })
 
@@ -1081,7 +1081,7 @@ test_that("set_* returns correct .trtclass column", {
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                                            trt_class = tclassf2), trt_ref = "B")$agd_arm$.trtclass,
                agd_arm$tclassf2)
-  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf2, trt_ref = "b"))$agd_regression$.trtclass,
+  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf2), trt_ref = "b")$agd_regression$.trtclass,
                agd_reg$tclassf2)
 
   # Check that unused factor levels are dropped
@@ -1229,7 +1229,7 @@ test_that("set_* returns classes factor variable", {
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                                            trt_class = tclassc), trt_ref = "B")$classes,
                f_class2)
-  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassc, trt_ref = "b"))$classes,
+  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassc), trt_ref = "b")$classes,
                f_classr2)
 
   # Checks when default trt_ref not first in sort order
@@ -1294,7 +1294,7 @@ test_that("set_* returns classes factor variable", {
                                            trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
                                trt_ref = "B")$classes,
                f_class2)
-  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf, trt_ref = "b"))$classes,
+  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf), trt_ref = "b")$classes,
                f_classr2)
 
   # Checks when default trt_ref not first in sort order
