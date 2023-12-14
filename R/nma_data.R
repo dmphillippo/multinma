@@ -1453,6 +1453,18 @@ combine_network <- function(..., trt_ref) {
     }
   }
 
+  # Get agd_regression
+  agd_regression <- purrr::map(s, "agd_regression")
+  if (!rlang::is_empty(agd_regression)) {
+    for (j in 1:length(agd_regression)) {
+      if (rlang::is_empty(agd_regression[[j]])) next
+      agd_regression[[j]]$.trt <- forcats::lvls_expand(agd_regression[[j]]$.trt, trts)
+      agd_regression[[j]]$.study <- forcats::lvls_expand(agd_regression[[j]]$.study, studs)
+      if (!is.null(classes))
+        agd_regression[[j]]$.trtclass <- forcats::lvls_expand(agd_regression[[j]]$.trtclass, class_lvls)
+    }
+  }
+
   # Get outcome type
   o_ipd <- unique(purrr::map_chr(purrr::map(s, "outcome"), "ipd"))
   o_ipd <- o_ipd[!is.na(o_ipd)]
@@ -1488,10 +1500,12 @@ combine_network <- function(..., trt_ref) {
   ipd <- dplyr::bind_rows(ipd)
   agd_arm <- dplyr::bind_rows(agd_arm)
   agd_contrast <- dplyr::bind_rows(agd_contrast)
+  agd_regression <- dplyr::bind_rows(agd_regression)
 
   out <- make_nma_data(
     agd_arm = agd_arm,
     agd_contrast = agd_contrast,
+    agd_regression = agd_regression,
     ipd = ipd,
     treatments = factor(trts, levels = trts),
     classes = classes,
@@ -1511,6 +1525,8 @@ combine_network <- function(..., trt_ref) {
       out$agd_arm$.trt <- forcats::fct_relevel(out$agd_arm$.trt, trt_ref)
     if (has_agd_contrast(out))
       out$agd_contrast$.trt <- forcats::fct_relevel(out$agd_contrast$.trt, trt_ref)
+    if (has_agd_regression(out))
+      out$agd_regression$.trt <- forcats::fct_relevel(out$agd_regression$.trt, trt_ref)
 
     if (!is.null(classes)) {
       class_ref <- as.character(out$classes[trt_sort[1]])
@@ -1522,6 +1538,8 @@ combine_network <- function(..., trt_ref) {
         out$agd_arm$.trtclass <- forcats::fct_relevel(out$agd_arm$.trtclass, class_ref)
       if (has_agd_contrast(out))
         out$agd_contrast$.trtclass <- forcats::fct_relevel(out$agd_contrast$.trtclass, class_ref)
+      if (has_agd_regression(out))
+        out$agd_regression$.trtclass <- forcats::fct_relevel(out$agd_regression$.trtclass, class_ref)
     }
   }
 
