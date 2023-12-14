@@ -15,6 +15,8 @@
 #'   \item{`agd_arm`}{data from studies with aggregate data (arm format)}
 #'   \item{`agd_contrast`}{data from studies with aggregate data (contrast
 #'   format)}
+#'   \item{`agd_regression`}{data from studies reporting regression
+#'   coefficients}
 #'   \item{`ipd`}{data from studies with individual patient data}
 #'   \item{`treatments`}{treatment coding factor for entire network}
 #'   \item{`classes`}{treatment class coding factor (same length as `treatments`
@@ -23,7 +25,7 @@
 #'   \item{`outcome`}{outcome type for each data source, named list}
 #'   }
 #'
-#' The `agd_arm`, `agd_contrast`, and `ipd` components are
+#' The `agd_arm`, `agd_contrast`, `agd_regression` and `ipd` components are
 #' tibbles with the following columns:
 #'   \describe{
 #'   \item{`.study`}{study (as factor)}
@@ -36,6 +38,9 @@
 #'   \item{`.E`}{time at risk (discrete)}
 #'   \item{`.Surv`}{survival outcome of type [`Surv`] (time-to-event), nested by
 #'   study arm}
+#'   \item{`.estimate`}{regression coefficient estimate}
+#'   \item{`.cov`}{regression coefficient covariance matrix, in compact
+#'   lower-triangular storage format}
 #'   \item{`.sample_size`}{sample size (`agd_*` only)}
 #'   \item{`...`}{other columns (typically covariates) from the original data
 #'   frame}
@@ -112,14 +117,29 @@ print.nma_data <- function(x, ..., n = 10) {
     n_agd_contrast <- 0
   }
 
-  if (all(n_ipd == 0, n_agd_arm == 0, n_agd_contrast == 0)) {
+  if (has_agd_regression(x)) {
+    s_agd_regression <- x$agd_regression %>%
+      dplyr::distinct(.data$.study, .data$.trt) %>%
+      dplyr::filter(!is.na(.data$.trt)) %>%
+      dplyr::group_by(.data$.study) %>%
+      dplyr::summarise("Treatment arms" = glue::glue("{dplyr::n()}: ",
+                                                     glue::glue_collapse(.data$.trt, sep = " | ", width = 0.8*cwidth))) %>%
+      dplyr::rename(Study = ".study") %>%
+      as.data.frame()
+    n_agd_regression <- nrow(s_agd_regression)
+  } else {
+    n_agd_regression <- 0
+  }
+
+  if (all(n_ipd == 0, n_agd_arm == 0, n_agd_contrast == 0, n_agd_regression == 0)) {
     cglue("An empty network.")
   } else {
     cglue("A network with ", glue::glue_collapse(c(
       "{n_ipd} IPD stud{ifelse(n_ipd == 1, 'y', 'ies')}",
       "{n_agd_arm} AgD stud{ifelse(n_agd_arm == 1, 'y', 'ies')} (arm-based)",
-      "{n_agd_contrast} AgD stud{ifelse(n_agd_contrast == 1, 'y', 'ies')} (contrast-based)"
-    )[c(n_ipd > 0, n_agd_arm > 0, n_agd_contrast > 0)],
+      "{n_agd_contrast} AgD stud{ifelse(n_agd_contrast == 1, 'y', 'ies')} (contrast-based)",
+      "{n_agd_regression} AgD stud{ifelse(n_agd_regression == 1, 'y', 'ies')} (regression coefficients)"
+    )[c(n_ipd > 0, n_agd_arm > 0, n_agd_contrast > 0, n_agd_regression > 0)],
     last = ", and ", sep = ", "), ".")
   }
   cat("\n")
@@ -150,6 +170,15 @@ print.nma_data <- function(x, ..., n = 10) {
     if (n_agd_contrast > n) cglue(subtle(" ... plus {n_agd_contrast - n} more studies"))
     cat("\n")
     cglue(" Outcome type: {x$outcome$agd_contrast}")
+    # cat("\n")
+  }
+
+  if (n_agd_regression > 0) {
+    sec_header("AgD studies (regression coefficients)")
+    print(s_agd_regression[1:min(n_agd_regression, n), ], right = FALSE, row.names = FALSE, max = 9999L)
+    if (n_agd_regression > n) cglue(subtle(" ... plus {n_agd_regression - n} more studies"))
+    cat("\n")
+    #cglue(" Outcome type: {x$outcome$agd_regression}")
     # cat("\n")
   }
 
@@ -289,8 +318,9 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
     e_ipd <- v_ipd <- tibble::tibble()
   }
 
-  if (has_agd_arm(x) || has_agd_contrast(x)) {
-    agd_all <- dplyr::bind_rows(x$agd_arm, x$agd_contrast)
+  if (has_agd_arm(x) || has_agd_contrast(x) || has_agd_regression(x)) {
+    agd_all <- dplyr::bind_rows(x$agd_arm, x$agd_contrast,
+                                if (has_agd_regression(x)) dplyr::distinct(x$agd_regression, .data$.study, .data$.trt) %>% dplyr::filter(!is.na(.data$.trt)) else NULL)
     e_agd <- agd_all %>%
       dplyr::group_by(.data$.study) %>%
       dplyr::group_modify(~make_contrasts(.x$.trt))
