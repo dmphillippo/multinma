@@ -830,11 +830,15 @@ nma <- function(network,
     if (has_agd_arm(network) && network$outcome$agd_arm == "survival") {
       wts <- c(rep(1, nrow(dat_ipd)),
                rep(1 / n_int, nrow(idat_agd_arm)),
-               rep(N_agd_contrast / n_int, each = n_int))
+               rep(N_agd_contrast / n_int, each = n_int),
+               # AgD regression data are currently ignored in calculating centering
+               rep(0, nrow(dat_agd_regression)))
     } else {
       wts <- c(rep(1, nrow(dat_ipd)),
                rep(N_agd_arm / n_int, each = n_int),
-               rep(N_agd_contrast / n_int, each = n_int))
+               rep(N_agd_contrast / n_int, each = n_int),
+               # AgD regression data are currently ignored in calculating centering
+               rep(0, nrow(dat_agd_regression)))
     }
 
     # Center numeric columns used in regression model
@@ -862,7 +866,12 @@ nma <- function(network,
 
     # Take weighted mean of all rows (including baseline rows for contrast data)
     if (any(reg_numeric)) {
-      xbar <- purrr::map_dbl(idat_all_plus_bl[, reg_names[reg_numeric]], weighted.mean, w = wts)
+      if (has_agd_regression(network) && !has_ipd(network) && !has_agd_arm(network) && !has_agd_contrast(network)) {
+        # If only AgD regression data just use raw means of reference levels
+        xbar <- purrr::map_dbl(dat_agd_regression_bl[, reg_names[reg_numeric]], mean)
+      } else {
+        xbar <- purrr::map_dbl(idat_all_plus_bl[, reg_names[reg_numeric]], weighted.mean, w = wts)
+      }
     } else {
       xbar <- NULL
     }
