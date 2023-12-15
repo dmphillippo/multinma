@@ -490,7 +490,7 @@ nma <- function(network,
                                 "gamma", "gengamma", "mspline", "pexp")
 
   # Are study intercepts present? Not if only contrast data
-  has_intercepts <- has_agd_arm(network) || has_ipd(network)
+  has_intercepts <- has_agd_arm(network) || has_ipd(network) || has_agd_regression(network)
 
   # Check priors
   check_prior(prior_intercept)
@@ -612,7 +612,6 @@ nma <- function(network,
     aux_by <- NULL
   }
 
-
   # Use numerical integration? TRUE if class mlnmr_data and regression is not NULL
   # (Avoids unnecessary use of integration points if regression formula not specified)
   use_int <- inherits(network, "mlnmr_data") && (!is.null(regression) || aux_needs_integration(aux_regression = aux_regression, aux_by = aux_by))
@@ -733,9 +732,56 @@ nma <- function(network,
     Sigma_agd_contrast <- NULL
   }
 
+  # Make NMA formula
+  nma_formula <- make_nma_formula(regression,
+                                  consistency = consistency,
+                                  classes = !is.null(network$classes),
+                                  class_interactions = class_interactions)
+
+  if (has_agd_regression(network)) {
+
+    dat_agd_regression <- network$agd_regression
+
+    # Split into baseline and non-baseline rows
+    dat_agd_regression_bl <- dplyr::filter(dat_agd_regression, is.na(.data$.estimate))
+    dat_agd_regression_nonbl <- dplyr::filter(dat_agd_regression, !is.na(.data$.estimate))
+
+    # Check that regression models in agd_regression are compatible with regression here
+    agd_reg_f <- purrr::map(dat_agd_regression_bl$.regression,
+                            ~make_nma_formula(.,
+                                              consistency = consistency,
+                                              classes = !is.null(network$classes),
+                                              class_interactions = class_interactions))
+
+    if (!all(purrr::map_lgl(agd_reg_f, ~setequal(all.vars(nma_formula), all.vars(.)))))
+      abort("Regression model `regression` and AgD regression summaries must currently be identical models.")
+
+    # if (any(purrr::map_lgl(agd_reg_f, ~length(setdiff(all.vars(nma_formula), all.vars(.))) > 0)))
+    #   abort("AgD regression summaries must be from nested models of `regression`")
+    #
+    # if (any(purrr::map_lgl(agd_reg_f, ~length(setdiff(all.vars(.), all.vars(nma_formula))) > 0)))
+    #   abort("AgD regression summaries must be from nested models of `regression`")
+
+    # Pull estimates
+    est_agd_regression <- dat_agd_regression_nonbl$.estimate
+
+    # Reconstruct covariance structure
+    cov_agd_regression <- by(dat_agd_regression_nonbl, ~.study, function(x) unpack_tri(x$.cov))[as.character(dat_agd_regression_bl$.study)]
+
+    # Take only necessary columns
+    dat_agd_regression <- get_model_data_columns(dat_agd_regression, regression = regression, label = "AgD (regression coefficients)")
+    dat_agd_regression_bl <- get_model_data_columns(dat_agd_regression_bl, regression = regression, label = "AgD (regression coefficients)")
+    dat_agd_regression_nonbl <- get_model_data_columns(dat_agd_regression_nonbl, regression = regression, label = "AgD (regression coefficients)")
+
+
+  } else {
+    dat_agd_regression <- dat_agd_regression_bl <- dat_agd_regression_nonbl <- tibble::tibble()
+    est_agd_regression <- cov_agd_regression <- NULL
+  }
+
   # Combine
-  idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast_nonbl)
-  idat_all_plus_bl <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast)
+  idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast_nonbl, dat_agd_regression_nonbl)
+  idat_all_plus_bl <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast, dat_agd_regression)
 
   # Get sample sizes for centering
   if (((!is.null(regression) && !is_only_offset(regression)) || has_aux_regression) && center) {
@@ -824,12 +870,6 @@ nma <- function(network,
   } else {
     xbar <- NULL
   }
-
-  # Make NMA formula
-  nma_formula <- make_nma_formula(regression,
-                                  consistency = consistency,
-                                  classes = !is.null(network$classes),
-                                  class_interactions = class_interactions)
 
   # Construct model matrix
   X_list <- make_nma_model_matrix(nma_formula = nma_formula,
