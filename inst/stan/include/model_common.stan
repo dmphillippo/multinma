@@ -39,3 +39,8 @@ u_delta ~ std_normal();
 if (ni_agd_contrast) {
   agd_contrast_y ~ multi_normal(eta_agd_contrast_bar, agd_contrast_Sigma);
 }
+
+// -- AgD model (regression coefficients) --
+if (ni_agd_regression) {
+  eta_agd_regression ~ multi_normal(agd_regression_est, agd_regression_cov);
+}

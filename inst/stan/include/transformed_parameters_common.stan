@@ -3,6 +3,7 @@
 // -- Linear and transformed predictors --
 vector[ni_ipd] eta_ipd; // IPD linear predictor
 // vector[ni_ipd] theta_ipd; // IPD transformed predictor
+vector[ni_agd_regression] eta_agd_regression; // AgD regression coefficients linear predictor
 
 // -- RE deltas --
 // Avoid evaluating tau[1] when no RE (u_delta is zero dim in this case)
@@ -119,5 +120,23 @@ if (nint_max > 1) {
       X_agd_contrast * beta_tilde + offset_agd_contrast :
       X_agd_contrast * beta_tilde;
   }
+}
+}
+
+// -- AgD model (regression coefficients) --
+if (ni_agd_regression) {
+if (RE) {
+  {
+    vector[ni_agd_regression] eta_agd_regression_noRE = X_agd_regression * beta_tilde;
+
+    for (i in 1:ni_agd_regression) {
+      if (which_RE[agd_regression_arm[i]])
+        eta_agd_regression[i] = eta_agd_regression_noRE[i] + f_delta[which_RE[agd_regression_arm[i]]];
+      else
+        eta_agd_regression[i] = eta_agd_regression_noRE[i];
+    }
+  }
+} else {
+  eta_agd_regression = X_agd_regression * beta_tilde;
 }
 }

@@ -3,10 +3,12 @@
 int<lower=0> ns_ipd; // number of IPD studies
 int<lower=0> ns_agd_arm; // number of AgD (arm-based) studies
 int<lower=0> ns_agd_contrast; // number of AgD (contrast-based) studies
+int<lower=0> ns_agd_regression; // number of AgD (regression coefficient) studies
 
 int<lower=0> ni_ipd; // total number of IPD individuals
 int<lower=0> ni_agd_arm; // total number of AgD (arm-based) data points
 int<lower=0> ni_agd_contrast; // total number of AgD (contrast-based) data points
+int<lower=0> ni_agd_regression; // total number of AgD (regression coefficient) data points
 
 // Treatment IDs
 int<lower=0> narm_ipd; // Number of IPD arms
@@ -16,6 +18,9 @@ int<lower=0> narm_agd_arm;
 array[narm_agd_arm] int<lower=1> agd_arm_trt;
 array[ni_agd_contrast] int<lower=1> agd_contrast_trt;
 array[ni_agd_contrast] int<lower=1> agd_contrast_trt_b;
+int<lower=0> narm_agd_regression; // Number of AgD regression arms
+array[ni_agd_regression] int<lower=1> agd_regression_arm; // Arm indicator for AgD regression (i.e. picking element of which_RE)
+array[narm_agd_regression] int<lower=1> agd_regression_trt;
 
 // Study IDs
 // array[max(ipd_arm)] int<lower=1> ipd_study;
@@ -38,9 +43,13 @@ int<lower=1> link; // link function
 vector[ni_agd_contrast] agd_contrast_y;
 cov_matrix[ni_agd_contrast ? ni_agd_contrast : 1] agd_contrast_Sigma;
 
+// -- AgD regression coefficients --
+vector[ni_agd_regression] agd_regression_est;
+cov_matrix[ni_agd_regression ? ni_agd_regression : 1] agd_regression_cov;
+
 // -- Design matrix or thin QR decomposition --
 int<lower=0, upper=1> QR; // use QR decomposition (yes = 1)
-matrix[ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast), nX] X; // X is Q from QR decomposition if QR = 1
+matrix[ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast) + ni_agd_regression, nX] X; // X is Q from QR decomposition if QR = 1
 matrix[QR ? nX : 0, QR ? nX : 0] R_inv;
 
 // -- Offsets --
@@ -49,7 +58,7 @@ vector[has_offset ? ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast) : 0] offs
 
 // -- Random effects --
 int<lower=0, upper=1> RE; // Random effects flag (yes = 1)
-array[RE ? narm_ipd + narm_agd_arm + ni_agd_contrast : 0] int<lower=0> which_RE; // ID of RE delta for each arm (0 for no RE delta)
+array[RE ? narm_ipd + narm_agd_arm + ni_agd_contrast + narm_agd_regression : 0] int<lower=0> which_RE; // ID of RE delta for each arm (0 for no RE delta)
 corr_matrix[RE ? max(which_RE) : 1] RE_cor; // RE correlation matrix
 
 // -- Node-splitting --
