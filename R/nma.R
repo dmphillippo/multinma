@@ -925,10 +925,16 @@ nma <- function(network,
       tdat_agd_contrast_nonbl <- tibble::tibble()
     }
 
-    tdat_all <- dplyr::bind_rows(tdat_ipd_arm, tdat_agd_arm, tdat_agd_contrast_nonbl)
+    if (has_agd_regression(network)) {
+      tdat_agd_regression_arm <- dplyr::distinct(dat_agd_regression_nonbl, .data$.study, .data$.trt)
+    } else {
+      tdat_agd_regression_arm <- tibble::tibble()
+    }
 
-    contr <- rep(c(FALSE, FALSE, TRUE),
-                 times = c(nrow(tdat_ipd_arm), nrow(tdat_agd_arm), nrow(tdat_agd_contrast_nonbl)))
+    tdat_all <- dplyr::bind_rows(tdat_ipd_arm, tdat_agd_arm, tdat_agd_contrast_nonbl, tdat_agd_regression_arm)
+
+    contr <- rep(c(FALSE, FALSE, TRUE, FALSE),
+                 times = c(nrow(tdat_ipd_arm), nrow(tdat_agd_arm), nrow(tdat_agd_contrast_nonbl), nrow(tdat_agd_regression_arm)))
 
     if (consistency %in% c("consistency", "nodesplit")) {
       .RE_cor <- RE_cor(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "reftrt")
