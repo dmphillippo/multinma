@@ -3024,12 +3024,12 @@ make_nma_model_matrix <- function(nma_formula,
 
     # Remove columns for study baselines corresponding to contrast-based studies - not used
     s_contr <- unique(dat_agd_contrast$.study)
-    bl_s_reg <- paste0("^\\.study(\\Q", paste0(s_contr, collapse = "\\E|\\Q"), "\\E)$")
-    bl_cols <- grepl(bl_s_reg, colnames(X_agd_contrast), perl = TRUE)
+    bl_s_contr_reg <- paste0("^\\.study(\\Q", paste0(s_contr, collapse = "\\E|\\Q"), "\\E)$")
+    bl_contr_cols <- grepl(bl_s_contr_reg, colnames(X_agd_contrast), perl = TRUE)
 
-    X_agd_contrast <- X_agd_contrast[, !bl_cols, drop = FALSE]
-    if (.has_ipd) X_ipd <- X_ipd[, !bl_cols, drop = FALSE]
-    if (.has_agd_arm) X_agd_arm <- X_agd_arm[, !bl_cols, drop = FALSE]
+    X_agd_contrast <- X_agd_contrast[, !bl_contr_cols, drop = FALSE]
+    if (.has_ipd) X_ipd <- X_ipd[, !bl_contr_cols, drop = FALSE]
+    if (.has_agd_arm) X_agd_arm <- X_agd_arm[, !bl_contr_cols, drop = FALSE]
   } else {
     X_agd_contrast <- offset_agd_contrast <- NULL
   }
@@ -3055,6 +3055,13 @@ make_nma_model_matrix <- function(nma_formula,
         NULL
       }
 
+    # Avoid differencing study intercepts from baseline rows
+    studies_reg <- unique(dat_agd_regression$.study)
+    studies_reg_reg <- paste0("^\\.study(\\Q", paste0(studies_reg, collapse = "\\E|\\Q"), "\\E)$")
+    study_reg_cols <- grepl(studies_reg_reg, colnames(X_agd_regression), perl = TRUE)
+
+    X_bl[, study_reg_cols] <- 0
+
     # Match non-baseline rows with baseline rows by study
     for (s in unique(dat_agd_regression$.study)) {
       nonbl_id <- which(dat_agd_regression$.study[!agd_regression_bl] == s)
@@ -3066,15 +3073,14 @@ make_nma_model_matrix <- function(nma_formula,
       if (has_offset) offset_agd_regression[nonbl_id] <- offset_agd_regression[nonbl_id] - offset_bl[bl_id]
     }
 
+    # Set intercept only if all other columns are zero
+    all0 <- apply(X_agd_regression[, !study_reg_cols, drop = FALSE], 1, function(x) all(x == 0))
+    X_agd_regression[!all0, study_reg_cols] <- 0
+
     # Remove columns for study baselines corresponding to contrast-based studies - not used
     if (.has_agd_contrast) {
-      # s_contr <- unique(dat_agd_regression$.study)
-      # bl_s_reg <- paste0("^\\.study(\\Q", paste0(s_contr, collapse = "\\E|\\Q"), "\\E)$")
-      bl_cols <- grepl(bl_s_reg, colnames(X_agd_regression), perl = TRUE)
-
-      X_agd_regression <- X_agd_regression[, !bl_cols, drop = FALSE]
-      # if (.has_ipd) X_ipd <- X_ipd[, !bl_cols, drop = FALSE]
-      # if (.has_agd_arm) X_agd_arm <- X_agd_arm[, !bl_cols, drop = FALSE]
+      bl_contr_cols <- grepl(bl_s_contr_reg, colnames(X_agd_regression), perl = TRUE)
+      X_agd_regression <- X_agd_regression[, !bl_contr_cols, drop = FALSE]
     }
 
   } else {
