@@ -2144,7 +2144,7 @@ nfactor <- function(x, ..., numeric = TRUE, resort = FALSE) {
 #' @param studies studies factor
 #' @param outcome outcome type list for each data source
 #'
-#' @nord
+#' @noRd
 make_nma_data <- function(agd_arm = NULL,
                           agd_contrast = NULL,
                           agd_regression = NULL,
