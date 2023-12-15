@@ -2350,7 +2350,7 @@ valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
 #'
 #' @noRd
 check_likelihood <- function(x, outcome) {
-  if (missing(outcome)) valid_lhood <- unlist(valid_lhood)
+  if (missing(outcome) || all(is.na(outcome))) valid_lhood <- unlist(valid_lhood)
   else if (!is.na(outcome$ipd)) {
     valid_lhood <- valid_lhood[[outcome$ipd]]
     otype <- outcome$ipd
@@ -2366,7 +2366,8 @@ check_likelihood <- function(x, outcome) {
   # Choose default likelihood if NULL
   if (is.null(x) && missing(outcome)) abort("Please specify a suitable likelihood.")
   else if (is.null(x)) {
-    x <- valid_lhood[1]
+    if (all(is.na(outcome))) x <- "normal"  # default for agd_regression only networks
+    else x <- valid_lhood[1]
 
   # Check valid option if given
   } else if (!is.character(x) || length(x) > 1 || !tolower(x) %in% valid_lhood) {
