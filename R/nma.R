@@ -886,6 +886,8 @@ nma <- function(network,
                                   dat_agd_arm = idat_agd_arm,
                                   dat_agd_contrast = idat_agd_contrast,
                                   agd_contrast_bl = is.na(idat_agd_contrast$.y),
+                                  dat_agd_regression = dat_agd_regression,
+                                  agd_regression_bl = is.na(dat_agd_regression$.estimate),
                                   xbar = xbar,
                                   consistency = consistency,
                                   nodesplit = nodesplit,
@@ -894,10 +896,12 @@ nma <- function(network,
   X_ipd <- X_list$X_ipd
   X_agd_arm <- X_list$X_agd_arm
   X_agd_contrast <- X_list$X_agd_contrast
+  X_agd_regression <- X_list$X_agd_regression
 
   offset_ipd <- X_list$offset_ipd
   offset_agd_arm <- X_list$offset_agd_arm
   offset_agd_contrast <- X_list$offset_agd_contrast
+  offset_agd_regression <- X_list$offset_agd_regression
 
   # Construct RE correlation matrix
   if (trt_effects == "random") {
@@ -2737,6 +2741,8 @@ make_nma_model_matrix <- function(nma_formula,
                                   dat_agd_arm = tibble::tibble(),
                                   dat_agd_contrast = tibble::tibble(),
                                   agd_contrast_bl = logical(),
+                                  dat_agd_regression = tibble::tibble(),
+                                  agd_regression_bl = logical(),
                                   xbar = NULL,
                                   consistency = c("consistency", "nodesplit", "ume"),
                                   nodesplit = NULL,
@@ -2746,7 +2752,8 @@ make_nma_model_matrix <- function(nma_formula,
   if (!rlang::is_formula(nma_formula)) abort("`nma_formula` is not a formula")
   stopifnot(is.data.frame(dat_ipd),
             is.data.frame(dat_agd_arm),
-            is.data.frame(dat_agd_contrast))
+            is.data.frame(dat_agd_contrast),
+            is.data.frame(dat_agd_regression))
   consistency <- rlang::arg_match(consistency)
   if (!rlang::is_bool(classes)) abort("`classes` should be TRUE or FALSE")
   if (nrow(dat_agd_contrast) && !rlang::is_logical(agd_contrast_bl, n = nrow(dat_agd_contrast)))
@@ -2767,6 +2774,7 @@ make_nma_model_matrix <- function(nma_formula,
   .has_ipd <- if (nrow(dat_ipd)) TRUE else FALSE
   .has_agd_arm <- if (nrow(dat_agd_arm)) TRUE else FALSE
   .has_agd_contrast <- if (nrow(dat_agd_contrast)) TRUE else FALSE
+  .has_agd_regression <- if (nrow(dat_agd_regression)) TRUE else FALSE
 
   # Sanitise factors
   if (.has_ipd) {
@@ -2783,6 +2791,11 @@ make_nma_model_matrix <- function(nma_formula,
     dat_agd_contrast <- dplyr::mutate_at(dat_agd_contrast,
                             .vars = if (classes) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
                             .funs = fct_sanitise)
+  }
+  if (.has_agd_regression) {
+    dat_agd_regression <- dplyr::mutate_at(dat_agd_regression,
+                                         .vars = if (classes) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
+                                         .funs = fct_sanitise)
   }
 
   # Define contrasts for UME model
@@ -2807,11 +2820,13 @@ make_nma_model_matrix <- function(nma_formula,
     # For AgD (contrast-based), take the specified baseline arm (with .y = NA)
     # Need to make sure to construct contrast the correct way around (d_12 instead of d_21)
     # and then make a note to change the sign if necessary
-    if (.has_agd_contrast) {
-      contrs_contr <- dat_agd_contrast %>%
+    if (.has_agd_contrast || .has_agd_regression) {
+      contrs_contr <- dplyr::bind_rows(dat_agd_contrast, dat_agd_regression) %>%
         dplyr::distinct(.data$.study, .data$.trt) %>%  # In case integration data passed
-        dplyr::left_join(dplyr::distinct(dat_agd_contrast[agd_contrast_bl, ], .data$.study, .data$.trt) %>%
-                           dplyr::transmute(.data$.study, .trt_b = .data$.trt), by = ".study") %>%
+        dplyr::left_join(
+          dplyr::bind_rows(dat_agd_regression[agd_regression_bl, ],
+                           dplyr::distinct(dat_agd_contrast[agd_contrast_bl, ], .data$.study, .data$.trt)) %>%
+            dplyr::transmute(.data$.study, .trt_b = .data$.trt), by = ".study") %>%
         dplyr::distinct(.data$.study, .data$.trt, .data$.trt_b) %>%
         dplyr::mutate(.contr_sign = dplyr::if_else(as.numeric(.data$.trt) < as.numeric(.data$.trt_b), -1, 1),
                       .contr = dplyr::if_else(.data$.trt == .data$.trt_b,
@@ -2846,6 +2861,9 @@ make_nma_model_matrix <- function(nma_formula,
     if (.has_agd_contrast) {
       dat_agd_contrast <- dplyr::left_join(dat_agd_contrast, contrs_all, by = c(".study", ".trt"))
     }
+    if (.has_agd_regression) {
+      dat_agd_regression <- dplyr::left_join(dat_agd_regression, contrs_all, by = c(".study", ".trt"))
+    }
   }
 
   # Derive .omega indicator for node-splitting model
@@ -2865,11 +2883,16 @@ make_nma_model_matrix <- function(nma_formula,
         dplyr::mutate(.omega = all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2]) %>%
         dplyr::ungroup()
     }
+    if (.has_agd_regression) {
+      dat_agd_regression <- dplyr::group_by(dat_agd_regression, .data$.study) %>%
+        dplyr::mutate(.omega = all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2]) %>%
+        dplyr::ungroup()
+    }
   }
 
   # Construct design matrix all together then split out, so that same dummy
   # coding is used everywhere
-  dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
+  dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast, dat_agd_regression)
 
   # Check that required variables are present in each data set, and non-missing
   check_regression_data(nma_formula,
@@ -3011,12 +3034,61 @@ make_nma_model_matrix <- function(nma_formula,
     X_agd_contrast <- offset_agd_contrast <- NULL
   }
 
+  if (.has_agd_regression) {
+    X_agd_regression_all <- X_all[nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression), , drop = FALSE]
+    offset_agd_regression_all <-
+      if (has_offset) {
+        offsets[nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression)]
+      } else {
+        NULL
+      }
+
+    # Difference out the baseline arms
+    X_bl <- X_agd_regression_all[agd_regression_bl, , drop = FALSE]
+    if (has_offset) offset_bl <- offset_agd_regression_all[agd_regression_bl]
+
+    X_agd_regression <- X_agd_regression_all[!agd_regression_bl, , drop = FALSE]
+    offset_agd_regression <-
+      if (has_offset) {
+        offset_agd_regression_all[!agd_regression_bl]
+      } else {
+        NULL
+      }
+
+    # Match non-baseline rows with baseline rows by study
+    for (s in unique(dat_agd_regression$.study)) {
+      nonbl_id <- which(dat_agd_regression$.study[!agd_regression_bl] == s)
+      bl_id <- which(dat_agd_regression$.study[agd_regression_bl] == s)
+
+      bl_id <- rep_len(bl_id, length(nonbl_id))
+
+      X_agd_regression[nonbl_id, ] <- X_agd_regression[nonbl_id, , drop = FALSE] - X_bl[bl_id, , drop = FALSE]
+      if (has_offset) offset_agd_regression[nonbl_id] <- offset_agd_regression[nonbl_id] - offset_bl[bl_id]
+    }
+
+    # Remove columns for study baselines corresponding to contrast-based studies - not used
+    if (.has_agd_contrast) {
+      # s_contr <- unique(dat_agd_regression$.study)
+      # bl_s_reg <- paste0("^\\.study(\\Q", paste0(s_contr, collapse = "\\E|\\Q"), "\\E)$")
+      bl_cols <- grepl(bl_s_reg, colnames(X_agd_regression), perl = TRUE)
+
+      X_agd_regression <- X_agd_regression[, !bl_cols, drop = FALSE]
+      # if (.has_ipd) X_ipd <- X_ipd[, !bl_cols, drop = FALSE]
+      # if (.has_agd_arm) X_agd_arm <- X_agd_arm[, !bl_cols, drop = FALSE]
+    }
+
+  } else {
+    X_agd_regression <- offset_agd_regression <- NULL
+  }
+
   return(list(X_ipd = X_ipd,
               X_agd_arm = X_agd_arm,
               X_agd_contrast = X_agd_contrast,
+              X_agd_regression = X_agd_regression,
               offset_ipd = offset_ipd,
               offset_agd_arm = offset_agd_arm,
-              offset_agd_contrast = offset_agd_contrast))
+              offset_agd_contrast = offset_agd_contrast,
+              offset_agd_regression = offset_agd_regression))
 }
 
 #' Extract columns used in model from data frame
