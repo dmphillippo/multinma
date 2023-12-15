@@ -1105,6 +1105,7 @@ nma <- function(network,
     agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
     agd_contrast_x = X_agd_contrast, agd_contrast_y = y_agd_contrast,
     agd_contrast_Sigma = Sigma_agd_contrast,
+    agd_regression_x = X_agd_regression, agd_regression_est = est_agd_regression, agd_regression_cov = cov_agd_regression,
     n_int = n_int,
     ipd_offset = offset_ipd,
     agd_arm_offset = offset_agd_arm,
@@ -1306,6 +1307,9 @@ nma <- function(network,
 #' @param agd_contrast_x  Design matrix for AgD studies (contrast-based)
 #' @param agd_contrast_y  Outcome data frame for AgD studies (contrast-based)
 #' @param agd_contrast_Sigma List of covariance matrices for contrast-based data
+#' @param agd_regression_x   Design matrix for AgD regression coefficients
+#' @param agd_regression_est AgD regression coefficient estimates
+#' @param agd_regression_cov List of covariance matrices for AgD regression coefficients
 #' @param n_int Number of numerical integration points used
 #' @param ipd_offset Vector of offset values for IPD
 #' @param agd_arm_offset Vector of offset values for AgD (arm-based)
@@ -1315,9 +1319,10 @@ nma <- function(network,
 #' @param basis Spline basis for `mspline` and `pexp` models
 #'
 #' @noRd
-nma.fit <- function(ipd_x, ipd_y,
-                    agd_arm_x, agd_arm_y,
-                    agd_contrast_x, agd_contrast_y, agd_contrast_Sigma,
+nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
+                    agd_arm_x = NULL, agd_arm_y = NULL,
+                    agd_contrast_x = NULL, agd_contrast_y = NULL, agd_contrast_Sigma = NULL,
+                    agd_regression_x = NULL, agd_regression_est = NULL, agd_regression_cov = NULL,
                     n_int,
                     ipd_offset = NULL, agd_arm_offset = NULL, agd_contrast_offset = NULL,
                     trt_effects = c("fixed", "random"),
@@ -1343,14 +1348,6 @@ nma.fit <- function(ipd_x, ipd_y,
                     int_check = TRUE,
                     basis) {
 
-  if (missing(ipd_x)) ipd_x <- NULL
-  if (missing(ipd_y)) ipd_y <- NULL
-  if (missing(agd_arm_x)) agd_arm_x <- NULL
-  if (missing(agd_arm_y)) agd_arm_y <- NULL
-  if (missing(agd_contrast_x)) agd_contrast_x <- NULL
-  if (missing(agd_contrast_y)) agd_contrast_y <- NULL
-  if (missing(agd_contrast_Sigma)) agd_contrast_Sigma <- NULL
-
   # Check available x and y
   if (xor(is.null(ipd_x), is.null(ipd_y)))
     abort("`ipd_x` and `ipd_y` should both be present or both NULL.")
@@ -1358,10 +1355,13 @@ nma.fit <- function(ipd_x, ipd_y,
     abort("`agd_arm_x` and `agd_arm_y` should both be present or both NULL.")
   if (xor(is.null(agd_contrast_x), is.null(agd_contrast_y)) || xor(is.null(agd_contrast_x), is.null(agd_contrast_Sigma)))
     abort("`agd_contrast_x`, `agd_contrast_y`, `agd_contrast_Sigma` should all be present or all NULL.")
+  if (xor(is.null(agd_regression_x), is.null(agd_regression_est)) || xor(is.null(agd_regression_x), is.null(agd_regression_cov)))
+    abort("`agd_regression_x`, `agd_regression_est`, `agd_regression_cov` should all be present or all NULL.")
 
   has_ipd <- !is.null(ipd_x) && !is.null(ipd_y)
   has_agd_arm <- !is.null(agd_arm_x) && !is.null(agd_arm_y)
   has_agd_contrast <-  !is.null(agd_contrast_x) && !is.null(agd_contrast_y) && !is.null(agd_contrast_Sigma)
+  has_agd_regression <-  !is.null(agd_regression_x) && !is.null(agd_regression_est) && !is.null(agd_regression_cov)
 
   # Ignore n_int if no AgD
   if (!has_agd_arm && !has_agd_contrast) n_int <- 1
@@ -1396,6 +1396,16 @@ nma.fit <- function(ipd_x, ipd_y,
     if (!is.list(agd_contrast_Sigma) || any(purrr::map_lgl(agd_contrast_Sigma, ~!is.numeric(.))))
       abort("`agd_contrast_Sigma` should be a list of covariance matrices, of length equal to the number of AgD (contrast-based) studies.")
   }
+  if (has_agd_regression) {
+    if (!is.matrix(agd_regression_x) || !is.numeric(agd_regression_x))
+      abort("`agd_regression_x` should be a numeric matrix.")
+    if (!is.numeric(agd_regression_est))
+      abort("`agd_regression_est` should be numeric regression coefficient estimates.")
+    if (nrow(agd_regression_x) != length(agd_regression_est))
+      abort("Number of rows in `agd_regression_x` and `agd_regression_est` do not match.")
+    if (!is.list(agd_regression_cov) || any(purrr::map_lgl(agd_regression_cov, ~!is.numeric(.))))
+      abort("`agd_regression_cov` should be a list of covariance matrices, of length equal to the number of AgD (regression coefficient) studies.")
+  }
 
   # Check offsets
   has_ipd_offset <- !is.null(ipd_offset)
@@ -1424,11 +1434,11 @@ nma.fit <- function(ipd_x, ipd_y,
     abort("`agd_contrast_offset` should be a numeric vector with length matching `agd_contrast_x`, `agd_contrast_y`")
 
   # Check matching X column names and dimensions if more than one present
-  if ((has_ipd &&
-       ((has_agd_arm && !identical(colnames(ipd_x), colnames(agd_arm_x))) ||
-        (has_agd_contrast && !identical(colnames(ipd_x), colnames(agd_contrast_x))))) ||
-      (has_agd_arm &&
-       (has_agd_contrast && !identical(colnames(agd_arm_x), colnames(agd_contrast_x)))))
+  colnames_all <- list(colnames(ipd_x),
+                       colnames(agd_arm_x),
+                       colnames(agd_contrast_x),
+                       colnames(agd_regression_x))[c(has_ipd, has_agd_arm, has_agd_contrast, has_agd_regression)]
+  if (length(colnames_all) > 2 && any(purrr::map_lgl(colnames_all[-1], ~!identical(., colnames_all[[1]]))))
     abort("Non-matching columns in *_x matrices.")
 
   # Check model arguments
@@ -1481,6 +1491,7 @@ nma.fit <- function(ipd_x, ipd_y,
   if (has_ipd) x_names <- colnames(ipd_x)
   else if (has_agd_arm) x_names <- colnames(agd_arm_x)
   else if (has_agd_contrast) x_names <- colnames(agd_contrast_x)
+  else if (has_agd_regression) x_names <- colnames(agd_regression_x)
 
   col_study <- grepl("^\\.study[^:]+$", x_names)
   col_trt <- grepl("^(\\.trt|\\.contr)[^:]+$", x_names)
@@ -1552,9 +1563,36 @@ nma.fit <- function(ipd_x, ipd_y,
     ns_agd_contrast <- 0
   }
 
+  if (has_agd_regression) {
+    agd_regression_s_t_all <- dplyr::tibble(.study = unname(apply(agd_regression_x[, col_study, drop = FALSE], 1, get_study)),
+                                            .trt = unname(apply(agd_regression_x[, col_trt, drop = FALSE], 1, get_trt)))
+    agd_regression_s_t <- dplyr::distinct(agd_regression_s_t_all) %>% dplyr::mutate(.arm = 1:dplyr::n())
+    agd_regression_arm <-  dplyr::left_join(agd_regression_s_t_all, agd_regression_s_t, by = c(".study", ".trt")) %>% dplyr::pull(.data$.arm)
+    agd_regression_study <- agd_regression_s_t$.study
+    agd_regression_trt <- agd_regression_s_t$.trt
+    narm_agd_regression <- max(agd_regression_arm)
+    ni_agd_regression <- nrow(agd_regression_x)
+
+    # Get number of AgD regression studies from length of covariance matrix list
+    ns_agd_regression <- length(agd_regression_cov)
+
+    # Construct single block-diagonal covariance matrix
+    agd_regression_cov <- as.matrix(Matrix::bdiag(agd_regression_cov))
+
+    if (nrow(agd_regression_cov) != ni_agd_regression)
+      abort("Dimensions of `agd_regression_cov` covariance matrices do not match the regression coefficient data.")
+  } else {
+    agd_regression_s_t_all <- dplyr::tibble(.study = integer(), .trt = integer())
+    agd_regression_study <- agd_regression_trt <- agd_regression_arm <- numeric()
+    ni_agd_regression <- 0
+    narm_agd_regression <- 0
+    ns_agd_regression <- 0
+    agd_regression_cov <- matrix(1, 1, 1)
+  }
+
   # Set up random effects
   if (trt_effects == "random") {
-    narm <- narm_ipd + narm_agd_arm + ni_agd_contrast
+    narm <- narm_ipd + narm_agd_arm + ni_agd_contrast + ni_agd_regression
     if (!is.null(which_RE)) {
       if (!rlang::is_integerish(which_RE) ||
           any(which_RE < 0) ||
@@ -1584,7 +1622,7 @@ nma.fit <- function(ipd_x, ipd_y,
   }
 
   # Make full design matrix
-  X_all <- rbind(ipd_x, agd_arm_x, agd_contrast_x)
+  X_all <- rbind(ipd_x, agd_arm_x, agd_contrast_x, agd_regression_x)
 
   # Make sure columns of X_all are in correct order (study, trt, omega (if nodesplit), regression terms)
   X_all <- cbind(X_all[, col_study, drop = FALSE],
@@ -1624,6 +1662,8 @@ nma.fit <- function(ipd_x, ipd_y,
     ni_agd_arm = ni_agd_arm,
     ns_agd_contrast = ns_agd_contrast,
     ni_agd_contrast = ni_agd_contrast,
+    ns_agd_regression = ns_agd_regression,
+    ni_agd_regression = ni_agd_regression,
     nt = n_trt,
     nchains = nchains,
     nint_max = nint_max,
@@ -1640,6 +1680,11 @@ nma.fit <- function(ipd_x, ipd_y,
     agd_contrast_trt_b = as.array(agd_contrast_trt_b),
     agd_contrast_y = if (has_agd_contrast) as.array(agd_contrast_y$.y) else numeric(),
     agd_contrast_Sigma = Sigma,
+    agd_regression_est = agd_regression_est,
+    agd_regression_cov = agd_regression_cov,
+    agd_regression_arm = agd_regression_arm,
+    agd_regression_trt = agd_regression_trt,
+    narm_agd_regression = narm_agd_regression,
     # ipd_study = ipd_study,
     # agd_arm_study = agd_arm_study,
     # agd_contrast_study = agd_contrast_study,
