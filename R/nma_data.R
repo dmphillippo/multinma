@@ -1168,6 +1168,14 @@ set_agd_regression <- function(data,
   if (!all(reg_vars %in% colnames(d)))
     abort(glue::glue("Regression variables not present in `data`: ", glue::glue_collapse(setdiff(reg_vars, colnames(d)), sep = ", ", last = " and ")))
 
+  # Set NA values to reference level (to result in 0 in design matrix)
+  d <- dplyr::group_by(d, .data$.study) %>%
+    dplyr::group_modify(~tidyr::replace_na(.,
+                                           dplyr::filter(., is.na(.data$.estimate)) %>% dplyr::select(-.data$.estimate) %>% as.list()
+                                           ) %>%
+                          dplyr::select(-.data$.study),
+                        .keep = TRUE)
+
   # Store regression formulae in data
   d <- dplyr::left_join(d,
     tidyr::pivot_longer(dplyr::as_tibble(purrr::map(regression, list)),
