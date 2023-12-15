@@ -1168,6 +1168,15 @@ set_agd_regression <- function(data,
   if (!all(reg_vars %in% colnames(d)))
     abort(glue::glue("Regression variables not present in `data`: ", glue::glue_collapse(setdiff(reg_vars, colnames(d)), sep = ", ", last = " and ")))
 
+  # Store regression formulae in data
+  d <- dplyr::left_join(d,
+    tidyr::pivot_longer(dplyr::as_tibble(purrr::map(regression, list)),
+                        cols = dplyr::everything(),
+                        names_to = ".study", values_to = ".regression") %>%
+      dplyr::mutate(.study = factor(.data$.study, levels = levels(d$.study))),
+    by = ".study"
+    )
+
   # Check covariance/correlation matrices
   if (!missing(cov)) {
     cmat <- cov
