@@ -2987,6 +2987,12 @@ make_nma_model_matrix <- function(nma_formula,
   offsets <- model.offset(model.frame(nma_formula, data = dat_all))
   has_offset <- !is.null(offsets)
 
+  # Determine "order" of terms: intercepts=0, main effects=1, 1st order interactions=2, ...
+  # Needed for agd_regression setup
+  X_order <- attr(terms(nma_formula), "order")[attr(X_all, "assign")]
+  X_order[grepl(paste0("^\\.study(\\Q", paste0(unique(dat_all$.study), collapse = "\\E|\\Q"), "\\E)$"), colnames(X_all), perl = TRUE)] <- 0
+  names(X_order) <- colnames(X_all)
+
   if (!is.null(single_study_label)) {
     # Restore single study label and .study column
     colnames(X_all) <- stringr::str_replace(colnames(X_all),
@@ -3124,9 +3130,12 @@ make_nma_model_matrix <- function(nma_formula,
       if (has_offset) offset_agd_regression[nonbl_id] <- offset_agd_regression[nonbl_id] - offset_bl[bl_id]
     }
 
-    # Set intercept only if all other columns are zero
-    all0 <- apply(X_agd_regression[, !study_reg_cols, drop = FALSE], 1, function(x) all(x == 0))
-    X_agd_regression[!all0, study_reg_cols] <- 0
+    # Only highest order terms are non-zero in each row
+    X_order <- X_order[colnames(X_agd_regression)]
+    for (i in 1:nrow(X_agd_regression)) {
+      ord_i <- max(X_order[X_agd_regression[i, ] != 0])
+      X_agd_regression[i, X_order < ord_i] <- 0
+    }
 
     # Remove columns for study baselines corresponding to contrast-based studies - not used
     if (.has_agd_contrast) {
