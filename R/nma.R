@@ -2954,8 +2954,12 @@ make_nma_model_matrix <- function(nma_formula,
 
   # Center
   if (!is.null(xbar)) {
-    dat_all[, names(xbar)] <-
-      purrr::map2(dat_all[, names(xbar), drop = FALSE], xbar, ~.x - .y)
+    # Only center baseline rows of agd_regression data
+    cen_bl <- c(rep(TRUE, nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast)),
+                agd_regression_bl)
+
+    dat_all[cen_bl, names(xbar)] <-
+      purrr::map2(dat_all[cen_bl, names(xbar), drop = FALSE], xbar, ~.x - .y)
   }
 
   # Explicitly set contrasts attribute for key variables
@@ -2987,11 +2991,36 @@ make_nma_model_matrix <- function(nma_formula,
   offsets <- model.offset(model.frame(nma_formula, data = dat_all))
   has_offset <- !is.null(offsets)
 
-  # Determine "order" of terms: intercepts=0, main effects=1, 1st order interactions=2, ...
+  # Determine "order" of terms: intercepts and trt effects=0, main effects=1, 1st order interactions=2, ...
   # Needed for agd_regression setup
   X_order <- attr(terms(nma_formula), "order")[attr(X_all, "assign")]
   X_order[grepl(paste0("^\\.study(\\Q", paste0(unique(dat_all$.study), collapse = "\\E|\\Q"), "\\E)$"), colnames(X_all), perl = TRUE)] <- 0
+  X_order[grepl(paste0("^\\.trt(\\Q", paste0(unique(dat_all$.trt), collapse = "\\E|\\Q"), "\\E)$"), colnames(X_all), perl = TRUE)] <- 0
   names(X_order) <- colnames(X_all)
+
+  # Determine columns corresponding to factor terms
+  fct_vars <- names(attr(X_all, "contrasts"))
+  fct_cols <- attr(X_all, "assign") %in% which(colSums(attr(terms(nma_formula), "factors")[fct_vars, , drop = FALSE] > 0) > 0)
+  names(fct_cols) <- colnames(X_all)
+  if (!is.null(single_study_label)) {
+    names(fct_cols) <- stringr::str_replace(names(fct_cols),
+                                          "^\\.study$",
+                                          paste0(".study", single_study_label))
+    fct_cols[paste0(".study", single_study_label)] <- TRUE
+  }
+
+  # Get design matrix for agd regression with all factors set to within-study reference levels
+  if (.has_agd_regression) {
+    dat_all_ref <-
+      dat_agd_regression[agd_regression_bl, ] %>%
+      dplyr::select(".study", ".trt",
+                    if (!is.null(classes)) ".trtclass" else NULL,
+                    dplyr::all_of(fct_vars))  %>%
+      dplyr::right_join(dplyr::select(dat_all, -dplyr::any_of(c(".trt", ".trtclass")), -dplyr::all_of(fct_vars), ".study"),
+                        by = ".study")
+
+    X_all_ref <- model.matrix(nma_formula, data = dat_all_ref)
+  }
 
   if (!is.null(single_study_label)) {
     # Restore single study label and .study column
@@ -3004,6 +3033,17 @@ make_nma_model_matrix <- function(nma_formula,
 
     # Drop intercept column from design matrix
     if ("(Intercept)" %in% colnames(X_all)) X_all <- X_all[, -1, drop = FALSE]
+
+    if (.has_agd_regression) {
+      colnames(X_all_ref) <- stringr::str_replace(colnames(X_all_ref),
+                                              "^\\.study$",
+                                              paste0(".study", single_study_label))
+      dat_all_ref <- dat_all_ref %>%
+        dplyr::mutate(.study = .data$.study_temp) %>%
+        dplyr::select(-".study_temp")
+
+      if ("(Intercept)" %in% colnames(X_all_ref)) X_all_ref <- X_all_ref[, -1, drop = FALSE]
+    }
   }
 
   # Remove columns for reference level of .trtclass
@@ -3012,6 +3052,10 @@ make_nma_model_matrix <- function(nma_formula,
     col_trtclass_ref <- grepl(paste0(".trtclass", ref_class),
                               colnames(X_all), fixed = TRUE)
     X_all <- X_all[, !col_trtclass_ref, drop = FALSE]
+
+    if (.has_agd_regression) {
+      X_all_ref <- X_all_ref[, !col_trtclass_ref, drop = FALSE]
+    }
   }
 
   # Remove columns for interactions with reference level of .trt or .trtclass
@@ -3022,15 +3066,20 @@ make_nma_model_matrix <- function(nma_formula,
                             "\\:\\.trtclass\\Q", ref_class, "\\E$|^\\.trtclass\\Q", ref_class, "\\E\\:")
   col_int_ref <- grepl(regex_int_ref, colnames(X_all), perl = TRUE)
   X_all <- X_all[, !col_int_ref, drop = FALSE]
+  if (.has_agd_regression) X_all_ref <- X_all_ref[, !col_int_ref, drop = FALSE]
 
   # Remove global intercept column (present for aux_regression)
   X_all <- X_all[, colnames(X_all) != "(Intercept)", drop = FALSE]
+  if (.has_agd_regression) X_all_ref <- X_all_ref[, colnames(X_all_ref) != "(Intercept)", drop = FALSE]
 
   if (consistency == "ume") {
     # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
     contr_cols <- grepl("^\\.contr", colnames(X_all))
     X_all[, contr_cols] <- sweep(X_all[, contr_cols, drop = FALSE], MARGIN = 1,
                                  STATS = dat_all$.contr_sign, FUN = "*")
+
+    if (.has_agd_regression) X_all_ref[, contr_cols] <- sweep(X_all_ref[, contr_cols, drop = FALSE], MARGIN = 1,
+                                                          STATS = dat_all$.contr_sign, FUN = "*")
   }
 
   if (.has_ipd) {
@@ -3100,7 +3149,7 @@ make_nma_model_matrix <- function(nma_formula,
         NULL
       }
 
-    # Difference out the baseline arms
+    # Baseline rows
     X_bl <- X_agd_regression_all[agd_regression_bl, , drop = FALSE]
     if (has_offset) offset_bl <- offset_agd_regression_all[agd_regression_bl]
 
@@ -3112,27 +3161,38 @@ make_nma_model_matrix <- function(nma_formula,
         NULL
       }
 
-    # Avoid differencing study intercepts from baseline rows
+    # Design matrix with all factors set to within-study reference level
+    X_agd_regression_ref_all <- X_all_ref[nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression), , drop = FALSE]
+    X_agd_regression_ref <- X_all_ref[!agd_regression_bl, , drop = FALSE]
+
+    # Determine study and treatment columns
     studies_reg <- unique(dat_agd_regression$.study)
     studies_reg_reg <- paste0("^\\.study(\\Q", paste0(studies_reg, collapse = "\\E|\\Q"), "\\E)$")
     study_reg_cols <- grepl(studies_reg_reg, colnames(X_agd_regression), perl = TRUE)
 
-    X_bl[, study_reg_cols] <- 0
+    trts_reg <- unique(dat_agd_regression$.trt)
+    trts_reg_reg <- paste0("^\\.trt(\\Q", paste0(trts_reg, collapse = "\\E|\\Q"), "\\E)$")
+    trt_reg_cols <- grepl(trts_reg_reg, colnames(X_agd_regression), perl = TRUE)
 
-    # Match non-baseline rows with baseline rows by study
-    for (s in unique(dat_agd_regression$.study)) {
-      nonbl_id <- which(dat_agd_regression$.study[!agd_regression_bl] == s)
-      bl_id <- which(dat_agd_regression$.study[agd_regression_bl] == s)
-
-      bl_id <- rep_len(bl_id, length(nonbl_id))
-
-      X_agd_regression[nonbl_id, ] <- X_agd_regression[nonbl_id, , drop = FALSE] - X_bl[bl_id, , drop = FALSE]
-      if (has_offset) offset_agd_regression[nonbl_id] <- offset_agd_regression[nonbl_id] - offset_bl[bl_id]
-    }
-
-    # Only highest order terms are non-zero in each row
+    fct_cols <- fct_cols[colnames(X_agd_regression)]
     X_order <- X_order[colnames(X_agd_regression)]
+
     for (i in 1:nrow(X_agd_regression)) {
+      # Get corresponding reference row
+      bl_id <- match(dat_agd_regression$.study[!agd_regression_bl][i], dat_agd_regression$.study[agd_regression_bl])
+
+      if (all(X_agd_regression[i, trt_reg_cols] == X_bl[bl_id, trt_reg_cols]) &&
+          all(X_agd_regression[i, !study_reg_cols & !trt_reg_cols] == 0)) {
+        # Intercept rows
+        # Set reference values of covariates
+        X_agd_regression[i, !study_reg_cols & !trt_reg_cols] <- X_bl[bl_id, !study_reg_cols & !trt_reg_cols]
+      } else {
+        # All other rows
+        # Difference out reference levels of factors
+        X_agd_regression[i, fct_cols] <- X_agd_regression[i, fct_cols, drop = FALSE] - X_agd_regression_ref[i, fct_cols, drop = FALSE]
+      }
+
+      # Only highest order terms in each row have non-zero entries in design matrix
       ord_i <- max(X_order[X_agd_regression[i, ] != 0])
       X_agd_regression[i, X_order < ord_i] <- 0
     }
