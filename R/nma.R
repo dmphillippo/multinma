@@ -3184,6 +3184,7 @@ make_nma_model_matrix <- function(nma_formula,
     for (i in 1:nrow(X_agd_regression)) {
       # Get corresponding reference row
       bl_id <- match(dat_agd_regression$.study[!agd_regression_bl][i], dat_agd_regression$.study[agd_regression_bl])
+      ord_pre_i <- max(X_order[X_agd_regression[i, ] != 0])
 
       if (all(X_agd_regression[i, trt_reg_cols] == X_bl[bl_id, trt_reg_cols]) &&
           all(X_agd_regression[i, !study_reg_cols & !trt_reg_cols] == 0)) {
@@ -3196,8 +3197,10 @@ make_nma_model_matrix <- function(nma_formula,
         X_agd_regression[i, fct_cols] <- X_agd_regression[i, fct_cols, drop = FALSE] - X_agd_regression_ref[i, fct_cols, drop = FALSE]
       }
 
+      ord_post_i <- max(X_order[X_agd_regression[i, ] != 0])
+      ord_i <- min(ord_pre_i, ord_post_i)
+
       # Only highest order terms in each row have non-zero entries in design matrix
-      ord_i <- max(X_order[X_agd_regression[i, ] != 0])
       X_agd_regression[i, X_order < ord_i] <- 0
     }
 
