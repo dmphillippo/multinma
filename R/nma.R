@@ -2998,7 +2998,7 @@ make_nma_model_matrix <- function(nma_formula,
   X_order[grepl(paste0("^\\.trt(\\Q", paste0(unique(dat_all$.trt), collapse = "\\E|\\Q"), "\\E)$"), colnames(X_all), perl = TRUE)] <- 0
   names(X_order) <- colnames(X_all)
 
-  # Determine columns corresponding to factor terms
+  # Determine columns corresponding to factor terms (including trt, study, trtclass)
   fct_vars <- names(attr(X_all, "contrasts"))
   fct_cols <- attr(X_all, "assign") %in% which(colSums(attr(terms(nma_formula), "factors")[fct_vars, , drop = FALSE] > 0) > 0)
   names(fct_cols) <- colnames(X_all)
@@ -3012,12 +3012,16 @@ make_nma_model_matrix <- function(nma_formula,
   # Get design matrix for agd regression with all factors set to within-study reference levels
   if (.has_agd_regression) {
     dat_all_ref <-
-      dat_agd_regression[agd_regression_bl, ] %>%
-      dplyr::select(".study", ".trt",
-                    if (!is.null(classes)) ".trtclass" else NULL,
-                    dplyr::all_of(fct_vars))  %>%
-      dplyr::right_join(dplyr::select(dat_all, -dplyr::any_of(c(".trt", ".trtclass")), -dplyr::all_of(fct_vars), ".study"),
-                        by = ".study")
+      dplyr::bind_rows(
+        dat_all[-(nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression)), ],
+        dplyr::select(dat_all[nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression), ],
+                      -dplyr::any_of(c(".trt", ".trtclass")), -dplyr::all_of(fct_vars), ".study") %>%
+          dplyr::left_join(dat_agd_regression[agd_regression_bl, ] %>%
+                             dplyr::select(".study", ".trt",
+                                           if (!is.null(classes)) ".trtclass" else NULL,
+                                           dplyr::all_of(fct_vars)),
+                           by = ".study")
+      )
 
     X_all_ref <- model.matrix(nma_formula, data = dat_all_ref)
   }
@@ -3163,7 +3167,7 @@ make_nma_model_matrix <- function(nma_formula,
 
     # Design matrix with all factors set to within-study reference level
     X_agd_regression_ref_all <- X_all_ref[nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression), , drop = FALSE]
-    X_agd_regression_ref <- X_all_ref[!agd_regression_bl, , drop = FALSE]
+    X_agd_regression_ref <- X_agd_regression_ref_all[!agd_regression_bl, , drop = FALSE]
 
     # Determine study and treatment columns
     studies_reg <- unique(dat_agd_regression$.study)
