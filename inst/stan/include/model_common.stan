@@ -42,5 +42,5 @@ if (ni_agd_contrast) {
 
 // -- AgD model (regression coefficients) --
 if (ni_agd_regression) {
-  eta_agd_regression ~ multi_normal(agd_regression_est, agd_regression_cov);
+  agd_regression_est ~ multi_normal(eta_agd_regression, agd_regression_cov);
 }
