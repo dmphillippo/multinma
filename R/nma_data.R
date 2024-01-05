@@ -1055,7 +1055,7 @@ set_agd_regression <- function(data,
   if (!is.null(.trtclass)) {
     if (rlang::is_list(.trtclass) || !is.null(dim(.trtclass)))
       abort("`trt_class` must be a regular column (not a list or matrix column)")
-    if (anyDuplicated(unique(cbind(.trt, .trtclass))[, ".trt"]))
+    if (anyDuplicated(na.omit(unique(cbind(.trt, .trtclass))[, ".trt"])))
       abort("Treatment present in more than one class (check `trt` and `trt_class`)")
 
     if (is.factor(.trtclass)) {
@@ -1167,6 +1167,13 @@ set_agd_regression <- function(data,
   reg_vars <- unique(unlist(purrr::map(regression, all.vars)))
   if (!all(reg_vars %in% colnames(d)))
     abort(glue::glue("Regression variables not present in `data`: ", glue::glue_collapse(setdiff(reg_vars, colnames(d)), sep = ", ", last = " and ")))
+
+  # Set treatment for shared class interactions if given as NA
+  if (!is.null(classes)) {
+    d <- dplyr::mutate(d, .trt = dplyr::if_else(is.na(.data$.trt) & !is.na(.data$.trtclass),
+                                                class_lookup$.trt[match(.data$.trtclass, class_lookup$.trtclass)],
+                                                .data$.trt))
+  }
 
   # Set NA values to reference level (to result in 0 in design matrix)
   d <- dplyr::group_by(d, .data$.study) %>%
