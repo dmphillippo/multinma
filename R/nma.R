@@ -2994,9 +2994,9 @@ make_nma_model_matrix <- function(nma_formula,
   # Determine "order" of terms: intercepts and trt effects=0, main effects=1, 1st order interactions=2, ...
   # Needed for agd_regression setup
   X_order <- attr(terms(nma_formula), "order")[attr(X_all, "assign")]
-  X_order[grepl(paste0("^\\.study(\\Q", paste0(unique(dat_all$.study), collapse = "\\E|\\Q"), "\\E)$"), colnames(X_all), perl = TRUE)] <- 0
-  X_order[grepl(paste0("^\\.trt(\\Q", paste0(unique(dat_all$.trt), collapse = "\\E|\\Q"), "\\E)$"), colnames(X_all), perl = TRUE)] <- 0
-  names(X_order) <- colnames(X_all)
+  names(X_order) <- if ("(Intercept)" %in% colnames(X_all)) colnames(X_all)[-1] else colnames(X_all)
+  X_order[grepl(paste0("^\\.study$|^\\.study(\\Q", paste0(unique(dat_all$.study), collapse = "\\E|\\Q"), "\\E)$"), names(X_order), perl = TRUE)] <- 0
+  X_order[grepl(paste0("^\\.trt(\\Q", paste0(unique(dat_all$.trt), collapse = "\\E|\\Q"), "\\E)$"), names(X_order), perl = TRUE)] <- 0
 
   # Determine columns corresponding to factor terms (including trt, study, trtclass)
   fct_vars <- names(attr(X_all, "contrasts"))
@@ -3011,16 +3011,26 @@ make_nma_model_matrix <- function(nma_formula,
 
   # Get design matrix for agd regression with all factors set to within-study reference levels
   if (.has_agd_regression) {
+
+    d1 <- dat_all[-(nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression)), ]
+
+    d2 <- dplyr::select(dat_all[nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression), ],
+                        -dplyr::any_of(c(".trt", ".trtclass")), -dplyr::all_of(fct_vars), ".study")
+
+    d3 <- dat_agd_regression[agd_regression_bl, ] %>%
+      dplyr::select(".study", ".trt",
+                    if (!is.null(classes)) ".trtclass" else NULL,
+                    dplyr::all_of(fct_vars))
+
+    if (!is.null(single_study_label)) {
+      d3$.study_temp <- d3$.study
+      d3$.study <- 1L
+    }
+
     dat_all_ref <-
       dplyr::bind_rows(
-        dat_all[-(nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression)), ],
-        dplyr::select(dat_all[nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression), ],
-                      -dplyr::any_of(c(".trt", ".trtclass")), -dplyr::all_of(fct_vars), ".study") %>%
-          dplyr::left_join(dat_agd_regression[agd_regression_bl, ] %>%
-                             dplyr::select(".study", ".trt",
-                                           if (!is.null(classes)) ".trtclass" else NULL,
-                                           dplyr::all_of(fct_vars)),
-                           by = ".study")
+        d1,
+        dplyr::left_join(d2, d3, by = ".study")
       )
 
     X_all_ref <- model.matrix(nma_formula, data = dat_all_ref)
@@ -3031,6 +3041,9 @@ make_nma_model_matrix <- function(nma_formula,
     colnames(X_all) <- stringr::str_replace(colnames(X_all),
                                             "^\\.study$",
                                             paste0(".study", single_study_label))
+
+    names(X_order) <- if ("(Intercept)" %in% colnames(X_all)) colnames(X_all)[-1] else colnames(X_all)
+
     dat_all <- dat_all %>%
       dplyr::mutate(.study = .data$.study_temp) %>%
       dplyr::select(-".study_temp")
