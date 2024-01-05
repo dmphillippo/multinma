@@ -1610,6 +1610,7 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
     narm_agd_regression <- 0
     ns_agd_regression <- 0
     agd_regression_cov <- matrix(1, 1, 1)
+    agd_regression_est <- numeric()
   }
 
   # Set up random effects
