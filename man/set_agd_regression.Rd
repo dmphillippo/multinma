@@ -75,6 +75,27 @@ one row per coefficient estimate. Multiple data sources may be combined once
 created using \code{\link[=combine_network]{combine_network()}}.
 }
 \details{
+Data are specified in \emph{long} format, with one row per coefficient estimate.
+The values of the treatment/covariate columns determine which model
+parameter(s) each estimate informs. The covariate columns should either be
+set to level to which the estimate corresponds, or to \code{NA} if the covariate
+is not present in this term. An additional row with \code{estimate=NA} defines the
+reference treatment and reference levels of the covariates in each study. For
+example, in a study of two treatments A and B with two covariates (one binary
+and one continuous), the regression coefficient data may be set up as
+follows:\tabular{lllll}{
+   \strong{\code{estimate}} \tab \strong{\code{trt}} \tab \strong{\code{x1} (binary/factor)} \tab \strong{\code{x2} (continuous)} \tab \strong{Interpretation} \cr
+   \code{NA} \tab \code{"A"} \tab \code{FALSE} \tab \code{0} \tab Reference treatment (A) and reference level of covariates in this study \cr
+   \verb{<value>} \tab \code{NA} \tab \code{NA} \tab \code{NA} \tab Intercept, corresponds to treatment A, \code{x1=FALSE} and \code{x2=0} \cr
+   \verb{<value>} \tab \code{"B"} \tab \code{NA} \tab \code{NA} \tab Treatment effect B vs. A \cr
+   \verb{<value>} \tab \code{NA} \tab \code{TRUE} \tab \code{NA} \tab Prognostic (main) effect of \code{x1=TRUE} (vs. \code{FALSE}) \cr
+   \verb{<value>} \tab \code{NA} \tab \code{NA} \tab \code{1} \tab Prognostic (main) effect of a 1 unit increase in \code{x2} \cr
+   \verb{<value>} \tab \code{NA} \tab \code{NA} \tab \code{5} \tab Prognostic (main) effect of a 5 unit increase in \code{x2}  (e.g. if different scaling was used for this covariate in this study/model) \cr
+   \verb{<value>} \tab \code{"B"} \tab \code{TRUE} \tab \code{NA} \tab Interaction effect of \code{x1=TRUE} on the treatment effect B vs. A \cr
+   \verb{<value>} \tab \code{"B"} \tab \code{NA} \tab \code{1} \tab Interaction effect of a 1 unit increase in \code{x2} on the treatment effect B vs. A \cr
+   \verb{<value>} \tab \code{"B"} \tab \code{TRUE} \tab \code{1} \tab Second-order interaction between \code{x1}, \code{x2} and the treatment effect B vs. A \cr
+}
+
 By default, \code{trt_ref = NULL} and a network reference treatment will be chosen
 that attempts to maximise computational efficiency and stability. If an
 alternative reference treatment is chosen and the model runs slowly or has

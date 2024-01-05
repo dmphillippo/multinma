@@ -987,6 +987,29 @@ set_agd_surv <- function(data,
 #' @return An object of class [nma_data]
 #' @export
 #'
+#' @details
+#' Data are specified in *long* format, with one row per coefficient estimate.
+#' The values of the treatment/covariate columns determine which model
+#' parameter(s) each estimate informs. The covariate columns should either be
+#' set to level to which the estimate corresponds, or to `NA` if the covariate
+#' is not present in this term. An additional row with `estimate=NA` defines the
+#' reference treatment and reference levels of the covariates in each study. For
+#' example, in a study of two treatments A and B with two covariates (one binary
+#' and one continuous), the regression coefficient data may be set up as
+#' follows:
+#'
+#' \strong{`estimate`} | \strong{`trt`}  |  \strong{`x1` (binary/factor)}  | \strong{`x2` (continuous)}  | \strong{Interpretation}
+#' -----------|--------|------------------------|--------------------|--------------
+#' `NA` | `"A"` | `FALSE`   | `0`    | Reference treatment (A) and reference level of covariates in this study
+#' `<value>`    | `NA` | `NA`   | `NA`   | Intercept, corresponds to treatment A, `x1=FALSE` and `x2=0`
+#' `<value>`    | `"B"`    | `NA`   | `NA` | Treatment effect B vs. A
+#' `<value>`    | `NA` | `TRUE` | `NA`   | Prognostic (main) effect of `x1=TRUE` (vs. `FALSE`)
+#' `<value>`    | `NA` | `NA`    | `1`   | Prognostic (main) effect of a 1 unit increase in `x2`
+#' `<value>`    | `NA` | `NA`    | `5`   | Prognostic (main) effect of a 5 unit increase in `x2`  (e.g. if different scaling was used for this covariate in this study/model)
+#' `<value>`    | `"B"`    | `TRUE` | `NA` | Interaction effect of `x1=TRUE` on the treatment effect B vs. A
+#' `<value>`    | `"B"`    | `NA`   | `1`  | Interaction effect of a 1 unit increase in `x2` on the treatment effect B vs. A
+#' `<value>`    | `"B"`    | `TRUE`  | `1` | Second-order interaction between `x1`, `x2` and the treatment effect B vs. A
+#'
 #' @template args-details_trt_ref
 #' @template args-details_mutate
 #'
