@@ -773,10 +773,12 @@ nma <- function(network,
     dat_agd_regression_bl <- get_model_data_columns(dat_agd_regression_bl, regression = regression, label = "AgD (regression coefficients)")
     dat_agd_regression_nonbl <- get_model_data_columns(dat_agd_regression_nonbl, regression = regression, label = "AgD (regression coefficients)")
 
+    # Study IDs
+    study_agd_regression <- as.integer(dat_agd_regression_nonbl$.study)
 
   } else {
     dat_agd_regression <- dat_agd_regression_bl <- dat_agd_regression_nonbl <- tibble::tibble()
-    est_agd_regression <- cov_agd_regression <- NULL
+    est_agd_regression <- cov_agd_regression <- study_agd_regression <- NULL
   }
 
   # Combine
@@ -926,25 +928,42 @@ nma <- function(network,
     }
 
     if (has_agd_regression(network)) {
-      tdat_agd_regression_arm <- dplyr::distinct(dat_agd_regression_nonbl, .data$.study, .data$.trt)
+      # For which_RE we set trt=NA for everything but treatment effects
+      trt_cols <- grepl("^\\.trt(?!class)[^\\:]+$", colnames(X_agd_regression), perl = TRUE)
+      trt_rows <- apply(X_agd_regression, 1, function(x) any(x[trt_cols] != 0) && all(x[!trt_cols] == 0))
+
+      tdat_agd_regression <- dplyr::select(dat_agd_regression_nonbl, ".study", ".trt")
+      tdat_agd_regression[!trt_rows, ".trt"] <- NA
+
+      # For RE_cor we take only non-reference arm treatments (with contrast = TRUE)
+      tdat_agd_regression_arm <-
+        dplyr::distinct(dat_agd_regression_nonbl, .data$.study, .data$.trt) %>%
+        dplyr::anti_join(dplyr::select(dat_agd_regression_bl, ".study", ".trt"),
+                         by = c(".study", ".trt"))
     } else {
-      tdat_agd_regression_arm <- tibble::tibble()
+      tdat_agd_regression <- tdat_agd_regression_arm <- tibble::tibble()
     }
 
     tdat_all <- dplyr::bind_rows(tdat_ipd_arm, tdat_agd_arm, tdat_agd_contrast_nonbl, tdat_agd_regression_arm)
 
-    contr <- rep(c(FALSE, FALSE, TRUE, FALSE),
+    contr <- rep(c(FALSE, FALSE, TRUE, TRUE),
                  times = c(nrow(tdat_ipd_arm), nrow(tdat_agd_arm), nrow(tdat_agd_contrast_nonbl), nrow(tdat_agd_regression_arm)))
+
+    tdat_all2 <- dplyr::bind_rows(tdat_ipd_arm, tdat_agd_arm, tdat_agd_contrast_nonbl, tdat_agd_regression)
+
+    contr2 <- rep(c(FALSE, FALSE, TRUE, TRUE),
+                 times = c(nrow(tdat_ipd_arm), nrow(tdat_agd_arm), nrow(tdat_agd_contrast_nonbl), nrow(tdat_agd_regression)))
 
     if (consistency %in% c("consistency", "nodesplit")) {
       .RE_cor <- RE_cor(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "reftrt")
-      .which_RE <- which_RE(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "reftrt")
+      .which_RE <- which_RE(tdat_all2$.study, tdat_all2$.trt, contrast = contr2, type = "reftrt")
     } else if (consistency == "ume") {
       .RE_cor <- RE_cor(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "blshift")
-      .which_RE <- which_RE(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "blshift")
+      .which_RE <- which_RE(tdat_all2$.study, tdat_all2$.trt, contrast = contr2, type = "blshift")
     } else {
       abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
     }
+
   } else {
     .RE_cor <- NULL
     .which_RE <- NULL
@@ -1105,7 +1124,7 @@ nma <- function(network,
     agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
     agd_contrast_x = X_agd_contrast, agd_contrast_y = y_agd_contrast,
     agd_contrast_Sigma = Sigma_agd_contrast,
-    agd_regression_x = X_agd_regression, agd_regression_est = est_agd_regression, agd_regression_cov = cov_agd_regression,
+    agd_regression_x = X_agd_regression, agd_regression_est = est_agd_regression, agd_regression_cov = cov_agd_regression, agd_regression_study = study_agd_regression,
     n_int = n_int,
     ipd_offset = offset_ipd,
     agd_arm_offset = offset_agd_arm,
@@ -1310,6 +1329,7 @@ nma <- function(network,
 #' @param agd_regression_x   Design matrix for AgD regression coefficients
 #' @param agd_regression_est AgD regression coefficient estimates
 #' @param agd_regression_cov List of covariance matrices for AgD regression coefficients
+#' @param agd_regression_study Integer variable giving the study ID for each estimate
 #' @param n_int Number of numerical integration points used
 #' @param ipd_offset Vector of offset values for IPD
 #' @param agd_arm_offset Vector of offset values for AgD (arm-based)
@@ -1322,7 +1342,7 @@ nma <- function(network,
 nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
                     agd_arm_x = NULL, agd_arm_y = NULL,
                     agd_contrast_x = NULL, agd_contrast_y = NULL, agd_contrast_Sigma = NULL,
-                    agd_regression_x = NULL, agd_regression_est = NULL, agd_regression_cov = NULL,
+                    agd_regression_x = NULL, agd_regression_est = NULL, agd_regression_cov = NULL, agd_regression_study = NULL,
                     n_int,
                     ipd_offset = NULL, agd_arm_offset = NULL, agd_contrast_offset = NULL,
                     trt_effects = c("fixed", "random"),
@@ -1405,6 +1425,8 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
       abort("Number of rows in `agd_regression_x` and `agd_regression_est` do not match.")
     if (!is.list(agd_regression_cov) || any(purrr::map_lgl(agd_regression_cov, ~!is.numeric(.))))
       abort("`agd_regression_cov` should be a list of covariance matrices, of length equal to the number of AgD (regression coefficient) studies.")
+    if (is.null(agd_regression_study) || !rlang::is_integerish(agd_regression_study, finite = TRUE))
+      abort("`agd_regression_study` must be an integer vector of study IDs for each estimate.")
   }
 
   # Check offsets
@@ -1500,7 +1522,7 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
 
   n_trt <- sum(col_trt) + 1
 
-  get_study <- function(x) which(x == 1)
+  get_study <- function(x) match(1, x, nomatch = NA_integer_)
   get_trt <- function(x, v = 1) if (any(x == v)) which(x == v) + 1 else 1
 
   if (has_ipd) {
@@ -1564,7 +1586,7 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
   }
 
   if (has_agd_regression) {
-    agd_regression_s_t_all <- dplyr::tibble(.study = unname(apply(agd_regression_x[, col_study, drop = FALSE], 1, get_study)),
+    agd_regression_s_t_all <- dplyr::tibble(.study = agd_regression_study,
                                             .trt = unname(apply(agd_regression_x[, col_trt, drop = FALSE], 1, get_trt)))
     agd_regression_s_t <- dplyr::distinct(agd_regression_s_t_all) %>% dplyr::mutate(.arm = 1:dplyr::n())
     agd_regression_arm <-  dplyr::left_join(agd_regression_s_t_all, agd_regression_s_t, by = c(".study", ".trt")) %>% dplyr::pull(.data$.arm)
@@ -2421,13 +2443,13 @@ which_RE <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
 
   reftrt <- levels(trt)[1]
   if (type == "reftrt") {
-    trt_nonref <- trt != reftrt | contrast
+    trt_nonref <- (trt != reftrt | contrast) & !is.na(trt)
     id[trt_nonref] <- 1:sum(trt_nonref)
   } else if (type == "blshift") {
     # Consider baseline arm to be first by treatment order
     non_bl <- tibble::tibble(study, trt, contrast) %>%
       dplyr::group_by(.data$study) %>%
-      dplyr::mutate(non_bl = .data$contrast | .data$trt != sort(.data$trt)[1] | (duplicated(.data$trt) & .data$trt != reftrt)) %>%
+      dplyr::mutate(non_bl = (.data$contrast | .data$trt != sort(.data$trt)[1] | (duplicated(.data$trt) & .data$trt != reftrt)) & !is.na(.data$trt)) %>%
       dplyr::pull(.data$non_bl)
     id[non_bl] <- 1:sum(non_bl)
   }

@@ -130,8 +130,8 @@ if (RE) {
     vector[ni_agd_regression] eta_agd_regression_noRE = X_agd_regression * beta_tilde;
 
     for (i in 1:ni_agd_regression) {
-      if (which_RE[agd_regression_arm[i]])
-        eta_agd_regression[i] = eta_agd_regression_noRE[i] + f_delta[which_RE[agd_regression_arm[i]]];
+      if (which_RE[narm_ipd + narm_agd_arm + ni_agd_contrast + i])
+        eta_agd_regression[i] = eta_agd_regression_noRE[i] + f_delta[which_RE[narm_ipd + narm_agd_arm + ni_agd_contrast + i]];
       else
         eta_agd_regression[i] = eta_agd_regression_noRE[i];
     }
