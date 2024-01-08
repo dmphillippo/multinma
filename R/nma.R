@@ -1170,7 +1170,12 @@ nma <- function(network,
       agd_arm_cumint_labels <- rep(agd_arm_data_labels, each = n_int_thin)
       agd_arm_cumint_labels <- paste0(agd_arm_cumint_labels, ", ", rep_len(1:n_int_thin * int_thin, length.out = length(agd_arm_cumint_labels)))
 
-      fnames_oi[grepl("^theta_bar_cum_agd_arm\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta_bar_cum_agd_arm[", agd_arm_cumint_labels, "]")
+      if (likelihood == "ordered") {
+        l_cat <- colnames(y_agd_arm$.r)
+        agd_arm_cumint_labels <- paste0(rep(agd_arm_cumint_labels, times = length(l_cat)), ", ", rep(l_cat, each = length(agd_arm_cumint_labels)))
+      }
+
+      fnames_oi[grepl("^theta_bar_cum_agd_arm\\[", fnames_oi)] <- paste0("theta_bar_cum_agd_arm[", agd_arm_cumint_labels, "]")
       if (likelihood %in% c("bernoulli2", "binomial2"))
         fnames_oi[grepl("^theta2_bar_cum\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta2_bar_cum[", agd_arm_cumint_labels, "]")
     }

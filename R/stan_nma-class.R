@@ -566,6 +566,8 @@ plot_integration_error <- function(x, ...,
 
   # Get cumulative integration points
   twoparbin <- x$likelihood %in% c("binomial2", "bernoulli2")
+  multi <- x$likelihood == "ordered"
+
   ipars <- c()
   if (has_agd_arm(x$network)) {
     ipars <- c(ipars, "theta_bar_cum_agd_arm")
@@ -588,23 +590,24 @@ plot_integration_error <- function(x, ...,
 
   n_int <- x$network$n_int
 
-  rx <- "^(theta2?)\\[(.+): (.+), ([0-9]+)\\]$"
+  rx <- if (multi) "^(theta2?)\\[(.+): (.+), ([0-9]+), (.+)\\]$" else "^(theta2?)\\[(.+): (.+), ([0-9]+)\\]$"
 
   int_dat <- tidyr::pivot_longer(int_dat, cols = -dplyr::one_of(".draw"),
                                  names_pattern = rx,
-                                 names_to = c("parameter", "study", "treatment", "n_int"),
+                                 names_to = if (multi) c("parameter", "study", "treatment", "n_int", "category") else c("parameter", "study", "treatment", "n_int"),
                                  names_transform = list(n_int = as.integer),
                                  values_to = "value")
 
   int_dat$study <- factor(int_dat$study, levels = levels(x$network$studies))
   int_dat$treatment <- factor(int_dat$treatment, levels = levels(x$network$treatments))
+  if (multi) int_dat$category <- forcats::fct_inorder(factor(int_dat$category))
 
   # Estimate integration error by subtracting final value
   int_dat <- dplyr::left_join(dplyr::filter(int_dat, .data$n_int != max(.data$n_int)),
                               dplyr::filter(int_dat, .data$n_int == max(.data$n_int)) %>%
                                 dplyr::rename(final_value = "value") %>%
                                 dplyr::select(-"n_int"),
-                              by = c("parameter", "study", "treatment", ".draw")) %>%
+                              by = if (multi)  c("parameter", "study", "treatment", "category", ".draw") else c("parameter", "study", "treatment", ".draw")) %>%
     dplyr::mutate(diff = .data$value - .data$final_value)
 
   int_thin <- min(int_dat$n_int)
@@ -675,9 +678,13 @@ plot_integration_error <- function(x, ...,
               args = rlang::dots_list(orientation = orientation, ..., !!! v_args, .homonyms = "first"))
   }
 
-  p <- p +
-    ggplot2::facet_wrap(~ study + treatment) +
-    theme_multinma()
+  if (multi) {
+    p <- p + ggplot2::facet_grid(study + treatment ~ category)
+  } else {
+    p <- p + ggplot2::facet_wrap(~ study + treatment)
+  }
+
+  p <- p + theme_multinma()
 
   return(p)
 }
