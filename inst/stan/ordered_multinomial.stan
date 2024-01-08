@@ -301,7 +301,7 @@ generated quantities {
 
   // Cumulative integration - note this is for the intermediate q
   for (i in 1:ni_agd_arm) {
-    for (k in 1:(ncat - 1)) {
+    for (k in 1:(agd_arm_ncat[i] - 1)) {
       for (j in 1:n_int_thin) {
         theta_bar_cum_agd_arm[(i - 1)*n_int_thin + j, agd_arm_cat[i, k]] = mean(theta_agd_arm_ii[(1 + (i - 1)*nint):((i - 1)*nint + j*int_thin), agd_arm_cat[i, k]]);
       }
