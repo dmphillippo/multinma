@@ -1201,9 +1201,9 @@ set_agd_regression <- function(data,
   # Set NA values to reference level (to result in 0 in design matrix)
   d <- dplyr::group_by(d, .data$.study) %>%
     dplyr::group_modify(~tidyr::replace_na(.,
-                                           dplyr::filter(., is.na(.data$.estimate)) %>% dplyr::select(-.data$.estimate) %>% as.list()
+                                           dplyr::filter(., is.na(.data$.estimate)) %>% dplyr::select(-".estimate") %>% as.list()
                                            ) %>%
-                          dplyr::select(-.data$.study),
+                          dplyr::select(-".study"),
                         .keep = TRUE)
 
   # Store regression formulae in data
