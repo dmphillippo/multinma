@@ -618,11 +618,11 @@ agd_reg <- tibble(studyc = c("A", "A", "A", "A", "B", "B", "B"),
                   studyf = factor(studyc),
                   studyn = as.numeric(studyf),
                   studyf2 = forcats::fct_rev(studyf),
-                  trtc = c("a", NA, "a", "b", "a", "a", "c"),
+                  trtc = c("a", NA, "a", "b", "b", NA, "c"),
                   trtf = factor(trtc),
                   trtn = as.numeric(trtf),
-                  trtf2 = forcats::fct_relevel(trtf, "b"),
-                  tclassc = c("1", NA, "1", "2", "1", "1", "2"),
+                  trtf2 = forcats::fct_relevel(trtf, "c"),
+                  tclassc = c("1", NA, "1", "2", "2", NA, "2"),
                   tclassf = factor(tclassc),
                   tclassn = as.numeric(tclassf),
                   tclassf2 = forcats::fct_relevel(tclassf, "2"),
@@ -638,8 +638,10 @@ test_that("set_* `.trt` column is correct", {
                agd_contrast$trtf)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin))$agd_arm$.trt,
                if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
+
+  reg_trtf <- factor(c("a", "a", "a", "b", "b", "b", "c"), levels = c("b", "a", "c"))  # should set NA to reference trt within each study
   expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.trt,
-               agd_reg$trtf)
+               reg_trtf)
 
   # by column position
   expect_equal(set_ipd(agd_arm, studyc, 6, y = cont)$ipd$.trt,
@@ -651,7 +653,7 @@ test_that("set_* `.trt` column is correct", {
   expect_equal(set_agd_surv(agd_arm, studyc, 6, Surv = Surv(cont_pos, bin))$agd_arm$.trt,
                if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
   expect_equal(set_agd_regression(agd_reg, studyc, 5, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.trt,
-               agd_reg$trtf)
+               reg_trtf)
 
   expect_equal(set_ipd(agd_arm, studyc, "trtc", y = cont)$ipd$.trt,
                agd_arm$trtf)
@@ -662,7 +664,7 @@ test_that("set_* `.trt` column is correct", {
   expect_equal(set_agd_surv(agd_arm, studyc, "trtc", Surv = Surv(cont_pos, bin))$agd_arm$.trt,
                if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
   expect_equal(set_agd_regression(agd_reg, studyc, "trtc", estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.trt,
-               agd_reg$trtf)
+               reg_trtf)
 
   expect_equal(set_ipd(agd_arm, studyc, factor(trtc), y = cont)$ipd$.trt,
                agd_arm$trtf)
@@ -673,7 +675,7 @@ test_that("set_* `.trt` column is correct", {
   expect_equal(set_agd_surv(agd_arm, studyc, factor(trtc), Surv = Surv(cont_pos, bin))$agd_arm$.trt,
                if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
   expect_equal(set_agd_regression(agd_reg, studyc, factor(trtc), estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.trt,
-               agd_reg$trtf)
+               reg_trtf)
 
 
   expect_equal(set_ipd(agd_arm, studyc, trtf, y = cont)$ipd$.trt,
@@ -685,7 +687,7 @@ test_that("set_* `.trt` column is correct", {
   expect_equal(set_agd_surv(agd_arm, studyc, trtf, Surv = Surv(cont_pos, bin))$agd_arm$.trt,
                if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
   expect_equal(set_agd_regression(agd_reg, studyc, trtf, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.trt,
-               agd_reg$trtf)
+               reg_trtf)
 
   expect_equal(set_ipd(agd_arm, studyc, trtf2, y = cont, trt_ref = "C")$ipd$.trt,
                agd_arm$trtf2)
@@ -695,8 +697,10 @@ test_that("set_* `.trt` column is correct", {
                agd_contrast$trtf2)
   expect_equal(set_agd_surv(agd_arm, studyc, trtf2, Surv = Surv(cont_pos, bin), trt_ref = "C")$agd_arm$.trt,
                agd_arm$trtf2)
-  expect_equal(set_agd_regression(agd_reg, studyc, trtf2, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_ref = "b")$agd_regression$.trt,
-               agd_reg$trtf2)
+
+  reg_trtf2 <- forcats::fct_relevel(reg_trtf, "c", "a", "b")
+  expect_equal(set_agd_regression(agd_reg, studyc, trtf2, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_ref = "c")$agd_regression$.trt,
+               reg_trtf2)
 
   # Check that unused factor levels are dropped
   expect_equal(set_ipd(agd_arm, studyc, forcats::fct_expand(trtf, "zzz"), y = cont)$ipd$.trt,
@@ -708,7 +712,7 @@ test_that("set_* `.trt` column is correct", {
   expect_equal(set_agd_surv(agd_arm, studyc, forcats::fct_expand(trtf, "zzz"), Surv = Surv(cont_pos, bin))$agd_arm$.trt,
                if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
   expect_equal(set_agd_regression(agd_reg, studyc, forcats::fct_expand(trtf, "zzz"), estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.trt,
-               agd_reg$trtf)
+               reg_trtf)
 
   expect_equal(set_ipd(agd_arm, studyc, forcats::fct_expand(trtf2, "zzz"), y = cont, trt_ref = "C")$ipd$.trt,
                agd_arm$trtf2)
@@ -718,8 +722,8 @@ test_that("set_* `.trt` column is correct", {
                agd_contrast$trtf2)
   expect_equal(set_agd_surv(agd_arm, studyc, forcats::fct_expand(trtf2, "zzz"), Surv = Surv(cont_pos, bin), trt_ref = "C")$agd_arm$.trt,
                agd_arm$trtf2)
-  expect_equal(set_agd_regression(agd_reg, studyc, forcats::fct_expand(trtf2, "zzz"), estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_ref = "b")$agd_regression$.trt,
-               agd_reg$trtf2)
+  expect_equal(set_agd_regression(agd_reg, studyc, forcats::fct_expand(trtf2, "zzz"), estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_ref = "c")$agd_regression$.trt,
+               reg_trtf2)
 })
 
 test_that("set_* `.study` column is correct", {
@@ -855,7 +859,7 @@ test_that("set_* return default `treatments` factor", {
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin))$treatments,
                if (bmax) .default(factor(c("B", "A", "C"), levels = c("B", "A", "C"))) else .default(factor(LETTERS[1:3])))
   expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$treatments,
-               .default(factor(letters[1:3])))
+               .default(factor(c("b", "a", "c"), levels = c("b", "a", "c"))))
 })
 
 test_that("set_* can set `trt_ref`", {
@@ -980,8 +984,11 @@ test_that("set_* returns correct .trtclass column", {
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                            trt_class = tclassc)$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
+
+  reg_tclassf <- factor(c("1", "1", "1", "2", "2", "2", "2"), levels = c("2", "1"))  # should set NA to reference trtclass within each study
   expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassc)$agd_regression$.trtclass,
-               agd_reg$tclassf)
+               reg_tclassf)
+
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = tclassc))$ipd$.trtclass,
                agd_arm$tclassf)
@@ -995,7 +1002,7 @@ test_that("set_* returns correct .trtclass column", {
                                            trt_class = tclassc))$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
   expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassc))$agd_regression$.trtclass,
-               agd_reg$tclassf)
+               reg_tclassf)
 
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = 11)$ipd$.trtclass,
@@ -1010,7 +1017,7 @@ test_that("set_* returns correct .trtclass column", {
                            trt_class = 11)$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
   expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = 9)$agd_regression$.trtclass,
-               agd_reg$tclassf)
+               reg_tclassf)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = 11))$ipd$.trtclass,
                agd_arm$tclassf)
@@ -1024,7 +1031,7 @@ test_that("set_* returns correct .trtclass column", {
                                            trt_class = 11))$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
   expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = 9))$agd_regression$.trtclass,
-               agd_reg$tclassf)
+               reg_tclassf)
 
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = tclassf)$ipd$.trtclass,
@@ -1039,7 +1046,7 @@ test_that("set_* returns correct .trtclass column", {
                            trt_class = tclassf)$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
   expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf)$agd_regression$.trtclass,
-               agd_reg$tclassf)
+               reg_tclassf)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = tclassf))$ipd$.trtclass,
                agd_arm$tclassf)
@@ -1053,7 +1060,7 @@ test_that("set_* returns correct .trtclass column", {
                                            trt_class = tclassf))$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
   expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf))$agd_regression$.trtclass,
-               agd_reg$tclassf)
+               reg_tclassf)
 
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont, trt_ref = "B",
                        trt_class = tclassf2)$ipd$.trtclass,
@@ -1067,8 +1074,11 @@ test_that("set_* returns correct .trtclass column", {
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin), trt_ref = "B",
                            trt_class = tclassf2)$agd_arm$.trtclass,
                agd_arm$tclassf2)
-  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf2, trt_ref = "b")$agd_regression$.trtclass,
-               agd_reg$tclassf2)
+
+  reg_tclassf2 <- factor(c(1, 1, 1, 2, 2, 2, 2), levels = c("1", "2"))
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf2, trt_ref = "a")$agd_regression$.trtclass,
+               reg_tclassf2)
+
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = tclassf2), trt_ref = "B")$ipd$.trtclass,
                agd_arm$tclassf2)
@@ -1081,8 +1091,8 @@ test_that("set_* returns correct .trtclass column", {
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                                            trt_class = tclassf2), trt_ref = "B")$agd_arm$.trtclass,
                agd_arm$tclassf2)
-  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf2), trt_ref = "b")$agd_regression$.trtclass,
-               agd_reg$tclassf2)
+  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf2), trt_ref = "a")$agd_regression$.trtclass,
+               reg_tclassf2)
 
   # Check that unused factor levels are dropped
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
@@ -1098,7 +1108,7 @@ test_that("set_* returns correct .trtclass column", {
                            trt_class = forcats::fct_expand(tclassf, "zzz"))$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
   expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = forcats::fct_expand(tclassf, "zzz"))$agd_regression$.trtclass,
-               agd_reg$tclassf)
+               reg_tclassf)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = forcats::fct_expand(tclassf, "zzz")))$ipd$.trtclass,
                agd_arm$tclassf)
@@ -1112,7 +1122,7 @@ test_that("set_* returns correct .trtclass column", {
                                            trt_class = forcats::fct_expand(tclassf, "zzz")))$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
   expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = forcats::fct_expand(tclassf, "zzz"))$agd_regression$.trtclass,
-               agd_reg$tclassf)
+               reg_tclassf)
 
   # Checks when default trt_ref not first in sort order
   expect_equal(set_ipd(aa, studyc, trtc, y = cont,
@@ -1143,7 +1153,7 @@ test_that("set_* returns correct .trtclass column", {
 
 test_that("set_* returns classes factor variable", {
   f_class <- factor(c("a", "b", "b"))
-  f_classr <- factor(c(1, 2, 2))
+  f_classr <- factor(c(2, 1, 2), levels = c(2, 1))
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont, trt_class = tclassc)$classes,
                f_class)
   expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_class = tclassc)$classes,
@@ -1202,7 +1212,7 @@ test_that("set_* returns classes factor variable", {
                f_classr)
 
   f_class2 <- factor(c("b", "a", "b"), levels = c("b", "a"))
-  f_classr2 <- factor(c("2", "1", "2"), levels = c("2", "1"))
+  f_classr2 <- factor(c("1", "2", "2"), levels = c("1", "2"))
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = tclassc, trt_ref = "B")$classes,
                f_class2)
@@ -1215,7 +1225,7 @@ test_that("set_* returns classes factor variable", {
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                            trt_class = tclassc, trt_ref = "B")$classes,
                f_class2)
-  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassc, trt_ref = "b")$classes,
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassc, trt_ref = "a")$classes,
                f_classr2)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = tclassc), trt_ref = "B")$classes,
@@ -1229,7 +1239,7 @@ test_that("set_* returns classes factor variable", {
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                                            trt_class = tclassc), trt_ref = "B")$classes,
                f_class2)
-  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassc), trt_ref = "b")$classes,
+  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassc), trt_ref = "a")$classes,
                f_classr2)
 
   # Checks when default trt_ref not first in sort order
@@ -1276,7 +1286,7 @@ test_that("set_* returns classes factor variable", {
                            trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
                            trt_ref = "B")$classes,
                f_class2)
-  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf, trt_ref = "b")$classes,
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf, trt_ref = "a")$classes,
                f_classr2)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
@@ -1294,7 +1304,7 @@ test_that("set_* returns classes factor variable", {
                                            trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
                                trt_ref = "B")$classes,
                f_class2)
-  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf), trt_ref = "b")$classes,
+  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf), trt_ref = "a")$classes,
                f_classr2)
 
   # Checks when default trt_ref not first in sort order
