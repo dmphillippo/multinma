@@ -1460,7 +1460,7 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
                        colnames(agd_arm_x),
                        colnames(agd_contrast_x),
                        colnames(agd_regression_x))[c(has_ipd, has_agd_arm, has_agd_contrast, has_agd_regression)]
-  if (length(colnames_all) > 2 && any(purrr::map_lgl(colnames_all[-1], ~!identical(., colnames_all[[1]]))))
+  if (length(colnames_all) >= 2 && any(purrr::map_lgl(colnames_all[-1], ~!identical(., colnames_all[[1]]))))
     abort("Non-matching columns in *_x matrices.")
 
   # Check model arguments
