@@ -8,14 +8,14 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-----------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
 
 
-## ---- eval = FALSE------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
-## ----setup, echo = FALSE------------------------------------------------------
+## ----setup, echo = FALSE--------------------------------------------------------------------------
 library(multinma)
 nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
              "true" =, "warn" = 2, 
@@ -23,11 +23,11 @@ nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
 options(mc.cores = nc)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 head(thrombolytics)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 thrombo_net <- set_agd_arm(thrombolytics, 
                            study = studyn,
                            trt = trtc,
@@ -35,7 +35,7 @@ thrombo_net <- set_agd_arm(thrombolytics,
                            n = n)
 thrombo_net
 
-## ---- include=FALSE, eval=params$run_tests------------------------------------
+## ----include=FALSE, eval=params$run_tests---------------------------------------------------------
 # Make trtf factor to order treatments in same way as Dias analysis - needed to
 # recreate inconsistency analyses
 trts <- dplyr::distinct(thrombolytics, trtn, trtc)
@@ -48,46 +48,46 @@ thrombo_net2 <- set_agd_arm(thrombolytics,
                             n = n)
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## plot(thrombo_net, weight_edges = TRUE, weight_nodes = TRUE)
 
-## ----thrombo_net_plot, echo=FALSE---------------------------------------------
+## ----thrombo_net_plot, echo=FALSE-----------------------------------------------------------------
 plot(thrombo_net, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(legend.margin = ggplot2::margin(l = 4, unit = "lines"))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 thrombo_fit <- nma(thrombo_net, 
                    trt_effects = "fixed",
                    prior_intercept = normal(scale = 100),
                    prior_trt = normal(scale = 100))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 thrombo_fit
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(thrombo_fit, pars = c("d", "mu"))
 
 
-## ----thrombo_pp_plot----------------------------------------------------------
+## ----thrombo_pp_plot------------------------------------------------------------------------------
 plot_prior_posterior(thrombo_fit, prior = "trt")
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (dic_consistency <- dic(thrombo_fit))
 
 
-## ----thrombo_resdev_plot, fig.width=12----------------------------------------
+## ----thrombo_resdev_plot, fig.width=12------------------------------------------------------------
 plot(dic_consistency)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 thrombo_fit_ume <- nma(thrombo_net, 
                        consistency = "ume",
                        trt_effects = "fixed",
@@ -96,23 +96,23 @@ thrombo_fit_ume <- nma(thrombo_net,
 thrombo_fit_ume
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 dic_consistency
 (dic_ume <- dic(thrombo_fit_ume))
 
 
-## ----thrombo_devdev_plot------------------------------------------------------
+## ----thrombo_devdev_plot--------------------------------------------------------------------------
 plot(dic_consistency, dic_ume, show_uncertainty = FALSE)
 
 
-## ---- eval=!params$run_tests--------------------------------------------------
+## ----eval=!params$run_tests-----------------------------------------------------------------------
 ## thrombo_nodesplit <- nma(thrombo_net,
 ##                          consistency = "nodesplit",
 ##                          trt_effects = "fixed",
 ##                          prior_intercept = normal(scale = 100),
 ##                          prior_trt = normal(scale = 100))
 
-## ---- include=FALSE, eval=params$run_tests------------------------------------
+## ----include=FALSE, eval=params$run_tests---------------------------------------------------------
 # Run node-splits with treatments ordered as per Dias
 thrombo_nodesplit <- nma(thrombo_net2, 
                          consistency = "nodesplit",
@@ -121,39 +121,39 @@ thrombo_nodesplit <- nma(thrombo_net2,
                          prior_trt = normal(scale = 100))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(thrombo_nodesplit)
 
 
-## ----thrombo_nodesplit, fig.width = 7-----------------------------------------
+## ----thrombo_nodesplit, fig.width = 7-------------------------------------------------------------
 plot(thrombo_nodesplit)
 
 
-## ----thrombo_nodesplit_omega, fig.height = 6----------------------------------
+## ----thrombo_nodesplit_omega, fig.height = 6------------------------------------------------------
 plot(thrombo_nodesplit, pars = "omega", stat = "halfeye", ref_line = 0) +
   ggplot2::aes(y = comparison) +
   ggplot2::facet_null()
 
 
-## ----thrombo_releff-----------------------------------------------------------
+## ----thrombo_releff-------------------------------------------------------------------------------
 (thrombo_releff <- relative_effects(thrombo_fit, all_contrasts = TRUE))
 plot(thrombo_releff, ref_line = 0)
 
 
-## ----thrombo_ranks------------------------------------------------------------
+## ----thrombo_ranks--------------------------------------------------------------------------------
 (thrombo_ranks <- posterior_ranks(thrombo_fit))
 plot(thrombo_ranks)
 
-## ----thrombo_rankprobs--------------------------------------------------------
+## ----thrombo_rankprobs----------------------------------------------------------------------------
 (thrombo_rankprobs <- posterior_rank_probs(thrombo_fit))
 plot(thrombo_rankprobs)
 
-## ----thrombo_cumrankprobs-----------------------------------------------------
+## ----thrombo_cumrankprobs-------------------------------------------------------------------------
 (thrombo_cumrankprobs <- posterior_rank_probs(thrombo_fit, cumulative = TRUE))
 plot(thrombo_cumrankprobs)
 
 
-## ----thrombo_tests, include=FALSE, eval=params$run_tests----------------------
+## ----thrombo_tests, include=FALSE, eval=params$run_tests------------------------------------------
 #--- Test against TSD 4 results ---
 library(testthat)
 library(dplyr)
