@@ -293,13 +293,21 @@ generated quantities {
     }
   }
 
-  // Cumulative integration - note this is for the intermediate q
+  // Cumulative integration
   for (i in 1:ni_agd_arm) {
-    for (k in 1:(agd_arm_ncat[i] - 1)) {
-      for (j in 1:n_int_thin) {
-        theta_bar_cum_agd_arm[(i - 1)*n_int_thin + j, agd_arm_cat[i, k]] = mean(theta_agd_arm_ii[(1 + (i - 1)*nint):((i - 1)*nint + j*int_thin), agd_arm_cat[i, k]]);
-      }
+    for (j in 1:n_int_thin) {
+      vector[ncat - 1] q_agd_arm_bar_cum;
+      for (k in 1:(agd_arm_ncat[i] - 1)) q_agd_arm_bar_cum[k] = mean(theta_agd_arm_ii[(1 + (i - 1)*nint):((i - 1)*nint + j*int_thin), k]);
+
+      // Category 1
+      theta_bar_cum_agd_arm[(i - 1)*n_int_thin + j, 1] = 1 - q_agd_arm_bar_cum[1];
+
+      // Categories 2:(agd_arm_ncat - 1)
+      for (k in 2:(agd_arm_ncat[i] - 1))
+        theta_bar_cum_agd_arm[(i - 1)*n_int_thin + j, agd_arm_cat[i, k]] = q_agd_arm_bar_cum[k - 1] - q_agd_arm_bar_cum[k];
+
+      // Category agd_arm_ncat
+      theta_bar_cum_agd_arm[(i - 1)*n_int_thin + j, agd_arm_cat[i, agd_arm_ncat[i]]] = q_agd_arm_bar_cum[agd_arm_ncat[i] - 1];
     }
   }
-
 }
