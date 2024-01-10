@@ -72,6 +72,8 @@ a data frame of layout coordinates) now works as expected when `nudge > 0`.
 * Fix: Documentation corrections (PR #24).
 * Fix: Added missing `as.tibble.stan_nma()` and `as_tibble.stan_nma()` methods, 
 to complement the existing `as.data.frame.stan_nma()`.
+* Fix: Bug in ordered multinomial models where data in studies with missing 
+categories could be assigned the wrong category (#28).
 
 # multinma 0.5.1
 

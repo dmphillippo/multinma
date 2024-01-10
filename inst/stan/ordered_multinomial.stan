@@ -59,26 +59,20 @@ transformed parameters {
   // Is this only necessary if link > 2? Since ordered_(logistic|probit) are available
   for (i in 1:ni_ipd) {
     vector[ipd_ncat[i] - 1] q_temp;
+    for (k in 1:(ipd_ncat[i] - 1)) {
+      if (link == 1) // logit link
+        q_temp[k] = inv_logit(eta_ipd[i] - cc[ipd_cat[i, k+1]-1]);
+      else if (link == 2) // probit link
+        q_temp[k] = Phi(eta_ipd[i] - cc[ipd_cat[i, k+1]-1]);
+      else if (link == 3) // cloglog link
+        q_temp[k] = inv_cloglog(eta_ipd[i] - cc[ipd_cat[i, k+1]-1]);
+    }
 
     // Category 1
-    if (link == 1) // logit link
-      q_temp[1] = inv_logit(eta_ipd[i] - cc[1]);
-    else if (link == 2) // probit link
-      q_temp[1] = Phi(eta_ipd[i] - cc[1]);
-    else if (link == 3) // cloglog link
-      q_temp[1] = inv_cloglog(eta_ipd[i] - cc[1]);
-
     theta_ipd[i, 1] = 1 - q_temp[1];
 
     // Categories 2:(ipd_ncat - 1)
     for (k in 2:(ipd_ncat[i] - 1)) {
-      if (link == 1) // logit link
-        q_temp[k] = inv_logit(eta_ipd[i] - cc[ipd_cat[i, k]]);
-      else if (link == 2) // probit link
-        q_temp[k] = Phi(eta_ipd[i] - cc[ipd_cat[i, k]]);
-      else if (link == 3) // cloglog link
-        q_temp[k] = inv_cloglog(eta_ipd[i] - cc[ipd_cat[i, k]]);
-
       // Store predictor in actual category column, rather than left-aligned
       theta_ipd[i, ipd_cat[i, k]] = q_temp[k - 1] - q_temp[k];
     }
@@ -107,7 +101,7 @@ transformed parameters {
               eta_agd_arm_RE = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
 
             for (k in 1:(agd_arm_ncat[i] - 1)) {
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint), agd_arm_cat[i, k]] = inv_logit(eta_agd_arm_RE - cc[agd_arm_cat[i, k]]);
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint), k] = inv_logit(eta_agd_arm_RE - cc[agd_arm_cat[i, k+1]-1]);
             }
           }
         } else if (link == 2) { // probit link
@@ -118,7 +112,7 @@ transformed parameters {
               eta_agd_arm_RE = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
 
             for (k in 1:(agd_arm_ncat[i] - 1)) {
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint), agd_arm_cat[i, k]] = Phi(eta_agd_arm_RE - cc[agd_arm_cat[i, k]]);
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint), k] = Phi(eta_agd_arm_RE - cc[agd_arm_cat[i, k+1]-1]);
             }
           }
         } else if (link == 3) { // cloglog link
@@ -129,7 +123,7 @@ transformed parameters {
               eta_agd_arm_RE = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
 
             for (k in 1:(agd_arm_ncat[i] - 1)) {
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint), agd_arm_cat[i, k]] = inv_cloglog(eta_agd_arm_RE - cc[agd_arm_cat[i, k]]);
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint), k] = inv_cloglog(eta_agd_arm_RE - cc[agd_arm_cat[i, k+1]-1]);
             }
           }
         }
@@ -139,19 +133,19 @@ transformed parameters {
         if (link == 1) { // logit link
           for (i in 1:ni_agd_arm) {
             for (k in 1:(agd_arm_ncat[i] - 1)) {
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint), agd_arm_cat[i, k]] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] - cc[agd_arm_cat[i, k]]);
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint), k] = inv_logit(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] - cc[agd_arm_cat[i, k+1]-1]);
             }
           }
         } else if (link == 2) { // probit link
           for (i in 1:ni_agd_arm) {
             for (k in 1:(agd_arm_ncat[i] - 1)) {
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint), agd_arm_cat[i, k]] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] - cc[agd_arm_cat[i, k]]);
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint), k] = Phi(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] - cc[agd_arm_cat[i, k+1]-1]);
             }
           }
         } else if (link == 3) { // cloglog link
           for (i in 1:ni_agd_arm) {
             for (k in 1:(agd_arm_ncat[i] - 1)) {
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint), agd_arm_cat[i, k]] = inv_cloglog(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] - cc[agd_arm_cat[i, k]]);
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint), k] = inv_cloglog(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] - cc[agd_arm_cat[i, k+1]-1]);
             }
           }
         }
@@ -160,7 +154,7 @@ transformed parameters {
 
       for (i in 1:ni_agd_arm) {
         for (k in 1:(agd_arm_ncat[i] - 1)) {
-          q_agd_arm_bar[i, agd_arm_cat[i, k]] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint), agd_arm_cat[i, k]]);
+          q_agd_arm_bar[i, k] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint), k]);
         }
       }
 
@@ -178,7 +172,7 @@ transformed parameters {
               eta_agd_arm_RE = eta_agd_arm_noRE[i];
 
             for (k in 1:(agd_arm_ncat[i] - 1)) {
-              q_agd_arm_bar[i, agd_arm_cat[i, k]] = inv_logit(eta_agd_arm_RE - cc[agd_arm_cat[i, k]]);
+              q_agd_arm_bar[i, k] = inv_logit(eta_agd_arm_RE - cc[agd_arm_cat[i, k+1]-1]);
             }
           }
         } else if (link == 2) { // probit link
@@ -189,7 +183,7 @@ transformed parameters {
               eta_agd_arm_RE = eta_agd_arm_noRE[i];
 
             for (k in 1:(agd_arm_ncat[i] - 1)) {
-              q_agd_arm_bar[i, agd_arm_cat[i, k]] = Phi(eta_agd_arm_RE - cc[agd_arm_cat[i, k]]);
+              q_agd_arm_bar[i, k] = Phi(eta_agd_arm_RE - cc[agd_arm_cat[i, k+1]-1]);
             }
           }
         } else if (link == 3) { // cloglog link
@@ -200,7 +194,7 @@ transformed parameters {
               eta_agd_arm_RE = eta_agd_arm_noRE[i];
 
             for (k in 1:(agd_arm_ncat[i] - 1)) {
-              q_agd_arm_bar[i, agd_arm_cat[i, k]] = inv_cloglog(eta_agd_arm_RE - cc[agd_arm_cat[i, k]]);
+              q_agd_arm_bar[i, k] = inv_cloglog(eta_agd_arm_RE - cc[agd_arm_cat[i, k+1]-1]);
             }
           }
         }
@@ -210,19 +204,19 @@ transformed parameters {
         if (link == 1) { // logit link
           for (i in 1:ni_agd_arm) {
             for (k in 1:(agd_arm_ncat[i] - 1)) {
-              q_agd_arm_bar[i, agd_arm_cat[i, k]] = inv_logit(eta_agd_arm_noRE[i] - cc[agd_arm_cat[i, k]]);
+              q_agd_arm_bar[i, k] = inv_logit(eta_agd_arm_noRE[i] - cc[agd_arm_cat[i, k+1]-1]);
             }
           }
         } else if (link == 2) { // probit link
           for (i in 1:ni_agd_arm) {
             for (k in 1:(agd_arm_ncat[i] - 1)) {
-              q_agd_arm_bar[i, agd_arm_cat[i, k]] = Phi(eta_agd_arm_noRE[i] - cc[agd_arm_cat[i, k]]);
+              q_agd_arm_bar[i, k] = Phi(eta_agd_arm_noRE[i] - cc[agd_arm_cat[i, k+1]-1]);
             }
           }
         } else if (link == 3) { // cloglog link
           for (i in 1:ni_agd_arm) {
             for (k in 1:(agd_arm_ncat[i] - 1)) {
-              q_agd_arm_bar[i, agd_arm_cat[i, k]] = inv_cloglog(eta_agd_arm_noRE[i] - cc[agd_arm_cat[i, k]]);
+              q_agd_arm_bar[i, k] = inv_cloglog(eta_agd_arm_noRE[i] - cc[agd_arm_cat[i, k+1]-1]);
             }
           }
         }
@@ -237,10 +231,10 @@ transformed parameters {
 
       // Categories 2:(agd_arm_ncat - 1)
       for (k in 2:(agd_arm_ncat[i] - 1))
-        theta_agd_arm_bar[i, agd_arm_cat[i, k]] = q_agd_arm_bar[i, agd_arm_cat[i, k - 1]] - q_agd_arm_bar[i, agd_arm_cat[i, k]];
+        theta_agd_arm_bar[i, agd_arm_cat[i, k]] = q_agd_arm_bar[i, k - 1] - q_agd_arm_bar[i, k];
 
       // Category agd_arm_ncat
-      theta_agd_arm_bar[i, agd_arm_cat[i, agd_arm_ncat[i]]] = q_agd_arm_bar[i, agd_arm_cat[i, agd_arm_ncat[i] - 1]];
+      theta_agd_arm_bar[i, agd_arm_cat[i, agd_arm_ncat[i]]] = q_agd_arm_bar[i, agd_arm_ncat[i] - 1];
     }
 
   }
@@ -299,13 +293,21 @@ generated quantities {
     }
   }
 
-  // Cumulative integration - note this is for the intermediate q
+  // Cumulative integration
   for (i in 1:ni_agd_arm) {
-    for (k in 1:(ncat - 1)) {
-      for (j in 1:n_int_thin) {
-        theta_bar_cum_agd_arm[(i - 1)*n_int_thin + j, agd_arm_cat[i, k]] = mean(theta_agd_arm_ii[(1 + (i - 1)*nint):((i - 1)*nint + j*int_thin), agd_arm_cat[i, k]]);
-      }
+    for (j in 1:n_int_thin) {
+      vector[ncat - 1] q_agd_arm_bar_cum;
+      for (k in 1:(agd_arm_ncat[i] - 1)) q_agd_arm_bar_cum[k] = mean(theta_agd_arm_ii[(1 + (i - 1)*nint):((i - 1)*nint + j*int_thin), k]);
+
+      // Category 1
+      theta_bar_cum_agd_arm[(i - 1)*n_int_thin + j, 1] = 1 - q_agd_arm_bar_cum[1];
+
+      // Categories 2:(agd_arm_ncat - 1)
+      for (k in 2:(agd_arm_ncat[i] - 1))
+        theta_bar_cum_agd_arm[(i - 1)*n_int_thin + j, agd_arm_cat[i, k]] = q_agd_arm_bar_cum[k - 1] - q_agd_arm_bar_cum[k];
+
+      // Category agd_arm_ncat
+      theta_bar_cum_agd_arm[(i - 1)*n_int_thin + j, agd_arm_cat[i, agd_arm_ncat[i]]] = q_agd_arm_bar_cum[agd_arm_ncat[i] - 1];
     }
   }
-
 }
