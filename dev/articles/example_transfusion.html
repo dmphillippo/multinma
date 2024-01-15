@@ -211,11 +211,11 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                   mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[Transfusion]   -1.23    0.03 1.01   -3.49   -1.72   -1.15   -0.62    0.63  1057    1</span></span>
-<span><span class="co">#&gt; lp__           -175.53    0.09 3.07 -182.43 -177.40 -175.29 -173.32 -170.52  1226    1</span></span>
-<span><span class="co">#&gt; tau               1.89    0.03 1.06    0.57    1.16    1.63    2.34    4.64  1322    1</span></span>
+<span><span class="co">#&gt; d[Transfusion]   -1.15    0.03 0.99   -3.35   -1.66   -1.10   -0.58    0.69  1160    1</span></span>
+<span><span class="co">#&gt; lp__           -134.40    0.09 3.11 -141.40 -136.27 -134.00 -132.23 -129.26  1125    1</span></span>
+<span><span class="co">#&gt; tau               1.85    0.03 1.04    0.52    1.15    1.59    2.27    4.66  1384    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 10 10:53:05 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Jan 15 16:43:21 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -237,7 +237,7 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">noninf_tausq</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"tausq"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">noninf_tausq</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; tausq 4.68 6.17 0.32 1.34 2.65 5.49 21.54     1275     1800    1</span></span></code></pre></div>
+<span><span class="co">#&gt; tausq 4.51 6.03 0.27 1.32 2.54 5.17 21.74     1216     1541    1</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="random-effects-meta-analysis-with-informative-heterogeneity-prior">Random effects meta-analysis with informative heterogeneity
@@ -279,11 +279,11 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                   mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[Transfusion]   -0.79    0.01 0.46   -1.78   -1.05   -0.76   -0.48   -0.01  1400    1</span></span>
-<span><span class="co">#&gt; lp__           -180.28    0.07 2.88 -186.79 -181.98 -179.99 -178.19 -175.52  1474    1</span></span>
-<span><span class="co">#&gt; tau               0.50    0.01 0.37    0.05    0.20    0.43    0.71    1.40  1219    1</span></span>
+<span><span class="co">#&gt; d[Transfusion]   -0.77    0.01 0.44   -1.73   -1.04   -0.75   -0.48    0.00  1826    1</span></span>
+<span><span class="co">#&gt; lp__           -141.27    0.08 2.91 -147.68 -142.96 -140.94 -139.19 -136.52  1463    1</span></span>
+<span><span class="co">#&gt; tau               0.48    0.01 0.36    0.05    0.19    0.41    0.68    1.34  1513    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 10 10:53:09 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Jan 15 16:43:24 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -309,7 +309,7 @@ was specified on <span class="math inline">\(\tau^2\)</span>.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">inf_tausq</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"tausq"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">inf_tausq</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; tausq 0.39 0.59    0 0.04 0.18 0.51  1.97     1146     2417    1</span></span></code></pre></div>
+<span><span class="co">#&gt; tausq 0.36 0.63    0 0.04 0.17 0.47  1.79     1432     2849    1</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2 unnumbered">
