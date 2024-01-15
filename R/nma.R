@@ -985,15 +985,18 @@ nma <- function(network,
       b_knots <- knots[c(1, nrow(knots)), ]
       i_knots <- knots[-c(1, nrow(knots)), ]
       basis <- purrr::imap(b_knots,
-                           ~tryCatch(splines2::mSpline(.x[1],
+                           ~withCallingHandlers(splines2::mSpline(.x[1],
                                                        knots = i_knots[[.y]],
                                                        Boundary.knots = .x,
                                                        degree = mspline_degree,
                                                        intercept = TRUE),
                                      error = function(e) abort(glue::glue("Could not create spline basis for study {glue::double_quote(.y)}."),
                                                                parent = e),
-                                     warning = function(w) warn(glue::glue("Warning while creating spline basis for study {glue::double_quote(.y)}."),
-                                                                parent = w))
+                                     warning = function(w) {
+                                       warn(glue::glue("Warning while creating spline basis for study {glue::double_quote(.y)}."), parent = w)
+                                       rlang::cnd_muffle(w)
+                                     }
+                                    )
                            )
 
     }
@@ -1943,15 +1946,26 @@ nma.fit <- function(ipd_x, ipd_y,
     # Number of spline coefficients
     n_scoef <- ncol(basis[[1]])
 
+    try_update <- function(..., study) {
+      withCallingHandlers(update(...),
+                          error = function(e) {
+                            abort(glue::glue("Could not create spline basis for study {glue::double_quote(study)}."), parent = e)
+                          },
+                          warning = function(w) {
+                            warn(glue::glue("In study {glue::double_quote(study)}: ", conditionMessage(w)))
+                            rlang::cnd_muffle(w)
+                          })
+    }
+
     # Evaluate splines
     if (has_ipd) {
       ipd_time <- ipd_itime <- ipd_start_itime <- ipd_delay_itime <- matrix(nrow = length(ipd_surv$time), ncol = n_scoef)
 
       for (s in unique(ipd_s_t_all$.study)) {
-        ipd_time[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s])
-        ipd_itime[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s], integral = TRUE)
-        ipd_start_itime[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$start_time[ipd_s_t_all$.study == s], integral = TRUE)
-        ipd_delay_itime[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$delay_time[ipd_s_t_all$.study == s], integral = TRUE)
+        ipd_time[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s], study = s)
+        ipd_itime[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s], integral = TRUE, study = s)
+        ipd_start_itime[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$start_time[ipd_s_t_all$.study == s], integral = TRUE, study = s)
+        ipd_delay_itime[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$delay_time[ipd_s_t_all$.study == s], integral = TRUE, study = s)
       }
 
     } else {
@@ -1962,10 +1976,10 @@ nma.fit <- function(ipd_x, ipd_y,
       agd_arm_time <- agd_arm_itime <- agd_arm_start_itime <- agd_arm_delay_itime <- matrix(nrow = length(agd_arm_surv$time), ncol = n_scoef)
 
       for (s in unique(agd_arm_s_t_all$.study)) {
-        agd_arm_time[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s])
-        agd_arm_itime[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s], integral = TRUE)
-        agd_arm_start_itime[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$start_time[agd_arm_s_t_all$.study == s], integral = TRUE)
-        agd_arm_delay_itime[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$delay_time[agd_arm_s_t_all$.study == s], integral = TRUE)
+        agd_arm_time[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s], study = s)
+        agd_arm_itime[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s], integral = TRUE, study = s)
+        agd_arm_start_itime[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$start_time[agd_arm_s_t_all$.study == s], integral = TRUE, study = s)
+        agd_arm_delay_itime[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$delay_time[agd_arm_s_t_all$.study == s], integral = TRUE, study = s)
       }
 
     } else {
