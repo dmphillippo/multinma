@@ -214,19 +214,19 @@ method:</p>
 <code class="sourceCode R"><span><span class="va">bcg_fit_unadj</span></span>
 <span><span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span></span>
 <span><span class="co">#&gt; Inference for Stan model: binomial_1par.</span></span>
-<span><span class="co">#&gt; 4 chains, each with iter=5000; warmup=2500; thin=1; </span></span>
-<span><span class="co">#&gt; post-warmup draws per chain=2500, total post-warmup draws=10000.</span></span>
+<span><span class="co">#&gt; 4 chains, each with iter=10000; warmup=5000; thin=1; </span></span>
+<span><span class="co">#&gt; post-warmup draws per chain=5000, total post-warmup draws=20000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                    mean se_mean   sd      2.5%       25%       50%       75%     97.5% n_eff</span></span>
-<span><span class="co">#&gt; d[Vaccinated]     -0.76    0.00 0.22     -1.22     -0.89     -0.75     -0.62     -0.33  3281</span></span>
-<span><span class="co">#&gt; lp__          -13453.76    0.08 4.37 -13463.19 -13456.47 -13453.46 -13450.70 -13446.08  2830</span></span>
-<span><span class="co">#&gt; tau                0.68    0.00 0.20      0.39      0.54      0.65      0.79      1.17  3711</span></span>
+<span><span class="co">#&gt; d[Vaccinated]     -0.76    0.00 0.21     -1.20     -0.90     -0.76     -0.63     -0.35  6648</span></span>
+<span><span class="co">#&gt; lp__          -13453.97    0.06 4.48 -13463.82 -13456.70 -13453.68 -13450.82 -13446.11  5366</span></span>
+<span><span class="co">#&gt; tau                0.68    0.00 0.20      0.39      0.54      0.64      0.78      1.17  7183</span></span>
 <span><span class="co">#&gt;               Rhat</span></span>
 <span><span class="co">#&gt; d[Vaccinated]    1</span></span>
 <span><span class="co">#&gt; lp__             1</span></span>
 <span><span class="co">#&gt; tau              1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Jan 15 16:28:08 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Jan 16 10:22:07 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -303,7 +303,7 @@ method:</p>
 <span><span class="co">#&gt; lp__                          -13448.40  1807    1</span></span>
 <span><span class="co">#&gt; tau                                0.73  1683    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Jan 15 16:28:25 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Jan 16 10:22:27 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -328,9 +328,9 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">bcg_dic_unadj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 25.9<span style="color: #555555;"> (on 26 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 23.4</span></span>
-<span><span class="co">#&gt;               DIC: 49.3</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 26.1<span style="color: #555555;"> (on 26 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 23.6</span></span>
+<span><span class="co">#&gt;               DIC: 49.7</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">bcg_dic_lat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Residual deviance: 30.9<span style="color: #555555;"> (on 26 data points)</span></span></span>
@@ -346,7 +346,7 @@ heterogeneity standard deviation:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     mean  sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; tau 0.68 0.2 0.39 0.54 0.65 0.79  1.17     3605     5930    1</span></span>
+<span><span class="co">#&gt; tau 0.68 0.2 0.39 0.54 0.64 0.78  1.17     7054    10406    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
 <span><span class="co">#&gt; tau 0.29 0.18 0.03 0.16 0.26 0.39  0.73     1565     2721    1</span></span></code></pre></div>
@@ -499,13 +499,13 @@ effectiveness in a new study is wide and covers a range of harmful
 effects:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">bcg_predeff_unadj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, predictive_distribution <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                        mean   sd  2.5%   25%   50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; delta_new[Vaccinated] -0.76 0.74 -2.25 -1.21 -0.76 -0.3  0.69     7911     8922    1</span></span></code></pre></div>
+<span><span class="co">#&gt;                        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; delta_new[Vaccinated] -0.77 0.75 -2.27 -1.22 -0.76 -0.32  0.72    17433    18382    1</span></span></code></pre></div>
 <p>The predictive probability of a new trial showing a harmful effect
 is:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">bcg_predeff_unadj</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.1354</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 0.1323</span></span></code></pre></div>
 <p>For the analysis adjusting for latitude, the predictive distribution
 of relative effects now depends on latitude; here we calculate these in
 increments of 10 degrees from the equator:</p>
