@@ -343,7 +343,7 @@ predict.stan_nma <- function(object, ...,
   if (!is.null(newdata)) {
     if (!is.data.frame(newdata)) abort("`newdata` is not a data frame.")
 
-    .study <- pull_non_null(newdata, enquo(study))
+    .study <- pull_non_null(newdata, rlang::enquo(study))
     if (is.null(.study)) {
       if (inherits(object, "integration_tbl"))
         newdata$.study <- nfactor(paste("New", seq_len(nrow(newdata))))
@@ -1520,7 +1520,7 @@ predict.stan_nma <- function(object, ...,
           if (any(purrr::map_lgl(aux, rlang::is_string))) aux_temp <- as.array(object, pars = aux_pars)
           if (n_aux == 1) {
             for (s in 1:n_studies) {
-              ss <- studies[s]
+              ss <- as.character(studies[s])
               if (inherits(aux[[ss]], "distr")) {
                 aux_array[, , s] <- rlang::eval_tidy(rlang::call2(aux[[ss]]$qfun, p = u[ , , s, drop = TRUE], !!! aux[[ss]]$args))
               } else {
@@ -1533,7 +1533,7 @@ predict.stan_nma <- function(object, ...,
             }
           } else {
             for (s in 1:n_studies) {
-              ss <- studies[s]
+              ss <- as.character(studies[s])
               if (!rlang::is_string(aux[[ss]])) {
                 if (!setequal(names(aux[[ss]]), aux_pars) || !all(purrr::map_lgl(aux[[ss]], inherits, "distr")))
                   abort(glue::glue("`aux` must be a single named list of distr() specifications for {glue::glue_collapse(aux_pars, sep = ', ', last = ' and ')}, ",
@@ -2016,6 +2016,8 @@ predict.stan_nma_surv <- function(object, times = NULL,
 
   type <- rlang::arg_match(type)
   times <- rlang::enquo(times)
+
+  if (!is.null(newdata)) study <- pull_non_null(newdata, rlang::enquo(study))
 
   if (!rlang::is_double(quantiles, finite = TRUE) || any(quantiles < 0) || any(quantiles > 1))
     abort("`quantiles` must be a numeric vector of quantiles between 0 and 1.")
