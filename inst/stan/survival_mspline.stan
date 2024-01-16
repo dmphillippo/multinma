@@ -67,8 +67,8 @@ functions {
               matrix itime,        // Integrated basis evaluated at event/cens time
               matrix start_itime,  // Integrated basis evaluated at left interval time
               matrix delay_itime,  // Integrated basis evaluated at delayed entry time
-              int[] delayed,             // Delayed entry flag (1=delay)
-              int[] status,              // Censoring status
+              array[] int delayed,             // Delayed entry flag (1=delay)
+              array[] int status,              // Censoring status
               vector eta,                // Linear predictor
               matrix scoef) {          // Spline coefficients
 
@@ -112,8 +112,8 @@ functions {
               matrix itime,        // Integrated basis evaluated at event/cens time
               matrix start_itime,  // Integrated basis evaluated at left interval time
               matrix delay_itime,  // Integrated basis evaluated at delayed entry time
-              int[] delayed,             // Delayed entry flag (1=delay)
-              int[] status,              // Censoring status
+              array[] int delayed,             // Delayed entry flag (1=delay)
+              array[] int status,              // Censoring status
               vector eta,                // Linear predictor
               vector scoef) {          // Spline coefficients
 
