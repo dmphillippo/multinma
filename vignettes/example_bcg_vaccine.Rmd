@@ -69,13 +69,15 @@ bcg_fit_unadj <- nma(bcg_net,
                      prior_het = half_normal(scale = 5))
 ```
 ```{r, echo = FALSE}
-bcg_fit_unadj <- nma(bcg_net, 
-                     seed = 14308133,
-                     iter = 5000,
-                     trt_effects = "random",
-                     prior_intercept = normal(scale = 100),
-                     prior_trt = normal(scale = 100),
-                     prior_het = half_normal(scale = 5))
+bcg_fit_unadj <- nowarn_on_ci(
+  nma(bcg_net, 
+      seed = 14308133,
+      iter = 10000,
+      trt_effects = "random",
+      prior_intercept = normal(scale = 100),
+      prior_trt = normal(scale = 100),
+      prior_het = half_normal(scale = 5))
+  )
 ```
 
 Basic parameter summaries are given by the `print()` method:
