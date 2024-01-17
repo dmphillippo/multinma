@@ -203,10 +203,10 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                     mean se_mean   sd     2.5%      25%      50%      75%    97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[Beta Blocker]    -0.26    0.00 0.05    -0.35    -0.29    -0.26    -0.23    -0.16  3081    1</span></span>
-<span><span class="co">#&gt; lp__            -5960.33    0.09 3.47 -5967.86 -5962.53 -5959.95 -5957.82 -5954.60  1604    1</span></span>
+<span><span class="co">#&gt; d[Beta Blocker]    -0.26    0.00 0.05    -0.36    -0.30    -0.26    -0.23    -0.16  3225    1</span></span>
+<span><span class="co">#&gt; lp__            -5960.46    0.09 3.45 -5968.32 -5962.54 -5960.12 -5957.90 -5954.97  1606    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Jan 16 17:14:58 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 17 14:35:16 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -258,11 +258,11 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                     mean se_mean   sd     2.5%      25%      50%      75%    97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[Beta Blocker]    -0.25    0.00 0.06    -0.38    -0.29    -0.25    -0.21    -0.13  2411    1</span></span>
-<span><span class="co">#&gt; lp__            -5970.91    0.17 5.58 -5982.23 -5974.38 -5970.75 -5967.07 -5960.53  1033    1</span></span>
-<span><span class="co">#&gt; tau                 0.13    0.00 0.08     0.01     0.07     0.13     0.19     0.31   795    1</span></span>
+<span><span class="co">#&gt; d[Beta Blocker]    -0.25    0.00 0.07    -0.38    -0.30    -0.25    -0.21    -0.11  2941 1.00</span></span>
+<span><span class="co">#&gt; lp__            -5970.69    0.17 5.54 -5982.46 -5974.26 -5970.39 -5966.71 -5960.79  1088 1.01</span></span>
+<span><span class="co">#&gt; tau                 0.14    0.00 0.08     0.01     0.07     0.13     0.19     0.31  1002 1.01</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Jan 16 17:15:04 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 17 14:35:20 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -284,14 +284,14 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">blocker_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 46.7<span style="color: #555555;"> (on 44 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 23</span></span>
-<span><span class="co">#&gt;               DIC: 69.7</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 46.9<span style="color: #555555;"> (on 44 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 23.3</span></span>
+<span><span class="co">#&gt;               DIC: 70.2</span></span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">blocker_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 42.2<span style="color: #555555;"> (on 44 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 28.5</span></span>
-<span><span class="co">#&gt;               DIC: 70.7</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 41.9<span style="color: #555555;"> (on 44 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 28.4</span></span>
+<span><span class="co">#&gt;               DIC: 70.3</span></span></code></pre></div>
 <p>The residual deviance is lower under the RE model, which is to be
 expected as this model is more flexible. However, this comes with an
 increased effective number of parameters (note the increase in <span class="math inline">\(p_D\)</span>). As a result, the DIC of both models
@@ -331,8 +331,8 @@ the corresponding Normal distribution. We set
 <span>                   type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
 <span><span class="va">pred_FE</span></span>
 <span><span class="co">#&gt;                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[Control]      0.11 0.05 0.04 0.07 0.10 0.14  0.25     4205     4145    1</span></span>
-<span><span class="co">#&gt; pred[Beta Blocker] 0.09 0.05 0.03 0.06 0.08 0.11  0.20     4184     4007    1</span></span>
+<span><span class="co">#&gt; pred[Control]      0.11 0.06 0.03 0.07 0.10 0.14  0.25     4166     3925    1</span></span>
+<span><span class="co">#&gt; pred[Beta Blocker] 0.09 0.05 0.03 0.06 0.08 0.11  0.21     4141     3859    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_blocker_files/figure-html/blocker_pred_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
@@ -341,8 +341,8 @@ the corresponding Normal distribution. We set
 <span>                   type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
 <span><span class="va">pred_RE</span></span>
 <span><span class="co">#&gt;                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[Control]      0.11 0.06 0.04 0.07 0.10 0.14  0.27     3974     3999    1</span></span>
-<span><span class="co">#&gt; pred[Beta Blocker] 0.09 0.05 0.03 0.06 0.08 0.11  0.22     3968     4188    1</span></span>
+<span><span class="co">#&gt; pred[Control]      0.11 0.06 0.04 0.07 0.10 0.14  0.25     4128     3417    1</span></span>
+<span><span class="co">#&gt; pred[Beta Blocker] 0.09 0.05 0.03 0.06 0.08 0.11  0.20     4034     3387    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_RE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_blocker_files/figure-html/blocker_pred_RE-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>If instead of information on the baseline logit-probability of
@@ -362,8 +362,8 @@ logit-probability).</p>
 <span>                        type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
 <span><span class="va">pred_FE_beta</span></span>
 <span><span class="co">#&gt;                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[Control]      0.11 0.05 0.03 0.07 0.10 0.14  0.23     4059     3776    1</span></span>
-<span><span class="co">#&gt; pred[Beta Blocker] 0.09 0.04 0.02 0.06 0.08 0.11  0.19     4019     3702    1</span></span>
+<span><span class="co">#&gt; pred[Control]      0.11 0.05 0.03 0.07 0.10 0.14  0.23     3774     3686    1</span></span>
+<span><span class="co">#&gt; pred[Beta Blocker] 0.09 0.04 0.02 0.06 0.08 0.11  0.19     3721     3790    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_FE_beta</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_blocker_files/figure-html/blocker_pred_FE_beta-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
@@ -373,8 +373,8 @@ logit-probability).</p>
 <span>                        type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
 <span><span class="va">pred_RE_beta</span></span>
 <span><span class="co">#&gt;                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[Control]      0.11 0.05 0.03 0.07 0.10 0.14  0.23     3803     3910    1</span></span>
-<span><span class="co">#&gt; pred[Beta Blocker] 0.09 0.04 0.03 0.06 0.08 0.11  0.19     3890     3966    1</span></span>
+<span><span class="co">#&gt; pred[Control]      0.11 0.05 0.03 0.07 0.10 0.14  0.23     3901     3892    1</span></span>
+<span><span class="co">#&gt; pred[Beta Blocker] 0.09 0.04 0.02 0.06 0.08 0.11  0.19     3912     3972    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_RE_beta</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_blocker_files/figure-html/blocker_pred_RE_beta-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>Notice that these results are nearly equivalent to those calculated
