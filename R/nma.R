@@ -981,7 +981,7 @@ nma <- function(network,
       # Set up basis
       # Only evaluate at first boundary knot for now to save time/memory
       knots <- purrr::map(knots, sort)
-      knots <- as.data.frame(knots)
+      knots <- tibble::as_tibble(knots)
       b_knots <- knots[c(1, nrow(knots)), ]
       i_knots <- knots[-c(1, nrow(knots)), ]
       basis <- purrr::imap(b_knots,
