@@ -1962,10 +1962,11 @@ nma.fit <- function(ipd_x, ipd_y,
       ipd_time <- ipd_itime <- ipd_start_itime <- ipd_delay_itime <- matrix(nrow = length(ipd_surv$time), ncol = n_scoef)
 
       for (s in unique(ipd_s_t_all$.study)) {
-        ipd_time[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s], study = s)
-        ipd_itime[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s], integral = TRUE, study = s)
-        ipd_start_itime[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$start_time[ipd_s_t_all$.study == s], integral = TRUE, study = s)
-        ipd_delay_itime[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$delay_time[ipd_s_t_all$.study == s], integral = TRUE, study = s)
+        s_chr <- gsub("^\\.study", "", x_names[s])
+        ipd_time[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s], study = s_chr)
+        ipd_itime[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s], integral = TRUE, study = s_chr)
+        ipd_start_itime[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$start_time[ipd_s_t_all$.study == s], integral = TRUE, study = s_chr)
+        ipd_delay_itime[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$delay_time[ipd_s_t_all$.study == s], integral = TRUE, study = s_chr)
       }
 
     } else {
@@ -1976,10 +1977,11 @@ nma.fit <- function(ipd_x, ipd_y,
       agd_arm_time <- agd_arm_itime <- agd_arm_start_itime <- agd_arm_delay_itime <- matrix(nrow = length(agd_arm_surv$time), ncol = n_scoef)
 
       for (s in unique(agd_arm_s_t_all$.study)) {
-        agd_arm_time[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s], study = s)
-        agd_arm_itime[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s], integral = TRUE, study = s)
-        agd_arm_start_itime[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$start_time[agd_arm_s_t_all$.study == s], integral = TRUE, study = s)
-        agd_arm_delay_itime[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$delay_time[agd_arm_s_t_all$.study == s], integral = TRUE, study = s)
+        s_chr <- gsub("^\\.study", "", x_names[s])
+        agd_arm_time[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s], study = s_chr)
+        agd_arm_itime[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s], integral = TRUE, study = s_chr)
+        agd_arm_start_itime[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$start_time[agd_arm_s_t_all$.study == s], integral = TRUE, study = s_chr)
+        agd_arm_delay_itime[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$delay_time[agd_arm_s_t_all$.study == s], integral = TRUE, study = s_chr)
       }
 
     } else {
