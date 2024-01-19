@@ -515,7 +515,7 @@ data {
 
   // auxiliary design matrix
   int<lower=0> nX_aux;
-  matrix[ni_ipd + (aux_int ? nint_max : 1) * (ni_agd_arm + ni_agd_contrast), nX_aux] X_aux;
+  matrix[ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm, nX_aux] X_aux;
   int<lower=0, upper=1> aux_reg_trt; // Flag aux regression includes main treatment effects (1 = yes)
 
   // Prior on aux regression coefficients
