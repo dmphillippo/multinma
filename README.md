@@ -60,7 +60,7 @@ gives a detailed introduction to network meta-analysis:
 > <https://www.sheffield.ac.uk/nice-dsu/tsds>.
 
 Multilevel network meta-regression is set out in the following methods
-paper:
+papers:
 
 > Phillippo, D. M. et al. (2020). “Multilevel Network Meta-Regression
 > for population-adjusted treatment comparisons.” *Journal of the Royal
@@ -68,12 +68,17 @@ paper:
 > 183(3):1189-1210. doi:
 > [10.1111/rssa.12579](https://doi.org/10.1111/rssa.12579).
 
+> Phillippo, D. M. et al. (2024). “Multilevel network meta-regression
+> for general likelihoods: synthesis of individual and aggregate data
+> with applications to survival analysis”.
+> *arXiv*:[2401.12640](https://arxiv.org/abs/2401.12640).
+
 ## Citing multinma
 
 The `multinma` package can be cited as follows:
 
-> Phillippo, D. M. (2023). *multinma: Bayesian Network Meta-Analysis of
-> Individual and Aggregate Data*. R package version 0.5.1, doi:
+> Phillippo, D. M. (2024). *multinma: Bayesian Network Meta-Analysis of
+> Individual and Aggregate Data*. R package version 0.6.0, doi:
 > [10.5281/zenodo.3904454](https://doi.org/10.5281/zenodo.3904454).
 
 When fitting ML-NMR models, please cite the methods paper:
@@ -83,6 +88,13 @@ When fitting ML-NMR models, please cite the methods paper:
 > Statistical Society: Series A (Statistics in Society)*,
 > 183(3):1189-1210. doi:
 > [10.1111/rssa.12579](https://doi.org/10.1111/rssa.12579).
+
+For ML-NMR models with time-to-event outcomes, please cite:
+
+> Phillippo, D. M. et al. (2024). “Multilevel network meta-regression
+> for general likelihoods: synthesis of individual and aggregate data
+> with applications to survival analysis”.
+> *arXiv*:[2401.12640](https://arxiv.org/abs/2401.12640).
 
 ## References
 

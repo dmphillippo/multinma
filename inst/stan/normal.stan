@@ -12,9 +12,9 @@ data {
   real<lower=0> prior_aux_df;
 
   // Outcomes
-  real ipd_y[ni_ipd];
-  real agd_arm_y[ni_agd_arm];
-  real<lower=0> agd_arm_se[ni_agd_arm];
+  array[ni_ipd] real ipd_y;
+  array[ni_agd_arm] real agd_arm_y;
+  array[ni_agd_arm] real<lower=0> agd_arm_se;
 }
 transformed data {
 #include /include/transformed_data_common.stan
@@ -35,25 +35,26 @@ transformed parameters {
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
-    if (nint > 1) { // -- If integration points are used --
+    if (nint_max > 1) { // -- If integration points are used --
+      vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+        X_agd_arm * beta_tilde + offset_agd_arm :
+        X_agd_arm * beta_tilde;
+
       if (RE) {
-        vector[nint * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
-          X_agd_arm * beta_tilde + offset_agd_arm :
-          X_agd_arm * beta_tilde;
 
         if (link == 1) { // identity link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]];
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] + f_delta[which_RE[narm_ipd + i]];
             else
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)];
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
           }
         } else if (link == 2) { // log link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = exp(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)] + f_delta[which_RE[narm_ipd + i]]);
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = exp(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] + f_delta[which_RE[narm_ipd + i]]);
             else
-              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = exp(eta_agd_arm_noRE[(1 + (i-1)*nint):(i*nint)]);
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = exp(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]);
           }
         }
 
@@ -63,13 +64,11 @@ transformed parameters {
 
       } else {
         if (link == 1) { // identity link
-          theta_agd_arm_ii = has_offset ?
-            X_agd_arm * beta_tilde + offset_agd_arm :
-            X_agd_arm * beta_tilde;
+          if (nint == nint_max) theta_agd_arm_ii = eta_agd_arm_noRE;
+          else for (i in 1:ni_agd_arm) theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
         } else if (link == 2) { // log link
-          theta_agd_arm_ii = has_offset ?
-            exp(X_agd_arm * beta_tilde + offset_agd_arm) :
-            exp(X_agd_arm * beta_tilde);
+          if (nint == nint_max) theta_agd_arm_ii = exp(eta_agd_arm_noRE);
+          else for (i in 1:ni_agd_arm) theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = exp(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]);
         }
 
         for (i in 1:ni_agd_arm) {

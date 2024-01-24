@@ -67,7 +67,7 @@ summary.nma_prior <- function(object, ..., probs = c(0.5, 0.95), digits = 2, tru
     cglue("A flat prior on the parameter support {round(trunc[1], digits)} to {round(trunc[2], digits)}.")
     invisible(tibble::tibble(probs = 1, lower = trunc[1], upper = trunc[2]))
   } else {
-    prior <- get_tidy_prior(object, trunc = trunc) %>%
+    prior <- get_tidy_prior(object, trunc = trunc, ...) %>%
       tidyr::expand_grid(probs = probs) %>%
       dplyr::group_by(.data[["dist"]], .data[["probs"]]) %>%
       {if (stringr::str_starts(object$dist, "half-|Exponential")) {

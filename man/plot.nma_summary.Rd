@@ -4,6 +4,7 @@
 \alias{plot.nma_summary}
 \alias{plot.nma_parameter_summary}
 \alias{plot.nma_rank_probs}
+\alias{plot.surv_nma_summary}
 \title{Plots of summary results}
 \usage{
 \method{plot}{nma_summary}(
@@ -23,6 +24,8 @@
 )
 
 \method{plot}{nma_rank_probs}(x, ...)
+
+\method{plot}{surv_nma_summary}(x, ..., stat = "lineribbon")
 }
 \arguments{
 \item{x}{A \code{nma_summary} object}
@@ -31,7 +34,9 @@
 stat, see Details}
 
 \item{stat}{Character string specifying the \code{ggdist} plot stat to use,
-default \code{"pointinterval"}}
+default \code{"pointinterval"}, except when plotting estimated
+survival/hazard/cumulative hazard curves from survival models where the
+default is \code{"lineribbon"}}
 
 \item{orientation}{Whether the \code{ggdist} geom is drawn horizontally
 (\code{"horizontal"}) or vertically (\code{"vertical"}), default \code{"horizontal"}}
@@ -54,19 +59,29 @@ posterior ranks and rank probabilities (when called on the output of
 Plotting is handled by \link{ggplot2} and the stats and geoms provided in
 the \link{ggdist} package. As a result, the output is very flexible. Any
 plotting stats provided by \code{ggdist} may be used, via the argument
-\code{stat}. The default uses
+\code{stat}.
+
+The default uses
 \code{\link[ggdist:stat_pointinterval]{ggdist::stat_pointinterval()}}, to
-produce medians and 95\% Credible Intervals with 66\% inner bands.
-Additional arguments in \code{...} are passed to the \code{ggdist} stat, to
-customise the output. For example, to produce means and Credible Intervals,
-specify \code{point_interval = "mean_qi"}. To produce an 80\% Credible Interval
-with no inner band, specify \code{.width = c(0, 0.8)}.
+produce medians and 95\% Credible Intervals with 66\% inner bands. Additional
+arguments in \code{...} are passed to the \code{ggdist} stat, to customise the
+output. For example, to produce means and Credible Intervals, specify
+\code{point_interval = "mean_qi"}. To produce an 80\% Credible Interval with no
+inner band, specify \code{.width = c(0, 0.8)}.
 
 Alternative stats can be specified to produce different summaries. For
 example, specify \code{stat = "[half]eye"} to produce (half) eye plots, or \code{stat = "histinterval"} to produce histograms with intervals.
 
 A full list of options and examples is found in the \code{ggdist} vignette
 \code{vignette("slabinterval", package = "ggdist")}.
+
+For survival/hazard/cumulative hazard curves estimated from survival
+models, the default uses
+\code{\link[ggdist:stat_lineribbon]{ggdist::stat_lineribbon()}} which
+produces curves of posterior medians with 50\%, 80\%, and 95\% Credible
+Interval bands. Again, additional arguments in \code{...} are passed to the
+\code{ggdist} stat. For example, to produce posterior means and 95\% Credible
+bands, specify \code{point_interval = "mean_qi"} and \code{.width = 0.95}.
 
 A \code{ggplot} object is returned which can be further modified through the
 usual \link{ggplot2} functions to add further aesthetics, geoms, themes, etc.

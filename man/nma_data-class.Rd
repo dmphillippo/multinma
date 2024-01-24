@@ -9,9 +9,9 @@
 \description{
 The \code{nma_data} class contains the data for a NMA in a standard format,
 created using the functions \code{\link[=set_ipd]{set_ipd()}}, \code{\link[=set_agd_arm]{set_agd_arm()}},
-\code{\link[=set_agd_contrast]{set_agd_contrast()}}, or \code{\link[=combine_network]{combine_network()}}. The sub-class \code{mlnmr_data} is
-created by the function \code{\link[=add_integration]{add_integration()}}, and further contains numerical
-integration points for the aggregate data.
+\code{\link[=set_agd_contrast]{set_agd_contrast()}}, \code{\link[=set_agd_surv]{set_agd_surv()}}, or \code{\link[=combine_network]{combine_network()}}. The sub-class
+\code{mlnmr_data} is created by the function \code{\link[=add_integration]{add_integration()}}, and further
+contains numerical integration points for the aggregate data.
 }
 \details{
 Objects of class \code{nma_data} have the following components:
@@ -38,7 +38,8 @@ tibbles with the following columns:
 \item{\code{.r}}{event count (discrete)}
 \item{\code{.n}}{event count denominator (discrete, \code{agd_arm} only)}
 \item{\code{.E}}{time at risk (discrete)}
-\item{\code{.surv}}{event/censoring time, of type \code{Surv} (time-to-event)}
+\item{\code{.Surv}}{survival outcome of type \code{\link{Surv}} (time-to-event), nested by
+study arm}
 \item{\code{.sample_size}}{sample size (\verb{agd_*} only)}
 \item{\code{...}}{other columns (typically covariates) from the original data
 frame}

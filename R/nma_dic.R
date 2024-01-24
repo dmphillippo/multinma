@@ -3,6 +3,9 @@
 #' Calculate the DIC for a model fitted using the [nma()] function.
 #'
 #' @param x A fitted model object, inheriting class [stan_nma]
+#' @param penalty The method for estimating the effective number of parameters,
+#'   used to penalise model fit in the DIC. Either `"pD"` (the default), or
+#'   `"pV"`. For survival likelihoods only `"pV"` is currently available.
 #' @param ... Other arguments (not used)
 #'
 #' @return A [nma_dic] object.
@@ -33,8 +36,12 @@
 #' # Compare residual deviance contributions
 #' plot(smk_dic_RE, smk_dic_RE_UME, show_uncertainty = FALSE)
 #' }
-dic <- function(x, ...) {
+dic <- function(x, penalty = c("pD", "pV"), ...) {
   if (!inherits(x, "stan_nma")) abort("Not a `stan_nma` object.")
+
+  penalty <- rlang::arg_match(penalty)
+
+  if (x$likelihood %in% valid_lhood$survival) penalty <- "pV"
 
   net <- x$network
 
@@ -45,15 +52,21 @@ dic <- function(x, ...) {
   if (has_ipd(net)) {
     n_ipd <- nrow(net$ipd)
     resdev_ipd <- resdev[1:n_ipd]
-    fitted_ipd <- colMeans(as.matrix(x, pars = "fitted_ipd"))
+    fitted_ipd <- if (!x$likelihood %in% valid_lhood$survival) colMeans(as.matrix(x, pars = "fitted_ipd")) else NA
   } else {
     n_ipd <- 0
   }
 
   if (has_agd_arm(net)) {
-    n_agd_arm <- nrow(net$agd_arm)
-    resdev_agd_arm <- resdev[n_ipd + (1:n_agd_arm)]
-    fitted_agd_arm <- colMeans(as.matrix(x, pars = "fitted_agd_arm"))
+    if (!x$likelihood %in% valid_lhood$survival) {
+      n_agd_arm <- nrow(net$agd_arm)
+      resdev_agd_arm <- resdev[n_ipd + (1:n_agd_arm)]
+      fitted_agd_arm <- colMeans(as.matrix(x, pars = "fitted_agd_arm"))
+    } else {
+      n_agd_arm <- sum(net$agd_arm$.sample_size)
+      resdev_agd_arm <- resdev[n_ipd + (1:n_agd_arm)]
+      fitted_agd_arm <- NA
+    }
   } else {
     n_agd_arm <- 0
   }
@@ -72,7 +85,7 @@ dic <- function(x, ...) {
 
   has_df <- FALSE
 
-  if (x$likelihood %in% c("bernoulli", "bernoulli2", "binomial", "binomial2")) {
+  if (x$likelihood %in% c("bernoulli", "bernoulli2", "binomial", "binomial2") && penalty != "pV") {
     if (has_ipd(net)) {
       ipd_r <- net$ipd$.r
       resdevfit_ipd <- 2 * ifelse(ipd_r == 1,
@@ -98,7 +111,7 @@ dic <- function(x, ...) {
       leverage_agd_arm <- NULL
     }
 
-  } else if (x$likelihood == "normal") {
+  } else if (x$likelihood == "normal" && penalty != "pV") {
     if (has_ipd(net)) {
       ipd_y <- net$ipd$.y
       ipd_arm <-  dplyr::group_indices(net$ipd, .data$.study, .data$.trt)
@@ -124,7 +137,7 @@ dic <- function(x, ...) {
       leverage_agd_arm <- NULL
     }
 
-  } else if (x$likelihood == "poisson") {
+  } else if (x$likelihood == "poisson" && penalty != "pV") {
     if (has_ipd(net)) {
       ipd_r <- net$ipd$.r
       resdevfit_ipd <- 2 * ((fitted_ipd - ipd_r) +
@@ -146,13 +159,16 @@ dic <- function(x, ...) {
   } else if (x$likelihood == "ordered") {
     if (has_ipd(net)) {
       ipd_r <- net$ipd$.r
-      m_fitted_ipd <- matrix(fitted_ipd, nrow = n_ipd)
 
-      resdevfit_ipd <- vector("double", n_ipd)
-      for (i in 1:n_ipd) {
-        resdevfit_ipd[i] <- 2 * sum((ipd_r[i,] * log(ipd_r[i,] / m_fitted_ipd[i,]))[!is.na(ipd_r[i,]) & ipd_r[i,] > 0])
+      if (penalty != "pV") {
+        m_fitted_ipd <- matrix(fitted_ipd, nrow = n_ipd)
+
+        resdevfit_ipd <- vector("double", n_ipd)
+        for (i in 1:n_ipd) {
+          resdevfit_ipd[i] <- 2 * sum((ipd_r[i,] * log(ipd_r[i,] / m_fitted_ipd[i,]))[!is.na(ipd_r[i,]) & ipd_r[i,] > 0])
+        }
+        leverage_ipd <- resdev_ipd - resdevfit_ipd
       }
-      leverage_ipd <- resdev_ipd - resdevfit_ipd
 
       # Degrees of freedom is 1 - number of categories
       df_ipd <- rowSums(!is.na(ipd_r)) - 1
@@ -163,13 +179,16 @@ dic <- function(x, ...) {
 
     if (has_agd_arm(net)) {
       agd_arm_r <- net$agd_arm$.r
-      m_fitted_agd_arm <- matrix(fitted_agd_arm, nrow = n_agd_arm)
 
-      resdevfit_agd_arm <- vector("double", n_agd_arm)
-      for (i in 1:n_agd_arm) {
-        resdevfit_agd_arm[i] <- 2 * sum((agd_arm_r[i,] * log(agd_arm_r[i,] / m_fitted_agd_arm[i,]))[!is.na(agd_arm_r[i,]) & agd_arm_r[i,] > 0])
+      if (penalty != "pV") {
+        m_fitted_agd_arm <- matrix(fitted_agd_arm, nrow = n_agd_arm)
+
+        resdevfit_agd_arm <- vector("double", n_agd_arm)
+        for (i in 1:n_agd_arm) {
+          resdevfit_agd_arm[i] <- 2 * sum((agd_arm_r[i,] * log(agd_arm_r[i,] / m_fitted_agd_arm[i,]))[!is.na(agd_arm_r[i,]) & agd_arm_r[i,] > 0])
+        }
+        leverage_agd_arm <- resdev_agd_arm - resdevfit_agd_arm
       }
-      leverage_agd_arm <- resdev_agd_arm - resdevfit_agd_arm
 
       # Degrees of freedom is 1 - number of categories
       df_agd_arm <- rowSums(!is.na(agd_arm_r)) - 1
@@ -182,7 +201,10 @@ dic <- function(x, ...) {
       df_agd_contrast <- 1
     }
 
-  } else {
+  } else if (x$likelihood %in% valid_lhood$survival) {
+    # Nothing to do, pV only
+
+  } else if (penalty != "pV") {
     abort(glue::glue("DIC not supported for likelihood of type '{x$likelihood}'."))
   }
 
@@ -213,6 +235,14 @@ dic <- function(x, ...) {
     leverage_agd_contrast <- NULL
   }
 
+  # Get pointwise contributions for pV
+  if (penalty == "pV") {
+    leverage <- colSums(var(matrix(resdev_array, ncol = dim(resdev_array)[3])))/2
+    if (has_ipd(net)) leverage_ipd <- leverage[1:n_ipd]
+    if (has_agd_arm(net)) leverage_agd_arm <- leverage[n_ipd + (1:n_agd_arm)]
+    if (has_agd_contrast(net)) leverage_agd_contrast <- leverage[n_ipd + n_agd_arm + (1:nr_agd_contrast)]
+  }
+
   # Set pointwise contributions
   pw <- list()
   if (has_ipd(net)) {
@@ -229,9 +259,12 @@ dic <- function(x, ...) {
   }
 
   if (has_agd_arm(net)) {
+    aa <- net$agd_arm
+    if (x$likelihood %in% valid_lhood$survival) aa <- tidyr::unnest(aa, cols = ".Surv")
+
     pw$agd_arm <- tibble::tibble(
-      .study = net$agd_arm$.study,
-      .trt = net$agd_arm$.trt,
+      .study = aa$.study,
+      .trt = aa$.trt,
       resdev = resdev_agd_arm,
       leverage = leverage_agd_arm,
       dic = resdev_agd_arm + leverage_agd_arm)
@@ -256,11 +289,20 @@ dic <- function(x, ...) {
 
   # Calculate pD, DIC
   totresdev <- sum(resdev)
-  pd <- sum(leverage_ipd, leverage_agd_arm, leverage_agd_contrast)
-  dic <- totresdev + pd
+
+  if (penalty == "pD") {
+    pd <- sum(leverage_ipd, leverage_agd_arm, leverage_agd_contrast)
+    dic <- totresdev + pd
+    pv <- NULL
+  } else if (penalty == "pV") {
+    pv <- var(rowSums(as.matrix(x, pars = "resdev"))) / 2
+    dic <- totresdev + pv
+    pd <- NULL
+  }
 
   # Return nma_dic object
-  out <- list(dic = dic, pd = pd, resdev = totresdev, pointwise = pw, resdev_array = resdev_array)
+  out <- list(dic = dic, pd = pd, pv = pv, resdev = totresdev, pointwise = pw, resdev_array = resdev_array)
   class(out) <- "nma_dic"
+  attr(out, "penalty") <- penalty
   return(out)
 }

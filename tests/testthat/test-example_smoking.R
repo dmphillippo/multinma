@@ -8,10 +8,10 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
 
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
@@ -37,7 +37,7 @@ smknet <- set_agd_arm(smoking,
 smknet
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## plot(smknet, weight_edges = TRUE, weight_nodes = TRUE)
 
 ## ----smoking_network_plot, echo=FALSE, fig.width=8, fig.height=6, out.width="100%"----------------
@@ -63,7 +63,7 @@ smkfit <- nma(smknet,
 smkfit
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(smkfit, pars = c("d", "tau", "mu", "delta"))
 
@@ -364,4 +364,9 @@ test_that("Robust to custom options(contrasts) settings", {
                as_tibble(summary(smkfit_ume))[, c("parameter", "mean", "sd")],
                tolerance = tol)
 })
+
+
+# Force clean up
+rm(list = ls())
+gc()
 

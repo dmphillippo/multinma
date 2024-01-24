@@ -2,6 +2,7 @@
 % Please edit documentation in R/predict.R
 \name{predict.stan_nma}
 \alias{predict.stan_nma}
+\alias{predict.stan_nma_surv}
 \title{Predictions of absolute effects from NMA models}
 \usage{
 \method{predict}{stan_nma}(
@@ -19,6 +20,24 @@
   predictive_distribution = FALSE,
   summary = TRUE
 )
+
+\method{predict}{stan_nma_surv}(
+  object,
+  times = NULL,
+  ...,
+  baseline = NULL,
+  aux = NULL,
+  newdata = NULL,
+  study = NULL,
+  trt_ref = NULL,
+  type = c("survival", "hazard", "cumhaz", "mean", "median", "quantile", "rmst", "link"),
+  quantiles = c(0.25, 0.5, 0.75),
+  level = c("aggregate", "individual"),
+  times_seq = NULL,
+  probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
+  predictive_distribution = FALSE,
+  summary = TRUE
+)
 }
 \arguments{
 \item{object}{A \code{stan_nma} object created by \code{\link[=nma]{nma()}}.}
@@ -27,13 +46,16 @@
 if \code{baseline_level = "aggregate"}.}
 
 \item{baseline}{An optional \code{\link[=distr]{distr()}} distribution for the baseline response
-(i.e. intercept), about which to produce absolute effects. If \code{NULL},
-predictions are produced using the baseline response for each study in the
-network with IPD or arm-based AgD.
+(i.e. intercept), about which to produce absolute effects. Can also be a
+character string naming a study in the network to take the estimated
+baseline response distribution from. If \code{NULL}, predictions are produced
+using the baseline response for each study in the network with IPD or
+arm-based AgD.
 
-For regression models, this may be a list of \code{\link[=distr]{distr()}} distributions of the
-same length as the number of studies in \code{newdata} (possibly named by the
-study names, or otherwise in order of appearance in \code{newdata}).
+For regression models, this may be a list of \code{\link[=distr]{distr()}} distributions (or
+study names in the network to use the baseline distributions from) of the
+same length as the number of studies in \code{newdata}, possibly named by the
+studies in \code{newdata} or otherwise in order of appearance in \code{newdata}.
 
 Use the \code{baseline_type} and \code{baseline_level} arguments to specify whether
 this distribution is on the response or linear predictor scale, and (for
@@ -41,7 +63,10 @@ ML-NMR or models including IPD) whether this applies to an individual at
 the reference level of the covariates or over the entire \code{newdata}
 population, respectively. For example, in a model with a logit link with
 \code{baseline_type = "link"}, this would be a distribution for the baseline log
-odds of an event.
+odds of an event. For survival models, \code{baseline} always corresponds to the
+intercept parameters in the linear predictor (i.e. \code{baseline_type} is
+always \code{"link"}, and \code{baseline_level} is \code{"individual"} for IPD NMA or
+ML-NMR, and \code{"aggregate"} for AgD NMA).
 
 Use the \code{trt_ref} argument to specify which treatment this distribution
 applies to.}
@@ -72,7 +97,20 @@ distribution will refer to the network reference treatment. Coerced to
 character string.}
 
 \item{type}{Whether to produce predictions on the \code{"link"} scale (the
-default, e.g. log odds) or \code{"response"} scale (e.g. probabilities).}
+default, e.g. log odds) or \code{"response"} scale (e.g. probabilities).
+
+For survival models, the options are \code{"survival"} for survival
+probabilities (the default), \code{"hazard"} for hazards, \code{"cumhaz"} for
+cumulative hazards, \code{"mean"} for mean survival times, \code{"quantile"} for
+quantiles of the survival time distribution, \code{"median"} for median survival
+times (equivalent to \code{type = "quantile"} with \code{quantiles = 0.5}), \code{"rmst"}
+for restricted mean survival times, or \code{"link"} for the linear predictor.
+For \code{type = "survival"}, \code{"hazard"} or \code{"cumhaz"}, predictions are given at
+the times specified by \code{times} or at the event/censoring times in the
+network if \code{times = NULL}. For \code{type = "rmst"}, the restricted time horizon
+is specified by \code{times}, or if \code{times = NULL} the earliest last follow-up
+time amongst the studies in the network is used. When \code{level = "aggregate"}, these all correspond to the standardised survival function
+(see details).}
 
 \item{level}{The level at which predictions are produced, either
 \code{"aggregate"} (the default), or \code{"individual"}. If \code{baseline} is not
@@ -82,14 +120,19 @@ studies in the network if \code{level} is \code{"aggregate"}.}
 
 \item{baseline_type}{When a \code{baseline} distribution is given, specifies
 whether this corresponds to the \code{"link"} scale (the default, e.g. log odds)
-or \code{"response"} scale (e.g. probabilities).}
+or \code{"response"} scale (e.g. probabilities). For survival models, \code{baseline}
+always corresponds to the intercept parameters in the linear predictor
+(i.e. \code{baseline_type} is always \code{"link"}).}
 
 \item{baseline_level}{When a \code{baseline} distribution is given, specifies
 whether this corresponds to an individual at the reference level of the
 covariates (\code{"individual"}, the default), or from an (unadjusted) average
 outcome on the reference treatment in the \code{newdata} population
 (\code{"aggregate"}). Ignored for AgD NMA, since the only option is
-\code{"aggregate"} in this instance.}
+\code{"aggregate"} in this instance. For survival models, \code{baseline} always
+corresponds to the intercept parameters in the linear predictor (i.e.
+\code{baseline_level} is \code{"individual"} for IPD NMA or ML-NMR, and \code{"aggregate"}
+for AgD NMA).}
 
 \item{probs}{Numeric vector of quantiles of interest to present in computed
 summary, default \code{c(0.025, 0.25, 0.5, 0.75, 0.975)}}
@@ -99,6 +142,36 @@ fitted, should the predictive distribution for absolute effects in a new
 study be returned? Default \code{FALSE}.}
 
 \item{summary}{Logical, calculate posterior summaries? Default \code{TRUE}.}
+
+\item{times}{A numeric vector of times to evaluate predictions at.
+Alternatively, if \code{newdata} is specified, \code{times} can be the name of a
+column in \code{newdata} which contains the times. If \code{NULL} (the default) then
+predictions are made at the event/censoring times from the studies included
+in the network (or according to \code{times_seq}). Only used if \code{type} is
+\code{"survival"}, \code{"hazard"}, \code{"cumhaz"} or \code{"rmst"}.}
+
+\item{aux}{An optional \code{\link[=distr]{distr()}} distribution for the auxiliary parameter(s)
+in the baseline hazard (e.g. shapes). Can also be a character string naming
+a study in the network to take the estimated auxiliary parameter
+distribution from. If \code{NULL}, predictions are produced using the parameter
+estimates for each study in the network with IPD or arm-based AgD.
+
+For regression models, this may be a list of \code{\link[=distr]{distr()}} distributions (or
+study names in the network to use the auxiliary parameters from) of the
+same length as the number of studies in \code{newdata}, possibly named by the
+study names or otherwise in order of appearance in \code{newdata}.}
+
+\item{quantiles}{A numeric vector of quantiles of the survival time
+distribution to produce estimates for when \code{type = "quantile"}.}
+
+\item{times_seq}{A positive integer, when specified evaluate predictions at
+this many evenly-spaced event times between 0 and the latest follow-up time
+in each study, instead of every observed event/censoring time. Only used if
+\code{newdata = NULL} and \code{type} is \code{"survival"}, \code{"hazard"} or \code{"cumhaz"}. This
+can be useful for plotting survival or (cumulative) hazard curves, where
+prediction at every observed even/censoring time is unnecessary and can be
+slow. When a call from within \code{plot()} is detected, e.g. like
+\code{plot(predict(fit, type = "survival"))}, \code{times_seq} will default to 50.}
 }
 \value{
 A \link{nma_summary} object if \code{summary = TRUE}, otherwise a list
@@ -108,8 +181,74 @@ frame of study information.
 \description{
 Obtain predictions of absolute effects from NMA models fitted with \code{\link[=nma]{nma()}}.
 For example, if a model is fitted to binary data with a logit link, predicted
-outcome probabilities or log odds can be produced.
+outcome probabilities or log odds can be produced. For survival models,
+predictions can be made for survival probabilities, (cumulative) hazards,
+(restricted) mean survival times, and quantiles including median survival
+times.
+When an IPD NMA or ML-NMR model has been fitted, predictions can be
+produced either at an individual level or at an aggregate level.
+Aggregate-level predictions are population-average absolute effects; these
+are marginalised or standardised over a population. For example, average
+event probabilities from a logistic regression, or marginal (standardised)
+survival probabilities from a survival model.
 }
+\section{Aggregate-level predictions from IPD NMA and ML-NMR models}{
+Population-average absolute effects can be produced from IPD NMA and ML-NMR
+models with \code{level = "aggregate"}. Predictions are averaged over the target
+population (i.e. standardised/marginalised), either by (numerical)
+integration over the joint covariate distribution (for AgD studies in the
+network for ML-NMR, or AgD \code{newdata} with integration points created by
+\code{\link[=add_integration]{add_integration()}}), or by averaging predictions for a sample of individuals
+(for IPD studies in the network for IPD NMA/ML-NMR, or IPD \code{newdata}).
+
+For example, with a binary outcome, the population-average event
+probabilities on treatment \eqn{k} in study/population \eqn{j} are
+\deqn{\bar{p}_{jk} = \int_\mathfrak{X} p_{jk}(\mathbf{x}) f_{jk}(\mathbf{x})
+d\mathbf{x}}
+for a joint covariate distribution \eqn{f_{jk}(\mathbf{x})} with
+support \eqn{\mathfrak{X}} or
+\deqn{\bar{p}_{jk} = \sum_i p_{jk}(\mathbf{x}_i)}
+for a sample of individuals with covariates \eqn{\mathbf{x}_i}.
+
+Population-average absolute predictions follow similarly for other types of
+outcomes, however for survival outcomes there are specific considerations.
+\subsection{Standardised survival predictions}{
+
+Different types of population-average survival predictions, often called
+standardised survival predictions, follow from the \strong{standardised survival
+function} created by integrating (or equivalently averaging) the
+individual-level survival functions at each time \eqn{t}:
+\deqn{\bar{S}_{jk}(t) = \int_\mathfrak{X} S_{jk}(t | \mathbf{x}) f_{jk}(\mathbf{x})
+d\mathbf{x}}
+which is itself produced using \code{type = "survival"}.
+
+The \strong{standardised hazard function} corresponding to this standardised
+survival function is a weighted average of the individual-level hazard
+functions
+\deqn{\bar{h}_{jk}(t) = \frac{\int_\mathfrak{X} S_{jk}(t | \mathbf{x}) h_{jk}(t | \mathbf{x}) f_{jk}(\mathbf{x})
+d\mathbf{x} }{\bar{S}_{jk}(t)}}
+weighted by the probability of surviving to time \eqn{t}. This is produced
+using \code{type = "hazard"}.
+
+The corresponding \strong{standardised cumulative hazard function} is
+\deqn{\bar{H}_{jk}(t) = -\log(\bar{S}_{jk}(t))}
+and is produced using \code{type = "cumhaz"}.
+
+\strong{Quantiles and medians} of the standardised survival times are found by
+solving
+\deqn{\bar{S}_{jk}(t) = 1-\alpha}
+for the \eqn{\alpha\%} quantile, using numerical root finding. These are
+produced using \code{type = "quantile"} or \code{"median"}.
+
+\strong{(Restricted) means} of the standardised survival times are found by
+integrating
+\deqn{\mathrm{RMST}_{jk}(t^*) = \int_0^{t^*} \bar{S}_{jk}(t) dt}
+up to the restricted time horizon \eqn{t^*}, with \eqn{t^*=\infty} for mean
+standardised survival time. These are produced using \code{type = "rmst"} or
+\code{"mean"}.
+}
+}
+
 \examples{
 ## Smoking cessation
 \donttest{
@@ -176,7 +315,7 @@ new_agd_int <- add_integration(new_agd_int,
                                weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
                                psa = distr(qbern, prob = psa),
                                cor = pso_net$int_cor,
-                               n_int = 1000)
+                               n_int = 64)
 
 # Predicted probabilities of achieving PASI 75 in this target population, given
 # a Normal(-1.75, 0.08^2) distribution on the baseline probit-probability of
@@ -186,6 +325,44 @@ new_agd_int <- add_integration(new_agd_int,
                          newdata = new_agd_int,
                          baseline = distr(qnorm, -1.75, 0.08)))
 plot(pso_pred_new, ref_line = c(0, 1))
+}
+
+## Progression free survival with newly-diagnosed multiple myeloma
+\donttest{
+# Run newly-diagnosed multiple myeloma example if not already available
+if (!exists("ndmm_fit")) example("example_ndmm", run.donttest = TRUE)
+}
+\donttest{
+# We can produce a range of predictions from models with survival outcomes,
+# chosen with the type argument to predict
+
+# Predicted survival probabilities at 5 years
+predict(ndmm_fit, type = "survival", times = 5)
+
+# Survival curves
+plot(predict(ndmm_fit, type = "survival"))
+
+# Hazard curves
+# Here we specify a vector of times to avoid attempting to plot infinite
+# hazards for some studies at t=0
+plot(predict(ndmm_fit, type = "hazard", times = seq(0.001, 6, length.out = 50)))
+
+# Cumulative hazard curves
+plot(predict(ndmm_fit, type = "cumhaz"))
+
+# Survival time quantiles and median survival
+predict(ndmm_fit, type = "quantile", quantiles = c(0.2, 0.5, 0.8))
+plot(predict(ndmm_fit, type = "median"))
+
+# Mean survival time
+predict(ndmm_fit, type = "mean")
+
+# Restricted mean survival time
+# By default, the time horizon is the shortest follow-up time in the network
+predict(ndmm_fit, type = "rmst")
+
+# An alternative restriction time can be set using the times argument
+predict(ndmm_fit, type = "rmst", times = 5)  # 5-year RMST
 }
 }
 \seealso{

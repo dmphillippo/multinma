@@ -69,12 +69,15 @@ bcg_fit_unadj <- nma(bcg_net,
                      prior_het = half_normal(scale = 5))
 ```
 ```{r, echo = FALSE}
-bcg_fit_unadj <- nma(bcg_net, 
-                     seed = 14308133,
-                     trt_effects = "random",
-                     prior_intercept = normal(scale = 100),
-                     prior_trt = normal(scale = 100),
-                     prior_het = half_normal(scale = 5))
+bcg_fit_unadj <- nowarn_on_ci(
+  nma(bcg_net, 
+      seed = 14308133,
+      iter = 10000,
+      trt_effects = "random",
+      prior_intercept = normal(scale = 100),
+      prior_trt = normal(scale = 100),
+      prior_het = half_normal(scale = 5))
+  )
 ```
 
 Basic parameter summaries are given by the `print()` method:
@@ -120,6 +123,7 @@ bcg_fit_lat <- nma(bcg_net,
 bcg_fit_lat <- nowarn_on_ci(
                  nma(bcg_net, 
                      seed = 1932599147,
+                     iter = 5000,
                      trt_effects = "random",
                      regression = ~.trt:latitude,
                      prior_intercept = normal(scale = 100),
@@ -366,5 +370,16 @@ test_that("Relative effects and predict work with data.frame", {
                            baseline = distr(qcons, -2)),
                    predict(bcg_fit_lat, newdata = as.data.frame(new), study = label,
                            baseline = distr(qcons, -2)))
+})
+
+test_that("Predictions using network baselines are correct", {
+  pred_all <- predict(bcg_fit_lat, type = "response")
+  pred_12 <- predict(bcg_fit_lat, type = "response", 
+                     baseline = list("1" = "1", "2" = "2"),
+                     newdata = subset(bcg_vaccine, studyn %in% 1:2),
+                     study = studyn)
+  
+  expect_equal(unclass(as.array(pred_12)),
+               as.array(pred_all)[ , , 1:4])
 })
 ```

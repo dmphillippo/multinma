@@ -8,10 +8,10 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
 
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
@@ -53,7 +53,7 @@ diet_fit_FE <- nma(diet_net,
 diet_fit_FE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(diet_fit_FE, pars = c("d", "mu"))
 
@@ -67,14 +67,14 @@ summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## diet_fit_RE <- nma(diet_net,
 ##                    trt_effects = "random",
 ##                    prior_intercept = normal(scale = 10),
 ##                    prior_trt = normal(scale = 10),
 ##                    prior_het = half_normal(scale = 5))
 
-## ---- echo=FALSE, warning=FALSE-------------------------------------------------------------------
+## ----echo=FALSE, warning=FALSE--------------------------------------------------------------------
 diet_fit_RE <- nowarn_on_ci(
                  nma(diet_net, 
                      trt_effects = "random",
@@ -88,7 +88,7 @@ diet_fit_RE <- nowarn_on_ci(
 diet_fit_RE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(diet_fit_RE, pars = c("d", "mu", "delta"))
 
@@ -206,4 +206,16 @@ test_that("RE predicted probabilities", {
   expect_equivalent(diet_pred_RE$`50%`, c(0.05, 0.05), tolerance = tol_dic)
   expect_equivalent(diet_pred_RE$`97.5%`, c(0.18, 0.18), tolerance = tol_dic)
 })
+
+# Predictions specifying study for baseline
+test_that("Specifying study for baseline gives correct result", {
+  pred_FE_DART <- predict(diet_fit_FE, type = "response", baseline = "DART")
+  expect_identical(c(as.array(pred_FE_DART)),
+                   c(as.array(pred_FE_studies)[ , , 1:2]))
+})
+
+
+# Force clean up
+rm(list = ls())
+gc()
 

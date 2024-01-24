@@ -209,11 +209,33 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
                 sep = "\n"))
 
       if (has_agd_arm(x$network)) {
-        if (inherits(x$network, "mlnmr_data")) {
-          dat_agd_arm <- .unnest_integration(x$network$agd_arm) %>%
-            dplyr::mutate(.sample_size = .data$.sample_size / x$network$n_int)
+        if (x$network$outcome$agd_arm != "survival") {
+          if (inherits(x$network, "mlnmr_data")) {
+            dat_agd_arm <- .unnest_integration(x$network$agd_arm) %>%
+              dplyr::mutate(.sample_size = .data$.sample_size / x$network$n_int)
+          } else {
+            dat_agd_arm <- x$network$agd_arm
+          }
         } else {
-          dat_agd_arm <- x$network$agd_arm
+          # For survival outcomes, check if we need to access .data_orig
+          if (any(rlang::has_name(x$agd_arm$.data_orig, all.vars(x$regression)))) {
+            dat_agd_arm <- x$network$agd_arm %>%
+              # Drop duplicated names in outer dataset from .data_orig before unnesting
+              dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(x$network$agd_arm)))),
+                            # Reset sample size for weighted mean later
+                            .sample_size = 1) %>%
+              # Unnest .data_orig
+              tidyr::unnest(cols = c(".Surv", ".data_orig"))
+          } else {
+            # Drop nested .Surv column, breaks join with ipd
+            dat_agd_arm <- dplyr::select(x$network$agd_arm, -.data$.Surv)
+          }
+
+          # Unnest integration points if present
+          if (inherits(x$network, "mlnmr_data")) {
+            dat_agd_arm <- .unnest_integration(dat_agd_arm) %>%
+              dplyr::mutate(.sample_size = .data$.sample_size / x$network$n_int)
+          }
         }
 
         # Only take necessary columns
@@ -577,8 +599,14 @@ tcrossprod_mcmc_array <- function(a, x) {
 
   nchains <- dim(a)[2]
 
-  for (i in 1:nchains) {
-    out[ , i, ] <- tcrossprod(a[ , i, ], x)
+  if (inherits(x, "Matrix")) {
+    for (i in 1:nchains) {
+      out[ , i, ] <- as.matrix(Matrix::tcrossprod(a[ , i, ], x))
+    }
+  } else {
+    for (i in 1:nchains) {
+      out[ , i, ] <- tcrossprod(a[ , i, ], x)
+    }
   }
 
   dimnames(out) <- dimnames_out

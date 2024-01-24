@@ -8,10 +8,10 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
 
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
@@ -68,7 +68,7 @@ pso_fit_FE <- nma(pso_net,
 pso_fit_FE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(pso_fit_FE, pars = c("d", "mu", "cc"))
 
@@ -87,7 +87,7 @@ summary(normal(scale = 100))
 summary(half_normal(scale = 2.5))
 
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 ## pso_fit_RE <- nma(pso_net,
 ##                   trt_effects = "random",
 ##                   link = "probit",
@@ -97,7 +97,7 @@ summary(half_normal(scale = 2.5))
 ##                   prior_het = half_normal(scale = 2.5),
 ##                   adapt_delta = 0.99)
 
-## ---- echo = FALSE, warning = FALSE---------------------------------------------------------------
+## ----echo = FALSE, warning = FALSE----------------------------------------------------------------
 pso_fit_RE <- nowarn_on_ci(nma(pso_net, 
                   trt_effects = "random",
                   link = "probit",
@@ -114,7 +114,7 @@ pso_fit_RE <- nowarn_on_ci(nma(pso_net,
 pso_fit_RE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(pso_fit_RE, pars = c("d", "cc", "mu", "delta"))
 
@@ -382,4 +382,9 @@ test_that("RE predicted probabilities (Beta distribution)", {
                pred_RE_beta[c("mean", "sd", "2.5%", "50%", "97.5%")],
                tolerance = tol)
 })
+
+
+# Force clean up
+rm(list = ls())
+gc()
 

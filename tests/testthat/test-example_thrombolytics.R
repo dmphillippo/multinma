@@ -8,10 +8,10 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
 
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
@@ -35,7 +35,7 @@ thrombo_net <- set_agd_arm(thrombolytics,
                            n = n)
 thrombo_net
 
-## ---- include=FALSE, eval=params$run_tests--------------------------------------------------------
+## ----include=FALSE, eval=params$run_tests---------------------------------------------------------
 # Make trtf factor to order treatments in same way as Dias analysis - needed to
 # recreate inconsistency analyses
 trts <- dplyr::distinct(thrombolytics, trtn, trtc)
@@ -48,7 +48,7 @@ thrombo_net2 <- set_agd_arm(thrombolytics,
                             n = n)
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## plot(thrombo_net, weight_edges = TRUE, weight_nodes = TRUE)
 
 ## ----thrombo_net_plot, echo=FALSE-----------------------------------------------------------------
@@ -70,7 +70,7 @@ thrombo_fit <- nma(thrombo_net,
 thrombo_fit
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(thrombo_fit, pars = c("d", "mu"))
 
@@ -105,14 +105,14 @@ dic_consistency
 plot(dic_consistency, dic_ume, show_uncertainty = FALSE)
 
 
-## ---- eval=!params$run_tests----------------------------------------------------------------------
+## ----eval=!params$run_tests-----------------------------------------------------------------------
 ## thrombo_nodesplit <- nma(thrombo_net,
 ##                          consistency = "nodesplit",
 ##                          trt_effects = "fixed",
 ##                          prior_intercept = normal(scale = 100),
 ##                          prior_trt = normal(scale = 100))
 
-## ---- include=FALSE, eval=params$run_tests--------------------------------------------------------
+## ----include=FALSE, eval=params$run_tests---------------------------------------------------------
 # Run node-splits with treatments ordered as per Dias
 thrombo_nodesplit <- nma(thrombo_net2, 
                          consistency = "nodesplit",
@@ -365,4 +365,9 @@ test_that("Node-splitting DIC", {
   expect_equal(thrombo_nodesplit_dic$resdev, dias2010_nodesplit_dic$resdev, tolerance = tol_dic)
   expect_equal(thrombo_nodesplit_dic$pd, dias2010_nodesplit_dic$pd, tolerance = tol_dic)
 })
+
+
+# Force clean up
+rm(list = ls())
+gc()
 

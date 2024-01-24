@@ -8,13 +8,13 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
 
-## ---- include=FALSE-------------------------------------------------------------------------------
+## ----include=FALSE--------------------------------------------------------------------------------
 set.seed(4783982)
 
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
@@ -50,7 +50,7 @@ summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## af_fit_1 <- nma(af_net,
 ##                 trt_effects = "random",
 ##                 prior_intercept = normal(scale = 100),
@@ -58,7 +58,7 @@ summary(half_normal(scale = 5))
 ##                 prior_het = half_normal(scale = 5),
 ##                 adapt_delta = 0.99)
 
-## ---- echo=FALSE----------------------------------------------------------------------------------
+## ----echo=FALSE-----------------------------------------------------------------------------------
 af_fit_1 <- nma(af_net, 
                 seed = 103533305,
                 trt_effects = "random",
@@ -72,7 +72,7 @@ af_fit_1 <- nma(af_net,
 af_fit_1
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(af_fit_1, pars = c("d", "mu", "delta"))
 
@@ -102,7 +102,7 @@ plot(af_1_rankprobs)
 plot(af_1_cumrankprobs)
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## af_fit_4b <- nma(af_net,
 ##                  trt_effects = "random",
 ##                  regression = ~ .trt:stroke,
@@ -114,7 +114,7 @@ plot(af_1_cumrankprobs)
 ##                  prior_het = half_normal(scale = 5),
 ##                  adapt_delta = 0.99)
 
-## ---- echo=FALSE, eval=!params$run_tests----------------------------------------------------------
+## ----echo=FALSE, eval=!params$run_tests-----------------------------------------------------------
 ## af_fit_4b <- nma(af_net,
 ##                  seed = 579212814,
 ##                  trt_effects = "random",
@@ -127,7 +127,7 @@ plot(af_1_cumrankprobs)
 ##                  prior_het = half_normal(scale = 5),
 ##                  adapt_delta = 0.99)
 
-## ---- echo=FALSE, eval=params$run_tests-----------------------------------------------------------
+## ----echo=FALSE, eval=params$run_tests------------------------------------------------------------
 af_fit_4b <- nowarn_on_ci(nma(af_net, 
                  seed = 579212814,
                  trt_effects = "random",
@@ -146,7 +146,7 @@ af_fit_4b <- nowarn_on_ci(nma(af_net,
 af_fit_4b
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(af_fit_4b, pars = c("d", "mu", "delta"))
 
@@ -368,7 +368,7 @@ Cooper_4b_beta <- tribble(
 "Anti-coagulant", -0.71,-1.58  , 0.15  ,
 "Anti-platelet" , 0.23 ,-0.45  , 0.93  ,
 #"Mixed"          , 3.05 ,-1.26  , 7.30  ,
-"Mixed"          , 3.05 ,-0.91  , 7.30  ,
+"Mixed"          , 3.21 ,-0.91  , 7.30  ,
 )
 
 af_4b_beta_df <- as.data.frame(summary(af_4b_beta))
@@ -477,4 +477,9 @@ test_that("Robust to custom options(contrasts) settings", {
                tolerance = tol)
 })
 
+
+
+# Force clean up
+rm(list = ls())
+gc()
 

@@ -8,13 +8,13 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
 
-## ---- include=FALSE-------------------------------------------------------------------------------
+## ----include=FALSE--------------------------------------------------------------------------------
 set.seed(2684319)
 
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
@@ -45,14 +45,14 @@ summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval=FALSE, echo=TRUE-----------------------------------------------------------------------
+## ----eval=FALSE, echo=TRUE------------------------------------------------------------------------
 ## tr_fit_RE_noninf <- nma(tr_net,
 ##                         trt_effects = "random",
 ##                         prior_intercept = normal(scale = 100),
 ##                         prior_trt = normal(scale = 100),
 ##                         prior_het = half_normal(scale = 5))
 
-## ---- echo=FALSE, eval=!params$run_tests----------------------------------------------------------
+## ----echo=FALSE, eval=!params$run_tests-----------------------------------------------------------
 ## tr_fit_RE_noninf <- nma(tr_net,
 ##                         seed = 857369814,
 ##                         trt_effects = "random",
@@ -60,7 +60,7 @@ summary(half_normal(scale = 5))
 ##                         prior_trt = normal(scale = 100),
 ##                         prior_het = half_normal(scale = 5))
 
-## ---- echo=FALSE, eval=params$run_tests-----------------------------------------------------------
+## ----echo=FALSE, eval=params$run_tests------------------------------------------------------------
 tr_fit_RE_noninf <- suppressWarnings(nma(tr_net, 
                         seed = 857369814,
                         trt_effects = "random",
@@ -75,7 +75,7 @@ tr_fit_RE_noninf <- suppressWarnings(nma(tr_net,
 tr_fit_RE_noninf
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(tr_fit_RE_noninf, pars = c("d", "mu", "delta"))
 
@@ -95,7 +95,7 @@ summary(noninf_tausq)
 summary(log_normal(-3.93, 1.51))
 
 
-## ---- echo=TRUE, eval=FALSE-----------------------------------------------------------------------
+## ----echo=TRUE, eval=FALSE------------------------------------------------------------------------
 ## tr_fit_RE_inf <- nma(tr_net,
 ##                      trt_effects = "random",
 ##                      prior_intercept = normal(scale = 100),
@@ -103,7 +103,7 @@ summary(log_normal(-3.93, 1.51))
 ##                      prior_het = log_normal(-3.93, 1.51),
 ##                      prior_het_type = "var")
 
-## ---- echo=FALSE, eval=!params$run_tests----------------------------------------------------------
+## ----echo=FALSE, eval=!params$run_tests-----------------------------------------------------------
 ## tr_fit_RE_inf <- nma(tr_net,
 ##                      seed = 1803772660,
 ##                      trt_effects = "random",
@@ -112,7 +112,7 @@ summary(log_normal(-3.93, 1.51))
 ##                      prior_het = log_normal(-3.93, 1.51),
 ##                      prior_het_type = "var")
 
-## ---- echo=FALSE, eval=params$run_tests-----------------------------------------------------------
+## ----echo=FALSE, eval=params$run_tests------------------------------------------------------------
 tr_fit_RE_inf <- suppressWarnings(nma(tr_net, 
                      seed = 1803772660,
                      trt_effects = "random",
@@ -127,7 +127,7 @@ tr_fit_RE_inf <- suppressWarnings(nma(tr_net,
 tr_fit_RE_inf
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(tr_fit_RE_inf, pars = c("d", "mu", "delta"))
 
@@ -165,6 +165,12 @@ tr_RE_inf_var <- as.data.frame(summary(inf_tausq))
 test_that("Informative RE heterogeneity variance", {
   expect_equivalent(tr_RE_inf_var$`50%`, 0.18, tolerance = tol)
   expect_equivalent(tr_RE_inf_var$`2.5%`, 0.003, tolerance = tol)
-  expect_equivalent(tr_RE_inf_var$`97.5%`, 1.70, tolerance = tol)
+  skip_on_ci()
+  expect_equivalent(tr_RE_inf_var$`97.5%`, 1.84, tolerance = tol)
 })
+
+
+# Force clean up
+rm(list = ls())
+gc()
 

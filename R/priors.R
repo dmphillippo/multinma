@@ -180,6 +180,7 @@ new_nma_prior <- function(dist, location = NA_real_, scale = NA_real_, df = NA_r
   return(o)
 }
 
+
 #' Produce tidy prior details
 #'
 #' Produces prior details in a data frame, in a suitable format for
@@ -187,10 +188,11 @@ new_nma_prior <- function(dist, location = NA_real_, scale = NA_real_, df = NA_r
 #'
 #' @param prior A nma_prior object
 #' @param trunc Optional vector of truncation limits
+#' @param ... Not used
 #'
 #' @return A data frame
 #' @noRd
-get_tidy_prior <- function(prior, trunc = NULL) {
+get_tidy_prior <- function(prior, trunc = NULL, ...) {
   if (!inherits(prior, "nma_prior"))
     abort("Not a `nma_prior` object.")
   if (!is.null(trunc) && (!rlang::is_double(trunc, n = 2) || trunc[2] <= trunc[1]))
@@ -267,6 +269,13 @@ get_tidy_prior <- function(prior, trunc = NULL) {
 #' @return String giving call to construct x
 #' @noRd
 get_prior_call <- function(x) {
+  # Deal with lists of priors
+  if (all(purrr::map_lgl(x, ~inherits(., "nma_prior")))) {
+    out <- purrr::imap_chr(x, ~paste0(.y, " = ", get_prior_call(.x)))
+    out <- paste0("list(", paste(out, collapse = ", "), ")")
+    return(out)
+  }
+
   if (!inherits(x, "nma_prior"))
     abort("Not a `nma_prior` object.")
 

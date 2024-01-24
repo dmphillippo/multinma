@@ -2,9 +2,9 @@
 #'
 #' The `nma_data` class contains the data for a NMA in a standard format,
 #' created using the functions [set_ipd()], [set_agd_arm()],
-#' [set_agd_contrast()], or [combine_network()]. The sub-class `mlnmr_data` is
-#' created by the function [add_integration()], and further contains numerical
-#' integration points for the aggregate data.
+#' [set_agd_contrast()], [set_agd_surv()], or [combine_network()]. The sub-class
+#' `mlnmr_data` is created by the function [add_integration()], and further
+#' contains numerical integration points for the aggregate data.
 #'
 #' @rdname nma_data-class
 #' @name nma_data-class
@@ -34,7 +34,8 @@
 #'   \item{`.r`}{event count (discrete)}
 #'   \item{`.n`}{event count denominator (discrete, `agd_arm` only)}
 #'   \item{`.E`}{time at risk (discrete)}
-##'   \item{`.surv`}{event/censoring time, of type `Surv` (time-to-event)}
+#'   \item{`.Surv`}{survival outcome of type [`Surv`] (time-to-event), nested by
+#'   study arm}
 #'   \item{`.sample_size`}{sample size (`agd_*` only)}
 #'   \item{`...`}{other columns (typically covariates) from the original data
 #'   frame}
@@ -58,7 +59,8 @@ NULL
 #' Print `nma_data` objects
 #'
 #' Print details of networks stored as [nma_data] objects, as created by
-#' [set_ipd()], [set_agd_arm()], [set_agd_contrast()], or [combine_network()].
+#' [set_ipd()], [set_agd_arm()], [set_agd_contrast()], [set_agd_surv()], or
+#' [combine_network()].
 #'
 #' @param x `nma_data` object
 #' @param ... other options (not used)
@@ -355,6 +357,10 @@ as_tbl_graph.nma_data <- function(x, ...) {
 #'
 #' @noRd
 make_contrasts <- function(trt) {
+  if (length(trt) < 2) {
+    return(dplyr::tibble(.trt = trt, .trt_b = trt))
+  }
+
   contrs <- utils::combn(sort(trt), 2)
   return(dplyr::tibble(.trt = contrs[2,],
                        .trt_b = contrs[1,]))
@@ -379,17 +385,33 @@ get_default_trt_ref <- function(network, ...) {
     abort("Empty network.")
   }
 
-  # g_c <- igraph::as.igraph(x)
+  # Prefer longer follow-up for survival outcomes
+  surv_dat <- dplyr::bind_rows(
+    if (identical(network$outcome$ipd, "survival")) dplyr::select(network$ipd, ".trt", ".Surv") else NULL,
+    if (identical(network$outcome$agd_arm, "survival")) tidyr::unnest(network$agd_arm, cols = ".Surv") %>% dplyr::select(".trt", ".Surv") else NULL
+  )
+
+  if (nrow(surv_dat) < 1) {
+    max_fu <- 0
+  } else {
+    max_fu <- dplyr::mutate(surv_dat, !!! get_Surv_data(surv_dat$.Surv)) %>%
+      dplyr::group_by(.data$.trt) %>%
+      dplyr::summarise(max_fu = max(.data$time)) %>%
+      dplyr::pull("max_fu")
+  }
+
   g_nc <- igraph::as.igraph(network, collapse = FALSE)
 
   nodes <-
     tibble::tibble(
       .trt = network$treatments,
       degree = igraph::degree(g_nc),
-      betweenness = igraph::betweenness(g_nc)
+      betweenness = igraph::betweenness(g_nc),
+      max_fu = max_fu
     ) %>%
     dplyr::arrange(dplyr::desc(.data$degree),
                    dplyr::desc(.data$betweenness),
+                   dplyr::desc(.data$max_fu),
                    .data$.trt)
 
   return(as.character(nodes[[1, ".trt"]]))
@@ -627,9 +649,9 @@ has_indirect <- function(network, trt1, trt2) {
 
   # Create network with studies on both trt1 and trt2 removed
   studies <- dplyr::bind_rows(
-    network$agd_arm,
+    if (identical(network$outcome$agd_arm, "survival")) dplyr::select(network$agd_arm, -.data$.Surv) else network$agd_arm,
     network$agd_contrast,
-    network$ipd
+    if (identical(network$outcome$ipd, "survival")) dplyr::select(network$ipd, -.data$.Surv) else network$ipd
   ) %>%
     dplyr::distinct(.data$.study, .data$.trt)
 
@@ -790,7 +812,7 @@ plot.nma_data <- function(x, ..., layout, circular,
     if (nudge == 0) {
       pos <- ggplot2::position_identity()
     } else {
-      if (circular || layout %in% c("circle", "star")) {
+      if (circular || (rlang::is_string(layout) && layout %in% c("circle", "star"))) {
         pos <- ggplot2::position_nudge(x = nudge * g$data$x,
                                        y = nudge * g$data$y)
       } else {

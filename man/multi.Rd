@@ -11,7 +11,8 @@ multi(..., inclusive = FALSE, type = c("ordered", "competing"))
 Argument names (optional) will be used to label the categories.}
 
 \item{inclusive}{Logical, are ordered category counts inclusive (\code{TRUE}) or
-exclusive (\code{FALSE})? Default \code{FALSE}. Only used when \code{ordered = TRUE}. See details.}
+exclusive (\code{FALSE})? Default \code{FALSE}. Only used when \code{type = "ordered"}.
+See details.}
 
 \item{type}{String, indicating whether categories are \code{"ordered"} or
 \code{"competing"}. Currently only ordered categorical outcomes are supported by

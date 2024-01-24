@@ -16,6 +16,7 @@ if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) { # Se
     fig.width = 6,
     fig.height = 4.5,
     fig.align = "center",
+    fig.cap = "",
     pngquant = '--speed 4 --nofs'
   )
   options(width = 100)
@@ -25,10 +26,12 @@ if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) { # Se
 
   # Write vignette details to asis file for precompiled vignettes
   if (!rlang::has_name(rmarkdown::metadata, "vignette")) {
-    .asis <- paste0(gsub("\\.Rmd$", "", knitr::current_input()), ".html.asis")
+    .asis <- paste0(gsub("\\.Rmd(\\.orig)?$", "", knitr::current_input()), ".html.asis")
     file.create(.asis)
+    vig_title <- rmarkdown::metadata$title
+    if (is.null(vig_title)) vig_title <- rmarkdown::yaml_front_matter(knitr::current_input())$title
     cat(
-      paste0("%\\VignetteIndexEntry{", rmarkdown::metadata$title, "}"),
+      paste0("%\\VignetteIndexEntry{", vig_title, "}"),
       "%\\VignetteEngine{R.rsp::asis}",
       "%\\VignetteEncoding{UTF-8}",
       sep = "\n",

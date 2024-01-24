@@ -1,3 +1,80 @@
+# multinma 0.6.0
+
+## Feature: Survival/time-to-event models are now supported
+
+* `set_ipd()` now has a `Surv` argument for specifying survival outcomes using 
+`survival::Surv()`, and a new function `set_agd_surv()` sets up aggregate data 
+in the form of event/censoring times (e.g. from digitized Kaplan-Meier curves) 
+and overall covariate summaries.
+* Left, right, and interval censoring as well as left truncation (delayed entry)
+are all supported.
+* The available likelihoods are Exponential (PH and AFT forms), Weibull (PH and 
+AFT forms), Gompertz, log-Normal, log-Logistic, Gamma, Generalised Gamma, 
+flexible M-splines on the baseline hazard, and piecewise exponential hazards.
+* Auxiliary parameters (e.g. shapes, spline coefficients) are always stratified 
+by study to respect randomisation, and may be further stratified by treatment
+(e.g. to relax the proportional hazards assumption) and/or by additional factors
+using the `aux_by` argument to `nma()`.
+* A regression model may be defined for the auxiliary parameters using the 
+`aux_regression` argument to `nma()`, allowing non-proportionality to be 
+modelled by treatment and/or covariate effects on the shapes or spline 
+coefficients.
+* The `predict()` method produces estimates of survival probabilities, hazards, 
+cumulative hazards, mean survival times, restricted mean survival times, 
+quantiles of the survival time distribution, and median survival times. All of
+these predictions can be plotted using the `plot()` method.
+* The `geom_km()` function assists in plotting Kaplan-Meier curves from a 
+network object, for example to overlay these on estimated survival curves. The 
+`transform` argument can be used to produce log-log plots for assessing the 
+proportional hazards assumption, along with cumulative hazards or log survival 
+curves.
+* A new vignette demonstrates ML-NMR survival analysis with an example of 
+progression-free survival after autologous stem cell transplant for newly 
+diagnosed multiple myeloma, with corresponding datasets `ndmm_ipd`, `ndmm_agd`,
+and `ndmm_agd_covs`.
+
+## Feature: Automatic checking of numerical integration for ML-NMR models
+
+* The accuracy of numerical integration for ML-NMR models can now be checked 
+automatically, and is by default. To do so, half of the chains are run with 
+`n_int` and half with `n_int/2` integration points. Any Rhat or effective sample 
+size warnings can then be ascribed to either: non-convergence of the MCMC 
+chains, requiring increased number of iterations `iter` in `nma()`, or; 
+insufficient accuracy of numerical integration, requiring increased number of 
+integration points `n_int` in `add_integration()`. Descriptive warning messages 
+indicate which is the case.
+* This feature is controlled by a new `int_check` argument to `nma()`, which is 
+enabled (`TRUE`) by default.
+* Saving thinned cumulative integration points can now be disabled with 
+`int_thin = 0`, and is now disabled by default. The previous default was
+`int_thin = max(n_int %/% 10, 1)`.
+* Because we can now check sufficient accuracy automatically, the default number 
+of integration points `n_int` in `add_integration()` has been lowered to 64.
+This is still a conservative choice, and will be sufficient in many cases; the 
+previous default of 1000 was excessive.
+* As a result, ML-NMR models are now much faster to run by default, both due to 
+lower `n_int` and disabling saving cumulative integration points.
+
+## Other updates
+
+* Feature: `dic()` now includes an option to use the pV penalty instead of pD.
+* Feature: The `baseline` and `aux` arguments to `predict()` can now be 
+specified as the name of a study in the network, to use the parameter estimates 
+from that study for prediction.
+* Improvement: `predict()` will now produce aggregate-level predictions over a
+sample of individuals in `newdata` for ML-NMR models (previously `newdata` had
+to include integration points).
+* Improvement: Compatibility with future rstan versions (PR #25).
+* Improvement: Added a `plot.mcmc_array()` method, as a shortcut for 
+`plot(summary(x), ...)`.
+* Fix: In `plot.nma_data()`, using a custom `layout` that is not a string (e.g. 
+a data frame of layout coordinates) now works as expected when `nudge > 0`.
+* Fix: Documentation corrections (PR #24).
+* Fix: Added missing `as.tibble.stan_nma()` and `as_tibble.stan_nma()` methods, 
+to complement the existing `as.data.frame.stan_nma()`.
+* Fix: Bug in ordered multinomial models where data in studies with missing 
+categories could be assigned the wrong category (#28).
+
 # multinma 0.5.1
 
 * Fix: Now compatible with latest StanHeaders v2.26.25 (fixes #23)

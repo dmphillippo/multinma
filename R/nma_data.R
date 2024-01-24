@@ -4,11 +4,12 @@
 #' sources may be combined once created using [combine_network()].
 #'
 #' @template args-data_common
+#' @template args-data_y
 # #' @template args-data_rE
 #' @param r column of `data` specifying a binary outcome or Poisson outcome count
 #' @param E column of `data` specifying the total time at risk for Poisson
 #'   outcomes
-# #' @template args-data_Surv
+#' @template args-data_Surv
 #'
 #' @return An object of class [nma_data]
 #' @export
@@ -47,7 +48,7 @@ set_ipd <- function(data,
                     trt,
                     y = NULL,
                     r = NULL, E = NULL,
-                    # Surv = NULL,
+                    Surv = NULL,
                     trt_ref = NULL,
                     trt_class = NULL) {
 
@@ -91,18 +92,6 @@ set_ipd <- function(data,
     trt_original_levels <- NULL
   }
 
-  # Check for single-arm studies
-  single_arm_studies <- tibble::tibble(.study, .trt) %>%
-    dplyr::distinct(.data$.study, .data$.trt) %>%
-    dplyr::group_by(.data$.study) %>%
-    dplyr::filter(dplyr::n() == 1) %>%
-    dplyr::pull(.data$.study)
-
-  if (length(single_arm_studies)) {
-    abort(glue::glue("Single-arm studies are not supported: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
-                     glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
-  }
-
   # Treatment classes
   .trtclass <- pull_non_null(data, enquo(trt_class))
   if (!is.null(.trtclass)) {
@@ -122,7 +111,7 @@ set_ipd <- function(data,
   .y <- pull_non_null(data, enquo(y))
   .r <- pull_non_null(data, enquo(r))
   .E <- pull_non_null(data, enquo(E))
-  # .Surv <- ...
+  .Surv <- pull_non_null(data, enquo(Surv))
 
   check_outcome_continuous(.y, with_se = FALSE)
 
@@ -143,10 +132,28 @@ set_ipd <- function(data,
     check_outcome_binary(.r, .E)
   }
 
-  # check_outcome_surv(.Surv)
+  check_outcome_survival(.Surv)
 
   o_type <- get_outcome_type(y = .y, se = NULL,
-                             r = .r, n = NULL, E = .E)
+                             r = .r, n = NULL, E = .E,
+                             Surv = .Surv)
+
+  # Check for single-arm studies
+  single_arm_studies <- tibble::tibble(.study, .trt) %>%
+    dplyr::distinct(.data$.study, .data$.trt) %>%
+    dplyr::group_by(.data$.study) %>%
+    dplyr::filter(dplyr::n() == 1) %>%
+    dplyr::pull(.data$.study)
+
+  if (length(single_arm_studies)) {
+    if (o_type == "survival") {
+      inform(glue::glue("Single-arm stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} present in the network: ",
+                        glue::glue_collapse(glue::double_quote(as.character(single_arm_studies)), sep = ", ", last = " and "), "."))
+    } else {
+      abort(glue::glue("Single-arm studies are not supported: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
+                       glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
+    }
+  }
 
   # Create tibble in standard format
   d <- tibble::tibble(
@@ -189,6 +196,8 @@ set_ipd <- function(data,
     .r <- unclass(.r)
 
     d <- tibble::add_column(d, .r = .r)
+  } else if (o_type == "survival") {
+    d <- tibble::add_column(d, .Surv = .Surv)
   }
 
   drop_reserved <- setdiff(colnames(data), colnames(d))
@@ -244,9 +253,9 @@ set_ipd <- function(data,
 #' once created using [combine_network()].
 #'
 #' @template args-data_common
+#' @template args-data_y
 #' @template args-data_se
 #' @template args-data_rE
-# #' @template args-data_Surv
 #' @param n column of `data` specifying Binomial outcome numerator
 #' @param sample_size column of `data` giving the sample size in each arm.
 #'   Optional, see details.
@@ -278,7 +287,6 @@ set_agd_arm <- function(data,
                         trt,
                         y = NULL, se = NULL,
                         r = NULL, n = NULL, E = NULL,
-                        # Surv = NULL,
                         sample_size = NULL,
                         trt_ref = NULL,
                         trt_class = NULL) {
@@ -355,7 +363,6 @@ set_agd_arm <- function(data,
   .r <- pull_non_null(data, enquo(r))
   .n <- pull_non_null(data, enquo(n))
   .E <- pull_non_null(data, enquo(E))
-  # .Surv <- ...
 
   check_outcome_continuous(.y, .se, with_se = TRUE)
 
@@ -366,10 +373,9 @@ set_agd_arm <- function(data,
     check_outcome_count(.r, .n, .E)
   }
 
-  # check_outcome_surv(.Surv)
-
   o_type <- get_outcome_type(y = .y, se = .se,
-                             r = .r, n = .n, E = .E)
+                             r = .r, n = .n, E = .E,
+                             Surv = NULL)
 
   # Pull and check sample size
   .sample_size <- pull_non_null(data, enquo(sample_size))
@@ -482,6 +488,7 @@ set_agd_arm <- function(data,
 #' Multiple data sources may be combined once created using [combine_network()].
 #'
 #' @template args-data_common
+#' @template args-data_y
 #' @template args-data_se
 #' @param sample_size column of `data` giving the sample size in each arm.
 #'   Optional, see details.
@@ -645,7 +652,7 @@ set_agd_contrast <- function(data,
     append = " for non-baseline rows (i.e. those specifying contrasts against baseline).")
 
   o_type <- get_outcome_type(y = .y[!bl], se = .se[!bl],
-                             r = NULL, n = NULL, E = NULL)
+                             r = NULL, n = NULL, E = NULL, Surv = NULL)
 
   # Create tibble in standard format
   d <- tibble::tibble(
@@ -740,6 +747,252 @@ set_agd_contrast <- function(data,
   if (!is.null(.trtclass)) attr(out$classes, "original_levels") <- trtclass_original_levels
 
   return(out)
+}
+
+
+#' Set up aggregate survival data
+#'
+#' Set up a network containing aggregate survival data (AgD) in the form of
+#' event/censoring times (e.g. reconstructed from digitized Kaplan-Meier curves)
+#' and covariate summary statistics from each study. Multiple data sources may be
+#' combined once created using [combine_network()].
+#'
+#' @template args-data_common
+#' @template args-data_Surv
+#' @param covariates data frame of covariate summary statistics for each study
+#'   or study arm, with corresponding `study` and `trt` columns to match to
+#'   those in `data`
+#'
+#' @return An object of class [nma_data]
+#' @export
+#'
+#' @template args-details_trt_ref
+#' @template args-details_mutate
+#'
+#' @seealso [set_ipd()] for individual patient data, [set_agd_contrast()] for
+#'   contrast-based aggregate data, and [combine_network()] for combining
+#'   several data sources in one network.
+#' @template seealso_nma_data
+#' @examples
+#' ## Newly diagnosed multiple myeloma
+#'
+#' head(ndmm_agd)  # Reconstructed Kaplan-Meier data
+#' ndmm_agd_covs   # Summary covariate information on each arm
+#'
+#' set_agd_surv(ndmm_agd,
+#'              study = studyf,
+#'              trt = trtf,
+#'              Surv = Surv(eventtime, status),
+#'              covariates = ndmm_agd_covs)
+#'
+set_agd_surv <- function(data,
+                         study,
+                         trt,
+                         Surv,
+                         covariates = NULL,
+                         trt_ref = NULL,
+                         trt_class = NULL) {
+
+  # Check data is data frame
+  if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
+  if (nrow(data) == 0) {
+    return(
+      structure(
+        list(agd_arm = NULL,
+             agd_contrast = NULL,
+             ipd = NULL,
+             treatments = NULL,
+             classes = NULL,
+             studies = NULL),
+        class = "nma_data")
+    )
+  }
+
+  if (!is.null(covariates)) {
+    if (!inherits(covariates, "data.frame")) abort("Argument `covariates` should be a data frame")
+  }
+
+  # Pull study and treatment columns
+  if (missing(study)) abort("Specify `study`")
+  .study <- pull_non_null(data, enquo(study))
+  if (is.null(.study)) abort("`study` cannot be NULL")
+  check_study(.study)
+
+  if (is.factor(.study)) {
+    study_original_levels <- levels(.study)
+    .study <- forcats::fct_drop(.study)
+  } else {
+    study_original_levels <- NULL
+  }
+
+  if (missing(trt)) abort("Specify `trt`")
+  .trt <- pull_non_null(data, enquo(trt))
+  if (is.null(.trt)) abort("`trt` cannot be NULL")
+  check_trt(.trt)
+
+  if (is.factor(.trt)) {
+    trt_original_levels <- levels(.trt)
+    .trt <- forcats::fct_drop(.trt)
+  } else {
+    trt_original_levels <- NULL
+  }
+
+  # Check for single-arm studies
+  single_arm_studies <- tibble::tibble(.study, .trt) %>%
+    dplyr::distinct(.data$.study, .data$.trt) %>%
+    dplyr::group_by(.data$.study) %>%
+    dplyr::filter(dplyr::n() == 1) %>%
+    dplyr::pull(.data$.study)
+
+  if (length(single_arm_studies)) {
+    inform(glue::glue("Single-arm stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} present in the network: ",
+                      glue::glue_collapse(glue::double_quote(as.character(single_arm_studies)), sep = ", ", last = " and "), "."))
+  }
+
+  # Treatment classes
+  .trtclass <- pull_non_null(data, enquo(trt_class))
+  if (!is.null(.trtclass)) {
+    check_trt_class(.trtclass, .trt)
+
+    if (is.factor(.trtclass)) {
+      trtclass_original_levels <- levels(.trtclass)
+      .trtclass <- forcats::fct_drop(.trtclass)
+    } else {
+      trtclass_original_levels <- NULL
+    }
+  }
+
+  if (!is.null(trt_ref) && length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
+
+  # Pull and check outcomes
+  .Surv <- pull_non_null(data, enquo(Surv))
+
+  check_outcome_survival(.Surv)
+
+  o_type <- get_outcome_type(y = NULL, se = NULL,
+                             r = NULL, n = NULL, E = NULL,
+                             Surv = .Surv)
+
+  # Create tibble in standard format
+  d <- tibble::tibble(
+    .study = nfactor(.study),
+    .trt = nfactor(.trt)
+  )
+
+  if (!is.null(trt_ref)) {
+    trt_ref <- as.character(trt_ref)
+    lvls_trt <- levels(d$.trt)
+    if (! trt_ref %in% lvls_trt)
+      abort(sprintf("`trt_ref` does not match a treatment in the data.\nSuitable values are: %s",
+                    ifelse(length(lvls_trt) <= 5,
+                           paste0(lvls_trt, collapse = ", "),
+                           paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
+    d$.trt <- forcats::fct_relevel(d$.trt, trt_ref)
+  }
+
+  if (!is.null(.trtclass)) {
+    d <- tibble::add_column(d, .trtclass = nfactor(.trtclass))
+    class_lookup <- d %>%
+      dplyr::distinct(.data$.trt, .data$.trtclass) %>%
+      dplyr::arrange(.data$.trt)
+    class_ref <- as.character(class_lookup[[1, ".trtclass"]])
+    d$.trtclass <- forcats::fct_relevel(d$.trtclass, class_ref)
+    classes <- forcats::fct_relevel(nfactor(class_lookup$.trtclass), class_ref)
+  } else {
+    classes <- NULL
+  }
+
+  d <- tibble::add_column(d, .Surv = .Surv)
+
+  # Add in sample size
+  d <- dplyr::group_by(d, .data$.study, .data$.trt) %>%
+    dplyr::mutate(.sample_size = dplyr::n()) %>%
+    dplyr::ungroup()
+
+  # Bind in original data
+  drop_reserved <- setdiff(colnames(data), colnames(d))
+  d <- dplyr::bind_cols(d, data[, drop_reserved, drop = FALSE])
+
+  # Drop original study and treatment columns
+  d <- drop_original(d, data, enquo(study))
+  d <- drop_original(d, data, enquo(trt))
+  if (!is.null(.trtclass)) d <- drop_original(d, data, enquo(trt_class))
+
+  # Nest survival data, keeping original data nested for later too
+  d <- dplyr::group_by(d, dplyr::across(dplyr::any_of(c(".study", ".trt", ".trtclass", ".sample_size")))) %>%
+    tidyr::nest(.Surv = ".Surv",
+                .data_orig = !dplyr::any_of(c(".study", ".trt", ".trtclass", ".sample_size", ".Surv"))) %>%
+    dplyr::ungroup()
+
+  # Join covariate details
+  if (!is.null(covariates)) {
+    covariates <- dplyr::ungroup(covariates)
+
+    .cov_study <- pull_non_null(covariates, enquo(study))
+    if (is.null(.cov_study)) abort("`study` cannot be NULL")
+    check_study(.cov_study)
+    .cov_study <- forcats::fct_drop(nfactor(.cov_study))
+
+    .cov_trt <- pull_non_null(covariates, enquo(trt))
+    if (is.null(.cov_trt)) abort("`trt` cannot be NULL")
+    check_trt(.cov_trt)
+    .cov_trt <- forcats::fct_drop(nfactor(.cov_trt))
+
+    if (!is.null(trt_ref)) {
+      .cov_trt <- forcats::fct_relevel(.cov_trt, trt_ref)
+    }
+
+    covs <- dplyr::mutate(covariates, .study = .cov_study, .trt = .cov_trt)
+    covs <- drop_original(covs, data, enquo(study))
+    covs <- drop_original(covs, data, enquo(trt))
+
+    d <- tryCatch(
+          dplyr::inner_join(d, covs, by = c(".study", ".trt"),
+                            multiple = "first",
+                            unmatched = c("error", "drop")),
+          error = function(e) abort("Not all study arms in `data` have matching rows in `covariates`", parent = e))
+
+    # Re-drop factors, in case extra unneeded trt/study rows included in covariate data
+    d$.trt <- forcats::fct_drop(d$.trt)
+    d$.study <- forcats::fct_drop(d$.study)
+  }
+
+  # Produce nma_data object
+  out <- structure(
+    list(agd_arm = d,
+         agd_contrast = NULL,
+         ipd = NULL,
+         treatments = forcats::fct_unique(d$.trt),
+         classes = classes,
+         studies = forcats::fct_unique(d$.study),
+         outcome = list(agd_arm = o_type, agd_contrast = NA, ipd = NA)),
+    class = "nma_data")
+
+  # If trt_ref not specified, mark treatments factor as default, calculate
+  # current reference trt
+  if (is.null(trt_ref)) {
+    trt_ref <- get_default_trt_ref(out)
+    trt_sort <- order(forcats::fct_relevel(out$treatments, trt_ref))
+    out$treatments <- .default(forcats::fct_relevel(out$treatments, trt_ref)[trt_sort])
+    out$agd_arm$.trt <- forcats::fct_relevel(out$agd_arm$.trt, trt_ref)
+    if (!is.null(.trtclass)) {
+      class_ref <- as.character(out$classes[trt_sort[1]])
+      if (!is.null(trtclass_original_levels))
+        class_ref <- c(class_ref,
+                       setdiff(intersect(trtclass_original_levels, levels(out$classes)),
+                               class_ref))
+      out$agd_arm$.trtclass <- forcats::fct_relevel(out$agd_arm$.trtclass, class_ref)
+      out$classes <- forcats::fct_relevel(out$classes, class_ref)[trt_sort]
+    }
+  }
+
+  # Add original_levels attributes (if not NULL)
+  attr(out$treatments, "original_levels") <- trt_original_levels
+  attr(out$studies, "original_levels") <- study_original_levels
+  if (!is.null(.trtclass)) attr(out$classes, "original_levels") <- trtclass_original_levels
+
+  return(out)
+
 }
 
 
@@ -1009,7 +1262,8 @@ combine_network <- function(..., trt_ref) {
 #' @param ... Two or more numeric columns (or vectors) of category counts.
 #'   Argument names (optional) will be used to label the categories.
 #' @param inclusive Logical, are ordered category counts inclusive (`TRUE`) or
-#'   exclusive (`FALSE`)? Default `FALSE`. Only used when `ordered = TRUE`. See details.
+#'   exclusive (`FALSE`)? Default `FALSE`. Only used when `type = "ordered"`.
+#'   See details.
 #' @param type String, indicating whether categories are `"ordered"` or
 #'   `"competing"`. Currently only ordered categorical outcomes are supported by
 #'   the modelling functions in this package.
@@ -1214,7 +1468,7 @@ drop_original <- function(data, orig_data, var) {
 #' Determines outcome type based on which inputs are NA
 #'
 #' @noRd
-get_outcome_type <- function(y, se, r, n, E) {
+get_outcome_type <- function(y, se, r, n, E, Surv) {
   o <- c()
   if (!is.null(y)) o <- c(o, "continuous")
   if (!is.null(r)) {
@@ -1224,6 +1478,7 @@ get_outcome_type <- function(y, se, r, n, E) {
     if (!is.null(n)) o <- c(o, "count")
     if (!inherits(r, c("multi_ordered", "multi_competing")) && is.null(n) && is.null(E)) o <- c(o, "binary")
   }
+  if (!is.null(Surv)) o <- c(o, "survival")
   if (length(o) == 0) abort("Please specify one and only one outcome.")
   if (length(o) > 1) abort(glue::glue("Please specify one and only one outcome, instead of ",
                                       glue::glue_collapse(o, sep = ", ", last = " and "), "."))
@@ -1354,6 +1609,38 @@ check_outcome_binary <- function(r, E) {
   invisible(list(r = r, E = E))
 }
 
+#' Check survival outcomes
+#'
+#' @param Surv vector
+#'
+#' @noRd
+check_outcome_survival <- function(Surv) {
+  if (!is.null(Surv)) {
+
+    if (!survival::is.Surv(Surv)) abort("Survival outcome `Surv` must be a `Surv` object created using `Surv()`")
+
+    stype <- attr(Surv, "type")
+    allowed_stypes <- c("right", "left", "interval", "interval2", "counting")
+    if (!stype %in% allowed_stypes)
+      abort(glue::glue('Survival outcome `Surv` of type "{stype}" is not supported.\n',
+                       "Supported types are ",
+                       glue::glue_collapse(allowed_stypes, sep = ", ", last = " and "), "."))
+
+    status <- Surv[, "status"]
+    if (any(is.na(status))) abort("Survival outcome `Surv` contains missing event status values")
+    if (!all(status %in% 0:3)) abort("Survival outcome `Surv` event status values must be 0, 1, 2, or 3")
+
+    S <- get_Surv_data(Surv)
+    if (any(is.na(S$time), is.na(S$start_time), is.na(S$delay_time))) abort("Survival outcome `Surv` contains missing times")
+    if (any(is.infinite(S$time), is.infinite(S$start_time), is.infinite(S$delay_time))) abort("Survival outcome `Surv` contains infinite times")
+    if (any(S$time <= 0)) abort("Survival outcome `Surv` must have strictly positive outcome times")
+    if (any(S$start_time < 0, S$delay_time < 0)) abort("Survival outcome `Surv` must have non-negative start times")
+
+  }
+
+  invisible(list(Surv = Surv))
+}
+
 #' Check valid outcome combination across data sources
 #'
 #' @param outcomes outcome list, see nma_data-class
@@ -1372,7 +1659,10 @@ check_outcome_combination <- function(outcomes) {
          ipd = c("continuous", NA)),
     list(agd_arm = c("ordered", NA),
          agd_contrast = c("continuous", NA),
-         ipd = c("ordered", NA))
+         ipd = c("ordered", NA)),
+    list(agd_arm = c("survival", NA),
+         agd_contrast = c("continuous", NA),
+         ipd = c("survival", NA))
   )
 
   if (!any(purrr::map_lgl(valid,

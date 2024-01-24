@@ -8,13 +8,13 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
 
-## ---- include=FALSE-------------------------------------------------------------------------------
+## ----include=FALSE--------------------------------------------------------------------------------
 set.seed(1042020)
 
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
@@ -48,13 +48,13 @@ plot(arm_net, weight_edges = TRUE, weight_nodes = TRUE)
 summary(normal(scale = 100))
 
 
-## ---- eval=!params$run_tests----------------------------------------------------------------------
+## ----eval=!params$run_tests-----------------------------------------------------------------------
 ## arm_fit_FE <- nma(arm_net,
 ##                   trt_effects = "fixed",
 ##                   prior_intercept = normal(scale = 100),
 ##                   prior_trt = normal(scale = 10))
 
-## ---- eval=params$run_tests, echo=FALSE-----------------------------------------------------------
+## ----eval=params$run_tests, echo=FALSE------------------------------------------------------------
 arm_fit_FE <- nma(arm_net, 
                   trt_effects = "fixed",
                   prior_intercept = normal(scale = 100),
@@ -66,7 +66,7 @@ arm_fit_FE <- nma(arm_net,
 arm_fit_FE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(arm_fit_FE, pars = c("d", "mu"))
 
@@ -80,7 +80,7 @@ summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval=!params$run_tests----------------------------------------------------------------------
+## ----eval=!params$run_tests-----------------------------------------------------------------------
 ## arm_fit_RE <- nma(arm_net,
 ##                   seed = 379394727,
 ##                   trt_effects = "random",
@@ -89,7 +89,7 @@ summary(half_normal(scale = 5))
 ##                   prior_het = half_normal(scale = 5),
 ##                   adapt_delta = 0.99)
 
-## ---- eval=params$run_tests, echo=FALSE-----------------------------------------------------------
+## ----eval=params$run_tests, echo=FALSE------------------------------------------------------------
 arm_fit_RE <- nowarn_on_ci(nma(arm_net, 
                   seed = 379394727,
                   trt_effects = "random",
@@ -108,7 +108,7 @@ pairs(arm_fit_RE, pars = c("mu[4]", "d[3]", "delta[4: 3]", "tau"))
 arm_fit_RE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(arm_fit_RE, pars = c("d", "mu", "delta"))
 
@@ -195,12 +195,12 @@ plot(contr_net, weight_edges = TRUE, weight_nodes = TRUE)
 summary(normal(scale = 100))
 
 
-## ---- eval=!params$run_tests----------------------------------------------------------------------
+## ----eval=!params$run_tests-----------------------------------------------------------------------
 ## contr_fit_FE <- nma(contr_net,
 ##                     trt_effects = "fixed",
 ##                     prior_trt = normal(scale = 100))
 
-## ---- eval=params$run_tests, echo=FALSE-----------------------------------------------------------
+## ----eval=params$run_tests, echo=FALSE------------------------------------------------------------
 contr_fit_FE <- nma(contr_net, 
                     trt_effects = "fixed",
                     prior_trt = normal(scale = 100),
@@ -220,7 +220,7 @@ summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval=!params$run_tests----------------------------------------------------------------------
+## ----eval=!params$run_tests-----------------------------------------------------------------------
 ## contr_fit_RE <- nma(contr_net,
 ##                     seed = 1150676438,
 ##                     trt_effects = "random",
@@ -228,7 +228,7 @@ summary(half_normal(scale = 5))
 ##                     prior_het = half_normal(scale = 5),
 ##                     adapt_delta = 0.99)
 
-## ---- eval=params$run_tests, echo=FALSE-----------------------------------------------------------
+## ----eval=params$run_tests, echo=FALSE------------------------------------------------------------
 contr_fit_RE <- nowarn_on_ci(nma(contr_net, 
                     seed = 1150676438,
                     trt_effects = "random",
@@ -246,7 +246,7 @@ pairs(contr_fit_RE, pars = c("d[3]", "delta[4: 4 vs. 3]", "tau"))
 contr_fit_RE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(contr_fit_RE, pars = c("d", "delta"))
 
@@ -296,7 +296,7 @@ contr_pred_RE
 plot(contr_pred_RE)
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## predict(contr_fit_FE, type = "response")
 
@@ -347,13 +347,13 @@ plot(mix_net, weight_edges = TRUE, weight_nodes = TRUE)
 summary(normal(scale = 100))
 
 
-## ---- eval=!params$run_tests----------------------------------------------------------------------
+## ----eval=!params$run_tests-----------------------------------------------------------------------
 ## mix_fit_FE <- nma(mix_net,
 ##                   trt_effects = "fixed",
 ##                   prior_intercept = normal(scale = 100),
 ##                   prior_trt = normal(scale = 100))
 
-## ---- eval=params$run_tests, echo=FALSE-----------------------------------------------------------
+## ----eval=params$run_tests, echo=FALSE------------------------------------------------------------
 mix_fit_FE <- nma(mix_net, 
                   trt_effects = "fixed",
                   prior_intercept = normal(scale = 100),
@@ -365,7 +365,7 @@ mix_fit_FE <- nma(mix_net,
 mix_fit_FE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(mix_fit_FE, pars = c("d", "mu"))
 
@@ -379,7 +379,7 @@ summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval=!params$run_tests----------------------------------------------------------------------
+## ----eval=!params$run_tests-----------------------------------------------------------------------
 ## mix_fit_RE <- nma(mix_net,
 ##                   seed = 437219664,
 ##                   trt_effects = "random",
@@ -388,7 +388,7 @@ summary(half_normal(scale = 5))
 ##                   prior_het = half_normal(scale = 5),
 ##                   adapt_delta = 0.99)
 
-## ---- eval=params$run_tests, echo=FALSE-----------------------------------------------------------
+## ----eval=params$run_tests, echo=FALSE------------------------------------------------------------
 mix_fit_RE <- nowarn_on_ci(nma(mix_net, 
                   seed = 437219664,
                   trt_effects = "random",
@@ -407,7 +407,7 @@ pairs(mix_fit_RE, pars = c("d[3]", "delta[4: 4 vs. 3]", "tau"))
 mix_fit_RE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(mix_fit_RE, pars = c("d", "mu", "delta"))
 
@@ -1097,4 +1097,9 @@ test_that("Robust to custom options(contrasts) settings", {
                                   tolerance = tol)
 
 })
+
+
+# Force clean up
+rm(list = ls())
+gc()
 

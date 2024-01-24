@@ -108,3 +108,26 @@ NULL
 #' }
 #' }
 NULL
+
+#' Example newly-diagnosed multiple myeloma
+#'
+# Newly-diagnosed multiple myeloma progression-free survival in a proportional
+# hazards Weibull NMA for use in examples.
+#'
+#' @name example_ndmm
+#' @rdname aa_example_ndmm
+#' @description Calling `example("example_ndmm")` will run a proportional
+#'   hazards Weibull NMA model on the newly-diagnosed multiple myeloma data,
+#'   using the code in the Examples section below. The resulting `stan_nma`
+#'   object `ndmm_fit` will then be available in the global environment.
+#'
+#' @keywords examples
+#' @template ex_ndmm_network
+#' @template ex_ndmm
+#' @examples \dontshow{
+#' if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) {
+#'   assign("ndmm_net", ndmm_net, .GlobalEnv)
+#'   assign("ndmm_fit", ndmm_fit, .GlobalEnv)
+#' }
+#' }
+NULL

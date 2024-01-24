@@ -45,7 +45,8 @@ NULL
 #' @return The `summary()` method returns a [nma_summary] object, the `print()`
 #'   method returns `x` invisibly. The `names()` method returns a character
 #'   vector of parameter names, and `names()<-` returns the object with updated
-#'   parameter names.
+#'   parameter names. The `plot()` method is a shortcut for
+#'   `plot(summary(x), ...)`, passing all arguments on to [plot.nma_summary()].
 #' @export
 summary.mcmc_array <- function(object, ..., probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
   ss <- summary_mcmc_array(object, probs = probs)
@@ -61,6 +62,14 @@ print.mcmc_array <- function(x, ...) {
   cglue("A MCMC array with {prod(d[1:2])} draws ({d[1]} iterations in {d[2]} chain{if (d[2] > 1) 's' else ''}) of {d[3]} parameter{if (d[3] > 1) 's' else ''}.")
   NextMethod(...)
   invisible(x)
+}
+
+#' @rdname mcmc_array-class
+#' @export
+plot.mcmc_array <- function(x, ...) {
+  xsum <- list(summary = NULL, sims = x)
+  class(xsum) <- "nma_summary"
+  plot(xsum, ...)
 }
 
 #' @rdname mcmc_array-class

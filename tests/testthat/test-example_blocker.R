@@ -8,10 +8,10 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
 
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
@@ -52,7 +52,7 @@ blocker_fit_FE <- nma(blocker_net,
 blocker_fit_FE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(blocker_fit_FE, pars = c("d", "mu"))
 
@@ -78,7 +78,7 @@ blocker_fit_RE <- nma(blocker_net,
 blocker_fit_RE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(blocker_fit_RE, pars = c("d", "mu", "delta"))
 
@@ -346,4 +346,9 @@ test_that("RE ordered multinomial predicted probabilities (Beta distribution)", 
   expect_equal(blocker_ord_pred_RE$`50%`, blocker_ord_predbeta_RE$`50%`, tolerance = tol)
   expect_equal(blocker_ord_pred_RE$`97.5%`, blocker_ord_predbeta_RE$`97.5%`, tolerance = tol)
 })
+
+
+# Force clean up
+rm(list = ls())
+gc()
 

@@ -8,10 +8,10 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
 
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
@@ -36,7 +36,7 @@ db_net <- set_agd_arm(diabetes,
 db_net
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## plot(db_net, weight_edges = TRUE, weight_nodes = TRUE)
 
 ## ----diabetes_network_plot, echo=FALSE------------------------------------------------------------
@@ -60,7 +60,7 @@ db_fit_FE <- nma(db_net,
 db_fit_FE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(db_fit_FE, pars = c("d", "mu"))
 
@@ -89,7 +89,7 @@ db_fit_RE <- nma(db_net,
 db_fit_RE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(db_fit_RE, pars = c("d", "mu", "delta"))
 
@@ -393,4 +393,9 @@ test_that("Predictions for reordered newdata/baselines works", {
   expect_equivalent(db_pred_RE_multi1$`2.5%`,  db_pred_RE_multi4$`2.5%`, tolerance = tol)
   expect_equivalent(db_pred_RE_multi1$`97.5%`, db_pred_RE_multi4$`97.5%`, tolerance = tol)
 })
+
+
+# Force clean up
+rm(list = ls())
+gc()
 
