@@ -8,7 +8,7 @@ message: 'To cite package "multinma" in publications use:'
 type: software
 license: GPL-3.0-only
 title: 'multinma: Bayesian Network Meta-Analysis of Individual and Aggregate Data'
-version: 0.5.1.9000
+version: 0.6.0
 doi: 10.5281/zenodo.3904454
 abstract: Network meta-analysis and network meta-regression models for aggregate data,
   individual patient data, and mixtures of both individual and aggregate data using
@@ -28,7 +28,7 @@ preferred-citation:
     email: david.phillippo@bristol.ac.uk
     orcid: https://orcid.org/0000-0003-2672-7841
   year: '2023'
-  notes: R package version 0.5.1.9000
+  notes: R package version 0.6.0
   url: https://dmphillippo.github.io/multinma/
   doi: 10.5281/zenodo.3904454
 repository: https://CRAN.R-project.org/package=multinma
@@ -80,7 +80,7 @@ references:
   - name: R Core Team
   location:
     name: Vienna, Austria
-  year: '2023'
+  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
   version: '>= 3.4.0'
@@ -92,7 +92,7 @@ references:
   - name: R Core Team
   location:
     name: Vienna, Austria
-  year: '2023'
+  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
 - type: software
@@ -103,7 +103,7 @@ references:
   - name: R Core Team
   location:
     name: Vienna, Austria
-  year: '2023'
+  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
 - type: software
@@ -114,9 +114,20 @@ references:
   - name: R Core Team
   location:
     name: Vienna, Austria
-  year: '2023'
+  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
+- type: software
+  title: survival
+  abstract: 'survival: Survival Analysis'
+  notes: Imports
+  url: https://github.com/therneau/survival
+  repository: https://CRAN.R-project.org/package=survival
+  authors:
+  - family-names: Therneau
+    given-names: Terry M
+    email: therneau.terry@mayo.edu
+  year: '2024'
 - type: software
   title: Rcpp
   abstract: 'Rcpp: Seamless R and C++ Integration'
@@ -142,7 +153,7 @@ references:
     given-names: Douglas
   - family-names: Chambers
     given-names: John
-  year: '2023'
+  year: '2024'
   version: '>= 0.12.0'
 - type: software
   title: RcppParallel
@@ -164,7 +175,7 @@ references:
   - family-names: Geelnard
     given-names: Marcus
   - name: Intel
-  year: '2023'
+  year: '2024'
   version: '>= 5.0.1'
 - type: software
   title: rstan
@@ -182,11 +193,18 @@ references:
   - family-names: Goodrich
     given-names: Ben
     email: benjamin.goodrich@columbia.edu
+  - family-names: Johnson
+    given-names: Andrew
+    email: andrew.johnson@arjohnsonau.com
   - family-names: Weber
     given-names: Sebastian
     email: sdw.post@waebers.de
-  year: '2023'
-  version: '>= 2.19.2'
+  - family-names: Badr
+    given-names: Hamada S.
+    email: badr@jhu.edu
+    orcid: https://orcid.org/0000-0002-9808-2344
+  year: '2024'
+  version: '>= 2.26.0'
 - type: software
   title: rstantools
   abstract: 'rstantools: Tools for Developing R Packages Interfacing with ''Stan'''
@@ -205,7 +223,7 @@ references:
     email: mlysy@uwaterloo.ca
   - family-names: Johnson
     given-names: Andrew
-  year: '2023'
+  year: '2024'
   version: '>= 2.0.0'
 - type: software
   title: Rdpack
@@ -217,7 +235,7 @@ references:
   - family-names: Boshnakov
     given-names: Georgi N.
     email: georgi.boshnakov@manchester.ac.uk
-  year: '2023'
+  year: '2024'
   version: '>= 0.7'
 - type: software
   title: tibble
@@ -233,7 +251,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@rstudio.com
-  year: '2023'
+  year: '2024'
   version: '>= 2.1.3'
 - type: software
   title: dplyr
@@ -258,7 +276,7 @@ references:
     given-names: Davis
     email: davis@posit.co
     orcid: https://orcid.org/0000-0003-4777-038X
-  year: '2023'
+  year: '2024'
   version: '>= 1.0.0'
 - type: software
   title: rlang
@@ -273,7 +291,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@posit.co
-  year: '2023'
+  year: '2024'
 - type: software
   title: purrr
   abstract: 'purrr: Functional Programming Tools'
@@ -288,7 +306,7 @@ references:
   - family-names: Henry
     given-names: Lionel
     email: lionel@rstudio.com
-  year: '2023'
+  year: '2024'
 - type: software
   title: forcats
   abstract: 'forcats: Tools for Working with Categorical Variables (Factors)'
@@ -299,7 +317,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@rstudio.com
-  year: '2023'
+  year: '2024'
 - type: software
   title: glue
   abstract: 'glue: Interpreted String Literals'
@@ -314,29 +332,28 @@ references:
     given-names: Jennifer
     email: jenny@rstudio.com
     orcid: https://orcid.org/0000-0002-6983-2759
-  year: '2023'
+  year: '2024'
 - type: software
   title: randtoolbox
   abstract: 'randtoolbox: Toolbox for Pseudo and Quasi Random Number Generation and
     Random Generator Tests'
   notes: Imports
-  url: https://r-forge.r-project.org/projects/rmetrics/
   repository: https://CRAN.R-project.org/package=randtoolbox
   authors:
   - family-names: Chalabi
-    given-names: R code by Yohan
+    given-names: R port by Yohan
   - family-names: Dutang
     given-names: Christophe
   - family-names: Savicky
     given-names: Petr
-  - family-names: Torus
-    given-names: Diethelm Wuertz; C code of
-  - name: Halton
-  - family-names: Dutang
-    given-names: Sobol sequences by Christophe
-  - family-names: Saito.
-    given-names: Mutsuo
-  year: '2023'
+  - family-names: Matsumoto
+    given-names: Diethelm Wuertz with some underlying C codes of the SFMT algorithm
+      from M.
+  - family-names: Saito
+    given-names: M.
+  - family-names: Knuth.
+    given-names: the Knuth-TAOCP RNG from D.
+  year: '2024'
 - type: software
   title: copula
   abstract: 'copula: Multivariate Dependence with Copulas'
@@ -360,7 +377,7 @@ references:
     given-names: Jun
     email: jun.yan@uconn.edu
     orcid: https://orcid.org/0000-0003-4401-7296
-  year: '2023'
+  year: '2024'
 - type: software
   title: tidyr
   abstract: 'tidyr: Tidy Messy Data'
@@ -376,7 +393,7 @@ references:
     email: davis@posit.co
   - family-names: Girlich
     given-names: Maximilian
-  year: '2023'
+  year: '2024'
   version: '>= 1.0.0'
 - type: software
   title: stringr
@@ -388,7 +405,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@rstudio.com
-  year: '2023'
+  year: '2024'
 - type: software
   title: Matrix
   abstract: 'Matrix: Sparse and Dense Matrix Classes and Methods'
@@ -406,7 +423,7 @@ references:
   - family-names: Jagan
     given-names: Mikael
     orcid: https://orcid.org/0000-0002-3542-2938
-  year: '2023'
+  year: '2024'
 - type: software
   title: igraph
   abstract: 'igraph: Network Analysis and Visualization'
@@ -433,7 +450,7 @@ references:
   - family-names: Müller
     given-names: Kirill
     email: kirill@cynkra.com
-  year: '2023'
+  year: '2024'
 - type: software
   title: ggraph
   abstract: 'ggraph: An Implementation of Grammar of Graphics for Graphs and Networks'
@@ -445,7 +462,7 @@ references:
     given-names: Thomas Lin
     email: thomasp85@gmail.com
     orcid: https://orcid.org/0000-0002-5147-4711
-  year: '2023'
+  year: '2024'
 - type: software
   title: ggplot2
   abstract: 'ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics'
@@ -480,7 +497,7 @@ references:
   - family-names: Dunnington
     given-names: Dewey
     orcid: https://orcid.org/0000-0002-9415-4582
-  year: '2023'
+  year: '2024'
   version: '>= 3.3.0'
 - type: software
   title: ggdist
@@ -492,7 +509,7 @@ references:
   - family-names: Kay
     given-names: Matthew
     email: mjskay@northwestern.edu
-  year: '2023'
+  year: '2024'
   version: '>= 2.1.1'
 - type: software
   title: truncdist
@@ -506,7 +523,7 @@ references:
   - family-names: Nadarajah
     given-names: Saralees
     email: saralees.nadarajah@manchester.ac.uk
-  year: '2023'
+  year: '2024'
 - type: software
   title: bayesplot
   abstract: 'bayesplot: Plotting for Bayesian Models'
@@ -519,7 +536,7 @@ references:
     email: jsg2201@columbia.edu
   - family-names: Mahr
     given-names: Tristan
-  year: '2023'
+  year: '2024'
 - type: software
   title: BH
   abstract: 'BH: Boost C++ Header Files'
@@ -533,7 +550,7 @@ references:
     given-names: John W.
   - family-names: Kane
     given-names: Michael J.
-  year: '2023'
+  year: '2024'
   version: '>= 1.66.0'
 - type: software
   title: RcppEigen
@@ -551,29 +568,8 @@ references:
     given-names: Romain
   - family-names: Eigen
     given-names: Yixuan Qiu; the authors of Eigen for the included version of
-  year: '2023'
+  year: '2024'
   version: '>= 0.3.3.3.0'
-- type: software
-  title: rstan
-  abstract: 'rstan: R Interface to Stan'
-  notes: Imports
-  url: https://mc-stan.org/rstan/
-  repository: https://CRAN.R-project.org/package=rstan
-  authors:
-  - family-names: Guo
-    given-names: Jiqiang
-    email: guojq28@gmail.com
-  - family-names: Gabry
-    given-names: Jonah
-    email: jsg2201@columbia.edu
-  - family-names: Goodrich
-    given-names: Ben
-    email: benjamin.goodrich@columbia.edu
-  - family-names: Weber
-    given-names: Sebastian
-    email: sdw.post@waebers.de
-  year: '2023'
-  version: '>= 2.18.1'
 - type: software
   title: StanHeaders
   abstract: 'StanHeaders: C++ Header Files for Stan'
@@ -626,8 +622,12 @@ references:
     given-names: Michael
   - family-names: Gao
     given-names: Yuanjun
-  year: '2023'
-  version: '>= 2.18.0'
+  - family-names: Badr
+    given-names: Hamada S.
+    email: badr@jhu.edu
+    orcid: https://orcid.org/0000-0002-9808-2344
+  year: '2024'
+  version: '>= 2.26.0'
 - type: software
   title: testthat
   abstract: 'testthat: Unit Testing for R'
@@ -638,7 +638,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@posit.co
-  year: '2023'
+  year: '2024'
   version: '>= 2.1.0'
 - type: software
   title: withr
@@ -663,7 +663,7 @@ references:
     email: hadley@rstudio.com
   - family-names: Chang
     given-names: Winston
-  year: '2023'
+  year: '2024'
 - type: software
   title: knitr
   abstract: 'knitr: A General-Purpose Package for Dynamic Report Generation in R'
@@ -675,7 +675,7 @@ references:
     given-names: Yihui
     email: xie@yihui.name
     orcid: https://orcid.org/0000-0003-0645-5666
-  year: '2023'
+  year: '2024'
 - type: software
   title: rmarkdown
   abstract: 'rmarkdown: Dynamic Documents for R'
@@ -718,7 +718,7 @@ references:
     given-names: Richard
     email: rich@posit.co
     orcid: https://orcid.org/0000-0003-3925-190X
-  year: '2023'
+  year: '2024'
 - type: software
   title: parallel
   abstract: 'R: A Language and Environment for Statistical Computing'
@@ -727,7 +727,7 @@ references:
   - name: R Core Team
   location:
     name: Vienna, Austria
-  year: '2023'
+  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
 - type: software
@@ -740,7 +740,7 @@ references:
   - family-names: Bengtsson
     given-names: Henrik
     email: henrikb@braju.com
-  year: '2023'
+  year: '2024'
 - type: software
   title: rprojroot
   abstract: 'rprojroot: Finding Files in Project Subdirectories'
@@ -752,7 +752,7 @@ references:
     given-names: Kirill
     email: krlmlr+r@mailbox.org
     orcid: https://orcid.org/0000-0002-1416-3412
-  year: '2023'
+  year: '2024'
 - type: software
   title: loo
   abstract: 'loo: Efficient Leave-One-Out Cross-Validation and WAIC for Bayesian Models'
@@ -776,7 +776,7 @@ references:
     given-names: Topi
   - family-names: Gelman
     given-names: Andrew
-  year: '2023'
+  year: '2024'
   version: '>= 2.0.0'
 - type: software
   title: logitnorm
@@ -786,7 +786,7 @@ references:
   authors:
   - family-names: Wutzler
     given-names: Thomas
-  year: '2023'
+  year: '2024'
 - type: software
   title: crayon
   abstract: 'crayon: Colored Terminal Output'
@@ -797,7 +797,7 @@ references:
   - family-names: Csárdi
     given-names: Gábor
     email: csardi.gabor@gmail.com
-  year: '2023'
+  year: '2024'
 - type: software
   title: tidygraph
   abstract: 'tidygraph: A Tidy API for Graph Manipulation'
@@ -809,7 +809,7 @@ references:
     given-names: Thomas Lin
     email: thomasp85@gmail.com
     orcid: https://orcid.org/0000-0002-5147-4711
-  year: '2023'
+  year: '2024'
 - type: software
   title: pkgdown
   abstract: 'pkgdown: Make Static HTML Documentation for a Package'
@@ -827,4 +827,48 @@ references:
   - family-names: Salmon
     given-names: Maëlle
     orcid: https://orcid.org/0000-0002-2815-0399
-  year: '2023'
+  year: '2024'
+- type: software
+  title: splines2
+  abstract: 'splines2: Regression Spline Functions and Classes'
+  notes: Suggests
+  url: https://wwenjie.org/splines2
+  repository: https://CRAN.R-project.org/package=splines2
+  authors:
+  - family-names: Wang
+    given-names: Wenjie
+    email: wang@wwenjie.org
+    orcid: https://orcid.org/0000-0003-0363-3180
+  - family-names: Yan
+    given-names: Jun
+    orcid: https://orcid.org/0000-0003-4401-7296
+  year: '2024'
+  version: '>= 0.5.0'
+- type: software
+  title: flexsurv
+  abstract: 'flexsurv: Flexible Parametric Survival and Multi-State Models'
+  notes: Suggests
+  url: https://github.com/chjackson/flexsurv-dev
+  repository: https://CRAN.R-project.org/package=flexsurv
+  authors:
+  - family-names: Jackson
+    given-names: Christopher
+    email: chris.jackson@mrc-bsu.cam.ac.uk
+  year: '2024'
+- type: software
+  title: rstpm2
+  abstract: 'rstpm2: Smooth Survival Models, Including Generalized Survival Models'
+  notes: Suggests
+  url: https://github.com/mclements/rstpm2
+  repository: https://CRAN.R-project.org/package=rstpm2
+  authors:
+  - family-names: Clements
+    given-names: Mark
+    email: mark.clements@ki.se
+  - family-names: Liu
+    given-names: Xing-Rong
+    email: xingrong.liu@ki.se
+  - family-names: Christoffersen
+    given-names: Benjamin
+    email: benjamin.christoffersen@ki.se
+  year: '2024'
