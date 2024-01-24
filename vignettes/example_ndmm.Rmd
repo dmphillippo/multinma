@@ -126,7 +126,7 @@ bind_rows(
 # Setup
 ## Preparing treatment classes
 We start by setting up the network for the analysis.
-Since we only have IPD on the placebo vs. lenalidomide comparison, and only one AgD study on the placebo vs. thalidomide comparison, we make the shared effect modifier assumption between the two active treatments in order to estimate the effect modifying treatment-covariate interactions for thalidomide [@TSD18,@methods_paper].
+Since we only have IPD on the placebo vs. lenalidomide comparison, and only one AgD study on the placebo vs. thalidomide comparison, we make the shared effect modifier assumption between the two active treatments in order to estimate the effect modifying treatment-covariate interactions for thalidomide [@TSD18;@methods_paper].
 Since lenalidomide and thalidomide are both in the same class of treatments, this assumption may be reasonable.
 
 To impose this assumption, we create a treatment class variable for active treatments vs. placebo.
@@ -246,7 +246,7 @@ ggplot() +
 The `transform` argument to `geom_km()` can be used to transform the Kaplan-Meier curves prior to plotting, for example `transform = "cloglog"` to assess proportional hazards with a log-log plot.
 
 # ML-NMR models with M-spline baseline hazards
-We fit a proportional hazards survival model with cubic M-splines on the baseline hazard [@Brilleman2020,@Phillippo_survival].
+We fit a proportional hazards survival model with cubic M-splines on the baseline hazard [@Brilleman2020;@Phillippo_survival].
 This allows the baseline hazard to flexibly follow any shape that the baseline hazard may take.
 ML-NMR models are fit using the `nma()` function, and we specify that a M-spline baseline hazard should be used with `likelihood = "mspline"`.
 

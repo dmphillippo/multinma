@@ -388,7 +388,7 @@ myeloma</h1>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; - As of v2.0.0 loo defaults to 1 core but we recommend using as many as possible. Use the &#39;cores&#39; argument or set options(mc.cores = NUM_CORES) for an entire session.</span></span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; - Windows 10 users: loo may be very slow if &#39;mc.cores&#39; is set in your .Rprofile file (see https://github.com/stan-dev/loo/issues/94).</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">mc.cores =</span> parallel<span class="sc">::</span><span class="fu">detectCores</span>())</span></code></pre></div>
-<p><span class="citation">Leahy and Walsh (<a href="#ref-Leahy2019" role="doc-biblioref">2019</a>)</span> present a network of five trials
+<p><span class="citation">Leahy and Walsh (<a href="#ref-Leahy2019">2019</a>)</span> present a network of five trials
 comparing lenalidomide and thalidomide to placebo for newly diagnosed
 multiple myeloma (NDMM) after autologous stem cell transplant (ASCT).
 The outcome of interest is progression free survival (PFS). Simulated
@@ -427,9 +427,9 @@ available on a further two trials, found in the data sets
 <span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 64.62894 9.399272  0.1921296        0.8310185 0.6215278</span></span>
 <span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 63.92360 9.006311  0.3634146        0.7170732 0.6195122</span></span>
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 65.59387 8.384686  0.3186275        0.7450980 0.6151961</span></span></code></pre></div>
-<p><span class="citation">Phillippo et al. (<a href="#ref-Phillippo_survival" role="doc-biblioref">n.d.</a>)</span>
-analysed these data using multilevel network meta-regression (ML-NMR),
-and we recreate these analyses here.</p>
+<p><span class="citation">Phillippo et al. (<a href="#ref-Phillippo_survival">2024</a>)</span> analysed these data
+using multilevel network meta-regression (ML-NMR), and we recreate these
+analyses here.</p>
 <div id="study-data" class="section level1">
 <h1>Study data</h1>
 <p>We consider adjustment for the following covariates:</p>
@@ -477,7 +477,8 @@ have IPD on the placebo vs. lenalidomide comparison, and only one AgD
 study on the placebo vs. thalidomide comparison, we make the shared
 effect modifier assumption between the two active treatments in order to
 estimate the effect modifying treatment-covariate interactions for
-thalidomide <span class="citation">Phillippo et al. (<a href="#ref-methods_paper" role="doc-biblioref">2020</a>)</span>. Since
+thalidomide <span class="citation">(<a href="#ref-TSD18">Phillippo et
+al. 2016</a>, <a href="#ref-methods_paper">2020</a>)</span>. Since
 lenalidomide and thalidomide are both in the same class of treatments,
 this assumption may be reasonable.</p>
 <p>To impose this assumption, we create a treatment class variable for
@@ -606,8 +607,8 @@ log-log plot.</p>
 <div id="ml-nmr-models-with-m-spline-baseline-hazards" class="section level1">
 <h1>ML-NMR models with M-spline baseline hazards</h1>
 <p>We fit a proportional hazards survival model with cubic M-splines on
-the baseline hazard <span class="citation">Phillippo et al. (<a href="#ref-Phillippo_survival" role="doc-biblioref">n.d.</a>)</span>.
-This allows the baseline hazard to flexibly follow any shape that the
+the baseline hazard <span class="citation">(<a href="#ref-Brilleman2020">Brilleman et al. 2020</a>; <a href="#ref-Phillippo_survival">Phillippo et al. 2024</a>)</span>. This
+allows the baseline hazard to flexibly follow any shape that the
 baseline hazard may take. ML-NMR models are fit using the
 <code>nma()</code> function, and we specify that a M-spline baseline
 hazard should be used with <code>likelihood = &quot;mspline&quot;</code>.</p>
@@ -617,15 +618,15 @@ location of the knots. By default, seven internal knots are used
 on the observed event times within each study. Overfitting is avoided by
 the use of a random walk prior distribution on the (inverse softmax
 transformed) spline coefficients that penalises complexity and shrinks
-towards a constant baseline hazard <span class="citation">(<a href="#ref-Phillippo_survival" role="doc-biblioref">Phillippo et al.,
-n.d.</a>)</span>; in practice this means that the number of knots can be
-set to a sufficiently large number and left to shrink to a suitable
-level of complexity controlled by the standard deviation of the random
-walk. The number of knots can be changed using the <code>n_knots</code>
-argument, or custom knot locations can be specified using the
-<code>knots</code> argument. The <code>nma()</code> function will always
-place boundary knots at the earliest entry time into the study (0 with
-no delayed entry) and at the maximum event/censoring time.</p>
+towards a constant baseline hazard <span class="citation">(<a href="#ref-Phillippo_survival">Phillippo et al. 2024</a>)</span>; in
+practice this means that the number of knots can be set to a
+sufficiently large number and left to shrink to a suitable level of
+complexity controlled by the standard deviation of the random walk. The
+number of knots can be changed using the <code>n_knots</code> argument,
+or custom knot locations can be specified using the <code>knots</code>
+argument. The <code>nma()</code> function will always place boundary
+knots at the earliest entry time into the study (0 with no delayed
+entry) and at the maximum event/censoring time.</p>
 <p>By default, the <code>nma()</code> function will fit a cubic M-spline
 (<code>mspline_degree = 3</code>). Piecewise-constant hazards
 (i.e. piecewise exponential hazards) are a special case with degree 0
@@ -1303,10 +1304,10 @@ Treatment Comparisons.”</span> <em>Journal of the Royal Statistical
 Society: Series A (Statistics in Society)</em> 183 (3): 1189–1210. <a href="https://doi.org/10.1111/rssa.12579">https://doi.org/10.1111/rssa.12579</a>.
 </div>
 <div id="ref-Phillippo_survival" class="csl-entry">
-Phillippo, D. M., S. Dias, A. E. Ades, and N. J. Welton. n.d.
-<span>“Extension of Multilevel Network Meta-Regression to General
-Likelihoods: Synthesis of Individual and Aggregate Data with
-Applications to Survival Analysis.”</span>
+Phillippo, D. M., S. Dias, A. E. Ades, and N. J. Welton. 2024.
+<span>“Multilevel Network Meta-Regression for General Likelihoods:
+Synthesis of Individual and Aggregate Data with Applications to Survival
+Analysis.”</span> <em>arXiv</em>, January. <a href="https://doi.org/10.48550/arXiv.2401.12640">https://doi.org/10.48550/arXiv.2401.12640</a>.
 </div>
 </div>
 </div>
