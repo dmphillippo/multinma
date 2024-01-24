@@ -1,4 +1,4 @@
-# multinma 0.5.1.9000
+# multinma 0.6.0
 
 ## Feature: Survival/time-to-event models are now supported
 
