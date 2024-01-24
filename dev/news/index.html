@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.9007</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,9 +66,12 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.5.1.9000" id="multinma-0519000">multinma 0.5.1.9000<a class="anchor" aria-label="anchor" href="#multinma-0519000"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.6.0.9000" id="multinma-0609000">multinma 0.6.0.9000<a class="anchor" aria-label="anchor" href="#multinma-0609000"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.0" id="multinma-060">multinma 0.6.0<a class="anchor" aria-label="anchor" href="#multinma-060"></a></h2><p class="text-muted">CRAN release: 2024-01-24</p>
 <div class="section level3">
-<h3 id="feature-survivaltime-to-event-models-are-now-supported-0-5-1-9000">Feature: Survival/time-to-event models are now supported<a class="anchor" aria-label="anchor" href="#feature-survivaltime-to-event-models-are-now-supported-0-5-1-9000"></a></h3>
+<h3 id="feature-survivaltime-to-event-models-are-now-supported-0-6-0">Feature: Survival/time-to-event models are now supported<a class="anchor" aria-label="anchor" href="#feature-survivaltime-to-event-models-are-now-supported-0-6-0"></a></h3>
 <ul><li>
 <code><a href="../reference/set_ipd.html">set_ipd()</a></code> now has a <code>Surv</code> argument for specifying survival outcomes using <code><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">survival::Surv()</a></code>, and a new function <code><a href="../reference/set_agd_surv.html">set_agd_surv()</a></code> sets up aggregate data in the form of event/censoring times (e.g. from digitized Kaplan-Meier curves) and overall covariate summaries.</li>
 <li>Left, right, and interval censoring as well as left truncation (delayed entry) are all supported.</li>
@@ -80,7 +83,7 @@
 <li>A new vignette demonstrates ML-NMR survival analysis with an example of progression-free survival after autologous stem cell transplant for newly diagnosed multiple myeloma, with corresponding datasets <code>ndmm_ipd</code>, <code>ndmm_agd</code>, and <code>ndmm_agd_covs</code>.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="feature-automatic-checking-of-numerical-integration-for-ml-nmr-models-0-5-1-9000">Feature: Automatic checking of numerical integration for ML-NMR models<a class="anchor" aria-label="anchor" href="#feature-automatic-checking-of-numerical-integration-for-ml-nmr-models-0-5-1-9000"></a></h3>
+<h3 id="feature-automatic-checking-of-numerical-integration-for-ml-nmr-models-0-6-0">Feature: Automatic checking of numerical integration for ML-NMR models<a class="anchor" aria-label="anchor" href="#feature-automatic-checking-of-numerical-integration-for-ml-nmr-models-0-6-0"></a></h3>
 <ul><li>The accuracy of numerical integration for ML-NMR models can now be checked automatically, and is by default. To do so, half of the chains are run with <code>n_int</code> and half with <code>n_int/2</code> integration points. Any Rhat or effective sample size warnings can then be ascribed to either: non-convergence of the MCMC chains, requiring increased number of iterations <code>iter</code> in <code><a href="../reference/nma.html">nma()</a></code>, or; insufficient accuracy of numerical integration, requiring increased number of integration points <code>n_int</code> in <code><a href="../reference/add_integration.html">add_integration()</a></code>. Descriptive warning messages indicate which is the case.</li>
 <li>This feature is controlled by a new <code>int_check</code> argument to <code><a href="../reference/nma.html">nma()</a></code>, which is enabled (<code>TRUE</code>) by default.</li>
 <li>Saving thinned cumulative integration points can now be disabled with <code>int_thin = 0</code>, and is now disabled by default. The previous default was <code>int_thin = max(n_int %/% 10, 1)</code>.</li>
@@ -88,7 +91,7 @@
 <li>As a result, ML-NMR models are now much faster to run by default, both due to lower <code>n_int</code> and disabling saving cumulative integration points.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="other-updates-0-5-1-9000">Other updates<a class="anchor" aria-label="anchor" href="#other-updates-0-5-1-9000"></a></h3>
+<h3 id="other-updates-0-6-0">Other updates<a class="anchor" aria-label="anchor" href="#other-updates-0-6-0"></a></h3>
 <ul><li>Feature: <code><a href="../reference/dic.html">dic()</a></code> now includes an option to use the pV penalty instead of pD.</li>
 <li>Feature: The <code>baseline</code> and <code>aux</code> arguments to <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> can now be specified as the name of a study in the network, to use the parameter estimates from that study for prediction.</li>
 <li>Improvement: <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> will now produce aggregate-level predictions over a sample of individuals in <code>newdata</code> for ML-NMR models (previously <code>newdata</code> had to include integration points).</li>
