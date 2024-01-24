@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.6/font.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.8/font.css" rel="stylesheet">
 <!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
@@ -35,7 +35,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,6 +59,7 @@
     <a class="dropdown-item" href="../articles/example_diabetes.html">Example: Diabetes</a>
     <a class="dropdown-item" href="../articles/example_dietary_fat.html">Example: Dietary fat</a>
     <a class="dropdown-item" href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a>
+    <a class="dropdown-item" href="../articles/example_ndmm.html">Example: Newly diagnosed multiple myeloma</a>
     <a class="dropdown-item" href="../articles/example_parkinsons.html">Example: Parkinson's disease</a>
     <a class="dropdown-item" href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a>
     <a class="dropdown-item" href="../articles/example_smoking.html">Example: Smoking cessation</a>
@@ -227,21 +228,21 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                       mean se_mean   sd      2.5%       25%       50%       75%     97.5%</span></span>
-<span><span class="co">#&gt; d[ACE Inhibitor]     -0.30    0.00 0.04     -0.40     -0.33     -0.30     -0.27     -0.22</span></span>
-<span><span class="co">#&gt; d[ARB]               -0.40    0.00 0.04     -0.48     -0.43     -0.40     -0.37     -0.31</span></span>
-<span><span class="co">#&gt; d[CCB]               -0.20    0.00 0.03     -0.25     -0.22     -0.20     -0.17     -0.14</span></span>
-<span><span class="co">#&gt; d[Diuretic]           0.06    0.00 0.05     -0.05      0.02      0.06      0.09      0.17</span></span>
-<span><span class="co">#&gt; d[Placebo]           -0.19    0.00 0.05     -0.29     -0.22     -0.19     -0.16     -0.10</span></span>
-<span><span class="co">#&gt; lp__             -37970.27    0.09 3.69 -37978.42 -37972.50 -37969.93 -37967.65 -37964.13</span></span>
+<span><span class="co">#&gt; d[ACE Inhibitor]     -0.30    0.00 0.04     -0.39     -0.33     -0.30     -0.27     -0.21</span></span>
+<span><span class="co">#&gt; d[ARB]               -0.39    0.00 0.05     -0.48     -0.43     -0.39     -0.37     -0.30</span></span>
+<span><span class="co">#&gt; d[CCB]               -0.20    0.00 0.03     -0.26     -0.22     -0.20     -0.17     -0.13</span></span>
+<span><span class="co">#&gt; d[Diuretic]           0.06    0.00 0.06     -0.05      0.02      0.06      0.09      0.17</span></span>
+<span><span class="co">#&gt; d[Placebo]           -0.19    0.00 0.05     -0.28     -0.22     -0.19     -0.16     -0.09</span></span>
+<span><span class="co">#&gt; lp__             -37970.38    0.09 3.75 -37978.59 -37972.66 -37969.93 -37967.74 -37963.99</span></span>
 <span><span class="co">#&gt;                  n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[ACE Inhibitor]  1652    1</span></span>
-<span><span class="co">#&gt; d[ARB]            2213    1</span></span>
-<span><span class="co">#&gt; d[CCB]            2033    1</span></span>
-<span><span class="co">#&gt; d[Diuretic]       2000    1</span></span>
-<span><span class="co">#&gt; d[Placebo]        1458    1</span></span>
-<span><span class="co">#&gt; lp__              1832    1</span></span>
+<span><span class="co">#&gt; d[ACE Inhibitor]  1205    1</span></span>
+<span><span class="co">#&gt; d[ARB]            1700    1</span></span>
+<span><span class="co">#&gt; d[CCB]            1693    1</span></span>
+<span><span class="co">#&gt; d[Diuretic]       1435    1</span></span>
+<span><span class="co">#&gt; d[Placebo]        1199    1</span></span>
+<span><span class="co">#&gt; lp__              1612    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed May 24 12:23:49 2023.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 24 15:04:33 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -300,23 +301,23 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                       mean se_mean   sd      2.5%       25%       50%       75%     97.5%</span></span>
-<span><span class="co">#&gt; d[ACE Inhibitor]     -0.33    0.00 0.07     -0.48     -0.38     -0.33     -0.28     -0.19</span></span>
-<span><span class="co">#&gt; d[ARB]               -0.40    0.00 0.09     -0.59     -0.46     -0.40     -0.34     -0.22</span></span>
-<span><span class="co">#&gt; d[CCB]               -0.17    0.00 0.07     -0.30     -0.21     -0.17     -0.13     -0.04</span></span>
-<span><span class="co">#&gt; d[Diuretic]           0.07    0.00 0.09     -0.10      0.02      0.07      0.13      0.24</span></span>
-<span><span class="co">#&gt; d[Placebo]           -0.22    0.00 0.08     -0.39     -0.27     -0.22     -0.16     -0.05</span></span>
-<span><span class="co">#&gt; lp__             -37980.49    0.21 6.58 -37994.33 -37984.58 -37980.13 -37975.95 -37968.66</span></span>
-<span><span class="co">#&gt; tau                   0.13    0.00 0.04      0.06      0.10      0.13      0.16      0.23</span></span>
+<span><span class="co">#&gt; d[ACE Inhibitor]     -0.33    0.00 0.08     -0.49     -0.38     -0.32     -0.28     -0.18</span></span>
+<span><span class="co">#&gt; d[ARB]               -0.40    0.00 0.10     -0.60     -0.46     -0.40     -0.34     -0.21</span></span>
+<span><span class="co">#&gt; d[CCB]               -0.17    0.00 0.06     -0.29     -0.21     -0.17     -0.13     -0.04</span></span>
+<span><span class="co">#&gt; d[Diuretic]           0.07    0.00 0.09     -0.11      0.02      0.07      0.13      0.24</span></span>
+<span><span class="co">#&gt; d[Placebo]           -0.22    0.00 0.09     -0.39     -0.27     -0.21     -0.16     -0.05</span></span>
+<span><span class="co">#&gt; lp__             -37980.69    0.24 6.94 -37995.43 -37985.24 -37980.22 -37975.94 -37968.25</span></span>
+<span><span class="co">#&gt; tau                   0.13    0.00 0.04      0.05      0.10      0.12      0.16      0.23</span></span>
 <span><span class="co">#&gt;                  n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[ACE Inhibitor]  1858    1</span></span>
-<span><span class="co">#&gt; d[ARB]            2435    1</span></span>
-<span><span class="co">#&gt; d[CCB]            2129    1</span></span>
-<span><span class="co">#&gt; d[Diuretic]       2207    1</span></span>
-<span><span class="co">#&gt; d[Placebo]        1692    1</span></span>
-<span><span class="co">#&gt; lp__               953    1</span></span>
-<span><span class="co">#&gt; tau                931    1</span></span>
+<span><span class="co">#&gt; d[ACE Inhibitor]  1929    1</span></span>
+<span><span class="co">#&gt; d[ARB]            2549    1</span></span>
+<span><span class="co">#&gt; d[CCB]            2018    1</span></span>
+<span><span class="co">#&gt; d[Diuretic]       2551    1</span></span>
+<span><span class="co">#&gt; d[Placebo]        1854    1</span></span>
+<span><span class="co">#&gt; lp__               866    1</span></span>
+<span><span class="co">#&gt; tau                866    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed May 24 12:24:12 2023.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 24 15:04:54 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -338,13 +339,13 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">db_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 78.1<span style="color: #555555;"> (on 48 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 26.9</span></span>
-<span><span class="co">#&gt;               DIC: 105.1</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 78.3<span style="color: #555555;"> (on 48 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 27.1</span></span>
+<span><span class="co">#&gt;               DIC: 105.5</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">db_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 53.2<span style="color: #555555;"> (on 48 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 38</span></span>
+<span><span class="co">#&gt; Residual deviance: 53.3<span style="color: #555555;"> (on 48 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 37.9</span></span>
 <span><span class="co">#&gt;               DIC: 91.2</span></span></code></pre></div>
 <p>The FE model is a very poor fit to the data, with a residual deviance
 much higher than the number of data points. The RE model fits the data
@@ -368,21 +369,21 @@ with <code>trt_ref = "Diuretic"</code>:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">db_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">db_fit_FE</span>, trt_ref <span class="op">=</span> <span class="st">"Diuretic"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                   mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[Beta Blocker]  -0.06 0.05 -0.17 -0.09 -0.06 -0.02  0.05     2037     2752    1</span></span>
-<span><span class="co">#&gt; d[ACE Inhibitor] -0.36 0.05 -0.47 -0.40 -0.36 -0.32 -0.25     4971     3107    1</span></span>
-<span><span class="co">#&gt; d[ARB]           -0.45 0.06 -0.57 -0.49 -0.45 -0.41 -0.33     3742     2993    1</span></span>
-<span><span class="co">#&gt; d[CCB]           -0.25 0.05 -0.36 -0.29 -0.25 -0.22 -0.15     3434     2911    1</span></span>
-<span><span class="co">#&gt; d[Placebo]       -0.25 0.06 -0.36 -0.29 -0.25 -0.21 -0.14     4527     3355    1</span></span>
+<span><span class="co">#&gt; d[Beta Blocker]  -0.06 0.06 -0.17 -0.09 -0.06 -0.02  0.05     1450     2322    1</span></span>
+<span><span class="co">#&gt; d[ACE Inhibitor] -0.36 0.05 -0.46 -0.40 -0.36 -0.32 -0.25     3906     3325    1</span></span>
+<span><span class="co">#&gt; d[ARB]           -0.45 0.06 -0.58 -0.50 -0.45 -0.41 -0.33     2961     2871    1</span></span>
+<span><span class="co">#&gt; d[CCB]           -0.25 0.05 -0.36 -0.29 -0.25 -0.22 -0.15     2707     2754    1</span></span>
+<span><span class="co">#&gt; d[Placebo]       -0.25 0.06 -0.36 -0.29 -0.25 -0.21 -0.14     3617     3555    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_releff_FE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_diabetes_files/figure-html/diabetes_releff_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">db_releff_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">db_fit_RE</span>, trt_ref <span class="op">=</span> <span class="st">"Diuretic"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                   mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[Beta Blocker]  -0.07 0.09 -0.24 -0.13 -0.07 -0.02  0.10     2289     2324    1</span></span>
-<span><span class="co">#&gt; d[ACE Inhibitor] -0.40 0.08 -0.58 -0.45 -0.40 -0.35 -0.24     4444     3057    1</span></span>
-<span><span class="co">#&gt; d[ARB]           -0.47 0.11 -0.70 -0.54 -0.47 -0.40 -0.26     3385     2621    1</span></span>
-<span><span class="co">#&gt; d[CCB]           -0.24 0.08 -0.41 -0.29 -0.24 -0.18 -0.08     4070     3074    1</span></span>
-<span><span class="co">#&gt; d[Placebo]       -0.29 0.09 -0.48 -0.34 -0.29 -0.23 -0.12     4287     2932    1</span></span>
+<span><span class="co">#&gt; d[Beta Blocker]  -0.07 0.09 -0.24 -0.13 -0.07 -0.02  0.11     2561     2605    1</span></span>
+<span><span class="co">#&gt; d[ACE Inhibitor] -0.40 0.09 -0.58 -0.45 -0.40 -0.35 -0.24     4721     3090    1</span></span>
+<span><span class="co">#&gt; d[ARB]           -0.47 0.12 -0.70 -0.55 -0.47 -0.40 -0.25     4640     2480    1</span></span>
+<span><span class="co">#&gt; d[CCB]           -0.24 0.09 -0.41 -0.29 -0.24 -0.19 -0.07     4894     3364    1</span></span>
+<span><span class="co">#&gt; d[Placebo]       -0.29 0.09 -0.48 -0.35 -0.29 -0.23 -0.12     4638     3039    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_diabetes_files/figure-html/diabetes_releff_RE-1.png" width="700" style="display: block; margin: auto;"></p>
 <p><span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span> produce absolute predictions of
@@ -410,12 +411,12 @@ predicted cloglog probabilities).</p>
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: New 1</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                            mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[New 1: Beta Blocker]  0.06 0.07 0.01 0.02 0.04 0.08  0.24     3959     3644    1</span></span>
-<span><span class="co">#&gt; pred[New 1: ACE Inhibitor] 0.05 0.05 0.00 0.02 0.03 0.06  0.19     3900     3728    1</span></span>
-<span><span class="co">#&gt; pred[New 1: ARB]           0.04 0.05 0.00 0.01 0.03 0.05  0.17     3943     3608    1</span></span>
-<span><span class="co">#&gt; pred[New 1: CCB]           0.05 0.06 0.01 0.02 0.03 0.07  0.20     3957     3653    1</span></span>
-<span><span class="co">#&gt; pred[New 1: Diuretic]      0.07 0.07 0.01 0.02 0.04 0.08  0.25     3892     3860    1</span></span>
-<span><span class="co">#&gt; pred[New 1: Placebo]       0.05 0.06 0.01 0.02 0.03 0.07  0.21     3903     3821    1</span></span>
+<span><span class="co">#&gt; pred[New 1: Beta Blocker]  0.06 0.06 0.01 0.02 0.04 0.08  0.23     3749     3849    1</span></span>
+<span><span class="co">#&gt; pred[New 1: ACE Inhibitor] 0.05 0.05 0.01 0.02 0.03 0.06  0.17     3751     3849    1</span></span>
+<span><span class="co">#&gt; pred[New 1: ARB]           0.04 0.04 0.00 0.01 0.03 0.05  0.16     3753     3848    1</span></span>
+<span><span class="co">#&gt; pred[New 1: CCB]           0.05 0.05 0.01 0.02 0.03 0.06  0.19     3750     3849    1</span></span>
+<span><span class="co">#&gt; pred[New 1: Diuretic]      0.06 0.06 0.01 0.02 0.05 0.08  0.24     3750     3849    1</span></span>
+<span><span class="co">#&gt; pred[New 1: Placebo]       0.05 0.05 0.01 0.02 0.04 0.06  0.19     3762     3890    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_pred_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_diabetes_files/figure-html/db_pred_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
@@ -428,12 +429,12 @@ predicted cloglog probabilities).</p>
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: New 1</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                            mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[New 1: Beta Blocker]  0.06 0.06 0.01 0.02 0.04 0.08  0.23     3893     3728    1</span></span>
-<span><span class="co">#&gt; pred[New 1: ACE Inhibitor] 0.05 0.05 0.00 0.02 0.03 0.06  0.18     3907     3809    1</span></span>
-<span><span class="co">#&gt; pred[New 1: ARB]           0.04 0.04 0.00 0.02 0.03 0.05  0.17     3889     3509    1</span></span>
-<span><span class="co">#&gt; pred[New 1: CCB]           0.05 0.05 0.01 0.02 0.04 0.07  0.20     3897     3804    1</span></span>
-<span><span class="co">#&gt; pred[New 1: Diuretic]      0.07 0.07 0.01 0.02 0.05 0.08  0.25     3903     3823    1</span></span>
-<span><span class="co">#&gt; pred[New 1: Placebo]       0.05 0.05 0.01 0.02 0.03 0.06  0.19     3894     3801    1</span></span>
+<span><span class="co">#&gt; pred[New 1: Beta Blocker]  0.06 0.07 0.01 0.02 0.04 0.08  0.25     4084     4015    1</span></span>
+<span><span class="co">#&gt; pred[New 1: ACE Inhibitor] 0.05 0.05 0.00 0.02 0.03 0.06  0.19     4098     3920    1</span></span>
+<span><span class="co">#&gt; pred[New 1: ARB]           0.04 0.05 0.00 0.01 0.03 0.05  0.18     4060     3939    1</span></span>
+<span><span class="co">#&gt; pred[New 1: CCB]           0.05 0.06 0.01 0.02 0.03 0.07  0.22     4093     3981    1</span></span>
+<span><span class="co">#&gt; pred[New 1: Diuretic]      0.07 0.07 0.01 0.02 0.04 0.08  0.27     4089     3932    1</span></span>
+<span><span class="co">#&gt; pred[New 1: Placebo]       0.05 0.06 0.00 0.02 0.03 0.06  0.21     4086     3933    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_pred_RE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_diabetes_files/figure-html/db_pred_RE-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>If the <code>baseline</code> and <code>newdata</code> arguments are
@@ -446,222 +447,222 @@ probabilities <span class="math inline">\(\mu_j\)</span>:</p>
 <span><span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: AASK</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                           mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[AASK: Beta Blocker]  0.17 0.02 0.14 0.16 0.17 0.18  0.20     5326     3239    1</span></span>
-<span><span class="co">#&gt; pred[AASK: ACE Inhibitor] 0.12 0.01 0.10 0.12 0.12 0.13  0.15     4231     3365    1</span></span>
-<span><span class="co">#&gt; pred[AASK: ARB]           0.12 0.01 0.09 0.11 0.12 0.13  0.15     4367     3036    1</span></span>
-<span><span class="co">#&gt; pred[AASK: CCB]           0.14 0.01 0.12 0.13 0.14 0.15  0.18     4574     2997    1</span></span>
-<span><span class="co">#&gt; pred[AASK: Diuretic]      0.18 0.02 0.14 0.17 0.18 0.19  0.22     3968     3190    1</span></span>
-<span><span class="co">#&gt; pred[AASK: Placebo]       0.14 0.02 0.11 0.13 0.14 0.15  0.17     3870     3242    1</span></span>
+<span><span class="co">#&gt; pred[AASK: Beta Blocker]  0.17 0.01 0.14 0.16 0.17 0.18  0.20     5956     3286    1</span></span>
+<span><span class="co">#&gt; pred[AASK: ACE Inhibitor] 0.12 0.01 0.10 0.12 0.12 0.13  0.15     4877     3174    1</span></span>
+<span><span class="co">#&gt; pred[AASK: ARB]           0.12 0.01 0.09 0.11 0.12 0.13  0.15     4885     2826    1</span></span>
+<span><span class="co">#&gt; pred[AASK: CCB]           0.14 0.01 0.12 0.13 0.14 0.15  0.17     4838     3478    1</span></span>
+<span><span class="co">#&gt; pred[AASK: Diuretic]      0.18 0.02 0.14 0.17 0.18 0.19  0.22     5017     3306    1</span></span>
+<span><span class="co">#&gt; pred[AASK: Placebo]       0.14 0.02 0.11 0.13 0.14 0.15  0.17     4541     3266    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: ALLHAT</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                             mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[ALLHAT: Beta Blocker]  0.04 0.01 0.03 0.04 0.04 0.05  0.06     2492     2111    1</span></span>
-<span><span class="co">#&gt; pred[ALLHAT: ACE Inhibitor] 0.03 0.00 0.02 0.03 0.03 0.03  0.04     3671     2444    1</span></span>
-<span><span class="co">#&gt; pred[ALLHAT: ARB]           0.03 0.00 0.02 0.03 0.03 0.03  0.04     3445     2412    1</span></span>
-<span><span class="co">#&gt; pred[ALLHAT: CCB]           0.04 0.00 0.03 0.03 0.04 0.04  0.05     3346     2304    1</span></span>
-<span><span class="co">#&gt; pred[ALLHAT: Diuretic]      0.05 0.01 0.04 0.04 0.05 0.05  0.06     3828     2472    1</span></span>
-<span><span class="co">#&gt; pred[ALLHAT: Placebo]       0.03 0.00 0.03 0.03 0.03 0.04  0.04     3559     2596    1</span></span>
+<span><span class="co">#&gt; pred[ALLHAT: Beta Blocker]  0.04 0.01 0.03 0.04 0.04 0.05  0.06     2770     2359    1</span></span>
+<span><span class="co">#&gt; pred[ALLHAT: ACE Inhibitor] 0.03 0.00 0.02 0.03 0.03 0.03  0.04     4229     2943    1</span></span>
+<span><span class="co">#&gt; pred[ALLHAT: ARB]           0.03 0.00 0.02 0.03 0.03 0.03  0.04     4566     3008    1</span></span>
+<span><span class="co">#&gt; pred[ALLHAT: CCB]           0.04 0.00 0.03 0.03 0.04 0.04  0.05     4713     2986    1</span></span>
+<span><span class="co">#&gt; pred[ALLHAT: Diuretic]      0.05 0.01 0.04 0.04 0.05 0.05  0.06     4982     2947    1</span></span>
+<span><span class="co">#&gt; pred[ALLHAT: Placebo]       0.03 0.00 0.03 0.03 0.03 0.04  0.04     4564     2806    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: ALPINE</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                             mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[ALPINE: Beta Blocker]  0.03 0.01 0.01 0.02 0.03 0.03  0.05     5226     2621    1</span></span>
-<span><span class="co">#&gt; pred[ALPINE: ACE Inhibitor] 0.02 0.01 0.01 0.01 0.02 0.02  0.04     5837     2410    1</span></span>
-<span><span class="co">#&gt; pred[ALPINE: ARB]           0.02 0.01 0.01 0.01 0.02 0.02  0.03     6246     2697    1</span></span>
-<span><span class="co">#&gt; pred[ALPINE: CCB]           0.02 0.01 0.01 0.02 0.02 0.03  0.04     5616     2648    1</span></span>
-<span><span class="co">#&gt; pred[ALPINE: Diuretic]      0.03 0.01 0.01 0.02 0.03 0.03  0.05     5663     2319    1</span></span>
-<span><span class="co">#&gt; pred[ALPINE: Placebo]       0.02 0.01 0.01 0.02 0.02 0.03  0.04     6036     2506    1</span></span>
+<span><span class="co">#&gt; pred[ALPINE: Beta Blocker]  0.03 0.01 0.01 0.02 0.02 0.03  0.05     6520     3213    1</span></span>
+<span><span class="co">#&gt; pred[ALPINE: ACE Inhibitor] 0.02 0.01 0.01 0.01 0.02 0.02  0.04     6820     3292    1</span></span>
+<span><span class="co">#&gt; pred[ALPINE: ARB]           0.02 0.01 0.01 0.01 0.02 0.02  0.03     7045     3348    1</span></span>
+<span><span class="co">#&gt; pred[ALPINE: CCB]           0.02 0.01 0.01 0.02 0.02 0.03  0.04     7080     3263    1</span></span>
+<span><span class="co">#&gt; pred[ALPINE: Diuretic]      0.03 0.01 0.01 0.02 0.03 0.03  0.05     7073     2897    1</span></span>
+<span><span class="co">#&gt; pred[ALPINE: Placebo]       0.02 0.01 0.01 0.02 0.02 0.03  0.04     6875     3382    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: ANBP-2</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                             mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[ANBP-2: Beta Blocker]  0.07 0.01 0.05 0.06 0.07 0.07  0.09     3021     2858    1</span></span>
-<span><span class="co">#&gt; pred[ANBP-2: ACE Inhibitor] 0.05 0.01 0.04 0.04 0.05 0.05  0.06     3890     3044    1</span></span>
-<span><span class="co">#&gt; pred[ANBP-2: ARB]           0.05 0.01 0.03 0.04 0.05 0.05  0.06     3560     2795    1</span></span>
-<span><span class="co">#&gt; pred[ANBP-2: CCB]           0.06 0.01 0.04 0.05 0.06 0.06  0.08     3567     2899    1</span></span>
-<span><span class="co">#&gt; pred[ANBP-2: Diuretic]      0.07 0.01 0.05 0.07 0.07 0.08  0.09     4193     2999    1</span></span>
-<span><span class="co">#&gt; pred[ANBP-2: Placebo]       0.05 0.01 0.04 0.05 0.05 0.06  0.07     3718     2976    1</span></span>
+<span><span class="co">#&gt; pred[ANBP-2: Beta Blocker]  0.07 0.01 0.05 0.06 0.07 0.07  0.09     2945     2814    1</span></span>
+<span><span class="co">#&gt; pred[ANBP-2: ACE Inhibitor] 0.05 0.01 0.04 0.04 0.05 0.05  0.06     4487     3109    1</span></span>
+<span><span class="co">#&gt; pred[ANBP-2: ARB]           0.05 0.01 0.03 0.04 0.05 0.05  0.06     4659     2984    1</span></span>
+<span><span class="co">#&gt; pred[ANBP-2: CCB]           0.06 0.01 0.04 0.05 0.06 0.06  0.08     4012     2434    1</span></span>
+<span><span class="co">#&gt; pred[ANBP-2: Diuretic]      0.07 0.01 0.06 0.07 0.07 0.08  0.09     4464     2206    1</span></span>
+<span><span class="co">#&gt; pred[ANBP-2: Placebo]       0.05 0.01 0.04 0.05 0.05 0.06  0.07     4494     2979    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: ASCOT</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                            mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[ASCOT: Beta Blocker]  0.11 0.00 0.10 0.11 0.11 0.11  0.12     5001     3095    1</span></span>
-<span><span class="co">#&gt; pred[ASCOT: ACE Inhibitor] 0.08 0.01 0.07 0.08 0.08 0.09  0.10     2331     2604    1</span></span>
-<span><span class="co">#&gt; pred[ASCOT: ARB]           0.08 0.01 0.06 0.07 0.08 0.08  0.09     2719     2718    1</span></span>
-<span><span class="co">#&gt; pred[ASCOT: CCB]           0.10 0.01 0.08 0.09 0.10 0.10  0.11     2468     2766    1</span></span>
-<span><span class="co">#&gt; pred[ASCOT: Diuretic]      0.12 0.01 0.10 0.11 0.12 0.13  0.14     2502     2552    1</span></span>
-<span><span class="co">#&gt; pred[ASCOT: Placebo]       0.09 0.01 0.08 0.09 0.09 0.10  0.11     2064     2479    1</span></span>
+<span><span class="co">#&gt; pred[ASCOT: Beta Blocker]  0.11 0.00 0.10 0.11 0.11 0.11  0.12     5316     2687    1</span></span>
+<span><span class="co">#&gt; pred[ASCOT: ACE Inhibitor] 0.08 0.01 0.07 0.08 0.08 0.09  0.10     2280     2405    1</span></span>
+<span><span class="co">#&gt; pred[ASCOT: ARB]           0.08 0.01 0.06 0.07 0.08 0.08  0.09     2742     2781    1</span></span>
+<span><span class="co">#&gt; pred[ASCOT: CCB]           0.10 0.01 0.08 0.09 0.10 0.10  0.11     2130     2088    1</span></span>
+<span><span class="co">#&gt; pred[ASCOT: Diuretic]      0.12 0.01 0.10 0.11 0.12 0.13  0.14     2703     2836    1</span></span>
+<span><span class="co">#&gt; pred[ASCOT: Placebo]       0.09 0.01 0.08 0.09 0.09 0.10  0.11     2211     2544    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: CAPPP</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                            mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[CAPPP: Beta Blocker]  0.07 0.00 0.07 0.07 0.07 0.08  0.08     4703     2951    1</span></span>
-<span><span class="co">#&gt; pred[CAPPP: ACE Inhibitor] 0.05 0.00 0.05 0.05 0.05 0.06  0.06     2047     2908    1</span></span>
-<span><span class="co">#&gt; pred[CAPPP: ARB]           0.05 0.01 0.04 0.05 0.05 0.05  0.06     2707     2322    1</span></span>
-<span><span class="co">#&gt; pred[CAPPP: CCB]           0.06 0.00 0.05 0.06 0.06 0.07  0.07     2831     3027    1</span></span>
-<span><span class="co">#&gt; pred[CAPPP: Diuretic]      0.08 0.01 0.07 0.08 0.08 0.08  0.10     2744     2837    1</span></span>
-<span><span class="co">#&gt; pred[CAPPP: Placebo]       0.06 0.01 0.05 0.06 0.06 0.06  0.07     1955     2142    1</span></span>
+<span><span class="co">#&gt; pred[CAPPP: Beta Blocker]  0.07 0.00 0.07 0.07 0.07 0.08  0.08     5544     3103    1</span></span>
+<span><span class="co">#&gt; pred[CAPPP: ACE Inhibitor] 0.05 0.00 0.05 0.05 0.05 0.06  0.06     2171     2519    1</span></span>
+<span><span class="co">#&gt; pred[CAPPP: ARB]           0.05 0.01 0.04 0.05 0.05 0.05  0.06     2916     2243    1</span></span>
+<span><span class="co">#&gt; pred[CAPPP: CCB]           0.06 0.00 0.05 0.06 0.06 0.07  0.07     2807     3022    1</span></span>
+<span><span class="co">#&gt; pred[CAPPP: Diuretic]      0.08 0.01 0.07 0.08 0.08 0.09  0.10     3129     3046    1</span></span>
+<span><span class="co">#&gt; pred[CAPPP: Placebo]       0.06 0.01 0.05 0.06 0.06 0.06  0.07     2151     2339    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: CHARM</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                            mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[CHARM: Beta Blocker]  0.09 0.01 0.07 0.08 0.09 0.10  0.12     3170     2404    1</span></span>
-<span><span class="co">#&gt; pred[CHARM: ACE Inhibitor] 0.07 0.01 0.05 0.06 0.07 0.07  0.09     4315     2496    1</span></span>
-<span><span class="co">#&gt; pred[CHARM: ARB]           0.06 0.01 0.05 0.06 0.06 0.07  0.08     4443     2333    1</span></span>
-<span><span class="co">#&gt; pred[CHARM: CCB]           0.08 0.01 0.06 0.07 0.08 0.08  0.10     4248     2459    1</span></span>
-<span><span class="co">#&gt; pred[CHARM: Diuretic]      0.10 0.01 0.07 0.09 0.10 0.11  0.13     4367     2580    1</span></span>
-<span><span class="co">#&gt; pred[CHARM: Placebo]       0.07 0.01 0.06 0.07 0.07 0.08  0.09     4666     2993    1</span></span>
+<span><span class="co">#&gt; pred[CHARM: Beta Blocker]  0.09 0.01 0.07 0.08 0.09 0.10  0.12     3288     2862    1</span></span>
+<span><span class="co">#&gt; pred[CHARM: ACE Inhibitor] 0.07 0.01 0.05 0.06 0.07 0.07  0.09     4510     2940    1</span></span>
+<span><span class="co">#&gt; pred[CHARM: ARB]           0.06 0.01 0.05 0.06 0.06 0.07  0.08     4758     2974    1</span></span>
+<span><span class="co">#&gt; pred[CHARM: CCB]           0.08 0.01 0.06 0.07 0.08 0.08  0.10     4111     2959    1</span></span>
+<span><span class="co">#&gt; pred[CHARM: Diuretic]      0.10 0.01 0.07 0.09 0.10 0.11  0.13     4318     3117    1</span></span>
+<span><span class="co">#&gt; pred[CHARM: Placebo]       0.07 0.01 0.06 0.07 0.07 0.08  0.09     4797     2980    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: DREAM</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                            mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[DREAM: Beta Blocker]  0.23 0.03 0.18 0.21 0.23 0.25  0.29     2874     2394    1</span></span>
-<span><span class="co">#&gt; pred[DREAM: ACE Inhibitor] 0.17 0.02 0.13 0.16 0.17 0.18  0.21     4495     2820    1</span></span>
-<span><span class="co">#&gt; pred[DREAM: ARB]           0.16 0.02 0.12 0.14 0.16 0.17  0.21     4070     3012    1</span></span>
-<span><span class="co">#&gt; pred[DREAM: CCB]           0.20 0.03 0.15 0.18 0.20 0.21  0.25     4270     2864    1</span></span>
-<span><span class="co">#&gt; pred[DREAM: Diuretic]      0.24 0.03 0.19 0.22 0.24 0.26  0.31     4291     2670    1</span></span>
-<span><span class="co">#&gt; pred[DREAM: Placebo]       0.19 0.02 0.15 0.17 0.19 0.20  0.23     4636     2978    1</span></span>
+<span><span class="co">#&gt; pred[DREAM: Beta Blocker]  0.23 0.03 0.18 0.21 0.23 0.25  0.29     2842     2479    1</span></span>
+<span><span class="co">#&gt; pred[DREAM: ACE Inhibitor] 0.17 0.02 0.13 0.16 0.17 0.18  0.21     4244     2516    1</span></span>
+<span><span class="co">#&gt; pred[DREAM: ARB]           0.16 0.02 0.12 0.15 0.16 0.17  0.21     3897     2880    1</span></span>
+<span><span class="co">#&gt; pred[DREAM: CCB]           0.20 0.03 0.15 0.18 0.20 0.21  0.25     3592     2655    1</span></span>
+<span><span class="co">#&gt; pred[DREAM: Diuretic]      0.24 0.03 0.19 0.22 0.24 0.26  0.32     4298     3056    1</span></span>
+<span><span class="co">#&gt; pred[DREAM: Placebo]       0.19 0.02 0.15 0.17 0.19 0.20  0.24     4328     2618    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: EWPH</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                           mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[EWPH: Beta Blocker]  0.06 0.01 0.04 0.05 0.06 0.07  0.09     3805     2601    1</span></span>
-<span><span class="co">#&gt; pred[EWPH: ACE Inhibitor] 0.05 0.01 0.03 0.04 0.04 0.05  0.06     5179     2853    1</span></span>
-<span><span class="co">#&gt; pred[EWPH: ARB]           0.04 0.01 0.03 0.04 0.04 0.05  0.06     5085     3306    1</span></span>
-<span><span class="co">#&gt; pred[EWPH: CCB]           0.05 0.01 0.04 0.05 0.05 0.06  0.08     5068     2967    1</span></span>
-<span><span class="co">#&gt; pred[EWPH: Diuretic]      0.07 0.01 0.05 0.06 0.07 0.07  0.09     5402     3162    1</span></span>
-<span><span class="co">#&gt; pred[EWPH: Placebo]       0.05 0.01 0.03 0.04 0.05 0.06  0.07     5359     2671    1</span></span>
+<span><span class="co">#&gt; pred[EWPH: Beta Blocker]  0.06 0.01 0.04 0.05 0.06 0.07  0.09     3686     2954    1</span></span>
+<span><span class="co">#&gt; pred[EWPH: ACE Inhibitor] 0.05 0.01 0.03 0.04 0.04 0.05  0.06     5136     3059    1</span></span>
+<span><span class="co">#&gt; pred[EWPH: ARB]           0.04 0.01 0.03 0.04 0.04 0.05  0.06     4791     3111    1</span></span>
+<span><span class="co">#&gt; pred[EWPH: CCB]           0.05 0.01 0.04 0.05 0.05 0.06  0.08     4574     3006    1</span></span>
+<span><span class="co">#&gt; pred[EWPH: Diuretic]      0.07 0.01 0.05 0.06 0.07 0.07  0.09     4884     2938    1</span></span>
+<span><span class="co">#&gt; pred[EWPH: Placebo]       0.05 0.01 0.03 0.04 0.05 0.06  0.07     5440     3404    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: FEVER</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                            mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[FEVER: Beta Blocker]  0.04 0.01 0.03 0.04 0.04 0.04  0.05     2720     2491    1</span></span>
-<span><span class="co">#&gt; pred[FEVER: ACE Inhibitor] 0.03 0.00 0.02 0.03 0.03 0.03  0.04     4078     2745    1</span></span>
-<span><span class="co">#&gt; pred[FEVER: ARB]           0.03 0.00 0.02 0.03 0.03 0.03  0.04     4118     2422    1</span></span>
-<span><span class="co">#&gt; pred[FEVER: CCB]           0.04 0.00 0.03 0.03 0.03 0.04  0.05     4307     2653    1</span></span>
-<span><span class="co">#&gt; pred[FEVER: Diuretic]      0.04 0.01 0.03 0.04 0.04 0.05  0.06     4302     2503    1</span></span>
-<span><span class="co">#&gt; pred[FEVER: Placebo]       0.03 0.00 0.02 0.03 0.03 0.04  0.04     4285     2898    1</span></span>
+<span><span class="co">#&gt; pred[FEVER: Beta Blocker]  0.04 0.01 0.03 0.04 0.04 0.04  0.05     3135     2805    1</span></span>
+<span><span class="co">#&gt; pred[FEVER: ACE Inhibitor] 0.03 0.00 0.02 0.03 0.03 0.03  0.04     4652     2436    1</span></span>
+<span><span class="co">#&gt; pred[FEVER: ARB]           0.03 0.00 0.02 0.03 0.03 0.03  0.04     4596     2908    1</span></span>
+<span><span class="co">#&gt; pred[FEVER: CCB]           0.04 0.00 0.03 0.03 0.03 0.04  0.05     4621     2807    1</span></span>
+<span><span class="co">#&gt; pred[FEVER: Diuretic]      0.04 0.01 0.03 0.04 0.04 0.05  0.06     4985     2809    1</span></span>
+<span><span class="co">#&gt; pred[FEVER: Placebo]       0.03 0.00 0.02 0.03 0.03 0.04  0.04     4827     2869    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: HAPPHY</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                             mean sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[HAPPHY: Beta Blocker]  0.02  0 0.02 0.02 0.02 0.03  0.03     5146     3286    1</span></span>
-<span><span class="co">#&gt; pred[HAPPHY: ACE Inhibitor] 0.02  0 0.01 0.02 0.02 0.02  0.02     4234     3445    1</span></span>
-<span><span class="co">#&gt; pred[HAPPHY: ARB]           0.02  0 0.01 0.02 0.02 0.02  0.02     4162     2981    1</span></span>
-<span><span class="co">#&gt; pred[HAPPHY: CCB]           0.02  0 0.02 0.02 0.02 0.02  0.03     4304     3189    1</span></span>
-<span><span class="co">#&gt; pred[HAPPHY: Diuretic]      0.03  0 0.02 0.02 0.03 0.03  0.03     3633     3286    1</span></span>
-<span><span class="co">#&gt; pred[HAPPHY: Placebo]       0.02  0 0.02 0.02 0.02 0.02  0.03     3775     2978    1</span></span>
+<span><span class="co">#&gt; pred[HAPPHY: Beta Blocker]  0.02  0 0.02 0.02 0.02 0.03  0.03     5422     2865    1</span></span>
+<span><span class="co">#&gt; pred[HAPPHY: ACE Inhibitor] 0.02  0 0.01 0.02 0.02 0.02  0.02     4777     2916    1</span></span>
+<span><span class="co">#&gt; pred[HAPPHY: ARB]           0.02  0 0.01 0.02 0.02 0.02  0.02     4855     2847    1</span></span>
+<span><span class="co">#&gt; pred[HAPPHY: CCB]           0.02  0 0.02 0.02 0.02 0.02  0.03     4924     3236    1</span></span>
+<span><span class="co">#&gt; pred[HAPPHY: Diuretic]      0.03  0 0.02 0.02 0.03 0.03  0.03     4126     3161    1</span></span>
+<span><span class="co">#&gt; pred[HAPPHY: Placebo]       0.02  0 0.02 0.02 0.02 0.02  0.02     4452     3112    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: HOPE</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                           mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[HOPE: Beta Blocker]  0.06 0.01 0.04 0.05 0.06 0.06  0.08     3284     2633    1</span></span>
-<span><span class="co">#&gt; pred[HOPE: ACE Inhibitor] 0.04 0.01 0.03 0.04 0.04 0.05  0.05     4746     2775    1</span></span>
-<span><span class="co">#&gt; pred[HOPE: ARB]           0.04 0.01 0.03 0.04 0.04 0.04  0.05     4343     2896    1</span></span>
-<span><span class="co">#&gt; pred[HOPE: CCB]           0.05 0.01 0.04 0.04 0.05 0.05  0.07     4444     2953    1</span></span>
-<span><span class="co">#&gt; pred[HOPE: Diuretic]      0.06 0.01 0.05 0.06 0.06 0.07  0.09     4727     2930    1</span></span>
-<span><span class="co">#&gt; pred[HOPE: Placebo]       0.05 0.01 0.04 0.04 0.05 0.05  0.06     4993     2860    1</span></span>
+<span><span class="co">#&gt; pred[HOPE: Beta Blocker]  0.06 0.01 0.04 0.05 0.06 0.06  0.08     2708     2393    1</span></span>
+<span><span class="co">#&gt; pred[HOPE: ACE Inhibitor] 0.04 0.01 0.03 0.04 0.04 0.05  0.06     4260     2955    1</span></span>
+<span><span class="co">#&gt; pred[HOPE: ARB]           0.04 0.01 0.03 0.04 0.04 0.04  0.05     4034     2623    1</span></span>
+<span><span class="co">#&gt; pred[HOPE: CCB]           0.05 0.01 0.04 0.04 0.05 0.05  0.07     3466     2912    1</span></span>
+<span><span class="co">#&gt; pred[HOPE: Diuretic]      0.06 0.01 0.05 0.06 0.06 0.07  0.08     4162     2357    1</span></span>
+<span><span class="co">#&gt; pred[HOPE: Placebo]       0.05 0.01 0.04 0.04 0.05 0.05  0.06     4677     2739    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: INSIGHT</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                              mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[INSIGHT: Beta Blocker]  0.07 0.01 0.05 0.06 0.06 0.07  0.09     3519     2643    1</span></span>
-<span><span class="co">#&gt; pred[INSIGHT: ACE Inhibitor] 0.05 0.01 0.03 0.04 0.05 0.05  0.06     4700     2872    1</span></span>
-<span><span class="co">#&gt; pred[INSIGHT: ARB]           0.04 0.01 0.03 0.04 0.04 0.05  0.06     4349     2776    1</span></span>
-<span><span class="co">#&gt; pred[INSIGHT: CCB]           0.06 0.01 0.04 0.05 0.05 0.06  0.07     4693     2981    1</span></span>
-<span><span class="co">#&gt; pred[INSIGHT: Diuretic]      0.07 0.01 0.05 0.06 0.07 0.08  0.09     4764     2833    1</span></span>
-<span><span class="co">#&gt; pred[INSIGHT: Placebo]       0.05 0.01 0.04 0.05 0.05 0.06  0.07     4441     2548    1</span></span>
+<span><span class="co">#&gt; pred[INSIGHT: Beta Blocker]  0.07 0.01 0.05 0.06 0.06 0.07  0.09     3338     2492    1</span></span>
+<span><span class="co">#&gt; pred[INSIGHT: ACE Inhibitor] 0.05 0.01 0.04 0.04 0.05 0.05  0.06     4620     3059    1</span></span>
+<span><span class="co">#&gt; pred[INSIGHT: ARB]           0.04 0.01 0.03 0.04 0.04 0.05  0.06     4590     3055    1</span></span>
+<span><span class="co">#&gt; pred[INSIGHT: CCB]           0.06 0.01 0.04 0.05 0.05 0.06  0.07     4734     2787    1</span></span>
+<span><span class="co">#&gt; pred[INSIGHT: Diuretic]      0.07 0.01 0.05 0.06 0.07 0.08  0.09     5174     2773    1</span></span>
+<span><span class="co">#&gt; pred[INSIGHT: Placebo]       0.05 0.01 0.04 0.05 0.05 0.06  0.07     4586     2984    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: INVEST</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                             mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[INVEST: Beta Blocker]  0.08 0.00 0.08 0.08 0.08 0.08  0.09     6633     3043    1</span></span>
-<span><span class="co">#&gt; pred[INVEST: ACE Inhibitor] 0.06 0.00 0.05 0.06 0.06 0.06  0.07     2349     2634    1</span></span>
-<span><span class="co">#&gt; pred[INVEST: ARB]           0.06 0.01 0.05 0.05 0.06 0.06  0.07     2741     2448    1</span></span>
-<span><span class="co">#&gt; pred[INVEST: CCB]           0.07 0.00 0.06 0.07 0.07 0.07  0.08     2567     2423    1</span></span>
-<span><span class="co">#&gt; pred[INVEST: Diuretic]      0.09 0.01 0.07 0.08 0.09 0.09  0.10     2820     2729    1</span></span>
-<span><span class="co">#&gt; pred[INVEST: Placebo]       0.07 0.01 0.06 0.06 0.07 0.07  0.08     2156     2244    1</span></span>
+<span><span class="co">#&gt; pred[INVEST: Beta Blocker]  0.08 0.00 0.08 0.08 0.08 0.08  0.09     7189     3252    1</span></span>
+<span><span class="co">#&gt; pred[INVEST: ACE Inhibitor] 0.06 0.00 0.05 0.06 0.06 0.06  0.07     2268     2517    1</span></span>
+<span><span class="co">#&gt; pred[INVEST: ARB]           0.06 0.01 0.05 0.05 0.06 0.06  0.07     2763     2589    1</span></span>
+<span><span class="co">#&gt; pred[INVEST: CCB]           0.07 0.00 0.06 0.07 0.07 0.07  0.08     2339     2432    1</span></span>
+<span><span class="co">#&gt; pred[INVEST: Diuretic]      0.09 0.01 0.07 0.08 0.09 0.09  0.10     2900     2936    1</span></span>
+<span><span class="co">#&gt; pred[INVEST: Placebo]       0.07 0.01 0.06 0.06 0.07 0.07  0.08     2098     2498    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: LIFE</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                           mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[LIFE: Beta Blocker]  0.08 0.00 0.07 0.08 0.08 0.08  0.09     5514     3352    1</span></span>
-<span><span class="co">#&gt; pred[LIFE: ACE Inhibitor] 0.06 0.01 0.05 0.06 0.06 0.06  0.07     2649     2796    1</span></span>
-<span><span class="co">#&gt; pred[LIFE: ARB]           0.06 0.01 0.05 0.05 0.06 0.06  0.07     2765     2748    1</span></span>
-<span><span class="co">#&gt; pred[LIFE: CCB]           0.07 0.01 0.06 0.07 0.07 0.07  0.08     3036     2597    1</span></span>
-<span><span class="co">#&gt; pred[LIFE: Diuretic]      0.09 0.01 0.07 0.08 0.09 0.09  0.10     2981     2822    1</span></span>
-<span><span class="co">#&gt; pred[LIFE: Placebo]       0.07 0.01 0.05 0.06 0.07 0.07  0.08     2317     2622    1</span></span>
+<span><span class="co">#&gt; pred[LIFE: Beta Blocker]  0.08 0.00 0.07 0.08 0.08 0.08  0.09     6416     2962    1</span></span>
+<span><span class="co">#&gt; pred[LIFE: ACE Inhibitor] 0.06 0.01 0.05 0.06 0.06 0.06  0.07     2830     2944    1</span></span>
+<span><span class="co">#&gt; pred[LIFE: ARB]           0.06 0.01 0.05 0.05 0.06 0.06  0.07     2937     2540    1</span></span>
+<span><span class="co">#&gt; pred[LIFE: CCB]           0.07 0.01 0.06 0.07 0.07 0.07  0.08     3314     2756    1</span></span>
+<span><span class="co">#&gt; pred[LIFE: Diuretic]      0.09 0.01 0.07 0.08 0.09 0.09  0.11     3410     2985    1</span></span>
+<span><span class="co">#&gt; pred[LIFE: Placebo]       0.07 0.01 0.05 0.06 0.07 0.07  0.08     2620     2583    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: MRC-E</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                            mean sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[MRC-E: Beta Blocker]  0.03  0 0.02 0.03 0.03 0.03  0.04     3741     3121    1</span></span>
-<span><span class="co">#&gt; pred[MRC-E: ACE Inhibitor] 0.02  0 0.02 0.02 0.02 0.02  0.03     4486     2669    1</span></span>
-<span><span class="co">#&gt; pred[MRC-E: ARB]           0.02  0 0.02 0.02 0.02 0.02  0.03     4725     3090    1</span></span>
-<span><span class="co">#&gt; pred[MRC-E: CCB]           0.03  0 0.02 0.02 0.02 0.03  0.03     4149     2915    1</span></span>
-<span><span class="co">#&gt; pred[MRC-E: Diuretic]      0.03  0 0.02 0.03 0.03 0.03  0.04     4160     2909    1</span></span>
-<span><span class="co">#&gt; pred[MRC-E: Placebo]       0.02  0 0.02 0.02 0.02 0.03  0.03     4244     2902    1</span></span>
+<span><span class="co">#&gt; pred[MRC-E: Beta Blocker]  0.03  0 0.02 0.03 0.03 0.03  0.04     4196     2389    1</span></span>
+<span><span class="co">#&gt; pred[MRC-E: ACE Inhibitor] 0.02  0 0.02 0.02 0.02 0.02  0.03     5194     2771    1</span></span>
+<span><span class="co">#&gt; pred[MRC-E: ARB]           0.02  0 0.01 0.02 0.02 0.02  0.03     5288     2734    1</span></span>
+<span><span class="co">#&gt; pred[MRC-E: CCB]           0.03  0 0.02 0.02 0.02 0.03  0.03     4024     2523    1</span></span>
+<span><span class="co">#&gt; pred[MRC-E: Diuretic]      0.03  0 0.02 0.03 0.03 0.03  0.04     4648     2918    1</span></span>
+<span><span class="co">#&gt; pred[MRC-E: Placebo]       0.02  0 0.02 0.02 0.02 0.03  0.03     4950     2689    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: NORDIL</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                             mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[NORDIL: Beta Blocker]  0.05 0.00 0.04 0.05 0.05 0.05  0.06     5501     2536    1</span></span>
-<span><span class="co">#&gt; pred[NORDIL: ACE Inhibitor] 0.04 0.00 0.03 0.03 0.04 0.04  0.04     2409     2976    1</span></span>
-<span><span class="co">#&gt; pred[NORDIL: ARB]           0.03 0.00 0.03 0.03 0.03 0.04  0.04     3109     2259    1</span></span>
-<span><span class="co">#&gt; pred[NORDIL: CCB]           0.04 0.00 0.04 0.04 0.04 0.04  0.05     2961     2329    1</span></span>
-<span><span class="co">#&gt; pred[NORDIL: Diuretic]      0.05 0.01 0.04 0.05 0.05 0.06  0.06     2882     2750    1</span></span>
-<span><span class="co">#&gt; pred[NORDIL: Placebo]       0.04 0.00 0.03 0.04 0.04 0.04  0.05     2209     2445    1</span></span>
+<span><span class="co">#&gt; pred[NORDIL: Beta Blocker]  0.05 0.00 0.04 0.05 0.05 0.05  0.06     6193     3127    1</span></span>
+<span><span class="co">#&gt; pred[NORDIL: ACE Inhibitor] 0.04 0.00 0.03 0.03 0.04 0.04  0.04     2781     2607    1</span></span>
+<span><span class="co">#&gt; pred[NORDIL: ARB]           0.03 0.00 0.03 0.03 0.03 0.04  0.04     3104     2715    1</span></span>
+<span><span class="co">#&gt; pred[NORDIL: CCB]           0.04 0.00 0.04 0.04 0.04 0.04  0.05     3110     2879    1</span></span>
+<span><span class="co">#&gt; pred[NORDIL: Diuretic]      0.05 0.01 0.04 0.05 0.05 0.06  0.06     3232     3096    1</span></span>
+<span><span class="co">#&gt; pred[NORDIL: Placebo]       0.04 0.00 0.03 0.04 0.04 0.04  0.05     2591     3055    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: PEACE</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                            mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[PEACE: Beta Blocker]  0.14 0.02 0.11 0.13 0.14 0.15  0.18     2759     2779    1</span></span>
-<span><span class="co">#&gt; pred[PEACE: ACE Inhibitor] 0.10 0.01 0.08 0.09 0.10 0.11  0.13     3898     2442    1</span></span>
-<span><span class="co">#&gt; pred[PEACE: ARB]           0.10 0.01 0.07 0.09 0.09 0.10  0.13     4172     3078    1</span></span>
-<span><span class="co">#&gt; pred[PEACE: CCB]           0.12 0.02 0.09 0.11 0.12 0.13  0.15     3868     2705    1</span></span>
-<span><span class="co">#&gt; pred[PEACE: Diuretic]      0.15 0.02 0.11 0.13 0.15 0.16  0.19     4064     2755    1</span></span>
-<span><span class="co">#&gt; pred[PEACE: Placebo]       0.11 0.01 0.09 0.10 0.11 0.12  0.14     4528     2824    1</span></span>
+<span><span class="co">#&gt; pred[PEACE: Beta Blocker]  0.14 0.02 0.10 0.13 0.14 0.15  0.18     2917     2506    1</span></span>
+<span><span class="co">#&gt; pred[PEACE: ACE Inhibitor] 0.10 0.01 0.08 0.09 0.10 0.11  0.13     4461     2972    1</span></span>
+<span><span class="co">#&gt; pred[PEACE: ARB]           0.09 0.01 0.07 0.09 0.09 0.10  0.12     4354     2493    1</span></span>
+<span><span class="co">#&gt; pred[PEACE: CCB]           0.12 0.02 0.09 0.11 0.12 0.13  0.15     4039     3168    1</span></span>
+<span><span class="co">#&gt; pred[PEACE: Diuretic]      0.15 0.02 0.11 0.13 0.15 0.16  0.19     4744     2720    1</span></span>
+<span><span class="co">#&gt; pred[PEACE: Placebo]       0.11 0.01 0.09 0.10 0.11 0.12  0.14     4869     2643    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: SCOPE</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                            mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[SCOPE: Beta Blocker]  0.06 0.01 0.05 0.06 0.06 0.07  0.09     3384     2358    1</span></span>
-<span><span class="co">#&gt; pred[SCOPE: ACE Inhibitor] 0.05 0.01 0.03 0.04 0.05 0.05  0.06     4528     2519    1</span></span>
-<span><span class="co">#&gt; pred[SCOPE: ARB]           0.04 0.01 0.03 0.04 0.04 0.05  0.06     4993     2981    1</span></span>
-<span><span class="co">#&gt; pred[SCOPE: CCB]           0.06 0.01 0.04 0.05 0.05 0.06  0.08     4450     2676    1</span></span>
-<span><span class="co">#&gt; pred[SCOPE: Diuretic]      0.07 0.01 0.05 0.06 0.07 0.08  0.10     4518     2238    1</span></span>
-<span><span class="co">#&gt; pred[SCOPE: Placebo]       0.05 0.01 0.04 0.05 0.05 0.06  0.07     4906     2792    1</span></span>
+<span><span class="co">#&gt; pred[SCOPE: Beta Blocker]  0.06 0.01 0.05 0.06 0.06 0.07  0.09     3031     1675    1</span></span>
+<span><span class="co">#&gt; pred[SCOPE: ACE Inhibitor] 0.05 0.01 0.03 0.04 0.05 0.05  0.06     4294     2431    1</span></span>
+<span><span class="co">#&gt; pred[SCOPE: ARB]           0.04 0.01 0.03 0.04 0.04 0.05  0.06     5003     2755    1</span></span>
+<span><span class="co">#&gt; pred[SCOPE: CCB]           0.06 0.01 0.04 0.05 0.05 0.06  0.08     3877     2349    1</span></span>
+<span><span class="co">#&gt; pred[SCOPE: Diuretic]      0.07 0.01 0.05 0.06 0.07 0.08  0.10     4263     2060    1</span></span>
+<span><span class="co">#&gt; pred[SCOPE: Placebo]       0.05 0.01 0.04 0.05 0.05 0.06  0.07     4574     2412    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: SHEP</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                           mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[SHEP: Beta Blocker]  0.09 0.01 0.06 0.08 0.09 0.09  0.11     2892     2401    1</span></span>
-<span><span class="co">#&gt; pred[SHEP: ACE Inhibitor] 0.06 0.01 0.05 0.06 0.06 0.07  0.08     4153     2551    1</span></span>
-<span><span class="co">#&gt; pred[SHEP: ARB]           0.06 0.01 0.04 0.05 0.06 0.06  0.08     4233     2493    1</span></span>
-<span><span class="co">#&gt; pred[SHEP: CCB]           0.07 0.01 0.06 0.07 0.07 0.08  0.10     3862     2485    1</span></span>
-<span><span class="co">#&gt; pred[SHEP: Diuretic]      0.09 0.01 0.07 0.08 0.09 0.10  0.12     4200     2565    1</span></span>
-<span><span class="co">#&gt; pred[SHEP: Placebo]       0.07 0.01 0.05 0.06 0.07 0.08  0.09     4569     2597    1</span></span>
+<span><span class="co">#&gt; pred[SHEP: Beta Blocker]  0.09 0.01 0.06 0.08 0.09 0.09  0.11     3041     2989    1</span></span>
+<span><span class="co">#&gt; pred[SHEP: ACE Inhibitor] 0.06 0.01 0.05 0.06 0.06 0.07  0.08     4974     3189    1</span></span>
+<span><span class="co">#&gt; pred[SHEP: ARB]           0.06 0.01 0.04 0.05 0.06 0.06  0.08     4585     2494    1</span></span>
+<span><span class="co">#&gt; pred[SHEP: CCB]           0.07 0.01 0.06 0.07 0.07 0.08  0.10     4587     2909    1</span></span>
+<span><span class="co">#&gt; pred[SHEP: Diuretic]      0.09 0.01 0.07 0.08 0.09 0.10  0.12     5078     3194    1</span></span>
+<span><span class="co">#&gt; pred[SHEP: Placebo]       0.07 0.01 0.05 0.06 0.07 0.08  0.09     5066     2858    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: STOP-2</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                             mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[STOP-2: Beta Blocker]  0.05 0.00 0.04 0.05 0.05 0.06  0.06     4468     3120    1</span></span>
-<span><span class="co">#&gt; pred[STOP-2: ACE Inhibitor] 0.04 0.00 0.03 0.04 0.04 0.04  0.05     2595     2706    1</span></span>
-<span><span class="co">#&gt; pred[STOP-2: ARB]           0.04 0.00 0.03 0.03 0.04 0.04  0.05     2968     2735    1</span></span>
-<span><span class="co">#&gt; pred[STOP-2: CCB]           0.05 0.00 0.04 0.04 0.05 0.05  0.05     3370     3077    1</span></span>
-<span><span class="co">#&gt; pred[STOP-2: Diuretic]      0.06 0.01 0.05 0.05 0.06 0.06  0.07     3760     2672    1</span></span>
-<span><span class="co">#&gt; pred[STOP-2: Placebo]       0.04 0.00 0.03 0.04 0.04 0.05  0.05     2482     2771    1</span></span>
+<span><span class="co">#&gt; pred[STOP-2: Beta Blocker]  0.05 0.00 0.04 0.05 0.05 0.06  0.06     5036     3122    1</span></span>
+<span><span class="co">#&gt; pred[STOP-2: ACE Inhibitor] 0.04 0.00 0.03 0.04 0.04 0.04  0.05     2710     2859    1</span></span>
+<span><span class="co">#&gt; pred[STOP-2: ARB]           0.04 0.00 0.03 0.03 0.04 0.04  0.05     3707     2391    1</span></span>
+<span><span class="co">#&gt; pred[STOP-2: CCB]           0.05 0.00 0.04 0.04 0.05 0.05  0.05     4001     2690    1</span></span>
+<span><span class="co">#&gt; pred[STOP-2: Diuretic]      0.06 0.01 0.05 0.05 0.06 0.06  0.07     4097     2617    1</span></span>
+<span><span class="co">#&gt; pred[STOP-2: Placebo]       0.04 0.00 0.03 0.04 0.04 0.05  0.05     2628     2764    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: VALUE</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                            mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[VALUE: Beta Blocker]  0.20 0.02 0.15 0.18 0.19 0.21  0.25     2992     2510    1</span></span>
-<span><span class="co">#&gt; pred[VALUE: ACE Inhibitor] 0.14 0.02 0.11 0.13 0.14 0.16  0.19     3872     2269    1</span></span>
-<span><span class="co">#&gt; pred[VALUE: ARB]           0.14 0.02 0.10 0.13 0.14 0.14  0.17     4032     2780    1</span></span>
-<span><span class="co">#&gt; pred[VALUE: CCB]           0.17 0.02 0.13 0.16 0.17 0.18  0.21     3698     2175    1</span></span>
-<span><span class="co">#&gt; pred[VALUE: Diuretic]      0.21 0.03 0.16 0.19 0.21 0.22  0.27     3933     2559    1</span></span>
-<span><span class="co">#&gt; pred[VALUE: Placebo]       0.16 0.02 0.12 0.15 0.16 0.17  0.20     3975     2408    1</span></span>
+<span><span class="co">#&gt; pred[VALUE: Beta Blocker]  0.20 0.02 0.15 0.18 0.19 0.21  0.25     3137     2533    1</span></span>
+<span><span class="co">#&gt; pred[VALUE: ACE Inhibitor] 0.15 0.02 0.11 0.13 0.15 0.16  0.19     4377     2963    1</span></span>
+<span><span class="co">#&gt; pred[VALUE: ARB]           0.14 0.02 0.11 0.13 0.14 0.15  0.17     4440     2679    1</span></span>
+<span><span class="co">#&gt; pred[VALUE: CCB]           0.17 0.02 0.13 0.16 0.17 0.18  0.21     4206     2823    1</span></span>
+<span><span class="co">#&gt; pred[VALUE: Diuretic]      0.21 0.03 0.16 0.19 0.21 0.23  0.27     4204     2600    1</span></span>
+<span><span class="co">#&gt; pred[VALUE: Placebo]       0.16 0.02 0.12 0.15 0.16 0.17  0.21     4312     2573    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_pred_RE_studies</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_diabetes_files/figure-html/db_pred_RE_all-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>We can also produce treatment rankings, rank probabilities, and
@@ -669,34 +670,34 @@ cumulative rank probabilities.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">db_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">db_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                     mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; rank[Beta Blocker]  5.18 0.41    5   5   5   5     6     2715       NA    1</span></span>
-<span><span class="co">#&gt; rank[ACE Inhibitor] 1.82 0.53    1   2   2   2     3     3509     3131    1</span></span>
-<span><span class="co">#&gt; rank[ARB]           1.27 0.51    1   1   1   1     3     3419     3029    1</span></span>
-<span><span class="co">#&gt; rank[CCB]           3.71 0.51    3   3   4   4     4     3960     3177    1</span></span>
-<span><span class="co">#&gt; rank[Diuretic]      5.81 0.40    5   6   6   6     6     2733       NA    1</span></span>
-<span><span class="co">#&gt; rank[Placebo]       3.20 0.57    2   3   3   4     4     3763     2900    1</span></span>
+<span><span class="co">#&gt; rank[Beta Blocker]  5.19 0.42    5   5   5   5     6     2817       NA    1</span></span>
+<span><span class="co">#&gt; rank[ACE Inhibitor] 1.85 0.53    1   2   2   2     3     3366     3476    1</span></span>
+<span><span class="co">#&gt; rank[ARB]           1.26 0.52    1   1   1   1     3     3378     3306    1</span></span>
+<span><span class="co">#&gt; rank[CCB]           3.71 0.51    3   3   4   4     4     3650     3293    1</span></span>
+<span><span class="co">#&gt; rank[Diuretic]      5.80 0.42    5   6   6   6     6     3054       NA    1</span></span>
+<span><span class="co">#&gt; rank[Placebo]       3.19 0.60    2   3   3   4     4     3393     3121    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_ranks</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_diabetes_files/figure-html/diabetes_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">db_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">db_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                  p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6]</span></span>
-<span><span class="co">#&gt; d[Beta Blocker]       0.00      0.00      0.00      0.01      0.80      0.19</span></span>
-<span><span class="co">#&gt; d[ACE Inhibitor]      0.24      0.71      0.05      0.00      0.00      0.00</span></span>
-<span><span class="co">#&gt; d[ARB]                0.76      0.21      0.03      0.00      0.00      0.00</span></span>
-<span><span class="co">#&gt; d[CCB]                0.00      0.02      0.26      0.71      0.01      0.00</span></span>
-<span><span class="co">#&gt; d[Diuretic]           0.00      0.00      0.00      0.00      0.19      0.81</span></span>
-<span><span class="co">#&gt; d[Placebo]            0.00      0.06      0.66      0.26      0.01      0.00</span></span>
+<span><span class="co">#&gt; d[Beta Blocker]       0.00      0.00      0.00      0.01      0.79       0.2</span></span>
+<span><span class="co">#&gt; d[ACE Inhibitor]      0.22      0.71      0.06      0.01      0.00       0.0</span></span>
+<span><span class="co">#&gt; d[ARB]                0.77      0.20      0.02      0.00      0.00       0.0</span></span>
+<span><span class="co">#&gt; d[CCB]                0.00      0.01      0.27      0.70      0.01       0.0</span></span>
+<span><span class="co">#&gt; d[Diuretic]           0.00      0.00      0.00      0.01      0.19       0.8</span></span>
+<span><span class="co">#&gt; d[Placebo]            0.01      0.07      0.64      0.27      0.01       0.0</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_rankprobs</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_diabetes_files/figure-html/diabetes_rankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">db_cumrankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">db_fit_RE</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                  p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6]</span></span>
-<span><span class="co">#&gt; d[Beta Blocker]       0.00      0.00      0.00      0.01      0.81         1</span></span>
-<span><span class="co">#&gt; d[ACE Inhibitor]      0.24      0.94      1.00      1.00      1.00         1</span></span>
-<span><span class="co">#&gt; d[ARB]                0.76      0.97      1.00      1.00      1.00         1</span></span>
-<span><span class="co">#&gt; d[CCB]                0.00      0.02      0.28      0.99      1.00         1</span></span>
-<span><span class="co">#&gt; d[Diuretic]           0.00      0.00      0.00      0.00      0.19         1</span></span>
-<span><span class="co">#&gt; d[Placebo]            0.00      0.07      0.73      0.99      1.00         1</span></span>
+<span><span class="co">#&gt; d[Beta Blocker]       0.00      0.00      0.00      0.01       0.8         1</span></span>
+<span><span class="co">#&gt; d[ACE Inhibitor]      0.22      0.93      0.99      1.00       1.0         1</span></span>
+<span><span class="co">#&gt; d[ARB]                0.77      0.97      1.00      1.00       1.0         1</span></span>
+<span><span class="co">#&gt; d[CCB]                0.00      0.02      0.29      0.99       1.0         1</span></span>
+<span><span class="co">#&gt; d[Diuretic]           0.00      0.00      0.00      0.01       0.2         1</span></span>
+<span><span class="co">#&gt; d[Placebo]            0.01      0.08      0.72      0.99       1.0         1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_cumrankprobs</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_diabetes_files/figure-html/diabetes_cumrankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>

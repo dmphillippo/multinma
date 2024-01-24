@@ -22,6 +22,9 @@
     <loc>https://dmphillippo.github.io/multinma/articles/example_hta_psoriasis.html</loc>
   </url>
   <url>
+    <loc>https://dmphillippo.github.io/multinma/articles/example_ndmm.html</loc>
+  </url>
+  <url>
     <loc>https://dmphillippo.github.io/multinma/articles/example_parkinsons.html</loc>
   </url>
   <url>
@@ -59,6 +62,9 @@
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/GammaDist.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/aa_example_ndmm.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/aa_example_pso_mlnmr.html</loc>
@@ -118,6 +124,9 @@
     <loc>https://dmphillippo.github.io/multinma/reference/generalised_t.html</loc>
   </url>
   <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/geom_km.html</loc>
+  </url>
+  <url>
     <loc>https://dmphillippo.github.io/multinma/reference/get_nodesplits.html</loc>
   </url>
   <url>
@@ -142,13 +151,22 @@
     <loc>https://dmphillippo.github.io/multinma/reference/loo.html</loc>
   </url>
   <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/make_knots.html</loc>
+  </url>
+  <url>
     <loc>https://dmphillippo.github.io/multinma/reference/mcmc_array-class.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/mspline.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/multi.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/multinma-package.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/ndmm.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/nma.html</loc>
@@ -229,6 +247,9 @@
     <loc>https://dmphillippo.github.io/multinma/reference/random_effects.html</loc>
   </url>
   <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/reexports.html</loc>
+  </url>
+  <url>
     <loc>https://dmphillippo.github.io/multinma/reference/relative_effects.html</loc>
   </url>
   <url>
@@ -236,6 +257,9 @@
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/set_agd_contrast.html</loc>
+  </url>
+  <url>
+    <loc>https://dmphillippo.github.io/multinma/reference/set_agd_surv.html</loc>
   </url>
   <url>
     <loc>https://dmphillippo.github.io/multinma/reference/set_ipd.html</loc>

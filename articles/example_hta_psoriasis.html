@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.6/font.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.8/font.css" rel="stylesheet">
 <!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
@@ -35,7 +35,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,6 +59,7 @@
     <a class="dropdown-item" href="../articles/example_diabetes.html">Example: Diabetes</a>
     <a class="dropdown-item" href="../articles/example_dietary_fat.html">Example: Dietary fat</a>
     <a class="dropdown-item" href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a>
+    <a class="dropdown-item" href="../articles/example_ndmm.html">Example: Newly diagnosed multiple myeloma</a>
     <a class="dropdown-item" href="../articles/example_parkinsons.html">Example: Parkinson's disease</a>
     <a class="dropdown-item" href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a>
     <a class="dropdown-item" href="../articles/example_smoking.html">Example: Smoking cessation</a>
@@ -254,17 +255,17 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                         mean se_mean   sd     2.5%      25%      50%      75%    97.5% n_eff</span></span>
-<span><span class="co">#&gt; d[Ciclosporin]          1.92    0.01 0.34     1.28     1.68     1.90     2.14     2.64  1627</span></span>
-<span><span class="co">#&gt; d[Efalizumab]           1.19    0.00 0.06     1.08     1.15     1.19     1.23     1.30  2127</span></span>
-<span><span class="co">#&gt; d[Etanercept 25 mg]     1.51    0.00 0.10     1.32     1.45     1.51     1.57     1.70  2232</span></span>
-<span><span class="co">#&gt; d[Etanercept 50 mg]     1.92    0.00 0.10     1.72     1.86     1.92     1.99     2.11  2119</span></span>
-<span><span class="co">#&gt; d[Fumaderm]             1.50    0.01 0.49     0.62     1.16     1.46     1.79     2.52  2554</span></span>
-<span><span class="co">#&gt; d[Infliximab]           2.33    0.01 0.26     1.85     2.15     2.32     2.51     2.86  2596</span></span>
-<span><span class="co">#&gt; d[Methotrexate]         1.61    0.01 0.45     0.74     1.31     1.60     1.90     2.53  1926</span></span>
-<span><span class="co">#&gt; lp__                -3405.08    0.08 3.57 -3412.88 -3407.32 -3404.80 -3402.43 -3399.20  1765</span></span>
+<span><span class="co">#&gt; d[Ciclosporin]          1.92    0.01 0.33     1.31     1.69     1.90     2.13     2.61  1475</span></span>
+<span><span class="co">#&gt; d[Efalizumab]           1.19    0.00 0.06     1.08     1.15     1.19     1.23     1.30  2233</span></span>
+<span><span class="co">#&gt; d[Etanercept 25 mg]     1.51    0.00 0.10     1.32     1.45     1.51     1.58     1.71  2458</span></span>
+<span><span class="co">#&gt; d[Etanercept 50 mg]     1.92    0.00 0.10     1.72     1.85     1.92     1.99     2.13  2516</span></span>
+<span><span class="co">#&gt; d[Fumaderm]             1.48    0.01 0.49     0.63     1.14     1.45     1.78     2.54  2909</span></span>
+<span><span class="co">#&gt; d[Infliximab]           2.33    0.01 0.27     1.81     2.14     2.33     2.51     2.88  2822</span></span>
+<span><span class="co">#&gt; d[Methotrexate]         1.61    0.01 0.43     0.80     1.31     1.60     1.89     2.47  1721</span></span>
+<span><span class="co">#&gt; lp__                -3405.15    0.09 3.59 -3412.96 -3407.28 -3404.76 -3402.59 -3399.11  1465</span></span>
 <span><span class="co">#&gt; cc[PASI50]              0.00     NaN 0.00     0.00     0.00     0.00     0.00     0.00   NaN</span></span>
-<span><span class="co">#&gt; cc[PASI75]              0.76    0.00 0.03     0.70     0.74     0.76     0.78     0.82  5825</span></span>
-<span><span class="co">#&gt; cc[PASI90]              1.57    0.00 0.05     1.46     1.53     1.57     1.60     1.67  6099</span></span>
+<span><span class="co">#&gt; cc[PASI75]              0.76    0.00 0.03     0.70     0.74     0.76     0.78     0.82  5551</span></span>
+<span><span class="co">#&gt; cc[PASI90]              1.57    0.00 0.05     1.46     1.53     1.56     1.60     1.67  5899</span></span>
 <span><span class="co">#&gt;                     Rhat</span></span>
 <span><span class="co">#&gt; d[Ciclosporin]         1</span></span>
 <span><span class="co">#&gt; d[Efalizumab]          1</span></span>
@@ -278,7 +279,7 @@ method:</p>
 <span><span class="co">#&gt; cc[PASI75]             1</span></span>
 <span><span class="co">#&gt; cc[PASI90]             1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed May 24 12:25:14 2023.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 24 15:05:59 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -359,18 +360,18 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=2500, total post-warmup draws=10000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                         mean se_mean   sd     2.5%      25%      50%      75%    97.5% n_eff</span></span>
-<span><span class="co">#&gt; d[Ciclosporin]          2.04    0.01 0.44     1.28     1.74     1.99     2.29     3.00  2717</span></span>
-<span><span class="co">#&gt; d[Efalizumab]           1.19    0.00 0.18     0.81     1.11     1.19     1.27     1.56  5020</span></span>
-<span><span class="co">#&gt; d[Etanercept 25 mg]     1.53    0.00 0.23     1.06     1.40     1.52     1.65     2.01  5016</span></span>
-<span><span class="co">#&gt; d[Etanercept 50 mg]     1.93    0.00 0.27     1.34     1.79     1.92     2.06     2.49  5135</span></span>
-<span><span class="co">#&gt; d[Fumaderm]             1.48    0.01 0.61     0.34     1.08     1.46     1.87     2.73  6855</span></span>
-<span><span class="co">#&gt; d[Infliximab]           2.32    0.00 0.38     1.56     2.09     2.32     2.55     3.06  7156</span></span>
-<span><span class="co">#&gt; d[Methotrexate]         1.72    0.01 0.65     0.55     1.31     1.70     2.10     3.09  3912</span></span>
-<span><span class="co">#&gt; lp__                -3410.84    0.19 6.80 -3424.69 -3415.46 -3410.57 -3405.96 -3398.62  1306</span></span>
-<span><span class="co">#&gt; tau                     0.30    0.01 0.22     0.02     0.15     0.26     0.41     0.83   932</span></span>
+<span><span class="co">#&gt; d[Ciclosporin]          2.01    0.01 0.42     1.29     1.72     1.98     2.26     2.94  2577</span></span>
+<span><span class="co">#&gt; d[Efalizumab]           1.19    0.00 0.17     0.83     1.11     1.19     1.27     1.54  3136</span></span>
+<span><span class="co">#&gt; d[Etanercept 25 mg]     1.53    0.00 0.23     1.07     1.41     1.53     1.64     2.01  5049</span></span>
+<span><span class="co">#&gt; d[Etanercept 50 mg]     1.93    0.00 0.27     1.40     1.79     1.93     2.05     2.46  4205</span></span>
+<span><span class="co">#&gt; d[Fumaderm]             1.49    0.01 0.62     0.35     1.08     1.45     1.87     2.82  6850</span></span>
+<span><span class="co">#&gt; d[Infliximab]           2.31    0.00 0.37     1.56     2.08     2.31     2.55     3.04  6869</span></span>
+<span><span class="co">#&gt; d[Methotrexate]         1.70    0.01 0.62     0.58     1.30     1.67     2.05     3.03  3097</span></span>
+<span><span class="co">#&gt; lp__                -3410.91    0.19 6.77 -3424.62 -3415.45 -3410.69 -3406.27 -3398.33  1217</span></span>
+<span><span class="co">#&gt; tau                     0.30    0.01 0.22     0.02     0.14     0.25     0.40     0.86   864</span></span>
 <span><span class="co">#&gt; cc[PASI50]              0.00     NaN 0.00     0.00     0.00     0.00     0.00     0.00   NaN</span></span>
-<span><span class="co">#&gt; cc[PASI75]              0.76    0.00 0.03     0.70     0.74     0.76     0.78     0.82 16361</span></span>
-<span><span class="co">#&gt; cc[PASI90]              1.56    0.00 0.05     1.46     1.53     1.56     1.60     1.67 19302</span></span>
+<span><span class="co">#&gt; cc[PASI75]              0.76    0.00 0.03     0.70     0.74     0.76     0.78     0.82 15056</span></span>
+<span><span class="co">#&gt; cc[PASI90]              1.56    0.00 0.05     1.47     1.53     1.56     1.60     1.66 16398</span></span>
 <span><span class="co">#&gt;                     Rhat</span></span>
 <span><span class="co">#&gt; d[Ciclosporin]      1.00</span></span>
 <span><span class="co">#&gt; d[Efalizumab]       1.00</span></span>
@@ -379,13 +380,13 @@ method:</p>
 <span><span class="co">#&gt; d[Fumaderm]         1.00</span></span>
 <span><span class="co">#&gt; d[Infliximab]       1.00</span></span>
 <span><span class="co">#&gt; d[Methotrexate]     1.00</span></span>
-<span><span class="co">#&gt; lp__                1.00</span></span>
+<span><span class="co">#&gt; lp__                1.01</span></span>
 <span><span class="co">#&gt; tau                 1.01</span></span>
 <span><span class="co">#&gt; cc[PASI50]           NaN</span></span>
 <span><span class="co">#&gt; cc[PASI75]          1.00</span></span>
 <span><span class="co">#&gt; cc[PASI90]          1.00</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed May 24 12:27:15 2023.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 24 15:07:29 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -407,14 +408,14 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">pso_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 74.8<span style="color: #555555;"> (on 58 data points)</span></span></span>
+<span><span class="co">#&gt; Residual deviance: 74.9<span style="color: #555555;"> (on 58 data points)</span></span></span>
 <span><span class="co">#&gt;                pD: 25.4</span></span>
-<span><span class="co">#&gt;               DIC: 100.1</span></span></code></pre></div>
+<span><span class="co">#&gt;               DIC: 100.3</span></span></code></pre></div>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">pso_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 63.1<span style="color: #555555;"> (on 58 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 33.4</span></span>
-<span><span class="co">#&gt;               DIC: 96.6</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 63.3<span style="color: #555555;"> (on 58 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 33.2</span></span>
+<span><span class="co">#&gt;               DIC: 96.5</span></span></code></pre></div>
 <p>The random effects model has a lower DIC and the residual deviance is
 closer to the number of data points, so is preferred in this case.</p>
 <p>We can also examine the residual deviance contributions with the
@@ -454,29 +455,29 @@ probabilities).</p>
 <span><span class="va">pred_FE</span></span>
 <span><span class="co">#&gt;                                mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
 <span><span class="co">#&gt; pred[Supportive care, PASI50]  0.14 0.02 0.10 0.12 0.14 0.15  0.18     3631     3432    1</span></span>
-<span><span class="co">#&gt; pred[Supportive care, PASI75]  0.03 0.01 0.02 0.03 0.03 0.04  0.05     3789     3232    1</span></span>
-<span><span class="co">#&gt; pred[Supportive care, PASI90]  0.00 0.00 0.00 0.00 0.00 0.00  0.01     4246     3776    1</span></span>
-<span><span class="co">#&gt; pred[Ciclosporin, PASI50]      0.78 0.10 0.57 0.72 0.79 0.85  0.94     1707     1890    1</span></span>
-<span><span class="co">#&gt; pred[Ciclosporin, PASI75]      0.52 0.13 0.28 0.43 0.52 0.62  0.80     1721     1983    1</span></span>
-<span><span class="co">#&gt; pred[Ciclosporin, PASI90]      0.24 0.11 0.08 0.16 0.22 0.31  0.50     1721     1992    1</span></span>
-<span><span class="co">#&gt; pred[Efalizumab, PASI50]       0.54 0.04 0.46 0.51 0.54 0.56  0.62     3152     3231    1</span></span>
-<span><span class="co">#&gt; pred[Efalizumab, PASI75]       0.25 0.04 0.19 0.23 0.25 0.28  0.33     3313     3733    1</span></span>
-<span><span class="co">#&gt; pred[Efalizumab, PASI90]       0.07 0.02 0.04 0.06 0.07 0.08  0.11     3565     3866    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI50] 0.66 0.05 0.56 0.63 0.66 0.69  0.75     2562     3057    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI75] 0.37 0.05 0.27 0.33 0.37 0.40  0.47     2665     2973    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI90] 0.13 0.03 0.08 0.11 0.13 0.14  0.19     2829     2993    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI50] 0.79 0.04 0.71 0.77 0.80 0.82  0.86     2556     2742    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI75] 0.53 0.05 0.42 0.49 0.53 0.56  0.63     2697     2753    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI90] 0.23 0.04 0.16 0.20 0.23 0.26  0.32     2852     2966    1</span></span>
-<span><span class="co">#&gt; pred[Fumaderm, PASI50]         0.64 0.16 0.31 0.53 0.64 0.76  0.93     2721     2454    1</span></span>
-<span><span class="co">#&gt; pred[Fumaderm, PASI75]         0.37 0.17 0.10 0.24 0.35 0.48  0.76     2739     2467    1</span></span>
-<span><span class="co">#&gt; pred[Fumaderm, PASI90]         0.15 0.12 0.02 0.07 0.12 0.20  0.45     2705     2500    1</span></span>
-<span><span class="co">#&gt; pred[Infliximab, PASI50]       0.88 0.05 0.76 0.85 0.89 0.92  0.96     2671     2514    1</span></span>
-<span><span class="co">#&gt; pred[Infliximab, PASI75]       0.68 0.10 0.48 0.61 0.68 0.75  0.85     2662     2568    1</span></span>
-<span><span class="co">#&gt; pred[Infliximab, PASI90]       0.37 0.10 0.19 0.30 0.37 0.44  0.59     2692     2683    1</span></span>
-<span><span class="co">#&gt; pred[Methotrexate, PASI50]     0.68 0.15 0.36 0.58 0.69 0.79  0.92     2001     2264    1</span></span>
-<span><span class="co">#&gt; pred[Methotrexate, PASI75]     0.41 0.16 0.13 0.29 0.40 0.52  0.76     2007     2264    1</span></span>
-<span><span class="co">#&gt; pred[Methotrexate, PASI90]     0.17 0.11 0.03 0.09 0.14 0.23  0.45     2003     2292    1</span></span>
+<span><span class="co">#&gt; pred[Supportive care, PASI75]  0.03 0.01 0.02 0.03 0.03 0.04  0.05     3958     3843    1</span></span>
+<span><span class="co">#&gt; pred[Supportive care, PASI90]  0.00 0.00 0.00 0.00 0.00 0.00  0.01     4199     3591    1</span></span>
+<span><span class="co">#&gt; pred[Ciclosporin, PASI50]      0.78 0.10 0.57 0.72 0.79 0.85  0.94     1552     2299    1</span></span>
+<span><span class="co">#&gt; pred[Ciclosporin, PASI75]      0.52 0.13 0.28 0.43 0.52 0.61  0.78     1550     2285    1</span></span>
+<span><span class="co">#&gt; pred[Ciclosporin, PASI90]      0.24 0.11 0.08 0.16 0.22 0.30  0.49     1589     2270    1</span></span>
+<span><span class="co">#&gt; pred[Efalizumab, PASI50]       0.54 0.04 0.45 0.51 0.54 0.57  0.62     3093     3522    1</span></span>
+<span><span class="co">#&gt; pred[Efalizumab, PASI75]       0.25 0.04 0.19 0.23 0.25 0.28  0.33     3304     3618    1</span></span>
+<span><span class="co">#&gt; pred[Efalizumab, PASI90]       0.07 0.02 0.04 0.06 0.07 0.08  0.11     3455     3664    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI50] 0.66 0.05 0.56 0.63 0.66 0.69  0.75     2877     2993    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI75] 0.37 0.05 0.27 0.33 0.37 0.40  0.47     2988     2969    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI90] 0.13 0.03 0.08 0.11 0.13 0.15  0.19     3185     3283    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI50] 0.79 0.04 0.71 0.77 0.79 0.82  0.86     2871     3208    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI75] 0.53 0.06 0.42 0.49 0.53 0.56  0.63     2958     3221    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI90] 0.23 0.04 0.15 0.20 0.23 0.26  0.32     3171     3137    1</span></span>
+<span><span class="co">#&gt; pred[Fumaderm, PASI50]         0.63 0.16 0.30 0.52 0.64 0.75  0.93     3206     2459    1</span></span>
+<span><span class="co">#&gt; pred[Fumaderm, PASI75]         0.37 0.17 0.10 0.24 0.34 0.47  0.76     3225     2325    1</span></span>
+<span><span class="co">#&gt; pred[Fumaderm, PASI90]         0.15 0.12 0.02 0.06 0.11 0.19  0.45     3251     2368    1</span></span>
+<span><span class="co">#&gt; pred[Infliximab, PASI50]       0.88 0.05 0.75 0.85 0.89 0.92  0.96     2900     3003    1</span></span>
+<span><span class="co">#&gt; pred[Infliximab, PASI75]       0.68 0.10 0.47 0.61 0.68 0.75  0.85     2924     2979    1</span></span>
+<span><span class="co">#&gt; pred[Infliximab, PASI90]       0.38 0.11 0.19 0.30 0.37 0.45  0.60     2909     2846    1</span></span>
+<span><span class="co">#&gt; pred[Methotrexate, PASI50]     0.68 0.14 0.38 0.58 0.70 0.79  0.92     1769     2308    1</span></span>
+<span><span class="co">#&gt; pred[Methotrexate, PASI75]     0.41 0.16 0.14 0.29 0.40 0.52  0.74     1765     2321    1</span></span>
+<span><span class="co">#&gt; pred[Methotrexate, PASI90]     0.17 0.11 0.03 0.09 0.15 0.22  0.44     1790     2074    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/pso_pred_FE-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
@@ -486,29 +487,29 @@ probabilities).</p>
 <span><span class="va">pred_RE</span></span>
 <span><span class="co">#&gt;                                mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
 <span><span class="co">#&gt; pred[Supportive care, PASI50]  0.14 0.02 0.10 0.12 0.14 0.15  0.18     9886     9993    1</span></span>
-<span><span class="co">#&gt; pred[Supportive care, PASI75]  0.03 0.01 0.02 0.03 0.03 0.04  0.05    10478    10203    1</span></span>
-<span><span class="co">#&gt; pred[Supportive care, PASI90]  0.00 0.00 0.00 0.00 0.00 0.00  0.01    11429     9859    1</span></span>
-<span><span class="co">#&gt; pred[Ciclosporin, PASI50]      0.80 0.11 0.57 0.74 0.82 0.89  0.97     3358     2722    1</span></span>
-<span><span class="co">#&gt; pred[Ciclosporin, PASI75]      0.56 0.16 0.28 0.45 0.56 0.67  0.87     3362     2728    1</span></span>
-<span><span class="co">#&gt; pred[Ciclosporin, PASI90]      0.28 0.14 0.08 0.18 0.25 0.36  0.63     3363     2722    1</span></span>
-<span><span class="co">#&gt; pred[Efalizumab, PASI50]       0.54 0.08 0.38 0.49 0.54 0.58  0.69     5752     4812    1</span></span>
-<span><span class="co">#&gt; pred[Efalizumab, PASI75]       0.26 0.06 0.14 0.22 0.25 0.29  0.40     5869     4726    1</span></span>
-<span><span class="co">#&gt; pred[Efalizumab, PASI90]       0.07 0.03 0.03 0.06 0.07 0.09  0.15     5994     4979    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI50] 0.66 0.09 0.48 0.61 0.67 0.72  0.83     5738     4407    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI75] 0.38 0.09 0.21 0.32 0.37 0.43  0.58     5787     4541    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI90] 0.14 0.06 0.05 0.10 0.13 0.16  0.27     5868     4792    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI50] 0.79 0.08 0.59 0.75 0.80 0.84  0.92     5779     4609    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI75] 0.53 0.11 0.30 0.47 0.53 0.59  0.75     5790     4548    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI90] 0.24 0.09 0.09 0.19 0.23 0.28  0.44     5816     4549    1</span></span>
-<span><span class="co">#&gt; pred[Fumaderm, PASI50]         0.63 0.20 0.22 0.49 0.64 0.78  0.95     7087     5940    1</span></span>
-<span><span class="co">#&gt; pred[Fumaderm, PASI75]         0.37 0.20 0.06 0.22 0.35 0.51  0.81     7075     5952    1</span></span>
-<span><span class="co">#&gt; pred[Fumaderm, PASI90]         0.16 0.14 0.01 0.06 0.11 0.22  0.54     7082     5962    1</span></span>
-<span><span class="co">#&gt; pred[Infliximab, PASI50]       0.87 0.08 0.67 0.84 0.89 0.93  0.98     7492     6191    1</span></span>
-<span><span class="co">#&gt; pred[Infliximab, PASI75]       0.67 0.13 0.38 0.59 0.68 0.76  0.89     7499     6050    1</span></span>
-<span><span class="co">#&gt; pred[Infliximab, PASI90]       0.37 0.14 0.13 0.28 0.36 0.46  0.67     7510     6112    1</span></span>
-<span><span class="co">#&gt; pred[Methotrexate, PASI50]     0.70 0.18 0.29 0.58 0.72 0.84  0.98     4442     3866    1</span></span>
-<span><span class="co">#&gt; pred[Methotrexate, PASI75]     0.45 0.21 0.09 0.29 0.44 0.60  0.89     4430     3914    1</span></span>
-<span><span class="co">#&gt; pred[Methotrexate, PASI90]     0.21 0.17 0.02 0.09 0.17 0.29  0.67     4434     3710    1</span></span>
+<span><span class="co">#&gt; pred[Supportive care, PASI75]  0.03 0.01 0.02 0.03 0.03 0.04  0.05    10318    10128    1</span></span>
+<span><span class="co">#&gt; pred[Supportive care, PASI90]  0.00 0.00 0.00 0.00 0.00 0.00  0.01    11047     9957    1</span></span>
+<span><span class="co">#&gt; pred[Ciclosporin, PASI50]      0.80 0.11 0.57 0.73 0.81 0.88  0.97     3241     2851    1</span></span>
+<span><span class="co">#&gt; pred[Ciclosporin, PASI75]      0.56 0.15 0.28 0.44 0.55 0.66  0.87     3259     2835    1</span></span>
+<span><span class="co">#&gt; pred[Ciclosporin, PASI90]      0.27 0.14 0.08 0.17 0.25 0.35  0.62     3276     2988    1</span></span>
+<span><span class="co">#&gt; pred[Efalizumab, PASI50]       0.54 0.07 0.38 0.49 0.54 0.58  0.69     4652     3945    1</span></span>
+<span><span class="co">#&gt; pred[Efalizumab, PASI75]       0.26 0.06 0.15 0.22 0.25 0.29  0.40     4750     4088    1</span></span>
+<span><span class="co">#&gt; pred[Efalizumab, PASI90]       0.07 0.03 0.03 0.06 0.07 0.09  0.14     4863     4179    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI50] 0.66 0.09 0.48 0.62 0.67 0.71  0.83     5547     4187    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI75] 0.38 0.09 0.21 0.32 0.37 0.42  0.57     5573     4280    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI90] 0.14 0.06 0.05 0.10 0.13 0.16  0.27     5678     4290    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI50] 0.79 0.08 0.61 0.75 0.80 0.84  0.92     5324     3820    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI75] 0.53 0.10 0.32 0.47 0.53 0.59  0.74     5277     3817    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI90] 0.24 0.09 0.10 0.19 0.23 0.28  0.44     5342     4025    1</span></span>
+<span><span class="co">#&gt; pred[Fumaderm, PASI50]         0.63 0.20 0.22 0.49 0.64 0.78  0.96     7380     4557    1</span></span>
+<span><span class="co">#&gt; pred[Fumaderm, PASI75]         0.38 0.20 0.06 0.22 0.34 0.51  0.84     7411     4659    1</span></span>
+<span><span class="co">#&gt; pred[Fumaderm, PASI90]         0.16 0.15 0.01 0.06 0.11 0.22  0.57     7503     4482    1</span></span>
+<span><span class="co">#&gt; pred[Infliximab, PASI50]       0.87 0.08 0.68 0.84 0.89 0.93  0.98     7164     4708    1</span></span>
+<span><span class="co">#&gt; pred[Infliximab, PASI75]       0.67 0.13 0.38 0.59 0.68 0.76  0.89     7093     4679    1</span></span>
+<span><span class="co">#&gt; pred[Infliximab, PASI90]       0.37 0.13 0.13 0.28 0.36 0.46  0.66     7186     4759    1</span></span>
+<span><span class="co">#&gt; pred[Methotrexate, PASI50]     0.69 0.18 0.30 0.58 0.72 0.83  0.97     3775     2836    1</span></span>
+<span><span class="co">#&gt; pred[Methotrexate, PASI75]     0.44 0.21 0.10 0.29 0.43 0.58  0.88     3783     2912    1</span></span>
+<span><span class="co">#&gt; pred[Methotrexate, PASI90]     0.20 0.16 0.02 0.09 0.16 0.27  0.66     3809     2883    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_RE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/pso_pred_RE-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>If instead of information on the baseline PASI 50 response probit
@@ -529,29 +530,29 @@ probability).</p>
 <span><span class="va">pred_FE_beta</span></span>
 <span><span class="co">#&gt;                                mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
 <span><span class="co">#&gt; pred[Supportive care, PASI50]  0.14 0.02 0.10 0.12 0.14 0.15  0.17     3940     4002    1</span></span>
-<span><span class="co">#&gt; pred[Supportive care, PASI75]  0.03 0.01 0.02 0.03 0.03 0.04  0.05     4192     4134    1</span></span>
-<span><span class="co">#&gt; pred[Supportive care, PASI90]  0.00 0.00 0.00 0.00 0.00 0.00  0.01     4512     3920    1</span></span>
-<span><span class="co">#&gt; pred[Ciclosporin, PASI50]      0.78 0.10 0.57 0.72 0.79 0.85  0.94     1695     2060    1</span></span>
-<span><span class="co">#&gt; pred[Ciclosporin, PASI75]      0.52 0.13 0.28 0.43 0.52 0.62  0.79     1712     2023    1</span></span>
-<span><span class="co">#&gt; pred[Ciclosporin, PASI90]      0.24 0.11 0.08 0.16 0.22 0.31  0.50     1703     2084    1</span></span>
-<span><span class="co">#&gt; pred[Efalizumab, PASI50]       0.54 0.04 0.46 0.51 0.54 0.56  0.61     3296     3831    1</span></span>
-<span><span class="co">#&gt; pred[Efalizumab, PASI75]       0.25 0.03 0.19 0.23 0.25 0.28  0.32     3470     4016    1</span></span>
-<span><span class="co">#&gt; pred[Efalizumab, PASI90]       0.07 0.02 0.05 0.06 0.07 0.08  0.10     3717     3772    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI50] 0.66 0.04 0.57 0.63 0.66 0.69  0.75     2975     3241    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI75] 0.37 0.05 0.28 0.34 0.37 0.40  0.46     3157     3445    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI90] 0.13 0.03 0.08 0.11 0.13 0.14  0.19     3214     3665    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI50] 0.79 0.04 0.72 0.77 0.80 0.82  0.86     2713     3184    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI75] 0.53 0.05 0.43 0.49 0.53 0.56  0.63     2961     3599    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI90] 0.23 0.04 0.16 0.20 0.23 0.26  0.31     3067     3553    1</span></span>
-<span><span class="co">#&gt; pred[Fumaderm, PASI50]         0.64 0.16 0.31 0.52 0.64 0.76  0.93     2796     2365    1</span></span>
-<span><span class="co">#&gt; pred[Fumaderm, PASI75]         0.37 0.17 0.11 0.24 0.35 0.48  0.75     2810     2452    1</span></span>
-<span><span class="co">#&gt; pred[Fumaderm, PASI90]         0.15 0.11 0.02 0.07 0.12 0.19  0.45     2764     2423    1</span></span>
-<span><span class="co">#&gt; pred[Infliximab, PASI50]       0.88 0.05 0.76 0.85 0.89 0.92  0.96     2794     2668    1</span></span>
-<span><span class="co">#&gt; pred[Infliximab, PASI75]       0.68 0.10 0.48 0.61 0.68 0.75  0.85     2779     2647    1</span></span>
-<span><span class="co">#&gt; pred[Infliximab, PASI90]       0.37 0.10 0.20 0.30 0.37 0.44  0.59     2791     2648    1</span></span>
-<span><span class="co">#&gt; pred[Methotrexate, PASI50]     0.68 0.15 0.36 0.58 0.69 0.79  0.93     1980     2457    1</span></span>
-<span><span class="co">#&gt; pred[Methotrexate, PASI75]     0.41 0.16 0.13 0.29 0.40 0.52  0.76     1990     2294    1</span></span>
-<span><span class="co">#&gt; pred[Methotrexate, PASI90]     0.17 0.11 0.03 0.09 0.14 0.23  0.46     1980     2306    1</span></span>
+<span><span class="co">#&gt; pred[Supportive care, PASI75]  0.03 0.01 0.02 0.03 0.03 0.04  0.05     4137     3934    1</span></span>
+<span><span class="co">#&gt; pred[Supportive care, PASI90]  0.00 0.00 0.00 0.00 0.00 0.00  0.01     4644     3739    1</span></span>
+<span><span class="co">#&gt; pred[Ciclosporin, PASI50]      0.78 0.09 0.57 0.72 0.79 0.85  0.94     1600     2189    1</span></span>
+<span><span class="co">#&gt; pred[Ciclosporin, PASI75]      0.52 0.13 0.28 0.43 0.52 0.61  0.78     1598     2222    1</span></span>
+<span><span class="co">#&gt; pred[Ciclosporin, PASI90]      0.24 0.11 0.08 0.16 0.22 0.30  0.50     1635     2184    1</span></span>
+<span><span class="co">#&gt; pred[Efalizumab, PASI50]       0.54 0.04 0.46 0.51 0.54 0.56  0.61     3251     3328    1</span></span>
+<span><span class="co">#&gt; pred[Efalizumab, PASI75]       0.25 0.03 0.19 0.23 0.25 0.28  0.32     3414     3820    1</span></span>
+<span><span class="co">#&gt; pred[Efalizumab, PASI90]       0.07 0.02 0.05 0.06 0.07 0.08  0.11     3593     3193    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI50] 0.66 0.05 0.57 0.63 0.66 0.69  0.75     2969     3422    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI75] 0.37 0.05 0.28 0.33 0.37 0.40  0.47     3055     3784    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI90] 0.13 0.03 0.08 0.11 0.13 0.14  0.19     3299     3421    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI50] 0.79 0.04 0.71 0.77 0.79 0.82  0.86     3018     3454    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI75] 0.53 0.05 0.42 0.49 0.53 0.56  0.63     3070     3620    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI90] 0.23 0.04 0.16 0.20 0.23 0.26  0.32     3338     3415    1</span></span>
+<span><span class="co">#&gt; pred[Fumaderm, PASI50]         0.63 0.16 0.32 0.52 0.64 0.76  0.93     3217     2324    1</span></span>
+<span><span class="co">#&gt; pred[Fumaderm, PASI75]         0.37 0.17 0.11 0.24 0.34 0.47  0.76     3230     2337    1</span></span>
+<span><span class="co">#&gt; pred[Fumaderm, PASI90]         0.15 0.12 0.02 0.06 0.11 0.19  0.46     3265     2296    1</span></span>
+<span><span class="co">#&gt; pred[Infliximab, PASI50]       0.88 0.05 0.76 0.85 0.89 0.92  0.96     2937     2923    1</span></span>
+<span><span class="co">#&gt; pred[Infliximab, PASI75]       0.68 0.10 0.48 0.61 0.68 0.75  0.85     2966     2932    1</span></span>
+<span><span class="co">#&gt; pred[Infliximab, PASI90]       0.38 0.11 0.19 0.30 0.37 0.44  0.59     2960     3025    1</span></span>
+<span><span class="co">#&gt; pred[Methotrexate, PASI50]     0.68 0.14 0.38 0.59 0.69 0.79  0.92     1824     1869    1</span></span>
+<span><span class="co">#&gt; pred[Methotrexate, PASI75]     0.41 0.16 0.14 0.29 0.40 0.52  0.74     1817     1973    1</span></span>
+<span><span class="co">#&gt; pred[Methotrexate, PASI90]     0.17 0.11 0.03 0.09 0.14 0.22  0.43     1846     1873    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_FE_beta</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/pso_pred_FE_beta-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
@@ -562,29 +563,29 @@ probability).</p>
 <span><span class="va">pred_RE_beta</span></span>
 <span><span class="co">#&gt;                                mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
 <span><span class="co">#&gt; pred[Supportive care, PASI50]  0.14 0.02 0.11 0.13 0.14 0.15  0.17     9843     9606    1</span></span>
-<span><span class="co">#&gt; pred[Supportive care, PASI75]  0.03 0.01 0.02 0.03 0.03 0.04  0.05    10708     9495    1</span></span>
-<span><span class="co">#&gt; pred[Supportive care, PASI90]  0.00 0.00 0.00 0.00 0.00 0.00  0.01    11922     9653    1</span></span>
-<span><span class="co">#&gt; pred[Ciclosporin, PASI50]      0.80 0.11 0.57 0.74 0.82 0.88  0.97     3308     2748    1</span></span>
-<span><span class="co">#&gt; pred[Ciclosporin, PASI75]      0.56 0.15 0.28 0.45 0.56 0.67  0.88     3321     2697    1</span></span>
-<span><span class="co">#&gt; pred[Ciclosporin, PASI90]      0.28 0.14 0.08 0.18 0.25 0.36  0.64     3312     2733    1</span></span>
-<span><span class="co">#&gt; pred[Efalizumab, PASI50]       0.54 0.07 0.38 0.50 0.54 0.58  0.69     6090     4709    1</span></span>
-<span><span class="co">#&gt; pred[Efalizumab, PASI75]       0.26 0.06 0.14 0.22 0.25 0.29  0.40     6255     4548    1</span></span>
-<span><span class="co">#&gt; pred[Efalizumab, PASI90]       0.07 0.03 0.03 0.06 0.07 0.09  0.14     6451     4860    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI50] 0.66 0.09 0.48 0.61 0.67 0.72  0.83     5726     4571    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI75] 0.38 0.09 0.21 0.32 0.37 0.43  0.57     5787     4746    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI90] 0.14 0.06 0.05 0.10 0.13 0.16  0.27     5881     4625    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI50] 0.79 0.08 0.59 0.75 0.80 0.84  0.92     5680     4343    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI75] 0.53 0.10 0.30 0.47 0.53 0.59  0.75     5693     4284    1</span></span>
-<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI90] 0.24 0.09 0.09 0.19 0.23 0.28  0.45     5736     4212    1</span></span>
-<span><span class="co">#&gt; pred[Fumaderm, PASI50]         0.63 0.20 0.22 0.49 0.64 0.78  0.95     7115     5685    1</span></span>
-<span><span class="co">#&gt; pred[Fumaderm, PASI75]         0.37 0.20 0.06 0.22 0.35 0.50  0.81     7110     5892    1</span></span>
-<span><span class="co">#&gt; pred[Fumaderm, PASI90]         0.16 0.14 0.01 0.06 0.11 0.21  0.53     7121     5758    1</span></span>
-<span><span class="co">#&gt; pred[Infliximab, PASI50]       0.87 0.08 0.68 0.84 0.89 0.93  0.98     7535     6008    1</span></span>
-<span><span class="co">#&gt; pred[Infliximab, PASI75]       0.67 0.13 0.38 0.59 0.68 0.76  0.89     7549     6255    1</span></span>
-<span><span class="co">#&gt; pred[Infliximab, PASI90]       0.37 0.14 0.13 0.28 0.36 0.46  0.66     7583     6152    1</span></span>
-<span><span class="co">#&gt; pred[Methotrexate, PASI50]     0.70 0.18 0.29 0.58 0.73 0.84  0.98     4370     3753    1</span></span>
-<span><span class="co">#&gt; pred[Methotrexate, PASI75]     0.45 0.21 0.09 0.29 0.44 0.60  0.89     4369     3774    1</span></span>
-<span><span class="co">#&gt; pred[Methotrexate, PASI90]     0.21 0.17 0.02 0.09 0.17 0.29  0.67     4368     3769    1</span></span>
+<span><span class="co">#&gt; pred[Supportive care, PASI75]  0.03 0.01 0.02 0.03 0.03 0.04  0.05    10562     9723    1</span></span>
+<span><span class="co">#&gt; pred[Supportive care, PASI90]  0.00 0.00 0.00 0.00 0.00 0.00  0.01    11624     9544    1</span></span>
+<span><span class="co">#&gt; pred[Ciclosporin, PASI50]      0.80 0.10 0.57 0.73 0.81 0.88  0.97     3189     2739    1</span></span>
+<span><span class="co">#&gt; pred[Ciclosporin, PASI75]      0.55 0.15 0.28 0.44 0.55 0.66  0.87     3208     2896    1</span></span>
+<span><span class="co">#&gt; pred[Ciclosporin, PASI90]      0.27 0.14 0.08 0.17 0.25 0.35  0.62     3224     2751    1</span></span>
+<span><span class="co">#&gt; pred[Efalizumab, PASI50]       0.54 0.07 0.39 0.50 0.54 0.58  0.68     4649     3782    1</span></span>
+<span><span class="co">#&gt; pred[Efalizumab, PASI75]       0.26 0.06 0.15 0.22 0.25 0.29  0.39     4767     3780    1</span></span>
+<span><span class="co">#&gt; pred[Efalizumab, PASI90]       0.07 0.03 0.03 0.06 0.07 0.09  0.14     4871     3891    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI50] 0.66 0.08 0.48 0.62 0.67 0.71  0.82     5487     3960    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI75] 0.38 0.09 0.21 0.32 0.37 0.42  0.57     5508     3932    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 25 mg, PASI90] 0.14 0.06 0.05 0.10 0.13 0.16  0.27     5613     3976    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI50] 0.79 0.08 0.61 0.75 0.80 0.83  0.92     5306     3563    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI75] 0.53 0.10 0.32 0.47 0.53 0.58  0.74     5260     3645    1</span></span>
+<span><span class="co">#&gt; pred[Etanercept 50 mg, PASI90] 0.24 0.08 0.10 0.19 0.23 0.28  0.44     5302     3640    1</span></span>
+<span><span class="co">#&gt; pred[Fumaderm, PASI50]         0.63 0.20 0.22 0.49 0.64 0.78  0.96     7364     4214    1</span></span>
+<span><span class="co">#&gt; pred[Fumaderm, PASI75]         0.38 0.20 0.06 0.22 0.34 0.51  0.83     7395     4299    1</span></span>
+<span><span class="co">#&gt; pred[Fumaderm, PASI90]         0.16 0.15 0.01 0.06 0.11 0.22  0.56     7456     4232    1</span></span>
+<span><span class="co">#&gt; pred[Infliximab, PASI50]       0.87 0.08 0.68 0.84 0.89 0.93  0.97     6991     4556    1</span></span>
+<span><span class="co">#&gt; pred[Infliximab, PASI75]       0.67 0.13 0.39 0.59 0.68 0.76  0.89     6932     4235    1</span></span>
+<span><span class="co">#&gt; pred[Infliximab, PASI90]       0.37 0.13 0.13 0.28 0.36 0.46  0.66     7024     4629    1</span></span>
+<span><span class="co">#&gt; pred[Methotrexate, PASI50]     0.69 0.18 0.30 0.58 0.72 0.83  0.97     3689     3065    1</span></span>
+<span><span class="co">#&gt; pred[Methotrexate, PASI75]     0.44 0.21 0.10 0.29 0.42 0.58  0.88     3708     3009    1</span></span>
+<span><span class="co">#&gt; pred[Methotrexate, PASI90]     0.20 0.16 0.02 0.09 0.16 0.27  0.64     3745     2881    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_RE_beta</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/pso_pred_RE_beta-1.png" width="700" style="display: block; margin: auto;">
 (Notice that these results are equivalent to those calculated above
@@ -614,27 +615,27 @@ better (the outcomes are positive).</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                        mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; rank[Supportive care]  7.99 0.11    8   8   8   8     8     5526       NA    1</span></span>
-<span><span class="co">#&gt; rank[Ciclosporin]      2.76 1.27    1   2   3   4     5     6613     6428    1</span></span>
-<span><span class="co">#&gt; rank[Efalizumab]       6.34 0.81    4   6   7   7     7     5629       NA    1</span></span>
-<span><span class="co">#&gt; rank[Etanercept 25 mg] 4.92 1.06    3   4   5   6     7     6871     5862    1</span></span>
-<span><span class="co">#&gt; rank[Etanercept 50 mg] 3.05 1.21    1   2   3   4     5     5194     5158    1</span></span>
-<span><span class="co">#&gt; rank[Fumaderm]         4.92 1.95    1   3   5   7     7     6876     6057    1</span></span>
-<span><span class="co">#&gt; rank[Infliximab]       1.81 1.18    1   1   1   2     5     3839     4463    1</span></span>
-<span><span class="co">#&gt; rank[Methotrexate]     4.21 1.89    1   3   4   6     7     5652     5599    1</span></span>
+<span><span class="co">#&gt; rank[Supportive care]  7.99 0.10    8   8   8   8     8     6011       NA    1</span></span>
+<span><span class="co">#&gt; rank[Ciclosporin]      2.79 1.27    1   2   3   4     5     6484     6981    1</span></span>
+<span><span class="co">#&gt; rank[Efalizumab]       6.35 0.79    4   6   7   7     7     4253       NA    1</span></span>
+<span><span class="co">#&gt; rank[Etanercept 25 mg] 4.90 1.07    3   4   5   6     7     6126     4791    1</span></span>
+<span><span class="co">#&gt; rank[Etanercept 50 mg] 3.02 1.18    1   2   3   4     5     4881     4733    1</span></span>
+<span><span class="co">#&gt; rank[Fumaderm]         4.89 1.97    1   3   5   7     7     7335     5606    1</span></span>
+<span><span class="co">#&gt; rank[Infliximab]       1.77 1.16    1   1   1   2     5     2924     3998    1</span></span>
+<span><span class="co">#&gt; rank[Methotrexate]     4.29 1.87    1   3   4   6     7     4574     5439    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_ranks</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_hta_psoriasis_files/figure-html/hta_psoriasis_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                     p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6] p_rank[7]</span></span>
 <span><span class="co">#&gt; d[Supportive care]       0.00      0.00      0.00      0.00      0.00      0.00      0.01</span></span>
-<span><span class="co">#&gt; d[Ciclosporin]           0.18      0.28      0.28      0.17      0.08      0.02      0.00</span></span>
+<span><span class="co">#&gt; d[Ciclosporin]           0.16      0.29      0.27      0.17      0.08      0.02      0.00</span></span>
 <span><span class="co">#&gt; d[Efalizumab]            0.00      0.00      0.00      0.02      0.10      0.36      0.51</span></span>
-<span><span class="co">#&gt; d[Etanercept 25 mg]      0.00      0.01      0.09      0.21      0.39      0.26      0.04</span></span>
-<span><span class="co">#&gt; d[Etanercept 50 mg]      0.07      0.30      0.26      0.25      0.09      0.02      0.01</span></span>
-<span><span class="co">#&gt; d[Fumaderm]              0.07      0.09      0.09      0.11      0.16      0.19      0.27</span></span>
-<span><span class="co">#&gt; d[Infliximab]            0.58      0.19      0.13      0.06      0.03      0.01      0.00</span></span>
-<span><span class="co">#&gt; d[Methotrexate]          0.10      0.12      0.15      0.18      0.16      0.14      0.15</span></span>
+<span><span class="co">#&gt; d[Etanercept 25 mg]      0.00      0.01      0.09      0.22      0.38      0.26      0.04</span></span>
+<span><span class="co">#&gt; d[Etanercept 50 mg]      0.07      0.30      0.28      0.24      0.09      0.01      0.00</span></span>
+<span><span class="co">#&gt; d[Fumaderm]              0.08      0.08      0.09      0.11      0.16      0.19      0.28</span></span>
+<span><span class="co">#&gt; d[Infliximab]            0.59      0.19      0.12      0.06      0.02      0.01      0.00</span></span>
+<span><span class="co">#&gt; d[Methotrexate]          0.09      0.12      0.15      0.18      0.17      0.15      0.15</span></span>
 <span><span class="co">#&gt;                     p_rank[8]</span></span>
 <span><span class="co">#&gt; d[Supportive care]       0.99</span></span>
 <span><span class="co">#&gt; d[Ciclosporin]           0.00</span></span>
@@ -650,13 +651,13 @@ better (the outcomes are positive).</p>
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_cumrankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                     p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6] p_rank[7]</span></span>
 <span><span class="co">#&gt; d[Supportive care]       0.00      0.00      0.00      0.00      0.00      0.00      0.01</span></span>
-<span><span class="co">#&gt; d[Ciclosporin]           0.18      0.46      0.73      0.90      0.98      1.00      1.00</span></span>
+<span><span class="co">#&gt; d[Ciclosporin]           0.16      0.45      0.73      0.90      0.98      1.00      1.00</span></span>
 <span><span class="co">#&gt; d[Efalizumab]            0.00      0.00      0.01      0.03      0.13      0.49      1.00</span></span>
-<span><span class="co">#&gt; d[Etanercept 25 mg]      0.00      0.01      0.10      0.31      0.70      0.96      1.00</span></span>
-<span><span class="co">#&gt; d[Etanercept 50 mg]      0.07      0.38      0.64      0.89      0.98      0.99      1.00</span></span>
-<span><span class="co">#&gt; d[Fumaderm]              0.07      0.16      0.25      0.37      0.53      0.72      0.99</span></span>
-<span><span class="co">#&gt; d[Infliximab]            0.58      0.77      0.90      0.96      0.99      1.00      1.00</span></span>
-<span><span class="co">#&gt; d[Methotrexate]          0.10      0.22      0.37      0.55      0.71      0.85      1.00</span></span>
+<span><span class="co">#&gt; d[Etanercept 25 mg]      0.00      0.02      0.10      0.32      0.70      0.96      1.00</span></span>
+<span><span class="co">#&gt; d[Etanercept 50 mg]      0.07      0.38      0.66      0.89      0.98      1.00      1.00</span></span>
+<span><span class="co">#&gt; d[Fumaderm]              0.08      0.16      0.26      0.37      0.53      0.72      0.99</span></span>
+<span><span class="co">#&gt; d[Infliximab]            0.59      0.78      0.90      0.96      0.99      1.00      1.00</span></span>
+<span><span class="co">#&gt; d[Methotrexate]          0.09      0.20      0.35      0.53      0.70      0.84      1.00</span></span>
 <span><span class="co">#&gt;                     p_rank[8]</span></span>
 <span><span class="co">#&gt; d[Supportive care]          1</span></span>
 <span><span class="co">#&gt; d[Ciclosporin]              1</span></span>

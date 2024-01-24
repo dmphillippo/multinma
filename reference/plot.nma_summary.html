@@ -4,7 +4,7 @@ parameter estimates (when called on a stan_nma object or its summary),
 relative effects (when called on the output of relative_effects()),
 absolute predictions (when called on the output of predict.stan_nma()),
 posterior ranks and rank probabilities (when called on the output of
-posterior_ranks() or posterior_rank_probs())."><title>Plots of summary results — plot.nma_summary • multinma</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.6/font.css" rel="stylesheet"><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet"><meta property="og:title" content="Plots of summary results — plot.nma_summary"><meta property="og:description" content="The plot method for nma_summary objects is used to produce plots of
+posterior_ranks() or posterior_rank_probs())."><title>Plots of summary results — plot.nma_summary • multinma</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.8/font.css" rel="stylesheet"><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet"><meta property="og:title" content="Plots of summary results — plot.nma_summary"><meta property="og:description" content="The plot method for nma_summary objects is used to produce plots of
 parameter estimates (when called on a stan_nma object or its summary),
 relative effects (when called on the output of relative_effects()),
 absolute predictions (when called on the output of predict.stan_nma()),
@@ -20,7 +20,7 @@ posterior_ranks() or posterior_rank_probs())."><meta property="og:image" content
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,6 +43,7 @@ posterior_ranks() or posterior_rank_probs())."><meta property="og:image" content
     <a class="dropdown-item" href="../articles/example_diabetes.html">Example: Diabetes</a>
     <a class="dropdown-item" href="../articles/example_dietary_fat.html">Example: Dietary fat</a>
     <a class="dropdown-item" href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a>
+    <a class="dropdown-item" href="../articles/example_ndmm.html">Example: Newly diagnosed multiple myeloma</a>
     <a class="dropdown-item" href="../articles/example_parkinsons.html">Example: Parkinson's disease</a>
     <a class="dropdown-item" href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a>
     <a class="dropdown-item" href="../articles/example_smoking.html">Example: Smoking cessation</a>
@@ -105,7 +106,10 @@ posterior ranks and rank probabilities (when called on the output of
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for nma_rank_probs</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for surv_nma_summary</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, stat <span class="op">=</span> <span class="st">"lineribbon"</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -121,7 +125,9 @@ stat, see Details</p></dd>
 
 <dt>stat</dt>
 <dd><p>Character string specifying the <code>ggdist</code> plot stat to use,
-default <code>"pointinterval"</code></p></dd>
+default <code>"pointinterval"</code>, except when plotting estimated
+survival/hazard/cumulative hazard curves from survival models where the
+default is <code>"lineribbon"</code></p></dd>
 
 
 <dt>orientation</dt>
@@ -142,22 +148,30 @@ no reference lines are drawn</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Plotting is handled by ggplot2 and the stats and geoms provided in
+    <p>Plotting is handled by <a href="https://ggplot2.tidyverse.org/reference/ggplot2-package.html" class="external-link">ggplot2</a> and the stats and geoms provided in
 the ggdist package. As a result, the output is very flexible. Any
 plotting stats provided by <code>ggdist</code> may be used, via the argument
-<code>stat</code>. The default uses
+<code>stat</code>.</p>
+<p>The default uses
 <code><a href="http://mjskay.github.io/ggdist/reference/stat_pointinterval.html" class="external-link">ggdist::stat_pointinterval()</a></code>, to
-produce medians and 95% Credible Intervals with 66% inner bands.
-Additional arguments in <code>...</code> are passed to the <code>ggdist</code> stat, to
-customise the output. For example, to produce means and Credible Intervals,
-specify <code>point_interval = "mean_qi"</code>. To produce an 80% Credible Interval
-with no inner band, specify <code>.width = c(0, 0.8)</code>.</p>
+produce medians and 95% Credible Intervals with 66% inner bands. Additional
+arguments in <code>...</code> are passed to the <code>ggdist</code> stat, to customise the
+output. For example, to produce means and Credible Intervals, specify
+<code>point_interval = "mean_qi"</code>. To produce an 80% Credible Interval with no
+inner band, specify <code>.width = c(0, 0.8)</code>.</p>
 <p>Alternative stats can be specified to produce different summaries. For
 example, specify <code>stat = "[half]eye"</code> to produce (half) eye plots, or <code>stat = "histinterval"</code> to produce histograms with intervals.</p>
 <p>A full list of options and examples is found in the <code>ggdist</code> vignette
 <code><a href="http://mjskay.github.io/ggdist/articles/slabinterval.html" class="external-link">vignette("slabinterval", package = "ggdist")</a></code>.</p>
+<p>For survival/hazard/cumulative hazard curves estimated from survival
+models, the default uses
+<code><a href="http://mjskay.github.io/ggdist/reference/stat_lineribbon.html" class="external-link">ggdist::stat_lineribbon()</a></code> which
+produces curves of posterior medians with 50%, 80%, and 95% Credible
+Interval bands. Again, additional arguments in <code>...</code> are passed to the
+<code>ggdist</code> stat. For example, to produce posterior means and 95% Credible
+bands, specify <code>point_interval = "mean_qi"</code> and <code>.width = 0.95</code>.</p>
 <p>A <code>ggplot</code> object is returned which can be further modified through the
-usual ggplot2 functions to add further aesthetics, geoms, themes, etc.</p>
+usual <a href="https://ggplot2.tidyverse.org/reference/ggplot2-package.html" class="external-link">ggplot2</a> functions to add further aesthetics, geoms, themes, etc.</p>
     </div>
 
     <div class="section level2">
