@@ -2089,12 +2089,11 @@ make_surv_predict <- function(eta, aux, times, likelihood,
   if (type %in% c("survival", "hazard", "cumhaz") && n_eta == 1) { # Multiple times, single linear predictor
     if (!is.null(aux)) aux <- matrix(aux, ncol = dim(aux)[3], dimnames = list(NULL, dimnames(aux)[[3]]))
     for (i in 1:length(times)) {
-      out[, , i] <- do.call(surv_predfuns[[likelihood]][[type]],
-                            args = list(times = times[i],
-                                        eta = as.vector(eta),
-                                        aux = aux,
-                                        quantiles = quantiles,
-                                        basis = basis))
+      out[, , i] <- surv_predfuns[[likelihood]][[type]](times = times[i],
+                                                        eta = as.vector(eta),
+                                                        aux = aux,
+                                                        quantiles = quantiles,
+                                                        basis = basis)
     }
   } else if (n_eta > 1) { # Single/multiple times, multiple linear predictors
     if (type == "quantile") {
@@ -2118,22 +2117,20 @@ make_surv_predict <- function(eta, aux, times, likelihood,
         }
       }
       out[ , , ((i-1)*iinc+1):(i*iinc)] <-
-        do.call(surv_predfuns[[likelihood]][[type]],
-                args = list(times = ti,
-                            eta = as.vector(eta[ , , i]),
-                            aux = auxi,
-                            quantiles = quantiles,
-                            basis = basis))
+        surv_predfuns[[likelihood]][[type]](times = ti,
+                                            eta = as.vector(eta[ , , i]),
+                                            aux = auxi,
+                                            quantiles = quantiles,
+                                            basis = basis)
     }
   } else { # Single time, single linear predictor
     if (!is.null(aux)) aux <- matrix(aux, ncol = dim(aux)[3], dimnames = list(NULL, dimnames(aux)[[3]]))
     if (type == "quantile") quantiles <- rep(quantiles, each = length(eta))
-    out <- array(do.call(surv_predfuns[[likelihood]][[type]],
-                         args = list(times = times,
-                                     eta = as.vector(eta),
-                                     aux = aux,
-                                     quantiles = quantiles,
-                                     basis = basis)),
+    out <- array(surv_predfuns[[likelihood]][[type]](times = times,
+                                                     eta = as.vector(eta),
+                                                     aux = aux,
+                                                     quantiles = quantiles,
+                                                     basis = basis),
                  dim = d_out, dimnames = dn_out)
   }
 
@@ -2284,11 +2281,10 @@ rmst_Sbar <- function(times, eta, weights, aux, likelihood, basis, start = 0) {
 pSbar <- function(times, eta, weights, aux, likelihood, basis) {
   Sbar <- numeric(length(times))
   for (i in 1:length(times)) {
-    S <- do.call(surv_predfuns[[likelihood]][["survival"]],
-                       args = list(times = times[i],
-                                   eta = eta,
-                                   aux = aux,
-                                   basis = basis))
+    S <- surv_predfuns[[likelihood]][["survival"]](times = times[i],
+                                                   eta = eta,
+                                                   aux = aux,
+                                                   basis = basis)
 
     Sbar[i] <- weighted.mean(S, weights)
   }
@@ -2346,11 +2342,10 @@ qSbar <- function(times, p, eta, weights, aux, likelihood, basis) {
         auxi <- as.vector(aux[ , , i])
       }
     }
-    S[ , , i] <- do.call(surv_predfuns[[likelihood]][["survival"]],
-                         args = list(times = times,
-                                     eta = as.vector(eta[ , , i]),
-                                     aux = auxi,
-                                     basis = basis))
+    S[ , , i] <- surv_predfuns[[likelihood]][["survival"]](times = times,
+                                                           eta = as.vector(eta[ , , i]),
+                                                           aux = auxi,
+                                                           basis = basis)
   }
 
   Sbar <- apply(S, MARGIN = 1:2, FUN = weighted.mean, w = weights)
