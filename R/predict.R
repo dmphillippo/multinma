@@ -761,64 +761,53 @@ predict.stan_nma <- function(object, ...,
     }
 
     # Produce nma_summary
+    if (object$likelihood == "ordered") {
+      pred_meta <- tibble::tibble(.trt = rep(preddat$.trt, each = n_cc),
+                                  .category = rep(l_cc, times = nrow(preddat)))
+
+    } else if (object$likelihood %in% valid_lhood$survival) {
+      if (type %in% c("survival", "hazard", "cumhaz")) {
+        preddat <- tidyr::unnest(preddat, cols = ".time")
+        pred_meta <- tibble::tibble(.trt = preddat$.trt,
+                                    .time = preddat$.time)
+      } else if (type == "rmst") {
+        pred_meta <- tibble::tibble(.trt = preddat$.trt,
+                                    .time = preddat$.time)
+      } else if (type == "quantile") {
+        pred_meta <- tibble::tibble(.trt = rep(preddat$.trt, each = length(quantiles)),
+                                    .quantile = rep(quantiles, times = nrow(preddat)))
+      } else {
+        pred_meta <- tibble::tibble(.trt = preddat$.trt)
+      }
+
+    } else {
+      pred_meta <- tibble::tibble(.trt = preddat$.trt)
+    }
+
+    if (is.null(baseline)) {
+      if (object$likelihood == "ordered") {
+        pred_meta <- tibble::add_column(pred_meta,
+                                        .study = rep(preddat$.study, each = n_cc),
+                                        .before = 1)
+      } else if (type == "quantile") {
+        pred_meta <- tibble::add_column(pred_meta,
+                                        .study = rep(preddat$.study, each = length(quantiles)),
+                                        .before = 1)
+      } else {
+        pred_meta <- tibble::add_column(pred_meta,
+                                        .study = preddat$.study,
+                                        .before = 1)
+      }
+    }
+
     if (summary) {
       pred_summary <- summary_mcmc_array(pred_array, probs)
-
-      if (object$likelihood == "ordered") {
-        pred_summary <- tibble::add_column(pred_summary,
-                                           .trt = rep(preddat$.trt, each = n_cc),
-                                           .category = rep(l_cc, times = nrow(preddat)),
-                                           .before = 1)
-
-      } else if (object$likelihood %in% valid_lhood$survival) {
-        if (type %in% c("survival", "hazard", "cumhaz")) {
-          preddat <- tidyr::unnest(preddat, cols = ".time")
-          pred_summary <- tibble::add_column(pred_summary,
-                                             .trt = preddat$.trt,
-                                             .time = preddat$.time,
-                                             .before = 1)
-        } else if (type == "rmst") {
-          pred_summary <- tibble::add_column(pred_summary,
-                                             .trt = preddat$.trt,
-                                             .time = preddat$.time,
-                                             .before = 1)
-        } else if (type == "quantile") {
-          pred_summary <- tibble::add_column(pred_summary,
-                                             .trt = rep(preddat$.trt, each = length(quantiles)),
-                                             .quantile = rep(quantiles, times = nrow(preddat)),
-                                             .before = 1)
-        } else {
-          pred_summary <- tibble::add_column(pred_summary,
-                                             .trt = preddat$.trt,
-                                             .before = 1)
-        }
-
-      } else {
-        pred_summary <- tibble::add_column(pred_summary,
-                                           .trt = preddat$.trt,
-                                           .before = 1)
-      }
-
-      if (is.null(baseline)) {
-        if (object$likelihood == "ordered") {
-          pred_summary <- tibble::add_column(pred_summary,
-                                             .study = rep(preddat$.study, each = n_cc),
-                                             .before = 1)
-        } else if (type == "quantile") {
-          pred_summary <- tibble::add_column(pred_summary,
-                                             .study = rep(preddat$.study, each = length(quantiles)),
-                                             .before = 1)
-        } else {
-          pred_summary <- tibble::add_column(pred_summary,
-                                             .study = preddat$.study,
-                                             .before = 1)
-        }
-      }
-
-      out <- list(summary = pred_summary, sims = pred_array)
+      pred_summary <- dplyr::bind_cols(pred_meta, pred_summary)
     } else {
-      out <- list(sims = pred_array)
+      pred_summary <- pred_meta
     }
+
+    out <- list(summary = pred_summary, sims = pred_array)
 
   # With regression model ------------------------------------------------------
   } else {
@@ -1922,34 +1911,31 @@ predict.stan_nma <- function(object, ...,
     }
 
     # Produce nma_summary
+    if (object$likelihood == "ordered") {
+      pred_meta <- tibble::tibble(.study = rep(preddat$.study, each = n_cc),
+                                  .trt = rep(preddat$.trt, each = n_cc),
+                                  .category = rep(l_cc, times = nrow(preddat)))
+    } else if (is_surv) {
+      pred_meta <- tibble::tibble(.study = outdat$.study,
+                                  .trt = outdat$.trt)
+      if (type %in% c("survival", "hazard", "cumhaz", "rmst")) {
+        pred_meta <- tibble::add_column(pred_meta, .time = outdat$.time, .after = ".trt")
+      } else if (type == "quantile") {
+        pred_meta <- tibble::add_column(pred_meta, .quantile = outdat$.quantile, .after = ".trt")
+      }
+    } else {
+      pred_meta <- tibble::tibble(.study = preddat$.study,
+                                  .trt = preddat$.trt)
+    }
+
     if (summary) {
       pred_summary <- summary_mcmc_array(pred_array, probs)
-      if (object$likelihood == "ordered") {
-        pred_summary <- tibble::add_column(pred_summary,
-                                           .study = rep(preddat$.study, each = n_cc),
-                                           .trt = rep(preddat$.trt, each = n_cc),
-                                           .category = rep(l_cc, times = nrow(preddat)),
-                                           .before = 1)
-      } else if (is_surv) {
-        pred_summary <- tibble::add_column(pred_summary,
-                                           .study = outdat$.study,
-                                           .trt = outdat$.trt,
-                                           .before = 1)
-        if (type %in% c("survival", "hazard", "cumhaz", "rmst")) {
-          pred_summary <- tibble::add_column(pred_summary, .time = outdat$.time, .after = ".trt")
-        } else if (type == "quantile") {
-          pred_summary <- tibble::add_column(pred_summary, .quantile = outdat$.quantile, .after = ".trt")
-        }
-      } else {
-        pred_summary <- tibble::add_column(pred_summary,
-                                           .study = preddat$.study,
-                                           .trt = preddat$.trt,
-                                           .before = 1)
-      }
-      out <- list(summary = pred_summary, sims = pred_array)
+      pred_summary <- dplyr::bind_cols(pred_meta, pred_summary)
     } else {
-      out <- list(sims = pred_array)
+      pred_summary <- pred_meta
     }
+
+    out <- list(summary = pred_summary, sims = pred_array)
 
   }
 
