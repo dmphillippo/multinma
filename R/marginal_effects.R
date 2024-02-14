@@ -79,17 +79,17 @@ marginal_effects <- function(object,
 
   # Call predict to get absolute predictions
   if (object$likelihood %in% valid_lhood$survival) {
-    pred <- predict(object,
-                    level = "aggregate",
-                    summary = FALSE,
-                    predictive_distribution = predictive_distribution,
-                    ...)
+    pred <- stats::predict(object,
+                           level = "aggregate",
+                           summary = FALSE,
+                           predictive_distribution = predictive_distribution,
+                           ...)
   } else {
-    pred <- predict(object,
-                    type = "response", level = "aggregate",
-                    summary = FALSE,
-                    predictive_distribution = predictive_distribution,
-                    ...)
+    pred <- stats::predict(object,
+                           type = "response", level = "aggregate",
+                           summary = FALSE,
+                           predictive_distribution = predictive_distribution,
+                           ...)
   }
 
   # Set up output metadata
@@ -149,7 +149,7 @@ marginal_effects <- function(object,
   }
 
   cfv <- function(x) cf(x[2], x[1])
-  mk_contr <- function(x) combn(x, 2, FUN = cfv)
+  mk_contr <- function(x) utils::combn(x, 2, FUN = cfv)
 
   # Calculate contrasts, looping over groups
   grps <- dplyr::distinct(out_meta, dplyr::pick(dplyr::all_of(vars)))
