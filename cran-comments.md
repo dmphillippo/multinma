@@ -1,6 +1,7 @@
-This release ensures compatibility with the forthcoming update to rstan and
-StanHeaders, as well as providing extensive new features, improvements, and
-fixes.
+This release addresses an "additional checks" UBSAN failure, caused by a memory
+allocation bug in Stan (https://github.com/stan-dev/rstan/issues/1111). The
+affected tests are now skipped on CRAN, until patched versions of rstan and
+StanHeaders are available.
 
 ## Test environments
 * local R installation (Windows 10), R 4.3.2
