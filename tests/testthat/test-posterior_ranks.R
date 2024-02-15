@@ -1,4 +1,7 @@
 
+# avoid running Stan models on CRAN
+skip_on_cran()
+
 smk_net <- set_agd_arm(smoking,
                        study = studyn,
                        trt = trtc,

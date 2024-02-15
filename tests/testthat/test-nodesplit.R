@@ -179,18 +179,6 @@ test_that("nma() nodesplit error if no comparisons to split", {
   )
 })
 
-test_that("nma() nodesplit warning about ignoring comparisons", {
-  expect_warning(
-    nma(thrombo_net,
-        consistency = "nodesplit",
-        nodesplit = data.frame(trt1 = "Acc t-PA", trt2 = c("TNK", "ASPAC")),
-        prior_intercept = normal(scale = 10),
-        prior_trt = normal(scale = 10),
-        test_grad = TRUE),
-    "Ignoring node-split comparisons.+Acc t-PA vs\\. TNK"
-  )
-})
-
 test_that("nma() nodesplit argument validation", {
   m1 <- "The data frame passed to `nodesplit` should have two columns"
 
@@ -230,6 +218,22 @@ test_that("nma() nodesplit argument validation", {
         prior_intercept = normal(scale = 10),
         prior_trt = normal(scale = 10)),
     m2
+  )
+})
+
+
+# avoid running Stan models on CRAN
+skip_on_cran()
+
+test_that("nma() nodesplit warning about ignoring comparisons", {
+  expect_warning(
+    nma(thrombo_net,
+        consistency = "nodesplit",
+        nodesplit = data.frame(trt1 = "Acc t-PA", trt2 = c("TNK", "ASPAC")),
+        prior_intercept = normal(scale = 10),
+        prior_trt = normal(scale = 10),
+        test_grad = TRUE),
+    "Ignoring node-split comparisons.+Acc t-PA vs\\. TNK"
   )
 })
 
