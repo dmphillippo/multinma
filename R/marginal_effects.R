@@ -29,7 +29,92 @@
 #' @return
 #' @export
 #'
-#' @examples
+#' @examples ## Smoking cessation
+#' @template ex_smoking_nma_re_example
+#' @examples \donttest{
+#' # Marginal risk difference in each study population in the network
+#' marginal_effects(smk_fit_RE, mtype = "difference")
+#'
+#' # Since there are no covariates in the model, the marginal and conditional
+#' # (log) odds ratios here coincide
+#' marginal_effects(smk_fit_RE, mtype = "link")
+#' relative_effects(smk_fit_RE)
+#'
+#' # Marginal risk differences in a population with 67 observed events out of
+#' # 566 individuals on No Intervention, corresponding to a Beta(67, 566 - 67)
+#' # distribution on the baseline probability of response
+#' (smk_rd_RE <- marginal_effects(smk_fit_RE,
+#'                                baseline = distr(qbeta, 67, 566 - 67),
+#'                                baseline_type = "response",
+#'                                mtype = "difference"))
+#' plot(smk_rd_RE)
+#' }
+#'
+#' ## Plaque psoriasis ML-NMR
+#' @template ex_plaque_psoriasis_mlnmr_example
+#' @examples \donttest{
+#' # Population-average marginal probit differences in each study in the network
+#' (pso_marg <- marginal_effects(pso_fit, mtype = "link"))
+#' plot(pso_marg, ref_line = c(0, 1))
+#'
+#' # Population-average marginal probit differences in a new target population,
+#' # with means and SDs or proportions given by
+#' new_agd_int <- data.frame(
+#'   bsa_mean = 0.6,
+#'   bsa_sd = 0.3,
+#'   prevsys = 0.1,
+#'   psa = 0.2,
+#'   weight_mean = 10,
+#'   weight_sd = 1,
+#'   durnpso_mean = 3,
+#'   durnpso_sd = 1
+#' )
+#'
+#' # We need to add integration points to this data frame of new data
+#' # We use the weighted mean correlation matrix computed from the IPD studies
+#' new_agd_int <- add_integration(new_agd_int,
+#'                                durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+#'                                prevsys = distr(qbern, prob = prevsys),
+#'                                bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+#'                                weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
+#'                                psa = distr(qbern, prob = psa),
+#'                                cor = pso_net$int_cor,
+#'                                n_int = 64)
+#'
+#' # Population-average marginal probit differences of achieving PASI 75 in this
+#' # target population, given a Normal(-1.75, 0.08^2) distribution on the
+#' # baseline probit-probability of response on Placebo (at the reference levels
+#' # of the covariates), are given by
+#' (pso_marg_new <- marginal_effects(pso_fit,
+#'                                   mtype = "link",
+#'                                   newdata = new_agd_int,
+#'                                   baseline = distr(qnorm, -1.75, 0.08)))
+#' plot(pso_marg_new)
+#' }
+#'
+#' ## Progression free survival with newly-diagnosed multiple myeloma
+#' @template ex_ndmm_example
+#' @examples \donttest{
+#' # We can produce a range of marginal effects from models with survival
+#' # outcomes, specified with the mtype and type arguments. For example:
+#'
+#' # Marginal survival probability difference at 5 years, all contrasts
+#' marginal_effects(ndmm_fit, type = "survival", mtype = "difference",
+#'                  times = 5, all_contrasts = TRUE)
+#'
+#' # Marginal difference in RMST up to 5 years
+#' marginal_effects(ndmm_fit, type = "rmst", mtype = "difference", times = 5)
+#'
+#' # Marginal median survival time ratios
+#' marginal_effects(ndmm_fit, type = "median", mtype = "ratio")
+#'
+#' # Marginal hazard ratios, notice that these are time-varying
+#' # Here we specify a vector of times to avoid attempting to plot undefined
+#' # hazard ratios for some studies at t=0
+#' plot(marginal_effects(ndmm_fit, type = "hazard", mtype = "ratio",
+#'                       times = seq(0.001, 6, length.out = 50)))
+#'
+#' }
 marginal_effects <- function(object,
                              ...,
                              mtype = c("difference", "ratio", "link"),
