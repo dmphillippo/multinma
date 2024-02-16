@@ -118,10 +118,12 @@ reference:
 
 - title: Posterior summaries and working with fitted models
   desc: >
-    Producing and plotting relative effects, absolute predictions, posterior ranks
-    and rank probabilities. Converting to MCMC arrays and matrices.
+    Producing and plotting relative effects, absolute predictions, marginal
+    effects, posterior ranks and rank probabilities. Converting to MCMC arrays
+    and matrices.
   contents:
   - relative_effects
+  - marginal_effects
   - predict.stan_nma
   - posterior_ranks
   - posterior_rank_probs
