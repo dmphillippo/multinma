@@ -104,6 +104,11 @@
 #'   fitted, should the predictive distribution for absolute effects in a new
 #'   study be returned? Default `FALSE`.
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
+#' @param progress Logical, display progress for potentially long-running
+#'   calculations? Population-average predictions from ML-NMR models are
+#'   computationally intensive, especially for survival outcomes. Currently the
+#'   default is to display progress only when running interactively and
+#'   producing predictions for a survival ML-NMR model.
 #'
 #' @details
 #' # Aggregate-level predictions from IPD NMA and ML-NMR models
@@ -281,9 +286,12 @@ predict.stan_nma <- function(object, ...,
                              baseline_level = c("individual", "aggregate"),
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
                              predictive_distribution = FALSE,
-                             summary = TRUE) {
+                             summary = TRUE,
+                             progress = FALSE) {
   # Checks
   if (!inherits(object, "stan_nma")) abort("Expecting a `stan_nma` object, as returned by nma().")
+
+  if (!rlang::is_bool(progress)) abort("`progress` must be a single logical value, TRUE/FALSE.")
 
   is_surv <- inherits(object, "stan_nma_surv")  # Survival flag
 
@@ -1556,6 +1564,16 @@ predict.stan_nma <- function(object, ...,
       l_cc <- stringr::str_replace(dimnames(cc)[[3]], "^cc\\[(.+)\\]$", "\\1")
     }
 
+    studies <- levels(forcats::fct_drop(preddat$.study))
+    n_studies <- length(studies)
+    treatments <- levels(forcats::fct_drop(preddat$.trt))
+    n_trt <- length(treatments)
+
+    if (progress) {
+      pb <- utils::txtProgressBar(max = n_studies * n_trt, style = 3, width = min(100, getOption("width")))
+      on.exit(close(pb))
+    }
+
     # Make prediction arrays
     if (is_surv) {
       # Handle survival models separately - produce predictions study by study
@@ -1631,6 +1649,8 @@ predict.stan_nma <- function(object, ...,
         }
 
         for (trt in 1:n_trt) {
+          #if (progress) cglue("\rCalculating predictions for {studies[s]}, {treatments[trt]} [{(s-1)*n_trt + trt} / {n_studies * n_trt}]", sep = "")
+
           # Collapse preddat by unique rows for efficiency
           collapse_by <- setdiff(colnames(preddat), c(".time", ".obs_id", ".sample_size"))
 
@@ -1775,6 +1795,7 @@ predict.stan_nma <- function(object, ...,
             pred_array[ , , outdat$.study == studies[s] & outdat$.trt == treatments[trt]] <- s_pred_array
           }
 
+          if (progress) utils::setTxtProgressBar(pb, (s-1)*n_trt + trt)
         }
       }
 
@@ -1810,6 +1831,8 @@ predict.stan_nma <- function(object, ...,
         pred_array <- inverse_link(pred_array, link = object$link)
       }
 
+      if (progress) utils::setTxtProgressBar(pb, n_studies * n_trt)
+
     } else { # Predictions aggregated over each population
 
       # Produce aggregated predictions study by study - more memory efficient
@@ -1842,6 +1865,8 @@ predict.stan_nma <- function(object, ...,
       ss <- vector(length = nrow(outdat))
 
       for (s in 1:n_studies) {
+
+        # if (progress) cglue("\rCalculating predictions for {studies[s]} [{s} / {n_studies}]", sep = "")
 
         # Study select
         ss <- preddat$.study == studies[s]
@@ -1905,10 +1930,14 @@ predict.stan_nma <- function(object, ...,
 
         pred_array[ , , outdat$.study == studies[s]] <- tcrossprod_mcmc_array(s_pred_array, X_weighted_mean)
 
+        if (progress) utils::setTxtProgressBar(pb, s * n_trt)
+
       }
 
       preddat <- dplyr::distinct(preddat, .data$.study, .data$.trt)
     }
+
+    # if (progress) cat("\rDone!")
 
     # Produce nma_summary
     if (object$likelihood == "ordered") {
@@ -1954,6 +1983,9 @@ predict.stan_nma <- function(object, ...,
       class(out) <- "nma_summary"
     }
   }
+
+  if (progress) cat("\r")
+
   return(out)
 }
 
@@ -1998,7 +2030,8 @@ predict.stan_nma_surv <- function(object, times = NULL,
                                   times_seq = NULL,
                                   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
                                   predictive_distribution = FALSE,
-                                  summary = TRUE) {
+                                  summary = TRUE,
+                                  progress = interactive()) {
 
   type <- rlang::arg_match(type)
   times <- rlang::enquo(times)
@@ -2025,7 +2058,8 @@ predict.stan_nma_surv <- function(object, times = NULL,
              quantiles = quantiles,
              times_seq = times_seq,
              baseline_level = "individual",
-             baseline_type = "link")
+             baseline_type = "link",
+             progress = progress)
 }
 
 #' Produce survival predictions from arrays of linear predictors and auxiliary parameters
