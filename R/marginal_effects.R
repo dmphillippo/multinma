@@ -194,8 +194,7 @@ marginal_effects <- function(object,
     out_meta <- dplyr::distinct(out_meta, dplyr::pick(dplyr::all_of(vars))) %>%
       dplyr::mutate(.trtb = list(trtb), .trta = list(trta))  %>%
       tidyr::unnest(cols = c(.data$.trtb, .data$.trta)) %>%
-      dplyr::select(dplyr::any_of(".study"), ".trtb", ".trta", dplyr::everything()) %>%
-      dplyr::arrange(dplyr::pick(dplyr::any_of(".study")), ".trta", ".trtb", dplyr::pick(dplyr::everything()))
+      dplyr::select(dplyr::any_of(".study"), ".trtb", ".trta", dplyr::everything())
   }
 
   pred_meta$id <- 1:nrow(pred_meta)
