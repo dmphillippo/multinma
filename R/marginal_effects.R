@@ -99,9 +99,7 @@ marginal_effects <- function(object,
   vars <- intersect(c(".study", ".time", ".quantile", ".category"), colnames(pred_meta))
 
   if (!all_contrasts) {
-    out_meta <- dplyr::filter(out_meta, .data$.trt != trt_ref) %>%
-      dplyr::mutate(.trtb = .data$.trt, .trta = trt_ref) %>%
-      dplyr::select(-".trt", ".study", ".trtb", ".trta", dplyr::everything())
+    out_meta <- dplyr::filter(out_meta, .data$.trt != trt_ref)
   } else {
     contrs <- utils::combn(object$network$treatments, 2)
     trtb <- contrs[2, ]
@@ -109,23 +107,23 @@ marginal_effects <- function(object,
     out_meta <- dplyr::distinct(out_meta, dplyr::pick(dplyr::all_of(vars))) %>%
       dplyr::mutate(.trtb = list(trtb), .trta = list(trta))  %>%
       tidyr::unnest(cols = c(.data$.trtb, .data$.trta)) %>%
-      dplyr::select(".study", ".trtb", ".trta", dplyr::everything()) %>%
-      dplyr::arrange(".study", ".trta", ".trtb", dplyr::pick(dplyr::everything()))
+      dplyr::select(dplyr::any_of(".study"), ".trtb", ".trta", dplyr::everything()) %>%
+      dplyr::arrange(dplyr::pick(dplyr::any_of(".study")), ".trta", ".trtb", dplyr::pick(dplyr::everything()))
   }
 
   pred_meta$id <- 1:nrow(pred_meta)
   out_meta$id <- 1:nrow(out_meta)
 
   if (".time" %in% vars) {
-    time_id <- dplyr::group_by(out_meta, .data$.study, .data$.trta, .data$.trtb) %>%
+    time_id <- dplyr::group_by(out_meta, .data$.study, dplyr::pick(dplyr::any_of(c(".trt", ".trta", ".trtb")))) %>%
       dplyr::mutate(time_id = 1:dplyr::n()) %>%
       dplyr::pull("time_id")
   }
 
   # Output parameter names
-  pnames <- paste0("D[",
-                   if (dplyr::n_distinct(out_meta$.study) > 1) paste0(out_meta$.study, ": ") else character(),
-                   out_meta$.trtb,
+  pnames <- paste0("marg[",
+                   if (rlang::has_name(out_meta, ".study")) paste0(out_meta$.study, ": ") else character(),
+                   if (all_contrasts) out_meta$.trtb else out_meta$.trt,
                    if (all_contrasts) paste0(" vs. ", out_meta$.trta) else character(),
                    if (".time" %in% vars) paste0(", ", time_id)
                    else if (".quantile" %in% vars) paste0(", ", out_meta$.quantile)
