@@ -66,6 +66,8 @@ NULL
 #' @param ... other options (not used)
 #' @param n number of studies of each type to print
 #'
+#' @return `x` is returned invisibly.
+#'
 #' @export
 print.nma_data <- function(x, ..., n = 10) {
   cwidth <- getOption("width")

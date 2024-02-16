@@ -515,13 +515,18 @@ distr <- function(qfun, ...) {
 
 #' The Bernoulli Distribution
 #'
-#' The quantile function `qbern` for a Bernoulli distribution, with success
-#' probability `prob`. This is equivalent to `qbinom(p, 1, prob)`.
+#' The density function `dbern()`, distribution function `pbern()`, and quantile
+#' function `qbern()` for a Bernoulli distribution, with success probability
+#' `prob`. These are equivalent to `dbinom(p, 1, prob)`, `pbinom(p, 1, prob)`
+#' and `qbinom(p, 1, prob)`.
 #'
 #' @param x,q vector of quantiles
 #' @param p vector of probabilities
 #' @param prob probability of success
 #' @param lower.tail,log.p,log see [stats::Binomial]
+#'
+#' @return Numeric vector of length equal to the maximum of the lengths of the
+#'   input arguments.
 #'
 #' @export
 #' @rdname Bernoulli
@@ -555,6 +560,9 @@ dbern <- function(x, prob, log = FALSE) {
 #' @param shape,rate,scale,log,lower.tail,log.p see [stats::GammaDist]
 #' @param mean,sd mean and standard deviation, overriding `shape` and
 #'   `rate` or `scale` if specified
+#'
+#' @return Numeric vector of length equal to the maximum of the lengths of the
+#'   input arguments.
 #'
 #' @export
 #' @rdname GammaDist
@@ -605,6 +613,9 @@ pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
 #' @param mu,sigma,... see \code{\link[logitnorm:logitnorm-package]{logitnorm}}
 #' @param mean,sd mean and standard deviation, overriding `mu` and `sigma` if
 #'   specified
+#'
+#' @return Numeric vector of length equal to the maximum of the lengths of the
+#'   input arguments.
 #'
 #' @export
 #' @rdname logitNormal
