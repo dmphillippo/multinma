@@ -26,7 +26,9 @@
 #'   study be returned? Default `FALSE`.
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #'
-#' @return
+#' @return A [nma_summary] object if `summary = TRUE`, otherwise a list
+#'   containing a 3D MCMC array of samples and (for regression models) a data
+#'   frame of study information.
 #' @export
 #'
 #' @examples ## Smoking cessation
