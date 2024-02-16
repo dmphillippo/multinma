@@ -18,7 +18,8 @@
   baseline_level = c("individual", "aggregate"),
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
   predictive_distribution = FALSE,
-  summary = TRUE
+  summary = TRUE,
+  progress = FALSE
 )
 
 \method{predict}{stan_nma_surv}(
@@ -36,7 +37,8 @@
   times_seq = NULL,
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
   predictive_distribution = FALSE,
-  summary = TRUE
+  summary = TRUE,
+  progress = interactive()
 )
 }
 \arguments{
@@ -142,6 +144,12 @@ fitted, should the predictive distribution for absolute effects in a new
 study be returned? Default \code{FALSE}.}
 
 \item{summary}{Logical, calculate posterior summaries? Default \code{TRUE}.}
+
+\item{progress}{Logical, display progress for potentially long-running
+calculations? Population-average predictions from ML-NMR models are
+computationally intensive, especially for survival outcomes. Currently the
+default is to display progress only when running interactively and
+producing predictions for a survival ML-NMR model.}
 
 \item{times}{A numeric vector of times to evaluate predictions at.
 Alternatively, if \code{newdata} is specified, \code{times} can be the name of a
