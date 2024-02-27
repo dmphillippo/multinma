@@ -167,6 +167,40 @@ test_that("nma() error if missing values in outcomes or predictors", {
         regression = ~x1, center = TRUE)), m)
 })
 
+smknet_3l <- combine_network(
+  set_agd_arm(smkdummy %>% mutate(extra = 0.5, tclass = if_else(trtn == 1, 0, 1)),
+              studyn, trtn, r = r, n = n, trt_class = tclass),
+  set_ipd(ipddummy %>% mutate(extra = TRUE, tclass = if_else(trtn == 1, 0, 1)),
+          studyn, trtn, r = r, trt_class = tclass),
+  trt_ref = 1) %>%
+  add_integration(x1 = distr(qnorm, x1_mean, x1_sd),
+                  x2 = distr(qbinom, 1, x2),
+                  x3 = distr(qnorm, x3_mean, x3_sd))
+
+smknet_3c <- combine_network(
+  set_agd_arm(smkdummy %>% mutate(extra = 0.5, tclass = if_else(trtn == 1, 0, 1)),
+              studyn, trtn, r = r, n = n, trt_class = tclass),
+  set_ipd(ipddummy %>% mutate(extra = "a", tclass = if_else(trtn == 1, 0, 1)),
+          studyn, trtn, r = r, trt_class = tclass),
+  trt_ref = 1) %>%
+  add_integration(x1 = distr(qnorm, x1_mean, x1_sd),
+                  x2 = distr(qbinom, 1, x2),
+                  x3 = distr(qnorm, x3_mean, x3_sd))
+
+test_that("nma() silently drops unnecessary columns", {
+  expect_error(nma(smknet_3l, regression = ~(x1 + x2 + x3):.trt,
+                    prior_intercept = normal(0, 10),
+                    prior_trt = normal(0, 10),
+                    prior_reg = normal(0, 5),
+                    test_grad = TRUE), NA)
+
+  expect_error(nma(smknet_3c, regression = ~(x1 + x2 + x3):.trt,
+                    prior_intercept = normal(0, 10),
+                    prior_trt = normal(0, 10),
+                    prior_reg = normal(0, 5),
+                    test_grad = TRUE), NA)
+})
+
 test_that("nma.fit() error if only one of x or y provided", {
   x <- matrix(1, nrow = 3, ncol = 3)
   colnames(x) <- c("a", "b", "c")
@@ -249,45 +283,6 @@ test_that("nma.fit() error if agd_contrast_Sigma is not right dimensions", {
                        prior_reg = normal(0, 5),
                        prior_het = normal(0, 1),
                        n_int = 1), "Dimensions of `agd_contrast_Sigma`.+do not match")
-})
-
-
-# avoid running Stan models on CRAN
-skip_on_cran()
-
-
-smknet_3l <- combine_network(
-  set_agd_arm(smkdummy %>% mutate(extra = 0.5, tclass = if_else(trtn == 1, 0, 1)),
-              studyn, trtn, r = r, n = n, trt_class = tclass),
-  set_ipd(ipddummy %>% mutate(extra = TRUE, tclass = if_else(trtn == 1, 0, 1)),
-          studyn, trtn, r = r, trt_class = tclass),
-  trt_ref = 1) %>%
-  add_integration(x1 = distr(qnorm, x1_mean, x1_sd),
-                  x2 = distr(qbinom, 1, x2),
-                  x3 = distr(qnorm, x3_mean, x3_sd))
-
-smknet_3c <- combine_network(
-  set_agd_arm(smkdummy %>% mutate(extra = 0.5, tclass = if_else(trtn == 1, 0, 1)),
-              studyn, trtn, r = r, n = n, trt_class = tclass),
-  set_ipd(ipddummy %>% mutate(extra = "a", tclass = if_else(trtn == 1, 0, 1)),
-          studyn, trtn, r = r, trt_class = tclass),
-  trt_ref = 1) %>%
-  add_integration(x1 = distr(qnorm, x1_mean, x1_sd),
-                  x2 = distr(qbinom, 1, x2),
-                  x3 = distr(qnorm, x3_mean, x3_sd))
-
-test_that("nma() silently drops unnecessary columns", {
-  expect_error(nma(smknet_3l, regression = ~(x1 + x2 + x3):.trt,
-                   prior_intercept = normal(0, 10),
-                   prior_trt = normal(0, 10),
-                   prior_reg = normal(0, 5),
-                   test_grad = TRUE), NA)
-
-  expect_error(nma(smknet_3c, regression = ~(x1 + x2 + x3):.trt,
-                   prior_intercept = normal(0, 10),
-                   prior_trt = normal(0, 10),
-                   prior_reg = normal(0, 5),
-                   test_grad = TRUE), NA)
 })
 
 
