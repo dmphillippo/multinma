@@ -6,7 +6,13 @@
 #'
 #' @param object A `stan_nma` object created by [nma()].
 #' @param ... Arguments passed to [predict.stan_nma()], for example to specify
-#'   the covariate distribution and baseline risk for a target population.
+#'   the covariate distribution and baseline risk for a target population, e.g.
+#'   `newdata`, `baseline`, and related arguments. For survival outcomes, `type`
+#'   can also be specified to determine the quantity from which to form a
+#'   marginal effect. For example, `type = "hazard"` with `mtype = "ratio"`
+#'   produces marginal hazard ratios, `type = "median"` with `mtype =
+#'   "difference"` produces marginal median survival time differences, and so
+#'   on.
 #' @param mtype The type of marginal effect to construct from the average
 #'   absolute effects, either `"difference"` (the default) for a difference of
 #'   absolute effects such as a risk difference, `"ratio"` for a ratio of
