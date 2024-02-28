@@ -165,18 +165,27 @@ marginal_effects <- function(object,
     abort(glue::glue("Cannot produce marginal effects under inconsistency '{object$consistency}' model."))
 
   # Call predict to get absolute predictions
+  if ("level" %in% ...names()) warn('Ignoring `level` argument, this is always "aggregate" for marginal effects.')
+
   if (object$likelihood %in% valid_lhood$survival) {
-    pred <- stats::predict(object,
-                           level = "aggregate",
-                           summary = FALSE,
-                           predictive_distribution = predictive_distribution,
-                           ...)
+    pred <- rlang::eval_tidy(rlang::call2(
+              stats::predict,
+              !!! rlang::dots_list(object,
+                                   level = "aggregate",
+                                   summary = FALSE,
+                                   predictive_distribution = predictive_distribution,
+                                   !!! rlang::enquos(...),
+                                   .homonyms = "first")))
   } else {
-    pred <- stats::predict(object,
-                           type = "response", level = "aggregate",
-                           summary = FALSE,
-                           predictive_distribution = predictive_distribution,
-                           ...)
+    if ("type" %in% ...names()) warn('Ignoring `type` argument, this is always "response" for marginal effects (except for survival models).')
+    pred <- rlang::eval_tidy(rlang::call2(
+              stats::predict,
+              !!! rlang::dots_list(object,
+                                   type = "response", level = "aggregate",
+                                   summary = FALSE,
+                                   predictive_distribution = predictive_distribution,
+                                   !!! rlang::enquos(...),
+                                   .homonyms = "first")))
   }
 
   # Set up output metadata
