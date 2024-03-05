@@ -1,7 +1,7 @@
 This release addresses an "additional checks" UBSAN failure, caused by a memory
-allocation bug in Stan (https://github.com/stan-dev/rstan/issues/1111). The
-affected tests are now skipped on CRAN, until patched versions of rstan and
-StanHeaders are available.
+allocation bug in Stan (https://github.com/stan-dev/rstan/issues/1111).
+StanHeaders has now been patched which resolves the issue; no changes are
+necessary in multinma. Verified passing UBSAN checks with rocker/r-devel-san.
 
 In response to CRAN request, I have also:
 
@@ -25,10 +25,11 @@ Regarding the other issues raised:
   
 
 ## Test environments
-* local R installation (Windows 10), R 4.3.2
+* local rocker/r-devel-san image with sanitizers
+* local R installation (Windows 10), R 4.3.3
 * win-builder (release, devel)
-* Ubuntu 22.04.3 on GitHub Actions (release, devel, oldrel)
-* Mac OS 12.7.2 on GitHub Actions (release)
+* Ubuntu 22.04.4 on GitHub Actions (release, devel, oldrel)
+* Mac OS 12.7.3 on GitHub Actions (release)
 * Windows Server 2022 10.0.20348 on GitHub Actions (release)
 
 ## R CMD check results
