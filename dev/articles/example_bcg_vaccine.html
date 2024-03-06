@@ -36,7 +36,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.1.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -116,10 +116,8 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     dgamma, pgamma, qgamma</span></span></code></pre>
 <p>This vignette describes the analysis of 13 trials investigating BCG
-vaccination vs. no vaccination for prevention of Tuberculosis (TB) <span class="citation">(<a href="#ref-TSD3" role="doc-biblioref">Dias et al.
-2011</a>; <a href="#ref-Berkey1995" role="doc-biblioref">Berkey et al.
-1995</a>)</span>. The data are available in this package as
-<code>bcg_vaccine</code>:</p>
+vaccination vs. no vaccination for prevention of Tuberculosis (TB) <span class="citation">(<a href="#ref-TSD3">Dias et al. 2011</a>; <a href="#ref-Berkey1995">Berkey et al. 1995</a>)</span>. The data are
+available in this package as <code>bcg_vaccine</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bcg_vaccine</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   studyn trtn         trtc latitude  r   n</span></span>
@@ -129,7 +127,7 @@ vaccination vs. no vaccination for prevention of Tuberculosis (TB) <span class=
 <span><span class="co">#&gt; 4      2    2   Vaccinated       55  6 306</span></span>
 <span><span class="co">#&gt; 5      3    1 Unvaccinated       42 11 220</span></span>
 <span><span class="co">#&gt; 6      3    2   Vaccinated       42  3 231</span></span></code></pre></div>
-<p><span class="citation">Dias et al. (<a href="#ref-TSD3" role="doc-biblioref">2011</a>)</span> used these data to demonstrate
+<p><span class="citation">Dias et al. (<a href="#ref-TSD3">2011</a>)</span> used these data to demonstrate
 meta-regression models adjusting for the continuous covariate
 <code>latitude</code>, the absolute degrees latitude at which the study
 was conducted, which we recreate here.</p>
@@ -226,7 +224,7 @@ method:</p>
 <span><span class="co">#&gt; lp__             1</span></span>
 <span><span class="co">#&gt; tau              1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Feb 15 11:33:44 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 14:31:28 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -303,7 +301,7 @@ method:</p>
 <span><span class="co">#&gt; lp__                          -13448.40  1807    1</span></span>
 <span><span class="co">#&gt; tau                                0.73  1683    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Feb 15 11:34:14 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 14:31:51 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -365,12 +363,11 @@ coefficient also excludes zero:</p>
 <p><img src="example_bcg_vaccine_files/figure-html/bcg_vaccine_beta_lat-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>Altogether, we might prefer the model with the adjustment for
 latitude. When considering covariates in random effects models it is
-important not to just look at the DIC <span class="citation">(<a href="#ref-TSD3" role="doc-biblioref">Dias et al. 2011</a>)</span>. We
-should also consider any reductions in heterogeneity, and the estimated
-regression coefficients and their standard error. The DIC is not
-sensitive to changes in the heterogeneity, as RE models are very
-flexible and can fit the data well whatever the level of
-heterogeneity.</p>
+important not to just look at the DIC <span class="citation">(<a href="#ref-TSD3">Dias et al. 2011</a>)</span>. We should also consider
+any reductions in heterogeneity, and the estimated regression
+coefficients and their standard error. The DIC is not sensitive to
+changes in the heterogeneity, as RE models are very flexible and can fit
+the data well whatever the level of heterogeneity.</p>
 </div>
 <div class="section level2">
 <h2 id="further-results">Further results<a class="anchor" aria-label="anchor" href="#further-results"></a>
@@ -487,11 +484,11 @@ makers should consider the predictive distribution of relative effects
 in a new study, instead of the posterior distribution of the mean
 treatment effects, as this reflects uncertainty due to heterogeneity and
 may better represent uncertainty about a future roll-out of a treatment
-<span class="citation">(see <a href="#ref-TSD3" role="doc-biblioref">Dias et al. 2011</a>)</span>. We can produce
-predictive distributions using the
+<span class="citation">(see <a href="#ref-TSD3">Dias et al.
+2011</a>)</span>. We can produce predictive distributions using the
 <code>predictive_distribution = TRUE</code> argument to
-<code><a href="../reference/relative_effects.html">relative_effects()</a></code>. Dias et al. <span class="citation">(<a href="#ref-Dias2018" role="doc-biblioref">2018, sec. 8.3.2</a>)</span>
-consider the predictive distributions for this BCG vaccine analysis.</p>
+<code><a href="../reference/relative_effects.html">relative_effects()</a></code>. Dias et al. <span class="citation">(<a href="#ref-Dias2018">2018, sec. 8.3.2</a>)</span> consider the
+predictive distributions for this BCG vaccine analysis.</p>
 <p>In the unadjusted analysis, whilst there is substantial evidence that
 vaccination is effective on average and essentially zero probability of
 harm based on the mean effect, the predictive distribution for
@@ -597,7 +594,7 @@ latitude the predictive probability is only 0.7%.</p>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-Berkey1995" class="csl-entry">
 Berkey, C. S., D. C. Hoaglin, F. Mosteller, and G. A. Colditz. 1995.
 <span>“A Random-Effects Regression Model for Meta-Analysis.”</span>

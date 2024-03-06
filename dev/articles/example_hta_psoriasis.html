@@ -36,7 +36,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.1.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -116,9 +116,11 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     dgamma, pgamma, qgamma</span></span></code></pre>
 <p>This vignette describes the analysis of treatments for
-moderate-to-severe plaque psoriasis from an HTA report <span class="citation">(<a href="#ref-Woolacott2006" role="doc-biblioref">Woolacott et al. 2006</a>)</span>, replicating the
-analysis in NICE Technical Support Document 2 <span class="citation">(<a href="#ref-TSD2" role="doc-biblioref">Dias et al. 2011</a>)</span>. The
-data are available in this package as <code>hta_psoriasis</code>:</p>
+moderate-to-severe plaque psoriasis from an HTA report <span class="citation">(<a href="#ref-Woolacott2006">Woolacott et al.
+2006</a>)</span>, replicating the analysis in NICE Technical Support
+Document 2 <span class="citation">(<a href="#ref-TSD2">Dias et al.
+2011</a>)</span>. The data are available in this package as
+<code>hta_psoriasis</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">hta_psoriasis</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   studyn   studyc year trtn             trtc sample_size PASI50 PASI75 PASI90</span></span>
@@ -280,13 +282,13 @@ method:</p>
 <span><span class="co">#&gt; cc[PASI75]             1</span></span>
 <span><span class="co">#&gt; cc[PASI90]             1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Feb 15 11:37:46 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 14:34:06 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
 <blockquote>
 <p><strong>Note:</strong> the treatment effects are the <em>opposite
-sign</em> to those in TSD 2 <span class="citation">(<a href="#ref-TSD2" role="doc-biblioref">Dias et al. 2011</a>)</span>. This is because we
+sign</em> to those in TSD 2 <span class="citation">(<a href="#ref-TSD2">Dias et al. 2011</a>)</span>. This is because we
 parameterise the linear predictor as <span class="math inline">\(\mu_j +
 d_k + c_m\)</span>, rather than <span class="math inline">\(\mu_j + d_k
 - c_m\)</span>. The interpretation here thus follows that of a standard
@@ -387,7 +389,7 @@ method:</p>
 <span><span class="co">#&gt; cc[PASI75]          1.00</span></span>
 <span><span class="co">#&gt; cc[PASI90]          1.00</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Feb 15 11:39:38 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 14:35:33 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -439,7 +441,7 @@ investigated further to see why this study appears to be an outlier.</p>
 <div class="section level3">
 <h3 id="predicted-probabilities-of-response">Predicted probabilities of response<a class="anchor" aria-label="anchor" href="#predicted-probabilities-of-response"></a>
 </h3>
-<p><span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span> produce absolute predictions of
+<p><span class="citation">Dias et al. (<a href="#ref-TSD2">2011</a>)</span> produce absolute predictions of
 probability of achieving responses at each PASI cutoff, assuming a
 Normal distribution for the baseline probit probability of PASI50
 response on supportive care with mean <span class="math inline">\(-1.097\)</span> and precision <span class="math inline">\(123\)</span>. We can replicate these results using
@@ -675,7 +677,7 @@ better (the outcomes are positive).</p>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-TSD2" class="csl-entry">
 Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011.
 <span>“<span>NICE DSU Technical Support Document</span> 2: A Generalised

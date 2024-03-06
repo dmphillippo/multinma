@@ -36,7 +36,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.1.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -119,13 +119,10 @@
 drugs (streptokinase, SK; alteplase, t-PA; accelerated alteplase, Acc
 t-PA; streptokinase plus alteplase, SK+tPA; reteplase, r-PA;
 tenocteplase, TNK; urokinase, UK; anistreptilase, ASPAC) plus
-per-cutaneous transluminal coronary angioplasty (PTCA) <span class="citation">(<a href="#ref-Boland2003" role="doc-biblioref">Boland
-et al. 2003</a>; <a href="#ref-Lu2006" role="doc-biblioref">Lu and Ades
-2006</a>; <a href="#ref-TSD4" role="doc-biblioref">Dias et al. 2011</a>,
-<a href="#ref-Dias2010" role="doc-biblioref">2010</a>)</span>. The
-number of deaths in 30 or 35 days following acute myocardial infarction
-are recorded. The data are available in this package as
-<code>thrombolytics</code>:</p>
+per-cutaneous transluminal coronary angioplasty (PTCA) <span class="citation">(<a href="#ref-Boland2003">Boland et al. 2003</a>; <a href="#ref-Lu2006">Lu and Ades 2006</a>; <a href="#ref-TSD4">Dias et al.
+2011</a>, <a href="#ref-Dias2010">2010</a>)</span>. The number of deaths
+in 30 or 35 days following acute myocardial infarction are recorded. The
+data are available in this package as <code>thrombolytics</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">thrombolytics</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   studyn trtn      trtc    r     n</span></span>
@@ -180,13 +177,13 @@ reference treatment.</p>
 <div class="section level2">
 <h2 id="fixed-effects-nma">Fixed effects NMA<a class="anchor" aria-label="anchor" href="#fixed-effects-nma"></a>
 </h2>
-<p>Following TSD 4 <span class="citation">(<a href="#ref-TSD4" role="doc-biblioref">Dias et al. 2011</a>)</span>, we fit a fixed
-effects NMA model, using the <code><a href="../reference/nma.html">nma()</a></code> function with
-<code>trt_effects = "fixed"</code>. We use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior distributions
-for the treatment effects <span class="math inline">\(d_k\)</span> and
-study-specific intercepts <span class="math inline">\(\mu_j\)</span>. We
-can examine the range of parameter values implied by these prior
-distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
+<p>Following TSD 4 <span class="citation">(<a href="#ref-TSD4">Dias et
+al. 2011</a>)</span>, we fit a fixed effects NMA model, using the
+<code><a href="../reference/nma.html">nma()</a></code> function with <code>trt_effects = "fixed"</code>. We
+use <span class="math inline">\(\mathrm{N}(0, 100^2)\)</span> prior
+distributions for the treatment effects <span class="math inline">\(d_k\)</span> and study-specific intercepts <span class="math inline">\(\mu_j\)</span>. We can examine the range of
+parameter values implied by these prior distributions with the
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span></span>
@@ -211,27 +208,27 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                   mean se_mean   sd      2.5%       25%       50%       75%     97.5% n_eff</span></span>
-<span><span class="co">#&gt; d[Acc t-PA]      -0.18    0.00 0.04     -0.26     -0.21     -0.18     -0.15     -0.09  2479</span></span>
-<span><span class="co">#&gt; d[ASPAC]          0.02    0.00 0.04     -0.05     -0.01      0.02      0.04      0.09  5261</span></span>
-<span><span class="co">#&gt; d[PTCA]          -0.47    0.00 0.10     -0.67     -0.54     -0.48     -0.40     -0.28  3921</span></span>
-<span><span class="co">#&gt; d[r-PA]          -0.12    0.00 0.06     -0.24     -0.16     -0.12     -0.08     -0.01  3181</span></span>
-<span><span class="co">#&gt; d[SK + t-PA]     -0.05    0.00 0.05     -0.14     -0.08     -0.05     -0.02      0.04  5591</span></span>
-<span><span class="co">#&gt; d[t-PA]           0.00    0.00 0.03     -0.06     -0.02      0.00      0.02      0.06  4901</span></span>
-<span><span class="co">#&gt; d[TNK]           -0.17    0.00 0.08     -0.32     -0.22     -0.17     -0.12     -0.02  3714</span></span>
-<span><span class="co">#&gt; d[UK]            -0.20    0.00 0.21     -0.61     -0.35     -0.20     -0.05      0.21  4505</span></span>
-<span><span class="co">#&gt; lp__         -43042.93    0.17 5.66 -43054.92 -43046.56 -43042.53 -43038.88 -43032.86  1051</span></span>
+<span><span class="co">#&gt; d[Acc t-PA]      -0.18    0.00 0.04     -0.27     -0.21     -0.18     -0.15     -0.09  2935</span></span>
+<span><span class="co">#&gt; d[ASPAC]          0.02    0.00 0.04     -0.06     -0.01      0.02      0.04      0.09  6738</span></span>
+<span><span class="co">#&gt; d[PTCA]          -0.48    0.00 0.10     -0.68     -0.54     -0.47     -0.41     -0.28  4218</span></span>
+<span><span class="co">#&gt; d[r-PA]          -0.12    0.00 0.06     -0.24     -0.16     -0.12     -0.08     -0.01  3891</span></span>
+<span><span class="co">#&gt; d[SK + t-PA]     -0.05    0.00 0.05     -0.14     -0.08     -0.05     -0.02      0.04  6368</span></span>
+<span><span class="co">#&gt; d[t-PA]           0.00    0.00 0.03     -0.06     -0.02      0.00      0.02      0.06  4208</span></span>
+<span><span class="co">#&gt; d[TNK]           -0.17    0.00 0.08     -0.33     -0.23     -0.17     -0.12     -0.02  3968</span></span>
+<span><span class="co">#&gt; d[UK]            -0.20    0.00 0.22     -0.64     -0.36     -0.21     -0.05      0.24  4997</span></span>
+<span><span class="co">#&gt; lp__         -43042.77    0.15 5.48 -43053.93 -43046.41 -43042.27 -43038.99 -43032.99  1350</span></span>
 <span><span class="co">#&gt;              Rhat</span></span>
-<span><span class="co">#&gt; d[Acc t-PA]  1.00</span></span>
-<span><span class="co">#&gt; d[ASPAC]     1.00</span></span>
-<span><span class="co">#&gt; d[PTCA]      1.00</span></span>
-<span><span class="co">#&gt; d[r-PA]      1.00</span></span>
-<span><span class="co">#&gt; d[SK + t-PA] 1.00</span></span>
-<span><span class="co">#&gt; d[t-PA]      1.00</span></span>
-<span><span class="co">#&gt; d[TNK]       1.00</span></span>
-<span><span class="co">#&gt; d[UK]        1.00</span></span>
-<span><span class="co">#&gt; lp__         1.01</span></span>
+<span><span class="co">#&gt; d[Acc t-PA]     1</span></span>
+<span><span class="co">#&gt; d[ASPAC]        1</span></span>
+<span><span class="co">#&gt; d[PTCA]         1</span></span>
+<span><span class="co">#&gt; d[r-PA]         1</span></span>
+<span><span class="co">#&gt; d[SK + t-PA]    1</span></span>
+<span><span class="co">#&gt; d[t-PA]         1</span></span>
+<span><span class="co">#&gt; d[TNK]          1</span></span>
+<span><span class="co">#&gt; d[UK]           1</span></span>
+<span><span class="co">#&gt; lp__            1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Feb 15 11:54:24 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 14:46:18 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -248,9 +245,9 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">dic_consistency</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">thrombo_fit</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 106<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 58.8</span></span>
-<span><span class="co">#&gt;               DIC: 164.9</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 105.7<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 58.5</span></span>
+<span><span class="co">#&gt;               DIC: 164.2</span></span></code></pre></div>
 <p>and the residual deviance contributions examined with the
 corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -265,20 +262,19 @@ than 1.</p>
 </h2>
 <blockquote>
 <p><strong>Note:</strong> The results of the inconsistency models here
-are slightly different to those of Dias et al. <span class="citation">(<a href="#ref-Dias2010" role="doc-biblioref">2010</a>,
-<a href="#ref-TSD4" role="doc-biblioref">2011</a>)</span>, although the
-overall conclusions are the same. This is due to the presence of
-multi-arm trials and a different ordering of treatments, meaning that
-inconsistency is parameterised differently within the multi-arm trials.
-The same results as Dias et al. are obtained if the network is instead
-set up with <code>trtn</code> as the treatment variable.</p>
+are slightly different to those of Dias et al. <span class="citation">(<a href="#ref-Dias2010">2010</a>, <a href="#ref-TSD4">2011</a>)</span>, although the overall conclusions are
+the same. This is due to the presence of multi-arm trials and a
+different ordering of treatments, meaning that inconsistency is
+parameterised differently within the multi-arm trials. The same results
+as Dias et al. are obtained if the network is instead set up with
+<code>trtn</code> as the treatment variable.</p>
 </blockquote>
 <div class="section level3">
 <h3 id="unrelated-mean-effects-model">Unrelated mean effects model<a class="anchor" aria-label="anchor" href="#unrelated-mean-effects-model"></a>
 </h3>
-<p>We first fit an unrelated mean effects (UME) model <span class="citation">(<a href="#ref-TSD4" role="doc-biblioref">Dias et al.
-2011</a>)</span> to assess the consistency assumption. Again, we use the
-function <code><a href="../reference/nma.html">nma()</a></code>, but now with the argument
+<p>We first fit an unrelated mean effects (UME) model <span class="citation">(<a href="#ref-TSD4">Dias et al. 2011</a>)</span> to
+assess the consistency assumption. Again, we use the function
+<code><a href="../reference/nma.html">nma()</a></code>, but now with the argument
 <code>consistency = "ume"</code>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">thrombo_fit_ume</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">thrombo_net</span>, </span>
@@ -295,54 +291,54 @@ function <code><a href="../reference/nma.html">nma()</a></code>, but now with th
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                            mean se_mean   sd      2.5%       25%       50%       75%     97.5%</span></span>
-<span><span class="co">#&gt; d[Acc t-PA vs. SK]        -0.16    0.00 0.05     -0.26     -0.19     -0.16     -0.12     -0.06</span></span>
-<span><span class="co">#&gt; d[ASPAC vs. SK]            0.00    0.00 0.04     -0.07     -0.02      0.00      0.03      0.08</span></span>
-<span><span class="co">#&gt; d[PTCA vs. SK]            -0.67    0.00 0.19     -1.04     -0.80     -0.66     -0.54     -0.31</span></span>
-<span><span class="co">#&gt; d[r-PA vs. SK]            -0.06    0.00 0.09     -0.24     -0.12     -0.06      0.00      0.12</span></span>
-<span><span class="co">#&gt; d[SK + t-PA vs. SK]       -0.04    0.00 0.05     -0.14     -0.08     -0.04     -0.01      0.05</span></span>
-<span><span class="co">#&gt; d[t-PA vs. SK]             0.00    0.00 0.03     -0.06     -0.02      0.00      0.02      0.06</span></span>
-<span><span class="co">#&gt; d[UK vs. SK]              -0.37    0.01 0.51     -1.40     -0.72     -0.37     -0.03      0.60</span></span>
-<span><span class="co">#&gt; d[ASPAC vs. Acc t-PA]      1.41    0.01 0.43      0.61      1.11      1.39      1.69      2.29</span></span>
-<span><span class="co">#&gt; d[PTCA vs. Acc t-PA]      -0.21    0.00 0.12     -0.44     -0.29     -0.21     -0.13      0.03</span></span>
+<span><span class="co">#&gt; d[Acc t-PA vs. SK]        -0.16    0.00 0.05     -0.25     -0.19     -0.16     -0.12     -0.06</span></span>
+<span><span class="co">#&gt; d[ASPAC vs. SK]            0.01    0.00 0.04     -0.07     -0.02      0.01      0.03      0.08</span></span>
+<span><span class="co">#&gt; d[PTCA vs. SK]            -0.66    0.00 0.18     -1.01     -0.79     -0.67     -0.54     -0.30</span></span>
+<span><span class="co">#&gt; d[r-PA vs. SK]            -0.06    0.00 0.09     -0.23     -0.12     -0.06      0.00      0.12</span></span>
+<span><span class="co">#&gt; d[SK + t-PA vs. SK]       -0.04    0.00 0.05     -0.13     -0.07     -0.04     -0.01      0.05</span></span>
+<span><span class="co">#&gt; d[t-PA vs. SK]             0.00    0.00 0.03     -0.06     -0.02      0.00      0.02      0.05</span></span>
+<span><span class="co">#&gt; d[UK vs. SK]              -0.37    0.01 0.51     -1.45     -0.70     -0.36     -0.02      0.60</span></span>
+<span><span class="co">#&gt; d[ASPAC vs. Acc t-PA]      1.40    0.01 0.42      0.64      1.12      1.38      1.66      2.30</span></span>
+<span><span class="co">#&gt; d[PTCA vs. Acc t-PA]      -0.21    0.00 0.12     -0.45     -0.30     -0.21     -0.13      0.04</span></span>
 <span><span class="co">#&gt; d[r-PA vs. Acc t-PA]       0.02    0.00 0.07     -0.11     -0.03      0.02      0.06      0.15</span></span>
-<span><span class="co">#&gt; d[TNK vs. Acc t-PA]        0.01    0.00 0.06     -0.12     -0.04      0.01      0.05      0.13</span></span>
-<span><span class="co">#&gt; d[UK vs. Acc t-PA]         0.14    0.01 0.36     -0.55     -0.10      0.13      0.38      0.85</span></span>
-<span><span class="co">#&gt; d[t-PA vs. ASPAC]          0.29    0.01 0.36     -0.41      0.05      0.29      0.53      0.99</span></span>
-<span><span class="co">#&gt; d[t-PA vs. PTCA]           0.54    0.01 0.42     -0.27      0.26      0.55      0.82      1.37</span></span>
-<span><span class="co">#&gt; d[UK vs. t-PA]            -0.30    0.00 0.34     -0.97     -0.53     -0.29     -0.05      0.36</span></span>
-<span><span class="co">#&gt; lp__                  -43039.86    0.15 5.75 -43051.89 -43043.65 -43039.49 -43035.77 -43029.49</span></span>
+<span><span class="co">#&gt; d[TNK vs. Acc t-PA]        0.01    0.00 0.06     -0.11     -0.04      0.01      0.05      0.13</span></span>
+<span><span class="co">#&gt; d[UK vs. Acc t-PA]         0.14    0.01 0.36     -0.56     -0.10      0.15      0.39      0.85</span></span>
+<span><span class="co">#&gt; d[t-PA vs. ASPAC]          0.29    0.01 0.36     -0.40      0.05      0.29      0.53      0.99</span></span>
+<span><span class="co">#&gt; d[t-PA vs. PTCA]           0.55    0.01 0.42     -0.24      0.25      0.55      0.85      1.36</span></span>
+<span><span class="co">#&gt; d[UK vs. t-PA]            -0.30    0.00 0.35     -0.99     -0.54     -0.30     -0.06      0.38</span></span>
+<span><span class="co">#&gt; lp__                  -43039.90    0.15 5.81 -43052.33 -43043.46 -43039.48 -43035.84 -43029.74</span></span>
 <span><span class="co">#&gt;                       n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[Acc t-PA vs. SK]     5759 1.00</span></span>
-<span><span class="co">#&gt; d[ASPAC vs. SK]        4381 1.00</span></span>
-<span><span class="co">#&gt; d[PTCA vs. SK]         5587 1.00</span></span>
-<span><span class="co">#&gt; d[r-PA vs. SK]         5043 1.00</span></span>
-<span><span class="co">#&gt; d[SK + t-PA vs. SK]    5628 1.00</span></span>
-<span><span class="co">#&gt; d[t-PA vs. SK]         3980 1.00</span></span>
-<span><span class="co">#&gt; d[UK vs. SK]           4963 1.00</span></span>
-<span><span class="co">#&gt; d[ASPAC vs. Acc t-PA]  3056 1.00</span></span>
-<span><span class="co">#&gt; d[PTCA vs. Acc t-PA]   4302 1.00</span></span>
-<span><span class="co">#&gt; d[r-PA vs. Acc t-PA]   4532 1.00</span></span>
-<span><span class="co">#&gt; d[TNK vs. Acc t-PA]    5330 1.00</span></span>
-<span><span class="co">#&gt; d[UK vs. Acc t-PA]     4204 1.00</span></span>
-<span><span class="co">#&gt; d[t-PA vs. ASPAC]      3910 1.00</span></span>
-<span><span class="co">#&gt; d[t-PA vs. PTCA]       4007 1.00</span></span>
-<span><span class="co">#&gt; d[UK vs. t-PA]         4872 1.00</span></span>
-<span><span class="co">#&gt; lp__                   1463 1.01</span></span>
+<span><span class="co">#&gt; d[Acc t-PA vs. SK]     5422    1</span></span>
+<span><span class="co">#&gt; d[ASPAC vs. SK]        4414    1</span></span>
+<span><span class="co">#&gt; d[PTCA vs. SK]         5900    1</span></span>
+<span><span class="co">#&gt; d[r-PA vs. SK]         5261    1</span></span>
+<span><span class="co">#&gt; d[SK + t-PA vs. SK]    6313    1</span></span>
+<span><span class="co">#&gt; d[t-PA vs. SK]         3757    1</span></span>
+<span><span class="co">#&gt; d[UK vs. SK]           5864    1</span></span>
+<span><span class="co">#&gt; d[ASPAC vs. Acc t-PA]  3748    1</span></span>
+<span><span class="co">#&gt; d[PTCA vs. Acc t-PA]   4336    1</span></span>
+<span><span class="co">#&gt; d[r-PA vs. Acc t-PA]   4497    1</span></span>
+<span><span class="co">#&gt; d[TNK vs. Acc t-PA]    4904    1</span></span>
+<span><span class="co">#&gt; d[UK vs. Acc t-PA]     4407    1</span></span>
+<span><span class="co">#&gt; d[t-PA vs. ASPAC]      4723    1</span></span>
+<span><span class="co">#&gt; d[t-PA vs. PTCA]       3436    1</span></span>
+<span><span class="co">#&gt; d[UK vs. t-PA]         5199    1</span></span>
+<span><span class="co">#&gt; lp__                   1552    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Feb 15 11:54:35 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 14:46:30 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
 <p>Comparing the model fit statistics</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dic_consistency</span></span>
-<span><span class="co">#&gt; Residual deviance: 106<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 58.8</span></span>
-<span><span class="co">#&gt;               DIC: 164.9</span></span>
+<span><span class="co">#&gt; Residual deviance: 105.7<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 58.5</span></span>
+<span><span class="co">#&gt;               DIC: 164.2</span></span>
 <span><span class="op">(</span><span class="va">dic_ume</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">thrombo_fit_ume</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 99.9<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 66.1</span></span>
-<span><span class="co">#&gt;               DIC: 166</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 100<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 66.2</span></span>
+<span><span class="co">#&gt;               DIC: 166.2</span></span></code></pre></div>
 <p>Whilst the UME model fits the data better, having a lower residual
 deviance, the additional parameters in the UME model mean that the DIC
 is very similar between both models. However, it is also important to
@@ -364,11 +360,10 @@ may be systematically different from the others in the network.</p>
 <div class="section level3">
 <h3 id="node-splitting">Node-splitting<a class="anchor" aria-label="anchor" href="#node-splitting"></a>
 </h3>
-<p>Another method for assessing inconsistency is node-splitting <span class="citation">(<a href="#ref-TSD4" role="doc-biblioref">Dias et al.
-2011</a>, <a href="#ref-Dias2010" role="doc-biblioref">2010</a>)</span>.
-Whereas the UME model assesses inconsistency globally, node-splitting
-assesses inconsistency locally for each potentially inconsistent
-comparison (those with both direct and indirect evidence) in turn.</p>
+<p>Another method for assessing inconsistency is node-splitting <span class="citation">(<a href="#ref-TSD4">Dias et al. 2011</a>, <a href="#ref-Dias2010">2010</a>)</span>. Whereas the UME model assesses
+inconsistency globally, node-splitting assesses inconsistency locally
+for each potentially inconsistent comparison (those with both direct and
+indirect evidence) in turn.</p>
 <p>Node-splitting can be performed using the <code><a href="../reference/nma.html">nma()</a></code> function
 with the argument <code>consistency = "nodesplit"</code>. By default,
 all possible comparisons will be split (as determined by the
@@ -426,198 +421,198 @@ under the consistency model would also be displayed.)</p>
 <span><span class="co">#&gt; <span style="color: #555555;">----------------------------------------------------</span> <span style="font-weight: bold;">Node-split Acc t-PA vs. SK</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net -0.18 0.04 -0.26 -0.20 -0.18 -0.15 -0.09     2955     3266    1</span></span>
-<span><span class="co">#&gt; d_dir -0.16 0.05 -0.25 -0.19 -0.16 -0.13 -0.06     3740     3287    1</span></span>
-<span><span class="co">#&gt; d_ind -0.25 0.09 -0.43 -0.31 -0.25 -0.19 -0.07      795     1317    1</span></span>
-<span><span class="co">#&gt; omega  0.09 0.10 -0.11  0.02  0.09  0.16  0.29      872     1744    1</span></span>
+<span><span class="co">#&gt; d_net -0.18 0.04 -0.26 -0.21 -0.18 -0.15 -0.09     2440     3198 1.00</span></span>
+<span><span class="co">#&gt; d_dir -0.16 0.05 -0.26 -0.19 -0.16 -0.13 -0.06     4143     3637 1.00</span></span>
+<span><span class="co">#&gt; d_ind -0.25 0.09 -0.43 -0.31 -0.25 -0.18 -0.07      787     1334 1.01</span></span>
+<span><span class="co">#&gt; omega  0.09 0.10 -0.12  0.02  0.09  0.16  0.29      929     1784 1.01</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 106.5<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 60.1</span></span>
-<span><span class="co">#&gt;               DIC: 166.6</span></span>
+<span><span class="co">#&gt; Residual deviance: 106.1<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 59.6</span></span>
+<span><span class="co">#&gt;               DIC: 165.6</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.38</span></span>
+<span><span class="co">#&gt; Bayesian p-value: 0.4</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------</span> <span style="font-weight: bold;">Node-split ASPAC vs. SK</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net  0.02 0.04 -0.06 -0.01  0.02  0.04  0.09     4788     3357    1</span></span>
-<span><span class="co">#&gt; d_dir  0.01 0.04 -0.07 -0.02  0.01  0.03  0.08     4124     3541    1</span></span>
-<span><span class="co">#&gt; d_ind  0.42 0.26 -0.07  0.24  0.42  0.59  0.93     2269     2762    1</span></span>
-<span><span class="co">#&gt; omega -0.41 0.26 -0.92 -0.59 -0.41 -0.24  0.09     2307     2769    1</span></span>
+<span><span class="co">#&gt; d_net  0.02 0.04 -0.06 -0.01  0.02  0.04  0.09     5168     3518    1</span></span>
+<span><span class="co">#&gt; d_dir  0.01 0.04 -0.06 -0.02  0.01  0.03  0.08     4507     3280    1</span></span>
+<span><span class="co">#&gt; d_ind  0.42 0.25 -0.06  0.26  0.42  0.59  0.91     2261     2856    1</span></span>
+<span><span class="co">#&gt; omega -0.41 0.25 -0.91 -0.58 -0.41 -0.25  0.07     2276     2772    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 103.9<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 59.4</span></span>
-<span><span class="co">#&gt;               DIC: 163.3</span></span>
+<span><span class="co">#&gt; Residual deviance: 104.7<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 60.2</span></span>
+<span><span class="co">#&gt;               DIC: 164.9</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.11</span></span>
+<span><span class="co">#&gt; Bayesian p-value: 0.098</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------</span> <span style="font-weight: bold;">Node-split PTCA vs. SK</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net -0.48 0.10 -0.68 -0.54 -0.48 -0.41 -0.28     3987     3213    1</span></span>
-<span><span class="co">#&gt; d_dir -0.66 0.18 -1.01 -0.79 -0.66 -0.54 -0.31     5561     3250    1</span></span>
-<span><span class="co">#&gt; d_ind -0.39 0.12 -0.64 -0.48 -0.40 -0.31 -0.15     2696     2977    1</span></span>
-<span><span class="co">#&gt; omega -0.27 0.22 -0.70 -0.42 -0.27 -0.12  0.15     4366     3563    1</span></span>
+<span><span class="co">#&gt; d_net -0.48 0.10 -0.67 -0.54 -0.48 -0.41 -0.28     4036     3520    1</span></span>
+<span><span class="co">#&gt; d_dir -0.66 0.18 -1.04 -0.78 -0.66 -0.54 -0.30     5349     3743    1</span></span>
+<span><span class="co">#&gt; d_ind -0.39 0.12 -0.63 -0.47 -0.39 -0.31 -0.15     3888     3539    1</span></span>
+<span><span class="co">#&gt; omega -0.27 0.22 -0.71 -0.42 -0.27 -0.12  0.16     4832     3378    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 105.7<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 60</span></span>
-<span><span class="co">#&gt;               DIC: 165.7</span></span>
+<span><span class="co">#&gt; Residual deviance: 105.1<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 59.4</span></span>
+<span><span class="co">#&gt;               DIC: 164.5</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Bayesian p-value: 0.22</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------</span> <span style="font-weight: bold;">Node-split r-PA vs. SK</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net -0.12 0.06 -0.24 -0.16 -0.12 -0.08 -0.01     3896     3524    1</span></span>
-<span><span class="co">#&gt; d_dir -0.06 0.09 -0.24 -0.12 -0.06  0.00  0.11     5857     3736    1</span></span>
-<span><span class="co">#&gt; d_ind -0.18 0.08 -0.34 -0.23 -0.18 -0.12 -0.02     2320     2902    1</span></span>
-<span><span class="co">#&gt; omega  0.12 0.12 -0.13  0.04  0.11  0.20  0.36     3168     2996    1</span></span>
+<span><span class="co">#&gt; d_net -0.12 0.06 -0.24 -0.16 -0.12 -0.08 -0.01     3232     3011    1</span></span>
+<span><span class="co">#&gt; d_dir -0.06 0.09 -0.24 -0.12 -0.06  0.00  0.12     5619     3249    1</span></span>
+<span><span class="co">#&gt; d_ind -0.17 0.08 -0.33 -0.23 -0.17 -0.12 -0.01     2258     2967    1</span></span>
+<span><span class="co">#&gt; omega  0.11 0.12 -0.12  0.03  0.12  0.20  0.35     3109     3115    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 106<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 59.7</span></span>
-<span><span class="co">#&gt;               DIC: 165.7</span></span>
+<span><span class="co">#&gt; Residual deviance: 105.9<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 59.6</span></span>
+<span><span class="co">#&gt;               DIC: 165.5</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.32</span></span>
+<span><span class="co">#&gt; Bayesian p-value: 0.36</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------</span> <span style="font-weight: bold;">Node-split t-PA vs. SK</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net  0.00 0.03 -0.05 -0.02  0.00  0.02  0.06     5164     3120    1</span></span>
-<span><span class="co">#&gt; d_dir  0.00 0.03 -0.06 -0.02  0.00  0.02  0.06     4298     3477    1</span></span>
-<span><span class="co">#&gt; d_ind  0.19 0.23 -0.25  0.03  0.19  0.35  0.66     1417     2322    1</span></span>
-<span><span class="co">#&gt; omega -0.19 0.23 -0.65 -0.35 -0.19 -0.03  0.25     1440     2107    1</span></span>
+<span><span class="co">#&gt; d_net  0.00 0.03 -0.06 -0.02  0.00  0.02  0.06     4623     3416    1</span></span>
+<span><span class="co">#&gt; d_dir  0.00 0.03 -0.06 -0.02  0.00  0.02  0.06     4241     3177    1</span></span>
+<span><span class="co">#&gt; d_ind  0.18 0.23 -0.27  0.03  0.18  0.34  0.65     1306     1873    1</span></span>
+<span><span class="co">#&gt; omega -0.18 0.23 -0.66 -0.33 -0.18 -0.02  0.27     1335     2058    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 106.1<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 59.5</span></span>
-<span><span class="co">#&gt;               DIC: 165.6</span></span>
+<span><span class="co">#&gt; Residual deviance: 106.6<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 60.1</span></span>
+<span><span class="co">#&gt;               DIC: 166.8</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.42</span></span>
+<span><span class="co">#&gt; Bayesian p-value: 0.43</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">----------------------------------------------------------</span> <span style="font-weight: bold;">Node-split UK vs. SK</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net -0.20 0.22 -0.63 -0.34 -0.20 -0.06  0.22     4463     3130    1</span></span>
-<span><span class="co">#&gt; d_dir -0.36 0.51 -1.42 -0.69 -0.35 -0.02  0.63     6010     3285    1</span></span>
-<span><span class="co">#&gt; d_ind -0.17 0.24 -0.67 -0.33 -0.17  0.00  0.29     4630     3298    1</span></span>
-<span><span class="co">#&gt; omega -0.19 0.57 -1.35 -0.55 -0.18  0.19  0.90     4990     3272    1</span></span>
+<span><span class="co">#&gt; d_net -0.20 0.22 -0.65 -0.35 -0.20 -0.05  0.21     4594     3329    1</span></span>
+<span><span class="co">#&gt; d_dir -0.38 0.53 -1.46 -0.73 -0.36 -0.02  0.67     6369     3530    1</span></span>
+<span><span class="co">#&gt; d_ind -0.16 0.25 -0.66 -0.33 -0.16  0.00  0.32     4472     3076    1</span></span>
+<span><span class="co">#&gt; omega -0.21 0.58 -1.38 -0.59 -0.21  0.18  0.92     6017     3001    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 106.9<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 59.8</span></span>
-<span><span class="co">#&gt;               DIC: 166.7</span></span>
+<span><span class="co">#&gt; Residual deviance: 107.1<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 60</span></span>
+<span><span class="co">#&gt;               DIC: 167.2</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.73</span></span>
+<span><span class="co">#&gt; Bayesian p-value: 0.71</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------</span> <span style="font-weight: bold;">Node-split ASPAC vs. Acc t-PA</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;       mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net 0.19 0.06 0.08 0.15 0.19 0.23  0.30     3639     3274    1</span></span>
-<span><span class="co">#&gt; d_dir 1.40 0.40 0.64 1.12 1.40 1.67  2.22     4371     2902    1</span></span>
-<span><span class="co">#&gt; d_ind 0.16 0.06 0.05 0.12 0.16 0.20  0.28     3138     3380    1</span></span>
-<span><span class="co">#&gt; omega 1.24 0.41 0.46 0.96 1.24 1.51  2.07     4222     2898    1</span></span>
+<span><span class="co">#&gt; d_net 0.19 0.06 0.08 0.15 0.19 0.23  0.30     3150     3476    1</span></span>
+<span><span class="co">#&gt; d_dir 1.41 0.42 0.63 1.12 1.39 1.68  2.32     3823     2653    1</span></span>
+<span><span class="co">#&gt; d_ind 0.16 0.06 0.04 0.13 0.16 0.20  0.28     3439     3457    1</span></span>
+<span><span class="co">#&gt; omega 1.25 0.43 0.45 0.96 1.23 1.52  2.17     3897     2529    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 96.8<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 59.7</span></span>
-<span><span class="co">#&gt;               DIC: 156.5</span></span>
+<span><span class="co">#&gt; Residual deviance: 96.9<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 59.8</span></span>
+<span><span class="co">#&gt;               DIC: 156.7</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Bayesian p-value: &lt;0.01</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------</span> <span style="font-weight: bold;">Node-split PTCA vs. Acc t-PA</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net -0.30 0.10 -0.49 -0.36 -0.30 -0.24 -0.10     5378     3304    1</span></span>
-<span><span class="co">#&gt; d_dir -0.22 0.12 -0.45 -0.29 -0.22 -0.14  0.01     3793     3514    1</span></span>
-<span><span class="co">#&gt; d_ind -0.47 0.17 -0.81 -0.59 -0.47 -0.36 -0.13     3125     2795    1</span></span>
-<span><span class="co">#&gt; omega  0.26 0.21 -0.15  0.11  0.26  0.40  0.66     2895     2992    1</span></span>
+<span><span class="co">#&gt; d_net -0.30 0.10 -0.48 -0.37 -0.30 -0.24 -0.12     5624     3685    1</span></span>
+<span><span class="co">#&gt; d_dir -0.22 0.12 -0.45 -0.30 -0.21 -0.14  0.02     3959     3577    1</span></span>
+<span><span class="co">#&gt; d_ind -0.48 0.18 -0.83 -0.60 -0.47 -0.36 -0.14     3157     3364    1</span></span>
+<span><span class="co">#&gt; omega  0.26 0.22 -0.15  0.12  0.26  0.41  0.69     2874     3040    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 104.8<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 59.1</span></span>
-<span><span class="co">#&gt;               DIC: 163.9</span></span>
+<span><span class="co">#&gt; Residual deviance: 106<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 60.3</span></span>
+<span><span class="co">#&gt;               DIC: 166.3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Bayesian p-value: 0.22</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------</span> <span style="font-weight: bold;">Node-split r-PA vs. Acc t-PA</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net  0.05 0.06 -0.05  0.02  0.05  0.09  0.16     6622     3739    1</span></span>
-<span><span class="co">#&gt; d_dir  0.02 0.07 -0.11 -0.02  0.02  0.07  0.15     4247     3361    1</span></span>
-<span><span class="co">#&gt; d_ind  0.14 0.10 -0.06  0.07  0.14  0.20  0.34     1972     2432    1</span></span>
-<span><span class="co">#&gt; omega -0.12 0.12 -0.35 -0.20 -0.12 -0.03  0.12     1948     2393    1</span></span>
+<span><span class="co">#&gt; d_net  0.05 0.05 -0.05  0.02  0.05  0.09  0.16     5864     3580    1</span></span>
+<span><span class="co">#&gt; d_dir  0.02 0.06 -0.11 -0.03  0.02  0.06  0.14     5063     3783    1</span></span>
+<span><span class="co">#&gt; d_ind  0.14 0.10 -0.06  0.07  0.14  0.21  0.33     1544     2655    1</span></span>
+<span><span class="co">#&gt; omega -0.12 0.12 -0.36 -0.20 -0.12 -0.04  0.12     1581     2663    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 105.9<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 59.6</span></span>
-<span><span class="co">#&gt;               DIC: 165.5</span></span>
+<span><span class="co">#&gt; Residual deviance: 106.4<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 60.2</span></span>
+<span><span class="co">#&gt;               DIC: 166.6</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.33</span></span>
+<span><span class="co">#&gt; Bayesian p-value: 0.3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">---------------------------------------------</span> <span style="font-weight: bold;">Node-split SK + t-PA vs. Acc t-PA</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net  0.13 0.05  0.03  0.09  0.13  0.16  0.23     5800     3595    1</span></span>
-<span><span class="co">#&gt; d_dir  0.13 0.05  0.02  0.09  0.13  0.16  0.23     3933     3361    1</span></span>
-<span><span class="co">#&gt; d_ind  0.63 0.70 -0.71  0.16  0.63  1.08  2.04     2745     2256    1</span></span>
-<span><span class="co">#&gt; omega -0.51 0.70 -1.92 -0.97 -0.51 -0.03  0.85     2766     2254    1</span></span>
+<span><span class="co">#&gt; d_net  0.13 0.05  0.03  0.09  0.13  0.16  0.23     6012     3360    1</span></span>
+<span><span class="co">#&gt; d_dir  0.13 0.06  0.02  0.09  0.13  0.16  0.24     3438     3292    1</span></span>
+<span><span class="co">#&gt; d_ind  0.62 0.68 -0.66  0.15  0.60  1.06  2.02     3129     2783    1</span></span>
+<span><span class="co">#&gt; omega -0.49 0.69 -1.90 -0.93 -0.48 -0.02  0.79     3137     2797    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 106.6<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 59.9</span></span>
-<span><span class="co">#&gt;               DIC: 166.6</span></span>
+<span><span class="co">#&gt; Residual deviance: 107<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 60.3</span></span>
+<span><span class="co">#&gt;               DIC: 167.3</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.47</span></span>
+<span><span class="co">#&gt; Bayesian p-value: 0.49</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">----------------------------------------------------</span> <span style="font-weight: bold;">Node-split UK vs. Acc t-PA</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean   sd  2.5%   25%   50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net -0.02 0.22 -0.46 -0.17 -0.02 0.12  0.41     4585     3346    1</span></span>
-<span><span class="co">#&gt; d_dir  0.15 0.35 -0.54 -0.09  0.15 0.38  0.87     4420     3321    1</span></span>
-<span><span class="co">#&gt; d_ind -0.14 0.29 -0.71 -0.33 -0.13 0.06  0.42     4016     2932    1</span></span>
-<span><span class="co">#&gt; omega  0.29 0.46 -0.60 -0.02  0.27 0.59  1.22     3746     3092    1</span></span>
+<span><span class="co">#&gt; d_net -0.02 0.22 -0.47 -0.17 -0.02 0.13  0.39     4727     3463    1</span></span>
+<span><span class="co">#&gt; d_dir  0.13 0.36 -0.55 -0.11  0.13 0.36  0.85     4327     3087    1</span></span>
+<span><span class="co">#&gt; d_ind -0.14 0.29 -0.70 -0.32 -0.13 0.05  0.42     3380     3387    1</span></span>
+<span><span class="co">#&gt; omega  0.27 0.45 -0.61 -0.04  0.26 0.57  1.14     3216     3265    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 107.2<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 60.3</span></span>
-<span><span class="co">#&gt;               DIC: 167.5</span></span>
+<span><span class="co">#&gt; Residual deviance: 106.6<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 59.8</span></span>
+<span><span class="co">#&gt;               DIC: 166.4</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.53</span></span>
+<span><span class="co">#&gt; Bayesian p-value: 0.55</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-----------------------------------------------------</span> <span style="font-weight: bold;">Node-split t-PA vs. ASPAC</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net -0.01 0.04 -0.09 -0.04 -0.01  0.01  0.06     6024     3306    1</span></span>
-<span><span class="co">#&gt; d_dir -0.02 0.04 -0.10 -0.05 -0.02  0.00  0.05     4818     2968    1</span></span>
-<span><span class="co">#&gt; d_ind  0.03 0.06 -0.09 -0.02  0.03  0.07  0.15     3759     3277    1</span></span>
-<span><span class="co">#&gt; omega -0.05 0.06 -0.17 -0.09 -0.05 -0.01  0.07     3842     3453    1</span></span>
+<span><span class="co">#&gt; d_net -0.01 0.04 -0.09 -0.04 -0.01  0.01  0.06     7427     2925    1</span></span>
+<span><span class="co">#&gt; d_dir -0.02 0.04 -0.10 -0.05 -0.02  0.00  0.05     5004     3676    1</span></span>
+<span><span class="co">#&gt; d_ind  0.02 0.06 -0.10 -0.02  0.02  0.07  0.14     3205     2987    1</span></span>
+<span><span class="co">#&gt; omega -0.05 0.06 -0.17 -0.09 -0.05 -0.01  0.08     3409     2682    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 106.2<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 59.6</span></span>
-<span><span class="co">#&gt;               DIC: 165.8</span></span>
+<span><span class="co">#&gt; Residual deviance: 106.3<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 59.8</span></span>
+<span><span class="co">#&gt;               DIC: 166.1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.42</span></span>
+<span><span class="co">#&gt; Bayesian p-value: 0.44</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------------------------------</span> <span style="font-weight: bold;">Node-split t-PA vs. PTCA</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;       mean   sd  2.5%   25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net 0.48 0.11  0.27  0.41 0.48 0.55  0.69     4089     3080    1</span></span>
-<span><span class="co">#&gt; d_dir 0.53 0.41 -0.25  0.27 0.52 0.81  1.37     4184     2940    1</span></span>
-<span><span class="co">#&gt; d_ind 0.47 0.11  0.26  0.40 0.47 0.55  0.68     3531     3510    1</span></span>
-<span><span class="co">#&gt; omega 0.06 0.43 -0.75 -0.22 0.05 0.34  0.92     3713     2619    1</span></span>
+<span><span class="co">#&gt; d_net 0.48 0.10  0.27  0.41 0.48 0.55  0.68     4145     3409    1</span></span>
+<span><span class="co">#&gt; d_dir 0.54 0.42 -0.27  0.26 0.54 0.82  1.37     4246     3327    1</span></span>
+<span><span class="co">#&gt; d_ind 0.47 0.11  0.26  0.40 0.47 0.55  0.69     3879     3457    1</span></span>
+<span><span class="co">#&gt; omega 0.07 0.43 -0.77 -0.23 0.06 0.36  0.93     3807     3356    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 107.2<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt; Residual deviance: 107.1<span style="color: #555555;"> (on 102 data points)</span></span></span>
 <span><span class="co">#&gt;                pD: 60</span></span>
-<span><span class="co">#&gt;               DIC: 167.2</span></span>
+<span><span class="co">#&gt;               DIC: 167.1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Bayesian p-value: 0.89</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------------------------</span> <span style="font-weight: bold;">Node-split UK vs. t-PA</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net -0.20 0.22 -0.64 -0.35 -0.20 -0.06  0.23     4380     3121    1</span></span>
-<span><span class="co">#&gt; d_dir -0.29 0.34 -0.98 -0.52 -0.28 -0.06  0.36     5146     3305    1</span></span>
-<span><span class="co">#&gt; d_ind -0.14 0.29 -0.72 -0.34 -0.14  0.06  0.42     4111     2846    1</span></span>
-<span><span class="co">#&gt; omega -0.15 0.45 -1.05 -0.45 -0.15  0.16  0.72     4445     3603    1</span></span>
+<span><span class="co">#&gt; d_net -0.20 0.22 -0.65 -0.35 -0.20 -0.05  0.22     4728     3313    1</span></span>
+<span><span class="co">#&gt; d_dir -0.30 0.35 -1.00 -0.52 -0.29 -0.07  0.37     5892     3266    1</span></span>
+<span><span class="co">#&gt; d_ind -0.14 0.29 -0.71 -0.34 -0.14  0.05  0.45     3931     3142    1</span></span>
+<span><span class="co">#&gt; omega -0.16 0.45 -1.05 -0.45 -0.15  0.14  0.69     4344     3250    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 106.8<span style="color: #555555;"> (on 102 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 59.8</span></span>
-<span><span class="co">#&gt;               DIC: 166.6</span></span>
+<span><span class="co">#&gt; Residual deviance: 107<span style="color: #555555;"> (on 102 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 59.9</span></span>
+<span><span class="co">#&gt;               DIC: 167</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.75</span></span></code></pre></div>
+<span><span class="co">#&gt; Bayesian p-value: 0.72</span></span></code></pre></div>
 <p>Node-splitting the ASPAC vs. Acc t-PA comparison results the lowest
 DIC, and this is lower than the consistency model. The posterior
 distribution for the inconsistency factor <span class="math inline">\(\omega\)</span> for this comparison lies far from
@@ -655,42 +650,42 @@ produced using the <code><a href="../reference/relative_effects.html">relative_e
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">thrombo_releff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">thrombo_fit</span>, all_contrasts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                            mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[Acc t-PA vs. SK]        -0.18 0.04 -0.26 -0.21 -0.18 -0.15 -0.09     2527     3088    1</span></span>
-<span><span class="co">#&gt; d[ASPAC vs. SK]            0.02 0.04 -0.05 -0.01  0.02  0.04  0.09     5305     3420    1</span></span>
-<span><span class="co">#&gt; d[PTCA vs. SK]            -0.47 0.10 -0.67 -0.54 -0.48 -0.40 -0.28     4015     3535    1</span></span>
-<span><span class="co">#&gt; d[r-PA vs. SK]            -0.12 0.06 -0.24 -0.16 -0.12 -0.08 -0.01     3218     3275    1</span></span>
-<span><span class="co">#&gt; d[SK + t-PA vs. SK]       -0.05 0.05 -0.14 -0.08 -0.05 -0.02  0.04     5673     2941    1</span></span>
-<span><span class="co">#&gt; d[t-PA vs. SK]             0.00 0.03 -0.06 -0.02  0.00  0.02  0.06     4936     3798    1</span></span>
-<span><span class="co">#&gt; d[TNK vs. SK]             -0.17 0.08 -0.32 -0.22 -0.17 -0.12 -0.02     3753     2997    1</span></span>
-<span><span class="co">#&gt; d[UK vs. SK]              -0.20 0.21 -0.61 -0.35 -0.20 -0.05  0.21     4519     3686    1</span></span>
-<span><span class="co">#&gt; d[ASPAC vs. Acc t-PA]      0.19 0.06  0.08  0.16  0.19  0.23  0.30     3362     3412    1</span></span>
-<span><span class="co">#&gt; d[PTCA vs. Acc t-PA]      -0.30 0.10 -0.50 -0.36 -0.30 -0.23 -0.11     5807     3526    1</span></span>
-<span><span class="co">#&gt; d[r-PA vs. Acc t-PA]       0.05 0.06 -0.05  0.02  0.05  0.09  0.17     5887     3493    1</span></span>
-<span><span class="co">#&gt; d[SK + t-PA vs. Acc t-PA]  0.13 0.05  0.02  0.09  0.13  0.16  0.23     5300     3323    1</span></span>
-<span><span class="co">#&gt; d[t-PA vs. Acc t-PA]       0.18 0.05  0.08  0.15  0.18  0.22  0.28     3021     3220    1</span></span>
-<span><span class="co">#&gt; d[TNK vs. Acc t-PA]        0.01 0.07 -0.12 -0.04  0.01  0.05  0.13     5800     3462    1</span></span>
-<span><span class="co">#&gt; d[UK vs. Acc t-PA]        -0.02 0.21 -0.44 -0.17 -0.02  0.12  0.39     4738     3598    1</span></span>
-<span><span class="co">#&gt; d[PTCA vs. ASPAC]         -0.49 0.11 -0.70 -0.56 -0.49 -0.42 -0.28     4282     3502    1</span></span>
-<span><span class="co">#&gt; d[r-PA vs. ASPAC]         -0.14 0.07 -0.27 -0.19 -0.14 -0.09  0.00     3842     3291    1</span></span>
-<span><span class="co">#&gt; d[SK + t-PA vs. ASPAC]    -0.07 0.06 -0.18 -0.10 -0.06 -0.03  0.05     5802     3543    1</span></span>
-<span><span class="co">#&gt; d[t-PA vs. ASPAC]         -0.01 0.04 -0.08 -0.04 -0.01  0.01  0.06     6698     3173    1</span></span>
-<span><span class="co">#&gt; d[TNK vs. ASPAC]          -0.19 0.09 -0.35 -0.24 -0.19 -0.13 -0.02     3939     3294    1</span></span>
-<span><span class="co">#&gt; d[UK vs. ASPAC]           -0.22 0.21 -0.62 -0.36 -0.22 -0.07  0.20     4563     3344    1</span></span>
-<span><span class="co">#&gt; d[r-PA vs. PTCA]           0.35 0.11  0.14  0.28  0.35  0.43  0.58     5820     3488    1</span></span>
-<span><span class="co">#&gt; d[SK + t-PA vs. PTCA]      0.43 0.11  0.21  0.35  0.43  0.50  0.64     5211     3543    1</span></span>
-<span><span class="co">#&gt; d[t-PA vs. PTCA]           0.48 0.11  0.27  0.40  0.48  0.55  0.69     4293     3476    1</span></span>
-<span><span class="co">#&gt; d[TNK vs. PTCA]            0.30 0.12  0.07  0.22  0.30  0.38  0.54     6575     3605    1</span></span>
-<span><span class="co">#&gt; d[UK vs. PTCA]             0.27 0.23 -0.18  0.12  0.27  0.43  0.72     4804     3639    1</span></span>
-<span><span class="co">#&gt; d[SK + t-PA vs. r-PA]      0.07 0.07 -0.06  0.03  0.08  0.12  0.21     5797     3404    1</span></span>
-<span><span class="co">#&gt; d[t-PA vs. r-PA]           0.13 0.07 -0.01  0.08  0.13  0.17  0.26     3497     3288    1</span></span>
-<span><span class="co">#&gt; d[TNK vs. r-PA]           -0.05 0.09 -0.22 -0.11 -0.05  0.01  0.12     7243     3182    1</span></span>
-<span><span class="co">#&gt; d[UK vs. r-PA]            -0.08 0.22 -0.51 -0.22 -0.08  0.07  0.35     4918     3466    1</span></span>
-<span><span class="co">#&gt; d[t-PA vs. SK + t-PA]      0.05 0.06 -0.06  0.01  0.05  0.09  0.16     5349     3233    1</span></span>
-<span><span class="co">#&gt; d[TNK vs. SK + t-PA]      -0.12 0.09 -0.29 -0.18 -0.12 -0.06  0.04     6090     3037    1</span></span>
-<span><span class="co">#&gt; d[UK vs. SK + t-PA]       -0.15 0.22 -0.57 -0.30 -0.15  0.00  0.27     4755     3485    1</span></span>
-<span><span class="co">#&gt; d[TNK vs. t-PA]           -0.17 0.08 -0.33 -0.23 -0.17 -0.12 -0.01     3709     3198    1</span></span>
-<span><span class="co">#&gt; d[UK vs. t-PA]            -0.20 0.21 -0.62 -0.35 -0.20 -0.05  0.21     4596     3514    1</span></span>
-<span><span class="co">#&gt; d[UK vs. TNK]             -0.03 0.22 -0.47 -0.18 -0.03  0.12  0.40     4947     3435    1</span></span>
+<span><span class="co">#&gt; d[Acc t-PA vs. SK]        -0.18 0.04 -0.27 -0.21 -0.18 -0.15 -0.09     2953     3069    1</span></span>
+<span><span class="co">#&gt; d[ASPAC vs. SK]            0.02 0.04 -0.06 -0.01  0.02  0.04  0.09     6713     3438    1</span></span>
+<span><span class="co">#&gt; d[PTCA vs. SK]            -0.48 0.10 -0.68 -0.54 -0.47 -0.41 -0.28     4192     3339    1</span></span>
+<span><span class="co">#&gt; d[r-PA vs. SK]            -0.12 0.06 -0.24 -0.16 -0.12 -0.08 -0.01     3869     3110    1</span></span>
+<span><span class="co">#&gt; d[SK + t-PA vs. SK]       -0.05 0.05 -0.14 -0.08 -0.05 -0.02  0.04     6494     2910    1</span></span>
+<span><span class="co">#&gt; d[t-PA vs. SK]             0.00 0.03 -0.06 -0.02  0.00  0.02  0.06     4294     3179    1</span></span>
+<span><span class="co">#&gt; d[TNK vs. SK]             -0.17 0.08 -0.33 -0.23 -0.17 -0.12 -0.02     3983     3484    1</span></span>
+<span><span class="co">#&gt; d[UK vs. SK]              -0.20 0.22 -0.64 -0.36 -0.21 -0.05  0.24     5030     3487    1</span></span>
+<span><span class="co">#&gt; d[ASPAC vs. Acc t-PA]      0.19 0.06  0.08  0.16  0.19  0.23  0.30     3851     3331    1</span></span>
+<span><span class="co">#&gt; d[PTCA vs. Acc t-PA]      -0.30 0.10 -0.49 -0.37 -0.30 -0.23 -0.11     5288     3646    1</span></span>
+<span><span class="co">#&gt; d[r-PA vs. Acc t-PA]       0.05 0.06 -0.06  0.02  0.05  0.09  0.16     6207     3483    1</span></span>
+<span><span class="co">#&gt; d[SK + t-PA vs. Acc t-PA]  0.13 0.05  0.02  0.09  0.13  0.17  0.24     5056     3455    1</span></span>
+<span><span class="co">#&gt; d[t-PA vs. Acc t-PA]       0.18 0.05  0.08  0.15  0.18  0.21  0.28     3348     3168    1</span></span>
+<span><span class="co">#&gt; d[TNK vs. Acc t-PA]        0.01 0.06 -0.12 -0.04  0.01  0.05  0.13     5204     3706    1</span></span>
+<span><span class="co">#&gt; d[UK vs. Acc t-PA]        -0.03 0.23 -0.46 -0.18 -0.03  0.13  0.43     5110     3453    1</span></span>
+<span><span class="co">#&gt; d[PTCA vs. ASPAC]         -0.49 0.11 -0.70 -0.56 -0.49 -0.42 -0.28     4730     3221    1</span></span>
+<span><span class="co">#&gt; d[r-PA vs. ASPAC]         -0.14 0.07 -0.27 -0.19 -0.14 -0.09  0.00     4421     3185    1</span></span>
+<span><span class="co">#&gt; d[SK + t-PA vs. ASPAC]    -0.06 0.06 -0.18 -0.11 -0.06 -0.02  0.05     6785     3344    1</span></span>
+<span><span class="co">#&gt; d[t-PA vs. ASPAC]         -0.01 0.04 -0.08 -0.04 -0.01  0.01  0.06     5900     3195    1</span></span>
+<span><span class="co">#&gt; d[TNK vs. ASPAC]          -0.19 0.09 -0.36 -0.24 -0.19 -0.13 -0.02     4499     3139    1</span></span>
+<span><span class="co">#&gt; d[UK vs. ASPAC]           -0.22 0.23 -0.66 -0.37 -0.22 -0.07  0.24     5137     3519    1</span></span>
+<span><span class="co">#&gt; d[r-PA vs. PTCA]           0.35 0.11  0.14  0.28  0.35  0.43  0.56     5704     3771    1</span></span>
+<span><span class="co">#&gt; d[SK + t-PA vs. PTCA]      0.43 0.11  0.23  0.35  0.43  0.50  0.64     4497     3567    1</span></span>
+<span><span class="co">#&gt; d[t-PA vs. PTCA]           0.48 0.10  0.28  0.41  0.48  0.55  0.68     4339     3371    1</span></span>
+<span><span class="co">#&gt; d[TNK vs. PTCA]            0.30 0.12  0.08  0.23  0.30  0.39  0.53     6237     3082    1</span></span>
+<span><span class="co">#&gt; d[UK vs. PTCA]             0.27 0.24 -0.19  0.11  0.27  0.44  0.75     5047     3589    1</span></span>
+<span><span class="co">#&gt; d[SK + t-PA vs. r-PA]      0.07 0.07 -0.06  0.03  0.07  0.12  0.21     5844     3053    1</span></span>
+<span><span class="co">#&gt; d[t-PA vs. r-PA]           0.13 0.07  0.00  0.08  0.13  0.17  0.25     4046     3334    1</span></span>
+<span><span class="co">#&gt; d[TNK vs. r-PA]           -0.05 0.09 -0.22 -0.11 -0.05  0.01  0.12     7056     2899    1</span></span>
+<span><span class="co">#&gt; d[UK vs. r-PA]            -0.08 0.23 -0.54 -0.24 -0.08  0.08  0.37     4955     3481    1</span></span>
+<span><span class="co">#&gt; d[t-PA vs. SK + t-PA]      0.05 0.05 -0.05  0.01  0.05  0.09  0.16     5467     3067    1</span></span>
+<span><span class="co">#&gt; d[TNK vs. SK + t-PA]      -0.12 0.08 -0.29 -0.18 -0.12 -0.07  0.04     5292     3057    1</span></span>
+<span><span class="co">#&gt; d[UK vs. SK + t-PA]       -0.15 0.23 -0.59 -0.31 -0.16  0.00  0.30     5246     3512    1</span></span>
+<span><span class="co">#&gt; d[TNK vs. t-PA]           -0.17 0.08 -0.34 -0.23 -0.17 -0.12 -0.01     4022     3333    1</span></span>
+<span><span class="co">#&gt; d[UK vs. t-PA]            -0.21 0.22 -0.65 -0.36 -0.21 -0.05  0.24     5029     3334    1</span></span>
+<span><span class="co">#&gt; d[UK vs. TNK]             -0.03 0.23 -0.48 -0.19 -0.04  0.13  0.43     5207     3579    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">thrombo_releff</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_thrombolytics_files/figure-html/thrombo_releff-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>Treatment rankings, rank probabilities, and cumulative rank
@@ -698,53 +693,53 @@ probabilities.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">thrombo_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">thrombo_fit</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                 mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; rank[SK]        7.44 0.99    6   7   7   8     9     3809       NA    1</span></span>
-<span><span class="co">#&gt; rank[Acc t-PA]  3.16 0.80    2   3   3   4     5     4221     3571    1</span></span>
-<span><span class="co">#&gt; rank[ASPAC]     7.98 1.13    5   7   8   9     9     4727       NA    1</span></span>
-<span><span class="co">#&gt; rank[PTCA]      1.13 0.35    1   1   1   1     2     3861     3667    1</span></span>
-<span><span class="co">#&gt; rank[r-PA]      4.41 1.17    2   4   4   5     7     4999     3767    1</span></span>
-<span><span class="co">#&gt; rank[SK + t-PA] 5.98 1.26    4   5   6   6     9     5454       NA    1</span></span>
-<span><span class="co">#&gt; rank[t-PA]      7.48 1.10    5   7   8   8     9     4836       NA    1</span></span>
-<span><span class="co">#&gt; rank[TNK]       3.51 1.28    2   3   3   4     6     5110     3219    1</span></span>
-<span><span class="co">#&gt; rank[UK]        3.90 2.66    1   2   3   5     9     4682       NA    1</span></span>
+<span><span class="co">#&gt; rank[SK]        7.45 0.97    6   7   7   8     9     4045       NA    1</span></span>
+<span><span class="co">#&gt; rank[Acc t-PA]  3.19 0.80    2   3   3   4     5     4376     3723    1</span></span>
+<span><span class="co">#&gt; rank[ASPAC]     7.96 1.16    5   7   8   9     9     5371       NA    1</span></span>
+<span><span class="co">#&gt; rank[PTCA]      1.14 0.35    1   1   1   1     2     3818     2991    1</span></span>
+<span><span class="co">#&gt; rank[r-PA]      4.39 1.17    2   4   4   5     7     4168     3425    1</span></span>
+<span><span class="co">#&gt; rank[SK + t-PA] 5.99 1.23    4   5   6   6     9     5270       NA    1</span></span>
+<span><span class="co">#&gt; rank[t-PA]      7.47 1.09    5   7   8   8     9     4000       NA    1</span></span>
+<span><span class="co">#&gt; rank[TNK]       3.49 1.25    2   3   3   4     6     4892     3388    1</span></span>
+<span><span class="co">#&gt; rank[UK]        3.92 2.73    1   2   2   6     9     4691       NA    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">thrombo_ranks</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_thrombolytics_files/figure-html/thrombo_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">thrombo_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">thrombo_fit</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;              p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6] p_rank[7] p_rank[8]</span></span>
-<span><span class="co">#&gt; d[SK]             0.00      0.00      0.00      0.00      0.02      0.13      0.39      0.30</span></span>
-<span><span class="co">#&gt; d[Acc t-PA]       0.00      0.21      0.46      0.29      0.04      0.00      0.00      0.00</span></span>
-<span><span class="co">#&gt; d[ASPAC]          0.00      0.00      0.00      0.00      0.02      0.10      0.17      0.26</span></span>
-<span><span class="co">#&gt; d[PTCA]           0.88      0.12      0.00      0.00      0.00      0.00      0.00      0.00</span></span>
-<span><span class="co">#&gt; d[r-PA]           0.00      0.06      0.14      0.30      0.39      0.08      0.02      0.01</span></span>
-<span><span class="co">#&gt; d[SK + t-PA]      0.00      0.00      0.01      0.07      0.25      0.44      0.10      0.07</span></span>
-<span><span class="co">#&gt; d[t-PA]           0.00      0.00      0.00      0.01      0.03      0.15      0.29      0.33</span></span>
-<span><span class="co">#&gt; d[TNK]            0.00      0.24      0.31      0.24      0.15      0.04      0.01      0.00</span></span>
-<span><span class="co">#&gt; d[UK]             0.12      0.37      0.08      0.09      0.10      0.06      0.03      0.02</span></span>
+<span><span class="co">#&gt; d[SK]             0.00      0.00      0.00      0.00      0.02      0.14      0.38      0.32</span></span>
+<span><span class="co">#&gt; d[Acc t-PA]       0.00      0.19      0.47      0.29      0.04      0.00      0.00      0.00</span></span>
+<span><span class="co">#&gt; d[ASPAC]          0.00      0.00      0.00      0.00      0.03      0.10      0.18      0.25</span></span>
+<span><span class="co">#&gt; d[PTCA]           0.87      0.13      0.00      0.00      0.00      0.00      0.00      0.00</span></span>
+<span><span class="co">#&gt; d[r-PA]           0.00      0.06      0.14      0.31      0.38      0.09      0.01      0.01</span></span>
+<span><span class="co">#&gt; d[SK + t-PA]      0.00      0.00      0.01      0.06      0.25      0.45      0.10      0.07</span></span>
+<span><span class="co">#&gt; d[t-PA]           0.00      0.00      0.00      0.01      0.03      0.15      0.31      0.32</span></span>
+<span><span class="co">#&gt; d[TNK]            0.00      0.24      0.31      0.25      0.15      0.03      0.01      0.00</span></span>
+<span><span class="co">#&gt; d[UK]             0.13      0.38      0.06      0.08      0.10      0.05      0.02      0.02</span></span>
 <span><span class="co">#&gt;              p_rank[9]</span></span>
-<span><span class="co">#&gt; d[SK]             0.16</span></span>
+<span><span class="co">#&gt; d[SK]             0.15</span></span>
 <span><span class="co">#&gt; d[Acc t-PA]       0.00</span></span>
 <span><span class="co">#&gt; d[ASPAC]          0.44</span></span>
 <span><span class="co">#&gt; d[PTCA]           0.00</span></span>
 <span><span class="co">#&gt; d[r-PA]           0.01</span></span>
-<span><span class="co">#&gt; d[SK + t-PA]      0.06</span></span>
+<span><span class="co">#&gt; d[SK + t-PA]      0.05</span></span>
 <span><span class="co">#&gt; d[t-PA]           0.19</span></span>
 <span><span class="co">#&gt; d[TNK]            0.00</span></span>
-<span><span class="co">#&gt; d[UK]             0.14</span></span>
+<span><span class="co">#&gt; d[UK]             0.15</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">thrombo_rankprobs</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_thrombolytics_files/figure-html/thrombo_rankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">thrombo_cumrankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">thrombo_fit</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;              p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6] p_rank[7] p_rank[8]</span></span>
-<span><span class="co">#&gt; d[SK]             0.00      0.00      0.00      0.00      0.02      0.15      0.54      0.84</span></span>
-<span><span class="co">#&gt; d[Acc t-PA]       0.00      0.21      0.67      0.96      1.00      1.00      1.00      1.00</span></span>
-<span><span class="co">#&gt; d[ASPAC]          0.00      0.00      0.00      0.00      0.03      0.13      0.30      0.56</span></span>
-<span><span class="co">#&gt; d[PTCA]           0.88      1.00      1.00      1.00      1.00      1.00      1.00      1.00</span></span>
-<span><span class="co">#&gt; d[r-PA]           0.00      0.06      0.20      0.50      0.89      0.97      0.98      0.99</span></span>
-<span><span class="co">#&gt; d[SK + t-PA]      0.00      0.00      0.01      0.08      0.33      0.77      0.87      0.94</span></span>
-<span><span class="co">#&gt; d[t-PA]           0.00      0.00      0.00      0.01      0.04      0.19      0.48      0.81</span></span>
-<span><span class="co">#&gt; d[TNK]            0.00      0.24      0.55      0.79      0.94      0.98      0.99      1.00</span></span>
-<span><span class="co">#&gt; d[UK]             0.12      0.49      0.57      0.66      0.75      0.81      0.84      0.86</span></span>
+<span><span class="co">#&gt; d[SK]             0.00      0.00      0.00      0.00      0.02      0.15      0.53      0.85</span></span>
+<span><span class="co">#&gt; d[Acc t-PA]       0.00      0.19      0.66      0.95      1.00      1.00      1.00      1.00</span></span>
+<span><span class="co">#&gt; d[ASPAC]          0.00      0.00      0.00      0.00      0.03      0.13      0.31      0.56</span></span>
+<span><span class="co">#&gt; d[PTCA]           0.87      1.00      1.00      1.00      1.00      1.00      1.00      1.00</span></span>
+<span><span class="co">#&gt; d[r-PA]           0.00      0.06      0.20      0.51      0.89      0.97      0.99      0.99</span></span>
+<span><span class="co">#&gt; d[SK + t-PA]      0.00      0.00      0.01      0.08      0.33      0.78      0.87      0.95</span></span>
+<span><span class="co">#&gt; d[t-PA]           0.00      0.00      0.00      0.01      0.04      0.18      0.49      0.81</span></span>
+<span><span class="co">#&gt; d[TNK]            0.00      0.24      0.55      0.80      0.95      0.98      0.99      1.00</span></span>
+<span><span class="co">#&gt; d[UK]             0.13      0.51      0.57      0.65      0.75      0.80      0.82      0.85</span></span>
 <span><span class="co">#&gt;              p_rank[9]</span></span>
 <span><span class="co">#&gt; d[SK]                1</span></span>
 <span><span class="co">#&gt; d[Acc t-PA]          1</span></span>
@@ -761,7 +756,7 @@ probabilities.</p>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-Boland2003" class="csl-entry">
 Boland, A., Y. Dundar, A. Bagust, A. Haycox, R. Hill, R. Mujica Mota, T.
 Walley, and R. Dickson. 2003. <span>“Early Thrombolysis for the

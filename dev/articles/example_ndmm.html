@@ -36,7 +36,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.1.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -132,7 +132,7 @@
 <span><span class="co">#&gt; - Windows 10 users: loo may be very slow if 'mc.cores' is set in your .Rprofile file (see https://github.com/stan-dev/loo/issues/94).</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>mc.cores <span class="op">=</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><span class="citation">Leahy and Walsh (<a href="#ref-Leahy2019" role="doc-biblioref">2019</a>)</span> present a network of five trials
+<p><span class="citation">Leahy and Walsh (<a href="#ref-Leahy2019">2019</a>)</span> present a network of five trials
 comparing lenalidomide and thalidomide to placebo for newly diagnosed
 multiple myeloma (NDMM) after autologous stem cell transplant (ASCT).
 The outcome of interest is progression free survival (PFS). Simulated
@@ -173,9 +173,9 @@ available on a further two trials, found in the data sets
 <span><span class="co">#&gt; 2 64.62894 9.399272  0.1921296        0.8310185 0.6215278</span></span>
 <span><span class="co">#&gt; 3 63.92360 9.006311  0.3634146        0.7170732 0.6195122</span></span>
 <span><span class="co">#&gt; 4 65.59387 8.384686  0.3186275        0.7450980 0.6151961</span></span></code></pre></div>
-<p><span class="citation">Phillippo et al. (<a href="#ref-Phillippo_survival" role="doc-biblioref">2024</a>)</span>
-analysed these data using multilevel network meta-regression (ML-NMR),
-and we recreate these analyses here.</p>
+<p><span class="citation">Phillippo et al. (<a href="#ref-Phillippo_survival">2024</a>)</span> analysed these data
+using multilevel network meta-regression (ML-NMR), and we recreate these
+analyses here.</p>
 <div class="section level2">
 <h2 id="study-data">Study data<a class="anchor" aria-label="anchor" href="#study-data"></a>
 </h2>
@@ -227,7 +227,8 @@ have IPD on the placebo vs. lenalidomide comparison, and only one AgD
 study on the placebo vs. thalidomide comparison, we make the shared
 effect modifier assumption between the two active treatments in order to
 estimate the effect modifying treatment-covariate interactions for
-thalidomide <span class="citation">(<a href="#ref-TSD18" role="doc-biblioref">Phillippo et al. 2016</a>, <a href="#ref-methods_paper" role="doc-biblioref">2020</a>)</span>. Since
+thalidomide <span class="citation">(<a href="#ref-TSD18">Phillippo et
+al. 2016</a>, <a href="#ref-methods_paper">2020</a>)</span>. Since
 lenalidomide and thalidomide are both in the same class of treatments,
 this assumption may be reasonable.</p>
 <p>To impose this assumption, we create a treatment class variable for
@@ -366,9 +367,9 @@ log-log plot.</p>
 <h2 id="ml-nmr-models-with-m-spline-baseline-hazards">ML-NMR models with M-spline baseline hazards<a class="anchor" aria-label="anchor" href="#ml-nmr-models-with-m-spline-baseline-hazards"></a>
 </h2>
 <p>We fit a proportional hazards survival model with cubic M-splines on
-the baseline hazard <span class="citation">(<a href="#ref-Brilleman2020" role="doc-biblioref">Brilleman et al. 2020</a>; <a href="#ref-Phillippo_survival" role="doc-biblioref">Phillippo et al.
-2024</a>)</span>. This allows the baseline hazard to flexibly follow any
-shape that the baseline hazard may take. ML-NMR models are fit using the
+the baseline hazard <span class="citation">(<a href="#ref-Brilleman2020">Brilleman et al. 2020</a>; <a href="#ref-Phillippo_survival">Phillippo et al. 2024</a>)</span>. This
+allows the baseline hazard to flexibly follow any shape that the
+baseline hazard may take. ML-NMR models are fit using the
 <code><a href="../reference/nma.html">nma()</a></code> function, and we specify that a M-spline baseline
 hazard should be used with <code>likelihood = "mspline"</code>.</p>
 <p>Fitting spline models requires the user to specify the number and
@@ -377,15 +378,15 @@ location of the knots. By default, seven internal knots are used
 on the observed event times within each study. Overfitting is avoided by
 the use of a random walk prior distribution on the (inverse softmax
 transformed) spline coefficients that penalises complexity and shrinks
-towards a constant baseline hazard <span class="citation">(<a href="#ref-Phillippo_survival" role="doc-biblioref">Phillippo et al.
-2024</a>)</span>; in practice this means that the number of knots can be
-set to a sufficiently large number and left to shrink to a suitable
-level of complexity controlled by the standard deviation of the random
-walk. The number of knots can be changed using the <code>n_knots</code>
-argument, or custom knot locations can be specified using the
-<code>knots</code> argument. The <code><a href="../reference/nma.html">nma()</a></code> function will always
-place boundary knots at the earliest entry time into the study (0 with
-no delayed entry) and at the maximum event/censoring time.</p>
+towards a constant baseline hazard <span class="citation">(<a href="#ref-Phillippo_survival">Phillippo et al. 2024</a>)</span>; in
+practice this means that the number of knots can be set to a
+sufficiently large number and left to shrink to a suitable level of
+complexity controlled by the standard deviation of the random walk. The
+number of knots can be changed using the <code>n_knots</code> argument,
+or custom knot locations can be specified using the <code>knots</code>
+argument. The <code><a href="../reference/nma.html">nma()</a></code> function will always place boundary
+knots at the earliest entry time into the study (0 with no delayed
+entry) and at the maximum event/censoring time.</p>
 <p>By default, the <code><a href="../reference/nma.html">nma()</a></code> function will fit a cubic M-spline
 (<code>mspline_degree = 3</code>). Piecewise-constant hazards
 (i.e. piecewise exponential hazards) are a special case with degree 0
@@ -1066,7 +1067,7 @@ ratios (or log survival time ratios for AFT models).</p>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-Brilleman2020" class="csl-entry">
 Brilleman, Samuel L., Eren M. Elci, Jacqueline Buros Novik, and Rory
 Wolfe. 2020. <span>“Bayesian Survival Analysis Using the Rstanarm

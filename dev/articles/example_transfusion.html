@@ -36,7 +36,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.1.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -118,9 +118,8 @@
 <p>This vignette describes the analysis of 6 trials comparing
 transfusion of granulocytes (white blood cells) to control for
 preventing mortality in patients with neutropenia or neutrophil
-dysfunction <span class="citation">(<a href="#ref-Stanworth2005" role="doc-biblioref">Stanworth et al. 2005</a>; <a href="#ref-Turner2012" role="doc-biblioref">Turner et al.
-2012</a>)</span>. The data are available in this package as
-<code>transfusion</code>:</p>
+dysfunction <span class="citation">(<a href="#ref-Stanworth2005">Stanworth et al. 2005</a>; <a href="#ref-Turner2012">Turner et al. 2012</a>)</span>. The data are
+available in this package as <code>transfusion</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">transfusion</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        studyc        trtc  r  n</span></span>
@@ -130,7 +129,7 @@ dysfunction <span class="citation">(<a href="#ref-Stanworth2005" role="doc-bibli
 <span><span class="co">#&gt; 4 Herzig 1977     Control  3 14</span></span>
 <span><span class="co">#&gt; 5  Higby 1975 Transfusion  2 17</span></span>
 <span><span class="co">#&gt; 6  Higby 1975     Control 14 19</span></span></code></pre></div>
-<p><span class="citation">Turner et al. (<a href="#ref-Turner2012" role="doc-biblioref">2012</a>)</span> previously used this dataset to
+<p><span class="citation">Turner et al. (<a href="#ref-Turner2012">2012</a>)</span> previously used this dataset to
 demonstrate the application of informative priors for heterogeneity, an
 analysis which we recreate here.</p>
 <div class="section level2">
@@ -172,7 +171,7 @@ reference treatment.</p>
 </h2>
 <p>We fit two random effects models, first with a non-informative prior
 for the heterogeneity, then using the informative prior described by
-<span class="citation">Turner et al. (<a href="#ref-Turner2012" role="doc-biblioref">2012</a>)</span>.</p>
+<span class="citation">Turner et al. (<a href="#ref-Turner2012">2012</a>)</span>.</p>
 <div class="section level3">
 <h3 id="random-effects-meta-analysis-with-non-informative-heterogeneity-prior">Random effects meta-analysis with non-informative heterogeneity
 prior<a class="anchor" aria-label="anchor" href="#random-effects-meta-analysis-with-non-informative-heterogeneity-prior"></a>
@@ -215,7 +214,7 @@ method:</p>
 <span><span class="co">#&gt; lp__           -134.40    0.09 3.11 -141.40 -136.27 -134.00 -132.23 -129.26  1125    1</span></span>
 <span><span class="co">#&gt; tau               1.85    0.03 1.04    0.52    1.15    1.59    2.27    4.66  1384    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Feb 15 11:56:49 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 14:48:22 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -283,7 +282,7 @@ method:</p>
 <span><span class="co">#&gt; lp__           -141.27    0.08 2.91 -147.68 -142.96 -140.94 -139.19 -136.52  1463    1</span></span>
 <span><span class="co">#&gt; tau               0.48    0.01 0.36    0.05    0.19    0.41    0.68    1.34  1513    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Feb 15 11:56:53 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 14:48:26 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -315,7 +314,7 @@ was specified on <span class="math inline">\(\tau^2\)</span>.</p>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-Stanworth2005" class="csl-entry">
 Stanworth, S., E. Massey, C. Hyde, S. J. Brunskill, C. Navarette, G.
 Lucas, D. Marks, and U. Paulus. 2005. <span>“Granulocyte Transfusions
