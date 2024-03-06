@@ -1,3 +1,5 @@
+# multinma 0.6.1.9000
+
 # multinma 0.6.1
 
 * Fix: Piecewise exponential hazard models no longer give errors during set-up. 
