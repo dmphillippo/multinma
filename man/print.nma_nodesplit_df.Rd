@@ -14,6 +14,9 @@
 
 \item{...}{Further arguments passed to \code{\link[=print.stanfit]{print.stanfit()}}}
 }
+\value{
+\code{x} is returned invisibly.
+}
 \description{
 Print \code{nma_nodesplit_df} objects
 }

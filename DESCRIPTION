@@ -1,6 +1,6 @@
 Package: multinma
 Title: Bayesian Network Meta-Analysis of Individual and Aggregate Data
-Version: 0.6.0.9000
+Version: 0.6.1
 Authors@R: 
     person(given = c("David", "M."),
            family = "Phillippo",

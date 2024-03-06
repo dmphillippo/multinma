@@ -40,6 +40,8 @@ NULL
 #' @param x A [stan_nma] object
 #' @param ... Further arguments passed to [print.stanfit()]
 #'
+#' @return `x` is returned invisibly.
+#'
 #' @export
 print.stan_nma <- function(x, ...) {
   if (inherits(x$network, "mlnmr_data")) type <- "ML-NMR"
