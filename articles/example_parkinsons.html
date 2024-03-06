@@ -35,7 +35,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -117,8 +117,9 @@
 <p>This vignette describes the analysis of data on the mean off-time
 reduction in patients given dopamine agonists as adjunct therapy in
 Parkinson’s disease, in a network of 7 trials of 4 active drugs plus
-placebo <span class="citation">(<a href="#ref-TSD2" role="doc-biblioref">Dias et al. 2011</a>)</span>. The data are
-available in this package as <code>parkinsons</code>:</p>
+placebo <span class="citation">(<a href="#ref-TSD2">Dias et al.
+2011</a>)</span>. The data are available in this package as
+<code>parkinsons</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">parkinsons</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   studyn trtn     y    se   n  diff se_diff</span></span>
@@ -238,7 +239,7 @@ method:</p>
 <span><span class="co">#&gt; d[5] -0.30    0.00 0.21  -0.73 -0.44 -0.30 -0.16  0.09  2683    1</span></span>
 <span><span class="co">#&gt; lp__ -6.73    0.06 2.43 -12.38 -8.12 -6.36 -4.98 -3.12  1570    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 24 15:08:16 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 13:23:17 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -294,7 +295,19 @@ for RE models). To diagnose, we use the <code><a href="https://rdrr.io/r/graphic
 investigate where in the posterior distribution these divergences are
 happening (indicated by red crosses):</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs</a></span><span class="op">(</span><span class="va">arm_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mu[4]"</span>, <span class="st">"d[3]"</span>, <span class="st">"delta[4: 3]"</span>, <span class="st">"tau"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs</a></span><span class="op">(</span><span class="va">arm_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mu[4]"</span>, <span class="st">"d[3]"</span>, <span class="st">"delta[4: 3]"</span>, <span class="st">"tau"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: New theme missing the following elements: axis.text.theta, axis.text.r,</span></span>
+<span><span class="co">#&gt; axis.ticks.theta, axis.ticks.r, axis.minor.ticks.x.top, axis.minor.ticks.x.bottom,</span></span>
+<span><span class="co">#&gt; axis.minor.ticks.y.left, axis.minor.ticks.y.right, axis.minor.ticks.theta, axis.minor.ticks.r,</span></span>
+<span><span class="co">#&gt; axis.ticks.length.theta, axis.ticks.length.r, axis.minor.ticks.length,</span></span>
+<span><span class="co">#&gt; axis.minor.ticks.length.x, axis.minor.ticks.length.x.top, axis.minor.ticks.length.x.bottom,</span></span>
+<span><span class="co">#&gt; axis.minor.ticks.length.y, axis.minor.ticks.length.y.left, axis.minor.ticks.length.y.right,</span></span>
+<span><span class="co">#&gt; axis.minor.ticks.length.theta, axis.minor.ticks.length.r, axis.line.theta, axis.line.r,</span></span>
+<span><span class="co">#&gt; legend.key.spacing, legend.key.spacing.x, legend.key.spacing.y, legend.frame, legend.ticks,</span></span>
+<span><span class="co">#&gt; legend.ticks.length, legend.axis.line, legend.text.position, legend.title.position,</span></span>
+<span><span class="co">#&gt; legend.position.inside, legend.byrow, legend.justification.top, legend.justification.bottom,</span></span>
+<span><span class="co">#&gt; legend.justification.left, legend.justification.right, legend.justification.inside,</span></span>
+<span><span class="co">#&gt; legend.location, plot.tag.location</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/plot_arm_RE_pairs-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>The divergent transitions occur in the upper tail of the
 heterogeneity standard deviation. In this case, with only a small number
@@ -319,7 +332,7 @@ method:</p>
 <span><span class="co">#&gt; lp__ -12.81    0.10 3.59 -20.80 -15.10 -12.52 -10.20 -6.61  1234    1</span></span>
 <span><span class="co">#&gt; tau    0.38    0.01 0.37   0.01   0.13   0.27   0.51  1.41   877    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 24 15:08:26 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 13:23:27 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -365,9 +378,8 @@ corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class
 <div class="section level3">
 <h3 id="further-results">Further results<a class="anchor" aria-label="anchor" href="#further-results"></a>
 </h3>
-<p>For comparison with <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we can produce
-relative effects against placebo using the
-<code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with
+<p>For comparison with <span class="citation">Dias et al. (<a href="#ref-TSD2">2011</a>)</span>, we can produce relative effects
+against placebo using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with
 <code>trt_ref = 1</code>:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">arm_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">arm_fit_FE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
@@ -387,8 +399,8 @@ relative effects against placebo using the
 <span><span class="co">#&gt; d[5] -0.81 0.78 -2.36 -1.25 -0.82 -0.36  0.66     1737     1588    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/arm_releff_RE-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we produce absolute predictions
-of the mean off-time reduction on each treatment assuming a Normal
+<p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2">2011</a>)</span>, we produce absolute predictions of
+the mean off-time reduction on each treatment assuming a Normal
 distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>
 method, where the <code>baseline</code> argument takes a
 <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the
@@ -613,7 +625,7 @@ method:</p>
 <span><span class="co">#&gt; d[5] -0.30    0.00 0.21 -0.71 -0.44 -0.30 -0.16  0.12  3359    1</span></span>
 <span><span class="co">#&gt; lp__ -3.16    0.03 1.46 -6.87 -3.86 -2.82 -2.09 -1.38  1762    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 24 15:08:48 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 13:23:51 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -662,7 +674,19 @@ for RE models). To diagnose, we use the <code><a href="https://rdrr.io/r/graphic
 investigate where in the posterior distribution these divergences are
 happening (indicated by red crosses):</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs</a></span><span class="op">(</span><span class="va">contr_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d[3]"</span>, <span class="st">"delta[4: 4 vs. 3]"</span>, <span class="st">"tau"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs</a></span><span class="op">(</span><span class="va">contr_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d[3]"</span>, <span class="st">"delta[4: 4 vs. 3]"</span>, <span class="st">"tau"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: New theme missing the following elements: axis.text.theta, axis.text.r,</span></span>
+<span><span class="co">#&gt; axis.ticks.theta, axis.ticks.r, axis.minor.ticks.x.top, axis.minor.ticks.x.bottom,</span></span>
+<span><span class="co">#&gt; axis.minor.ticks.y.left, axis.minor.ticks.y.right, axis.minor.ticks.theta, axis.minor.ticks.r,</span></span>
+<span><span class="co">#&gt; axis.ticks.length.theta, axis.ticks.length.r, axis.minor.ticks.length,</span></span>
+<span><span class="co">#&gt; axis.minor.ticks.length.x, axis.minor.ticks.length.x.top, axis.minor.ticks.length.x.bottom,</span></span>
+<span><span class="co">#&gt; axis.minor.ticks.length.y, axis.minor.ticks.length.y.left, axis.minor.ticks.length.y.right,</span></span>
+<span><span class="co">#&gt; axis.minor.ticks.length.theta, axis.minor.ticks.length.r, axis.line.theta, axis.line.r,</span></span>
+<span><span class="co">#&gt; legend.key.spacing, legend.key.spacing.x, legend.key.spacing.y, legend.frame, legend.ticks,</span></span>
+<span><span class="co">#&gt; legend.ticks.length, legend.axis.line, legend.text.position, legend.title.position,</span></span>
+<span><span class="co">#&gt; legend.position.inside, legend.byrow, legend.justification.top, legend.justification.bottom,</span></span>
+<span><span class="co">#&gt; legend.justification.left, legend.justification.right, legend.justification.inside,</span></span>
+<span><span class="co">#&gt; legend.location, plot.tag.location</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/plot_contr_RE_pairs-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>The divergent transitions occur in the upper tail of the
 heterogeneity standard deviation. In this case, with only a small number
@@ -687,7 +711,7 @@ method:</p>
 <span><span class="co">#&gt; lp__ -8.38    0.08 2.83 -14.87 -10.07 -8.13 -6.32 -3.71  1338    1</span></span>
 <span><span class="co">#&gt; tau   0.37    0.01 0.38   0.01   0.12  0.27  0.50  1.29   982    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 24 15:08:55 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 13:23:57 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -732,9 +756,8 @@ corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class
 <div class="section level3">
 <h3 id="further-results-1">Further results<a class="anchor" aria-label="anchor" href="#further-results-1"></a>
 </h3>
-<p>For comparison with <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we can produce
-relative effects against placebo using the
-<code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with
+<p>For comparison with <span class="citation">Dias et al. (<a href="#ref-TSD2">2011</a>)</span>, we can produce relative effects
+against placebo using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with
 <code>trt_ref = 1</code>:</p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">contr_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">contr_fit_FE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
@@ -754,8 +777,8 @@ relative effects against placebo using the
 <span><span class="co">#&gt; d[5] -0.82 0.74 -2.25 -1.27 -0.82 -0.38  0.63     1967     1595    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/contr_releff_RE-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we produce absolute predictions
-of the mean off-time reduction on each treatment assuming a Normal
+<p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2">2011</a>)</span>, we produce absolute predictions of
+the mean off-time reduction on each treatment assuming a Normal
 distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>
 method, where the <code>baseline</code> argument takes a
 <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the
@@ -835,8 +858,9 @@ cumulative rank probabilities.</p>
 <h2 id="analysis-of-mixed-arm-based-and-contrast-based-data">Analysis of mixed arm-based and contrast-based data<a class="anchor" aria-label="anchor" href="#analysis-of-mixed-arm-based-and-contrast-based-data"></a>
 </h2>
 <p>We now perform an analysis where some studies contribute arm-based
-data, and other contribute contrast-based data. Replicating <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we consider arm-based data from
-studies 1-3, and contrast-based data from studies 4-7.</p>
+data, and other contribute contrast-based data. Replicating <span class="citation">Dias et al. (<a href="#ref-TSD2">2011</a>)</span>, we
+consider arm-based data from studies 1-3, and contrast-based data from
+studies 4-7.</p>
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">studies</span> <span class="op">&lt;-</span> <span class="va">parkinsons</span><span class="op">$</span><span class="va">studyn</span></span>
 <span><span class="op">(</span><span class="va">parkinsons_arm</span> <span class="op">&lt;-</span> <span class="va">parkinsons</span><span class="op">[</span><span class="va">studies</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="op">]</span><span class="op">)</span></span>
@@ -952,7 +976,7 @@ method:</p>
 <span><span class="co">#&gt; d[5] -0.30    0.00 0.20 -0.71 -0.44 -0.30 -0.16  0.10  2836    1</span></span>
 <span><span class="co">#&gt; lp__ -4.61    0.04 1.87 -9.22 -5.57 -4.28 -3.26 -2.00  1833    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 24 15:09:10 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 13:24:12 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -1010,7 +1034,19 @@ for RE models). To diagnose, we use the <code><a href="https://rdrr.io/r/graphic
 investigate where in the posterior distribution these divergences are
 happening (indicated by red crosses):</p>
 <div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs</a></span><span class="op">(</span><span class="va">mix_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d[3]"</span>, <span class="st">"delta[4: 4 vs. 3]"</span>, <span class="st">"tau"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs</a></span><span class="op">(</span><span class="va">mix_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d[3]"</span>, <span class="st">"delta[4: 4 vs. 3]"</span>, <span class="st">"tau"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: New theme missing the following elements: axis.text.theta, axis.text.r,</span></span>
+<span><span class="co">#&gt; axis.ticks.theta, axis.ticks.r, axis.minor.ticks.x.top, axis.minor.ticks.x.bottom,</span></span>
+<span><span class="co">#&gt; axis.minor.ticks.y.left, axis.minor.ticks.y.right, axis.minor.ticks.theta, axis.minor.ticks.r,</span></span>
+<span><span class="co">#&gt; axis.ticks.length.theta, axis.ticks.length.r, axis.minor.ticks.length,</span></span>
+<span><span class="co">#&gt; axis.minor.ticks.length.x, axis.minor.ticks.length.x.top, axis.minor.ticks.length.x.bottom,</span></span>
+<span><span class="co">#&gt; axis.minor.ticks.length.y, axis.minor.ticks.length.y.left, axis.minor.ticks.length.y.right,</span></span>
+<span><span class="co">#&gt; axis.minor.ticks.length.theta, axis.minor.ticks.length.r, axis.line.theta, axis.line.r,</span></span>
+<span><span class="co">#&gt; legend.key.spacing, legend.key.spacing.x, legend.key.spacing.y, legend.frame, legend.ticks,</span></span>
+<span><span class="co">#&gt; legend.ticks.length, legend.axis.line, legend.text.position, legend.title.position,</span></span>
+<span><span class="co">#&gt; legend.position.inside, legend.byrow, legend.justification.top, legend.justification.bottom,</span></span>
+<span><span class="co">#&gt; legend.justification.left, legend.justification.right, legend.justification.inside,</span></span>
+<span><span class="co">#&gt; legend.location, plot.tag.location</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/plot_mix_RE_pairs-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>The divergent transitions occur in the upper tail of the
 heterogeneity standard deviation. In this case, with only a small number
@@ -1035,7 +1071,7 @@ method:</p>
 <span><span class="co">#&gt; lp__ -10.72    0.08 3.23 -17.78 -12.71 -10.44 -8.45 -5.15  1444 1.00</span></span>
 <span><span class="co">#&gt; tau    0.42    0.02 0.46   0.01   0.13   0.28  0.54  1.67   533 1.01</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 24 15:09:21 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 13:24:25 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -1081,9 +1117,8 @@ corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class
 <div class="section level3">
 <h3 id="further-results-2">Further results<a class="anchor" aria-label="anchor" href="#further-results-2"></a>
 </h3>
-<p>For comparison with <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we can produce
-relative effects against placebo using the
-<code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with
+<p>For comparison with <span class="citation">Dias et al. (<a href="#ref-TSD2">2011</a>)</span>, we can produce relative effects
+against placebo using the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with
 <code>trt_ref = 1</code>:</p>
 <div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">mix_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">mix_fit_FE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
@@ -1103,8 +1138,8 @@ relative effects against placebo using the
 <span><span class="co">#&gt; d[5] -0.81 0.79 -2.32 -1.27 -0.82 -0.38  0.82     1866     1679    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_releff_RE-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2" role="doc-biblioref">2011</a>)</span>, we produce absolute predictions
-of the mean off-time reduction on each treatment assuming a Normal
+<p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2">2011</a>)</span>, we produce absolute predictions of
+the mean off-time reduction on each treatment assuming a Normal
 distribution for the outcomes on treatment 1 (placebo) with mean <span class="math inline">\(-0.73\)</span> and precision <span class="math inline">\(21\)</span>. We use the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>
 method, where the <code>baseline</code> argument takes a
 <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the
@@ -1212,7 +1247,7 @@ cumulative rank probabilities.</p>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-TSD2" class="csl-entry">
 Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011.
 <span>“<span>NICE DSU Technical Support Document</span> 2: A Generalised

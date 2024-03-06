@@ -35,7 +35,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -114,9 +114,11 @@
 <span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     dgamma, pgamma, qgamma</span></span></code></pre>
-<p>This vignette describes the analysis of smoking cessation data <span class="citation">(<a href="#ref-Hasselblad1998" role="doc-biblioref">Hasselblad 1998</a>)</span>, replicating the
-analysis in NICE Technical Support Document 4 <span class="citation">(<a href="#ref-TSD4" role="doc-biblioref">Dias et al. 2011</a>)</span>. The
-data are available in this package as <code>smoking</code>:</p>
+<p>This vignette describes the analysis of smoking cessation data <span class="citation">(<a href="#ref-Hasselblad1998">Hasselblad
+1998</a>)</span>, replicating the analysis in NICE Technical Support
+Document 4 <span class="citation">(<a href="#ref-TSD4">Dias et al.
+2011</a>)</span>. The data are available in this package as
+<code>smoking</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">smoking</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   studyn trtn                   trtc  r   n</span></span>
@@ -208,19 +210,19 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                               mean se_mean   sd     2.5%      25%      50%      75%    97.5%</span></span>
-<span><span class="co">#&gt; d[Group counselling]          1.10    0.01 0.44     0.31     0.81     1.08     1.38     2.02</span></span>
-<span><span class="co">#&gt; d[Individual counselling]     0.84    0.01 0.24     0.38     0.68     0.83     0.99     1.31</span></span>
-<span><span class="co">#&gt; d[Self-help]                  0.48    0.01 0.40    -0.27     0.23     0.48     0.73     1.29</span></span>
-<span><span class="co">#&gt; lp__                      -5767.93    0.20 6.36 -5781.19 -5772.07 -5767.56 -5763.45 -5756.20</span></span>
-<span><span class="co">#&gt; tau                           0.84    0.01 0.19     0.55     0.71     0.82     0.94     1.27</span></span>
+<span><span class="co">#&gt; d[Group counselling]          1.10    0.01 0.44     0.28     0.80     1.08     1.38     1.95</span></span>
+<span><span class="co">#&gt; d[Individual counselling]     0.84    0.01 0.23     0.41     0.68     0.83     0.99     1.33</span></span>
+<span><span class="co">#&gt; d[Self-help]                  0.48    0.01 0.40    -0.30     0.21     0.48     0.74     1.25</span></span>
+<span><span class="co">#&gt; lp__                      -5768.06    0.20 6.44 -5781.69 -5772.21 -5767.77 -5763.58 -5756.14</span></span>
+<span><span class="co">#&gt; tau                           0.84    0.01 0.18     0.55     0.71     0.81     0.93     1.25</span></span>
 <span><span class="co">#&gt;                           n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[Group counselling]       2074    1</span></span>
-<span><span class="co">#&gt; d[Individual counselling]  1101    1</span></span>
-<span><span class="co">#&gt; d[Self-help]               1777    1</span></span>
-<span><span class="co">#&gt; lp__                        976    1</span></span>
-<span><span class="co">#&gt; tau                        1225    1</span></span>
+<span><span class="co">#&gt; d[Group counselling]       2243    1</span></span>
+<span><span class="co">#&gt; d[Individual counselling]  1053    1</span></span>
+<span><span class="co">#&gt; d[Self-help]               1888    1</span></span>
+<span><span class="co">#&gt; lp__                       1078    1</span></span>
+<span><span class="co">#&gt; tau                         935    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 24 15:17:21 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 13:32:03 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -245,9 +247,9 @@ distributions (in this case <span class="math inline">\(d_k\)</span>,
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">dic_consistency</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">smkfit</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 53.9<span style="color: #555555;"> (on 50 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 43.7</span></span>
-<span><span class="co">#&gt;               DIC: 97.6</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 54.1<span style="color: #555555;"> (on 50 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 43.8</span></span>
+<span><span class="co">#&gt;               DIC: 97.8</span></span></code></pre></div>
 <p>and the residual deviance contributions examined with the
 corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -268,20 +270,19 @@ the two zero counts in the data:</p>
 </h2>
 <blockquote>
 <p><strong>Note:</strong> The results of the inconsistency models here
-are slightly different to those of Dias et al. <span class="citation">(<a href="#ref-Dias2010" role="doc-biblioref">2010</a>,
-<a href="#ref-TSD4" role="doc-biblioref">2011</a>)</span>, although the
-overall conclusions are the same. This is due to the presence of
-multi-arm trials and a different ordering of treatments, meaning that
-inconsistency is parameterised differently within the multi-arm trials.
-The same results as Dias et al. are obtained if the network is instead
-set up with <code>trtn</code> as the treatment variable.</p>
+are slightly different to those of Dias et al. <span class="citation">(<a href="#ref-Dias2010">2010</a>, <a href="#ref-TSD4">2011</a>)</span>, although the overall conclusions are
+the same. This is due to the presence of multi-arm trials and a
+different ordering of treatments, meaning that inconsistency is
+parameterised differently within the multi-arm trials. The same results
+as Dias et al. are obtained if the network is instead set up with
+<code>trtn</code> as the treatment variable.</p>
 </blockquote>
 <div class="section level3">
 <h3 id="unrelated-mean-effects">Unrelated mean effects<a class="anchor" aria-label="anchor" href="#unrelated-mean-effects"></a>
 </h3>
-<p>We first fit an unrelated mean effects (UME) model <span class="citation">(<a href="#ref-TSD4" role="doc-biblioref">Dias et al.
-2011</a>)</span> to assess the consistency assumption. Again, we use the
-function <code><a href="../reference/nma.html">nma()</a></code>, but now with the argument
+<p>We first fit an unrelated mean effects (UME) model <span class="citation">(<a href="#ref-TSD4">Dias et al. 2011</a>)</span> to
+assess the consistency assumption. Again, we use the function
+<code><a href="../reference/nma.html">nma()</a></code>, but now with the argument
 <code>consistency = "ume"</code>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">smkfit_ume</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">smknet</span>, </span>
@@ -298,38 +299,38 @@ function <code><a href="../reference/nma.html">nma()</a></code>, but now with th
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                                                     mean se_mean   sd     2.5%      25%</span></span>
-<span><span class="co">#&gt; d[Group counselling vs. No intervention]            1.16    0.02 0.81    -0.37     0.61</span></span>
-<span><span class="co">#&gt; d[Individual counselling vs. No intervention]       0.91    0.01 0.28     0.39     0.72</span></span>
-<span><span class="co">#&gt; d[Self-help vs. No intervention]                    0.31    0.01 0.60    -0.93    -0.08</span></span>
-<span><span class="co">#&gt; d[Individual counselling vs. Group counselling]    -0.27    0.01 0.63    -1.49    -0.68</span></span>
-<span><span class="co">#&gt; d[Self-help vs. Group counselling]                 -0.61    0.01 0.73    -2.03    -1.07</span></span>
-<span><span class="co">#&gt; d[Self-help vs. Individual counselling]             0.16    0.02 1.08    -2.01    -0.51</span></span>
-<span><span class="co">#&gt; lp__                                            -5765.08    0.20 6.37 -5778.58 -5769.14</span></span>
-<span><span class="co">#&gt; tau                                                 0.95    0.01 0.23     0.59     0.78</span></span>
+<span><span class="co">#&gt; d[Group counselling vs. No intervention]            1.13    0.02 0.80    -0.38     0.59</span></span>
+<span><span class="co">#&gt; d[Individual counselling vs. No intervention]       0.90    0.01 0.27     0.42     0.71</span></span>
+<span><span class="co">#&gt; d[Self-help vs. No intervention]                    0.34    0.01 0.59    -0.80    -0.05</span></span>
+<span><span class="co">#&gt; d[Individual counselling vs. Group counselling]    -0.29    0.01 0.60    -1.49    -0.68</span></span>
+<span><span class="co">#&gt; d[Self-help vs. Group counselling]                 -0.63    0.02 0.75    -2.15    -1.09</span></span>
+<span><span class="co">#&gt; d[Self-help vs. Individual counselling]             0.13    0.02 1.04    -1.95    -0.54</span></span>
+<span><span class="co">#&gt; lp__                                            -5765.49    0.23 6.47 -5779.46 -5769.62</span></span>
+<span><span class="co">#&gt; tau                                                 0.93    0.01 0.22     0.59     0.77</span></span>
 <span><span class="co">#&gt;                                                      50%      75%    97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[Group counselling vs. No intervention]            1.12     1.67     2.84  2761 1.00</span></span>
-<span><span class="co">#&gt; d[Individual counselling vs. No intervention]       0.90     1.08     1.49  1295 1.00</span></span>
-<span><span class="co">#&gt; d[Self-help vs. No intervention]                    0.31     0.71     1.52  2184 1.00</span></span>
-<span><span class="co">#&gt; d[Individual counselling vs. Group counselling]    -0.28     0.14     0.97  2337 1.00</span></span>
-<span><span class="co">#&gt; d[Self-help vs. Group counselling]                 -0.63    -0.14     0.84  2367 1.00</span></span>
-<span><span class="co">#&gt; d[Self-help vs. Individual counselling]             0.16     0.85     2.24  3627 1.00</span></span>
-<span><span class="co">#&gt; lp__                                            -5764.77 -5760.71 -5753.60  1063 1.01</span></span>
-<span><span class="co">#&gt; tau                                                 0.91     1.08     1.46  1288 1.00</span></span>
+<span><span class="co">#&gt; d[Group counselling vs. No intervention]            1.10     1.64     2.79  2012    1</span></span>
+<span><span class="co">#&gt; d[Individual counselling vs. No intervention]       0.89     1.07     1.46  1279    1</span></span>
+<span><span class="co">#&gt; d[Self-help vs. No intervention]                    0.33     0.72     1.52  2312    1</span></span>
+<span><span class="co">#&gt; d[Individual counselling vs. Group counselling]    -0.30     0.10     0.90  2359    1</span></span>
+<span><span class="co">#&gt; d[Self-help vs. Group counselling]                 -0.63    -0.14     0.88  2188    1</span></span>
+<span><span class="co">#&gt; d[Self-help vs. Individual counselling]             0.12     0.80     2.25  3626    1</span></span>
+<span><span class="co">#&gt; lp__                                            -5765.01 -5760.99 -5753.81   764    1</span></span>
+<span><span class="co">#&gt; tau                                                 0.89     1.05     1.46   787    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jan 24 15:17:39 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar  6 13:32:20 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
 <p>Comparing the model fit statistics</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dic_consistency</span></span>
-<span><span class="co">#&gt; Residual deviance: 53.9<span style="color: #555555;"> (on 50 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 43.7</span></span>
-<span><span class="co">#&gt;               DIC: 97.6</span></span>
+<span><span class="co">#&gt; Residual deviance: 54.1<span style="color: #555555;"> (on 50 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 43.8</span></span>
+<span><span class="co">#&gt;               DIC: 97.8</span></span>
 <span><span class="op">(</span><span class="va">dic_ume</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">smkfit_ume</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 53.5<span style="color: #555555;"> (on 50 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 44.9</span></span>
-<span><span class="co">#&gt;               DIC: 98.4</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 54.1<span style="color: #555555;"> (on 50 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 45.2</span></span>
+<span><span class="co">#&gt;               DIC: 99.4</span></span></code></pre></div>
 <p>We see that there is little to choose between the two models.
 However, it is also important to examine the individual contributions to
 model fit of each data point under the two models (a so-called “dev-dev”
@@ -345,11 +346,10 @@ evidence for inconsistency here.</p>
 <div class="section level3">
 <h3 id="node-splitting">Node-splitting<a class="anchor" aria-label="anchor" href="#node-splitting"></a>
 </h3>
-<p>Another method for assessing inconsistency is node-splitting <span class="citation">(<a href="#ref-TSD4" role="doc-biblioref">Dias et al.
-2011</a>, <a href="#ref-Dias2010" role="doc-biblioref">2010</a>)</span>.
-Whereas the UME model assesses inconsistency globally, node-splitting
-assesses inconsistency locally for each potentially inconsistent
-comparison (those with both direct and indirect evidence) in turn.</p>
+<p>Another method for assessing inconsistency is node-splitting <span class="citation">(<a href="#ref-TSD4">Dias et al. 2011</a>, <a href="#ref-Dias2010">2010</a>)</span>. Whereas the UME model assesses
+inconsistency globally, node-splitting assesses inconsistency locally
+for each potentially inconsistent comparison (those with both direct and
+indirect evidence) in turn.</p>
 <p>Node-splitting can be performed using the <code><a href="../reference/nma.html">nma()</a></code> function
 with the argument <code>consistency = "nodesplit"</code>. By default,
 all possible comparisons will be split (as determined by the
@@ -386,98 +386,98 @@ DIC model fit statistics are also provided.</p>
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------</span> <span style="font-weight: bold;">Node-split Group counselling vs. No intervention</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                  mean   sd  2.5%   25%   50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net            1.10 0.44  0.26  0.82  1.09 1.37  2.02     1357     2022 1.00</span></span>
-<span><span class="co">#&gt; d_dir            1.07 0.74 -0.35  0.57  1.05 1.55  2.57     2792     2254 1.00</span></span>
-<span><span class="co">#&gt; d_ind            1.14 0.54  0.14  0.78  1.13 1.48  2.24     1988     2390 1.00</span></span>
-<span><span class="co">#&gt; omega           -0.07 0.89 -1.79 -0.66 -0.10 0.52  1.72     2488     2616 1.00</span></span>
-<span><span class="co">#&gt; tau              0.86 0.19  0.55  0.73  0.84 0.97  1.29     1078     1834 1.00</span></span>
-<span><span class="co">#&gt; tau_consistency  0.85 0.19  0.55  0.71  0.82 0.95  1.30     1243     1858 1.01</span></span>
+<span><span class="co">#&gt; d_net            1.10 0.44  0.25  0.80  1.10 1.38  2.01     1842     2310    1</span></span>
+<span><span class="co">#&gt; d_dir            1.08 0.77 -0.34  0.57  1.03 1.55  2.73     3363     2708    1</span></span>
+<span><span class="co">#&gt; d_ind            1.12 0.55  0.06  0.77  1.12 1.47  2.20     1957     2237    1</span></span>
+<span><span class="co">#&gt; omega           -0.04 0.94 -1.81 -0.66 -0.08 0.53  1.96     2529     2748    1</span></span>
+<span><span class="co">#&gt; tau              0.88 0.20  0.56  0.74  0.85 1.00  1.34     1151     1940    1</span></span>
+<span><span class="co">#&gt; tau_consistency  0.84 0.19  0.54  0.71  0.82 0.95  1.29     1080     1667    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 54.7<span style="color: #555555;"> (on 50 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 44.6</span></span>
-<span><span class="co">#&gt;               DIC: 99.3</span></span>
+<span><span class="co">#&gt; Residual deviance: 53.7<span style="color: #555555;"> (on 50 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 43.9</span></span>
+<span><span class="co">#&gt;               DIC: 97.6</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.92</span></span>
+<span><span class="co">#&gt; Bayesian p-value: 0.93</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-------------------------</span> <span style="font-weight: bold;">Node-split Individual counselling vs. No intervention</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                 mean   sd  2.5%   25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net           0.84 0.24  0.38  0.68 0.83 0.99  1.34      984     1591 1.01</span></span>
-<span><span class="co">#&gt; d_dir           0.88 0.26  0.39  0.72 0.88 1.04  1.42     1869     2329 1.00</span></span>
-<span><span class="co">#&gt; d_ind           0.58 0.68 -0.72  0.13 0.57 1.01  1.98     1980     1964 1.00</span></span>
-<span><span class="co">#&gt; omega           0.31 0.71 -1.10 -0.15 0.31 0.76  1.68     1967     2180 1.00</span></span>
-<span><span class="co">#&gt; tau             0.87 0.20  0.55  0.73 0.84 0.99  1.33     1312     1893 1.00</span></span>
-<span><span class="co">#&gt; tau_consistency 0.85 0.19  0.55  0.71 0.82 0.95  1.30     1243     1858 1.01</span></span>
+<span><span class="co">#&gt; d_net           0.85 0.24  0.39  0.69 0.84 1.00  1.35      814     1946    1</span></span>
+<span><span class="co">#&gt; d_dir           0.88 0.25  0.39  0.71 0.88 1.04  1.39     2757     2731    1</span></span>
+<span><span class="co">#&gt; d_ind           0.57 0.66 -0.71  0.14 0.58 0.98  1.91     2121     2178    1</span></span>
+<span><span class="co">#&gt; omega           0.31 0.69 -1.07 -0.13 0.32 0.76  1.68     2174     2358    1</span></span>
+<span><span class="co">#&gt; tau             0.86 0.19  0.55  0.72 0.84 0.98  1.28     1627     2142    1</span></span>
+<span><span class="co">#&gt; tau_consistency 0.84 0.19  0.54  0.71 0.82 0.95  1.29     1080     1667    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 53.9<span style="color: #555555;"> (on 50 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 44</span></span>
-<span><span class="co">#&gt;               DIC: 97.9</span></span>
+<span><span class="co">#&gt; Residual deviance: 54.3<span style="color: #555555;"> (on 50 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 44.3</span></span>
+<span><span class="co">#&gt;               DIC: 98.6</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Bayesian p-value: 0.64</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">--------------------------------------</span> <span style="font-weight: bold;">Node-split Self-help vs. No intervention</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                  mean   sd  2.5%   25%   50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net            0.49 0.40 -0.28  0.23  0.48 0.74  1.30     1398     2259 1.00</span></span>
-<span><span class="co">#&gt; d_dir            0.34 0.57 -0.79 -0.03  0.35 0.72  1.48     2889     2911 1.00</span></span>
-<span><span class="co">#&gt; d_ind            0.65 0.66 -0.61  0.22  0.66 1.07  1.97     1546     2110 1.00</span></span>
-<span><span class="co">#&gt; omega           -0.31 0.88 -2.03 -0.88 -0.32 0.26  1.38     1527     1854 1.00</span></span>
-<span><span class="co">#&gt; tau              0.88 0.19  0.57  0.74  0.85 0.99  1.33     1207     2486 1.00</span></span>
-<span><span class="co">#&gt; tau_consistency  0.85 0.19  0.55  0.71  0.82 0.95  1.30     1243     1858 1.01</span></span>
+<span><span class="co">#&gt; d_net            0.49 0.41 -0.32  0.22  0.49 0.75  1.34     1702     2168    1</span></span>
+<span><span class="co">#&gt; d_dir            0.34 0.55 -0.76 -0.02  0.35 0.70  1.44     3677     2791    1</span></span>
+<span><span class="co">#&gt; d_ind            0.71 0.65 -0.52  0.29  0.70 1.13  2.04     2128     2465    1</span></span>
+<span><span class="co">#&gt; omega           -0.37 0.85 -2.09 -0.91 -0.35 0.18  1.35     2278     2408    1</span></span>
+<span><span class="co">#&gt; tau              0.88 0.20  0.56  0.74  0.85 0.99  1.32     1377     2307    1</span></span>
+<span><span class="co">#&gt; tau_consistency  0.84 0.19  0.54  0.71  0.82 0.95  1.29     1080     1667    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Residual deviance: 53.5<span style="color: #555555;"> (on 50 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 44</span></span>
-<span><span class="co">#&gt;               DIC: 97.6</span></span>
+<span><span class="co">#&gt;                pD: 44.1</span></span>
+<span><span class="co">#&gt;               DIC: 97.5</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.71</span></span>
+<span><span class="co">#&gt; Bayesian p-value: 0.64</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-----------------------</span> <span style="font-weight: bold;">Node-split Individual counselling vs. Group counselling</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                  mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net           -0.26 0.42 -1.12 -0.53 -0.25  0.00  0.57     2099     2723 1.00</span></span>
-<span><span class="co">#&gt; d_dir           -0.11 0.51 -1.10 -0.43 -0.11  0.23  0.90     3797     2831 1.00</span></span>
-<span><span class="co">#&gt; d_ind           -0.53 0.62 -1.75 -0.94 -0.52 -0.14  0.69     1608     2343 1.00</span></span>
-<span><span class="co">#&gt; omega            0.43 0.68 -0.90 -0.01  0.42  0.86  1.80     1600     2483 1.00</span></span>
-<span><span class="co">#&gt; tau              0.86 0.19  0.55  0.72  0.84  0.97  1.30     1179     2186 1.00</span></span>
-<span><span class="co">#&gt; tau_consistency  0.85 0.19  0.55  0.71  0.82  0.95  1.30     1243     1858 1.01</span></span>
+<span><span class="co">#&gt; d_net           -0.25 0.42 -1.09 -0.52 -0.25  0.02  0.59     2986     2816    1</span></span>
+<span><span class="co">#&gt; d_dir           -0.10 0.48 -1.09 -0.42 -0.10  0.22  0.85     3462     3361    1</span></span>
+<span><span class="co">#&gt; d_ind           -0.53 0.61 -1.79 -0.92 -0.51 -0.13  0.65     1505     1984    1</span></span>
+<span><span class="co">#&gt; omega            0.42 0.68 -0.93 -0.01  0.42  0.85  1.81     1698     2254    1</span></span>
+<span><span class="co">#&gt; tau              0.87 0.20  0.56  0.73  0.85  0.99  1.34     1197     2073    1</span></span>
+<span><span class="co">#&gt; tau_consistency  0.84 0.19  0.54  0.71  0.82  0.95  1.29     1080     1667    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 54.3<span style="color: #555555;"> (on 50 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 44.6</span></span>
-<span><span class="co">#&gt;               DIC: 98.9</span></span>
+<span><span class="co">#&gt; Residual deviance: 53.4<span style="color: #555555;"> (on 50 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 43.9</span></span>
+<span><span class="co">#&gt;               DIC: 97.2</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Bayesian p-value: 0.51</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">------------------------------------</span> <span style="font-weight: bold;">Node-split Self-help vs. Group counselling</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                  mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net           -0.61 0.50 -1.63 -0.92 -0.59 -0.28  0.36     2556     2449 1.00</span></span>
-<span><span class="co">#&gt; d_dir           -0.63 0.65 -2.01 -1.05 -0.63 -0.19  0.63     4004     3418 1.00</span></span>
-<span><span class="co">#&gt; d_ind           -0.64 0.66 -1.99 -1.05 -0.63 -0.20  0.61     1701     2049 1.00</span></span>
-<span><span class="co">#&gt; omega            0.01 0.86 -1.68 -0.55  0.00  0.56  1.77     2019     2334 1.00</span></span>
-<span><span class="co">#&gt; tau              0.85 0.19  0.55  0.72  0.83  0.96  1.28     1127     2043 1.01</span></span>
-<span><span class="co">#&gt; tau_consistency  0.85 0.19  0.55  0.71  0.82  0.95  1.30     1243     1858 1.01</span></span>
+<span><span class="co">#&gt; d_net           -0.61 0.49 -1.59 -0.93 -0.59 -0.28  0.34     3229     3131    1</span></span>
+<span><span class="co">#&gt; d_dir           -0.62 0.68 -1.98 -1.05 -0.62 -0.17  0.69     3958     2729    1</span></span>
+<span><span class="co">#&gt; d_ind           -0.61 0.68 -1.97 -1.02 -0.61 -0.19  0.72     1837     2170    1</span></span>
+<span><span class="co">#&gt; omega           -0.01 0.87 -1.72 -0.59  0.00  0.58  1.67     2118     2599    1</span></span>
+<span><span class="co">#&gt; tau              0.87 0.20  0.56  0.73  0.85  0.99  1.34     1135     1759    1</span></span>
+<span><span class="co">#&gt; tau_consistency  0.84 0.19  0.54  0.71  0.82  0.95  1.29     1080     1667    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 54.5<span style="color: #555555;"> (on 50 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 44.4</span></span>
-<span><span class="co">#&gt;               DIC: 99</span></span>
+<span><span class="co">#&gt; Residual deviance: 53.9<span style="color: #555555;"> (on 50 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 44.2</span></span>
+<span><span class="co">#&gt;               DIC: 98.2</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Bayesian p-value: 1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-------------------------------</span> <span style="font-weight: bold;">Node-split Self-help vs. Individual counselling</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                  mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_net           -0.35 0.41 -1.17 -0.61 -0.35 -0.08  0.48     1725     2334 1.00</span></span>
-<span><span class="co">#&gt; d_dir            0.09 0.64 -1.18 -0.33  0.10  0.51  1.35     3686     2952 1.00</span></span>
-<span><span class="co">#&gt; d_ind           -0.62 0.53 -1.67 -0.95 -0.61 -0.28  0.44     2052     2580 1.00</span></span>
-<span><span class="co">#&gt; omega            0.71 0.82 -0.97  0.20  0.71  1.22  2.36     2310     2616 1.00</span></span>
-<span><span class="co">#&gt; tau              0.85 0.20  0.55  0.71  0.82  0.96  1.31     1281     1946 1.00</span></span>
-<span><span class="co">#&gt; tau_consistency  0.85 0.19  0.55  0.71  0.82  0.95  1.30     1243     1858 1.01</span></span>
+<span><span class="co">#&gt; d_net           -0.36 0.42 -1.20 -0.62 -0.36 -0.09  0.47     2304     2681    1</span></span>
+<span><span class="co">#&gt; d_dir            0.06 0.64 -1.19 -0.36  0.05  0.50  1.30     3381     3282    1</span></span>
+<span><span class="co">#&gt; d_ind           -0.62 0.50 -1.64 -0.95 -0.62 -0.29  0.35     1776     2539    1</span></span>
+<span><span class="co">#&gt; omega            0.68 0.79 -0.85  0.16  0.67  1.22  2.21     2295     3012    1</span></span>
+<span><span class="co">#&gt; tau              0.86 0.19  0.55  0.72  0.83  0.97  1.30     1218     1967    1</span></span>
+<span><span class="co">#&gt; tau_consistency  0.84 0.19  0.54  0.71  0.82  0.95  1.29     1080     1667    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 53.9<span style="color: #555555;"> (on 50 data points)</span></span></span>
+<span><span class="co">#&gt; Residual deviance: 53.8<span style="color: #555555;"> (on 50 data points)</span></span></span>
 <span><span class="co">#&gt;                pD: 44.2</span></span>
-<span><span class="co">#&gt;               DIC: 98.2</span></span>
+<span><span class="co">#&gt;               DIC: 98</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.35</span></span></code></pre></div>
+<span><span class="co">#&gt; Bayesian p-value: 0.38</span></span></code></pre></div>
 <p>The DIC of each inconsistency model is unchanged from the consistency
 model, no node-splits result in reduced heterogeneity standard deviation
 <span class="math inline">\(\tau\)</span> compared to the consistency
@@ -492,7 +492,7 @@ comparison, so the network (consistency) estimate is very similar to the
 direct estimate for this comparison.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_nodesplit</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.direct <span class="op">=</span> <span class="st">"horizontal"</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.direction <span class="op">=</span> <span class="st">"horizontal"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_smoking_files/figure-html/smk_nodesplit-1.png" width="672" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -504,19 +504,19 @@ direct estimate for this comparison.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">smk_releff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">smkfit</span>, all_contrasts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                                  mean   sd  2.5%   25%   50%   75% 97.5%</span></span>
-<span><span class="co">#&gt; d[Group counselling vs. No intervention]         1.10 0.44  0.31  0.81  1.08  1.38  2.02</span></span>
-<span><span class="co">#&gt; d[Individual counselling vs. No intervention]    0.84 0.24  0.38  0.68  0.83  0.99  1.31</span></span>
-<span><span class="co">#&gt; d[Self-help vs. No intervention]                 0.48 0.40 -0.27  0.23  0.48  0.73  1.29</span></span>
-<span><span class="co">#&gt; d[Individual counselling vs. Group counselling] -0.27 0.41 -1.08 -0.53 -0.26  0.00  0.54</span></span>
-<span><span class="co">#&gt; d[Self-help vs. Group counselling]              -0.62 0.49 -1.58 -0.93 -0.62 -0.29  0.31</span></span>
-<span><span class="co">#&gt; d[Self-help vs. Individual counselling]         -0.35 0.41 -1.20 -0.62 -0.35 -0.08  0.45</span></span>
+<span><span class="co">#&gt; d[Group counselling vs. No intervention]         1.10 0.44  0.28  0.80  1.08  1.38  1.95</span></span>
+<span><span class="co">#&gt; d[Individual counselling vs. No intervention]    0.84 0.23  0.41  0.68  0.83  0.99  1.33</span></span>
+<span><span class="co">#&gt; d[Self-help vs. No intervention]                 0.48 0.40 -0.30  0.21  0.48  0.74  1.25</span></span>
+<span><span class="co">#&gt; d[Individual counselling vs. Group counselling] -0.26 0.41 -1.06 -0.52 -0.26  0.01  0.52</span></span>
+<span><span class="co">#&gt; d[Self-help vs. Group counselling]              -0.62 0.48 -1.59 -0.92 -0.60 -0.31  0.33</span></span>
+<span><span class="co">#&gt; d[Self-help vs. Individual counselling]         -0.36 0.41 -1.18 -0.62 -0.35 -0.10  0.43</span></span>
 <span><span class="co">#&gt;                                                 Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[Group counselling vs. No intervention]            2083     2361    1</span></span>
-<span><span class="co">#&gt; d[Individual counselling vs. No intervention]       1109     2036    1</span></span>
-<span><span class="co">#&gt; d[Self-help vs. No intervention]                    1818     2565    1</span></span>
-<span><span class="co">#&gt; d[Individual counselling vs. Group counselling]     2851     2773    1</span></span>
-<span><span class="co">#&gt; d[Self-help vs. Group counselling]                  2959     2404    1</span></span>
-<span><span class="co">#&gt; d[Self-help vs. Individual counselling]             2154     2534    1</span></span>
+<span><span class="co">#&gt; d[Group counselling vs. No intervention]            2398     2689    1</span></span>
+<span><span class="co">#&gt; d[Individual counselling vs. No intervention]       1068     1727    1</span></span>
+<span><span class="co">#&gt; d[Self-help vs. No intervention]                    1946     2294    1</span></span>
+<span><span class="co">#&gt; d[Individual counselling vs. Group counselling]     3070     2868    1</span></span>
+<span><span class="co">#&gt; d[Self-help vs. Group counselling]                  3028     2505    1</span></span>
+<span><span class="co">#&gt; d[Self-help vs. Individual counselling]             2213     2320    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_releff</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_smoking_files/figure-html/smoking_releff-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>Treatment rankings, rank probabilities, and cumulative rank
@@ -525,35 +525,35 @@ log odds of cessation is better (the outcome is positive).</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">smk_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">smkfit</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                              mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; rank[No intervention]        3.89 0.32    3   4   4   4     4     2680       NA    1</span></span>
-<span><span class="co">#&gt; rank[Group counselling]      1.35 0.61    1   1   1   2     3     3182     3177    1</span></span>
-<span><span class="co">#&gt; rank[Individual counselling] 1.94 0.63    1   2   2   2     3     2385     2675    1</span></span>
-<span><span class="co">#&gt; rank[Self-help]              2.83 0.67    1   3   3   3     4     2603       NA    1</span></span>
+<span><span class="co">#&gt; rank[No intervention]        3.89 0.32    3   4   4   4     4     2574       NA    1</span></span>
+<span><span class="co">#&gt; rank[Group counselling]      1.36 0.61    1   1   1   2     3     3285     3179    1</span></span>
+<span><span class="co">#&gt; rank[Individual counselling] 1.93 0.63    1   2   2   2     3     2440       NA    1</span></span>
+<span><span class="co">#&gt; rank[Self-help]              2.83 0.68    1   3   3   3     4     2536       NA    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_ranks</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_smoking_files/figure-html/smoking_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">smk_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">smkfit</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]</span></span>
 <span><span class="co">#&gt; d[No intervention]             0.00      0.00      0.11      0.89</span></span>
-<span><span class="co">#&gt; d[Group counselling]           0.72      0.22      0.06      0.01</span></span>
-<span><span class="co">#&gt; d[Individual counselling]      0.23      0.60      0.17      0.00</span></span>
-<span><span class="co">#&gt; d[Self-help]                   0.05      0.18      0.67      0.10</span></span>
+<span><span class="co">#&gt; d[Group counselling]           0.71      0.23      0.06      0.00</span></span>
+<span><span class="co">#&gt; d[Individual counselling]      0.24      0.60      0.16      0.00</span></span>
+<span><span class="co">#&gt; d[Self-help]                   0.05      0.17      0.67      0.10</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_rankprobs</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_smoking_files/figure-html/smoking_rankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">smk_cumrankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">smkfit</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]</span></span>
 <span><span class="co">#&gt; d[No intervention]             0.00      0.00      0.11         1</span></span>
-<span><span class="co">#&gt; d[Group counselling]           0.72      0.94      0.99         1</span></span>
-<span><span class="co">#&gt; d[Individual counselling]      0.23      0.83      1.00         1</span></span>
-<span><span class="co">#&gt; d[Self-help]                   0.05      0.23      0.90         1</span></span>
+<span><span class="co">#&gt; d[Group counselling]           0.71      0.94      1.00         1</span></span>
+<span><span class="co">#&gt; d[Individual counselling]      0.24      0.84      1.00         1</span></span>
+<span><span class="co">#&gt; d[Self-help]                   0.05      0.22      0.90         1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_cumrankprobs</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_smoking_files/figure-html/smoking_cumrankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-Dias2010" class="csl-entry">
 Dias, S., N. J. Welton, D. M. Caldwell, and A. E. Ades. 2010.
 <span>“Checking Consistency in Mixed Treatment Comparison
