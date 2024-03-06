@@ -1,3 +1,8 @@
+# multinma 0.6.1
+
+* Fix: Piecewise exponential hazard models no longer give errors during set-up. 
+Calculation of RW1 prior weights needed to be handled as a special case.
+
 # multinma 0.6.0
 
 ## Feature: Survival/time-to-event models are now supported
