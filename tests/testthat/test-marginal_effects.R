@@ -64,6 +64,9 @@ test_that("newdata argument", {
 
 skip_on_cran()  # Reduce CRAN check time
 
+
+# Binary AgD only --------------------------------------------------------------
+
 # Only small number of samples to test
 smk_fit_RE <- suppressWarnings(nma(smk_net,
                                    trt_effects = "random",
@@ -72,7 +75,7 @@ smk_fit_RE <- suppressWarnings(nma(smk_net,
                                    prior_het = normal(scale = 5),
                                    iter = 10))
 
-test_that(".trta, .trtb columns are correct", {
+test_that("Binary AgD: .trta, .trtb columns are correct", {
   re1.1 <- tibble::as_tibble(marginal_effects(smk_fit_RE, mtype = "difference"))
   expect_identical(paste0("marg[", re1.1$.study, ": ", re1.1$.trtb, "]"),
                    re1.1$parameter)
@@ -119,7 +122,7 @@ test_that(".trta, .trtb columns are correct", {
 })
 
 
-test_that(".trta, .trtb columns are correct in new populations", {
+test_that("Binary AgD: .trta, .trtb columns are correct in new populations", {
   re1.1 <- tibble::as_tibble(marginal_effects(smk_fit_RE, baseline = distr(qnorm, 0, 0.1), mtype = "difference"))
   expect_identical(paste0("marg[", re1.1$.trtb, "]"),
                    re1.1$parameter)
@@ -164,6 +167,9 @@ test_that(".trta, .trtb columns are correct in new populations", {
                    re3.3$parameter)
   expect_identical(as.character(re3.3$.trta), rep("Self-help", times = nrow(re3.3)))
 })
+
+
+# Binary with IPD regression ---------------------------------------------------
 
 library(dplyr)
 
@@ -257,7 +263,7 @@ test_that("baseline required when newdata specified", {
   expect_error(marginal_effects(pso_fit, baseline = distr(qnorm, 0, 0.1)), m)
 })
 
-test_that(".study, .trta, .trtb columns are correct", {
+test_that("Binary IPD: .study, .trta, .trtb columns are correct", {
   re1 <- tibble::as_tibble(marginal_effects(pso_fit))
   expect_identical(paste0("marg[", re1$.study, ": ", re1$.trtb, "]"),
                    re1$parameter)
@@ -286,3 +292,117 @@ test_that(".study, .trta, .trtb columns are correct", {
                    re6$parameter)
   expect_identical(as.character(re6$.trta), rep("ETN", times = nrow(re6)))
 })
+
+
+# Ordered categorical -----------------------------------------------------
+
+ord_net <- set_agd_arm(plaque_psoriasis_agd,
+                       studyc, trtc,
+                       r = multi(r0 = pasi75_n,
+                                 PASI75 = pasi75_r,
+                                 PASI90 = pasi90_r,
+                                 PASI100 = pasi100_r,
+                                 type = "ordered", inclusive = TRUE))
+
+
+# Only small number of samples to test
+ord_fit <- suppressWarnings(nma(ord_net,
+                                trt_effects = "random",
+                                prior_intercept = normal(scale = 100),
+                                prior_trt = normal(scale = 100),
+                                prior_het = normal(scale = 5),
+                                iter = 10))
+
+test_that("Ordered categorical: .study, .trta, .trtb, .category columns are correct", {
+  re1.1 <- tibble::as_tibble(marginal_effects(ord_fit, mtype = "difference"))
+  expect_identical(paste0("marg[", re1.1$.study, ": ", re1.1$.trtb, ", ", re1.1$.category, "]"),
+                   re1.1$parameter)
+  expect_identical(as.character(re1.1$.trta), rep("SEC_300", times = nrow(re1.1)))
+
+  re1.2 <- tibble::as_tibble(marginal_effects(ord_fit, mtype = "ratio"))
+  expect_identical(paste0("marg[", re1.1$.study, ": ", re1.2$.trtb, ", ", re1.2$.category, "]"),
+                   re1.2$parameter)
+  expect_identical(as.character(re1.2$.trta), rep("SEC_300", times = nrow(re1.2)))
+
+  re1.3 <- tibble::as_tibble(marginal_effects(ord_fit, mtype = "link"))
+  expect_identical(paste0("marg[", re1.1$.study, ": ", re1.3$.trtb, ", ", re1.3$.category, "]"),
+                   re1.3$parameter)
+  expect_identical(as.character(re1.3$.trta), rep("SEC_300", times = nrow(re1.3)))
+
+
+  re2.1 <- tibble::as_tibble(marginal_effects(ord_fit, all_contrasts = TRUE, mtype = "difference"))
+  expect_identical(paste0("marg[", re2.1$.study, ": ", re2.1$.trtb, " vs. ", re2.1$.trta, ", ", re2.1$.category, "]"),
+                   re2.1$parameter)
+
+  re2.2 <- tibble::as_tibble(marginal_effects(ord_fit, all_contrasts = TRUE, mtype = "ratio"))
+  expect_identical(paste0("marg[", re2.1$.study, ": ", re2.2$.trtb, " vs. ", re2.2$.trta, ", ", re2.2$.category, "]"),
+                   re2.2$parameter)
+
+  re2.3 <- tibble::as_tibble(marginal_effects(ord_fit, all_contrasts = TRUE, mtype = "link"))
+  expect_identical(paste0("marg[", re2.1$.study, ": ", re2.3$.trtb, " vs. ", re2.3$.trta, ", ", re2.3$.category, "]"),
+                   re2.3$parameter)
+
+
+  re3.1 <- tibble::as_tibble(marginal_effects(ord_fit, trt_ref = "PBO", mtype = "difference"))
+  expect_identical(paste0("marg[", re1.1$.study, ": ", re3.1$.trtb, ", ", re3.1$.category, "]"),
+                   re3.1$parameter)
+  expect_identical(as.character(re3.1$.trta), rep("PBO", times = nrow(re3.1)))
+
+  re3.2 <- tibble::as_tibble(marginal_effects(ord_fit, trt_ref = "PBO", mtype = "ratio"))
+  expect_identical(paste0("marg[", re1.1$.study, ": ", re3.2$.trtb, ", ", re3.2$.category, "]"),
+                   re3.2$parameter)
+  expect_identical(as.character(re3.2$.trta), rep("PBO", times = nrow(re3.2)))
+
+  re3.3 <- tibble::as_tibble(marginal_effects(ord_fit, trt_ref = "PBO", mtype = "link"))
+  expect_identical(paste0("marg[", re3.1$.study, ": ", re3.3$.trtb, ", ", re3.3$.category, "]"),
+                   re3.3$parameter)
+  expect_identical(as.character(re3.3$.trta), rep("PBO", times = nrow(re3.3)))
+})
+
+
+test_that("Ordered categorical: .trta, .trtb, .category columns are correct in new populations", {
+  re1.1 <- tibble::as_tibble(marginal_effects(ord_fit, baseline = distr(qnorm, 0, 0.1), mtype = "difference"))
+  expect_identical(paste0("marg[", re1.1$.trtb, ", ", re1.1$.category, "]"),
+                   re1.1$parameter)
+  expect_identical(as.character(re1.1$.trta), rep("SEC_300", times = nrow(re1.1)))
+
+  re1.2 <- tibble::as_tibble(marginal_effects(ord_fit, baseline = distr(qnorm, 0, 0.1), mtype = "ratio"))
+  expect_identical(paste0("marg[", re1.2$.trtb, ", ", re1.2$.category, "]"),
+                   re1.2$parameter)
+  expect_identical(as.character(re1.2$.trta), rep("SEC_300", times = nrow(re1.2)))
+
+  re1.3 <- tibble::as_tibble(marginal_effects(ord_fit, baseline = distr(qnorm, 0, 0.1), mtype = "link"))
+  expect_identical(paste0("marg[", re1.3$.trtb, ", ", re1.3$.category, "]"),
+                   re1.3$parameter)
+  expect_identical(as.character(re1.3$.trta), rep("SEC_300", times = nrow(re1.3)))
+
+
+  re2.1 <- tibble::as_tibble(marginal_effects(ord_fit, baseline = distr(qnorm, 0, 0.1), all_contrasts = TRUE, mtype = "difference"))
+  expect_identical(paste0("marg[", re2.1$.trtb, " vs. ", re2.1$.trta, ", ", re2.1$.category, "]"),
+                   re2.1$parameter)
+
+  re2.2 <- tibble::as_tibble(marginal_effects(ord_fit, baseline = distr(qnorm, 0, 0.1), all_contrasts = TRUE, mtype = "ratio"))
+  expect_identical(paste0("marg[", re2.2$.trtb, " vs. ", re2.2$.trta, ", ", re2.2$.category, "]"),
+                   re2.2$parameter)
+
+  re2.3 <- tibble::as_tibble(marginal_effects(ord_fit, baseline = distr(qnorm, 0, 0.1), all_contrasts = TRUE, mtype = "link"))
+  expect_identical(paste0("marg[", re2.3$.trtb, " vs. ", re2.3$.trta, ", ", re2.3$.category, "]"),
+                   re2.3$parameter)
+
+
+  re3.1 <- tibble::as_tibble(marginal_effects(ord_fit, baseline = distr(qnorm, 0, 0.1), trt_ref = "PBO", mtype = "difference"))
+  expect_identical(paste0("marg[", re3.1$.trtb, ", ", re3.1$.category, "]"),
+                   re3.1$parameter)
+  expect_identical(as.character(re3.1$.trta), rep("PBO", times = nrow(re3.1)))
+
+  re3.2 <- tibble::as_tibble(marginal_effects(ord_fit, baseline = distr(qnorm, 0, 0.1), trt_ref = "PBO", mtype = "ratio"))
+  expect_identical(paste0("marg[", re3.2$.trtb, ", ", re3.2$.category, "]"),
+                   re3.2$parameter)
+  expect_identical(as.character(re3.2$.trta), rep("PBO", times = nrow(re3.2)))
+
+  re3.3 <- tibble::as_tibble(marginal_effects(ord_fit, baseline = distr(qnorm, 0, 0.1), trt_ref = "PBO", mtype = "link"))
+  expect_identical(paste0("marg[", re3.3$.trtb, ", ", re3.3$.category, "]"),
+                   re3.3$parameter)
+  expect_identical(as.character(re3.3$.trta), rep("PBO", times = nrow(re3.3)))
+})
+
