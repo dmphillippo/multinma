@@ -168,6 +168,24 @@ test_that("Binary AgD: .trta, .trtb columns are correct in new populations", {
   expect_identical(as.character(re3.3$.trta), rep("Self-help", times = nrow(re3.3)))
 })
 
+blocker_net <- set_agd_arm(blocker, studyn, trtc, r = r, n = n)
+blocker_fit <- suppressWarnings(nma(blocker_net,
+                                    prior_intercept = normal(scale = 100),
+                                    prior_trt = normal(scale = 100),
+                                    iter = 10))
+
+test_that("all_contrasts works with only two treatments", {
+  expect_equal(
+    dplyr::select(as.data.frame(marginal_effects(blocker_fit)), -"parameter"),
+    dplyr::select(as.data.frame(marginal_effects(blocker_fit, all_contrasts = TRUE)) ,-"parameter"),
+    check.attributes = FALSE
+  )
+  expect_identical(
+    unname(as.array(marginal_effects(blocker_fit))),
+    unname(as.array(marginal_effects(blocker_fit, all_contrasts = TRUE)))
+  )
+})
+
 
 # Binary with IPD regression ---------------------------------------------------
 
