@@ -338,12 +338,12 @@ test_that("Ordered categorical: .study, .trta, .trtb, .category columns are corr
   expect_identical(as.character(re1.1$.trta), rep("SEC_300", times = nrow(re1.1)))
 
   re1.2 <- tibble::as_tibble(marginal_effects(ord_fit, mtype = "ratio"))
-  expect_identical(paste0("marg[", re1.1$.study, ": ", re1.2$.trtb, ", ", re1.2$.category, "]"),
+  expect_identical(paste0("marg[", re1.2$.study, ": ", re1.2$.trtb, ", ", re1.2$.category, "]"),
                    re1.2$parameter)
   expect_identical(as.character(re1.2$.trta), rep("SEC_300", times = nrow(re1.2)))
 
   re1.3 <- tibble::as_tibble(marginal_effects(ord_fit, mtype = "link"))
-  expect_identical(paste0("marg[", re1.1$.study, ": ", re1.3$.trtb, ", ", re1.3$.category, "]"),
+  expect_identical(paste0("marg[", re1.3$.study, ": ", re1.3$.trtb, ", ", re1.3$.category, "]"),
                    re1.3$parameter)
   expect_identical(as.character(re1.3$.trta), rep("SEC_300", times = nrow(re1.3)))
 
@@ -353,11 +353,11 @@ test_that("Ordered categorical: .study, .trta, .trtb, .category columns are corr
                    re2.1$parameter)
 
   re2.2 <- tibble::as_tibble(marginal_effects(ord_fit, all_contrasts = TRUE, mtype = "ratio"))
-  expect_identical(paste0("marg[", re2.1$.study, ": ", re2.2$.trtb, " vs. ", re2.2$.trta, ", ", re2.2$.category, "]"),
+  expect_identical(paste0("marg[", re2.2$.study, ": ", re2.2$.trtb, " vs. ", re2.2$.trta, ", ", re2.2$.category, "]"),
                    re2.2$parameter)
 
   re2.3 <- tibble::as_tibble(marginal_effects(ord_fit, all_contrasts = TRUE, mtype = "link"))
-  expect_identical(paste0("marg[", re2.1$.study, ": ", re2.3$.trtb, " vs. ", re2.3$.trta, ", ", re2.3$.category, "]"),
+  expect_identical(paste0("marg[", re2.3$.study, ": ", re2.3$.trtb, " vs. ", re2.3$.trta, ", ", re2.3$.category, "]"),
                    re2.3$parameter)
 
 
@@ -424,3 +424,67 @@ test_that("Ordered categorical: .trta, .trtb, .category columns are correct in n
   expect_identical(as.character(re3.3$.trta), rep("PBO", times = nrow(re3.3)))
 })
 
+
+# Survival ----------------------------------------------------------------
+
+surv_net <- set_ipd(ndmm_agd, study, trt, Surv = Surv(eventtime, status))
+
+# Only small number of samples to test
+surv_fit <- suppressWarnings(nma(surv_net,
+                                 likelihood = "weibull",
+                                 prior_intercept = normal(scale = 100),
+                                 prior_trt = normal(scale = 100),
+                                 prior_aux = normal(scale = 5),
+                                 iter = 10))
+
+test_that("Survival: .study, .trta, .trtb columns are correct", {
+  re1.1 <- tibble::as_tibble(marginal_effects(surv_fit, type = "median", mtype = "difference"))
+  expect_identical(paste0("marg[", re1.1$.study, ": ", re1.1$.trtb, "]"),
+                   re1.1$parameter)
+  expect_identical(as.character(re1.1$.trta), rep("Pbo", times = nrow(re1.1)))
+
+  re1.2 <- tibble::as_tibble(marginal_effects(surv_fit, type = "hazard", mtype = "ratio")) %>%
+    group_by(.study, .trtb, .trta) %>%
+    mutate(.id = 1:n())
+  expect_identical(paste0("marg[", re1.2$.study, ": ", re1.2$.trtb, ", ", re1.2$.id, "]"),
+                   re1.2$parameter)
+  expect_identical(as.character(re1.2$.trta), rep("Pbo", times = nrow(re1.2)))
+
+  re1.3 <- tibble::as_tibble(marginal_effects(surv_fit, type = "quantile", mtype = "difference"))
+  expect_identical(paste0("marg[", re1.3$.study, ": ", re1.3$.trtb, ", ", re1.3$.quantile, "]"),
+                   re1.3$parameter)
+  expect_identical(as.character(re1.3$.trta), rep("Pbo", times = nrow(re1.3)))
+
+
+  re2.1 <- tibble::as_tibble(marginal_effects(surv_fit, all_contrasts = TRUE, type = "median", mtype = "difference"))
+  expect_identical(paste0("marg[", re2.1$.study, ": ", re2.1$.trtb, " vs. ", re2.1$.trta, "]"),
+                   re2.1$parameter)
+
+  re2.2 <- tibble::as_tibble(marginal_effects(surv_fit, all_contrasts = TRUE, type = "hazard", mtype = "ratio")) %>%
+    group_by(.study, .trtb, .trta) %>%
+    mutate(.id = 1:n())
+  expect_identical(paste0("marg[", re2.2$.study, ": ", re2.2$.trtb, " vs. ", re2.2$.trta, ", ", re2.2$.id, "]"),
+                   re2.2$parameter)
+
+  re2.3 <- tibble::as_tibble(marginal_effects(surv_fit, all_contrasts = TRUE, type = "quantile", mtype = "difference"))
+  expect_identical(paste0("marg[", re2.3$.study, ": ", re2.3$.trtb, " vs. ", re2.3$.trta, ", ", re2.3$.quantile, "]"),
+                   re2.3$parameter)
+
+
+  re3.1 <- tibble::as_tibble(marginal_effects(surv_fit, trt_ref = "Len", type = "median", mtype = "difference"))
+  expect_identical(paste0("marg[", re3.1$.study, ": ", re3.1$.trtb, "]"),
+                   re3.1$parameter)
+  expect_identical(as.character(re3.1$.trta), rep("Len", times = nrow(re3.1)))
+
+  re3.2 <- tibble::as_tibble(marginal_effects(surv_fit, trt_ref = "Len", type = "hazard", mtype = "ratio")) %>%
+    group_by(.study, .trtb, .trta) %>%
+    mutate(.id = 1:n())
+  expect_identical(paste0("marg[", re3.2$.study, ": ", re3.2$.trtb, ", ", re3.2$.id, "]"),
+                   re3.2$parameter)
+  expect_identical(as.character(re3.2$.trta), rep("Len", times = nrow(re3.2)))
+
+  re3.3 <- tibble::as_tibble(marginal_effects(surv_fit, trt_ref = "Len", type = "quantile", mtype = "difference"))
+  expect_identical(paste0("marg[", re3.3$.study, ": ", re3.3$.trtb, ", ", re3.3$.quantile, "]"),
+                   re3.3$parameter)
+  expect_identical(as.character(re3.3$.trta), rep("Len", times = nrow(re3.3)))
+})
