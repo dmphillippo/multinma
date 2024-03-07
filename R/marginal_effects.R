@@ -201,7 +201,9 @@ marginal_effects <- function(object,
   vars <- intersect(c(".study", ".time", ".quantile", ".category"), colnames(pred_meta))
 
   if (!all_contrasts) {
-    out_meta <- dplyr::filter(out_meta, .data$.trt != trt_ref)
+    out_meta <- dplyr::filter(out_meta, .data$.trt != trt_ref) %>%
+      dplyr::mutate(.trtb = .data$.trt, .trta = factor(trt_ref, levels = levels(object$network$treatments))) %>%
+      dplyr::select(dplyr::any_of(".study"), ".trtb", ".trta", dplyr::everything(), -".trt")
   } else {
     contrs <- utils::combn(object$network$treatments, 2)
     trtb <- contrs[2, ]
@@ -216,7 +218,7 @@ marginal_effects <- function(object,
   out_meta$id <- 1:nrow(out_meta)
 
   if (".time" %in% vars) {
-    time_id <- dplyr::group_by(out_meta, .data$.study, dplyr::pick(dplyr::any_of(c(".trt", ".trta", ".trtb")))) %>%
+    time_id <- dplyr::group_by(out_meta, .data$.study, .data$.trta, .data$.trtb) %>%
       dplyr::mutate(time_id = 1:dplyr::n()) %>%
       dplyr::pull("time_id")
   }
@@ -224,7 +226,7 @@ marginal_effects <- function(object,
   # Output parameter names
   pnames <- paste0("marg[",
                    if (rlang::has_name(out_meta, ".study")) paste0(out_meta$.study, ": ") else character(),
-                   if (all_contrasts) out_meta$.trtb else out_meta$.trt,
+                   out_meta$.trtb,
                    if (all_contrasts) paste0(" vs. ", out_meta$.trta) else character(),
                    if (".time" %in% vars) paste0(", ", time_id)
                    else if (".quantile" %in% vars) paste0(", ", out_meta$.quantile)
