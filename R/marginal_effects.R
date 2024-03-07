@@ -142,7 +142,7 @@ marginal_effects <- function(object,
   if (!is.null(trt_ref)) {
     if (all_contrasts) {
       warn("Ignoring `trt_ref` when all_contrasts = TRUE.")
-      trt_ref <- NULL
+      trt_ref <- levels(object$network$treatments)[1]
     } else {
       if (length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
       trt_ref <- as.character(trt_ref)
@@ -262,7 +262,7 @@ marginal_effects <- function(object,
     predi <- dplyr::semi_join(pred_meta, grpi, by = vars)$id
     outi <- dplyr::semi_join(out_meta, grpi, by = vars)$id
 
-    if (all_contrasts) {
+    if (all_contrasts && nlevels(object$network$treatments) > 2) {
       out_array[ , , outi] <- aperm(apply(pred$sims[ , , predi], MARGIN = 1:2, FUN = mk_contr), c(2, 3, 1))
     } else {
       predi_ref <- dplyr::semi_join(pred_meta, dplyr::mutate(grpi, .trt = trt_ref), by = c(vars, ".trt"))$id
