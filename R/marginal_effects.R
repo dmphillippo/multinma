@@ -196,9 +196,17 @@ marginal_effects <- function(object,
 
   # Set up output metadata
   pred_meta <- pred$summary
-  out_meta <- pred_meta
-
   vars <- intersect(c(".study", ".time", ".quantile", ".category"), colnames(pred_meta))
+
+  if (".time" %in% vars) {
+    pred_meta <- dplyr::group_by(pred_meta, .data$.study, .data$.trt) %>%
+      dplyr::mutate(.time_id = 1:dplyr::n()) %>%
+      dplyr::ungroup()
+
+    vars <- c(vars, ".time_id")
+  }
+
+  out_meta <- pred_meta
 
   if (!all_contrasts) {
     out_meta <- dplyr::filter(out_meta, .data$.trt != trt_ref) %>%
@@ -217,18 +225,12 @@ marginal_effects <- function(object,
   pred_meta$id <- 1:nrow(pred_meta)
   out_meta$id <- 1:nrow(out_meta)
 
-  if (".time" %in% vars) {
-    time_id <- dplyr::group_by(out_meta, .data$.study, .data$.trta, .data$.trtb) %>%
-      dplyr::mutate(time_id = 1:dplyr::n()) %>%
-      dplyr::pull("time_id")
-  }
-
   # Output parameter names
   pnames <- paste0("marg[",
                    if (rlang::has_name(out_meta, ".study")) paste0(out_meta$.study, ": ") else character(),
                    out_meta$.trtb,
                    if (all_contrasts) paste0(" vs. ", out_meta$.trta) else character(),
-                   if (".time" %in% vars) paste0(", ", time_id)
+                   if (".time" %in% vars) paste0(", ", out_meta$.time_id)
                    else if (".quantile" %in% vars) paste0(", ", out_meta$.quantile)
                    else if (".category" %in% vars) paste0(", ", out_meta$.category)
                    else character()
@@ -270,6 +272,7 @@ marginal_effects <- function(object,
   }
 
   out_meta <- dplyr::select(out_meta, -"id")
+  if (".time_id" %in% vars) out_meta <- dplyr::select(out_meta, -".time_id")
 
   # Summarise
   if (summary) {
