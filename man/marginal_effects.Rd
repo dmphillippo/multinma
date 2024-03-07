@@ -19,7 +19,12 @@ marginal_effects(
 \item{object}{A \code{stan_nma} object created by \code{\link[=nma]{nma()}}.}
 
 \item{...}{Arguments passed to \code{\link[=predict.stan_nma]{predict.stan_nma()}}, for example to specify
-the covariate distribution and baseline risk for a target population.}
+the covariate distribution and baseline risk for a target population, e.g.
+\code{newdata}, \code{baseline}, and related arguments. For survival outcomes, \code{type}
+can also be specified to determine the quantity from which to form a
+marginal effect. For example, \code{type = "hazard"} with \code{mtype = "ratio"}
+produces marginal hazard ratios, \code{type = "median"} with \code{mtype = "difference"} produces marginal median survival time differences, and so
+on.}
 
 \item{mtype}{The type of marginal effect to construct from the average
 absolute effects, either \code{"difference"} (the default) for a difference of

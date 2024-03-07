@@ -11,26 +11,27 @@
   baseline = NULL,
   newdata = NULL,
   study = NULL,
-  trt_ref = NULL,
   type = c("link", "response"),
   level = c("aggregate", "individual"),
+  baseline_trt = NULL,
   baseline_type = c("link", "response"),
   baseline_level = c("individual", "aggregate"),
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
   predictive_distribution = FALSE,
   summary = TRUE,
-  progress = FALSE
+  progress = FALSE,
+  trt_ref = NULL
 )
 
 \method{predict}{stan_nma_surv}(
   object,
   times = NULL,
   ...,
+  baseline_trt = NULL,
   baseline = NULL,
   aux = NULL,
   newdata = NULL,
   study = NULL,
-  trt_ref = NULL,
   type = c("survival", "hazard", "cumhaz", "mean", "median", "quantile", "rmst", "link"),
   quantiles = c(0.25, 0.5, 0.75),
   level = c("aggregate", "individual"),
@@ -38,7 +39,8 @@
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
   predictive_distribution = FALSE,
   summary = TRUE,
-  progress = interactive()
+  progress = interactive(),
+  trt_ref = NULL
 )
 }
 \arguments{
@@ -70,8 +72,8 @@ intercept parameters in the linear predictor (i.e. \code{baseline_type} is
 always \code{"link"}, and \code{baseline_level} is \code{"individual"} for IPD NMA or
 ML-NMR, and \code{"aggregate"} for AgD NMA).
 
-Use the \code{trt_ref} argument to specify which treatment this distribution
-applies to.}
+Use the \code{baseline_trt} argument to specify which treatment this
+distribution applies to.}
 
 \item{newdata}{Only required if a regression model is fitted and \code{baseline}
 is specified. A data frame of covariate details, for which to produce
@@ -92,11 +94,6 @@ arm-based AgD in the network, depending on the value of \code{level}.}
 specified: if \code{newdata} contains integration points produced by
 \code{\link[=add_integration]{add_integration()}}, studies will be labelled sequentially by row;
 otherwise data will be assumed to come from a single study.}
-
-\item{trt_ref}{Treatment to which the \code{baseline} response distribution
-refers, if \code{baseline} is specified. By default, the baseline response
-distribution will refer to the network reference treatment. Coerced to
-character string.}
 
 \item{type}{Whether to produce predictions on the \code{"link"} scale (the
 default, e.g. log odds) or \code{"response"} scale (e.g. probabilities).
@@ -119,6 +116,11 @@ time amongst the studies in the network is used. When \code{level = "aggregate"}
 specified, predictions are produced for all IPD studies in the network if
 \code{level} is \code{"individual"} or \code{"aggregate"}, and for all arm-based AgD
 studies in the network if \code{level} is \code{"aggregate"}.}
+
+\item{baseline_trt}{Treatment to which the \code{baseline} response distribution
+refers, if \code{baseline} is specified. By default, the baseline response
+distribution will refer to the network reference treatment. Coerced to
+character string.}
 
 \item{baseline_type}{When a \code{baseline} distribution is given, specifies
 whether this corresponds to the \code{"link"} scale (the default, e.g. log odds)
@@ -150,6 +152,8 @@ calculations? Population-average predictions from ML-NMR models are
 computationally intensive, especially for survival outcomes. Currently the
 default is to display progress only when running interactively and
 producing predictions for a survival ML-NMR model.}
+
+\item{trt_ref}{Deprecated, use \code{baseline_trt} instead.}
 
 \item{times}{A numeric vector of times to evaluate predictions at.
 Alternatively, if \code{newdata} is specified, \code{times} can be the name of a
