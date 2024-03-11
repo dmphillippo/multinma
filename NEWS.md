@@ -1,5 +1,8 @@
 # multinma 0.6.1.9000
 
+* Fix: Fallback formatting used by print methods when the crayon package is not 
+installed now works properly, rather than giving errors.
+
 # multinma 0.6.1
 
 * Fix: Piecewise exponential hazard models no longer give errors during set-up. 
