@@ -213,25 +213,25 @@ subtle <- function(...) {
   if (require_pkg("crayon", error = FALSE))
     return(crayon::silver(...))
   else
-    return(...)
+    return(paste0(...))
 }
 bold <- function(...) {
   if (require_pkg("crayon", error = FALSE))
     return(crayon::bold(...))
   else
-    return(...)
+    return(paste0(...))
 }
 red <- function(...) {
   if (require_pkg("crayon", error = FALSE))
     return(crayon::red(...))
   else
-    return(...)
+    return(paste0(...))
 }
 green <- function(...) {
   if (require_pkg("crayon", error = FALSE))
     return(crayon::green(...))
   else
-    return(...)
+    return(paste0(...))
 }
 
 #' Convert networks to graph objects
