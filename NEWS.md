@@ -2,6 +2,8 @@
 
 * Fix: Fallback formatting used by print methods when the crayon package is not 
 installed now works properly, rather than giving errors.
+* Fix: Small bug caused `predict()` for AgD meta-regression models with new data 
+and `baseline_type = "response"` to fail with an error.
 
 # multinma 0.6.1
 
