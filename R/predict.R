@@ -1354,7 +1354,7 @@ predict.stan_nma <- function(object, ...,
 
         # Convert to linear predictor scale if baseline_type = "response"
         if (any(baseline_type == "response")) {
-          mu[ , , baseline_type == "response"] <- link_fun(mu[ , , baseline_type = "response"], link = object$link)
+          mu[ , , baseline_type == "response"] <- link_fun(mu[ , , baseline_type == "response"], link = object$link)
         }
 
         # Convert to samples on network ref trt if trt_ref given
