@@ -53,7 +53,7 @@
 #' @import methods
 #' @import Rcpp
 #' @importFrom dplyr %>%
-#' @importFrom rlang abort warn inform enquo .data :=
+#' @importFrom rlang abort warn inform enquo .data := %||%
 #' @importFrom rstan sampling
 #' @importFrom Rdpack reprompt
 #' @importFrom graphics plot pairs

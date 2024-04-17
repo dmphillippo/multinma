@@ -12,6 +12,9 @@
 #'   effect-modifying terms for a regression model. Any references to treatment
 #'   should use the `.trt` special variable, for example specifying effect
 #'   modifier interactions as `variable:.trt` (see details).
+#' @param baseline_risk Set to `TRUE` to fit a meta-regression on the baseline risk.
+#'   The baseline risk for centering purposed will be calculated from the network data.
+#'   The baseline risk can also be set manually by passing a numeric scalar.
 #' @param class_interactions Character string specifying whether effect modifier
 #'   interactions are specified as `"common"`, `"exchangeable"`, or
 #'   `"independent"`.
@@ -37,6 +40,8 @@
 #'   precision \eqn{1/\tau^2} (`"prec"`).
 #' @param prior_reg Specification of prior distribution for the regression
 #'   coefficients (if `regression` formula specified)
+#' @param prior_br Specification of prior distribution for the baseline risk
+#'   meta-regression coefficient (if `baseline_risk` specified).
 #' @param prior_aux Specification of prior distribution for the auxiliary
 #'   parameter, if applicable (see details). For `likelihood = "gengamma"` this
 #'   should be a list of prior distributions with elements `sigma` and `k`.
@@ -262,6 +267,7 @@ nma <- function(network,
                 consistency = c("consistency", "ume", "nodesplit"),
                 trt_effects = c("fixed", "random"),
                 regression = NULL,
+                baseline_risk = NULL,
                 class_interactions = c("common", "exchangeable", "independent"),
                 likelihood = NULL,
                 link = NULL,
@@ -272,6 +278,7 @@ nma <- function(network,
                 prior_het = .default(half_normal(scale = 5)),
                 prior_het_type = c("sd", "var", "prec"),
                 prior_reg = .default(normal(scale = 10)),
+                prior_br = .default(normal(scale = 10)),
                 prior_aux = .default(),
                 prior_aux_reg = .default(),
                 aux_by = NULL,
@@ -388,6 +395,7 @@ nma <- function(network,
                          prior_het = prior_het,
                          prior_het_type = prior_het_type,
                          prior_reg = prior_reg,
+                         prior_br = prior_br,
                          prior_aux = prior_aux,
                          prior_aux_reg = prior_aux_reg,
                          aux_by = aux_by,
@@ -515,6 +523,8 @@ nma <- function(network,
     prior_defaults$prior_het <- get_prior_call(prior_het)
   if (!is.null(regression) && !is_only_offset(regression) && .is_default(prior_reg))
     prior_defaults$prior_reg <- get_prior_call(prior_reg)
+  if (!is.null(baseline_risk) && .is_default(prior_br))
+    prior_defaults$prior_br <- get_prior_call(prior_br)
   if (has_aux && .is_default(prior_aux)) {
     if (likelihood == "normal" && has_ipd(network)) {
       prior_aux <- .default(half_normal(scale = 5))
@@ -891,6 +901,22 @@ nma <- function(network,
     .which_RE <- NULL
   }
 
+  if (!is.null(baseline_risk) && !isFALSE(baseline_risk)) {
+    if (!(likelihood %in% c("bernoulli", "binomial", "ordered", "normal"))) {
+      abort(glue::glue("Baseline risk meta-regression not yet supported with likelihood '{likelihood}'."))
+    }
+    if (is.numeric(baseline_risk)) {
+      baseline_risk <- link_fun(baseline_risk, link)
+    } else {
+      if (!isTRUE(baseline_risk)) {
+        abort("`baseline_risk` should be a single logical or numeric value.")
+      }
+      baseline_risk <- calculate_baseline_risk(network, link)
+    }
+  } else {
+    baseline_risk <- FALSE
+  }
+
   # Set up spline basis for mspline and pexp models
   if (likelihood %in% c("mspline", "pexp") && (has_ipd(network) || has_agd_arm(network))) {
     require_pkg("splines2")
@@ -1054,6 +1080,7 @@ nma <- function(network,
     agd_arm_offset = offset_agd_arm,
     agd_contrast_offset = offset_agd_contrast,
     trt_effects = trt_effects,
+    baseline_risk = baseline_risk,
     RE_cor = .RE_cor,
     which_RE = .which_RE,
     likelihood = likelihood,
@@ -1065,6 +1092,7 @@ nma <- function(network,
     prior_het = prior_het,
     prior_het_type = prior_het_type,
     prior_reg = prior_reg,
+    prior_br = prior_br,
     prior_aux = prior_aux,
     prior_aux_reg = prior_aux_reg,
     aux_id = aux_id,
@@ -1219,6 +1247,7 @@ nma <- function(network,
               consistency = consistency,
               regression = regression,
               aux_regression = aux_regression,
+              baseline_risk = baseline_risk,
               class_interactions = if (!is.null(regression) && !is.null(network$classes)) class_interactions else NULL,
               xbar = xbar,
               likelihood = likelihood,
@@ -1229,6 +1258,7 @@ nma <- function(network,
                             prior_het = if (trt_effects == "random") prior_het else NULL,
                             prior_het_type = if (trt_effects == "random") prior_het_type else NULL,
                             prior_reg = if (!is.null(regression) && !is_only_offset(regression)) prior_reg else NULL,
+                            prior_br = if (!is.null(baseline_risk)) prior_br else NULL,
                             prior_aux = if (has_aux) prior_aux else NULL,
                             prior_aux_reg = if (has_aux_regression) prior_aux_reg else NULL))
 
@@ -1270,6 +1300,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     n_int,
                     ipd_offset = NULL, agd_arm_offset = NULL, agd_contrast_offset = NULL,
                     trt_effects = c("fixed", "random"),
+                    baseline_risk = NULL,
                     RE_cor = NULL,
                     which_RE = NULL,
                     likelihood = NULL,
@@ -1281,6 +1312,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_het,
                     prior_het_type = c("sd", "var", "prec"),
                     prior_reg,
+                    prior_br,
                     prior_aux,
                     prior_aux_reg,
                     aux_id = integer(),
@@ -1397,6 +1429,7 @@ nma.fit <- function(ipd_x, ipd_y,
   check_prior(prior_trt)
   if (trt_effects == "random") check_prior(prior_het)
   check_prior(prior_reg)
+  if (!is.null(baseline_risk)) check_prior(prior_br)
   if (has_aux) {
     if (likelihood == "gengamma") check_prior(prior_aux, c("sigma", "k"))
     else check_prior(prior_aux)
@@ -1604,7 +1637,10 @@ nma.fit <- function(ipd_x, ipd_y,
     R_inv = if (QR) X_all_R_inv else matrix(0, 0, 0),
     # Offsets
     has_offset = has_offsets,
-    offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric()
+    offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric(),
+    baseline_risk = 0,
+    baseline_risk_flag = 0,
+    baseline_risk_which = numeric()
     )
 
   # Add priors
@@ -1614,6 +1650,8 @@ nma.fit <- function(ipd_x, ipd_y,
     !!! prior_standat(prior_trt, "prior_trt",
                       valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
     !!! prior_standat(prior_reg, "prior_reg",
+                      valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
+    !!! prior_standat(prior_br, "prior_br",
                       valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
     !!! prior_standat(prior_het, "prior_het",
                       valid = c("Normal", "half-Normal", "log-Normal",
@@ -1658,6 +1696,22 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Set chain_id to make CHAIN_ID available in data block
   stanargs$chain_id <- 1L
+
+  # Baseline risk meta-regression
+  if (!isFALSE(baseline_risk)) {
+    pars <- c(pars, "beta_baseline_risk")
+
+    studies <- X_all[, seq_len(standat$ns_agd_arm)]
+    is_reference <- unname(agd_arm_trt == 1L)
+    includes_reference <- as.logical(studies %*% (t(studies) %*% as.matrix(is_reference)))
+
+    baseline_risk_which <- (!is_reference) * includes_reference
+
+    standat <-
+      standat %>%
+      purrr::list_modify(baseline_risk = baseline_risk, baseline_risk_flag = 1L,
+                         baseline_risk_which = baseline_risk_which)
+  }
 
   # Call Stan model for given likelihood
 

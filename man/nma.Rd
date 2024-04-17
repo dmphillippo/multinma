@@ -9,6 +9,7 @@ nma(
   consistency = c("consistency", "ume", "nodesplit"),
   trt_effects = c("fixed", "random"),
   regression = NULL,
+  baseline_risk = NULL,
   class_interactions = c("common", "exchangeable", "independent"),
   likelihood = NULL,
   link = NULL,
@@ -19,6 +20,7 @@ nma(
   prior_het = .default(half_normal(scale = 5)),
   prior_het_type = c("sd", "var", "prec"),
   prior_reg = .default(normal(scale = 10)),
+  prior_br = .default(normal(scale = 10)),
   prior_aux = .default(),
   prior_aux_reg = .default(),
   aux_by = NULL,
@@ -47,6 +49,10 @@ model to fit, either \code{"consistency"}, \code{"ume"}, or \code{"nodesplit"}}
 effect-modifying terms for a regression model. Any references to treatment
 should use the \code{.trt} special variable, for example specifying effect
 modifier interactions as \code{variable:.trt} (see details).}
+
+\item{baseline_risk}{Set to \code{TRUE} to fit a meta-regression on the baseline risk.
+The baseline risk for centering purposed will be calculated from the network data.
+The baseline risk can also be set manually by passing a numeric scalar.}
 
 \item{class_interactions}{Character string specifying whether effect modifier
 interactions are specified as \code{"common"}, \code{"exchangeable"}, or
@@ -82,6 +88,9 @@ precision \eqn{1/\tau^2} (\code{"prec"}).}
 
 \item{prior_reg}{Specification of prior distribution for the regression
 coefficients (if \code{regression} formula specified)}
+
+\item{prior_br}{Specification of prior distribution for the baseline risk
+meta-regression coefficient (if \code{baseline_risk} specified).}
 
 \item{prior_aux}{Specification of prior distribution for the auxiliary
 parameter, if applicable (see details). For \code{likelihood = "gengamma"} this

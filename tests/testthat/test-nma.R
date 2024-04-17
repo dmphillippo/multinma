@@ -274,6 +274,7 @@ test_that("nma.fit() error if agd_contrast_Sigma is not right dimensions", {
                        prior_intercept = normal(0, 10),
                        prior_trt = normal(0, 10),
                        prior_reg = normal(0, 5),
+                       priot_br = normal(0, 10),
                        prior_het = normal(0, 1),
                        n_int = 1), "Dimensions of `agd_contrast_Sigma`.+do not match")
   expect_error(nma.fit(agd_contrast_x = x1, agd_contrast_y = y,
@@ -281,6 +282,7 @@ test_that("nma.fit() error if agd_contrast_Sigma is not right dimensions", {
                        prior_intercept = normal(0, 10),
                        prior_trt = normal(0, 10),
                        prior_reg = normal(0, 5),
+                       priot_br = normal(0, 10),
                        prior_het = normal(0, 1),
                        n_int = 1), "Dimensions of `agd_contrast_Sigma`.+do not match")
 })

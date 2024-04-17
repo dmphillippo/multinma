@@ -400,3 +400,8 @@
 #'    \item{male}{proportion of male participants}
 #'  }
 "ndmm_agd_covs"
+
+#' Certolizumab
+#'
+#' Data analysed in \insertCite{TSD3}{multinma}.
+"certolizumab"
