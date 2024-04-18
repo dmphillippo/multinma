@@ -40,24 +40,36 @@ NULL
 #' @param x A [stan_nma] object
 #' @param ... Further arguments passed to [print.stanfit()]
 #'
+#' @return `x` is returned invisibly.
+#'
 #' @export
 print.stan_nma <- function(x, ...) {
   if (inherits(x$network, "mlnmr_data")) type <- "ML-NMR"
   else type <- "NMA"
   cglue("A {x$trt_effects} effects {type} with a {x$likelihood} likelihood ({x$link} link).")
+  if (x$likelihood %in% c("mspline", "pexp")) {
+    deg <- switch(x$likelihood,
+                  mspline = switch(attr(x$basis[[1]], 'degree'),
+                                   "1" = "Piecewise constant",
+                                   "2" = "Quadratic M-spline",
+                                   "3" = "Cubic M-spline",
+                                   paste('Degree', attr(x$basis[[1]], 'degree'), 'M-spline')),
+                  pexp = 'Piecewise constant')
+    cglue("{deg} baseline hazard with {length(attr(x$basis[[1]], 'knots'))} internal knots.")
+  }
   if (x$consistency != "consistency") {
     if (x$consistency == "nodesplit")
       cglue("An inconsistency model ('{x$consistency}') was fitted, splitting the comparison {x$nodesplit[2]} vs. {x$nodesplit[1]}.")
     else
       cglue("An inconsistency model ('{x$consistency}') was fitted.")
   }
-  if (!is.null(x$regression)) {
-    cglue("Regression model: {rlang::as_label(x$regression)}.")
-    if (!is.null(x$xbar)) {
-      cglue("Centred covariates at the following overall mean values:")
-      print(x$xbar)
-    }
+  if (!is.null(x$regression)) cglue("Regression model: {rlang::as_label(x$regression)}.")
+  if (!is.null(x$aux_regression)) cglue("Auxiliary regression model: {rlang::as_label(x$aux_regression)}.")
+  if ((!is.null(x$regression) || !is.null(x$aux_regression)) && !is.null(x$xbar)) {
+    cglue("Centred covariates at the following overall mean values:")
+    print(x$xbar)
   }
+  if (length(setdiff(x$aux_by, ".study"))) cglue("Stratified baseline hazards by {glue::glue_collapse(x$aux_by, sep = ', ', last = ' and ')}.")
 
   sf <- as.stanfit(x)
   dots <- list(...)
@@ -70,7 +82,14 @@ print.stan_nma <- function(x, ...) {
                                     "theta_bar_cum_agd_arm",
                                     "theta_bar_cum_agd_contrast",
                                     "theta2_bar_cum",
-                                    "mu", "delta"),
+                                    "mu", "delta",
+                                    if (!is.null(x$aux_regression) &&
+                                        length(setdiff(colnames(attr(terms(x$aux_regression), "factor")), ".trt")) > 0) {
+                                      if (x$likelihood %in% c("mspline", "pexp")) NULL else "d_aux"
+                                    } else {
+                                      "beta_aux"
+                                    },
+                                    "scoef"),
                            include = include,
                            use_cache = FALSE,
                            !!! dots,
@@ -240,7 +259,8 @@ plot_prior_posterior <- function(x, ...,
       "trt"[!is.null(x$priors$prior_trt)],
       "het"[!is.null(x$priors$prior_het)],
       "reg"[!is.null(x$priors$prior_reg)],
-      "aux"[!is.null(x$priors$prior_aux)])
+      "aux"[!is.null(x$priors$prior_aux)],
+      "aux_reg"[!is.null(x$priors$prior_aux_reg)])
 
   if (is.null(prior)) {
     prior <- priors_used
@@ -265,7 +285,7 @@ plot_prior_posterior <- function(x, ...,
   # Get prior details
   prior_dat <- vector("list", length(prior))
   for (i in seq_along(prior)) {
-    if (prior[i] %in% c("het", "aux")) trunc <- c(0, Inf)
+    if (prior[i] %in% c("het", "aux") || (prior[i] == "aux_reg" && x$likelihood %in% c("mspline", "pexp"))) trunc <- c(0, Inf)
     else trunc <- NULL
 
     if (x$likelihood == "gengamma" && prior[i] == "aux") {
@@ -273,10 +293,6 @@ plot_prior_posterior <- function(x, ...,
         dplyr::bind_rows(get_tidy_prior(x$priors$prior_aux$sigma, trunc = trunc),
                          get_tidy_prior(x$priors$prior_aux$k, trunc = trunc)) %>%
         tibble::add_column(prior = c("aux", "aux2"))
-
-    } else if (x$likelihood %in% c("mspline", "pexp") && prior[i] == "aux") {
-      prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc, n_dim = n_scoef) %>%
-        tibble::add_column(prior = prior[i])
 
     } else {
       prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc) %>%
@@ -300,10 +316,15 @@ plot_prior_posterior <- function(x, ...,
                                                         loglogistic = "shape",
                                                         gamma = "shape",
                                                         gengamma = "sigma",
-                                                        mspline = "scoef",
-                                                        pexp = "scoef"),
+                                                        mspline = "sigma",
+                                                        pexp = "sigma"),
                                            aux2 = switch(x$likelihood,
-                                                         gengamma = "k")))
+                                                         gengamma = "k"),
+                                           aux_reg = switch(x$likelihood,
+                                                            pexp =, mspline = "sigma_beta",
+                                                            weibull =, gompertz =, `weibull-aft` =,
+                                                            lognormal =, loglogistic =, gamma =,
+                                                            gengamma = "beta_aux")))
 
   # Add in omega parameter if node-splitting model, which uses prior_trt
   if (inherits(x, "nma_nodesplit")) {
@@ -547,6 +568,8 @@ plot_integration_error <- function(x, ...,
 
   # Get cumulative integration points
   twoparbin <- x$likelihood %in% c("binomial2", "bernoulli2")
+  multi <- x$likelihood == "ordered"
+
   ipars <- c()
   if (has_agd_arm(x$network)) {
     ipars <- c(ipars, "theta_bar_cum_agd_arm")
@@ -569,23 +592,24 @@ plot_integration_error <- function(x, ...,
 
   n_int <- x$network$n_int
 
-  rx <- "^(theta2?)\\[(.+): (.+), ([0-9]+)\\]$"
+  rx <- if (multi) "^(theta2?)\\[(.+): (.+), ([0-9]+), (.+)\\]$" else "^(theta2?)\\[(.+): (.+), ([0-9]+)\\]$"
 
   int_dat <- tidyr::pivot_longer(int_dat, cols = -dplyr::one_of(".draw"),
                                  names_pattern = rx,
-                                 names_to = c("parameter", "study", "treatment", "n_int"),
+                                 names_to = if (multi) c("parameter", "study", "treatment", "n_int", "category") else c("parameter", "study", "treatment", "n_int"),
                                  names_transform = list(n_int = as.integer),
                                  values_to = "value")
 
   int_dat$study <- factor(int_dat$study, levels = levels(x$network$studies))
   int_dat$treatment <- factor(int_dat$treatment, levels = levels(x$network$treatments))
+  if (multi) int_dat$category <- forcats::fct_inorder(factor(int_dat$category))
 
   # Estimate integration error by subtracting final value
   int_dat <- dplyr::left_join(dplyr::filter(int_dat, .data$n_int != max(.data$n_int)),
                               dplyr::filter(int_dat, .data$n_int == max(.data$n_int)) %>%
                                 dplyr::rename(final_value = "value") %>%
                                 dplyr::select(-"n_int"),
-                              by = c("parameter", "study", "treatment", ".draw")) %>%
+                              by = if (multi)  c("parameter", "study", "treatment", "category", ".draw") else c("parameter", "study", "treatment", ".draw")) %>%
     dplyr::mutate(diff = .data$value - .data$final_value)
 
   int_thin <- min(int_dat$n_int)
@@ -656,9 +680,13 @@ plot_integration_error <- function(x, ...,
               args = rlang::dots_list(orientation = orientation, ..., !!! v_args, .homonyms = "first"))
   }
 
-  p <- p +
-    ggplot2::facet_wrap(~ study + treatment) +
-    theme_multinma()
+  if (multi) {
+    p <- p + ggplot2::facet_grid(study + treatment ~ category)
+  } else {
+    p <- p + ggplot2::facet_wrap(~ study + treatment)
+  }
+
+  p <- p + theme_multinma()
 
   return(p)
 }
@@ -751,6 +779,19 @@ as.array.stan_nma <- function(x, ..., pars, include = TRUE) {
 #' @export
 as.data.frame.stan_nma <- function(x, ..., pars, include = TRUE) {
   return(as.data.frame(as.matrix(x, ..., pars = pars, include = include)))
+}
+
+#' @rdname as.array.stan_nma
+#' @export
+as_tibble.stan_nma <- function(x, ..., pars, include = TRUE) {
+  return(tibble::as_tibble(as.matrix(x, ..., pars = pars, include = include)))
+}
+
+#' @rdname as.array.stan_nma
+#' @method as.tibble stan_nma
+#' @export
+as.tibble.stan_nma <- function(x, ..., pars, include = TRUE) {
+  return(tibble::as_tibble(as.matrix(x, ..., pars = pars, include = include)))
 }
 
 #' @rdname as.array.stan_nma
@@ -860,8 +901,8 @@ pairs.stan_nma <- function(x, ..., pars, include = TRUE) {
                            condition = bayesplot::pairs_condition(nuts = "accept_stat__"),
                            .homonyms = "first")
 
-  thm <- bayesplot::bayesplot_theme_set(theme_multinma())
+  thm <- ggplot2::theme_set(theme_multinma())
   out <- do.call(bayesplot::mcmc_pairs, args = args)
-  bayesplot::bayesplot_theme_set(thm)
+  ggplot2::theme_set(thm)
   return(out)
 }

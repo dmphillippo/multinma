@@ -21,7 +21,13 @@ dbern(x, prob, log = FALSE)
 
 \item{x, q}{vector of quantiles}
 }
+\value{
+Numeric vector of length equal to the maximum of the lengths of the
+input arguments.
+}
 \description{
-The quantile function \code{qbern} for a Bernoulli distribution, with success
-probability \code{prob}. This is equivalent to \code{qbinom(p, 1, prob)}.
+The density function \code{dbern()}, distribution function \code{pbern()}, and quantile
+function \code{qbern()} for a Bernoulli distribution, with success probability
+\code{prob}. These are equivalent to \code{dbinom(p, 1, prob)}, \code{pbinom(p, 1, prob)}
+and \code{qbinom(p, 1, prob)}.
 }

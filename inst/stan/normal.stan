@@ -12,9 +12,9 @@ data {
   real<lower=0> prior_aux_df;
 
   // Outcomes
-  real ipd_y[ni_ipd];
-  real agd_arm_y[ni_agd_arm];
-  real<lower=0> agd_arm_se[ni_agd_arm];
+  array[ni_ipd] real ipd_y;
+  array[ni_agd_arm] real agd_arm_y;
+  array[ni_agd_arm] real<lower=0> agd_arm_se;
 }
 transformed data {
 #include /include/transformed_data_common.stan

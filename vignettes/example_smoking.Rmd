@@ -175,7 +175,7 @@ These are all in agreement; the posterior densities of the direct and indirect e
 Notice that there is not much indirect information for the Individual counselling vs. No intervention comparison, so the network (consistency) estimate is very similar to the direct estimate for this comparison.
 ```{r smk_nodesplit, fig.width = 7}
 plot(smk_nodesplit) +
-  ggplot2::theme(legend.position = "bottom", legend.direct = "horizontal")
+  ggplot2::theme(legend.position = "bottom", legend.direction = "horizontal")
 ```
 
 ## Further results

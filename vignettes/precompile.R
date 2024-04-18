@@ -10,6 +10,15 @@ precompile <- function(vignette,
   rmd_in <- root$find_file("vignettes", vignette)
 
   if (build_vignette) {
+
+    # .Rmd.orig files are compiled to static .Rmd first
+    if (tools::file_ext(rmd_in) == "orig") {
+      rmd_built <- tools::file_path_sans_ext(rmd_in)
+      knitr::knit(rmd_in, output = rmd_built)
+      rmd_in <- rmd_built
+      write_tests <- FALSE
+    }
+
     rmarkdown::render(rmd_in)
   }
 
@@ -54,4 +63,8 @@ precompile("example_statins.Rmd")
 precompile("example_bcg_vaccine.Rmd")
 precompile("example_plaque_psoriasis.Rmd")
 precompile("example_hta_psoriasis.Rmd")
+
+# NDMM example is fully static (for pkgdown as well as cran)
+# precompile("example_ndmm.Rmd.orig", write_tests = FALSE)
+precompile("example_ndmm.Rmd", write_tests = FALSE)
 

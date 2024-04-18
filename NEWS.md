@@ -1,4 +1,16 @@
-# multinma 0.5.1.9000
+# multinma 0.6.1.9000
+
+* Fix: Fallback formatting used by print methods when the crayon package is not 
+installed now works properly, rather than giving errors.
+* Fix: Small bug caused `predict()` for AgD meta-regression models with new data 
+and `baseline_type = "response"` to fail with an error.
+
+# multinma 0.6.1
+
+* Fix: Piecewise exponential hazard models no longer give errors during set-up. 
+Calculation of RW1 prior weights needed to be handled as a special case.
+
+# multinma 0.6.0
 
 ## Feature: Survival/time-to-event models are now supported
 
@@ -15,10 +27,19 @@ flexible M-splines on the baseline hazard, and piecewise exponential hazards.
 by study to respect randomisation, and may be further stratified by treatment
 (e.g. to relax the proportional hazards assumption) and/or by additional factors
 using the `aux_by` argument to `nma()`.
+* A regression model may be defined for the auxiliary parameters using the 
+`aux_regression` argument to `nma()`, allowing non-proportionality to be 
+modelled by treatment and/or covariate effects on the shapes or spline 
+coefficients.
 * The `predict()` method produces estimates of survival probabilities, hazards, 
 cumulative hazards, mean survival times, restricted mean survival times, 
 quantiles of the survival time distribution, and median survival times. All of
 these predictions can be plotted using the `plot()` method.
+* The `geom_km()` function assists in plotting Kaplan-Meier curves from a 
+network object, for example to overlay these on estimated survival curves. The 
+`transform` argument can be used to produce log-log plots for assessing the 
+proportional hazards assumption, along with cumulative hazards or log survival 
+curves.
 * A new vignette demonstrates ML-NMR survival analysis with an example of 
 progression-free survival after autologous stem cell transplant for newly 
 diagnosed multiple myeloma, with corresponding datasets `ndmm_ipd`, `ndmm_agd`,
@@ -49,11 +70,22 @@ lower `n_int` and disabling saving cumulative integration points.
 ## Other updates
 
 * Feature: `dic()` now includes an option to use the pV penalty instead of pD.
+* Feature: The `baseline` and `aux` arguments to `predict()` can now be 
+specified as the name of a study in the network, to use the parameter estimates 
+from that study for prediction.
 * Improvement: `predict()` will now produce aggregate-level predictions over a
 sample of individuals in `newdata` for ML-NMR models (previously `newdata` had
 to include integration points).
+* Improvement: Compatibility with future rstan versions (PR #25).
+* Improvement: Added a `plot.mcmc_array()` method, as a shortcut for 
+`plot(summary(x), ...)`.
 * Fix: In `plot.nma_data()`, using a custom `layout` that is not a string (e.g. 
 a data frame of layout coordinates) now works as expected when `nudge > 0`.
+* Fix: Documentation corrections (PR #24).
+* Fix: Added missing `as.tibble.stan_nma()` and `as_tibble.stan_nma()` methods, 
+to complement the existing `as.data.frame.stan_nma()`.
+* Fix: Bug in ordered multinomial models where data in studies with missing 
+categories could be assigned the wrong category (#28).
 
 # multinma 0.5.1
 

@@ -48,9 +48,14 @@
 #' @param prior_aux Specification of prior distribution for the auxiliary
 #'   parameter, if applicable (see details). For `likelihood = "gengamma"` this
 #'   should be a list of prior distributions with elements `sigma` and `k`.
+#' @param prior_aux_reg Specification of prior distribution for the auxiliary
+#'   regression parameters, if `aux_regression` is specified (see details).
 #' @param aux_by Vector of variable names listing the variables to stratify the
 #'   auxiliary parameters by. Currently only used for survival models, see
-#'   details.
+#'   details. Cannot be used with `aux_regression`.
+#' @param aux_regression A one-sided model formula giving a regression model for
+#'   the auxiliary parameters. Currently only used for survival models, see
+#'   details. Cannot be used with `aux_by`.
 #' @param prior_class_mean Specification of prior distribution for the
 #'   treatment class means (if `class_effects = "exchangeable"`).
 #' @param prior_class_sd Specification of prior distribution for the
@@ -77,14 +82,29 @@
 #'   into intervals. The knot locations within each study will be determined by
 #'   the corresponding quantiles of the observed event times, plus boundary
 #'   knots at the earliest entry time (0 with no delayed entry) and the maximum
-#'   event/censoring time. For example, with the default `n_knots = 3`, the
-#'   internal knot locations will be at the 25%, 50%, and 75% quantiles of the
-#'   observed event times. Ignored when `knots` is specified.
+#'   event/censoring time. For example, with `n_knots = 3`, the internal knot
+#'   locations will be at the 25%, 50%, and 75% quantiles of the observed event
+#'   times. The default is `n_knots = 7`; overfitting is avoided by shrinking
+#'   towards a constant hazard with a random walk prior (see details). If
+#'   `aux_regression` is specified then a single set of knot locations will be
+#'   calculated across all studies in the network. See [make_knots()] for more
+#'   details on the knot positioning algorithms. Ignored when `knots` is
+#'   specified.
 #' @param knots For `mspline` and `pexp` likelihoods, a named list of numeric
-#'   vectors of internal knot locations for each of the studies in the network.
-#'   Currently, each vector must have the same length (i.e. each study must use
-#'   the same number of knots). If unspecified (the default), the knots will be
-#'   chosen based on `n_knots` as described above.
+#'   vectors of knot locations (including boundary knots) for each of the
+#'   studies in the network. Currently, each vector must have the same length
+#'   (i.e. each study must use the same number of knots). Alternatively, a
+#'   single numeric vector of knot locations can be provided which will be
+#'   shared across all studies in the network. If unspecified (the default), the
+#'   knots will be chosen based on `n_knots` as described above. If
+#'   `aux_regression` is specified then `knots` should be a single numeric
+#'   vector of knot locations which will be shared across all studies in the
+#'   network. [make_knots()] can be used to help specify `knots` directly, or to
+#'   investigate knot placement prior to model fitting.
+#' @param mspline_basis Instead of specifying `mspline_degree` and `n_knots` or
+#'   `knots`, a named list of M-spline bases (one for each study) can be
+#'   provided with `mspline_basis` which will be used directly. In this case,
+#'   all other M-spline options will be ignored.
 #'
 #' @details When specifying a model formula in the `regression` argument, the
 #'   usual formula syntax is available (as interpreted by [model.matrix()]). The
@@ -190,8 +210,11 @@
 #'
 #'   For the `mspline` and `pexp` likelihoods, the auxiliary parameters are the
 #'   spline coefficients for each study. These form a unit simplex (i.e. lie
-#'   between 0 and 1, and sum to 1), and are given a [dirichlet()] prior
-#'   distribution.
+#'   between 0 and 1, and sum to 1), and are given a random walk prior
+#'   distribution. `prior_aux` specifies the hyperprior on the random walk
+#'   standard deviation \eqn{\sigma} which controls the level of smoothing of
+#'   the baseline hazard, with \eqn{\sigma = 0} corresponding to a constant
+#'   baseline hazard.
 #'
 #'   The auxiliary parameters can be stratified by additional factors through
 #'   the `aux_by` argument. For example, to allow the shape of the baseline
@@ -202,6 +225,21 @@
 #'   proportional hazards assumption. The default is equivalent to `aux_by =
 #'   ".study"` which stratifies the auxiliary parameters by study, as described
 #'   above.
+#'
+#'   A regression model may be specified on the auxiliary parameters using
+#'   `aux_regression`. This is useful if we wish to model departures from
+#'   non-proportionality, rather than allowing the baseline hazards to be
+#'   completely independent using `aux_by`. This is necessary if absolute
+#'   predictions (e.g. survival curves) are required in a population for
+#'   unobserved combinations of covariates; for example, if `aux_by = .trt` then
+#'   absolute predictions may only be produced for the observed treatment arms
+#'   in each study population, whereas if `aux_regression = ~.trt` then absolute
+#'   predictions can be produced for all treatments in any population. For
+#'   `mspline` and `pexp` likelihoods, the regression coefficients are smoothed
+#'   over time using a random walk prior to avoid overfitting: `prior_aux_reg`
+#'   specifies the hyperprior for the random walk standard deviation. For other
+#'   parametric likelihoods, `prior_aux_reg` specifies the prior for the
+#'   auxiliary regression coefficients.
 #'
 #' @return `nma()` returns a [stan_nma] object, except when `consistency =
 #'   "nodesplit"` when a [nma_nodesplit] or [nma_nodesplit_df] object is
@@ -228,6 +266,10 @@
 #' @template ex_plaque_psoriasis_integration
 #' @template ex_plaque_psoriasis_mlnmr
 #'
+#' @examples
+#' ## Newly-diagnosed multiple myeloma NMA
+#' @template ex_ndmm_network
+#' @template ex_ndmm
 nma <- function(network,
                 consistency = c("consistency", "ume", "nodesplit"),
                 trt_effects = c("fixed", "random"),
@@ -245,17 +287,20 @@ nma <- function(network,
                 prior_het_type = c("sd", "var", "prec"),
                 prior_reg = .default(normal(scale = 10)),
                 prior_aux = .default(),
+                prior_aux_reg = .default(),
                 prior_class_mean = .default(normal(scale = 10)),
                 prior_class_sd = .default(half_normal(scale = 5)),
                 aux_by = NULL,
+                aux_regression = NULL,
                 QR = FALSE,
                 center = TRUE,
                 adapt_delta = NULL,
                 int_thin = 0,
                 int_check = TRUE,
                 mspline_degree = 3,
-                n_knots = 3,
-                knots = NULL) {
+                n_knots = 7,
+                knots = NULL,
+                mspline_basis = NULL) {
 
 
   # Check network
@@ -413,7 +458,9 @@ nma <- function(network,
                          prior_het_type = prior_het_type,
                          prior_reg = prior_reg,
                          prior_aux = prior_aux,
+                         prior_aux_reg = prior_aux_reg,
                          aux_by = aux_by,
+                         aux_regression = aux_regression,
                          prior_class_mean = prior_class_mean,
                          prior_class_sd = prior_class_sd,
                          QR = QR,
@@ -422,7 +469,8 @@ nma <- function(network,
                          int_thin = int_thin,
                          mspline_degree = mspline_degree,
                          n_knots = n_knots,
-                         knots = knots)
+                         knots = knots,
+                         mspline_basis = mspline_basis)
 
       if (!missing(class_interactions)) ns_arglist$class_interactions <- class_interactions
 
@@ -559,9 +607,17 @@ nma <- function(network,
       prior_aux <- .default(list(sigma = half_normal(scale = 10),
                                  k = half_normal(scale = 10)))
     } else if (likelihood %in% c("mspline", "pexp")) {
-      prior_aux <- .default(dirichlet(1))
+      prior_aux <- .default(half_normal(scale = 1))
     }
     prior_defaults$prior_aux <- get_prior_call(prior_aux)
+  }
+  if (has_aux && !is.null(aux_regression) && .is_default(prior_aux_reg)) {
+    if (likelihood %in% c("mspline", "pexp")) {
+      prior_aux_reg <- .default(half_normal(scale = 1))
+    } else if (likelihood %in% valid_lhood$survival) {
+      prior_aux_reg <- .default(normal(scale = 10))
+    }
+    prior_defaults$prior_aux_reg <- get_prior_call(prior_aux_reg)
   }
 
   # Check if class_effects is "exchangeable" and if prior_class_mean or prior_class_sd are at their default values
@@ -597,14 +653,37 @@ nma <- function(network,
   } else if (!rlang::is_scalar_double(adapt_delta) ||
       adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
+  # Check aux_by / aux_regression combination
+  aux_by <- rlang::enquo(aux_by)
+  if (!rlang::quo_is_null(aux_by) && !is.null(aux_regression)) {
+    abort("Cannot specify both `aux_by` and `aux_regression`.")
+  }
+
+  # Set up aux_regression
+  has_aux_regression <- FALSE
+  if (!is.null(aux_regression) && likelihood %in% valid_lhood$survival &&
+      has_aux &&
+      (has_ipd(network) || has_agd_arm(network))) {
+    if (!rlang::is_formula(aux_regression, lhs = FALSE)) abort("`aux_regression` should be a one-sided formula.")
+    if (!is.null(attr(aux_regression, "offset"))) abort("Offset terms not allowed in `aux_regression`.")
+
+    # Remove main effect of study if specified, and make sure treatment handled properly (first, no intercept for M-spline model with symmetric RW prior)
+    if (".trt" %in% colnames(attr(terms(aux_regression), "factor"))) {
+      aux_regression <- update.formula(aux_regression, ~. -.study -.trt +1)
+      if (likelihood %in% c("mspline", "pexp")) aux_regression <- update.formula(aux_regression, ~.trt + . -1)
+      else aux_regression <- update.formula(aux_regression, ~.trt + . +1)
+    } else {
+      aux_regression <- update.formula(aux_regression, ~. -.study +1)
+    }
+    has_aux_regression <- TRUE
+  }
+
   # Set up aux_by
-  has_aux_by <- FALSE
   if (likelihood %in% valid_lhood$survival &&
       has_aux &&
       (has_ipd(network) || has_agd_arm(network))) {
 
     has_aux_by <- TRUE
-    aux_by <- rlang::enquo(aux_by)
     if (rlang::quo_is_null(aux_by)) aux_by <- ".study"
 
     aux_dat <- dplyr::bind_rows(if (has_ipd(network)) dplyr::select(network$ipd, -".Surv") else NULL,
@@ -618,14 +697,15 @@ nma <- function(network,
 
     # Check specs and translate into string column names
     aux_by <- colnames(get_aux_by_data(aux_dat, by = aux_by))
+  } else {
+    has_aux_by <- FALSE
+    aux_by <- NULL
   }
 
 
   # Use numerical integration? TRUE if class mlnmr_data and regression is not NULL
   # (Avoids unnecessary use of integration points if regression formula not specified)
-  use_int <- inherits(network, "mlnmr_data") &&
-               (!is.null(regression) ||
-                  (has_aux_by && length(setdiff(aux_by, c(".study", ".trt"))) > 0))
+  use_int <- inherits(network, "mlnmr_data") && (!is.null(regression) || aux_needs_integration(aux_regression = aux_regression, aux_by = aux_by))
 
   # Number of numerical integration points
   # Set to 1 if no numerical integration, so that regression on summary data is possible
@@ -647,6 +727,7 @@ nma <- function(network,
     # Only take necessary columns
     dat_ipd <- get_model_data_columns(dat_ipd,
                                       regression = regression,
+                                      aux_regression = aux_regression,
                                       label = "IPD",
                                       keep = if (has_aux_by) aux_by else NULL)
 
@@ -693,6 +774,7 @@ nma <- function(network,
     # Only take necessary columns
     idat_agd_arm <- get_model_data_columns(idat_agd_arm,
                                            regression = regression,
+                                           aux_regression = aux_regression,
                                            label = "AgD (arm-based)",
                                            keep = if (has_aux_by) aux_by else NULL)
 
@@ -740,12 +822,21 @@ nma <- function(network,
   idat_all_plus_bl <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast)
 
   # Get sample sizes for centering
-  if (!is.null(regression) && !is_only_offset(regression) && center) {
+  if (((!is.null(regression) && !is_only_offset(regression)) || has_aux_regression) && center) {
     # Check that required variables are present in each data set, and non-missing
-    check_regression_data(regression,
-                          dat_ipd = dat_ipd,
-                          dat_agd_arm = idat_agd_arm,
-                          dat_agd_contrast = idat_agd_contrast)
+    if (!is.null(regression)) {
+      check_regression_data(regression,
+                            dat_ipd = dat_ipd,
+                            dat_agd_arm = idat_agd_arm,
+                            dat_agd_contrast = idat_agd_contrast)
+    }
+
+    if (has_aux_regression) {
+      check_regression_data(aux_regression,
+                            dat_ipd = dat_ipd,
+                            dat_agd_arm = idat_agd_arm,
+                            dat_agd_contrast = idat_agd_contrast)
+    }
 
     # If IPD or IPD+AgD use weighted means for centering, otherwise with only AgD use raw mean
 
@@ -785,15 +876,24 @@ nma <- function(network,
     }
 
     # Center numeric columns used in regression model
-    reg_names <- all.vars(regression)
 
-    # Ignore any variable(s) used as offset(s)
-    reg_terms <- terms(regression)
+    if (!is.null(regression)) {
+      reg_names <- all.vars(regression)
 
-    if (length(attr(reg_terms, "offset"))) {
-      off_terms <- rownames(attr(reg_terms, "factors"))[attr(reg_terms, "offset")]
-      off_names <- all.vars(as.formula(paste("~", off_terms, sep = "+")))
-      reg_names <- setdiff(reg_names, off_names)
+      # Ignore any variable(s) used as offset(s)
+      reg_terms <- terms(regression)
+
+      if (length(attr(reg_terms, "offset"))) {
+        off_terms <- rownames(attr(reg_terms, "factors"))[attr(reg_terms, "offset")]
+        off_names <- all.vars(as.formula(paste("~", off_terms, sep = "+")))
+        reg_names <- setdiff(reg_names, off_names)
+      }
+    } else {
+      reg_names <- character()
+    }
+
+    if (has_aux_regression) {
+      reg_names <- unique(c(reg_names, all.vars(aux_regression)))
     }
 
     reg_numeric <- purrr::map_lgl(idat_all[, reg_names], is.numeric)
@@ -879,12 +979,6 @@ nma <- function(network,
   if (likelihood %in% c("mspline", "pexp") && (has_ipd(network) || has_agd_arm(network))) {
     require_pkg("splines2")
 
-    if (likelihood == "pexp") mspline_degree <- 0
-
-    if (!rlang::is_scalar_integerish(mspline_degree, finite = TRUE) || mspline_degree < 0)
-      abort("`mspline_degree` must be a single non-negative integer.")
-
-    # Calculate boundary knots
     survdat <-
       if (!has_agd_arm(network)) {
         dplyr::tibble(.Surv = y_ipd$.Surv,
@@ -900,50 +994,96 @@ nma <- function(network,
                       observed = .data$.Surv[, "status"]  == 1)
       }
 
-    stype <- attr(survdat$.Surv, "type")
     survdat <- dplyr::mutate(survdat, !!! get_Surv_data(survdat$.Surv))
 
-    # Boundary knots at earliest entry time (0 with no delayed entry) and latest event/censoring time
-    b_knots <- by(survdat, survdat$.study, function(x) c(min(x$delay_time), max(x$time)),
-                  simplify = FALSE)
 
-    if (is.null(knots)) {  # Calculate internal knots based on quantiles
-      if (!rlang::is_scalar_integerish(n_knots, finite = TRUE) || n_knots <= 0)
-        abort("`n_knots` must be a single positive integer (or specify `knots` directly)")
+    if (!is.null(mspline_basis)) {
 
-      observed_survdat <- dplyr::filter(survdat, .data$observed)
-      knots <- by(observed_survdat, observed_survdat$.study,
-                  function(x) quantile(x$time, probs = seq(1, n_knots) / (n_knots + 1)),
-                  simplify = FALSE)
+      if (!is.list(mspline_basis) || any(!purrr::map_lgl(mspline_basis, is_mspline)))
+        abort("`mspline_basis` must be a named list of M-spline bases created using splines2::mSpline().")
 
-    } else {  # User-provided internal knots
-      # Check required format
-      if (!is.list(knots) || any(!purrr::map_lgl(knots, is.numeric)))
-        abort("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.")
-
-      missing_names <- setdiff(levels(survdat$.study), names(knots))
+      missing_names <- setdiff(levels(survdat$.study), names(mspline_basis))
       if (length(missing_names) > 0)
-        abort(glue::glue("`knots` must be a named list of numeric vectors giving the internal knot locations for each study.\n",
-                         "Missing knot location vector{if (length(missing_names > 1) 's' else ''} for stud{if (length(missing_names > 1) 'ies' else 'y'} ",
+        abort(glue::glue("`mspline_basis` must be a named list of M-spline basis for each study.\n",
+                         "Missing {if (length(missing_names) > 1) 'bases' else 'basis'} for stud{if (length(missing_names) > 1) 'ies' else 'y'} ",
                          glue::glue_collapse(glue::double_quote(missing_names), sep = ", ", last = " and ", width = 30), "."))
 
-      if (!all(purrr::map_int(knots, length) == length(knots[[1]])))
-        abort("Each element of `knots` must currently be the same length (each study must have the same number of knots).")
-    }
+      if (!all(purrr::map_int(mspline_basis, ncol) == ncol(mspline_basis[[1]])))
+        abort("Each basis in `mspline_basis` must currently have the same number of knots.")
 
-    # Set up basis
-    # Only evaluate at first boundary knot for now to save time/memory
-    basis <- purrr::imap(b_knots,
-                         ~tryCatch(splines2::mSpline(.x[1],
-                                                     knots = knots[[.y]],
-                                                     Boundary.knots = .x,
-                                                     degree = mspline_degree,
-                                                     intercept = TRUE),
-                                   error = function(e) abort(glue::glue("Could not create spline basis for study {glue::double_quote(.y)}."),
-                                                             parent = e),
-                                   warning = function(w) warn(glue::glue("Warning while creating spline basis for study {glue::double_quote(.y)}."),
-                                                              parent = e))
-                         )
+      if (likelihood == "pexp" && any(purrr::map_lgl(mspline_basis, ~attr(., "degree") != 0)))
+        abort("`mspline_basis` for piecewise exponential model must all have degree = 0.")
+
+      basis <- mspline_basis
+
+    } else {
+
+      if (likelihood == "pexp") mspline_degree <- 0
+
+      if (!rlang::is_scalar_integerish(mspline_degree, finite = TRUE) || mspline_degree < 0)
+        abort("`mspline_degree` must be a single non-negative integer.")
+
+      if (is.null(knots)) {
+
+        knots <- make_knots(network, n_knots = n_knots, type = if (!is.null(aux_regression)) "quantile_common" else "quantile")
+
+      } else {  # User-provided knots
+        # Check required format
+        if (!has_aux_regression) {
+          if ((!is.list(knots) || any(!purrr::map_lgl(knots, is.numeric))) && !is.vector(knots, mode = "numeric"))
+            abort("`knots` must be a named list of numeric vectors giving the knot locations for each study, or a single numeric vector of knot locations to use for all studies.")
+
+          if (is.vector(knots, mode = "numeric")) {
+            knots <- rep_len(list(knots), dplyr::n_distinct(survdat$.study))
+            names(knots) <- unique(survdat$.study)
+          }
+
+          missing_names <- setdiff(levels(survdat$.study), names(knots))
+          if (length(missing_names) > 0)
+            abort(glue::glue("`knots` must be a named list of numeric vectors giving the knot locations for each study.\n",
+                             "Missing knot location vector{if (length(missing_names) > 1) 's' else ''} for stud{if (length(missing_names) > 1) 'ies' else 'y'} ",
+                             glue::glue_collapse(glue::double_quote(missing_names), sep = ", ", last = " and ", width = 30), "."))
+
+          if (!all(purrr::map_int(knots, length) == length(knots[[1]])))
+            abort("Each vector in `knots` must currently be the same length (each study must have the same number of knots).")
+
+          if (length(knots[[1]]) < 3)
+            abort("Each vector in `knots` must be at least length 3 (boundary knots and one internal knot).")
+        } else {
+          # With aux_regression, only a single vector of knot locations is allowed
+          if (!is.vector(knots, mode = "numeric"))
+            abort("`knots` must be a single numeric vector of knot locations, shared for all studies, when `aux_regression` is specified.")
+
+          if (length(knots) < 3)
+            abort("`knots` must be at least length 3 (boundary knots and one internal knot).")
+
+          knots <- rep_len(list(knots), dplyr::n_distinct(survdat$.study))
+          names(knots) <- unique(survdat$.study)
+        }
+      }
+
+      # Set up basis
+      # Only evaluate at first boundary knot for now to save time/memory
+      knots <- purrr::map(knots, sort)
+      knots <- tibble::as_tibble(knots)
+      b_knots <- knots[c(1, nrow(knots)), ]
+      i_knots <- knots[-c(1, nrow(knots)), ]
+      basis <- purrr::imap(b_knots,
+                           ~withCallingHandlers(splines2::mSpline(.x[1],
+                                                       knots = i_knots[[.y]],
+                                                       Boundary.knots = .x,
+                                                       degree = mspline_degree,
+                                                       intercept = TRUE),
+                                     error = function(e) abort(glue::glue("Could not create spline basis for study {glue::double_quote(.y)}."),
+                                                               parent = e),
+                                     warning = function(w) {
+                                       warn(glue::glue("Warning while creating spline basis for study {glue::double_quote(.y)}."), parent = w)
+                                       rlang::cnd_muffle(w)
+                                     }
+                                    )
+                           )
+
+    }
 
     # Ensure list is in factor order
     basis <- basis[levels(survdat$.study)]
@@ -954,7 +1094,10 @@ nma <- function(network,
 
   # Set up aux_by design vector
   if (has_aux_by) {
-    if (length(setdiff(aux_by, c(".study", ".trt"))) > 0) {
+    # Determine whether we need to integrate over the aux regression too
+    aux_int <- aux_needs_integration(aux_regression = aux_regression, aux_by = aux_by)
+
+    if (aux_int) {
       aux_dat <- dplyr::bind_rows(dat_ipd, idat_agd_arm)
     } else {
       aux_dat <- dplyr::bind_rows(dat_ipd,
@@ -963,6 +1106,26 @@ nma <- function(network,
     aux_id <- get_aux_id(aux_dat, aux_by)
   } else {
     aux_id <- integer()
+    aux_int <- FALSE
+  }
+
+  # Set up aux_regression design matrix
+  if (has_aux_regression) {
+    X_aux <- make_nma_model_matrix(aux_regression,
+                                   dat_ipd = aux_dat,
+                                   xbar = xbar)$X_ipd
+
+    # Group common rows of X_aux for efficiency if possible
+    if (aux_int && use_int && has_agd_arm(network)) {
+      aux_group <- 1:nrow(X_aux)
+    } else {
+      X_aux_dat <- as.data.frame(X_aux)
+      if (!rlang::has_name(X_aux_dat, ".study")) X_aux_dat <- dplyr::mutate(X_aux_dat, aux_dat$.study, .before = 0)  # Always group within study
+      aux_group <- dplyr::group_indices(dplyr::group_by_all(X_aux_dat))
+    }
+  } else {
+    X_aux <- NULL
+    aux_group <- aux_id
   }
 
 # Creating design Vector for class effects
@@ -1046,9 +1209,12 @@ nma <- function(network,
     prior_het_type = prior_het_type,
     prior_reg = prior_reg,
     prior_aux = prior_aux,
+    prior_aux_reg = prior_aux_reg,
     prior_class_mean = prior_class_mean,
     prior_class_sd = prior_class_sd,
     aux_id = aux_id,
+    aux_group = aux_group,
+    X_aux = X_aux,
     QR = QR,
     adapt_delta = adapt_delta,
     int_thin = int_thin,
@@ -1152,7 +1318,12 @@ nma <- function(network,
       agd_arm_cumint_labels <- rep(agd_arm_data_labels, each = n_int_thin)
       agd_arm_cumint_labels <- paste0(agd_arm_cumint_labels, ", ", rep_len(1:n_int_thin * int_thin, length.out = length(agd_arm_cumint_labels)))
 
-      fnames_oi[grepl("^theta_bar_cum_agd_arm\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta_bar_cum_agd_arm[", agd_arm_cumint_labels, "]")
+      if (likelihood == "ordered") {
+        l_cat <- colnames(y_agd_arm$.r)
+        agd_arm_cumint_labels <- paste0(rep(agd_arm_cumint_labels, times = length(l_cat)), ", ", rep(l_cat, each = length(agd_arm_cumint_labels)))
+      }
+
+      fnames_oi[grepl("^theta_bar_cum_agd_arm\\[", fnames_oi)] <- paste0("theta_bar_cum_agd_arm[", agd_arm_cumint_labels, "]")
       if (likelihood %in% c("bernoulli2", "binomial2"))
         fnames_oi[grepl("^theta2_bar_cum\\[[0-9]+\\]$", fnames_oi)] <- paste0("theta2_bar_cum[", agd_arm_cumint_labels, "]")
     }
@@ -1207,6 +1378,7 @@ nma <- function(network,
               trt_effects = trt_effects,
               consistency = consistency,
               regression = regression,
+              aux_regression = aux_regression,
               class_interactions = if (!is.null(regression) && !is.null(network$classes)) class_interactions else NULL,
               xbar = xbar,
               likelihood = likelihood,
@@ -1217,7 +1389,8 @@ nma <- function(network,
                             prior_het = if (trt_effects == "random") prior_het else NULL,
                             prior_het_type = if (trt_effects == "random") prior_het_type else NULL,
                             prior_reg = if (!is.null(regression) && !is_only_offset(regression)) prior_reg else NULL,
-                            prior_aux = if (has_aux) prior_aux else NULL))
+                            prior_aux = if (has_aux) prior_aux else NULL,
+                            prior_aux_reg = if (has_aux_regression) prior_aux_reg else NULL))
 
   if (likelihood %in% c("mspline", "pexp")) out$basis <- basis
 
@@ -1273,9 +1446,12 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_het_type = c("sd", "var", "prec"),
                     prior_reg,
                     prior_aux,
+                    prior_aux_reg,
                     prior_class_mean,
                     prior_class_sd,
                     aux_id = integer(),
+                    aux_group = integer(),
+                    X_aux = NULL,
                     QR = FALSE,
                     adapt_delta = NULL,
                     int_thin = 0,
@@ -1382,7 +1558,9 @@ nma.fit <- function(ipd_x, ipd_y,
   link <- check_link(link, likelihood)
 
   # When are priors on auxiliary parameters required?
-  has_aux <- (likelihood == "normal" && has_ipd) || likelihood == "ordered"
+  has_aux <- (likelihood == "normal" && has_ipd) ||
+    (likelihood %in% c("ordered", setdiff(valid_lhood$survival, c("exponential", "exponential-aft"))) &&
+       (has_ipd || has_agd_arm))
 
   # Check priors
   check_prior(prior_intercept)
@@ -1392,6 +1570,8 @@ nma.fit <- function(ipd_x, ipd_y,
   if (has_aux) {
     if (likelihood == "gengamma") check_prior(prior_aux, c("sigma", "k"))
     else check_prior(prior_aux)
+
+    if (!is.null(X_aux)) check_prior(prior_aux_reg)
   }
   if (class_effects != "independent"){
   check_prior(prior_class_mean)
@@ -1444,6 +1624,7 @@ nma.fit <- function(ipd_x, ipd_y,
     narm_ipd <- max(ipd_arm)
     ni_ipd <- nrow(ipd_x)
   } else {
+    ipd_s_t_all <- dplyr::tibble(.study = integer(), .trt = integer())
     ipd_study <- ipd_trt <- ipd_arm <- numeric()
     ni_ipd <- 0
     narm_ipd <- 0
@@ -1467,6 +1648,7 @@ nma.fit <- function(ipd_x, ipd_y,
     }
 
   } else {
+    agd_arm_s_t_all <- dplyr::tibble(.study = integer(), .trt = integer())
     agd_arm_study <- agd_arm_trt <- agd_arm_arm <- numeric()
     ni_agd_arm <- narm_agd_arm <- 0
   }
@@ -1494,7 +1676,7 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Set up random effects
   if (trt_effects == "random") {
-    narm <- narm_ipd + ni_agd_arm + ni_agd_contrast
+    narm <- narm_ipd + narm_agd_arm + ni_agd_contrast
     if (!is.null(which_RE)) {
       if (!rlang::is_integerish(which_RE) ||
           any(which_RE < 0) ||
@@ -1830,24 +2012,40 @@ nma.fit <- function(ipd_x, ipd_y,
     # Add in dummy prior_aux2 if not gengamma - not used, but requested by Stan data
     if (likelihood != "gengamma") prior_aux2 <- flat()
 
+    # Add in dummy prior_aux_reg if no aux_regression
+    if (is.null(X_aux)) prior_aux_reg <- flat()
+
     # Check aux IDs
     if (!(has_ipd || has_agd_arm)) {
       aux_id <- integer()
     } else {
       if (likelihood %in% c("exponential", "exponential-aft")) {
-        aux_id <- rep_len(1, ni_ipd + ni_agd_arm)  # Not used (no aux pars)
+        aux_id <- aux_group <- rep_len(1, ni_ipd + ni_agd_arm)  # Not used (no aux pars)
       } else if (!rlang::is_integerish(aux_id, finite = TRUE)) {
         abort("`aux_id` must be an integer vector identifying the auxiliary parameter for each observation in IPD and AgD (arm-based) data.")
       }
     }
+
+    # Set aux_int
+    aux_int <- !is.null(X_aux) && max(aux_group) == nrow(X_aux)
+
+    # Set flag for aux regression including main treatment effects
+    aux_reg_trt <- any(grepl("^\\.trt[^:]", colnames(X_aux)))
 
     standat <- purrr::list_modify(standat,
                                   # AgD arm IDs
                                   agd_arm_arm = agd_arm_arm,
 
                                   # Auxiliary IDs for shape parameters
-                                  aux_by = length(aux_id) == ni_ipd + ni_agd_arm*n_int,
+                                  #aux_by = length(aux_id) == ni_ipd + ni_agd_arm*n_int,
+                                  aux_int = aux_int,
                                   aux_id = aux_id,
+                                  aux_group = aux_group,
+
+                                  # Aux regression
+                                  nX_aux = if (!is.null(X_aux)) ncol(X_aux) else 0,
+                                  X_aux = if (!is.null(X_aux))  X_aux else matrix(0, length(aux_id), 0),
+                                  aux_reg_trt = aux_reg_trt,
 
                                   # Add outcomes
                                   ipd_time = ipd_surv$time,
@@ -1873,7 +2071,14 @@ nma.fit <- function(ipd_x, ipd_y,
                                                 gengamma = 9),
 
                                   # Specify link
-                                  link = switch(link, log = 1)
+                                  link = switch(link, log = 1),
+
+                                  # Add prior for aux_regression coefs
+                                  !!! prior_standat(prior_aux_reg, "prior_aux_reg",
+                                                    valid = c("Normal", "half-Normal", "log-Normal",
+                                                              "Cauchy",  "half-Cauchy",
+                                                              "Student t", "half-Student t", "log-Student t",
+                                                              "Exponential", "flat (implicit)"))
     )
 
     # Add in priors for auxiliary parameters
@@ -1914,9 +2119,9 @@ nma.fit <- function(ipd_x, ipd_y,
                                    # Monitor auxiliary parameters
                                    pars =
                                      if (likelihood %in% c("exponential", "exponential-aft")) pars
-                                     else if (likelihood == "lognormal") c(pars, "sdlog")
-                                     else if (likelihood == "gengamma") c(pars, "sigma", "k")
-                                     else c(pars, "shape")
+                                     else if (likelihood == "lognormal") c(pars, "sdlog", "beta_aux", "d_aux")
+                                     else if (likelihood == "gengamma") c(pars, "sigma", "k", "beta_aux", "d_aux")
+                                     else c(pars, "shape", "beta_aux", "d_aux")
                                    )
 
 
@@ -1930,15 +2135,27 @@ nma.fit <- function(ipd_x, ipd_y,
     # Number of spline coefficients
     n_scoef <- ncol(basis[[1]])
 
+    try_update <- function(..., study) {
+      withCallingHandlers(update(...),
+                          error = function(e) {
+                            abort(glue::glue("Could not create spline basis for study {glue::double_quote(study)}."), parent = e)
+                          },
+                          warning = function(w) {
+                            warn(glue::glue("In study {glue::double_quote(study)}: ", conditionMessage(w)))
+                            rlang::cnd_muffle(w)
+                          })
+    }
+
     # Evaluate splines
     if (has_ipd) {
       ipd_time <- ipd_itime <- ipd_start_itime <- ipd_delay_itime <- matrix(nrow = length(ipd_surv$time), ncol = n_scoef)
 
       for (s in unique(ipd_s_t_all$.study)) {
-        ipd_time[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s])
-        ipd_itime[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s], integral = TRUE)
-        ipd_start_itime[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$start_time[ipd_s_t_all$.study == s], integral = TRUE)
-        ipd_delay_itime[ipd_s_t_all$.study == s, ] <- update(basis[[s]], x = ipd_surv$delay_time[ipd_s_t_all$.study == s], integral = TRUE)
+        s_chr <- gsub("^\\.study", "", x_names[s])
+        ipd_time[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s], study = s_chr)
+        ipd_itime[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$time[ipd_s_t_all$.study == s], integral = TRUE, study = s_chr)
+        ipd_start_itime[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$start_time[ipd_s_t_all$.study == s], integral = TRUE, study = s_chr)
+        ipd_delay_itime[ipd_s_t_all$.study == s, ] <- try_update(basis[[s]], x = ipd_surv$delay_time[ipd_s_t_all$.study == s], integral = TRUE, study = s_chr)
       }
 
     } else {
@@ -1949,10 +2166,11 @@ nma.fit <- function(ipd_x, ipd_y,
       agd_arm_time <- agd_arm_itime <- agd_arm_start_itime <- agd_arm_delay_itime <- matrix(nrow = length(agd_arm_surv$time), ncol = n_scoef)
 
       for (s in unique(agd_arm_s_t_all$.study)) {
-        agd_arm_time[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s])
-        agd_arm_itime[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s], integral = TRUE)
-        agd_arm_start_itime[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$start_time[agd_arm_s_t_all$.study == s], integral = TRUE)
-        agd_arm_delay_itime[agd_arm_s_t_all$.study == s, ] <- update(basis[[s]], x = agd_arm_surv$delay_time[agd_arm_s_t_all$.study == s], integral = TRUE)
+        s_chr <- gsub("^\\.study", "", x_names[s])
+        agd_arm_time[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s], study = s_chr)
+        agd_arm_itime[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$time[agd_arm_s_t_all$.study == s], integral = TRUE, study = s_chr)
+        agd_arm_start_itime[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$start_time[agd_arm_s_t_all$.study == s], integral = TRUE, study = s_chr)
+        agd_arm_delay_itime[agd_arm_s_t_all$.study == s, ] <- try_update(basis[[s]], x = agd_arm_surv$delay_time[agd_arm_s_t_all$.study == s], integral = TRUE, study = s_chr)
       }
 
     } else {
@@ -1967,16 +2185,51 @@ nma.fit <- function(ipd_x, ipd_y,
         abort("`aux_id` must be an integer vector identifying the auxiliary parameter for each observation in IPD and AgD (arm-based) data.")
     }
 
+    # Set aux_int
+    aux_int <- !is.null(X_aux) && max(aux_group) == nrow(X_aux)
+
+    # Get scoef prior means and weights for RW(1) prior with non-equally spaced knots
+    if (!is.null(X_aux)) {
+      # If aux_regression specified, single spline basis shared across network
+      prior_aux_location <- list(mspline_constant_hazard(basis[[1]]))
+
+      lscoef_weight <- list(rw1_prior_weights(basis[[1]]))
+
+      aux_reg_trt <- any(grepl("^\\.trt[^:]", colnames(X_aux)))
+
+    } else {
+      prior_aux_location <- purrr::map(basis[unique(cbind(aux_id, study = c(ipd_s_t_all$.study, rep(agd_arm_s_t_all$.study, each = if (aux_int) n_int else 1))))[, "study"]],
+                                       mspline_constant_hazard)
+
+      lscoef_weight <- purrr::map(basis[unique(cbind(aux_id, study = c(ipd_s_t_all$.study, rep(agd_arm_s_t_all$.study, each = if (aux_int) n_int else 1))))[, "study"]],
+                                  rw1_prior_weights)
+
+      # Dummy prior for aux regression smoothing sd (not used)
+      prior_aux_reg <- flat()
+
+      aux_reg_trt <- FALSE
+    }
+
     standat <- purrr::list_modify(standat,
                                   # AgD arm IDs
                                   agd_arm_arm = agd_arm_arm,
 
                                   # Aux IDs
-                                  aux_by = length(aux_id) == ni_ipd + ni_agd_arm*n_int,
+                                  #aux_by = length(aux_id) == ni_ipd + ni_agd_arm*n_int,
+                                  aux_int = aux_int,
                                   aux_id = aux_id,
+                                  aux_group = aux_group,
+
+                                  # Aux regression
+                                  nX_aux = if (!is.null(X_aux)) ncol(X_aux) else 0,
+                                  X_aux = if (!is.null(X_aux))  X_aux else matrix(0, length(aux_id), 0),
+                                  aux_reg_trt = aux_reg_trt,
 
                                   # Number of spline coefficients
                                   n_scoef = n_scoef,
+
+                                  # RW1 prior weights
+                                  lscoef_weight = lscoef_weight,
 
                                   # Add outcomes
                                   ipd_time = ipd_time,
@@ -1996,16 +2249,31 @@ nma.fit <- function(ipd_x, ipd_y,
                                   # Specify link
                                   link = switch(link, log = 1),
 
-                                  # Add priors for spline coefficients
-                                  !!! prior_standat(prior_aux, "prior_aux",
-                                                    valid = "Dirichlet")
+                                  # Add prior for spline smoothing sd
+                                  !!! prior_standat(prior_aux, "prior_hyper",
+                                                    valid = c("Normal", "half-Normal", "log-Normal",
+                                                              "Cauchy",  "half-Cauchy",
+                                                              "Student t", "half-Student t", "log-Student t",
+                                                              "Exponential", "flat (implicit)")),
+
+                                  # Add prior for aux_regression smoothing sd
+                                  !!! prior_standat(prior_aux_reg, "prior_reg_hyper",
+                                                    valid = c("Normal", "half-Normal", "log-Normal",
+                                                              "Cauchy",  "half-Cauchy",
+                                                              "Student t", "half-Student t", "log-Student t",
+                                                              "Exponential", "flat (implicit)"))
     )
+
+    # Add prior mean for spline coefficients
+    standat$prior_aux_location <- prior_aux_location
 
     # Monitor spline coefficients
     stanargs <- purrr::list_modify(stanargs,
                                    object = stanmodels$survival_mspline,
                                    data = standat,
-                                   pars = c(pars, "scoef"))
+                                   pars = c(pars,
+                                            # "lscoef", "u_aux"
+                                            "scoef", "beta_aux", "d_aux", "sigma", "sigma_beta"))
 
   } else {
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
@@ -2069,10 +2337,10 @@ nma.fit <- function(ipd_x, ipd_y,
         }
 
         if (bulk_ess_warn_a) {
-          bulk_ess_1 <- apply(sims_nint1, 3, rstan::ess_bulk)
-          bulk_ess_2 <- apply(sims_nint2, 3, rstan::ess_bulk)
+          bulk_ess_1 <- apply(sims_nint1, 3, rstan::ess_bulk) / ncol(sims_nint1)
+          bulk_ess_2 <- apply(sims_nint2, 3, rstan::ess_bulk) / ncol(sims_nint2)
           bulk_ess_w <- pmin(bulk_ess_1, bulk_ess_2, na.rm = TRUE)
-          bulk_ess_warn_w <- any(bulk_ess_w < 100 * ncol(sims), na.rm = TRUE)
+          bulk_ess_warn_w <- any(bulk_ess_w < 100, na.rm = TRUE)
 
           if (bulk_ess_warn_w) {
             warning("Bulk Effective Sample Size (ESS) is too low, ",
@@ -2088,10 +2356,10 @@ nma.fit <- function(ipd_x, ipd_y,
         }
 
         if (tail_ess_warn_a) {
-          tail_ess_1 <- apply(sims_nint1, 3, rstan::ess_tail)
-          tail_ess_2 <- apply(sims_nint2, 3, rstan::ess_tail)
+          tail_ess_1 <- apply(sims_nint1, 3, rstan::ess_tail) / ncol(sims_nint1)
+          tail_ess_2 <- apply(sims_nint2, 3, rstan::ess_tail) / ncol(sims_nint2)
           tail_ess_w <- pmin(tail_ess_1, tail_ess_2, na.rm = TRUE)
-          tail_ess_warn_w <- any(tail_ess_w < 100 * ncol(sims), na.rm = TRUE)
+          tail_ess_warn_w <- any(tail_ess_w < 100, na.rm = TRUE)
 
           if (tail_ess_warn_w) {
             warning("Tail Effective Sample Size (ESS) is too low, indicating ",
@@ -2123,6 +2391,25 @@ nma.fit <- function(ipd_x, ipd_y,
   fnames_oi[grepl("^mu\\[[0-9]+\\]$", fnames_oi)] <- paste0("mu[", x_names_sub[col_study], "]")
   fnames_oi[grepl("^d\\[[0-9]+\\]$", fnames_oi)] <- paste0("d[", x_names_sub[col_trt], "]")
   fnames_oi[grepl("^beta\\[[0-9]+\\]$", fnames_oi)] <- paste0("beta[", x_names[col_reg], "]")
+  if (!is.null(X_aux)) {
+    if (likelihood %in% c("mspline", "pexp")) {
+      fnames_oi[grepl("^beta_aux\\[", fnames_oi)] <- paste0("beta_aux[", rep(colnames(X_aux), times = n_scoef-1), ", ", rep(1:(n_scoef-1), each = ncol(X_aux)), "]")
+      if (aux_reg_trt) {
+        fnames_oi[grepl("^sigma_beta\\[", fnames_oi)] <- c("sigma_beta[.trt]",
+                                                           if (ncol(X_aux) > n_trt) paste0("sigma_beta[", colnames(X_aux[, -(1:n_trt), drop = FALSE]), "]")
+                                                           else NULL)
+        fnames_oi[grepl("^d_aux\\[", fnames_oi)] <- paste0("d_aux[", rep(x_names_sub[col_trt], times = n_scoef-1), ", ", rep(1:(n_scoef-1), each = n_trt-1), "]")
+      } else {
+        fnames_oi[grepl("^sigma_beta\\[", fnames_oi)] <- paste0("sigma_beta[", colnames(X_aux), "]")
+      }
+    } else if (likelihood == "gengamma") {
+      fnames_oi[grepl("^beta_aux\\[", fnames_oi)] <- paste0("beta_aux[", rep(colnames(X_aux), times = 2), ", ", rep(c("sigma", "k"), each = ncol(X_aux)), "]")
+      if (aux_reg_trt) fnames_oi[grepl("^d_aux\\[", fnames_oi)] <- paste0("d_aux[", rep(x_names_sub[col_trt], times = 2), ", ", rep(c("sigma", "k"), each = n_trt-1), "]")
+    } else {
+      fnames_oi[grepl("^beta_aux\\[", fnames_oi)] <- paste0("beta_aux[", colnames(X_aux), "]")
+      if (aux_reg_trt) fnames_oi[grepl("^d_aux\\[", fnames_oi)] <- paste0("d_aux[", x_names_sub[col_trt], "]")
+    }
+  }
   fnames_oi <- gsub("tau[1]", "tau", fnames_oi, fixed = TRUE)
   fnames_oi <- gsub("omega[1]", "omega", fnames_oi, fixed = TRUE)
 
@@ -2818,15 +3105,15 @@ make_nma_model_matrix <- function(nma_formula,
 
   # Drop study to factor to 1L if only one study (avoid contrasts need 2 or
   # more levels error)
-  if (dplyr::n_distinct(dat_all$.study) == 1) {
+  if (".study" %in% fvars && dplyr::n_distinct(dat_all$.study) == 1) {
 
     # Save study label to restore
     single_study_label <- unique(dat_all$.study)
     dat_all$.study_temp <- dat_all$.study
     dat_all$.study <- 1L
 
-    # Fix up model formula with an intercept
-    nma_formula <- update.formula(nma_formula, ~. + 1)
+    # Fix up model formula with an intercept (if .study is main effect, which is not usually the case for aux_regression)
+    if (".study" %in% colnames(attr(terms(nma_formula), "factors"))) nma_formula <- update.formula(nma_formula, ~. + 1)
   } else {
     single_study_label <- NULL
     if (".study" %in% fvars) stats::contrasts(dat_all$.study) <- "contr.treatment"
@@ -2847,7 +3134,7 @@ make_nma_model_matrix <- function(nma_formula,
       dplyr::select(-".study_temp")
 
     # Drop intercept column from design matrix
-    X_all <- X_all[, -1, drop = FALSE]
+    if ("(Intercept)" %in% colnames(X_all)) X_all <- X_all[, -1, drop = FALSE]
   }
 
   # Remove columns for reference level of .trtclass
@@ -2866,6 +3153,9 @@ make_nma_model_matrix <- function(nma_formula,
                             "\\:\\.trtclass\\Q", ref_class, "\\E$|^\\.trtclass\\Q", ref_class, "\\E\\:")
   col_int_ref <- grepl(regex_int_ref, colnames(X_all), perl = TRUE)
   X_all <- X_all[, !col_int_ref, drop = FALSE]
+
+  # Remove global intercept column (present for aux_regression)
+  X_all <- X_all[, colnames(X_all) != "(Intercept)", drop = FALSE]
 
   if (consistency == "ume") {
     # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
@@ -2944,13 +3234,17 @@ make_nma_model_matrix <- function(nma_formula,
 #'
 #' @param data Data frame
 #' @param regression Regression formula or NULL
+#' @param aux_regression Regression formula or NULL
 #' @param label Label for data source or NULL, used for informative errors
 #' @param keep Additional variables to keep in data
 #'
 #' @return Data frame with required columns
 #' @noRd
-get_model_data_columns <- function(data, regression = NULL, label = NULL, keep = NULL) {
+get_model_data_columns <- function(data, regression = NULL, aux_regression = NULL, label = NULL, keep = NULL) {
   if (!is.null(label)) label <- paste(" in", label)
+  regvars <- NULL
+  auxregvars <- NULL
+
   if (!is.null(regression)) {
     regvars <- setdiff(all.vars(regression), c(".trt", ".trtclass", ".study", ".contr", ".omega"))
     badvars <- setdiff(regvars, colnames(data))
@@ -2961,10 +3255,21 @@ get_model_data_columns <- function(data, regression = NULL, label = NULL, keep =
                    " not found", label, ".")
       )
     }
-    out <- dplyr::select(data, dplyr::starts_with("."), !! regvars, !! keep)
-  } else {
-    out <- dplyr::select(data, dplyr::starts_with("."), !! keep)
   }
+
+  if (!is.null(aux_regression)) {
+    auxregvars <- setdiff(all.vars(aux_regression), c(".trt", ".trtclass", ".study", ".contr", ".omega"))
+    badvars <- setdiff(auxregvars, colnames(data))
+    if (length(badvars)) {
+      abort(
+        glue::glue("Auxiliary regression variable{if (length(badvars) > 1) 's' else ''} ",
+                   glue::glue_collapse(glue::double_quote(badvars), sep = ", ", last = " and "),
+                   " not found", label, ".")
+      )
+    }
+  }
+
+  out <- dplyr::select(data, dplyr::starts_with("."), !! regvars, !! auxregvars, !! keep)
 
   # Work around dplyr::bind_rows() bug - convert .Surv column to bare matrix if present
   if (rlang::has_name(out, ".Surv")) out$.Surv <- as.matrix(out$.Surv)
@@ -3093,7 +3398,8 @@ prior_standat <- function(x, par, valid){
                   `Student t` = , `half-Student t` = 3,
                   Exponential = 4,
                   `log-Normal` = 5,
-                  `log-Student t` = 6)
+                  `log-Student t` = 6,
+                  Gamma = 7)
 
   out <- purrr::list_modify(c(x), dist = distn, fun = purrr::zap())
   # Set unnecessary (NA) parameters to zero. These will be ignored by Stan, but
@@ -3291,6 +3597,13 @@ get_aux_by_data <- function(data, by, add_study = TRUE) {
   )
 }
 
+#' Determine whether auxiliary parameters need to be integrated over based on
+#' aux_regression and aux_by
+#' @noRd
+aux_needs_integration <- function(aux_regression, aux_by) {
+  (!is.null(aux_regression) && length(setdiff(colnames(attr(terms(aux_regression), "factor")), c(".study", ".trt", ".trtclass"))) > 0) ||
+    (!is.null(aux_by) && length(setdiff(aux_by, c(".study", ".trt", ".trtclass"))) > 0)
+}
 rename_trt_class <- function(fnames, pattern, vector_levels) {
   # Find the names in fnames that match the pattern
   matching_indices <- grep(pattern, fnames)

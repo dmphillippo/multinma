@@ -16,6 +16,9 @@
 
 \item{n}{number of studies of each type to print}
 }
+\value{
+\code{x} is returned invisibly.
+}
 \description{
 Print details of networks stored as \link{nma_data} objects, as created by
 \code{\link[=set_ipd]{set_ipd()}}, \code{\link[=set_agd_arm]{set_agd_arm()}}, \code{\link[=set_agd_contrast]{set_agd_contrast()}}, \code{\link[=set_agd_surv]{set_agd_surv()}}, or

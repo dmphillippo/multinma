@@ -27,7 +27,7 @@ jobs:
       _R_CHECK_DONTTEST_EXAMPLES_: false
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -39,7 +39,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
+          extra-packages: any::V8, any::rcmdcheck
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2

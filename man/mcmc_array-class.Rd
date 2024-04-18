@@ -5,6 +5,7 @@
 \alias{mcmc_array}
 \alias{summary.mcmc_array}
 \alias{print.mcmc_array}
+\alias{plot.mcmc_array}
 \alias{names.mcmc_array}
 \alias{names<-.mcmc_array}
 \title{Working with 3D MCMC arrays}
@@ -12,6 +13,8 @@
 \method{summary}{mcmc_array}(object, ..., probs = c(0.025, 0.25, 0.5, 0.75, 0.975))
 
 \method{print}{mcmc_array}(x, ...)
+
+\method{plot}{mcmc_array}(x, ...)
 
 \method{names}{mcmc_array}(x)
 
@@ -30,7 +33,8 @@
 The \code{summary()} method returns a \link{nma_summary} object, the \code{print()}
 method returns \code{x} invisibly. The \code{names()} method returns a character
 vector of parameter names, and \verb{names()<-} returns the object with updated
-parameter names.
+parameter names. The \code{plot()} method is a shortcut for
+\code{plot(summary(x), ...)}, passing all arguments on to \code{\link[=plot.nma_summary]{plot.nma_summary()}}.
 }
 \description{
 3D MCMC arrays (Iterations, Chains, Parameters) are produced by \code{as.array()}

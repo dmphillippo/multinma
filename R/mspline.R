@@ -229,7 +229,288 @@ mean_mspline <- function(basis, scoef, rate, ...) {
   rmst_mspline(t = Inf, basis, scoef, rate)
 }
 
-# Function to check for mspline/ispline objects
+# Check for mspline/ispline objects
+#' @param x Object to check is MSpline class
+#' @return logical
+#' @noRd
 is_mspline <- function(x) {
   inherits(x, "MSpline")
+}
+
+# Create a (logit scale) coefficient vector corresponding to a constant hazard
+#' @param basis A M-spline basis created using splines2::mSpline()
+#' @return Coefficient vector
+#' @noRd
+mspline_constant_hazard <- function(basis) {
+  if (!is_mspline(basis)) abort("`basis` must be an M-spline basis created using splines2::mSpline()")
+
+  df <- ncol(basis)
+  ord <- attr(basis, "degree") + 1
+  iknots <- attr(basis, "knots")
+  bknots <- attr(basis, "Boundary.knots")
+
+  # Using approach of Jackson arXiv:2306.03957
+  knots <- c(rep(bknots[1], ord), iknots, rep(bknots[2], ord))
+  coefs <- (knots[(1:df) + ord] - knots[1:df]) / (ord * (diff(bknots)))
+
+  # inverse softmax transform
+  inv_softmax(coefs)
+}
+
+#' Create a vector of (normalised) weights for a RW(1) prior on an M-spline with
+#' unequally spaced knots
+#' @param basis M-spline basis created using splines2::mSpline()
+#' @return Vector of normalised weights
+#' @noRd
+rw1_prior_weights <- function(basis) {
+  nscoef <- ncol(basis)
+  ord <- attr(basis, "degree") + 1
+  iknots <- attr(basis, "knots")
+  bknots <- attr(basis, "Boundary.knots")
+  knots <- c(rep(bknots[1], ord), iknots, rep(bknots[2], ord))
+  if (ord == 1) {
+    wts <- (knots[2:nscoef] - knots[1:(nscoef - 1)]) / (knots[nscoef] - bknots[1])
+  } else {
+    wts <- (knots[(ord + 1):(nscoef + ord - 1)] - knots[2:nscoef]) / ((ord - 1) * (bknots[2] - bknots[1]))
+  }
+  return(sqrt(wts))
+}
+
+#' softmax transform
+#' @param x K-1 vector of reals
+#' @return K vector simplex
+#' @noRd
+softmax <- function(x) {
+  x0 <- c(0, x)
+  exp(x0 - logsumexp(x0))
+}
+
+logsumexp <- function(x) {
+  maxx <- max(x)
+  max(x) + log(sum(exp(x - maxx)))
+}
+
+#' inverse softmax transform
+#' @param p K vector simplex
+#' @return K-1 vector of reals
+#' @noRd
+inv_softmax <- function(p) {
+  log(p[-1]) - log(p[1])
+}
+
+
+#' Knot locations for M-spline baseline hazard models
+#'
+#' Several different algorithms are provided to calculate knot locations for
+#' M-spline baseline hazard models. This function is called internally within
+#' the [nma()] function, but may be called directly by the user for more
+#' control.
+#'
+#' @param network A network object, containing survival outcomes
+#' @param n_knots Non-negative integer giving the number of internal knots
+#'   (default `7`)
+# #' @param degree Non-negative integer giving the degree of the M-spline
+# #'   polynomial (default `3`)
+#' @param type String specifying the knot location algorithm to use (see
+#'   details). The default used by [nma()] is `"quantile"`, except when a
+#'   regression model is specified (using `aux_regression`) in which case the
+#'   default is `"quantile_common"`.
+#'
+#' @details The `type` argument can be used to choose between different
+#'   algorithms for placing the knots:
+#'
+#' \describe{
+#'   \item{`"quantile"`}{Creates separate knot locations for each study,
+#'   internal knots are placed at evenly-spaced quantiles of the observed event
+#'   times within each study.}
+#'   \item{`"quantile_lumped"`}{Creates a common set of knots for all studies,
+#'   calculated as evenly-spaced quantiles of the observed event times from all
+#'   studies lumped together.}
+#'   \item{`"quantile_common"`}{Creates a common set of knots for all studies,
+#'   taking quantiles of the quantiles of the observed event times within each
+#'   study. This often seems to result in a more even knot spacing than
+#'   `"quantile_lumped"`, particularly when follow-up is uneven across studies,
+#'   and may handle differing behaviour in the baseline hazard across studies
+#'   better than `"quantile_longest"`.}
+#'   \item{`"quantile_longest"`}{Creates a common set of knots for all studies,
+#'   using evenly-spaced quantiles of the observed event times in the longest
+#'   study.}
+#'   \item{`"equal"`}{Creates separate knot locations for each study, at
+#'   evenly-spaced times between the boundary knots in each study.}
+#'   \item{`"equal_common"`}{Creates a common set of knots for all studies, at
+#'   evenly-spaced times between the earliest entry time and last
+#'   event/censoring time in the network.}
+#' }
+#'
+#' Boundary knots are calculated as follows:
+#'
+#' * For separate knot locations in each study, boundary knots are placed at the
+#' earliest entry time and last event/censoring time in each study.
+#' * For a common set of knots across all studies, boundary knots are placed at
+#' the earliest entry time and last event/censoring time across all studies.
+#'
+#' Models with regression on the spline coefficients (i.e. with `aux_regression`
+#' specified) require a common set of knots across all studies.
+#'
+#' Provided that a sufficient number of knots are used, model fit should be
+#' largely unaffected by the knot locations. However, sampling difficulties can
+#' sometimes occur if knot placement is poor, for example if a knot is placed
+#' just before the last follow-up time in a study.
+#'
+#' @return A named list of vectors giving the knot locations in each study.
+#' @export
+#'
+#' @template ex_ndmm_network
+#' @examples
+#'
+#' # The default knot locations
+#' make_knots(ndmm_net, type = "quantile")
+#'
+#' # Increasing the number of knots
+#' make_knots(ndmm_net, n_knots = 10)
+#'
+#' # Comparing alternative knot positioning algorithms
+#' # Visualise these with a quick function
+#' plot_knots <- function(network, knots) {
+#'   ggplot2::ggplot() +
+#'     geom_km(network) +
+#'     ggplot2::geom_vline(ggplot2::aes(xintercept = .data$knot),
+#'                         data = tidyr::pivot_longer(as.data.frame(knots), cols = dplyr::everything(),
+#'                                                    names_to = "Study", values_to = "knot"),
+#'                         linetype = 2, colour = "grey60") +
+#'     ggplot2::facet_wrap(~Study) +
+#'     theme_multinma()
+#' }
+#'
+#' plot_knots(ndmm_net, make_knots(ndmm_net, type = "quantile"))
+#' plot_knots(ndmm_net, make_knots(ndmm_net, type = "quantile_common"))
+#' plot_knots(ndmm_net, make_knots(ndmm_net, type = "quantile_lumped"))
+#' plot_knots(ndmm_net, make_knots(ndmm_net, type = "quantile_longest"))
+#' plot_knots(ndmm_net, make_knots(ndmm_net, type = "equal"))
+#' plot_knots(ndmm_net, make_knots(ndmm_net, type = "equal_common"))
+#'
+make_knots <- function(network,
+                       n_knots = 7,
+                       type = c("quantile",
+                                "quantile_common",
+                                "quantile_lumped",
+                                "quantile_longest",
+                                "equal",
+                                "equal_common")) {
+
+  # Argument checks
+  if (!inherits(network, "nma_data"))
+    abort("`network` must be an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
+
+  if (!(identical(network$outcome$ipd, "survival") || identical(network$outcome$agd_arm, "survival")))
+    abort("`network` does not contain survival outcomes.")
+
+  if (!rlang::is_scalar_integerish(n_knots, finite = TRUE) || n_knots < 1)
+    abort("`n_knots` must be a positive integer giving the number of internal knots.")
+
+  type <- rlang::arg_match(type)
+
+  # Get survival data
+  survdat <- dplyr::bind_rows(
+    if (has_ipd(network)) dplyr::select(network$ipd, ".study", ".trt", ".Surv") else NULL,
+    if (has_agd_arm(network)) dplyr::select(network$agd_arm, ".study", ".trt", ".Surv") %>% tidyr::unnest(cols = ".Surv") else NULL
+  )
+
+  survdat <- dplyr::mutate(survdat,
+                           !!! get_Surv_data(survdat$.Surv),
+                           observed = .data$status == 1)
+
+  observed_survdat <- dplyr::filter(survdat, .data$observed)
+
+  studies <- unique(survdat$.study)
+  n_studies <- length(studies)
+
+  # Calculate knots
+  if (type == "quantile") {
+
+    # Boundary knots
+    b_knots <- by(survdat, survdat$.study, function(x) c(min(x$delay_time), max(x$time)),
+                  simplify = FALSE)
+
+    # Internal knots
+    i_knots <- by(observed_survdat, observed_survdat$.study,
+                  function(x) quantile(x$time, probs = seq(1, n_knots) / (n_knots + 1)),
+                  simplify = FALSE)
+
+  } else if (type == "quantile_common") {
+
+    # Boundary knots
+    b_knots <- c(min(survdat$delay_time), max(survdat$time))
+    b_knots <- rep_len(list(b_knots), n_studies)
+    names(b_knots) <- studies
+
+    # Internal knots
+    # Take quantiles of knots and boundary knots in individual studies
+    temp_b_knots <- by(survdat, survdat$.study, function(x) c(min(x$delay_time), max(x$time)),
+                       simplify = FALSE)
+
+    temp_i_knots <- by(observed_survdat, observed_survdat$.study,
+                       function(x) quantile(x$time, probs = seq(1, n_knots) / (n_knots + 1)),
+                       simplify = FALSE)
+
+    i_knots <- quantile(c(unlist(temp_i_knots), unlist(temp_b_knots)), probs = seq(0, 1, length.out = n_knots+2))[2:(n_knots+1)]
+    i_knots <- rep_len(list(i_knots), n_studies)
+    names(i_knots) <- studies
+
+  } else if (type == "quantile_lumped") {
+
+    # Boundary knots
+    b_knots <- c(min(survdat$delay_time), max(survdat$time))
+    b_knots <- rep_len(list(b_knots), n_studies)
+    names(b_knots) <- studies
+
+    # Internal knots
+    i_knots <- quantile(observed_survdat$time, probs = seq(1, n_knots) / (n_knots + 1))
+    i_knots <- rep_len(list(i_knots), n_studies)
+    names(i_knots) <- studies
+
+  } else if (type == "quantile_longest") {
+
+    # Boundary knots
+    b_knots <- c(min(survdat$delay_time), max(survdat$time))
+    b_knots <- rep_len(list(b_knots), n_studies)
+    names(b_knots) <- studies
+
+    # Find study with longest follow-up
+    fu <- by(survdat, survdat$.study, function(x) max(x$time) - min(x$delay_time), simplify = TRUE)
+    max_fu <- names(which.max(fu))
+
+    # Internal knots
+    i_knots <- quantile(dplyr::filter(observed_survdat, .data$.study == max_fu)$time, probs = seq(1, n_knots) / (n_knots + 1))
+    i_knots <- rep_len(list(i_knots), n_studies)
+    names(i_knots) <- studies
+
+  } else if (type == "equal") {
+
+    # Boundary knots
+    b_knots <- by(survdat, survdat$.study, function(x) c(min(x$delay_time), max(x$time)),
+                  simplify = FALSE)
+
+    # Internal knots
+    i_knots <- by(survdat, survdat$.study,
+                  function(x) seq(from = min(x$delay_time), to = max(x$time), length.out = n_knots+2)[2:(n_knots+1)],
+                  simplify = FALSE)
+
+  } else if (type == "equal_common") {
+
+    # Boundary knots
+    b_knots <- c(min(survdat$delay_time), max(survdat$time))
+    b_knots <- rep_len(list(b_knots), n_studies)
+    names(b_knots) <- studies
+
+    # Internal knots
+    i_knots <- seq(from = min(survdat$delay_time), to = max(survdat$time), length.out = n_knots+2)[2:(n_knots+1)]
+    i_knots <- rep_len(list(i_knots), n_studies)
+    names(i_knots) <- studies
+  }
+
+  # Combine boundary and internal knots
+  out <- purrr::map2(b_knots, i_knots, ~ c(.x[1], .y, .x[2]))
+
+  return(out)
 }

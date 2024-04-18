@@ -53,12 +53,15 @@ summary(half_normal(scale = 5))
 ##                      prior_het = half_normal(scale = 5))
 
 ## ---- echo = FALSE------------------------------------------------------------
-bcg_fit_unadj <- nma(bcg_net, 
-                     seed = 14308133,
-                     trt_effects = "random",
-                     prior_intercept = normal(scale = 100),
-                     prior_trt = normal(scale = 100),
-                     prior_het = half_normal(scale = 5))
+bcg_fit_unadj <- nowarn_on_ci(
+  nma(bcg_net, 
+      seed = 14308133,
+      iter = 10000,
+      trt_effects = "random",
+      prior_intercept = normal(scale = 100),
+      prior_trt = normal(scale = 100),
+      prior_het = half_normal(scale = 5))
+  )
 
 
 ## -----------------------------------------------------------------------------
@@ -93,6 +96,7 @@ summary(half_normal(scale = 5))
 bcg_fit_lat <- nowarn_on_ci(
                  nma(bcg_net, 
                      seed = 1932599147,
+                     iter = 5000,
                      trt_effects = "random",
                      regression = ~.trt:latitude,
                      prior_intercept = normal(scale = 100),
@@ -295,16 +299,21 @@ test_that("Relative effects and predict work with data.frame", {
   new <- tibble::tibble(latitude = seq(10, 50, by = 10), label = paste0(latitude, "\u00B0 latitude"))
   expect_identical(relative_effects(bcg_fit_lat, newdata = new, study = label),
                    relative_effects(bcg_fit_lat, newdata = as.data.frame(new), study = label))
+  
   # For predict() we need to account for the random baseline sample
-  # expect_identical(withr::with_seed(predict(bcg_fit_lat, newdata = new, study = label,
-  #                                           baseline = distr(qnorm, mean = -2, sd = 0.1)), seed = 1234),
-  #                  withr::with_seed(predict(bcg_fit_lat, newdata = as.data.frame(new), study = label,
-  #                                           baseline = distr(qnorm, mean = -2, sd = 0.1)), seed = 1234))
   qcons <- function(p, cons = 0) {cons}
+  
   expect_identical(predict(bcg_fit_lat, newdata = new, study = label,
                            baseline = distr(qcons, -2)),
                    predict(bcg_fit_lat, newdata = as.data.frame(new), study = label,
                            baseline = distr(qcons, -2)))
+  
+  expect_identical(predict(bcg_fit_lat, newdata = new, study = label,
+                           baseline = distr(qcons, 0.5),
+                           baseline_type = "response"),
+                   predict(bcg_fit_lat, newdata = as.data.frame(new), study = label,
+                           baseline = distr(qcons, 0.5),
+                           baseline_type = "response"))
 })
 
 test_that("Predictions using network baselines are correct", {

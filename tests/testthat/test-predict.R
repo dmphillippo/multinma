@@ -266,7 +266,7 @@ ndmm_fit_mspline <- suppressWarnings(nma(ndmm_net,
                                          likelihood = "mspline",
                                          prior_intercept = normal(0, 100),
                                          prior_trt = normal(0, 10),
-                                         prior_aux = dirichlet(1),
+                                         prior_aux = half_normal(1),
                                          iter = 10))
 
 ndmm_preddat <- dplyr::bind_rows(
@@ -1005,7 +1005,7 @@ ndmm_fit_mspline_reg <- suppressWarnings(nma(ndmm_net,
                                              prior_intercept = normal(0, 100),
                                              prior_trt = normal(0, 10),
                                              prior_reg = normal(0, 10),
-                                             prior_aux = dirichlet(1),
+                                             prior_aux = half_normal(1),
                                              iter = 10))
 
 

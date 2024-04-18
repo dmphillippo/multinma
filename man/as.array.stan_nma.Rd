@@ -3,12 +3,18 @@
 \name{as.array.stan_nma}
 \alias{as.array.stan_nma}
 \alias{as.data.frame.stan_nma}
+\alias{as_tibble.stan_nma}
+\alias{as.tibble.stan_nma}
 \alias{as.matrix.stan_nma}
 \title{Convert samples into arrays, matrices, or data frames}
 \usage{
 \method{as.array}{stan_nma}(x, ..., pars, include = TRUE)
 
 \method{as.data.frame}{stan_nma}(x, ..., pars, include = TRUE)
+
+\method{as_tibble}{stan_nma}(x, ..., pars, include = TRUE)
+
+\method{as.tibble}{stan_nma}(x, ..., pars, include = TRUE)
 
 \method{as.matrix}{stan_nma}(x, ..., pars, include = TRUE)
 }

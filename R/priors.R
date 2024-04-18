@@ -6,7 +6,6 @@
 #' @param scale Prior scale. Typically prior standard deviation (see details).
 #' @param df Prior degrees of freedom.
 #' @param rate Prior rate.
-#' @param shape Prior shape.
 # #' @param lower,upper Lower and upper bounds for a uniform prior distribution.
 #'
 #' @rdname priors
@@ -41,7 +40,6 @@
 #' | \strong{half-Student t} `half_student_t()` | - | - | Yes | - | Yes |
 #' | \strong{log-Student t} `log_student_t()` | - | - | Yes | - | Yes |
 #' | \strong{Exponential} `exponential()` | - | - | Yes | - | Yes |
-#' | \strong{Dirichlet} `dirichlet()` | - | - | - | - | Yes |
 #' | \strong{Flat} `flat()` | Yes | Yes | Yes | Yes | Yes |
 #'
 #' The `flat()` prior is a special case where no prior information is added to
@@ -50,15 +48,6 @@
 #' parameter is unbounded, and is not generally advised. See the
 #' [Stan user's guide](https://mc-stan.org/docs/stan-users-guide/some-differences-in-the-statistical-models-that-are-allowed.html)
 #' for more details.
-#'
-#' The `dirichlet()` prior is currently only used as a prior distribution for
-#' the spline coefficients in `mspline` or `pexp` models, which form an
-#' \eqn{L}-dimensional unit simplex (i.e. lie between 0 and 1, and sum to 1).
-#' The `shape` parameter controls the concentration, with `shape=1`
-#' corresponding to a uniform prior over all simplexes. Values of `shape`
-#' \eqn{<1} concentrate the prior mass into the corners of the simplex, with one
-#' dimension close to 1 and the rest close to zero; values of `shape` \eqn{>1}
-#' increasingly concentrate all dimensions towards the prior mean \eqn{1/L}.
 #'
 #' @return Object of class [nma_prior].
 #' @export
@@ -155,14 +144,6 @@ flat <- function() {
   return(new_nma_prior("flat (implicit)"))
 }
 
-#' @rdname priors
-#' @export
-dirichlet <- function(shape = 1) {
-  check_prior_scale(shape, type = "shape")
-
-  return(new_nma_prior("Dirichlet", shape = shape))
-}
-
 # #' @rdname priors
 # #' @export
 # uniform <- function(lower, upper) {
@@ -208,12 +189,10 @@ new_nma_prior <- function(dist, location = NA_real_, scale = NA_real_, df = NA_r
 #' @param prior A nma_prior object
 #' @param trunc Optional vector of truncation limits
 #' @param ... Not used
-#' @param n_dim Prior dimension. Currently only used for Dirichlet priors to
-#'   construct the marginal distributions.
 #'
 #' @return A data frame
 #' @noRd
-get_tidy_prior <- function(prior, trunc = NULL, ..., n_dim) {
+get_tidy_prior <- function(prior, trunc = NULL, ...) {
   if (!inherits(prior, "nma_prior"))
     abort("Not a `nma_prior` object.")
   if (!is.null(trunc) && (!rlang::is_double(trunc, n = 2) || trunc[2] <= trunc[1]))
@@ -267,11 +246,6 @@ get_tidy_prior <- function(prior, trunc = NULL, ..., n_dim) {
     out <- tibble::tibble(dist_label = d,
                           dist = "exp",
                           args = list(list(rate = 1 / prior$scale)))
-  } else if (d == "Dirichlet") {
-    if (missing(n_dim)) abort("Provide `n_dim`, the number of dimensions for the Dirichlet prior.")
-    out <- tibble::tibble(dist_label = d,
-                          dist = "beta",
-                          args = list(list(shape1 = prior$shape, shape2 = (n_dim - 1)*prior$shape)))
   } else if (d == "flat (implicit)") {
     out <- tibble::tibble(dist_label = d,
                           dist = "unif",

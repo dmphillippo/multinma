@@ -6,9 +6,9 @@ data {
 #include /include/data_common.stan
 
   // Outcomes
-  int<lower=0> ipd_r[ni_ipd];
+  array[ni_ipd] int<lower=0> ipd_r;
   vector<lower=0>[ni_ipd] ipd_E;
-  int<lower=0> agd_arm_r[ni_agd_arm];
+  array[ni_agd_arm] int<lower=0> agd_arm_r;
   vector<lower=0>[ni_agd_arm] agd_arm_E;
 }
 transformed data {

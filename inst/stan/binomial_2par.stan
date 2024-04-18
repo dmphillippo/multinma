@@ -6,9 +6,9 @@ data {
 #include /include/data_common.stan
 
   // Outcomes
-  int<lower=0, upper=1> ipd_r[ni_ipd];
-  int<lower=0> agd_arm_n[ni_agd_arm];
-  int<lower=0> agd_arm_r[ni_agd_arm];
+  array[ni_ipd] int<lower=0, upper=1> ipd_r;
+  array[ni_agd_arm] int<lower=0> agd_arm_n;
+  array[ni_agd_arm] int<lower=0> agd_arm_r;
 }
 transformed data {
 #include /include/transformed_data_common.stan
@@ -18,8 +18,8 @@ parameters {
 }
 transformed parameters {
   vector[ni_agd_arm] theta2_agd_arm_bar;
-  real<lower=0> nprime[ni_agd_arm];
-  real<lower=0, upper=1> pprime[ni_agd_arm];
+  array[ni_agd_arm] real<lower=0> nprime;
+  array[ni_agd_arm] real<lower=0, upper=1> pprime;
 #include /include/transformed_parameters_theta.stan
 #include /include/transformed_parameters_common.stan
 

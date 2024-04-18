@@ -66,6 +66,8 @@ NULL
 #' @param ... other options (not used)
 #' @param n number of studies of each type to print
 #'
+#' @return `x` is returned invisibly.
+#'
 #' @export
 print.nma_data <- function(x, ..., n = 10) {
   cwidth <- getOption("width")
@@ -211,25 +213,25 @@ subtle <- function(...) {
   if (require_pkg("crayon", error = FALSE))
     return(crayon::silver(...))
   else
-    return(...)
+    return(paste0(...))
 }
 bold <- function(...) {
   if (require_pkg("crayon", error = FALSE))
     return(crayon::bold(...))
   else
-    return(...)
+    return(paste0(...))
 }
 red <- function(...) {
   if (require_pkg("crayon", error = FALSE))
     return(crayon::red(...))
   else
-    return(...)
+    return(paste0(...))
 }
 green <- function(...) {
   if (require_pkg("crayon", error = FALSE))
     return(crayon::green(...))
   else
-    return(...)
+    return(paste0(...))
 }
 
 #' Convert networks to graph objects
@@ -357,6 +359,10 @@ as_tbl_graph.nma_data <- function(x, ...) {
 #'
 #' @noRd
 make_contrasts <- function(trt) {
+  if (length(trt) < 2) {
+    return(dplyr::tibble(.trt = trt, .trt_b = trt))
+  }
+
   contrs <- utils::combn(sort(trt), 2)
   return(dplyr::tibble(.trt = contrs[2,],
                        .trt_b = contrs[1,]))
@@ -381,17 +387,33 @@ get_default_trt_ref <- function(network, ...) {
     abort("Empty network.")
   }
 
-  # g_c <- igraph::as.igraph(x)
+  # Prefer longer follow-up for survival outcomes
+  surv_dat <- dplyr::bind_rows(
+    if (identical(network$outcome$ipd, "survival")) dplyr::select(network$ipd, ".trt", ".Surv") else NULL,
+    if (identical(network$outcome$agd_arm, "survival")) tidyr::unnest(network$agd_arm, cols = ".Surv") %>% dplyr::select(".trt", ".Surv") else NULL
+  )
+
+  if (nrow(surv_dat) < 1) {
+    max_fu <- 0
+  } else {
+    max_fu <- dplyr::mutate(surv_dat, !!! get_Surv_data(surv_dat$.Surv)) %>%
+      dplyr::group_by(.data$.trt) %>%
+      dplyr::summarise(max_fu = max(.data$time)) %>%
+      dplyr::pull("max_fu")
+  }
+
   g_nc <- igraph::as.igraph(network, collapse = FALSE)
 
   nodes <-
     tibble::tibble(
       .trt = network$treatments,
       degree = igraph::degree(g_nc),
-      betweenness = igraph::betweenness(g_nc)
+      betweenness = igraph::betweenness(g_nc),
+      max_fu = max_fu
     ) %>%
     dplyr::arrange(dplyr::desc(.data$degree),
                    dplyr::desc(.data$betweenness),
+                   dplyr::desc(.data$max_fu),
                    .data$.trt)
 
   return(as.character(nodes[[1, ".trt"]]))
@@ -629,9 +651,9 @@ has_indirect <- function(network, trt1, trt2) {
 
   # Create network with studies on both trt1 and trt2 removed
   studies <- dplyr::bind_rows(
-    network$agd_arm,
+    if (identical(network$outcome$agd_arm, "survival")) dplyr::select(network$agd_arm, -.data$.Surv) else network$agd_arm,
     network$agd_contrast,
-    network$ipd
+    if (identical(network$outcome$ipd, "survival")) dplyr::select(network$ipd, -.data$.Surv) else network$ipd
   ) %>%
     dplyr::distinct(.data$.study, .data$.trt)
 
