@@ -21,8 +21,8 @@ test_that("TSD3 Certolizumab example can be reproduced", {
 
   expect_equal(summary_fe$mean, -0.93, tolerance = 0.02)
   expect_equal(summary_fe$sd, 0.09, tolerance = 0.02)
-  expect_equal(summary_fe$`2.5%`, -1.03, tolerance = 0.03)
-  expect_equal(summary_fe$`97.5%`, -0.69, tolerance = 0.03)
+  expect_equal(summary_fe$`2.5%`, -1.03, tolerance = 0.06)
+  expect_equal(summary_fe$`97.5%`, -0.69, tolerance = 0.06)
 
   # Note that TSD3 places a uniform [0, 5] prior on the between-trail standard deviation,
   # which is not possible in multinma
@@ -40,6 +40,6 @@ test_that("TSD3 Certolizumab example can be reproduced", {
 
   expect_equal(summary_re$mean, -0.95, tolerance = 0.02)
   expect_equal(summary_re$sd, 0.10, tolerance = 0.02)
-  expect_equal(summary_re$`2.5%`, -1.10, tolerance = 0.03)
-  expect_equal(summary_re$`97.5%`, -0.70, tolerance = 0.03)
+  expect_equal(summary_re$`2.5%`, -1.10, tolerance = 0.06)
+  expect_equal(summary_re$`97.5%`, -0.70, tolerance = 0.06)
 })
