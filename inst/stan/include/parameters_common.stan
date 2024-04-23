@@ -5,5 +5,3 @@ vector[nX] beta_tilde;
 // (Uncorrelated) random effects and heterogeneity SD
 vector[n_delta] u_delta;
 vector<lower = 0>[RE ? 1 : 0] tau;
-
-vector[baseline_risk_flag ? 1 : 0] beta_baseline_risk;

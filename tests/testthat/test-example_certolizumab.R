@@ -1,23 +1,18 @@
 test_that("TSD3 Certolizumab example can be reproduced", {
   net <- set_agd_arm(certolizumab, study = study, trt = trt, n = n, r = r)
 
-  baseline_risk <- -2.421
-
-  expect_equal(
-    calculate_baseline_risk(net, "logit"), baseline_risk,
-    tolerance = 0.001
-  )
-
   fit_fe <- nma(
     net,
-    baseline_risk = plogis(baseline_risk),
+    regression = ~.mu,
     prior_intercept = normal(scale = sqrt(1000)),
     prior_trt = normal(scale = 100),
-    prior_br = normal(scale = 100),
+    prior_reg = normal(scale = 100),
     seed = 641
   )
 
-  summary_fe <- as.data.frame(summary(fit_fe, pars = "beta_baseline_risk"))
+  expect_equal(fit_fe$xbar[[".mu"]], -2.421)
+
+  summary_fe <- as.data.frame(summary(fit_fe, pars = "beta"))
 
   expect_equal(summary_fe$mean, -0.93, tolerance = 0.02)
   expect_equal(summary_fe$sd, 0.09, tolerance = 0.02)
@@ -29,14 +24,16 @@ test_that("TSD3 Certolizumab example can be reproduced", {
   fit_re <- nma(
     net,
     trt_effects = "random",
-    baseline_risk = plogis(baseline_risk),
+    regression = ~.mu,
     prior_intercept = normal(scale = sqrt(1000)),
     prior_trt = normal(scale = 100),
-    prior_br = normal(scale = 100),
+    prior_reg = normal(scale = 100),
     seed = 970
   )
 
-  summary_re <- as.data.frame(summary(fit_re, pars = "beta_baseline_risk"))
+  expect_equal(fit_re$xbar[[".mu"]], -2.421)
+
+  summary_re <- as.data.frame(summary(fit_re, pars = "beta"))
 
   expect_equal(summary_re$mean, -0.95, tolerance = 0.02)
   expect_equal(summary_re$sd, 0.10, tolerance = 0.02)

@@ -12,9 +12,6 @@
 #'   effect-modifying terms for a regression model. Any references to treatment
 #'   should use the `.trt` special variable, for example specifying effect
 #'   modifier interactions as `variable:.trt` (see details).
-#' @param baseline_risk Set to `TRUE` to fit a meta-regression on the baseline risk.
-#'   The baseline risk for centering purposed will be calculated from the network data.
-#'   The baseline risk can also be set manually by passing a numeric scalar.
 #' @param class_interactions Character string specifying whether effect modifier
 #'   interactions are specified as `"common"`, `"exchangeable"`, or
 #'   `"independent"`.
@@ -40,8 +37,6 @@
 #'   precision \eqn{1/\tau^2} (`"prec"`).
 #' @param prior_reg Specification of prior distribution for the regression
 #'   coefficients (if `regression` formula specified)
-#' @param prior_br Specification of prior distribution for the baseline risk
-#'   meta-regression coefficient (if `baseline_risk` specified).
 #' @param prior_aux Specification of prior distribution for the auxiliary
 #'   parameter, if applicable (see details). For `likelihood = "gengamma"` this
 #'   should be a list of prior distributions with elements `sigma` and `k`.
@@ -267,7 +262,6 @@ nma <- function(network,
                 consistency = c("consistency", "ume", "nodesplit"),
                 trt_effects = c("fixed", "random"),
                 regression = NULL,
-                baseline_risk = NULL,
                 class_interactions = c("common", "exchangeable", "independent"),
                 likelihood = NULL,
                 link = NULL,
@@ -278,7 +272,6 @@ nma <- function(network,
                 prior_het = .default(half_normal(scale = 5)),
                 prior_het_type = c("sd", "var", "prec"),
                 prior_reg = .default(normal(scale = 10)),
-                prior_br = .default(normal(scale = 10)),
                 prior_aux = .default(),
                 prior_aux_reg = .default(),
                 aux_by = NULL,
@@ -395,7 +388,6 @@ nma <- function(network,
                          prior_het = prior_het,
                          prior_het_type = prior_het_type,
                          prior_reg = prior_reg,
-                         prior_br = prior_br,
                          prior_aux = prior_aux,
                          prior_aux_reg = prior_aux_reg,
                          aux_by = aux_by,
@@ -523,8 +515,6 @@ nma <- function(network,
     prior_defaults$prior_het <- get_prior_call(prior_het)
   if (!is.null(regression) && !is_only_offset(regression) && .is_default(prior_reg))
     prior_defaults$prior_reg <- get_prior_call(prior_reg)
-  if (!is.null(baseline_risk) && .is_default(prior_br))
-    prior_defaults$prior_br <- get_prior_call(prior_br)
   if (has_aux && .is_default(prior_aux)) {
     if (likelihood == "normal" && has_ipd(network)) {
       prior_aux <- .default(half_normal(scale = 5))
@@ -566,6 +556,16 @@ nma <- function(network,
       int_thin < 0) abort("`int_thin` should be an integer >= 0.")
   if (!rlang::is_bool(int_check)) abort("`int_check` should be a logical scalar (TRUE or FALSE).")
   if (int_thin > 0) int_check <- FALSE
+
+  if (".mu" %in% all.vars(regression)) {
+    if (QR) {
+      abort("Cannot fit model with baseline risk meta-regression and QR.")
+    }
+
+    if (!(likelihood %in% c("bernoulli", "binomial", "ordered", "normal"))) {
+      abort(glue::glue("Baseline risk meta-regression not yet supported with likelihood '{likelihood}'."))
+    }
+  }
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
@@ -806,6 +806,9 @@ nma <- function(network,
     if (!is.null(regression)) {
       reg_names <- all.vars(regression)
 
+      # Centering of the baseline risk is dealt with separately (`xbar_mu`)
+      reg_names <- setdiff(reg_names, ".mu")
+
       # Ignore any variable(s) used as offset(s)
       reg_terms <- terms(regression)
 
@@ -834,6 +837,8 @@ nma <- function(network,
   } else {
     xbar <- NULL
   }
+
+  xbar_mu <- if (".mu" %in% all.vars(regression)) calculate_baseline_risk(network, link)
 
   # Make NMA formula
   nma_formula <- make_nma_formula(regression,
@@ -899,22 +904,6 @@ nma <- function(network,
   } else {
     .RE_cor <- NULL
     .which_RE <- NULL
-  }
-
-  if (!is.null(baseline_risk) && !isFALSE(baseline_risk)) {
-    if (!(likelihood %in% c("bernoulli", "binomial", "ordered", "normal"))) {
-      abort(glue::glue("Baseline risk meta-regression not yet supported with likelihood '{likelihood}'."))
-    }
-    if (is.numeric(baseline_risk)) {
-      baseline_risk <- link_fun(baseline_risk, link)
-    } else {
-      if (!isTRUE(baseline_risk)) {
-        abort("`baseline_risk` should be a single logical or numeric value.")
-      }
-      baseline_risk <- calculate_baseline_risk(network, link)
-    }
-  } else {
-    baseline_risk <- FALSE
   }
 
   # Set up spline basis for mspline and pexp models
@@ -1080,7 +1069,7 @@ nma <- function(network,
     agd_arm_offset = offset_agd_arm,
     agd_contrast_offset = offset_agd_contrast,
     trt_effects = trt_effects,
-    baseline_risk = baseline_risk,
+    xbar_mu = xbar_mu,
     RE_cor = .RE_cor,
     which_RE = .which_RE,
     likelihood = likelihood,
@@ -1092,7 +1081,6 @@ nma <- function(network,
     prior_het = prior_het,
     prior_het_type = prior_het_type,
     prior_reg = prior_reg,
-    prior_br = prior_br,
     prior_aux = prior_aux,
     prior_aux_reg = prior_aux_reg,
     aux_id = aux_id,
@@ -1247,9 +1235,8 @@ nma <- function(network,
               consistency = consistency,
               regression = regression,
               aux_regression = aux_regression,
-              baseline_risk = baseline_risk,
               class_interactions = if (!is.null(regression) && !is.null(network$classes)) class_interactions else NULL,
-              xbar = xbar,
+              xbar = c(xbar, .mu = xbar_mu),
               likelihood = likelihood,
               link = link,
               aux_by = if (has_aux_by) colnames(get_aux_by_data(aux_dat, by = aux_by)) else NULL,
@@ -1258,7 +1245,6 @@ nma <- function(network,
                             prior_het = if (trt_effects == "random") prior_het else NULL,
                             prior_het_type = if (trt_effects == "random") prior_het_type else NULL,
                             prior_reg = if (!is.null(regression) && !is_only_offset(regression)) prior_reg else NULL,
-                            prior_br = if (!is.null(baseline_risk)) prior_br else NULL,
                             prior_aux = if (has_aux) prior_aux else NULL,
                             prior_aux_reg = if (has_aux_regression) prior_aux_reg else NULL))
 
@@ -1300,7 +1286,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     n_int,
                     ipd_offset = NULL, agd_arm_offset = NULL, agd_contrast_offset = NULL,
                     trt_effects = c("fixed", "random"),
-                    baseline_risk = NULL,
+                    xbar_mu = NULL,
                     RE_cor = NULL,
                     which_RE = NULL,
                     likelihood = NULL,
@@ -1312,7 +1298,6 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_het,
                     prior_het_type = c("sd", "var", "prec"),
                     prior_reg,
-                    prior_br,
                     prior_aux,
                     prior_aux_reg,
                     aux_id = integer(),
@@ -1468,6 +1453,7 @@ nma.fit <- function(ipd_x, ipd_y,
   col_trt <- grepl("^(\\.trt|\\.contr)[^:]+$", x_names)
   col_omega <- x_names == ".omegaTRUE"
   col_reg <- !col_study & !col_trt & !col_omega
+  col_br <- col_reg & grepl("^\\.mu[^:]+$", x_names)
 
   n_trt <- sum(col_trt) + 1
 
@@ -1638,10 +1624,11 @@ nma.fit <- function(ipd_x, ipd_y,
     # Offsets
     has_offset = has_offsets,
     offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric(),
-    baseline_risk = 0,
-    baseline_risk_flag = 0,
-    baseline_risk_which = numeric()
-    )
+    br_n = 0L,
+    br_index = matrix(0L, 0L, 2L),
+    br_mu = integer(),
+    mu_center = 0
+  )
 
   # Add priors
   standat <- purrr::list_modify(standat,
@@ -1650,8 +1637,6 @@ nma.fit <- function(ipd_x, ipd_y,
     !!! prior_standat(prior_trt, "prior_trt",
                       valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
     !!! prior_standat(prior_reg, "prior_reg",
-                      valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
-    !!! prior_standat(prior_br, "prior_br",
                       valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
     !!! prior_standat(prior_het, "prior_het",
                       valid = c("Normal", "half-Normal", "log-Normal",
@@ -1698,19 +1683,21 @@ nma.fit <- function(ipd_x, ipd_y,
   stanargs$chain_id <- 1L
 
   # Baseline risk meta-regression
-  if (!isFALSE(baseline_risk)) {
-    pars <- c(pars, "beta_baseline_risk")
+  if (!is.null(xbar_mu)) {
+    stopifnot(length(col_br) == ncol(X_all))
 
-    studies <- X_all[, seq_len(standat$ns_agd_arm)]
-    is_reference <- unname(agd_arm_trt == 1L)
-    includes_reference <- as.logical(studies %*% (t(studies) %*% as.matrix(is_reference)))
+    br_index <- which(
+      t(t(X_all) != 0 & col_br),
+      arr.ind = TRUE
+    )
 
-    baseline_risk_which <- (!is_reference) * includes_reference
-
-    standat <-
-      standat %>%
-      purrr::list_modify(baseline_risk = baseline_risk, baseline_risk_flag = 1L,
-                         baseline_risk_which = baseline_risk_which)
+    standat <- purrr::list_modify(
+      standat,
+      br_n = nrow(br_index),
+      br_index = br_index,
+      br_mu = as.array(as.integer(X_all[br_index])),
+      mu_center = xbar_mu
+    )
   }
 
   # Call Stan model for given likelihood
@@ -3060,6 +3047,22 @@ get_model_data_columns <- function(data, regression = NULL, aux_regression = NUL
   auxregvars <- NULL
 
   if (!is.null(regression)) {
+    if (".mu" %in% all.vars(regression)) {
+      if (".mu" %in% colnames(data)) {
+        warn("Overwriting '.mu'. Special name. Use different name.")
+      }
+
+      ref_trt <- levels(data$.trt)[1L]
+
+      data <- data %>%
+        dplyr::group_by(.data$.study) %>%
+        dplyr::mutate(.mu = dplyr::if_else(
+          .data$.trt != ref_trt & ref_trt %in% .data$.trt,
+          as.numeric(.data$.study), 0
+        )) %>%
+        dplyr::ungroup()
+    }
+
     regvars <- setdiff(all.vars(regression), c(".trt", ".trtclass", ".study", ".contr", ".omega"))
     badvars <- setdiff(regvars, colnames(data))
     if (length(badvars)) {

@@ -7,8 +7,6 @@ prior_select_lp(mu, prior_intercept_dist, prior_intercept_location, prior_interc
 prior_select_lp(d, prior_trt_dist, prior_trt_location, prior_trt_scale, prior_trt_df);
 // Regression parameters
 prior_select_lp(beta, prior_reg_dist, prior_reg_location, prior_reg_scale, prior_reg_df);
-// Baseline risk meta-regression
-prior_select_lp(beta_baseline_risk, prior_br_dist, prior_br_location, prior_br_scale, prior_br_df);
 
 // Node-splitting - just use prior for d
 prior_select_lp(omega, prior_trt_dist, prior_trt_location, prior_trt_scale, prior_trt_df);

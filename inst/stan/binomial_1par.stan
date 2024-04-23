@@ -34,10 +34,6 @@ transformed parameters {
       X_agd_arm * beta_tilde + offset_agd_arm :
       X_agd_arm * beta_tilde;
 
-    if (baseline_risk_flag) {
-      eta_agd_arm_noRE += beta_baseline_risk[1] * baseline_risk_which .* (X_agd_arm[, 1:ns_agd_arm] * beta_tilde[1:ns_agd_arm] - baseline_risk);
-    }
-
     if (nint_max > 1) { // -- If integration points are used --
       if (RE) {
         if (link == 1) { // logit link

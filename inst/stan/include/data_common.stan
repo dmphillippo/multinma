@@ -77,11 +77,7 @@ real prior_reg_location;
 real<lower=0> prior_reg_scale;
 real<lower=0> prior_reg_df;
 
-int<lower=0,upper=3> prior_br_dist;
-real prior_br_location;
-real<lower=0> prior_br_scale;
-real<lower=0> prior_br_df;
-
-real baseline_risk;
-int<lower=0, upper=1> baseline_risk_flag;
-vector[baseline_risk_flag ? ni_agd_arm : 0] baseline_risk_which;
+int<lower=0> br_n;
+array[br_n, 2] int<lower=1> br_index;
+array[br_n] int<lower=1> br_mu;
+real mu_center;
