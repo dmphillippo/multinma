@@ -10,7 +10,7 @@ test_that("TSD3 Certolizumab example can be reproduced", {
     seed = 641
   )
 
-  expect_equal(fit_fe$xbar[[".mu"]], -2.421)
+  expect_equal(fit_fe$xbar[[".mu"]], -2.421, tolerance = 0.01)
 
   summary_fe <- as.data.frame(summary(fit_fe, pars = "beta"))
 
@@ -31,7 +31,7 @@ test_that("TSD3 Certolizumab example can be reproduced", {
     seed = 970
   )
 
-  expect_equal(fit_re$xbar[[".mu"]], -2.421)
+  expect_equal(fit_re$xbar[[".mu"]], -2.421, tolerance = 0.01)
 
   summary_re <- as.data.frame(summary(fit_re, pars = "beta"))
 

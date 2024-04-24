@@ -1452,7 +1452,7 @@ nma.fit <- function(ipd_x, ipd_y,
   col_trt <- grepl("^(\\.trt|\\.contr)[^:]+$", x_names)
   col_omega <- x_names == ".omegaTRUE"
   col_reg <- !col_study & !col_trt & !col_omega
-  col_br <- col_reg & grepl("^\\.mu[^:]+$", x_names)
+  col_br <- col_reg & grepl("^\\.mu", x_names)
 
   n_trt <- sum(col_trt) + 1
 
