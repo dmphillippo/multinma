@@ -383,12 +383,12 @@ plot(pso_pred_FE_new, ref_line = c(0, 1))
 ## 
 ## plot(pso_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE, nudge = 0.1) +
 ##   ggraph::scale_edge_colour_manual("Data",
-##                                    values = c(AgD = "#113259", IPD = "#55A480"),
-##                                    guide = guide_legend(override.aes = list(edge_width = 2))) +
+##                                    values = c(AgD = "#113259", IPD = "#55A480")) +
 ##   scale_fill_manual("Treatment class",
 ##                     values = class_pal,
-##                     aesthetics = c("fill", "colour"),
-##                     guide = guide_legend(override.aes = list(size = 2)))
+##                     aesthetics = c("fill", "colour")) +
+##   guides(edge_colour = guide_legend(override.aes = list(edge_width = 2)),
+##          fill = guide_legend(override.aes = list(size = 2)))
 
 
 ## ----eval=!params$run_tests-----------------------------------------------------------------------
