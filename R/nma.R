@@ -697,6 +697,22 @@ nma <- function(network,
       }
     }
 
+    if (".mu" %in% all.vars(regression)) {
+      if (".mu" %in% colnames(data)) {
+        warn("Overwriting '.mu'. Special name. Use different name.")
+      }
+
+      ref_trt <- levels(idat_agd_arm$.trt)[1L]
+
+      idat_agd_arm <- idat_agd_arm %>%
+        dplyr::group_by(.data$.study) %>%
+        dplyr::mutate(.mu = dplyr::if_else(
+          .data$.trt != ref_trt & ref_trt %in% .data$.trt,
+          as.numeric(.data$.study), 0
+        )) %>%
+        dplyr::ungroup()
+    }
+
     # Only take necessary columns
     idat_agd_arm <- get_model_data_columns(idat_agd_arm,
                                            regression = regression,
@@ -1452,7 +1468,7 @@ nma.fit <- function(ipd_x, ipd_y,
   col_trt <- grepl("^(\\.trt|\\.contr)[^:]+$", x_names)
   col_omega <- x_names == ".omegaTRUE"
   col_reg <- !col_study & !col_trt & !col_omega
-  col_br <- col_reg & grepl("^\\.mu", x_names)
+  col_br <- col_reg & grepl("\\.mu", x_names)
 
   n_trt <- sum(col_trt) + 1
 
@@ -3046,22 +3062,6 @@ get_model_data_columns <- function(data, regression = NULL, aux_regression = NUL
   auxregvars <- NULL
 
   if (!is.null(regression)) {
-    if (".mu" %in% all.vars(regression)) {
-      if (".mu" %in% colnames(data)) {
-        warn("Overwriting '.mu'. Special name. Use different name.")
-      }
-
-      ref_trt <- levels(data$.trt)[1L]
-
-      data <- data %>%
-        dplyr::group_by(.data$.study) %>%
-        dplyr::mutate(.mu = dplyr::if_else(
-          .data$.trt != ref_trt & ref_trt %in% .data$.trt,
-          as.numeric(.data$.study), 0
-        )) %>%
-        dplyr::ungroup()
-    }
-
     regvars <- setdiff(all.vars(regression), c(".trt", ".trtclass", ".study", ".contr", ".omega"))
     badvars <- setdiff(regvars, colnames(data))
     if (length(badvars)) {

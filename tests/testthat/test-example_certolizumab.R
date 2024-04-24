@@ -1,9 +1,13 @@
 test_that("TSD3 Certolizumab example can be reproduced", {
-  net <- set_agd_arm(certolizumab, study = study, trt = trt, n = n, r = r)
+  net <- set_agd_arm(
+    certolizumab,
+    study = study, trt = trt, n = n, r = r,
+    trt_class = dplyr::if_else(trt == "Placebo", "Placebo", "Treatment")
+  )
 
   fit_fe <- nma(
     net,
-    regression = ~.mu,
+    regression = ~.mu:.trt,
     prior_intercept = normal(scale = sqrt(1000)),
     prior_trt = normal(scale = 100),
     prior_reg = normal(scale = 100),
@@ -24,7 +28,7 @@ test_that("TSD3 Certolizumab example can be reproduced", {
   fit_re <- nma(
     net,
     trt_effects = "random",
-    regression = ~.mu,
+    regression = ~.mu:.trt,
     prior_intercept = normal(scale = sqrt(1000)),
     prior_trt = normal(scale = 100),
     prior_reg = normal(scale = 100),
