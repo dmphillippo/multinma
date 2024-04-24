@@ -1414,7 +1414,6 @@ nma.fit <- function(ipd_x, ipd_y,
   check_prior(prior_trt)
   if (trt_effects == "random") check_prior(prior_het)
   check_prior(prior_reg)
-  if (!is.null(baseline_risk)) check_prior(prior_br)
   if (has_aux) {
     if (likelihood == "gengamma") check_prior(prior_aux, c("sigma", "k"))
     else check_prior(prior_aux)
