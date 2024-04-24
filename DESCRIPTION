@@ -57,6 +57,7 @@ RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Suggests: 
     testthat (>= 2.1.0),
+    vdiffr,
     withr,
     knitr,
     rmarkdown,
