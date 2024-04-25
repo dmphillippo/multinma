@@ -12,7 +12,7 @@ mean survival time functions for the M-spline baseline hazards model."><meta pro
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.1.9002</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.1.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -148,8 +148,8 @@ described by Brilleman et al. (2020)
 Piecewise-exponential baseline hazards are a special case where the degree
 of the M-spline polynomial is 0.</p>
 <p>The d/p/h/H functions are calculated from their definitions. <code>qmspline()</code>
-uses numerical inversion via <code><a href="https://rdrr.io/pkg/flexsurv/man/qgeneric.html" class="external-link">flexsurv::qgeneric()</a></code>. <code>rmst_mspline()</code>uses
-numerical integration via <code><a href="https://rdrr.io/pkg/flexsurv/man/rmst_generic.html" class="external-link">flexsurv::rmst_generic()</a></code>, except for the
+uses numerical inversion via <code><a href="http://chjackson.github.io/flexsurv-dev/reference/qgeneric.html" class="external-link">flexsurv::qgeneric()</a></code>. <code>rmst_mspline()</code>uses
+numerical integration via <code><a href="http://chjackson.github.io/flexsurv-dev/reference/rmst_generic.html" class="external-link">flexsurv::rmst_generic()</a></code>, except for the
 special case of the piecewise-exponential hazard (i.e. degree 0 M-splines)
 which uses the explicit formula from
 Royston and Parmar (2013)
