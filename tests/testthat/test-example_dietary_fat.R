@@ -8,17 +8,17 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-------------------------------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
 
 
-## ---- eval = FALSE--------------------------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
 ## ----setup, echo = FALSE--------------------------------------------------------------------------
 library(multinma)
-nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
-             "true" =, "warn" = 2,
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
+             "true" =, "warn" = 2, 
              parallel::detectCores())
 options(mc.cores = nc)
 
@@ -28,10 +28,10 @@ head(dietary_fat)
 
 
 ## -------------------------------------------------------------------------------------------------
-diet_net <- set_agd_arm(dietary_fat,
+diet_net <- set_agd_arm(dietary_fat, 
                         study = studyc,
                         trt = trtc,
-                        r = r,
+                        r = r, 
                         E = E,
                         trt_ref = "Control",
                         sample_size = n)
@@ -43,7 +43,7 @@ summary(normal(scale = 100))
 
 
 ## -------------------------------------------------------------------------------------------------
-diet_fit_FE <- nma(diet_net,
+diet_fit_FE <- nma(diet_net, 
                    trt_effects = "fixed",
                    prior_intercept = normal(scale = 100),
                    prior_trt = normal(scale = 100))
@@ -53,7 +53,7 @@ diet_fit_FE <- nma(diet_net,
 diet_fit_FE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(diet_fit_FE, pars = c("d", "mu"))
 
@@ -67,16 +67,16 @@ summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## diet_fit_RE <- nma(diet_net,
 ##                    trt_effects = "random",
 ##                    prior_intercept = normal(scale = 100),
 ##                    prior_trt = normal(scale = 100),
 ##                    prior_het = half_normal(scale = 5))
 
-## ---- echo=FALSE, warning=FALSE-------------------------------------------------------------------
+## ----echo=FALSE, warning=FALSE--------------------------------------------------------------------
 diet_fit_RE <- nowarn_on_ci(
-                 nma(diet_net,
+                 nma(diet_net, 
                      trt_effects = "random",
                      prior_intercept = normal(scale = 100),
                      prior_trt = normal(scale = 100),
@@ -88,7 +88,7 @@ diet_fit_RE <- nowarn_on_ci(
 diet_fit_RE
 
 
-## ---- eval=FALSE----------------------------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(diet_fit_RE, pars = c("d", "mu", "delta"))
 
@@ -113,15 +113,15 @@ plot(dic_RE)
 
 
 ## ----diet_pred_FE, fig.height = 2-----------------------------------------------------------------
-pred_FE <- predict(diet_fit_FE,
-                   baseline = distr(qnorm, mean = -3, sd = 1.77^-0.5),
+pred_FE <- predict(diet_fit_FE, 
+                   baseline = distr(qnorm, mean = -3, sd = 1.77^-0.5), 
                    type = "response")
 pred_FE
 plot(pred_FE)
 
 ## ----diet_pred_RE, fig.height = 2-----------------------------------------------------------------
-pred_RE <- predict(diet_fit_RE,
-                   baseline = distr(qnorm, mean = -3, sd = 1.77^-0.5),
+pred_RE <- predict(diet_fit_RE, 
+                   baseline = distr(qnorm, mean = -3, sd = 1.77^-0.5), 
                    type = "response")
 pred_RE
 plot(pred_RE)

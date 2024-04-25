@@ -4,6 +4,10 @@
 installed now works properly, rather than giving errors.
 * Fix: Small bug caused `predict()` for AgD meta-regression models with new data 
 and `baseline_type = "response"` to fail with an error.
+* Fix: The number of studies on a contrast in a network plot `plot.nma_data()`
+with `weight_edges = TRUE` was incorrect when a study had multiple arms of the 
+same treatment. This now correctly counts the number of studies making a 
+comparison, rather than the number of arms.
 
 # multinma 0.6.1
 
