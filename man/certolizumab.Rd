@@ -5,12 +5,22 @@
 \alias{certolizumab}
 \title{Certolizumab}
 \format{
-An object of class \code{data.frame} with 24 rows and 5 columns.
+A data frame with 24 rows and 5 variables:
+\describe{
+\item{study}{study name}
+\item{trt}{treatment name}
+\item{r}{number of patients achieving ACR50 at 6 months}
+\item{n}{sample size}
+\item{disease_duration}{mean disease duration in years}
+}
 }
 \usage{
 certolizumab
 }
 \description{
 Data analysed in \insertCite{TSD3}{multinma}.
+}
+\references{
+\insertAllCited{}
 }
 \keyword{datasets}
