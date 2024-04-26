@@ -279,7 +279,7 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
     if (collapse) {
       e_ipd <- e_ipd %>%
         dplyr::group_by(.data$.trt, .data$.trt_b) %>%
-        dplyr::summarise(.nstudy = dplyr::n(), .type = "IPD")
+        dplyr::summarise(.nstudy = dplyr::n_distinct(.data$.study), .type = "IPD")
     } else {
       e_ipd$.type <- "IPD"
     }
@@ -300,7 +300,7 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
     if (collapse) {
       e_agd <- e_agd %>%
         dplyr::group_by(.data$.trt, .data$.trt_b) %>%
-        dplyr::summarise(.nstudy = dplyr::n(), .type = "AgD")
+        dplyr::summarise(.nstudy = dplyr::n_distinct(.data$.study), .type = "AgD")
     } else {
       e_agd$.type <- "AgD"
     }
