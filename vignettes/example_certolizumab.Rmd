@@ -130,6 +130,48 @@ plot(cert_rankprobs)
 plot(cert_cumrankprobs)
 ```
 
+```{r certolizumab_reg_plot}
+library(dplyr)
+library(ggplot2)
+
+mu_dat <- seq(log(0.02), log(0.5), length.out = 20)
+
+cert_mu_reg <- cert_fit_FE %>%
+  relative_effects(newdata = tibble::tibble(.mu = mu_dat), study = .mu) %>%
+  as_tibble() %>%
+  mutate(
+    .trt = .trtb,
+    .mu = as.numeric(as.character(.study))
+  )
+
+cert_lor <-
+  cert_net$agd_arm %>%
+  mutate(
+    probability = .r / .n,
+    log_odds = log(probability / (1 - probability))
+  ) %>%
+  group_by(.study) %>%
+  mutate(
+    .mu = log_odds[.trt == "Placebo"],
+    log_odds_ratio = log_odds - .mu,
+    sample_size = sum(n),
+  ) %>%
+  ungroup() %>%
+  filter(.trt != "Placebo")
+
+cert_lor %>%
+  ggplot(aes(x = .mu)) +
+  geom_hline(yintercept = 0, colour = "grey60") +
+  geom_ribbon(aes(ymin = `2.5%`, ymax = `97.5%`), data = cert_mu_reg,
+              fill = "darkred", alpha = 0.3) +
+  geom_line(aes(y = mean), data = cert_mu_reg,
+            colour = "darkred") +
+  geom_point(aes(y = log_odds_ratio, size = sample_size), alpha = 0.6) +
+  facet_wrap(vars(.trt)) +
+  labs(x = "Placebo log odds", y = "log Odds Ratio", size = "Sample Size") +
+  theme_multinma()
+```
+
 ## References
 
 ```{r certolizumab_tests, include=FALSE, eval=params$run_tests}
