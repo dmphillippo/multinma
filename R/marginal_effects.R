@@ -218,7 +218,7 @@ marginal_effects <- function(object,
     trta <- contrs[1, ]
     out_meta <- dplyr::distinct(out_meta, dplyr::pick(dplyr::all_of(vars))) %>%
       dplyr::mutate(.trtb = list(trtb), .trta = list(trta))  %>%
-      tidyr::unnest(cols = c(.data$.trtb, .data$.trta)) %>%
+      tidyr::unnest(cols = c(".trtb", ".trta")) %>%
       dplyr::select(dplyr::any_of(".study"), ".trtb", ".trta", dplyr::everything())
   }
 
@@ -257,10 +257,16 @@ marginal_effects <- function(object,
   # Calculate contrasts, looping over groups
   grps <- dplyr::distinct(out_meta, dplyr::pick(dplyr::all_of(vars)))
 
-  for (i in 1:nrow(grps)) {
-    grpi <- grps[i, ]
-    predi <- dplyr::semi_join(pred_meta, grpi, by = vars)$id
-    outi <- dplyr::semi_join(out_meta, grpi, by = vars)$id
+  for (i in 1:ifelse(length(vars), nrow(grps), 1)) {
+    if (length(vars)) {
+      grpi <- grps[i, ]
+      predi <- dplyr::semi_join(pred_meta, grpi, by = vars)$id
+      outi <- dplyr::semi_join(out_meta, grpi, by = vars)$id
+    } else { # No grouping variables
+      grpi <- tibble::tibble(.rows = 1)
+      predi <- pred_meta$id
+      outi <- out_meta$id
+    }
 
     if (all_contrasts && nlevels(object$network$treatments) > 2) {
       out_array[ , , outi] <- aperm(apply(pred$sims[ , , predi], MARGIN = 1:2, FUN = mk_contr), c(2, 3, 1))
