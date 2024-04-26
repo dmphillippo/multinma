@@ -1,5 +1,19 @@
 # multinma 0.6.1.9000
 
+* Feature: The new `marginal_effects()` function produces marginal treatment
+effects, as a wrapper around absolute predictions from `predict()`. For example, 
+for an analysis with a binary outcome marginal odds ratios, risk ratios, or risk
+differences may be produced. For survival outcomes, marginal effects may be 
+based on the full range of predictions produced by `predict()`, such as marginal 
+differences in restricted mean survival times, or time-varying marginal hazard 
+ratios.
+* Feature: Progress bars are now displayed when running interactively for
+calculations with `predict()` or `marginal_effects()` from ML-NMR models that 
+may take longer to run. These can be controlled with the new `progress` 
+argument.
+* Deprecation: The `trt_ref` argument to `predict()` is now soft-deprecated, and
+the new argument `baseline_ref` is preferred. This makes way for the new 
+`marginal_effects()` functionality.
 * Fix: Fallback formatting used by print methods when the crayon package is not 
 installed now works properly, rather than giving errors.
 * Fix: Small bug caused `predict()` for AgD meta-regression models with new data 
