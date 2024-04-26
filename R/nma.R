@@ -11,7 +11,8 @@
 #' @param regression A one-sided model formula, specifying the prognostic and
 #'   effect-modifying terms for a regression model. Any references to treatment
 #'   should use the `.trt` special variable, for example specifying effect
-#'   modifier interactions as `variable:.trt` (see details).
+#'   modifier interactions as `variable:.trt` (see details). The special variable `.mu`
+#'   can be used for baseline risk meta-regression: `~.mu:.trt`.
 #' @param class_interactions Character string specifying whether effect modifier
 #'   interactions are specified as `"common"`, `"exchangeable"`, or
 #'   `"independent"`.
