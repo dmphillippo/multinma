@@ -319,11 +319,29 @@ marginal_effects <- function(object,
                                                  type = type),
                                   " Ratio")
     } else if (mtype == "link") {
-      attr(out, "ylab") <- paste0("Marginal ",
-                                  get_scale_name(likelihood = object$likelihood,
-                                                 link = object$link,
-                                                 measure = "relative",
-                                                 type = type))
+      if (object$likelihood %in% valid_lhood$survival) {
+        if (object$link == "log") {
+          attr(out, "ylab") <- paste0("Marginal log ",
+                                      get_scale_name(likelihood = object$likelihood,
+                                                     link = object$link,
+                                                     measure = "absolute",
+                                                     type = type),
+                                      " Ratio")
+        } else {
+          attr(out, "ylab") <- paste0("Marginal ", object$link, " ",
+                                      get_scale_name(likelihood = object$likelihood,
+                                                     link = object$link,
+                                                     measure = "absolute",
+                                                     type = type),
+                                      " Difference ")
+        }
+      } else {
+        attr(out, "ylab") <- paste0("Marginal ",
+                                    get_scale_name(likelihood = object$likelihood,
+                                                   link = object$link,
+                                                   measure = "relative",
+                                                   type = type))
+      }
     }
 
     if (object$likelihood == "ordered") {
