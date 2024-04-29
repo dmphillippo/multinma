@@ -36,7 +36,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.1.9003</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.1.9004</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -210,11 +210,11 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                   mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[Transfusion]   -1.16    0.03 1.03   -3.40   -1.71   -1.10   -0.58    0.67  1173    1</span></span>
-<span><span class="co">#&gt; lp__           -134.23    0.08 3.02 -141.00 -136.13 -133.91 -132.02 -129.29  1309    1</span></span>
-<span><span class="co">#&gt; tau               1.90    0.03 1.08    0.58    1.17    1.63    2.32    4.64  1538    1</span></span>
+<span><span class="co">#&gt; d[Transfusion]   -1.17    0.05 1.06   -3.34   -1.67   -1.10   -0.56    0.68   538    1</span></span>
+<span><span class="co">#&gt; lp__           -134.50    0.09 3.11 -141.53 -136.37 -134.16 -132.24 -129.53  1098    1</span></span>
+<span><span class="co">#&gt; tau               1.87    0.04 1.09    0.56    1.16    1.63    2.29    4.73   650    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Apr 25 09:05:49 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Apr 29 13:41:18 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -235,8 +235,8 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <span><span class="va">noninf_tausq</span> <span class="op">&lt;-</span> <span class="va">noninf_tau</span><span class="op">^</span><span class="fl">2</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">noninf_tausq</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"tausq"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">noninf_tausq</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       mean   sd 2.5%  25%  50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; tausq 4.77 6.92 0.34 1.37 2.67 5.4 21.57     1526     2186    1</span></span></code></pre></div>
+<span><span class="co">#&gt;       mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; tausq  4.7 7.02 0.31 1.34 2.64 5.26 22.34      883      941    1</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="random-effects-meta-analysis-with-informative-heterogeneity-prior">Random effects meta-analysis with informative heterogeneity
@@ -274,11 +274,11 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                   mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[Transfusion]   -0.77    0.01 0.43   -1.72   -1.02   -0.75   -0.48   -0.01  2290    1</span></span>
-<span><span class="co">#&gt; lp__           -141.06    0.07 2.76 -147.17 -142.73 -140.77 -139.09 -136.58  1682    1</span></span>
-<span><span class="co">#&gt; tau               0.48    0.01 0.34    0.05    0.20    0.42    0.68    1.27  1226    1</span></span>
+<span><span class="co">#&gt; d[Transfusion]   -0.78    0.01 0.44   -1.76   -1.03   -0.74   -0.49    0.01  2308    1</span></span>
+<span><span class="co">#&gt; lp__           -140.97    0.07 2.77 -147.30 -142.63 -140.64 -138.91 -136.61  1385    1</span></span>
+<span><span class="co">#&gt; tau               0.50    0.01 0.36    0.05    0.21    0.44    0.70    1.38  1654    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Apr 25 09:05:54 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Apr 29 13:41:20 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -303,8 +303,8 @@ was specified on <span class="math inline">\(\tau^2\)</span>.</p>
 <span><span class="va">inf_tausq</span> <span class="op">&lt;-</span> <span class="va">inf_tau</span><span class="op">^</span><span class="fl">2</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">inf_tausq</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"tausq"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">inf_tausq</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       mean  sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; tausq 0.35 0.5    0 0.04 0.17 0.46  1.62     1126     2393    1</span></span></code></pre></div>
+<span><span class="co">#&gt;       mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; tausq 0.38 0.55    0 0.05 0.19 0.49  1.92     1553     2904    1</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2 unnumbered">
