@@ -11,9 +11,12 @@ ratios.
 calculations with `predict()` or `marginal_effects()` from ML-NMR models that 
 may take longer to run. These can be controlled with the new `progress` 
 argument.
-* Deprecation: The `trt_ref` argument to `predict()` is now soft-deprecated, and
-the new argument `baseline_ref` is preferred. This makes way for the new 
-`marginal_effects()` functionality.
+* Deprecation: The `trt_ref` argument to `predict()` has been renamed to 
+`baseline_ref`; using `trt_ref` is now soft-deprecated. Renaming this argument 
+`baseline_ref` follows the naming convention for the other arguments 
+(`baseline_type`, `baseline_level`) that specify the details of a provided 
+`baseline` distribution. This also makes way for the new `marginal_effects()` 
+functionality.
 * Fix: Fallback formatting used by print methods when the crayon package is not 
 installed now works properly, rather than giving errors.
 * Fix: Small bug caused `predict()` for AgD meta-regression models with new data 
