@@ -1626,7 +1626,7 @@ No information on baseline response was available from PsoBest, so no prediction
                         "Chiricozzi 2019" = distr(qbeta, 243, 330-243)),
         baseline_type = "response",
         baseline_level = "aggregate",
-        trt_ref = "SEC_300"))
+        baseline_trt = "SEC_300"))
 ```
 
 ```r
