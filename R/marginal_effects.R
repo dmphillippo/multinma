@@ -116,13 +116,21 @@
 #' # Marginal median survival time ratios
 #' marginal_effects(ndmm_fit, type = "median", mtype = "ratio")
 #'
-#' # Marginal hazard ratios, notice that these are time-varying
-#' # Here we specify a vector of times to avoid attempting to plot undefined
-#' # hazard ratios for some studies at t=0
-#' plot(marginal_effects(ndmm_fit, type = "hazard", mtype = "ratio",
-#'                       times = seq(0.001, 6, length.out = 50)))
+#' # Marginal log hazard ratios
+#' # With no covariates in the model, these are constant over time and study
+#' # populations, and are equal to the log hazard ratios from relative_effects()
+#' plot(marginal_effects(ndmm_fit, type = "hazard", mtype = "link"),
+#'      # The hazard is infinite at t=0 in some studies, giving undefined logHRs at t=0
+#'      na.rm = TRUE)
 #'
+#' # The NDMM vignette demonstrates the production of time-varying marginal
+#' # hazard ratios from a ML-NMR model that includes covariates, see
+#' # `vignette("example_ndmm")`
+#'
+#' # Marginal survival difference over time
+#' plot(marginal_effects(ndmm_fit, type = "survival", mtype = "difference"))
 #' }
+#'
 marginal_effects <- function(object,
                              ...,
                              mtype = c("difference", "ratio", "link"),
