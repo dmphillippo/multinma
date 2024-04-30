@@ -240,7 +240,7 @@ method:</p>
 <span><span class="co">#&gt; d[5] -0.30    0.00 0.22  -0.73 -0.45 -0.30 -0.15  0.12  3127    1</span></span>
 <span><span class="co">#&gt; lp__ -6.76    0.06 2.41 -12.44 -8.12 -6.42 -5.02 -3.12  1724    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Apr 29 13:34:19 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Apr 30 09:25:16 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -321,7 +321,7 @@ method:</p>
 <span><span class="co">#&gt; lp__ -13.00    0.10 3.53 -20.90 -15.16 -12.71 -10.46 -7.04  1160    1</span></span>
 <span><span class="co">#&gt; tau    0.37    0.02 0.39   0.01   0.11   0.26   0.49  1.46   516    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Apr 29 13:34:22 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Apr 30 09:25:20 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -394,7 +394,7 @@ distribution for the outcomes on treatment 1 (placebo) with mean <span class="ma
 method, where the <code>baseline</code> argument takes a
 <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the
 corresponding Normal distribution, and we specify
-<code>trt_ref = 1</code> to indicate that the baseline distribution
+<code>baseline_trt = 1</code> to indicate that the baseline distribution
 corresponds to treatment 1. (Strictly speaking,
 <code>type = "response"</code> is unnecessary here, since the identity
 link function was used.)</p>
@@ -402,7 +402,7 @@ link function was used.)</p>
 <code class="sourceCode R"><span><span class="va">arm_pred_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">arm_fit_FE</span>, </span>
 <span>                       baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">0.73</span>, sd <span class="op">=</span> <span class="fl">21</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>                       type <span class="op">=</span> <span class="st">"response"</span>,</span>
-<span>                       trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>                       baseline_trt <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">arm_pred_FE</span></span>
 <span><span class="co">#&gt;          mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
 <span><span class="co">#&gt; pred[4] -1.27 0.53 -2.29 -1.62 -1.28 -0.91 -0.24     1701     2585    1</span></span>
@@ -416,7 +416,7 @@ link function was used.)</p>
 <code class="sourceCode R"><span><span class="va">arm_pred_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">arm_fit_RE</span>, </span>
 <span>                       baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">0.73</span>, sd <span class="op">=</span> <span class="fl">21</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>                       type <span class="op">=</span> <span class="st">"response"</span>,</span>
-<span>                       trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>                       baseline_trt <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">arm_pred_RE</span></span>
 <span><span class="co">#&gt;          mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
 <span><span class="co">#&gt; pred[4] -1.25 0.64 -2.50 -1.68 -1.26 -0.85 -0.02     2148     1954    1</span></span>
@@ -614,7 +614,7 @@ method:</p>
 <span><span class="co">#&gt; d[5] -0.30    0.00 0.21 -0.71 -0.44 -0.30 -0.16  0.08  3831    1</span></span>
 <span><span class="co">#&gt; lp__ -3.12    0.03 1.36 -6.55 -3.77 -2.82 -2.12 -1.39  1841    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Apr 29 13:34:30 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Apr 30 09:25:29 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -684,7 +684,7 @@ method:</p>
 <span><span class="co">#&gt; lp__ -8.27    0.09 2.92 -14.84 -10.03 -7.97 -6.20 -3.43  1172 1.00</span></span>
 <span><span class="co">#&gt; tau   0.38    0.01 0.38   0.01   0.12  0.28  0.52  1.42   945 1.01</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Apr 29 13:34:32 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Apr 30 09:25:31 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -756,7 +756,7 @@ distribution for the outcomes on treatment 1 (placebo) with mean <span class="ma
 method, where the <code>baseline</code> argument takes a
 <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the
 corresponding Normal distribution, and we specify
-<code>trt_ref = 1</code> to indicate that the baseline distribution
+<code>baseline_trt = 1</code> to indicate that the baseline distribution
 corresponds to treatment 1. (Strictly speaking,
 <code>type = "response"</code> is unnecessary here, since the identity
 link function was used.)</p>
@@ -764,7 +764,7 @@ link function was used.)</p>
 <code class="sourceCode R"><span><span class="va">contr_pred_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">contr_fit_FE</span>, </span>
 <span>                       baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">0.73</span>, sd <span class="op">=</span> <span class="fl">21</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>                       type <span class="op">=</span> <span class="st">"response"</span>,</span>
-<span>                       trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>                       baseline_trt <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">contr_pred_FE</span></span>
 <span><span class="co">#&gt;          mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
 <span><span class="co">#&gt; pred[4] -1.26 0.51 -2.27 -1.61 -1.27 -0.91 -0.25     2343     3040    1</span></span>
@@ -778,7 +778,7 @@ link function was used.)</p>
 <code class="sourceCode R"><span><span class="va">contr_pred_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">contr_fit_RE</span>, </span>
 <span>                       baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">0.73</span>, sd <span class="op">=</span> <span class="fl">21</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>                       type <span class="op">=</span> <span class="st">"response"</span>,</span>
-<span>                       trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>                       baseline_trt <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">contr_pred_RE</span></span>
 <span><span class="co">#&gt;          mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
 <span><span class="co">#&gt; pred[4] -1.25 0.63 -2.47 -1.65 -1.25 -0.84 -0.01     2628     2267    1</span></span>
@@ -949,7 +949,7 @@ method:</p>
 <span><span class="co">#&gt; d[5] -0.30    0.00 0.21 -0.72 -0.44 -0.29 -0.16  0.11  3050    1</span></span>
 <span><span class="co">#&gt; lp__ -4.66    0.05 1.87 -9.12 -5.73 -4.34 -3.23 -2.01  1640    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Apr 29 13:34:37 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Apr 30 09:25:37 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -1026,7 +1026,7 @@ method:</p>
 <span><span class="co">#&gt; lp__ -10.88    0.09 3.26 -18.03 -12.90 -10.60 -8.59 -5.26  1465    1</span></span>
 <span><span class="co">#&gt; tau    0.37    0.01 0.36   0.01   0.12   0.27  0.49  1.28  1080    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Apr 29 13:34:40 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Apr 30 09:25:42 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -1099,7 +1099,7 @@ distribution for the outcomes on treatment 1 (placebo) with mean <span class="ma
 method, where the <code>baseline</code> argument takes a
 <code><a href="../reference/distr.html">distr()</a></code> distribution object with which we specify the
 corresponding Normal distribution, and we specify
-<code>trt_ref = 1</code> to indicate that the baseline distribution
+<code>baseline_trt = 1</code> to indicate that the baseline distribution
 corresponds to treatment 1. (Strictly speaking,
 <code>type = "response"</code> is unnecessary here, since the identity
 link function was used.)</p>
@@ -1107,7 +1107,7 @@ link function was used.)</p>
 <code class="sourceCode R"><span><span class="va">mix_pred_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mix_fit_FE</span>, </span>
 <span>                       baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">0.73</span>, sd <span class="op">=</span> <span class="fl">21</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>                       type <span class="op">=</span> <span class="st">"response"</span>,</span>
-<span>                       trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>                       baseline_trt <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">mix_pred_FE</span></span>
 <span><span class="co">#&gt;          mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
 <span><span class="co">#&gt; pred[4] -1.23 0.53 -2.27 -1.59 -1.22 -0.88 -0.17     1777     2613    1</span></span>
@@ -1121,7 +1121,7 @@ link function was used.)</p>
 <code class="sourceCode R"><span><span class="va">mix_pred_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mix_fit_RE</span>, </span>
 <span>                       baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">0.73</span>, sd <span class="op">=</span> <span class="fl">21</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>                       type <span class="op">=</span> <span class="st">"response"</span>,</span>
-<span>                       trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>                       baseline_trt <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">mix_pred_RE</span></span>
 <span><span class="co">#&gt;          mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
 <span><span class="co">#&gt; pred[4] -1.27 0.63 -2.52 -1.68 -1.27 -0.87 -0.06     2088     2415    1</span></span>
