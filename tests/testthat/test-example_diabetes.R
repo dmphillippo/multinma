@@ -126,7 +126,7 @@ plot(db_releff_RE, ref_line = 0)
 db_pred_FE <- predict(db_fit_FE, 
                       newdata = data.frame(time = 3),
                       baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5), 
-                      trt_ref = "Diuretic",
+                      baseline_trt = "Diuretic",
                       type = "response")
 db_pred_FE
 plot(db_pred_FE)
@@ -135,7 +135,7 @@ plot(db_pred_FE)
 db_pred_RE <- predict(db_fit_RE, 
                       newdata = data.frame(time = 3),
                       baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5), 
-                      trt_ref = "Diuretic",
+                      baseline_trt = "Diuretic",
                       type = "response")
 db_pred_RE
 plot(db_pred_RE)
@@ -302,35 +302,35 @@ db_pred_FE_multi1 <- as.data.frame(predict(db_fit_FE,
                       newdata = data.frame(time = times),
                       baseline = unname(bls), 
                       study = time,
-                      trt_ref = "Diuretic",
+                      baseline_trt = "Diuretic",
                       type = "response"))
 
 db_pred_RE_multi1 <- as.data.frame(predict(db_fit_RE, 
                       newdata = data.frame(time = times),
                       baseline = unname(bls), 
                       study = time,
-                      trt_ref = "Diuretic",
+                      baseline_trt = "Diuretic",
                       type = "response"))
 
 db_pred_FE_multi2 <- as.data.frame(predict(db_fit_FE, 
                       newdata = data.frame(time = times),
                       baseline = bls, 
                       study = time,
-                      trt_ref = "Diuretic",
+                      baseline_trt = "Diuretic",
                       type = "response"))
 
 db_pred_RE_multi2 <- as.data.frame(predict(db_fit_RE, 
                       newdata = data.frame(time = times),
                       baseline = bls, 
                       study = time,
-                      trt_ref = "Diuretic",
+                      baseline_trt = "Diuretic",
                       type = "response"))
 
 db_pred_FE_multi3 <- as.data.frame(predict(db_fit_FE, 
                       newdata = data.frame(time = rev(times)),
                       baseline = bls, 
                       study = time,
-                      trt_ref = "Diuretic",
+                      baseline_trt = "Diuretic",
                       type = "response")) %>% 
   arrange(.study)
 
@@ -338,7 +338,7 @@ db_pred_RE_multi3 <- as.data.frame(predict(db_fit_RE,
                       newdata = data.frame(time = rev(times)),
                       baseline = bls, 
                       study = time,
-                      trt_ref = "Diuretic",
+                      baseline_trt = "Diuretic",
                       type = "response")) %>% 
   arrange(.study)
 
@@ -346,14 +346,14 @@ db_pred_FE_multi4 <- as.data.frame(predict(db_fit_FE,
                       newdata = data.frame(time = times),
                       baseline = rev(bls), 
                       study = time,
-                      trt_ref = "Diuretic",
+                      baseline_trt = "Diuretic",
                       type = "response"))
 
 db_pred_RE_multi4 <- as.data.frame(predict(db_fit_RE, 
                       newdata = data.frame(time = times),
                       baseline = rev(bls), 
                       study = time,
-                      trt_ref = "Diuretic",
+                      baseline_trt = "Diuretic",
                       type = "response"))
 
 test_that("Predictions for reordered newdata/baselines works", {

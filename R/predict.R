@@ -109,7 +109,7 @@
 #'   computationally intensive, especially for survival outcomes. Currently the
 #'   default is to display progress only when running interactively and
 #'   producing predictions for a survival ML-NMR model.
-#' @param trt_ref Deprecated, use `baseline_trt` instead.
+#' @param trt_ref Deprecated, renamed to `baseline_trt`.
 #'
 #' @details
 #' # Aggregate-level predictions from IPD NMA and ML-NMR models

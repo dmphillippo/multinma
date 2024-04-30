@@ -661,7 +661,7 @@ plot(pso_pred_FE_new, ref_line = c(0, 1))
 ##                         "Chiricozzi 2019" = distr(qbeta, 243, 330-243)),
 ##         baseline_type = "response",
 ##         baseline_level = "aggregate",
-##         trt_ref = "SEC_300"))
+##         baseline_trt = "SEC_300"))
 
 
 ## ----pso-full-pred-new, eval=!params$run_tests && params$eval_multinomial-------------------------

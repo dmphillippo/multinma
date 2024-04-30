@@ -153,7 +153,7 @@ computationally intensive, especially for survival outcomes. Currently the
 default is to display progress only when running interactively and
 producing predictions for a survival ML-NMR model.}
 
-\item{trt_ref}{Deprecated, use \code{baseline_trt} instead.}
+\item{trt_ref}{Deprecated, renamed to \code{baseline_trt}.}
 
 \item{times}{A numeric vector of times to evaluate predictions at.
 Alternatively, if \code{newdata} is specified, \code{times} can be the name of a
