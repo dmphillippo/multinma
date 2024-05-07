@@ -1,3 +1,31 @@
+# multinma 0.7.0
+
+* Feature: The new `marginal_effects()` function produces marginal treatment
+effects, as a wrapper around absolute predictions from `predict()`. For example, 
+for an analysis with a binary outcome marginal odds ratios, risk ratios, or risk
+differences may be produced. For survival outcomes, marginal effects may be 
+based on the full range of predictions produced by `predict()`, such as marginal 
+differences in restricted mean survival times, or time-varying marginal hazard 
+ratios.
+* Feature: Progress bars are now displayed when running interactively for
+calculations with `predict()` or `marginal_effects()` from ML-NMR models that 
+may take longer to run. These can be controlled with the new `progress` 
+argument.
+* Deprecation: The `trt_ref` argument to `predict()` has been renamed to 
+`baseline_ref`; using `trt_ref` is now soft-deprecated. Renaming this argument 
+`baseline_ref` follows the naming convention for the other arguments 
+(`baseline_type`, `baseline_level`) that specify the details of a provided 
+`baseline` distribution. This also makes way for the new `marginal_effects()` 
+functionality.
+* Fix: Fallback formatting used by print methods when the crayon package is not 
+installed now works properly, rather than giving errors.
+* Fix: Small bug caused `predict()` for AgD meta-regression models with new data 
+and `baseline_type = "response"` to fail with an error.
+* Fix: The number of studies on a contrast in a network plot `plot.nma_data()`
+with `weight_edges = TRUE` was incorrect when a study had multiple arms of the 
+same treatment. This now correctly counts the number of studies making a 
+comparison, rather than the number of arms.
+
 # multinma 0.6.1
 
 * Fix: Piecewise exponential hazard models no longer give errors during set-up. 

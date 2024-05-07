@@ -17,7 +17,7 @@ if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) { # Se
     fig.height = 4.5,
     fig.align = "center",
     fig.cap = "",
-    pngquant = '--speed 4 --nofs'
+    pngquant = '--speed 4 --skip-if-larger'
   )
   options(width = 100)
 

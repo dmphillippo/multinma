@@ -39,8 +39,8 @@
 #'   always `"link"`, and `baseline_level` is `"individual"` for IPD NMA or
 #'   ML-NMR, and `"aggregate"` for AgD NMA).
 #'
-#'   Use the `trt_ref` argument to specify which treatment this distribution
-#'   applies to.
+#'   Use the `baseline_trt` argument to specify which treatment this
+#'   distribution applies to.
 #' @param newdata Only required if a regression model is fitted and `baseline`
 #'   is specified. A data frame of covariate details, for which to produce
 #'   predictions. Column names must match variables in the regression model.
@@ -59,10 +59,6 @@
 #'   specified: if `newdata` contains integration points produced by
 #'   [add_integration()], studies will be labelled sequentially by row;
 #'   otherwise data will be assumed to come from a single study.
-#' @param trt_ref Treatment to which the `baseline` response distribution
-#'   refers, if `baseline` is specified. By default, the baseline response
-#'   distribution will refer to the network reference treatment. Coerced to
-#'   character string.
 #' @param type Whether to produce predictions on the `"link"` scale (the
 #'   default, e.g. log odds) or `"response"` scale (e.g. probabilities).
 #'
@@ -84,6 +80,10 @@
 #'   specified, predictions are produced for all IPD studies in the network if
 #'   `level` is `"individual"` or `"aggregate"`, and for all arm-based AgD
 #'   studies in the network if `level` is `"aggregate"`.
+#' @param baseline_trt Treatment to which the `baseline` response distribution
+#'   refers, if `baseline` is specified. By default, the baseline response
+#'   distribution will refer to the network reference treatment. Coerced to
+#'   character string.
 #' @param baseline_type When a `baseline` distribution is given, specifies
 #'   whether this corresponds to the `"link"` scale (the default, e.g. log odds)
 #'   or `"response"` scale (e.g. probabilities). For survival models, `baseline`
@@ -104,6 +104,12 @@
 #'   fitted, should the predictive distribution for absolute effects in a new
 #'   study be returned? Default `FALSE`.
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
+#' @param progress Logical, display progress for potentially long-running
+#'   calculations? Population-average predictions from ML-NMR models are
+#'   computationally intensive, especially for survival outcomes. Currently the
+#'   default is to display progress only when running interactively and
+#'   producing predictions for a survival ML-NMR model.
+#' @param trt_ref Deprecated, renamed to `baseline_trt`.
 #'
 #' @details
 #' # Aggregate-level predictions from IPD NMA and ML-NMR models
@@ -274,16 +280,21 @@
 #' predict(ndmm_fit, type = "rmst", times = 5)  # 5-year RMST
 #' }
 predict.stan_nma <- function(object, ...,
-                             baseline = NULL, newdata = NULL, study = NULL, trt_ref = NULL,
+                             baseline = NULL, newdata = NULL, study = NULL,
                              type = c("link", "response"),
                              level = c("aggregate", "individual"),
+                             baseline_trt = NULL,
                              baseline_type = c("link", "response"),
                              baseline_level = c("individual", "aggregate"),
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
                              predictive_distribution = FALSE,
-                             summary = TRUE) {
+                             summary = TRUE,
+                             progress = FALSE,
+                             trt_ref = NULL) {
   # Checks
   if (!inherits(object, "stan_nma")) abort("Expecting a `stan_nma` object, as returned by nma().")
+
+  if (!rlang::is_bool(progress)) abort("`progress` must be a single logical value, TRUE/FALSE.")
 
   is_surv <- inherits(object, "stan_nma_surv")  # Survival flag
 
@@ -307,23 +318,26 @@ predict.stan_nma <- function(object, ...,
   # Get network reference treatment
   nrt <- levels(object$network$treatments)[1]
 
-  if (!is.null(trt_ref)) {
+  # Deprecated trt_ref in favour of baseline_trt
+  if (is.null(baseline_trt) && !is.null(trt_ref)) baseline_trt <- trt_ref
+
+  if (!is.null(baseline_trt)) {
     if (is.null(baseline)) {
-      # warn("Ignoring `trt_ref` since `baseline` is not given.")
-      trt_ref <- nrt
+      # warn("Ignoring `baseline_trt` since `baseline` is not given.")
+      baseline_trt <- nrt
     } else {
-      if (length(trt_ref) > 1) abort("`trt_ref` must be length 1.")
-      trt_ref <- as.character(trt_ref)
+      if (length(baseline_trt) > 1) abort("`baseline_trt` must be length 1.")
+      baseline_trt <- as.character(baseline_trt)
       lvls_trt <- levels(object$network$treatments)
-      if (! trt_ref %in% lvls_trt)
-        abort(sprintf("`trt_ref` does not match a treatment in the network.\nSuitable values are: %s",
+      if (! baseline_trt %in% lvls_trt)
+        abort(sprintf("`baseline_trt` does not match a treatment in the network.\nSuitable values are: %s",
                       ifelse(length(lvls_trt) <= 5,
                              paste0(lvls_trt, collapse = ", "),
                              paste0(paste0(lvls_trt[1:5], collapse = ", "), ", ..."))))
     }
   } else {
-    # Set trt_ref to network reference treatment if unset
-    trt_ref <- nrt
+    # Set baseline_trt to network reference treatment if unset
+    baseline_trt <- nrt
   }
 
   # Define auxiliary parameters for survival models
@@ -550,9 +564,9 @@ predict.stan_nma <- function(object, ...,
         mu <- link_fun(mu, link = object$link)
       }
 
-      # Convert to samples on network ref trt if trt_ref given
-      if (trt_ref != nrt) {
-        mu <- mu - d[ , , paste0("d[", trt_ref, "]"), drop = FALSE]
+      # Convert to samples on network ref trt if baseline_trt given
+      if (baseline_trt != nrt) {
+        mu <- mu - d[ , , paste0("d[", baseline_trt, "]"), drop = FALSE]
       }
 
       # Combine mu and d
@@ -761,64 +775,53 @@ predict.stan_nma <- function(object, ...,
     }
 
     # Produce nma_summary
+    if (object$likelihood == "ordered") {
+      pred_meta <- tibble::tibble(.trt = rep(preddat$.trt, each = n_cc),
+                                  .category = rep(l_cc, times = nrow(preddat)))
+
+    } else if (object$likelihood %in% valid_lhood$survival) {
+      if (type %in% c("survival", "hazard", "cumhaz")) {
+        preddat <- tidyr::unnest(preddat, cols = ".time")
+        pred_meta <- tibble::tibble(.trt = preddat$.trt,
+                                    .time = preddat$.time)
+      } else if (type == "rmst") {
+        pred_meta <- tibble::tibble(.trt = preddat$.trt,
+                                    .time = preddat$.time)
+      } else if (type == "quantile") {
+        pred_meta <- tibble::tibble(.trt = rep(preddat$.trt, each = length(quantiles)),
+                                    .quantile = rep(quantiles, times = nrow(preddat)))
+      } else {
+        pred_meta <- tibble::tibble(.trt = preddat$.trt)
+      }
+
+    } else {
+      pred_meta <- tibble::tibble(.trt = preddat$.trt)
+    }
+
+    if (is.null(baseline)) {
+      if (object$likelihood == "ordered") {
+        pred_meta <- tibble::add_column(pred_meta,
+                                        .study = rep(preddat$.study, each = n_cc),
+                                        .before = 1)
+      } else if (type == "quantile") {
+        pred_meta <- tibble::add_column(pred_meta,
+                                        .study = rep(preddat$.study, each = length(quantiles)),
+                                        .before = 1)
+      } else {
+        pred_meta <- tibble::add_column(pred_meta,
+                                        .study = preddat$.study,
+                                        .before = 1)
+      }
+    }
+
     if (summary) {
       pred_summary <- summary_mcmc_array(pred_array, probs)
-
-      if (object$likelihood == "ordered") {
-        pred_summary <- tibble::add_column(pred_summary,
-                                           .trt = rep(preddat$.trt, each = n_cc),
-                                           .category = rep(l_cc, times = nrow(preddat)),
-                                           .before = 1)
-
-      } else if (object$likelihood %in% valid_lhood$survival) {
-        if (type %in% c("survival", "hazard", "cumhaz")) {
-          preddat <- tidyr::unnest(preddat, cols = ".time")
-          pred_summary <- tibble::add_column(pred_summary,
-                                             .trt = preddat$.trt,
-                                             .time = preddat$.time,
-                                             .before = 1)
-        } else if (type == "rmst") {
-          pred_summary <- tibble::add_column(pred_summary,
-                                             .trt = preddat$.trt,
-                                             .time = preddat$.time,
-                                             .before = 1)
-        } else if (type == "quantile") {
-          pred_summary <- tibble::add_column(pred_summary,
-                                             .trt = rep(preddat$.trt, each = length(quantiles)),
-                                             .quantile = rep(quantiles, times = nrow(preddat)),
-                                             .before = 1)
-        } else {
-          pred_summary <- tibble::add_column(pred_summary,
-                                             .trt = preddat$.trt,
-                                             .before = 1)
-        }
-
-      } else {
-        pred_summary <- tibble::add_column(pred_summary,
-                                           .trt = preddat$.trt,
-                                           .before = 1)
-      }
-
-      if (is.null(baseline)) {
-        if (object$likelihood == "ordered") {
-          pred_summary <- tibble::add_column(pred_summary,
-                                             .study = rep(preddat$.study, each = n_cc),
-                                             .before = 1)
-        } else if (type == "quantile") {
-          pred_summary <- tibble::add_column(pred_summary,
-                                             .study = rep(preddat$.study, each = length(quantiles)),
-                                             .before = 1)
-        } else {
-          pred_summary <- tibble::add_column(pred_summary,
-                                             .study = preddat$.study,
-                                             .before = 1)
-        }
-      }
-
-      out <- list(summary = pred_summary, sims = pred_array)
+      pred_summary <- dplyr::bind_cols(pred_meta, pred_summary)
     } else {
-      out <- list(sims = pred_array)
+      pred_summary <- pred_meta
     }
+
+    out <- list(summary = pred_summary, sims = pred_array)
 
   # With regression model ------------------------------------------------------
   } else {
@@ -1354,12 +1357,12 @@ predict.stan_nma <- function(object, ...,
 
         # Convert to linear predictor scale if baseline_type = "response"
         if (any(baseline_type == "response")) {
-          mu[ , , baseline_type == "response"] <- link_fun(mu[ , , baseline_type = "response"], link = object$link)
+          mu[ , , baseline_type == "response"] <- link_fun(mu[ , , baseline_type == "response"], link = object$link)
         }
 
-        # Convert to samples on network ref trt if trt_ref given
-        if (trt_ref != nrt) {
-          mu <- sweep(mu, 1:2, post_temp[ , , paste0("d[", trt_ref, "]"), drop = FALSE], FUN = "-")
+        # Convert to samples on network ref trt if baseline_trt given
+        if (baseline_trt != nrt) {
+          mu <- sweep(mu, 1:2, post_temp[ , , paste0("d[", baseline_trt, "]"), drop = FALSE], FUN = "-")
         }
       } else { # ML-NMR or IPD NMR
         if (any(baseline_level == "individual")) {
@@ -1369,9 +1372,9 @@ predict.stan_nma <- function(object, ...,
             mu[ , , baseline_level == "individual" & baseline_type == "response"] <- link_fun(mu[ , , baseline_level == "individual" & baseline_type == "response"], link = object$link)
           }
 
-          # Convert to samples on network ref trt if trt_ref given
-          if (trt_ref != nrt) {
-            mu[ , , baseline_level == "individual" & baseline_level == "individual"] <- sweep(mu[ , , baseline_level == "individual" & baseline_level == "individual", drop = FALSE], 1:2, post_temp[ , , paste0("d[", trt_ref, "]"), drop = FALSE], FUN = "-")
+          # Convert to samples on network ref trt if baseline_trt given
+          if (baseline_trt != nrt) {
+            mu[ , , baseline_level == "individual" & baseline_level == "individual"] <- sweep(mu[ , , baseline_level == "individual" & baseline_level == "individual", drop = FALSE], 1:2, post_temp[ , , paste0("d[", baseline_trt, "]"), drop = FALSE], FUN = "-")
           }
 
         }
@@ -1386,21 +1389,21 @@ predict.stan_nma <- function(object, ...,
             mu0[ , , baseline_level == "aggregate" & baseline_type == "link"] <- inverse_link(mu[ , , baseline_level == "aggregate" & baseline_type == "link"], link = object$link)
           }
 
-          preddat_trt_ref <- dplyr::filter(preddat, .data$.trt == trt_ref)
+          preddat_trt_ref <- dplyr::filter(preddat, .data$.trt == baseline_trt)
 
-          # Get posterior samples of betas and d[trt_ref]
+          # Get posterior samples of betas and d[baseline_trt]
           post_beta <- as.array(object, pars = "beta")
-          if (trt_ref == nrt) {
+          if (baseline_trt == nrt) {
             post_d <- 0
           } else {
-            post_d <- as.array(object, pars = paste0("d[", trt_ref, "]"))
+            post_d <- as.array(object, pars = paste0("d[", baseline_trt, "]"))
           }
 
-          # Get design matrix for regression for trt_ref
-          X_trt_ref <- X_all[preddat$.trt == trt_ref, , drop = FALSE]
+          # Get design matrix for regression for baseline_trt
+          X_trt_ref <- X_all[preddat$.trt == baseline_trt, , drop = FALSE]
           X_beta_trt_ref <- X_trt_ref[ , !grepl("^(\\.study|\\.trt|\\.contr)[^:]+$", colnames(X_trt_ref)), drop = FALSE]
 
-          if (!is.null(offset_all)) offset_trt_ref <- offset_all[preddat$.trt == trt_ref]
+          if (!is.null(offset_all)) offset_trt_ref <- offset_all[preddat$.trt == baseline_trt]
 
           range_mu <- range(as.array(object, pars = "mu"))
 
@@ -1428,7 +1431,7 @@ predict.stan_nma <- function(object, ...,
                 rtsolve <- uniroot(mu_solve, interval = range_mu, extendInt = "yes", ...,
                                    mu0 = mu0[i_iter, i_chain, s, drop = TRUE],
                                    post_beta = post_beta[i_iter, i_chain, , drop = TRUE],
-                                   post_d = if (trt_ref == nrt) 0 else post_d[i_iter, i_chain, , drop = TRUE],
+                                   post_d = if (baseline_trt == nrt) 0 else post_d[i_iter, i_chain, , drop = TRUE],
                                    X_beta = s_X_beta,
                                    offset = if (!is.null(offset_all)) s_offset else 0,
                                    link = object$link)
@@ -1567,6 +1570,16 @@ predict.stan_nma <- function(object, ...,
       l_cc <- stringr::str_replace(dimnames(cc)[[3]], "^cc\\[(.+)\\]$", "\\1")
     }
 
+    studies <- levels(forcats::fct_drop(preddat$.study))
+    n_studies <- length(studies)
+    treatments <- levels(forcats::fct_drop(preddat$.trt))
+    n_trt <- length(treatments)
+
+    if (progress) {
+      pb <- utils::txtProgressBar(max = n_studies * n_trt, style = 3, width = min(100, getOption("width")))
+      on.exit(close(pb))
+    }
+
     # Make prediction arrays
     if (is_surv) {
       # Handle survival models separately - produce predictions study by study
@@ -1642,6 +1655,8 @@ predict.stan_nma <- function(object, ...,
         }
 
         for (trt in 1:n_trt) {
+          #if (progress) cglue("\rCalculating predictions for {studies[s]}, {treatments[trt]} [{(s-1)*n_trt + trt} / {n_studies * n_trt}]", sep = "")
+
           # Collapse preddat by unique rows for efficiency
           collapse_by <- setdiff(colnames(preddat), c(".time", ".obs_id", ".sample_size"))
 
@@ -1786,6 +1801,7 @@ predict.stan_nma <- function(object, ...,
             pred_array[ , , outdat$.study == studies[s] & outdat$.trt == treatments[trt]] <- s_pred_array
           }
 
+          if (progress) utils::setTxtProgressBar(pb, (s-1)*n_trt + trt)
         }
       }
 
@@ -1821,6 +1837,8 @@ predict.stan_nma <- function(object, ...,
         pred_array <- inverse_link(pred_array, link = object$link)
       }
 
+      if (progress) utils::setTxtProgressBar(pb, n_studies * n_trt)
+
     } else { # Predictions aggregated over each population
 
       # Produce aggregated predictions study by study - more memory efficient
@@ -1853,6 +1871,8 @@ predict.stan_nma <- function(object, ...,
       ss <- vector(length = nrow(outdat))
 
       for (s in 1:n_studies) {
+
+        # if (progress) cglue("\rCalculating predictions for {studies[s]} [{s} / {n_studies}]", sep = "")
 
         # Study select
         ss <- preddat$.study == studies[s]
@@ -1916,40 +1936,41 @@ predict.stan_nma <- function(object, ...,
 
         pred_array[ , , outdat$.study == studies[s]] <- tcrossprod_mcmc_array(s_pred_array, X_weighted_mean)
 
+        if (progress) utils::setTxtProgressBar(pb, s * n_trt)
+
       }
 
       preddat <- dplyr::distinct(preddat, .data$.study, .data$.trt)
     }
 
+    # if (progress) cat("\rDone!")
+
     # Produce nma_summary
+    if (object$likelihood == "ordered") {
+      pred_meta <- tibble::tibble(.study = rep(preddat$.study, each = n_cc),
+                                  .trt = rep(preddat$.trt, each = n_cc),
+                                  .category = rep(l_cc, times = nrow(preddat)))
+    } else if (is_surv) {
+      pred_meta <- tibble::tibble(.study = outdat$.study,
+                                  .trt = outdat$.trt)
+      if (type %in% c("survival", "hazard", "cumhaz", "rmst")) {
+        pred_meta <- tibble::add_column(pred_meta, .time = outdat$.time, .after = ".trt")
+      } else if (type == "quantile") {
+        pred_meta <- tibble::add_column(pred_meta, .quantile = outdat$.quantile, .after = ".trt")
+      }
+    } else {
+      pred_meta <- tibble::tibble(.study = preddat$.study,
+                                  .trt = preddat$.trt)
+    }
+
     if (summary) {
       pred_summary <- summary_mcmc_array(pred_array, probs)
-      if (object$likelihood == "ordered") {
-        pred_summary <- tibble::add_column(pred_summary,
-                                           .study = rep(preddat$.study, each = n_cc),
-                                           .trt = rep(preddat$.trt, each = n_cc),
-                                           .category = rep(l_cc, times = nrow(preddat)),
-                                           .before = 1)
-      } else if (is_surv) {
-        pred_summary <- tibble::add_column(pred_summary,
-                                           .study = outdat$.study,
-                                           .trt = outdat$.trt,
-                                           .before = 1)
-        if (type %in% c("survival", "hazard", "cumhaz", "rmst")) {
-          pred_summary <- tibble::add_column(pred_summary, .time = outdat$.time, .after = ".trt")
-        } else if (type == "quantile") {
-          pred_summary <- tibble::add_column(pred_summary, .quantile = outdat$.quantile, .after = ".trt")
-        }
-      } else {
-        pred_summary <- tibble::add_column(pred_summary,
-                                           .study = preddat$.study,
-                                           .trt = preddat$.trt,
-                                           .before = 1)
-      }
-      out <- list(summary = pred_summary, sims = pred_array)
+      pred_summary <- dplyr::bind_cols(pred_meta, pred_summary)
     } else {
-      out <- list(sims = pred_array)
+      pred_summary <- pred_meta
     }
+
+    out <- list(summary = pred_summary, sims = pred_array)
 
   }
 
@@ -1968,6 +1989,9 @@ predict.stan_nma <- function(object, ...,
       class(out) <- "nma_summary"
     }
   }
+
+  if (progress) cat("\r")
+
   return(out)
 }
 
@@ -2003,16 +2027,19 @@ predict.stan_nma <- function(object, ...,
 #' @rdname predict.stan_nma
 predict.stan_nma_surv <- function(object, times = NULL,
                                   ...,
+                                  baseline_trt = NULL,
                                   baseline = NULL,
                                   aux = NULL,
-                                  newdata = NULL, study = NULL, trt_ref = NULL,
+                                  newdata = NULL, study = NULL,
                                   type = c("survival", "hazard", "cumhaz", "mean", "median", "quantile", "rmst", "link"),
                                   quantiles = c(0.25, 0.5, 0.75),
                                   level = c("aggregate", "individual"),
                                   times_seq = NULL,
                                   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
                                   predictive_distribution = FALSE,
-                                  summary = TRUE) {
+                                  summary = TRUE,
+                                  progress = interactive(),
+                                  trt_ref = NULL) {
 
   type <- rlang::arg_match(type)
   times <- rlang::enquo(times)
@@ -2026,7 +2053,9 @@ predict.stan_nma_surv <- function(object, times = NULL,
     abort("`times_seq` must be a single positive integer.")
 
   # Set times_seq by default if called within plot()
-  if (is.null(times_seq) && type %in% c("survival", "hazard", "cumhaz") && deparse(sys.call(-2)[[1]]) == "plot")
+  if (is.null(times_seq) && type %in% c("survival", "hazard", "cumhaz") &&
+       (deparse(sys.call(-2)[[1]]) == "plot" ||
+        deparse(sys.call(-3)[[1]]) == "marginal_effects" && deparse(sys.call(-4)[[1]]) == "plot"))
     times_seq <- 50
 
   # Other checks (including times, aux) in predict.stan_nma()
@@ -2037,7 +2066,8 @@ predict.stan_nma_surv <- function(object, times = NULL,
              quantiles = quantiles,
              times_seq = times_seq,
              baseline_level = "individual",
-             baseline_type = "link")
+             baseline_type = "link",
+             progress = progress)
 }
 
 #' Produce survival predictions from arrays of linear predictors and auxiliary parameters

@@ -491,12 +491,22 @@ plot.surv_nma_summary <- function(x, ..., stat = "lineribbon") {
   if (has_studies <- rlang::has_name(draws, ".study")) {
     draws$Study <- draws$.study
   }
-  draws$Treatment <- draws$.trt
+
   draws$Time <- draws$.time
 
-  p <- ggplot2::ggplot(draws, ggplot2::aes(x = .data$Time, y = .data$value,
-                                           colour = .data$Treatment,
-                                           fill = .data$Treatment)) +
+  if (rlang::has_name(draws, ".trt") || dplyr::n_distinct(draws$.trta) == 1) {
+    draws$Treatment <- if (rlang::has_name(draws, ".trt")) draws$.trt else draws$.trtb
+    p <- ggplot2::ggplot(draws, ggplot2::aes(x = .data$Time, y = .data$value,
+                                             colour = .data$Treatment,
+                                             fill = .data$Treatment))
+  } else {
+    draws$Contrast <- paste0(draws$.trtb, " vs. ", draws$.trta)
+    p <- ggplot2::ggplot(draws, ggplot2::aes(x = .data$Time, y = .data$value,
+                                             colour = .data$Contrast,
+                                             fill = .data$Contrast))
+  }
+
+  p <- p +
     ggplot2::ylab(p_ylab) +
     ggplot2::xlab(p_xlab)
 

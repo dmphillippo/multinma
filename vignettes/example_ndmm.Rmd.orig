@@ -73,7 +73,7 @@ bind_rows(
 # Setup
 ## Preparing treatment classes
 We start by setting up the network for the analysis.
-Since we only have IPD on the placebo vs. lenalidomide comparison, and only one AgD study on the placebo vs. thalidomide comparison, we make the shared effect modifier assumption between the two active treatments in order to estimate the effect modifying treatment-covariate interactions for thalidomide [@TSD18,@methods_paper].
+Since we only have IPD on the placebo vs. lenalidomide comparison, and only one AgD study on the placebo vs. thalidomide comparison, we make the shared effect modifier assumption between the two active treatments in order to estimate the effect modifying treatment-covariate interactions for thalidomide [@TSD18;@methods_paper].
 Since lenalidomide and thalidomide are both in the same class of treatments, this assumption may be reasonable.
 
 To impose this assumption, we create a treatment class variable for active treatments vs. placebo.
@@ -100,12 +100,12 @@ ndmm_net <- combine_network(
           study = studyf,
           trt = trtf,
           trt_class = trtclass,
-          Surv = Surv(eventtime, status)),
+          Surv = Surv(eventtime / 12, status)),
   set_agd_surv(ndmm_agd,
                study = studyf,
                trt = trtf,
                trt_class = trtclass,
-               Surv = Surv(eventtime, status),
+               Surv = Surv(eventtime / 12, status),
                covariates = ndmm_agd_covs)
 )
 ```
@@ -327,7 +327,7 @@ Including the covariates in the ML-NMR model is sufficient to remove this PH vio
 
 # Producing population-average estimates
 We now produce population-average estimates for several different quantities of interest.
-The usual array of posterior summary functions is available, including `relative_effects()`, `predict()`, `posterior_ranks()` and `posterior_rank_probs()`.
+The usual array of posterior summary functions is available, including `relative_effects()`, `predict()`, `marginal_effects()`, `posterior_ranks()` and `posterior_rank_probs()`.
 The `predict()` function in particular has numerous options when working with survival models, selected using the `type` argument:
 
 * `"survival"` for survival probabilities
@@ -340,6 +340,7 @@ The `predict()` function in particular has numerous options when working with su
 * `"link"` for the linear predictor
 
 When producing population-average predictions (which is the default with `level = "aggregate"`), each of these quantities corresponds to the population-average marginal survival function; see `?predict.stan_nma` for more details.
+The `marginal_effects()` function may be used to form population-average marginal treatment effects from any of the above population-average predictions.
 
 ## Population-average survival probabilities
 To produce population-average survival curves we use the `predict()` function with `type = "survival"`.
@@ -370,5 +371,14 @@ With a ML-NMR model (or an IPD meta-regression), these are population-average co
 
 plot(loghr)
 ```
+
+## Population-average marginal hazard ratios
+The `marginal_effects()` function produces population-average marginal relative effects, which are formed from the marginal absolute predictions produced by `predict()`.
+For example, we can produce population-average marginal hazard ratios:
+```{r ndmm-marginal-hr}
+plot(marginal_effects(ndmm_fit, type = "hazard", mtype = "ratio")) +
+  theme(legend.position = "top", legend.box.spacing = unit(0, "lines"))
+```
+These are time-varying and non-proportional because the model includes covariate effects, even though the covariates were only measured at baseline and were not themselves time-varying.
 
 # References

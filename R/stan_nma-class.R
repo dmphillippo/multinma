@@ -901,8 +901,8 @@ pairs.stan_nma <- function(x, ..., pars, include = TRUE) {
                            condition = bayesplot::pairs_condition(nuts = "accept_stat__"),
                            .homonyms = "first")
 
-  thm <- bayesplot::bayesplot_theme_set(theme_multinma())
+  thm <- ggplot2::theme_set(theme_multinma())
   out <- do.call(bayesplot::mcmc_pairs, args = args)
-  bayesplot::bayesplot_theme_set(thm)
+  ggplot2::theme_set(thm)
   return(out)
 }

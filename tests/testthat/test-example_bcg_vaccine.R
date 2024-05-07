@@ -8,17 +8,17 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ---- code=readLines("children/knitr_setup.R"), include=FALSE-----------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
 
-## ---- include=FALSE-----------------------------------------------------------
+## ----include=FALSE--------------------------------------------------------------------------------
 set.seed(18284729)
 
 
-## ---- eval = FALSE------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
-## ----setup, echo = FALSE------------------------------------------------------
+## ----setup, echo = FALSE--------------------------------------------------------------------------
 library(multinma)
 nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
              "true" =, "warn" = 2, 
@@ -26,11 +26,11 @@ nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
 options(mc.cores = nc)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 head(bcg_vaccine)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 bcg_net <- set_agd_arm(bcg_vaccine, 
                        study = studyn,
                        trt = trtc,
@@ -40,19 +40,19 @@ bcg_net <- set_agd_arm(bcg_vaccine,
 bcg_net
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval = FALSE------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 ## bcg_fit_unadj <- nma(bcg_net,
 ##                      trt_effects = "random",
 ##                      prior_intercept = normal(scale = 100),
 ##                      prior_trt = normal(scale = 100),
 ##                      prior_het = half_normal(scale = 5))
 
-## ---- echo = FALSE------------------------------------------------------------
+## ----echo = FALSE---------------------------------------------------------------------------------
 bcg_fit_unadj <- nowarn_on_ci(
   nma(bcg_net, 
       seed = 14308133,
@@ -64,25 +64,25 @@ bcg_fit_unadj <- nowarn_on_ci(
   )
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 bcg_fit_unadj
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(bcg_fit_unadj, pars = c("d", "mu", "delta", "tau"))
 
 
-## ----bcg_unadj_pp_plot--------------------------------------------------------
+## ----bcg_unadj_pp_plot----------------------------------------------------------------------------
 plot_prior_posterior(bcg_fit_unadj, prior = c("trt", "het"))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ---- eval = FALSE------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 ## bcg_fit_lat <- nma(bcg_net,
 ##                    trt_effects = "random",
 ##                    regression = ~.trt:latitude,
@@ -92,7 +92,7 @@ summary(half_normal(scale = 5))
 ##                    prior_het = half_normal(scale = 5),
 ##                    adapt_delta = 0.99)
 
-## ---- echo = FALSE------------------------------------------------------------
+## ----echo = FALSE---------------------------------------------------------------------------------
 bcg_fit_lat <- nowarn_on_ci(
                  nma(bcg_net, 
                      seed = 1932599147,
@@ -107,32 +107,32 @@ bcg_fit_lat <- nowarn_on_ci(
                  )
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 bcg_fit_lat
 
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 ## # Not run
 ## print(bcg_fit_lat, pars = c("d", "beta", "mu", "delta", "tau"))
 
 
-## ----bcg_lat_pp_plot----------------------------------------------------------
+## ----bcg_lat_pp_plot------------------------------------------------------------------------------
 plot_prior_posterior(bcg_fit_lat, prior = c("trt", "reg", "het"))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (bcg_dic_unadj <- dic(bcg_fit_unadj))
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (bcg_dic_lat <- dic(bcg_fit_lat))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 summary(bcg_fit_unadj, pars = "tau")
 summary(bcg_fit_lat, pars = "tau")
 
 
-## ----bcg_vaccine_beta_lat, fig.height = 4-------------------------------------
+## ----bcg_vaccine_beta_lat, fig.height = 4---------------------------------------------------------
 summary(bcg_fit_lat, pars = "beta")
 
 plot(bcg_fit_lat, 
@@ -141,7 +141,7 @@ plot(bcg_fit_lat,
      stat = "halfeye")
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 bcg_releff_lat <- relative_effects(bcg_fit_lat,
                                    newdata = tibble::tibble(latitude = seq(10, 50, by = 10),
                                                             label = paste0(latitude, "\u00B0 latitude")),
@@ -150,12 +150,12 @@ bcg_releff_lat <- relative_effects(bcg_fit_lat,
 bcg_releff_lat
 
 
-## ----bcg_vaccine_releff_lat, fig.height = 5-----------------------------------
+## ----bcg_vaccine_releff_lat, fig.height = 5-------------------------------------------------------
 plot(bcg_releff_lat, 
      ref_line = 0)
 
 
-## ----bcg_vaccine_reg_plot-----------------------------------------------------
+## ----bcg_vaccine_reg_plot-------------------------------------------------------------------------
 library(dplyr)
 library(ggplot2)
 
@@ -189,15 +189,15 @@ ggplot(aes(x = latitude), data = bcg_lor) +
   theme_multinma()
 
 
-## ----bcg_vaccine_predictive_unadj---------------------------------------------
+## ----bcg_vaccine_predictive_unadj-----------------------------------------------------------------
 (bcg_predeff_unadj <- relative_effects(bcg_fit_unadj, predictive_distribution = TRUE))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 mean(as.matrix(bcg_predeff_unadj) > 0)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 bcg_predeff_lat <- relative_effects(bcg_fit_lat,
                                    newdata = tibble::tibble(latitude = seq(0, 50, by = 10),
                                                             label = paste0(latitude, "\u00B0 latitude")),
@@ -207,11 +207,11 @@ bcg_predeff_lat <- relative_effects(bcg_fit_lat,
 bcg_predeff_lat
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 colMeans(as.matrix(bcg_predeff_lat) > 0)
 
 
-## ----bcg_vaccine_tests, include=FALSE, eval=params$run_tests------------------
+## ----bcg_vaccine_tests, include=FALSE, eval=params$run_tests--------------------------------------
 #--- Test against TSD 3 results ---
 library(testthat)
 library(dplyr)
@@ -299,16 +299,21 @@ test_that("Relative effects and predict work with data.frame", {
   new <- tibble::tibble(latitude = seq(10, 50, by = 10), label = paste0(latitude, "\u00B0 latitude"))
   expect_identical(relative_effects(bcg_fit_lat, newdata = new, study = label),
                    relative_effects(bcg_fit_lat, newdata = as.data.frame(new), study = label))
+  
   # For predict() we need to account for the random baseline sample
-  # expect_identical(withr::with_seed(predict(bcg_fit_lat, newdata = new, study = label,
-  #                                           baseline = distr(qnorm, mean = -2, sd = 0.1)), seed = 1234),
-  #                  withr::with_seed(predict(bcg_fit_lat, newdata = as.data.frame(new), study = label,
-  #                                           baseline = distr(qnorm, mean = -2, sd = 0.1)), seed = 1234))
   qcons <- function(p, cons = 0) {cons}
+  
   expect_identical(predict(bcg_fit_lat, newdata = new, study = label,
                            baseline = distr(qcons, -2)),
                    predict(bcg_fit_lat, newdata = as.data.frame(new), study = label,
                            baseline = distr(qcons, -2)))
+  
+  expect_identical(predict(bcg_fit_lat, newdata = new, study = label,
+                           baseline = distr(qcons, 0.5),
+                           baseline_type = "response"),
+                   predict(bcg_fit_lat, newdata = as.data.frame(new), study = label,
+                           baseline = distr(qcons, 0.5),
+                           baseline_type = "response"))
 })
 
 test_that("Predictions using network baselines are correct", {
