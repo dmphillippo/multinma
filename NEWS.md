@@ -1,3 +1,5 @@
+# multinma 0.7.0.9000
+
 # multinma 0.7.0
 
 * Feature: The new `marginal_effects()` function produces marginal treatment
