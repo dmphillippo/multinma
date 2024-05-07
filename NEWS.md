@@ -1,4 +1,4 @@
-# multinma 0.6.1.9000
+# multinma 0.7.0
 
 * Feature: The new `marginal_effects()` function produces marginal treatment
 effects, as a wrapper around absolute predictions from `predict()`. For example, 
