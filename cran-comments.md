@@ -1,6 +1,14 @@
-This release adds new features and fixes a few bugs.
+Incremented the version number and resubmitted.
+
+Package previously archived due to UBSAN warnings. StanHeaders 2.32.7 and 2.32.8
+omitted the necessary patch, which has been reinstated with 2.32.9.
+
+Confirmed that this fixes the sanitizer warnings with rocker/r-devel-san. No 
+changes are required to this package, this submission is identical to the 
+previous release (v0.7.0).
 
 ## Test environments
+* rocker/r-devel-san
 * local R installation (Windows 10), R 4.4.0
 * win-builder (release, devel)
 * Ubuntu 22.04.4 on GitHub Actions (release, devel, oldrel)
