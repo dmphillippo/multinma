@@ -1,4 +1,7 @@
-# multinma 0.7.0.9000
+# multinma 0.7.1
+
+No changes. Re-release on CRAN after sanitizer warnings addressed by StanHeaders
+(stan-dev/rstan#1111).
 
 # multinma 0.7.0
 
