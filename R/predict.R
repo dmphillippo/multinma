@@ -2054,7 +2054,7 @@ predict.stan_nma_surv <- function(object, times = NULL,
 
   # Set times_seq by default if called within plot()
   if (is.null(times_seq) && type %in% c("survival", "hazard", "cumhaz") &&
-       "plot" %in% purrr::map_chr(sys.calls(), ~deparse(.[[1]])))
+      "plot" %in% unlist(lapply(sys.calls(), function(x) deparse(x[[1]]))))
     times_seq <- 50
 
   # Other checks (including times, aux) in predict.stan_nma()
