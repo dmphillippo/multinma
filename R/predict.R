@@ -2054,8 +2054,7 @@ predict.stan_nma_surv <- function(object, times = NULL,
 
   # Set times_seq by default if called within plot()
   if (is.null(times_seq) && type %in% c("survival", "hazard", "cumhaz") &&
-       (deparse(sys.call(-2)[[1]]) == "plot" ||
-        deparse(sys.call(-3)[[1]]) == "marginal_effects" && deparse(sys.call(-4)[[1]]) == "plot"))
+       "plot" %in% purrr::map_chr(sys.calls(), ~deparse(.[[1]])))
     times_seq <- 50
 
   # Other checks (including times, aux) in predict.stan_nma()
