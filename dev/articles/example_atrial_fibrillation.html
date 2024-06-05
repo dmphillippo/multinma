@@ -213,15 +213,16 @@ parameter values implied by these prior distributions with the
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span></span>
 <span><span class="co">#&gt; 50% of the prior density lies between -67.45 and 67.45.</span></span>
-<span><span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A half-Normal prior distribution: location = 0, scale = 5.</span></span>
 <span><span class="co">#&gt; 50% of the prior density lies between 0 and 3.37.</span></span>
 <span><span class="co">#&gt; 95% of the prior density lies between 0 and 9.8.</span></span></code></pre></div>
 <p>Fitting the model with the <code><a href="../reference/nma.html">nma()</a></code> function. We increase
 the target acceptance rate <code>adapt_delta = 0.99</code> to minimise
 divergent transition warnings.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">af_fit_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">af_net</span>, </span>
 <span>                trt_effects <span class="op">=</span> <span class="st">"random"</span>,</span>
 <span>                prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
@@ -231,7 +232,7 @@ divergent transition warnings.</p>
 <pre><code><span><span class="co">#&gt; Note: Setting "Standard adjusted dose anti-coagulant" as the network reference treatment.</span></span></code></pre>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">af_fit_1</span></span>
 <span><span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span></span>
 <span><span class="co">#&gt; Inference for Stan model: binomial_1par.</span></span>
@@ -277,25 +278,25 @@ method:</p>
 <span><span class="co">#&gt; lp__                                         -4766.62 -4758.17   927    1</span></span>
 <span><span class="co">#&gt; tau                                              0.37     0.58   720    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue May  7 17:13:21 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jun  5 08:52:51 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
 <p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects
 <span class="math inline">\(\delta_{jk}\)</span> are hidden, but could
 be examined by changing the <code>pars</code> argument:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">af_fit_1</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The prior and posterior distributions can be compared visually using
 the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">af_fit_1</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_pp_plot-1.png" width="100%" style="display: block; margin: auto;"></p>
 <p>We can compute relative effects against placebo/standard care with
 the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with the
 <code>trt_ref</code> argument:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_1_releff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">af_fit_1</span>, trt_ref <span class="op">=</span> <span class="st">"Placebo/Standard care"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                               mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS</span></span>
 <span><span class="co">#&gt; d[Standard adjusted dose anti-coagulant]     -0.76 0.20 -1.16 -0.89 -0.76 -0.63 -0.37     1788</span></span>
@@ -333,12 +334,12 @@ the <code><a href="../reference/relative_effects.html">relative_effects()</a></c
 <span><span class="co">#&gt; d[Ximelagatran]                                  2983    1</span></span></code></pre></div>
 <p>These estimates can easily be plotted with the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>
 method:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_releff</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_releff_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>We can also produce treatment rankings, rank probabilities, and
 cumulative rank probabilities.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_1_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">af_fit_1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                                  mean   sd  2.5% 25% 50% 75% 97.5% Bulk_ESS</span></span>
 <span><span class="co">#&gt; rank[Standard adjusted dose anti-coagulant]      5.29 1.40  3.00   4   5   6     8     2826</span></span>
@@ -375,10 +376,11 @@ cumulative rank probabilities.</p>
 <span><span class="co">#&gt; rank[Medium dose aspirin]                           3363    1</span></span>
 <span><span class="co">#&gt; rank[Placebo/Standard care]                         3334    1</span></span>
 <span><span class="co">#&gt; rank[Triflusal]                                       NA    1</span></span>
-<span><span class="co">#&gt; rank[Ximelagatran]                                  3156    1</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_ranks</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt; rank[Ximelagatran]                                  3156    1</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_ranks</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_1_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">af_fit_1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                              p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]</span></span>
 <span><span class="co">#&gt; d[Standard adjusted dose anti-coagulant]          0.00      0.01      0.08      0.20      0.28</span></span>
@@ -451,10 +453,11 @@ cumulative rank probabilities.</p>
 <span><span class="co">#&gt; d[Medium dose aspirin]                             0.02       0.01       0.00       0.00</span></span>
 <span><span class="co">#&gt; d[Placebo/Standard care]                           0.22       0.18       0.09       0.03</span></span>
 <span><span class="co">#&gt; d[Triflusal]                                       0.06       0.08       0.10       0.19</span></span>
-<span><span class="co">#&gt; d[Ximelagatran]                                    0.00       0.00       0.00       0.00</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_rankprobs</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt; d[Ximelagatran]                                    0.00       0.00       0.00       0.00</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_rankprobs</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_rankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_1_cumrankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">af_fit_1</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                              p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]</span></span>
 <span><span class="co">#&gt; d[Standard adjusted dose anti-coagulant]          0.00      0.01      0.09      0.29      0.58</span></span>
@@ -527,8 +530,9 @@ cumulative rank probabilities.</p>
 <span><span class="co">#&gt; d[Medium dose aspirin]                             0.99       1.00       1.00          1</span></span>
 <span><span class="co">#&gt; d[Placebo/Standard care]                           0.71       0.89       0.97          1</span></span>
 <span><span class="co">#&gt; d[Triflusal]                                       0.63       0.70       0.81          1</span></span>
-<span><span class="co">#&gt; d[Ximelagatran]                                    1.00       1.00       1.00          1</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_cumrankprobs</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt; d[Ximelagatran]                                    1.00       1.00       1.00          1</span></span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_cumrankprobs</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_cumrankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -557,7 +561,7 @@ regression models by decorrelating the sampling space; we specify that
 this should be used with <code>QR = TRUE</code>, and increase the target
 acceptance rate <code>adapt_delta = 0.99</code> to minimise divergent
 transition warnings.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">af_fit_4b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">af_net</span>, </span>
 <span>                 trt_effects <span class="op">=</span> <span class="st">"random"</span>,</span>
 <span>                 regression <span class="op">=</span> <span class="op">~</span> <span class="va">.trt</span><span class="op">:</span><span class="va">stroke</span>,</span>
@@ -574,7 +578,7 @@ transition warnings.</p>
 <span><span class="co">#&gt; https://mc-stan.org/misc/warnings.html#bulk-ess</span></span></code></pre>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">af_fit_4b</span></span>
 <span><span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span></span>
 <span><span class="co">#&gt; Regression model: ~.trt:stroke.</span></span>
@@ -630,7 +634,7 @@ method:</p>
 <span><span class="co">#&gt; lp__                                         -4766.36 -4758.07  1138 1.00</span></span>
 <span><span class="co">#&gt; tau                                              0.26     0.50   330 1.02</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue May  7 17:13:30 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Jun  5 08:53:01 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -641,19 +645,19 @@ here proportion of prior stroke centered at the network mean value
 <p>By default, summaries of the study-specific intercepts <span class="math inline">\(\mu_j\)</span> and study-specific relative effects
 <span class="math inline">\(\delta_{jk}\)</span> are hidden, but could
 be examined by changing the <code>pars</code> argument:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The prior and posterior distributions can be compared visually using
 the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"reg"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>We can compute relative effects against placebo/standard care with
 the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with the
 <code>trt_ref</code> argument, which by default produces relative
 effects for the observed proportions of prior stroke in each study:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="op">(</span><span class="va">af_4b_releff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, trt_ref <span class="op">=</span> <span class="st">"Placebo/Standard care"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_releff</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
@@ -661,7 +665,7 @@ effects for the observed proportions of prior stroke in each study:</p>
 values using the <code>newdata</code> argument. For example, treatment
 effects when no individuals or all individuals have prior stroke are
 produced by</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_4b_releff_01</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, </span>
 <span>                                     trt_ref <span class="op">=</span> <span class="st">"Placebo/Standard care"</span>,</span>
 <span>                                     newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>stroke <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, </span>
@@ -747,18 +751,19 @@ produced by</p>
 <span><span class="co">#&gt; d[stroke = 1: Low dose aspirin + dipyridamole]            0.41     5452     3293 1.00</span></span>
 <span><span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                        0.21     4399     2268 1.01</span></span>
 <span><span class="co">#&gt; d[stroke = 1: Triflusal]                                  1.58     4603     2921 1.00</span></span>
-<span><span class="co">#&gt; d[stroke = 1: Ximelagatran]                              -0.55     4235     2734 1.00</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_releff_01</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt; d[stroke = 1: Ximelagatran]                              -0.55     4235     2734 1.00</span></span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_releff_01</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_releff_01_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>The estimated class interactions (against the reference “Mixed”
 class) are very uncertain.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, pars <span class="op">=</span> <span class="st">"beta"</span>, stat <span class="op">=</span> <span class="st">"halfeye"</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_betas-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>The interactions are more straightforward to interpret if we
 transform the interaction coefficients (using the consistency equations)
 so that they are against the control class:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">af_4b_beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">as.array</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, pars <span class="op">=</span> <span class="st">"beta"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Subtract beta[Control:stroke] from the other class interactions</span></span>
@@ -778,8 +783,9 @@ so that they are against the control class:</p>
 <span><span class="co">#&gt;                                      Tail_ESS Rhat</span></span>
 <span><span class="co">#&gt; beta[.trtclassAnti-coagulant:stroke]     2957 1.01</span></span>
 <span><span class="co">#&gt; beta[.trtclassAnti-platelet:stroke]      2766 1.00</span></span>
-<span><span class="co">#&gt; beta[.trtclassMixed:stroke]              2927 1.00</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">af_4b_beta</span><span class="op">)</span>, stat <span class="op">=</span> <span class="st">"halfeye"</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt; beta[.trtclassMixed:stroke]              2927 1.00</span></span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">af_4b_beta</span><span class="op">)</span>, stat <span class="op">=</span> <span class="st">"halfeye"</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_betas_transformed-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>There is some evidence that the effect of anti-coagulants increases
 (compared to control) with prior stroke. There is little evidence the
@@ -795,7 +801,7 @@ cumulative rank probabilities. By default (without the
 value of <code>stroke</code> for each study in the network in turn. To
 instead produce rankings for when no individuals or all individuals have
 prior stroke, we specify the <code>newdata</code> argument.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_4b_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">af_fit_4b</span>,</span>
 <span>                                newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>stroke <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, </span>
 <span>                                                     label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"stroke = 0"</span>, <span class="st">"stroke = 1"</span><span class="op">)</span><span class="op">)</span>, </span>
@@ -884,10 +890,11 @@ prior stroke, we specify the <code>newdata</code> argument.</p>
 <span><span class="co">#&gt; rank[stroke = 1: Medium dose aspirin]                           4235     3679    1</span></span>
 <span><span class="co">#&gt; rank[stroke = 1: Placebo/Standard care]                         4379     3372    1</span></span>
 <span><span class="co">#&gt; rank[stroke = 1: Triflusal]                                     4014     3015    1</span></span>
-<span><span class="co">#&gt; rank[stroke = 1: Ximelagatran]                                  2616     2661    1</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_ranks</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt; rank[stroke = 1: Ximelagatran]                                  2616     2661    1</span></span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_ranks</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_4b_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">af_fit_4b</span>,</span>
 <span>                                         newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>stroke <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, </span>
 <span>                                                              label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"stroke = 0"</span>, <span class="st">"stroke = 1"</span><span class="op">)</span><span class="op">)</span>, </span>
@@ -1120,15 +1127,16 @@ prior stroke, we specify the <code>newdata</code> argument.</p>
 <span><span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                             0.00       0.00</span></span>
 <span><span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                           0.01       0.00</span></span>
 <span><span class="co">#&gt; d[stroke = 1: Triflusal]                                       0.03       0.05</span></span>
-<span><span class="co">#&gt; d[stroke = 1: Ximelagatran]                                    0.00       0.00</span></span>
-<span></span>
+<span><span class="co">#&gt; d[stroke = 1: Ximelagatran]                                    0.00       0.00</span></span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># Modify the default output with ggplot2 functionality</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_rankprobs</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">Treatment</span><span class="op">~</span><span class="va">Study</span>, labeller <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labellers.html" class="external-link">label_wrap_gen</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>strip.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_rankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_4b_cumrankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>                                            newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>stroke <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, </span>
 <span>                                                                 label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"stroke = 0"</span>, <span class="st">"stroke = 1"</span><span class="op">)</span><span class="op">)</span>, </span>
@@ -1361,8 +1369,9 @@ prior stroke, we specify the <code>newdata</code> argument.</p>
 <span><span class="co">#&gt; d[stroke = 1: Medium dose aspirin]                             1.00          1</span></span>
 <span><span class="co">#&gt; d[stroke = 1: Placebo/Standard care]                           1.00          1</span></span>
 <span><span class="co">#&gt; d[stroke = 1: Triflusal]                                       0.95          1</span></span>
-<span><span class="co">#&gt; d[stroke = 1: Ximelagatran]                                    1.00          1</span></span>
-<span></span>
+<span><span class="co">#&gt; d[stroke = 1: Ximelagatran]                                    1.00          1</span></span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_cumrankprobs</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">Treatment</span><span class="op">~</span><span class="va">Study</span>, labeller <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labellers.html" class="external-link">label_wrap_gen</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>strip.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -1373,12 +1382,12 @@ prior stroke, we specify the <code>newdata</code> argument.</p>
 <h2 id="model-fit-and-comparison">Model fit and comparison<a class="anchor" aria-label="anchor" href="#model-fit-and-comparison"></a>
 </h2>
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_dic_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">af_fit_1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Residual deviance: 60.4<span style="color: #555555;"> (on 61 data points)</span></span></span>
 <span><span class="co">#&gt;                pD: 48.9</span></span>
 <span><span class="co">#&gt;               DIC: 109.4</span></span></code></pre></div>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_dic_4b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">af_fit_4b</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Residual deviance: 58.3<span style="color: #555555;"> (on 61 data points)</span></span></span>
 <span><span class="co">#&gt;                pD: 48.3</span></span>
@@ -1393,10 +1402,10 @@ patients with prior stroke is explaining some of the heterogeneity in
 the data.</p>
 <p>We can also examine the residual deviance contributions with the
 corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_dic_1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_1_resdev_plot-1.png" width="700" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_dic_4b</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_atrial_fibrillation_files/figure-html/af_4b_resdev_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
