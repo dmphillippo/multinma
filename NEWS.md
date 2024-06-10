@@ -1,7 +1,10 @@
 # multinma 0.7.1
 
-No changes. Re-release on CRAN after sanitizer warnings addressed by StanHeaders
-(stan-dev/rstan#1111).
+* Fix: Producing survival/hazard/cumulative hazard predictions for survival 
+models with `predict()` outside of a `plot()` call no longer gives an error 
+(#40).
+* Fix: Increased StanHeaders version requirement to version 2.32.9 or later, to 
+avoid CRAN sanitizer warnings (caused by stan-dev/rstan#1111).
 
 # multinma 0.7.0
 
