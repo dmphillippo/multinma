@@ -1663,7 +1663,9 @@ predict.stan_nma <- function(object, ...,
           if (packageVersion("dplyr") > "1.1.0") {
             pd_undups <- dplyr::filter(preddat, .data$.study == studies[s], .data$.trt == treatments[trt]) %>%
               dplyr::distinct(dplyr::pick(dplyr::all_of(collapse_by))) %>%
-              dplyr::mutate(.dup_id = 1:dplyr::n())
+              dplyr::mutate(.dup_id = seq_len(dplyr::n()))
+
+            if (nrow(pd_undups) == 0) next
 
             pd_col <- dplyr::filter(preddat, .data$.study == studies[s], .data$.trt == treatments[trt]) %>%
               dplyr::left_join(pd_undups, by = collapse_by) %>%
@@ -1673,7 +1675,9 @@ predict.stan_nma <- function(object, ...,
           } else {
             pd_undups <- dplyr::filter(preddat, .data$.study == studies[s], .data$.trt == treatments[trt]) %>%
               dplyr::distinct(dplyr::across(dplyr::all_of(collapse_by))) %>%
-              dplyr::mutate(.dup_id = 1:dplyr::n())
+              dplyr::mutate(.dup_id = seq_len(dplyr::n()))
+
+            if (nrow(pd_undups) == 0) next
 
             pd_col <- dplyr::filter(preddat, .data$.study == studies[s], .data$.trt == treatments[trt]) %>%
               dplyr::left_join(pd_undups, by = collapse_by) %>%
