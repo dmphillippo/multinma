@@ -1,3 +1,5 @@
+# multinma 0.7.1.9000
+
 # multinma 0.7.1
 
 * Fix: Producing survival/hazard/cumulative hazard predictions for survival 
