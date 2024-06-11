@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.1.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,8 +66,13 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.7.0.9000" id="multinma-0709000">multinma 0.7.0.9000<a class="anchor" aria-label="anchor" href="#multinma-0709000"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.7.1.9000" id="multinma-0719000">multinma 0.7.1.9000<a class="anchor" aria-label="anchor" href="#multinma-0719000"></a></h2>
 </div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.1" id="multinma-071">multinma 0.7.1<a class="anchor" aria-label="anchor" href="#multinma-071"></a></h2><p class="text-muted">CRAN release: 2024-06-11</p>
+<ul><li>Fix: Producing survival/hazard/cumulative hazard predictions for survival models with <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> outside of a <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> call no longer gives an error (<a href="https://github.com/dmphillippo/multinma/issues/40" class="external-link">#40</a>).</li>
+<li>Fix: Increased StanHeaders version requirement to version 2.32.9 or later, to avoid CRAN sanitizer warnings (caused by stan-dev/rstan#1111).</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.0" id="multinma-070">multinma 0.7.0<a class="anchor" aria-label="anchor" href="#multinma-070"></a></h2><p class="text-muted">CRAN release: 2024-05-07</p>
 <ul><li>Feature: The new <code><a href="../reference/marginal_effects.html">marginal_effects()</a></code> function produces marginal treatment effects, as a wrapper around absolute predictions from <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>. For example, for an analysis with a binary outcome marginal odds ratios, risk ratios, or risk differences may be produced. For survival outcomes, marginal effects may be based on the full range of predictions produced by <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>, such as marginal differences in restricted mean survival times, or time-varying marginal hazard ratios.</li>
