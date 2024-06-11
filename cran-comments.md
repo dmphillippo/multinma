@@ -1,6 +1,12 @@
-This release adds new features and fixes a few bugs.
+Require StanHeaders version 2.32.9 or later in LinkingTo, as requested, which 
+fixes the UBSAN warnings.
+
+Confirmed that this fixes the sanitizer warnings with rocker/r-devel-san and 
+rhub clang-asan.
 
 ## Test environments
+* rocker/r-devel-san
+* rhub clang-asan
 * local R installation (Windows 10), R 4.4.0
 * win-builder (release, devel)
 * Ubuntu 22.04.4 on GitHub Actions (release, devel, oldrel)

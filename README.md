@@ -78,7 +78,7 @@ papers:
 The `multinma` package can be cited as follows:
 
 > Phillippo, D. M. (2024). *multinma: Bayesian Network Meta-Analysis of
-> Individual and Aggregate Data*. R package version 0.7.0, doi:
+> Individual and Aggregate Data*. R package version 0.7.1, doi:
 > [10.5281/zenodo.3904454](https://doi.org/10.5281/zenodo.3904454).
 
 When fitting ML-NMR models, please cite the methods paper:
