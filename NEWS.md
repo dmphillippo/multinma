@@ -1,5 +1,9 @@
 # multinma 0.7.1.9000
 
+* Fix: Predictions for non-proportional hazards IPD NMA or ML-NMR survival 
+models using `aux_regression = ~.trt` were incorrectly omitting the treatment 
+effects on the auxiliary parameter(s) in some cases (#43).
+
 # multinma 0.7.1
 
 * Fix: Producing survival/hazard/cumulative hazard predictions for survival 

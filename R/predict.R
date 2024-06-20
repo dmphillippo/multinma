@@ -1704,7 +1704,16 @@ predict.stan_nma <- function(object, ...,
           if (!aux_int) { #(length(setdiff(object$aux_by, c(".study", ".trt"))) == 0) {
             aux_s <- grepl(paste0("\\[(", paste(aux_l, collapse = "|"), if (object$likelihood %in% c("mspline", "pexp")) ")," else ")\\]"),
                            dimnames(aux_array)[[3]])
-            aux_array_s <- aux_array[ , , aux_s, drop = FALSE]
+
+            # Add in arm-level aux regression terms, if present
+            if (!is.null(object$aux_regression)) {
+              aux_array_s <- make_aux_predict(aux = aux_array[ , , aux_s, drop = FALSE],
+                                              beta_aux = beta_aux,
+                                              X_aux = X_aux[ss[1], , drop = FALSE],
+                                              likelihood = object$likelihood)
+            } else {
+              aux_array_s <- aux_array[ , , aux_s, drop = FALSE]
+            }
 
           } else {
             # Aux regression or stratified aux pars within arm, need to expand these out over the individuals/integration points
