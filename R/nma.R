@@ -11,7 +11,8 @@
 #' @param regression A one-sided model formula, specifying the prognostic and
 #'   effect-modifying terms for a regression model. Any references to treatment
 #'   should use the `.trt` special variable, for example specifying effect
-#'   modifier interactions as `variable:.trt` (see details).
+#'   modifier interactions as `variable:.trt` (see details). The special variable `.mu`
+#'   can be used for baseline risk meta-regression: `~.mu:.trt`.
 #' @param class_interactions Character string specifying whether effect modifier
 #'   interactions are specified as `"common"`, `"exchangeable"`, or
 #'   `"independent"`.
@@ -557,6 +558,16 @@ nma <- function(network,
   if (!rlang::is_bool(int_check)) abort("`int_check` should be a logical scalar (TRUE or FALSE).")
   if (int_thin > 0) int_check <- FALSE
 
+  if (".mu" %in% all.vars(regression)) {
+    if (QR) {
+      abort("Cannot fit model with baseline risk meta-regression and QR.")
+    }
+
+    if (!(likelihood %in% c("bernoulli", "binomial", "ordered", "normal"))) {
+      abort(glue::glue("Baseline risk meta-regression not yet supported with likelihood '{likelihood}'."))
+    }
+  }
+
   # Set adapt_delta
   if (is.null(adapt_delta)) {
     adapt_delta <- switch(trt_effects, fixed = 0.8, random = 0.95)
@@ -687,6 +698,22 @@ nma <- function(network,
       }
     }
 
+    if (".mu" %in% all.vars(regression)) {
+      if (".mu" %in% colnames(data)) {
+        warn("Overwriting '.mu'. Special name. Use different name.")
+      }
+
+      ref_trt <- levels(idat_agd_arm$.trt)[1L]
+
+      idat_agd_arm <- idat_agd_arm %>%
+        dplyr::group_by(.data$.study) %>%
+        dplyr::mutate(.mu = dplyr::if_else(
+          .data$.trt != ref_trt & ref_trt %in% .data$.trt,
+          as.numeric(.data$.study), 0
+        )) %>%
+        dplyr::ungroup()
+    }
+
     # Only take necessary columns
     idat_agd_arm <- get_model_data_columns(idat_agd_arm,
                                            regression = regression,
@@ -796,6 +823,9 @@ nma <- function(network,
     if (!is.null(regression)) {
       reg_names <- all.vars(regression)
 
+      # Centering of the baseline risk is dealt with separately (`xbar_mu`)
+      reg_names <- setdiff(reg_names, ".mu")
+
       # Ignore any variable(s) used as offset(s)
       reg_terms <- terms(regression)
 
@@ -824,6 +854,8 @@ nma <- function(network,
   } else {
     xbar <- NULL
   }
+
+  xbar_mu <- if (".mu" %in% all.vars(regression)) calculate_baseline_risk(network, link)
 
   # Make NMA formula
   nma_formula <- make_nma_formula(regression,
@@ -1054,6 +1086,7 @@ nma <- function(network,
     agd_arm_offset = offset_agd_arm,
     agd_contrast_offset = offset_agd_contrast,
     trt_effects = trt_effects,
+    xbar_mu = xbar_mu,
     RE_cor = .RE_cor,
     which_RE = .which_RE,
     likelihood = likelihood,
@@ -1220,7 +1253,7 @@ nma <- function(network,
               regression = regression,
               aux_regression = aux_regression,
               class_interactions = if (!is.null(regression) && !is.null(network$classes)) class_interactions else NULL,
-              xbar = xbar,
+              xbar = c(xbar, .mu = xbar_mu),
               likelihood = likelihood,
               link = link,
               aux_by = if (has_aux_by) colnames(get_aux_by_data(aux_dat, by = aux_by)) else NULL,
@@ -1270,6 +1303,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     n_int,
                     ipd_offset = NULL, agd_arm_offset = NULL, agd_contrast_offset = NULL,
                     trt_effects = c("fixed", "random"),
+                    xbar_mu = NULL,
                     RE_cor = NULL,
                     which_RE = NULL,
                     likelihood = NULL,
@@ -1435,6 +1469,7 @@ nma.fit <- function(ipd_x, ipd_y,
   col_trt <- grepl("^(\\.trt|\\.contr)[^:]+$", x_names)
   col_omega <- x_names == ".omegaTRUE"
   col_reg <- !col_study & !col_trt & !col_omega
+  col_br <- col_reg & grepl("\\.mu", x_names)
 
   n_trt <- sum(col_trt) + 1
 
@@ -1604,8 +1639,12 @@ nma.fit <- function(ipd_x, ipd_y,
     R_inv = if (QR) X_all_R_inv else matrix(0, 0, 0),
     # Offsets
     has_offset = has_offsets,
-    offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric()
-    )
+    offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric(),
+    br_n = 0L,
+    br_index = matrix(0L, 0L, 2L),
+    br_mu = integer(),
+    mu_center = 0
+  )
 
   # Add priors
   standat <- purrr::list_modify(standat,
@@ -1658,6 +1697,24 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Set chain_id to make CHAIN_ID available in data block
   stanargs$chain_id <- 1L
+
+  # Baseline risk meta-regression
+  if (!is.null(xbar_mu)) {
+    stopifnot(length(col_br) == ncol(X_all))
+
+    br_index <- which(
+      t(t(X_all) != 0 & col_br),
+      arr.ind = TRUE
+    )
+
+    standat <- purrr::list_modify(
+      standat,
+      br_n = nrow(br_index),
+      br_index = br_index,
+      br_mu = as.array(as.integer(X_all[br_index])),
+      mu_center = xbar_mu
+    )
+  }
 
   # Call Stan model for given likelihood
 
