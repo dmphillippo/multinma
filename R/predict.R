@@ -1707,17 +1707,10 @@ predict.stan_nma <- function(object, ...,
 
             # Add in arm-level aux regression terms, if present
             if (!is.null(object$aux_regression)) {
-              if (object$likelihood %in% c("mspline", "pexp", "gengamma")) {
-                aux_array_s <- make_aux_predict(aux = aux_array[ , , aux_s, , drop = TRUE],
-                                                          beta_aux = beta_aux,
-                                                          X_aux = X_aux[ss[1], , drop = FALSE],
-                                                          likelihood = object$likelihood)
-              } else {
-                aux_array_s <- make_aux_predict(aux = aux_array[ , , aux_s, drop = FALSE],
-                                                        beta_aux = beta_aux,
-                                                        X_aux = X_aux[ss[1], , drop = FALSE],
-                                                        likelihood = object$likelihood)
-              }
+              aux_array_s <- make_aux_predict(aux = aux_array[ , , aux_s, drop = FALSE],
+                                              beta_aux = beta_aux,
+                                              X_aux = X_aux[ss[1], , drop = FALSE],
+                                              likelihood = object$likelihood)
             } else {
               aux_array_s <- aux_array[ , , aux_s, drop = FALSE]
             }
