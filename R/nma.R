@@ -15,6 +15,14 @@
 #' @param class_interactions Character string specifying whether effect modifier
 #'   interactions are specified as `"common"`, `"exchangeable"`, or
 #'   `"independent"`.
+#' @param class_effects Character string specifying a model for treatment class effects,
+#'   either `"independent"` (the default), `"exchangeable"`, or `"common"`.
+#' @param class_sd Character string specifying whether the class standard deviations in a
+#'   class effects model should be `"independent"` (i.e. separate for each class, the default),
+#'   or `"common"` (i.e. shared across all classes). Alternatively this can be a list of
+#'   character vectors, each of which describe a set classes for which to share a common class SD;
+#'   any list names will be used to name the output parameters, otherwise the name will be taken
+#'   from the first class in each set.
 #' @param likelihood Character string specifying a likelihood, if unspecified
 #'   will be inferred from the data (see details)
 #' @param link Character string specifying a link function, if unspecified will
@@ -48,6 +56,10 @@
 #' @param aux_regression A one-sided model formula giving a regression model for
 #'   the auxiliary parameters. Currently only used for survival models, see
 #'   details. Cannot be used with `aux_by`.
+#' @param prior_class_mean Specification of prior distribution for the
+#'   treatment class means (if `class_effects = "exchangeable"`).
+#' @param prior_class_sd Specification of prior distribution for the
+#'   treatment class standard deviations (if `class_effects = "exchangeable"`).
 #' @param QR Logical scalar (default `FALSE`), whether to apply a QR
 #'   decomposition to the model design matrix
 #' @param center Logical scalar (default `TRUE`), whether to center the
@@ -263,6 +275,8 @@ nma <- function(network,
                 trt_effects = c("fixed", "random"),
                 regression = NULL,
                 class_interactions = c("common", "exchangeable", "independent"),
+                class_effects = c("independent","common", "exchangeable"),
+                class_sd =  c("independent", "common"),
                 likelihood = NULL,
                 link = NULL,
                 ...,
@@ -274,6 +288,8 @@ nma <- function(network,
                 prior_reg = .default(normal(scale = 10)),
                 prior_aux = .default(),
                 prior_aux_reg = .default(),
+                prior_class_mean = .default(normal(scale = 10)),
+                prior_class_sd = .default(half_normal(scale = 5)),
                 aux_by = NULL,
                 aux_regression = NULL,
                 QR = FALSE,
@@ -285,6 +301,7 @@ nma <- function(network,
                 n_knots = 7,
                 knots = NULL,
                 mspline_basis = NULL) {
+
 
   # Check network
   if (!inherits(network, "nma_data")) {
@@ -300,6 +317,56 @@ nma <- function(network,
   if (length(consistency) > 1) abort("`consistency` must be a single string.")
   trt_effects <- rlang::arg_match(trt_effects)
   if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
+  class_effects <- rlang::arg_match(class_effects)
+  if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
+
+  # Notify if default reference treatment is used
+  if (.is_default(network$treatments))
+    inform(glue::glue('Note: Setting "{levels(network$treatments)[1]}" as the network reference treatment.'))
+
+  if (!is_network_connected(network)) {
+    inform("Note: Network is disconnected. See ?is_network_connected for more details.")
+  }
+
+
+  if (class_effects == "common") {
+    # Overwrite treatments with class variables for individual patient data (IPD)
+    if (has_ipd(network)) {
+      network$ipd$.trt <- network$ipd$.trtclass
+    }
+
+    # Add similar code for aggregated data (AGD) - arm and contrast
+    if (has_agd_arm(network)) {
+      network$agd_arm$.trt <- network$agd_arm$.trtclass
+    }
+    if (has_agd_contrast(network)) {
+      network$agd_contrast$.trt <- network$agd_contrast$.trtclass
+    }
+
+    # Update the treatments based on the classes
+    # Assuming '.default()' is a function that processes classes into treatments
+    network$treatments <- .default(network$classes)
+  }
+
+  # Check class_sd
+  if (is.list(class_sd)) {
+    # Check that all classes listed in 'class_sd' are in 'network$classes'
+    if (!all(unlist(class_sd) %in% network$classes)) {
+      stop("Some classes listed in 'class_sd' are not found in 'network$classes'")
+    }
+
+
+    # Check that all the collapsed classes are distinct and don't share a class
+    flattened_classes <- unlist(class_sd)
+    if (length(flattened_classes) != length(unique(flattened_classes))) {
+      stop("Some classes are listed in more than one shared standard deviation group in 'class_sd'")
+    }
+  } else {
+    class_sd <- rlang::arg_match(class_sd)
+    if (length(class_sd) > 1) abort("`class_sd` must be a single string.")
+  }
+
+
 
   if (consistency == "nodesplit") {
 
@@ -379,6 +446,8 @@ nma <- function(network,
       ns_arglist <- list(network = network,
                          consistency = "nodesplit",
                          trt_effects = trt_effects,
+                         class_effects = class_effects,
+                         class_sd = class_sd,
                          regression = regression,
                          likelihood = likelihood,
                          link = link,
@@ -392,6 +461,8 @@ nma <- function(network,
                          prior_aux_reg = prior_aux_reg,
                          aux_by = aux_by,
                          aux_regression = aux_regression,
+                         prior_class_mean = prior_class_mean,
+                         prior_class_sd = prior_class_sd,
                          QR = QR,
                          center = center,
                          adapt_delta = adapt_delta,
@@ -483,6 +554,13 @@ nma <- function(network,
   likelihood <- check_likelihood(likelihood, network$outcome)
   link <- check_link(link, likelihood)
 
+  # Check class_effects and network classes
+  if (class_effects != "independent") {
+    if (is.null(network$classes)) {
+      abort("`network$classes` should not be NULL when `class_effects` is not 'independent'.")
+    }
+  }
+
   # When are priors on auxiliary parameters required?
   has_aux <- (likelihood == "normal" && has_ipd(network)) ||
               likelihood %in% c("ordered", "weibull", "gompertz",
@@ -504,7 +582,6 @@ nma <- function(network,
 
   prior_het_type <- rlang::arg_match(prior_het_type)
 
-
   # Prior defaults
   prior_defaults <- list()
   if (has_intercepts && .is_default(prior_intercept))
@@ -513,6 +590,9 @@ nma <- function(network,
     prior_defaults$prior_trt <- get_prior_call(prior_trt)
   if (trt_effects == "random" && .is_default(prior_het))
     prior_defaults$prior_het <- get_prior_call(prior_het)
+  if (class_effects == "exchangeable" && .is_default(prior_class_mean))
+    prior_defaults$prior_class_mean <- get_prior_call(prior_class_mean)
+    prior_defaults$prior_class_sd <- get_prior_call(prior_class_sd)
   if (!is.null(regression) && !is_only_offset(regression) && .is_default(prior_reg))
     prior_defaults$prior_reg <- get_prior_call(prior_reg)
   if (has_aux && .is_default(prior_aux)) {
@@ -538,6 +618,16 @@ nma <- function(network,
       prior_aux_reg <- .default(normal(scale = 10))
     }
     prior_defaults$prior_aux_reg <- get_prior_call(prior_aux_reg)
+  }
+
+  # Check if class_effects is "exchangeable" and if prior_class_mean or prior_class_sd are at their default values
+  if (class_effects == "exchangeable") {
+    if (.is_default(prior_class_mean)) {
+      warning("`prior_class_mean` is at its default value while `class_effects` is 'exchangeable'.")
+    }
+    if (.is_default(prior_class_sd)) {
+      warning("`prior_class_sd` is at its default value while `class_effects` is 'exchangeable'.")
+    }
   }
 
   # Warn where default priors are used
@@ -628,13 +718,7 @@ nma <- function(network,
                     "Use `add_integration()` to add integration points to the network."))
   }
 
-  # Notify if default reference treatment is used
-  if (.is_default(network$treatments))
-    inform(glue::glue('Note: Setting "{levels(network$treatments)[1]}" as the network reference treatment.'))
 
-  # Notify if network is disconnected
-  if (!is_network_connected(network))
-    inform("Note: Network is disconnected. See ?is_network_connected for more details.")
 
   # Get data for design matrices and outcomes
   if (has_ipd(network)) {
@@ -1044,6 +1128,62 @@ nma <- function(network,
     aux_group <- aux_id
   }
 
+# Creating design Vector for class effects
+  # Ensure classes are factors
+  # Initialize lengths and other frequently used values
+  n_treatments_minus_one <- length(network$treatments) - 1
+  n_classes_minus_one <- length(unique(network$treatments)) - 1
+
+  # Create which_CE and which_CE_num
+  if (class_effects == "exchangeable") {
+    temp_which_CE <- which_CE(network$classes)
+    which_CE_num <- temp_which_CE$which_CE_num
+    which_CE_num <- which_CE_num[-1]
+    which_CE <- temp_which_CE$which_CE
+    which_CE <- which_CE[-1]
+  }
+  if (class_effects == "common") {
+    which_CE <- rep(0, n_classes_minus_one)
+    which_CE_num <- rep(0, n_classes_minus_one)
+  }
+  if (class_effects == "independent"){
+    which_CE <- rep(0, n_treatments_minus_one)
+    which_CE_num <- rep(0, n_treatments_minus_one)
+  }
+
+  # Check if which_CE is a factor with a "0" level
+  #if(is.factor(which_CE) && "0" %in% levels(which_CE)) {
+    # Find the positions where the label is "0"
+    #zero_positions <- which(as.character(which_CE) == "0")
+
+    # Set the corresponding positions in which_CE_num to numerical 0
+    #which_CE_num[zero_positions] <- 0
+
+  # Create which_CE_sd and which_CE_sd_num
+  if (is.list(class_sd)) {
+    temp_which_CE_sd <- which_CE(forcats::fct_collapse(network$classes, !!!class_sd))
+    which_CE_sd <- temp_which_CE_sd$which_CE[-1]
+    which_CE_sd_num <- temp_which_CE_sd$which_CE_num[-1]
+  } else {
+    if (class_sd == "common") {
+      # For the numeric vector
+      which_CE_sd_num <- which_CE_num  # Initialize with which_CE_num
+      which_CE_sd_num[which_CE_sd_num != 0] <- 1  # Change non-zero values to 1
+
+      # For the factor
+      which_CE_sd <- c(1)
+      which_CE_sd <- factor(which_CE_sd)
+      levels(which_CE_sd) <- "All Classes"
+
+  } else if (class_sd == "independent") {
+      # For the numeric vector
+      which_CE_sd_num <- which_CE_num  # Assign which_CE_num to which_CE_sd_num
+
+      # For the factor
+      which_CE_sd <- which_CE  # Assign which_CE to which_CE_sd
+    }
+  }
+
   # Fit using nma.fit
   stanfit <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
     agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
@@ -1056,6 +1196,9 @@ nma <- function(network,
     trt_effects = trt_effects,
     RE_cor = .RE_cor,
     which_RE = .which_RE,
+    class_effects = class_effects,
+    which_CE_num = which_CE_num,
+    which_CE_sd_num = which_CE_sd_num,
     likelihood = likelihood,
     link = link,
     consistency = consistency,
@@ -1067,6 +1210,8 @@ nma <- function(network,
     prior_reg = prior_reg,
     prior_aux = prior_aux,
     prior_aux_reg = prior_aux_reg,
+    prior_class_mean = prior_class_mean,
+    prior_class_sd = prior_class_sd,
     aux_id = aux_id,
     aux_group = aux_group,
     X_aux = X_aux,
@@ -1210,6 +1355,21 @@ nma <- function(network,
     }
   }
 
+  if (class_effects != "independent"){
+  which_CE_labels <- levels(which_CE)
+  which_CE_sd_labels <- levels(which_CE_sd)
+  # For class_mean
+  matched_indices_mean <- grepl("^class_mean\\[[0-9]+\\]$", fnames_oi)
+  extracted_numbers_mean <- gsub("^class_mean\\[([0-9]+)\\]$", "\\1", fnames_oi[matched_indices_mean])
+  new_labels_mean <- which_CE_labels[as.numeric(extracted_numbers_mean)]
+  fnames_oi[matched_indices_mean] <- paste0("class_mean[", new_labels_mean, "]")
+
+  # For class_sd
+  matched_indices_sd <- grepl("^class_sd\\[[0-9]+\\]$", fnames_oi)
+  extracted_numbers_sd <- gsub("^class_sd\\[([0-9]+)\\]$", "\\1", fnames_oi[matched_indices_sd])
+  new_labels_sd <- which_CE_sd_labels[as.numeric(extracted_numbers_sd)]
+  fnames_oi[matched_indices_sd] <- paste0("class_sd[", new_labels_sd, "]")
+}
   stanfit@sim$fnames_oi <- fnames_oi
 
   # Create stan_nma object
@@ -1261,6 +1421,7 @@ nma <- function(network,
 #' @param agd_contrast_offset Vector of offset values for AgD (contrast-based)
 #' @param RE_cor Random effects correlation matrix, when `trt_effects = "random"`
 #' @param which_RE Random effects design vector, when `trt_effects = "random"`
+#' @param which_CE
 #' @param basis Spline basis for `mspline` and `pexp` models
 #'
 #' @noRd
@@ -1272,6 +1433,9 @@ nma.fit <- function(ipd_x, ipd_y,
                     trt_effects = c("fixed", "random"),
                     RE_cor = NULL,
                     which_RE = NULL,
+                    class_effects = c("independent", "exchangeable", "common"),
+                    which_CE_num = NULL,
+                    which_CE_sd_num = NULL,
                     likelihood = NULL,
                     link = NULL,
                     consistency = c("consistency", "ume", "nodesplit"),
@@ -1283,6 +1447,8 @@ nma.fit <- function(ipd_x, ipd_y,
                     prior_reg,
                     prior_aux,
                     prior_aux_reg,
+                    prior_class_mean,
+                    prior_class_sd,
                     aux_id = integer(),
                     aux_group = integer(),
                     X_aux = NULL,
@@ -1384,6 +1550,10 @@ nma.fit <- function(ipd_x, ipd_y,
   trt_effects <- rlang::arg_match(trt_effects)
   if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
 
+  # Check class effect arguments
+  class_effects <- rlang::arg_match(class_effects)
+  if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
+
   likelihood <- check_likelihood(likelihood)
   link <- check_link(link, likelihood)
 
@@ -1403,7 +1573,10 @@ nma.fit <- function(ipd_x, ipd_y,
 
     if (!is.null(X_aux)) check_prior(prior_aux_reg)
   }
-
+  if (class_effects != "independent"){
+  check_prior(prior_class_mean)
+  check_prior(prior_class_sd)
+}
   prior_het_type <- rlang::arg_match(prior_het_type)
 
   # Dummy RE prior for FE model, not used but requested by Stan data
@@ -1604,7 +1777,11 @@ nma.fit <- function(ipd_x, ipd_y,
     R_inv = if (QR) X_all_R_inv else matrix(0, 0, 0),
     # Offsets
     has_offset = has_offsets,
-    offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric()
+    offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric(),
+    # Class effects
+    which_CE_num = if (class_effects != "independent") which_CE_num else numeric(0),
+    which_CE_sd_num = if (class_effects != "independent") which_CE_sd_num else numeric(0),
+    class_effects = ifelse(class_effects == "independent", 0, 1)
     )
 
   # Add priors
@@ -1616,6 +1793,13 @@ nma.fit <- function(ipd_x, ipd_y,
     !!! prior_standat(prior_reg, "prior_reg",
                       valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
     !!! prior_standat(prior_het, "prior_het",
+                      valid = c("Normal", "half-Normal", "log-Normal",
+                                "Cauchy",  "half-Cauchy",
+                                "Student t", "half-Student t", "log-Student t",
+                                "Exponential", "flat (implicit)")),
+    !!! prior_standat(prior_class_mean, "prior_class_mean",
+                      valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
+    !!! prior_standat(prior_class_sd, "prior_class_sd",
                       valid = c("Normal", "half-Normal", "log-Normal",
                                 "Cauchy",  "half-Cauchy",
                                 "Student t", "half-Student t", "log-Student t",
@@ -1647,6 +1831,11 @@ nma.fit <- function(ipd_x, ipd_y,
   if (n_int > 1 && !is_survival && int_thin > 0) {
     if (has_agd_arm) pars <- c(pars, "theta_bar_cum_agd_arm")
     if (has_agd_contrast) pars <- c(pars, "theta_bar_cum_agd_contrast")
+  }
+
+  # Monitor class effects if class effects in use
+  if (class_effects == "exchangeable") {
+    pars <- c(pars, "class_mean", "class_sd")
   }
 
   # Set adapt_delta, but respect other control arguments if passed in ...
@@ -2191,6 +2380,10 @@ nma.fit <- function(ipd_x, ipd_y,
     stanfit <- do.call(rstan::sampling, stanargs)
   }
 
+  # Convert which_CE to a factor and set its levels to the unique class names
+  #which_CE <- as.factor(which_CE)
+  #levels(which_CE) <- levels(network$classes)
+
   # Set readable parameter names in the stanfit object
   fnames_oi <- stanfit@sim$fnames_oi
   x_names_sub <- gsub("^(\\.study|\\.trt|\\.trtclass|\\.contr)", "", x_names)
@@ -2219,6 +2412,7 @@ nma.fit <- function(ipd_x, ipd_y,
   }
   fnames_oi <- gsub("tau[1]", "tau", fnames_oi, fixed = TRUE)
   fnames_oi <- gsub("omega[1]", "omega", fnames_oi, fixed = TRUE)
+
 
   if (likelihood == "ordered") {
     if (has_ipd) l_cat <- colnames(ipd_y$.r)[-1]
@@ -2363,6 +2557,52 @@ valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
                                  "exponential-aft", "weibull-aft",
                                  "lognormal", "loglogistic", "gamma", "gengamma",
                                  "mspline", "pexp"))
+
+
+#' @rdname class_effects
+#' @aliases which_CE
+#' @export
+#' @examples
+#'
+
+which_CE <- function(classes) {
+  # Count the frequency of each class
+  class_tab <- table(classes)
+
+  # Identify classes that appear only once
+  solo_classes <- names(class_tab[class_tab == 1])
+
+  # Create which_CE as a copy of classes
+  which_CE <- classes
+
+  # Identify unique values
+  unique_values <- levels(which_CE)[table(which_CE) == 1]
+
+  # Replace unique values with NA
+  which_CE[which_CE %in% unique_values] <- NA
+
+  # Optionally, drop levels that no longer have any data
+  which_CE <- droplevels(which_CE)
+
+  # Check the result
+  which_CE_num <- as.numeric(which_CE)
+
+  # Replace NA values with 0
+  which_CE_num[is.na(which_CE_num)] <- 0
+
+  # Re-level which_CE_num
+  #remaining_classes <- unique(which_CE_num[which_CE_num != 0])
+  #new_values <- 1:length(remaining_classes)
+  #mapping <- setNames(new_values, remaining_classes)
+  #which_CE_num[which_CE_num != 0] <- mapping[as.character(which_CE_num[which_CE_num != 0])]
+
+  # Update which_CE to remove levels that have turned into zeros in which_CE_num
+  #which_CE <- droplevels(which_CE, exclude = solo_classes)
+
+
+  return(list(which_CE = which_CE, which_CE_num = which_CE_num))
+}
+
 
 #' Check likelihood function, or provide default value
 #'
@@ -3364,3 +3604,22 @@ aux_needs_integration <- function(aux_regression, aux_by) {
   (!is.null(aux_regression) && length(setdiff(colnames(attr(terms(aux_regression), "factor")), c(".study", ".trt", ".trtclass"))) > 0) ||
     (!is.null(aux_by) && length(setdiff(aux_by, c(".study", ".trt", ".trtclass"))) > 0)
 }
+rename_trt_class <- function(fnames, pattern, vector_levels) {
+  # Find the names in fnames that match the pattern
+  matching_indices <- grep(pattern, fnames)
+
+  # Extract the numerical indices from those names
+  extracted_indices <- as.numeric(gsub(".*\\[([0-9]+)\\]", "\\1", fnames[matching_indices]))
+
+  # Look up the corresponding levels from the vector_levels
+  corresponding_levels <- levels(vector_levels)[extracted_indices]
+
+  # Construct the new names
+  new_names <- paste0(gsub("\\[.*\\]", "", pattern), "[", corresponding_levels, "]")
+
+  # Update fnames
+  fnames[matching_indices] <- new_names
+
+  return(fnames)
+}
+
