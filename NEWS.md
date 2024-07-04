@@ -3,6 +3,8 @@
 * Fix: Predictions for non-proportional hazards IPD NMA or ML-NMR survival 
 models using `aux_regression = ~.trt` were incorrectly omitting the treatment 
 effects on the auxiliary parameter(s) in some cases (#43).
+* Fix: Calling `marginal_effects()` for survival outcomes with a single target
+population previously gave an error.
 
 # multinma 0.7.1
 

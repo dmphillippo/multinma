@@ -207,7 +207,7 @@ marginal_effects <- function(object,
   vars <- intersect(c(".study", ".time", ".quantile", ".category"), colnames(pred_meta))
 
   if (".time" %in% vars) {
-    pred_meta <- dplyr::group_by(pred_meta, .data$.study, .data$.trt) %>%
+    pred_meta <- { if (".study" %in% vars) dplyr::group_by(pred_meta, .data$.study, .data$.trt) else dplyr::group_by(pred_meta, .data$.trt) } %>%
       dplyr::mutate(.time_id = 1:dplyr::n()) %>%
       dplyr::ungroup()
 
