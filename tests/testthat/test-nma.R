@@ -126,6 +126,47 @@ test_that("nma() regression formula is valid", {
                    prior_reg = normal(0, 5)), 'Regression variables "a" and "b" not found')
 })
 
+
+test_that("aux_regression ignored with warning", {
+  surv_net <- set_ipd(ndmm_agd, study, trt, Surv = Surv(eventtime, status))
+
+  expect_warning(f <- nma(smknet, aux_regression = ~.trt,
+                     prior_intercept = normal(0, 10),
+                     prior_trt = normal(0, 10),
+                     prior_aux_reg = normal(0, 5), test_grad = TRUE),
+                 "Ignoring `aux_regression`, only supported for survival")
+
+  expect_null(f$aux_regression)
+
+  expect_warning(f <- nma(surv_net, aux_regression = ~.trt,
+                          likelihood = "exponential",
+                          prior_intercept = normal(0, 10),
+                          prior_trt = normal(0, 10), test_grad = TRUE),
+                 "Ignoring `aux_regression`, no auxiliary parameters in exponential model")
+
+  expect_null(f$aux_regression)
+})
+
+test_that("aux_by ignored with warning", {
+  surv_net <- set_ipd(ndmm_agd, study, trt, Surv = Surv(eventtime, status))
+
+  expect_warning(f <- nma(smknet, aux_by = ".trt",
+                          prior_intercept = normal(0, 10),
+                          prior_trt = normal(0, 10),
+                          prior_aux_reg = normal(0, 5), test_grad = TRUE),
+                 "Ignoring `aux_by`, only supported for survival")
+
+  expect_null(f$aux_by)
+
+  expect_warning(f <- nma(surv_net, aux_by = ".trt",
+                          likelihood = "exponential",
+                          prior_intercept = normal(0, 10),
+                          prior_trt = normal(0, 10), test_grad = TRUE),
+                 "Ignoring `aux_by`, no auxiliary parameters in exponential model")
+
+  expect_null(f$aux_by)
+})
+
 make_na <- function(x, n) {
   x[sample.int(length(x), n)] <- NA
   return(x)

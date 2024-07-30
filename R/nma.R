@@ -569,8 +569,23 @@ nma <- function(network,
     abort("Cannot specify both `aux_by` and `aux_regression`.")
   }
 
+  if (!is.null(aux_regression)) {
+    if (!likelihood %in% valid_lhood$survival) {
+      warn("Ignoring `aux_regression`, only supported for survival likelihoods at present.")
+    } else if (!has_aux) {
+      warn(glue::glue("Ignoring `aux_regression`, no auxiliary parameters in {likelihood} model."))
+    }
+  }
+
+  if (!rlang::quo_is_null(aux_by)) {
+    if (!likelihood %in% valid_lhood$survival) {
+      warn("Ignoring `aux_by`, only supported for survival likelihoods at present.")
+    } else if (!has_aux) {
+      warn(glue::glue("Ignoring `aux_by`, no auxiliary parameters in {likelihood} model."))
+    }
+  }
+
   # Set up aux_regression
-  has_aux_regression <- FALSE
   if (!is.null(aux_regression) && likelihood %in% valid_lhood$survival &&
       has_aux &&
       (has_ipd(network) || has_agd_arm(network))) {
@@ -586,6 +601,9 @@ nma <- function(network,
       aux_regression <- update.formula(aux_regression, ~. -.study +1)
     }
     has_aux_regression <- TRUE
+  } else {
+    has_aux_regression <- FALSE
+    aux_regression <- NULL
   }
 
   # Set up aux_by

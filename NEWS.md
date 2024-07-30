@@ -5,6 +5,10 @@ models using `aux_regression = ~.trt` were incorrectly omitting the treatment
 effects on the auxiliary parameter(s) in some cases (#43).
 * Fix: Calling `marginal_effects()` for survival outcomes with a single target
 population previously gave an error.
+* Fix: Predictions from exponential models where `aux_regression` had been
+specified were giving an error (#44). `aux_regression` and `aux_by` have no 
+effect for exponential models since there are no auxiliary (shape) parameters 
+and are ignored, now with a warning.
 
 # multinma 0.7.1
 
