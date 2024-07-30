@@ -1,294 +1,100 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/articles/example_atrial_fibrillation.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/articles/example_bcg_vaccine.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/articles/example_blocker.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/articles/example_diabetes.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/articles/example_dietary_fat.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/articles/example_hta_psoriasis.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/articles/example_ndmm.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/articles/example_parkinsons.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/articles/example_plaque_psoriasis.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/articles/example_smoking.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/articles/example_statins.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/articles/example_thrombolytics.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/articles/example_transfusion.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/articles/vignette_overview.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/index.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/Bernoulli.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/GammaDist.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/aa_example_ndmm.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/aa_example_pso_mlnmr.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/aa_example_smk_fe.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/aa_example_smk_nodesplit.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/aa_example_smk_re.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/aa_example_smk_ume.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/adapt_delta.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/add_integration.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/as.array.stan_nma.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/as.stanfit.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/atrial_fibrillation.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/bcg_vaccine.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/blocker.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/combine_network.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/default_values.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/diabetes.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/dic.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/dietary_fat.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/distr.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/generalised_t.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/geom_km.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/get_nodesplits.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/graph_conversion.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/hta_psoriasis.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/is_network_connected.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/log_t.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/logitNormal.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/loo.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/make_knots.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/marginal_effects.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/mcmc_array-class.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/mspline.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/multi.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/multinma-package.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/ndmm.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/nma.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/nma_data-class.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/nma_dic-class.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/nma_nodesplit-class.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/nma_prior-class.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/nma_summary-class.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/nma_summary-methods.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/nodesplit_summary-class.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/nodesplit_summary-methods.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/pairs.stan_nma.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/parkinsons.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/plaque_psoriasis.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/plot.nma_data.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/plot.nma_dic.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/plot.nma_summary.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/plot.nodesplit_summary.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/plot_integration_error.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/plot_prior_posterior.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/posterior_ranks.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/predict.stan_nma.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/print.nma_data.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/print.nma_dic.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/print.nma_nodesplit_df.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/print.stan_nma.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/priors.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/random_effects.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/reexports.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/relative_effects.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/set_agd_arm.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/set_agd_contrast.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/set_agd_surv.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/set_ipd.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/smoking.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/stan_nma-class.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/statins.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/summary.nma_nodesplit_df.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/summary.nma_prior.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/summary.stan_nma.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/theme_multinma.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/thrombolytics.html</loc>
-  </url>
-  <url>
-    <loc>https://dmphillippo.github.io/multinma/dev/reference/transfusion.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://dmphillippo.github.io/multinma/dev/articles/example_atrial_fibrillation.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/articles/example_bcg_vaccine.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/articles/example_blocker.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/articles/example_diabetes.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/articles/example_dietary_fat.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/articles/example_hta_psoriasis.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/articles/example_ndmm.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/articles/example_parkinsons.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/articles/example_plaque_psoriasis.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/articles/example_smoking.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/articles/example_statins.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/articles/example_thrombolytics.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/articles/example_transfusion.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/articles/index.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/articles/vignette_overview.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/authors.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/index.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/news/index.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/Bernoulli.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/GammaDist.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/aa_example_ndmm.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/aa_example_pso_mlnmr.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/aa_example_smk_fe.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/aa_example_smk_nodesplit.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/aa_example_smk_re.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/aa_example_smk_ume.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/adapt_delta.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/add_integration.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/as.array.stan_nma.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/as.stanfit.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/atrial_fibrillation.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/bcg_vaccine.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/blocker.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/combine_network.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/default_values.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/diabetes.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/dic.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/dietary_fat.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/distr.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/generalised_t.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/geom_km.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/get_nodesplits.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/graph_conversion.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/hta_psoriasis.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/index.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/is_network_connected.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/log_t.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/logitNormal.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/loo.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/make_knots.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/marginal_effects.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/mcmc_array-class.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/mspline.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/multi.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/multinma-package.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/ndmm.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/nma.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/nma_data-class.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/nma_dic-class.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/nma_nodesplit-class.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/nma_prior-class.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/nma_summary-class.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/nma_summary-methods.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/nodesplit_summary-class.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/nodesplit_summary-methods.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/pairs.stan_nma.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/parkinsons.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/plaque_psoriasis.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/plot.nma_data.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/plot.nma_dic.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/plot.nma_summary.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/plot.nodesplit_summary.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/plot_integration_error.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/plot_prior_posterior.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/posterior_ranks.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/predict.stan_nma.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/print.nma_data.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/print.nma_dic.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/print.nma_nodesplit_df.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/print.stan_nma.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/priors.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/random_effects.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/reexports.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/relative_effects.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/set_agd_arm.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/set_agd_contrast.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/set_agd_surv.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/set_ipd.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/smoking.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/stan_nma-class.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/statins.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/summary.nma_nodesplit_df.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/summary.nma_prior.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/summary.stan_nma.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/theme_multinma.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/thrombolytics.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/transfusion.html</loc></url>
 </urlset>
+
