@@ -924,7 +924,7 @@ nma <- function(network,
                       observed = .data$.Surv[, "status"]  == 1)
       } else {
         dplyr::tibble(.Surv = c(y_ipd$.Surv, y_agd_arm$.Surv),
-                      .study = forcats::fct_drop(c(dat_ipd$.study, rep(dat_agd_arm$.study, times = dat_agd_arm$.sample_size))),
+                      .study = forcats::fct_drop(forcats::fct_c(dat_ipd$.study, rep(dat_agd_arm$.study, times = dat_agd_arm$.sample_size))),
                       observed = .data$.Surv[, "status"]  == 1)
       }
 
