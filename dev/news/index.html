@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.1.9003</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.1.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,6 +55,7 @@
 <ul><li>Fix: Predictions for non-proportional hazards IPD NMA or ML-NMR survival models using <code>aux_regression = ~.trt</code> were incorrectly omitting the treatment effects on the auxiliary parameter(s) in some cases (<a href="https://github.com/dmphillippo/multinma/issues/43" class="external-link">#43</a>).</li>
 <li>Fix: Calling <code><a href="../reference/marginal_effects.html">marginal_effects()</a></code> for survival outcomes with a single target population previously gave an error.</li>
 <li>Fix: Predictions from exponential models where <code>aux_regression</code> had been specified were giving an error (<a href="https://github.com/dmphillippo/multinma/issues/44" class="external-link">#44</a>). <code>aux_regression</code> and <code>aux_by</code> have no effect for exponential models since there are no auxiliary (shape) parameters and are ignored, now with a warning.</li>
+<li>Fix: Avoid an error when trying to fit M-spline models combining IPD and AgD in R versions prior to 4.1.0, due to integer coercion of factors by <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code>.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.1" id="multinma-071">multinma 0.7.1<a class="anchor" aria-label="anchor" href="#multinma-071"></a></h2><p class="text-muted">CRAN release: 2024-06-11</p>
