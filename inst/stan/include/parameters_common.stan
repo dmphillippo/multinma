@@ -7,5 +7,5 @@ vector[n_delta] u_delta;
 vector<lower = 0>[RE ? 1 : 0] tau;
 
 // New vector parameters for class effects model
-vector[class_effects ? max(which_CE_num) : 0] class_mean; // Class means (zero-length if no exchangeable class effects)
-vector<lower=0>[class_effects ? max(which_CE_sd_num) : 0] class_sd; // Class standard deviations (zero-length if no exchangeable class effects)
+vector[class_effects ? max(which_CE) : 0] class_mean; // Class means (zero-length if no exchangeable class effects)
+vector<lower=0>[class_effects ? max(which_CE_sd) : 0] class_sd; // Class standard deviations (zero-length if no exchangeable class effects)
