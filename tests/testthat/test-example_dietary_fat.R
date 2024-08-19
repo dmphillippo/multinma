@@ -70,16 +70,16 @@ summary(half_normal(scale = 5))
 ## ----eval=FALSE-----------------------------------------------------------------------------------
 ## diet_fit_RE <- nma(diet_net,
 ##                    trt_effects = "random",
-##                    prior_intercept = normal(scale = 10),
-##                    prior_trt = normal(scale = 10),
+##                    prior_intercept = normal(scale = 100),
+##                    prior_trt = normal(scale = 100),
 ##                    prior_het = half_normal(scale = 5))
 
 ## ----echo=FALSE, warning=FALSE--------------------------------------------------------------------
 diet_fit_RE <- nowarn_on_ci(
                  nma(diet_net, 
                      trt_effects = "random",
-                     prior_intercept = normal(scale = 10),
-                     prior_trt = normal(scale = 10),
+                     prior_intercept = normal(scale = 100),
+                     prior_trt = normal(scale = 100),
                      prior_het = half_normal(scale = 5))
                  )
 

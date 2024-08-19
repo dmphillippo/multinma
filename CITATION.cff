@@ -1,18 +1,18 @@
-# -----------------------------------------------------------
-# CITATION file created with {cffr} R package, v0.5.0
+# --------------------------------------------
+# CITATION file created with {cffr} R package
 # See also: https://docs.ropensci.org/cffr/
-# -----------------------------------------------------------
+# --------------------------------------------
  
 cff-version: 1.2.0
 message: 'To cite package "multinma" in publications use:'
 type: software
 license: GPL-3.0-only
 title: 'multinma: Bayesian Network Meta-Analysis of Individual and Aggregate Data'
-version: 0.6.1.9000
+version: 0.7.1.9000
 doi: 10.5281/zenodo.3904454
 abstract: Network meta-analysis and network meta-regression models for aggregate data,
   individual patient data, and mixtures of both individual and aggregate data using
-  multilevel network meta-regression as described by Phillippo et al. (2020) <doi:10.1111/rssa.12579>.
+  multilevel network meta-regression as described by Phillippo et al. (2020) <https://doi.org/10.1111/rssa.12579>.
   Models are estimated in a Bayesian framework using 'Stan'.
 authors:
 - family-names: Phillippo
@@ -27,8 +27,8 @@ preferred-citation:
     given-names: David M.
     email: david.phillippo@bristol.ac.uk
     orcid: https://orcid.org/0000-0003-2672-7841
-  year: '2023'
-  notes: R package version 0.6.1.9000
+  year: '2024'
+  notes: R package version 0.7.1.9000
   url: https://dmphillippo.github.io/multinma/
   doi: 10.5281/zenodo.3904454
 repository: https://CRAN.R-project.org/package=multinma
@@ -78,11 +78,10 @@ references:
   url: https://www.R-project.org/
   authors:
   - name: R Core Team
-  location:
-    name: Vienna, Austria
-  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
+    address: Vienna, Austria
+  year: '2024'
   version: '>= 3.4.0'
 - type: software
   title: methods
@@ -90,33 +89,30 @@ references:
   notes: Imports
   authors:
   - name: R Core Team
-  location:
-    name: Vienna, Austria
-  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
+    address: Vienna, Austria
+  year: '2024'
 - type: software
   title: stats
   abstract: 'R: A Language and Environment for Statistical Computing'
   notes: Imports
   authors:
   - name: R Core Team
-  location:
-    name: Vienna, Austria
-  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
+    address: Vienna, Austria
+  year: '2024'
 - type: software
   title: graphics
   abstract: 'R: A Language and Environment for Statistical Computing'
   notes: Imports
   authors:
   - name: R Core Team
-  location:
-    name: Vienna, Austria
-  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
+    address: Vienna, Austria
+  year: '2024'
 - type: software
   title: survival
   abstract: 'survival: Survival Analysis'
@@ -174,7 +170,9 @@ references:
     given-names: Gregory
   - family-names: Geelnard
     given-names: Marcus
+    website: https://tinythreadpp.bitsnbites.eu/
   - name: Intel
+    website: https://www.threadingbuildingblocks.org/
   year: '2024'
   version: '>= 5.0.1'
 - type: software
@@ -330,7 +328,7 @@ references:
     orcid: https://orcid.org/0000-0002-2739-7082
   - family-names: Bryan
     given-names: Jennifer
-    email: jenny@rstudio.com
+    email: jenny@posit.co
     orcid: https://orcid.org/0000-0002-6983-2759
   year: '2024'
 - type: software
@@ -338,21 +336,22 @@ references:
   abstract: 'randtoolbox: Toolbox for Pseudo and Quasi Random Number Generation and
     Random Generator Tests'
   notes: Imports
+  url: https://r-forge.r-project.org/projects/rmetrics/
   repository: https://CRAN.R-project.org/package=randtoolbox
   authors:
   - family-names: Chalabi
-    given-names: R port by Yohan
+    given-names: R code by Yohan
   - family-names: Dutang
     given-names: Christophe
   - family-names: Savicky
     given-names: Petr
-  - family-names: Matsumoto
-    given-names: Diethelm Wuertz with some underlying C codes of the SFMT algorithm
-      from M.
-  - family-names: Saito
-    given-names: M.
-  - family-names: Knuth.
-    given-names: the Knuth-TAOCP RNG from D.
+  - family-names: Torus
+    given-names: Diethelm Wuertz; C code of
+  - name: Halton
+  - family-names: Dutang
+    given-names: Sobol sequences by Christophe
+  - family-names: Saito.
+    given-names: Mutsuo
   year: '2024'
 - type: software
   title: copula
@@ -404,7 +403,7 @@ references:
   authors:
   - family-names: Wickham
     given-names: Hadley
-    email: hadley@rstudio.com
+    email: hadley@posit.co
   year: '2024'
 - type: software
   title: Matrix
@@ -434,22 +433,28 @@ references:
   - family-names: Csárdi
     given-names: Gábor
     email: csardi.gabor@gmail.com
+    orcid: https://orcid.org/0000-0001-7098-9676
   - family-names: Nepusz
     given-names: Tamás
     email: ntamas@gmail.com
+    orcid: https://orcid.org/0000-0002-1451-338X
   - family-names: Traag
     given-names: Vincent
+    orcid: https://orcid.org/0000-0003-3170-3879
   - family-names: Horvát
     given-names: Szabolcs
     email: szhorvat@gmail.com
+    orcid: https://orcid.org/0000-0002-3100-523X
   - family-names: Zanini
     given-names: Fabio
     email: fabio.zanini@unsw.edu.au
+    orcid: https://orcid.org/0000-0001-7097-8539
   - family-names: Noom
     given-names: Daniel
   - family-names: Müller
     given-names: Kirill
     email: kirill@cynkra.com
+    orcid: https://orcid.org/0000-0002-1416-3412
   year: '2024'
 - type: software
   title: ggraph
@@ -497,6 +502,10 @@ references:
   - family-names: Dunnington
     given-names: Dewey
     orcid: https://orcid.org/0000-0002-9415-4582
+  - family-names: Brand
+    given-names: Teun
+    name-particle: van den
+    orcid: https://orcid.org/0000-0002-9335-7468
   year: '2024'
   version: '>= 3.3.0'
 - type: software
@@ -627,7 +636,7 @@ references:
     email: badr@jhu.edu
     orcid: https://orcid.org/0000-0002-9808-2344
   year: '2024'
-  version: '>= 2.26.0'
+  version: '>= 2.32.9'
 - type: software
   title: testthat
   abstract: 'testthat: Unit Testing for R'
@@ -641,6 +650,30 @@ references:
   year: '2024'
   version: '>= 2.1.0'
 - type: software
+  title: vdiffr
+  abstract: 'vdiffr: Visual Regression Testing and Graphical Diffing'
+  notes: Suggests
+  url: https://vdiffr.r-lib.org/
+  repository: https://CRAN.R-project.org/package=vdiffr
+  authors:
+  - family-names: Henry
+    given-names: Lionel
+    email: lionel@posit.co
+  - family-names: Pedersen
+    given-names: Thomas Lin
+    email: thomas.pedersen@posit.co
+    orcid: https://orcid.org/0000-0002-5147-4711
+  - family-names: Luciani
+    given-names: T Jake
+    email: jake@apache.org
+  - family-names: Decorde
+    given-names: Matthieu
+    email: matthieu.decorde@ens-lyon.fr
+  - family-names: Lise
+    given-names: Vaudor
+    email: lise.vaudor@ens-lyon.fr
+  year: '2024'
+- type: software
   title: withr
   abstract: 'withr: Run Code ''With'' Temporarily Modified Global State'
   notes: Suggests
@@ -651,7 +684,7 @@ references:
     given-names: Jim
   - family-names: Henry
     given-names: Lionel
-    email: lionel@rstudio.com
+    email: lionel@posit.co
   - family-names: Müller
     given-names: Kirill
     email: krlmlr+r@mailbox.org
@@ -660,7 +693,7 @@ references:
     email: kevinushey@gmail.com
   - family-names: Wickham
     given-names: Hadley
-    email: hadley@rstudio.com
+    email: hadley@posit.co
   - family-names: Chang
     given-names: Winston
   year: '2024'
@@ -725,16 +758,15 @@ references:
   notes: Suggests
   authors:
   - name: R Core Team
-  location:
-    name: Vienna, Austria
-  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
+    address: Vienna, Austria
+  year: '2024'
 - type: software
   title: R.rsp
   abstract: 'R.rsp: Dynamic Generation of Scientific Reports'
   notes: Suggests
-  url: https://github.com/HenrikBengtsson/R.rsp
+  url: https://henrikbengtsson.github.io/R.rsp/
   repository: https://CRAN.R-project.org/package=R.rsp
   authors:
   - family-names: Bengtsson
@@ -750,7 +782,7 @@ references:
   authors:
   - family-names: Müller
     given-names: Kirill
-    email: krlmlr+r@mailbox.org
+    email: kirill@cynkra.com
     orcid: https://orcid.org/0000-0002-1416-3412
   year: '2024'
 - type: software
@@ -819,7 +851,7 @@ references:
   authors:
   - family-names: Wickham
     given-names: Hadley
-    email: hadley@rstudio.com
+    email: hadley@posit.co
     orcid: https://orcid.org/0000-0003-4757-117X
   - family-names: Hesselberth
     given-names: Jay
@@ -848,7 +880,7 @@ references:
   title: flexsurv
   abstract: 'flexsurv: Flexible Parametric Survival and Multi-State Models'
   notes: Suggests
-  url: https://github.com/chjackson/flexsurv-dev
+  url: http://chjackson.github.io/flexsurv/
   repository: https://CRAN.R-project.org/package=flexsurv
   authors:
   - family-names: Jackson
@@ -872,3 +904,4 @@ references:
     given-names: Benjamin
     email: benjamin.christoffersen@ki.se
   year: '2024'
+

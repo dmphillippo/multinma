@@ -41,13 +41,22 @@ statin_net
 summary(normal(scale = 100))
 
 
-## -------------------------------------------------------------------------------------------------
+## ----eval=!params$run_tests-----------------------------------------------------------------------
+## statin_fit_FE <- nma(statin_net,
+##                      trt_effects = "fixed",
+##                      regression = ~.trt:prevention,
+##                      prior_intercept = normal(scale = 100),
+##                      prior_trt = normal(scale = 100),
+##                      prior_reg = normal(scale = 100))
+
+## ----eval=params$run_tests, echo=FALSE------------------------------------------------------------
 statin_fit_FE <- nma(statin_net, 
                      trt_effects = "fixed",
                      regression = ~.trt:prevention,
                      prior_intercept = normal(scale = 100),
                      prior_trt = normal(scale = 100),
-                     prior_reg = normal(scale = 100))
+                     prior_reg = normal(scale = 100),
+                     iter = 5000)
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -86,7 +95,8 @@ statin_fit_RE <- nowarn_on_ci(nma(statin_net,
                      prior_trt = normal(scale = 100),
                      prior_reg = normal(scale = 100),
                      prior_het = half_normal(scale = 5),
-                     adapt_delta = 0.99))
+                     adapt_delta = 0.99,
+                     iter = 5000))
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -217,7 +227,8 @@ test_that("Robust to custom options(contrasts) settings", {
                          regression = ~.trt:prevention,
                          prior_intercept = normal(scale = 100),
                          prior_trt = normal(scale = 100),
-                         prior_reg = normal(scale = 100))
+                         prior_reg = normal(scale = 100),
+                         iter = 5000)
     
     # Model pars are different (reference level of prevention is different) but
     # relative effects should still be calculated correctly
