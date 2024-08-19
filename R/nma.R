@@ -334,8 +334,6 @@ nma <- function(network,
     if (has_ipd(network)) {
       network$ipd$.trt <- network$ipd$.trtclass
     }
-
-    # Add similar code for aggregated data (AGD) - arm and contrast
     if (has_agd_arm(network)) {
       network$agd_arm$.trt <- network$agd_arm$.trtclass
     }
