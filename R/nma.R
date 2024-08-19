@@ -330,7 +330,7 @@ nma <- function(network,
 
 
   if (class_effects == "common") {
-    # Overwrite treatments with class variables for individual patient data (IPD)
+    # Overwrite treatments with class variables
     if (has_ipd(network)) {
       network$ipd$.trt <- network$ipd$.trtclass
     }
