@@ -2688,11 +2688,11 @@ make_nma_formula <- function(regression,
     }
 
     if (consistency == "ume") {
-      nma_formula <- update.formula(nma_formula, ~-1 + .study + .contr + .)
+      nma_formula <- update.formula(nma_formula, ~.study + .contr + . -1)
     } else if (consistency == "nodesplit") {
-      nma_formula <- update.formula(nma_formula, ~-1 + .study + .trt + .omega + .)
+      nma_formula <- update.formula(nma_formula, ~.study + .trt + .omega + . -1)
     } else {
-      nma_formula <- update.formula(nma_formula, ~-1 + .study + .trt + .)
+      nma_formula <- update.formula(nma_formula, ~.study + .trt + . -1)
     }
   } else {
     if (consistency == "ume") {
