@@ -1437,7 +1437,8 @@ nma <- function(network,
 #' @param agd_contrast_offset Vector of offset values for AgD (contrast-based)
 #' @param RE_cor Random effects correlation matrix, when `trt_effects = "random"`
 #' @param which_RE Random effects design vector, when `trt_effects = "random"`
-#' @param which_CE
+#' @param which_CE Class effects means design vector (0 = no class)
+#' @param which_CE_sd Class effects SDs design vector (0 = no class)
 #' @param basis Spline basis for `mspline` and `pexp` models
 #'
 #' @noRd
