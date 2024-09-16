@@ -12,7 +12,7 @@
 \arguments{
 \item{x}{A \link{nma_nodesplit_df} object}
 
-\item{...}{Further arguments passed to \code{\link[rstan:print]{print.stanfit()}}}
+\item{...}{Further arguments passed to \code{\link[rstan:print.stanfit]{print.stanfit()}}}
 }
 \value{
 \code{x} is returned invisibly.
