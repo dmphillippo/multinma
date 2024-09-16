@@ -42,13 +42,14 @@ A \code{ggplot} object.
 Produce summary plots of node-splitting models
 }
 \details{
-Plotting is handled by \link{ggplot2} and the stats and geoms provided in
-the \link{ggdist} package. As a result, the output is very flexible. Any
-plotting stats provided by \code{ggdist} may be used, via the argument \code{stat}.
-The default \code{"dens_overlay"} is a special exception, which uses
-\code{\link[ggplot2:geom_density]{ggplot2::geom_density()}}, to plot overlaid
-densities. Additional arguments in \code{...} are passed to the \code{ggdist} stat,
-to customise the output.
+Plotting is handled by \link[ggplot2:ggplot2-package]{ggplot2} and
+the stats and geoms provided in the \link[ggdist:ggdist-package]{ggdist}
+package. As a result, the output is very flexible. Any plotting stats
+provided by \code{ggdist} may be used, via the argument \code{stat}. The default
+\code{"dens_overlay"} is a special exception, which uses
+\code{\link[ggplot2:geom_density]{ggplot2::geom_density()}}, to plot
+overlaid densities. Additional arguments in \code{...} are passed to the
+\code{ggdist} stat, to customise the output.
 
 Alternative stats can be specified to produce different summaries. For
 example, specify \code{stat = "[half]eye"} to produce (half) eye plots, or \code{stat = "pointinterval"} to produce point estimates and credible intervals.
@@ -57,7 +58,8 @@ A full list of options and examples is found in the \code{ggdist} vignette
 \code{vignette("slabinterval", package = "ggdist")}.
 
 A \code{ggplot} object is returned which can be further modified through the
-usual \link{ggplot2} functions to add further aesthetics, geoms, themes, etc.
+usual \link[ggplot2:ggplot2-package]{ggplot2} functions to add further
+aesthetics, geoms, themes, etc.
 }
 \examples{
 \donttest{

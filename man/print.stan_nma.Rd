@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{A \link{stan_nma} object}
 
-\item{...}{Further arguments passed to \code{\link[=print.stanfit]{print.stanfit()}}}
+\item{...}{Further arguments passed to \code{\link[rstan:print.stanfit]{print.stanfit()}}}
 }
 \value{
 \code{x} is returned invisibly.

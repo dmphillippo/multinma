@@ -237,8 +237,9 @@ green <- function(...) {
 #' Convert networks to graph objects
 #'
 #' The method `as.igraph()` converts `nma_data` objects into the form used by
-#' the [igraph] package. The method `as_tbl_graph()` converts `nma_data` objects
-#' into the form used by the [ggraph] and
+#' the \link[igraph:igraph-package]{igraph} package. The method `as_tbl_graph()`
+#' converts `nma_data` objects into the form used by the
+#' \link[ggraph:ggraph-package]{ggraph} and
 #' \link[tidygraph:tidygraph-package]{tidygraph} packages.
 #'
 #' @param x An [nma_data] object to convert
@@ -682,13 +683,16 @@ has_indirect <- function(network, trt1, trt2) {
 #' Create a network plot from a `nma_data` network object.
 #'
 #' @param x A [nma_data] object to plot
-#' @param ... Additional arguments passed to [ggraph()] and on to the layout
-#'   function
-#' @param layout The type of layout to create. Any layout accepted by [ggraph()]
-#'   may be used, including all of the layout functions provided by [igraph].
-#' @param circular Whether to use a circular representation. See [ggraph()].
+#' @param ... Additional arguments passed to
+#'   \code{\link[ggraph:ggraph]{ggraph()}} and on to the layout function
+#' @param layout The type of layout to create. Any layout accepted by
+#'   \code{\link[ggraph:ggraph]{ggraph()}} may be used, including all of the
+#'   layout functions provided by \link[igraph:igraph-package]{igraph}.
+#' @param circular Whether to use a circular representation. See
+#'   \code{\link[ggraph:ggraph]{ggraph()}}.
 #' @param weight_edges Weight edges by the number of studies? Default is `TRUE`.
-#' @param weight_nodes Weight nodes by the total sample size? Default is `FALSE`.
+#' @param weight_nodes Weight nodes by the total sample size? Default is
+#'   `FALSE`.
 #' @param show_trt_class Colour treatment nodes by class, if `trt_class` is set?
 #'   Default is `FALSE`.
 #' @param nudge Numeric value to nudge the treatment labels away from the nodes
@@ -705,7 +709,8 @@ has_indirect <- function(network, trt1, trt2) {
 #'   any aggregate data in the network, using the `sample_size` option of
 #'   `set_agd_*()`.
 #'
-#' @return A `ggplot` object, as produced by [ggraph()].
+#' @return A `ggplot` object, as produced by
+#'   \code{\link[ggraph:ggraph]{ggraph()}}.
 #' @export
 #'
 #' @examples ## Stroke prevention in atrial fibrillation

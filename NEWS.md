@@ -1,3 +1,17 @@
+# multinma 0.7.2
+
+* Fix: Predictions for non-proportional hazards IPD NMA or ML-NMR survival 
+models using `aux_regression = ~.trt` were incorrectly omitting the treatment 
+effects on the auxiliary parameter(s) in some cases (#43).
+* Fix: Calling `marginal_effects()` for survival outcomes with a single target
+population previously gave an error.
+* Fix: Predictions from exponential models where `aux_regression` had been
+specified were giving an error (#44). `aux_regression` and `aux_by` have no 
+effect for exponential models since there are no auxiliary (shape) parameters 
+and are ignored, now with a warning.
+* Fix: Avoid an error when trying to fit M-spline models combining IPD and AgD 
+in R versions prior to 4.1.0, due to integer coercion of factors by `c()`.
+
 # multinma 0.7.1
 
 * Fix: Producing survival/hazard/cumulative hazard predictions for survival 

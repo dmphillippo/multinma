@@ -56,10 +56,10 @@ posterior ranks and rank probabilities (when called on the output of
 \code{\link[=posterior_ranks]{posterior_ranks()}} or \code{\link[=posterior_rank_probs]{posterior_rank_probs()}}).
 }
 \details{
-Plotting is handled by \link{ggplot2} and the stats and geoms provided in
-the \link{ggdist} package. As a result, the output is very flexible. Any
-plotting stats provided by \code{ggdist} may be used, via the argument
-\code{stat}.
+Plotting is handled by \link[ggplot2:ggplot2-package]{ggplot2} and
+the stats and geoms provided in the \link[ggdist:ggdist-package]{ggdist}
+package. As a result, the output is very flexible. Any plotting stats
+provided by \code{ggdist} may be used, via the argument \code{stat}.
 
 The default uses
 \code{\link[ggdist:stat_pointinterval]{ggdist::stat_pointinterval()}}, to
@@ -84,7 +84,8 @@ Interval bands. Again, additional arguments in \code{...} are passed to the
 bands, specify \code{point_interval = "mean_qi"} and \code{.width = 0.95}.
 
 A \code{ggplot} object is returned which can be further modified through the
-usual \link{ggplot2} functions to add further aesthetics, geoms, themes, etc.
+usual \link[ggplot2:ggplot2-package]{ggplot2} functions to add further
+aesthetics, geoms, themes, etc.
 }
 \examples{
 ## Smoking cessation
