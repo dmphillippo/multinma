@@ -9,7 +9,7 @@ meta-regression models in Stan."><meta property="og:image" content="https://dmph
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.1.9004</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -106,7 +106,8 @@ model to fit, either <code>"consistency"</code>, <code>"ume"</code>, or <code>"n
 
 
 <dt id="arg-trt-effects">trt_effects<a class="anchor" aria-label="anchor" href="#arg-trt-effects"></a></dt>
-<dd><p>Character string specifying either <code>"fixed"</code> or <code>"random"</code> effects</p></dd>
+<dd><p>Character string specifying either <code>"fixed"</code> or <code>"random"</code>
+effects</p></dd>
 
 
 <dt id="arg-regression">regression<a class="anchor" aria-label="anchor" href="#arg-regression"></a></dt>
@@ -151,7 +152,8 @@ comparisons will be chosen (see <code><a href="get_nodesplits.html">get_nodespli
 
 
 <dt id="arg-prior-trt">prior_trt<a class="anchor" aria-label="anchor" href="#arg-prior-trt"></a></dt>
-<dd><p>Specification of prior distribution for the treatment effects</p></dd>
+<dd><p>Specification of prior distribution for the treatment
+effects</p></dd>
 
 
 <dt id="arg-prior-het">prior_het<a class="anchor" aria-label="anchor" href="#arg-prior-het"></a></dt>
@@ -269,7 +271,8 @@ all other M-spline options will be ignored.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p><code>nma()</code> returns a <a href="stan_nma-class.html">stan_nma</a> object, except when <code>consistency = "nodesplit"</code> when a <a href="nma_nodesplit-class.html">nma_nodesplit</a> or <a href="nma_nodesplit-class.html">nma_nodesplit_df</a> object is
-returned. <code>nma.fit()</code> returns a stanfit object.</p>
+returned. <code>nma.fit()</code> returns a <code><a href="https://mc-stan.org/rstan/reference/stanfit-class.html" class="external-link">stanfit</a></code>
+object.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -283,8 +286,8 @@ expands to <code>variable + variable:.trt</code> (plus <code>.trt</code>, which 
 NMA model).</p>
 <p>For the advanced user, the additional specials <code>.study</code> and <code>.trtclass</code> are
 also available, and refer to studies and (if specified) treatment classes
-respectively. When node-splitting models are fitted (<code>consistency = "nodesplit"</code>) the special <code>.omega</code> is available, indicating the arms
-to which the node-splitting inconsistency factor is added.</p>
+respectively. When node-splitting models are fitted (<code>consistency = "nodesplit"</code>) the special <code>.omega</code> is available, indicating the arms to
+which the node-splitting inconsistency factor is added.</p>
 <p>See <code><a href="priors.html">?priors</a></code> for details on prior
 specification. Default prior distributions are available, but may not be
 appropriate for the particular setting and will raise a warning if used. No

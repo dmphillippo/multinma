@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.1.9004</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,10 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.7.1.9000" id="multinma-0719000">multinma 0.7.1.9000<a class="anchor" aria-label="anchor" href="#multinma-0719000"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.7.2.9000" id="multinma-0729000">multinma 0.7.2.9000<a class="anchor" aria-label="anchor" href="#multinma-0729000"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.2" id="multinma-072">multinma 0.7.2<a class="anchor" aria-label="anchor" href="#multinma-072"></a></h2><p class="text-muted">CRAN release: 2024-09-16</p>
 <ul><li>Fix: Predictions for non-proportional hazards IPD NMA or ML-NMR survival models using <code>aux_regression = ~.trt</code> were incorrectly omitting the treatment effects on the auxiliary parameter(s) in some cases (<a href="https://github.com/dmphillippo/multinma/issues/43" class="external-link">#43</a>).</li>
 <li>Fix: Calling <code><a href="../reference/marginal_effects.html">marginal_effects()</a></code> for survival outcomes with a single target population previously gave an error.</li>
 <li>Fix: Predictions from exponential models where <code>aux_regression</code> had been specified were giving an error (<a href="https://github.com/dmphillippo/multinma/issues/44" class="external-link">#44</a>). <code>aux_regression</code> and <code>aux_by</code> have no effect for exponential models since there are no auxiliary (shape) parameters and are ignored, now with a warning.</li>

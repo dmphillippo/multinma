@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.1.9004</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -111,19 +111,21 @@ no reference lines are drawn.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Plotting is handled by <a href="https://ggplot2.tidyverse.org/reference/ggplot2-package.html" class="external-link">ggplot2</a> and the stats and geoms provided in
-the ggdist package. As a result, the output is very flexible. Any
-plotting stats provided by <code>ggdist</code> may be used, via the argument <code>stat</code>.
-The default <code>"dens_overlay"</code> is a special exception, which uses
-<code><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">ggplot2::geom_density()</a></code>, to plot overlaid
-densities. Additional arguments in <code>...</code> are passed to the <code>ggdist</code> stat,
-to customise the output.</p>
+    <p>Plotting is handled by <a href="https://ggplot2.tidyverse.org/reference/ggplot2-package.html" class="external-link">ggplot2</a> and
+the stats and geoms provided in the <a href="http://mjskay.github.io/ggdist/reference/ggdist-package.html" class="external-link">ggdist</a>
+package. As a result, the output is very flexible. Any plotting stats
+provided by <code>ggdist</code> may be used, via the argument <code>stat</code>. The default
+<code>"dens_overlay"</code> is a special exception, which uses
+<code><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">ggplot2::geom_density()</a></code>, to plot
+overlaid densities. Additional arguments in <code>...</code> are passed to the
+<code>ggdist</code> stat, to customise the output.</p>
 <p>Alternative stats can be specified to produce different summaries. For
 example, specify <code>stat = "[half]eye"</code> to produce (half) eye plots, or <code>stat = "pointinterval"</code> to produce point estimates and credible intervals.</p>
 <p>A full list of options and examples is found in the <code>ggdist</code> vignette
 <code><a href="http://mjskay.github.io/ggdist/articles/slabinterval.html" class="external-link">vignette("slabinterval", package = "ggdist")</a></code>.</p>
 <p>A <code>ggplot</code> object is returned which can be further modified through the
-usual <a href="https://ggplot2.tidyverse.org/reference/ggplot2-package.html" class="external-link">ggplot2</a> functions to add further aesthetics, geoms, themes, etc.</p>
+usual <a href="https://ggplot2.tidyverse.org/reference/ggplot2-package.html" class="external-link">ggplot2</a> functions to add further
+aesthetics, geoms, themes, etc.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
