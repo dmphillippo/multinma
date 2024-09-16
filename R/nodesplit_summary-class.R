@@ -146,13 +146,14 @@ as.data.frame.nodesplit_summary <- function(x, ...) {
 #' @param ref_line Numeric vector of positions for reference lines, by default
 #'   no reference lines are drawn.
 #'
-#' @details Plotting is handled by [ggplot2] and the stats and geoms provided in
-#'   the [ggdist] package. As a result, the output is very flexible. Any
-#'   plotting stats provided by `ggdist` may be used, via the argument `stat`.
-#'   The default `"dens_overlay"` is a special exception, which uses
-#'   \code{\link[ggplot2:geom_density]{ggplot2::geom_density()}}, to plot overlaid
-#'   densities. Additional arguments in `...` are passed to the `ggdist` stat,
-#'   to customise the output.
+#' @details Plotting is handled by \link[ggplot2:ggplot2-package]{ggplot2} and
+#'   the stats and geoms provided in the \link[ggdist:ggdist-package]{ggdist}
+#'   package. As a result, the output is very flexible. Any plotting stats
+#'   provided by `ggdist` may be used, via the argument `stat`. The default
+#'   `"dens_overlay"` is a special exception, which uses
+#'   \code{\link[ggplot2:geom_density]{ggplot2::geom_density()}}, to plot
+#'   overlaid densities. Additional arguments in `...` are passed to the
+#'   `ggdist` stat, to customise the output.
 #'
 #'   Alternative stats can be specified to produce different summaries. For
 #'   example, specify `stat = "[half]eye"` to produce (half) eye plots, or `stat
@@ -162,7 +163,8 @@ as.data.frame.nodesplit_summary <- function(x, ...) {
 #'   `vignette("slabinterval", package = "ggdist")`.
 #'
 #'   A `ggplot` object is returned which can be further modified through the
-#'   usual [ggplot2] functions to add further aesthetics, geoms, themes, etc.
+#'   usual \link[ggplot2:ggplot2-package]{ggplot2} functions to add further
+#'   aesthetics, geoms, themes, etc.
 #'
 #' @return A `ggplot` object.
 #' @seealso [summary.nma_nodesplit_df()]

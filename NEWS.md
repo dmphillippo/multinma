@@ -1,4 +1,4 @@
-# multinma 0.7.1.9000
+# multinma 0.7.2
 
 * Fix: Predictions for non-proportional hazards IPD NMA or ML-NMR survival 
 models using `aux_regression = ~.trt` were incorrectly omitting the treatment 

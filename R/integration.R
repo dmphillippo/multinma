@@ -25,7 +25,7 @@
 #'   \code{\link[randtoolbox:quasiRNG]{sobol()}}
 #'
 #' @return For the `nma_data` method, an object of class [nma_data]. For the
-#'   `data.frame` method, the input data frame is returned (as a [tibble]) with
+#'   `data.frame` method, the input data frame is returned (as a `tibble`) with
 #'   an added column for each covariate (prefixed with ".int_"), containing the
 #'   numerical integration points nested as length-`n_int` vectors within each
 #'   row. For `unnest_integration()`, a data frame with integration points

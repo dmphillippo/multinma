@@ -41,7 +41,8 @@ nma(
 \item{consistency}{Character string specifying the type of (in)consistency
 model to fit, either \code{"consistency"}, \code{"ume"}, or \code{"nodesplit"}}
 
-\item{trt_effects}{Character string specifying either \code{"fixed"} or \code{"random"} effects}
+\item{trt_effects}{Character string specifying either \code{"fixed"} or \code{"random"}
+effects}
 
 \item{regression}{A one-sided model formula, specifying the prognostic and
 effect-modifying terms for a regression model. Any references to treatment
@@ -70,7 +71,8 @@ comparisons will be chosen (see \code{\link[=get_nodesplits]{get_nodesplits()}})
 
 \item{prior_intercept}{Specification of prior distribution for the intercept}
 
-\item{prior_trt}{Specification of prior distribution for the treatment effects}
+\item{prior_trt}{Specification of prior distribution for the treatment
+effects}
 
 \item{prior_het}{Specification of prior distribution for the heterogeneity
 (if \code{trt_effects = "random"})}
@@ -154,7 +156,8 @@ all other M-spline options will be ignored.}
 }
 \value{
 \code{nma()} returns a \link{stan_nma} object, except when \code{consistency = "nodesplit"} when a \link{nma_nodesplit} or \link{nma_nodesplit_df} object is
-returned. \code{nma.fit()} returns a \link{stanfit} object.
+returned. \code{nma.fit()} returns a \code{\link[rstan:stanfit-class]{stanfit}}
+object.
 }
 \description{
 The \code{nma} function fits network meta-analysis and (multilevel) network
@@ -172,8 +175,8 @@ NMA model).
 
 For the advanced user, the additional specials \code{.study} and \code{.trtclass} are
 also available, and refer to studies and (if specified) treatment classes
-respectively. When node-splitting models are fitted (\code{consistency = "nodesplit"}) the special \code{.omega} is available, indicating the arms
-to which the node-splitting inconsistency factor is added.
+respectively. When node-splitting models are fitted (\code{consistency = "nodesplit"}) the special \code{.omega} is available, indicating the arms to
+which the node-splitting inconsistency factor is added.
 
 See \code{\link[multinma:priors]{?priors}} for details on prior
 specification. Default prior distributions are available, but may not be

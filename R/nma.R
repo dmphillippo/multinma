@@ -7,7 +7,8 @@
 #'   `combine_network()`, or `add_integration()`
 #' @param consistency Character string specifying the type of (in)consistency
 #'   model to fit, either `"consistency"`, `"ume"`, or `"nodesplit"`
-#' @param trt_effects Character string specifying either `"fixed"` or `"random"` effects
+#' @param trt_effects Character string specifying either `"fixed"` or `"random"`
+#'   effects
 #' @param regression A one-sided model formula, specifying the prognostic and
 #'   effect-modifying terms for a regression model. Any references to treatment
 #'   should use the `.trt` special variable, for example specifying effect
@@ -28,7 +29,8 @@
 #'   multiple treatment comparisons to split in turn. By default, all possible
 #'   comparisons will be chosen (see [get_nodesplits()]).
 #' @param prior_intercept Specification of prior distribution for the intercept
-#' @param prior_trt Specification of prior distribution for the treatment effects
+#' @param prior_trt Specification of prior distribution for the treatment
+#'   effects
 #' @param prior_het Specification of prior distribution for the heterogeneity
 #'   (if `trt_effects = "random"`)
 #' @param prior_het_type Character string specifying whether the prior
@@ -106,8 +108,8 @@
 #'   For the advanced user, the additional specials `.study` and `.trtclass` are
 #'   also available, and refer to studies and (if specified) treatment classes
 #'   respectively. When node-splitting models are fitted (`consistency =
-#'   "nodesplit"`) the special `.omega` is available, indicating the arms
-#'   to which the node-splitting inconsistency factor is added.
+#'   "nodesplit"`) the special `.omega` is available, indicating the arms to
+#'   which the node-splitting inconsistency factor is added.
 #'
 #'   See \code{\link[multinma:priors]{?priors}} for details on prior
 #'   specification. Default prior distributions are available, but may not be
@@ -231,7 +233,8 @@
 #'
 #' @return `nma()` returns a [stan_nma] object, except when `consistency =
 #'   "nodesplit"` when a [nma_nodesplit] or [nma_nodesplit_df] object is
-#'   returned. `nma.fit()` returns a [stanfit] object.
+#'   returned. `nma.fit()` returns a \code{\link[rstan:stanfit-class]{stanfit}}
+#'   object.
 #' @export
 #'
 #' @references
