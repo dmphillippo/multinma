@@ -1569,6 +1569,12 @@ nma.fit <- function(ipd_x, ipd_y,
   # Check class effect arguments
   class_effects <- rlang::arg_match(class_effects)
   if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
+if (class_effects == "exchangeable") {
+  if (is.null(which_CE) || !rlang::is_integerish(which_CE) || any(which_CE < 0)) 
+    abort("`which_CE` must be an integer design vector for class effects.")
+  if (is.null(which_CE_sd) || !rlang::is_integerish(which_CE_sd) || any(which_CE_sd < 0)) 
+    abort("`which_CE_sd` must be an integer design vector for class effect SDs.")
+}
 
   likelihood <- check_likelihood(likelihood)
   link <- check_link(link, likelihood)
