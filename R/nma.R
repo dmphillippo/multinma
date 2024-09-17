@@ -320,13 +320,6 @@ nma <- function(network,
   class_effects <- rlang::arg_match(class_effects)
   if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
 
-  # Notify if default reference treatment is used
-  if (.is_default(network$treatments))
-    inform(glue::glue('Note: Setting "{levels(network$treatments)[1]}" as the network reference treatment.'))
-
-  if (!is_network_connected(network)) {
-    inform("Note: Network is disconnected. See ?is_network_connected for more details.")
-  }
 
 
   if (class_effects == "common") {
