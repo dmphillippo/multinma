@@ -1143,62 +1143,24 @@ nma <- function(network,
     aux_group <- aux_id
   }
 
-# Creating design Vector for class effects
-  # Ensure classes are factors
-  # Initialize lengths and other frequently used values
-  n_treatments_minus_one <- length(network$treatments) - 1
-  n_classes_minus_one <- length(unique(network$treatments)) - 1
-
-  # Create which_CE and which_CE_num
-  if (class_effects == "exchangeable") {
-    temp_which_CE <- which_CE(network$classes)
-    which_CE_num <- temp_which_CE$which_CE_num
-    which_CE_num <- which_CE_num[-1]
-    which_CE <- temp_which_CE$which_CE
-    which_CE <- which_CE[-1]
-  }
-  if (class_effects == "common") {
-    which_CE <- rep(0, n_classes_minus_one)
-    which_CE_num <- rep(0, n_classes_minus_one)
-  }
-  if (class_effects == "independent"){
-    which_CE <- rep(0, n_treatments_minus_one)
-    which_CE_num <- rep(0, n_treatments_minus_one)
-  }
-
-  # Check if which_CE is a factor with a "0" level
-  #if(is.factor(which_CE) && "0" %in% levels(which_CE)) {
-    # Find the positions where the label is "0"
-    #zero_positions <- which(as.character(which_CE) == "0")
-
-    # Set the corresponding positions in which_CE_num to numerical 0
-    #which_CE_num[zero_positions] <- 0
-
-  # Create which_CE_sd and which_CE_sd_num
+if (class_effects == "exchangeable") {
+  # Create class design vector for class means
+  class_mean_design <- which_CE(network$classes)
+  
+  # Create class design vector for class SDs
   if (is.list(class_sd)) {
-    temp_which_CE_sd <- which_CE(forcats::fct_collapse(network$classes, !!!class_sd))
-    which_CE_sd <- temp_which_CE_sd$which_CE[-1]
-    which_CE_sd_num <- temp_which_CE_sd$which_CE_num[-1]
-  } else {
-    if (class_sd == "common") {
-      # For the numeric vector
-      which_CE_sd_num <- which_CE_num  # Initialize with which_CE_num
-      which_CE_sd_num[which_CE_sd_num != 0] <- 1  # Change non-zero values to 1
-
-      # For the factor
-      which_CE_sd <- c(1)
-      which_CE_sd <- factor(which_CE_sd)
-      levels(which_CE_sd) <- "All Classes"
-
+    class_sd_design <- which_CE(forcats::fct_collapse(network$classes, !!!class_sd))
+  } else if (class_sd == "common") {
+    class_sd_design <- list(
+      # Change non-zero class IDs to 1
+      id = pmin(class_mean_design$id, 1),
+      # Set common class label
+      label = "All Classes"
+    )
   } else if (class_sd == "independent") {
-      # For the numeric vector
-      which_CE_sd_num <- which_CE_num  # Assign which_CE_num to which_CE_sd_num
-
-      # For the factor
-      which_CE_sd <- which_CE  # Assign which_CE to which_CE_sd
-    }
+    class_sd_design <- class_mean_design
   }
-
+}
   # Fit using nma.fit
   stanfit <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
     agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
