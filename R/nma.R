@@ -341,9 +341,15 @@ nma <- function(network,
       network$agd_contrast$.trt <- network$agd_contrast$.trtclass
     }
 
-    # Update the treatments based on the classes
-    # Assuming '.default()' is a function that processes classes into treatments
-    network$treatments <- .default(network$classes)
+    # Set the network treatments vector
+    network$treatments <- if (.is_default(network$treatments)) {
+        .default(factor(levels(network$classes), levels = levels(network$classes)))
+      } else {
+        factor(levels(network$classes), levels = levels(network$classes))
+      }
+    
+    # Set network classes vector
+    network$classes <- network$treatments
   }
 
   # Check class_sd
