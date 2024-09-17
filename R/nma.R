@@ -1370,20 +1370,12 @@ nma <- function(network,
     }
   }
 
-  if (class_effects != "independent"){
-  which_CE_labels <- levels(which_CE)
-  which_CE_sd_labels <- levels(which_CE_sd)
-  # For class_mean
-  matched_indices_mean <- grepl("^class_mean\\[[0-9]+\\]$", fnames_oi)
-  extracted_numbers_mean <- gsub("^class_mean\\[([0-9]+)\\]$", "\\1", fnames_oi[matched_indices_mean])
-  new_labels_mean <- which_CE_labels[as.numeric(extracted_numbers_mean)]
-  fnames_oi[matched_indices_mean] <- paste0("class_mean[", new_labels_mean, "]")
+  if (class_effects == "exchangeable"){
+    # Label class_mean parameters
+    fnames_oi[grepl("^class_mean\\[[0-9]+\\]$", fnames_oi)] <- paste0("class_mean[", class_mean_design$label, "]")
 
-  # For class_sd
-  matched_indices_sd <- grepl("^class_sd\\[[0-9]+\\]$", fnames_oi)
-  extracted_numbers_sd <- gsub("^class_sd\\[([0-9]+)\\]$", "\\1", fnames_oi[matched_indices_sd])
-  new_labels_sd <- which_CE_sd_labels[as.numeric(extracted_numbers_sd)]
-  fnames_oi[matched_indices_sd] <- paste0("class_sd[", new_labels_sd, "]")
+    # Label class_sd parameters
+    fnames_oi[grepl("^class_sd\\[[0-9]+\\]$", fnames_oi)] <- paste0("class_sd[", class_sd_design$label, "]")
 }
   stanfit@sim$fnames_oi <- fnames_oi
 
