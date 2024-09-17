@@ -21,7 +21,7 @@
 \arguments{
 \item{x}{A \code{stan_nma} object}
 
-\item{...}{Additional arguments passed to \code{\link[=as.array.stanfit]{as.array.stanfit()}}}
+\item{...}{Additional arguments passed to \code{\link[rstan:as.array.stanfit]{as.array.stanfit()}}}
 
 \item{pars}{Optional character vector of parameter names to include in output. If not specified, all parameters are used.}
 

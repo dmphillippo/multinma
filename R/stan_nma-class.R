@@ -38,7 +38,7 @@ NULL
 #' Print `stan_nma` objects
 #'
 #' @param x A [stan_nma] object
-#' @param ... Further arguments passed to [print.stanfit()]
+#' @param ... Further arguments passed to \code{\link[rstan:print.stanfit]{print.stanfit()}}
 #'
 #' @return `x` is returned invisibly.
 #'
@@ -722,7 +722,7 @@ as.stanfit.default <- function(x, ...) {
 #' array, matrix, or data frame.
 #'
 #' @param x A `stan_nma` object
-#' @param ... Additional arguments passed to [as.array.stanfit()]
+#' @param ... Additional arguments passed to \code{\link[rstan:as.array.stanfit]{as.array.stanfit()}}
 #' @param pars Optional character vector of parameter names to include in output. If not specified, all parameters are used.
 #' @param include Logical, are parameters in `pars` to be included (`TRUE`, default) or excluded (`FALSE`)?
 #'

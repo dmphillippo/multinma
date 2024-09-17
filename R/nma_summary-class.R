@@ -150,10 +150,10 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #' @param ref_line Numeric vector of positions for reference lines, by default
 #'   no reference lines are drawn
 #'
-#' @details Plotting is handled by [ggplot2] and the stats and geoms provided in
-#'   the [ggdist] package. As a result, the output is very flexible. Any
-#'   plotting stats provided by `ggdist` may be used, via the argument
-#'   `stat`.
+#' @details Plotting is handled by \link[ggplot2:ggplot2-package]{ggplot2} and
+#'   the stats and geoms provided in the \link[ggdist:ggdist-package]{ggdist}
+#'   package. As a result, the output is very flexible. Any plotting stats
+#'   provided by `ggdist` may be used, via the argument `stat`.
 #'
 #'   The default uses
 #'   \code{\link[ggdist:stat_pointinterval]{ggdist::stat_pointinterval()}}, to
@@ -179,7 +179,8 @@ print.nma_summary <- function(x, ..., digits = 2, pars, include = TRUE) {
 #'   bands, specify `point_interval = "mean_qi"` and `.width = 0.95`.
 #'
 #'   A `ggplot` object is returned which can be further modified through the
-#'   usual [ggplot2] functions to add further aesthetics, geoms, themes, etc.
+#'   usual \link[ggplot2:ggplot2-package]{ggplot2} functions to add further
+#'   aesthetics, geoms, themes, etc.
 #'
 #' @return A `ggplot` object.
 #'

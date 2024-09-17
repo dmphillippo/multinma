@@ -60,7 +60,7 @@ columns as \verb{.int_<variable name>}}
 }
 \value{
 For the \code{nma_data} method, an object of class \link{nma_data}. For the
-\code{data.frame} method, the input data frame is returned (as a \link{tibble}) with
+\code{data.frame} method, the input data frame is returned (as a \code{tibble}) with
 an added column for each covariate (prefixed with ".int_"), containing the
 numerical integration points nested as length-\code{n_int} vectors within each
 row. For \code{unnest_integration()}, a data frame with integration points
