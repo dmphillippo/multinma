@@ -1546,6 +1546,10 @@ if (class_effects == "exchangeable") {
   if (class_effects == "exchangeable"){
   check_prior(prior_class_mean)
   check_prior(prior_class_sd)
+} else {
+  # Dummy class effects priors for non-CE models, not used but requested by Stan data
+  prior_class_mean <- normal(0, 1)
+  prior_class_sd <- half_normal(1)
 }
   prior_het_type <- rlang::arg_match(prior_het_type)
 
@@ -1749,9 +1753,9 @@ if (class_effects == "exchangeable") {
     has_offset = has_offsets,
     offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric(),
     # Class effects
-    which_CE_num = if (class_effects != "independent") which_CE_num else numeric(0),
-    which_CE_sd_num = if (class_effects != "independent") which_CE_sd_num else numeric(0),
-    class_effects = ifelse(class_effects == "independent", 0, 1)
+    which_CE = if (class_effects == "exchangeable") which_CE else numeric(0),
+    which_CE_sd = if (class_effects == "exchangeable") which_CE_sd else numeric(0),
+    class_effects = ifelse(class_effects == "exchangeable", 1, 0)
     )
 
   # Add priors
@@ -2350,10 +2354,6 @@ if (class_effects == "exchangeable") {
     stanfit <- do.call(rstan::sampling, stanargs)
   }
 
-  # Convert which_CE to a factor and set its levels to the unique class names
-  #which_CE <- as.factor(which_CE)
-  #levels(which_CE) <- levels(network$classes)
-
   # Set readable parameter names in the stanfit object
   fnames_oi <- stanfit@sim$fnames_oi
   x_names_sub <- gsub("^(\\.study|\\.trt|\\.trtclass|\\.contr)", "", x_names)
@@ -2529,48 +2529,30 @@ valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
                                  "mspline", "pexp"))
 
 
-#' @rdname class_effects
-#' @aliases which_CE
-#' @export
-#' @examples
-#'
+#' Create exchangeable class effects design vector
+#' @param classes Network classes factor vector
+#' @return A list, with elements `id` giving the design vector (0 = no class effect), and `label` giving the corresponding class labels
+#' @noRd
 
-which_CE <- function(classes) {
-  # Count the frequency of each class
-  class_tab <- table(classes)
-
-  # Identify classes that appear only once
-  solo_classes <- names(class_tab[class_tab == 1])
-
-  # Create which_CE as a copy of classes
-  which_CE <- classes
-
-  # Identify unique values
-  unique_values <- levels(which_CE)[table(which_CE) == 1]
-
-  # Replace unique values with NA
-  which_CE[which_CE %in% unique_values] <- NA
-
-  # Optionally, drop levels that no longer have any data
-  which_CE <- droplevels(which_CE)
-
-  # Check the result
-  which_CE_num <- as.numeric(which_CE)
-
-  # Replace NA values with 0
-  which_CE_num[is.na(which_CE_num)] <- 0
-
-  # Re-level which_CE_num
-  #remaining_classes <- unique(which_CE_num[which_CE_num != 0])
-  #new_values <- 1:length(remaining_classes)
-  #mapping <- setNames(new_values, remaining_classes)
-  #which_CE_num[which_CE_num != 0] <- mapping[as.character(which_CE_num[which_CE_num != 0])]
-
-  # Update which_CE to remove levels that have turned into zeros in which_CE_num
-  #which_CE <- droplevels(which_CE, exclude = solo_classes)
-
-
-  return(list(which_CE = which_CE, which_CE_num = which_CE_num))
+which_CE <- function(classes)   {
+  
+  # Class vector, without network reference treatment
+  x <- classes[-1]
+  
+  # Identify sole occupancy classes
+  solo_classes <- levels(x)[table(x) == 1]
+  
+  # Set sole occupancy classes to NA (no class effects) and drop unused levels
+  x <- droplevels(x, exclude = solo_classes)
+  
+  # Create numeric ID vector (0 = no class effect)
+  id <- as.numeric(x)
+  id[is.na(id)] <- 0
+  
+  # Create class labels
+  label <- levels(x)
+  
+  return(list(id = id, label = label))
 }
 
 
