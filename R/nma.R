@@ -1543,7 +1543,7 @@ if (class_effects == "exchangeable") {
 
     if (!is.null(X_aux)) check_prior(prior_aux_reg)
   }
-  if (class_effects != "independent"){
+  if (class_effects == "exchangeable"){
   check_prior(prior_class_mean)
   check_prior(prior_class_sd)
 }
