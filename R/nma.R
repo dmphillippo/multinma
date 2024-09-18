@@ -3583,22 +3583,3 @@ aux_needs_integration <- function(aux_regression, aux_by) {
   (!is.null(aux_regression) && length(setdiff(colnames(attr(terms(aux_regression), "factor")), c(".study", ".trt", ".trtclass"))) > 0) ||
     (!is.null(aux_by) && length(setdiff(aux_by, c(".study", ".trt", ".trtclass"))) > 0)
 }
-rename_trt_class <- function(fnames, pattern, vector_levels) {
-  # Find the names in fnames that match the pattern
-  matching_indices <- grep(pattern, fnames)
-
-  # Extract the numerical indices from those names
-  extracted_indices <- as.numeric(gsub(".*\\[([0-9]+)\\]", "\\1", fnames[matching_indices]))
-
-  # Look up the corresponding levels from the vector_levels
-  corresponding_levels <- levels(vector_levels)[extracted_indices]
-
-  # Construct the new names
-  new_names <- paste0(gsub("\\[.*\\]", "", pattern), "[", corresponding_levels, "]")
-
-  # Update fnames
-  fnames[matching_indices] <- new_names
-
-  return(fnames)
-}
-
