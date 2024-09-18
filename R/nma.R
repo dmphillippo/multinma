@@ -557,7 +557,8 @@ nma <- function(network,
   # Check class_effects and network classes
   if (class_effects != "independent") {
     if (is.null(network$classes)) {
-      abort("`network$classes` should not be NULL when `class_effects` is not 'independent'.")
+      abort(paste("Setting `class_effects` requires treatment classes to be specified in the network.", 
+                  "See set_*() argument `trt_class`.", sep = "\n"))
     }
   }
 
