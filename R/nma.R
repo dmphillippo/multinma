@@ -2930,7 +2930,7 @@ make_nma_model_matrix <- function(nma_formula,
 
   # Remove columns for reference levels of discrete covariates
   if (length(disc_names)) for (xvar in disc_names) {
-    if (is.logical(dat_all[[xvar]])) x_ref <- FALSE else x_ref <- levels(dat_all[[xvar]])[1]
+    x_ref <- if (is.factor(dat_all[[xvar]])) levels(dat_all[[xvar]])[1] else levels(as.factor(dat_all[[xvar]]))[1]
     col_x_ref <- grepl(paste0("\\Q", xvar, x_ref, "\\E"), colnames(X_all), perl = TRUE)
     X_all <- X_all[, !col_x_ref, drop = FALSE]
   }
