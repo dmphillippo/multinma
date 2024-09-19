@@ -11,7 +11,7 @@ with aggregate data, individual patient data, or mixtures of both."><meta proper
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,33 +67,27 @@ with aggregate data, individual patient data, or mixtures of both.</p>
     <p>Network meta-analysis (NMA) combines (aggregate) data from multiple
 studies on multiple treatments in order to produce consistent estimates of
 relative treatment effects between each pair of treatments in the network
-(Dias et al. 2011)
-.</p>
+TSD2multinma.</p>
 <p>Network meta-regression (NMR) extends NMA to include covariates, allowing
 adjustment for differences in effect-modifying variables between studies
-(Dias et al. 2011)
-. NMR is typically performed using aggregate
+TSD3multinma. NMR is typically performed using aggregate
 data (AgD), which lacks power and is prone to ecological bias. NMR with
 individual patient data (IPD) is the gold standard, if data are available.</p>
 <p>Multilevel network meta-regression (ML-NMR) allows IPD and AgD to be
 incorporated together in a network meta-regression
-(Phillippo et al. 2020; Phillippo 2019)
-. As in IPD NMR, an
+methods_paper,Phillippo_thesismultinma. As in IPD NMR, an
 individual-level regression model is defined. AgD studies are then fitted
 by integrating the individual-level model over the respective covariate
 distributions. This correctly links the two levels of the model (instead of
 "plugging in" mean covariate values), avoiding aggregation bias.
-Population-adjusted treatment effects (Phillippo et al. 2016)
- can be
+Population-adjusted treatment effects TSD18multinma can be
 produced for any study population in the network, or for an external target
 population.</p>
 <p>Models are estimated in a Bayesian framework using Stan
-(Carpenter et al. 2017)
-. Quasi-Monte Carlo numerical
+Carpenter2017multinma. Quasi-Monte Carlo numerical
 integration based on Sobol' sequences is used for the integration in ML-NMR
 models, with a Gaussian copula to account for correlations between
-covariates (Phillippo et al. 2020; Phillippo 2019)
-.</p>
+covariates methods_paper,Phillippo_thesismultinma.</p>
     </div>
     <div class="section level2">
     <h2 id="getting-started">Getting Started<a class="anchor" aria-label="anchor" href="#getting-started"></a></h2>
@@ -103,40 +97,13 @@ covariates (Phillippo et al. 2020; Phillippo 2019)
 example analyses, see <code><a href="../articles/vignette_overview.html">vignette("vignette_overview")</a></code> for an overview.
 The series of NICE Technical Support Documents on evidence synthesis gives
 a detailed introduction to network meta-analysis:</p>
-<p>Dias S, Welton NJ, Sutton AJ, Caldwell DM, Lu G, Reken S, Ades AE (2011).
-“NICE DSU Technical Support Documents 1-7: Evidence Synthesis for Decision Making.”
-National Institute for Health and Care Excellence.
-<a href="https://www.sheffield.ac.uk/nice-dsu" class="external-link">https://www.sheffield.ac.uk/nice-dsu</a>.</p>
+<p>TSD_evsynthmultinma</p>
 <p>Multilevel network meta-regression is set out in the following methods paper:</p>
-<p>Phillippo DM, Dias S, Ades AE, Belger M, Brnabic A, Schacht A, Saure D, Kadziola Z, Welton NJ (2020).
-“Multilevel Network Meta-Regression for population-adjusted treatment comparisons.”
-<em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em>, <b>183</b>(3), 1189–1210.
-<a href="https://doi.org/10.1111/rssa.12579" class="external-link">doi:10.1111/rssa.12579</a>
-.</p>
+<p>methods_papermultinma</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>Carpenter B, Gelman A, Hoffman MD, Lee D, Goodrich B, Betancourt M, Brubaker M, Guo J, Li P, Riddell A (2017).
-“Stan: A Probabilistic Programming Language.”
-<em>Journal of Statistical Software</em>, <b>76</b>(1).
-<a href="https://doi.org/10.18637/jss.v076.i01" class="external-link">doi:10.18637/jss.v076.i01</a>
-.<br><br> Dias S, Sutton AJ, Welton NJ, Ades AE (2011).
-“NICE DSU Technical Support Document 3: Heterogeneity: subgroups, meta-regression, bias and bias-adjustment.”
-National Institute for Health and Care Excellence.
-<a href="https://www.sheffield.ac.uk/nice-dsu" class="external-link">https://www.sheffield.ac.uk/nice-dsu</a>.<br><br> Dias S, Welton NJ, Sutton AJ, Ades AE (2011).
-“NICE DSU Technical Support Document 2: A generalised linear modelling framework for pair-wise and network meta-analysis of randomised controlled trials.”
-National Institute for Health and Care Excellence.
-<a href="https://www.sheffield.ac.uk/nice-dsu" class="external-link">https://www.sheffield.ac.uk/nice-dsu</a>.<br><br> Phillippo DM (2019).
-<em>Calibration of Treatment Effects in Network Meta-Analysis using Individual Patient Data</em>.
-Ph.D. thesis, University of Bristol.
-Available from <a href="https://research-information.bris.ac.uk/" class="external-link">https://research-information.bris.ac.uk/</a>.<br><br> Phillippo DM, Ades AE, Dias S, Palmer S, Abrams KR, Welton NJ (2016).
-“NICE DSU Technical Support Document 18: Methods for population-adjusted indirect comparisons in submission to NICE.”
-National Institute for Health and Care Excellence.
-<a href="https://www.sheffield.ac.uk/nice-dsu" class="external-link">https://www.sheffield.ac.uk/nice-dsu</a>.<br><br> Phillippo DM, Dias S, Ades AE, Belger M, Brnabic A, Schacht A, Saure D, Kadziola Z, Welton NJ (2020).
-“Multilevel Network Meta-Regression for population-adjusted treatment comparisons.”
-<em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em>, <b>183</b>(3), 1189–1210.
-<a href="https://doi.org/10.1111/rssa.12579" class="external-link">doi:10.1111/rssa.12579</a>
-.</p>
+    <p></p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -159,7 +126,7 @@ National Institute for Health and Care Excellence.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

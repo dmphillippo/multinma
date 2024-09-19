@@ -9,7 +9,7 @@ meta-regression models in Stan."><meta property="og:image" content="https://dmph
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -308,12 +308,10 @@ each data type:</p><table class="table table"><tr><td><strong>Data type</strong>
 Binomial likelihood for arm-based AgD, which more closely matches the
 underlying Poisson Binomial distribution for the summarised aggregate
 outcomes in a ML-NMR model than the typical (one parameter) Binomial
-distribution (see Phillippo et al. 2020)
-.</p>
+distribution @see @methods_papermultinma.</p>
 <p>When a <code>cloglog</code> link is used, including an offset for log follow-up time
 (i.e. <code>regression = ~offset(log(time))</code>) results in a model on the log
-hazard (see Dias et al. 2011)
-.</p>
+hazard @see @TSD2multinma.</p>
 <p>For survival data, all accelerated failure time models (<code>exponential-aft</code>,
 <code>weibull-aft</code>, <code>lognormal</code>, <code>loglogistic</code>, <code>gamma</code>, <code>gengamma</code>) are
 parameterised so that the treatment effects and any regression parameters
@@ -323,8 +321,7 @@ survival time). These can be converted to log Acceleration Factors using
 the relation \(\log(\mathrm{AF}) = -\log(\mathrm{STR})\) (or equivalently
 \(\mathrm{AF} = 1/\mathrm{STR}\)).</p>
 <p>Further details on each likelihood and link function are given by
-Dias et al. (2011)
-.</p>
+TSD2;textualmultinma.</p>
     </div>
     <div class="section level2">
     <h2 id="auxiliary-parameters">Auxiliary parameters<a class="anchor" aria-label="anchor" href="#auxiliary-parameters"></a></h2>
@@ -364,12 +361,10 @@ the log scale \(\sigma_j&gt;0\).</p>
 <p>The <code>gengamma</code> likelihood has two sets of auxiliary parameters,
 study-specific scale parameters \(\sigma_j&gt;0\) and shape parameters
 \(k_j\), following the parameterisation of
-Lawless (1980)
-, which permits a range of
+Lawless1980;textualmultinma, which permits a range of
 behaviours for the baseline hazard including increasing, decreasing,
 bathtub and arc-shaped hazards. This parameterisation is related to that
-discussed by Cox et al. (2007)
- and implemented in the
+discussed by Cox2007;textualmultinma and implemented in the
 <code>flexsurv</code> package with \(Q = k^{-0.5}\). The parameterisation used here
 effectively bounds the shape parameter \(k\) away from numerical
 instabilities as \(k \rightarrow \infty\) (i.e. away from \(Q
@@ -411,22 +406,7 @@ auxiliary regression coefficients.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>Cox C, Chu H, Schneider MF, Muñoz A (2007).
-“Parametric survival analysis and taxonomy of hazard functions for the generalized gamma distribution.”
-<em>Statistics in Medicine</em>, <b>26</b>(23), 4352–4374.
-<a href="https://doi.org/10.1002/sim.2836" class="external-link">doi:10.1002/sim.2836</a>
-.<br><br> Dias S, Welton NJ, Sutton AJ, Ades AE (2011).
-“NICE DSU Technical Support Document 2: A generalised linear modelling framework for pair-wise and network meta-analysis of randomised controlled trials.”
-National Institute for Health and Care Excellence.
-<a href="https://www.sheffield.ac.uk/nice-dsu" class="external-link">https://www.sheffield.ac.uk/nice-dsu</a>.<br><br> Lawless JF (1980).
-“Inference in the Generalized Gamma and Log Gamma Distributions.”
-<em>Technometrics</em>, <b>22</b>(3), 409–419.
-<a href="https://doi.org/10.1080/00401706.1980.10486173" class="external-link">doi:10.1080/00401706.1980.10486173</a>
-.<br><br> Phillippo DM, Dias S, Ades AE, Belger M, Brnabic A, Schacht A, Saure D, Kadziola Z, Welton NJ (2020).
-“Multilevel Network Meta-Regression for population-adjusted treatment comparisons.”
-<em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em>, <b>183</b>(3), 1189–1210.
-<a href="https://doi.org/10.1111/rssa.12579" class="external-link">doi:10.1111/rssa.12579</a>
-.</p>
+    <p></p>
     </div>
 
     <div class="section level2">
@@ -442,7 +422,7 @@ National Institute for Health and Care Excellence.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

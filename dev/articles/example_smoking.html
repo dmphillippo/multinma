@@ -29,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -191,7 +191,41 @@ auto-detected from the data.</p>
 <span>              trt_effects <span class="op">=</span> <span class="st">"random"</span>,</span>
 <span>              prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>              prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
-<span>              prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>              prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.589 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.456 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                1.045 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: </span></span>
+<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.614 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.445 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2:                1.059 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2: </span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: </span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.585 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.495 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                1.08 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3:</span></span></code></pre></div>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -214,7 +248,7 @@ method:</p>
 <span><span class="co">#&gt; lp__                       1137 1.01</span></span>
 <span><span class="co">#&gt; tau                        1067 1.00</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Sep 16 14:18:48 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Sep 19 22:21:54 2024.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -289,36 +323,31 @@ assess the consistency assumption. Again, we use the function
 <span>                  prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                  prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                  prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">smkfit_ume</span></span>
-<span><span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span></span>
-<span><span class="co">#&gt; An inconsistency model ('ume') was fitted.</span></span>
-<span><span class="co">#&gt; Inference for Stan model: binomial_1par.</span></span>
-<span><span class="co">#&gt; 4 chains, each with iter=2000; warmup=1000; thin=1; </span></span>
-<span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                                                     mean se_mean   sd     2.5%      25%</span></span>
-<span><span class="co">#&gt; d[Group counselling vs. No intervention]            1.13    0.02 0.79    -0.36     0.60</span></span>
-<span><span class="co">#&gt; d[Individual counselling vs. No intervention]       0.90    0.01 0.27     0.38     0.72</span></span>
-<span><span class="co">#&gt; d[Self-help vs. No intervention]                    0.36    0.01 0.57    -0.76     0.00</span></span>
-<span><span class="co">#&gt; d[Individual counselling vs. Group counselling]    -0.30    0.01 0.59    -1.48    -0.68</span></span>
-<span><span class="co">#&gt; d[Self-help vs. Group counselling]                 -0.61    0.01 0.70    -1.99    -1.06</span></span>
-<span><span class="co">#&gt; d[Self-help vs. Individual counselling]             0.21    0.02 1.04    -1.92    -0.45</span></span>
-<span><span class="co">#&gt; lp__                                            -5765.38    0.22 6.51 -5779.01 -5769.62</span></span>
-<span><span class="co">#&gt; tau                                                 0.93    0.01 0.22     0.58     0.77</span></span>
-<span><span class="co">#&gt;                                                      50%      75%    97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[Group counselling vs. No intervention]            1.10     1.63     2.73  2279    1</span></span>
-<span><span class="co">#&gt; d[Individual counselling vs. No intervention]       0.89     1.06     1.44  1100    1</span></span>
-<span><span class="co">#&gt; d[Self-help vs. No intervention]                    0.35     0.73     1.47  2081    1</span></span>
-<span><span class="co">#&gt; d[Individual counselling vs. Group counselling]    -0.28     0.09     0.86  2360    1</span></span>
-<span><span class="co">#&gt; d[Self-help vs. Group counselling]                 -0.61    -0.15     0.74  2420    1</span></span>
-<span><span class="co">#&gt; d[Self-help vs. Individual counselling]             0.21     0.86     2.32  3639    1</span></span>
-<span><span class="co">#&gt; lp__                                            -5764.97 -5760.84 -5753.71   898    1</span></span>
-<span><span class="co">#&gt; tau                                                 0.90     1.05     1.45  1123    1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Sep 16 14:18:55 2024.</span></span>
-<span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
-<span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
-<span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
+<span><span class="co">#&gt;   (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: </span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.523 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.417 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.94 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3: </span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: </span></span>
+<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.603 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.433 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2:                1.036 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2: </span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="va">smkfit_ume</span></span></code></pre></div>
 <p>Comparing the model fit statistics</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dic_consistency</span></span>
@@ -590,7 +619,7 @@ Studies.”</span> <em>Medical Decision Making</em> 18 (1): 37–43. <a href="ht
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

@@ -9,7 +9,7 @@ mean survival time functions for the M-spline baseline hazards model."><meta pro
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -128,8 +128,7 @@ hazard function, and <code>rmst_mspline()</code> gives restricted mean survival 
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Survival models with a flexible M-spline on the baseline hazard are
-described by Brilleman et al. (2020)
-.
+described by Brilleman2020;textualmultinma.
 Piecewise-exponential baseline hazards are a special case where the degree
 of the M-spline polynomial is 0.</p>
 <p>The d/p/h/H functions are calculated from their definitions. <code>qmspline()</code>
@@ -137,8 +136,7 @@ uses numerical inversion via <code><a href="http://chjackson.github.io/flexsurv-
 numerical integration via <code><a href="http://chjackson.github.io/flexsurv-dev/reference/rmst_generic.html" class="external-link">flexsurv::rmst_generic()</a></code>, except for the
 special case of the piecewise-exponential hazard (i.e. degree 0 M-splines)
 which uses the explicit formula from
-Royston and Parmar (2013)
-.</p>
+Royston2013;textualmultinma.</p>
 <p>Beyond the boundary knots, the hazard is assumed to be constant. (This
 differs from the approach in <code><a href="https://wwenjie.org/splines2/reference/mSpline.html" class="external-link">splines2::mSpline()</a></code> that extrapolates the
 polynomial basis functions, which is numerically unstable and highly
@@ -153,15 +151,7 @@ with <code>t = Inf</code>).</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>Brilleman SL, Elci EM, Novik JB, Wolfe R (2020).
-“Bayesian Survival Analysis Using the rstanarm R Package.”
-<em>arXiv</em>.
-<a href="https://doi.org/10.48550/arXiv.2002.09633" class="external-link">doi:10.48550/arXiv.2002.09633</a>
-, 2002.09633.<br><br> Royston P, Parmar MKB (2013).
-“Restricted mean survival time: an alternative to the hazard ratio for the design and analysis of randomized trials with a time-to-event outcome.”
-<em>BMC Medical Research Methodology</em>, <b>13</b>(1).
-<a href="https://doi.org/10.1186/1471-2288-13-152" class="external-link">doi:10.1186/1471-2288-13-152</a>
-.</p>
+    <p></p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -173,7 +163,7 @@ with <code>t = Inf</code>).</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>
