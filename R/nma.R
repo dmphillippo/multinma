@@ -2540,7 +2540,7 @@ which_CE <- function(classes)   {
   x <- classes[-1]
   
   # Identify sole occupancy classes
-  solo_classes <- levels(x)[table(x) == 1]
+  solo_classes <- setdiff(levels(x)[table(x) == 1] , unlist(class_sd))
   
   # Set sole occupancy classes to NA (no class effects) and drop unused levels
   x <- droplevels(x, exclude = solo_classes)
