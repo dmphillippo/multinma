@@ -2938,10 +2938,12 @@ make_nma_model_matrix <- function(nma_formula,
     if (ctype == "contr.treatment") {
       x_ref <-
         if (is.factor(dat_all[[xvar]])) levels(dat_all[[xvar]])[1]
+        else if (is.logical(dat_all[[xvar]])) FALSE
         else levels(as.factor(dat_all[[xvar]]))[1]
     } else if (ctype == "contr.SAS") {
       x_ref <-
         if (is.factor(dat_all[[xvar]])) rev(levels(dat_all[[xvar]]))[1]
+        else if (is.logical(dat_all[[xvar]])) FALSE
         else rev(levels(as.factor(dat_all[[xvar]])))[1]
     } else {
       x_ref <- NULL
