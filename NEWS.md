@@ -1,5 +1,10 @@
 # multinma 0.7.2.9000
 
+* Fix: Resolved a bug where trying to fit meta-regression models with discrete 
+covariates would sometimes result in a misspecified and inestimable model, due 
+to the inclusion of additional columns in the design matrix for the reference 
+level of the covariates.
+
 # multinma 0.7.2
 
 * Fix: Predictions for non-proportional hazards IPD NMA or ML-NMR survival 

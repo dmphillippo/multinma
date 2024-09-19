@@ -2905,6 +2905,8 @@ make_nma_model_matrix <- function(nma_formula,
   offsets <- model.offset(model.frame(nma_formula, data = dat_all))
   has_offset <- !is.null(offsets)
 
+  disc_names <- setdiff(names(attr(X_all, "contrasts")), c(".study", ".trt", ".trtclass", ".contr", ".omega"))
+
   if (!is.null(single_study_label)) {
     # Restore single study label and .study column
     colnames(X_all) <- stringr::str_replace(colnames(X_all),
@@ -2921,9 +2923,37 @@ make_nma_model_matrix <- function(nma_formula,
   # Remove columns for reference level of .trtclass
   if (classes) {
     ref_class <- levels(dat_all$.trtclass)[1]
-    col_trtclass_ref <- grepl(paste0(".trtclass", ref_class),
-                              colnames(X_all), fixed = TRUE)
+    col_trtclass_ref <- grepl(paste0(".trtclass\\Q", ref_class, "\\E"),
+                              colnames(X_all), perl = TRUE)
     X_all <- X_all[, !col_trtclass_ref, drop = FALSE]
+  }
+
+  # Remove columns for reference levels of discrete covariates
+  if (length(disc_names)) for (xvar in disc_names) {
+    # Check contrast type
+    ctype <- attr(dat_all[[xvar]], "contrasts")
+    if (is.null(ctype)) ctype <- getOption("contrasts")[if (is.ordered(dat_all[[xvar]])) "ordered" else "unordered"]
+
+    # Get reference level for treatment/SAS contrasts
+    if (ctype == "contr.treatment") {
+      x_ref <-
+        if (is.factor(dat_all[[xvar]])) levels(dat_all[[xvar]])[1]
+        else if (is.logical(dat_all[[xvar]])) FALSE
+        else levels(as.factor(dat_all[[xvar]]))[1]
+    } else if (ctype == "contr.SAS") {
+      x_ref <-
+        if (is.factor(dat_all[[xvar]])) rev(levels(dat_all[[xvar]]))[1]
+        else if (is.logical(dat_all[[xvar]])) FALSE
+        else rev(levels(as.factor(dat_all[[xvar]])))[1]
+    } else {
+      x_ref <- NULL
+    }
+
+    # Remove reference level columns if present
+    if (!is.null(x_ref)) {
+      col_x_ref <- grepl(paste0("\\Q", xvar, x_ref, "\\E"), colnames(X_all), perl = TRUE)
+      X_all <- X_all[, !col_x_ref, drop = FALSE]
+    }
   }
 
   # Remove columns for interactions with reference level of .trt or .trtclass
