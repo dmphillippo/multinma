@@ -2951,7 +2951,7 @@ make_nma_model_matrix <- function(nma_formula,
 
     # Remove reference level columns if present
     if (!is.null(x_ref)) {
-      col_x_ref <- grepl(paste0("\\Q", xvar, x_ref, "\\E"), colnames(X_all), perl = TRUE)
+      col_x_ref <- grepl(paste0("(`?)\\Q", xvar, "\\E(`?)\\Q", x_ref, "\\E"), colnames(X_all), perl = TRUE)
       X_all <- X_all[, !col_x_ref, drop = FALSE]
     }
   }
