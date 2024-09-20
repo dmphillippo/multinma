@@ -343,7 +343,7 @@ nma <- function(network,
       } else {
         factor(levels(network$classes), levels = levels(network$classes))
       }
-    
+
     # Set network classes vector
     network$classes <- network$treatments
   }
@@ -557,7 +557,7 @@ nma <- function(network,
   # Check class_effects and network classes
   if (class_effects != "independent") {
     if (is.null(network$classes)) {
-      abort(paste("Setting `class_effects` requires treatment classes to be specified in the network.", 
+      abort(paste("Setting `class_effects` requires treatment classes to be specified in the network.",
                   "See set_*() argument `trt_class`.", sep = "\n"))
     }
   }
@@ -1139,11 +1139,11 @@ nma <- function(network,
 
 if (class_effects == "exchangeable") {
   # Create class design vector for class means
-  class_mean_design <- which_CE(network$classes)
-  
+  class_mean_design <- which_CE(network$classes, class_sd)
+
   # Create class design vector for class SDs
   if (is.list(class_sd)) {
-    class_sd_design <- which_CE(forcats::fct_collapse(network$classes, !!!class_sd))
+    class_sd_design <- which_CE(forcats::fct_collapse(network$classes, !!!class_sd), class_sd)
   } else if (class_sd == "common") {
     class_sd_design <- list(
       # Change non-zero class IDs to 1
@@ -1518,9 +1518,9 @@ nma.fit <- function(ipd_x, ipd_y,
   class_effects <- rlang::arg_match(class_effects)
   if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
 if (class_effects == "exchangeable") {
-  if (is.null(which_CE) || !rlang::is_integerish(which_CE) || any(which_CE < 0)) 
+  if (is.null(which_CE) || !rlang::is_integerish(which_CE) || any(which_CE < 0))
     abort("`which_CE` must be an integer design vector for class effects.")
-  if (is.null(which_CE_sd) || !rlang::is_integerish(which_CE_sd) || any(which_CE_sd < 0)) 
+  if (is.null(which_CE_sd) || !rlang::is_integerish(which_CE_sd) || any(which_CE_sd < 0))
     abort("`which_CE_sd` must be an integer design vector for class effect SDs.")
 }
 
@@ -2534,24 +2534,24 @@ valid_lhood <- list(binary = c("bernoulli", "bernoulli2"),
 #' @return A list, with elements `id` giving the design vector (0 = no class effect), and `label` giving the corresponding class labels
 #' @noRd
 
-which_CE <- function(classes)   {
-  
+which_CE <- function(classes, class_sd)   {
+
   # Class vector, without network reference treatment
   x <- classes[-1]
-  
+
   # Identify sole occupancy classes
   solo_classes <- setdiff(levels(x)[table(x) == 1] , unlist(class_sd))
-  
+
   # Set sole occupancy classes to NA (no class effects) and drop unused levels
   x <- droplevels(x, exclude = solo_classes)
-  
+
   # Create numeric ID vector (0 = no class effect)
   id <- as.numeric(x)
   id[is.na(id)] <- 0
-  
+
   # Create class labels
   label <- levels(x)
-  
+
   return(list(id = id, label = label))
 }
 
