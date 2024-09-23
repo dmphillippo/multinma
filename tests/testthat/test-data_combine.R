@@ -424,4 +424,26 @@ test_that("combine_network respects mlnma_data objects with integration points",
     expect_message(combine_network(ipd_net, agd_net1, agd_net2),
                    "Dropping integration points"),
     "nma_data", exact = TRUE)
+
+  expect_s3_class(combine_network(ipd_net, agd_net2), "nma_data")
+
+  agd_net4 <- set_agd_arm(
+    filter(plaque_psoriasis_agd, !studyc %in% c("FEATURE", "FIXTURE", "JUNCTURE")),
+    study = studyc, trt = trtc, r = pasi75_r, n = pasi75_n
+  ) %>%
+    add_integration(durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd))
+
+  expect_error(combine_network(agd_net1, agd_net4), "different sets of covariates")
+  expect_error(combine_network(ipd_net, agd_net1, agd_net4), "different sets of covariates")
+
+  agd_net5 <- set_agd_arm(
+    filter(plaque_psoriasis_agd, !studyc %in% c("FEATURE", "FIXTURE", "JUNCTURE")),
+    study = studyc, trt = trtc, r = pasi75_r, n = pasi75_n
+  ) %>%
+    add_integration(durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+                    weight = distr(qgamma, mean = weight_mean, sd = weight_sd), cor = diag(2),
+                    n_int = 8)
+
+  expect_error(combine_network(agd_net1, agd_net5), "different numbers of integration points")
+  expect_error(combine_network(ipd_net, agd_net1, agd_net5), "different numbers of integration points")
 })
