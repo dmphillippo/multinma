@@ -28,10 +28,12 @@ NULL
 #' Print `nma_nodesplit_df` objects
 #'
 #' @param x A [nma_nodesplit_df] object
-#' @param ... Further arguments passed to [print.stanfit()]
+#' @param ... Further arguments passed to \code{\link[rstan:print.stanfit]{print.stanfit()}}
 #'
 #' @seealso The summary method [summary.nma_nodesplit_df()] summarises the
 #'   node-splitting results.
+#'
+#' @return `x` is returned invisibly.
 #'
 #' @export
 print.nma_nodesplit_df <- function(x, ...) {

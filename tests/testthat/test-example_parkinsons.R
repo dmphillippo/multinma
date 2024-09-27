@@ -145,7 +145,7 @@ plot(arm_releff_RE, ref_line = 0)
 arm_pred_FE <- predict(arm_fit_FE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
-                       trt_ref = 1)
+                       baseline_trt = 1)
 arm_pred_FE
 plot(arm_pred_FE)
 
@@ -153,7 +153,7 @@ plot(arm_pred_FE)
 arm_pred_RE <- predict(arm_fit_RE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
-                       trt_ref = 1)
+                       baseline_trt = 1)
 arm_pred_RE
 plot(arm_pred_RE)
 
@@ -283,7 +283,7 @@ plot(contr_releff_RE, ref_line = 0)
 contr_pred_FE <- predict(contr_fit_FE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
-                       trt_ref = 1)
+                       baseline_trt = 1)
 contr_pred_FE
 plot(contr_pred_FE)
 
@@ -291,7 +291,7 @@ plot(contr_pred_FE)
 contr_pred_RE <- predict(contr_fit_RE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
-                       trt_ref = 1)
+                       baseline_trt = 1)
 contr_pred_RE
 plot(contr_pred_RE)
 
@@ -444,7 +444,7 @@ plot(mix_releff_RE, ref_line = 0)
 mix_pred_FE <- predict(mix_fit_FE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
-                       trt_ref = 1)
+                       baseline_trt = 1)
 mix_pred_FE
 plot(mix_pred_FE)
 
@@ -452,7 +452,7 @@ plot(mix_pred_FE)
 mix_pred_RE <- predict(mix_fit_RE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
-                       trt_ref = 1)
+                       baseline_trt = 1)
 mix_pred_RE
 plot(mix_pred_RE)
 
@@ -727,7 +727,7 @@ test_that("Analysis of reordered contrast data gives same results", {
   expect_equivalent_nma_summary(predict(reorder_fit_FE, 
                                      baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                                      type = "response",
-                                     trt_ref = 1),
+                                     baseline_trt = 1),
                            contr_pred_FE,
                            tolerance = tol)
   
@@ -747,7 +747,7 @@ test_that("Analysis of reordered contrast data gives same results", {
   expect_equivalent_nma_summary(predict(reorder_fit_RE, 
                                      baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                                      type = "response",
-                                     trt_ref = 1),
+                                     baseline_trt = 1),
                            contr_pred_RE,
                            tolerance = tol)
   

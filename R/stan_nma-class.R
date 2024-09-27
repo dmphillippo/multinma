@@ -38,7 +38,9 @@ NULL
 #' Print `stan_nma` objects
 #'
 #' @param x A [stan_nma] object
-#' @param ... Further arguments passed to [print.stanfit()]
+#' @param ... Further arguments passed to \code{\link[rstan:print.stanfit]{print.stanfit()}}
+#'
+#' @return `x` is returned invisibly.
 #'
 #' @export
 print.stan_nma <- function(x, ...) {
@@ -720,7 +722,7 @@ as.stanfit.default <- function(x, ...) {
 #' array, matrix, or data frame.
 #'
 #' @param x A `stan_nma` object
-#' @param ... Additional arguments passed to [as.array.stanfit()]
+#' @param ... Additional arguments passed to \code{\link[rstan:as.array.stanfit]{as.array.stanfit()}}
 #' @param pars Optional character vector of parameter names to include in output. If not specified, all parameters are used.
 #' @param include Logical, are parameters in `pars` to be included (`TRUE`, default) or excluded (`FALSE`)?
 #'
@@ -899,8 +901,8 @@ pairs.stan_nma <- function(x, ..., pars, include = TRUE) {
                            condition = bayesplot::pairs_condition(nuts = "accept_stat__"),
                            .homonyms = "first")
 
-  thm <- bayesplot::bayesplot_theme_set(theme_multinma())
+  thm <- ggplot2::theme_set(theme_multinma())
   out <- do.call(bayesplot::mcmc_pairs, args = args)
-  bayesplot::bayesplot_theme_set(thm)
+  ggplot2::theme_set(thm)
   return(out)
 }

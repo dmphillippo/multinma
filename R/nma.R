@@ -7,7 +7,8 @@
 #'   `combine_network()`, or `add_integration()`
 #' @param consistency Character string specifying the type of (in)consistency
 #'   model to fit, either `"consistency"`, `"ume"`, or `"nodesplit"`
-#' @param trt_effects Character string specifying either `"fixed"` or `"random"` effects
+#' @param trt_effects Character string specifying either `"fixed"` or `"random"`
+#'   effects
 #' @param regression A one-sided model formula, specifying the prognostic and
 #'   effect-modifying terms for a regression model. Any references to treatment
 #'   should use the `.trt` special variable, for example specifying effect
@@ -29,7 +30,8 @@
 #'   multiple treatment comparisons to split in turn. By default, all possible
 #'   comparisons will be chosen (see [get_nodesplits()]).
 #' @param prior_intercept Specification of prior distribution for the intercept
-#' @param prior_trt Specification of prior distribution for the treatment effects
+#' @param prior_trt Specification of prior distribution for the treatment
+#'   effects
 #' @param prior_het Specification of prior distribution for the heterogeneity
 #'   (if `trt_effects = "random"`)
 #' @param prior_het_type Character string specifying whether the prior
@@ -107,8 +109,8 @@
 #'   For the advanced user, the additional specials `.study` and `.trtclass` are
 #'   also available, and refer to studies and (if specified) treatment classes
 #'   respectively. When node-splitting models are fitted (`consistency =
-#'   "nodesplit"`) the special `.omega` is available, indicating the arms
-#'   to which the node-splitting inconsistency factor is added.
+#'   "nodesplit"`) the special `.omega` is available, indicating the arms to
+#'   which the node-splitting inconsistency factor is added.
 #'
 #'   See \code{\link[multinma:priors]{?priors}} for details on prior
 #'   specification. Default prior distributions are available, but may not be
@@ -232,7 +234,8 @@
 #'
 #' @return `nma()` returns a [stan_nma] object, except when `consistency =
 #'   "nodesplit"` when a [nma_nodesplit] or [nma_nodesplit_df] object is
-#'   returned. `nma.fit()` returns a [stanfit] object.
+#'   returned. `nma.fit()` returns a \code{\link[rstan:stanfit-class]{stanfit}}
+#'   object.
 #' @export
 #'
 #' @references
@@ -580,8 +583,23 @@ nma <- function(network,
     abort("Cannot specify both `aux_by` and `aux_regression`.")
   }
 
+  if (!is.null(aux_regression)) {
+    if (!likelihood %in% valid_lhood$survival) {
+      warn("Ignoring `aux_regression`, only supported for survival likelihoods at present.")
+    } else if (!has_aux) {
+      warn(glue::glue("Ignoring `aux_regression`, no auxiliary parameters in {likelihood} model."))
+    }
+  }
+
+  if (!rlang::quo_is_null(aux_by)) {
+    if (!likelihood %in% valid_lhood$survival) {
+      warn("Ignoring `aux_by`, only supported for survival likelihoods at present.")
+    } else if (!has_aux) {
+      warn(glue::glue("Ignoring `aux_by`, no auxiliary parameters in {likelihood} model."))
+    }
+  }
+
   # Set up aux_regression
-  has_aux_regression <- FALSE
   if (!is.null(aux_regression) && likelihood %in% valid_lhood$survival &&
       has_aux &&
       (has_ipd(network) || has_agd_arm(network))) {
@@ -597,6 +615,9 @@ nma <- function(network,
       aux_regression <- update.formula(aux_regression, ~. -.study +1)
     }
     has_aux_regression <- TRUE
+  } else {
+    has_aux_regression <- FALSE
+    aux_regression <- NULL
   }
 
   # Set up aux_by
@@ -938,7 +959,7 @@ nma <- function(network,
                       observed = .data$.Surv[, "status"]  == 1)
       } else {
         dplyr::tibble(.Surv = c(y_ipd$.Surv, y_agd_arm$.Surv),
-                      .study = forcats::fct_drop(c(dat_ipd$.study, rep(dat_agd_arm$.study, times = dat_agd_arm$.sample_size))),
+                      .study = forcats::fct_drop(forcats::fct_c(dat_ipd$.study, rep(dat_agd_arm$.study, times = dat_agd_arm$.sample_size))),
                       observed = .data$.Surv[, "status"]  == 1)
       }
 
@@ -2727,11 +2748,11 @@ make_nma_formula <- function(regression,
     }
 
     if (consistency == "ume") {
-      nma_formula <- update.formula(nma_formula, ~-1 + .study + .contr + .)
+      nma_formula <- update.formula(nma_formula, ~.study + .contr + . -1)
     } else if (consistency == "nodesplit") {
-      nma_formula <- update.formula(nma_formula, ~-1 + .study + .trt + .omega + .)
+      nma_formula <- update.formula(nma_formula, ~.study + .trt + .omega + . -1)
     } else {
-      nma_formula <- update.formula(nma_formula, ~-1 + .study + .trt + .)
+      nma_formula <- update.formula(nma_formula, ~.study + .trt + . -1)
     }
   } else {
     if (consistency == "ume") {
@@ -2941,6 +2962,8 @@ make_nma_model_matrix <- function(nma_formula,
   offsets <- model.offset(model.frame(nma_formula, data = dat_all))
   has_offset <- !is.null(offsets)
 
+  disc_names <- setdiff(names(attr(X_all, "contrasts")), c(".study", ".trt", ".trtclass", ".contr", ".omega"))
+
   if (!is.null(single_study_label)) {
     # Restore single study label and .study column
     colnames(X_all) <- stringr::str_replace(colnames(X_all),
@@ -2957,9 +2980,37 @@ make_nma_model_matrix <- function(nma_formula,
   # Remove columns for reference level of .trtclass
   if (classes) {
     ref_class <- levels(dat_all$.trtclass)[1]
-    col_trtclass_ref <- grepl(paste0(".trtclass", ref_class),
-                              colnames(X_all), fixed = TRUE)
+    col_trtclass_ref <- grepl(paste0(".trtclass\\Q", ref_class, "\\E"),
+                              colnames(X_all), perl = TRUE)
     X_all <- X_all[, !col_trtclass_ref, drop = FALSE]
+  }
+
+  # Remove columns for reference levels of discrete covariates
+  if (length(disc_names)) for (xvar in disc_names) {
+    # Check contrast type
+    ctype <- attr(dat_all[[xvar]], "contrasts")
+    if (is.null(ctype)) ctype <- getOption("contrasts")[if (is.ordered(dat_all[[xvar]])) "ordered" else "unordered"]
+
+    # Get reference level for treatment/SAS contrasts
+    if (ctype == "contr.treatment") {
+      x_ref <-
+        if (is.factor(dat_all[[xvar]])) levels(dat_all[[xvar]])[1]
+        else if (is.logical(dat_all[[xvar]])) FALSE
+        else levels(as.factor(dat_all[[xvar]]))[1]
+    } else if (ctype == "contr.SAS") {
+      x_ref <-
+        if (is.factor(dat_all[[xvar]])) rev(levels(dat_all[[xvar]]))[1]
+        else if (is.logical(dat_all[[xvar]])) FALSE
+        else rev(levels(as.factor(dat_all[[xvar]])))[1]
+    } else {
+      x_ref <- NULL
+    }
+
+    # Remove reference level columns if present
+    if (!is.null(x_ref)) {
+      col_x_ref <- grepl(paste0("(`?)\\Q", xvar, "\\E(`?)\\Q", x_ref, "\\E"), colnames(X_all), perl = TRUE)
+      X_all <- X_all[, !col_x_ref, drop = FALSE]
+    }
   }
 
   # Remove columns for interactions with reference level of .trt or .trtclass

@@ -1,11 +1,10 @@
-This update fixes runtime errors in donttest examples (caused by latest
-StanHeaders), as per email from CRAN.
+This is a minor bugfix release. Also addresses new CRAN check note "Rd \link{} 
+targets missing package anchors".
 
 ## Test environments
-* local R installation (Windows 10), R 4.3.0
-* win-builder (release, devel)
-* Ubuntu 22.04.2 on GitHub Actions (release, devel, oldrel)
-* Mac OS 12.6.5 on GitHub Actions (release)
+* local R installation (Windows 10), R 4.4.1
+* Ubuntu 22.04.4 on GitHub Actions (release, devel, oldrel)
+* Mac OS 14.6.1 on GitHub Actions (release)
 * Windows Server 2022 10.0.20348 on GitHub Actions (release)
 
 ## R CMD check results
@@ -13,15 +12,16 @@ StanHeaders), as per email from CRAN.
 0 errors | 0 warnings | 3 notes
 
 * checking package dependencies ... NOTE
-  Imports includes 22 non-default packages.
+  Imports includes 23 non-default packages.
 
-* checking installed package size ... 
-  installed size is 12.3Mb
+* checking installed package size ... NOTE
+  installed size is 18.0Mb
   sub-directories of 1Mb or more:
-    doc    4.0Mb
-    libs   6.9Mb
-
-The docs directory contains 12 html vignettes demonstrating full analyses using
+    R      1.7Mb
+    doc    4.2Mb
+    libs  11.5Mb
+    
+The docs directory contains 13 html vignettes demonstrating full analyses using
 the package.
 
 * checking for GNU extensions in Makefiles ... NOTE

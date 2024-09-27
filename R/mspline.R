@@ -268,8 +268,12 @@ rw1_prior_weights <- function(basis) {
   iknots <- attr(basis, "knots")
   bknots <- attr(basis, "Boundary.knots")
   knots <- c(rep(bknots[1], ord), iknots, rep(bknots[2], ord))
-  wts <- 1/(ord - 1) * (knots[(ord + 1):(nscoef + ord - 1)] - knots[2:nscoef])
-  return(sqrt(wts / sum(wts)))
+  if (ord == 1) {
+    wts <- (knots[2:nscoef] - knots[1:(nscoef - 1)]) / (knots[nscoef] - bknots[1])
+  } else {
+    wts <- (knots[(ord + 1):(nscoef + ord - 1)] - knots[2:nscoef]) / ((ord - 1) * (bknots[2] - bknots[1]))
+  }
+  return(sqrt(wts))
 }
 
 #' softmax transform

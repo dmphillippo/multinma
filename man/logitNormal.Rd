@@ -22,6 +22,10 @@ specified}
 
 \item{q}{vector of probabilities}
 }
+\value{
+Numeric vector of length equal to the maximum of the lengths of the
+input arguments.
+}
 \description{
 We provide convenient extensions of the \verb{[dpq]logitnorm} functions in the
 package \link[logitnorm:logitnorm-package]{logitnorm}, which allow the

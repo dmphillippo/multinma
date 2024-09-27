@@ -40,6 +40,10 @@ pgamma(
 
 \item{x, q}{vector of quantiles}
 }
+\value{
+Numeric vector of length equal to the maximum of the lengths of the
+input arguments.
+}
 \description{
 We provide convenient extensions of the \verb{[dpq]gamma} functions, which allow
 the distribution to be specified in terms of its mean and standard deviation,

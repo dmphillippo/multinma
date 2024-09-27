@@ -46,7 +46,6 @@
 #'
 #'   \insertRef{methods_paper}{multinma}
 #'
-#' @docType package
 #' @name multinma-package
 #' @aliases multinma
 #' @useDynLib multinma, .registration = TRUE
@@ -69,7 +68,7 @@
 #' @references
 #'   \insertAllCited{}
 #'
-NULL
+"_PACKAGE"
 
 # Stop R CMD check thinking . used in pipes is an undeclared global variable
 if (getRversion() >= "2.15.1")  utils::globalVariables(c("."))

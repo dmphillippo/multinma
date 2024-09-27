@@ -122,7 +122,7 @@ summary(smk_nodesplit)
 
 ## ----smk_nodesplit, fig.width = 7-----------------------------------------------------------------
 plot(smk_nodesplit) +
-  ggplot2::theme(legend.position = "bottom", legend.direct = "horizontal")
+  ggplot2::theme(legend.position = "bottom", legend.direction = "horizontal")
 
 
 ## ----smoking_releff, fig.height=4.5---------------------------------------------------------------
