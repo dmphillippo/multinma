@@ -300,9 +300,7 @@ nma <- function(network,
 
   # Check model arguments
   consistency <- rlang::arg_match(consistency)
-  if (length(consistency) > 1) abort("`consistency` must be a single string.")
   trt_effects <- rlang::arg_match(trt_effects)
-  if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
 
   if (consistency == "nodesplit") {
 
@@ -481,7 +479,6 @@ nma <- function(network,
     }
   }
   class_interactions <- rlang::arg_match(class_interactions)
-  if (length(class_interactions) > 1) abort("`class_interactions` must be a single string.")
 
   likelihood <- check_likelihood(likelihood, network$outcome)
   link <- check_link(link, likelihood)
@@ -506,7 +503,6 @@ nma <- function(network,
   }
 
   prior_het_type <- rlang::arg_match(prior_het_type)
-
 
   # Prior defaults
   prior_defaults <- list()
