@@ -25,24 +25,7 @@ social_anxiety <- sa %>%
   # Add in class details
   left_join(sa_class, by = "classn")
 
-# Create network
-sa_net <- set_agd_contrast(social_anxiety,
-                           studyc, trtc,
-                           y = y, se = se,
-                           trt_class = classc)
+social_anxiety <- as.data.frame(social_anxiety)
 
-sa_net
-
-plot(sa_net, show_trt_class = TRUE)
-
-
-# Fit RE NMA *without* any treatment classes
-sa_fit_RE <- nma(sa_net,
-                 trt_effects = "random",
-                 prior_trt = normal(0, 100),
-                 prior_het = half_normal(5))
-
-sa_fit_RE
-
-plot_prior_posterior(sa_fit_RE)
+usethis::use_data(social_anxiety)
 
