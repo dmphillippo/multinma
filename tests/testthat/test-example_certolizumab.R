@@ -100,6 +100,10 @@ plot(cert_releff_FE, ref_line = 0)
 plot(cert_releff_RE, ref_line = 0)
 
 
+## ----certolizumab_releff_study_RE-----------------------------------------------------------------
+(cert_releff_study_RE <- relative_effects(cert_fit_RE))
+
+
 ## ----certolizumab_ranks---------------------------------------------------------------------------
 (cert_ranks <- posterior_ranks(cert_fit_RE, newdata = newdata))
 plot(cert_ranks)
@@ -203,6 +207,11 @@ test_that("RE relative effects", {
   expect_equivalent(cert_releff_RE$sd, tsd_RE$sd, tolerance = tol)
   expect_equivalent(cert_releff_RE$`2.5%`, tsd_RE$lower, tolerance = tol)
   expect_equivalent(cert_releff_RE$`97.5%`, tsd_RE$upper, tolerance = tol)
+})
+
+cert_fit_RE_mu <- summary(cert_fit_RE, pars = "mu")
+test_that("mean study-specific intercepts identical to those in parameter summary", {
+  expect_equal(cert_releff_study_RE$studies$.mu, unname(cert_fit_RE_mu$summary$mean))
 })
 
 # Heterogeneity SD
