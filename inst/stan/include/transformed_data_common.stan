@@ -33,11 +33,7 @@ int totns = ns_ipd + ns_agd_arm; // + ns_agd_contrast;
 // All treatments vector
 array[narm_ipd + narm_agd_arm + ni_agd_contrast] int<lower=1> trt = append_array(append_array(ipd_trt, agd_arm_trt), agd_contrast_trt);
 
-// Split Q matrix or X matrix into IPD and AgD rows
 matrix[0, nX] Xdummy;
-matrix[ni_ipd, nX] X_ipd = ni_ipd ? X[1:ni_ipd] : Xdummy;
-matrix[nint_max * ni_agd_arm, nX] X_agd_arm = ni_agd_arm ? X[(ni_ipd + 1):(ni_ipd + nint_max * ni_agd_arm)] : Xdummy;
-matrix[nint_max * ni_agd_contrast, nX] X_agd_contrast = ni_agd_contrast ? X[(ni_ipd + nint_max * ni_agd_arm + 1):(ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast))] : Xdummy;
 
 // Split offsets into IPD and AgD rows
 vector[0] odummy;

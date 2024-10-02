@@ -31,6 +31,7 @@ Title | Outcome type | Likelihood | Link function | Notable features
 [WBC transfusion](example_transfusion.html) | Counts | Binomial | logit | Informative log-Normal prior on $\tau^2$
 [ML-NMR plaque psoriasis](example_plaque_psoriasis.html) | Binary (IPD) and counts (AgD), and ordered categorical | Bernoulli (IPD) and two-parameter Binomial (AgD), and ordered multinomial | probit | Multilevel network meta-regression combining IPD and AgD
 [ML-NMR newly diagnosed multiple myeloma](example_ndmm.html) | Time-to-event with censoring | M-spline baseline hazard | log | Multilevel network meta-regression combining IPD and AgD
+[Certolizumab](example_certolizumab.html) | Counts | Binomial | logit | Baseline risk meta-regression
 
 
 ## References
