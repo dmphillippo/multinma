@@ -384,10 +384,6 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       }
     } else {
 
-      # Name columns to match Stan parameters
-      colnames(X_EM) <- paste0("beta[", colnames(X_EM), "]")
-      colnames(X_d) <- paste0("d[", x$network$treatments[-1], "]")
-
       # Split baseline risk meta-regression from other effect modifiers
       brmr <- grepl("\\.mu:", colnames(X_EM)) & is.null(newdata)
       X_BRMR <- X_EM[, brmr, drop = FALSE]
@@ -432,6 +428,15 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         nonzero <- X_EM != 0
         X_EM[nonzero] <- X_study_means_rep[nonzero]
       }
+
+      # Name columns to match Stan parameters
+      if (ncol(X_EM) > 0) {
+        colnames(X_EM) <- paste0("beta[", colnames(X_EM), "]")
+      }
+      if (ncol(X_BRMR) > 0) {
+        colnames(X_BRMR) <- paste0("beta[", colnames(X_BRMR), "]")
+      }
+      colnames(X_d) <- paste0("d[", x$network$treatments[-1], "]")
 
       X_EM_d <- cbind(X_EM, X_d)
 
