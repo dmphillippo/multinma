@@ -1,5 +1,10 @@
 # multinma 0.7.2.9000
 
+* Feature: Networks with integration points can now be combined with 
+`combine_network()`, where previously these were discarded. One potential use 
+case is to specify different types of marginal distributions or correlation 
+structures for different AgD studies in the network, by setting these up 
+separately with `add_integration()` before combining with `combine_network()`.
 * Fix: Resolved a bug where trying to fit meta-regression models with discrete 
 covariates would sometimes result in a misspecified and inestimable model, due 
 to the inclusion of additional columns in the design matrix for the reference 
