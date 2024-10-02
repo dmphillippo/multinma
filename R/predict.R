@@ -354,6 +354,14 @@ predict.stan_nma <- function(object, ...,
     aux_pars <- NULL
   }
 
+  if (!is.null(baseline) && ".mu" %in% all.vars(object$regression)) {
+    if (is.null(newdata)) {
+      newdata <- data.frame(.mu = 1)
+    } else {
+      newdata$.mu <- 1
+    }
+  }
+
   if (!is.null(newdata)) {
     if (!is.data.frame(newdata)) abort("`newdata` is not a data frame.")
 
@@ -996,6 +1004,9 @@ predict.stan_nma <- function(object, ...,
             dat_agd_arm <- dplyr::select(dat_agd_arm, -".Surv")
           }
 
+          # A `.mu` column is expected if baseline risk meta-regression is used in this model
+          dat_agd_arm$.mu <- 1
+
           # Only take necessary columns
           dat_agd_arm <- get_model_data_columns(dat_agd_arm,
                                                 regression = object$regression,
@@ -1112,7 +1123,7 @@ predict.stan_nma <- function(object, ...,
       X_list <- make_nma_model_matrix(nma_formula,
                                       dat_ipd = preddat,
                                       dat_agd_contrast = dat_agd_contrast,
-                                      xbar = object$xbar,
+                                      xbar = object$xbar[names(object$xbar) != ".mu"],
                                       consistency = object$consistency,
                                       classes = !is.null(object$network$classes),
                                       newdata = TRUE)
@@ -1881,7 +1892,7 @@ predict.stan_nma <- function(object, ...,
                           dim = dim_pred_array,
                           dimnames = dimnames_pred_array)
 
-      ss <- vector(length = nrow(outdat))
+      brmr <- grepl("\\.mu:", colnames(X_all))
 
       for (s in 1:n_studies) {
 
@@ -1891,7 +1902,24 @@ predict.stan_nma <- function(object, ...,
         ss <- preddat$.study == studies[s]
 
         # Get prediction array for this study
-        s_pred_array <- tcrossprod_mcmc_array(post, X_all[ss, , drop = FALSE])
+        s_pred_array <- tcrossprod_mcmc_array(
+          post[, , !brmr, drop = FALSE],
+          X_all[ss, !brmr, drop = FALSE]
+        )
+
+        if (any(brmr)) {
+          s_pred_array <- s_pred_array +
+            tcrossprod_mcmc_array(
+              post[, , brmr, drop = FALSE],
+              X_all[ss, brmr, drop = FALSE]
+            ) * (
+              tcrossprod_mcmc_array(
+                post[, , grepl("^mu\\[", colnames(X_all)), drop = FALSE],
+                X_all[ss, grepl("^mu\\[", colnames(X_all)), drop = FALSE]
+              ) - object$xbar[[".mu"]]
+            )
+
+        }
 
         if (!is.null(offset_all))
           s_pred_array <- sweep(s_pred_array, 3, offset_all[ss], FUN = "+")

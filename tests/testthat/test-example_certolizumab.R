@@ -104,6 +104,14 @@ plot(cert_releff_RE, ref_line = 0)
 (cert_releff_study_RE <- relative_effects(cert_fit_RE))
 
 
+## -------------------------------------------------------------------------------------------------
+predict(cert_fit_RE, baseline = distr(qnorm))
+
+
+## -------------------------------------------------------------------------------------------------
+predict(cert_fit_RE)
+
+
 ## ----certolizumab_ranks---------------------------------------------------------------------------
 (cert_ranks <- posterior_ranks(cert_fit_RE, newdata = newdata))
 plot(cert_ranks)

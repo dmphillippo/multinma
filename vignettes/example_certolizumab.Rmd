@@ -123,6 +123,19 @@ Note that the sampled study-specific intercepts are used.
 (cert_releff_study_RE <- relative_effects(cert_fit_RE))
 ```
 
+`predict()` will use the `.mu` values sampled from the `baseline` distribution.
+
+```{r}
+predict(cert_fit_RE, baseline = distr(qnorm))
+```
+
+When not passing a `baseline` distribution, predictions will be produced per study.
+The sampled study-specific intercepts are used in the baseline risk meta-regression.
+
+```{r}
+predict(cert_fit_RE)
+```
+
 We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.
 ```{r certolizumab_ranks}
 (cert_ranks <- posterior_ranks(cert_fit_RE, newdata = newdata))
