@@ -7,8 +7,6 @@ params:
   run_tests: FALSE
 ---
 
-Just testing this 
-
 ```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
 ```
 ```{r, include=FALSE}
