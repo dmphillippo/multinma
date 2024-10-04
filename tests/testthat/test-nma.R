@@ -441,3 +441,26 @@ test_that("rstan R-hat and ESS warnings are captured correctly", {
     "Bulk Effective Sample(s?) Size \\(ESS\\) is too low"),
     "Tail Effective Sample(s?) Size \\(ESS\\) is too low")
 })
+
+sa_net <- set_agd_contrast(social_anxiety,
+                           studyc, trtc,
+                           y = y, se = se,
+                           trt_class = classc,
+                           trt_ref = "Waitlist")
+
+test_that("nma() throws errors for invalid class_effects and class_sd", {
+  # Test for unsupported class_effects
+  expect_error(nma(network = sa_net,
+                   class_effects = c("exchangeable","common")),
+               "`class_effects` must be a single string.")
+
+  expect_error(nma(network = sa_net,
+                   class_effects = c("exchange")),
+               "`class_effects` must be a single string.")
+
+  # Test for unsupported class_sd
+  expect_error(nma(network = sa_net,
+                   class_sd = "unsupported"),
+               "Invalid class sd specified")  # Adjust error message to match
+})
+
