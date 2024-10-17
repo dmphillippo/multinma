@@ -728,10 +728,7 @@ nma <- function(network,
 
       idat_agd_arm <- idat_agd_arm %>%
         dplyr::group_by(.data$.study) %>%
-        dplyr::mutate(.mu = dplyr::if_else(
-          .data$.trt != ref_trt & ref_trt %in% .data$.trt,
-          as.numeric(.data$.study), 0
-        )) %>%
+        dplyr::mutate(.mu = as.integer(.data$.trt != ref_trt & ref_trt %in% .data$.trt)) %>%
         dplyr::ungroup()
     }
 
@@ -876,7 +873,11 @@ nma <- function(network,
     xbar <- NULL
   }
 
-  xbar_mu <- if (".mu" %in% all.vars(regression)) calculate_baseline_risk(network, link)
+  if (".mu" %in% all.vars(regression)) {
+    xbar_mu <- calculate_baseline_risk(network, link)
+  } else {
+    xbar_mu <- 0
+  }
 
   # Make NMA formula
   nma_formula <- make_nma_formula(regression,
@@ -1490,7 +1491,7 @@ nma.fit <- function(ipd_x, ipd_y,
   col_trt <- grepl("^(\\.trt|\\.contr)[^:]+$", x_names)
   col_omega <- x_names == ".omegaTRUE"
   col_reg <- !col_study & !col_trt & !col_omega
-  col_br <- col_reg & grepl("\\.mu", x_names)
+  col_brmr <- col_reg & grepl("\\.mu", x_names)
 
   n_trt <- sum(col_trt) + 1
 
@@ -1661,10 +1662,9 @@ nma.fit <- function(ipd_x, ipd_y,
     # Offsets
     has_offset = has_offsets,
     offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric(),
-    br_n = 0L,
-    br_index = matrix(0L, 0L, 2L),
-    br_mu = integer(),
-    mu_center = 0
+    brmr_n_col = sum(col_brmr),
+    brmr_col = which(col_brmr),
+    xbar_mu = xbar_mu
   )
 
   # Add priors
@@ -1718,24 +1718,6 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Set chain_id to make CHAIN_ID available in data block
   stanargs$chain_id <- 1L
-
-  # Baseline risk meta-regression
-  if (!is.null(xbar_mu)) {
-    stopifnot(length(col_br) == ncol(X_all))
-
-    br_index <- which(
-      t(t(X_all) != 0 & col_br),
-      arr.ind = TRUE
-    )
-
-    standat <- purrr::list_modify(
-      standat,
-      br_n = nrow(br_index),
-      br_index = br_index,
-      br_mu = as.array(as.integer(X_all[br_index])),
-      mu_center = xbar_mu
-    )
-  }
 
   # Call Stan model for given likelihood
 

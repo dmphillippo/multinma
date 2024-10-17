@@ -48,17 +48,6 @@ if (nodesplit) {
   omega[1] = allbeta[totns + nt];
 }
 
-// -- Baseline risk meta-regression --
-matrix[ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast), nX] X2 = X;
-for (i in 1:br_n) {
-  X2[br_index[i, 1], br_index[i, 2]] = mu[br_mu[i]] - mu_center;
-}
-
-// Split Q matrix or X matrix into IPD and AgD rows
-matrix[ni_ipd, nX] X_ipd = ni_ipd ? X2[1:ni_ipd] : Xdummy;
-matrix[nint_max * ni_agd_arm, nX] X_agd_arm = ni_agd_arm ? X2[(ni_ipd + 1):(ni_ipd + nint_max * ni_agd_arm)] : Xdummy;
-matrix[nint_max * ni_agd_contrast, nX] X_agd_contrast = ni_agd_contrast ? X2[(ni_ipd + nint_max * ni_agd_arm + 1):(ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast))] : Xdummy;
-
 // -- IPD model --
 // We define the IPD and AgD models here in the transformed parameters block,
 // as the linear predictors are required to calculate the log likelihood
