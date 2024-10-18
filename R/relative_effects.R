@@ -385,7 +385,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
     } else {
 
       # Split baseline risk meta-regression from other effect modifiers
-      brmr <- grepl("\\.mu:", colnames(X_EM)) & is.null(newdata)
+      brmr <- grepl("(^\\.mu\\:)|(\\:\\.mu$)", colnames(X_EM)) & is.null(newdata)
       X_BRMR <- X_EM[, brmr, drop = FALSE]
       X_EM <- X_EM[, !brmr, drop = FALSE]
 

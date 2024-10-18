@@ -1892,7 +1892,7 @@ predict.stan_nma <- function(object, ...,
                           dim = dim_pred_array,
                           dimnames = dimnames_pred_array)
 
-      brmr <- grepl("\\.mu:", colnames(X_all))
+      brmr <- grepl("(^\\.mu\\:)|(\\:\\.mu$)", colnames(X_all))
 
       for (s in 1:n_studies) {
 
