@@ -873,11 +873,7 @@ nma <- function(network,
     xbar <- NULL
   }
 
-  if (".mu" %in% all.vars(regression)) {
-    xbar_mu <- calculate_baseline_risk(network, link)
-  } else {
-    xbar_mu <- 0
-  }
+  xbar_mu <- if (".mu" %in% all.vars(regression)) calculate_baseline_risk(network, link)
 
   # Make NMA formula
   nma_formula <- make_nma_formula(regression,
@@ -1663,8 +1659,8 @@ nma.fit <- function(ipd_x, ipd_y,
     has_offset = has_offsets,
     offsets = if (has_offsets) as.array(c(ipd_offset, agd_arm_offset, agd_contrast_offset)) else numeric(),
     brmr_n_col = sum(col_brmr),
-    brmr_col = which(col_brmr),
-    xbar_mu = xbar_mu
+    brmr_col = as.array(which(col_brmr)),
+    xbar_mu = xbar_mu %||% 0
   )
 
   # Add priors
