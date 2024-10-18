@@ -720,7 +720,7 @@ nma <- function(network,
     }
 
     if (".mu" %in% all.vars(regression)) {
-      if (".mu" %in% colnames(data)) {
+      if (".mu" %in% colnames(idat_agd_arm)) {
         warn("Overwriting '.mu'. Special name. Use different name.")
       }
 
