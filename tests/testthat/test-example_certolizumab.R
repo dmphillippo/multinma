@@ -97,7 +97,7 @@ cert_fit_RE <- nma(cert_net,
                    prior_intercept = normal(scale = sqrt(1000)),
                    prior_trt = normal(scale = 100),
                    prior_reg = normal(scale = 100),
-                   iter = 4000,
+                   iter = 6000,
                    adapt_delta = 0.98)
 
 
