@@ -562,13 +562,8 @@ nma <- function(network,
   if (int_thin > 0) int_check <- FALSE
 
   if (".mu" %in% all.vars(regression)) {
-    if (QR) {
-      abort("Cannot fit model with baseline risk meta-regression and QR.")
-    }
-
-    if (!(likelihood %in% c("bernoulli", "binomial", "ordered", "normal"))) {
-      abort(glue::glue("Baseline risk meta-regression not yet supported with likelihood '{likelihood}'."))
-    }
+    if (has_ipd(network)) abort("Cannot fit baseline risk meta-regression model with IPD.")
+    if (QR) abort("Cannot fit baseline risk meta-regression model with QR.")
   }
 
   # Set adapt_delta
