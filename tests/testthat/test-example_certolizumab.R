@@ -25,9 +25,39 @@ nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
              parallel::detectCores())
 options(mc.cores = nc)
 
+## -------------------------------------------------------------------------------------------------
+library(dplyr)
+library(ggplot2)
+
 
 ## -------------------------------------------------------------------------------------------------
 head(certolizumab)
+
+
+## ----certolizumab_baseline_risk_plot--------------------------------------------------------------
+certolizumab <-
+  certolizumab %>%
+  mutate(
+    probability = r / n,
+    odds = probability / (1 - probability),
+    log_odds = log(odds)
+  )
+
+p_baseline_risk <-
+  left_join(
+    filter(certolizumab, trt != "Placebo"),
+    filter(certolizumab, trt == "Placebo"),
+    by = "study",
+    suffix = c("", "_baseline")
+  ) %>%
+  mutate(log_odds_ratio = log_odds - log_odds_baseline, n_total = n + n_baseline) %>%
+  ggplot(aes(log_odds_baseline)) +
+  geom_hline(yintercept = 1, linetype = "dashed") +
+  labs(x = "Placebo log odds", y = "log Odds Ratio", size = "Sample Size") +
+  theme_multinma()
+
+p_baseline_risk +
+  geom_point(aes(y = log_odds_ratio, size = n_total))
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -67,7 +97,8 @@ cert_fit_RE <- nma(cert_net,
                    prior_intercept = normal(scale = sqrt(1000)),
                    prior_trt = normal(scale = 100),
                    prior_reg = normal(scale = 100),
-                   iter = 4000)
+                   iter = 4000,
+                   adapt_delta = 0.98)
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -87,9 +118,30 @@ plot(dic_FE)
 plot(dic_RE)
 
 
+## ----certolizumab_reg_plot------------------------------------------------------------------------
+cert_mu_reg <-
+  cert_fit_FE %>%
+  relative_effects(
+    newdata = tibble(.mu = seq(log(0.02), log(0.5), length.out = 20)),
+    study = .mu
+  ) %>%
+  as_tibble() %>%
+  mutate(
+    trt = .trtb,
+    log_odds_baseline = as.numeric(as.character(.study))
+  )
+
+p_baseline_risk +
+  facet_wrap(vars(trt)) +
+  geom_ribbon(aes(ymin = `2.5%`, ymax = `97.5%`), data = cert_mu_reg,
+              fill = "darkred", alpha = 0.3) +
+  geom_line(aes(y = mean), data = cert_mu_reg,
+            colour = "darkred") +
+  geom_point(aes(y = log_odds_ratio, size = n_total), alpha = 0.6)
+
+
 ## -------------------------------------------------------------------------------------------------
 newdata <- data.frame(.mu = cert_fit_FE$xbar[[".mu"]])
-
 
 ## ----certolizumab_releff_FE, fig.height=3---------------------------------------------------------
 (cert_releff_FE <- relative_effects(cert_fit_FE, newdata = newdata))
@@ -105,7 +157,7 @@ plot(cert_releff_RE, ref_line = 0)
 
 
 ## -------------------------------------------------------------------------------------------------
-predict(cert_fit_RE, baseline = distr(qnorm))
+predict(cert_fit_RE, baseline = distr(qnorm, mean = cert_fit_FE$xbar[[".mu"]], sd = 0.5))
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -125,46 +177,14 @@ plot(cert_rankprobs)
 plot(cert_cumrankprobs)
 
 
-## ----certolizumab_reg_plot------------------------------------------------------------------------
-library(dplyr)
-library(ggplot2)
-
-mu_dat <- seq(log(0.02), log(0.5), length.out = 20)
-
-cert_mu_reg <- cert_fit_FE %>%
-  relative_effects(newdata = tibble::tibble(.mu = mu_dat), study = .mu) %>%
-  as_tibble() %>%
-  mutate(
-    .trt = .trtb,
-    .mu = as.numeric(as.character(.study))
-  )
-
-cert_lor <-
-  cert_net$agd_arm %>%
-  mutate(
-    probability = .r / .n,
-    log_odds = log(probability / (1 - probability))
-  ) %>%
-  group_by(.study) %>%
-  mutate(
-    .mu = log_odds[.trt == "Placebo"],
-    log_odds_ratio = log_odds - .mu,
-    sample_size = sum(n),
-  ) %>%
-  ungroup() %>%
-  filter(.trt != "Placebo")
-
-cert_lor %>%
-  ggplot(aes(x = .mu)) +
-  geom_hline(yintercept = 0, colour = "grey60") +
-  geom_ribbon(aes(ymin = `2.5%`, ymax = `97.5%`), data = cert_mu_reg,
-              fill = "darkred", alpha = 0.3) +
-  geom_line(aes(y = mean), data = cert_mu_reg,
-            colour = "darkred") +
-  geom_point(aes(y = log_odds_ratio, size = sample_size), alpha = 0.6) +
-  facet_wrap(vars(.trt)) +
-  labs(x = "Placebo log odds", y = "log Odds Ratio", size = "Sample Size") +
-  theme_multinma()
+## -------------------------------------------------------------------------------------------------
+nma(cert_net,
+    trt_effects = "fixed",
+    regression = ~(disease_duration + .mu):.trt,
+    prior_intercept = normal(scale = sqrt(1000)),
+    prior_trt = normal(scale = 100),
+    prior_reg = normal(scale = 100),
+    adapt_delta = 0.95)
 
 
 ## ----certolizumab_tests, include=FALSE, eval=params$run_tests-------------------------------------

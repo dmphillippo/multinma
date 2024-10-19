@@ -24,11 +24,45 @@ nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
              parallel::detectCores())
 options(mc.cores = nc)
 ```
+```{r}
+library(dplyr)
+library(ggplot2)
+```
 
-This vignette describes the analysis of data on [@TSD3].
+This vignette describes the analysis of 12 trials comparing 6 treatments against placebo for "the treatment of rheumatoid arthritis (RA)
+in patients who had failed on disease-modifying anti-rheumatic drugs (DMARDs)" [@TSD3].
 The data are available in this package as `certolizumab`:
 ```{r}
 head(certolizumab)
+```
+
+@TSD3 used this data to demonstrate baseline risk meta-regression models.
+Plotting the baseline risk against the treatment effect, we suspect there might be an effect of the baseline risk on the treatment effect.
+Specifically, the log baseline odds (placebo in this case) seem to be negatively linearly correlated with the odds ratio.
+```{r certolizumab_baseline_risk_plot}
+certolizumab <-
+  certolizumab %>%
+  mutate(
+    probability = r / n,
+    odds = probability / (1 - probability),
+    log_odds = log(odds)
+  )
+
+p_baseline_risk <-
+  left_join(
+    filter(certolizumab, trt != "Placebo"),
+    filter(certolizumab, trt == "Placebo"),
+    by = "study",
+    suffix = c("", "_baseline")
+  ) %>%
+  mutate(log_odds_ratio = log_odds - log_odds_baseline, n_total = n + n_baseline) %>%
+  ggplot(aes(log_odds_baseline)) +
+  geom_hline(yintercept = 1, linetype = "dashed") +
+  labs(x = "Placebo log odds", y = "log Odds Ratio", size = "Sample Size") +
+  theme_multinma()
+
+p_baseline_risk +
+  geom_point(aes(y = log_odds_ratio, size = n_total))
 ```
 
 ## Setting up the network
@@ -51,6 +85,7 @@ plot(cert_net, weight_edges = TRUE, weight_nodes = TRUE) +
 
 ## Meta-analysis models
 We fit both fixed effect (FE) and random effects (RE) models.
+The special variable `.mu` is used in the `regression` formula to specify a baseline risk meta-regression model.
 
 ### Fixed effect meta-analysis
 ```{r}
@@ -77,7 +112,8 @@ cert_fit_RE <- nma(cert_net,
                    prior_intercept = normal(scale = sqrt(1000)),
                    prior_trt = normal(scale = 100),
                    prior_reg = normal(scale = 100),
-                   iter = 4000)
+                   iter = 4000,
+                   adapt_delta = 0.98)
 ```
 
 Basic parameter summaries are given by the `print()` method:
@@ -101,6 +137,29 @@ plot(dic_FE)
 plot(dic_RE)
 ```
 
+### Baseline risk meta-regression
+Plotting the estimated baseline risk effect (fixed effect model) together with the crude odds ratios.
+```{r certolizumab_reg_plot}
+cert_mu_reg <-
+  cert_fit_FE %>%
+  relative_effects(
+    newdata = tibble(.mu = seq(log(0.02), log(0.5), length.out = 20)),
+    study = .mu
+  ) %>%
+  as_tibble() %>%
+  mutate(
+    trt = .trtb,
+    log_odds_baseline = as.numeric(as.character(.study))
+  )
+
+p_baseline_risk +
+  facet_wrap(vars(trt)) +
+  geom_ribbon(aes(ymin = `2.5%`, ymax = `97.5%`), data = cert_mu_reg,
+              fill = "darkred", alpha = 0.3) +
+  geom_line(aes(y = mean), data = cert_mu_reg,
+            colour = "darkred") +
+  geom_point(aes(y = log_odds_ratio, size = n_total), alpha = 0.6)
+```
 
 ## Further results
 ```{r}
@@ -126,7 +185,7 @@ Note that the sampled study-specific intercepts are used.
 `predict()` will use the `.mu` values sampled from the `baseline` distribution.
 
 ```{r}
-predict(cert_fit_RE, baseline = distr(qnorm))
+predict(cert_fit_RE, baseline = distr(qnorm, mean = cert_fit_FE$xbar[[".mu"]], sd = 0.5))
 ```
 
 When not passing a `baseline` distribution, predictions will be produced per study.
@@ -150,46 +209,17 @@ plot(cert_rankprobs)
 plot(cert_cumrankprobs)
 ```
 
-```{r certolizumab_reg_plot}
-library(dplyr)
-library(ggplot2)
 
-mu_dat <- seq(log(0.02), log(0.5), length.out = 20)
-
-cert_mu_reg <- cert_fit_FE %>%
-  relative_effects(newdata = tibble::tibble(.mu = mu_dat), study = .mu) %>%
-  as_tibble() %>%
-  mutate(
-    .trt = .trtb,
-    .mu = as.numeric(as.character(.study))
-  )
-
-cert_lor <-
-  cert_net$agd_arm %>%
-  mutate(
-    probability = .r / .n,
-    log_odds = log(probability / (1 - probability))
-  ) %>%
-  group_by(.study) %>%
-  mutate(
-    .mu = log_odds[.trt == "Placebo"],
-    log_odds_ratio = log_odds - .mu,
-    sample_size = sum(n),
-  ) %>%
-  ungroup() %>%
-  filter(.trt != "Placebo")
-
-cert_lor %>%
-  ggplot(aes(x = .mu)) +
-  geom_hline(yintercept = 0, colour = "grey60") +
-  geom_ribbon(aes(ymin = `2.5%`, ymax = `97.5%`), data = cert_mu_reg,
-              fill = "darkred", alpha = 0.3) +
-  geom_line(aes(y = mean), data = cert_mu_reg,
-            colour = "darkred") +
-  geom_point(aes(y = log_odds_ratio, size = sample_size), alpha = 0.6) +
-  facet_wrap(vars(.trt)) +
-  labs(x = "Placebo log odds", y = "log Odds Ratio", size = "Sample Size") +
-  theme_multinma()
+It is also possible to combine baseline risk meta-regression with regular meta-regression.
+For example, we can add `disease_duration` to the regression formula.
+```{r}
+nma(cert_net,
+    trt_effects = "fixed",
+    regression = ~(disease_duration + .mu):.trt,
+    prior_intercept = normal(scale = sqrt(1000)),
+    prior_trt = normal(scale = 100),
+    prior_reg = normal(scale = 100),
+    adapt_delta = 0.95)
 ```
 
 ## References
