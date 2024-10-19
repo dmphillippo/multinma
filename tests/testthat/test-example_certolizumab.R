@@ -165,15 +165,18 @@ predict(cert_fit_RE)
 
 
 ## ----certolizumab_ranks---------------------------------------------------------------------------
-(cert_ranks <- posterior_ranks(cert_fit_RE, newdata = newdata))
+(cert_ranks <- posterior_ranks(cert_fit_RE, newdata = newdata,
+                               lower_better = FALSE))
 plot(cert_ranks)
 
 ## ----certolizumab_rankprobs-----------------------------------------------------------------------
-(cert_rankprobs <- posterior_rank_probs(cert_fit_RE, newdata = newdata))
+(cert_rankprobs <- posterior_rank_probs(cert_fit_RE, newdata = newdata,
+                                        lower_better = FALSE))
 plot(cert_rankprobs)
 
 ## ----certolizumab_cumrankprobs--------------------------------------------------------------------
-(cert_cumrankprobs <- posterior_rank_probs(cert_fit_RE, cumulative = TRUE, newdata = newdata))
+(cert_cumrankprobs <- posterior_rank_probs(cert_fit_RE, cumulative = TRUE,
+                                           newdata = newdata, lower_better = FALSE))
 plot(cert_cumrankprobs)
 
 
