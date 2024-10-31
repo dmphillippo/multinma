@@ -10,15 +10,16 @@ params:
 ```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
 ```
 ```{r, include=FALSE}
-set.seed(4783982)
 ```
 
 ```{r, eval = FALSE}
 library(multinma)
+library(dplyr)      # dplyr and tidyr for data manipulation
+library(tidyr)
+library(ggplot2) 
 options(mc.cores = parallel::detectCores())
 ```
 ```{r setup, echo = FALSE}
-library(multinma)
 nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
              "true" =, "warn" = 2, 
              parallel::detectCores())
@@ -31,6 +32,8 @@ head(social_anxiety)
 ```
 
 @mayo2014psychological used this dataset to rank treatments and classes. We will demonstrate their approach by incorporating class effects and sharing class standard deviations across classes to replicate these results.
+
+We will demonstrate the use of the model selection strategy proposed by Perren et al. to determine the most suitable model, using class effects, for the social anxiety dataset. 
 
 ## Setting up the network
 We follow Mayo-Wilson et al. by analysing results as standardised mean differences (`y`) with standard error (`se`) therefore we use the function `set_agd_contrast` to set up the network. We make sure to set treatment classes as `classc` and `Waitlist` as the network reference treatment.
@@ -47,6 +50,98 @@ sa_net <- set_agd_contrast(social_anxiety,
 sa_net
 ```
 
+## Model selection strategy
+### STEP 1: Heterogeniety assessement
+First, we assess heterogeneity by first fitting fixed effects (FE) and random effects (RE) models using `nma()` and stating `trt_effects = "random"` for the RE model and `trt_effects = "fixed"` for the FE model. We use uninformative priors on the treatment effects with `prior_trt = normal(0, 100)` and heterogeneity with `prior_het = half_normal(5)`.
+
+```{r}
+set.seed(951)
+sa_fit_FE <- nma(sa_net,
+                 trt_effects = "fixed",
+                 prior_trt = normal(0, 100),
+                 prior_het = half_normal(5),
+)
+
+sa_fit_RE <- nma(sa_net,
+                 trt_effects = "random",
+                 prior_trt = normal(0, 100),
+                 prior_het = half_normal(5),
+)
+```
+
+The model fit under the FE and RE models can be checked using the dic() function.
+
+```{r}
+(sa_dic_FE <- dic(sa_fit_FE))
+(sa_dic_RE <- dic(sa_fit_RE))
+```
+
+The DIC for the random effects model (257.4) is much lower than that of the fixed effects model (328.4) due to the large decrease in residual deviance showing a much better fit to the data. Therefore, our preferred No Class NMA model is the RE model, which we use in subsequent steps.
+
+### STEP 2: Consistency assessment
+Next, we assess consistency, comparing model fit statistics for the UME model and the No Class NMA (con-
+sistency) model, both with random treatment effects. 
+
+```{r}
+sa_UME_RE <- nma(sa_net,
+                 trt_effects = "random",
+                 consistency = "ume",
+                 prior_trt = normal(0, 100),
+                 prior_het = half_normal(5))
+
+(sa_dic_RE <- dic(sa_fit_RE))
+(sa_dic_ume_RE <- dic(sa_UME_RE))
+
+summary(sa_UME_RE, pars = "tau")
+summary(sa_fit_RE, pars = "tau")
+```
+
+The residual deviance is not meaningfully different between the two models, suggesting a similar level of model fit between the two. However, the DIC is lower in the No Class NMA model (257.0) compared to the UME model (270.4), because the No Class NMA model is more parsimonious (smaller $p_D$).  Moreover, the between-study SD $\tau$ is essentially unchanged between the consistency model (0.21, 95\% Crl: 0.15 - 0.27) and the UME model (0.22, 95\% Crl: 0.16 - 0.29). Altogether, there is no evidence of inconsistency at the global level. 
+
+```{r}
+plotume <- plot(sa_dic_RE, sa_dic_ume_RE, show_uncertainty = FALSE) +
+  xlab("Residual deviance - No Class model") +
+  ylab("Residual deviance - UME model") +
+  theme(text = element_text(size = 18))
+
+plotume
+```
+
+The dev-dev plot (\Cref{fig:devdev_ume_noclass}) comparing residual deviance contributions for the UME model and no-class model shows that most data points lie close to the line of equality. This suggests a comparable model fit for most data points. However, two studies—ALDEN2011 and EMMELKAMP2006—stand out, each with a residual deviance that is smaller in the UME model by a difference of 1 or more compared to the no-class model, as indicated in \Cref{fig:devdev_ume_noclass} . The ALDEN2011 study has a high residual deviance indicating a poor fit, but exhibits this trait in both the NMA and UME models, suggesting that its deviation is more indicative of heterogeneity rather than inconsistency. The EMMELKAMP2006 study has a lower residual deviance in the UME model of 4.25, compared to 6.76 in the No Class model. This suggests that there may be some inconsistency in evidence loops including the EMMELKAMP2006 study.
+
+```{r}
+EMMELKAMP2006 <- data.frame(
+  Group = c("CBT individual", "Waitlist", "Waitlist"),
+  Therapy_Type = c("Psychodynamic psychotherapy", "Psychodynamic psychotherapy", "CBT individual")
+)
+
+ALDEN2011 <- data.frame(
+  Group = c("Waitlist"),
+  Therapy_Type = c("CBT group")
+)
+
+sa_fit_RE_nodesplit_EMMELKAMP <- nma(sa_net,
+                           consistency = "nodesplit",
+                           nodesplit = EMMELKAMP2006,
+                           trt_effects = "random",
+                           prior_trt = normal(0, 100),
+                           prior_het = half_normal(5),
+)
+
+sa_fit_RE_nodesplit_ALDEN <- nma(sa_net,
+                             consistency = "nodesplit",
+                             nodesplit = ALDEN2011,
+                             trt_effects = "random",
+                             prior_trt = normal(0, 100),
+                             prior_het = half_normal(5),
+)
+
+summary(sa_fit_RE_nodesplit_ALDEN)
+summary(sa_fit_RE_nodesplit_EMMELKAMP)
+```
+
+We then use nodes-plitting to investigate direct and indirect treatment effect estimates for the treatments that are within these two outlier studies. For the ALDEN2011 study, it reports a -1.88, with standard error 0.28, treatment effect for 'CBT group' against 'Waitlist'. This effect is substantially larger than those observed in other CBT group trials and deviates from the direct and indirect estimates of -0.89 (CrI -1.16 to -0.63) and -0.73 (CrI -1.00 to -0.46) respectively, however does not suggest inconsistency and more of study heterogeneity. A review of study characteristics should be completed for ALDEN2011. EMMELKAMP2006 reports a relative treatment effect of 0.159 for psychodynamic psychotherapy and -0.06 for CBT individual, which contrasts with both the direct and indirect estimates in this evidence loop: Psychodynamic vs Waitlist direct and indirect evidence reports treatment effects of -0.60 (CrI -0.95 to -0.22) and -0.69 (CrI -1.51 to 0.18) respectively. CBT individual vs Waitlist direct and indirect evidence reports treatment effects of -0.83 (CrI -1.31 to -0.36) and -1.46 (CrI -1.91 to -0.98) respectively. This discrepancy suggests potential inconsistency, as EMMELKAMP2006's findings indicate a negative effect on patient recovery where all other estimates suggest positive effects on patient recovery. We would advise that these studies (including studies in the same evidence loops as EMMELKAMP2006) be double checked, re-visited, and a decision made as to their inclusion. If there is no reason identified to exclude them, then since there was no evidence of inconsistency in the global checks, it may be appropriate to proceed to Step 3 of the model selection process. However, results should be interpreted with caution regarding the potential for these outliers to influence the outcome of the analysis, and sensitivity analyses excluding these studies would be advised.
+
 ## Class effect models
 
 We fit two (random effects) models:
@@ -60,10 +155,6 @@ We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k
 We set `class_effects` as `exchangeable` and use $\mathrm{N}(0.33,0.1)$ for prior_class_sd.
 
 This follows the approach used by [@mayo2014psychological], except that we replace their inverse-Gamma prior with a truncated normal prior for compatibility with the \texttt{multinma} package.
-
-Put something here on the difference between Mayo et al and our analysis. 
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
 
 ```{r}
 sa_fit_EXclass_RE <- nma(sa_net,
