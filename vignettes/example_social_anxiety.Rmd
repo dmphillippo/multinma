@@ -9,16 +9,15 @@ params:
 
 ```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
 ```
-```{r, include=FALSE}
-```
 
 ```{r, eval = FALSE}
 library(multinma)
 library(dplyr)      # dplyr and tidyr for data manipulation
 library(tidyr)
-library(ggplot2) 
+library(ggplot2)    # ggplot2 for plotting covariate distributions
 options(mc.cores = parallel::detectCores())
 ```
+
 ```{r setup, echo = FALSE}
 nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
              "true" =, "warn" = 2, 
