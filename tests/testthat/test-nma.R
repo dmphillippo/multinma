@@ -461,6 +461,6 @@ test_that("nma() throws errors for invalid class_effects and class_sd", {
   # Test for unsupported class_sd
   expect_error(nma(network = sa_net,
                    class_sd = "unsupported"),
-               "Invalid class sd specified")  # Adjust error message to match
+               "Invalid class sd specified")
 })
 
