@@ -63,8 +63,11 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' @param y (Optional) A second `nma_dic` object, to produce "dev-dev" plots for
 #'   model comparison.
 #' @param ... Additional arguments passed on to other methods
+#' @param type With a single `nma_dic` object, whether to show the residual
+#'   deviance contribution for each data point (`"resdev"`, the default), or a
+#'   leverage plot (`"leverage"`).
 #' @param show_uncertainty Logical, show uncertainty with a `ggdist` plot
-#'   stat? Default `TRUE`.
+#'   stat? Default `TRUE`. Ignored for `type = "leverage"`.
 #' @param stat Character string specifying the `ggdist` plot stat to use if
 #'   `show_uncertainty = TRUE`, default `"pointinterval"`. If `y` is provided,
 #'   currently only `"pointinterval"` is supported.
@@ -75,10 +78,14 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' @return A `ggplot` object.
 #' @export
 #'
-#' @details When a single `nma_dic` object is given, a plot of the residual
-#'   deviance contribution for each data point is produced. For a good fitting
-#'   model, each data point is expected to have a residual deviance of 1; larger
-#'   values indicate data points that are fit poorly by the model.
+#' @details When a single `nma_dic` object is given, the default plot (`type =
+#'   "resdev"`) shows the residual deviance contribution for each data point. For a good fitting model, each data point is expected to have a
+#'   residual deviance of 1; larger values indicate data points that are fit
+#'   poorly by the model. A leverage plot can be produced with `type =
+#'   "leverage"`, plotting the leverages (contributions to \eqn{p_D}) against
+#'   the signed square root residual deviance. Contours for different DIC
+#'   contribution cutoffs are also shown; points which lie outside the DIC=3
+#'   contour are generally identified as contributing to a model's poor fit.
 #'
 #'   When two `nma_dic` objects are given, a "dev-dev" plot comparing the
 #'   residual deviance contributions under each model is produced. Data points
@@ -138,6 +145,7 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' plot(smk_dic_RE, smk_dic_RE_UME, point_alpha = 0.5, interval_alpha = 0.1)
 #' }
 plot.nma_dic <- function(x, y, ...,
+                         type = c("resdev", "leverage"),
                          show_uncertainty = TRUE,
                          stat = "pointinterval",
                          orientation = c("vertical", "horizontal", "x", "y")) {
@@ -153,6 +161,9 @@ plot.nma_dic <- function(x, y, ...,
   orientation <- rlang::arg_match(orientation)
   if (orientation == "x") orientation <- "vertical"
   else if (orientation == "y") orientation <- "horizontal"
+
+  type <- rlang::arg_match(type)
+  if (type == "leverage") show_uncertainty <- FALSE
 
   # Get resdev samples from resdev_array
   resdev_post <- as.matrix.nma_summary(x$resdev_array) %>%
@@ -332,86 +343,141 @@ plot.nma_dic <- function(x, y, ...,
 
     p <- p + theme_multinma()
 
-  } else { # Produce resdev plot
+  } else {
 
-    if (show_uncertainty) {
-      if (!rlang::is_string(stat))
-        abort("`stat` should be a character string specifying the name of a ggdist stat")
+    if (type == "resdev") { # Produce resdev plot
 
-      stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
+      if (show_uncertainty) {
+        if (!rlang::is_string(stat))
+          abort("`stat` should be a character string specifying the name of a ggdist stat")
 
-      tb_stat <- tryCatch(getExportedValue("ggdist", paste0("stat_", stat)),
-                          error = function(err) {
-                            abort(paste("`stat` should be a character string specifying the name of a ggdist stat:",
-                                        err, sep = "\n"))
-                          })
+        stat <- stringr::str_remove(stat, "^(stat_dist_|stat_|geom_)")
 
-    }
+        tb_stat <- tryCatch(getExportedValue("ggdist", paste0("stat_", stat)),
+                            error = function(err) {
+                              abort(paste("`stat` should be a character string specifying the name of a ggdist stat:",
+                                          err, sep = "\n"))
+                            })
 
-    # Is a horizontal geom specified?
-    horizontal <- orientation == "horizontal"
+      }
 
-    if (horizontal) {
-      resdev_post$.label <- forcats::fct_rev(resdev_post$.label)
+      # Is a horizontal geom specified?
+      horizontal <- orientation == "horizontal"
 
-      p <- ggplot2::ggplot(resdev_post,
-                           ggplot2::aes(y = .data$.label,
-                                        x = .data$resdev)) +
-        ggplot2::labs(x = "Residual Deviance", y = "Data Point")
+      if (horizontal) {
+        resdev_post$.label <- forcats::fct_rev(resdev_post$.label)
 
-      if (dplyr::n_distinct(resdev_post$df) > 1) {
-        if (dplyr::n_distinct(resdev_post$Type) > 1) {
-          p <- p + ggplot2::facet_grid(Type~df_label, space = "free", scales = "free_y") +
-            ggplot2::geom_vline(ggplot2::aes(xintercept = df), colour = "grey60")
+        p <- ggplot2::ggplot(resdev_post,
+                             ggplot2::aes(y = .data$.label,
+                                          x = .data$resdev)) +
+          ggplot2::labs(x = "Residual Deviance", y = "Data Point")
+
+        if (dplyr::n_distinct(resdev_post$df) > 1) {
+          if (dplyr::n_distinct(resdev_post$Type) > 1) {
+            p <- p + ggplot2::facet_grid(Type~df_label, space = "free", scales = "free_y") +
+              ggplot2::geom_vline(ggplot2::aes(xintercept = df), colour = "grey60")
+          } else {
+            p <- p + ggplot2::facet_grid(df_label~., space = "free", scales = "free_y") +
+              ggplot2::geom_vline(ggplot2::aes(xintercept = df), colour = "grey60")
+          }
         } else {
-          p <- p + ggplot2::facet_grid(df_label~., space = "free", scales = "free_y") +
-            ggplot2::geom_vline(ggplot2::aes(xintercept = df), colour = "grey60")
+          p <- p + ggplot2::geom_vline(xintercept = 1, colour = "grey60")
+          if (dplyr::n_distinct(resdev_post$Type) > 1) {
+            p <- p + ggplot2::facet_grid(Type~., space = "free", scales = "free_y")
+          }
         }
+
       } else {
-        p <- p + ggplot2::geom_vline(xintercept = 1, colour = "grey60")
-        if (dplyr::n_distinct(resdev_post$Type) > 1) {
-          p <- p + ggplot2::facet_grid(Type~., space = "free", scales = "free_y")
+        p <- ggplot2::ggplot(resdev_post,
+                             ggplot2::aes(x = .data$.label,
+                                          y = .data$resdev)) +
+          ggplot2::labs(y = "Residual Deviance", x = "Data Point")
+
+        if (dplyr::n_distinct(resdev_post$df) > 1) {
+          if (dplyr::n_distinct(resdev_post$Type) > 1) {
+            p <- p + ggplot2::facet_grid(df_label~Type, space = "free", scales = "free_x") +
+              ggplot2::geom_hline(ggplot2::aes(yintercept = df), colour = "grey60")
+          } else {
+            p <- p + ggplot2::facet_grid(.~df_label, space = "free", scales = "free_x") +
+              ggplot2::geom_hline(ggplot2::aes(yintercept = df), colour = "grey60")
+          }
+        } else {
+          p <- p + ggplot2::geom_hline(yintercept = 1, colour = "grey60")
+          if (dplyr::n_distinct(resdev_post$Type) > 1) {
+            p <- p + ggplot2::facet_grid(.~Type, space = "free", scales = "free_x")
+          }
         }
       }
 
-    } else {
-      p <- ggplot2::ggplot(resdev_post,
-                           ggplot2::aes(x = .data$.label,
-                                        y = .data$resdev)) +
-        ggplot2::labs(y = "Residual Deviance", x = "Data Point")
-
-      if (dplyr::n_distinct(resdev_post$df) > 1) {
-        if (dplyr::n_distinct(resdev_post$Type) > 1) {
-          p <- p + ggplot2::facet_grid(df_label~Type, space = "free", scales = "free_x") +
-            ggplot2::geom_hline(ggplot2::aes(yintercept = df), colour = "grey60")
-        } else {
-          p <- p + ggplot2::facet_grid(.~df_label, space = "free", scales = "free_x") +
-            ggplot2::geom_hline(ggplot2::aes(yintercept = df), colour = "grey60")
-        }
+      if (show_uncertainty) {
+        p <- p + do.call(tb_stat,
+                         args = rlang::dots_list(point_interval = ggdist::mean_qi,
+                                                 ...,
+                                                 orientation = orientation,
+                                                 .homonyms = "last"))
       } else {
-        p <- p + ggplot2::geom_hline(yintercept = 1, colour = "grey60")
-        if (dplyr::n_distinct(resdev_post$Type) > 1) {
-          p <- p + ggplot2::facet_grid(.~Type, space = "free", scales = "free_x")
-        }
+        p <- p + ggplot2::geom_point(...)
       }
-    }
 
-    if (show_uncertainty) {
-      p <- p + do.call(tb_stat,
-                       args = rlang::dots_list(point_interval = ggdist::mean_qi,
-                                               ...,
-                                               orientation = orientation,
-                                               .homonyms = "last"))
-    } else {
-      p <- p + ggplot2::geom_point(...)
-    }
+      p <- p + theme_multinma()
 
-    p <- p + theme_multinma()
+      if (!horizontal) {
+        p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5))
+      } else {
+        p <- p + ggplot2::theme(axis.text.y = ggplot2::element_text(hjust = 0, vjust = 0.5))
+      }
 
-    if (!horizontal) {
-      p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5))
-    } else {
-      p <- p + ggplot2::theme(axis.text.y = ggplot2::element_text(hjust = 0, vjust = 0.5))
+    } else { # Leverage plot
+
+      # Calculate signed sqrt resdev, add in leverages
+      resdev_post$resdev <- sign(resdev_post$resdev) * sqrt(resdev_post$resdev)
+
+      if (NROW(x$pointwise$ipd)) {
+        resdev_post <- dplyr::left_join(resdev_post,
+                                        dplyr::transmute(x$pointwise$ipd,
+                                                         parameter = make_data_labels(.data$.study, .data$.trt),
+                                                         .data$leverage),
+                                        by = "parameter")
+      }
+      if (NROW(x$pointwise$agd_arm)) {
+        resdev_post <- dplyr::left_join(resdev_post,
+                                        dplyr::transmute(x$pointwise$agd_arm,
+                                                         parameter = make_data_labels(.data$.study, .data$.trt),
+                                                         .data$leverage),
+                                        by = "parameter")
+      }
+      if (NROW(x$pointwise$agd_contrast)) {
+        resdev_post <- dplyr::left_join(resdev_post,
+                                        dplyr::transmute(x$pointwise$agd_contrast,
+                                                         parameter = make_data_labels(.data$.study, .data$.trta, .data$.trtb),
+                                                         .data$leverage),
+                                        by = "parameter")
+      }
+
+
+      p <- ggplot2::ggplot(resdev_post,
+                           ggplot2::aes(y = .data$leverage,
+                                        x = .data$resdev,
+                                        label = .data$.label))
+
+      if (dplyr::n_distinct(resdev_post$Type) > 1) {
+        p <- p +
+          ggplot2::aes(colour = .data$Type) +
+          ggplot2::scale_colour_viridis_d("")
+      }
+
+      p <- p +
+        ggplot2::labs(x = "Square Root Residual Deviance",
+                      y = "Leverage") +
+        ggplot2::geom_function(fun = function(x) 5 - x^2) +
+        ggplot2::geom_function(fun = function(x) 4 - x^2) +
+        ggplot2::geom_function(fun = function(x) 3 - x^2) +
+        ggplot2::geom_function(fun = function(x) 2 - x^2) +
+        ggplot2::geom_function(fun = function(x) 1 - x^2) +
+        ggplot2::annotate("label", x = 0, y = 1:5, label = paste0("DIC = ", 1:5)) +
+        ggplot2::geom_point(...) +
+        theme_multinma()
+
     }
   }
 
