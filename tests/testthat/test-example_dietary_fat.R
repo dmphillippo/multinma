@@ -8,14 +8,14 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE------------------
 
 
-## ----eval = FALSE---------------------------------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 ## library(multinma)
 ## options(mc.cores = parallel::detectCores())
 
-## ----setup, echo = FALSE--------------------------------------------------------------------------
+## ----setup, echo = FALSE------------------------------------------------------
 library(multinma)
 nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
              "true" =, "warn" = 2, 
@@ -23,11 +23,11 @@ nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
 options(mc.cores = nc)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 head(dietary_fat)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 diet_net <- set_agd_arm(dietary_fat, 
                         study = studyc,
                         trt = trtc,
@@ -38,43 +38,43 @@ diet_net <- set_agd_arm(dietary_fat,
 diet_net
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 summary(normal(scale = 100))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 diet_fit_FE <- nma(diet_net, 
                    trt_effects = "fixed",
                    prior_intercept = normal(scale = 100),
                    prior_trt = normal(scale = 100))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 diet_fit_FE
 
 
-## ----eval=FALSE-----------------------------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 ## # Not run
 ## print(diet_fit_FE, pars = c("d", "mu"))
 
 
-## ----diet_FE_pp_plot------------------------------------------------------------------------------
+## ----diet_FE_pp_plot----------------------------------------------------------
 plot_prior_posterior(diet_fit_FE)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 summary(normal(scale = 100))
 summary(half_normal(scale = 5))
 
 
-## ----eval=FALSE-----------------------------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 ## diet_fit_RE <- nma(diet_net,
 ##                    trt_effects = "random",
 ##                    prior_intercept = normal(scale = 100),
 ##                    prior_trt = normal(scale = 100),
 ##                    prior_het = half_normal(scale = 5))
 
-## ----echo=FALSE, warning=FALSE--------------------------------------------------------------------
+## ----echo=FALSE, warning=FALSE------------------------------------------------
 diet_fit_RE <- nowarn_on_ci(
                  nma(diet_net, 
                      trt_effects = "random",
@@ -84,42 +84,42 @@ diet_fit_RE <- nowarn_on_ci(
                  )
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 diet_fit_RE
 
 
-## ----eval=FALSE-----------------------------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 ## # Not run
 ## print(diet_fit_RE, pars = c("d", "mu", "delta"))
 
 
-## ----diet_RE_pp_plot------------------------------------------------------------------------------
+## ----diet_RE_pp_plot----------------------------------------------------------
 plot_prior_posterior(diet_fit_RE, prior = c("trt", "het"))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 (dic_FE <- dic(diet_fit_FE))
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 (dic_RE <- dic(diet_fit_RE))
 
 
-## ----diet_FE_resdev_plot--------------------------------------------------------------------------
+## ----diet_FE_resdev_plot------------------------------------------------------
 plot(dic_FE)
 
 
-## ----diet_RE_resdev_plot--------------------------------------------------------------------------
+## ----diet_RE_resdev_plot------------------------------------------------------
 plot(dic_RE)
 
 
-## ----diet_pred_FE, fig.height = 2-----------------------------------------------------------------
+## ----diet_pred_FE, fig.height = 2---------------------------------------------
 pred_FE <- predict(diet_fit_FE, 
                    baseline = distr(qnorm, mean = -3, sd = 1.77^-0.5), 
                    type = "response")
 pred_FE
 plot(pred_FE)
 
-## ----diet_pred_RE, fig.height = 2-----------------------------------------------------------------
+## ----diet_pred_RE, fig.height = 2---------------------------------------------
 pred_RE <- predict(diet_fit_RE, 
                    baseline = distr(qnorm, mean = -3, sd = 1.77^-0.5), 
                    type = "response")
@@ -127,13 +127,13 @@ pred_RE
 plot(pred_RE)
 
 
-## ----diet_pred_FE_all, fig.height=10--------------------------------------------------------------
+## ----diet_pred_FE_all, fig.height=10------------------------------------------
 pred_FE_studies <- predict(diet_fit_FE, type = "response")
 pred_FE_studies
 plot(pred_FE_studies) + ggplot2::facet_grid(Study~., labeller = ggplot2::label_wrap_gen(width = 10))
 
 
-## ----diet_tests_tests, include=FALSE, eval=params$run_tests---------------------------------------
+## ----diet_tests_tests, include=FALSE, eval=params$run_tests-------------------
 #--- Test against TSD 2 results ---
 library(testthat)
 library(dplyr)
@@ -212,6 +212,74 @@ test_that("Specifying study for baseline gives correct result", {
   pred_FE_DART <- predict(diet_fit_FE, type = "response", baseline = "DART")
   expect_identical(c(as.array(pred_FE_DART)),
                    c(as.array(pred_FE_studies)[ , , 1:2]))
+})
+
+# Test identical model treating data as IPD
+diet_net_ipd <- set_ipd(dietary_fat, 
+                        study = studyc,
+                        trt = trtc,
+                        r = r, 
+                        E = E,
+                        trt_ref = "Control")
+
+diet_fit_FE_ipd <- nma(diet_net_ipd, 
+                       trt_effects = "fixed",
+                       prior_intercept = normal(scale = 100),
+                       prior_trt = normal(scale = 100))
+
+diet_fit_RE_ipd <- nowarn_on_ci(
+                     nma(diet_net_ipd, 
+                         trt_effects = "random",
+                         prior_intercept = normal(scale = 100),
+                         prior_trt = normal(scale = 100),
+                         prior_het = half_normal(scale = 5))
+                   )
+
+# Relative effects
+diet_FE_ipd_releff <- as.data.frame(relative_effects(diet_fit_FE_ipd))
+
+test_that("IPD FE relative effects", {
+  expect_equivalent(diet_FE_ipd_releff$mean, -0.01, tolerance = tol)
+  expect_equivalent(diet_FE_ipd_releff$sd, 0.054, tolerance = tol)
+  expect_equivalent(diet_FE_ipd_releff$`2.5%`, -0.11, tolerance = tol)
+  expect_equivalent(diet_FE_ipd_releff$`50%`, -0.01, tolerance = tol)
+  expect_equivalent(diet_FE_ipd_releff$`97.5%`, 0.10, tolerance = tol)
+})
+
+diet_RE_ipd_releff <- as.data.frame(relative_effects(diet_fit_RE_ipd))
+
+test_that("IPD RE relative effects", {
+  expect_equivalent(diet_RE_ipd_releff$mean, -0.02, tolerance = tol)
+  expect_equivalent(diet_RE_ipd_releff$sd, 0.09, tolerance = tol)
+  expect_equivalent(diet_RE_ipd_releff$`2.5%`, -0.19, tolerance = tol)
+  expect_equivalent(diet_RE_ipd_releff$`50%`, -0.01, tolerance = tol)
+  expect_equivalent(diet_RE_ipd_releff$`97.5%`, 0.16, tolerance = tol)
+})
+
+# RE heterogeneity SD
+diet_RE_ipd_sd <- as.data.frame(summary(diet_fit_RE_ipd, pars = "tau"))
+
+test_that("IPD RE heterogeneity SD", {
+  expect_equivalent(diet_RE_ipd_sd$mean, 0.13, tolerance = tol)
+  expect_equivalent(diet_RE_ipd_sd$sd, 0.12, tolerance = tol)
+  expect_equivalent(diet_RE_ipd_sd$`2.5%`, 0.00, tolerance = tol)
+  expect_equivalent(diet_RE_ipd_sd$`50%`, 0.10, tolerance = tol)
+  expect_equivalent(diet_RE_ipd_sd$`97.5%`, 0.43, tolerance = tol)
+})
+
+# DIC
+dic_FE_ipd <- dic(diet_fit_FE_ipd)
+test_that("IPD FE DIC", {
+  expect_equivalent(dic_FE_ipd$resdev, 23.32, tolerance = tol_dic)
+  expect_equivalent(dic_FE_ipd$pd, 10.9, tolerance = tol_dic)
+  expect_equivalent(dic_FE_ipd$dic, 33.2, tolerance = tol_dic)
+})
+
+dic_RE_ipd <- dic(diet_fit_RE_ipd)
+test_that("IPD RE DIC", {
+  expect_equivalent(dic_RE_ipd$resdev, 21.5, tolerance = tol_dic)
+  expect_equivalent(dic_RE_ipd$pd, 13.3, tolerance = tol_dic)
+  expect_equivalent(dic_RE_ipd$dic, 34.8, tolerance = tol_dic)
 })
 
 
