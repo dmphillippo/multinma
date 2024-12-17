@@ -50,7 +50,7 @@ sa_net <- set_agd_contrast(social_anxiety,
 
 sa_net
 ```
-```{r}
+```{r eval=FALSE, include=FALSE}
 plot(sa_net, weight_edges = TRUE, show_trt_class = TRUE) + 
   ggplot2::theme(legend.position = "bottom", 
                  legend.box = "vertical", 
@@ -88,7 +88,7 @@ The DIC for the random effects model (256.1) is much lower than that of the fixe
 ### STEP 2: Consistency assessment
 Next, assess residual inconsistency using an unrelated mean effects model, comparing model fit statistics for the UME model and the No Class NMA (consistency) model, both with random treatment effects. To fit a UME model, we use the `nma()` function but specify `consistency = "ume"`. 
 
-```{r include=FALSE}
+```{r echo=TRUE, results='hide'}
 sa_UME_RE <- nma(sa_net,
                  trt_effects = "random",
                  consistency = "ume",
@@ -96,7 +96,7 @@ sa_UME_RE <- nma(sa_net,
                  prior_het = half_normal(5))
 ```
 
-We compare model fit from the no-class (consistency) RE model and the UME RE model using the DIC and $\tau$.
+We compare model fit from the no-class (consistency) RE model and the UME RE model using the DIC and $\tau$ .
 
 ```{r}
 (sa_dic_RE <- dic(sa_fit_RE))
@@ -108,6 +108,9 @@ summary(sa_fit_RE, pars = "tau")
 
 The residual deviance is not meaningfully different between the two models, suggesting a similar level of model fit between the two. However, the DIC is lower in the No Class NMA model (256.1) compared to the UME model (271.5), because the No Class NMA model is more parsimonious (smaller $p_D$).  Moreover, the between-study SD $\tau$ is essentially unchanged between the consistency model (0.21, 95\% Crl: 0.15 - 0.27) and the UME model (0.22, 95\% Crl: 0.16 - 0.29). Altogether, there is no evidence of inconsistency at the global level. 
 
+It is also important to compare the residual deviance contributions under each model to see whether there are any points that fit better under the UME model, as this can also indicate inconsistency.
+Using the `plot()` function produces a "dev-dev" plot of the residual deviance contributions under either model.
+
 ```{r}
 plotume <- plot(sa_dic_RE, sa_dic_ume_RE, show_uncertainty = FALSE) +
   xlab("Residual deviance - No Class model") +
@@ -117,17 +120,18 @@ plotume <- plot(sa_dic_RE, sa_dic_ume_RE, show_uncertainty = FALSE) +
 plotume
 ```
 
-The dev-dev plot (\Cref{fig:devdev_ume_noclass}) comparing residual deviance contributions for the UME model and no-class model shows that most data points lie close to the line of equality. This suggests a comparable model fit for most data points. However, two studies—ALDEN2011 and EMMELKAMP2006—stand out, each with a residual deviance that is smaller in the UME model by a difference of 1 or more compared to the no-class model, as indicated in \Cref{fig:devdev_ume_noclass} . The ALDEN2011 study has a high residual deviance indicating a poor fit, but exhibits this trait in both the NMA and UME models, suggesting that its deviation is more indicative of heterogeneity rather than inconsistency. The EMMELKAMP2006 study has a lower residual deviance in the UME model of 4.25, compared to 6.76 in the No Class model. This suggests that there may be some inconsistency in evidence loops including the EMMELKAMP2006 study.
+The dev-dev plot (\Cref{fig:devdev_ume_noclass}) comparing residual deviance contributions for the UME model and no-class model shows that most data points lie close to the line of equality. This suggests a comparable model fit for most data points. However, two studies—ALDEN2011 and EMMELKAMP2006—stand out as outliers. The ALDEN2011 study has a high residual deviance indicating a poor fit, but exhibits this trait in both the NMA and UME models, suggesting that its deviation is more indicative of heterogeneity rather than inconsistency. The EMMELKAMP2006 study has a lower residual deviance in the UME model of 4.25, compared to 6.76 in the No Class model. This suggests that there may be some inconsistency in evidence loops including the EMMELKAMP2006 study.
 
-```{r include=FALSE}
+We can explore the consistency of specific evidence loops using node-splitting by setting `consistency = "nodesplit"`. However, given the size of the network, running node-splitting on all comparisons would be computationally intensive. To focus the analysis, we first define the specific treatment comparisons of interest by creating two data frames that specify the desired treatment comparisons. These are then passed to the `nodesplit` argument within the `nma()` function. 
+```{r echo=TRUE, results='hide'}
 EMMELKAMP2006 <- data.frame(
-  Group = c("CBT individual", "Waitlist", "Waitlist"),
-  Therapy_Type = c("Psychodynamic psychotherapy", "Psychodynamic psychotherapy", "CBT individual")
+  Treatment_1 = c("CBT individual", "Waitlist", "Waitlist"),
+  Treatment_2 = c("Psychodynamic psychotherapy", "Psychodynamic psychotherapy", "CBT individual")
 )
 
 ALDEN2011 <- data.frame(
-  Group = c("Waitlist"),
-  Therapy_Type = c("CBT group")
+  Treatment_1 = c("Waitlist"),
+  Treatment_2 = c("CBT group")
 )
 
 sa_fit_RE_nodesplit_EMMELKAMP <- nma(sa_net,
@@ -152,12 +156,12 @@ summary(sa_fit_RE_nodesplit_ALDEN)
 summary(sa_fit_RE_nodesplit_EMMELKAMP)
 ```
 
-We then use nodes-plitting to investigate direct and indirect treatment effect estimates for the treatments that are within these two outlier studies. For the ALDEN2011 study, it reports a -1.88, with standard error 0.28, treatment effect for 'CBT group' against 'Waitlist'. This effect is substantially larger than those observed in other CBT group trials and deviates from the direct and indirect estimates of -0.89 (CrI -1.16 to -0.63) and -0.73 (CrI -1.00 to -0.46) respectively, however does not suggest inconsistency and more of study heterogeneity. A review of study characteristics should be completed for ALDEN2011. EMMELKAMP2006 reports a relative treatment effect of 0.159 for psychodynamic psychotherapy and -0.06 for CBT individual, which contrasts with both the direct and indirect estimates in this evidence loop: Psychodynamic vs Waitlist direct and indirect evidence reports treatment effects of -0.60 (CrI -0.95 to -0.22) and -0.69 (CrI -1.51 to 0.18) respectively. CBT individual vs Waitlist direct and indirect evidence reports treatment effects of -0.83 (CrI -1.31 to -0.36) and -1.46 (CrI -1.91 to -0.98) respectively. This discrepancy suggests potential inconsistency, as EMMELKAMP2006's findings indicate a negative effect on patient recovery where all other estimates suggest positive effects on patient recovery. We would advise that these studies (including studies in the same evidence loops as EMMELKAMP2006) be double checked, re-visited, and a decision made as to their inclusion. If there is no reason identified to exclude them, then since there was no evidence of inconsistency in the global checks, it may be appropriate to proceed to Step 3 of the model selection process. However, results should be interpreted with caution regarding the potential for these outliers to influence the outcome of the analysis, and sensitivity analyses excluding these studies would be advised.
+For the ALDEN2011 study, it reports a -1.88, with standard error 0.28, treatment effect for 'CBT group' against 'Waitlist'. This effect is substantially larger than those observed in other CBT group trials and deviates from the direct and indirect estimates of -0.89 (CrI -1.16 to -0.63) and -0.73 (CrI -1.00 to -0.46) respectively, however does not suggest inconsistency and more of study heterogeneity. A review of study characteristics should be completed for ALDEN2011. EMMELKAMP2006 reports a relative treatment effect of 0.159 for psychodynamic psychotherapy and -0.06 for CBT individual, which contrasts with both the direct and indirect estimates in this evidence loop: Psychodynamic vs Waitlist direct and indirect evidence reports treatment effects of -0.60 (CrI -0.95 to -0.22) and -0.69 (CrI -1.51 to 0.18) respectively. CBT individual vs Waitlist direct and indirect evidence reports treatment effects of -0.83 (CrI -1.31 to -0.36) and -1.46 (CrI -1.91 to -0.98) respectively. This discrepancy suggests potential inconsistency, as EMMELKAMP2006's findings indicate a negative effect on patient recovery where all other estimates suggest positive effects on patient recovery. We would advise that these studies (including studies in the same evidence loops as EMMELKAMP2006) be double checked, re-visited, and a decision made as to their inclusion. If there is no reason identified to exclude them, then since there was no evidence of inconsistency in the global checks, it may be appropriate to proceed to Step 3 of the model selection process. However, results should be interpreted with caution regarding the potential for these outliers to influence the outcome of the analysis, and sensitivity analyses excluding these studies would be advised.
 
 ## STEP 3: Class effects assessment
 
-In this step, we assess whether a class assumption is suitable for the data.
-```{r include=FALSE}
+In this step, we assess whether a class assumption is suitable for the data. 
+```{r echo=TRUE, results='hide'}
 sa_fit_EXclass_RE <- nma(sa_net,
                          trt_effects = "random",
                          prior_trt = normal(0, 100),
@@ -195,7 +199,7 @@ Examining the residual deviance contributions from both models on a dev-dev plot
 
 After we have determined that a class effects model is appropriate, it is time to finalise which combination of common or exchangeable class effects and fixed or random treatment effects provides the most suitable model fit while considering between-study heterogeneity and within-class SD. As we are using a random effects model, we now fit 2 other models to our data; Exchangeable class FE and Common class RE. This gives us a total of 3 models to compare. 
 
-```{r include=FALSE}
+```{r echo=TRUE, results='hide'}
 sa_fit_COclass_RE <- nma(sa_net,
                          trt_effects = "random",
                          prior_trt = normal(0, 100),
@@ -265,9 +269,70 @@ plot(sa_rankprobs_class_RE)
 
 ```{r}
 # Class ranks
+EXclass_mean <- (as.matrix(sa_fit_EXclass_RE))
+
+# Filter columns that contain 'class_mean[' with any text inside the brackets
+EXclass_mean <- EXclass_mean[, grepl("class_mean", colnames(EXclass_mean))]
+
+EXclass_mean <- cbind(`d[Reference]` = 0, EXclass_mean)
+
+# Take ranks at each iteration
+EXranks <- t(apply(EXclass_mean, 1, rank))
+
+# Assuming 'results' is your matrix from the 'apply' function
+EXresults <- t(apply(EXranks, 2, quantile, probs = c(0.025, 0.5, 0.975)))
+
+# Convert to data frame and make it long format
+EXresults_df <- as.data.frame(EXresults)
+EXresults_df$class <- rownames(EXresults_df)
+
+EXresults_df$class <- factor(EXresults_df$class, levels = sort(unique(EXresults_df$class), decreasing = TRUE))
+
+RankCI_EX<-EXresults_df %>%
+  ggplot(aes(x=class, y=`50%`, ymin=`2.5%`, ymax=`97.5%`)) +
+  geom_pointrange(size = 0.5) +
+  coord_flip() +  # flip coordinates (puts labels on y axis)
+  xlab("Class") + ylab("Posterior Ranks") +
+  theme_bw()
+
+RankCI_EX
+```
+```{r}
+# 
+EXranks_df <- as.data.frame(EXranks)
+
+# RANK PROBS for class
+rank_probs_EX <- apply(EXranks_df, 2, function(x) table(factor(x, levels = 1:ncol(EXranks_df))) / nrow(EXranks_df))
+
+# Convert to data frame
+rank_probs_df_EX <- as.data.frame(rank_probs_EX)
+
+# Convert the data frame to a long format
+rank_probs_long_EX <- rank_probs_df_EX %>%
+  mutate(Rank = row_number()) %>%
+  pivot_longer(
+    cols = -Rank,
+    names_to = "Class",
+    values_to = "Probability"
+  )
+
+# Plot density
+RankDensity_EX<-ggplot(rank_probs_long_EX, aes(x = Rank, y = Probability)) +
+  geom_line() +
+  facet_wrap(~ Class) + # Assuming you might want each class to have its own y scale for clarity
+  theme_minimal() +
+  labs(x = "Rank",
+       y = "Probability") +
+  theme(
+    text = element_text(size = 12),
+    )
+
+RankDensity_EX
 
 ```
-We fit two (random effects) models:
+
+
+
 
 1. Exchangeable class effects with class sd sharing for the following groups; (`Exercise promotion`, `Self-help no support`), (`SSRI/SNRI`, `NSSA`), (`Psychodynamic psychotherapy`, `Other psychological therapies`)
 2. Common class effects 
@@ -279,7 +344,7 @@ We set `class_effects` as `exchangeable` and use $\mathrm{N}(0.33,0.1)$ for prio
 
 This follows the approach used by [@mayo2014psychological], except that we replace their inverse-Gamma prior with a truncated normal prior for compatibility with the \texttt{multinma} package.
 
-```{r include=FALSE}
+```{r echo=TRUE, results='hide'}
 sa_fit_EXclass_RE <- nma(sa_net,
                          trt_effects = "random",
                          prior_trt = normal(0, 100),
