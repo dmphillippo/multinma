@@ -1349,6 +1349,8 @@ if (class_effects == "exchangeable") {
               aux_by = if (has_aux_by) colnames(get_aux_by_data(aux_dat, by = aux_by)) else NULL,
               priors = list(prior_intercept = if (has_intercepts) prior_intercept else NULL,
                             prior_trt = prior_trt,
+                            prior_class_mean = if (class_effects == "exchangeable") prior_class_mean else NULL,
+                            prior_class_sd = if (class_effects == "exchangeable") prior_class_sd else NULL,
                             prior_het = if (trt_effects == "random") prior_het else NULL,
                             prior_het_type = if (trt_effects == "random") prior_het_type else NULL,
                             prior_reg = if (!is.null(regression) && !is_only_offset(regression)) prior_reg else NULL,
