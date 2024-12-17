@@ -507,11 +507,3 @@ test_that("rstan R-hat and ESS warnings are captured correctly", {
     "Bulk Effective Sample(s?) Size \\(ESS\\) is too low"),
     "Tail Effective Sample(s?) Size \\(ESS\\) is too low")
 })
-
-sa_net <- set_agd_contrast(social_anxiety,
-                           studyc, trtc,
-                           y = y, se = se,
-                           trt_class = classc,
-                           trt_ref = "Waitlist")
-
-
