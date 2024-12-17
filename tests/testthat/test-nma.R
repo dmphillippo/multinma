@@ -97,6 +97,28 @@ test_that("nma() gives an informative error if class_effect or class_sd are spec
   expect_error(nma(smknet, class_sd = "common"), m_no_classes)
 })
 
+test_that("class_mean and class_sd parameters are named correctly", {
+  # Extract summaries for class_mean and class_sd
+  cm_summary <- summary(sa_fit_EXclass_RE, pars = "class_mean")$summary
+  cs_summary <- summary(sa_fit_EXclass_RE, pars = "class_sd")$summary
+
+  # Convert to data frames if they aren't already
+  cm_summary <- as.data.frame(cm_summary)
+  cs_summary <- as.data.frame(cs_summary)
+
+  # Extract parameter names from row names
+  cm_params <- rownames(cm_summary)
+  cs_params <- rownames(cs_summary)
+
+  # Check that all class_mean parameters are in format class_mean[<class_name>]
+  expect_true(all(grepl("^class_mean\\[.*\\]$", cm_params)),
+              info = "All class_mean parameters should match the pattern class_mean[...]")
+
+  # Check that all class_sd parameters are in format class_sd[<class_name>]
+  expect_true(all(grepl("^class_sd\\[.*\\]$", cs_params)),
+              info = "All class_sd parameters should match the pattern class_sd[...]")
+})
+
 # Make dummy covariate data for smoking network
 ns_agd <- max(smoking$studyn)
 smkdummy <-
