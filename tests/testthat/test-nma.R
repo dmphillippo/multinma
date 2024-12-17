@@ -53,6 +53,50 @@ test_that("nma() link must be valid", {
   expect_error(nma(smknet, link = c("log", "identity")), m)
 })
 
+#Class effect parameter error checks
+test_that("nma() class_effect must be valid", {
+  m <- "`class_effect` should be one of 'independent', 'common', or 'exchangeable'"
+  expect_error(nma(sa_net, class_effect = 1), m)
+  expect_error(nma(sa_net, class_effect = "random"), m)
+  expect_error(nma(sa_net, class_effect = c("independent", "common", "other")), m)
+})
+
+test_that("nma() class_sd must be valid", {
+  m <- "`class_sd` should be one of 'independent' or 'common'"
+  expect_error(nma(sa_net, class_sd = 1), m)
+  expect_error(nma(sa_net, class_sd = "exchangeable"), m)
+  expect_error(nma(sa_net, class_sd = c("independent", "common", "extra")), m)
+
+m_list <- "`class_sd` should be a list of character vectors corresponding to valid classes, with no duplicates"
+expect_error(
+  nma(sa_net, class_sd = list(classA = 1, classB = "Exposure")),
+  m_list
+)
+expect_error(
+  nma(sa_net, class_sd = list(classA = c("Exposure", "Exposure"))),
+  m_list
+)
+expect_error(
+  nma(sa_net, class_sd = list(classA = c("Exposure", "non_existent_class"))),
+  m_list
+)
+expect_error(
+  nma(sa_net, class_sd = list(
+    first_set = "Exposure",
+    second_set = "Exposure",
+    third_set = "Combined"
+  )),
+  m_list
+)
+})
+
+test_that("nma() gives an informative error if class_effect or class_sd are specified without classes in the network", {
+  m_no_classes <- "No classes found in the network, cannot specify class_effect or class_sd."
+
+  expect_error(nma(smknet, class_effect = "common"), m_no_classes)
+  expect_error(nma(smknet, class_sd = "common"), m_no_classes)
+})
+
 # Make dummy covariate data for smoking network
 ns_agd <- max(smoking$studyn)
 smkdummy <-
@@ -448,19 +492,4 @@ sa_net <- set_agd_contrast(social_anxiety,
                            trt_class = classc,
                            trt_ref = "Waitlist")
 
-test_that("nma() throws errors for invalid class_effects and class_sd", {
-  # Test for unsupported class_effects
-  expect_error(nma(network = sa_net,
-                   class_effects = c("exchangeable","common")),
-               "`class_effects` must be a single string.")
-
-  expect_error(nma(network = sa_net,
-                   class_effects = c("exchange")),
-               "`class_effects` must be a single string.")
-
-  # Test for unsupported class_sd
-  expect_error(nma(network = sa_net,
-                   class_sd = "unsupported"),
-               "Invalid class sd specified")
-})
 
