@@ -206,7 +206,7 @@ plot.stan_nma <- function(x, ...,
 #' @param ... Additional arguments passed on to methods
 #' @param prior Character vector selecting the prior and posterior
 #'   distribution(s) to plot. May include `"intercept"`, `"trt"`, `"het"`,
-#'   `"reg"`, or `"aux"`, as appropriate.
+#'   `"reg"`, `"aux"`, `"class_mean"` or `"class_sd` as appropriate.
 #' @param post_args List of arguments passed on to [ggplot2::geom_histogram] to
 #'   control plot output for the posterior distribution
 #' @param prior_args List of arguments passed on to [ggplot2::geom_path] to
