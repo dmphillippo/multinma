@@ -8,9 +8,9 @@ library(readr)
 options(mc.cores = parallel::detectCores())
 
 # Read in data
-sa <- read_tsv("social_anxiety.txt")
-sa_trt <- read_tsv("social_anxiety_treatments.txt")
-sa_class <- read_tsv("social_anxiety_classes.txt")
+sa <- read_tsv("./data-raw/smoking/social_anxiety.txt")
+sa_trt <- read_tsv("./data-raw/smoking/social_anxiety_treatments.txt")
+sa_class <- read_tsv("./data-raw/smoking/social_anxiety_classes.txt")
 
 # Tidy data
 social_anxiety <- sa %>%
