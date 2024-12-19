@@ -716,7 +716,10 @@ nma <- function(network,
 
     if (".mu" %in% all.vars(regression)) {
       if (".mu" %in% colnames(idat_agd_arm)) {
-        warn("Overwriting '.mu'. Special name. Use different name.")
+        warn(c(
+          "Detected `.mu` in the `regression` formula and in the data.",
+          i = "`.mu` is a special variable refering to the modelled baseline risk."
+        ))
       }
 
       ref_trt <- levels(idat_agd_arm$.trt)[1L]
