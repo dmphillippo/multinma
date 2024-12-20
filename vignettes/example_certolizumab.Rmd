@@ -10,7 +10,7 @@ params:
 ```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
 ```
 ```{r, include=FALSE}
-set.seed(76439)
+set.seed(76441)
 ```
 
 ```{r, eval = FALSE}
