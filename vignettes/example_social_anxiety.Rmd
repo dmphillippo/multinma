@@ -83,10 +83,10 @@ The model fit under the FE and RE models can be checked using the `dic()` functi
 (sa_dic_RE <- dic(sa_fit_RE))
 ```
 
-The DIC for the random effects model (256.1) is much lower than that of the fixed effects model (328.4) due to the large decrease in residual deviance showing a much better fit to the data. Therefore, our preferred No Class NMA model is the RE model, which we use in subsequent steps.
+The DIC for the random effects model (256.1) is much lower than that of the fixed effects model (328.4) due to the large decrease in residual deviance showing a much better fit to the data. Therefore, our preferred model is the RE model, which we use in subsequent steps.
 
 ### STEP 2: Consistency assessment
-Next, assess residual inconsistency using an unrelated mean effects model, comparing model fit statistics for the UME model and the No Class NMA (consistency) model, both with random treatment effects. To fit a UME model, we use the `nma()` function but specify `consistency = "ume"`. 
+Next, assess residual inconsistency using an unrelated mean effects model, comparing model fit statistics for the UME model and the NMA (consistency) model, both with random treatment effects. To fit a UME model, we use the `nma()` function but specify `consistency = "ume"`. 
 
 ```{r echo=TRUE, results='hide'}
 sa_UME_RE <- nma(sa_net,
@@ -96,7 +96,7 @@ sa_UME_RE <- nma(sa_net,
                  prior_het = half_normal(5))
 ```
 
-We compare model fit from the no-class (consistency) RE model and the UME RE model using the DIC and $\tau$ .
+We compare model fit from the NMA (consistency) RE model and the UME RE model using the DIC and $\tau$ .
 
 ```{r}
 (sa_dic_RE <- dic(sa_fit_RE))
@@ -106,7 +106,7 @@ summary(sa_UME_RE, pars = "tau")
 summary(sa_fit_RE, pars = "tau")
 ```
 
-The residual deviance is not meaningfully different between the two models, suggesting a similar level of model fit between the two. However, the DIC is lower in the No Class NMA model (256.1) compared to the UME model (271.5), because the No Class NMA model is more parsimonious (smaller $p_D$).  Moreover, the between-study SD $\tau$ is essentially unchanged between the consistency model (0.21, 95\% Crl: 0.15 - 0.27) and the UME model (0.22, 95\% Crl: 0.16 - 0.29). Altogether, there is no evidence of inconsistency at the global level. 
+The residual deviance is not meaningfully different between the two models, suggesting a similar level of model fit between the two. However, the DIC is lower in the NMA model (256.1) compared to the UME model (271.5), because the NMA model is more parsimonious (smaller $p_D$).  Moreover, the between-study SD $\tau$ is essentially unchanged between the consistency model (0.21, 95\% Crl: 0.15 - 0.27) and the UME model (0.22, 95\% Crl: 0.16 - 0.29). Altogether, there is no evidence of inconsistency at the global level. 
 
 It is also important to compare the residual deviance contributions under each model to see whether there are any points that fit better under the UME model, as this can also indicate inconsistency.
 Using the `plot()` function produces a "dev-dev" plot of the residual deviance contributions under either model.
@@ -123,6 +123,7 @@ plotume
 The dev-dev plot (\Cref{fig:devdev_ume_noclass}) comparing residual deviance contributions for the UME model and no-class model shows that most data points lie close to the line of equality. This suggests a comparable model fit for most data points. However, two studies—ALDEN2011 and EMMELKAMP2006—stand out as outliers. The ALDEN2011 study has a high residual deviance indicating a poor fit, but exhibits this trait in both the NMA and UME models, suggesting that its deviation is more indicative of heterogeneity rather than inconsistency. The EMMELKAMP2006 study has a lower residual deviance in the UME model of 4.25, compared to 6.76 in the No Class model. This suggests that there may be some inconsistency in evidence loops including the EMMELKAMP2006 study.
 
 We can explore the consistency of specific evidence loops using node-splitting by setting `consistency = "nodesplit"`. However, given the size of the network, running node-splitting on all comparisons would be computationally intensive. To focus the analysis, we first define the specific treatment comparisons of interest by creating two data frames that specify the desired treatment comparisons. These are then passed to the `nodesplit` argument within the `nma()` function. 
+
 ```{r echo=TRUE, results='hide'}
 EMMELKAMP2006 <- data.frame(
   Treatment_1 = c("CBT individual", "Waitlist", "Waitlist"),
@@ -160,7 +161,8 @@ For the ALDEN2011 study, it reports a -1.88, with standard error 0.28, treatment
 
 ## STEP 3: Class effects assessment
 
-In this step, we assess whether a class assumption is suitable for the data. 
+In this step, we assess whether a class assumption is suitable for the data by comparing our NMA RE model with an exchangeable class model with corresponding RE. In this model, we specify `class_effects = "exchangeable"`, meaning that treatments within each class are considered to be from a common distribution. The `prior_class_sd` sets a prior on the variability between treatment effects within each class. We use an informative prior of `normal(0.33,0.1)` as used in Perren et. al. We’ve defined `class_sd` as a list of character vectors, each grouping certain classes together to share a common SD. `prior_class_mean` will be left at the default `normal(location = 0, scale = 10)`.
+
 ```{r echo=TRUE, results='hide'}
 sa_fit_EXclass_RE <- nma(sa_net,
                          trt_effects = "random",
@@ -183,7 +185,7 @@ summary(sa_fit_RE, pars = "tau")
 summary(sa_fit_EXclass_RE, pars = "tau")
 ```
 
-Table 5 shows that the exchangeable class model has an improved model fit compared to the no class model selected at Step 1, with a lower DIC (250.0 vs. 257.0). This reduction in DIC by 7 points is due to the exchangeable class model giving a similar absolute fit to the no class model (residual deviance 162.7 compared with 162.1), but reduced model complexity (effective number of parameters, pD =94.3 in the no class model compared with 87.9 in the exchangeable class model). Furthermore, the between study SD is similar in the exchangeable class and no class models; we would have been concerned if this increased with the inclusion of class effects.
+The exchangeable class model has an improved model fit compared to the no class model, with a lower DIC (250.0 vs. 257.0). This reduction in DIC is due to the reduced model complexity (pD=94.3 vs 87.9). Furthermore, the between study SD is similar in the exchangeable class and no class models; we would have been concerned if this increased with the inclusion of class effects.
 
 ```{r}
 plotEX <- plot(sa_dic_EXclass_RE, sa_dic_RE, show_uncertainty = FALSE) +
@@ -193,11 +195,11 @@ plotEX <- plot(sa_dic_EXclass_RE, sa_dic_RE, show_uncertainty = FALSE) +
 plotEX
 ```
 
-Examining the residual deviance contributions from both models on a dev-dev plot (fig. 9), we see that the data points all lie on the line of equality, indicating no concerns with the fit of specific data points in the exchangeable class model. In summary, the exchangeable class model provides a comparable absolute fit to the no class model and does not inflate the between study heterogeneity whilst reducing complexity and DIC. These findings suggest that a class model is appropriate for analysing the social anxiety data.
+Examining the residual deviance contributions from both models on a dev-dev plot, we see that the data points all lie near the line of equality, indicating no concerns with the fit of specific data points in the exchangeable class model. In summary, the exchangeable class model provides a comparable absolute fit to the no class model and does not inflate the between study heterogeneity whilst reducing complexity and DIC. These findings suggest that a class model is appropriate for analysing the social anxiety data.
 
 ## STEP 4: Class Model Assessment
 
-After we have determined that a class effects model is appropriate, it is time to finalise which combination of common or exchangeable class effects and fixed or random treatment effects provides the most suitable model fit while considering between-study heterogeneity and within-class SD. As we are using a random effects model, we now fit 2 other models to our data; Exchangeable class FE and Common class RE. This gives us a total of 3 models to compare. 
+After we have determined that a class effects model is appropriate, it is time to finalise which combination of common or exchangeable class effects and fixed or random treatment effects provides the most suitable model fit. As we are using a random effects model, we now fit 2 other models to our data; Exchangeable class FE and Common class RE. This gives us a total of 3 models to compare. 
 
 ```{r echo=TRUE, results='hide'}
 sa_fit_COclass_RE <- nma(sa_net,
@@ -225,7 +227,7 @@ sa_fit_EXclass_FE <- nma(sa_net,
 (sa_dic_EXclass_RE <- dic(sa_fit_EXclass_RE))
 ```
 
-From \Cref{table:DIC_COvsEXvsEX} we can see that model fit is better with the common and exchangeable class models with random effects (posterior mean residual deviance of 158.6 and 161.1 respectively) compared with the exchangeable class model with fixed effects (284.4). The between-study heterogeneity is higher for the common class model (0.25, 95\% Crl: 0.20 to 0.31), compared to the exchangeable class model (0.20, 95\% Crl: 0.14 to 0.26). This difference in between-study heterogeneity underscores the trade-offs inherent in model selection: while the common class model offers a marginally better fit according to residual deviance, it does so at the expense of increased heterogeneity. When absolute fit is penalised for complexity, the common and exchangeable class models with random effects give similar fit (DIC of 252.1 and 250.0 respectively), and are substantially preferable to the exchangeable class model with fixed effect (318.3).
+We can see that model fit is better with the common and exchangeable class models with random effects (posterior mean residual deviance of 158.6 and 161.1 respectively) compared with the exchangeable class model with fixed effects (284.4). The between-study heterogeneity is higher for the common class model (0.25, 95\% Crl: 0.20 to 0.31), compared to the exchangeable class model (0.20, 95\% Crl: 0.14 to 0.26). This difference in between-study heterogeneity underscores the trade-offs inherent in model selection: while the common class model offers a marginally better fit according to residual deviance, it does so at the expense of increased heterogeneity. When absolute fit is penalised for complexity, the common and exchangeable class models with random effects give similar fit (DIC of 252.1 and 250.0 respectively), and are substantially preferable to the exchangeable class model with fixed effect (318.3).
 
 ```{r}
 plotEXCO <- plot(sa_dic_COclass_RE, sa_dic_EXclass_RE, show_uncertainty = FALSE) +
@@ -236,9 +238,9 @@ plotEXCO <- plot(sa_dic_COclass_RE, sa_dic_EXclass_RE, show_uncertainty = FALSE)
 plotEXCO
 ```
 
-The dev-dev plot (\Cref{fig:dev_dev_EXvsCO}) comparing the exchangeable class and common class models with random effects reveals a cluster of data points in the lower left corner of the plot that are fit well by both models with low residual deviances. As we move away from this cluster, points disperse further from the line of equality, albeit in a somewhat even distribution above and below it. This suggests that while some data points are better fit by the common class model, others are better fit by the exchangeable class model.
+The dev-dev plot comparing the exchangeable class and common class models with random effects reveals a cluster of data points in the lower left corner of the plot that are fit well by both models with low residual deviances. As we move away from this cluster, points disperse further from the line of equality, albeit in a somewhat even distribution above and below it. This suggests that while some data points are better fit by the common class model, others are better fit by the exchangeable class model.
 
-Given that the DIC scores are very similar between the RE common class and RE exchangeable class models, with the common class model giving slightly better absolute fit, and the exchangeable class having less model complexity with lower heterogeneity, either model could be used here, and the final selection should largely be driven by clinical interpretability and the decision context. If decision-makers are interested in the effects of individual treatments or are concerned with the variability of treatment effects within classes, then the exchangeable class model is more suitable. If decision-makers wish to make recommendations for treatment classes and are not concerned with potential variability of treatment effects within classes, then the common class model may be preferred, as class-level effects and rankings are estimated with more precision, as shown in \Cref{fig:forest_EXvsCO} and \ref{fig:RankDen_EXvsCO}.
+Given that the DIC scores are very similar between the RE common class and RE exchangeable class models the final selection should largely be driven by clinical interpretability and the decision context. If decision-makers are interested in the effects of individual treatments or are concerned with the variability of treatment effects within classes, then the exchangeable class model is more suitable. If decision-makers wish to make recommendations for treatment classes and are not concerned with potential variability of treatment effects within classes, then the common class model may be preferred, as class-level effects and rankings are estimated with more precision.
 
 ## Results
 ### Relative treatment and class effects
