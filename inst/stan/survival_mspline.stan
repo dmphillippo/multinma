@@ -420,6 +420,14 @@ transformed parameters {
               X_agd_arm * beta_tilde + offset_agd_arm :
               X_agd_arm * beta_tilde;
 
+    if (class_effects) {
+      for (i in 1:ni_agd_arm) {
+        if (which_CE[agd_arm_trt[i]]) {
+          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_CE[agd_arm_trt[i]]];
+        }
+      }
+    }
+
 
     if (nint_max > 1) { // -- If integration points are used --
 

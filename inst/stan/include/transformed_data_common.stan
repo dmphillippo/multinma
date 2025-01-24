@@ -69,3 +69,7 @@ if (ns_agd_contrast) {
   // for i = ni_agd_contrast
   nc_agd_contrast[s] = c;
 }
+
+// Number of class effects
+int<lower=0> n_class = class_effects ? max(which_CE) : 0;
+
