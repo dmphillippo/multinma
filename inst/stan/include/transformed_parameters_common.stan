@@ -75,13 +75,19 @@ if (RE) {
 }
 
 // Class effects contributions
-vector[n_class] f_class = class_effects ? class_sd .* z_class : rep_vector(0, n_class);
+print("class_sd size: ", size(class_sd));
+print("z_class size: ", size(z_class));
+print("which_CE_sd size: ", size(which_CE_sd));
+print("which_gt0a(which_CE_sd) size: ", size(which_gt0a(which_CE_sd)));
+
+vector[class_effects ? max(which_CE) : 0] f_class;
+if (class_effects) f_class = class_sd[which_CE_sd[which_gt0a(which_CE_sd)]] .* z_class;
 
  // Add class effects contribution
   if (class_effects) {
     for (i in 1:ni_ipd) {
-      if (which_CE[ipd_trt[ipd_arm[i]]]) {
-        eta_ipd[i] += f_class[which_CE[ipd_trt[ipd_arm[i]]]];
+      if (ipd_trt[ipd_arm[i]] > 1 && which_CE[ipd_trt[ipd_arm[i]] - 1]) {
+        eta_ipd[i] += f_class[which_CE[ipd_trt[ipd_arm[i] - 1]]];
       }
     }
   }
@@ -93,14 +99,17 @@ vector[n_class] f_class = class_effects ? class_sd .* z_class : rep_vector(0, n_
         X_agd_contrast * beta_tilde + offset_agd_contrast :
         X_agd_contrast * beta_tilde;
 
-// Add class effects contribution
-          if (class_effects) {
-            for (i in 1:ni_agd_arm){
-              if (which_CE[narm_ipd + narm_agd_arm + i]) {
-                eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] += f_class[which_CE[narm_ipd + narm_agd_arm + i]];
-              }
-            }
+      // Add class effects contribution
+      if (class_effects) {
+        for (i in 1:ni_agd_arm){
+          if (agd_contrast_trt[i] > 1 && which_CE[agd_contrast_trt[i] - 1]) {
+            eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_CE[agd_contrast_trt[i] - 1]];
           }
+          if (agd_contrast_trt_b[i] > 1 && which_CE[agd_contrast_trt_b[i] - 1]) {
+            eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] -= f_class[which_CE[agd_contrast_trt_b[i] - 1]];
+          }
+        }
+      }
 
       if (RE) {
         for (i in 1:ni_agd_contrast) {
@@ -145,19 +154,21 @@ vector[n_class] f_class = class_effects ? class_sd .* z_class : rep_vector(0, n_
           X_agd_contrast * beta_tilde + offset_agd_contrast :
           X_agd_contrast * beta_tilde;
 
-      if (class_effects) {
-        for (i in 1:ni_agd_contrast) {
-            if (which_CE[agd_contrast_trt[i]]) {
-              eta_agd_contrast_bar[i] += f_class[which_CE[agd_contrast_trt[i]]];
-            }
-            if (which_CE[agd_contrast_trt_b[i]]) {
-              eta_agd_contrast_bar[i] -= f_class[which_CE[agd_contrast_trt_b[i]]];
+    }
+
+    if (class_effects) {
+      for (i in 1:ni_agd_contrast) {
+        if (agd_contrast_trt[i] > 1 && which_CE[agd_contrast_trt[i] - 1]) {
+          eta_agd_contrast_bar[i] += f_class[which_CE[agd_contrast_trt[i] - 1]];
+        }
+        if (agd_contrast_trt_b[i] > 1 && which_CE[agd_contrast_trt_b[i] - 1]) {
+          eta_agd_contrast_bar[i] -= f_class[which_CE[agd_contrast_trt_b[i] - 1]];
         }
       }
-      }
     }
+
   }
-  }
+}
 
 
 
