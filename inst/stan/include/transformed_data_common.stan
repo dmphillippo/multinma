@@ -70,6 +70,17 @@ if (ns_agd_contrast) {
   nc_agd_contrast[s] = c;
 }
 
-// Number of class effects
+// Number of class effects and which_class_sd, mapping class sd to classes
 int<lower=0> n_class = class_effects ? max(which_CE) : 0;
+int<lower=0> which_class_sd[class_effects ? n_class : 0]; // Vector to map class SDs to classes
 
+ if (class_effects) {
+    for (c in 1:n_class) {
+      for (t in 1:size(which_CE)) {
+        if (which_CE[t] == c) {
+          which_class_sd[c] = which_CE_sd[t];
+          break;
+        }
+      }
+    }
+  }
