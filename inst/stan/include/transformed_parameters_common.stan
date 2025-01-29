@@ -81,30 +81,22 @@ print("which_CE", which_CE);
 print("which_CE_sd: ", which_CE_sd);
 print("which_class_sd", which_class_sd);
 
-vector[class_effects ? max(which_CE) : 0] expanded_class_sd;
 vector[class_effects ? max(which_CE) : 0] f_class;
 
 if (class_effects) {
-    expanded_class_sd = class_sd[which_class_sd];
+    f_class = class_sd[which_class_sd] .* z_class;
 }
-
-// Multiply with z_class
-if (class_effects) f_class = expanded_class_sd .* z_class;
 
  // Add class effects contribution
   if (class_effects) {
     for (i in 1:ni_ipd) {
-      print("ipd_arm[i]: ", ipd_arm[i]);
-    print("ipd_trt[ipd_arm[i]]: ", ipd_trt[ipd_arm[i]]);
-    print("which_CE[ipd_trt[ipd_arm[i]] - 1]: ", which_CE[ipd_trt[ipd_arm[i]] - 1]);
-    print("f_class[which_CE[ipd_trt[ipd_arm[i]] - 1]]: ", f_class[which_CE[ipd_trt[ipd_arm[i]] - 1]]);
       if (ipd_trt[ipd_arm[i]] > 1 && which_CE[ipd_trt[ipd_arm[i]] - 1]) {
         eta_ipd[i] += f_class[which_CE[ipd_trt[ipd_arm[i] - 1]]];
       }
     }
   }
 
-print("expanded_class_sd: ", expanded_class_sd);
+print("class_sd[which_class_sd]: ", class_sd[which_class_sd]);
 print("f_class: ", f_class);
 
 // -- AgD model (contrast-based) --
