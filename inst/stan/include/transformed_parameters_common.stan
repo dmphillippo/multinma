@@ -74,30 +74,32 @@ if (RE) {
 }
 }
 
-// Class effects contributions
-print("class_sd: ", class_sd);
-print("z_class: ", z_class);
-print("which_CE", which_CE);
-print("which_CE_sd: ", which_CE_sd);
-print("which_class_sd", which_class_sd);
+vector[class_effects ? max(which_class) : 0] f_class; // product of class sds and ~N(0,1) to be added onto linear predictor
+vector[class_effects ? max(which_class) : 0] filtered_class_sd; // class sds assigned to treatments (non zero values)
 
-vector[class_effects ? max(which_CE) : 0] f_class;
+  if (class_effects) {
+    int index = 1;  // Track position for valid values
+
+    for (t in 1:(nt - 1)) {
+      if (which_CE_sd[t] > 0) {  // Only keep nonzero values
+        filtered_class_sd[index] = class_sd[which_CE_sd[t]];
+        index += 1;  // Move to the next position
+      }
+    }
+  }
 
 if (class_effects) {
-    f_class = class_sd[which_class_sd] .* z_class;
-}
+    f_class = class_mean[which_CE[which_gt0a(which_CE)]] - d[which_gt0a(which_CE)] + filtered_class_sd .* z_class;
+    d[which_gt0a(which_CE)] = class_mean[which_CE[which_gt0a(which_CE)]] + filtered_class_sd .* z_class;
 
  // Add class effects contribution
   if (class_effects) {
     for (i in 1:ni_ipd) {
       if (ipd_trt[ipd_arm[i]] > 1 && which_CE[ipd_trt[ipd_arm[i]] - 1]) {
-        eta_ipd[i] += f_class[which_CE[ipd_trt[ipd_arm[i] - 1]]];
+        eta_ipd[i] += f_class[which_class[ipd_trt[ipd_arm[i] - 1]]];
       }
     }
   }
-
-print("class_sd[which_class_sd]: ", class_sd[which_class_sd]);
-print("f_class: ", f_class);
 
 // -- AgD model (contrast-based) --
   if (ni_agd_contrast) {
@@ -110,10 +112,10 @@ print("f_class: ", f_class);
       if (class_effects) {
         for (i in 1:ni_agd_arm){
           if (agd_contrast_trt[i] > 1 && which_CE[agd_contrast_trt[i] - 1]) {
-            eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_CE[agd_contrast_trt[i] - 1]];
+            eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_class[agd_contrast_trt[i] - 1]];
           }
           if (agd_contrast_trt_b[i] > 1 && which_CE[agd_contrast_trt_b[i] - 1]) {
-            eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] -= f_class[which_CE[agd_contrast_trt_b[i] - 1]];
+            eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] -= f_class[which_class[agd_contrast_trt_b[i] - 1]];
           }
         }
       }
@@ -166,10 +168,10 @@ print("f_class: ", f_class);
     if (class_effects) {
       for (i in 1:ni_agd_contrast) {
         if (agd_contrast_trt[i] > 1 && which_CE[agd_contrast_trt[i] - 1]) {
-          eta_agd_contrast_bar[i] += f_class[which_CE[agd_contrast_trt[i] - 1]];
+          eta_agd_contrast_bar[i] += f_class[which_class[agd_contrast_trt[i] - 1]];
         }
         if (agd_contrast_trt_b[i] > 1 && which_CE[agd_contrast_trt_b[i] - 1]) {
-          eta_agd_contrast_bar[i] -= f_class[which_CE[agd_contrast_trt_b[i] - 1]];
+          eta_agd_contrast_bar[i] -= f_class[which_class[agd_contrast_trt_b[i] - 1]];
         }
       }
     }

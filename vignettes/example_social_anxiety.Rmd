@@ -106,9 +106,8 @@ summary(sa_UME_RE, pars = "tau")
 summary(sa_fit_RE, pars = "tau")
 ```
 
-The residual deviance is not meaningfully different between the two models, suggesting a similar level of model fit between the two. However, the DIC is lower in the NMA model (256.1) compared to the UME model (271.5), because the NMA model is more parsimonious (smaller $p_D$).  Moreover, the between-study SD $\tau$ is essentially unchanged between the consistency model (0.21, 95\% Crl: 0.15 - 0.27) and the UME model (0.22, 95\% Crl: 0.16 - 0.29). Altogether, there is no evidence of inconsistency at the global level. 
+The residual deviance is not meaningfully different between the two models, however, the DIC is lower in the NMA model (256.1) compared to the UME model (271.5). There is no evidence of inconsistency at the global level. 
 
-It is also important to compare the residual deviance contributions under each model to see whether there are any points that fit better under the UME model, as this can also indicate inconsistency.
 Using the `plot()` function produces a "dev-dev" plot of the residual deviance contributions under either model.
 
 ```{r}
@@ -120,7 +119,7 @@ plotume <- plot(sa_dic_RE, sa_dic_ume_RE, show_uncertainty = FALSE) +
 plotume
 ```
 
-The dev-dev plot (\Cref{fig:devdev_ume_noclass}) comparing residual deviance contributions for the UME model and no-class model shows that most data points lie close to the line of equality. This suggests a comparable model fit for most data points. However, two studies—ALDEN2011 and EMMELKAMP2006—stand out as outliers. The ALDEN2011 study has a high residual deviance indicating a poor fit, but exhibits this trait in both the NMA and UME models, suggesting that its deviation is more indicative of heterogeneity rather than inconsistency. The EMMELKAMP2006 study has a lower residual deviance in the UME model of 4.25, compared to 6.76 in the No Class model. This suggests that there may be some inconsistency in evidence loops including the EMMELKAMP2006 study.
+The dev-dev plot (\Cref{fig:devdev_ume_noclass}) comparing residual deviance contributions for the UME model and no-class model shows that most data points lie close to the line of equality. However, two studies—ALDEN2011 and EMMELKAMP2006—stand out as outliers. 
 
 We can explore the consistency of specific evidence loops using node-splitting by setting `consistency = "nodesplit"`. However, given the size of the network, running node-splitting on all comparisons would be computationally intensive. To focus the analysis, we first define the specific treatment comparisons of interest by creating two data frames that specify the desired treatment comparisons. These are then passed to the `nodesplit` argument within the `nma()` function. 
 
@@ -157,8 +156,6 @@ summary(sa_fit_RE_nodesplit_ALDEN)
 summary(sa_fit_RE_nodesplit_EMMELKAMP)
 ```
 
-For the ALDEN2011 study, it reports a -1.88, with standard error 0.28, treatment effect for 'CBT group' against 'Waitlist'. This effect is substantially larger than those observed in other CBT group trials and deviates from the direct and indirect estimates of -0.89 (CrI -1.16 to -0.63) and -0.73 (CrI -1.00 to -0.46) respectively, however does not suggest inconsistency and more of study heterogeneity. A review of study characteristics should be completed for ALDEN2011. EMMELKAMP2006 reports a relative treatment effect of 0.159 for psychodynamic psychotherapy and -0.06 for CBT individual, which contrasts with both the direct and indirect estimates in this evidence loop: Psychodynamic vs Waitlist direct and indirect evidence reports treatment effects of -0.60 (CrI -0.95 to -0.22) and -0.69 (CrI -1.51 to 0.18) respectively. CBT individual vs Waitlist direct and indirect evidence reports treatment effects of -0.83 (CrI -1.31 to -0.36) and -1.46 (CrI -1.91 to -0.98) respectively. This discrepancy suggests potential inconsistency, as EMMELKAMP2006's findings indicate a negative effect on patient recovery where all other estimates suggest positive effects on patient recovery. We would advise that these studies (including studies in the same evidence loops as EMMELKAMP2006) be double checked, re-visited, and a decision made as to their inclusion. If there is no reason identified to exclude them, then since there was no evidence of inconsistency in the global checks, it may be appropriate to proceed to Step 3 of the model selection process. However, results should be interpreted with caution regarding the potential for these outliers to influence the outcome of the analysis, and sensitivity analyses excluding these studies would be advised.
-
 ## STEP 3: Class effects assessment
 
 In this step, we assess whether a class assumption is suitable for the data by comparing our NMA RE model with an exchangeable class model with corresponding RE. In this model, we specify `class_effects = "exchangeable"`, meaning that treatments within each class are considered to be from a common distribution. The `prior_class_sd` sets a prior on the variability between treatment effects within each class. We use an informative prior of `normal(0.33,0.1)` as used in Perren et. al. We’ve defined `class_sd` as a list of character vectors, each grouping certain classes together to share a common SD. `prior_class_mean` will be left at the default `normal(location = 0, scale = 10)`.
@@ -185,8 +182,6 @@ summary(sa_fit_RE, pars = "tau")
 summary(sa_fit_EXclass_RE, pars = "tau")
 ```
 
-The exchangeable class model has an improved model fit compared to the no class model, with a lower DIC (250.0 vs. 257.0). This reduction in DIC is due to the reduced model complexity (pD=94.3 vs 87.9). Furthermore, the between study SD is similar in the exchangeable class and no class models; we would have been concerned if this increased with the inclusion of class effects.
-
 ```{r}
 plotEX <- plot(sa_dic_EXclass_RE, sa_dic_RE, show_uncertainty = FALSE) +
   xlab("Residual deviance - Exchangeable Class model") +
@@ -195,7 +190,7 @@ plotEX <- plot(sa_dic_EXclass_RE, sa_dic_RE, show_uncertainty = FALSE) +
 plotEX
 ```
 
-Examining the residual deviance contributions from both models on a dev-dev plot, we see that the data points all lie near the line of equality, indicating no concerns with the fit of specific data points in the exchangeable class model. In summary, the exchangeable class model provides a comparable absolute fit to the no class model and does not inflate the between study heterogeneity whilst reducing complexity and DIC. These findings suggest that a class model is appropriate for analysing the social anxiety data.
+These findings suggest that a class model is appropriate for analysing the social anxiety data.
 
 ## STEP 4: Class Model Assessment
 
@@ -227,8 +222,6 @@ sa_fit_EXclass_FE <- nma(sa_net,
 (sa_dic_EXclass_RE <- dic(sa_fit_EXclass_RE))
 ```
 
-We can see that model fit is better with the common and exchangeable class models with random effects (posterior mean residual deviance of 158.6 and 161.1 respectively) compared with the exchangeable class model with fixed effects (284.4). The between-study heterogeneity is higher for the common class model (0.25, 95\% Crl: 0.20 to 0.31), compared to the exchangeable class model (0.20, 95\% Crl: 0.14 to 0.26). This difference in between-study heterogeneity underscores the trade-offs inherent in model selection: while the common class model offers a marginally better fit according to residual deviance, it does so at the expense of increased heterogeneity. When absolute fit is penalised for complexity, the common and exchangeable class models with random effects give similar fit (DIC of 252.1 and 250.0 respectively), and are substantially preferable to the exchangeable class model with fixed effect (318.3).
-
 ```{r}
 plotEXCO <- plot(sa_dic_COclass_RE, sa_dic_EXclass_RE, show_uncertainty = FALSE) +
   xlab("Residual deviance - Common Class model") +
@@ -237,8 +230,6 @@ plotEXCO <- plot(sa_dic_COclass_RE, sa_dic_EXclass_RE, show_uncertainty = FALSE)
 
 plotEXCO
 ```
-
-The dev-dev plot comparing the exchangeable class and common class models with random effects reveals a cluster of data points in the lower left corner of the plot that are fit well by both models with low residual deviances. As we move away from this cluster, points disperse further from the line of equality, albeit in a somewhat even distribution above and below it. This suggests that while some data points are better fit by the common class model, others are better fit by the exchangeable class model.
 
 Given that the DIC scores are very similar between the RE common class and RE exchangeable class models the final selection should largely be driven by clinical interpretability and the decision context. If decision-makers are interested in the effects of individual treatments or are concerned with the variability of treatment effects within classes, then the exchangeable class model is more suitable. If decision-makers wish to make recommendations for treatment classes and are not concerned with potential variability of treatment effects within classes, then the common class model may be preferred, as class-level effects and rankings are estimated with more precision.
 
@@ -331,31 +322,4 @@ RankDensity_EX<-ggplot(rank_probs_long_EX, aes(x = Rank, y = Probability)) +
 
 RankDensity_EX
 
-```
-
-
-
-
-1. Exchangeable class effects with class sd sharing for the following groups; (`Exercise promotion`, `Self-help no support`), (`SSRI/SNRI`, `NSSA`), (`Psychodynamic psychotherapy`, `Other psychological therapies`)
-2. Common class effects 
-
-## Exchangeable class model
-We fit a random effects model using the `nma()` function with `trt_effects = "random"`.
-We use $\mathrm{N}(0, 100^2)$ prior distributions for the treatment effects $d_k$ and study-specific intercepts $\mu_j$, and a $\textrm{half-N}(5^2)$ prior for the heterogeneity standard deviation $\tau$.
-We set `class_effects` as `exchangeable` and use $\mathrm{N}(0.33,0.1)$ for prior_class_sd.
-
-This follows the approach used by [@mayo2014psychological], except that we replace their inverse-Gamma prior with a truncated normal prior for compatibility with the \texttt{multinma} package.
-
-```{r echo=TRUE, results='hide'}
-sa_fit_EXclass_RE <- nma(sa_net,
-                         trt_effects = "random",
-                         prior_trt = normal(0, 100),
-                         prior_het = half_normal(5),
-                         class_effects = "exchangeable",
-                         prior_class_sd = normal(0.33,0.1),
-                         class_sd = list(`Exercise and SH no support` = c("Exercise promotion", "Self-help no support"),
-                                         `SSRIs and NSSA` = c("SSRI/SNRI", "NSSA"),
-                                         `Psychodynamic & Other psychological therapies` = c("Psychodynamic psychotherapy", "Other psychological therapies")
-                         )
-)
 ```

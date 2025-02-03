@@ -72,11 +72,12 @@ if (ns_agd_contrast) {
 
 // Number of class effects and which_class_sd, mapping class sd to classes
 int<lower=0> n_class = class_effects ? max(which_CE) : 0;
+int<lower=0> which_class[class_effects ? nt-1 : 0]; // Vector to mapping treatments to class effects
 int<lower=0> which_class_sd[class_effects ? n_class : 0]; // Vector to map class SDs to classes
 
  if (class_effects) {
     for (c in 1:n_class) {
-      for (t in 1:size(which_CE)) {
+      for (t in 1:nt - 1) {
         if (which_CE[t] == c) {
           which_class_sd[c] = which_CE_sd[t];
           break;
@@ -84,3 +85,16 @@ int<lower=0> which_class_sd[class_effects ? n_class : 0]; // Vector to map class
       }
     }
   }
+
+if (class_effects) {
+  int count = 1;  // Counter for nonzero elements in f_class
+
+  for (t in 1:(nt - 1)) {
+    if (which_CE_sd[t] > 0) {
+      which_class[t] = count;
+      count += 1;
+    } else {
+      which_class[t] = 0;  // No class effect for this treatment
+    }
+  }
+}
