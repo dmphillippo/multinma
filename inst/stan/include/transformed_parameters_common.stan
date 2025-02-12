@@ -54,45 +54,45 @@ if (nodesplit) {
 // later on. This is slightly more inefficient than defining the models
 // locally in the model block.
 if (ni_ipd) {
-if (RE) {
-  {
-    vector[ni_ipd] eta_ipd_noRE = has_offset ?
+  if (RE) {
+    {
+      vector[ni_ipd] eta_ipd_noRE = has_offset ?
       X_ipd * beta_tilde + offset_ipd :
       X_ipd * beta_tilde;
 
-    for (i in 1:ni_ipd) {
-      if (which_RE[ipd_arm[i]])
+      for (i in 1:ni_ipd) {
+        if (which_RE[ipd_arm[i]])
         eta_ipd[i] = eta_ipd_noRE[i] + f_delta[which_RE[ipd_arm[i]]];
-      else
+        else
         eta_ipd[i] = eta_ipd_noRE[i];
+      }
     }
-  }
-} else {
-  eta_ipd = has_offset ?
+  } else {
+    eta_ipd = has_offset ?
     X_ipd * beta_tilde + offset_ipd :
     X_ipd * beta_tilde;
-}
+  }
 }
 
 vector[class_effects ? max(which_class) : 0] f_class; // product of class sds and ~N(0,1) to be added onto linear predictor
 vector[class_effects ? max(which_class) : 0] filtered_class_sd; // class sds assigned to treatments (non zero values)
 
-  if (class_effects) {
-    int index = 1;  // Track position for valid values
+if (class_effects) {
+  int index = 1;  // Track position for valid values
 
-    for (t in 1:(nt - 1)) {
-      if (which_CE_sd[t] > 0) {  // Only keep nonzero values
-        filtered_class_sd[index] = class_sd[which_CE_sd[t]];
-        index += 1;  // Move to the next position
-      }
+  for (t in 1:(nt - 1)) {
+    if (which_CE_sd[t] > 0) {  // Only keep nonzero values
+    filtered_class_sd[index] = class_sd[which_CE_sd[t]];
+    index += 1;  // Move to the next position
     }
   }
+}
 
 if (class_effects) {
-    f_class = class_mean[which_CE[which_gt0a(which_CE)]] - d[which_gt0a(which_CE)] + filtered_class_sd .* z_class;
-    d[which_gt0a(which_CE)] = class_mean[which_CE[which_gt0a(which_CE)]] + filtered_class_sd .* z_class;
+  f_class = class_mean[which_CE[which_gt0a(which_CE)]] - d[which_gt0a(which_CE)] + filtered_class_sd .* z_class;
+  d[which_gt0a(which_CE)] = class_mean[which_CE[which_gt0a(which_CE)]] + filtered_class_sd .* z_class;
 
- // Add class effects contribution
+  // Add class effects contribution
   if (class_effects) {
     for (i in 1:ni_ipd) {
       if (ipd_trt[ipd_arm[i]] > 1 && which_CE[ipd_trt[ipd_arm[i]] - 1]) {
@@ -102,66 +102,66 @@ if (class_effects) {
   }
 
 // -- AgD model (contrast-based) --
-  if (ni_agd_contrast) {
-    if (nint_max > 1) {
-      vector[nint_max * ni_agd_contrast] eta_agd_contrast_noRE = has_offset ?
-        X_agd_contrast * beta_tilde + offset_agd_contrast :
-        X_agd_contrast * beta_tilde;
+if (ni_agd_contrast) {
+  if (nint_max > 1) {
+    vector[nint_max * ni_agd_contrast] eta_agd_contrast_noRE = has_offset ?
+    X_agd_contrast * beta_tilde + offset_agd_contrast :
+    X_agd_contrast * beta_tilde;
 
-      // Add class effects contribution
-      if (class_effects) {
-        for (i in 1:ni_agd_arm){
-          if (agd_contrast_trt[i] > 1 && which_CE[agd_contrast_trt[i] - 1]) {
-            eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_class[agd_contrast_trt[i] - 1]];
-          }
-          if (agd_contrast_trt_b[i] > 1 && which_CE[agd_contrast_trt_b[i] - 1]) {
-            eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] -= f_class[which_class[agd_contrast_trt_b[i] - 1]];
-          }
+    // Add class effects contribution
+    if (class_effects) {
+      for (i in 1:ni_agd_arm){
+        if (agd_contrast_trt[i] > 1 && which_CE[agd_contrast_trt[i] - 1]) {
+          eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_class[agd_contrast_trt[i] - 1]];
+        }
+        if (agd_contrast_trt_b[i] > 1 && which_CE[agd_contrast_trt_b[i] - 1]) {
+          eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] -= f_class[which_class[agd_contrast_trt_b[i] - 1]];
         }
       }
+    }
 
-      if (RE) {
+    if (RE) {
+      for (i in 1:ni_agd_contrast) {
+        // Initialize eta_agd_contrast_ii
+        eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
+
+        // Add random effects contribution
+        if (which_RE[narm_ipd + narm_agd_arm + i]) {
+          eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] += f_delta[which_RE[narm_ipd + narm_agd_arm + i]];
+        }
+
+        // Compute mean of the contrasts for output
+        eta_agd_contrast_bar[i] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)]);
+      }
+    } else {
+      if (nint == nint_max) eta_agd_contrast_ii = eta_agd_contrast_noRE;
+      else {
         for (i in 1:ni_agd_contrast) {
-          // Initialize eta_agd_contrast_ii
           eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
-
-          // Add random effects contribution
-          if (which_RE[narm_ipd + narm_agd_arm + i]) {
-            eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] += f_delta[which_RE[narm_ipd + narm_agd_arm + i]];
-          }
 
           // Compute mean of the contrasts for output
           eta_agd_contrast_bar[i] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)]);
         }
-      } else {
-        if (nint == nint_max) eta_agd_contrast_ii = eta_agd_contrast_noRE;
-        else {
-          for (i in 1:ni_agd_contrast) {
-            eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
+      }
+    }
+  } else {
+    if (RE) {
+      vector[nint * ni_agd_contrast] eta_agd_contrast_noRE = has_offset ?
+      X_agd_contrast * beta_tilde + offset_agd_contrast :
+      X_agd_contrast * beta_tilde;
 
-            // Compute mean of the contrasts for output
-            eta_agd_contrast_bar[i] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)]);
-          }
+      for (i in 1:ni_agd_contrast) {
+        eta_agd_contrast_bar[i] = eta_agd_contrast_noRE[i];
+
+        // Add random effects contribution
+        if (which_RE[narm_ipd + narm_agd_arm + i]) {
+          eta_agd_contrast_bar[i] += f_delta[which_RE[narm_ipd + narm_agd_arm + i]];
         }
       }
     } else {
-      if (RE) {
-        vector[nint * ni_agd_contrast] eta_agd_contrast_noRE = has_offset ?
-          X_agd_contrast * beta_tilde + offset_agd_contrast :
-          X_agd_contrast * beta_tilde;
-
-        for (i in 1:ni_agd_contrast) {
-          eta_agd_contrast_bar[i] = eta_agd_contrast_noRE[i];
-
-          // Add random effects contribution
-          if (which_RE[narm_ipd + narm_agd_arm + i]) {
-            eta_agd_contrast_bar[i] += f_delta[which_RE[narm_ipd + narm_agd_arm + i]];
-          }
-        }
-      } else {
-        eta_agd_contrast_bar = has_offset ?
-          X_agd_contrast * beta_tilde + offset_agd_contrast :
-          X_agd_contrast * beta_tilde;
+      eta_agd_contrast_bar = has_offset ?
+      X_agd_contrast * beta_tilde + offset_agd_contrast :
+      X_agd_contrast * beta_tilde;
 
     }
 
@@ -175,9 +175,6 @@ if (class_effects) {
         }
       }
     }
-
   }
 }
-
-
-
+}
