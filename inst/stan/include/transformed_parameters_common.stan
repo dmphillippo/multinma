@@ -122,26 +122,23 @@ if (ni_agd_contrast) {
 
     if (RE) {
       for (i in 1:ni_agd_contrast) {
-        // Initialize eta_agd_contrast_ii
-        eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
+        if (which_RE[narm_ipd + narm_agd_arm + i])
+        eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] =
+        eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] + f_delta[which_RE[narm_ipd + narm_agd_arm + i]];
+        else
+        eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] =
+        eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
 
-        // Add random effects contribution
-        if (which_RE[narm_ipd + narm_agd_arm + i]) {
-          eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] += f_delta[which_RE[narm_ipd + narm_agd_arm + i]];
-        }
-
-        // Compute mean of the contrasts for output
         eta_agd_contrast_bar[i] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)]);
       }
     } else {
       if (nint == nint_max) eta_agd_contrast_ii = eta_agd_contrast_noRE;
-      else {
-        for (i in 1:ni_agd_contrast) {
-          eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
+      else for (i in 1:ni_agd_contrast) {
+        eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
+      }
 
-          // Compute mean of the contrasts for output
-          eta_agd_contrast_bar[i] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)]);
-        }
+      for (i in 1:ni_agd_contrast) {
+        eta_agd_contrast_bar[i] = mean(eta_agd_contrast_ii[(1 + (i-1)*nint):(i*nint)]);
       }
     }
   } else {
@@ -151,12 +148,10 @@ if (ni_agd_contrast) {
       X_agd_contrast * beta_tilde;
 
       for (i in 1:ni_agd_contrast) {
+        if (which_RE[narm_ipd + narm_agd_arm + i])
+        eta_agd_contrast_bar[i] = eta_agd_contrast_noRE[i] + f_delta[which_RE[narm_ipd + narm_agd_arm + i]];
+        else
         eta_agd_contrast_bar[i] = eta_agd_contrast_noRE[i];
-
-        // Add random effects contribution
-        if (which_RE[narm_ipd + narm_agd_arm + i]) {
-          eta_agd_contrast_bar[i] += f_delta[which_RE[narm_ipd + narm_agd_arm + i]];
-        }
       }
     } else {
       eta_agd_contrast_bar = has_offset ?
@@ -178,3 +173,4 @@ if (ni_agd_contrast) {
   }
 }
 }
+print("eta_agd_contrast_bar:", eta_agd_contrast_bar);
