@@ -10,3 +10,17 @@ int count_nonzero(matrix m) {
   }
   return c;
 }
+
+// Which entries are greater than 0
+array[] int which_gt0a(array[] int x) {
+  int n = num_elements(x);
+  array[n] int w; // Over-allocate w and then truncate later
+  int c = 1;
+  for (i in 1:n) {
+    if (x[i] > 0) {
+      w[c] = i;
+      c += 1;
+    }
+  }
+  return w[1:(c-1)];
+}

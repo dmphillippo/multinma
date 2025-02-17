@@ -21,7 +21,7 @@ plot_prior_posterior(
 
 \item{prior}{Character vector selecting the prior and posterior
 distribution(s) to plot. May include \code{"intercept"}, \code{"trt"}, \code{"het"},
-\code{"reg"}, or \code{"aux"}, as appropriate.}
+\code{"reg"}, \code{"aux"}, \code{"class_mean"} or \code{"class_sd"} as appropriate.}
 
 \item{post_args}{List of arguments passed on to \link[ggplot2:geom_histogram]{ggplot2::geom_histogram} to
 control plot output for the posterior distribution}
