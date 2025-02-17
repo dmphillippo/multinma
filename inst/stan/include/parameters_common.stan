@@ -12,4 +12,3 @@ vector<lower=0>[class_effects ? max(which_CE_sd) : 0] class_sd; // Class standar
 
 // randomised part of our non-centred parameterisation
 vector[class_effects ? size(which_gt0a(which_CE)) : 0] z_class;
-
