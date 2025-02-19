@@ -182,10 +182,12 @@ generated quantities {
                           lmultiply(agd_arm_r[i], pprime[i]) +
                           (nprime[i] - agd_arm_r[i]) * log1m(pprime[i]);
     // Approximate residual deviance for AgD, letting nprime be fixed
-    resdev[ni_ipd + i] = 2 * (lmultiply(agd_arm_r[i],
-                                        agd_arm_r[i] / (nprime[i] * pprime[i])) +
-                              lmultiply(agd_arm_n[i] - agd_arm_r[i],
-                                        (agd_arm_n[i] - agd_arm_r[i]) / (agd_arm_n[i] - nprime[i] * pprime[i])));
+    resdev[ni_ipd + i] = 2 * ((agd_arm_r[i] > 0 ?
+                                lmultiply(agd_arm_r[i],
+                                          agd_arm_r[i] / (nprime[i] * pprime[i])) : 0) +
+                              (agd_arm_r[i] < agd_arm_n[i] ?
+                                lmultiply(agd_arm_n[i] - agd_arm_r[i],
+                                          (agd_arm_n[i] - agd_arm_r[i]) / (agd_arm_n[i] - nprime[i] * pprime[i])) : 0));
     fitted_agd_arm[i] = nprime[i] * pprime[i];
 
 	  for (j in 1:n_int_thin) {
