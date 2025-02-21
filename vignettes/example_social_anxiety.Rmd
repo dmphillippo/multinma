@@ -83,7 +83,7 @@ The model fit under the FE and RE models can be checked using the `dic()` functi
 (sa_dic_RE <- dic(sa_fit_RE))
 ```
 
-The DIC for the random effects model (256.1) is much lower than that of the fixed effects model (328.4) due to the large decrease in residual deviance showing a much better fit to the data. Therefore, our preferred model is the RE model, which we use in subsequent steps.
+The DIC for the random effects model (257.4) is much lower than that of the fixed effects model (328.4) due to the large decrease in residual deviance showing a much better fit to the data. Therefore, our preferred model is the RE model, which we use in subsequent steps.
 
 ### STEP 2: Consistency assessment
 Next, assess residual inconsistency using an unrelated mean effects model (UME), comparing model fit statistics for the UME model and the NMA (consistency) model, both with random treatment effects. To fit a UME model, we use the `nma()` function but specify `consistency = "ume"`. 
@@ -106,7 +106,7 @@ summary(sa_UME_RE, pars = "tau")
 summary(sa_fit_RE, pars = "tau")
 ```
 
-The residual deviance is not meaningfully different between the two models, however, the DIC is lower in the NMA model (256.1) compared to the UME model (271.5). There is no evidence of inconsistency at the global level. 
+The residual deviance is not meaningfully different between the two models, however, the DIC is lower in the NMA model (257.4) compared to the UME model (270.4). There is no evidence of inconsistency at the global level. 
 
 Using the `plot()` function produces a "dev-dev" plot of the residual deviance contributions under either model.
 
@@ -192,7 +192,7 @@ plotEX <- plot(sa_dic_EXclass_RE, sa_dic_RE, show_uncertainty = FALSE) +
 plotEX
 ```
 
-The exchangeable class model improves overall fit compared to the no‐class model. Although both models yield similar residual deviance (162.5 vs. 163.3) and between‐study heterogeneity, the exchangeable class model reduces model complexity—reflected by a lower effective number of parameters (87.8 vs. 94.9) and a lower DIC (251.1 vs. 257.0). A deviance–deviance plot confirms that all data points fit equally well. Overall, these findings support using the class model for the social anxiety data.
+The exchangeable class model improves overall fit compared to the no‐class model. Although both models yield similar residual deviance (162.5 vs. 163.3) and between‐study heterogeneity, the exchangeable class model reduces model complexity—reflected by a lower effective number of parameters (87.8 vs. 94.9) and a lower DIC (251.1 vs. 257.4). A deviance–deviance plot confirms that all data points fit equally well. Overall, these findings support using the class model for the social anxiety data.
 
 ## STEP 4: Class Model Assessment
 
@@ -236,7 +236,7 @@ plotEXCO <- plot(sa_dic_COclass_RE, sa_dic_EXclass_RE, show_uncertainty = FALSE)
 plotEXCO
 ```
 
-After confirming a class effects model is appropriate, we compared three random‐effects models: an exchangeable class model with fixed effects, an exchangeable class model with random effects, and a common class model with random effects. Both random‐effects models showed substantially better fit than the fixed‐effect model (posterior mean residual deviance of 163.3 and 158.6 versus 284.6, and DIC values of 251.1 and 252.1 versus 318.7). Although the common class model achieved a slightly better absolute fit, it had higher between‐study heterogeneity (0.25 vs. 0.20) than the exchangeable class model. The deviance–deviance plot indicates that while some data points favor one model over the other, overall the fit is similar. Therefore, given nearly identical DIC scores, the choice between the two random‐effects models should be guided by clinical considerations: use the exchangeable class model if treatment‐level variability is important, or the common class model if the focus is on class-level effects and not concerned with potential variability of treatment effects within classes.
+After confirming a class effects model is appropriate, we compared three random‐effects models: an exchangeable class model with fixed effects, an exchangeable class model with random effects, and a common class model with random effects. Both random‐effects models showed substantially better fit than the fixed‐effect model (posterior mean residual deviance of 163.3 and 158.2 versus 284.7, and DIC values of 251.1 and 251.5 versus 318.9). Although the common class model achieved a slightly better absolute fit, it had higher between‐study heterogeneity (0.25 vs. 0.20) than the exchangeable class model. The deviance–deviance plot indicates that while some data points favor one model over the other, overall the fit is similar. Therefore, given nearly identical DIC scores, the choice between the two random‐effects models should be guided by clinical considerations: use the exchangeable class model if treatment‐level variability is important, or the common class model if the focus is on class-level effects and not concerned with potential variability of treatment effects within classes.
 
 ## Results
 ### Relative treatment and class effects
@@ -249,7 +249,7 @@ plot(sa_fit_EXclass_RE,
      ref_line = 0)
 ```
 
-We extract the posterior draws for class means, add a reference treatment, and compute the rank of each treatment for every iteration. Then, we summarize these ranks by calculating the median and 95% credible intervals to create a point-range plot, and we also derive the rank probability distributions to visualize uncertainty in the treatment rankings.
+We extract the posterior draws for class means, add a reference treatment, and compute the rank of each treatment for every iteration. Then, we summarize these ranks by calculating the median and 95% credible intervals to create a point-range plot, and we also derive and plot the rank probability distributions of each treatment class.
 
 ```{r}
 # Class ranks
