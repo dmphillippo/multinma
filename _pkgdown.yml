@@ -11,6 +11,7 @@ home:
 
 template:
   bootstrap: 5
+  light-switch: true
   bslib:
     base_font: {google: "Source Sans Pro"}
     heading_font: {google: "Source Sans Pro"}
