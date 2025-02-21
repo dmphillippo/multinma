@@ -119,6 +119,20 @@ test_that("class_mean and class_sd parameters are named correctly", {
               info = "All class_sd parameters should match the pattern class_sd[...]")
 })
 
+
+test_that("class_effects = 'common' updates network$treatments", {
+  net_common <- nma(sa_net,
+                    class_effects = "common",
+                    trt_effects = "random",
+                    prior_trt = normal(0, 100),
+                    prior_het = half_normal(5))
+
+  # Check that net_common$network$treatments is updated to classes
+  expect_equal(levels(net_common$network$treatments),
+               levels(sa_net$classes),
+               info = "network$treatments should be replaced by class factor levels")
+})
+
 # Make dummy covariate data for smoking network
 ns_agd <- max(smoking$studyn)
 smkdummy <-
