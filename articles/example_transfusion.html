@@ -12,19 +12,21 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.9/font.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Example: White blood cell transfusion">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" integrity="sha384-zh0CIslj+VczCZtlzBcjt5ppRcsAmDnRem7ESsYwWwg3m/OaJ2l4x7YBZl9Kxxib" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js" integrity="sha384-Rma6DA2IPUwhNxmrB/7S3Tno0YY7sFu9WSYMCuulLhIqYSGZ2gKCJWIqhBWqMQfh" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
@@ -66,6 +68,14 @@
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/dmphillippo/multinma/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -187,9 +197,43 @@ distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class
 <span>                        prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                        prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                        prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt;  2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: </span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.215 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.146 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.361 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3: </span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: </span></span>
+<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.226 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.224 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.45 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2: </span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.22 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.273 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.493 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:</span></span></code></pre>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tr_fit_RE_noninf</span></span>
 <span><span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span></span>
 <span><span class="co">#&gt; Inference for Stan model: binomial_1par.</span></span>
@@ -201,7 +245,7 @@ method:</p>
 <span><span class="co">#&gt; lp__           -134.50    0.09 3.11 -141.53 -136.37 -134.16 -132.24 -129.53  1098    1</span></span>
 <span><span class="co">#&gt; tau               1.87    0.04 1.09    0.56    1.16    1.63    2.29    4.73   650    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Sep 16 13:43:31 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Feb 21 12:07:36 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -211,18 +255,18 @@ and study-specific relative effects
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mrow><mi>j</mi><mi>k</mi></mrow></msub><annotation encoding="application/x-tex">\delta_{jk}</annotation></semantics></math>
 are hidden, but could be examined by changing the <code>pars</code>
 argument:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">tr_fit_RE_noninf</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The prior and posterior distributions can be compared visually using
 the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">tr_fit_RE_noninf</span>, prior <span class="op">=</span> <span class="st">"het"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_transfusion_files/figure-html/tr_RE_noninf_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>The posterior distribution for the heterogeneity variance
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>τ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\tau^2</annotation></semantics></math>
 is summarised by</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">noninf_tau</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">as.array</a></span><span class="op">(</span><span class="va">tr_fit_RE_noninf</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span>
 <span><span class="va">noninf_tausq</span> <span class="op">&lt;-</span> <span class="va">noninf_tau</span><span class="op">^</span><span class="fl">2</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">noninf_tausq</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"tausq"</span></span>
@@ -241,7 +285,7 @@ prior for the heterogeneity variance
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>τ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\tau^2</annotation></semantics></math>.
 We can examine the range of parameter values implied by this prior
 distribution with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">log_normal</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3.93</span>, <span class="fl">1.51</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A log-Normal prior distribution: location = -3.93, scale = 1.51.</span></span>
 <span><span class="co">#&gt; 50% of the prior density lies between 0.01 and 0.05.</span></span>
@@ -251,16 +295,55 @@ distribution in the <code>prior_het</code> argument, and set
 <code>prior_het_type = "var"</code> to indicate that this prior
 distribution is on the variance scale (instead of the standard
 deviation, the default).</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tr_fit_RE_inf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">tr_net</span>, </span>
 <span>                     trt_effects <span class="op">=</span> <span class="st">"random"</span>,</span>
 <span>                     prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                     prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                     prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">log_normal</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3.93</span>, <span class="fl">1.51</span><span class="op">)</span>,</span>
 <span>                     prior_het_type <span class="op">=</span> <span class="st">"var"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; n 3: Iteration:  800 / 2000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.19 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.176 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.366 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 3: </span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.16 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.177 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.337 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3: </span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: </span></span>
+<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.213 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.165 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.378 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2:</span></span></code></pre>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tr_fit_RE_inf</span></span>
 <span><span class="co">#&gt; A random effects NMA with a binomial likelihood (logit link).</span></span>
 <span><span class="co">#&gt; Inference for Stan model: binomial_1par.</span></span>
@@ -272,7 +355,7 @@ method:</p>
 <span><span class="co">#&gt; lp__           -140.97    0.07 2.77 -147.30 -142.63 -140.64 -138.91 -136.61  1385    1</span></span>
 <span><span class="co">#&gt; tau               0.50    0.01 0.36    0.05    0.21    0.44    0.70    1.38  1654    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Sep 16 13:43:34 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Feb 21 12:07:40 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -282,12 +365,12 @@ and study-specific relative effects
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mrow><mi>j</mi><mi>k</mi></mrow></msub><annotation encoding="application/x-tex">\delta_{jk}</annotation></semantics></math>
 are hidden, but could be examined by changing the <code>pars</code>
 argument:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">tr_fit_RE_inf</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The prior and posterior distributions can be compared visually using
 the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">tr_fit_RE_inf</span>, prior <span class="op">=</span> <span class="st">"het"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_transfusion_files/figure-html/tr_RE_inf_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <blockquote>
@@ -299,7 +382,7 @@ is plotted here since the prior was specified on
 <p>The posterior distribution for the heterogeneity variance
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>τ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\tau^2</annotation></semantics></math>
 is summarised by</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">inf_tau</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">as.array</a></span><span class="op">(</span><span class="va">tr_fit_RE_inf</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span>
 <span><span class="va">inf_tausq</span> <span class="op">&lt;-</span> <span class="va">inf_tau</span><span class="op">^</span><span class="fl">2</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">inf_tausq</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"tausq"</span></span>
@@ -339,7 +422,7 @@ Epidemiology</em> 41 (3): 818–27. <a href="https://doi.org/10.1093/ije/dys041"
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

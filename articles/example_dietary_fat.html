@@ -12,19 +12,21 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.9/font.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Example: Dietary fat">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" integrity="sha384-zh0CIslj+VczCZtlzBcjt5ppRcsAmDnRem7ESsYwWwg3m/OaJ2l4x7YBZl9Kxxib" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js" integrity="sha384-Rma6DA2IPUwhNxmrB/7S3Tno0YY7sFu9WSYMCuulLhIqYSGZ2gKCJWIqhBWqMQfh" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
@@ -66,6 +68,14 @@
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/dmphillippo/multinma/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -187,7 +197,41 @@ auto-detected from the data.</p>
 <code class="sourceCode R"><span><span class="va">diet_fit_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">diet_net</span>, </span>
 <span>                   trt_effects <span class="op">=</span> <span class="st">"fixed"</span>,</span>
 <span>                   prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
-<span>                   prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>                   prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  / 2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: </span></span>
+<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.053 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.037 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.09 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2: </span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.067 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.045 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.112 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: </span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.074 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.038 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.112 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3:</span></span></code></pre></div>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -201,7 +245,7 @@ method:</p>
 <span><span class="co">#&gt; d[Reduced Fat]   -0.01    0.00 0.05   -0.11   -0.04   -0.01    0.03    0.10  3568    1</span></span>
 <span><span class="co">#&gt; lp__           5386.16    0.06 2.49 5380.38 5384.77 5386.50 5387.97 5389.91  1586    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Sep 16 13:35:08 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Feb 21 11:56:33 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -250,9 +294,43 @@ distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class
 <span>                   prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                   prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                   prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; 2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.255 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.202 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.457 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: </span></span>
+<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.241 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.211 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.452 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2: </span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: </span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.245 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.223 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.468 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3:</span></span></code></pre>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">diet_fit_RE</span></span>
 <span><span class="co">#&gt; A random effects NMA with a poisson likelihood (log link).</span></span>
 <span><span class="co">#&gt; Inference for Stan model: poisson.</span></span>
@@ -264,7 +342,7 @@ method:</p>
 <span><span class="co">#&gt; lp__           5379.23    0.11 3.74 5371.41 5376.76 5379.38 5381.88 5385.92  1217    1</span></span>
 <span><span class="co">#&gt; tau               0.13    0.00 0.12    0.01    0.05    0.10    0.18    0.45   819    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Sep 16 13:35:12 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Feb 21 11:56:36 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -274,12 +352,12 @@ and study-specific relative effects
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mrow><mi>j</mi><mi>k</mi></mrow></msub><annotation encoding="application/x-tex">\delta_{jk}</annotation></semantics></math>
 are hidden, but could be examined by changing the <code>pars</code>
 argument:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">diet_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The prior and posterior distributions can be compared visually using
 the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">diet_fit_RE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_dietary_fat_files/figure-html/diet_RE_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
@@ -287,12 +365,12 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <h3 id="model-comparison">Model comparison<a class="anchor" aria-label="anchor" href="#model-comparison"></a>
 </h3>
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">diet_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Residual deviance: 22.5<span style="color: #555555;"> (on 21 data points)</span></span></span>
 <span><span class="co">#&gt;                pD: 11.3</span></span>
 <span><span class="co">#&gt;               DIC: 33.8</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">diet_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Residual deviance: 21.4<span style="color: #555555;"> (on 21 data points)</span></span></span>
 <span><span class="co">#&gt;                pD: 13.5</span></span>
@@ -302,10 +380,10 @@ close to the number of data points. The DIC is very similar between
 models, so the FE model may be preferred for parsimony.</p>
 <p>We can also examine the residual deviance contributions with the
 corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dic_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_dietary_fat_files/figure-html/diet_FE_resdev_plot-1.png" width="700" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dic_RE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_dietary_fat_files/figure-html/diet_RE_resdev_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
@@ -325,7 +403,7 @@ distribution object, with which we specify the corresponding Normal
 distribution. We set <code>type = "response"</code> to produce predicted
 rates (<code>type = "link"</code> would produce predicted log
 rates).</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">diet_fit_FE</span>, </span>
 <span>                   baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">3</span>, sd <span class="op">=</span> <span class="fl">1.77</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>, </span>
 <span>                   type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
@@ -335,7 +413,7 @@ rates).</p>
 <span><span class="co">#&gt; pred[Reduced Fat] 0.06 0.05 0.01 0.03 0.05 0.08  0.21     4118     3909    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_dietary_fat_files/figure-html/diet_pred_FE-1.png" width="700" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">diet_fit_RE</span>, </span>
 <span>                   baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">3</span>, sd <span class="op">=</span> <span class="fl">1.77</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>, </span>
 <span>                   type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
@@ -349,7 +427,7 @@ rates).</p>
 will be produced for every study in the network based on their estimated
 baseline log rate
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\mu_j</annotation></semantics></math>:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred_FE_studies</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">diet_fit_FE</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
 <span><span class="va">pred_FE_studies</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">-------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: DART</span> <span style="color: #555555;">----</span> </span></span>
@@ -454,7 +532,7 @@ Disease.”</span> <em>Cochrane Database of Systematic Reviews</em>, no.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

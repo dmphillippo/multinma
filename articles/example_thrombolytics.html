@@ -12,19 +12,21 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.9/font.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Example: Thrombolytic treatments">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" integrity="sha384-zh0CIslj+VczCZtlzBcjt5ppRcsAmDnRem7ESsYwWwg3m/OaJ2l4x7YBZl9Kxxib" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js" integrity="sha384-Rma6DA2IPUwhNxmrB/7S3Tno0YY7sFu9WSYMCuulLhIqYSGZ2gKCJWIqhBWqMQfh" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
@@ -66,6 +68,14 @@
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/dmphillippo/multinma/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -214,7 +224,7 @@ method:</p>
 <span><span class="co">#&gt; d[UK]           1</span></span>
 <span><span class="co">#&gt; lp__            1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Sep 16 13:42:15 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Feb 21 12:05:51 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -272,21 +282,7 @@ assess the consistency assumption. Again, we use the function
 <span>                       prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: Setting "SK" as the network reference treatment.</span></span>
 <span><span class="va">thrombo_fit_ume</span></span>
-<span><span class="co">#&gt; A fixed effects NMA with a binomial likelihood (logit link).</span></span>
-<span><span class="co">#&gt; An inconsistency model ('ume') was fitted.</span></span>
-<span><span class="co">#&gt; Inference for Stan model: binomial_1par.</span></span>
-<span><span class="co">#&gt; 4 chains, each with iter=2000; warmup=1000; thin=1; </span></span>
-<span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                            mean se_mean   sd      2.5%       25%       50%       75%     97.5%</span></span>
-<span><span class="co">#&gt; d[Acc t-PA vs. SK]        -0.16    0.00 0.05     -0.25     -0.19     -0.16     -0.13     -0.07</span></span>
-<span><span class="co">#&gt; d[ASPAC vs. SK]            0.01    0.00 0.04     -0.07     -0.02      0.01      0.03      0.08</span></span>
-<span><span class="co">#&gt; d[PTCA vs. SK]            -0.66    0.00 0.19     -1.04     -0.79     -0.66     -0.54     -0.29</span></span>
-<span><span class="co">#&gt; d[r-PA vs. SK]            -0.06    0.00 0.09     -0.24     -0.12     -0.06      0.00      0.12</span></span>
-<span><span class="co">#&gt; d[SK + t-PA vs. SK]       -0.04    0.00 0.05     -0.13     -0.08     -0.04     -0.01      0.05</span></span>
-<span><span class="co">#&gt; d[t-PA vs. SK]             0.00    0.00 0.03     -0.06     -0.02      0.00      0.02      0.06</span></span>
-<span><span class="co">#&gt; d[UK vs. SK]              -0.37    0.01 0.52     -1.46     -0.71     -0.38     -0.01      0.65</span></span>
-<span><span class="co">#&gt; d[ASPAC vs. Acc t-PA]      1.41    0.01 0.42      0.62      1.12      1.39      1.69      2.23</span></span>
+<span><span class="co">#&gt; vs. Acc t-PA]      1.41    0.01 0.42      0.62      1.12      1.39      1.69      2.23</span></span>
 <span><span class="co">#&gt; d[PTCA vs. Acc t-PA]      -0.21    0.00 0.12     -0.44     -0.29     -0.22     -0.13      0.01</span></span>
 <span><span class="co">#&gt; d[r-PA vs. Acc t-PA]       0.02    0.00 0.07     -0.11     -0.03      0.02      0.06      0.16</span></span>
 <span><span class="co">#&gt; d[TNK vs. Acc t-PA]        0.00    0.00 0.06     -0.12     -0.04      0.01      0.05      0.13</span></span>
@@ -313,7 +309,7 @@ assess the consistency assumption. Again, we use the function
 <span><span class="co">#&gt; d[UK vs. t-PA]         4645    1</span></span>
 <span><span class="co">#&gt; lp__                   1655    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Sep 16 13:42:22 2024.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Feb 21 12:06:01 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -796,7 +792,7 @@ Statistical Association</em> 101 (474): 447–59. <a href="https://doi.org/10.11
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>
