@@ -87,6 +87,14 @@ transformed parameters {
           X_agd_arm * beta_tilde + offset_agd_arm :
           X_agd_arm * beta_tilde;
 
+    // Baseline risk meta-regression
+    if (brmr_n_col > 0) {
+      // Subtracting 1 from the centred baseline risk here, as the associated
+      // beta was already added once to the linear predictor by
+      // `X_agd_arm * beta_tilde`
+      eta_agd_arm_noRE += (X_agd_arm[,1:totns] * mu - xbar_mu - 1) .* (X_agd_arm[,brmr_col] * beta_tilde[brmr_col]);
+    }
+
     if (nint_max > 1) { // -- If integration points are used --
 
       if (RE) {

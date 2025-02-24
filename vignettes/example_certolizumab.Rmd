@@ -1,0 +1,329 @@
+---
+title: "Example: Certolizumab"
+output: rmarkdown::html_vignette
+link-citations: yes
+bibliography: ../inst/REFERENCES.bib
+params:
+  run_tests: FALSE
+---
+
+```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
+```
+```{r, include=FALSE}
+set.seed(76441)
+```
+
+```{r, eval = FALSE}
+library(multinma)
+options(mc.cores = parallel::detectCores())
+```
+```{r setup, echo = FALSE}
+library(multinma)
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
+             "true" =, "warn" = 2, 
+             parallel::detectCores())
+options(mc.cores = nc)
+```
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+This vignette describes the analysis of 12 trials comparing 6 treatments against placebo for "the treatment of rheumatoid arthritis (RA)
+in patients who had failed on disease-modifying anti-rheumatic drugs (DMARDs)" [@TSD3].
+The data are available in this package as `certolizumab`:
+```{r}
+head(certolizumab)
+```
+
+@TSD3 used this data to demonstrate baseline risk meta-regression models.
+Plotting the baseline risk against the treatment effect, we suspect there might be an effect of the baseline risk on the treatment effect.
+Specifically, the log baseline odds (placebo in this case) seem to be negatively linearly correlated with the odds ratio.
+```{r certolizumab_baseline_risk_plot}
+certolizumab <-
+  certolizumab %>%
+  mutate(
+    probability = r / n,
+    odds = probability / (1 - probability),
+    log_odds = log(odds)
+  )
+
+p_baseline_risk <-
+  left_join(
+    filter(certolizumab, trt != "Placebo"),
+    filter(certolizumab, trt == "Placebo"),
+    by = "study",
+    suffix = c("", "_baseline")
+  ) %>%
+  mutate(log_odds_ratio = log_odds - log_odds_baseline, n_total = n + n_baseline) %>%
+  ggplot(aes(log_odds_baseline)) +
+  geom_hline(yintercept = 1, linetype = "dashed") +
+  labs(x = "Placebo log odds", y = "log Odds Ratio", size = "Sample Size") +
+  theme_multinma()
+
+p_baseline_risk +
+  geom_point(aes(y = log_odds_ratio, size = n_total))
+```
+
+## Setting up the network
+We begin by setting up the network.
+```{r}
+cert_net <- set_agd_arm(certolizumab,
+                        study = study, trt = trt, n = n, r = r,
+                        trt_class = dplyr::if_else(trt == "Placebo", "Placebo", "Treatment"))
+cert_net
+```
+
+Plot the network structure.
+```{r, eval=FALSE}
+plot(cert_net, weight_edges = TRUE, weight_nodes = TRUE)
+```
+```{r certolizumab_network_plot, echo=FALSE}
+plot(cert_net, weight_edges = TRUE, weight_nodes = TRUE) +
+  ggplot2::theme(legend.box.margin = ggplot2::unit(c(0, 0, 0, 4), "lines"))
+```
+
+## Meta-analysis models
+We fit both fixed effect (FE) and random effects (RE) models.
+The special variable `.mu` is used in the `regression` formula to specify a baseline risk meta-regression model.
+
+### Fixed effect meta-analysis
+```{r}
+cert_fit_FE <- nma(cert_net,
+                   trt_effects = "fixed",
+                   regression = ~.mu:.trt,
+                   prior_intercept = normal(scale = sqrt(1000)),
+                   prior_trt = normal(scale = 100),
+                   prior_reg = normal(scale = 100),
+                   iter = 4000,
+                   adapt_delta = 0.95)
+```
+
+Basic parameter summaries are given by the `print()` method:
+```{r}
+cert_fit_FE
+```
+
+### Random effects meta-analysis
+```{r}
+cert_fit_RE <- nma(cert_net,
+                   trt_effects = "random",
+                   regression = ~.mu:.trt,
+                   prior_intercept = normal(scale = sqrt(1000)),
+                   prior_trt = normal(scale = 100),
+                   prior_reg = normal(scale = 100),
+                   iter = 8000,
+                   adapt_delta = 0.98)
+```
+
+Basic parameter summaries are given by the `print()` method:
+```{r}
+cert_fit_RE
+```
+
+### Model comparison
+Model fit can be checked using the `dic()` function:
+```{r}
+(dic_FE <- dic(cert_fit_FE))
+(dic_RE <- dic(cert_fit_RE))
+```
+
+We can also examine the residual deviance contributions with the corresponding `plot()` method.
+```{r}
+plot(dic_FE)
+```
+
+```{r}
+plot(dic_RE)
+```
+
+### Baseline risk meta-regression
+Plotting the estimated baseline risk effect (fixed effect model) together with the crude odds ratios.
+```{r certolizumab_reg_plot}
+cert_mu_reg <-
+  cert_fit_FE %>%
+  relative_effects(
+    newdata = tibble(.mu = seq(log(0.02), log(0.5), length.out = 20)),
+    study = .mu
+  ) %>%
+  as_tibble() %>%
+  mutate(
+    trt = .trtb,
+    log_odds_baseline = as.numeric(as.character(.study))
+  )
+
+p_baseline_risk +
+  facet_wrap(vars(trt)) +
+  geom_ribbon(aes(ymin = `2.5%`, ymax = `97.5%`), data = cert_mu_reg,
+              fill = "darkred", alpha = 0.3) +
+  geom_line(aes(y = mean), data = cert_mu_reg,
+            colour = "darkred") +
+  geom_point(aes(y = log_odds_ratio, size = n_total), alpha = 0.6)
+```
+
+## Further results
+```{r}
+newdata <- data.frame(.mu = cert_fit_FE$xbar[[".mu"]])
+```
+For comparison with @TSD3, we can produce relative effects against "Placebo" using the `relative_effects()` function:
+```{r certolizumab_releff_FE, fig.height=3}
+(cert_releff_FE <- relative_effects(cert_fit_FE, newdata = newdata))
+plot(cert_releff_FE, ref_line = 0)
+```
+```{r certolizumab_releff_RE, fig.height=3}
+(cert_releff_RE <- relative_effects(cert_fit_RE, newdata = newdata))
+plot(cert_releff_RE, ref_line = 0)
+```
+
+Without `newdata`, `relative_effects()` will produce relative effects per study.
+Note that the sampled study-specific intercepts are used.
+
+```{r certolizumab_releff_study_RE}
+(cert_releff_study_RE <- relative_effects(cert_fit_RE))
+```
+
+`predict()` will use the `.mu` values sampled from the `baseline` distribution.
+
+```{r}
+predict(cert_fit_RE, baseline = distr(qnorm, mean = cert_fit_FE$xbar[[".mu"]], sd = 0.5))
+```
+
+When not passing a `baseline` distribution, predictions will be produced per study.
+The sampled study-specific intercepts are used in the baseline risk meta-regression.
+
+```{r}
+predict(cert_fit_RE)
+```
+
+We can also produce treatment rankings, rank probabilities, and cumulative rank probabilities.
+```{r certolizumab_ranks}
+(cert_ranks <- posterior_ranks(cert_fit_RE, newdata = newdata,
+                               lower_better = FALSE))
+plot(cert_ranks)
+```
+```{r certolizumab_rankprobs}
+(cert_rankprobs <- posterior_rank_probs(cert_fit_RE, newdata = newdata,
+                                        lower_better = FALSE))
+plot(cert_rankprobs)
+```
+```{r certolizumab_cumrankprobs}
+(cert_cumrankprobs <- posterior_rank_probs(cert_fit_RE, cumulative = TRUE,
+                                           newdata = newdata, lower_better = FALSE))
+plot(cert_cumrankprobs)
+```
+
+
+It is also possible to combine baseline risk meta-regression with regular meta-regression.
+For example, we can add `disease_duration` to the regression formula.
+```{r}
+nma(cert_net,
+    trt_effects = "fixed",
+    regression = ~(disease_duration + .mu):.trt,
+    prior_intercept = normal(scale = sqrt(1000)),
+    prior_trt = normal(scale = 100),
+    prior_reg = normal(scale = 100),
+    adapt_delta = 0.95)
+```
+
+## References
+
+```{r certolizumab_tests, include=FALSE, eval=params$run_tests}
+#--- Test against TSD 3 results ---
+library(testthat)
+library(dplyr)
+
+tol <- 0.05
+tol_dic <- 0.1
+
+# FE Relative effects
+tsd_FE <- tribble(
+~trt          , ~mean, ~sd , ~lower, ~upper,
+"CZP"         , 1.85 , 0.10, 1.67  , 2.06  ,
+"Adalimumab"  , 2.13 , 0.11, 1.90  , 2.35  ,
+"Etanercept"  , 2.08 , 0.34, 1.47  , 2.80  ,
+"Infliximab"  , 1.68 , 0.10, 1.49  , 1.86  ,
+"Rituximab"   , 0.36 , 0.50, -0.72 , 1.27  ,
+"Tocilizumab" , 2.20 , 0.14, 1.93  , 2.46  ,
+) %>%
+  arrange(ordered(trt, levels = levels(cert_net$treatments)))
+
+cert_releff_FE <- as.data.frame(cert_releff_FE)
+
+test_that("FE relative effects", {
+  expect_equivalent(cert_releff_FE$mean, tsd_FE$mean, tolerance = tol)
+  expect_equivalent(cert_releff_FE$sd, tsd_FE$sd, tolerance = tol)
+  expect_equivalent(cert_releff_FE$`2.5%`, tsd_FE$lower, tolerance = tol)
+  expect_equivalent(cert_releff_FE$`97.5%`, tsd_FE$upper, tolerance = tol)
+})
+
+# RE Relative effects
+tsd_RE <- tribble(
+~trt          , ~mean, ~sd , ~lower, ~upper,
+"CZP"         , 1.83 , 0.24, 1.35  , 2.29  ,
+"Adalimumab"  , 2.18 , 0.22, 1.79  , 2.63  ,
+"Etanercept"  , 2.04 , 0.46, 1.19  , 2.94  ,
+"Infliximab"  , 1.71 , 0.22, 1.30  , 2.16  ,
+"Rituximab"   , 0.37 , 0.59, -0.86 , 1.45  ,
+"Tocilizumab" , 2.25 , 0.27, 1.75  , 2.79  ,
+) %>%
+  arrange(ordered(trt, levels = levels(cert_net$treatments)))
+
+cert_releff_RE <- as.data.frame(cert_releff_RE)
+
+test_that("RE relative effects", {
+  expect_equivalent(cert_releff_RE$mean, tsd_RE$mean, tolerance = tol)
+  expect_equivalent(cert_releff_RE$sd, tsd_RE$sd, tolerance = tol)
+  expect_equivalent(cert_releff_RE$`2.5%`, tsd_RE$lower, tolerance = tol)
+  expect_equivalent(cert_releff_RE$`97.5%`, tsd_RE$upper, tolerance = tol)
+})
+
+cert_fit_RE_mu <- summary(cert_fit_RE, pars = "mu")
+test_that("mean study-specific intercepts identical to those in parameter summary", {
+  expect_equal(cert_releff_study_RE$studies$.mu, unname(cert_fit_RE_mu$summary$mean))
+})
+
+# Heterogeneity SD
+cert_tau <- as.data.frame(summary(cert_fit_RE, pars = "tau"))
+
+test_that("RE heterogeneity SD", {
+  expect_equivalent(cert_tau$mean, 0.19, tolerance = tol)
+  expect_equivalent(cert_tau$sd, 0.19, tolerance = tol)
+  expect_equivalent(cert_tau$`2.5%`, 0.01, tolerance = tol)
+  expect_equivalent(cert_tau$`97.5%`, 0.70, tolerance = tol)
+})
+
+# Baseline risk meta-regression
+expect_equal(cert_fit_FE$xbar[[".mu"]], -2.421, tolerance = 0.01)
+expect_equal(cert_fit_RE$xbar[[".mu"]], -2.421, tolerance = 0.01)
+
+cert_beta_FE <- as.data.frame(summary(cert_fit_FE, pars = "beta"))
+
+test_that("FE baseline risk meta-regression", {
+  expect_equal(cert_beta_FE$mean, -0.93, tolerance = tol)
+  expect_equal(cert_beta_FE$sd, 0.09, tolerance = tol)
+  expect_equal(cert_beta_FE$`2.5%`, -1.03, tolerance = tol)
+  expect_equal(cert_beta_FE$`97.5%`, -0.69, tolerance = tol)
+})
+
+cert_beta_RE <- as.data.frame(summary(cert_fit_RE, pars = "beta"))
+
+test_that("RE baseline risk meta-regression", {
+  expect_equal(cert_beta_RE$mean, -0.95, tolerance = tol)
+  expect_equal(cert_beta_RE$sd, 0.10, tolerance = tol)
+  expect_equal(cert_beta_RE$`2.5%`, -1.10, tolerance = tol)
+  expect_equal(cert_beta_RE$`97.5%`, -0.70, tolerance = tol)
+})
+
+# DIC
+test_that("FE DIC", {
+  expect_equivalent(dic_FE$resdev, 27.3, tolerance = tol_dic)
+  expect_equivalent(dic_FE$pd, 19.0, tolerance = tol_dic)
+  expect_equivalent(dic_FE$dic, 46.3, tolerance = tol_dic)
+})
+
+test_that("RE DIC", {
+  expect_equivalent(dic_RE$resdev, 24.2, tolerance = tol_dic)
+  expect_equivalent(dic_RE$pd, 19.4, tolerance = tol_dic)
+  expect_equivalent(dic_RE$dic, 43.6, tolerance = tol_dic)
+})
+```

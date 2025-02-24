@@ -55,6 +55,11 @@ corr_matrix[RE ? max(which_RE) : 1] RE_cor; // RE correlation matrix
 // -- Node-splitting --
 int<lower=0, upper=1> nodesplit; // Node-splitting flag (yes = 1)
 
+// -- Baseline risk meta-regression --
+int<lower=0> brmr_n_col;
+array[brmr_n_col] int<lower=1> brmr_col;
+real xbar_mu;
+
 // -- Priors --
 int<lower=0,upper=3> prior_intercept_dist;
 real prior_intercept_location;
