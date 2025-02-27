@@ -323,7 +323,13 @@ nma <- function(network,
   class_effects <- rlang::arg_match(class_effects)
   if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
 
-
+  # Check class_effects and network classes
+  if (class_effects != "independent") {
+    if (is.null(network$classes)) {
+      abort(paste("Setting `class_effects` requires treatment classes to be specified in the network.",
+                  "See set_*() argument `trt_class`.", sep = "\n"))
+    }
+  }
 
   if (class_effects == "common") {
     # Overwrite treatments with class variables
@@ -365,8 +371,6 @@ nma <- function(network,
     class_sd <- rlang::arg_match(class_sd)
     if (length(class_sd) > 1) abort("`class_sd` must be a single string.")
   }
-
-
 
   if (consistency == "nodesplit") {
 
@@ -554,14 +558,6 @@ nma <- function(network,
   likelihood <- check_likelihood(likelihood, network$outcome)
   link <- check_link(link, likelihood)
 
-  # Check class_effects and network classes
-  if (class_effects != "independent") {
-    if (is.null(network$classes)) {
-      abort(paste("Setting `class_effects` requires treatment classes to be specified in the network.",
-                  "See set_*() argument `trt_class`.", sep = "\n"))
-    }
-  }
-
   # When are priors on auxiliary parameters required?
   has_aux <- (likelihood == "normal" && has_ipd(network)) ||
               likelihood %in% c("ordered", "weibull", "gompertz",
@@ -593,6 +589,7 @@ nma <- function(network,
     prior_defaults$prior_het <- get_prior_call(prior_het)
   if (class_effects == "exchangeable" && .is_default(prior_class_mean))
     prior_defaults$prior_class_mean <- get_prior_call(prior_class_mean)
+  if (class_effects == "exchangeable" && .is_default(prior_class_sd))
     prior_defaults$prior_class_sd <- get_prior_call(prior_class_sd)
   if (!is.null(regression) && !is_only_offset(regression) && .is_default(prior_reg))
     prior_defaults$prior_reg <- get_prior_call(prior_reg)

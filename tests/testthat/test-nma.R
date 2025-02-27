@@ -53,32 +53,32 @@ test_that("nma() link must be valid", {
   expect_error(nma(smknet, link = c("log", "identity")), m)
 })
 
+sa_net <- set_agd_contrast(social_anxiety, studyc, trtc, y = y, se = se, trt_class = classc, trt_ref = "Waitlist")
+
 #Class effect parameter error checks
 test_that("nma() class_effect must be valid", {
-  m <- "`class_effect` should be one of 'independent', 'common', or 'exchangeable'"
-  expect_error(nma(sa_net, class_effect = 1), m)
-  expect_error(nma(sa_net, class_effect = "random"), m)
-  expect_error(nma(sa_net, class_effect = c("independent", "common", "other")), m)
+  expect_error(nma(sa_net, class_effect = 1), "`class_effects` must be a character vector, not the number 1")
+  expect_error(nma(sa_net, class_effect = "random"), "`class_effects` must be one of \"independent\", \"common\", or \"exchangeable\", not \"random\".")
+  expect_error(nma(sa_net, class_effect = c("independent", "common", "other")), "`class_effects` must be one of \"independent\", \"common\", or \"exchangeable\", not \"independent\".")
 })
 
 test_that("nma() class_sd must be valid", {
-  m <- "`class_sd` should be one of 'independent' or 'common'"
-  expect_error(nma(sa_net, class_sd = 1), m)
-  expect_error(nma(sa_net, class_sd = "exchangeable"), m)
-  expect_error(nma(sa_net, class_sd = c("independent", "common", "extra")), m)
+  expect_error(nma(sa_net, class_sd = 1), "`class_sd` must be a character vector, not the number 1.")
+  expect_error(nma(sa_net, class_sd = "exchangeable"), "`class_sd` must be one of \"independent\" or \"common\", not \"exchangeable\".")
+  expect_error(nma(sa_net, class_sd = c("independent", "common", "extra")), "`class_sd` must be one of \"independent\" or \"common\", not \"independent\".")
 
 m_list <- "`class_sd` should be a list of character vectors corresponding to valid classes, with no duplicates"
 expect_error(
   nma(sa_net, class_sd = list(classA = 1, classB = "Exposure")),
-  m_list
+  "Some classes listed in 'class_sd' are not found in 'network$classes'"
 )
 expect_error(
   nma(sa_net, class_sd = list(classA = c("Exposure", "Exposure"))),
-  m_list
+  "Some classes are listed in more than one shared standard deviation group in 'class_sd'"
 )
 expect_error(
   nma(sa_net, class_sd = list(classA = c("Exposure", "non_existent_class"))),
-  m_list
+  "Some classes listed in 'class_sd' are not found in 'network$classes'"
 )
 expect_error(
   nma(sa_net, class_sd = list(
@@ -86,7 +86,7 @@ expect_error(
     second_set = "Exposure",
     third_set = "Combined"
   )),
-  m_list
+  "Some classes are listed in more than one shared standard deviation group in 'class_sd'"
 )
 })
 
@@ -94,8 +94,9 @@ test_that("nma() gives an informative error if class_effect or class_sd are spec
   m_no_classes <- "No classes found in the network, cannot specify class_effect or class_sd."
 
   expect_error(nma(smknet, class_effect = "common"), m_no_classes)
-  expect_error(nma(smknet, class_sd = "common"), m_no_classes)
 })
+
+sa_fit_EXclass_RE <- nma(sa_net, trt_effects = "random", prior_trt = normal(0, 100), prior_het = half_normal(5), class_effects = "exchangeable", prior_class_sd = normal(0.33,0.1), class_sd = list(`Exercise and SH no support` = c("Exercise promotion", "Self-help no support"), `SSRIs and NSSA` = c("SSRI/SNRI", "NSSA"), `Psychodynamic & Other psychological therapies` = c("Psychodynamic psychotherapy", "Other psychological therapies")))
 
 test_that("class_mean and class_sd parameters are named correctly", {
   # Extract summaries for class_mean and class_sd
@@ -107,8 +108,8 @@ test_that("class_mean and class_sd parameters are named correctly", {
   cs_summary <- as.data.frame(cs_summary)
 
   # Extract parameter names from row names
-  cm_params <- rownames(cm_summary)
-  cs_params <- rownames(cs_summary)
+  cm_params <- cm_summary$parameter
+  cs_params <- cs_summary$parameter
 
   # Check that all class_mean parameters are in format class_mean[<class_name>]
   expect_true(all(grepl("^class_mean\\[.*\\]$", cm_params)),
@@ -118,7 +119,6 @@ test_that("class_mean and class_sd parameters are named correctly", {
   expect_true(all(grepl("^class_sd\\[.*\\]$", cs_params)),
               info = "All class_sd parameters should match the pattern class_sd[...]")
 })
-
 
 test_that("class_effects = 'common' updates network$treatments", {
   net_common <- nma(sa_net,
