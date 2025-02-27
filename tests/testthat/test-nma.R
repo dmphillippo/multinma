@@ -57,42 +57,20 @@ sa_net <- set_agd_contrast(social_anxiety, studyc, trtc, y = y, se = se, trt_cla
 
 #Class effect parameter error checks
 test_that("nma() class_effect must be valid", {
-  expect_error(nma(sa_net, class_effect = 1), "`class_effects` must be a character vector, not the number 1")
-  expect_error(nma(sa_net, class_effect = "random"), "`class_effects` must be one of \"independent\", \"common\", or \"exchangeable\", not \"random\".")
-  expect_error(nma(sa_net, class_effect = c("independent", "common", "other")), "`class_effects` must be one of \"independent\", \"common\", or \"exchangeable\", not \"independent\".")
+  expect_error(nma(sa_net, class_effects = c("independent", "common")),"`class_effects` must be a single string.")
+  expect_error(nma(sa_net, class_effects = 1), "`class_effects` must be a character vector, not the number 1.")
+  expect_error(nma(smknet, class_effects = "common"), "Setting `class_effects` requires treatment classes to be specified in the network.\nSee set_*() argument `trt_class`.")
+  expect_error(nma(smknet, class_effects = "exchangeable"), "Setting `class_effects` requires treatment classes to be specified in the network.\nSee set_*() argument `trt_class`.")
 })
 
 test_that("nma() class_sd must be valid", {
-  expect_error(nma(sa_net, class_sd = 1), "`class_sd` must be a character vector, not the number 1.")
-  expect_error(nma(sa_net, class_sd = "exchangeable"), "`class_sd` must be one of \"independent\" or \"common\", not \"exchangeable\".")
-  expect_error(nma(sa_net, class_sd = c("independent", "common", "extra")), "`class_sd` must be one of \"independent\" or \"common\", not \"independent\".")
-
-m_list <- "`class_sd` should be a list of character vectors corresponding to valid classes, with no duplicates"
-expect_error(
-  nma(sa_net, class_sd = list(classA = 1, classB = "Exposure")),
-  "Some classes listed in 'class_sd' are not found in 'network$classes'"
-)
-expect_error(
-  nma(sa_net, class_sd = list(classA = c("Exposure", "Exposure"))),
-  "Some classes are listed in more than one shared standard deviation group in 'class_sd'"
-)
-expect_error(
-  nma(sa_net, class_sd = list(classA = c("Exposure", "non_existent_class"))),
-  "Some classes listed in 'class_sd' are not found in 'network$classes'"
-)
-expect_error(
-  nma(sa_net, class_sd = list(
-    first_set = "Exposure",
-    second_set = "Exposure",
-    third_set = "Combined"
-  )),
-  "Some classes are listed in more than one shared standard deviation group in 'class_sd'"
-)
+  expect_error(nma(sa_net, class_sd = list(group1 = c("Exposure", "NonExistentClass"))), "Some classes listed in 'class_sd' are not found in 'network$classes'")
+  expect_error(nma(sa_net, class_sd = list(group1 = c("Exposure", "NSSA"), group2 = c("NSSA", "SSRI/SNRI"))), "Some classes are listed in more than one shared standard deviation group in 'class_sd'")
+  expect_error(nma(sa_net, class_sd = c("common", "exchangeable")), "`class_sd` must be a single string.")
 })
 
 test_that("nma() gives an informative error if class_effect or class_sd are specified without classes in the network", {
   m_no_classes <- "No classes found in the network, cannot specify class_effect or class_sd."
-
   expect_error(nma(smknet, class_effect = "common"), m_no_classes)
 })
 
