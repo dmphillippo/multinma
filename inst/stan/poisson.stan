@@ -12,13 +12,14 @@ data {
   vector<lower=0>[ni_agd_arm] agd_arm_E;
 }
 transformed data {
+  vector[ni_ipd] ipd_logE = log(ipd_E);
 #include /include/transformed_data_common.stan
 }
 parameters {
 #include /include/parameters_common.stan
 }
 transformed parameters {
-  vector<lower=0>[ni_ipd] E_eta_ipd;
+  vector[ni_ipd] E_eta_ipd;
   vector<lower=0>[ni_agd_arm] E_theta_agd_arm;
 
 #include /include/transformed_parameters_theta.stan
@@ -112,7 +113,7 @@ transformed parameters {
   }
 
   // Predictors with time at risk offset
-  E_eta_ipd = eta_ipd + ipd_E;
+  E_eta_ipd = eta_ipd + ipd_logE;
   E_theta_agd_arm = theta_agd_arm_bar .* agd_arm_E;
 }
 model {

@@ -9,6 +9,10 @@ separately with `add_integration()` before combining with `combine_network()`.
 covariates would sometimes result in a misspecified and inestimable model, due 
 to the inclusion of additional columns in the design matrix for the reference 
 level of the covariates.
+* Fix: IPD Poisson models were broken due to an incorrect offset for log time at 
+risk (thanks to @n8thangreen for spotting this).
+* Fix: In a Binomial model, studies where everyone experienced the outcome 
+(`r = n` on all arms) no longer give `NaN` residual deviance.
 
 # multinma 0.7.2
 

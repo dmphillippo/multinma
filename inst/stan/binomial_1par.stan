@@ -179,10 +179,12 @@ generated quantities {
   for (i in 1:ni_agd_arm) {
     log_lik[ni_ipd + i] = binomial_lpmf(agd_arm_r[i] | agd_arm_n[i], theta_agd_arm_bar[i]);
     resdev[ni_ipd + i] = 2 *
-      (lmultiply(agd_arm_r[i],
-                 agd_arm_r[i] / (agd_arm_n[i] * theta_agd_arm_bar[i])) +
-       lmultiply(agd_arm_n[i] - agd_arm_r[i],
-                 (agd_arm_n[i] - agd_arm_r[i]) / (agd_arm_n[i] - agd_arm_n[i] * theta_agd_arm_bar[i])));
+      ((agd_arm_r[i] > 0 ?
+         lmultiply(agd_arm_r[i],
+                   agd_arm_r[i] / (agd_arm_n[i] * theta_agd_arm_bar[i])) : 0) +
+       (agd_arm_r[i] < agd_arm_n[i] ?
+         lmultiply(agd_arm_n[i] - agd_arm_r[i],
+                  (agd_arm_n[i] - agd_arm_r[i]) / (agd_arm_n[i] - agd_arm_n[i] * theta_agd_arm_bar[i])) : 0));
     fitted_agd_arm[i] = agd_arm_n[i] * theta_agd_arm_bar[i];
   }
 
