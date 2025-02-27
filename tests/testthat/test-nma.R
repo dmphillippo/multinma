@@ -53,6 +53,86 @@ test_that("nma() link must be valid", {
   expect_error(nma(smknet, link = c("log", "identity")), m)
 })
 
+#Class effect parameter error checks
+test_that("nma() class_effect must be valid", {
+  m <- "`class_effect` should be one of 'independent', 'common', or 'exchangeable'"
+  expect_error(nma(sa_net, class_effect = 1), m)
+  expect_error(nma(sa_net, class_effect = "random"), m)
+  expect_error(nma(sa_net, class_effect = c("independent", "common", "other")), m)
+})
+
+test_that("nma() class_sd must be valid", {
+  m <- "`class_sd` should be one of 'independent' or 'common'"
+  expect_error(nma(sa_net, class_sd = 1), m)
+  expect_error(nma(sa_net, class_sd = "exchangeable"), m)
+  expect_error(nma(sa_net, class_sd = c("independent", "common", "extra")), m)
+
+m_list <- "`class_sd` should be a list of character vectors corresponding to valid classes, with no duplicates"
+expect_error(
+  nma(sa_net, class_sd = list(classA = 1, classB = "Exposure")),
+  m_list
+)
+expect_error(
+  nma(sa_net, class_sd = list(classA = c("Exposure", "Exposure"))),
+  m_list
+)
+expect_error(
+  nma(sa_net, class_sd = list(classA = c("Exposure", "non_existent_class"))),
+  m_list
+)
+expect_error(
+  nma(sa_net, class_sd = list(
+    first_set = "Exposure",
+    second_set = "Exposure",
+    third_set = "Combined"
+  )),
+  m_list
+)
+})
+
+test_that("nma() gives an informative error if class_effect or class_sd are specified without classes in the network", {
+  m_no_classes <- "No classes found in the network, cannot specify class_effect or class_sd."
+
+  expect_error(nma(smknet, class_effect = "common"), m_no_classes)
+  expect_error(nma(smknet, class_sd = "common"), m_no_classes)
+})
+
+test_that("class_mean and class_sd parameters are named correctly", {
+  # Extract summaries for class_mean and class_sd
+  cm_summary <- summary(sa_fit_EXclass_RE, pars = "class_mean")$summary
+  cs_summary <- summary(sa_fit_EXclass_RE, pars = "class_sd")$summary
+
+  # Convert to data frames if they aren't already
+  cm_summary <- as.data.frame(cm_summary)
+  cs_summary <- as.data.frame(cs_summary)
+
+  # Extract parameter names from row names
+  cm_params <- rownames(cm_summary)
+  cs_params <- rownames(cs_summary)
+
+  # Check that all class_mean parameters are in format class_mean[<class_name>]
+  expect_true(all(grepl("^class_mean\\[.*\\]$", cm_params)),
+              info = "All class_mean parameters should match the pattern class_mean[...]")
+
+  # Check that all class_sd parameters are in format class_sd[<class_name>]
+  expect_true(all(grepl("^class_sd\\[.*\\]$", cs_params)),
+              info = "All class_sd parameters should match the pattern class_sd[...]")
+})
+
+
+test_that("class_effects = 'common' updates network$treatments", {
+  net_common <- nma(sa_net,
+                    class_effects = "common",
+                    trt_effects = "random",
+                    prior_trt = normal(0, 100),
+                    prior_het = half_normal(5))
+
+  # Check that net_common$network$treatments is updated to classes
+  expect_equal(levels(net_common$network$treatments),
+               levels(sa_net$classes),
+               info = "network$treatments should be replaced by class factor levels")
+})
+
 # Make dummy covariate data for smoking network
 ns_agd <- max(smoking$studyn)
 smkdummy <-
