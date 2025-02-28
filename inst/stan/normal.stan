@@ -40,8 +40,15 @@ transformed parameters {
         X_agd_arm * beta_tilde + offset_agd_arm :
         X_agd_arm * beta_tilde;
 
-      if (RE) {
+    if (class_effects) {
+      for (i in 1:ni_agd_arm) {
+        if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_class[agd_arm_trt[i] - 1]];
+        }
+      }
+    }
 
+      if (RE) {
         if (link == 1) { // identity link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
@@ -81,6 +88,15 @@ transformed parameters {
           X_agd_arm * beta_tilde + offset_agd_arm :
           X_agd_arm * beta_tilde;
 
+      // Add class effects contribution to the linear predictor
+        if (class_effects) {
+          for (i in 1:ni_agd_arm) {
+            if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+              eta_agd_arm_noRE[i] += f_class[which_class[agd_arm_trt[i] - 1]];
+            }
+          }
+        }
+
         if (link == 1) { // identity link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
@@ -97,17 +113,28 @@ transformed parameters {
           }
         }
       } else {
-        if (link == 1) // identity link
-          theta_agd_arm_bar = has_offset ?
-            X_agd_arm * beta_tilde + offset_agd_arm :
-            X_agd_arm * beta_tilde;
-        else if (link == 2) // log link
-          theta_agd_arm_bar = has_offset ?
-            exp(X_agd_arm * beta_tilde + offset_agd_arm) :
-            exp(X_agd_arm * beta_tilde);
+  vector[ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+    X_agd_arm * beta_tilde + offset_agd_arm :
+    X_agd_arm * beta_tilde;
+
+  // Add class effects contribution to the linear predictor
+  if (class_effects) {
+    for (i in 1:ni_agd_arm) {
+      if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+        eta_agd_arm_noRE[i] += f_class[which_class[agd_arm_trt[i] - 1]];
       }
     }
   }
+
+  // Apply the appropriate link function
+  if (link == 1) { // identity link
+    theta_agd_arm_bar = eta_agd_arm_noRE;
+  } else if (link == 2) { // log link
+    theta_agd_arm_bar = exp(eta_agd_arm_noRE);
+    }
+}
+}
+}
 }
 model {
 #include /include/model_common.stan

@@ -53,6 +53,64 @@ test_that("nma() link must be valid", {
   expect_error(nma(smknet, link = c("log", "identity")), m)
 })
 
+sa_net <- set_agd_contrast(social_anxiety, studyc, trtc, y = y, se = se, trt_class = classc, trt_ref = "Waitlist")
+
+#Class effect parameter error checks
+test_that("nma() class_effect must be valid", {
+  m <- "`class_effects` must be"
+  expect_error(nma(sa_net, class_effects = c("independent", "common")), m)
+  expect_error(nma(sa_net, class_effects = 1), m)
+  expect_error(nma(sa_net, class_effects = "random"), m)
+})
+
+test_that("nma() class_sd must be valid", {
+  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = list(group1 = c("Exposure", "NonExistentClass"))), "Some classes listed in 'class_sd' are not found in 'network$classes'")
+  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = list(group1 = c("Exposure", "NSSA"), group2 = c("NSSA", "SSRI/SNRI"))), "Some classes are listed in more than one shared standard deviation group in 'class_sd'")
+  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = c("common", "independent")), "class_sd must be provided as a list, not a character vector.")
+})
+
+test_that("nma() gives an informative error if class_effect are specified without classes in the network", {
+  m_no_classes <- "Setting `class_effects` requires treatment classes to be specified"
+  expect_error(nma(smknet, class_effect = "common"), m_no_classes)
+})
+
+sa_fit_EXclass_RE <- nma(sa_net, trt_effects = "random", prior_trt = normal(0, 100), prior_het = half_normal(5), class_effects = "exchangeable", prior_class_sd = normal(0.33,0.1), class_sd = list(`Exercise and SH no support` = c("Exercise promotion", "Self-help no support"), `SSRIs and NSSA` = c("SSRI/SNRI", "NSSA"), `Psychodynamic & Other psychological therapies` = c("Psychodynamic psychotherapy", "Other psychological therapies")))
+
+test_that("class_mean and class_sd parameters are named correctly", {
+  # Extract summaries for class_mean and class_sd
+  cm_summary <- summary(sa_fit_EXclass_RE, pars = "class_mean")$summary
+  cs_summary <- summary(sa_fit_EXclass_RE, pars = "class_sd")$summary
+
+  # Convert to data frames if they aren't already
+  cm_summary <- as.data.frame(cm_summary)
+  cs_summary <- as.data.frame(cs_summary)
+
+  # Extract parameter names from row names
+  cm_params <- cm_summary$parameter
+  cs_params <- cs_summary$parameter
+
+  # Check that all class_mean parameters are in format class_mean[<class_name>]
+  expect_true(all(grepl("^class_mean\\[.*\\]$", cm_params)),
+              info = "All class_mean parameters should match the pattern class_mean[...]")
+
+  # Check that all class_sd parameters are in format class_sd[<class_name>]
+  expect_true(all(grepl("^class_sd\\[.*\\]$", cs_params)),
+              info = "All class_sd parameters should match the pattern class_sd[...]")
+})
+
+test_that("class_effects = 'common' updates network$treatments", {
+  net_common <- nma(sa_net,
+                    class_effects = "common",
+                    trt_effects = "random",
+                    prior_trt = normal(0, 100),
+                    prior_het = half_normal(5))
+
+  # Check that net_common$network$treatments is updated to classes
+  expect_equal(levels(net_common$network$treatments),
+               levels(sa_net$classes),
+               info = "network$treatments should be replaced by class factor levels")
+})
+
 # Make dummy covariate data for smoking network
 ns_agd <- max(smoking$studyn)
 smkdummy <-
