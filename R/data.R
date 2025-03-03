@@ -400,3 +400,28 @@
 #'    \item{male}{proportion of male participants}
 #'  }
 "ndmm_agd_covs"
+
+#' Social Anxiety Dataset
+#'
+#' 3 data frames `sa`, `sa_trt` and `sa_class` containing aggregated data (AgD) results of 101 clinical trials comparing first-line treatments for social anxiety disorder
+#' in adults . The dataset comprises data from a total of 13,164 participants, comparing 41 different treatments
+#' that are further categorised into 17 distinct classes. The interventions of interest include oral drugs,
+#' psychological or behavioural therapies, and combinations of pharmacological and psychological therapies.
+#' Following Mayo-Wilson et al. \insertCite{mayo2014psychological}, the results are analysed as standardised mean differences (SMD) to allow comparisons.
+#'
+#' @format A data frame with 248 rows and 8 variables:
+#' \describe{
+#'   \item{studyn}{numeric study ID}
+#'   \item{studyc}{study name}
+#'   \item{trtn}{treatment ID}
+#'   \item{y}{standardised mean difference of the outcome measure}
+#'   \item{se}{standard error of the outcome measure}
+#'   \item{trtc}{treatment name}
+#'   \item{classn}{class ID}
+#'   \item{classc}{class name}
+#' }
+#'
+#' @references
+#'   \insertAllCited{}
+#'
+"social_anxiety"
