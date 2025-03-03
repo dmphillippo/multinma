@@ -64,14 +64,14 @@ test_that("nma() class_effect must be valid", {
 })
 
 test_that("nma() class_sd must be valid", {
-  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = list(group1 = c("Exposure", "NonExistentClass"))), "Some classes listed in 'class_sd' are not found in 'network$classes'")
+  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = list(group1 = c("Exposure", "NonExistentClass"))), "Some classes listed in 'class_sd' are not found in 'network$classes'", fixed = TRUE)
   expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = list(group1 = c("Exposure", "NSSA"), group2 = c("NSSA", "SSRI/SNRI"))), "Some classes are listed in more than one shared standard deviation group in 'class_sd'")
-  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = c("common", "independent")), "class_sd must be provided as a list, not a character vector.")
 })
 
 test_that("nma() gives an informative error if class_effect are specified without classes in the network", {
   m_no_classes <- "Setting `class_effects` requires treatment classes to be specified"
   expect_error(nma(smknet, class_effect = "common"), m_no_classes)
+  expect_error(nma(smknet, class_effect = "exchangeable"), m_no_classes)
 })
 
 sa_fit_EXclass_RE <- nma(sa_net, trt_effects = "random", prior_trt = normal(0, 100), prior_het = half_normal(5), class_effects = "exchangeable", prior_class_sd = normal(0.33,0.1), class_sd = list(`Exercise and SH no support` = c("Exercise promotion", "Self-help no support"), `SSRIs and NSSA` = c("SSRI/SNRI", "NSSA"), `Psychodynamic & Other psychological therapies` = c("Psychodynamic psychotherapy", "Other psychological therapies")))

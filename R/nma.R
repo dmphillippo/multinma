@@ -357,9 +357,6 @@ nma <- function(network,
   }
 
   # Check class_sd
-  if (!is.list(class_sd)) {
-    stop("class_sd must be provided as a list, not a character vector.")
-  }
   if (is.list(class_sd)) {
     # Check that all classes listed in 'class_sd' are in 'network$classes'
     if (!all(unlist(class_sd) %in% network$classes)) {
