@@ -209,17 +209,14 @@ plot.nma_dic <- function(x, y, ...,
   resdev_post$df_label <- paste0("df = ", resdev_post$df)
 
   if (!show_uncertainty) {
+    pw_all <- do.call(dplyr::bind_rows, x$pointwise)
+
     resdev_post <- dplyr::group_by(resdev_post, .data$parameter,
                                    .data$.label, .data$Type,
                                    .data$df, .data$df_label) %>%
       dplyr::summarise(resdev = mean(.data$resdev)) %>%
       dplyr::ungroup() %>%
-      dplyr::mutate(fitted = c(x$pointwise$ipd$fitted,
-                               x$pointwise$agd_arm$fitted,
-                               x$pointwise$agd_contrast$fitted),
-                    observed = c(x$pointwise$ipd$observed,
-                                 x$pointwise$agd_arm$observed,
-                                 x$pointwise$agd_contrast$observed))
+      dplyr::mutate(fitted = pw_all$fitted, observed = pw_all$observed)
   }
 
   if (has_y) { # Produce dev-dev plot
@@ -445,7 +442,11 @@ plot.nma_dic <- function(x, y, ...,
 
       # Calculate signed sqrt resdev, add in leverages
       rmax <- max(sqrt(resdev_post$resdev))
-      resdev_post$ssrd <- sign(resdev_post$observed - resdev_post$fitted) * sqrt(resdev_post$resdev)
+      if (is.matrix(resdev_post$observed)) {  # Ordered multinomial case
+        resdev_post$ssrd <- sign(rowSums(resdev_post$observed[,-1] - resdev_post$fitted[,-1], na.rm = TRUE)) * sqrt(resdev_post$resdev)
+      } else {
+        resdev_post$ssrd <- sign(resdev_post$observed - resdev_post$fitted) * sqrt(resdev_post$resdev)
+      }
 
       if (NROW(x$pointwise$ipd)) {
         resdev_post <- dplyr::left_join(resdev_post,

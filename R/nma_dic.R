@@ -159,13 +159,12 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
   } else if (x$likelihood == "ordered") {
     if (has_ipd(net)) {
       ipd_r <- net$ipd$.r
+      fitted_ipd <- matrix(fitted_ipd, nrow = n_ipd)
 
       if (penalty != "pV") {
-        m_fitted_ipd <- matrix(fitted_ipd, nrow = n_ipd)
-
         resdevfit_ipd <- vector("double", n_ipd)
         for (i in 1:n_ipd) {
-          resdevfit_ipd[i] <- 2 * sum((ipd_r[i,] * log(ipd_r[i,] / m_fitted_ipd[i,]))[!is.na(ipd_r[i,]) & ipd_r[i,] > 0])
+          resdevfit_ipd[i] <- 2 * sum((ipd_r[i,] * log(ipd_r[i,] / fitted_ipd[i,]))[!is.na(ipd_r[i,]) & ipd_r[i,] > 0])
         }
         leverage_ipd <- resdev_ipd - resdevfit_ipd
       }
@@ -179,13 +178,12 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
 
     if (has_agd_arm(net)) {
       agd_arm_r <- net$agd_arm$.r
+      fitted_agd_arm <- matrix(fitted_agd_arm, nrow = n_agd_arm)
 
       if (penalty != "pV") {
-        m_fitted_agd_arm <- matrix(fitted_agd_arm, nrow = n_agd_arm)
-
         resdevfit_agd_arm <- vector("double", n_agd_arm)
         for (i in 1:n_agd_arm) {
-          resdevfit_agd_arm[i] <- 2 * sum((agd_arm_r[i,] * log(agd_arm_r[i,] / m_fitted_agd_arm[i,]))[!is.na(agd_arm_r[i,]) & agd_arm_r[i,] > 0])
+          resdevfit_agd_arm[i] <- 2 * sum((agd_arm_r[i,] * log(agd_arm_r[i,] / fitted_agd_arm[i,]))[!is.na(agd_arm_r[i,]) & agd_arm_r[i,] > 0])
         }
         leverage_agd_arm <- resdev_agd_arm - resdevfit_agd_arm
       }
