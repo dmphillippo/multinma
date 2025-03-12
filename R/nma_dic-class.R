@@ -209,14 +209,10 @@ plot.nma_dic <- function(x, y, ...,
   resdev_post$df_label <- paste0("df = ", resdev_post$df)
 
   if (!show_uncertainty) {
-    pw_all <- do.call(dplyr::bind_rows, x$pointwise)
-
     resdev_post <- dplyr::group_by(resdev_post, .data$parameter,
                                    .data$.label, .data$Type,
                                    .data$df, .data$df_label) %>%
-      dplyr::summarise(resdev = mean(.data$resdev)) %>%
-      dplyr::ungroup() %>%
-      dplyr::mutate(fitted = pw_all$fitted, observed = pw_all$observed)
+      dplyr::summarise(resdev = mean(.data$resdev))
   }
 
   if (has_y) { # Produce dev-dev plot
@@ -442,33 +438,50 @@ plot.nma_dic <- function(x, y, ...,
 
       # Calculate signed sqrt resdev, add in leverages
       rmax <- max(sqrt(resdev_post$resdev))
-      if (is.matrix(resdev_post$observed)) {  # Ordered multinomial case
-        resdev_post$ssrd <- sign(rowSums(resdev_post$observed[,-1] - resdev_post$fitted[,-1], na.rm = TRUE)) * sqrt(resdev_post$resdev)
-      } else {
-        resdev_post$ssrd <- sign(resdev_post$observed - resdev_post$fitted) * sqrt(resdev_post$resdev)
-      }
 
       if (NROW(x$pointwise$ipd)) {
-        resdev_post <- dplyr::left_join(resdev_post,
+        resdev_post_ipd <- dplyr::right_join(resdev_post,
                                         dplyr::transmute(x$pointwise$ipd,
                                                          parameter = make_data_labels(.data$.study, .data$.trt),
-                                                         .data$leverage),
+                                                         .data$leverage,
+                                                         ssrd =
+                                                           if (is.matrix(.data$observed)) {  # Ordered multinomial case
+                                                            sign(rowSums(.data$observed[,-1] - .data$fitted[,-1], na.rm = TRUE)) * sqrt(.data$resdev)
+                                                           } else {
+                                                             sign(.data$observed - .data$fitted) * sqrt(.data$resdev)
+                                                           }
+                                        ),
                                         by = "parameter")
       }
       if (NROW(x$pointwise$agd_arm)) {
-        resdev_post <- dplyr::left_join(resdev_post,
+        resdev_post_aa <- dplyr::right_join(resdev_post,
                                         dplyr::transmute(x$pointwise$agd_arm,
                                                          parameter = make_data_labels(.data$.study, .data$.trt),
-                                                         .data$leverage),
+                                                         .data$leverage,
+                                                         ssrd =
+                                                           if (is.matrix(.data$observed)) {  # Ordered multinomial case
+                                                             sign(rowSums(.data$observed[,-1] - .data$fitted[,-1], na.rm = TRUE)) * sqrt(.data$resdev)
+                                                           } else {
+                                                             sign(.data$observed - .data$fitted) * sqrt(.data$resdev)
+                                                           }
+                                        ),
                                         by = "parameter")
       }
       if (NROW(x$pointwise$agd_contrast)) {
-        resdev_post <- dplyr::left_join(resdev_post,
+        resdev_post_ac <- dplyr::right_join(resdev_post,
                                         dplyr::transmute(x$pointwise$agd_contrast,
-                                                         parameter = make_data_labels(.data$.study, .data$.trta, .data$.trtb),
-                                                         .data$leverage),
+                                                         parameter = .data$.study,
+                                                         .data$leverage,
+                                                         ssrd = purrr::map2_dbl(.data$observed,
+                                                                                .data$fitted,
+                                                                                ~sign(sum(.x - .y))) * sqrt(.data$resdev)
+                                        ),
                                         by = "parameter")
       }
+
+      resdev_post <- dplyr::bind_rows(if (NROW(x$pointwise$ipd)) resdev_post_ipd else tibble::tibble(),
+                                      if (NROW(x$pointwise$agd_arm)) resdev_post_aa else tibble::tibble(),
+                                      if (NROW(x$pointwise$agd_contrast)) resdev_post_ac else tibble::tibble())
 
 
       p <- ggplot2::ggplot(resdev_post,
