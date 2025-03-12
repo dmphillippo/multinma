@@ -251,7 +251,9 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
       .trt = net$ipd$.trt,
       resdev = resdev_ipd,
       leverage = leverage_ipd,
-      dic = resdev_ipd + leverage_ipd)
+      dic = resdev_ipd + leverage_ipd,
+      fitted = fitted_ipd,
+      observed = get_outcome_variables(net$ipd, net$outcome$ipd)[[1]])
 
     if (has_df) pw$ipd$df <- df_ipd
   } else {
@@ -267,7 +269,9 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
       .trt = aa$.trt,
       resdev = resdev_agd_arm,
       leverage = leverage_agd_arm,
-      dic = resdev_agd_arm + leverage_agd_arm)
+      dic = resdev_agd_arm + leverage_agd_arm,
+      fitted = fitted_agd_arm,
+      observed = get_outcome_variables(net$agd_arm, net$outcome$agd_arm)[[1]])
 
     if (has_df) pw$agd_arm$df <- df_agd_arm
   } else {
@@ -280,7 +284,9 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
       n_contrast = agd_contrast_resdev_dat$n_contrast,
       resdev = resdev_agd_contrast,
       leverage = leverage_agd_contrast,
-      dic = resdev_agd_contrast + leverage_agd_contrast)
+      dic = resdev_agd_contrast + leverage_agd_contrast,
+      fitted = fitted_agd_contrast,
+      observed = get_outcome_variables(net$agd_contrast, net$outcome$agd_contrast)[[1]])
 
     if (has_df) pw$agd_contrast$df <- df_agd_contrast
   } else {
