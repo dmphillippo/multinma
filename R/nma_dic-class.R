@@ -476,12 +476,13 @@ plot.nma_dic <- function(x, y, ...,
       p <- p +
         ggplot2::labs(x = "Signed Square Root Residual Deviance",
                       y = "Leverage") +
-        ggplot2::geom_function(fun = function(x) 5 - x^2) +
-        ggplot2::geom_function(fun = function(x) 4 - x^2) +
-        ggplot2::geom_function(fun = function(x) 3 - x^2) +
-        ggplot2::geom_function(fun = function(x) 2 - x^2) +
-        ggplot2::geom_function(fun = function(x) 1 - x^2) +
-        ggplot2::annotate("label", x = 0, y = 1:5, label = paste0("DIC = ", 1:5)) +
+        ggplot2::geom_function(fun = function(x) 5 - x^2, colour = "grey60", inherit.aes = FALSE) +
+        ggplot2::geom_function(fun = function(x) 4 - x^2, colour = "grey60", inherit.aes = FALSE) +
+        ggplot2::geom_function(fun = function(x) 3 - x^2, colour = "grey60", inherit.aes = FALSE) +
+        ggplot2::geom_function(fun = function(x) 2 - x^2, colour = "grey60", inherit.aes = FALSE) +
+        ggplot2::geom_function(fun = function(x) 1 - x^2, colour = "grey60", inherit.aes = FALSE) +
+        ggplot2::annotate("label", vjust = 0, label.size = 0,  colour = "grey60", fill = NA,
+                          x = 0, y = 1:5, label = paste0("DIC = ", 1:5)) +
         ggplot2::geom_point(...) +
         theme_multinma()
 
