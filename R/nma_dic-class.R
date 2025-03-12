@@ -205,7 +205,14 @@ plot.nma_dic <- function(x, y, ...,
     resdev_post <- dplyr::group_by(resdev_post, .data$parameter,
                                    .data$.label, .data$Type,
                                    .data$df, .data$df_label) %>%
-      dplyr::summarise(resdev = mean(.data$resdev))
+      dplyr::summarise(resdev = mean(.data$resdev)) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(fitted = c(x$pointwise$ipd$fitted,
+                               x$pointwise$agd_arm$fitted,
+                               x$pointwise$agd_contrast$fitted),
+                    observed = c(x$pointwise$ipd$observed,
+                                 x$pointwise$agd_arm$observed,
+                                 x$pointwise$agd_contrast$observed))
   }
 
   if (has_y) { # Produce dev-dev plot
@@ -430,7 +437,7 @@ plot.nma_dic <- function(x, y, ...,
     } else { # Leverage plot
 
       # Calculate signed sqrt resdev, add in leverages
-      resdev_post$resdev <- sign(resdev_post$resdev) * sqrt(resdev_post$resdev)
+      resdev_post$resdev <- sign(resdev_post$observed - resdev_post$fitted) * sqrt(resdev_post$resdev)
 
       if (NROW(x$pointwise$ipd)) {
         resdev_post <- dplyr::left_join(resdev_post,
@@ -467,7 +474,7 @@ plot.nma_dic <- function(x, y, ...,
       }
 
       p <- p +
-        ggplot2::labs(x = "Square Root Residual Deviance",
+        ggplot2::labs(x = "Signed Square Root Residual Deviance",
                       y = "Leverage") +
         ggplot2::geom_function(fun = function(x) 5 - x^2) +
         ggplot2::geom_function(fun = function(x) 4 - x^2) +
