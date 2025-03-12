@@ -338,9 +338,7 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
   }
 
   if (!is.null(x$classes)) {
-    if(!identical(x$classes, x$treatments)) {
-      v_all$.trtclass <- x$classes
-    }
+    v_all$.trtclass <- x$classes
   }
 
   g <- igraph::graph_from_data_frame(e_all, directed = FALSE, vertices = v_all)
@@ -697,7 +695,6 @@ has_indirect <- function(network, trt1, trt2) {
 #'   `FALSE`.
 #' @param show_trt_class Colour treatment nodes by class, if `trt_class` is set?
 #'   Default is `FALSE`.
-#' @param level Display network at the treatment (default) or class level.
 #' @param nudge Numeric value to nudge the treatment labels away from the nodes
 #'   when `weight_nodes = TRUE`. Default is `0` (no adjustment to label
 #'   position). A small value like `0.1` is usually sufficient.
@@ -755,12 +752,8 @@ has_indirect <- function(network, trt1, trt2) {
 #'   ggplot2::guides(edge_width = "none", size = "none")
 #'
 plot.nma_data <- function(x, ..., layout, circular,
-                          weight_edges = TRUE,
-                          weight_nodes = FALSE,
-                          show_trt_class = FALSE,
-                          level = c("treatment", "class"),
-                          nudge = 0) {
-  level <- match.arg(level)
+                          weight_edges = TRUE, weight_nodes = FALSE,
+                          show_trt_class = FALSE, nudge = 0) {
   if (missing(layout) && missing(circular)) {
     layout <- "linear"
     circular <- TRUE
@@ -787,29 +780,8 @@ plot.nma_data <- function(x, ..., layout, circular,
     abort(paste("Treatment classes not specified in network.",
                 "Specify `trt_class` in set_*(), or set show_trt_class = FALSE.", sep = "\n"))
 
-  if(level == "class" && is.null(x$classes))
-    abort(paste("Treatment classes not specified in network.",
-                "Specify `trt_class` in set_*(), or set level == class", sep = "\n"))
-
   if (!rlang::is_double(nudge, n = 1, finite = TRUE))
     abort("`nudge` must be a single numeric value")
-
-  # network at the class level
-  if (level == "class"){
-    if(has_agd_contrast(x)){
-      x$agd_contrast$.trt <- x$agd_contrast$.trtclass
-      x$agd_contrast$trtn <- x$agd_contrast$classn
-      x$treatments <- x$classes
-    }
-    if(has_agd_arm(x)){
-      x$agd_arm$.trt <- x$agd_arm$.trtclass
-      x$treatments <- x$classes
-    }
-    if(has_ipd(x)){
-      x$ipd$.trt <- x$ipd$.trtclass
-      x$treatments <- x$classes
-    }
-  }
 
   dat_mixed <- has_ipd(x) && (has_agd_arm(x) || has_agd_contrast(x))
   g <- ggraph::ggraph(igraph::as.igraph(x), layout = layout, circular = circular, ...)
