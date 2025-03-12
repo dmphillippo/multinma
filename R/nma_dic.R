@@ -214,18 +214,20 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
       net$agd_contrast %>%
         dplyr::filter(!is.na(.data$.y)) %>%
         dplyr::mutate(.fitted = fitted_agd_contrast,
+                      .observed = get_outcome_variables(., net$outcome$agd_contrast)[[1]],
                       .study_inorder = forcats::fct_inorder(forcats::fct_drop(.data$.study))) %>%
         dplyr::group_by(.data$.study_inorder, .data$.study) %>%
         dplyr::summarise(.y = list(.data$.y),
                          fitted = list(.data$.fitted),
+                         observed = list(.data$.observed),
                          n_contrast = dplyr::n()) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(Sigma = Sigma,
                       resdev = resdev_agd_contrast) %>%
         dplyr::rowwise() %>%
-        dplyr::mutate(resdevfit = crossprod(.data$.y - .data$fitted,
+        dplyr::mutate(resdevfit = drop(crossprod(.data$.y - .data$fitted,
                                             solve(.data$Sigma,
-                                                  .data$.y - .data$fitted)),
+                                                  .data$.y - .data$fitted))),
                       leverage = .data$resdev - .data$resdevfit)
 
     leverage_agd_contrast <- agd_contrast_resdev_dat$leverage
@@ -283,8 +285,8 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
       resdev = resdev_agd_contrast,
       leverage = leverage_agd_contrast,
       dic = resdev_agd_contrast + leverage_agd_contrast,
-      fitted = fitted_agd_contrast,
-      observed = get_outcome_variables(net$agd_contrast, net$outcome$agd_contrast)[[1]])
+      fitted = agd_contrast_resdev_dat$fitted,
+      observed = agd_contrast_resdev_dat$observed)
 
     if (has_df) pw$agd_contrast$df <- df_agd_contrast
   } else {
