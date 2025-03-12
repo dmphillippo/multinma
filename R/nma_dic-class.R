@@ -74,6 +74,8 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' @param orientation Whether the `ggdist` geom is drawn horizontally
 #'   (`"horizontal"`) or vertically (`"vertical"`). Only used for residual
 #'   deviance plots, default `"vertical"`.
+#' @param dic_contours Numeric vector of DIC contribution contours to show on
+#'   leverage plots, default `1:4`.
 #'
 #' @return A `ggplot` object.
 #' @export
@@ -148,7 +150,8 @@ plot.nma_dic <- function(x, y, ...,
                          type = c("resdev", "leverage"),
                          show_uncertainty = TRUE,
                          stat = "pointinterval",
-                         orientation = c("vertical", "horizontal", "x", "y")) {
+                         orientation = c("vertical", "horizontal", "x", "y"),
+                         dic_contours = 1:4) {
   # Checks
   has_y <- !missing(y)
 
@@ -163,7 +166,11 @@ plot.nma_dic <- function(x, y, ...,
   else if (orientation == "y") orientation <- "horizontal"
 
   type <- rlang::arg_match(type)
-  if (type == "leverage") show_uncertainty <- FALSE
+  if (type == "leverage") {
+    show_uncertainty <- FALSE
+    if (!rlang::is_vector(dic_contours) || !(is.numeric(dic_contours) || all(is.na(dic_contours))))
+      abort("`dic_contours` must be a numeric vector.")
+  }
 
   # Get resdev samples from resdev_array
   resdev_post <- as.matrix.nma_summary(x$resdev_array) %>%
@@ -475,14 +482,18 @@ plot.nma_dic <- function(x, y, ...,
 
       p <- p +
         ggplot2::labs(x = "Signed Square Root Residual Deviance",
-                      y = "Leverage") +
-        ggplot2::geom_function(fun = function(x) 5 - x^2, colour = "grey60", inherit.aes = FALSE) +
-        ggplot2::geom_function(fun = function(x) 4 - x^2, colour = "grey60", inherit.aes = FALSE) +
-        ggplot2::geom_function(fun = function(x) 3 - x^2, colour = "grey60", inherit.aes = FALSE) +
-        ggplot2::geom_function(fun = function(x) 2 - x^2, colour = "grey60", inherit.aes = FALSE) +
-        ggplot2::geom_function(fun = function(x) 1 - x^2, colour = "grey60", inherit.aes = FALSE) +
-        ggplot2::annotate("label", vjust = 0, label.size = 0,  colour = "grey60", fill = NA,
-                          x = 0, y = 1:5, label = paste0("DIC = ", 1:5)) +
+                      y = "Leverage")
+
+      if (!all(is.na(dic_contours))) {
+        p <- p +
+          purrr::map(dic_contours,
+                     ~ggplot2::geom_function(fun = function(x, c) c - x^2, args = list(c = .),
+                                            colour = "grey60", inherit.aes = FALSE)) +
+          ggplot2::annotate("label", vjust = 0, label.size = 0,  colour = "grey60", fill = NA,
+                            x = 0, y = dic_contours, label = paste0("DIC = ", dic_contours))
+      }
+
+      p <- p +
         ggplot2::geom_point(...) +
         theme_multinma()
 
