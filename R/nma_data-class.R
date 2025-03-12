@@ -791,10 +791,6 @@ plot.nma_data <- function(x, ..., layout, circular,
     abort(paste("Treatment classes not specified in network.",
                 "Specify `trt_class` in set_*(), or set level == class", sep = "\n"))
 
-  if(level == "class" && show_trt_class)
-    abort(paste("show_trt_class is only available when levels = treatment.",
-                "Set show_trt_class = FALSE or set level = treatment", sep = "\n"))
-
   if (!rlang::is_double(nudge, n = 1, finite = TRUE))
     abort("`nudge` must be a single numeric value")
 
@@ -835,11 +831,11 @@ plot.nma_data <- function(x, ..., layout, circular,
 
   if (weight_nodes) {
     if (show_trt_class) {
-        g <- g +
-          ggraph::geom_node_point(ggplot2::aes(size = .data$.sample_size,
-                                               fill = .data$.trtclass,
-                                               colour = .data$.trtclass),
-                                  shape = 21)
+      g <- g +
+        ggraph::geom_node_point(ggplot2::aes(size = .data$.sample_size,
+                                             fill = .data$.trtclass,
+                                             colour = .data$.trtclass),
+                                shape = 21)
     } else {
       g <- g +
         ggraph::geom_node_point(ggplot2::aes(size = .data$.sample_size),
