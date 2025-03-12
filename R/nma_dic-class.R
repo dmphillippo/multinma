@@ -444,7 +444,8 @@ plot.nma_dic <- function(x, y, ...,
     } else { # Leverage plot
 
       # Calculate signed sqrt resdev, add in leverages
-      resdev_post$resdev <- sign(resdev_post$observed - resdev_post$fitted) * sqrt(resdev_post$resdev)
+      rmax <- max(sqrt(resdev_post$resdev))
+      resdev_post$ssrd <- sign(resdev_post$observed - resdev_post$fitted) * sqrt(resdev_post$resdev)
 
       if (NROW(x$pointwise$ipd)) {
         resdev_post <- dplyr::left_join(resdev_post,
@@ -471,7 +472,7 @@ plot.nma_dic <- function(x, y, ...,
 
       p <- ggplot2::ggplot(resdev_post,
                            ggplot2::aes(y = .data$leverage,
-                                        x = .data$resdev,
+                                        x = .data$ssrd,
                                         label = .data$.label))
 
       if (dplyr::n_distinct(resdev_post$Type) > 1) {
@@ -488,13 +489,18 @@ plot.nma_dic <- function(x, y, ...,
         p <- p +
           purrr::map(dic_contours,
                      ~ggplot2::geom_function(fun = function(x, c) c - x^2, args = list(c = .),
-                                            colour = "grey60", inherit.aes = FALSE)) +
+                                            colour = "grey60", inherit.aes = FALSE,
+                                            xlim = c(-rmax, rmax)*1.2)) +
           ggplot2::annotate("label", vjust = 0, label.size = 0,  colour = "grey60", fill = NA,
                             x = 0, y = dic_contours, label = paste0("DIC = ", dic_contours))
       }
 
       p <- p +
         ggplot2::geom_point(...) +
+        ggplot2::coord_cartesian(
+          ylim = c(min(0, resdev_post$leverage, na.rm = TRUE),
+                   max(dic_contours, resdev_post$leverage, na.rm = TRUE)),
+          xlim = c(-rmax, rmax)) +
         theme_multinma()
 
     }
