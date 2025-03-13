@@ -1,5 +1,7 @@
 # multinma 0.7.2.9000
 
+* Feature: Leverage plots can now be produced by `plot.nma_dic()`, with the 
+option `type = "leverage"`.
 * Feature: Networks with integration points can now be combined with 
 `combine_network()`, where previously these were discarded. One potential use 
 case is to specify different types of marginal distributions or correlation 

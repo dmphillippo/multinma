@@ -52,7 +52,7 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
   if (has_ipd(net)) {
     n_ipd <- nrow(net$ipd)
     resdev_ipd <- resdev[1:n_ipd]
-    fitted_ipd <- if (!x$likelihood %in% valid_lhood$survival) colMeans(as.matrix(x, pars = "fitted_ipd")) else NA
+    fitted_ipd <- if (!x$likelihood %in% valid_lhood$survival) colMeans(as.matrix(x, pars = "fitted_ipd")) else NULL
   } else {
     n_ipd <- 0
   }
@@ -65,7 +65,7 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
     } else {
       n_agd_arm <- sum(net$agd_arm$.sample_size)
       resdev_agd_arm <- resdev[n_ipd + (1:n_agd_arm)]
-      fitted_agd_arm <- NA
+      fitted_agd_arm <- NULL
     }
   } else {
     n_agd_arm <- 0
@@ -84,6 +84,7 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
   }
 
   has_df <- FALSE
+  df_ipd <- df_agd_arm <- df_agd_contrast <- 1
 
   if (x$likelihood %in% c("bernoulli", "bernoulli2", "binomial", "binomial2") && penalty != "pV") {
     if (has_ipd(net)) {
@@ -159,13 +160,12 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
   } else if (x$likelihood == "ordered") {
     if (has_ipd(net)) {
       ipd_r <- net$ipd$.r
+      fitted_ipd <- matrix(fitted_ipd, nrow = n_ipd)
 
       if (penalty != "pV") {
-        m_fitted_ipd <- matrix(fitted_ipd, nrow = n_ipd)
-
         resdevfit_ipd <- vector("double", n_ipd)
         for (i in 1:n_ipd) {
-          resdevfit_ipd[i] <- 2 * sum((ipd_r[i,] * log(ipd_r[i,] / m_fitted_ipd[i,]))[!is.na(ipd_r[i,]) & ipd_r[i,] > 0])
+          resdevfit_ipd[i] <- 2 * sum((ipd_r[i,] * log(ipd_r[i,] / fitted_ipd[i,]))[!is.na(ipd_r[i,]) & ipd_r[i,] > 0])
         }
         leverage_ipd <- resdev_ipd - resdevfit_ipd
       }
@@ -179,13 +179,12 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
 
     if (has_agd_arm(net)) {
       agd_arm_r <- net$agd_arm$.r
+      fitted_agd_arm <- matrix(fitted_agd_arm, nrow = n_agd_arm)
 
       if (penalty != "pV") {
-        m_fitted_agd_arm <- matrix(fitted_agd_arm, nrow = n_agd_arm)
-
         resdevfit_agd_arm <- vector("double", n_agd_arm)
         for (i in 1:n_agd_arm) {
-          resdevfit_agd_arm[i] <- 2 * sum((agd_arm_r[i,] * log(agd_arm_r[i,] / m_fitted_agd_arm[i,]))[!is.na(agd_arm_r[i,]) & agd_arm_r[i,] > 0])
+          resdevfit_agd_arm[i] <- 2 * sum((agd_arm_r[i,] * log(agd_arm_r[i,] / fitted_agd_arm[i,]))[!is.na(agd_arm_r[i,]) & agd_arm_r[i,] > 0])
         }
         leverage_agd_arm <- resdev_agd_arm - resdevfit_agd_arm
       }
@@ -195,10 +194,6 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
       has_df <- TRUE
     } else {
       leverage_agd_arm <- NULL
-    }
-
-    if (has_agd_contrast(net)) {
-      df_agd_contrast <- 1
     }
 
   } else if (x$likelihood %in% valid_lhood$survival) {
@@ -216,21 +211,29 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
       net$agd_contrast %>%
         dplyr::filter(!is.na(.data$.y)) %>%
         dplyr::mutate(.fitted = fitted_agd_contrast,
+                      .observed = get_outcome_variables(., net$outcome$agd_contrast)[[1]],
                       .study_inorder = forcats::fct_inorder(forcats::fct_drop(.data$.study))) %>%
         dplyr::group_by(.data$.study_inorder, .data$.study) %>%
         dplyr::summarise(.y = list(.data$.y),
                          fitted = list(.data$.fitted),
+                         observed = list(.data$.observed),
                          n_contrast = dplyr::n()) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(Sigma = Sigma,
                       resdev = resdev_agd_contrast) %>%
         dplyr::rowwise() %>%
-        dplyr::mutate(resdevfit = crossprod(.data$.y - .data$fitted,
+        dplyr::mutate(resdevfit = drop(crossprod(.data$.y - .data$fitted,
                                             solve(.data$Sigma,
-                                                  .data$.y - .data$fitted)),
+                                                  .data$.y - .data$fitted))),
                       leverage = .data$resdev - .data$resdevfit)
 
     leverage_agd_contrast <- agd_contrast_resdev_dat$leverage
+
+    # df for multi-arm trials
+    if (any(agd_contrast_resdev_dat$n_contrast > 1)) {
+      has_df <- TRUE
+      df_agd_contrast <- agd_contrast_resdev_dat$n_contrast
+    }
   } else {
     leverage_agd_contrast <- NULL
   }
@@ -251,7 +254,9 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
       .trt = net$ipd$.trt,
       resdev = resdev_ipd,
       leverage = leverage_ipd,
-      dic = resdev_ipd + leverage_ipd)
+      dic = resdev_ipd + leverage_ipd,
+      fitted = fitted_ipd,
+      observed = get_outcome_variables(net$ipd, net$outcome$ipd)[[1]])
 
     if (has_df) pw$ipd$df <- df_ipd
   } else {
@@ -267,7 +272,9 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
       .trt = aa$.trt,
       resdev = resdev_agd_arm,
       leverage = leverage_agd_arm,
-      dic = resdev_agd_arm + leverage_agd_arm)
+      dic = resdev_agd_arm + leverage_agd_arm,
+      fitted = fitted_agd_arm,
+      observed = get_outcome_variables(aa, net$outcome$agd_arm)[[1]])
 
     if (has_df) pw$agd_arm$df <- df_agd_arm
   } else {
@@ -280,7 +287,9 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
       n_contrast = agd_contrast_resdev_dat$n_contrast,
       resdev = resdev_agd_contrast,
       leverage = leverage_agd_contrast,
-      dic = resdev_agd_contrast + leverage_agd_contrast)
+      dic = resdev_agd_contrast + leverage_agd_contrast,
+      fitted = agd_contrast_resdev_dat$fitted,
+      observed = agd_contrast_resdev_dat$observed)
 
     if (has_df) pw$agd_contrast$df <- df_agd_contrast
   } else {
