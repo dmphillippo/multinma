@@ -13,7 +13,7 @@ TSD2;textualmultinma."><meta property="og:image" content="https://dmphillippo.gi
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9006</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9007</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,9 +77,11 @@ TSD2;textualmultinma.</p>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
 <span>  <span class="va">...</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"resdev"</span>, <span class="st">"leverage"</span><span class="op">)</span>,</span>
 <span>  show_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  stat <span class="op">=</span> <span class="st">"pointinterval"</span>,</span>
-<span>  orientation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"vertical"</span>, <span class="st">"horizontal"</span>, <span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span></span>
+<span>  orientation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"vertical"</span>, <span class="st">"horizontal"</span>, <span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span>,</span>
+<span>  dic_contours <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -100,9 +102,15 @@ model comparison.</p></dd>
 <dd><p>Additional arguments passed on to other methods</p></dd>
 
 
+<dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
+<dd><p>With a single <code>nma_dic</code> object, whether to show the residual
+deviance contribution for each data point (<code>"resdev"</code>, the default), or a
+leverage plot (<code>"leverage"</code>).</p></dd>
+
+
 <dt id="arg-show-uncertainty">show_uncertainty<a class="anchor" aria-label="anchor" href="#arg-show-uncertainty"></a></dt>
 <dd><p>Logical, show uncertainty with a <code>ggdist</code> plot
-stat? Default <code>TRUE</code>.</p></dd>
+stat? Default <code>TRUE</code>. Ignored for <code>type = "leverage"</code>.</p></dd>
 
 
 <dt id="arg-stat">stat<a class="anchor" aria-label="anchor" href="#arg-stat"></a></dt>
@@ -116,6 +124,11 @@ currently only <code>"pointinterval"</code> is supported.</p></dd>
 (<code>"horizontal"</code>) or vertically (<code>"vertical"</code>). Only used for residual
 deviance plots, default <code>"vertical"</code>.</p></dd>
 
+
+<dt id="arg-dic-contours">dic_contours<a class="anchor" aria-label="anchor" href="#arg-dic-contours"></a></dt>
+<dd><p>Numeric vector of DIC contribution contours to show on
+leverage plots, default <code>1:4</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -123,10 +136,16 @@ deviance plots, default <code>"vertical"</code>.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>When a single <code>nma_dic</code> object is given, a plot of the residual
-deviance contribution for each data point is produced. For a good fitting
-model, each data point is expected to have a residual deviance of 1; larger
-values indicate data points that are fit poorly by the model.</p>
+    <p>When a single <code>nma_dic</code> object is given, the default plot (<code>type = "resdev"</code>) shows the residual deviance contribution for each data point.
+For a good fitting model, each data point is expected to have a residual
+deviance equal to its degrees of freedom (typically 1, except for multi-arm
+trials in contrast format or multinomial outcomes); larger values indicate
+data points that are fit poorly by the model. A leverage plot can be
+produced with <code>type = "leverage"</code>, plotting the leverages (contributions to
+\(p_D\)) against the signed square root residual deviance, both
+standardised by the degrees of freedom. Contours for different DIC
+contribution cutoffs are also shown; points which lie outside the DIC=3
+contour are generally identified as contributing to a model's poor fit.</p>
 <p>When two <code>nma_dic</code> objects are given, a "dev-dev" plot comparing the
 residual deviance contributions under each model is produced. Data points
 with residual deviance contributions lying on the line of equality are fit
@@ -184,6 +203,10 @@ mean effects (UME) inconsistency model (fitted using <code><a href="nma.html">nm
 <span class="r-in"><span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_identity.html" class="external-link">scale_colour_identity</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot.nma_dic-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Leverage plot for RE model</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_dic_RE</span>, type <span class="op">=</span> <span class="st">"leverage"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot.nma_dic-4.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Check for inconsistency using UME model</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
@@ -203,16 +226,16 @@ mean effects (UME) inconsistency model (fitted using <code><a href="nma.html">nm
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Compare residual deviance contributions with a "dev-dev" plot</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_dic_RE</span>, <span class="va">smk_dic_RE_UME</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="plot.nma_dic-4.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="plot.nma_dic-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># By default the dev-dev plot can be a little cluttered</span></span></span>
 <span class="r-in"><span><span class="co"># Hiding the credible intervals</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_dic_RE</span>, <span class="va">smk_dic_RE_UME</span>, show_uncertainty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="plot.nma_dic-5.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="plot.nma_dic-6.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Changing transparency</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_dic_RE</span>, <span class="va">smk_dic_RE_UME</span>, point_alpha <span class="op">=</span> <span class="fl">0.5</span>, interval_alpha <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="plot.nma_dic-6.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="plot.nma_dic-7.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
