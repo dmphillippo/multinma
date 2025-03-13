@@ -102,7 +102,7 @@ reference:
   - plot_prior_posterior
   - plot_integration_error
   - dic
-  - nma_dic-methods
+  - print.nma_dic
   - plot.nma_dic
   - nma_dic-class
   - loo
