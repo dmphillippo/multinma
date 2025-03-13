@@ -102,7 +102,7 @@ reference:
   - plot_prior_posterior
   - plot_integration_error
   - dic
-  - print.nma_dic
+  - nma_dic-methods
   - plot.nma_dic
   - nma_dic-class
   - loo
@@ -146,6 +146,7 @@ reference:
   - matches("[pdqhH]mspline")
   - rmst_mspline
   - make_knots
+  - softmax
 
 - title: ggplot functions
   desc: Functions for creating or customising ggplot outputs.
