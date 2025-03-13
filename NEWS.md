@@ -7,6 +7,10 @@ option `type = "leverage"`.
 case is to specify different types of marginal distributions or correlation 
 structures for different AgD studies in the network, by setting these up 
 separately with `add_integration()` before combining with `combine_network()`.
+* Feature: Added `as.data.frame.nma_dic()` and `as_tibble.nma_dic()` methods 
+that return data frames of the pointwise contributions to the DIC, and
+`as.matrix.nma_dic()` and `as.array.nma_dic()` methods that return posterior 
+samples of the residual deviances as a matrix or 3D array.
 * Fix: Resolved a bug where trying to fit meta-regression models with discrete 
 covariates would sometimes result in a misspecified and inestimable model, due 
 to the inclusion of additional columns in the design matrix for the reference 

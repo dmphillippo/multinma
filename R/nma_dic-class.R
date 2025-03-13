@@ -22,16 +22,29 @@
 #'
 NULL
 
-#' Print DIC details
+#' Methods for `nma_dic` objects
 #'
-#' Print details of DIC model fit statistics, computed by [dic()] function.
+#' The `print()` method prints details of DIC model fit statistics, computed by
+#' the  [dic()] function. The `as.data.frame()`, `as_tibble()`, and `as.tibble()` methods return the
+#' pointwise contributions to the DIC and $p_D$ in a data frame or tibble. The `as.array()` and `as.matrix()`
+#' methods returns a 3D MCMC array (as class [mcmc_array]) or matrix of posterior draws of the residual deviances.
+#'
 #'
 #' @param x An object of class [nma_dic]
-#' @param digits An integer passed to [round()]
-#' @param ... Ignored
+#' @param digits Integer number of digits to display
+#' @param ... Additional arguments passed on to other methods
 #'
-#' @return `x` is returned invisibly.
+#' @rdname nma_dic-methods
+#'
+#' @seealso [dic()], [plot.nma_dic()]
+#'
+#' @return A `data.frame` for `as.data.frame()`, a `tbl_df` for `as.tibble()`
+#'   and `as_tibble()`, a `matrix` for `as.matrix()`, and an `mcmc_array` for
+#'   `as.array()`.
+#'
+#'   The `print()` method returns `x` invisibly.
 #' @export
+#'
 print.nma_dic <- function(x, digits = 1, ...) {
   if (!rlang::is_scalar_integerish(digits)) abort("`digits` must be a single integer.")
 
@@ -51,6 +64,45 @@ print.nma_dic <- function(x, digits = 1, ...) {
   invisible(x)
 }
 
+#' @rdname nma_dic-methods
+#' @export
+as.data.frame.nma_dic <- function(x, ...) {
+  return(as.data.frame(dplyr::bind_rows(purrr::map(x$pointwise, ~dplyr::select(., -.data$observed, -.data$fitted)), ...)))
+}
+
+#' @rdname nma_dic-methods
+#' @method as.tibble nma_dic
+#' @export
+as.tibble.nma_dic <- function(x, ...) {
+  return(dplyr::bind_rows(purrr::map(x$pointwise, ~dplyr::select(., -.data$observed, -.data$fitted)), ...))
+}
+
+#' @rdname nma_dic-methods
+#' @export
+as_tibble.nma_dic <- function(x, ...) {
+  return(dplyr::bind_rows(purrr::map(x$pointwise, ~dplyr::select(., -.data$observed, -.data$fitted)), ...))
+}
+
+#' @rdname nma_dic-methods
+#' @export
+as.array.nma_dic <- function(x, ...) {
+  out <- x$resdev_array
+  class(out) <-  c("mcmc_array", "array")
+  return(out)
+}
+
+#' @rdname nma_dic-methods
+#' @export
+as.matrix.nma_dic <- function(x, ...){
+  # Follow approach in rstan:::as.matrix.stanfit
+  a <- as.array(x)
+  names_a <- dimnames(a)
+  dim_a <- dim(a)
+  dim(a) <- c(dim_a[1] * dim_a[2], dim_a[3])
+  dimnames(a) <- names_a[-2]
+  class(a) <- "matrix"
+  return(a)
+}
 
 #' Plots of model fit diagnostics
 #'
