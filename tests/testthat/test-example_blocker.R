@@ -12,8 +12,9 @@ list(run_tests = FALSE)
 
 
 ## ----eval = FALSE---------------------------------------------------------------------------------
-## library(multinma)
-## options(mc.cores = parallel::detectCores())
+# library(multinma)
+# options(mc.cores = parallel::detectCores())
+# library(ggplot2)
 
 ## ----setup, echo = FALSE--------------------------------------------------------------------------
 library(multinma)
@@ -21,6 +22,7 @@ nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
              "true" =, "warn" = 2, 
              parallel::detectCores())
 options(mc.cores = nc)
+library(ggplot2)
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -53,8 +55,8 @@ blocker_fit_FE
 
 
 ## ----eval=FALSE-----------------------------------------------------------------------------------
-## # Not run
-## print(blocker_fit_FE, pars = c("d", "mu"))
+# # Not run
+# print(blocker_fit_FE, pars = c("d", "mu"))
 
 
 ## ----blocker_FE_pp_plot---------------------------------------------------------------------------
@@ -79,8 +81,8 @@ blocker_fit_RE
 
 
 ## ----eval=FALSE-----------------------------------------------------------------------------------
-## # Not run
-## print(blocker_fit_RE, pars = c("d", "mu", "delta"))
+# # Not run
+# print(blocker_fit_RE, pars = c("d", "mu", "delta"))
 
 
 ## ----blocker_RE_pp_plot---------------------------------------------------------------------------
@@ -100,6 +102,18 @@ plot(dic_FE)
 
 ## ----blocker_RE_resdev_plot-----------------------------------------------------------------------
 plot(dic_RE)
+
+
+## ----blocker_leverage_FE--------------------------------------------------------------------------
+plot(dic_FE, type = "leverage") + 
+  # Add labels for points outside DIC=3
+  geom_text(aes(label = parameter), data = ~subset(., dic > 3), vjust = -0.5)
+
+
+## ----blocker_leverage_RE--------------------------------------------------------------------------
+plot(dic_RE, type = "leverage") + 
+  # Add labels for points outside DIC=3
+  geom_text(aes(label = parameter), data = ~subset(., dic > 3), vjust = -0.5)
 
 
 ## ----blocker_pred_FE, fig.height = 2--------------------------------------------------------------
