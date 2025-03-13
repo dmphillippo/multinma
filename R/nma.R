@@ -1331,6 +1331,7 @@ if (class_effects == "exchangeable") {
 
     # Label class_sd parameters
     fnames_oi[grepl("^class_sd\\[[0-9]+\\]$", fnames_oi)] <- paste0("class_sd[", class_sd_design$label, "]")
+    network$class_sd <- class_sd_design$label
 }
   stanfit@sim$fnames_oi <- fnames_oi
 
