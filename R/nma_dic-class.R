@@ -131,6 +131,9 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #'   ggplot2::aes(colour = ggplot2::after_stat(ifelse(ymin > 1, "darkorange", "black"))) +
 #'   ggplot2::scale_colour_identity()
 #'
+#' # Leverage plot for RE model
+#' plot(smk_dic_RE, type = "leverage")
+#'
 #' # Check for inconsistency using UME model
 #' }
 #' @template ex_smoking_nma_re_ume_example
