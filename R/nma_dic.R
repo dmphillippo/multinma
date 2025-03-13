@@ -52,7 +52,7 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
   if (has_ipd(net)) {
     n_ipd <- nrow(net$ipd)
     resdev_ipd <- resdev[1:n_ipd]
-    fitted_ipd <- if (!x$likelihood %in% valid_lhood$survival) colMeans(as.matrix(x, pars = "fitted_ipd")) else NA
+    fitted_ipd <- if (!x$likelihood %in% valid_lhood$survival) colMeans(as.matrix(x, pars = "fitted_ipd")) else NULL
   } else {
     n_ipd <- 0
   }
@@ -65,7 +65,7 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
     } else {
       n_agd_arm <- sum(net$agd_arm$.sample_size)
       resdev_agd_arm <- resdev[n_ipd + (1:n_agd_arm)]
-      fitted_agd_arm <- NA
+      fitted_agd_arm <- NULL
     }
   } else {
     n_agd_arm <- 0
@@ -271,7 +271,7 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
       leverage = leverage_agd_arm,
       dic = resdev_agd_arm + leverage_agd_arm,
       fitted = fitted_agd_arm,
-      observed = get_outcome_variables(net$agd_arm, net$outcome$agd_arm)[[1]])
+      observed = get_outcome_variables(aa, net$outcome$agd_arm)[[1]])
 
     if (has_df) pw$agd_arm$df <- df_agd_arm
   } else {

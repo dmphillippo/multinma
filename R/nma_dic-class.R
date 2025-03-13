@@ -170,6 +170,9 @@ plot.nma_dic <- function(x, y, ...,
     show_uncertainty <- FALSE
     if (!rlang::is_vector(dic_contours) || !(is.numeric(dic_contours) || all(is.na(dic_contours))))
       abort("`dic_contours` must be a numeric vector.")
+    if (!is.null(x$pointwise$ipd) && survival::is.Surv(x$pointwise$ipd[["observed"]]) ||
+        !is.null(x$pointwise$agd_arm) && survival::is.Surv(x$pointwise$agd_arm[["observed"]]))
+      abort("Leverage plots are not currently supported for survival outcomes.")
   }
 
   # Get resdev samples from resdev_array
