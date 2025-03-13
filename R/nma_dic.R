@@ -84,6 +84,7 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
   }
 
   has_df <- FALSE
+  df_ipd <- df_agd_arm <- df_agd_contrast <- 1
 
   if (x$likelihood %in% c("bernoulli", "bernoulli2", "binomial", "binomial2") && penalty != "pV") {
     if (has_ipd(net)) {
@@ -195,10 +196,6 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
       leverage_agd_arm <- NULL
     }
 
-    if (has_agd_contrast(net)) {
-      df_agd_contrast <- 1
-    }
-
   } else if (x$likelihood %in% valid_lhood$survival) {
     # Nothing to do, pV only
 
@@ -231,6 +228,12 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
                       leverage = .data$resdev - .data$resdevfit)
 
     leverage_agd_contrast <- agd_contrast_resdev_dat$leverage
+
+    # df for multi-arm trials
+    if (any(agd_contrast_resdev_dat$n_contrast > 1)) {
+      has_df <- TRUE
+      df_agd_contrast <- agd_contrast_resdev_dat$n_contrast
+    }
   } else {
     leverage_agd_contrast <- NULL
   }

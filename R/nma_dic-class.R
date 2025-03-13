@@ -81,11 +81,14 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' @export
 #'
 #' @details When a single `nma_dic` object is given, the default plot (`type =
-#'   "resdev"`) shows the residual deviance contribution for each data point. For a good fitting model, each data point is expected to have a
-#'   residual deviance of 1; larger values indicate data points that are fit
-#'   poorly by the model. A leverage plot can be produced with `type =
-#'   "leverage"`, plotting the leverages (contributions to \eqn{p_D}) against
-#'   the signed square root residual deviance. Contours for different DIC
+#'   "resdev"`) shows the residual deviance contribution for each data point.
+#'   For a good fitting model, each data point is expected to have a residual
+#'   deviance equal to its degrees of freedom (typically 1, except for multi-arm
+#'   trials in contrast format or multinomial outcomes); larger values indicate
+#'   data points that are fit poorly by the model. A leverage plot can be
+#'   produced with `type = "leverage"`, plotting the leverages (contributions to
+#'   \eqn{p_D}) against the signed square root residual deviance, both
+#'   standardised by the degrees of freedom. Contours for different DIC
 #'   contribution cutoffs are also shown; points which lie outside the DIC=3
 #'   contour are generally identified as contributing to a model's poor fit.
 #'
@@ -440,8 +443,6 @@ plot.nma_dic <- function(x, y, ...,
     } else { # Leverage plot
 
       # Calculate signed sqrt resdev, add in leverages
-      rmax <- max(sqrt(resdev_post$resdev))
-
       if (NROW(x$pointwise$ipd)) {
         resdev_post_ipd <- dplyr::right_join(resdev_post,
                                         dplyr::transmute(x$pointwise$ipd,
@@ -486,6 +487,10 @@ plot.nma_dic <- function(x, y, ...,
                                       if (NROW(x$pointwise$agd_arm)) resdev_post_aa else tibble::tibble(),
                                       if (NROW(x$pointwise$agd_contrast)) resdev_post_ac else tibble::tibble())
 
+      # Standardise sqrt residual deviances and leverages by df (e.g. for multi-arm trials)
+      resdev_post$ssrd <- resdev_post$ssrd / sqrt(resdev_post$df)
+      resdev_post$leverage <- resdev_post$leverage / resdev_post$df
+
 
       p <- ggplot2::ggplot(resdev_post,
                            ggplot2::aes(y = .data$leverage,
@@ -501,6 +506,8 @@ plot.nma_dic <- function(x, y, ...,
       p <- p +
         ggplot2::labs(x = "Signed Square Root Residual Deviance",
                       y = "Leverage")
+
+      rmax <- max(sqrt(resdev_post$resdev))
 
       if (!all(is.na(dic_contours))) {
         p <- p +
