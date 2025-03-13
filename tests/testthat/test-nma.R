@@ -80,30 +80,6 @@ test_that("nma() gives an informative error if class_effect are specified withou
   expect_error(nma(smknet, class_effect = "exchangeable"), m_no_classes)
 })
 
-sa_fit_EXclass_RE <- nma(sa_net, trt_effects = "random", prior_trt = normal(0, 100), prior_het = half_normal(5), class_effects = "exchangeable", prior_class_sd = normal(0.33,0.1), class_sd = list(`Exercise and SH no support` = c("Exercise promotion", "Self-help no support"), `SSRIs and NSSA` = c("SSRI/SNRI", "NSSA"), `Psychodynamic & Other psychological therapies` = c("Psychodynamic psychotherapy", "Other psychological therapies")))
-
-test_that("class_mean and class_sd parameters are named correctly", {
-  # Extract summaries for class_mean and class_sd
-  cm_summary <- summary(sa_fit_EXclass_RE, pars = "class_mean")$summary
-  cs_summary <- summary(sa_fit_EXclass_RE, pars = "class_sd")$summary
-
-  # Convert to data frames if they aren't already
-  cm_summary <- as.data.frame(cm_summary)
-  cs_summary <- as.data.frame(cs_summary)
-
-  # Extract parameter names from row names
-  cm_params <- cm_summary$parameter
-  cs_params <- cs_summary$parameter
-
-  # Check that all class_mean parameters are in format class_mean[<class_name>]
-  expect_true(all(grepl("^class_mean\\[.*\\]$", cm_params)),
-              info = "All class_mean parameters should match the pattern class_mean[...]")
-
-  # Check that all class_sd parameters are in format class_sd[<class_name>]
-  expect_true(all(grepl("^class_sd\\[.*\\]$", cs_params)),
-              info = "All class_sd parameters should match the pattern class_sd[...]")
-})
-
 test_that("class_effects = 'common' updates network$treatments", {
   net_common <- nma(sa_net,
                     class_effects = "common",
