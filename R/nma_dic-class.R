@@ -450,6 +450,7 @@ plot.nma_dic <- function(x, y, ...,
         resdev_post_ipd <- dplyr::right_join(resdev_post,
                                         dplyr::transmute(x$pointwise$ipd,
                                                          parameter = make_data_labels(.data$.study, .data$.trt),
+                                                         .data$dic,
                                                          .data$leverage,
                                                          ssrd =
                                                            if (is.matrix(.data$observed)) {  # Ordered multinomial case
@@ -464,6 +465,7 @@ plot.nma_dic <- function(x, y, ...,
         resdev_post_aa <- dplyr::right_join(resdev_post,
                                         dplyr::transmute(x$pointwise$agd_arm,
                                                          parameter = make_data_labels(.data$.study, .data$.trt),
+                                                         .data$dic,
                                                          .data$leverage,
                                                          ssrd =
                                                            if (is.matrix(.data$observed)) {  # Ordered multinomial case
@@ -478,6 +480,7 @@ plot.nma_dic <- function(x, y, ...,
         resdev_post_ac <- dplyr::right_join(resdev_post,
                                         dplyr::transmute(x$pointwise$agd_contrast,
                                                          parameter = .data$.study,
+                                                         .data$dic,
                                                          .data$leverage,
                                                          ssrd = purrr::map2_dbl(.data$observed,
                                                                                 .data$fitted,
