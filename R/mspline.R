@@ -276,10 +276,18 @@ rw1_prior_weights <- function(basis) {
   return(sqrt(wts))
 }
 
-#' softmax transform
+#' Softmax transform
+#'
+#' The softmax transform is a multivariate generalisation of the logit
+#' transform. `softmax()` maps a vector of $K-1$ values on the real line to a
+#' $K$ simplex (i.e. values between 0 and 1, that all sum to 1). `inv_softmax()`
+#' provides the inverse transform, mapping a $K$ simplex vector to a vector of
+#' $K-1$ real values.
+#'
 #' @param x K-1 vector of reals
-#' @return K vector simplex
-#' @noRd
+#' @return `softmax()` returns a vector of length K that is a simplex.
+#'   `inv_softmax()` returns a vector of reals of length K-1.
+#' @export
 softmax <- function(x) {
   x0 <- c(0, x)
   exp(x0 - logsumexp(x0))
@@ -292,8 +300,8 @@ logsumexp <- function(x) {
 
 #' inverse softmax transform
 #' @param p K vector simplex
-#' @return K-1 vector of reals
-#' @noRd
+#' @export
+#' @rdname softmax
 inv_softmax <- function(p) {
   log(p[-1]) - log(p[1])
 }

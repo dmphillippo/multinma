@@ -11,6 +11,7 @@ separately with `add_integration()` before combining with `combine_network()`.
 that return data frames of the pointwise contributions to the DIC, and
 `as.matrix.nma_dic()` and `as.array.nma_dic()` methods that return posterior 
 samples of the residual deviances as a matrix or 3D array.
+* Feature: The `softmax()` and `inv_softmax()` transforms are now exported.
 * Fix: Resolved a bug where trying to fit meta-regression models with discrete 
 covariates would sometimes result in a misspecified and inestimable model, due 
 to the inclusion of additional columns in the design matrix for the reference 
