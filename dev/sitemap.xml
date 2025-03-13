@@ -58,6 +58,7 @@
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/nma.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/nma_data-class.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/nma_dic-class.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/nma_dic-methods.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/nma_nodesplit-class.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/nma_prior-class.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/nma_summary-class.html</loc></url>
@@ -76,7 +77,6 @@
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/posterior_ranks.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/predict.stan_nma.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/print.nma_data.html</loc></url>
-<url><loc>https://dmphillippo.github.io/multinma/dev/reference/print.nma_dic.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/print.nma_nodesplit_df.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/print.stan_nma.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/priors.html</loc></url>
@@ -88,6 +88,7 @@
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/set_agd_surv.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/set_ipd.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/smoking.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/dev/reference/softmax.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/stan_nma-class.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/statins.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/dev/reference/summary.nma_nodesplit_df.html</loc></url>
