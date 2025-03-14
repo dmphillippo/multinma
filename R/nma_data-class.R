@@ -796,6 +796,23 @@ plot.nma_data <- function(x, ..., layout, circular,
   if (!rlang::is_double(nudge, n = 1, finite = TRUE))
     abort("`nudge` must be a single numeric value")
 
+  # network at the class level
+  if (level == "class"){
+    if(has_agd_contrast(x)){
+      x$agd_contrast$.trt <- x$agd_contrast$.trtclass
+      x$agd_contrast$trtn <- x$agd_contrast$classn
+      x$treatments <- x$classes
+    }
+    if(has_agd_arm(x)){
+      x$agd_arm$.trt <- x$agd_arm$.trtclass
+      x$treatments <- x$classes
+    }
+    if(has_ipd(x)){
+      x$ipd$.trt <- x$ipd$.trtclass
+      x$treatments <- x$classes
+    }
+  }
+
   dat_mixed <- has_ipd(x) && (has_agd_arm(x) || has_agd_contrast(x))
   g <- ggraph::ggraph(igraph::as.igraph(x), layout = layout, circular = circular, ...)
 
