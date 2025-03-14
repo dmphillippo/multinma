@@ -25,3 +25,10 @@ transform. \code{softmax()} maps a vector of \eqn{K-1} values on the real line t
 provides the inverse transform, mapping a \eqn{K}-simplex vector to a vector of
 \eqn{K-1} real values.
 }
+\examples{
+x <- c(-1, 3, -0.5, 2)
+(p <- softmax(x))
+sum(p)
+inv_softmax(p)
+
+}

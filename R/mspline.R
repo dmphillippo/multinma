@@ -288,6 +288,13 @@ rw1_prior_weights <- function(basis) {
 #' @return `softmax()` returns a vector of length \eqn{K} that is a simplex.
 #'   `inv_softmax()` returns a vector of reals of length \eqn{K-1}.
 #' @export
+#'
+#' @examples
+#' x <- c(-1, 3, -0.5, 2)
+#' (p <- softmax(x))
+#' sum(p)
+#' inv_softmax(p)
+#'
 softmax <- function(x) {
   x0 <- c(0, x)
   exp(x0 - logsumexp(x0))
