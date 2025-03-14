@@ -695,6 +695,7 @@ has_indirect <- function(network, trt1, trt2) {
 #'   `FALSE`.
 #' @param show_trt_class Colour treatment nodes by class, if `trt_class` is set?
 #'   Default is `FALSE`.
+#' @param level Display network at the treatment (default) or class level.
 #' @param nudge Numeric value to nudge the treatment labels away from the nodes
 #'   when `weight_nodes = TRUE`. Default is `0` (no adjustment to label
 #'   position). A small value like `0.1` is usually sufficient.
