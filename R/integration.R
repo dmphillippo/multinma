@@ -621,36 +621,43 @@ pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
 #' @rdname logitNormal
 #' @aliases qlogitnorm
 qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
-  require_pkg("logitnorm")
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
-  return(logitnorm::qlogitnorm(p, pars[["mu"]], pars[["sigma"]], ...))
+  return(plogis(qnorm(p, mean = pars[["mu"]], sd = pars[["sigma"]], ...)))
 }
 
 #' @export
 #' @rdname logitNormal
 #' @aliases dlogitnorm
 dlogitnorm <- function(x, mu = 0, sigma = 1, ..., mean, sd) {
-  require_pkg("logitnorm")
+  islog <- isTRUE(rlang::list2(...)$log)
+
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
-  return(logitnorm::dlogitnorm(x, pars[["mu"]], pars[["sigma"]], ...))
+
+  out <- dnorm(qlogis(x), mean = pars[["mu"]], sd = pars[["sigma"]], ...)
+  if (islog) {
+    out <- out - log(x) - log1p(-x)
+  } else {
+    out <- out / (x * (1 - x))
+  }
+  return(out)
 }
 
 #' @export
 #' @rdname logitNormal
 #' @aliases plogitnorm
 plogitnorm <- function(q, mu = 0, sigma = 1, ..., mean, sd) {
-  require_pkg("logitnorm")
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
-  return(logitnorm::plogitnorm(q, pars[["mu"]], pars[["sigma"]], ...))
+  return(pnorm(qlogis(q), mean = pars[["mu"]], sd = pars[["sigma"]], ...))
 }
 
 # Internal functions for *logitnorm()
 .lndiff <- function(est, m, s){
-  x <- logitnorm::momentsLogitnorm(est[1], est[2])
-  return((x[1] - m)^2 + (sqrt(x[2]) - s)^2)
+  smean <- integrate(function(x) x * dlogitnorm(x, mu = est[1], sigma = est[2]), 0, 1)$value
+  ssd <- sqrt(integrate(function(x) (x - smean)^2 * dlogitnorm(x, mu = est[1], sigma = est[2]), 0, 1)$value)
+  return((smean - m)^2 + (ssd - s)^2)
 }
 
 .lnopt <- function(m, s) {
