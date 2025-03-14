@@ -9,6 +9,7 @@ sa_fit_EXclass_RE <- suppressWarnings(nma(sa_net, trt_effects = "random",
                                           prior_trt = normal(0, 100),
                                           prior_het = half_normal(5),
                                           class_effects = "exchangeable",
+                                          iter = 10,
                                           prior_class_sd = normal(0.33,0.1),
                                           class_sd =
                                             list(`Exercise and SH no support` = c("Exercise promotion", "Self-help no support"),
