@@ -65,7 +65,6 @@ Suggests:
     R.rsp,
     rprojroot,
     loo (>= 2.0.0),
-    logitnorm,
     crayon,
     tidygraph,
     pkgdown,
