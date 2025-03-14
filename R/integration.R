@@ -603,29 +603,22 @@ pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
 
 #' The logit Normal distribution
 #'
-#' We provide convenient extensions of the `[dpq]logitnorm` functions in the
-#' package \link[logitnorm:logitnorm-package]{logitnorm}, which allow the
-#' distribution to be specified in terms of its mean and standard deviation,
-#' instead of its logit-mean and logit-sd.
+#' Density, distribution function, and quantile function for the logit Normal
+#' distribution. The location and scale parameters of the distribution are `mu`
+#' and `sigma`, which are the mean and standard deviation on the logit scale.
+#' For convenience, the distribution may also be specified in terms of its mean
+#' and standard deviation, instead of its logit-mean and logit-sd.
 #'
 #' @param p,x vector of quantiles
 #' @param q vector of probabilities
-#' @param mu,sigma,... see \code{\link[logitnorm:logitnorm-package]{logitnorm}}
+#' @param mu,sigma location and scale parameters, on the logit scale
+#' @param ... additional arguments, passed to `[dpq]norm()`
 #' @param mean,sd mean and standard deviation, overriding `mu` and `sigma` if
 #'   specified
 #'
 #' @return Numeric vector of length equal to the maximum of the lengths of the
 #'   input arguments.
 #'
-#' @export
-#' @rdname logitNormal
-#' @aliases qlogitnorm
-qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
-  if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
-  else pars <- list(mu = mu, sigma = sigma)
-  return(plogis(qnorm(p, mean = pars[["mu"]], sd = pars[["sigma"]], ...)))
-}
-
 #' @export
 #' @rdname logitNormal
 #' @aliases dlogitnorm
@@ -652,6 +645,16 @@ plogitnorm <- function(q, mu = 0, sigma = 1, ..., mean, sd) {
   else pars <- list(mu = mu, sigma = sigma)
   return(pnorm(qlogis(q), mean = pars[["mu"]], sd = pars[["sigma"]], ...))
 }
+
+#' @export
+#' @rdname logitNormal
+#' @aliases qlogitnorm
+qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
+  if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
+  else pars <- list(mu = mu, sigma = sigma)
+  return(plogis(qnorm(p, mean = pars[["mu"]], sd = pars[["sigma"]], ...)))
+}
+
 
 # Internal functions for *logitnorm()
 .lndiff <- function(est, m, s){
