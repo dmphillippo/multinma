@@ -12,6 +12,8 @@ that return data frames of the pointwise contributions to the DIC, and
 `as.matrix.nma_dic()` and `as.array.nma_dic()` methods that return posterior 
 samples of the residual deviances as a matrix or 3D array.
 * Feature: The `softmax()` and `inv_softmax()` transforms are now exported.
+* Improvement: Removed suggested dependency on the logitnorm package. The 
+logit Normal distribution functions are now implemented internally.
 * Fix: Resolved a bug where trying to fit meta-regression models with discrete 
 covariates would sometimes result in a misspecified and inestimable model, due 
 to the inclusion of additional columns in the design matrix for the reference 
