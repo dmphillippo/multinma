@@ -403,7 +403,7 @@
 
 #' Social Anxiety
 #'
-#' 3 data frames `sa`, `sa_trt` and `sa_class` containing aggregated data (AgD) results of 101 clinical trials comparing first-line treatments for social anxiety disorder
+#' Data frame containing the results of 101 clinical trials comparing 41 first-line treatments for social anxiety disorder
 #' in adults . The dataset comprises data from a total of 13,164 participants, comparing 41 different treatments
 #' that are further categorised into 17 distinct classes. The interventions of interest include oral drugs,
 #' psychological or behavioural therapies, and combinations of pharmacological and psychological therapies.
