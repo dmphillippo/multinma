@@ -1,5 +1,20 @@
-sa_net <- set_agd_contrast(social_anxiety, studyc, trtc, y = y, se = se, trt_class = classc, trt_ref = "Waitlist")
-sa_fit_EXclass_RE <- suppressWarnings(nma(sa_net, trt_effects = "random", prior_trt = normal(0, 100), prior_het = half_normal(5), class_effects = "exchangeable", prior_class_sd = normal(0.33,0.1), class_sd = list(`Exercise and SH no support` = c("Exercise promotion", "Self-help no support"), `SSRIs and NSSA` = c("SSRI/SNRI", "NSSA"), `Psychodynamic & Other psychological therapies` = c("Psychodynamic psychotherapy", "Other psychological therapies"))))
+sa_net <- set_agd_contrast(social_anxiety, studyc,
+                           trtc,
+                           y = y,
+                           se = se,
+                           trt_class = classc,
+                           trt_ref = "Waitlist")
+
+sa_fit_EXclass_RE <- suppressWarnings(nma(sa_net, trt_effects = "random",
+                                          prior_trt = normal(0, 100),
+                                          prior_het = half_normal(5),
+                                          class_effects = "exchangeable",
+                                          prior_class_sd = normal(0.33,0.1),
+                                          class_sd =
+                                            list(`Exercise and SH no support` = c("Exercise promotion", "Self-help no support"),
+                                                 `SSRIs and NSSA` = c("SSRI/SNRI", "NSSA"),
+                                                 `Psychodynamic & Other psychological therapies` = c("Psychodynamic psychotherapy", "Other psychological therapies")),
+                                          test_grad = TRUE))
 
 test_that("class_mean and class_sd parameters are named correctly", {
   # Extract summaries for class_mean
