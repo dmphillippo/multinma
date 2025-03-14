@@ -785,6 +785,14 @@ plot.nma_data <- function(x, ..., layout, circular,
     abort(paste("Treatment classes not specified in network.",
                 "Specify `trt_class` in set_*(), or set show_trt_class = FALSE.", sep = "\n"))
 
+  if(level == "class" && is.null(x$classes))
+    abort(paste("Treatment classes not specified in network.",
+                "Specify `trt_class` in set_*(), or set level == class", sep = "\n"))
+
+  if(level == "class" && show_trt_class)
+    abort(paste("show_trt_class is only available when levels = treatment.",
+                "Set show_trt_class = FALSE or set level = treatment", sep = "\n"))
+
   if (!rlang::is_double(nudge, n = 1, finite = TRUE))
     abort("`nudge` must be a single numeric value")
 
