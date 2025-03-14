@@ -13,8 +13,7 @@ sa_fit_EXclass_RE <- suppressWarnings(nma(sa_net, trt_effects = "random",
                                           class_sd =
                                             list(`Exercise and SH no support` = c("Exercise promotion", "Self-help no support"),
                                                  `SSRIs and NSSA` = c("SSRI/SNRI", "NSSA"),
-                                                 `Psychodynamic & Other psychological therapies` = c("Psychodynamic psychotherapy", "Other psychological therapies")),
-                                          test_grad = TRUE))
+                                                 `Psychodynamic & Other psychological therapies` = c("Psychodynamic psychotherapy", "Other psychological therapies"))))
 
 test_that("class_mean and class_sd parameters are named correctly", {
   # Extract summaries for class_mean
