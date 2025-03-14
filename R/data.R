@@ -404,8 +404,7 @@
 #' Social Anxiety
 #'
 #' Data frame containing the results of 101 clinical trials comparing 41 first-line treatments for social anxiety disorder
-#' in adults . The dataset comprises data from a total of 13,164 participants, comparing 41 different treatments
-#' that are further categorised into 17 distinct classes. The interventions of interest include oral drugs,
+#' in adults . The 41 treatments are further categorised into 17 distinct classes. The interventions of interest include oral drugs,
 #' psychological or behavioural therapies, and combinations of pharmacological and psychological therapies.
 #' Following Mayo-Wilson et al. \insertCite{mayo2014psychological}{multinma} the results are analysed as standardised mean differences (SMD) to allow comparisons.
 #'
