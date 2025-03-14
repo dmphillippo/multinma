@@ -401,7 +401,7 @@
 #'  }
 "ndmm_agd_covs"
 
-#' Social Anxiety
+#' Social Anxiety Dataset
 #'
 #' Data frame containing the results of 101 clinical trials comparing 41 first-line treatments for social anxiety disorder
 #' in adults . The 41 treatments are further categorised into 17 distinct classes. The interventions of interest include oral drugs,
