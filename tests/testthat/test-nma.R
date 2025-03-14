@@ -85,7 +85,8 @@ test_that("class_effects = 'common' updates network$treatments", {
                     class_effects = "common",
                     trt_effects = "random",
                     prior_trt = normal(0, 100),
-                    prior_het = half_normal(5))
+                    prior_het = half_normal(5),
+                    test_grad = TRUE)
 
   # Check that net_common$network$treatments is updated to classes
   expect_equal(levels(net_common$network$treatments),
