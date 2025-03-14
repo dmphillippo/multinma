@@ -305,7 +305,6 @@ nma <- function(network,
                 knots = NULL,
                 mspline_basis = NULL) {
 
-
   # Check network
   if (!inherits(network, "nma_data")) {
     abort("Expecting an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
