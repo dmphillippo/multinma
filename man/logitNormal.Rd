@@ -13,6 +13,8 @@ plogitnorm(q, mu = 0, sigma = 1, ..., mean, sd)
 qlogitnorm(p, mu = 0, sigma = 1, ..., mean, sd)
 }
 \arguments{
+\item{x, q}{vector of quantiles}
+
 \item{mu, sigma}{location and scale parameters, on the logit scale}
 
 \item{...}{additional arguments, passed to \verb{[dpq]norm()}}
@@ -20,9 +22,7 @@ qlogitnorm(p, mu = 0, sigma = 1, ..., mean, sd)
 \item{mean, sd}{mean and standard deviation, overriding \code{mu} and \code{sigma} if
 specified}
 
-\item{q}{vector of probabilities}
-
-\item{p, x}{vector of quantiles}
+\item{p}{vector of probabilities}
 }
 \value{
 Numeric vector of length equal to the maximum of the lengths of the

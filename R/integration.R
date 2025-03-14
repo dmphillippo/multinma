@@ -609,8 +609,8 @@ pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
 #' For convenience, the distribution may also be specified in terms of its mean
 #' and standard deviation, instead of its logit-mean and logit-sd.
 #'
-#' @param p,x vector of quantiles
-#' @param q vector of probabilities
+#' @param x,q vector of quantiles
+#' @param p vector of probabilities
 #' @param mu,sigma location and scale parameters, on the logit scale
 #' @param ... additional arguments, passed to `[dpq]norm()`
 #' @param mean,sd mean and standard deviation, overriding `mu` and `sigma` if
