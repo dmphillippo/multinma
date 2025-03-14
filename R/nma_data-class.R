@@ -753,8 +753,12 @@ has_indirect <- function(network, trt1, trt2) {
 #'   ggplot2::guides(edge_width = "none", size = "none")
 #'
 plot.nma_data <- function(x, ..., layout, circular,
-                          weight_edges = TRUE, weight_nodes = FALSE,
-                          show_trt_class = FALSE, nudge = 0) {
+                          weight_edges = TRUE,
+                          weight_nodes = FALSE,
+                          show_trt_class = FALSE,
+                          level = c("treatment", "class"),
+                          nudge = 0) {
+  level <- match.arg(level)
   if (missing(layout) && missing(circular)) {
     layout <- "linear"
     circular <- TRUE
