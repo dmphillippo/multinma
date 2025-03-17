@@ -725,6 +725,12 @@ nma <- function(network,
                     "Use `add_integration()` to add integration points to the network."))
   }
 
+  # Notify if default reference treatment is used
+  if (.is_default(network$treatments))
+    inform(glue::glue('Note: Setting "{levels(network$treatments)[1]}" as the network reference treatment.'))
+  # Notify if network is disconnected
+  if (!is_network_connected(network))
+    inform("Note: Network is disconnected. See ?is_network_connected for more details.")
 
 
   # Get data for design matrices and outcomes
