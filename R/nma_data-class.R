@@ -338,7 +338,9 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
   }
 
   if (!is.null(x$classes)) {
-    v_all$.trtclass <- x$classes
+    if(!identical(x$classes, x$treatments)){
+      v_all$.trtclass <- x$classes
+    }
   }
 
   g <- igraph::graph_from_data_frame(e_all, directed = FALSE, vertices = v_all)
@@ -790,7 +792,7 @@ plot.nma_data <- function(x, ..., layout, circular,
                 "Specify `trt_class` in set_*(), or set level == class", sep = "\n"))
 
   if(level == "class" && show_trt_class)
-    abort(paste("show_trt_class is only available when levels = treatment.",
+    abort(paste("show_trt_class is only available when level = treatment.",
                 "Set show_trt_class = FALSE or set level = treatment", sep = "\n"))
 
   if (!rlang::is_double(nudge, n = 1, finite = TRUE))
