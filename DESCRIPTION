@@ -1,6 +1,6 @@
 Package: multinma
 Title: Bayesian Network Meta-Analysis of Individual and Aggregate Data
-Version: 0.7.2.9007
+Version: 0.7.2.9008
 Authors@R: 
     c(person(given = c("David", "M."),
            family = "Phillippo",
@@ -70,7 +70,6 @@ Suggests:
     R.rsp,
     rprojroot,
     loo (>= 2.0.0),
-    logitnorm,
     crayon,
     tidygraph,
     pkgdown,
