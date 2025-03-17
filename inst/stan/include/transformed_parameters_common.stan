@@ -7,10 +7,10 @@ vector[ni_ipd] eta_ipd; // IPD linear predictor
 // -- RE deltas --
 // Avoid evaluating tau[1] when no RE (u_delta is zero dim in this case)
 vector[n_delta] f_delta =
-RE ? (
-  RE_sparse ?
-  tau[1] * csr_matrix_times_vector(n_delta, n_delta, RE_L_w, RE_L_v, RE_L_u, u_delta) :
-  tau[1] * RE_L * u_delta
+  RE ? (
+    RE_sparse ?
+      tau[1] * csr_matrix_times_vector(n_delta, n_delta, RE_L_w, RE_L_v, RE_L_u, u_delta) :
+      tau[1] * RE_L * u_delta
   ) : u_delta;
 
   // -- Back-transformed parameters --
