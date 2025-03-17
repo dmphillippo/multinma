@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9007</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -338,10 +338,9 @@ suitable marginal distributions for these covariates to draw the
 integration points from. <code>prevsys</code> and <code>psa</code> are
 binary covariates, so these are given a Bernoulli distribution.
 <code>bsa</code> is a percentage, so we choose a logit-Normal
-distribution (note, this requires the <code>logitnorm</code> package to
-be installed). We choose Gamma distributions for <code>durnpso</code>
-and <code>weight</code> to account for skewness. These choices seem to
-match well the marginal distributions observed in the IPD:</p>
+distribution. We choose Gamma distributions for <code>durnpso</code> and
+<code>weight</code> to account for skewness. These choices seem to match
+well the marginal distributions observed in the IPD:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get mean and sd of covariates in each study</span></span>
 <span><span class="va">ipd_summary</span> <span class="op">&lt;-</span> <span class="va">pso_ipd</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
@@ -372,7 +371,9 @@ match well the marginal distributions observed in the IPD:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">dens</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">ipd_summary</span>,</span>
 <span>            colour <span class="op">=</span> <span class="st">"darkred"</span>, linewidth <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">studyc</span> <span class="op">+</span> <span class="va">covariate</span>, scales <span class="op">=</span> <span class="st">"free"</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/theme_multinma.html">theme_multinma</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/theme_multinma.html">theme_multinma</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Removed 1 row containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_line()`).</span></span></code></pre></div>
 <p><img src="example_plaque_psoriasis_files/figure-html/pso_covariate_plot-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>We add integration points to the AgD studies in the network using the
 <code><a href="../reference/add_integration.html">add_integration()</a></code> function. Marginal distributions for each
@@ -399,8 +400,8 @@ functions for specifying these distributions, including
 distribution in terms of mean and standard deviation,
 <code><a href="../reference/Bernoulli.html">qbern()</a></code> which provides the Bernoulli distribution, and
 <code><a href="../reference/logitNormal.html">qlogitnorm()</a></code> which provides the logit-Normal distribution
-allowing for a parameterisation in terms of mean and standard deviation
-(requires the <code>logitnorm</code> package to be installed).</p>
+allowing for a parameterisation in terms of mean and standard
+deviation.</p>
 </blockquote>
 </div>
 </div>
@@ -512,7 +513,7 @@ method:</p>
 <span><span class="co">#&gt; d[SEC_300]                              2.69  5369    1</span></span>
 <span><span class="co">#&gt; lp__                                -1570.58  1627    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Mar 14 09:53:52 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Mar 17 14:23:32 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -646,7 +647,7 @@ method:</p>
 <span><span class="co">#&gt; lp__                                -1571.94   803 1.01</span></span>
 <span><span class="co">#&gt; tau                                     0.48   580 1.00</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Mar 14 09:56:55 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Mar 17 14:27:19 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
