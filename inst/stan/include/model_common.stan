@@ -56,6 +56,7 @@ if (class_effects) {
       // Priors for treatments without a class effect or in a single-occupancy class
       prior_select2_lp(d[t], prior_trt_dist, prior_trt_location, prior_trt_scale, prior_trt_df);
     } else {
+      // Add dummy information to unused allbeta parameters to avoid Stan warnings
       allbeta[(totns + t)] ~ std_normal();
     }
   }
