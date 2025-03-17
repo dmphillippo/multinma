@@ -732,7 +732,6 @@ nma <- function(network,
   if (!is_network_connected(network))
     inform("Note: Network is disconnected. See ?is_network_connected for more details.")
 
-
   # Get data for design matrices and outcomes
   if (has_ipd(network)) {
     dat_ipd <- network$ipd
