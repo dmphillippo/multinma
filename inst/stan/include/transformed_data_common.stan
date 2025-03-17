@@ -72,8 +72,8 @@ if (ns_agd_contrast) {
 
 // Number of class effects and which_class_sd, mapping class sd to classes
 int<lower=0> n_class = class_effects ? max(which_CE) : 0;
-int<lower=0> which_class[class_effects ? nt-1 : 0]; // Vector to mapping treatments to class effects
-int<lower=0> which_class_sd[class_effects ? n_class : 0]; // Vector to map class SDs to classes
+array[class_effects ? nt-1 : 0] int<lower=0> which_class; // Vector to mapping treatments to class effects
+array[class_effects ? n_class : 0] int<lower=0> which_class_sd; // Vector to map class SDs to classes
 
  if (class_effects) {
     for (c in 1:n_class) {
