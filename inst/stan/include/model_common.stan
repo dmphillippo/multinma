@@ -6,7 +6,7 @@ prior_select_lp(mu, prior_intercept_dist, prior_intercept_location, prior_interc
 // Treatment effects
   if (class_effects == 0) {
     prior_select_lp(d, prior_trt_dist, prior_trt_location, prior_trt_scale, prior_trt_df);
-} else {
+  } else {
     // Priors for class mean parameters
     prior_select_lp(class_mean, prior_class_mean_dist, prior_class_mean_location, prior_class_mean_scale, prior_class_mean_df);
 
@@ -56,6 +56,7 @@ if (class_effects) {
       // Priors for treatments without a class effect or in a single-occupancy class
       prior_select2_lp(d[t], prior_trt_dist, prior_trt_location, prior_trt_scale, prior_trt_df);
     } else {
+      // Add dummy information to unused allbeta parameters to avoid Stan warnings
       allbeta[(totns + t)] ~ std_normal();
     }
   }

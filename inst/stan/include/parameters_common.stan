@@ -11,4 +11,4 @@ vector[class_effects ? max(which_CE) : 0] class_mean; // Class means (zero-lengt
 vector<lower=0>[class_effects ? max(which_CE_sd) : 0] class_sd; // Class standard deviations (zero-length if no exchangeable class effects)
 
 // randomised part of our non-centred parameterisation
-vector[class_effects ? size(which_gt0a(which_CE)) : 0] z_class;
+vector[class_effects ? n_class_trts : 0] z_class;

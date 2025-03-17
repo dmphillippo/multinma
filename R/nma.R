@@ -359,7 +359,7 @@ nma <- function(network,
   if (is.list(class_sd)) {
     # Check that all classes listed in 'class_sd' are in 'network$classes'
     if (!all(unlist(class_sd) %in% network$classes)) {
-      stop("Some classes listed in 'class_sd' are not found in 'network$classes'")
+      stop("Some classes listed in 'class_sd' are not present in the network.")
     }
 
 
