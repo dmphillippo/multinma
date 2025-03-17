@@ -622,6 +622,7 @@ pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
 #' @export
 #' @rdname logitNormal
 #' @aliases dlogitnorm
+#' @importFrom stats integrate dnorm
 dlogitnorm <- function(x, mu = 0, sigma = 1, ..., mean, sd) {
   islog <- isTRUE(rlang::list2(...)$log)
 
