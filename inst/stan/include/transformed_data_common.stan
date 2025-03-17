@@ -76,7 +76,7 @@ array[class_effects ? nt-1 : 0] int<lower=0> which_class; // Vector to mapping t
 array[class_effects ? n_class : 0] int<lower=0> which_class_sd; // Vector to map class SDs to classes
 
 int<lower=0> n_class_trts = num_elements(which_gt0a(which_CE));  // Number of treatments with class effects
-array[n_class_trts] which_class_trt = which_gt0a(which_CE); // Vector mapping classes to treatments
+array[n_class_trts] int which_class_trt = which_gt0a(which_CE); // Vector mapping classes to treatments
  if (class_effects) {
     for (c in 1:n_class) {
       for (t in 1:nt - 1) {
