@@ -75,22 +75,10 @@ vector[n_delta] f_delta =
   }
 
   vector[class_effects ? max(which_class) : 0] f_class; // product of class sds and ~N(0,1) to be added onto linear predictor
-  vector[class_effects ? max(which_class) : 0] filtered_class_sd; // class sds assigned to treatments (non zero values)
 
   if (class_effects) {
-    int index = 1;  // Track position for valid values
-
-    for (t in 1:(nt - 1)) {
-      if (which_CE_sd[t] > 0) {  // Only keep nonzero values
-      filtered_class_sd[index] = class_sd[which_CE_sd[t]];
-      index += 1;  // Move to the next position
-      }
-    }
-  }
-
-  if (class_effects) {
-    f_class = class_mean[which_CE[which_gt0a(which_CE)]] - d[which_gt0a(which_CE)] + filtered_class_sd .* z_class;
-    d[which_gt0a(which_CE)] = class_mean[which_CE[which_gt0a(which_CE)]] + filtered_class_sd .* z_class;
+    f_class = class_mean[which_CE[which_gt0a(which_CE)]] - d[which_gt0a(which_CE)] + class_sd[which_CE_sd[which_class_trt]] .* z_class;
+    d[which_gt0a(which_CE)] = class_mean[which_CE[which_gt0a(which_CE)]] + class_sd[which_CE_sd[which_class_trt]] .* z_class;
   }
   // Add class effects contribution
   if (class_effects) {
