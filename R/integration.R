@@ -676,7 +676,9 @@ qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
 
 # Estimate mu and sigma parameters of logit-normal from sample mean and sd
 pars_logitnorm <- function(m, s) {
-  if (length(m) != length(s)) abort("Parameters not same length.")
+  if (length(m) != length(s) && length(m) > 1 && length(s) > 1) {
+    abort("Parameters not same length.")
+  }
   if (any(m > 1 | m < 0)) abort("Mean not in [0,1]. Have you rescaled?")
 
   return(as.data.frame(do.call(rbind, mapply(.lnopt, m, s, SIMPLIFY = FALSE))))
