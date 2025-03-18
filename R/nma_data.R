@@ -1850,3 +1850,54 @@ nfactor <- function(x, ..., numeric = TRUE, resort = FALSE) {
     return(factor(x, levels = stringr::str_sort(unique(x), numeric = numeric), ...))
   }
 }
+
+#' Calculate baseline risk
+#'
+#' @param network An `nma_data` object.
+#' @param link The name of the link function to use.
+#' @param treatment The reference treatment. If `NULL` (the default), use the `network`
+#'   reference treatment.
+#'
+#' @return The baseline risk as a single numeric value.
+#' @export
+calculate_baseline_risk <- function(network, link, treatment = NULL) {
+  if (!inherits(network, "nma_data")) abort("Not nma_data object.")
+
+  if (!has_agd_arm(network) || has_agd_contrast(network) || has_ipd(network)) {
+    abort("Should only have agd_arm.")
+  }
+
+  treatments <- levels(network$treatments)
+  treatment <- treatment %||% treatments[1L]
+  treatment <- rlang::arg_match(treatment, treatments)
+
+  agd_arm <- network$agd_arm[network$agd_arm$.trt == treatment, ]
+
+  if (network$outcome$agd_arm == "continuous") {
+    out <- agd_arm$.y
+
+  } else if (network$outcome$agd_arm %in% c("count", "ordered")) {
+    r <- agd_arm$.r
+    if (inherits(r, "matrix")) {
+      n <- rowSums(r, na.rm = TRUE)
+      r <- rowSums(r[, -1L], na.rm = TRUE)
+    } else {
+      n <- agd_arm$.n
+    }
+
+    out <- r / n
+
+    # Assume odds of 0.01 if r is 0
+    out[r == 0] <- 0.01 / (1 + 0.01)
+
+    stopifnot(all(out >= 0 & out <= 1))
+
+  } else {
+    abort(paste(
+      "Calculation of baseline risk not yet implemented for",
+      network$outcome$agd_arm, "outcomes."
+    ))
+  }
+
+  mean(link_fun(out, link))
+}

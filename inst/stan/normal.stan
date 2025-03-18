@@ -35,11 +35,19 @@ transformed parameters {
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
-    if (nint_max > 1) { // -- If integration points are used --
-      vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
-        X_agd_arm * beta_tilde + offset_agd_arm :
-        X_agd_arm * beta_tilde;
+    vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+      X_agd_arm * beta_tilde + offset_agd_arm :
+      X_agd_arm * beta_tilde;
 
+    // Baseline risk meta-regression
+    if (brmr_n_col > 0) {
+      // Subtracting 1 from the centred baseline risk here, as the associated
+      // beta was already added once to the linear predictor by
+      // `X_agd_arm * beta_tilde`
+      eta_agd_arm_noRE += (X_agd_arm[,1:totns] * mu - xbar_mu - 1) .* (X_agd_arm[,brmr_col] * beta_tilde[brmr_col]);
+    }
+
+    if (nint_max > 1) { // -- If integration points are used --
       if (RE) {
 
         if (link == 1) { // identity link
@@ -77,10 +85,6 @@ transformed parameters {
       }
     } else { // -- If no integration --
       if (RE) {
-        vector[nint * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
-          X_agd_arm * beta_tilde + offset_agd_arm :
-          X_agd_arm * beta_tilde;
-
         if (link == 1) { // identity link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
@@ -98,13 +102,9 @@ transformed parameters {
         }
       } else {
         if (link == 1) // identity link
-          theta_agd_arm_bar = has_offset ?
-            X_agd_arm * beta_tilde + offset_agd_arm :
-            X_agd_arm * beta_tilde;
+          theta_agd_arm_bar = eta_agd_arm_noRE;
         else if (link == 2) // log link
-          theta_agd_arm_bar = has_offset ?
-            exp(X_agd_arm * beta_tilde + offset_agd_arm) :
-            exp(X_agd_arm * beta_tilde);
+          theta_agd_arm_bar = exp(eta_agd_arm_noRE);
       }
     }
   }
