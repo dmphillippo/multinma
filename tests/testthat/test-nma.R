@@ -64,7 +64,7 @@ test_that("nma() class_effect must be valid", {
 })
 
 test_that("nma() class_sd lists must be valid", {
-  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = list(group1 = c("Exposure", "NonExistentClass"))), "Some classes listed in 'class_sd' are not found in 'network$classes'", fixed = TRUE)
+  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = list(group1 = c("Exposure", "NonExistentClass"))), "Some classes listed in 'class_sd' are not present in the network", fixed = TRUE)
   expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = list(group1 = c("Exposure", "NSSA"), group2 = c("NSSA", "SSRI/SNRI"))), "Some classes are listed in more than one shared standard deviation group in 'class_sd'")
 })
 
