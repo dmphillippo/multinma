@@ -9,8 +9,11 @@
    viewBox="0 0 537.96399 802.88135"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
-  <defs
-     id="defs1" />
+  <defs id="defs1">
+	<style type="text/css">
+	  @import url('../deps/Source_Sans_Pro-0.4.9/font.css');
+	</style>
+  </defs>
   <g
      id="g1">
     <path
@@ -25,7 +28,6 @@
          id="tspan1"
          style="font-variant:normal;font-weight:bold;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         dx="0 0 -0.95640957 0 -0.95640957"
          y="0">START</tspan></text>
     <path
        id="path2"
@@ -39,15 +41,13 @@
          id="tspan2"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         dx="0 0 0 0 3.3175459 0 4.9812999 0 0 0 0 0 0 0 0 0 0 0 -0.31880319 3.3275084 0 0 0 0 0 0 0 0 -0.31880319 3.318419 3.3175459"
          y="0"><tspan
    style="font-weight:bold"
-   id="tspan104">Step1:HeterogeneityAssessment</tspan>-Fit</tspan><tspan
+   id="tspan104">Step 1: Heterogeneity Assessment</tspan> - Fit</tspan><tspan
          id="tspan3"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="4.046"
-         dx="0 0 3.3175459 0 0 3.3175459 0 3.3275084 0 0.27895281 0 0 0 0 3.3175459 0 0 0 0 0 3.3175459 0 0 0 0 0 0 0 0 3.3275084 0 0.26899019"
-         y="11.955">FEandREmodels,selectpreferredmodel</tspan></text>
+         y="11.955">FE and RE models, select preferred model</tspan></text>
     <path
        id="path3"
        d="m -109.62114,-141.73405 h 219.24228 v 28.34679 h -219.24228 z"
@@ -60,15 +60,13 @@
          id="tspan4"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         dx="0 0 0 0 3.3175459 0 4.9812999 0 0 0 0 0 0 0 0 0 0 3.3275084 0 0 0 0 0 0 0 0 -0.31880319 3.3178759 3.3175459"
          y="0"><tspan
    style="font-weight:bold"
-   id="tspan105">Step2:ConsistencyAssessment</tspan>-Fit</tspan><tspan
+   id="tspan105">Step 2: Consistency Assessment</tspan> - Fit</tspan><tspan
          id="tspan5"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="-8.2919998"
-         dx="0 0 0 3.3175459 0 0 3.3275084 0 0.26899019 0 0 3.3275084 0 0 3.3175459 0 0 3.3175459 -0.27895281 0 0 0 0.0099625997 3.3175459 0 0 0 0 3.3175459 0 0.27895281"
-         y="11.956">theUMEmodelforthechosenFE/REmodel</tspan></text>
+         y="11.956">the UME model for the chosen FE/RE model</tspan></text>
     <path
        id="path5"
        d="m -72.21301,-212.60109 10.30598,28.3468 H 72.21301 l -10.30598,-28.3468 z"
@@ -81,13 +79,11 @@
          id="tspan6"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         dx="0 0 3.3175459 0 0 3.3275084"
-         y="0">Istheconsistency</tspan><tspan
+         y="0">Is the consistency</tspan><tspan
          id="tspan7"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="4.1929998"
-         dx="0 0 0.27895281 0 0 3.3175459"
-         y="11.955">modelpreferred</tspan></text>
+         y="11.955">model preferred?</tspan></text>
     <path
        id="path7"
        d="M 282.80367,-166.76859 H 114.05182 c -2.20094,0 -3.98511,-1.78416 -3.98511,-3.98511 v -55.348 c 0,-2.20093 1.78417,-3.9851 3.98511,-3.9851 h 168.75185 c 2.20093,0 3.9851,1.78417 3.9851,3.9851 v 55.348 c 0,2.20095 -1.78417,3.98511 -3.9851,3.98511 z"
@@ -100,30 +96,25 @@
          id="tspan8"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         dx="0 0 0 0 0 0 0 0 0 0 0 0 0 3.3175459 0 0 0 0 0 -0.31880319 3.3246186 3.3175459 0 0 0 -0.26899019"
          y="0"><tspan
    style="font-weight:bold"
-   id="tspan108">Inconsistencypresent</tspan>-Check</tspan><tspan
+   id="tspan108">Inconsistency present</tspan> - Check</tspan><tspan
          id="tspan9"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         x="5.7649999"
-         dx="0 0 0 3.3175459 0 0 0 3.3175459 0 0 0.0099625997 -0.0099625997 0.0099625997 0 3.3175459 0 -0.27895281 -0.27895281 0 0 0 0 0 0 0 3.3275084 0.26899019"
-         y="11.955">fordataissues,investigatepo-</tspan><tspan
+         x="15.7649999"
+         y="11.955">for data issues, investigate</tspan><tspan
          id="tspan10"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="5.6399999"
-         dx="0 0 0 -0.27895281 0 0 0 3.3175459 0.0099625997 0 -0.0099625997 0.0099625997 0 3.3175459 0 3.3175459 0 0 0 0 0 0 0 0 0 0 0 0 -0.82689577"
-         y="23.91">tentialcausesofinconsistency.</tspan><tspan
+         y="23.91">potential causes of inconsistency.</tspan><tspan
          id="tspan11"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="3.2739999"
-         dx="0 0 3.3175459 0 0 0 0 3.3275084 0 0 3.3175459 0.27895281 3.3175459 0 0 0 0 0 -0.27895281 0 0 3.3275084"
-         y="35.865002">Ifthesecanberesolved,restart</tspan><tspan
+         y="35.865002">If these can be resolved, restart</tspan><tspan
          id="tspan12"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="11.189"
-         dx="0 0 0 3.3175459 0 0.27895281 0 0 3.3175459 0 0 0 0 0.0099625997 0 -0.0099625997 0 3.3275084 0 0 0.26899019 0 0.0099625997"
-         y="47.82">themodelselectionprocess.</tspan></text>
+         y="47.82">the model selection process.</tspan></text>
     <path
        id="path12"
        d="M -88.36102,-294.00757 H 88.36103 v 49.42567 H -88.36102 Z"
@@ -136,25 +127,21 @@
          id="tspan13"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         dx="0 0 0 0 3.3175459 0 4.9812999 0 0 0 0 3.3275084 0 0 0 0 0 0 0 0 -0.31880319"
          y="0"><tspan
    style="font-weight:bold"
-   id="tspan106">Step3:ClassAssessment</tspan></tspan><tspan
+   id="tspan106">Step 3: Class Assessment</tspan> - </tspan><tspan
          id="tspan14"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="4.5079999"
-         dx="0 3.3175459 0 0 3.3275084 0 3.3175459 0 0 -0.27895281 0 0 0 0 0 0 0 0 3.3175459 0 0 0 0.0099625997"
-         y="11.955">-Fitanexchangeableclass</tspan><tspan
+         y="11.955">Fit an exchangeable class</tspan><tspan
          id="tspan15"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="-5.3850002"
-         dx="0 0 0.27895281 0 0 3.3175459 0 0 0 3.3175459 0 0 0 0 0 0 0.27895281 0 0 0 0 0 3.3175459"
-         y="23.91">modelwithcorrespondingfixed</tspan><tspan
+         y="23.91">model with corresponding fixed</tspan><tspan
          id="tspan16"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0.82800001"
-         dx="0 0 3.3175459 0 0 0 0 0 3.3175459 0 0 0 0 0 0 0.0099625997 -0.27895281 3.3175459"
-         y="35.865002">orrandomtreatmenteffects.</tspan></text>
+         y="35.865002">or random treatment effects.</tspan></text>
     <path
        id="path16"
        d="m -72.21301,-347.24844 10.30598,28.34678 H 72.21301 l -10.30598,-28.34678 z"
@@ -167,13 +154,11 @@
          id="tspan17"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         dx="0 0 3.3175459 0 0 3.3275084 0 0 -0.27895281"
-         y="0">Istheexchangeable</tspan><tspan
+         y="0">Is the exchangeable</tspan><tspan
          id="tspan18"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="-5.881"
-         dx="0 0 0 0 0 3.3175459 0 0.27895281 0 0 3.3275084 -0.0099625997 0 0.0099625997 -0.0099625997 0.0099625997 -0.0099625997"
-         y="11.955">classmodelpreferred?</tspan></text>
+         y="11.955">class model preferred?</tspan></text>
     <path
        id="path18"
        d="M 282.80367,-307.3936 H 114.05182 c -2.20094,0 -3.98511,-1.78416 -3.98511,-3.98511 v -43.39269 c 0,-2.20094 1.78417,-3.9851 3.98511,-3.9851 h 168.75185 c 2.20093,0 3.9851,1.78416 3.9851,3.9851 v 43.39269 c 0,2.20095 -1.78417,3.98511 -3.9851,3.98511 z"
@@ -186,25 +171,21 @@
          id="tspan19"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         dx="0 0 -0.31880319 0 0 3.3175459 0 0 0 0.0099625997 3.3175459 0 0 0 0 0 0 0 0 0 0 3.319706 3.3175459"
          y="0"><tspan
    style="font-weight:bold"
-   id="tspan109">Avoidclassassumptions</tspan>-Opt</tspan><tspan
+   id="tspan109">Avoid class assumptions</tspan> - Opt</tspan><tspan
          id="tspan20"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="11.249"
-         dx="0 0 0 3.3175459 0 0 3.3275084 -0.0099625997 3.3275084 0 0 0 0 3.3175459 0 0 0 0 0 3.3275084 0 0.26899019"
-         y="11.955">forthenoclasseffectmodel.</tspan><tspan
+         y="11.955">for the no class effect model.</tspan><tspan
          id="tspan21"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="4.053"
-         dx="0 0 3.3175459 0 0 0 0 0 0 0 0 0 0 0 0 3.3275084 0 0 0 3.3175459 0 0 0 0 0 0 0 0 0 -0.27895281"
-         y="23.91">Ifdisconnected,seekalternative</tspan><tspan
+         y="23.91">If disconnected, seek alternative</tspan><tspan
          id="tspan22"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="-6.0900002"
-         dx="0 0 0 -0.27895281 -0.27895281 0 0 0 0 0.0099625997 0 -0.0099625997 0 0 0.0099625997 0 0 -0.0099625997 3.3275084 0 0 0 0 0.27895281 0 0 4.9812999"
-         y="35.865002">network-connectingmethods.STOP</tspan></text>
+         y="35.865002">network-connecting methods. STOP</tspan></text>
     <path
        id="path22"
        d="m -102.53444,-423.64587 h 205.06888 v 39.40756 h -205.06888 z"
@@ -217,20 +198,17 @@
          id="tspan23"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         dx="0 0 0 0 3.3175459 0 4.9812999 0 0 0 0 3.3275084 0 0.31880319 0 0 3.3175459 0 0 0 0 0 0 0 0 -0.31880319 3.3207753 3.3175459"
          y="0"><tspan
    style="font-weight:bold"
-   id="tspan107">Step4:ClassModelAssessment</tspan>-Fit</tspan><tspan
+   id="tspan107">Step 4: Class Model Assessment</tspan> - Fit</tspan><tspan
          id="tspan24"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="4.954"
-         dx="0 3.3175459 0 0 0 0 0 3.3275084 0 0 0 0 3.3175459 0 0.27895281 0 0 3.3175459 0 0 0 3.3175459 0 0 0 0 0 0.0099625997 0.26899019"
-         y="11.956">acommonclassmodelwithcorrespond-</tspan><tspan
+         y="11.956">a common class model with correspond-</tspan><tspan
          id="tspan25"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="9.5609999"
-         dx="0 0 0 3.3175459 0 0 0 0 3.3275084 0 3.3175459 0 0 0 0 0 3.3175459 0 0 0 0 0 0 0 -0.27895281 3.3275084"
-         y="23.910999">ingfixedorrandomtreatmenteffects.</tspan></text>
+         y="23.910999">ing fixed or random treatment effects.</tspan></text>
     <path
        id="path25"
        d="m -76.91676,-474.80911 10.30647,28.34678 H 76.91676 l -10.30647,-28.34678 z"
@@ -243,13 +221,11 @@
          id="tspan26"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         dx="0 0 0.27895281 0 3.3175459 0 0 3.3175459 0.0099625997 0.26899019 0 0 3.3275084 0 0 3.3175459"
-         y="0">Doesthemodeluseran-</tspan><tspan
+         y="0">Does the model use ran-</tspan><tspan
          id="tspan27"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="3.141"
-         dx="0 0 0 3.3175459 0 0 0 0 0 0 0 -0.26899019 3.3175459"
-         y="11.955">domtreatmenteffects?</tspan></text>
+         y="11.955">dom treatment effects?</tspan></text>
     <path
        id="path27"
        d="M 268.63025,-435.92288 H 128.22523 c -2.20094,0 -3.9851,-1.78417 -3.9851,-3.98511 v -41.45546 c 0,-2.20094 1.78416,-3.98511 3.9851,-3.98511 h 140.40502 c 2.20094,0 3.98511,1.78417 3.98511,3.98511 v 41.45546 c 0,2.20094 -1.78417,3.98511 -3.98511,3.98511 z"
@@ -262,18 +238,15 @@
          id="tspan28"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         dx="0 0 0 0.27895281 0 0 3.3175459 0 0 0 0 0 0 0 0 3.3175459 0 0.27895281"
-         y="0">Choosepreferredmodel;</tspan><tspan
+         y="0">Choose preferred model:</tspan><tspan
          id="tspan29"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="2.0209999"
-         dx="0 0 0 -0.27895281 0 0 0 0 0 0 0 0 3.3175459 0 0 0 0.0099625997 3.3175459"
-         y="11.956">ExchangeableclassFE,</tspan><tspan
+         y="11.956">Exchangeable class FE,</tspan><tspan
          id="tspan30"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="12.052"
-         dx="0 0 0 0 0 0 3.3175459 0 0 0 0 3.3275084"
-         y="23.910999">CommonclassFE.</tspan><tspan
+         y="23.910999">Common class FE.</tspan><tspan
          id="tspan31"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="39.436001"
@@ -290,28 +263,23 @@
          id="tspan32"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         dx="0 0 0 3.3175459 0 0 -0.26899019 0 0 -0.0099625997 0.0099625997 0 0 0 -0.0099625997 3.3275084 0 0 0 0 3.3175459 0 3.3175459 0.0099625997 0.26899019"
-         y="0">FitexchangeableclassFEmodel.</tspan><tspan
+         y="0">Fit exchangeable class FE model.</tspan><tspan
          id="tspan33"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="14.197"
-         dx="0 0 0 0 0 0 3.3175459 0 0 3.3275084 0 0 0 0 0 0 0 0 3.3175459 0 0.27895281"
-         y="11.955">Selectthepreferredmodel;</tspan><tspan
+         y="11.955">Select the preferred model:</tspan><tspan
          id="tspan34"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="21.447001"
-         dx="0 0 0 -0.27895281 0 0 0 0 0 0 0 0 3.3275084 0 0 0 0 3.3175459"
-         y="23.91">ExchangeableclassRE,</tspan><tspan
+         y="23.91">Exchangeable class RE,</tspan><tspan
          id="tspan35"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="21.862"
-         dx="0 0 0 -0.27895281 0 0 0 0 0 0 0 0 3.3275084 0 0 0 0 3.3175459"
-         y="35.865002">ExchangeableclassFE,</tspan><tspan
+         y="35.865002">Exchangeable class FE,</tspan><tspan
          id="tspan36"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="31.479"
-         dx="0 0 0 0 0 0 3.3175459 0 0 0 0 3.3275084"
-         y="47.82">CommonclassRE.</tspan><tspan
+         y="47.82">Common class RE.</tspan><tspan
          id="tspan37"
          style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="59.277"
