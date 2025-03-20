@@ -337,11 +337,7 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
       dplyr::arrange(.data$.trt)
   }
 
-  if (!is.null(x$classes)) {
-    if(!identical(x$classes, x$treatments)){
-      v_all$.trtclass <- x$classes
-    }
-  }
+  if (!is.null(x$classes)) v_all$.trtclass <- x$classes
 
   g <- igraph::graph_from_data_frame(e_all, directed = FALSE, vertices = v_all)
   return(g)
@@ -791,10 +787,6 @@ plot.nma_data <- function(x, ..., layout, circular,
     abort(paste("Treatment classes not specified in network.",
                 'Specify `trt_class` in set_*(), or use level = "treatment"', sep = "\n"))
 
-  if(level == "class" && show_trt_class)
-    abort(paste('Cannot set both show_trt_class = TRUE and level = "class".',
-                'Either set show_trt_class = FALSE or set level = "treatment"', sep = "\n"))
-
   if (!rlang::is_double(nudge, n = 1, finite = TRUE))
     abort("`nudge` must be a single numeric value")
 
@@ -802,17 +794,15 @@ plot.nma_data <- function(x, ..., layout, circular,
   if (level == "class"){
     if(has_agd_contrast(x)){
       x$agd_contrast$.trt <- x$agd_contrast$.trtclass
-      x$agd_contrast$trtn <- x$agd_contrast$classn
-      x$treatments <- x$classes
     }
     if(has_agd_arm(x)){
       x$agd_arm$.trt <- x$agd_arm$.trtclass
-      x$treatments <- x$classes
     }
     if(has_ipd(x)){
       x$ipd$.trt <- x$ipd$.trtclass
-      x$treatments <- x$classes
     }
+    x$classes <- forcats::fct_unique(x$classes)
+    x$treatments <- x$classes
   }
 
   dat_mixed <- has_ipd(x) && (has_agd_arm(x) || has_agd_contrast(x))
