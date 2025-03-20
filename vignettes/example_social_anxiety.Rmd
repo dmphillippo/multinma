@@ -15,7 +15,7 @@ params:
 library(multinma)
 library(dplyr)      # dplyr and tidyr for data manipulation
 library(tidyr)
-library(ggplot2)    # ggplot2 for plotting covariate distributions
+library(ggplot2)    # ggplot2 for plotting
 ```
 ```{r, include=FALSE}
 options(mc.cores = parallel::detectCores())
@@ -56,8 +56,7 @@ We create a plot at the class level by setting `level = "class"`.
 
 ```{r}
 plot(sa_net, level = "class", weight_nodes = TRUE) + 
-  ggplot2::theme(legend.position = "bottom", 
-                 legend.box = "vertical")
+  theme(legend.position = "bottom", legend.box = "vertical")
 ```
 
 ## Model selection strategy
@@ -120,21 +119,18 @@ To asses local inconsistency, we use the `plot()` function that produces a "dev-
 ```{r}
 plot(sa_dic_RE, sa_dic_ume_RE, show_uncertainty = FALSE) +
   xlab("Residual deviance - No Class model") +
-  ylab("Residual deviance - UME model") +
-  theme(text = element_text(size = 12))
+  ylab("Residual deviance - UME model")
 ```
 
 The dev-dev plot comparing residual deviance contributions for the UME model and no-class model shows that most data points lie close to the line of equality. 
 
 ```{r}
-df <- do.call(rbind, sa_dic_RE$pointwise) %>% as.data.frame()
-
-df %>%
+as.data.frame(sa_dic_RE) %>%
   arrange(desc(resdev)) %>%
   head(5)
 ```
 
-We can see from investigating the data that the two outlier studies are ALDEN2011 and EMMELKAMP2006 with their large `resdev` values in the no class model. 
+We can see from investigating the pointwise contributions to the residual deviance that the two outlier studies are ALDEN2011 and EMMELKAMP2006 with their large `resdev` values in the no class model. 
 
 We can explore the consistency of specific evidence loops using node-splitting by setting `consistency = "nodesplit"`. However, given the size of the network, running node-splitting on all comparisons would be computationally intensive. We instead run the node-splitting analysis specifically for the loops that include the studies identified in the dev-dev plots (ALDEN2011 and EMMELKAMP2006). We first define the specific treatment comparisons of interest by creating two data frames that specify the desired treatment comparisons. These are then passed to the `nodesplit` argument within the `nma()` function. 
 
@@ -207,8 +203,7 @@ We use the `plot()` function that produces a "dev-dev" plot of the residual devi
 ```{r}
 plot(sa_dic_EXclass_RE, sa_dic_RE, show_uncertainty = FALSE) +
   xlab("Residual deviance - Exchangeable Class model") +
-  ylab("Residual deviance - No Class model") +
-  theme(text = element_text(size = 12))
+  ylab("Residual deviance - No Class model")
 ```
 
 Although both models yield similar residual deviance (162.6 vs. 163) and between‐study heterogeneity, the exchangeable class model reduces model complexity—reflected by a lower effective number of parameters (87.9 vs. 94.8) and a lower DIC (250.9 vs. 257.4). A deviance–deviance plot confirms that all data points fit equally well. Overall, these findings support using the class model for the social anxiety data.
@@ -255,8 +250,7 @@ We use the `plot()` function to produce a "dev-dev" plot of the residual devianc
 ```{r}
 plot(sa_dic_COclass_RE, sa_dic_EXclass_RE, show_uncertainty = FALSE) +
   xlab("Residual deviance - Common Class model") +
-  ylab("Residual deviance - Exchangeable Class model") +
-  theme(text = element_text(size = 12))
+  ylab("Residual deviance - Exchangeable Class model")
 ```
 
  The dev–dev plot indicates that while some data points favor one model over the other, overall the fit is similar. Therefore, given nearly identical DIC scores, the choice between the two random‐effects models should be guided by clinical considerations: use the exchangeable class model if reporting distinct treatment‐level effects is important, or the common class model if the focus is on class-level effects and not concerned with potential variability of treatment effects within classes.
