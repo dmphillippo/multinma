@@ -63,7 +63,7 @@ plot(sa_net, level = "class", weight_nodes = TRUE) +
 ## Model selection strategy
 We follow the model selection stategey proposed by Perren et.al  
 
-<img src="class_effects_flow_chart-1.png" width="600px" style="display: block; margin: auto;" />
+<img src="class_effects_flow_chart-1.svg" width="600px" style="display: block; margin: auto;" />
 
 ### STEP 1: Heterogeniety assessement
 First, we assess heterogeneity by fitting fixed effects (FE) and random effects (RE) models using `nma()` and stating `trt_effects = "random"` for the RE model and `trt_effects = "fixed"` for the FE model. We use uninformative priors on the treatment effects with `prior_trt = normal(0, 100)` and heterogeneity with `prior_het = half_normal(5)`.
