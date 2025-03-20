@@ -792,8 +792,8 @@ plot.nma_data <- function(x, ..., layout, circular,
                 'Specify `trt_class` in set_*(), or use level = "treatment"', sep = "\n"))
 
   if(level == "class" && show_trt_class)
-    abort(paste("show_trt_class is only available when level = treatment.",
-                "Set show_trt_class = FALSE or set level = treatment", sep = "\n"))
+    abort(paste('Cannot set both show_trt_class = TRUE and level = "class".',
+                'Either set show_trt_class = FALSE or set level = "treatment"', sep = "\n"))
 
   if (!rlang::is_double(nudge, n = 1, finite = TRUE))
     abort("`nudge` must be a single numeric value")
