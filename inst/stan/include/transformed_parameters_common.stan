@@ -77,8 +77,8 @@ vector[n_delta] f_delta =
   vector[class_effects ? max(which_class) : 0] f_class; // product of class sds and ~N(0,1) to be added onto linear predictor
 
   if (class_effects) {
-    f_class = class_mean[which_CE[which_gt0a(which_CE)]] - d[which_gt0a(which_CE)] + class_sd[which_CE_sd[which_class_trt]] .* z_class;
-    d[which_gt0a(which_CE)] = class_mean[which_CE[which_gt0a(which_CE)]] + class_sd[which_CE_sd[which_class_trt]] .* z_class;
+    f_class = class_mean[which_CE[which_class_trt]] - d[which_class_trt] + class_sd[which_CE_sd[which_class_trt]] .* z_class;
+    d[which_class_trt] = class_mean[which_CE[which_class_trt]] + class_sd[which_CE_sd[which_class_trt]] .* z_class;
   }
   // Add class effects contribution
   if (class_effects) {
