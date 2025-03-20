@@ -3,7 +3,7 @@
 \docType{data}
 \name{social_anxiety}
 \alias{social_anxiety}
-\title{Social Anxiety Dataset}
+\title{Social Anxiety}
 \format{
 A data frame with 248 rows and 8 variables:
 \describe{
