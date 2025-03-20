@@ -760,7 +760,7 @@ plot.nma_data <- function(x, ..., layout, circular,
                           show_trt_class = FALSE,
                           level = c("treatment", "class"),
                           nudge = 0) {
-  level <- match.arg(level)
+  level <- rlang::arg_match(level)
   if (missing(layout) && missing(circular)) {
     layout <- "linear"
     circular <- TRUE
