@@ -789,7 +789,7 @@ plot.nma_data <- function(x, ..., layout, circular,
 
   if(level == "class" && is.null(x$classes))
     abort(paste("Treatment classes not specified in network.",
-                "Specify `trt_class` in set_*(), or set level == class", sep = "\n"))
+                'Specify `trt_class` in set_*(), or use level = "treatment"', sep = "\n"))
 
   if(level == "class" && show_trt_class)
     abort(paste("show_trt_class is only available when level = treatment.",
