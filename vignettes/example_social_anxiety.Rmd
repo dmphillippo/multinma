@@ -36,7 +36,7 @@ head(social_anxiety)
 
 We demonstrate the model selection strategy proposed by Perren et al. to determine the most suitable class effects model. 
 
-## Setting up the network
+# Setting up the network
 We follow Mayo-Wilson et al. by analysing results as standardised mean differences (`y`) with standard errors (`se`) therefore we use the function `set_agd_contrast` to set up the network. We set treatment classes with `trt_class = classc` and set `Waitlist` as the network reference treatment.
 
 ```{r}
@@ -59,12 +59,12 @@ plot(sa_net, level = "class", weight_nodes = TRUE) +
   theme(legend.position = "bottom", legend.box = "vertical")
 ```
 
-## Model selection strategy
-We follow the model selection stategey proposed by Perren et.al  
+# Model selection strategy
+We follow the model selection strategy proposed by Perren et al. 
 
 <img src="class_effects_flow_chart-1.svg" width="600px" style="display: block; margin: auto;" />
 
-### STEP 1: Heterogeniety assessement
+## STEP 1: Heterogeniety assessement
 First, we assess heterogeneity by fitting fixed effects (FE) and random effects (RE) models using `nma()` and stating `trt_effects = "random"` for the RE model and `trt_effects = "fixed"` for the FE model. We use uninformative priors on the treatment effects with `prior_trt = normal(0, 100)` and heterogeneity with `prior_het = half_normal(5)`.
 
 ```{r echo=TRUE, results='hide'}
@@ -91,7 +91,7 @@ The model fit under the FE and RE models can be checked using the `dic()` functi
 
 The DIC for the random effects model (`r sprintf("%.1f", sa_dic_RE$dic)`) is much lower than that of the fixed effects model (`r (sprintf("%.1f", sa_dic_FE$dic))`) due to the large decrease in residual deviance showing a much better fit to the data. Therefore, our preferred model is the RE model, which we use in subsequent steps.
 
-### STEP 2: Consistency assessment
+## STEP 2: Consistency assessment
 The next step is to assess inconsistency using an unrelated mean effects model (UME), comparing model fit statistics for the UME model and the NMA (consistency) model, both with RE. To fit a UME model we specify `consistency = "ume"`. 
 
 ```{r echo=TRUE, results='hide'}
@@ -167,11 +167,11 @@ summary(sa_fit_RE_nodesplit_ALDEN)
 summary(sa_fit_RE_nodesplit_EMMELKAMP)
 ```
 
-Our node‐splitting analysis shows that the CBT individual and Waitlist comparison has a p-value of 0.065 and a stronger effect for the indirect estimate compared to the direct estimate, however the Crls do overlap and both estimates are in the same direction and do not include 0. This indicates no evidence of inconsistency in the network meta‐analysis. However, studies should be reviewed and sensitivity analyses are advised.
+Our node‐splitting analysis shows that the CBT individual and Waitlist comparison has a p-value of 0.065 and a stronger effect for the indirect estimate compared to the direct estimate, however the CrIs do overlap and both estimates are in the same direction and do not include 0. This indicates no evidence of inconsistency in the network meta‐analysis. However, studies should be reviewed and sensitivity analyses are advised.
 
 ## STEP 3: Class effects assessment
 
-In this step, we assess whether a class assumption is suitable for the data by comparing our NMA RE model with an exchangeable class model with a RE treatment model. In this model, we specify `class_effects = "exchangeable"`, meaning that treatments within each class are considered to be from a common distribution. The `prior_class_sd` sets a prior on the variability between treatment effects within each class. We use an informative prior of `normal(0.33,0.1)` as used in Perren et. al. We’ve defined `class_sd` as a list of character vectors, each indicating which classes share a common SD. `prior_class_mean` will be set as `normal(location = 0, scale = 10)`.
+In this step, we assess whether a class assumption is suitable for the data by comparing our NMA RE model with an exchangeable class model with a RE treatment model. In this model, we specify `class_effects = "exchangeable"`, meaning that treatments within each class are considered to be from a common distribution. The `prior_class_sd` sets a prior on the variability between treatment effects within each class. We use an informative $\mathrm{N}(0.33,0.1^2)$ prior as used in Perren et al. We’ve defined `class_sd` as a list of character vectors, each indicating which classes share a common SD. `prior_class_mean` will be set as $\mathrm{N}(0, 10^2)$.
 
 ```{r echo=TRUE, results='hide'}
 sa_fit_EXclass_RE <- nma(sa_net,
@@ -181,11 +181,14 @@ sa_fit_EXclass_RE <- nma(sa_net,
                          class_effects = "exchangeable",
                          prior_class_mean = normal(0, 10),
                          prior_class_sd = normal(0.33,0.1),
-                         class_sd = list(`Exercise and SH no support` = c("Exercise promotion", "Self-help no support"),
-                                         `SSRIs and NSSA` = c("SSRI/SNRI", "NSSA"),
-                                         `Psychodynamic & Other psychological therapies` = c("Psychodynamic psychotherapy", "Other psychological therapies")
+                         class_sd = 
+                           list(`Exercise and SH no support` = 
+                                  c("Exercise promotion", "Self-help no support"),
+                                `SSRIs and NSSA` = 
+                                  c("SSRI/SNRI", "NSSA"),
+                                `Psychodynamic & Other psychological therapies` =
+                                  c("Psychodynamic psychotherapy", "Other psychological therapies"))
                          )
-)
 ```
 
 We compare model fit from the Exchangeable class RE model and the no class RE model using the `dic()` function and $\tau$.
@@ -226,11 +229,14 @@ sa_fit_EXclass_FE <- nma(sa_net,
                          class_effects = "exchangeable",
                          prior_class_mean = normal(0, 10),
                          prior_class_sd = normal(0.33,0.1),
-                         class_sd = list(`Exercise and SH no support` = c("Exercise promotion", "Self-help no support"),
-                                         `SSRIs and NSSA` = c("SSRI/SNRI", "NSSA"),
-                                         `Psychodynamic & Other psychological therapies` = c("Psychodynamic psychotherapy", "Other psychological therapies")
+                         class_sd = 
+                           list(`Exercise and SH no support` = 
+                                  c("Exercise promotion", "Self-help no support"),
+                                `SSRIs and NSSA` = 
+                                  c("SSRI/SNRI", "NSSA"),
+                                `Psychodynamic & Other psychological therapies` = 
+                                  c("Psychodynamic psychotherapy", "Other psychological therapies"))
                          )
-)
 ```
 
 We compare model fit from all three models using the `dic()` function and evaluate $\tau$ in the common class RE model and the exchangeable class RE model.
@@ -253,14 +259,20 @@ plot(sa_dic_COclass_RE, sa_dic_EXclass_RE, show_uncertainty = FALSE) +
   ylab("Residual deviance - Exchangeable Class model")
 ```
 
- The dev–dev plot indicates that while some data points favor one model over the other, overall the fit is similar. Therefore, given nearly identical DIC scores, the choice between the two random‐effects models should be guided by clinical considerations: use the exchangeable class model if reporting distinct treatment‐level effects is important, or the common class model if the focus is on class-level effects and not concerned with potential variability of treatment effects within classes.
+The dev–dev plot indicates that while some data points favor one model over the other, overall the fit is similar. Therefore, given nearly identical DIC scores, the choice between the two random‐effects models should be guided by clinical considerations: use the exchangeable class model if reporting distinct treatment‐level effects is important, or the common class model if the focus is on class-level effects and not concerned with potential variability of treatment effects within classes.
 
-## Results for final chosen model
-### Relative treatment and class effects
+# Results for final chosen model
+
+## Relative treatment effects 
+Relative treatment effects are produced with the `relative_effects()` function, and can be plotted using `plot()`.
+```{r}
+plot(relative_effects(sa_fit_EXclass_RE), ref_line = 0)
+```
+
+## Relative class effects
 We can produce a plot showing relative class effects against `Waitlist` using `plot()` with `pars = "class_mean"` to select these parameters.
 
 ```{r}
-# Class effects
 plot(sa_fit_EXclass_RE,
      pars = "class_mean",
      ref_line = 0)
@@ -269,28 +281,26 @@ plot(sa_fit_EXclass_RE,
 We aim to visualize the class ranks and rank probabilities by summarizing their distributions. To achieve this, we extract the posterior draws for class means, add a reference treatment, and compute the rank of each treatment at every iteration. We then summarize these ranks by calculating the median and 95% credible intervals to generate a point-range plot and derive the rank probability distributions for each treatment class, which we then plot.
 ```{r}
 # Class means
-EXclass_mean <- as.matrix(sa_fit_EXclass_RE)
-
-# Filter columns that contain 'class_mean[' with any text inside the brackets
-EXclass_mean <- EXclass_mean[, grepl("class_mean", colnames(EXclass_mean))]
+EXclass_mean <- as.matrix(sa_fit_EXclass_RE, pars = "class_mean")
 
 EXclass_mean <- cbind(`d[Reference]` = 0, EXclass_mean)
 
 # Take ranks at each iteration
 EXranks <- t(apply(EXclass_mean, 1, rank))
 
-# Get mediam rank and 95% credible interval
+# Get median rank and 95% credible interval
 EXresults <- t(apply(EXranks, 2, quantile, probs = c(0.025, 0.5, 0.975)))
 
 # Convert to data frame
 EXresults_df <- as.data.frame(EXresults)
 EXresults_df$class <- rownames(EXresults_df)
 
-EXresults_df$class <- factor(EXresults_df$class, levels = sort(unique(EXresults_df$class), decreasing = TRUE))
+EXresults_df$class <- factor(EXresults_df$class, 
+                             levels = sort(unique(EXresults_df$class), decreasing = TRUE))
 
 ggplot(EXresults_df, aes(x=class, y=`50%`, ymin=`2.5%`, ymax=`97.5%`)) +
 geom_pointrange(size = 0.5) +
-coord_flip() +  # flip coordinates (puts labels on y axis)
+coord_flip() +
 xlab("Class") + ylab("Posterior Ranks") +
 theme_multinma()
 ```
@@ -328,7 +338,7 @@ ggplot(rank_probs_long_EX, aes(x = Rank, y = Probability)) +
 
 Higher-ranked classes have a greater density on the left side of the x-axis, indicating a higher probability of achieving a top rank across posterior samples. The Combined class shows the highest density on the left, suggesting it is most likely to be ranked among the top treatments, followed by CBT individual. In contrast, most other classes have relatively flat distributions, reflecting greater uncertainty in their rankings. Exercise promotion, Other psychological therapies, and the reference class have densities skewed toward the right, indicating a higher probability of lower rankings.
 
-## References
+# References
 ```{r smoking_tests, include=FALSE, eval=params$run_tests}
 #--- Test against TSD 4 results ---
 library(testthat)
@@ -429,7 +439,7 @@ test_that("EX FE DIC", {
   expect_equivalent(sa_dic_EXclass_FE$dic, 319.4, tolerance = tol_dic)
 })
 
-#== Tau checks ====
+#--- Tau checks ---
 CO_RE_tau <- summary(sa_fit_COclass_RE, pars = "tau")
 EX_RE_tau <- summary(sa_fit_EXclass_RE, pars = "tau")
 RE_tau <- summary(sa_fit_RE, pars = "tau")
