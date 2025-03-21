@@ -278,6 +278,37 @@ plot(sa_fit_EXclass_RE,
      ref_line = 0)
 ```
 
+We can combine the treatment and class effects into a single plot as follows:
+```{r fig.height=8}
+# Relative treatment effects
+trt_eff <- as_tibble(relative_effects(sa_fit_EXclass_RE)) %>% 
+  # Add in class details
+  mutate(Class = sa_net$classes[as.numeric(.trtb)],
+         level = "treatment")
+
+# Class effects
+class_eff <- as_tibble(summary(sa_fit_EXclass_RE, pars = "class_mean")) %>% 
+  # Extract class details
+  mutate(Class = factor(gsub(".*\\[(.+)\\]", "\\1", parameter), levels = levels(sa_net$classes)),
+         level = "class",
+         .trtb = factor("Class Mean", levels = c(levels(sa_net$classes), "Class Mean")))
+
+# Combine and plot
+bind_rows(trt_eff, class_eff) %>% 
+  ggplot(aes(y = .trtb, 
+             x = mean, xmin = `2.5%`, xmax = `97.5%`,
+             colour = level, shape = level)) +
+  geom_vline(xintercept = 0, colour = "grey60") +
+  geom_pointrange() +
+  facet_grid(rows = "Class", scales = "free", space = "free") +
+  scale_shape_manual(values = c(15, 16), guide = guide_none()) +
+  scale_colour_manual(values = c("#113259", "#55A480"), guide = guide_none()) +
+  xlab("SMD") + ylab("") +
+  theme_multinma() +
+  theme(strip.text.y = element_text(angle = 0))
+```
+
+
 We aim to visualize the class ranks and rank probabilities by summarizing their distributions. To achieve this, we extract the posterior draws for class means, add a reference treatment, and compute the rank of each treatment at every iteration. We then summarize these ranks by calculating the median and 95% credible intervals to generate a point-range plot and derive the rank probability distributions for each treatment class, which we then plot.
 ```{r}
 # Class means
