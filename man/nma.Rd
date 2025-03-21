@@ -10,6 +10,8 @@ nma(
   trt_effects = c("fixed", "random"),
   regression = NULL,
   class_interactions = c("common", "exchangeable", "independent"),
+  class_effects = c("independent", "common", "exchangeable"),
+  class_sd = c("independent", "common"),
   likelihood = NULL,
   link = NULL,
   ...,
@@ -21,6 +23,8 @@ nma(
   prior_reg = .default(normal(scale = 10)),
   prior_aux = .default(),
   prior_aux_reg = .default(),
+  prior_class_mean = .default(normal(scale = 10)),
+  prior_class_sd = .default(half_normal(scale = 5)),
   aux_by = NULL,
   aux_regression = NULL,
   QR = FALSE,
@@ -52,6 +56,16 @@ modifier interactions as \code{variable:.trt} (see details).}
 \item{class_interactions}{Character string specifying whether effect modifier
 interactions are specified as \code{"common"}, \code{"exchangeable"}, or
 \code{"independent"}.}
+
+\item{class_effects}{Character string specifying a model for treatment class effects,
+either \code{"independent"} (the default), \code{"exchangeable"}, or \code{"common"}.}
+
+\item{class_sd}{Character string specifying whether the class standard deviations in a
+class effects model should be \code{"independent"} (i.e. separate for each class, the default),
+or \code{"common"} (i.e. shared across all classes). Alternatively this can be a list of
+character vectors, each of which describe a set classes for which to share a common class SD;
+any list names will be used to name the output parameters, otherwise the name will be taken
+from the first class in each set.}
 
 \item{likelihood}{Character string specifying a likelihood, if unspecified
 will be inferred from the data (see details)}
@@ -91,6 +105,12 @@ should be a list of prior distributions with elements \code{sigma} and \code{k}.
 
 \item{prior_aux_reg}{Specification of prior distribution for the auxiliary
 regression parameters, if \code{aux_regression} is specified (see details).}
+
+\item{prior_class_mean}{Specification of prior distribution for the
+treatment class means (if \code{class_effects = "exchangeable"}).}
+
+\item{prior_class_sd}{Specification of prior distribution for the
+treatment class standard deviations (if \code{class_effects = "exchangeable"}).}
 
 \item{aux_by}{Vector of variable names listing the variables to stratify the
 auxiliary parameters by. Currently only used for survival models, see

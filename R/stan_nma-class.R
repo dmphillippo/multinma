@@ -206,7 +206,7 @@ plot.stan_nma <- function(x, ...,
 #' @param ... Additional arguments passed on to methods
 #' @param prior Character vector selecting the prior and posterior
 #'   distribution(s) to plot. May include `"intercept"`, `"trt"`, `"het"`,
-#'   `"reg"`, or `"aux"`, as appropriate.
+#'   `"reg"`, `"aux"`, `"class_mean"` or `"class_sd"` as appropriate.
 #' @param post_args List of arguments passed on to [ggplot2::geom_histogram] to
 #'   control plot output for the posterior distribution
 #' @param prior_args List of arguments passed on to [ggplot2::geom_path] to
@@ -260,7 +260,9 @@ plot_prior_posterior <- function(x, ...,
       "het"[!is.null(x$priors$prior_het)],
       "reg"[!is.null(x$priors$prior_reg)],
       "aux"[!is.null(x$priors$prior_aux)],
-      "aux_reg"[!is.null(x$priors$prior_aux_reg)])
+      "aux_reg"[!is.null(x$priors$prior_aux_reg)],
+      "class_mean"[!is.null(x$priors$prior_class_mean)],
+      "class_sd"[!is.null(x$priors$prior_class_sd)])
 
   if (is.null(prior)) {
     prior <- priors_used
@@ -287,6 +289,9 @@ plot_prior_posterior <- function(x, ...,
   for (i in seq_along(prior)) {
     if (prior[i] %in% c("het", "aux") || (prior[i] == "aux_reg" && x$likelihood %in% c("mspline", "pexp"))) trunc <- c(0, Inf)
     else trunc <- NULL
+
+    prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc) %>%
+      tibble::add_column(prior = prior[i])
 
     if (x$likelihood == "gengamma" && prior[i] == "aux") {
       prior_dat[[i]] <-
@@ -324,7 +329,9 @@ plot_prior_posterior <- function(x, ...,
                                                             pexp =, mspline = "sigma_beta",
                                                             weibull =, gompertz =, `weibull-aft` =,
                                                             lognormal =, loglogistic =, gamma =,
-                                                            gengamma = "beta_aux")))
+                                                            gengamma = "beta_aux"),
+                                           class_mean = "class_mean",
+                                           class_sd = "class_sd"))
 
   # Add in omega parameter if node-splitting model, which uses prior_trt
   if (inherits(x, "nma_nodesplit")) {

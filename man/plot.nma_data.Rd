@@ -12,6 +12,7 @@
   weight_edges = TRUE,
   weight_nodes = FALSE,
   show_trt_class = FALSE,
+  level = c("treatment", "class"),
   nudge = 0
 )
 }
@@ -35,6 +36,8 @@ layout functions provided by \link[igraph:igraph-package]{igraph}.}
 
 \item{show_trt_class}{Colour treatment nodes by class, if \code{trt_class} is set?
 Default is \code{FALSE}.}
+
+\item{level}{Display network at the \code{"treatment"} (default) or \code{"class"} level.}
 
 \item{nudge}{Numeric value to nudge the treatment labels away from the nodes
 when \code{weight_nodes = TRUE}. Default is \code{0} (no adjustment to label

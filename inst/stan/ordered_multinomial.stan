@@ -87,6 +87,15 @@ transformed parameters {
           X_agd_arm * beta_tilde + offset_agd_arm :
           X_agd_arm * beta_tilde;
 
+  // Add class effects contribution to the linear predictor
+    if (class_effects) {
+      for (i in 1:ni_agd_arm) {
+        if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_class[agd_arm_trt[i] - 1]];
+        }
+      }
+    }
+
     if (nint_max > 1) { // -- If integration points are used --
 
       if (RE) {
@@ -164,6 +173,14 @@ transformed parameters {
 
         real eta_agd_arm_RE;
 
+        if (class_effects) {
+          for (i in 1:ni_agd_arm) {
+            if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+              eta_agd_arm_noRE[i] += f_class[which_class[agd_arm_trt[i] - 1]];
+            }
+          }
+        }
+
         if (link == 1) { // logit link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
@@ -201,6 +218,14 @@ transformed parameters {
 
       } else {
 
+          if (class_effects) {
+            for (i in 1:ni_agd_arm) {
+              if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+                eta_agd_arm_noRE[i] += f_class[which_class[agd_arm_trt[i] - 1]];
+              }
+            }
+          }
+
         if (link == 1) { // logit link
           for (i in 1:ni_agd_arm) {
             for (k in 1:(agd_arm_ncat[i] - 1)) {
@@ -220,10 +245,8 @@ transformed parameters {
             }
           }
         }
-
       }
     }
-
 
     for (i in 1:ni_agd_arm) {
       // Category 1

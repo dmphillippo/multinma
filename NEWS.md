@@ -1,5 +1,11 @@
 # multinma 0.7.2.9000
 
+* Feature: Class effects models are now available, thanks to @sjperren (PR #37).
+The new `class_effects` argument in `nma()` allows models with independent, 
+exchangeable, or common class effects to be fitted. Class standard deviations
+can also be shared between classes or subsets of classes, controlled by the
+`class_sd` argument. These features are demonstrated in a new vignette,
+analysing a network of interventions for social anxiety.
 * Feature: Leverage plots can now be produced by `plot.nma_dic()`, with the 
 option `type = "leverage"`.
 * Feature: Networks with integration points can now be combined with 

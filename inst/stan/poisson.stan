@@ -36,6 +36,15 @@ transformed parameters {
         X_agd_arm * beta_tilde + offset_agd_arm :
         X_agd_arm * beta_tilde;
 
+        // Add class effects contribution to the linear predictor
+    if (class_effects) {
+      for (i in 1:ni_agd_arm) {
+        if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_class[agd_arm_trt[i] - 1]];
+        }
+      }
+    }
+
       if (RE) {
 
         if (link == 1) { // log link
@@ -67,6 +76,14 @@ transformed parameters {
           X_agd_arm * beta_tilde + offset_agd_arm :
           X_agd_arm * beta_tilde;
 
+        if (class_effects) {
+          for (i in 1:ni_agd_arm) {
+            if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+            eta_agd_arm_noRE[i] += f_class[which_class[agd_arm_trt[i] - 1]];
+            }
+          }
+        }
+
         if (link == 1) { // log link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
@@ -76,10 +93,21 @@ transformed parameters {
           }
         }
       } else {
+
+        vector[nint * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+          X_agd_arm * beta_tilde + offset_agd_arm :
+          X_agd_arm * beta_tilde;
+
+        if (class_effects) {
+          for (i in 1:ni_agd_arm) {
+            if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+              eta_agd_arm_noRE[i] += f_class[which_class[agd_arm_trt[i] - 1]];
+            }
+          }
+        }
+
         if (link == 1) // log link
-          theta_agd_arm_bar = has_offset ?
-            exp(X_agd_arm * beta_tilde + offset_agd_arm) :
-            exp(X_agd_arm * beta_tilde);
+          theta_agd_arm_bar = exp(eta_agd_arm_noRE);
       }
     }
   }
