@@ -89,7 +89,7 @@ The model fit under the FE and RE models can be checked using the `dic()` functi
 (sa_dic_RE <- dic(sa_fit_RE))
 ```
 
-The DIC for the random effects model (257.4) is much lower than that of the fixed effects model (328.4) due to the large decrease in residual deviance showing a much better fit to the data. Therefore, our preferred model is the RE model, which we use in subsequent steps.
+The DIC for the random effects model (`r sprintf("%.1f", sa_dic_RE$dic)`) is much lower than that of the fixed effects model (`r (sprintf("%.1f", sa_dic_FE$dic))`) due to the large decrease in residual deviance showing a much better fit to the data. Therefore, our preferred model is the RE model, which we use in subsequent steps.
 
 ### STEP 2: Consistency assessment
 The next step is to assess inconsistency using an unrelated mean effects model (UME), comparing model fit statistics for the UME model and the NMA (consistency) model, both with RE. To fit a UME model we specify `consistency = "ume"`. 
@@ -112,7 +112,7 @@ summary(sa_UME_RE, pars = "tau")
 summary(sa_fit_RE, pars = "tau")
 ```
 
-The residual deviance is not meaningfully different between the two models, however, the DIC is lower in the NMA model (257.4) compared to the UME model (270.4). There is no evidence of inconsistency at the global level. 
+The residual deviance is not meaningfully different between the two models, however, the DIC is lower in the NMA model (`r (sprintf("%.1f", sa_dic_RE$dic))`) compared to the UME model (`r (sprintf("%.1f", sa_dic_ume_RE$dic))`). There is no evidence of inconsistency at the global level. 
 
 To asses local inconsistency, we use the `plot()` function that produces a "dev-dev" plot of the residual deviance contributions for the UME model plotted against the NMA consistency model.
 
@@ -206,7 +206,7 @@ plot(sa_dic_EXclass_RE, sa_dic_RE, show_uncertainty = FALSE) +
   ylab("Residual deviance - No Class model")
 ```
 
-Although both models yield similar residual deviance (162.6 vs. 163) and between‐study heterogeneity, the exchangeable class model reduces model complexity—reflected by a lower effective number of parameters (87.9 vs. 94.8) and a lower DIC (250.9 vs. 257.4). A deviance–deviance plot confirms that all data points fit equally well. Overall, these findings support using the class model for the social anxiety data.
+Although both models yield similar residual deviance (`r (sprintf("%.1f", sa_dic_EXclass_RE$resdev))` vs. `r (sprintf("%.1f", sa_dic_RE$resdev))`) and between‐study heterogeneity, the exchangeable class model reduces model complexity—reflected by a lower effective number of parameters (`r (sprintf("%.1f", sa_dic_EXclass_RE$pD))` vs. `r (sprintf("%.1f", sa_dic_RE$pd))`) and a lower DIC (`r (sprintf("%.1f", sa_dic_EXclass_RE$dic))` vs. `r (sprintf("%.1f", sa_dic_RE$dic))`). A deviance–deviance plot confirms that all data points fit equally well. Overall, these findings support using the class model for the social anxiety data.
 
 ## STEP 4: Class Model Assessment
 
@@ -244,7 +244,7 @@ summary(sa_fit_COclass_RE, pars = "tau")
 summary(sa_fit_EXclass_RE, pars = "tau")
 ```
 
-Both random‐effects models showed substantially better fit than the fixed‐effect model (posterior mean residual deviance of 163 and 157.8 versus 284.8, and DIC values of 251 and 250.9 versus 319.1). Although the common class model achieved a slightly better absolute fit, it had higher between‐study heterogeneity (0.25 vs. 0.20) than the exchangeable class model.
+Both random‐effects models showed substantially better fit than the fixed‐effect model (posterior mean residual deviance of `r (sprintf("%.1f", sa_dic_COclass_RE$resdev))` and `r (sprintf("%.1f", sa_dic_EXclass_RE$resdev))` versus `r (sprintf("%.1f", sa_dic_EXclass_FE$resdev))`, and DIC values of `r (sprintf("%.1f", sa_dic_COclass_RE$dic))` and `r (sprintf("%.1f", sa_dic_EXclass_RE$dic))` versus `r (sprintf("%.1f", sa_dic_EXclass_FE$dic))`). Although the common class model achieved a slightly better absolute fit, it had higher between‐study heterogeneity (0.25 vs. 0.20) than the exchangeable class model.
 We use the `plot()` function to produce a "dev-dev" plot of the residual deviance contributions for the Exchangeable class model plotted against the no class model.
 
 ```{r}
