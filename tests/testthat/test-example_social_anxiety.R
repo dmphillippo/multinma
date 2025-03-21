@@ -138,11 +138,14 @@ sa_fit_EXclass_RE <- nma(sa_net,
                          class_effects = "exchangeable",
                          prior_class_mean = normal(0, 10),
                          prior_class_sd = normal(0.33,0.1),
-                         class_sd = list(`Exercise and SH no support` = c("Exercise promotion", "Self-help no support"),
-                                         `SSRIs and NSSA` = c("SSRI/SNRI", "NSSA"),
-                                         `Psychodynamic & Other psychological therapies` = c("Psychodynamic psychotherapy", "Other psychological therapies")
+                         class_sd = 
+                           list(`Exercise and SH no support` = 
+                                  c("Exercise promotion", "Self-help no support"),
+                                `SSRIs and NSSA` = 
+                                  c("SSRI/SNRI", "NSSA"),
+                                `Psychodynamic & Other psychological therapies` =
+                                  c("Psychodynamic psychotherapy", "Other psychological therapies"))
                          )
-)
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -173,11 +176,14 @@ sa_fit_EXclass_FE <- nma(sa_net,
                          class_effects = "exchangeable",
                          prior_class_mean = normal(0, 10),
                          prior_class_sd = normal(0.33,0.1),
-                         class_sd = list(`Exercise and SH no support` = c("Exercise promotion", "Self-help no support"),
-                                         `SSRIs and NSSA` = c("SSRI/SNRI", "NSSA"),
-                                         `Psychodynamic & Other psychological therapies` = c("Psychodynamic psychotherapy", "Other psychological therapies")
+                         class_sd = 
+                           list(`Exercise and SH no support` = 
+                                  c("Exercise promotion", "Self-help no support"),
+                                `SSRIs and NSSA` = 
+                                  c("SSRI/SNRI", "NSSA"),
+                                `Psychodynamic & Other psychological therapies` = 
+                                  c("Psychodynamic psychotherapy", "Other psychological therapies"))
                          )
-)
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -196,36 +202,66 @@ plot(sa_dic_COclass_RE, sa_dic_EXclass_RE, show_uncertainty = FALSE) +
 
 
 ## -------------------------------------------------------------------------------------------------
-# Class effects
+plot(relative_effects(sa_fit_EXclass_RE), ref_line = 0)
+
+
+## -------------------------------------------------------------------------------------------------
 plot(sa_fit_EXclass_RE,
      pars = "class_mean",
      ref_line = 0)
 
 
+## ----fig.height=8---------------------------------------------------------------------------------
+# Relative treatment effects
+trt_eff <- as_tibble(relative_effects(sa_fit_EXclass_RE)) %>% 
+  # Add in class details
+  mutate(Class = sa_net$classes[as.numeric(.trtb)],
+         level = "treatment")
+
+# Class effects
+class_eff <- as_tibble(summary(sa_fit_EXclass_RE, pars = "class_mean")) %>% 
+  # Extract class details
+  mutate(Class = factor(gsub(".*\\[(.+)\\]", "\\1", parameter), levels = levels(sa_net$classes)),
+         level = "class",
+         .trtb = factor("Class Mean", levels = c(levels(sa_net$classes), "Class Mean")))
+
+# Combine and plot
+bind_rows(trt_eff, class_eff) %>% 
+  ggplot(aes(y = .trtb, 
+             x = mean, xmin = `2.5%`, xmax = `97.5%`,
+             colour = level, shape = level)) +
+  geom_vline(xintercept = 0, colour = "grey60") +
+  geom_pointrange() +
+  facet_grid(rows = "Class", scales = "free", space = "free") +
+  scale_shape_manual(values = c(15, 16), guide = guide_none()) +
+  scale_colour_manual(values = c("#113259", "#55A480"), guide = guide_none()) +
+  xlab("SMD") + ylab("") +
+  theme_multinma() +
+  theme(strip.text.y = element_text(angle = 0))
+
+
 ## -------------------------------------------------------------------------------------------------
 # Class means
-EXclass_mean <- as.matrix(sa_fit_EXclass_RE)
-
-# Filter columns that contain 'class_mean[' with any text inside the brackets
-EXclass_mean <- EXclass_mean[, grepl("class_mean", colnames(EXclass_mean))]
+EXclass_mean <- as.matrix(sa_fit_EXclass_RE, pars = "class_mean")
 
 EXclass_mean <- cbind(`d[Reference]` = 0, EXclass_mean)
 
 # Take ranks at each iteration
 EXranks <- t(apply(EXclass_mean, 1, rank))
 
-# Get mediam rank and 95% credible interval
+# Get median rank and 95% credible interval
 EXresults <- t(apply(EXranks, 2, quantile, probs = c(0.025, 0.5, 0.975)))
 
 # Convert to data frame
 EXresults_df <- as.data.frame(EXresults)
 EXresults_df$class <- rownames(EXresults_df)
 
-EXresults_df$class <- factor(EXresults_df$class, levels = sort(unique(EXresults_df$class), decreasing = TRUE))
+EXresults_df$class <- factor(EXresults_df$class, 
+                             levels = sort(unique(EXresults_df$class), decreasing = TRUE))
 
 ggplot(EXresults_df, aes(x=class, y=`50%`, ymin=`2.5%`, ymax=`97.5%`)) +
 geom_pointrange(size = 0.5) +
-coord_flip() +  # flip coordinates (puts labels on y axis)
+coord_flip() +
 xlab("Class") + ylab("Posterior Ranks") +
 theme_multinma()
 
@@ -357,7 +393,7 @@ test_that("EX FE DIC", {
   expect_equivalent(sa_dic_EXclass_FE$dic, 319.4, tolerance = tol_dic)
 })
 
-#== Tau checks ====
+#--- Tau checks ---
 CO_RE_tau <- summary(sa_fit_COclass_RE, pars = "tau")
 EX_RE_tau <- summary(sa_fit_EXclass_RE, pars = "tau")
 RE_tau <- summary(sa_fit_RE, pars = "tau")
