@@ -9,7 +9,7 @@ meta-regression models in Stan."><meta property="og:image" content="https://dmph
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9008</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9009</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,7 @@ meta-regression models in Stan."><meta property="og:image" content="https://dmph
     <li><a class="dropdown-item" href="../articles/example_parkinsons.html">Example: Parkinson's disease</a></li>
     <li><a class="dropdown-item" href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a></li>
     <li><a class="dropdown-item" href="../articles/example_smoking.html">Example: Smoking cessation</a></li>
+    <li><a class="dropdown-item" href="../articles/example_social_anxiety.html">Example: Social Anxiety</a></li>
     <li><a class="dropdown-item" href="../articles/example_statins.html">Example: Statins for cholesterol lowering</a></li>
     <li><a class="dropdown-item" href="../articles/example_thrombolytics.html">Example: Thrombolytic treatments</a></li>
     <li><a class="dropdown-item" href="../articles/example_transfusion.html">Example: White blood cell transfusion</a></li>
@@ -72,6 +73,8 @@ meta-regression models in Stan.</p>
 <span>  trt_effects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fixed"</span>, <span class="st">"random"</span><span class="op">)</span>,</span>
 <span>  regression <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  class_interactions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"common"</span>, <span class="st">"exchangeable"</span>, <span class="st">"independent"</span><span class="op">)</span>,</span>
+<span>  class_effects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"independent"</span>, <span class="st">"common"</span>, <span class="st">"exchangeable"</span><span class="op">)</span>,</span>
+<span>  class_sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"independent"</span>, <span class="st">"common"</span><span class="op">)</span>,</span>
 <span>  likelihood <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  link <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
@@ -83,6 +86,8 @@ meta-regression models in Stan.</p>
 <span>  prior_reg <span class="op">=</span> <span class="fu"><a href="default_values.html">.default</a></span><span class="op">(</span><span class="fu"><a href="priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  prior_aux <span class="op">=</span> <span class="fu"><a href="default_values.html">.default</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  prior_aux_reg <span class="op">=</span> <span class="fu"><a href="default_values.html">.default</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  prior_class_mean <span class="op">=</span> <span class="fu"><a href="default_values.html">.default</a></span><span class="op">(</span><span class="fu"><a href="priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  prior_class_sd <span class="op">=</span> <span class="fu"><a href="default_values.html">.default</a></span><span class="op">(</span><span class="fu"><a href="priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  aux_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  aux_regression <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  QR <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -127,6 +132,20 @@ modifier interactions as <code>variable:.trt</code> (see details).</p></dd>
 <dd><p>Character string specifying whether effect modifier
 interactions are specified as <code>"common"</code>, <code>"exchangeable"</code>, or
 <code>"independent"</code>.</p></dd>
+
+
+<dt id="arg-class-effects">class_effects<a class="anchor" aria-label="anchor" href="#arg-class-effects"></a></dt>
+<dd><p>Character string specifying a model for treatment class effects,
+either <code>"independent"</code> (the default), <code>"exchangeable"</code>, or <code>"common"</code>.</p></dd>
+
+
+<dt id="arg-class-sd">class_sd<a class="anchor" aria-label="anchor" href="#arg-class-sd"></a></dt>
+<dd><p>Character string specifying whether the class standard deviations in a
+class effects model should be <code>"independent"</code> (i.e. separate for each class, the default),
+or <code>"common"</code> (i.e. shared across all classes). Alternatively this can be a list of
+character vectors, each of which describe a set classes for which to share a common class SD;
+any list names will be used to name the output parameters, otherwise the name will be taken
+from the first class in each set.</p></dd>
 
 
 <dt id="arg-likelihood">likelihood<a class="anchor" aria-label="anchor" href="#arg-likelihood"></a></dt>
@@ -188,6 +207,16 @@ should be a list of prior distributions with elements <code>sigma</code> and <co
 <dt id="arg-prior-aux-reg">prior_aux_reg<a class="anchor" aria-label="anchor" href="#arg-prior-aux-reg"></a></dt>
 <dd><p>Specification of prior distribution for the auxiliary
 regression parameters, if <code>aux_regression</code> is specified (see details).</p></dd>
+
+
+<dt id="arg-prior-class-mean">prior_class_mean<a class="anchor" aria-label="anchor" href="#arg-prior-class-mean"></a></dt>
+<dd><p>Specification of prior distribution for the
+treatment class means (if <code>class_effects = "exchangeable"</code>).</p></dd>
+
+
+<dt id="arg-prior-class-sd">prior_class_sd<a class="anchor" aria-label="anchor" href="#arg-prior-class-sd"></a></dt>
+<dd><p>Specification of prior distribution for the
+treatment class standard deviations (if <code>class_effects = "exchangeable"</code>).</p></dd>
 
 
 <dt id="arg-aux-by">aux_by<a class="anchor" aria-label="anchor" href="#arg-aux-by"></a></dt>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9008</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9009</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,6 +31,7 @@
     <li><a class="dropdown-item" href="../articles/example_parkinsons.html">Example: Parkinson's disease</a></li>
     <li><a class="dropdown-item" href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a></li>
     <li><a class="dropdown-item" href="../articles/example_smoking.html">Example: Smoking cessation</a></li>
+    <li><a class="dropdown-item" href="../articles/example_social_anxiety.html">Example: Social Anxiety</a></li>
     <li><a class="dropdown-item" href="../articles/example_statins.html">Example: Statins for cholesterol lowering</a></li>
     <li><a class="dropdown-item" href="../articles/example_thrombolytics.html">Example: Thrombolytic treatments</a></li>
     <li><a class="dropdown-item" href="../articles/example_transfusion.html">Example: White blood cell transfusion</a></li>
@@ -58,7 +59,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.2.9000" id="multinma-0729000">multinma 0.7.2.9000<a class="anchor" aria-label="anchor" href="#multinma-0729000"></a></h2>
-<ul><li>Feature: Leverage plots can now be produced by <code><a href="../reference/plot.nma_dic.html">plot.nma_dic()</a></code>, with the option <code>type = "leverage"</code>.</li>
+<ul><li>Feature: Class effects models are now available, thanks to <a href="https://github.com/sjperren" class="external-link">@sjperren</a> (PR <a href="https://github.com/dmphillippo/multinma/issues/37" class="external-link">#37</a>). The new <code>class_effects</code> argument in <code><a href="../reference/nma.html">nma()</a></code> allows models with independent, exchangeable, or common class effects to be fitted. Class standard deviations can also be shared between classes or subsets of classes, controlled by the <code>class_sd</code> argument. These features are demonstrated in a new vignette, analysing a network of interventions for social anxiety.</li>
+<li>Feature: Leverage plots can now be produced by <code><a href="../reference/plot.nma_dic.html">plot.nma_dic()</a></code>, with the option <code>type = "leverage"</code>.</li>
 <li>Feature: Networks with integration points can now be combined with <code><a href="../reference/combine_network.html">combine_network()</a></code>, where previously these were discarded. One potential use case is to specify different types of marginal distributions or correlation structures for different AgD studies in the network, by setting these up separately with <code><a href="../reference/add_integration.html">add_integration()</a></code> before combining with <code><a href="../reference/combine_network.html">combine_network()</a></code>.</li>
 <li>Feature: Added <code><a href="../reference/nma_dic-methods.html">as.data.frame.nma_dic()</a></code> and <code><a href="../reference/nma_dic-methods.html">as_tibble.nma_dic()</a></code> methods that return data frames of the pointwise contributions to the DIC, and <code><a href="../reference/nma_dic-methods.html">as.matrix.nma_dic()</a></code> and <code><a href="../reference/nma_dic-methods.html">as.array.nma_dic()</a></code> methods that return posterior samples of the residual deviances as a matrix or 3D array.</li>
 <li>Feature: The <code><a href="../reference/softmax.html">softmax()</a></code> and <code><a href="../reference/softmax.html">inv_softmax()</a></code> transforms are now exported.</li>

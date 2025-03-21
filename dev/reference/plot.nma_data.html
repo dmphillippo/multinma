@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9008</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9009</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,6 +31,7 @@
     <li><a class="dropdown-item" href="../articles/example_parkinsons.html">Example: Parkinson's disease</a></li>
     <li><a class="dropdown-item" href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a></li>
     <li><a class="dropdown-item" href="../articles/example_smoking.html">Example: Smoking cessation</a></li>
+    <li><a class="dropdown-item" href="../articles/example_social_anxiety.html">Example: Social Anxiety</a></li>
     <li><a class="dropdown-item" href="../articles/example_statins.html">Example: Statins for cholesterol lowering</a></li>
     <li><a class="dropdown-item" href="../articles/example_thrombolytics.html">Example: Thrombolytic treatments</a></li>
     <li><a class="dropdown-item" href="../articles/example_transfusion.html">Example: White blood cell transfusion</a></li>
@@ -72,6 +73,7 @@
 <span>  weight_edges <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  weight_nodes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show_trt_class <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"treatment"</span>, <span class="st">"class"</span><span class="op">)</span>,</span>
 <span>  nudge <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -112,6 +114,10 @@ layout functions provided by <a href="https://r.igraph.org/reference/aaa-igraph-
 <dt id="arg-show-trt-class">show_trt_class<a class="anchor" aria-label="anchor" href="#arg-show-trt-class"></a></dt>
 <dd><p>Colour treatment nodes by class, if <code>trt_class</code> is set?
 Default is <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-level">level<a class="anchor" aria-label="anchor" href="#arg-level"></a></dt>
+<dd><p>Display network at the <code>"treatment"</code> (default) or <code>"class"</code> level.</p></dd>
 
 
 <dt id="arg-nudge">nudge<a class="anchor" aria-label="anchor" href="#arg-nudge"></a></dt>
