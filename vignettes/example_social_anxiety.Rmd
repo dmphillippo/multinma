@@ -300,7 +300,7 @@ bind_rows(trt_eff, class_eff) %>%
              colour = level, shape = level)) +
   geom_vline(xintercept = 0, colour = "grey60") +
   geom_pointrange() +
-  facet_grid(rows = "Class", scales = "free", space = "free") +
+  facet_grid(rows = "Class", scales = "free", space = "free", labeller = label_wrap_gen(22)) +
   scale_shape_manual(values = c(15, 16), guide = guide_none()) +
   scale_colour_manual(values = c("#113259", "#55A480"), guide = guide_none()) +
   xlab("SMD") + ylab("") +
