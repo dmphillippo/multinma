@@ -67,20 +67,20 @@ print.nma_dic <- function(x, digits = 1, ...) {
 #' @rdname nma_dic-methods
 #' @export
 as.data.frame.nma_dic <- function(x, ...) {
-  return(as.data.frame(dplyr::bind_rows(purrr::map(x$pointwise, ~dplyr::select(., -.data$observed, -.data$fitted)), ...)))
+  return(as.data.frame(dplyr::bind_rows(purrr::map(x$pointwise, ~dplyr::select(., -"observed", -"fitted")), ...)))
 }
 
 #' @rdname nma_dic-methods
 #' @method as.tibble nma_dic
 #' @export
 as.tibble.nma_dic <- function(x, ...) {
-  return(dplyr::bind_rows(purrr::map(x$pointwise, ~dplyr::select(., -.data$observed, -.data$fitted)), ...))
+  return(dplyr::bind_rows(purrr::map(x$pointwise, ~dplyr::select(., -"observed", -"fitted")), ...))
 }
 
 #' @rdname nma_dic-methods
 #' @export
 as_tibble.nma_dic <- function(x, ...) {
-  return(dplyr::bind_rows(purrr::map(x$pointwise, ~dplyr::select(., -.data$observed, -.data$fitted)), ...))
+  return(dplyr::bind_rows(purrr::map(x$pointwise, ~dplyr::select(., -"observed", -"fitted")), ...))
 }
 
 #' @rdname nma_dic-methods
