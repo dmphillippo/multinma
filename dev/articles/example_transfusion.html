@@ -200,38 +200,38 @@ distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class
 <span>                        prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                        prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;  2000 [ 50%]  (Warmup)</span></span>
-<span><span class="co">#&gt; Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
-<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.184 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 3:                0.165 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3:                0.349 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.181 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.133 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.314 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: </span></span>
 <span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.189 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 2:                0.234 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 2:                0.423 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.183 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.372 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 2: </span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
 <span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.196 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 1:                0.246 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 1:                0.442 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.207 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.403 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 1:</span></span></code></pre>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
@@ -247,7 +247,7 @@ method:</p>
 <span><span class="co">#&gt; lp__           -134.50    0.09 3.11 -141.53 -136.37 -134.16 -132.24 -129.53  1098    1</span></span>
 <span><span class="co">#&gt; tau               1.87    0.04 1.09    0.56    1.16    1.63    2.29    4.73   650    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Mar 21 13:50:34 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Mar 24 10:18:04 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -304,44 +304,39 @@ deviation, the default).</p>
 <span>                     prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                     prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">log_normal</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3.93</span>, <span class="fl">1.51</span><span class="op">)</span>,</span>
 <span>                     prior_het_type <span class="op">=</span> <span class="st">"var"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; : Iteration:  800 / 2000 [ 40%]  (Warmup)</span></span>
-<span><span class="co">#&gt; Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)</span></span>
-<span><span class="co">#&gt; Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)</span></span>
-<span><span class="co">#&gt; Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
-<span><span class="co">#&gt; Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
+<pre><code><span><span class="co">#&gt;  2000 [ 50%]  (Warmup)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
-<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.16 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 1:                0.173 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 1:                0.333 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.122 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.133 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.255 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
-<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.163 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 3:                0.174 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3:                0.337 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.117 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.131 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.248 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: </span></span>
-<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.175 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 2:                0.186 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 2:                0.361 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.136 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.147 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.283 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 2:</span></span></code></pre>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
@@ -357,7 +352,7 @@ method:</p>
 <span><span class="co">#&gt; lp__           -140.97    0.07 2.77 -147.30 -142.63 -140.64 -138.91 -136.61  1385    1</span></span>
 <span><span class="co">#&gt; tau               0.50    0.01 0.36    0.05    0.21    0.44    0.70    1.38  1654    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Mar 21 13:50:37 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Mar 24 10:18:06 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
