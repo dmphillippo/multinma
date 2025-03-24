@@ -6,12 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Example: Social Anxiety • multinma</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.9/font.css" rel="stylesheet">
@@ -119,8 +118,9 @@ The data are available in this package as
 using a NMA model with class effects, which we recreate here. When
 fitting class effects models there are multiple modeling options
 available.</p>
-<p>We demonstrate the model selection strategy proposed by Perren et
-al. to determine the most suitable class effects model.</p>
+<p>We demonstrate the model selection strategy proposed by <span class="citation">Perren et al. (<a href="#ref-Perren2025">in
+preparation</a>)</span> to determine the most suitable class effects
+model.</p>
 <div class="section level2">
 <h2 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
 </h2>
@@ -173,7 +173,8 @@ network reference treatment.</p>
 <div class="section level2">
 <h2 id="model-selection-strategy">Model selection strategy<a class="anchor" aria-label="anchor" href="#model-selection-strategy"></a>
 </h2>
-<p>We follow the model selection strategy proposed by Perren et al. </p>
+<p>We follow the model selection strategy proposed by <span class="citation">Perren et al. (<a href="#ref-Perren2025">in
+preparation</a>)</span></p>
 <p><img src="class_effects_flow_chart-1.svg" width="600px" style="display: block; margin: auto;"></p>
 <div class="section level3">
 <h3 id="step-1-heterogeniety-assessement">STEP 1: Heterogeniety assessement<a class="anchor" aria-label="anchor" href="#step-1-heterogeniety-assessement"></a>
@@ -390,12 +391,17 @@ the data by comparing our NMA RE model with an exchangeable class model
 with a RE treatment model. In this model, we specify
 <code>class_effects = "exchangeable"</code>, meaning that treatments
 within each class are considered to be from a common distribution. The
-<code>prior_class_sd</code> sets a prior on the variability between
-treatment effects within each class. We use an informative
+<code>prior_class_sd</code> sets a prior on the standard deviation
+between treatment effects within each class. Because it is difficult to
+estimate the class standard deviations with only a small number of
+treatments in each class, here we specify an informative
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0.33</mn><mo>,</mo><msup><mn>0.1</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{N}(0.33,0.1^2)</annotation></semantics></math>
-prior as used in Perren et al. We’ve defined <code>class_sd</code> as a
-list of character vectors, each indicating which classes share a common
-SD. <code>prior_class_mean</code> will be set as
+prior distribution that is chosen to keep class variability within a
+clinically-plausible range <span class="citation">(<a href="#ref-Perren2025">Perren et al., in preparation</a>)</span>. We
+also define <code>class_sd</code> as a list of character vectors
+indicating which classes share a common SD, again aiding estimation of
+these parameters. For the class effects means,
+<code>prior_class_mean</code> is set as
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mn>10</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{N}(0, 10^2)</annotation></semantics></math>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sa_fit_EXclass_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">sa_net</span>,</span>
@@ -667,6 +673,11 @@ and Pharmacological Interventions for Social Anxiety Disorder in Adults:
 A Systematic Review and Network Meta-Analysis.”</span> <em>The Lancet
 Psychiatry</em> 1 (5): 368–76.
 </div>
+<div id="ref-Perren2025" class="csl-entry">
+Perren, S. J., H. Pedder, N. J. Welton, and D. M. Phillippo. In
+preparation. <span>“Network Meta-Analysis with Class Effects: A
+Practical Guide and Model Selection Algorithm.”</span>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -680,7 +691,7 @@ Psychiatry</em> 1 (5): 368–76.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
 </div>
 
     </footer>

@@ -6,12 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Example: Newly diagnosed multiple myeloma • multinma</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.9/font.css" rel="stylesheet">
@@ -335,7 +334,7 @@ method.</p>
 <span>                         y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>edge_colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>edge_width <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.direction <span class="op">=</span> <span class="st">"vertical"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figure%2Fndmm-network-1.png" style="display: block; margin: auto;"></p>
+<p><img src="figure/ndmm-network-1.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="kaplan-meier-plots">Kaplan-Meier plots<a class="anchor" aria-label="anchor" href="#kaplan-meier-plots"></a>
@@ -350,7 +349,7 @@ the aid of the <code><a href="../reference/geom_km.html">geom_km()</a></code> fu
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_multinma.html">theme_multinma</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"top"</span>, legend.box.spacing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0</span>, <span class="st">"lines"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figure%2Fndmm-km-data-1.png" style="display: block; margin: auto;"></p>
+<p><img src="figure/ndmm-km-data-1.png" style="display: block; margin: auto;"></p>
 <p>The <code>transform</code> argument to <code><a href="../reference/geom_km.html">geom_km()</a></code> can be
 used to transform the Kaplan-Meier curves prior to plotting, for example
 <code>transform = "cloglog"</code> to assess proportional hazards with a
@@ -531,7 +530,7 @@ which is the default). These can then be plotted using the
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> function.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">ndmm_fit</span>, type <span class="op">=</span> <span class="st">"hazard"</span>, level <span class="op">=</span> <span class="st">"aggregate"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figure%2Fndmm-marginal-hazards-1.png" style="display: block; margin: auto;"></p>
+<p><img src="figure/ndmm-marginal-hazards-1.png" style="display: block; margin: auto;"></p>
 <p>We can also look at the individual-level baseline hazards. This is
 again possible using the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> function, this time with
 <code>level = "individual"</code>. Since we want to show the baseline
@@ -566,7 +565,7 @@ posterior distributions from each study for these parameters.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">ndmm_fit</span>, type <span class="op">=</span> <span class="st">"hazard"</span>, level <span class="op">=</span> <span class="st">"individual"</span>,</span>
 <span>             newdata <span class="op">=</span> <span class="va">refdat</span>, study <span class="op">=</span> <span class="va">study</span>, times <span class="op">=</span> <span class="va">times</span>,</span>
 <span>             baseline <span class="op">=</span> <span class="va">studies</span>, aux <span class="op">=</span> <span class="va">studies</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figure%2Fndmm-baseline-hazards-1.png" style="display: block; margin: auto;"></p>
+<p><img src="figure/ndmm-baseline-hazards-1.png" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level2">
@@ -928,7 +927,7 @@ unadjusted Kaplan-Meier curves from the data using the
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">ndmm_fit</span>, type <span class="op">=</span> <span class="st">"survival"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_km.html">geom_km</a></span><span class="op">(</span><span class="va">ndmm_net</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"top"</span>, legend.box.spacing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0</span>, <span class="st">"lines"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figure%2Fndmm-survival-1.png" style="display: block; margin: auto;"></p>
+<p><img src="figure/ndmm-survival-1.png" style="display: block; margin: auto;"></p>
 <p>Whilst the adjusted and unadjusted curves are not exactly comparable
 (although these are both marginal survival estimates, the adjusted
 curves account for differences in covariate distributions between arms
@@ -986,7 +985,7 @@ survival times:</p>
 <span><span class="co">#&gt; pred[Morgan2012: Thal] 2.30 0.21 1.92 2.15 2.29 2.43  2.74     4889     3545 1.00</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">medsurv</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figure%2Fndmm-median-survival-1.png" style="display: block; margin: auto;"></p>
+<p><img src="figure/ndmm-median-survival-1.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="population-average-conditional-log-hazard-ratios">Population-average conditional log hazard ratios<a class="anchor" aria-label="anchor" href="#population-average-conditional-log-hazard-ratios"></a>
@@ -1053,7 +1052,7 @@ ratios (or log survival time ratios for AFT models).</p>
 <span><span class="co">#&gt; d[Morgan2012: Thal vs. Len]  0.47 0.12  0.23  0.38  0.46  0.55  0.71     3904     2960    1</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">loghr</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figure%2Fndmm-loghr-1.png" style="display: block; margin: auto;"></p>
+<p><img src="figure/ndmm-loghr-1.png" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="population-average-marginal-hazard-ratios">Population-average marginal hazard ratios<a class="anchor" aria-label="anchor" href="#population-average-marginal-hazard-ratios"></a>
@@ -1065,7 +1064,7 @@ example, we can produce population-average marginal hazard ratios:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/marginal_effects.html">marginal_effects</a></span><span class="op">(</span><span class="va">ndmm_fit</span>, type <span class="op">=</span> <span class="st">"hazard"</span>, mtype <span class="op">=</span> <span class="st">"ratio"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"top"</span>, legend.box.spacing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0</span>, <span class="st">"lines"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="figure%2Fndmm-marginal-hr-1.png" style="display: block; margin: auto;">
+<p><img src="figure/ndmm-marginal-hr-1.png" style="display: block; margin: auto;">
 These are time-varying and non-proportional because the model includes
 covariate effects, even though the covariates were only measured at
 baseline and were not themselves time-varying.</p>
@@ -1119,7 +1118,7 @@ Analysis.”</span> <em>arXiv</em>, January. <a href="https://doi.org/10.48550/a
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
 </div>
 
     </footer>
