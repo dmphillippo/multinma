@@ -1,4 +1,4 @@
-# multinma 0.7.2.9000
+# multinma 0.8.0
 
 * Feature: Class effects models are now available, thanks to @sjperren (PR #37).
 The new `class_effects` argument in `nma()` allows models with independent, 
