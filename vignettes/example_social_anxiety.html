@@ -382,8 +382,9 @@ The data are available in this package as
 using a NMA model with class effects, which we recreate here. When
 fitting class effects models there are multiple modeling options
 available.</p>
-<p>We demonstrate the model selection strategy proposed by Perren et
-al. to determine the most suitable class effects model.</p>
+<p>We demonstrate the model selection strategy proposed by <span class="citation">Perren et al. (<a href="#ref-Perren2025">in
+preparation</a>)</span> to determine the most suitable class effects
+model.</p>
 <div id="setting-up-the-network" class="section level1">
 <h1>Setting up the network</h1>
 <p>We follow Mayo-Wilson et al. by analysing results as standardised
@@ -432,7 +433,8 @@ network reference treatment.</p>
 </div>
 <div id="model-selection-strategy" class="section level1">
 <h1>Model selection strategy</h1>
-<p>We follow the model selection strategy proposed by Perren et al. </p>
+<p>We follow the model selection strategy proposed by <span class="citation">Perren et al. (<a href="#ref-Perren2025">in
+preparation</a>)</span></p>
 <p><svg id="svg1" role="img" width="600px" style="display: block; margin: auto;" height="802.88135" viewBox="0 0 537.96399 802.88135" xmlns:svg="http://www.w3.org/2000/svg">
   <defs id="svg1_defs1">
 	<style type="text/css">
@@ -700,11 +702,16 @@ the data by comparing our NMA RE model with an exchangeable class model
 with a RE treatment model. In this model, we specify
 <code>class_effects = &quot;exchangeable&quot;</code>, meaning that treatments
 within each class are considered to be from a common distribution. The
-<code>prior_class_sd</code> sets a prior on the variability between
-treatment effects within each class. We use an informative <span class="math inline">\(\mathrm{N}(0.33,0.1^2)\)</span> prior as used in
-Perren et al. We’ve defined <code>class_sd</code> as a list of character
-vectors, each indicating which classes share a common SD.
-<code>prior_class_mean</code> will be set as <span class="math inline">\(\mathrm{N}(0, 10^2)\)</span>.</p>
+<code>prior_class_sd</code> sets a prior on the standard deviation
+between treatment effects within each class. Because it is difficult to
+estimate the class standard deviations with only a small number of
+treatments in each class, here we specify an informative <span class="math inline">\(\mathrm{N}(0.33,0.1^2)\)</span> prior distribution
+that is chosen to keep class variability within a clinically-plausible
+range <span class="citation">(<a href="#ref-Perren2025">Perren et al.,
+in preparation</a>)</span>. We also define <code>class_sd</code> as a
+list of character vectors indicating which classes share a common SD,
+again aiding estimation of these parameters. For the class effects
+means, <code>prior_class_mean</code> is set as <span class="math inline">\(\mathrm{N}(0, 10^2)\)</span>.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>sa_fit_EXclass_RE <span class="ot">&lt;-</span> <span class="fu">nma</span>(sa_net,</span>
 <span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>                         <span class="at">trt_effects =</span> <span class="st">&quot;random&quot;</span>,</span>
 <span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>                         <span class="at">prior_trt =</span> <span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">100</span>),</span>
@@ -959,6 +966,11 @@ David M Clark, AE Ades, and Stephen Pilling. 2014. <span>“Psychological
 and Pharmacological Interventions for Social Anxiety Disorder in Adults:
 A Systematic Review and Network Meta-Analysis.”</span> <em>The Lancet
 Psychiatry</em> 1 (5): 368–76.
+</div>
+<div id="ref-Perren2025" class="csl-entry">
+Perren, S. J., H. Pedder, N. J. Welton, and D. M. Phillippo. In
+preparation. <span>“Network Meta-Analysis with Class Effects: A
+Practical Guide and Model Selection Algorithm.”</span>
 </div>
 </div>
 </div>

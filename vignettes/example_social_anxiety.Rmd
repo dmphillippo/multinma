@@ -34,7 +34,7 @@ head(social_anxiety)
 
 @mayo2014psychological analysed this dataset using a NMA model with class effects, which we recreate here. When fitting class effects models there are multiple modeling options available. 
 
-We demonstrate the model selection strategy proposed by Perren et al. to determine the most suitable class effects model. 
+We demonstrate the model selection strategy proposed by @Perren2025 to determine the most suitable class effects model. 
 
 # Setting up the network
 We follow Mayo-Wilson et al. by analysing results as standardised mean differences (`y`) with standard errors (`se`) therefore we use the function `set_agd_contrast` to set up the network. We set treatment classes with `trt_class = classc` and set `Waitlist` as the network reference treatment.
@@ -60,7 +60,7 @@ plot(sa_net, level = "class", weight_nodes = TRUE) +
 ```
 
 # Model selection strategy
-We follow the model selection strategy proposed by Perren et al. 
+We follow the model selection strategy proposed by @Perren2025
 
 <img src="class_effects_flow_chart-1.svg" width="600px" style="display: block; margin: auto;" />
 
@@ -171,7 +171,7 @@ Our node‐splitting analysis shows that the CBT individual and Waitlist compari
 
 ## STEP 3: Class effects assessment
 
-In this step, we assess whether a class assumption is suitable for the data by comparing our NMA RE model with an exchangeable class model with a RE treatment model. In this model, we specify `class_effects = "exchangeable"`, meaning that treatments within each class are considered to be from a common distribution. The `prior_class_sd` sets a prior on the variability between treatment effects within each class. We use an informative $\mathrm{N}(0.33,0.1^2)$ prior as used in Perren et al. We’ve defined `class_sd` as a list of character vectors, each indicating which classes share a common SD. `prior_class_mean` will be set as $\mathrm{N}(0, 10^2)$.
+In this step, we assess whether a class assumption is suitable for the data by comparing our NMA RE model with an exchangeable class model with a RE treatment model. In this model, we specify `class_effects = "exchangeable"`, meaning that treatments within each class are considered to be from a common distribution. The `prior_class_sd` sets a prior on the standard deviation between treatment effects within each class. Because it is difficult to estimate the class standard deviations with only a small number of treatments in each class, here we specify an informative $\mathrm{N}(0.33,0.1^2)$ prior distribution that is chosen to keep class variability within a clinically-plausible range [@Perren2025]. We also define `class_sd` as a list of character vectors indicating which classes share a common SD, again aiding estimation of these parameters. For the class effects means, `prior_class_mean` is set as $\mathrm{N}(0, 10^2)$.
 
 ```{r echo=TRUE, results='hide'}
 sa_fit_EXclass_RE <- nma(sa_net,
