@@ -1,4 +1,8 @@
-This release adds new features and fixes a few bugs.
+This is a resubmission, fixing the broken link in the documentation (invalid file URI).
+
+The note "Found the following (possibly) invalid URLs: https://research-information.bris.ac.uk/"
+is a false-positive. The link works in browsers, but the R CMD CHECK curl request 
+may be blocked (status 403) by cloudflare.
 
 ## Test environments
 * local R installation (Windows 10), R 4.4.3
