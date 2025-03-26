@@ -202,13 +202,13 @@ auto-detected from the data.</p>
 <span>              prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>              prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>              prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 00 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt;  2000 [ 50%]  (Warmup)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
@@ -220,21 +220,21 @@ auto-detected from the data.</p>
 <span><span class="co">#&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
-<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.578 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 1:                0.456 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 1:                1.034 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.602 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.452 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                1.054 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: </span></span>
-<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.603 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 2:                0.433 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 2:                1.036 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.608 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.445 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2:                1.053 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 2: </span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
-<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.579 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 3:                0.49 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3:                1.069 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.587 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.5 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                1.087 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 3:</span></span></code></pre></div>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
@@ -258,7 +258,7 @@ method:</p>
 <span><span class="co">#&gt; lp__                       1137 1.01</span></span>
 <span><span class="co">#&gt; tau                        1067 1.00</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar 26 11:06:07 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar 26 15:52:16 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -333,7 +333,7 @@ assess the consistency assumption. Again, we use the function
 <span>                  prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                  prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                  prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; 000 [ 50%]  (Warmup)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
@@ -350,22 +350,22 @@ assess the consistency assumption. Again, we use the function
 <span><span class="co">#&gt; Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
-<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.535 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 3:                0.421 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3:                0.956 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.53 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.422 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.952 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: </span></span>
-<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.596 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 2:                0.433 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 2:                1.029 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.606 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.435 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2:                1.041 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 2: </span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
-<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.596 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 1:                0.572 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 1:                1.168 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.599 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.583 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                1.182 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 1:</span></span>
 <span><span class="va">smkfit_ume</span></span></code></pre></div>
 <p>Comparing the model fit statistics</p>
