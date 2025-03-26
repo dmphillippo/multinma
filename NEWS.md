@@ -1,3 +1,5 @@
+# multinma 0.8.0.9000
+
 # multinma 0.8.0
 
 * Feature: Class effects models are now available, thanks to @sjperren (PR #37).
