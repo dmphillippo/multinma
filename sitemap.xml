@@ -10,6 +10,7 @@
 <url><loc>https://dmphillippo.github.io/multinma/articles/example_parkinsons.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/articles/example_plaque_psoriasis.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/articles/example_smoking.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/articles/example_social_anxiety.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/articles/example_statins.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/articles/example_thrombolytics.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/articles/example_transfusion.html</loc></url>
@@ -59,6 +60,7 @@
 <url><loc>https://dmphillippo.github.io/multinma/reference/nma.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/nma_data-class.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/nma_dic-class.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/reference/nma_dic-methods.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/nma_nodesplit-class.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/nma_prior-class.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/nma_summary-class.html</loc></url>
@@ -77,7 +79,6 @@
 <url><loc>https://dmphillippo.github.io/multinma/reference/posterior_ranks.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/predict.stan_nma.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/print.nma_data.html</loc></url>
-<url><loc>https://dmphillippo.github.io/multinma/reference/print.nma_dic.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/print.nma_nodesplit_df.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/print.stan_nma.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/priors.html</loc></url>
@@ -89,6 +90,8 @@
 <url><loc>https://dmphillippo.github.io/multinma/reference/set_agd_surv.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/set_ipd.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/smoking.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/reference/social_anxiety.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/reference/softmax.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/stan_nma-class.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/statins.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/summary.nma_nodesplit_df.html</loc></url>

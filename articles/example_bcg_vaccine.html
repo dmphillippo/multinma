@@ -6,12 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Example: BCG vaccine for tuberculosis • multinma</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.9/font.css" rel="stylesheet">
@@ -30,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,6 +55,7 @@
     <li><a class="dropdown-item" href="../articles/example_parkinsons.html">Example: Parkinson's disease</a></li>
     <li><a class="dropdown-item" href="../articles/example_plaque_psoriasis.html">Example: Plaque psoriasis ML-NMR</a></li>
     <li><a class="dropdown-item" href="../articles/example_smoking.html">Example: Smoking cessation</a></li>
+    <li><a class="dropdown-item" href="../articles/example_social_anxiety.html">Example: Social Anxiety</a></li>
     <li><a class="dropdown-item" href="../articles/example_statins.html">Example: Statins for cholesterol lowering</a></li>
     <li><a class="dropdown-item" href="../articles/example_thrombolytics.html">Example: Thrombolytic treatments</a></li>
     <li><a class="dropdown-item" href="../articles/example_transfusion.html">Example: White blood cell transfusion</a></li>
@@ -204,27 +204,16 @@ random effects model specified by
 <span>                     prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                     prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                     prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; rmup)</span></span>
-<span><span class="co">#&gt; Chain 2: Iteration: 2000 / 10000 [ 20%]  (Warmup)</span></span>
-<span><span class="co">#&gt; Chain 3: Iteration: 2000 / 10000 [ 20%]  (Warmup)</span></span>
-<span><span class="co">#&gt; Chain 1: Iteration: 3000 / 10000 [ 30%]  (Warmup)</span></span>
-<span><span class="co">#&gt; Chain 2: Iteration: 3000 / 10000 [ 30%]  (Warmup)</span></span>
-<span><span class="co">#&gt; Chain 3: Iteration: 3000 / 10000 [ 30%]  (Warmup)</span></span>
-<span><span class="co">#&gt; Chain 1: Iteration: 4000 / 10000 [ 40%]  (Warmup)</span></span>
-<span><span class="co">#&gt; Chain 2: Iteration: 4000 / 10000 [ 40%]  (Warmup)</span></span>
-<span><span class="co">#&gt; Chain 3: Iteration: 4000 / 10000 [ 40%]  (Warmup)</span></span>
-<span><span class="co">#&gt; Chain 1: Iteration: 5000 / 10000 [ 50%]  (Warmup)</span></span>
+<pre><code><span><span class="co">#&gt; 0 / 10000 [ 50%]  (Warmup)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 5001 / 10000 [ 50%]  (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 2: Iteration: 5000 / 10000 [ 50%]  (Warmup)</span></span>
-<span><span class="co">#&gt; Chain 2: Iteration: 5001 / 10000 [ 50%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 5000 / 10000 [ 50%]  (Warmup)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 5001 / 10000 [ 50%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 6000 / 10000 [ 60%]  (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 2: Iteration: 6000 / 10000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 6000 / 10000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 6000 / 10000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 7000 / 10000 [ 70%]  (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 2: Iteration: 7000 / 10000 [ 70%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 7000 / 10000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 7000 / 10000 [ 70%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 8000 / 10000 [ 80%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 8000 / 10000 [ 80%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 8000 / 10000 [ 80%]  (Sampling)</span></span>
@@ -233,21 +222,21 @@ random effects model specified by
 <span><span class="co">#&gt; Chain 2: Iteration: 9000 / 10000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 10000 / 10000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
-<span><span class="co">#&gt; Chain 1:  Elapsed Time: 2.186 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 1:                1.83 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 1:                4.016 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 1.48 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                1.376 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                2.856 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 10000 / 10000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
-<span><span class="co">#&gt; Chain 3:  Elapsed Time: 2.25 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 3:                1.865 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3:                4.115 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 1.475 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                1.392 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                2.867 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 10000 / 10000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: </span></span>
-<span><span class="co">#&gt; Chain 2:  Elapsed Time: 2.233 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 2:                1.954 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 2:                4.187 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2:  Elapsed Time: 1.46 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 2:                1.523 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2:                2.983 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 2:</span></span></code></pre>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
@@ -267,7 +256,7 @@ method:</p>
 <span><span class="co">#&gt; lp__             1</span></span>
 <span><span class="co">#&gt; tau              1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Feb 21 11:55:22 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar 26 10:19:20 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -355,7 +344,7 @@ method:</p>
 <span><span class="co">#&gt; lp__                          -13448.27  1772    1</span></span>
 <span><span class="co">#&gt; tau                                0.73  1905    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Feb 21 11:55:34 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar 26 10:19:28 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -683,7 +672,7 @@ Excellence</span>. <a href="https://www.sheffield.ac.uk/nice-dsu" class="externa
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
 </div>
 
     </footer>
