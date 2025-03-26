@@ -30,7 +30,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.2.9009</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.8.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -190,7 +190,7 @@ auto-detected from the data.</p>
 <span>                   trt_effects <span class="op">=</span> <span class="st">"fixed"</span>,</span>
 <span>                   prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                   prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; / 2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt;  2000 [ 50%]  (Warmup)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
@@ -207,22 +207,22 @@ auto-detected from the data.</p>
 <span><span class="co">#&gt; Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
-<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.058 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 1:                0.042 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 1:                0.1 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.056 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.043 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.099 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: </span></span>
-<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.058 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.056 seconds (Warm-up)</span></span>
 <span><span class="co">#&gt; Chain 2:                0.042 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 2:                0.1 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.098 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 2: </span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
-<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.056 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.057 seconds (Warm-up)</span></span>
 <span><span class="co">#&gt; Chain 3:                0.044 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3:                0.1 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.101 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 3:</span></span></code></pre></div>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
@@ -237,7 +237,7 @@ method:</p>
 <span><span class="co">#&gt; d[Beta Blocker]    -0.26    0.00 0.05    -0.36    -0.30    -0.26    -0.23    -0.16  3693    1</span></span>
 <span><span class="co">#&gt; lp__            -5960.39    0.09 3.48 -5968.17 -5962.42 -5960.09 -5957.94 -5954.57  1363    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Mar 24 12:26:37 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar 26 10:59:33 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -304,21 +304,21 @@ distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class
 <span><span class="co">#&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: </span></span>
-<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.296 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 2:                0.199 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 2:                0.495 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.265 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.201 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.466 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 2: </span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
-<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.309 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 1:                0.202 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 1:                0.511 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.286 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.213 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.499 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
-<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.304 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 3:                0.202 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3:                0.506 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.282 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.204 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.486 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 3:</span></span></code></pre></div>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
@@ -334,7 +334,7 @@ method:</p>
 <span><span class="co">#&gt; lp__            -5970.70    0.17 5.66 -5982.57 -5974.43 -5970.52 -5966.81 -5960.34  1072    1</span></span>
 <span><span class="co">#&gt; tau                 0.13    0.00 0.08     0.01     0.07     0.13     0.19     0.31   928    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Mon Mar 24 12:26:44 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar 26 10:59:39 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
