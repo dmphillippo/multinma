@@ -1,4 +1,4 @@
-This is a resubmission, fixing the broken link in the documentation (invalid file URI).
+This is a hotfix release to update deprecated Stan syntax.
 
 The note "Found the following (possibly) invalid URLs: https://research-information.bris.ac.uk/"
 is a false-positive. The link works in browsers, but the R CMD CHECK curl request 
