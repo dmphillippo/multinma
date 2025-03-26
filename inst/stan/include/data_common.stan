@@ -76,3 +76,18 @@ int<lower=0,upper=3> prior_reg_dist;
 real prior_reg_location;
 real<lower=0> prior_reg_scale;
 real<lower=0> prior_reg_df;
+
+// -- class effects model --
+int<lower=0, upper=1> class_effects; // Flag for whether an exchangeable class model is used (1) or not (0)
+int<lower=0> which_CE[class_effects ? nt-1 : 0]; // Class ID for each treatment (0 for no class effect)
+int<lower=0> which_CE_sd[class_effects ? nt-1 : 0]; // Design vector for class standard deviations
+
+int<lower=0,upper=3> prior_class_mean_dist; // Prior specifications for class means
+real prior_class_mean_location;
+real<lower=0> prior_class_mean_scale;
+real<lower=0> prior_class_mean_df;
+
+int<lower=0,upper=6> prior_class_sd_dist; // Prior specifications for class standard deviations
+real prior_class_sd_location;
+real<lower=0> prior_class_sd_scale;
+real<lower=0> prior_class_sd_df;

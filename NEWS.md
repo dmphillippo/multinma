@@ -1,3 +1,34 @@
+# multinma 0.8.0
+
+* Feature: Class effects models are now available, thanks to @sjperren (PR #37).
+The new `class_effects` argument in `nma()` allows models with independent, 
+exchangeable, or common class effects to be fitted. Class standard deviations
+can also be shared between classes or subsets of classes, controlled by the
+`class_sd` argument. These features are demonstrated in a new vignette,
+analysing a network of interventions for social anxiety.
+* Feature: Leverage plots can now be produced by `plot.nma_dic()`, with the 
+option `type = "leverage"`.
+* Feature: Networks with integration points can now be combined with 
+`combine_network()`, where previously these were discarded. One potential use 
+case is to specify different types of marginal distributions or correlation 
+structures for different AgD studies in the network, by setting these up 
+separately with `add_integration()` before combining with `combine_network()`.
+* Feature: Added `as.data.frame.nma_dic()` and `as_tibble.nma_dic()` methods 
+that return data frames of the pointwise contributions to the DIC, and
+`as.matrix.nma_dic()` and `as.array.nma_dic()` methods that return posterior 
+samples of the residual deviances as a matrix or 3D array.
+* Feature: The `softmax()` and `inv_softmax()` transforms are now exported.
+* Improvement: Removed suggested dependency on the logitnorm package. The 
+logit Normal distribution functions are now implemented internally.
+* Fix: Resolved a bug where trying to fit meta-regression models with discrete 
+covariates would sometimes result in a misspecified and inestimable model, due 
+to the inclusion of additional columns in the design matrix for the reference 
+level of the covariates.
+* Fix: IPD Poisson models were broken due to an incorrect offset for log time at 
+risk (thanks to @n8thangreen for spotting this).
+* Fix: In a Binomial model, studies where everyone experienced the outcome 
+(`r = n` on all arms) no longer give `NaN` residual deviance.
+
 # multinma 0.7.2
 
 * Fix: Predictions for non-proportional hazards IPD NMA or ML-NMR survival 

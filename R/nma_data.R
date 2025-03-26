@@ -1202,6 +1202,38 @@ combine_network <- function(..., trt_ref) {
   if (o_ipd %in% c("ordered", "competing") && o_agd_arm %in% c("ordered", "competing"))
     check_multi_combine(purrr::map(c(ipd, agd_arm), ".r"))
 
+  # Check integration points
+  if (any(purrr::map_lgl(s, inherits, what = "mlnmr_data")) &&
+      all(purrr::map_lgl(s, inherits, what = "mlnmr_data") |
+        (purrr::map_lgl(s, has_ipd) & !purrr::map_lgl(s, has_agd_arm) & !purrr::map_lgl(s, has_agd_contrast)))) {
+
+    has_int <- TRUE
+
+    s_int <- s[purrr::map_lgl(s, inherits, what = "mlnmr_data")]
+
+    # Check int_names
+    l_int_names <- purrr::map(s_int, "int_names")
+    if (!all(purrr::map_lgl(l_int_names, ~identical(., l_int_names[[1]])))) {
+      abort("Cannot combine AgD sources with different sets of covariates with integration points.")
+    } else {
+      int_names <- l_int_names[[1]]
+    }
+
+    # Check n_int
+    l_n_int <- purrr::map_dbl(s_int, "n_int")
+    if (!all(l_n_int == l_n_int[1])) {
+      abort("Cannot combine AgD sources with different numbers of integration points.")
+    } else {
+      n_int <- l_n_int[[1]]
+    }
+
+  } else if (any(purrr::map_lgl(s, inherits, what = "mlnmr_data"))) {
+    message("Dropping integration points from combined network, some AgD sources do not have integration points.")
+    has_int <- FALSE
+  } else {
+    has_int <- FALSE
+  }
+
   # Produce nma_data object
   ipd <- dplyr::bind_rows(ipd)
   agd_arm <- dplyr::bind_rows(agd_arm)
@@ -1216,6 +1248,14 @@ combine_network <- function(..., trt_ref) {
          studies = factor(studs, levels = studs),
          outcome = outcome),
     class = "nma_data")
+
+  # Integration data setup
+  if (has_int) {
+    out$n_int <- n_int
+    out$int_names <- int_names
+
+    class(out) <- c("mlnmr_data", class(out))
+  }
 
   # If trt_ref not specified, mark treatments factor as default, calculate
   # current reference trt

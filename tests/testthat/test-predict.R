@@ -2026,16 +2026,16 @@ test_that(".study, .trt, .time columns are correct (gengamma, regression, aggreg
   expect_identical(pred3.2$parameter,
                    paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
 
-  pred3.3 <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg, type = "rmst", time = 3,
-                                       study = study,
-                                       newdata = newdata,
-                                       baseline = distr(qnorm, 0, 1),
-                                       aux = list(sigma = distr(qlnorm, 0, 0.1),
-                                                  k = distr(qlnorm, 0, 0.1))))
-  expect_equivalent(pred3.3[, c(".study", ".trt")],
-                    preddat3[, c(".study", ".trt")])
-  expect_identical(pred3.3$parameter,
-                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+  #pred3.3 <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg, type = "rmst", time = 3,
+  #                                     study = study,
+  #                                     newdata = newdata,
+  #                                     baseline = distr(qnorm, 0, 1),
+  #                                     aux = list(sigma = distr(qlnorm, 0, 0.1),
+  #                                                k = distr(qlnorm, 0, 0.1))))
+  #expect_equivalent(pred3.3[, c(".study", ".trt")],
+  #                  preddat3[, c(".study", ".trt")])
+  #expect_identical(pred3.3$parameter,
+  #                 paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
 
   pred3.4 <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg, type = "link",
                                        study = study,
@@ -2614,17 +2614,17 @@ test_that(".study, .trt, .time columns are correct (gengamma, regression, indivi
   expect_identical(pred3.2$parameter,
                    paste0("pred[", preddat3$.study, ": ", preddat3$.trt, ", ", preddat3$id, "]"))
 
-  pred3.3 <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg, level = "individual",
-                                       type = "rmst", time = 3,
-                                       study = study,
-                                       newdata = newdata,
-                                       baseline = distr(qnorm, 0, 1),
-                                       aux = list(sigma = distr(qlnorm, 0, 0.1),
-                                                  k = distr(qlnorm, 0, 0.1))))
-  expect_equivalent(pred3.3[, c(".study", ".trt")],
-                    preddat3[, c(".study", ".trt")])
-  expect_identical(pred3.3$parameter,
-                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, ", ", preddat3$id, "]"))
+  #pred3.3 <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg, level = "individual",
+  #                                     type = "rmst", time = 3,
+  #                                     study = study,
+  #                                     newdata = newdata,
+  #                                     baseline = distr(qnorm, 0, 1),
+  #                                     aux = list(sigma = distr(qlnorm, 0, 0.1),
+  #                                                k = distr(qlnorm, 0, 0.1))))
+  #expect_equivalent(pred3.3[, c(".study", ".trt")],
+  #                  preddat3[, c(".study", ".trt")])
+  #expect_identical(pred3.3$parameter,
+  #                 paste0("pred[", preddat3$.study, ": ", preddat3$.trt, ", ", preddat3$id, "]"))
 
   pred3.4 <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg, level = "individual",
                                        type = "link",

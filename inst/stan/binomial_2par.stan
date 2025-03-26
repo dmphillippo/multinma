@@ -38,8 +38,15 @@ transformed parameters {
           X_agd_arm * beta_tilde + offset_agd_arm :
           X_agd_arm * beta_tilde;
 
-      if (RE) {
+    if (class_effects) {
+      for (i in 1:ni_agd_arm) {
+        if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_class[agd_arm_trt[i] - 1]];
+        }
+      }
+    }
 
+      if (RE) {
         if (link == 1) { // logit link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
@@ -92,6 +99,15 @@ transformed parameters {
           X_agd_arm * beta_tilde + offset_agd_arm :
           X_agd_arm * beta_tilde;
 
+      // Add class effects contribution to the linear predictor
+        if (class_effects) {
+          for (i in 1:ni_agd_arm) {
+            if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+              eta_agd_arm_noRE[i] += f_class[which_class[agd_arm_trt[i] - 1]];
+            }
+          }
+        }
+
         if (link == 1) { // logit link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
@@ -115,18 +131,26 @@ transformed parameters {
           }
         }
       } else {
+
+        vector[ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+          X_agd_arm * beta_tilde + offset_agd_arm :
+          X_agd_arm * beta_tilde;
+
+        // Add class effects contribution to the linear predictor
+        if (class_effects) {
+          for (i in 1:ni_agd_arm) {
+            if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+              eta_agd_arm_noRE[i] += f_class[which_class[agd_arm_trt[i] - 1]];
+            }
+          }
+        }
+
         if (link == 1) // logit link
-          theta_agd_arm_bar = has_offset ?
-            inv_logit(X_agd_arm * beta_tilde + offset_agd_arm) :
-            inv_logit(X_agd_arm * beta_tilde);
+          theta_agd_arm_bar = inv_logit(eta_agd_arm_noRE) ;
         else if (link == 2) // probit link
-          theta_agd_arm_bar = has_offset ?
-            Phi(X_agd_arm * beta_tilde + offset_agd_arm) :
-            Phi(X_agd_arm * beta_tilde);
+          theta_agd_arm_bar = Phi(eta_agd_arm_noRE) ;
         else if (link == 3) // cloglog link
-          theta_agd_arm_bar = has_offset ?
-            inv_cloglog(X_agd_arm * beta_tilde + offset_agd_arm) :
-            inv_cloglog(X_agd_arm * beta_tilde);
+          theta_agd_arm_bar = inv_cloglog(eta_agd_arm_noRE) ;
       }
 
       theta2_agd_arm_bar = theta_agd_arm_bar .* theta_agd_arm_bar;
@@ -182,10 +206,12 @@ generated quantities {
                           lmultiply(agd_arm_r[i], pprime[i]) +
                           (nprime[i] - agd_arm_r[i]) * log1m(pprime[i]);
     // Approximate residual deviance for AgD, letting nprime be fixed
-    resdev[ni_ipd + i] = 2 * (lmultiply(agd_arm_r[i],
-                                        agd_arm_r[i] / (nprime[i] * pprime[i])) +
-                              lmultiply(agd_arm_n[i] - agd_arm_r[i],
-                                        (agd_arm_n[i] - agd_arm_r[i]) / (agd_arm_n[i] - nprime[i] * pprime[i])));
+    resdev[ni_ipd + i] = 2 * ((agd_arm_r[i] > 0 ?
+                                lmultiply(agd_arm_r[i],
+                                          agd_arm_r[i] / (nprime[i] * pprime[i])) : 0) +
+                              (agd_arm_r[i] < agd_arm_n[i] ?
+                                lmultiply(agd_arm_n[i] - agd_arm_r[i],
+                                          (agd_arm_n[i] - agd_arm_r[i]) / (agd_arm_n[i] - nprime[i] * pprime[i])) : 0));
     fitted_agd_arm[i] = nprime[i] * pprime[i];
 
 	  for (j in 1:n_int_thin) {

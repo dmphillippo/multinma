@@ -146,6 +146,7 @@ reference:
   - matches("[pdqhH]mspline")
   - rmst_mspline
   - make_knots
+  - softmax
 
 - title: ggplot functions
   desc: Functions for creating or customising ggplot outputs.
