@@ -199,13 +199,13 @@ plot(arm_releff_RE, ref_line = 0)
 ```
 
 Following @TSD2, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean $-0.73$ and precision $21$.
-We use the `predict()` method, where the `baseline` argument takes a `distr()` distribution object with which we specify the corresponding Normal distribution, and we specify `trt_ref = 1` to indicate that the baseline distribution corresponds to treatment 1.
+We use the `predict()` method, where the `baseline` argument takes a `distr()` distribution object with which we specify the corresponding Normal distribution, and we specify `baseline_trt = 1` to indicate that the baseline distribution corresponds to treatment 1.
 (Strictly speaking, `type = "response"` is unnecessary here, since the identity link function was used.)
 ```{r arm_pred_FE, fig.height = 2}
 arm_pred_FE <- predict(arm_fit_FE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
-                       trt_ref = 1)
+                       baseline_trt = 1)
 arm_pred_FE
 plot(arm_pred_FE)
 ```
@@ -213,7 +213,7 @@ plot(arm_pred_FE)
 arm_pred_RE <- predict(arm_fit_RE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
-                       trt_ref = 1)
+                       baseline_trt = 1)
 arm_pred_RE
 plot(arm_pred_RE)
 ```
@@ -384,13 +384,13 @@ plot(contr_releff_RE, ref_line = 0)
 ```
 
 Following @TSD2, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean $-0.73$ and precision $21$.
-We use the `predict()` method, where the `baseline` argument takes a `distr()` distribution object with which we specify the corresponding Normal distribution, and we specify `trt_ref = 1` to indicate that the baseline distribution corresponds to treatment 1.
+We use the `predict()` method, where the `baseline` argument takes a `distr()` distribution object with which we specify the corresponding Normal distribution, and we specify `baseline_trt = 1` to indicate that the baseline distribution corresponds to treatment 1.
 (Strictly speaking, `type = "response"` is unnecessary here, since the identity link function was used.)
 ```{r contr_pred_FE, fig.height = 2}
 contr_pred_FE <- predict(contr_fit_FE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
-                       trt_ref = 1)
+                       baseline_trt = 1)
 contr_pred_FE
 plot(contr_pred_FE)
 ```
@@ -398,7 +398,7 @@ plot(contr_pred_FE)
 contr_pred_RE <- predict(contr_fit_RE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
-                       trt_ref = 1)
+                       baseline_trt = 1)
 contr_pred_RE
 plot(contr_pred_RE)
 ```
@@ -594,13 +594,13 @@ plot(mix_releff_RE, ref_line = 0)
 ```
 
 Following @TSD2, we produce absolute predictions of the mean off-time reduction on each treatment assuming a Normal distribution for the outcomes on treatment 1 (placebo) with mean $-0.73$ and precision $21$.
-We use the `predict()` method, where the `baseline` argument takes a `distr()` distribution object with which we specify the corresponding Normal distribution, and we specify `trt_ref = 1` to indicate that the baseline distribution corresponds to treatment 1.
+We use the `predict()` method, where the `baseline` argument takes a `distr()` distribution object with which we specify the corresponding Normal distribution, and we specify `baseline_trt = 1` to indicate that the baseline distribution corresponds to treatment 1.
 (Strictly speaking, `type = "response"` is unnecessary here, since the identity link function was used.)
 ```{r mix_pred_FE, fig.height = 2}
 mix_pred_FE <- predict(mix_fit_FE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
-                       trt_ref = 1)
+                       baseline_trt = 1)
 mix_pred_FE
 plot(mix_pred_FE)
 ```
@@ -608,7 +608,7 @@ plot(mix_pred_FE)
 mix_pred_RE <- predict(mix_fit_RE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
-                       trt_ref = 1)
+                       baseline_trt = 1)
 mix_pred_RE
 plot(mix_pred_RE)
 ```
@@ -888,7 +888,7 @@ test_that("Analysis of reordered contrast data gives same results", {
   expect_equivalent_nma_summary(predict(reorder_fit_FE, 
                                      baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                                      type = "response",
-                                     trt_ref = 1),
+                                     baseline_trt = 1),
                            contr_pred_FE,
                            tolerance = tol)
   
@@ -908,7 +908,7 @@ test_that("Analysis of reordered contrast data gives same results", {
   expect_equivalent_nma_summary(predict(reorder_fit_RE, 
                                      baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                                      type = "response",
-                                     trt_ref = 1),
+                                     baseline_trt = 1),
                            contr_pred_RE,
                            tolerance = tol)
   

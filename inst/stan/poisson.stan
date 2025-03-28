@@ -12,13 +12,14 @@ data {
   vector<lower=0>[ni_agd_arm] agd_arm_E;
 }
 transformed data {
+  vector[ni_ipd] ipd_logE = log(ipd_E);
 #include /include/transformed_data_common.stan
 }
 parameters {
 #include /include/parameters_common.stan
 }
 transformed parameters {
-  vector<lower=0>[ni_ipd] E_eta_ipd;
+  vector[ni_ipd] E_eta_ipd;
   vector<lower=0>[ni_agd_arm] E_theta_agd_arm;
 
 #include /include/transformed_parameters_theta.stan
@@ -34,6 +35,15 @@ transformed parameters {
       vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
         X_agd_arm * beta_tilde + offset_agd_arm :
         X_agd_arm * beta_tilde;
+
+        // Add class effects contribution to the linear predictor
+    if (class_effects) {
+      for (i in 1:ni_agd_arm) {
+        if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_class[agd_arm_trt[i] - 1]];
+        }
+      }
+    }
 
       if (RE) {
 
@@ -66,6 +76,14 @@ transformed parameters {
           X_agd_arm * beta_tilde + offset_agd_arm :
           X_agd_arm * beta_tilde;
 
+        if (class_effects) {
+          for (i in 1:ni_agd_arm) {
+            if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+            eta_agd_arm_noRE[i] += f_class[which_class[agd_arm_trt[i] - 1]];
+            }
+          }
+        }
+
         if (link == 1) { // log link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
@@ -75,16 +93,27 @@ transformed parameters {
           }
         }
       } else {
+
+        vector[nint * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+          X_agd_arm * beta_tilde + offset_agd_arm :
+          X_agd_arm * beta_tilde;
+
+        if (class_effects) {
+          for (i in 1:ni_agd_arm) {
+            if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+              eta_agd_arm_noRE[i] += f_class[which_class[agd_arm_trt[i] - 1]];
+            }
+          }
+        }
+
         if (link == 1) // log link
-          theta_agd_arm_bar = has_offset ?
-            exp(X_agd_arm * beta_tilde + offset_agd_arm) :
-            exp(X_agd_arm * beta_tilde);
+          theta_agd_arm_bar = exp(eta_agd_arm_noRE);
       }
     }
   }
 
   // Predictors with time at risk offset
-  E_eta_ipd = eta_ipd + ipd_E;
+  E_eta_ipd = eta_ipd + ipd_logE;
   E_theta_agd_arm = theta_agd_arm_bar .* agd_arm_E;
 }
 model {

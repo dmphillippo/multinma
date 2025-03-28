@@ -25,7 +25,7 @@
 #'   \code{\link[randtoolbox:quasiRNG]{sobol()}}
 #'
 #' @return For the `nma_data` method, an object of class [nma_data]. For the
-#'   `data.frame` method, the input data frame is returned (as a [tibble]) with
+#'   `data.frame` method, the input data frame is returned (as a `tibble`) with
 #'   an added column for each covariate (prefixed with ".int_"), containing the
 #'   numerical integration points nested as length-`n_int` vectors within each
 #'   row. For `unnest_integration()`, a data frame with integration points
@@ -515,13 +515,18 @@ distr <- function(qfun, ...) {
 
 #' The Bernoulli Distribution
 #'
-#' The quantile function `qbern` for a Bernoulli distribution, with success
-#' probability `prob`. This is equivalent to `qbinom(p, 1, prob)`.
+#' The density function `dbern()`, distribution function `pbern()`, and quantile
+#' function `qbern()` for a Bernoulli distribution, with success probability
+#' `prob`. These are equivalent to `dbinom(p, 1, prob)`, `pbinom(p, 1, prob)`
+#' and `qbinom(p, 1, prob)`.
 #'
 #' @param x,q vector of quantiles
 #' @param p vector of probabilities
 #' @param prob probability of success
 #' @param lower.tail,log.p,log see [stats::Binomial]
+#'
+#' @return Numeric vector of length equal to the maximum of the lengths of the
+#'   input arguments.
 #'
 #' @export
 #' @rdname Bernoulli
@@ -555,6 +560,9 @@ dbern <- function(x, prob, log = FALSE) {
 #' @param shape,rate,scale,log,lower.tail,log.p see [stats::GammaDist]
 #' @param mean,sd mean and standard deviation, overriding `shape` and
 #'   `rate` or `scale` if specified
+#'
+#' @return Numeric vector of length equal to the maximum of the lengths of the
+#'   input arguments.
 #'
 #' @export
 #' @rdname GammaDist
@@ -595,51 +603,65 @@ pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
 
 #' The logit Normal distribution
 #'
-#' We provide convenient extensions of the `[dpq]logitnorm` functions in the
-#' package \link[logitnorm:logitnorm-package]{logitnorm}, which allow the
-#' distribution to be specified in terms of its mean and standard deviation,
-#' instead of its logit-mean and logit-sd.
+#' Density, distribution function, and quantile function for the logit Normal
+#' distribution. The location and scale parameters of the distribution are `mu`
+#' and `sigma`, which are the mean and standard deviation on the logit scale.
+#' For convenience, the distribution may also be specified in terms of its mean
+#' and standard deviation, instead of its logit-mean and logit-sd.
 #'
-#' @param p,x vector of quantiles
-#' @param q vector of probabilities
-#' @param mu,sigma,... see \code{\link[logitnorm:logitnorm-package]{logitnorm}}
+#' @param x,q vector of quantiles
+#' @param p vector of probabilities
+#' @param mu,sigma location and scale parameters, on the logit scale
+#' @param ... additional arguments, passed to `[dpq]norm()`
 #' @param mean,sd mean and standard deviation, overriding `mu` and `sigma` if
 #'   specified
 #'
-#' @export
-#' @rdname logitNormal
-#' @aliases qlogitnorm
-qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
-  require_pkg("logitnorm")
-  if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
-  else pars <- list(mu = mu, sigma = sigma)
-  return(logitnorm::qlogitnorm(p, pars[["mu"]], pars[["sigma"]], ...))
-}
-
+#' @return Numeric vector of length equal to the maximum of the lengths of the
+#'   input arguments.
+#'
 #' @export
 #' @rdname logitNormal
 #' @aliases dlogitnorm
+#' @importFrom stats integrate dnorm
 dlogitnorm <- function(x, mu = 0, sigma = 1, ..., mean, sd) {
-  require_pkg("logitnorm")
+  islog <- isTRUE(rlang::list2(...)$log)
+
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
-  return(logitnorm::dlogitnorm(x, pars[["mu"]], pars[["sigma"]], ...))
+
+  out <- dnorm(qlogis(x), mean = pars[["mu"]], sd = pars[["sigma"]], ...)
+  if (islog) {
+    out <- out - log(x) - log1p(-x)
+  } else {
+    out <- out / (x * (1 - x))
+  }
+  return(out)
 }
 
 #' @export
 #' @rdname logitNormal
 #' @aliases plogitnorm
 plogitnorm <- function(q, mu = 0, sigma = 1, ..., mean, sd) {
-  require_pkg("logitnorm")
   if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
   else pars <- list(mu = mu, sigma = sigma)
-  return(logitnorm::plogitnorm(q, pars[["mu"]], pars[["sigma"]], ...))
+  return(pnorm(qlogis(q), mean = pars[["mu"]], sd = pars[["sigma"]], ...))
 }
+
+#' @export
+#' @rdname logitNormal
+#' @aliases qlogitnorm
+qlogitnorm <- function(p, mu = 0, sigma = 1, ..., mean, sd){
+  if (!missing(mean) && !missing(sd)) pars <- pars_logitnorm(mean, sd)
+  else pars <- list(mu = mu, sigma = sigma)
+  return(plogis(qnorm(p, mean = pars[["mu"]], sd = pars[["sigma"]], ...)))
+}
+
 
 # Internal functions for *logitnorm()
 .lndiff <- function(est, m, s){
-  x <- logitnorm::momentsLogitnorm(est[1], est[2])
-  return((x[1] - m)^2 + (sqrt(x[2]) - s)^2)
+  smean <- integrate(function(x) x * dlogitnorm(x, mu = est[1], sigma = est[2]), 0, 1)$value
+  ssd <- sqrt(integrate(function(x) (x - smean)^2 * dlogitnorm(x, mu = est[1], sigma = est[2]), 0, 1)$value)
+  return((smean - m)^2 + (ssd - s)^2)
 }
 
 .lnopt <- function(m, s) {
@@ -655,7 +677,9 @@ plogitnorm <- function(q, mu = 0, sigma = 1, ..., mean, sd) {
 
 # Estimate mu and sigma parameters of logit-normal from sample mean and sd
 pars_logitnorm <- function(m, s) {
-  if (length(m) != length(s)) abort("Parameters not same length.")
+  if (length(m) != length(s) && length(m) > 1 && length(s) > 1) {
+    abort("Parameters not same length.")
+  }
   if (any(m > 1 | m < 0)) abort("Mean not in [0,1]. Have you rescaled?")
 
   return(as.data.frame(do.call(rbind, mapply(.lnopt, m, s, SIMPLIFY = FALSE))))

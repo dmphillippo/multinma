@@ -38,7 +38,9 @@ NULL
 #' Print `stan_nma` objects
 #'
 #' @param x A [stan_nma] object
-#' @param ... Further arguments passed to [print.stanfit()]
+#' @param ... Further arguments passed to \code{\link[rstan:print.stanfit]{print.stanfit()}}
+#'
+#' @return `x` is returned invisibly.
 #'
 #' @export
 print.stan_nma <- function(x, ...) {
@@ -204,7 +206,7 @@ plot.stan_nma <- function(x, ...,
 #' @param ... Additional arguments passed on to methods
 #' @param prior Character vector selecting the prior and posterior
 #'   distribution(s) to plot. May include `"intercept"`, `"trt"`, `"het"`,
-#'   `"reg"`, or `"aux"`, as appropriate.
+#'   `"reg"`, `"aux"`, `"class_mean"` or `"class_sd"` as appropriate.
 #' @param post_args List of arguments passed on to [ggplot2::geom_histogram] to
 #'   control plot output for the posterior distribution
 #' @param prior_args List of arguments passed on to [ggplot2::geom_path] to
@@ -258,7 +260,9 @@ plot_prior_posterior <- function(x, ...,
       "het"[!is.null(x$priors$prior_het)],
       "reg"[!is.null(x$priors$prior_reg)],
       "aux"[!is.null(x$priors$prior_aux)],
-      "aux_reg"[!is.null(x$priors$prior_aux_reg)])
+      "aux_reg"[!is.null(x$priors$prior_aux_reg)],
+      "class_mean"[!is.null(x$priors$prior_class_mean)],
+      "class_sd"[!is.null(x$priors$prior_class_sd)])
 
   if (is.null(prior)) {
     prior <- priors_used
@@ -285,6 +289,9 @@ plot_prior_posterior <- function(x, ...,
   for (i in seq_along(prior)) {
     if (prior[i] %in% c("het", "aux") || (prior[i] == "aux_reg" && x$likelihood %in% c("mspline", "pexp"))) trunc <- c(0, Inf)
     else trunc <- NULL
+
+    prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc) %>%
+      tibble::add_column(prior = prior[i])
 
     if (x$likelihood == "gengamma" && prior[i] == "aux") {
       prior_dat[[i]] <-
@@ -322,7 +329,9 @@ plot_prior_posterior <- function(x, ...,
                                                             pexp =, mspline = "sigma_beta",
                                                             weibull =, gompertz =, `weibull-aft` =,
                                                             lognormal =, loglogistic =, gamma =,
-                                                            gengamma = "beta_aux")))
+                                                            gengamma = "beta_aux"),
+                                           class_mean = "class_mean",
+                                           class_sd = "class_sd"))
 
   # Add in omega parameter if node-splitting model, which uses prior_trt
   if (inherits(x, "nma_nodesplit")) {
@@ -566,6 +575,8 @@ plot_integration_error <- function(x, ...,
 
   # Get cumulative integration points
   twoparbin <- x$likelihood %in% c("binomial2", "bernoulli2")
+  multi <- x$likelihood == "ordered"
+
   ipars <- c()
   if (has_agd_arm(x$network)) {
     ipars <- c(ipars, "theta_bar_cum_agd_arm")
@@ -588,23 +599,24 @@ plot_integration_error <- function(x, ...,
 
   n_int <- x$network$n_int
 
-  rx <- "^(theta2?)\\[(.+): (.+), ([0-9]+)\\]$"
+  rx <- if (multi) "^(theta2?)\\[(.+): (.+), ([0-9]+), (.+)\\]$" else "^(theta2?)\\[(.+): (.+), ([0-9]+)\\]$"
 
   int_dat <- tidyr::pivot_longer(int_dat, cols = -dplyr::one_of(".draw"),
                                  names_pattern = rx,
-                                 names_to = c("parameter", "study", "treatment", "n_int"),
+                                 names_to = if (multi) c("parameter", "study", "treatment", "n_int", "category") else c("parameter", "study", "treatment", "n_int"),
                                  names_transform = list(n_int = as.integer),
                                  values_to = "value")
 
   int_dat$study <- factor(int_dat$study, levels = levels(x$network$studies))
   int_dat$treatment <- factor(int_dat$treatment, levels = levels(x$network$treatments))
+  if (multi) int_dat$category <- forcats::fct_inorder(factor(int_dat$category))
 
   # Estimate integration error by subtracting final value
   int_dat <- dplyr::left_join(dplyr::filter(int_dat, .data$n_int != max(.data$n_int)),
                               dplyr::filter(int_dat, .data$n_int == max(.data$n_int)) %>%
                                 dplyr::rename(final_value = "value") %>%
                                 dplyr::select(-"n_int"),
-                              by = c("parameter", "study", "treatment", ".draw")) %>%
+                              by = if (multi)  c("parameter", "study", "treatment", "category", ".draw") else c("parameter", "study", "treatment", ".draw")) %>%
     dplyr::mutate(diff = .data$value - .data$final_value)
 
   int_thin <- min(int_dat$n_int)
@@ -675,9 +687,13 @@ plot_integration_error <- function(x, ...,
               args = rlang::dots_list(orientation = orientation, ..., !!! v_args, .homonyms = "first"))
   }
 
-  p <- p +
-    ggplot2::facet_wrap(~ study + treatment) +
-    theme_multinma()
+  if (multi) {
+    p <- p + ggplot2::facet_grid(study + treatment ~ category)
+  } else {
+    p <- p + ggplot2::facet_wrap(~ study + treatment)
+  }
+
+  p <- p + theme_multinma()
 
   return(p)
 }
@@ -713,7 +729,7 @@ as.stanfit.default <- function(x, ...) {
 #' array, matrix, or data frame.
 #'
 #' @param x A `stan_nma` object
-#' @param ... Additional arguments passed to [as.array.stanfit()]
+#' @param ... Additional arguments passed to \code{\link[rstan:as.array.stanfit]{as.array.stanfit()}}
 #' @param pars Optional character vector of parameter names to include in output. If not specified, all parameters are used.
 #' @param include Logical, are parameters in `pars` to be included (`TRUE`, default) or excluded (`FALSE`)?
 #'
@@ -892,8 +908,8 @@ pairs.stan_nma <- function(x, ..., pars, include = TRUE) {
                            condition = bayesplot::pairs_condition(nuts = "accept_stat__"),
                            .homonyms = "first")
 
-  thm <- bayesplot::bayesplot_theme_set(theme_multinma())
+  thm <- ggplot2::theme_set(theme_multinma())
   out <- do.call(bayesplot::mcmc_pairs, args = args)
-  bayesplot::bayesplot_theme_set(thm)
+  ggplot2::theme_set(thm)
   return(out)
 }

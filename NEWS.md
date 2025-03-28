@@ -1,4 +1,92 @@
-# multinma 0.5.1.9000
+# multinma 0.8.0.9000
+
+# multinma 0.8.0
+
+* Feature: Class effects models are now available, thanks to @sjperren (PR #37).
+The new `class_effects` argument in `nma()` allows models with independent, 
+exchangeable, or common class effects to be fitted. Class standard deviations
+can also be shared between classes or subsets of classes, controlled by the
+`class_sd` argument. These features are demonstrated in a new vignette,
+analysing a network of interventions for social anxiety.
+* Feature: Leverage plots can now be produced by `plot.nma_dic()`, with the 
+option `type = "leverage"`.
+* Feature: Networks with integration points can now be combined with 
+`combine_network()`, where previously these were discarded. One potential use 
+case is to specify different types of marginal distributions or correlation 
+structures for different AgD studies in the network, by setting these up 
+separately with `add_integration()` before combining with `combine_network()`.
+* Feature: Added `as.data.frame.nma_dic()` and `as_tibble.nma_dic()` methods 
+that return data frames of the pointwise contributions to the DIC, and
+`as.matrix.nma_dic()` and `as.array.nma_dic()` methods that return posterior 
+samples of the residual deviances as a matrix or 3D array.
+* Feature: The `softmax()` and `inv_softmax()` transforms are now exported.
+* Improvement: Removed suggested dependency on the logitnorm package. The 
+logit Normal distribution functions are now implemented internally.
+* Fix: Resolved a bug where trying to fit meta-regression models with discrete 
+covariates would sometimes result in a misspecified and inestimable model, due 
+to the inclusion of additional columns in the design matrix for the reference 
+level of the covariates.
+* Fix: IPD Poisson models were broken due to an incorrect offset for log time at 
+risk (thanks to @n8thangreen for spotting this).
+* Fix: In a Binomial model, studies where everyone experienced the outcome 
+(`r = n` on all arms) no longer give `NaN` residual deviance.
+
+# multinma 0.7.2
+
+* Fix: Predictions for non-proportional hazards IPD NMA or ML-NMR survival 
+models using `aux_regression = ~.trt` were incorrectly omitting the treatment 
+effects on the auxiliary parameter(s) in some cases (#43).
+* Fix: Calling `marginal_effects()` for survival outcomes with a single target
+population previously gave an error.
+* Fix: Predictions from exponential models where `aux_regression` had been
+specified were giving an error (#44). `aux_regression` and `aux_by` have no 
+effect for exponential models since there are no auxiliary (shape) parameters 
+and are ignored, now with a warning.
+* Fix: Avoid an error when trying to fit M-spline models combining IPD and AgD 
+in R versions prior to 4.1.0, due to integer coercion of factors by `c()`.
+
+# multinma 0.7.1
+
+* Fix: Producing survival/hazard/cumulative hazard predictions for survival 
+models with `predict()` outside of a `plot()` call no longer gives an error 
+(#40).
+* Fix: Increased StanHeaders version requirement to version 2.32.9 or later, to 
+avoid CRAN sanitizer warnings (caused by stan-dev/rstan#1111).
+
+# multinma 0.7.0
+
+* Feature: The new `marginal_effects()` function produces marginal treatment
+effects, as a wrapper around absolute predictions from `predict()`. For example, 
+for an analysis with a binary outcome marginal odds ratios, risk ratios, or risk
+differences may be produced. For survival outcomes, marginal effects may be 
+based on the full range of predictions produced by `predict()`, such as marginal 
+differences in restricted mean survival times, or time-varying marginal hazard 
+ratios.
+* Feature: Progress bars are now displayed when running interactively for
+calculations with `predict()` or `marginal_effects()` from ML-NMR models that 
+may take longer to run. These can be controlled with the new `progress` 
+argument.
+* Deprecation: The `trt_ref` argument to `predict()` has been renamed to 
+`baseline_ref`; using `trt_ref` is now soft-deprecated. Renaming this argument 
+`baseline_ref` follows the naming convention for the other arguments 
+(`baseline_type`, `baseline_level`) that specify the details of a provided 
+`baseline` distribution. This also makes way for the new `marginal_effects()` 
+functionality.
+* Fix: Fallback formatting used by print methods when the crayon package is not 
+installed now works properly, rather than giving errors.
+* Fix: Small bug caused `predict()` for AgD meta-regression models with new data 
+and `baseline_type = "response"` to fail with an error.
+* Fix: The number of studies on a contrast in a network plot `plot.nma_data()`
+with `weight_edges = TRUE` was incorrect when a study had multiple arms of the 
+same treatment. This now correctly counts the number of studies making a 
+comparison, rather than the number of arms.
+
+# multinma 0.6.1
+
+* Fix: Piecewise exponential hazard models no longer give errors during set-up. 
+Calculation of RW1 prior weights needed to be handled as a special case.
+
+# multinma 0.6.0
 
 ## Feature: Survival/time-to-event models are now supported
 
@@ -72,6 +160,8 @@ a data frame of layout coordinates) now works as expected when `nudge > 0`.
 * Fix: Documentation corrections (PR #24).
 * Fix: Added missing `as.tibble.stan_nma()` and `as_tibble.stan_nma()` methods, 
 to complement the existing `as.data.frame.stan_nma()`.
+* Fix: Bug in ordered multinomial models where data in studies with missing 
+categories could be assigned the wrong category (#28).
 
 # multinma 0.5.1
 

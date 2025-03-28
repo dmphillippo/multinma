@@ -12,33 +12,40 @@
   weight_edges = TRUE,
   weight_nodes = FALSE,
   show_trt_class = FALSE,
+  level = c("treatment", "class"),
   nudge = 0
 )
 }
 \arguments{
 \item{x}{A \link{nma_data} object to plot}
 
-\item{...}{Additional arguments passed to \code{\link[=ggraph]{ggraph()}} and on to the layout
-function}
+\item{...}{Additional arguments passed to
+\code{\link[ggraph:ggraph]{ggraph()}} and on to the layout function}
 
-\item{layout}{The type of layout to create. Any layout accepted by \code{\link[=ggraph]{ggraph()}}
-may be used, including all of the layout functions provided by \link{igraph}.}
+\item{layout}{The type of layout to create. Any layout accepted by
+\code{\link[ggraph:ggraph]{ggraph()}} may be used, including all of the
+layout functions provided by \link[igraph:igraph-package]{igraph}.}
 
-\item{circular}{Whether to use a circular representation. See \code{\link[=ggraph]{ggraph()}}.}
+\item{circular}{Whether to use a circular representation. See
+\code{\link[ggraph:ggraph]{ggraph()}}.}
 
 \item{weight_edges}{Weight edges by the number of studies? Default is \code{TRUE}.}
 
-\item{weight_nodes}{Weight nodes by the total sample size? Default is \code{FALSE}.}
+\item{weight_nodes}{Weight nodes by the total sample size? Default is
+\code{FALSE}.}
 
 \item{show_trt_class}{Colour treatment nodes by class, if \code{trt_class} is set?
 Default is \code{FALSE}.}
+
+\item{level}{Display network at the \code{"treatment"} (default) or \code{"class"} level.}
 
 \item{nudge}{Numeric value to nudge the treatment labels away from the nodes
 when \code{weight_nodes = TRUE}. Default is \code{0} (no adjustment to label
 position). A small value like \code{0.1} is usually sufficient.}
 }
 \value{
-A \code{ggplot} object, as produced by \code{\link[=ggraph]{ggraph()}}.
+A \code{ggplot} object, as produced by
+\code{\link[ggraph:ggraph]{ggraph()}}.
 }
 \description{
 Create a network plot from a \code{nma_data} network object.

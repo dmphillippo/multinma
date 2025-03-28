@@ -1,12 +1,17 @@
 Package: multinma
 Title: Bayesian Network Meta-Analysis of Individual and Aggregate Data
-Version: 0.5.1.9006
+Version: 0.8.0.9000
 Authors@R: 
-    person(given = c("David", "M."),
+    c(person(given = c("David", "M."),
            family = "Phillippo",
            role = c("aut", "cre"),
            email = "david.phillippo@bristol.ac.uk",
-           comment = c(ORCID = "0000-0003-2672-7841"))
+           comment = c(ORCID = "0000-0003-2672-7841")),
+    person(given = c("Samuel", "J."),
+            family = "Perren",
+            role = "ctb",
+            email = "samuel.perren@bristol.ac.uk",
+            comment = c(ORCID = "0009-0005-1921-6957")))
 Description: Network meta-analysis and network meta-regression models for 
     aggregate data, individual patient data, and mixtures of both individual 
     and aggregate data using multilevel network meta-regression as described by
@@ -51,12 +56,13 @@ LinkingTo:
     RcppEigen (>= 0.3.3.3.0),
     RcppParallel (>= 5.0.1),
     rstan (>= 2.26.0),
-    StanHeaders (>= 2.26.0)
+    StanHeaders (>= 2.32.9)
 SystemRequirements: GNU make
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 Suggests: 
     testthat (>= 2.1.0),
+    vdiffr,
     withr,
     knitr,
     rmarkdown,
@@ -64,7 +70,6 @@ Suggests:
     R.rsp,
     rprojroot,
     loo (>= 2.0.0),
-    logitnorm,
     crayon,
     tidygraph,
     pkgdown,

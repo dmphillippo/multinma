@@ -515,7 +515,7 @@ data {
 
   // auxiliary design matrix
   int<lower=0> nX_aux;
-  matrix[ni_ipd + (aux_int ? nint_max : 1) * (ni_agd_arm + ni_agd_contrast), nX_aux] X_aux;
+  matrix[ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm, nX_aux] X_aux;
   int<lower=0, upper=1> aux_reg_trt; // Flag aux regression includes main treatment effects (1 = yes)
 
   // Prior on aux regression coefficients
@@ -638,6 +638,14 @@ transformed parameters {
     vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
               X_agd_arm * beta_tilde + offset_agd_arm :
               X_agd_arm * beta_tilde;
+
+    if (class_effects) {
+      for (i in 1:ni_agd_arm) {
+        if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_class[agd_arm_trt[i] - 1]];
+        }
+      }
+    }
 
     if (nint_max > 1) { // -- If integration points are used --
 

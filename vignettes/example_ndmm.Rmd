@@ -126,7 +126,7 @@ bind_rows(
 # Setup
 ## Preparing treatment classes
 We start by setting up the network for the analysis.
-Since we only have IPD on the placebo vs. lenalidomide comparison, and only one AgD study on the placebo vs. thalidomide comparison, we make the shared effect modifier assumption between the two active treatments in order to estimate the effect modifying treatment-covariate interactions for thalidomide [@TSD18,@methods_paper].
+Since we only have IPD on the placebo vs. lenalidomide comparison, and only one AgD study on the placebo vs. thalidomide comparison, we make the shared effect modifier assumption between the two active treatments in order to estimate the effect modifying treatment-covariate interactions for thalidomide [@TSD18;@methods_paper].
 Since lenalidomide and thalidomide are both in the same class of treatments, this assumption may be reasonable.
 
 To impose this assumption, we create a treatment class variable for active treatments vs. placebo.
@@ -155,12 +155,12 @@ ndmm_net <- combine_network(
           study = studyf,
           trt = trtf,
           trt_class = trtclass,
-          Surv = Surv(eventtime, status)),
+          Surv = Surv(eventtime / 12, status)),
   set_agd_surv(ndmm_agd,
                study = studyf,
                trt = trtf,
                trt_class = trtclass,
-               Surv = Surv(eventtime, status),
+               Surv = Surv(eventtime / 12, status),
                covariates = ndmm_agd_covs)
 )
 ```
@@ -252,7 +252,7 @@ ML-NMR models are fit using the `nma()` function, and we specify that a M-spline
 
 Fitting spline models requires the user to specify the number and location of the knots.
 By default, seven internal knots are used (`n_knots = 7`) which are placed at evenly spaced quantiles on the observed event times within each study.
-Overfitting is avoided by the use of a random walk prior distribution on the (inverse softmax transformed) spline coefficients that penalises complexity and shrinks towards a constant baseline hazard [@Phillippo_survival]; in practice this means that the number of knots can be set to a sufficiently large number and left to shrink to a suitable level of complexity controlled by the standard deviation of the random walk. 
+Overfitting is avoided by the use of a random walk prior distribution on the (inverse softmax transformed) spline coefficients that penalises complexity and shrinks towards a constant baseline hazard [@Phillippo_survival]; in practice this means that the number of knots can be set to a sufficiently large number and left to shrink to a suitable level of complexity controlled by the standard deviation of the random walk.
 The number of knots can be changed using the `n_knots` argument, or custom knot locations can be specified using the `knots` argument.
 The `nma()` function will always place boundary knots at the earliest entry time into the study (0 with no delayed entry) and at the maximum event/censoring time.
 
@@ -287,42 +287,42 @@ ndmm_fit
 #> 4 chains, each with iter=2000; warmup=1000; thin=1; 
 #> post-warmup draws per chain=1000, total post-warmup draws=4000.
 #> 
-#>                                             mean se_mean   sd      2.5%       25%       50%
-#> beta[age]                                   0.08    0.00 0.01      0.06      0.07      0.08
-#> beta[iss_stage3]                            0.35    0.00 0.13      0.10      0.26      0.35
-#> beta[response_cr_vgpr]                     -0.13    0.00 0.10     -0.34     -0.20     -0.13
-#> beta[male]                                  0.00    0.00 0.10     -0.20     -0.07      0.00
-#> beta[age:.trtclassActive]                  -0.02    0.00 0.01     -0.03     -0.02     -0.02
-#> beta[iss_stage3:.trtclassActive]            0.20    0.00 0.17     -0.14      0.09      0.20
-#> beta[response_cr_vgpr:.trtclassActive]      0.20    0.00 0.14     -0.09      0.10      0.20
-#> beta[male:.trtclassActive]                  0.14    0.00 0.15     -0.17      0.03      0.14
-#> d[Len]                                     -0.66    0.00 0.05     -0.77     -0.70     -0.66
-#> d[Thal]                                    -0.20    0.00 0.11     -0.40     -0.27     -0.20
-#> lp__                                   -12499.11    0.23 7.32 -12514.14 -12504.05 -12498.73
-#> sigma[Attal2012]                            0.88    0.01 0.39      0.29      0.60      0.82
-#> sigma[McCarthy2012]                         1.75    0.01 0.56      0.83      1.34      1.68
-#> sigma[Palumbo2014]                          0.59    0.01 0.52      0.02      0.20      0.45
-#> sigma[Jackson2019]                          0.81    0.01 0.33      0.33      0.57      0.75
-#> sigma[Morgan2012]                           0.77    0.02 0.50      0.04      0.41      0.70
-#>                                              75%     97.5% n_eff Rhat
-#> beta[age]                                   0.08      0.09  4376 1.00
-#> beta[iss_stage3]                            0.43      0.59  4972 1.00
-#> beta[response_cr_vgpr]                     -0.06      0.07  5101 1.00
-#> beta[male]                                  0.07      0.20  5881 1.00
-#> beta[age:.trtclassActive]                  -0.01      0.00  3695 1.00
-#> beta[iss_stage3:.trtclassActive]            0.32      0.54  4979 1.00
-#> beta[response_cr_vgpr:.trtclassActive]      0.29      0.48  4627 1.00
-#> beta[male:.trtclassActive]                  0.24      0.44  5149 1.00
-#> d[Len]                                     -0.63     -0.56  4987 1.00
-#> d[Thal]                                    -0.12      0.01  3918 1.01
-#> lp__                                   -12493.85 -12485.92  1052 1.01
-#> sigma[Attal2012]                            1.09      1.82  1936 1.00
-#> sigma[McCarthy2012]                         2.11      2.98  2491 1.00
-#> sigma[Palumbo2014]                          0.85      1.93  1445 1.00
-#> sigma[Jackson2019]                          0.98      1.59  1734 1.01
-#> sigma[Morgan2012]                           1.06      1.95   969 1.00
+#>                                            mean se_mean   sd     2.5%      25%      50%      75%
+#> beta[age]                                  0.08    0.00 0.01     0.06     0.07     0.08     0.08
+#> beta[iss_stage3]                           0.35    0.00 0.13     0.08     0.26     0.35     0.44
+#> beta[response_cr_vgpr]                    -0.13    0.00 0.10    -0.33    -0.20    -0.13    -0.07
+#> beta[male]                                 0.00    0.00 0.10    -0.20    -0.07     0.00     0.07
+#> beta[age:.trtclassActive]                 -0.02    0.00 0.01    -0.03    -0.02    -0.02    -0.01
+#> beta[iss_stage3:.trtclassActive]           0.21    0.00 0.18    -0.14     0.09     0.21     0.32
+#> beta[response_cr_vgpr:.trtclassActive]     0.20    0.00 0.14    -0.09     0.11     0.20     0.29
+#> beta[male:.trtclassActive]                 0.13    0.00 0.15    -0.16     0.04     0.13     0.23
+#> d[Len]                                    -0.66    0.00 0.05    -0.77    -0.70    -0.66    -0.63
+#> d[Thal]                                   -0.20    0.00 0.11    -0.41    -0.27    -0.19    -0.12
+#> lp__                                   -6142.01    0.22 7.11 -6156.79 -6146.76 -6141.61 -6137.15
+#> sigma[Attal2012]                           0.88    0.01 0.39     0.26     0.60     0.82     1.09
+#> sigma[McCarthy2012]                        1.77    0.01 0.55     0.85     1.36     1.72     2.11
+#> sigma[Palumbo2014]                         0.61    0.01 0.53     0.02     0.20     0.47     0.88
+#> sigma[Jackson2019]                         0.80    0.01 0.33     0.30     0.55     0.74     0.98
+#> sigma[Morgan2012]                          0.79    0.02 0.49     0.05     0.43     0.73     1.07
+#>                                           97.5% n_eff Rhat
+#> beta[age]                                  0.09  4064    1
+#> beta[iss_stage3]                           0.61  5131    1
+#> beta[response_cr_vgpr]                     0.07  4804    1
+#> beta[male]                                 0.21  6516    1
+#> beta[age:.trtclassActive]                  0.00  3544    1
+#> beta[iss_stage3:.trtclassActive]           0.56  4974    1
+#> beta[response_cr_vgpr:.trtclassActive]     0.47  3194    1
+#> beta[male:.trtclassActive]                 0.43  5312    1
+#> d[Len]                                    -0.56  4723    1
+#> d[Thal]                                    0.02  3842    1
+#> lp__                                   -6128.88  1081    1
+#> sigma[Attal2012]                           1.77  1817    1
+#> sigma[McCarthy2012]                        2.94  2106    1
+#> sigma[Palumbo2014]                         2.00  1506    1
+#> sigma[Jackson2019]                         1.57  1511    1
+#> sigma[Morgan2012]                          1.95  1004    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Thu Oct 12 19:58:13 2023.
+#> Samples were drawn using NUTS(diag_e) at Sat Apr 27 02:43:00 2024.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -333,61 +333,61 @@ The details of the spline coefficients are not printed by default, but can be sh
 ```r
 summary(ndmm_fit, pars = "scoef")
 #>                         mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> scoef[Attal2012, 1]     0.02 0.00 0.01 0.01 0.02 0.02  0.03     2468     1624 1.00
-#> scoef[McCarthy2012, 1]  0.01 0.00 0.00 0.00 0.01 0.01  0.01     3523     3205 1.00
-#> scoef[Palumbo2014, 1]   0.01 0.00 0.01 0.01 0.02 0.02  0.02     2116     3388 1.00
-#> scoef[Jackson2019, 1]   0.01 0.00 0.01 0.01 0.01 0.01  0.02     2495     3269 1.01
-#> scoef[Morgan2012, 1]    0.01 0.00 0.01 0.01 0.01 0.01  0.02     1165     2636 1.01
-#> scoef[Attal2012, 2]     0.03 0.01 0.02 0.02 0.03 0.03  0.04     2661     1995 1.00
-#> scoef[McCarthy2012, 2]  0.01 0.01 0.00 0.01 0.01 0.02  0.03     3293     3334 1.00
-#> scoef[Palumbo2014, 2]   0.03 0.01 0.02 0.03 0.03 0.03  0.04     2465     3270 1.00
-#> scoef[Jackson2019, 2]   0.02 0.00 0.02 0.02 0.02 0.03  0.03     2222     3147 1.01
-#> scoef[Morgan2012, 2]    0.02 0.00 0.01 0.02 0.02 0.03  0.03     1342     2926 1.01
-#> scoef[Attal2012, 3]     0.05 0.01 0.04 0.05 0.05 0.06  0.07     3837     3615 1.00
-#> scoef[McCarthy2012, 3]  0.05 0.01 0.03 0.04 0.05 0.06  0.09     3373     3301 1.00
-#> scoef[Palumbo2014, 3]   0.05 0.01 0.04 0.05 0.05 0.06  0.07     4695     3591 1.00
-#> scoef[Jackson2019, 3]   0.04 0.00 0.04 0.04 0.04 0.05  0.05     3312     3224 1.00
-#> scoef[Morgan2012, 3]    0.04 0.01 0.03 0.04 0.04 0.05  0.06     3584     3326 1.00
-#> scoef[Attal2012, 4]     0.09 0.01 0.06 0.08 0.08 0.09  0.11     4699     2958 1.00
-#> scoef[McCarthy2012, 4]  0.09 0.02 0.06 0.08 0.09 0.10  0.13     4182     3236 1.00
-#> scoef[Palumbo2014, 4]   0.07 0.01 0.05 0.06 0.07 0.07  0.09     4427     3725 1.00
-#> scoef[Jackson2019, 4]   0.06 0.01 0.05 0.06 0.06 0.07  0.08     3811     3104 1.00
-#> scoef[Morgan2012, 4]    0.07 0.01 0.05 0.06 0.07 0.07  0.08     3657     3469 1.00
-#> scoef[Attal2012, 5]     0.10 0.01 0.07 0.09 0.10 0.11  0.13     4416     3747 1.00
-#> scoef[McCarthy2012, 5]  0.07 0.02 0.04 0.06 0.07 0.09  0.11     3400     3357 1.00
-#> scoef[Palumbo2014, 5]   0.09 0.01 0.07 0.08 0.08 0.09  0.12     3100     3537 1.00
-#> scoef[Jackson2019, 5]   0.08 0.01 0.07 0.08 0.08 0.09  0.10     3484     3268 1.00
-#> scoef[Morgan2012, 5]    0.08 0.01 0.07 0.08 0.08 0.09  0.11     1542     2765 1.00
-#> scoef[Attal2012, 6]     0.11 0.02 0.08 0.10 0.11 0.12  0.15     4130     3521 1.00
-#> scoef[McCarthy2012, 6]  0.08 0.02 0.05 0.07 0.08 0.09  0.12     3733     3526 1.00
-#> scoef[Palumbo2014, 6]   0.09 0.01 0.06 0.08 0.09 0.09  0.12     4718     3260 1.00
-#> scoef[Jackson2019, 6]   0.11 0.01 0.09 0.10 0.11 0.11  0.13     3673     3629 1.00
-#> scoef[Morgan2012, 6]    0.10 0.01 0.08 0.09 0.10 0.11  0.13     3914     3569 1.00
-#> scoef[Attal2012, 7]     0.14 0.02 0.11 0.13 0.14 0.15  0.19     3454     3624 1.00
-#> scoef[McCarthy2012, 7]  0.13 0.03 0.08 0.11 0.12 0.14  0.18     3538     3333 1.00
-#> scoef[Palumbo2014, 7]   0.13 0.02 0.10 0.12 0.12 0.14  0.18     3550     3357 1.00
-#> scoef[Jackson2019, 7]   0.13 0.01 0.10 0.12 0.13 0.13  0.15     3705     3604 1.00
-#> scoef[Morgan2012, 7]    0.13 0.02 0.10 0.12 0.13 0.14  0.16     4651     3552 1.00
-#> scoef[Attal2012, 8]     0.17 0.02 0.12 0.15 0.17 0.18  0.22     4415     3648 1.00
-#> scoef[McCarthy2012, 8]  0.19 0.04 0.12 0.16 0.18 0.21  0.27     3589     3194 1.00
-#> scoef[Palumbo2014, 8]   0.18 0.03 0.13 0.17 0.18 0.19  0.24     4096     3493 1.00
-#> scoef[Jackson2019, 8]   0.19 0.02 0.15 0.18 0.19 0.20  0.23     3722     3896 1.00
-#> scoef[Morgan2012, 8]    0.20 0.02 0.15 0.18 0.19 0.21  0.25     3894     3098 1.00
-#> scoef[Attal2012, 9]     0.12 0.02 0.07 0.10 0.12 0.13  0.16     4005     3200 1.00
-#> scoef[McCarthy2012, 9]  0.12 0.04 0.05 0.10 0.12 0.15  0.20     2951     3267 1.00
-#> scoef[Palumbo2014, 9]   0.14 0.03 0.08 0.13 0.15 0.16  0.18     3351     3011 1.00
-#> scoef[Jackson2019, 9]   0.15 0.02 0.11 0.13 0.15 0.16  0.19     3277     3337 1.00
-#> scoef[Morgan2012, 9]    0.16 0.03 0.11 0.15 0.16 0.17  0.22     3822     3196 1.00
-#> scoef[Attal2012, 10]    0.10 0.02 0.07 0.09 0.10 0.11  0.14     4864     3366 1.00
-#> scoef[McCarthy2012, 10] 0.16 0.04 0.09 0.13 0.15 0.18  0.24     4056     3424 1.00
-#> scoef[Palumbo2014, 10]  0.13 0.02 0.08 0.12 0.13 0.14  0.18     5155     3406 1.00
-#> scoef[Jackson2019, 10]  0.12 0.02 0.09 0.11 0.12 0.13  0.16     3572     3232 1.00
-#> scoef[Morgan2012, 10]   0.12 0.02 0.08 0.11 0.12 0.13  0.17     4044     3655 1.00
-#> scoef[Attal2012, 11]    0.07 0.02 0.05 0.06 0.07 0.08  0.11     6035     3940 1.00
-#> scoef[McCarthy2012, 11] 0.09 0.03 0.04 0.06 0.08 0.10  0.15     4969     3157 1.00
-#> scoef[Palumbo2014, 11]  0.08 0.02 0.05 0.07 0.08 0.09  0.13     4934     3655 1.00
-#> scoef[Jackson2019, 11]  0.08 0.01 0.06 0.07 0.08 0.09  0.12     4599     3791 1.00
-#> scoef[Morgan2012, 11]   0.06 0.02 0.03 0.05 0.07 0.08  0.09     2666     3835 1.00
+#> scoef[Attal2012, 1]     0.02 0.00 0.01 0.01 0.02 0.02  0.03     2587     2098 1.00
+#> scoef[McCarthy2012, 1]  0.01 0.00 0.00 0.00 0.01 0.01  0.01     3120     3214 1.00
+#> scoef[Palumbo2014, 1]   0.01 0.00 0.01 0.01 0.02 0.02  0.02     2055     3306 1.00
+#> scoef[Jackson2019, 1]   0.01 0.00 0.01 0.01 0.01 0.01  0.01     2162     3013 1.01
+#> scoef[Morgan2012, 1]    0.01 0.00 0.01 0.01 0.01 0.01  0.02     1195     2463 1.00
+#> scoef[Attal2012, 2]     0.03 0.01 0.02 0.02 0.03 0.03  0.04     2857     2436 1.00
+#> scoef[McCarthy2012, 2]  0.01 0.01 0.01 0.01 0.01 0.02  0.03     3252     2680 1.00
+#> scoef[Palumbo2014, 2]   0.03 0.01 0.02 0.03 0.03 0.03  0.04     2563     3889 1.00
+#> scoef[Jackson2019, 2]   0.02 0.00 0.02 0.02 0.02 0.03  0.03     2550     3571 1.01
+#> scoef[Morgan2012, 2]    0.02 0.00 0.01 0.02 0.02 0.03  0.03     1548     2542 1.00
+#> scoef[Attal2012, 3]     0.05 0.01 0.04 0.05 0.05 0.06  0.07     4196     3599 1.00
+#> scoef[McCarthy2012, 3]  0.05 0.01 0.03 0.05 0.05 0.06  0.08     2954     3520 1.00
+#> scoef[Palumbo2014, 3]   0.05 0.01 0.04 0.05 0.05 0.06  0.07     5008     3892 1.00
+#> scoef[Jackson2019, 3]   0.04 0.00 0.04 0.04 0.04 0.05  0.05     3295     3299 1.00
+#> scoef[Morgan2012, 3]    0.04 0.01 0.03 0.04 0.04 0.05  0.06     3051     3396 1.00
+#> scoef[Attal2012, 4]     0.09 0.01 0.07 0.08 0.08 0.09  0.11     4662     3890 1.00
+#> scoef[McCarthy2012, 4]  0.09 0.02 0.06 0.08 0.09 0.10  0.13     3948     3648 1.00
+#> scoef[Palumbo2014, 4]   0.07 0.01 0.05 0.06 0.07 0.07  0.09     4576     3631 1.00
+#> scoef[Jackson2019, 4]   0.06 0.01 0.05 0.06 0.06 0.07  0.08     3611     3096 1.00
+#> scoef[Morgan2012, 4]    0.07 0.01 0.05 0.06 0.07 0.07  0.08     3457     3155 1.00
+#> scoef[Attal2012, 5]     0.10 0.01 0.07 0.09 0.10 0.11  0.13     3837     3318 1.00
+#> scoef[McCarthy2012, 5]  0.07 0.02 0.04 0.06 0.07 0.08  0.11     3598     3568 1.00
+#> scoef[Palumbo2014, 5]   0.09 0.01 0.07 0.08 0.08 0.09  0.12     3510     3013 1.00
+#> scoef[Jackson2019, 5]   0.08 0.01 0.07 0.08 0.08 0.09  0.10     3458     3456 1.00
+#> scoef[Morgan2012, 5]    0.09 0.01 0.07 0.08 0.08 0.09  0.11     1584     3279 1.00
+#> scoef[Attal2012, 6]     0.11 0.02 0.08 0.10 0.11 0.12  0.15     3436     3359 1.00
+#> scoef[McCarthy2012, 6]  0.08 0.02 0.05 0.07 0.08 0.09  0.12     3315     2908 1.00
+#> scoef[Palumbo2014, 6]   0.09 0.01 0.06 0.08 0.09 0.09  0.12     5062     3506 1.00
+#> scoef[Jackson2019, 6]   0.11 0.01 0.09 0.10 0.10 0.11  0.13     3951     3407 1.00
+#> scoef[Morgan2012, 6]    0.10 0.01 0.08 0.09 0.10 0.11  0.13     3735     3238 1.00
+#> scoef[Attal2012, 7]     0.14 0.02 0.11 0.13 0.14 0.15  0.19     3401     3420 1.00
+#> scoef[McCarthy2012, 7]  0.13 0.03 0.08 0.11 0.13 0.14  0.18     3191     3092 1.00
+#> scoef[Palumbo2014, 7]   0.13 0.02 0.10 0.12 0.12 0.14  0.18     4028     3972 1.00
+#> scoef[Jackson2019, 7]   0.13 0.01 0.10 0.12 0.13 0.13  0.15     3708     3016 1.00
+#> scoef[Morgan2012, 7]    0.13 0.02 0.10 0.12 0.13 0.14  0.16     4266     3723 1.00
+#> scoef[Attal2012, 8]     0.17 0.02 0.12 0.16 0.17 0.19  0.22     3805     3309 1.00
+#> scoef[McCarthy2012, 8]  0.19 0.04 0.12 0.16 0.18 0.21  0.26     3395     3363 1.00
+#> scoef[Palumbo2014, 8]   0.18 0.03 0.13 0.17 0.18 0.19  0.24     4403     3393 1.00
+#> scoef[Jackson2019, 8]   0.19 0.02 0.15 0.18 0.19 0.20  0.23     3085     3193 1.00
+#> scoef[Morgan2012, 8]    0.20 0.02 0.15 0.18 0.19 0.21  0.25     3857     3612 1.00
+#> scoef[Attal2012, 9]     0.12 0.02 0.07 0.10 0.12 0.13  0.16     3185     3507 1.00
+#> scoef[McCarthy2012, 9]  0.12 0.04 0.05 0.10 0.12 0.15  0.20     2975     3141 1.00
+#> scoef[Palumbo2014, 9]   0.14 0.03 0.08 0.13 0.15 0.16  0.19     3241     2855 1.00
+#> scoef[Jackson2019, 9]   0.15 0.02 0.11 0.14 0.15 0.16  0.19     3015     2984 1.00
+#> scoef[Morgan2012, 9]    0.16 0.03 0.11 0.15 0.16 0.17  0.22     3478     3039 1.00
+#> scoef[Attal2012, 10]    0.10 0.02 0.07 0.09 0.10 0.12  0.14     4591     3615 1.00
+#> scoef[McCarthy2012, 10] 0.16 0.04 0.09 0.13 0.15 0.18  0.23     3741     3299 1.00
+#> scoef[Palumbo2014, 10]  0.13 0.02 0.08 0.12 0.13 0.14  0.18     5639     3402 1.00
+#> scoef[Jackson2019, 10]  0.12 0.02 0.09 0.11 0.12 0.13  0.16     3360     3424 1.00
+#> scoef[Morgan2012, 10]   0.12 0.02 0.08 0.11 0.12 0.13  0.17     4206     3575 1.00
+#> scoef[Attal2012, 11]    0.07 0.02 0.05 0.06 0.07 0.08  0.11     4771     2936 1.00
+#> scoef[McCarthy2012, 11] 0.09 0.03 0.04 0.07 0.08 0.10  0.16     5087     3110 1.00
+#> scoef[Palumbo2014, 11]  0.08 0.02 0.05 0.07 0.08 0.09  0.14     4560     3523 1.00
+#> scoef[Jackson2019, 11]  0.08 0.01 0.06 0.07 0.08 0.09  0.12     5130     3486 1.00
+#> scoef[Morgan2012, 11]   0.06 0.02 0.03 0.05 0.07 0.08  0.09     2543     3587 1.00
 ```
 
 ## Ploting hazards
@@ -447,6 +447,7 @@ We can relax and assess the proportional hazards (PH) assumption by allowing the
 This may be achieved using the `aux_by` argument, with `aux_by = c(.study, .trt)`.
 Technically, `aux_by = .study` is always assumed in order to respect randomisation (analogous to stratifying the intercept terms in a NMA by study), and we could simply write `aux_by = .trt`; but we choose to make the stratification by study explicit in this instance.
 
+
 ```r
 ndmm_fit_nph <- nma(ndmm_net,
                     regression = ~(age + iss_stage3 + response_cr_vgpr + male)*.trt,
@@ -471,52 +472,52 @@ ndmm_fit_nph
 #> 4 chains, each with iter=2000; warmup=1000; thin=1; 
 #> post-warmup draws per chain=1000, total post-warmup draws=4000.
 #> 
-#>                                             mean se_mean   sd      2.5%       25%       50%
-#> beta[age]                                   0.07    0.00 0.01      0.06      0.07      0.07
-#> beta[iss_stage3]                            0.33    0.00 0.13      0.08      0.24      0.33
-#> beta[response_cr_vgpr]                     -0.11    0.00 0.10     -0.30     -0.18     -0.11
-#> beta[male]                                 -0.01    0.00 0.10     -0.21     -0.08     -0.01
-#> beta[age:.trtclassActive]                  -0.01    0.00 0.01     -0.03     -0.02     -0.01
-#> beta[iss_stage3:.trtclassActive]            0.24    0.00 0.17     -0.11      0.11      0.24
-#> beta[response_cr_vgpr:.trtclassActive]      0.16    0.00 0.14     -0.12      0.06      0.16
-#> beta[male:.trtclassActive]                  0.15    0.00 0.15     -0.14      0.05      0.15
-#> d[Len]                                     -0.62    0.00 0.07     -0.75     -0.66     -0.62
-#> d[Thal]                                    -0.26    0.00 0.12     -0.49     -0.33     -0.25
-#> lp__                                   -12534.68    0.27 9.19 -12553.34 -12540.75 -12534.38
-#> sigma[Attal2012: Pbo]                       0.93    0.01 0.42      0.17      0.64      0.89
-#> sigma[Attal2012: Len]                       0.63    0.01 0.40      0.06      0.34      0.55
-#> sigma[McCarthy2012: Pbo]                    1.38    0.01 0.53      0.56      0.98      1.31
-#> sigma[McCarthy2012: Len]                    1.20    0.01 0.46      0.50      0.86      1.14
-#> sigma[Palumbo2014: Pbo]                     0.60    0.01 0.49      0.02      0.24      0.49
-#> sigma[Palumbo2014: Len]                     0.77    0.01 0.54      0.03      0.35      0.68
-#> sigma[Jackson2019: Pbo]                     0.63    0.01 0.33      0.16      0.40      0.58
-#> sigma[Jackson2019: Len]                     0.99    0.01 0.41      0.35      0.69      0.93
-#> sigma[Morgan2012: Pbo]                      0.33    0.01 0.32      0.01      0.10      0.23
-#> sigma[Morgan2012: Thal]                     1.02    0.01 0.49      0.19      0.67      0.97
-#>                                              75%     97.5% n_eff Rhat
-#> beta[age]                                   0.08      0.09  3031    1
-#> beta[iss_stage3]                            0.42      0.58  5960    1
-#> beta[response_cr_vgpr]                     -0.04      0.08  6219    1
-#> beta[male]                                  0.05      0.19  5980    1
-#> beta[age:.trtclassActive]                  -0.01      0.01  3006    1
-#> beta[iss_stage3:.trtclassActive]            0.36      0.58  5580    1
-#> beta[response_cr_vgpr:.trtclassActive]      0.25      0.43  4989    1
-#> beta[male:.trtclassActive]                  0.25      0.46  4670    1
-#> d[Len]                                     -0.57     -0.49  2884    1
-#> d[Thal]                                    -0.17     -0.03  5412    1
-#> lp__                                   -12528.20 -12517.61  1138    1
-#> sigma[Attal2012: Pbo]                       1.18      1.86  1319    1
-#> sigma[Attal2012: Len]                       0.84      1.59  1986    1
-#> sigma[McCarthy2012: Pbo]                    1.70      2.59  2816    1
-#> sigma[McCarthy2012: Len]                    1.47      2.27  2672    1
-#> sigma[Palumbo2014: Pbo]                     0.84      1.85  2023    1
-#> sigma[Palumbo2014: Len]                     1.09      2.06  2084    1
-#> sigma[Jackson2019: Pbo]                     0.80      1.42  1811    1
-#> sigma[Jackson2019: Len]                     1.24      1.94  1921    1
-#> sigma[Morgan2012: Pbo]                      0.45      1.22  2206    1
-#> sigma[Morgan2012: Thal]                     1.31      2.12  1601    1
+#>                                            mean se_mean   sd     2.5%      25%      50%      75%
+#> beta[age]                                  0.07    0.00 0.01     0.06     0.07     0.07     0.08
+#> beta[iss_stage3]                           0.34    0.00 0.12     0.09     0.25     0.34     0.42
+#> beta[response_cr_vgpr]                    -0.11    0.00 0.10    -0.31    -0.18    -0.11    -0.04
+#> beta[male]                                -0.01    0.00 0.10    -0.21    -0.08    -0.01     0.06
+#> beta[age:.trtclassActive]                 -0.01    0.00 0.01    -0.03    -0.02    -0.01    -0.01
+#> beta[iss_stage3:.trtclassActive]           0.23    0.00 0.18    -0.11     0.11     0.23     0.35
+#> beta[response_cr_vgpr:.trtclassActive]     0.15    0.00 0.14    -0.12     0.06     0.15     0.26
+#> beta[male:.trtclassActive]                 0.15    0.00 0.15    -0.13     0.05     0.15     0.25
+#> d[Len]                                    -0.62    0.00 0.07    -0.75    -0.66    -0.62    -0.58
+#> d[Thal]                                   -0.25    0.00 0.12    -0.49    -0.33    -0.25    -0.17
+#> lp__                                   -6173.53    0.28 9.48 -6192.85 -6179.84 -6173.02 -6166.98
+#> sigma[Attal2012: Pbo]                      0.95    0.01 0.43     0.20     0.65     0.90     1.21
+#> sigma[Attal2012: Len]                      0.59    0.01 0.38     0.04     0.32     0.52     0.79
+#> sigma[McCarthy2012: Pbo]                   1.38    0.01 0.53     0.54     0.99     1.31     1.73
+#> sigma[McCarthy2012: Len]                   1.21    0.01 0.46     0.50     0.86     1.15     1.47
+#> sigma[Palumbo2014: Pbo]                    0.60    0.01 0.49     0.02     0.23     0.48     0.85
+#> sigma[Palumbo2014: Len]                    0.78    0.01 0.56     0.04     0.34     0.67     1.11
+#> sigma[Jackson2019: Pbo]                    0.63    0.01 0.32     0.16     0.41     0.57     0.81
+#> sigma[Jackson2019: Len]                    1.01    0.01 0.43     0.36     0.70     0.94     1.27
+#> sigma[Morgan2012: Pbo]                     0.33    0.01 0.32     0.01     0.11     0.24     0.45
+#> sigma[Morgan2012: Thal]                    1.01    0.02 0.50     0.13     0.65     0.97     1.31
+#>                                           97.5% n_eff Rhat
+#> beta[age]                                  0.09  2193    1
+#> beta[iss_stage3]                           0.58  5568    1
+#> beta[response_cr_vgpr]                     0.08  5831    1
+#> beta[male]                                 0.18  5236    1
+#> beta[age:.trtclassActive]                  0.01  2637    1
+#> beta[iss_stage3:.trtclassActive]           0.57  5536    1
+#> beta[response_cr_vgpr:.trtclassActive]     0.43  4496    1
+#> beta[male:.trtclassActive]                 0.45  4772    1
+#> d[Len]                                    -0.49  2425    1
+#> d[Thal]                                   -0.02  3444    1
+#> lp__                                   -6155.82  1156    1
+#> sigma[Attal2012: Pbo]                      1.93  1491    1
+#> sigma[Attal2012: Len]                      1.55  1642    1
+#> sigma[McCarthy2012: Pbo]                   2.56  2173    1
+#> sigma[McCarthy2012: Len]                   2.28  2430    1
+#> sigma[Palumbo2014: Pbo]                    1.85  1934    1
+#> sigma[Palumbo2014: Len]                    2.11  1783    1
+#> sigma[Jackson2019: Pbo]                    1.39  1487    1
+#> sigma[Jackson2019: Len]                    2.02  1479    1
+#> sigma[Morgan2012: Pbo]                     1.18  1869    1
+#> sigma[Morgan2012: Thal]                    2.15  1048    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Thu Oct 12 22:47:57 2023.
+#> Samples were drawn using NUTS(diag_e) at Sat Apr 27 06:37:01 2024.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -529,10 +530,10 @@ We then compare model fit between models with and without PH using the LOOIC.
 #> 
 #> Computed from 4000 by 4144 log-likelihood matrix
 #> 
-#>          Estimate    SE
-#> elpd_loo -12398.8 116.0
-#> p_loo        35.1   0.7
-#> looic     24797.7 232.1
+#>          Estimate   SE
+#> elpd_loo  -6129.3 47.2
+#> p_loo        35.2  0.7
+#> looic     12258.5 94.5
 #> ------
 #> Monte Carlo SE of elpd_loo is 0.1.
 #> 
@@ -542,10 +543,10 @@ We then compare model fit between models with and without PH using the LOOIC.
 #> 
 #> Computed from 4000 by 4144 log-likelihood matrix
 #> 
-#>          Estimate    SE
-#> elpd_loo -12405.4 116.1
-#> p_loo        44.2   0.8
-#> looic     24810.9 232.2
+#>          Estimate   SE
+#> elpd_loo  -6135.9 47.2
+#> p_loo        44.0  0.8
+#> looic     12271.9 94.3
 #> ------
 #> Monte Carlo SE of elpd_loo is 0.1.
 #> 
@@ -556,7 +557,7 @@ We then compare model fit between models with and without PH using the LOOIC.
 loo_compare(ndmm_fit_loo, ndmm_fit_nph_loo)
 #>        elpd_diff se_diff
 #> model1  0.0       0.0   
-#> model2 -6.6       3.5
+#> model2 -6.7       3.5
 ```
 The overall fit for the proportional hazards model is better.
 
@@ -569,11 +570,11 @@ cbind(
   `non-PH` = by(ndmm_fit_nph_loo$pointwise[, "looic"], studies_all, sum)
 )
 #>                     PH    non-PH
-#> Attal2012     3345.132  3346.962
-#> Jackson2019  12398.245 12400.166
-#> McCarthy2012  2726.430  2737.793
-#> Morgan2012    4991.066  4989.484
-#> Palumbo2014   1336.786  1336.462
+#> Attal2012    1630.6453 1632.3042
+#> Jackson2019  6270.7875 6272.2199
+#> McCarthy2012 1378.9831 1390.9979
+#> Morgan2012   2346.9508 2345.6749
+#> Palumbo2014   631.1527  630.7023
 ```
 The LOOIC is similar or lower for the proportional hazards model compared to the non-proportional hazards model in all studies.
 Based on LOOIC alone, there is no evidence to suggest that the proportional hazards assumption is invalid here.
@@ -602,26 +603,17 @@ ndmm_fit_nma
 #> 4 chains, each with iter=2000; warmup=1000; thin=1; 
 #> post-warmup draws per chain=1000, total post-warmup draws=4000.
 #> 
-#>                          mean se_mean   sd      2.5%       25%       50%       75%     97.5% n_eff
-#> d[Len]                  -0.52    0.00 0.05     -0.61     -0.55     -0.52     -0.49     -0.43  3117
-#> d[Thal]                 -0.11    0.00 0.09     -0.28     -0.17     -0.11     -0.05      0.07  4059
-#> lp__                -12533.05    0.21 6.85 -12547.59 -12537.46 -12532.59 -12528.12 -12521.11  1032
-#> sigma[Attal2012]         0.82    0.01 0.39      0.19      0.55      0.77      1.04      1.74  1573
-#> sigma[McCarthy2012]      1.71    0.01 0.56      0.76      1.29      1.66      2.06      2.95  2142
-#> sigma[Palumbo2014]       0.66    0.01 0.50      0.04      0.29      0.55      0.91      1.89  1794
-#> sigma[Jackson2019]       0.85    0.01 0.31      0.41      0.62      0.80      1.01      1.59  1960
-#> sigma[Morgan2012]        0.90    0.01 0.46      0.29      0.57      0.80      1.14      2.02  1424
-#>                     Rhat
-#> d[Len]                 1
-#> d[Thal]                1
-#> lp__                   1
-#> sigma[Attal2012]       1
-#> sigma[McCarthy2012]    1
-#> sigma[Palumbo2014]     1
-#> sigma[Jackson2019]     1
-#> sigma[Morgan2012]      1
+#>                         mean se_mean   sd     2.5%      25%      50%      75%    97.5% n_eff Rhat
+#> d[Len]                 -0.52    0.00 0.05    -0.61    -0.55    -0.52    -0.49    -0.43  4055    1
+#> d[Thal]                -0.11    0.00 0.09    -0.28    -0.16    -0.11    -0.04     0.07  4644    1
+#> lp__                -6220.38    0.21 6.74 -6235.14 -6224.78 -6220.01 -6215.62 -6208.25  1064    1
+#> sigma[Attal2012]        0.81    0.01 0.39     0.20     0.54     0.75     1.03     1.73  1985    1
+#> sigma[McCarthy2012]     1.68    0.01 0.56     0.73     1.28     1.64     2.02     2.91  2117    1
+#> sigma[Palumbo2014]      0.64    0.01 0.47     0.03     0.28     0.53     0.88     1.78  1775    1
+#> sigma[Jackson2019]      0.87    0.01 0.32     0.41     0.64     0.82     1.05     1.65  2280    1
+#> sigma[Morgan2012]       0.91    0.01 0.46     0.27     0.57     0.82     1.16     2.03  1490    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Thu Oct 12 23:00:43 2023.
+#> Samples were drawn using NUTS(diag_e) at Sat Apr 27 06:55:51 2024.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -642,36 +634,36 @@ ndmm_fit_nma_nph
 #> 4 chains, each with iter=2000; warmup=1000; thin=1; 
 #> post-warmup draws per chain=1000, total post-warmup draws=4000.
 #> 
-#>                               mean se_mean   sd      2.5%       25%       50%       75%     97.5%
-#> d[Len]                       -0.47    0.00 0.05     -0.57     -0.50     -0.47     -0.43     -0.37
-#> d[Thal]                      -0.14    0.00 0.10     -0.34     -0.21     -0.14     -0.08      0.05
-#> lp__                     -12563.41    0.25 8.85 -12581.68 -12569.30 -12563.15 -12557.29 -12547.02
-#> sigma[Attal2012: Pbo]         0.95    0.01 0.43      0.22      0.65      0.91      1.20      1.94
-#> sigma[Attal2012: Len]         0.51    0.01 0.38      0.03      0.23      0.43      0.70      1.44
-#> sigma[McCarthy2012: Pbo]      1.26    0.01 0.55      0.40      0.86      1.19      1.60      2.57
-#> sigma[McCarthy2012: Len]      1.13    0.01 0.47      0.42      0.78      1.06      1.39      2.22
-#> sigma[Palumbo2014: Pbo]       0.87    0.01 0.50      0.13      0.51      0.78      1.14      2.07
-#> sigma[Palumbo2014: Len]       0.72    0.01 0.56      0.03      0.28      0.59      1.05      2.06
-#> sigma[Jackson2019: Pbo]       0.88    0.01 0.32      0.43      0.65      0.83      1.05      1.68
-#> sigma[Jackson2019: Len]       1.06    0.01 0.43      0.45      0.75      0.98      1.30      2.09
-#> sigma[Morgan2012: Pbo]        0.51    0.01 0.35      0.05      0.26      0.43      0.68      1.40
-#> sigma[Morgan2012: Thal]       1.07    0.01 0.45      0.36      0.74      1.01      1.33      2.12
-#>                          n_eff Rhat
-#> d[Len]                    2546    1
-#> d[Thal]                   3304    1
-#> lp__                      1252    1
-#> sigma[Attal2012: Pbo]     1825    1
-#> sigma[Attal2012: Len]     1854    1
-#> sigma[McCarthy2012: Pbo]  2327    1
-#> sigma[McCarthy2012: Len]  2396    1
-#> sigma[Palumbo2014: Pbo]   2391    1
-#> sigma[Palumbo2014: Len]   2302    1
-#> sigma[Jackson2019: Pbo]   2060    1
-#> sigma[Jackson2019: Len]   1774    1
-#> sigma[Morgan2012: Pbo]    2150    1
-#> sigma[Morgan2012: Thal]   2407    1
+#>                              mean se_mean   sd     2.5%      25%      50%      75%    97.5% n_eff
+#> d[Len]                      -0.47    0.00 0.05    -0.57    -0.50    -0.47    -0.43    -0.37  3041
+#> d[Thal]                     -0.14    0.00 0.10    -0.33    -0.21    -0.14    -0.08     0.05  3173
+#> lp__                     -6245.96    0.26 8.98 -6264.36 -6251.77 -6245.47 -6239.57 -6229.71  1230
+#> sigma[Attal2012: Pbo]        0.93    0.01 0.42     0.21     0.64     0.89     1.18     1.86  1762
+#> sigma[Attal2012: Len]        0.52    0.01 0.38     0.02     0.23     0.44     0.72     1.45  1861
+#> sigma[McCarthy2012: Pbo]     1.27    0.01 0.54     0.41     0.86     1.20     1.59     2.50  2356
+#> sigma[McCarthy2012: Len]     1.15    0.01 0.49     0.42     0.79     1.08     1.43     2.27  2842
+#> sigma[Palumbo2014: Pbo]      0.88    0.01 0.50     0.13     0.52     0.80     1.15     2.10  2332
+#> sigma[Palumbo2014: Len]      0.70    0.01 0.54     0.03     0.29     0.59     1.00     2.01  1938
+#> sigma[Jackson2019: Pbo]      0.88    0.01 0.31     0.43     0.66     0.82     1.04     1.63  2452
+#> sigma[Jackson2019: Len]      1.07    0.01 0.42     0.44     0.75     1.00     1.31     2.07  1859
+#> sigma[Morgan2012: Pbo]       0.52    0.01 0.36     0.05     0.26     0.44     0.68     1.42  2233
+#> sigma[Morgan2012: Thal]      1.07    0.01 0.45     0.36     0.74     1.02     1.33     2.12  2005
+#>                          Rhat
+#> d[Len]                      1
+#> d[Thal]                     1
+#> lp__                        1
+#> sigma[Attal2012: Pbo]       1
+#> sigma[Attal2012: Len]       1
+#> sigma[McCarthy2012: Pbo]    1
+#> sigma[McCarthy2012: Len]    1
+#> sigma[Palumbo2014: Pbo]     1
+#> sigma[Palumbo2014: Len]     1
+#> sigma[Jackson2019: Pbo]     1
+#> sigma[Jackson2019: Len]     1
+#> sigma[Morgan2012: Pbo]      1
+#> sigma[Morgan2012: Thal]     1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Thu Oct 12 23:07:04 2023.
+#> Samples were drawn using NUTS(diag_e) at Sat Apr 27 07:05:35 2024.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -685,10 +677,10 @@ Again, we compare the model fit using the LOOIC, both overall and within each st
 #> 
 #> Computed from 4000 by 4144 log-likelihood matrix
 #> 
-#>          Estimate    SE
-#> elpd_loo -12473.4 115.2
-#> p_loo        27.1   0.4
-#> looic     24946.7 230.5
+#>          Estimate   SE
+#> elpd_loo  -6203.9 45.5
+#> p_loo        27.1  0.4
+#> looic     12407.8 91.1
 #> ------
 #> Monte Carlo SE of elpd_loo is 0.1.
 #> 
@@ -699,10 +691,10 @@ Again, we compare the model fit using the LOOIC, both overall and within each st
 #> 
 #> Computed from 4000 by 4144 log-likelihood matrix
 #> 
-#>          Estimate    SE
-#> elpd_loo -12475.9 115.3
-#> p_loo        37.6   0.6
-#> looic     24951.8 230.6
+#>          Estimate   SE
+#> elpd_loo  -6206.1 45.5
+#> p_loo        37.4  0.6
+#> looic     12412.3 91.0
 #> ------
 #> Monte Carlo SE of elpd_loo is 0.1.
 #> 
@@ -712,19 +704,19 @@ Again, we compare the model fit using the LOOIC, both overall and within each st
 loo_compare(ndmm_fit_nma_loo, ndmm_fit_nma_nph_loo)
 #>        elpd_diff se_diff
 #> model1  0.0       0.0   
-#> model2 -2.5       4.4
+#> model2 -2.2       4.4
 
 # Compare model fit by study
 cbind(
   PH = by(ndmm_fit_nma_loo$pointwise[, "looic"], studies_all, sum),
   `non-PH` = by(ndmm_fit_nma_nph_loo$pointwise[, "looic"], studies_all, sum)
 )
-#>                     PH    non-PH
-#> Attal2012     3410.058  3410.280
-#> Jackson2019  12404.314 12398.934
-#> McCarthy2012  2770.382  2781.407
-#> Morgan2012    4989.289  4990.538
-#> Palumbo2014   1372.698  1370.594
+#>                     PH   non-PH
+#> Attal2012    1695.4881 1695.942
+#> Jackson2019  6276.3877 6270.620
+#> McCarthy2012 1423.6705 1434.468
+#> Morgan2012   2345.1156 2346.434
+#> Palumbo2014   667.1769  664.794
 ```
 Whilst there is little difference in overall model fit, the non-PH model is preferred in the Jackson2019 study with a substantially lower LOOIC.
 Including the covariates in the ML-NMR model is sufficient to remove this PH violation, even though the covariates are fixed and not time-varying, and the ML-NMR model is a much better fit overall.
@@ -733,7 +725,7 @@ Including the covariates in the ML-NMR model is sufficient to remove this PH vio
 
 # Producing population-average estimates
 We now produce population-average estimates for several different quantities of interest.
-The usual array of posterior summary functions is available, including `relative_effects()`, `predict()`, `posterior_ranks()` and `posterior_rank_probs()`.
+The usual array of posterior summary functions is available, including `relative_effects()`, `predict()`, `marginal_effects()`, `posterior_ranks()` and `posterior_rank_probs()`.
 The `predict()` function in particular has numerous options when working with survival models, selected using the `type` argument:
 
 * `"survival"` for survival probabilities
@@ -746,6 +738,7 @@ The `predict()` function in particular has numerous options when working with su
 * `"link"` for the linear predictor
 
 When producing population-average predictions (which is the default with `level = "aggregate"`), each of these quantities corresponds to the population-average marginal survival function; see `?predict.stan_nma` for more details.
+The `marginal_effects()` function may be used to form population-average marginal treatment effects from any of the above population-average predictions.
 
 ## Population-average survival probabilities
 To produce population-average survival curves we use the `predict()` function with `type = "survival"`.
@@ -753,7 +746,7 @@ These are marginal or standardised survival curves.
 We also overlay the unadjusted Kaplan-Meier curves from the data using the `geom_km()` helper function.
 
 ```r
-plot(predict(ndmm_fit, type = "survival")) + 
+plot(predict(ndmm_fit, type = "survival")) +
   geom_km(ndmm_net) +
   theme(legend.position = "top", legend.box.spacing = unit(0, "lines"))
 ```
@@ -774,38 +767,38 @@ The `predict()` function can produce a range of other absolute effect summaries,
 #> Evaluating M-spline at times beyond the boundary knots.
 #> -------------------------------------------------------------- Study: Attal2012 ---- 
 #> 
-#>                        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> pred[Attal2012: Pbo]  28.95 1.47 26.13 27.93 28.93 29.90 31.91     5299     3136 1.00
-#> pred[Attal2012: Len]  46.74 2.33 42.20 45.14 46.78 48.29 51.41     7287     3045 1.00
-#> pred[Attal2012: Thal] 32.35 3.42 26.30 29.99 32.11 34.43 39.96     2487     3264 1.01
+#>                       mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
+#> pred[Attal2012: Pbo]  2.41 0.13 2.17 2.33 2.41 2.50  2.67     5533     3109    1
+#> pred[Attal2012: Len]  3.89 0.20 3.50 3.76 3.90 4.02  4.29     6980     3079    1
+#> pred[Attal2012: Thal] 2.69 0.30 2.17 2.49 2.67 2.87  3.34     3590     3103    1
 #> 
 #> ----------------------------------------------------------- Study: McCarthy2012 ---- 
 #> 
-#>                           mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> pred[McCarthy2012: Pbo]  33.79 2.11 29.63 32.37 33.74 35.16 38.05     4417     3185 1.00
-#> pred[McCarthy2012: Len]  55.66 3.31 49.21 53.37 55.69 57.81 62.25     5297     3292 1.00
-#> pred[McCarthy2012: Thal] 38.52 4.02 31.17 35.83 38.32 41.02 46.74     3925     3168 1.01
+#>                          mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
+#> pred[McCarthy2012: Pbo]  2.81 0.16 2.51 2.70 2.81 2.92  3.14     4700     3412    1
+#> pred[McCarthy2012: Len]  4.64 0.27 4.13 4.45 4.63 4.82  5.17     6116     3226    1
+#> pred[McCarthy2012: Thal] 3.20 0.34 2.58 2.97 3.19 3.42  3.91     4287     3134    1
 #> 
 #> ------------------------------------------------------------ Study: Palumbo2014 ---- 
 #> 
-#>                          mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> pred[Palumbo2014: Pbo]  22.29 2.21 18.29 20.75 22.14 23.76 26.91     4908     3445 1.00
-#> pred[Palumbo2014: Len]  44.53 4.65 36.18 41.24 44.34 47.42 54.18     7050     2970 1.00
-#> pred[Palumbo2014: Thal] 27.56 4.21 20.07 24.61 27.28 30.17 36.60     4591     3615 1.01
+#>                         mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
+#> pred[Palumbo2014: Pbo]  1.86 0.18 1.52 1.73 1.85 1.98  2.25     5166     3450    1
+#> pred[Palumbo2014: Len]  3.72 0.39 3.03 3.45 3.70 3.96  4.55     6734     3356    1
+#> pred[Palumbo2014: Thal] 2.30 0.37 1.66 2.03 2.27 2.53  3.09     4463     3521    1
 #> 
 #> ------------------------------------------------------------ Study: Jackson2019 ---- 
 #> 
-#>                          mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> pred[Jackson2019: Pbo]  24.45 1.34 22.02 23.50 24.43 25.33 27.15     2035     3398 1.01
-#> pred[Jackson2019: Len]  50.47 2.48 45.75 48.76 50.38 52.05 55.47      118     2795 1.03
-#> pred[Jackson2019: Thal] 31.27 3.76 24.60 28.64 31.03 33.65 39.21     5212     3108 1.00
+#>                         mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
+#> pred[Jackson2019: Pbo]  2.04 0.11 1.83 1.96 2.04 2.11  2.26      196     2566 1.02
+#> pred[Jackson2019: Len]  4.21 0.20 3.83 4.06 4.20 4.35  4.62      125     2626 1.03
+#> pred[Jackson2019: Thal] 2.60 0.32 2.04 2.37 2.58 2.81  3.29     4478     3345 1.00
 #> 
 #> ------------------------------------------------------------- Study: Morgan2012 ---- 
 #> 
-#>                         mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> pred[Morgan2012: Pbo]  21.22 1.90 17.67 19.91 21.13 22.45 25.26     1157     3295 1.01
-#> pred[Morgan2012: Len]  48.88 6.57 38.03 44.37 48.25 52.45 63.32      873     3187 1.01
-#> pred[Morgan2012: Thal] 27.59 2.50 23.22 25.81 27.40 29.25 32.85     4950     3698 1.00
+#>                        mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
+#> pred[Morgan2012: Pbo]  1.77 0.16 1.47 1.66 1.76 1.88  2.12     1912     3489 1.01
+#> pred[Morgan2012: Len]  4.09 0.57 3.17 3.69 4.03 4.41  5.37     3155     3106 1.01
+#> pred[Morgan2012: Thal] 2.30 0.21 1.92 2.15 2.29 2.43  2.74     4889     3545 1.00
 
 plot(medsurv)
 ```
@@ -825,9 +818,9 @@ With a ML-NMR model (or an IPD meta-regression), these are population-average co
 #>  54.29        0.2             0.54 0.57
 #> 
 #>                             mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d[Attal2012: Len vs. Pbo]  -0.60 0.07 -0.74 -0.64 -0.59 -0.54 -0.45     7342     3387 1.00
-#> d[Attal2012: Thal vs. Pbo] -0.13 0.13 -0.39 -0.22 -0.13 -0.04  0.12     4188     3416 1.01
-#> d[Attal2012: Thal vs. Len]  0.46 0.12  0.24  0.38  0.46  0.54  0.69     3631     3276 1.01
+#> d[Attal2012: Len vs. Pbo]  -0.60 0.07 -0.74 -0.65 -0.59 -0.55 -0.45     7521     3160    1
+#> d[Attal2012: Thal vs. Pbo] -0.13 0.14 -0.40 -0.22 -0.13 -0.04  0.14     3707     3286    1
+#> d[Attal2012: Thal vs. Len]  0.47 0.12  0.23  0.38  0.46  0.55  0.71     3904     2960    1
 #> 
 #> ----------------------------------------------------------- Study: McCarthy2012 ---- 
 #> 
@@ -836,9 +829,9 @@ With a ML-NMR model (or an IPD meta-regression), these are population-average co
 #>  57.66       0.23             0.67 0.54
 #> 
 #>                                mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d[McCarthy2012: Len vs. Pbo]  -0.62 0.06 -0.74 -0.66 -0.62 -0.58 -0.51     7421     3243 1.00
-#> d[McCarthy2012: Thal vs. Pbo] -0.16 0.12 -0.39 -0.24 -0.16 -0.08  0.07     4194     2877 1.01
-#> d[McCarthy2012: Thal vs. Len]  0.46 0.12  0.24  0.38  0.46  0.54  0.69     3631     3276 1.01
+#> d[McCarthy2012: Len vs. Pbo]  -0.62 0.06 -0.74 -0.66 -0.62 -0.58 -0.51     6907     3318    1
+#> d[McCarthy2012: Thal vs. Pbo] -0.15 0.12 -0.39 -0.24 -0.15 -0.07  0.09     3687     3176    1
+#> d[McCarthy2012: Thal vs. Len]  0.47 0.12  0.23  0.38  0.46  0.55  0.71     3904     2960    1
 #> 
 #> ------------------------------------------------------------ Study: Palumbo2014 ---- 
 #> 
@@ -847,9 +840,9 @@ With a ML-NMR model (or an IPD meta-regression), these are population-average co
 #>  54.17       0.11              0.4 0.55
 #> 
 #>                               mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d[Palumbo2014: Len vs. Pbo]  -0.64 0.08 -0.80 -0.70 -0.64 -0.58 -0.48     7666     3354 1.00
-#> d[Palumbo2014: Thal vs. Pbo] -0.18 0.14 -0.44 -0.27 -0.18 -0.08  0.09     4182     3321 1.01
-#> d[Palumbo2014: Thal vs. Len]  0.46 0.12  0.24  0.38  0.46  0.54  0.69     3631     3276 1.01
+#> d[Palumbo2014: Len vs. Pbo]  -0.64 0.08 -0.80 -0.69 -0.64 -0.59 -0.48     7772     3098    1
+#> d[Palumbo2014: Thal vs. Pbo] -0.18 0.14 -0.45 -0.27 -0.18 -0.08  0.10     3954     3073    1
+#> d[Palumbo2014: Thal vs. Len]  0.47 0.12  0.23  0.38  0.46  0.55  0.71     3904     2960    1
 #> 
 #> ------------------------------------------------------------ Study: Jackson2019 ---- 
 #> 
@@ -858,9 +851,9 @@ With a ML-NMR model (or an IPD meta-regression), these are population-average co
 #>  64.63       0.21             0.84 0.62
 #> 
 #>                               mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d[Jackson2019: Len vs. Pbo]  -0.69 0.06 -0.81 -0.72 -0.69 -0.64 -0.57     4040     3447 1.00
-#> d[Jackson2019: Thal vs. Pbo] -0.22 0.11 -0.44 -0.29 -0.22 -0.15 -0.01     4339     2883 1.01
-#> d[Jackson2019: Thal vs. Len]  0.46 0.12  0.24  0.38  0.46  0.54  0.69     3631     3276 1.01
+#> d[Jackson2019: Len vs. Pbo]  -0.69 0.06 -0.81 -0.73 -0.68 -0.64 -0.57     3658     2731    1
+#> d[Jackson2019: Thal vs. Pbo] -0.22 0.11 -0.44 -0.30 -0.22 -0.14  0.00     4231     2708    1
+#> d[Jackson2019: Thal vs. Len]  0.47 0.12  0.23  0.38  0.46  0.55  0.71     3904     2960    1
 #> 
 #> ------------------------------------------------------------- Study: Morgan2012 ---- 
 #> 
@@ -869,13 +862,25 @@ With a ML-NMR model (or an IPD meta-regression), these are population-average co
 #>  64.46       0.33             0.73 0.62
 #> 
 #>                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d[Morgan2012: Len vs. Pbo]  -0.68 0.06 -0.80 -0.72 -0.68 -0.64 -0.56     4134     3288 1.00
-#> d[Morgan2012: Thal vs. Pbo] -0.22 0.10 -0.42 -0.28 -0.22 -0.15 -0.02     4430     2726 1.01
-#> d[Morgan2012: Thal vs. Len]  0.46 0.12  0.24  0.38  0.46  0.54  0.69     3631     3276 1.01
+#> d[Morgan2012: Len vs. Pbo]  -0.68 0.06 -0.81 -0.72 -0.68 -0.64 -0.56     4429     3066    1
+#> d[Morgan2012: Thal vs. Pbo] -0.22 0.11 -0.43 -0.29 -0.21 -0.14 -0.01     4490     3058    1
+#> d[Morgan2012: Thal vs. Len]  0.47 0.12  0.23  0.38  0.46  0.55  0.71     3904     2960    1
 
 plot(loghr)
 ```
 
 <img src="figure/ndmm-loghr-1.png" style="display: block; margin: auto;" />
+
+## Population-average marginal hazard ratios
+The `marginal_effects()` function produces population-average marginal relative effects, which are formed from the marginal absolute predictions produced by `predict()`.
+For example, we can produce population-average marginal hazard ratios:
+
+```r
+plot(marginal_effects(ndmm_fit, type = "hazard", mtype = "ratio")) +
+  theme(legend.position = "top", legend.box.spacing = unit(0, "lines"))
+```
+
+<img src="figure/ndmm-marginal-hr-1.png" style="display: block; margin: auto;" />
+These are time-varying and non-proportional because the model includes covariate effects, even though the covariates were only measured at baseline and were not themselves time-varying.
 
 # References

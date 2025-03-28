@@ -13,6 +13,7 @@ params:
 ```{r, eval = FALSE}
 library(multinma)
 options(mc.cores = parallel::detectCores())
+library(ggplot2)
 ```
 ```{r setup, echo = FALSE}
 library(multinma)
@@ -20,6 +21,7 @@ nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
              "true" =, "warn" = 2, 
              parallel::detectCores())
 options(mc.cores = nc)
+library(ggplot2)
 ```
 
 This vignette describes the analysis of 22 trials comparing beta blockers to control for preventing mortality after myocardial infarction [@Carlin1992; @TSD2].
@@ -140,6 +142,25 @@ plot(dic_RE)
 There are a number of points which are not very well fit by the FE model, having posterior mean residual deviance contributions greater than 1.
 Study 14 is a particularly poor fit under the FE model, but its residual deviance is reduced (although still high) under the RE model.
 The evidence should be given further careful examination, and consideration given to other issues such as the potential for effect-modifying covariates [@TSD2].
+
+Leverage plots can also be produced with the `plot()` method, with `type = "leverage"`.
+```{r blocker_leverage_FE}
+plot(dic_FE, type = "leverage") + 
+  # Add labels for points outside DIC=3
+  geom_text(aes(label = parameter), data = ~subset(., dic > 3), vjust = -0.5)
+```
+
+```{r blocker_leverage_RE}
+plot(dic_RE, type = "leverage") + 
+  # Add labels for points outside DIC=3
+  geom_text(aes(label = parameter), data = ~subset(., dic > 3), vjust = -0.5)
+```
+
+These plot the leverage for each data point (i.e. its contribution to model complexity $p_D$) against the square root of the residual deviance.
+The sign of the square root residual deviance is given by sign of the difference between the observed and model-predicted values, indicating whether each data point is under- or over-estimated by the model.
+Contours are displayed which indicate lines of constant contribution to the DIC.
+Points contributing more than 3 to the DIC are generally considered to be contributing to poor fit; here we have labelled these points using the `ggplot2` function `geom_text()`.
+As with the residual deviance plots above, we again see that both arms of study 14 are fit poorly under the FE model, and their fit is improved (but still poor) under the RE model.
 
 ## Further results
 @TSD2 produce absolute predictions of the probability of mortality on beta blockers and control, assuming a Normal distribution on the baseline logit-probability of mortality with mean $-2.2$ and precision $3.3$.

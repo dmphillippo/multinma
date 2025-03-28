@@ -57,3 +57,21 @@ Multilevel network meta-regression is set out in the following methods paper:
 \references{
 \insertAllCited{}
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://dmphillippo.github.io/multinma/}
+  \item \url{https://github.com/dmphillippo/multinma}
+  \item Report bugs at \url{https://github.com/dmphillippo/multinma/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: David M. Phillippo \email{david.phillippo@bristol.ac.uk} (\href{https://orcid.org/0000-0003-2672-7841}{ORCID})
+
+Other contributors:
+\itemize{
+  \item Samuel J. Perren \email{samuel.perren@bristol.ac.uk} (\href{https://orcid.org/0009-0005-1921-6957}{ORCID}) [contributor]
+}
+
+}
