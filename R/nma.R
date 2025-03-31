@@ -1347,6 +1347,8 @@ if (class_effects == "exchangeable") {
               regression = regression,
               aux_regression = aux_regression,
               class_interactions = if (!is.null(regression) && !is.null(network$classes)) class_interactions else NULL,
+              class_effects = class_effects,
+              class_sd = if (class_effects == "exchangeable") class_sd else NULL,
               xbar = xbar,
               likelihood = likelihood,
               link = link,
