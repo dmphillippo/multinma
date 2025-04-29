@@ -1759,10 +1759,16 @@ if (class_effects == "exchangeable") {
     # Get number of AgD regression studies from length of covariance matrix list
     ns_agd_regression <- length(agd_regression_cov)
 
-    # Construct single block-diagonal covariance matrix
-    agd_regression_cov <- as.matrix(Matrix::bdiag(agd_regression_cov))
+    # Construct array of cholesky decompositions of covariance matrices
+    agd_regression_ncoef <- purrr::map_int(agd_regression_cov, nrow)
+    agd_regression_max_ncoef <- max(agd_regression_ncoef)
+    agd_regression_chol <- array(NA_real_, dim = c(ns_agd_regression, agd_regression_max_ncoef, agd_regression_max_ncoef))
+    for (i in 1:ns_agd_regression) {
+      agd_regression_chol[i, , ] <- diag(agd_regression_max_ncoef) # pad out ragged array
+      agd_regression_chol[i, 1:agd_regression_ncoef[i], 1:agd_regression_ncoef[i]] <- t(chol(agd_regression_cov[[i]]))
+    }
 
-    if (nrow(agd_regression_cov) != ni_agd_regression)
+    if (sum(agd_regression_ncoef) != ni_agd_regression)
       abort("Dimensions of `agd_regression_cov` covariance matrices do not match the regression coefficient data.")
   } else {
     agd_regression_s_t_all <- dplyr::tibble(.study = integer(), .trt = integer())
@@ -1770,7 +1776,9 @@ if (class_effects == "exchangeable") {
     ni_agd_regression <- 0
     narm_agd_regression <- 0
     ns_agd_regression <- 0
-    agd_regression_cov <- matrix(1, 1, 1)
+    agd_regression_ncoef <- integer()
+    agd_regression_max_ncoef <- 1
+    agd_regression_chol <- array(1, dim = c(0, 1, 1))
     agd_regression_est <- numeric()
   }
 
@@ -1865,7 +1873,9 @@ if (class_effects == "exchangeable") {
     agd_contrast_y = if (has_agd_contrast) as.array(agd_contrast_y$.y) else numeric(),
     agd_contrast_Sigma = Sigma,
     agd_regression_est = agd_regression_est,
-    agd_regression_cov = agd_regression_cov,
+    agd_regression_max_ncoef = agd_regression_max_ncoef,
+    agd_regression_ncoef = agd_regression_ncoef,
+    agd_regression_cov = agd_regression_chol,
     agd_regression_arm = agd_regression_arm,
     agd_regression_trt = agd_regression_trt,
     narm_agd_regression = narm_agd_regression,
@@ -3246,7 +3256,7 @@ make_nma_model_matrix <- function(nma_formula,
   fct_vars <- names(attr(X_all, "contrasts"))
   fct_cols <- attr(X_all, "assign") %in% which(colSums(attr(terms(nma_formula), "factors")[fct_vars, , drop = FALSE] > 0) > 0)
   names(fct_cols) <- colnames(X_all)
-  
+
   if (!is.null(single_study_label)) {
     names(fct_cols) <- stringr::str_replace(names(fct_cols),
                                           "^\\.study$",

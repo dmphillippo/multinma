@@ -67,5 +67,11 @@ z_class ~ std_normal();
 
 // -- AgD model (regression coefficients) --
 if (ni_agd_regression) {
-  agd_regression_est ~ multi_normal(eta_agd_regression, agd_regression_cov);
+  int c=0;
+  for (i in 1:ns_agd_regression) {
+    segment(agd_regression_est, c + 1, agd_regression_ncoef[i]) ~
+      multi_normal_cholesky(segment(eta_agd_regression, c + 1, agd_regression_ncoef[i]),
+                            block(agd_regression_cov[i], 1, 1, agd_regression_ncoef[i], agd_regression_ncoef[i]));
+    c += agd_regression_ncoef[i];
+  }
 }
