@@ -1825,6 +1825,13 @@ if (class_effects == "exchangeable") {
   else
     stanargs$control <- list(adapt_delta = adapt_delta)
 
+  # Global option rstan_refresh for refresh
+  if (!"refresh" %in% names(stanargs) && !is.null(getOption("rstan_refresh"))) {
+    refresh <- getOption("rstan_refresh")
+    if (!rlang::is_integerish(refresh, n = 1, finite = TRUE)) abort("Global option `rstan_refresh` must be an integer.")
+    stanargs$refresh <- refresh
+  }
+
   # Set chain_id to make CHAIN_ID available in data block
   stanargs$chain_id <- 1L
 
