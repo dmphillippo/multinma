@@ -129,7 +129,7 @@ pso_net <- add_integration(pso_net,
 
 \donttest{
 # Fit the ML-NMR model
-pso_fit <- nma(pso_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+pso_fit <- nma(pso_net, 
                trt_effects = "fixed",
                link = "probit",
                likelihood = "bernoulli2",

@@ -28,7 +28,7 @@ smk_net
 
 \donttest{
 # Fitting all possible node-splitting models
-smk_fit_RE_nodesplit <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+smk_fit_RE_nodesplit <- nma(smk_net, 
                             consistency = "nodesplit",
                             trt_effects = "random",
                             prior_intercept = normal(scale = 100),
