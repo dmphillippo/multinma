@@ -221,9 +221,9 @@ divergent transition warnings.</p>
 <span>                prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
 <span>                adapt_delta <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Note: Setting "Standard adjusted dose anti-coagulant" as the network reference treatment.</span></span>
-<span><span class="co">#&gt; ling)</span></span>
-<span><span class="co">#&gt; Chain 3: Iteration: 3000 / 5000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; %]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 3000 / 5000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 3000 / 5000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 3000 / 5000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 3500 / 5000 [ 70%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 3500 / 5000 [ 70%]  (Sampling)</span></span>
@@ -231,13 +231,13 @@ divergent transition warnings.</p>
 <span><span class="co">#&gt; Chain 2: Iteration: 3500 / 5000 [ 70%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 4500 / 5000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 4000 / 5000 [ 80%]  (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 2: Iteration: 4000 / 5000 [ 80%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 5000 / 5000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
-<span><span class="co">#&gt; Chain 3:  Elapsed Time: 2.174 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 3:                1.483 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3:                3.657 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 2.892 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                1.956 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                4.848 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 4000 / 5000 [ 80%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 4500 / 5000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 4500 / 5000 [ 90%]  (Sampling)</span></span></code></pre>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
@@ -288,7 +288,7 @@ method:</p>
 <span><span class="co">#&gt; lp__                                         -4766.76 -4758.57  2386    1</span></span>
 <span><span class="co">#&gt; tau                                              0.36     0.57  1635    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue May 27 13:25:12 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue May 27 16:10:18 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -580,7 +580,7 @@ transition warnings.</p>
 <span>                 prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
 <span>                 adapt_delta <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Note: Setting "Standard adjusted dose anti-coagulant" as the network reference treatment.</span></span>
-<span><span class="co">#&gt; 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; 0 / 2000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
@@ -589,30 +589,30 @@ transition warnings.</p>
 <span><span class="co">#&gt; Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
-<span><span class="co">#&gt; Chain 1:  Elapsed Time: 1.22 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 1:                0.827 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 1:                2.047 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 1.774 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                1.207 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                2.981 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: </span></span>
-<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.963 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 2:                1.172 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 2:                2.135 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2:  Elapsed Time: 1.375 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 2:                1.675 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2:                3.05 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 2: </span></span>
-<span><span class="co">#&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
-<span><span class="co">#&gt; Chain 3:  Elapsed Time: 1.324 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 3:                1.062 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3:                2.386 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 1.752 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                1.554 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                3.306 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 3:</span></span>
 <span><span class="co">#&gt; Warning: Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.</span></span>
 <span><span class="co">#&gt; Running the chains for more iterations may help. See</span></span>
@@ -675,7 +675,7 @@ method:</p>
 <span><span class="co">#&gt; lp__                                         -4766.36 -4758.07  1138 1.00</span></span>
 <span><span class="co">#&gt; tau                                              0.26     0.50   330 1.02</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue May 27 13:25:24 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue May 27 16:10:34 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>

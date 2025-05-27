@@ -79,7 +79,224 @@ available in the global environment.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Set up plaque psoriasis network combining IPD and AgD</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘dplyr’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:stats’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     filter, lag</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:base’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     intersect, setdiff, setequal, union</span>
+<span class="r-in"><span><span class="va">pso_ipd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">plaque_psoriasis_ipd</span>,</span></span>
+<span class="r-in"><span>                  <span class="va">studyc</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"UNCOVER-1"</span>, <span class="st">"UNCOVER-2"</span>, <span class="st">"UNCOVER-3"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">pso_agd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">plaque_psoriasis_agd</span>,</span></span>
+<span class="r-in"><span>                  <span class="va">studyc</span> <span class="op">==</span> <span class="st">"FIXTURE"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pso_ipd</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      studyc      trtc_long    trtc trtn pasi75 pasi90 pasi100 age  bmi pasi_w0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 UNCOVER-1 Ixekizumab Q2W IXE_Q2W    2      0      0       0  34 32.2    18.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 UNCOVER-1 Ixekizumab Q2W IXE_Q2W    2      1      0       0  64 41.9    23.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 UNCOVER-1 Ixekizumab Q2W IXE_Q2W    2      1      1       0  42 26.2    12.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 UNCOVER-1 Ixekizumab Q2W IXE_Q2W    2      0      0       0  45 52.9    36.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 UNCOVER-1 Ixekizumab Q2W IXE_Q2W    2      1      0       0  67 22.9    20.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 UNCOVER-1 Ixekizumab Q2W IXE_Q2W    2      1      1       1  57 22.4    18.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    male bsa weight durnpso prevsys   psa</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  TRUE  18   98.1     6.7    TRUE  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  TRUE  33  129.6    14.5   FALSE  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  TRUE  33   78.0    26.5    TRUE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 FALSE  50  139.9    25.0    TRUE  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 FALSE  35   54.2    11.9    TRUE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  TRUE  29   67.5    15.2    TRUE FALSE</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pso_agd</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    studyc          trtc_long    trtc trtn pasi75_r pasi75_n pasi90_r pasi90_n</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 FIXTURE         Etanercept     ETN    4      142      323       67      323</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 FIXTURE            Placebo     PBO    1       16      324        5      324</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 FIXTURE Secukinumab 150 mg SEC_150    5      219      327      137      327</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 FIXTURE Secukinumab 300 mg SEC_300    6      249      323      175      323</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   pasi100_r pasi100_n sample_size_w0 age_mean age_sd bmi_mean bmi_sd</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        14       323            326     43.8   13.0     28.7    5.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2         0       324            326     44.1   12.6     27.9    6.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3        47       327            327     45.4   12.9     28.4    5.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4        78       323            327     44.5   13.2     28.4    6.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   pasi_w0_mean pasi_w0_sd male bsa_mean bsa_sd weight_mean weight_sd</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1         23.2        9.8 71.2     33.6   18.0        84.6      20.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2         24.1       10.5 72.7     35.2   19.1        82.0      20.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3         23.7       10.5 72.2     34.5   19.4        83.6      20.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4         23.9        9.9 68.5     34.3   19.2        83.0      21.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   durnpso_mean durnpso_sd prevsys  psa</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1         16.4       12.0    65.6 13.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2         16.6       11.6    62.6 15.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3         17.3       12.2    64.8 15.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4         15.8       12.3    63.0 15.3</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">pso_ipd</span> <span class="op">&lt;-</span> <span class="va">pso_ipd</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="co"># Variable transformations</span></span></span>
+<span class="r-in"><span>    bsa <span class="op">=</span> <span class="va">bsa</span> <span class="op">/</span> <span class="fl">100</span>,</span></span>
+<span class="r-in"><span>    prevsys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">prevsys</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    psa <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">psa</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    weight <span class="op">=</span> <span class="va">weight</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>    durnpso <span class="op">=</span> <span class="va">durnpso</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>    <span class="co"># Treatment classes</span></span></span>
+<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
+<span class="r-in"><span>                         <span class="va">trtn</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span> <span class="op">~</span> <span class="st">"IL blocker"</span>,</span></span>
+<span class="r-in"><span>                         <span class="va">trtn</span> <span class="op">==</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"TNFa blocker"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    <span class="co"># Check complete cases for covariates of interest</span></span></span>
+<span class="r-in"><span>    complete <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html" class="external-link">complete.cases</a></span><span class="op">(</span><span class="va">durnpso</span>, <span class="va">prevsys</span>, <span class="va">bsa</span>, <span class="va">weight</span>, <span class="va">psa</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">pso_agd</span> <span class="op">&lt;-</span> <span class="va">pso_agd</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="co"># Variable transformations</span></span></span>
+<span class="r-in"><span>    bsa_mean <span class="op">=</span> <span class="va">bsa_mean</span> <span class="op">/</span> <span class="fl">100</span>,</span></span>
+<span class="r-in"><span>    bsa_sd <span class="op">=</span> <span class="va">bsa_sd</span> <span class="op">/</span> <span class="fl">100</span>,</span></span>
+<span class="r-in"><span>    prevsys <span class="op">=</span> <span class="va">prevsys</span> <span class="op">/</span> <span class="fl">100</span>,</span></span>
+<span class="r-in"><span>    psa <span class="op">=</span> <span class="va">psa</span> <span class="op">/</span> <span class="fl">100</span>,</span></span>
+<span class="r-in"><span>    weight_mean <span class="op">=</span> <span class="va">weight_mean</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>    weight_sd <span class="op">=</span> <span class="va">weight_sd</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>    durnpso_mean <span class="op">=</span> <span class="va">durnpso_mean</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>    durnpso_sd <span class="op">=</span> <span class="va">durnpso_sd</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>    <span class="co"># Treatment classes</span></span></span>
+<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
+<span class="r-in"><span>                         <span class="va">trtn</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span> <span class="op">~</span> <span class="st">"IL blocker"</span>,</span></span>
+<span class="r-in"><span>                         <span class="va">trtn</span> <span class="op">==</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"TNFa blocker"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Exclude small number of individuals with missing covariates</span></span></span>
+<span class="r-in"><span><span class="va">pso_ipd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pso_ipd</span>, <span class="va">complete</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">pso_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="combine_network.html">combine_network</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="set_ipd.html">set_ipd</a></span><span class="op">(</span><span class="va">pso_ipd</span>,</span></span>
+<span class="r-in"><span>          study <span class="op">=</span> <span class="va">studyc</span>,</span></span>
+<span class="r-in"><span>          trt <span class="op">=</span> <span class="va">trtc</span>,</span></span>
+<span class="r-in"><span>          r <span class="op">=</span> <span class="va">pasi75</span>,</span></span>
+<span class="r-in"><span>          trt_class <span class="op">=</span> <span class="va">trtclass</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="set_agd_arm.html">set_agd_arm</a></span><span class="op">(</span><span class="va">pso_agd</span>,</span></span>
+<span class="r-in"><span>              study <span class="op">=</span> <span class="va">studyc</span>,</span></span>
+<span class="r-in"><span>              trt <span class="op">=</span> <span class="va">trtc</span>,</span></span>
+<span class="r-in"><span>              r <span class="op">=</span> <span class="va">pasi75_r</span>,</span></span>
+<span class="r-in"><span>              n <span class="op">=</span> <span class="va">pasi75_n</span>,</span></span>
+<span class="r-in"><span>              trt_class <span class="op">=</span> <span class="va">trtclass</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Print network details</span></span></span>
+<span class="r-in"><span><span class="va">pso_net</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A network with 3 IPD studies, and 1 AgD study (arm-based).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">-------------------------------------------------------------------</span> <span style="font-weight: bold;">IPD studies</span> <span style="color: #555555;">----</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Study     Treatment arms                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  UNCOVER-1 3: IXE_Q2W | IXE_Q4W | PBO      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  UNCOVER-2 4: ETN | IXE_Q2W | IXE_Q4W | PBO</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  UNCOVER-3 4: ETN | IXE_Q2W | IXE_Q4W | PBO</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Outcome type: binary</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">-------------------------------------------------------</span> <span style="font-weight: bold;">AgD studies (arm-based)</span> <span style="color: #555555;">----</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Study   Treatment arms                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  FIXTURE 4: PBO | ETN | SEC_150 | SEC_300</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Outcome type: count</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">------------------------------------------------------------------------------------</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Total number of treatments: 6, in 3 classes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Total number of studies: 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Reference treatment is: PBO</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Network is <span style="color: #00BB00;">connected</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Add integration points to the network</span></span></span>
+<span class="r-in"><span><span class="va">pso_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="add_integration.html">add_integration</a></span><span class="op">(</span><span class="va">pso_net</span>,</span></span>
+<span class="r-in"><span>  durnpso <span class="op">=</span> <span class="fu"><a href="distr.html">distr</a></span><span class="op">(</span><span class="va">qgamma</span>, mean <span class="op">=</span> <span class="va">durnpso_mean</span>, sd <span class="op">=</span> <span class="va">durnpso_sd</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  prevsys <span class="op">=</span> <span class="fu"><a href="distr.html">distr</a></span><span class="op">(</span><span class="va">qbern</span>, prob <span class="op">=</span> <span class="va">prevsys</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  bsa <span class="op">=</span> <span class="fu"><a href="distr.html">distr</a></span><span class="op">(</span><span class="va">qlogitnorm</span>, mean <span class="op">=</span> <span class="va">bsa_mean</span>, sd <span class="op">=</span> <span class="va">bsa_sd</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  weight <span class="op">=</span> <span class="fu"><a href="distr.html">distr</a></span><span class="op">(</span><span class="va">qgamma</span>, mean <span class="op">=</span> <span class="va">weight_mean</span>, sd <span class="op">=</span> <span class="va">weight_sd</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  psa <span class="op">=</span> <span class="fu"><a href="distr.html">distr</a></span><span class="op">(</span><span class="va">qbern</span>, prob <span class="op">=</span> <span class="va">psa</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  n_int <span class="op">=</span> <span class="fl">64</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Using weighted average correlation matrix computed from IPD studies.</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="co"># Fitting a ML-NMR model.</span></span></span>
+<span class="r-in"><span><span class="co"># Specify a regression model to include effect modifier interactions for five</span></span></span>
+<span class="r-in"><span><span class="co"># covariates, along with main (prognostic) effects. We use a probit link and</span></span></span>
+<span class="r-in"><span><span class="co"># specify that the two-parameter Binomial approximation for the aggregate-level</span></span></span>
+<span class="r-in"><span><span class="co"># likelihood should be used. We set treatment-covariate interactions to be equal</span></span></span>
+<span class="r-in"><span><span class="co"># within each class. We narrow the possible range for random initial values with</span></span></span>
+<span class="r-in"><span><span class="co"># init_r = 0.1, since probit models in particular are often hard to initialise.</span></span></span>
+<span class="r-in"><span><span class="co"># Using the QR decomposition greatly improves sampling efficiency here, as is</span></span></span>
+<span class="r-in"><span><span class="co"># often the case for regression models.</span></span></span>
+<span class="r-in"><span><span class="va">pso_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="nma.html">nma</a></span><span class="op">(</span><span class="va">pso_net</span>, </span></span>
+<span class="r-in"><span>               trt_effects <span class="op">=</span> <span class="st">"fixed"</span>,</span></span>
+<span class="r-in"><span>               link <span class="op">=</span> <span class="st">"probit"</span>,</span></span>
+<span class="r-in"><span>               likelihood <span class="op">=</span> <span class="st">"bernoulli2"</span>,</span></span>
+<span class="r-in"><span>               regression <span class="op">=</span> <span class="op">~</span><span class="op">(</span><span class="va">durnpso</span> <span class="op">+</span> <span class="va">prevsys</span> <span class="op">+</span> <span class="va">bsa</span> <span class="op">+</span> <span class="va">weight</span> <span class="op">+</span> <span class="va">psa</span><span class="op">)</span><span class="op">*</span><span class="va">.trt</span>,</span></span>
+<span class="r-in"><span>               class_interactions <span class="op">=</span> <span class="st">"common"</span>,</span></span>
+<span class="r-in"><span>               prior_intercept <span class="op">=</span> <span class="fu"><a href="priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>               prior_trt <span class="op">=</span> <span class="fu"><a href="priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>               prior_reg <span class="op">=</span> <span class="fu"><a href="priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>               init_r <span class="op">=</span> <span class="fl">0.1</span>,</span></span>
+<span class="r-in"><span>               QR <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Note: Setting "PBO" as the network reference treatment.</span>
+<span class="r-in"><span><span class="va">pso_fit</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A fixed effects ML-NMR with a bernoulli2 likelihood (probit link).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Regression model: ~(durnpso + prevsys + bsa + weight + psa) * .trt.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Centred covariates at the following overall mean values:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   durnpso   prevsys       bsa    weight       psa </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1.8134535 0.6450416 0.2909089 8.9369318 0.2147914 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Inference for Stan model: binomial_2par.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 chains, each with iter=2000; warmup=1000; thin=1; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> post-warmup draws per chain=1000, total post-warmup draws=4000.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                         mean se_mean   sd     2.5%      25%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso]                           0.04    0.00 0.06    -0.07     0.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys]                          -0.14    0.00 0.16    -0.44    -0.25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa]                              -0.06    0.01 0.44    -0.94    -0.36</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight]                            0.04    0.00 0.03    -0.02     0.02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa]                              -0.08    0.00 0.17    -0.42    -0.20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03    0.00 0.07    -0.17    -0.08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01    0.00 0.07    -0.14    -0.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.19    0.00 0.19    -0.18     0.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.07    0.00 0.17    -0.29    -0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.05    0.01 0.52    -0.92    -0.31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassIL blocker]           0.29    0.01 0.49    -0.64    -0.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    0.00 0.04    -0.24    -0.19</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassIL blocker]       -0.10    0.00 0.03    -0.16    -0.12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.06    0.00 0.21    -0.45    -0.20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassIL blocker]           0.01    0.00 0.18    -0.34    -0.12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[ETN]                                  1.55    0.00 0.08     1.40     1.49</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q2W]                              2.95    0.00 0.09     2.79     2.89</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q4W]                              2.54    0.00 0.08     2.39     2.48</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_150]                              2.14    0.00 0.12     1.92     2.07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45    0.00 0.12     2.22     2.37</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1576.41    0.09 3.44 -1584.08 -1578.46</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                          50%      75%    97.5% n_eff Rhat</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso]                           0.04     0.09     0.17  6289    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys]                          -0.14    -0.03     0.18  5741    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa]                              -0.05     0.25     0.77  6177    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight]                            0.04     0.06     0.10  5434    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa]                              -0.07     0.04     0.25  5911    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03     0.02     0.11  6560    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01     0.03     0.12  7175    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.20     0.32     0.56  6078    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.07     0.19     0.40  6284    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.04     0.39     1.08  5973    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassIL blocker]           0.27     0.62     1.27  7052    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    -0.14    -0.10  5582    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassIL blocker]       -0.10    -0.08    -0.04  6989    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.06     0.09     0.35  6467    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassIL blocker]           0.01     0.13     0.37  6917    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[ETN]                                  1.55     1.60     1.71  3939    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q2W]                              2.95     3.01     3.13  5355    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q4W]                              2.54     2.60     2.70  5128    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_150]                              2.14     2.22     2.37  4535    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45     2.53     2.68  5066    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1576.07 -1573.96 -1570.79  1532    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Tue May 27 15:46:33 2025.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
