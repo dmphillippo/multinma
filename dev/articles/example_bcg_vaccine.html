@@ -11,16 +11,15 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.9/font.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Example: BCG vaccine for tuberculosis">
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" integrity="sha384-zh0CIslj+VczCZtlzBcjt5ppRcsAmDnRem7ESsYwWwg3m/OaJ2l4x7YBZl9Kxxib" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js" integrity="sha384-Rma6DA2IPUwhNxmrB/7S3Tno0YY7sFu9WSYMCuulLhIqYSGZ2gKCJWIqhBWqMQfh" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -175,18 +174,12 @@ and then with a meta-regression on the continuous covariate
 <h3 id="re-meta-analysis-no-covariate">RE meta-analysis (no covariate)<a class="anchor" aria-label="anchor" href="#re-meta-analysis-no-covariate"></a>
 </h3>
 <p>We start by fitting a standard RE model without any covariates. We
-use
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mn>100</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{N}(0, 100^2)</annotation></semantics></math>
-prior distributions for the treatment effect
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">e</mi></mrow></msub><annotation encoding="application/x-tex">d_\mathrm{Vaccine}</annotation></semantics></math>
-and study-specific intercepts
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\mu_j</annotation></semantics></math>,
-and a
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">half-N</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mn>5</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\textrm{half-N}(0, 5^2)</annotation></semantics></math>
-prior distribution for the heterogeneity standard deviation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>τ</mi><annotation encoding="application/x-tex">\tau</annotation></semantics></math>.
-We can examine the range of parameter values implied by these prior
-distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
+use <span class="math inline">\mathrm{N}(0, 100^2)</span> prior
+distributions for the treatment effect <span class="math inline">d_\mathrm{Vaccine}</span> and study-specific
+intercepts <span class="math inline">\mu_j</span>, and a <span class="math inline">\textrm{half-N}(0, 5^2)</span> prior distribution
+for the heterogeneity standard deviation <span class="math inline">\tau</span>. We can examine the range of parameter
+values implied by these prior distributions with the
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span></span>
@@ -205,13 +198,24 @@ random effects model specified by
 <span>                     prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                     prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                     prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; / 10000 [ 50%]  (Warmup)</span></span>
+<pre><code><span><span class="co">#&gt; (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 2000 / 10000 [ 20%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 2000 / 10000 [ 20%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 3000 / 10000 [ 30%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 3000 / 10000 [ 30%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 3000 / 10000 [ 30%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 4000 / 10000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 4000 / 10000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 4000 / 10000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 5000 / 10000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 5001 / 10000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 5000 / 10000 [ 50%]  (Warmup)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 5001 / 10000 [ 50%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 5000 / 10000 [ 50%]  (Warmup)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 5001 / 10000 [ 50%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 6000 / 10000 [ 60%]  (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 2: Iteration: 6000 / 10000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 6000 / 10000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 6000 / 10000 [ 60%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 7000 / 10000 [ 70%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 7000 / 10000 [ 70%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 7000 / 10000 [ 70%]  (Sampling)</span></span>
@@ -223,21 +227,21 @@ random effects model specified by
 <span><span class="co">#&gt; Chain 2: Iteration: 9000 / 10000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: Iteration: 10000 / 10000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
-<span><span class="co">#&gt; Chain 3:  Elapsed Time: 1.756 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 3:                1.901 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 3:                3.657 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 1.66 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                1.775 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                3.435 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 3: </span></span>
 <span><span class="co">#&gt; Chain 1: Iteration: 10000 / 10000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
-<span><span class="co">#&gt; Chain 1:  Elapsed Time: 1.807 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 1:                1.94 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 1:                3.747 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 1.718 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                1.78 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                3.498 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 1: </span></span>
 <span><span class="co">#&gt; Chain 2: Iteration: 10000 / 10000 [100%]  (Sampling)</span></span>
 <span><span class="co">#&gt; Chain 2: </span></span>
-<span><span class="co">#&gt; Chain 2:  Elapsed Time: 1.794 seconds (Warm-up)</span></span>
-<span><span class="co">#&gt; Chain 2:                2.211 seconds (Sampling)</span></span>
-<span><span class="co">#&gt; Chain 2:                4.005 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2:  Elapsed Time: 1.693 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 2:                1.912 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2:                3.605 seconds (Total)</span></span>
 <span><span class="co">#&gt; Chain 2:</span></span></code></pre>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
@@ -257,16 +261,12 @@ method:</p>
 <span><span class="co">#&gt; lp__             1</span></span>
 <span><span class="co">#&gt; tau              1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar 26 15:42:13 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue May 27 13:25:54 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
-<p>By default, summaries of the study-specific intercepts
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\mu_j</annotation></semantics></math>
-and random effects
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\delta_j</annotation></semantics></math>
-are hidden, but could be examined by changing the <code>pars</code>
-argument:</p>
+<p>By default, summaries of the study-specific intercepts <span class="math inline">\mu_j</span> and random effects <span class="math inline">\delta_j</span> are hidden, but could be examined by
+changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span>, <span class="st">"tau"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -280,20 +280,12 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <h3 id="re-meta-regression-with-covariate-latitude">RE meta-regression with covariate <code>latitude</code><a class="anchor" aria-label="anchor" href="#re-meta-regression-with-covariate-latitude"></a>
 </h3>
 <p>We now fit a RE meta-regression model, adjusting for
-<code>latitude</code>. We use
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mn>100</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{N}(0, 100^2)</annotation></semantics></math>
-prior distributions for the treatment effect
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">c</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">e</mi></mrow></msub><annotation encoding="application/x-tex">d_\mathrm{Vaccine}</annotation></semantics></math>,
-study-specific intercepts
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\mu_j</annotation></semantics></math>,
-and regression coefficient
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>.
-We use a
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">half-N</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mn>5</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{half-N}(0, 5^2)</annotation></semantics></math>
-prior distribution for the heterogeneity standard deviation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>τ</mi><annotation encoding="application/x-tex">\tau</annotation></semantics></math>.
-We can examine the range of parameter values implied by these prior
-distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
+<code>latitude</code>. We use <span class="math inline">\mathrm{N}(0,
+100^2)</span> prior distributions for the treatment effect <span class="math inline">d_\mathrm{Vaccine}</span>, study-specific intercepts
+<span class="math inline">\mu_j</span>, and regression coefficient <span class="math inline">\beta</span>. We use a <span class="math inline">\text{half-N}(0, 5^2)</span> prior distribution for
+the heterogeneity standard deviation <span class="math inline">\tau</span>. We can examine the range of parameter
+values implied by these prior distributions with the
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 100.</span></span>
@@ -320,7 +312,18 @@ transition errors (the default for RE models is set to 0.95).</p>
 <span>                   prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
 <span>                   adapt_delta <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Note: No treatment classes specified in network, any interactions in `regression` formula will be separate (independent) for each treatment.</span></span>
-<span><span class="co">#&gt; Use set_*() argument `trt_class` and nma() argument `class_interactions` to change this.</span></span></code></pre>
+<span><span class="co">#&gt; Use set_*() argument `trt_class` and nma() argument `class_interactions` to change this.</span></span>
+<span><span class="co">#&gt; %]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 3000 / 5000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 4500 / 5000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 4000 / 5000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 5000 / 5000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 2.26 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                2.154 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                4.414 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 4500 / 5000 [ 90%]  (Sampling)</span></span></code></pre>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -345,18 +348,15 @@ method:</p>
 <span><span class="co">#&gt; lp__                          -13448.27  1772    1</span></span>
 <span><span class="co">#&gt; tau                                0.73  1905    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar 26 15:42:28 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue May 27 13:26:07 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
 <p>Note that <code>latitude</code> has automatically been centered at
 33.46, the mean value for the studies in the network.</p>
-<p>By default, summaries of the study-specific intercepts
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\mu_j</annotation></semantics></math>
-and study-specific relative effects
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mrow><mi>j</mi><mi>k</mi></mrow></msub><annotation encoding="application/x-tex">\delta_{jk}</annotation></semantics></math>
-are hidden, but could be examined by changing the <code>pars</code>
-argument:</p>
+<p>By default, summaries of the study-specific intercepts <span class="math inline">\mu_j</span> and study-specific relative effects
+<span class="math inline">\delta_{jk}</span> are hidden, but could be
+examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"beta"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span>, <span class="st">"tau"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -384,9 +384,8 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <p>The DIC is very similar between the two models, so we might at first
 choose the unadjusted model. The posterior mean residual deviance is
 larger for the model with the covariate, but this model also has a lower
-effective number of parameters
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>p</mi><mi>D</mi></msub><annotation encoding="application/x-tex">p_D</annotation></semantics></math>
-so is allowing for more shrinkage of the random treatment effects.
+effective number of parameters <span class="math inline">p_D</span> so
+is allowing for more shrinkage of the random treatment effects.
 Moreover, the model with the covariate has a much lower estimated
 heterogeneity standard deviation:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
@@ -673,7 +672,7 @@ Excellence</span>. <a href="https://www.sheffield.ac.uk/nice-dsu" class="externa
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

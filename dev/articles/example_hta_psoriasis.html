@@ -11,16 +11,15 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.9/font.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Example: Plaque psoriasis HTA report">
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" integrity="sha384-zh0CIslj+VczCZtlzBcjt5ppRcsAmDnRem7ESsYwWwg3m/OaJ2l4x7YBZl9Kxxib" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js" integrity="sha384-Rma6DA2IPUwhNxmrB/7S3Tno0YY7sFu9WSYMCuulLhIqYSGZ2gKCJWIqhBWqMQfh" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -206,15 +205,10 @@ to specify the ordered outcomes correctly.</p>
 </h3>
 <p>First, we fit a fixed effect model using the <code><a href="../reference/nma.html">nma()</a></code>
 function with <code>trt_effects = "fixed"</code>, using a probit link
-function <code>link = "probit"</code>. We use
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mn>10</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{N}(0, 10^2)</annotation></semantics></math>
-prior distributions for the treatment effects
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mi>k</mi></msub><annotation encoding="application/x-tex">d_k</annotation></semantics></math>,
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mn>100</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{N}(0, 100^2)</annotation></semantics></math>
-prior distributions for the study-specific intercepts
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\mu_j</annotation></semantics></math>.
-We can examine the range of parameter values implied by these prior
+function <code>link = "probit"</code>. We use <span class="math inline">\mathrm{N}(0, 10^2)</span> prior distributions for
+the treatment effects <span class="math inline">d_k</span>, and <span class="math inline">\mathrm{N}(0, 100^2)</span> prior distributions for
+the study-specific intercepts <span class="math inline">\mu_j</span>. We
+can examine the range of parameter values implied by these prior
 distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
@@ -226,17 +220,12 @@ distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class
 <span><span class="co">#&gt; 50% of the prior density lies between -67.45 and 67.45.</span></span>
 <span><span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span></span></code></pre></div>
 <p>We also need to specify prior distributions for the latent cutpoints
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><mtext mathvariant="normal">PASI75</mtext></msub><annotation encoding="application/x-tex">c_\textrm{PASI75}</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><mtext mathvariant="normal">PASI90</mtext></msub><annotation encoding="application/x-tex">c_\textrm{PASI90}</annotation></semantics></math>
-on the underlying scale - here the PASI standardised mean difference due
-to the probit link (the cutpoint
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mtext mathvariant="normal">PASI50</mtext></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">c_\textrm{PASI50}=0</annotation></semantics></math>).
-To make these easier to reason about, we actually specify priors on the
-<em>differences</em> between adjacent cutpoints,
-e.g. <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mtext mathvariant="normal">PASI90</mtext></msub><mo>−</mo><msub><mi>c</mi><mtext mathvariant="normal">PASI75</mtext></msub></mrow><annotation encoding="application/x-tex">c_\textrm{PASI90} - c_\textrm{PASI75}</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mtext mathvariant="normal">PASI75</mtext></msub><mo>−</mo><msub><mi>c</mi><mtext mathvariant="normal">PASI50</mtext></msub></mrow><annotation encoding="application/x-tex">c_\textrm{PASI75} - c_\textrm{PASI50}</annotation></semantics></math>.
+<span class="math inline">c_\textrm{PASI75}</span> and <span class="math inline">c_\textrm{PASI90}</span> on the underlying scale -
+here the PASI standardised mean difference due to the probit link (the
+cutpoint <span class="math inline">c_\textrm{PASI50}=0</span>). To make
+these easier to reason about, we actually specify priors on the
+<em>differences</em> between adjacent cutpoints, e.g. <span class="math inline">c_\textrm{PASI90} - c_\textrm{PASI75}</span> and
+<span class="math inline">c_\textrm{PASI75} - c_\textrm{PASI50}</span>.
 These can be given any positive-valued prior distribution, and Stan will
 automatically impose the necessary ordering constraints behind the
 scenes. We choose to give these implicit flat priors
@@ -249,7 +238,41 @@ scenes. We choose to give these implicit flat priors
 <span>                  prior_intercept <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                  prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
 <span>                  prior_aux <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">flat</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Note: Setting "Supportive care" as the network reference treatment.</span></span></code></pre></div>
+<span><span class="co">#&gt; Note: Setting "Supportive care" as the network reference treatment.</span></span>
+<span><span class="co">#&gt; 0 / 2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: </span></span>
+<span><span class="co">#&gt; Chain 2:  Elapsed Time: 0.703 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 2:                0.488 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2:                1.191 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 2: </span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3: </span></span>
+<span><span class="co">#&gt; Chain 3:  Elapsed Time: 0.685 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 3:                0.509 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3:                1.194 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 3: </span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 0.703 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                0.515 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                1.218 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1:</span></span></code></pre></div>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -284,29 +307,26 @@ method:</p>
 <span><span class="co">#&gt; cc[PASI75]             1</span></span>
 <span><span class="co">#&gt; cc[PASI90]             1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar 26 15:44:28 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue May 27 13:27:38 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
 <blockquote>
 <p><strong>Note:</strong> the treatment effects are the <em>opposite
 sign</em> to those in TSD 2 <span class="citation">(<a href="#ref-TSD2">Dias et al. 2011</a>)</span>. This is because we
-parameterise the linear predictor as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mi>j</mi></msub><mo>+</mo><msub><mi>d</mi><mi>k</mi></msub><mo>+</mo><msub><mi>c</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">\mu_j + d_k + c_m</annotation></semantics></math>,
-rather than
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mi>j</mi></msub><mo>+</mo><msub><mi>d</mi><mi>k</mi></msub><mo>−</mo><msub><mi>c</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">\mu_j + d_k - c_m</annotation></semantics></math>.
-The interpretation here thus follows that of a standard binomial probit
-(or logit) regression; SMDs (or log ORs) greater than zero mean that the
-treatment increases the probability of an event compared to the
-comparator (and less than zero mean a reduction in probability). Here
-higher outcomes are positive, and all of the active treatments are
-estimated to increase the response (i.e. a greater reduction) on the
-PASI scale compared to the network reference (supportive care).</p>
+parameterise the linear predictor as <span class="math inline">\mu_j +
+d_k + c_m</span>, rather than <span class="math inline">\mu_j + d_k -
+c_m</span>. The interpretation here thus follows that of a standard
+binomial probit (or logit) regression; SMDs (or log ORs) greater than
+zero mean that the treatment increases the probability of an event
+compared to the comparator (and less than zero mean a reduction in
+probability). Here higher outcomes are positive, and all of the active
+treatments are estimated to increase the response (i.e. a greater
+reduction) on the PASI scale compared to the network reference
+(supportive care).</p>
 </blockquote>
-<p>By default, summaries of the study-specific intercepts
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\mu_j</annotation></semantics></math>
-are hidden, but could be examined by changing the <code>pars</code>
-argument:</p>
+<p>By default, summaries of the study-specific intercepts <span class="math inline">\mu_j</span> are hidden, but could be examined by
+changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"mu"</span>, <span class="st">"cc"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -326,18 +346,12 @@ these parameters.</p>
 <h3 id="random-effects-meta-analysis">Random effects meta-analysis<a class="anchor" aria-label="anchor" href="#random-effects-meta-analysis"></a>
 </h3>
 <p>We now fit a random effects model using the <code><a href="../reference/nma.html">nma()</a></code>
-function with <code>trt_effects = "random"</code>. Again, we use
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mn>10</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{N}(0, 10^2)</annotation></semantics></math>
-prior distributions for the treatment effects
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mi>k</mi></msub><annotation encoding="application/x-tex">d_k</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mn>100</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{N}(0, 100^2)</annotation></semantics></math>
-prior distributions for the study-specific intercepts
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\mu_j</annotation></semantics></math>,
+function with <code>trt_effects = "random"</code>. Again, we use <span class="math inline">\mathrm{N}(0, 10^2)</span> prior distributions for
+the treatment effects <span class="math inline">d_k</span>, <span class="math inline">\mathrm{N}(0, 100^2)</span> prior distributions for
+the study-specific intercepts <span class="math inline">\mu_j</span>,
 implicit flat prior distributions for the latent cutpoints, and we
-additionally use a
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">half-N</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msup><mn>2.5</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\textrm{half-N}(2.5^2)</annotation></semantics></math>
-prior for the heterogeneity standard deviation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>τ</mi><annotation encoding="application/x-tex">\tau</annotation></semantics></math>.
+additionally use a <span class="math inline">\textrm{half-N}(2.5^2)</span> prior for the
+heterogeneity standard deviation <span class="math inline">\tau</span>.
 We can examine the range of parameter values implied by these prior
 distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
@@ -363,7 +377,16 @@ distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class
 <span>                  prior_aux <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">flat</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>                  prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span>,</span>
 <span>                  adapt_delta <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; Note: Setting "Supportive care" as the network reference treatment.</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; Note: Setting "Supportive care" as the network reference treatment.</span></span>
+<span><span class="co">#&gt; 1: Iteration: 4500 / 5000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2: Iteration: 4500 / 5000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: Iteration: 5000 / 5000 [100%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 1:  Elapsed Time: 12.472 seconds (Warm-up)</span></span>
+<span><span class="co">#&gt; Chain 1:                7.365 seconds (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1:                19.837 seconds (Total)</span></span>
+<span><span class="co">#&gt; Chain 1: </span></span>
+<span><span class="co">#&gt; Chain 3: Iteration: 3500 / 5000 [ 70%]  (Sampling)</span></span></code></pre>
 <p>Basic parameter summaries are given by the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
 method:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
@@ -400,16 +423,13 @@ method:</p>
 <span><span class="co">#&gt; cc[PASI75]          1.00</span></span>
 <span><span class="co">#&gt; cc[PASI90]          1.00</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar 26 15:45:47 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue May 27 13:28:40 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
-<p>By default, summaries of the study-specific intercepts
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\mu_j</annotation></semantics></math>
-and study-specific relative effects
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mrow><mi>j</mi><mi>k</mi></mrow></msub><annotation encoding="application/x-tex">\delta_{jk}</annotation></semantics></math>
-are hidden, but could be examined by changing the <code>pars</code>
-argument:</p>
+<p>By default, summaries of the study-specific intercepts <span class="math inline">\mu_j</span> and study-specific relative effects
+<span class="math inline">\delta_{jk}</span> are hidden, but could be
+examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"cc"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -458,16 +478,12 @@ investigated further to see why this study appears to be an outlier.</p>
 <p><span class="citation">Dias et al. (<a href="#ref-TSD2">2011</a>)</span> produce absolute predictions of
 probability of achieving responses at each PASI cutoff, assuming a
 Normal distribution for the baseline probit probability of PASI50
-response on supportive care with mean
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>1.097</mn></mrow><annotation encoding="application/x-tex">-1.097</annotation></semantics></math>
-and precision
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>123</mn><annotation encoding="application/x-tex">123</annotation></semantics></math>.
-We can replicate these results using the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method.
-The <code>baseline</code> argument takes a <code><a href="../reference/distr.html">distr()</a></code>
-distribution object, with which we specify the corresponding Normal
-distribution. We set <code>type = "response"</code> to produce predicted
-probabilities (<code>type = "link"</code> would produce predicted probit
-probabilities).</p>
+response on supportive care with mean <span class="math inline">-1.097</span> and precision <span class="math inline">123</span>. We can replicate these results using the
+<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method. The <code>baseline</code> argument takes
+a <code><a href="../reference/distr.html">distr()</a></code> distribution object, with which we specify the
+corresponding Normal distribution. We set <code>type = "response"</code>
+to produce predicted probabilities (<code>type = "link"</code> would
+produce predicted probit probabilities).</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, </span>
 <span>                   baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">1.097</span>, sd <span class="op">=</span> <span class="fl">123</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>, </span>
@@ -537,10 +553,9 @@ probability we have PASI 50 event counts, we can use these to construct
 a Beta distribution for the baseline probability of PASI 50 response.
 For example, if 56 out of 408 individuals achieved PASI 50 response on
 supportive care in the target population of interest, the appropriate
-Beta distribution for the response probability would be
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Beta</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mn>56</mn><mo>,</mo><mn>408</mn><mo>−</mo><mn>56</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\textrm{Beta}(56, 408-56)</annotation></semantics></math>.
-We can specify this Beta distribution for the baseline response using
-the <code>baseline_type = "reponse"</code> argument (the default is
+Beta distribution for the response probability would be <span class="math inline">\textrm{Beta}(56, 408-56)</span>. We can specify
+this Beta distribution for the baseline response using the
+<code>baseline_type = "reponse"</code> argument (the default is
 <code>"link"</code>, used above for the baseline probit
 probability).</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
@@ -624,8 +639,7 @@ coding (instead of split into facets):</p>
 <p><img src="example_hta_psoriasis_files/figure-html/pso_pred_RE_colour-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>If the <code>baseline</code> argument is omitted, predicted
 probabilities will be produced for every study in the network based on
-their estimated baseline probit probability
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\mu_j</annotation></semantics></math>.</p>
+their estimated baseline probit probability <span class="math inline">\mu_j</span>.</p>
 </div>
 <div class="section level3">
 <h3 id="ranks-and-rank-probabilities">Ranks and rank probabilities<a class="anchor" aria-label="anchor" href="#ranks-and-rank-probabilities"></a>
@@ -723,7 +737,7 @@ Technology Assessment</em> 10 (46). <a href="https://doi.org/10.3310/hta10460" c
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
