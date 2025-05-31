@@ -11,15 +11,14 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.9/font.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Example: Plaque psoriasis ML-NMR">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" integrity="sha384-zh0CIslj+VczCZtlzBcjt5ppRcsAmDnRem7ESsYwWwg3m/OaJ2l4x7YBZl9Kxxib" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js" integrity="sha384-Rma6DA2IPUwhNxmrB/7S3Tno0YY7sFu9WSYMCuulLhIqYSGZ2gKCJWIqhBWqMQfh" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -29,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -198,17 +197,16 @@ run a ML-NMR model. Firstly, we need to handle the binary covariates
 as <code>TRUE</code> or <code>FALSE</code>, but in the AgD these are
 coded as percentages (out of 100). We need these to transform both of
 these sets of variables so that they are numeric and lie in the interval
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[0,1]</annotation></semantics></math>,
-so that the variables are compatible across the data sources. Whilst we
-are here, we also transform body surface area <code>bsa</code> (a
-percentage) to lie in
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[0,1]</annotation></semantics></math>,
-since that will make specifying an appropriate marginal distribution
-easier later, and rescale <code>weight</code> and <code>duration</code>
-to aid interpretation of the regression coefficients (in terms of 10
-kilos and 10 years respectively). We also add in a <code>trtclass</code>
-variable, indicating which treatments belong to which classes. Finally,
-we check for missing values in the IPD.</p>
+<span class="math inline">[0,1]</span>, so that the variables are
+compatible across the data sources. Whilst we are here, we also
+transform body surface area <code>bsa</code> (a percentage) to lie in
+<span class="math inline">[0,1]</span>, since that will make specifying
+an appropriate marginal distribution easier later, and rescale
+<code>weight</code> and <code>duration</code> to aid interpretation of
+the regression coefficients (in terms of 10 kilos and 10 years
+respectively). We also add in a <code>trtclass</code> variable,
+indicating which treatments belong to which classes. Finally, we check
+for missing values in the IPD.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_ipd</span> <span class="op">&lt;-</span> <span class="va">pso_ipd</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="co"># Variable transformations</span></span>
@@ -321,11 +319,8 @@ aggregate data - specifically, quasi-Monte Carlo (QMC) integration with
 a Gaussian copula <span class="citation">(<a href="#ref-methods_paper">Phillippo et al. 2020</a>; <a href="#ref-Phillippo_thesis">Phillippo 2019</a>)</span>. QMC integration
 is a very general and flexible integration approach, which typically
 requires far fewer integration points than standard (pseudo-random)
-Monte-Carlo integration to achieve the same numerical accuracy.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;The convergence rate of QMC is typically
-&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;𝒪&lt;/mi&gt;&lt;mrow&gt;&lt;mo stretchy="true" form="prefix"&gt;(&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mi&gt;/&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo stretchy="true" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;\mathcal{O}(1/n)&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;,
-whereas the expected convergence rate of standard MC is
-&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;𝒪&lt;/mi&gt;&lt;mrow&gt;&lt;mo stretchy="true" form="prefix"&gt;(&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mi&gt;/&lt;/mi&gt;&lt;msup&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mfrac&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mfrac&gt;&lt;/msup&gt;&lt;mo stretchy="true" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;\mathcal{O}(1/n^\frac{1}{2})&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;span class="citation"&gt;(&lt;a href="#ref-Caflisch1998"&gt;Caflisch 1998&lt;/a&gt;;
-&lt;a href="#ref-Niederreiter1978"&gt;Niederreiter 1978&lt;/a&gt;)&lt;/span&gt;.&lt;/p&gt;'><sup>1</sup></a> A Gaussian
+Monte-Carlo integration to achieve the same numerical accuracy.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;The convergence rate of QMC is typically &lt;span class="math inline"&gt;\mathcal{O}(1/n)&lt;/span&gt;, whereas the expected
+convergence rate of standard MC is &lt;span class="math inline"&gt;\mathcal{O}(1/n^\frac{1}{2})&lt;/span&gt; &lt;span class="citation"&gt;(&lt;a href="#ref-Caflisch1998"&gt;Caflisch 1998&lt;/a&gt;; &lt;a href="#ref-Niederreiter1978"&gt;Niederreiter 1978&lt;/a&gt;)&lt;/span&gt;.&lt;/p&gt;'><sup>1</sup></a> A Gaussian
 copula allows us to account for correlations between covariates, which
 may have any specified marginal distributions.</p>
 <p>We now set up the numerical integration for the network. The five
@@ -414,10 +409,9 @@ models.</p>
 </h4>
 <p>First, we fit a FE ML-NMR model using the function
 <code><a href="../reference/nma.html">nma()</a></code>. Following <span class="citation">(<a href="#ref-methods_paper">Phillippo et al. 2020</a>)</span> we specify
-weakly-informative
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mn>10</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(0, 10^2)</annotation></semantics></math>
-priors on each parameter. The range of parameter values implied by these
-prior distributions can be checked using the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>
+weakly-informative <span class="math inline">N(0, 10^2)</span> priors on
+each parameter. The range of parameter values implied by these prior
+distributions can be checked using the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>
 method:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
@@ -512,14 +506,12 @@ method:</p>
 <span><span class="co">#&gt; d[SEC_300]                              2.69  5369    1</span></span>
 <span><span class="co">#&gt; lp__                                -1570.58  1627    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar 26 10:23:19 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sat May 31 10:44:40 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
-<p>By default, summaries of the study-specific intercepts
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\mu_j</annotation></semantics></math>
-are hidden, but could be examined by changing the <code>pars</code>
-argument:</p>
+<p>By default, summaries of the study-specific intercepts <span class="math inline">\mu_j</span> are hidden, but could be examined by
+changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"beta"</span>, <span class="st">"mu"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -549,14 +541,11 @@ integration error, which can be achieved by setting
 <div class="section level4">
 <h4 id="random-effects-ml-nmr">Random effects ML-NMR<a class="anchor" aria-label="anchor" href="#random-effects-ml-nmr"></a>
 </h4>
-<p>We now fit a RE model. Again, we specify weakly-informative
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mn>10</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(0, 10^2)</annotation></semantics></math>
-priors on each parameter, and now specify a
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">half-N</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mn>2.5</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\textrm{half-N}(0, 2.5^2)</annotation></semantics></math>
-prior for the heterogeneity standard deviation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>τ</mi><annotation encoding="application/x-tex">\tau</annotation></semantics></math>.
-The range of parameter values implied by these prior distributions can
-be checked using the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
+<p>We now fit a RE model. Again, we specify weakly-informative <span class="math inline">N(0, 10^2)</span> priors on each parameter, and now
+specify a <span class="math inline">\textrm{half-N}(0, 2.5^2)</span>
+prior for the heterogeneity standard deviation <span class="math inline">\tau</span>. The range of parameter values implied
+by these prior distributions can be checked using the
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; A Normal prior distribution: location = 0, scale = 10.</span></span>
@@ -646,16 +635,13 @@ method:</p>
 <span><span class="co">#&gt; lp__                                -1571.94   803 1.01</span></span>
 <span><span class="co">#&gt; tau                                     0.48   580 1.00</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Wed Mar 26 10:25:42 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sat May 31 10:47:21 2025.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
-<p>By default, summaries of the study-specific intercepts
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\mu_j</annotation></semantics></math>
-and study-specific relative effects
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mrow><mi>j</mi><mi>k</mi></mrow></msub><annotation encoding="application/x-tex">\delta_{jk}</annotation></semantics></math>
-are hidden, but could be examined by changing the <code>pars</code>
-argument:</p>
+<p>By default, summaries of the study-specific intercepts <span class="math inline">\mu_j</span> and study-specific relative effects
+<span class="math inline">\delta_{jk}</span> are hidden, but could be
+examined by changing the <code>pars</code> argument:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Not run</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d"</span>, <span class="st">"beta"</span>, <span class="st">"tau"</span>, <span class="st">"mu"</span>, <span class="st">"delta"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -1071,8 +1057,7 @@ network object as <code>int_cor</code>.</p>
 <span>  cor <span class="op">=</span> <span class="va">pso_net</span><span class="op">$</span><span class="va">int_cor</span>,</span>
 <span>  n_int <span class="op">=</span> <span class="fl">64</span><span class="op">)</span></span></code></pre></div>
 <p>Predicted probabilities of achieving PASI 75 in this target
-population, given a
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mn>1.75</mn><mo>,</mo><msup><mn>0.08</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(-1.75, 0.08^2)</annotation></semantics></math>
+population, given a <span class="math inline">N(-1.75, 0.08^2)</span>
 distribution on the baseline probit-probability of response on Placebo
 (at the reference levels of the covariates), are then produced using the
 <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method:</p>
@@ -1176,31 +1161,19 @@ the IPD, which we simply exclude from the analysis.</p>
 (multinomial) outcome using the <code><a href="../reference/multi.html">multi()</a></code> helper function.
 The outcome data are in “inclusive” format, i.e. the lowest category is
 the sample size (or 1 for IPD), the second category counts those
-achieving PASI 75 <em>or greater</em>
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≥</mo><mn>75</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">\ge 75\%</annotation></semantics></math>
-reduction in symptoms), the third counts those achieving PASI 90 <em>or
-greater</em>
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≥</mo><mn>90</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">\ge 90\%</annotation></semantics></math>
+achieving PASI 75 <em>or greater</em> (<span class="math inline">\ge
+75\%</span> reduction in symptoms), the third counts those achieving
+PASI 90 <em>or greater</em> (<span class="math inline">\ge 90\%</span>
 reduction), and the final category counts those achieving PASI 100
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>100</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">100\%</annotation></semantics></math>
-reduction).<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;The alternative is “exclusive” format, where the lowest
+(<span class="math inline">100\%</span> reduction).<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;The alternative is “exclusive” format, where the lowest
 category counts those not achieving any higher outcomes (i.e. failure to
-achieve PASI 75,
-&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mo&gt;&amp;lt;&lt;/mo&gt;&lt;mn&gt;75&lt;/mn&gt;&lt;mi&gt;%&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;&amp;lt;75\%&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
-reduction in symptoms), the second counts those achieving PASI 75
-&lt;em&gt;but not PASI 90 or 100&lt;/em&gt;
-(&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mo&gt;≥&lt;/mo&gt;&lt;mn&gt;75&lt;/mn&gt;&lt;mi&gt;%&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;\ge 75\%&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
-and
-&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mo&gt;&amp;lt;&lt;/mo&gt;&lt;mn&gt;90&lt;/mn&gt;&lt;mi&gt;%&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;&amp;lt;90\%&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
-reduction), the third counts those achieving PASI 90 &lt;em&gt;but not PASI
-100&lt;/em&gt;
-(&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mo&gt;≥&lt;/mo&gt;&lt;mn&gt;90&lt;/mn&gt;&lt;mi&gt;%&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;\ge 90\%&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
-and
-&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mo&gt;&amp;lt;&lt;/mo&gt;&lt;mn&gt;100&lt;/mn&gt;&lt;mi&gt;%&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;&amp;lt;100\%&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
-reduction), and the final category counts those achieving PASI 100
-(&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mn&gt;100&lt;/mn&gt;&lt;mi&gt;%&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;100\%&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
-reduction).&lt;/p&gt;'><sup>2</sup></a> We specify the treatment classes with
-<code>trt_class = trtclass</code>.</p>
+achieve PASI 75, &lt;span class="math inline"&gt;&amp;lt;75\%&lt;/span&gt; reduction in
+symptoms), the second counts those achieving PASI 75 &lt;em&gt;but not PASI 90
+or 100&lt;/em&gt; (&lt;span class="math inline"&gt;\ge 75\%&lt;/span&gt; and &lt;span class="math inline"&gt;&amp;lt;90\%&lt;/span&gt; reduction), the third counts those
+achieving PASI 90 &lt;em&gt;but not PASI 100&lt;/em&gt; (&lt;span class="math inline"&gt;\ge 90\%&lt;/span&gt; and &lt;span class="math inline"&gt;&amp;lt;100\%&lt;/span&gt; reduction), and the final category
+counts those achieving PASI 100 (&lt;span class="math inline"&gt;100\%&lt;/span&gt;
+reduction).&lt;/p&gt;'><sup>2</sup></a> We specify the
+treatment classes with <code>trt_class = trtclass</code>.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combine_network.html">combine_network</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/set_ipd.html">set_ipd</a></span><span class="op">(</span><span class="va">pso_ipd</span>,</span>
@@ -1311,14 +1284,13 @@ treatment, so we make the shared effect modifier assumption within each
 class of treatments <span class="citation">(<a href="#ref-TSD18">Phillippo et al. 2016</a>)</span> and specify common
 interaction terms within each treatment class
 (<code>class_interactions = "common"</code>). As before, we specify
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mn>10</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{N}(0, 10^2)</annotation></semantics></math>
-prior distributions on the study-specific intercepts, treatment effects,
-and regression parameters. However, since we now have an ordered
-multinomial likelihood we also need to specify priors for the
-differences between the latent cutoffs for each outcome category; we
-choose an improper flat prior
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">U</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mi>∞</mi><mo>,</mo><mi>∞</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{U}(-\infty,\infty)</annotation></semantics></math>
-which will automatically be truncated to meet the ordering constraints
+<span class="math inline">\mathrm{N}(0, 10^2)</span> prior distributions
+on the study-specific intercepts, treatment effects, and regression
+parameters. However, since we now have an ordered multinomial likelihood
+we also need to specify priors for the differences between the latent
+cutoffs for each outcome category; we choose an improper flat prior
+<span class="math inline">\mathrm{U}(-\infty,\infty)</span> which will
+automatically be truncated to meet the ordering constraints
 (<code>prior_aux = flat()</code>).</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_fit_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">pso_net</span>, </span>
@@ -1437,9 +1409,8 @@ effects (UME) model.</p>
 heterogeneity. The call to the <code><a href="../reference/nma.html">nma()</a></code> function is identical
 to the fixed effect model above, except that now we specify
 <code>trt_effects = "random"</code> and need to provide a prior for the
-between-study heterogeneity (we choose a
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">half-N</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mn>2.5</mn><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\textrm{half-N}(0, 2.5^2)</annotation></semantics></math>
-prior with <code>prior_het = half_normal(scale = 2.5)</code>.</p>
+between-study heterogeneity (we choose a <span class="math inline">\textrm{half-N}(0, 2.5^2)</span> prior with
+<code>prior_het = half_normal(scale = 2.5)</code>.</p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pso_fit_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">pso_net</span>, </span>
 <span>                  trt_effects <span class="op">=</span> <span class="st">"random"</span>,</span>
@@ -1888,7 +1859,7 @@ interactions, one covariate at a time).</p>
 <span><span class="co"># Plot</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">value</span>, y <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_rev.html" class="external-link">fct_rev</a></span><span class="op">(</span><span class="va">treatment</span><span class="op">)</span>, colour <span class="op">=</span> <span class="va">Interactions</span>, fill <span class="op">=</span> <span class="va">Interactions</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">0</span>, colour <span class="op">=</span> <span class="st">"grey70"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggdist</span><span class="fu">::</span><span class="fu"><a href="http://mjskay.github.io/ggdist/reference/stat_halfeye.html" class="external-link">stat_halfeye</a></span><span class="op">(</span>normalize <span class="op">=</span> <span class="st">"panels"</span>, slab_alpha <span class="op">=</span> <span class="fl">0.3</span>, .width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.95</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggdist</span><span class="fu">::</span><span class="fu"><a href="https://mjskay.github.io/ggdist/reference/stat_halfeye.html" class="external-link">stat_halfeye</a></span><span class="op">(</span>normalize <span class="op">=</span> <span class="st">"panels"</span>, slab_alpha <span class="op">=</span> <span class="fl">0.3</span>, .width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.95</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="st">"covariatef"</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Interaction effect (SMD)"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Treatment / Class"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -2623,7 +2594,7 @@ of Dermatology and Venereology</em> 34 (2): 310–18. <a href="https://doi.org/1
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
