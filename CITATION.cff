@@ -8,7 +8,7 @@ message: 'To cite package "multinma" in publications use:'
 type: software
 license: GPL-3.0-only
 title: 'multinma: Bayesian Network Meta-Analysis of Individual and Aggregate Data'
-version: 0.8.1
+version: 0.8.1.9000
 doi: 10.5281/zenodo.3904454
 identifiers:
 - type: doi
@@ -31,7 +31,7 @@ preferred-citation:
     email: david.phillippo@bristol.ac.uk
     orcid: https://orcid.org/0000-0003-2672-7841
   year: '2024'
-  notes: R package version 0.8.1
+  notes: R package version 0.8.1.9000
   url: https://dmphillippo.github.io/multinma/
   doi: 10.5281/zenodo.3904454
 repository: https://CRAN.R-project.org/package=multinma
@@ -249,6 +249,7 @@ references:
   - family-names: Boshnakov
     given-names: Georgi N.
     email: georgi.boshnakov@manchester.ac.uk
+    orcid: https://orcid.org/0000-0003-2839-346X
   year: '2025'
   doi: 10.32614/CRAN.package.Rdpack
   version: '>= 0.7'
@@ -319,11 +320,11 @@ references:
   authors:
   - family-names: Wickham
     given-names: Hadley
-    email: hadley@rstudio.com
+    email: hadley@posit.co
     orcid: https://orcid.org/0000-0003-4757-117X
   - family-names: Henry
     given-names: Lionel
-    email: lionel@rstudio.com
+    email: lionel@posit.co
   year: '2025'
   doi: 10.32614/CRAN.package.purrr
 - type: software
