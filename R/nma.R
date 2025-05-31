@@ -1347,6 +1347,8 @@ if (class_effects == "exchangeable") {
               regression = regression,
               aux_regression = aux_regression,
               class_interactions = if (!is.null(regression) && !is.null(network$classes)) class_interactions else NULL,
+              class_effects = class_effects,
+              class_sd = if (class_effects == "exchangeable") class_sd else NULL,
               xbar = xbar,
               likelihood = likelihood,
               link = link,
@@ -1824,6 +1826,13 @@ if (class_effects == "exchangeable") {
     stanargs$control <- purrr::list_modify(stanargs$control, adapt_delta = adapt_delta)
   else
     stanargs$control <- list(adapt_delta = adapt_delta)
+
+  # Global option rstan_refresh for refresh
+  if (!"refresh" %in% names(stanargs) && !is.null(getOption("rstan_refresh"))) {
+    refresh <- getOption("rstan_refresh")
+    if (!rlang::is_integerish(refresh, n = 1, finite = TRUE)) abort("Global option `rstan_refresh` must be an integer.")
+    stanargs$refresh <- refresh
+  }
 
   # Set chain_id to make CHAIN_ID available in data block
   stanargs$chain_id <- 1L

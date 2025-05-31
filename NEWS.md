@@ -1,3 +1,7 @@
+# multinma 0.8.1
+
+* Fix: Update deprecated Stan array syntax (PR #51).
+
 # multinma 0.8.0
 
 * Feature: Class effects models are now available, thanks to @sjperren (PR #37).
