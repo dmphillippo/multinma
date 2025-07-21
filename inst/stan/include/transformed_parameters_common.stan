@@ -83,7 +83,7 @@ vector[n_delta] f_delta =
   // Add class effects contribution
   if (class_effects) {
     for (i in 1:ni_ipd) {
-      if (ipd_trt[ipd_arm[i]] > 1 && which_CE[ipd_trt[ipd_arm[i]] - 1]) {
+      if (ipd_trt[ipd_arm[i]] > 1 && ipd_trt[ipd_arm[i]] <= nt && which_CE[ipd_trt[ipd_arm[i]] - 1]) {
         eta_ipd[i] += f_class[which_class[ipd_trt[ipd_arm[i] - 1]]];
       }
     }
@@ -99,10 +99,10 @@ vector[n_delta] f_delta =
       // Add class effects contribution
       if (class_effects) {
         for (i in 1:ni_agd_arm){
-          if (agd_contrast_trt[i] > 1 && which_CE[agd_contrast_trt[i] - 1]) {
+          if (agd_contrast_trt[i] > 1 && agd_contrast_trt[i] <= nt && which_CE[agd_contrast_trt[i] - 1]) {
             eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_class[agd_contrast_trt[i] - 1]];
           }
-          if (agd_contrast_trt_b[i] > 1 && which_CE[agd_contrast_trt_b[i] - 1]) {
+          if (agd_contrast_trt_b[i] > 1 && agd_contrast_trt_b[i] <= nt && which_CE[agd_contrast_trt_b[i] - 1]) {
             eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] -= f_class[which_class[agd_contrast_trt_b[i] - 1]];
           }
         }
@@ -149,10 +149,10 @@ vector[n_delta] f_delta =
 
       if (class_effects) {
         for (i in 1:ni_agd_contrast) {
-          if (agd_contrast_trt[i] > 1 && which_CE[agd_contrast_trt[i] - 1]) {
+          if (agd_contrast_trt[i] > 1 && agd_contrast_trt[i] <= nt && which_CE[agd_contrast_trt[i] - 1]) {
             eta_agd_contrast_bar[i] += f_class[which_class[agd_contrast_trt[i] - 1]];
           }
-          if (agd_contrast_trt_b[i] > 1 && which_CE[agd_contrast_trt_b[i] - 1]) {
+          if (agd_contrast_trt_b[i] > 1 && agd_contrast_trt_b[i] <= nt && which_CE[agd_contrast_trt_b[i] - 1]) {
             eta_agd_contrast_bar[i] -= f_class[which_class[agd_contrast_trt_b[i] - 1]];
           }
         }
