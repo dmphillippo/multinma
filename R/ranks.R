@@ -126,6 +126,20 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
   if (x$consistency != "consistency")
     abort(glue::glue("Cannot produce ranks under inconsistency '{x$consistency}' model."))
 
+  # Check for ranking ambiguity in TTE parametric models with aux treatment effects
+  is_tte_parametric <- x$likelihood %in% c("weibull", "gompertz", "weibull-aft",
+                                           "lognormal", "loglogistic", "gamma", "gengamma")
+  has_aux_trt_effects <- (!is.null(x$aux_by) && ".trt" %in% x$aux_by) ||
+                         (!is.null(x$aux_regression) && any(grepl("^\\.trt", colnames(attr(terms(x$aux_regression), "factor")))))
+
+  if (is_tte_parametric && has_aux_trt_effects) {
+    warn(paste("Treatment rankings may be ambiguous for time-to-event parametric models",
+               "with auxiliary treatment effects (aux_by or aux_regression including .trt).",
+               "Rankings are based on main treatment effects (d) only, but auxiliary",
+               "treatment effects (d_aux) on distributional parameters also influence",
+               "treatment comparisons. Consider examining both sets of effects."))
+  }
+
   # Get reference treatment, number of treatments
   trt_ref <- levels(x$network$treatments)[1]
   ntrt <- nlevels(x$network$treatments)

@@ -166,6 +166,9 @@ add_integration.data.frame <- function(x, ...,
 
       if (ncol(cor) != nx)
         abort("Dimensions of correlation matrix `cor` and number of covariates specified in `...` do not match.")
+
+      # Detect multicollinearity in user-provided correlation matrix
+      detect_multicollinearity(cor, x_names)
     } else {
       abort("Specify a correlation matrix using the `cor` argument.")
     }
@@ -208,6 +211,9 @@ add_integration.data.frame <- function(x, ...,
         warn("Adjusted correlation matrix not positive definite; using Matrix::nearPD().")
         copula_cor <- as.matrix(Matrix::nearPD(copula_cor, corr = TRUE)$mat)
       }
+      
+      # Detect multicollinearity in adjusted correlation matrix
+      detect_multicollinearity(copula_cor, x_names)
     }
 
     cop <- copula::normalCopula(copula::P2p(copula_cor), dim = nx, dispstr = "un")
@@ -368,6 +374,9 @@ add_integration.nma_data <- function(x, ...,
     ipd_cor <- (exp(2 * w_z) - 1) / (exp(2 * w_z) + 1)
 
     diag(ipd_cor) <- 1
+
+    # Detect multicollinearity in IPD-derived correlation matrix
+    detect_multicollinearity(ipd_cor, x_names)
 
     cor <- ipd_cor
   }
@@ -780,4 +789,105 @@ cor_adjust_pearson <- function(X, types) {
   diag(X) <- 1
 
   return(X)
+}
+
+# Internal function to detect multicollinearity in correlation matrices
+detect_multicollinearity <- function(cor_matrix, var_names, 
+                                    high_cor_threshold = 0.95,
+                                    cond_num_threshold = 30,
+                                    det_threshold = 1e-8) {
+  
+  # Input validation
+  if (!is.matrix(cor_matrix) || !is.numeric(cor_matrix)) {
+    abort("cor_matrix must be a numeric matrix")
+  }
+  
+  if (!isSymmetric(cor_matrix)) {
+    abort("cor_matrix must be symmetric")
+  }
+  
+  if (missing(var_names) || length(var_names) != ncol(cor_matrix)) {
+    abort("var_names must be provided and match the number of columns in cor_matrix")
+  }
+  
+  n_vars <- ncol(cor_matrix)
+  
+  # Skip detection for single variable case
+  if (n_vars <= 1) {
+    return(invisible(NULL))
+  }
+  
+  issues_found <- list()
+  
+  # 1. Check for high pairwise correlations
+  high_cors <- which(abs(cor_matrix) >= high_cor_threshold & upper.tri(cor_matrix, diag = FALSE), arr.ind = TRUE)
+  if (nrow(high_cors) > 0) {
+    high_cor_pairs <- apply(high_cors, 1, function(idx) {
+      paste0(var_names[idx[1]], " & ", var_names[idx[2]], 
+             " (r = ", round(cor_matrix[idx[1], idx[2]], 3), ")")
+    })
+    issues_found$high_correlations <- high_cor_pairs
+  }
+  
+  # 2. Check condition number
+  eigenvals <- eigen(cor_matrix, symmetric = TRUE)$values
+  condition_number <- max(eigenvals) / min(eigenvals[eigenvals > 1e-12])
+  
+  if (condition_number > cond_num_threshold) {
+    issues_found$condition_number <- condition_number
+  }
+  
+  # 3. Check determinant (near-singularity)
+  det_val <- det(cor_matrix)
+  if (det_val < det_threshold) {
+    issues_found$determinant <- det_val
+  }
+  
+  # 4. Check for near-zero eigenvalues
+  near_zero_eigs <- eigenvals[eigenvals < 1e-8]
+  if (length(near_zero_eigs) > 0) {
+    issues_found$eigenvalues <- near_zero_eigs
+  }
+  
+  # Issue warnings if problems detected
+  if (length(issues_found) > 0) {
+    warning_msgs <- character()
+    
+    if (!is.null(issues_found$high_correlations)) {
+      warning_msgs <- c(warning_msgs, 
+        paste("High pairwise correlations detected (|r| >= ", high_cor_threshold, "):\n  ",
+              paste(issues_found$high_correlations, collapse = "\n  ")))
+    }
+    
+    if (!is.null(issues_found$condition_number)) {
+      warning_msgs <- c(warning_msgs,
+        paste("High condition number detected:", round(issues_found$condition_number, 2),
+              "(threshold:", cond_num_threshold, ")"))
+    }
+    
+    if (!is.null(issues_found$determinant)) {
+      warning_msgs <- c(warning_msgs,
+        paste("Near-singular matrix detected, determinant =", 
+              format(issues_found$determinant, scientific = TRUE),
+              "(threshold:", format(det_threshold, scientific = TRUE), ")"))
+    }
+    
+    if (!is.null(issues_found$eigenvalues)) {
+      warning_msgs <- c(warning_msgs,
+        paste("Matrix has", length(issues_found$eigenvalues), 
+              "near-zero eigenvalue(s), smallest =",
+              format(min(issues_found$eigenvalues), scientific = TRUE)))
+    }
+    
+    # Add remediation advice
+    warning_msgs <- c(warning_msgs, "",
+      "Multicollinearity may lead to numerical instability in ML-NMR models.",
+      "Consider: (1) removing highly correlated variables, (2) using PCA or",
+      "factor analysis, (3) regularization techniques, or (4) domain knowledge",
+      "to select the most clinically relevant variables.")
+    
+    warn(paste(warning_msgs, collapse = "\n"))
+  }
+  
+  return(invisible(issues_found))
 }

@@ -1074,6 +1074,9 @@ nma <- function(network,
         }
       }
 
+      # Store original knots before transformations
+      knots_original <- knots
+
       # Set up basis
       # Only evaluate at first boundary knot for now to save time/memory
       knots <- purrr::map(knots, sort)
@@ -1363,7 +1366,10 @@ if (class_effects == "exchangeable") {
                             prior_aux = if (has_aux) prior_aux else NULL,
                             prior_aux_reg = if (has_aux_regression) prior_aux_reg else NULL))
 
-  if (likelihood %in% c("mspline", "pexp")) out$basis <- basis
+  if (likelihood %in% c("mspline", "pexp")) {
+    out$basis <- basis
+    out$knots <- knots_original
+  }
 
   if (inherits(network, "mlnmr_data")) class(out) <- c("stan_mlnmr", "stan_nma")
   else class(out) <- "stan_nma"
