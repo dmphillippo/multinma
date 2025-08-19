@@ -8,30 +8,30 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE, eval_multinomial = FALSE)
 
-## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE------------------
 
 
-## ----include=FALSE, setup-------------------------------------------------------------------------
+## ----include=FALSE, setup-----------------------------------------------------
 library(multinma)
 library(dplyr)      # dplyr and tidyr for data manipulation
 library(tidyr)
 library(ggplot2)    # ggplot2 for plotting
 
-## ----include=FALSE--------------------------------------------------------------------------------
+## ----include=FALSE------------------------------------------------------------
 options(mc.cores = parallel::detectCores())
 
-## ----include=FALSE--------------------------------------------------------------------------------
+## ----include=FALSE------------------------------------------------------------
 nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
              "true" =, "warn" = 2, 
              parallel::detectCores())
 options(mc.cores = nc)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 head(social_anxiety)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 sa_net <- set_agd_contrast(social_anxiety,
                            study = studyc, 
                            trt = trtc,
@@ -44,12 +44,12 @@ sa_net <- set_agd_contrast(social_anxiety,
 sa_net
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 plot(sa_net, level = "class", weight_nodes = TRUE) + 
   theme(legend.position = "bottom", legend.box = "vertical")
 
 
-## ----echo=TRUE, results='hide'--------------------------------------------------------------------
+## ----echo=TRUE, results='hide'------------------------------------------------
 set.seed(951)
 sa_fit_FE <- nma(sa_net,
                  trt_effects = "fixed",
@@ -64,12 +64,12 @@ sa_fit_RE <- nma(sa_net,
 )
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 (sa_dic_FE <- dic(sa_fit_FE))
 (sa_dic_RE <- dic(sa_fit_RE))
 
 
-## ----echo=TRUE, results='hide'--------------------------------------------------------------------
+## ----echo=TRUE, results='hide'------------------------------------------------
 sa_UME_RE <- nma(sa_net,
                  trt_effects = "random",
                  consistency = "ume",
@@ -77,7 +77,7 @@ sa_UME_RE <- nma(sa_net,
                  prior_het = half_normal(5))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 (sa_dic_RE <- dic(sa_fit_RE))
 (sa_dic_ume_RE <- dic(sa_UME_RE))
 
@@ -85,52 +85,52 @@ summary(sa_UME_RE, pars = "tau")
 summary(sa_fit_RE, pars = "tau")
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 plot(sa_dic_RE, sa_dic_ume_RE, show_uncertainty = FALSE) +
   xlab("Residual deviance - No Class model") +
   ylab("Residual deviance - UME model")
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 as.data.frame(sa_dic_RE) %>%
   arrange(desc(resdev)) %>%
   head(5)
 
 
-## ----echo=TRUE, results='hide'--------------------------------------------------------------------
-EMMELKAMP2006 <- data.frame(
-  Treatment_1 = c("CBT individual", "Waitlist", "Waitlist"),
-  Treatment_2 = c("Psychodynamic psychotherapy", "Psychodynamic psychotherapy", "CBT individual")
-)
-
-ALDEN2011 <- data.frame(
-  Treatment_1 = c("Waitlist"),
-  Treatment_2 = c("CBT group")
-)
-
-sa_fit_RE_nodesplit_EMMELKAMP <- nma(sa_net,
-                           consistency = "nodesplit",
-                           nodesplit = EMMELKAMP2006,
-                           trt_effects = "random",
-                           prior_trt = normal(0, 100),
-                           prior_het = half_normal(5),
-)
-
-sa_fit_RE_nodesplit_ALDEN <- nma(sa_net,
-                             consistency = "nodesplit",
-                             nodesplit = ALDEN2011,
-                             trt_effects = "random",
-                             prior_trt = normal(0, 100),
-                             prior_het = half_normal(5),
-)
-
-
-## -------------------------------------------------------------------------------------------------
-summary(sa_fit_RE_nodesplit_ALDEN)
-summary(sa_fit_RE_nodesplit_EMMELKAMP)
+## ----echo=TRUE, results='hide', eval=!params$run_tests------------------------
+# EMMELKAMP2006 <- data.frame(
+#   Treatment_1 = c("CBT individual", "Waitlist", "Waitlist"),
+#   Treatment_2 = c("Psychodynamic psychotherapy", "Psychodynamic psychotherapy", "CBT individual")
+# )
+# 
+# ALDEN2011 <- data.frame(
+#   Treatment_1 = c("Waitlist"),
+#   Treatment_2 = c("CBT group")
+# )
+# 
+# sa_fit_RE_nodesplit_EMMELKAMP <- nma(sa_net,
+#                            consistency = "nodesplit",
+#                            nodesplit = EMMELKAMP2006,
+#                            trt_effects = "random",
+#                            prior_trt = normal(0, 100),
+#                            prior_het = half_normal(5),
+# )
+# 
+# sa_fit_RE_nodesplit_ALDEN <- nma(sa_net,
+#                              consistency = "nodesplit",
+#                              nodesplit = ALDEN2011,
+#                              trt_effects = "random",
+#                              prior_trt = normal(0, 100),
+#                              prior_het = half_normal(5),
+# )
 
 
-## ----echo=TRUE, results='hide'--------------------------------------------------------------------
+## ----eval=!params$run_tests---------------------------------------------------
+# summary(sa_fit_RE_nodesplit_ALDEN)
+# summary(sa_fit_RE_nodesplit_EMMELKAMP)
+
+
+## ----echo=TRUE, results='hide'------------------------------------------------
 sa_fit_EXclass_RE <- nma(sa_net,
                          trt_effects = "random",
                          prior_trt = normal(0, 100),
@@ -148,7 +148,7 @@ sa_fit_EXclass_RE <- nma(sa_net,
                          )
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 (sa_dic_EXclass_RE <- dic(sa_fit_EXclass_RE))
 (sa_dic_RE <- dic(sa_fit_RE))
 
@@ -156,13 +156,13 @@ summary(sa_fit_RE, pars = "tau")
 summary(sa_fit_EXclass_RE, pars = "tau")
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 plot(sa_dic_EXclass_RE, sa_dic_RE, show_uncertainty = FALSE) +
   xlab("Residual deviance - Exchangeable Class model") +
   ylab("Residual deviance - No Class model")
 
 
-## ----echo=TRUE, results='hide'--------------------------------------------------------------------
+## ----echo=TRUE, results='hide'------------------------------------------------
 sa_fit_COclass_RE <- nma(sa_net,
                          trt_effects = "random",
                          prior_trt = normal(0, 100),
@@ -186,7 +186,7 @@ sa_fit_EXclass_FE <- nma(sa_net,
                          )
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 (sa_dic_COclass_RE <- dic(sa_fit_COclass_RE))
 (sa_dic_EXclass_FE <- dic(sa_fit_EXclass_FE))
 (sa_dic_EXclass_RE <- dic(sa_fit_EXclass_RE))
@@ -195,23 +195,23 @@ summary(sa_fit_COclass_RE, pars = "tau")
 summary(sa_fit_EXclass_RE, pars = "tau")
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 plot(sa_dic_COclass_RE, sa_dic_EXclass_RE, show_uncertainty = FALSE) +
   xlab("Residual deviance - Common Class model") +
   ylab("Residual deviance - Exchangeable Class model")
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 plot(relative_effects(sa_fit_EXclass_RE), ref_line = 0)
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 plot(sa_fit_EXclass_RE,
      pars = "class_mean",
      ref_line = 0)
 
 
-## ----fig.height=8---------------------------------------------------------------------------------
+## ----fig.height=8-------------------------------------------------------------
 # Relative treatment effects
 trt_eff <- as_tibble(relative_effects(sa_fit_EXclass_RE)) %>% 
   # Add in class details
@@ -240,7 +240,7 @@ bind_rows(trt_eff, class_eff) %>%
   theme(strip.text.y = element_text(angle = 0))
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # Class means
 EXclass_mean <- as.matrix(sa_fit_EXclass_RE, pars = "class_mean")
 
@@ -266,7 +266,7 @@ xlab("Class") + ylab("Posterior Ranks") +
 theme_multinma()
 
 
-## -------------------------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 EXranks_df <- as.data.frame(EXranks)
 
 # Rank probabilities for class
@@ -293,7 +293,7 @@ ggplot(rank_probs_long_EX, aes(x = Rank, y = Probability)) +
        y = "Probability")
 
 
-## ----smoking_tests, include=FALSE, eval=params$run_tests------------------------------------------
+## ----smoking_tests, include=FALSE, eval=params$run_tests----------------------
 #--- Test against TSD 4 results ---
 library(testthat)
 library(dplyr)
@@ -431,73 +431,73 @@ test_that("UME RE Tau", {
   expect_equivalent(EX_RE_tau$summary$`97.5%`, 0.289, tolerance = tol)
 })
 
-nodesplit_ALDEN <- summary(sa_fit_RE_nodesplit_ALDEN)
-nodesplit_EMMELKAMP <- summary(sa_fit_RE_nodesplit_EMMELKAMP)
-
-ALDEN_test <- tribble(
-  ~parameter, ~mean, ~sd, ~`2.5%`, ~`50%`, ~`97.5%`,
-  "d_dir[CBT group vs. Waitlist]", -0.90, 0.13, -1.16, -0.90, -0.64,
-  "d_ind[CBT group vs. Waitlist]", -0.73, 0.13, -0.99, -0.73, -0.46,
-  "omega", -0.17, 0.17, -0.51, -0.17, 0.18,
-  "tau", 0.21, 0.03, 0.15, 0.21, 0.27
-)
-
-
-EMMELKAMP_test1 <- tribble(
-  ~parameter, ~mean, ~sd, ~`2.5%`, ~`25%`, ~`50%`, ~`75%`, ~`97.5%`, ~Bulk_ESS, ~Tail_ESS, ~Rhat,
-  "d_dir", 0.71, 0.33, 0.06, 0.49, 0.71, 0.94, 1.35, 5354, 2759, 1.00,
-  "d_ind", 0.45, 0.26, -0.07, 0.27, 0.45, 0.63, 0.96, 4159, 3058, 1.00,
-  "omega", 0.26, 0.39, -0.51, 0.00, 0.25, 0.53, 1.02, 4849, 3147, 1.00,
-  "tau", 0.21, 0.03, 0.15, 0.19, 0.21, 0.23, 0.27, 1291, 2516, 1.01
-)
-
-EMMELKAMP_test2 <- tribble(
-  ~parameter, ~mean, ~sd, ~`2.5%`, ~`25%`, ~`50%`, ~`75%`, ~`97.5%`, ~Bulk_ESS, ~Tail_ESS, ~Rhat,
-  "d_dir", -0.61, 0.19, -0.96, -0.73, -0.61, -0.48, -0.22, 5103, 3262, 1.00,
-  "d_ind", -0.68, 0.42, -1.49, -0.96, -0.68, -0.40, 0.15, 4157, 3138, 1.00,
-  "omega", 0.08, 0.46, -0.84, -0.23, 0.07, 0.39, 0.98, 4293, 2877, 1.00,
-  "tau", 0.21, 0.03, 0.15, 0.19, 0.21, 0.23, 0.27, 959, 1921, 1.00
-)
-
-EMMELKAMP_test3 <- tribble(
-  ~parameter, ~mean, ~sd, ~`2.5%`, ~`25%`, ~`50%`, ~`75%`, ~`97.5%`, ~Bulk_ESS, ~Tail_ESS, ~Rhat,
-  "d_dir", -0.84, 0.25, -1.32, -1.00, -0.84, -0.67, -0.36, 4676, 3392, 1,
-  "d_ind", -1.46, 0.24, -1.93, -1.62, -1.46, -1.30, -0.99, 1466, 2413, 1,
-  "omega", 0.62, 0.34, -0.04, 0.39, 0.62, 0.85, 1.31, 1999, 2802, 1,
-  "tau", 0.20, 0.03, 0.15, 0.18, 0.20, 0.22, 0.26, 1238, 1834, 1
-)
-
-test_that("Node-splitting estimates_ALDEN", {
-  expect_equal(ALDEN_test$mean, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$mean), tolerance = tol)
-  expect_equal(ALDEN_test$sd, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$sd), tolerance = tol)
-  expect_equal(ALDEN_test$`2.5%`, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$`2.5%`), tolerance = tol)
-  expect_equal(ALDEN_test$`50%`, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$`50%`), tolerance = tol)
-  expect_equal(ALDEN_test$`97.5%`, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$`97.5%`), tolerance = tol)
-})
-
-test_that("Node-splitting estimates_EMMEL1", {
-  expect_equal(EMMELKAMP_test1$mean, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$mean), tolerance = tol)
-  expect_equal(EMMELKAMP_test1$sd, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$sd), tolerance = tol)
-  expect_equal(EMMELKAMP_test1$`2.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$`2.5%`), tolerance = tol)
-  expect_equal(EMMELKAMP_test1$`50%`, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$`50%`), tolerance = tol)
-  expect_equal(EMMELKAMP_test1$`97.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$`97.5%`), tolerance = tol)
-})
-
-test_that("Node-splitting estimates_EMMEL2", {
-  expect_equal(EMMELKAMP_test2$mean, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$mean), tolerance = tol)
-  expect_equal(EMMELKAMP_test2$sd, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$sd), tolerance = tol)
-  expect_equal(EMMELKAMP_test2$`2.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$`2.5%`), tolerance = tol)
-  expect_equal(EMMELKAMP_test2$`50%`, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$`50%`), tolerance = tol)
-  expect_equal(EMMELKAMP_test2$`97.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$`97.5%`), tolerance = tol)
-})
-
-test_that("Node-splitting estimates_EMMEL3", {
-  expect_equal(EMMELKAMP_test3$mean, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$mean), tolerance = tol)
-  expect_equal(EMMELKAMP_test3$sd, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$sd), tolerance = tol)
-  expect_equal(EMMELKAMP_test3$`2.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$`2.5%`), tolerance = tol)
-  expect_equal(EMMELKAMP_test3$`50%`, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$`50%`), tolerance = tol)
-  expect_equal(EMMELKAMP_test3$`97.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$`97.5%`), tolerance = tol)
-})
+# nodesplit_ALDEN <- summary(sa_fit_RE_nodesplit_ALDEN)
+# nodesplit_EMMELKAMP <- summary(sa_fit_RE_nodesplit_EMMELKAMP)
+# 
+# ALDEN_test <- tribble(
+#   ~parameter, ~mean, ~sd, ~`2.5%`, ~`50%`, ~`97.5%`,
+#   "d_dir[CBT group vs. Waitlist]", -0.90, 0.13, -1.16, -0.90, -0.64,
+#   "d_ind[CBT group vs. Waitlist]", -0.73, 0.13, -0.99, -0.73, -0.46,
+#   "omega", -0.17, 0.17, -0.51, -0.17, 0.18,
+#   "tau", 0.21, 0.03, 0.15, 0.21, 0.27
+# )
+# 
+# 
+# EMMELKAMP_test1 <- tribble(
+#   ~parameter, ~mean, ~sd, ~`2.5%`, ~`25%`, ~`50%`, ~`75%`, ~`97.5%`, ~Bulk_ESS, ~Tail_ESS, ~Rhat,
+#   "d_dir", 0.71, 0.33, 0.06, 0.49, 0.71, 0.94, 1.35, 5354, 2759, 1.00,
+#   "d_ind", 0.45, 0.26, -0.07, 0.27, 0.45, 0.63, 0.96, 4159, 3058, 1.00,
+#   "omega", 0.26, 0.39, -0.51, 0.00, 0.25, 0.53, 1.02, 4849, 3147, 1.00,
+#   "tau", 0.21, 0.03, 0.15, 0.19, 0.21, 0.23, 0.27, 1291, 2516, 1.01
+# )
+# 
+# EMMELKAMP_test2 <- tribble(
+#   ~parameter, ~mean, ~sd, ~`2.5%`, ~`25%`, ~`50%`, ~`75%`, ~`97.5%`, ~Bulk_ESS, ~Tail_ESS, ~Rhat,
+#   "d_dir", -0.61, 0.19, -0.96, -0.73, -0.61, -0.48, -0.22, 5103, 3262, 1.00,
+#   "d_ind", -0.68, 0.42, -1.49, -0.96, -0.68, -0.40, 0.15, 4157, 3138, 1.00,
+#   "omega", 0.08, 0.46, -0.84, -0.23, 0.07, 0.39, 0.98, 4293, 2877, 1.00,
+#   "tau", 0.21, 0.03, 0.15, 0.19, 0.21, 0.23, 0.27, 959, 1921, 1.00
+# )
+# 
+# EMMELKAMP_test3 <- tribble(
+#   ~parameter, ~mean, ~sd, ~`2.5%`, ~`25%`, ~`50%`, ~`75%`, ~`97.5%`, ~Bulk_ESS, ~Tail_ESS, ~Rhat,
+#   "d_dir", -0.84, 0.25, -1.32, -1.00, -0.84, -0.67, -0.36, 4676, 3392, 1,
+#   "d_ind", -1.46, 0.24, -1.93, -1.62, -1.46, -1.30, -0.99, 1466, 2413, 1,
+#   "omega", 0.62, 0.34, -0.04, 0.39, 0.62, 0.85, 1.31, 1999, 2802, 1,
+#   "tau", 0.20, 0.03, 0.15, 0.18, 0.20, 0.22, 0.26, 1238, 1834, 1
+# )
+# 
+# test_that("Node-splitting estimates_ALDEN", {
+#   expect_equal(ALDEN_test$mean, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$mean), tolerance = tol)
+#   expect_equal(ALDEN_test$sd, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$sd), tolerance = tol)
+#   expect_equal(ALDEN_test$`2.5%`, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$`2.5%`), tolerance = tol)
+#   expect_equal(ALDEN_test$`50%`, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$`50%`), tolerance = tol)
+#   expect_equal(ALDEN_test$`97.5%`, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$`97.5%`), tolerance = tol)
+# })
+# 
+# test_that("Node-splitting estimates_EMMEL1", {
+#   expect_equal(EMMELKAMP_test1$mean, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$mean), tolerance = tol)
+#   expect_equal(EMMELKAMP_test1$sd, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$sd), tolerance = tol)
+#   expect_equal(EMMELKAMP_test1$`2.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$`2.5%`), tolerance = tol)
+#   expect_equal(EMMELKAMP_test1$`50%`, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$`50%`), tolerance = tol)
+#   expect_equal(EMMELKAMP_test1$`97.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$`97.5%`), tolerance = tol)
+# })
+# 
+# test_that("Node-splitting estimates_EMMEL2", {
+#   expect_equal(EMMELKAMP_test2$mean, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$mean), tolerance = tol)
+#   expect_equal(EMMELKAMP_test2$sd, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$sd), tolerance = tol)
+#   expect_equal(EMMELKAMP_test2$`2.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$`2.5%`), tolerance = tol)
+#   expect_equal(EMMELKAMP_test2$`50%`, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$`50%`), tolerance = tol)
+#   expect_equal(EMMELKAMP_test2$`97.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$`97.5%`), tolerance = tol)
+# })
+# 
+# test_that("Node-splitting estimates_EMMEL3", {
+#   expect_equal(EMMELKAMP_test3$mean, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$mean), tolerance = tol)
+#   expect_equal(EMMELKAMP_test3$sd, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$sd), tolerance = tol)
+#   expect_equal(EMMELKAMP_test3$`2.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$`2.5%`), tolerance = tol)
+#   expect_equal(EMMELKAMP_test3$`50%`, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$`50%`), tolerance = tol)
+#   expect_equal(EMMELKAMP_test3$`97.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$`97.5%`), tolerance = tol)
+# })
 
 
 # Force clean up

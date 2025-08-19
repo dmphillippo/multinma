@@ -5,7 +5,7 @@ if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) { # Se
     comment = "#>",
     fig.align = "center"
   )
-  options(width = 95)
+  options(width = 95, rstan_refresh = 0)
 
 } else { # Setup for vignettes
   knitr::opts_chunk$set(
@@ -19,7 +19,7 @@ if (requireNamespace("pkgdown", quietly = TRUE) && pkgdown::in_pkgdown()) { # Se
     fig.cap = "",
     pngquant = '--speed 4 --skip-if-larger'
   )
-  options(width = 100)
+  options(width = 100, rstan_refresh = 0)
 
   # Compress PNG images - needs pngquant on path
   knitr::knit_hooks$set(pngquant = knitr::hook_pngquant)

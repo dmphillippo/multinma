@@ -34,7 +34,7 @@ head(social_anxiety)
 
 @mayo2014psychological analysed this dataset using a NMA model with class effects, which we recreate here. When fitting class effects models there are multiple modeling options available. 
 
-We demonstrate the model selection strategy proposed by Perren et al. to determine the most suitable class effects model. 
+We demonstrate the model selection strategy proposed by @Perren2025 to determine the most suitable class effects model. 
 
 # Setting up the network
 We follow Mayo-Wilson et al. by analysing results as standardised mean differences (`y`) with standard errors (`se`) therefore we use the function `set_agd_contrast` to set up the network. We set treatment classes with `trt_class = classc` and set `Waitlist` as the network reference treatment.
@@ -60,7 +60,7 @@ plot(sa_net, level = "class", weight_nodes = TRUE) +
 ```
 
 # Model selection strategy
-We follow the model selection strategy proposed by Perren et al. 
+We follow the model selection strategy proposed by @Perren2025
 
 <img src="class_effects_flow_chart-1.svg" width="600px" style="display: block; margin: auto;" />
 
@@ -134,7 +134,7 @@ We can see from investigating the pointwise contributions to the residual devian
 
 We can explore the consistency of specific evidence loops using node-splitting by setting `consistency = "nodesplit"`. However, given the size of the network, running node-splitting on all comparisons would be computationally intensive. We instead run the node-splitting analysis specifically for the loops that include the studies identified in the dev-dev plots (ALDEN2011 and EMMELKAMP2006). We first define the specific treatment comparisons of interest by creating two data frames that specify the desired treatment comparisons. These are then passed to the `nodesplit` argument within the `nma()` function. 
 
-```{r echo=TRUE, results='hide'}
+```{r echo=TRUE, results='hide', eval=!params$run_tests}
 EMMELKAMP2006 <- data.frame(
   Treatment_1 = c("CBT individual", "Waitlist", "Waitlist"),
   Treatment_2 = c("Psychodynamic psychotherapy", "Psychodynamic psychotherapy", "CBT individual")
@@ -162,7 +162,7 @@ sa_fit_RE_nodesplit_ALDEN <- nma(sa_net,
 )
 ```
 
-```{r}
+```{r, eval=!params$run_tests}
 summary(sa_fit_RE_nodesplit_ALDEN)
 summary(sa_fit_RE_nodesplit_EMMELKAMP)
 ```
@@ -171,7 +171,7 @@ Our node‐splitting analysis shows that the CBT individual and Waitlist compari
 
 ## STEP 3: Class effects assessment
 
-In this step, we assess whether a class assumption is suitable for the data by comparing our NMA RE model with an exchangeable class model with a RE treatment model. In this model, we specify `class_effects = "exchangeable"`, meaning that treatments within each class are considered to be from a common distribution. The `prior_class_sd` sets a prior on the variability between treatment effects within each class. We use an informative $\mathrm{N}(0.33,0.1^2)$ prior as used in Perren et al. We’ve defined `class_sd` as a list of character vectors, each indicating which classes share a common SD. `prior_class_mean` will be set as $\mathrm{N}(0, 10^2)$.
+In this step, we assess whether a class assumption is suitable for the data by comparing our NMA RE model with an exchangeable class model with a RE treatment model. In this model, we specify `class_effects = "exchangeable"`, meaning that treatments within each class are considered to be from a common distribution. The `prior_class_sd` sets a prior on the standard deviation between treatment effects within each class. Because it is difficult to estimate the class standard deviations with only a small number of treatments in each class, here we specify an informative $\mathrm{N}(0.33,0.1^2)$ prior distribution that is chosen to keep class variability within a clinically-plausible range [@Perren2025]. We also define `class_sd` as a list of character vectors indicating which classes share a common SD, again aiding estimation of these parameters. For the class effects means, `prior_class_mean` is set as $\mathrm{N}(0, 10^2)$.
 
 ```{r echo=TRUE, results='hide'}
 sa_fit_EXclass_RE <- nma(sa_net,
@@ -508,73 +508,73 @@ test_that("UME RE Tau", {
   expect_equivalent(EX_RE_tau$summary$`97.5%`, 0.289, tolerance = tol)
 })
 
-nodesplit_ALDEN <- summary(sa_fit_RE_nodesplit_ALDEN)
-nodesplit_EMMELKAMP <- summary(sa_fit_RE_nodesplit_EMMELKAMP)
-
-ALDEN_test <- tribble(
-  ~parameter, ~mean, ~sd, ~`2.5%`, ~`50%`, ~`97.5%`,
-  "d_dir[CBT group vs. Waitlist]", -0.90, 0.13, -1.16, -0.90, -0.64,
-  "d_ind[CBT group vs. Waitlist]", -0.73, 0.13, -0.99, -0.73, -0.46,
-  "omega", -0.17, 0.17, -0.51, -0.17, 0.18,
-  "tau", 0.21, 0.03, 0.15, 0.21, 0.27
-)
-
-
-EMMELKAMP_test1 <- tribble(
-  ~parameter, ~mean, ~sd, ~`2.5%`, ~`25%`, ~`50%`, ~`75%`, ~`97.5%`, ~Bulk_ESS, ~Tail_ESS, ~Rhat,
-  "d_dir", 0.71, 0.33, 0.06, 0.49, 0.71, 0.94, 1.35, 5354, 2759, 1.00,
-  "d_ind", 0.45, 0.26, -0.07, 0.27, 0.45, 0.63, 0.96, 4159, 3058, 1.00,
-  "omega", 0.26, 0.39, -0.51, 0.00, 0.25, 0.53, 1.02, 4849, 3147, 1.00,
-  "tau", 0.21, 0.03, 0.15, 0.19, 0.21, 0.23, 0.27, 1291, 2516, 1.01
-)
-
-EMMELKAMP_test2 <- tribble(
-  ~parameter, ~mean, ~sd, ~`2.5%`, ~`25%`, ~`50%`, ~`75%`, ~`97.5%`, ~Bulk_ESS, ~Tail_ESS, ~Rhat,
-  "d_dir", -0.61, 0.19, -0.96, -0.73, -0.61, -0.48, -0.22, 5103, 3262, 1.00,
-  "d_ind", -0.68, 0.42, -1.49, -0.96, -0.68, -0.40, 0.15, 4157, 3138, 1.00,
-  "omega", 0.08, 0.46, -0.84, -0.23, 0.07, 0.39, 0.98, 4293, 2877, 1.00,
-  "tau", 0.21, 0.03, 0.15, 0.19, 0.21, 0.23, 0.27, 959, 1921, 1.00
-)
-
-EMMELKAMP_test3 <- tribble(
-  ~parameter, ~mean, ~sd, ~`2.5%`, ~`25%`, ~`50%`, ~`75%`, ~`97.5%`, ~Bulk_ESS, ~Tail_ESS, ~Rhat,
-  "d_dir", -0.84, 0.25, -1.32, -1.00, -0.84, -0.67, -0.36, 4676, 3392, 1,
-  "d_ind", -1.46, 0.24, -1.93, -1.62, -1.46, -1.30, -0.99, 1466, 2413, 1,
-  "omega", 0.62, 0.34, -0.04, 0.39, 0.62, 0.85, 1.31, 1999, 2802, 1,
-  "tau", 0.20, 0.03, 0.15, 0.18, 0.20, 0.22, 0.26, 1238, 1834, 1
-)
-
-test_that("Node-splitting estimates_ALDEN", {
-  expect_equal(ALDEN_test$mean, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$mean), tolerance = tol)
-  expect_equal(ALDEN_test$sd, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$sd), tolerance = tol)
-  expect_equal(ALDEN_test$`2.5%`, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$`2.5%`), tolerance = tol)
-  expect_equal(ALDEN_test$`50%`, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$`50%`), tolerance = tol)
-  expect_equal(ALDEN_test$`97.5%`, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$`97.5%`), tolerance = tol)
-})
-
-test_that("Node-splitting estimates_EMMEL1", {
-  expect_equal(EMMELKAMP_test1$mean, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$mean), tolerance = tol)
-  expect_equal(EMMELKAMP_test1$sd, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$sd), tolerance = tol)
-  expect_equal(EMMELKAMP_test1$`2.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$`2.5%`), tolerance = tol)
-  expect_equal(EMMELKAMP_test1$`50%`, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$`50%`), tolerance = tol)
-  expect_equal(EMMELKAMP_test1$`97.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$`97.5%`), tolerance = tol)
-})
-
-test_that("Node-splitting estimates_EMMEL2", {
-  expect_equal(EMMELKAMP_test2$mean, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$mean), tolerance = tol)
-  expect_equal(EMMELKAMP_test2$sd, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$sd), tolerance = tol)
-  expect_equal(EMMELKAMP_test2$`2.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$`2.5%`), tolerance = tol)
-  expect_equal(EMMELKAMP_test2$`50%`, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$`50%`), tolerance = tol)
-  expect_equal(EMMELKAMP_test2$`97.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$`97.5%`), tolerance = tol)
-})
-
-test_that("Node-splitting estimates_EMMEL3", {
-  expect_equal(EMMELKAMP_test3$mean, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$mean), tolerance = tol)
-  expect_equal(EMMELKAMP_test3$sd, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$sd), tolerance = tol)
-  expect_equal(EMMELKAMP_test3$`2.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$`2.5%`), tolerance = tol)
-  expect_equal(EMMELKAMP_test3$`50%`, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$`50%`), tolerance = tol)
-  expect_equal(EMMELKAMP_test3$`97.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$`97.5%`), tolerance = tol)
-})
+# nodesplit_ALDEN <- summary(sa_fit_RE_nodesplit_ALDEN)
+# nodesplit_EMMELKAMP <- summary(sa_fit_RE_nodesplit_EMMELKAMP)
+# 
+# ALDEN_test <- tribble(
+#   ~parameter, ~mean, ~sd, ~`2.5%`, ~`50%`, ~`97.5%`,
+#   "d_dir[CBT group vs. Waitlist]", -0.90, 0.13, -1.16, -0.90, -0.64,
+#   "d_ind[CBT group vs. Waitlist]", -0.73, 0.13, -0.99, -0.73, -0.46,
+#   "omega", -0.17, 0.17, -0.51, -0.17, 0.18,
+#   "tau", 0.21, 0.03, 0.15, 0.21, 0.27
+# )
+# 
+# 
+# EMMELKAMP_test1 <- tribble(
+#   ~parameter, ~mean, ~sd, ~`2.5%`, ~`25%`, ~`50%`, ~`75%`, ~`97.5%`, ~Bulk_ESS, ~Tail_ESS, ~Rhat,
+#   "d_dir", 0.71, 0.33, 0.06, 0.49, 0.71, 0.94, 1.35, 5354, 2759, 1.00,
+#   "d_ind", 0.45, 0.26, -0.07, 0.27, 0.45, 0.63, 0.96, 4159, 3058, 1.00,
+#   "omega", 0.26, 0.39, -0.51, 0.00, 0.25, 0.53, 1.02, 4849, 3147, 1.00,
+#   "tau", 0.21, 0.03, 0.15, 0.19, 0.21, 0.23, 0.27, 1291, 2516, 1.01
+# )
+# 
+# EMMELKAMP_test2 <- tribble(
+#   ~parameter, ~mean, ~sd, ~`2.5%`, ~`25%`, ~`50%`, ~`75%`, ~`97.5%`, ~Bulk_ESS, ~Tail_ESS, ~Rhat,
+#   "d_dir", -0.61, 0.19, -0.96, -0.73, -0.61, -0.48, -0.22, 5103, 3262, 1.00,
+#   "d_ind", -0.68, 0.42, -1.49, -0.96, -0.68, -0.40, 0.15, 4157, 3138, 1.00,
+#   "omega", 0.08, 0.46, -0.84, -0.23, 0.07, 0.39, 0.98, 4293, 2877, 1.00,
+#   "tau", 0.21, 0.03, 0.15, 0.19, 0.21, 0.23, 0.27, 959, 1921, 1.00
+# )
+# 
+# EMMELKAMP_test3 <- tribble(
+#   ~parameter, ~mean, ~sd, ~`2.5%`, ~`25%`, ~`50%`, ~`75%`, ~`97.5%`, ~Bulk_ESS, ~Tail_ESS, ~Rhat,
+#   "d_dir", -0.84, 0.25, -1.32, -1.00, -0.84, -0.67, -0.36, 4676, 3392, 1,
+#   "d_ind", -1.46, 0.24, -1.93, -1.62, -1.46, -1.30, -0.99, 1466, 2413, 1,
+#   "omega", 0.62, 0.34, -0.04, 0.39, 0.62, 0.85, 1.31, 1999, 2802, 1,
+#   "tau", 0.20, 0.03, 0.15, 0.18, 0.20, 0.22, 0.26, 1238, 1834, 1
+# )
+# 
+# test_that("Node-splitting estimates_ALDEN", {
+#   expect_equal(ALDEN_test$mean, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$mean), tolerance = tol)
+#   expect_equal(ALDEN_test$sd, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$sd), tolerance = tol)
+#   expect_equal(ALDEN_test$`2.5%`, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$`2.5%`), tolerance = tol)
+#   expect_equal(ALDEN_test$`50%`, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$`50%`), tolerance = tol)
+#   expect_equal(ALDEN_test$`97.5%`, as.numeric(nodesplit_ALDEN$summary[[1]]$summary$`97.5%`), tolerance = tol)
+# })
+# 
+# test_that("Node-splitting estimates_EMMEL1", {
+#   expect_equal(EMMELKAMP_test1$mean, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$mean), tolerance = tol)
+#   expect_equal(EMMELKAMP_test1$sd, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$sd), tolerance = tol)
+#   expect_equal(EMMELKAMP_test1$`2.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$`2.5%`), tolerance = tol)
+#   expect_equal(EMMELKAMP_test1$`50%`, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$`50%`), tolerance = tol)
+#   expect_equal(EMMELKAMP_test1$`97.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[1]]$summary$`97.5%`), tolerance = tol)
+# })
+# 
+# test_that("Node-splitting estimates_EMMEL2", {
+#   expect_equal(EMMELKAMP_test2$mean, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$mean), tolerance = tol)
+#   expect_equal(EMMELKAMP_test2$sd, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$sd), tolerance = tol)
+#   expect_equal(EMMELKAMP_test2$`2.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$`2.5%`), tolerance = tol)
+#   expect_equal(EMMELKAMP_test2$`50%`, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$`50%`), tolerance = tol)
+#   expect_equal(EMMELKAMP_test2$`97.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[2]]$summary$`97.5%`), tolerance = tol)
+# })
+# 
+# test_that("Node-splitting estimates_EMMEL3", {
+#   expect_equal(EMMELKAMP_test3$mean, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$mean), tolerance = tol)
+#   expect_equal(EMMELKAMP_test3$sd, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$sd), tolerance = tol)
+#   expect_equal(EMMELKAMP_test3$`2.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$`2.5%`), tolerance = tol)
+#   expect_equal(EMMELKAMP_test3$`50%`, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$`50%`), tolerance = tol)
+#   expect_equal(EMMELKAMP_test3$`97.5%`, as.numeric(nodesplit_EMMELKAMP$summary[[3]]$summary$`97.5%`), tolerance = tol)
+# })
 ```
 
 

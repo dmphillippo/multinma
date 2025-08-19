@@ -341,7 +341,7 @@ smk_net
 
 \donttest{
 # Fitting a fixed effect model
-smk_fit_FE <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+smk_fit_FE <- nma(smk_net,
                   trt_effects = "fixed",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 100))
@@ -351,7 +351,7 @@ smk_fit_FE
 
 \donttest{
 # Fitting a random effects model
-smk_fit_RE <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+smk_fit_RE <- nma(smk_net, 
                   trt_effects = "random",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 100),
@@ -362,7 +362,7 @@ smk_fit_RE
 
 \donttest{
 # Fitting an unrelated mean effects (inconsistency) model
-smk_fit_RE_UME <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+smk_fit_RE_UME <- nma(smk_net, 
                       consistency = "ume",
                       trt_effects = "random",
                       prior_intercept = normal(scale = 100),
@@ -374,7 +374,7 @@ smk_fit_RE_UME
 
 \donttest{
 # Fitting all possible node-splitting models
-smk_fit_RE_nodesplit <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+smk_fit_RE_nodesplit <- nma(smk_net, 
                             consistency = "nodesplit",
                             trt_effects = "random",
                             prior_intercept = normal(scale = 100),
@@ -470,7 +470,7 @@ pso_net <- add_integration(pso_net,
 # init_r = 0.1, since probit models in particular are often hard to initialise.
 # Using the QR decomposition greatly improves sampling efficiency here, as is
 # often the case for regression models.
-pso_fit <- nma(pso_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+pso_fit <- nma(pso_net, 
                trt_effects = "fixed",
                link = "probit",
                likelihood = "bernoulli2",
@@ -500,7 +500,7 @@ ndmm_net <- combine_network(
                covariates = ndmm_agd_covs))
 \donttest{
 # Fit Weibull (PH) model
-ndmm_fit <- nma(ndmm_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+ndmm_fit <- nma(ndmm_net, 
                 likelihood = "weibull",
                 prior_intercept = normal(scale = 100),
                 prior_trt = normal(scale = 10),
