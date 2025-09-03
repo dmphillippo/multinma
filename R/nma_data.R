@@ -50,7 +50,8 @@ set_ipd <- function(data,
                     r = NULL, E = NULL,
                     Surv = NULL,
                     trt_ref = NULL,
-                    trt_class = NULL) {
+                    trt_class = NULL,
+                    allow_singlearm_studies = FALSE) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -150,8 +151,10 @@ set_ipd <- function(data,
       inform(glue::glue("Single-arm stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} present in the network: ",
                         glue::glue_collapse(glue::double_quote(as.character(single_arm_studies)), sep = ", ", last = " and "), "."))
     } else {
-      abort(glue::glue("Single-arm studies are not supported: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
+      if (!allow_singlearm_studies) {
+        warn(glue::glue("Single-arm studies detected: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
                        glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
+      }
     }
   }
 
@@ -289,7 +292,8 @@ set_agd_arm <- function(data,
                         r = NULL, n = NULL, E = NULL,
                         sample_size = NULL,
                         trt_ref = NULL,
-                        trt_class = NULL) {
+                        trt_class = NULL,
+                        allow_singlearm_studies = FALSE) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -337,9 +341,12 @@ set_agd_arm <- function(data,
     dplyr::filter(dplyr::n() == 1) %>%
     dplyr::pull(.data$.study)
 
-  if (length(single_arm_studies)) {
-    abort(glue::glue("Single-arm studies are not supported: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
+  # Warn if single-arm studies are present
+  if (!allow_singlearm_studies) {
+    if (length(single_arm_studies)) {
+      warn(glue::glue("Single-arm studies detected: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
                      glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
+    }
   }
 
   # Treatment classes
