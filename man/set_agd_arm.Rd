@@ -15,7 +15,8 @@ set_agd_arm(
   E = NULL,
   sample_size = NULL,
   trt_ref = NULL,
-  trt_class = NULL
+  trt_class = NULL,
+  allow_singlearm_studies = FALSE
 )
 }
 \arguments{

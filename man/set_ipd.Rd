@@ -13,7 +13,8 @@ set_ipd(
   E = NULL,
   Surv = NULL,
   trt_ref = NULL,
-  trt_class = NULL
+  trt_class = NULL,
+  allow_singlearm_studies = FALSE
 )
 }
 \arguments{

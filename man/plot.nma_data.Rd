@@ -13,7 +13,8 @@
   weight_nodes = FALSE,
   show_trt_class = FALSE,
   level = c("treatment", "class"),
-  nudge = 0
+  nudge = 0,
+  show_single_arm = FALSE
 )
 }
 \arguments{
@@ -37,7 +38,11 @@ layout functions provided by \link[igraph:igraph-package]{igraph}.}
 \item{show_trt_class}{Colour treatment nodes by class, if \code{trt_class} is set?
 Default is \code{FALSE}.}
 
-\item{level}{Display network at the \code{"treatment"} (default) or \code{"class"} level.}
+\item{level}{Display network at the \code{"treatment"} (default) or \code{"class"} level.
+' @param show_single_arm Display single-arm studies as points on the treatment
+nodes? Default is \code{FALSE}. When \code{TRUE}, each treatment with single-arm
+studies is marked by a point with the legend listing the corresponding
+study names.}
 
 \item{nudge}{Numeric value to nudge the treatment labels away from the nodes
 when \code{weight_nodes = TRUE}. Default is \code{0} (no adjustment to label
