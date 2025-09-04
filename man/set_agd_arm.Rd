@@ -49,6 +49,10 @@ will be chosen (see details).}
 
 \item{trt_class}{column of \code{data} specifying treatment classes, coded using
 integers, strings, or factors. By default, no classes are specified.}
+
+\item{allow_singlearm_studies}{logical; if \code{FALSE} (default) a warning is
+given when single-arm studies are present. The default can be set globally
+via option \code{multinma.allow_singlearm_studies}.}
 }
 \value{
 An object of class \link{nma_data}
