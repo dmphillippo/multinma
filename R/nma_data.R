@@ -10,6 +10,9 @@
 #' @param E column of `data` specifying the total time at risk for Poisson
 #'   outcomes
 #' @template args-data_Surv
+#' @param allow_singlearm_studies logical; if `FALSE` (default) a warning is
+#'   given when single-arm studies are present. The default can be set globally
+#'   via option `multinma.allow_singlearm_studies`.
 #'
 #' @return An object of class [nma_data]
 #' @export
@@ -262,7 +265,9 @@ set_ipd <- function(data,
 #' @param n column of `data` specifying Binomial outcome numerator
 #' @param sample_size column of `data` giving the sample size in each arm.
 #'   Optional, see details.
-#'
+#' @param allow_singlearm_studies logical; if `FALSE` (default) a warning is
+#'   given when single-arm studies are present. The default can be set globally
+#'   via option `multinma.allow_singlearm_studies`.
 #' @return An object of class [nma_data]
 #' @export
 
@@ -769,7 +774,9 @@ set_agd_contrast <- function(data,
 #' @param covariates data frame of covariate summary statistics for each study
 #'   or study arm, with corresponding `study` and `trt` columns to match to
 #'   those in `data`
-#'
+#' @param allow_singlearm_studies logical; if `FALSE` (default) a warning is
+#'   given when single-arm studies are present. The default can be set globally
+#'   via option `multinma.allow_singlearm_studies`.
 #' @return An object of class [nma_data]
 #' @export
 #'
@@ -798,7 +805,8 @@ set_agd_surv <- function(data,
                          Surv,
                          covariates = NULL,
                          trt_ref = NULL,
-                         trt_class = NULL) {
+                         trt_class = NULL,
+                         allow_singlearm_studies = getOption("multinma.allow_singlearm_studies", FALSE)) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
