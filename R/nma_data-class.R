@@ -610,10 +610,6 @@ get_nodesplits <- function(network, include_consistency = FALSE) {
 #' @export
 #' @rdname get_nodesplits
 has_direct <- function(network, trt1, trt2) {
-  #'' @param show_single_arm Display single-arm studies as points on the treatment
-  #'   nodes? Default is `FALSE`. When `TRUE`, each treatment with single-arm
-  #'   studies is marked by a point with the legend listing the corresponding
-  #'   study names.
   # Check network
   if (!inherits(network, "nma_data")) {
     abort("`network` must be an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
