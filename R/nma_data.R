@@ -51,7 +51,7 @@ set_ipd <- function(data,
                     Surv = NULL,
                     trt_ref = NULL,
                     trt_class = NULL,
-                    allow_singlearm_studies = FALSE) {
+                    allow_singlearm_studies = getOption("multinma.allow_singlearm_studies", FALSE)) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -293,7 +293,7 @@ set_agd_arm <- function(data,
                         sample_size = NULL,
                         trt_ref = NULL,
                         trt_class = NULL,
-                        allow_singlearm_studies = FALSE) {
+                        allow_singlearm_studies = getOption("multinma.allow_singlearm_studies", FALSE)) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
