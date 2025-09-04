@@ -774,9 +774,6 @@ set_agd_contrast <- function(data,
 #' @param covariates data frame of covariate summary statistics for each study
 #'   or study arm, with corresponding `study` and `trt` columns to match to
 #'   those in `data`
-#' @param allow_singlearm_studies logical; if `FALSE` (default) a warning is
-#'   given when single-arm studies are present. The default can be set globally
-#'   via option `multinma.allow_singlearm_studies`.
 #' @return An object of class [nma_data]
 #' @export
 #'
