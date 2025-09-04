@@ -11,8 +11,7 @@ set_agd_surv(
   Surv,
   covariates = NULL,
   trt_ref = NULL,
-  trt_class = NULL,
-  allow_singlearm_studies = getOption("multinma.allow_singlearm_studies", FALSE)
+  trt_class = NULL
 )
 }
 \arguments{

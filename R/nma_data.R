@@ -805,8 +805,7 @@ set_agd_surv <- function(data,
                          Surv,
                          covariates = NULL,
                          trt_ref = NULL,
-                         trt_class = NULL,
-                         allow_singlearm_studies = getOption("multinma.allow_singlearm_studies", FALSE)) {
+                         trt_class = NULL) {
 
   # Check data is data frame
   if (!inherits(data, "data.frame")) abort("Argument `data` should be a data frame")
@@ -859,11 +858,9 @@ set_agd_surv <- function(data,
     dplyr::filter(dplyr::n() == 1) %>%
     dplyr::pull(.data$.study)
 
-  if (!allow_singlearm_studies) {
-    if (length(single_arm_studies)) {
-      warn(glue::glue("Single-arm studies detected: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
-                      glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
-    }
+  if (length(single_arm_studies)) {
+    inform(glue::glue("Single-arm stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} present in the network: ",
+                      glue::glue_collapse(glue::double_quote(as.character(single_arm_studies)), sep = ", ", last = " and "), "."))
   }
 
   # Treatment classes
