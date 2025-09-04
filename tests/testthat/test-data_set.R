@@ -53,9 +53,9 @@ test_that("set_* error if single-arm studies included", {
   m <- "Single-arm studies are not supported"
 
   s <- tibble(study = c("a", "b", "b", "c"), trt = c("A", "A", "A", "B"), r = 1, n = 2, time = 1, status = 1)
-  expect_error(set_ipd(s, study, trt, r = r), paste0(m, '.+studies "a", "b" and "c"'))
-  expect_error(set_agd_arm(s, study, trt, r = r, n = n), paste0(m, '.+studies "a" and "c"'))
-  expect_error(set_agd_contrast(s, study, trt, y = r, se = n), paste0(m, '.+studies "a" and "c"'))
+  expect_warning(set_ipd(s, study, trt, r = r), 'Single-arm studies detected: issue with studies "a", "b" and "c"\.')
+  expect_warning(set_agd_arm(s, study, trt, r = r, n = n),'Single-arm studies detected: issue with studies "a" and "c"\.')
+  expect_error(set_agd_contrast(s, study, trt, y = r, se = n),'Single-arm studies are not supported: issue with studies "a" and "c"')
 
   # Allowed with message for survival outcomes
   expect_message(set_ipd(s, study, trt, Surv = Surv(time, status)), 'Single-arm studies present in the network: "a", "b" and "c"')

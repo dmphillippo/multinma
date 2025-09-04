@@ -851,9 +851,11 @@ set_agd_surv <- function(data,
     dplyr::filter(dplyr::n() == 1) %>%
     dplyr::pull(.data$.study)
 
-  if (length(single_arm_studies)) {
-    inform(glue::glue("Single-arm stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} present in the network: ",
-                      glue::glue_collapse(glue::double_quote(as.character(single_arm_studies)), sep = ", ", last = " and "), "."))
+  if (!allow_singlearm_studies) {
+    if (length(single_arm_studies)) {
+      warn(glue::glue("Single-arm studies detected: issue with stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} ",
+                      glue::glue_collapse(glue::double_quote(single_arm_studies), sep = ", ", last = " and "), "."))
+    }
   }
 
   # Treatment classes
