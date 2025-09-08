@@ -553,10 +553,10 @@ pso_net <- combine_network(
               trt_class = trtclass)
 )
 
-test_that("con() recieves correct arguments"){
+test_that("con() recieves correct arguments", {
   expect_error(nma(pso_net, connect_baseline = con(type = "rando", studies = c("FIXTURE", "FEATURE"), baseline_prior = normal(0,10))), "type must equal 'fixed' or 'random'.")
   expect_error(nma(pso_net, connect_baseline = con(type = "random", studies = c("FIXTUR", "FEATURE"), baseline_prior = normal(0,10))), "Some studies listed in `connect_baseline()` are not present in the network (IPD or AgD-arm).", fixed = TRUE)
   expect_error(nma(pso_net, connect_baseline = con(type = "random", studies = c("FIXTURE", "FEATURE"))), "`baseline_prior` must be provided when type = 'random'.")
   expect_error(nma(pso_net, connect_baseline = con(type = "random", studies = c("FIXTURE", "FEATURE"), baseline_prior = letters),), "`baseline_prior` must be a prior distribution")
   expect_error(nma(pso_net, connect_baseline = con(type = "random", studies = c("FIXTURE", "FEATURE"), baseline_prior = list(normal(0, 1))),), "`baseline_prior` must be a prior distribution")
-}
+})
