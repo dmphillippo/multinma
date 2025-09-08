@@ -3723,6 +3723,9 @@ aux_needs_integration <- function(aux_regression, aux_by) {
 #' Helper function for the `connect_baseline` argument of [nma()] to specify
 #' how study baselines are linked.
 #'
+#' @name connect_baseline
+#' @rdname connect_baseline
+#' @aliases con
 #' @param type Type of connection, either "fixed" or "random".
 #' @param studies Character vector of study names.
 #' @param baseline_prior Prior distribution for the shared baseline mean when
