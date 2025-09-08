@@ -313,6 +313,17 @@ nma <- function(network,
                 knots = NULL,
                 mspline_basis = NULL) {
 
+  # Remove random baseline arguments from ...
+  dlist <- list(...)
+  if ("random_baseline" %in% names(dlist)) {
+    random_baseline <- dlist$random_baseline
+    prior_intercept_sd <- dlist$prior_intercept_sd
+    dlist  <- NULL
+  } else {
+    random_baseline <- FALSE
+    prior_intercept_sd <- NULL
+  }
+
   # Check network
   if (!inherits(network, "nma_data")) {
     abort("Expecting an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
