@@ -325,7 +325,6 @@ nma <- function(network,
   # Check and apply connect_baseline specifications
   if (!is.null(connect_baseline)) {
     # Turn single con(...) into a list
-    if (inherits(connect_baseline, "nma_connect"))
       connect_baseline <- list(connect_baseline)
     for (spec in connect_baseline) {
       if (spec$type == "fixed") {
@@ -3734,14 +3733,17 @@ aux_needs_integration <- function(aux_regression, aux_by) {
 con <- function(type = c("fixed", "random"),
                 studies,
                 baseline_prior = NULL) {
-  type    <- match.arg(type)
+  if (!type %in% c("fixed", "random")) {
+    stop("type must equal 'fixed' or 'random'.", call. = FALSE)
+  }
   studies <- as.character(studies)
   if (length(studies) < 1)
     stop("`studies` must be a non-empty character vector.")
 
-  if (type == "random" && is.null(baseline_prior)) {
-    stop("`baseline_prior` must be provided when type = 'random'.")
-  }
+  if (type == "random" && is.null(baseline_prior))
+      stop("`baseline_prior` must be provided when type = 'random'.", call. = FALSE)
+  if (type == "random" && !is.null(baseline_prior))
+      check_prior(baseline_prior)
 
   structure(
     list(type      = type,
