@@ -25,6 +25,10 @@
 #'   character vectors, each of which describe a set classes for which to share a common class SD;
 #'   any list names will be used to name the output parameters, otherwise the name will be taken
 #'   from the first class in each set.
+#' @param connect_baseline Optional baseline connections. Supply one or more
+#'   `con()` specifications to share baselines between studies. Random
+#'   baseline require a `baseline_prior` distribution. All studies listed in a
+#'   single `con()` that are `type = "fixed"` must originate from the same data type (IPD or AgD).
 #' @param likelihood Character string specifying a likelihood, if unspecified
 #'   will be inferred from the data (see details)
 #' @param link Character string specifying a link function, if unspecified will
@@ -283,6 +287,7 @@ nma <- function(network,
                 class_interactions = c("common", "exchangeable", "independent"),
                 class_effects = c("independent", "common", "exchangeable"),
                 class_sd =  c("independent", "common"),
+                connect_baseline = NULL,
                 likelihood = NULL,
                 link = NULL,
                 ...,
@@ -315,6 +320,61 @@ nma <- function(network,
 
   if (all(purrr::map_lgl(network, is.null))) {
     abort("Empty network.")
+  }
+
+  # Check and apply connect_baseline specifications
+  if (!is.null(connect_baseline)) {
+    # Turn single con(...) into a list
+    if (inherits(connect_baseline, "nma_connect"))
+      connect_baseline <- list(connect_baseline)
+    for (spec in connect_baseline) {
+      if (spec$type == "fixed") {
+
+        # 1) Abort if *any* study is in the AgD-contrast data
+        if (has_agd_contrast(network) &&
+            any(spec$studies %in% as.character(network$agd_contrast$.study))) {
+          abort(
+            "`connect_baseline()` cannot combine studies from AgD-contrast data."
+          )
+        }
+        # 2) Now test pure IPD vs AgD-arm
+        in_ipd <- has_ipd(network) &&
+          all(spec$studies %in% as.character(network$ipd$.study))
+
+        in_agd_arm <- has_agd_arm(network) &&
+          all(spec$studies %in% as.character(network$agd_arm$.study))
+
+        # exactly one of those may be TRUE
+        if (sum(in_ipd, in_agd_arm) != 1L) {
+          abort(
+            "`Studies within each con() in connect_baseline()` must be all IPD or all in AgD-arm, not mixed."
+          )
+        }
+
+        if (!is.null(spec$baseline_prior)) {
+          warning(
+            sprintf(
+              "Baseline prior supplied for fixed connection on studies [%s]; ignoring it.",
+              paste(spec$studies, collapse = ", ")
+            ),
+            call. = FALSE
+          )
+        }
+        network <- apply_connect_fixed(network, spec$studies)
+      } else {
+        # Random baseline connection
+        if (has_agd_contrast(network) &&
+            any(spec$studies %in% as.character(network$agd_contrast$.study))) {
+          abort("`connect_baseline()` cannot include studies from AgD-contrast data; please remove them.")
+        }
+        known_studies <- c(if (has_ipd(network)) as.character(network$ipd$.study) else NULL,
+                           if (has_agd_arm(network)) as.character(network$agd_arm$.study) else NULL)
+        if (!all(spec$studies %in% known_studies)) {
+          abort("Some studies listed in `connect_baseline()` are not present in the network (IPD or AgD-arm).")
+        }
+        which_baseline <- which_BP(network$studies, connect_baseline, prior_intercept)
+      }
+    }
   }
 
   # Check model arguments
@@ -3657,4 +3717,67 @@ get_aux_by_data <- function(data, by, add_study = TRUE) {
 aux_needs_integration <- function(aux_regression, aux_by) {
   (!is.null(aux_regression) && length(setdiff(colnames(attr(terms(aux_regression), "factor")), c(".study", ".trt", ".trtclass"))) > 0) ||
     (!is.null(aux_by) && length(setdiff(aux_by, c(".study", ".trt", ".trtclass"))) > 0)
+}
+
+#' Specify baseline connections
+#'
+#' Helper function for the `connect_baseline` argument of [nma()] to specify
+#' how study baselines are linked.
+#'
+#' @param type Type of connection, either "fixed" or "random".
+#' @param studies Character vector of study names.
+#' @param baseline_prior Prior distribution for the shared baseline mean when
+#'   `type = "random"`, as a [nma_prior] object.
+#'
+#' @return An object of class `nma_connect`.
+#' @export
+con <- function(type = c("fixed", "random"),
+                studies,
+                baseline_prior = NULL) {
+  type    <- match.arg(type)
+  studies <- as.character(studies)
+  if (length(studies) < 1)
+    stop("`studies` must be a non-empty character vector.")
+
+  if (type == "random" && is.null(baseline_prior)) {
+    stop("`baseline_prior` must be provided when type = 'random'.")
+  }
+
+  structure(
+    list(type      = type,
+         studies   = studies,
+         baseline_prior  = baseline_prior)
+  )
+}
+
+
+#' Apply fixed baseline connections
+#'
+#' Collapse studies so that they share a common baseline under a fixed
+#' connection. All studies must originate from the same data source. AgD
+#' contrast data cannot be used in a fixed connection.
+#'
+#' @param network An `nma_data` object
+#' @param studies Character vector of study names to combine
+#'
+#' @return Modified `nma_data` object
+#' @noRd
+apply_connect_fixed <- function(network, studies) {
+  new_name <- paste(studies, collapse = " & ")
+
+  if (has_ipd(network)) {
+    network$ipd$.study <-
+      forcats::fct_collapse(network$ipd$.study, !!new_name := studies)
+  }
+  if (has_agd_arm(network)) {
+    network$agd_arm$.study <-
+      forcats::fct_collapse(network$agd_arm$.study, !!new_name := studies)
+  }
+  if (has_agd_contrast(network)) {
+    network$agd_contrast$.study <-
+      forcats::fct_collapse(network$agd_contrast$.study, !!new_name := studies)
+  }
+
+  network$studies <- forcats::fct_collapse(network$studies, !!new_name := studies)
+  network
 }
