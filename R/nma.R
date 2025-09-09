@@ -3797,3 +3797,71 @@ apply_connect_fixed <- function(network, studies) {
   network$studies <- forcats::fct_collapse(network$studies, !!new_name := studies)
   network
 }
+
+#' Baseline synthesis wrapper around `nma()`
+#'
+#' Runs `nma()` with random baseline enabled and returns the fit with an
+#' attached summary of baseline-related parameters.
+#'
+#' @name baseline_synthesis
+#' @param network A `multinma` network object.
+#' @param prior_intercept_sd Prior for the baseline SD (used by random baseline).
+#' @param random_baseline Logical; ensure random baseline is used. Default `TRUE`.
+#' @param ... Any additional arguments passed directly to [nma()].
+#' @return An `nma` fit with extra components:
+#'   * `baseline_summary`: data frame of summaries for `baseline_new`,
+#'     `baseline_mean`, `baseline_sd`, and `mu[i]`.
+#'   * `priors$prior_intercept_sd`: the prior you supplied (for plotting, etc.).
+#' @export
+
+baseline_synthesis <- function(network,
+                               prior_intercept_sd = .default(half_normal(scale = 5)),
+                               random_baseline = TRUE,
+                               ...) {
+  # Keep your informative warning when the default is implicitly used
+  if (.is_default(prior_intercept_sd)) {
+    warn(glue::glue(
+      "Warning: 'prior_intercept_sd' was left at its default value: {get_prior_call(prior_intercept_sd)}"
+    ))
+  }
+  check_prior(prior_intercept_sd)
+
+  # Call nma()
+  fit <- do.call(
+    nma,
+    c(
+      list(
+        network = network,
+        random_baseline = random_baseline,
+        prior_intercept_sd = prior_intercept_sd
+      ),
+      list(...)
+    )
+  )
+
+  # Summarise baseline-related parameters and attach
+  ss <- rstan::summary(fit$stanfit,
+                       pars  = c("baseline_new","baseline_mean","baseline_sd","mu"),
+                       probs = c(0.025, 0.5, 0.975))$summary
+
+  keep <- grepl("^(baseline_new|baseline_mean|baseline_sd|mu\\[)", rownames(ss))
+  summary_df <- as.data.frame(ss[keep, , drop = FALSE])
+  summary_df$parameter <- rownames(ss)[keep]
+  summary_df <- summary_df[, c("parameter", setdiff(names(summary_df), "parameter"))]
+  rownames(summary_df) <- NULL
+
+  fit$baseline_summary <- summary_df
+
+  # Store prior for baseline standard deviation for plotting
+  fit$priors$prior_intercept_sd <- prior_intercept_sd
+
+
+  class(fit) <- c("baseline_synthesis", class(fit))
+  fit
+}
+
+#' @export
+print.baseline_synthesis <- function(x, ...) {
+  print(x$baseline_summary)
+  invisible(x)
+}
