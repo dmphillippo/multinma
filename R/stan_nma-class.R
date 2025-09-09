@@ -257,7 +257,6 @@ plot_prior_posterior <- function(x, ...,
 
   priors_used <-
     c("intercept"[!is.null(x$priors$prior_intercept)],
-      "intercept_sd"[!is.null(x$priors$prior_intercept_sd)],
       "trt"[!is.null(x$priors$prior_trt)],
       "het"[!is.null(x$priors$prior_het)],
       "reg"[!is.null(x$priors$prior_reg)],
@@ -333,19 +332,7 @@ plot_prior_posterior <- function(x, ...,
                                                             lognormal =, loglogistic =, gamma =,
                                                             gengamma = "beta_aux"),
                                            class_mean = "class_mean",
-                                           class_sd = "class_sd",
-                                           baseline_mean = "baseline_mean",
-                                           baseline_sd = "baseline_sd"))
-
-  if ("intercept_sd" %in% prior) {
-    prior_dat <- dplyr::bind_rows(
-      prior_dat,
-      get_tidy_prior(x$priors$prior_intercept) %>%
-        tibble::add_column(prior = "intercept", par_base = "baseline_mean"),
-      get_tidy_prior(x$priors$prior_intercept_sd) %>%
-        tibble::add_column(prior = "intercept", par_base = "baseline_sd")
-    )
-  }
+                                           class_sd = "class_sd"))
 
   # Add in omega parameter if node-splitting model, which uses prior_trt
   if (inherits(x, "nma_nodesplit")) {
@@ -358,7 +345,10 @@ plot_prior_posterior <- function(x, ...,
 
   # Get parameter samples
   pars <- unique(prior_dat$par_base)
-
+  # all available posterior parameter names
+  avail <- colnames(as.matrix(x))
+  # keep only those in pars that are actually present
+  pars <- intersect(pars, avail)
   draws <- tibble::as_tibble(as.matrix(x, pars = pars))
 
   # Transform heterogeneity samples to prior scale (SD, variance, precision)
