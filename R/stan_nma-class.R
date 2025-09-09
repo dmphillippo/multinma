@@ -345,10 +345,7 @@ plot_prior_posterior <- function(x, ...,
 
   # Get parameter samples
   pars <- unique(prior_dat$par_base)
-  # all available posterior parameter names
-  avail <- colnames(as.matrix(x))
-  # keep only those in pars that are actually present
-  pars <- intersect(pars, avail)
+
   draws <- tibble::as_tibble(as.matrix(x, pars = pars))
 
   # Transform heterogeneity samples to prior scale (SD, variance, precision)
