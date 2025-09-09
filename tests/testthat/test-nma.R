@@ -94,6 +94,13 @@ test_that("class_effects = 'common' updates network$treatments", {
                info = "network$treatments should be replaced by class factor levels")
 })
 
+#Baseline synthesis tests
+test_that("baseline_synthesis() prior_intercept_sd must be valid", {
+  m_baseline_sd <- "`prior_intercept_sd` must be"
+  expect_error(baseline_synthesis(sa_net, prior_intercept_sd = 1), m_baseline_sd)
+  expect_error(baseline_synthesis(sa_net, prior_intercept_sd = "a"), m_baseline_sd)
+})
+
 # Make dummy covariate data for smoking network
 ns_agd <- max(smoking$studyn)
 smkdummy <-
