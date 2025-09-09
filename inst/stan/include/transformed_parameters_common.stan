@@ -33,11 +33,20 @@ vector[nX - totns - (nt - 1) - nodesplit] beta;
 vector[nint_max > 1 ? nint * ni_agd_contrast : 0] eta_agd_contrast_ii;
 vector[ni_agd_contrast] eta_agd_contrast_bar;
 
+// -- Random baseline effect --
+vector[random_baseline ? totns : 0] f_baseline;
 
 // -- Study baselines --
 // Pull out mu from allbeta
 if (totns) {
   mu = allbeta[1:totns];
+}
+
+if (random_baseline) {
+  real bmean = baseline_mean[1];
+  real bsd   = baseline_sd[1];
+  f_baseline = rep_vector(bmean, totns) - mu + bsd .* z_baseline;
+  mu = rep_vector(bmean, totns) + bsd .* z_baseline;
 }
 
 // -- Regression predictors --
@@ -97,6 +106,14 @@ if (ni_ipd) {
       if (ipd_trt[ipd_arm[i]] > 1 && which_CE[ipd_trt[ipd_arm[i]] - 1]) {
         eta_ipd[i] += f_class[which_fclass[ipd_trt[ipd_arm[i]] - 1]];
       }
+    }
+  }
+}
+
+  // Add random baseline contribution
+  if (random_baseline) {
+    for (i in 1:ni_ipd) {
+      eta_ipd[i] += f_baseline[ipd_study[ipd_arm[i]]];
     }
   }
 }

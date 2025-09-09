@@ -1558,7 +1558,9 @@ nma.fit <- function(ipd_x, ipd_y,
                     adapt_delta = NULL,
                     int_thin = 0,
                     int_check = TRUE,
-                    basis) {
+                    basis,
+                    random_baseline = FALSE,
+                    prior_intercept_sd) {
 
   if (missing(ipd_x)) ipd_x <- NULL
   if (missing(ipd_y)) ipd_y <- NULL
@@ -1671,6 +1673,12 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Check priors
   check_prior(prior_intercept)
+  if (random_baseline == TRUE){
+    check_prior(prior_intercept_sd)
+  } else {
+    # Dummy intercept priors for fixed baseline models, not used but requested by Stan data
+    prior_intercept_sd <- half_normal(1)
+  }
   check_prior(prior_trt)
   if (trt_effects == "random") check_prior(prior_het)
   check_prior(prior_reg)
@@ -1874,8 +1882,8 @@ nma.fit <- function(ipd_x, ipd_y,
     agd_contrast_trt_b = as.array(agd_contrast_trt_b),
     agd_contrast_y = if (has_agd_contrast) as.array(agd_contrast_y$.y) else numeric(),
     agd_contrast_Sigma = Sigma,
-    # ipd_study = ipd_study,
-    # agd_arm_study = agd_arm_study,
+    ipd_study = ipd_study,
+    agd_arm_study = agd_arm_study,
     # agd_contrast_study = agd_contrast_study,
     # Random effects
     RE = switch(trt_effects, fixed = 0, random = 1),
@@ -1897,7 +1905,9 @@ nma.fit <- function(ipd_x, ipd_y,
     # Baseline risk meta-regression
     brmr_n_col = sum(col_brmr),
     brmr_col = as.array(which(col_brmr)),
-    xbar_mu = xbar_mu %||% 0
+    xbar_mu = xbar_mu %||% 0,
+    # random baseline effect
+    random_baseline = ifelse(random_baseline == TRUE, 1, 0)
   )
 
   # Add priors
@@ -1952,6 +1962,11 @@ nma.fit <- function(ipd_x, ipd_y,
   # Monitor class effects if class effects in use
   if (class_effects == "exchangeable") {
     pars <- c(pars, "class_mean", "class_sd")
+  }
+
+  # Monitor baseline mean, sd and new if random baselines in use
+  if (random_baseline == TRUE) {
+    pars <- c(pars, "baseline_mean", "baseline_sd", "baseline_new")
   }
 
   # Set adapt_delta, but respect other control arguments if passed in ...
@@ -2531,6 +2546,12 @@ nma.fit <- function(ipd_x, ipd_y,
   }
   fnames_oi <- gsub("tau[1]", "tau", fnames_oi, fixed = TRUE)
   fnames_oi <- gsub("omega[1]", "omega", fnames_oi, fixed = TRUE)
+
+  if (random_baseline == TRUE) {
+    fnames_oi <- gsub("baseline_mean[1]", "baseline_mean", fnames_oi, fixed = TRUE)
+    fnames_oi <- gsub("baseline_sd[1]", "baseline_sd", fnames_oi, fixed = TRUE)
+    fnames_oi <- gsub("baseline_new[1]", "baseline_new", fnames_oi, fixed = TRUE)
+  }
 
 
   if (likelihood == "ordered") {

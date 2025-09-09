@@ -54,6 +54,12 @@ transformed parameters {
         }
       }
 
+    if (random_baseline == 1) {
+      for (i in 1:ni_agd_arm) {
+        eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_baseline[agd_arm_study[i]];
+      }
+    }
+
       if (RE) {
 
         if (link == 1) { // log link
@@ -89,6 +95,12 @@ transformed parameters {
           }
         }
 
+        if (random_baseline) {
+          for (i in 1:ni_agd_arm) {
+            eta_agd_arm_noRE[i] += f_baseline[agd_arm_study[i]];
+          }
+        }
+
         if (link == 1) { // log link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
@@ -104,6 +116,12 @@ transformed parameters {
             if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
               eta_agd_arm_noRE[i] += f_class[which_fclass[agd_arm_trt[i] - 1]];
             }
+          }
+        }
+
+        if (random_baseline) {
+          for (i in 1:ni_agd_arm) {
+            eta_agd_arm_noRE[i] += f_baseline[agd_arm_study[i]];
           }
         }
 

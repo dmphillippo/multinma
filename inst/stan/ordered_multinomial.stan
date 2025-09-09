@@ -104,6 +104,12 @@ transformed parameters {
       }
     }
 
+    if (random_baseline) {
+      for (i in 1:ni_agd_arm) {
+        eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_baseline[agd_arm_study[i]];
+      }
+    }
+
     if (nint_max > 1) { // -- If integration points are used --
 
       if (RE) {
@@ -189,6 +195,12 @@ transformed parameters {
           }
         }
 
+        if (random_baseline) {
+        for (i in 1:ni_agd_arm) {
+          eta_agd_arm_noRE[i] += f_baseline[agd_arm_study[i]];
+        }
+      }
+
         if (link == 1) { // logit link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
@@ -233,6 +245,12 @@ transformed parameters {
             }
           }
         }
+
+          if (random_baseline) {
+        for (i in 1:ni_agd_arm) {
+          eta_agd_arm_noRE[i] += f_baseline[agd_arm_study[i]];
+        }
+      }
 
         if (link == 1) { // logit link
           for (i in 1:ni_agd_arm) {

@@ -2,7 +2,14 @@
 
 // -- Priors --
 // Study-specific baselines
-prior_select_lp(mu, prior_intercept_dist, prior_intercept_location, prior_intercept_scale, prior_intercept_df);
+if (random_baseline == 0) {
+  prior_select_lp(mu, prior_intercept_dist, prior_intercept_location, prior_intercept_scale, prior_intercept_df);
+} else {
+  prior_select_lp(baseline_mean, prior_intercept_dist, prior_intercept_location, prior_intercept_scale, prior_intercept_df);
+  prior_select_lp(baseline_sd, prior_intercept_sd_dist, prior_intercept_sd_location, prior_intercept_sd_scale, prior_intercept_sd_df);
+
+  allbeta[1:totns] ~ std_normal();
+}
 // Treatment effects
   if (class_effects == 0) {
     prior_select_lp(d, prior_trt_dist, prior_trt_location, prior_trt_scale, prior_trt_df);
@@ -64,3 +71,4 @@ if (class_effects) {
 
 // Draw auxiliary variables from standard normal
 z_class ~ std_normal();
+z_baseline ~ std_normal();

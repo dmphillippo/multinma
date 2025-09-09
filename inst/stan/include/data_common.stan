@@ -18,8 +18,8 @@ array[ni_agd_contrast] int<lower=1> agd_contrast_trt;
 array[ni_agd_contrast] int<lower=1> agd_contrast_trt_b;
 
 // Study IDs
-// array[max(ipd_arm)] int<lower=1> ipd_study;
-// array[ni_agd_arm] int<lower=1> agd_arm_study;
+array[max(ipd_arm)] int<lower=1> ipd_study;
+array[ni_agd_arm] int<lower=1> agd_arm_study;
 // array[ni_agd_contrast] int<lower=1> agd_contrast_study;
 
 int<lower=1> nt; // number of treatments
@@ -66,6 +66,11 @@ real prior_intercept_location;
 real<lower=0> prior_intercept_scale;
 real<lower=0> prior_intercept_df;
 
+int<lower=0,upper=6> prior_intercept_sd_dist;
+real prior_intercept_sd_location;
+real<lower=0> prior_intercept_sd_scale;
+real<lower=0> prior_intercept_sd_df;
+
 int<lower=0,upper=3> prior_trt_dist;
 real prior_trt_location;
 real<lower=0> prior_trt_scale;
@@ -96,3 +101,6 @@ int<lower=0,upper=6> prior_class_sd_dist; // Prior specifications for class stan
 real prior_class_sd_location;
 real<lower=0> prior_class_sd_scale;
 real<lower=0> prior_class_sd_df;
+
+// Flag to indicate whether a random baseline is used (1 = random, 0 = fixed)
+int<lower=0, upper=1> random_baseline;

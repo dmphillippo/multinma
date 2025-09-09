@@ -206,7 +206,8 @@ plot.stan_nma <- function(x, ...,
 #' @param ... Additional arguments passed on to methods
 #' @param prior Character vector selecting the prior and posterior
 #'   distribution(s) to plot. May include `"intercept"`, `"trt"`, `"het"`,
-#'   `"reg"`, `"aux"`, `"class_mean"` or `"class_sd"` as appropriate.
+#'   `"reg"`, `"aux"`, `"class_mean"`, `"class_sd"`, `"baseline_mean"` or
+#'   `"baseline_sd"` as appropriate.
 #' @param post_args List of arguments passed on to [ggplot2::geom_histogram] to
 #'   control plot output for the posterior distribution
 #' @param prior_args List of arguments passed on to [ggplot2::geom_path] to
@@ -256,6 +257,7 @@ plot_prior_posterior <- function(x, ...,
 
   priors_used <-
     c("intercept"[!is.null(x$priors$prior_intercept)],
+      "intercept_sd"[!is.null(x$priors$prior_intercept_sd)],
       "trt"[!is.null(x$priors$prior_trt)],
       "het"[!is.null(x$priors$prior_het)],
       "reg"[!is.null(x$priors$prior_reg)],
@@ -331,7 +333,19 @@ plot_prior_posterior <- function(x, ...,
                                                             lognormal =, loglogistic =, gamma =,
                                                             gengamma = "beta_aux"),
                                            class_mean = "class_mean",
-                                           class_sd = "class_sd"))
+                                           class_sd = "class_sd",
+                                           baseline_mean = "baseline_mean",
+                                           baseline_sd = "baseline_sd"))
+
+  if (inherits(x, "baseline_synthesis") && "intercept" %in% prior) {
+    prior_dat <- dplyr::bind_rows(
+      prior_dat,
+      get_tidy_prior(x$priors$prior_intercept) %>%
+        tibble::add_column(prior = "intercept", par_base = "baseline_mean"),
+      get_tidy_prior(x$priors$prior_intercept_sd) %>%
+        tibble::add_column(prior = "intercept", par_base = "baseline_sd")
+    )
+  }
 
   # Add in omega parameter if node-splitting model, which uses prior_trt
   if (inherits(x, "nma_nodesplit")) {
