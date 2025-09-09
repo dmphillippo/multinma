@@ -61,10 +61,10 @@ array[brmr_n_col] int<lower=1> brmr_col;
 real xbar_mu;
 
 // -- Priors --
-int<lower=0,upper=3> prior_intercept_dist;
-real prior_intercept_location;
-real<lower=0> prior_intercept_scale;
-real<lower=0> prior_intercept_df;
+int[random_baseline]<lower=0,upper=3> prior_intercept_dist;
+real[random_baseline] prior_intercept_location;
+real[random_baseline]<lower=0> prior_intercept_scale;
+real[random_baseline]<lower=0> prior_intercept_df;
 
 int<lower=0,upper=6> prior_intercept_sd_dist;
 real prior_intercept_sd_location;
