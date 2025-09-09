@@ -1314,6 +1314,16 @@ if (class_effects == "exchangeable") {
     int_check = int_check,
     basis = basis)
 
+  dlist <- list(...)
+  if ("random_baseline" %in% names(dlist)) {
+    random_baseline <- dlist$random_baseline
+    prior_intercept_sd <- dlist$prior_intercept_sd
+    dlist  <- NULL
+  } else {
+    random_baseline <- FALSE
+    prior_intercept_sd <- NULL
+  }
+
   # Make readable parameter names for generated quantities
   fnames_oi <- stanfit@sim$fnames_oi
 
