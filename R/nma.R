@@ -638,6 +638,9 @@ nma <- function(network,
 
   # Check priors
   check_prior(prior_intercept)
+  if (random_baseline == TRUE){
+    check_prior(prior_intercept_sd)
+  }
   check_prior(prior_trt)
   check_prior(prior_het)
   check_prior(prior_reg)
@@ -1483,6 +1486,7 @@ if (class_effects == "exchangeable") {
               link = link,
               aux_by = if (has_aux_by) colnames(get_aux_by_data(aux_dat, by = aux_by)) else NULL,
               priors = list(prior_intercept = if (has_intercepts) prior_intercept else NULL,
+                            prior_intercept_sd = if (random_baseline) prior_intercept_sd else NULL,
                             prior_trt = prior_trt,
                             prior_class_mean = if (class_effects == "exchangeable") prior_class_mean else NULL,
                             prior_class_sd = if (class_effects == "exchangeable") prior_class_sd else NULL,
@@ -1914,6 +1918,11 @@ nma.fit <- function(ipd_x, ipd_y,
   standat <- purrr::list_modify(standat,
     !!! prior_standat(prior_intercept, "prior_intercept",
                       valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
+    !!! prior_standat(prior_intercept_sd, "prior_intercept_sd",
+                      valid = c("Normal", "half-Normal", "log-Normal",
+                                "Cauchy",  "half-Cauchy",
+                                "Student t", "half-Student t", "log-Student t",
+                                "Exponential", "flat (implicit)")),
     !!! prior_standat(prior_trt, "prior_trt",
                       valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
     !!! prior_standat(prior_reg, "prior_reg",

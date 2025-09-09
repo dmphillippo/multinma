@@ -337,7 +337,7 @@ plot_prior_posterior <- function(x, ...,
                                            baseline_mean = "baseline_mean",
                                            baseline_sd = "baseline_sd"))
 
-  if (inherits(x, "baseline_synthesis") && "intercept" %in% prior) {
+  if ("intercept_sd" %in% prior) {
     prior_dat <- dplyr::bind_rows(
       prior_dat,
       get_tidy_prior(x$priors$prior_intercept) %>%
