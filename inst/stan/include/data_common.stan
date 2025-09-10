@@ -17,9 +17,11 @@ array[narm_agd_arm] int<lower=1> agd_arm_trt;
 array[ni_agd_contrast] int<lower=1> agd_contrast_trt;
 array[ni_agd_contrast] int<lower=1> agd_contrast_trt_b;
 
+// Flag to indicate whether a random baseline is used (1 = random, 0 = fixed)
+int<lower=0, upper=1> random_baseline;
 // Study IDs
-array[max(ipd_arm)] int<lower=1> ipd_study;
-array[ni_agd_arm] int<lower=1> agd_arm_study;
+array[random_baseline ? max(ipd_arm) : 0] int<lower=1> ipd_study;
+array[random_baseline ? ni_agd_arm : 0] int<lower=1> agd_arm_study;
 // array[ni_agd_contrast] int<lower=1> agd_contrast_study;
 
 int<lower=1> nt; // number of treatments
@@ -61,10 +63,10 @@ array[brmr_n_col] int<lower=1> brmr_col;
 real xbar_mu;
 
 // -- Priors --
-int[random_baseline]<lower=0,upper=3> prior_intercept_dist;
-real[random_baseline] prior_intercept_location;
-real[random_baseline]<lower=0> prior_intercept_scale;
-real[random_baseline]<lower=0> prior_intercept_df;
+int<lower=0,upper=3> prior_intercept_dist;
+real prior_intercept_location;
+real<lower=0> prior_intercept_scale;
+real<lower=0> prior_intercept_df;
 
 int<lower=0,upper=6> prior_intercept_sd_dist;
 real prior_intercept_sd_location;
@@ -101,6 +103,3 @@ int<lower=0,upper=6> prior_class_sd_dist; // Prior specifications for class stan
 real prior_class_sd_location;
 real<lower=0> prior_class_sd_scale;
 real<lower=0> prior_class_sd_df;
-
-// Flag to indicate whether a random baseline is used (1 = random, 0 = fixed)
-int<lower=0, upper=1> random_baseline;
