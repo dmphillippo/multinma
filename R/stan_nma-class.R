@@ -332,7 +332,20 @@ plot_prior_posterior <- function(x, ...,
                                                             lognormal =, loglogistic =, gamma =,
                                                             gengamma = "beta_aux"),
                                            class_mean = "class_mean",
-                                           class_sd = "class_sd"))
+                                           class_sd = "class_sd",
+                                           baseline_mean = "baseline_mean",
+                                           baseline_sd = "baseline_sd"))
+
+  # If baseline_sysnthesis object then show baseline_mean and sd
+  if (inherits(x, "baseline_synthesis")) {
+    prior_dat <- dplyr::bind_rows(
+      prior_dat,
+      get_tidy_prior(x$priors$prior_intercept) %>%
+        tibble::add_column(prior = "intercept", par_base = "baseline_mean"),
+      get_tidy_prior(x$priors$prior_intercept_sd) %>%
+        tibble::add_column(prior = "intercept", par_base = "baseline_sd")
+    )
+  }
 
   # Add in omega parameter if node-splitting model, which uses prior_trt
   if (inherits(x, "nma_nodesplit")) {
