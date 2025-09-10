@@ -63,10 +63,12 @@ array[brmr_n_col] int<lower=1> brmr_col;
 real xbar_mu;
 
 // -- Priors --
-int<lower=0,upper=3> prior_intercept_dist;
-real prior_intercept_location;
-real<lower=0> prior_intercept_scale;
-real<lower=0> prior_intercept_df;
+// Scalar when connect_baseline = 0, study-specific vector otherwise
+int<lower=0, upper=1> connect_baseline;
+array[connect_baseline ? ns_ipd + ns_agd_arm : 1] int<lower=0,upper=3> prior_intercept_dist;
+array[connect_baseline ? ns_ipd + ns_agd_arm : 1] real prior_intercept_location;
+array[connect_baseline ? ns_ipd + ns_agd_arm : 1] real<lower=0> prior_intercept_scale;
+array[connect_baseline ? ns_ipd + ns_agd_arm : 1] real<lower=0> prior_intercept_df;
 
 int<lower=0,upper=6> prior_intercept_sd_dist;
 real prior_intercept_sd_location;
