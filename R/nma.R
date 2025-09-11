@@ -333,21 +333,23 @@ nma <- function(network,
     abort("Empty network.")
   }
 
+  connect_flag <- 0
   # Check and apply connect_baseline specifications
   if (!is.null(connect_baseline)) {
     # Turn single con(...) into a list
-      connect_baseline <- list(connect_baseline)
+    connect_baseline <- list(connect_baseline)
     for (spec in connect_baseline) {
+      if (has_agd_contrast(network) &&
+          any(spec$studies %in% as.character(network$agd_contrast$.study))) {
+        abort("`connect_baseline()` cannot include studies from AgD-contrast data; please remove them.")
+      }
+      known_studies <- c(if (has_ipd(network)) as.character(network$ipd$.study) else NULL,
+                         if (has_agd_arm(network)) as.character(network$agd_arm$.study) else NULL)
+      if (!all(spec$studies %in% known_studies)) {
+        abort("Some studies listed in `connect_baseline()` are not present in the network (IPD or AgD-arm).")
+      }
       if (spec$type == "fixed") {
-
-        # 1) Abort if *any* study is in the AgD-contrast data
-        if (has_agd_contrast(network) &&
-            any(spec$studies %in% as.character(network$agd_contrast$.study))) {
-          abort(
-            "`connect_baseline()` cannot combine studies from AgD-contrast data."
-          )
-        }
-        # 2) Now test pure IPD vs AgD-arm
+        # Now test pure IPD vs AgD-arm
         in_ipd <- has_ipd(network) &&
           all(spec$studies %in% as.character(network$ipd$.study))
 
@@ -357,14 +359,14 @@ nma <- function(network,
         # exactly one of those may be TRUE
         if (sum(in_ipd, in_agd_arm) != 1L) {
           abort(
-            "`Studies within each con() in connect_baseline()` must be all IPD or all in AgD-arm, not mixed."
+            "`Studies within each con() of type = `fixed` must be all IPD or all in AgD-arm, not mixed."
           )
         }
-
+        # warning supplied baseline_prior when using type = "fixed"
         if (!is.null(spec$baseline_prior)) {
           warning(
             sprintf(
-              "Baseline prior supplied for fixed connection on studies [%s]; ignoring it.",
+              "baseline_prior supplied for fixed connection on studies [%s]; ignoring it.",
               paste(spec$studies, collapse = ", ")
             ),
             call. = FALSE
@@ -372,17 +374,13 @@ nma <- function(network,
         }
         network <- apply_connect_fixed(network, spec$studies)
       } else {
-        # Random baseline connection
-        if (has_agd_contrast(network) &&
-            any(spec$studies %in% as.character(network$agd_contrast$.study))) {
-          abort("`connect_baseline()` cannot include studies from AgD-contrast data; please remove them.")
-        }
-        known_studies <- c(if (has_ipd(network)) as.character(network$ipd$.study) else NULL,
-                           if (has_agd_arm(network)) as.character(network$agd_arm$.study) else NULL)
-        if (!all(spec$studies %in% known_studies)) {
-          abort("Some studies listed in `connect_baseline()` are not present in the network (IPD or AgD-arm).")
-        }
-        which_baseline <- which_BP(network$studies, connect_baseline, prior_intercept)
+        # Random baseline flag
+        connect_flag <- 1
+        totns <- length(network$studies)
+        prior_intercept_org <- prior_intercept
+        prior_intercept <- rep(list(prior_intercept), totns)
+        idx <- match(spec$studies, levels(network$studies))
+        prior_intercept[idx] <- list(spec$baseline_prior)
       }
     }
   }
@@ -637,7 +635,12 @@ nma <- function(network,
   has_intercepts <- has_agd_arm(network) || has_ipd(network)
 
   # Check priors
-  check_prior(prior_intercept)
+  if (connect_flag == 1){
+    prior_intercept_unique <- unique(prior_intercept)
+    lapply(prior_intercept_unique, check_prior)
+  } else {
+    check_prior(prior_intercept)
+  }
   if (random_baseline == TRUE){
     check_prior(prior_intercept_sd)
   }
@@ -653,8 +656,13 @@ nma <- function(network,
 
   # Prior defaults
   prior_defaults <- list()
+  if (connect_flag == 1){
+    if (has_intercepts && .is_default(prior_intercept_org))
+      prior_defaults$prior_intercept_org <- get_prior_call(prior_intercept_org)
+  } else {
   if (has_intercepts && .is_default(prior_intercept))
     prior_defaults$prior_intercept <- get_prior_call(prior_intercept)
+  }
   if (.is_default(prior_trt))
     prior_defaults$prior_trt <- get_prior_call(prior_trt)
   if (trt_effects == "random" && .is_default(prior_het))
@@ -1298,6 +1306,7 @@ if (class_effects == "exchangeable") {
     likelihood = likelihood,
     link = link,
     consistency = consistency,
+    connect_flag = connect_flag,
     ...,
     prior_intercept = prior_intercept,
     prior_trt = prior_trt,
@@ -1545,8 +1554,10 @@ nma.fit <- function(ipd_x, ipd_y,
                     likelihood = NULL,
                     link = NULL,
                     consistency = c("consistency", "ume", "nodesplit"),
+                    connect_flag,
                     ...,
                     prior_intercept,
+                    prior_intercept_sd,
                     prior_trt,
                     prior_het,
                     prior_het_type = c("sd", "var", "prec"),
@@ -1563,8 +1574,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     int_thin = 0,
                     int_check = TRUE,
                     basis,
-                    random_baseline = FALSE,
-                    prior_intercept_sd) {
+                    random_baseline = FALSE) {
 
   if (missing(ipd_x)) ipd_x <- NULL
   if (missing(ipd_y)) ipd_y <- NULL
@@ -1676,7 +1686,12 @@ nma.fit <- function(ipd_x, ipd_y,
        (has_ipd || has_agd_arm))
 
   # Check priors
-  check_prior(prior_intercept)
+  if (connect_flag == 1){
+    prior_intercept_unique <- unique(prior_intercept)
+    lapply(prior_intercept_unique, check_prior)
+  } else {
+    check_prior(prior_intercept)
+  }
   if (random_baseline == TRUE){
     check_prior(prior_intercept_sd)
   } else {
@@ -1911,13 +1926,21 @@ nma.fit <- function(ipd_x, ipd_y,
     brmr_col = as.array(which(col_brmr)),
     xbar_mu = xbar_mu %||% 0,
     # random baseline effect
-    random_baseline = ifelse(random_baseline == TRUE, 1, 0)
+    random_baseline = ifelse(random_baseline == TRUE, 1, 0),
+    connect_baseline = connect_flag
   )
 
   # Add priors
+  if (connect_flag == 1){
+    standat <- purrr::list_modify(standat,
+      !!! prior_standat_list(prior_intercept, "prior_intercept",
+                             valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")))
+  } else {
   standat <- purrr::list_modify(standat,
     !!! prior_standat(prior_intercept, "prior_intercept",
-                      valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
+                      valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")))
+  }
+  standat <- purrr::list_modify(standat,
     !!! prior_standat(prior_intercept_sd, "prior_intercept_sd",
                       valid = c("Normal", "half-Normal", "log-Normal",
                                 "Cauchy",  "half-Cauchy",
@@ -3569,6 +3592,50 @@ prior_standat <- function(x, par, valid){
   # Set unnecessary (NA) parameters to zero. These will be ignored by Stan, but
   # need to pass rstan checks
   out[is.na(out)] <- 0
+  names(out) <- paste0(par, "_", names(out))
+  return(out)
+}
+
+#’ To vectorise the list of intercept priors ready for stan
+
+#' @param x a `nma_prior` object
+#' @param valid character vector, giving valid distributions
+#' @param par character string, giving the Stan root parameter name (e.g.
+#'   "prior_trt")
+#' @param valid character vector, giving valid distributions
+#'
+#’ @noRd
+prior_standat_list <- function(x, par, valid) {
+  if (!purrr::every(unique(x), ~inherits(.x, "nma_prior"))) {
+    abort("All elements of prior_intercept must be `nma_prior` objects.")
+  }
+  dists  <- vapply(unique(x), `[[`, character(1), "dist")
+  dist   <- vapply(x, `[[`, character(1), "dist")
+  bad <- unique(dists[is.na(dists) | !(dists %in% valid)])
+  if (length(bad)) {
+    abort(glue::glue(
+      "Invalid `{par}` distribution{if (length(bad)>1) 's' else ''}: ",
+      "{glue::glue_collapse(bad, ', ', last = ', and ')}. ",
+      "Allowed: {glue::glue_collapse(valid, ', ', last = ', or ')}."
+    ))
+  }
+  dist_lookup <- c(
+    "flat (implicit)" = 0L,
+    "Normal"          = 1L,
+    "Cauchy"          = 2L,
+    "Student t"       = 3L
+  )
+  distn <- unname(as.integer(dist_lookup[dist]))
+
+  out <- list(
+    dist     = as.integer(distn),
+    location = unname(vapply(x, function(pr) pr$location, numeric(1))),
+    scale    = unname(vapply(x, function(pr) pr$scale,    numeric(1))),
+    df       = unname(vapply(x, function(pr) pr$df,       numeric(1)))
+  )
+  # Set unnecessary (NA) parameters to zero. These will be ignored by Stan, but
+  # need to pass rstan checks
+  out <- lapply(out, function(v) { v[is.na(v)] <- 0; v })
   names(out) <- paste0(par, "_", names(out))
   return(out)
 }
