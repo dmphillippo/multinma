@@ -224,7 +224,9 @@ plot.stan_nma <- function(x, ...,
 #' @export
 #'
 #' @details Prior distributions are displayed as lines, posterior distributions
-#'   are displayed as histograms.
+#'   are displayed as histograms. When study-specific baseline priors are
+#'   supplied via [connect_baseline()] with `type = "random"`, intercept
+#'   parameters are plotted separately for each study.
 #'
 #' @importFrom truncdist dtrunc ptrunc qtrunc
 #'
@@ -291,9 +293,23 @@ plot_prior_posterior <- function(x, ...,
     if (prior[i] %in% c("het", "aux") || (prior[i] == "aux_reg" && x$likelihood %in% c("mspline", "pexp"))) trunc <- c(0, Inf)
     else trunc <- NULL
 
+    if (prior[i] == "intercept" && !inherits(x$priors$prior_intercept, "nma_prior")){
+      unique_priors <- unique(x$priors$prior_intercept)
+      sig <- vapply(x$priors$prior_intercept, function(p) paste(capture.output(dput(p)), collapse = ""), character(1))
+      map_df <- tibble::tibble(
+        study = x$network$studies,
+        intercept_ids = match(sig, unique(sig))
+      )
+
+      #prior_dat[i] <- vector("list", length(unique_priors))
+      for (j in seq_along(unique_priors)) {
+        prior_dat[[i]][[j]] <- get_tidy_prior(unique_priors[[j]], trunc = trunc) %>%
+          tibble::add_column(prior = "intercept")
+      }
+    } else {
     prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc) %>%
       tibble::add_column(prior = prior[i])
-
+    }
     if (x$likelihood == "gengamma" && prior[i] == "aux") {
       prior_dat[[i]] <-
         dplyr::bind_rows(get_tidy_prior(x$priors$prior_aux$sigma, trunc = trunc),
@@ -301,8 +317,10 @@ plot_prior_posterior <- function(x, ...,
         tibble::add_column(prior = c("aux", "aux2"))
 
     } else {
+      if (!(isTRUE(prior[i] == "intercept") && !inherits(x$priors$prior_intercept, "nma_prior"))){
       prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc) %>%
         tibble::add_column(prior = prior[i])
+      }
     }
   }
 
@@ -444,6 +462,12 @@ plot_prior_posterior <- function(x, ...,
   prior_dat <- tibble::add_column(prior_dat, xseq = xseq, dens = dens)
   prior_dat <- tidyr::unnest(prior_dat, c("xseq", "dens"))
 
+  if (!inherits(x$priors$prior_intercept, "nma_prior")) {
+    prior_dat$intercept_id <- NA_integer_
+    idx <- with(prior_dat, prior == "intercept" & par_base == "mu")
+    prior_dat$intercept_id[idx] <- match(prior_dat$args[idx], unique(prior_dat$args[idx]))
+    }
+
   # Repeat rows of prior_dat for each corresponding parameter
   if (packageVersion("dplyr") >= "1.1.1") {
     prior_dat <- dplyr::left_join(prior_dat,
@@ -455,6 +479,10 @@ plot_prior_posterior <- function(x, ...,
                                   dplyr::distinct(draws, .data$par_base, .data$parameter),
                                   by = "par_base")
   }
+
+  # if (!inherits(x$priors$prior_intercept, "nma_prior")) {
+  #  prior_dat <- dplyr::left_join(prior_dat,
+  # }
 
   # Construct plot
   xlim <- c(min(draws$value, 0), max(draws$value))
