@@ -297,8 +297,8 @@ plot_prior_posterior <- function(x, ...,
       unique_priors <- unique(x$priors$prior_intercept)
       sig <- vapply(x$priors$prior_intercept, function(p) paste(capture.output(dput(p)), collapse = ""), character(1))
       map_df <- tibble::tibble(
-        study = x$network$studies,
-        intercept_ids = match(sig, unique(sig))
+        parameter = paste0("mu[", x$network$studies, "]"),
+        intercept_id = match(sig, unique(sig))
       )
 
       #prior_dat[i] <- vector("list", length(unique_priors))
@@ -417,6 +417,10 @@ plot_prior_posterior <- function(x, ...,
   draws$par_base <- stringr::str_remove(draws$parameter, "\\[.*\\]")
   draws$parameter <- forcats::fct_inorder(factor(draws$parameter))
 
+  if (exists("map_df")) {
+    draws <- dplyr::left_join(draws, map_df[, c("parameter", "intercept_id")], by = "parameter")
+  }
+
   # Join prior name into posterior
   draws <- dplyr::left_join(draws, prior_dat[, c("par_base", "prior")], by = "par_base")
 
@@ -471,13 +475,13 @@ plot_prior_posterior <- function(x, ...,
   # Repeat rows of prior_dat for each corresponding parameter
   if (packageVersion("dplyr") >= "1.1.1") {
     prior_dat <- dplyr::left_join(prior_dat,
-                                  dplyr::distinct(draws, .data$par_base, .data$parameter),
-                                  by = "par_base",
+                                  dplyr::distinct(draws, .data$par_base, .data$parameter, .data$intercept_id),
+                                  by = c("par_base", "intercept_id"),
                                   relationship = "many-to-many")
   } else {
     prior_dat <- dplyr::left_join(prior_dat,
-                                  dplyr::distinct(draws, .data$par_base, .data$parameter),
-                                  by = "par_base")
+                                  dplyr::distinct(draws, .data$par_base, .data$parameter, .data$intercept_id),
+                                  by = c("par_base", "intercept_id"))
   }
 
   # if (!inherits(x$priors$prior_intercept, "nma_prior")) {
