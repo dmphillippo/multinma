@@ -336,8 +336,9 @@ nma <- function(network,
   connect_flag <- 0
   # Check and apply connect_baseline specifications
   if (!is.null(connect_baseline)) {
-    # Turn single con(...) into a list
-    connect_baseline <- list(connect_baseline)
+    if ("type" %in% names(connect_baseline)) {
+      connect_baseline <- list(connect_baseline)
+    }
     for (spec in connect_baseline) {
       if (has_agd_contrast(network) &&
           any(spec$studies %in% as.character(network$agd_contrast$.study))) {
@@ -373,17 +374,19 @@ nma <- function(network,
           )
         }
         network <- apply_connect_fixed(network, spec$studies)
-      } else {
-        # Random baseline flag
-        connect_flag <- 1
-        totns <- length(network$studies)
-        prior_intercept_org <- prior_intercept
-        prior_intercept <- rep(list(prior_intercept), totns)
-        idx <- match(spec$studies, levels(network$studies))
-        prior_intercept[idx] <- list(spec$baseline_prior)
       }
     }
+    if (spec$type == "random") {
+      connect_flag <- 1
+      totns <- length(network$studies)
+      prior_intercept_org <- prior_intercept
+      prior_intercept <- rep(list(prior_intercept), totns)
+      for (spec in connect_baseline) {
+        idx <- match(spec$studies, levels(network$studies))
+        prior_intercept[idx] <- rep(list(spec$baseline_prior), length(idx))
+      }
   }
+}
 
   # Check model arguments
   consistency <- rlang::arg_match(consistency)
