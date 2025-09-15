@@ -3944,12 +3944,6 @@ baseline_synthesis <- function(network,
                                prior_intercept_sd = .default(half_normal(scale = 5)),
                                random_baseline = TRUE,
                                ...) {
-  # Keep your informative warning when the default is implicitly used
-  #if (.is_default(prior_intercept_sd)) {
-    #warn(glue::glue(
-      #"Warning: 'prior_intercept_sd' was left at its default value: {get_prior_call(prior_intercept_sd)}"
-    #))
-  #}
   check_prior(prior_intercept_sd)
 
   # Call nma()

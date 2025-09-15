@@ -297,13 +297,13 @@ test_that("nma.fit() error if only one of x or y provided", {
   y <- tibble(.y = 1:3)
 
   m <- "both be present or both NULL"
-  expect_error(nma.fit(ipd_x = x), m)
-  expect_error(nma.fit(ipd_y = y), m)
-  expect_error(nma.fit(agd_arm_x = x), m)
-  expect_error(nma.fit(agd_arm_y = y), m)
-  expect_error(nma.fit(agd_contrast_x = x), "all be present or all NULL")
-  expect_error(nma.fit(agd_contrast_y = y), "all be present or all NULL")
-  expect_error(nma.fit(agd_contrast_Sigma = list()), "all be present or all NULL")
+  expect_error(nma.fit(ipd_x = x, connect_flag = 0), m)
+  expect_error(nma.fit(ipd_y = y, connect_flag = 0), m)
+  expect_error(nma.fit(agd_arm_x = x, connect_flag = 0), m)
+  expect_error(nma.fit(agd_arm_y = y, connect_flag = 0), m)
+  expect_error(nma.fit(agd_contrast_x = x, connect_flag = 0), "all be present or all NULL")
+  expect_error(nma.fit(agd_contrast_y = y, connect_flag = 0), "all be present or all NULL")
+  expect_error(nma.fit(agd_contrast_Sigma = list(), connect_flag = 0), "all be present or all NULL")
 })
 
 test_that("nma.fit() error if x and y dimension mismatch", {
@@ -313,9 +313,9 @@ test_that("nma.fit() error if x and y dimension mismatch", {
   y <- tibble(.y = 1:2)
 
   m <- "Number of rows.+do not match"
-  expect_error(nma.fit(ipd_x = x, ipd_y = y), m)
-  expect_error(nma.fit(agd_arm_x = x, agd_arm_y = y, n_int = 1), m)
-  expect_error(nma.fit(agd_contrast_x = x, agd_contrast_y = y, agd_contrast_Sigma = list(), n_int = 1), m)
+  expect_error(nma.fit(ipd_x = x, ipd_y = y, connect_flag = 0), m)
+  expect_error(nma.fit(agd_arm_x = x, agd_arm_y = y, n_int = 1, connect_flag = 0), m)
+  expect_error(nma.fit(agd_contrast_x = x, agd_contrast_y = y, agd_contrast_Sigma = list(), n_int = 1, connect_flag = 0), m)
 })
 
 test_that("nma.fit() error if x column names different", {
@@ -331,22 +331,22 @@ test_that("nma.fit() error if x column names different", {
   m <- "Non-matching columns"
   expect_error(nma.fit(ipd_x = x1, ipd_y = y,
                        agd_arm_x = x2, agd_arm_y = y,
-                       n_int = 1), m)
+                       n_int = 1, connect_flag = 0), m)
   expect_error(nma.fit(ipd_x = x1, ipd_y = y,
                        agd_contrast_x = x2, agd_contrast_y = y, agd_contrast_Sigma = Sigma,
-                       n_int = 1), m)
+                       n_int = 1, connect_flag = 0), m)
   expect_error(nma.fit(agd_arm_x = x1, agd_arm_y = y,
                        agd_contrast_x = x2, agd_contrast_y = y, agd_contrast_Sigma = Sigma,
-                       n_int = 1), m)
+                       n_int = 1, connect_flag = 0), m)
   expect_error(nma.fit(ipd_x = x1, ipd_y = y,
                        agd_arm_x = x3, agd_arm_y = y,
-                       n_int = 1), m)
+                       n_int = 1, connect_flag = 0), m)
   expect_error(nma.fit(ipd_x = x1, ipd_y = y,
                        agd_contrast_x = x3, agd_contrast_y = y, agd_contrast_Sigma = Sigma,
-                       n_int = 1), m)
+                       n_int = 1, connect_flag = 0), m)
   expect_error(nma.fit(agd_arm_x = x2, agd_arm_y = y,
                        agd_contrast_x = x3, agd_contrast_y = y, agd_contrast_Sigma = Sigma,
-                       n_int = 1), m)
+                       n_int = 1, connect_flag = 0), m)
 })
 
 test_that("nma.fit() error if agd_contrast_Sigma is not right dimensions", {
