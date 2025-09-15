@@ -338,6 +338,18 @@ nma <- function(network,
   if (!is.null(connect_baseline)) {
     if ("type" %in% names(connect_baseline)) {
       connect_baseline <- list(connect_baseline)
+    } else {
+      all_studies <- unlist(lapply(connect_baseline, function(spec) spec$studies), use.names = FALSE)
+      dup_studies <- unique(all_studies[duplicated(all_studies)])
+      if (length(dup_studies)) {
+        rlang::abort(
+          paste0(
+            "Each study may appear in at most one con(). ",
+            "Duplicates found: ",
+            paste(dup_studies, collapse = ", ")
+          )
+        )
+      }
     }
     for (spec in connect_baseline) {
       if (has_agd_contrast(network) &&
@@ -665,6 +677,9 @@ nma <- function(network,
   } else {
   if (has_intercepts && .is_default(prior_intercept))
     prior_defaults$prior_intercept <- get_prior_call(prior_intercept)
+  }
+  if (random_baseline == TRUE && .is_default(prior_intercept_sd)) {
+    prior_defaults$prior_intercept_sd <- get_prior_call(prior_intercept_sd)
   }
   if (.is_default(prior_trt))
     prior_defaults$prior_trt <- get_prior_call(prior_trt)
@@ -3603,13 +3618,12 @@ prior_standat <- function(x, par, valid){
 
 #’ To vectorise the list of intercept priors ready for stan
 
-#' @param x a `nma_prior` object
-#' @param valid character vector, giving valid distributions
+#' @param x a list of `nma_prior` object
 #' @param par character string, giving the Stan root parameter name (e.g.
 #'   "prior_trt")
 #' @param valid character vector, giving valid distributions
 #'
-#’ @noRd
+#' @noRd
 prior_standat_list <- function(x, par, valid) {
   if (!purrr::every(unique(x), ~inherits(.x, "nma_prior"))) {
     abort("All elements of prior_intercept must be `nma_prior` objects.")
@@ -3931,11 +3945,11 @@ baseline_synthesis <- function(network,
                                random_baseline = TRUE,
                                ...) {
   # Keep your informative warning when the default is implicitly used
-  if (.is_default(prior_intercept_sd)) {
-    warn(glue::glue(
-      "Warning: 'prior_intercept_sd' was left at its default value: {get_prior_call(prior_intercept_sd)}"
-    ))
-  }
+  #if (.is_default(prior_intercept_sd)) {
+    #warn(glue::glue(
+      #"Warning: 'prior_intercept_sd' was left at its default value: {get_prior_call(prior_intercept_sd)}"
+    #))
+  #}
   check_prior(prior_intercept_sd)
 
   # Call nma()
@@ -3950,6 +3964,13 @@ baseline_synthesis <- function(network,
       list(...)
     )
   )
+
+  dots <- list(...)
+  if (isTRUE(dots$test_grad)) {
+    return(list(
+      network = network
+    ))
+  }
 
   # Summarise baseline-related parameters and attach
   ss <- rstan::summary(fit$stanfit,

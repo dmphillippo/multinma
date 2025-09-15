@@ -224,9 +224,7 @@ plot.stan_nma <- function(x, ...,
 #' @export
 #'
 #' @details Prior distributions are displayed as lines, posterior distributions
-#'   are displayed as histograms. When study-specific baseline priors are
-#'   supplied via [connect_baseline()] with `type = "random"`, intercept
-#'   parameters are plotted separately for each study.
+#'   are displayed as histograms.
 #'
 #' @importFrom truncdist dtrunc ptrunc qtrunc
 #'
@@ -296,7 +294,7 @@ plot_prior_posterior <- function(x, ...,
     if (prior[i] == "intercept" && !inherits(x$priors$prior_intercept, "nma_prior")){
       unique_priors <- unique(x$priors$prior_intercept)
       sig <- vapply(x$priors$prior_intercept, function(p) paste(capture.output(dput(p)), collapse = ""), character(1))
-      map_df <- tibble::tibble(
+      map_tbl <- tibble::tibble(
         parameter = paste0("mu[", x$network$studies, "]"),
         intercept_id = match(sig, unique(sig))
       )
@@ -417,8 +415,8 @@ plot_prior_posterior <- function(x, ...,
   draws$par_base <- stringr::str_remove(draws$parameter, "\\[.*\\]")
   draws$parameter <- forcats::fct_inorder(factor(draws$parameter))
 
-  if (exists("map_df")) {
-    draws <- dplyr::left_join(draws, map_df[, c("parameter", "intercept_id")], by = "parameter")
+  if (exists("map_tbl")) {
+    draws <- dplyr::left_join(draws, map_tbl[, c("parameter", "intercept_id")], by = "parameter")
   }
 
   # Join prior name into posterior
@@ -474,14 +472,27 @@ plot_prior_posterior <- function(x, ...,
 
   # Repeat rows of prior_dat for each corresponding parameter
   if (packageVersion("dplyr") >= "1.1.1") {
+    if (exists("map_tbl")) {
     prior_dat <- dplyr::left_join(prior_dat,
                                   dplyr::distinct(draws, .data$par_base, .data$parameter, .data$intercept_id),
                                   by = c("par_base", "intercept_id"),
                                   relationship = "many-to-many")
+    } else {
+      prior_dat <- dplyr::left_join(prior_dat,
+                                    dplyr::distinct(draws, .data$par_base, .data$parameter),
+                                    by = "par_base",
+                                    relationship = "many-to-many")
+    }
   } else {
+    if (exists("map_tbl")) {
     prior_dat <- dplyr::left_join(prior_dat,
                                   dplyr::distinct(draws, .data$par_base, .data$parameter, .data$intercept_id),
                                   by = c("par_base", "intercept_id"))
+    } else {
+      prior_dat <- dplyr::left_join(prior_dat,
+                                    dplyr::distinct(draws, .data$par_base, .data$parameter),
+                                    by = "par_base")
+    }
   }
 
   # if (!inherits(x$priors$prior_intercept, "nma_prior")) {

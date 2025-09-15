@@ -364,6 +364,7 @@ test_that("nma.fit() error if agd_contrast_Sigma is not right dimensions", {
                        prior_trt = normal(0, 10),
                        prior_reg = normal(0, 5),
                        prior_het = normal(0, 1),
+                       connect_flag = 0,
                        n_int = 1), "Dimensions of `agd_contrast_Sigma`.+do not match")
   expect_error(nma.fit(agd_contrast_x = x1, agd_contrast_y = y,
                        agd_contrast_Sigma = Sigma2, likelihood = "normal", link = "identity",
@@ -371,6 +372,7 @@ test_that("nma.fit() error if agd_contrast_Sigma is not right dimensions", {
                        prior_trt = normal(0, 10),
                        prior_reg = normal(0, 5),
                        prior_het = normal(0, 1),
+                       connect_flag = 0,
                        n_int = 1), "Dimensions of `agd_contrast_Sigma`.+do not match")
 })
 
@@ -432,7 +434,7 @@ test_that("nma() gives warnings for default priors", {
   expect_warning(nma(smknet_yi, trt_effects = "random", prior_trt = normal(0, 1), test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_het.+", "prior_aux.+"))
   expect_warning(nma(smknet_yi, trt_effects = "random", prior_het = half_normal(1), test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_trt.+", "prior_aux.+"))
   expect_warning(nma(smknet_yi, trt_effects = "random", prior_aux = half_normal(1), test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_trt.+", "prior_het.+"))
-
+  expect_warning(baseline_synthesis(smknet_yi, trt_effects = "random", test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_intercept_sd.+", "prior_trt.+", "prior_het.+", "prior_aux.+"))
 })
 
 test_that("nma() error with incompatible priors", {
@@ -562,7 +564,12 @@ pso_net <- combine_network(
 
 test_that("con() recieves correct arguments", {
   expect_error(nma(pso_net, connect_baseline = con(type = "rando", studies = c("FIXTURE", "FEATURE"), baseline_prior = normal(0,10))), "type must equal 'fixed' or 'random'.")
+  expect_error(nma(pso_net, connect_baseline = con(type = 1, studies = c("FIXTURE", "FEATURE"), baseline_prior = normal(0,10))), "type must equal 'fixed' or 'random'.")
+  expect_error(nma(pso_net, connect_baseline = list(con(type = "rando", studies = c("FIXTURE", "FEATURE"), baseline_prior = normal(0,10)), con(type = "random", studies = c("JUNCTURE"), baseline_prior = normal(0,10)))), "type must equal 'fixed' or 'random'.")
+  expect_error(nma(pso_net, connect_baseline = list(con(type = "random", studies = c("FIXTURE", "FEATURE"), baseline_prior = normal(0,10)), con(type = 1, studies = c("JUNCTURE"), baseline_prior = normal(0,10)))), "type must equal 'fixed' or 'random'.")
+  expect_error(nma(pso_net, connect_baseline = list(con(type = "random", studies = c("FIXTURE"), baseline_prior = normal(0,10)), con(type = "fixed", studies = c("FIXTURE", "JUNCTURE")))), "^Each study may appear in at most one con\\(\\)\\. Duplicates found: FIXTURE$")
   expect_error(nma(pso_net, connect_baseline = con(type = "random", studies = c("FIXTUR", "FEATURE"), baseline_prior = normal(0,10))), "Some studies listed in `connect_baseline()` are not present in the network (IPD or AgD-arm).", fixed = TRUE)
+  expect_error(nma(pso_net, connect_baseline = con(type = "random", studies = c(1, "FEATURE"), baseline_prior = normal(0,10))), "Some studies listed in `connect_baseline()` are not present in the network (IPD or AgD-arm).", fixed = TRUE)
   expect_error(nma(pso_net, connect_baseline = con(type = "random", studies = c("FIXTURE", "FEATURE"))), "`baseline_prior` must be provided when type = 'random'.")
   expect_error(nma(pso_net, connect_baseline = con(type = "random", studies = c("FIXTURE", "FEATURE"), baseline_prior = letters),), "`baseline_prior` must be a prior distribution")
   expect_error(nma(pso_net, connect_baseline = con(type = "random", studies = c("FIXTURE", "FEATURE"), baseline_prior = list(normal(0, 1))),), "`baseline_prior` must be a prior distribution")
