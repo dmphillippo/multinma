@@ -561,7 +561,6 @@ nma <- function(network,
 
       if (!missing(class_interactions)) ns_arglist$class_interactions <- class_interactions
 
-
       for (i in 1:nrow(nodesplit)) {
 
         inform(glue::glue("Fitting model {i} of {n_ns}, node-split: ",
