@@ -1875,7 +1875,13 @@ nma.fit <- function(ipd_x, ipd_y,
     X_all_qr <- qr(X_all)
     X_all_Q <- qr.Q(X_all_qr) * sqrt(nrow(X_all) - 1)
     X_all_R <- qr.R(X_all_qr)[, sort.list(X_all_qr$pivot)] / sqrt(nrow(X_all) - 1)
+    if (X_all_qr$rank < ncol(X_all_R)) {
+      QR == FALSE
+      warning(glue::glue("Design matrix is rank-deficient (rank {X_all_qr$rank} < {ncol(X_all_R)}). ",
+                         "Falling back to using the original design matrix instead of QR decomposition."))
+    } else {
     X_all_R_inv <- solve(X_all_R)
+    }
   }
 
   # Handle integration points
@@ -3103,7 +3109,7 @@ make_nma_formula <- function(regression,
 
 #' Construct NMA design matrix
 #'
-#' @param nma_formula NMA formula, returned by `make_nma_formula()`
+#' @param nma_formula NMA formula, returned by make_nma_formula()
 #' @param ipd,agd_arm,agd_contrast Data frames
 #' @param agd_contrast_bl Logical vector identifying baseline rows for contrast
 #'   data
