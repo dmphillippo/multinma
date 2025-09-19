@@ -947,7 +947,7 @@ plot.nma_data <- function(x, ..., layout, circular,
   }
 
   if (show_trt_class) {
-    g <- g + ggplot2::labs(fill = "Treatment Class", colour = "Treatment Class")
+    g <- g + ggplot2::scale_fill_discrete(name = "Treatment Class", aesthetics = c("fill", "colour"))
   }
 
   if (show_single_arm && !is.null(sa_nodes)) {

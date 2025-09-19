@@ -88,6 +88,24 @@
 <text x='594.97' y='462.40' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
 <text x='594.97' y='479.68' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>3</text>
 <text x='594.97' y='496.96' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>4</text>
+<text x='572.21' y='320.46' style='font-size: 11.00px; font-family: sans;' textLength='89.28px' lengthAdjust='spacingAndGlyphs'>Number of studies</text>
+<line x1='573.94' y1='335.72' x2='587.76' y2='335.72' style='stroke-width: 2.13; stroke-linecap: butt;' />
+<line x1='573.94' y1='353.00' x2='587.76' y2='353.00' style='stroke-width: 5.69; stroke-linecap: butt;' />
+<line x1='573.94' y1='370.28' x2='587.76' y2='370.28' style='stroke-width: 9.25; stroke-linecap: butt;' />
+<line x1='573.94' y1='387.56' x2='587.76' y2='387.56' style='stroke-width: 12.80; stroke-linecap: butt;' />
+<text x='594.97' y='338.75' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='594.97' y='356.03' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='594.97' y='373.31' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text x='594.97' y='390.59' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>4</text>
+<text x='572.21' y='426.83' style='font-size: 11.00px; font-family: sans;' textLength='78.26px' lengthAdjust='spacingAndGlyphs'>Treatment class</text>
+<circle cx='580.85' cy='442.09' r='2.49' style='stroke-width: 0.71; stroke: #D95F02; fill: #D95F02;' />
+<circle cx='580.85' cy='459.37' r='2.49' style='stroke-width: 0.71; stroke: #7570B3; fill: #7570B3;' />
+<circle cx='580.85' cy='476.65' r='2.49' style='stroke-width: 0.71; stroke: #E7298A; fill: #E7298A;' />
+<circle cx='580.85' cy='493.93' r='2.49' style='stroke-width: 0.71; stroke: #E6AB02; fill: #E6AB02;' />
+<text x='594.97' y='445.12' style='font-size: 8.80px; font-family: sans;' textLength='63.11px' lengthAdjust='spacingAndGlyphs'>IL-12/23 blocker</text>
+<text x='594.97' y='462.40' style='font-size: 8.80px; font-family: sans;' textLength='50.88px' lengthAdjust='spacingAndGlyphs'>IL-17 blocker</text>
+<text x='594.97' y='479.68' style='font-size: 8.80px; font-family: sans;' textLength='31.81px' lengthAdjust='spacingAndGlyphs'>Placebo</text>
+<text x='594.97' y='496.96' style='font-size: 8.80px; font-family: sans;' textLength='52.82px' lengthAdjust='spacingAndGlyphs'>TNFa blocker</text>
 <text x='53.03' y='42.28' style='font-size: 18.00px; font-weight: bold; font-family: sans;' textLength='200.13px' lengthAdjust='spacingAndGlyphs'>Plaque psoriasis network</text>
 </g>
 </svg>
