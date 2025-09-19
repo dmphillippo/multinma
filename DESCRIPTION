@@ -62,7 +62,7 @@ LinkingTo:
     rstan (>= 2.26.0),
     StanHeaders (>= 2.32.9)
 SystemRequirements: GNU make
-RoxygenNote: 7.3.3
+RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 Suggests: 
     testthat (>= 2.1.0),
