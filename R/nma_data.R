@@ -1181,11 +1181,12 @@ set_agd_regression <- function(data,
 
 
   # Check regression
-  if (missing(regression) || !rlang::is_formula(regression, lhs = FALSE))
-    abort("`regression` must be a one-sided regression formula specifying the model for which estimates are given.")
+  if ( missing(regression) || !inherits(regression, "list")) abort("Argument `regression` should be a list")
+  if ( any(purrr::map_lgl(regression, ~!rlang::is_formula(., lhs = FALSE))))
+    abort("`regression` for each study must be a one-sided regression formula specifying the model for which estimates are given.")
 
-  regression <- rep_len(list(regression), nlevels(d$.study))
-  names(regression) <- levels(d$.study)
+  # regression <- rep_len(list(regression), nlevels(d$.study))
+  # names(regression) <- levels(d$.study)
 
   reg_vars <- unique(unlist(purrr::map(regression, all.vars)))
   if (!all(reg_vars %in% colnames(d)))
@@ -1214,6 +1215,11 @@ set_agd_regression <- function(data,
       dplyr::mutate(.study = factor(.data$.study, levels = levels(d$.study))),
     by = ".study"
     )
+
+  # Check covariates
+  if (!inherits(covariates, "data.frame")) abort("Argument `covariates` should be a data frame")
+  if(!all(levels(d$.study) %in% covariates$study)) abort("`covariates` should cover all studies")
+  d <- dplyr::left_join(d,covariates)
 
   # Check covariance/correlation matrices
   if (!missing(cov)) {

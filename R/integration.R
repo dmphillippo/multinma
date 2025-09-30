@@ -278,7 +278,7 @@ add_integration.nma_data <- function(x, ...,
     abort("Empty network.")
   }
 
-  if (!has_agd_arm(network) && !has_agd_contrast(network)) {
+  if (!has_agd_arm(network) && !has_agd_contrast(network) && !has_agd_regression(network)) {
     abort("No aggregate data found in network.")
   }
 
@@ -408,6 +408,16 @@ add_integration.nma_data <- function(x, ...,
       invalid_int_generated = invalid_int_generated)
 
     copula_cor <- attr(out$agd_contrast, "copula_cor")
+  }
+
+  if (has_agd_regression(network)) {
+    out$agd_regression <- withCallingHandlers(
+      add_integration.data.frame(network$agd_regression, ...,
+                                 cor = cor, cor_adjust = cor_adjust, n_int = n_int, int_args = int_args),
+      int_col_present = int_col_present,
+      invalid_int_generated = invalid_int_generated)
+
+    copula_cor <- attr(out$agd_regression, "copula_cor")
   }
 
   # Set as mlnmr_data class
