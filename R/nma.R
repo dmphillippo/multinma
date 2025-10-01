@@ -362,19 +362,6 @@ nma <- function(network,
         abort("Some studies listed in `connect_baseline()` are not present in the network (IPD or AgD-arm).")
       }
       if (spec$type == "fixed") {
-        # Now test pure IPD vs AgD-arm
-        in_ipd <- has_ipd(network) &&
-          all(spec$studies %in% as.character(network$ipd$.study))
-
-        in_agd_arm <- has_agd_arm(network) &&
-          all(spec$studies %in% as.character(network$agd_arm$.study))
-
-        # exactly one of those may be TRUE
-        if (sum(in_ipd, in_agd_arm) != 1L) {
-          abort(
-            "`Studies within each con() of type = `fixed` must be all IPD or all in AgD-arm, not mixed."
-          )
-        }
         # warning supplied baseline_prior when using type = "fixed"
         if (!is.null(spec$baseline_prior)) {
           warning(
