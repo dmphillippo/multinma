@@ -905,7 +905,7 @@ nma <- function(network,
                                ~ get(.x) * get(.y)) %>% purrr::reduce(`*`) * .estimate)
             }) %>% group_by(.study) %>%
           # Sum a mix of vectors (from integration points) and scalars (without integration points)
-          reframe(.OVB_GLM_lin_prd = list(Reduce(`+`, .OVB_GLM_lin_prd)))
+          dplyr::summarise(.OVB_GLM_lin_prd = list(Reduce(`+`, .OVB_GLM_lin_prd))) %>% ungroup()
         , by = ".study")
 
 
@@ -975,8 +975,8 @@ nma <- function(network,
   }
 
   # Combine
-  idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast_nonbl, dat_agd_regression_nonbl)
-  idat_all_plus_bl <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast, dat_agd_regression)
+  idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast_nonbl, idat_agd_regression_nonbl)
+  idat_all_plus_bl <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast, idat_agd_regression)
 
   # Get sample sizes for centering
   if (((!is.null(regression) && !is_only_offset(regression)) || has_aux_regression) && center) {
@@ -3672,7 +3672,7 @@ get_model_data_columns <- function(data, regression = NULL, aux_regression = NUL
 #' constructed, and that there are no missing values.
 #'
 #' @param formula Model formula
-#' @param dat_ipd,dat_agd_arm,dat_agd_contrast Data frames
+#' @param dat_ipd,dat_agd_arm,dat_agd_contrast,dat_agd_regression Data frames
 #' @param newdata Providing newdata post-fitting? TRUE / FALSE
 #'
 #' @noRd
@@ -3680,11 +3680,13 @@ check_regression_data <- function(formula,
                                   dat_ipd = tibble::tibble(),
                                   dat_agd_arm = tibble::tibble(),
                                   dat_agd_contrast = tibble::tibble(),
+                                  dat_agd_regression = tibble::tibble(),
                                   newdata = FALSE) {
 
   .has_ipd <- if (nrow(dat_ipd)) TRUE else FALSE
   .has_agd_arm <- if (nrow(dat_agd_arm)) TRUE else FALSE
   .has_agd_contrast <- if (nrow(dat_agd_contrast)) TRUE else FALSE
+  .has_agd_regression <- if (nrow(dat_agd_regression)) TRUE else FALSE
 
   # Check that required variables are present in each data set, and non-missing
   if (.has_ipd) {
@@ -3729,7 +3731,8 @@ check_regression_data <- function(formula,
 
   dat_has_na <- c(length(X_ipd_has_na) > 0,
                   length(X_agd_arm_has_na) > 0,
-                  length(X_agd_contrast_has_na) > 0)
+                  length(X_agd_contrast_has_na) > 0,
+                  length(X_agd_regression_has_na) > 0)
   if (any(dat_has_na)) {
     if (newdata) {
       abort(glue::glue("Variables with missing or infinite values in `newdata`: {paste(c(X_ipd_has_na, X_agd_arm_has_na, X_agd_contrast_has_na), collapse = ', ')}."))
@@ -3737,7 +3740,8 @@ check_regression_data <- function(formula,
       abort(glue::glue(glue::glue_collapse(
         c("Variables with missing or infinite values in IPD: {paste(X_ipd_has_na, collapse = ', ')}.",
           "Variables with missing or infinite values in AgD (arm-based): {paste(X_agd_arm_has_na, collapse = ', ')}.",
-          "Variables with missing or infinite values in AgD (contrast-based): {paste(X_agd_contrast_has_na, collapse = ', ')}."
+          "Variables with missing or infinite values in AgD (contrast-based): {paste(X_agd_contrast_has_na, collapse = ', ')}.",
+          "Variables with missing or infinite values in AgD (regression-based): {paste(X_agd_regression_has_na, collapse = ', ')}."
         )[dat_has_na], sep = "\n")))
     }
   }
