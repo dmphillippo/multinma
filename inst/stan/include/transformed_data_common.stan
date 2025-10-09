@@ -79,6 +79,17 @@ int<lower=0> n_class = class_effects ? max(which_CE) : 0; // Number of classes
 array[class_effects ? nt-1 : 0] int<lower=0> which_fclass; // Vector to mapping treatments to f_class
 
 if (class_effects) {
+  for (c in 1:n_class) {
+    for (t in 1:(nt - 1)) {
+      if (which_CE[t] == c) {
+        which_class_sd[c] = which_CE_sd[t];
+        break;
+      }
+    }
+  }
+}
+
+if (class_effects) {
   int count = 1;  // Counter for nonzero elements in f_class
 
   for (t in 1:(nt - 1)) {
