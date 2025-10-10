@@ -280,6 +280,7 @@ get_prior_call <- function(x) {
     abort("Not a `nma_prior` object.")
 
   prior_args <- purrr::list_modify(x, dist = purrr::zap(), fun = purrr::zap())
+  if (stringr::str_starts(x$dist, "half-")) prior_args <- purrr::list_modify(prior_args, location = purrr::zap())
   prior_args <- prior_args[!is.na(prior_args)]
   if (length(prior_args)) {
     out <- paste0(x$fun, "(",
