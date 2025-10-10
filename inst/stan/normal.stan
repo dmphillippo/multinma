@@ -111,7 +111,7 @@ transformed parameters {
         }
 
       // Add random‐baseline contribution when no integration
-      if (random_baseline ) {
+      if (random_baseline) {
         for (i in 1:ni_agd_arm) {
           eta_agd_arm_noRE[i] += f_baseline[agd_arm_study[i]];
         }

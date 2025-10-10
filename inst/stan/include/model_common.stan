@@ -7,7 +7,8 @@ if (random_baseline == 0) {
     for (s in 1:totns)
     prior_select2_lp(mu[s], prior_intercept_dist[s], prior_intercept_location[s], prior_intercept_scale[s], prior_intercept_df[s]);
   } else {
-    prior_select_lp(mu, prior_intercept_dist[1], prior_intercept_location[1], prior_intercept_scale[1], prior_intercept_df[1]); }
+    prior_select_lp(mu, prior_intercept_dist[1], prior_intercept_location[1], prior_intercept_scale[1], prior_intercept_df[1]);
+    }
 } else {
   prior_select_lp(baseline_mean, prior_intercept_dist[1], prior_intercept_location[1], prior_intercept_scale[1], prior_intercept_df[1]);
   prior_select_lp(baseline_sd, prior_intercept_sd_dist, prior_intercept_sd_location, prior_intercept_sd_scale, prior_intercept_sd_df);
