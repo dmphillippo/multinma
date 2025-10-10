@@ -84,7 +84,7 @@ vector[n_delta] f_delta =
   if (class_effects) {
     for (i in 1:ni_ipd) {
       if (ipd_trt[ipd_arm[i]] > 1 && which_CE[ipd_trt[ipd_arm[i]] - 1]) {
-        eta_ipd[i] += f_class[which_class[ipd_trt[ipd_arm[i] - 1]]];
+        eta_ipd[i] += f_class[which_class[ipd_trt[ipd_arm[i]] - 1]];
       }
     }
   }
