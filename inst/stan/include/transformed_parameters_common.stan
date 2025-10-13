@@ -108,7 +108,6 @@ if (ni_ipd) {
       }
     }
   }
-}
 
   // Add random baseline contribution
   if (random_baseline) {
