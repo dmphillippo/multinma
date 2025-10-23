@@ -43,8 +43,7 @@ We follow Mayo-Wilson et al. by analysing results as standardised mean differenc
 sa_net <- set_agd_contrast(social_anxiety,
                            study = studyc, 
                            trt = trtc,
-                           y = y, 
-                           sample_size = 1,
+                           y = y,
                            se = se,
                            trt_class = classc,
                            trt_ref = "Waitlist")
@@ -55,7 +54,7 @@ sa_net
 We create a plot at the class level by setting `level = "class"`.
 
 ```{r}
-plot(sa_net, level = "class", weight_nodes = TRUE) + 
+plot(sa_net, level = "class") + 
   theme(legend.position = "bottom", legend.box = "vertical")
 ```
 
@@ -370,7 +369,7 @@ ggplot(rank_probs_long_EX, aes(x = Rank, y = Probability)) +
 Higher-ranked classes have a greater density on the left side of the x-axis, indicating a higher probability of achieving a top rank across posterior samples. The Combined class shows the highest density on the left, suggesting it is most likely to be ranked among the top treatments, followed by CBT individual. In contrast, most other classes have relatively flat distributions, reflecting greater uncertainty in their rankings. Exercise promotion, Other psychological therapies, and the reference class have densities skewed toward the right, indicating a higher probability of lower rankings.
 
 # References
-```{r smoking_tests, include=FALSE, eval=params$run_tests}
+```{r socialanxiety_tests, include=FALSE, eval=params$run_tests}
 #--- Test against TSD 4 results ---
 library(testthat)
 library(dplyr)
