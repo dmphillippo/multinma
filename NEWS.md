@@ -1,5 +1,9 @@
 # multinma 0.8.1.9000
 
+* Feature: New `subset` argument to `posterior_ranks()` and 
+`posterior_rank_probs()` allows ranks to be calculated for a smaller decision 
+set of treatments than the full analysis set.
+
 # multinma 0.8.1
 
 * Fix: Update deprecated Stan array syntax (PR #51).
