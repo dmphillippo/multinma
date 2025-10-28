@@ -41,10 +41,15 @@ vector[ni_agd_contrast] agd_contrast_y;
 cov_matrix[ni_agd_contrast ? ni_agd_contrast : 1] agd_contrast_Sigma;
 
 // -- AgD regression coefficients --
-vector[ni_agd_regression] agd_regression_est;
+int<lower=0> nc_agd_regression; // total number of coef in each model
+vector[nc_agd_regression] agd_regression_est;
+vector[nc_agd_regression] agd_regression_OVB_GLM_dif;
+vector[nc_agd_regression] agd_regression_OVB_GLM_inc;
 int<lower=1> agd_regression_max_ncoef;
 array[ns_agd_regression] int<lower=1,upper=agd_regression_max_ncoef> agd_regression_ncoef;
 array[ns_agd_regression] cholesky_factor_cov[agd_regression_max_ncoef] agd_regression_cov;
+array[ns_agd_regression] int<lower=1> agd_regression_nrow; // Number of rows of AgD regression design matrix for each study
+array[ns_agd_regression] int<lower=0,upper=1> agd_regression_reduced_study;
 
 // -- Design matrix or thin QR decomposition --
 int<lower=0, upper=1> QR; // use QR decomposition (yes = 1)

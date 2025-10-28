@@ -868,7 +868,7 @@ nma <- function(network,
       dropped_vars <- purrr::reduce(omitted_vars, intersect)
     }
 
-    # Add dropped vars as dummy (zero value) to work smoothly with other design matrix, e.g., IPD or AgD arm
+    # Add dropped vars as dummy (zero value) to work smoothly with other design matrix, e.g., IPD or AgD
     if( length(dropped_vars) ){
       dat_agd_regression <- dat_agd_regression %>%
         tibble::add_column(!!!rlang::set_names(rep(list(0), length(dropped_vars)), dropped_vars))
@@ -891,12 +891,16 @@ nma <- function(network,
     agd_regression_reduced_study <-  dat_agd_regression %>%  group_by(.study) %>%
       dplyr::slice(1) %>% dplyr::ungroup() %>% dplyr::pull(.is_reduced)
 
+    # Check link and likelihood
+    likelihood <- check_likelihood(likelihood)
+    link <- check_link(link, likelihood)
+
     # OVB adjustments
     if(sum(agd_regression_reduced_study)){
 
       # Linear model OVB
       if(likelihood == "normal" && link=="identity"){
-        abort("OVB adjustment for the likelihood and link function combination does not support yet.")
+        abort("OVB adjustment for the likelihood and link function combination is not yet supported.")
 
         # GLM-OVB adjustment
       }else if(likelihood %in%c("bernoulli", "bernoulli2", "binomial", "binomial2",  "poisson",  "normal",  "ordered") ){
@@ -929,23 +933,26 @@ nma <- function(network,
         # Identify the corresponding intercept for each regression coefficient, from the same regression model
         var_reg_names <- all.vars(nma_formula)%>% stringr::str_subset("^\\.",negate = TRUE)
 
-        dat_agd_regression <- dplyr::left_join(
-          dat_agd_regression,
-          dat_agd_regression %>% group_by(.study) %>%
-            summarise(
-              .OVB_GLM_intercept = .estimate[
-                which(rowSums(across(all_of(var_reg_names)) != 0) == 0 & .trt %in% .trt[is.na(.estimate)] & !is.na(.estimate))[1]
-              ], .groups = 'drop')
-          , by = ".study")
+        dat_agd_regression <-dat_agd_regression %>%
+          group_by(.study) %>%
+          mutate(.is_intercept = as.integer(rowSums(across(all_of(var_reg_names)) != 0) == 0 & .trt %in% .trt[is.na(.estimate)] & !is.na(.estimate)) ) %>%
+          mutate(.OVB_GLM_intercept = .estimate[.is_intercept==1]) %>% ungroup()
 
         # Calculate GLM OVB adjustment (the difference between conditional and average)
         dat_agd_regression <- dat_agd_regression %>% rowwise() %>%
-          dplyr::mutate(.OVB_GLM_delta = mean(inverse_link(.OVB_GLM_lin_prd ,link=link)) -
-                          inverse_link(.OVB_GLM_intercept + .estimate ,link=link)) %>% ungroup()
+          dplyr::mutate(.OVB_GLM_dif = dplyr::if_else(.is_intercept == 1,
+                                                      mean(inverse_link(.OVB_GLM_lin_prd ,link=link)) - inverse_link(.OVB_GLM_intercept             ,link=link), # intercept
+                                                      mean(inverse_link(.OVB_GLM_lin_prd ,link=link)) - inverse_link(.OVB_GLM_intercept + .estimate ,link=link)  # not intercept
+          )) %>% ungroup()
+
+        # Set zero here to prevent conditional handling later in Stan code for intercept and none intercept estimations
+        dat_agd_regression <- dat_agd_regression %>%
+          mutate(.OVB_GLM_intercept = dplyr::if_else(.is_intercept==1,0,.OVB_GLM_intercept)) %>%
+          dplyr::select(-.is_intercept)
 
         # GLM OVB adjustment
-        est_agd_regression_OVB_GLM_dif <- dat_agd_regression %>% dplyr::filter(!is.na(.estimate)) %>% dplyr::pull(.OVB_GLM_delta)
-        est_agd_regression_OVB_GLM_inc <- dat_agd_regression %>% dplyr::filter(!is.na(.estimate)) %>% dplyr::pull(.OVB_GLM_intercept)
+        agd_regression_OVB_GLM_dif <- dat_agd_regression %>% dplyr::filter(!is.na(.estimate)) %>% dplyr::pull(.OVB_GLM_dif)
+        agd_regression_OVB_GLM_inc <- dat_agd_regression %>% dplyr::filter(!is.na(.estimate)) %>% dplyr::pull(.OVB_GLM_intercept)
 
         # Remove unnecessary cols
         dat_agd_regression <- dat_agd_regression %>%
@@ -981,12 +988,12 @@ nma <- function(network,
           dplyr::select( stringr::str_subset(colnames(.),"^\\.int_",negate = TRUE)  )
 
       }else{
-        abort("OVB adjustment for the likelihood and link function combination does not support yet.")
+        abort("OVB adjustment for the likelihood and link function combination is not yet supported.")
       }
 
     }else{
       idat_agd_regression <- tibble::tibble()
-      est_agd_regression_OVB_GLM_dif <- est_agd_regression_OVB_GLM_inc <- nrow_agd_regression <- NULL
+      agd_regression_OVB_GLM_dif <- agd_regression_OVB_GLM_inc <- nrow_agd_regression <- NULL
     }
 
     # Pull estimates
@@ -1013,7 +1020,7 @@ nma <- function(network,
       dat_agd_regression_bl <- idat_agd_regression_bl <-
       dat_agd_regression_nonbl <- idat_agd_regression_nonbl <- tibble::tibble()
 
-    est_agd_regression <- est_agd_regression_OVB_GLM_dif <- est_agd_regression_OVB_GLM_inc <-
+    est_agd_regression <- agd_regression_OVB_GLM_dif <- agd_regression_OVB_GLM_inc <-
       cov_agd_regression <- study_agd_regression <-
       agd_regression_reduced <- agd_regression_reduced_study <- nrow_agd_regression <- NULL
   }
@@ -1384,6 +1391,8 @@ if (class_effects == "exchangeable") {
     agd_contrast_x = X_agd_contrast, agd_contrast_y = y_agd_contrast,
     agd_contrast_Sigma = Sigma_agd_contrast,
     agd_regression_x = X_agd_regression, agd_regression_est = est_agd_regression, agd_regression_cov = cov_agd_regression, agd_regression_study = study_agd_regression,
+    agd_regression_reduced_study = agd_regression_reduced_study, nrow_agd_regression = nrow_agd_regression,
+    agd_regression_OVB_GLM_dif = agd_regression_OVB_GLM_dif, agd_regression_OVB_GLM_inc = agd_regression_OVB_GLM_inc,
     n_int = n_int,
     ipd_offset = offset_ipd,
     agd_arm_offset = offset_agd_arm,
@@ -1624,6 +1633,8 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
                     agd_arm_x = NULL, agd_arm_y = NULL,
                     agd_contrast_x = NULL, agd_contrast_y = NULL, agd_contrast_Sigma = NULL,
                     agd_regression_x = NULL, agd_regression_est = NULL, agd_regression_cov = NULL, agd_regression_study = NULL,
+                    agd_regression_reduced_study = NULL, nrow_agd_regression = NULL,
+                    agd_regression_OVB_GLM_dif = NULL, agd_regression_OVB_GLM_inc = NULL,
                     n_int,
                     ipd_offset = NULL, agd_arm_offset = NULL, agd_contrast_offset = NULL,
                     trt_effects = c("fixed", "random"),
@@ -1707,8 +1718,8 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
       abort("`agd_regression_x` should be a numeric matrix.")
     if (!is.numeric(agd_regression_est))
       abort("`agd_regression_est` should be numeric regression coefficient estimates.")
-    if (nrow(agd_regression_x) != length(agd_regression_est))
-      abort("Number of rows in `agd_regression_x` and `agd_regression_est` do not match.")
+    # if (nrow(agd_regression_x) != length(agd_regression_est))
+    #   abort("Number of rows in `agd_regression_x` and `agd_regression_est` do not match.")
     if (!is.list(agd_regression_cov) || any(purrr::map_lgl(agd_regression_cov, ~!is.numeric(.))))
       abort("`agd_regression_cov` should be a list of covariance matrices, of length equal to the number of AgD (regression coefficient) studies.")
     if (is.null(agd_regression_study) || !rlang::is_integerish(agd_regression_study, finite = TRUE))
@@ -1889,13 +1900,13 @@ if (class_effects == "exchangeable") {
   }
 
   if (has_agd_regression) {
-    agd_regression_s_t_all <- dplyr::tibble(.study = agd_regression_study,
-                                            .trt = unname(apply(agd_regression_x[, col_trt, drop = FALSE], 1, get_trt)))
-    agd_regression_s_t <- dplyr::distinct(agd_regression_s_t_all) %>% dplyr::mutate(.arm = 1:dplyr::n())
-    agd_regression_arm <-  dplyr::left_join(agd_regression_s_t_all, agd_regression_s_t, by = c(".study", ".trt")) %>% dplyr::pull(.data$.arm)
-    agd_regression_study <- agd_regression_s_t$.study
-    agd_regression_trt <- agd_regression_s_t$.trt
-    narm_agd_regression <- max(agd_regression_arm)
+    # agd_regression_s_t_all <- dplyr::tibble(.study = agd_regression_study,
+    #                                         .trt = unname(apply(agd_regression_x[, col_trt, drop = FALSE], 1, get_trt)))
+    # agd_regression_s_t <- dplyr::distinct(agd_regression_s_t_all) %>% dplyr::mutate(.arm = 1:dplyr::n())
+    # agd_regression_arm <-  dplyr::left_join(agd_regression_s_t_all, agd_regression_s_t, by = c(".study", ".trt")) %>% dplyr::pull(.data$.arm)
+    # agd_regression_study <- agd_regression_s_t$.study
+    # agd_regression_trt <- agd_regression_s_t$.trt
+    # narm_agd_regression <- max(agd_regression_arm)
     ni_agd_regression <- nrow(agd_regression_x)
 
     # Get number of AgD regression studies from length of covariance matrix list
@@ -1910,8 +1921,8 @@ if (class_effects == "exchangeable") {
       agd_regression_chol[i, 1:agd_regression_ncoef[i], 1:agd_regression_ncoef[i]] <- t(chol(agd_regression_cov[[i]]))
     }
 
-    if (sum(agd_regression_ncoef) != ni_agd_regression)
-      abort("Dimensions of `agd_regression_cov` covariance matrices do not match the regression coefficient data.")
+    # if (sum(agd_regression_ncoef) != ni_agd_regression)
+    #   abort("Dimensions of `agd_regression_cov` covariance matrices do not match the regression coefficient data.")
   } else {
     agd_regression_s_t_all <- dplyr::tibble(.study = integer(), .trt = integer())
     agd_regression_study <- agd_regression_trt <- agd_regression_arm <- numeric()
@@ -2018,9 +2029,14 @@ if (class_effects == "exchangeable") {
     agd_regression_max_ncoef = agd_regression_max_ncoef,
     agd_regression_ncoef = agd_regression_ncoef,
     agd_regression_cov = agd_regression_chol,
-    agd_regression_arm = agd_regression_arm,
-    agd_regression_trt = agd_regression_trt,
-    narm_agd_regression = narm_agd_regression,
+    nc_agd_regression = sum(agd_regression_ncoef),
+    agd_regression_reduced_study = agd_regression_reduced_study,
+    agd_regression_nrow = nrow_agd_regression,
+    agd_regression_OVB_GLM_dif = agd_regression_OVB_GLM_dif,
+    agd_regression_OVB_GLM_inc = agd_regression_OVB_GLM_inc,
+    # agd_regression_arm = agd_regression_arm,
+    # agd_regression_trt = agd_regression_trt,
+    # narm_agd_regression = narm_agd_regression,
     # ipd_study = ipd_study,
     # agd_arm_study = agd_arm_study,
     # agd_contrast_study = agd_contrast_study,
