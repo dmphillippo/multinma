@@ -898,11 +898,11 @@ nma <- function(network,
     # OVB adjustments
     if(sum(agd_regression_reduced_study)){
 
-      # Linear model OVB
+      # Linear
       if(likelihood == "normal" && link=="identity"){
         abort("OVB adjustment for the likelihood and link function combination is not yet supported.")
 
-        # GLM-OVB adjustment
+      # GLM
       }else if(likelihood %in%c("bernoulli", "bernoulli2", "binomial", "binomial2",  "poisson",  "normal",  "ordered") ){
 
         # determine which cols have integration points to calculate mean of response
@@ -980,7 +980,7 @@ nma <- function(network,
             summarise( n()) %>% pull( "n()" )
 
         } else {
-          idat_agd_regression <- tibble::tibble()
+          idat_agd_regression <- dat_agd_regression %>% dplyr::select( stringr::str_subset(colnames(.),"^\\.int_",negate = TRUE)  )
         }
 
         # Remove unnecessary cols
@@ -992,7 +992,9 @@ nma <- function(network,
       }
 
     }else{
-      idat_agd_regression <- tibble::tibble()
+      dat_agd_regression <- dat_agd_regression %>%
+        dplyr::select( stringr::str_subset(colnames(.),"^\\.int_",negate = TRUE)  )
+      idat_agd_regression <- dat_agd_regression
       agd_regression_OVB_GLM_dif <- agd_regression_OVB_GLM_inc <- nrow_agd_regression <- NULL
     }
 
@@ -1173,9 +1175,21 @@ nma <- function(network,
     }
 
     if (has_agd_regression(network)) {
+      # Use dat_agd_regression rather idat_agd_regression to create X_agd_regression
+      X_agd_regression_tmp <- make_nma_model_matrix(nma_formula = nma_formula,
+                                                    dat_ipd = dat_ipd,
+                                                    dat_agd_arm = idat_agd_arm,
+                                                    dat_agd_contrast = idat_agd_contrast,
+                                                    agd_contrast_bl = if (has_agd_contrast(network)) is.na(idat_agd_contrast$.y) else logical(),
+                                                    dat_agd_regression = dat_agd_regression %>% mutate(.is_reduced=0),
+                                                    agd_regression_bl = if (has_agd_regression(network)) is.na(dat_agd_regression$.estimate) else logical(),
+                                                    xbar = xbar,
+                                                    consistency = consistency,
+                                                    nodesplit = nodesplit,
+                                                    classes = !is.null(network$classes))[['X_agd_regression']]
       # For which_RE we set trt=NA for everything but treatment effects
-      trt_cols <- grepl("^\\.trt(?!class)[^\\:]+$", colnames(X_agd_regression), perl = TRUE)
-      trt_rows <- apply(X_agd_regression, 1, function(x) any(x[trt_cols] != 0) && all(x[!trt_cols] == 0))
+      trt_cols <- grepl("^\\.trt(?!class)[^\\:]+$", colnames(X_agd_regression_tmp), perl = TRUE)
+      trt_rows <- apply(X_agd_regression_tmp, 1, function(x) any(x[trt_cols] != 0) && all(x[!trt_cols] == 0))
 
       tdat_agd_regression <- dplyr::select(dat_agd_regression_nonbl, ".study", ".trt")
       tdat_agd_regression[!trt_rows, ".trt"] <- NA
@@ -1208,6 +1222,10 @@ nma <- function(network,
     } else {
       abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
     }
+
+    # RE matrix
+    Z_agd_regression <- unname(model.matrix(~  as.factor( tail(.which_RE,nrow(X_agd_regression_tmp)) ) - 1)[,-1])
+    nRE_agd_regression <- sort(setdiff(unique(tail(.which_RE,nrow(X_agd_regression_tmp))),0))
 
   } else {
     .RE_cor <- NULL
@@ -1393,6 +1411,7 @@ if (class_effects == "exchangeable") {
     agd_regression_x = X_agd_regression, agd_regression_est = est_agd_regression, agd_regression_cov = cov_agd_regression, agd_regression_study = study_agd_regression,
     agd_regression_reduced_study = agd_regression_reduced_study, nrow_agd_regression = nrow_agd_regression,
     agd_regression_OVB_GLM_dif = agd_regression_OVB_GLM_dif, agd_regression_OVB_GLM_inc = agd_regression_OVB_GLM_inc,
+    nRE_agd_regression = nRE_agd_regression, Z_agd_regression = Z_agd_regression,
     n_int = n_int,
     ipd_offset = offset_ipd,
     agd_arm_offset = offset_agd_arm,
@@ -1900,13 +1919,13 @@ if (class_effects == "exchangeable") {
   }
 
   if (has_agd_regression) {
-    # agd_regression_s_t_all <- dplyr::tibble(.study = agd_regression_study,
-    #                                         .trt = unname(apply(agd_regression_x[, col_trt, drop = FALSE], 1, get_trt)))
-    # agd_regression_s_t <- dplyr::distinct(agd_regression_s_t_all) %>% dplyr::mutate(.arm = 1:dplyr::n())
-    # agd_regression_arm <-  dplyr::left_join(agd_regression_s_t_all, agd_regression_s_t, by = c(".study", ".trt")) %>% dplyr::pull(.data$.arm)
-    # agd_regression_study <- agd_regression_s_t$.study
-    # agd_regression_trt <- agd_regression_s_t$.trt
-    # narm_agd_regression <- max(agd_regression_arm)
+    agd_regression_s_t_all <- dplyr::tibble(.study = agd_regression_study,
+                                            .trt = unname(apply(agd_regression_x[, col_trt, drop = FALSE], 1, get_trt)))
+    agd_regression_s_t <- dplyr::distinct(agd_regression_s_t_all) %>% dplyr::mutate(.arm = 1:dplyr::n())
+    agd_regression_arm <-  dplyr::left_join(agd_regression_s_t_all, agd_regression_s_t, by = c(".study", ".trt")) %>% dplyr::pull(.data$.arm)
+    agd_regression_study <- agd_regression_s_t$.study
+    agd_regression_trt <- agd_regression_s_t$.trt
+    narm_agd_regression <- max(agd_regression_arm)
     ni_agd_regression <- nrow(agd_regression_x)
 
     # Get number of AgD regression studies from length of covariance matrix list
@@ -2034,6 +2053,8 @@ if (class_effects == "exchangeable") {
     agd_regression_nrow = nrow_agd_regression,
     agd_regression_OVB_GLM_dif = agd_regression_OVB_GLM_dif,
     agd_regression_OVB_GLM_inc = agd_regression_OVB_GLM_inc,
+    nRE_agd_regression = nRE_agd_regression,
+    Z_agd_regression = Z_agd_regression,
     # agd_regression_arm = agd_regression_arm,
     # agd_regression_trt = agd_regression_trt,
     # narm_agd_regression = narm_agd_regression,

@@ -151,38 +151,28 @@ transformed parameters {
 
   // -- AgD model (regression coefficients) --
   if (ni_agd_regression) {
-    if (RE) {
-      // {
-        // vector[ni_agd_regression] eta_agd_regression_noRE = X_agd_regression * beta_tilde;
-        //
-        // for (i in 1:ni_agd_regression) {
-        //   if (which_RE[narm_ipd + narm_agd_arm + ni_agd_contrast + i])
-        //   eta_agd_regression[i] = eta_agd_regression_noRE[i] + f_delta[which_RE[narm_ipd + narm_agd_arm + ni_agd_contrast + i]];
-        //   else
-        //   eta_agd_regression[i] = eta_agd_regression_noRE[i];
-        // }
-      // }
-    } else {
-      int c_c = 0; // Coef. counter
-      int c_x = 0; // X rows counter
 
-      for (i in 1:ns_agd_regression) {
-        if(agd_regression_reduced_study[i]){
-          if (link == 1){ // logit link
-            eta_agd_regression[(c_c+1):(c_c+agd_regression_ncoef[i])] = logit(rep_vector(mean(inv_logit(X_agd_regression[(c_x+1):(c_x+agd_regression_nrow[i]),] * beta_tilde)),agd_regression_ncoef[i]) - agd_regression_OVB_GLM_dif[(c_c+1):(c_c+agd_regression_ncoef[i])] ) - agd_regression_OVB_GLM_inc[(c_c+1):(c_c+agd_regression_ncoef[i])] ;
-          }else if (link == 2){ // probit link
-            eta_agd_regression[(c_c+1):(c_c+agd_regression_ncoef[i])] = inv_Phi(rep_vector(mean(Phi(X_agd_regression[(c_x+1):(c_x+agd_regression_nrow[i]),] * beta_tilde)),agd_regression_ncoef[i]) - agd_regression_OVB_GLM_dif[(c_c+1):(c_c+agd_regression_ncoef[i])] ) - agd_regression_OVB_GLM_inc[(c_c+1):(c_c+agd_regression_ncoef[i])] ;
-          }else if (link == 3){ // cloglog link
-            eta_agd_regression[(c_c+1):(c_c+agd_regression_ncoef[i])] = log(-log1m(rep_vector(mean(inv_cloglog(X_agd_regression[(c_x+1):(c_x+agd_regression_nrow[i]),] * beta_tilde)),agd_regression_ncoef[i]) - agd_regression_OVB_GLM_dif[(c_c+1):(c_c+agd_regression_ncoef[i])] )) - agd_regression_OVB_GLM_inc[(c_c+1):(c_c+agd_regression_ncoef[i])] ;
-          }
-        }else{
-          eta_agd_regression[(c_c+1):(c_c+agd_regression_ncoef[i])] = X_agd_regression[ (c_x+1):(c_x+agd_regression_nrow[i]),] * beta_tilde;
+    int c_c = 0; // Coef. counter
+    int c_x = 0; // X rows counter
+
+    for (i in 1:ns_agd_regression) {
+      if(agd_regression_reduced_study[i]){
+
+        if (link == 1){ // logit link
+          eta_agd_regression[(c_c+1):(c_c+agd_regression_ncoef[i])] = logit(rep_vector(mean(inv_logit(       eta_agd_regression[(c_x+1):(c_x+agd_regression_nrow[i]),])),agd_regression_ncoef[i]) - agd_regression_OVB_GLM_dif[(c_c+1):(c_c+agd_regression_ncoef[i])] ) - agd_regression_OVB_GLM_inc[(c_c+1):(c_c+agd_regression_ncoef[i])] ;
+        }else if (link == 2){ // probit link
+          eta_agd_regression[(c_c+1):(c_c+agd_regression_ncoef[i])] = inv_Phi(rep_vector(mean(Phi(           eta_agd_regression[(c_x+1):(c_x+agd_regression_nrow[i]),])),agd_regression_ncoef[i]) - agd_regression_OVB_GLM_dif[(c_c+1):(c_c+agd_regression_ncoef[i])] ) - agd_regression_OVB_GLM_inc[(c_c+1):(c_c+agd_regression_ncoef[i])] ;
+        }else if (link == 3){ // cloglog link
+          eta_agd_regression[(c_c+1):(c_c+agd_regression_ncoef[i])] = log(-log1m(rep_vector(mean(inv_cloglog(eta_agd_regression[(c_x+1):(c_x+agd_regression_nrow[i]),])),agd_regression_ncoef[i]) - agd_regression_OVB_GLM_dif[(c_c+1):(c_c+agd_regression_ncoef[i])] )) - agd_regression_OVB_GLM_inc[(c_c+1):(c_c+agd_regression_ncoef[i])] ;
         }
+
         c_c += agd_regression_ncoef[i];
         c_x += agd_regression_nrow[i];
+
       }
     }
   }
+
 }
 model {
 #include /include/model_common.stan
