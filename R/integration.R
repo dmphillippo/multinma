@@ -283,6 +283,7 @@ add_integration.nma_data <- function(x, ...,
   }
 
   # Covariate arguments
+  ds_exprs <- rlang::enexprs(...)
   ds <- list(...)
 
   if (length(ds) == 0) {
@@ -420,6 +421,8 @@ add_integration.nma_data <- function(x, ...,
   out$int_cor <- cor
   attr(out$int_cor, "cor_adjust") <- cor_adjust
   attr(out$int_cor, "copula_cor") <- copula_cor
+
+  out$integration_code <- ds_exprs
 
   class(out) <- c("mlnmr_data", "nma_data")
   return(out)

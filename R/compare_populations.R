@@ -12,9 +12,7 @@
 
 compare_populations <- function(network,
                                 covariates = NULL,
-                                method = c("euclidean", "propensity"),
-                                distributions = NULL,
-                                binary = NULL) {
+                                method = c("euclidean", "propensity")) {
   # Check method argument
   method <- match.arg(method)
 
@@ -25,10 +23,6 @@ compare_populations <- function(network,
   # Checks for covariates argument
   if (is.null(covariates)) {
     abort("`covariates` argument must be specified and cannot be NULL.")
-  }
-  # checking binary variables are within covariates
-  if (!is.null(binary) && !all(binary %in% covariates)) {
-    abort("All `binary` must also be included in `covariates`.")
   }
   # Check IPD covariates
   if (isTRUE(nrow(network$ipd) > 0)) {
@@ -95,9 +89,10 @@ compare_populations <- function(network,
 
       agd_arm_networks_list <- lapply(agd_arm_networks_list, function(net) {
         total_sample_size <- sum(net$agd_arm$.sample_size)
+        integration_distr_objects <- lapply(network$integration_code, eval)
         other_args <- list(x = net,
                            n_int = total_sample_size)
-        all_args <- c(other_args, distributions)
+        all_args <- c(other_args, integration_distr_objects)
         net_integrated <- do.call(add_integration, all_args)
         unnested_agd <- unnest_integration(net_integrated$agd_arm)
         unnested_agd <- unnested_agd[covariates]
@@ -174,11 +169,11 @@ compare_populations <- function(network,
       sum_of_squared_weights <- sum(df$ate_weight^2)
       effective_sample_size <- (sum_of_weights^2) / sum_of_squared_weights
 
-      # e. Calculate the percentage reduction
+      # Calculate the percentage reduction
       original_n <- nrow(df)
       ess_percent <- (effective_sample_size / original_n) * 100
 
-      # f. Add the results to our summary data frame
+      # Add the results to our summary data frame
       ess_summary <- rbind(ess_summary, data.frame(
         comparison = pair_name,
         original_n = original_n,
@@ -187,10 +182,88 @@ compare_populations <- function(network,
       ))
       ess_summary <- ess_summary[order(ess_summary$ess_percent_of_original, decreasing = TRUE), ]
     }
-    return(list(
+# --- Long to short ---
+    g <- igraph::as.igraph(network)
+    components <- igraph::components(g)
+
+    treatment_components <- data.frame(
+      .trt = names(components$membership),
+      subnetwork = components$membership
+    )
+
+    study_trt_lookup <- list(
+      network$ipd,
+      network$agd_contrast,
+      network$agd_arm
+    ) %>%
+      purrr::compact() %>%
+      purrr::map_dfr(~ {
+        cols <- colnames(.x)
+        if (all(c(".study", ".trt") %in% cols)) {
+          dplyr::tibble(
+            .study = as.character(.x$.study),
+            .trt   = as.character(.x$.trt)
+          )
+        } else {
+          NULL
+        }
+      }) %>%
+      dplyr::distinct()
+
+    # Join subnetwork info to each study
+    study_components <- study_trt_lookup %>%
+      dplyr::left_join(treatment_components, by = ".trt") %>%
+      dplyr::select(-.trt) %>%
+      dplyr::distinct(.study, subnetwork)
+
+    df_long <- ess_summary %>%
+      separate(comparison, into = c("item1", "item2"), sep = "_vs_") %>%
+      select(item1, item2, value = ess_percent_of_original)
+
+    df_symmetric <- df_long %>%
+      rename(item2 = item1,
+             item1 = item2,
+             value = value)
+
+    df_all <- rbind(df_long, df_symmetric)
+
+    all_items <- unique(c(df_all$item1, df_all$item2))
+
+    final_matrix_df <- df_all %>%
+      pivot_wider(
+        names_from = item2,
+        values_from = value
+      )
+
+    final_matrix <- final_matrix_df %>%
+      column_to_rownames(var = "item1") %>%
+      as.matrix()
+
+    sorted_names <- sort(rownames(final_matrix))
+    sorted_matrix <- final_matrix[sorted_names, sorted_names]
+
+    if (max(study_components$subnetwork) == 2) {
+      # Split the data by subnetwork
+      sub1 <- dplyr::filter(study_components, subnetwork == 1)
+      sub2 <- dplyr::filter(study_components, subnetwork == 2)
+
+      rows_to_keep <- rownames(sorted_matrix) %in% sub1$.study
+      cols_to_keep <- colnames(sorted_matrix) %in% sub2$.study
+
+      filtered_matrix <- sorted_matrix[rows_to_keep, cols_to_keep]
+    }
+
+    output_list <- list(
       propensity_scores = propensity_scores_list,
-      summary = ess_summary
-    ))
+      summary = ess_summary,
+      full_matrix = sorted_matrix
+    )
+
+    if (max(study_components$subnetwork) == 2) {
+      output_list$subnetwork_matrix <- filtered_matrix
+    }
+
+    return(output_list)
   }
 
 
