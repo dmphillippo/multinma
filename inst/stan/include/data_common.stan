@@ -8,6 +8,8 @@ int<lower=0> ni_ipd; // total number of IPD individuals
 int<lower=0> ni_agd_arm; // total number of AgD (arm-based) data points
 int<lower=0> ni_agd_contrast; // total number of AgD (contrast-based) data points
 
+int<lower=0> mixed_studies; // total number of studies that contain both IPD and AgD
+
 // Treatment IDs
 int<lower=0> narm_ipd; // Number of IPD arms
 array[ni_ipd] int<lower=1> ipd_arm; // Arm indicator for IPD (i.e. picking element of which_RE)

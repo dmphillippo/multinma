@@ -1056,7 +1056,7 @@ set_agd_surv <- function(data,
 #'
 #' # Plot network
 #' plot(pso_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE)
-combine_network <- function(..., trt_ref) {
+combine_network <- function(..., trt_ref, allow_mixed_studies = FALSE) {
   s <- list(...)
 
   # Check that arguments all inherit from nma_data class
@@ -1128,9 +1128,11 @@ combine_network <- function(..., trt_ref) {
 
   # Check that no studies are duplicated between data sources
   all_studs <- purrr::flatten_chr(purrr::map(s, ~levels(.$studies)))
-  if (anyDuplicated(all_studs)) {
-    abort(sprintf("Studies with same label found in multiple data sources: %s",
-                  paste0(unique(all_studs[duplicated(all_studs)]), collapse = ", ")))
+  if (allow_mixed_studies == FALSE) {
+    if (anyDuplicated(all_studs)) {
+      abort(sprintf("Studies with same label found in multiple data sources: %s",
+                    paste0(unique(all_studs[duplicated(all_studs)]), collapse = ", ")))
+    }
   }
 
   # Combine study code factor
