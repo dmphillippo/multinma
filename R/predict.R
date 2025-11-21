@@ -421,7 +421,8 @@ predict.stan_nma <- function(object, ...,
           preddat <- dplyr::bind_rows(
             if (has_ipd(object$network)) dplyr::distinct(object$network$ipd, .data$.study, .data$.trt) else dplyr::tibble(),
             if (has_agd_arm(object$network)) dplyr::distinct(object$network$agd_arm, .data$.study, .data$.trt) else dplyr::tibble()
-          )
+          ) %>%
+            dplyr::arrange(.data$.study, .data$.trt)
         }
 
         # Add in .trtclass if defined in network
