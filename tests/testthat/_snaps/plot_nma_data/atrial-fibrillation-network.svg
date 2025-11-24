@@ -59,20 +59,20 @@
 <polyline points='390.11,72.22 389.50,72.22 388.89,72.22 388.28,72.22 387.67,72.22 387.06,72.22 386.46,72.22 385.85,72.22 385.24,72.22 384.63,72.22 384.02,72.22 383.42,72.22 382.81,72.22 382.20,72.22 381.59,72.22 380.98,72.22 380.37,72.22 379.77,72.22 379.16,72.22 378.55,72.22 377.94,72.22 377.33,72.22 376.73,72.22 376.12,72.22 375.51,72.22 374.90,72.22 374.29,72.22 373.68,72.22 373.08,72.22 372.47,72.22 371.86,72.22 371.25,72.22 370.64,72.22 370.04,72.22 369.43,72.22 368.82,72.22 368.21,72.22 367.60,72.22 366.99,72.22 366.39,72.22 365.78,72.22 365.17,72.22 364.56,72.22 363.95,72.22 363.35,72.22 362.74,72.22 362.13,72.22 361.52,72.22 360.91,72.22 360.30,72.22 359.70,72.22 359.09,72.22 358.48,72.22 357.87,72.22 357.26,72.22 356.65,72.22 356.05,72.22 355.44,72.22 354.83,72.22 354.22,72.22 353.61,72.22 353.01,72.22 352.40,72.22 351.79,72.22 351.18,72.22 350.57,72.22 349.96,72.22 349.36,72.22 348.75,72.22 348.14,72.22 347.53,72.22 346.92,72.22 346.32,72.22 345.71,72.22 345.10,72.22 344.49,72.22 343.88,72.22 343.27,72.22 342.67,72.22 342.06,72.22 341.45,72.22 340.84,72.22 340.23,72.22 339.63,72.22 339.02,72.22 338.41,72.22 337.80,72.22 337.19,72.22 336.58,72.22 335.98,72.22 335.37,72.22 334.76,72.22 334.15,72.22 333.54,72.22 332.94,72.22 332.33,72.22 331.72,72.22 331.11,72.22 330.50,72.22 329.89,72.22 ' style='stroke-width: 4.80; stroke: #113259;' />
 <circle cx='390.11' cy='72.22' r='13.16' style='stroke-width: 0.71; stroke: #F8766D; fill: #F8766D;' />
 <circle cx='446.25' cy='93.97' r='2.23' style='stroke-width: 0.71; stroke: #C77CFF; fill: #C77CFF;' />
-<circle cx='490.75' cy='134.53' r='1.51' style='stroke-width: 0.71; stroke: #7CAE00; fill: #7CAE00;' />
-<circle cx='517.59' cy='188.43' r='1.66' style='stroke-width: 0.71; stroke: #7CAE00; fill: #7CAE00;' />
+<circle cx='490.75' cy='134.53' r='1.51' style='stroke-width: 0.71; stroke: #00BFC4; fill: #00BFC4;' />
+<circle cx='517.59' cy='188.43' r='1.66' style='stroke-width: 0.71; stroke: #00BFC4; fill: #00BFC4;' />
 <circle cx='523.14' cy='248.39' r='2.53' style='stroke-width: 0.71; stroke: #F8766D; fill: #F8766D;' />
 <circle cx='506.66' cy='306.30' r='2.59' style='stroke-width: 0.71; stroke: #C77CFF; fill: #C77CFF;' />
 <circle cx='470.38' cy='354.35' r='3.57' style='stroke-width: 0.71; stroke: #C77CFF; fill: #C77CFF;' />
-<circle cx='419.19' cy='386.05' r='0.91' style='stroke-width: 0.71; stroke: #7CAE00; fill: #7CAE00;' />
-<circle cx='360.00' cy='397.11' r='2.98' style='stroke-width: 0.71; stroke: #7CAE00; fill: #7CAE00;' />
+<circle cx='419.19' cy='386.05' r='0.91' style='stroke-width: 0.71; stroke: #00BFC4; fill: #00BFC4;' />
+<circle cx='360.00' cy='397.11' r='2.98' style='stroke-width: 0.71; stroke: #00BFC4; fill: #00BFC4;' />
 <circle cx='300.81' cy='386.05' r='3.53' style='stroke-width: 0.71; stroke: #F8766D; fill: #F8766D;' />
-<circle cx='249.62' cy='354.35' r='5.77' style='stroke-width: 0.71; stroke: #7CAE00; fill: #7CAE00;' />
-<circle cx='213.34' cy='306.30' r='7.41' style='stroke-width: 0.71; stroke: #7CAE00; fill: #7CAE00;' />
-<circle cx='196.86' cy='248.39' r='1.60' style='stroke-width: 0.71; stroke: #7CAE00; fill: #7CAE00;' />
-<circle cx='202.41' cy='188.43' r='5.36' style='stroke-width: 0.71; stroke: #7CAE00; fill: #7CAE00;' />
-<circle cx='229.25' cy='134.53' r='6.39' style='stroke-width: 0.71; stroke: #00BFC4; fill: #00BFC4;' />
-<circle cx='273.75' cy='93.97' r='2.25' style='stroke-width: 0.71; stroke: #7CAE00; fill: #7CAE00;' />
+<circle cx='249.62' cy='354.35' r='5.77' style='stroke-width: 0.71; stroke: #00BFC4; fill: #00BFC4;' />
+<circle cx='213.34' cy='306.30' r='7.41' style='stroke-width: 0.71; stroke: #00BFC4; fill: #00BFC4;' />
+<circle cx='196.86' cy='248.39' r='1.60' style='stroke-width: 0.71; stroke: #00BFC4; fill: #00BFC4;' />
+<circle cx='202.41' cy='188.43' r='5.36' style='stroke-width: 0.71; stroke: #00BFC4; fill: #00BFC4;' />
+<circle cx='229.25' cy='134.53' r='6.39' style='stroke-width: 0.71; stroke: #7CAE00; fill: #7CAE00;' />
+<circle cx='273.75' cy='93.97' r='2.25' style='stroke-width: 0.71; stroke: #00BFC4; fill: #00BFC4;' />
 <circle cx='329.89' cy='72.22' r='7.75' style='stroke-width: 0.71; stroke: #F8766D; fill: #F8766D;' />
 <text x='390.11' y='72.22' style='font-size: 11.00px; font-family: sans;' textLength='188.38px' lengthAdjust='spacingAndGlyphs'>Standard adjusted dose anti-coagulant</text>
 <text x='446.25' y='93.97' style='font-size: 11.00px; font-family: sans;' textLength='76.45px' lengthAdjust='spacingAndGlyphs'>Acenocoumarol</text>
@@ -91,35 +91,35 @@
 <text x='229.25' y='134.53' text-anchor='end' style='font-size: 11.00px; font-family: sans;' textLength='111.92px' lengthAdjust='spacingAndGlyphs'>Placebo/Standard care</text>
 <text x='273.75' y='93.97' text-anchor='end' style='font-size: 11.00px; font-family: sans;' textLength='38.50px' lengthAdjust='spacingAndGlyphs'>Triflusal</text>
 <text x='329.89' y='72.22' text-anchor='end' style='font-size: 11.00px; font-family: sans;' textLength='64.82px' lengthAdjust='spacingAndGlyphs'>Ximelagatran</text>
-<text x='185.88' y='442.22' style='font-size: 11.00px; font-family: sans;' textLength='80.70px' lengthAdjust='spacingAndGlyphs'>Treatment Class</text>
-<circle cx='280.70' cy='438.44' r='1.95' style='stroke-width: 0.71; stroke: #F8766D; fill: #F8766D;' />
-<circle cx='365.21' cy='438.44' r='1.95' style='stroke-width: 0.71; stroke: #7CAE00; fill: #7CAE00;' />
-<circle cx='439.91' cy='438.44' r='1.95' style='stroke-width: 0.71; stroke: #00BFC4; fill: #00BFC4;' />
-<circle cx='496.52' cy='438.44' r='1.95' style='stroke-width: 0.71; stroke: #C77CFF; fill: #C77CFF;' />
-<text x='294.82' y='441.46' style='font-size: 8.80px; font-family: sans;' textLength='56.26px' lengthAdjust='spacingAndGlyphs'>Anti-coagulant</text>
-<text x='379.32' y='441.46' style='font-size: 8.80px; font-family: sans;' textLength='46.47px' lengthAdjust='spacingAndGlyphs'>Anti-platelet</text>
-<text x='454.03' y='441.46' style='font-size: 8.80px; font-family: sans;' textLength='28.37px' lengthAdjust='spacingAndGlyphs'>Control</text>
-<text x='510.64' y='441.46' style='font-size: 8.80px; font-family: sans;' textLength='23.48px' lengthAdjust='spacingAndGlyphs'>Mixed</text>
-<text x='232.53' y='481.42' style='font-size: 11.00px; font-family: sans;' textLength='89.28px' lengthAdjust='spacingAndGlyphs'>Number of studies</text>
-<line x1='329.01' y1='477.63' x2='342.84' y2='477.63' style='stroke-width: 2.13; stroke-linecap: butt;' />
-<line x1='362.15' y1='477.63' x2='375.97' y2='477.63' style='stroke-width: 4.80; stroke-linecap: butt;' />
-<line x1='395.28' y1='477.63' x2='409.10' y2='477.63' style='stroke-width: 7.47; stroke-linecap: butt;' />
-<line x1='428.41' y1='477.63' x2='442.24' y2='477.63' style='stroke-width: 10.14; stroke-linecap: butt;' />
-<line x1='461.55' y1='477.63' x2='475.37' y2='477.63' style='stroke-width: 12.80; stroke-linecap: butt;' />
-<text x='350.04' y='480.66' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='383.18' y='480.66' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text x='416.31' y='480.66' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>3</text>
-<text x='449.44' y='480.66' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>4</text>
-<text x='482.58' y='480.66' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>5</text>
-<text x='203.30' y='528.20' style='font-size: 11.00px; font-family: sans;' textLength='85.60px' lengthAdjust='spacingAndGlyphs'>Total sample size</text>
-<circle cx='303.02' cy='524.41' r='6.46' style='stroke-width: 0.71;' />
-<circle cx='353.67' cy='524.41' r='8.99' style='stroke-width: 0.71;' />
-<circle cx='409.72' cy='524.41' r='10.93' style='stroke-width: 0.71;' />
-<circle cx='470.53' cy='524.41' r='12.57' style='stroke-width: 0.71;' />
-<text x='317.14' y='527.44' style='font-size: 8.80px; font-family: sans;' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>2500</text>
-<text x='370.62' y='527.44' style='font-size: 8.80px; font-family: sans;' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>5000</text>
-<text x='429.25' y='527.44' style='font-size: 8.80px; font-family: sans;' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>7500</text>
-<text x='492.23' y='527.44' style='font-size: 8.80px; font-family: sans;' textLength='24.47px' lengthAdjust='spacingAndGlyphs'>10000</text>
+<text x='232.53' y='442.22' style='font-size: 11.00px; font-family: sans;' textLength='89.28px' lengthAdjust='spacingAndGlyphs'>Number of studies</text>
+<line x1='329.01' y1='438.44' x2='342.84' y2='438.44' style='stroke-width: 2.13; stroke-linecap: butt;' />
+<line x1='362.15' y1='438.44' x2='375.97' y2='438.44' style='stroke-width: 4.80; stroke-linecap: butt;' />
+<line x1='395.28' y1='438.44' x2='409.10' y2='438.44' style='stroke-width: 7.47; stroke-linecap: butt;' />
+<line x1='428.41' y1='438.44' x2='442.24' y2='438.44' style='stroke-width: 10.14; stroke-linecap: butt;' />
+<line x1='461.55' y1='438.44' x2='475.37' y2='438.44' style='stroke-width: 12.80; stroke-linecap: butt;' />
+<text x='350.04' y='441.46' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='383.18' y='441.46' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='416.31' y='441.46' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text x='449.44' y='441.46' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>4</text>
+<text x='482.58' y='441.46' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>5</text>
+<text x='203.30' y='489.00' style='font-size: 11.00px; font-family: sans;' textLength='85.60px' lengthAdjust='spacingAndGlyphs'>Total sample size</text>
+<circle cx='303.02' cy='485.21' r='6.46' style='stroke-width: 0.71;' />
+<circle cx='353.67' cy='485.21' r='8.99' style='stroke-width: 0.71;' />
+<circle cx='409.72' cy='485.21' r='10.93' style='stroke-width: 0.71;' />
+<circle cx='470.53' cy='485.21' r='12.57' style='stroke-width: 0.71;' />
+<text x='317.14' y='488.24' style='font-size: 8.80px; font-family: sans;' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>2500</text>
+<text x='370.62' y='488.24' style='font-size: 8.80px; font-family: sans;' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>5000</text>
+<text x='429.25' y='488.24' style='font-size: 8.80px; font-family: sans;' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>7500</text>
+<text x='492.23' y='488.24' style='font-size: 8.80px; font-family: sans;' textLength='24.47px' lengthAdjust='spacingAndGlyphs'>10000</text>
+<text x='185.88' y='535.78' style='font-size: 11.00px; font-family: sans;' textLength='80.70px' lengthAdjust='spacingAndGlyphs'>Treatment Class</text>
+<circle cx='280.70' cy='531.99' r='1.95' style='stroke-width: 0.71; stroke: #F8766D; fill: #F8766D;' />
+<circle cx='365.21' cy='531.99' r='1.95' style='stroke-width: 0.71; stroke: #7CAE00; fill: #7CAE00;' />
+<circle cx='421.81' cy='531.99' r='1.95' style='stroke-width: 0.71; stroke: #00BFC4; fill: #00BFC4;' />
+<circle cx='496.52' cy='531.99' r='1.95' style='stroke-width: 0.71; stroke: #C77CFF; fill: #C77CFF;' />
+<text x='294.82' y='535.02' style='font-size: 8.80px; font-family: sans;' textLength='56.26px' lengthAdjust='spacingAndGlyphs'>Anti-coagulant</text>
+<text x='379.32' y='535.02' style='font-size: 8.80px; font-family: sans;' textLength='28.37px' lengthAdjust='spacingAndGlyphs'>Control</text>
+<text x='435.93' y='535.02' style='font-size: 8.80px; font-family: sans;' textLength='46.47px' lengthAdjust='spacingAndGlyphs'>Anti-platelet</text>
+<text x='510.64' y='535.02' style='font-size: 8.80px; font-family: sans;' textLength='23.48px' lengthAdjust='spacingAndGlyphs'>Mixed</text>
 <text x='180.54' y='42.28' style='font-size: 18.00px; font-weight: bold; font-family: sans;' textLength='190.07px' lengthAdjust='spacingAndGlyphs'>Atrial fibrillation network</text>
 </g>
 </svg>

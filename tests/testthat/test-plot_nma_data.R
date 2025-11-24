@@ -198,7 +198,10 @@ test_that("Plaque psoriasis", {
   )
 
 
-  class_pal <- c("#D95F02", "#7570B3", "#E7298A", "#E6AB02")
+  class_pal <- c(`IL-12/23 blocker` = "#D95F02",
+                 `IL-17 blocker` = "#7570B3",
+                 `Placebo` = "#E7298A",
+                 `TNFa blocker` = "#E6AB02")
 
 
   expect_doppelganger("Plaque psoriasis network",
