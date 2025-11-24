@@ -1,5 +1,12 @@
 # multinma 0.8.1.9000
 
+* Feature: New `subset` argument to `posterior_ranks()` and 
+`posterior_rank_probs()` allows ranks to be calculated for a smaller decision 
+set of treatments than the full analysis set.
+* Fix: Bug where generalised gamma models with an `aux_regression` model on the 
+auxiliary shape parameters gave an error when trying to use `predict()` or 
+`marginal_effects()` (#62).
+
 # multinma 0.8.1
 
 * Fix: Update deprecated Stan array syntax (PR #51).
