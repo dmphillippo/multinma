@@ -1223,10 +1223,6 @@ nma <- function(network,
       abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
     }
 
-    # RE matrix
-    Z_agd_regression <- unname(model.matrix(~  as.factor( tail(.which_RE,nrow(X_agd_regression_tmp)) ) - 1)[,-1])
-    nRE_agd_regression <- sort(setdiff(unique(tail(.which_RE,nrow(X_agd_regression_tmp))),0))
-
   } else {
     .RE_cor <- NULL
     .which_RE <- NULL
@@ -1411,7 +1407,6 @@ if (class_effects == "exchangeable") {
     agd_regression_x = X_agd_regression, agd_regression_est = est_agd_regression, agd_regression_cov = cov_agd_regression, agd_regression_study = study_agd_regression,
     agd_regression_reduced_study = agd_regression_reduced_study, nrow_agd_regression = nrow_agd_regression,
     agd_regression_OVB_GLM_dif = agd_regression_OVB_GLM_dif, agd_regression_OVB_GLM_inc = agd_regression_OVB_GLM_inc,
-    nRE_agd_regression = nRE_agd_regression, Z_agd_regression = Z_agd_regression,
     n_int = n_int,
     ipd_offset = offset_ipd,
     agd_arm_offset = offset_agd_arm,
@@ -2053,8 +2048,6 @@ if (class_effects == "exchangeable") {
     agd_regression_nrow = nrow_agd_regression,
     agd_regression_OVB_GLM_dif = agd_regression_OVB_GLM_dif,
     agd_regression_OVB_GLM_inc = agd_regression_OVB_GLM_inc,
-    nRE_agd_regression = nRE_agd_regression,
-    Z_agd_regression = Z_agd_regression,
     # agd_regression_arm = agd_regression_arm,
     # agd_regression_trt = agd_regression_trt,
     # narm_agd_regression = narm_agd_regression,
