@@ -740,7 +740,7 @@ nma <- function(network,
     n_in_class <- sum(network$classes == ref_class)
 
     if (n_in_class >= 2) {
-      warn(glue::glue("Note: Reference treatment {ref_trt} has been removed from {ref_class}."))
+      inform(glue::glue("Note: Reference treatment {ref_trt} has been removed from {ref_class}."))
     }
   }
 
