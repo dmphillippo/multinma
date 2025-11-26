@@ -14,7 +14,7 @@ vector[n_delta] f_delta =
   ) : u_delta;
 
 // -- Class effects --
-vector[class_effects ? max(which_class) : 0] f_class;
+vector[class_effects ? max(which_fclass) : 0] f_class;
 
 // -- Back-transformed parameters --
 vector[nX] allbeta = QR ? R_inv * beta_tilde : beta_tilde;
@@ -87,7 +87,7 @@ if (ni_ipd) {
   if (class_effects) {
     for (i in 1:ni_ipd) {
       if (ipd_trt[ipd_arm[i]] > 1 && which_CE[ipd_trt[ipd_arm[i]] - 1]) {
-        eta_ipd[i] += f_class[which_class[ipd_trt[ipd_arm[i]] - 1]];
+        eta_ipd[i] += f_class[which_fclass[ipd_trt[ipd_arm[i]] - 1]];
       }
     }
   }
@@ -104,10 +104,10 @@ if (ni_agd_contrast) {
     if (class_effects) {
       for (i in 1:ni_agd_arm){
         if (agd_contrast_trt[i] > 1 && which_CE[agd_contrast_trt[i] - 1]) {
-          eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_class[agd_contrast_trt[i] - 1]];
+          eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_fclass[agd_contrast_trt[i] - 1]];
         }
         if (agd_contrast_trt_b[i] > 1 && which_CE[agd_contrast_trt_b[i] - 1]) {
-          eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] -= f_class[which_class[agd_contrast_trt_b[i] - 1]];
+          eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] -= f_class[which_fclass[agd_contrast_trt_b[i] - 1]];
         }
       }
     }
@@ -154,10 +154,10 @@ if (ni_agd_contrast) {
     if (class_effects) {
       for (i in 1:ni_agd_contrast) {
         if (agd_contrast_trt[i] > 1 && which_CE[agd_contrast_trt[i] - 1]) {
-          eta_agd_contrast_bar[i] += f_class[which_class[agd_contrast_trt[i] - 1]];
+          eta_agd_contrast_bar[i] += f_class[which_fclass[agd_contrast_trt[i] - 1]];
         }
         if (agd_contrast_trt_b[i] > 1 && which_CE[agd_contrast_trt_b[i] - 1]) {
-          eta_agd_contrast_bar[i] -= f_class[which_class[agd_contrast_trt_b[i] - 1]];
+          eta_agd_contrast_bar[i] -= f_class[which_fclass[agd_contrast_trt_b[i] - 1]];
         }
       }
     }
