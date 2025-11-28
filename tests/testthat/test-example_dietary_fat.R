@@ -12,8 +12,8 @@ list(run_tests = FALSE)
 
 
 ## ----eval = FALSE-------------------------------------------------------------
-## library(multinma)
-## options(mc.cores = parallel::detectCores())
+# library(multinma)
+# options(mc.cores = parallel::detectCores())
 
 ## ----setup, echo = FALSE------------------------------------------------------
 library(multinma)
@@ -54,8 +54,8 @@ diet_fit_FE
 
 
 ## ----eval=FALSE---------------------------------------------------------------
-## # Not run
-## print(diet_fit_FE, pars = c("d", "mu"))
+# # Not run
+# print(diet_fit_FE, pars = c("d", "mu"))
 
 
 ## ----diet_FE_pp_plot----------------------------------------------------------
@@ -68,11 +68,11 @@ summary(half_normal(scale = 5))
 
 
 ## ----eval=FALSE---------------------------------------------------------------
-## diet_fit_RE <- nma(diet_net,
-##                    trt_effects = "random",
-##                    prior_intercept = normal(scale = 100),
-##                    prior_trt = normal(scale = 100),
-##                    prior_het = half_normal(scale = 5))
+# diet_fit_RE <- nma(diet_net,
+#                    trt_effects = "random",
+#                    prior_intercept = normal(scale = 100),
+#                    prior_trt = normal(scale = 100),
+#                    prior_het = half_normal(scale = 5))
 
 ## ----echo=FALSE, warning=FALSE------------------------------------------------
 diet_fit_RE <- nowarn_on_ci(
@@ -89,8 +89,8 @@ diet_fit_RE
 
 
 ## ----eval=FALSE---------------------------------------------------------------
-## # Not run
-## print(diet_fit_RE, pars = c("d", "mu", "delta"))
+# # Not run
+# print(diet_fit_RE, pars = c("d", "mu", "delta"))
 
 
 ## ----diet_RE_pp_plot----------------------------------------------------------
@@ -212,6 +212,28 @@ test_that("Specifying study for baseline gives correct result", {
   pred_FE_DART <- predict(diet_fit_FE, type = "response", baseline = "DART")
   expect_identical(c(as.array(pred_FE_DART)),
                    c(as.array(pred_FE_studies)[ , , 1:2]))
+})
+
+# Predictions escape study names correctly
+test_that("Predictions escaping baseline study names", {
+  diet_net2 <- set_agd_arm(dietary_fat, 
+                        study = paste0(studyc, "(", studyn, ")$"),
+                        trt = trtc,
+                        r = r, 
+                        E = E,
+                        trt_ref = "Control",
+                        sample_size = n)
+  
+  diet_fit_FE2 <- nma(diet_net2, 
+                   trt_effects = "fixed",
+                   prior_intercept = normal(scale = 100),
+                   prior_trt = normal(scale = 100))
+  
+  pred_FE_DART <- predict(diet_fit_FE, type = "response", baseline = "DART")
+  pred_FE_DART2 <- predict(diet_fit_FE2, type = "response", baseline = "DART(1)$")
+  expect_equivalent(as.data.frame(pred_FE_DART2)[, c("mean", "sd")],
+                    as.data.frame(pred_FE_DART)[, c("mean", "sd")],
+                    tol = tol)
 })
 
 # Test identical model treating data as IPD

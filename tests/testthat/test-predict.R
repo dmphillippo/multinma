@@ -3062,3 +3062,80 @@ test_that("aux argument", {
                        ), "All elements of `aux` must match the name of an IPD or AgD \\(arm-based\\) study in the network, or be a list of distr\\(\\) distributions")
 
 })
+
+test_that("baseline and aux are escaped correctly", {
+  ndmm_net <- set_ipd(ndmm_ipd,
+                      study = gsub("(.+)([0-9]{4})", "\\1 (\\2)$", study),
+                      trt = trt,
+                      Surv = Surv(eventtime, status))
+
+  ndmm_fit_gg <- suppressWarnings(nma(ndmm_net,
+                  likelihood = "gengamma",
+                  aux_regression = ~.trt,
+                  iter = 10))
+
+  par <- c("pred[Len, 1]", "pred[Pbo, 1]")
+  pd <- dplyr::distinct(ndmm_net$ipd, .study, .trt)
+
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit_gg, times = 10, type = "survival",
+            aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
+    par)
+
+  ndmm_fit_weib <- suppressWarnings(nma(ndmm_net,
+                                      likelihood = "weibull",
+                                      aux_regression = ~.trt,
+                                      iter = 10))
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit_weib, times = 10, type = "survival",
+                             aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
+    par)
+
+  ndmm_fit_ms <- suppressWarnings(nma(ndmm_net,
+                                        likelihood = "mspline",
+                                        aux_regression = ~.trt,
+                                        iter = 10))
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit_ms, times = 10, type = "survival",
+                             aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
+    par)
+
+  par <- c("pred[New 1: Len, 1]", "pred[New 1: Pbo, 1]")
+
+  ndmm_fit2_gg <- suppressWarnings(nma(ndmm_net,
+                   likelihood = "gengamma",
+                   regression = ~age*.trt,
+                   aux_regression = ~.trt,
+                   iter = 10))
+
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit2_gg, times = 10, type = "survival",
+                             newdata = data.frame(age = 50),
+                             aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
+    par)
+
+  ndmm_fit2_weib <- suppressWarnings(nma(ndmm_net,
+                                       likelihood = "weibull",
+                                       regression = ~age*.trt,
+                                       aux_regression = ~.trt,
+                                       iter = 10))
+
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit2_weib, times = 10, type = "survival",
+                             newdata = data.frame(age = 50),
+                             aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
+    par)
+
+  ndmm_fit2_ms <- suppressWarnings(nma(ndmm_net,
+                                       likelihood = "mspline",
+                                       regression = ~age*.trt,
+                                       aux_regression = ~.trt,
+                                       iter = 10))
+
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit2_ms, times = 10, type = "survival",
+                             newdata = data.frame(age = 50),
+                             aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
+  par)
+
+})
