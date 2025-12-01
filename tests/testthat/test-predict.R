@@ -3104,37 +3104,37 @@ test_that("baseline and aux are escaped correctly", {
 
   ndmm_fit2_gg <- suppressWarnings(nma(ndmm_net,
                    likelihood = "gengamma",
-                   regression = ~age*.trt,
+                   regression = ~I(age/10)*.trt,
                    aux_regression = ~.trt,
                    iter = 10))
 
   expect_identical(
     dplyr::as_tibble(predict(ndmm_fit2_gg, times = 10, type = "survival",
-                             newdata = data.frame(age = 50),
+                             newdata = data.frame(age = 5),
                              aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
     par)
 
   ndmm_fit2_weib <- suppressWarnings(nma(ndmm_net,
                                        likelihood = "weibull",
-                                       regression = ~age*.trt,
+                                       regression = ~I(age/10)*.trt,
                                        aux_regression = ~.trt,
                                        iter = 10))
 
   expect_identical(
     dplyr::as_tibble(predict(ndmm_fit2_weib, times = 10, type = "survival",
-                             newdata = data.frame(age = 50),
+                             newdata = data.frame(age = 5),
                              aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
     par)
 
   ndmm_fit2_ms <- suppressWarnings(nma(ndmm_net,
                                        likelihood = "mspline",
-                                       regression = ~age*.trt,
+                                       regression = ~I(age/10)*.trt,
                                        aux_regression = ~.trt,
                                        iter = 10))
 
   expect_identical(
     dplyr::as_tibble(predict(ndmm_fit2_ms, times = 10, type = "survival",
-                             newdata = data.frame(age = 50),
+                             newdata = data.frame(age = 5),
                              aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
   par)
 
