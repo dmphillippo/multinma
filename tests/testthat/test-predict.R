@@ -3075,7 +3075,6 @@ test_that("baseline and aux are escaped correctly", {
                   iter = 10))
 
   par <- c("pred[Len, 1]", "pred[Pbo, 1]")
-  pd <- dplyr::distinct(ndmm_net$ipd, .study, .trt)
 
   expect_identical(
     dplyr::as_tibble(predict(ndmm_fit_gg, times = 10, type = "survival",
@@ -3101,6 +3100,7 @@ test_that("baseline and aux are escaped correctly", {
     par)
 
   par <- c("pred[New 1: Len, 1]", "pred[New 1: Pbo, 1]")
+  par2 <- c("pred[(a): Len, 1]", "pred[(a): Pbo, 1]", "pred[(b): Len, 1]", "pred[(b): Pbo, 1]")
 
   ndmm_fit2_gg <- suppressWarnings(nma(ndmm_net,
                    likelihood = "gengamma",
@@ -3114,6 +3114,15 @@ test_that("baseline and aux are escaped correctly", {
                              aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
     par)
 
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit2_gg, times = 10, type = "survival",
+                             newdata = data.frame(age = 5, s = c("(a)", "(b)")), study = s,
+                             aux = list("(a)" = "Attal (2012)$",
+                                        "(b)" = "McCarthy (2012)$"),
+                             baseline = list("(a)" = "Attal (2012)$",
+                                             "(b)" = "McCarthy (2012)$")))$parameter,
+    par2)
+
   ndmm_fit2_weib <- suppressWarnings(nma(ndmm_net,
                                        likelihood = "weibull",
                                        regression = ~I(age/10)*.trt,
@@ -3126,6 +3135,15 @@ test_that("baseline and aux are escaped correctly", {
                              aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
     par)
 
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit2_weib, times = 10, type = "survival",
+                             newdata = data.frame(age = 5, s = c("(a)", "(b)")), study = s,
+                             aux = list("(a)" = "Attal (2012)$",
+                                        "(b)" = "McCarthy (2012)$"),
+                             baseline = list("(a)" = "Attal (2012)$",
+                                             "(b)" = "McCarthy (2012)$")))$parameter,
+    par2)
+
   ndmm_fit2_ms <- suppressWarnings(nma(ndmm_net,
                                        likelihood = "mspline",
                                        regression = ~I(age/10)*.trt,
@@ -3137,5 +3155,14 @@ test_that("baseline and aux are escaped correctly", {
                              newdata = data.frame(age = 5),
                              aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
   par)
+
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit2_ms, times = 10, type = "survival",
+                             newdata = data.frame(age = 5, s = c("(a)", "(b)")), study = s,
+                             aux = list("(a)" = "Attal (2012)$",
+                                        "(b)" = "McCarthy (2012)$"),
+                             baseline = list("(a)" = "Attal (2012)$",
+                                             "(b)" = "McCarthy (2012)$")))$parameter,
+    par2)
 
 })
