@@ -13,6 +13,11 @@
   [`predict()`](https://rdrr.io/r/stats/predict.html) or
   [`marginal_effects()`](https://dmphillippo.github.io/multinma/dev/reference/marginal_effects.md)
   ([\#62](https://github.com/dmphillippo/multinma/issues/62)).
+- Fix: Calling [`predict()`](https://rdrr.io/r/stats/predict.html) for
+  models where study names include special regex characters
+  (e.g. parentheses like “Smith (2025)”) no longer fails when these
+  studies are used to inform the `baseline` or `aux` arguments
+  ([\#63](https://github.com/dmphillippo/multinma/issues/63)).
 
 ## multinma 0.8.1
 

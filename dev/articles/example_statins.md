@@ -135,7 +135,7 @@ statin_fit_FE
 #> d[Statin]                                0.09  2463    1
 #> lp__                                 -7241.06  1543    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Nov 24 16:41:39 2025.
+#> Samples were drawn using NUTS(diag_e) at Tue Dec  2 12:44:29 2025.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -221,7 +221,7 @@ statin_fit_RE
 #> lp__                                 -7246.03   863 1.01
 #> tau                                      0.77   667 1.01
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Nov 24 16:41:48 2025.
+#> Samples were drawn using NUTS(diag_e) at Tue Dec  2 12:44:34 2025.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
