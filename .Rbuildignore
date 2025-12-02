@@ -18,3 +18,4 @@
 ^docs$
 ^pkgdown$
 ^CITATION\.cff$
+^codecov\.yml$
