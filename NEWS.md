@@ -6,6 +6,9 @@ set of treatments than the full analysis set.
 * Fix: Bug where generalised gamma models with an `aux_regression` model on the 
 auxiliary shape parameters gave an error when trying to use `predict()` or 
 `marginal_effects()` (#62).
+* Fix: Calling `predict()` for models where study names include special regex
+characters (e.g. parentheses like "Smith (2025)") no longer fails when these 
+studies are used to inform the `baseline` or `aux` arguments (#63).
 
 # multinma 0.8.1
 
