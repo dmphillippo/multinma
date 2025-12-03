@@ -13,6 +13,11 @@
   [`predict()`](https://rdrr.io/r/stats/predict.html) or
   [`marginal_effects()`](https://dmphillippo.github.io/multinma/dev/reference/marginal_effects.md)
   ([\#62](https://github.com/dmphillippo/multinma/issues/62)).
+- Fix: Class effects models with IPD were broken, now resolved (PR
+  [\#57](https://github.com/dmphillippo/multinma/issues/57)).
+- Improvement: Class effects models now note when the reference
+  treatment was included in a class, and has been removed (PR
+  [\#57](https://github.com/dmphillippo/multinma/issues/57)).
 - Fix: Calling [`predict()`](https://rdrr.io/r/stats/predict.html) for
   models where study names include special regex characters
   (e.g. parentheses like “Smith (2025)”) no longer fails when these

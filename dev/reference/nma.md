@@ -503,7 +503,7 @@ smk_fit_FE
 #> d[Self-help]                  0.31     0.47  2451    1
 #> lp__                      -5856.77 -5853.19  1596    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Dec  2 15:09:02 2025.
+#> Samples were drawn using NUTS(diag_e) at Wed Dec  3 16:28:18 2025.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -536,7 +536,7 @@ smk_fit_RE
 #> lp__                      -5763.50 -5756.32   987    1
 #> tau                           0.96     1.29  1121    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Dec  2 15:09:14 2025.
+#> Samples were drawn using NUTS(diag_e) at Wed Dec  3 16:28:24 2025.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -586,7 +586,7 @@ smk_fit_RE_UME
 #> lp__                                            -5753.55  1081    1
 #> tau                                                 1.50  1005    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Dec  2 15:09:25 2025.
+#> Samples were drawn using NUTS(diag_e) at Wed Dec  3 16:28:30 2025.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -915,7 +915,7 @@ pso_fit
 #> d[SEC_300]                              2.45     2.53     2.68  5394    1
 #> lp__                                -1576.14 -1574.02 -1570.51  1568    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Dec  2 15:12:11 2025.
+#> Samples were drawn using NUTS(diag_e) at Wed Dec  3 16:31:07 2025.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -990,7 +990,7 @@ ndmm_fit
 #> shape[Morgan2012]       0.94  4953    1
 #> shape[Palumbo2014]      1.16  4718    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Dec  2 15:16:11 2025.
+#> Samples were drawn using NUTS(diag_e) at Wed Dec  3 16:35:06 2025.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).

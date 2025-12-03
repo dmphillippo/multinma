@@ -7,8 +7,8 @@ Many of these examples recreate analyses from the series of Technical
 Support Documents published by the NICE Decision Support Unit ([Dias et
 al. 2011](#ref-TSD_evsynth)). The exceptions are atrial fibrillation
 ([Cooper et al. 2009](#ref-Cooper2009)), white blood cell transfusion
-([Turner et al. 2012](#ref-Turner2012)), social anxiety ([Perren et al.,
-in preparation](#ref-Perren2025); [Mayo-Wilson et al.
+([Turner et al. 2012](#ref-Turner2012)), social anxiety ([Perren et al.
+2025](#ref-Perren2025); [Mayo-Wilson et al.
 2014](#ref-mayo2014psychological)), and plaque psoriasis multilevel
 network meta-regression ([Phillippo et al. 2020](#ref-methods_paper),
 [2022](#ref-Phillippo2022)).
@@ -49,9 +49,10 @@ Pharmacological Interventions for Social Anxiety Disorder in Adults: A
 Systematic Review and Network Meta-Analysis.” *The Lancet Psychiatry* 1
 (5): 368–76.
 
-Perren, S. J., H. Pedder, N. J. Welton, and D. M. Phillippo. In
-preparation. “Network Meta-Analysis with Class Effects: A Practical
-Guide and Model Selection Algorithm.”
+Perren, Samuel J., Hugo Pedder, Nicky J. Welton, and David M. Phillippo.
+2025. “Network Meta-Analysis with Class Effects: A Practical Guide and
+Model Selection Algorithm.” *Medical Decision Making*, November.
+<https://doi.org/10.1177/0272989x251389887>.
 
 Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, D. Saure,
 Y. Schymura, and N. J. Welton. 2022. “Validating the Assumptions of

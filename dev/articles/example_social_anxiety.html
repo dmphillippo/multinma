@@ -117,9 +117,8 @@ The data are available in this package as
 using a NMA model with class effects, which we recreate here. When
 fitting class effects models there are multiple modeling options
 available.</p>
-<p>We demonstrate the model selection strategy proposed by <span class="citation">Perren et al. (<a href="#ref-Perren2025">in
-preparation</a>)</span> to determine the most suitable class effects
-model.</p>
+<p>We demonstrate the model selection strategy proposed by <span class="citation">Perren et al. (<a href="#ref-Perren2025">2025</a>)</span> to determine the most suitable
+class effects model.</p>
 <div class="section level2">
 <h2 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
 </h2>
@@ -133,11 +132,12 @@ network reference treatment.</p>
 <code class="sourceCode R"><span><span class="va">sa_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_agd_contrast.html">set_agd_contrast</a></span><span class="op">(</span><span class="va">social_anxiety</span>,</span>
 <span>                           study <span class="op">=</span> <span class="va">studyc</span>, </span>
 <span>                           trt <span class="op">=</span> <span class="va">trtc</span>,</span>
-<span>                           y <span class="op">=</span> <span class="va">y</span>, </span>
-<span>                           sample_size <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                           y <span class="op">=</span> <span class="va">y</span>,</span>
 <span>                           se <span class="op">=</span> <span class="va">se</span>,</span>
 <span>                           trt_class <span class="op">=</span> <span class="va">classc</span>,</span>
 <span>                           trt_ref <span class="op">=</span> <span class="st">"Waitlist"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Note: Optional argument `sample_size` not provided, some features may not be available (see</span></span>
+<span><span class="co">#&gt; ?set_agd_contrast).</span></span>
 <span></span>
 <span><span class="va">sa_net</span></span>
 <span><span class="co">#&gt; A network with 101 AgD studies (contrast-based).</span></span>
@@ -165,15 +165,14 @@ network reference treatment.</p>
 <p>We create a plot at the class level by setting
 <code>level = "class"</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sa_net</span>, level <span class="op">=</span> <span class="st">"class"</span>, weight_nodes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> </span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sa_net</span>, level <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.box <span class="op">=</span> <span class="st">"vertical"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="model-selection-strategy">Model selection strategy<a class="anchor" aria-label="anchor" href="#model-selection-strategy"></a>
 </h2>
-<p>We follow the model selection strategy proposed by <span class="citation">Perren et al. (<a href="#ref-Perren2025">in
-preparation</a>)</span></p>
+<p>We follow the model selection strategy proposed by <span class="citation">Perren et al. (<a href="#ref-Perren2025">2025</a>)</span></p>
 <p><img src="class_effects_flow_chart-1.svg" width="600px" style="display: block; margin: auto;"></p>
 <div class="section level3">
 <h3 id="step-1-heterogeniety-assessement">STEP 1: Heterogeniety assessement<a class="anchor" aria-label="anchor" href="#step-1-heterogeniety-assessement"></a>
@@ -394,11 +393,11 @@ between treatment effects within each class. Because it is difficult to
 estimate the class standard deviations with only a small number of
 treatments in each class, here we specify an informative <span class="math inline">\mathrm{N}(0.33,0.1^2)</span> prior distribution
 that is chosen to keep class variability within a clinically-plausible
-range <span class="citation">(<a href="#ref-Perren2025">Perren et al.,
-in preparation</a>)</span>. We also define <code>class_sd</code> as a
-list of character vectors indicating which classes share a common SD,
-again aiding estimation of these parameters. For the class effects
-means, <code>prior_class_mean</code> is set as <span class="math inline">\mathrm{N}(0, 10^2)</span>.</p>
+range <span class="citation">(<a href="#ref-Perren2025">Perren et al.
+2025</a>)</span>. We also define <code>class_sd</code> as a list of
+character vectors indicating which classes share a common SD, again
+aiding estimation of these parameters. For the class effects means,
+<code>prior_class_mean</code> is set as <span class="math inline">\mathrm{N}(0, 10^2)</span>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sa_fit_EXclass_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nma.html">nma</a></span><span class="op">(</span><span class="va">sa_net</span>,</span>
 <span>                         trt_effects <span class="op">=</span> <span class="st">"random"</span>,</span>
@@ -668,9 +667,10 @@ A Systematic Review and Network Meta-Analysis.”</span> <em>The Lancet
 Psychiatry</em> 1 (5): 368–76.
 </div>
 <div id="ref-Perren2025" class="csl-entry">
-Perren, S. J., H. Pedder, N. J. Welton, and D. M. Phillippo. In
-preparation. <span>“Network Meta-Analysis with Class Effects: A
-Practical Guide and Model Selection Algorithm.”</span>
+Perren, Samuel J., Hugo Pedder, Nicky J. Welton, and David M. Phillippo.
+2025. <span>“Network Meta-Analysis with Class Effects: A Practical Guide
+and Model Selection Algorithm.”</span> <em>Medical Decision Making</em>,
+November. <a href="https://doi.org/10.1177/0272989x251389887" class="external-link">https://doi.org/10.1177/0272989x251389887</a>.
 </div>
 </div>
 </div>

@@ -24,8 +24,8 @@ When fitting class effects models there are multiple modeling options
 available.
 
 We demonstrate the model selection strategy proposed by Perren et al.
-([in preparation](#ref-Perren2025)) to determine the most suitable class
-effects model.
+([2025](#ref-Perren2025)) to determine the most suitable class effects
+model.
 
 ## Setting up the network
 
@@ -39,11 +39,12 @@ reference treatment.
 sa_net <- set_agd_contrast(social_anxiety,
                            study = studyc, 
                            trt = trtc,
-                           y = y, 
-                           sample_size = 1,
+                           y = y,
                            se = se,
                            trt_class = classc,
                            trt_ref = "Waitlist")
+#> Note: Optional argument `sample_size` not provided, some features may not be available (see
+#> ?set_agd_contrast).
 
 sa_net
 #> A network with 101 AgD studies (contrast-based).
@@ -73,7 +74,7 @@ sa_net
 We create a plot at the class level by setting `level = "class"`.
 
 ``` r
-plot(sa_net, level = "class", weight_nodes = TRUE) + 
+plot(sa_net, level = "class") + 
   theme(legend.position = "bottom", legend.box = "vertical")
 ```
 
@@ -81,8 +82,8 @@ plot(sa_net, level = "class", weight_nodes = TRUE) +
 
 ## Model selection strategy
 
-We follow the model selection strategy proposed by Perren et al. ([in
-preparation](#ref-Perren2025))
+We follow the model selection strategy proposed by Perren et al.
+([2025](#ref-Perren2025))
 
 ![](class_effects_flow_chart-1.svg)
 
@@ -332,11 +333,11 @@ treatment effects within each class. Because it is difficult to estimate
 the class standard deviations with only a small number of treatments in
 each class, here we specify an informative \mathrm{N}(0.33,0.1^2) prior
 distribution that is chosen to keep class variability within a
-clinically-plausible range ([Perren et al., in
-preparation](#ref-Perren2025)). We also define `class_sd` as a list of
-character vectors indicating which classes share a common SD, again
-aiding estimation of these parameters. For the class effects means,
-`prior_class_mean` is set as \mathrm{N}(0, 10^2).
+clinically-plausible range ([Perren et al. 2025](#ref-Perren2025)). We
+also define `class_sd` as a list of character vectors indicating which
+classes share a common SD, again aiding estimation of these parameters.
+For the class effects means, `prior_class_mean` is set as \mathrm{N}(0,
+10^2).
 
 ``` r
 sa_fit_EXclass_RE <- nma(sa_net,
@@ -641,6 +642,7 @@ Pharmacological Interventions for Social Anxiety Disorder in Adults: A
 Systematic Review and Network Meta-Analysis.” *The Lancet Psychiatry* 1
 (5): 368–76.
 
-Perren, S. J., H. Pedder, N. J. Welton, and D. M. Phillippo. In
-preparation. “Network Meta-Analysis with Class Effects: A Practical
-Guide and Model Selection Algorithm.”
+Perren, Samuel J., Hugo Pedder, Nicky J. Welton, and David M. Phillippo.
+2025. “Network Meta-Analysis with Class Effects: A Practical Guide and
+Model Selection Algorithm.” *Medical Decision Making*, November.
+<https://doi.org/10.1177/0272989x251389887>.
