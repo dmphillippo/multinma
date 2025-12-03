@@ -6,6 +6,9 @@ set of treatments than the full analysis set.
 * Fix: Bug where generalised gamma models with an `aux_regression` model on the 
 auxiliary shape parameters gave an error when trying to use `predict()` or 
 `marginal_effects()` (#62).
+* Fix: Class effects models with IPD were broken, now resolved (PR #57).
+* Improvement: Class effects models now note when the reference treatment was 
+included in a class, and has been removed (PR #57).
 * Fix: Calling `predict()` for models where study names include special regex
 characters (e.g. parentheses like "Smith (2025)") no longer fails when these 
 studies are used to inform the `baseline` or `aux` arguments (#63).

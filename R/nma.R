@@ -731,6 +731,18 @@ nma <- function(network,
   # Notify if network is disconnected
   if (!is_network_connected(network))
     inform("Note: Network is disconnected. See ?is_network_connected for more details.")
+  # Notify if reference treatment is within a class when running the exchangeable class model
+  if (class_effects == "exchangeable" && !is.null(network$classes)) {
+    ref_trt <- levels(network$treatments)[1]
+    ref_class <- levels(network$classes)[1]
+
+    # Count how many treatments share this class
+    n_in_class <- sum(network$classes == ref_class)
+
+    if (n_in_class >= 2) {
+      inform(glue::glue("Note: Reference treatment {ref_trt} has been removed from {ref_class}."))
+    }
+  }
 
   # Get data for design matrices and outcomes
   if (has_ipd(network)) {
@@ -2896,7 +2908,7 @@ make_nma_formula <- function(regression,
 
 #' Construct NMA design matrix
 #'
-#' @param nma_formula NMA formula, returned by [make_nma_formula()]
+#' @param nma_formula NMA formula, returned by `make_nma_formula()`
 #' @param ipd,agd_arm,agd_contrast Data frames
 #' @param agd_contrast_bl Logical vector identifying baseline rows for contrast
 #'   data
