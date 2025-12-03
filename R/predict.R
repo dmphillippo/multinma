@@ -548,7 +548,7 @@ predict.stan_nma <- function(object, ...,
           abort("`baseline` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
 
         mu <- as.array(object, pars = "mu")
-        mu <- mu[ , , grep(paste0("\\[", baseline, "[\\:,\\]]"), dimnames(mu)[[3]], perl = TRUE), drop = FALSE]
+        mu <- mu[ , , grep(paste0("\\[\\Q", baseline, "\\E[\\:,\\]]"), dimnames(mu)[[3]], perl = TRUE), drop = FALSE]
 
         baseline_type <- "link"
         baseline_level <- "individual"
@@ -607,7 +607,7 @@ predict.stan_nma <- function(object, ...,
             }
 
             aux_array <- as.array(object, pars = aux_pars)
-            aux_array <- aux_array[ , , grep(paste0("\\[", aux, "[\\:,\\]]"), dimnames(aux_array)[[3]], perl = TRUE), drop = FALSE]
+            aux_array <- aux_array[ , , grep(paste0("\\[\\Q", aux, "\\E[\\:,\\]]"), dimnames(aux_array)[[3]], perl = TRUE), drop = FALSE]
 
             # Set preddat .study to use this aux par (and basis, for mspline/pexp)
             preddat$.study <- aux
@@ -1312,7 +1312,7 @@ predict.stan_nma <- function(object, ...,
           abort("`baseline` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
 
         mu <- as.array(object, pars = "mu")
-        mu <- mu[ , , grep(paste0("\\[", baseline, "[\\:,\\]]"), dimnames(mu)[[3]], perl = TRUE), drop = FALSE]
+        mu <- mu[ , , grep(paste0("\\[\\Q", baseline, "\\E[\\:,\\]]"), dimnames(mu)[[3]], perl = TRUE), drop = FALSE]
 
         baseline_type <- "link"
         baseline_level <- "individual"
@@ -1338,7 +1338,7 @@ predict.stan_nma <- function(object, ...,
                                                       if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
               abort("All elements of `baseline` must be strings matching the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
 
-            mu[ , , s] <- mu_temp[ , , grep(paste0("\\[", baseline[[ss]], "[\\:,\\]]"), dimnames(mu_temp)[[3]], perl = TRUE), drop = FALSE]
+            mu[ , , s] <- mu_temp[ , , grep(paste0("\\[\\Q", baseline[[ss]], "\\E[\\:,\\]]"), dimnames(mu_temp)[[3]], perl = TRUE), drop = FALSE]
 
             baseline_type[s] <- "link"
             baseline_level[s] <- "individual"
@@ -1532,7 +1532,7 @@ predict.stan_nma <- function(object, ...,
                                                      if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
                   abort("All elements of `aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
 
-                aux_array[ , , s] <- aux_temp[ , , grep(paste0("\\[", aux[[ss]], "[\\:,\\]]"), dimnames(aux_temp)[[3]], perl = TRUE), drop = FALSE]
+                aux_array[ , , s] <- aux_temp[ , , grep(paste0("\\[\\Q", aux[[ss]], "\\E[\\:,\\]]"), dimnames(aux_temp)[[3]], perl = TRUE), drop = FALSE]
               }
             }
           } else {
@@ -1550,7 +1550,7 @@ predict.stan_nma <- function(object, ...,
                                                                    if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
                   abort("All elements of `aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a list of distr() distributions.")
 
-                aux_array[ , , (s-1)*n_aux + (1:n_aux)] <- aux_temp[ , , grep(paste0("\\[", aux[[ss]], "[\\:,\\]]"), dimnames(aux_temp)[[3]], perl = TRUE), drop = FALSE]
+                aux_array[ , , (s-1)*n_aux + (1:n_aux)] <- aux_temp[ , , grep(paste0("\\[\\Q", aux[[ss]], "\\E[\\:,\\]]"), dimnames(aux_temp)[[3]], perl = TRUE), drop = FALSE]
               }
             }
           }
@@ -1703,7 +1703,7 @@ predict.stan_nma <- function(object, ...,
           aux_id <- get_aux_id(preddat[ss, ], by = object$aux_by)
 
           if (!aux_int) { #(length(setdiff(object$aux_by, c(".study", ".trt"))) == 0) {
-            aux_s <- grepl(paste0("\\[(", paste(aux_l, collapse = "|"), if (object$likelihood %in% c("mspline", "pexp")) ")," else ")\\]"),
+            aux_s <- grepl(paste0("\\[(\\Q", paste(aux_l, collapse = "\\E|\\Q"), if (object$likelihood %in% c("mspline", "pexp")) "\\E)," else "\\E)\\]"),
                            dimnames(aux_array)[[3]])
 
             # Add in arm-level aux regression terms, if present
@@ -1722,22 +1722,22 @@ predict.stan_nma <- function(object, ...,
             if (object$likelihood %in% c("mspline", "pexp")) {
               aux_array_s <- array(NA_real_, dim = c(dim(eta_pred_array), length(basis)))
               for (i in 1:length(basis)) {
-                aux_s <- grep(paste0("\\[(", paste(aux_l, collapse = "|"), "), ", i, "\\]"),
+                aux_s <- grep(paste0("\\[(\\Q", paste(aux_l, collapse = "\\E|\\Q"), "\\E), ", i, "\\]"),
                               dimnames(aux_array)[[3]])
                 aux_array_s[ , , , i] <- aux_array[ , , aux_s[aux_id]]
               }
             } else if (object$likelihood == "gengamma") {
               aux_array_s <- array(NA_real_, dim = c(dim(eta_pred_array), 2),
                                    dimnames = list(iterations = NULL, chains = NULL, parameters = NULL, aux = c("sigma[]", "k[]")))
-              sigma_s <- grep(paste0("^sigma\\[(", paste(aux_l, collapse = "|"), ")", "\\]"),
+              sigma_s <- grep(paste0("^sigma\\[(\\Q", paste(aux_l, collapse = "\\E|\\Q"), "\\E)", "\\]"),
                             dimnames(aux_array)[[3]])
-              k_s <- grep(paste0("^k\\[(", paste(aux_l, collapse = "|"), ")", "\\]"),
+              k_s <- grep(paste0("^k\\[(\\Q", paste(aux_l, collapse = "\\E|\\Q"), "\\E)", "\\]"),
                               dimnames(aux_array)[[3]])
               aux_array_s[ , , , "sigma[]"] <- aux_array[ , , sigma_s[aux_id]]
               aux_array_s[ , , , "k[]"] <- aux_array[ , , k_s[aux_id]]
 
             } else {
-              aux_s <- grep(paste0("\\[(", paste(aux_l, collapse = "|"), ")\\]"),
+              aux_s <- grep(paste0("\\[(\\Q", paste(aux_l, collapse = "\\E|\\Q"), "\\E)\\]"),
                             dimnames(aux_array)[[3]])
               aux_array_s <- aux_array[ , , aux_s[aux_id], drop = FALSE]
             }
