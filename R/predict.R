@@ -1278,6 +1278,15 @@ predict.stan_nma <- function(object, ...,
             names(aux) <- studies
           }
         }
+
+        # Check aux_by
+        if (".trt" %in% object$aux_by) {
+          inform(c("Note: Producing predictions for new data from a model with baseline hazard stratified by treatment arm.",
+                   "Did you mean to use `aux_regression` instead?"))
+
+          if (!all(purrr::map_lgl(aux, rlang::is_string)))
+            abort("Predictions are only supported against network study `aux` when `aux_by` contains `.trt`")
+        }
       }
 
       # Make design matrix of all studies and all treatments
@@ -1295,6 +1304,17 @@ predict.stan_nma <- function(object, ...,
                                                   .study = .data$.study,
                                                   .trt = object$network$treatments),
                                     by = ".study")
+      }
+
+      # With aux_by = .trt, only predict for observed arms
+      if (".trt" %in% object$aux_by) {
+        t_obs <- dplyr::bind_rows(
+          if (has_ipd(object$network)) dplyr::distinct(object$network$ipd, .data$.study, .data$.trt),
+          if (has_agd_arm(object$network)) dplyr::distinct(object$network$agd_arm, .data$.study, .data$.trt)
+        ) %>%
+          dplyr::mutate(.study = forcats::fct_recode(.data$.study, !!! aux))
+
+        preddat <- dplyr::inner_join(preddat, t_obs, by = c(".study", ".trt"))
       }
 
       # Add in .trtclass if defined in network
