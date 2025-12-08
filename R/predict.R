@@ -1228,7 +1228,7 @@ predict.stan_nma <- function(object, ...,
       preddat <- get_model_data_columns(preddat,
                                         regression = object$regression,
                                         aux_regression = object$aux_regression,
-                                        keep = object$aux_by,
+                                        keep = setdiff(object$aux_by, c(".trt", ".trtclass", ".study", ".contr", ".omega")),
                                         label = "`newdata`")
 
       # Make design matrix of all studies and all treatments
