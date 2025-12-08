@@ -1231,6 +1231,55 @@ predict.stan_nma <- function(object, ...,
                                         keep = setdiff(object$aux_by, c(".trt", ".trtclass", ".study", ".contr", ".omega")),
                                         label = "`newdata`")
 
+      # Check aux spec
+      if (is_surv && !is.null(aux_pars)) {
+        studies <- unique(preddat$.study)
+        n_studies <- length(studies)
+        n_aux <- length(aux_pars)
+
+        if (n_aux == 1) {
+          if (!inherits(aux, "distr") && !rlang::is_string(aux) && length(aux) != n_studies)
+            abort(sprintf("`aux` must be a single distr() specification or study name, or a list of length %d (number of `newdata` studies)", n_studies))
+          if (inherits(aux, "distr") || rlang::is_string(aux)) {
+            aux <- rep(list(aux), times = n_studies)
+            names(aux) <- studies
+          } else {
+            if (any(purrr::map_lgl(aux, ~!inherits(., "distr") && !rlang::is_string(.))))
+              abort(sprintf("`aux` must be a single distr() specification or study name, or a list of length %d (number of `newdata` studies)", n_studies))
+            if (!rlang::is_named(aux)) {
+              names(aux) <- studies
+            } else {
+              aux_names <- names(aux)
+              if (!setequal(aux_names, studies))
+                abort(glue::glue("`aux` list names must match all study names from `newdata`.\n",
+                                 "Unmatched list names: ",
+                                 glue::glue_collapse(glue::double_quote(setdiff(aux_names, studies)), sep = ", ", width = 30),
+                                 ".\n",
+                                 "Unmatched `newdata` study names: ",
+                                 glue::glue_collapse(glue::double_quote(setdiff(studies, aux_names)), sep = ", ", width = 30),
+                                 ".\n"))
+            }
+          }
+        } else {
+          aux_names <- names(aux)
+          if (!(rlang::is_string(aux) || (
+            rlang::is_bare_list(aux) &&
+            length(aux) %in% c(n_aux, n_studies) &&
+            (setequal(aux_names, aux_pars) || setequal(aux_names, levels(studies))) &&
+            all(purrr::map_lgl(purrr::list_flatten(aux), ~inherits(., "distr") || rlang::is_string(.)))))) {
+            abort(glue::glue("`aux` must be a single named list of distr() specifications for {glue::glue_collapse(aux_pars, sep = ', ', last = ' and ')}, ",
+                             "a study name, or a list of length {n_studies} (number of `newdata` studies) of such lists."))
+          }
+
+          if (setequal(aux_names, aux_pars) || rlang::is_string(aux)) {
+            aux <- rep(list(aux), times = n_studies)
+            names(aux) <- studies
+          } else if (!rlang::is_named(aux)) {
+            names(aux) <- studies
+          }
+        }
+      }
+
       # Make design matrix of all studies and all treatments
       if (rlang::has_name(preddat, ".trt")) preddat <- dplyr::select(preddat, -".trt")
       if (packageVersion("dplyr") >= "1.1.1") {
@@ -1457,51 +1506,6 @@ predict.stan_nma <- function(object, ...,
         if (is.null(aux_pars)) {
           aux_array <- NULL
         } else {
-
-          # Check aux spec
-          n_aux <- length(aux_pars)
-
-          if (n_aux == 1) {
-            if (!inherits(aux, "distr") && !rlang::is_string(aux) && length(aux) != n_studies)
-              abort(sprintf("`aux` must be a single distr() specification or study name, or a list of length %d (number of `newdata` studies)", n_studies))
-            if (inherits(aux, "distr") || rlang::is_string(aux)) {
-              aux <- rep(list(aux), times = n_studies)
-              names(aux) <- studies
-            } else {
-              if (any(purrr::map_lgl(aux, ~!inherits(., "distr") && !rlang::is_string(.))))
-                  abort(sprintf("`aux` must be a single distr() specification or study name, or a list of length %d (number of `newdata` studies)", n_studies))
-              if (!rlang::is_named(aux)) {
-                names(aux) <- studies
-              } else {
-                aux_names <- names(aux)
-                if (!setequal(aux_names, studies))
-                  abort(glue::glue("`aux` list names must match all study names from `newdata`.\n",
-                                   "Unmatched list names: ",
-                                   glue::glue_collapse(glue::double_quote(setdiff(aux_names, studies)), sep = ", ", width = 30),
-                                   ".\n",
-                                   "Unmatched `newdata` study names: ",
-                                   glue::glue_collapse(glue::double_quote(setdiff(studies, aux_names)), sep = ", ", width = 30),
-                                   ".\n"))
-              }
-            }
-          } else {
-            aux_names <- names(aux)
-            if (!(rlang::is_string(aux) || (
-                    rlang::is_bare_list(aux) &&
-                    length(aux) %in% c(n_aux, n_studies) &&
-                    (setequal(aux_names, aux_pars) || setequal(aux_names, levels(studies))) &&
-                    all(purrr::map_lgl(purrr::list_flatten(aux), ~inherits(., "distr") || rlang::is_string(.)))))) {
-              abort(glue::glue("`aux` must be a single named list of distr() specifications for {glue::glue_collapse(aux_pars, sep = ', ', last = ' and ')}, ",
-                               "a study name, or a list of length {n_studies} (number of `newdata` studies) of such lists."))
-            }
-
-            if (setequal(aux_names, aux_pars) || rlang::is_string(aux)) {
-              aux <- rep(list(aux), times = n_studies)
-              names(aux) <- studies
-            } else if (!rlang::is_named(aux)) {
-              names(aux) <- studies
-            }
-          }
 
           if (object$likelihood %in% c("mspline", "pexp")) {
             if (!all(purrr::map_lgl(aux, rlang::is_string)))
