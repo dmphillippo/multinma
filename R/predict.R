@@ -1283,9 +1283,10 @@ predict.stan_nma <- function(object, ...,
         if (".trt" %in% object$aux_by) {
           inform(c("Note: Producing predictions for new data from a model with baseline hazard stratified by treatment arm.",
                    "Did you mean to use `aux_regression` instead?"))
-
-          if (!all(purrr::map_lgl(aux, rlang::is_string)))
-            abort("Predictions are only supported against network study `aux` when `aux_by` contains `.trt`")
+        }
+        if (!is.null(object$aux_by) &&
+             (!all(purrr::map_lgl(aux, rlang::is_string)) && !all(purrr::map_lgl(aux, ~inherits(., "distr"))))) {
+            abort("`aux` cannot currently mix named studies and distr() distributions when `aux_by` was used.")
         }
       }
 
@@ -1307,14 +1308,18 @@ predict.stan_nma <- function(object, ...,
       }
 
       # With aux_by = .trt, only predict for observed arms
-      if (".trt" %in% object$aux_by) {
-        t_obs <- dplyr::bind_rows(
-          if (has_ipd(object$network)) dplyr::distinct(object$network$ipd, .data$.study, .data$.trt),
-          if (has_agd_arm(object$network)) dplyr::distinct(object$network$agd_arm, .data$.study, .data$.trt)
+      if (!is.null(object$aux_by) && any(purrr::map_lgl(aux, rlang::is_string))) {
+        has_aux_by <- TRUE
+
+        aux_by_obs <- dplyr::bind_rows(
+          if (has_ipd(object$network)) dplyr::distinct(object$network$ipd, .data$.study, !!! rlang::syms(object$aux_by)),
+          if (has_agd_arm(object$network)) dplyr::distinct(object$network$agd_arm, .data$.study, !!! rlang::syms(object$aux_by))
         ) %>%
           dplyr::mutate(.study = forcats::fct_recode(.data$.study, !!! aux))
 
-        preddat <- dplyr::inner_join(preddat, t_obs, by = c(".study", ".trt"))
+        preddat <- dplyr::inner_join(preddat, aux_by_obs, by = unique(c(".study", object$aux_by)))
+      } else {
+        hax_aux_by <- FALSE
       }
 
       # Add in .trtclass if defined in network
@@ -1527,54 +1532,81 @@ predict.stan_nma <- function(object, ...,
           aux_array <- NULL
         } else {
 
-          if (object$likelihood %in% c("mspline", "pexp")) {
-            if (!all(purrr::map_lgl(aux, rlang::is_string)))
-              abort(glue::glue('Producing predictions with external `aux` spline coefficients is not currently supported for "{object$likelihood}" models.'))
-            n_aux <- length(object$basis[[1]])
-            aux_names <- paste0(rep(aux_pars, times = n_studies), "[", rep(studies, each = n_aux), ", ", rep(1:n_aux, times = n_studies), "]")
-          } else {
-            n_aux <- length(aux_pars)
-            aux_names <- paste0(rep(aux_pars, times = n_studies), "[", rep(studies, each = n_aux) , "]")
-          }
+          if (has_aux_by) {  # aux is only a named list of studies in the network
 
-          dim_aux <- c(dim_mu[1:2], n_aux * n_studies)
-          u <- array(runif(prod(dim_aux)), dim = dim_aux)
-          aux_array <- array(NA_real_,
-                             dim = dim_aux,
-                             dimnames = list(iterations = NULL,
-                                             chains = NULL,
-                                             parameters = aux_names))
+            aux_inv <- setNames(names(aux), unlist(aux))
+            preddat_in <- dplyr::mutate(preddat, .study = forcats::fct_recode(.data$.study, !!! aux_inv))
+            aux_in_labels <- get_aux_labels(preddat_in, object$aux_by)
+            aux_ex_labels <- get_aux_labels(preddat, object$aux_by)
 
-          if (any(purrr::map_lgl(aux, rlang::is_string))) aux_temp <- as.array(object, pars = aux_pars)
-          if (n_aux == 1) {
-            for (s in 1:n_studies) {
-              ss <- as.character(studies[s])
-              if (inherits(aux[[ss]], "distr")) {
-                aux_array[, , s] <- rlang::eval_tidy(rlang::call2(aux[[ss]]$qfun, p = u[ , , s, drop = TRUE], !!! aux[[ss]]$args))
-              } else {
-                if (! aux[[ss]] %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
-                                                     if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
-                  abort("All elements of `aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
+            if (object$likelihood %in% c("mspline", "pexp")) {
+              if (!all(purrr::map_lgl(aux, rlang::is_string)))
+                abort(glue::glue('Producing predictions with external `aux` spline coefficients is not currently supported for "{object$likelihood}" models.'))
 
-                aux_array[ , , s] <- aux_temp[ , , grep(paste0("\\[\\Q", aux[[ss]], "\\E[\\:,\\]]"), dimnames(aux_temp)[[3]], perl = TRUE), drop = FALSE]
-              }
+              n_aux <- length(object$basis[[1]])
+              aux_in_names <- paste0(rep(aux_pars, times = length(aux_in_labels)), "[", rep(aux_in_labels, each = n_aux), ", ", rep(1:n_aux, times = length(aux_in_labels)), "]")
+              aux_ex_names <- paste0(rep(aux_pars, times = length(aux_ex_labels)), "[", rep(aux_ex_labels, each = n_aux), ", ", rep(1:n_aux, times = length(aux_ex_labels)), "]")
+            } else {
+              n_aux <- length(aux_pars)
+              aux_in_names <- paste0(rep(aux_pars, times = length(aux_in_labels)), "[", rep(aux_in_labels, each = n_aux) , "]")
+              aux_ex_names <- paste0(rep(aux_pars, times = length(aux_ex_labels)), "[", rep(aux_ex_labels, each = n_aux) , "]")
             }
-          } else {
-            for (s in 1:n_studies) {
-              ss <- as.character(studies[s])
-              if (!rlang::is_string(aux[[ss]])) {
-                if (!setequal(names(aux[[ss]]), aux_pars) || !all(purrr::map_lgl(aux[[ss]], inherits, "distr")))
-                  abort(glue::glue("`aux` must be a single named list of distr() specifications for {glue::glue_collapse(aux_pars, sep = ', ', last = ' and ')}, ",
-                                   "a study name, or a list of length {n_studies} (number of `newdata` studies) of such lists."))
-                for (i in 1:n_aux) {
-                  aux_array[, , (s-1)*n_aux + i] <- rlang::eval_tidy(rlang::call2(aux[[ss]][[aux_pars[i]]]$qfun, p = u[ , , (s-1)*n_aux + i, drop = TRUE], !!! aux[[ss]][[aux_pars[i]]]$args))
-                }
-              } else {
-                if (! aux[[ss]] %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
-                                                                   if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
-                  abort("All elements of `aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a list of distr() distributions.")
 
-                aux_array[ , , (s-1)*n_aux + (1:n_aux)] <- aux_temp[ , , grep(paste0("\\[\\Q", aux[[ss]], "\\E[\\:,\\]]"), dimnames(aux_temp)[[3]], perl = TRUE), drop = FALSE]
+            aux_array <- as.array(object, pars = aux_in_names)
+            dimnames(aux_array)[[3]] <- aux_ex_names
+
+          } else {
+
+            if (object$likelihood %in% c("mspline", "pexp")) {
+              if (!all(purrr::map_lgl(aux, rlang::is_string)))
+                abort(glue::glue('Producing predictions with external `aux` spline coefficients is not currently supported for "{object$likelihood}" models.'))
+
+              n_aux <- length(object$basis[[1]])
+              aux_names <- paste0(rep(aux_pars, times = n_studies), "[", rep(studies, each = n_aux), ", ", rep(1:n_aux, times = n_studies), "]")
+            } else {
+              n_aux <- length(aux_pars)
+              aux_names <- paste0(rep(aux_pars, times = n_studies), "[", rep(studies, each = n_aux) , "]")
+            }
+
+            dim_aux <- c(dim_mu[1:2], length(aux_names))
+            u <- array(runif(prod(dim_aux)), dim = dim_aux)
+            aux_array <- array(NA_real_,
+                               dim = dim_aux,
+                               dimnames = list(iterations = NULL,
+                                               chains = NULL,
+                                               parameters = aux_names))
+
+            if (any(purrr::map_lgl(aux, rlang::is_string))) aux_temp <- as.array(object, pars = aux_pars)
+            if (n_aux == 1) {
+              for (s in 1:n_studies) {
+                ss <- as.character(studies[s])
+                if (inherits(aux[[ss]], "distr")) {
+                  aux_array[, , s] <- rlang::eval_tidy(rlang::call2(aux[[ss]]$qfun, p = u[ , , s, drop = TRUE], !!! aux[[ss]]$args))
+                } else {
+                  if (! aux[[ss]] %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
+                                                       if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
+                    abort("All elements of `aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
+
+                  aux_array[ , , s] <- aux_temp[ , , grep(paste0("\\[\\Q", aux[[ss]], "\\E[\\:,\\]]"), dimnames(aux_temp)[[3]], perl = TRUE), drop = FALSE]
+                }
+              }
+            } else {
+              for (s in 1:n_studies) {
+                ss <- as.character(studies[s])
+                if (!rlang::is_string(aux[[ss]])) {
+                  if (!setequal(names(aux[[ss]]), aux_pars) || !all(purrr::map_lgl(aux[[ss]], inherits, "distr")))
+                    abort(glue::glue("`aux` must be a single named list of distr() specifications for {glue::glue_collapse(aux_pars, sep = ', ', last = ' and ')}, ",
+                                     "a study name, or a list of length {n_studies} (number of `newdata` studies) of such lists."))
+                  for (i in 1:n_aux) {
+                    aux_array[, , (s-1)*n_aux + i] <- rlang::eval_tidy(rlang::call2(aux[[ss]][[aux_pars[i]]]$qfun, p = u[ , , (s-1)*n_aux + i, drop = TRUE], !!! aux[[ss]][[aux_pars[i]]]$args))
+                  }
+                } else {
+                  if (! aux[[ss]] %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
+                                                                     if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
+                    abort("All elements of `aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a list of distr() distributions.")
+
+                  aux_array[ , , (s-1)*n_aux + (1:n_aux)] <- aux_temp[ , , grep(paste0("\\[\\Q", aux[[ss]], "\\E[\\:,\\]]"), dimnames(aux_temp)[[3]], perl = TRUE), drop = FALSE]
+                }
               }
             }
           }
