@@ -1081,7 +1081,8 @@ test_that(".study, .trt, .time columns are correct (mspline, no regression, new 
 
 ndmm_fit_weib_reg <- suppressWarnings(nma(ndmm_net,
                                           likelihood = "weibull-aft",
-                                          regression = ~age*.trt,
+                                          regression = ~I(age/10)*.trt,
+                                          class_interactions= "common",
                                           prior_intercept = normal(0, 100),
                                           prior_trt = normal(0, 10),
                                           prior_reg = normal(0, 10),
@@ -1091,7 +1092,8 @@ ndmm_fit_weib_reg <- suppressWarnings(nma(ndmm_net,
 
 ndmm_fit_exp_reg <- suppressWarnings(nma(ndmm_net,
                                          likelihood = "exponential",
-                                         reg = ~age*.trt,
+                                         regression = ~I(age/10)*.trt,
+                                         class_interactions = "common",
                                          prior_intercept = normal(0, 100),
                                          prior_trt = normal(0, 10),
                                          prior_reg = normal(0, 10),
@@ -1099,7 +1101,8 @@ ndmm_fit_exp_reg <- suppressWarnings(nma(ndmm_net,
 
 ndmm_fit_gengamma_reg <- suppressWarnings(nma(ndmm_net,
                                               likelihood = "gengamma",
-                                              reg = ~age*.trt,
+                                              regression = ~I(age/10)*.trt,
+                                              class_interactions= "common",
                                               prior_intercept = normal(0, 100),
                                               prior_trt = normal(0, 10),
                                               prior_reg = normal(0, 10),
@@ -1109,7 +1112,8 @@ ndmm_fit_gengamma_reg <- suppressWarnings(nma(ndmm_net,
 
 ndmm_fit_mspline_reg <- suppressWarnings(nma(ndmm_net,
                                              likelihood = "mspline",
-                                             reg = ~age*.trt,
+                                             regression = ~I(age/10)*.trt,
+                                             class_interactions = "common",
                                              prior_intercept = normal(0, 100),
                                              prior_trt = normal(0, 10),
                                              prior_reg = normal(0, 10),
@@ -3067,11 +3071,12 @@ test_that("baseline and aux are escaped correctly", {
   ndmm_net <- set_ipd(ndmm_ipd,
                       study = gsub("(.+)([0-9]{4})", "\\1 (\\2)$", study),
                       trt = trt,
-                      Surv = Surv(eventtime, status))
+                      Surv = Surv(eventtime/7, status))
 
   ndmm_fit_gg <- suppressWarnings(nma(ndmm_net,
                   likelihood = "gengamma",
                   aux_regression = ~.trt,
+                  init_r = 0.1,
                   iter = 10))
 
   par <- c("pred[Len, 1]", "pred[Pbo, 1]")
@@ -3106,6 +3111,7 @@ test_that("baseline and aux are escaped correctly", {
                    likelihood = "gengamma",
                    regression = ~I(age/10)*.trt,
                    aux_regression = ~.trt,
+                   init_r = 0.1,
                    iter = 10))
 
   expect_identical(
