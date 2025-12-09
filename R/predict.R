@@ -1333,6 +1333,9 @@ predict.stan_nma <- function(object, ...,
         hax_aux_by <- FALSE
       }
 
+      # Make sure preddat$.study doesn't have extra levels
+      preddat$.study <- forcats::fct_drop(preddat$.study)
+
       # Add in .trtclass if defined in network
       if (!is.null(object$network$classes)) {
         preddat$.trtclass <- object$network$classes[as.numeric(preddat$.trt)]
