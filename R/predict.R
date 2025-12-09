@@ -1387,6 +1387,13 @@ predict.stan_nma <- function(object, ...,
         }
       }
 
+      if (rlang::is_string(baseline)) {
+        # Using the baseline from a study in the network
+        if (! baseline %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
+                                                  if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
+          abort("`baseline` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
+      }
+
       if (inherits(baseline, "distr") || rlang::is_string(baseline)) {
         baseline <- rep(list(baseline), times = n_studies)
         names(baseline) <- studies
