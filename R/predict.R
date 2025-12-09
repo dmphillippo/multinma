@@ -1384,53 +1384,41 @@ predict.stan_nma <- function(object, ...,
         }
       }
 
+      if (inherits(baseline, "distr") || rlang::is_string(baseline)) {
+        baseline <- rep(list(baseline), times = n_studies)
+        names(baseline) <- studies
+      }
+
       # Generate baseline samples
       dim_post_temp <- dim(post_temp)
       dim_mu <- c(dim_post_temp[1:2], n_studies)
       dimnames_mu <- c(dimnames(post_temp)[1:2], list(parameters = paste0("mu[", levels(studies), "]")))
 
-      if (inherits(baseline, "distr")) {
-        u <- runif(prod(dim_mu))
-        mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
-                    dim = dim_mu, dimnames = dimnames_mu)
-      } else if (rlang::is_string(baseline)) {
-        # Using the baseline from a study in the network
-        if (! baseline %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
-                                                  if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
-          abort("`baseline` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
+      u <- array(runif(prod(dim_mu)), dim = dim_mu)
+      mu <- array(NA_real_, dim = dim_mu, dimnames = dimnames_mu)
 
-        mu <- as.array(object, pars = "mu")
-        mu <- mu[ , , grep(paste0("\\[\\Q", baseline, "\\E[\\:,\\]]"), dimnames(mu)[[3]], perl = TRUE), drop = FALSE]
+      if (any(purrr::map_lgl(baseline, rlang::is_string))) mu_temp <- as.array(object, pars = "mu")
 
-        baseline_type <- "link"
-        baseline_level <- "individual"
-      } else {
-        u <- array(runif(prod(dim_mu)), dim = dim_mu)
-        mu <- array(NA_real_, dim = dim_mu, dimnames = dimnames_mu)
+      baseline_type <- rep_len(baseline_type, n_studies)
+      baseline_level <- rep_len(baseline_level, n_studies)
 
-        if (any(purrr::map_lgl(baseline, rlang::is_string))) mu_temp <- as.array(object, pars = "mu")
+      for (s in 1:n_studies) {
+        # NOTE: mu must be in *factor order* for later multiplication with design matrix, not observation order
+        ss <- levels(studies)[s]
 
-        baseline_type <- rep_len(baseline_type, n_studies)
-        baseline_level <- rep_len(baseline_level, n_studies)
+        if (inherits(baseline[[ss]], "distr")) {
+          mu[ , , s] <- array(rlang::eval_tidy(rlang::call2(baseline[[ss]]$qfun, p = u[ , , s], !!! baseline[[ss]]$args)),
+                              dim = c(dim_mu[1:2], 1))
+        } else if (rlang::is_string(baseline[[ss]])) {
+          # Using the baseline from a study in the network
+          if (! baseline[[ss]] %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
+                                                    if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
+            abort("All elements of `baseline` must be strings matching the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
 
-        for (s in 1:n_studies) {
-          # NOTE: mu must be in *factor order* for later multiplication with design matrix, not observation order
-          ss <- levels(studies)[s]
+          mu[ , , s] <- mu_temp[ , , grep(paste0("\\[\\Q", baseline[[ss]], "\\E[\\:,\\]]"), dimnames(mu_temp)[[3]], perl = TRUE), drop = FALSE]
 
-          if (inherits(baseline[[ss]], "distr")) {
-            mu[ , , s] <- array(rlang::eval_tidy(rlang::call2(baseline[[ss]]$qfun, p = u[ , , s], !!! baseline[[ss]]$args)),
-                                dim = c(dim_mu[1:2], 1))
-          } else if (rlang::is_string(baseline[[ss]])) {
-            # Using the baseline from a study in the network
-            if (! baseline[[ss]] %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
-                                                      if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
-              abort("All elements of `baseline` must be strings matching the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
-
-            mu[ , , s] <- mu_temp[ , , grep(paste0("\\[\\Q", baseline[[ss]], "\\E[\\:,\\]]"), dimnames(mu_temp)[[3]], perl = TRUE), drop = FALSE]
-
-            baseline_type[s] <- "link"
-            baseline_level[s] <- "individual"
-          }
+          baseline_type[s] <- "link"
+          baseline_level[s] <- "individual"
         }
       }
 
