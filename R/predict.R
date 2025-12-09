@@ -522,6 +522,17 @@ predict.stan_nma <- function(object, ...,
       # Make design matrix of SINGLE study, and all treatments
       preddat <- tibble::tibble(.study = factor("..dummy.."), .trt = object$network$treatments)
 
+      # Only predict for observed arms if using aux_by
+      if (!is.null(object$aux_by) && rlang::is_string(aux)) {
+        aux_by_obs <- dplyr::bind_rows(
+          if (has_ipd(object$network)) dplyr::distinct(object$network$ipd, .data$.study, !!! rlang::syms(object$aux_by)),
+          if (has_agd_arm(object$network)) dplyr::distinct(object$network$agd_arm, .data$.study, !!! rlang::syms(object$aux_by))
+        ) %>%
+          dplyr::mutate(.study = forcats::fct_recode(.data$.study, "..dummy.." = !! aux))
+
+        preddat <- dplyr::inner_join(preddat, aux_by_obs, by = unique(c(".study", object$aux_by)))
+      }
+
       # Add in .trtclass if defined in network
       if (!is.null(object$network$classes)) {
         preddat$.trtclass <- object$network$classes[as.numeric(preddat$.trt)]
