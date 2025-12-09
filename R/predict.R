@@ -1330,7 +1330,7 @@ predict.stan_nma <- function(object, ...,
 
         preddat <- dplyr::inner_join(preddat, aux_by_obs, by = unique(c(".study", object$aux_by)))
       } else {
-        hax_aux_by <- FALSE
+        has_aux_by <- FALSE
       }
 
       # Make sure preddat$.study doesn't have extra levels
