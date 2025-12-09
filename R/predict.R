@@ -354,6 +354,9 @@ predict.stan_nma <- function(object, ...,
     aux_pars <- NULL
   }
 
+  # Was aux_by used?
+  used_aux_by <- !is.null(object$aux_by) && !(length(object$aux_by) == 1 && object$aux_by == ".study")
+
   if (!is.null(newdata)) {
     if (!is.data.frame(newdata)) abort("`newdata` is not a data frame.")
 
@@ -523,7 +526,7 @@ predict.stan_nma <- function(object, ...,
       preddat <- tibble::tibble(.study = factor("..dummy.."), .trt = object$network$treatments)
 
       # Only predict for observed arms if using aux_by
-      if (!is.null(object$aux_by) && rlang::is_string(aux)) {
+      if (used_aux_by && rlang::is_string(aux)) {
         aux_by_obs <- dplyr::bind_rows(
           if (has_ipd(object$network)) dplyr::distinct(object$network$ipd, .data$.study, !!! rlang::syms(object$aux_by)),
           if (has_agd_arm(object$network)) dplyr::distinct(object$network$agd_arm, .data$.study, !!! rlang::syms(object$aux_by))
@@ -1295,8 +1298,8 @@ predict.stan_nma <- function(object, ...,
           inform(c("Note: Producing predictions for new data from a model with baseline hazard stratified by treatment arm.",
                    "Did you mean to use `aux_regression` instead?"))
         }
-        if (!is.null(object$aux_by) &&
-             (!all(purrr::map_lgl(aux, rlang::is_string)) && !all(purrr::map_lgl(aux, ~inherits(., "distr"))))) {
+        if (used_aux_by &&
+             (!all(purrr::map_lgl(aux, rlang::is_string)) && any(purrr::map_lgl(aux, rlang::is_string)))) {
             abort("`aux` cannot currently mix named studies and distr() distributions when `aux_by` was used.")
         }
       }
@@ -1319,7 +1322,7 @@ predict.stan_nma <- function(object, ...,
       }
 
       # With aux_by = .trt, only predict for observed arms
-      if (!is.null(object$aux_by) && any(purrr::map_lgl(aux, rlang::is_string))) {
+      if (used_aux_by && any(purrr::map_lgl(aux, rlang::is_string))) {
         has_aux_by <- TRUE
 
         aux_by_obs <- dplyr::bind_rows(
