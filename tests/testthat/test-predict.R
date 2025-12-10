@@ -2130,6 +2130,37 @@ test_that(".study, .trt, .time columns are correct (weibull, regression, aggrega
   expect_identical(pred1.1r$parameter,
                    paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
 
+  newdata2 <- dplyr::bind_rows(
+    dplyr::mutate(newdata, study = "Test"),
+    dplyr::mutate(newdata, study = "B"),
+    dplyr::mutate(newdata, study = "C")
+  )
+  preddat2 <- dplyr::mutate(newdata2, .study = factor(study), .time = rep(tm, times = 3)) %>%
+    dplyr::group_by(.study) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::cross_join(dplyr::tibble(.trt = unique(ndmm_preddat$.trt)))
+
+  pred1.1r2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg_nphr, type = "survival", time = time,
+                                        study = study,
+                                        newdata = newdata2,
+                                        baseline = "Attal2012",
+                                        aux = "Attal2012"))
+  expect_equivalent(pred1.1r2[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1r2$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
+  pred1.1r3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg_nphr, type = "survival", time = time,
+                                         study = study,
+                                         newdata = newdata2,
+                                         baseline = list(Test = "Attal2012", B = "Morgan2012", C = distr(qlnorm, 0, 1)),
+                                         aux = list(Test = "Attal2012", B = "Morgan2012", C = distr(qlnorm, 0, 0.01))))
+  expect_equivalent(pred1.1r3[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1r3$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
   preddat1_nphs <- dplyr::filter(preddat1, .trt %in% c("Pbo", "Len"))
   pred1.1s <- tibble::as_tibble(predict(ndmm_fit_weib_reg_nphs, type = "survival", time = time,
                                         study = study,
@@ -2140,6 +2171,28 @@ test_that(".study, .trt, .time columns are correct (weibull, regression, aggrega
                     preddat1_nphs[, c(".study", ".trt", ".time")])
   expect_identical(pred1.1s$parameter,
                    paste0("pred[", preddat1_nphs$.study, ": ", preddat1_nphs$.trt, ", ", preddat1_nphs$id, "]"))
+
+  preddat2_nphs <- dplyr::filter(preddat2, .trt %in% c("Pbo", "Len"))
+  pred1.1s2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg_nphs, type = "survival", time = time,
+                                         study = study,
+                                         newdata = newdata2,
+                                         baseline = "Attal2012",
+                                         aux = "Attal2012"))
+  expect_equivalent(pred1.1s2[, c(".study", ".trt", ".time")],
+                    preddat2_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1s2$parameter,
+                   paste0("pred[", preddat2_nphs$.study, ": ", preddat2_nphs$.trt, ", ", preddat2_nphs$id, "]"))
+
+  preddat3_nphs <- dplyr::filter(preddat2, .study == "Test" & .trt %in% c("Pbo", "Len") | .study == "B" & .trt %in% c("Pbo", "Thal") | .study == "C")
+  pred1.1s3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg_nphs, type = "survival", time = time,
+                                         study = study,
+                                         newdata = newdata2,
+                                         baseline = list(Test = "Attal2012", B = "Morgan2012", C = distr(qlnorm, 0, 1)),
+                                         aux = list(Test = "Attal2012", B = "Morgan2012", C = distr(qlnorm, 0, 0.01))))
+  expect_equivalent(pred1.1s3[, c(".study", ".trt", ".time")],
+                    preddat3_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1s3$parameter,
+                   paste0("pred[", preddat3_nphs$.study, ": ", preddat3_nphs$.trt, ", ", preddat3_nphs$id, "]"))
 
   pred1.2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "hazard", time = time,
                                        study = study,
