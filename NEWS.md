@@ -3,6 +3,10 @@
 * Feature: New `subset` argument to `posterior_ranks()` and 
 `posterior_rank_probs()` allows ranks to be calculated for a smaller decision 
 set of treatments than the full analysis set.
+* Fix: `predict()` now works correctly for `newdata` when `aux_by` was used, 
+rather than giving errors (including #50).
+* Fix: `predict()` no longer errors when using a single `baseline` for multiple 
+`newdata` studies.
 * Fix: Bug where generalised gamma models with an `aux_regression` model on the 
 auxiliary shape parameters gave an error when trying to use `predict()` or 
 `marginal_effects()` (#62).
