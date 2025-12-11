@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.8.1.9004</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.8.1.9005</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,6 +60,8 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.8.1.9000" id="multinma-0819000">multinma 0.8.1.9000<a class="anchor" aria-label="anchor" href="#multinma-0819000"></a></h2>
 <ul><li>Feature: New <code>subset</code> argument to <code><a href="../reference/posterior_ranks.html">posterior_ranks()</a></code> and <code><a href="../reference/posterior_ranks.html">posterior_rank_probs()</a></code> allows ranks to be calculated for a smaller decision set of treatments than the full analysis set.</li>
+<li>Fix: <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> now works correctly for <code>newdata</code> when <code>aux_by</code> was used, rather than giving errors (including <a href="https://github.com/dmphillippo/multinma/issues/50" class="external-link">#50</a>).</li>
+<li>Fix: <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> no longer errors when using a single <code>baseline</code> for multiple <code>newdata</code> studies.</li>
 <li>Fix: Bug where generalised gamma models with an <code>aux_regression</code> model on the auxiliary shape parameters gave an error when trying to use <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> or <code><a href="../reference/marginal_effects.html">marginal_effects()</a></code> (<a href="https://github.com/dmphillippo/multinma/issues/62" class="external-link">#62</a>).</li>
 <li>Fix: Class effects models with IPD were broken, now resolved (PR <a href="https://github.com/dmphillippo/multinma/issues/57" class="external-link">#57</a>).</li>
 <li>Improvement: Class effects models now note when the reference treatment was included in a class, and has been removed (PR <a href="https://github.com/dmphillippo/multinma/issues/57" class="external-link">#57</a>).</li>

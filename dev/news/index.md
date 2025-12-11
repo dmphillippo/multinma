@@ -8,6 +8,12 @@
   [`posterior_rank_probs()`](https://dmphillippo.github.io/multinma/dev/reference/posterior_ranks.md)
   allows ranks to be calculated for a smaller decision set of treatments
   than the full analysis set.
+- Fix: [`predict()`](https://rdrr.io/r/stats/predict.html) now works
+  correctly for `newdata` when `aux_by` was used, rather than giving
+  errors (including
+  [\#50](https://github.com/dmphillippo/multinma/issues/50)).
+- Fix: [`predict()`](https://rdrr.io/r/stats/predict.html) no longer
+  errors when using a single `baseline` for multiple `newdata` studies.
 - Fix: Bug where generalised gamma models with an `aux_regression` model
   on the auxiliary shape parameters gave an error when trying to use
   [`predict()`](https://rdrr.io/r/stats/predict.html) or

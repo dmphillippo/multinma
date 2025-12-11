@@ -445,7 +445,7 @@ print(pso_fit_FE)
 #> d[SEC_300]                              2.68  5409    1
 #> lp__                                -1570.52  1587    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Wed Dec  3 18:17:47 2025.
+#> Samples were drawn using NUTS(diag_e) at Thu Dec 11 16:05:38 2025.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -596,7 +596,7 @@ print(pso_fit_RE)
 #> lp__                                -1571.53   750 1.01
 #> tau                                     0.56   451 1.01
 #> 
-#> Samples were drawn using NUTS(diag_e) at Wed Dec  3 18:21:07 2025.
+#> Samples were drawn using NUTS(diag_e) at Thu Dec 11 16:09:44 2025.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
