@@ -547,7 +547,7 @@ make_knots <- function(network,
 #'
 #' @returns A list of vectors of knot locations, for each study in the network.
 #' @seealso [make_knots()] for constructing knots for a network object.
-#' @export
+#' @exportS3Method stats::knots
 knots.stan_nma <- function(Fn, type = c("all", "internal", "boundary"), ...) {
   type <- rlang::arg_match(type)
   if (!Fn$likelihood %in% c("mspline", "pexp"))
@@ -557,12 +557,12 @@ knots.stan_nma <- function(Fn, type = c("all", "internal", "boundary"), ...) {
 
   if (type == "all") {
     .knots <- function(x, ...) {
-      ik <- knots(x, type = "internal", ...)
-      bk <- knots(x, type = "boundary", ...)
+      ik <- stats::knots(x, type = "internal", ...)
+      bk <- stats::knots(x, type = "boundary", ...)
       c(bk[1], ik, bk[2])
     }
     return(purrr::map(basis, .knots, ...))
   } else {
-    return(purrr::map(basis, knots, type = type, ...))
+    return(purrr::map(basis, stats::knots, type = type, ...))
   }
 }
