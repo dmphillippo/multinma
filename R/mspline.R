@@ -527,7 +527,7 @@ make_knots <- function(network,
   }
 
   # Combine boundary and internal knots
-  out <- purrr::map2(b_knots, i_knots, ~ c(.x[1], .y, .x[2]))
+  out <- purrr::map2(b_knots, i_knots, ~ unname(c(.x[1], .y, .x[2])))
 
   return(out)
 }
