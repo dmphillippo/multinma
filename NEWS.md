@@ -3,6 +3,9 @@
 * Feature: New `subset` argument to `posterior_ranks()` and 
 `posterior_rank_probs()` allows ranks to be calculated for a smaller decision 
 set of treatments than the full analysis set.
+* Feature: New `knots.stan_nma()` method for easily obtaining the knots from a 
+fitted M-spline or piecewise exponential model, rather than working with the 
+spline basis objects `fit$basis` (#53).
 * Fix: `predict()` now works correctly for `newdata` when `aux_by` was used, 
 rather than giving errors (including #50).
 * Fix: `predict()` no longer errors when using a single `baseline` for multiple 
