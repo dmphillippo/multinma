@@ -435,11 +435,12 @@ make_knots <- function(network,
 
   survdat <- dplyr::mutate(survdat,
                            !!! get_Surv_data(survdat$.Surv),
-                           observed = .data$status == 1)
+                           observed = .data$status == 1,
+                           .study = forcats::fct_drop(.data$.study))
 
   observed_survdat <- dplyr::filter(survdat, .data$observed)
 
-  studies <- unique(survdat$.study)
+  studies <- levels(survdat$.study)
   n_studies <- length(studies)
 
   # Calculate knots
