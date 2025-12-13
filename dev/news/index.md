@@ -8,6 +8,12 @@
   [`posterior_rank_probs()`](https://dmphillippo.github.io/multinma/dev/reference/posterior_ranks.md)
   allows ranks to be calculated for a smaller decision set of treatments
   than the full analysis set.
+- Feature: New
+  [`knots.stan_nma()`](https://dmphillippo.github.io/multinma/dev/reference/knots.stan_nma.md)
+  method for easily obtaining the knots from a fitted M-spline or
+  piecewise exponential model, rather than working with the spline basis
+  objects `fit$basis`
+  ([\#53](https://github.com/dmphillippo/multinma/issues/53)).
 - Fix: [`predict()`](https://rdrr.io/r/stats/predict.html) now works
   correctly for `newdata` when `aux_by` was used, rather than giving
   errors (including

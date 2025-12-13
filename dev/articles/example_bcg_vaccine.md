@@ -135,7 +135,7 @@ bcg_fit_unadj
 #> lp__             1
 #> tau              1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Thu Dec 11 16:00:49 2025.
+#> Samples were drawn using NUTS(diag_e) at Sat Dec 13 11:50:29 2025.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -228,7 +228,7 @@ bcg_fit_lat
 #> lp__                          -13448.27  1772    1
 #> tau                                0.73  1905    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Thu Dec 11 16:01:02 2025.
+#> Samples were drawn using NUTS(diag_e) at Sat Dec 13 11:50:44 2025.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
