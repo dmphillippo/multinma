@@ -808,7 +808,8 @@ nma <- function(network,
       if (".mu" %in% colnames(idat_agd_arm)) {
         warn(c(
           "Detected `.mu` in the `regression` formula and in the data.",
-          i = "`.mu` is a special variable refering to the modelled baseline risk."
+          `*` = "`.mu` column in data will be ignored.",
+          i = "`.mu` is a special variable referring to the modelled baseline risk."
         ))
       }
 
