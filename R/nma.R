@@ -813,12 +813,7 @@ nma <- function(network,
         ))
       }
 
-      ref_trt <- levels(idat_agd_arm$.trt)[1L]
-
-      idat_agd_arm <- idat_agd_arm %>%
-        dplyr::group_by(.data$.study) %>%
-        dplyr::mutate(.mu = as.integer(.data$.trt != ref_trt & ref_trt %in% .data$.trt)) %>%
-        dplyr::ungroup()
+      idat_agd_arm$.mu <- 1L
     }
 
     # Only take necessary columns
