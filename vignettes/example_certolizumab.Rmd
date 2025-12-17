@@ -39,11 +39,13 @@ head(certolizumab)
 @TSD3 used this data to demonstrate baseline risk meta-regression models.
 Plotting the baseline risk against the treatment effect, we suspect there might be an effect of the baseline risk on the treatment effect.
 Specifically, the log baseline odds (placebo in this case) seem to be negatively linearly correlated with the odds ratio.
+For purposes of plotting only, we apply a continuity correction to the Abe 2006 study, in which no events were observed on placebo.
 ```{r certolizumab_baseline_risk_plot}
 certolizumab <-
   certolizumab %>%
+  group_by(study) %>% 
   mutate(
-    probability = r / n,
+    probability = case_when(any(r == 0) ~ (r + 0.5) / (n + 0.5), TRUE ~ r / n),
     odds = probability / (1 - probability),
     log_odds = log(odds)
   )
@@ -57,7 +59,7 @@ p_baseline_risk <-
   ) %>%
   mutate(log_odds_ratio = log_odds - log_odds_baseline, n_total = n + n_baseline) %>%
   ggplot(aes(log_odds_baseline)) +
-  geom_hline(yintercept = 1, linetype = "dashed") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
   labs(x = "Placebo log odds", y = "log Odds Ratio", size = "Sample Size") +
   theme_multinma()
 
@@ -70,7 +72,7 @@ We begin by setting up the network.
 ```{r}
 cert_net <- set_agd_arm(certolizumab,
                         study = study, trt = trt, n = n, r = r,
-                        trt_class = dplyr::if_else(trt == "Placebo", "Placebo", "Treatment"))
+                        trt_class = if_else(trt == "Placebo", "Placebo", "Treatment"))
 cert_net
 ```
 
@@ -95,9 +97,9 @@ cert_fit_FE <- nma(cert_net,
                    prior_intercept = normal(scale = sqrt(1000)),
                    prior_trt = normal(scale = 100),
                    prior_reg = normal(scale = 100),
-                   iter = 4000,
                    adapt_delta = 0.95)
 ```
+We may see a few divergent transitions due to the zero on placebo in Abe 2006; increasing `adapt_delta` to 0.95 here helps to minimise these.
 
 Basic parameter summaries are given by the `print()` method:
 ```{r}
@@ -112,8 +114,8 @@ cert_fit_RE <- nma(cert_net,
                    prior_intercept = normal(scale = sqrt(1000)),
                    prior_trt = normal(scale = 100),
                    prior_reg = normal(scale = 100),
-                   iter = 8000,
-                   adapt_delta = 0.98)
+                   prior_het = half_normal(2.5),
+                   adapt_delta = 0.95)
 ```
 
 Basic parameter summaries are given by the `print()` method:
@@ -143,7 +145,7 @@ Plotting the estimated baseline risk effect (fixed effect model) together with t
 cert_mu_reg <-
   cert_fit_FE %>%
   relative_effects(
-    newdata = tibble(.mu = seq(log(0.02), log(0.5), length.out = 20)),
+    newdata = tibble(.mu = seq(log(0.01), log(0.5), length.out = 20)),
     study = .mu
   ) %>%
   as_tibble() %>%
@@ -162,11 +164,9 @@ p_baseline_risk +
 ```
 
 ## Further results
-```{r}
-newdata <- data.frame(.mu = cert_fit_FE$xbar[[".mu"]])
-```
-For comparison with @TSD3, we can produce relative effects against "Placebo" using the `relative_effects()` function:
+For comparison with @TSD3, we can produce relative effects against placebo at the average observed log odds, using the `relative_effects()` function:
 ```{r certolizumab_releff_FE, fig.height=3}
+newdata <- data.frame(.mu = cert_fit_FE$xbar[[".mu"]])
 (cert_releff_FE <- relative_effects(cert_fit_FE, newdata = newdata))
 plot(cert_releff_FE, ref_line = 0)
 ```
@@ -175,21 +175,21 @@ plot(cert_releff_FE, ref_line = 0)
 plot(cert_releff_RE, ref_line = 0)
 ```
 
-Without `newdata`, `relative_effects()` will produce relative effects per study.
-Note that the sampled study-specific intercepts are used.
+Without providing `newdata`, `relative_effects()` will produce relative effects per study.
+Note that the estimated study-specific intercepts are used.
 
 ```{r certolizumab_releff_study_RE}
 (cert_releff_study_RE <- relative_effects(cert_fit_RE))
 ```
 
-`predict()` will use the `.mu` values sampled from the `baseline` distribution.
+To produce predictions against a reference baseline risk distribution, `predict()` will use the `.mu` values sampled from the `baseline` distribution, for example:
 
 ```{r}
-predict(cert_fit_RE, baseline = distr(qnorm, mean = cert_fit_FE$xbar[[".mu"]], sd = 0.5))
+predict(cert_fit_RE, baseline = distr(qnorm, mean = cert_fit_RE$xbar[[".mu"]], sd = 0.5))
 ```
 
 When not passing a `baseline` distribution, predictions will be produced per study.
-The sampled study-specific intercepts are used in the baseline risk meta-regression.
+The estimated study-specific intercepts are used in the baseline risk meta-regression.
 
 ```{r}
 predict(cert_fit_RE)

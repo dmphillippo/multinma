@@ -15,8 +15,8 @@ set.seed(76441)
 
 
 ## ----eval = FALSE---------------------------------------------------------------------------------
-## library(multinma)
-## options(mc.cores = parallel::detectCores())
+# library(multinma)
+# options(mc.cores = parallel::detectCores())
 
 ## ----setup, echo = FALSE--------------------------------------------------------------------------
 library(multinma)
@@ -37,8 +37,9 @@ head(certolizumab)
 ## ----certolizumab_baseline_risk_plot--------------------------------------------------------------
 certolizumab <-
   certolizumab %>%
+  group_by(study) %>% 
   mutate(
-    probability = r / n,
+    probability = case_when(any(r == 0) ~ (r + 0.5) / (n + 0.5), TRUE ~ r / n),
     odds = probability / (1 - probability),
     log_odds = log(odds)
   )
@@ -52,7 +53,7 @@ p_baseline_risk <-
   ) %>%
   mutate(log_odds_ratio = log_odds - log_odds_baseline, n_total = n + n_baseline) %>%
   ggplot(aes(log_odds_baseline)) +
-  geom_hline(yintercept = 1, linetype = "dashed") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
   labs(x = "Placebo log odds", y = "log Odds Ratio", size = "Sample Size") +
   theme_multinma()
 
@@ -63,12 +64,12 @@ p_baseline_risk +
 ## -------------------------------------------------------------------------------------------------
 cert_net <- set_agd_arm(certolizumab,
                         study = study, trt = trt, n = n, r = r,
-                        trt_class = dplyr::if_else(trt == "Placebo", "Placebo", "Treatment"))
+                        trt_class = if_else(trt == "Placebo", "Placebo", "Treatment"))
 cert_net
 
 
 ## ----eval=FALSE-----------------------------------------------------------------------------------
-## plot(cert_net, weight_edges = TRUE, weight_nodes = TRUE)
+# plot(cert_net, weight_edges = TRUE, weight_nodes = TRUE)
 
 ## ----certolizumab_network_plot, echo=FALSE--------------------------------------------------------
 plot(cert_net, weight_edges = TRUE, weight_nodes = TRUE) +
@@ -82,7 +83,6 @@ cert_fit_FE <- nma(cert_net,
                    prior_intercept = normal(scale = sqrt(1000)),
                    prior_trt = normal(scale = 100),
                    prior_reg = normal(scale = 100),
-                   iter = 4000,
                    adapt_delta = 0.95)
 
 
@@ -97,8 +97,8 @@ cert_fit_RE <- nma(cert_net,
                    prior_intercept = normal(scale = sqrt(1000)),
                    prior_trt = normal(scale = 100),
                    prior_reg = normal(scale = 100),
-                   iter = 8000,
-                   adapt_delta = 0.98)
+                   prior_het = half_normal(2.5),
+                   adapt_delta = 0.95)
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -122,7 +122,7 @@ plot(dic_RE)
 cert_mu_reg <-
   cert_fit_FE %>%
   relative_effects(
-    newdata = tibble(.mu = seq(log(0.02), log(0.5), length.out = 20)),
+    newdata = tibble(.mu = seq(log(0.01), log(0.5), length.out = 20)),
     study = .mu
   ) %>%
   as_tibble() %>%
@@ -140,10 +140,8 @@ p_baseline_risk +
   geom_point(aes(y = log_odds_ratio, size = n_total), alpha = 0.6)
 
 
-## -------------------------------------------------------------------------------------------------
-newdata <- data.frame(.mu = cert_fit_FE$xbar[[".mu"]])
-
 ## ----certolizumab_releff_FE, fig.height=3---------------------------------------------------------
+newdata <- data.frame(.mu = cert_fit_FE$xbar[[".mu"]])
 (cert_releff_FE <- relative_effects(cert_fit_FE, newdata = newdata))
 plot(cert_releff_FE, ref_line = 0)
 
@@ -157,7 +155,7 @@ plot(cert_releff_RE, ref_line = 0)
 
 
 ## -------------------------------------------------------------------------------------------------
-predict(cert_fit_RE, baseline = distr(qnorm, mean = cert_fit_FE$xbar[[".mu"]], sd = 0.5))
+predict(cert_fit_RE, baseline = distr(qnorm, mean = cert_fit_RE$xbar[[".mu"]], sd = 0.5))
 
 
 ## -------------------------------------------------------------------------------------------------
