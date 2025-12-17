@@ -90,7 +90,7 @@ We fit both fixed effect (FE) and random effects (RE) models.
 The special variable `.mu` is used in the `regression` formula to specify a baseline risk meta-regression model.
 
 ### Fixed effect meta-analysis
-```{r}
+```{r, eval=!params$run_tests}
 cert_fit_FE <- nma(cert_net,
                    trt_effects = "fixed",
                    regression = ~.mu:.trt,
@@ -98,6 +98,15 @@ cert_fit_FE <- nma(cert_net,
                    prior_trt = normal(scale = 100),
                    prior_reg = normal(scale = 100),
                    adapt_delta = 0.95)
+```
+```{r, eval=params$run_tests}
+cert_fit_FE <- nowarn_on_ci(nma(cert_net,
+                   trt_effects = "fixed",
+                   regression = ~.mu:.trt,
+                   prior_intercept = normal(scale = sqrt(1000)),
+                   prior_trt = normal(scale = 100),
+                   prior_reg = normal(scale = 100),
+                   adapt_delta = 0.95))
 ```
 We may see a few divergent transitions due to the zero on placebo in Abe 2006; increasing `adapt_delta` to 0.95 here helps to minimise these.
 
@@ -107,7 +116,7 @@ cert_fit_FE
 ```
 
 ### Random effects meta-analysis
-```{r}
+```{r, eval=!params$run_tests}
 cert_fit_RE <- nma(cert_net,
                    trt_effects = "random",
                    regression = ~.mu:.trt,
@@ -116,6 +125,17 @@ cert_fit_RE <- nma(cert_net,
                    prior_reg = normal(scale = 100),
                    prior_het = half_normal(2.5),
                    adapt_delta = 0.95)
+```
+```{r, eval=params$run_tests}
+cert_fit_RE <- nowarn_on_ci(nma(cert_net,
+                   trt_effects = "random",
+                   regression = ~.mu:.trt,
+                   prior_intercept = normal(scale = sqrt(1000)),
+                   prior_trt = normal(scale = 100),
+                   prior_reg = normal(scale = 100),
+                   prior_het = half_normal(2.5),
+                   iter = 4000,
+                   adapt_delta = 0.95))
 ```
 
 Basic parameter summaries are given by the `print()` method:
