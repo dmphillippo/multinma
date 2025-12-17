@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="537.96399"
+   height="802.88135"
+   viewBox="0 0 537.96399 802.88135"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs id="defs1">
+	<style type="text/css">
+	  @import url('../deps/Source_Sans_Pro-0.4.9/font.css');
+	</style>
+  </defs>
+  <g
+     id="g1">
+    <path
+       id="path1"
+       d="M 66.76839,12.75595 H -66.76837 v -25.5119 H 66.76839 Z"
+       style="fill:#b3ffb3;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <text
+       id="text1"
+       xml:space="preserve"
+       transform="matrix(1.2,0,0,1.2,128.28253,25.821333)"><tspan
+         id="tspan1"
+         style="font-variant:normal;font-weight:bold;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0">START</tspan></text>
+    <path
+       id="path2"
+       d="m -102.53444,-70.86702 h 205.06888 v 28.34679 h -205.06888 z"
+       style="fill:#ffd9b3;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <text
+       id="text2"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,21.738667,92.661333)"><tspan
+         id="tspan2"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0"><tspan
+   style="font-weight:bold"
+   id="tspan104">Step 1: Heterogeneity Assessment</tspan> - Fit</tspan><tspan
+         id="tspan3"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="4.046"
+         y="11.955">FE and RE models, select preferred model</tspan></text>
+    <path
+       id="path3"
+       d="m -109.62114,-141.73405 h 219.24228 v 28.34679 h -219.24228 z"
+       style="fill:#ffd9b3;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <text
+       id="text3"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,28.761333,186.78)"><tspan
+         id="tspan4"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0"><tspan
+   style="font-weight:bold"
+   id="tspan105">Step 2: Consistency Assessment</tspan> - Fit</tspan><tspan
+         id="tspan5"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="-8.2919998"
+         y="11.956">the UME model for the chosen FE/RE model</tspan></text>
+    <path
+       id="path5"
+       d="m -72.21301,-212.60109 10.30598,28.3468 H 72.21301 l -10.30598,-28.3468 z"
+       style="fill:#b3b3ff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <text
+       id="text5"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,99.472,281.63733)"><tspan
+         id="tspan6"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0">Is the consistency</tspan><tspan
+         id="tspan7"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="4.1929998"
+         y="11.955">model preferred?</tspan></text>
+    <path
+       id="path7"
+       d="M 282.80367,-166.76859 H 114.05182 c -2.20094,0 -3.98511,-1.78416 -3.98511,-3.98511 v -55.348 c 0,-2.20093 1.78417,-3.9851 3.98511,-3.9851 h 168.75185 c 2.20093,0 3.9851,1.78417 3.9851,3.9851 v 55.348 c 0,2.20095 -1.78417,3.98511 -3.9851,3.98511 z"
+       style="fill:#ffb3b3;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <text
+       id="text7"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,319.584,257.728)"><tspan
+         id="tspan8"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0"><tspan
+   style="font-weight:bold"
+   id="tspan108">Inconsistency present</tspan> - Check</tspan><tspan
+         id="tspan9"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="15.7649999"
+         y="11.955">for data issues, investigate</tspan><tspan
+         id="tspan10"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="5.6399999"
+         y="23.91">potential causes of inconsistency.</tspan><tspan
+         id="tspan11"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="3.2739999"
+         y="35.865002">If these can be resolved, restart</tspan><tspan
+         id="tspan12"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="11.189"
+         y="47.82">the model selection process.</tspan></text>
+    <path
+       id="path12"
+       d="M -88.36102,-294.00757 H 88.36103 v 49.42567 H -88.36102 Z"
+       style="fill:#ffd9b3;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <text
+       id="text12"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,66.654667,361.47733)"><tspan
+         id="tspan13"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0"><tspan
+   style="font-weight:bold"
+   id="tspan106">Step 3: Class Assessment</tspan> - </tspan><tspan
+         id="tspan14"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="4.5079999"
+         y="11.955">Fit an exchangeable class</tspan><tspan
+         id="tspan15"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="-5.3850002"
+         y="23.91">model with corresponding fixed</tspan><tspan
+         id="tspan16"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0.82800001"
+         y="35.865002">or random treatment effects.</tspan></text>
+    <path
+       id="path16"
+       d="m -72.21301,-347.24844 10.30598,28.34678 H 72.21301 l -10.30598,-28.34678 z"
+       style="fill:#b3b3ff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <text
+       id="text16"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,94.196,461.16533)"><tspan
+         id="tspan17"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0">Is the exchangeable</tspan><tspan
+         id="tspan18"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="-5.881"
+         y="11.955">class model preferred?</tspan></text>
+    <path
+       id="path18"
+       d="M 282.80367,-307.3936 H 114.05182 c -2.20094,0 -3.98511,-1.78416 -3.98511,-3.98511 v -43.39269 c 0,-2.20094 1.78417,-3.9851 3.98511,-3.9851 h 168.75185 c 2.20093,0 3.9851,1.78416 3.9851,3.9851 v 43.39269 c 0,2.20095 -1.78417,3.98511 -3.9851,3.98511 z"
+       style="fill:#ffb3b3;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <text
+       id="text18"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,317.14267,445.22533)"><tspan
+         id="tspan19"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0"><tspan
+   style="font-weight:bold"
+   id="tspan109">Avoid class assumptions</tspan> - Opt</tspan><tspan
+         id="tspan20"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="11.249"
+         y="11.955">for the no class effect model.</tspan><tspan
+         id="tspan21"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="4.053"
+         y="23.91">If disconnected, seek alternative</tspan><tspan
+         id="tspan22"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="-6.0900002"
+         y="35.865002">network-connecting methods. STOP</tspan></text>
+    <path
+       id="path22"
+       d="m -102.53444,-423.64587 h 205.06888 v 39.40756 h -205.06888 z"
+       style="fill:#ffd9b3;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <text
+       id="text22"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,27.889333,547.68267)"><tspan
+         id="tspan23"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0"><tspan
+   style="font-weight:bold"
+   id="tspan107">Step 4: Class Model Assessment</tspan> - Fit</tspan><tspan
+         id="tspan24"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="4.954"
+         y="11.956">a common class model with correspond-</tspan><tspan
+         id="tspan25"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="9.5609999"
+         y="23.910999">ing fixed or random treatment effects.</tspan></text>
+    <path
+       id="path25"
+       d="m -76.91676,-474.80911 10.30647,28.34678 H 76.91676 l -10.30647,-28.34678 z"
+       style="fill:#b3b3ff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <text
+       id="text25"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,80.026667,632.536)"><tspan
+         id="tspan26"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0">Does the model use ran-</tspan><tspan
+         id="tspan27"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="3.141"
+         y="11.955">dom treatment effects?</tspan></text>
+    <path
+       id="path27"
+       d="M 268.63025,-435.92288 H 128.22523 c -2.20094,0 -3.9851,-1.78417 -3.9851,-3.98511 v -41.45546 c 0,-2.20094 1.78416,-3.98511 3.9851,-3.98511 h 140.40502 c 2.20094,0 3.98511,1.78417 3.98511,3.98511 v 41.45546 c 0,2.20094 -1.78417,3.98511 -3.98511,3.98511 z"
+       style="fill:#ffb3b3;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <text
+       id="text27"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,344.68533,616.59467)"><tspan
+         id="tspan28"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0">Choose preferred model:</tspan><tspan
+         id="tspan29"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="2.0209999"
+         y="11.956">Exchangeable class FE,</tspan><tspan
+         id="tspan30"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="12.052"
+         y="23.910999">Common class FE.</tspan><tspan
+         id="tspan31"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="39.436001"
+         y="35.866001">STOP</tspan></text>
+    <path
+       id="path31"
+       d="M -88.36102,-582.34431 H 88.36103 v 73.33632 H -88.36102 Z"
+       style="fill:#ffd9b3;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.3985;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <text
+       id="text31"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,53.662667,714.04133)"><tspan
+         id="tspan32"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0">Fit exchangeable class FE model.</tspan><tspan
+         id="tspan33"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="14.197"
+         y="11.955">Select the preferred model:</tspan><tspan
+         id="tspan34"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="21.447001"
+         y="23.91">Exchangeable class RE,</tspan><tspan
+         id="tspan35"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="21.862"
+         y="35.865002">Exchangeable class FE,</tspan><tspan
+         id="tspan36"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="31.479"
+         y="47.82">Common class RE.</tspan><tspan
+         id="tspan37"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="59.277"
+         y="59.775002">STOP</tspan></text>
+    <path
+       id="path37"
+       d="M 0,-12.93527 V -39.73071"
+       style="fill:none;stroke:#000000;stroke-width:0.79701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <path
+       id="path38"
+       d="M 2.59026,0 -1.55415,2.0722 0,0 -1.55415,-2.0722"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0,1.3333333,1.3333333,0,150.872,74.69428)" />
+    <path
+       id="path39"
+       d="m 0,-71.06628 v -39.53147"
+       style="fill:none;stroke:#000000;stroke-width:0.79701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <path
+       id="path40"
+       d="M 2.59026,0 -1.55415,2.0722 0,0 -1.55415,-2.0722"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0,1.3333333,1.3333333,0,150.872,169.18367)" />
+    <path
+       id="path41"
+       d="m 0.0024,-141.9333 0.00735,-39.52971"
+       style="fill:none;stroke:#000000;stroke-width:0.79701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <path
+       id="path42"
+       d="M 2.59026,0 -1.55415,2.0722 0,0 -1.55415,-2.0722"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(2.2666667e-4,1.3333067,1.3333067,-2.2666667e-4,150.885,263.67068)" />
+    <path
+       id="path43"
+       d="m 67.27739,-198.42781 39.9998,1.2e-4"
+       style="fill:none;stroke:#000000;stroke-width:0.79701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <path
+       id="path44"
+       d="M 2.59026,0 -1.55415,2.0722 0,0 -1.55415,-2.0722"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(1.3333333,0,0,-1.3333333,293.90825,286.29025)" />
+    <text
+       id="text44"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,260.66533,281.328)"><tspan
+         id="tspan44"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0">No</tspan></text>
+    <path
+       id="path45"
+       d="M 0.00995,-212.80331 7.6e-4,-241.79242"
+       style="fill:none;stroke:#000000;stroke-width:0.79701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <path
+       id="path46"
+       d="M 2.59026,0 -1.55415,2.0722 0,0 -1.55415,-2.0722"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(-4e-4,1.3333067,1.3333067,4e-4,150.87304,344.10989)" />
+    <text
+       id="text46"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,125.92133,331.04533)"><tspan
+         id="tspan46"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         dx="0 -0.82689577"
+         y="0">Yes</tspan></text>
+    <path
+       id="path47"
+       d="M 198.42773,-166.56934 V -56.69363 H 105.32394"
+       style="fill:none;stroke:#000000;stroke-width:0.79701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:0.79701, 1.99255;stroke-dashoffset:0;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <path
+       id="path48"
+       d="M 2.59026,0 -1.55415,2.0722 0,0 -1.55415,-2.0722"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(-1.3333333,0,0,1.3333333,291.30392,97.311507)" />
+    <path
+       id="path49"
+       d="m 0.00645,-294.20682 0.00583,-21.90355"
+       style="fill:none;stroke:#000000;stroke-width:0.79701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <path
+       id="path50"
+       d="M 2.59026,0 -1.55415,2.0722 0,0 -1.55415,-2.0722"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(3.4666667e-4,1.3333067,1.3333067,-3.4666667e-4,150.88837,443.20049)" />
+    <path
+       id="path51"
+       d="m 67.27739,-333.07516 39.9998,1.2e-4"
+       style="fill:none;stroke:#000000;stroke-width:0.79701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <path
+       id="path52"
+       d="M 2.59026,0 -1.55415,2.0722 0,0 -1.55415,-2.0722"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(1.3333333,0,0,-1.3333333,293.90825,465.82005)" />
+    <text
+       id="text52"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,260.66533,460.856)"><tspan
+         id="tspan52"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0">No</tspan></text>
+    <path
+       id="path53"
+       d="M 0.00815,-347.45068 5.6e-4,-381.44882"
+       style="fill:none;stroke:#000000;stroke-width:0.79701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <path
+       id="path54"
+       d="M 2.59026,0 -1.55415,2.0722 0,0 -1.55415,-2.0722"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(-3.0666667e-4,1.3333067,1.3333067,3.0666667e-4,150.87277,530.31843)" />
+    <text
+       id="text54"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,125.92,513.912)"><tspan
+         id="tspan54"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         dx="0 -0.82689577"
+         y="0">Yes</tspan></text>
+    <path
+       id="path55"
+       d="m 71.97955,-460.63577 49.47105,6e-5"
+       style="fill:none;stroke:#000000;stroke-width:0.79701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <path
+       id="path56"
+       d="M 2.59026,0 -1.55415,2.0722 0,0 -1.55415,-2.0722"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(1.3333333,0,0,-1.3333333,312.80613,635.90095)" />
+    <text
+       id="text56"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,273.248,630.93467)"><tspan
+         id="tspan56"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0">No</tspan></text>
+    <path
+       id="path57"
+       d="M 0.01346,-475.01202 0.001,-506.21854"
+       style="fill:none;stroke:#000000;stroke-width:0.79701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <path
+       id="path58"
+       d="M 2.59026,0 -1.55415,2.0722 0,0 -1.55415,-2.0722"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(-5.3333333e-4,1.3333067,1.3333067,5.3333333e-4,150.87336,696.67805)" />
+    <text
+       id="text58"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,125.92267,682.13067)"><tspan
+         id="tspan58"
+         style="font-variant:normal;font-weight:normal;font-size:9.9626px;font-family:'Source Sans Pro', sans-serif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         dx="0 -0.82689577"
+         y="0">Yes</tspan></text>
+    <path
+       id="path59"
+       d="m 0.00363,-423.84512 0.00389,-19.82515"
+       style="fill:none;stroke:#000000;stroke-width:0.79701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+    <path
+       id="path60"
+       d="M 2.59026,0 -1.55415,2.0722 0,0 -1.55415,-2.0722"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(2.6666667e-4,1.3333067,1.3333067,-2.6666667e-4,150.882,613.28036)" />
+    <path
+       id="path61"
+       d="m 88.5838,-284.79417 v 0 0 z"
+       style="fill:none;stroke:#ffffff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(1.3333333,0,0,-1.3333333,150.872,21.72)" />
+  </g>
+</svg>

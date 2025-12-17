@@ -89,7 +89,8 @@ af_fit_1 <- nma(af_net,
                 prior_intercept = normal(scale = 100),
                 prior_trt = normal(scale = 100),
                 prior_het = half_normal(scale = 5),
-                adapt_delta = 0.99)
+                adapt_delta = 0.99,
+                iter = 5000)
 ```
 
 Basic parameter summaries are given by the `print()` method:

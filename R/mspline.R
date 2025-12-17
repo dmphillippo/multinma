@@ -276,10 +276,25 @@ rw1_prior_weights <- function(basis) {
   return(sqrt(wts))
 }
 
-#' softmax transform
-#' @param x K-1 vector of reals
-#' @return K vector simplex
-#' @noRd
+#' Softmax transform
+#'
+#' The softmax transform is a multivariate generalisation of the logit
+#' transform. `softmax()` maps a vector of \eqn{K-1} values on the real line to a
+#' \eqn{K}-simplex (i.e. values between 0 and 1, that sum to 1). `inv_softmax()`
+#' provides the inverse transform, mapping a \eqn{K}-simplex vector to a vector of
+#' \eqn{K-1} real values.
+#'
+#' @param x \eqn{K-1} vector of reals
+#' @return `softmax()` returns a vector of length \eqn{K} that is a simplex.
+#'   `inv_softmax()` returns a vector of reals of length \eqn{K-1}.
+#' @export
+#'
+#' @examples
+#' x <- c(-1, 3, -0.5, 2)
+#' (p <- softmax(x))
+#' sum(p)
+#' inv_softmax(p)
+#'
 softmax <- function(x) {
   x0 <- c(0, x)
   exp(x0 - logsumexp(x0))
@@ -291,9 +306,9 @@ logsumexp <- function(x) {
 }
 
 #' inverse softmax transform
-#' @param p K vector simplex
-#' @return K-1 vector of reals
-#' @noRd
+#' @param p \eqn{K} vector simplex
+#' @export
+#' @rdname softmax
 inv_softmax <- function(p) {
   log(p[-1]) - log(p[1])
 }
@@ -358,6 +373,8 @@ inv_softmax <- function(p) {
 #' just before the last follow-up time in a study.
 #'
 #' @return A named list of vectors giving the knot locations in each study.
+#' @seealso [knots.stan_nma()] for obtaining the knots from a fitted model
+#' object.
 #' @export
 #'
 #' @template ex_ndmm_network
@@ -418,11 +435,12 @@ make_knots <- function(network,
 
   survdat <- dplyr::mutate(survdat,
                            !!! get_Surv_data(survdat$.Surv),
-                           observed = .data$status == 1)
+                           observed = .data$status == 1,
+                           .study = forcats::fct_drop(.data$.study))
 
   observed_survdat <- dplyr::filter(survdat, .data$observed)
 
-  studies <- unique(survdat$.study)
+  studies <- levels(survdat$.study)
   n_studies <- length(studies)
 
   # Calculate knots
@@ -510,7 +528,41 @@ make_knots <- function(network,
   }
 
   # Combine boundary and internal knots
-  out <- purrr::map2(b_knots, i_knots, ~ c(.x[1], .y, .x[2]))
+  out <- purrr::map2(b_knots, i_knots, ~ unname(c(.x[1], .y, .x[2])))
 
   return(out)
+}
+
+
+#' Knot locations for a fitted model
+#'
+#' Obtain the knot locations from a fitted M-spline or piecewise exponential
+#' model.
+#'
+#' @param Fn A fitted [stan_nma] object
+#' @param type String, indicating whether to return all knots (`"all"`, the
+#'   default), or only the internal knots (`"internal"`) or boundary knots
+#'   (`"boundary"`).
+#' @param ... Other arguments, passed on to [splines2::knots()]
+#'
+#' @returns A list of vectors of knot locations, for each study in the network.
+#' @seealso [make_knots()] for constructing knots for a network object.
+#' @exportS3Method stats::knots
+knots.stan_nma <- function(Fn, type = c("all", "internal", "boundary"), ...) {
+  type <- rlang::arg_match(type)
+  if (!Fn$likelihood %in% c("mspline", "pexp"))
+    abort("No knots present. Not an M-spline or piecewise exponential model.")
+
+  basis <- Fn$basis
+
+  if (type == "all") {
+    .knots <- function(x, ...) {
+      ik <- stats::knots(x, type = "internal", ...)
+      bk <- stats::knots(x, type = "boundary", ...)
+      c(bk[1], ik, bk[2])
+    }
+    return(purrr::map(basis, .knots, ...))
+  } else {
+    return(purrr::map(basis, stats::knots, type = type, ...))
+  }
 }
