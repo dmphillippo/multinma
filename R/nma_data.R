@@ -1859,7 +1859,7 @@ nfactor <- function(x, ..., numeric = TRUE, resort = FALSE) {
 #'   reference treatment.
 #'
 #' @return The baseline risk as a single numeric value.
-#' @export
+#' @noRd
 calculate_baseline_risk <- function(network, link, treatment = NULL) {
   if (!inherits(network, "nma_data")) abort("Not nma_data object.")
 
