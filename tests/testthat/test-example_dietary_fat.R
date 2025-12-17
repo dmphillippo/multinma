@@ -254,7 +254,8 @@ diet_fit_RE_ipd <- nowarn_on_ci(
                          trt_effects = "random",
                          prior_intercept = normal(scale = 100),
                          prior_trt = normal(scale = 100),
-                         prior_het = half_normal(scale = 5))
+                         prior_het = half_normal(scale = 5),
+                         iter = 4000)
                    )
 
 # Relative effects
