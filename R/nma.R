@@ -639,7 +639,10 @@ nma <- function(network,
 
   if (".mu" %in% all.vars(regression)) {
     if (has_ipd(network)) abort("Cannot fit baseline risk meta-regression model with IPD.")
-    if (QR) abort("Cannot fit baseline risk meta-regression model with QR.")
+    if (QR) {
+      warn("Cannot fit baseline risk meta-regression model with QR decomposition, setting QR = FALSE.")
+      QR <- FALSE
+    }
   }
 
   # Set adapt_delta
