@@ -18,7 +18,7 @@ A data frame with 24 rows and 5 variables:
 certolizumab
 }
 \description{
-Data analysed in \insertCite{TSD3}{multinma}.
+Data frame containing the results of 12 trials comparing 7 treatments for rheumatoid arthritis, analysed in \insertCite{TSD3}{multinma}.
 }
 \references{
 \insertAllCited{}
