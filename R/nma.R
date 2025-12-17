@@ -962,7 +962,7 @@ nma <- function(network,
     xbar <- NULL
   }
 
-  xbar_mu <- if (".mu" %in% all.vars(regression)) calculate_baseline_risk(network, link)
+  xbar_mu <- if (".mu" %in% all.vars(regression)) calculate_baseline_risk(network, link) else NULL
 
   # Make NMA formula
   nma_formula <- make_nma_formula(regression,
