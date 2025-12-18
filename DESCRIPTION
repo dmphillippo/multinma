@@ -11,8 +11,8 @@ Authors@R:
             family = "Perren",
             role = "ctb",
             email = "samuel.perren@bristol.ac.uk",
-            comment = c(ORCID = "0009-0005-1921-6957"))),
-    person(given = c("Niels"),
+            comment = c(ORCID = "0009-0005-1921-6957")),
+    person(given = "Niels",
             family = "Dunnewind",
             role = "ctb",
             comment = c(ORCID = "0009-0009-8675-9109")))
