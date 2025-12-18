@@ -117,7 +117,7 @@ cert_fit_RE <- nowarn_on_ci(nma(cert_net,
                    prior_trt = normal(scale = 100),
                    prior_reg = normal(scale = 100),
                    prior_het = half_normal(2.5),
-                   iter = 4000,
+                   iter = 8000,
                    adapt_delta = 0.95))
 
 
