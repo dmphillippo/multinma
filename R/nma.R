@@ -765,6 +765,19 @@ nma <- function(network,
                                       keep = if (has_aux_by) aux_by else NULL)
 
     y_ipd <- get_outcome_variables(network$ipd, network$outcome$ipd)
+
+    if (".mu" %in% all.vars(regression)) {
+      if (".mu" %in% colnames(dat_ipd)) {
+        warn(c(
+          "Detected `.mu` in the `regression` formula and in the data.",
+          `*` = "`.mu` column in data will be ignored.",
+          i = "`.mu` is a special variable referring to the modelled baseline risk."
+        ))
+      }
+
+      dat_ipd$.mu <- 1L
+    }
+
   } else {
     dat_ipd <- tibble::tibble()
     y_ipd <- NULL
@@ -830,6 +843,10 @@ nma <- function(network,
 
   if (has_agd_contrast(network)) {
     dat_agd_contrast <- network$agd_contrast
+
+    if (".mu" %in% all.vars(regression)) {
+      abort("Regression on baseline risk (`.mu` in `regression` formula) is not supported with contrast data.")
+    }
 
     y_agd_contrast <- get_outcome_variables(dat_agd_contrast, network$outcome$agd_contrast)
 
