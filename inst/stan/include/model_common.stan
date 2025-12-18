@@ -66,7 +66,7 @@ if (class_effects) {
 z_class ~ std_normal();
 
 // -- AgD model (regression coefficients) --
-if (ni_agd_regression) {
+if (nc_agd_regression) {
   int c=0;
   for (i in 1:ns_agd_regression) {
     segment(agd_regression_est, c + 1, agd_regression_ncoef[i]) ~

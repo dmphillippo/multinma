@@ -38,7 +38,7 @@ matrix[0, nX] Xdummy;
 matrix[ni_ipd, nX] X_ipd = ni_ipd ? X[1:ni_ipd] : Xdummy;
 matrix[nint_max * ni_agd_arm, nX] X_agd_arm = ni_agd_arm ? X[(ni_ipd + 1):(ni_ipd + nint_max * ni_agd_arm)] : Xdummy;
 matrix[nint_max * ni_agd_contrast, nX] X_agd_contrast = ni_agd_contrast ? X[(ni_ipd + nint_max * ni_agd_arm + 1):(ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast))] : Xdummy;
-matrix[ni_agd_regression, nX] X_agd_regression = ni_agd_regression ? X[(ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast) + 1):(ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast) + ni_agd_regression)] : Xdummy;
+matrix[nc_agd_regression, nX] X_agd_regression = nc_agd_regression ? X[(ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast) + 1):(ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast) + nc_agd_regression)] : Xdummy;
 
 // Split offsets into IPD and AgD rows
 vector[0] odummy;
