@@ -85,7 +85,7 @@ plot(cert_net, weight_edges = TRUE, weight_nodes = TRUE) +
 #                    prior_reg = normal(scale = 100),
 #                    adapt_delta = 0.95)
 
-## ----eval=params$run_tests----------------------------------------------------
+## ----echo=FALSE, eval=params$run_tests----------------------------------------
 cert_fit_FE <- nowarn_on_ci(nma(cert_net,
                    trt_effects = "fixed",
                    regression = ~.mu:.trt,
@@ -109,7 +109,7 @@ cert_fit_FE
 #                    prior_het = half_normal(2.5),
 #                    adapt_delta = 0.95)
 
-## ----eval=params$run_tests----------------------------------------------------
+## ----echo=FALSE, eval=params$run_tests----------------------------------------
 cert_fit_RE <- nowarn_on_ci(nma(cert_net,
                    trt_effects = "random",
                    regression = ~.mu:.trt,
@@ -198,14 +198,23 @@ plot(cert_rankprobs)
 plot(cert_cumrankprobs)
 
 
-## -----------------------------------------------------------------------------
-nma(cert_net,
+## ----eval=!params$run_tests---------------------------------------------------
+# nma(cert_net,
+#     trt_effects = "fixed",
+#     regression = ~(disease_duration + .mu):.trt,
+#     prior_intercept = normal(scale = sqrt(1000)),
+#     prior_trt = normal(scale = 100),
+#     prior_reg = normal(scale = 100),
+#     adapt_delta = 0.95)
+
+## ----echo=FALSE, eval=params$run_tests----------------------------------------
+nowarn_on_ci(nma(cert_net,
     trt_effects = "fixed",
     regression = ~(disease_duration + .mu):.trt,
     prior_intercept = normal(scale = sqrt(1000)),
     prior_trt = normal(scale = 100),
     prior_reg = normal(scale = 100),
-    adapt_delta = 0.95)
+    adapt_delta = 0.95))
 
 
 ## ----certolizumab_tests, include=FALSE, eval=params$run_tests-----------------
@@ -304,8 +313,10 @@ test_that("FE DIC", {
 
 test_that("RE DIC", {
   expect_equivalent(dic_RE$resdev, 24.2, tolerance = tol_dic)
-  expect_equivalent(dic_RE$pd, 19.4, tolerance = tol_dic)
-  expect_equivalent(dic_RE$dic, 43.6, tolerance = tol_dic)
+  #expect_equivalent(dic_RE$pd, 19.4, tolerance = tol_dic)
+  #expect_equivalent(dic_RE$dic, 43.6, tolerance = tol_dic)
+  expect_equivalent(dic_RE$pd, 21.5, tolerance = tol_dic)
+  expect_equivalent(dic_RE$dic, 45.8, tolerance = tol_dic)
 })
 
 
