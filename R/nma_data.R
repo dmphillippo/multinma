@@ -1872,7 +1872,8 @@ calculate_baseline_risk <- function(network, link) {
       if (has_agd_arm(network)) dplyr::select(network$agd_arm, .data$.study, .data$.trt, .data$.r, .data$.n)
     ) %>%
       dplyr::filter(.data$.trt == ref_trt) %>%
-      dplyr::mutate(.r = ifelse(.data$.r == 0, 0.5, .data$.r))
+      dplyr::mutate(.n = ifelse(.data$.r == 0, .data$.n + 0.5, .data$.n),
+                    .r = ifelse(.data$.r == 0, 0.5, .data$.r))
 
     bl <- stats::coef(suppressWarnings(stats::glm(cbind(.r, .n - .r) ~ .study -1, data = ref_dat, family = stats::binomial(link = link))))
     out <- mean(bl)
@@ -1888,7 +1889,8 @@ calculate_baseline_risk <- function(network, link) {
         dplyr::mutate(.n = rowSums(.data$.r), .r = .data$.r[,2])
     ) %>%
       dplyr::filter(.data$.trt == ref_trt) %>%
-      dplyr::mutate(.r = ifelse(.data$.r == 0, 0.5, .data$.r))
+      dplyr::mutate(.n = ifelse(.data$.r == 0, .data$.n + 0.5, .data$.n),
+                    .r = ifelse(.data$.r == 0, 0.5, .data$.r))
 
     bl <- stats::coef(suppressWarnings(stats::glm(cbind(.r, .n - .r) ~ .study -1, data = ref_dat, family = stats::binomial(link = link))))
     out <- mean(bl)
