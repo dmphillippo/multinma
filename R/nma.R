@@ -2934,6 +2934,9 @@ make_nma_formula <- function(regression,
       nma_formula <- regression
     }
 
+    # Remove any main effect of .mu if baseline risk regression used
+    if (".mu" %in% all.vars(regression)) nma_formula <- update.formula(nma_formula, ~. - .mu)
+
     if (consistency == "ume") {
       nma_formula <- update.formula(nma_formula, ~.study + .contr + . -1)
     } else if (consistency == "nodesplit") {
