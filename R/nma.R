@@ -638,7 +638,7 @@ nma <- function(network,
   if (int_thin > 0) int_check <- FALSE
 
   if (".mu" %in% all.vars(regression)) {
-    if (has_ipd(network)) abort("Cannot fit baseline risk meta-regression model with IPD.")
+    if (has_agd_contrast(network)) abort("Regression on baseline risk (`.mu` in `regression` formula) is not supported with contrast data.")
     if (QR) {
       warn("Cannot fit baseline risk meta-regression model with QR decomposition, setting QR = FALSE.")
       QR <- FALSE
@@ -843,10 +843,6 @@ nma <- function(network,
 
   if (has_agd_contrast(network)) {
     dat_agd_contrast <- network$agd_contrast
-
-    if (".mu" %in% all.vars(regression)) {
-      abort("Regression on baseline risk (`.mu` in `regression` formula) is not supported with contrast data.")
-    }
 
     y_agd_contrast <- get_outcome_variables(dat_agd_contrast, network$outcome$agd_contrast)
 
