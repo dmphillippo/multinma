@@ -757,15 +757,6 @@ nma <- function(network,
   if (has_ipd(network)) {
     dat_ipd <- network$ipd
 
-    # Only take necessary columns
-    dat_ipd <- get_model_data_columns(dat_ipd,
-                                      regression = regression,
-                                      aux_regression = aux_regression,
-                                      label = "IPD",
-                                      keep = if (has_aux_by) aux_by else NULL)
-
-    y_ipd <- get_outcome_variables(network$ipd, network$outcome$ipd)
-
     if (".mu" %in% all.vars(regression)) {
       if (".mu" %in% colnames(dat_ipd)) {
         warn(c(
@@ -777,6 +768,15 @@ nma <- function(network,
 
       dat_ipd$.mu <- 1L
     }
+
+    # Only take necessary columns
+    dat_ipd <- get_model_data_columns(dat_ipd,
+                                      regression = regression,
+                                      aux_regression = aux_regression,
+                                      label = "IPD",
+                                      keep = if (has_aux_by) aux_by else NULL)
+
+    y_ipd <- get_outcome_variables(network$ipd, network$outcome$ipd)
 
   } else {
     dat_ipd <- tibble::tibble()
