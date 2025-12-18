@@ -1855,49 +1855,65 @@ nfactor <- function(x, ..., numeric = TRUE, resort = FALSE) {
 #'
 #' @param network An `nma_data` object.
 #' @param link The name of the link function to use.
-#' @param treatment The reference treatment. If `NULL` (the default), use the `network`
-#'   reference treatment.
 #'
 #' @return The baseline risk as a single numeric value.
 #' @noRd
-calculate_baseline_risk <- function(network, link, treatment = NULL) {
+calculate_baseline_risk <- function(network, link) {
   if (!inherits(network, "nma_data")) abort("Not nma_data object.")
 
-  if (!has_agd_arm(network) || has_agd_contrast(network) || has_ipd(network)) {
-    abort("Should only have agd_arm.")
-  }
+  likelihood <- check_likelihood(NULL, network$outcome)
+  ref_trt <- levels(network$treatments)[1L]
 
-  treatments <- levels(network$treatments)
-  treatment <- treatment %||% treatments[1L]
-  treatment <- rlang::arg_match(treatment, treatments)
+  if (likelihood %in% unlist(valid_lhood[c("binary", "count")])) {
 
-  agd_arm <- network$agd_arm[network$agd_arm$.trt == treatment, ]
+    ref_dat <- dplyr::bind_rows(
+      if (has_ipd(network)) dplyr::group_by(network$ipd, .data$.study, .data$.trt) %>%
+        dplyr::summarise(.r = sum(.data$.r), .n = dplyr::n()),
+      if (has_agd_arm(network)) dplyr::select(network$agd_arm, .data$.study, .data$.trt, .data$.r, .data$.n)
+    ) %>%
+      dplyr::filter(.data$.trt == ref_trt) %>%
+      dplyr::mutate(.r = ifelse(.data$.r == 0, 0.5, .data$.r))
 
-  if (network$outcome$agd_arm == "continuous") {
-    out <- agd_arm$.y
+    bl <- coef(stats::glm(cbind(.r, .n - .r) ~ .study -1, data = ref_dat, family = stats::binomial(link = link)))
+    out <- mean(bl)
 
-  } else if (network$outcome$agd_arm %in% c("count", "ordered")) {
-    r <- agd_arm$.r
-    if (inherits(r, "matrix")) {
-      n <- rowSums(r, na.rm = TRUE)
-      r <- rowSums(r[, -1L], na.rm = TRUE)
-    } else {
-      n <- agd_arm$.n
-    }
+  } else if (likelihood %in% valid_lhood$ordered) {
 
-    out <- r / n
+    # Take lowest outcome and treat as binary
 
-    # Assume odds of 0.01 if r is 0
-    out[r == 0] <- 0.01 / (1 + 0.01)
+    ref_dat <- dplyr::bind_rows(
+      if (has_ipd(network)) dplyr::group_by(network$ipd, .data$.study, .data$.trt) %>%
+        dplyr::summarise(.r = sum(.data$.r[,2]), .n = dplyr::n()),
+      if (has_agd_arm(network)) dplyr::select(network$agd_arm, .data$.study, .data$.trt, .data$.r) %>%
+        dplyr::mutate(.n = rowSums(.data$.r), .r = .data$.r[,2])
+    ) %>%
+      dplyr::filter(.data$.trt == ref_trt) %>%
+      dplyr::mutate(.r = ifelse(.data$.r == 0, 0.5, .data$.r))
 
-    stopifnot(all(out >= 0 & out <= 1))
+    bl <- coef(stats::glm(cbind(.r, .n - .r) ~ .study -1, data = ref_dat, family = stats::binomial(link = link)))
+    out <- mean(bl)
+
+  } else if (likelihood %in% valid_lhood$rate) {
+
+    ref_dat <- dplyr::bind_rows(
+      if (has_ipd(network)) dplyr::group_by(network$ipd, .data$.study, .data$.trt) %>%
+        dplyr::summarise(.r = sum(.data$.r), .E = sum(.data$.E)),
+      if (has_agd_arm(network)) dplyr::select(network$agd_arm, .data$.study, .data$.trt, .data$.r, .data$.E)
+    ) %>%
+      dplyr::filter(.data$.trt == ref_trt) %>%
+      dplyr::mutate(.r = ifelse(.data$.r == 0, 0.5, .data$.r))
+
+    bl <- coef(stats::glm(.r ~ offset(log(.E)) + .study -1, data = ref_dat, family = stats::poisson(link = link)))
+    out <- mean(bl)
+
+  } else if (likelihood %in% valid_lhood$continuous) {
+
+    out <- mean(link_fun(c(network$ipd$.y, network$agd_arm$.y), link))
 
   } else {
-    abort(paste(
-      "Calculation of baseline risk not yet implemented for",
-      network$outcome$agd_arm, "outcomes."
-    ))
+    inform(glue::glue("Automated centering of baseline risk not yet implemented for {likelihood} outcomes."))
+    out <- 0
   }
 
-  mean(link_fun(out, link))
+  return(out)
 }
