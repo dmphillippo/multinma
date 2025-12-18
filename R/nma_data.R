@@ -1911,7 +1911,7 @@ calculate_baseline_risk <- function(network, link) {
     out <- mean(link_fun(c(network$ipd$.y, network$agd_arm$.y), link))
 
   } else {
-    inform(glue::glue("Automated centering of baseline risk not yet implemented for {likelihood} outcomes."))
+    inform(glue::glue("NOTE: Automated centering of baseline risk not yet implemented for survival outcomes."))
     out <- 0
   }
 
