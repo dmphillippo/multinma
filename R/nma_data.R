@@ -1874,7 +1874,7 @@ calculate_baseline_risk <- function(network, link) {
       dplyr::filter(.data$.trt == ref_trt) %>%
       dplyr::mutate(.r = ifelse(.data$.r == 0, 0.5, .data$.r))
 
-    bl <- stats::coef(stats::glm(cbind(.r, .n - .r) ~ .study -1, data = ref_dat, family = stats::binomial(link = link)))
+    bl <- stats::coef(suppressWarnings(stats::glm(cbind(.r, .n - .r) ~ .study -1, data = ref_dat, family = stats::binomial(link = link))))
     out <- mean(bl)
 
   } else if (likelihood %in% valid_lhood$ordered) {
@@ -1890,7 +1890,7 @@ calculate_baseline_risk <- function(network, link) {
       dplyr::filter(.data$.trt == ref_trt) %>%
       dplyr::mutate(.r = ifelse(.data$.r == 0, 0.5, .data$.r))
 
-    bl <- stats::coef(stats::glm(cbind(.r, .n - .r) ~ .study -1, data = ref_dat, family = stats::binomial(link = link)))
+    bl <- stats::coef(suppressWarnings(stats::glm(cbind(.r, .n - .r) ~ .study -1, data = ref_dat, family = stats::binomial(link = link))))
     out <- mean(bl)
 
   } else if (likelihood %in% valid_lhood$rate) {
@@ -1903,7 +1903,7 @@ calculate_baseline_risk <- function(network, link) {
       dplyr::filter(.data$.trt == ref_trt) %>%
       dplyr::mutate(.r = ifelse(.data$.r == 0, 0.5, .data$.r))
 
-    bl <- stats::coef(stats::glm(.r ~ offset(log(.E)) + .study -1, data = ref_dat, family = stats::poisson(link = link)))
+    bl <- stats::coef(suppressWarnings(stats::glm(.r ~ offset(log(.E)) + .study -1, data = ref_dat, family = stats::poisson(link = link))))
     out <- mean(bl)
 
   } else if (likelihood %in% valid_lhood$continuous) {
