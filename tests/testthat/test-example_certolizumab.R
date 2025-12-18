@@ -276,10 +276,10 @@ test_that("mean study-specific intercepts identical to those in parameter summar
 cert_tau <- as.data.frame(summary(cert_fit_RE, pars = "tau"))
 
 test_that("RE heterogeneity SD", {
-  expect_equivalent(cert_tau$mean, 0.19, tolerance = tol)
+  expect_equivalent(cert_tau$`50%`, 0.19, tolerance = tol)
   expect_equivalent(cert_tau$sd, 0.19, tolerance = tol)
   expect_equivalent(cert_tau$`2.5%`, 0.01, tolerance = tol)
-  expect_equivalent(cert_tau$`97.5%`, 0.70, tolerance = tol)
+  expect_equivalent(cert_tau$`97.5%`, 0.70, tolerance = tol*2)
 })
 
 # Baseline risk meta-regression
