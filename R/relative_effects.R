@@ -265,6 +265,9 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         dat_ipd <- x$network$ipd
         dat_ipd$.sample_size <- 1
 
+        # A `.mu` column is expected if baseline risk meta-regression is used in this model
+        dat_ipd$.mu <- 1
+
         # Only take necessary columns
         dat_ipd <- get_model_data_columns(dat_ipd, regression = x$regression, label = "IPD")
       } else {

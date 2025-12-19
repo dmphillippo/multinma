@@ -1082,6 +1082,9 @@ predict.stan_nma <- function(object, ...,
             dat_ipd <- dplyr::select(dat_ipd, -".Surv")
           }
 
+          # A `.mu` column is expected if baseline risk meta-regression is used in this model
+          dat_ipd$.mu <- 1
+
           # Only take necessary columns
           dat_ipd <- get_model_data_columns(dat_ipd,
                                             regression = object$regression,
