@@ -72,6 +72,7 @@ Useful links:
 Other contributors:
 \itemize{
   \item Samuel J. Perren \email{samuel.perren@bristol.ac.uk} (\href{https://orcid.org/0009-0005-1921-6957}{ORCID}) [contributor]
+  \item Niels Dunnewind (\href{https://orcid.org/0009-0009-8675-9109}{ORCID}) [contributor]
 }
 
 }
