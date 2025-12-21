@@ -1869,7 +1869,7 @@ calculate_baseline_risk <- function(network, link) {
     ref_dat <- dplyr::bind_rows(
       if (has_ipd(network)) dplyr::group_by(network$ipd, .data$.study, .data$.trt) %>%
         dplyr::summarise(.r = sum(.data$.r), .n = dplyr::n()),
-      if (has_agd_arm(network)) dplyr::select(network$agd_arm, .data$.study, .data$.trt, .data$.r, .data$.n)
+      if (has_agd_arm(network)) dplyr::select(network$agd_arm, ".study", ".trt", ".r", ".n")
     ) %>%
       dplyr::filter(.data$.trt == ref_trt) %>%
       dplyr::mutate(.n = ifelse(.data$.r == 0, .data$.n + 0.5, .data$.n),
@@ -1883,9 +1883,9 @@ calculate_baseline_risk <- function(network, link) {
     # Take lowest outcome and treat as binary
 
     ref_dat <- dplyr::bind_rows(
-      if (has_ipd(network)) dplyr::group_by(network$ipd, .data$.study, .data$.trt) %>%
+      if (has_ipd(network)) dplyr::group_by(network$ipd, ".study", ".trt") %>%
         dplyr::summarise(.r = sum(.data$.r[,2]), .n = dplyr::n()),
-      if (has_agd_arm(network)) dplyr::select(network$agd_arm, .data$.study, .data$.trt, .data$.r) %>%
+      if (has_agd_arm(network)) dplyr::select(network$agd_arm, ".study", ".trt", ".r") %>%
         dplyr::mutate(.n = rowSums(.data$.r), .r = .data$.r[,2])
     ) %>%
       dplyr::filter(.data$.trt == ref_trt) %>%
@@ -1900,7 +1900,7 @@ calculate_baseline_risk <- function(network, link) {
     ref_dat <- dplyr::bind_rows(
       if (has_ipd(network)) dplyr::group_by(network$ipd, .data$.study, .data$.trt) %>%
         dplyr::summarise(.r = sum(.data$.r), .E = sum(.data$.E)),
-      if (has_agd_arm(network)) dplyr::select(network$agd_arm, .data$.study, .data$.trt, .data$.r, .data$.E)
+      if (has_agd_arm(network)) dplyr::select(network$agd_arm, ".study", ".trt", ".r", ".E")
     ) %>%
       dplyr::filter(.data$.trt == ref_trt) %>%
       dplyr::mutate(.r = ifelse(.data$.r == 0, 0.5, .data$.r))
