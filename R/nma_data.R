@@ -1884,9 +1884,9 @@ calculate_baseline_risk <- function(network, link) {
 
     ref_dat <- dplyr::bind_rows(
       if (has_ipd(network)) dplyr::group_by(network$ipd, ".study", ".trt") %>%
-        dplyr::summarise(.r = sum(.data$.r[,2]), .n = dplyr::n()),
+        dplyr::summarise(.r = rowSums(.data$.r[, -1], na.rm = TRUE), .n = dplyr::n()),
       if (has_agd_arm(network)) dplyr::select(network$agd_arm, ".study", ".trt", ".r") %>%
-        dplyr::mutate(.n = rowSums(.data$.r), .r = .data$.r[,2])
+        dplyr::mutate(.n = rowSums(.data$.r, na.rm = TRUE), .r = rowSums(.data$.r[, -1], na.rm = TRUE))
     ) %>%
       dplyr::filter(.data$.trt == ref_trt) %>%
       dplyr::mutate(.n = ifelse(.data$.r == 0, .data$.n + 0.5, .data$.n),
