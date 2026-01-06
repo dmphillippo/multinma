@@ -1219,7 +1219,7 @@ set_agd_regression <- function(data,
   # Check covariates
   if (!inherits(covariates, "data.frame")) abort("Argument `covariates` should be a data frame")
   if(!all(levels(d$.study) %in% covariates$study)) abort("`covariates` should cover all studies")
-  d <- dplyr::left_join(d,covariates)
+  d <- suppressMessages(dplyr::left_join(d,covariates))
 
   # Check covariance/correlation matrices
   if (!missing(cov)) {

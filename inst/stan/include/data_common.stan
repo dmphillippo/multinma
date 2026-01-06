@@ -43,13 +43,14 @@ cov_matrix[ni_agd_contrast ? ni_agd_contrast : 1] agd_contrast_Sigma;
 // -- AgD regression coefficients --
 int<lower=0> nc_agd_regression; // Total number of coef (or included coef.)
 int<lower=0> no_agd_regression; // Total number of omitted coef.
+//int<lower=0> nl_agd_regression; // Total number of included coef.
 int<lower=0> agd_regression_max_ncoef;
 int<lower=0> agd_regression_max_ncoef_omt;
 int<lower=0> agd_regression_max_nrow;
 vector[nc_agd_regression] agd_regression_est; // Reported coef. estimations
 array[ns_agd_regression] int<lower=0,upper=agd_regression_max_ncoef> agd_regression_ncoef; // Number of coef. (or included coef.) in each regression model
 array[ns_agd_regression] cholesky_factor_cov[agd_regression_max_ncoef] agd_regression_cov;
-array[ns_agd_regression] int<lower=0,upper=1> agd_regression_reduced_study; // which study is reduced, indicated by 1
+array[ns_agd_regression] int<lower=0,upper=1> agd_regression_reduced_study; // specify reduced study, (yes = 1)
 // Note:
 //    - If there is at leat one reduced AgD regression then ni>0 else ni=0
 //    - If nc = 0 then ni=0
@@ -59,16 +60,18 @@ vector[ni_agd_regression ? nc_agd_regression : 0] agd_regression_OVB_GLM_dif; //
 vector[ni_agd_regression ? nc_agd_regression : 0] agd_regression_OVB_GLM_inc; //  GLM OVB intercept adjustment
 vector[ni_agd_regression ? ni_agd_regression : 0] exp_std_gen; // Generated sampels from Exp(1) used in COX OVB adjustment
 matrix[ni_agd_regression ? ni_agd_regression : 0, ni_agd_regression ? nX : 0] X_agd_regression_int; // Design matrix using integration points (unnested)
-array[ni_agd_regression ? ns_agd_regression : 0] int<lower=1> agd_regression_nrow; // Number of rows for AgD regression design matrix for each study
+matrix[ns_agd_regression ? nc_agd_regression : 0, ns_agd_regression ? nX : 0] X_agd_regression_no_QR; // Design matrix using integration points (unnested)
+array[ns_agd_regression ? ns_agd_regression : 0] int<lower=0> agd_regression_nx; // Number of rows for AgD regression design matrix for each study
 array[ns_agd_regression ? ns_agd_regression : 0] int<lower=0,upper=agd_regression_max_ncoef_omt> agd_regression_ncoef_omt; // Number of omitted coef. in each regression model
 array[ni_agd_regression ? ns_agd_regression : 0] matrix[agd_regression_max_ncoef,agd_regression_max_ncoef_omt] agd_regression_OVB_LM; // Pre-computed pert of LM OVB adjustment
 array[ni_agd_regression ? ns_agd_regression : 0] matrix[agd_regression_max_nrow,agd_regression_max_ncoef+2] agd_regression_OVB_COX; // Pre-computed part of COX OVB adjustment
-
+int<lower=0, upper=1> OVB_adj;
 
 // -- Design matrix or thin QR decomposition --
 int<lower=0, upper=1> QR; // use QR decomposition (yes = 1)
 matrix[ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast) + nc_agd_regression, nX] X; // X is Q from QR decomposition if QR = 1
 matrix[QR ? nX : 0, QR ? nX : 0] R_inv;
+//matrix[QR ? nX : 0, QR ? nX : 0] R;
 
 // -- Offsets --
 int<lower=0, upper=1> has_offset; // Offset flag (yes = 1)

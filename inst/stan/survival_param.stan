@@ -779,34 +779,10 @@ transformed parameters {
   }
 
   // -- AgD model (regression coefficients) --
-  if (nc_agd_regression) {
-
-    vector [nX] allbeta_OVB;
-
-    int c_i = 0; // Included coef. counter
-    int c_o = 0; // Omitted coef. counter
-    for (i in 1:ns_agd_regression) {
-     // reset in each study as there might be some common coef. should be adjusted.
-      allbeta_OVB = allbeta;
-      // OVB adjustment
-      if(agd_regression_reduced_study[i]){
-          allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef[i])]] = allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef[i])]] + block(agd_regression_OVB_LM[i], 1, 1,agd_regression_ncoef[i] ,agd_regression_ncoef_omt[i] ) * allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]];
-      }
-      // Update study spesific eta
-      eta_agd_regression[ (c_i+1):(c_i+agd_regression_ncoef[i]) ] = (X_agd_regression * allbeta_OVB)[ (c_i+1):(c_i+agd_regression_ncoef[i]) ];
-
-      c_i += agd_regression_ncoef[i];
-      c_o += agd_regression_ncoef_omt[i];
-    }
-
-    if (RE) {
-      for (i in 1:nc_agd_regression) {
-        if (which_RE[narm_ipd + narm_agd_arm + ni_agd_contrast + i]){
-          eta_agd_regression[i] = eta_agd_regression[i] + f_delta[which_RE[narm_ipd + narm_agd_arm + ni_agd_contrast + i]];
-        }
-      }
-    }
-  }
+  //if (nc_agd_regression) {
+  //
+  //
+  //}
 
 }
 model {
