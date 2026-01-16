@@ -194,7 +194,7 @@ to specify the ordered outcomes correctly.</p>
 <span>  <span class="co"># Nudge the legend over</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.box.spacing <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.75</span>, <span class="st">"in"</span><span class="op">)</span>,</span>
 <span>                 plot.margin <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">margin</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0</span>, <span class="fl">0.1</span>, <span class="fl">0.75</span>, <span class="st">"in"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_hta_psoriasis_files/figure-html/hta_psoriasis_network_plot-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_hta_psoriasis_files/figure-html/hta_psoriasis_network_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="meta-analysis-models">Meta-analysis models<a class="anchor" aria-label="anchor" href="#meta-analysis-models"></a>
@@ -273,7 +273,7 @@ method:</p>
 <span><span class="co">#&gt; cc[PASI75]             1</span></span>
 <span><span class="co">#&gt; cc[PASI90]             1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sat Dec 13 11:52:39 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan 16 14:47:26 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -300,13 +300,13 @@ changing the <code>pars</code> argument:</p>
 the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">pso_fit_FE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_hta_psoriasis_files/figure-html/pso_FE_pp_plot-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_hta_psoriasis_files/figure-html/pso_FE_pp_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>Focusing specifically on the cutpoints we see that these are highly
 identified by the data, which is why the implicit flat priors work for
 these parameters.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, prior <span class="op">=</span> <span class="st">"aux"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_hta_psoriasis_files/figure-html/pso_FE_pp_cutpoint_plot-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_hta_psoriasis_files/figure-html/pso_FE_pp_cutpoint_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="random-effects-meta-analysis">Random effects meta-analysis<a class="anchor" aria-label="anchor" href="#random-effects-meta-analysis"></a>
@@ -380,7 +380,7 @@ method:</p>
 <span><span class="co">#&gt; cc[PASI75]          1.00</span></span>
 <span><span class="co">#&gt; cc[PASI90]          1.00</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sat Dec 13 11:53:51 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan 16 14:48:30 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -394,7 +394,7 @@ examined by changing the <code>pars</code> argument:</p>
 the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"aux"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_hta_psoriasis_files/figure-html/pso_RE_pp_plot-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_hta_psoriasis_files/figure-html/pso_RE_pp_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="model-comparison">Model comparison<a class="anchor" aria-label="anchor" href="#model-comparison"></a>
@@ -416,10 +416,10 @@ closer to the number of data points, so is preferred in this case.</p>
 corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dic_FE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_hta_psoriasis_files/figure-html/pso_FE_resdev_plot-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_hta_psoriasis_files/figure-html/pso_FE_resdev_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dic_RE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_hta_psoriasis_files/figure-html/pso_RE_resdev_plot-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_hta_psoriasis_files/figure-html/pso_RE_resdev_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>Most data points are fit well, with posterior mean residual deviances
 close to the degrees of freedom. The Meffert 1997 study has a
 substantially higher residual deviance contribution, which could be
@@ -472,7 +472,7 @@ produce predicted probit probabilities).</p>
 <span><span class="co">#&gt; pred[Methotrexate, PASI75]     0.42 0.16 0.14 0.30 0.41 0.52  0.74     1893     2389    1</span></span>
 <span><span class="co">#&gt; pred[Methotrexate, PASI90]     0.17 0.11 0.03 0.09 0.15 0.23  0.43     1923     2344    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_FE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_hta_psoriasis_files/figure-html/pso_pred_FE-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_hta_psoriasis_files/figure-html/pso_pred_FE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, </span>
 <span>                   baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qnorm</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">1.097</span>, sd <span class="op">=</span> <span class="fl">123</span><span class="op">^</span><span class="op">-</span><span class="fl">0.5</span><span class="op">)</span>, </span>
@@ -504,7 +504,7 @@ produce predicted probit probabilities).</p>
 <span><span class="co">#&gt; pred[Methotrexate, PASI75]     0.44 0.21 0.09 0.29 0.42 0.59  0.88     4700     4651    1</span></span>
 <span><span class="co">#&gt; pred[Methotrexate, PASI90]     0.20 0.16 0.02 0.09 0.16 0.28  0.65     4746     4506    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_RE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_hta_psoriasis_files/figure-html/pso_pred_RE-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_hta_psoriasis_files/figure-html/pso_pred_RE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>If instead of information on the baseline PASI 50 response probit
 probability we have PASI 50 event counts, we can use these to construct
 a Beta distribution for the baseline probability of PASI 50 response.
@@ -547,7 +547,7 @@ probability).</p>
 <span><span class="co">#&gt; pred[Methotrexate, PASI75]     0.42 0.16 0.13 0.30 0.41 0.52  0.74     1896     2275    1</span></span>
 <span><span class="co">#&gt; pred[Methotrexate, PASI90]     0.17 0.11 0.03 0.09 0.15 0.23  0.43     1924     2318    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_FE_beta</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_hta_psoriasis_files/figure-html/pso_pred_FE_beta-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_hta_psoriasis_files/figure-html/pso_pred_FE_beta-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred_RE_beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, </span>
 <span>                        baseline <span class="op">=</span> <span class="fu"><a href="../reference/distr.html">distr</a></span><span class="op">(</span><span class="va">qbeta</span>, <span class="fl">56</span>, <span class="fl">408</span><span class="op">-</span><span class="fl">56</span><span class="op">)</span>,</span>
@@ -580,7 +580,7 @@ probability).</p>
 <span><span class="co">#&gt; pred[Methotrexate, PASI75]     0.44 0.21 0.09 0.29 0.43 0.59  0.88     4847     4407    1</span></span>
 <span><span class="co">#&gt; pred[Methotrexate, PASI90]     0.20 0.16 0.02 0.09 0.16 0.28  0.64     4893     4362    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred_RE_beta</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_hta_psoriasis_files/figure-html/pso_pred_RE_beta-1.png" class="r-plt" width="700" style="display: block; margin: auto;">
+<p><img src="example_hta_psoriasis_files/figure-html/pso_pred_RE_beta-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;">
 (Notice that these results are equivalent to those calculated above
 using the Normal distribution for the baseline probit probability, since
 these event counts correspond to the same probit probability.)</p>
@@ -593,7 +593,7 @@ coding (instead of split into facets):</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_null.html" class="external-link">facet_null</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="va">Category</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_colour_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Blues"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_hta_psoriasis_files/figure-html/pso_pred_RE_colour-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_hta_psoriasis_files/figure-html/pso_pred_RE_colour-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>If the <code>baseline</code> argument is omitted, predicted
 probabilities will be produced for every study in the network based on
 their estimated baseline probit probability <span class="math inline">\mu_j</span>.</p>
@@ -617,7 +617,7 @@ better (the outcomes are positive).</p>
 <span><span class="co">#&gt; rank[Infliximab]       1.80 1.18    1   1   1   2     5     4057     4624    1</span></span>
 <span><span class="co">#&gt; rank[Methotrexate]     4.26 1.87    1   3   4   6     7     5791     6025    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_ranks</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_hta_psoriasis_files/figure-html/hta_psoriasis_ranks-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_hta_psoriasis_files/figure-html/hta_psoriasis_ranks-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                     p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6] p_rank[7]</span></span>
@@ -639,7 +639,7 @@ better (the outcomes are positive).</p>
 <span><span class="co">#&gt; d[Infliximab]            0.00</span></span>
 <span><span class="co">#&gt; d[Methotrexate]          0.00</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_rankprobs</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_hta_psoriasis_files/figure-html/hta_psoriasis_rankprobs-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_hta_psoriasis_files/figure-html/hta_psoriasis_rankprobs-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_cumrankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                     p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6] p_rank[7]</span></span>
@@ -661,7 +661,7 @@ better (the outcomes are positive).</p>
 <span><span class="co">#&gt; d[Infliximab]               1</span></span>
 <span><span class="co">#&gt; d[Methotrexate]             1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_cumrankprobs</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_hta_psoriasis_files/figure-html/hta_psoriasis_cumrankprobs-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_hta_psoriasis_files/figure-html/hta_psoriasis_cumrankprobs-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level2 unnumbered">

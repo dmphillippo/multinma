@@ -216,7 +216,7 @@ method:</p>
 <span><span class="co">#&gt; lp__             1</span></span>
 <span><span class="co">#&gt; tau              1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sat Dec 13 11:50:29 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan 16 14:45:27 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -229,7 +229,7 @@ changing the <code>pars</code> argument:</p>
 the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">bcg_fit_unadj</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_bcg_vaccine_files/figure-html/bcg_unadj_pp_plot-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_bcg_vaccine_files/figure-html/bcg_unadj_pp_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="re-meta-regression-with-covariate-latitude">RE meta-regression with covariate <code>latitude</code><a class="anchor" aria-label="anchor" href="#re-meta-regression-with-covariate-latitude"></a>
@@ -292,7 +292,7 @@ method:</p>
 <span><span class="co">#&gt; lp__                          -13448.27  1772    1</span></span>
 <span><span class="co">#&gt; tau                                0.73  1905    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sat Dec 13 11:50:44 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan 16 14:45:40 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -308,7 +308,7 @@ examined by changing the <code>pars</code> argument:</p>
 the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">bcg_fit_lat</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"reg"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_bcg_vaccine_files/figure-html/bcg_lat_pp_plot-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_bcg_vaccine_files/figure-html/bcg_lat_pp_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level2">
@@ -351,7 +351,7 @@ coefficient also excludes zero:</p>
 <span>     pars <span class="op">=</span> <span class="st">"beta"</span>, </span>
 <span>     ref_line <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>     stat <span class="op">=</span> <span class="st">"halfeye"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_bcg_vaccine_files/figure-html/bcg_vaccine_beta_lat-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_bcg_vaccine_files/figure-html/bcg_vaccine_beta_lat-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>Altogether, we might prefer the model with the adjustment for
 latitude. When considering covariates in random effects models it is
 important not to just look at the DIC <span class="citation">(<a href="#ref-TSD3">Dias et al. 2011</a>)</span>. We should also consider
@@ -425,7 +425,7 @@ estimates:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bcg_releff_lat</span>, </span>
 <span>     ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_bcg_vaccine_files/figure-html/bcg_vaccine_releff_lat-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_bcg_vaccine_files/figure-html/bcg_vaccine_releff_lat-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>A more sophisticated plot shows the regression line and confidence
 band for the effect of latitude, overlaid on the observed log odds
 ratios in each study:</p>
@@ -469,7 +469,7 @@ ratios in each study:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Degrees Latitude"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"log Odds Ratio"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_size.html" class="external-link">scale_size</a></span><span class="op">(</span><span class="st">"Sample Size"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_multinma.html">theme_multinma</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_bcg_vaccine_files/figure-html/bcg_vaccine_reg_plot-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_bcg_vaccine_files/figure-html/bcg_vaccine_reg_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>In the presence of heterogeneity, it has been argued that decision
 makers should consider the predictive distribution of relative effects
 in a new study, instead of the posterior distribution of the mean

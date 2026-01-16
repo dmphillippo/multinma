@@ -176,7 +176,7 @@ will automatically be made available in the network.</p>
 <p>Plot the network structure.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_net</span>, weight_edges <span class="op">=</span> <span class="cn">TRUE</span>, weight_nodes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_diabetes_files/figure-html/diabetes_network_plot-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_diabetes_files/figure-html/diabetes_network_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="meta-analysis-models">Meta-analysis models<a class="anchor" aria-label="anchor" href="#meta-analysis-models"></a>
@@ -236,7 +236,7 @@ method:</p>
 <span><span class="co">#&gt; d[Placebo]        1482    1</span></span>
 <span><span class="co">#&gt; lp__              1824    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sat Dec 13 11:51:23 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan 16 14:46:20 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -249,7 +249,7 @@ changing the <code>pars</code> argument:</p>
 the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">db_fit_FE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_diabetes_files/figure-html/db_FE_pp_plot-1.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="example_diabetes_files/figure-html/db_FE_pp_plot-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="random-effects-meta-analysis">Random effects meta-analysis<a class="anchor" aria-label="anchor" href="#random-effects-meta-analysis"></a>
@@ -311,7 +311,7 @@ method:</p>
 <span><span class="co">#&gt; lp__              1032    1</span></span>
 <span><span class="co">#&gt; tau               1053    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sat Dec 13 11:51:40 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan 16 14:46:34 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -325,7 +325,7 @@ examined by changing the <code>pars</code> argument:</p>
 the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">db_fit_RE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_diabetes_files/figure-html/db_RE_pp_plot-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_diabetes_files/figure-html/db_RE_pp_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="model-comparison">Model comparison<a class="anchor" aria-label="anchor" href="#model-comparison"></a>
@@ -348,10 +348,10 @@ better, and has a much lower DIC; we prefer the RE model.</p>
 corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dic_FE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_diabetes_files/figure-html/db_FE_resdev_plot-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_diabetes_files/figure-html/db_FE_resdev_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dic_RE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_diabetes_files/figure-html/db_RE_resdev_plot-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_diabetes_files/figure-html/db_RE_resdev_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level2">
@@ -370,7 +370,7 @@ function with <code>trt_ref = "Diuretic"</code>:</p>
 <span><span class="co">#&gt; d[CCB]           -0.25 0.05 -0.35 -0.29 -0.25 -0.22 -0.15     3358     3133    1</span></span>
 <span><span class="co">#&gt; d[Placebo]       -0.25 0.06 -0.36 -0.28 -0.25 -0.21 -0.14     4578     3624    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_releff_FE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_diabetes_files/figure-html/diabetes_releff_FE-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_diabetes_files/figure-html/diabetes_releff_FE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">db_releff_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">db_fit_RE</span>, trt_ref <span class="op">=</span> <span class="st">"Diuretic"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                   mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
@@ -380,7 +380,7 @@ function with <code>trt_ref = "Diuretic"</code>:</p>
 <span><span class="co">#&gt; d[CCB]           -0.24 0.08 -0.41 -0.30 -0.24 -0.19 -0.08     4094     3073    1</span></span>
 <span><span class="co">#&gt; d[Placebo]       -0.29 0.09 -0.48 -0.35 -0.29 -0.23 -0.12     4296     3191    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_diabetes_files/figure-html/diabetes_releff_RE-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_diabetes_files/figure-html/diabetes_releff_RE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p><span class="citation">Dias et al. (<a href="#ref-TSD2">2011</a>)</span> produce absolute predictions of the
 probability of developing diabetes after three years, assuming a Normal
 distribution on the baseline cloglog probability of developing diabetes
@@ -414,7 +414,7 @@ predicted cloglog probabilities).</p>
 <span><span class="co">#&gt; pred[New 1: Diuretic]      0.06 0.06 0.01 0.02 0.04 0.08  0.23     4064     3878    1</span></span>
 <span><span class="co">#&gt; pred[New 1: Placebo]       0.05 0.05 0.01 0.02 0.03 0.06  0.19     4065     3879    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_pred_FE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_diabetes_files/figure-html/db_pred_FE-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_diabetes_files/figure-html/db_pred_FE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">db_pred_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">db_fit_RE</span>, </span>
 <span>                      newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span>
@@ -432,7 +432,7 @@ predicted cloglog probabilities).</p>
 <span><span class="co">#&gt; pred[New 1: Diuretic]      0.07 0.07 0.01 0.02 0.04 0.08  0.26     4365     3649    1</span></span>
 <span><span class="co">#&gt; pred[New 1: Placebo]       0.05 0.06 0.01 0.02 0.03 0.06  0.20     4351     3892    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_pred_RE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_diabetes_files/figure-html/db_pred_RE-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_diabetes_files/figure-html/db_pred_RE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>If the <code>baseline</code> and <code>newdata</code> arguments are
 omitted, predicted probabilities will be produced for every study in the
 network based on their follow-up times and estimated baseline cloglog
@@ -660,7 +660,7 @@ probabilities <span class="math inline">\mu_j</span>:</p>
 <span><span class="co">#&gt; pred[VALUE: Diuretic]      0.21 0.03 0.16 0.19 0.21 0.22  0.27     4294     2406    1</span></span>
 <span><span class="co">#&gt; pred[VALUE: Placebo]       0.16 0.02 0.12 0.15 0.16 0.17  0.21     4569     2700    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_pred_RE_studies</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_diabetes_files/figure-html/db_pred_RE_all-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_diabetes_files/figure-html/db_pred_RE_all-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>We can also produce treatment rankings, rank probabilities, and
 cumulative rank probabilities.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
@@ -673,7 +673,7 @@ cumulative rank probabilities.</p>
 <span><span class="co">#&gt; rank[Diuretic]      5.80 0.41    5   6   6   6     6     2907       NA    1</span></span>
 <span><span class="co">#&gt; rank[Placebo]       3.20 0.59    2   3   3   4     4     3404     2810    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_ranks</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_diabetes_files/figure-html/diabetes_ranks-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_diabetes_files/figure-html/diabetes_ranks-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">db_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">db_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                  p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6]</span></span>
@@ -684,7 +684,7 @@ cumulative rank probabilities.</p>
 <span><span class="co">#&gt; d[Diuretic]           0.00      0.00      0.00      0.00      0.19       0.8</span></span>
 <span><span class="co">#&gt; d[Placebo]            0.00      0.07      0.65      0.27      0.00       0.0</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_rankprobs</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_diabetes_files/figure-html/diabetes_rankprobs-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_diabetes_files/figure-html/diabetes_rankprobs-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">db_cumrankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">db_fit_RE</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                  p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6]</span></span>
@@ -695,7 +695,7 @@ cumulative rank probabilities.</p>
 <span><span class="co">#&gt; d[Diuretic]           0.00      0.00      0.00      0.00       0.2         1</span></span>
 <span><span class="co">#&gt; d[Placebo]            0.00      0.08      0.72      1.00       1.0         1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">db_cumrankprobs</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_diabetes_files/figure-html/diabetes_cumrankprobs-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_diabetes_files/figure-html/diabetes_cumrankprobs-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

@@ -301,7 +301,7 @@ method:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_net</span>, weight_nodes <span class="op">=</span> <span class="cn">TRUE</span>, weight_edges <span class="op">=</span> <span class="cn">TRUE</span>, show_trt_class <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.box <span class="op">=</span> <span class="st">"vertical"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_plaque_psoriasis_files/figure-html/pso_network_plot-1.png" class="r-plt" width="768" style="display: block; margin: auto;"></p>
+<p><img src="example_plaque_psoriasis_files/figure-html/pso_network_plot-1.png" class="r-plt" alt="" width="768" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="numerical-integration-for-ml-nmr">Numerical integration for ML-NMR<a class="anchor" aria-label="anchor" href="#numerical-integration-for-ml-nmr"></a>
@@ -369,7 +369,7 @@ well the marginal distributions observed in the IPD:</p>
 <span>  <span class="fu"><a href="../reference/theme_multinma.html">theme_multinma</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Removed 6 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_line()`).</span></span></code></pre></div>
-<p><img src="example_plaque_psoriasis_files/figure-html/pso_covariate_plot-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_plaque_psoriasis_files/figure-html/pso_covariate_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>We add integration points to the AgD studies in the network using the
 <code><a href="../reference/add_integration.html">add_integration()</a></code> function. Marginal distributions for each
 covariate are specified using the <code><a href="../reference/distr.html">distr()</a></code> function, which
@@ -507,7 +507,7 @@ method:</p>
 <span><span class="co">#&gt; d[SEC_300]                              2.68  5409    1</span></span>
 <span><span class="co">#&gt; lp__                                -1570.52  1587    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sat Dec 13 11:56:32 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan 16 14:51:24 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -520,7 +520,7 @@ changing the <code>pars</code> argument:</p>
 the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"intercept"</span>, <span class="st">"trt"</span>, <span class="st">"reg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_plaque_psoriasis_files/figure-html/pso_FE_pp_plot-1.png" class="r-plt" width="768" style="display: block; margin: auto;"></p>
+<p><img src="example_plaque_psoriasis_files/figure-html/pso_FE_pp_plot-1.png" class="r-plt" alt="" width="768" style="display: block; margin: auto;"></p>
 <p>We now recommend assessing sufficient accuracy of the numerical
 integration by running half of the chains with <code>n_int / 2</code>
 integration points and half with the full <code>n_int</code>. Any
@@ -636,7 +636,7 @@ method:</p>
 <span><span class="co">#&gt; lp__                                -1571.53   750 1.01</span></span>
 <span><span class="co">#&gt; tau                                     0.56   451 1.01</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sat Dec 13 12:00:19 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Jan 16 14:56:52 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -650,7 +650,7 @@ examined by changing the <code>pars</code> argument:</p>
 using the <code><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs()</a></code> method:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"delta[UNCOVER-2: ETN]"</span>, <span class="st">"d[ETN]"</span>, <span class="st">"tau"</span>, <span class="st">"lp__"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_plaque_psoriasis_files/figure-html/pso_RE_pairs-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_plaque_psoriasis_files/figure-html/pso_RE_pairs-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>The divergent transition errors (red crosses) seem to be concentrated
 in the upper tail of the heterogeneity standard deviation parameter.
 This suggests that the information to identify the heterogeneity
@@ -660,7 +660,7 @@ a more informative prior distribution might aid estimation.</p>
 the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">pso_fit_RE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"intercept"</span>, <span class="st">"trt"</span>, <span class="st">"reg"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_plaque_psoriasis_files/figure-html/pso_RE_pp_plot-1.png" class="r-plt" width="768" style="display: block; margin: auto;"></p>
+<p><img src="example_plaque_psoriasis_files/figure-html/pso_RE_pp_plot-1.png" class="r-plt" alt="" width="768" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level3">
@@ -691,7 +691,7 @@ coefficients:</p>
 <span>     pars <span class="op">=</span> <span class="st">"beta"</span>,</span>
 <span>     stat <span class="op">=</span> <span class="st">"halfeye"</span>,</span>
 <span>     ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_plaque_psoriasis_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_plaque_psoriasis_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>Plots of posterior summaries are based on the <code>ggdist</code>
 package, which allows a great degree of flexibility, and can be further
 customised using <code>ggplot2</code> commands. In the above command we
@@ -756,7 +756,7 @@ function.</p>
 <span><span class="co">#&gt; d[UNCOVER-3: SEC_150] 2.13 0.11 1.92 2.05 2.13 2.21  2.36     4450     3053    1</span></span>
 <span><span class="co">#&gt; d[UNCOVER-3: SEC_300] 2.43 0.12 2.20 2.35 2.44 2.52  2.66     5482     2972    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_releff_FE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_plaque_psoriasis_files/figure-html/pso_releff_FE-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_plaque_psoriasis_files/figure-html/pso_releff_FE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>Predicted probabilities of achieving PASI 75 in each study population
 on each treatment are produced using the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method.
 The argument <code>type = "reponse"</code> specifies that we want
@@ -803,7 +803,7 @@ predicted probabilities, rather than probit probabilities.</p>
 <span><span class="co">#&gt; pred[UNCOVER-3: SEC_150] 0.75 0.04 0.68 0.72 0.75 0.77  0.81     6487     3104    1</span></span>
 <span><span class="co">#&gt; pred[UNCOVER-3: SEC_300] 0.83 0.03 0.77 0.81 0.83 0.85  0.88     8466     3262    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_pred_FE</span>, ref_line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_plaque_psoriasis_files/figure-html/pso_pred_FE-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_plaque_psoriasis_files/figure-html/pso_pred_FE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>We can produce population-adjusted ranks, rank probabilities, and
 cumulative rank probabilities in each study population using the
 <code><a href="../reference/posterior_ranks.html">posterior_ranks()</a></code> and <code><a href="../reference/posterior_ranks.html">posterior_rank_probs()</a></code>
@@ -869,7 +869,7 @@ the distributions of effect modifiers are similar). We specify
 <span><span class="co">#&gt; rank[UNCOVER-3: SEC_150] 4.00 0.05    4   4   4   4     4     2430       NA    1</span></span>
 <span><span class="co">#&gt; rank[UNCOVER-3: SEC_300] 2.77 0.42    2   3   3   3     3     4058     2017    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_ranks_FE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_plaque_psoriasis_files/figure-html/pso_ranks_FE-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_plaque_psoriasis_files/figure-html/pso_ranks_FE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_rankprobs_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: FIXTURE</span> <span style="color: #555555;">----</span> </span></span>
@@ -928,7 +928,7 @@ the distributions of effect modifiers are similar). We specify
 <span><span class="co">#&gt; d[UNCOVER-3: SEC_150]         0      0.00      0.00         1         0         0</span></span>
 <span><span class="co">#&gt; d[UNCOVER-3: SEC_300]         0      0.23      0.77         0         0         0</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_rankprobs_FE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_plaque_psoriasis_files/figure-html/pso_rankprobs_FE-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_plaque_psoriasis_files/figure-html/pso_rankprobs_FE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">pso_cumrankprobs_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">pso_fit_FE</span>, lower_better <span class="op">=</span> <span class="cn">FALSE</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">----------------------------------------------------------------</span> <span style="font-weight: bold;">Study: FIXTURE</span> <span style="color: #555555;">----</span> </span></span>
@@ -987,7 +987,7 @@ the distributions of effect modifiers are similar). We specify
 <span><span class="co">#&gt; d[UNCOVER-3: SEC_150]         0      0.00         0         1         1         1</span></span>
 <span><span class="co">#&gt; d[UNCOVER-3: SEC_300]         0      0.23         1         1         1         1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_cumrankprobs_FE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_plaque_psoriasis_files/figure-html/pso_cumrankprobs_FE-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_plaque_psoriasis_files/figure-html/pso_cumrankprobs_FE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>All of the above estimates (relative effects, predictions, rankings)
 can also be produced for a specific target population or populations by
 providing a suitable <code>newdata</code> argument to for function (and
@@ -1021,7 +1021,7 @@ can be plotted with the corresponding <code><a href="https://rdrr.io/r/graphics/
 <span><span class="co">#&gt; d[New 1: SEC_150] 2.08 0.22 1.66 1.93 2.07 2.23  2.52     6533     3218    1</span></span>
 <span><span class="co">#&gt; d[New 1: SEC_300] 2.38 0.22 1.95 2.24 2.38 2.53  2.82     7062     3444    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_releff_FE_new</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_plaque_psoriasis_files/figure-html/pso_releff_FE_new-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_plaque_psoriasis_files/figure-html/pso_releff_FE_new-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>For absolute predictions, we require information about the full
 covariate distribution in the target population, not just the mean
 values. If IPD are available for the target population,
@@ -1077,7 +1077,7 @@ distribution on the baseline probit-probability of response on Placebo
 <span><span class="co">#&gt; pred[New 1: SEC_150] 0.68 0.06 0.57 0.64 0.68 0.72  0.78     4461     3516    1</span></span>
 <span><span class="co">#&gt; pred[New 1: SEC_300] 0.78 0.05 0.68 0.75 0.78 0.81  0.86     5052     3480    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pso_pred_FE_new</span>, ref_line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_plaque_psoriasis_files/figure-html/pso_pred_FE_new-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_plaque_psoriasis_files/figure-html/pso_pred_FE_new-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level2">
@@ -1245,7 +1245,7 @@ syntax to alter the colour scheme.</p>
 <span><span class="co">#&gt; Adding another scale for <span style="color: #00BB00;">edge_colour</span>, which will replace the existing scale.</span></span>
 <span><span class="co">#&gt; Scale for <span style="color: #00BB00;">fill</span> is already present.</span></span>
 <span><span class="co">#&gt; Adding another scale for <span style="color: #00BB00;">fill</span>, which will replace the existing scale.</span></span></code></pre></div>
-<p><img src="example_plaque_psoriasis_files/figure-html/pso-full-network-1.png" class="r-plt" width="768" style="display: block; margin: auto;"></p>
+<p><img src="example_plaque_psoriasis_files/figure-html/pso-full-network-1.png" class="r-plt" alt="" width="768" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="numerical-integration-for-ml-nmr-models">Numerical integration for ML-NMR models<a class="anchor" aria-label="anchor" href="#numerical-integration-for-ml-nmr-models"></a>

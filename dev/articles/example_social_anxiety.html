@@ -167,7 +167,7 @@ network reference treatment.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sa_net</span>, level <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.box <span class="op">=</span> <span class="st">"vertical"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="model-selection-strategy">Model selection strategy<a class="anchor" aria-label="anchor" href="#model-selection-strategy"></a>
@@ -255,7 +255,7 @@ for the UME model plotted against the NMA consistency model.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sa_dic_RE</span>, <span class="va">sa_dic_ume_RE</span>, show_uncertainty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Residual deviance - No Class model"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Residual deviance - UME model"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>The dev-dev plot comparing residual deviance contributions for the
 UME model and no-class model shows that most data points lie close to
 the line of equality.</p>
@@ -439,7 +439,7 @@ model plotted against the no class model.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sa_dic_EXclass_RE</span>, <span class="va">sa_dic_RE</span>, show_uncertainty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Residual deviance - Exchangeable Class model"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Residual deviance - No Class model"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>Although both models yield similar residual deviance (163.4
 vs. 162.6) and between‐study heterogeneity, the exchangeable class model
 reduces model complexity—reflected by a lower effective number of
@@ -515,7 +515,7 @@ Exchangeable class model plotted against the no class model.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sa_dic_COclass_RE</span>, <span class="va">sa_dic_EXclass_RE</span>, show_uncertainty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Residual deviance - Common Class model"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Residual deviance - Exchangeable Class model"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>The dev–dev plot indicates that while some data points favor one
 model over the other, overall the fit is similar. Therefore, given
 nearly identical DIC scores, the choice between the two random‐effects
@@ -537,7 +537,7 @@ classes.</p>
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">sa_fit_EXclass_RE</span><span class="op">)</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-21-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-21-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="relative-class-effects">Relative class effects<a class="anchor" aria-label="anchor" href="#relative-class-effects"></a>
@@ -549,7 +549,7 @@ classes.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sa_fit_EXclass_RE</span>,</span>
 <span>     pars <span class="op">=</span> <span class="st">"class_mean"</span>,</span>
 <span>     ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>We can combine the treatment and class effects into a single plot as
 follows:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
@@ -579,7 +579,7 @@ follows:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"SMD"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_multinma.html">theme_multinma</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>strip.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-23-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-23-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>We aim to visualize the class ranks and rank probabilities by
 summarizing their distributions. To achieve this, we extract the
 posterior draws for class means, add a reference treatment, and compute
@@ -611,7 +611,7 @@ treatment class, which we then plot.</p>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html" class="external-link">coord_flip</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Class"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Posterior Ranks"</span><span class="op">)</span> <span class="op">+</span></span>
 <span><span class="fu"><a href="../reference/theme_multinma.html">theme_multinma</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-24-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-24-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>Treatment classes with higher ranks have median values closer to 1,
 positioned toward the left of the x-axis. The Combined treatment class
 has the highest median rank, followed by CBT individual. In contrast,
@@ -643,7 +643,7 @@ classes, aside from the reference.</p>
 <span>  <span class="fu"><a href="../reference/theme_multinma.html">theme_multinma</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Rank"</span>,</span>
 <span>       y <span class="op">=</span> <span class="st">"Probability"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-25-1.png" class="r-plt" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-25-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>Higher-ranked classes have a greater density on the left side of the
 x-axis, indicating a higher probability of achieving a top rank across
 posterior samples. The Combined class shows the highest density on the
