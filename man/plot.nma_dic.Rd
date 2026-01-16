@@ -8,9 +8,11 @@
   x,
   y,
   ...,
+  type = c("resdev", "leverage"),
   show_uncertainty = TRUE,
   stat = "pointinterval",
-  orientation = c("vertical", "horizontal", "x", "y")
+  orientation = c("vertical", "horizontal", "x", "y"),
+  dic_contours = 1:4
 )
 }
 \arguments{
@@ -21,8 +23,12 @@ model comparison.}
 
 \item{...}{Additional arguments passed on to other methods}
 
+\item{type}{With a single \code{nma_dic} object, whether to show the residual
+deviance contribution for each data point (\code{"resdev"}, the default), or a
+leverage plot (\code{"leverage"}).}
+
 \item{show_uncertainty}{Logical, show uncertainty with a \code{ggdist} plot
-stat? Default \code{TRUE}.}
+stat? Default \code{TRUE}. Ignored for \code{type = "leverage"}.}
 
 \item{stat}{Character string specifying the \code{ggdist} plot stat to use if
 \code{show_uncertainty = TRUE}, default \code{"pointinterval"}. If \code{y} is provided,
@@ -31,6 +37,9 @@ currently only \code{"pointinterval"} is supported.}
 \item{orientation}{Whether the \code{ggdist} geom is drawn horizontally
 (\code{"horizontal"}) or vertically (\code{"vertical"}). Only used for residual
 deviance plots, default \code{"vertical"}.}
+
+\item{dic_contours}{Numeric vector of DIC contribution contours to show on
+leverage plots, default \code{1:4}.}
 }
 \value{
 A \code{ggplot} object.
@@ -42,10 +51,16 @@ Further detail on these plots and their interpretation is given by
 \insertCite{TSD2;textual}{multinma}.
 }
 \details{
-When a single \code{nma_dic} object is given, a plot of the residual
-deviance contribution for each data point is produced. For a good fitting
-model, each data point is expected to have a residual deviance of 1; larger
-values indicate data points that are fit poorly by the model.
+When a single \code{nma_dic} object is given, the default plot (\code{type = "resdev"}) shows the residual deviance contribution for each data point.
+For a good fitting model, each data point is expected to have a residual
+deviance equal to its degrees of freedom (typically 1, except for multi-arm
+trials in contrast format or multinomial outcomes); larger values indicate
+data points that are fit poorly by the model. A leverage plot can be
+produced with \code{type = "leverage"}, plotting the leverages (contributions to
+\eqn{p_D}) against the signed square root residual deviance, both
+standardised by the degrees of freedom. Contours for different DIC
+contribution cutoffs are also shown; points which lie outside the DIC=3
+contour are generally identified as contributing to a model's poor fit.
 
 When two \code{nma_dic} objects are given, a "dev-dev" plot comparing the
 residual deviance contributions under each model is produced. Data points
@@ -89,6 +104,9 @@ plot(smk_dic_RE) +
 plot(smk_dic_RE, .width = c(0.6, 0.95)) +
   ggplot2::aes(colour = ggplot2::after_stat(ifelse(ymin > 1, "darkorange", "black"))) +
   ggplot2::scale_colour_identity()
+
+# Leverage plot for RE model
+plot(smk_dic_RE, type = "leverage")
 
 # Check for inconsistency using UME model
 }

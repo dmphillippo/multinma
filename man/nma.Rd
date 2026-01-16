@@ -10,6 +10,8 @@ nma(
   trt_effects = c("fixed", "random"),
   regression = NULL,
   class_interactions = c("common", "exchangeable", "independent"),
+  class_effects = c("independent", "common", "exchangeable"),
+  class_sd = c("independent", "common"),
   likelihood = NULL,
   link = NULL,
   ...,
@@ -21,6 +23,8 @@ nma(
   prior_reg = .default(normal(scale = 10)),
   prior_aux = .default(),
   prior_aux_reg = .default(),
+  prior_class_mean = .default(normal(scale = 10)),
+  prior_class_sd = .default(half_normal(scale = 5)),
   aux_by = NULL,
   aux_regression = NULL,
   QR = FALSE,
@@ -52,6 +56,16 @@ modifier interactions as \code{variable:.trt} (see details).}
 \item{class_interactions}{Character string specifying whether effect modifier
 interactions are specified as \code{"common"}, \code{"exchangeable"}, or
 \code{"independent"}.}
+
+\item{class_effects}{Character string specifying a model for treatment class effects,
+either \code{"independent"} (the default), \code{"exchangeable"}, or \code{"common"}.}
+
+\item{class_sd}{Character string specifying whether the class standard deviations in a
+class effects model should be \code{"independent"} (i.e. separate for each class, the default),
+or \code{"common"} (i.e. shared across all classes). Alternatively this can be a list of
+character vectors, each of which describe a set classes for which to share a common class SD;
+any list names will be used to name the output parameters, otherwise the name will be taken
+from the first class in each set.}
 
 \item{likelihood}{Character string specifying a likelihood, if unspecified
 will be inferred from the data (see details)}
@@ -91,6 +105,12 @@ should be a list of prior distributions with elements \code{sigma} and \code{k}.
 
 \item{prior_aux_reg}{Specification of prior distribution for the auxiliary
 regression parameters, if \code{aux_regression} is specified (see details).}
+
+\item{prior_class_mean}{Specification of prior distribution for the
+treatment class means (if \code{class_effects = "exchangeable"}).}
+
+\item{prior_class_sd}{Specification of prior distribution for the
+treatment class standard deviations (if \code{class_effects = "exchangeable"}).}
 
 \item{aux_by}{Vector of variable names listing the variables to stratify the
 auxiliary parameters by. Currently only used for survival models, see
@@ -321,7 +341,7 @@ smk_net
 
 \donttest{
 # Fitting a fixed effect model
-smk_fit_FE <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+smk_fit_FE <- nma(smk_net,
                   trt_effects = "fixed",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 100))
@@ -331,7 +351,7 @@ smk_fit_FE
 
 \donttest{
 # Fitting a random effects model
-smk_fit_RE <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+smk_fit_RE <- nma(smk_net, 
                   trt_effects = "random",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 100),
@@ -342,7 +362,7 @@ smk_fit_RE
 
 \donttest{
 # Fitting an unrelated mean effects (inconsistency) model
-smk_fit_RE_UME <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+smk_fit_RE_UME <- nma(smk_net, 
                       consistency = "ume",
                       trt_effects = "random",
                       prior_intercept = normal(scale = 100),
@@ -354,7 +374,7 @@ smk_fit_RE_UME
 
 \donttest{
 # Fitting all possible node-splitting models
-smk_fit_RE_nodesplit <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+smk_fit_RE_nodesplit <- nma(smk_net, 
                             consistency = "nodesplit",
                             trt_effects = "random",
                             prior_intercept = normal(scale = 100),
@@ -450,7 +470,7 @@ pso_net <- add_integration(pso_net,
 # init_r = 0.1, since probit models in particular are often hard to initialise.
 # Using the QR decomposition greatly improves sampling efficiency here, as is
 # often the case for regression models.
-pso_fit <- nma(pso_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+pso_fit <- nma(pso_net, 
                trt_effects = "fixed",
                link = "probit",
                likelihood = "bernoulli2",
@@ -480,7 +500,7 @@ ndmm_net <- combine_network(
                covariates = ndmm_agd_covs))
 \donttest{
 # Fit Weibull (PH) model
-ndmm_fit <- nma(ndmm_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+ndmm_fit <- nma(ndmm_net, 
                 likelihood = "weibull",
                 prior_intercept = normal(scale = 100),
                 prior_trt = normal(scale = 10),

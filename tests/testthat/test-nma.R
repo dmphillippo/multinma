@@ -53,6 +53,47 @@ test_that("nma() link must be valid", {
   expect_error(nma(smknet, link = c("log", "identity")), m)
 })
 
+sa_net <- set_agd_contrast(social_anxiety, studyc, trtc, y = y, se = se, trt_class = classc, trt_ref = "Waitlist")
+
+#Class effect parameter error checks
+test_that("nma() class_effect must be valid", {
+  m <- "`class_effects` must be"
+  expect_error(nma(sa_net, class_effects = c("independent", "common")), m)
+  expect_error(nma(sa_net, class_effects = 1), m)
+  expect_error(nma(sa_net, class_effects = "random"), m)
+})
+
+test_that("nma() class_sd lists must be valid", {
+  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = list(group1 = c("Exposure", "NonExistentClass"))), "Some classes listed in 'class_sd' are not present in the network", fixed = TRUE)
+  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = list(group1 = c("Exposure", "NSSA"), group2 = c("NSSA", "SSRI/SNRI"))), "Some classes are listed in more than one shared standard deviation group in 'class_sd'")
+})
+
+test_that("nma() class_sd must be valid", {
+  m_class_sd <- "`class_sd` must be"
+  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = 1), m_class_sd)
+  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = "a"), m_class_sd)
+})
+
+test_that("nma() gives an informative error if class_effect are specified without classes in the network", {
+  m_no_classes <- "Setting `class_effects` requires treatment classes to be specified"
+  expect_error(nma(smknet, class_effect = "common"), m_no_classes)
+  expect_error(nma(smknet, class_effect = "exchangeable"), m_no_classes)
+})
+
+test_that("class_effects = 'common' updates network$treatments", {
+  net_common <- nma(sa_net,
+                    class_effects = "common",
+                    trt_effects = "random",
+                    prior_trt = normal(0, 100),
+                    prior_het = half_normal(5),
+                    test_grad = TRUE)
+
+  # Check that net_common$network$treatments is updated to classes
+  expect_equal(levels(net_common$network$treatments),
+               levels(sa_net$classes),
+               info = "network$treatments should be replaced by class factor levels")
+})
+
 # Make dummy covariate data for smoking network
 ns_agd <- max(smoking$studyn)
 smkdummy <-

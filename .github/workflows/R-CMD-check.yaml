@@ -32,6 +32,7 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v2
 
       - uses: r-lib/actions/setup-r@v2
+        id: setup-r
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
@@ -39,7 +40,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::V8, any::rcmdcheck
+          extra-packages: any::V8, any::rcmdcheck, ${{ steps.setup-r.outputs.installed-r-version ==  '4.4.3' && 'gsl@2.1-8' || '' }}
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2

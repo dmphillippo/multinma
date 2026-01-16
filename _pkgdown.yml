@@ -11,6 +11,8 @@ home:
 
 template:
   bootstrap: 5
+  math-rendering: katex
+  light-switch: true
   bslib:
     base_font: {google: "Source Sans Pro"}
     heading_font: {google: "Source Sans Pro"}
@@ -141,6 +143,8 @@ reference:
   - matches("[pdqhH]mspline")
   - rmst_mspline
   - make_knots
+  - knots.stan_nma
+  - softmax
 
 - title: ggplot functions
   desc: Functions for creating or customising ggplot outputs.
