@@ -316,11 +316,8 @@ nma <- function(network,
 
   # Check model arguments
   consistency <- rlang::arg_match(consistency)
-  if (length(consistency) > 1) abort("`consistency` must be a single string.")
   trt_effects <- rlang::arg_match(trt_effects)
-  if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
   class_effects <- rlang::arg_match(class_effects)
-  if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
 
   # Check class_effects and network classes
   if (class_effects != "independent") {
@@ -370,7 +367,6 @@ nma <- function(network,
     }
   } else {
     class_sd <- rlang::arg_match(class_sd)
-    if (length(class_sd) > 1) abort("`class_sd` must be a single string.")
   }
 
   if (consistency == "nodesplit") {
@@ -554,7 +550,6 @@ nma <- function(network,
     }
   }
   class_interactions <- rlang::arg_match(class_interactions)
-  if (length(class_interactions) > 1) abort("`class_interactions` must be a single string.")
 
   likelihood <- check_likelihood(likelihood, network$outcome)
   link <- check_link(link, likelihood)
@@ -1532,17 +1527,16 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Check model arguments
   trt_effects <- rlang::arg_match(trt_effects)
-  if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
 
   # Check class effect arguments
   class_effects <- rlang::arg_match(class_effects)
-  if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
-if (class_effects == "exchangeable") {
-  if (is.null(which_CE) || !rlang::is_integerish(which_CE) || any(which_CE < 0))
-    abort("`which_CE` must be an integer design vector for class effects.")
-  if (is.null(which_CE_sd) || !rlang::is_integerish(which_CE_sd) || any(which_CE_sd < 0))
-    abort("`which_CE_sd` must be an integer design vector for class effect SDs.")
-}
+
+  if (class_effects == "exchangeable") {
+    if (is.null(which_CE) || !rlang::is_integerish(which_CE) || any(which_CE < 0))
+      abort("`which_CE` must be an integer design vector for class effects.")
+    if (is.null(which_CE_sd) || !rlang::is_integerish(which_CE_sd) || any(which_CE_sd < 0))
+      abort("`which_CE_sd` must be an integer design vector for class effect SDs.")
+  }
 
   likelihood <- check_likelihood(likelihood)
   link <- check_link(link, likelihood)

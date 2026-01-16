@@ -1371,9 +1371,6 @@ combine_network <- function(..., trt_ref) {
 #' pso_net
 #'
 multi <- function(..., inclusive = FALSE, type = c("ordered", "competing")) {
-  if (packageVersion("dplyr") < "1.0.0")
-    abort("Multinomial outcomes require `dplyr` package version 1.0.0 or later.")
-
   # Argument checks
   if (!rlang::is_bool(inclusive)) abort("`inclusive` must be a logical value TRUE/FALSE")
   type <- rlang::arg_match(type)
