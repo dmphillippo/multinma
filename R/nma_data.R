@@ -969,7 +969,6 @@ set_agd_surv <- function(data,
 #' @template args-data_common
 #' @param estimate Column of `data` containing regression coefficient estimates
 #' @param se Column of `data` containing regression coefficient standard errors.
-#'   Currently either `se` and `cor`, or `cov` must be specified.
 #' @param cor Named list of correlation matrices for the regression coefficients
 #'  corresponding to studies in which this matrix is known.
 #'   The row and column ordering must match the ordering of the coefficient rows in `data`.
@@ -1230,7 +1229,7 @@ set_agd_regression <- function(data,
                                            dplyr::filter(., is.na(.data$.estimate)) %>% dplyr::select(-".estimate") %>% as.list()
                                            ) %>%
                           dplyr::select(-".study"),
-                        .keep = TRUE)%>% ungroup()
+                        .keep = TRUE) %>% ungroup()
 
   # Store regression formulas in data
   d <- dplyr::left_join(d,
@@ -1253,14 +1252,14 @@ set_agd_regression <- function(data,
 
   # Check for a list of matrices
   if ( !missing(cov) && !is.list(cov) )
-    abort(glue::glue("`cov` must be a named list for availabe covarince matrix of regressionjn coef."))
+    abort(glue::glue("`cov` must be a named list for availabe covariance matrix."))
   if ( !missing(cor) && !is.list(cor) )
-    abort(glue::glue("`cor` must be a named list for availabe covariate matrix of regressionjn coef."))
+    abort(glue::glue("`cor` must be a named list for availabe correlation matrix."))
 
   n_studies <- nlevels(d$.study)
 
   if ( !missing(cov) && ( !all(purrr::map_lgl(cov, is.matrix)) || !all(purrr::map_lgl(cov, is.numeric)) || (n_studies>1 && !rlang::is_named(cov)) ) )
-    abort(glue::glue("`cov` must be a named list of covariance matrices for available study."))
+    abort(glue::glue("`cov` must be a named list for  availabe covariance matrix."))
   if (n_studies == 1 && length(cov) == 1 && !rlang::is_named(cov)) names(cov) <- levels(d$.study)
 
   if ( !missing(cov) && length(miss_names <- setdiff(names(cov), levels(d$.study))) )
@@ -1271,7 +1270,7 @@ set_agd_regression <- function(data,
       ".\n"))
 
   if ( !missing(cor) && ( !all(purrr::map_lgl(cor, is.matrix)) || !all(purrr::map_lgl(cor, is.numeric)) || (n_studies>1 && !rlang::is_named(cor)) ) )
-    abort(glue::glue("`cor` must be a named list of correlation matrices for available study."))
+    abort(glue::glue("`cor` must be a named list for available correlation matrix."))
   if (n_studies == 1 && length(cor) == 1 && !rlang::is_named(cor)) names(cor) <- levels(d$.study)
   if ( !missing(cor) && length(miss_names <- setdiff(names(cor), levels(d$.study))) )
     abort(glue::glue("`cor` list names must match study names in `data`.\n",
@@ -1299,7 +1298,7 @@ set_agd_regression <- function(data,
       abort(glue::glue("Standard error `se` must be numeric and greater than zero for study {si}."))
     # check cor and cov vals
     if( !is.null(tmp_cov) && ( !is.numeric(tmp_cov) || any(is.na(tmp_cov)) || any(is.infinite(tmp_cov)) ) )
-      abort(glue::glue("Covarince matrix `cov` must be numeric for study {si}."))
+      abort(glue::glue("Covariance matrix `cov` must be numeric for study {si}."))
     if( !is.null(tmp_cor) && ( !is.numeric(tmp_cor) || any(is.na(tmp_cor)) || any(is.infinite(tmp_cor)) ) )
       abort(glue::glue("Correlation matrix `cor` must be numeric for study {si}."))
 
