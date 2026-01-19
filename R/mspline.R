@@ -434,7 +434,7 @@ make_knots <- function(network,
   survdat <- dplyr::mutate(survdat,
                            !!! get_Surv_data(survdat$.Surv),
                            observed = .data$status == 1)
-
+  survdat$.study <- droplevels(survdat$.study)
   observed_survdat <- dplyr::filter(survdat, .data$observed)
 
   studies <- unique(survdat$.study)

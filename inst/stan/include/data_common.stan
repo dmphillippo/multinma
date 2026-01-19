@@ -41,11 +41,12 @@ vector[ni_agd_contrast] agd_contrast_y;
 cov_matrix[ni_agd_contrast ? ni_agd_contrast : 1] agd_contrast_Sigma;
 
 // -- AgD regression coefficients --
-int<lower=0> nc_agd_regression; // Total number of coef (or included coef.)
+int<lower=0> nc_agd_regression; // Total number of coef.
 int<lower=0> no_agd_regression; // Total number of omitted coef.
-//int<lower=0> nl_agd_regression; // Total number of included coef.
+int<lower=0> nl_agd_regression; // Total number of included coef.
 int<lower=0> agd_regression_max_ncoef;
 int<lower=0> agd_regression_max_ncoef_omt;
+int<lower=0> agd_regression_max_ncoef_inc;
 int<lower=0> agd_regression_max_nrow;
 vector[nc_agd_regression] agd_regression_est; // Reported coef. estimations
 array[ns_agd_regression] int<lower=0,upper=agd_regression_max_ncoef> agd_regression_ncoef; // Number of coef. (or included coef.) in each regression model
@@ -54,18 +55,19 @@ array[ns_agd_regression] int<lower=0,upper=1> agd_regression_reduced_study; // s
 // Note:
 //    - If there is at leat one reduced AgD regression then ni>0 else ni=0
 //    - If nc = 0 then ni=0
-array[ni_agd_regression ? nc_agd_regression : 0] int XI_col_vec; // Column numbers of included coef. in the network design matrix
+array[ni_agd_regression ? nl_agd_regression : 0] int XI_col_vec; // Column numbers of included coef. in the network design matrix
 array[ni_agd_regression ? no_agd_regression : 0] int XO_col_vec; // Column numbers of reduced coef. in the netwoek design matrix
-vector[ni_agd_regression ? nc_agd_regression : 0] agd_regression_OVB_GLM_dif; //  GLM OVB difference adjustment between contitional and average in reduced model
-vector[ni_agd_regression ? nc_agd_regression : 0] agd_regression_OVB_GLM_inc; //  GLM OVB intercept adjustment
 vector[ni_agd_regression ? ni_agd_regression : 0] exp_std_gen; // Generated sampels from Exp(1) used in COX OVB adjustment
 matrix[ni_agd_regression ? ni_agd_regression : 0, ni_agd_regression ? nX : 0] X_agd_regression_int; // Design matrix using integration points (unnested)
 matrix[ns_agd_regression ? nc_agd_regression : 0, ns_agd_regression ? nX : 0] X_agd_regression_no_QR; // Design matrix using integration points (unnested)
 array[ns_agd_regression ? ns_agd_regression : 0] int<lower=0> agd_regression_nx; // Number of rows for AgD regression design matrix for each study
 array[ns_agd_regression ? ns_agd_regression : 0] int<lower=0,upper=agd_regression_max_ncoef_omt> agd_regression_ncoef_omt; // Number of omitted coef. in each regression model
-array[ni_agd_regression ? ns_agd_regression : 0] matrix[agd_regression_max_ncoef,agd_regression_max_ncoef_omt] agd_regression_OVB_LM; // Pre-computed pert of LM OVB adjustment
-array[ni_agd_regression ? ns_agd_regression : 0] matrix[agd_regression_max_nrow,agd_regression_max_ncoef+2] agd_regression_OVB_COX; // Pre-computed part of COX OVB adjustment
-int<lower=0, upper=1> OVB_adj;
+array[ns_agd_regression ? ns_agd_regression : 0] int<lower=0,upper=agd_regression_max_ncoef_inc> agd_regression_ncoef_inc; // Number of included coef. in each regression model
+int<lower=0> OVB_type; // OVB adjustment type
+array[ni_agd_regression ? ns_agd_regression : 0] matrix[agd_regression_max_ncoef_inc,agd_regression_max_ncoef_omt] agd_regression_OVB_LM; // Pre-computed pert of LM OVB adjustment
+vector[ni_agd_regression ? nc_agd_regression : 0] agd_regression_OVB_GLM_dif; //  GLM OVB difference adjustment between contitional and average in reduced model
+vector[ni_agd_regression ? nc_agd_regression : 0] agd_regression_OVB_GLM_inc; //  GLM OVB intercept adjustment
+array[ni_agd_regression ? ns_agd_regression : 0] matrix[agd_regression_max_nrow,agd_regression_max_ncoef_inc+2] agd_regression_OVB_COX; // Pre-computed part of COX OVB adjustment
 
 // -- Design matrix or thin QR decomposition --
 int<lower=0, upper=1> QR; // use QR decomposition (yes = 1)

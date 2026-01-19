@@ -154,25 +154,30 @@ if (nc_agd_regression) {
 
   vector [nX] allbeta_OVB;
 
-  int c_i = 0; // Coef. counter
-  int c_x = 0; // X rows counter
+  int c_c = 0; // coef. counter
+  int c_i = 0; // Included coef. counter
+  // int c_o = 0; // Omitted coef. counter
+  int c_x = 0; // X_int rows counter
   for (i in 1:ns_agd_regression) {
     allbeta_OVB = allbeta;
     // OVB adjustment
-    if(agd_regression_reduced_study[i] && OVB_adj){
+    if(agd_regression_reduced_study[i]){
       if (link == 1){ // logit link
-        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef[i])]] = logit(rep_vector(mean(inv_logit(       X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)),agd_regression_ncoef[i]) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef[i])] )  - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef[i])] ;
+        // allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef[i])]] = logit(rep_vector(mean(inv_logit(       X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)),agd_regression_ncoef[i]) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef[i])] )  - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef[i])] ;
+        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = logit(rep_vector(mean(inv_logit(       X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)),agd_regression_ncoef_inc[i]) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef[i])] )  - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ;
       }else if (link == 2){ // probit link
-        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef[i])]] = inv_Phi(rep_vector(mean(Phi(           X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)),agd_regression_ncoef[i]) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef[i])] )  - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef[i])] ;
+        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = inv_Phi(rep_vector(mean(Phi(           X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)),agd_regression_ncoef_inc[i]) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef[i])] )  - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ;
       }else if (link == 3){ // cloglog link
-        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef[i])]] = log(-log1m(rep_vector(mean(inv_cloglog(X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)),agd_regression_ncoef[i]) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef[i])] )) - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef[i])] ;
+        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = log(-log1m(rep_vector(mean(inv_cloglog(X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)),agd_regression_ncoef_inc[i]) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef[i])] )) - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ;
       }
     }
 
     // Update eta
-    eta_agd_regression[ (c_i+1):(c_i+agd_regression_ncoef[i]) ] = (X_agd_regression_no_QR * allbeta_OVB)[ (c_i+1):(c_i+agd_regression_ncoef[i]) ];
+    eta_agd_regression[ (c_c+1):(c_c+agd_regression_ncoef[i]) ] = (X_agd_regression_no_QR * allbeta_OVB)[ (c_c+1):(c_c+agd_regression_ncoef[i]) ];
 
-    c_i += agd_regression_ncoef[i];
+    c_c += agd_regression_ncoef[i];
+    c_i += agd_regression_ncoef_inc[i];
+    // c_o += agd_regression_ncoef_omt[i];
     c_x += agd_regression_nx[i];
   }
 

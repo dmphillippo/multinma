@@ -120,12 +120,15 @@ print.nma_data <- function(x, ..., n = 10) {
   }
 
   if (has_agd_regression(x)) {
-    s_agd_regression <- x$agd_regression %>%
-      dplyr::distinct(.data$.study, .data$.trt) %>%
+    s_agd_regression <-
+      x$agd_regression %>%
+      dplyr::mutate( .regression = as.character(.data$.regression)) %>%
+      dplyr::distinct(.data$.study, .data$.trt, .data$.regression) %>%
       dplyr::filter(!is.na(.data$.trt)) %>%
       dplyr::group_by(.data$.study) %>%
       dplyr::summarise("Treatment arms" = glue::glue("{dplyr::n()}: ",
-                                                     glue::glue_collapse(.data$.trt, sep = " | ", width = 0.8*cwidth))) %>%
+                                                     glue::glue_collapse(.data$.trt, sep = " | ", width = 0.4*cwidth)),
+                       "Regression formula" = glue::glue(.data$.regression[1] , width = 0.4*cwidth)) %>%
       dplyr::rename(Study = ".study") %>%
       as.data.frame()
     n_agd_regression <- nrow(s_agd_regression)
