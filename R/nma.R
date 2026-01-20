@@ -316,11 +316,8 @@ nma <- function(network,
 
   # Check model arguments
   consistency <- rlang::arg_match(consistency)
-  if (length(consistency) > 1) abort("`consistency` must be a single string.")
   trt_effects <- rlang::arg_match(trt_effects)
-  if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
   class_effects <- rlang::arg_match(class_effects)
-  if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
 
   # Check class_effects and network classes
   if (class_effects != "independent") {
@@ -370,7 +367,6 @@ nma <- function(network,
     }
   } else {
     class_sd <- rlang::arg_match(class_sd)
-    if (length(class_sd) > 1) abort("`class_sd` must be a single string.")
   }
 
   if (consistency == "nodesplit") {
@@ -554,7 +550,6 @@ nma <- function(network,
     }
   }
   class_interactions <- rlang::arg_match(class_interactions)
-  if (length(class_interactions) > 1) abort("`class_interactions` must be a single string.")
 
   likelihood <- check_likelihood(likelihood, network$outcome)
   link <- check_link(link, likelihood)
@@ -730,6 +725,18 @@ nma <- function(network,
   # Notify if network is disconnected
   if (!is_network_connected(network))
     inform("Note: Network is disconnected. See ?is_network_connected for more details.")
+  # Notify if reference treatment is within a class when running the exchangeable class model
+  if (class_effects == "exchangeable" && !is.null(network$classes)) {
+    ref_trt <- levels(network$treatments)[1]
+    ref_class <- levels(network$classes)[1]
+
+    # Count how many treatments share this class
+    n_in_class <- sum(network$classes == ref_class)
+
+    if (n_in_class >= 2) {
+      inform(glue::glue("Note: Reference treatment {ref_trt} has been removed from {ref_class}."))
+    }
+  }
 
   # Get data for design matrices and outcomes
   if (has_ipd(network)) {
@@ -1426,6 +1433,8 @@ if (class_effects == "exchangeable") {
               regression = regression,
               aux_regression = aux_regression,
               class_interactions = if (!is.null(regression) && !is.null(network$classes)) class_interactions else NULL,
+              class_effects = class_effects,
+              class_sd = if (class_effects == "exchangeable") class_sd else NULL,
               xbar = xbar,
               likelihood = likelihood,
               link = link,
@@ -1609,17 +1618,16 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
 
   # Check model arguments
   trt_effects <- rlang::arg_match(trt_effects)
-  if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
 
   # Check class effect arguments
   class_effects <- rlang::arg_match(class_effects)
-  if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
-if (class_effects == "exchangeable") {
-  if (is.null(which_CE) || !rlang::is_integerish(which_CE) || any(which_CE < 0))
-    abort("`which_CE` must be an integer design vector for class effects.")
-  if (is.null(which_CE_sd) || !rlang::is_integerish(which_CE_sd) || any(which_CE_sd < 0))
-    abort("`which_CE_sd` must be an integer design vector for class effect SDs.")
-}
+
+  if (class_effects == "exchangeable") {
+    if (is.null(which_CE) || !rlang::is_integerish(which_CE) || any(which_CE < 0))
+      abort("`which_CE` must be an integer design vector for class effects.")
+    if (is.null(which_CE_sd) || !rlang::is_integerish(which_CE_sd) || any(which_CE_sd < 0))
+      abort("`which_CE_sd` must be an integer design vector for class effect SDs.")
+  }
 
   likelihood <- check_likelihood(likelihood)
   link <- check_link(link, likelihood)
@@ -1961,6 +1969,13 @@ if (class_effects == "exchangeable") {
     stanargs$control <- purrr::list_modify(stanargs$control, adapt_delta = adapt_delta)
   else
     stanargs$control <- list(adapt_delta = adapt_delta)
+
+  # Global option rstan_refresh for refresh
+  if (!"refresh" %in% names(stanargs) && !is.null(getOption("rstan_refresh"))) {
+    refresh <- getOption("rstan_refresh")
+    if (!rlang::is_integerish(refresh, n = 1, finite = TRUE)) abort("Global option `rstan_refresh` must be an integer.")
+    stanargs$refresh <- refresh
+  }
 
   # Set chain_id to make CHAIN_ID available in data block
   stanargs$chain_id <- 1L
@@ -3025,7 +3040,7 @@ make_nma_formula <- function(regression,
 
 #' Construct NMA design matrix
 #'
-#' @param nma_formula NMA formula, returned by [make_nma_formula()]
+#' @param nma_formula NMA formula, returned by `make_nma_formula()`
 #' @param ipd,agd_arm,agd_contrast Data frames
 #' @param agd_contrast_bl Logical vector identifying baseline rows for contrast
 #'   data
