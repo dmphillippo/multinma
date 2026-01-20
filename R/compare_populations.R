@@ -516,7 +516,7 @@ compare_populations <- function(network,
   stop_point <- "whatever"
 }
 
-#' Calculate Latent Bayesian R2 (In-Sample and LOO-Adjusted)
+#' Calculate Latent Bayesian R2 (LOO-Adjusted)
 #'
 #' Calculates the total Bayesian R2 on the latent scale, automatically handling
 #' complex interaction terms (e.g., "age:.trtclass") created by multinma.
