@@ -1790,7 +1790,7 @@ nma.fit <- function(ipd_x, ipd_y,
     ni_agd_arm <- nrow(agd_arm_y)
     aa1 <- 0:(ni_agd_arm - 1)*n_int + 1
     agd_arm_study <- apply(agd_arm_x[aa1, col_study, drop = FALSE], 1, get_study)
-    agd_arm_trt <- apply(agd_arm_x[aa1, col_trt, drop = FALSE], 1, get_trt)
+    agd_arm_trt <- as.array(apply(agd_arm_x[aa1, col_trt, drop = FALSE], 1, get_trt))
 
     if (!is_survival) {
       narm_agd_arm <- ni_agd_arm
@@ -1799,7 +1799,7 @@ nma.fit <- function(ipd_x, ipd_y,
       agd_arm_s_t <- dplyr::distinct(agd_arm_s_t_all) %>% dplyr::mutate(.arm = 1:dplyr::n())
       agd_arm_arm <-  dplyr::left_join(agd_arm_s_t_all, agd_arm_s_t, by = c(".study", ".trt")) %>% dplyr::pull(.data$.arm)
       agd_arm_study <- agd_arm_s_t$.study
-      agd_arm_trt <- agd_arm_s_t$.trt
+      agd_arm_trt <- as.array(agd_arm_s_t$.trt)
       narm_agd_arm <- max(agd_arm_arm)
     }
 
@@ -2078,8 +2078,8 @@ nma.fit <- function(ipd_x, ipd_y,
     standat <- purrr::list_modify(standat,
       # Add outcomes
       ipd_r = if (has_ipd) ipd_y$.r else integer(),
-      agd_arm_r = if (has_agd_arm) agd_arm_y$.r else integer(),
-      agd_arm_n = if (has_agd_arm) agd_arm_y$.n else integer(),
+      agd_arm_r = as.array(if (has_agd_arm) agd_arm_y$.r else integer()),
+      agd_arm_n = as.array(if (has_agd_arm) agd_arm_y$.n else integer()),
 
       # Specify link
       link = switch(link, logit = 1, probit = 2, cloglog = 3)
@@ -2097,7 +2097,7 @@ nma.fit <- function(ipd_x, ipd_y,
       # Add outcomes
       ipd_r = if (has_ipd) ipd_y$.r else integer(),
       agd_arm_r = if (has_agd_arm) agd_arm_y$.r else integer(),
-      agd_arm_n = if (has_agd_arm) agd_arm_y$.n else integer(),
+      agd_arm_n = as.array(if (has_agd_arm) agd_arm_y$.n else integer()),
 
       # Specify link
       link = switch(link, logit = 1, probit = 2, cloglog = 3)
@@ -2155,9 +2155,9 @@ nma.fit <- function(ipd_x, ipd_y,
                          }))
       agd_arm_ncat <- rowSums(agd_arm_cat > 0)
       # Replace missing category counts with 0 (these will drop out of the likelihood)
-      agd_arm_r <- agd_arm_y$.r
+      agd_arm_r <- as.array(agd_arm_y$.r)
       agd_arm_r[is.na(agd_arm_r)] <- 0
-      agd_arm_n <- rowSums(agd_arm_y$.r, na.rm = TRUE)
+      agd_arm_n <- as.array(rowSums(agd_arm_y$.r, na.rm = TRUE))
     }
 
     if (!has_ipd && !has_agd_arm) {
