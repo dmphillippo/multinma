@@ -266,14 +266,6 @@ compare_populations <- function(network,
     return(output_list)
   }
 
-
-
-
-
-
-
-
-
   # Check AGD contrast covariates (exact or with "_mean" suffix)
   if (isTRUE(nrow(network$agd_contrast) > 0)) {
     # Ensure .sample_size exists
@@ -522,4 +514,122 @@ compare_populations <- function(network,
 
   ?seq_le
   stop_point <- "whatever"
+}
+
+#' Calculate Latent Bayesian R2 (In-Sample and LOO-Adjusted)
+#'
+#' Calculates the total Bayesian R2 on the latent scale, automatically handling
+#' complex interaction terms (e.g., "age:.trtclass") created by multinma.
+#'
+#' @param nma A `stan_nma` object.
+#'
+#' @return A list containing the single LOO-adjusted point estimate.
+#' @export
+cross_validation <- function(nma) {
+
+  if (!requireNamespace("loo", quietly = TRUE)) {
+    stop("The 'loo' package is required. Please install it with install.packages('loo').")
+  }
+
+  if (!inherits(nma, "stan_nma")) {
+    stop("Input must be a 'stan_nma' object.")
+  }
+
+  # --- Prepare Data ---
+  ipd_data <- nma$network$ipd
+
+  # Get the design matrix (X)
+  X <- model.matrix(nma$regression, data = ipd_data)
+  if ("(Intercept)" %in% colnames(X)) {
+    X <- X[, -which(colnames(X) == "(Intercept)"), drop = FALSE]
+  }
+
+  # Get the Posterior Betas
+  beta_samples <- as.matrix(nma$stanfit, pars = "beta")
+  colnames(beta_samples) <- sub("^beta\\[(.*)\\]$", "\\1", colnames(beta_samples))
+
+  # Initialize Linear Predictor Matrix (Patients x Iterations)
+  n_patients <- nrow(X)
+  n_iters <- nrow(beta_samples)
+  eta_samples <- matrix(0, nrow = n_patients, ncol = n_iters)
+
+  # Determine Interaction Type (Default to 'independent' if NULL)
+  int_type <- if (is.null(nma$class_interactions)) "independent" else nma$class_interactions
+
+  # PATH A: Independent Interactions (Fast Matrix Math)
+  if (int_type == "independent") {
+    common_cols <- intersect(colnames(X), colnames(beta_samples))
+    if (length(common_cols) > 0) {
+      X_matched <- X[, common_cols, drop = FALSE]
+      beta_matched <- beta_samples[, common_cols, drop = FALSE]
+      eta_samples <- X_matched %*% t(beta_matched)
+    }
+  }
+
+  # PATH B: Common/Class Interactions (Robust Loop)
+  if (int_type == "common") {
+    # Identify Class column
+    target_col_name <- if (".trtclass" %in% colnames(ipd_data)) ".trtclass" else ".trt"
+    patient_trts <- as.character(ipd_data[[target_col_name]])
+
+    matched_count <- 0
+
+    for (b_name in colnames(beta_samples)) {
+      b_vals <- beta_samples[, b_name]
+      contribution <- NULL
+
+      if (grepl(":", b_name)) {
+        # Interaction Logic
+        parts <- strsplit(b_name, ":")[[1]]
+        cov_name <- parts[1]
+        trt_part <- parts[2]
+
+        if (cov_name %in% colnames(X)) {
+          mask <- sapply(patient_trts, function(t) grepl(t, trt_part, fixed = TRUE))
+          if (sum(mask, na.rm = TRUE) > 0) {
+            contribution <- (X[, cov_name] * mask) %*% t(b_vals)
+          }
+        }
+      } else {
+        # Main Effect Logic
+        if (b_name %in% colnames(X)) {
+          contribution <- X[, b_name] %*% t(b_vals)
+        }
+      }
+
+      if (!is.null(contribution)) {
+        eta_samples <- eta_samples + contribution
+        matched_count <- matched_count + 1
+      }
+    }
+  }
+
+  outcome_type <- nma$network$outcome$ipd
+
+  if (outcome_type %in% c("ordered", "binary")) {
+    var_res_scalar <- pi^2 / 3
+  } else if (outcome_type == "continuous") {
+    sigma <- as.matrix(nma$stanfit, pars = "sigma")
+    var_res_scalar <- mean(as.vector(sigma^2))
+  } else {
+    stop(paste("Outcome type", outcome_type, "not supported."))
+  }
+
+  # --- 7. LOO-Adjusted R2 ---
+  log_lik <- as.matrix(nma$stanfit, pars = "log_lik")
+  loo_obj <- suppressWarnings(loo::loo(log_lik, save_psis = TRUE))
+  psis_weights <- weights(loo_obj$psis_object, normalize = TRUE, log = FALSE)
+
+  # Calculate Weighted Mean Risk (Eta) for each patient
+  loo_eta <- numeric(n_patients)
+  for (i in 1:n_patients) {
+    loo_eta[i] <- sum(psis_weights[, i] * eta_samples[i, ])
+  }
+
+  # Final Formula
+  var_fit_loo <- var(loo_eta)
+  r2_loo <- var_fit_loo / (var_fit_loo + var_res_scalar)
+  r2_percent <- round(r2_loo * 100, 2)
+
+  return(list(r2_percent = r2_percent))
 }
