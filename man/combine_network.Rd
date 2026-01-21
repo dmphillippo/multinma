@@ -4,7 +4,7 @@
 \alias{combine_network}
 \title{Combine multiple data sources into one network}
 \usage{
-combine_network(..., trt_ref)
+combine_network(..., trt_ref, allow_mixed_studies = FALSE)
 }
 \arguments{
 \item{...}{multiple data sources, as defined using the \verb{set_*} functions}
