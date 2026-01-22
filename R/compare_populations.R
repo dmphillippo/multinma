@@ -9,7 +9,7 @@
 #' @return A list with a `summary` dataframe and `distance_matrix`.
 #'
 #' @importFrom magrittr %>%
-#' @importFrom dplyr select rename filter group_by summarise mutate left_join bind_rows distinct across all_of tibble
+#' @importFrom dplyr select rename filter group_by summarise mutate left_join bind_rows distinct across all_of tibble n
 #' @importFrom tidyr separate pivot_wider
 #' @importFrom tibble column_to_rownames
 #' @importFrom rlang abort expr sym
@@ -19,44 +19,35 @@
 compare_populations <- function(network,
                                 covariates = NULL,
                                 method = c("euclidean", "propensity")) {
-  # Check method argument
-  method <- match.arg(method)
+
+  method <- tryCatch({
+    if (missing(method)) stop()
+    match.arg(method, choices = valid_choices)
+  }, error = function(e) {
+    rlang::abort("Argument `method` must be either 'euclidean' or 'propensity'.")
+  })
 
   # Check network
   if (!inherits(network, "nma_data")) {
     abort("Expecting an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
   }
+
+  # Check for Integration Code
+  if (is.null(network$integration_code)) {
+    abort("The network object does not contain integration code. Please run `add_integration()` on your network first to define the covariate distributions.")
+  }
+  avail_covariates <- names(network$integration_code)
+
   # Checks for covariates argument
   if (is.null(covariates)) {
-    abort("`covariates` argument must be specified and cannot be NULL.")
-  }
-
-  # Check IPD covariates
-  if (isTRUE(nrow(network$ipd) > 0)) {
-    ipd_covariates <- colnames(network$ipd)
-    missing_ipd_covariates <- setdiff(covariates, ipd_covariates)
-    if (length(missing_ipd_covariates) > 0) {
-      rlang::abort(paste0(
-        "The following covariates are missing from the IPD data: ",
-        paste(missing_ipd_covariates, collapse = ", ")
-      ))
-    }
-  }
-
-  # Check AGD covariates (exact or with "_mean" suffix)
-  if (isTRUE(nrow(network$agd_arm)) > 0) {
-    # Ensure .sample_size exists
-    if (!".sample_size" %in% colnames(network$agd_arm)) {
-      abort("Aggregate arm data must contain a '.sample_size' column.")
-    }
-    agd_covariates <- c(colnames(network$agd_arm))
-    agd_covariates <- unique(c(agd_covariates, sub("_mean$", "", agd_covariates)))
-    missing_agd_covariates <- setdiff(covariates, agd_covariates)
-    if (length(missing_agd_covariates) > 0) {
-      rlang::abort(paste0(
-        "The following covariates are missing from the AGD arm data: ",
-        paste(missing_agd_covariates, collapse = ", ")
-      ))
+    covariates <- avail_covariates
+    message(paste0("Using covariates defined in integration code: ", paste(covariates, collapse = ", ")))
+  } else {
+    missing_covs <- setdiff(covariates, avail_covariates)
+    if (length(missing_covs) > 0) {
+      abort(paste0("The following covariates are NOT defined in the network's integration code: ",
+                   paste(missing_covs, collapse = ", "),
+                   ". Please define them using `add_integration()` or remove them."))
     }
   }
 
@@ -65,7 +56,7 @@ compare_populations <- function(network,
   # ==========================================
   if (method == "propensity") {
 
-    # 1. Prepare IPD Data
+    # Prepare IPD Data
     if (isTRUE(nrow(network$ipd) > 0)) {
       ipd_covariate_data <- network$ipd
       columns_to_keep <- c(covariates, ".study")
@@ -84,7 +75,7 @@ compare_populations <- function(network,
       abort("IPD must be present when wanting to compare populations using method = `propensity`")
     }
 
-    # 2. Prepare AGD Data (via Integration)
+    # Prepare AGD Data (via Integration)
     if (isTRUE(nrow(network$agd_arm) > 0)) {
       studies <- network$agd_arm$.study
       arm_indices <- seq_len(nrow(network$agd_arm))
@@ -114,11 +105,11 @@ compare_populations <- function(network,
       })
     }
 
-    # 3. Combine Data
+    # Combine Data
     if (isTRUE(nrow(network$ipd) > 0)) all_data <- ipd_covariate_data
     if (isTRUE(nrow(network$agd_arm) > 0)) all_data <- c(all_data, agd_arm_covariate_data)
 
-    # 4. Run Pairwise Logistic Regressions
+    # Run Pairwise Logistic Regressions
     regression_results <- list()
 
     for (i in 1:(length(all_data) - 1)) {
@@ -134,7 +125,7 @@ compare_populations <- function(network,
       }
     }
 
-    # 5. Calculate Propensity Scores & Weights
+    # Calculate Propensity Scores & Weights
     propensity_scores_list <- list()
     for (pair_name in names(regression_results)) {
       model <- regression_results[[pair_name]]
@@ -157,7 +148,7 @@ compare_populations <- function(network,
       propensity_scores_list[[pair_name]] <- combined_df
     }
 
-    # 6. Calculate Effective Sample Size (ESS)
+    # Calculate Effective Sample Size (ESS)
     ess_summary <- data.frame(
       comparison = character(),
       original_n = integer(),
@@ -184,7 +175,7 @@ compare_populations <- function(network,
     }
     ess_summary <- ess_summary[order(ess_summary$ess_percent_of_original, decreasing = TRUE), ]
 
-    # 7. Format Output Matrix (Long to Wide)
+    # Format Output Matrix (Long to Wide)
     g <- igraph::as.igraph(network)
     components <- igraph::components(g)
     treatment_components <- data.frame(
@@ -254,12 +245,15 @@ compare_populations <- function(network,
   # ==========================================
   if (method == "euclidean") {
 
-    # 1. Validation for Euclidean specific requirements
+    # Validation
     if (isTRUE(nrow(network$agd_contrast) > 0)) {
-      abort("Aggregate contrast data must contain a '.sample_size' column.")
+      # Check if the specific column ".sample_size" is MISSING
+      if (!".sample_size" %in% colnames(network$agd_contrast)) {
+        abort("Aggregate contrast data must contain a '.sample_size' column.")
+      }
     }
 
-    # 2. Process IPD: Convert logical to numeric and average by study
+    # Process IPD: Convert logical to numeric and average by study
     if (nrow(network$ipd) > 0) {
       ipd_covariate_data <- network$ipd
       ipd_covariate_data[covariates] <- lapply(ipd_covariate_data[covariates], function(x) {
@@ -268,12 +262,13 @@ compare_populations <- function(network,
       ipd_summary <- ipd_covariate_data %>%
         dplyr::group_by(.study) %>%
         dplyr::summarise(
+          total_n = dplyr::n(),
           dplyr::across(all_of(covariates), list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE))),
           .groups = "drop"
         )
     }
 
-    # 3. Helper Function: Extract AGD Means (Binary logic removed)
+    # Helper Function: Extract AGD Means
     extract_agd_means <- function(agd_df) {
       if (nrow(agd_df) == 0) return(NULL)
 
@@ -281,9 +276,31 @@ compare_populations <- function(network,
       retained_covariates <- c()
 
       for (cov in covariates) {
-        mean_col <- paste0(cov, "_mean")
-        sd_col <- paste0(cov, "_sd")
+        distr_obj <- network$integration_code[[cov]]
+        args <- distr_obj
+
+        is_binary_dist <- "prob" %in% names(args)
+
         add_covariate <- TRUE
+
+        if (is_binary_dist) {
+          # --- BINARY LOGIC (Bernoulli/Binomial) ---
+          prob_col <- as.character(args$prob)
+
+          if (prob_col %in% colnames(agd_df)) {
+            p <- agd_df[[prob_col]]
+            df[[paste0(cov, "_mean")]] <- p
+            # Auto-calculate SD for binary: sqrt(p * (1-p))
+            df[[paste0(cov, "_sd")]] <- sqrt(p * (1 - p))
+          } else {
+            warning(glue::glue("Probability column '{prob_col}' for covariate '{cov}' not found in AgD. Dropped."))
+            add_covariate <- FALSE
+          }
+
+        } else {
+
+          mean_col <- as.character(args$mean)
+          sd_col <- as.character(args$sd)
 
         # --- Handle Means ---
         if (mean_col %in% colnames(agd_df)) {
@@ -298,12 +315,15 @@ compare_populations <- function(network,
         # --- Handle SDs ---
         if (add_covariate) {
           if (sd_col %in% colnames(agd_df)) {
+            # Explicit SD column exists -> Use it
             df[[paste0(cov, "_sd")]] <- agd_df[[sd_col]]
+
           } else {
-            # Removed logic that auto-calculated SD from binary means
-            warning(glue::glue("Missing SD for covariate '{cov}' in AgD. Covariate dropped."))
-            df[[paste0(cov, "_mean")]] <- NULL
-            add_covariate <- FALSE
+              # Continuous variable missing SD (or percentage > 1) -> Drop it
+              warning(glue::glue("SD column '{sd_col}' for covariate '{cov}' not found in AgD. Dropped (Continuous variable requires explicit SD)."))
+              df[[paste0(cov, "_mean")]] <- NULL
+              add_covariate <- FALSE
+            }
           }
         }
 
@@ -316,17 +336,17 @@ compare_populations <- function(network,
           df[[paste0(cov, "_sd")]] <- NULL
         }
       }
-      # Update the parent 'covariates' list to exclude dropped ones
+      # Update the 'covariates' list to exclude dropped ones
       assign("covariates", retained_covariates, envir = parent.env(environment()))
       return(df)
     }
 
-    # 4. Extract AGD Data
+    # Extract AGD Data
     agd_contrast_means <- extract_agd_means(network$agd_contrast)
     agd_arm_means <- extract_agd_means(network$agd_arm)
     agd_all <- dplyr::bind_rows(agd_contrast_means, agd_arm_means)
 
-    # 5. Check for NAs in extracted AGD
+    # Check for NAs in extracted AGD
     idx <- which(is.na(agd_all), arr.ind = TRUE)
     if (nrow(idx)) {
       rows <- idx[, "row"]
@@ -342,7 +362,7 @@ compare_populations <- function(network,
       ))
     }
 
-    # 6. Weighted Summarization of AGD
+    # Weighted Summary of AGD
     agd_summary <- agd_all %>%
       dplyr::group_by(.study) %>%
       dplyr::summarise(
@@ -394,7 +414,7 @@ compare_populations <- function(network,
     dist_matrix <- matrix(NA, nrow = nrow(sub1), ncol = nrow(sub2), dimnames = list(sub1$.study, sub2$.study))
     dist_matrix_full <- matrix(NA, nrow = nrow(all_summary), ncol = nrow(all_summary), dimnames = list(all_summary$.study, all_summary$.study))
 
-    # 8. Calculate Distances (Subnetwork 1 vs 2)
+    # Calculate Distances (Subnetwork 1 vs 2)
     if (nrow(sub2) < 1) {
       for (i in seq_len(nrow(sub1))) {
         for (j in seq_len(nrow(sub2))) {
@@ -410,7 +430,7 @@ compare_populations <- function(network,
       }
     }
 
-    # 9. Calculate Distances (Full Matrix)
+    # Calculate Distances (Full Matrix)
     for (i in seq_len(nrow(all_summary))) {
       for (j in seq_len(nrow(all_summary))) {
         if (i == j) next
@@ -425,7 +445,7 @@ compare_populations <- function(network,
       }
     }
 
-    # 10. Return Euclidean Results
+    # Return Euclidean Results
     if (nrow(sub2) < 1) {
       return(list(summary = all_summary, distance_matrix = dist_matrix_full))
     } else {
