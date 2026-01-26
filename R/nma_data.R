@@ -1199,14 +1199,21 @@ set_agd_regression <- function(data,
 
 
   # Check regression
-  if ( missing(regression) || !inherits(regression, "list")) abort("Argument `regression` should be a list")
-  if ( any(purrr::map_lgl(regression, ~!rlang::is_formula(., lhs = FALSE))))
+  if (missing(regression) || (!inherits(regression, "list") && !rlang::is_formula(regression)))
+    abort("`regression` must be a regression formula or named list of regression formulas for each study")
+
+  if (rlang::is_formula(regression)) {
+    regression <- rep(list(regression), times = nlevels(d$.study))
+    names(regression) <- levels(d$.study)
+  }
+
+  if (any(purrr::map_lgl(regression, ~!rlang::is_formula(., lhs = FALSE))))
     abort("`regression` for each study must be a one-sided regression formula specifying the model for which estimates are given.")
 
-  if( !rlang::is_named(regression) )
+  if (!rlang::is_named(regression))
     abort("`regression` must be a named list of formulas for available study.")
 
-  if ( any(miss_names <- setdiff(levels(d$.study),names(regression))) )
+  if (any(miss_names <- setdiff(levels(d$.study),names(regression))))
     abort(glue::glue("`regression` list names must match study names in `data`.\n",
                      "Mismatched regression name{if (length(miss_names)>1) 's' } for stud{if (length(miss_names)>1) 'ies' else 'y'} ",
                      glue::glue_collapse(glue::double_quote(miss_names), sep = ", ", last = " and ", width = 30),
