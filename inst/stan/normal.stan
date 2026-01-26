@@ -1,9 +1,9 @@
 functions {
-  #include /include/prior_select.stan
-  #include /include/count_nonzero.stan
+#include /include/prior_select.stan
+#include /include/count_nonzero.stan
 }
 data {
-  #include /include/data_common.stan
+#include /include/data_common.stan
 
   // Prior on IPD variance
   int<lower=0,upper=6> prior_aux_dist;
@@ -17,28 +17,28 @@ data {
   array[ni_agd_arm] real<lower=0> agd_arm_se;
 }
 transformed data {
-  #include /include/transformed_data_common.stan
+#include /include/transformed_data_common.stan
 }
 parameters {
-  #include /include/parameters_common.stan
+#include /include/parameters_common.stan
   vector<lower=0>[narm_ipd] sigma;
 }
 transformed parameters {
-  #include /include/transformed_parameters_theta.stan
-  #include /include/transformed_parameters_common.stan
+#include /include/transformed_parameters_theta.stan
+#include /include/transformed_parameters_common.stan
 
   // -- IPD model --
   if (link == 1) // identity link
-  theta_ipd = eta_ipd;
+    theta_ipd = eta_ipd;
   else if (link == 2) // log link
-  theta_ipd = exp(eta_ipd);
+    theta_ipd = exp(eta_ipd);
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
     if (nint_max > 1) { // -- If integration points are used --
-    vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
-    X_agd_arm * beta_tilde + offset_agd_arm :
-    X_agd_arm * beta_tilde;
+      vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+        X_agd_arm * beta_tilde + offset_agd_arm :
+        X_agd_arm * beta_tilde;
 
     if (class_effects) {
       for (i in 1:ni_agd_arm) {
@@ -48,45 +48,45 @@ transformed parameters {
       }
     }
 
-    if (RE) {
-      if (link == 1) { // identity link
-      for (i in 1:ni_agd_arm) {
-        if (which_RE[narm_ipd + i])
-        theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] + f_delta[which_RE[narm_ipd + i]];
-        else
-        theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
-      }
-      } else if (link == 2) { // log link
-      for (i in 1:ni_agd_arm) {
-        if (which_RE[narm_ipd + i])
-        theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = exp(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] + f_delta[which_RE[narm_ipd + i]]);
-        else
-        theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = exp(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]);
-      }
-      }
+      if (RE) {
+        if (link == 1) { // identity link
+          for (i in 1:ni_agd_arm) {
+            if (which_RE[narm_ipd + i])
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] + f_delta[which_RE[narm_ipd + i]];
+            else
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
+          }
+        } else if (link == 2) { // log link
+          for (i in 1:ni_agd_arm) {
+            if (which_RE[narm_ipd + i])
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = exp(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] + f_delta[which_RE[narm_ipd + i]]);
+            else
+              theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = exp(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]);
+          }
+        }
 
-      for (i in 1:ni_agd_arm) {
-        theta_agd_arm_bar[i] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)]);
-      }
+        for (i in 1:ni_agd_arm) {
+          theta_agd_arm_bar[i] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)]);
+        }
 
-    } else {
-      if (link == 1) { // identity link
-      if (nint == nint_max) theta_agd_arm_ii = eta_agd_arm_noRE;
-      else for (i in 1:ni_agd_arm) theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
-      } else if (link == 2) { // log link
-      if (nint == nint_max) theta_agd_arm_ii = exp(eta_agd_arm_noRE);
-      else for (i in 1:ni_agd_arm) theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = exp(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]);
-      }
+      } else {
+        if (link == 1) { // identity link
+          if (nint == nint_max) theta_agd_arm_ii = eta_agd_arm_noRE;
+          else for (i in 1:ni_agd_arm) theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)];
+        } else if (link == 2) { // log link
+          if (nint == nint_max) theta_agd_arm_ii = exp(eta_agd_arm_noRE);
+          else for (i in 1:ni_agd_arm) theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)] = exp(eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)]);
+        }
 
-      for (i in 1:ni_agd_arm) {
-        theta_agd_arm_bar[i] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)]);
+        for (i in 1:ni_agd_arm) {
+          theta_agd_arm_bar[i] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)]);
+        }
       }
-    }
     } else { // -- If no integration --
-    if (RE) {
-      vector[nint * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
-      X_agd_arm * beta_tilde + offset_agd_arm :
-      X_agd_arm * beta_tilde;
+      if (RE) {
+        vector[nint * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+          X_agd_arm * beta_tilde + offset_agd_arm :
+          X_agd_arm * beta_tilde;
 
       // Add class effects contribution to the linear predictor
         if (class_effects) {
@@ -122,60 +122,57 @@ transformed parameters {
     for (i in 1:ni_agd_arm) {
       if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
         eta_agd_arm_noRE[i] += f_class[which_fclass[agd_arm_trt[i] - 1]];
-          }
-        }
       }
-
-      // Apply the appropriate link function
-      if (link == 1) { // identity link
-      theta_agd_arm_bar = eta_agd_arm_noRE;
-      } else if (link == 2) { // log link
-      theta_agd_arm_bar = exp(eta_agd_arm_noRE);
-      }
-    }
     }
   }
 
-  // -- AgD model (regression coefficients) --
-  if (nc_agd_regression) {
-
-    vector [nX] allbeta_OVB;
-    int c_c = 0; // coef. counter
-    int c_i = 0; // Included coef. counter
-    int c_o = 0; // Omitted coef. counter
-    int c_x = 0; // X_int rows counter
-    for (i in 1:ns_agd_regression) {
-      allbeta_OVB = allbeta;
-      // OVB adjustment
-      if(agd_regression_reduced_study[i] ){
-        if (link == 1){ // identity link
-          allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] + block(agd_regression_OVB_LM[i], 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_ncoef_omt[i] ) * allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]];
-        }else if (link == 2){ // log link (GLM)
-          allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = log(mean(exp(       X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] )  - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ;
-        }
-      }
-      // Update eta
-      eta_agd_regression[ (c_c+1):(c_c+agd_regression_ncoef[i]) ] = (X_agd_regression_no_QR * allbeta_OVB)[ (c_c+1):(c_c+agd_regression_ncoef[i]) ];
-
-      c_c += agd_regression_ncoef[i];
-      c_i += agd_regression_ncoef_inc[i];
-      c_o += agd_regression_ncoef_omt[i];
-      c_x += agd_regression_nx[i];
+  // Apply the appropriate link function
+  if (link == 1) { // identity link
+    theta_agd_arm_bar = eta_agd_arm_noRE;
+  } else if (link == 2) { // log link
+    theta_agd_arm_bar = exp(eta_agd_arm_noRE);
     }
+}
+}
+}
+// -- AgD model (regression coefficients) --
+if (nc_agd_regression) {
 
-    if (RE) {
-      for (i in 1:nc_agd_regression) {
-        if (which_RE[narm_ipd + narm_agd_arm + ni_agd_contrast + i])
-          eta_agd_regression[i] = eta_agd_regression[i] + f_delta[which_RE[narm_ipd + narm_agd_arm + ni_agd_contrast + i]];
+  vector [nX] allbeta_OVB;
+  int c_c = 0; // coef. counter
+  int c_i = 0; // Included coef. counter
+  int c_o = 0; // Omitted coef. counter
+  int c_x = 0; // X_int rows counter
+  for (i in 1:ns_agd_regression) {
+    allbeta_OVB = allbeta;
+    // OVB adjustment
+    if(agd_regression_reduced_study[i] ){
+      if (link == 1){ // identity link
+        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] + block(agd_regression_OVB_LM[i], 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_ncoef_omt[i] ) * allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]];
+      }else if (link == 2){ // log link (GLM)
+        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = log(mean(exp(       X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] )  - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ;
       }
     }
+    // Update eta
+    eta_agd_regression[ (c_c+1):(c_c+agd_regression_ncoef[i]) ] = (X_agd_regression_no_QR * allbeta_OVB)[ (c_c+1):(c_c+agd_regression_ncoef[i]) ];
 
+    c_c += agd_regression_ncoef[i];
+    c_i += agd_regression_ncoef_inc[i];
+    c_o += agd_regression_ncoef_omt[i];
+    c_x += agd_regression_nx[i];
   }
 
+  if (RE) {
+    for (i in 1:nc_agd_regression) {
+      if (which_RE[narm_ipd + narm_agd_arm + ni_agd_contrast + i])
+        eta_agd_regression[i] = eta_agd_regression[i] + f_delta[which_RE[narm_ipd + narm_agd_arm + ni_agd_contrast + i]];
+    }
+  }
 
 }
+}
 model {
-  #include /include/model_common.stan
+#include /include/model_common.stan
 
   // -- Prior on arm-level variance --
   prior_select_lp(sigma, prior_aux_dist, prior_aux_location, prior_aux_scale, prior_aux_df);
@@ -188,9 +185,9 @@ model {
   agd_arm_y ~ normal(theta_agd_arm_bar, agd_arm_se);
 }
 generated quantities {
-  #include /include/generated_quantities_theta_fitted.stan
-  #include /include/generated_quantities_common.stan
-  #include /include/generated_quantities_theta.stan
+#include /include/generated_quantities_theta_fitted.stan
+#include /include/generated_quantities_common.stan
+#include /include/generated_quantities_theta.stan
 
   // IPD log likelihood and residual deviance
   for (i in 1:ni_ipd) {
