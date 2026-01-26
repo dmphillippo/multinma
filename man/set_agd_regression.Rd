@@ -36,21 +36,22 @@ strings, or factors}
 
 \item{estimate}{Column of \code{data} containing regression coefficient estimates}
 
-\item{se}{Column of \code{data} containing regression coefficient standard errors.
-Currently either \code{se} and \code{cor}, or \code{cov} must be specified.}
+\item{se}{Column of \code{data} containing regression coefficient standard errors.}
 
 \item{cor}{Named list of correlation matrices for the regression coefficients
-in each study. Currently either \code{se} and \code{cor}, or \code{cov} must be specified.}
+corresponding to studies in which this matrix is known.
+The row and column ordering must match the ordering of the coefficient rows in \code{data}.}
 
 \item{cov}{Named list of covariance matrices for the regression coefficients
-in each study. Currently either \code{se} and \code{cor}, or \code{cov} must be specified.}
+corresponding to studies in which this matrix is known.
+The row and column ordering must match the ordering of the coefficient rows in \code{data}.}
 
 \item{regression}{Regression formula. Currently this must be a single formula
 which all studies have estimated, and must then match the regression model
 specified when fitting the model with \code{nma()}. Specify terms involving
 treatment with the \code{.trt} special.}
 
-\item{covariates}{\strong{NOT USED YET} data frame of covariate summary statistics
+\item{covariates}{data frame of covariate summary statistics
 for each study or study arm, with corresponding \code{study} and \code{trt} columns
 to match to those in \code{data}}
 
@@ -112,6 +113,27 @@ All arguments specifying columns of \code{data} accept the following:
 \item \code{dplyr::mutate()} style semantics for inline variable transformations, e.g. \code{study = paste(author, year)}
 }
 }
+\section{Covariance matrix}{
+
+Three input types are considered for specifying the covariance matrix:
+standard errors, correlation matrix, and covariance matrix directly.
+It is not necessary to provide all three inputs simultaneously.
+The specification of covariance information is study-specific,
+so it is not required that all studies use the same specification method.
+For each study, valid ways to specify the covariance matrix are listed below:
+\itemize{
+\item Directly provide the covariance matrix, so the standard error values
+for that study can be set to \code{NA}, and the study's correlation matrix
+need not be provided in the \code{cor} argument.
+\item Provide standard errors and a correlation matrix,
+so the study's covariance matrix need not be provided in the \code{cov} argument.
+\item Only provide standard errors, so the study's correlation and covariance matrices
+need not be provided in the \code{cor} and \code{cov} arguments, and the covariance matrix must be reconstructed,
+requiring QMC integration points using \code{\link[=add_integration]{add_integration()}}.
+This reconstruction of the covariance matrix is currently available for non-survival likelihoods.
+}
+}
+
 \seealso{
 \code{\link[=set_ipd]{set_ipd()}} for individual patient data, \code{\link[=set_agd_arm]{set_agd_arm()}} and
 \code{\link[=set_agd_contrast]{set_agd_contrast()}} for arm- and contrast-based aggregate data, and

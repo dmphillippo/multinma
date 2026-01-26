@@ -373,6 +373,8 @@ inv_softmax <- function(p) {
 #' just before the last follow-up time in a study.
 #'
 #' @return A named list of vectors giving the knot locations in each study.
+#' @seealso [knots.stan_nma()] for obtaining the knots from a fitted model
+#' object.
 #' @export
 #'
 #' @template ex_ndmm_network
@@ -433,11 +435,12 @@ make_knots <- function(network,
 
   survdat <- dplyr::mutate(survdat,
                            !!! get_Surv_data(survdat$.Surv),
-                           observed = .data$status == 1)
-  survdat$.study <- droplevels(survdat$.study)
+                           observed = .data$status == 1,
+                           .study = forcats::fct_drop(.data$.study))
+
   observed_survdat <- dplyr::filter(survdat, .data$observed)
 
-  studies <- unique(survdat$.study)
+  studies <- levels(survdat$.study)
   n_studies <- length(studies)
 
   # Calculate knots
@@ -525,7 +528,41 @@ make_knots <- function(network,
   }
 
   # Combine boundary and internal knots
-  out <- purrr::map2(b_knots, i_knots, ~ c(.x[1], .y, .x[2]))
+  out <- purrr::map2(b_knots, i_knots, ~ unname(c(.x[1], .y, .x[2])))
 
   return(out)
+}
+
+
+#' Knot locations for a fitted model
+#'
+#' Obtain the knot locations from a fitted M-spline or piecewise exponential
+#' model.
+#'
+#' @param Fn A fitted [stan_nma] object
+#' @param type String, indicating whether to return all knots (`"all"`, the
+#'   default), or only the internal knots (`"internal"`) or boundary knots
+#'   (`"boundary"`).
+#' @param ... Other arguments, passed on to [splines2::knots()]
+#'
+#' @returns A list of vectors of knot locations, for each study in the network.
+#' @seealso [make_knots()] for constructing knots for a network object.
+#' @exportS3Method stats::knots
+knots.stan_nma <- function(Fn, type = c("all", "internal", "boundary"), ...) {
+  type <- rlang::arg_match(type)
+  if (!Fn$likelihood %in% c("mspline", "pexp"))
+    abort("No knots present. Not an M-spline or piecewise exponential model.")
+
+  basis <- Fn$basis
+
+  if (type == "all") {
+    .knots <- function(x, ...) {
+      ik <- stats::knots(x, type = "internal", ...)
+      bk <- stats::knots(x, type = "boundary", ...)
+      c(bk[1], ik, bk[2])
+    }
+    return(purrr::map(basis, .knots, ...))
+  } else {
+    return(purrr::map(basis, stats::knots, type = type, ...))
+  }
 }

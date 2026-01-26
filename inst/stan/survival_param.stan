@@ -642,7 +642,7 @@ transformed parameters {
     if (class_effects) {
       for (i in 1:ni_agd_arm) {
         if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
-          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_class[agd_arm_trt[i] - 1]];
+          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_fclass[agd_arm_trt[i] - 1]];
         }
       }
     }
@@ -795,12 +795,13 @@ transformed parameters {
       allbeta_OVB = allbeta;
       // OVB adjustment
       if(agd_regression_reduced_study[i] && OVB_type==3 ){ // Apply OVB for COX PH models
+
+        //  *** First Method ***
+
         matrix [ agd_regression_nx[i] ,agd_regression_ncoef_inc[i]+2 ] OVB_COX_X;
         matrix [  agd_regression_ncoef_inc[i]+2,agd_regression_ncoef_omt[i] ] B;
-
         // Create design matrix: [1, rank, XI ]
         OVB_COX_X =  block(agd_regression_OVB_COX[i], 1, 1,agd_regression_nx[i] ,agd_regression_ncoef_inc[i]+2);
-
         // Calculate ranks
         {
           array[agd_regression_nx[i]] int OVB_COX_idx;
@@ -812,7 +813,6 @@ transformed parameters {
           }
           OVB_COX_X[,2] = to_vector(OVB_COX_rank); // Add rank
         }
-
         // --- Address OVB ---
         //  X_O ~ c_0 + c_r*rank + c_1*XI or X_O ~ D*B
         //  B = inverse(D'D)*D'X_O:
@@ -824,6 +824,51 @@ transformed parameters {
         allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] =  allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]]  +
         B[3:(agd_regression_ncoef_inc[i]+2),] *  /* Note: the first and second calulated coef. are intercept and rank coefficients */
           allbeta[  XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]  ] ;
+
+
+        //  *** Second Method ***
+
+        // array[agd_regression_nx[i]] int OVB_COX_idx;
+        // OVB_COX_idx = sort_indices_asc( (exp_std_gen[(c_x+1):(c_x+agd_regression_nx[i])]) .* exp( -1*(X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta) )) ;
+        //
+        // int a = agd_regression_ncoef_inc[i];
+        // int b = agd_regression_ncoef_omt[i];
+        // row_vector[a] muX;
+        // row_vector[b] muZ;
+        // matrix[a, a] Sxx;
+        // matrix[a, b] Sxz;
+        // matrix[a, b] C1_avg;
+        //
+        // C1_avg = rep_matrix(0.0, a, b);
+        //
+        // for (j in 1:(agd_regression_nx[i]-agd_regression_ncoef_inc[i])) {
+        //
+        //   int nj = agd_regression_nx[i] - j + 1 ;
+        //   matrix[nj, a] Xj;
+        //   matrix[nj, b] Zj;
+        //
+        //   // Risk set
+        //   Xj = X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_o+1):(c_o+agd_regression_ncoef_inc[i])] ][ OVB_COX_idx[ j:(agd_regression_nx[i]) ] ,];
+        //   Zj = X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ][ OVB_COX_idx[ j:(agd_regression_nx[i]) ] ,];
+        //   // Centered
+        //   for(c in 1:a ){
+        //     Xj[,c] = Xj[,c] - mean(Xj[,c]);
+        //   }
+        //   for(c in 1:b ){
+        //     Zj[,c] = Zj[,c] - mean(Zj[,c]);
+        //   }
+        //   // Covariances
+        //   Sxx = (Xj' * Xj) / (nj - 1);
+        //   Sxz = (Xj' * Zj) / (nj - 1);
+        //   C1_avg += inverse(Sxx) * Sxz;
+        //
+        // }
+        //
+        // C1_avg /=  (agd_regression_nx[i]-agd_regression_ncoef_inc[i]) ;
+        //
+        // allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] =  allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]]  +
+        // C1_avg * allbeta[  XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]  ] ;
+
 
       }else if(agd_regression_reduced_study[i] && OVB_type==1 ){ // Apply OVB for AFT models
         allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] + block(agd_regression_OVB_LM[i], 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_ncoef_omt[i] ) * allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]];

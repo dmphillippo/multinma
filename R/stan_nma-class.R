@@ -239,7 +239,7 @@ plot.stan_nma <- function(x, ...,
 #'
 #' # Customise plot
 #' plot_prior_posterior(smk_fit_RE, prior = "het",
-#'                      prior_args = list(colour = "darkred", size = 2),
+#'                      prior_args = list(colour = "darkred", linewidth = 2),
 #'                      post_args = list(alpha = 0.6))
 #' }
 #'
@@ -518,7 +518,7 @@ plot_prior_posterior <- function(x, ...,
 #' @template ex_plaque_psoriasis_integration
 #' @examples \donttest{
 #' # Fit the ML-NMR model
-#' pso_fit <- nma(pso_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+#' pso_fit <- nma(pso_net,
 #'                trt_effects = "fixed",
 #'                link = "probit",
 #'                likelihood = "bernoulli2",

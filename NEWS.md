@@ -1,4 +1,28 @@
-# multinma 0.8.0.9000
+# multinma 0.8.1.9000
+
+* Feature: New `subset` argument to `posterior_ranks()` and 
+`posterior_rank_probs()` allows ranks to be calculated for a smaller decision 
+set of treatments than the full analysis set.
+* Feature: New `knots.stan_nma()` method for easily obtaining the knots from a 
+fitted M-spline or piecewise exponential model, rather than working with the 
+spline basis objects `fit$basis` (#53).
+* Fix: `predict()` now works correctly for `newdata` when `aux_by` was used, 
+rather than giving errors (including #50).
+* Fix: `predict()` no longer errors when using a single `baseline` for multiple 
+`newdata` studies.
+* Fix: Bug where generalised gamma models with an `aux_regression` model on the 
+auxiliary shape parameters gave an error when trying to use `predict()` or 
+`marginal_effects()` (#62).
+* Fix: Class effects models with IPD were broken, now resolved (PR #57).
+* Improvement: Class effects models now note when the reference treatment was 
+included in a class, and has been removed (PR #57).
+* Fix: Calling `predict()` for models where study names include special regex
+characters (e.g. parentheses like "Smith (2025)") no longer fails when these 
+studies are used to inform the `baseline` or `aux` arguments (#63).
+
+# multinma 0.8.1
+
+* Fix: Update deprecated Stan array syntax (PR #51).
 
 # multinma 0.8.0
 

@@ -15,9 +15,9 @@
 #'   modifier interactions as `variable:.trt` (see details).
 #' @param OVB_adj Character string controlling omitted variable bias (OVB)
 #'   adjustment for reduced models.
-#'   `"all"` (the default) Apply OVB adjustment to all reduced models. Quasi–Monte Carlo (QMC) integration points must be available for all reduced model(s).
-#'   `"auto"` Apply OVB adjustment only to reduced models which the QMC integration points are available.
-#'   `"none"` Do not apply OVB adjustment for reduced model(s), even if QMC integration points are provided.
+#'   `"all"` (the default) apply OVB adjustment to all reduced models. Quasi–Monte Carlo (QMC) integration points must be available for all reduced model(s).
+#'   `"auto"` apply OVB adjustment only to reduced models which the QMC integration points are available.
+#'   `"none"` do not apply OVB adjustment for reduced model(s), even if QMC integration points are provided.
 #' @param class_interactions Character string specifying whether effect modifier
 #'   interactions are specified as `"common"`, `"exchangeable"`, or
 #'   `"independent"`.
@@ -322,13 +322,9 @@ nma <- function(network,
 
   # Check model arguments
   consistency <- rlang::arg_match(consistency)
-  if (length(consistency) > 1) abort("`consistency` must be a single string.")
   trt_effects <- rlang::arg_match(trt_effects)
-  if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
-  OVB_adj <- rlang::arg_match(OVB_adj)
-  if (length(OVB_adj) > 1) abort("`OVB_adj` must be a single string.")
   class_effects <- rlang::arg_match(class_effects)
-  if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
+  OVB_adj <- rlang::arg_match(OVB_adj)
 
   # Check class_effects and network classes
   if (class_effects != "independent") {
@@ -378,7 +374,6 @@ nma <- function(network,
     }
   } else {
     class_sd <- rlang::arg_match(class_sd)
-    if (length(class_sd) > 1) abort("`class_sd` must be a single string.")
   }
 
   if (consistency == "nodesplit") {
@@ -562,7 +557,6 @@ nma <- function(network,
     }
   }
   class_interactions <- rlang::arg_match(class_interactions)
-  if (length(class_interactions) > 1) abort("`class_interactions` must be a single string.")
 
   likelihood <- check_likelihood(likelihood, network$outcome)
   link <- check_link(link, likelihood)
@@ -738,6 +732,18 @@ nma <- function(network,
   # Notify if network is disconnected
   if (!is_network_connected(network))
     inform("Note: Network is disconnected. See ?is_network_connected for more details.")
+  # Notify if reference treatment is within a class when running the exchangeable class model
+  if (class_effects == "exchangeable" && !is.null(network$classes)) {
+    ref_trt <- levels(network$treatments)[1]
+    ref_class <- levels(network$classes)[1]
+
+    # Count how many treatments share this class
+    n_in_class <- sum(network$classes == ref_class)
+
+    if (n_in_class >= 2) {
+      inform(glue::glue("Note: Reference treatment {ref_trt} has been removed from {ref_class}."))
+    }
+  }
 
   # Get data for design matrices and outcomes
   if (has_ipd(network)) {
@@ -842,13 +848,11 @@ nma <- function(network,
                                   classes = !is.null(network$classes),
                                   class_interactions = class_interactions)
 
-
   if (has_agd_regression(network)) {
 
     dat_agd_regression <- network$agd_regression
 
     # Convert to a list by study to manipulate it easier using map()
-    # guarantee to be listed when there is just one study
     dat_agd_regression_split <- dat_agd_regression %>%
       split(factor(.$.study,levels = unique(.$.study))) # keep the original order
 
@@ -948,7 +952,7 @@ nma <- function(network,
       agd_regression_reduced_study <- rep(0,length(agd_regression_reduced_study))
       message(glue::glue("`OVB_adj` is {OVB_adj}, and there is reduced",
                          " stud{if (sum(miss_names)>1) 'ies' else 'y'} ",
-                         glue::glue_collapse(glue::double_quote(agd_regression_name_study[miss_names]), sep = ", ", last = " and ", width = 30),
+                         glue::glue_collapse(glue::double_quote(agd_regression_name_study[as.logical(miss_names)]), sep = ", ", last = " and ", width = 30),
                          ".\n The OVB adjustment does not apply."
       ))
 
@@ -1026,8 +1030,7 @@ nma <- function(network,
                                                                  (.trt %in% .trt[is.na(.estimate)]) & !is.na(.estimate)  )) %>%
                    dplyr::pull(.is_intercept) ) %>% unlist()
 
-    # Remove intercept columns from network design matrix for COX PH models (AgD regression)
-    # Note: Remove from the Agd regression models that the intercept estimation(s) have not been reported.
+    # Remove intercept columns from the network design matrix for COX PH models (AgD regression) whose intercept estimation(s) have not been reported.
     if( likelihood %in%c('exponential', 'weibull', 'gompertz','mspline', 'pexp') &&
         length(agd_regression_name_study[!agd_regression_intercept_study]) ){
       tmp_X_agd_regression[[1]] <- tmp_X_agd_regression[[1]][ , !colnames(tmp_X_agd_regression[[1]])%in%
@@ -1838,6 +1841,8 @@ if (class_effects == "exchangeable") {
               regression = regression,
               aux_regression = aux_regression,
               class_interactions = if (!is.null(regression) && !is.null(network$classes)) class_interactions else NULL,
+              class_effects = class_effects,
+              class_sd = if (class_effects == "exchangeable") class_sd else NULL,
               xbar = xbar,
               likelihood = likelihood,
               link = link,
@@ -2030,17 +2035,16 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
 
   # Check model arguments
   trt_effects <- rlang::arg_match(trt_effects)
-  if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
 
   # Check class effect arguments
   class_effects <- rlang::arg_match(class_effects)
-  if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
-if (class_effects == "exchangeable") {
-  if (is.null(which_CE) || !rlang::is_integerish(which_CE) || any(which_CE < 0))
-    abort("`which_CE` must be an integer design vector for class effects.")
-  if (is.null(which_CE_sd) || !rlang::is_integerish(which_CE_sd) || any(which_CE_sd < 0))
-    abort("`which_CE_sd` must be an integer design vector for class effect SDs.")
-}
+
+  if (class_effects == "exchangeable") {
+    if (is.null(which_CE) || !rlang::is_integerish(which_CE) || any(which_CE < 0))
+      abort("`which_CE` must be an integer design vector for class effects.")
+    if (is.null(which_CE_sd) || !rlang::is_integerish(which_CE_sd) || any(which_CE_sd < 0))
+      abort("`which_CE_sd` must be an integer design vector for class effect SDs.")
+  }
 
   likelihood <- check_likelihood(likelihood)
   link <- check_link(link, likelihood)
@@ -2402,6 +2406,13 @@ if (class_effects == "exchangeable") {
     stanargs$control <- purrr::list_modify(stanargs$control, adapt_delta = adapt_delta)
   else
     stanargs$control <- list(adapt_delta = adapt_delta)
+
+  # Global option rstan_refresh for refresh
+  if (!"refresh" %in% names(stanargs) && !is.null(getOption("rstan_refresh"))) {
+    refresh <- getOption("rstan_refresh")
+    if (!rlang::is_integerish(refresh, n = 1, finite = TRUE)) abort("Global option `rstan_refresh` must be an integer.")
+    stanargs$refresh <- refresh
+  }
 
   # Set chain_id to make CHAIN_ID available in data block
   stanargs$chain_id <- 1L
@@ -3466,7 +3477,7 @@ make_nma_formula <- function(regression,
 
 #' Construct NMA design matrix
 #'
-#' @param nma_formula NMA formula, returned by [make_nma_formula()]
+#' @param nma_formula NMA formula, returned by `make_nma_formula()`
 #' @param ipd,agd_arm,agd_contrast Data frames
 #' @param agd_contrast_bl Logical vector identifying baseline rows for contrast
 #'   data
@@ -3921,26 +3932,26 @@ make_nma_model_matrix <- function(nma_formula,
     X_order <- X_order[colnames(X_agd_regression)]
 
     for (i in 1:nrow(X_agd_regression)) {
-        # Get corresponding reference row
-        bl_id <- match(dat_agd_regression$.study[!agd_regression_bl][i], dat_agd_regression$.study[agd_regression_bl])
-        ord_pre_i <- max(X_order[X_agd_regression[i, ] != 0])
+      # Get corresponding reference row
+      bl_id <- match(dat_agd_regression$.study[!agd_regression_bl][i], dat_agd_regression$.study[agd_regression_bl])
+      ord_pre_i <- max(X_order[X_agd_regression[i, ] != 0])
 
-        if (all(X_agd_regression[i, trt_reg_cols] == X_bl[bl_id, trt_reg_cols]) &&
-            all(X_agd_regression[i, !study_reg_cols & !trt_reg_cols] == 0)) {
-          # Intercept rows
-          # Set reference values of covariates
-          X_agd_regression[i, !study_reg_cols & !trt_reg_cols] <- X_bl[bl_id, !study_reg_cols & !trt_reg_cols]
-        } else {
-          # All other rows
-          # Difference out reference levels of factors
-          X_agd_regression[i, fct_cols] <- X_agd_regression[i, fct_cols, drop = FALSE] - X_agd_regression_ref[i, fct_cols, drop = FALSE]
-        }
+      if (all(X_agd_regression[i, trt_reg_cols] == X_bl[bl_id, trt_reg_cols]) &&
+          all(X_agd_regression[i, !study_reg_cols & !trt_reg_cols] == 0)) {
+        # Intercept rows
+        # Set reference values of covariates
+        X_agd_regression[i, !study_reg_cols & !trt_reg_cols] <- X_bl[bl_id, !study_reg_cols & !trt_reg_cols]
+      } else {
+        # All other rows
+        # Difference out reference levels of factors
+        X_agd_regression[i, fct_cols] <- X_agd_regression[i, fct_cols, drop = FALSE] - X_agd_regression_ref[i, fct_cols, drop = FALSE]
+      }
 
-        ord_post_i <- max(X_order[X_agd_regression[i, ] != 0])
-        ord_i <- min(ord_pre_i, ord_post_i)
+      ord_post_i <- max(X_order[X_agd_regression[i, ] != 0])
+      ord_i <- min(ord_pre_i, ord_post_i)
 
-        # Only highest order terms in each row have non-zero entries in design matrix
-        X_agd_regression[i, X_order < ord_i] <- 0
+      # Only highest order terms in each row have non-zero entries in design matrix
+      X_agd_regression[i, X_order < ord_i] <- 0
     }
 
     # Remove columns for study baselines corresponding to contrast-based studies - not used

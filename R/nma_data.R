@@ -1021,16 +1021,16 @@ set_agd_surv <- function(data,
 #'  The specification of covariance information is study-specific,
 #'  so it is not required that all studies use the same specification method.
 #'  For each study, valid ways to specify the covariance matrix are listed below:
-#'  \describe{
-#'  \item{directly provide the covariance matrix, so the standard error values
+#'  \itemize{
+#'  \item Directly provide the covariance matrix, so the standard error values
 #'  for that study can be set to `NA`, and the study's correlation matrix
-#'   need not be provided in the `cor` argument}
-#'  \item{provide standard errors and a correlation matrix,
-#'  so the study's covariance matrix need not be provided in the `cov` argument. }
-#'  \item{only provide standard errors, so the study's correlation and covariance matrices
+#'  need not be provided in the `cor` argument.
+#'  \item Provide standard errors and a correlation matrix,
+#'  so the study's covariance matrix need not be provided in the `cov` argument.
+#'  \item Only provide standard errors, so the study's correlation and covariance matrices
 #'   need not be provided in the `cor` and `cov` arguments, and the covariance matrix must be reconstructed,
-#'    requiring QMC integration points using `add_integration()`.
-#'    This reconstruction of the covariance matrix is currently available for non-survival likelihoods. }
+#'    requiring QMC integration points using [add_integration()].
+#'    This reconstruction of the covariance matrix is currently available for non-survival likelihoods.
 #'  }
 #'
 #' @seealso [set_ipd()] for individual patient data, [set_agd_arm()] and
@@ -1785,9 +1785,6 @@ combine_network <- function(..., trt_ref) {
 #' pso_net
 #'
 multi <- function(..., inclusive = FALSE, type = c("ordered", "competing")) {
-  if (packageVersion("dplyr") < "1.0.0")
-    abort("Multinomial outcomes require `dplyr` package version 1.0.0 or later.")
-
   # Argument checks
   if (!rlang::is_bool(inclusive)) abort("`inclusive` must be a logical value TRUE/FALSE")
   type <- rlang::arg_match(type)

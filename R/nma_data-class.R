@@ -902,7 +902,7 @@ plot.nma_data <- function(x, ..., layout, circular,
   }
 
   if (show_trt_class) {
-    g <- g + ggplot2::scale_fill_discrete("Treatment Class", aesthetics = c("fill", "colour"))
+    g <- g + ggplot2::scale_fill_discrete(name = "Treatment Class", aesthetics = c("fill", "colour"))
   }
 
   g <- g +

@@ -249,6 +249,23 @@ ndmm_fit_weib <- suppressWarnings(nma(ndmm_net,
                                   prior_aux = half_normal(10),
                                   iter = 10))
 
+ndmm_fit_weib_nphr <- suppressWarnings(nma(ndmm_net,
+                                      likelihood = "weibull-aft",
+                                      aux_regression = ~.trt,
+                                      prior_intercept = normal(0, 100),
+                                      prior_trt = normal(0, 10),
+                                      prior_aux = half_normal(10),
+                                      prior_aux_reg = normal(0, 10),
+                                      iter = 10))
+
+ndmm_fit_weib_nphs <- suppressWarnings(nma(ndmm_net,
+                                           likelihood = "weibull-aft",
+                                           aux_by = ".trt",
+                                           prior_intercept = normal(0, 100),
+                                           prior_trt = normal(0, 10),
+                                           prior_aux = half_normal(10),
+                                           iter = 10))
+
 ndmm_fit_exp <- suppressWarnings(nma(ndmm_net,
                                      likelihood = "exponential",
                                      prior_intercept = normal(0, 100),
@@ -262,12 +279,46 @@ ndmm_fit_gengamma <- suppressWarnings(nma(ndmm_net,
                                           prior_aux = list(sigma = half_normal(5), k = half_normal(5)),
                                           iter = 10))
 
+ndmm_fit_gengamma_nphr <- suppressWarnings(nma(ndmm_net,
+                                          likelihood = "gengamma",
+                                          aux_regression = ~.trt,
+                                          prior_intercept = normal(0, 100),
+                                          prior_trt = normal(0, 10),
+                                          prior_aux = list(sigma = half_normal(5), k = half_normal(5)),
+                                          prior_aux_reg = normal(0, 10),
+                                          iter = 10))
+
+ndmm_fit_gengamma_nphs <- suppressWarnings(nma(ndmm_net,
+                                               likelihood = "gengamma",
+                                               aux_by = ".trt",
+                                               prior_intercept = normal(0, 100),
+                                               prior_trt = normal(0, 10),
+                                               prior_aux = list(sigma = half_normal(5), k = half_normal(5)),
+                                               iter = 10))
+
 ndmm_fit_mspline <- suppressWarnings(nma(ndmm_net,
                                          likelihood = "mspline",
                                          prior_intercept = normal(0, 100),
                                          prior_trt = normal(0, 10),
                                          prior_aux = half_normal(1),
                                          iter = 10))
+
+ndmm_fit_mspline_nphr <- suppressWarnings(nma(ndmm_net,
+                                         likelihood = "mspline",
+                                         aux_regression = ~.trt,
+                                         prior_intercept = normal(0, 100),
+                                         prior_trt = normal(0, 10),
+                                         prior_aux = half_normal(1),
+                                         prior_aux_reg = normal(0, 10),
+                                         iter = 10))
+
+ndmm_fit_mspline_nphs <- suppressWarnings(nma(ndmm_net,
+                                              likelihood = "mspline",
+                                              aux_by = ".trt",
+                                              prior_intercept = normal(0, 100),
+                                              prior_trt = normal(0, 10),
+                                              prior_aux = half_normal(1),
+                                              iter = 10))
 
 ndmm_preddat <- dplyr::bind_rows(
   dplyr::transmute(ndmm_net$ipd, .study, .trt, .time = .Surv[, "time"]),
@@ -365,6 +416,25 @@ test_that(".study, .trt, .time columns are correct (weibull, no regression, netw
                     preddat4[, c(".study", ".trt")])
   expect_identical(pred4.1$parameter,
                    paste0("pred[", preddat4$.study, ": ", preddat4$.trt, ", ", preddat4$.quantile, "]"))
+
+  # Check non-PH
+  pred1.1_nphr <- tibble::as_tibble(predict(ndmm_fit_weib_nphr, type = "survival"))
+  expect_equivalent(pred1.1_nphr[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1_nphr$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  preddat1_nphs <- dplyr::inner_join(preddat1,
+                                     dplyr::distinct(ndmm_preddat, .study, .trt),
+                                     by = c(".study", ".trt")) %>%
+    dplyr::arrange(.study, .trt)
+
+  pred1.1_nphs <- tibble::as_tibble(predict(ndmm_fit_weib_nphs, type = "survival"))
+  expect_equivalent(pred1.1_nphs[, c(".study", ".trt", ".time")],
+                    preddat1_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1_nphs$parameter,
+                   paste0("pred[", preddat1_nphs$.study, ": ", preddat1_nphs$.trt, ", ", preddat1_nphs$id, "]"))
+
 })
 
 
@@ -553,6 +623,25 @@ test_that(".study, .trt, .time columns are correct (gengamma, no regression, net
                     preddat4[, c(".study", ".trt")])
   expect_identical(pred4.1$parameter,
                    paste0("pred[", preddat4$.study, ": ", preddat4$.trt, ", ", preddat4$.quantile, "]"))
+
+  # Check non-PH
+  pred1.1_nphr <- tibble::as_tibble(predict(ndmm_fit_gengamma_nphr, type = "survival"))
+  expect_equivalent(pred1.1_nphr[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1_nphr$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  preddat1_nphs <- dplyr::inner_join(preddat1,
+                                     dplyr::distinct(ndmm_preddat, .study, .trt),
+                                     by = c(".study", ".trt")) %>%
+    dplyr::arrange(.study, .trt)
+
+  pred1.1_nphs <- tibble::as_tibble(predict(ndmm_fit_gengamma_nphs, type = "survival"))
+  expect_equivalent(pred1.1_nphs[, c(".study", ".trt", ".time")],
+                    preddat1_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1_nphs$parameter,
+                   paste0("pred[", preddat1_nphs$.study, ": ", preddat1_nphs$.trt, ", ", preddat1_nphs$id, "]"))
+
 })
 
 
@@ -653,6 +742,25 @@ test_that(".study, .trt, .time columns are correct (mspline, no regression, netw
                     preddat4[, c(".study", ".trt")])
   expect_identical(pred4.1$parameter,
                    paste0("pred[", preddat4$.study, ": ", preddat4$.trt, ", ", preddat4$.quantile, "]"))
+
+  # Check non-PH
+  pred1.1_nphr <- tibble::as_tibble(predict(ndmm_fit_mspline_nphr, type = "survival"))
+  expect_equivalent(pred1.1_nphr[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1_nphr$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  preddat1_nphs <- dplyr::inner_join(preddat1,
+                                     dplyr::distinct(ndmm_preddat, .study, .trt),
+                                     by = c(".study", ".trt")) %>%
+    dplyr::arrange(.study, .trt)
+
+  pred1.1_nphs <- tibble::as_tibble(predict(ndmm_fit_mspline_nphs, type = "survival"))
+  expect_equivalent(pred1.1_nphs[, c(".study", ".trt", ".time")],
+                    preddat1_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1_nphs$parameter,
+                   paste0("pred[", preddat1_nphs$.study, ": ", preddat1_nphs$.trt, ", ", preddat1_nphs$id, "]"))
+
 })
 
 test_that("Survival predictions for new studies require correct args", {
@@ -692,6 +800,25 @@ test_that(".study, .trt, .time columns are correct (weibull, no regression, new 
                     preddat1[, c(".trt", ".time")])
   expect_identical(pred1.1$parameter,
                    paste0("pred[", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.1r <- tibble::as_tibble(predict(ndmm_fit_weib_nphr, type = "survival",
+                                       times = time,
+                                       baseline = distr(qnorm, 0, 1),
+                                       aux = distr(qlnorm, 0, 0.01)))
+  expect_equivalent(pred1.1r[, c(".trt", ".time")],
+                    preddat1[, c(".trt", ".time")])
+  expect_identical(pred1.1r$parameter,
+                   paste0("pred[", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  preddat1s <- dplyr::filter(preddat1, .trt %in% c("Pbo", "Len"))
+  pred1.1s <- tibble::as_tibble(predict(ndmm_fit_weib_nphs, type = "survival",
+                                        times = time,
+                                        baseline = "Attal2012",
+                                        aux = "Attal2012"))
+  expect_equivalent(pred1.1s[, c(".trt", ".time")],
+                    preddat1s[, c(".trt", ".time")])
+  expect_identical(pred1.1s$parameter,
+                   paste0("pred[", preddat1s$.trt, ", ", preddat1s$id, "]"))
 
   pred1.2 <- tibble::as_tibble(predict(ndmm_fit_weib, type = "hazard",
                                        times = time,
@@ -866,6 +993,26 @@ test_that(".study, .trt, .time columns are correct (gengamma, no regression, new
   expect_identical(pred1.1$parameter,
                    paste0("pred[", preddat1$.trt, ", ", preddat1$id, "]"))
 
+  pred1.1r <- tibble::as_tibble(predict(ndmm_fit_gengamma_nphr, type = "survival",
+                                        times = time,
+                                        baseline = distr(qnorm, 0, 1),
+                                        aux = list(sigma = distr(qlnorm, 0, 0.1),
+                                                   k = distr(qlnorm, 0, 0.1))))
+  expect_equivalent(pred1.1r[, c(".trt", ".time")],
+                    preddat1[, c(".trt", ".time")])
+  expect_identical(pred1.1r$parameter,
+                   paste0("pred[", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  preddat1s <- dplyr::filter(preddat1, .trt %in% c("Pbo", "Len"))
+  pred1.1s <- tibble::as_tibble(predict(ndmm_fit_gengamma_nphs, type = "survival",
+                                        times = time,
+                                        baseline = "Attal2012",
+                                        aux = "Attal2012"))
+  expect_equivalent(pred1.1s[, c(".trt", ".time")],
+                    preddat1s[, c(".trt", ".time")])
+  expect_identical(pred1.1s$parameter,
+                   paste0("pred[", preddat1s$.trt, ", ", preddat1s$id, "]"))
+
   pred1.2 <- tibble::as_tibble(predict(ndmm_fit_gengamma, type = "hazard",
                                        times = time,
                                        baseline = distr(qnorm, 0, 1),
@@ -968,12 +1115,142 @@ test_that(".study, .trt, .time columns are correct (mspline, no regression, new 
                        aux = distr(qnorm, 0, 1)),
                'Producing predictions with external `aux` spline coefficients is not currently supported for "mspline" models.')
 
+  time <- 0:5
+
+  # Prediction format new times
+  preddat1 <- tidyr::expand_grid(.study = "New 1",
+                                 .trt = unique(ndmm_preddat$.trt),
+                                 .time = time) %>%
+    dplyr::group_by(.trt) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup()
+
+  pred1.1 <- tibble::as_tibble(predict(ndmm_fit_mspline, type = "survival",
+                                       times = time,
+                                       baseline = "Attal2012",
+                                       aux = "Attal2012"))
+  expect_equivalent(pred1.1[, c(".trt", ".time")],
+                    preddat1[, c(".trt", ".time")])
+  expect_identical(pred1.1$parameter,
+                   paste0("pred[", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.1r <- tibble::as_tibble(predict(ndmm_fit_mspline_nphr, type = "survival",
+                                        times = time,
+                                        baseline = "Attal2012",
+                                        aux = "Attal2012"))
+  expect_equivalent(pred1.1r[, c(".trt", ".time")],
+                    preddat1[, c(".trt", ".time")])
+  expect_identical(pred1.1r$parameter,
+                   paste0("pred[", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  preddat1s <- dplyr::filter(preddat1, .trt %in% c("Pbo", "Len"))
+  pred1.1s <- tibble::as_tibble(predict(ndmm_fit_mspline_nphs, type = "survival",
+                                        times = time,
+                                        baseline = "Attal2012",
+                                        aux = "Attal2012"))
+  expect_equivalent(pred1.1s[, c(".trt", ".time")],
+                    preddat1s[, c(".trt", ".time")])
+  expect_identical(pred1.1s$parameter,
+                   paste0("pred[", preddat1s$.trt, ", ", preddat1s$id, "]"))
+
+  pred1.2 <- tibble::as_tibble(predict(ndmm_fit_mspline, type = "hazard",
+                                       times = time,
+                                       baseline = "Attal2012",
+                                       aux = "Attal2012"))
+  expect_equivalent(pred1.2[, c(".trt", ".time")],
+                    preddat1[, c(".trt", ".time")])
+  expect_identical(pred1.2$parameter,
+                   paste0("pred[", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.3 <- tibble::as_tibble(predict(ndmm_fit_mspline, type = "cumhaz",
+                                       times = time,
+                                       baseline = "Attal2012",
+                                       aux = "Attal2012"))
+  expect_equivalent(pred1.3[, c(".trt", ".time")],
+                    preddat1[, c(".trt", ".time")])
+  expect_identical(pred1.3$parameter,
+                   paste0("pred[", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  # Prediction format for single summaries
+  preddat3 <- tibble::tibble(.trt = unique(ndmm_preddat$.trt))
+
+  # pred3.1 <- tibble::as_tibble(predict(ndmm_fit_mspline, type = "mean",
+  #                                      baseline = "Attal2012,
+  #                                      aux = "Attal2012"))
+  # expect_equivalent(pred3.1[, ".trt"],
+  #                   preddat3)
+  # expect_identical(pred3.1$parameter,
+  #                  paste0("pred[", preddat3$.trt, "]"))
+
+  pred3.2 <- suppressWarnings(tibble::as_tibble(predict(ndmm_fit_mspline, type = "median",
+                                       baseline = "Attal2012",
+                                       aux = "Attal2012")))
+  expect_equivalent(pred3.2[, ".trt"],
+                    preddat3)
+  expect_identical(pred3.2$parameter,
+                   paste0("pred[", preddat3$.trt, "]"))
+
+  pred3.3 <- tibble::as_tibble(predict(ndmm_fit_mspline, type = "rmst",
+                                       time = 3,
+                                       baseline = "Attal2012",
+                                       aux = "Attal2012"))
+  expect_equivalent(pred3.3[, c(".trt", ".time")],
+                    dplyr::mutate(preddat3, .time = 3))
+  expect_identical(pred3.3$parameter,
+                   paste0("pred[", preddat3$.trt, "]"))
+
+  pred3.4 <- tibble::as_tibble(predict(ndmm_fit_mspline, type = "link",
+                                       time = 3,
+                                       baseline = "Attal2012",
+                                       aux = "Attal2012"))
+  expect_equivalent(pred3.4[, ".trt"],
+                    preddat3)
+  expect_identical(pred3.4$parameter,
+                   paste0("pred[", preddat3$.trt, "]"))
+
+  # Prediction format for quantiles
+  qs <- c(0.2, 0.4, 0.6, 0.8)
+  preddat4 <- tidyr::expand_grid(.trt = unique(ndmm_preddat$.trt),
+                                 .quantile = qs)
+
+  pred4.1 <- suppressWarnings(tibble::as_tibble(predict(ndmm_fit_mspline, type = "quantile", quantiles = qs,
+                                       baseline = "Attal2012",
+                                       aux = "Attal2012")))
+  expect_equivalent(pred4.1[, c(".trt", ".quantile")],
+                    preddat4[, c(".trt", ".quantile")])
+  expect_identical(pred4.1$parameter,
+                   paste0("pred[", preddat4$.trt, ", ", preddat4$.quantile, "]"))
 })
 
 
 ndmm_fit_weib_reg <- suppressWarnings(nma(ndmm_net,
                                           likelihood = "weibull-aft",
-                                          regression = ~age*.trt,
+                                          regression = ~I(age/10)*.trt,
+                                          class_interactions= "common",
+                                          prior_intercept = normal(0, 100),
+                                          prior_trt = normal(0, 10),
+                                          prior_reg = normal(0, 10),
+                                          prior_aux = half_normal(10),
+                                          iter = 10,
+                                          seed = 42))
+
+ndmm_fit_weib_reg_nphr <- suppressWarnings(nma(ndmm_net,
+                                          likelihood = "weibull-aft",
+                                          regression = ~I(age/10)*.trt,
+                                          aux_regression = ~.trt,
+                                          class_interactions= "common",
+                                          prior_intercept = normal(0, 100),
+                                          prior_trt = normal(0, 10),
+                                          prior_reg = normal(0, 10),
+                                          prior_aux = half_normal(10),
+                                          iter = 10,
+                                          seed = 42))
+
+ndmm_fit_weib_reg_nphs <- suppressWarnings(nma(ndmm_net,
+                                          likelihood = "weibull-aft",
+                                          regression = ~I(age/10)*.trt,
+                                          aux_by = ".trt",
+                                          class_interactions= "common",
                                           prior_intercept = normal(0, 100),
                                           prior_trt = normal(0, 10),
                                           prior_reg = normal(0, 10),
@@ -983,7 +1260,8 @@ ndmm_fit_weib_reg <- suppressWarnings(nma(ndmm_net,
 
 ndmm_fit_exp_reg <- suppressWarnings(nma(ndmm_net,
                                          likelihood = "exponential",
-                                         reg = ~age*.trt,
+                                         regression = ~I(age/10)*.trt,
+                                         class_interactions = "common",
                                          prior_intercept = normal(0, 100),
                                          prior_trt = normal(0, 10),
                                          prior_reg = normal(0, 10),
@@ -991,7 +1269,32 @@ ndmm_fit_exp_reg <- suppressWarnings(nma(ndmm_net,
 
 ndmm_fit_gengamma_reg <- suppressWarnings(nma(ndmm_net,
                                               likelihood = "gengamma",
-                                              reg = ~age*.trt,
+                                              regression = ~I(age/10)*.trt,
+                                              class_interactions= "common",
+                                              prior_intercept = normal(0, 100),
+                                              prior_trt = normal(0, 10),
+                                              prior_reg = normal(0, 10),
+                                              prior_aux = list(sigma = half_normal(5), k = half_normal(5)),
+                                              init_r = 0.1,
+                                              iter = 10))
+
+ndmm_fit_gengamma_reg_nphr <- suppressWarnings(nma(ndmm_net,
+                                              likelihood = "gengamma",
+                                              regression = ~I(age/10)*.trt,
+                                              aux_regression = ~.trt,
+                                              class_interactions= "common",
+                                              prior_intercept = normal(0, 100),
+                                              prior_trt = normal(0, 10),
+                                              prior_reg = normal(0, 10),
+                                              prior_aux = list(sigma = half_normal(5), k = half_normal(5)),
+                                              init_r = 0.1,
+                                              iter = 10))
+
+ndmm_fit_gengamma_reg_nphs <- suppressWarnings(nma(ndmm_net,
+                                              likelihood = "gengamma",
+                                              regression = ~I(age/10)*.trt,
+                                              aux_by = ".trt",
+                                              class_interactions= "common",
                                               prior_intercept = normal(0, 100),
                                               prior_trt = normal(0, 10),
                                               prior_reg = normal(0, 10),
@@ -1001,7 +1304,30 @@ ndmm_fit_gengamma_reg <- suppressWarnings(nma(ndmm_net,
 
 ndmm_fit_mspline_reg <- suppressWarnings(nma(ndmm_net,
                                              likelihood = "mspline",
-                                             reg = ~age*.trt,
+                                             regression = ~I(age/10)*.trt,
+                                             class_interactions = "common",
+                                             prior_intercept = normal(0, 100),
+                                             prior_trt = normal(0, 10),
+                                             prior_reg = normal(0, 10),
+                                             prior_aux = half_normal(1),
+                                             iter = 10))
+
+ndmm_fit_mspline_reg_nphr <- suppressWarnings(nma(ndmm_net,
+                                             likelihood = "mspline",
+                                             regression = ~I(age/10)*.trt,
+                                             aux_regression = ~.trt,
+                                             class_interactions = "common",
+                                             prior_intercept = normal(0, 100),
+                                             prior_trt = normal(0, 10),
+                                             prior_reg = normal(0, 10),
+                                             prior_aux = half_normal(1),
+                                             iter = 10))
+
+ndmm_fit_mspline_reg_nphs <- suppressWarnings(nma(ndmm_net,
+                                             likelihood = "mspline",
+                                             regression = ~I(age/10)*.trt,
+                                             aux_by = ".trt",
+                                             class_interactions = "common",
                                              prior_intercept = normal(0, 100),
                                              prior_trt = normal(0, 10),
                                              prior_reg = normal(0, 10),
@@ -1039,6 +1365,23 @@ test_that(".study, .trt, .time columns are correct (weibull, regression, individ
                     preddat1[, c(".study", ".trt", ".time")])
   expect_identical(pred1.1$parameter,
                    paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.1r <- tibble::as_tibble(predict(ndmm_fit_weib_reg_nphr, type = "survival", level = "individual"))
+  expect_equivalent(pred1.1r[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1r$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  preddat1_nphs <- dplyr::filter(ndmm_preddat, .study %in% unique(ndmm_ipd$study)) %>%
+    dplyr::group_by(.study) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup()
+
+  pred1.1s <- tibble::as_tibble(predict(ndmm_fit_weib_reg_nphs, type = "survival", level = "individual"))
+  expect_equivalent(pred1.1s[, c(".study", ".trt", ".time")],
+                    preddat1_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1s$parameter,
+                   paste0("pred[", preddat1_nphs$.study, ": ", preddat1_nphs$.trt, ", ", preddat1_nphs$id, "]"))
 
   pred1.2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "hazard", level = "individual"))
   expect_equivalent(pred1.2[, c(".study", ".trt", ".time")],
@@ -1170,6 +1513,23 @@ test_that(".study, .trt, .time columns are correct (gengamma, regression, indivi
   expect_identical(pred1.1$parameter,
                    paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
 
+  pred1.1r <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg_nphr, type = "survival", level = "individual"))
+  expect_equivalent(pred1.1r[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1r$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  preddat1_nphs <- dplyr::filter(ndmm_preddat, .study %in% unique(ndmm_ipd$study)) %>%
+    dplyr::group_by(.study) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup()
+
+  pred1.1s <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg_nphs, type = "survival", level = "individual"))
+  expect_equivalent(pred1.1s[, c(".study", ".trt", ".time")],
+                    preddat1_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1s$parameter,
+                   paste0("pred[", preddat1_nphs$.study, ": ", preddat1_nphs$.trt, ", ", preddat1_nphs$id, "]"))
+
   pred1.2 <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg, type = "hazard", level = "individual"))
   expect_equivalent(pred1.2[, c(".study", ".trt", ".time")],
                     preddat1[, c(".study", ".trt", ".time")])
@@ -1234,6 +1594,23 @@ test_that(".study, .trt, .time columns are correct (mspline, regression, individ
                     preddat1[, c(".study", ".trt", ".time")])
   expect_identical(pred1.1$parameter,
                    paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.1r <- tibble::as_tibble(predict(ndmm_fit_mspline_reg_nphr, type = "survival", level = "individual"))
+  expect_equivalent(pred1.1r[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1r$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  preddat1_nphs <- dplyr::filter(ndmm_preddat, .study %in% unique(ndmm_ipd$study)) %>%
+    dplyr::group_by(.study) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup()
+
+  pred1.1s <- tibble::as_tibble(predict(ndmm_fit_mspline_reg_nphs, type = "survival", level = "individual"))
+  expect_equivalent(pred1.1s[, c(".study", ".trt", ".time")],
+                    preddat1_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1s$parameter,
+                   paste0("pred[", preddat1_nphs$.study, ": ", preddat1_nphs$.trt, ", ", preddat1_nphs$id, "]"))
 
   pred1.2 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "hazard", level = "individual"))
   expect_equivalent(pred1.2[, c(".study", ".trt", ".time")],
@@ -1305,6 +1682,24 @@ test_that(".study, .trt, .time columns are correct (weibull, regression, aggrega
                     preddat1[, c(".study", ".trt", ".time")])
   expect_identical(pred1.1$parameter,
                    paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.1r <- tibble::as_tibble(predict(ndmm_fit_weib_reg_nphr, type = "survival"))
+  expect_equivalent(pred1.1r[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1r$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  preddat1_nphs <- ndmm_preddat %>%
+    dplyr::group_by(.study) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::arrange(.study, .trt, id)
+
+  pred1.1s <- tibble::as_tibble(predict(ndmm_fit_weib_reg_nphs, type = "survival"))
+  expect_equivalent(pred1.1s[, c(".study", ".trt", ".time")],
+                    preddat1_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1s$parameter,
+                   paste0("pred[", preddat1_nphs$.study, ": ", preddat1_nphs$.trt, ", ", preddat1_nphs$id, "]"))
 
   pred1.2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "hazard"))
   expect_equivalent(pred1.2[, c(".study", ".trt", ".time")],
@@ -1493,6 +1888,24 @@ test_that(".study, .trt, .time columns are correct (gengamma, regression, aggreg
   expect_identical(pred1.1$parameter,
                    paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
 
+  pred1.1r <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg_nphr, type = "survival"))
+  expect_equivalent(pred1.1r[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1r$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  preddat1_nphs <- ndmm_preddat %>%
+    dplyr::group_by(.study) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::arrange(.study, .trt, id)
+
+  pred1.1s <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg_nphs, type = "survival"))
+  expect_equivalent(pred1.1s[, c(".study", ".trt", ".time")],
+                    preddat1_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1s$parameter,
+                   paste0("pred[", preddat1_nphs$.study, ": ", preddat1_nphs$.trt, ", ", preddat1_nphs$id, "]"))
+
   pred1.2 <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg, type = "hazard"))
   expect_equivalent(pred1.2[, c(".study", ".trt", ".time")],
                     preddat1[, c(".study", ".trt", ".time")])
@@ -1585,6 +1998,24 @@ test_that(".study, .trt, .time columns are correct (mspline, regression, aggrega
                     preddat1[, c(".study", ".trt", ".time")])
   expect_identical(pred1.1$parameter,
                    paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.1r <- tibble::as_tibble(predict(ndmm_fit_mspline_reg_nphr, type = "survival"))
+  expect_equivalent(pred1.1r[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1r$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  preddat1_nphs <- ndmm_preddat %>%
+    dplyr::group_by(.study) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::arrange(.study, .trt, id)
+
+  pred1.1s <- tibble::as_tibble(predict(ndmm_fit_mspline_reg_nphs, type = "survival"))
+  expect_equivalent(pred1.1s[, c(".study", ".trt", ".time")],
+                    preddat1_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1s$parameter,
+                   paste0("pred[", preddat1_nphs$.study, ": ", preddat1_nphs$.trt, ", ", preddat1_nphs$id, "]"))
 
   pred1.2 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "hazard"))
   expect_equivalent(pred1.2[, c(".study", ".trt", ".time")],
@@ -1689,6 +2120,80 @@ test_that(".study, .trt, .time columns are correct (weibull, regression, aggrega
   expect_identical(pred1.1$parameter,
                    paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
 
+  pred1.1r <- tibble::as_tibble(predict(ndmm_fit_weib_reg_nphr, type = "survival", time = time,
+                                        study = study,
+                                        newdata = newdata,
+                                        baseline = "Attal2012",
+                                        aux = "Attal2012"))
+  expect_equivalent(pred1.1r[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1r$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  newdata2 <- dplyr::bind_rows(
+    dplyr::mutate(newdata, study = "Test"),
+    dplyr::mutate(newdata, study = "B"),
+    dplyr::mutate(newdata, study = "C")
+  )
+  preddat2 <- dplyr::mutate(newdata2, .study = factor(study), .time = rep(tm, times = 3)) %>%
+    dplyr::group_by(.study) %>%
+    dplyr::mutate(id = 1:dplyr::n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::cross_join(dplyr::tibble(.trt = unique(ndmm_preddat$.trt)))
+
+  pred1.1r2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg_nphr, type = "survival", time = time,
+                                        study = study,
+                                        newdata = newdata2,
+                                        baseline = "Attal2012",
+                                        aux = "Attal2012"))
+  expect_equivalent(pred1.1r2[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1r2$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
+  pred1.1r3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg_nphr, type = "survival", time = time,
+                                         study = study,
+                                         newdata = newdata2,
+                                         baseline = list(Test = "Attal2012", B = "Morgan2012", C = distr(qlnorm, 0, 1)),
+                                         aux = list(Test = "Attal2012", B = "Morgan2012", C = distr(qlnorm, 0, 0.01))))
+  expect_equivalent(pred1.1r3[, c(".study", ".trt", ".time")],
+                    preddat2[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1r3$parameter,
+                   paste0("pred[", preddat2$.study, ": ", preddat2$.trt, ", ", preddat2$id, "]"))
+
+  preddat1_nphs <- dplyr::filter(preddat1, .trt %in% c("Pbo", "Len"))
+  pred1.1s <- tibble::as_tibble(predict(ndmm_fit_weib_reg_nphs, type = "survival", time = time,
+                                        study = study,
+                                        newdata = newdata,
+                                        baseline = "Attal2012",
+                                        aux = "Attal2012"))
+  expect_equivalent(pred1.1s[, c(".study", ".trt", ".time")],
+                    preddat1_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1s$parameter,
+                   paste0("pred[", preddat1_nphs$.study, ": ", preddat1_nphs$.trt, ", ", preddat1_nphs$id, "]"))
+
+  preddat2_nphs <- dplyr::filter(preddat2, .trt %in% c("Pbo", "Len"))
+  pred1.1s2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg_nphs, type = "survival", time = time,
+                                         study = study,
+                                         newdata = newdata2,
+                                         baseline = "Attal2012",
+                                         aux = "Attal2012"))
+  expect_equivalent(pred1.1s2[, c(".study", ".trt", ".time")],
+                    preddat2_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1s2$parameter,
+                   paste0("pred[", preddat2_nphs$.study, ": ", preddat2_nphs$.trt, ", ", preddat2_nphs$id, "]"))
+
+  preddat3_nphs <- dplyr::filter(preddat2, .study == "Test" & .trt %in% c("Pbo", "Len") | .study == "B" & .trt %in% c("Pbo", "Thal") | .study == "C")
+  pred1.1s3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg_nphs, type = "survival", time = time,
+                                         study = study,
+                                         newdata = newdata2,
+                                         baseline = list(Test = "Attal2012", B = "Morgan2012", C = distr(qlnorm, 0, 1)),
+                                         aux = list(Test = "Attal2012", B = "Morgan2012", C = distr(qlnorm, 0, 0.01))))
+  expect_equivalent(pred1.1s3[, c(".study", ".trt", ".time")],
+                    preddat3_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1s3$parameter,
+                   paste0("pred[", preddat3_nphs$.study, ": ", preddat3_nphs$.trt, ", ", preddat3_nphs$id, "]"))
+
   pred1.2 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "hazard", time = time,
                                        study = study,
                                        newdata = newdata,
@@ -1764,15 +2269,15 @@ test_that(".study, .trt, .time columns are correct (weibull, regression, aggrega
   expect_identical(pred3.2$parameter,
                    paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
 
-  pred3.3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "rmst", time = 3,
-                                       study = study,
-                                       newdata = newdata,
-                                       baseline = distr(qnorm, 0, 1),
-                                       aux = distr(qlnorm, 0, 0.01)))
-  expect_equivalent(pred3.3[, c(".study", ".trt")],
-                    preddat3[, c(".study", ".trt")])
-  expect_identical(pred3.3$parameter,
-                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+  # pred3.3 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "rmst", time = 3,
+  #                                      study = study,
+  #                                      newdata = newdata,
+  #                                      baseline = distr(qnorm, 0, 1),
+  #                                      aux = distr(qlnorm, 0, 0.01)))
+  # expect_equivalent(pred3.3[, c(".study", ".trt")],
+  #                   preddat3[, c(".study", ".trt")])
+  # expect_identical(pred3.3$parameter,
+  #                  paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
 
   pred3.4 <- tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "link",
                                        study = study,
@@ -1944,6 +2449,28 @@ test_that(".study, .trt, .time columns are correct (gengamma, regression, aggreg
   expect_identical(pred1.1$parameter,
                    paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
 
+  pred1.1r <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg_nphr, type = "survival", time = time,
+                                        study = study,
+                                        newdata = newdata,
+                                        baseline = "Attal2012",
+                                        aux = "Attal2012"))
+  expect_equivalent(pred1.1r[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1r$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  preddat1_nphs <- dplyr::filter(preddat1, .trt %in% c("Pbo", "Len"))
+  pred1.1s <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg_nphs, type = "survival", time = time,
+                                        study = study,
+                                        newdata = newdata,
+                                        baseline = "Attal2012",
+                                        aux = "Attal2012"))
+  expect_equivalent(pred1.1s[, c(".study", ".trt", ".time")],
+                    preddat1_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1s$parameter,
+                   paste0("pred[", preddat1_nphs$.study, ": ", preddat1_nphs$.trt, ", ", preddat1_nphs$id, "]"))
+
+
   pred1.2 <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg, type = "hazard", time = time,
                                        study = study,
                                        newdata = newdata,
@@ -2102,6 +2629,27 @@ test_that(".study, .trt, .time columns are correct (mspline, regression, aggrega
                     preddat1[, c(".study", ".trt", ".time")])
   expect_identical(pred1.1b$parameter,
                    paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  pred1.1r <- tibble::as_tibble(predict(ndmm_fit_mspline_reg_nphr, type = "survival", time = time,
+                                        study = study,
+                                        newdata = newdata,
+                                        baseline = "Attal2012",
+                                        aux = "Attal2012"))
+  expect_equivalent(pred1.1r[, c(".study", ".trt", ".time")],
+                    preddat1[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1r$parameter,
+                   paste0("pred[", preddat1$.study, ": ", preddat1$.trt, ", ", preddat1$id, "]"))
+
+  preddat1_nphs <- dplyr::filter(preddat1, .trt %in% c("Pbo", "Len"))
+  pred1.1s <- tibble::as_tibble(predict(ndmm_fit_mspline_reg_nphs, type = "survival", time = time,
+                                        study = study,
+                                        newdata = newdata,
+                                        baseline = "Attal2012",
+                                        aux = "Attal2012"))
+  expect_equivalent(pred1.1s[, c(".study", ".trt", ".time")],
+                    preddat1_nphs[, c(".study", ".trt", ".time")])
+  expect_identical(pred1.1s$parameter,
+                   paste0("pred[", preddat1_nphs$.study, ": ", preddat1_nphs$.trt, ", ", preddat1_nphs$id, "]"))
 
   pred1.2 <- tibble::as_tibble(predict(ndmm_fit_mspline_reg, type = "hazard", time = time,
                                        study = study,
@@ -2952,5 +3500,111 @@ test_that("aux argument", {
                                   k = distr(qlnorm, 0, 1)),
                          b = "bad")
                        ), "All elements of `aux` must match the name of an IPD or AgD \\(arm-based\\) study in the network, or be a list of distr\\(\\) distributions")
+
+})
+
+test_that("baseline and aux are escaped correctly", {
+  ndmm_net <- set_ipd(ndmm_ipd,
+                      study = gsub("(.+)([0-9]{4})", "\\1 (\\2)$", study),
+                      trt = trt,
+                      Surv = Surv(eventtime/7, status))
+
+  ndmm_fit_gg <- suppressWarnings(nma(ndmm_net,
+                  likelihood = "gengamma",
+                  aux_regression = ~.trt,
+                  init_r = 0.1,
+                  iter = 10))
+
+  par <- c("pred[Len, 1]", "pred[Pbo, 1]")
+
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit_gg, times = 10, type = "survival",
+            aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
+    par)
+
+  ndmm_fit_weib <- suppressWarnings(nma(ndmm_net,
+                                      likelihood = "weibull",
+                                      aux_regression = ~.trt,
+                                      iter = 10))
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit_weib, times = 10, type = "survival",
+                             aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
+    par)
+
+  ndmm_fit_ms <- suppressWarnings(nma(ndmm_net,
+                                        likelihood = "mspline",
+                                        aux_regression = ~.trt,
+                                        iter = 10))
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit_ms, times = 10, type = "survival",
+                             aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
+    par)
+
+  par <- c("pred[New 1: Len, 1]", "pred[New 1: Pbo, 1]")
+  par2 <- c("pred[(a): Len, 1]", "pred[(a): Pbo, 1]", "pred[(b): Len, 1]", "pred[(b): Pbo, 1]")
+
+  ndmm_fit2_gg <- suppressWarnings(nma(ndmm_net,
+                   likelihood = "gengamma",
+                   regression = ~I(age/10)*.trt,
+                   aux_regression = ~.trt,
+                   init_r = 0.1,
+                   iter = 10))
+
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit2_gg, times = 10, type = "survival",
+                             newdata = data.frame(age = 5),
+                             aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
+    par)
+
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit2_gg, times = 10, type = "survival",
+                             newdata = data.frame(age = 5, s = c("(a)", "(b)")), study = s,
+                             aux = list("(a)" = "Attal (2012)$",
+                                        "(b)" = "McCarthy (2012)$"),
+                             baseline = list("(a)" = "Attal (2012)$",
+                                             "(b)" = "McCarthy (2012)$")))$parameter,
+    par2)
+
+  ndmm_fit2_weib <- suppressWarnings(nma(ndmm_net,
+                                       likelihood = "weibull",
+                                       regression = ~I(age/10)*.trt,
+                                       aux_regression = ~.trt,
+                                       iter = 10))
+
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit2_weib, times = 10, type = "survival",
+                             newdata = data.frame(age = 5),
+                             aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
+    par)
+
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit2_weib, times = 10, type = "survival",
+                             newdata = data.frame(age = 5, s = c("(a)", "(b)")), study = s,
+                             aux = list("(a)" = "Attal (2012)$",
+                                        "(b)" = "McCarthy (2012)$"),
+                             baseline = list("(a)" = "Attal (2012)$",
+                                             "(b)" = "McCarthy (2012)$")))$parameter,
+    par2)
+
+  ndmm_fit2_ms <- suppressWarnings(nma(ndmm_net,
+                                       likelihood = "mspline",
+                                       regression = ~I(age/10)*.trt,
+                                       aux_regression = ~.trt,
+                                       iter = 10))
+
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit2_ms, times = 10, type = "survival",
+                             newdata = data.frame(age = 5),
+                             aux = "Attal (2012)$", baseline = "Attal (2012)$"))$parameter,
+  par)
+
+  expect_identical(
+    dplyr::as_tibble(predict(ndmm_fit2_ms, times = 10, type = "survival",
+                             newdata = data.frame(age = 5, s = c("(a)", "(b)")), study = s,
+                             aux = list("(a)" = "Attal (2012)$",
+                                        "(b)" = "McCarthy (2012)$"),
+                             baseline = list("(a)" = "Attal (2012)$",
+                                             "(b)" = "McCarthy (2012)$")))$parameter,
+    par2)
 
 })

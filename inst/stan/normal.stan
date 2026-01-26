@@ -43,7 +43,7 @@ transformed parameters {
     if (class_effects) {
       for (i in 1:ni_agd_arm) {
         if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
-          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_class[agd_arm_trt[i] - 1]];
+          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_fclass[agd_arm_trt[i] - 1]];
         }
       }
     }
@@ -89,39 +89,39 @@ transformed parameters {
       X_agd_arm * beta_tilde;
 
       // Add class effects contribution to the linear predictor
-      if (class_effects) {
-        for (i in 1:ni_agd_arm) {
-          if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
-            eta_agd_arm_noRE[i] += f_class[which_class[agd_arm_trt[i] - 1]];
+        if (class_effects) {
+          for (i in 1:ni_agd_arm) {
+            if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+              eta_agd_arm_noRE[i] += f_class[which_fclass[agd_arm_trt[i] - 1]];
+            }
           }
         }
-      }
 
-      if (link == 1) { // identity link
-      for (i in 1:ni_agd_arm) {
-        if (which_RE[narm_ipd + i])
-        theta_agd_arm_bar[i] = eta_agd_arm_noRE[i] + f_delta[which_RE[narm_ipd + i]];
-        else
-        theta_agd_arm_bar[i] = eta_agd_arm_noRE[i];
-      }
-      } else if (link == 2) { // log link
-      for (i in 1:ni_agd_arm) {
-        if (which_RE[narm_ipd + i])
-        theta_agd_arm_bar[i] = exp(eta_agd_arm_noRE[i] + f_delta[which_RE[narm_ipd + i]]);
-        else
-        theta_agd_arm_bar[i] = exp(eta_agd_arm_noRE[i]);
-      }
-      }
-    } else {
-      vector[ni_agd_arm] eta_agd_arm_noRE = has_offset ?
-      X_agd_arm * beta_tilde + offset_agd_arm :
-      X_agd_arm * beta_tilde;
+        if (link == 1) { // identity link
+          for (i in 1:ni_agd_arm) {
+            if (which_RE[narm_ipd + i])
+              theta_agd_arm_bar[i] = eta_agd_arm_noRE[i] + f_delta[which_RE[narm_ipd + i]];
+            else
+              theta_agd_arm_bar[i] = eta_agd_arm_noRE[i];
+          }
+        } else if (link == 2) { // log link
+          for (i in 1:ni_agd_arm) {
+            if (which_RE[narm_ipd + i])
+              theta_agd_arm_bar[i] = exp(eta_agd_arm_noRE[i] + f_delta[which_RE[narm_ipd + i]]);
+            else
+              theta_agd_arm_bar[i] = exp(eta_agd_arm_noRE[i]);
+          }
+        }
+      } else {
+  vector[ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+    X_agd_arm * beta_tilde + offset_agd_arm :
+    X_agd_arm * beta_tilde;
 
-      // Add class effects contribution to the linear predictor
-      if (class_effects) {
-        for (i in 1:ni_agd_arm) {
-          if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
-            eta_agd_arm_noRE[i] += f_class[which_class[agd_arm_trt[i] - 1]];
+  // Add class effects contribution to the linear predictor
+  if (class_effects) {
+    for (i in 1:ni_agd_arm) {
+      if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+        eta_agd_arm_noRE[i] += f_class[which_fclass[agd_arm_trt[i] - 1]];
           }
         }
       }
@@ -151,7 +151,7 @@ transformed parameters {
         if (link == 1){ // identity link
           allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] + block(agd_regression_OVB_LM[i], 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_ncoef_omt[i] ) * allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]];
         }else if (link == 2){ // log link (GLM)
-          allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = log(rep_vector(mean(exp(       X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)),agd_regression_ncoef_inc[i]) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] )  - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ;
+          allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = log(mean(exp(       X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] )  - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ;
         }
       }
       // Update eta
