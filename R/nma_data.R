@@ -979,9 +979,8 @@ set_agd_surv <- function(data,
 #'   which all studies have estimated, and must then match the regression model
 #'   specified when fitting the model with `nma()`. Specify terms involving
 #'   treatment with the `.trt` special.
-#' @param covariates data frame of covariate summary statistics
-#'   for each study or study arm, with corresponding `study` and `trt` columns
-#'   to match to those in `data`
+#' @param covariates data frame of covariate summary statistics for each study,
+#'   with corresponding `study` column matching that in `data`
 #' @param sample_size **NOT USED YET** column of `covariates` giving the sample
 #'   size in each arm (optional).
 #'
@@ -1246,16 +1245,29 @@ set_agd_regression <- function(data,
       dplyr::mutate(.study = factor(.data$.study, levels = levels(d$.study))),
     by = ".study")
 
-  # Check covariance/correlation matrices
-  if ( !missing(covariates)  && !inherits(covariates, "data.frame") )
-    abort("Argument `covariates` should be a data frame")
-  # if(!all(levels(d$.study) %in% covariates$study)) abort("`covariates` should cover all studies")
-  if( !missing(covariates)  && (!study %in% colnames(covariates)) )
-    abort("`covariates` should contain study {study} column.")
-  if( !missing(covariates) )
-    d <- dplyr::left_join(d,covariates,by = study)
-  d$.qmc_known <- FALSE
-  d$.qmc_known[d$study %in% covariates$study] <- TRUE
+  # Join covariate details
+  if (!is.null(covariates)) {
+    if (!inherits(covariates, "data.frame") )
+      abort("`covariates` should be a data frame")
+
+    covariates <- dplyr::ungroup(covariates)
+
+    .cov_study <- pull_non_null(covariates, enquo(study))
+    if (is.null(.cov_study)) abort("`study` cannot be NULL")
+    check_study(.cov_study)
+    .cov_study <- forcats::fct_drop(nfactor(.cov_study))
+
+    covs <- dplyr::mutate(covariates, .study = .cov_study)
+    covs <- drop_original(covs, data, enquo(study))
+    covs <- drop_original(covs, data, enquo(trt))
+
+    d <- dplyr::left_join(d, covs, ".study", relationship = "many-to-one")
+
+    # Re-drop factors, in case extra unneeded study rows included in covariate data
+    d$.study <- forcats::fct_drop(d$.study)
+
+    d$.qmc_known <- d$.study %in% .cov_study
+  }
 
   # Check for a list of matrices
   if ( !missing(cov) && !is.list(cov) )
