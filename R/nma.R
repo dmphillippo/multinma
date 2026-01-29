@@ -854,7 +854,7 @@ nma <- function(network,
 
     # Convert to a list by study to manipulate it easier using map()
     dat_agd_regression_split <- dat_agd_regression %>%
-      split(factor(.$.study,levels = unique(.$.study))) # keep the original order
+      split(forcats::fct_inorder(.$.study)) # keep the original order
 
     # Check regression models in agd_regression are compatible with NMA regression
     # Check all terms, such as main and interaction terms, rather than just check variables
@@ -932,13 +932,13 @@ nma <- function(network,
       map_lgl(~ .x %>% dplyr::filter(!is.na(.estimate)) %>%
                 dplyr::summarise(.cov_known =  all(.cov_known)) %>% dplyr::pull(.cov_known) )
 
-    if( sum(!agd_regression_cov_known) && likelihood %in%c('exponential', 'weibull', 'gompertz','mspline', 'pexp',     'exponential-aft', 'weibull-aft', 'lognormal', 'loglogistic', 'gamma', 'gengamma') ){
-      abort(glue::glue("Reconstructing the variance-covariance matrix of coefficients is not yet supported for survival likelihoods using QMC integration points and `se`. For each regression model, specify `se` and `cor` or `cov`."))
+    if ( sum(!agd_regression_cov_known) && likelihood %in% valid_lhood$survival ) {
+      abort("Reconstructing the variance-covariance matrix of coefficient estimates is not yet supported for survival likelihoods. For each regression model, specify `se` and `cor`, or `cov`.")
     } else if( any( miss_names <- !agd_regression_cov_known &  !agd_regression_qmc_known ) ){
-      abort(glue::glue("QMC integration points are not provided to reconstruct the covariance matrix of the coefficients",
+      abort(glue::glue("Integration points are not provided to reconstruct the covariance matrix of the coefficients",
                        " for stud{if (sum(miss_names)>1) 'ies' else 'y'} ",
                        glue::glue_collapse(glue::double_quote(agd_regression_name_study[miss_names]), sep = ", ", last = " and ", width = 30),
-                       ".\n For each study, provide `se` and QMC integration points (reconstruction), or `se` and `cor`, or `cov`."))
+                       ".\nFor each study, provide `se` and integration points with `add_integration()`, or provide `se` and `cor`, or `cov`."))
     }
     # Unpack given covariance matrices and others will be reconstructed
     cov_agd_regression <- vector("list", ns_agd_regression )
@@ -959,15 +959,15 @@ nma <- function(network,
     } else if(OVB_adj == 'auto' && any( miss_names <- agd_regression_reduced_study & !agd_regression_qmc_known )  ){
       # Apply OVB for reduced studies with QMC integration points
       agd_regression_reduced_study <- as.numeric( agd_regression_reduced_study & agd_regression_qmc_known )
-      message(glue::glue("`OVB_adj` is {OVB_adj} and QMC integration ponits are not provided",
+      message(glue::glue(Integration points are not provided",
                          " for stud{if (sum(miss_names)>1) 'ies' else 'y'} ",
                          glue::glue_collapse(glue::double_quote(agd_regression_name_study[miss_names]), sep = ", ", last = " and ", width = 30),
-                         ".\n The OVB adjustment does not apply to them."))
+                         ".\nOVB adjustment will not apply to {if (sum(miss_names)>1) 'these studies' else 'this study'}."))
 
     } else if(OVB_adj == 'all' &&  any( miss_names <- agd_regression_reduced_study & !agd_regression_qmc_known) ){
-      abort(glue::glue("`OVB_adj` is {OVB_adj}, while there is no QMC integration points",
+      abort(glue::glue('OVB_adj = "{OVB_adj}", but no integration points are provided',
                        " for stud{if (sum(miss_names)>1) 'ies' else 'y'} ",
-                       glue::glue_collapse(glue::double_quote(agd_regression_name_study[miss_names]), sep = ", ", last = " and ", width = 30)
+                       glue::glue_collapse(glue::double_quote(agd_regression_name_study[miss_names]), sep = ", ", last = " and ", width = 30), "\nUse add_integration(), or set OVB_adj = "auto" or "none".
       ))
     }
 
@@ -1128,6 +1128,9 @@ nma <- function(network,
     # Provide message regarding reconstructing contrivance matrices
     if( any(miss_names <- !agd_regression_cov_known) ){
       message(glue::glue("Varince-covarince matrix is recostructed using `se` and QMC integration points",
+                         " for stud{if (sum(miss_names)>1) 'ies' else 'y'} ",
+                         glue::glue_collapse(glue::double_quote(agd_regression_name_study[miss_names]), sep = ", ", last = " and ", width = 30)
+      inform(glue::glue("Variance-covariance matrix reconstructed using provided `se` and integration points",
                          " for stud{if (sum(miss_names)>1) 'ies' else 'y'} ",
                          glue::glue_collapse(glue::double_quote(agd_regression_name_study[miss_names]), sep = ", ", last = " and ", width = 30)
       ))

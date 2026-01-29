@@ -1210,11 +1210,11 @@ set_agd_regression <- function(data,
     abort("`regression` for each study must be a one-sided regression formula specifying the model for which estimates are given.")
 
   if (!rlang::is_named(regression))
-    abort("`regression` must be a named list of formulas for available study.")
+    abort("`regression` must be a named list of regression formulas for the included studies.")
 
   if (any(miss_names <- setdiff(levels(d$.study),names(regression))))
     abort(glue::glue("`regression` list names must match study names in `data`.\n",
-                     "Mismatched regression name{if (length(miss_names)>1) 's' } for stud{if (length(miss_names)>1) 'ies' else 'y'} ",
+                     "No match for name{if (length(miss_names)>1) 's' } for stud{if 
                      glue::glue_collapse(glue::double_quote(miss_names), sep = ", ", last = " and ", width = 30),
                      ".\n"))
 
@@ -1271,14 +1271,14 @@ set_agd_regression <- function(data,
 
   # Check for a list of matrices
   if ( !missing(cov) && !is.list(cov) )
-    abort(glue::glue("`cov` must be a named list for availabe covariance matrix."))
+    abort("`cov` must be a named list of covariance matrices.")
   if ( !missing(cor) && !is.list(cor) )
-    abort(glue::glue("`cor` must be a named list for availabe correlation matrix."))
+    abort("`cor` must be a named list of correlation matrices.")
 
   n_studies <- nlevels(d$.study)
 
   if ( !missing(cov) && ( !all(purrr::map_lgl(cov, is.matrix)) || !all(purrr::map_lgl(cov, is.numeric)) || (n_studies>1 && !rlang::is_named(cov)) ) )
-    abort(glue::glue("`cov` must be a named list for  availabe covariance matrix."))
+    abort("`cov` must be a named list of covariance matrices.")
   if (n_studies == 1 && length(cov) == 1 && !rlang::is_named(cov)) names(cov) <- levels(d$.study)
 
   if ( !missing(cov) && length(miss_names <- setdiff(names(cov), levels(d$.study))) )
@@ -1289,7 +1289,7 @@ set_agd_regression <- function(data,
       ".\n"))
 
   if ( !missing(cor) && ( !all(purrr::map_lgl(cor, is.matrix)) || !all(purrr::map_lgl(cor, is.numeric)) || (n_studies>1 && !rlang::is_named(cor)) ) )
-    abort(glue::glue("`cor` must be a named list for available correlation matrix."))
+    abort("`cor` must be a named list of correlation matrices.")
   if (n_studies == 1 && length(cor) == 1 && !rlang::is_named(cor)) names(cor) <- levels(d$.study)
   if ( !missing(cor) && length(miss_names <- setdiff(names(cor), levels(d$.study))) )
     abort(glue::glue("`cor` list names must match study names in `data`.\n",
@@ -1324,7 +1324,7 @@ set_agd_regression <- function(data,
 
     # Check available full var-cov or reconstruct
     if ( is.null(tmp_se)  && is.null(tmp_cov) ){
-      abort(glue::glue("Specify regression coefficient standard errors `se` (reconstructable for non-survival likelihoods), or standard errors `se` and correlation matrix `cor`, or covariance matrix `cov` for study {si}."))
+      abort(c(glue::glue("Specify regression coefficient standard errors `se` and correlation matrix `cor`, or covariance matrix `cov` for study {si}."), "If only standard errors `se` are provided for non-survival models, the covariances may be reconstructed using integration points."))
     }else if ( !is.null(tmp_se) && is.null(tmp_cor) && is.null(tmp_cov) ){ # reconstruct
       cmat_int_warn <- c(cmat_int_warn,si) # will be reconstructed in nma()
     }else{
@@ -1369,7 +1369,7 @@ set_agd_regression <- function(data,
   if (length(cmat_dim_err)) abort(glue::glue("Dimensions of {ctype} matrix `{substr(ctype, 1, 3)}` do not match the number of coefficients in `data` for stud{if (length(cmat_dim_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_dim_err), sep = ", ", width = 30, last = " and ")))
   if (length(cmat_cor_err)) abort(glue::glue("`cor` is not a proper correlation matrix for stud{if (length(cmat_cor_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_cor_err), sep = ", ", width = 30, last = " and ")))
   if (length(cmat_pd_err)) abort(glue::glue("Covariance matrix {if (ctype=='covariance') '`cov`' else 'constructed from `cor` and `se`'} is not symmetric positive definite for stud{if (length(cmat_pd_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_pd_err), sep = ", ", width = 30, last = " and ")))
-  if (length(cmat_int_warn)) message(glue::glue("Correlation matrix `cor` and covariance matrix `cov` are not specified for stud{if (length(cmat_dim_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_int_warn), sep = ", ", width = 30, last = " and "), '.\n Use `add_integration` to be reconstructable.'))
+  if (length(cmat_int_warn)) message(glue::glue("Neither correlation matrix `cor` or covariance matrix `cov` specified for stud{if (length(cmat_dim_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_int_warn), sep = ", ", width = 30, last = " and "), '.\nUse `add_integration()` to reconstruct these (for non-survival models only).'))
 
   # Store covariance matrix in compact lower triangular form
   d$.cov <- NA_real_
