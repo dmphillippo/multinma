@@ -950,16 +950,16 @@ nma <- function(network,
     if (OVB_adj == 'none' && any( miss_names <- agd_regression_reduced_study) ){
       # Ignore OVB for reduced models
       agd_regression_reduced_study <- rep(0,length(agd_regression_reduced_study))
-      message(glue::glue("`OVB_adj` is {OVB_adj}, and there is reduced",
-                         " stud{if (sum(miss_names)>1) 'ies' else 'y'} ",
+      inform(glue::glue('OVB_adj = "{OVB_adj}".',
+                         " AgD (regression) stud{if (sum(miss_names)>1) 'ies' else 'y'} ",
                          glue::glue_collapse(glue::double_quote(agd_regression_name_study[as.logical(miss_names)]), sep = ", ", last = " and ", width = 30),
-                         ".\n The OVB adjustment does not apply."
+                         " provide{if (sum(miss_names)>1) '' else 's'} results from {if (sum(miss_names)>1) 'reduced models' else 'a reduced model'}.\nNo OVB adjustment will be applied."
       ))
 
     } else if(OVB_adj == 'auto' && any( miss_names <- agd_regression_reduced_study & !agd_regression_qmc_known )  ){
       # Apply OVB for reduced studies with QMC integration points
       agd_regression_reduced_study <- as.numeric( agd_regression_reduced_study & agd_regression_qmc_known )
-      message(glue::glue(Integration points are not provided",
+      inform(glue::glue("Integration points are not provided",
                          " for stud{if (sum(miss_names)>1) 'ies' else 'y'} ",
                          glue::glue_collapse(glue::double_quote(agd_regression_name_study[miss_names]), sep = ", ", last = " and ", width = 30),
                          ".\nOVB adjustment will not apply to {if (sum(miss_names)>1) 'these studies' else 'this study'}."))
