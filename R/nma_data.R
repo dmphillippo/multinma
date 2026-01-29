@@ -1214,7 +1214,7 @@ set_agd_regression <- function(data,
 
   if (any(miss_names <- setdiff(levels(d$.study),names(regression))))
     abort(glue::glue("`regression` list names must match study names in `data`.\n",
-                     "No match for name{if (length(miss_names)>1) 's' } for stud{if 
+                     "No match for name{if (length(miss_names)>1) 's' } for stud{if (length(miss_names)>1) 's' }",
                      glue::glue_collapse(glue::double_quote(miss_names), sep = ", ", last = " and ", width = 30),
                      ".\n"))
 
