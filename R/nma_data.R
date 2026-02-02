@@ -1847,3 +1847,72 @@ nfactor <- function(x, ..., numeric = TRUE, resort = FALSE) {
     return(factor(x, levels = stringr::str_sort(unique(x), numeric = numeric), ...))
   }
 }
+
+#' Calculate baseline risk
+#'
+#' @param network An `nma_data` object.
+#' @param link The name of the link function to use.
+#'
+#' @return The baseline risk as a single numeric value.
+#' @noRd
+calculate_baseline_risk <- function(network, link) {
+  if (!inherits(network, "nma_data")) abort("Not nma_data object.")
+
+  likelihood <- check_likelihood(NULL, network$outcome)
+  ref_trt <- levels(network$treatments)[1L]
+
+  if (likelihood %in% unlist(valid_lhood[c("binary", "count")])) {
+
+    ref_dat <- dplyr::bind_rows(
+      if (has_ipd(network)) dplyr::group_by(network$ipd, .data$.study, .data$.trt) %>%
+        dplyr::summarise(.r = sum(.data$.r), .n = dplyr::n()),
+      if (has_agd_arm(network)) dplyr::select(network$agd_arm, ".study", ".trt", ".r", ".n")
+    ) %>%
+      dplyr::filter(.data$.trt == ref_trt) %>%
+      dplyr::mutate(.n = ifelse(.data$.r == 0, .data$.n + 0.5, .data$.n),
+                    .r = ifelse(.data$.r == 0, 0.5, .data$.r))
+
+    bl <- stats::coef(suppressWarnings(stats::glm(cbind(.r, .n - .r) ~ .study -1, data = ref_dat, family = stats::binomial(link = link))))
+    out <- mean(bl)
+
+  } else if (likelihood %in% valid_lhood$ordered) {
+
+    # Take lowest outcome and treat as binary
+
+    ref_dat <- dplyr::bind_rows(
+      if (has_ipd(network)) dplyr::group_by(network$ipd, ".study", ".trt") %>%
+        dplyr::summarise(.r = rowSums(.data$.r[, -1], na.rm = TRUE), .n = dplyr::n()),
+      if (has_agd_arm(network)) dplyr::select(network$agd_arm, ".study", ".trt", ".r") %>%
+        dplyr::mutate(.n = rowSums(.data$.r, na.rm = TRUE), .r = rowSums(.data$.r[, -1], na.rm = TRUE))
+    ) %>%
+      dplyr::filter(.data$.trt == ref_trt) %>%
+      dplyr::mutate(.n = ifelse(.data$.r == 0, .data$.n + 0.5, .data$.n),
+                    .r = ifelse(.data$.r == 0, 0.5, .data$.r))
+
+    bl <- stats::coef(suppressWarnings(stats::glm(cbind(.r, .n - .r) ~ .study -1, data = ref_dat, family = stats::binomial(link = link))))
+    out <- mean(bl)
+
+  } else if (likelihood %in% valid_lhood$rate) {
+
+    ref_dat <- dplyr::bind_rows(
+      if (has_ipd(network)) dplyr::group_by(network$ipd, .data$.study, .data$.trt) %>%
+        dplyr::summarise(.r = sum(.data$.r), .E = sum(.data$.E)),
+      if (has_agd_arm(network)) dplyr::select(network$agd_arm, ".study", ".trt", ".r", ".E")
+    ) %>%
+      dplyr::filter(.data$.trt == ref_trt) %>%
+      dplyr::mutate(.r = ifelse(.data$.r == 0, 0.5, .data$.r))
+
+    bl <- stats::coef(suppressWarnings(stats::glm(.r ~ offset(log(.E)) + .study -1, data = ref_dat, family = stats::poisson(link = link))))
+    out <- mean(bl)
+
+  } else if (likelihood %in% valid_lhood$continuous) {
+
+    out <- mean(link_fun(c(network$ipd$.y, network$agd_arm$.y), link))
+
+  } else {
+    inform(glue::glue("NOTE: Automated centering of baseline risk not yet implemented for survival outcomes."))
+    out <- 0
+  }
+
+  return(out)
+}

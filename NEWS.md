@@ -1,5 +1,12 @@
 # multinma 0.8.1.9000
 
+* Feature: Regression on baseline risk is now supported, with a new `.mu` 
+special variable for `regression` formulas which can interact with treatment, 
+e.g. `regression = ~.mu:.trt`. Following TSD3, the regression is performed on
+the estimated intercept parameter not the observed baseline risk, to correctly
+capture uncertainty and account for correlations between baseline risk and 
+treatment effect. A new Certolizumab vignette demonstrates the new features.
+Thanks to @ndunnewind (PR #36).
 * Feature: New `subset` argument to `posterior_ranks()` and 
 `posterior_rank_probs()` allows ranks to be calculated for a smaller decision 
 set of treatments than the full analysis set.
