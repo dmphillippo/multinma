@@ -111,3 +111,6 @@ Other contributors:
 
 - Samuel J. Perren <samuel.perren@bristol.ac.uk>
   ([ORCID](https://orcid.org/0009-0005-1921-6957)) \[contributor\]
+
+- Niels Dunnewind ([ORCID](https://orcid.org/0009-0009-8675-9109))
+  \[contributor\]

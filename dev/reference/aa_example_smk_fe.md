@@ -78,7 +78,7 @@ smk_fit_FE
 #> d[Self-help]                  0.31     0.47  2682    1
 #> lp__                      -5856.85 -5853.32  1850    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Jan 16 14:23:04 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Feb  3 11:25:39 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).

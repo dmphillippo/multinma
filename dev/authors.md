@@ -8,6 +8,9 @@
 - **Samuel J. Perren**. Contributor.
   [](https://orcid.org/0009-0005-1921-6957)
 
+- **Niels Dunnewind**. Contributor.
+  [](https://orcid.org/0009-0009-8675-9109)
+
 ## Citation
 
 Source:
@@ -16,13 +19,13 @@ Source:
 Phillippo DM (2024). *multinma: Bayesian Network Meta-Analysis of
 Individual and Aggregate Data*.
 [doi:10.5281/zenodo.3904454](https://doi.org/10.5281/zenodo.3904454), R
-package version 0.8.1.9006, <https://dmphillippo.github.io/multinma/>.
+package version 0.8.1.9007, <https://dmphillippo.github.io/multinma/>.
 
     @Manual{,
       title = {multinma: Bayesian Network Meta-Analysis of Individual and Aggregate Data},
       author = {David M. Phillippo},
       year = {2024},
-      note = {R package version 0.8.1.9006},
+      note = {R package version 0.8.1.9007},
       url = {https://dmphillippo.github.io/multinma/},
       doi = {10.5281/zenodo.3904454},
     }

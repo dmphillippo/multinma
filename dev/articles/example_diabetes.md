@@ -153,7 +153,7 @@ db_fit_FE
 #> d[Placebo]        1482    1
 #> lp__              1824    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Jan 16 14:46:20 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Feb  3 11:44:25 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -244,7 +244,7 @@ db_fit_RE
 #> lp__              1032    1
 #> tau               1053    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Jan 16 14:46:34 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Feb  3 11:44:36 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).

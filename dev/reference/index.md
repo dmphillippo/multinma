@@ -337,6 +337,8 @@ Datasets used for examples and vignettes.
   : BCG vaccination
 - [`blocker`](https://dmphillippo.github.io/multinma/dev/reference/blocker.md)
   : Beta blockers to prevent mortality after MI
+- [`certolizumab`](https://dmphillippo.github.io/multinma/dev/reference/certolizumab.md)
+  : Certolizumab
 - [`diabetes`](https://dmphillippo.github.io/multinma/dev/reference/diabetes.md)
   : Incidence of diabetes in trials of antihypertensive drugs
 - [`dietary_fat`](https://dmphillippo.github.io/multinma/dev/reference/dietary_fat.md)

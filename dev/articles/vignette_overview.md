@@ -29,6 +29,7 @@ network meta-regression ([Phillippo et al. 2020](#ref-methods_paper),
 | [ML-NMR plaque psoriasis](https://dmphillippo.github.io/multinma/dev/articles/example_plaque_psoriasis.md)     | Binary (IPD) and counts (AgD), and ordered categorical | Bernoulli (IPD) and two-parameter Binomial (AgD), and ordered multinomial | probit        | Multilevel network meta-regression combining IPD and AgD                      |
 | [ML-NMR newly diagnosed multiple myeloma](https://dmphillippo.github.io/multinma/dev/articles/example_ndmm.md) | Time-to-event with censoring                           | M-spline baseline hazard                                                  | log           | Multilevel network meta-regression combining IPD and AgD                      |
 | [Social anxiety](https://dmphillippo.github.io/multinma/dev/articles/example_social_anxiety.md)                | Continuous                                             | Normal                                                                    | Identity      | Model selection with class effects models                                     |
+| [Certolizumab](https://dmphillippo.github.io/multinma/dev/articles/example_certolizumab.md)                    | Counts                                                 | Binomial                                                                  | logit         | Baseline risk meta-regression                                                 |
 
 ## References
 

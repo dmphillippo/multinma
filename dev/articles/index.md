@@ -14,6 +14,8 @@
 - [Example: Beta
   blockers](https://dmphillippo.github.io/multinma/dev/articles/example_blocker.md):
 - [Example:
+  Certolizumab](https://dmphillippo.github.io/multinma/dev/articles/example_certolizumab.md):
+- [Example:
   Diabetes](https://dmphillippo.github.io/multinma/dev/articles/example_diabetes.md):
 - [Example: Dietary
   fat](https://dmphillippo.github.io/multinma/dev/articles/example_dietary_fat.md):
