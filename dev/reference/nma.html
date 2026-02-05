@@ -535,7 +535,7 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  0.31     0.47  2451    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -5856.77 -5853.19  1596    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Tue Feb  3 11:28:46 2026.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Thu Feb  5 14:53:11 2026.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
@@ -568,7 +568,7 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -5763.50 -5756.32   987    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> tau                           0.96     1.29  1121    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Tue Feb  3 11:28:51 2026.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Thu Feb  5 14:53:15 2026.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
@@ -618,7 +618,7 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                            -5753.55  1081    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> tau                                                 1.50  1005    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Tue Feb  3 11:28:57 2026.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Thu Feb  5 14:53:22 2026.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
@@ -797,7 +797,7 @@ National Institute for Health and Care Excellence.
 <span class="r-in"><span>    weight <span class="op">=</span> <span class="va">weight</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    durnpso <span class="op">=</span> <span class="va">durnpso</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    <span class="co"># Treatment classes</span></span></span>
-<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
+<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span> <span class="op">~</span> <span class="st">"IL blocker"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op">==</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"TNFa blocker"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    <span class="co"># Check complete cases for covariates of interest</span></span></span>
@@ -816,7 +816,7 @@ National Institute for Health and Care Excellence.
 <span class="r-in"><span>    durnpso_mean <span class="op">=</span> <span class="va">durnpso_mean</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    durnpso_sd <span class="op">=</span> <span class="va">durnpso_sd</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    <span class="co"># Treatment classes</span></span></span>
-<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
+<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span> <span class="op">~</span> <span class="st">"IL blocker"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op">==</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"TNFa blocker"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
@@ -947,7 +947,7 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45     2.53     2.68  5394    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1576.14 -1574.02 -1570.51  1568    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Tue Feb  3 11:30:19 2026.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Thu Feb  5 14:54:51 2026.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
@@ -1022,7 +1022,7 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> shape[Morgan2012]       0.94  4953    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> shape[Palumbo2014]      1.16  4718    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Tue Feb  3 11:32:58 2026.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Thu Feb  5 14:57:14 2026.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>

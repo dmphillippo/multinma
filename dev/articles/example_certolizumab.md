@@ -57,7 +57,8 @@ certolizumab <-
   certolizumab %>%
   group_by(study) %>% 
   mutate(
-    probability = case_when(any(r == 0) ~ (r + 0.5) / (n + 0.5), TRUE ~ r / n),
+    cc = any(r == 0),
+    probability = if_else(cc, (r + 0.5) / (n + 0.5), r / n),
     odds = probability / (1 - probability),
     log_odds = log(odds)
   )
@@ -177,7 +178,7 @@ cert_fit_FE
 #> d[Tocilizumab]                   2.46  2863 1.00
 #> lp__                         -1703.43  1589 1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Feb  3 11:43:58 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Feb  5 15:07:47 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -236,7 +237,7 @@ cert_fit_RE
 #> lp__                         -1706.97  1087 1.00
 #> tau                              0.69   617 1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Feb  3 11:44:02 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Feb  5 15:07:52 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -814,7 +815,7 @@ nma(cert_net,
 #> d[Tocilizumab]                                2.28     2.48  3132 1.00
 #> lp__                                      -1706.87 -1703.98  1706 1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Feb  3 11:44:13 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Feb  5 15:08:01 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).

@@ -147,7 +147,8 @@ placebo.</p>
 <span>  <span class="va">certolizumab</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    probability <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">r</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">~</span> <span class="op">(</span><span class="va">r</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="va">n</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">)</span>, <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">r</span> <span class="op">/</span> <span class="va">n</span><span class="op">)</span>,</span>
+<span>    cc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">r</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span>,</span>
+<span>    probability <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">cc</span>, <span class="op">(</span><span class="va">r</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="va">n</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">)</span>, <span class="va">r</span> <span class="op">/</span> <span class="va">n</span><span class="op">)</span>,</span>
 <span>    odds <span class="op">=</span> <span class="va">probability</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">probability</span><span class="op">)</span>,</span>
 <span>    log_odds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">odds</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
@@ -257,7 +258,7 @@ method:</p>
 <span><span class="co">#&gt; d[Tocilizumab]                   2.46  2863 1.00</span></span>
 <span><span class="co">#&gt; lp__                         -1703.43  1589 1.00</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Feb  3 11:43:58 2026.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Feb  5 15:07:47 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -313,7 +314,7 @@ method:</p>
 <span><span class="co">#&gt; lp__                         -1706.97  1087 1.00</span></span>
 <span><span class="co">#&gt; tau                              0.69   617 1.00</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Feb  3 11:44:02 2026.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Feb  5 15:07:52 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -850,7 +851,7 @@ regular meta-regression. For example, we can add
 <span><span class="co">#&gt; d[Tocilizumab]                                2.28     2.48  3132 1.00</span></span>
 <span><span class="co">#&gt; lp__                                      -1706.87 -1703.98  1706 1.00</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Feb  3 11:44:13 2026.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Feb  5 15:08:01 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>

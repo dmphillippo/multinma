@@ -227,13 +227,13 @@ this assumption may be reasonable.</p>
 <p>To impose this assumption, we create a treatment class variable for
 active treatments vs. placebo.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ndmm_ipd</span><span class="op">$</span><span class="va">trtclass</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_match.html" class="external-link">case_match</a></span><span class="op">(</span><span class="va">ndmm_ipd</span><span class="op">$</span><span class="va">trtf</span>,</span>
-<span>                                <span class="st">"Pbo"</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span>
-<span>                                <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Len"</span>, <span class="st">"Thal"</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Active"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">ndmm_ipd</span><span class="op">$</span><span class="va">trtclass</span> <span class="op">&lt;-</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_collapse.html" class="external-link">fct_collapse</a></span><span class="op">(</span><span class="va">ndmm_ipd</span><span class="op">$</span><span class="va">trtf</span>,</span>
+<span>                                           Placebo <span class="op">=</span> <span class="st">"Pbo"</span>,</span>
+<span>                                           Active <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Len"</span>, <span class="st">"Thal"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">ndmm_agd</span><span class="op">$</span><span class="va">trtclass</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_match.html" class="external-link">case_match</a></span><span class="op">(</span><span class="va">ndmm_agd</span><span class="op">$</span><span class="va">trtf</span>,</span>
-<span>                                <span class="st">"Pbo"</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span>
-<span>                                <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Len"</span>, <span class="st">"Thal"</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Active"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">ndmm_agd</span><span class="op">$</span><span class="va">trtclass</span> <span class="op">&lt;-</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_collapse.html" class="external-link">fct_collapse</a></span><span class="op">(</span><span class="va">ndmm_agd</span><span class="op">$</span><span class="va">trtf</span>,</span>
+<span>                                           Placebo <span class="op">=</span> <span class="st">"Pbo"</span>,</span>
+<span>                                           Active <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Len"</span>, <span class="st">"Thal"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>

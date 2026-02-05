@@ -190,7 +190,7 @@ memory).</p>
 <span class="r-in"><span>    weight <span class="op">=</span> <span class="va">weight</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    durnpso <span class="op">=</span> <span class="va">durnpso</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    <span class="co"># Treatment classes</span></span></span>
-<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
+<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span> <span class="op">~</span> <span class="st">"IL blocker"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op">==</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"TNFa blocker"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    <span class="co"># Check complete cases for covariates of interest</span></span></span>
@@ -209,7 +209,7 @@ memory).</p>
 <span class="r-in"><span>    durnpso_mean <span class="op">=</span> <span class="va">durnpso_mean</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    durnpso_sd <span class="op">=</span> <span class="va">durnpso_sd</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    <span class="co"># Treatment classes</span></span></span>
-<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
+<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span> <span class="op">~</span> <span class="st">"IL blocker"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op">==</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"TNFa blocker"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
@@ -335,7 +335,7 @@ memory).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45     2.53     2.68  6729    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1575.90 -1573.79 -1570.48  1579    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Tue Feb  3 11:36:32 2026.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Thu Feb  5 14:59:33 2026.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
