@@ -20,8 +20,10 @@ compare_populations <- function(network,
                                 covariates = NULL,
                                 method = c("euclidean", "propensity")) {
 
+  valid_choices <- c("euclidean", "propensity")
   method <- tryCatch({
     if (missing(method)) stop()
+    if (length(method) > 1) stop()
     match.arg(method, choices = valid_choices)
   }, error = function(e) {
     rlang::abort("Argument `method` must be either 'euclidean' or 'propensity'.")
@@ -125,7 +127,7 @@ compare_populations <- function(network,
       }
     }
 
-    # Calculate Propensity Scores & Weights
+    # Calculate propensity scores & weights
     propensity_scores_list <- list()
     for (pair_name in names(regression_results)) {
       model <- regression_results[[pair_name]]
@@ -284,7 +286,7 @@ compare_populations <- function(network,
         add_covariate <- TRUE
 
         if (is_binary_dist) {
-          # --- BINARY LOGIC (Bernoulli/Binomial) ---
+          # BINARY LOGIC (Bernoulli/Binomial)
           prob_col <- as.character(args$prob)
 
           if (prob_col %in% colnames(agd_df)) {
@@ -302,7 +304,7 @@ compare_populations <- function(network,
           mean_col <- as.character(args$mean)
           sd_col <- as.character(args$sd)
 
-        # --- Handle Means ---
+        # Handle Means
         if (mean_col %in% colnames(agd_df)) {
           df[[paste0(cov, "_mean")]] <- agd_df[[mean_col]]
         } else if (cov %in% colnames(agd_df)) {
@@ -312,7 +314,7 @@ compare_populations <- function(network,
           add_covariate <- FALSE
         }
 
-        # --- Handle SDs ---
+        # Handle SDs
         if (add_covariate) {
           if (sd_col %in% colnames(agd_df)) {
             # Explicit SD column exists -> Use it
@@ -382,7 +384,7 @@ compare_populations <- function(network,
     agd_summary$source <- "AGD"
     all_summary <- dplyr::bind_rows(ipd_summary, agd_summary)
 
-    # 7. Identify Subnetworks
+    # Identify Subnetworks
     g <- igraph::as.igraph(network)
     components <- igraph::components(g)
     treatment_components <- data.frame(
@@ -465,7 +467,6 @@ compare_populations <- function(network,
 #' @name cross_validation
 #' @export
 cross_validation <- function(nma) {
-
   if (!requireNamespace("loo", quietly = TRUE)) {
     stop("The 'loo' package is required. Please install it with install.packages('loo').")
   }
@@ -473,72 +474,83 @@ cross_validation <- function(nma) {
   if (!inherits(nma, "stan_nma")) {
     stop("Input must be a 'stan_nma' object.")
   }
-
-  # --- Prepare Data ---
   ipd_data <- nma$network$ipd
-
-  # Get the design matrix (X)
+  if (!isTRUE(nrow(ipd_data) > 0)) {
+    stop("The network must contain IPD to compute individual-level LOO R2.")
+  }
+  # Get design matrix for covariates
   X <- model.matrix(nma$regression, data = ipd_data)
   if ("(Intercept)" %in% colnames(X)) {
     X <- X[, -which(colnames(X) == "(Intercept)"), drop = FALSE]
   }
-
-  # Get the Posterior Betas
-  beta_samples <- as.matrix(nma$stanfit, pars = "beta")
-  colnames(beta_samples) <- sub("^beta\\[(.*)\\]$", "\\1", colnames(beta_samples))
-
-  # Initialize Linear Predictor Matrix (Patients x Iterations)
-  n_patients <- nrow(X)
-  n_iters <- nrow(beta_samples)
-  eta_samples <- matrix(0, nrow = n_patients, ncol = n_iters)
-
-  # Determine Interaction Type (Default to 'independent' if NULL)
-  int_type <- if (is.null(nma$class_interactions)) "independent" else nma$class_interactions
-
-  # PATH A: Independent Interactions (Fast Matrix Math)
-  if (int_type == "independent") {
-    common_cols <- intersect(colnames(X), colnames(beta_samples))
-    if (length(common_cols) > 0) {
-      X_matched <- X[, common_cols, drop = FALSE]
-      beta_matched <- beta_samples[, common_cols, drop = FALSE]
-      eta_samples <- X_matched %*% t(beta_matched)
-    }
+  log_lik <- as.matrix(nma$stanfit, pars = "log_lik")
+  n_patients <- nrow(ipd_data)
+  n_iters <- nrow(log_lik)
+  if (ncol(log_lik) != n_patients) {
+    stop("The log_lik matrix does not align with the number of IPD rows.")
   }
-
-  # PATH B: Common/Class Interactions (Robust Loop)
-  if (int_type == "common") {
-    # Identify Class column
-    target_col_name <- if (".trtclass" %in% colnames(ipd_data)) ".trtclass" else ".trt"
-    patient_trts <- as.character(ipd_data[[target_col_name]])
-
-    matched_count <- 0
-
-    for (b_name in colnames(beta_samples)) {
-      b_vals <- beta_samples[, b_name]
-      contribution <- NULL
-
-      if (grepl(":", b_name)) {
-        # Interaction Logic
-        parts <- strsplit(b_name, ":")[[1]]
-        cov_name <- parts[1]
-        trt_part <- parts[2]
-
-        if (cov_name %in% colnames(X)) {
-          mask <- sapply(patient_trts, function(t) grepl(t, trt_part, fixed = TRUE))
-          if (sum(mask, na.rm = TRUE) > 0) {
-            contribution <- (X[, cov_name] * mask) %*% t(b_vals)
+  eta_samples <- matrix(0, nrow = n_patients, ncol = n_iters)
+  pars_oi <- nma$stanfit@sim$pars_oi
+  if ("beta" %in% pars_oi) {
+    beta_samples <- as.matrix(nma$stanfit, pars = "beta")
+    colnames(beta_samples) <- sub("^beta\\[(.*)\\]$", "\\1", colnames(beta_samples))
+    int_type <- if (is.null(nma$class_interactions)) "independent" else nma$class_interactions
+    if (int_type == "independent") {
+      common_cols <- intersect(colnames(X), colnames(beta_samples))
+      if (length(common_cols) > 0) {
+        X_matched <- X[, common_cols, drop = FALSE]
+        beta_matched <- beta_samples[, common_cols, drop = FALSE]
+        eta_samples <- eta_samples + (X_matched %*% t(beta_matched))
+      }
+    }
+    if (int_type == "common") {
+      target_col_name <- if (".trtclass" %in% colnames(ipd_data)) ".trtclass" else ".trt"
+      patient_trts <- as.character(ipd_data[[target_col_name]])
+      for (b_name in colnames(beta_samples)) {
+        b_vals <- beta_samples[, b_name]
+        contribution <- NULL
+        if (grepl(":", b_name)) {
+          parts <- strsplit(b_name, ":")[[1]]
+          cov_name <- parts[1]
+          trt_part <- parts[2]
+          if (cov_name %in% colnames(X)) {
+            mask <- sapply(patient_trts, function(t) grepl(t, trt_part, fixed = TRUE))
+            if (sum(mask, na.rm = TRUE) > 0) {
+              contribution <- (X[, cov_name] * mask) %*% t(b_vals)
+            }
+          }
+        } else {
+          if (b_name %in% colnames(X)) {
+            contribution <- X[, b_name] %*% t(b_vals)
           }
         }
-      } else {
-        # Main Effect Logic
-        if (b_name %in% colnames(X)) {
-          contribution <- X[, b_name] %*% t(b_vals)
+
+        if (!is.null(contribution)) {
+          eta_samples <- eta_samples + contribution
         }
       }
+    }
+  }
+  if ("mu" %in% pars_oi) {
+    mu_samples <- as.matrix(nma$stanfit, pars = "mu")
+    colnames(mu_samples) <- sub("^mu\\[(.*)\\]$", "\\1", colnames(mu_samples))
+    patient_studies <- as.character(ipd_data$.study)
 
-      if (!is.null(contribution)) {
-        eta_samples <- eta_samples + contribution
-        matched_count <- matched_count + 1
+    for (study_name in colnames(mu_samples)) {
+      idx <- which(patient_studies == study_name)
+      if (length(idx) > 0) {
+        eta_samples[idx, ] <- sweep(eta_samples[idx, , drop = FALSE], 2, mu_samples[, study_name], "+")
+      }
+    }
+  }
+  if ("d" %in% pars_oi) {
+    d_samples <- as.matrix(nma$stanfit, pars = "d")
+    colnames(d_samples) <- sub("^d\\[(.*)\\]$", "\\1", colnames(d_samples))
+    patient_treatments <- as.character(ipd_data$.trt)
+    for (trt_name in colnames(d_samples)) {
+      idx <- which(patient_treatments == trt_name)
+      if (length(idx) > 0) {
+        eta_samples[idx, ] <- sweep(eta_samples[idx, , drop = FALSE], 2, d_samples[, trt_name], "+")
       }
     }
   }
@@ -546,29 +558,29 @@ cross_validation <- function(nma) {
   outcome_type <- nma$network$outcome$ipd
 
   if (outcome_type %in% c("ordered", "binary")) {
-    var_res_scalar <- pi^2 / 3
+    link_fun <- nma$link
+    if (link_fun == "logit") {
+      var_res_scalar <- pi^2 / 3
+    } else if (link_fun == "probit") {
+      var_res_scalar <- 1.0
+    } else {
+      warning(paste("Link", link_fun, "not standard. Defaulting to logit variance."))
+      var_res_scalar <- pi^2 / 3
+    }
   } else if (outcome_type == "continuous") {
     sigma <- as.matrix(nma$stanfit, pars = "sigma")
     var_res_scalar <- mean(as.vector(sigma^2))
   } else {
     stop(paste("Outcome type", outcome_type, "not supported."))
   }
-
-  # --- 7. LOO-Adjusted R2 ---
-  log_lik <- as.matrix(nma$stanfit, pars = "log_lik")
   loo_obj <- suppressWarnings(loo::loo(log_lik, save_psis = TRUE))
   psis_weights <- weights(loo_obj$psis_object, normalize = TRUE, log = FALSE)
-
-  # Calculate Weighted Mean Risk (Eta) for each patient
   loo_eta <- numeric(n_patients)
   for (i in 1:n_patients) {
     loo_eta[i] <- sum(psis_weights[, i] * eta_samples[i, ])
   }
-
-  # Final Formula
   var_fit_loo <- var(loo_eta)
   r2_loo <- var_fit_loo / (var_fit_loo + var_res_scalar)
   r2_percent <- round(r2_loo * 100, 2)
-
-  return(list(r2_percent = r2_percent))
+  return(list(r2 = r2_loo, r2_percent = r2_percent, link = if (outcome_type %in% c("ordered", "binary")) nma$link else "identity"))
 }

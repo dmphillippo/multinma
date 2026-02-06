@@ -2,7 +2,7 @@
 % Please edit documentation in R/compare_populations.R
 \name{cross_validation}
 \alias{cross_validation}
-\title{Calculate Latent Bayesian R2 (LOO-Adjusted)}
+\title{Calculate Total Bayesian R2 (LOO-Adjusted)}
 \usage{
 cross_validation(nma)
 }
@@ -10,9 +10,10 @@ cross_validation(nma)
 \item{nma}{A \code{stan_nma} object.}
 }
 \value{
-A list containing the single LOO-adjusted point estimate.
+A list containing the R2 percentage and the link function used.
 }
 \description{
-Calculates the total Bayesian R2 on the latent scale, automatically handling
-complex interaction terms (e.g., "age:.trtclass") created by multinma.
+Calculates the true predictive power of the NMA model, including
+both Covariates (Beta) and Treatment Effects (d).
+Automatically handles Probit/Logit differences.
 }

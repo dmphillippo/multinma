@@ -3,9 +3,9 @@ library(dplyr)
 
 test_that("compare_populations() wants a nma_data object", {
   m <- "Expecting an `nma_data` object"
-  expect_error(compare_populations(network = 1), m)
-  expect_error(compare_populations(network = list()), m)
-  expect_error(compare_populations(network = NULL), m)
+  expect_error(compare_populations(network = 1, method = "propensity"), m)
+  expect_error(compare_populations(network = list(), method = "propensity"), m)
+  expect_error(compare_populations(network = NULL, method = "propensity"), m)
 })
 
 pso_ipd <- plaque_psoriasis_ipd %>%
@@ -81,7 +81,7 @@ pso_net <- combine_network(
 
 test_that("compare_populations() covariates argument must be one listed", {
   m <- "The network object does not contain integration code"
-  expect_error(compare_populations(pso_net), m)
+  expect_error(compare_populations(pso_net, method = "propensity"), m)
 })
 
 pso_net_int <- add_integration(pso_net,
@@ -96,10 +96,10 @@ pso_net_int <- add_integration(pso_net,
 
 test_that("compare_populations() covariates must be listed in data", {
   m <- "The following covariates are NOT defined in the network's integration code"
-  expect_error(compare_populations(pso_net_int, covariates = "height"), m)
-  expect_error(compare_populations(pso_net_int, covariates = "a"), m)
-  expect_error(compare_populations(pso_net_int, covariates = c("age", "height")), m)
-  expect_error(compare_populations(pso_net_int, covariates = 1), m)
+  expect_error(compare_populations(pso_net_int, method = "propensity", covariates = "height"), m)
+  expect_error(compare_populations(pso_net_int, method = "propensity", covariates = "a"), m)
+  expect_error(compare_populations(pso_net_int, method = "propensity", covariates = c("age", "height")), m)
+  expect_error(compare_populations(pso_net_int, method = "propensity", covariates = 1), m)
 })
 
 test_that("a method is stated in compare_populations()", {
