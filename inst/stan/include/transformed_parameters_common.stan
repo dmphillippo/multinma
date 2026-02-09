@@ -84,6 +84,14 @@ if (ni_ipd) {
     X_ipd * beta_tilde;
   }
 
+  // Baseline risk meta-regression
+  if (brmr_n_col > 0) {
+    // Subtracting 1 from the centred baseline risk here, as the associated
+    // beta was already added once to the linear predictor by
+    // `X_ipd * beta_tilde`
+    eta_ipd += (X_ipd[,1:totns] * mu - xbar_mu - 1) .* (X_ipd[,brmr_col] * beta_tilde[brmr_col]);
+  }
+
   // Add class effects contribution
   if (class_effects) {
     for (i in 1:ni_ipd) {

@@ -1,6 +1,6 @@
 Package: multinma
 Title: Bayesian Network Meta-Analysis of Individual and Aggregate Data
-Version: 0.8.1.9006
+Version: 0.8.1.9007
 Authors@R: 
     c(person(given = c("David", "M."),
            family = "Phillippo",
@@ -11,7 +11,11 @@ Authors@R:
             family = "Perren",
             role = "ctb",
             email = "samuel.perren@bristol.ac.uk",
-            comment = c(ORCID = "0009-0005-1921-6957")))
+            comment = c(ORCID = "0009-0005-1921-6957")),
+    person(given = "Niels",
+            family = "Dunnewind",
+            role = "ctb",
+            comment = c(ORCID = "0009-0009-8675-9109")))
 Description: Network meta-analysis and network meta-regression models for 
     aggregate data, individual patient data, and mixtures of both individual 
     and aggregate data using multilevel network meta-regression as described by

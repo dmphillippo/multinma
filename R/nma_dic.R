@@ -207,6 +207,8 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
     # Get covariance structure
     Sigma <- make_Sigma(net$agd_contrast)
 
+    ul <- function(x) if (is.list(x)) x[[1]] else x
+
     agd_contrast_resdev_dat <-
       net$agd_contrast %>%
         dplyr::filter(!is.na(.data$.y)) %>%
@@ -223,7 +225,7 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
                       resdev = resdev_agd_contrast) %>%
         dplyr::rowwise() %>%
         dplyr::mutate(resdevfit = drop(crossprod(.data$.y - .data$fitted,
-                                            solve(.data$Sigma,
+                                            solve(ul(.data$Sigma),
                                                   .data$.y - .data$fitted))),
                       leverage = .data$resdev - .data$resdevfit)
 

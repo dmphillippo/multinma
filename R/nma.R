@@ -12,7 +12,8 @@
 #' @param regression A one-sided model formula, specifying the prognostic and
 #'   effect-modifying terms for a regression model. Any references to treatment
 #'   should use the `.trt` special variable, for example specifying effect
-#'   modifier interactions as `variable:.trt` (see details).
+#'   modifier interactions as `variable:.trt` (see details). The special
+#'   variable `.mu` can be used for baseline risk meta-regression: `~.mu:.trt`.
 #' @param OVB_adj Character string controlling omitted variable bias (OVB)
 #'   adjustment for reduced models.
 #'   `"all"` (the default) apply OVB adjustment to all reduced models. Quasi–Monte Carlo (QMC) integration points must be available for all reduced model(s).
@@ -638,6 +639,14 @@ nma <- function(network,
   if (!rlang::is_bool(int_check)) abort("`int_check` should be a logical scalar (TRUE or FALSE).")
   if (int_thin > 0) int_check <- FALSE
 
+  if (".mu" %in% all.vars(regression)) {
+    if (has_agd_contrast(network)) abort("Regression on baseline risk (`.mu` in `regression` formula) is not supported with contrast data.")
+    if (QR) {
+      warn("Cannot fit baseline risk meta-regression model with QR decomposition, setting QR = FALSE.")
+      QR <- FALSE
+    }
+  }
+
   # Set adapt_delta
   if (is.null(adapt_delta)) {
     adapt_delta <- switch(trt_effects, fixed = 0.8, random = 0.95)
@@ -749,6 +758,18 @@ nma <- function(network,
   if (has_ipd(network)) {
     dat_ipd <- network$ipd
 
+    if (".mu" %in% all.vars(regression)) {
+      if (".mu" %in% colnames(dat_ipd)) {
+        warn(c(
+          "Detected `.mu` in the `regression` formula and in the data.",
+          `*` = "`.mu` column in data will be ignored.",
+          i = "`.mu` is a special variable referring to the modelled baseline risk."
+        ))
+      }
+
+      dat_ipd$.mu <- 1L
+    }
+
     # Only take necessary columns
     dat_ipd <- get_model_data_columns(dat_ipd,
                                       regression = regression,
@@ -757,6 +778,7 @@ nma <- function(network,
                                       keep = if (has_aux_by) aux_by else NULL)
 
     y_ipd <- get_outcome_variables(network$ipd, network$outcome$ipd)
+
   } else {
     dat_ipd <- tibble::tibble()
     y_ipd <- NULL
@@ -794,6 +816,18 @@ nma <- function(network,
       } else {
         idat_agd_arm <- dat_agd_arm
       }
+    }
+
+    if (".mu" %in% all.vars(regression)) {
+      if (".mu" %in% colnames(idat_agd_arm)) {
+        warn(c(
+          "Detected `.mu` in the `regression` formula and in the data.",
+          `*` = "`.mu` column in data will be ignored.",
+          i = "`.mu` is a special variable referring to the modelled baseline risk."
+        ))
+      }
+
+      idat_agd_arm$.mu <- 1L
     }
 
     # Only take necessary columns
@@ -1312,6 +1346,9 @@ nma <- function(network,
     if (!is.null(regression)) {
       reg_names <- all.vars(regression)
 
+      # Centering of the baseline risk is dealt with separately (`xbar_mu`)
+      reg_names <- setdiff(reg_names, ".mu")
+
       # Ignore any variable(s) used as offset(s)
       reg_terms <- terms(regression)
 
@@ -1346,6 +1383,7 @@ nma <- function(network,
     xbar <- NULL
   }
 
+  xbar_mu <- if (".mu" %in% all.vars(regression)) calculate_baseline_risk(network, link) else NULL
   # Construct model matrix
   X_list <- make_nma_model_matrix(nma_formula = nma_formula,
                                   dat_ipd = dat_ipd,
@@ -1655,6 +1693,7 @@ if (class_effects == "exchangeable") {
                      agd_arm_offset = offset_agd_arm,
                      agd_contrast_offset = offset_agd_contrast,
                      trt_effects = trt_effects,
+                     xbar_mu = xbar_mu,
                      RE_cor = .RE_cor,
                      which_RE = .which_RE,
                      class_effects = class_effects,
@@ -1836,7 +1875,7 @@ if (class_effects == "exchangeable") {
               class_interactions = if (!is.null(regression) && !is.null(network$classes)) class_interactions else NULL,
               class_effects = class_effects,
               class_sd = if (class_effects == "exchangeable") class_sd else NULL,
-              xbar = xbar,
+              xbar = c(xbar, .mu = xbar_mu),
               likelihood = likelihood,
               link = link,
               aux_by = if (has_aux_by) colnames(get_aux_by_data(aux_dat, by = aux_by)) else NULL,
@@ -1903,6 +1942,7 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
                     n_int,
                     ipd_offset = NULL, agd_arm_offset = NULL, agd_contrast_offset = NULL,
                     trt_effects = c("fixed", "random"),
+                    xbar_mu = NULL,
                     RE_cor = NULL,
                     which_RE = NULL,
                     class_effects = c("independent", "exchangeable", "common"),
@@ -2097,6 +2137,7 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
   col_trt <- grepl("^(\\.trt|\\.contr)[^:]+$", x_names)
   col_omega <- x_names == ".omegaTRUE"
   col_reg <- !col_study & !col_trt & !col_omega
+  col_brmr <- col_reg & grepl("(^\\.mu\\:)|(\\:\\.mu$)", x_names)
 
   n_trt <- sum(col_trt) + 1
 
@@ -2332,8 +2373,12 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
     # Class effects
     which_CE = if (class_effects == "exchangeable") which_CE else numeric(0),
     which_CE_sd = if (class_effects == "exchangeable") which_CE_sd else numeric(0),
-    class_effects = ifelse(class_effects == "exchangeable", 1, 0)
-    )
+    class_effects = ifelse(class_effects == "exchangeable", 1, 0),
+    # Baseline risk meta-regression
+    brmr_n_col = sum(col_brmr),
+    brmr_col = as.array(which(col_brmr)),
+    xbar_mu = xbar_mu %||% 0
+  )
 
   # Add priors
   standat <- purrr::list_modify(standat,
@@ -3445,6 +3490,9 @@ make_nma_formula <- function(regression,
     } else {
       nma_formula <- regression
     }
+
+    # Remove any main effect of .mu if baseline risk regression used
+    if (".mu" %in% all.vars(regression)) nma_formula <- update.formula(nma_formula, ~. - .mu)
 
     if (consistency == "ume") {
       nma_formula <- update.formula(nma_formula, ~.study + .contr + . -1)

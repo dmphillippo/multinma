@@ -52,7 +52,8 @@ effects}
 \item{regression}{A one-sided model formula, specifying the prognostic and
 effect-modifying terms for a regression model. Any references to treatment
 should use the \code{.trt} special variable, for example specifying effect
-modifier interactions as \code{variable:.trt} (see details).}
+modifier interactions as \code{variable:.trt} (see details). The special
+variable \code{.mu} can be used for baseline risk meta-regression: \code{~.mu:.trt}.}
 
 \item{OVB_adj}{Character string controlling omitted variable bias (OVB)
 adjustment for reduced models.

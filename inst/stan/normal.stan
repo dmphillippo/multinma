@@ -40,18 +40,27 @@ transformed parameters {
 
   // -- AgD model (arm-based) --
   if (ni_agd_arm) {
-    if (nint_max > 1) { // -- If integration points are used --
-      vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
-        X_agd_arm * beta_tilde + offset_agd_arm :
-        X_agd_arm * beta_tilde;
+    vector[nint_max * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
+      X_agd_arm * beta_tilde + offset_agd_arm :
+      X_agd_arm * beta_tilde;
 
-    if (class_effects) {
-      for (i in 1:ni_agd_arm) {
-        if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
-          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_fclass[agd_arm_trt[i] - 1]];
+    // Baseline risk meta-regression
+    if (brmr_n_col > 0) {
+      // Subtracting 1 from the centred baseline risk here, as the associated
+      // beta was already added once to the linear predictor by
+      // `X_agd_arm * beta_tilde`
+      eta_agd_arm_noRE += (X_agd_arm[,1:totns] * mu - xbar_mu - 1) .* (X_agd_arm[,brmr_col] * beta_tilde[brmr_col]);
+    }
+
+    if (nint_max > 1) { // -- If integration points are used --
+
+      if (class_effects) {
+        for (i in 1:ni_agd_arm) {
+          if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+            eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_fclass[agd_arm_trt[i] - 1]];
+          }
         }
       }
-    }
 
       if (RE) {
         if (link == 1) { // identity link
@@ -89,11 +98,8 @@ transformed parameters {
       }
     } else { // -- If no integration --
       if (RE) {
-        vector[nint * ni_agd_arm] eta_agd_arm_noRE = has_offset ?
-          X_agd_arm * beta_tilde + offset_agd_arm :
-          X_agd_arm * beta_tilde;
 
-      // Add class effects contribution to the linear predictor
+        // Add class effects contribution to the linear predictor
         if (class_effects) {
           for (i in 1:ni_agd_arm) {
             if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
@@ -118,15 +124,20 @@ transformed parameters {
           }
         }
       } else {
-  vector[ni_agd_arm] eta_agd_arm_noRE = has_offset ?
-    X_agd_arm * beta_tilde + offset_agd_arm :
-    X_agd_arm * beta_tilde;
+        // Add class effects contribution to the linear predictor
+        if (class_effects) {
+          for (i in 1:ni_agd_arm) {
+            if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+              eta_agd_arm_noRE[i] += f_class[which_fclass[agd_arm_trt[i] - 1]];
+            }
+          }
+        }
 
-  // Add class effects contribution to the linear predictor
-  if (class_effects) {
-    for (i in 1:ni_agd_arm) {
-      if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
-        eta_agd_arm_noRE[i] += f_class[which_fclass[agd_arm_trt[i] - 1]];
+        if (link == 1) { // identity link
+          theta_agd_arm_bar = eta_agd_arm_noRE;
+        } else if (link == 2) { // log link
+          theta_agd_arm_bar = exp(eta_agd_arm_noRE);
+        }
       }
     }
   }
@@ -179,6 +190,7 @@ if (nc_agd_regression) {
   }
 
 }
+
 }
 model {
 #include /include/model_common.stan
