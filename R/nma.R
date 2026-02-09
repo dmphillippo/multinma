@@ -888,7 +888,7 @@ nma <- function(network,
 
     # Convert to a list by study to manipulate it easier using map()
     dat_agd_regression_split <- dat_agd_regression %>%
-      split(forcats::fct_inorder(.$.study)) # keep the original order
+      split(forcats::fct_inorder(forcats::fct_drop(.$.study))) # keep the original order
 
     # Check regression models in agd_regression are compatible with NMA regression
     # Check all terms, such as main and interaction terms, rather than just check variables
@@ -1021,7 +1021,7 @@ nma <- function(network,
                 dplyr::select( stringr::str_subset(colnames(.),"^\\.int_",negate = TRUE)  ) %>% slice(1), # Keep the ref. rows to match the structure
               .unnest_integration(dplyr::bind_rows(
                 .x %>% dplyr::filter(is.na(.estimate)) %>% slice(1) ,
-                .x %>% dplyr::filter( .trt != .trt[is.na(estimate)] ) %>% slice(1)
+                .x %>% dplyr::filter( .trt != .trt[is.na(estimate)] ) %>% dplyr::distinct(.trt, .keep_all = TRUE)
               )) %>% dplyr::mutate(.estimate = 0) # set zero to indicate non-ref rows and  prevent removing the rows later
             )
           } else {
