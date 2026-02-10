@@ -142,15 +142,6 @@ transformed parameters {
     }
   }
 
-  // Apply the appropriate link function
-  if (link == 1) { // identity link
-    theta_agd_arm_bar = eta_agd_arm_noRE;
-  } else if (link == 2) { // log link
-    theta_agd_arm_bar = exp(eta_agd_arm_noRE);
-    }
-}
-}
-}
 // -- AgD model (regression coefficients) --
 if (nc_agd_regression) {
 

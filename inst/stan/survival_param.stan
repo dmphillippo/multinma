@@ -3,6 +3,12 @@ functions {
 #include /include/count_nonzero.stan
 #include /include/vector_functions.stan
 
+  // -- Covariance Computation --
+  real cov_xy(vector x, vector y) {
+    int N = num_elements(x);
+    return dot_product(x - mean(x), y - mean(y)) / (N - 1);
+  }
+
   // -- Generalised Gamma ldpf --
   real gengamma_lpdf(real y, real mu, real sigma, real k) {
     // Parameterisation of Lawless
@@ -569,6 +575,10 @@ transformed data {
     if (ni_aux_group_ipd[i]) wi_aux_group_ipd[i, 1:ni_aux_group_ipd[i]] = which(aux_group_ipd, i);
     if (ni_aux_group_agd_arm[i]) wi_aux_group_agd_arm[i, 1:ni_aux_group_agd_arm[i]] = which(aux_group_agd_arm, i);
   }
+
+  // Update totns (no intercepts for Cox)
+  // if(no_agd_regression && dist<=3)
+  //   totns -= ns_agd_regression;
 }
 parameters {
 #include /include/parameters_common.stan
@@ -810,78 +820,21 @@ transformed parameters {
         // OVB adjustment
         if(agd_regression_reduced_study[i] && dist<=3 ){ // Apply OVB for COX PH models
 
-          //  *** First Method ***
+          int tmp_n = agd_regression_nx[i];
+          vector[tmp_n] tmp_X;
+          vector[tmp_n] tmp_Z;
+          vector[tmp_n] tmp_Y;
+          real c1 ;
 
-          matrix [ agd_regression_nx[i] ,agd_regression_ncoef_inc[i]+2 ] OVB_COX_X;
-          matrix [  agd_regression_ncoef_inc[i]+2,agd_regression_ncoef_omt[i] ] B;
-          // Create design matrix: [1, rank, XI ]
-          OVB_COX_X =  block(agd_regression_OVB_COX[i], 1, 1,agd_regression_nx[i] ,agd_regression_ncoef_inc[i]+2);
-          // Calculate ranks
-          {
-            array[agd_regression_nx[i]] int OVB_COX_idx;
-            array[agd_regression_nx[i]] int OVB_COX_rank;
-            // https://mc-stan.org/docs/functions-reference/array_operations.html#sorting-functions
-            OVB_COX_idx = sort_indices_asc( (exp_std_gen[(c_x+1):(c_x+agd_regression_nx[i])]) .* exp( -1*(X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta) )) ;
-            for (n in 1:agd_regression_nx[i] ) {
-              OVB_COX_rank[OVB_COX_idx[n]] = n;
-            }
-            OVB_COX_X[,2] = to_vector(OVB_COX_rank); // Add rank
-          }
-          // --- Address OVB ---
-          //  X_O ~ c_0 + c_r*rank + c_1*XI or X_O ~ D*B
-          //  B = inverse(D'D)*D'X_O:
-          //    - If M = D'D  and N = D'X_O
-          //    - vector mdivide_left_spd( M,  N)  equals to inverse(M) * N
-          //      https://mc-stan.org/docs/functions-reference/matrix_operations.html#symmetric-positive-definite-matrix-division-functions
-          //    - also, matrix crossprod(matrix x) equals to X'X
-          B = mdivide_left_spd(crossprod(OVB_COX_X), OVB_COX_X' * X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ] );
-          allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] =  allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]]  +
-          B[3:(agd_regression_ncoef_inc[i]+2),] *  /* Note: the first and second calulated coef. are intercept and rank coefficients */
-          allbeta[  XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]  ] ;
+          tmp_Y =  (exp_std_gen[(c_x+1):(c_x+agd_regression_nx[i])]) .* exp( -1*(X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta) );
+          tmp_X = X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ]*allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]];
+          tmp_Z = X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ]*allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]];
 
+          c1 = ( cov_xy(tmp_X,tmp_Z)*cov_xy(tmp_Y,tmp_Y) - cov_xy(tmp_Z,tmp_Y)*cov_xy(tmp_X,tmp_Y)  )/( cov_xy(tmp_X,tmp_X)*cov_xy(tmp_Y,tmp_Y) - cov_xy(tmp_X,tmp_Y)^2 );
 
-          //  *** Second Method ***
-
-          // array[agd_regression_nx[i]] int OVB_COX_idx;
-          // OVB_COX_idx = sort_indices_asc( (exp_std_gen[(c_x+1):(c_x+agd_regression_nx[i])]) .* exp( -1*(X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta) )) ;
-          //
-          // int a = agd_regression_ncoef_inc[i];
-          // int b = agd_regression_ncoef_omt[i];
-          // row_vector[a] muX;
-          // row_vector[b] muZ;
-          // matrix[a, a] Sxx;
-          // matrix[a, b] Sxz;
-          // matrix[a, b] C1_avg;
-          //
-          // C1_avg = rep_matrix(0.0, a, b);
-          //
-          // for (j in 1:(agd_regression_nx[i]-agd_regression_ncoef_inc[i])) {
-          //
-          //   int nj = agd_regression_nx[i] - j + 1 ;
-          //   matrix[nj, a] Xj;
-          //   matrix[nj, b] Zj;
-          //
-          //   // Risk set
-          //   Xj = X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_o+1):(c_o+agd_regression_ncoef_inc[i])] ][ OVB_COX_idx[ j:(agd_regression_nx[i]) ] ,];
-          //   Zj = X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ][ OVB_COX_idx[ j:(agd_regression_nx[i]) ] ,];
-          //   // Centered
-          //   for(c in 1:a ){
-          //     Xj[,c] = Xj[,c] - mean(Xj[,c]);
-          //   }
-          //   for(c in 1:b ){
-          //     Zj[,c] = Zj[,c] - mean(Zj[,c]);
-          //   }
-          //   // Covariances
-          //   Sxx = (Xj' * Xj) / (nj - 1);
-          //   Sxz = (Xj' * Zj) / (nj - 1);
-          //   C1_avg += inverse(Sxx) * Sxz;
-          //
-          // }
-          //
-          // C1_avg /=  (agd_regression_nx[i]-agd_regression_ncoef_inc[i]) ;
-          //
-          // allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] =  allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]]  +
-          // C1_avg * allbeta[  XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]  ] ;
+          allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] =
+          allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]]  +
+          c1 * allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] ;
 
         }else if(agd_regression_reduced_study[i] && dist>=4 ){ // Apply OVB for AFT models
           allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] + block(agd_regression_OVB_LM[i], 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_ncoef_omt[i] ) * allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]];
