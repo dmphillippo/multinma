@@ -529,35 +529,197 @@ test_that("set_agd_contrast - positive definite check", {
 test_that("set_agd_regression - checks for standard errors and covariance/correlation matrices", {
   s <- tibble(study = c("A", "A", "A", "B", "B", "B"),
               trt = c("a", "a", "b", "b", "b", "c"),
-              est = c(NA, 1, 2, NA, 1, 2), se = 1, se2 = -1, se3 = NA, x = 1)
+              est = c(NA, 1, 2, NA, 1, 2),
+              se = 1, se2 = -1, se3 = NA,
+              seA = c(NA,1,1,NA,NA,NA),
+              seB = c(NA,NA,NA,NA,1,1),
+              x = 1)
 
   cor_list <- list(A = diag(2), B = diag(2))
+  cov_list <- list(A = diag(2), B = diag(2))
 
-  # either se+cor or cov required
-  m <- "Specify regression coefficient standard errors `se` and correlation matrix `cor`, or covariance matrix `cov`"
-  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est), m)
-  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se), m)
-  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cor = cor_list), m)
+  # --- input types ---
+  m <- 'Standard error `se` must be a regular column \\(not a list or matrix column\\)'
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = list(s$se)       , cov = cov_list), m)
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = matrix(s$se)     , cov = cov_list), m)
+  expect_no_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = data.frame(s$se) , cov = cov_list))
+  expect_no_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = NULL             , cov = cov_list))
 
-  # se must be >0
-  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se2, cor = cor_list, regression = ~x*.trt),
-               "Standard errors `se` must be greater than zero")
+  m <- '`cor` must be a named list of correlation matrices.'
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se, cor = NA               ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se, cor = NULL             ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se, cor = 'zzz'            ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se, cor = 1:3              ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se, cor = data.frame(x=1:2)), m)
 
-  # missing se not allowed
-  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se3, cor = cor_list, regression = ~x*.trt),
-               "Missing standard errors `se` are not allowed")
+  m <- '`cov` must be a named list of covariance matrices.'
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = NA               ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = NULL             ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = 'zzz'            ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = 1:3              ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = data.frame(x=1:2)), m)
 
-  # cor/cov required for all studies
-  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = cor_list[1], regression = ~x*.trt),
-               '`cor` list names must match all study names in `data`\\.\nMissing correlation matrix for study "B"')
+  # --- se/cor/cov different input combinations ---
+  err_A <- 'Specify regression coefficient standard errors `se` and correlation matrix `cor`, or covariance matrix `cov` for study "A"\\.\nIf only standard errors `se` are provided for non-survival models, the covariances may be reconstructed using integration points\\.'
+  err_B <- 'Specify regression coefficient standard errors `se` and correlation matrix `cor`, or covariance matrix `cov` for study "B"\\.\nIf only standard errors `se` are provided for non-survival models, the covariances may be reconstructed using integration points\\.'
+  err_AB<- 'Specify regression coefficient standard errors `se` and correlation matrix `cor`, or covariance matrix `cov` for studies "A" and "B"\\.\nIf only standard errors `se` are provided for non-survival models, the covariances may be reconstructed using integration points\\.'
+
+  msg_A <- 'Neither correlation matrix `cor` or covariance matrix `cov` specified for study "A"\\.\nUse `add_integration\\(\\)` to reconstruct these \\(for non-survival models only\\)\\.'
+  msg_B <- 'Neither correlation matrix `cor` or covariance matrix `cov` specified for study "B"\\.\nUse `add_integration\\(\\)` to reconstruct these \\(for non-survival models only\\)\\.'
+  msg_AB<- 'Neither correlation matrix `cor` or covariance matrix `cov` specified for studies "A" and "B"\\.\nUse `add_integration\\(\\)` to reconstruct these \\(for non-survival models only\\)\\.'
+  # none
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x                                                ), err_AB)
+  # se
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se                                       ), msg_AB)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA                                      ), err_B)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seB                                      ), err_A)
+  # cor
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list                      ), err_AB)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[1]                   ), err_AB)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[2]                   ), err_AB)
+  # cov
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x                             , cov = cov_list   ))
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x                             , cov = cov_list[1]), err_B)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x                             , cov = cov_list[2]), err_A)
+  # se & cor
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list                      ))
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2]                   ), msg_A)
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1]                   ), msg_B)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[1]                   ), err_B)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[2]                   ), err_B)
+  # se & cov
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se ,                  , cov = cov_list   ))
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se ,                  , cov = cov_list[1]), msg_B )
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se ,                  , cov = cov_list[2]), msg_A )
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA,                  , cov = cov_list[1]), err_B )
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA,                  , cov = cov_list[2]), msg_A )
+  # cor & cov
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list   , cov = cov_list   ))
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list   , cov = cov_list[1]), err_B)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list   , cov = cov_list[2]), err_A)
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[1], cov = cov_list   ))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[2], cov = cov_list   ))
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[1], cov = cov_list[1]), err_B)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[1], cov = cov_list[2]), err_A)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[2], cov = cov_list[1]), err_B)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[2], cov = cov_list[2]), err_A)
+  # se & cor & cov
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list   , cov = cov_list   ))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list   , cov = cov_list[1]))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list   , cov = cov_list[2]))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1], cov = cov_list   ))
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1], cov = cov_list[1]), msg_B)
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1], cov = cov_list[2]))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2], cov = cov_list   ))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2], cov = cov_list[1]))
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2], cov = cov_list[2]), msg_A)
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list   , cov = cov_list   ))
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list   , cov = cov_list[1]), err_B)
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list   , cov = cov_list[2]))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[1], cov = cov_list   ))
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[1], cov = cov_list[1]), err_B)
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[1], cov = cov_list[2]))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[2], cov = cov_list   ))
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[2], cov = cov_list[1]), err_B)
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[2], cov = cov_list[2]), msg_A)
+
+  # --- .cov_known different input combinations ---
+  m_TT <- c(FALSE, TRUE , TRUE , FALSE, TRUE , TRUE  )
+  m_TF <- c(FALSE, TRUE , TRUE , FALSE, FALSE, FALSE )
+  m_FT <- c(FALSE, FALSE, FALSE, FALSE, TRUE , TRUE  )
+  m_FF <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE )
+  # se
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se                                       )$agd_regression$.cov_known , m_FF)
+  # cov
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x                             , cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  # se & cor
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list                      )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1]                   )$agd_regression$.cov_known , m_TF)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2]                   )$agd_regression$.cov_known , m_FT)
+  # se & cov
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se                    , cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se                    , cov = cov_list[1])$agd_regression$.cov_known , m_TF)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se                    , cov = cov_list[2])$agd_regression$.cov_known , m_FT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA                   , cov = cov_list[2])$agd_regression$.cov_known , m_FT)
+  # cor & cov
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list   , cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[1], cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[2], cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  # se & cor & cov
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list   , cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list   , cov = cov_list[1])$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list   , cov = cov_list[2])$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1], cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1], cov = cov_list[1])$agd_regression$.cov_known , m_TF)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1], cov = cov_list[2])$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2], cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2], cov = cov_list[1])$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2], cov = cov_list[2])$agd_regression$.cov_known , m_FT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list   , cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list   , cov = cov_list[2])$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[1], cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[1], cov = cov_list[2])$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[2], cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[2], cov = cov_list[2])$agd_regression$.cov_known , m_FT)
+
+  # --- provided se must be >0 ---
+  err_A <- "Standard error `se` must be numeric and greater than zero for study A\\."
+  err_B <- "Standard error `se` must be numeric and greater than zero for study B\\."
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = -1*se , cor = cor_list, regression = ~x*.trt), err_A)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = -1*seA, cor = cor_list, regression = ~x*.trt), err_A)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = -1*seB, cor = cor_list, regression = ~x*.trt), err_B)
+
+  # --- cor/cov named list  ---
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(diag(2), diag(2)), regression = ~x*.trt),
+               '`cor` must be a named list of correlation matrices.')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(diag(2), diag(2)), regression = ~x*.trt),
+               '`cov` must be a named list of covariance matrices.')
+
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = diag(2), D = diag(2)), regression = ~x*.trt),
+               '`cor` list names must match study names in `data`\\.\nMismatched for study "D"\\.')
   expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(C = diag(2), D = diag(2)), regression = ~x*.trt),
-               '`cor` list names must match all study names in `data`\\.\nMissing correlation matrices for studies "A" and "B"')
-  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cor_list[1], regression = ~x*.trt),
-               '`cov` list names must match all study names in `data`\\.\nMissing covariance matrix for study "B"')
-  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = list(C = diag(2), D = diag(2)), regression = ~x*.trt),
-               '`cov` list names must match all study names in `data`\\.\nMissing covariance matrices for studies "A" and "B"')
+               '`cor` list names must match study names in `data`\\.\nMismatched for studies "C" and "D"')
 
-  # cor/cov must be right dimensions
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = list(A = diag(2), D = diag(2)), regression = ~x*.trt),
+               '`cov` list names must match study names in `data`\\.\nMismatched for study "D"\\.')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = list(C = diag(2), D = diag(2)), regression = ~x*.trt),
+               '`cov` list names must match study names in `data`\\.\nMismatched for studies "C" and "D"\\.')
+
+  # --- cor values ---
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c('1','-0.5','-.5','1'), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt),
+                  '`cor` must be a named list of correlation matrices\\.')
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1,-0.5,-.5,1), nrow=2), B = matrix(c(1,"-0.5",-.5, 1), nrow=2)), regression = ~x*.trt),
+                  '`cor` must be a named list of correlation matrices\\.')
+
+  err_A <- 'Correlation matrix `cor` must be numeric for study A\\.'
+  err_B <- 'Correlation matrix `cor` must be numeric for study B\\.'
+  expect_no_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt))
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1, Inf,-.5, 1), nrow=2), B = matrix(c(1,  NA,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1, NA ,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1, NaN,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1, Inf,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1, 0.5, NA, 1), nrow=2)), regression = ~x*.trt), err_B )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1, 0.5,NaN, 1), nrow=2)), regression = ~x*.trt), err_B )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1, 0.5,Inf, 1), nrow=2)), regression = ~x*.trt), err_B )
+
+  # --- cov values ---
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c('1','-0.5','-.5','1'), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt),
+                  '`cov` must be a named list of covariance matrices\\.')
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1,-0.5,-.5,1), nrow=2), B = matrix(c(1,"-0.5",-.5, 1), nrow=2)), regression = ~x*.trt),
+                  '`cov` must be a named list of covariance matrices\\.')
+
+  err_A <- 'Covariance matrix `cov` must be numeric for study A\\.'
+  err_B <- 'Covariance matrix `cov` must be numeric for study B\\.'
+  expect_no_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt))
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1, Inf,-.5, 1), nrow=2), B = matrix(c(1,  NA,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1, NA ,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1, NaN,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1, Inf,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1, 0.5, NA, 1), nrow=2)), regression = ~x*.trt), err_B )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1, 0.5,NaN, 1), nrow=2)), regression = ~x*.trt), err_B )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1, 0.5,Inf, 1), nrow=2)), regression = ~x*.trt), err_B )
+
+  # --- provided cor/cov must be right dimensions ---
   expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = diag(2), B = diag(4)), regression = ~x*.trt),
                'Dimensions of correlation matrix `cor` do not match the number of coefficients in `data` for study "B"')
   expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = diag(2), B = matrix(1, nrow = 3, ncol = 4)), regression = ~x*.trt),
@@ -571,7 +733,7 @@ test_that("set_agd_regression - checks for standard errors and covariance/correl
   expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = list(A = diag(3), B = diag(4)), regression = ~x*.trt),
                'Dimensions of covariance matrix `cov` do not match the number of coefficients in `data` for studies "A" and "B"')
 
-  # cor must be a correlation matrix
+  # --- provided cor must be a correlation matrix ---
   expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(), regression = ~x*.trt),
                '`cor` must be a named list of correlation matrices')
   expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = "A", b = matrix("B")), regression = ~x*.trt),
@@ -581,28 +743,124 @@ test_that("set_agd_regression - checks for standard errors and covariance/correl
   expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = diag(2), B = matrix(c(1, -1.5, -1.5, 1), nrow=2)), regression = ~x*.trt),
                '`cor` is not a proper correlation matrix for study "B"')
 
-  # cov (or reconstructed from se and cor) must be positive definite
+  # --- cov or reconstructed cov from se and cor must be positive definite ---
   expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = diag(2), B = matrix(c(1, 0.5, 0.4, 1), nrow=2)), regression = ~x*.trt),
                'Covariance matrix constructed from `cor` and `se` is not symmetric positive definite for study "B"')
   expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = diag(2), B = matrix(c(1, 1, 1, 1), nrow=2)), regression = ~x*.trt),
                'Covariance matrix constructed from `cor` and `se` is not symmetric positive definite for study "B"')
   expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = list(A = matrix(c(1, 0.5, 0.4, 1), nrow=2), B = matrix(c(0.1, 1, 1, 0.1), nrow = 2)), regression = ~x*.trt),
                'Covariance matrix `cov` is not symmetric positive definite for studies "A" and "B"')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = seB, cov = list(A = diag(2)), cor = list(B = matrix(c(1, 0.5, 0.4, 1), nrow=2)), regression = ~x*.trt),
+               'Covariance matrix constructed from `cor` and `se` is not symmetric positive definite for study "B"')
+
 })
 
 test_that("set_agd_regression - checks for regression", {
   s <- tibble(study = c("A", "A", "A", "B", "B", "B"),
               trt = c("a", "a", "b", "b", "b", "c"),
-              est = c(NA, 1, 2, NA, 1, 2), se = 1, se2 = -1, se3 = NA, x = 1)
+              est = c(NA, 1, 2, NA, 1, 2), se = 1, se2 = -1, se3 = NA, x = 1, y = 1)
+
+  cov_list <- list(A = diag(2), B = diag(2))
+
+  # --- input types ---
+  m <- '`regression` must be a regression formula or named list of regression formulas for each study'
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = NULL             ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = NA               ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = 'zzz'            ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = data.frame(x=1:2)), m)
+
+  # --- one-sided regression formula ---
+  m <- '`regression` for each study must be a one-sided regression formula specifying the model for which estimates are given\\.'
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = cor_list, regression = list('zzz')                          ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = cor_list, regression = list(A = 'zzz', B = 'zzz')           ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = cor_list, regression =          y ~ x*.trt                  ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = cor_list, regression = list(A =   ~ x2*.trt, B = y ~ x*.trt)), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = cor_list, regression = list(A = y ~ x2*.trt, B =   ~ x*.trt)), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = cor_list, regression = list(A = y ~ x2*.trt, B = y ~ x*.trt)), m)
+
+  # --- regression variables present in data ---
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = ~x2*.trt),
+               'Regression variables not present in `data`: x2')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = ~(x + x2 + x3)*.trt),
+               'Regression variables not present in `data`: x2 and x3')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list(A = ~(x + x4)*.trt, B = ~(x + x2 + x3)*.trt)),
+               'Regression variables not present in `data`: x4, x2 and x3')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list(A = ~ x*.trt, B = ~(x2 + x3)*.trt)),
+               'Regression variables not present in `data`: x2 and x3')
+
+  # --- named list ---
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list( ~ x*.trt, ~ x *.trt)),
+               '`regression` must be a named list of regression formulas for the included studies\\.')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list(A = ~ x*.trt,  ~ x*.trt)),
+               '`regression` must be a named list of regression formulas for the included studies\\.')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list(  ~ x*.trt, B = ~ x*.trt)),
+               '`regression` must be a named list of regression formulas for the included studies\\.')
+
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list(A = ~ x*.trt, C = ~ x*.trt)),
+               '`regression` list names must match study names in `data`\\.\nNo match for name for study "B"\\.')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list(C = ~ x*.trt, B = ~ x*.trt)),
+               '`regression` list names must match study names in `data`\\.\nNo match for name for study "A"\\.')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list(C = ~ x*.trt, D = ~ x*.trt)),
+               '`regression` list names must match study names in `data`\\.\nNo match for names for studies "A" and "B"\\.')
+
+})
+
+test_that("set_agd_regression - checks for estimate", {
+  s <- tibble(study = c("A", "A", "A", "B", "B", "B"),
+              trt = c("a", "a", "b", "b", "b", "c"),
+              est = c(NA, 1, 2, NA, 1, 2),
+              se = 1,
+              x = 1)
 
   cor_list <- list(A = diag(2), B = diag(2))
+  cov_list <- list(A = diag(2), B = diag(2))
 
-  # regression variables present in data
-  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = cor_list, regression = ~x2*.trt),
-               'Regression variables not present in `data`: x2')
-  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = cor_list, regression = ~(x + x2 + x3)*.trt),
-               'Regression variables not present in `data`: x2 and x3')
+  # --- input types ---
+  expect_error(set_agd_regression(s, study = study, trt = trt,  estimate = NULL, cov = cov_list, regression = ~ x*.trt),
+               'Specify `estimates` column of regression coefficient estimates\\.')
+  expect_error(set_agd_regression(s, study = study, trt = trt,  estimate = list('zzz'), cov = cov_list, regression = ~ x*.trt),
+               'Estimates column `estimates` must be a regular column \\(not a list or matrix column\\)\\.')
+
+  # --- check values ---
+  m <-'`estimates` must be numeric.'
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = c(NA,1,1, NA, '1',1), regression = ~ x, cov = cov_list), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = c(NA,1,1, NA, NaN,1), regression = ~ x, cov = cov_list), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = c(NA,1,1, NA, Inf,1), regression = ~ x, cov = cov_list), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = c(NA,1,1, NA,-Inf,1), regression = ~ x, cov = cov_list), m)
+
 })
+
+test_that("set_agd_regression - covariate checks work", {
+  s <- tibble(study = c("A", "A", "A", "B", "B", "B"),
+              trt = c("a", "a", "b", "b", "b", "c"),
+              est = c(NA, 1, 2, NA, 1, 2),
+              se = 1,
+              x = 1)
+  cor_list <- list(A = diag(2), B = diag(2))
+  cov_list <- list(A = diag(2), B = diag(2))
+  cvt     <- data.frame(study = c('A','B'    ),x_mean = c(1,2), x_sd = c(0.1,0.2))
+  cvt_dup <- data.frame(study = c('A','B','B'),x_mean = c(1,2,3), x_sd = c(0.1,0.2,0.3))
+
+  m <- "`covariates` must be a data frame\\."
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list, covariates = list(z=1)), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list, covariates = 1:3      ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list, covariates = NA       ), m)
+
+  expect_no_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list, covariates = cvt    ))
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list, covariates = cvt_dup),
+                  "Only one row is allowed per study in `covariates`.")
+
+  expect_equivalent(
+    set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list, covariates = cvt)$agd_regression %>%
+      dplyr::select(.study,x_mean,x_sd) %>%
+      dplyr::arrange(.study) %>%
+      dplyr::distinct(.study, .keep_all =TRUE) %>%
+      arrange(.study) %>%
+      select(-.study),
+    cvt %>% arrange(study) %>% select(-study) )
+
+})
+
 
 test_that("set_* - take one and only one outcome", {
   m <- "specify one and only one outcome"
