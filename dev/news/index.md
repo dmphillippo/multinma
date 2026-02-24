@@ -23,6 +23,11 @@
   piecewise exponential model, rather than working with the spline basis
   objects `fit$basis`
   ([\#53](https://github.com/dmphillippo/multinma/issues/53)).
+- Feature: New `expand` argument for
+  [`predict.stan_nma()`](https://dmphillippo.github.io/multinma/dev/reference/predict.stan_nma.md),
+  to allow predictions to be made only for observed treatments in each
+  study/for each individual rather than expanding out predictions for
+  every treatment.
 - Fix: [`predict()`](https://rdrr.io/r/stats/predict.html) now works
   correctly for `newdata` when `aux_by` was used, rather than giving
   errors (including

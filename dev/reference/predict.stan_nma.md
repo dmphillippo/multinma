@@ -31,6 +31,7 @@ predict(
   baseline_level = c("individual", "aggregate"),
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
   predictive_distribution = FALSE,
+  expand = TRUE,
   summary = TRUE,
   progress = FALSE,
   trt_ref = NULL
@@ -52,6 +53,7 @@ predict(
   times_seq = NULL,
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
   predictive_distribution = FALSE,
+  expand = TRUE,
   summary = TRUE,
   progress = interactive(),
   trt_ref = NULL
@@ -195,6 +197,11 @@ predict(
   Logical, when a random effects model has been fitted, should the
   predictive distribution for absolute effects in a new study be
   returned? Default `FALSE`.
+
+- expand:
+
+  Logical, expand out predictions for every treatment (`TRUE`), or only
+  produce predictions for observed treatments (`FALSE`). Default `TRUE`.
 
 - summary:
 
