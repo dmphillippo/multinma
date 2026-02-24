@@ -13,6 +13,9 @@ set of treatments than the full analysis set.
 * Feature: New `knots.stan_nma()` method for easily obtaining the knots from a 
 fitted M-spline or piecewise exponential model, rather than working with the 
 spline basis objects `fit$basis` (#53).
+* Feature: New `expand` argument for `predict.stan_nma()`, to allow predictions
+to be made only for observed treatments in each study/for each individual 
+rather than expanding out predictions for every treatment.
 * Fix: `predict()` now works correctly for `newdata` when `aux_by` was used, 
 rather than giving errors (including #50).
 * Fix: `predict()` no longer errors when using a single `baseline` for multiple 
