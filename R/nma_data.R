@@ -1045,6 +1045,8 @@ set_agd_regression <- function(data,
                                covariates = NULL,
                                trt_ref = NULL,
                                trt_class = NULL,
+                               ordinal_cut = NULL,
+                               ordinal_cut_lab = NULL,
                                sample_size = NULL) {
 
   # Check data is data frame
@@ -1382,12 +1384,31 @@ set_agd_regression <- function(data,
   d$.cov <- NA_real_
   d$.cov[!is.na(d$.estimate) & d$.cov_known] <- purrr::list_flatten(purrr::map(cmat, pack_tri))
 
+  # Check ordinal category, more checks will be done in nma()
+  .ordinal_cut <- pull_non_null(data, enquo(ordinal_cut))
+  if (xor(is.null(ordinal_cut_lab), is.null(.ordinal_cut)))
+    abort('Specify both `ordinal_cut_lab` and `ordinal_cut`.')
+
+  if (!is.null(.ordinal_cut)){
+    if (rlang::is_list(.ordinal_cut) || !is.null(dim(.ordinal_cut))  )
+      abort("`ordinal_cut` columns must be a regular column (not a list or matrix column).")
+    if (rlang::is_list(ordinal_cut_lab) || !is.null(dim(ordinal_cut_lab)) )
+      abort("`ordinal_cut_lab` column must be a regular vector (not a list or matrix column).")
+    if (length(ordinal_cut_lab) != length(unique(ordinal_cut_lab)))
+      abort(' `ordinal_cut_lab` must contain unique values.')
+    if (any( !na.omit(.ordinal_cut) %in% ordinal_cut_lab))
+      abort(' `ordinal_cut` must be a subset of `ordinal_cut_lab`.')
+    d$.rank_intercept <- match(.ordinal_cut, ordinal_cut_lab)
+    d$.rank_intercept[is.na(d$.rank_intercept)] <- 0
+  }
+
   # Produce nma_data object
   out <- structure(
     list(agd_regression = d,
          treatments = purrr::discard(forcats::fct_unique(d$.trt), is.na),
          classes = classes,
          studies = forcats::fct_unique(d$.study),
+         agd_regression_ordinal_cut_lab = ordinal_cut_lab,
          outcome = list(agd_arm = NA, agd_contrast = NA, ipd = NA)),
     class = "nma_data")
 

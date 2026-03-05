@@ -169,11 +169,11 @@ if (nc_agd_regression) {
       // OVB adjustment
       if(agd_regression_reduced_study[i]){
         if (link == 1){ // logit link
-        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = logit(mean(inv_logit(       X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef[i])] )  - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ;
+        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = logit(mean(inv_logit(       X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] )  - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ;
         }else if (link == 2){ // probit link
-        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = inv_Phi(mean(Phi(           X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef[i])] )  - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ;
+        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = inv_Phi(mean(Phi(           X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] )  - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ;
         }else if (link == 3){ // cloglog link
-        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = log(-log1m(mean(inv_cloglog(X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef[i])] )) - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ;
+        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = log(-log1m(mean(inv_cloglog(X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] )) - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ;
         }
       }
       // Update eta

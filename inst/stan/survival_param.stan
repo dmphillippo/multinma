@@ -503,7 +503,7 @@ data {
   array[ni_agd_arm] int<lower=1> agd_arm_arm; // Arm indicator for AgD (arm-based) (i.e. picking element of which_RE)
 
   // -- AgD regression coefficients --
-  array[(no_agd_regression && dist<=3) ? ns_agd_regression : 0] matrix[agd_regression_max_nrow,agd_regression_max_ncoef_inc+2] agd_regression_OVB_COX; // Pre-computed part of COX PH OVB adjustment
+  // array[(no_agd_regression && dist<=3) ? ns_agd_regression : 0] matrix[agd_regression_max_nrow,agd_regression_max_ncoef_inc+2] agd_regression_OVB_COX; // Pre-computed part of COX PH OVB adjustment
   array[(no_agd_regression && dist>=4) ? ns_agd_regression : 0] matrix[agd_regression_max_ncoef_inc,agd_regression_max_ncoef_omt] agd_regression_OVB_LM; // Pre-computed part of AFT (LM) OVB adjustment
 
   // Outcomes
