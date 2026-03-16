@@ -9,7 +9,7 @@
 #' @return A list with a `summary` dataframe and `distance_matrix`.
 #'
 #' @importFrom magrittr %>%
-#' @importFrom dplyr select rename filter group_by summarise mutate left_join bind_rows distinct across all_of tibble n
+#' @importFrom dplyr select filter group_by summarise mutate left_join bind_rows distinct across all_of tibble n
 #' @importFrom tidyr separate pivot_wider
 #' @importFrom tibble column_to_rownames
 #' @importFrom rlang abort expr sym
@@ -59,125 +59,93 @@ compare_populations <- function(network,
   if (method == "propensity") {
 
     # Prepare IPD Data
-    if (isTRUE(nrow(network$ipd) > 0)) {
-      ipd_covariate_data <- network$ipd
-      columns_to_keep <- c(covariates, ".study")
-      ipd_covariate_data <- ipd_covariate_data[columns_to_keep]
-      ipd_covariate_data <- as.data.frame(
-        lapply(ipd_covariate_data, function(x) {
-          if (is.logical(x)) as.numeric(x) else x
-        })
-      )
-      ipd_covariate_data <- split(ipd_covariate_data, ipd_covariate_data$.study, drop = TRUE)
-      ipd_covariate_data <- lapply(ipd_covariate_data, function(x) {
-        x$.study <- NULL
-        return(x)
-      })
-    } else {
+    if (!isTRUE(nrow(network$ipd) > 0)) {
       abort("IPD must be present when wanting to compare populations using method = `propensity`")
     }
 
-    # Prepare AGD Data (via Integration)
-    if (isTRUE(nrow(network$agd_arm) > 0)) {
-      studies <- network$agd_arm$.study
-      arm_indices <- seq_len(nrow(network$agd_arm))
+    ipd_df <- as.data.frame(
+      lapply(network$ipd[c(covariates, ".study")], function(x) if (is.logical(x)) as.numeric(x) else x)
+    )
+    ipd_covariate_data <- split(ipd_df[covariates], ipd_df$.study, drop = TRUE)
 
-      agd_arm_networks_list <- lapply(arm_indices, function(i) {
-        new_network <- network
-        new_network$agd_arm <- new_network$agd_arm[i, , drop = FALSE]
-        return(new_network)
+    # Prepare AGD Data: unnest existing integration points, combine arms within each study
+    agd_covariate_data <- if (isTRUE(nrow(network$agd_arm) > 0)) {
+      agd_study_labels <- as.character(network$agd_arm$.study)
+      arm_data <- lapply(seq_len(nrow(network$agd_arm)), function(i) {
+        unnested <- unnest_integration(network$agd_arm[i, , drop = FALSE])
+        unnested[covariates]
       })
-      names(agd_arm_networks_list) <- studies
-
-      agd_arm_networks_list <- lapply(agd_arm_networks_list, function(net) {
-        total_sample_size <- sum(net$agd_arm$.sample_size)
-        integration_distr_objects <- lapply(network$integration_code, eval)
-        other_args <- list(x = net, n_int = total_sample_size)
-        all_args <- c(other_args, integration_distr_objects)
-
-        net_integrated <- do.call(add_integration, all_args)
-        unnested_agd <- unnest_integration(net_integrated$agd_arm)
-        unnested_agd <- unnested_agd[covariates]
-        return(unnested_agd)
-      })
-
-      agd_arm_covariate_data <- split(agd_arm_networks_list, names(agd_arm_networks_list))
-      agd_arm_covariate_data <- lapply(agd_arm_covariate_data, function(sub_list) {
-        do.call(rbind, sub_list)
-      })
+      names(arm_data) <- agd_study_labels
+      # Combine arms that belong to the same study
+      lapply(split(arm_data, agd_study_labels), function(arms) do.call(rbind, arms))
+    } else {
+      list()
     }
 
-    # Combine Data
-    if (isTRUE(nrow(network$ipd) > 0)) all_data <- ipd_covariate_data
-    if (isTRUE(nrow(network$agd_arm) > 0)) all_data <- c(all_data, agd_arm_covariate_data)
+    all_data <- c(ipd_covariate_data, agd_covariate_data)
+    study_names <- names(all_data)
+    n_studies <- length(all_data)
 
-    # Run Pairwise Logistic Regressions
-    regression_results <- list()
+    # Single pass: fit model, compute propensity scores, weights, and ESS per pair
+    propensity_scores_list <- list()
+    ess_rows <- vector("list", n_studies * (n_studies - 1L) / 2L)
+    k <- 0L
 
-    for (i in 1:(length(all_data) - 1)) {
-      for (j in (i + 1):length(all_data)) {
-        study1_df <- all_data[[i]]
-        study2_df <- all_data[[j]]
-        combined_df <- rbind(study1_df, study2_df)
-        combined_df$study_indicator <- c(rep(1, nrow(study1_df)), rep(0, nrow(study2_df)))
+    # for (i in 1:(n_studies - 1)) {
+      for (j in (i + 1):n_studies) {
+        s1 <- study_names[i]
+        s2 <- study_names[j]
+
+        combined_df <- rbind(
+          cbind(all_data[[i]], study_indicator = 1L),
+          cbind(all_data[[j]], study_indicator = 0L)
+        )
 
         model <- glm(study_indicator ~ ., data = combined_df, family = "binomial")
-        pair_name <- paste(names(all_data)[i], names(all_data)[j], sep = "_vs_")
-        regression_results[[pair_name]] <- model
+        ps <- predict(model, newdata = combined_df, type = "response")
+
+        combined_df$propensity_score <- ps
+        combined_df$ate_weight <- ifelse(
+          combined_df$study_indicator == 1L,
+          1 / ps,
+          1 / (1 - ps)
+        )
+
+        w <- combined_df$ate_weight
+        ess <- sum(w)^2 / sum(w^2)
+
+        pair_name <- paste(s1, s2, sep = "_vs_")
+        propensity_scores_list[[pair_name]] <- combined_df
+
+        k <- k + 1L
+        ess_rows[[k]] <- data.frame(
+          comparison = pair_name,
+          study1 = s1,
+          study2 = s2,
+          original_n = nrow(combined_df),
+          ess = ess,
+          ess_percent_of_original = ess / nrow(combined_df) * 100,
+          stringsAsFactors = FALSE
+        )
       }
     }
 
-    # Calculate propensity scores & weights
-    propensity_scores_list <- list()
-    for (pair_name in names(regression_results)) {
-      model <- regression_results[[pair_name]]
-      study_names <- strsplit(pair_name, "_vs_")[[1]]
-
-      study1_df <- all_data[[study_names[1]]]
-      study1_df$study_indicator <- 1
-      study2_df <- all_data[[study_names[2]]]
-      study2_df$study_indicator <- 0
-
-      combined_df <- rbind(study1_df, study2_df)
-      propensity_scores <- predict(model, newdata = combined_df, type = "response")
-
-      combined_df$propensity_score <- propensity_scores
-      combined_df$ate_weight <- ifelse(
-        combined_df$study_indicator == 1,
-        1 / combined_df$propensity_score,
-        1 / (1 - combined_df$propensity_score)
-      )
-      propensity_scores_list[[pair_name]] <- combined_df
-    }
-
-    # Calculate Effective Sample Size (ESS)
-    ess_summary <- data.frame(
-      comparison = character(),
-      original_n = integer(),
-      ess = numeric(),
-      ess_reduction_percent = numeric(),
-      stringsAsFactors = FALSE
-    )
-
-    for (pair_name in names(propensity_scores_list)) {
-      df <- propensity_scores_list[[pair_name]]
-      sum_of_weights <- sum(df$ate_weight)
-      sum_of_squared_weights <- sum(df$ate_weight^2)
-      effective_sample_size <- (sum_of_weights^2) / sum_of_squared_weights
-
-      original_n <- nrow(df)
-      ess_percent <- (effective_sample_size / original_n) * 100
-
-      ess_summary <- rbind(ess_summary, data.frame(
-        comparison = pair_name,
-        original_n = original_n,
-        ess = effective_sample_size,
-        ess_percent_of_original = ess_percent
-      ))
-    }
+    ess_summary <- do.call(rbind, ess_rows)
     ess_summary <- ess_summary[order(ess_summary$ess_percent_of_original, decreasing = TRUE), ]
 
-    # Format Output Matrix (Long to Wide)
+    # Build symmetric ESS matrix directly
+    sorted_names <- sort(study_names)
+    n <- length(sorted_names)
+    sorted_matrix <- matrix(NA_real_, nrow = n, ncol = n, dimnames = list(sorted_names, sorted_names))
+    for (r in seq_len(nrow(ess_summary))) {
+      s1 <- ess_summary$study1[r]
+      s2 <- ess_summary$study2[r]
+      val <- ess_summary$ess_percent_of_original[r]
+      sorted_matrix[s1, s2] <- val
+      sorted_matrix[s2, s1] <- val
+    }
+
+    # Detect subnetworks
     g <- igraph::as.igraph(network)
     components <- igraph::components(g)
     treatment_components <- data.frame(
@@ -188,8 +156,7 @@ compare_populations <- function(network,
     study_trt_lookup <- list(network$ipd, network$agd_contrast, network$agd_arm) %>%
       purrr::compact() %>%
       purrr::map_dfr(~ {
-        cols <- colnames(.x)
-        if (all(c(".study", ".trt") %in% cols)) {
+        if (all(c(".study", ".trt") %in% colnames(.x))) {
           dplyr::tibble(.study = as.character(.x$.study), .trt = as.character(.x$.trt))
         } else {
           NULL
@@ -202,33 +169,6 @@ compare_populations <- function(network,
       dplyr::select(-.trt) %>%
       dplyr::distinct(.study, subnetwork)
 
-    df_long <- ess_summary %>%
-      separate(comparison, into = c("item1", "item2"), sep = "_vs_") %>%
-      select(item1, item2, value = ess_percent_of_original)
-
-    df_symmetric <- df_long %>%
-      rename(item2 = item1, item1 = item2, value = value)
-
-    df_all <- rbind(df_long, df_symmetric)
-    final_matrix_df <- df_all %>%
-      pivot_wider(names_from = item2, values_from = value)
-
-    final_matrix <- final_matrix_df %>%
-      column_to_rownames(var = "item1") %>%
-      as.matrix()
-
-    sorted_names <- sort(rownames(final_matrix))
-    sorted_matrix <- final_matrix[sorted_names, sorted_names]
-
-    # Filter by subnetwork if applicable
-    if (max(study_components$subnetwork) == 2) {
-      sub1 <- dplyr::filter(study_components, subnetwork == 1)
-      sub2 <- dplyr::filter(study_components, subnetwork == 2)
-      rows_to_keep <- rownames(sorted_matrix) %in% sub1$.study
-      cols_to_keep <- colnames(sorted_matrix) %in% sub2$.study
-      filtered_matrix <- sorted_matrix[rows_to_keep, cols_to_keep]
-    }
-
     output_list <- list(
       propensity_scores = propensity_scores_list,
       summary = ess_summary,
@@ -236,11 +176,16 @@ compare_populations <- function(network,
     )
 
     if (max(study_components$subnetwork) == 2) {
-      output_list$subnetwork_matrix <- filtered_matrix
+      sub1 <- dplyr::filter(study_components, subnetwork == 1)$.study
+      sub2 <- dplyr::filter(study_components, subnetwork == 2)$.study
+      output_list$subnetwork_matrix <- sorted_matrix[
+        rownames(sorted_matrix) %in% sub1,
+        colnames(sorted_matrix) %in% sub2,
+        drop = FALSE
+      ]
     }
 
     return(output_list)
-  }
 
   # ==========================================
   # METHOD: EUCLIDEAN
