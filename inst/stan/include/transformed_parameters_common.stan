@@ -45,8 +45,12 @@ if (totns) {
 if (random_baseline) {
   real bmean = baseline_mean[1];
   real bsd   = baseline_sd[1];
-  f_baseline = rep_vector(bmean, totns) - mu + bsd .* z_baseline;
-  mu = rep_vector(bmean, totns) + bsd .* z_baseline;
+  f_baseline = rep_vector(0.0, totns);
+  for (i in 1:n_baseline_studies) {
+    int s = baseline_study_idx[i];
+    f_baseline[s] = bmean - mu[s] + bsd * z_baseline[i];
+    mu[s] = bmean + bsd * z_baseline[i];
+  }
 }
 
 // -- Regression predictors --

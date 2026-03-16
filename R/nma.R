@@ -311,7 +311,8 @@ nma <- function(network,
                 mspline_degree = 3,
                 n_knots = 7,
                 knots = NULL,
-                mspline_basis = NULL) {
+                mspline_basis = NULL,
+                baseline_subnet = NULL) {
 
   # Remove random baseline arguments from ...
   dlist <- list(...)
@@ -828,9 +829,23 @@ nma <- function(network,
   # Notify if default reference treatment is used
   if (.is_default(network$treatments))
     inform(glue::glue('Note: Setting "{levels(network$treatments)[1]}" as the network reference treatment.'))
-  # Notify if network is disconnected
-  if (!is_network_connected(network))
-    inform("Note: Network is disconnected. See ?is_network_connected for more details.")
+  # Error if network is disconnected (must use baseline_synthesis() instead)
+  if (!is_network_connected(network) && is.null(baseline_subnet))
+    abort("Network is disconnected. See ?is_network_connected for more details.")
+
+  # Auto-compute subnetwork_trt from igraph components when baseline_subnet is set
+  subnetwork_trt <- NULL
+  if (!is.null(baseline_subnet)) {
+    g          <- igraph::as.igraph(network)
+    comp       <- igraph::components(g)
+    raw_subnet <- comp$membership
+    ref_trt    <- as.character(levels(network$treatments)[1])
+    ref_comp   <- raw_subnet[[ref_trt]]
+    old_ids    <- c(ref_comp, setdiff(seq_len(comp$no), ref_comp))
+    id_map     <- stats::setNames(seq_len(comp$no), old_ids)
+    subnetwork_trt        <- id_map[as.character(raw_subnet)]
+    names(subnetwork_trt) <- names(raw_subnet)
+  }
   # Notify if reference treatment is within a class when running the exchangeable class model
   if (class_effects == "exchangeable" && !is.null(network$classes)) {
     ref_trt <- levels(network$treatments)[1]
@@ -1078,7 +1093,8 @@ nma <- function(network,
                                   xbar = xbar,
                                   consistency = consistency,
                                   nodesplit = nodesplit,
-                                  classes = !is.null(network$classes))
+                                  classes = !is.null(network$classes),
+                                  subnetwork_trt = subnetwork_trt)
 
   X_ipd <- X_list$X_ipd
   X_agd_arm <- X_list$X_agd_arm
@@ -1087,6 +1103,33 @@ nma <- function(network,
   offset_ipd <- X_list$offset_ipd
   offset_agd_arm <- X_list$offset_agd_arm
   offset_agd_contrast <- X_list$offset_agd_contrast
+
+  # Compute baseline study indices (for random baseline hierarchy)
+  {
+    X_check <- if (!is.null(X_ipd)) X_ipd else if (!is.null(X_agd_arm)) X_agd_arm else X_agd_contrast
+    x_nms   <- colnames(X_check)
+    col_sty <- grepl("^\\.study[^:]+$", x_nms)
+    sty_nms <- sub("^\\.study", "", x_nms[col_sty])
+
+    if (!is.null(subnetwork_trt) && !is.null(baseline_subnet)) {
+      all_study_trt <- dplyr::bind_rows(
+        if (has_ipd(network)) dplyr::distinct(dat_ipd,
+          .study = as.character(.data$.study), .trt = as.character(.data$.trt)) else NULL,
+        if (has_agd_arm(network)) dplyr::distinct(idat_agd_arm,
+          .study = as.character(.data$.study), .trt = as.character(.data$.trt)) else NULL
+      )
+      bl_studies <- all_study_trt %>%
+        dplyr::mutate(.sn = subnetwork_trt[.data$.trt]) %>%
+        dplyr::filter(.data$.sn == baseline_subnet) %>%
+        dplyr::pull(.data$.study) %>%
+        unique()
+      baseline_study_idx <- which(sty_nms %in% bl_studies)
+      n_baseline_studies <- length(baseline_study_idx)
+    } else {
+      n_baseline_studies <- length(sty_nms)
+      baseline_study_idx <- seq_len(n_baseline_studies)
+    }
+  }
 
   # Construct RE correlation matrix
   if (trt_effects == "random") {
@@ -1322,6 +1365,8 @@ if (class_effects == "exchangeable") {
     connect_flag = connect_flag,
     fixed_baseline = fixed_baseline,
     mixed_studies = mixed_studies,
+    n_baseline_studies = n_baseline_studies,
+    baseline_study_idx = baseline_study_idx,
     ...,
     prior_intercept = prior_intercept,
     prior_trt = prior_trt,
@@ -1521,6 +1566,7 @@ if (class_effects == "exchangeable") {
                             prior_aux_reg = if (has_aux_regression) prior_aux_reg else NULL))
 
   if (likelihood %in% c("mspline", "pexp")) out$basis <- basis
+  if (!is.null(baseline_subnet)) out$baseline_study_idx <- baseline_study_idx
 
   if (inherits(network, "mlnmr_data")) class(out) <- c("stan_mlnmr", "stan_nma")
   else class(out) <- "stan_nma"
@@ -1591,7 +1637,9 @@ nma.fit <- function(ipd_x, ipd_y,
                     int_thin = 0,
                     int_check = TRUE,
                     basis,
-                    random_baseline = FALSE) {
+                    random_baseline = FALSE,
+                    n_baseline_studies = NULL,
+                    baseline_study_idx = NULL) {
 
   if (missing(ipd_x)) ipd_x <- NULL
   if (missing(ipd_y)) ipd_y <- NULL
@@ -1949,6 +1997,8 @@ nma.fit <- function(ipd_x, ipd_y,
     xbar_mu = xbar_mu %||% 0,
     # random baseline effect
     random_baseline = ifelse(random_baseline == TRUE, 1, 0),
+    n_baseline_studies = if (!is.null(n_baseline_studies)) n_baseline_studies else 0L,
+    baseline_study_idx = if (!is.null(baseline_study_idx)) as.array(baseline_study_idx) else integer(0),
     connect_baseline = connect_flag,
     fixed_baseline = fixed_baseline,
     mixed_studies = mixed_studies
@@ -3133,7 +3183,8 @@ make_nma_model_matrix <- function(nma_formula,
                                   consistency = c("consistency", "nodesplit", "ume"),
                                   nodesplit = NULL,
                                   classes = FALSE,
-                                  newdata = FALSE) {
+                                  newdata = FALSE,
+                                  subnetwork_trt = NULL) {
   # Checks
   if (!rlang::is_formula(nma_formula)) abort("`nma_formula` is not a formula")
   stopifnot(is.data.frame(dat_ipd),
@@ -3262,6 +3313,22 @@ make_nma_model_matrix <- function(nma_formula,
   # Construct design matrix all together then split out, so that same dummy
   # coding is used everywhere
   dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
+
+  # Recode .trt factor for disconnected networks so each subnetwork has its own
+  # reference treatment, both mapping to "..ref.." so R drops both as reference
+  if (!is.null(subnetwork_trt)) {
+    trt_levels <- levels(dat_all$.trt)
+    sn_of_trt  <- subnetwork_trt[trt_levels]
+    subnet_refs <- tapply(trt_levels, sn_of_trt, function(x) x[[1]])
+    new_trt_labels <- vapply(trt_levels, function(trt) {
+      ref <- subnet_refs[[as.character(sn_of_trt[[trt]])]]
+      if (trt == ref) "..ref.." else paste0(trt, " vs ", ref)
+    }, character(1))
+    names(new_trt_labels) <- trt_levels
+    new_trt_levels <- c("..ref..", setdiff(new_trt_labels, "..ref.."))
+    dat_all$.trt <- factor(new_trt_labels[as.character(dat_all$.trt)],
+                           levels = new_trt_levels)
+  }
 
   # Check that required variables are present in each data set, and non-missing
   check_regression_data(nma_formula,
@@ -3955,42 +4022,58 @@ baseline_synthesis <- function(network,
                                ...) {
   check_prior(prior_intercept_sd)
 
-  # Call nma()
-  fit <- do.call(
-    nma,
-    c(
-      list(
-        network = network,
-        random_baseline = random_baseline,
-        prior_intercept_sd = prior_intercept_sd
-      ),
-      list(...)
-    )
+  if (is_network_connected(network))
+    abort("`baseline_synthesis()` is only for disconnected networks.")
+
+  # The baseline subnetwork is always 1 — nma() reorders components so the
+  # network reference treatment's subnetwork is always subnetwork 1
+  baseline_subnet <- 1L
+
+  fit <- nma(
+    network            = network,
+    baseline_subnet    = baseline_subnet,
+    random_baseline    = random_baseline,
+    prior_intercept_sd = prior_intercept_sd,
+    ...
   )
 
   dots <- list(...)
   if (isTRUE(dots$test_grad)) {
-    return(list(
-      network = network
-    ))
+    return(list(network = network))
   }
 
   # Summarise baseline-related parameters and attach
-  ss <- rstan::summary(fit$stanfit,
-                       pars  = c("baseline_new","baseline_mean","baseline_sd","mu"),
-                       probs = c(0.025, 0.5, 0.975))$summary
+  # Extract all mu[], then filter to reference subnetwork studies only
+  ss_bl <- rstan::summary(fit$stanfit,
+                          pars  = c("baseline_new", "baseline_mean", "baseline_sd"),
+                          probs = c(0.025, 0.5, 0.975))$summary
+  ss_mu <- rstan::summary(fit$stanfit,
+                          pars  = "mu",
+                          probs = c(0.025, 0.5, 0.975))$summary
+  ss_d  <- rstan::summary(fit$stanfit,
+                          pars  = "d",
+                          probs = c(0.025, 0.5, 0.975))$summary
 
-  keep <- grepl("^(baseline_new|baseline_mean|baseline_sd|mu\\[)", rownames(ss))
+  # Split d[] by subnetwork: subnet 1 d's have the network reference treatment as their ref
+  ref_trt_name <- levels(network$treatments)[1]
+  d_names      <- rownames(ss_d)  # e.g. "d[IXE_Q2W vs PBO]", "d[SEC_300 vs SEC_150]"
+  d_refs       <- sub(".*vs (.+)\\]$", "\\1", d_names)
+
+  ss <- rbind(
+    ss_bl,
+    ss_mu[fit$baseline_study_idx, , drop = FALSE],
+    ss_d[d_refs == ref_trt_name, , drop = FALSE],   # subnet 1 d's
+    ss_d[d_refs != ref_trt_name, , drop = FALSE]    # subnet 2+ d's
+  )
+
+  keep <- grepl("^(baseline_new|baseline_mean|baseline_sd|mu\\[|d\\[)", rownames(ss))
   summary_df <- as.data.frame(ss[keep, , drop = FALSE])
   summary_df$parameter <- rownames(ss)[keep]
   summary_df <- summary_df[, c("parameter", setdiff(names(summary_df), "parameter"))]
   rownames(summary_df) <- NULL
 
   fit$baseline_summary <- summary_df
-
-  # Store prior for baseline standard deviation for plotting
   fit$priors$prior_intercept_sd <- prior_intercept_sd
-
 
   class(fit) <- c("baseline_synthesis", class(fit))
   fit

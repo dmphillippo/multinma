@@ -13,7 +13,13 @@ if (random_baseline == 0) {
   prior_select_lp(baseline_mean, prior_intercept_dist[1], prior_intercept_location[1], prior_intercept_scale[1], prior_intercept_df[1]);
   prior_select_lp(baseline_sd, prior_intercept_sd_dist, prior_intercept_sd_location, prior_intercept_sd_scale, prior_intercept_sd_df);
 
-  allbeta[1:totns] ~ std_normal();
+  for (s in 1:totns) {
+    if (in_baseline_subnet[s]) {
+      allbeta[s] ~ std_normal();
+    } else {
+      prior_select2_lp(mu[s], prior_intercept_dist[1], prior_intercept_location[1], prior_intercept_scale[1], prior_intercept_df[1]);
+    }
+  }
 }
 // Treatment effects
   if (class_effects == 0) {

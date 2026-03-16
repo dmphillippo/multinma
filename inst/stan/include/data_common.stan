@@ -25,6 +25,8 @@ int<lower=0, upper=1> random_baseline;
 array[random_baseline ? max(ipd_arm) : 0] int<lower=1> ipd_study;
 array[random_baseline ? ni_agd_arm : 0] int<lower=1> agd_arm_study;
 // array[ni_agd_contrast] int<lower=1> agd_contrast_study;
+int<lower=0> n_baseline_studies;
+array[random_baseline ? n_baseline_studies : 0] int<lower=1> baseline_study_idx;
 
 int<lower=1> nt; // number of treatments
 int<lower=0> nX; // number of columns of design matrix
