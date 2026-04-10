@@ -52,7 +52,9 @@ test_that("Diabetes", {
                         r = r,
                         n = n)
   expect_doppelganger("Diabetes network",
-    plot(db_net, weight_edges = TRUE, weight_nodes = TRUE) + ggplot2::theme(legend.box.margin = ggplot2::unit(c(0, 0, 0, 4), "lines"))
+    plot(db_net, weight_edges = TRUE, weight_nodes = TRUE) +
+      ggplot2::guides(size = ggplot2::guide_legend(order = 1), edge_width = ggplot2::guide_legend(order = 2)) +
+      ggplot2::theme(legend.box.margin = ggplot2::unit(c(0, 0, 0, 4), "lines"))
   )
 })
 
@@ -79,6 +81,7 @@ test_that("HTA psoriasis", {
 
   expect_doppelganger("HTA psoriasis network",
     plot(pso_net, weight_edges = TRUE, weight_nodes = TRUE) +
+      ggplot2::guides(size = ggplot2::guide_legend(order = 1), edge_width = ggplot2::guide_legend(order = 2)) +
       # Nudge the legend over
       ggplot2::theme(legend.box.spacing = ggplot2::unit(0.75, "in"),
                      plot.margin = ggplot2::margin(0.1, 0, 0.1, 0.75, "in"))
@@ -95,7 +98,8 @@ test_that("Parkinsons", {
                          sample_size = n)
 
   expect_doppelganger("Parkinsons arm network",
-    plot(arm_net, weight_edges = TRUE, weight_nodes = TRUE)
+    plot(arm_net, weight_edges = TRUE, weight_nodes = TRUE) +
+    ggplot2::guides(size = ggplot2::guide_legend(order = 1), edge_width = ggplot2::guide_legend(order = 2))
   )
 
   contr_net <- set_agd_contrast(parkinsons,
@@ -106,7 +110,8 @@ test_that("Parkinsons", {
                                 sample_size = n)
 
   expect_doppelganger("Parkinsons contrast network",
-    plot(contr_net, weight_edges = TRUE, weight_nodes = TRUE)
+    plot(contr_net, weight_edges = TRUE, weight_nodes = TRUE) +
+      ggplot2::guides(size = ggplot2::guide_legend(order = 1), edge_width = ggplot2::guide_legend(order = 2))
   )
 
   studies <- parkinsons$studyn
@@ -130,7 +135,8 @@ test_that("Parkinsons", {
   mix_net <- combine_network(mix_arm_net, mix_contr_net)
 
   expect_doppelganger("Parkinsons mixed network",
-    plot(mix_net, weight_edges = TRUE, weight_nodes = TRUE)
+    plot(mix_net, weight_edges = TRUE, weight_nodes = TRUE) +
+      ggplot2::guides(size = ggplot2::guide_legend(order = 1), edge_width = ggplot2::guide_legend(order = 2))
   )
 })
 
@@ -211,8 +217,11 @@ test_that("Plaque psoriasis", {
       scale_fill_manual("Treatment class",
                         values = class_pal,
                         aesthetics = c("fill", "colour")) +
-      guides(edge_colour = guide_legend(override.aes = list(edge_width = 2)),
-             fill = guide_legend(override.aes = list(size = 2)))
+      guides(size = guide_legend(order = 1),
+             edge_colour = guide_legend(override.aes = list(edge_width = 2), order = 2),
+             fill = guide_legend(override.aes = list(size = 2), order = 3),
+             color = guide_legend(order = 3),
+             edge_width = guide_legend(order = 4))
   )
 })
 
@@ -253,7 +262,8 @@ test_that("Thrombolytics", {
                              n = n)
 
   expect_doppelganger("Thrombolytics network",
-    plot(thrombo_net, weight_edges = TRUE, weight_nodes = TRUE)
+    plot(thrombo_net, weight_edges = TRUE, weight_nodes = TRUE) +
+      ggplot2::guides(size = ggplot2::guide_legend(order = 2), edge_width = ggplot2::guide_legend(order = 1))
   )
 
   # Make trtf factor to order treatments in same way as Dias analysis
@@ -267,7 +277,8 @@ test_that("Thrombolytics", {
                               n = n)
 
   expect_doppelganger("Thrombolytics Dias network",
-                      plot(thrombo_net2, weight_edges = TRUE, weight_nodes = TRUE)
+                      plot(thrombo_net2, weight_edges = TRUE, weight_nodes = TRUE) +
+                        ggplot2::guides(size = ggplot2::guide_legend(order = 2), edge_width = ggplot2::guide_legend(order = 1))
   )
 })
 
