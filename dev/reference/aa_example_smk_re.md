@@ -69,19 +69,19 @@ smk_fit_RE
 #> post-warmup draws per chain=1000, total post-warmup draws=4000.
 #> 
 #>                               mean se_mean   sd     2.5%      25%      50%
-#> d[Group counselling]          1.11    0.01 0.45     0.26     0.82     1.10
-#> d[Individual counselling]     0.85    0.01 0.24     0.39     0.69     0.84
-#> d[Self-help]                  0.48    0.01 0.41    -0.30     0.22     0.48
-#> lp__                      -5767.79    0.19 6.42 -5781.22 -5771.84 -5767.54
-#> tau                           0.84    0.01 0.19     0.55     0.71     0.82
+#> d[Group counselling]          1.08    0.01 0.42     0.24     0.81     1.08
+#> d[Individual counselling]     0.83    0.01 0.24     0.37     0.67     0.82
+#> d[Self-help]                  0.50    0.01 0.40    -0.29     0.24     0.49
+#> lp__                      -5768.46    0.20 6.47 -5782.01 -5772.66 -5768.15
+#> tau                           0.82    0.00 0.18     0.54     0.70     0.80
 #>                                75%    97.5% n_eff Rhat
-#> d[Group counselling]          1.39     2.05  1472    1
-#> d[Individual counselling]     1.01     1.36   969    1
-#> d[Self-help]                  0.74     1.32  1472    1
-#> lp__                      -5763.28 -5756.12  1126    1
-#> tau                           0.95     1.27  1089    1
+#> d[Group counselling]          1.34     1.93  1908    1
+#> d[Individual counselling]     0.99     1.34  1154    1
+#> d[Self-help]                  0.76     1.32  2000    1
+#> lp__                      -5763.90 -5756.72  1067    1
+#> tau                           0.93     1.24  1337    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Feb 24 14:08:48 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Apr 10 14:35:37 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).

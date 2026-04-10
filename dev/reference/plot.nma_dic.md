@@ -125,13 +125,13 @@ if (!exists("smk_fit_RE")) example("example_smk_re", run.donttest = TRUE)
 # \donttest{
 # Compare DIC of FE and RE models
 (smk_dic_FE <- dic(smk_fit_FE))
-#> Residual deviance: 267.4 (on 50 data points)
-#>                pD: 27.2
-#>               DIC: 294.6
+#> Residual deviance: 267.1 (on 50 data points)
+#>                pD: 26.9
+#>               DIC: 293.9
 (smk_dic_RE <- dic(smk_fit_RE))   # substantially better fit
-#> Residual deviance: 53.8 (on 50 data points)
-#>                pD: 43.7
-#>               DIC: 97.5
+#> Residual deviance: 54.5 (on 50 data points)
+#>                pD: 44
+#>               DIC: 98.4
 
 # Plot residual deviance contributions under RE model
 plot(smk_dic_RE)
@@ -164,13 +164,13 @@ if (!exists("smk_fit_RE_UME")) example("example_smk_ume", run.donttest = TRUE)
 # \donttest{
 # Compare DIC
 smk_dic_RE
-#> Residual deviance: 53.8 (on 50 data points)
-#>                pD: 43.7
-#>               DIC: 97.5
+#> Residual deviance: 54.5 (on 50 data points)
+#>                pD: 44
+#>               DIC: 98.4
 (smk_dic_RE_UME <- dic(smk_fit_RE_UME))  # no difference in fit
-#> Residual deviance: 54.1 (on 50 data points)
-#>                pD: 45.2
-#>               DIC: 99.3
+#> Residual deviance: 54 (on 50 data points)
+#>                pD: 45.4
+#>               DIC: 99.5
 
 # Compare residual deviance contributions with a "dev-dev" plot
 plot(smk_dic_RE, smk_dic_RE_UME)

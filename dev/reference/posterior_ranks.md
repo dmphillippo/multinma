@@ -121,10 +121,10 @@ if (!exists("smk_fit_RE")) example("example_smk_re", run.donttest = TRUE)
 smk_rank_RE <- posterior_ranks(smk_fit_RE, lower_better = FALSE)
 smk_rank_RE
 #>                              mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS
-#> rank[No intervention]        3.88 0.33    3   4   4   4     4     2038       NA
-#> rank[Group counselling]      1.38 0.63    1   1   1   2     3     2728     2781
-#> rank[Individual counselling] 1.92 0.63    1   2   2   2     3     2263       NA
-#> rank[Self-help]              2.82 0.69    1   3   3   3     4     1859       NA
+#> rank[No intervention]        3.90 0.31    3   4   4   4     4     2381       NA
+#> rank[Group counselling]      1.37 0.62    1   1   1   2     3     2812     2553
+#> rank[Individual counselling] 1.93 0.64    1   2   2   2     3     2474     2625
+#> rank[Self-help]              2.80 0.68    1   3   3   3     4     2517       NA
 #>                              Rhat
 #> rank[No intervention]           1
 #> rank[Group counselling]         1
@@ -137,10 +137,10 @@ plot(smk_rank_RE)
 smk_rankprob_RE <- posterior_rank_probs(smk_fit_RE, lower_better = FALSE)
 smk_rankprob_RE
 #>                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]
-#> d[No intervention]             0.00      0.00      0.11      0.89
-#> d[Group counselling]           0.70      0.23      0.07      0.00
-#> d[Individual counselling]      0.24      0.60      0.16      0.00
-#> d[Self-help]                   0.06      0.17      0.67      0.11
+#> d[No intervention]             0.00      0.00      0.10      0.90
+#> d[Group counselling]           0.70      0.23      0.06      0.01
+#> d[Individual counselling]      0.24      0.59      0.17      0.00
+#> d[Self-help]                   0.06      0.18      0.67      0.10
 plot(smk_rankprob_RE)
 
 
@@ -149,10 +149,10 @@ smk_cumrankprob_RE <- posterior_rank_probs(smk_fit_RE, lower_better = FALSE,
                                            cumulative = TRUE)
 smk_cumrankprob_RE
 #>                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]
-#> d[No intervention]             0.00      0.00      0.11         1
-#> d[Group counselling]           0.70      0.93      1.00         1
-#> d[Individual counselling]      0.24      0.84      1.00         1
-#> d[Self-help]                   0.06      0.23      0.89         1
+#> d[No intervention]             0.00      0.00      0.10         1
+#> d[Group counselling]           0.70      0.93      0.99         1
+#> d[Individual counselling]      0.24      0.83      1.00         1
+#> d[Self-help]                   0.06      0.23      0.90         1
 plot(smk_cumrankprob_RE)
 
 
@@ -185,9 +185,9 @@ pso_rank
 #> rank[FIXTURE: PBO]     1.00 0.00    1   1   1   1     1       NA       NA   NA
 #> rank[FIXTURE: ETN]     2.00 0.00    2   2   2   2     2       NA       NA   NA
 #> rank[FIXTURE: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA   NA
-#> rank[FIXTURE: IXE_Q4W] 4.78 0.42    4   5   5   5     5     4289       NA    1
-#> rank[FIXTURE: SEC_150] 3.00 0.04    3   3   3   3     3     4029     4029    1
-#> rank[FIXTURE: SEC_300] 4.22 0.42    4   4   4   4     5     4410       NA    1
+#> rank[FIXTURE: IXE_Q4W] 4.77 0.42    4   5   5   5     5     4350       NA    1
+#> rank[FIXTURE: SEC_150] 3.00 0.05    3   3   3   3     3     4037     4037    1
+#> rank[FIXTURE: SEC_300] 4.23 0.43    4   4   4   4     5     4483       NA    1
 #> 
 #> -------------------------------------------------------------- Study: UNCOVER-1 ---- 
 #> 
@@ -199,9 +199,9 @@ pso_rank
 #> rank[UNCOVER-1: PBO]     1.00 0.00    1   1   1   1     1       NA       NA
 #> rank[UNCOVER-1: ETN]     2.00 0.00    2   2   2   2     2       NA       NA
 #> rank[UNCOVER-1: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA
-#> rank[UNCOVER-1: IXE_Q4W] 4.78 0.42    4   5   5   5     5     4289       NA
-#> rank[UNCOVER-1: SEC_150] 3.00 0.04    3   3   3   3     3     4029     4029
-#> rank[UNCOVER-1: SEC_300] 4.22 0.42    4   4   4   4     5     4410       NA
+#> rank[UNCOVER-1: IXE_Q4W] 4.77 0.42    4   5   5   5     5     4350       NA
+#> rank[UNCOVER-1: SEC_150] 3.00 0.05    3   3   3   3     3     4037     4037
+#> rank[UNCOVER-1: SEC_300] 4.23 0.43    4   4   4   4     5     4483       NA
 #>                          Rhat
 #> rank[UNCOVER-1: PBO]       NA
 #> rank[UNCOVER-1: ETN]       NA
@@ -220,9 +220,9 @@ pso_rank
 #> rank[UNCOVER-2: PBO]     1.00 0.00    1   1   1   1     1       NA       NA
 #> rank[UNCOVER-2: ETN]     2.00 0.00    2   2   2   2     2       NA       NA
 #> rank[UNCOVER-2: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA
-#> rank[UNCOVER-2: IXE_Q4W] 4.78 0.42    4   5   5   5     5     4289       NA
-#> rank[UNCOVER-2: SEC_150] 3.00 0.04    3   3   3   3     3     4029     4029
-#> rank[UNCOVER-2: SEC_300] 4.22 0.42    4   4   4   4     5     4410       NA
+#> rank[UNCOVER-2: IXE_Q4W] 4.77 0.42    4   5   5   5     5     4350       NA
+#> rank[UNCOVER-2: SEC_150] 3.00 0.05    3   3   3   3     3     4037     4037
+#> rank[UNCOVER-2: SEC_300] 4.23 0.43    4   4   4   4     5     4483       NA
 #>                          Rhat
 #> rank[UNCOVER-2: PBO]       NA
 #> rank[UNCOVER-2: ETN]       NA
@@ -241,9 +241,9 @@ pso_rank
 #> rank[UNCOVER-3: PBO]     1.00 0.00    1   1   1   1     1       NA       NA
 #> rank[UNCOVER-3: ETN]     2.00 0.00    2   2   2   2     2       NA       NA
 #> rank[UNCOVER-3: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA
-#> rank[UNCOVER-3: IXE_Q4W] 4.78 0.42    4   5   5   5     5     4289       NA
-#> rank[UNCOVER-3: SEC_150] 3.00 0.04    3   3   3   3     3     4029     4029
-#> rank[UNCOVER-3: SEC_300] 4.22 0.42    4   4   4   4     5     4410       NA
+#> rank[UNCOVER-3: IXE_Q4W] 4.77 0.42    4   5   5   5     5     4350       NA
+#> rank[UNCOVER-3: SEC_150] 3.00 0.05    3   3   3   3     3     4037     4037
+#> rank[UNCOVER-3: SEC_300] 4.23 0.43    4   4   4   4     5     4483       NA
 #>                          Rhat
 #> rank[UNCOVER-3: PBO]       NA
 #> rank[UNCOVER-3: ETN]       NA
@@ -268,9 +268,9 @@ pso_rankprobs
 #> d[FIXTURE: PBO]             1         0         0      0.00      0.00         0
 #> d[FIXTURE: ETN]             0         1         0      0.00      0.00         0
 #> d[FIXTURE: IXE_Q2W]         0         0         0      0.00      0.00         1
-#> d[FIXTURE: IXE_Q4W]         0         0         0      0.22      0.78         0
+#> d[FIXTURE: IXE_Q4W]         0         0         0      0.23      0.77         0
 #> d[FIXTURE: SEC_150]         0         0         1      0.00      0.00         0
-#> d[FIXTURE: SEC_300]         0         0         0      0.78      0.22         0
+#> d[FIXTURE: SEC_300]         0         0         0      0.77      0.23         0
 #> 
 #> -------------------------------------------------------------- Study: UNCOVER-1 ---- 
 #> 
@@ -282,9 +282,9 @@ pso_rankprobs
 #> d[UNCOVER-1: PBO]             1         0         0      0.00      0.00
 #> d[UNCOVER-1: ETN]             0         1         0      0.00      0.00
 #> d[UNCOVER-1: IXE_Q2W]         0         0         0      0.00      0.00
-#> d[UNCOVER-1: IXE_Q4W]         0         0         0      0.22      0.78
+#> d[UNCOVER-1: IXE_Q4W]         0         0         0      0.23      0.77
 #> d[UNCOVER-1: SEC_150]         0         0         1      0.00      0.00
-#> d[UNCOVER-1: SEC_300]         0         0         0      0.78      0.22
+#> d[UNCOVER-1: SEC_300]         0         0         0      0.77      0.23
 #>                       p_rank[6]
 #> d[UNCOVER-1: PBO]             0
 #> d[UNCOVER-1: ETN]             0
@@ -303,9 +303,9 @@ pso_rankprobs
 #> d[UNCOVER-2: PBO]             1         0         0      0.00      0.00
 #> d[UNCOVER-2: ETN]             0         1         0      0.00      0.00
 #> d[UNCOVER-2: IXE_Q2W]         0         0         0      0.00      0.00
-#> d[UNCOVER-2: IXE_Q4W]         0         0         0      0.22      0.78
+#> d[UNCOVER-2: IXE_Q4W]         0         0         0      0.23      0.77
 #> d[UNCOVER-2: SEC_150]         0         0         1      0.00      0.00
-#> d[UNCOVER-2: SEC_300]         0         0         0      0.78      0.22
+#> d[UNCOVER-2: SEC_300]         0         0         0      0.77      0.23
 #>                       p_rank[6]
 #> d[UNCOVER-2: PBO]             0
 #> d[UNCOVER-2: ETN]             0
@@ -324,9 +324,9 @@ pso_rankprobs
 #> d[UNCOVER-3: PBO]             1         0         0      0.00      0.00
 #> d[UNCOVER-3: ETN]             0         1         0      0.00      0.00
 #> d[UNCOVER-3: IXE_Q2W]         0         0         0      0.00      0.00
-#> d[UNCOVER-3: IXE_Q4W]         0         0         0      0.22      0.78
+#> d[UNCOVER-3: IXE_Q4W]         0         0         0      0.23      0.77
 #> d[UNCOVER-3: SEC_150]         0         0         1      0.00      0.00
-#> d[UNCOVER-3: SEC_300]         0         0         0      0.78      0.22
+#> d[UNCOVER-3: SEC_300]         0         0         0      0.77      0.23
 #>                       p_rank[6]
 #> d[UNCOVER-3: PBO]             0
 #> d[UNCOVER-3: ETN]             0
@@ -351,9 +351,9 @@ pso_cumrankprobs
 #> d[FIXTURE: PBO]             1         1         1      1.00         1         1
 #> d[FIXTURE: ETN]             0         1         1      1.00         1         1
 #> d[FIXTURE: IXE_Q2W]         0         0         0      0.00         0         1
-#> d[FIXTURE: IXE_Q4W]         0         0         0      0.22         1         1
+#> d[FIXTURE: IXE_Q4W]         0         0         0      0.23         1         1
 #> d[FIXTURE: SEC_150]         0         0         1      1.00         1         1
-#> d[FIXTURE: SEC_300]         0         0         0      0.78         1         1
+#> d[FIXTURE: SEC_300]         0         0         0      0.77         1         1
 #> 
 #> -------------------------------------------------------------- Study: UNCOVER-1 ---- 
 #> 
@@ -365,9 +365,9 @@ pso_cumrankprobs
 #> d[UNCOVER-1: PBO]             1         1         1      1.00         1
 #> d[UNCOVER-1: ETN]             0         1         1      1.00         1
 #> d[UNCOVER-1: IXE_Q2W]         0         0         0      0.00         0
-#> d[UNCOVER-1: IXE_Q4W]         0         0         0      0.22         1
+#> d[UNCOVER-1: IXE_Q4W]         0         0         0      0.23         1
 #> d[UNCOVER-1: SEC_150]         0         0         1      1.00         1
-#> d[UNCOVER-1: SEC_300]         0         0         0      0.78         1
+#> d[UNCOVER-1: SEC_300]         0         0         0      0.77         1
 #>                       p_rank[6]
 #> d[UNCOVER-1: PBO]             1
 #> d[UNCOVER-1: ETN]             1
@@ -386,9 +386,9 @@ pso_cumrankprobs
 #> d[UNCOVER-2: PBO]             1         1         1      1.00         1
 #> d[UNCOVER-2: ETN]             0         1         1      1.00         1
 #> d[UNCOVER-2: IXE_Q2W]         0         0         0      0.00         0
-#> d[UNCOVER-2: IXE_Q4W]         0         0         0      0.22         1
+#> d[UNCOVER-2: IXE_Q4W]         0         0         0      0.23         1
 #> d[UNCOVER-2: SEC_150]         0         0         1      1.00         1
-#> d[UNCOVER-2: SEC_300]         0         0         0      0.78         1
+#> d[UNCOVER-2: SEC_300]         0         0         0      0.77         1
 #>                       p_rank[6]
 #> d[UNCOVER-2: PBO]             1
 #> d[UNCOVER-2: ETN]             1
@@ -407,9 +407,9 @@ pso_cumrankprobs
 #> d[UNCOVER-3: PBO]             1         1         1      1.00         1
 #> d[UNCOVER-3: ETN]             0         1         1      1.00         1
 #> d[UNCOVER-3: IXE_Q2W]         0         0         0      0.00         0
-#> d[UNCOVER-3: IXE_Q4W]         0         0         0      0.22         1
+#> d[UNCOVER-3: IXE_Q4W]         0         0         0      0.23         1
 #> d[UNCOVER-3: SEC_150]         0         0         1      1.00         1
-#> d[UNCOVER-3: SEC_300]         0         0         0      0.78         1
+#> d[UNCOVER-3: SEC_300]         0         0         0      0.77         1
 #>                       p_rank[6]
 #> d[UNCOVER-3: PBO]             1
 #> d[UNCOVER-3: ETN]             1
@@ -442,9 +442,9 @@ posterior_ranks(pso_fit, newdata = new_agd_means)
 #> rank[New 1: PBO]     1.00 0.00    1   1   1   1     1       NA       NA   NA
 #> rank[New 1: ETN]     2.00 0.00    2   2   2   2     2       NA       NA   NA
 #> rank[New 1: IXE_Q2W] 6.00 0.00    6   6   6   6     6       NA       NA   NA
-#> rank[New 1: IXE_Q4W] 4.78 0.42    4   5   5   5     5     4289       NA    1
-#> rank[New 1: SEC_150] 3.00 0.04    3   3   3   3     3     4029     4029    1
-#> rank[New 1: SEC_300] 4.22 0.42    4   4   4   4     5     4410       NA    1
+#> rank[New 1: IXE_Q4W] 4.77 0.42    4   5   5   5     5     4350       NA    1
+#> rank[New 1: SEC_150] 3.00 0.05    3   3   3   3     3     4037     4037    1
+#> rank[New 1: SEC_300] 4.23 0.43    4   4   4   4     5     4483       NA    1
 #> 
 
 # Rank probabilities
@@ -459,9 +459,9 @@ posterior_rank_probs(pso_fit, newdata = new_agd_means)
 #> d[New 1: PBO]             1         0         0      0.00      0.00         0
 #> d[New 1: ETN]             0         1         0      0.00      0.00         0
 #> d[New 1: IXE_Q2W]         0         0         0      0.00      0.00         1
-#> d[New 1: IXE_Q4W]         0         0         0      0.22      0.78         0
+#> d[New 1: IXE_Q4W]         0         0         0      0.23      0.77         0
 #> d[New 1: SEC_150]         0         0         1      0.00      0.00         0
-#> d[New 1: SEC_300]         0         0         0      0.78      0.22         0
+#> d[New 1: SEC_300]         0         0         0      0.77      0.23         0
 #> 
 
 # Cumulative rank probabilities
@@ -477,9 +477,9 @@ posterior_rank_probs(pso_fit, newdata = new_agd_means,
 #> d[New 1: PBO]             1         1         1      1.00         1         1
 #> d[New 1: ETN]             0         1         1      1.00         1         1
 #> d[New 1: IXE_Q2W]         0         0         0      0.00         0         1
-#> d[New 1: IXE_Q4W]         0         0         0      0.22         1         1
+#> d[New 1: IXE_Q4W]         0         0         0      0.23         1         1
 #> d[New 1: SEC_150]         0         0         1      1.00         1         1
-#> d[New 1: SEC_300]         0         0         0      0.78         1         1
+#> d[New 1: SEC_300]         0         0         0      0.77         1         1
 #> 
 # }
 ```

@@ -179,51 +179,51 @@ pso_fit
 #> post-warmup draws per chain=1000, total post-warmup draws=4000.
 #> 
 #>                                         mean se_mean   sd     2.5%      25%
-#> beta[durnpso]                           0.04    0.00 0.06    -0.08     0.00
-#> beta[prevsys]                          -0.14    0.00 0.16    -0.45    -0.25
-#> beta[bsa]                              -0.06    0.01 0.45    -0.96    -0.36
+#> beta[durnpso]                           0.04    0.00 0.06    -0.07     0.00
+#> beta[prevsys]                          -0.13    0.00 0.16    -0.45    -0.24
+#> beta[bsa]                              -0.07    0.01 0.44    -0.94    -0.37
 #> beta[weight]                            0.04    0.00 0.03    -0.02     0.02
 #> beta[psa]                              -0.08    0.00 0.17    -0.41    -0.19
-#> beta[durnpso:.trtclassTNFa blocker]    -0.03    0.00 0.08    -0.18    -0.08
-#> beta[durnpso:.trtclassIL blocker]      -0.01    0.00 0.07    -0.15    -0.06
-#> beta[prevsys:.trtclassTNFa blocker]     0.19    0.00 0.18    -0.16     0.06
-#> beta[prevsys:.trtclassIL blocker]       0.07    0.00 0.17    -0.28    -0.05
-#> beta[bsa:.trtclassTNFa blocker]         0.05    0.01 0.53    -0.99    -0.31
-#> beta[bsa:.trtclassIL blocker]           0.28    0.01 0.49    -0.66    -0.05
+#> beta[durnpso:.trtclassTNFa blocker]    -0.03    0.00 0.07    -0.17    -0.08
+#> beta[durnpso:.trtclassIL blocker]      -0.01    0.00 0.07    -0.14    -0.06
+#> beta[prevsys:.trtclassTNFa blocker]     0.19    0.00 0.19    -0.18     0.06
+#> beta[prevsys:.trtclassIL blocker]       0.06    0.00 0.17    -0.29    -0.05
+#> beta[bsa:.trtclassTNFa blocker]         0.05    0.01 0.52    -0.94    -0.29
+#> beta[bsa:.trtclassIL blocker]           0.29    0.01 0.49    -0.65    -0.05
 #> beta[weight:.trtclassTNFa blocker]     -0.17    0.00 0.04    -0.24    -0.19
 #> beta[weight:.trtclassIL blocker]       -0.10    0.00 0.03    -0.16    -0.12
-#> beta[psa:.trtclassTNFa blocker]        -0.05    0.00 0.20    -0.46    -0.19
+#> beta[psa:.trtclassTNFa blocker]        -0.06    0.00 0.21    -0.46    -0.20
 #> beta[psa:.trtclassIL blocker]           0.01    0.00 0.19    -0.35    -0.12
-#> d[ETN]                                  1.55    0.00 0.08     1.39     1.50
-#> d[IXE_Q2W]                              2.95    0.00 0.09     2.78     2.89
-#> d[IXE_Q4W]                              2.54    0.00 0.08     2.38     2.49
-#> d[SEC_150]                              2.14    0.00 0.12     1.93     2.07
-#> d[SEC_300]                              2.45    0.00 0.12     2.20     2.36
-#> lp__                                -1576.51    0.09 3.39 -1583.95 -1578.63
+#> d[ETN]                                  1.55    0.00 0.08     1.40     1.50
+#> d[IXE_Q2W]                              2.95    0.00 0.09     2.79     2.90
+#> d[IXE_Q4W]                              2.54    0.00 0.08     2.39     2.49
+#> d[SEC_150]                              2.15    0.00 0.12     1.91     2.07
+#> d[SEC_300]                              2.45    0.00 0.12     2.21     2.37
+#> lp__                                -1576.30    0.09 3.44 -1583.69 -1578.45
 #>                                          50%      75%    97.5% n_eff Rhat
-#> beta[durnpso]                           0.04     0.08     0.17  6396    1
-#> beta[prevsys]                          -0.14    -0.03     0.18  5620    1
-#> beta[bsa]                              -0.05     0.25     0.78  5453    1
-#> beta[weight]                            0.04     0.06     0.09  6046    1
-#> beta[psa]                              -0.08     0.04     0.24  5789    1
-#> beta[durnpso:.trtclassTNFa blocker]    -0.03     0.02     0.12  6118    1
-#> beta[durnpso:.trtclassIL blocker]      -0.01     0.03     0.12  7519    1
-#> beta[prevsys:.trtclassTNFa blocker]     0.19     0.31     0.56  5770    1
-#> beta[prevsys:.trtclassIL blocker]       0.07     0.18     0.40  6557    1
-#> beta[bsa:.trtclassTNFa blocker]         0.05     0.39     1.09  5751    1
-#> beta[bsa:.trtclassIL blocker]           0.28     0.60     1.26  6464    1
-#> beta[weight:.trtclassTNFa blocker]     -0.17    -0.14    -0.10  6923    1
-#> beta[weight:.trtclassIL blocker]       -0.10    -0.08    -0.04  7368    1
-#> beta[psa:.trtclassTNFa blocker]        -0.05     0.08     0.36  5998    1
-#> beta[psa:.trtclassIL blocker]           0.00     0.13     0.37  7279    1
-#> d[ETN]                                  1.55     1.61     1.71  4460    1
-#> d[IXE_Q2W]                              2.95     3.02     3.13  5083    1
-#> d[IXE_Q4W]                              2.54     2.59     2.71  5711    1
-#> d[SEC_150]                              2.14     2.22     2.37  5015    1
-#> d[SEC_300]                              2.45     2.53     2.69  5871    1
-#> lp__                                -1576.20 -1574.09 -1570.68  1447    1
+#> beta[durnpso]                           0.04     0.09     0.16  5295    1
+#> beta[prevsys]                          -0.14    -0.03     0.18  5579    1
+#> beta[bsa]                              -0.06     0.25     0.76  5664    1
+#> beta[weight]                            0.04     0.06     0.10  5628    1
+#> beta[psa]                              -0.08     0.04     0.24  6430    1
+#> beta[durnpso:.trtclassTNFa blocker]    -0.03     0.02     0.11  5703    1
+#> beta[durnpso:.trtclassIL blocker]      -0.01     0.03     0.11  5861    1
+#> beta[prevsys:.trtclassTNFa blocker]     0.19     0.31     0.56  6183    1
+#> beta[prevsys:.trtclassIL blocker]       0.06     0.18     0.41  6589    1
+#> beta[bsa:.trtclassTNFa blocker]         0.05     0.39     1.11  5848    1
+#> beta[bsa:.trtclassIL blocker]           0.27     0.61     1.28  7344    1
+#> beta[weight:.trtclassTNFa blocker]     -0.17    -0.14    -0.10  5399    1
+#> beta[weight:.trtclassIL blocker]       -0.10    -0.08    -0.04  6930    1
+#> beta[psa:.trtclassTNFa blocker]        -0.06     0.08     0.35  6164    1
+#> beta[psa:.trtclassIL blocker]           0.01     0.14     0.38  8059    1
+#> d[ETN]                                  1.55     1.60     1.71  4393    1
+#> d[IXE_Q2W]                              2.95     3.01     3.13  5582    1
+#> d[IXE_Q4W]                              2.54     2.59     2.71  5394    1
+#> d[SEC_150]                              2.15     2.23     2.37  5005    1
+#> d[SEC_300]                              2.45     2.53     2.69  6112    1
+#> lp__                                -1576.03 -1573.83 -1570.52  1570    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Feb 24 14:07:12 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Apr 10 14:33:58 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
