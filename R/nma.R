@@ -214,10 +214,10 @@
 #'   For the `mspline` and `pexp` likelihoods, the auxiliary parameters are the
 #'   spline coefficients for each study. These form a unit simplex (i.e. lie
 #'   between 0 and 1, and sum to 1), and are given a random walk prior
-#'   distribution. `prior_aux` specifies the hyperprior on the random walk
-#'   standard deviation \eqn{\sigma} which controls the level of smoothing of
-#'   the baseline hazard, with \eqn{\sigma = 0} corresponding to a constant
-#'   baseline hazard.
+#'   distribution \insertCite{Phillippo_mspline}{multinma}. `prior_aux`
+#'   specifies the hyperprior on the random walk standard deviation \eqn{\sigma}
+#'   which controls the level of smoothing of the baseline hazard, with
+#'   \eqn{\sigma = 0} corresponding to a constant baseline hazard.
 #'
 #'   The auxiliary parameters can be stratified by additional factors through
 #'   the `aux_by` argument. For example, to allow the shape of the baseline
@@ -239,10 +239,11 @@
 #'   in each study population, whereas if `aux_regression = ~.trt` then absolute
 #'   predictions can be produced for all treatments in any population. For
 #'   `mspline` and `pexp` likelihoods, the regression coefficients are smoothed
-#'   over time using a random walk prior to avoid overfitting: `prior_aux_reg`
-#'   specifies the hyperprior for the random walk standard deviation. For other
-#'   parametric likelihoods, `prior_aux_reg` specifies the prior for the
-#'   auxiliary regression coefficients.
+#'   over time using a random walk prior to avoid overfitting
+#'   \insertCite{Phillippo_mspline}{multinma}: `prior_aux_reg` specifies the
+#'   hyperprior for the random walk standard deviation. For other parametric
+#'   likelihoods, `prior_aux_reg` specifies the prior for the auxiliary
+#'   regression coefficients.
 #'
 #' @return `nma()` returns a [stan_nma] object, except when `consistency =
 #'   "nodesplit"` when a [nma_nodesplit] or [nma_nodesplit_df] object is
