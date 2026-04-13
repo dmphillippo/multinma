@@ -1,4 +1,5 @@
 This release introduces new features and fixes a few bugs.
+Fixed permanently moved 301 status URLs.
 
 ## Test environments
 * local R installation (Windows 10), R 4.5.3
