@@ -74,7 +74,7 @@ survival times.
 ## Details
 
 Survival models with a flexible M-spline on the baseline hazard are
-described by Brilleman et al. (2020) . Piecewise-exponential baseline
+described by Phillippo et al. (2025) . Piecewise-exponential baseline
 hazards are a special case where the degree of the M-spline polynomial
 is 0.
 
@@ -102,10 +102,11 @@ horizon (i.e. `rmst_mspline()` with `t = Inf`).
 
 ## References
 
-Brilleman SL, Elci EM, Novik JB, Wolfe R (2020). “Bayesian Survival
-Analysis Using the rstanarm R Package.” *arXiv*.
-[doi:10.48550/arXiv.2002.09633](https://doi.org/10.48550/arXiv.2002.09633)
-, 2002.09633.  
+Phillippo DM, Sadek A, Pedder H, Welton NJ (2025). “Network
+Meta-Analysis of survival outcomes with non-proportional hazards using
+flexible M-splines.” *arXiv*.
+[doi:10.48550/ARXIV.2509.10383](https://doi.org/10.48550/ARXIV.2509.10383)
+, 2509.10383.  
   
 Royston P, Parmar MKB (2013). “Restricted mean survival time: an
 alternative to the hazard ratio for the design and analysis of

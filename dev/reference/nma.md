@@ -378,10 +378,10 @@ package.
 For the `mspline` and `pexp` likelihoods, the auxiliary parameters are
 the spline coefficients for each study. These form a unit simplex (i.e.
 lie between 0 and 1, and sum to 1), and are given a random walk prior
-distribution. `prior_aux` specifies the hyperprior on the random walk
-standard deviation \\\sigma\\ which controls the level of smoothing of
-the baseline hazard, with \\\sigma = 0\\ corresponding to a constant
-baseline hazard.
+distribution (Phillippo et al. 2025) . `prior_aux` specifies the
+hyperprior on the random walk standard deviation \\\sigma\\ which
+controls the level of smoothing of the baseline hazard, with \\\sigma =
+0\\ corresponding to a constant baseline hazard.
 
 The auxiliary parameters can be stratified by additional factors through
 the `aux_by` argument. For example, to allow the shape of the baseline
@@ -404,10 +404,10 @@ treatment arms in each study population, whereas if
 `aux_regression = ~.trt` then absolute predictions can be produced for
 all treatments in any population. For `mspline` and `pexp` likelihoods,
 the regression coefficients are smoothed over time using a random walk
-prior to avoid overfitting: `prior_aux_reg` specifies the hyperprior for
-the random walk standard deviation. For other parametric likelihoods,
-`prior_aux_reg` specifies the prior for the auxiliary regression
-coefficients.
+prior to avoid overfitting (Phillippo et al. 2025) : `prior_aux_reg`
+specifies the hyperprior for the random walk standard deviation. For
+other parametric likelihoods, `prior_aux_reg` specifies the prior for
+the auxiliary regression coefficients.
 
 ## References
 
@@ -432,7 +432,13 @@ Kadziola Z, Welton NJ (2020). “Multilevel Network Meta-Regression for
 population-adjusted treatment comparisons.” *Journal of the Royal
 Statistical Society: Series A (Statistics in Society)*, **183**(3),
 1189–1210. [doi:10.1111/rssa.12579](https://doi.org/10.1111/rssa.12579)
-.
+.  
+  
+Phillippo DM, Sadek A, Pedder H, Welton NJ (2025). “Network
+Meta-Analysis of survival outcomes with non-proportional hazards using
+flexible M-splines.” *arXiv*.
+[doi:10.48550/ARXIV.2509.10383](https://doi.org/10.48550/ARXIV.2509.10383)
+, 2509.10383.
 
 ## Examples
 
@@ -504,7 +510,7 @@ smk_fit_FE
 #> d[Self-help]                  0.31     0.46  2696    1
 #> lp__                      -5856.58 -5852.87  1699    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 10 14:37:36 2026.
+#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:17:07 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -537,7 +543,7 @@ smk_fit_RE
 #> lp__                      -5763.68 -5756.83  1081    1
 #> tau                           0.93     1.26  1169    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 10 14:37:42 2026.
+#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:17:11 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -587,7 +593,7 @@ smk_fit_RE_UME
 #> lp__                                            -5754.24   929    1
 #> tau                                                 1.43  1050    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 10 14:37:47 2026.
+#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:17:15 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -916,7 +922,7 @@ pso_fit
 #> d[SEC_300]                              2.45     2.53     2.68  5719    1
 #> lp__                                -1576.05 -1573.88 -1570.57  1619    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 10 14:39:40 2026.
+#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:18:54 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -991,7 +997,7 @@ ndmm_fit
 #> shape[Morgan2012]       0.94  5126    1
 #> shape[Palumbo2014]      1.16  4504    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 10 14:41:33 2026.
+#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:21:13 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
