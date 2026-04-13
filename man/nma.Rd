@@ -244,7 +244,8 @@ the relation \eqn{\log(\mathrm{AF}) = -\log(\mathrm{STR})} (or equivalently
 \eqn{\mathrm{AF} = 1/\mathrm{STR}}).
 
 Further details on each likelihood and link function are given by
-\insertCite{TSD2;textual}{multinma}.
+\insertCite{TSD2;textual}{multinma}. Details of survival models are given
+by \insertCite{Phillippo_survival;textual}{multinma}.
 }
 
 \section{Auxiliary parameters}{
