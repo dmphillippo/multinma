@@ -38,7 +38,7 @@ A data frame with 50 rows and 5 variables:
 Dias S, Welton NJ, Sutton AJ, Caldwell DM, Lu G, Ades AE (2011). “NICE
 DSU Technical Support Document 4: Inconsistency in networks of evidence
 based on randomised controlled trials.” National Institute for Health
-and Care Excellence. <https://www.sheffield.ac.uk/nice-dsu>.  
+and Care Excellence. <https://sheffield.ac.uk/nice-dsu>.  
   
 Hasselblad V (1998). “Meta-analysis of Multitreatment Studies.” *Medical
 Decision Making*, **18**(1), 37–43.

@@ -50,4 +50,4 @@ regression model for meta-analysis.” *Statistics in Medicine*,
 Dias S, Sutton AJ, Welton NJ, Ades AE (2011). “NICE DSU Technical
 Support Document 3: Heterogeneity: subgroups, meta-regression, bias and
 bias-adjustment.” National Institute for Health and Care Excellence.
-<https://www.sheffield.ac.uk/nice-dsu>.
+<https://sheffield.ac.uk/nice-dsu>.

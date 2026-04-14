@@ -138,7 +138,7 @@ smkfit
 #> lp__                       1137 1.01
 #> tau                        1067 1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:41:41 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:51:49 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -257,7 +257,7 @@ smkfit_ume
 #> lp__                                            -5764.97 -5760.84 -5753.71   898    1
 #> tau                                                 0.90     1.05     1.45  1123    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:41:48 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:51:59 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -533,7 +533,7 @@ Dias, S., N. J. Welton, A. J. Sutton, D. M. Caldwell, G. Lu, and A. E.
 Ades. 2011. “NICE DSU Technical Support Document 4: Inconsistency in
 Networks of Evidence Based on Randomised Controlled Trials.” National
 Institute for Health and Care Excellence.
-<https://www.sheffield.ac.uk/nice-dsu>.
+<https://sheffield.ac.uk/nice-dsu>.
 
 Hasselblad, V. 1998. “Meta-Analysis of Multitreatment Studies.” *Medical
 Decision Making* 18 (1): 37–43.

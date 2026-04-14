@@ -143,7 +143,7 @@ thrombo_fit
 #> d[UK]           1
 #> lp__            1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:49:50 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 10:00:34 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -258,7 +258,7 @@ thrombo_fit_ume
 #> d[UK vs. t-PA]         4645    1
 #> lp__                   1655    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:49:58 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 10:00:41 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -744,7 +744,7 @@ Dias, S., N. J. Welton, A. J. Sutton, D. M. Caldwell, G. Lu, and A. E.
 Ades. 2011. “NICE DSU Technical Support Document 4: Inconsistency in
 Networks of Evidence Based on Randomised Controlled Trials.” National
 Institute for Health and Care Excellence.
-<https://www.sheffield.ac.uk/nice-dsu>.
+<https://sheffield.ac.uk/nice-dsu>.
 
 Lu, G. B., and A. E. Ades. 2006. “Assessing Evidence Inconsistency in
 Mixed Treatment Comparisons.” *Journal of the American Statistical

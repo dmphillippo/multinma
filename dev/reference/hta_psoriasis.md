@@ -68,7 +68,7 @@ Dias S, Welton NJ, Sutton AJ, Ades AE (2011). “NICE DSU Technical
 Support Document 2: A generalised linear modelling framework for
 pair-wise and network meta-analysis of randomised controlled trials.”
 National Institute for Health and Care Excellence.
-<https://www.sheffield.ac.uk/nice-dsu>.  
+<https://sheffield.ac.uk/nice-dsu>.  
   
 Woolacott N, Hawkins N, Mason A, Kainth A, Khadjesari Z, Bravo Vergel Y,
 Misso K, Light K, Chalmers R, Sculpher M, Riemsma R (2006). “Etanercept

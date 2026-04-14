@@ -202,7 +202,7 @@ pso_fit_FE
 #> cc[PASI75]             1
 #> cc[PASI90]             1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:35:07 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:42:39 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -327,7 +327,7 @@ pso_fit_RE
 #> cc[PASI75]          1.00
 #> cc[PASI90]          1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:36:08 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:43:47 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -664,7 +664,7 @@ Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. “NICE DSU
 Technical Support Document 2: A Generalised Linear Modelling Framework
 for Pair-Wise and Network Meta-Analysis of Randomised Controlled
 Trials.” National Institute for Health and Care Excellence.
-<https://www.sheffield.ac.uk/nice-dsu>.
+<https://sheffield.ac.uk/nice-dsu>.
 
 Woolacott, N., N. Hawkins, A. Mason, A. Kainth, Z. Khadjesari, Y. Bravo
 Vergel, K. Misso, et al. 2006. “Etanercept and Efalizumab for the

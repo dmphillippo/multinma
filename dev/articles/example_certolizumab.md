@@ -178,7 +178,7 @@ cert_fit_FE
 #> d[Tocilizumab]                   2.46  2863 1.00
 #> lp__                         -1703.43  1589 1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:33:37 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:40:54 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -237,7 +237,7 @@ cert_fit_RE
 #> lp__                         -1706.97  1087 1.00
 #> tau                              0.69   617 1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:33:42 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:40:59 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -815,7 +815,7 @@ nma(cert_net,
 #> d[Tocilizumab]                                2.28     2.48  3132 1.00
 #> lp__                                      -1706.87 -1703.98  1706 1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:33:54 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:41:14 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -826,4 +826,4 @@ nma(cert_net,
 Dias, S., A. J. Sutton, N. J. Welton, and A. E. Ades. 2011. “NICE DSU
 Technical Support Document 3: Heterogeneity: Subgroups, Meta-Regression,
 Bias and Bias-Adjustment.” National Institute for Health and Care
-Excellence. <https://www.sheffield.ac.uk/nice-dsu>.
+Excellence. <https://sheffield.ac.uk/nice-dsu>.

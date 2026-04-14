@@ -117,7 +117,7 @@ blocker_fit_FE
 #> d[Beta Blocker]    -0.26    0.00 0.05    -0.36    -0.30    -0.26    -0.23    -0.16  3693    1
 #> lp__            -5960.39    0.09 3.48 -5968.17 -5962.42 -5960.09 -5957.94 -5954.57  1363    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:33:15 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:40:29 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -189,7 +189,7 @@ blocker_fit_RE
 #> lp__            -5970.70    0.17 5.66 -5982.57 -5974.43 -5970.52 -5966.81 -5960.34  1072    1
 #> tau                 0.13    0.00 0.08     0.01     0.07     0.13     0.19     0.31   928    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:33:20 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:40:34 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -389,4 +389,4 @@ Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. “NICE DSU
 Technical Support Document 2: A Generalised Linear Modelling Framework
 for Pair-Wise and Network Meta-Analysis of Randomised Controlled
 Trials.” National Institute for Health and Care Excellence.
-<https://www.sheffield.ac.uk/nice-dsu>.
+<https://sheffield.ac.uk/nice-dsu>.

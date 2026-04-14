@@ -49,7 +49,7 @@ myocardial infarction: a systematic review and economic evaluation.”
 Dias S, Welton NJ, Sutton AJ, Caldwell DM, Lu G, Ades AE (2011). “NICE
 DSU Technical Support Document 4: Inconsistency in networks of evidence
 based on randomised controlled trials.” National Institute for Health
-and Care Excellence. <https://www.sheffield.ac.uk/nice-dsu>.  
+and Care Excellence. <https://sheffield.ac.uk/nice-dsu>.  
   
 Lu GB, Ades AE (2006). “Assessing evidence inconsistency in mixed
 treatment comparisons.” *Journal of the American Statistical

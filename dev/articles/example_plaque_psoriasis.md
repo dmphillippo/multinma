@@ -445,7 +445,7 @@ print(pso_fit_FE)
 #> d[SEC_300]                              2.68  6502    1
 #> lp__                                -1570.45  1745    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:38:03 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:46:35 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -596,7 +596,7 @@ print(pso_fit_RE)
 #> lp__                                -1572.12   984 1.00
 #> tau                                     0.46   619 1.01
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:40:21 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:49:50 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -2655,7 +2655,7 @@ Dias, S., N. J. Welton, A. J. Sutton, D. M. Caldwell, G. Lu, and A. E.
 Ades. 2011. “NICE DSU Technical Support Document 4: Inconsistency in
 Networks of Evidence Based on Randomised Controlled Trials.” National
 Institute for Health and Care Excellence.
-<https://www.sheffield.ac.uk/nice-dsu>.
+<https://sheffield.ac.uk/nice-dsu>.
 
 Gordon, K. B., A. Blauvelt, K. A. Papp, R. G. Langley, T. Luger, M.
 Ohtsuki, K. Reich, et al. 2016. “Phase 3 Trials of Ixekizumab in
@@ -2685,7 +2685,7 @@ Phillippo, D. M., A. E. Ades, S. Dias, S. Palmer, K. R. Abrams, and N.
 J. Welton. 2016. “NICE DSU Technical Support Document 18: Methods for
 Population-Adjusted Indirect Comparisons in Submission to NICE.”
 National Institute for Health and Care Excellence.
-<https://www.sheffield.ac.uk/nice-dsu>.
+<https://sheffield.ac.uk/nice-dsu>.
 
 Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, D. Saure,
 Y. Schymura, and N. J. Welton. 2022. “Validating the Assumptions of

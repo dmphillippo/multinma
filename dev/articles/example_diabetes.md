@@ -153,7 +153,7 @@ db_fit_FE
 #> d[Placebo]        1482    1
 #> lp__              1824    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:34:07 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:41:28 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -244,7 +244,7 @@ db_fit_RE
 #> lp__              1032    1
 #> tau               1053    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:34:21 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:41:46 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -685,7 +685,7 @@ Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. “NICE DSU
 Technical Support Document 2: A Generalised Linear Modelling Framework
 for Pair-Wise and Network Meta-Analysis of Randomised Controlled
 Trials.” National Institute for Health and Care Excellence.
-<https://www.sheffield.ac.uk/nice-dsu>.
+<https://sheffield.ac.uk/nice-dsu>.
 
 Elliott, W. J., and P. M. Meyer. 2007. “Incident Diabetes in Clinical
 Trials of Antihypertensive Drugs: A Network Meta-Analysis.” *The Lancet*

@@ -1,6 +1,10 @@
 # Changelog
 
-## multinma 0.8.1.9000
+## multinma 0.9.0.9000
+
+## multinma 0.9.0
+
+CRAN release: 2026-04-13
 
 - Feature: Regression on baseline risk is now supported, with a new
   `.mu` special variable for `regression` formulas which can interact

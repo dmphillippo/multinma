@@ -46,7 +46,7 @@ meta-analysis:
 Dias S, Welton NJ, Sutton AJ, Caldwell DM, Lu G, Reken S, Ades AE
 (2011). “NICE DSU Technical Support Documents 1-7: Evidence Synthesis
 for Decision Making.” National Institute for Health and Care Excellence.
-<https://www.sheffield.ac.uk/nice-dsu>.
+<https://sheffield.ac.uk/nice-dsu>.
 
 Multilevel network meta-regression is set out in the following methods
 paper:
@@ -68,13 +68,13 @@ Programming Language.” *Journal of Statistical Software*, **76**(1).
 Dias S, Sutton AJ, Welton NJ, Ades AE (2011). “NICE DSU Technical
 Support Document 3: Heterogeneity: subgroups, meta-regression, bias and
 bias-adjustment.” National Institute for Health and Care Excellence.
-<https://www.sheffield.ac.uk/nice-dsu>.  
+<https://sheffield.ac.uk/nice-dsu>.  
   
 Dias S, Welton NJ, Sutton AJ, Ades AE (2011). “NICE DSU Technical
 Support Document 2: A generalised linear modelling framework for
 pair-wise and network meta-analysis of randomised controlled trials.”
 National Institute for Health and Care Excellence.
-<https://www.sheffield.ac.uk/nice-dsu>.  
+<https://sheffield.ac.uk/nice-dsu>.  
   
 Phillippo DM (2019). *Calibration of Treatment Effects in Network
 Meta-Analysis using Individual Patient Data*. Ph.D. thesis, University
@@ -83,7 +83,7 @@ of Bristol. Available from <https://research-information.bris.ac.uk/>.
 Phillippo DM, Ades AE, Dias S, Palmer S, Abrams KR, Welton NJ (2016).
 “NICE DSU Technical Support Document 18: Methods for population-adjusted
 indirect comparisons in submission to NICE.” National Institute for
-Health and Care Excellence. <https://www.sheffield.ac.uk/nice-dsu>.  
+Health and Care Excellence. <https://sheffield.ac.uk/nice-dsu>.  
   
 Phillippo DM, Dias S, Ades AE, Belger M, Brnabic A, Schacht A, Saure D,
 Kadziola Z, Welton NJ (2020). “Multilevel Network Meta-Regression for

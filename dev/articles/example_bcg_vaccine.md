@@ -135,7 +135,7 @@ bcg_fit_unadj
 #> lp__             1
 #> tau              1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:32:47 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:39:53 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -228,7 +228,7 @@ bcg_fit_lat
 #> lp__                          -13448.27  1772    1
 #> tau                                0.73  1905    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:32:59 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:40:09 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -575,4 +575,4 @@ Practice. John Wiley & Sons, Ltd.
 Dias, S., A. J. Sutton, N. J. Welton, and A. E. Ades. 2011. “NICE DSU
 Technical Support Document 3: Heterogeneity: Subgroups, Meta-Regression,
 Bias and Bias-Adjustment.” National Institute for Health and Care
-Excellence. <https://www.sheffield.ac.uk/nice-dsu>.
+Excellence. <https://sheffield.ac.uk/nice-dsu>.

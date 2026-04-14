@@ -42,7 +42,7 @@ Medicine* 28 (14): 1861–81. <https://doi.org/10.1002/sim.3594>.
 Dias, S., N. J. Welton, A. J. Sutton, D. M. Caldwell, G. Lu, S. Reken,
 and A. E. Ades. 2011. “NICE DSU Technical Support Documents 1-7:
 Evidence Synthesis for Decision Making.” National Institute for Health
-and Care Excellence. <https://www.sheffield.ac.uk/nice-dsu>.
+and Care Excellence. <https://sheffield.ac.uk/nice-dsu>.
 
 Mayo-Wilson, Evan, Sofia Dias, Ifigeneia Mavranezouli, Kayleigh Kew,
 David M Clark, AE Ades, and Stephen Pilling. 2014. “Psychological and

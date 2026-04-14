@@ -135,7 +135,7 @@ statin_fit_FE
 #> d[Statin]                                0.09  2463    1
 #> lp__                                 -7241.06  1543    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:49:33 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 10:00:15 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -221,7 +221,7 @@ statin_fit_RE
 #> lp__                                 -7246.03   863 1.01
 #> tau                                      0.77   667 1.01
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Apr 13 11:49:38 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 10:00:21 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -357,4 +357,4 @@ that statins are more effective for secondary prevention.
 Dias, S., A. J. Sutton, N. J. Welton, and A. E. Ades. 2011. “NICE DSU
 Technical Support Document 3: Heterogeneity: Subgroups, Meta-Regression,
 Bias and Bias-Adjustment.” National Institute for Health and Care
-Excellence. <https://www.sheffield.ac.uk/nice-dsu>.
+Excellence. <https://sheffield.ac.uk/nice-dsu>.

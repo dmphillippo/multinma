@@ -1056,7 +1056,7 @@ Phillippo, D. M., A. E. Ades, S. Dias, S. Palmer, K. R. Abrams, and N.
 J. Welton. 2016. “NICE DSU Technical Support Document 18: Methods for
 Population-Adjusted Indirect Comparisons in Submission to NICE.”
 National Institute for Health and Care Excellence.
-<https://www.sheffield.ac.uk/nice-dsu>.
+<https://sheffield.ac.uk/nice-dsu>.
 
 Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A.
 Schacht, D. Saure, Z. Kadziola, and N. J. Welton. 2020. “Multilevel
