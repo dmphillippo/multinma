@@ -1,4 +1,4 @@
-# multinma 0.8.1.9000
+# multinma 0.9.0
 
 * Feature: Regression on baseline risk is now supported, with a new `.mu` 
 special variable for `regression` formulas which can interact with treatment, 

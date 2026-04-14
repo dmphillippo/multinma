@@ -57,7 +57,7 @@ gives a detailed introduction to network meta-analysis:
 > Dias, S. et al. (2011). “NICE DSU Technical Support Documents 1-7:
 > Evidence Synthesis for Decision Making.” *National Institute for
 > Health and Care Excellence.* Available from
-> <https://www.sheffield.ac.uk/nice-dsu/tsds>.
+> <https://sheffield.ac.uk/nice-dsu/tsds>.
 
 Multilevel network meta-regression is set out in the following methods
 papers:
@@ -79,7 +79,7 @@ papers:
 The `multinma` package can be cited as follows:
 
 > Phillippo, D. M. (2026). *multinma: Bayesian Network Meta-Analysis of
-> Individual and Aggregate Data*. R package version 0.8.1.9007, doi:
+> Individual and Aggregate Data*. R package version 0.9.0, doi:
 > [10.5281/zenodo.3904454](https://doi.org/10.5281/zenodo.3904454).
 
 When fitting ML-NMR models, please cite the methods paper:
