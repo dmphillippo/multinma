@@ -1,3 +1,35 @@
+# multinma 0.9.0
+
+* Feature: Regression on baseline risk is now supported, with a new `.mu` 
+special variable for `regression` formulas which can interact with treatment, 
+e.g. `regression = ~.mu:.trt`. Following TSD3, the regression is performed on
+the estimated intercept parameter not the observed baseline risk, to correctly
+capture uncertainty and account for correlations between baseline risk and 
+treatment effect. A new Certolizumab vignette demonstrates the new features.
+Thanks to @ndunnewind (PR #36).
+* Feature: New `subset` argument to `posterior_ranks()` and 
+`posterior_rank_probs()` allows ranks to be calculated for a smaller decision 
+set of treatments than the full analysis set.
+* Feature: New `knots.stan_nma()` method for easily obtaining the knots from a 
+fitted M-spline or piecewise exponential model, rather than working with the 
+spline basis objects `fit$basis` (#53).
+* Feature: New `expand` argument for `predict.stan_nma()`, to allow predictions
+to be made only for observed treatments in each study/for each individual 
+rather than expanding out predictions for every treatment.
+* Fix: `predict()` now works correctly for `newdata` when `aux_by` was used, 
+rather than giving errors (including #50).
+* Fix: `predict()` no longer errors when using a single `baseline` for multiple 
+`newdata` studies.
+* Fix: Bug where generalised gamma models with an `aux_regression` model on the 
+auxiliary shape parameters gave an error when trying to use `predict()` or 
+`marginal_effects()` (#62).
+* Fix: Class effects models with IPD were broken, now resolved (PR #57).
+* Improvement: Class effects models now note when the reference treatment was 
+included in a class, and has been removed (PR #57).
+* Fix: Calling `predict()` for models where study names include special regex
+characters (e.g. parentheses like "Smith (2025)") no longer fails when these 
+studies are used to inform the `baseline` or `aux` arguments (#63).
+
 # multinma 0.8.1
 
 * Fix: Update deprecated Stan array syntax (PR #51).

@@ -348,7 +348,7 @@ test_that("set_ipd - survival outcome checks work", {
     set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, cont_pos + 1, c(0, 1, 3, 3, 3), type = "interval"))$ipd[[".Surv"]],
     with(agd_arm, Surv(cont_pos, cont_pos + 1, c(0, 1, 3, 3, 3), type = "interval")))
 
-  expect_error(set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, bin, type = "mstate")), 'type "mright" is not supported')
+  expect_error(set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, factor(bin))), 'type "mright" is not supported')
 
   expect_error(set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_neg, bin)), "must have strictly positive outcome times")
   expect_error(set_ipd(agd_arm, "studyn", "trtc", Surv = Surv(cont_inf, bin)), "infinite times")
@@ -385,7 +385,7 @@ test_that("set_agd_surv - survival outcome checks work", {
                                covariates = ndmm_agd_covs)$agd_arm, ".Surv")$.Surv,
     with(ndmm_agd, Surv(eventtime, status)))
 
-  expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, bin, type = "mstate")), 'type "mright" is not supported')
+  expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_pos, factor(bin))), 'type "mright" is not supported')
 
   expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_neg, bin)), "must have strictly positive outcome times")
   expect_error(set_agd_surv(agd_arm, "studyn", "trtc", Surv = Surv(cont_inf, bin)), "infinite times")

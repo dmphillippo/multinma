@@ -262,6 +262,28 @@ test_that("Specifying study for baseline gives correct result", {
                    c(as.array(pred_FE_studies)[ , , 1:2]))
 })
 
+# Predictions escape study names correctly
+test_that("Predictions escaping baseline study names", {
+  diet_net2 <- set_agd_arm(dietary_fat, 
+                        study = paste0(studyc, "(", studyn, ")$"),
+                        trt = trtc,
+                        r = r, 
+                        E = E,
+                        trt_ref = "Control",
+                        sample_size = n)
+  
+  diet_fit_FE2 <- nma(diet_net2, 
+                   trt_effects = "fixed",
+                   prior_intercept = normal(scale = 100),
+                   prior_trt = normal(scale = 100))
+  
+  pred_FE_DART <- predict(diet_fit_FE, type = "response", baseline = "DART")
+  pred_FE_DART2 <- predict(diet_fit_FE2, type = "response", baseline = "DART(1)$")
+  expect_equivalent(as.data.frame(pred_FE_DART2)[, c("mean", "sd")],
+                    as.data.frame(pred_FE_DART)[, c("mean", "sd")],
+                    tol = tol)
+})
+
 # Test identical model treating data as IPD
 diet_net_ipd <- set_ipd(dietary_fat, 
                         study = studyc,
@@ -280,7 +302,8 @@ diet_fit_RE_ipd <- nowarn_on_ci(
                          trt_effects = "random",
                          prior_intercept = normal(scale = 100),
                          prior_trt = normal(scale = 100),
-                         prior_het = half_normal(scale = 5))
+                         prior_het = half_normal(scale = 5),
+                         iter = 4000)
                    )
 
 # Relative effects

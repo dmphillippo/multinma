@@ -87,11 +87,19 @@ transformed parameters {
           X_agd_arm * beta_tilde + offset_agd_arm :
           X_agd_arm * beta_tilde;
 
-  // Add class effects contribution to the linear predictor
+    // Baseline risk meta-regression
+    if (brmr_n_col > 0) {
+      // Subtracting 1 from the centred baseline risk here, as the associated
+      // beta was already added once to the linear predictor by
+      // `X_agd_arm * beta_tilde`
+      eta_agd_arm_noRE += (X_agd_arm[,1:totns] * mu - xbar_mu - 1) .* (X_agd_arm[,brmr_col] * beta_tilde[brmr_col]);
+    }
+
+    // Add class effects contribution to the linear predictor
     if (class_effects) {
       for (i in 1:ni_agd_arm) {
         if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
-          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_class[agd_arm_trt[i] - 1]];
+          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_fclass[agd_arm_trt[i] - 1]];
         }
       }
     }
@@ -176,7 +184,7 @@ transformed parameters {
         if (class_effects) {
           for (i in 1:ni_agd_arm) {
             if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
-              eta_agd_arm_noRE[i] += f_class[which_class[agd_arm_trt[i] - 1]];
+              eta_agd_arm_noRE[i] += f_class[which_fclass[agd_arm_trt[i] - 1]];
             }
           }
         }
@@ -218,13 +226,13 @@ transformed parameters {
 
       } else {
 
-          if (class_effects) {
-            for (i in 1:ni_agd_arm) {
-              if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
-                eta_agd_arm_noRE[i] += f_class[which_class[agd_arm_trt[i] - 1]];
-              }
+        if (class_effects) {
+          for (i in 1:ni_agd_arm) {
+            if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+              eta_agd_arm_noRE[i] += f_class[which_fclass[agd_arm_trt[i] - 1]];
             }
           }
+        }
 
         if (link == 1) { // logit link
           for (i in 1:ni_agd_arm) {

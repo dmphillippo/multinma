@@ -12,7 +12,8 @@
 #' @param regression A one-sided model formula, specifying the prognostic and
 #'   effect-modifying terms for a regression model. Any references to treatment
 #'   should use the `.trt` special variable, for example specifying effect
-#'   modifier interactions as `variable:.trt` (see details).
+#'   modifier interactions as `variable:.trt` (see details). The special
+#'   variable `.mu` can be used for baseline risk meta-regression: `~.mu:.trt`.
 #' @param class_interactions Character string specifying whether effect modifier
 #'   interactions are specified as `"common"`, `"exchangeable"`, or
 #'   `"independent"`.
@@ -167,7 +168,8 @@
 #'   \eqn{\mathrm{AF} = 1/\mathrm{STR}}).
 #'
 #'   Further details on each likelihood and link function are given by
-#'   \insertCite{TSD2;textual}{multinma}.
+#'   \insertCite{TSD2;textual}{multinma}. Details of survival models are given
+#'   by \insertCite{Phillippo_survival;textual}{multinma}.
 #'
 #'
 #' @section Auxiliary parameters:
@@ -213,10 +215,10 @@
 #'   For the `mspline` and `pexp` likelihoods, the auxiliary parameters are the
 #'   spline coefficients for each study. These form a unit simplex (i.e. lie
 #'   between 0 and 1, and sum to 1), and are given a random walk prior
-#'   distribution. `prior_aux` specifies the hyperprior on the random walk
-#'   standard deviation \eqn{\sigma} which controls the level of smoothing of
-#'   the baseline hazard, with \eqn{\sigma = 0} corresponding to a constant
-#'   baseline hazard.
+#'   distribution \insertCite{Phillippo_mspline}{multinma}. `prior_aux`
+#'   specifies the hyperprior on the random walk standard deviation \eqn{\sigma}
+#'   which controls the level of smoothing of the baseline hazard, with
+#'   \eqn{\sigma = 0} corresponding to a constant baseline hazard.
 #'
 #'   The auxiliary parameters can be stratified by additional factors through
 #'   the `aux_by` argument. For example, to allow the shape of the baseline
@@ -238,10 +240,11 @@
 #'   in each study population, whereas if `aux_regression = ~.trt` then absolute
 #'   predictions can be produced for all treatments in any population. For
 #'   `mspline` and `pexp` likelihoods, the regression coefficients are smoothed
-#'   over time using a random walk prior to avoid overfitting: `prior_aux_reg`
-#'   specifies the hyperprior for the random walk standard deviation. For other
-#'   parametric likelihoods, `prior_aux_reg` specifies the prior for the
-#'   auxiliary regression coefficients.
+#'   over time using a random walk prior to avoid overfitting
+#'   \insertCite{Phillippo_mspline}{multinma}: `prior_aux_reg` specifies the
+#'   hyperprior for the random walk standard deviation. For other parametric
+#'   likelihoods, `prior_aux_reg` specifies the prior for the auxiliary
+#'   regression coefficients.
 #'
 #' @return `nma()` returns a [stan_nma] object, except when `consistency =
 #'   "nodesplit"` when a [nma_nodesplit] or [nma_nodesplit_df] object is
@@ -316,11 +319,8 @@ nma <- function(network,
 
   # Check model arguments
   consistency <- rlang::arg_match(consistency)
-  if (length(consistency) > 1) abort("`consistency` must be a single string.")
   trt_effects <- rlang::arg_match(trt_effects)
-  if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
   class_effects <- rlang::arg_match(class_effects)
-  if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
 
   # Check class_effects and network classes
   if (class_effects != "independent") {
@@ -370,7 +370,6 @@ nma <- function(network,
     }
   } else {
     class_sd <- rlang::arg_match(class_sd)
-    if (length(class_sd) > 1) abort("`class_sd` must be a single string.")
   }
 
   if (consistency == "nodesplit") {
@@ -554,7 +553,6 @@ nma <- function(network,
     }
   }
   class_interactions <- rlang::arg_match(class_interactions)
-  if (length(class_interactions) > 1) abort("`class_interactions` must be a single string.")
 
   likelihood <- check_likelihood(likelihood, network$outcome)
   link <- check_link(link, likelihood)
@@ -635,6 +633,14 @@ nma <- function(network,
       int_thin < 0) abort("`int_thin` should be an integer >= 0.")
   if (!rlang::is_bool(int_check)) abort("`int_check` should be a logical scalar (TRUE or FALSE).")
   if (int_thin > 0) int_check <- FALSE
+
+  if (".mu" %in% all.vars(regression)) {
+    if (has_agd_contrast(network)) abort("Regression on baseline risk (`.mu` in `regression` formula) is not supported with contrast data.")
+    if (QR) {
+      warn("Cannot fit baseline risk meta-regression model with QR decomposition, setting QR = FALSE.")
+      QR <- FALSE
+    }
+  }
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
@@ -731,10 +737,34 @@ nma <- function(network,
   # Notify if network is disconnected
   if (!is_network_connected(network))
     inform("Note: Network is disconnected. See ?is_network_connected for more details.")
+  # Notify if reference treatment is within a class when running the exchangeable class model
+  if (class_effects == "exchangeable" && !is.null(network$classes)) {
+    ref_trt <- levels(network$treatments)[1]
+    ref_class <- levels(network$classes)[1]
+
+    # Count how many treatments share this class
+    n_in_class <- sum(network$classes == ref_class)
+
+    if (n_in_class >= 2) {
+      inform(glue::glue("Note: Reference treatment {ref_trt} has been removed from {ref_class}."))
+    }
+  }
 
   # Get data for design matrices and outcomes
   if (has_ipd(network)) {
     dat_ipd <- network$ipd
+
+    if (".mu" %in% all.vars(regression)) {
+      if (".mu" %in% colnames(dat_ipd)) {
+        warn(c(
+          "Detected `.mu` in the `regression` formula and in the data.",
+          `*` = "`.mu` column in data will be ignored.",
+          i = "`.mu` is a special variable referring to the modelled baseline risk."
+        ))
+      }
+
+      dat_ipd$.mu <- 1L
+    }
 
     # Only take necessary columns
     dat_ipd <- get_model_data_columns(dat_ipd,
@@ -744,6 +774,7 @@ nma <- function(network,
                                       keep = if (has_aux_by) aux_by else NULL)
 
     y_ipd <- get_outcome_variables(network$ipd, network$outcome$ipd)
+
   } else {
     dat_ipd <- tibble::tibble()
     y_ipd <- NULL
@@ -781,6 +812,18 @@ nma <- function(network,
       } else {
         idat_agd_arm <- dat_agd_arm
       }
+    }
+
+    if (".mu" %in% all.vars(regression)) {
+      if (".mu" %in% colnames(idat_agd_arm)) {
+        warn(c(
+          "Detected `.mu` in the `regression` formula and in the data.",
+          `*` = "`.mu` column in data will be ignored.",
+          i = "`.mu` is a special variable referring to the modelled baseline risk."
+        ))
+      }
+
+      idat_agd_arm$.mu <- 1L
     }
 
     # Only take necessary columns
@@ -892,6 +935,9 @@ nma <- function(network,
     if (!is.null(regression)) {
       reg_names <- all.vars(regression)
 
+      # Centering of the baseline risk is dealt with separately (`xbar_mu`)
+      reg_names <- setdiff(reg_names, ".mu")
+
       # Ignore any variable(s) used as offset(s)
       reg_terms <- terms(regression)
 
@@ -920,6 +966,8 @@ nma <- function(network,
   } else {
     xbar <- NULL
   }
+
+  xbar_mu <- if (".mu" %in% all.vars(regression)) calculate_baseline_risk(network, link) else NULL
 
   # Make NMA formula
   nma_formula <- make_nma_formula(regression,
@@ -1168,6 +1216,7 @@ if (class_effects == "exchangeable") {
     agd_arm_offset = offset_agd_arm,
     agd_contrast_offset = offset_agd_contrast,
     trt_effects = trt_effects,
+    xbar_mu = xbar_mu,
     RE_cor = .RE_cor,
     which_RE = .which_RE,
     class_effects = class_effects,
@@ -1349,7 +1398,7 @@ if (class_effects == "exchangeable") {
               class_interactions = if (!is.null(regression) && !is.null(network$classes)) class_interactions else NULL,
               class_effects = class_effects,
               class_sd = if (class_effects == "exchangeable") class_sd else NULL,
-              xbar = xbar,
+              xbar = c(xbar, .mu = xbar_mu),
               likelihood = likelihood,
               link = link,
               aux_by = if (has_aux_by) colnames(get_aux_by_data(aux_dat, by = aux_by)) else NULL,
@@ -1403,6 +1452,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     n_int,
                     ipd_offset = NULL, agd_arm_offset = NULL, agd_contrast_offset = NULL,
                     trt_effects = c("fixed", "random"),
+                    xbar_mu = NULL,
                     RE_cor = NULL,
                     which_RE = NULL,
                     class_effects = c("independent", "exchangeable", "common"),
@@ -1520,17 +1570,16 @@ nma.fit <- function(ipd_x, ipd_y,
 
   # Check model arguments
   trt_effects <- rlang::arg_match(trt_effects)
-  if (length(trt_effects) > 1) abort("`trt_effects` must be a single string.")
 
   # Check class effect arguments
   class_effects <- rlang::arg_match(class_effects)
-  if (length(class_effects) > 1) abort("`class_effects` must be a single string.")
-if (class_effects == "exchangeable") {
-  if (is.null(which_CE) || !rlang::is_integerish(which_CE) || any(which_CE < 0))
-    abort("`which_CE` must be an integer design vector for class effects.")
-  if (is.null(which_CE_sd) || !rlang::is_integerish(which_CE_sd) || any(which_CE_sd < 0))
-    abort("`which_CE_sd` must be an integer design vector for class effect SDs.")
-}
+
+  if (class_effects == "exchangeable") {
+    if (is.null(which_CE) || !rlang::is_integerish(which_CE) || any(which_CE < 0))
+      abort("`which_CE` must be an integer design vector for class effects.")
+    if (is.null(which_CE_sd) || !rlang::is_integerish(which_CE_sd) || any(which_CE_sd < 0))
+      abort("`which_CE_sd` must be an integer design vector for class effect SDs.")
+  }
 
   likelihood <- check_likelihood(likelihood)
   link <- check_link(link, likelihood)
@@ -1590,6 +1639,7 @@ if (class_effects == "exchangeable") {
   col_trt <- grepl("^(\\.trt|\\.contr)[^:]+$", x_names)
   col_omega <- x_names == ".omegaTRUE"
   col_reg <- !col_study & !col_trt & !col_omega
+  col_brmr <- col_reg & grepl("(^\\.mu\\:)|(\\:\\.mu$)", x_names)
 
   n_trt <- sum(col_trt) + 1
 
@@ -1763,8 +1813,12 @@ if (class_effects == "exchangeable") {
     # Class effects
     which_CE = if (class_effects == "exchangeable") which_CE else numeric(0),
     which_CE_sd = if (class_effects == "exchangeable") which_CE_sd else numeric(0),
-    class_effects = ifelse(class_effects == "exchangeable", 1, 0)
-    )
+    class_effects = ifelse(class_effects == "exchangeable", 1, 0),
+    # Baseline risk meta-regression
+    brmr_n_col = sum(col_brmr),
+    brmr_col = as.array(which(col_brmr)),
+    xbar_mu = xbar_mu %||% 0
+  )
 
   # Add priors
   standat <- purrr::list_modify(standat,
@@ -2876,6 +2930,9 @@ make_nma_formula <- function(regression,
       nma_formula <- regression
     }
 
+    # Remove any main effect of .mu if baseline risk regression used
+    if (".mu" %in% all.vars(regression)) nma_formula <- update.formula(nma_formula, ~. - .mu)
+
     if (consistency == "ume") {
       nma_formula <- update.formula(nma_formula, ~.study + .contr + . -1)
     } else if (consistency == "nodesplit") {
@@ -2896,7 +2953,7 @@ make_nma_formula <- function(regression,
 
 #' Construct NMA design matrix
 #'
-#' @param nma_formula NMA formula, returned by [make_nma_formula()]
+#' @param nma_formula NMA formula, returned by `make_nma_formula()`
 #' @param ipd,agd_arm,agd_contrast Data frames
 #' @param agd_contrast_bl Logical vector identifying baseline rows for contrast
 #'   data

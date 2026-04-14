@@ -51,7 +51,8 @@ effects}
 \item{regression}{A one-sided model formula, specifying the prognostic and
 effect-modifying terms for a regression model. Any references to treatment
 should use the \code{.trt} special variable, for example specifying effect
-modifier interactions as \code{variable:.trt} (see details).}
+modifier interactions as \code{variable:.trt} (see details). The special
+variable \code{.mu} can be used for baseline risk meta-regression: \code{~.mu:.trt}.}
 
 \item{class_interactions}{Character string specifying whether effect modifier
 interactions are specified as \code{"common"}, \code{"exchangeable"}, or
@@ -243,7 +244,8 @@ the relation \eqn{\log(\mathrm{AF}) = -\log(\mathrm{STR})} (or equivalently
 \eqn{\mathrm{AF} = 1/\mathrm{STR}}).
 
 Further details on each likelihood and link function are given by
-\insertCite{TSD2;textual}{multinma}.
+\insertCite{TSD2;textual}{multinma}. Details of survival models are given
+by \insertCite{Phillippo_survival;textual}{multinma}.
 }
 
 \section{Auxiliary parameters}{
@@ -294,10 +296,10 @@ the other survival distributions implemented in this package.
 For the \code{mspline} and \code{pexp} likelihoods, the auxiliary parameters are the
 spline coefficients for each study. These form a unit simplex (i.e. lie
 between 0 and 1, and sum to 1), and are given a random walk prior
-distribution. \code{prior_aux} specifies the hyperprior on the random walk
-standard deviation \eqn{\sigma} which controls the level of smoothing of
-the baseline hazard, with \eqn{\sigma = 0} corresponding to a constant
-baseline hazard.
+distribution \insertCite{Phillippo_mspline}{multinma}. \code{prior_aux}
+specifies the hyperprior on the random walk standard deviation \eqn{\sigma}
+which controls the level of smoothing of the baseline hazard, with
+\eqn{\sigma = 0} corresponding to a constant baseline hazard.
 
 The auxiliary parameters can be stratified by additional factors through
 the \code{aux_by} argument. For example, to allow the shape of the baseline
@@ -317,10 +319,11 @@ absolute predictions may only be produced for the observed treatment arms
 in each study population, whereas if \code{aux_regression = ~.trt} then absolute
 predictions can be produced for all treatments in any population. For
 \code{mspline} and \code{pexp} likelihoods, the regression coefficients are smoothed
-over time using a random walk prior to avoid overfitting: \code{prior_aux_reg}
-specifies the hyperprior for the random walk standard deviation. For other
-parametric likelihoods, \code{prior_aux_reg} specifies the prior for the
-auxiliary regression coefficients.
+over time using a random walk prior to avoid overfitting
+\insertCite{Phillippo_mspline}{multinma}: \code{prior_aux_reg} specifies the
+hyperprior for the random walk standard deviation. For other parametric
+likelihoods, \code{prior_aux_reg} specifies the prior for the auxiliary
+regression coefficients.
 }
 }
 

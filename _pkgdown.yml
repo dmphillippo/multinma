@@ -143,6 +143,7 @@ reference:
   - matches("[pdqhH]mspline")
   - rmst_mspline
   - make_knots
+  - knots.stan_nma
   - softmax
 
 - title: ggplot functions

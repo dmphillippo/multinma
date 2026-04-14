@@ -70,33 +70,23 @@ if (ns_agd_contrast) {
   nc_agd_contrast[s] = c;
 }
 
-// Number of class effects and which_class_sd, mapping class sd to classes
-int<lower=0> n_class = class_effects ? max(which_CE) : 0;
-array[class_effects ? nt-1 : 0] int<lower=0> which_class; // Vector to mapping treatments to class effects
-array[class_effects ? n_class : 0] int<lower=0> which_class_sd; // Vector to map class SDs to classes
-
-int<lower=0> n_class_trts = num_elements(which_gt0a(which_CE));  // Number of treatments with class effects
+// Pick out treatments with class effects
+int<lower=0> n_class_trts = num_elements(which_gt0a(which_CE)); // Number of treatments with class effects
 array[n_class_trts] int which_class_trt = which_gt0a(which_CE); // Vector mapping classes to treatments
- if (class_effects) {
-    for (c in 1:n_class) {
-      for (t in 1:nt - 1) {
-        if (which_CE[t] == c) {
-          which_class_sd[c] = which_CE_sd[t];
-          break;
-        }
-      }
-    }
-  }
+
+// Pick out elements of zero-mean random class effects f_class by treatment
+int<lower=0> n_class = class_effects ? max(which_CE) : 0; // Number of classes
+array[class_effects ? nt-1 : 0] int<lower=0> which_fclass; // Vector to mapping treatments to f_class
 
 if (class_effects) {
   int count = 1;  // Counter for nonzero elements in f_class
 
   for (t in 1:(nt - 1)) {
     if (which_CE_sd[t] > 0) {
-      which_class[t] = count;
+      which_fclass[t] = count;
       count += 1;
     } else {
-      which_class[t] = 0;  // No class effect for this treatment
+      which_fclass[t] = 0;  // No class effect for this treatment
     }
   }
 }

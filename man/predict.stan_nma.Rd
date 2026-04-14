@@ -18,6 +18,7 @@
   baseline_level = c("individual", "aggregate"),
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
   predictive_distribution = FALSE,
+  expand = TRUE,
   summary = TRUE,
   progress = FALSE,
   trt_ref = NULL
@@ -38,6 +39,7 @@
   times_seq = NULL,
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
   predictive_distribution = FALSE,
+  expand = TRUE,
   summary = TRUE,
   progress = interactive(),
   trt_ref = NULL
@@ -144,6 +146,10 @@ summary, default \code{c(0.025, 0.25, 0.5, 0.75, 0.975)}}
 \item{predictive_distribution}{Logical, when a random effects model has been
 fitted, should the predictive distribution for absolute effects in a new
 study be returned? Default \code{FALSE}.}
+
+\item{expand}{Logical, expand out predictions for every treatment (\code{TRUE}),
+or only produce predictions for observed treatments (\code{FALSE}). Default
+\code{TRUE}.}
 
 \item{summary}{Logical, calculate posterior summaries? Default \code{TRUE}.}
 
