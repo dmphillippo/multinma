@@ -1,0 +1,526 @@
+# multinma: Network Meta-Analysis of individual and aggregate data in Stan
+
+The `multinma` package implements network meta-analysis, network
+meta-regression, and multilevel network meta-regression models which
+combine evidence from a network of studies and treatments using either
+aggregate data or individual patient data from each study (Phillippo et
+al. 2020; Phillippo 2019). Models are estimated in a Bayesian framework
+using Stan (Carpenter et al. 2017).
+
+## Installation
+
+You can install the released version of `multinma` from
+[CRAN](https://CRAN.R-project.org/package=multinma) with:
+
+``` r
+install.packages("multinma")
+```
+
+The development version can be installed from
+[R-universe](https://dmphillippo.r-universe.dev) with:
+
+``` r
+install.packages("multinma", repos = c("https://dmphillippo.r-universe.dev", getOption("repos")))
+```
+
+or from source on [GitHub](https://github.com/dmphillippo/multinma)
+with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("dmphillippo/multinma")
+```
+
+Installing from source requires that the `rstan` package is installed
+and configured. See the installation guide
+[here](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started).
+
+## Getting started
+
+A good place to start is with the package vignettes which walk through
+example analyses, see
+[`vignette("vignette_overview")`](https://dmphillippo.github.io/multinma/articles/vignette_overview.md)
+for an overview. The series of NICE Technical Support Documents on
+evidence synthesis gives a detailed introduction to network
+meta-analysis:
+
+> Dias, S. et al. (2011). “NICE DSU Technical Support Documents 1-7:
+> Evidence Synthesis for Decision Making.” *National Institute for
+> Health and Care Excellence.* Available from
+> <https://sheffield.ac.uk/nice-dsu/tsds>.
+
+Multilevel network meta-regression is set out in the following methods
+papers:
+
+> Phillippo, D. M. et al. (2020). “Multilevel Network Meta-Regression
+> for population-adjusted treatment comparisons.” *Journal of the Royal
+> Statistical Society: Series A (Statistics in Society)*,
+> 183(3):1189-1210. doi:
+> [10.1111/rssa.12579](https://doi.org/10.1111/rssa.12579).
+
+> Phillippo, D. M. et al. (2025). “Multilevel network meta-regression
+> for general likelihoods: synthesis of individual and aggregate data
+> with applications to survival analysis”. *Journal of the Royal
+> Statistical Society: Series A (Statistics in Society)*, qnaf169. doi:
+> [10.1093/jrsssa/qnaf169](https://doi.org/10.1093/jrsssa/qnaf169).
+
+## Citing multinma
+
+The `multinma` package can be cited as follows:
+
+> Phillippo, D. M. (2026). *multinma: Bayesian Network Meta-Analysis of
+> Individual and Aggregate Data*. R package version 0.9.0, doi:
+> [10.5281/zenodo.3904454](https://doi.org/10.5281/zenodo.3904454).
+
+When fitting ML-NMR models, please cite the methods paper:
+
+> Phillippo, D. M. et al. (2020). “Multilevel Network Meta-Regression
+> for population-adjusted treatment comparisons.” *Journal of the Royal
+> Statistical Society: Series A (Statistics in Society)*,
+> 183(3):1189-1210. doi:
+> [10.1111/rssa.12579](https://doi.org/10.1111/rssa.12579).
+
+For ML-NMR models with time-to-event outcomes, please cite:
+
+> Phillippo, D. M. et al. (2025). “Multilevel network meta-regression
+> for general likelihoods: synthesis of individual and aggregate data
+> with applications to survival analysis”. *Journal of the Royal
+> Statistical Society: Series A (Statistics in Society)*, qnaf169. doi:
+> [10.1093/jrsssa/qnaf169](https://doi.org/10.1093/jrsssa/qnaf169).
+
+## References
+
+Carpenter, B., A. Gelman, M. D. Hoffman, D. Lee, B. Goodrich, M.
+Betancourt, M. Brubaker, J. Guo, P. Li, and A. Riddell. 2017. “Stan: A
+Probabilistic Programming Language.” *Journal of Statistical Software*
+76 (1). <https://doi.org/10.18637/jss.v076.i01>.
+
+Phillippo, D. M. 2019. “Calibration of Treatment Effects in Network
+Meta-Analysis Using Individual Patient Data.” PhD thesis, University of
+Bristol.
+
+Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A.
+Schacht, D. Saure, Z. Kadziola, and N. J. Welton. 2020. “Multilevel
+Network Meta-Regression for Population-Adjusted Treatment Comparisons.”
+*Journal of the Royal Statistical Society: Series A (Statistics in
+Society)* 183 (3): 1189–1210. <https://doi.org/10.1111/rssa.12579>.
+
+# Package index
+
+## Package overview
+
+- [`multinma-package`](https://dmphillippo.github.io/multinma/reference/multinma-package.md)
+  [`multinma`](https://dmphillippo.github.io/multinma/reference/multinma-package.md)
+  : multinma: A Package for Network Meta-Analysis of Individual and
+  Aggregate Data in Stan
+
+## Defining a network
+
+Setting up a network from different data sources, creating network
+plots.
+
+- [`set_agd_arm()`](https://dmphillippo.github.io/multinma/reference/set_agd_arm.md)
+  : Set up arm-based aggregate data
+
+- [`set_agd_contrast()`](https://dmphillippo.github.io/multinma/reference/set_agd_contrast.md)
+  : Set up contrast-based aggregate data
+
+- [`set_agd_surv()`](https://dmphillippo.github.io/multinma/reference/set_agd_surv.md)
+  : Set up aggregate survival data
+
+- [`set_ipd()`](https://dmphillippo.github.io/multinma/reference/set_ipd.md)
+  : Set up individual patient data
+
+- [`combine_network()`](https://dmphillippo.github.io/multinma/reference/combine_network.md)
+  : Combine multiple data sources into one network
+
+- [`multi()`](https://dmphillippo.github.io/multinma/reference/multi.md)
+  : Multinomial outcome data
+
+- [`print(`*`<nma_data>`*`)`](https://dmphillippo.github.io/multinma/reference/print.nma_data.md)
+  [`print(`*`<mlnmr_data>`*`)`](https://dmphillippo.github.io/multinma/reference/print.nma_data.md)
+  :
+
+  Print `nma_data` objects
+
+- [`plot(`*`<nma_data>`*`)`](https://dmphillippo.github.io/multinma/reference/plot.nma_data.md)
+  : Network plots
+
+- [`as.igraph(`*`<nma_data>`*`)`](https://dmphillippo.github.io/multinma/reference/graph_conversion.md)
+  [`as_tbl_graph(`*`<nma_data>`*`)`](https://dmphillippo.github.io/multinma/reference/graph_conversion.md)
+  : Convert networks to graph objects
+
+- [`nma_data-class`](https://dmphillippo.github.io/multinma/reference/nma_data-class.md)
+  [`nma_data`](https://dmphillippo.github.io/multinma/reference/nma_data-class.md)
+  [`mlnmr_data`](https://dmphillippo.github.io/multinma/reference/nma_data-class.md)
+  [`mlnmr_data-class`](https://dmphillippo.github.io/multinma/reference/nma_data-class.md)
+  : The nma_data class
+
+- [`is_network_connected()`](https://dmphillippo.github.io/multinma/reference/is_network_connected.md)
+  : Check network connectedness
+
+## Setting up numerical integration (ML-NMR only)
+
+Multilevel network meta-regression models require numerical integration
+points to be specified for the distributions of covariates in each
+aggregate data study in the network.
+
+- [`add_integration()`](https://dmphillippo.github.io/multinma/reference/add_integration.md)
+  [`unnest_integration()`](https://dmphillippo.github.io/multinma/reference/add_integration.md)
+  : Add numerical integration points to aggregate data
+- [`distr()`](https://dmphillippo.github.io/multinma/reference/distr.md)
+  : Specify a general marginal distribution
+- [`qbern()`](https://dmphillippo.github.io/multinma/reference/Bernoulli.md)
+  [`pbern()`](https://dmphillippo.github.io/multinma/reference/Bernoulli.md)
+  [`dbern()`](https://dmphillippo.github.io/multinma/reference/Bernoulli.md)
+  : The Bernoulli Distribution
+- [`qgamma()`](https://dmphillippo.github.io/multinma/reference/GammaDist.md)
+  [`dgamma()`](https://dmphillippo.github.io/multinma/reference/GammaDist.md)
+  [`pgamma()`](https://dmphillippo.github.io/multinma/reference/GammaDist.md)
+  : The Gamma distribution
+- [`dgent()`](https://dmphillippo.github.io/multinma/reference/generalised_t.md)
+  [`pgent()`](https://dmphillippo.github.io/multinma/reference/generalised_t.md)
+  [`qgent()`](https://dmphillippo.github.io/multinma/reference/generalised_t.md)
+  : Generalised Student's t distribution (with location and scale)
+- [`dlogt()`](https://dmphillippo.github.io/multinma/reference/log_t.md)
+  [`plogt()`](https://dmphillippo.github.io/multinma/reference/log_t.md)
+  [`qlogt()`](https://dmphillippo.github.io/multinma/reference/log_t.md)
+  : Log Student's t distribution
+- [`dlogitnorm()`](https://dmphillippo.github.io/multinma/reference/logitNormal.md)
+  [`plogitnorm()`](https://dmphillippo.github.io/multinma/reference/logitNormal.md)
+  [`qlogitnorm()`](https://dmphillippo.github.io/multinma/reference/logitNormal.md)
+  : The logit Normal distribution
+
+## Prior distributions
+
+Specify and summarise prior distributions.
+
+- [`normal()`](https://dmphillippo.github.io/multinma/reference/priors.md)
+  [`half_normal()`](https://dmphillippo.github.io/multinma/reference/priors.md)
+  [`log_normal()`](https://dmphillippo.github.io/multinma/reference/priors.md)
+  [`cauchy()`](https://dmphillippo.github.io/multinma/reference/priors.md)
+  [`half_cauchy()`](https://dmphillippo.github.io/multinma/reference/priors.md)
+  [`student_t()`](https://dmphillippo.github.io/multinma/reference/priors.md)
+  [`half_student_t()`](https://dmphillippo.github.io/multinma/reference/priors.md)
+  [`log_student_t()`](https://dmphillippo.github.io/multinma/reference/priors.md)
+  [`exponential()`](https://dmphillippo.github.io/multinma/reference/priors.md)
+  [`flat()`](https://dmphillippo.github.io/multinma/reference/priors.md)
+  : Prior distributions
+- [`summary(`*`<nma_prior>`*`)`](https://dmphillippo.github.io/multinma/reference/summary.nma_prior.md)
+  : Summary of prior distributions
+- [`nma_prior-class`](https://dmphillippo.github.io/multinma/reference/nma_prior-class.md)
+  [`nma_prior`](https://dmphillippo.github.io/multinma/reference/nma_prior-class.md)
+  : The nma_prior class
+- [`plot_prior_posterior()`](https://dmphillippo.github.io/multinma/reference/plot_prior_posterior.md)
+  : Plot prior vs posterior distribution
+- [`dgent()`](https://dmphillippo.github.io/multinma/reference/generalised_t.md)
+  [`pgent()`](https://dmphillippo.github.io/multinma/reference/generalised_t.md)
+  [`qgent()`](https://dmphillippo.github.io/multinma/reference/generalised_t.md)
+  : Generalised Student's t distribution (with location and scale)
+- [`dlogt()`](https://dmphillippo.github.io/multinma/reference/log_t.md)
+  [`plogt()`](https://dmphillippo.github.io/multinma/reference/log_t.md)
+  [`qlogt()`](https://dmphillippo.github.io/multinma/reference/log_t.md)
+  : Log Student's t distribution
+
+## Model fitting
+
+Model specification and fitting is accomplished using the
+[`nma()`](https://dmphillippo.github.io/multinma/reference/nma.md)
+function.
+
+- [`nma()`](https://dmphillippo.github.io/multinma/reference/nma.md) :
+  Network meta-analysis models
+
+- [`print(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/reference/print.stan_nma.md)
+  :
+
+  Print `stan_nma` objects
+
+- [`summary(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/reference/summary.stan_nma.md)
+  [`plot(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/reference/summary.stan_nma.md)
+  :
+
+  Posterior summaries from `stan_nma` objects
+
+- [`pairs(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/reference/pairs.stan_nma.md)
+  :
+
+  Matrix of plots for a `stan_nma` object
+
+- [`stan_nma-class`](https://dmphillippo.github.io/multinma/reference/stan_nma-class.md)
+  [`stan_nma`](https://dmphillippo.github.io/multinma/reference/stan_nma-class.md)
+  [`stan_mlnmr`](https://dmphillippo.github.io/multinma/reference/stan_nma-class.md)
+  : The stan_nma class
+
+- [`adapt_delta`](https://dmphillippo.github.io/multinma/reference/adapt_delta.md)
+  : Target average acceptance probability
+
+- [`RE_cor()`](https://dmphillippo.github.io/multinma/reference/random_effects.md)
+  [`which_RE()`](https://dmphillippo.github.io/multinma/reference/random_effects.md)
+  : Random effects structure
+
+- [`.default()`](https://dmphillippo.github.io/multinma/reference/default_values.md)
+  [`.is_default()`](https://dmphillippo.github.io/multinma/reference/default_values.md)
+  : Set default values
+
+## Model checking and comparison
+
+Checking model fit and comparing models.
+
+- [`plot_prior_posterior()`](https://dmphillippo.github.io/multinma/reference/plot_prior_posterior.md)
+  : Plot prior vs posterior distribution
+
+- [`plot_integration_error()`](https://dmphillippo.github.io/multinma/reference/plot_integration_error.md)
+  : Plot numerical integration error
+
+- [`dic()`](https://dmphillippo.github.io/multinma/reference/dic.md) :
+  Deviance Information Criterion (DIC)
+
+- [`print(`*`<nma_dic>`*`)`](https://dmphillippo.github.io/multinma/reference/nma_dic-methods.md)
+  [`as.data.frame(`*`<nma_dic>`*`)`](https://dmphillippo.github.io/multinma/reference/nma_dic-methods.md)
+  [`as.tibble(`*`<nma_dic>`*`)`](https://dmphillippo.github.io/multinma/reference/nma_dic-methods.md)
+  [`as_tibble(`*`<nma_dic>`*`)`](https://dmphillippo.github.io/multinma/reference/nma_dic-methods.md)
+  [`as.array(`*`<nma_dic>`*`)`](https://dmphillippo.github.io/multinma/reference/nma_dic-methods.md)
+  [`as.matrix(`*`<nma_dic>`*`)`](https://dmphillippo.github.io/multinma/reference/nma_dic-methods.md)
+  :
+
+  Methods for `nma_dic` objects
+
+- [`plot(`*`<nma_dic>`*`)`](https://dmphillippo.github.io/multinma/reference/plot.nma_dic.md)
+  : Plots of model fit diagnostics
+
+- [`nma_dic-class`](https://dmphillippo.github.io/multinma/reference/nma_dic-class.md)
+  [`nma_dic`](https://dmphillippo.github.io/multinma/reference/nma_dic-class.md)
+  : The nma_dic class
+
+- [`loo(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/reference/loo.md)
+  [`waic(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/reference/loo.md)
+  :
+
+  Model comparison using the `loo` package
+
+## Node-splitting
+
+Generate and summarise node-splitting models for assessing
+inconsistency.
+
+- [`get_nodesplits()`](https://dmphillippo.github.io/multinma/reference/get_nodesplits.md)
+  [`has_direct()`](https://dmphillippo.github.io/multinma/reference/get_nodesplits.md)
+  [`has_indirect()`](https://dmphillippo.github.io/multinma/reference/get_nodesplits.md)
+  : Direct and indirect evidence
+
+- [`nma_nodesplit-class`](https://dmphillippo.github.io/multinma/reference/nma_nodesplit-class.md)
+  [`nma_nodesplit`](https://dmphillippo.github.io/multinma/reference/nma_nodesplit-class.md)
+  [`nma_nodesplit_df`](https://dmphillippo.github.io/multinma/reference/nma_nodesplit-class.md)
+  [`nma_nodesplit_df-class`](https://dmphillippo.github.io/multinma/reference/nma_nodesplit-class.md)
+  : The nma_nodesplit class
+
+- [`print(`*`<nma_nodesplit_df>`*`)`](https://dmphillippo.github.io/multinma/reference/print.nma_nodesplit_df.md)
+  [`print(`*`<nma_nodesplit>`*`)`](https://dmphillippo.github.io/multinma/reference/print.nma_nodesplit_df.md)
+  :
+
+  Print `nma_nodesplit_df` objects
+
+- [`summary(`*`<nma_nodesplit_df>`*`)`](https://dmphillippo.github.io/multinma/reference/summary.nma_nodesplit_df.md)
+  [`summary(`*`<nma_nodesplit>`*`)`](https://dmphillippo.github.io/multinma/reference/summary.nma_nodesplit_df.md)
+  [`plot(`*`<nma_nodesplit>`*`)`](https://dmphillippo.github.io/multinma/reference/summary.nma_nodesplit_df.md)
+  [`plot(`*`<nma_nodesplit_df>`*`)`](https://dmphillippo.github.io/multinma/reference/summary.nma_nodesplit_df.md)
+  : Summarise the results of node-splitting models
+
+- [`nodesplit_summary-class`](https://dmphillippo.github.io/multinma/reference/nodesplit_summary-class.md)
+  [`nodesplit_summary`](https://dmphillippo.github.io/multinma/reference/nodesplit_summary-class.md)
+  :
+
+  The `nodesplit_summary` class
+
+- [`print(`*`<nodesplit_summary>`*`)`](https://dmphillippo.github.io/multinma/reference/nodesplit_summary-methods.md)
+  [`as_tibble(`*`<nodesplit_summary>`*`)`](https://dmphillippo.github.io/multinma/reference/nodesplit_summary-methods.md)
+  [`as.tibble.nodesplit_summary()`](https://dmphillippo.github.io/multinma/reference/nodesplit_summary-methods.md)
+  [`as.data.frame(`*`<nodesplit_summary>`*`)`](https://dmphillippo.github.io/multinma/reference/nodesplit_summary-methods.md)
+  :
+
+  Methods for `nodesplit_summary` objects
+
+- [`plot(`*`<nodesplit_summary>`*`)`](https://dmphillippo.github.io/multinma/reference/plot.nodesplit_summary.md)
+  : Plots of node-splitting models
+
+## Posterior summaries and working with fitted models
+
+Producing and plotting relative effects, absolute predictions, marginal
+effects, posterior ranks and rank probabilities. Converting to MCMC
+arrays and matrices.
+
+- [`relative_effects()`](https://dmphillippo.github.io/multinma/reference/relative_effects.md)
+  : Relative treatment effects
+
+- [`marginal_effects()`](https://dmphillippo.github.io/multinma/reference/marginal_effects.md)
+  : Marginal treatment effects
+
+- [`predict(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/reference/predict.stan_nma.md)
+  [`predict(`*`<stan_nma_surv>`*`)`](https://dmphillippo.github.io/multinma/reference/predict.stan_nma.md)
+  : Predictions of absolute effects from NMA models
+
+- [`posterior_ranks()`](https://dmphillippo.github.io/multinma/reference/posterior_ranks.md)
+  [`posterior_rank_probs()`](https://dmphillippo.github.io/multinma/reference/posterior_ranks.md)
+  : Treatment rankings and rank probabilities
+
+- [`print(`*`<nma_summary>`*`)`](https://dmphillippo.github.io/multinma/reference/nma_summary-methods.md)
+  [`as.data.frame(`*`<nma_summary>`*`)`](https://dmphillippo.github.io/multinma/reference/nma_summary-methods.md)
+  [`as.tibble(`*`<nma_summary>`*`)`](https://dmphillippo.github.io/multinma/reference/nma_summary-methods.md)
+  [`as_tibble(`*`<nma_summary>`*`)`](https://dmphillippo.github.io/multinma/reference/nma_summary-methods.md)
+  [`as.array(`*`<nma_summary>`*`)`](https://dmphillippo.github.io/multinma/reference/nma_summary-methods.md)
+  [`as.matrix(`*`<nma_summary>`*`)`](https://dmphillippo.github.io/multinma/reference/nma_summary-methods.md)
+  [`as.array(`*`<nma_rank_probs>`*`)`](https://dmphillippo.github.io/multinma/reference/nma_summary-methods.md)
+  [`as.matrix(`*`<nma_rank_probs>`*`)`](https://dmphillippo.github.io/multinma/reference/nma_summary-methods.md)
+  :
+
+  Methods for `nma_summary` objects
+
+- [`plot(`*`<nma_summary>`*`)`](https://dmphillippo.github.io/multinma/reference/plot.nma_summary.md)
+  [`plot(`*`<nma_parameter_summary>`*`)`](https://dmphillippo.github.io/multinma/reference/plot.nma_summary.md)
+  [`plot(`*`<nma_rank_probs>`*`)`](https://dmphillippo.github.io/multinma/reference/plot.nma_summary.md)
+  [`plot(`*`<surv_nma_summary>`*`)`](https://dmphillippo.github.io/multinma/reference/plot.nma_summary.md)
+  : Plots of summary results
+
+- [`nma_summary-class`](https://dmphillippo.github.io/multinma/reference/nma_summary-class.md)
+  [`nma_summary`](https://dmphillippo.github.io/multinma/reference/nma_summary-class.md)
+  [`nma_rank_probs`](https://dmphillippo.github.io/multinma/reference/nma_summary-class.md)
+  :
+
+  The `nma_summary` class
+
+- [`as.array(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/reference/as.array.stan_nma.md)
+  [`as.data.frame(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/reference/as.array.stan_nma.md)
+  [`as_tibble(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/reference/as.array.stan_nma.md)
+  [`as.tibble(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/reference/as.array.stan_nma.md)
+  [`as.matrix(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/reference/as.array.stan_nma.md)
+  : Convert samples into arrays, matrices, or data frames
+
+- [`summary(`*`<mcmc_array>`*`)`](https://dmphillippo.github.io/multinma/reference/mcmc_array-class.md)
+  [`print(`*`<mcmc_array>`*`)`](https://dmphillippo.github.io/multinma/reference/mcmc_array-class.md)
+  [`plot(`*`<mcmc_array>`*`)`](https://dmphillippo.github.io/multinma/reference/mcmc_array-class.md)
+  [`names(`*`<mcmc_array>`*`)`](https://dmphillippo.github.io/multinma/reference/mcmc_array-class.md)
+  [`` `names<-`( ``*`<mcmc_array>`*`)`](https://dmphillippo.github.io/multinma/reference/mcmc_array-class.md)
+  : Working with 3D MCMC arrays
+
+- [`as.stanfit()`](https://dmphillippo.github.io/multinma/reference/as.stanfit.md)
+  : as.stanfit
+
+## M-spline hazards
+
+Functions for flexibile M-splines on the baseline hazard.
+
+- [`dmspline()`](https://dmphillippo.github.io/multinma/reference/mspline.md)
+  [`pmspline()`](https://dmphillippo.github.io/multinma/reference/mspline.md)
+  [`qmspline()`](https://dmphillippo.github.io/multinma/reference/mspline.md)
+  [`hmspline()`](https://dmphillippo.github.io/multinma/reference/mspline.md)
+  [`Hmspline()`](https://dmphillippo.github.io/multinma/reference/mspline.md)
+  [`rmst_mspline()`](https://dmphillippo.github.io/multinma/reference/mspline.md)
+  : Distribution functions for M-spline baseline hazards
+- [`make_knots()`](https://dmphillippo.github.io/multinma/reference/make_knots.md)
+  : Knot locations for M-spline baseline hazard models
+- [`knots(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/reference/knots.stan_nma.md)
+  : Knot locations for a fitted model
+- [`softmax()`](https://dmphillippo.github.io/multinma/reference/softmax.md)
+  [`inv_softmax()`](https://dmphillippo.github.io/multinma/reference/softmax.md)
+  : Softmax transform
+
+## ggplot functions
+
+Functions for creating or customising ggplot outputs.
+
+- [`theme_multinma()`](https://dmphillippo.github.io/multinma/reference/theme_multinma.md)
+  : Plot theme for multinma plots
+- [`geom_km()`](https://dmphillippo.github.io/multinma/reference/geom_km.md)
+  : Kaplan-Meier curves of survival data
+
+## Datasets
+
+Datasets used for examples and vignettes.
+
+- [`atrial_fibrillation`](https://dmphillippo.github.io/multinma/reference/atrial_fibrillation.md)
+  : Stroke prevention in atrial fibrillation patients
+- [`bcg_vaccine`](https://dmphillippo.github.io/multinma/reference/bcg_vaccine.md)
+  : BCG vaccination
+- [`blocker`](https://dmphillippo.github.io/multinma/reference/blocker.md)
+  : Beta blockers to prevent mortality after MI
+- [`certolizumab`](https://dmphillippo.github.io/multinma/reference/certolizumab.md)
+  : Certolizumab
+- [`diabetes`](https://dmphillippo.github.io/multinma/reference/diabetes.md)
+  : Incidence of diabetes in trials of antihypertensive drugs
+- [`dietary_fat`](https://dmphillippo.github.io/multinma/reference/dietary_fat.md)
+  : Reduced dietary fat to prevent mortality
+- [`hta_psoriasis`](https://dmphillippo.github.io/multinma/reference/hta_psoriasis.md)
+  : HTA Plaque Psoriasis
+- [`ndmm_ipd`](https://dmphillippo.github.io/multinma/reference/ndmm.md)
+  [`ndmm_agd`](https://dmphillippo.github.io/multinma/reference/ndmm.md)
+  [`ndmm_agd_covs`](https://dmphillippo.github.io/multinma/reference/ndmm.md)
+  : Newly diagnosed multiple myeloma
+- [`parkinsons`](https://dmphillippo.github.io/multinma/reference/parkinsons.md)
+  : Mean off-time reduction in Parkison's disease
+- [`plaque_psoriasis_ipd`](https://dmphillippo.github.io/multinma/reference/plaque_psoriasis.md)
+  [`plaque_psoriasis_agd`](https://dmphillippo.github.io/multinma/reference/plaque_psoriasis.md)
+  : Plaque psoriasis data
+- [`smoking`](https://dmphillippo.github.io/multinma/reference/smoking.md)
+  : Smoking cessation data
+- [`social_anxiety`](https://dmphillippo.github.io/multinma/reference/social_anxiety.md)
+  : Social Anxiety
+- [`statins`](https://dmphillippo.github.io/multinma/reference/statins.md)
+  : Statins for cholesterol lowering
+- [`thrombolytics`](https://dmphillippo.github.io/multinma/reference/thrombolytics.md)
+  : Thrombolytic treatments data
+- [`transfusion`](https://dmphillippo.github.io/multinma/reference/transfusion.md)
+  : Granulocyte transfusion in patients with neutropenia or neutrophil
+  dysfunction
+- [`example_ndmm`](https://dmphillippo.github.io/multinma/reference/aa_example_ndmm.md)
+  : Example newly-diagnosed multiple myeloma
+- [`example_pso_mlnmr`](https://dmphillippo.github.io/multinma/reference/aa_example_pso_mlnmr.md)
+  : Example plaque psoriasis ML-NMR
+- [`example_smk_fe`](https://dmphillippo.github.io/multinma/reference/aa_example_smk_fe.md)
+  : Example smoking FE NMA
+- [`example_smk_nodesplit`](https://dmphillippo.github.io/multinma/reference/aa_example_smk_nodesplit.md)
+  : Example smoking node-splitting
+- [`example_smk_re`](https://dmphillippo.github.io/multinma/reference/aa_example_smk_re.md)
+  : Example smoking RE NMA
+- [`example_smk_ume`](https://dmphillippo.github.io/multinma/reference/aa_example_smk_ume.md)
+  : Example smoking UME NMA
+
+# Articles
+
+### Overview of Examples
+
+- [Overview of
+  Examples](https://dmphillippo.github.io/multinma/articles/vignette_overview.md):
+
+### Examples
+
+- [Example: Atrial
+  fibrillation](https://dmphillippo.github.io/multinma/articles/example_atrial_fibrillation.md):
+- [Example: BCG vaccine for
+  tuberculosis](https://dmphillippo.github.io/multinma/articles/example_bcg_vaccine.md):
+- [Example: Beta
+  blockers](https://dmphillippo.github.io/multinma/articles/example_blocker.md):
+- [Example:
+  Certolizumab](https://dmphillippo.github.io/multinma/articles/example_certolizumab.md):
+- [Example:
+  Diabetes](https://dmphillippo.github.io/multinma/articles/example_diabetes.md):
+- [Example: Dietary
+  fat](https://dmphillippo.github.io/multinma/articles/example_dietary_fat.md):
+- [Example: Plaque psoriasis HTA
+  report](https://dmphillippo.github.io/multinma/articles/example_hta_psoriasis.md):
+- [Example: Newly diagnosed multiple
+  myeloma](https://dmphillippo.github.io/multinma/articles/example_ndmm.md):
+- [Example: Parkinson's
+  disease](https://dmphillippo.github.io/multinma/articles/example_parkinsons.md):
+- [Example: Plaque psoriasis
+  ML-NMR](https://dmphillippo.github.io/multinma/articles/example_plaque_psoriasis.md):
+- [Example: Smoking
+  cessation](https://dmphillippo.github.io/multinma/articles/example_smoking.md):
+- [Example: Social
+  Anxiety](https://dmphillippo.github.io/multinma/articles/example_social_anxiety.md):
+- [Example: Statins for cholesterol
+  lowering](https://dmphillippo.github.io/multinma/articles/example_statins.md):
+- [Example: Thrombolytic
+  treatments](https://dmphillippo.github.io/multinma/articles/example_thrombolytics.md):
+- [Example: White blood cell
+  transfusion](https://dmphillippo.github.io/multinma/articles/example_transfusion.md):

@@ -1,0 +1,591 @@
+# Changelog
+
+## multinma 0.9.0
+
+CRAN release: 2026-04-13
+
+- Feature: Regression on baseline risk is now supported, with a new
+  `.mu` special variable for `regression` formulas which can interact
+  with treatment, e.g. `regression = ~.mu:.trt`. Following TSD3, the
+  regression is performed on the estimated intercept parameter not the
+  observed baseline risk, to correctly capture uncertainty and account
+  for correlations between baseline risk and treatment effect. A new
+  Certolizumab vignette demonstrates the new features. Thanks to
+  [@ndunnewind](https://github.com/ndunnewind) (PR
+  [\#36](https://github.com/dmphillippo/multinma/issues/36)).
+- Feature: New `subset` argument to
+  [`posterior_ranks()`](https://dmphillippo.github.io/multinma/reference/posterior_ranks.md)
+  and
+  [`posterior_rank_probs()`](https://dmphillippo.github.io/multinma/reference/posterior_ranks.md)
+  allows ranks to be calculated for a smaller decision set of treatments
+  than the full analysis set.
+- Feature: New
+  [`knots.stan_nma()`](https://dmphillippo.github.io/multinma/reference/knots.stan_nma.md)
+  method for easily obtaining the knots from a fitted M-spline or
+  piecewise exponential model, rather than working with the spline basis
+  objects `fit$basis`
+  ([\#53](https://github.com/dmphillippo/multinma/issues/53)).
+- Feature: New `expand` argument for
+  [`predict.stan_nma()`](https://dmphillippo.github.io/multinma/reference/predict.stan_nma.md),
+  to allow predictions to be made only for observed treatments in each
+  study/for each individual rather than expanding out predictions for
+  every treatment.
+- Fix: [`predict()`](https://rdrr.io/r/stats/predict.html) now works
+  correctly for `newdata` when `aux_by` was used, rather than giving
+  errors (including
+  [\#50](https://github.com/dmphillippo/multinma/issues/50)).
+- Fix: [`predict()`](https://rdrr.io/r/stats/predict.html) no longer
+  errors when using a single `baseline` for multiple `newdata` studies.
+- Fix: Bug where generalised gamma models with an `aux_regression` model
+  on the auxiliary shape parameters gave an error when trying to use
+  [`predict()`](https://rdrr.io/r/stats/predict.html) or
+  [`marginal_effects()`](https://dmphillippo.github.io/multinma/reference/marginal_effects.md)
+  ([\#62](https://github.com/dmphillippo/multinma/issues/62)).
+- Fix: Class effects models with IPD were broken, now resolved (PR
+  [\#57](https://github.com/dmphillippo/multinma/issues/57)).
+- Improvement: Class effects models now note when the reference
+  treatment was included in a class, and has been removed (PR
+  [\#57](https://github.com/dmphillippo/multinma/issues/57)).
+- Fix: Calling [`predict()`](https://rdrr.io/r/stats/predict.html) for
+  models where study names include special regex characters
+  (e.g. parentheses like “Smith (2025)”) no longer fails when these
+  studies are used to inform the `baseline` or `aux` arguments
+  ([\#63](https://github.com/dmphillippo/multinma/issues/63)).
+
+## multinma 0.8.1
+
+CRAN release: 2025-05-30
+
+- Fix: Update deprecated Stan array syntax (PR
+  [\#51](https://github.com/dmphillippo/multinma/issues/51)).
+
+## multinma 0.8.0
+
+CRAN release: 2025-03-25
+
+- Feature: Class effects models are now available, thanks to
+  [@sjperren](https://github.com/sjperren) (PR
+  [\#37](https://github.com/dmphillippo/multinma/issues/37)). The new
+  `class_effects` argument in
+  [`nma()`](https://dmphillippo.github.io/multinma/reference/nma.md)
+  allows models with independent, exchangeable, or common class effects
+  to be fitted. Class standard deviations can also be shared between
+  classes or subsets of classes, controlled by the `class_sd` argument.
+  These features are demonstrated in a new vignette, analysing a network
+  of interventions for social anxiety.
+- Feature: Leverage plots can now be produced by
+  [`plot.nma_dic()`](https://dmphillippo.github.io/multinma/reference/plot.nma_dic.md),
+  with the option `type = "leverage"`.
+- Feature: Networks with integration points can now be combined with
+  [`combine_network()`](https://dmphillippo.github.io/multinma/reference/combine_network.md),
+  where previously these were discarded. One potential use case is to
+  specify different types of marginal distributions or correlation
+  structures for different AgD studies in the network, by setting these
+  up separately with
+  [`add_integration()`](https://dmphillippo.github.io/multinma/reference/add_integration.md)
+  before combining with
+  [`combine_network()`](https://dmphillippo.github.io/multinma/reference/combine_network.md).
+- Feature: Added
+  [`as.data.frame.nma_dic()`](https://dmphillippo.github.io/multinma/reference/nma_dic-methods.md)
+  and
+  [`as_tibble.nma_dic()`](https://dmphillippo.github.io/multinma/reference/nma_dic-methods.md)
+  methods that return data frames of the pointwise contributions to the
+  DIC, and
+  [`as.matrix.nma_dic()`](https://dmphillippo.github.io/multinma/reference/nma_dic-methods.md)
+  and
+  [`as.array.nma_dic()`](https://dmphillippo.github.io/multinma/reference/nma_dic-methods.md)
+  methods that return posterior samples of the residual deviances as a
+  matrix or 3D array.
+- Feature: The
+  [`softmax()`](https://dmphillippo.github.io/multinma/reference/softmax.md)
+  and
+  [`inv_softmax()`](https://dmphillippo.github.io/multinma/reference/softmax.md)
+  transforms are now exported.
+- Improvement: Removed suggested dependency on the logitnorm package.
+  The logit Normal distribution functions are now implemented
+  internally.
+- Fix: Resolved a bug where trying to fit meta-regression models with
+  discrete covariates would sometimes result in a misspecified and
+  inestimable model, due to the inclusion of additional columns in the
+  design matrix for the reference level of the covariates.
+- Fix: IPD Poisson models were broken due to an incorrect offset for log
+  time at risk (thanks to [@n8thangreen](https://github.com/n8thangreen)
+  for spotting this).
+- Fix: In a Binomial model, studies where everyone experienced the
+  outcome (`r = n` on all arms) no longer give `NaN` residual deviance.
+
+## multinma 0.7.2
+
+CRAN release: 2024-09-16
+
+- Fix: Predictions for non-proportional hazards IPD NMA or ML-NMR
+  survival models using `aux_regression = ~.trt` were incorrectly
+  omitting the treatment effects on the auxiliary parameter(s) in some
+  cases ([\#43](https://github.com/dmphillippo/multinma/issues/43)).
+- Fix: Calling
+  [`marginal_effects()`](https://dmphillippo.github.io/multinma/reference/marginal_effects.md)
+  for survival outcomes with a single target population previously gave
+  an error.
+- Fix: Predictions from exponential models where `aux_regression` had
+  been specified were giving an error
+  ([\#44](https://github.com/dmphillippo/multinma/issues/44)).
+  `aux_regression` and `aux_by` have no effect for exponential models
+  since there are no auxiliary (shape) parameters and are ignored, now
+  with a warning.
+- Fix: Avoid an error when trying to fit M-spline models combining IPD
+  and AgD in R versions prior to 4.1.0, due to integer coercion of
+  factors by [`c()`](https://rdrr.io/r/base/c.html).
+
+## multinma 0.7.1
+
+CRAN release: 2024-06-11
+
+- Fix: Producing survival/hazard/cumulative hazard predictions for
+  survival models with
+  [`predict()`](https://rdrr.io/r/stats/predict.html) outside of a
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) call no
+  longer gives an error
+  ([\#40](https://github.com/dmphillippo/multinma/issues/40)).
+- Fix: Increased StanHeaders version requirement to version 2.32.9 or
+  later, to avoid CRAN sanitizer warnings (caused by
+  stan-dev/rstan#1111).
+
+## multinma 0.7.0
+
+CRAN release: 2024-05-07
+
+- Feature: The new
+  [`marginal_effects()`](https://dmphillippo.github.io/multinma/reference/marginal_effects.md)
+  function produces marginal treatment effects, as a wrapper around
+  absolute predictions from
+  [`predict()`](https://rdrr.io/r/stats/predict.html). For example, for
+  an analysis with a binary outcome marginal odds ratios, risk ratios,
+  or risk differences may be produced. For survival outcomes, marginal
+  effects may be based on the full range of predictions produced by
+  [`predict()`](https://rdrr.io/r/stats/predict.html), such as marginal
+  differences in restricted mean survival times, or time-varying
+  marginal hazard ratios.
+- Feature: Progress bars are now displayed when running interactively
+  for calculations with
+  [`predict()`](https://rdrr.io/r/stats/predict.html) or
+  [`marginal_effects()`](https://dmphillippo.github.io/multinma/reference/marginal_effects.md)
+  from ML-NMR models that may take longer to run. These can be
+  controlled with the new `progress` argument.
+- Deprecation: The `trt_ref` argument to
+  [`predict()`](https://rdrr.io/r/stats/predict.html) has been renamed
+  to `baseline_ref`; using `trt_ref` is now soft-deprecated. Renaming
+  this argument `baseline_ref` follows the naming convention for the
+  other arguments (`baseline_type`, `baseline_level`) that specify the
+  details of a provided `baseline` distribution. This also makes way for
+  the new
+  [`marginal_effects()`](https://dmphillippo.github.io/multinma/reference/marginal_effects.md)
+  functionality.
+- Fix: Fallback formatting used by print methods when the crayon package
+  is not installed now works properly, rather than giving errors.
+- Fix: Small bug caused
+  [`predict()`](https://rdrr.io/r/stats/predict.html) for AgD
+  meta-regression models with new data and `baseline_type = "response"`
+  to fail with an error.
+- Fix: The number of studies on a contrast in a network plot
+  [`plot.nma_data()`](https://dmphillippo.github.io/multinma/reference/plot.nma_data.md)
+  with `weight_edges = TRUE` was incorrect when a study had multiple
+  arms of the same treatment. This now correctly counts the number of
+  studies making a comparison, rather than the number of arms.
+
+## multinma 0.6.1
+
+CRAN release: 2024-03-06
+
+- Fix: Piecewise exponential hazard models no longer give errors during
+  set-up. Calculation of RW1 prior weights needed to be handled as a
+  special case.
+
+## multinma 0.6.0
+
+CRAN release: 2024-01-24
+
+### Feature: Survival/time-to-event models are now supported
+
+- [`set_ipd()`](https://dmphillippo.github.io/multinma/reference/set_ipd.md)
+  now has a `Surv` argument for specifying survival outcomes using
+  [`survival::Surv()`](https://rdrr.io/pkg/survival/man/Surv.html), and
+  a new function
+  [`set_agd_surv()`](https://dmphillippo.github.io/multinma/reference/set_agd_surv.md)
+  sets up aggregate data in the form of event/censoring times (e.g. from
+  digitized Kaplan-Meier curves) and overall covariate summaries.
+- Left, right, and interval censoring as well as left truncation
+  (delayed entry) are all supported.
+- The available likelihoods are Exponential (PH and AFT forms), Weibull
+  (PH and AFT forms), Gompertz, log-Normal, log-Logistic, Gamma,
+  Generalised Gamma, flexible M-splines on the baseline hazard, and
+  piecewise exponential hazards.
+- Auxiliary parameters (e.g. shapes, spline coefficients) are always
+  stratified by study to respect randomisation, and may be further
+  stratified by treatment (e.g. to relax the proportional hazards
+  assumption) and/or by additional factors using the `aux_by` argument
+  to [`nma()`](https://dmphillippo.github.io/multinma/reference/nma.md).
+- A regression model may be defined for the auxiliary parameters using
+  the `aux_regression` argument to
+  [`nma()`](https://dmphillippo.github.io/multinma/reference/nma.md),
+  allowing non-proportionality to be modelled by treatment and/or
+  covariate effects on the shapes or spline coefficients.
+- The [`predict()`](https://rdrr.io/r/stats/predict.html) method
+  produces estimates of survival probabilities, hazards, cumulative
+  hazards, mean survival times, restricted mean survival times,
+  quantiles of the survival time distribution, and median survival
+  times. All of these predictions can be plotted using the
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method.
+- The
+  [`geom_km()`](https://dmphillippo.github.io/multinma/reference/geom_km.md)
+  function assists in plotting Kaplan-Meier curves from a network
+  object, for example to overlay these on estimated survival curves. The
+  `transform` argument can be used to produce log-log plots for
+  assessing the proportional hazards assumption, along with cumulative
+  hazards or log survival curves.
+- A new vignette demonstrates ML-NMR survival analysis with an example
+  of progression-free survival after autologous stem cell transplant for
+  newly diagnosed multiple myeloma, with corresponding datasets
+  `ndmm_ipd`, `ndmm_agd`, and `ndmm_agd_covs`.
+
+### Feature: Automatic checking of numerical integration for ML-NMR models
+
+- The accuracy of numerical integration for ML-NMR models can now be
+  checked automatically, and is by default. To do so, half of the chains
+  are run with `n_int` and half with `n_int/2` integration points. Any
+  Rhat or effective sample size warnings can then be ascribed to either:
+  non-convergence of the MCMC chains, requiring increased number of
+  iterations `iter` in
+  [`nma()`](https://dmphillippo.github.io/multinma/reference/nma.md),
+  or; insufficient accuracy of numerical integration, requiring
+  increased number of integration points `n_int` in
+  [`add_integration()`](https://dmphillippo.github.io/multinma/reference/add_integration.md).
+  Descriptive warning messages indicate which is the case.
+- This feature is controlled by a new `int_check` argument to
+  [`nma()`](https://dmphillippo.github.io/multinma/reference/nma.md),
+  which is enabled (`TRUE`) by default.
+- Saving thinned cumulative integration points can now be disabled with
+  `int_thin = 0`, and is now disabled by default. The previous default
+  was `int_thin = max(n_int %/% 10, 1)`.
+- Because we can now check sufficient accuracy automatically, the
+  default number of integration points `n_int` in
+  [`add_integration()`](https://dmphillippo.github.io/multinma/reference/add_integration.md)
+  has been lowered to 64. This is still a conservative choice, and will
+  be sufficient in many cases; the previous default of 1000 was
+  excessive.
+- As a result, ML-NMR models are now much faster to run by default, both
+  due to lower `n_int` and disabling saving cumulative integration
+  points.
+
+### Other updates
+
+- Feature:
+  [`dic()`](https://dmphillippo.github.io/multinma/reference/dic.md) now
+  includes an option to use the pV penalty instead of pD.
+- Feature: The `baseline` and `aux` arguments to
+  [`predict()`](https://rdrr.io/r/stats/predict.html) can now be
+  specified as the name of a study in the network, to use the parameter
+  estimates from that study for prediction.
+- Improvement: [`predict()`](https://rdrr.io/r/stats/predict.html) will
+  now produce aggregate-level predictions over a sample of individuals
+  in `newdata` for ML-NMR models (previously `newdata` had to include
+  integration points).
+- Improvement: Compatibility with future rstan versions (PR
+  [\#25](https://github.com/dmphillippo/multinma/issues/25)).
+- Improvement: Added a
+  [`plot.mcmc_array()`](https://dmphillippo.github.io/multinma/reference/mcmc_array-class.md)
+  method, as a shortcut for `plot(summary(x), ...)`.
+- Fix: In
+  [`plot.nma_data()`](https://dmphillippo.github.io/multinma/reference/plot.nma_data.md),
+  using a custom `layout` that is not a string (e.g.  a data frame of
+  layout coordinates) now works as expected when `nudge > 0`.
+- Fix: Documentation corrections (PR
+  [\#24](https://github.com/dmphillippo/multinma/issues/24)).
+- Fix: Added missing
+  [`as.tibble.stan_nma()`](https://dmphillippo.github.io/multinma/reference/as.array.stan_nma.md)
+  and
+  [`as_tibble.stan_nma()`](https://dmphillippo.github.io/multinma/reference/as.array.stan_nma.md)
+  methods, to complement the existing
+  [`as.data.frame.stan_nma()`](https://dmphillippo.github.io/multinma/reference/as.array.stan_nma.md).
+- Fix: Bug in ordered multinomial models where data in studies with
+  missing categories could be assigned the wrong category
+  ([\#28](https://github.com/dmphillippo/multinma/issues/28)).
+
+## multinma 0.5.1
+
+CRAN release: 2023-05-24
+
+- Fix: Now compatible with latest StanHeaders v2.26.25 (fixes
+  [\#23](https://github.com/dmphillippo/multinma/issues/23))
+- Fix: Dealt with various tidyverse deprecations
+- Fix: Updated TSD URLs again (thanks to
+  [@ndunnewind](https://github.com/ndunnewind))
+
+## multinma 0.5.0
+
+CRAN release: 2022-08-29
+
+- Feature: Treatment labels in network plots can now be nudged away from
+  the nodes when `weight_nodes = TRUE`, using the new `nudge` argument
+  to
+  [`plot.nma_data()`](https://dmphillippo.github.io/multinma/reference/plot.nma_data.md)
+  ([\#15](https://github.com/dmphillippo/multinma/issues/15)).
+- Feature: The data frame returned by calling
+  [`as_tibble()`](https://tibble.tidyverse.org/reference/as_tibble.html)
+  or [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) on
+  an `nma_summary` object (such as relative effects or predictions) now
+  includes columns for the corresponding treatment (`.trt`) or contrast
+  (`.trta` and `.trtb`), and a `.category` column may be included for
+  multinomial models. Previously these details were only present as part
+  of the `parameter` column
+- Feature: Added log t prior distribution
+  [`log_student_t()`](https://dmphillippo.github.io/multinma/reference/priors.md),
+  which can be used for positive-valued parameters (e.g. heterogeneity
+  variance).
+- Improvement:
+  [`set_agd_contrast()`](https://dmphillippo.github.io/multinma/reference/set_agd_contrast.md)
+  now produces an informative error message when the covariance matrix
+  implied by the `se` column is not positive definite. Previously this
+  was only checked by Stan after calling the
+  [`nma()`](https://dmphillippo.github.io/multinma/reference/nma.md)
+  function.
+- Improvement: Updated plaque psoriasis ML-NMR vignette to include new
+  analyses, including assessing the assumptions of population adjustment
+  and synthesising multinomial outcomes.
+- Improvement: Improved behaviour of the `.trtclass` special in
+  regression formulas, now main effects of `.trtclass` are always
+  removed since these are collinear with `.trt`. This allows expansion
+  of interactions with `*` to work properly, e.g. `~variable*.trtclass`,
+  whereas previously this resulted in an over-parametrised model.
+- Fix: CRAN check note for manual HTML5 compatibility.
+- Fix: Residual deviance and log likelihood parameters are now named
+  correctly when only contrast-based aggregate data is present (PR
+  [\#19](https://github.com/dmphillippo/multinma/issues/19)).
+
+## multinma 0.4.2
+
+CRAN release: 2022-03-02
+
+- Fix: Error in
+  [`get_nodesplits()`](https://dmphillippo.github.io/multinma/reference/get_nodesplits.md)
+  when studies have multiple arms of the same treatment.
+- Fix:
+  [`print.nma_data()`](https://dmphillippo.github.io/multinma/reference/print.nma_data.md)
+  now prints the repeated arms when studies have multiple arms of the
+  same treatment.
+- Fix: CRAN warning regarding invalid img tag height attribute in
+  documentation.
+
+## multinma 0.4.1
+
+CRAN release: 2022-02-04
+
+- Fix: tidyr v1.2.0 breaks ordered multinomial models when some studies
+  do not report all categories (i.e. some multinomial category outcomes
+  are `NA` in
+  [`multi()`](https://dmphillippo.github.io/multinma/reference/multi.md))
+  (PR [\#11](https://github.com/dmphillippo/multinma/issues/11))
+
+## multinma 0.4.0
+
+CRAN release: 2022-01-18
+
+- Feature: Node-splitting models for assessing inconsistency are now
+  available with `consistency = "nodesplit"` in
+  [`nma()`](https://dmphillippo.github.io/multinma/reference/nma.md).
+  Comparisons to split can be chosen using the `nodesplit` argument, by
+  default all possibly inconsistent comparisons are chosen using
+  [`get_nodesplits()`](https://dmphillippo.github.io/multinma/reference/get_nodesplits.md).
+  Node-splitting results can be summarised with
+  [`summary.nma_nodesplit()`](https://dmphillippo.github.io/multinma/reference/summary.nma_nodesplit_df.md)
+  and plotted with
+  [`plot.nodesplit_summary()`](https://dmphillippo.github.io/multinma/reference/plot.nodesplit_summary.md).
+- Feature: The correlation matrix for generating integration points with
+  [`add_integration()`](https://dmphillippo.github.io/multinma/reference/add_integration.md)
+  for ML-NMR models is now adjusted to the underlying Gaussian copula,
+  so that the output correlations of the integration points better match
+  the requested input correlations. A new argument `cor_adjust` controls
+  this behaviour, with options `"spearman"`, `"pearson"`, or `"none"`.
+  Although these correlations typically have little impact on the
+  results, for strict reproducibility the old behaviour from version
+  0.3.0 and below is available with `cor_adjust = "legacy"`.
+- Feature: For random effects models, the predictive distribution of
+  relative/absolute effects in a new study can now be obtained in
+  [`relative_effects()`](https://dmphillippo.github.io/multinma/reference/relative_effects.md)
+  and
+  [`predict.stan_nma()`](https://dmphillippo.github.io/multinma/reference/predict.stan_nma.md)
+  respectively, using the new argument `predictive_distribution = TRUE`.
+- Feature: Added option to calculate SUCRA values when summarising the
+  posterior treatment ranks with
+  [`posterior_ranks()`](https://dmphillippo.github.io/multinma/reference/posterior_ranks.md)
+  or
+  [`posterior_rank_probs()`](https://dmphillippo.github.io/multinma/reference/posterior_ranks.md),
+  when argument `sucra = TRUE`.
+- Improvement: Factor order is now respected when `trt`, `study`, or
+  `trt_class` are factors, previously the order of levels was reset into
+  natural sort order.
+- Improvement: Update package website to Bootstrap 5 with release of
+  pkgdown 2.0.0
+- Fix: Model fitting is now robust to non-default settings of
+  `options("contrasts")`.
+- Fix:
+  [`plot.nma_data()`](https://dmphillippo.github.io/multinma/reference/plot.nma_data.md)
+  no longer gives a ggplot deprecation warning (PR
+  [\#6](https://github.com/dmphillippo/multinma/issues/6)).
+- Fix: Bug in
+  [`predict.stan_nma()`](https://dmphillippo.github.io/multinma/reference/predict.stan_nma.md)
+  with a single covariate when `newdata` is a `data.frame` (PR
+  [\#7](https://github.com/dmphillippo/multinma/issues/7)).
+- Fix: Attempting to call
+  [`predict.stan_nma()`](https://dmphillippo.github.io/multinma/reference/predict.stan_nma.md)
+  on a regression model with only contrast data and no `newdata` or
+  `baseline` specified now throws a descriptive error message.
+
+## multinma 0.3.0
+
+CRAN release: 2021-03-18
+
+- Feature: Added `baseline_type` and `baseline_level` arguments to
+  [`predict.stan_nma()`](https://dmphillippo.github.io/multinma/reference/predict.stan_nma.md),
+  which allow baseline distributions to be specified on the response or
+  linear predictor scale, and at the individual or aggregate level.
+- Feature: The `baseline` argument to
+  [`predict.stan_nma()`](https://dmphillippo.github.io/multinma/reference/predict.stan_nma.md)
+  can now accept a (named) list of baseline distributions if `newdata`
+  contains multiple studies.
+- Improvement: Misspecified `newdata` arguments to functions like
+  [`relative_effects()`](https://dmphillippo.github.io/multinma/reference/relative_effects.md)
+  and
+  [`predict.stan_nma()`](https://dmphillippo.github.io/multinma/reference/predict.stan_nma.md)
+  now give more informative error messages.
+- Fix: Constructing models with contrast-based data previously gave
+  errors in some scenarios (ML-NMR models, UME models, and in some cases
+  AgD meta-regression models).
+- Fix: Ensure CRAN additional checks with `--run-donttest` run
+  correctly.
+
+## multinma 0.2.1
+
+CRAN release: 2021-01-09
+
+- Fix: Producing relative effect estimates for all contrasts using
+  [`relative_effects()`](https://dmphillippo.github.io/multinma/reference/relative_effects.md)
+  with `all_contrasts = TRUE` no longer gives an error for regression
+  models.
+- Fix: Specifying the covariate correlation matrix `cor` in
+  [`add_integration()`](https://dmphillippo.github.io/multinma/reference/add_integration.md)
+  is not required when only one covariate is present.
+- Improvement: Added more detailed documentation on the likelihoods and
+  link functions available for each data type (`likelihood` and `link`
+  arguments in
+  [`nma()`](https://dmphillippo.github.io/multinma/reference/nma.md)).
+
+## multinma 0.2.0
+
+CRAN release: 2020-12-04
+
+- Feature: The `set_*()` functions now accept
+  [`dplyr::mutate()`](https://dplyr.tidyverse.org/reference/mutate.html)
+  style semantics, allowing inline variable transformations.
+- Feature: Added ordered multinomial models, with helper function
+  [`multi()`](https://dmphillippo.github.io/multinma/reference/multi.md)
+  for specifying the outcomes. Accompanied by a new data set
+  `hta_psoriasis` and vignette.
+- Feature: Implicit flat priors can now be specified, on any parameter,
+  using
+  [`flat()`](https://dmphillippo.github.io/multinma/reference/priors.md).
+- Improvement:
+  [`as.array.stan_nma()`](https://dmphillippo.github.io/multinma/reference/as.array.stan_nma.md)
+  is now much more efficient, meaning that many post-estimation
+  functions are also now much more efficient.
+- Improvement:
+  [`plot.nma_dic()`](https://dmphillippo.github.io/multinma/reference/plot.nma_dic.md)
+  is now more efficient, particularly with large numbers of data points.
+- Improvement: The layering of points when producing “dev-dev” plots
+  using
+  [`plot.nma_dic()`](https://dmphillippo.github.io/multinma/reference/plot.nma_dic.md)
+  with multiple data types has been reversed for improved clarity (now
+  AgD over the top of IPD).
+- Improvement: Aggregate-level predictions with
+  [`predict()`](https://rdrr.io/r/stats/predict.html) from ML-NMR / IPD
+  regression models are now calculated in a much more memory-efficient
+  manner.
+- Improvement: Added an overview of examples given in the vignettes.
+- Improvement: Network plots with `weight_edges = TRUE` no longer
+  produce legends with non-integer values for the number of studies.
+- Fix:
+  [`plot.nma_dic()`](https://dmphillippo.github.io/multinma/reference/plot.nma_dic.md)
+  no longer gives an error when attempting to specify `.width` argument
+  when producing “dev-dev” plots.
+
+## multinma 0.1.3
+
+CRAN release: 2020-06-30
+
+- Format DESCRIPTION to CRAN requirements
+
+## multinma 0.1.2
+
+- Wrapped long-running examples in `\donttest{}` instead of `\dontrun{}`
+
+## multinma 0.1.1
+
+- Reduced size of vignettes
+- Added methods paper reference to DESCRIPTION
+- Added zenodo DOI
+
+## multinma 0.1.0
+
+- Feature: Network plots, using a
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method for
+  `nma_data` objects.
+- Feature: `as.igraph()`, `as_tbl_graph()` methods for `nma_data`
+  objects.
+- Feature: Produce relative effect estimates with
+  [`relative_effects()`](https://dmphillippo.github.io/multinma/reference/relative_effects.md),
+  posterior ranks with
+  [`posterior_ranks()`](https://dmphillippo.github.io/multinma/reference/posterior_ranks.md),
+  and posterior rank probabilities with
+  [`posterior_rank_probs()`](https://dmphillippo.github.io/multinma/reference/posterior_ranks.md).
+  These will be study-specific when a regression model is given.
+- Feature: Produce predictions of absolute effects with a
+  [`predict()`](https://rdrr.io/r/stats/predict.html) method for
+  `stan_nma` objects.
+- Feature: Plots of relative effects, ranks, predictions, and parameter
+  estimates via
+  [`plot.nma_summary()`](https://dmphillippo.github.io/multinma/reference/plot.nma_summary.md).
+- Feature: Optional `sample_size` argument for `set_agd_*()` that:
+  - Enables centering of predictors (`center = TRUE`) in
+    [`nma()`](https://dmphillippo.github.io/multinma/reference/nma.md)
+    when a regression model is given, replacing the `agd_sample_size`
+    argument of
+    [`nma()`](https://dmphillippo.github.io/multinma/reference/nma.md)
+  - Enables production of study-specific relative effects, rank
+    probabilities, etc. for studies in the network when a regression
+    model is given
+  - Allows nodes in network plots to be weighted by sample size
+- Feature: Plots of residual deviance contributions for a model and
+  “dev-dev” plots comparing residual deviance contributions between two
+  models, using a
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method for
+  `nma_dic` objects produced by
+  [`dic()`](https://dmphillippo.github.io/multinma/reference/dic.md).
+- Feature: Complementary log-log (cloglog) link function
+  `link = "cloglog"` for binomial likelihoods.
+- Feature: Option to specify priors for heterogeneity on the standard
+  deviation, variance, or precision, with argument `prior_het_type`.
+- Feature: Added log-Normal prior distribution.
+- Feature: Plots of prior distributions vs. posterior distributions with
+  [`plot_prior_posterior()`](https://dmphillippo.github.io/multinma/reference/plot_prior_posterior.md).
+- Feature: Pairs plot method
+  [`pairs()`](https://rdrr.io/r/graphics/pairs.html).
+- Feature: Added vignettes with example analyses from the NICE TSDs and
+  more.
+- Fix: Random effects models with even moderate numbers of studies could
+  be very slow. These now run much more quickly, using a sparse
+  representation of the RE correlation matrix which is automatically
+  enabled for sparsity above 90% (roughly equivalent to 10 or more
+  studies).
+
+## multinma 0.0.1
+
+- Initial release.

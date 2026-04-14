@@ -13,7 +13,7 @@ See (Phillippo et al. 2020; Phillippo 2019)
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,6 +30,7 @@ See (Phillippo et al. 2020; Phillippo 2019)
     <li><a class="dropdown-item" href="../articles/example_atrial_fibrillation.html">Example: Atrial fibrillation</a></li>
     <li><a class="dropdown-item" href="../articles/example_bcg_vaccine.html">Example: BCG vaccine for tuberculosis</a></li>
     <li><a class="dropdown-item" href="../articles/example_blocker.html">Example: Beta blockers</a></li>
+    <li><a class="dropdown-item" href="../articles/example_certolizumab.html">Example: Certolizumab</a></li>
     <li><a class="dropdown-item" href="../articles/example_diabetes.html">Example: Diabetes</a></li>
     <li><a class="dropdown-item" href="../articles/example_dietary_fat.html">Example: Dietary fat</a></li>
     <li><a class="dropdown-item" href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a></li>
@@ -189,7 +190,7 @@ memory).</p>
 <span class="r-in"><span>    weight <span class="op">=</span> <span class="va">weight</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    durnpso <span class="op">=</span> <span class="va">durnpso</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    <span class="co"># Treatment classes</span></span></span>
-<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
+<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span> <span class="op">~</span> <span class="st">"IL blocker"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op">==</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"TNFa blocker"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    <span class="co"># Check complete cases for covariates of interest</span></span></span>
@@ -208,7 +209,7 @@ memory).</p>
 <span class="r-in"><span>    durnpso_mean <span class="op">=</span> <span class="va">durnpso_mean</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    durnpso_sd <span class="op">=</span> <span class="va">durnpso_sd</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    <span class="co"># Treatment classes</span></span></span>
-<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
+<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span> <span class="op">~</span> <span class="st">"IL blocker"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op">==</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"TNFa blocker"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
@@ -264,7 +265,7 @@ memory).</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Fit the ML-NMR model</span></span></span>
-<span class="r-in"><span><span class="va">pso_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="nma.html">nma</a></span><span class="op">(</span><span class="va">pso_net</span>, </span></span>
+<span class="r-in"><span><span class="va">pso_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="nma.html">nma</a></span><span class="op">(</span><span class="va">pso_net</span>,</span></span>
 <span class="r-in"><span>               trt_effects <span class="op">=</span> <span class="st">"fixed"</span>,</span></span>
 <span class="r-in"><span>               link <span class="op">=</span> <span class="st">"probit"</span>,</span></span>
 <span class="r-in"><span>               likelihood <span class="op">=</span> <span class="st">"bernoulli2"</span>,</span></span>
@@ -291,50 +292,50 @@ memory).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                         mean se_mean   sd     2.5%      25%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso]                           0.04    0.00 0.06    -0.08     0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys]                          -0.13    0.00 0.16    -0.46    -0.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa]                              -0.07    0.01 0.45    -0.97    -0.36</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys]                          -0.14    0.00 0.16    -0.45    -0.25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa]                              -0.08    0.01 0.45    -1.01    -0.36</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight]                            0.04    0.00 0.03    -0.02     0.02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa]                              -0.08    0.00 0.17    -0.42    -0.19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03    0.00 0.07    -0.17    -0.08</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01    0.00 0.07    -0.15    -0.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa]                              -0.07    0.00 0.17    -0.42    -0.19</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03    0.00 0.07    -0.18    -0.08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01    0.00 0.07    -0.14    -0.06</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.19    0.00 0.19    -0.19     0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.06    0.00 0.18    -0.29    -0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.06    0.01 0.51    -0.92    -0.29</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassIL blocker]           0.29    0.01 0.49    -0.66    -0.04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    0.00 0.04    -0.24    -0.19</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.07    0.00 0.17    -0.28    -0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.07    0.01 0.52    -0.94    -0.29</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassIL blocker]           0.30    0.01 0.50    -0.64    -0.04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    0.00 0.04    -0.23    -0.19</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassIL blocker]       -0.10    0.00 0.03    -0.16    -0.12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.05    0.00 0.20    -0.45    -0.19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassIL blocker]           0.01    0.00 0.19    -0.37    -0.12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[ETN]                                  1.55    0.00 0.08     1.40     1.50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q2W]                              2.96    0.00 0.09     2.78     2.89</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.06    0.00 0.21    -0.46    -0.20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassIL blocker]           0.00    0.00 0.19    -0.36    -0.12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[ETN]                                  1.56    0.00 0.08     1.40     1.50</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q2W]                              2.96    0.00 0.09     2.79     2.90</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q4W]                              2.54    0.00 0.08     2.39     2.49</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_150]                              2.14    0.00 0.12     1.93     2.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45    0.00 0.12     2.22     2.36</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1576.50    0.10 3.54 -1584.32 -1578.65</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_150]                              2.15    0.00 0.12     1.92     2.07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45    0.00 0.12     2.22     2.37</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1576.42    0.08 3.43 -1583.89 -1578.69</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                          50%      75%    97.5% n_eff Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso]                           0.04     0.09     0.17  6099    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys]                          -0.13    -0.02     0.19  6201    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa]                              -0.06     0.24     0.77  5576    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight]                            0.04     0.06     0.09  6049    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa]                              -0.08     0.03     0.25  5944    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03     0.02     0.12  6126    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01     0.03     0.13  7081    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.19     0.32     0.57  6670    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.06     0.19     0.42  7146    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.05     0.40     1.09  5639    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassIL blocker]           0.28     0.60     1.28  6380    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    -0.14    -0.10  5802    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassIL blocker]       -0.10    -0.08    -0.04  6804    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.06     0.08     0.34  6411    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassIL blocker]           0.01     0.14     0.38  6935    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[ETN]                                  1.55     1.61     1.71  4104    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q2W]                              2.95     3.01     3.13  5437    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q4W]                              2.54     2.60     2.70  5258    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_150]                              2.14     2.22     2.38  4731    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45     2.53     2.69  5259    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1576.13 -1573.95 -1570.66  1236    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso]                           0.04     0.09     0.16  5670    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys]                          -0.14    -0.03     0.19  5527    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa]                              -0.07     0.23     0.77  5051    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight]                            0.04     0.06     0.10  5746    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa]                              -0.07     0.04     0.26  5391    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03     0.02     0.12  6178    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01     0.03     0.13  7052    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.19     0.31     0.56  5580    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.07     0.18     0.40  6257    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.05     0.41     1.13  5498    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassIL blocker]           0.29     0.64     1.29  6710    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    -0.14    -0.10  6769    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassIL blocker]       -0.10    -0.08    -0.04  6777    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.06     0.08     0.35  4954    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassIL blocker]           0.00     0.13     0.38  5800    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[ETN]                                  1.55     1.61     1.71  4360    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q2W]                              2.96     3.02     3.12  4868    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q4W]                              2.54     2.60     2.70  4973    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_150]                              2.15     2.23     2.37  4897    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45     2.53     2.69  5543    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1576.06 -1573.90 -1570.67  1681    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Sat May 31 10:36:10 2025.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Tue Apr 14 08:16:37 2026.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
@@ -354,7 +355,7 @@ memory).</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

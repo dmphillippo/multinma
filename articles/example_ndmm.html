@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,7 @@
     <li><a class="dropdown-item" href="../articles/example_atrial_fibrillation.html">Example: Atrial fibrillation</a></li>
     <li><a class="dropdown-item" href="../articles/example_bcg_vaccine.html">Example: BCG vaccine for tuberculosis</a></li>
     <li><a class="dropdown-item" href="../articles/example_blocker.html">Example: Beta blockers</a></li>
+    <li><a class="dropdown-item" href="../articles/example_certolizumab.html">Example: Certolizumab</a></li>
     <li><a class="dropdown-item" href="../articles/example_diabetes.html">Example: Diabetes</a></li>
     <li><a class="dropdown-item" href="../articles/example_dietary_fat.html">Example: Dietary fat</a></li>
     <li><a class="dropdown-item" href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a></li>
@@ -164,7 +165,7 @@ available on a further two trials, found in the data sets
 <span><span class="co">#&gt; 2 64.62894 9.399272  0.1921296        0.8310185 0.6215278</span></span>
 <span><span class="co">#&gt; 3 63.92360 9.006311  0.3634146        0.7170732 0.6195122</span></span>
 <span><span class="co">#&gt; 4 65.59387 8.384686  0.3186275        0.7450980 0.6151961</span></span></code></pre></div>
-<p><span class="citation">Phillippo et al. (<a href="#ref-Phillippo_survival">2024</a>)</span> analysed these data
+<p><span class="citation">Phillippo, Dias, et al. (<a href="#ref-Phillippo_survival">2025</a>)</span> analysed these data
 using multilevel network meta-regression (ML-NMR), and we recreate these
 analyses here.</p>
 <div class="section level2">
@@ -225,13 +226,13 @@ this assumption may be reasonable.</p>
 <p>To impose this assumption, we create a treatment class variable for
 active treatments vs. placebo.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ndmm_ipd</span><span class="op">$</span><span class="va">trtclass</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_match.html" class="external-link">case_match</a></span><span class="op">(</span><span class="va">ndmm_ipd</span><span class="op">$</span><span class="va">trtf</span>,</span>
-<span>                                <span class="st">"Pbo"</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span>
-<span>                                <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Len"</span>, <span class="st">"Thal"</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Active"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">ndmm_ipd</span><span class="op">$</span><span class="va">trtclass</span> <span class="op">&lt;-</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_collapse.html" class="external-link">fct_collapse</a></span><span class="op">(</span><span class="va">ndmm_ipd</span><span class="op">$</span><span class="va">trtf</span>,</span>
+<span>                                           Placebo <span class="op">=</span> <span class="st">"Pbo"</span>,</span>
+<span>                                           Active <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Len"</span>, <span class="st">"Thal"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">ndmm_agd</span><span class="op">$</span><span class="va">trtclass</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_match.html" class="external-link">case_match</a></span><span class="op">(</span><span class="va">ndmm_agd</span><span class="op">$</span><span class="va">trtf</span>,</span>
-<span>                                <span class="st">"Pbo"</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span>
-<span>                                <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Len"</span>, <span class="st">"Thal"</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Active"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">ndmm_agd</span><span class="op">$</span><span class="va">trtclass</span> <span class="op">&lt;-</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_collapse.html" class="external-link">fct_collapse</a></span><span class="op">(</span><span class="va">ndmm_agd</span><span class="op">$</span><span class="va">trtf</span>,</span>
+<span>                                           Placebo <span class="op">=</span> <span class="st">"Pbo"</span>,</span>
+<span>                                           Active <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Len"</span>, <span class="st">"Thal"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="setting-up-the-network">Setting up the network<a class="anchor" aria-label="anchor" href="#setting-up-the-network"></a>
@@ -358,7 +359,7 @@ log-log plot.</p>
 <h2 id="ml-nmr-models-with-m-spline-baseline-hazards">ML-NMR models with M-spline baseline hazards<a class="anchor" aria-label="anchor" href="#ml-nmr-models-with-m-spline-baseline-hazards"></a>
 </h2>
 <p>We fit a proportional hazards survival model with cubic M-splines on
-the baseline hazard <span class="citation">Phillippo et al. (<a href="#ref-Phillippo_survival">2024</a>)</span>. This allows the
+the baseline hazard <span class="citation">Phillippo, Dias, et al. (<a href="#ref-Phillippo_survival">2025</a>)</span>. This allows the
 baseline hazard to flexibly follow any shape that the baseline hazard
 may take. ML-NMR models are fit using the <code><a href="../reference/nma.html">nma()</a></code> function,
 and we specify that a M-spline baseline hazard should be used with
@@ -369,8 +370,8 @@ location of the knots. By default, seven internal knots are used
 on the observed event times within each study. Overfitting is avoided by
 the use of a random walk prior distribution on the (inverse softmax
 transformed) spline coefficients that penalises complexity and shrinks
-towards a constant baseline hazard <span class="citation">(<a href="#ref-Phillippo_survival">Phillippo et al. 2024</a>)</span>; in
-practice this means that the number of knots can be set to a
+towards a constant baseline hazard <span class="citation">(<a href="#ref-Phillippo_mspline">Phillippo, Sadek, et al. 2025</a>)</span>;
+in practice this means that the number of knots can be set to a
 sufficiently large number and left to shrink to a suitable level of
 complexity controlled by the standard deviation of the random walk. The
 number of knots can be changed using the <code>n_knots</code> argument,
@@ -568,8 +569,9 @@ posterior distributions from each study for these parameters.</p>
 </h2>
 <p>We can relax and assess the proportional hazards (PH) assumption by
 allowing the spline coefficients to vary between treatment arms within
-each study. This may be achieved using the <code>aux_by</code> argument,
-with <code>aux_by = c(.study, .trt)</code>. Technically,
+each study <span class="citation">(<a href="#ref-Phillippo_mspline">Phillippo, Sadek, et al. 2025</a>)</span>.
+This may be achieved using the <code>aux_by</code> argument, with
+<code>aux_by = c(.study, .trt)</code>. Technically,
 <code>aux_by = .study</code> is always assumed in order to respect
 randomisation (analogous to stratifying the intercept terms in a NMA by
 study), and we could simply write <code>aux_by = .trt</code>; but we
@@ -716,14 +718,14 @@ inappropriate, we might consider instead modelling departures from
 proportional hazards using the <code>aux_regression</code> argument to
 <code><a href="../reference/nma.html">nma()</a></code> which places a model on the (inverse softmax
 transformed) spline coefficients, or on the shape parameters in a
-parametric model. For example, we can allow the baseline hazard to vary
-smoothly by treatment arm (<code>aux_regression = ~.trt</code>) and/or
-by other covariates
-(e.g. <code>aux_regression = ~.trt + iss_stage3</code>). This further
-relaxes the proportional hazards assumption (which is already relaxed by
-the inclusion of patient-level covariates), whilst still allowing
-predictions to be produced on every treatment in any population of
-interest.</p>
+parametric model <span class="citation">(<a href="#ref-Phillippo_mspline">Phillippo, Sadek, et al. 2025</a>)</span>.
+For example, we can allow the baseline hazard to vary smoothly by
+treatment arm (<code>aux_regression = ~.trt</code>) and/or by other
+covariates (e.g. <code>aux_regression = ~.trt + iss_stage3</code>). This
+further relaxes the proportional hazards assumption (which is already
+relaxed by the inclusion of patient-level covariates), whilst still
+allowing predictions to be produced on every treatment in any population
+of interest.</p>
 </div>
 <div class="section level2">
 <h2 id="comparison-to-unadjusted-nma">Comparison to unadjusted NMA<a class="anchor" aria-label="anchor" href="#comparison-to-unadjusted-nma"></a>
@@ -1069,11 +1071,6 @@ baseline and were not themselves time-varying.</p>
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-Brilleman2020" class="csl-entry">
-Brilleman, Samuel L., Eren M. Elci, Jacqueline Buros Novik, and Rory
-Wolfe. 2020. <span>“Bayesian Survival Analysis Using the Rstanarm
-<span>R</span> Package.”</span> <em>arXiv</em>, February. <a href="https://doi.org/10.48550/arXiv.2002.09633" class="external-link">https://doi.org/10.48550/arXiv.2002.09633</a>.
-</div>
 <div id="ref-Leahy2019" class="csl-entry">
 Leahy, Joy, and Cathal Walsh. 2019. <span>“Assessing the Impact of a
 Matching-Adjusted Indirect Comparison in a <span>Bayesian</span> Network
@@ -1085,7 +1082,7 @@ Phillippo, D. M., A. E. Ades, S. Dias, S. Palmer, K. R. Abrams, and N.
 J. Welton. 2016. <span>“<span>NICE DSU Technical Support Document</span>
 18: Methods for Population-Adjusted Indirect Comparisons in Submission
 to <span>NICE</span>.”</span> <span>National Institute for Health and
-Care Excellence</span>. <a href="https://www.sheffield.ac.uk/nice-dsu" class="external-link">https://www.sheffield.ac.uk/nice-dsu</a>.
+Care Excellence</span>. <a href="https://sheffield.ac.uk/nice-dsu" class="external-link">https://sheffield.ac.uk/nice-dsu</a>.
 </div>
 <div id="ref-methods_paper" class="csl-entry">
 Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A.
@@ -1095,10 +1092,16 @@ Treatment Comparisons.”</span> <em>Journal of the Royal Statistical
 Society: Series A (Statistics in Society)</em> 183 (3): 1189–1210. <a href="https://doi.org/10.1111/rssa.12579" class="external-link">https://doi.org/10.1111/rssa.12579</a>.
 </div>
 <div id="ref-Phillippo_survival" class="csl-entry">
-Phillippo, D. M., S. Dias, A. E. Ades, and N. J. Welton. 2024.
+Phillippo, D. M., S. Dias, A. E. Ades, and N. J. Welton. 2025.
 <span>“Multilevel Network Meta-Regression for General Likelihoods:
 Synthesis of Individual and Aggregate Data with Applications to Survival
-Analysis.”</span> <em>arXiv</em>, January. <a href="https://doi.org/10.48550/arXiv.2401.12640" class="external-link">https://doi.org/10.48550/arXiv.2401.12640</a>.
+Analysis.”</span> <em>Journal of the Royal Statistical Society Series A:
+Statistics in Society</em>, October. <a href="https://doi.org/10.1093/jrsssa/qnaf169" class="external-link">https://doi.org/10.1093/jrsssa/qnaf169</a>.
+</div>
+<div id="ref-Phillippo_mspline" class="csl-entry">
+Phillippo, D. M., A. Sadek, H. Pedder, and N. J. Welton. 2025.
+<span>“<span>Network Meta-Analysis</span> of Survival Outcomes with
+Non-Proportional Hazards Using Flexible <span class="nocase">M-splines</span>.”</span> <em>arXiv</em>. <a href="https://doi.org/10.48550/ARXIV.2509.10383" class="external-link">https://doi.org/10.48550/ARXIV.2509.10383</a>.
 </div>
 </div>
 </div>
@@ -1113,7 +1116,7 @@ Analysis.”</span> <em>arXiv</em>, January. <a href="https://doi.org/10.48550/a
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

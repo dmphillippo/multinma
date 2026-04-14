@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,6 +24,7 @@
     <li><a class="dropdown-item" href="../articles/example_atrial_fibrillation.html">Example: Atrial fibrillation</a></li>
     <li><a class="dropdown-item" href="../articles/example_bcg_vaccine.html">Example: BCG vaccine for tuberculosis</a></li>
     <li><a class="dropdown-item" href="../articles/example_blocker.html">Example: Beta blockers</a></li>
+    <li><a class="dropdown-item" href="../articles/example_certolizumab.html">Example: Certolizumab</a></li>
     <li><a class="dropdown-item" href="../articles/example_diabetes.html">Example: Diabetes</a></li>
     <li><a class="dropdown-item" href="../articles/example_dietary_fat.html">Example: Dietary fat</a></li>
     <li><a class="dropdown-item" href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a></li>
@@ -61,8 +62,7 @@
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -78,8 +78,7 @@
 
       <div class="section-desc"><p>Setting up a network from different data sources, creating network plots.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -90,61 +89,71 @@
 
         </dt>
         <dd>Set up arm-based aggregate data</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="set_agd_contrast.html">set_agd_contrast()</a></code>
 
         </dt>
         <dd>Set up contrast-based aggregate data</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="set_agd_surv.html">set_agd_surv()</a></code>
 
         </dt>
         <dd>Set up aggregate survival data</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="set_ipd.html">set_ipd()</a></code>
 
         </dt>
         <dd>Set up individual patient data</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="combine_network.html">combine_network()</a></code>
 
         </dt>
         <dd>Combine multiple data sources into one network</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="multi.html">multi()</a></code>
 
         </dt>
         <dd>Multinomial outcome data</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="print.nma_data.html">print(<i>&lt;nma_data&gt;</i>)</a></code> <code><a href="print.nma_data.html">print(<i>&lt;mlnmr_data&gt;</i>)</a></code>
 
         </dt>
         <dd>Print <code>nma_data</code> objects</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="plot.nma_data.html">plot(<i>&lt;nma_data&gt;</i>)</a></code>
 
         </dt>
         <dd>Network plots</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="graph_conversion.html">as.igraph(<i>&lt;nma_data&gt;</i>)</a></code> <code><a href="graph_conversion.html">as_tbl_graph(<i>&lt;nma_data&gt;</i>)</a></code>
 
         </dt>
         <dd>Convert networks to graph objects</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="nma_data-class.html">nma_data-class</a></code> <code><a href="nma_data-class.html">nma_data</a></code> <code><a href="nma_data-class.html">mlnmr_data</a></code> <code><a href="nma_data-class.html">mlnmr_data-class</a></code>
 
         </dt>
         <dd>The nma_data class</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="is_network_connected.html">is_network_connected()</a></code>
 
@@ -155,8 +164,7 @@
 
       <div class="section-desc"><p>Multilevel network meta-regression models require numerical integration points to be specified for the distributions of covariates in each aggregate data study in the network.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -167,37 +175,43 @@
 
         </dt>
         <dd>Add numerical integration points to aggregate data</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="distr.html">distr()</a></code>
 
         </dt>
         <dd>Specify a general marginal distribution</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="Bernoulli.html">qbern()</a></code> <code><a href="Bernoulli.html">pbern()</a></code> <code><a href="Bernoulli.html">dbern()</a></code>
 
         </dt>
         <dd>The Bernoulli Distribution</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="GammaDist.html">qgamma()</a></code> <code><a href="GammaDist.html">dgamma()</a></code> <code><a href="GammaDist.html">pgamma()</a></code>
 
         </dt>
         <dd>The Gamma distribution</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="generalised_t.html">dgent()</a></code> <code><a href="generalised_t.html">pgent()</a></code> <code><a href="generalised_t.html">qgent()</a></code>
 
         </dt>
         <dd>Generalised Student's t distribution (with location and scale)</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="log_t.html">dlogt()</a></code> <code><a href="log_t.html">plogt()</a></code> <code><a href="log_t.html">qlogt()</a></code>
 
         </dt>
         <dd>Log Student's t distribution</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="logitNormal.html">dlogitnorm()</a></code> <code><a href="logitNormal.html">plogitnorm()</a></code> <code><a href="logitNormal.html">qlogitnorm()</a></code>
 
@@ -208,8 +222,7 @@
 
       <div class="section-desc"><p>Specify and summarise prior distributions.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -220,31 +233,36 @@
 
         </dt>
         <dd>Prior distributions</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="summary.nma_prior.html">summary(<i>&lt;nma_prior&gt;</i>)</a></code>
 
         </dt>
         <dd>Summary of prior distributions</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="nma_prior-class.html">nma_prior-class</a></code> <code><a href="nma_prior-class.html">nma_prior</a></code>
 
         </dt>
         <dd>The nma_prior class</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="plot_prior_posterior.html">plot_prior_posterior()</a></code>
 
         </dt>
         <dd>Plot prior vs posterior distribution</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="generalised_t.html">dgent()</a></code> <code><a href="generalised_t.html">pgent()</a></code> <code><a href="generalised_t.html">qgent()</a></code>
 
         </dt>
         <dd>Generalised Student's t distribution (with location and scale)</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="log_t.html">dlogt()</a></code> <code><a href="log_t.html">plogt()</a></code> <code><a href="log_t.html">qlogt()</a></code>
 
@@ -255,8 +273,7 @@
 
       <div class="section-desc"><p>Model specification and fitting is accomplished using the <code><a href="../reference/nma.html">nma()</a></code> function.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -267,43 +284,50 @@
 
         </dt>
         <dd>Network meta-analysis models</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="print.stan_nma.html">print(<i>&lt;stan_nma&gt;</i>)</a></code>
 
         </dt>
         <dd>Print <code>stan_nma</code> objects</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="summary.stan_nma.html">summary(<i>&lt;stan_nma&gt;</i>)</a></code> <code><a href="summary.stan_nma.html">plot(<i>&lt;stan_nma&gt;</i>)</a></code>
 
         </dt>
         <dd>Posterior summaries from <code>stan_nma</code> objects</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="pairs.stan_nma.html">pairs(<i>&lt;stan_nma&gt;</i>)</a></code>
 
         </dt>
         <dd>Matrix of plots for a <code>stan_nma</code> object</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="stan_nma-class.html">stan_nma-class</a></code> <code><a href="stan_nma-class.html">stan_nma</a></code> <code><a href="stan_nma-class.html">stan_mlnmr</a></code>
 
         </dt>
         <dd>The stan_nma class</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="adapt_delta.html">adapt_delta</a></code>
 
         </dt>
         <dd>Target average acceptance probability</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="random_effects.html">RE_cor()</a></code> <code><a href="random_effects.html">which_RE()</a></code>
 
         </dt>
         <dd>Random effects structure</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="default_values.html">.default()</a></code> <code><a href="default_values.html">.is_default()</a></code>
 
@@ -314,8 +338,7 @@
 
       <div class="section-desc"><p>Checking model fit and comparing models.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -326,37 +349,43 @@
 
         </dt>
         <dd>Plot prior vs posterior distribution</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="plot_integration_error.html">plot_integration_error()</a></code>
 
         </dt>
         <dd>Plot numerical integration error</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="dic.html">dic()</a></code>
 
         </dt>
         <dd>Deviance Information Criterion (DIC)</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="nma_dic-methods.html">print(<i>&lt;nma_dic&gt;</i>)</a></code> <code><a href="nma_dic-methods.html">as.data.frame(<i>&lt;nma_dic&gt;</i>)</a></code> <code><a href="nma_dic-methods.html">as.tibble(<i>&lt;nma_dic&gt;</i>)</a></code> <code><a href="nma_dic-methods.html">as_tibble(<i>&lt;nma_dic&gt;</i>)</a></code> <code><a href="nma_dic-methods.html">as.array(<i>&lt;nma_dic&gt;</i>)</a></code> <code><a href="nma_dic-methods.html">as.matrix(<i>&lt;nma_dic&gt;</i>)</a></code>
 
         </dt>
         <dd>Methods for <code>nma_dic</code> objects</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="plot.nma_dic.html">plot(<i>&lt;nma_dic&gt;</i>)</a></code>
 
         </dt>
         <dd>Plots of model fit diagnostics</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="nma_dic-class.html">nma_dic-class</a></code> <code><a href="nma_dic-class.html">nma_dic</a></code>
 
         </dt>
         <dd>The nma_dic class</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="loo.html">loo(<i>&lt;stan_nma&gt;</i>)</a></code> <code><a href="loo.html">waic(<i>&lt;stan_nma&gt;</i>)</a></code>
 
@@ -367,8 +396,7 @@
 
       <div class="section-desc"><p>Generate and summarise node-splitting models for assessing inconsistency.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -379,37 +407,43 @@
 
         </dt>
         <dd>Direct and indirect evidence</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="nma_nodesplit-class.html">nma_nodesplit-class</a></code> <code><a href="nma_nodesplit-class.html">nma_nodesplit</a></code> <code><a href="nma_nodesplit-class.html">nma_nodesplit_df</a></code> <code><a href="nma_nodesplit-class.html">nma_nodesplit_df-class</a></code>
 
         </dt>
         <dd>The nma_nodesplit class</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="print.nma_nodesplit_df.html">print(<i>&lt;nma_nodesplit_df&gt;</i>)</a></code> <code><a href="print.nma_nodesplit_df.html">print(<i>&lt;nma_nodesplit&gt;</i>)</a></code>
 
         </dt>
         <dd>Print <code>nma_nodesplit_df</code> objects</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="summary.nma_nodesplit_df.html">summary(<i>&lt;nma_nodesplit_df&gt;</i>)</a></code> <code><a href="summary.nma_nodesplit_df.html">summary(<i>&lt;nma_nodesplit&gt;</i>)</a></code> <code><a href="summary.nma_nodesplit_df.html">plot(<i>&lt;nma_nodesplit&gt;</i>)</a></code> <code><a href="summary.nma_nodesplit_df.html">plot(<i>&lt;nma_nodesplit_df&gt;</i>)</a></code>
 
         </dt>
         <dd>Summarise the results of node-splitting models</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="nodesplit_summary-class.html">nodesplit_summary-class</a></code> <code><a href="nodesplit_summary-class.html">nodesplit_summary</a></code>
 
         </dt>
         <dd>The <code>nodesplit_summary</code> class</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="nodesplit_summary-methods.html">print(<i>&lt;nodesplit_summary&gt;</i>)</a></code> <code><a href="nodesplit_summary-methods.html">as_tibble(<i>&lt;nodesplit_summary&gt;</i>)</a></code> <code><a href="nodesplit_summary-methods.html">as.tibble.nodesplit_summary()</a></code> <code><a href="nodesplit_summary-methods.html">as.data.frame(<i>&lt;nodesplit_summary&gt;</i>)</a></code>
 
         </dt>
         <dd>Methods for <code>nodesplit_summary</code> objects</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="plot.nodesplit_summary.html">plot(<i>&lt;nodesplit_summary&gt;</i>)</a></code>
 
@@ -420,8 +454,7 @@
 
       <div class="section-desc"><p>Producing and plotting relative effects, absolute predictions, marginal effects, posterior ranks and rank probabilities. Converting to MCMC arrays and matrices.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -432,55 +465,64 @@
 
         </dt>
         <dd>Relative treatment effects</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="marginal_effects.html">marginal_effects()</a></code>
 
         </dt>
         <dd>Marginal treatment effects</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="predict.stan_nma.html">predict(<i>&lt;stan_nma&gt;</i>)</a></code> <code><a href="predict.stan_nma.html">predict(<i>&lt;stan_nma_surv&gt;</i>)</a></code>
 
         </dt>
         <dd>Predictions of absolute effects from NMA models</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="posterior_ranks.html">posterior_ranks()</a></code> <code><a href="posterior_ranks.html">posterior_rank_probs()</a></code>
 
         </dt>
         <dd>Treatment rankings and rank probabilities</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="nma_summary-methods.html">print(<i>&lt;nma_summary&gt;</i>)</a></code> <code><a href="nma_summary-methods.html">as.data.frame(<i>&lt;nma_summary&gt;</i>)</a></code> <code><a href="nma_summary-methods.html">as.tibble(<i>&lt;nma_summary&gt;</i>)</a></code> <code><a href="nma_summary-methods.html">as_tibble(<i>&lt;nma_summary&gt;</i>)</a></code> <code><a href="nma_summary-methods.html">as.array(<i>&lt;nma_summary&gt;</i>)</a></code> <code><a href="nma_summary-methods.html">as.matrix(<i>&lt;nma_summary&gt;</i>)</a></code> <code><a href="nma_summary-methods.html">as.array(<i>&lt;nma_rank_probs&gt;</i>)</a></code> <code><a href="nma_summary-methods.html">as.matrix(<i>&lt;nma_rank_probs&gt;</i>)</a></code>
 
         </dt>
         <dd>Methods for <code>nma_summary</code> objects</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="plot.nma_summary.html">plot(<i>&lt;nma_summary&gt;</i>)</a></code> <code><a href="plot.nma_summary.html">plot(<i>&lt;nma_parameter_summary&gt;</i>)</a></code> <code><a href="plot.nma_summary.html">plot(<i>&lt;nma_rank_probs&gt;</i>)</a></code> <code><a href="plot.nma_summary.html">plot(<i>&lt;surv_nma_summary&gt;</i>)</a></code>
 
         </dt>
         <dd>Plots of summary results</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="nma_summary-class.html">nma_summary-class</a></code> <code><a href="nma_summary-class.html">nma_summary</a></code> <code><a href="nma_summary-class.html">nma_rank_probs</a></code>
 
         </dt>
         <dd>The <code>nma_summary</code> class</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="as.array.stan_nma.html">as.array(<i>&lt;stan_nma&gt;</i>)</a></code> <code><a href="as.array.stan_nma.html">as.data.frame(<i>&lt;stan_nma&gt;</i>)</a></code> <code><a href="as.array.stan_nma.html">as_tibble(<i>&lt;stan_nma&gt;</i>)</a></code> <code><a href="as.array.stan_nma.html">as.tibble(<i>&lt;stan_nma&gt;</i>)</a></code> <code><a href="as.array.stan_nma.html">as.matrix(<i>&lt;stan_nma&gt;</i>)</a></code>
 
         </dt>
         <dd>Convert samples into arrays, matrices, or data frames</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="mcmc_array-class.html">summary(<i>&lt;mcmc_array&gt;</i>)</a></code> <code><a href="mcmc_array-class.html">print(<i>&lt;mcmc_array&gt;</i>)</a></code> <code><a href="mcmc_array-class.html">plot(<i>&lt;mcmc_array&gt;</i>)</a></code> <code><a href="mcmc_array-class.html">names(<i>&lt;mcmc_array&gt;</i>)</a></code> <code><a href="mcmc_array-class.html">`names&lt;-`(<i>&lt;mcmc_array&gt;</i>)</a></code>
 
         </dt>
         <dd>Working with 3D MCMC arrays</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="as.stanfit.html">as.stanfit()</a></code>
 
@@ -491,8 +533,7 @@
 
       <div class="section-desc"><p>Functions for flexibile M-splines on the baseline hazard.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -503,13 +544,22 @@
 
         </dt>
         <dd>Distribution functions for M-spline baseline hazards</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="make_knots.html">make_knots()</a></code>
 
         </dt>
         <dd>Knot locations for M-spline baseline hazard models</dd>
-      </dl><dl><dt>
+
+        <dt>
+
+          <code><a href="knots.stan_nma.html">knots(<i>&lt;stan_nma&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Knot locations for a fitted model</dd>
+
+        <dt>
 
           <code><a href="softmax.html">softmax()</a></code> <code><a href="softmax.html">inv_softmax()</a></code>
 
@@ -520,8 +570,7 @@
 
       <div class="section-desc"><p>Functions for creating or customising ggplot outputs.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -532,7 +581,8 @@
 
         </dt>
         <dd>Plot theme for multinma plots</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="geom_km.html">geom_km()</a></code>
 
@@ -543,8 +593,7 @@
 
       <div class="section-desc"><p>Datasets used for examples and vignettes.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -555,115 +604,141 @@
 
         </dt>
         <dd>Stroke prevention in atrial fibrillation patients</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="bcg_vaccine.html">bcg_vaccine</a></code>
 
         </dt>
         <dd>BCG vaccination</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="blocker.html">blocker</a></code>
 
         </dt>
         <dd>Beta blockers to prevent mortality after MI</dd>
-      </dl><dl><dt>
+
+        <dt>
+
+          <code><a href="certolizumab.html">certolizumab</a></code>
+
+        </dt>
+        <dd>Certolizumab</dd>
+
+        <dt>
 
           <code><a href="diabetes.html">diabetes</a></code>
 
         </dt>
         <dd>Incidence of diabetes in trials of antihypertensive drugs</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="dietary_fat.html">dietary_fat</a></code>
 
         </dt>
         <dd>Reduced dietary fat to prevent mortality</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="hta_psoriasis.html">hta_psoriasis</a></code>
 
         </dt>
         <dd>HTA Plaque Psoriasis</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="ndmm.html">ndmm_ipd</a></code> <code><a href="ndmm.html">ndmm_agd</a></code> <code><a href="ndmm.html">ndmm_agd_covs</a></code>
 
         </dt>
         <dd>Newly diagnosed multiple myeloma</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="parkinsons.html">parkinsons</a></code>
 
         </dt>
         <dd>Mean off-time reduction in Parkison's disease</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="plaque_psoriasis.html">plaque_psoriasis_ipd</a></code> <code><a href="plaque_psoriasis.html">plaque_psoriasis_agd</a></code>
 
         </dt>
         <dd>Plaque psoriasis data</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="smoking.html">smoking</a></code>
 
         </dt>
         <dd>Smoking cessation data</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="social_anxiety.html">social_anxiety</a></code>
 
         </dt>
         <dd>Social Anxiety</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="statins.html">statins</a></code>
 
         </dt>
         <dd>Statins for cholesterol lowering</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="thrombolytics.html">thrombolytics</a></code>
 
         </dt>
         <dd>Thrombolytic treatments data</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="transfusion.html">transfusion</a></code>
 
         </dt>
         <dd>Granulocyte transfusion in patients with neutropenia or neutrophil dysfunction</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="aa_example_ndmm.html">example_ndmm</a></code>
 
         </dt>
         <dd>Example newly-diagnosed multiple myeloma</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="aa_example_pso_mlnmr.html">example_pso_mlnmr</a></code>
 
         </dt>
         <dd>Example plaque psoriasis ML-NMR</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="aa_example_smk_fe.html">example_smk_fe</a></code>
 
         </dt>
         <dd>Example smoking FE NMA</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="aa_example_smk_nodesplit.html">example_smk_nodesplit</a></code>
 
         </dt>
         <dd>Example smoking node-splitting</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="aa_example_smk_re.html">example_smk_re</a></code>
 
         </dt>
         <dd>Example smoking RE NMA</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="aa_example_smk_ume.html">example_smk_ume</a></code>
 
@@ -679,7 +754,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

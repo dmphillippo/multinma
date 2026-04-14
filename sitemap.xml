@@ -3,6 +3,7 @@
 <url><loc>https://dmphillippo.github.io/multinma/articles/example_atrial_fibrillation.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/articles/example_bcg_vaccine.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/articles/example_blocker.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/articles/example_certolizumab.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/articles/example_diabetes.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/articles/example_dietary_fat.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/articles/example_hta_psoriasis.html</loc></url>
@@ -34,6 +35,7 @@
 <url><loc>https://dmphillippo.github.io/multinma/reference/atrial_fibrillation.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/bcg_vaccine.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/blocker.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/reference/certolizumab.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/combine_network.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/default_values.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/diabetes.html</loc></url>
@@ -47,6 +49,7 @@
 <url><loc>https://dmphillippo.github.io/multinma/reference/hta_psoriasis.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/index.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/is_network_connected.html</loc></url>
+<url><loc>https://dmphillippo.github.io/multinma/reference/knots.stan_nma.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/log_t.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/logitNormal.html</loc></url>
 <url><loc>https://dmphillippo.github.io/multinma/reference/loo.html</loc></url>

@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,7 @@
     <li><a class="dropdown-item" href="../articles/example_atrial_fibrillation.html">Example: Atrial fibrillation</a></li>
     <li><a class="dropdown-item" href="../articles/example_bcg_vaccine.html">Example: BCG vaccine for tuberculosis</a></li>
     <li><a class="dropdown-item" href="../articles/example_blocker.html">Example: Beta blockers</a></li>
+    <li><a class="dropdown-item" href="../articles/example_certolizumab.html">Example: Certolizumab</a></li>
     <li><a class="dropdown-item" href="../articles/example_diabetes.html">Example: Diabetes</a></li>
     <li><a class="dropdown-item" href="../articles/example_dietary_fat.html">Example: Dietary fat</a></li>
     <li><a class="dropdown-item" href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a></li>
@@ -177,7 +178,7 @@ above. The following code remains identical.)</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_net</span>, weight_nodes <span class="op">=</span> <span class="cn">TRUE</span>, weight_edges <span class="op">=</span> <span class="cn">TRUE</span>, show_trt_class <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.box <span class="op">=</span> <span class="st">"vertical"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_atrial_fibrillation_files/figure-html/af_network_plot-1.png" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="example_atrial_fibrillation_files/figure-html/af_network_plot-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="meta-analysis-models">Meta-analysis models<a class="anchor" aria-label="anchor" href="#meta-analysis-models"></a>
@@ -206,7 +207,7 @@ distributions with the <code><a href="https://rdrr.io/r/base/summary.html" class
 <span><span class="co">#&gt; 50% of the prior density lies between -67.45 and 67.45.</span></span>
 <span><span class="co">#&gt; 95% of the prior density lies between -196 and 196.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; A half-Normal prior distribution: location = 0, scale = 5.</span></span>
+<span><span class="co">#&gt; A half-Normal prior distribution: scale = 5.</span></span>
 <span><span class="co">#&gt; 50% of the prior density lies between 0 and 3.37.</span></span>
 <span><span class="co">#&gt; 95% of the prior density lies between 0 and 9.8.</span></span></code></pre></div>
 <p>Fitting the model with the <code><a href="../reference/nma.html">nma()</a></code> function. We increase
@@ -268,7 +269,7 @@ method:</p>
 <span><span class="co">#&gt; lp__                                         -4766.76 -4758.57  2386    1</span></span>
 <span><span class="co">#&gt; tau                                              0.36     0.57  1635    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sat May 31 10:39:55 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Apr 14 08:23:55 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -282,7 +283,7 @@ examined by changing the <code>pars</code> argument:</p>
 the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">af_fit_1</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trt"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_atrial_fibrillation_files/figure-html/af_1_pp_plot-1.png" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="example_atrial_fibrillation_files/figure-html/af_1_pp_plot-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <p>We can compute relative effects against placebo/standard care with
 the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with the
 <code>trt_ref</code> argument:</p>
@@ -326,7 +327,7 @@ the <code><a href="../reference/relative_effects.html">relative_effects()</a></c
 method:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_releff</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_atrial_fibrillation_files/figure-html/af_1_releff_plot-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_atrial_fibrillation_files/figure-html/af_1_releff_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>We can also produce treatment rankings, rank probabilities, and
 cumulative rank probabilities.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -368,7 +369,7 @@ cumulative rank probabilities.</p>
 <span><span class="co">#&gt; rank[Triflusal]                                       NA    1</span></span>
 <span><span class="co">#&gt; rank[Ximelagatran]                                  6411    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_ranks</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_atrial_fibrillation_files/figure-html/af_1_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_atrial_fibrillation_files/figure-html/af_1_ranks-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_1_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">af_fit_1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                              p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]</span></span>
@@ -444,7 +445,7 @@ cumulative rank probabilities.</p>
 <span><span class="co">#&gt; d[Triflusal]                                       0.06       0.08       0.10       0.17</span></span>
 <span><span class="co">#&gt; d[Ximelagatran]                                    0.00       0.00       0.00       0.00</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_rankprobs</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_atrial_fibrillation_files/figure-html/af_1_rankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_atrial_fibrillation_files/figure-html/af_1_rankprobs-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_1_cumrankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">af_fit_1</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                              p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]</span></span>
@@ -520,7 +521,7 @@ cumulative rank probabilities.</p>
 <span><span class="co">#&gt; d[Triflusal]                                       0.65       0.73       0.83          1</span></span>
 <span><span class="co">#&gt; d[Ximelagatran]                                    1.00       1.00       1.00          1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_1_cumrankprobs</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_atrial_fibrillation_files/figure-html/af_1_cumrankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_atrial_fibrillation_files/figure-html/af_1_cumrankprobs-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="network-meta-regression-adjusting-for-proportion-of-prior-stroke">Network meta-regression adjusting for proportion of prior
@@ -621,7 +622,7 @@ method:</p>
 <span><span class="co">#&gt; lp__                                         -4766.36 -4758.07  1138 1.00</span></span>
 <span><span class="co">#&gt; tau                                              0.26     0.50   330 1.02</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Sat May 31 10:40:08 2025.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Tue Apr 14 08:24:12 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -639,7 +640,7 @@ examined by changing the <code>pars</code> argument:</p>
 the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior()</a></code> function:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prior_posterior.html">plot_prior_posterior</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"reg"</span>, <span class="st">"het"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_pp_plot-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_pp_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>We can compute relative effects against placebo/standard care with
 the <code><a href="../reference/relative_effects.html">relative_effects()</a></code> function with the
 <code>trt_ref</code> argument, which by default produces relative
@@ -740,12 +741,12 @@ produced by</p>
 <span><span class="co">#&gt; d[stroke = 1: Triflusal]                                  1.58     4603     2921 1.00</span></span>
 <span><span class="co">#&gt; d[stroke = 1: Ximelagatran]                              -0.55     4235     2734 1.00</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_releff_01</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_releff_01_plot-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_releff_01_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>The estimated class interactions (against the reference “Mixed”
 class) are very uncertain.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, pars <span class="op">=</span> <span class="st">"beta"</span>, stat <span class="op">=</span> <span class="st">"halfeye"</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_betas-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_betas-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>The interactions are more straightforward to interpret if we
 transform the interaction coefficients (using the consistency equations)
 so that they are against the control class:</p>
@@ -771,7 +772,7 @@ so that they are against the control class:</p>
 <span><span class="co">#&gt; beta[.trtclassAnti-platelet:stroke]      2766 1.00</span></span>
 <span><span class="co">#&gt; beta[.trtclassMixed:stroke]              2927 1.00</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">af_4b_beta</span><span class="op">)</span>, stat <span class="op">=</span> <span class="st">"halfeye"</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_betas_transformed-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_betas_transformed-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>There is some evidence that the effect of anti-coagulants increases
 (compared to control) with prior stroke. There is little evidence the
 effect of anti-platelets reduces with prior stroke, although the point
@@ -877,7 +878,7 @@ prior stroke, we specify the <code>newdata</code> argument.</p>
 <span><span class="co">#&gt; rank[stroke = 1: Triflusal]                                     4014     3015    1</span></span>
 <span><span class="co">#&gt; rank[stroke = 1: Ximelagatran]                                  2616     2661    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_ranks</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_ranks-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_ranks-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_4b_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">af_fit_4b</span>,</span>
 <span>                                         newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>stroke <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, </span>
@@ -1118,7 +1119,7 @@ prior stroke, we specify the <code>newdata</code> argument.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_rankprobs</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">Treatment</span><span class="op">~</span><span class="va">Study</span>, labeller <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labellers.html" class="external-link">label_wrap_gen</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>strip.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_rankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_rankprobs-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">af_4b_cumrankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">af_fit_4b</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>                                            newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>stroke <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, </span>
@@ -1357,7 +1358,7 @@ prior stroke, we specify the <code>newdata</code> argument.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_4b_cumrankprobs</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">Treatment</span><span class="op">~</span><span class="va">Study</span>, labeller <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labellers.html" class="external-link">label_wrap_gen</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>strip.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_cumrankprobs-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_cumrankprobs-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level2">
@@ -1386,10 +1387,10 @@ the data.</p>
 corresponding <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method.</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_dic_1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_atrial_fibrillation_files/figure-html/af_1_resdev_plot-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_atrial_fibrillation_files/figure-html/af_1_resdev_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">af_dic_4b</span><span class="op">)</span></span></code></pre></div>
-<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_resdev_plot-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="example_atrial_fibrillation_files/figure-html/af_4b_resdev_plot-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
@@ -1415,7 +1416,7 @@ in Individuals with Non-Rheumatic Atrial Fibrillation.”</span>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

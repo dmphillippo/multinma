@@ -9,7 +9,7 @@ meta-regression models in Stan."><meta property="og:image" content="https://dmph
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,6 +26,7 @@ meta-regression models in Stan."><meta property="og:image" content="https://dmph
     <li><a class="dropdown-item" href="../articles/example_atrial_fibrillation.html">Example: Atrial fibrillation</a></li>
     <li><a class="dropdown-item" href="../articles/example_bcg_vaccine.html">Example: BCG vaccine for tuberculosis</a></li>
     <li><a class="dropdown-item" href="../articles/example_blocker.html">Example: Beta blockers</a></li>
+    <li><a class="dropdown-item" href="../articles/example_certolizumab.html">Example: Certolizumab</a></li>
     <li><a class="dropdown-item" href="../articles/example_diabetes.html">Example: Diabetes</a></li>
     <li><a class="dropdown-item" href="../articles/example_dietary_fat.html">Example: Dietary fat</a></li>
     <li><a class="dropdown-item" href="../articles/example_hta_psoriasis.html">Example: Plaque psoriasis HTA report</a></li>
@@ -125,7 +126,8 @@ effects</p></dd>
 <dd><p>A one-sided model formula, specifying the prognostic and
 effect-modifying terms for a regression model. Any references to treatment
 should use the <code>.trt</code> special variable, for example specifying effect
-modifier interactions as <code>variable:.trt</code> (see details).</p></dd>
+modifier interactions as <code>variable:.trt</code> (see details). The special
+variable <code>.mu</code> can be used for baseline risk meta-regression: <code>~.mu:.trt</code>.</p></dd>
 
 
 <dt id="arg-class-interactions">class_interactions<a class="anchor" aria-label="anchor" href="#arg-class-interactions"></a></dt>
@@ -359,6 +361,8 @@ the relation \(\log(\mathrm{AF}) = -\log(\mathrm{STR})\) (or equivalently
 \(\mathrm{AF} = 1/\mathrm{STR}\)).</p>
 <p>Further details on each likelihood and link function are given by
 Dias et al. (2011)
+. Details of survival models are given
+by Phillippo et al. (2025)
 .</p>
     </div>
     <div class="section level2">
@@ -416,10 +420,11 @@ the other survival distributions implemented in this package.</p>
 <p>For the <code>mspline</code> and <code>pexp</code> likelihoods, the auxiliary parameters are the
 spline coefficients for each study. These form a unit simplex (i.e. lie
 between 0 and 1, and sum to 1), and are given a random walk prior
-distribution. <code>prior_aux</code> specifies the hyperprior on the random walk
-standard deviation \(\sigma\) which controls the level of smoothing of
-the baseline hazard, with \(\sigma = 0\) corresponding to a constant
-baseline hazard.</p>
+distribution (Phillippo et al. 2025)
+. <code>prior_aux</code>
+specifies the hyperprior on the random walk standard deviation \(\sigma\)
+which controls the level of smoothing of the baseline hazard, with
+\(\sigma = 0\) corresponding to a constant baseline hazard.</p>
 <p>The auxiliary parameters can be stratified by additional factors through
 the <code>aux_by</code> argument. For example, to allow the shape of the baseline
 hazard to vary between treatment arms as well as studies, use <code>aux_by = c(".study", ".trt")</code>. (Technically, <code>.study</code> is always included in the
@@ -437,10 +442,12 @@ absolute predictions may only be produced for the observed treatment arms
 in each study population, whereas if <code>aux_regression = ~.trt</code> then absolute
 predictions can be produced for all treatments in any population. For
 <code>mspline</code> and <code>pexp</code> likelihoods, the regression coefficients are smoothed
-over time using a random walk prior to avoid overfitting: <code>prior_aux_reg</code>
-specifies the hyperprior for the random walk standard deviation. For other
-parametric likelihoods, <code>prior_aux_reg</code> specifies the prior for the
-auxiliary regression coefficients.</p>
+over time using a random walk prior to avoid overfitting
+(Phillippo et al. 2025)
+: <code>prior_aux_reg</code> specifies the
+hyperprior for the random walk standard deviation. For other parametric
+likelihoods, <code>prior_aux_reg</code> specifies the prior for the auxiliary
+regression coefficients.</p>
 </div>
 
     </div>
@@ -453,7 +460,7 @@ auxiliary regression coefficients.</p>
 .<br><br> Dias S, Welton NJ, Sutton AJ, Ades AE (2011).
 “NICE DSU Technical Support Document 2: A generalised linear modelling framework for pair-wise and network meta-analysis of randomised controlled trials.”
 National Institute for Health and Care Excellence.
-<a href="https://www.sheffield.ac.uk/nice-dsu" class="external-link">https://www.sheffield.ac.uk/nice-dsu</a>.<br><br> Lawless JF (1980).
+<a href="https://sheffield.ac.uk/nice-dsu" class="external-link">https://sheffield.ac.uk/nice-dsu</a>.<br><br> Lawless JF (1980).
 “Inference in the Generalized Gamma and Log Gamma Distributions.”
 <em>Technometrics</em>, <b>22</b>(3), 409–419.
 <a href="https://doi.org/10.1080/00401706.1980.10486173" class="external-link">doi:10.1080/00401706.1980.10486173</a>
@@ -461,7 +468,15 @@ National Institute for Health and Care Excellence.
 “Multilevel Network Meta-Regression for population-adjusted treatment comparisons.”
 <em>Journal of the Royal Statistical Society: Series A (Statistics in Society)</em>, <b>183</b>(3), 1189–1210.
 <a href="https://doi.org/10.1111/rssa.12579" class="external-link">doi:10.1111/rssa.12579</a>
-.</p>
+.<br><br> Phillippo DM, Dias S, Ades AE, Welton NJ (2025).
+“Multilevel network meta-regression for general likelihoods: synthesis of individual and aggregate data with applications to survival analysis.”
+<em>Journal of the Royal Statistical Society Series A: Statistics in Society</em>.
+<a href="https://doi.org/10.1093/jrsssa/qnaf169" class="external-link">doi:10.1093/jrsssa/qnaf169</a>
+.<br><br> Phillippo DM, Sadek A, Pedder H, Welton NJ (2025).
+“Network Meta-Analysis of survival outcomes with non-proportional hazards using flexible M-splines.”
+<em>arXiv</em>.
+<a href="https://doi.org/10.48550/ARXIV.2509.10383" class="external-link">doi:10.48550/ARXIV.2509.10383</a>
+, 2509.10383.</p>
     </div>
 
     <div class="section level2">
@@ -533,7 +548,7 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  0.31     0.46  2696    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -5856.58 -5852.87  1699    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Sat May 31 10:31:41 2025.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Tue Apr 14 08:03:45 2026.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
@@ -566,7 +581,7 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> lp__                      -5763.68 -5756.83  1081    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> tau                           0.93     1.26  1169    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Sat May 31 10:31:44 2025.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Tue Apr 14 08:03:49 2026.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
@@ -616,7 +631,7 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                            -5754.24   929    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> tau                                                 1.43  1050    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Sat May 31 10:31:48 2025.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Tue Apr 14 08:03:59 2026.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
@@ -795,7 +810,7 @@ National Institute for Health and Care Excellence.
 <span class="r-in"><span>    weight <span class="op">=</span> <span class="va">weight</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    durnpso <span class="op">=</span> <span class="va">durnpso</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    <span class="co"># Treatment classes</span></span></span>
-<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
+<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span> <span class="op">~</span> <span class="st">"IL blocker"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op">==</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"TNFa blocker"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    <span class="co"># Check complete cases for covariates of interest</span></span></span>
@@ -814,7 +829,7 @@ National Institute for Health and Care Excellence.
 <span class="r-in"><span>    durnpso_mean <span class="op">=</span> <span class="va">durnpso_mean</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    durnpso_sd <span class="op">=</span> <span class="va">durnpso_sd</span> <span class="op">/</span> <span class="fl">10</span>,</span></span>
 <span class="r-in"><span>    <span class="co"># Treatment classes</span></span></span>
-<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
+<span class="r-in"><span>    trtclass <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">trtn</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Placebo"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span> <span class="op">~</span> <span class="st">"IL blocker"</span>,</span></span>
 <span class="r-in"><span>                         <span class="va">trtn</span> <span class="op">==</span> <span class="fl">4</span> <span class="op">~</span> <span class="st">"TNFa blocker"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
@@ -902,50 +917,50 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                         mean se_mean   sd     2.5%      25%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso]                           0.04    0.00 0.06    -0.08     0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys]                          -0.14    0.00 0.16    -0.44    -0.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa]                              -0.06    0.01 0.44    -0.96    -0.35</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys]                          -0.14    0.00 0.16    -0.45    -0.25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa]                              -0.07    0.01 0.45    -1.00    -0.36</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight]                            0.04    0.00 0.03    -0.02     0.02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa]                              -0.08    0.00 0.17    -0.43    -0.19</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa]                              -0.08    0.00 0.17    -0.42    -0.19</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03    0.00 0.07    -0.17    -0.08</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01    0.00 0.07    -0.15    -0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.19    0.00 0.19    -0.19     0.06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.06    0.00 0.18    -0.28    -0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.05    0.01 0.51    -0.93    -0.29</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassIL blocker]           0.29    0.01 0.48    -0.64    -0.04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    0.00 0.03    -0.24    -0.19</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01    0.00 0.07    -0.14    -0.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.19    0.00 0.19    -0.17     0.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.06    0.00 0.17    -0.27    -0.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.06    0.01 0.52    -0.93    -0.29</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassIL blocker]           0.29    0.01 0.50    -0.67    -0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    0.00 0.04    -0.24    -0.19</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassIL blocker]       -0.10    0.00 0.03    -0.16    -0.12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.06    0.00 0.21    -0.45    -0.19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassIL blocker]           0.01    0.00 0.18    -0.35    -0.12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.05    0.00 0.21    -0.45    -0.19</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassIL blocker]           0.01    0.00 0.18    -0.35    -0.11</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[ETN]                                  1.55    0.00 0.08     1.40     1.50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q2W]                              2.96    0.00 0.09     2.79     2.90</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q4W]                              2.54    0.00 0.08     2.39     2.49</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_150]                              2.15    0.00 0.12     1.92     2.07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45    0.00 0.12     2.23     2.37</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1576.21    0.08 3.47 -1583.78 -1578.25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q2W]                              2.95    0.00 0.09     2.78     2.89</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q4W]                              2.54    0.00 0.08     2.38     2.48</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_150]                              2.14    0.00 0.11     1.92     2.07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45    0.00 0.12     2.22     2.37</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1576.37    0.09 3.46 -1584.16 -1578.48</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                          50%      75%    97.5% n_eff Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso]                           0.04     0.08     0.17  5868    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys]                          -0.13    -0.03     0.18  4860    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa]                              -0.06     0.22     0.78  5045    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight]                            0.04     0.06     0.09  5265    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa]                              -0.07     0.03     0.24  5328    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03     0.02     0.12  6239    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01     0.03     0.12  7265    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.18     0.32     0.56  5558    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.06     0.18     0.41  5892    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.03     0.39     1.09  5691    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassIL blocker]           0.28     0.61     1.22  6049    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    -0.14    -0.10  5795    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassIL blocker]       -0.10    -0.08    -0.04  6292    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.06     0.09     0.35  5470    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassIL blocker]           0.00     0.13     0.38  6675    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[ETN]                                  1.56     1.61     1.71  3934    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q2W]                              2.96     3.01     3.13  4700    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q4W]                              2.54     2.60     2.70  5305    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_150]                              2.14     2.22     2.37  4742    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45     2.53     2.69  4777    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1575.90 -1573.75 -1570.34  1681    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso]                           0.04     0.09     0.16  5196    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys]                          -0.14    -0.03     0.16  4999    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa]                              -0.05     0.24     0.79  4920    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight]                            0.04     0.06     0.10  5407    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa]                              -0.08     0.03     0.24  5913    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassTNFa blocker]    -0.03     0.02     0.12  5812    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[durnpso:.trtclassIL blocker]      -0.01     0.03     0.12  6260    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassTNFa blocker]     0.19     0.32     0.55  5327    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[prevsys:.trtclassIL blocker]       0.06     0.18     0.40  5968    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassTNFa blocker]         0.05     0.39     1.13  5376    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[bsa:.trtclassIL blocker]           0.27     0.62     1.33  5975    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassTNFa blocker]     -0.17    -0.14    -0.10  5261    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[weight:.trtclassIL blocker]       -0.10    -0.08    -0.04  6266    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassTNFa blocker]        -0.05     0.09     0.36  5963    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> beta[psa:.trtclassIL blocker]           0.01     0.13     0.38  6671    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[ETN]                                  1.55     1.60     1.71  4573    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q2W]                              2.95     3.01     3.13  4767    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[IXE_Q4W]                              2.54     2.60     2.70  5233    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_150]                              2.14     2.22     2.37  5488    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[SEC_300]                              2.45     2.53     2.68  5719    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lp__                                -1576.05 -1573.88 -1570.57  1619    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Sat May 31 10:32:48 2025.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Tue Apr 14 08:05:47 2026.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
@@ -1020,7 +1035,7 @@ National Institute for Health and Care Excellence.
 <span class="r-out co"><span class="r-pr">#&gt;</span> shape[Morgan2012]       0.94  5126    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> shape[Palumbo2014]      1.16  4504    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Sat May 31 10:34:15 2025.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Samples were drawn using NUTS(diag_e) at Tue Apr 14 08:09:48 2026.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> For each parameter, n_eff is a crude measure of effective sample size,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> and Rhat is the potential scale reduction factor on split chains (at </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> convergence, Rhat=1).</span>
@@ -1036,7 +1051,7 @@ National Institute for Health and Care Excellence.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
