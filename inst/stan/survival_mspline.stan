@@ -479,11 +479,14 @@ transformed parameters {
 
           if (ni) {
             array[ni] int wi = wi_aux_group_agd_arm[i, 1:ni];
-            row_vector[n_scoef-1] Xb_auxi = X_aux_agd_arm[wi[1], ] * beta_aux;
             vector[n_scoef] scoef_agd_arm;
 
-            if (nX_aux) scoef_agd_arm = softmax(append_row(0, lscoef[aux_id_agd_arm[wi[1]]] + to_vector(Xb_auxi)));
-            else scoef_agd_arm = scoef_temp[i];
+            if (nX_aux) {
+              row_vector[n_scoef-1] Xb_auxi = X_aux_agd_arm[wi[1], ] * beta_aux;
+              scoef_agd_arm = softmax(append_row(0, lscoef[aux_id_agd_arm[wi[1]]] + to_vector(Xb_auxi)));
+            } else {
+              scoef_agd_arm = scoef_temp[i];
+            }
 
             for (j in 1:ni) {
               vector[nint] eta_agd_arm_ii;
