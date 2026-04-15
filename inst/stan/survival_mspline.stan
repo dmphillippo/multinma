@@ -291,13 +291,17 @@ transformed data {
   array[aux_int == 0 ? n_aux_group : 0, max(ni_aux_group_agd_arm)] int wi_aux_group_agd_arm;
 
   // Split spline X matrix into IPD and AgD rows
-  matrix[0, nX_aux] Xauxdummy;
-  matrix[ni_ipd, nX_aux] X_aux_ipd = ni_ipd ? X_aux[1:ni_ipd] : Xauxdummy;
-  matrix[(aux_int ? nint_max : 1) * ni_agd_arm, nX_aux] X_aux_agd_arm = ni_agd_arm ? X_aux[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)] : Xauxdummy;
+  matrix[ni_ipd, nX_aux] X_aux_ipd;
+  matrix[(aux_int ? nint_max : 1) * ni_agd_arm, nX_aux] X_aux_agd_arm;
 
   cholesky_factor_corr[aux_reg_trt ? nt : 0] sigma_beta_L;
 
 #include /include/transformed_data_common.stan
+
+  if (nX_aux) {
+    if (ni_ipd) X_aux_ipd = X_aux[1:ni_ipd, ];
+    if (ni_agd_arm) X_aux_agd_arm = X_aux[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm), ];
+  }
 
   if (aux_int == 0) for (i in 1:n_aux_group) {
     if (ni_aux_group_ipd[i]) wi_aux_group_ipd[i, 1:ni_aux_group_ipd[i]] = which(aux_group_ipd, i);
