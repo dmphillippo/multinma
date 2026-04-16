@@ -52,7 +52,7 @@ Systematic Review and Network Meta-Analysis.” *The Lancet Psychiatry* 1
 
 Perren, Samuel J., Hugo Pedder, Nicky J. Welton, and David M. Phillippo.
 2025. “Network Meta-Analysis with Class Effects: A Practical Guide and
-Model Selection Algorithm.” *Medical Decision Making*, November.
+Model Selection Algorithm.” *Medical Decision Making* 46 (3): 275–95.
 <https://doi.org/10.1177/0272989x251389887>.
 
 Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, D. Saure,

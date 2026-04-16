@@ -122,7 +122,7 @@ tr_fit_RE_noninf
 #> lp__           -134.50    0.09 3.11 -141.53 -136.37 -134.16 -132.24 -129.53  1098    1
 #> tau               1.87    0.04 1.09    0.56    1.16    1.63    2.29    4.73   650    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 10:01:54 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Apr 16 09:56:02 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -203,7 +203,7 @@ tr_fit_RE_inf
 #> lp__           -140.97    0.07 2.77 -147.30 -142.63 -140.64 -138.91 -136.61  1385    1
 #> tau               0.50    0.01 0.36    0.05    0.21    0.44    0.70    1.38  1654    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 10:01:56 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Apr 16 09:56:05 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).

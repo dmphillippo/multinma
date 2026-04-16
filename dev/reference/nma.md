@@ -517,7 +517,7 @@ smk_fit_FE
 #> d[Self-help]                  0.31     0.46  2696    1
 #> lp__                      -5856.58 -5852.87  1699    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:22:58 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Apr 16 09:18:27 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -550,7 +550,7 @@ smk_fit_RE
 #> lp__                      -5763.68 -5756.83  1081    1
 #> tau                           0.93     1.26  1169    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:23:06 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Apr 16 09:18:34 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -600,7 +600,7 @@ smk_fit_RE_UME
 #> lp__                                            -5754.24   929    1
 #> tau                                                 1.43  1050    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:23:14 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Apr 16 09:18:53 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -929,7 +929,7 @@ pso_fit
 #> d[SEC_300]                              2.45     2.53     2.68  5719    1
 #> lp__                                -1576.05 -1573.88 -1570.57  1619    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:25:54 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Apr 16 09:20:41 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -978,8 +978,6 @@ ndmm_fit <- nma(ndmm_net,
                 prior_trt = normal(scale = 10),
                 prior_aux = half_normal(scale = 10))
 #> Note: Setting "Pbo" as the network reference treatment.
-#> Warning: 1 parallel function call did not deliver a result
-#> Error in x@mode: no applicable method for `@` applied to an object of class "NULL"
 
 ndmm_fit
 #> A fixed effects NMA with a weibull likelihood (log link).
@@ -988,25 +986,25 @@ ndmm_fit
 #> post-warmup draws per chain=1000, total post-warmup draws=4000.
 #> 
 #>                         mean se_mean   sd     2.5%      25%      50%      75%
-#> d[Len]                 -0.54    0.00 0.04    -0.63    -0.57    -0.54    -0.51
-#> d[Thal]                -0.11    0.00 0.09    -0.28    -0.17    -0.11    -0.05
-#> lp__                -6230.03    0.06 2.43 -6235.71 -6231.45 -6229.77 -6228.25
-#> shape[Attal2012]        1.30    0.00 0.06     1.18     1.25     1.30     1.34
+#> d[Len]                 -0.54    0.00 0.05    -0.62    -0.57    -0.54    -0.50
+#> d[Thal]                -0.11    0.00 0.09    -0.29    -0.17    -0.11    -0.05
+#> lp__                -6230.00    0.06 2.46 -6235.50 -6231.49 -6229.69 -6228.20
+#> shape[Attal2012]        1.30    0.00 0.06     1.18     1.26     1.30     1.34
 #> shape[Jackson2019]      0.93    0.00 0.02     0.89     0.92     0.93     0.95
 #> shape[McCarthy2012]     1.29    0.00 0.07     1.16     1.25     1.29     1.34
 #> shape[Morgan2012]       0.88    0.00 0.03     0.82     0.86     0.88     0.90
-#> shape[Palumbo2014]      1.02    0.00 0.07     0.88     0.97     1.01     1.06
+#> shape[Palumbo2014]      1.01    0.00 0.07     0.88     0.97     1.01     1.06
 #>                        97.5% n_eff Rhat
-#> d[Len]                 -0.45  5305    1
-#> d[Thal]                 0.06  5012    1
-#> lp__                -6226.20  1820    1
-#> shape[Attal2012]        1.42  4170    1
-#> shape[Jackson2019]      0.98  4719    1
-#> shape[McCarthy2012]     1.43  4930    1
-#> shape[Morgan2012]       0.94  4713    1
-#> shape[Palumbo2014]      1.16  4706    1
+#> d[Len]                 -0.45  5785    1
+#> d[Thal]                 0.05  5270    1
+#> lp__                -6226.20  1928    1
+#> shape[Attal2012]        1.42  4507    1
+#> shape[Jackson2019]      0.98  4813    1
+#> shape[McCarthy2012]     1.43  4602    1
+#> shape[Morgan2012]       0.94  5126    1
+#> shape[Palumbo2014]      1.16  4504    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Apr 14 09:14:33 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Apr 16 09:23:27 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
