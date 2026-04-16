@@ -91,7 +91,7 @@ compare_populations <- function(network,
     ess_rows <- vector("list", n_studies * (n_studies - 1L) / 2L)
     k <- 0L
 
-    # for (i in 1:(n_studies - 1)) {
+    for (i in 1:(n_studies - 1)) {
       for (j in (i + 1):n_studies) {
         s1 <- study_names[i]
         s2 <- study_names[j]
@@ -186,6 +186,8 @@ compare_populations <- function(network,
     }
 
     return(output_list)
+
+  }
 
   # ==========================================
   # METHOD: EUCLIDEAN

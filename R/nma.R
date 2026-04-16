@@ -336,6 +336,15 @@ nma <- function(network,
 
   connect_flag <- 0
   fixed_baseline <- 0
+
+  # Calculate mixed studies BEFORE connect_baseline modifies the network,
+  # so studies that become mixed only due to apply_connect_fixed() are not
+  # double-counted with fixed_baseline in the totns calculation
+  mixed_studies <- length(intersect(
+    if (has_ipd(network))     unique(network$ipd$.study)     else character(0),
+    if (has_agd_arm(network)) unique(network$agd_arm$.study) else character(0)
+  ))
+
   # Check and apply connect_baseline specifications
   if (!is.null(connect_baseline)) {
     if ("type" %in% names(connect_baseline)) {
@@ -390,12 +399,6 @@ nma <- function(network,
       }
   }
 }
-
-  # Check to see if there are mixed studies
-  ipd_studies <- unique(network$ipd$.study)
-  agd_arm_studies <- unique(network$agd_arm$.study)
-  mixed_studies <- intersect(ipd_studies, agd_arm_studies)
-  mixed_studies <- length(mixed_studies)
 
   # Check model arguments
   consistency <- rlang::arg_match(consistency)
@@ -829,8 +832,8 @@ nma <- function(network,
   # Notify if default reference treatment is used
   if (.is_default(network$treatments))
     inform(glue::glue('Note: Setting "{levels(network$treatments)[1]}" as the network reference treatment.'))
-  # Error if network is disconnected (must use baseline_synthesis() instead)
-  if (!is_network_connected(network) && is.null(baseline_subnet))
+  # Error if network is disconnected (must use baseline_synthesis() or connect_baseline instead)
+  if (!is_network_connected(network) && is.null(baseline_subnet) && is.null(connect_baseline))
     abort("Network is disconnected. See ?is_network_connected for more details.")
 
   # Auto-compute subnetwork_trt from igraph components when baseline_subnet is set
@@ -1997,8 +2000,8 @@ nma.fit <- function(ipd_x, ipd_y,
     xbar_mu = xbar_mu %||% 0,
     # random baseline effect
     random_baseline = ifelse(random_baseline == TRUE, 1, 0),
-    n_baseline_studies = if (!is.null(n_baseline_studies)) n_baseline_studies else 0L,
-    baseline_study_idx = if (!is.null(baseline_study_idx)) as.array(baseline_study_idx) else integer(0),
+    n_baseline_studies = if (random_baseline && !is.null(n_baseline_studies)) n_baseline_studies else 0L,
+    baseline_study_idx = if (random_baseline && !is.null(baseline_study_idx)) as.array(baseline_study_idx) else integer(0),
     connect_baseline = connect_flag,
     fixed_baseline = fixed_baseline,
     mixed_studies = mixed_studies

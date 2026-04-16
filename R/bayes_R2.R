@@ -35,10 +35,11 @@ bayes_R2.stan_nma <- function(object, ..., probs = c(0.025, 0.5, 0.975), summary
   if (object$likelihood %in% c(valid_lhood$binary, valid_lhood$count)) {
     var_res[,,1] <- apply(mu_pred * (1 - mu_pred), 1:2, "mean")
   } else if (object$likelihood == "ordered") {
-    # This is still weird...
     n <- nrow(object$network$ipd)
-    var_res[,,1] <- apply(mu_pred, 1:2, function(p) mean(apply(matrix(p, nrow = n), 1, "prod")))
-    # var_res[,,1] <- apply(mu_pred, 1:2, function(p) mean(apply(matrix(p*(1-p), nrow = n)[, -1, drop = FALSE], 1, "sum")))
+    var_res[,,1] <- apply(mu_pred, 1:2, function(p) {
+      pmat <- matrix(p, nrow = n, byrow = TRUE)[, -1, drop = FALSE]
+      mean(rowSums(pmat * (1 - pmat)))
+    })
   } else if (object$likelihood == "normal") {
     var_res[,,1] <- as.array(object, pars = "sigma")^2
   } else if (object$likelihood == "poisson") {
@@ -48,8 +49,10 @@ bayes_R2.stan_nma <- function(object, ..., probs = c(0.025, 0.5, 0.975), summary
   }
 
   if (object$likelihood == "ordered") {
-    # This is still weird...
-    var_mu_pred[,,1] <- apply(mu_pred, 1:2, function(p) sum(diag(var(matrix(p, nrow = n)[, -1, drop = FALSE]))))
+    var_mu_pred[,,1] <- apply(mu_pred, 1:2, function(p) {
+      pmat <- matrix(p, nrow = n, byrow = TRUE)[, -1, drop = FALSE]
+      sum(diag(var(pmat)))
+    })
   } else {
     var_mu_pred[,,1] <- apply(mu_pred, 1:2, "var")
   }
@@ -82,12 +85,11 @@ loo_R2.stan_nma <- function(object, ..., probs = c(0.025, 0.5, 0.975), summary =
     inform("Note: R-squared calculated on IPD portion of the model only.")
   if (object$likelihood %in% valid_lhood$survival) abort("Not supported for survival outcomes.")
 
-  # Observed outcomes
+  if (object$likelihood == "ordered") abort("loo_R2 is not supported for ordered outcomes.")
+
+  # Observed outcomes (non-ordered, unchanged)
   if (object$likelihood %in% c(valid_lhood$binary, valid_lhood$count, "poisson")) {
     y <- object$network$ipd$.r
-  } else if (object$likelihood == "ordered") {
-    abort("Multinomial models not yet supported.")
-    y <- c(t(object$network$ipd$.r[, -1]))
   } else if (object$likelihood == "normal") {
     y <- object$network$ipd$.y
   } else {

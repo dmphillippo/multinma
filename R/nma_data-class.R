@@ -203,7 +203,7 @@ print.nma_data <- function(x, ..., n = 10) {
   cglue("Reference treatment is: {levels(x$treatments)[1]}")
   cglue("Network is {if (is_network_connected(x)) green('connected') else red('disconnected')}")
   if (length(single_arm_studies) > 0) {
-    cglue("Single-arm studies: {(single_arm_studies)}")
+    cglue("Single-arm studies: {paste(single_arm_studies, collapse = ', ')}")
   }
   invisible(x)
 }
