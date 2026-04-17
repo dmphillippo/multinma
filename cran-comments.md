@@ -1,7 +1,8 @@
-This release introduces new features and fixes a few bugs.
-Fixed permanently moved 301 status URLs.
+Fixed UBSAN warnings identified in CRAN additional tests. Confirmed that this
+fixes the warnings with rocker/r-devel-ubsan-clang.
 
 ## Test environments
+* rocker/r-devel-ubsan-clang 
 * local R installation (Windows 10), R 4.5.3
 * Ubuntu 24.04.4 on GitHub Actions (release, devel, oldrel)
 * Mac OS 15.7.4 on GitHub Actions (release)

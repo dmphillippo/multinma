@@ -1,3 +1,8 @@
+# multinma 0.9.1
+
+* Fix: UBSAN warnings in CRAN additional tests, caused by unnecessary indexing
+of zero-dimensional matrices.
+
 # multinma 0.9.0
 
 * Feature: Regression on baseline risk is now supported, with a new `.mu` 
