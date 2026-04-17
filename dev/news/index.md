@@ -1,6 +1,10 @@
 # Changelog
 
-## multinma 0.9.0.9000
+## multinma 0.9.1.9000
+
+## multinma 0.9.1
+
+CRAN release: 2026-04-16
 
 - Fix: UBSAN warnings in CRAN additional tests, caused by unnecessary
   indexing of zero-dimensional matrices.
