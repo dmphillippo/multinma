@@ -7,8 +7,7 @@ data {
 
   // -- AgD regression coefficients --
   array[(link==1 && no_agd_regression) ? ns_agd_regression : 0] matrix[agd_regression_max_ncoef_inc,agd_regression_max_ncoef_omt] agd_regression_OVB_LM; // Pre-computed part of LM OVB adjustment
-  vector[(link==2 && no_agd_regression) ? nc_agd_regression : 0] agd_regression_OVB_GLM_dif; //  GLM OVB difference adjustment between contitional and average in reduced model
-  vector[(link==2 && no_agd_regression) ? nc_agd_regression : 0] agd_regression_OVB_GLM_inc; //  GLM OVB intercept adjustment
+  vector[(link==2 && no_agd_regression) ? nc_agd_regression : 0] agd_regression_OVB_GLM; //  GLM OVB adjustment
 
   // Prior on IPD variance
   int<lower=0,upper=6> prior_aux_dist;
@@ -156,12 +155,12 @@ if (nc_agd_regression) {
       // OVB adjustment
       if (agd_regression_reduced_study[i] ){
         if (link == 1){ // identity link
-        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] + block(agd_regression_OVB_LM[i], 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_ncoef_omt[i] ) * allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]];
+           allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] + block(agd_regression_OVB_LM[i], 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_ncoef_omt[i] ) * allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]];
         }else if (link == 2){ // log link (GLM)
-        allbeta_OVB[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] = log(mean(exp(       X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)) - agd_regression_OVB_GLM_dif[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] )  - agd_regression_OVB_GLM_inc[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ;
+          eta_agd_regression[ (c_c+1):(c_c+agd_regression_ncoef[i]) ] = log(mean(exp(X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)))  - agd_regression_OVB_GLM[(c_c+1):(c_c+agd_regression_ncoef[i])];
         }
       }
-      // Update eta
+
       eta_agd_regression[ (c_c+1):(c_c+agd_regression_ncoef[i]) ] = X_agd_regression_no_QR[ (c_c+1):(c_c+agd_regression_ncoef[i]), ] * allbeta_OVB;
 
       c_c += agd_regression_ncoef[i];

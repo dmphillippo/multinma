@@ -1400,6 +1400,7 @@ set_agd_regression <- function(data,
       abort(' `ordinal_cut` must be a subset of `ordinal_cut_lab`.')
     d$.rank_intercept <- match(.ordinal_cut, ordinal_cut_lab)
     d$.rank_intercept[is.na(d$.rank_intercept)] <- 0
+    d <- d %>% mutate(.ordinal_cut_lab = rep(list(ordinal_cut_lab), n()))
   }
 
   # Produce nma_data object
@@ -1408,7 +1409,6 @@ set_agd_regression <- function(data,
          treatments = purrr::discard(forcats::fct_unique(d$.trt), is.na),
          classes = classes,
          studies = forcats::fct_unique(d$.study),
-         agd_regression_ordinal_cut_lab = ordinal_cut_lab,
          outcome = list(agd_arm = NA, agd_contrast = NA, ipd = NA)),
     class = "nma_data")
 
