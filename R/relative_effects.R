@@ -322,6 +322,14 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
                                     classes = !is.null(x$network$classes),
                                     class_interactions = x$class_interactions)
 
+    # Check if regression model includes non-linear terms and warn if newdata
+    # does not include integration points
+    if (!is.null(newdata)) {
+      if (is_nonlinear(nma_formula, names(dat_all)) && !inherits(newdata, "integration_tbl"))
+        warn(c("Fitted model may be non-linear in the covariates.",
+               "Add integration points to `newdata` with add_integration() to produce population-average conditional treatment effects."))
+    }
+
     # If `newdata` was not supplied, relative effects are calculated for each study, and
     # the baseline risk meta-regression columns in the design matrix are 0/1 values.
     # Therefore, they should not be centered here.
@@ -714,4 +722,25 @@ get_delta_new <- function(x, ...) {
   class(delta_new) <- c("mcmc_array", class(delta_new))
 
   return(delta_new)
+}
+
+#' Check if a formula is non-linear in covariate terms
+#'
+#' This check is conservative. Any data transformation will be flagged - even
+#' those that are linear, e.g. I(x / 10) or factor(x).
+#'
+#' @param f Formula
+#' @param vars Character vector of variable names in input data
+#'
+#' @return TRUE if non-linear in vars, FALSE otherwise
+#' @noRd
+is_nonlinear <- function(f, vars) {
+  specials <- c(".study", ".trt", ".trtclass", ".omega", ".contr", ".mu")
+  tms <- attr(terms(f), "term.labels")
+
+  # grep any terms that aren't raw vars, specials, vars:special or special:vars
+  length(vars) > 0 && any(!tms %in% c(vars,
+                                      specials,
+                                      paste(rep(specials, each = length(vars)), vars, sep = ":"),
+                                      paste(vars, rep(specials, each = length(vars)), sep = ":")))
 }
