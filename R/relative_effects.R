@@ -562,7 +562,10 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
           study_EMs[, cen_vars] <- sweep(study_EMs[, cen_vars, drop = FALSE], 2, x$xbar[cen_vars], FUN = "+")
         }
       } else {
-        study_EMs <- newdata[EM_vars]
+        # Try to subset EM vars only - fails if some are transformed in the formula
+        study_EMs <-
+          if (all(EM_vars %in% names(newdata))) newdata[EM_vars]
+          else dplyr::select(regdat, -".study")
       }
 
       study_EMs <- tibble::as_tibble(study_EMs) %>%
