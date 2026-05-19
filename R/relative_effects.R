@@ -284,7 +284,19 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
     } else {
       # Produce relative effects for all studies in newdata
 
-      dat_studies <- newdata
+      # If integration points provided, expand
+      if (inherits(newdata, "integration_tbl")) {
+        dat_all <- .unnest_integration(newdata) %>%
+          dplyr::mutate(.sample_size = 1)
+
+        # Take the first row for each study. We will correct the design matrix below
+        dat_studies <- dat_all %>%
+          dplyr::group_by(.data$.study) %>%
+          dplyr::slice(1)
+
+      } else {
+        dat_all <- dat_studies <- newdata
+      }
 
       # Check all variables are present
       regdat <- get_model_data_columns(dat_studies, regression = x$regression, label = "`newdata`")
@@ -397,7 +409,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       EM_vars <- get_EM_vars(nma_formula)
 
       # Replace EM design matrix with study means if newdata is NULL
-      if (is.null(newdata)) {
+      if (is.null(newdata) || inherits(newdata, "integration_tbl")) {
 
         # Apply centering if used
         dat_all_cen <- dat_all
@@ -407,7 +419,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         }
 
         # Get model matrix of EM "main effects" - notably this expands out factors
-        # into dummy variables so we can average those too
+        # into dummy variables and computes any variable transformations so we can average those too
         EM_formula <- as.formula(paste0("~", paste(EM_vars, collapse = " + ")))
 
         # Calculate mean covariate values by study in the network
@@ -430,6 +442,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         # This works only because trt columns are 0/1, so interactions are just the covariate values
         nonzero <- X_EM != 0
         X_EM[nonzero] <- X_study_means_rep[nonzero]
+
       }
 
       # Name columns to match Stan parameters
@@ -553,7 +566,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       }
 
       # Prepare study covariate info
-      if (is.null(newdata)) {
+      if (is.null(newdata) || inherits(newdata, "integration_tbl")) {
         study_EMs <- X_study_means
 
         # Uncenter if necessary
