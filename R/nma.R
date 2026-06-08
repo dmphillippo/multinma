@@ -921,7 +921,7 @@ nma <- function(network,
     # Add common omitted vars as dummy (zero value) to work smoothly with other design matrices, e.g., IPD or AgD
     if(length(omitted_vars_common)){
       dat_agd_regression_split <- dat_agd_regression_split %>%
-        purrr::map(~ .x %>% tibble::add_column(!!!rlang::set_names(rep(list(0), length(omitted_vars_common)), omitted_vars_common)))
+        purrr::map(~ .x %>% dplyr::select(-any_of(omitted_vars_common)) %>% tibble::add_column(!!!rlang::set_names(rep(list(0), length(omitted_vars_common)), omitted_vars_common)))
     }
 
     # Identify reduced models
@@ -1012,7 +1012,7 @@ nma <- function(network,
     agd_regression_ncoef_cpt <- dat_agd_regression_split %>% purrr::map_int(~sum(.x$.is_intercept))
     np_agd_regression <- sum(agd_regression_ncoef_cpt) # Total number of intercepts
 
-    X_agd_regression_cc <- agd_regression_intercept_rnk <- NULL
+    X_agd_regression_cc <- agd_regression_intercept_rnk <- agd_regression_est_no_intercept <- NULL
     if (likelihood == 'ordered'){
 
       if ( any(agd_regression_ncoef_cpt==0) ) abort("No intercept specified in AgD regression.")
@@ -1028,8 +1028,19 @@ nma <- function(network,
 
       # Sorted ranks per study to ensure the first one is the lowest one which is study effect
       agd_regression_intercept_rnk <- dat_agd_regression_split %>%
-        purrr::map(~ .x %>% dplyr::filter(.rank_intercept != 0) %>% dplyr::pull(.rank_intercept) %>% sort() ) %>% unlist()
+        purrr::map(
+          ~ .x %>%  dplyr::filter(!is.na(.estimate)) %>%
+            mutate(tmp = c(match(1:max(.$.rank_intercept), .$.rank_intercept),
+                           rep(0,nrow(.) - max(.$.rank_intercept)) # keep them as dummy to avoid defining more indexing in Stan
+            )) %>% pull(tmp)
+        ) %>% unlist()
 
+      # excluding intercepts from estimations
+      agd_regression_est_no_intercept <- dat_agd_regression_split %>%
+        purrr::map(
+          ~ c(.x %>% dplyr::filter(!is.na(.estimate)) %>% dplyr::filter(.rank_intercept <= 1) %>% dplyr::pull(.estimate),
+              .x %>% dplyr::filter(!is.na(.estimate)) %>% dplyr::filter(.rank_intercept >  1) %>% dplyr::pull(.estimate)) # keep them as dummy to avoid defining more indexing in Stan
+        ) %>% unlist()
 
       # Check categories cut
       agd_regression_ordinal_cut_lab <- dat_agd_regression$.ordinal_cut_lab[[1]]
@@ -1058,10 +1069,10 @@ nma <- function(network,
       if ( any(agd_regression_ncoef_cpt >1) )
         abort("Intercept rows are not allowed in Cox PH models.")
     }else{
-      if ( any(tmp <- agd_regression_ncoef_cpt >1))
+      if ( any(agd_regression_ncoef_cpt >1))
         abort("More than one intercept per study is not allowed.")
 
-      if ( any(tmp <- agd_regression_ncoef_cpt==0))
+      if ( any(agd_regression_ncoef_cpt==0))
         abort("No intercept specified.")
     }
 
@@ -1238,66 +1249,51 @@ nma <- function(network,
 
     # --- OVB adjustments ---
     if(sum(agd_regression_reduced_study)){
-      agd_regression_OVB_LM <- agd_regression_OVB_GLM <- agd_regression_OVB_COX <- NULL
+      # agd_regression_OVB_LM <- agd_regression_OVB_GLM <- agd_regression_OVB_COX <- NULL
       # LM & AFT
       if( (likelihood == "normal" && link=="identity") ||
           likelihood %in%c('exponential-aft', 'weibull-aft', 'lognormal', 'loglogistic', 'gamma', 'gengamma') ){
-        agd_regression_OVB_LM <- array(0, dim = c(ns_agd_regression, agd_regression_max_ncoef_inc, agd_regression_max_ncoef_omt))
-        # Calculate inverse(XI'XI)XI'XO
-        for(i in 1:ns_agd_regression ){
-          if(agd_regression_reduced_study[i]){
-            XtX <- t(XI[[i]]) %*% XI[[i]]
-            if( det(XtX) == 0 ) stop("X'X is singular; cannot invert (OVB-LM)")
-            agd_regression_OVB_LM[i,1:agd_regression_ncoef_inc[i], 1:agd_regression_ncoef_omt[i]] <- (solve(XtX) %*% t(XI[[i]]) ) %*% (XO[[i]])
-          }
-        }
+        # agd_regression_OVB_LM <- array(0, dim = c(ns_agd_regression, agd_regression_max_ncoef_inc, agd_regression_max_ncoef_omt))
+        # # Calculate inverse(XI'XI)XI'XO
+        # for(i in 1:ns_agd_regression ){
+        #   if(agd_regression_reduced_study[i]){
+        #     XtX <- t(XI[[i]]) %*% XI[[i]]
+        #     if( det(XtX) == 0 ) stop("X'X is singular; cannot invert (OVB-LM)")
+        #     agd_regression_OVB_LM[i,1:agd_regression_ncoef_inc[i], 1:agd_regression_ncoef_omt[i]] <- (solve(XtX) %*% t(XI[[i]]) ) %*% (XO[[i]])
+        #   }
+        # }
       # GLM (non-ordinal)
       }else if( (likelihood == "normal" && link!="identity") ||
-                likelihood %in%c("bernoulli", "bernoulli2", "binomial", "binomial2",  "poisson") ){
-        dat_agd_regression_split <- dat_agd_regression_split %>%
-          # repeat the intercept for non-intercept rows and set zero for intercept row to work for both  intercept and non-intercept OVB adjustment formulas
-          purrr::map(~.x %>% dplyr::filter(!is.na(.estimate)) %>%
-                       dplyr::mutate(.OVB_GLM_inc = .estimate[.is_intercept==1] * (1 - .is_intercept) )) %>%
-          # Calculate the difference between conditional and average
-          purrr::map2(.,XI,~{
-            if(nrow(.y)!=0)
-              .x %>% dplyr::mutate(.OVB_GLM_dif = link_fun(mean(inverse_link(.y %*% .x$.estimate ,link=link)),link=link) - (.x$.estimate + .x$.OVB_GLM_inc) )
-            else
-              .x %>% dplyr::mutate(.OVB_GLM_dif = 0 ) # dummy
-          })
+                likelihood %in%c("bernoulli", "bernoulli2", "binomial", "binomial2",  "poisson", "ordered") ){
 
-        # GLM OVB adjustment
-        agd_regression_OVB_GLM <- dat_agd_regression_split %>% map( ~ .$.OVB_GLM_dif + .$.OVB_GLM_inc) %>% unlist()
+        # agd_regression_OVB_GLM <- X_agd_regression_int
+        #
+        # c_x = 0
+        # for(i1 in 1:ns_agd_regression ){
+        #   if( agd_regression_reduced_study[i1] ){
+        #     for(i2 in XO_col[[i1]] ){
+        #       agd_regression_OVB_GLM[ (c_x+1):(agd_regression_nx[i1]) , i2 ] <-
+        #         residuals(lm( X_agd_regression_int[ (c_x+1):(agd_regression_nx[i1]) , i2           ] ~ -1 +
+        #                       X_agd_regression_int[ (c_x+1):(agd_regression_nx[i1]) , XI_col[[i1]] ]))
+        #     }
+        #   }
+        #   c_X <- c_x + agd_regression_nx[i1]
+        # }
 
-      # GLM - ordered
-      }else if( likelihood == "ordered" ){
-        dat_agd_regression_split <- dat_agd_regression_split %>%
-          # repeat the lowest intercept for non-intercept rows and set zero for intercept rows to work for both  intercept and non-intercept OVB adjustment formulas
-          purrr::map(~.x %>% dplyr::filter(!is.na(.estimate)) %>%
-                       dplyr::mutate(.OVB_GLM_inc = dplyr::if_else(.is_intercept, 0,  .estimate[.rank_intercept == .rank_intercept_min[1]] ))) %>%
-          # Calculate the difference between conditional and average
-          purrr::map2(.,XI,~{
-            if(nrow(.y)!=0){
-              tmp_rank_intercept_min <- .x$.rank_intercept_min[1]
-              tmp_mu_reduced <- 1
-              for(j in 1:(agd_regression_ncat_ordinal-1) ){
-                if(  j %in% .x$.rank_intercept ){
-                  tmp_mu_reduced <- tmp_mu_reduced +
-                    inverse_link(.y %*% .x$.estimate[.x$.rank_intercept <= tmp_rank_intercept_min ] # design matrix include the lowest one as the study baseline
-                                 - (.x$.estimate[.x$.rank_intercept==j] - .x$.estimate[.x$.rank_intercept== tmp_rank_intercept_min ]) # f_cc_j
-                                 - 2*(.x$.estimate[.x$.rank_intercept == tmp_rank_intercept_min ])
-                                 , link=link)
-                }
-              }
-              tmp_mu_reduced <- mean(tmp_mu_reduced)
-              .x %>% dplyr::mutate(.OVB_GLM_dif = link_fun((tmp_mu_reduced-1)/(agd_regression_ncat_ordinal-1), link=link) - .estimate + .OVB_GLM_inc)
-            }else{
-              .x %>% dplyr::mutate(.OVB_GLM_dif = 0 ) # dummy
-            }
-          })
-
-        # GLM OVB adjustment
-        agd_regression_OVB_GLM <- dat_agd_regression_split %>% map( ~ .$.OVB_GLM_dif - .$.OVB_GLM_inc) %>% unlist()
+        # dat_agd_regression_split <- dat_agd_regression_split %>%
+        #   # repeat the intercept for non-intercept rows and set zero for intercept row to work for both  intercept and non-intercept OVB adjustment formulas
+        #   purrr::map(~.x %>% dplyr::filter(!is.na(.estimate)) %>%
+        #                dplyr::mutate(.OVB_GLM_inc = .estimate[.is_intercept==1] * (1 - .is_intercept) )) %>%
+        #   # Calculate the difference between conditional and average
+        #   purrr::map2(.,XI,~{
+        #     if(nrow(.y)!=0)
+        #       .x %>% dplyr::mutate(.OVB_GLM_dif = link_fun(mean(inverse_link(.y %*% .x$.estimate ,link=link)),link=link) - (.x$.estimate + .x$.OVB_GLM_inc) )
+        #     else
+        #       .x %>% dplyr::mutate(.OVB_GLM_dif = 0 ) # dummy
+        #   })
+        #
+        # # GLM OVB adjustment
+        # agd_regression_OVB_GLM <- dat_agd_regression_split %>% map( ~ .$.OVB_GLM_dif + .$.OVB_GLM_inc) %>% unlist()
 
       # Cox PH
       } else if(likelihood %in%c('exponential', 'weibull', 'gompertz','mspline', 'pexp') ){
@@ -1320,7 +1316,7 @@ nma <- function(network,
       agd_regression_ncoef_omt <- agd_regression_ncoef_inc <- agd_regression_nx <- NULL
       XI_col_vec <- XO_col_vec <- NULL
       X_agd_regression_int <- NULL
-      agd_regression_OVB_LM <- agd_regression_OVB_GLM <- agd_regression_OVB_COX <- NULL
+      # agd_regression_OVB_COX <- NULL
 
     }
 
@@ -1339,7 +1335,7 @@ nma <- function(network,
     agd_regression_max_ncoef <- 0
     cov_agd_regression <- NULL
     study_agd_regression <- NULL
-    est_agd_regression <- agd_regression_ncoef <- NULL
+    est_agd_regression <- agd_regression_est_no_intercept <- agd_regression_ncoef <- NULL
     agd_regression_name_study <- c()
     np_agd_regression <- 0
     agd_regression_ncoef_cpt <- NULL
@@ -1354,7 +1350,7 @@ nma <- function(network,
     agd_regression_ncoef_omt <- agd_regression_ncoef_inc <- agd_regression_nx <- NULL
     XI_col_vec <- XO_col_vec <- NULL
     X_agd_regression_int <- NULL
-    agd_regression_OVB_LM <- agd_regression_OVB_GLM <- agd_regression_OVB_COX <- NULL
+    # agd_regression_OVB_COX <- NULL
   }
 
   # Combine
@@ -1755,6 +1751,7 @@ if (class_effects == "exchangeable") {
                      X_agd_regression_int = X_agd_regression_int,
                      agd_regression_x = X_agd_regression,
                      agd_regression_est = est_agd_regression,
+                     agd_regression_est_no_intercept = agd_regression_est_no_intercept,
                      agd_regression_cov = cov_agd_regression,
                      agd_regression_study = study_agd_regression,
                      agd_regression_reduced_study = agd_regression_reduced_study,
@@ -1765,9 +1762,9 @@ if (class_effects == "exchangeable") {
                      XI_col_vec = XI_col_vec,
                      XO_col_vec = XO_col_vec,
 
-                     agd_regression_OVB_GLM = agd_regression_OVB_GLM,
-                     agd_regression_OVB_LM = agd_regression_OVB_LM,
-                     agd_regression_OVB_COX = agd_regression_OVB_COX,
+                     # agd_regression_OVB_GLM = agd_regression_OVB_GLM,
+                     # agd_regression_OVB_LM = agd_regression_OVB_LM,
+                     # agd_regression_OVB_COX = agd_regression_OVB_COX,
                      agd_regression_glm_method = agd_regression_glm_method, # temporary
                      n_int = n_int,
                      ipd_offset = offset_ipd,
@@ -2011,15 +2008,16 @@ if (class_effects == "exchangeable") {
 nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
                     agd_arm_x = NULL, agd_arm_y = NULL,
                     agd_contrast_x = NULL, agd_contrast_y = NULL, agd_contrast_Sigma = NULL,
-                    agd_regression_x = NULL, agd_regression_est = NULL, agd_regression_cov = NULL, agd_regression_study = NULL,
+                    agd_regression_x = NULL, agd_regression_est = NULL, agd_regression_est_no_intercept = NULL, agd_regression_cov = NULL, agd_regression_study = NULL,
                     ns_agd_regression = NULL,nc_agd_regression = NULL,no_agd_regression = NULL,nl_agd_regression = NULL,ni_agd_regression = NULL,
                     XI_col_vec = NULL,XO_col_vec = NULL,
                     agd_regression_ncoef = NULL,agd_regression_ncoef_omt = NULL,agd_regression_ncoef_inc = NULL,
                     agd_regression_max_ncoef = NULL,agd_regression_max_ncoef_omt = NULL,agd_regression_max_ncoef_inc = NULL,
                     X_agd_regression_int = NULL, agd_regression_max_nrow = NULL,
                     agd_regression_reduced_study = NULL, agd_regression_nx = NULL,
-                    agd_regression_OVB_GLM = NULL,
-                    agd_regression_OVB_LM = NULL,agd_regression_OVB_COX = NULL,
+                    # agd_regression_OVB_GLM = NULL,
+                    # agd_regression_OVB_LM = NULL,
+                    # agd_regression_OVB_COX = NULL,
                     np_agd_regression = NULL, agd_regression_ncoef_cpt = NULL, agd_regression_intercept_rnk = NULL, X_agd_regression_cc = NULL,
                     agd_regression_glm_method = NULL, # temporary
                     n_int,
@@ -2414,25 +2412,26 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
     agd_contrast_y = if (has_agd_contrast) as.array(agd_contrast_y$.y) else numeric(),
     agd_contrast_Sigma = Sigma,
     agd_regression_est = if(is.null(agd_regression_est)) numeric(0) else agd_regression_est,
+    agd_regression_est_no_intercept = if(is.null(agd_regression_est_no_intercept)) numeric(0) else agd_regression_est_no_intercept,
     agd_regression_max_ncoef = agd_regression_max_ncoef,
     agd_regression_max_ncoef_omt = agd_regression_max_ncoef_omt,
     agd_regression_max_ncoef_inc = agd_regression_max_ncoef_inc,
     no_agd_regression = no_agd_regression,
     nl_agd_regression = nl_agd_regression,
     agd_regression_ncoef = if(is.null(agd_regression_ncoef)) numeric() else as.array(agd_regression_ncoef),
-    agd_regression_ncoef_omt = if(is.null(agd_regression_ncoef_omt) & ns_agd_regression!=0 ) rep(0,ns_agd_regression) else if (is.null(agd_regression_ncoef_omt) & ns_agd_regression==0 ) numeric(0) else as.array(agd_regression_ncoef_omt),
-    agd_regression_ncoef_inc = if(is.null(agd_regression_ncoef_inc) & ns_agd_regression!=0 ) rep(0,ns_agd_regression) else if (is.null(agd_regression_ncoef_inc) & ns_agd_regression==0 ) numeric(0) else as.array(agd_regression_ncoef_inc),
+    agd_regression_ncoef_omt = if(is.null(agd_regression_ncoef_omt) & ns_agd_regression!=0 ) as.array(rep(0,ns_agd_regression)) else if (is.null(agd_regression_ncoef_omt) & ns_agd_regression==0 ) as.array(numeric(0)) else as.array(agd_regression_ncoef_omt),
+    agd_regression_ncoef_inc = if(is.null(agd_regression_ncoef_inc) & ns_agd_regression!=0 ) as.array(rep(0,ns_agd_regression)) else if (is.null(agd_regression_ncoef_inc) & ns_agd_regression==0 ) as.array(numeric(0)) else as.array(agd_regression_ncoef_inc),
     agd_regression_cov = if(is.null(agd_regression_cov)) array(numeric(0), dim = c(0,agd_regression_max_ncoef,agd_regression_max_ncoef)) else agd_regression_chol,
     nc_agd_regression = nc_agd_regression,
     XI_col_vec = if(is.null(XI_col_vec)) numeric() else array(XI_col_vec),
     XO_col_vec = if(is.null(XO_col_vec)) numeric() else array(XO_col_vec),
     agd_regression_reduced_study = if(is.null(agd_regression_reduced_study)) numeric() else as.array(agd_regression_reduced_study),
-    agd_regression_nx = if(is.null(agd_regression_nx) & ns_agd_regression!=0 ) rep(0,ns_agd_regression) else if (is.null(agd_regression_nx) & ns_agd_regression==0 ) numeric(0) else as.array(agd_regression_nx),
+    agd_regression_nx = if(is.null(agd_regression_nx) & ns_agd_regression!=0 ) as.array(rep(0,ns_agd_regression)) else if (is.null(agd_regression_nx) & ns_agd_regression==0 ) as.array(numeric(0)) else as.array(agd_regression_nx),
     agd_regression_max_nrow = agd_regression_max_nrow,
-    agd_regression_OVB_GLM = if(is.null(agd_regression_OVB_GLM)) numeric(0) else agd_regression_OVB_GLM,
     X_agd_regression_int = if(is.null(X_agd_regression_int)) matrix(numeric(0), nrow = 0, ncol = 0) else X_agd_regression_int,
-    agd_regression_OVB_LM = if(is.null(agd_regression_OVB_LM)) array(numeric(0), dim = c(0,agd_regression_max_ncoef_inc,agd_regression_max_ncoef_omt)) else agd_regression_OVB_LM,
-    agd_regression_OVB_COX = if(is.null(agd_regression_OVB_COX)) array(numeric(0), dim = c(0,agd_regression_max_nrow,agd_regression_max_ncoef_inc+2)) else agd_regression_OVB_COX,
+    # agd_regression_OVB_LM = if(is.null(agd_regression_OVB_LM)) array(numeric(0), dim = c(0,agd_regression_max_ncoef_inc,agd_regression_max_ncoef_omt)) else agd_regression_OVB_LM,
+    # agd_regression_OVB_GLM = if(is.null(agd_regression_OVB_GLM)) numeric(0) else agd_regression_OVB_GLM,
+    # agd_regression_OVB_COX = if(is.null(agd_regression_OVB_COX)) array(numeric(0), dim = c(0,agd_regression_max_nrow,agd_regression_max_ncoef_inc+2)) else agd_regression_OVB_COX,
     np_agd_regression = np_agd_regression,
     agd_regression_ncoef_cpt = if(is.null(agd_regression_ncoef_cpt)) numeric() else as.array(agd_regression_ncoef_cpt),
     agd_regression_intercept_rnk = if(is.null(agd_regression_intercept_rnk)) numeric() else as.array(agd_regression_intercept_rnk),

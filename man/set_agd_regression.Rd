@@ -16,6 +16,8 @@ set_agd_regression(
   covariates = NULL,
   trt_ref = NULL,
   trt_class = NULL,
+  ordinal_cut = NULL,
+  ordinal_cut_lab = NULL,
   sample_size = NULL
 )
 }
@@ -51,9 +53,8 @@ which all studies have estimated, and must then match the regression model
 specified when fitting the model with \code{nma()}. Specify terms involving
 treatment with the \code{.trt} special.}
 
-\item{covariates}{data frame of covariate summary statistics
-for each study or study arm, with corresponding \code{study} and \code{trt} columns
-to match to those in \code{data}}
+\item{covariates}{data frame of covariate summary statistics for each study,
+with corresponding \code{study} column matching that in \code{data}}
 
 \item{trt_ref}{reference treatment for the network, as a single integer,
 string, or factor. If not specified, a reasonable well-connected default

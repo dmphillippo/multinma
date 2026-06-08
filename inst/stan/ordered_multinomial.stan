@@ -9,10 +9,11 @@ data {
   int<lower=2> ncat;
 
   // -- AgD regression coefficients --
-  int np_agd_regression; // Total number of intercepts
-  vector[no_agd_regression ? nc_agd_regression : 0] agd_regression_OVB_GLM; //  GLM OVB adjustment
-  array[ns_agd_regression ? ns_agd_regression : 0] int agd_regression_ncoef_cpt; // Number of intercepts per study
-  array[ns_agd_regression ? np_agd_regression : 0] int agd_regression_intercept_rnk; // cut thresholds
+  matrix[ni_agd_regression ? ni_agd_regression : 0, ni_agd_regression ? nX : 0] agd_regression_OVB_GLM; //  GLM OVB adjustment
+  //int np_agd_regression; // Total number of intercepts
+  ///vector[no_agd_regression ? nc_agd_regression : 0] agd_regression_OVB_GLM; //  GLM OVB adjustment
+  //array[ns_agd_regression ? ns_agd_regression : 0] int agd_regression_ncoef_cpt; // Number of intercepts per study
+  //array[ns_agd_regression ? np_agd_regression : 0] int agd_regression_intercept_rnk; // cut thresholds
   matrix[ns_agd_regression ? nc_agd_regression : 0, ns_agd_regression ? (ncat-1) : 0] X_agd_regression_cc; // Complementary design matrix for cc
 
   array[ni_ipd] int<lower=1, upper=ncat> ipd_r;
@@ -35,6 +36,7 @@ transformed data {
   array[ni_ipd] vector[ncat] theta_ipd0 = rep_array(rep_vector(0, ncat), ni_ipd);
   array[ni_agd_arm] vector[ncat] theta_agd_arm_bar0 = rep_array(rep_vector(0, ncat), ni_agd_arm);
   // matrix[ni_agd_arm * n_int_thin, ncat] theta_bar_cum_agd_arm0 = rep_matrix(0, ni_agd_arm * n_int_thin, ncat);
+  int ncat_mid = (ncat - 2) / 2 + 1; // middle cat
 #include /include/transformed_data_common.stan
 }
 parameters {
@@ -43,6 +45,7 @@ parameters {
   // Ordered cutoffs on underlying probit-PASI scale
   // "Fixed effect" cutoffs, the same across trials
   positive_ordered[ncat - 2] f_cc;
+  real<lower=0> err_sd;
 }
 transformed parameters {
   vector[ncat - 1] cc;
@@ -277,15 +280,18 @@ transformed parameters {
 
   }
 
-    // -- AgD model (regression coefficients) --
+  // -- AgD model (regression coefficients) --
+  vector[ni_agd_regression] err;
+  matrix[ni_agd_regression,nX] err_mat; // constraints for each coefficents (excluding threshholds cc )
+  matrix[ni_agd_regression,ncat] err_mat_cat; // constraints for each category
   if (nc_agd_regression) {
 
     if (sum(agd_regression_reduced_study)){
 
+      // int c_p = 0; // intercePt counter
       int c_c = 0; // Coef. counter
-      int c_p = 0; // intercePt counter
       int c_i = 0; // Included coef. counter
-      // int c_o = 0; // Omitted coef. counter
+      int c_o = 0; // Omitted coef. counter
       int c_x = 0; // X_int rows counter
       real tmp_mu_ful;
 
@@ -295,33 +301,139 @@ transformed parameters {
         if(agd_regression_reduced_study[i]){
           tmp_mu_ful = 1;
           if (link == 1){ // logit link
-            for(j in  agd_regression_intercept_rnk[(c_p+1):(c_p+agd_regression_ncoef_cpt[i])]    ){
-              tmp_mu_ful += mean(inv_logit( X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta - cc[j] - 2*allbeta[XI_col_vec[c_i+1]] ));
+            // for(j in  agd_regression_intercept_rnk[(c_p+1):(c_p+agd_regression_ncoef_cpt[i])]    ){
+            //   tmp_mu_ful += mean(inv_logit( X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta - cc[j] - 2*allbeta[XI_col_vec[c_i+1]] ));
+            // }
+            // eta_agd_regression[ (c_c+1):(c_c+agd_regression_ncoef[i]) ] = logit( (tmp_mu_ful - 1)/(ncat - 1) ) - agd_regression_OVB_GLM[ (c_c+1):(c_c+agd_regression_ncoef[i])]  +
+                                                                                // X_agd_regression_cc[    (c_c+1):(c_c+agd_regression_ncoef[i]), ] * cc;
+
+            //  *** Constraints derived from catregories ***
+            // first cat
+            err_mat_cat[(c_x+1):(c_x+agd_regression_nx[i]), 1] =
+            (1 - inv_logit( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+2):(c_i+agd_regression_ncoef_inc[i])] ] * agd_regression_est[ (c_c+ncat):(c_c+agd_regression_ncoef[i]) ] - 1*agd_regression_est[c_c+1])) -
+            (1 - inv_logit( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,                                                      ] * allbeta                                                     - cc[1])) ;
+            // middle cats
+            for(j in  2:(ncat-1)){
+              err_mat_cat[(c_x+1):(c_x+agd_regression_nx[i]), j] =
+              (
+                inv_logit( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+2):(c_i+agd_regression_ncoef_inc[i])]] * agd_regression_est[ (c_c+ncat):(c_c+agd_regression_ncoef[i]) ] - 1*agd_regression_est[c_c+j-1]) -
+                inv_logit( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+2):(c_i+agd_regression_ncoef_inc[i])]] * agd_regression_est[ (c_c+ncat):(c_c+agd_regression_ncoef[i]) ] - 1*agd_regression_est[c_c+j  ])
+                )-(
+                inv_logit( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,                                                     ] * allbeta - cc[j-1]) -
+                inv_logit( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,                                                     ] * allbeta - cc[j  ])
+                  ) ;
             }
-            eta_agd_regression[ (c_c+1):(c_c+agd_regression_ncoef[i]) ] = logit( (tmp_mu_ful - 1)/(ncat - 1) ) - agd_regression_OVB_GLM[ (c_c+1):(c_c+agd_regression_ncoef[i])]  +
-                                                                                X_agd_regression_cc[    (c_c+1):(c_c+agd_regression_ncoef[i]), ] * cc;
+            // last cat
+            err_mat_cat[(c_x+1):(c_x+agd_regression_nx[i]), ncat] =
+            (
+                inv_logit( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+2):(c_i+agd_regression_ncoef_inc[i])]] * agd_regression_est[ (c_c+ncat):(c_c+agd_regression_ncoef[i]) ] - 1*agd_regression_est[c_c+ncat-1])
+              )-(
+                inv_logit( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,                                                     ] * allbeta                                                     - cc[ncat-1])
+                ) ;
+
+                //  *** Constraints derived from score equations ***
+                // Residuals betrwwen reduced and full models means from binary cats
+                err[(c_x+1):(c_x+agd_regression_nx[i])] =
+                inv_logit( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+2):(c_i+agd_regression_ncoef_inc[i])]] * agd_regression_est[ (c_c+ncat):(c_c+agd_regression_ncoef[i]) ] - 1*agd_regression_est[c_c+ncat_mid])-
+                inv_logit( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,                                                     ] * allbeta                                                     - cc[ncat_mid]) ;
+
+                // Constraints for included covariates
+                err_mat[               (c_x+1):(c_x+agd_regression_nx[i]) , XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ] =
+                X_agd_regression_int[  (c_x+1):(c_x+agd_regression_nx[i]) , XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ] .*
+                rep_matrix( err[(c_x+1):(c_x+agd_regression_nx[i])], agd_regression_ncoef_inc[i] ) ;
+
+                // Constraints for omitted covariates
+                err_mat[               (c_x+1):(c_x+agd_regression_nx[i]) , XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ] =
+                X_agd_regression_int[  (c_x+1):(c_x+agd_regression_nx[i]) , XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ] .*
+                rep_matrix( err[(c_x+1):(c_x+agd_regression_nx[i])], agd_regression_ncoef_omt[i] ) ;
+
+
+                // *** Rcover coefficents in the reduced model ***
+                eta_agd_regression[ (c_c+1):(c_c+3                      ) ] = cc - allbeta[ XI_col_vec[(c_i+1)] ];
+                eta_agd_regression[ (c_c+4):(c_c+agd_regression_ncoef[i]) ] =
+                mdivide_left_spd( crossprod(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])][2:] ]   ) ,
+                (X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])][2:] ])' ) *
+                logit(
+                  inv_logit( X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)  -
+                  err_mat_cat[(c_x+1):(c_x+agd_regression_nx[i]), 1]
+                  ) + agd_regression_est[c_c+1];
+
+
           }else if (link == 2){ // probit link
-            for(j in  agd_regression_intercept_rnk[(c_p+1):(c_p+agd_regression_ncoef_cpt[i])]    ){
-              tmp_mu_ful += mean(Phi( X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta - cc[j] - 2*allbeta[XI_col_vec[c_i+1]] ));
+            // for(j in  agd_regression_intercept_rnk[(c_p+1):(c_p+agd_regression_ncoef_cpt[i])]    ){
+            //   tmp_mu_ful += mean(Phi( X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta - cc[j] - 2*allbeta[XI_col_vec[c_i+1]] ));
+            // }
+            // eta_agd_regression[ (c_c+1):(c_c+agd_regression_ncoef[i]) ] = inv_Phi( (tmp_mu_ful - 1)/(ncat - 1) ) - agd_regression_OVB_GLM[ (c_c+1):(c_c+agd_regression_ncoef[i])]  +
+                                                                            // X_agd_regression_cc[    (c_c+1):(c_c+agd_regression_ncoef[i]), ] * cc;
+
+            //  *** Constraints derived from catregories ***
+            // first cat
+            err_mat_cat[(c_x+1):(c_x+agd_regression_nx[i]), 1] =
+            (1 - Phi( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+2):(c_i+agd_regression_ncoef_inc[i])] ] * agd_regression_est[ (c_c+ncat):(c_c+agd_regression_ncoef[i]) ] - 1*agd_regression_est[c_c+1])) -
+            (1 - Phi( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,                                                      ] * allbeta                                                     - cc[1])) ;
+            // middle cats
+            for(j in  2:(ncat-1)){
+              err_mat_cat[(c_x+1):(c_x+agd_regression_nx[i]), j] =
+              (
+                Phi( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+2):(c_i+agd_regression_ncoef_inc[i])]] * agd_regression_est[ (c_c+ncat):(c_c+agd_regression_ncoef[i]) ] - 1*agd_regression_est[c_c+j-1]) -
+                Phi( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+2):(c_i+agd_regression_ncoef_inc[i])]] * agd_regression_est[ (c_c+ncat):(c_c+agd_regression_ncoef[i]) ] - 1*agd_regression_est[c_c+j  ])
+                )-(
+                Phi( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,                                                     ] * allbeta - cc[j-1]) -
+                Phi( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,                                                     ] * allbeta - cc[j  ])
+                  ) ;
             }
-            eta_agd_regression[ (c_c+1):(c_c+agd_regression_ncoef[i]) ] = inv_Phi( (tmp_mu_ful - 1)/(ncat - 1) ) - agd_regression_OVB_GLM[ (c_c+1):(c_c+agd_regression_ncoef[i])]  +
-                                                                            X_agd_regression_cc[    (c_c+1):(c_c+agd_regression_ncoef[i]), ] * cc;
+            // last cat
+            err_mat_cat[(c_x+1):(c_x+agd_regression_nx[i]), ncat] =
+            (
+                Phi( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+2):(c_i+agd_regression_ncoef_inc[i])]] * agd_regression_est[ (c_c+ncat):(c_c+agd_regression_ncoef[i]) ] - 1*agd_regression_est[c_c+ncat-1])
+              )-(
+                Phi( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,                                                     ] * allbeta                                                     - cc[ncat-1])
+                ) ;
+
+                //  *** Constraints derived from score equations ***
+                // Residuals betrwwen reduced and full models means from binary cats
+                err[(c_x+1):(c_x+agd_regression_nx[i])] =
+                inv_logit( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+2):(c_i+agd_regression_ncoef_inc[i])]] * agd_regression_est[ (c_c+ncat):(c_c+agd_regression_ncoef[i]) ] - 1*agd_regression_est[c_c+ncat_mid])-
+                inv_logit( X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,                                                     ] * allbeta                                                     - cc[ncat_mid]) ;
+
+                // Constraints for included covariates
+                err_mat[               (c_x+1):(c_x+agd_regression_nx[i]) , XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ] =
+                X_agd_regression_int[  (c_x+1):(c_x+agd_regression_nx[i]) , XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ] .*
+                rep_matrix( err[(c_x+1):(c_x+agd_regression_nx[i])], agd_regression_ncoef_inc[i] ) ;
+
+                // Constraints for omitted covariates
+                err_mat[               (c_x+1):(c_x+agd_regression_nx[i]) , XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ] =
+                X_agd_regression_int[  (c_x+1):(c_x+agd_regression_nx[i]) , XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ] .*
+                rep_matrix( err[(c_x+1):(c_x+agd_regression_nx[i])], agd_regression_ncoef_omt[i] ) ;
+
+
+                // *** Rcover coefficents in the reduced model ***
+                eta_agd_regression[ (c_c+1):(c_c+3                      ) ] = cc - allbeta[ XI_col_vec[(c_i+1)] ];
+                eta_agd_regression[ (c_c+4):(c_c+agd_regression_ncoef[i]) ] =
+                mdivide_left_spd( crossprod(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])][2:] ]   ) ,
+                (X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])][2:] ])' ) *
+                inv_Phi(
+                  Phi( X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta)  -
+                  err_mat_cat[(c_x+1):(c_x+agd_regression_nx[i]), 1]
+                  ) + agd_regression_est[c_c+1];
+
+
           }else if (link == 3){ // cloglog link
-            for(j in  agd_regression_intercept_rnk[(c_p+1):(c_p+agd_regression_ncoef_cpt[i])]    ){
-              tmp_mu_ful += mean(inv_cloglog( X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta - cc[j] - 2*allbeta[XI_col_vec[c_i+1]] ));
-            }
-            eta_agd_regression[ (c_c+1):(c_c+agd_regression_ncoef[i]) ] = log(-log1m( (tmp_mu_ful - 1)/(ncat - 1) )) - agd_regression_OVB_GLM[ (c_c+1):(c_c+agd_regression_ncoef[i])]  +
-                                                                            X_agd_regression_cc[    (c_c+1):(c_c+agd_regression_ncoef[i]), ] * cc;
+            // for(j in  agd_regression_intercept_rnk[(c_p+1):(c_p+agd_regression_ncoef_cpt[i])]    ){
+            //   tmp_mu_ful += mean(inv_cloglog( X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]),]*allbeta - cc[j] - 2*allbeta[XI_col_vec[c_i+1]] ));
+            // }
+            // eta_agd_regression[ (c_c+1):(c_c+agd_regression_ncoef[i]) ] = log(-log1m( (tmp_mu_ful - 1)/(ncat - 1) )) - agd_regression_OVB_GLM[ (c_c+1):(c_c+agd_regression_ncoef[i])]  +
+            //                                                                 X_agd_regression_cc[    (c_c+1):(c_c+agd_regression_ncoef[i]), ] * cc;
           }
         } else {
           eta_agd_regression[ (c_c+1):(c_c+agd_regression_ncoef[i]) ] = X_agd_regression_no_QR[ (c_c+1):(c_c+agd_regression_ncoef[i]), ] * allbeta +
                                                                         X_agd_regression_cc[    (c_c+1):(c_c+agd_regression_ncoef[i]), ] * cc;
         }
 
-        c_p += agd_regression_ncoef_cpt[i];
+        //c_p += agd_regression_ncoef_cpt[i];
         c_c += agd_regression_ncoef[i];
         c_i += agd_regression_ncoef_inc[i];
-        // c_o += agd_regression_ncoef_omt[i];
+        c_o += agd_regression_ncoef_omt[i];
         c_x += agd_regression_nx[i];
       }
     }else{
@@ -349,6 +461,39 @@ model {
   // -- AgD likelihood (arm-based) --
   for (i in 1:ni_agd_arm)
     agd_arm_r[i] ~ multinomial(theta_agd_arm_bar[i]);
+
+  // -- AgD likelihood (regression) --
+  if(nc_agd_regression){
+    int c_x = 0;
+    int c_i = 0;
+    int c_o = 0;
+    for (i in 1:ns_agd_regression) {
+      if(agd_regression_reduced_study[i]){
+
+        for (j in 1:ncat) {
+          mean( err_mat_cat[(c_x+1):(c_x+agd_regression_nx[i]), j]  ) ~ normal( 0 , err_sd);
+        }
+
+        for (j in 1:agd_regression_ncoef_inc[i]) {
+            mean( (err_mat[(c_x+1):(c_x+agd_regression_nx[i]), XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ])[,j] ) ~ normal( 0 , err_sd);
+        }
+
+        for (j in 1:agd_regression_ncoef_omt[i]) {
+        mean(                (err_mat[(c_x+1):(c_x+agd_regression_nx[i]), XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ])[,j] ) ~
+        normal(
+          mean(
+            (err[                    (c_x+1):(c_x+agd_regression_nx[i])                                                        ]) .*
+            (agd_regression_OVB_GLM[(c_x+1):(c_x+agd_regression_nx[i]), XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ])[,j]
+          ), err_sd);
+        }
+
+      }
+      c_i += agd_regression_ncoef_inc[i];
+      c_x += agd_regression_nx[i];
+      c_o += agd_regression_ncoef_omt[i];
+    }
+    err_sd ~ cauchy(0, 2.5);
+  }
 
   // -- Priors on cutpoints --
   // Implied improper uniform prior on cutpoints if prior_aux_dist = 0

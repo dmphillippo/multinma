@@ -1286,7 +1286,7 @@ set_agd_regression <- function(data,
 
   if ( !missing(cov) && ( !all(purrr::map_lgl(cov, is.matrix)) || !all(purrr::map_lgl(cov, is.numeric)) || (n_studies>1 && !rlang::is_named(cov)) ) )
     abort("`cov` must be a named list of covariance matrices.")
-  if (n_studies == 1 && length(cov) == 1 && !rlang::is_named(cov)) names(cov) <- levels(d$.study)
+  if ( !missing(cov) && n_studies == 1 && length(cov) == 1 && !rlang::is_named(cov)) names(cov) <- levels(d$.study)
   if ( !missing(cov) && length(miss_names <- setdiff(names(cov), levels(d$.study) )) )
     abort(glue::glue("`cov` list names must match study names in `data`.\n",
                      "Mismatched for stud{if (length(miss_names)>1) 'ies' else 'y'} ",
@@ -1295,7 +1295,7 @@ set_agd_regression <- function(data,
 
   if ( !missing(cor) && ( !all(purrr::map_lgl(cor, is.matrix)) || !all(purrr::map_lgl(cor, is.numeric)) || (n_studies>1 && !rlang::is_named(cor)) ) )
     abort("`cor` must be a named list of correlation matrices.")
-  if (n_studies == 1 && length(cor) == 1 && !rlang::is_named(cor)) names(cor) <- levels(d$.study)
+  if ( !missing(cor) && n_studies == 1 && length(cor) == 1 && !rlang::is_named(cor)) names(cor) <- levels(d$.study)
   if ( !missing(cor) && length(miss_names <- setdiff(names(cor), levels(d$.study) )) )
     abort(glue::glue("`cor` list names must match study names in `data`.\n",
                      "Mismatched for stud{if (length(miss_names)>1) 'ies' else 'y'} ",
