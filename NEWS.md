@@ -1,5 +1,10 @@
 # multinma 0.9.1.9000
 
+* Feature: New function `bind_chains()` combines multiple runs of the same model
+into a single model object. For MCMC arrays, a new `cbind.mcmc_array()` method
+combines multiple MCMC arrays containing samples of the same parameters into a 
+single MCMC array.
+
 # multinma 0.9.1
 
 * Fix: UBSAN warnings in CRAN additional tests, caused by unnecessary indexing
