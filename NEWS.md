@@ -1,5 +1,9 @@
 # multinma 0.9.1.9000
 
+* Feature: New function `bind_chains()` combines multiple runs of the same model
+into a single model object. For MCMC arrays, a new `cbind.mcmc_array()` method
+combines multiple MCMC arrays containing samples of the same parameters into a 
+single MCMC array.
 * Improvement: `relative_effects()` now works when `newdata` contains
 integration points. Furthermore, `relative_effects()` will now ask for 
 integration points to be provided for models that involve non-linear covariate 
