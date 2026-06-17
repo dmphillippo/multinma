@@ -584,7 +584,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         }
       } else {
         EM_formula <- as.formula(paste0("~", paste(EM_vars, collapse = " + ")))
-        study_EMs <- model.frame(EM_formula, data = newdata)
+        study_EMs <- c(model.frame(EM_formula, data = newdata))
       }
 
       study_EMs <- tibble::as_tibble(study_EMs) %>%
