@@ -14,8 +14,8 @@ bind_chains(...)
 }
 \arguments{
 \item{...}{Multiple fitted \link{stan_nma} model objects (for \code{bind_chains()}) or
-\link{mcmc_array} arrays (for \code{cbind.mcmc_array()}). Both functions also accept a
-single list as input, containing the objects to combine.}
+\link{mcmc_array} arrays (for \code{cbind.mcmc_array()}). \code{bind_chains()} also accepts
+a single list as input, containing the objects to combine.}
 }
 \value{
 A \link{stan_nma} or \link{mcmc_array} object.

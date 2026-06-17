@@ -9,8 +9,8 @@
 #' that both the model specification and input data must be the same.
 #'
 #' @param ... Multiple fitted [stan_nma] model objects (for `bind_chains()`) or
-#' [mcmc_array] arrays (for `cbind.mcmc_array()`). Both functions also accept a
-#' single list as input, containing the objects to combine.
+#' [mcmc_array] arrays (for `cbind.mcmc_array()`). `bind_chains()` also accepts
+#' a single list as input, containing the objects to combine.
 #'
 #' @return A [stan_nma] or [mcmc_array] object.
 #' @export
@@ -48,7 +48,6 @@ cbind.stan_nma <- function(...) {
 #' @export
 cbind.mcmc_array <- function(...) {
   a <- list(...)
-  if (length(a) == 1 && is.list(a[[1]])) a <- a[[1]]
 
   if (!all(purrr::map_lgl(a, inherits, "mcmc_array"))) abort("Can only combine mcmc_array objects.")
 
