@@ -16,7 +16,7 @@
 #' @export
 bind_chains <- function(...) {
   m <- list(...)
-  if (length(m) == 1 && is.list(m[[1]])) m <- m[[1]]
+  if (length(m) == 1 && rlang::is_bare_list(m[[1]])) m <- m[[1]]
 
   if (!all(purrr::map_lgl(m, inherits, "stan_nma"))) abort("Can only combine stan_nma objects.")
 
