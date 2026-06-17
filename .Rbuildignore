@@ -18,3 +18,5 @@
 ^docs$
 ^pkgdown$
 ^CITATION\.cff$
+^\.positai$
+^\.claude$

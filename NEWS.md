@@ -1,5 +1,10 @@
 # multinma 0.9.1.9000
 
+* Improvement: `relative_effects()` now works when `newdata` contains
+integration points. Furthermore, `relative_effects()` will now ask for 
+integration points to be provided for models that involve non-linear covariate 
+terms, so that these can be averaged over correctly. 
+
 # multinma 0.9.1
 
 * Fix: UBSAN warnings in CRAN additional tests, caused by unnecessary indexing

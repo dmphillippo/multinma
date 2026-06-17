@@ -284,7 +284,19 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
     } else {
       # Produce relative effects for all studies in newdata
 
-      dat_studies <- newdata
+      # If integration points provided, expand
+      if (inherits(newdata, "integration_tbl")) {
+        dat_all <- .unnest_integration(newdata) %>%
+          dplyr::mutate(.sample_size = 1)
+
+        # Take the first row for each study. We will correct the design matrix below
+        dat_studies <- dat_all %>%
+          dplyr::group_by(.data$.study) %>%
+          dplyr::slice(1)
+
+      } else {
+        dat_all <- dat_studies <- newdata
+      }
 
       # Check all variables are present
       regdat <- get_model_data_columns(dat_studies, regression = x$regression, label = "`newdata`")
@@ -309,6 +321,14 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
                                     consistency = x$consistency,
                                     classes = !is.null(x$network$classes),
                                     class_interactions = x$class_interactions)
+
+    # Check if regression model includes non-linear terms and warn if newdata
+    # does not include integration points
+    if (!is.null(newdata)) {
+      if (is_nonlinear(nma_formula, names(dat_all)) && !inherits(newdata, "integration_tbl"))
+        warn(c("Fitted model may be non-linear in the covariates.",
+               "Add integration points to `newdata` with add_integration() to produce population-average conditional treatment effects."))
+    }
 
     # If `newdata` was not supplied, relative effects are calculated for each study, and
     # the baseline risk meta-regression columns in the design matrix are 0/1 values.
@@ -397,7 +417,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       EM_vars <- get_EM_vars(nma_formula)
 
       # Replace EM design matrix with study means if newdata is NULL
-      if (is.null(newdata)) {
+      if (is.null(newdata) || inherits(newdata, "integration_tbl")) {
 
         # Apply centering if used
         dat_all_cen <- dat_all
@@ -407,7 +427,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         }
 
         # Get model matrix of EM "main effects" - notably this expands out factors
-        # into dummy variables so we can average those too
+        # into dummy variables and computes any variable transformations so we can average those too
         EM_formula <- as.formula(paste0("~", paste(EM_vars, collapse = " + ")))
 
         # Calculate mean covariate values by study in the network
@@ -430,6 +450,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         # This works only because trt columns are 0/1, so interactions are just the covariate values
         nonzero <- X_EM != 0
         X_EM[nonzero] <- X_study_means_rep[nonzero]
+
       }
 
       # Name columns to match Stan parameters
@@ -553,7 +574,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       }
 
       # Prepare study covariate info
-      if (is.null(newdata)) {
+      if (is.null(newdata) || inherits(newdata, "integration_tbl")) {
         study_EMs <- X_study_means
 
         # Uncenter if necessary
@@ -562,7 +583,8 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
           study_EMs[, cen_vars] <- sweep(study_EMs[, cen_vars, drop = FALSE], 2, x$xbar[cen_vars], FUN = "+")
         }
       } else {
-        study_EMs <- newdata[EM_vars]
+        EM_formula <- as.formula(paste0("~", paste(EM_vars, collapse = " + ")))
+        study_EMs <- c(model.frame(EM_formula, data = newdata))
       }
 
       study_EMs <- tibble::as_tibble(study_EMs) %>%
@@ -698,4 +720,25 @@ get_delta_new <- function(x, ...) {
   class(delta_new) <- c("mcmc_array", class(delta_new))
 
   return(delta_new)
+}
+
+#' Check if a formula is non-linear in covariate terms
+#'
+#' This check is conservative. Any data transformation will be flagged - even
+#' those that are linear, e.g. I(x / 10) or factor(x).
+#'
+#' @param f Formula
+#' @param vars Character vector of variable names in input data
+#'
+#' @return TRUE if non-linear in vars, FALSE otherwise
+#' @noRd
+is_nonlinear <- function(f, vars) {
+  specials <- c(".study", ".trt", ".trtclass", ".omega", ".contr", ".mu")
+  tms <- attr(terms(f), "term.labels")
+
+  # grep any terms that aren't raw vars, specials, vars:special or special:vars
+  length(vars) > 0 && any(!tms %in% c(vars,
+                                      specials,
+                                      paste(rep(specials, each = length(vars)), vars, sep = ":"),
+                                      paste(vars, rep(specials, each = length(vars)), sep = ":")))
 }
