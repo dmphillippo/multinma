@@ -62,7 +62,9 @@ cbind.mcmc_array <- function(...) {
 
   # combine
   odims <- c(dims[1, 1], sum(dims[, 2]), dims[1, 3])
-  odimnames <- list(iterations = NULL, chains = NULL, parameters = nms[[1]])
+  odimnames <- list(iterations = NULL,
+                    chains = unlist(purrr::map(a, ~dimnames(.)[[2]])),
+                    parameters = nms[[1]])
 
   out <- array(dim = odims, dimnames = odimnames)
   chain <- 0
