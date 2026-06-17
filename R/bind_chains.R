@@ -71,6 +71,6 @@ cbind.mcmc_array <- function(...) {
     chain <- chain + dims[i, 2]
   }
 
-  class(out) <- "mcmc_array"
+  class(out) <- c("mcmc_array", class(out))
   return(out)
 }
