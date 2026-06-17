@@ -1,6 +1,7 @@
 # Example: White blood cell transfusion
 
 ``` r
+
 library(multinma)
 options(mc.cores = parallel::detectCores())
 ```
@@ -20,6 +21,7 @@ al. 2005](#ref-Stanworth2005); [Turner et al. 2012](#ref-Turner2012)).
 The data are available in this package as `transfusion`:
 
 ``` r
+
 head(transfusion)
 #>        studyc        trtc  r  n
 #> 1    Bow 1984 Transfusion  5 13
@@ -43,6 +45,7 @@ the total (`n`) in each arm, so we use the function
 We set “Control” as the reference treatment.
 
 ``` r
+
 tr_net <- set_agd_arm(transfusion, 
                            study = studyc,
                            trt = trtc,
@@ -87,6 +90,7 @@ parameter values implied by these prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -100,6 +104,7 @@ summary(half_normal(scale = 5))
 Fitting the RE model
 
 ``` r
+
 tr_fit_RE_noninf <- nma(tr_net, 
                         trt_effects = "random",
                         prior_intercept = normal(scale = 100),
@@ -111,6 +116,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 tr_fit_RE_noninf
 #> A random effects NMA with a binomial likelihood (logit link).
 #> Inference for Stan model: binomial_1par.
@@ -122,7 +128,7 @@ tr_fit_RE_noninf
 #> lp__           -134.50    0.09 3.11 -141.53 -136.37 -134.16 -132.24 -129.53  1098    1
 #> tau               1.87    0.04 1.09    0.56    1.16    1.63    2.29    4.73   650    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:14:07 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:55:57 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -133,6 +139,7 @@ study-specific relative effects \delta\_{jk} are hidden, but could be
 examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(tr_fit_RE_noninf, pars = c("d", "mu", "delta"))
 ```
@@ -142,6 +149,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(tr_fit_RE_noninf, prior = "het")
 ```
 
@@ -151,6 +159,7 @@ The posterior distribution for the heterogeneity variance \tau^2 is
 summarised by
 
 ``` r
+
 noninf_tau <- as.array(tr_fit_RE_noninf, pars = "tau")
 noninf_tausq <- noninf_tau^2
 names(noninf_tausq) <- "tausq"
@@ -168,6 +177,7 @@ prior distribution with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(log_normal(-3.93, 1.51))
 #> A log-Normal prior distribution: location = -3.93, scale = 1.51.
 #> 50% of the prior density lies between 0.01 and 0.05.
@@ -180,6 +190,7 @@ that this prior distribution is on the variance scale (instead of the
 standard deviation, the default).
 
 ``` r
+
 tr_fit_RE_inf <- nma(tr_net, 
                      trt_effects = "random",
                      prior_intercept = normal(scale = 100),
@@ -192,6 +203,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 tr_fit_RE_inf
 #> A random effects NMA with a binomial likelihood (logit link).
 #> Inference for Stan model: binomial_1par.
@@ -203,7 +215,7 @@ tr_fit_RE_inf
 #> lp__           -140.97    0.07 2.77 -147.30 -142.63 -140.64 -138.91 -136.61  1385    1
 #> tau               0.50    0.01 0.36    0.05    0.21    0.44    0.70    1.38  1654    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:14:09 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:56:00 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -214,6 +226,7 @@ study-specific relative effects \delta\_{jk} are hidden, but could be
 examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(tr_fit_RE_inf, pars = c("d", "mu", "delta"))
 ```
@@ -223,6 +236,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(tr_fit_RE_inf, prior = "het")
 ```
 
@@ -235,6 +249,7 @@ The posterior distribution for the heterogeneity variance \tau^2 is
 summarised by
 
 ``` r
+
 inf_tau <- as.array(tr_fit_RE_inf, pars = "tau")
 inf_tausq <- inf_tau^2
 names(inf_tausq) <- "tausq"
@@ -245,11 +260,10 @@ summary(inf_tausq)
 
 ## References
 
-Stanworth, S., E. Massey, C. Hyde, S. J. Brunskill, C. Navarette, G.
-Lucas, D. Marks, and U. Paulus. 2005. “Granulocyte Transfusions for
-Treating Infections in Patients with Neutropenia or Neutrophil
-Dysfunction.” *Cochrane Database of Systematic Reviews*, no. 3.
-<https://doi.org/10.1002/14651858.CD005339>.
+Stanworth, S., E. Massey, C. Hyde, et al. 2005. “Granulocyte
+Transfusions for Treating Infections in Patients with Neutropenia or
+Neutrophil Dysfunction.” *Cochrane Database of Systematic Reviews*, no.
+3. <https://doi.org/10.1002/14651858.CD005339>.
 
 Turner, R. M., J. Davey, M. J. Clarke, S. G. Thompson, and J. P. T.
 Higgins. 2012. “Predicting the Extent of Heterogeneity in Meta-Analysis,

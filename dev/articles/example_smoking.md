@@ -1,6 +1,7 @@
 # Example: Smoking cessation
 
 ``` r
+
 library(multinma)
 options(mc.cores = parallel::detectCores())
 ```
@@ -19,6 +20,7 @@ NICE Technical Support Document 4 ([Dias et al. 2011](#ref-TSD4)). The
 data are available in this package as `smoking`:
 
 ``` r
+
 head(smoking)
 #>   studyn trtn                   trtc  r   n
 #> 1      1    1        No intervention  9 140
@@ -38,6 +40,7 @@ we use the function
 Treatment “No intervention” is set as the network reference treatment.
 
 ``` r
+
 smknet <- set_agd_arm(smoking, 
                       study = studyn,
                       trt = trtc,
@@ -72,6 +75,7 @@ smknet
 Plot the network structure.
 
 ``` r
+
 plot(smknet, weight_edges = TRUE, weight_nodes = TRUE)
 ```
 
@@ -89,6 +93,7 @@ range of parameter values implied by these prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -96,6 +101,7 @@ summary(normal(scale = 100))
 ```
 
 ``` r
+
 summary(half_normal(scale = 5))
 #> A half-Normal prior distribution: scale = 5.
 #> 50% of the prior density lies between 0 and 3.37.
@@ -108,6 +114,7 @@ function. By default, this will use a Binomial likelihood and a logit
 link function, auto-detected from the data.
 
 ``` r
+
 smkfit <- nma(smknet, 
               trt_effects = "random",
               prior_intercept = normal(scale = 100),
@@ -119,6 +126,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 smkfit
 #> A random effects NMA with a binomial likelihood (logit link).
 #> Inference for Stan model: binomial_1par.
@@ -138,7 +146,7 @@ smkfit
 #> lp__                       1137 1.01
 #> tau                        1067 1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:05:50 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:46:55 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -149,6 +157,7 @@ study-specific relative effects \delta\_{jk} are hidden, but could be
 examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(smkfit, pars = c("d", "tau", "mu", "delta"))
 ```
@@ -158,6 +167,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(smkfit)
 ```
 
@@ -168,6 +178,7 @@ By default, this displays all model parameters given prior distributions
 `prior` argument:
 
 ``` r
+
 plot_prior_posterior(smkfit, prior = "het")
 ```
 
@@ -178,6 +189,7 @@ Model fit can be checked using the
 function
 
 ``` r
+
 (dic_consistency <- dic(smkfit))
 #> Residual deviance: 53.5 (on 50 data points)
 #>                pD: 43.5
@@ -188,6 +200,7 @@ and the residual deviance contributions examined with the corresponding
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method
 
 ``` r
+
 plot(dic_consistency)
 ```
 
@@ -199,6 +212,7 @@ with higher residual deviance (i.e. worse fit) correspond to the two
 zero counts in the data:
 
 ``` r
+
 smoking[smoking$r == 0, ]
 #>    studyn trtn            trtc r  n
 #> 13      6    1 No intervention 0 33
@@ -225,6 +239,7 @@ the function
 but now with the argument `consistency = "ume"`.
 
 ``` r
+
 smkfit_ume <- nma(smknet, 
                   consistency = "ume",
                   trt_effects = "random",
@@ -257,7 +272,7 @@ smkfit_ume
 #> lp__                                            -5764.97 -5760.84 -5753.71   898    1
 #> tau                                                 0.90     1.05     1.45  1123    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:05:58 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:47:04 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -266,6 +281,7 @@ smkfit_ume
 Comparing the model fit statistics
 
 ``` r
+
 dic_consistency
 #> Residual deviance: 53.5 (on 50 data points)
 #>                pD: 43.5
@@ -285,6 +301,7 @@ function to the [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
 method produces this dev-dev plot:
 
 ``` r
+
 plot(dic_consistency, dic_ume, point_alpha = 0.5, interval_alpha = 0.2)
 ```
 
@@ -310,6 +327,7 @@ function). Alternatively, a specific comparison or comparisons to split
 can be provided to the `nodesplit` argument.
 
 ``` r
+
 smk_nodesplit <- nma(smknet, 
                      consistency = "nodesplit",
                      trt_effects = "random",
@@ -336,6 +354,7 @@ under each node-split model and under the consistency model is also
 displayed. The DIC model fit statistics are also provided.
 
 ``` r
+
 summary(smk_nodesplit)
 #> Node-splitting models fitted for 6 comparisons.
 #> 
@@ -451,6 +470,7 @@ network (consistency) estimate is very similar to the direct estimate
 for this comparison.
 
 ``` r
+
 plot(smk_nodesplit) +
   ggplot2::theme(legend.position = "bottom", legend.direction = "horizontal")
 ```
@@ -463,6 +483,7 @@ Pairwise relative effects, for all pairwise contrasts with
 `all_contrasts = TRUE`.
 
 ``` r
+
 (smk_releff <- relative_effects(smkfit, all_contrasts = TRUE))
 #>                                                  mean   sd  2.5%   25%   50%   75% 97.5%
 #> d[Group counselling vs. No intervention]         1.11 0.45  0.22  0.82  1.10  1.40  2.05
@@ -488,6 +509,7 @@ probabilities. We set `lower_better = FALSE` since a higher log odds of
 cessation is better (the outcome is positive).
 
 ``` r
+
 (smk_ranks <- posterior_ranks(smkfit, lower_better = FALSE))
 #>                              mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> rank[No intervention]        3.88 0.33    3   4   4   4     4     2240       NA    1
@@ -500,6 +522,7 @@ plot(smk_ranks)
 ![](example_smoking_files/figure-html/smoking_ranks-1.png)
 
 ``` r
+
 (smk_rankprobs <- posterior_rank_probs(smkfit, lower_better = FALSE))
 #>                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]
 #> d[No intervention]             0.00      0.00      0.11      0.88
@@ -512,6 +535,7 @@ plot(smk_rankprobs)
 ![](example_smoking_files/figure-html/smoking_rankprobs-1.png)
 
 ``` r
+
 (smk_cumrankprobs <- posterior_rank_probs(smkfit, lower_better = FALSE, cumulative = TRUE))
 #>                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]
 #> d[No intervention]             0.00      0.00      0.12         1
@@ -530,8 +554,8 @@ Consistency in Mixed Treatment Comparison Meta-Analysis.” *Statistics in
 Medicine* 29 (7-8): 932–44. <https://doi.org/10.1002/sim.3767>.
 
 Dias, S., N. J. Welton, A. J. Sutton, D. M. Caldwell, G. Lu, and A. E.
-Ades. 2011. “NICE DSU Technical Support Document 4: Inconsistency in
-Networks of Evidence Based on Randomised Controlled Trials.” National
+Ades. 2011. *NICE DSU Technical Support Document 4: Inconsistency in
+Networks of Evidence Based on Randomised Controlled Trials*. National
 Institute for Health and Care Excellence.
 <https://sheffield.ac.uk/nice-dsu>.
 

@@ -1,6 +1,7 @@
 # Example: Atrial fibrillation
 
 ``` r
+
 library(multinma)
 options(mc.cores = parallel::detectCores())
 ```
@@ -19,6 +20,7 @@ atrial fibrillation ([Cooper et al. 2009](#ref-Cooper2009)). The data
 are available in this package as `atrial_fibrillation`:
 
 ``` r
+
 head(atrial_fibrillation)
 #>     studyc studyn                                  trtc trtn      trt_class   r    n    E
 #> 1 ACTIVE-W      1 Standard adjusted dose anti-coagulant    3 Anti-coagulant  65 3371 4200
@@ -51,6 +53,7 @@ to set up the network, making sure to specify the treatment classes
 zero events, and this study therefore contributes no information.
 
 ``` r
+
 af_net <- set_agd_arm(atrial_fibrillation[atrial_fibrillation$studyc != "WASPO", ], 
                       study = studyc,
                       trt = trtc,
@@ -92,6 +95,7 @@ Plot the network with the
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method:
 
 ``` r
+
 plot(af_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) + 
   ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
 ```
@@ -121,6 +125,7 @@ implied by these prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -137,6 +142,7 @@ function. We increase the target acceptance rate `adapt_delta = 0.99` to
 minimise divergent transition warnings.
 
 ``` r
+
 af_fit_1 <- nma(af_net, 
                 trt_effects = "random",
                 prior_intercept = normal(scale = 100),
@@ -151,6 +157,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 af_fit_1
 #> A random effects NMA with a binomial likelihood (logit link).
 #> Inference for Stan model: binomial_1par.
@@ -196,7 +203,7 @@ af_fit_1
 #> lp__                                         -4766.76 -4758.57  2386    1
 #> tau                                              0.36     0.57  1635    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:56:17 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:37:17 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -207,6 +214,7 @@ study-specific relative effects \delta\_{jk} are hidden, but could be
 examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(af_fit_1, pars = c("d", "mu", "delta"))
 ```
@@ -216,6 +224,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(af_fit_1, prior = c("trt", "het"))
 ```
 
@@ -226,6 +235,7 @@ We can compute relative effects against placebo/standard care with the
 function with the `trt_ref` argument:
 
 ``` r
+
 (af_1_releff <- relative_effects(af_fit_1, trt_ref = "Placebo/Standard care"))
 #>                                               mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS
 #> d[Standard adjusted dose anti-coagulant]     -0.76 0.20 -1.16 -0.89 -0.76 -0.63 -0.36     3734
@@ -267,6 +277,7 @@ These estimates can easily be plotted with the
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method:
 
 ``` r
+
 plot(af_1_releff, ref_line = 0)
 ```
 
@@ -276,6 +287,7 @@ We can also produce treatment rankings, rank probabilities, and
 cumulative rank probabilities.
 
 ``` r
+
 (af_1_ranks <- posterior_ranks(af_fit_1))
 #>                                                  mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS
 #> rank[Standard adjusted dose anti-coagulant]      5.30 1.42    3   4   5   6     8     6202
@@ -319,6 +331,7 @@ plot(af_1_ranks)
 ![](example_atrial_fibrillation_files/figure-html/af_1_ranks-1.png)
 
 ``` r
+
 (af_1_rankprobs <- posterior_rank_probs(af_fit_1))
 #>                                              p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]
 #> d[Standard adjusted dose anti-coagulant]          0.00      0.01      0.08      0.20      0.28
@@ -398,6 +411,7 @@ plot(af_1_rankprobs)
 ![](example_atrial_fibrillation_files/figure-html/af_1_rankprobs-1.png)
 
 ``` r
+
 (af_1_cumrankprobs <- posterior_rank_probs(af_fit_1, cumulative = TRUE))
 #>                                              p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]
 #> d[Standard adjusted dose anti-coagulant]          0.00      0.01      0.09      0.29      0.58
@@ -502,6 +516,7 @@ with `QR = TRUE`, and increase the target acceptance rate
 `adapt_delta = 0.99` to minimise divergent transition warnings.
 
 ``` r
+
 af_fit_4b <- nma(af_net, 
                  trt_effects = "random",
                  regression = ~ .trt:stroke,
@@ -523,6 +538,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 af_fit_4b
 #> A random effects NMA with a binomial likelihood (logit link).
 #> Regression model: ~.trt:stroke.
@@ -578,7 +594,7 @@ af_fit_4b
 #> lp__                                         -4766.36 -4758.07  1138 1.00
 #> tau                                              0.26     0.50   330 1.02
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:56:35 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:37:32 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -593,6 +609,7 @@ study-specific relative effects \delta\_{jk} are hidden, but could be
 examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(af_fit_4b, pars = c("d", "mu", "delta"))
 ```
@@ -602,6 +619,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(af_fit_4b, prior = c("reg", "het"))
 ```
 
@@ -613,6 +631,7 @@ function with the `trt_ref` argument, which by default produces relative
 effects for the observed proportions of prior stroke in each study:
 
 ``` r
+
 # Not run
 (af_4b_releff <- relative_effects(af_fit_4b, trt_ref = "Placebo/Standard care"))
 plot(af_4b_releff, ref_line = 0)
@@ -623,6 +642,7 @@ values using the `newdata` argument. For example, treatment effects when
 no individuals or all individuals have prior stroke are produced by
 
 ``` r
+
 (af_4b_releff_01 <- relative_effects(af_fit_4b, 
                                      trt_ref = "Placebo/Standard care",
                                      newdata = data.frame(stroke = c(0, 1), 
@@ -718,6 +738,7 @@ The estimated class interactions (against the reference “Mixed” class)
 are very uncertain.
 
 ``` r
+
 plot(af_fit_4b, pars = "beta", stat = "halfeye", ref_line = 0)
 ```
 
@@ -728,6 +749,7 @@ the interaction coefficients (using the consistency equations) so that
 they are against the control class:
 
 ``` r
+
 af_4b_beta <- as.array(af_fit_4b, pars = "beta")
 
 # Subtract beta[Control:stroke] from the other class interactions
@@ -770,6 +792,7 @@ no individuals or all individuals have prior stroke, we specify the
 `newdata` argument.
 
 ``` r
+
 (af_4b_ranks <- posterior_ranks(af_fit_4b,
                                 newdata = data.frame(stroke = c(0, 1), 
                                                      label = c("stroke = 0", "stroke = 1")), 
@@ -865,6 +888,7 @@ plot(af_4b_ranks)
 ![](example_atrial_fibrillation_files/figure-html/af_4b_ranks-1.png)
 
 ``` r
+
 (af_4b_rankprobs <- posterior_rank_probs(af_fit_4b,
                                          newdata = data.frame(stroke = c(0, 1), 
                                                               label = c("stroke = 0", "stroke = 1")), 
@@ -1109,6 +1133,7 @@ plot(af_4b_rankprobs) +
 ![](example_atrial_fibrillation_files/figure-html/af_4b_rankprobs-1.png)
 
 ``` r
+
 (af_4b_cumrankprobs <- posterior_rank_probs(af_fit_4b, cumulative = TRUE,
                                             newdata = data.frame(stroke = c(0, 1), 
                                                                  label = c("stroke = 0", "stroke = 1")), 
@@ -1357,6 +1382,7 @@ Model fit can be checked using the
 function:
 
 ``` r
+
 (af_dic_1 <- dic(af_fit_1))
 #> Residual deviance: 60.5 (on 61 data points)
 #>                pD: 48.7
@@ -1364,6 +1390,7 @@ function:
 ```
 
 ``` r
+
 (af_dic_4b <- dic(af_fit_4b))
 #> Residual deviance: 58.3 (on 61 data points)
 #>                pD: 48.3
@@ -1383,12 +1410,14 @@ corresponding [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
 method.
 
 ``` r
+
 plot(af_dic_1)
 ```
 
 ![](example_atrial_fibrillation_files/figure-html/af_1_resdev_plot-1.png)
 
 ``` r
+
 plot(af_dic_4b)
 ```
 

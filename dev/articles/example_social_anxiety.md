@@ -6,6 +6,7 @@ adults ([Mayo-Wilson et al. 2014](#ref-mayo2014psychological)). The data
 are available in this package as `social_anxiety`:
 
 ``` r
+
 head(social_anxiety)
 #> # A tibble: 6 × 8
 #>   studyn studyc          trtn      y     se trtc                            classn classc      
@@ -36,6 +37,7 @@ classes with `trt_class = classc` and set `Waitlist` as the network
 reference treatment.
 
 ``` r
+
 sa_net <- set_agd_contrast(social_anxiety,
                            study = studyc, 
                            trt = trtc,
@@ -74,6 +76,7 @@ sa_net
 We create a plot at the class level by setting `level = "class"`.
 
 ``` r
+
 plot(sa_net, level = "class") + 
   theme(legend.position = "bottom", legend.box = "vertical")
 ```
@@ -98,6 +101,7 @@ the treatment effects with `prior_trt = normal(0, 100)` and
 heterogeneity with `prior_het = half_normal(5)`.
 
 ``` r
+
 set.seed(951)
 sa_fit_FE <- nma(sa_net,
                  trt_effects = "fixed",
@@ -117,6 +121,7 @@ The model fit under the FE and RE models can be checked using the
 function.
 
 ``` r
+
 (sa_dic_FE <- dic(sa_fit_FE))
 #> Residual deviance: 288.1 (on 147 data points)
 #>                pD: 39.9
@@ -140,6 +145,7 @@ NMA (consistency) model, both with RE. To fit a UME model we specify
 `consistency = "ume"`.
 
 ``` r
+
 sa_UME_RE <- nma(sa_net,
                  trt_effects = "random",
                  consistency = "ume",
@@ -153,6 +159,7 @@ model using the
 function and \tau.
 
 ``` r
+
 (sa_dic_RE <- dic(sa_fit_RE))
 #> Residual deviance: 162.6 (on 147 data points)
 #>                pD: 94.3
@@ -181,6 +188,7 @@ produces a “dev-dev” plot of the residual deviance contributions for the
 UME model plotted against the NMA consistency model.
 
 ``` r
+
 plot(sa_dic_RE, sa_dic_ume_RE, show_uncertainty = FALSE) +
   xlab("Residual deviance - No Class model") +
   ylab("Residual deviance - UME model")
@@ -193,6 +201,7 @@ model and no-class model shows that most data points lie close to the
 line of equality.
 
 ``` r
+
 as.data.frame(sa_dic_RE) %>%
   arrange(desc(resdev)) %>%
   head(5)
@@ -221,6 +230,7 @@ the `nodesplit` argument within the
 function.
 
 ``` r
+
 EMMELKAMP2006 <- data.frame(
   Treatment_1 = c("CBT individual", "Waitlist", "Waitlist"),
   Treatment_2 = c("Psychodynamic psychotherapy", "Psychodynamic psychotherapy", "CBT individual")
@@ -253,6 +263,7 @@ sa_fit_RE_nodesplit_ALDEN <- nma(sa_net,
 ```
 
 ``` r
+
 summary(sa_fit_RE_nodesplit_ALDEN)
 #> Node-splitting model fitted for 1 comparison: CBT group vs. Waitlist.
 #> 
@@ -340,6 +351,7 @@ For the class effects means, `prior_class_mean` is set as \mathrm{N}(0,
 10^2).
 
 ``` r
+
 sa_fit_EXclass_RE <- nma(sa_net,
                          trt_effects = "random",
                          prior_trt = normal(0, 100),
@@ -363,6 +375,7 @@ class RE model using the
 function and \tau.
 
 ``` r
+
 (sa_dic_EXclass_RE <- dic(sa_fit_EXclass_RE))
 #> Residual deviance: 163.4 (on 147 data points)
 #>                pD: 88.2
@@ -386,6 +399,7 @@ contributions for the Exchangeable class model plotted against the no
 class model.
 
 ``` r
+
 plot(sa_dic_EXclass_RE, sa_dic_RE, show_uncertainty = FALSE) +
   xlab("Residual deviance - Exchangeable Class model") +
   ylab("Residual deviance - No Class model")
@@ -411,6 +425,7 @@ gives us a total of 3 models to compare. Exchangeable class FE,
 Exchangeable class RE and Common class RE.
 
 ``` r
+
 sa_fit_COclass_RE <- nma(sa_net,
                          trt_effects = "random",
                          prior_trt = normal(0, 100),
@@ -440,6 +455,7 @@ function and evaluate \tau in the common class RE model and the
 exchangeable class RE model.
 
 ``` r
+
 (sa_dic_COclass_RE <- dic(sa_fit_COclass_RE))
 #> Residual deviance: 157.7 (on 147 data points)
 #>                pD: 93
@@ -472,6 +488,7 @@ produce a “dev-dev” plot of the residual deviance contributions for the
 Exchangeable class model plotted against the no class model.
 
 ``` r
+
 plot(sa_dic_COclass_RE, sa_dic_EXclass_RE, show_uncertainty = FALSE) +
   xlab("Residual deviance - Common Class model") +
   ylab("Residual deviance - Exchangeable Class model")
@@ -498,6 +515,7 @@ function, and can be plotted using
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html).
 
 ``` r
+
 plot(relative_effects(sa_fit_EXclass_RE), ref_line = 0)
 ```
 
@@ -510,6 +528,7 @@ using [`plot()`](https://rdrr.io/r/graphics/plot.default.html) with
 `pars = "class_mean"` to select these parameters.
 
 ``` r
+
 plot(sa_fit_EXclass_RE,
      pars = "class_mean",
      ref_line = 0)
@@ -521,6 +540,7 @@ We can combine the treatment and class effects into a single plot as
 follows:
 
 ``` r
+
 # Relative treatment effects
 trt_eff <- as_tibble(relative_effects(sa_fit_EXclass_RE)) %>% 
   # Add in class details
@@ -560,6 +580,7 @@ point-range plot and derive the rank probability distributions for each
 treatment class, which we then plot.
 
 ``` r
+
 # Class means
 EXclass_mean <- as.matrix(sa_fit_EXclass_RE, pars = "class_mean")
 
@@ -596,6 +617,7 @@ classes, aside from the reference.
 We now calculate and plot the class rank probabilities.
 
 ``` r
+
 EXranks_df <- as.data.frame(EXranks)
 
 # Rank probabilities for class
@@ -636,11 +658,10 @@ higher probability of lower rankings.
 
 ## References
 
-Mayo-Wilson, Evan, Sofia Dias, Ifigeneia Mavranezouli, Kayleigh Kew,
-David M Clark, AE Ades, and Stephen Pilling. 2014. “Psychological and
-Pharmacological Interventions for Social Anxiety Disorder in Adults: A
-Systematic Review and Network Meta-Analysis.” *The Lancet Psychiatry* 1
-(5): 368–76.
+Mayo-Wilson, Evan, Sofia Dias, Ifigeneia Mavranezouli, et al. 2014.
+“Psychological and Pharmacological Interventions for Social Anxiety
+Disorder in Adults: A Systematic Review and Network Meta-Analysis.” *The
+Lancet Psychiatry* 1 (5): 368–76.
 
 Perren, Samuel J., Hugo Pedder, Nicky J. Welton, and David M. Phillippo.
 2025. “Network Meta-Analysis with Class Effects: A Practical Guide and

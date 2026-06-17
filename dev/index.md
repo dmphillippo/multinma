@@ -13,6 +13,7 @@ You can install the released version of `multinma` from
 [CRAN](https://CRAN.R-project.org/package=multinma) with:
 
 ``` r
+
 install.packages("multinma")
 ```
 
@@ -20,6 +21,7 @@ The development version can be installed from
 [R-universe](https://dmphillippo.r-universe.dev) with:
 
 ``` r
+
 install.packages("multinma", repos = c("https://dmphillippo.r-universe.dev", getOption("repos")))
 ```
 
@@ -27,6 +29,7 @@ or from source on [GitHub](https://github.com/dmphillippo/multinma)
 with:
 
 ``` r
+
 # install.packages("devtools")
 devtools::install_github("dmphillippo/multinma")
 ```

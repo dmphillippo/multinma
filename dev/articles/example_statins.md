@@ -1,6 +1,7 @@
 # Example: Statins for cholesterol lowering
 
 ``` r
+
 library(multinma)
 options(mc.cores = parallel::detectCores())
 ```
@@ -18,6 +19,7 @@ placebo or usual care ([Dias et al. 2011](#ref-TSD3)). The data are
 available in this package as `statins`:
 
 ``` r
+
 head(statins)
 #>   studyn    studyc trtn    trtc prevention   r    n
 #> 1      1        4S    1 Placebo  Secondary 256 2223
@@ -41,6 +43,7 @@ to set up the network. We set placebo as the network reference
 treatment.
 
 ``` r
+
 statin_net <- set_agd_arm(statins, 
                           study = studyc,
                           trt = trtc,
@@ -90,6 +93,7 @@ distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -105,6 +109,7 @@ will be included; the `.trt` special variable indicates treatment, and
 `prevention` is in the original data set.
 
 ``` r
+
 statin_fit_FE <- nma(statin_net, 
                      trt_effects = "fixed",
                      regression = ~.trt:prevention,
@@ -119,6 +124,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 statin_fit_FE
 #> A fixed effects NMA with a binomial likelihood (logit link).
 #> Regression model: ~.trt:prevention.
@@ -135,7 +141,7 @@ statin_fit_FE
 #> d[Statin]                                0.09  2463    1
 #> lp__                                 -7241.06  1543    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:12:39 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:54:08 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -145,6 +151,7 @@ By default, summaries of the study-specific intercepts \mu_j are hidden,
 but could be examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(statin_fit_FE, pars = c("d", "beta", "mu"))
 ```
@@ -154,6 +161,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(statin_fit_FE, prior = c("trt", "reg"))
 ```
 
@@ -170,6 +178,7 @@ distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -187,6 +196,7 @@ to 0.99 to remove a small number of divergent transition errors (the
 default for RE models is set to 0.95).
 
 ``` r
+
 statin_fit_RE <- nma(statin_net, 
                      trt_effects = "random",
                      regression = ~.trt:prevention,
@@ -203,6 +213,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 statin_fit_RE
 #> A random effects NMA with a binomial likelihood (logit link).
 #> Regression model: ~.trt:prevention.
@@ -221,7 +232,7 @@ statin_fit_RE
 #> lp__                                 -7246.03   863 1.01
 #> tau                                      0.77   667 1.01
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:12:44 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:54:14 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -232,6 +243,7 @@ study-specific relative effects \delta\_{jk} are hidden, but could be
 examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(statin_fit_RE, pars = c("d", "beta", "mu", "delta"))
 ```
@@ -241,6 +253,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(statin_fit_RE, prior = c("trt", "reg", "het"))
 ```
 
@@ -253,6 +266,7 @@ Model fit can be checked using the
 function:
 
 ``` r
+
 (statin_dic_FE <- dic(statin_fit_FE))
 #> Residual deviance: 45.9 (on 38 data points)
 #>                pD: 21.6
@@ -260,6 +274,7 @@ function:
 ```
 
 ``` r
+
 (statin_dic_RE <- dic(statin_fit_RE))
 #> Residual deviance: 42.5 (on 38 data points)
 #>                pD: 25
@@ -276,12 +291,14 @@ corresponding [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
 method.
 
 ``` r
+
 plot(statin_dic_FE)
 ```
 
 ![](example_statins_files/figure-html/statin_FE_resdev_plot-1.png)
 
 ``` r
+
 plot(statin_dic_RE)
 ```
 
@@ -303,6 +320,7 @@ levels of the covariate `prevention` that we are interested in, and the
 informative label.
 
 ``` r
+
 statin_releff_FE <- relative_effects(statin_fit_FE,
                                      newdata = data.frame(prevention = c("Primary", "Secondary")),
                                      study = prevention)
@@ -331,6 +349,7 @@ The [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method may
 be used to visually compare these estimates:
 
 ``` r
+
 plot(statin_releff_FE, 
      ref_line = 0)
 ```
@@ -341,6 +360,7 @@ Model parameters may be plotted with the corresponding
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method:
 
 ``` r
+
 plot(statin_fit_FE, 
      pars = "beta", 
      ref_line = 0,
@@ -354,7 +374,7 @@ that statins are more effective for secondary prevention.
 
 ## References
 
-Dias, S., A. J. Sutton, N. J. Welton, and A. E. Ades. 2011. “NICE DSU
+Dias, S., A. J. Sutton, N. J. Welton, and A. E. Ades. 2011. *NICE DSU
 Technical Support Document 3: Heterogeneity: Subgroups, Meta-Regression,
-Bias and Bias-Adjustment.” National Institute for Health and Care
+Bias and Bias-Adjustment*. National Institute for Health and Care
 Excellence. <https://sheffield.ac.uk/nice-dsu>.

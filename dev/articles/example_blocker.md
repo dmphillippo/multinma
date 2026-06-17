@@ -1,6 +1,7 @@
 # Example: Beta blockers
 
 ``` r
+
 library(multinma)
 options(mc.cores = parallel::detectCores())
 library(ggplot2)
@@ -20,6 +21,7 @@ blockers to control for preventing mortality after myocardial infarction
 data are available in this package as `blocker`:
 
 ``` r
+
 head(blocker)
 #>   studyn trtn         trtc  r   n
 #> 1      1    1      Control  3  39
@@ -39,6 +41,7 @@ the total (`n`) in each arm, so we use the function
 We set “Control” as the reference treatment.
 
 ``` r
+
 blocker_net <- set_agd_arm(blocker, 
                            study = studyn,
                            trt = trtc,
@@ -85,6 +88,7 @@ by these prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -97,6 +101,7 @@ function. By default, this will use a Binomial likelihood and a logit
 link function, auto-detected from the data.
 
 ``` r
+
 blocker_fit_FE <- nma(blocker_net, 
                    trt_effects = "fixed",
                    prior_intercept = normal(scale = 100),
@@ -107,6 +112,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 blocker_fit_FE
 #> A fixed effects NMA with a binomial likelihood (logit link).
 #> Inference for Stan model: binomial_1par.
@@ -117,7 +123,7 @@ blocker_fit_FE
 #> d[Beta Blocker]    -0.26    0.00 0.05    -0.36    -0.30    -0.26    -0.23    -0.16  3693    1
 #> lp__            -5960.39    0.09 3.48 -5968.17 -5962.42 -5960.09 -5957.94 -5954.57  1363    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:57:26 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:38:18 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -127,6 +133,7 @@ By default, summaries of the study-specific intercepts \mu_j are hidden,
 but could be examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(blocker_fit_FE, pars = c("d", "mu"))
 ```
@@ -136,6 +143,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(blocker_fit_FE, prior = "trt")
 ```
 
@@ -154,6 +162,7 @@ prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -167,6 +176,7 @@ summary(half_normal(scale = 5))
 Fitting the RE model
 
 ``` r
+
 blocker_fit_RE <- nma(blocker_net, 
                    trt_effects = "random",
                    prior_intercept = normal(scale = 100),
@@ -178,6 +188,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 blocker_fit_RE
 #> A random effects NMA with a binomial likelihood (logit link).
 #> Inference for Stan model: binomial_1par.
@@ -189,7 +200,7 @@ blocker_fit_RE
 #> lp__            -5970.70    0.17 5.66 -5982.57 -5974.43 -5970.52 -5966.81 -5960.34  1072    1
 #> tau                 0.13    0.00 0.08     0.01     0.07     0.13     0.19     0.31   928    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:57:29 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:38:21 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -200,6 +211,7 @@ study-specific relative effects \delta\_{jk} are hidden, but could be
 examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(blocker_fit_RE, pars = c("d", "mu", "delta"))
 ```
@@ -209,6 +221,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(blocker_fit_RE, prior = c("trt", "het"))
 ```
 
@@ -221,6 +234,7 @@ Model fit can be checked using the
 function:
 
 ``` r
+
 (dic_FE <- dic(blocker_fit_FE))
 #> Residual deviance: 46.8 (on 44 data points)
 #>                pD: 23.1
@@ -228,6 +242,7 @@ function:
 ```
 
 ``` r
+
 (dic_RE <- dic(blocker_fit_RE))
 #> Residual deviance: 41.8 (on 44 data points)
 #>                pD: 28.1
@@ -245,12 +260,14 @@ corresponding [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
 method.
 
 ``` r
+
 plot(dic_FE)
 ```
 
 ![](example_blocker_files/figure-html/blocker_FE_resdev_plot-1.png)
 
 ``` r
+
 plot(dic_RE)
 ```
 
@@ -269,6 +286,7 @@ Leverage plots can also be produced with the
 `type = "leverage"`.
 
 ``` r
+
 plot(dic_FE, type = "leverage") + 
   # Add labels for points outside DIC=3
   geom_text(aes(label = parameter), data = ~subset(., dic > 3), vjust = -0.5)
@@ -277,6 +295,7 @@ plot(dic_FE, type = "leverage") +
 ![](example_blocker_files/figure-html/blocker_leverage_FE-1.png)
 
 ``` r
+
 plot(dic_RE, type = "leverage") + 
   # Add labels for points outside DIC=3
   geom_text(aes(label = parameter), data = ~subset(., dic > 3), vjust = -0.5)
@@ -312,6 +331,7 @@ distribution. We set `type = "response"` to produce predicted
 probabilities (`type = "link"` would produce predicted log odds).
 
 ``` r
+
 pred_FE <- predict(blocker_fit_FE, 
                    baseline = distr(qnorm, mean = -2.2, sd = 3.3^-0.5), 
                    type = "response")
@@ -325,6 +345,7 @@ plot(pred_FE)
 ![](example_blocker_files/figure-html/blocker_pred_FE-1.png)
 
 ``` r
+
 pred_RE <- predict(blocker_fit_RE, 
                    baseline = distr(qnorm, mean = -2.2, sd = 3.3^-0.5), 
                    type = "response")
@@ -347,6 +368,7 @@ baseline response using the `baseline_type = "reponse"` argument (the
 default is `"link"`, used above for the baseline logit-probability).
 
 ``` r
+
 pred_FE_beta <- predict(blocker_fit_FE, 
                         baseline = distr(qbeta, 4, 36-4),
                         baseline_type = "response",
@@ -361,6 +383,7 @@ plot(pred_FE_beta)
 ![](example_blocker_files/figure-html/blocker_pred_FE_beta-1.png)
 
 ``` r
+
 pred_RE_beta <- predict(blocker_fit_RE, 
                         baseline = distr(qbeta, 4, 36-4),
                         baseline_type = "response",
@@ -385,8 +408,8 @@ Carlin, J. B. 1992. “Meta-Analysis for 2 x 2 Tables: A Bayesian
 Approach.” *Statistics in Medicine* 11 (2): 141–58.
 <https://doi.org/10.1002/sim.4780110202>.
 
-Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. “NICE DSU
+Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. *NICE DSU
 Technical Support Document 2: A Generalised Linear Modelling Framework
 for Pair-Wise and Network Meta-Analysis of Randomised Controlled
-Trials.” National Institute for Health and Care Excellence.
+Trials*. National Institute for Health and Care Excellence.
 <https://sheffield.ac.uk/nice-dsu>.

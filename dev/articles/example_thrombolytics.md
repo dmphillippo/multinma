@@ -1,6 +1,7 @@
 # Example: Thrombolytic treatments
 
 ``` r
+
 library(multinma)
 options(mc.cores = parallel::detectCores())
 ```
@@ -24,6 +25,7 @@ per-cutaneous transluminal coronary angioplasty (PTCA) ([Boland et al.
 available in this package as `thrombolytics`:
 
 ``` r
+
 head(thrombolytics)
 #>   studyn trtn      trtc    r     n
 #> 1      1    1        SK 1472 20251
@@ -43,6 +45,7 @@ the function
 By default, SK is set as the network reference treatment.
 
 ``` r
+
 thrombo_net <- set_agd_arm(thrombolytics, 
                            study = studyn,
                            trt = trtc,
@@ -76,6 +79,7 @@ thrombo_net
 Plot the network structure.
 
 ``` r
+
 plot(thrombo_net, weight_edges = TRUE, weight_nodes = TRUE)
 ```
 
@@ -93,6 +97,7 @@ by these prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -105,6 +110,7 @@ function. By default, this will use a Binomial likelihood and a logit
 link function, auto-detected from the data.
 
 ``` r
+
 thrombo_fit <- nma(thrombo_net, 
                    trt_effects = "fixed",
                    prior_intercept = normal(scale = 100),
@@ -116,6 +122,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 thrombo_fit
 #> A fixed effects NMA with a binomial likelihood (logit link).
 #> Inference for Stan model: binomial_1par.
@@ -143,7 +150,7 @@ thrombo_fit
 #> d[UK]           1
 #> lp__            1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:12:54 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:54:28 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -153,6 +160,7 @@ By default, summaries of the study-specific intercepts \mu_j are hidden,
 but could be examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(thrombo_fit, pars = c("d", "mu"))
 ```
@@ -162,6 +170,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(thrombo_fit, prior = "trt")
 ```
 
@@ -172,6 +181,7 @@ Model fit can be checked using the
 function
 
 ``` r
+
 (dic_consistency <- dic(thrombo_fit))
 #> Residual deviance: 105.9 (on 102 data points)
 #>                pD: 58.7
@@ -182,6 +192,7 @@ and the residual deviance contributions examined with the corresponding
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method.
 
 ``` r
+
 plot(dic_consistency)
 ```
 
@@ -210,6 +221,7 @@ the function
 but now with the argument `consistency = "ume"`.
 
 ``` r
+
 thrombo_fit_ume <- nma(thrombo_net, 
                        consistency = "ume",
                        trt_effects = "fixed",
@@ -258,7 +270,7 @@ thrombo_fit_ume
 #> d[UK vs. t-PA]         4645    1
 #> lp__                   1655    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:13:00 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:54:36 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -267,6 +279,7 @@ thrombo_fit_ume
 Comparing the model fit statistics
 
 ``` r
+
 dic_consistency
 #> Residual deviance: 105.9 (on 102 data points)
 #>                pD: 58.7
@@ -288,6 +301,7 @@ function to the [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
 method produces this dev-dev plot:
 
 ``` r
+
 plot(dic_consistency, dic_ume, show_uncertainty = FALSE)
 ```
 
@@ -318,6 +332,7 @@ function). Alternatively, a specific comparison or comparisons to split
 can be provided to the `nodesplit` argument.
 
 ``` r
+
 thrombo_nodesplit <- nma(thrombo_net, 
                          consistency = "nodesplit",
                          trt_effects = "fixed",
@@ -366,6 +381,7 @@ heterogeneity standard deviation \tau under each node-split model and
 under the consistency model would also be displayed.)
 
 ``` r
+
 summary(thrombo_nodesplit)
 #> Node-splitting models fitted for 14 comparisons.
 #> 
@@ -578,6 +594,7 @@ using the [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
 method.
 
 ``` r
+
 plot(thrombo_nodesplit)
 ```
 
@@ -591,6 +608,7 @@ credible intervals, and customise the plot layout with standard
 `ggplot2` functions.
 
 ``` r
+
 plot(thrombo_nodesplit, pars = "omega", stat = "halfeye", ref_line = 0) +
   ggplot2::aes(y = comparison) +
   ggplot2::facet_null()
@@ -611,6 +629,7 @@ produced using the
 function, with `all_contrasts = TRUE`.
 
 ``` r
+
 (thrombo_releff <- relative_effects(thrombo_fit, all_contrasts = TRUE))
 #>                            mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> d[Acc t-PA vs. SK]        -0.18 0.04 -0.26 -0.21 -0.18 -0.15 -0.09     2297     2890    1
@@ -658,6 +677,7 @@ Treatment rankings, rank probabilities, and cumulative rank
 probabilities.
 
 ``` r
+
 (thrombo_ranks <- posterior_ranks(thrombo_fit))
 #>                 mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> rank[SK]        7.44 0.96    6   7   7   8     9     3745       NA    1
@@ -675,6 +695,7 @@ plot(thrombo_ranks)
 ![](example_thrombolytics_files/figure-html/thrombo_ranks-1.png)
 
 ``` r
+
 (thrombo_rankprobs <- posterior_rank_probs(thrombo_fit))
 #>              p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6] p_rank[7] p_rank[8]
 #> d[SK]             0.00      0.00      0.00      0.00      0.02      0.14      0.39      0.32
@@ -702,6 +723,7 @@ plot(thrombo_rankprobs)
 ![](example_thrombolytics_files/figure-html/thrombo_rankprobs-1.png)
 
 ``` r
+
 (thrombo_cumrankprobs <- posterior_rank_probs(thrombo_fit, cumulative = TRUE))
 #>              p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6] p_rank[7] p_rank[8]
 #> d[SK]             0.00      0.00      0.00      0.00      0.02      0.15      0.54      0.85
@@ -730,10 +752,9 @@ plot(thrombo_cumrankprobs)
 
 ## References
 
-Boland, A., Y. Dundar, A. Bagust, A. Haycox, R. Hill, R. Mujica Mota, T.
-Walley, and R. Dickson. 2003. “Early Thrombolysis for the Treatment of
-Acute Myocardial Infarction: A Systematic Review and Economic
-Evaluation.” *Health Technology Assessment* 7 (15).
+Boland, A., Y. Dundar, A. Bagust, et al. 2003. “Early Thrombolysis for
+the Treatment of Acute Myocardial Infarction: A Systematic Review and
+Economic Evaluation.” *Health Technology Assessment* 7 (15).
 <https://doi.org/10.3310/hta7150>.
 
 Dias, S., N. J. Welton, D. M. Caldwell, and A. E. Ades. 2010. “Checking
@@ -741,8 +762,8 @@ Consistency in Mixed Treatment Comparison Meta-Analysis.” *Statistics in
 Medicine* 29 (7-8): 932–44. <https://doi.org/10.1002/sim.3767>.
 
 Dias, S., N. J. Welton, A. J. Sutton, D. M. Caldwell, G. Lu, and A. E.
-Ades. 2011. “NICE DSU Technical Support Document 4: Inconsistency in
-Networks of Evidence Based on Randomised Controlled Trials.” National
+Ades. 2011. *NICE DSU Technical Support Document 4: Inconsistency in
+Networks of Evidence Based on Randomised Controlled Trials*. National
 Institute for Health and Care Excellence.
 <https://sheffield.ac.uk/nice-dsu>.
 

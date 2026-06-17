@@ -1,6 +1,7 @@
 # Example: Diabetes
 
 ``` r
+
 library(multinma)
 options(mc.cores = parallel::detectCores())
 ```
@@ -19,6 +20,7 @@ of diabetes in 22 trials of 6 antihypertensive drugs ([Elliott and Meyer
 available in this package as `diabetes`:
 
 ``` r
+
 head(diabetes)
 #>   studyn studyc trtn         trtc   r    n time
 #> 1      1  MRC-E    1     Diuretic  43 1081  5.8
@@ -39,9 +41,10 @@ For computational efficiency, we let “Beta Blocker” be set as the
 network reference treatment by default. Elliott and Meyer
 ([2007](#ref-Elliott2007)) and Dias et al. ([2011](#ref-TSD2)) use
 “Diuretic” as the reference, but it is a simple matter to transform the
-results after fitting the NMA model.[¹](#fn1)
+results after fitting the NMA model.[^1]
 
 ``` r
+
 db_net <- set_agd_arm(diabetes, 
                       study = studyc,
                       trt = trtc,
@@ -82,6 +85,7 @@ column `time`) will automatically be made available in the network.
 Plot the network structure.
 
 ``` r
+
 plot(db_net, weight_edges = TRUE, weight_nodes = TRUE)
 ```
 
@@ -102,6 +106,7 @@ by these prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -116,6 +121,7 @@ data), and specify the log follow-up time offset using the regression
 formula `regression = ~offset(log(time))`.
 
 ``` r
+
 db_fit_FE <- nma(db_net, 
                  trt_effects = "fixed",
                  link = "cloglog",
@@ -131,6 +137,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 db_fit_FE
 #> A fixed effects NMA with a binomial likelihood (cloglog link).
 #> Regression model: ~offset(log(time)).
@@ -153,7 +160,7 @@ db_fit_FE
 #> d[Placebo]        1482    1
 #> lp__              1824    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:58:05 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:38:50 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -163,6 +170,7 @@ By default, summaries of the study-specific intercepts \mu_j are hidden,
 but could be examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(db_fit_FE, pars = c("d", "mu"))
 ```
@@ -172,6 +180,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(db_fit_FE)
 ```
 
@@ -190,6 +199,7 @@ prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -203,6 +213,7 @@ summary(half_normal(scale = 5))
 Fitting the RE model
 
 ``` r
+
 db_fit_RE <- nma(db_net, 
                  trt_effects = "random",
                  link = "cloglog",
@@ -220,6 +231,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 db_fit_RE
 #> A random effects NMA with a binomial likelihood (cloglog link).
 #> Regression model: ~offset(log(time)).
@@ -244,7 +256,7 @@ db_fit_RE
 #> lp__              1032    1
 #> tau               1053    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:58:16 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:38:58 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -255,6 +267,7 @@ study-specific relative effects \delta\_{jk} are hidden, but could be
 examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(db_fit_RE, pars = c("d", "mu", "delta"))
 ```
@@ -264,6 +277,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(db_fit_RE, prior = c("trt", "het"))
 ```
 
@@ -276,6 +290,7 @@ Model fit can be checked using the
 function:
 
 ``` r
+
 (dic_FE <- dic(db_fit_FE))
 #> Residual deviance: 78.2 (on 48 data points)
 #>                pD: 27
@@ -283,6 +298,7 @@ function:
 ```
 
 ``` r
+
 (dic_RE <- dic(db_fit_RE))
 #> Residual deviance: 53.5 (on 48 data points)
 #>                pD: 38.2
@@ -298,12 +314,14 @@ corresponding [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
 method.
 
 ``` r
+
 plot(dic_FE)
 ```
 
 ![](example_diabetes_files/figure-html/db_FE_resdev_plot-1.png)
 
 ``` r
+
 plot(dic_RE)
 ```
 
@@ -318,6 +336,7 @@ Dias et al. ([2011](#ref-TSD2)), we can produce relative effects against
 function with `trt_ref = "Diuretic"`:
 
 ``` r
+
 (db_releff_FE <- relative_effects(db_fit_FE, trt_ref = "Diuretic"))
 #>                   mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> d[Beta Blocker]  -0.05 0.06 -0.16 -0.09 -0.06 -0.02  0.05     1895     2372    1
@@ -331,6 +350,7 @@ plot(db_releff_FE, ref_line = 0)
 ![](example_diabetes_files/figure-html/diabetes_releff_FE-1.png)
 
 ``` r
+
 (db_releff_RE <- relative_effects(db_fit_RE, trt_ref = "Diuretic"))
 #>                   mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> d[Beta Blocker]  -0.07 0.09 -0.25 -0.13 -0.07 -0.01  0.10     2296     2559    1
@@ -361,6 +381,7 @@ probabilities (`type = "link"` would produce predicted cloglog
 probabilities).
 
 ``` r
+
 db_pred_FE <- predict(db_fit_FE, 
                       newdata = data.frame(time = 3),
                       baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5), 
@@ -382,6 +403,7 @@ plot(db_pred_FE)
 ![](example_diabetes_files/figure-html/db_pred_FE-1.png)
 
 ``` r
+
 db_pred_RE <- predict(db_fit_RE, 
                       newdata = data.frame(time = 3),
                       baseline = distr(qnorm, mean = -4.2, sd = 1.11^-0.5), 
@@ -408,6 +430,7 @@ their follow-up times and estimated baseline cloglog probabilities
 \mu_j:
 
 ``` r
+
 db_pred_RE_studies <- predict(db_fit_RE, type = "response")
 db_pred_RE_studies
 #> ------------------------------------------------------------------- Study: AASK ---- 
@@ -638,6 +661,7 @@ We can also produce treatment rankings, rank probabilities, and
 cumulative rank probabilities.
 
 ``` r
+
 (db_ranks <- posterior_ranks(db_fit_RE))
 #>                     mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> rank[Beta Blocker]  5.19 0.42    5   5   5   5     6     2951       NA    1
@@ -652,6 +676,7 @@ plot(db_ranks)
 ![](example_diabetes_files/figure-html/diabetes_ranks-1.png)
 
 ``` r
+
 (db_rankprobs <- posterior_rank_probs(db_fit_RE))
 #>                  p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6]
 #> d[Beta Blocker]       0.00      0.00      0.00      0.01      0.79       0.2
@@ -666,6 +691,7 @@ plot(db_rankprobs)
 ![](example_diabetes_files/figure-html/diabetes_rankprobs-1.png)
 
 ``` r
+
 (db_cumrankprobs <- posterior_rank_probs(db_fit_RE, cumulative = TRUE))
 #>                  p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6]
 #> d[Beta Blocker]       0.00      0.00      0.00      0.01       0.8         1
@@ -681,23 +707,21 @@ plot(db_cumrankprobs)
 
 ## References
 
-Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. “NICE DSU
+Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. *NICE DSU
 Technical Support Document 2: A Generalised Linear Modelling Framework
 for Pair-Wise and Network Meta-Analysis of Randomised Controlled
-Trials.” National Institute for Health and Care Excellence.
+Trials*. National Institute for Health and Care Excellence.
 <https://sheffield.ac.uk/nice-dsu>.
 
 Elliott, W. J., and P. M. Meyer. 2007. “Incident Diabetes in Clinical
 Trials of Antihypertensive Drugs: A Network Meta-Analysis.” *The Lancet*
 369 (9557): 201–7. <https://doi.org/10.1016/s0140-6736(07)60108-1>.
 
-------------------------------------------------------------------------
-
-1.  The gain in efficiency here from using “Beta Blocker” as the network
-    reference treatment instead of “Diuretic” is considerable - around
-    4-8 times, in terms of effective samples per second. The functions
-    in this package will always attempt to choose a default network
-    reference treatment that maximises computational efficiency and
-    stability. If you have chosen an alternative network reference
+[^1]: The gain in efficiency here from using “Beta Blocker” as the
+    network reference treatment instead of “Diuretic” is considerable -
+    around 4-8 times, in terms of effective samples per second. The
+    functions in this package will always attempt to choose a default
+    network reference treatment that maximises computational efficiency
+    and stability. If you have chosen an alternative network reference
     treatment and the model runs very slowly or has low effective sample
     size, this is a likely cause.

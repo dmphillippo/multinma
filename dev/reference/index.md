@@ -299,6 +299,11 @@ arrays and matrices.
 - [`as.stanfit()`](https://dmphillippo.github.io/multinma/dev/reference/as.stanfit.md)
   : as.stanfit
 
+- [`bind_chains()`](https://dmphillippo.github.io/multinma/dev/reference/bind_chains.md)
+  [`cbind(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/dev/reference/bind_chains.md)
+  [`cbind(`*`<mcmc_array>`*`)`](https://dmphillippo.github.io/multinma/dev/reference/bind_chains.md)
+  : Bind chains
+
 ## M-spline hazards
 
 Functions for flexibile M-splines on the baseline hazard.

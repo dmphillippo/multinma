@@ -1,6 +1,7 @@
 # Example: Plaque psoriasis ML-NMR
 
 ``` r
+
 library(multinma)
 #> For execution on a local, multicore CPU with excess RAM we recommend calling
 #> options(mc.cores = parallel::detectCores())
@@ -23,6 +24,7 @@ library(ggplot2)    # ggplot2 for plotting covariate distributions
 ```
 
 ``` r
+
 options(mc.cores = parallel::detectCores())
 ```
 
@@ -57,6 +59,7 @@ UNCOVER-1, UNCOVER-2, and UNCOVER-3 ([Griffiths et al.
 AgD from one study, FIXTURE ([Langley et al. 2014](#ref-Langley2014)).
 
 ``` r
+
 pso_ipd <- filter(plaque_psoriasis_ipd,
                   studyc %in% c("UNCOVER-1", "UNCOVER-2", "UNCOVER-3"))
 
@@ -121,6 +124,7 @@ treatments belong to which classes. Finally, we check for missing values
 in the IPD.
 
 ``` r
+
 pso_ipd <- pso_ipd %>% 
   mutate(# Variable transformations
          bsa = bsa / 100,
@@ -157,6 +161,7 @@ pso_agd <- pso_agd %>%
 A small number of individuals have missing covariates:
 
 ``` r
+
 sum(!pso_ipd$complete)
 #> [1] 4
 mean(!pso_ipd$complete)
@@ -167,6 +172,7 @@ Since the proportion of missing data is so small, we will simply exclude
 these individuals from the analysis.
 
 ``` r
+
 pso_ipd <- filter(pso_ipd, complete)
 ```
 
@@ -183,6 +189,7 @@ outcome `pasi75_r` and denominator `pasi75_n` as `r` and `n` in the AgD.
 We specify the treatment classes with `trt_class = trtclass`.
 
 ``` r
+
 pso_net <- combine_network(
   set_ipd(pso_ipd, 
           study = studyc, 
@@ -223,6 +230,7 @@ We can produce a network plot with the
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method:
 
 ``` r
+
 plot(pso_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) + 
   ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
 ```
@@ -246,9 +254,9 @@ copula ([Phillippo et al. 2020](#ref-methods_paper); [Phillippo
 2019](#ref-Phillippo_thesis)). QMC integration is a very general and
 flexible integration approach, which typically requires far fewer
 integration points than standard (pseudo-random) Monte-Carlo integration
-to achieve the same numerical accuracy.[¹](#fn1) A Gaussian copula
-allows us to account for correlations between covariates, which may have
-any specified marginal distributions.
+to achieve the same numerical accuracy.[^1] A Gaussian copula allows us
+to account for correlations between covariates, which may have any
+specified marginal distributions.
 
 We now set up the numerical integration for the network. The five
 covariates that we will consider adjusting for are body surface area
@@ -262,6 +270,7 @@ choose a logit-Normal distribution. We choose Gamma distributions for
 match well the marginal distributions observed in the IPD:
 
 ``` r
+
 # Get mean and sd of covariates in each study
 ipd_summary <- pso_ipd %>% 
   group_by(studyc) %>% 
@@ -311,6 +320,7 @@ the weighted mean of the correlations in the IPD studies (the default
 option).
 
 ``` r
+
 pso_net <- add_integration(pso_net,
   durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
   prevsys = distr(qbern, prob = prevsys),
@@ -347,6 +357,7 @@ parameter values implied by these prior distributions can be checked
 using the [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 10))
 #> A Normal prior distribution: location = 0, scale = 10.
 #> 50% of the prior density lies between -6.74 and 6.74.
@@ -372,6 +383,7 @@ the QR decomposition (`QR = TRUE`) greatly improves sampling efficiency
 here, as is often the case for regression models.
 
 ``` r
+
 pso_fit_FE <- nma(pso_net, 
                   trt_effects = "fixed",
                   link = "probit", 
@@ -390,6 +402,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 print(pso_fit_FE)
 #> A fixed effects ML-NMR with a bernoulli2 likelihood (probit link).
 #> Regression model: ~(durnpso + prevsys + bsa + weight + psa) * .trt.
@@ -445,7 +458,7 @@ print(pso_fit_FE)
 #> d[SEC_300]                              2.68  6502    1
 #> lp__                                -1570.45  1745    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:01:50 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:41:50 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -455,6 +468,7 @@ By default, summaries of the study-specific intercepts \mu_j are hidden,
 but could be examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(pso_fit_FE, pars = c("d", "beta", "mu"))
 ```
@@ -464,6 +478,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(pso_fit_FE, prior = c("intercept", "trt", "reg"))
 ```
 
@@ -501,6 +516,7 @@ parameter values implied by these prior distributions can be checked
 using the [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 10))
 #> A Normal prior distribution: location = 0, scale = 10.
 #> 50% of the prior density lies between -6.74 and 6.74.
@@ -516,6 +532,7 @@ Fitting the model uses the same call to
 as before, except now with `trt_effects = "random"`.
 
 ``` r
+
 pso_fit_RE <- nma(pso_net, 
                   trt_effects = "random",
                   link = "probit", 
@@ -539,6 +556,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 print(pso_fit_RE)
 #> A random effects ML-NMR with a bernoulli2 likelihood (probit link).
 #> Regression model: ~(durnpso + prevsys + bsa + weight + psa) * .trt.
@@ -596,7 +614,7 @@ print(pso_fit_RE)
 #> lp__                                -1572.12   984 1.00
 #> tau                                     0.46   619 1.01
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:04:28 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:44:42 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -607,6 +625,7 @@ study-specific relative effects \delta\_{jk} are hidden, but could be
 examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(pso_fit_RE, pars = c("d", "beta", "tau", "mu", "delta"))
 ```
@@ -615,6 +634,7 @@ There are a number of divergent transitions, which we can investigate
 using the [`pairs()`](https://rdrr.io/r/graphics/pairs.html) method:
 
 ``` r
+
 pairs(pso_fit_RE, pars = c("delta[UNCOVER-2: ETN]", "d[ETN]", "tau", "lp__"))
 ```
 
@@ -631,6 +651,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(pso_fit_RE, prior = c("intercept", "trt", "reg", "het"))
 ```
 
@@ -643,6 +664,7 @@ The model fit under the FE and RE models can be checked using the
 function.
 
 ``` r
+
 (pso_dic_FE <- dic(pso_fit_FE))
 #> Residual deviance: 3129.3 (on 3858 data points)
 #>                pD: 24
@@ -663,6 +685,7 @@ Parameter estimates can be plotted using the
 example to examine the estimated regression coefficients:
 
 ``` r
+
 plot(pso_fit_FE,
      pars = "beta",
      stat = "halfeye",
@@ -685,6 +708,7 @@ population in the network using the
 function.
 
 ``` r
+
 (pso_releff_FE <- relative_effects(pso_fit_FE))
 #> ---------------------------------------------------------------- Study: FIXTURE ---- 
 #> 
@@ -749,6 +773,7 @@ each treatment are produced using the
 rather than probit probabilities.
 
 ``` r
+
 (pso_pred_FE <- predict(pso_fit_FE, type = "response"))
 #> ---------------------------------------------------------------- Study: FIXTURE ---- 
 #> 
@@ -805,6 +830,7 @@ the distributions of effect modifiers are similar). We specify
 of achieving PASI 75).
 
 ``` r
+
 (pso_ranks_FE <- posterior_ranks(pso_fit_FE, lower_better = FALSE))
 #> ---------------------------------------------------------------- Study: FIXTURE ---- 
 #> 
@@ -867,6 +893,7 @@ plot(pso_ranks_FE)
 ![](example_plaque_psoriasis_files/figure-html/pso_ranks_FE-1.png)
 
 ``` r
+
 (pso_rankprobs_FE <- posterior_rank_probs(pso_fit_FE, lower_better = FALSE))
 #> ---------------------------------------------------------------- Study: FIXTURE ---- 
 #> 
@@ -929,6 +956,7 @@ plot(pso_rankprobs_FE)
 ![](example_plaque_psoriasis_files/figure-html/pso_rankprobs_FE-1.png)
 
 ``` r
+
 (pso_cumrankprobs_FE <- posterior_rank_probs(pso_fit_FE, lower_better = FALSE, cumulative = TRUE))
 #> ---------------------------------------------------------------- Study: FIXTURE ---- 
 #> 
@@ -1002,6 +1030,7 @@ covariate values in that population. For example, `newdata` could
 provide the following mean covariate values:
 
 ``` r
+
 new_agd_means <- tibble(
   bsa = 0.6,
   prevsys = 0.1,
@@ -1017,6 +1046,7 @@ function, and can be plotted with the corresponding
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method:
 
 ``` r
+
 (pso_releff_FE_new <- relative_effects(pso_fit_FE, newdata = new_agd_means))
 #> ------------------------------------------------------------------ Study: New 1 ---- 
 #> 
@@ -1049,6 +1079,7 @@ had the following covariate means and standard deviations (for
 continuous covariates) or proportions (for discrete covariates):
 
 ``` r
+
 new_agd_int <- tibble(
   bsa_mean = 0.6,
   bsa_sd = 0.3,
@@ -1068,6 +1099,7 @@ computed earlier from the IPD in the network, which is stored in the
 network object as `int_cor`.
 
 ``` r
+
 new_agd_int <- add_integration(new_agd_int,
   durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
   prevsys = distr(qbern, prob = prevsys),
@@ -1085,6 +1117,7 @@ then produced using the
 [`predict()`](https://rdrr.io/r/stats/predict.html) method:
 
 ``` r
+
 (pso_pred_FE_new <- predict(pso_fit_FE, 
                             type = "response",
                             newdata = new_agd_int,
@@ -1118,6 +1151,7 @@ We begin, as before, with some data transformations for each of the
 covariates and set up a treatment class variable `trtclass`.
 
 ``` r
+
 # IPD studies
 pso_ipd <- plaque_psoriasis_ipd %>% 
   mutate(
@@ -1162,6 +1196,7 @@ There are a very small number of individuals with missing values in the
 IPD, which we simply exclude from the analysis.
 
 ``` r
+
 pso_ipd %>% 
   group_by(studyc) %>% 
   summarise(n_total = n(),
@@ -1193,10 +1228,11 @@ lowest category is the sample size (or 1 for IPD), the second category
 counts those achieving PASI 75 *or greater* (\ge 75\\ reduction in
 symptoms), the third counts those achieving PASI 90 *or greater* (\ge
 90\\ reduction), and the final category counts those achieving PASI 100
-(100\\ reduction).[²](#fn2) We specify the treatment classes with
+(100\\ reduction).[^2] We specify the treatment classes with
 `trt_class = trtclass`.
 
 ``` r
+
 pso_net <- combine_network(
   set_ipd(pso_ipd,
     study = studyc,
@@ -1255,6 +1291,7 @@ nodes (`nudge = 0.1`). We further customise the plot using ggplot syntax
 to alter the colour scheme.
 
 ``` r
+
 class_pal <- c("#D95F02", "#7570B3", "#E7298A", "#E6AB02")
 
 plot(pso_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE, nudge = 0.1) +
@@ -1289,6 +1326,7 @@ these with the weighted mean of the correlations in the IPD studies (the
 default option).
 
 ``` r
+
 pso_net <- add_integration(pso_net,
   durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
   prevsys = distr(qbern, prob = prevsys),
@@ -1322,6 +1360,7 @@ which will automatically be truncated to meet the ordering constraints
 (`prior_aux = flat()`).
 
 ``` r
+
 pso_fit_FE <- nma(pso_net, 
                   trt_effects = "fixed",
                   link = "probit", 
@@ -1336,14 +1375,17 @@ pso_fit_FE <- nma(pso_net,
 ```
 
 ``` r
+
 #> Note: Setting "PBO" as the network reference treatment.
 ```
 
 ``` r
+
 pso_fit_FE
 ```
 
 ``` r
+
 #> A fixed effects ML-NMR with a ordered likelihood (probit link).
 #> Regression model: ~(durnpso + prevsys + bsa + weight + psa) * .trt.
 #> Centred covariates at the following overall mean values:
@@ -1450,6 +1492,7 @@ between-study heterogeneity (we choose a \textrm{half-N}(0, 2.5^2) prior
 with `prior_het = half_normal(scale = 2.5)`.
 
 ``` r
+
 pso_fit_RE <- nma(pso_net, 
                   trt_effects = "random",
                   link = "probit", 
@@ -1465,6 +1508,7 @@ pso_fit_RE <- nma(pso_net,
 ```
 
 ``` r
+
 #> Note: Setting "PBO" as the network reference treatment.
 #> Warning: There were 1 divergent transitions after warmup. See
 #> https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
@@ -1473,10 +1517,12 @@ pso_fit_RE <- nma(pso_net,
 ```
 
 ``` r
+
 pso_fit_RE
 ```
 
 ``` r
+
 #> A random effects ML-NMR with a ordered likelihood (probit link).
 #> Regression model: ~(durnpso + prevsys + bsa + weight + psa) * .trt.
 #> Centred covariates at the following overall mean values:
@@ -1562,20 +1608,24 @@ small compared to the relative treatment effects. We compare the model
 fit using the DIC:
 
 ``` r
+
 (pso_dic_FE <- dic(pso_fit_FE))
 ```
 
 ``` r
+
 #> Residual deviance: 8811.2 (on 12387 data points)
 #>                pD: 36
 #>               DIC: 8847.3
 ```
 
 ``` r
+
 (pso_dic_RE <- dic(pso_fit_RE))
 ```
 
 ``` r
+
 #> Residual deviance: 8799.8 (on 12387 data points)
 #>                pD: 42.3
 #>               DIC: 8842.1
@@ -1608,6 +1658,7 @@ analysis using synthetic IPD there was evidence of heterogeneity and we
 should really fit a random effects UME model instead.
 
 ``` r
+
 pso_fit_UME <- nma(pso_net, 
                    trt_effects = "fixed",
                    consistency = "ume",
@@ -1623,14 +1674,17 @@ pso_fit_UME <- nma(pso_net,
 ```
 
 ``` r
+
 #> Note: Setting "PBO" as the network reference treatment.
 ```
 
 ``` r
+
 pso_fit_UME
 ```
 
 ``` r
+
 #> A fixed effects ML-NMR with a ordered likelihood (probit link).
 #> An inconsistency model ('ume') was fitted.
 #> Regression model: ~(durnpso + prevsys + bsa + weight + psa) * .trt.
@@ -1715,20 +1769,24 @@ pso_fit_UME
 We compare model fit to the FE ML-NMR model using the DIC.
 
 ``` r
+
 pso_dic_FE
 ```
 
 ``` r
+
 #> Residual deviance: 8811.2 (on 12387 data points)
 #>                pD: 36
 #>               DIC: 8847.3
 ```
 
 ``` r
+
 (pso_dic_UME <- dic(pso_fit_UME))
 ```
 
 ``` r
+
 #> Residual deviance: 8811.8 (on 12387 data points)
 #>                pD: 36.5
 #>               DIC: 8848.4
@@ -1745,6 +1803,7 @@ produces a “dev-dev” plot of the residual deviance contributions under
 either model.
 
 ``` r
+
 plot(pso_dic_FE, pso_dic_UME, show_uncertainty = FALSE) +
   xlab("Residual deviance - consistency model") +
   ylab("Residual deviance - inconsistency (UME) model")
@@ -1763,6 +1822,7 @@ the UME model can also indicate inconsistency.
 The treatment classes in the network are as follows:
 
 ``` r
+
 data.frame(classes = pso_net$classes, treatments = pso_net$treatments)
 #>            classes treatments
 #> 1          Placebo        PBO
@@ -1802,6 +1862,7 @@ class_interactions = "common"
 can be written equivalently using the `.trtclass` special as
 
 ``` r
+
 regression = ~(durnpso + prevsys + bsa + weight + psa)*.trtclass
 ```
 
@@ -1824,6 +1885,7 @@ Since we are fitting several of these models, let us set up a list of
 model specifications and iterate over these.
 
 ``` r
+
 noSEM_mods <- list(
   durnpso = ~(prevsys + bsa + weight + psa)*.trtclass + durnpso*.trt,
   prevsys = ~(durnpso + bsa + weight + psa)*.trtclass + prevsys*.trt,
@@ -1856,6 +1918,7 @@ for (m in 1:length(noSEM_mods)) {
 ```
 
 ``` r
+
 #> Fitting model with independent interactions for durnpso
 #> Note: Setting "PBO" as the network reference treatment.
 #> Fitting model with independent interactions for prevsys
@@ -1871,20 +1934,24 @@ for (m in 1:length(noSEM_mods)) {
 Comparing model fit using the DIC
 
 ``` r
+
 pso_dic_FE
 ```
 
 ``` r
+
 #> Residual deviance: 8811.2 (on 12387 data points)
 #>                pD: 36
 #>               DIC: 8847.3
 ```
 
 ``` r
+
 lapply(noSEM_fits, dic)
 ```
 
 ``` r
+
 #> $durnpso
 #> Residual deviance: 8812.4 (on 12387 data points)
 #>                pD: 37.7
@@ -1922,6 +1989,7 @@ assumption for all covariates) and the relaxed models (independent
 interactions, one covariate at a time).
 
 ``` r
+
 library(purrr)
 library(stringr)
 library(forcats)
@@ -2002,10 +2070,12 @@ populations represented in the network using the
 function.
 
 ``` r
+
 (pso_releff_FE <- relative_effects(pso_fit_FE))
 ```
 
 ``` r
+
 #> ------------------------------------------------------------------ Study: CLEAR ---- 
 #> 
 #> Covariate values:
@@ -2137,6 +2207,7 @@ These relative effects can then be plotted using the
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html) function.
 
 ``` r
+
 plot(pso_releff_FE, ref_line = 0)
 ```
 
@@ -2150,10 +2221,12 @@ study population, at each PASI cutoff can be produced using the
 probit-probabilities).
 
 ``` r
+
 (pso_pred_FE <- predict(pso_fit_FE, type = "response"))
 ```
 
 ``` r
+
 #> ------------------------------------------------------------------ Study: CLEAR ---- 
 #> 
 #>                               mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
@@ -2384,6 +2457,7 @@ Again, these can be plotted using the
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html) function.
 
 ``` r
+
 plot(pso_pred_FE, ref_line = c(0, 1))
 ```
 
@@ -2408,6 +2482,7 @@ PsoBest registry ([Reich et al. 2015](#ref-Reich2015); [Augustin et al.
 covariate means and standard deviations in each of these populations:
 
 ``` r
+
 new_agd_means <- tibble::tribble(
              ~study, ~covariate,  ~mean,   ~sd,
           "PsoBest",      "bsa",     24,  20.5,
@@ -2450,6 +2525,7 @@ populations as the `newdata` argument. We only need the covariate means,
 with variable names matching those in the regression.
 
 ``` r
+
 (pso_releff_FE_new <- relative_effects(pso_fit_FE, 
                                        newdata = transmute(new_agd_means,
                                                            study,
@@ -2462,6 +2538,7 @@ with variable names matching those in the regression.
 ```
 
 ``` r
+
 #> -------------------------------------------------------- Study: Chiricozzi 2019 ---- 
 #> 
 #> Covariate values:
@@ -2509,6 +2586,7 @@ These estimates are plotted using the
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html) function.
 
 ``` r
+
 plot(pso_releff_FE_new, ref_line = 0) + facet_wrap("Study")
 ```
 
@@ -2527,6 +2605,7 @@ AgD studies in the network, and the weighted correlation matrix from the
 IPD studies.
 
 ``` r
+
 new_agd_int <- add_integration(filter(new_agd_means, study != "PsoBest"),
                                durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
                                prevsys = distr(qbern, prob = prevsys),
@@ -2555,6 +2634,7 @@ was available from PsoBest, so no predictions of absolute response rates
 could be made.
 
 ``` r
+
 (pso_pred_FE_new <- predict(pso_fit_FE, 
         type = "response", 
         newdata = new_agd_int,
@@ -2567,6 +2647,7 @@ could be made.
 ```
 
 ``` r
+
 #> -------------------------------------------------------- Study: Chiricozzi 2019 ---- 
 #> 
 #>                                         mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
@@ -2623,6 +2704,7 @@ Again, we then plot these estimates using the
 with some customisation using ggplot syntax.
 
 ``` r
+
 plot(pso_pred_FE_new, ref_line = c(0, 1)) + 
   facet_grid(rows = "Study") + 
   aes(colour = Category) +
@@ -2634,8 +2716,7 @@ pso-full-pred-new](pso-full-pred-new-1.png "plot of chunk pso-full-pred-new")
 
 ## References
 
-Augustin, Matthias, Christina Spehr, Marc A. Radtke, Wolf-Henning
-Boehncke, Thomas Luger, Ulrich Mrowietz, Michael Reusch, et al. 2014.
+Augustin, Matthias, Christina Spehr, Marc A. Radtke, et al. 2014.
 “German Psoriasis Registry PsoBest: Objectives, Methodology and Baseline
 Data.” *JDDG: Journal Der Deutschen Dermatologischen Gesellschaft* 12
 (1): 48–57. <https://doi.org/10.1111/ddg.12233>.
@@ -2643,8 +2724,7 @@ Data.” *JDDG: Journal Der Deutschen Dermatologischen Gesellschaft* 12
 Caflisch, R. E. 1998. “Monte Carlo and Quasi-Monte Carlo Methods.” *Acta
 Numerica* 7: 1–49. <https://doi.org/10.1017/S0962492900002804>.
 
-Chiricozzi, Andrea, Anna Balato, Curdin Conrad, Andrea Conti, Paolo
-Dapavo, Paulo Ferreira, Francesca Maria Gaiani, et al. 2019.
+Chiricozzi, Andrea, Anna Balato, Curdin Conrad, et al. 2019.
 “Secukinumab Demonstrates Improvements in Absolute and Relative
 Psoriasis Area Severity Indices in Moderate-to-Severe Plaque Psoriasis:
 Results from a European, Multicentric, Retrospective, Real-World Study.”
@@ -2652,26 +2732,24 @@ Results from a European, Multicentric, Retrospective, Real-World Study.”
 <https://doi.org/10.1080/09546634.2019.1671577>.
 
 Dias, S., N. J. Welton, A. J. Sutton, D. M. Caldwell, G. Lu, and A. E.
-Ades. 2011. “NICE DSU Technical Support Document 4: Inconsistency in
-Networks of Evidence Based on Randomised Controlled Trials.” National
+Ades. 2011. *NICE DSU Technical Support Document 4: Inconsistency in
+Networks of Evidence Based on Randomised Controlled Trials*. National
 Institute for Health and Care Excellence.
 <https://sheffield.ac.uk/nice-dsu>.
 
-Gordon, K. B., A. Blauvelt, K. A. Papp, R. G. Langley, T. Luger, M.
-Ohtsuki, K. Reich, et al. 2016. “Phase 3 Trials of Ixekizumab in
-Moderate-to-Severe Plaque Psoriasis.” *New England Journal of Medicine*
-375 (4): 345–56. <https://doi.org/10.1056/nejmoa1512711>.
+Gordon, K. B., A. Blauvelt, K. A. Papp, et al. 2016. “Phase 3 Trials of
+Ixekizumab in Moderate-to-Severe Plaque Psoriasis.” *New England Journal
+of Medicine* 375 (4): 345–56. <https://doi.org/10.1056/nejmoa1512711>.
 
-Griffiths, C. E. M., K. Reich, M. Lebwohl, P. van de Kerkhof, C. Paul,
-A. Menter, G. S. Cameron, et al. 2015. “Comparison of Ixekizumab with
-Etanercept or Placebo in Moderate-to-Severe Psoriasis (UNCOVER-2 and
-UNCOVER-3): Results from Two Phase 3 Randomised Trials.” *The Lancet*
-386 (9993): 541–51. <https://doi.org/10.1016/s0140-6736(15)60125-8>.
+Griffiths, C. E. M., K. Reich, M. Lebwohl, et al. 2015. “Comparison of
+Ixekizumab with Etanercept or Placebo in Moderate-to-Severe Psoriasis
+(UNCOVER-2 and UNCOVER-3): Results from Two Phase 3 Randomised Trials.”
+*The Lancet* 386 (9993): 541–51.
+<https://doi.org/10.1016/s0140-6736(15)60125-8>.
 
-Langley, R. G., B. E. Elewski, M. Lebwohl, K. Reich, C. E. M. Griffiths,
-K. Papp, L. Puig, et al. 2014. “Secukinumab in Plaque Psoriasis —
-Results of Two Phase 3 Trials.” *New England Journal of Medicine* 371
-(4): 326–38. <https://doi.org/10.1056/nejmoa1314258>.
+Langley, R. G., B. E. Elewski, M. Lebwohl, et al. 2014. “Secukinumab in
+Plaque Psoriasis — Results of Two Phase 3 Trials.” *New England Journal
+of Medicine* 371 (4): 326–38. <https://doi.org/10.1056/nejmoa1314258>.
 
 Niederreiter, H. 1978. “Quasi-Monte Carlo Methods and Pseudo-Random
 Numbers.” *Bulletin of the American Mathematical Society* 84 (6):
@@ -2682,44 +2760,39 @@ Meta-Analysis Using Individual Patient Data.” PhD thesis, University of
 Bristol.
 
 Phillippo, D. M., A. E. Ades, S. Dias, S. Palmer, K. R. Abrams, and N.
-J. Welton. 2016. “NICE DSU Technical Support Document 18: Methods for
-Population-Adjusted Indirect Comparisons in Submission to NICE.”
+J. Welton. 2016. *NICE DSU Technical Support Document 18: Methods for
+Population-Adjusted Indirect Comparisons in Submission to NICE*.
 National Institute for Health and Care Excellence.
 <https://sheffield.ac.uk/nice-dsu>.
 
-Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, D. Saure,
-Y. Schymura, and N. J. Welton. 2022. “Validating the Assumptions of
-Population Adjustment: Application of Multilevel Network Meta-Regression
-to a Network of Treatments for Plaque Psoriasis.” *Medical Decision
-Making*. <https://doi.org/10.1177/0272989X221117162>.
+Phillippo, D. M., S. Dias, A. E. Ades, et al. 2020. “Multilevel Network
+Meta-Regression for Population-Adjusted Treatment Comparisons.” *Journal
+of the Royal Statistical Society: Series A (Statistics in Society)* 183
+(3): 1189–210. <https://doi.org/10.1111/rssa.12579>.
 
-Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A.
-Schacht, D. Saure, Z. Kadziola, and N. J. Welton. 2020. “Multilevel
-Network Meta-Regression for Population-Adjusted Treatment Comparisons.”
-*Journal of the Royal Statistical Society: Series A (Statistics in
-Society)* 183 (3): 1189–1210. <https://doi.org/10.1111/rssa.12579>.
+Phillippo, D. M., S. Dias, A. E. Ades, et al. 2022. “Validating the
+Assumptions of Population Adjustment: Application of Multilevel Network
+Meta-Regression to a Network of Treatments for Plaque Psoriasis.”
+*Medical Decision Making*, ahead of print.
+<https://doi.org/10.1177/0272989X221117162>.
 
-Reich, K., U. Mrowietz, M. A. Radtke, D. Thaci, S. J. Rustenbach, C.
-Spehr, and M. Augustin. 2015. “Drug Safety of Systemic Treatments for
-Psoriasis: Results from the German Psoriasis Registry PsoBest.”
-*Archives of Dermatological Research* 307 (10): 875–83.
-<https://doi.org/10.1007/s00403-015-1593-8>.
+Reich, K., U. Mrowietz, M. A. Radtke, et al. 2015. “Drug Safety of
+Systemic Treatments for Psoriasis: Results from the German Psoriasis
+Registry PsoBest.” *Archives of Dermatological Research* 307 (10):
+875–83. <https://doi.org/10.1007/s00403-015-1593-8>.
 
-Thaçi, D., A. Körber, R. Kiedrowski, T. Bachhuber, N. Melzer, T.
-Kasparek, E. Duetting, G. Kraehn-Senftleben, U. Amon, and M. Augustin.
-2019. “Secukinumab Is Effective in Treatment of Moderate-to-Severe
-Plaque Psoriasis: Real-Life Effectiveness and Safety from the PROSPECT
-Study.” *Journal of the European Academy of Dermatology and Venereology*
-34 (2): 310–18. <https://doi.org/10.1111/jdv.15962>.
+Thaçi, D., A. Körber, R. Kiedrowski, et al. 2019. “Secukinumab Is
+Effective in Treatment of Moderate-to-Severe Plaque Psoriasis: Real-Life
+Effectiveness and Safety from the PROSPECT Study.” *Journal of the
+European Academy of Dermatology and Venereology* 34 (2): 310–18.
+<https://doi.org/10.1111/jdv.15962>.
 
-------------------------------------------------------------------------
-
-1.  The convergence rate of QMC is typically \mathcal{O}(1/n), whereas
+[^1]: The convergence rate of QMC is typically \mathcal{O}(1/n), whereas
     the expected convergence rate of standard MC is
     \mathcal{O}(1/n^\frac{1}{2}) ([Caflisch 1998](#ref-Caflisch1998);
     [Niederreiter 1978](#ref-Niederreiter1978)).
 
-2.  The alternative is “exclusive” format, where the lowest category
+[^2]: The alternative is “exclusive” format, where the lowest category
     counts those not achieving any higher outcomes (i.e. failure to
     achieve PASI 75, \<75\\ reduction in symptoms), the second counts
     those achieving PASI 75 *but not PASI 90 or 100* (\ge 75\\ and

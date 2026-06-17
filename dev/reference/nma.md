@@ -298,15 +298,15 @@ method for `nma_prior` objects prints prior intervals.
 Currently, the following likelihoods and link functions are supported
 for each data type:
 
-|                |                                                                                                                                            |                              |
-|----------------|--------------------------------------------------------------------------------------------------------------------------------------------|------------------------------|
-| **Data type**  | **Likelihood**                                                                                                                             | **Link function**            |
-| **Binary**     | `bernoulli`, `bernoulli2`                                                                                                                  | `logit`, `probit`, `cloglog` |
-| **Count**      | `binomial`, `binomial2`                                                                                                                    | `logit`, `probit`, `cloglog` |
-| **Rate**       | `poisson`                                                                                                                                  | `log`                        |
-| **Continuous** | `normal`                                                                                                                                   | `identity`, `log`            |
-| **Ordered**    | `ordered`                                                                                                                                  | `logit`, `probit`, `cloglog` |
-| **Survival**   | `exponential`, `weibull`, `gompertz`, `exponential-aft`, `weibull-aft`, `lognormal`, `loglogistic`, `gamma`, `gengamma`, `mspline`, `pexp` | `log`                        |
+|  |  |  |
+|----|----|----|
+| **Data type** | **Likelihood** | **Link function** |
+| **Binary** | `bernoulli`, `bernoulli2` | `logit`, `probit`, `cloglog` |
+| **Count** | `binomial`, `binomial2` | `logit`, `probit`, `cloglog` |
+| **Rate** | `poisson` | `log` |
+| **Continuous** | `normal` | `identity`, `log` |
+| **Ordered** | `ordered` | `logit`, `probit`, `cloglog` |
+| **Survival** | `exponential`, `weibull`, `gompertz`, `exponential-aft`, `weibull-aft`, `lognormal`, `loglogistic`, `gamma`, `gengamma`, `mspline`, `pexp` | `log` |
 
 The `bernoulli2` and `binomial2` likelihoods correspond to a
 two-parameter Binomial likelihood for arm-based AgD, which more closely
@@ -445,7 +445,7 @@ Phillippo DM, Sadek A, Pedder H, Welton NJ (2025). “Network
 Meta-Analysis of survival outcomes with non-proportional hazards using
 flexible M-splines.” *arXiv*.
 [doi:10.48550/ARXIV.2509.10383](https://doi.org/10.48550/ARXIV.2509.10383)
-, 2509.10383.
+. 2509.10383.
 
 ## Examples
 
@@ -517,7 +517,7 @@ smk_fit_FE
 #> d[Self-help]                  0.31     0.46  2696    1
 #> lp__                      -5856.58 -5852.87  1699    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:41:18 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:26:11 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -550,7 +550,7 @@ smk_fit_RE
 #> lp__                      -5763.68 -5756.83  1081    1
 #> tau                           0.93     1.26  1169    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:41:23 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:26:15 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -600,7 +600,7 @@ smk_fit_RE_UME
 #> lp__                                            -5754.24   929    1
 #> tau                                                 1.43  1050    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:41:35 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:26:21 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -929,7 +929,7 @@ pso_fit
 #> d[SEC_300]                              2.45     2.53     2.68  5719    1
 #> lp__                                -1576.05 -1573.88 -1570.57  1619    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:43:31 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:27:39 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -1004,7 +1004,7 @@ ndmm_fit
 #> shape[Morgan2012]       0.94  5126    1
 #> shape[Palumbo2014]      1.16  4504    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:46:12 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:29:13 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).

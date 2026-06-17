@@ -1,6 +1,7 @@
 # Example: Plaque psoriasis HTA report
 
 ``` r
+
 library(multinma)
 options(mc.cores = parallel::detectCores())
 ```
@@ -20,6 +21,7 @@ Technical Support Document 2 ([Dias et al. 2011](#ref-TSD2)). The data
 are available in this package as `hta_psoriasis`:
 
 ``` r
+
 head(hta_psoriasis)
 #>   studyn   studyc year trtn             trtc sample_size PASI50 PASI75 PASI90
 #> 1      1  Elewski 2004    1  Supportive care         193     12      5      1
@@ -36,6 +38,7 @@ Outcomes are ordered multinomial success/failure to achieve 50%, 75%, or
 cutpoints, others only one or two:
 
 ``` r
+
 dplyr::filter(hta_psoriasis, studyc %in% c("Elewski", "Gordon", "ACD2058g", "Altmeyer"))
 #>   studyn   studyc year trtn             trtc sample_size PASI50 PASI75 PASI90
 #> 1      1  Elewski 2004    1  Supportive care         193     12      5      1
@@ -72,6 +75,7 @@ The function
 helps us to specify the ordered outcomes correctly.
 
 ``` r
+
 pso_net <- set_agd_arm(hta_psoriasis, 
                        study = paste(studyc, year), 
                        trt = trtc, 
@@ -107,6 +111,7 @@ pso_net
 Plot the network structure.
 
 ``` r
+
 plot(pso_net, weight_edges = TRUE, weight_nodes = TRUE) + 
   # Nudge the legend over
   ggplot2::theme(legend.box.spacing = ggplot2::unit(0.75, "in"),
@@ -131,6 +136,7 @@ parameter values implied by these prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 10))
 #> A Normal prior distribution: location = 0, scale = 10.
 #> 50% of the prior density lies between -6.74 and 6.74.
@@ -158,6 +164,7 @@ The model is fitted using the
 function.
 
 ``` r
+
 pso_fit_FE <- nma(pso_net, 
                   trt_effects = "fixed",
                   link = "probit",
@@ -171,6 +178,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 pso_fit_FE
 #> A fixed effects NMA with a ordered likelihood (probit link).
 #> Inference for Stan model: ordered_multinomial.
@@ -202,7 +210,7 @@ pso_fit_FE
 #> cc[PASI75]             1
 #> cc[PASI90]             1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:58:53 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:39:27 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -223,6 +231,7 @@ By default, summaries of the study-specific intercepts \mu_j are hidden,
 but could be examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(pso_fit_FE, pars = c("d", "mu", "cc"))
 ```
@@ -232,6 +241,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(pso_fit_FE)
 ```
 
@@ -242,6 +252,7 @@ identified by the data, which is why the implicit flat priors work for
 these parameters.
 
 ``` r
+
 plot_prior_posterior(pso_fit_FE, prior = "aux")
 ```
 
@@ -261,6 +272,7 @@ implied by these prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 10))
 #> A Normal prior distribution: location = 0, scale = 10.
 #> 50% of the prior density lies between -6.74 and 6.74.
@@ -278,6 +290,7 @@ summary(half_normal(scale = 2.5))
 Fitting the RE model
 
 ``` r
+
 pso_fit_RE <- nma(pso_net, 
                   trt_effects = "random",
                   link = "probit",
@@ -294,6 +307,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 pso_fit_RE
 #> A random effects NMA with a ordered likelihood (probit link).
 #> Inference for Stan model: ordered_multinomial.
@@ -327,7 +341,7 @@ pso_fit_RE
 #> cc[PASI75]          1.00
 #> cc[PASI90]          1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:59:46 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:40:12 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -338,6 +352,7 @@ study-specific relative effects \delta\_{jk} are hidden, but could be
 examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(pso_fit_RE, pars = c("d", "cc", "mu", "delta"))
 ```
@@ -347,6 +362,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(pso_fit_RE, prior = c("trt", "aux", "het"))
 ```
 
@@ -359,6 +375,7 @@ Model fit can be checked using the
 function:
 
 ``` r
+
 (dic_FE <- dic(pso_fit_FE))
 #> Residual deviance: 74.7 (on 58 data points)
 #>                pD: 25.2
@@ -366,6 +383,7 @@ function:
 ```
 
 ``` r
+
 (dic_RE <- dic(pso_fit_RE))
 #> Residual deviance: 62.6 (on 58 data points)
 #>                pD: 33.3
@@ -380,12 +398,14 @@ corresponding [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
 method.
 
 ``` r
+
 plot(dic_FE)
 ```
 
 ![](example_hta_psoriasis_files/figure-html/pso_FE_resdev_plot-1.png)
 
 ``` r
+
 plot(dic_RE)
 ```
 
@@ -414,6 +434,7 @@ probabilities (`type = "link"` would produce predicted probit
 probabilities).
 
 ``` r
+
 pred_FE <- predict(pso_fit_FE, 
                    baseline = distr(qnorm, mean = -1.097, sd = 123^-0.5), 
                    type = "response")
@@ -449,6 +470,7 @@ plot(pred_FE)
 ![](example_hta_psoriasis_files/figure-html/pso_pred_FE-1.png)
 
 ``` r
+
 pred_RE <- predict(pso_fit_RE, 
                    baseline = distr(qnorm, mean = -1.097, sd = 123^-0.5), 
                    type = "response")
@@ -494,6 +516,7 @@ baseline response using the `baseline_type = "reponse"` argument (the
 default is `"link"`, used above for the baseline probit probability).
 
 ``` r
+
 pred_FE_beta <- predict(pso_fit_FE, 
                         baseline = distr(qbeta, 56, 408-56),
                         baseline_type = "response",
@@ -530,6 +553,7 @@ plot(pred_FE_beta)
 ![](example_hta_psoriasis_files/figure-html/pso_pred_FE_beta-1.png)
 
 ``` r
+
 pred_RE_beta <- predict(pso_fit_RE, 
                         baseline = distr(qbeta, 56, 408-56),
                         baseline_type = "response",
@@ -573,6 +597,7 @@ to plot the cutpoints together with a colour coding (instead of split
 into facets):
 
 ``` r
+
 library(ggplot2)
 plot(pred_RE, position = position_dodge(width = 0.75)) +
   facet_null() +
@@ -593,6 +618,7 @@ probabilities can also be produced. We set `lower_better = FALSE` since
 higher outcome categories are better (the outcomes are positive).
 
 ``` r
+
 (pso_ranks <- posterior_ranks(pso_fit_RE, lower_better = FALSE))
 #>                        mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> rank[Supportive care]  7.99 0.12    8   8   8   8     8     5133       NA    1
@@ -609,6 +635,7 @@ plot(pso_ranks)
 ![](example_hta_psoriasis_files/figure-html/hta_psoriasis_ranks-1.png)
 
 ``` r
+
 (pso_rankprobs <- posterior_rank_probs(pso_fit_RE, lower_better = FALSE))
 #>                     p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6] p_rank[7]
 #> d[Supportive care]       0.00      0.00      0.00      0.00      0.00      0.00      0.01
@@ -634,6 +661,7 @@ plot(pso_rankprobs)
 ![](example_hta_psoriasis_files/figure-html/hta_psoriasis_rankprobs-1.png)
 
 ``` r
+
 (pso_cumrankprobs <- posterior_rank_probs(pso_fit_RE, lower_better = FALSE, cumulative = TRUE))
 #>                     p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5] p_rank[6] p_rank[7]
 #> d[Supportive care]       0.00      0.00      0.00      0.00      0.00      0.00      0.01
@@ -660,13 +688,12 @@ plot(pso_cumrankprobs)
 
 ## References
 
-Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. “NICE DSU
+Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. *NICE DSU
 Technical Support Document 2: A Generalised Linear Modelling Framework
 for Pair-Wise and Network Meta-Analysis of Randomised Controlled
-Trials.” National Institute for Health and Care Excellence.
+Trials*. National Institute for Health and Care Excellence.
 <https://sheffield.ac.uk/nice-dsu>.
 
-Woolacott, N., N. Hawkins, A. Mason, A. Kainth, Z. Khadjesari, Y. Bravo
-Vergel, K. Misso, et al. 2006. “Etanercept and Efalizumab for the
-Treatment of Psoriasis: A Systematic Review.” *Health Technology
-Assessment* 10 (46). <https://doi.org/10.3310/hta10460>.
+Woolacott, N., N. Hawkins, A. Mason, et al. 2006. “Etanercept and
+Efalizumab for the Treatment of Psoriasis: A Systematic Review.” *Health
+Technology Assessment* 10 (46). <https://doi.org/10.3310/hta10460>.

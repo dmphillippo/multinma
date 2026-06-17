@@ -70,19 +70,19 @@ parameters (heterogeneity SD/variance/precision, and any auxiliary
 parameter). If a real-valued prior distribution is specified for a
 non-negative parameter, it will be truncated at 0 to be non-negative.
 
-|                                       |                                 |                                   |                               |                                         |                                     |
-|---------------------------------------|---------------------------------|-----------------------------------|-------------------------------|-----------------------------------------|-------------------------------------|
-|                                       | **Intercept** `prior_intercept` | **Treatment effects** `prior_trt` | **Heterogeneity** `prior_het` | **Regression coefficients** `prior_reg` | **Auxiliary parameter** `prior_aux` |
-| **Normal** `normal()`                 | Yes                             | Yes                               | Yes                           | Yes                                     | Yes                                 |
-| **half-Normal** `half_normal()`       | \-                              | \-                                | Yes                           | \-                                      | Yes                                 |
-| **log-Normal** `log_normal()`         | \-                              | \-                                | Yes                           | \-                                      | Yes                                 |
-| **Cauchy** `cauchy()`                 | Yes                             | Yes                               | Yes                           | Yes                                     | Yes                                 |
-| **half-Cauchy** `half_cauchy()`       | \-                              | \-                                | Yes                           | \-                                      | Yes                                 |
-| **Student t** `student_t()`           | Yes                             | Yes                               | Yes                           | Yes                                     | Yes                                 |
-| **half-Student t** `half_student_t()` | \-                              | \-                                | Yes                           | \-                                      | Yes                                 |
-| **log-Student t** `log_student_t()`   | \-                              | \-                                | Yes                           | \-                                      | Yes                                 |
-| **Exponential** `exponential()`       | \-                              | \-                                | Yes                           | \-                                      | Yes                                 |
-| **Flat** `flat()`                     | Yes                             | Yes                               | Yes                           | Yes                                     | Yes                                 |
+|  |  |  |  |  |  |
+|----|----|----|----|----|----|
+|  | **Intercept** `prior_intercept` | **Treatment effects** `prior_trt` | **Heterogeneity** `prior_het` | **Regression coefficients** `prior_reg` | **Auxiliary parameter** `prior_aux` |
+| **Normal** `normal()` | Yes | Yes | Yes | Yes | Yes |
+| **half-Normal** `half_normal()` | \- | \- | Yes | \- | Yes |
+| **log-Normal** `log_normal()` | \- | \- | Yes | \- | Yes |
+| **Cauchy** `cauchy()` | Yes | Yes | Yes | Yes | Yes |
+| **half-Cauchy** `half_cauchy()` | \- | \- | Yes | \- | Yes |
+| **Student t** `student_t()` | Yes | Yes | Yes | Yes | Yes |
+| **half-Student t** `half_student_t()` | \- | \- | Yes | \- | Yes |
+| **log-Student t** `log_student_t()` | \- | \- | Yes | \- | Yes |
+| **Exponential** `exponential()` | \- | \- | Yes | \- | Yes |
+| **Flat** `flat()` | Yes | Yes | Yes | Yes | Yes |
 
 The `flat()` prior is a special case where no prior information is added
 to the model, resulting in an implicit flat uniform prior distribution

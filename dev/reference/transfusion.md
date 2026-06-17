@@ -36,7 +36,7 @@ A data frame with 12 rows and 4 variables:
 Stanworth S, Massey E, Hyde C, Brunskill SJ, Navarette C, Lucas G, Marks
 D, Paulus U (2005). “Granulocyte transfusions for treating infections in
 patients with neutropenia or neutrophil dysfunction.” *Cochrane Database
-of Systematic Reviews*. ISSN 1465-1858,
+of Systematic Reviews*. ISSN 1465-1858.
 [doi:10.1002/14651858.CD005339](https://doi.org/10.1002/14651858.CD005339)
 .  
   

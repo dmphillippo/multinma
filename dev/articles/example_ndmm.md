@@ -1,6 +1,7 @@
 # Example: Newly diagnosed multiple myeloma
 
 ``` r
+
 library(multinma)
 #> For execution on a local, multicore CPU with excess RAM we recommend calling
 #> options(mc.cores = parallel::detectCores())
@@ -28,6 +29,7 @@ library(loo)
 ```
 
 ``` r
+
 options(mc.cores = parallel::detectCores())
 ```
 
@@ -40,6 +42,7 @@ the data set `ndmm_ipd`. These include outcome times, censoring
 indicators, and covariates for each individual:
 
 ``` r
+
 head(ndmm_ipd)
 #>          study trt       studyf trtf      age iss_stage3 response_cr_vgpr male eventtime status
 #> 1 McCarthy2012 Pbo McCarthy2012  Pbo 50.81625          0                1    0 31.106516      1
@@ -56,6 +59,7 @@ on a further two trials, found in the data sets `ndmm_agd` and
 `ndmm_agd_covs`.
 
 ``` r
+
 head(ndmm_agd)
 #>        study     studyf trt trtf eventtime status
 #> 1 Morgan2012 Morgan2012 Pbo  Pbo  18.72575      1
@@ -96,6 +100,7 @@ The summary distributions of these characteristics in each study are as
 follows:
 
 ``` r
+
 bind_rows(
   summarise(ndmm_ipd,
             N = n(),
@@ -140,6 +145,7 @@ To impose this assumption, we create a treatment class variable for
 active treatments vs. placebo.
 
 ``` r
+
 ndmm_ipd$trtclass <- forcats::fct_collapse(ndmm_ipd$trtf,
                                            Placebo = "Pbo",
                                            Active = c("Len", "Thal"))
@@ -171,6 +177,7 @@ and AgD are then combined into a single network using
 [`combine_network()`](https://dmphillippo.github.io/multinma/dev/reference/combine_network.md).
 
 ``` r
+
 ndmm_net <- combine_network(
   set_ipd(ndmm_ipd,
           study = studyf,
@@ -205,6 +212,7 @@ the `cor` argument. However, by default the weighted average
 correlations from the IPD studies will be used.
 
 ``` r
+
 ndmm_net <- add_integration(ndmm_net,
                             age = distr(qgamma, mean = age_mean, sd = age_sd),
                             iss_stage3 = distr(qbern, iss_stage3),
@@ -246,6 +254,7 @@ We can plot the network diagram using the
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method.
 
 ``` r
+
 plot(ndmm_net,
      weight_nodes = TRUE,
      weight_edges = TRUE,
@@ -268,6 +277,7 @@ aid of the
 function.
 
 ``` r
+
 ggplot() +
   geom_km(ndmm_net) +
   facet_wrap(~.study) +
@@ -332,6 +342,7 @@ for the random walk prior for the spline coefficients a
 efficiency for regression models.
 
 ``` r
+
 ndmm_fit <- nma(ndmm_net,
                 regression = ~(age + iss_stage3 + response_cr_vgpr + male)*.trt,
                 likelihood = "mspline",
@@ -400,6 +411,7 @@ can be shown with [`print()`](https://rdrr.io/r/base/print.html) or
 option:
 
 ``` r
+
 summary(ndmm_fit, pars = "scoef")
 #>                         mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> scoef[Attal2012, 1]     0.02 0.00 0.01 0.01 0.02 0.02  0.03     2587     2098 1.00
@@ -470,6 +482,7 @@ default). These can then be plotted using the
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html) function.
 
 ``` r
+
 plot(predict(ndmm_fit, type = "hazard", level = "aggregate"))
 ```
 
@@ -483,6 +496,7 @@ create a data frame to pass to
 [`predict()`](https://rdrr.io/r/stats/predict.html) as `newdata`.
 
 ``` r
+
 refdat <- tibble(study = ndmm_net$studies,
                  age = ndmm_fit$xbar["age"],
                  iss_stage3 = 0,
@@ -499,6 +513,7 @@ names for both `baseline` and `aux`, to use the posterior distributions
 from each study for these parameters.
 
 ``` r
+
 # At evenly spaced times between the boundary knots
 tdat <- purrr::imap_dfr(ndmm_fit$basis,
                         ~tibble(study = factor(.y, levels = ndmm_net$studies),
@@ -514,6 +529,7 @@ studies <- as.list(setNames(nm = levels(ndmm_net$studies)))
 Then we produce the predictions and plot:
 
 ``` r
+
 plot(predict(ndmm_fit, type = "hazard", level = "individual",
              newdata = refdat, study = study, times = times,
              baseline = studies, aux = studies))
@@ -534,6 +550,7 @@ intercept terms in a NMA by study), and we could simply write
 explicit in this instance.
 
 ``` r
+
 ndmm_fit_nph <- nma(ndmm_net,
                     regression = ~(age + iss_stage3 + response_cr_vgpr + male)*.trt,
                     likelihood = "mspline",
@@ -612,6 +629,7 @@ We then compare model fit between models with and without PH using the
 LOOIC.
 
 ``` r
+
 (ndmm_fit_loo <- loo(ndmm_fit))
 #> 
 #> Computed from 4000 by 4144 log-likelihood matrix
@@ -653,6 +671,7 @@ model, in case an improved fit in one study has been masked by the
 increased complexity in others.
 
 ``` r
+
 studies_all <- c(ndmm_ipd$study, ndmm_agd$study)
 cbind(
   PH = by(ndmm_fit_loo$pointwise[, "looic"], studies_all, sum),
@@ -700,6 +719,7 @@ For comparison, we also fit NMA models without any covariate adjustment,
 both with and without the proportional hazards assumption.
 
 ``` r
+
 ndmm_fit_nma <- nma(ndmm_net,
                     likelihood = "mspline",
                     prior_intercept = normal(0, 100),
@@ -784,6 +804,7 @@ Again, we compare the model fit using the LOOIC, both overall and within
 each study.
 
 ``` r
+
 # Compare overall model fit
 (ndmm_fit_nma_loo <- loo(ndmm_fit_nma))
 #> 
@@ -889,6 +910,7 @@ the
 helper function.
 
 ``` r
+
 plot(predict(ndmm_fit, type = "survival")) +
   geom_km(ndmm_net) +
   theme(legend.position = "top", legend.box.spacing = unit(0, "lines"))
@@ -911,6 +933,7 @@ produce a range of other absolute effect summaries, for example
 population-average median survival times:
 
 ``` r
+
 (medsurv <- predict(ndmm_fit, type = "median"))
 #> Warning: Evaluating M-spline at times beyond the boundary knots.
 #> Evaluating M-spline at times beyond the boundary knots.
@@ -965,6 +988,7 @@ population-average conditional log hazard ratios (or log survival time
 ratios for AFT models).
 
 ``` r
+
 (loghr <- relative_effects(ndmm_fit, all_contrasts = TRUE))
 #> -------------------------------------------------------------- Study: Attal2012 ---- 
 #> 
@@ -1036,6 +1060,7 @@ are formed from the marginal absolute predictions produced by
 produce population-average marginal hazard ratios:
 
 ``` r
+
 plot(marginal_effects(ndmm_fit, type = "hazard", mtype = "ratio")) +
   theme(legend.position = "top", legend.box.spacing = unit(0, "lines"))
 ```
@@ -1053,25 +1078,24 @@ Meta-Analysis.” *Research Synthesis Methods* 10 (4): 546–68.
 <https://doi.org/10.1002/jrsm.1372>.
 
 Phillippo, D. M., A. E. Ades, S. Dias, S. Palmer, K. R. Abrams, and N.
-J. Welton. 2016. “NICE DSU Technical Support Document 18: Methods for
-Population-Adjusted Indirect Comparisons in Submission to NICE.”
+J. Welton. 2016. *NICE DSU Technical Support Document 18: Methods for
+Population-Adjusted Indirect Comparisons in Submission to NICE*.
 National Institute for Health and Care Excellence.
 <https://sheffield.ac.uk/nice-dsu>.
 
-Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A.
-Schacht, D. Saure, Z. Kadziola, and N. J. Welton. 2020. “Multilevel
-Network Meta-Regression for Population-Adjusted Treatment Comparisons.”
-*Journal of the Royal Statistical Society: Series A (Statistics in
-Society)* 183 (3): 1189–1210. <https://doi.org/10.1111/rssa.12579>.
+Phillippo, D. M., S. Dias, A. E. Ades, et al. 2020. “Multilevel Network
+Meta-Regression for Population-Adjusted Treatment Comparisons.” *Journal
+of the Royal Statistical Society: Series A (Statistics in Society)* 183
+(3): 1189–210. <https://doi.org/10.1111/rssa.12579>.
 
 Phillippo, D. M., S. Dias, A. E. Ades, and N. J. Welton. 2025.
 “Multilevel Network Meta-Regression for General Likelihoods: Synthesis
 of Individual and Aggregate Data with Applications to Survival
 Analysis.” *Journal of the Royal Statistical Society Series A:
-Statistics in Society*, October.
+Statistics in Society*, ahead of print, October.
 <https://doi.org/10.1093/jrsssa/qnaf169>.
 
 Phillippo, D. M., A. Sadek, H. Pedder, and N. J. Welton. 2025. “Network
 Meta-Analysis of Survival Outcomes with Non-Proportional Hazards Using
-Flexible M-splines.” *arXiv*.
+Flexible M-splines.” *arXiv*, ahead of print.
 <https://doi.org/10.48550/ARXIV.2509.10383>.

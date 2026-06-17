@@ -1,6 +1,7 @@
 # Example: BCG vaccine for tuberculosis
 
 ``` r
+
 library(multinma)
 options(mc.cores = parallel::detectCores())
 ```
@@ -19,6 +20,7 @@ vaccination vs. no vaccination for prevention of Tuberculosis (TB)
 The data are available in this package as `bcg_vaccine`:
 
 ``` r
+
 head(bcg_vaccine)
 #>   studyn trtn         trtc latitude  r   n
 #> 1      1    1 Unvaccinated       44 11 139
@@ -43,6 +45,7 @@ to set up the network. We set “unvaccinated” as the network reference
 treatment.
 
 ``` r
+
 bcg_net <- set_agd_arm(bcg_vaccine, 
                        study = studyn,
                        trt = trtc,
@@ -93,6 +96,7 @@ implied by these prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -109,6 +113,7 @@ function, with a random effects model specified by
 `trt_effects = "random"`.
 
 ``` r
+
 bcg_fit_unadj <- nma(bcg_net, 
                      trt_effects = "random",
                      prior_intercept = normal(scale = 100),
@@ -120,6 +125,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 bcg_fit_unadj
 #> A random effects NMA with a binomial likelihood (logit link).
 #> Inference for Stan model: binomial_1par.
@@ -135,7 +141,7 @@ bcg_fit_unadj
 #> lp__             1
 #> tau              1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:57:04 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:37:58 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -146,6 +152,7 @@ effects \delta_j are hidden, but could be examined by changing the
 `pars` argument:
 
 ``` r
+
 # Not run
 print(bcg_fit_unadj, pars = c("d", "mu", "delta", "tau"))
 ```
@@ -155,6 +162,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(bcg_fit_unadj, prior = c("trt", "het"))
 ```
 
@@ -171,6 +179,7 @@ parameter values implied by these prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -190,6 +199,7 @@ data set. We increase `adapt_delta` to 0.99 to remove a small number of
 divergent transition errors (the default for RE models is set to 0.95).
 
 ``` r
+
 bcg_fit_lat <- nma(bcg_net, 
                    trt_effects = "random",
                    regression = ~.trt:latitude,
@@ -207,6 +217,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 bcg_fit_lat
 #> A random effects NMA with a binomial likelihood (logit link).
 #> Regression model: ~.trt:latitude.
@@ -228,7 +239,7 @@ bcg_fit_lat
 #> lp__                          -13448.27  1772    1
 #> tau                                0.73  1905    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:57:14 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:38:07 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -242,6 +253,7 @@ study-specific relative effects \delta\_{jk} are hidden, but could be
 examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(bcg_fit_lat, pars = c("d", "beta", "mu", "delta", "tau"))
 ```
@@ -251,6 +263,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(bcg_fit_lat, prior = c("trt", "reg", "het"))
 ```
 
@@ -263,6 +276,7 @@ Model fit can be checked using the
 function:
 
 ``` r
+
 (bcg_dic_unadj <- dic(bcg_fit_unadj))
 #> Residual deviance: 26 (on 26 data points)
 #>                pD: 23.5
@@ -270,6 +284,7 @@ function:
 ```
 
 ``` r
+
 (bcg_dic_lat <- dic(bcg_fit_lat))
 #> Residual deviance: 30.7 (on 26 data points)
 #>                pD: 21.5
@@ -284,6 +299,7 @@ the random treatment effects. Moreover, the model with the covariate has
 a much lower estimated heterogeneity standard deviation:
 
 ``` r
+
 summary(bcg_fit_unadj, pars = "tau")
 #>     mean  sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> tau 0.68 0.2 0.39 0.54 0.65 0.78  1.16     6616    10707    1
@@ -297,6 +313,7 @@ heterogeneity in the data. The 95% Credible Interval for the regression
 coefficient also excludes zero:
 
 ``` r
+
 summary(bcg_fit_lat, pars = "beta")
 #>                                mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> beta[.trtVaccinated:latitude] -0.03 0.01 -0.05 -0.04 -0.03 -0.03 -0.01     4890     4242    1
@@ -328,6 +345,7 @@ values of the covariate `latitude` that we are interested in, and the
 informative label.
 
 ``` r
+
 bcg_releff_lat <- relative_effects(bcg_fit_lat,
                                    newdata = tibble::tibble(latitude = seq(10, 50, by = 10),
                                                             label = paste0(latitude, "\u00B0 latitude")),
@@ -384,6 +402,7 @@ The [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method may
 be used to visually compare these estimates:
 
 ``` r
+
 plot(bcg_releff_lat, 
      ref_line = 0)
 ```
@@ -395,6 +414,7 @@ for the effect of latitude, overlaid on the observed log odds ratios in
 each study:
 
 ``` r
+
 library(dplyr)
 #> 
 #> Attaching package: 'dplyr'
@@ -456,6 +476,7 @@ effectiveness in a new study is wide and covers a range of harmful
 effects:
 
 ``` r
+
 (bcg_predeff_unadj <- relative_effects(bcg_fit_unadj, predictive_distribution = TRUE))
 #>                        mean   sd 2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> delta_new[Vaccinated] -0.77 0.75 -2.3 -1.22 -0.76 -0.31  0.73    16583    17208    1
@@ -464,6 +485,7 @@ effects:
 The predictive probability of a new trial showing a harmful effect is:
 
 ``` r
+
 mean(as.matrix(bcg_predeff_unadj) > 0)
 #> [1] 0.1316
 ```
@@ -473,6 +495,7 @@ relative effects now depends on latitude; here we calculate these in
 increments of 10 degrees from the equator:
 
 ``` r
+
 bcg_predeff_lat <- relative_effects(bcg_fit_lat,
                                    newdata = tibble::tibble(latitude = seq(0, 50, by = 10),
                                                             label = paste0(latitude, "\u00B0 latitude")),
@@ -549,6 +572,7 @@ The predictive probabilities of a new trial carried out at a given
 latitude showing a harmful effect can be calculated as:
 
 ``` r
+
 colMeans(as.matrix(bcg_predeff_lat) > 0)
 #>  delta_new[0° latitude: Vaccinated] delta_new[10° latitude: Vaccinated] 
 #>                              0.8062                              0.5047 
@@ -572,7 +596,7 @@ Dias, S., A. E. Ades, N. J. Welton, J. P. Jansen, and A. J. Sutton.
 2018. *Network Meta-Analysis for Decision Making*. Statistics in
 Practice. John Wiley & Sons, Ltd.
 
-Dias, S., A. J. Sutton, N. J. Welton, and A. E. Ades. 2011. “NICE DSU
+Dias, S., A. J. Sutton, N. J. Welton, and A. E. Ades. 2011. *NICE DSU
 Technical Support Document 3: Heterogeneity: Subgroups, Meta-Regression,
-Bias and Bias-Adjustment.” National Institute for Health and Care
+Bias and Bias-Adjustment*. National Institute for Health and Care
 Excellence. <https://sheffield.ac.uk/nice-dsu>.

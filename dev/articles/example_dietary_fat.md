@@ -1,6 +1,7 @@
 # Example: Dietary fat
 
 ``` r
+
 library(multinma)
 options(mc.cores = parallel::detectCores())
 ```
@@ -19,6 +20,7 @@ diets to control (non-reduced fat diets) for preventing mortality
 The data are available in this package as `dietary_fat`:
 
 ``` r
+
 head(dietary_fat)
 #>   studyn            studyc trtn        trtc   r    n      E
 #> 1      1              DART    1     Control 113 1015 1917.0
@@ -38,6 +40,7 @@ person-years at risk (`E`) in each arm, so we use the function
 We set “Control” as the reference treatment.
 
 ``` r
+
 diet_net <- set_agd_arm(dietary_fat, 
                         study = studyc,
                         trt = trtc,
@@ -94,6 +97,7 @@ by these prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -106,6 +110,7 @@ function. By default, this will use a Poisson likelihood with a log link
 function, auto-detected from the data.
 
 ``` r
+
 diet_fit_FE <- nma(diet_net, 
                    trt_effects = "fixed",
                    prior_intercept = normal(scale = 100),
@@ -116,6 +121,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 diet_fit_FE
 #> A fixed effects NMA with a poisson likelihood (log link).
 #> Inference for Stan model: poisson.
@@ -126,7 +132,7 @@ diet_fit_FE
 #> d[Reduced Fat]   -0.01    0.00 0.05   -0.11   -0.04   -0.01    0.03    0.10  3568    1
 #> lp__           5386.16    0.06 2.49 5380.38 5384.77 5386.50 5387.97 5389.91  1586    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:58:36 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:39:13 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -136,6 +142,7 @@ By default, summaries of the study-specific intercepts \mu_j are hidden,
 but could be examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(diet_fit_FE, pars = c("d", "mu"))
 ```
@@ -145,6 +152,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(diet_fit_FE)
 ```
 
@@ -163,6 +171,7 @@ prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -176,6 +185,7 @@ summary(half_normal(scale = 5))
 Fitting the RE model
 
 ``` r
+
 diet_fit_RE <- nma(diet_net, 
                    trt_effects = "random",
                    prior_intercept = normal(scale = 100),
@@ -187,6 +197,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 diet_fit_RE
 #> A random effects NMA with a poisson likelihood (log link).
 #> Inference for Stan model: poisson.
@@ -198,7 +209,7 @@ diet_fit_RE
 #> lp__           5379.23    0.11 3.74 5371.41 5376.76 5379.38 5381.88 5385.92  1217    1
 #> tau               0.13    0.00 0.12    0.01    0.05    0.10    0.18    0.45   819    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:58:40 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:39:17 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -209,6 +220,7 @@ study-specific relative effects \delta\_{jk} are hidden, but could be
 examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(diet_fit_RE, pars = c("d", "mu", "delta"))
 ```
@@ -218,6 +230,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(diet_fit_RE, prior = c("trt", "het"))
 ```
 
@@ -230,6 +243,7 @@ Model fit can be checked using the
 function:
 
 ``` r
+
 (dic_FE <- dic(diet_fit_FE))
 #> Residual deviance: 22.5 (on 21 data points)
 #>                pD: 11.3
@@ -237,6 +251,7 @@ function:
 ```
 
 ``` r
+
 (dic_RE <- dic(diet_fit_RE))
 #> Residual deviance: 21.4 (on 21 data points)
 #>                pD: 13.5
@@ -252,12 +267,14 @@ corresponding [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
 method.
 
 ``` r
+
 plot(dic_FE)
 ```
 
 ![](example_dietary_fat_files/figure-html/diet_FE_resdev_plot-1.png)
 
 ``` r
+
 plot(dic_RE)
 ```
 
@@ -277,6 +294,7 @@ distribution. We set `type = "response"` to produce predicted rates
 (`type = "link"` would produce predicted log rates).
 
 ``` r
+
 pred_FE <- predict(diet_fit_FE, 
                    baseline = distr(qnorm, mean = -3, sd = 1.77^-0.5), 
                    type = "response")
@@ -290,6 +308,7 @@ plot(pred_FE)
 ![](example_dietary_fat_files/figure-html/diet_pred_FE-1.png)
 
 ``` r
+
 pred_RE <- predict(diet_fit_RE, 
                    baseline = distr(qnorm, mean = -3, sd = 1.77^-0.5), 
                    type = "response")
@@ -307,6 +326,7 @@ for every study in the network based on their estimated baseline log
 rate \mu_j:
 
 ``` r
+
 pred_FE_studies <- predict(diet_fit_FE, type = "response")
 pred_FE_studies
 #> ------------------------------------------------------------------- Study: DART ---- 
@@ -384,14 +404,13 @@ plot(pred_FE_studies) + ggplot2::facet_grid(Study~., labeller = ggplot2::label_w
 
 ## References
 
-Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. “NICE DSU
+Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. *NICE DSU
 Technical Support Document 2: A Generalised Linear Modelling Framework
 for Pair-Wise and Network Meta-Analysis of Randomised Controlled
-Trials.” National Institute for Health and Care Excellence.
+Trials*. National Institute for Health and Care Excellence.
 <https://sheffield.ac.uk/nice-dsu>.
 
-Hooper, L., C. D. Summerbell, J. P. T. Higgins, R. L. Thompson, G.
-Clements, N. Capps, G. Davey Smith, R. Riemersma, and S. Ebrahim. 2000.
-“Reduced or Modified Dietary Fat for Preventing Cardiovascular Disease.”
-*Cochrane Database of Systematic Reviews*, no. 2.
+Hooper, L., C. D. Summerbell, J. P. T. Higgins, et al. 2000. “Reduced or
+Modified Dietary Fat for Preventing Cardiovascular Disease.” *Cochrane
+Database of Systematic Reviews*, no. 2.
 <https://doi.org/10.1002/14651858.CD002137>.

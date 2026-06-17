@@ -2,6 +2,21 @@
 
 ## multinma 0.9.1.9000
 
+- Feature: New function
+  [`bind_chains()`](https://dmphillippo.github.io/multinma/dev/reference/bind_chains.md)
+  combines multiple runs of the same model into a single model object.
+  For MCMC arrays, a new
+  [`cbind.mcmc_array()`](https://dmphillippo.github.io/multinma/dev/reference/bind_chains.md)
+  method combines multiple MCMC arrays containing samples of the same
+  parameters into a single MCMC array.
+- Improvement:
+  [`relative_effects()`](https://dmphillippo.github.io/multinma/dev/reference/relative_effects.md)
+  now works when `newdata` contains integration points. Furthermore,
+  [`relative_effects()`](https://dmphillippo.github.io/multinma/dev/reference/relative_effects.md)
+  will now ask for integration points to be provided for models that
+  involve non-linear covariate terms, so that these can be averaged over
+  correctly.
+
 ## multinma 0.9.1
 
 CRAN release: 2026-04-16

@@ -1,6 +1,7 @@
 # Example: Certolizumab
 
 ``` r
+
 library(multinma)
 options(mc.cores = parallel::detectCores())
 ```
@@ -14,6 +15,7 @@ options(mc.cores = parallel::detectCores())
     #>     dgamma, pgamma, qgamma
 
 ``` r
+
 library(dplyr)
 #> 
 #> Attaching package: 'dplyr'
@@ -33,6 +35,7 @@ patients who had failed on disease-modifying anti-rheumatic drugs
 this package as `certolizumab`:
 
 ``` r
+
 head(certolizumab)
 #>      study        trt   r   n disease_duration
 #> 1  RAPID 1    Placebo  15 199             6.15
@@ -53,6 +56,7 @@ correction to the Abe 2006 study, in which no events were observed on
 placebo.
 
 ``` r
+
 certolizumab <-
   certolizumab %>%
   group_by(study) %>% 
@@ -87,6 +91,7 @@ p_baseline_risk +
 We begin by setting up the network.
 
 ``` r
+
 cert_net <- set_agd_arm(certolizumab,
                         study = study, trt = trt, n = n, r = r,
                         trt_class = if_else(trt == "Placebo", "Placebo", "Treatment"))
@@ -118,6 +123,7 @@ cert_net
 Plot the network structure.
 
 ``` r
+
 plot(cert_net, weight_edges = TRUE, weight_nodes = TRUE)
 ```
 
@@ -132,6 +138,7 @@ baseline risk meta-regression model.
 ### Fixed effect meta-analysis
 
 ``` r
+
 cert_fit_FE <- nma(cert_net,
                    trt_effects = "fixed",
                    regression = ~.mu:.trt,
@@ -149,6 +156,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 cert_fit_FE
 #> A fixed effects NMA with a binomial likelihood (logit link).
 #> Regression model: ~.mu:.trt.
@@ -178,7 +186,7 @@ cert_fit_FE
 #> d[Tocilizumab]                   2.46  2863 1.00
 #> lp__                         -1703.43  1589 1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:57:43 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:38:32 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -187,6 +195,7 @@ cert_fit_FE
 ### Random effects meta-analysis
 
 ``` r
+
 cert_fit_RE <- nma(cert_net,
                    trt_effects = "random",
                    regression = ~.mu:.trt,
@@ -206,6 +215,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 cert_fit_RE
 #> A random effects NMA with a binomial likelihood (logit link).
 #> Regression model: ~.mu:.trt.
@@ -237,7 +247,7 @@ cert_fit_RE
 #> lp__                         -1706.97  1087 1.00
 #> tau                              0.69   617 1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:57:47 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:38:36 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -250,6 +260,7 @@ Model fit can be checked using the
 function:
 
 ``` r
+
 (dic_FE <- dic(cert_fit_FE))
 #> Residual deviance: 27.1 (on 24 data points)
 #>                pD: 18.7
@@ -265,12 +276,14 @@ corresponding [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
 method.
 
 ``` r
+
 plot(dic_FE)
 ```
 
 ![](example_certolizumab_files/figure-html/unnamed-chunk-15-1.png)
 
 ``` r
+
 plot(dic_RE)
 ```
 
@@ -282,6 +295,7 @@ Plotting the estimated baseline risk effect (fixed effect model)
 together with the crude odds ratios.
 
 ``` r
+
 cert_mu_reg <-
   cert_fit_FE %>%
   relative_effects(
@@ -314,6 +328,7 @@ the
 function:
 
 ``` r
+
 newdata <- data.frame(.mu = cert_fit_FE$xbar[[".mu"]])
 (cert_releff_FE <- relative_effects(cert_fit_FE, newdata = newdata))
 #> ------------------------------------------------------------------ Study: New 1 ---- 
@@ -335,6 +350,7 @@ plot(cert_releff_FE, ref_line = 0)
 ![](example_certolizumab_files/figure-html/certolizumab_releff_FE-1.png)
 
 ``` r
+
 (cert_releff_RE <- relative_effects(cert_fit_RE, newdata = newdata))
 #> ------------------------------------------------------------------ Study: New 1 ---- 
 #> 
@@ -360,6 +376,7 @@ will produce relative effects per study. Note that the estimated
 study-specific intercepts are used.
 
 ``` r
+
 (cert_releff_study_RE <- relative_effects(cert_fit_RE))
 #> --------------------------------------------------------------- Study: Abe 2006 ---- 
 #> 
@@ -535,6 +552,7 @@ To produce predictions against a reference baseline risk distribution,
 values sampled from the `baseline` distribution, for example:
 
 ``` r
+
 predict(cert_fit_RE, baseline = distr(qnorm, mean = cert_fit_RE$xbar[[".mu"]], sd = 0.5))
 #> ------------------------------------------------------------------ Study: New 1 ---- 
 #> 
@@ -553,6 +571,7 @@ per study. The estimated study-specific intercepts are used in the
 baseline risk meta-regression.
 
 ``` r
+
 predict(cert_fit_RE)
 #> --------------------------------------------------------------- Study: Abe 2006 ---- 
 #> 
@@ -707,6 +726,7 @@ We can also produce treatment rankings, rank probabilities, and
 cumulative rank probabilities.
 
 ``` r
+
 (cert_ranks <- posterior_ranks(cert_fit_RE, newdata = newdata,
                                lower_better = FALSE))
 #> ------------------------------------------------------------------ Study: New 1 ---- 
@@ -729,6 +749,7 @@ plot(cert_ranks)
 ![](example_certolizumab_files/figure-html/certolizumab_ranks-1.png)
 
 ``` r
+
 (cert_rankprobs <- posterior_rank_probs(cert_fit_RE, newdata = newdata,
                                         lower_better = FALSE))
 #> ------------------------------------------------------------------ Study: New 1 ---- 
@@ -751,6 +772,7 @@ plot(cert_rankprobs)
 ![](example_certolizumab_files/figure-html/certolizumab_rankprobs-1.png)
 
 ``` r
+
 (cert_cumrankprobs <- posterior_rank_probs(cert_fit_RE, cumulative = TRUE,
                                            newdata = newdata, lower_better = FALSE))
 #> ------------------------------------------------------------------ Study: New 1 ---- 
@@ -777,6 +799,7 @@ regular meta-regression. For example, we can add `disease_duration` to
 the regression formula.
 
 ``` r
+
 nma(cert_net,
     trt_effects = "fixed",
     regression = ~(disease_duration + .mu):.trt,
@@ -815,7 +838,7 @@ nma(cert_net,
 #> d[Tocilizumab]                                2.28     2.48  3132 1.00
 #> lp__                                      -1706.87 -1703.98  1706 1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 09:57:56 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:38:43 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -823,7 +846,7 @@ nma(cert_net,
 
 ## References
 
-Dias, S., A. J. Sutton, N. J. Welton, and A. E. Ades. 2011. “NICE DSU
+Dias, S., A. J. Sutton, N. J. Welton, and A. E. Ades. 2011. *NICE DSU
 Technical Support Document 3: Heterogeneity: Subgroups, Meta-Regression,
-Bias and Bias-Adjustment.” National Institute for Health and Care
+Bias and Bias-Adjustment*. National Institute for Health and Care
 Excellence. <https://sheffield.ac.uk/nice-dsu>.

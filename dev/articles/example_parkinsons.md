@@ -1,6 +1,7 @@
 # Example: Parkinson's disease
 
 ``` r
+
 library(multinma)
 options(mc.cores = parallel::detectCores())
 ```
@@ -20,6 +21,7 @@ placebo ([Dias et al. 2011](#ref-TSD2)). The data are available in this
 package as `parkinsons`:
 
 ``` r
+
 head(parkinsons)
 #>   studyn trtn     y    se   n  diff se_diff
 #> 1      1    1 -1.22 0.504  54    NA   0.504
@@ -64,6 +66,7 @@ We have arm-level continuous data giving the mean off-time reduction
 to set up the network.
 
 ``` r
+
 arm_net <- set_agd_arm(parkinsons, 
                       study = studyn,
                       trt = trtn,
@@ -100,6 +103,7 @@ size in the network plot.
 Plot the network structure.
 
 ``` r
+
 plot(arm_net, weight_edges = TRUE, weight_nodes = TRUE)
 ```
 
@@ -120,6 +124,7 @@ by these prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -131,6 +136,7 @@ The model is fitted using the
 function.
 
 ``` r
+
 arm_fit_FE <- nma(arm_net, 
                   trt_effects = "fixed",
                   prior_intercept = normal(scale = 100),
@@ -142,6 +148,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 arm_fit_FE
 #> A fixed effects NMA with a normal likelihood (identity link).
 #> Inference for Stan model: normal.
@@ -155,7 +162,7 @@ arm_fit_FE
 #> d[5] -0.30    0.00 0.22  -0.73 -0.45 -0.30 -0.15  0.12  3127    1
 #> lp__ -6.76    0.06 2.41 -12.44 -8.12 -6.42 -5.02 -3.12  1724    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:00:21 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:40:36 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -165,6 +172,7 @@ By default, summaries of the study-specific intercepts \mu_j are hidden,
 but could be examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(arm_fit_FE, pars = c("d", "mu"))
 ```
@@ -174,6 +182,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(arm_fit_FE)
 ```
 
@@ -192,6 +201,7 @@ prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -205,6 +215,7 @@ summary(half_normal(scale = 5))
 Fitting the RE model
 
 ``` r
+
 arm_fit_RE <- nma(arm_net, 
                   seed = 379394727,
                   trt_effects = "random",
@@ -227,6 +238,7 @@ where in the posterior distribution these divergences are happening
 (indicated by red crosses):
 
 ``` r
+
 pairs(arm_fit_RE, pars = c("mu[4]", "d[3]", "delta[4: 3]", "tau"))
 ```
 
@@ -243,6 +255,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 arm_fit_RE
 #> A random effects NMA with a normal likelihood (identity link).
 #> Inference for Stan model: normal.
@@ -257,7 +270,7 @@ arm_fit_RE
 #> lp__ -13.00    0.10 3.53 -20.90 -15.16 -12.71 -10.46 -7.04  1160    1
 #> tau    0.37    0.02 0.39   0.01   0.11   0.26   0.49  1.46   516    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:00:27 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:40:41 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -268,6 +281,7 @@ study-specific relative effects \delta\_{jk} are hidden, but could be
 examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(arm_fit_RE, pars = c("d", "mu", "delta"))
 ```
@@ -277,6 +291,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(arm_fit_RE)
 ```
 
@@ -289,6 +304,7 @@ Model fit can be checked using the
 function:
 
 ``` r
+
 (arm_dic_FE <- dic(arm_fit_FE))
 #> Residual deviance: 13.5 (on 15 data points)
 #>                pD: 11.2
@@ -296,6 +312,7 @@ function:
 ```
 
 ``` r
+
 (arm_dic_RE <- dic(arm_fit_RE))
 #> Residual deviance: 13.7 (on 15 data points)
 #>                pD: 12.4
@@ -311,12 +328,14 @@ corresponding [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
 method.
 
 ``` r
+
 plot(arm_dic_FE)
 ```
 
 ![](example_parkinsons_files/figure-html/arm_FE_resdev_plot-1.png)
 
 ``` r
+
 plot(arm_dic_RE)
 ```
 
@@ -330,6 +349,7 @@ relative effects against placebo using the
 function with `trt_ref = 1`:
 
 ``` r
+
 (arm_releff_FE <- relative_effects(arm_fit_FE, trt_ref = 1))
 #>       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> d[4] -0.54 0.47 -1.47 -0.86 -0.55 -0.23  0.38     1520     2166    1
@@ -342,6 +362,7 @@ plot(arm_releff_FE, ref_line = 0)
 ![](example_parkinsons_files/figure-html/arm_releff_FE-1.png)
 
 ``` r
+
 (arm_releff_RE <- relative_effects(arm_fit_RE, trt_ref = 1))
 #>       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> d[4] -0.53 0.61 -1.69 -0.91 -0.55 -0.15  0.65     1998     1640    1
@@ -367,6 +388,7 @@ baseline distribution corresponds to treatment 1. (Strictly speaking,
 function was used.)
 
 ``` r
+
 arm_pred_FE <- predict(arm_fit_FE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
@@ -384,6 +406,7 @@ plot(arm_pred_FE)
 ![](example_parkinsons_files/figure-html/arm_pred_FE-1.png)
 
 ``` r
+
 arm_pred_RE <- predict(arm_fit_RE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
@@ -405,6 +428,7 @@ reduction will be produced for every study in the network based on their
 estimated baseline response \mu_j:
 
 ``` r
+
 arm_pred_FE_studies <- predict(arm_fit_FE, type = "response")
 arm_pred_FE_studies
 #> ---------------------------------------------------------------------- Study: 1 ---- 
@@ -478,6 +502,7 @@ We can also produce treatment rankings, rank probabilities, and
 cumulative rank probabilities.
 
 ``` r
+
 (arm_ranks <- posterior_ranks(arm_fit_FE))
 #>         mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> rank[4] 3.49 0.70    2   3   3   4     5     1990       NA    1
@@ -491,6 +516,7 @@ plot(arm_ranks)
 ![](example_parkinsons_files/figure-html/parkinsons_arm_ranks-1.png)
 
 ``` r
+
 (arm_rankprobs <- posterior_rank_probs(arm_fit_FE))
 #>      p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]
 #> d[4]      0.00      0.04      0.49      0.39      0.07
@@ -504,6 +530,7 @@ plot(arm_rankprobs)
 ![](example_parkinsons_files/figure-html/parkinson_arm_rankprobs-1.png)
 
 ``` r
+
 (arm_cumrankprobs <- posterior_rank_probs(arm_fit_FE, cumulative = TRUE))
 #>      p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]
 #> d[4]      0.00      0.05      0.54      0.93         1
@@ -529,6 +556,7 @@ reduction (`diff`) and standard error (`se_diff`), we use the function
 to set up the network.
 
 ``` r
+
 contr_net <- set_agd_contrast(parkinsons, 
                               study = studyn,
                               trt = trtn,
@@ -562,6 +590,7 @@ weighted by sample size in the network plot.
 Plot the network structure.
 
 ``` r
+
 plot(contr_net, weight_edges = TRUE, weight_nodes = TRUE)
 ```
 
@@ -581,6 +610,7 @@ parameter values implied by these prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -592,6 +622,7 @@ The model is fitted using the
 function.
 
 ``` r
+
 contr_fit_FE <- nma(contr_net, 
                     trt_effects = "fixed",
                     prior_trt = normal(scale = 100))
@@ -602,6 +633,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 contr_fit_FE
 #> A fixed effects NMA with a normal likelihood (identity link).
 #> Inference for Stan model: normal.
@@ -615,7 +647,7 @@ contr_fit_FE
 #> d[5] -0.30    0.00 0.21 -0.71 -0.44 -0.30 -0.16  0.08  3831    1
 #> lp__ -3.12    0.03 1.36 -6.55 -3.77 -2.82 -2.12 -1.39  1841    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:00:39 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:40:50 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -626,6 +658,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(contr_fit_FE)
 ```
 
@@ -643,6 +676,7 @@ implied by these prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -656,6 +690,7 @@ summary(half_normal(scale = 5))
 Fitting the RE model
 
 ``` r
+
 contr_fit_RE <- nma(contr_net, 
                     seed = 1150676438,
                     trt_effects = "random",
@@ -673,6 +708,7 @@ where in the posterior distribution these divergences are happening
 (indicated by red crosses):
 
 ``` r
+
 pairs(contr_fit_RE, pars = c("d[3]", "delta[4: 4 vs. 3]", "tau"))
 ```
 
@@ -689,6 +725,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 contr_fit_RE
 #> A random effects NMA with a normal likelihood (identity link).
 #> Inference for Stan model: normal.
@@ -703,7 +740,7 @@ contr_fit_RE
 #> lp__ -8.27    0.09 2.92 -14.84 -10.03 -7.97 -6.20 -3.43  1172 1.00
 #> tau   0.38    0.01 0.38   0.01   0.12  0.28  0.52  1.42   945 1.01
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:00:42 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:40:52 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -714,6 +751,7 @@ By default, summaries of the study-specific relative effects
 argument:
 
 ``` r
+
 # Not run
 print(contr_fit_RE, pars = c("d", "delta"))
 ```
@@ -723,6 +761,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(contr_fit_RE)
 ```
 
@@ -735,6 +774,7 @@ Model fit can be checked using the
 function:
 
 ``` r
+
 (contr_dic_FE <- dic(contr_fit_FE))
 #> Residual deviance: 6.2 (on 8 data points)
 #>                pD: 3.9
@@ -742,6 +782,7 @@ function:
 ```
 
 ``` r
+
 (contr_dic_RE <- dic(contr_fit_RE))
 #> Residual deviance: 6.5 (on 8 data points)
 #>                pD: 5.3
@@ -757,12 +798,14 @@ corresponding [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
 method.
 
 ``` r
+
 plot(contr_dic_FE)
 ```
 
 ![](example_parkinsons_files/figure-html/contr_FE_resdev_plot-1.png)
 
 ``` r
+
 plot(contr_dic_RE)
 ```
 
@@ -776,6 +819,7 @@ relative effects against placebo using the
 function with `trt_ref = 1`:
 
 ``` r
+
 (contr_releff_FE <- relative_effects(contr_fit_FE, trt_ref = 1))
 #>       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> d[4] -0.54 0.46 -1.43 -0.84 -0.53 -0.23  0.37     2193     2485    1
@@ -788,6 +832,7 @@ plot(contr_releff_FE, ref_line = 0)
 ![](example_parkinsons_files/figure-html/contr_releff_FE-1.png)
 
 ``` r
+
 (contr_releff_RE <- relative_effects(contr_fit_RE, trt_ref = 1))
 #>       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> d[4] -0.51 0.60 -1.65 -0.90 -0.52 -0.13  0.65     2505     2312    1
@@ -813,6 +858,7 @@ baseline distribution corresponds to treatment 1. (Strictly speaking,
 function was used.)
 
 ``` r
+
 contr_pred_FE <- predict(contr_fit_FE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
@@ -830,6 +876,7 @@ plot(contr_pred_FE)
 ![](example_parkinsons_files/figure-html/contr_pred_FE-1.png)
 
 ``` r
+
 contr_pred_RE <- predict(contr_fit_RE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
@@ -850,6 +897,7 @@ If the `baseline` argument is omitted an error will be raised, as there
 are no study baselines estimated in this network.
 
 ``` r
+
 # Not run
 predict(contr_fit_FE, type = "response")
 ```
@@ -858,6 +906,7 @@ We can also produce treatment rankings, rank probabilities, and
 cumulative rank probabilities.
 
 ``` r
+
 (contr_ranks <- posterior_ranks(contr_fit_FE))
 #>         mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> rank[4] 3.49 0.70    2   3   3   4     5     2741       NA    1
@@ -871,6 +920,7 @@ plot(contr_ranks)
 ![](example_parkinsons_files/figure-html/parkinsons_contr_ranks-1.png)
 
 ``` r
+
 (contr_rankprobs <- posterior_rank_probs(contr_fit_FE))
 #>      p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]
 #> d[4]      0.00      0.04      0.50      0.39      0.07
@@ -884,6 +934,7 @@ plot(contr_rankprobs)
 ![](example_parkinsons_files/figure-html/parkinsons_contr_rankprobs-1.png)
 
 ``` r
+
 (contr_cumrankprobs <- posterior_rank_probs(contr_fit_FE, cumulative = TRUE))
 #>      p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]
 #> d[4]      0.00      0.04      0.54      0.93         1
@@ -904,6 +955,7 @@ and other contribute contrast-based data. Replicating Dias et al.
 contrast-based data from studies 4-7.
 
 ``` r
+
 studies <- parkinsons$studyn
 (parkinsons_arm <- parkinsons[studies %in% 1:3, ])
 #>   studyn trtn     y    se   n  diff se_diff
@@ -937,6 +989,7 @@ combine together with
 [`combine_network()`](https://dmphillippo.github.io/multinma/dev/reference/combine_network.md).
 
 ``` r
+
 mix_arm_net <- set_agd_arm(parkinsons_arm, 
                            study = studyn,
                            trt = trtn,
@@ -983,6 +1036,7 @@ weighted by sample size in the network plot.
 Plot the network structure.
 
 ``` r
+
 plot(mix_net, weight_edges = TRUE, weight_nodes = TRUE)
 ```
 
@@ -1003,6 +1057,7 @@ by these prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -1014,6 +1069,7 @@ The model is fitted using the
 function.
 
 ``` r
+
 mix_fit_FE <- nma(mix_net, 
                   trt_effects = "fixed",
                   prior_intercept = normal(scale = 100),
@@ -1025,6 +1081,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 mix_fit_FE
 #> A fixed effects NMA with a normal likelihood (identity link).
 #> Inference for Stan model: normal.
@@ -1038,7 +1095,7 @@ mix_fit_FE
 #> d[5] -0.30    0.00 0.21 -0.72 -0.44 -0.29 -0.16  0.11  3050    1
 #> lp__ -4.66    0.05 1.87 -9.12 -5.73 -4.34 -3.23 -2.01  1640    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:00:51 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:41:00 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -1048,6 +1105,7 @@ By default, summaries of the study-specific intercepts \mu_j are hidden,
 but could be examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(mix_fit_FE, pars = c("d", "mu"))
 ```
@@ -1057,6 +1115,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(mix_fit_FE)
 ```
 
@@ -1075,6 +1134,7 @@ prior distributions with the
 [`summary()`](https://rdrr.io/r/base/summary.html) method:
 
 ``` r
+
 summary(normal(scale = 100))
 #> A Normal prior distribution: location = 0, scale = 100.
 #> 50% of the prior density lies between -67.45 and 67.45.
@@ -1088,6 +1148,7 @@ summary(half_normal(scale = 5))
 Fitting the RE model
 
 ``` r
+
 mix_fit_RE <- nma(mix_net, 
                   seed = 437219664,
                   trt_effects = "random",
@@ -1106,6 +1167,7 @@ where in the posterior distribution these divergences are happening
 (indicated by red crosses):
 
 ``` r
+
 pairs(mix_fit_RE, pars = c("d[3]", "delta[4: 4 vs. 3]", "tau"))
 ```
 
@@ -1122,6 +1184,7 @@ Basic parameter summaries are given by the
 [`print()`](https://rdrr.io/r/base/print.html) method:
 
 ``` r
+
 mix_fit_RE
 #> A random effects NMA with a normal likelihood (identity link).
 #> Inference for Stan model: normal.
@@ -1136,7 +1199,7 @@ mix_fit_RE
 #> lp__ -10.88    0.09 3.26 -18.03 -12.90 -10.60 -8.59 -5.26  1465    1
 #> tau    0.37    0.01 0.36   0.01   0.12   0.27  0.49  1.28  1080    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Apr 17 10:00:56 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jun 17 14:41:03 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -1147,6 +1210,7 @@ study-specific relative effects \delta\_{jk} are hidden, but could be
 examined by changing the `pars` argument:
 
 ``` r
+
 # Not run
 print(mix_fit_RE, pars = c("d", "mu", "delta"))
 ```
@@ -1156,6 +1220,7 @@ The prior and posterior distributions can be compared visually using the
 function:
 
 ``` r
+
 plot_prior_posterior(mix_fit_RE)
 ```
 
@@ -1168,6 +1233,7 @@ Model fit can be checked using the
 function:
 
 ``` r
+
 (mix_dic_FE <- dic(mix_fit_FE))
 #> Residual deviance: 9.3 (on 11 data points)
 #>                pD: 7
@@ -1175,6 +1241,7 @@ function:
 ```
 
 ``` r
+
 (mix_dic_RE <- dic(mix_fit_RE))
 #> Residual deviance: 9.6 (on 11 data points)
 #>                pD: 8.4
@@ -1190,12 +1257,14 @@ corresponding [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
 method.
 
 ``` r
+
 plot(mix_dic_FE)
 ```
 
 ![](example_parkinsons_files/figure-html/mix_FE_resdev_plot-1.png)
 
 ``` r
+
 plot(mix_dic_RE)
 ```
 
@@ -1209,6 +1278,7 @@ relative effects against placebo using the
 function with `trt_ref = 1`:
 
 ``` r
+
 (mix_releff_FE <- relative_effects(mix_fit_FE, trt_ref = 1))
 #>       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> d[4] -0.51 0.48 -1.46 -0.83 -0.50 -0.18  0.43     1606     2262    1
@@ -1221,6 +1291,7 @@ plot(mix_releff_FE, ref_line = 0)
 ![](example_parkinsons_files/figure-html/mix_releff_FE-1.png)
 
 ``` r
+
 (mix_releff_RE <- relative_effects(mix_fit_RE, trt_ref = 1))
 #>       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> d[4] -0.55 0.59 -1.73 -0.91 -0.54 -0.15  0.61     1952     2171    1
@@ -1246,6 +1317,7 @@ baseline distribution corresponds to treatment 1. (Strictly speaking,
 function was used.)
 
 ``` r
+
 mix_pred_FE <- predict(mix_fit_FE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
@@ -1263,6 +1335,7 @@ plot(mix_pred_FE)
 ![](example_parkinsons_files/figure-html/mix_pred_FE-1.png)
 
 ``` r
+
 mix_pred_RE <- predict(mix_fit_RE, 
                        baseline = distr(qnorm, mean = -0.73, sd = 21^-0.5),
                        type = "response",
@@ -1284,6 +1357,7 @@ reduction will be produced for every *arm-based* study in the network
 based on their estimated baseline response \mu_j:
 
 ``` r
+
 mix_pred_FE_studies <- predict(mix_fit_FE, type = "response")
 mix_pred_FE_studies
 #> ---------------------------------------------------------------------- Study: 1 ---- 
@@ -1321,6 +1395,7 @@ We can also produce treatment rankings, rank probabilities, and
 cumulative rank probabilities.
 
 ``` r
+
 (mix_ranks <- posterior_ranks(mix_fit_FE))
 #>         mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> rank[4] 3.51 0.71    2   3   3   4     5     2379       NA    1
@@ -1334,6 +1409,7 @@ plot(mix_ranks)
 ![](example_parkinsons_files/figure-html/parkinsons_mix_ranks-1.png)
 
 ``` r
+
 (mix_rankprobs <- posterior_rank_probs(mix_fit_FE))
 #>      p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]
 #> d[4]      0.00      0.04      0.49      0.39      0.08
@@ -1347,6 +1423,7 @@ plot(mix_rankprobs)
 ![](example_parkinsons_files/figure-html/parkinsons_mix_rankprobs-1.png)
 
 ``` r
+
 (mix_cumrankprobs <- posterior_rank_probs(mix_fit_FE, cumulative = TRUE))
 #>      p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]
 #> d[4]      0.00      0.04      0.53      0.92         1
@@ -1361,8 +1438,8 @@ plot(mix_cumrankprobs)
 
 ## References
 
-Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. “NICE DSU
+Dias, S., N. J. Welton, A. J. Sutton, and A. E. Ades. 2011. *NICE DSU
 Technical Support Document 2: A Generalised Linear Modelling Framework
 for Pair-Wise and Network Meta-Analysis of Randomised Controlled
-Trials.” National Institute for Health and Care Excellence.
+Trials*. National Institute for Health and Care Excellence.
 <https://sheffield.ac.uk/nice-dsu>.
