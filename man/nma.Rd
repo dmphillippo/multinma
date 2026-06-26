@@ -10,7 +10,6 @@ nma(
   trt_effects = c("fixed", "random"),
   regression = NULL,
   OVB_adj = c("all", "auto", "none"),
-  agd_regression_glm_method = 1,
   class_interactions = c("common", "exchangeable", "independent"),
   class_effects = c("independent", "common", "exchangeable"),
   class_sd = c("independent", "common"),

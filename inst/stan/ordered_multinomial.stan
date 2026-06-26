@@ -9,7 +9,7 @@ data {
   int<lower=2> ncat;
 
   // -- AgD regression coefficients --
-  matrix[ni_agd_regression ? ni_agd_regression : 0, ni_agd_regression ? nX : 0] agd_regression_OVB_GLM; //  GLM OVB adjustment
+  // matrix[ni_agd_regression ? ni_agd_regression : 0, ni_agd_regression ? nX : 0] agd_regression_OVB_GLM; //  GLM OVB adjustment
   //int np_agd_regression; // Total number of intercepts
   ///vector[no_agd_regression ? nc_agd_regression : 0] agd_regression_OVB_GLM; //  GLM OVB adjustment
   //array[ns_agd_regression ? ns_agd_regression : 0] int agd_regression_ncoef_cpt; // Number of intercepts per study
@@ -45,7 +45,6 @@ parameters {
   // Ordered cutoffs on underlying probit-PASI scale
   // "Fixed effect" cutoffs, the same across trials
   positive_ordered[ncat - 2] f_cc;
-  real<lower=0> err_sd;
 }
 transformed parameters {
   vector[ncat - 1] cc;
@@ -288,7 +287,7 @@ transformed parameters {
 
     if (sum(agd_regression_reduced_study)){
 
-      // int c_p = 0; // intercePt counter
+      // int c_p = 0; // intercept counter
       int c_c = 0; // Coef. counter
       int c_i = 0; // Included coef. counter
       int c_o = 0; // Omitted coef. counter
@@ -470,29 +469,26 @@ model {
     for (i in 1:ns_agd_regression) {
       if(agd_regression_reduced_study[i]){
 
-        for (j in 1:ncat) {
-          mean( err_mat_cat[(c_x+1):(c_x+agd_regression_nx[i]), j]  ) ~ normal( 0 , err_sd);
-        }
+
 
         for (j in 1:agd_regression_ncoef_inc[i]) {
-            mean( (err_mat[(c_x+1):(c_x+agd_regression_nx[i]), XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ])[,j] ) ~ normal( 0 , err_sd);
+            mean( (err_mat[(c_x+1):(c_x+agd_regression_nx[i]), XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ])[,j] ) ~ normal( 0 , 0.01);
         }
 
-        for (j in 1:agd_regression_ncoef_omt[i]) {
-        mean(                (err_mat[(c_x+1):(c_x+agd_regression_nx[i]), XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ])[,j] ) ~
-        normal(
-          mean(
-            (err[                    (c_x+1):(c_x+agd_regression_nx[i])                                                        ]) .*
-            (agd_regression_OVB_GLM[(c_x+1):(c_x+agd_regression_nx[i]), XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ])[,j]
-          ), err_sd);
-        }
+        // for (j in 1:agd_regression_ncoef_omt[i]) {
+        // mean(                (err_mat[(c_x+1):(c_x+agd_regression_nx[i]), XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ])[,j] ) ~
+        // normal(
+        //   mean(
+        //     (err[                    (c_x+1):(c_x+agd_regression_nx[i])                                                        ]) .*
+        //     (agd_regression_OVB_GLM[(c_x+1):(c_x+agd_regression_nx[i]), XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ])[,j]
+        //   ), 0.01);
+        // }
 
       }
       c_i += agd_regression_ncoef_inc[i];
       c_x += agd_regression_nx[i];
       c_o += agd_regression_ncoef_omt[i];
     }
-    err_sd ~ cauchy(0, 2.5);
   }
 
   // -- Priors on cutpoints --
