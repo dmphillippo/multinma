@@ -8,6 +8,8 @@ single MCMC array.
 integration points. Furthermore, `relative_effects()` will now ask for 
 integration points to be provided for models that involve non-linear covariate 
 terms, so that these can be averaged over correctly. 
+* Fix: Error in `dic()` for models with IPD and a Normal likelihood, caused by
+dplyr deprecation.
 
 # multinma 0.9.1
 
