@@ -8,38 +8,39 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE)
 
-## ----code=readLines("children/knitr_setup.R"), include=FALSE------------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
 
-## ----include=FALSE------------------------------------------------------------
+## ----include=FALSE--------------------------------------------------------------------------------
 set.seed(76441)
 
 
-## ----eval = FALSE-------------------------------------------------------------
+## ----eval = FALSE---------------------------------------------------------------------------------
 # library(multinma)
 # options(mc.cores = parallel::detectCores())
 
-## ----setup, echo = FALSE------------------------------------------------------
+## ----setup, echo = FALSE--------------------------------------------------------------------------
 library(multinma)
 nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
              "true" =, "warn" = 2, 
              parallel::detectCores())
 options(mc.cores = nc)
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 library(dplyr)
 library(ggplot2)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 head(certolizumab)
 
 
-## ----certolizumab_baseline_risk_plot------------------------------------------
+## ----certolizumab_baseline_risk_plot--------------------------------------------------------------
 certolizumab <-
   certolizumab %>%
   group_by(study) %>% 
   mutate(
-    probability = case_when(any(r == 0) ~ (r + 0.5) / (n + 0.5), TRUE ~ r / n),
+    cc = any(r == 0),
+    probability = if_else(cc, (r + 0.5) / (n + 0.5), r / n),
     odds = probability / (1 - probability),
     log_odds = log(odds)
   )
@@ -61,22 +62,22 @@ p_baseline_risk +
   geom_point(aes(y = log_odds_ratio, size = n_total))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 cert_net <- set_agd_arm(certolizumab,
                         study = study, trt = trt, n = n, r = r,
                         trt_class = if_else(trt == "Placebo", "Placebo", "Treatment"))
 cert_net
 
 
-## ----eval=FALSE---------------------------------------------------------------
+## ----eval=FALSE-----------------------------------------------------------------------------------
 # plot(cert_net, weight_edges = TRUE, weight_nodes = TRUE)
 
-## ----certolizumab_network_plot, echo=FALSE------------------------------------
+## ----certolizumab_network_plot, echo=FALSE--------------------------------------------------------
 plot(cert_net, weight_edges = TRUE, weight_nodes = TRUE) +
   ggplot2::theme(legend.box.margin = ggplot2::unit(c(0, 0, 0, 4), "lines"))
 
 
-## ----eval=!params$run_tests---------------------------------------------------
+## ----eval=!params$run_tests-----------------------------------------------------------------------
 # cert_fit_FE <- nma(cert_net,
 #                    trt_effects = "fixed",
 #                    regression = ~.mu:.trt,
@@ -85,7 +86,7 @@ plot(cert_net, weight_edges = TRUE, weight_nodes = TRUE) +
 #                    prior_reg = normal(scale = 100),
 #                    adapt_delta = 0.95)
 
-## ----echo=FALSE, eval=params$run_tests----------------------------------------
+## ----echo=FALSE, eval=params$run_tests------------------------------------------------------------
 cert_fit_FE <- nowarn_on_ci(nma(cert_net,
                    trt_effects = "fixed",
                    regression = ~.mu:.trt,
@@ -95,11 +96,11 @@ cert_fit_FE <- nowarn_on_ci(nma(cert_net,
                    adapt_delta = 0.95))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 cert_fit_FE
 
 
-## ----eval=!params$run_tests---------------------------------------------------
+## ----eval=!params$run_tests-----------------------------------------------------------------------
 # cert_fit_RE <- nma(cert_net,
 #                    trt_effects = "random",
 #                    regression = ~.mu:.trt,
@@ -109,7 +110,7 @@ cert_fit_FE
 #                    prior_het = half_normal(2.5),
 #                    adapt_delta = 0.95)
 
-## ----echo=FALSE, eval=params$run_tests----------------------------------------
+## ----echo=FALSE, eval=params$run_tests------------------------------------------------------------
 cert_fit_RE <- nowarn_on_ci(nma(cert_net,
                    trt_effects = "random",
                    regression = ~.mu:.trt,
@@ -121,24 +122,24 @@ cert_fit_RE <- nowarn_on_ci(nma(cert_net,
                    adapt_delta = 0.95))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 cert_fit_RE
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (dic_FE <- dic(cert_fit_FE))
 (dic_RE <- dic(cert_fit_RE))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 plot(dic_FE)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 plot(dic_RE)
 
 
-## ----certolizumab_reg_plot----------------------------------------------------
+## ----certolizumab_reg_plot------------------------------------------------------------------------
 cert_mu_reg <-
   cert_fit_FE %>%
   relative_effects(
@@ -160,45 +161,45 @@ p_baseline_risk +
   geom_point(aes(y = log_odds_ratio, size = n_total), alpha = 0.6)
 
 
-## ----certolizumab_releff_FE, fig.height=3-------------------------------------
+## ----certolizumab_releff_FE, fig.height=3---------------------------------------------------------
 newdata <- data.frame(.mu = cert_fit_FE$xbar[[".mu"]])
 (cert_releff_FE <- relative_effects(cert_fit_FE, newdata = newdata))
 plot(cert_releff_FE, ref_line = 0)
 
-## ----certolizumab_releff_RE, fig.height=3-------------------------------------
+## ----certolizumab_releff_RE, fig.height=3---------------------------------------------------------
 (cert_releff_RE <- relative_effects(cert_fit_RE, newdata = newdata))
 plot(cert_releff_RE, ref_line = 0)
 
 
-## ----certolizumab_releff_study_RE---------------------------------------------
+## ----certolizumab_releff_study_RE-----------------------------------------------------------------
 (cert_releff_study_RE <- relative_effects(cert_fit_RE))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 predict(cert_fit_RE, baseline = distr(qnorm, mean = cert_fit_RE$xbar[[".mu"]], sd = 0.5))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 predict(cert_fit_RE)
 
 
-## ----certolizumab_ranks-------------------------------------------------------
+## ----certolizumab_ranks---------------------------------------------------------------------------
 (cert_ranks <- posterior_ranks(cert_fit_RE, newdata = newdata,
                                lower_better = FALSE))
 plot(cert_ranks)
 
-## ----certolizumab_rankprobs---------------------------------------------------
+## ----certolizumab_rankprobs-----------------------------------------------------------------------
 (cert_rankprobs <- posterior_rank_probs(cert_fit_RE, newdata = newdata,
                                         lower_better = FALSE))
 plot(cert_rankprobs)
 
-## ----certolizumab_cumrankprobs------------------------------------------------
+## ----certolizumab_cumrankprobs--------------------------------------------------------------------
 (cert_cumrankprobs <- posterior_rank_probs(cert_fit_RE, cumulative = TRUE,
                                            newdata = newdata, lower_better = FALSE))
 plot(cert_cumrankprobs)
 
 
-## ----eval=!params$run_tests---------------------------------------------------
+## ----eval=!params$run_tests-----------------------------------------------------------------------
 # nma(cert_net,
 #     trt_effects = "fixed",
 #     regression = ~(disease_duration + .mu):.trt,
@@ -207,7 +208,7 @@ plot(cert_cumrankprobs)
 #     prior_reg = normal(scale = 100),
 #     adapt_delta = 0.95)
 
-## ----echo=FALSE, eval=params$run_tests----------------------------------------
+## ----echo=FALSE, eval=params$run_tests------------------------------------------------------------
 nowarn_on_ci(nma(cert_net,
     trt_effects = "fixed",
     regression = ~(disease_duration + .mu):.trt,
@@ -217,7 +218,7 @@ nowarn_on_ci(nma(cert_net,
     adapt_delta = 0.95))
 
 
-## ----certolizumab_tests, include=FALSE, eval=params$run_tests-----------------
+## ----certolizumab_tests, include=FALSE, eval=params$run_tests-------------------------------------
 #--- Test against TSD 3 results ---
 library(testthat)
 library(dplyr)

@@ -51,6 +51,15 @@ test_that("summary argument", {
   expect_error(predict(smk_fit_RE, summary = NULL), m)
 })
 
+test_that("expand argument", {
+  m <- "should be TRUE or FALSE"
+  expect_error(predict(smk_fit_RE, expand = "a"), m)
+  expect_error(predict(smk_fit_RE, expand = 1), m)
+  expect_error(predict(smk_fit_RE, expand = list()), m)
+  expect_error(predict(smk_fit_RE, expand = NA), m)
+  expect_error(predict(smk_fit_RE, expand = NULL), m)
+})
+
 test_that("newdata argument", {
   m <- "not a data frame"
   expect_error(predict(smk_fit_RE, newdata = "a"), m)
@@ -117,6 +126,41 @@ test_that(".study, .trt columns are correct", {
   pred2 <- tibble::as_tibble(predict(smk_fit_RE, baseline = distr(qnorm, 0, 1)))
   expect_identical(paste0("pred[", pred2$.trt, "]"),
                    pred2$parameter)
+})
+
+test_that("expand TRUE and FALSE", {
+  pred1 <- tibble::as_tibble(predict(smk_fit_RE, expand = TRUE))
+  expect_identical(pred1$parameter,
+                   paste0("pred[",
+                          tidyr::expand_grid(s = smk_net$studies, t = smk_net$treatments) %>%
+                            dplyr::mutate(l = paste(s, t, sep = ": ")) %>%
+                            dplyr::pull(l), "]"))
+
+  pred2 <- tibble::as_tibble(predict(smk_fit_RE, expand = FALSE))
+  expect_identical(pred2$parameter,
+                   paste0("pred[",
+                          dplyr::arrange(smk_net$agd_arm, .study, .trt) %>%
+                            dplyr::mutate(l = paste(.study, .trt, sep = ": ")) %>%
+                            dplyr::pull(l), "]"))
+
+  pred3 <- tibble::as_tibble(predict(smk_fit_RE, expand = FALSE, baseline = "1"))
+  expect_identical(pred3$parameter,
+                   paste0("pred[",
+                          dplyr::filter(smk_net$agd_arm, .study == "1")$.trt, "]"))
+
+  expect_error(predict(smk_fit_RE, expand = FALSE, baseline = distr(qnorm, 0, 1)),
+               "Provide `newdata` with a `\\.trt` column")
+
+  pred4 <- tibble::as_tibble(predict(smk_fit_RE, expand = FALSE,
+                                     baseline = distr(qnorm, 0, 1),
+                                     newdata = data.frame(.trt = c("No intervention", "Self-help"))))
+  expect_identical(pred4$parameter,
+                   paste0("pred[", c("No intervention", "Self-help"), "]"))
+
+  expect_error(predict(smk_fit_RE, expand = FALSE,
+                       baseline = distr(qnorm, 0, 1),
+                       newdata = data.frame(.trt = c("a", "b"))),
+               "Treatments in `newdata` do not match those in the network")
 })
 
 pso_net <- set_ipd(plaque_psoriasis_ipd[complete.cases(plaque_psoriasis_ipd), ],
@@ -199,6 +243,60 @@ test_that(".study, .trt columns are correct", {
   expect_identical(paste0("pred[", pred2$.study, ": ", pred2$.trt, "]"),
                    pred2$parameter)
 })
+
+
+test_that("expand TRUE and FALSE", {
+  pred1 <- tibble::as_tibble(predict(pso_fit, expand = TRUE))
+  expect_identical(pred1$parameter,
+                   paste0("pred[",
+                          tidyr::expand_grid(s = pso_net$studies, t = pso_net$treatments) %>%
+                            dplyr::mutate(l = paste(s, t, sep = ": ")) %>%
+                            dplyr::pull(l), "]"))
+
+  pred2 <- tibble::as_tibble(predict(pso_fit, expand = FALSE))
+  expect_identical(pred2$parameter,
+                   paste0("pred[",
+                          dplyr::distinct(pso_net$ipd, .study, .trt) %>%
+                            dplyr::arrange(.study, .trt) %>%
+                            dplyr::mutate(l = paste(.study, .trt, sep = ": ")) %>%
+                            dplyr::pull(l), "]"))
+
+  pred3 <- tibble::as_tibble(predict(pso_fit, expand = FALSE, baseline = "UNCOVER-1",
+                                     newdata = dplyr::mutate(pso_new, .trt = "IXE_Q2W")))
+  expect_identical(pred3$parameter, "pred[New 1: IXE_Q2W]")
+
+  expect_error(predict(pso_fit, expand = FALSE, baseline = distr(qnorm, 0, 1), newdata = pso_new),
+               "`newdata` should have a `\\.trt` column")
+
+  pred4 <- tibble::as_tibble(predict(pso_fit, expand = FALSE,
+                                     baseline = distr(qnorm, 0, 1),
+                                     study = study,
+                                     newdata = dplyr::mutate(pso_new, .trt = "IXE_Q2W")))
+  expect_identical(pred4$parameter,
+                   paste0("pred[", c("One", "Two"), ": ", "IXE_Q2W", "]"))
+
+  expect_error(predict(pso_fit, expand = FALSE,
+                       baseline = distr(qnorm, 0, 1),
+                       newdata = dplyr::mutate(pso_new, .trt = "a")),
+               "Treatments in `newdata` do not match those in the network")
+
+  pred5 <- tibble::as_tibble(predict(pso_fit, expand = TRUE, level = "individual"))
+  expect_identical(pred5$parameter,
+                   paste0("pred[",
+                          dplyr::group_by(pso_net$ipd, .study) %>%
+                            dplyr::mutate(id = 1:dplyr::n()) %>%
+                            dplyr::select(-.trt) %>%
+                            tidyr::expand(id, .trt = pso_net$treatments) %>%
+                            dplyr::mutate(l = paste0(.study, ": ", .trt, ", ", id)) %>%
+                            dplyr::pull(l), "]"))
+
+  pred6 <- tibble::as_tibble(predict(pso_fit, expand = FALSE, level = "individual"))
+  expect_identical(pred6$parameter,
+                   paste0("pred[", dplyr::group_by(pso_net$ipd, .study, .trt) %>%
+                            dplyr::mutate(l = paste0(.study, ": ", .trt, ", ", 1:dplyr::n())) %>%
+                            dplyr::pull(l), "]"))
+})
+
 
 hta_net <- set_agd_arm(hta_psoriasis,
                        study = paste(studyc, year),

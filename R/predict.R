@@ -103,6 +103,9 @@
 #' @param predictive_distribution Logical, when a random effects model has been
 #'   fitted, should the predictive distribution for absolute effects in a new
 #'   study be returned? Default `FALSE`.
+#' @param expand Logical, expand out predictions for every treatment (`TRUE`),
+#'   or only produce predictions for observed treatments (`FALSE`). Default
+#'   `TRUE`.
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #' @param progress Logical, display progress for potentially long-running
 #'   calculations? Population-average predictions from ML-NMR models are
@@ -288,6 +291,7 @@ predict.stan_nma <- function(object, ...,
                              baseline_level = c("individual", "aggregate"),
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
                              predictive_distribution = FALSE,
+                             expand = TRUE,
                              summary = TRUE,
                              progress = FALSE,
                              trt_ref = NULL) {
@@ -380,6 +384,9 @@ predict.stan_nma <- function(object, ...,
     }
   }
 
+  if (!rlang::is_bool(expand))
+    abort("`expand` should be TRUE or FALSE.")
+
   if (!rlang::is_bool(summary))
     abort("`summary` should be TRUE or FALSE.")
 
@@ -421,7 +428,7 @@ predict.stan_nma <- function(object, ...,
       } else {
 
         # Make design matrix of all studies with baselines, and all treatments
-        if (is.null(object$aux_by) || !".trt" %in% object$aux_by) {
+        if (expand && (is.null(object$aux_by) || !".trt" %in% object$aux_by)) {
           studies <- forcats::fct_unique(forcats::fct_drop(forcats::fct_c(
             if (has_ipd(object$network)) object$network$ipd$.study else factor(),
             if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor()
@@ -531,7 +538,22 @@ predict.stan_nma <- function(object, ...,
     } else {
 
       # Make design matrix of SINGLE study, and all treatments
-      preddat <- tibble::tibble(.study = factor("..dummy.."), .trt = object$network$treatments)
+      if (expand) {
+        preddat <- tibble::tibble(.study = factor("..dummy.."), .trt = object$network$treatments)
+      } else if (rlang::is_string(baseline)) {
+        preddat <- dplyr::bind_rows(
+          if (has_ipd(object$network)) dplyr::distinct(object$network$ipd, .data$.study, .data$.trt),
+          if (has_agd_arm(object$network)) dplyr::distinct(object$network$agd_arm, .data$.study, .data$.trt)
+        ) %>%
+          dplyr::filter(.data$.study == baseline) %>%
+          dplyr::mutate(.study = forcats::fct_recode(.data$.study, "..dummy.." = !! baseline))
+      } else {
+        if (is.null(newdata) || !rlang::has_name(newdata, ".trt"))
+          abort("Provide `newdata` with a `.trt` column specifying the treatments to predict for when `expand = FALSE`.")
+        if (!all(newdata$.trt %in% levels(object$network$treatments)))
+          abort("Treatments in `newdata` do not match those in the network.")
+        preddat <- dplyr::mutate(newdata, .study = "..dummy..", .trt = factor(.data$.trt, levels = levels(object$network$treatments)))
+      }
 
       # Only predict for observed arms if using aux_by
       if (used_aux_by && rlang::is_string(aux)) {
@@ -1101,7 +1123,7 @@ predict.stan_nma <- function(object, ...,
       }
 
       # Produce predictions on every treatment for each observed arm/individual
-      if (is.null(object$aux_by) || ! ".trt" %in% object$aux_by) {
+      if (expand && (is.null(object$aux_by) || ! ".trt" %in% object$aux_by)) {
         if (packageVersion("dplyr") >= "1.1.1") {
           preddat <- preddat %>%
             dplyr::rename(.trt_old = ".trt") %>%
@@ -1146,7 +1168,7 @@ predict.stan_nma <- function(object, ...,
                                       classes = !is.null(object$network$classes),
                                       newdata = TRUE)
       X_all <- X_list$X_ipd
-      rownames(X_all) <- paste0("pred[", preddat$.study, ": ", preddat$.trt, "]")
+      rownames(X_all) <- paste0("pred[", make_data_labels(preddat$.study, preddat$.trt), "]")
 
       offset_all <- X_list$offset_ipd
 
@@ -1315,20 +1337,28 @@ predict.stan_nma <- function(object, ...,
       }
 
       # Make design matrix of all studies and all treatments
-      if (rlang::has_name(preddat, ".trt")) preddat <- dplyr::select(preddat, -".trt")
-      if (packageVersion("dplyr") >= "1.1.1") {
-        preddat <- dplyr::left_join(preddat,
-                                    tidyr::expand(preddat,
-                                                  .study = .data$.study,
-                                                  .trt = object$network$treatments),
-                                    by = ".study",
-                                    relationship = "many-to-many")
+      if (expand) {
+        if (rlang::has_name(preddat, ".trt")) preddat <- dplyr::select(preddat, -".trt")
+        if (packageVersion("dplyr") >= "1.1.1") {
+          preddat <- dplyr::left_join(preddat,
+                                      tidyr::expand(preddat,
+                                                    .study = .data$.study,
+                                                    .trt = object$network$treatments),
+                                      by = ".study",
+                                      relationship = "many-to-many")
+        } else {
+          preddat <- dplyr::left_join(preddat,
+                                      tidyr::expand(preddat,
+                                                    .study = .data$.study,
+                                                    .trt = object$network$treatments),
+                                      by = ".study")
+        }
       } else {
-        preddat <- dplyr::left_join(preddat,
-                                    tidyr::expand(preddat,
-                                                  .study = .data$.study,
-                                                  .trt = object$network$treatments),
-                                    by = ".study")
+        if (!rlang::has_name(preddat, ".trt"))
+          abort("`newdata` should have a `.trt` column specifying the treatments to predict for when `expand = FALSE`.")
+        if (!all(preddat$.trt %in% levels(object$network$treatments)))
+          abort("Treatments in `newdata` do not match those in the network.")
+        preddat <- dplyr::mutate(preddat, .trt = factor(.data$.trt, levels = levels(object$network$treatments)))
       }
 
       # With aux_by = .trt, only predict for observed arms
@@ -1372,7 +1402,7 @@ predict.stan_nma <- function(object, ...,
                                       classes = !is.null(object$network$classes),
                                       newdata = TRUE)
       X_all <- X_list$X_ipd
-      rownames(X_all) <- paste0("pred[", preddat$.study, ": ", preddat$.trt, "]")
+      rownames(X_all) <- paste0("pred[", make_data_labels(preddat$.study, preddat$.trt), "]")
 
       offset_all <- X_list$offset_ipd
 
@@ -2003,7 +2033,7 @@ predict.stan_nma <- function(object, ...,
             dplyr::group_by(.data$.study, .data$.trt, .data$.cc) %>%
             dplyr::mutate(.weights = .data$.sample_size / sum(.data$.sample_size))
 
-          X_weighted_mean <- Matrix::Matrix(0, ncol = dim(s_pred_array)[3], nrow = n_trt * n_cc)
+          X_weighted_mean <- Matrix::Matrix(0, ncol = dim(s_pred_array)[3], nrow = dplyr::n_distinct(s_preddat$.trt) * n_cc)
 
           X_weighted_mean[cbind(dplyr::group_indices(s_preddat),
                                 1:dim(s_pred_array)[3])] <- s_preddat$.weights
@@ -2014,7 +2044,7 @@ predict.stan_nma <- function(object, ...,
             dplyr::group_by(.data$.study, .data$.trt) %>%
             dplyr::mutate(.weights = .data$.sample_size / sum(.data$.sample_size))
 
-          X_weighted_mean <- Matrix::Matrix(0, ncol = dim(s_pred_array)[3], nrow = n_trt)
+          X_weighted_mean <- Matrix::Matrix(0, ncol = dim(s_pred_array)[3], nrow = dplyr::n_distinct(s_preddat$.trt))
 
           X_weighted_mean[cbind(dplyr::group_indices(s_preddat),
                                 1:dim(s_pred_array)[3])] <- s_preddat$.weights
@@ -2123,6 +2153,7 @@ predict.stan_nma_surv <- function(object, times = NULL,
                                   times_seq = NULL,
                                   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
                                   predictive_distribution = FALSE,
+                                  expand = TRUE,
                                   summary = TRUE,
                                   progress = interactive(),
                                   trt_ref = NULL) {

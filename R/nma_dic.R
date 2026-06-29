@@ -115,7 +115,7 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
   } else if (x$likelihood == "normal" && penalty != "pV") {
     if (has_ipd(net)) {
       ipd_y <- net$ipd$.y
-      ipd_arm <-  dplyr::group_indices(net$ipd, .data$.study, .data$.trt)
+      ipd_arm <- dplyr::group_by(net$ipd, .data$.study, .data$.trt) %>% dplyr::group_indices()
 
       # Use posterior median for sigma
       ipd_sigma <- apply(as.matrix(x, pars = "sigma"), 2, median)

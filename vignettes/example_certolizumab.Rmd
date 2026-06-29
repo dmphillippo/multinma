@@ -45,7 +45,8 @@ certolizumab <-
   certolizumab %>%
   group_by(study) %>% 
   mutate(
-    probability = case_when(any(r == 0) ~ (r + 0.5) / (n + 0.5), TRUE ~ r / n),
+    cc = any(r == 0),
+    probability = if_else(cc, (r + 0.5) / (n + 0.5), r / n),
     odds = probability / (1 - probability),
     log_odds = log(odds)
   )

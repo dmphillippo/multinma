@@ -1,4 +1,22 @@
-# multinma 0.8.1.9000
+# multinma 0.9.1.9000
+
+* Feature: New function `bind_chains()` combines multiple runs of the same model
+into a single model object. For MCMC arrays, a new `cbind.mcmc_array()` method
+combines multiple MCMC arrays containing samples of the same parameters into a 
+single MCMC array.
+* Improvement: `relative_effects()` now works when `newdata` contains
+integration points. Furthermore, `relative_effects()` will now ask for 
+integration points to be provided for models that involve non-linear covariate 
+terms, so that these can be averaged over correctly. 
+* Fix: Error in `dic()` for models with IPD and a Normal likelihood, caused by
+dplyr deprecation.
+
+# multinma 0.9.1
+
+* Fix: UBSAN warnings in CRAN additional tests, caused by unnecessary indexing
+of zero-dimensional matrices.
+
+# multinma 0.9.0
 
 * Feature: Regression on baseline risk is now supported, with a new `.mu` 
 special variable for `regression` formulas which can interact with treatment, 
@@ -13,6 +31,9 @@ set of treatments than the full analysis set.
 * Feature: New `knots.stan_nma()` method for easily obtaining the knots from a 
 fitted M-spline or piecewise exponential model, rather than working with the 
 spline basis objects `fit$basis` (#53).
+* Feature: New `expand` argument for `predict.stan_nma()`, to allow predictions
+to be made only for observed treatments in each study/for each individual 
+rather than expanding out predictions for every treatment.
 * Fix: `predict()` now works correctly for `newdata` when `aux_by` was used, 
 rather than giving errors (including #50).
 * Fix: `predict()` no longer errors when using a single `baseline` for multiple 
