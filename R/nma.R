@@ -1531,24 +1531,17 @@ nma <- function(network,
       tdat_agd_regression <- dplyr::select(dat_agd_regression_nonbl, ".study", ".trt")
       tdat_agd_regression[!trt_rows, ".trt"] <- NA
 
-      # For RE_cor we take only non-reference arm treatments (with contrast = TRUE)
-      tdat_agd_regression_arm <-
-        dplyr::distinct(dat_agd_regression_nonbl, .data$.study, .data$.trt) %>%
-        dplyr::anti_join(dplyr::select(dat_agd_regression_bl, ".study", ".trt"),
-                         by = c(".study", ".trt"))
-
-      tdat_agd_regression_arm <- tdat_agd_regression_arm[
-        ! as.character(tdat_agd_regression_arm$.study) %in% as.character(tdat_agd_regression$.study[!trt_rows])
-        ,]
+      # For RE_cor we take only the treatment coefficient rows (with contrast = TRUE)
+      # tdat_agd_regression_trt <- tdat_agd_regression[trt_rows, ]
 
     } else {
-      tdat_agd_regression <- tdat_agd_regression_arm <- tibble::tibble()
+      tdat_agd_regression <- tibble::tibble()
     }
 
-    tdat_all <- dplyr::bind_rows(tdat_ipd_arm, tdat_agd_arm, tdat_agd_contrast_nonbl, tdat_agd_regression_arm)
+    tdat_all <- dplyr::bind_rows(tdat_ipd_arm, tdat_agd_arm, tdat_agd_contrast_nonbl, tdat_agd_regression)
 
     contr <- rep(c(FALSE, FALSE, TRUE, TRUE),
-                 times = c(nrow(tdat_ipd_arm), nrow(tdat_agd_arm), nrow(tdat_agd_contrast_nonbl), nrow(tdat_agd_regression_arm)))
+                 times = c(nrow(tdat_ipd_arm), nrow(tdat_agd_arm), nrow(tdat_agd_contrast_nonbl), nrow(tdat_agd_regression)))
 
     tdat_all2 <- dplyr::bind_rows(tdat_ipd_arm, tdat_agd_arm, tdat_agd_contrast_nonbl, tdat_agd_regression)
 
@@ -3175,7 +3168,7 @@ RE_cor <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
   reftrt <- levels(trt)[1]
   if (type == "reftrt") {
     # Treat contrast rows as non ref trt arms (since they always have REs)
-    nonref <- trt != reftrt | contrast
+    nonref <- (trt != reftrt | contrast) & !is.na(trt)
     nRE <- sum(nonref)  # RE for each non ref trt arm
     Rho <- matrix(0, nrow = nRE, ncol = nRE)
     study <- study[nonref]
@@ -3185,7 +3178,7 @@ RE_cor <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
     # Treat contrast rows as non baseline arms (since they always have REs)
     nonbl <- tibble::tibble(study, trt, contrast) %>%
       dplyr::group_by(.data$study) %>%
-      dplyr::mutate(nonbl = .data$contrast | .data$trt != sort(.data$trt)[1] | (duplicated(.data$trt) & .data$trt != reftrt)) %>%
+      dplyr::mutate(nonbl = (.data$contrast | .data$trt != sort(.data$trt)[1] | (duplicated(.data$trt) & .data$trt != reftrt)) & !is.na(.data$trt)) %>%
       dplyr::pull(.data$nonbl)
     nRE <- sum(nonbl)  # RE for each non baseline arm
     Rho <- matrix(0, nrow = nRE, ncol = nRE)
