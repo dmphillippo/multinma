@@ -8,14 +8,6 @@ data {
   // Outcomes
   int<lower=2> ncat;
 
-  // -- AgD regression coefficients --
-  // matrix[ni_agd_regression ? ni_agd_regression : 0, ni_agd_regression ? nX : 0] agd_regression_OVB_GLM; //  GLM OVB adjustment
-  //int np_agd_regression; // Total number of intercepts
-  ///vector[no_agd_regression ? nc_agd_regression : 0] agd_regression_OVB_GLM; //  GLM OVB adjustment
-  //array[ns_agd_regression ? ns_agd_regression : 0] int agd_regression_ncoef_cpt; // Number of intercepts per study
-  //array[ns_agd_regression ? np_agd_regression : 0] int agd_regression_intercept_rnk; // cut thresholds
-  matrix[ns_agd_regression ? nc_agd_regression : 0, ns_agd_regression ? (ncat-1) : 0] X_agd_regression_cc; // Complementary design matrix for cc
-
   array[ni_ipd] int<lower=1, upper=ncat> ipd_r;
   array[ni_ipd, ncat] int<lower=0, upper=ncat> ipd_cat;  // Category specs, left-aligned, padded with zeros
   array[ni_ipd] int<lower=2, upper=ncat> ipd_ncat;  // Number of categories observed
@@ -24,6 +16,9 @@ data {
   vector[ni_agd_arm] agd_arm_n; // AgD arm sample sizes
   array[ni_agd_arm, ncat] int<lower=0, upper=ncat> agd_arm_cat;  // Category specs, left-aligned, padded with zeros
   array[ni_agd_arm] int<lower=2, upper=ncat> agd_arm_ncat;  // Number of categories observed
+
+  // -- AgD regression coefficients --
+  matrix[ns_agd_regression ? nc_agd_regression : 0, ns_agd_regression ? (ncat-1) : 0] X_agd_regression_cc; // Complementary design matrix for cc
 
   // Prior on differences between cutpoints
   int<lower=0,upper=6> prior_aux_dist;
