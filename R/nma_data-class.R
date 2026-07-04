@@ -163,27 +163,27 @@ print.nma_data <- function(x, ..., n = 10) {
 
   if (!is.null(x$ipd) && nrow(x$ipd) > 0){
     single_arm_studies_ipd <- x$ipd %>%
-      dplyr::select(.study, .trt) %>%
-      dplyr::distinct(.study, .trt) %>%
-      dplyr::group_by(.study) %>%
+      dplyr::select(".study", ".trt") %>%
+      dplyr::distinct(.data$.study, .data$.trt) %>%
+      dplyr::group_by(.data$.study) %>%
       dplyr::filter(dplyr::n() == 1) %>%
-      dplyr::pull(.study) %>%
+      dplyr::pull(".study") %>%
       as.character()
   }
   if (!is.null(x$agd_arm) && nrow(x$agd_arm) > 0) {
     single_arm_studies_agd <- x$agd_arm %>%
-      dplyr::select(.study, .trt) %>%
-      dplyr::group_by(.study) %>%
+      dplyr::select(".study", ".trt") %>%
+      dplyr::group_by(.data$.study) %>%
       dplyr::filter(dplyr::n() == 1) %>%
-      dplyr::pull(.study) %>%
+      dplyr::pull(".study") %>%
       as.character()
   }
   if (!is.null(x$agd_contrast) && nrow(x$agd_contrast) > 0) {
     single_arm_studies_agd_cont <- x$agd_contrast %>%
-      dplyr::select(.study, .trt) %>%
-      dplyr::group_by(.study) %>%
+      dplyr::select(".study", ".trt") %>%
+      dplyr::group_by(.data$.study) %>%
       dplyr::filter(dplyr::n() == 1) %>%
-      dplyr::pull(.study) %>%
+      dplyr::pull(".study") %>%
       as.character()
   }
 
@@ -859,9 +859,9 @@ plot.nma_data <- function(x, ..., layout, circular,
     sa_edges <- e_full[e_full$from == e_full$to, c("from", ".study")]
     if (nrow(sa_edges) > 0) {
       sa_nodes <- sa_edges %>%
-        dplyr::group_by(from) %>%
-        dplyr::summarise(study = paste(.study, collapse = ", "), .groups = "drop") %>%
-        dplyr::rename(name = from)
+        dplyr::group_by(.data$from) %>%
+        dplyr::summarise(study = paste(.data$.study, collapse = ", "), .groups = "drop") %>%
+        dplyr::rename(name = "from")
     }
   }
 
@@ -902,7 +902,7 @@ plot.nma_data <- function(x, ..., layout, circular,
                                  by = "name")
       g <- g +
         ggplot2::geom_point(data = sa_tmp,
-                            ggplot2::aes(x = x, y = y, shape = name),
+                            ggplot2::aes(x = .data$x, y = .data$y, shape = .data$name),
                             size = 2, colour = "black")
     }
 
@@ -942,7 +942,7 @@ plot.nma_data <- function(x, ..., layout, circular,
                                by = "name")
     g <- g +
       ggplot2::geom_point(data = sa_tmp,
-                          ggplot2::aes(x = x, y = y, shape = name),
+                          ggplot2::aes(x = .data$x, y = .data$y, shape = .data$name),
                           size = 2, colour = "black")
   }
 

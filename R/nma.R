@@ -112,6 +112,10 @@
 #'   `knots`, a named list of M-spline bases (one for each study) can be
 #'   provided with `mspline_basis` which will be used directly. In this case,
 #'   all other M-spline options will be ignored.
+#' @param baseline_subnet Internal flag used by [baseline_synthesis()] to allow
+#'   fitting on a disconnected network. When set, `subnetwork_trt` is computed
+#'   automatically from the network's connected components, with treatment
+#'   effects still estimated for every subnetwork. Not intended for direct use.
 #'
 #' @details When specifying a model formula in the `regression` argument, the
 #'   usual formula syntax is available (as interpreted by [model.matrix()]). The

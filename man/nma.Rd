@@ -36,7 +36,8 @@ nma(
   mspline_degree = 3,
   n_knots = 7,
   knots = NULL,
-  mspline_basis = NULL
+  mspline_basis = NULL,
+  baseline_subnet = NULL
 )
 }
 \arguments{
@@ -180,6 +181,11 @@ investigate knot placement prior to model fitting.}
 \code{knots}, a named list of M-spline bases (one for each study) can be
 provided with \code{mspline_basis} which will be used directly. In this case,
 all other M-spline options will be ignored.}
+
+\item{baseline_subnet}{Internal flag used by \code{\link[=baseline_synthesis]{baseline_synthesis()}} to allow
+fitting on a disconnected network. When set, \code{subnetwork_trt} is computed
+automatically from the network's connected components, with treatment
+effects still estimated for every subnetwork. Not intended for direct use.}
 }
 \value{
 \code{nma()} returns a \link{stan_nma} object, except when \code{consistency = "nodesplit"} when a \link{nma_nodesplit} or \link{nma_nodesplit_df} object is

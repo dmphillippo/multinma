@@ -1015,6 +1015,10 @@ set_agd_surv <- function(data,
 #' @param ... multiple data sources, as defined using the `set_*` functions
 #' @param trt_ref reference treatment for the entire network, as a string (or
 #'   coerced as such) referring to the levels of the treatment factor variable
+#' @param allow_mixed_studies Logical scalar (default `FALSE`), whether to
+#'   allow the same study label to appear in more than one data source. By
+#'   default, studies with the same label found in multiple data sources will
+#'   produce an error.
 #'
 #' @return An object of class [nma_data]
 #' @export

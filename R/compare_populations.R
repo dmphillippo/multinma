@@ -166,8 +166,8 @@ compare_populations <- function(network,
 
     study_components <- study_trt_lookup %>%
       dplyr::left_join(treatment_components, by = ".trt") %>%
-      dplyr::select(-.trt) %>%
-      dplyr::distinct(.study, subnetwork)
+      dplyr::select(-".trt") %>%
+      dplyr::distinct(.data$.study, .data$subnetwork)
 
     output_list <- list(
       propensity_scores = propensity_scores_list,
@@ -176,8 +176,8 @@ compare_populations <- function(network,
     )
 
     if (max(study_components$subnetwork) == 2) {
-      sub1 <- dplyr::filter(study_components, subnetwork == 1)$.study
-      sub2 <- dplyr::filter(study_components, subnetwork == 2)$.study
+      sub1 <- dplyr::filter(study_components, .data$subnetwork == 1)$.study
+      sub2 <- dplyr::filter(study_components, .data$subnetwork == 2)$.study
       output_list$subnetwork_matrix <- sorted_matrix[
         rownames(sorted_matrix) %in% sub1,
         colnames(sorted_matrix) %in% sub2,
@@ -209,7 +209,7 @@ compare_populations <- function(network,
         if (is.logical(x)) as.numeric(x) else x
       })
       ipd_summary <- ipd_covariate_data %>%
-        dplyr::group_by(.study) %>%
+        dplyr::group_by(.data$.study) %>%
         dplyr::summarise(
           total_n = dplyr::n(),
           dplyr::across(all_of(covariates), list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE))),
@@ -306,14 +306,14 @@ compare_populations <- function(network,
       lines_by_var <- tapply(miss$study, miss$variable, function(s) paste(unique(s), collapse = ", "))
       stop(paste0(
         "AgD covariate inputs contain missing values:\n",
-        paste(" • ", names(lines_by_var), " missing in studies: ", unname(lines_by_var), collapse = "\n"),
+        paste(" \u2022 ", names(lines_by_var), " missing in studies: ", unname(lines_by_var), collapse = "\n"),
         "\nPlease remove these variables from `covariates`"
       ))
     }
 
     # Weighted Summary of AGD
     agd_summary <- agd_all %>%
-      dplyr::group_by(.study) %>%
+      dplyr::group_by(.data$.study) %>%
       dplyr::summarise(
         total_n = sum(.data$.sample_size, na.rm = TRUE),
         !!!setNames(unlist(lapply(covariates, function(cov) {
@@ -352,13 +352,13 @@ compare_populations <- function(network,
 
     study_components <- study_trt_lookup %>%
       dplyr::left_join(treatment_components, by = ".trt") %>%
-      dplyr::select(-.trt) %>%
-      dplyr::distinct(.study, subnetwork)
+      dplyr::select(-".trt") %>%
+      dplyr::distinct(.data$.study, .data$subnetwork)
 
     all_summary <- dplyr::left_join(all_summary, study_components, by = ".study")
 
-    sub1 <- dplyr::filter(all_summary, subnetwork == 1)
-    sub2 <- dplyr::filter(all_summary, subnetwork == 2)
+    sub1 <- dplyr::filter(all_summary, .data$subnetwork == 1)
+    sub2 <- dplyr::filter(all_summary, .data$subnetwork == 2)
 
     dist_matrix <- matrix(NA, nrow = nrow(sub1), ncol = nrow(sub2), dimnames = list(sub1$.study, sub2$.study))
     dist_matrix_full <- matrix(NA, nrow = nrow(all_summary), ncol = nrow(all_summary), dimnames = list(all_summary$.study, all_summary$.study))
