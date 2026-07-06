@@ -63,6 +63,14 @@ will be chosen (see details).}
 \item{trt_class}{column of \code{data} specifying treatment classes, coded using
 integers, strings, or factors. By default, no classes are specified.}
 
+\item{ordinal_cut}{The name of an additional column in the data argument of set_agd_regression().
+This column should be NA for all rows except those corresponding to intercepts (cut-points).
+For intercept rows, the value should match one of the entries in ordinal_cut_lab,
+indicating which intercept the row represents (e.g., the first, second, etc.).}
+
+\item{ordinal_cut_lab}{A character vector of length equal to the number of outcome categories minus one.
+The order of the elements is important, as it defines the ordering of the intercepts (cut-points).}
+
 \item{sample_size}{\strong{NOT USED YET} column of \code{covariates} giving the sample
 size in each arm (optional).}
 }
@@ -135,6 +143,9 @@ This reconstruction of the covariance matrix is currently available for non-surv
 }
 }
 
+\examples{
+## will be added
+}
 \seealso{
 \code{\link[=set_ipd]{set_ipd()}} for individual patient data, \code{\link[=set_agd_arm]{set_agd_arm()}} and
 \code{\link[=set_agd_contrast]{set_agd_contrast()}} for arm- and contrast-based aggregate data, and

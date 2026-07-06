@@ -1043,7 +1043,7 @@ set_agd_surv <- function(data,
 #'   [combine_network()] for combining several data sources in one network.
 #' @template seealso_nma_data
 #' @examples
-#' ## soon
+#' ## will be added
 set_agd_regression <- function(data,
                                study,
                                trt,
