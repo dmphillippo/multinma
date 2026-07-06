@@ -981,6 +981,12 @@ set_agd_surv <- function(data,
 #'   treatment with the `.trt` special.
 #' @param covariates data frame of covariate summary statistics for each study,
 #'   with corresponding `study` column matching that in `data`
+#' @param ordinal_cut The name of an additional column in the data argument of set_agd_regression().
+#'  This column should be NA for all rows except those corresponding to intercepts (cut-points).
+#'  For intercept rows, the value should match one of the entries in ordinal_cut_lab,
+#'   indicating which intercept the row represents (e.g., the first, second, etc.).
+#' @param ordinal_cut_lab A character vector of length equal to the number of outcome categories minus one.
+#'  The order of the elements is important, as it defines the ordering of the intercepts (cut-points).
 #' @param sample_size **NOT USED YET** column of `covariates` giving the sample
 #'   size in each arm (optional).
 #'
@@ -1037,6 +1043,7 @@ set_agd_surv <- function(data,
 #'   [combine_network()] for combining several data sources in one network.
 #' @template seealso_nma_data
 #' @examples
+#' ## soon
 set_agd_regression <- function(data,
                                study,
                                trt,
@@ -1239,7 +1246,7 @@ set_agd_regression <- function(data,
                                            dplyr::filter(., is.na(.data$.estimate)) %>% dplyr::select(-".estimate") %>% as.list()
                                            ) %>%
                           dplyr::select(-".study"),
-                        .keep = TRUE) %>% ungroup()
+                        .keep = TRUE) %>% dplyr::ungroup()
 
   # Store regression formulas in data
   d <- dplyr::left_join(d,
@@ -1314,7 +1321,7 @@ set_agd_regression <- function(data,
   for (si in levels(d$.study)) {
     tmp_cov <- tmp_cor <- tmp_se <- NULL
 
-    tmp_se  <- if (!is.null(.se) ) d %>% filter(!is.na(.estimate) & .study== si ) %>% dplyr::select(.se) %>% pull()
+    tmp_se  <- if (!is.null(.se) ) d %>% dplyr::filter(!is.na(.estimate) & .study== si ) %>% dplyr::select(.se) %>% dplyr::pull()
     if (!is.null(tmp_se) && all(is.na(tmp_se))) tmp_se <- NULL
     tmp_cov <- if (!missing(cov) && (si %in% names(cov)) ) cov[[si]]
     tmp_cor <- if (!missing(cor) && (si %in% names(cor)) ) cor[[si]]
@@ -1400,7 +1407,7 @@ set_agd_regression <- function(data,
       abort(' `ordinal_cut` must be a subset of `ordinal_cut_lab`.')
     d$.rank_intercept <- match(.ordinal_cut, ordinal_cut_lab)
     d$.rank_intercept[is.na(d$.rank_intercept)] <- 0
-    d <- d %>% mutate(.ordinal_cut_lab = rep(list(ordinal_cut_lab), n()))
+    d <- d %>% dplyr::mutate(.ordinal_cut_lab = rep(list(ordinal_cut_lab), dplyr::n()))
   }
 
   # Produce nma_data object

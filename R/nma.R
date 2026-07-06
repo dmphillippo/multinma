@@ -944,22 +944,23 @@ nma <- function(network,
     # Total number of coef.
     nc_agd_regression <- sum(agd_regression_ncoef)
 
+    # Check availability of QMC integration points for each study
+    agd_regression_qmc_known <- dat_agd_regression_split %>%
+      purrr::map_lgl(
+        ~ all(purrr::flatten(
+          .x %>% dplyr::select( paste0('.int_',agd_reg_var_nma))
+        ) %>% purrr::map_int(length))
+      )
+
     # Unlist dat_agd_regression
     dat_agd_regression <- dplyr::bind_rows(dat_agd_regression_split)
-
-    # Check availability of QMC integration points
-    # Note: This requirement may be reconsidered in the future to allow QMC for studies where it is necessary, for example:
-    #   - One study is full, and the Cov matrix is fully reported, so no QMC integration points are needed.
-    #   - Another one is full, but for the Cov matrix reconstruction, QMC integration points are needed.
-    dat_agd_regression$.qmc_known <-
-    length(setdiff(paste0('.int_',agd_reg_var_nma),colnames(dat_agd_regression_split[[1]] ))) == 0
 
     # Split into baseline and non-baseline rows
     dat_agd_regression_bl <- dplyr::filter(dat_agd_regression, is.na(.data$.estimate))
     dat_agd_regression_nonbl <- dplyr::filter(dat_agd_regression, !is.na(.data$.estimate))
 
     # Study names
-    agd_regression_name_study <- dat_agd_regression_bl %>% pull(.study) %>% as.character()
+    agd_regression_name_study <- dat_agd_regression_bl %>% dplyr::pull(.data$.study) %>% as.character()
 
     # Pull estimates
     est_agd_regression <- dat_agd_regression_nonbl$.estimate
@@ -972,7 +973,7 @@ nma <- function(network,
 
     # --- Covariance structure ---
     agd_regression_cov_known <-  dat_agd_regression_split %>%
-      map_lgl(~ .x %>% dplyr::filter(!is.na(.estimate)) %>%
+      purrr::map_lgl(~ .x %>% dplyr::filter(!is.na(.estimate)) %>%
                 dplyr::summarise(.cov_known =  all(.cov_known)) %>% dplyr::pull(.cov_known) )
 
     if ( sum(!agd_regression_cov_known) && likelihood %in% valid_lhood$survival ) {
@@ -986,7 +987,7 @@ nma <- function(network,
     # Unpack given covariance matrices and others will be reconstructed
     cov_agd_regression <- vector("list", ns_agd_regression )
     cov_agd_regression[agd_regression_cov_known] <-
-      by( dat_agd_regression_split %>%  dplyr::bind_rows() %>% dplyr::filter(.cov_known) ,
+      by( dat_agd_regression_split %>%  dplyr::bind_rows() %>% dplyr::filter(.data$.cov_known) ,
           ~.study, function(x) unpack_tri(x$.cov))[ names(agd_regression_cov_known)[agd_regression_cov_known] ]
 
     # --- Update reduced study status using OVB adjustment type ---
@@ -1112,7 +1113,7 @@ nma <- function(network,
         })
 
       # Number of rows for each study
-      agd_regression_nx <- idat_agd_regression %>% map_int(~{
+      agd_regression_nx <- idat_agd_regression %>% purrr::map_int(~{
         if(nrow(.x)!=0)
           .x %>% dplyr::filter(!is.na(.estimate)) %>% nrow()
         else 0
