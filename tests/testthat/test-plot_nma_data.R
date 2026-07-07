@@ -335,7 +335,9 @@ test_that("NDMM", {
          # Manual layout
          layout = data.frame(x = c(0, -1, 1),
                              y = c(-0.5, 0, 0))) +
-      guides(edge_colour = guide_legend(override.aes = list(edge_width = 2))) +
+      guides(size = guide_legend(order = 1),
+             edge_width = guide_legend(order = 2),
+             edge_colour = guide_legend(override.aes = list(edge_width = 2), order = 3)) +
       theme(legend.position = "bottom", legend.direction = "vertical")
   )
 })
