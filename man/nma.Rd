@@ -73,7 +73,9 @@ from the first class in each set.}
 \item{connect_baseline}{Optional baseline connections. Supply one or more
 \code{con()} specifications to share baselines between studies. Random
 baseline require a \code{baseline_prior} distribution. All studies listed in a
-single \code{con()} that are \code{type = "fixed"} must originate from the same data type (IPD or AgD).}
+single \code{con()} that are \code{type = "fixed"} must originate from the same data type (IPD or AgD).
+Multiple \code{con()} specifications may only be combined if they are all
+\code{type = "fixed"}; a \code{type = "random"} connection must be given on its own.}
 
 \item{likelihood}{Character string specifying a likelihood, if unspecified
 will be inferred from the data (see details)}

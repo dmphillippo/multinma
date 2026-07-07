@@ -101,6 +101,54 @@ test_that("baseline_synthesis() prior_intercept_sd must be valid", {
   expect_error(baseline_synthesis(sa_net, prior_intercept_sd = "a"), m_baseline_sd)
 })
 
+test_that("baseline_synthesis() requires a disconnected network", {
+  expect_error(baseline_synthesis(sa_net), "`baseline_synthesis()` is only for disconnected networks.", fixed = TRUE)
+})
+
+# Minimal disconnected, AgD-arm-only network: two studies, no shared treatment
+disc_dat <- tibble(study = c("S1", "S1", "S2", "S2"),
+                   trt   = c("A", "B", "C", "D"),
+                   r     = c(50, 60, 55, 65),
+                   n     = c(100, 100, 100, 100))
+disc_net <- set_agd_arm(disc_dat, study, trt, r = r, n = n)
+
+test_that("baseline_synthesis() summarises baseline parameters for the reference subnetwork only", {
+  skip_on_cran()
+
+  fit <- suppressWarnings(baseline_synthesis(disc_net, iter = 50))
+
+  expect_s3_class(fit, "baseline_synthesis")
+  expect_s3_class(fit, "stan_nma")
+
+  params <- fit$baseline_summary$parameter
+  expect_true(all(c("baseline_new", "baseline_mean", "baseline_sd") %in% params))
+  # Only S1 (the reference treatment's subnetwork) contributes a mu[] row
+  expect_equal(sum(grepl("^mu\\[", params)), 1)
+  # d[] splits into one relative effect per subnetwork
+  expect_equal(sum(grepl("^d\\[", params)), 2)
+})
+
+# Minimal disconnected, AgD-arm-only network with three subnetworks, no shared treatments
+disc_dat_3 <- tibble(study = c("S1", "S1", "S2", "S2", "S3", "S3"),
+                     trt   = c("A", "B", "C", "D", "E", "F"),
+                     r     = c(50, 60, 55, 65, 48, 58),
+                     n     = c(100, 100, 100, 100, 100, 100))
+disc_net_3 <- set_agd_arm(disc_dat_3, study, trt, r = r, n = n)
+
+test_that("baseline_synthesis() works with more than two subnetworks", {
+  skip_on_cran()
+
+  fit <- suppressWarnings(baseline_synthesis(disc_net_3, iter = 50))
+
+  expect_s3_class(fit, "baseline_synthesis")
+
+  params <- fit$baseline_summary$parameter
+  # Only S1 (the reference treatment's subnetwork) contributes a mu[] row
+  expect_equal(sum(grepl("^mu\\[", params)), 1)
+  # d[] splits into one relative effect per subnetwork (S1 vs S2 vs S3)
+  expect_equal(sum(grepl("^d\\[", params)), 3)
+})
+
 # Make dummy covariate data for smoking network
 ns_agd <- max(smoking$studyn)
 smkdummy <-
@@ -568,10 +616,54 @@ test_that("con() recieves correct arguments", {
   expect_error(nma(pso_net, connect_baseline = con(type = 1, studies = c("FIXTURE", "FEATURE"), baseline_prior = normal(0,10))), "type must equal 'fixed' or 'random'.")
   expect_error(nma(pso_net, connect_baseline = list(con(type = "rando", studies = c("FIXTURE", "FEATURE"), baseline_prior = normal(0,10)), con(type = "random", studies = c("JUNCTURE"), baseline_prior = normal(0,10)))), "type must equal 'fixed' or 'random'.")
   expect_error(nma(pso_net, connect_baseline = list(con(type = "random", studies = c("FIXTURE", "FEATURE"), baseline_prior = normal(0,10)), con(type = 1, studies = c("JUNCTURE"), baseline_prior = normal(0,10)))), "type must equal 'fixed' or 'random'.")
-  expect_error(nma(pso_net, connect_baseline = list(con(type = "random", studies = c("FIXTURE"), baseline_prior = normal(0,10)), con(type = "fixed", studies = c("FIXTURE", "JUNCTURE")))), "^Each study may appear in at most one con\\(\\)\\. Duplicates found: FIXTURE$")
+  m_multi_random <- "Only a single `con()` is allowed in `connect_baseline` when using `type = \"random\"`."
+  expect_error(nma(pso_net, connect_baseline = list(con(type = "random", studies = c("FIXTURE"), baseline_prior = normal(0,10)), con(type = "fixed", studies = c("FEATURE", "JUNCTURE")))), m_multi_random, fixed = TRUE)
+  expect_error(nma(pso_net, connect_baseline = list(con(type = "random", studies = c("FIXTURE"), baseline_prior = normal(0,10)), con(type = "random", studies = c("JUNCTURE"), baseline_prior = normal(0,10)))), m_multi_random, fixed = TRUE)
+  expect_error(nma(pso_net, connect_baseline = list(con(type = "fixed", studies = c("FIXTURE", "JUNCTURE")), con(type = "fixed", studies = c("FIXTURE")))), "^Each study may appear in at most one con\\(\\)\\. Duplicates found: FIXTURE$")
   expect_error(nma(pso_net, connect_baseline = con(type = "random", studies = c("FIXTUR", "FEATURE"), baseline_prior = normal(0,10))), "Some studies listed in `connect_baseline()` are not present in the network (IPD or AgD-arm).", fixed = TRUE)
   expect_error(nma(pso_net, connect_baseline = con(type = "random", studies = c(1, "FEATURE"), baseline_prior = normal(0,10))), "Some studies listed in `connect_baseline()` are not present in the network (IPD or AgD-arm).", fixed = TRUE)
   expect_error(nma(pso_net, connect_baseline = con(type = "random", studies = c("FIXTURE", "FEATURE"))), "`baseline_prior` must be provided when type = 'random'.")
   expect_error(nma(pso_net, connect_baseline = con(type = "random", studies = c("FIXTURE", "FEATURE"), baseline_prior = letters),), "`baseline_prior` must be a prior distribution")
   expect_error(nma(pso_net, connect_baseline = con(type = "random", studies = c("FIXTURE", "FEATURE"), baseline_prior = list(normal(0, 1))),), "`baseline_prior` must be a prior distribution")
+})
+
+test_that("con() rejects studies from AgD-contrast data", {
+  cs_study <- as.character(sa_net$agd_contrast$.study[1])
+  expect_error(
+    nma(sa_net, connect_baseline = con(type = "random", studies = cs_study, baseline_prior = normal(0, 10))),
+    "`connect_baseline()` cannot include studies from AgD-contrast data", fixed = TRUE
+  )
+})
+
+fixdat <- tibble(study = c("F1", "F1", "F2", "F2"),
+                 trt   = c("P", "Q", "P", "Q"),
+                 r     = c(20, 25, 22, 28),
+                 n     = c(50, 50, 50, 50))
+fixnet <- set_agd_arm(fixdat, study, trt, r = r, n = n)
+
+test_that("con() warns if baseline_prior is supplied with type = 'fixed'", {
+  expect_warning(
+    nma(fixnet, connect_baseline = con(type = "fixed", studies = c("F1", "F2"), baseline_prior = normal(0, 10)), test_grad = TRUE),
+    "baseline_prior supplied for fixed connection"
+  )
+})
+
+test_that("con() with type = 'fixed' collapses the named studies onto a shared baseline", {
+  fit <- suppressWarnings(nma(fixnet, connect_baseline = con(type = "fixed", studies = c("F1", "F2")), test_grad = TRUE))
+
+  expect_s3_class(fit, "stan_nma")
+  expect_equal(levels(fit$network$studies), "F1 & F2")
+})
+
+test_that("nma() errors on a disconnected network unless baseline_subnet or connect_baseline is given", {
+  expect_error(nma(disc_net), "Network is disconnected")
+
+  fit_subnet <- suppressWarnings(nma(disc_net, baseline_subnet = 1L, random_baseline = TRUE,
+                                     prior_intercept_sd = half_normal(scale = 5), test_grad = TRUE))
+  expect_s3_class(fit_subnet, "stan_nma")
+
+  fit_connect <- suppressWarnings(nma(disc_net,
+    connect_baseline = con(type = "random", studies = c("S1", "S2"), baseline_prior = normal(0, 10)),
+    test_grad = TRUE))
+  expect_s3_class(fit_connect, "stan_nma")
 })
