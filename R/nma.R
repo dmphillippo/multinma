@@ -29,6 +29,8 @@
 #'   `con()` specifications to share baselines between studies. Random
 #'   baseline require a `baseline_prior` distribution. All studies listed in a
 #'   single `con()` that are `type = "fixed"` must originate from the same data type (IPD or AgD).
+#'   Multiple `con()` specifications may only be combined if they are all
+#'   `type = "fixed"`; a `type = "random"` connection must be given on its own.
 #' @param likelihood Character string specifying a likelihood, if unspecified
 #'   will be inferred from the data (see details)
 #' @param link Character string specifying a link function, if unspecified will
@@ -354,6 +356,14 @@ nma <- function(network,
     if ("type" %in% names(connect_baseline)) {
       connect_baseline <- list(connect_baseline)
     } else {
+      is_random <- vapply(connect_baseline, function(spec) spec$type == "random", logical(1))
+      if (length(connect_baseline) > 1 && any(is_random)) {
+        abort(paste(
+          "Only a single `con()` is allowed in `connect_baseline` when using `type = \"random\"`.",
+          "Multiple `con()` specifications are only supported when all use `type = \"fixed\"`."
+        ))
+      }
+
       all_studies <- unlist(lapply(connect_baseline, function(spec) spec$studies), use.names = FALSE)
       dup_studies <- unique(all_studies[duplicated(all_studies)])
       if (length(dup_studies)) {
@@ -390,19 +400,16 @@ nma <- function(network,
         connect_fixed <- apply_connect_fixed(network, spec$studies)
         network <- connect_fixed$network
         fixed_baseline <- connect_fixed$n_collapsed
-      }
-    }
-    if (spec$type == "random") {
-      connect_flag <- 1
-      totns <- length(network$studies)
-      prior_intercept_org <- prior_intercept
-      prior_intercept <- rep(list(prior_intercept), totns)
-      for (spec in connect_baseline) {
+      } else if (spec$type == "random") {
+        connect_flag <- 1
+        totns <- length(network$studies)
+        prior_intercept_org <- prior_intercept
+        prior_intercept <- rep(list(prior_intercept), totns)
         idx <- match(spec$studies, levels(network$studies))
         prior_intercept[idx] <- rep(list(spec$baseline_prior), length(idx))
       }
+    }
   }
-}
 
   # Check model arguments
   consistency <- rlang::arg_match(consistency)
