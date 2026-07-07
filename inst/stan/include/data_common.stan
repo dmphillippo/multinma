@@ -22,7 +22,7 @@ array[ni_agd_contrast] int<lower=1> agd_contrast_trt_b;
 // Flag to indicate whether a random baseline is used (1 = random, 0 = fixed)
 int<lower=0, upper=1> random_baseline;
 // Study IDs
-array[random_baseline ? max(ipd_arm) : 0] int<lower=1> ipd_study;
+array[random_baseline && ni_ipd > 0 ? max(ipd_arm) : 0] int<lower=1> ipd_study;
 array[random_baseline ? ni_agd_arm : 0] int<lower=1> agd_arm_study;
 // array[ni_agd_contrast] int<lower=1> agd_contrast_study;
 int<lower=0> n_baseline_studies;
