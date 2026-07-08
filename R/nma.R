@@ -1022,7 +1022,7 @@ nma <- function(network,
     agd_regression_ncoef_cpt <- dat_agd_regression_split %>% purrr::map_int(~sum(.x$.is_intercept))
     np_agd_regression <- sum(agd_regression_ncoef_cpt) # Total number of intercepts
 
-    X_agd_regression_cc <- NULL
+    X_agd_regression_cc <- agd_regression_est_map_cc <- NULL
     if (likelihood == 'ordered'){
 
       if ( OVB_adj != "none"  && any(agd_regression_ncoef_cpt==0) ) abort("No intercept specified in AgD regression.")
@@ -1037,44 +1037,31 @@ nma <- function(network,
         purrr::map(~.x %>% dplyr::mutate( .rank_intercept_min =
                                             ifelse( all(.rank_intercept==0), 0, min(.rank_intercept[.rank_intercept!=0]))
         ))
-      # Sorted ranks per study to ensure the first one is the lowest one which is study effect
-      # agd_regression_intercept_rnk <- dat_agd_regression_split %>%
-      #   purrr::map(
-      #     ~ .x %>%  dplyr::filter(!is.na(.estimate)) %>%
-      #       mutate(tmp = c(match(1:max(.$.rank_intercept), .$.rank_intercept),
-      #                      rep(0,nrow(.) - max(.$.rank_intercept)) # keep them as dummy to avoid defining more indexing in Stan
-      #       )) %>% pull(tmp)
-      #   ) %>% unlist()
 
-      # excluding intercepts from estimations
-      # agd_regression_est_no_intercept <- dat_agd_regression_split %>%
-      #   purrr::map(
-      #     ~ c(.x %>% dplyr::filter(!is.na(.estimate)) %>% dplyr::filter(.rank_intercept <= 1) %>% dplyr::pull(.estimate),
-      #         .x %>% dplyr::filter(!is.na(.estimate)) %>% dplyr::filter(.rank_intercept >  1) %>% dplyr::pull(.estimate)) # keep them as dummy to avoid defining more indexing in Stan
-      #   ) %>% unlist()
-
-      # Check categories cut
+      # Cutpoint labels
       agd_regression_ordinal_cut_lab <- dat_agd_regression$.ordinal_cut_lab[[1]]
       agd_regression_ncat_ordinal <- length( agd_regression_ordinal_cut_lab ) +1
-      # names(agd_regression_ncoef_cpt) <- agd_regression_ordinal_cut_lab
-      # if( has_ipd &&  has_agd_arm && any( colnames(ipd_y$.r)[-1]     != colnames(agd_arm_y$.r)[-1]    ) ) abort('mismatch cut labels between IPD AgD')
-      # if( has_ipd                 && any( colnames(ipd_y$.r)[-1]     != agd_regression_ordinal_cut_lab) ) abort('mismatch cut labels between IPD reg')
-      # if(             has_agd_arm && any( colnames(agd_arm_y$.r)[-1] != agd_regression_ordinal_cut_lab) ) abort('mismatch cut labels between AgD reg')
 
+      # Complementary design matrix for cc
+      agd_regression_intercept_rnk  <- dat_agd_regression_split %>%
+        purrr::map(~ .x %>% dplyr::filter(!is.na(.estimate)) %>%
+                     dplyr::pull(.rank_intercept)) %>% unlist()
 
-      # complementary design matrix of for cc
-      .rank_intercept_cc  <- dat_agd_regression_split %>% purrr::map(
-        ~ .x %>% dplyr::filter(!is.na(.estimate)) %>% dplyr::mutate(.rank_intercept_cc = dplyr::if_else(.rank_intercept==.rank_intercept_min,0,.rank_intercept)  ) %>% dplyr::pull(.rank_intercept_cc)
-      ) %>% unlist()
-
-      if( min(.rank_intercept_cc) == 0 ){
-        X_agd_regression_cc <-
-          model.matrix(~ -1 + factor(.rank_intercept_cc, levels = 0:(agd_regression_ncat_ordinal-1))  )[,-1]
-      }else{
-        X_agd_regression_cc <-
-          model.matrix(~ -1 + factor(.rank_intercept_cc, levels = 1:(agd_regression_ncat_ordinal-1))  )
-      }
+      X_agd_regression_cc <-
+        model.matrix(~ 1 + factor(agd_regression_intercept_rnk, levels = 0:(agd_regression_ncat_ordinal-1))  )[,-1]
       colnames(X_agd_regression_cc) <- agd_regression_ordinal_cut_lab
+
+      # Maps each position in agd_regression_est (which includes all intercepts/cutpoints)
+      # to its corresponding position in the version excluding them (needed for Stan)
+      agd_regression_est_map_cc <- agd_regression_intercept_rnk
+      agd_regression_est_map_cc[ agd_regression_est_map_cc <= 1] <- 1:sum(agd_regression_intercept_rnk <= 1)
+      tmp_std <- rep(1:ns_agd_regression,agd_regression_ncoef)
+      for(i in 1:length(agd_regression_est_map_cc) ){
+        if( agd_regression_intercept_rnk[i] >1 ){
+          agd_regression_est_map_cc[i] <-
+            agd_regression_est_map_cc[ (agd_regression_intercept_rnk == 1) & (tmp_std == tmp_std[i]) ]
+        }
+      }
 
     }else if( likelihood %in% c('exponential', 'weibull', 'gompertz','mspline', 'pexp') ){
       if ( any(agd_regression_ncoef_cpt >1) )
@@ -1351,7 +1338,7 @@ nma <- function(network,
     agd_regression_name_study <- c()
     np_agd_regression <- 0
     agd_regression_ncoef_cpt <- NULL
-    X_agd_regression_cc <- NULL
+    X_agd_regression_cc <- agd_regression_est_map_cc <- NULL
 
     # Reduced related
     idat_agd_regression <- idat_agd_regression_bl <- idat_agd_regression_nonbl <- tibble::tibble()
@@ -1757,6 +1744,7 @@ if (class_effects == "exchangeable") {
                      agd_regression_max_ncoef_inc = agd_regression_max_ncoef_inc,
 
                      X_agd_regression_cc = X_agd_regression_cc,
+                     agd_regression_est_map_cc = agd_regression_est_map_cc,
                      X_agd_regression_int = X_agd_regression_int,
                      agd_regression_x = X_agd_regression,
                      agd_regression_est = est_agd_regression,
@@ -2025,7 +2013,7 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
                     # agd_regression_OVB_GLM = NULL,
                     # agd_regression_OVB_LM = NULL,
                     # agd_regression_OVB_COX = NULL,
-                    np_agd_regression = NULL, agd_regression_ncoef_cpt = NULL, X_agd_regression_cc = NULL,
+                    np_agd_regression = NULL, agd_regression_ncoef_cpt = NULL, X_agd_regression_cc = NULL, agd_regression_est_map_cc = NULL,
 
                     n_int,
                     ipd_offset = NULL, agd_arm_offset = NULL, agd_contrast_offset = NULL,
@@ -2441,6 +2429,7 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
     np_agd_regression = np_agd_regression,
     agd_regression_ncoef_cpt = if(is.null(agd_regression_ncoef_cpt)) numeric() else as.array(agd_regression_ncoef_cpt),
     X_agd_regression_cc = if(is.null(X_agd_regression_cc)) matrix(numeric(0), nrow = 0, ncol = 0) else X_agd_regression_cc,
+    agd_regression_est_map_cc = if(is.null(agd_regression_est_map_cc)) numeric() else agd_regression_est_map_cc,
 
     # agd_regression_arm = agd_regression_arm,
     # agd_regression_trt = agd_regression_trt,

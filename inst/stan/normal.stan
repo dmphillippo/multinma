@@ -208,12 +208,12 @@ transformed parameters {
             mu_ful[(c_x+1):(c_x+agd_regression_nx[i])] =  exp(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]),] * allbeta) ;
 
             mu_err[(c_x+1):(c_x+agd_regression_nx[i])] =
-            exp(mu_red[ (c_x+1):(c_x+agd_regression_nx[i])]) -
-            exp(mu_ful[ (c_x+1):(c_x+agd_regression_nx[i])]);
+              mu_red[ (c_x+1):(c_x+agd_regression_nx[i])] -
+              mu_ful[ (c_x+1):(c_x+agd_regression_nx[i])];
 
             lp_err[(c_x+1):(c_x+agd_regression_nx[i])] =
-            eta_red[(c_x+1):(c_x+agd_regression_nx[i])] -
-            log(mu_red[(c_x+1):(c_x+agd_regression_nx[i])] - mu_err[(c_x+1):(c_x+agd_regression_nx[i])]);
+              eta_red[(c_x+1):(c_x+agd_regression_nx[i])] -
+              log(mu_red[(c_x+1):(c_x+agd_regression_nx[i])] - mu_err[(c_x+1):(c_x+agd_regression_nx[i])]);
 
             eta_agd_regression[(c_c+1):(c_c+agd_regression_ncoef[i])] =
               allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] +
