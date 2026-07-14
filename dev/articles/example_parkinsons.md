@@ -162,7 +162,7 @@ arm_fit_FE
 #> d[5] -0.30    0.00 0.22  -0.73 -0.45 -0.30 -0.15  0.12  3127    1
 #> lp__ -6.76    0.06 2.41 -12.44 -8.12 -6.42 -5.02 -3.12  1724    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 15:50:15 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 18:05:32 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -270,7 +270,7 @@ arm_fit_RE
 #> lp__ -13.00    0.10 3.53 -20.90 -15.16 -12.71 -10.46 -7.04  1160    1
 #> tau    0.37    0.02 0.39   0.01   0.11   0.26   0.49  1.46   516    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 15:50:18 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 18:05:36 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -647,7 +647,7 @@ contr_fit_FE
 #> d[5] -0.30    0.00 0.21 -0.71 -0.44 -0.30 -0.16  0.08  3831    1
 #> lp__ -3.12    0.03 1.36 -6.55 -3.77 -2.82 -2.12 -1.39  1841    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 15:50:27 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 18:05:45 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -740,7 +740,7 @@ contr_fit_RE
 #> lp__ -8.27    0.09 2.92 -14.84 -10.03 -7.97 -6.20 -3.43  1172 1.00
 #> tau   0.38    0.01 0.38   0.01   0.12  0.28  0.52  1.42   945 1.01
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 15:50:28 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 18:05:47 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -1095,7 +1095,7 @@ mix_fit_FE
 #> d[5] -0.30    0.00 0.21 -0.72 -0.44 -0.29 -0.16  0.11  3050    1
 #> lp__ -4.66    0.05 1.87 -9.12 -5.73 -4.34 -3.23 -2.01  1640    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 15:50:34 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 18:05:53 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -1199,7 +1199,7 @@ mix_fit_RE
 #> lp__ -10.88    0.09 3.26 -18.03 -12.90 -10.60 -8.59 -5.26  1465    1
 #> tau    0.37    0.01 0.36   0.01   0.12   0.27  0.49  1.28  1080    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 15:50:37 2026.
+#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 18:05:56 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
