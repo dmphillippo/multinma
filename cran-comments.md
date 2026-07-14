@@ -1,14 +1,12 @@
-This is a hotfix release to update deprecated Stan syntax.
-
-The note "Found the following (possibly) invalid URLs: https://research-information.bris.ac.uk/"
-is a false-positive. The link works in browsers, but the R CMD CHECK curl request 
-may be blocked (status 403) by cloudflare.
+Fixed UBSAN warnings identified in CRAN additional tests. Confirmed that this
+fixes the warnings with rocker/r-devel-ubsan-clang.
 
 ## Test environments
-* local R installation (Windows 10), R 4.4.3
-* Ubuntu 24.04.2 on GitHub Actions (release, devel, oldrel)
-* Mac OS 14.7.4 on GitHub Actions (release)
-* Windows Server 2022 10.0.20348 on GitHub Actions (release)
+* rocker/r-devel-ubsan-clang 
+* local R installation (Windows 10), R 4.5.3
+* Ubuntu 24.04.4 on GitHub Actions (release, devel, oldrel)
+* Mac OS 15.7.4 on GitHub Actions (release)
+* Windows Server 2025 10.0.26100 on GitHub Actions (release)
 
 ## R CMD check results
 
@@ -17,14 +15,14 @@ may be blocked (status 403) by cloudflare.
 * checking package dependencies ... NOTE
   Imports includes 23 non-default packages.
 
-* checking installed package size ... NOTE
-  installed size is 22.2Mb
+* checking installed package size ... INFO
+  installed size is 21.0Mb
   sub-directories of 1Mb or more:
-    R      2.1Mb
-    doc    4.5Mb
-    libs  14.8Mb
+    R      1.9Mb
+    doc    4.8Mb
+    libs  13.6Mb
     
-The docs directory contains 14 html vignettes demonstrating full analyses using
+The docs directory contains 15 html vignettes demonstrating full analyses using
 the package.
 
 * checking for GNU extensions in Makefiles ... NOTE

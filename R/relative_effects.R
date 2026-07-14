@@ -238,6 +238,9 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
           }
         }
 
+        # A `.mu` column is expected if baseline risk meta-regression is used in this model
+        dat_agd_arm$.mu <- 1
+
         # Only take necessary columns
         dat_agd_arm <- get_model_data_columns(dat_agd_arm, regression = x$regression, label = "AgD (arm-based)")
       } else {
@@ -262,6 +265,9 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         dat_ipd <- x$network$ipd
         dat_ipd$.sample_size <- 1
 
+        # A `.mu` column is expected if baseline risk meta-regression is used in this model
+        dat_ipd$.mu <- 1
+
         # Only take necessary columns
         dat_ipd <- get_model_data_columns(dat_ipd, regression = x$regression, label = "IPD")
       } else {
@@ -278,12 +284,23 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
     } else {
       # Produce relative effects for all studies in newdata
 
-      dat_studies <- newdata
+      # If integration points provided, expand
+      if (inherits(newdata, "integration_tbl")) {
+        dat_all <- .unnest_integration(newdata) %>%
+          dplyr::mutate(.sample_size = 1)
+
+        # Take the first row for each study. We will correct the design matrix below
+        dat_studies <- dat_all %>%
+          dplyr::group_by(.data$.study) %>%
+          dplyr::slice(1)
+
+      } else {
+        dat_all <- dat_studies <- newdata
+      }
 
       # Check all variables are present
       regdat <- get_model_data_columns(dat_studies, regression = x$regression, label = "`newdata`")
     }
-
 
     # Get number of treatments, number of studies
     ntrt <- nlevels(x$network$treatments)
@@ -305,9 +322,25 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
                                     classes = !is.null(x$network$classes),
                                     class_interactions = x$class_interactions)
 
+    # Check if regression model includes non-linear terms and warn if newdata
+    # does not include integration points
+    if (!is.null(newdata)) {
+      if (is_nonlinear(nma_formula, names(dat_all)) && !inherits(newdata, "integration_tbl"))
+        warn(c("Fitted model may be non-linear in the covariates.",
+               "Add integration points to `newdata` with add_integration() to produce population-average conditional treatment effects."))
+    }
+
+    # If `newdata` was not supplied, relative effects are calculated for each study, and
+    # the baseline risk meta-regression columns in the design matrix are 0/1 values.
+    # Therefore, they should not be centered here.
+    xbar <- x$xbar
+    if (is.null(newdata)) {
+      xbar <- xbar[names(xbar) != ".mu"]
+    }
+
     X_list <- make_nma_model_matrix(nma_formula,
                                     dat_agd_arm = dat_studies,
-                                    xbar = x$xbar,
+                                    xbar = xbar,
                                     consistency = x$consistency,
                                     classes = !is.null(x$network$classes),
                                     newdata = TRUE)
@@ -374,26 +407,28 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       }
     } else {
 
+      # Split baseline risk meta-regression from other effect modifiers
+      brmr <- grepl("(^\\.mu\\:)|(\\:\\.mu$)", colnames(X_EM)) & is.null(newdata)
+      X_BRMR <- X_EM[, brmr, drop = FALSE]
+      X_EM <- X_EM[, !brmr, drop = FALSE]
+
       # Which covariates are EMs
       EM_col_names <- stringr::str_remove(colnames(X_EM), EM_regex)
       EM_vars <- get_EM_vars(nma_formula)
 
       # Replace EM design matrix with study means if newdata is NULL
-      if (is.null(newdata)) {
+      if (is.null(newdata) || inherits(newdata, "integration_tbl")) {
 
         # Apply centering if used
+        dat_all_cen <- dat_all
         if (!is.null(x$xbar)) {
           cen_vars <- intersect(names(dat_all), names(x$xbar))
-          dat_all_cen <- dat_all
           dat_all_cen[, cen_vars] <- sweep(dat_all[, cen_vars, drop = FALSE], 2, x$xbar[cen_vars])
-        } else {
-          dat_all_cen <- dat_all
         }
 
         # Get model matrix of EM "main effects" - notably this expands out factors
-        # into dummy variables so we can average those too
+        # into dummy variables and computes any variable transformations so we can average those too
         EM_formula <- as.formula(paste0("~", paste(EM_vars, collapse = " + ")))
-
 
         # Calculate mean covariate values by study in the network
         X_study_means <- model.matrix(EM_formula, data = dat_all_cen) %>%
@@ -415,10 +450,16 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
         # This works only because trt columns are 0/1, so interactions are just the covariate values
         nonzero <- X_EM != 0
         X_EM[nonzero] <- X_study_means_rep[nonzero]
+
       }
 
       # Name columns to match Stan parameters
-      colnames(X_EM) <- paste0("beta[", colnames(X_EM), "]")
+      if (ncol(X_EM) > 0) {
+        colnames(X_EM) <- paste0("beta[", colnames(X_EM), "]")
+      }
+      if (ncol(X_BRMR) > 0) {
+        colnames(X_BRMR) <- paste0("beta[", colnames(X_BRMR), "]")
+      }
       colnames(X_d) <- paste0("d[", x$network$treatments[-1], "]")
 
       X_EM_d <- cbind(X_EM, X_d)
@@ -434,6 +475,26 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
 
       # Linear combination with posterior MCMC array
       re_array <- tcrossprod_mcmc_array(d_array, X_EM_d)
+
+      if (any(brmr)) {
+        # Centered sampled study-specific intercepts
+        mu_array <- as.array(x, pars = paste0("mu[", x$network$studies , "]")) - x$xbar[[".mu"]]
+
+        # Include the mean study-specific intercepts in the covariate values
+        mu_means <- apply(mu_array, 3, mean)
+
+        X_study_means <- cbind(
+          X_study_means,
+          .mu = mu_means[paste0("mu[", unique(dat_studies$.study), "]")]
+        )
+
+        brmr_array <- as.array(x, pars = colnames(X_BRMR))
+
+        # Add to relative effects
+        re_array <- re_array + tcrossprod_mcmc_array(brmr_array, X_BRMR) * (
+          mu_array[, , paste0("mu[", as.character(dat_studies$.study), "]"), drop = FALSE]
+        )
+      }
 
       # Set treatments vector
       trtb <- x$network$treatments[-1]
@@ -513,7 +574,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
       }
 
       # Prepare study covariate info
-      if (is.null(newdata)) {
+      if (is.null(newdata) || inherits(newdata, "integration_tbl")) {
         study_EMs <- X_study_means
 
         # Uncenter if necessary
@@ -522,7 +583,8 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
           study_EMs[, cen_vars] <- sweep(study_EMs[, cen_vars, drop = FALSE], 2, x$xbar[cen_vars], FUN = "+")
         }
       } else {
-        study_EMs <- newdata[EM_vars]
+        EM_formula <- as.formula(paste0("~", paste(EM_vars, collapse = " + ")))
+        study_EMs <- c(model.frame(EM_formula, data = newdata))
       }
 
       study_EMs <- tibble::as_tibble(study_EMs) %>%
@@ -658,4 +720,25 @@ get_delta_new <- function(x, ...) {
   class(delta_new) <- c("mcmc_array", class(delta_new))
 
   return(delta_new)
+}
+
+#' Check if a formula is non-linear in covariate terms
+#'
+#' This check is conservative. Any data transformation will be flagged - even
+#' those that are linear, e.g. I(x / 10) or factor(x).
+#'
+#' @param f Formula
+#' @param vars Character vector of variable names in input data
+#'
+#' @return TRUE if non-linear in vars, FALSE otherwise
+#' @noRd
+is_nonlinear <- function(f, vars) {
+  specials <- c(".study", ".trt", ".trtclass", ".omega", ".contr", ".mu")
+  tms <- attr(terms(f), "term.labels")
+
+  # grep any terms that aren't raw vars, specials, vars:special or special:vars
+  length(vars) > 0 && any(!tms %in% c(vars,
+                                      specials,
+                                      paste(rep(specials, each = length(vars)), vars, sep = ":"),
+                                      paste(vars, rep(specials, each = length(vars)), sep = ":")))
 }

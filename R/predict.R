@@ -103,6 +103,9 @@
 #' @param predictive_distribution Logical, when a random effects model has been
 #'   fitted, should the predictive distribution for absolute effects in a new
 #'   study be returned? Default `FALSE`.
+#' @param expand Logical, expand out predictions for every treatment (`TRUE`),
+#'   or only produce predictions for observed treatments (`FALSE`). Default
+#'   `TRUE`.
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #' @param progress Logical, display progress for potentially long-running
 #'   calculations? Population-average predictions from ML-NMR models are
@@ -288,6 +291,7 @@ predict.stan_nma <- function(object, ...,
                              baseline_level = c("individual", "aggregate"),
                              probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
                              predictive_distribution = FALSE,
+                             expand = TRUE,
                              summary = TRUE,
                              progress = FALSE,
                              trt_ref = NULL) {
@@ -354,6 +358,17 @@ predict.stan_nma <- function(object, ...,
     aux_pars <- NULL
   }
 
+  # Was aux_by used?
+  used_aux_by <- !is.null(object$aux_by) && !(length(object$aux_by) == 1 && object$aux_by == ".study")
+
+  if (!is.null(baseline) && ".mu" %in% all.vars(object$regression)) {
+    if (is.null(newdata)) {
+      newdata <- data.frame(.mu = 1)
+    } else {
+      newdata$.mu <- 1
+    }
+  }
+
   if (!is.null(newdata)) {
     if (!is.data.frame(newdata)) abort("`newdata` is not a data frame.")
 
@@ -368,6 +383,9 @@ predict.stan_nma <- function(object, ...,
       newdata <- dplyr::mutate(newdata, .study = nfactor(.study))
     }
   }
+
+  if (!rlang::is_bool(expand))
+    abort("`expand` should be TRUE or FALSE.")
 
   if (!rlang::is_bool(summary))
     abort("`summary` should be TRUE or FALSE.")
@@ -410,7 +428,7 @@ predict.stan_nma <- function(object, ...,
       } else {
 
         # Make design matrix of all studies with baselines, and all treatments
-        if (is.null(object$aux_by) || !".trt" %in% object$aux_by) {
+        if (expand && (is.null(object$aux_by) || !".trt" %in% object$aux_by)) {
           studies <- forcats::fct_unique(forcats::fct_drop(forcats::fct_c(
             if (has_ipd(object$network)) object$network$ipd$.study else factor(),
             if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor()
@@ -520,7 +538,33 @@ predict.stan_nma <- function(object, ...,
     } else {
 
       # Make design matrix of SINGLE study, and all treatments
-      preddat <- tibble::tibble(.study = factor("..dummy.."), .trt = object$network$treatments)
+      if (expand) {
+        preddat <- tibble::tibble(.study = factor("..dummy.."), .trt = object$network$treatments)
+      } else if (rlang::is_string(baseline)) {
+        preddat <- dplyr::bind_rows(
+          if (has_ipd(object$network)) dplyr::distinct(object$network$ipd, .data$.study, .data$.trt),
+          if (has_agd_arm(object$network)) dplyr::distinct(object$network$agd_arm, .data$.study, .data$.trt)
+        ) %>%
+          dplyr::filter(.data$.study == baseline) %>%
+          dplyr::mutate(.study = forcats::fct_recode(.data$.study, "..dummy.." = !! baseline))
+      } else {
+        if (is.null(newdata) || !rlang::has_name(newdata, ".trt"))
+          abort("Provide `newdata` with a `.trt` column specifying the treatments to predict for when `expand = FALSE`.")
+        if (!all(newdata$.trt %in% levels(object$network$treatments)))
+          abort("Treatments in `newdata` do not match those in the network.")
+        preddat <- dplyr::mutate(newdata, .study = "..dummy..", .trt = factor(.data$.trt, levels = levels(object$network$treatments)))
+      }
+
+      # Only predict for observed arms if using aux_by
+      if (used_aux_by && rlang::is_string(aux)) {
+        aux_by_obs <- dplyr::bind_rows(
+          if (has_ipd(object$network)) dplyr::distinct(object$network$ipd, .data$.study, !!! rlang::syms(object$aux_by)),
+          if (has_agd_arm(object$network)) dplyr::distinct(object$network$agd_arm, .data$.study, !!! rlang::syms(object$aux_by))
+        ) %>%
+          dplyr::mutate(.study = forcats::fct_recode(.data$.study, "..dummy.." = !! aux))
+
+        preddat <- dplyr::inner_join(preddat, aux_by_obs, by = unique(c(".study", object$aux_by)))
+      }
 
       # Add in .trtclass if defined in network
       if (!is.null(object$network$classes)) {
@@ -997,6 +1041,9 @@ predict.stan_nma <- function(object, ...,
             dat_agd_arm <- dplyr::select(dat_agd_arm, -".Surv")
           }
 
+          # A `.mu` column is expected if baseline risk meta-regression is used in this model
+          dat_agd_arm$.mu <- 1
+
           # Only take necessary columns
           dat_agd_arm <- get_model_data_columns(dat_agd_arm,
                                                 regression = object$regression,
@@ -1057,6 +1104,9 @@ predict.stan_nma <- function(object, ...,
             dat_ipd <- dplyr::select(dat_ipd, -".Surv")
           }
 
+          # A `.mu` column is expected if baseline risk meta-regression is used in this model
+          dat_ipd$.mu <- 1
+
           # Only take necessary columns
           dat_ipd <- get_model_data_columns(dat_ipd,
                                             regression = object$regression,
@@ -1073,7 +1123,7 @@ predict.stan_nma <- function(object, ...,
       }
 
       # Produce predictions on every treatment for each observed arm/individual
-      if (is.null(object$aux_by) || ! ".trt" %in% object$aux_by) {
+      if (expand && (is.null(object$aux_by) || ! ".trt" %in% object$aux_by)) {
         if (packageVersion("dplyr") >= "1.1.1") {
           preddat <- preddat %>%
             dplyr::rename(.trt_old = ".trt") %>%
@@ -1113,12 +1163,12 @@ predict.stan_nma <- function(object, ...,
       X_list <- make_nma_model_matrix(nma_formula,
                                       dat_ipd = preddat,
                                       dat_agd_contrast = dat_agd_contrast,
-                                      xbar = object$xbar,
+                                      xbar = object$xbar[names(object$xbar) != ".mu"],
                                       consistency = object$consistency,
                                       classes = !is.null(object$network$classes),
                                       newdata = TRUE)
       X_all <- X_list$X_ipd
-      rownames(X_all) <- paste0("pred[", preddat$.study, ": ", preddat$.trt, "]")
+      rownames(X_all) <- paste0("pred[", make_data_labels(preddat$.study, preddat$.trt), "]")
 
       offset_all <- X_list$offset_ipd
 
@@ -1228,25 +1278,116 @@ predict.stan_nma <- function(object, ...,
       preddat <- get_model_data_columns(preddat,
                                         regression = object$regression,
                                         aux_regression = object$aux_regression,
-                                        keep = object$aux_by,
+                                        keep = setdiff(object$aux_by, c(".trt", ".trtclass", ".study", ".contr", ".omega")),
                                         label = "`newdata`")
 
-      # Make design matrix of all studies and all treatments
-      if (rlang::has_name(preddat, ".trt")) preddat <- dplyr::select(preddat, -".trt")
-      if (packageVersion("dplyr") >= "1.1.1") {
-        preddat <- dplyr::left_join(preddat,
-                                    tidyr::expand(preddat,
-                                                  .study = .data$.study,
-                                                  .trt = object$network$treatments),
-                                    by = ".study",
-                                    relationship = "many-to-many")
-      } else {
-        preddat <- dplyr::left_join(preddat,
-                                    tidyr::expand(preddat,
-                                                  .study = .data$.study,
-                                                  .trt = object$network$treatments),
-                                    by = ".study")
+      # Check aux spec
+      if (is_surv && !is.null(aux_pars)) {
+        studies <- unique(preddat$.study)
+        n_studies <- length(studies)
+        n_aux <- length(aux_pars)
+
+        if (n_aux == 1) {
+          if (!inherits(aux, "distr") && !rlang::is_string(aux) && length(aux) != n_studies)
+            abort(sprintf("`aux` must be a single distr() specification or study name, or a list of length %d (number of `newdata` studies)", n_studies))
+          if (inherits(aux, "distr") || rlang::is_string(aux)) {
+            aux <- rep(list(aux), times = n_studies)
+            names(aux) <- studies
+          } else {
+            if (any(purrr::map_lgl(aux, ~!inherits(., "distr") && !rlang::is_string(.))))
+              abort(sprintf("`aux` must be a single distr() specification or study name, or a list of length %d (number of `newdata` studies)", n_studies))
+            if (!rlang::is_named(aux)) {
+              names(aux) <- studies
+            } else {
+              aux_names <- names(aux)
+              if (!setequal(aux_names, studies))
+                abort(glue::glue("`aux` list names must match all study names from `newdata`.\n",
+                                 "Unmatched list names: ",
+                                 glue::glue_collapse(glue::double_quote(setdiff(aux_names, studies)), sep = ", ", width = 30),
+                                 ".\n",
+                                 "Unmatched `newdata` study names: ",
+                                 glue::glue_collapse(glue::double_quote(setdiff(studies, aux_names)), sep = ", ", width = 30),
+                                 ".\n"))
+            }
+          }
+        } else {
+          aux_names <- names(aux)
+          if (!(rlang::is_string(aux) || (
+            rlang::is_bare_list(aux) &&
+            length(aux) %in% c(n_aux, n_studies) &&
+            (setequal(aux_names, aux_pars) || setequal(aux_names, levels(studies))) &&
+            all(purrr::map_lgl(purrr::list_flatten(aux), ~inherits(., "distr") || rlang::is_string(.)))))) {
+            abort(glue::glue("`aux` must be a single named list of distr() specifications for {glue::glue_collapse(aux_pars, sep = ', ', last = ' and ')}, ",
+                             "a study name, or a list of length {n_studies} (number of `newdata` studies) of such lists."))
+          }
+
+          if (setequal(aux_names, aux_pars) || rlang::is_string(aux)) {
+            aux <- rep(list(aux), times = n_studies)
+            names(aux) <- studies
+          } else if (!rlang::is_named(aux)) {
+            names(aux) <- studies
+          }
+        }
+
+        # Check aux_by
+        if (".trt" %in% object$aux_by) {
+          inform(c("Note: Producing predictions for new data from a model with baseline hazard stratified by treatment arm.",
+                   "Did you mean to use `aux_regression` instead?"))
+        }
       }
+
+      # Make design matrix of all studies and all treatments
+      if (expand) {
+        if (rlang::has_name(preddat, ".trt")) preddat <- dplyr::select(preddat, -".trt")
+        if (packageVersion("dplyr") >= "1.1.1") {
+          preddat <- dplyr::left_join(preddat,
+                                      tidyr::expand(preddat,
+                                                    .study = .data$.study,
+                                                    .trt = object$network$treatments),
+                                      by = ".study",
+                                      relationship = "many-to-many")
+        } else {
+          preddat <- dplyr::left_join(preddat,
+                                      tidyr::expand(preddat,
+                                                    .study = .data$.study,
+                                                    .trt = object$network$treatments),
+                                      by = ".study")
+        }
+      } else {
+        if (!rlang::has_name(preddat, ".trt"))
+          abort("`newdata` should have a `.trt` column specifying the treatments to predict for when `expand = FALSE`.")
+        if (!all(preddat$.trt %in% levels(object$network$treatments)))
+          abort("Treatments in `newdata` do not match those in the network.")
+        preddat <- dplyr::mutate(preddat, .trt = factor(.data$.trt, levels = levels(object$network$treatments)))
+      }
+
+      # With aux_by = .trt, only predict for observed arms
+      if (used_aux_by && any(purrr::map_lgl(aux, rlang::is_string))) {
+        has_aux_by <- TRUE
+
+        aux_by_obs <- dplyr::bind_rows(
+          if (has_ipd(object$network)) dplyr::distinct(object$network$ipd, .data$.study, !!! rlang::syms(object$aux_by)),
+          if (has_agd_arm(object$network)) dplyr::distinct(object$network$agd_arm, .data$.study, !!! rlang::syms(object$aux_by))
+        )
+
+        aux_by_obs <- purrr::imap_dfr(aux[purrr::map_lgl(aux, rlang::is_string)],
+                                      ~dplyr::filter(aux_by_obs, .study == .x) %>% dplyr::mutate(.study = .y))
+
+        # Add in rows for any distr() studies
+        if (!all(purrr::map_lgl(aux, rlang::is_string))) {
+          aux_by_distr <- dplyr::filter(preddat, .study %in% names(aux[purrr::map_lgl(aux, ~!rlang::is_string(.))])) %>%
+            dplyr::distinct(.data$.study, !!! rlang::syms(object$aux_by))
+
+          aux_by_obs <- dplyr::bind_rows(aux_by_obs, aux_by_distr)
+        }
+
+        preddat <- dplyr::inner_join(preddat, aux_by_obs, by = unique(c(".study", object$aux_by)))
+      } else {
+        has_aux_by <- FALSE
+      }
+
+      # Make sure preddat$.study doesn't have extra levels
+      preddat$.study <- forcats::fct_drop(preddat$.study)
 
       # Add in .trtclass if defined in network
       if (!is.null(object$network$classes)) {
@@ -1261,7 +1402,7 @@ predict.stan_nma <- function(object, ...,
                                       classes = !is.null(object$network$classes),
                                       newdata = TRUE)
       X_all <- X_list$X_ipd
-      rownames(X_all) <- paste0("pred[", preddat$.study, ": ", preddat$.trt, "]")
+      rownames(X_all) <- paste0("pred[", make_data_labels(preddat$.study, preddat$.trt), "]")
 
       offset_all <- X_list$offset_ipd
 
@@ -1296,53 +1437,48 @@ predict.stan_nma <- function(object, ...,
         }
       }
 
+      if (rlang::is_string(baseline)) {
+        # Using the baseline from a study in the network
+        if (! baseline %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
+                                                  if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
+          abort("`baseline` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
+      }
+
+      if (inherits(baseline, "distr") || rlang::is_string(baseline)) {
+        baseline <- rep(list(baseline), times = n_studies)
+        names(baseline) <- studies
+      }
+
       # Generate baseline samples
       dim_post_temp <- dim(post_temp)
       dim_mu <- c(dim_post_temp[1:2], n_studies)
       dimnames_mu <- c(dimnames(post_temp)[1:2], list(parameters = paste0("mu[", levels(studies), "]")))
 
-      if (inherits(baseline, "distr")) {
-        u <- runif(prod(dim_mu))
-        mu <- array(rlang::eval_tidy(rlang::call2(baseline$qfun, p = u, !!! baseline$args)),
-                    dim = dim_mu, dimnames = dimnames_mu)
-      } else if (rlang::is_string(baseline)) {
-        # Using the baseline from a study in the network
-        if (! baseline %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
-                                                  if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
-          abort("`baseline` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
+      u <- array(runif(prod(dim_mu)), dim = dim_mu)
+      mu <- array(NA_real_, dim = dim_mu, dimnames = dimnames_mu)
 
-        mu <- as.array(object, pars = "mu")
-        mu <- mu[ , , grep(paste0("\\[\\Q", baseline, "\\E[\\:,\\]]"), dimnames(mu)[[3]], perl = TRUE), drop = FALSE]
+      if (any(purrr::map_lgl(baseline, rlang::is_string))) mu_temp <- as.array(object, pars = "mu")
 
-        baseline_type <- "link"
-        baseline_level <- "individual"
-      } else {
-        u <- array(runif(prod(dim_mu)), dim = dim_mu)
-        mu <- array(NA_real_, dim = dim_mu, dimnames = dimnames_mu)
+      baseline_type <- rep_len(baseline_type, n_studies)
+      baseline_level <- rep_len(baseline_level, n_studies)
 
-        if (any(purrr::map_lgl(baseline, rlang::is_string))) mu_temp <- as.array(object, pars = "mu")
+      for (s in 1:n_studies) {
+        # NOTE: mu must be in *factor order* for later multiplication with design matrix, not observation order
+        ss <- levels(studies)[s]
 
-        baseline_type <- rep_len(baseline_type, n_studies)
-        baseline_level <- rep_len(baseline_level, n_studies)
+        if (inherits(baseline[[ss]], "distr")) {
+          mu[ , , s] <- array(rlang::eval_tidy(rlang::call2(baseline[[ss]]$qfun, p = u[ , , s], !!! baseline[[ss]]$args)),
+                              dim = c(dim_mu[1:2], 1))
+        } else if (rlang::is_string(baseline[[ss]])) {
+          # Using the baseline from a study in the network
+          if (! baseline[[ss]] %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
+                                                    if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
+            abort("All elements of `baseline` must be strings matching the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
 
-        for (s in 1:n_studies) {
-          # NOTE: mu must be in *factor order* for later multiplication with design matrix, not observation order
-          ss <- levels(studies)[s]
+          mu[ , , s] <- mu_temp[ , , grep(paste0("\\[\\Q", baseline[[ss]], "\\E[\\:,\\]]"), dimnames(mu_temp)[[3]], perl = TRUE), drop = FALSE]
 
-          if (inherits(baseline[[ss]], "distr")) {
-            mu[ , , s] <- array(rlang::eval_tidy(rlang::call2(baseline[[ss]]$qfun, p = u[ , , s], !!! baseline[[ss]]$args)),
-                                dim = c(dim_mu[1:2], 1))
-          } else if (rlang::is_string(baseline[[ss]])) {
-            # Using the baseline from a study in the network
-            if (! baseline[[ss]] %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
-                                                      if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
-              abort("All elements of `baseline` must be strings matching the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
-
-            mu[ , , s] <- mu_temp[ , , grep(paste0("\\[\\Q", baseline[[ss]], "\\E[\\:,\\]]"), dimnames(mu_temp)[[3]], perl = TRUE), drop = FALSE]
-
-            baseline_type[s] <- "link"
-            baseline_level[s] <- "individual"
-          }
+          baseline_type[s] <- "link"
+          baseline_level[s] <- "individual"
         }
       }
 
@@ -1458,62 +1594,20 @@ predict.stan_nma <- function(object, ...,
           aux_array <- NULL
         } else {
 
-          # Check aux spec
-          n_aux <- length(aux_pars)
-
-          if (n_aux == 1) {
-            if (!inherits(aux, "distr") && !rlang::is_string(aux) && length(aux) != n_studies)
-              abort(sprintf("`aux` must be a single distr() specification or study name, or a list of length %d (number of `newdata` studies)", n_studies))
-            if (inherits(aux, "distr") || rlang::is_string(aux)) {
-              aux <- rep(list(aux), times = n_studies)
-              names(aux) <- studies
-            } else {
-              if (any(purrr::map_lgl(aux, ~!inherits(., "distr") && !rlang::is_string(.))))
-                  abort(sprintf("`aux` must be a single distr() specification or study name, or a list of length %d (number of `newdata` studies)", n_studies))
-              if (!rlang::is_named(aux)) {
-                names(aux) <- studies
-              } else {
-                aux_names <- names(aux)
-                if (!setequal(aux_names, studies))
-                  abort(glue::glue("`aux` list names must match all study names from `newdata`.\n",
-                                   "Unmatched list names: ",
-                                   glue::glue_collapse(glue::double_quote(setdiff(aux_names, studies)), sep = ", ", width = 30),
-                                   ".\n",
-                                   "Unmatched `newdata` study names: ",
-                                   glue::glue_collapse(glue::double_quote(setdiff(studies, aux_names)), sep = ", ", width = 30),
-                                   ".\n"))
-              }
-            }
-          } else {
-            aux_names <- names(aux)
-            if (!(rlang::is_string(aux) || (
-                    rlang::is_bare_list(aux) &&
-                    length(aux) %in% c(n_aux, n_studies) &&
-                    (setequal(aux_names, aux_pars) || setequal(aux_names, levels(studies))) &&
-                    all(purrr::map_lgl(purrr::list_flatten(aux), ~inherits(., "distr") || rlang::is_string(.)))))) {
-              abort(glue::glue("`aux` must be a single named list of distr() specifications for {glue::glue_collapse(aux_pars, sep = ', ', last = ' and ')}, ",
-                               "a study name, or a list of length {n_studies} (number of `newdata` studies) of such lists."))
-            }
-
-            if (setequal(aux_names, aux_pars) || rlang::is_string(aux)) {
-              aux <- rep(list(aux), times = n_studies)
-              names(aux) <- studies
-            } else if (!rlang::is_named(aux)) {
-              names(aux) <- studies
-            }
-          }
+          aux_ex_labels <- unlist(purrr::imap(aux, ~dplyr::filter(preddat, .study == .y) %>% get_aux_labels(by = object$aux_by)))
 
           if (object$likelihood %in% c("mspline", "pexp")) {
             if (!all(purrr::map_lgl(aux, rlang::is_string)))
               abort(glue::glue('Producing predictions with external `aux` spline coefficients is not currently supported for "{object$likelihood}" models.'))
+
             n_aux <- length(object$basis[[1]])
-            aux_names <- paste0(rep(aux_pars, times = n_studies), "[", rep(studies, each = n_aux), ", ", rep(1:n_aux, times = n_studies), "]")
+            aux_names <- paste0(rep(aux_pars, times = length(aux_ex_labels)), "[", rep(aux_ex_labels, each = n_aux), ", ", rep(1:n_aux, times = length(aux_ex_labels)), "]")
           } else {
             n_aux <- length(aux_pars)
-            aux_names <- paste0(rep(aux_pars, times = n_studies), "[", rep(studies, each = n_aux) , "]")
+            aux_names <- paste0(rep(aux_pars, times = length(aux_ex_labels)), "[", rep(aux_ex_labels, each = n_aux) , "]")
           }
 
-          dim_aux <- c(dim_mu[1:2], n_aux * n_studies)
+          dim_aux <- c(dim_mu[1:2], length(aux_names))
           u <- array(runif(prod(dim_aux)), dim = dim_aux)
           aux_array <- array(NA_real_,
                              dim = dim_aux,
@@ -1522,36 +1616,27 @@ predict.stan_nma <- function(object, ...,
                                              parameters = aux_names))
 
           if (any(purrr::map_lgl(aux, rlang::is_string))) aux_temp <- as.array(object, pars = aux_pars)
-          if (n_aux == 1) {
-            for (s in 1:n_studies) {
-              ss <- as.character(studies[s])
-              if (inherits(aux[[ss]], "distr")) {
-                aux_array[, , s] <- rlang::eval_tidy(rlang::call2(aux[[ss]]$qfun, p = u[ , , s, drop = TRUE], !!! aux[[ss]]$args))
-              } else {
-                if (! aux[[ss]] %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
-                                                     if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
-                  abort("All elements of `aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
 
-                aux_array[ , , s] <- aux_temp[ , , grep(paste0("\\[\\Q", aux[[ss]], "\\E[\\:,\\]]"), dimnames(aux_temp)[[3]], perl = TRUE), drop = FALSE]
-              }
-            }
-          } else {
-            for (s in 1:n_studies) {
-              ss <- as.character(studies[s])
-              if (!rlang::is_string(aux[[ss]])) {
+          for (s in 1:n_studies) {
+            ss <- as.character(studies[s])
+            se <- grep(paste0("\\[\\Q", ss, "\\E[\\:,\\]]"), aux_names, perl = TRUE)
+            if (!rlang::is_string(aux[[ss]])) {
+              if (n_aux == 1) {
+                aux_array[, , se] <- rlang::eval_tidy(rlang::call2(aux[[ss]]$qfun, p = u[ , , se, drop = TRUE], !!! aux[[ss]]$args))
+              } else for (i in 1:n_aux) {
                 if (!setequal(names(aux[[ss]]), aux_pars) || !all(purrr::map_lgl(aux[[ss]], inherits, "distr")))
                   abort(glue::glue("`aux` must be a single named list of distr() specifications for {glue::glue_collapse(aux_pars, sep = ', ', last = ' and ')}, ",
                                    "a study name, or a list of length {n_studies} (number of `newdata` studies) of such lists."))
-                for (i in 1:n_aux) {
-                  aux_array[, , (s-1)*n_aux + i] <- rlang::eval_tidy(rlang::call2(aux[[ss]][[aux_pars[i]]]$qfun, p = u[ , , (s-1)*n_aux + i, drop = TRUE], !!! aux[[ss]][[aux_pars[i]]]$args))
-                }
-              } else {
-                if (! aux[[ss]] %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
-                                                                   if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor())))
-                  abort("All elements of `aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a list of distr() distributions.")
-
-                aux_array[ , , (s-1)*n_aux + (1:n_aux)] <- aux_temp[ , , grep(paste0("\\[\\Q", aux[[ss]], "\\E[\\:,\\]]"), dimnames(aux_temp)[[3]], perl = TRUE), drop = FALSE]
+                aux_array[, , se[i]] <- rlang::eval_tidy(rlang::call2(aux[[ss]][[aux_pars[i]]]$qfun, p = u[ , , se[i], drop = TRUE], !!! aux[[ss]][[aux_pars[i]]]$args))
               }
+            } else {
+              if (! aux[[ss]] %in% unique(forcats::fct_c(if (has_ipd(object$network)) object$network$ipd$.study else factor(),
+                                                   if (has_agd_arm(object$network)) object$network$agd_arm$.study else factor()))) {
+                if (n_aux == 1) abort("All elements of `aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a distr() distribution.")
+                else abort("All elements of `aux` must match the name of an IPD or AgD (arm-based) study in the network, or be a list of distr() distributions.")
+              }
+
+              aux_array[ , , se] <- aux_temp[ , , grep(paste0("\\[\\Q", aux[[ss]], "\\E[\\:,\\]]"), dimnames(aux_temp)[[3]], perl = TRUE), drop = FALSE]
             }
           }
         }
@@ -1882,7 +1967,7 @@ predict.stan_nma <- function(object, ...,
                           dim = dim_pred_array,
                           dimnames = dimnames_pred_array)
 
-      ss <- vector(length = nrow(outdat))
+      brmr <- grepl("(^\\.mu\\:)|(\\:\\.mu$)", colnames(X_all))
 
       for (s in 1:n_studies) {
 
@@ -1892,7 +1977,24 @@ predict.stan_nma <- function(object, ...,
         ss <- preddat$.study == studies[s]
 
         # Get prediction array for this study
-        s_pred_array <- tcrossprod_mcmc_array(post, X_all[ss, , drop = FALSE])
+        s_pred_array <- tcrossprod_mcmc_array(
+          post[, , !brmr, drop = FALSE],
+          X_all[ss, !brmr, drop = FALSE]
+        )
+
+        if (any(brmr)) {
+          s_pred_array <- s_pred_array +
+            tcrossprod_mcmc_array(
+              post[, , brmr, drop = FALSE],
+              X_all[ss, brmr, drop = FALSE]
+            ) * (
+              tcrossprod_mcmc_array(
+                post[, , grepl("^mu\\[", colnames(X_all)), drop = FALSE],
+                X_all[ss, grepl("^mu\\[", colnames(X_all)), drop = FALSE]
+              ) - object$xbar[[".mu"]]
+            )
+
+        }
 
         if (!is.null(offset_all))
           s_pred_array <- sweep(s_pred_array, 3, offset_all[ss], FUN = "+")
@@ -1931,7 +2033,7 @@ predict.stan_nma <- function(object, ...,
             dplyr::group_by(.data$.study, .data$.trt, .data$.cc) %>%
             dplyr::mutate(.weights = .data$.sample_size / sum(.data$.sample_size))
 
-          X_weighted_mean <- Matrix::Matrix(0, ncol = dim(s_pred_array)[3], nrow = n_trt * n_cc)
+          X_weighted_mean <- Matrix::Matrix(0, ncol = dim(s_pred_array)[3], nrow = dplyr::n_distinct(s_preddat$.trt) * n_cc)
 
           X_weighted_mean[cbind(dplyr::group_indices(s_preddat),
                                 1:dim(s_pred_array)[3])] <- s_preddat$.weights
@@ -1942,7 +2044,7 @@ predict.stan_nma <- function(object, ...,
             dplyr::group_by(.data$.study, .data$.trt) %>%
             dplyr::mutate(.weights = .data$.sample_size / sum(.data$.sample_size))
 
-          X_weighted_mean <- Matrix::Matrix(0, ncol = dim(s_pred_array)[3], nrow = n_trt)
+          X_weighted_mean <- Matrix::Matrix(0, ncol = dim(s_pred_array)[3], nrow = dplyr::n_distinct(s_preddat$.trt))
 
           X_weighted_mean[cbind(dplyr::group_indices(s_preddat),
                                 1:dim(s_pred_array)[3])] <- s_preddat$.weights
@@ -2051,6 +2153,7 @@ predict.stan_nma_surv <- function(object, times = NULL,
                                   times_seq = NULL,
                                   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
                                   predictive_distribution = FALSE,
+                                  expand = TRUE,
                                   summary = TRUE,
                                   progress = interactive(),
                                   trt_ref = NULL) {

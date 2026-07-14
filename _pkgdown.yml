@@ -136,6 +136,7 @@ reference:
   - mcmc_array-class
   - as.matrix.stan_nma
   - as.stanfit.stan_nma
+  - bind_chains
 
 - title: M-spline hazards
   desc: Functions for flexibile M-splines on the baseline hazard.
@@ -143,6 +144,7 @@ reference:
   - matches("[pdqhH]mspline")
   - rmst_mspline
   - make_knots
+  - knots.stan_nma
   - softmax
 
 - title: ggplot functions

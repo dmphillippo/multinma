@@ -291,13 +291,17 @@ transformed data {
   array[aux_int == 0 ? n_aux_group : 0, max(ni_aux_group_agd_arm)] int wi_aux_group_agd_arm;
 
   // Split spline X matrix into IPD and AgD rows
-  matrix[0, nX_aux] Xauxdummy;
-  matrix[ni_ipd, nX_aux] X_aux_ipd = ni_ipd ? X_aux[1:ni_ipd] : Xauxdummy;
-  matrix[(aux_int ? nint_max : 1) * ni_agd_arm, nX_aux] X_aux_agd_arm = ni_agd_arm ? X_aux[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm)] : Xauxdummy;
+  matrix[ni_ipd, nX_aux] X_aux_ipd;
+  matrix[(aux_int ? nint_max : 1) * ni_agd_arm, nX_aux] X_aux_agd_arm;
 
   cholesky_factor_corr[aux_reg_trt ? nt : 0] sigma_beta_L;
 
 #include /include/transformed_data_common.stan
+
+  if (nX_aux) {
+    if (ni_ipd) X_aux_ipd = X_aux[1:ni_ipd, ];
+    if (ni_agd_arm) X_aux_agd_arm = X_aux[(ni_ipd + 1):(ni_ipd + (aux_int ? nint_max : 1) * ni_agd_arm), ];
+  }
 
   if (aux_int == 0) for (i in 1:n_aux_group) {
     if (ni_aux_group_ipd[i]) wi_aux_group_ipd[i, 1:ni_aux_group_ipd[i]] = which(aux_group_ipd, i);
@@ -420,6 +424,14 @@ transformed parameters {
               X_agd_arm * beta_tilde + offset_agd_arm :
               X_agd_arm * beta_tilde;
 
+    // Baseline risk meta-regression
+    if (brmr_n_col > 0) {
+      // Subtracting 1 from the centred baseline risk here, as the associated
+      // beta was already added once to the linear predictor by
+      // `X_agd_arm * beta_tilde`
+      eta_agd_arm_noRE += (X_agd_arm[,1:totns] * mu - xbar_mu - 1) .* (X_agd_arm[,brmr_col] * beta_tilde[brmr_col]);
+    }
+
     if (class_effects) {
       for (i in 1:ni_agd_arm) {
         if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
@@ -467,11 +479,14 @@ transformed parameters {
 
           if (ni) {
             array[ni] int wi = wi_aux_group_agd_arm[i, 1:ni];
-            row_vector[n_scoef-1] Xb_auxi = X_aux_agd_arm[wi[1], ] * beta_aux;
             vector[n_scoef] scoef_agd_arm;
 
-            if (nX_aux) scoef_agd_arm = softmax(append_row(0, lscoef[aux_id_agd_arm[wi[1]]] + to_vector(Xb_auxi)));
-            else scoef_agd_arm = scoef_temp[i];
+            if (nX_aux) {
+              row_vector[n_scoef-1] Xb_auxi = X_aux_agd_arm[wi[1], ] * beta_aux;
+              scoef_agd_arm = softmax(append_row(0, lscoef[aux_id_agd_arm[wi[1]]] + to_vector(Xb_auxi)));
+            } else {
+              scoef_agd_arm = scoef_temp[i];
+            }
 
             for (j in 1:ni) {
               vector[nint] eta_agd_arm_ii;
