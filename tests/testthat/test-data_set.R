@@ -526,7 +526,7 @@ test_that("set_agd_contrast - positive definite check", {
                'not positive definite for studies "b" and "c"')
 })
 
-test_that("set_agd_regression - checks for standard errors and covariance/correlation matrices", {
+test_that("set_agd_regression - standard errors and covariance/correlation matrices", {
   s <- tibble(study = c("A", "A", "A", "B", "B", "B"),
               trt = c("a", "a", "b", "b", "b", "c"),
               est = c(NA, 1, 2, NA, 1, 2),
@@ -755,7 +755,7 @@ test_that("set_agd_regression - checks for standard errors and covariance/correl
 
 })
 
-test_that("set_agd_regression - checks for regression", {
+test_that("set_agd_regression - regression formula", {
   s <- tibble(study = c("A", "A", "A", "B", "B", "B"),
               trt = c("a", "a", "b", "b", "b", "c"),
               est = c(NA, 1, 2, NA, 1, 2), se = 1, se2 = -1, se3 = NA, x = 1, y = 1)
@@ -805,7 +805,7 @@ test_that("set_agd_regression - checks for regression", {
 
 })
 
-test_that("set_agd_regression - checks for estimate", {
+test_that("set_agd_regression - estimate", {
   s <- tibble(study = c("A", "A", "A", "B", "B", "B"),
               trt = c("a", "a", "b", "b", "b", "c"),
               est = c(NA, 1, 2, NA, 1, 2),
@@ -830,37 +830,280 @@ test_that("set_agd_regression - checks for estimate", {
 
 })
 
-test_that("set_agd_regression - covariate checks work", {
-  s <- tibble(study = c("A", "A", "A", "B", "B", "B"),
-              trt = c("a", "a", "b", "b", "b", "c"),
-              est = c(NA, 1, 2, NA, 1, 2),
-              se = 1,
-              x = 1)
-  cor_list <- list(A = diag(2), B = diag(2))
-  cov_list <- list(A = diag(2), B = diag(2))
-  cvt     <- data.frame(study = c('A','B'    ),x_mean = c(1,2), x_sd = c(0.1,0.2))
-  cvt_dup <- data.frame(study = c('A','B','B'),x_mean = c(1,2,3), x_sd = c(0.1,0.2,0.3))
+
+test_that("set_agd_regression - covariate", {
+  s <- tibble(study = c("A","A", "A", "A", "B", "B", "B", "B"),
+              trt = c("a","a", "a","b", "a", "a","a", "c"),
+              est = c(NA, 1,1,1, NA, 1,1,1),
+              se = c(NA,1,1,1,NA,1,1,1),
+              x1 = c(NA,0,1,0,NA,0,1,0))
+
+  cov_list <- list(A = diag(3), B = diag(3))
+  cvt_AB      <- data.frame(study = c('A','B'    ),x1_mean = c(1,2)  , x1_sd = c(0.1,0.2)    , x2_mean = c(1,2)  , x2_sd = c(0.1,0.2)    )
+  cvt_ABB     <- data.frame(study = c('A','B','B'),x1_mean = c(1,2,3), x1_sd = c(0.1,0.2,0.3), x2_mean = c(1,2,3), x2_sd = c(0.1,0.2,0.3))
+  cvt_BC_x1x2 <- data.frame(study = c('C','B')    ,x1_mean = c(3,2)  , x1_sd = c(0.3,0.2)    , x2_mean = c(3,2)  , x2_sd = c(0.3,0.2)    )
+  cvt_BC_x1   <- data.frame(study = c('C','B')    ,x1_mean = c(3,2)  , x1_sd = c(0.3,0.2))
+
 
   m <- "`covariates` must be a data frame\\."
-  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list, covariates = list(z=1)), m)
-  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list, covariates = 1:3      ), m)
-  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list, covariates = NA       ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1, cov = cov_list, covariates = list(z=1)), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1, cov = cov_list, covariates = 1:3      ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1, cov = cov_list, covariates = NA       ), m)
 
-  expect_no_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list, covariates = cvt    ))
-  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list, covariates = cvt_dup),
+  expect_no_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1, cov = cov_list, covariates = cvt_AB ))
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1, cov = cov_list, covariates = cvt_ABB),
                   "Only one row is allowed per study in `covariates`.")
 
+  # Full provided
   expect_equivalent(
-    set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list, covariates = cvt)$agd_regression %>%
-      dplyr::select(.study,x_mean,x_sd) %>%
+    set_agd_regression(s, study = study, trt = trt, estimate = est,
+                       regression = ~ .trt + x1, cov = cov_list,
+                       covariates = cvt_AB)$agd_regression %>%
+      dplyr::select(.study,x1_mean,x1_sd,x2_mean,x2_sd) %>%
       dplyr::arrange(.study) %>%
       dplyr::distinct(.study, .keep_all =TRUE) %>%
-      arrange(.study) %>%
-      select(-.study),
-    cvt %>% arrange(study) %>% select(-study) )
+      arrange(.study),
+    cvt_AB %>% arrange(study) %>%
+      rename(.study = study) %>%
+      mutate(.study = as.factor(.study) )
+    )
+
+  # Partially provided
+  expect_equivalent(
+    set_agd_regression(s, study = study, trt = trt, estimate = est,
+                       regression = ~ .trt + x1, cov = cov_list,
+                       covariates = cvt_BC_x1x2)$agd_regression %>%
+      dplyr::select(.study,x1_mean,x1_sd,x2_mean,x2_sd) %>%
+      dplyr::arrange(.study) %>%
+      dplyr::distinct(.study, .keep_all =TRUE) %>%
+      arrange(.study),
+    cvt_AB %>% arrange(study) %>%
+      rename(.study = study) %>%
+      mutate(.study = as.factor(.study) ) %>%
+      mutate(across(c(x1_mean,x1_sd,x2_mean,x2_sd), ~ if_else(.study == "A", NA_real_, .)))
+    )
+
+
+  m <- 'OVB_adj = "all", but no integration points are provided for study "A"\nUse add_integration\\(\\), or set OVB_adj = "auto" or "none"\\.'
+  AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est,
+                                regression = ~ .trt + x1, cov = list(A = diag(3), B = diag(3)),
+                                covariates = cvt_BC_x1x2)
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=x1_mean,sd=x1_sd),
+                             x2 = distr(qnorm,mean=x2_mean,sd=x2_sd),
+                             cor=diag(2))
+  expect_error(nma(AgD_reg, regression = ~ .trt + x1 + x2, likelihood = "bernoulli" , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+
+
+  m <- 'OVB_adj = "all", but no integration points are provided for studies "A" and "B"\nUse add_integration\\(\\), or set OVB_adj = "auto" or "none"\\.'
+  AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est,
+                                regression = ~ .trt + x1, cov = list(A = diag(3), B = diag(3)),
+                                covariates = cvt_BC_x1)
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=x1_mean,sd=x1_sd),
+                             #x2 = distr(qnorm,mean=x2_mean,sd=x2_sd),
+                             cor=diag(2))
+  expect_error(nma(AgD_reg, regression = ~ .trt + x1 + x2, likelihood = "bernoulli" , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+
+
+  # Multicollinearity
+  # s <- tibble(study = c("A","A", "A", "A","A", "B", "B", "B", "B"),
+  #             trt = c("a","a", "a","a","b", "a", "a","a", "c"),
+  #             est = c(NA, 1,1,1,1, NA, 1,1,1),
+  #             se = c(NA,1,1,1,1,NA,1,1,1),
+  #             x1 = c(0,0,1,0,0,0,0,1,0),
+  #             x2 = c(0,0,0,1,0,0,0,0,0))
+  # m <- 'The included matrix is singular and cannot be inverted for study A\\.'
+  # AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est,
+  #                               regression = ~ .trt + x1 + x2, cov = list(A = diag(4), B = diag(3)))
+  # AgD_reg <- add_integration(AgD_reg,
+  #                            x1 = distr(qbern, prob = .01),
+  #                            x2 = distr(qbern, prob = .99),
+  #                            x3 = distr(qnorm, mean=2, sd=1),
+  #                            cor = matrix(c(1 ,.5,.1,
+  #                                           .5, 1,.3,
+  #                                           .1,.3, 1),3,3))
+  # expect_error(nma(AgD_reg, regression = ~ .trt + x1 + x2 + x3, likelihood = "bernoulli" , OVB_adj = 'all'), m)
 
 })
 
+test_that("set_agd_regression - ordinal cutpoins", {
+  s <- tibble(study = c("A", "A", "A","A", "B", "B", "B", "B", "B"),
+              trt = c("a", "a","a", "b", "b", "b","b", "b", "c"),
+              est = c(NA, 1, 2,3, NA, 1, 2,3,4),
+              se = 1,
+              x = 1)
+  cov_list <- list(A = diag(3), B = diag(4))
+
+  s$ord_cut <- c(NA,'1|2',NA,NA,NA,NA,NA,'1|2',NA)
+  m <- "Specify both `ordinal_cut_lab` and `ordinal_cut`\\."
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list,
+                        ordinal_cut = 'ord_cut'),m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list,
+                                  ordinal_cut_lab = c('1|2','2|3','3|4')),m)
+
+
+  s$ord_cut <- c(NA,'1|2',NA,NA,NA,NA,NA,'1|2',NA)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list,
+                                  ordinal_cut_lab = 1:3,
+                                  ordinal_cut = 'ord_cut'),
+               "`ordinal_cut_lab` must be a character vector.")
+  s$ord_cut <- 1
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list,
+                                  ordinal_cut_lab = c('1|2','2|3','3|4'),
+                                  ordinal_cut = 'ord_cut'),
+               "`ordinal_cut` must be a character vector of cutpoint names.")
+
+  s$ord_cut <- c(NA,'1|2',NA,NA,NA,NA,NA,'1|2',NA)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list,
+                                  ordinal_cut_lab = c('1|2','1|2','3|4'),
+                                  ordinal_cut = 'ord_cut'),
+               "`ordinal_cut_lab` must contain unique values.")
+
+  s$ord_cut <- c(NA,'1|2',NA,NA,NA,NA,NA,'10|2',NA)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list,
+                                  ordinal_cut_lab = c('1|2','2|3','3|4'),
+                                  ordinal_cut = 'ord_cut'),
+               " `ordinal_cut` must be a subset of `ordinal_cut_lab`.")
+
+  s$ord_cut <- c(NA,'2|3',NA,NA,NA,NA,'3|4','1|2',NA)
+  expect_equivalent(
+    set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list,
+                       ordinal_cut_lab = c('1|2','2|3','3|4'),
+                       ordinal_cut = 'ord_cut')$agd_regression %>%
+      dplyr::select(.rank_intercept) %>% dplyr::pull(),
+    c(0,2,0,0,0,0,3,1,0))
+
+})
+
+test_that("set_agd_regression - OVB_adj", {
+  m <- 'OVB_adj = "all", but no integration points are provided for studies "A" and "B"'
+  s <- tibble(study = c("A", "A", "A","A", "B", "B", "B", "B", "B"),
+              trt = c("a", "a","a", "b", "a", "a","a", "a", "c"),
+              est = c(NA, 1, 2,3, NA, 1, 2,3,4),
+              se = c(NA, 1, 1,1, NA, 1, 1,1,1),
+              x = c(NA,0,1,0, NA,0,0,1,0))
+  s2 <- s[-6,]
+  AgD_reg <- set_agd_regression(s2, study = study, trt = trt, estimate = est,
+                                regression = ~ x, cov = list(A = diag(3), B = diag(3)))
+  expect_error(nma(AgD_reg, regression = ~ x + z, likelihood = "bernoulli" , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+})
+
+test_that("set_agd_regression - intercept", {
+  s <- tibble(study = c("A", "A", "A","A", "B", "B", "B", "B", "B"),
+              trt = c("a", "a","a", "b", "a", "a","a", "a", "c"),
+              est = c(NA, 1, 2,3, NA, 1, 2,3,4),
+              se = c(NA, 1, 1,1, NA, 1, 1,1,1),
+              x1 = c(0,0,1,0, 0,0,0,1,0))
+  AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est,
+                                regression = ~ x1, cov = list(A = diag(3), B = diag(4)))
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=1,sd=1),
+                             x2 = distr(qnorm,mean=1,sd=1),
+                             cor=diag(2))
+  m <- "Intercept rows are not allowed in Cox PH models\\."
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "exponential" , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "weibull"     , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "gompertz"    , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "mspline"     , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "pexp"        , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "exponential" , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "weibull"     , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "gompertz"    , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "mspline"     , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "pexp"        , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+
+  m <- "More than one intercept per study is not allowed\\."
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "bernoulli"   , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "bernoulli2"  , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "binomial"    , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "binomial2"   , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "poisson"     , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "normal"      , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "bernoulli"   , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "bernoulli2"  , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "binomial"    , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "binomial2"   , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "poisson"     , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "normal"      , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+
+  s2 <- s[-c(2,6),]
+  AgD_reg <- set_agd_regression(s2, study = study, trt = trt, estimate = est,
+                                regression = ~ .trt + x1, cov = list(A = diag(2), B = diag(3)))
+
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=1,sd=1),
+                             x2 = distr(qnorm,mean=1,sd=1),
+                             cor=diag(2))
+
+  m <- "No intercept row specified for reducd models\\."
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "bernoulli"   , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "bernoulli2"  , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "binomial"    , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "binomial2"   , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "poisson"     , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "normal"      , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+
+  # ordinal
+  m <- "No intercept specified in AgD regression for reduced models\\."
+  s$ord_cut <- c(NA,'1|2',NA,NA,NA,'2|3','1|2',NA,NA)
+  s2 <- s[-c(2),]
+  AgD_reg <- set_agd_regression(s2, study = study, trt = trt, estimate = est, regression = ~ x1,
+                                cov = list(A = diag(2), B = diag(4)),
+                                ordinal_cut = 'ord_cut',
+                                ordinal_cut_lab = c('1|2','2|3','3|4'))
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=1,sd=1),
+                             x2 = distr(qnorm,mean=1,sd=1),
+                             cor=diag(2))
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "ordered", OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+
+
+  m <- 'Specify cuts using `ordinal_cut` and `ordinal_cut_lab` argumnets for reduced models\\.'
+  AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1,
+                                cov = list(A = diag(3), B = diag(4))
+                                # ordinal_cut = 'ord_cut',
+                                #ordinal_cut_lab = c('1|2','2|3','3|4')
+                                )
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=1,sd=1),
+                             x2 = distr(qnorm,mean=1,sd=1),
+                             cor=diag(2))
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "ordered", OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+
+
+  m <- '`ordinal_cut` must be used only for intercept rows\\.'
+  s$ord_cut <- c(NA,NA,'1|2',NA,NA,'2|3','1|2',NA,NA)
+  AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1,
+                                cov = list(A = diag(3), B = diag(4)),
+                                ordinal_cut = 'ord_cut',
+                                ordinal_cut_lab = c('1|2','2|3','3|4')
+  )
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=1,sd=1),
+                             x2 = distr(qnorm,mean=1,sd=1),
+                             cor=diag(2))
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "ordered", OVB_adj = 'all' , prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+  #expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "ordered", OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+
+
+  m <- 'Intercept\\(s\\) at least must include the smallest one \\(study baseline\\) for reduced models\\.'
+  s$ord_cut <- c(NA,'2|3',NA,NA,NA,'2|3','1|2',NA,NA)
+  AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1,
+                                cov = list(A = diag(3), B = diag(4)),
+                                ordinal_cut = 'ord_cut',
+                                ordinal_cut_lab = c('1|2','2|3','3|4')
+  )
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=1,sd=1),
+                             x2 = distr(qnorm,mean=1,sd=1),
+                             cor=diag(2))
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "ordered", OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+
+
+})
 
 test_that("set_* - take one and only one outcome", {
   m <- "specify one and only one outcome"

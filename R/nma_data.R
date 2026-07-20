@@ -1121,14 +1121,14 @@ set_agd_regression <- function(data,
 
   # Pull and check estimates
   .estimate <- pull_non_null(data, enquo(estimate))
-  .se <- pull_non_null(data, enquo(se))
-
   if (is.null(.estimate)) abort("Specify `estimates` column of regression coefficient estimates.")
   if (rlang::is_list(.estimate) || !is.null(dim(.estimate)))
     abort("Estimates column `estimates` must be a regular column (not a list or matrix column).")
   if (!is.null(.estimate) && any(!is.na(.estimate))  && ( !is.numeric(.estimate) || any(is.infinite(.estimate)) ||  any(is.nan(.estimate)) ) )
     abort("`estimates` must be numeric.")
 
+  # Pull and check SE
+  .se <- pull_non_null(data, enquo(se))
   if ( !is.null(.se) && (rlang::is_list(.se) || !is.null(dim(.se))) )
     abort("Standard error `se` must be a regular column (not a list or matrix column)")
 
@@ -1401,10 +1401,17 @@ set_agd_regression <- function(data,
       abort("`ordinal_cut` columns must be a regular column (not a list or matrix column).")
     if (rlang::is_list(ordinal_cut_lab) || !is.null(dim(ordinal_cut_lab)) )
       abort("`ordinal_cut_lab` column must be a regular vector (not a list or matrix column).")
+
+    if (!is.character(ordinal_cut_lab))
+      abort("`ordinal_cut_lab` must be a character vector.")
+    if (!is.character(.ordinal_cut))
+      abort("`ordinal_cut` must be a character vector of cutpoint names.")
+
     if (length(ordinal_cut_lab) != length(unique(ordinal_cut_lab)))
       abort(' `ordinal_cut_lab` must contain unique values.')
     if (any( !na.omit(.ordinal_cut) %in% ordinal_cut_lab))
       abort(' `ordinal_cut` must be a subset of `ordinal_cut_lab`.')
+
     d$.rank_intercept <- match(.ordinal_cut, ordinal_cut_lab)
     d$.rank_intercept[is.na(d$.rank_intercept)] <- 0
     d <- d %>% dplyr::mutate(.ordinal_cut_lab = rep(list(ordinal_cut_lab), dplyr::n()))

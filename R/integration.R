@@ -411,29 +411,49 @@ add_integration.nma_data <- function(x, ...,
   }
 
   if (has_agd_regression(network)) {
-    # out$agd_regression <- withCallingHandlers(
-    #   add_integration.data.frame(network$agd_regression, ...,
-    #                              cor = cor, cor_adjust = cor_adjust, n_int = n_int, int_args = int_args),
-    #   int_col_present = int_col_present,
-    #   invalid_int_generated = invalid_int_generated)
 
-    tmp <- network$agd_regression %>%
-      dplyr::mutate(.row_id = dplyr::row_number())   # keep the original order
+    tmp_dat <- network$agd_regression
 
-    tmp_no_int <- apply(tmp[, paste0(x_names,'_mean') ],1,function(x) any(is.na(x)) )
+    tmp_var <-
+      ds %>% purrr::map(~{
+        .x$args %>%
+          purrr::map(~ all.vars(rlang::quo_get_expr(.x))) %>%
+          unlist() %>%
+          intersect(colnames(tmp_dat)) %>%
+          unique()
+      }) %>% unlist() %>% unique()
 
-    tmp1 <- tmp %>% dplyr::filter(tmp_no_int)
-    tmp2 <- tmp %>% dplyr::filter(!tmp_no_int)
-    tmp2 <- withCallingHandlers(
-      add_integration.data.frame(tmp2, ...,
-                                 cor = cor, cor_adjust = cor_adjust, n_int = n_int, int_args = int_args),
-      int_col_present = int_col_present,
-      invalid_int_generated = invalid_int_generated)
+    if (length(tmp_var)){
+      tmp_row.mis <- !complete.cases(tmp_dat[,tmp_var,drop=FALSE])
+    } else {
+      tmp_row.mis <- rep(FALSE,nrow(tmp_dat))
+    }
 
-    out$agd_regression <-
-      dplyr::bind_rows(tmp1, tmp2) %>%
-      dplyr::arrange(.data$.row_id) %>%
-      dplyr::select(-".row_id")
+    if (sum(tmp_row.mis)) {
+
+      # keep the original order
+      tmp <- tmp_dat %>% dplyr::mutate(.row_id = dplyr::row_number())
+
+      tmp1 <- tmp %>% dplyr::filter( tmp_row.mis)
+      tmp2 <- tmp %>% dplyr::filter(!tmp_row.mis)
+      tmp2 <- withCallingHandlers(
+        add_integration.data.frame(tmp2, ...,
+                                   cor = cor, cor_adjust = cor_adjust, n_int = n_int, int_args = int_args),
+        int_col_present = int_col_present,
+        invalid_int_generated = invalid_int_generated)
+
+      out$agd_regression <-
+        dplyr::bind_rows(tmp1, tmp2) %>%
+        dplyr::arrange(.data$.row_id) %>%
+        dplyr::select(-".row_id")
+
+    } else {
+      out$agd_regression <- withCallingHandlers(
+        add_integration.data.frame(network$agd_regression, ...,
+                                   cor = cor, cor_adjust = cor_adjust, n_int = n_int, int_args = int_args),
+        int_col_present = int_col_present,
+        invalid_int_generated = invalid_int_generated)
+    }
 
     copula_cor <- attr(out$agd_regression, "copula_cor")
   }
