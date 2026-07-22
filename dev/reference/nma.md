@@ -330,7 +330,7 @@ Acceleration Factors using the relation \\\log(\mathrm{AF}) =
 
 Further details on each likelihood and link function are given by Dias
 et al. (2011) . Details of survival models are given by Phillippo et al.
-(2025) .
+(2026) .
 
 ## Auxiliary parameters
 
@@ -435,10 +435,11 @@ Statistical Society: Series A (Statistics in Society)*, **183**(3),
 1189–1210. [doi:10.1111/rssa.12579](https://doi.org/10.1111/rssa.12579)
 .  
   
-Phillippo DM, Dias S, Ades AE, Welton NJ (2025). “Multilevel network
+Phillippo DM, Dias S, Ades AE, Welton NJ (2026). “Multilevel network
 meta-regression for general likelihoods: synthesis of individual and
 aggregate data with applications to survival analysis.” *Journal of the
-Royal Statistical Society Series A: Statistics in Society*.
+Royal Statistical Society Series A: Statistics in Society*, **189**(3),
+1856–1875. ISSN 1467-985X.
 [doi:10.1093/jrsssa/qnaf169](https://doi.org/10.1093/jrsssa/qnaf169) .  
   
 Phillippo DM, Sadek A, Pedder H, Welton NJ (2025). “Network
@@ -517,7 +518,7 @@ smk_fit_FE
 #> d[Self-help]                  0.31     0.46  2696    1
 #> lp__                      -5856.58 -5852.87  1699    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 17:43:52 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jul 22 14:50:11 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -550,7 +551,7 @@ smk_fit_RE
 #> lp__                      -5763.68 -5756.83  1081    1
 #> tau                           0.93     1.26  1169    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 17:43:59 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jul 22 14:50:19 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -600,7 +601,7 @@ smk_fit_RE_UME
 #> lp__                                            -5754.24   929    1
 #> tau                                                 1.43  1050    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 17:44:05 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jul 22 14:50:26 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -929,7 +930,7 @@ pso_fit
 #> d[SEC_300]                              2.45     2.53     2.68  5719    1
 #> lp__                                -1576.05 -1573.88 -1570.57  1619    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 17:45:36 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jul 22 14:52:06 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -1004,7 +1005,7 @@ ndmm_fit
 #> shape[Morgan2012]       0.94  5126    1
 #> shape[Palumbo2014]      1.16  4504    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Tue Jul 14 17:48:19 2026.
+#> Samples were drawn using NUTS(diag_e) at Wed Jul 22 14:55:16 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).

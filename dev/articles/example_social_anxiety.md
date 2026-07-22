@@ -25,7 +25,7 @@ When fitting class effects models there are multiple modeling options
 available.
 
 We demonstrate the model selection strategy proposed by Perren et al.
-([2025](#ref-Perren2025)) to determine the most suitable class effects
+([2026](#ref-Perren2025)) to determine the most suitable class effects
 model.
 
 ## Setting up the network
@@ -86,7 +86,7 @@ plot(sa_net, level = "class") +
 ## Model selection strategy
 
 We follow the model selection strategy proposed by Perren et al.
-([2025](#ref-Perren2025))
+([2026](#ref-Perren2025))
 
 ![](class_effects_flow_chart-1.svg)
 
@@ -344,7 +344,7 @@ treatment effects within each class. Because it is difficult to estimate
 the class standard deviations with only a small number of treatments in
 each class, here we specify an informative \mathrm{N}(0.33,0.1^2) prior
 distribution that is chosen to keep class variability within a
-clinically-plausible range ([Perren et al. 2025](#ref-Perren2025)). We
+clinically-plausible range ([Perren et al. 2026](#ref-Perren2025)). We
 also define `class_sd` as a list of character vectors indicating which
 classes share a common SD, again aiding estimation of these parameters.
 For the class effects means, `prior_class_mean` is set as \mathrm{N}(0,
@@ -664,6 +664,6 @@ Disorder in Adults: A Systematic Review and Network Meta-Analysis.” *The
 Lancet Psychiatry* 1 (5): 368–76.
 
 Perren, Samuel J., Hugo Pedder, Nicky J. Welton, and David M. Phillippo.
-2025. “Network Meta-Analysis with Class Effects: A Practical Guide and
+2026. “Network Meta-Analysis with Class Effects: A Practical Guide and
 Model Selection Algorithm.” *Medical Decision Making* 46 (3): 275–95.
 <https://doi.org/10.1177/0272989x251389887>.
