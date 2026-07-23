@@ -53,8 +53,7 @@ Imports:
     ggplot2 (>= 3.3.0),
     ggdist (>= 2.1.1),
     truncdist,
-    bayesplot,
-    magrittr
+    bayesplot
 LinkingTo: 
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),
