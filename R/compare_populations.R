@@ -8,13 +8,7 @@
 #'
 #' @return A list with a `summary` dataframe and `distance_matrix`.
 #'
-#' @importFrom magrittr %>%
-#' @importFrom dplyr select filter group_by summarise mutate left_join bind_rows distinct across all_of tibble n
-#' @importFrom tidyr separate pivot_wider
-#' @importFrom tibble column_to_rownames
-#' @importFrom rlang abort expr sym
 #' @importFrom stats glm model.matrix predict weighted.mean sd var weights
-#' @importFrom utils type.convert
 #' @export
 compare_populations <- function(network,
                                 covariates = NULL,
@@ -101,8 +95,8 @@ compare_populations <- function(network,
           cbind(all_data[[j]], study_indicator = 0L)
         )
 
-        model <- glm(study_indicator ~ ., data = combined_df, family = "binomial")
-        ps <- predict(model, newdata = combined_df, type = "response")
+        model <- stats::glm(study_indicator ~ ., data = combined_df, family = "binomial")
+        ps <- stats::predict(model, newdata = combined_df, type = "response")
 
         combined_df$propensity_score <- ps
         combined_df$ate_weight <- ifelse(
