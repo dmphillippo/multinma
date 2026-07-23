@@ -422,7 +422,8 @@ add_integration.nma_data <- function(x, ...,
   attr(out$int_cor, "cor_adjust") <- cor_adjust
   attr(out$int_cor, "copula_cor") <- copula_cor
 
-  out$integration_code <- ds_exprs
+  # Store distr calls
+  out$int_call <- ds_exprs
 
   class(out) <- c("mlnmr_data", "nma_data")
   return(out)

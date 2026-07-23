@@ -31,8 +31,10 @@ compare_populations <- function(network,
   # Check for Integration Code
   if (is.null(network$integration_code)) {
     abort("The network object does not contain integration code. Please run `add_integration()` on your network first to define the covariate distributions.")
+  # Check for integration call
+  if (is.null(network$int_call)) {
   }
-  avail_covariates <- names(network$integration_code)
+  avail_covariates <- names(network$int_call)
 
   # Checks for covariates argument
   if (is.null(covariates)) {
@@ -219,7 +221,7 @@ compare_populations <- function(network,
       retained_covariates <- c()
 
       for (cov in covariates) {
-        distr_obj <- network$integration_code[[cov]]
+        distr_obj <- network$int_call[[cov]]
         args <- distr_obj
 
         is_binary_dist <- "prob" %in% names(args)
