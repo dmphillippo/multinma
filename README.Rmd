@@ -59,7 +59,7 @@ Multilevel network meta-regression is set out in the following methods papers:
 
 > Phillippo, D. M. et al. (2020). "Multilevel Network Meta-Regression for population-adjusted treatment comparisons." _Journal of the Royal Statistical Society: Series A (Statistics in Society)_, 183(3):1189-1210. doi: [10.1111/rssa.12579](https://doi.org/10.1111/rssa.12579).
 
-> Phillippo, D. M. et al. (2025). "Multilevel network meta-regression for general likelihoods: synthesis of individual and aggregate data with applications to survival analysis". _Journal of the Royal Statistical Society: Series A (Statistics in Society)_, qnaf169. doi: [10.1093/jrsssa/qnaf169](https://doi.org/10.1093/jrsssa/qnaf169).
+> Phillippo, D. M. et al. (2026). "Multilevel network meta-regression for general likelihoods: synthesis of individual and aggregate data with applications to survival analysis". _Journal of the Royal Statistical Society: Series A (Statistics in Society)_, 189(3):1856-1875. doi: [10.1093/jrsssa/qnaf169](https://doi.org/10.1093/jrsssa/qnaf169).
 
 ## Citing multinma
 The `multinma` package can be cited as follows:
@@ -72,6 +72,6 @@ When fitting ML-NMR models, please cite the methods paper:
 
 For ML-NMR models with time-to-event outcomes, please cite:
 
-> Phillippo, D. M. et al. (2025). "Multilevel network meta-regression for general likelihoods: synthesis of individual and aggregate data with applications to survival analysis". _Journal of the Royal Statistical Society: Series A (Statistics in Society)_, qnaf169. doi: [10.1093/jrsssa/qnaf169](https://doi.org/10.1093/jrsssa/qnaf169).
+> Phillippo, D. M. et al. (2026). "Multilevel network meta-regression for general likelihoods: synthesis of individual and aggregate data with applications to survival analysis". _Journal of the Royal Statistical Society: Series A (Statistics in Society)_, 189(3):1856-1875. doi: [10.1093/jrsssa/qnaf169](https://doi.org/10.1093/jrsssa/qnaf169).
 
 ## References
