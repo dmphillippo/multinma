@@ -12,7 +12,7 @@
 #' @export
 compare_populations <- function(network,
                                 covariates = NULL,
-                                method = c("euclidean", "propensity")) {
+                                method = c("propensity", "euclidean")) {
 
   valid_choices <- c("euclidean", "propensity")
   method <- tryCatch({

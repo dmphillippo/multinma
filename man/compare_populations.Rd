@@ -7,7 +7,7 @@
 compare_populations(
   network,
   covariates = NULL,
-  method = c("euclidean", "propensity")
+  method = c("propensity", "euclidean")
 )
 }
 \arguments{
