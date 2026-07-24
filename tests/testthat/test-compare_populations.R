@@ -124,8 +124,7 @@ fit <- nma(pso_net_int,
            prior_reg = normal(scale = 10),
            prior_aux = flat(),
            QR = TRUE,
-           init_r = 0.5,
-           chains = 2, iter = 20, warmup = 10)
+           test_grad = TRUE)
 
 
 test_that("cross_validation() rejects incorrect input types", {
