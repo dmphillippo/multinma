@@ -4043,21 +4043,19 @@ apply_connect_fixed <- function(network, studies) {
 
 baseline_synthesis <- function(network,
                                prior_intercept_sd = .default(half_normal(scale = 5)),
-                               random_baseline = TRUE,
                                ...) {
   check_prior(prior_intercept_sd)
 
   if (is_network_connected(network))
     abort("`baseline_synthesis()` is only for disconnected networks.")
 
+  fit <- nma(
+    network = network,
   # The baseline subnetwork is always 1 — nma() reorders components so the
   # network reference treatment's subnetwork is always subnetwork 1
-  baseline_subnet <- 1L
-
-  fit <- nma(
-    network            = network,
-    baseline_subnet    = baseline_subnet,
-    random_baseline    = random_baseline,
+    baseline_subnet = 1L,
+    random_baseline = TRUE,
+    prior_intercept = prior_intercept,
     prior_intercept_sd = prior_intercept_sd,
     ...
   )
