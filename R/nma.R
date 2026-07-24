@@ -3175,7 +3175,7 @@ make_nma_formula <- function(regression,
 
 #' Construct NMA design matrix
 #'
-#' @param nma_formula NMA formula, returned by [make_nma_formula()]
+#' @param nma_formula NMA formula, returned by `make_nma_formula()`
 #' @param ipd,agd_arm,agd_contrast Data frames
 #' @param agd_contrast_bl Logical vector identifying baseline rows for contrast
 #'   data
