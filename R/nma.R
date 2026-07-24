@@ -2102,6 +2102,11 @@ nma.fit <- function(ipd_x, ipd_y,
   # Set chain_id to make CHAIN_ID available in data block
   stanargs$chain_id <- 1L
 
+  # Zap extra arguments from ... passed by random baseline model
+  if (random_baseline) {
+    stanargs$baseline_subnet <- NULL
+  }
+
   # Call Stan model for given likelihood
 
   # -- Normal likelihood
