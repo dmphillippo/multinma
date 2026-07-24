@@ -656,7 +656,8 @@ test_that("con() with type = 'fixed' collapses the named studies onto a shared b
 })
 
 test_that("nma() errors on a disconnected network unless baseline_subnet or connect_baseline is given", {
-  expect_error(nma(disc_net), "Network is disconnected")
+  expect_error(suppressWarnings(nma(disc_net)),
+               "Network is disconnected")
 
   fit_subnet <- suppressWarnings(nma(disc_net, baseline_subnet = 1L, random_baseline = TRUE,
                                      prior_intercept_sd = half_normal(scale = 5), test_grad = TRUE))
