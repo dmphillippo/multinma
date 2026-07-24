@@ -110,8 +110,8 @@ test_that("AgD, IPD, and mixed analysis identical", {
   s_i <- as.data.frame(summary(fit_i)) %>% select(-"Bulk_ESS", -"Tail_ESS", -"Rhat")
   s_ai <- as.data.frame(summary(fit_ai)) %>% select(-"Bulk_ESS", -"Tail_ESS", -"Rhat")
 
-  expect_equal(s_a, s_i, tol = 0.05)
-  expect_equal(s_a, s_ai, tol = 0.05)
+  expect_equal(s_a, s_i, tolerance = 0.05)
+  expect_equal(s_a, s_ai, tolerance = 0.05)
 
 })
 
@@ -138,19 +138,19 @@ test_that("correct posterior - normal likelihood, disconnected", {
   # baseline mean
   expect_equal(as.data.frame(summary(cfit, pars = "baseline_mean"))$mean,
                weighted.mean(bl$y, 1 / (bl$se^2 + tau_mu^2)),
-               tol = 0.05)
+               tolerance = 0.05)
   expect_equal(as.data.frame(summary(cfit, pars = "baseline_mean"))$sd,
                sqrt(1/sum(1 / (bl$se^2 + tau_mu^2))),
-               tol = 0.05)
+               tolerance = 0.05)
 
   # predictive dist
   expect_equal(as.data.frame(summary(cfit, pars = "baseline_new"))$mean,
                as.data.frame(summary(cfit, pars = "baseline_mean"))$mean,
-               tol = 0.05)
+               tolerance = 0.05)
   expect_equal(as.data.frame(summary(cfit, pars = "baseline_new"))$sd,
                as.data.frame(summary(cfit, pars = "baseline_mean"))$sd +
                  as.data.frame(summary(cfit, pars = "baseline_sd"))$mean,
-               tol = 0.05)
+               tolerance = 0.05)
 
 })
 
@@ -175,18 +175,84 @@ test_that("correct posterior - normal likelihood, connected", {
   # baseline mean
   expect_equal(as.data.frame(summary(cfit, pars = "baseline_mean"))$mean,
                weighted.mean(bl$y, 1 / (bl$se^2 + tau_mu^2)),
-               tol = 0.05)
+               tolerance = 0.05)
   expect_equal(as.data.frame(summary(cfit, pars = "baseline_mean"))$sd,
                sqrt(1/sum(1 / (bl$se^2 + tau_mu^2))),
-               tol = 0.05)
+               tolerance = 0.05)
 
   # predictive dist
   expect_equal(as.data.frame(summary(cfit, pars = "baseline_new"))$mean,
                as.data.frame(summary(cfit, pars = "baseline_mean"))$mean,
-               tol = 0.05)
+               tolerance = 0.05)
   expect_equal(as.data.frame(summary(cfit, pars = "baseline_new"))$sd,
                as.data.frame(summary(cfit, pars = "baseline_mean"))$sd +
                  as.data.frame(summary(cfit, pars = "baseline_sd"))$mean,
-               tol = 0.05)
+               tolerance = 0.05)
 
+})
+
+test_that("TSD5 smoking cessation - simultaneous modelling", {
+  smknet <- set_agd_arm(smoking, studyn, trtc, r = r, n = n,
+                        trt_ref = "No intervention")
+  fit <- baseline_synthesis(smknet,
+                            trt_effects = "random",
+                            prior_intercept = normal(scale = 100),
+                            prior_trt = normal(scale = 100),
+                            prior_het = normal(scale = 5),
+                            prior_intercept_sd = half_normal(2.5))
+
+
+  tol <- 0.05
+
+  s_mean <- as.data.frame(summary(fit, pars = "baseline_mean"))
+  expect_equal(s_mean$mean, -2.49, tolerance = tol)
+  expect_equal(s_mean$sd, 0.13, tolerance = tol)
+  expect_equal(s_mean$`2.5%`, -2.75, tolerance = tol)
+  expect_equal(s_mean$`97.5%`, -2.25, tolerance = tol)
+
+  s_sd <- as.data.frame(summary(fit, pars = "baseline_sd"))
+  expect_equal(s_sd$`50%`, 0.45, tolerance = tol)
+  expect_equal(s_sd$sd, 0.11, tolerance = tol)
+  expect_equal(s_sd$`2.5%`, 0.29, tolerance = tol)
+  expect_equal(s_sd$`97.5%`, 0.71, tolerance = tol)
+
+  s_new <- as.data.frame(summary(fit, pars = "baseline_new"))
+  expect_equal(s_new$mean, -2.49, tolerance = tol)
+  expect_equal(s_new$sd, 0.49, tolerance = tol)
+  expect_equal(s_new$`2.5%`, -3.48, tolerance = tol)
+  expect_equal(s_new$`97.5%`, -1.52, tolerance = tol)
+})
+
+
+test_that("TSD5 smoking cessation - separate modelling", {
+  smknet <- set_agd_arm(smoking %>% filter(trtc == "No intervention"),
+                        studyn, trtc, r = r, n = n,
+                        allow_singlearm_studies = TRUE)
+  fit <- baseline_synthesis(smknet,
+                            trt_effects = "random",
+                            prior_intercept = normal(scale = 100),
+                            prior_trt = normal(scale = 100),
+                            prior_het = normal(scale = 5),
+                            prior_intercept_sd = half_normal(2.5))
+
+
+  tol <- 0.05
+
+  s_mean <- as.data.frame(summary(fit, pars = "baseline_mean"))
+  expect_equal(s_mean$mean, -2.59, tolerance = tol)
+  expect_equal(s_mean$sd, 0.16, tolerance = tol)
+  expect_equal(s_mean$`2.5%`, -2.94, tolerance = tol)
+  expect_equal(s_mean$`97.5%`, -2.30, tolerance = tol)
+
+  s_sd <- as.data.frame(summary(fit, pars = "baseline_sd"))
+  expect_equal(s_sd$`50%`, 0.54, tolerance = tol)
+  expect_equal(s_sd$sd, 0.16, tolerance = tol)
+  expect_equal(s_sd$`2.5%`, 0.32, tolerance = tol)
+  expect_equal(s_sd$`97.5%`, 0.93, tolerance = tol)
+
+  s_new <- as.data.frame(summary(fit, pars = "baseline_new"))
+  expect_equal(s_new$mean, -2.59, tolerance = tol)
+  expect_equal(s_new$sd, 0.60, tolerance = tol)
+  expect_equal(s_new$`2.5%`, -3.82, tolerance = tol)
+  expect_equal(s_new$`97.5%`, -1.41, tolerance = tol)
 })
