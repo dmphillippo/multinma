@@ -4050,8 +4050,8 @@ baseline_synthesis <- function(network,
 
   fit <- nma(
     network = network,
-  # The baseline subnetwork is always 1 — nma() reorders components so the
-  # network reference treatment's subnetwork is always subnetwork 1
+    # The baseline subnetwork is always 1 — nma() reorders components so the
+    # network reference treatment's subnetwork is always subnetwork 1
     baseline_subnet = 1L,
     random_baseline = TRUE,
     prior_intercept = prior_intercept,
@@ -4059,50 +4059,54 @@ baseline_synthesis <- function(network,
     ...
   )
 
-  dots <- list(...)
-  if (isTRUE(dots$test_grad)) {
-    return(list(network = network))
-  }
-
-  # Summarise baseline-related parameters and attach
-  # Extract all mu[], then filter to reference subnetwork studies only
-  ss_bl <- rstan::summary(fit$stanfit,
-                          pars  = c("baseline_new", "baseline_mean", "baseline_sd"),
-                          probs = c(0.025, 0.5, 0.975))$summary
-  ss_mu <- rstan::summary(fit$stanfit,
-                          pars  = "mu",
-                          probs = c(0.025, 0.5, 0.975))$summary
-  ss_d  <- rstan::summary(fit$stanfit,
-                          pars  = "d",
-                          probs = c(0.025, 0.5, 0.975))$summary
-
-  # Split d[] by subnetwork: subnet 1 d's have the network reference treatment as their ref
-  ref_trt_name <- levels(network$treatments)[1]
-  d_names      <- rownames(ss_d)  # e.g. "d[IXE_Q2W vs PBO]", "d[SEC_300 vs SEC_150]"
-  d_refs       <- sub(".*vs (.+)\\]$", "\\1", d_names)
-
-  ss <- rbind(
-    ss_bl,
-    ss_mu[fit$baseline_study_idx, , drop = FALSE],
-    ss_d[d_refs == ref_trt_name, , drop = FALSE],   # subnet 1 d's
-    ss_d[d_refs != ref_trt_name, , drop = FALSE]    # subnet 2+ d's
-  )
-
-  keep <- grepl("^(baseline_new|baseline_mean|baseline_sd|mu\\[|d\\[)", rownames(ss))
-  summary_df <- as.data.frame(ss[keep, , drop = FALSE])
-  summary_df$parameter <- rownames(ss)[keep]
-  summary_df <- summary_df[, c("parameter", setdiff(names(summary_df), "parameter"))]
-  rownames(summary_df) <- NULL
-
-  fit$baseline_summary <- summary_df
-  fit$priors$prior_intercept_sd <- prior_intercept_sd
-
-  class(fit) <- c("baseline_synthesis", class(fit))
+  class(fit) <- c("stan_baseline", class(fit))
   fit
 }
 
 #' @export
-print.baseline_synthesis <- function(x, ...) {
-  print(x$baseline_summary)
-  invisible(x)
+#' @rdname summary.stan_nma
+summary.stan_baseline <- function(object, ...,
+                                  pars, include,
+                                  probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
+
+  if (missing(pars)) pars <- c("baseline_new", "baseline_mean", "baseline_sd", "mu")
+
+  # # Summarise baseline-related parameters and attach
+  # # Extract all mu[], then filter to reference subnetwork studies only
+  # ss_bl <- rstan::summary(fit$stanfit,
+  #                         pars  = c("baseline_new", "baseline_mean", "baseline_sd"),
+  #                         probs = c(0.025, 0.5, 0.975))$summary
+  # ss_mu <- rstan::summary(fit$stanfit,
+  #                         pars  = "mu",
+  #                         probs = c(0.025, 0.5, 0.975))$summary
+  # ss_d  <- rstan::summary(fit$stanfit,
+  #                         pars  = "d",
+  #                         probs = c(0.025, 0.5, 0.975))$summary
+  #
+  # # Split d[] by subnetwork: subnet 1 d's have the network reference treatment as their ref
+  # ref_trt_name <- levels(network$treatments)[1]
+  # d_names      <- rownames(ss_d)  # e.g. "d[IXE_Q2W vs PBO]", "d[SEC_300 vs SEC_150]"
+  # d_refs       <- sub(".*vs (.+)\\]$", "\\1", d_names)
+  #
+  # ss <- rbind(
+  #   ss_bl,
+  #   ss_mu[fit$baseline_study_idx, , drop = FALSE],
+  #   ss_d[d_refs == ref_trt_name, , drop = FALSE],   # subnet 1 d's
+  #   ss_d[d_refs != ref_trt_name, , drop = FALSE]    # subnet 2+ d's
+  # )
+  #
+  # keep <- grepl("^(baseline_new|baseline_mean|baseline_sd|mu\\[|d\\[)", rownames(ss))
+  # summary_df <- as.data.frame(ss[keep, , drop = FALSE])
+  # summary_df$parameter <- rownames(ss)[keep]
+  # summary_df <- summary_df[, c("parameter", setdiff(names(summary_df), "parameter"))]
+  # rownames(summary_df) <- NULL
+
+  NextMethod()
+}
+
+#' @export
+#' @rdname print.stan_nma
+print.stan_baseline <- function(x, ...) {
+  if ("pars" %in% names(list(...))) NextMethod()
+  else print(summary(stan_baseline), ...)
 }

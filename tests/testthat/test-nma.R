@@ -117,7 +117,7 @@ test_that("baseline_synthesis() summarises baseline parameters for the reference
 
   fit <- suppressWarnings(baseline_synthesis(disc_net, iter = 50))
 
-  expect_s3_class(fit, "baseline_synthesis")
+  expect_s3_class(fit, "stan_baseline")
   expect_s3_class(fit, "stan_nma")
 
   params <- fit$baseline_summary$parameter
@@ -140,7 +140,7 @@ test_that("baseline_synthesis() works with more than two subnetworks", {
 
   fit <- suppressWarnings(baseline_synthesis(disc_net_3, iter = 50))
 
-  expect_s3_class(fit, "baseline_synthesis")
+  expect_s3_class(fit, "stan_baseline")
 
   params <- fit$baseline_summary$parameter
   # Only S1 (the reference treatment's subnetwork) contributes a mu[] row
