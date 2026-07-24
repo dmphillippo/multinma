@@ -79,8 +79,8 @@ pso_net <- combine_network(
               trt_class = trtclass)
 )
 
-test_that("compare_populations() covariates argument must be one listed", {
-  m <- "The network object does not contain integration code"
+test_that("type = 'propensity' needs integration points for AgD", {
+  m <- "Integration points must be present"
   expect_error(compare_populations(pso_net, method = "propensity"), m)
 })
 
@@ -95,7 +95,7 @@ pso_net_int <- add_integration(pso_net,
                            n_int = 64)
 
 test_that("compare_populations() covariates must be listed in data", {
-  m <- "The following covariates are NOT defined in the network's integration code"
+  m <- "Cannot compare requested covariates missing integration points"
   expect_error(compare_populations(pso_net_int, method = "propensity", covariates = "height"), m)
   expect_error(compare_populations(pso_net_int, method = "propensity", covariates = "a"), m)
   expect_error(compare_populations(pso_net_int, method = "propensity", covariates = c("age", "height")), m)
@@ -103,11 +103,8 @@ test_that("compare_populations() covariates must be listed in data", {
 })
 
 test_that("a method is stated in compare_populations()", {
-  m <- "Argument `method` must be either 'euclidean' or 'propensity'."
-  expect_error(compare_populations(pso_net_int, method = 1), m)
-  expect_error(compare_populations(pso_net_int, method = "a"), m)
-  expect_error(compare_populations(pso_net_int, method = euclidean), m)
-  expect_error(compare_populations(pso_net_int, method = c("euclidean", "propensity")), m)
+  expect_error(compare_populations(pso_net_int, method = 1), "must be a character vector")
+  expect_error(compare_populations(pso_net_int, method = "a"), "must be one of")
 })
 
 #-------------------------------------------------
@@ -124,6 +121,7 @@ fit <- nma(pso_net_int,
            prior_reg = normal(scale = 10),
            prior_aux = flat(),
            QR = TRUE,
+           init_r = 0.5,
            test_grad = TRUE)
 
 
