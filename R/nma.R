@@ -4038,8 +4038,11 @@ apply_connect_fixed <- function(network, studies) {
 #' @export
 
 baseline_synthesis <- function(network,
+                               prior_intercept = .default(normal(scale = 100)),
                                prior_intercept_sd = .default(half_normal(scale = 5)),
                                ...) {
+
+  check_prior(prior_intercept)
   check_prior(prior_intercept_sd)
 
   if (is_network_connected(network))
