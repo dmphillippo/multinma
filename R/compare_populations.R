@@ -200,7 +200,7 @@ compare_populations <- function(network,
         dplyr::group_by(.data$.study) %>%
         dplyr::summarise(
           total_n = dplyr::n(),
-          dplyr::across(all_of(covariates), list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE))),
+          dplyr::across(dplyr::all_of(covariates), list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE))),
           .groups = "drop"
         )
     }
