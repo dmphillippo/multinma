@@ -67,20 +67,20 @@ bdat_a <- data.frame(study = c("S1", "S1", "S2", "S3", "S4", "S5"),
                      n     = c(10, 10, 10, 10, 10, 10))
 
 bnet_a <- set_agd_arm(bdat_a, study, trt, r = r, n = n,
-                      allow_singlearm_studies = TRUE)
+                      allow_single_arm = TRUE)
 
 bdat_i <- rowwise(bdat_a) %>%
   mutate(ri = list(c(rep(1, r), rep(0, n - r)))) %>%
   tidyr::unnest(cols = "ri")
 
 bnet_i <- set_ipd(bdat_i, study, trt, r = ri,
-                  allow_singlearm_studies = TRUE)
+                  allow_single_arm = TRUE)
 
 bnet_ai <- combine_network(
   set_agd_arm(bdat_a %>% filter(study == "S1"), study, trt, r = r, n = n,
-              allow_singlearm_studies = TRUE),
+              allow_single_arm = TRUE),
   set_ipd(bdat_i %>% filter(study != "S1"), study, trt, r = ri,
-          allow_singlearm_studies = TRUE)
+          allow_single_arm = TRUE)
 )
 
 test_that("AgD, IPD, and mixed analysis identical", {
@@ -124,7 +124,7 @@ test_that("correct posterior - normal likelihood, disconnected", {
                      se = runif(8, 0.1, 0.25))
 
   cnet <- set_agd_arm(cdat, study, trt, y = y, se = se,
-                      allow_singlearm_studies = TRUE)
+                      allow_single_arm = TRUE)
 
   cfit <- suppressWarnings(baseline_synthesis(cnet,
                              prior_intercept = normal(0, 10),
@@ -227,7 +227,7 @@ test_that("TSD5 smoking cessation - simultaneous modelling", {
 test_that("TSD5 smoking cessation - separate modelling", {
   smknet <- set_agd_arm(smoking %>% filter(trtc == "No intervention"),
                         studyn, trtc, r = r, n = n,
-                        allow_singlearm_studies = TRUE)
+                        allow_single_arm = TRUE)
   fit <- baseline_synthesis(smknet,
                             trt_effects = "random",
                             prior_intercept = normal(scale = 100),
