@@ -48,6 +48,7 @@ print.stan_nma <- function(x, ...) {
   else type <- "NMA"
   if (inherits(x, "stan_baseline")) {
     cglue("A baseline synthesis model with a {x$likelihood} likelihood ({x$link} link).")
+    cglue("Study baselines correspond to reference treatment: {levels(x$network$treatments)[1]}.")
   } else {
     cglue("A {x$trt_effects} effects {type} with a {x$likelihood} likelihood ({x$link} link).")
   }
