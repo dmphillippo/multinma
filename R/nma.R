@@ -4014,20 +4014,31 @@ apply_connect_fixed <- function(network, studies) {
   list(network = network, n_collapsed = diff)
 }
 
-#' Baseline synthesis wrapper around `nma()`
+#' Baseline synthesis models
 #'
-#' Runs `nma()` with random baseline enabled and returns the fit with an
-#' attached summary of baseline-related parameters.
+#' Runs a baseline synthesis model, placing a random effect on the
+#' study-specific intercepts to obtain a pooled estimate of the absolute
+#' outcomes on the network reference treatment. This can be combined with a
+#' regression model to obtain an adjusted estimate. Estimates of both the
+#' overall mean and standard deviation (`baseline_mean` and `baseline_sd`) as
+#' well as the predictive distribution (`baseline_new`) are returned.
+#'
+#' @details The baseline synthesis model places a random effect on the
+#'   study-specific intercept parameters of the NMA or ML-NMR model fitted by
+#'   [nma()]:
+#'   \deqn{\mu_j \sim \mathrm{N}(m, \tau_\mu)}{\mu_j ~ N(m, \tau_\mu)}
+#'   The prior distribution on the mean \eqn{m} is specified by the
+#'   `prior_intercept` argument, and the prior for \eqn{\tau_\mu}$ by
+#'   `prior_intercept_sd`.
 #'
 #' @name baseline_synthesis
 #' @param network A `multinma` network object.
-#' @param prior_intercept_sd Prior for the baseline SD (used by random baseline).
-#' @param random_baseline Logical; ensure random baseline is used. Default `TRUE`.
-#' @param ... Any additional arguments passed directly to [nma()].
-#' @return An `nma` fit with extra components:
-#'   * `baseline_summary`: data frame of summaries for `baseline_new`,
-#'     `baseline_mean`, `baseline_sd`, and `mu[i]`.
-#'   * `priors$prior_intercept_sd`: the prior you supplied (for plotting, etc.).
+#' @param prior_intercept Prior for the mean of the random effects distribution
+#'   on the study-specific intercepts.
+#' @param prior_intercept_sd Prior for standard deviation of the random effects
+#'   distribution on the study-specific intercepts.
+#' @param ... Additional arguments passed directly to [nma()].
+#' @return A `stan_baseline` object, inheriting from [stan_nma].
 #' @export
 
 baseline_synthesis <- function(network,
