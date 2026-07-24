@@ -114,10 +114,6 @@
 #'   `knots`, a named list of M-spline bases (one for each study) can be
 #'   provided with `mspline_basis` which will be used directly. In this case,
 #'   all other M-spline options will be ignored.
-#' @param baseline_subnet Internal flag used by [baseline_synthesis()] to allow
-#'   fitting on a disconnected network. When set, `subnetwork_trt` is computed
-#'   automatically from the network's connected components, with treatment
-#'   effects still estimated for every subnetwork. Not intended for direct use.
 #'
 #' @details When specifying a model formula in the `regression` argument, the
 #'   usual formula syntax is available (as interpreted by [model.matrix()]). The
@@ -317,18 +313,18 @@ nma <- function(network,
                 mspline_degree = 3,
                 n_knots = 7,
                 knots = NULL,
-                mspline_basis = NULL,
-                baseline_subnet = NULL) {
+                mspline_basis = NULL) {
 
-  # Remove random baseline arguments from ...
+  # Get random baseline arguments from ...
   dlist <- list(...)
   if ("random_baseline" %in% names(dlist)) {
     random_baseline <- dlist$random_baseline
     prior_intercept_sd <- dlist$prior_intercept_sd
-    dlist  <- NULL
+    baseline_subnet <- dlist$baseline_subnet %||% 1L
   } else {
     random_baseline <- FALSE
     prior_intercept_sd <- NULL
+    baseline_subnet <- NULL
   }
 
   # Check network
