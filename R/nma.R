@@ -4050,9 +4050,6 @@ baseline_synthesis <- function(network,
   check_prior(prior_intercept)
   check_prior(prior_intercept_sd)
 
-  if (is_network_connected(network))
-    abort("`baseline_synthesis()` is only for disconnected networks.")
-
   fit <- nma(
     network = network,
     # The baseline subnetwork is always 1 — nma() reorders components so the
