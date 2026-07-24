@@ -46,7 +46,11 @@ NULL
 print.stan_nma <- function(x, ...) {
   if (inherits(x$network, "mlnmr_data")) type <- "ML-NMR"
   else type <- "NMA"
-  cglue("A {x$trt_effects} effects {type} with a {x$likelihood} likelihood ({x$link} link).")
+  if (inherits(x, "stan_baseline")) {
+    cglue("A baseline synthesis model with a {x$likelihood} likelihood ({x$link} link).")
+  } else {
+    cglue("A {x$trt_effects} effects {type} with a {x$likelihood} likelihood ({x$link} link).")
+  }
   if (x$likelihood %in% c("mspline", "pexp")) {
     deg <- switch(x$likelihood,
                   mspline = switch(attr(x$basis[[1]], 'degree'),
@@ -73,23 +77,29 @@ print.stan_nma <- function(x, ...) {
 
   sf <- as.stanfit(x)
   dots <- list(...)
-  include <- "pars" %in% names(dots)
+  if (inherits(x, "stan_baseline") && !"pars" %in% names(dots)) {
+    pars <- c("baseline_new", "baseline_mean", "baseline_sd", "mu", "lp__")
+    include <- TRUE
+  } else {
+    include <- "pars" %in% names(dots)
+    pars <- c("log_lik", "resdev",
+              "fitted_ipd",
+              "fitted_agd_arm",
+              "fitted_agd_contrast",
+              "theta_bar_cum_agd_arm",
+              "theta_bar_cum_agd_contrast",
+              "theta2_bar_cum",
+              "mu", "delta",
+              if (!is.null(x$aux_regression) &&
+                  length(setdiff(colnames(attr(terms(x$aux_regression), "factor")), ".trt")) > 0) {
+                if (x$likelihood %in% c("mspline", "pexp")) NULL else "d_aux"
+              } else {
+                "beta_aux"
+              },
+              "scoef")
+  }
   dots <- rlang::dots_list(x = sf,
-                           pars = c("log_lik", "resdev",
-                                    "fitted_ipd",
-                                    "fitted_agd_arm",
-                                    "fitted_agd_contrast",
-                                    "theta_bar_cum_agd_arm",
-                                    "theta_bar_cum_agd_contrast",
-                                    "theta2_bar_cum",
-                                    "mu", "delta",
-                                    if (!is.null(x$aux_regression) &&
-                                        length(setdiff(colnames(attr(terms(x$aux_regression), "factor")), ".trt")) > 0) {
-                                      if (x$likelihood %in% c("mspline", "pexp")) NULL else "d_aux"
-                                    } else {
-                                      "beta_aux"
-                                    },
-                                    "scoef"),
+                           pars = pars,
                            include = include,
                            use_cache = FALSE,
                            !!! dots,
@@ -146,6 +156,10 @@ summary.stan_nma <- function(object, ...,
                              ) {
 
   # Set defaults for pars, include
+  if (inherits(object, "stan_baseline") && missing(pars)) {
+    pars <- c("baseline_new", "baseline_mean", "baseline_sd", "mu")
+    include <- TRUE
+  }
   if (missing(include)) {
     include <- !missing(pars)
   } else {
