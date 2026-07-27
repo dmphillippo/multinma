@@ -166,7 +166,7 @@ set_ipd <- function(data,
     if (allow_single_arm == "inform" || isTRUE(allow_single_arm)) {
       inform(glue::glue("Single-arm stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} present in the network: ",
                         glue::glue_collapse(glue::double_quote(as.character(single_arm_studies)), sep = ", ", last = " and "), "."))
-    } else if (allow_single_arm == "inform" || isTRUE(allow_single_arm)) {
+    } else if (allow_single_arm == "warn") {
       warn(glue::glue("Single-arm stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} present in the network: ",
                       glue::glue_collapse(glue::double_quote(as.character(single_arm_studies)), sep = ", ", last = " and "), "."))
     } else if (allow_single_arm == "error" || isFALSE(allow_single_arm)) {
@@ -373,7 +373,7 @@ set_agd_arm <- function(data,
     if (allow_single_arm == "inform" || isTRUE(allow_single_arm)) {
       inform(glue::glue("Single-arm stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} present in the network: ",
                         glue::glue_collapse(glue::double_quote(as.character(single_arm_studies)), sep = ", ", last = " and "), "."))
-    } else if (allow_single_arm == "inform" || isTRUE(allow_single_arm)) {
+    } else if (allow_single_arm == "warn") {
       warn(glue::glue("Single-arm stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} present in the network: ",
                       glue::glue_collapse(glue::double_quote(as.character(single_arm_studies)), sep = ", ", last = " and "), "."))
     } else if (allow_single_arm == "error" || isFALSE(allow_single_arm)) {
@@ -901,7 +901,7 @@ set_agd_surv <- function(data,
     if (allow_single_arm == "inform" || isTRUE(allow_single_arm)) {
       inform(glue::glue("Single-arm stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} present in the network: ",
                         glue::glue_collapse(glue::double_quote(as.character(single_arm_studies)), sep = ", ", last = " and "), "."))
-    } else if (allow_single_arm == "inform" || isTRUE(allow_single_arm)) {
+    } else if (allow_single_arm == "warn") {
       warn(glue::glue("Single-arm stud{if (length(single_arm_studies) > 1) 'ies' else 'y'} present in the network: ",
                       glue::glue_collapse(glue::double_quote(as.character(single_arm_studies)), sep = ", ", last = " and "), "."))
     } else if (allow_single_arm == "error" || isFALSE(allow_single_arm)) {
