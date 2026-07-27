@@ -50,16 +50,141 @@ test_that("set_* error if study not given, missing values, or not regular 1D col
 })
 
 test_that("set_* error if single-arm studies included", {
-  m <- "Single-arm studies are not supported"
 
-  s <- tibble(study = c("a", "b", "b", "c"), trt = c("A", "A", "A", "B"), r = 1, n = 2, time = 1, status = 1)
-  expect_warning(set_ipd(s, study, trt, r = r), 'Single-arm studies detected: issue with studies "a", "b" and "c"\\.')
-  expect_warning(set_agd_arm(s, study, trt, r = r, n = n),'Single-arm studies detected: issue with studies "a" and "c"\\.')
+  s <- tibble(study = c("a", "b", "b", "c", "d", "d"), trt = c("A", "A", "A", "B", "A", "B"), r = 1, n = 2, time = 1, status = 1)
   expect_error(set_agd_contrast(s, study, trt, y = r, se = n),'Single-arm studies are not supported: issue with studies "a" and "c"')
 
+  # Default behaviour - warning
+  wi <- 'Single-arm studies present in the network: "a", "b" and "c"'
+  wa <- 'Single-arm studies present in the network: "a" and "c"'
+  expect_warning(set_ipd(s, study, trt, r = r), wi)
+  expect_warning(set_agd_arm(s, study, trt, r = r, n = n), wa)
+  expect_warning(set_ipd(s, study, trt, r = r), wi)
+  expect_warning(set_agd_arm(s, study, trt, r = r, n = n), wa)
+
   # Allowed with message for survival outcomes
-  expect_message(set_ipd(s, study, trt, Surv = Surv(time, status)), 'Single-arm studies present in the network: "a", "b" and "c"')
-  expect_message(set_agd_surv(s, study, trt, Surv = Surv(time, status)), 'Single-arm studies present in the network: "a", "b" and "c"')
+  expect_message(set_ipd(s, study, trt, Surv = Surv(time, status)), wi)
+  expect_message(set_agd_surv(s, study, trt, Surv = Surv(time, status)), wi)
+
+  # allow = warn
+  expect_warning(set_ipd(s, study, trt, r = r,
+                         allow_single_arm = "warn"), wi)
+  expect_warning(set_agd_arm(s, study, trt, r = r, n = n,
+                             allow_single_arm = "warn"), wa)
+  expect_warning(set_ipd(s, study, trt, r = r,
+                         allow_single_arm = "warn"), wi)
+  expect_warning(set_agd_arm(s, study, trt, r = r, n = n,
+                             allow_single_arm = "warn"), wa)
+  expect_warning(set_ipd(s, study, trt, Surv = Surv(time, status),
+                         allow_single_arm = "warn"), wi)
+  expect_warning(set_agd_surv(s, study, trt, Surv = Surv(time, status),
+                              allow_single_arm = "warn"), wi)
+
+  # allow = FALSE/error
+  ei <- 'Single-arm studies detected: issue with studies "a", "b" and "c"\\.'
+  ea <- 'Single-arm studies detected: issue with studies "a" and "c"\\.'
+  expect_error(set_ipd(s, study, trt, r = r,
+                         allow_single_arm = "error"), ei)
+  expect_error(set_agd_arm(s, study, trt, r = r, n = n,
+                             allow_single_arm = "error"), ea)
+  expect_error(set_ipd(s, study, trt, r = r,
+                         allow_single_arm = "error"), ei)
+  expect_error(set_agd_arm(s, study, trt, r = r, n = n,
+                             allow_single_arm = "error"), ea)
+  expect_error(set_ipd(s, study, trt, Surv = Surv(time, status),
+                         allow_single_arm = "error"), ei)
+  expect_error(set_agd_surv(s, study, trt, Surv = Surv(time, status),
+                              allow_single_arm = "error"), ei)
+
+  expect_error(set_ipd(s, study, trt, r = r,
+                         allow_single_arm = FALSE), ei)
+  expect_error(set_agd_arm(s, study, trt, r = r, n = n,
+                             allow_single_arm = FALSE), ea)
+  expect_error(set_ipd(s, study, trt, r = r,
+                         allow_single_arm = FALSE), ei)
+  expect_error(set_agd_arm(s, study, trt, r = r, n = n,
+                             allow_single_arm = FALSE), ea)
+  expect_error(set_ipd(s, study, trt, Surv = Surv(time, status),
+                         allow_single_arm = FALSE), ei)
+  expect_error(set_agd_surv(s, study, trt, Surv = Surv(time, status),
+                              allow_single_arm = FALSE), ei)
+
+  # allow = TRUE/inform
+  expect_message(set_ipd(s, study, trt, r = r,
+                         allow_single_arm = "inform"), wi)
+  expect_message(set_agd_arm(s, study, trt, r = r, n = n,
+                             allow_single_arm = "inform"), wa)
+  expect_message(set_ipd(s, study, trt, r = r,
+                         allow_single_arm = "inform"), wi)
+  expect_message(set_agd_arm(s, study, trt, r = r, n = n,
+                             allow_single_arm = "inform"), wa)
+  expect_message(set_ipd(s, study, trt, Surv = Surv(time, status),
+                         allow_single_arm = "inform"), wi)
+  expect_message(set_agd_surv(s, study, trt, Surv = Surv(time, status),
+                              allow_single_arm = "inform"), wi)
+
+  expect_message(set_ipd(s, study, trt, r = r,
+                         allow_single_arm = TRUE), wi)
+  expect_message(set_agd_arm(s, study, trt, r = r, n = n,
+                             allow_single_arm = TRUE), wa)
+  expect_message(set_ipd(s, study, trt, r = r,
+                         allow_single_arm = TRUE), wi)
+  expect_message(set_agd_arm(s, study, trt, r = r, n = n,
+                             allow_single_arm = TRUE), wa)
+  expect_message(set_ipd(s, study, trt, Surv = Surv(time, status),
+                         allow_single_arm = TRUE), wi)
+  expect_message(set_agd_surv(s, study, trt, Surv = Surv(time, status),
+                              allow_single_arm = TRUE), wi)
+
+  ## use option multinma.allow_single_arm
+
+  withr::with_options(list(multinma.allow_single_arm = "warn"), {
+    # allow = warn
+    expect_warning(set_ipd(s, study, trt, r = r), wi)
+    expect_warning(set_agd_arm(s, study, trt, r = r, n = n), wa)
+    expect_warning(set_ipd(s, study, trt, r = r), wi)
+    expect_warning(set_agd_arm(s, study, trt, r = r, n = n), wa)
+    expect_warning(set_ipd(s, study, trt, Surv = Surv(time, status)), wi)
+    expect_warning(set_agd_surv(s, study, trt, Surv = Surv(time, status)), wi)
+  })
+
+  # allow = FALSE/error
+  withr::with_options(list(multinma.allow_single_arm = "error"), {
+    expect_error(set_ipd(s, study, trt, r = r), ei)
+    expect_error(set_agd_arm(s, study, trt, r = r, n = n), ea)
+    expect_error(set_ipd(s, study, trt, r = r), ei)
+    expect_error(set_agd_arm(s, study, trt, r = r, n = n), ea)
+    expect_error(set_ipd(s, study, trt, Surv = Surv(time, status)), ei)
+    expect_error(set_agd_surv(s, study, trt, Surv = Surv(time, status)), ei)
+  })
+
+  withr::with_options(list(multinma.allow_single_arm = FALSE), {
+    expect_error(set_ipd(s, study, trt, r = r), ei)
+    expect_error(set_agd_arm(s, study, trt, r = r, n = n), ea)
+    expect_error(set_ipd(s, study, trt, r = r), ei)
+    expect_error(set_agd_arm(s, study, trt, r = r, n = n), ea)
+    expect_error(set_ipd(s, study, trt, Surv = Surv(time, status)), ei)
+    expect_error(set_agd_surv(s, study, trt, Surv = Surv(time, status)), ei)
+  })
+
+  # allow = TRUE/inform
+  withr::with_options(list(multinma.allow_single_arm = "inform"), {
+    expect_message(set_ipd(s, study, trt, r = r), wi)
+    expect_message(set_agd_arm(s, study, trt, r = r, n = n), wa)
+    expect_message(set_ipd(s, study, trt, r = r), wi)
+    expect_message(set_agd_arm(s, study, trt, r = r, n = n), wa)
+    expect_message(set_ipd(s, study, trt, Surv = Surv(time, status)), wi)
+    expect_message(set_agd_surv(s, study, trt, Surv = Surv(time, status)), wi)
+  })
+
+  withr::with_options(list(multinma.allow_single_arm = TRUE), {
+    expect_message(set_ipd(s, study, trt, r = r), wi)
+    expect_message(set_agd_arm(s, study, trt, r = r, n = n), wa)
+    expect_message(set_ipd(s, study, trt, r = r), wi)
+    expect_message(set_agd_arm(s, study, trt, r = r, n = n), wa)
+    expect_message(set_ipd(s, study, trt, Surv = Surv(time, status)), wi)
+    expect_message(set_agd_surv(s, study, trt, Surv = Surv(time, status)), wi)
+  })
 })
 
 test_that("set_* error if trt not given, missing values, or not regular 1D column", {
