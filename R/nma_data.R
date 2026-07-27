@@ -884,8 +884,7 @@ set_agd_surv <- function(data,
   }
 
   if (missing(allow_single_arm)) {
-    allow_single_arm <- getOption("multinma.allow_single_arm",
-                                  if (o_type == "survival") TRUE else "warn")
+    allow_single_arm <- getOption("multinma.allow_single_arm", TRUE)
   }
   if (!rlang::is_bool(allow_single_arm)) {
     rlang::arg_match(allow_single_arm, c("warn", "error", "inform", "TRUE", "FALSE"))
