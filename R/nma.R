@@ -420,6 +420,11 @@ nma <- function(network,
     }
   }
 
+  # Check for single treatment only (e.g. baseline synthesis)
+  if (length(network$treatments) == 1) {
+    trt_effects <- "fixed"
+    if (consistency != "consistency") abort("Only a single treatment, cannot fit inconsistency model.")
+  }
 
 
   if (class_effects == "common") {
