@@ -600,6 +600,14 @@ test_that("con() with type = 'fixed' collapses the named studies onto a shared b
   expect_equal(levels(fit$network$studies), "F1 & F2")
 })
 
+
+# Minimal disconnected, AgD-arm-only network: two studies, no shared treatment
+disc_dat <- tibble(study = c("S1", "S1", "S2", "S2"),
+                   trt   = c("A", "B", "C", "D"),
+                   r     = c(50, 60, 55, 65),
+                   n     = c(100, 100, 100, 100))
+disc_net <- set_agd_arm(disc_dat, study, trt, r = r, n = n)
+
 test_that("nma() errors on a disconnected network unless baseline_subnet or connect_baseline is given", {
   expect_error(suppressWarnings(nma(disc_net)),
                "Network is disconnected")
