@@ -30,6 +30,26 @@ test_that("default summmary for correct parameters", {
 
   expect_true(all(c("baseline_new", "baseline_mean", "baseline_sd") %in% s$parameter))
 
+  w <- "Accessing relative treatment effects"
+  expect_warning(as.array(fit, pars = "d"), w)
+  expect_warning(as.data.frame(fit, pars = "d"), w)
+  expect_warning(as_tibble(fit, pars = "d"), w)
+  expect_warning(as.matrix(fit, pars = "d"), w)
+  expect_warning(print(fit, pars = "d"), w)
+  expect_warning(summary(fit, pars = "d"), w)
+  expect_warning(as.array(fit, pars = "baseline_mean", include = FALSE), w)
+  expect_warning(as.data.frame(fit, pars = "baseline_mean", include = FALSE), w)
+  expect_warning(as_tibble(fit, pars = "baseline_mean", include = FALSE), w)
+  expect_warning(as.matrix(fit, pars = "baseline_mean", include = FALSE), w)
+  expect_warning(print(fit, pars = "baseline_mean", include = FALSE), w)
+  expect_warning(summary(fit, pars = "baseline_mean", include = FALSE), w)
+  expect_warning(as.array(fit, pars = c("d", "baseline_mean")), w)
+  expect_warning(as.data.frame(fit, pars = c("d", "baseline_mean")), w)
+  expect_warning(as_tibble(fit, pars = c("d", "baseline_mean")), w)
+  expect_warning(as.matrix(fit, pars = c("d", "baseline_mean")), w)
+  expect_warning(print(fit, pars = c("d", "baseline_mean")), w)
+  expect_warning(summary(fit, pars = c("d", "baseline_mean")), w)
+
   skip("To re-implement")
 
   # Only S1 (the reference treatment's subnetwork) contributes a mu[] row

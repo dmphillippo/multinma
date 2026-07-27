@@ -99,6 +99,10 @@ print.stan_nma <- function(x, ...) {
               },
               "scoef")
   }
+  if (inherits(x, "stan_baseline") && !xor(any(grepl("^d(\\[|$)", dots$pars %||% pars)), dots$include %||% include)) {
+    warn(c("Accessing relative treatment effects `d` from baseline synthesis model. Proceed with caution!",
+           "Treatment effect estimates may be biased unless the baseline model is correct."))
+  }
   dots <- rlang::dots_list(x = sf,
                            pars = pars,
                            include = include,
@@ -830,6 +834,11 @@ as.array.stan_nma <- function(x, ..., pars, include = TRUE) {
     if (length(badpars))
       abort(glue::glue("No parameter{if (length(badpars) > 1) 's' else ''} ",
                        glue::glue_collapse(glue::double_quote(badpars), sep = ", ", last = " or "), "."))
+
+    if (inherits(x, "stan_baseline") && !xor(any(grepl("^d(\\[|$)", pars)), include)) {
+      warn(c("Accessing relative treatment effects `d` from baseline synthesis model. Proceed with caution!",
+             "Treatment effect estimates may be biased unless the baseline model is correct."))
+    }
 
     # Extract from stanfit only parameters represented in pars
     if (include) {
