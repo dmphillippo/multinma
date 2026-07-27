@@ -3334,20 +3334,26 @@ make_nma_model_matrix <- function(nma_formula,
   # coding is used everywhere
   dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
 
-  # Recode .trt factor for disconnected networks so each subnetwork has its own
-  # reference treatment, both mapping to "..ref.." so R drops both as reference
-  if (!is.null(subnetwork_trt)) {
-    trt_levels <- levels(dat_all$.trt)
-    sn_of_trt  <- subnetwork_trt[trt_levels]
-    subnet_refs <- tapply(trt_levels, sn_of_trt, function(x) x[[1]])
-    new_trt_labels <- vapply(trt_levels, function(trt) {
-      ref <- subnet_refs[[as.character(sn_of_trt[[trt]])]]
-      if (trt == ref) "..ref.." else paste0(trt, " vs ", ref)
-    }, character(1))
-    names(new_trt_labels) <- trt_levels
-    new_trt_levels <- c("..ref..", setdiff(new_trt_labels, "..ref.."))
-    dat_all$.trt <- factor(new_trt_labels[as.character(dat_all$.trt)],
-                           levels = new_trt_levels)
+  if (nlevels(dat_all$.trt) == 1) {
+    # Single treatment only (some baseline syntheses)
+    nma_formula <- update(nma_formula, ~ . -.trt)
+  } else {
+
+    # Recode .trt factor for disconnected networks so each subnetwork has its own
+    # reference treatment, both mapping to "..ref.." so R drops both as reference
+    if (!is.null(subnetwork_trt)) {
+      trt_levels <- levels(dat_all$.trt)
+      sn_of_trt  <- subnetwork_trt[trt_levels]
+      subnet_refs <- tapply(trt_levels, sn_of_trt, function(x) x[[1]])
+      new_trt_labels <- vapply(trt_levels, function(trt) {
+        ref <- subnet_refs[[as.character(sn_of_trt[[trt]])]]
+        if (trt == ref) "..ref.." else paste0(trt, " vs ", ref)
+      }, character(1))
+      names(new_trt_labels) <- trt_levels
+      new_trt_levels <- c("..ref..", setdiff(new_trt_labels, "..ref.."))
+      dat_all$.trt <- factor(new_trt_labels[as.character(dat_all$.trt)],
+                             levels = new_trt_levels)
+    }
   }
 
   # Check that required variables are present in each data set, and non-missing

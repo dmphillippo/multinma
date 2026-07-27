@@ -21,7 +21,7 @@ vector[nX] allbeta = QR ? R_inv * beta_tilde : beta_tilde;
 // Study baselines
 vector[totns] mu;
 // Treatment effects
-vector[nt - 1] d = allbeta[(totns +1):(totns + nt - 1)];
+vector[nt - 1] d;
 // Node-splitting omega ()
 vector[nodesplit] omega; // nodesplit ? allbeta[totns + ns] : vector(0);
 // Regression predictors
@@ -51,6 +51,11 @@ if (random_baseline) {
     f_baseline[s] = bmean - mu[s] + bsd * z_baseline[i];
     mu[s] = bmean + bsd * z_baseline[i];
   }
+}
+
+// -- Treatment effects --
+if (nt > 1) {
+  d = allbeta[(totns +1):(totns + nt - 1)];
 }
 
 // -- Regression predictors --

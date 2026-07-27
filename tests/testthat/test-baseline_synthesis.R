@@ -249,7 +249,7 @@ test_that("TSD5 smoking cessation - separate modelling", {
                         studyn, trtc, r = r, n = n,
                         allow_single_arm = TRUE)
   fit <- baseline_synthesis(smknet,
-                            trt_effects = "random",
+                            trt_effects = "random", ## should disable RE model when all single-arm
                             prior_intercept = normal(scale = 100),
                             prior_trt = normal(scale = 100),
                             prior_het = normal(scale = 5),
