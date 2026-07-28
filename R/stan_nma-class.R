@@ -282,7 +282,8 @@ plot_prior_posterior <- function(x, ...,
       "aux"[!is.null(x$priors$prior_aux)],
       "aux_reg"[!is.null(x$priors$prior_aux_reg)],
       "class_mean"[!is.null(x$priors$prior_class_mean)],
-      "class_sd"[!is.null(x$priors$prior_class_sd)])
+      "class_sd"[!is.null(x$priors$prior_class_sd)],
+      "intercept_sd"[!is.null(x$priors$prior_intercept_sd)])
 
   if (is.null(prior)) {
     prior <- priors_used
@@ -343,7 +344,8 @@ plot_prior_posterior <- function(x, ...,
 
   prior_dat <- dplyr::bind_rows(prior_dat) %>%
     dplyr::mutate(par_base = dplyr::recode(.data$prior,
-                                           intercept = "mu",
+                                           # If baseline synthesis then intercept prior is on baseline_mean rather than mu
+                                           intercept = if (inherits(x, "stan_baseline")) "baseline_mean" else "mu",
                                            trt = "d",
                                            het = "tau",
                                            reg = "beta",
@@ -368,19 +370,7 @@ plot_prior_posterior <- function(x, ...,
                                                             gengamma = "beta_aux"),
                                            class_mean = "class_mean",
                                            class_sd = "class_sd",
-                                           baseline_mean = "baseline_mean",
-                                           baseline_sd = "baseline_sd"))
-
-  # If baseline sysnthesis object then show baseline_mean and sd
-  if (inherits(x, "stan_baseline")) {
-    prior_dat <- dplyr::bind_rows(
-      prior_dat,
-      get_tidy_prior(x$priors$prior_intercept) %>%
-        tibble::add_column(prior = "intercept", par_base = "baseline_mean"),
-      get_tidy_prior(x$priors$prior_intercept_sd) %>%
-        tibble::add_column(prior = "intercept", par_base = "baseline_sd")
-    )
-  }
+                                           intercept_sd = "baseline_sd"))
 
   # Add in omega parameter if node-splitting model, which uses prior_trt
   if (inherits(x, "nma_nodesplit")) {
