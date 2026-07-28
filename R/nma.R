@@ -349,10 +349,20 @@ nma <- function(network,
 
   # Check and apply connect_baseline specifications
   if (!is.null(connect_baseline)) {
-    if ("type" %in% names(connect_baseline)) {
+
+    if (inherits(connect_baseline, "nma_connect")) {
+
       connect_baseline <- list(connect_baseline)
+
     } else {
-      is_random <- vapply(connect_baseline, function(spec) spec$type == "random", logical(1))
+
+      if (!rlang::is_bare_list(connect_baseline) ||
+          !all(purrr::map_lgl(connect_baseline, inherits, what = "nma_connect"))) {
+        abort("`connect_baseline` must be a con() object or a list of con() objects defining the connections.")
+      }
+
+      is_random <- purrr::map_lgl(connect_baseline, function(spec) spec$type == "random")
+
       if (length(connect_baseline) > 1 && any(is_random)) {
         abort(paste(
           "Only a single `con()` is allowed in `connect_baseline` when using `type = \"random\"`.",
@@ -363,7 +373,7 @@ nma <- function(network,
       all_studies <- unlist(lapply(connect_baseline, function(spec) spec$studies), use.names = FALSE)
       dup_studies <- unique(all_studies[duplicated(all_studies)])
       if (length(dup_studies)) {
-        rlang::abort(
+        abort(
           paste0(
             "Each study may appear in at most one con(). ",
             "Duplicates found: ",
@@ -372,37 +382,36 @@ nma <- function(network,
         )
       }
     }
+
     for (spec in connect_baseline) {
+
       if (has_agd_contrast(network) &&
           any(spec$studies %in% as.character(network$agd_contrast$.study))) {
-        abort("`connect_baseline()` cannot include studies from AgD-contrast data; please remove them.")
+        abort("`connect_baseline()` cannot include studies from AgD-contrast data.")
       }
+
       known_studies <- c(if (has_ipd(network)) as.character(network$ipd$.study) else NULL,
                          if (has_agd_arm(network)) as.character(network$agd_arm$.study) else NULL)
+
       if (!all(spec$studies %in% known_studies)) {
-        abort("Some studies listed in `connect_baseline()` are not present in the network (IPD or AgD-arm).")
+        abort("Some studies listed in `connect_baseline()` are not present in the network (IPD or AgD arm-based).")
       }
+
       if (spec$type == "fixed") {
-        # warning supplied baseline_prior when using type = "fixed"
-        if (!is.null(spec$baseline_prior)) {
-          warning(
-            sprintf(
-              "baseline_prior supplied for fixed connection on studies [%s]; ignoring it.",
-              paste(spec$studies, collapse = ", ")
-            ),
-            call. = FALSE
-          )
-        }
+
         connect_fixed <- apply_connect_fixed(network, spec$studies)
         network <- connect_fixed$network
         fixed_baseline <- connect_fixed$n_collapsed
+
       } else if (spec$type == "random") {
+
         connect_flag <- 1
         totns <- length(network$studies)
         prior_intercept_org <- prior_intercept
         prior_intercept <- rep(list(prior_intercept), totns)
         idx <- match(spec$studies, levels(network$studies))
         prior_intercept[idx] <- rep(list(spec$baseline_prior), length(idx))
+
       }
     }
   }
@@ -3980,22 +3989,31 @@ aux_needs_integration <- function(aux_regression, aux_by) {
 con <- function(type = c("fixed", "random"),
                 studies,
                 baseline_prior = NULL) {
-  if (!type %in% c("fixed", "random")) {
-    stop("type must equal 'fixed' or 'random'.", call. = FALSE)
-  }
-  studies <- as.character(studies)
-  if (length(studies) < 1)
-    stop("`studies` must be a non-empty character vector.")
 
-  if (type == "random" && is.null(baseline_prior))
-      stop("`baseline_prior` must be provided when type = 'random'.", call. = FALSE)
-  if (type == "random" && !is.null(baseline_prior))
-      check_prior(baseline_prior)
+  type <- rlang::arg_match(type)
+
+  studies <- as.character(studies)
+  if (!is.vector(studies) ||
+      type == "fixed" && length(studies) < 2 ||
+      type == "random" && length(studies) < 1)
+    abort(glue::glue('`studies` must be a vector of study names of length > {switch(type, fixed = 2L, random = 1L)} for type = "{type}".'))
+
+  if (type == "random") {
+    if (is.null(baseline_prior)) abort('`baseline_prior` must be provided when type = "random".')
+    check_prior(baseline_prior)
+  } else {
+    if (!is.null(baseline_prior)) {
+      warn(glue::glue('Ignoring `baseline_prior` provided with type = "fixed" for stud{if (studies) > 1) "ies" else "y"}: ',
+                      glue::glue_collapse(glue::double_quote(studies), sep = ", ", last = " and "), "."))
+      baseline_prior <- NULL
+    }
+  }
 
   structure(
     list(type      = type,
          studies   = studies,
-         baseline_prior  = baseline_prior)
+         baseline_prior  = baseline_prior),
+    class = "nma_connect"
   )
 }
 
