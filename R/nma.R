@@ -17,20 +17,20 @@
 #' @param class_interactions Character string specifying whether effect modifier
 #'   interactions are specified as `"common"`, `"exchangeable"`, or
 #'   `"independent"`.
-#' @param class_effects Character string specifying a model for treatment class effects,
-#'   either `"independent"` (the default), `"exchangeable"`, or `"common"`.
-#' @param class_sd Character string specifying whether the class standard deviations in a
-#'   class effects model should be `"independent"` (i.e. separate for each class, the default),
-#'   or `"common"` (i.e. shared across all classes). Alternatively this can be a list of
-#'   character vectors, each of which describe a set classes for which to share a common class SD;
-#'   any list names will be used to name the output parameters, otherwise the name will be taken
-#'   from the first class in each set.
-#' @param connect_baseline Optional baseline connections. Supply one or more
-#'   `con()` specifications to share baselines between studies. Random
-#'   baseline require a `baseline_prior` distribution. All studies listed in a
-#'   single `con()` that are `type = "fixed"` must originate from the same data type (IPD or AgD).
-#'   Multiple `con()` specifications may only be combined if they are all
-#'   `type = "fixed"`; a `type = "random"` connection must be given on its own.
+#' @param class_effects Character string specifying a model for treatment class
+#'   effects, either `"independent"` (the default), `"exchangeable"`, or
+#'   `"common"`.
+#' @param class_sd Character string specifying whether the class standard
+#'   deviations in a class effects model should be `"independent"` (i.e.
+#'   separate for each class, the default), or `"common"` (i.e. shared across
+#'   all classes). Alternatively this can be a list of character vectors, each
+#'   of which describe a set classes for which to share a common class SD; any
+#'   list names will be used to name the output parameters, otherwise the name
+#'   will be taken from the first class in each set.
+#' @param connect_baseline Baseline connections created by [con()], used to
+#'   connect a disconnected network. Multiple [con()] specifications of
+#'   `type = "fixed"` may be provided as a list. Currently a single
+#'   `type = "random"` connection must be given on its own.
 #' @param likelihood Character string specifying a likelihood, if unspecified
 #'   will be inferred from the data (see details)
 #' @param link Character string specifying a link function, if unspecified will
@@ -3956,16 +3956,24 @@ aux_needs_integration <- function(aux_regression, aux_by) {
 
 #' Specify baseline connections
 #'
-#' Helper function for the `connect_baseline` argument of [nma()] to specify
-#' how study baselines are linked.
+#' Helper function for the `connect_baseline` argument of [nma()] to specify how
+#' study baselines (intercepts) are linked, to connect a disconnected network or
+#' single-arm studies.
+#'
+#' @details A random baseline connection is specified with `type = "random"`.
+#'   This places an informative prior distribution on the baselines of studies
+#'   listed in `studies`, specified with the `baseline_prior` argument.
+#'
+#'   A fixed baseline connection is specified with `type = "fixed"`. This shares
+#'   the baseline parameter for studies listed in `studies`.
 #'
 #' @name connect_baseline
 #' @rdname connect_baseline
 #' @aliases con
 #' @param type Type of connection, either "fixed" or "random".
-#' @param studies Character vector of study names.
-#' @param baseline_prior Prior distribution for the shared baseline mean when
-#'   `type = "random"`, as a [nma_prior] object.
+#' @param studies Vector of study names.
+#' @param baseline_prior Prior distribution for the baseline parameters of
+#'   `studies` when `type = "random"`, as a [nma_prior] object (see [priors]).
 #'
 #' @return An object of class `nma_connect`.
 #' @export
