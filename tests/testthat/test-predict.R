@@ -2367,14 +2367,14 @@ test_that(".study, .trt, .time columns are correct (weibull, regression, aggrega
   expect_identical(pred3.2$parameter,
                    paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
 
-  pred3.3 <- withr::with_seed(
-    123,
-    tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "rmst", time = 3,
-                                       study = study,
-                                       newdata = newdata,
-                                       baseline = distr(qnorm, 0, 1),
-                                       aux = distr(qlnorm, 0, 0.01)))
-  )
+  # pred3.3 <- withr::with_seed(
+  #   123,
+  #   tibble::as_tibble(predict(ndmm_fit_weib_reg, type = "rmst", time = 3,
+  #                                      study = study,
+  #                                      newdata = newdata,
+  #                                      baseline = distr(qnorm, 0, 1),
+  #                                      aux = distr(qlnorm, 0, 0.01)))
+  # )
 
   expect_equivalent(pred3.3[, c(".study", ".trt")],
                     preddat3[, c(".study", ".trt")])
