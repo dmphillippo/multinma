@@ -358,28 +358,23 @@ nma <- function(network,
 
       if (!rlang::is_bare_list(connect_baseline) ||
           !all(purrr::map_lgl(connect_baseline, inherits, what = "nma_connect"))) {
-        abort("`connect_baseline` must be a con() object or a list of con() objects defining the connections.")
+        abort("`connect_baseline` must be a con() specification or list of con() specifications.")
       }
 
       is_random <- purrr::map_lgl(connect_baseline, function(spec) spec$type == "random")
 
       if (length(connect_baseline) > 1 && any(is_random)) {
-        abort(paste(
+        abort(c(
           "Only a single `con()` is allowed in `connect_baseline` when using `type = \"random\"`.",
-          "Multiple `con()` specifications are only supported when all use `type = \"fixed\"`."
+          "Multiple `con()` specifications are only supported when all are `type = \"fixed\"`."
         ))
       }
 
       all_studies <- unlist(lapply(connect_baseline, function(spec) spec$studies), use.names = FALSE)
       dup_studies <- unique(all_studies[duplicated(all_studies)])
       if (length(dup_studies)) {
-        abort(
-          paste0(
-            "Each study may appear in at most one con(). ",
-            "Duplicates found: ",
-            paste(dup_studies, collapse = ", ")
-          )
-        )
+        abort(c("Each study may appear in at most one con() specification. ",
+                paste0("Duplicates found: ", paste(dup_studies, collapse = ", "))))
       }
     }
 
@@ -387,14 +382,14 @@ nma <- function(network,
 
       if (has_agd_contrast(network) &&
           any(spec$studies %in% as.character(network$agd_contrast$.study))) {
-        abort("`connect_baseline()` cannot include studies from AgD-contrast data.")
+        abort("`connect_baseline` cannot include studies from AgD-contrast data.")
       }
 
       known_studies <- c(if (has_ipd(network)) as.character(network$ipd$.study) else NULL,
                          if (has_agd_arm(network)) as.character(network$agd_arm$.study) else NULL)
 
       if (!all(spec$studies %in% known_studies)) {
-        abort("Some studies listed in `connect_baseline()` are not present in the network (IPD or AgD arm-based).")
+        abort("Some studies listed in `connect_baseline` are not present in the network (IPD or AgD arm-based).")
       }
 
       if (spec$type == "fixed") {
@@ -4003,7 +3998,7 @@ con <- function(type = c("fixed", "random"),
     check_prior(baseline_prior)
   } else {
     if (!is.null(baseline_prior)) {
-      warn(glue::glue('Ignoring `baseline_prior` provided with type = "fixed" for stud{if (studies) > 1) "ies" else "y"}: ',
+      warn(glue::glue('Ignoring `baseline_prior` provided with type = "fixed" for stud{if (length(studies)  > 1) "ies" else "y"}: ',
                       glue::glue_collapse(glue::double_quote(studies), sep = ", ", last = " and "), "."))
       baseline_prior <- NULL
     }
