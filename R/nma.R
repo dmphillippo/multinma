@@ -354,32 +354,27 @@ nma <- function(network,
       warn(c("`connect_baseline` supplied with a connected network.",
              "This is not recommended and may lead to bias."))
 
-    if (inherits(connect_baseline, "nma_connect")) {
+    if (inherits(connect_baseline, "nma_connect")) connect_baseline <- list(connect_baseline)
 
-      connect_baseline <- list(connect_baseline)
+    if (!rlang::is_bare_list(connect_baseline) ||
+        !all(purrr::map_lgl(connect_baseline, inherits, what = "nma_connect"))) {
+      abort("`connect_baseline` must be a con() specification or list of con() specifications.")
+    }
 
-    } else {
+    is_random <- purrr::map_lgl(connect_baseline, function(spec) spec$type == "random")
 
-      if (!rlang::is_bare_list(connect_baseline) ||
-          !all(purrr::map_lgl(connect_baseline, inherits, what = "nma_connect"))) {
-        abort("`connect_baseline` must be a con() specification or list of con() specifications.")
-      }
+    if (length(connect_baseline) > 1 && any(is_random)) {
+      abort(c(
+        "Only a single `con()` is allowed in `connect_baseline` when using `type = \"random\"`.",
+        "Multiple `con()` specifications are only supported when all are `type = \"fixed\"`."
+      ))
+    }
 
-      is_random <- purrr::map_lgl(connect_baseline, function(spec) spec$type == "random")
-
-      if (length(connect_baseline) > 1 && any(is_random)) {
-        abort(c(
-          "Only a single `con()` is allowed in `connect_baseline` when using `type = \"random\"`.",
-          "Multiple `con()` specifications are only supported when all are `type = \"fixed\"`."
-        ))
-      }
-
-      all_studies <- unlist(lapply(connect_baseline, function(spec) spec$studies), use.names = FALSE)
-      dup_studies <- unique(all_studies[duplicated(all_studies)])
-      if (length(dup_studies)) {
-        abort(c("Each study may appear in at most one con() specification. ",
-                paste0("Duplicates found: ", paste(dup_studies, collapse = ", "))))
-      }
+    all_studies <- unlist(lapply(connect_baseline, function(spec) spec$studies), use.names = FALSE)
+    dup_studies <- unique(all_studies[duplicated(all_studies)])
+    if (length(dup_studies)) {
+      abort(c("Each study may appear in at most one con() specification. ",
+              paste0("Duplicates found: ", paste(dup_studies, collapse = ", "))))
     }
 
     for (spec in connect_baseline) {
@@ -412,6 +407,32 @@ nma <- function(network,
         prior_intercept[idx] <- rep(list(spec$prior_baseline), length(idx))
 
       }
+    }
+
+    # Check connectedness
+    if (any(is_random)) {
+      # With random baselines, check everything now joined to reference treatment
+      # by prior information
+
+      # Get a study on the network reference treatment
+      refstudy <- dplyr::bind_rows(
+        if (has_ipd(network)) dplyr::select(network$ipd, .data$.study, .data$.trt) else NULL,
+        if (has_agd_arm(network)) dplyr::select(network$agd_arm, .data$.study, .data$.trt) else NULL) %>%
+        dplyr::filter(.data$.trt == levels(network$treatments)[1])
+      refstudy <- refstudy$.study[1]
+
+      # Check by connecting up network reference treatment study with con() studies
+      net_temp <- apply_connect_fixed(network,
+                                      studies = c(as.character(refstudy),
+                                                  unlist(purrr::map(connect_baseline, "studies"))))$network
+
+      if (!is_network_connected(net_temp))
+        abort("Network is still disconnected after applying con() connections.")
+
+    } else {
+      # With fixed baselines, check updated network is connected
+      if (!is_network_connected(network))
+        abort("Network is still disconnected after applying con() connections.")
     }
   }
 

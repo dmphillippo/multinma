@@ -632,25 +632,51 @@ test_that("con() with type = 'fixed' collapses the named studies onto a shared b
   expect_equal(levels(fit$network$studies), "F1 & F2")
 })
 
-
-# Minimal disconnected, AgD-arm-only network: two studies, no shared treatment
-disc_dat <- tibble(study = c("S1", "S1", "S2", "S2"),
-                   trt   = c("A", "B", "C", "D"),
-                   r     = c(50, 60, 55, 65),
-                   n     = c(100, 100, 100, 100))
-disc_net <- set_agd_arm(disc_dat, study, trt, r = r, n = n)
+disc_dat <- tibble(study = c("S1", "S1", "S2", "S2", "S3"),
+                   trt   = c("A", "B", "C", "D", "A"),
+                   r     = c(50, 60, 55, 65, 1),
+                   n     = c(100, 100, 100, 100, 1))
+disc_net <- set_agd_arm(disc_dat, study, trt, r = r, n = n, allow_single_arm = TRUE)
 
 test_that("nma() errors on a disconnected network unless baseline_subnet or connect_baseline is given", {
-  expect_error(suppressWarnings(nma(disc_net)),
+  expect_error(nma(disc_net, prior_intercept = normal(0, 1), prior_trt = normal(0, 1)),
                "Network is disconnected")
 
-  fit_subnet <- suppressWarnings(nma(disc_net, baseline_subnet = 1L, random_baseline = TRUE,
-                                     prior_intercept_sd = half_normal(scale = 5), test_grad = TRUE))
+  fit_subnet <- nma(disc_net, baseline_subnet = 1L, random_baseline = TRUE,
+                    prior_intercept_sd = half_normal(scale = 5),
+                    prior_intercept = normal(0, 1), prior_trt = normal(0, 1),
+                    test_grad = TRUE)
   expect_s3_class(fit_subnet, "stan_nma")
 
-  fit_connect <- suppressWarnings(nma(disc_net,
-    connect_baseline = con(type = "random", studies = c("S1", "S2"), baseline_prior = normal(0, 10)),
-    test_grad = TRUE))
+  fit_connect <- nma(disc_net,
+                     connect_baseline = con(type = "random", studies = c("S1", "S2"), prior_baseline = normal(0, 10)),
+                     prior_intercept = normal(0, 1), prior_trt = normal(0, 1),
+                     test_grad = TRUE)
   expect_s3_class(fit_connect, "stan_nma")
+})
+
+test_that("nma() errors if still disconnected after con() applied", {
+
+  # Still disconnected
+  expect_error(nma(disc_net, prior_intercept = normal(0, 1), prior_trt = normal(0, 1),
+                   connect_baseline = con("fixed", c("S1", "S3"))),
+               "Network is still disconnected after applying con() connections",
+               fixed = TRUE)
+
+  expect_error(nma(disc_net, prior_intercept = normal(0, 1), prior_trt = normal(0, 1),
+                   connect_baseline = con("random", c("S1", "S3"), prior_baseline = normal(0, 1))),
+               "Network is still disconnected after applying con() connections",
+               fixed = TRUE)
+
+  # Connected
+  expect_s3_class(nma(disc_net, prior_intercept = normal(0, 1), prior_trt = normal(0, 1),
+                      connect_baseline = con("fixed", c("S1", "S2")),
+                      test_grad = TRUE),
+                  "stan_nma")
+
+  expect_s3_class(nma(disc_net, prior_intercept = normal(0, 1), prior_trt = normal(0, 1),
+                      connect_baseline = con("random", "S2", prior_baseline = normal(0, 1)),
+                      test_grad = TRUE),
+                  "stan_nma")
 })
 
