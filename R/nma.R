@@ -409,7 +409,7 @@ nma <- function(network,
         prior_intercept_org <- prior_intercept
         prior_intercept <- rep(list(prior_intercept), totns)
         idx <- match(spec$studies, levels(network$studies))
-        prior_intercept[idx] <- rep(list(spec$baseline_prior), length(idx))
+        prior_intercept[idx] <- rep(list(spec$prior_baseline), length(idx))
 
       }
     }
@@ -3970,7 +3970,7 @@ aux_needs_integration <- function(aux_regression, aux_by) {
 #'
 #' @details A random baseline connection is specified with `type = "random"`.
 #'   This places an informative prior distribution on the baselines of studies
-#'   listed in `studies`, specified with the `baseline_prior` argument.
+#'   listed in `studies`, specified with the `prior_baseline` argument.
 #'
 #'   A fixed baseline connection is specified with `type = "fixed"`. This shares
 #'   the baseline parameter for studies listed in `studies`.
@@ -3980,14 +3980,14 @@ aux_needs_integration <- function(aux_regression, aux_by) {
 #' @aliases con
 #' @param type Type of connection, either "fixed" or "random".
 #' @param studies Vector of study names.
-#' @param baseline_prior Prior distribution for the baseline parameters of
+#' @param prior_baseline Prior distribution for the baseline parameters of
 #'   `studies` when `type = "random"`, as a [nma_prior] object (see [priors]).
 #'
 #' @return An object of class `nma_connect`.
 #' @export
 con <- function(type = c("fixed", "random"),
                 studies,
-                baseline_prior = NULL) {
+                prior_baseline = NULL) {
 
   type <- rlang::arg_match(type)
 
@@ -3998,20 +3998,20 @@ con <- function(type = c("fixed", "random"),
     abort(glue::glue('`studies` must be a vector of study names of length > {switch(type, fixed = 2L, random = 1L)} for type = "{type}".'))
 
   if (type == "random") {
-    if (is.null(baseline_prior)) abort('`baseline_prior` must be provided when type = "random".')
-    check_prior(baseline_prior)
+    if (is.null(prior_baseline)) abort('`prior_baseline` must be provided when type = "random".')
+    check_prior(prior_baseline)
   } else {
-    if (!is.null(baseline_prior)) {
-      warn(glue::glue('Ignoring `baseline_prior` provided with type = "fixed" for stud{if (length(studies)  > 1) "ies" else "y"}: ',
+    if (!is.null(prior_baseline)) {
+      warn(glue::glue('Ignoring `prior_baseline` provided with type = "fixed" for stud{if (length(studies)  > 1) "ies" else "y"}: ',
                       glue::glue_collapse(glue::double_quote(studies), sep = ", ", last = " and "), "."))
-      baseline_prior <- NULL
+      prior_baseline <- NULL
     }
   }
 
   structure(
     list(type      = type,
          studies   = studies,
-         baseline_prior  = baseline_prior),
+         prior_baseline  = prior_baseline),
     class = "nma_connect"
   )
 }

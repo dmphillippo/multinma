@@ -5,14 +5,14 @@
 \alias{con}
 \title{Specify baseline connections}
 \usage{
-con(type = c("fixed", "random"), studies, baseline_prior = NULL)
+con(type = c("fixed", "random"), studies, prior_baseline = NULL)
 }
 \arguments{
 \item{type}{Type of connection, either "fixed" or "random".}
 
 \item{studies}{Vector of study names.}
 
-\item{baseline_prior}{Prior distribution for the baseline parameters of
+\item{prior_baseline}{Prior distribution for the baseline parameters of
 \code{studies} when \code{type = "random"}, as a \link{nma_prior} object (see \link{priors}).}
 }
 \value{
@@ -26,7 +26,7 @@ single-arm studies.
 \details{
 A random baseline connection is specified with \code{type = "random"}.
 This places an informative prior distribution on the baselines of studies
-listed in \code{studies}, specified with the \code{baseline_prior} argument.
+listed in \code{studies}, specified with the \code{prior_baseline} argument.
 
 A fixed baseline connection is specified with \code{type = "fixed"}. This shares
 the baseline parameter for studies listed in \code{studies}.

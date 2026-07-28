@@ -506,31 +506,31 @@ test_that("con() argument checks", {
   expect_error(nma(pso_net,
                    connect_baseline = con(type = "rando",
                                           studies = c("FIXTURE", "FEATURE"),
-                                          baseline_prior = normal(0,10))),
+                                          prior_baseline = normal(0,10))),
                '`type` must be one of "fixed" or "random"')
 
   expect_error(nma(pso_net,
                    connect_baseline = con(type = 1,
                                           studies = c("FIXTURE", "FEATURE"),
-                                          baseline_prior = normal(0,10))),
+                                          prior_baseline = normal(0,10))),
                '`type` must be')
 
   expect_error(nma(pso_net,
                    connect_baseline = list(con(type = "rando",
                                                studies = c("FIXTURE", "FEATURE"),
-                                               baseline_prior = normal(0,10)),
+                                               prior_baseline = normal(0,10)),
                                            con(type = "random",
                                                studies = c("JUNCTURE"),
-                                               baseline_prior = normal(0,10)))),
+                                               prior_baseline = normal(0,10)))),
                '`type` must be one of "fixed" or "random"')
 
   expect_error(nma(pso_net,
                    connect_baseline = list(con(type = "random",
                                                studies = c("FIXTURE", "FEATURE"),
-                                               baseline_prior = normal(0,10)),
+                                               prior_baseline = normal(0,10)),
                                            con(type = 1,
                                                studies = c("JUNCTURE"),
-                                               baseline_prior = normal(0,10)))),
+                                               prior_baseline = normal(0,10)))),
                '`type` must be')
 
   m_multi_random <- "Only a single `con()` is allowed in `connect_baseline` when using `type = \"random\"`."
@@ -538,7 +538,7 @@ test_that("con() argument checks", {
   expect_error(nma(pso_net,
                    connect_baseline = list(con(type = "random",
                                                studies = c("FIXTURE"),
-                                               baseline_prior = normal(0,10)),
+                                               prior_baseline = normal(0,10)),
                                            con(type = "fixed",
                                                studies = c("FEATURE", "JUNCTURE")))),
                m_multi_random, fixed = TRUE)
@@ -546,10 +546,10 @@ test_that("con() argument checks", {
   expect_error(nma(pso_net,
                    connect_baseline = list(con(type = "random",
                                                studies = c("FIXTURE"),
-                                               baseline_prior = normal(0,10)),
+                                               prior_baseline = normal(0,10)),
                                            con(type = "random",
                                                studies = c("JUNCTURE"),
-                                               baseline_prior = normal(0,10)))),
+                                               prior_baseline = normal(0,10)))),
                m_multi_random, fixed = TRUE)
 
   expect_error(nma(pso_net, connect_baseline = list(con(type = "fixed",
@@ -562,7 +562,7 @@ test_that("con() argument checks", {
                                                         studies = c("FIXTURE", "JUNCTURE")),
                                                     con(type = "random",
                                                         studies = list(),
-                                                        baseline_prior = normal(0,1)))),
+                                                        prior_baseline = normal(0,1)))),
                '`studies` must be a vector of study names of length > 1 for type = "random"')
 
   expect_error(nma(pso_net, connect_baseline = list(con(type = "fixed",
@@ -573,36 +573,36 @@ test_that("con() argument checks", {
 
   expect_error(nma(pso_net, connect_baseline = con(type = "random",
                                                    studies = c("FIXTUR", "FEATURE"),
-                                                   baseline_prior = normal(0,10))),
+                                                   prior_baseline = normal(0,10))),
                "Some studies listed in `connect_baseline` are not present in the network (IPD or AgD arm-based).",
                fixed = TRUE)
 
   expect_error(nma(pso_net, connect_baseline = con(type = "random",
                                                    studies = c(1, "FEATURE"),
-                                                   baseline_prior = normal(0,10))),
+                                                   prior_baseline = normal(0,10))),
                "Some studies listed in `connect_baseline` are not present in the network (IPD or AgD arm-based).",
                fixed = TRUE)
 
   expect_error(nma(pso_net, connect_baseline = con(type = "random",
                                                    studies = c("FIXTURE", "FEATURE"))),
-               '`baseline_prior` must be provided when type = "random".')
+               '`prior_baseline` must be provided when type = "random".')
 
   expect_error(nma(pso_net, connect_baseline = con(type = "random",
                                                    studies = c("FIXTURE", "FEATURE"),
-                                                   baseline_prior = letters),),
-               "`baseline_prior` must be a prior distribution, see ?priors", fixed = TRUE)
+                                                   prior_baseline = letters),),
+               "`prior_baseline` must be a prior distribution, see ?priors", fixed = TRUE)
 
   expect_error(nma(pso_net, connect_baseline = con(type = "random",
                                                    studies = c("FIXTURE", "FEATURE"),
-                                                   baseline_prior = list(normal(0, 1))),),
-               "`baseline_prior` must be a prior distribution, see ?priors", fixed = TRUE)
+                                                   prior_baseline = list(normal(0, 1))),),
+               "`prior_baseline` must be a prior distribution, see ?priors", fixed = TRUE)
 })
 
 test_that("con() rejects studies from AgD-contrast data", {
   cs_study <- as.character(sa_net$agd_contrast$.study[1])
   expect_warning(
     expect_error(
-      nma(sa_net, connect_baseline = con(type = "random", studies = cs_study, baseline_prior = normal(0, 10))),
+      nma(sa_net, connect_baseline = con(type = "random", studies = cs_study, prior_baseline = normal(0, 10))),
       "`connect_baseline` cannot include studies from AgD-contrast data"),
     "`connect_baseline` supplied with a connected network")
 })
@@ -613,13 +613,13 @@ fixdat <- tibble(study = c("F1", "F1", "F2", "F2"),
                  n     = c(50, 50, 50, 50))
 fixnet <- set_agd_arm(fixdat, study, trt, r = r, n = n)
 
-test_that("con() warns if baseline_prior is supplied with type = 'fixed'", {
+test_that("con() warns if prior_baseline is supplied with type = 'fixed'", {
   expect_warning(
     nma(fixnet,
-        connect_baseline = con(type = "fixed", studies = c("F1", "F2"), baseline_prior = normal(0, 10)),
+        connect_baseline = con(type = "fixed", studies = c("F1", "F2"), prior_baseline = normal(0, 10)),
         prior_intercept = normal(0, 100), prior_trt = normal(0, 10),
         test_grad = TRUE),
-    'Ignoring `baseline_prior` provided with type = "fixed"'
+    'Ignoring `prior_baseline` provided with type = "fixed"'
   )
 })
 
