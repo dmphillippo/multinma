@@ -350,6 +350,10 @@ nma <- function(network,
   # Check and apply connect_baseline specifications
   if (!is.null(connect_baseline)) {
 
+    if (is_network_connected(network))
+      warn(c("`connect_baseline` supplied with a connected network.",
+             "This is not recommended and may lead to bias."))
+
     if (inherits(connect_baseline, "nma_connect")) {
 
       connect_baseline <- list(connect_baseline)

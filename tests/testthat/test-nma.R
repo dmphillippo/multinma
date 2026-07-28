@@ -600,10 +600,11 @@ test_that("con() argument checks", {
 
 test_that("con() rejects studies from AgD-contrast data", {
   cs_study <- as.character(sa_net$agd_contrast$.study[1])
-  expect_error(
-    nma(sa_net, connect_baseline = con(type = "random", studies = cs_study, baseline_prior = normal(0, 10))),
-    "`connect_baseline()` cannot include studies from AgD-contrast data", fixed = TRUE
-  )
+  expect_warning(
+    expect_error(
+      nma(sa_net, connect_baseline = con(type = "random", studies = cs_study, baseline_prior = normal(0, 10))),
+      "`connect_baseline` cannot include studies from AgD-contrast data"),
+    "`connect_baseline` supplied with a connected network")
 })
 
 fixdat <- tibble(study = c("F1", "F1", "F2", "F2"),
