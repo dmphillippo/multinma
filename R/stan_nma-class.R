@@ -101,7 +101,8 @@ print.stan_nma <- function(x, ...) {
   }
   if (inherits(x, "stan_baseline") && !xor(any(grepl("^d(\\[|$)", dots$pars %||% pars)), dots$include %||% include)) {
     warn(c("Accessing relative treatment effects `d` from baseline synthesis model. Proceed with caution!",
-           "Treatment effect estimates may be biased unless the baseline model is correct."))
+           "Treatment effect estimates may be biased unless the baseline model is correct."),
+         class = "access_baseline_d")
   }
   dots <- rlang::dots_list(x = sf,
                            pars = pars,
@@ -381,10 +382,16 @@ plot_prior_posterior <- function(x, ...,
     )
   }
 
+  # If single treatment only (some baseline syntheses) drop d
+  if (length(x$network$treatments) == 1) {
+    prior_dat <- dplyr::filter(prior_dat, .data$prior != "trt")
+  }
+
   # Get parameter samples
   pars <- unique(prior_dat$par_base)
 
-  draws <- tibble::as_tibble(as.matrix(x, pars = pars))
+  draws <- suppressWarnings(tibble::as_tibble(as.matrix(x, pars = pars)),
+                            classes = "access_baseline_d")
 
   # Transform heterogeneity samples to prior scale (SD, variance, precision)
   if ("het" %in% prior) {
@@ -827,7 +834,8 @@ as.array.stan_nma <- function(x, ..., pars, include = TRUE) {
 
     if (inherits(x, "stan_baseline") && !xor(any(grepl("^d(\\[|$)", pars)), include)) {
       warn(c("Accessing relative treatment effects `d` from baseline synthesis model. Proceed with caution!",
-             "Treatment effect estimates may be biased unless the baseline model is correct."))
+             "Treatment effect estimates may be biased unless the baseline model is correct."),
+           class = "access_baseline_d")
     }
 
     # Extract from stanfit only parameters represented in pars
