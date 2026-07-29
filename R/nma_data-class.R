@@ -948,7 +948,7 @@ plot.nma_data <- function(x, ..., layout, circular,
   }
 
   g <- g +
-    ggraph::scale_edge_colour_manual("Data", values = c(AgD = "#113259", IPD = "#55A480"),
+    ggraph::scale_edge_colour_manual("Data", values = c(AgD = "#113259", IPD = "#55A480", Mixed = "#E5A93C"),
                                      guide = if (dat_mixed) "legend" else "none") +
     ggraph::theme_graph(base_family = "") +
     ggplot2::coord_fixed(clip = "off")
