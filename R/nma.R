@@ -336,13 +336,6 @@ nma <- function(network,
     abort("Empty network.")
   }
 
-  # Calculate number of mixed studies, those appearing in both IPD and AgD arm.
-  # This reduces the number of intercept parameters in the network
-  mixed_studies <- length(intersect(
-    if (has_ipd(network))     unique(network$ipd$.study)     else character(0),
-    if (has_agd_arm(network)) unique(network$agd_arm$.study) else character(0)
-  ))
-
   # Check and apply connect_baseline specifications
   connect_flag <- 0
   if (!is.null(connect_baseline)) {
@@ -430,6 +423,13 @@ nma <- function(network,
         abort("Network is still disconnected after applying con() connections.")
     }
   }
+
+  # Calculate number of mixed studies, those appearing in both IPD and AgD arm.
+  # This reduces the number of intercept parameters in the network
+  mixed_studies <- length(intersect(
+    if (has_ipd(network))     unique(network$ipd$.study)     else character(0),
+    if (has_agd_arm(network)) unique(network$agd_arm$.study) else character(0)
+  ))
 
   # Check model arguments
   consistency <- rlang::arg_match(consistency)
