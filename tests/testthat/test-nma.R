@@ -670,6 +670,33 @@ test_that("con() with type = 'fixed' collapses the named studies onto a shared b
   expect_s3_class(fit_ai, "stan_nma")
   expect_equal(levels(fit_ai$network$studies), "S1 & S2")
 
+
+  # Should work with contrast data present (just not used for bridging)
+  s3dat <- data.frame(study = "S3", trt = c("A", "C"), y = c(NA, 1), se = c(NA, 0.1))
+
+  fit_aic <- nma(
+    combine_network(set_agd_arm(s1dat, study, trt, r = r, n = n, allow_single_arm = TRUE),
+                    set_ipd(s2dat, study, trt, r = r, allow_single_arm = TRUE),
+                    set_agd_contrast(s3dat, study, trt, y = y, se = se)),
+    connect_baseline = con("fixed", studies = c("S1", "S2")),
+    prior_intercept = normal(0,1), prior_trt = normal(0, 1),
+    test_grad = TRUE
+  )
+
+  expect_s3_class(fit_aic, "stan_nma")
+  expect_equal(levels(fit_aic$network$studies), "S1 & S2")
+
+  fit_aac <- nma(
+    combine_network(set_agd_arm(s1dat, study, trt, r = r, n = n, allow_single_arm = TRUE),
+                    set_agd_arm(s2dat, study, trt, r = r, n = n, allow_single_arm = TRUE),
+                    set_agd_contrast(s3dat, study, trt, y = y, se = se)),
+    connect_baseline = con("fixed", studies = c("S1", "S2")),
+    prior_intercept = normal(0,1), prior_trt = normal(0, 1),
+    test_grad = TRUE
+  )
+
+  expect_s3_class(fit_aac, "stan_nma")
+  expect_equal(levels(fit_aac$network$studies), "S1 & S2")
 })
 
 disc_dat <- tibble(study = c("S1", "S1", "S2", "S2", "S3"),
