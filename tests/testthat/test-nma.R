@@ -492,8 +492,8 @@ disc_dat <- tibble(study = c("S1", "S1", "S2", "S2", "S3"),
 disc_net <- set_agd_arm(disc_dat, study, trt, r = r, n = n, allow_single_arm = TRUE)
 
 test_that("con() argument checks", {
-  expect_warning(nma(pso_net,
-                     connect_baseline = con("random", "FIXTURE", normal(0, 1)),
+  expect_warning(nma(smknet,
+                     connect_baseline = con("random", c(1, 2), normal(0, 1)),
                      prior_intercept = normal(0, 10),
                      prior_trt = normal(0, 10),
                      test_grad = TRUE),
