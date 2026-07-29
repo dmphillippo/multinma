@@ -336,18 +336,15 @@ nma <- function(network,
     abort("Empty network.")
   }
 
-  connect_flag <- 0
-  fixed_baseline <- 0
-
-  # Calculate mixed studies BEFORE connect_baseline modifies the network,
-  # so studies that become mixed only due to apply_connect_fixed() are not
-  # double-counted with fixed_baseline in the totns calculation
+  # Calculate number of mixed studies, those appearing in both IPD and AgD arm.
+  # This reduces the number of intercept parameters in the network
   mixed_studies <- length(intersect(
     if (has_ipd(network))     unique(network$ipd$.study)     else character(0),
     if (has_agd_arm(network)) unique(network$agd_arm$.study) else character(0)
   ))
 
   # Check and apply connect_baseline specifications
+  connect_flag <- 0
   if (!is.null(connect_baseline)) {
 
     if (is_network_connected(network))
@@ -393,9 +390,7 @@ nma <- function(network,
 
       if (spec$type == "fixed") {
 
-        connect_fixed <- apply_connect_fixed(network, spec$studies)
-        network <- connect_fixed$network
-        fixed_baseline <- connect_fixed$n_collapsed
+        network <- apply_connect_fixed(network, spec$studies)
 
       } else if (spec$type == "random") {
 
@@ -424,7 +419,7 @@ nma <- function(network,
       # Check by connecting up network reference treatment study with con() studies
       net_temp <- apply_connect_fixed(network,
                                       studies = c(as.character(refstudy),
-                                                  unlist(purrr::map(connect_baseline, "studies"))))$network
+                                                  unlist(purrr::map(connect_baseline, "studies"))))
 
       if (!is_network_connected(net_temp))
         abort("Network is still disconnected after applying con() connections.")
@@ -1407,7 +1402,6 @@ if (class_effects == "exchangeable") {
     link = link,
     consistency = consistency,
     connect_flag = connect_flag,
-    fixed_baseline = fixed_baseline,
     mixed_studies = mixed_studies,
     n_baseline_studies = n_baseline_studies,
     baseline_study_idx = baseline_study_idx,
@@ -1659,9 +1653,8 @@ nma.fit <- function(ipd_x, ipd_y,
                     likelihood = NULL,
                     link = NULL,
                     consistency = c("consistency", "ume", "nodesplit"),
-                    connect_flag,
-                    fixed_baseline,
-                    mixed_studies,
+                    connect_flag = 0,
+                    mixed_studies = 0,
                     ...,
                     prior_intercept,
                     prior_intercept_sd,
@@ -2044,7 +2037,6 @@ nma.fit <- function(ipd_x, ipd_y,
     n_baseline_studies = if (random_baseline && !is.null(n_baseline_studies)) n_baseline_studies else 0L,
     baseline_study_idx = if (random_baseline && !is.null(baseline_study_idx)) as.array(baseline_study_idx) else integer(0),
     connect_baseline = connect_flag,
-    fixed_baseline = fixed_baseline,
     mixed_studies = mixed_studies
   )
 
@@ -4052,16 +4044,13 @@ con <- function(type = c("fixed", "random"),
 apply_connect_fixed <- function(network, studies) {
   new_name <- paste(studies, collapse = " & ")
 
-  n_s_ipd <- n_s_agd <- 0
   if (has_ipd(network)) {
     network$ipd$.study <-
       forcats::fct_collapse(network$ipd$.study, !!new_name := studies)
-    n_s_ipd <- length(unique(network$ipd$.study))
   }
   if (has_agd_arm(network)) {
     network$agd_arm$.study <-
       forcats::fct_collapse(network$agd_arm$.study, !!new_name := studies)
-    n_s_agd <- length(unique(network$agd_arm$.study))
   }
   if (has_agd_contrast(network)) {
     network$agd_contrast$.study <-
@@ -4070,9 +4059,8 @@ apply_connect_fixed <- function(network, studies) {
 
   network$studies <- forcats::fct_collapse(network$studies, !!new_name := studies)
   network$studies <- forcats::fct_unique(network$studies)
-  diff <- n_s_agd + n_s_ipd - length(network$studies)
 
-  list(network = network, n_collapsed = diff)
+  return(network)
 }
 
 #' Baseline synthesis models

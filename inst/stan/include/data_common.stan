@@ -8,7 +8,7 @@ int<lower=0> ni_ipd; // total number of IPD individuals
 int<lower=0> ni_agd_arm; // total number of AgD (arm-based) data points
 int<lower=0> ni_agd_contrast; // total number of AgD (contrast-based) data points
 
-int<lower=0> mixed_studies; // total number of studies that contain both IPD and AgD
+int<lower=0> mixed_studies; // total number of studies that contain both IPD and AgD (arm-based)
 
 // Treatment IDs
 int<lower=0> narm_ipd; // Number of IPD arms
@@ -67,7 +67,6 @@ array[brmr_n_col] int<lower=1> brmr_col;
 real xbar_mu;
 
 // -- Priors --
-int<lower=0> fixed_baseline;
 // Scalar when connect_baseline = 0, study-specific vector otherwise
 int<lower=0, upper=1> connect_baseline;
 array[connect_baseline ? ns_ipd + ns_agd_arm : 1] int<lower=0,upper=3> prior_intercept_dist;
