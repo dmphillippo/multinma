@@ -312,18 +312,8 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
     abort("`collapse` must be TRUE or FALSE.")
 
   if (has_ipd(x)) {
-    e_ipd <- x$ipd %>%
-      dplyr::distinct(.data$.study, .data$.trt) %>%
-      dplyr::group_by(.data$.study) %>%
-      dplyr::group_modify(~make_contrasts(.x$.trt))
-
-    if (collapse) {
-      e_ipd <- e_ipd %>%
-        dplyr::group_by(.data$.trt, .data$.trt_b) %>%
-        dplyr::summarise(.nstudy = dplyr::n_distinct(.data$.study), .type = "IPD")
-    } else {
-      e_ipd$.type <- "IPD"
-    }
+    e_ipd <- dplyr::distinct(x$ipd, .data$.study, .data$.trt)
+    e_ipd$.type <- "IPD"
 
     v_ipd <- x$ipd %>%
       dplyr::group_by(.data$.trt) %>%
@@ -334,17 +324,8 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
 
   if (has_agd_arm(x) || has_agd_contrast(x)) {
     agd_all <- dplyr::bind_rows(x$agd_arm, x$agd_contrast)
-    e_agd <- agd_all %>%
-      dplyr::group_by(.data$.study) %>%
-      dplyr::group_modify(~make_contrasts(.x$.trt))
-
-    if (collapse) {
-      e_agd <- e_agd %>%
-        dplyr::group_by(.data$.trt, .data$.trt_b) %>%
-        dplyr::summarise(.nstudy = dplyr::n_distinct(.data$.study), .type = "AgD")
-    } else {
-      e_agd$.type <- "AgD"
-    }
+    e_agd <- agd_all
+    e_agd$.type <- "AgD"
 
     if (has_agd_sample_size(x)) {
       v_agd <- agd_all %>%
@@ -357,13 +338,20 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
     e_agd <- v_agd <- tibble::tibble()
   }
 
-  e_all <- dplyr::bind_rows(e_ipd, e_agd) %>%
+  e_all <- dplyr::bind_rows(e_ipd, e_agd)  %>%
+    dplyr::group_by(.data$.study) %>%
+    dplyr::summarise(ctr = list(make_contrasts(.data$.trt)),
+                     .type = dplyr::if_else(dplyr::n_distinct(.data$.type) == 1, .data$.type[1], "Mixed")) %>%
+    tidyr::unnest(cols = "ctr") %>%
     dplyr::rename(from = ".trt_b", to = ".trt") %>%
     dplyr::select("from", "to", dplyr::everything())
 
   if (collapse) {
     e_all <- e_all %>%
-      dplyr::mutate(.nstudy = dplyr::if_else(is.na(.data$.nstudy), 0L, .data$.nstudy))
+      dplyr::group_by(.data$from, .data$to, .data$.type) %>%
+      dplyr::summarise(.nstudy = dplyr::n_distinct(.data$.study)) %>%
+      dplyr::mutate(.nstudy = dplyr::if_else(is.na(.data$.nstudy), 0L, .data$.nstudy)) %>%
+      dplyr::arrange(dplyr::desc(.data$.type), .data$from, .data$to)
   }
 
   if (has_agd_sample_size(x)) {
