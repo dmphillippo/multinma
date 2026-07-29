@@ -2000,16 +2000,16 @@ nma.fit <- function(ipd_x, ipd_y,
     int_thin = int_thin,
     # Study and treatment details
     narm_ipd = narm_ipd,
-    ipd_arm = ipd_arm,
-    ipd_trt = ipd_trt,
+    ipd_arm = as.array(ipd_arm),
+    ipd_trt = as.array(ipd_trt),
     narm_agd_arm = narm_agd_arm,
-    agd_arm_trt = agd_arm_trt,
+    agd_arm_trt = as.array(agd_arm_trt),
     agd_contrast_trt = as.array(agd_contrast_trt),
     agd_contrast_trt_b = as.array(agd_contrast_trt_b),
     agd_contrast_y = if (has_agd_contrast) as.array(agd_contrast_y$.y) else numeric(),
     agd_contrast_Sigma = Sigma,
-    ipd_study = if (random_baseline) ipd_study else integer(0),
-    agd_arm_study = if (random_baseline) agd_arm_study else integer(0),
+    ipd_study = if (random_baseline) as.array(ipd_study) else integer(0),
+    agd_arm_study = if (random_baseline) as.array(agd_arm_study) else integer(0),
     # agd_contrast_study = agd_contrast_study,
     # Random effects
     RE = switch(trt_effects, fixed = 0, random = 1),
@@ -2143,9 +2143,9 @@ nma.fit <- function(ipd_x, ipd_y,
 
     standat <- purrr::list_modify(standat,
       # Add outcomes
-      ipd_y = if (has_ipd) ipd_y$.y else numeric(),
-      agd_arm_y = if (has_agd_arm) agd_arm_y$.y else numeric(),
-      agd_arm_se = if (has_agd_arm) agd_arm_y$.se else numeric(),
+      ipd_y = as.array(if (has_ipd) ipd_y$.y else numeric()),
+      agd_arm_y = as.array(if (has_agd_arm) agd_arm_y$.y else numeric()),
+      agd_arm_se = as.array(if (has_agd_arm) agd_arm_y$.se else numeric()),
 
       # Add prior for auxiliary parameter - individual-level variance
       !!! prior_standat(prior_aux, "prior_aux",
@@ -2168,7 +2168,7 @@ nma.fit <- function(ipd_x, ipd_y,
 
     standat <- purrr::list_modify(standat,
       # Add outcomes
-      ipd_r = if (has_ipd) ipd_y$.r else integer(),
+      ipd_r = as.array(if (has_ipd) ipd_y$.r else integer()),
       agd_arm_r = as.array(if (has_agd_arm) agd_arm_y$.r else integer()),
       agd_arm_n = as.array(if (has_agd_arm) agd_arm_y$.n else integer()),
 
@@ -2186,8 +2186,8 @@ nma.fit <- function(ipd_x, ipd_y,
 
     standat <- purrr::list_modify(standat,
       # Add outcomes
-      ipd_r = if (has_ipd) ipd_y$.r else integer(),
-      agd_arm_r = if (has_agd_arm) agd_arm_y$.r else integer(),
+      ipd_r = as.array(if (has_ipd) ipd_y$.r else integer()),
+      agd_arm_r = as.array(if (has_agd_arm) agd_arm_y$.r else integer()),
       agd_arm_n = as.array(if (has_agd_arm) agd_arm_y$.n else integer()),
 
       # Specify link
@@ -2204,10 +2204,10 @@ nma.fit <- function(ipd_x, ipd_y,
 
     standat <- purrr::list_modify(standat,
       # Add outcomes
-      ipd_r = if (has_ipd) ipd_y$.r else integer(),
-      ipd_E = if (has_ipd) ipd_y$.E else numeric(),
-      agd_arm_r = if (has_agd_arm) agd_arm_y$.r else integer(),
-      agd_arm_E = if (has_agd_arm) agd_arm_y$.E else numeric(),
+      ipd_r = as.array(if (has_ipd) ipd_y$.r else integer()),
+      ipd_E = as.array(if (has_ipd) ipd_y$.E else numeric()),
+      agd_arm_r = as.array(if (has_agd_arm) agd_arm_y$.r else integer()),
+      agd_arm_E = as.array(if (has_agd_arm) agd_arm_y$.E else numeric()),
 
       # Specify link
       link = switch(link, log = 1)
@@ -2259,14 +2259,14 @@ nma.fit <- function(ipd_x, ipd_y,
       # Add outcomes
       ncat = ncat,
 
-      ipd_r = if (has_ipd) ipd_r_int else integer(),
-      ipd_cat = if (has_ipd) ipd_cat else matrix(0, 0, ncat),
-      ipd_ncat = if (has_ipd) ipd_ncat else integer(),
+      ipd_r = if (has_ipd) as.array(ipd_r_int) else integer(),
+      ipd_cat = if (has_ipd) as.array(ipd_cat) else matrix(0, 0, ncat),
+      ipd_ncat = if (has_ipd) as.array(ipd_ncat) else integer(),
 
-      agd_arm_r = if (has_agd_arm) agd_arm_r else matrix(0, 0, ncat),
+      agd_arm_r = if (has_agd_arm) as.array(agd_arm_r) else matrix(0, 0, ncat),
       agd_arm_n = if (has_agd_arm) agd_arm_n else integer(),
-      agd_arm_cat = if (has_agd_arm) agd_arm_cat else matrix(0, 0, ncat),
-      agd_arm_ncat = if (has_agd_arm) agd_arm_ncat else integer(),
+      agd_arm_cat = if (has_agd_arm) as.array(agd_arm_cat) else matrix(0, 0, ncat),
+      agd_arm_ncat = if (has_agd_arm) as.array(agd_arm_ncat) else integer(),
 
       # Add prior for auxiliary parameters - latent cutoffs
       !!! prior_standat(prior_aux, "prior_aux",
