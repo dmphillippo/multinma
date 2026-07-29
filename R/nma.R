@@ -4033,8 +4033,7 @@ con <- function(type = c("fixed", "random"),
 #' Apply fixed baseline connections
 #'
 #' Collapse studies so that they share a common baseline under a fixed
-#' connection. All studies must originate from the same data source. AgD
-#' contrast data cannot be used in a fixed connection.
+#' connection.
 #'
 #' @param network An `nma_data` object
 #' @param studies Character vector of study names to combine
