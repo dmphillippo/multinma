@@ -411,8 +411,8 @@ nma <- function(network,
 
       # Get a study on the network reference treatment
       refstudy <- dplyr::bind_rows(
-        if (has_ipd(network)) dplyr::select(network$ipd, .data$.study, .data$.trt) else NULL,
-        if (has_agd_arm(network)) dplyr::select(network$agd_arm, .data$.study, .data$.trt) else NULL) %>%
+        if (has_ipd(network)) dplyr::select(network$ipd, ".study", ".trt") else NULL,
+        if (has_agd_arm(network)) dplyr::select(network$agd_arm, ".study", ".trt") else NULL) %>%
         dplyr::filter(.data$.trt == levels(network$treatments)[1])
       refstudy <- refstudy$.study[1]
 
