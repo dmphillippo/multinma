@@ -17,20 +17,20 @@
 #' @param class_interactions Character string specifying whether effect modifier
 #'   interactions are specified as `"common"`, `"exchangeable"`, or
 #'   `"independent"`.
-#' @param class_effects Character string specifying a model for treatment class effects,
-#'   either `"independent"` (the default), `"exchangeable"`, or `"common"`.
-#' @param class_sd Character string specifying whether the class standard deviations in a
-#'   class effects model should be `"independent"` (i.e. separate for each class, the default),
-#'   or `"common"` (i.e. shared across all classes). Alternatively this can be a list of
-#'   character vectors, each of which describe a set classes for which to share a common class SD;
-#'   any list names will be used to name the output parameters, otherwise the name will be taken
-#'   from the first class in each set.
-#' @param connect_baseline Optional baseline connections. Supply one or more
-#'   `con()` specifications to share baselines between studies. Random
-#'   baseline require a `baseline_prior` distribution. All studies listed in a
-#'   single `con()` that are `type = "fixed"` must originate from the same data type (IPD or AgD).
-#'   Multiple `con()` specifications may only be combined if they are all
-#'   `type = "fixed"`; a `type = "random"` connection must be given on its own.
+#' @param class_effects Character string specifying a model for treatment class
+#'   effects, either `"independent"` (the default), `"exchangeable"`, or
+#'   `"common"`.
+#' @param class_sd Character string specifying whether the class standard
+#'   deviations in a class effects model should be `"independent"` (i.e.
+#'   separate for each class, the default), or `"common"` (i.e. shared across
+#'   all classes). Alternatively this can be a list of character vectors, each
+#'   of which describe a set classes for which to share a common class SD; any
+#'   list names will be used to name the output parameters, otherwise the name
+#'   will be taken from the first class in each set.
+#' @param connect_baseline Baseline connections created by [con()], used to
+#'   connect a disconnected network. Multiple [con()] specifications of
+#'   `type = "fixed"` may be provided as a list. Currently a single
+#'   `type = "random"` connection must be given on its own.
 #' @param likelihood Character string specifying a likelihood, if unspecified
 #'   will be inferred from the data (see details)
 #' @param link Character string specifying a link function, if unspecified will
@@ -114,10 +114,6 @@
 #'   `knots`, a named list of M-spline bases (one for each study) can be
 #'   provided with `mspline_basis` which will be used directly. In this case,
 #'   all other M-spline options will be ignored.
-#' @param baseline_subnet Internal flag used by [baseline_synthesis()] to allow
-#'   fitting on a disconnected network. When set, `subnetwork_trt` is computed
-#'   automatically from the network's connected components, with treatment
-#'   effects still estimated for every subnetwork. Not intended for direct use.
 #'
 #' @details When specifying a model formula in the `regression` argument, the
 #'   usual formula syntax is available (as interpreted by [model.matrix()]). The
@@ -317,18 +313,18 @@ nma <- function(network,
                 mspline_degree = 3,
                 n_knots = 7,
                 knots = NULL,
-                mspline_basis = NULL,
-                baseline_subnet = NULL) {
+                mspline_basis = NULL) {
 
-  # Remove random baseline arguments from ...
+  # Get random baseline arguments from ...
   dlist <- list(...)
   if ("random_baseline" %in% names(dlist)) {
     random_baseline <- dlist$random_baseline
     prior_intercept_sd <- dlist$prior_intercept_sd
-    dlist  <- NULL
+    baseline_subnet <- dlist$baseline_subnet %||% 1L
   } else {
     random_baseline <- FALSE
     prior_intercept_sd <- NULL
+    baseline_subnet <- NULL
   }
 
   # Check network
@@ -353,61 +349,90 @@ nma <- function(network,
 
   # Check and apply connect_baseline specifications
   if (!is.null(connect_baseline)) {
-    if ("type" %in% names(connect_baseline)) {
-      connect_baseline <- list(connect_baseline)
-    } else {
-      is_random <- vapply(connect_baseline, function(spec) spec$type == "random", logical(1))
-      if (length(connect_baseline) > 1 && any(is_random)) {
-        abort(paste(
-          "Only a single `con()` is allowed in `connect_baseline` when using `type = \"random\"`.",
-          "Multiple `con()` specifications are only supported when all use `type = \"fixed\"`."
-        ))
-      }
 
-      all_studies <- unlist(lapply(connect_baseline, function(spec) spec$studies), use.names = FALSE)
-      dup_studies <- unique(all_studies[duplicated(all_studies)])
-      if (length(dup_studies)) {
-        rlang::abort(
-          paste0(
-            "Each study may appear in at most one con(). ",
-            "Duplicates found: ",
-            paste(dup_studies, collapse = ", ")
-          )
-        )
-      }
+    if (is_network_connected(network))
+      warn(c("`connect_baseline` supplied with a connected network.",
+             "This is not recommended and may lead to bias."))
+
+    if (inherits(connect_baseline, "nma_connect")) connect_baseline <- list(connect_baseline)
+
+    if (!rlang::is_bare_list(connect_baseline) ||
+        !all(purrr::map_lgl(connect_baseline, inherits, what = "nma_connect"))) {
+      abort("`connect_baseline` must be a con() specification or list of con() specifications.")
     }
+
+    is_random <- purrr::map_lgl(connect_baseline, function(spec) spec$type == "random")
+
+    if (length(connect_baseline) > 1 && any(is_random)) {
+      abort(c(
+        "Only a single `con()` is allowed in `connect_baseline` when using `type = \"random\"`.",
+        "Multiple `con()` specifications are only supported when all are `type = \"fixed\"`."
+      ))
+    }
+
+    all_studies <- unlist(lapply(connect_baseline, function(spec) spec$studies), use.names = FALSE)
+    dup_studies <- unique(all_studies[duplicated(all_studies)])
+    if (length(dup_studies)) {
+      abort(c("Each study may appear in at most one con() specification. ",
+              paste0("Duplicates found: ", paste(dup_studies, collapse = ", "))))
+    }
+
     for (spec in connect_baseline) {
+
       if (has_agd_contrast(network) &&
           any(spec$studies %in% as.character(network$agd_contrast$.study))) {
-        abort("`connect_baseline()` cannot include studies from AgD-contrast data; please remove them.")
+        abort("`connect_baseline` cannot include studies from AgD-contrast data.")
       }
+
       known_studies <- c(if (has_ipd(network)) as.character(network$ipd$.study) else NULL,
                          if (has_agd_arm(network)) as.character(network$agd_arm$.study) else NULL)
+
       if (!all(spec$studies %in% known_studies)) {
-        abort("Some studies listed in `connect_baseline()` are not present in the network (IPD or AgD-arm).")
+        abort("Some studies listed in `connect_baseline` are not present in the network (IPD or AgD arm-based).")
       }
+
       if (spec$type == "fixed") {
-        # warning supplied baseline_prior when using type = "fixed"
-        if (!is.null(spec$baseline_prior)) {
-          warning(
-            sprintf(
-              "baseline_prior supplied for fixed connection on studies [%s]; ignoring it.",
-              paste(spec$studies, collapse = ", ")
-            ),
-            call. = FALSE
-          )
-        }
+
         connect_fixed <- apply_connect_fixed(network, spec$studies)
         network <- connect_fixed$network
         fixed_baseline <- connect_fixed$n_collapsed
+
       } else if (spec$type == "random") {
+
         connect_flag <- 1
         totns <- length(network$studies)
         prior_intercept_org <- prior_intercept
         prior_intercept <- rep(list(prior_intercept), totns)
         idx <- match(spec$studies, levels(network$studies))
-        prior_intercept[idx] <- rep(list(spec$baseline_prior), length(idx))
+        prior_intercept[idx] <- rep(list(spec$prior_baseline), length(idx))
+
       }
+    }
+
+    # Check connectedness
+    if (any(is_random)) {
+      # With random baselines, check everything now joined to reference treatment
+      # by prior information
+
+      # Get a study on the network reference treatment
+      refstudy <- dplyr::bind_rows(
+        if (has_ipd(network)) dplyr::select(network$ipd, .data$.study, .data$.trt) else NULL,
+        if (has_agd_arm(network)) dplyr::select(network$agd_arm, .data$.study, .data$.trt) else NULL) %>%
+        dplyr::filter(.data$.trt == levels(network$treatments)[1])
+      refstudy <- refstudy$.study[1]
+
+      # Check by connecting up network reference treatment study with con() studies
+      net_temp <- apply_connect_fixed(network,
+                                      studies = c(as.character(refstudy),
+                                                  unlist(purrr::map(connect_baseline, "studies"))))$network
+
+      if (!is_network_connected(net_temp))
+        abort("Network is still disconnected after applying con() connections.")
+
+    } else {
+      # With fixed baselines, check updated network is connected
+      if (!is_network_connected(network))
+        abort("Network is still disconnected after applying con() connections.")
     }
   }
 
@@ -424,6 +449,11 @@ nma <- function(network,
     }
   }
 
+  # Check for single treatment only (e.g. baseline synthesis)
+  if (length(network$treatments) == 1) {
+    trt_effects <- "fixed"
+    if (consistency != "consistency") abort("Only a single treatment, cannot fit inconsistency model.")
+  }
 
 
   if (class_effects == "common") {
@@ -2106,6 +2136,11 @@ nma.fit <- function(ipd_x, ipd_y,
   # Set chain_id to make CHAIN_ID available in data block
   stanargs$chain_id <- 1L
 
+  # Zap extra arguments from ... passed by random baseline model
+  if (random_baseline) {
+    stanargs$baseline_subnet <- NULL
+  }
+
   # Call Stan model for given likelihood
 
   # -- Normal likelihood
@@ -3174,7 +3209,7 @@ make_nma_formula <- function(regression,
 
 #' Construct NMA design matrix
 #'
-#' @param nma_formula NMA formula, returned by [make_nma_formula()]
+#' @param nma_formula NMA formula, returned by `make_nma_formula()`
 #' @param ipd,agd_arm,agd_contrast Data frames
 #' @param agd_contrast_bl Logical vector identifying baseline rows for contrast
 #'   data
@@ -3328,20 +3363,26 @@ make_nma_model_matrix <- function(nma_formula,
   # coding is used everywhere
   dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
 
-  # Recode .trt factor for disconnected networks so each subnetwork has its own
-  # reference treatment, both mapping to "..ref.." so R drops both as reference
-  if (!is.null(subnetwork_trt)) {
-    trt_levels <- levels(dat_all$.trt)
-    sn_of_trt  <- subnetwork_trt[trt_levels]
-    subnet_refs <- tapply(trt_levels, sn_of_trt, function(x) x[[1]])
-    new_trt_labels <- vapply(trt_levels, function(trt) {
-      ref <- subnet_refs[[as.character(sn_of_trt[[trt]])]]
-      if (trt == ref) "..ref.." else paste0(trt, " vs ", ref)
-    }, character(1))
-    names(new_trt_labels) <- trt_levels
-    new_trt_levels <- c("..ref..", setdiff(new_trt_labels, "..ref.."))
-    dat_all$.trt <- factor(new_trt_labels[as.character(dat_all$.trt)],
-                           levels = new_trt_levels)
+  if (nlevels(dat_all$.trt) == 1) {
+    # Single treatment only (some baseline syntheses)
+    nma_formula <- update(nma_formula, ~ . -.trt)
+  } else {
+
+    # Recode .trt factor for disconnected networks so each subnetwork has its own
+    # reference treatment, both mapping to "..ref.." so R drops both as reference
+    if (!is.null(subnetwork_trt)) {
+      trt_levels <- levels(dat_all$.trt)
+      sn_of_trt  <- subnetwork_trt[trt_levels]
+      subnet_refs <- tapply(trt_levels, sn_of_trt, function(x) x[[1]])
+      new_trt_labels <- vapply(trt_levels, function(trt) {
+        ref <- subnet_refs[[as.character(sn_of_trt[[trt]])]]
+        if (trt == ref) "..ref.." else paste0(trt, " vs ", ref)
+      }, character(1))
+      names(new_trt_labels) <- trt_levels
+      new_trt_levels <- c("..ref..", setdiff(new_trt_labels, "..ref.."))
+      dat_all$.trt <- factor(new_trt_labels[as.character(dat_all$.trt)],
+                             levels = new_trt_levels)
+    }
   }
 
   # Check that required variables are present in each data set, and non-missing
@@ -3944,38 +3985,55 @@ aux_needs_integration <- function(aux_regression, aux_by) {
 
 #' Specify baseline connections
 #'
-#' Helper function for the `connect_baseline` argument of [nma()] to specify
-#' how study baselines are linked.
+#' Helper function for the `connect_baseline` argument of [nma()] to specify how
+#' study baselines (intercepts) are linked, to connect a disconnected network or
+#' single-arm studies.
+#'
+#' @details A random baseline connection is specified with `type = "random"`.
+#'   This places an informative prior distribution on the baselines of studies
+#'   listed in `studies`, specified with the `prior_baseline` argument.
+#'
+#'   A fixed baseline connection is specified with `type = "fixed"`. This shares
+#'   the baseline parameter for studies listed in `studies`.
 #'
 #' @name connect_baseline
 #' @rdname connect_baseline
 #' @aliases con
 #' @param type Type of connection, either "fixed" or "random".
-#' @param studies Character vector of study names.
-#' @param baseline_prior Prior distribution for the shared baseline mean when
-#'   `type = "random"`, as a [nma_prior] object.
+#' @param studies Vector of study names.
+#' @param prior_baseline Prior distribution for the baseline parameters of
+#'   `studies` when `type = "random"`, as a [nma_prior] object (see [priors]).
 #'
 #' @return An object of class `nma_connect`.
 #' @export
 con <- function(type = c("fixed", "random"),
                 studies,
-                baseline_prior = NULL) {
-  if (!type %in% c("fixed", "random")) {
-    stop("type must equal 'fixed' or 'random'.", call. = FALSE)
-  }
-  studies <- as.character(studies)
-  if (length(studies) < 1)
-    stop("`studies` must be a non-empty character vector.")
+                prior_baseline = NULL) {
 
-  if (type == "random" && is.null(baseline_prior))
-      stop("`baseline_prior` must be provided when type = 'random'.", call. = FALSE)
-  if (type == "random" && !is.null(baseline_prior))
-      check_prior(baseline_prior)
+  type <- rlang::arg_match(type)
+
+  studies <- as.character(studies)
+  if (!is.vector(studies) ||
+      type == "fixed" && length(studies) < 2 ||
+      type == "random" && length(studies) < 1)
+    abort(glue::glue('`studies` must be a vector of study names of length > {switch(type, fixed = 2L, random = 1L)} for type = "{type}".'))
+
+  if (type == "random") {
+    if (is.null(prior_baseline)) abort('`prior_baseline` must be provided when type = "random".')
+    check_prior(prior_baseline)
+  } else {
+    if (!is.null(prior_baseline)) {
+      warn(glue::glue('Ignoring `prior_baseline` provided with type = "fixed" for stud{if (length(studies)  > 1) "ies" else "y"}: ',
+                      glue::glue_collapse(glue::double_quote(studies), sep = ", ", last = " and "), "."))
+      prior_baseline <- NULL
+    }
+  }
 
   structure(
     list(type      = type,
          studies   = studies,
-         baseline_prior  = baseline_prior)
+         prior_baseline  = prior_baseline),
+    class = "nma_connect"
   )
 }
 
@@ -4014,87 +4072,52 @@ apply_connect_fixed <- function(network, studies) {
   list(network = network, n_collapsed = diff)
 }
 
-#' Baseline synthesis wrapper around `nma()`
+#' Baseline synthesis models
 #'
-#' Runs `nma()` with random baseline enabled and returns the fit with an
-#' attached summary of baseline-related parameters.
+#' Runs a baseline synthesis model, placing a random effect on the
+#' study-specific intercepts to obtain a pooled estimate of the absolute
+#' outcomes on the network reference treatment. This can be combined with a
+#' regression model to obtain an adjusted estimate. Estimates of both the
+#' overall mean and standard deviation (`baseline_mean` and `baseline_sd`) as
+#' well as the predictive distribution (`baseline_new`) are returned.
+#'
+#' @details The baseline synthesis model places a random effect on the
+#'   study-specific intercept parameters of the NMA or ML-NMR model fitted by
+#'   [nma()]:
+#'   \deqn{\mu_j \sim \mathrm{N}(m, \tau_\mu)}{\mu_j ~ N(m, \tau_\mu)}
+#'   The prior distribution on the mean \eqn{m} is specified by the
+#'   `prior_intercept` argument, and the prior for \eqn{\tau_\mu}$ by
+#'   `prior_intercept_sd`.
 #'
 #' @name baseline_synthesis
 #' @param network A `multinma` network object.
-#' @param prior_intercept_sd Prior for the baseline SD (used by random baseline).
-#' @param random_baseline Logical; ensure random baseline is used. Default `TRUE`.
-#' @param ... Any additional arguments passed directly to [nma()].
-#' @return An `nma` fit with extra components:
-#'   * `baseline_summary`: data frame of summaries for `baseline_new`,
-#'     `baseline_mean`, `baseline_sd`, and `mu[i]`.
-#'   * `priors$prior_intercept_sd`: the prior you supplied (for plotting, etc.).
+#' @param prior_intercept Prior for the mean of the random effects distribution
+#'   on the study-specific intercepts.
+#' @param prior_intercept_sd Prior for standard deviation of the random effects
+#'   distribution on the study-specific intercepts.
+#' @param ... Additional arguments passed directly to [nma()].
+#' @return A `stan_baseline` object, inheriting from [stan_nma].
 #' @export
 
 baseline_synthesis <- function(network,
+                               prior_intercept = .default(normal(scale = 100)),
                                prior_intercept_sd = .default(half_normal(scale = 5)),
-                               random_baseline = TRUE,
                                ...) {
+
+  check_prior(prior_intercept)
   check_prior(prior_intercept_sd)
 
-  if (is_network_connected(network))
-    abort("`baseline_synthesis()` is only for disconnected networks.")
-
-  # The baseline subnetwork is always 1 — nma() reorders components so the
-  # network reference treatment's subnetwork is always subnetwork 1
-  baseline_subnet <- 1L
-
   fit <- nma(
-    network            = network,
-    baseline_subnet    = baseline_subnet,
-    random_baseline    = random_baseline,
+    network = network,
+    # The baseline subnetwork is always 1 — nma() reorders components so the
+    # network reference treatment's subnetwork is always subnetwork 1
+    baseline_subnet = 1L,
+    random_baseline = TRUE,
+    prior_intercept = prior_intercept,
     prior_intercept_sd = prior_intercept_sd,
     ...
   )
 
-  dots <- list(...)
-  if (isTRUE(dots$test_grad)) {
-    return(list(network = network))
-  }
-
-  # Summarise baseline-related parameters and attach
-  # Extract all mu[], then filter to reference subnetwork studies only
-  ss_bl <- rstan::summary(fit$stanfit,
-                          pars  = c("baseline_new", "baseline_mean", "baseline_sd"),
-                          probs = c(0.025, 0.5, 0.975))$summary
-  ss_mu <- rstan::summary(fit$stanfit,
-                          pars  = "mu",
-                          probs = c(0.025, 0.5, 0.975))$summary
-  ss_d  <- rstan::summary(fit$stanfit,
-                          pars  = "d",
-                          probs = c(0.025, 0.5, 0.975))$summary
-
-  # Split d[] by subnetwork: subnet 1 d's have the network reference treatment as their ref
-  ref_trt_name <- levels(network$treatments)[1]
-  d_names      <- rownames(ss_d)  # e.g. "d[IXE_Q2W vs PBO]", "d[SEC_300 vs SEC_150]"
-  d_refs       <- sub(".*vs (.+)\\]$", "\\1", d_names)
-
-  ss <- rbind(
-    ss_bl,
-    ss_mu[fit$baseline_study_idx, , drop = FALSE],
-    ss_d[d_refs == ref_trt_name, , drop = FALSE],   # subnet 1 d's
-    ss_d[d_refs != ref_trt_name, , drop = FALSE]    # subnet 2+ d's
-  )
-
-  keep <- grepl("^(baseline_new|baseline_mean|baseline_sd|mu\\[|d\\[)", rownames(ss))
-  summary_df <- as.data.frame(ss[keep, , drop = FALSE])
-  summary_df$parameter <- rownames(ss)[keep]
-  summary_df <- summary_df[, c("parameter", setdiff(names(summary_df), "parameter"))]
-  rownames(summary_df) <- NULL
-
-  fit$baseline_summary <- summary_df
-  fit$priors$prior_intercept_sd <- prior_intercept_sd
-
-  class(fit) <- c("baseline_synthesis", class(fit))
+  class(fit) <- c("stan_baseline", class(fit))
   fit
-}
-
-#' @export
-print.baseline_synthesis <- function(x, ...) {
-  print(x$baseline_summary)
-  invisible(x)
 }

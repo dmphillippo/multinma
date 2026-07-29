@@ -14,7 +14,7 @@ set_ipd(
   Surv = NULL,
   trt_ref = NULL,
   trt_class = NULL,
-  allow_singlearm_studies = getOption("multinma.allow_singlearm_studies", FALSE)
+  allow_single_arm
 )
 }
 \arguments{
@@ -44,9 +44,13 @@ will be chosen (see details).}
 \item{trt_class}{column of \code{data} specifying treatment classes, coded using
 integers, strings, or factors. By default, no classes are specified.}
 
-\item{allow_singlearm_studies}{logical; if \code{FALSE} (default) a warning is
-given when single-arm studies are present. The default can be set globally
-via option \code{multinma.allow_singlearm_studies}.}
+\item{allow_single_arm}{Should single-arm studies be allowed? If \code{"warn"}
+a warning is given when single-arm studies are present. If \code{"error"} or
+\code{FALSE}, an error is given when single-arm studies are present. If \code{TRUE} or
+\code{"inform"}, an informative note is given. The default is \code{"warn"}, except for
+survival data for which the default is \code{TRUE} to allow convenient prediction
+for external
+data sources. Can be set globally via option \code{multinma.allow_single_arm}.}
 }
 \value{
 An object of class \link{nma_data}

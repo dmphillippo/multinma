@@ -36,8 +36,7 @@ nma(
   mspline_degree = 3,
   n_knots = 7,
   knots = NULL,
-  mspline_basis = NULL,
-  baseline_subnet = NULL
+  mspline_basis = NULL
 )
 }
 \arguments{
@@ -60,22 +59,22 @@ variable \code{.mu} can be used for baseline risk meta-regression: \code{~.mu:.t
 interactions are specified as \code{"common"}, \code{"exchangeable"}, or
 \code{"independent"}.}
 
-\item{class_effects}{Character string specifying a model for treatment class effects,
-either \code{"independent"} (the default), \code{"exchangeable"}, or \code{"common"}.}
+\item{class_effects}{Character string specifying a model for treatment class
+effects, either \code{"independent"} (the default), \code{"exchangeable"}, or
+\code{"common"}.}
 
-\item{class_sd}{Character string specifying whether the class standard deviations in a
-class effects model should be \code{"independent"} (i.e. separate for each class, the default),
-or \code{"common"} (i.e. shared across all classes). Alternatively this can be a list of
-character vectors, each of which describe a set classes for which to share a common class SD;
-any list names will be used to name the output parameters, otherwise the name will be taken
-from the first class in each set.}
+\item{class_sd}{Character string specifying whether the class standard
+deviations in a class effects model should be \code{"independent"} (i.e.
+separate for each class, the default), or \code{"common"} (i.e. shared across
+all classes). Alternatively this can be a list of character vectors, each
+of which describe a set classes for which to share a common class SD; any
+list names will be used to name the output parameters, otherwise the name
+will be taken from the first class in each set.}
 
-\item{connect_baseline}{Optional baseline connections. Supply one or more
-\code{con()} specifications to share baselines between studies. Random
-baseline require a \code{baseline_prior} distribution. All studies listed in a
-single \code{con()} that are \code{type = "fixed"} must originate from the same data type (IPD or AgD).
-Multiple \code{con()} specifications may only be combined if they are all
-\code{type = "fixed"}; a \code{type = "random"} connection must be given on its own.}
+\item{connect_baseline}{Baseline connections created by \code{\link[=con]{con()}}, used to
+connect a disconnected network. Multiple \code{\link[=con]{con()}} specifications of
+\code{type = "fixed"} may be provided as a list. Currently a single
+\code{type = "random"} connection must be given on its own.}
 
 \item{likelihood}{Character string specifying a likelihood, if unspecified
 will be inferred from the data (see details)}
@@ -183,11 +182,6 @@ investigate knot placement prior to model fitting.}
 \code{knots}, a named list of M-spline bases (one for each study) can be
 provided with \code{mspline_basis} which will be used directly. In this case,
 all other M-spline options will be ignored.}
-
-\item{baseline_subnet}{Internal flag used by \code{\link[=baseline_synthesis]{baseline_synthesis()}} to allow
-fitting on a disconnected network. When set, \code{subnetwork_trt} is computed
-automatically from the network's connected components, with treatment
-effects still estimated for every subnetwork. Not intended for direct use.}
 }
 \value{
 \code{nma()} returns a \link{stan_nma} object, except when \code{consistency = "nodesplit"} when a \link{nma_nodesplit} or \link{nma_nodesplit_df} object is

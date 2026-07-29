@@ -2,33 +2,43 @@
 % Please edit documentation in R/nma.R
 \name{baseline_synthesis}
 \alias{baseline_synthesis}
-\title{Baseline synthesis wrapper around \code{nma()}}
+\title{Baseline synthesis models}
 \usage{
 baseline_synthesis(
   network,
+  prior_intercept = .default(normal(scale = 100)),
   prior_intercept_sd = .default(half_normal(scale = 5)),
-  random_baseline = TRUE,
   ...
 )
 }
 \arguments{
 \item{network}{A \code{multinma} network object.}
 
-\item{prior_intercept_sd}{Prior for the baseline SD (used by random baseline).}
+\item{prior_intercept}{Prior for the mean of the random effects distribution
+on the study-specific intercepts.}
 
-\item{random_baseline}{Logical; ensure random baseline is used. Default \code{TRUE}.}
+\item{prior_intercept_sd}{Prior for standard deviation of the random effects
+distribution on the study-specific intercepts.}
 
-\item{...}{Any additional arguments passed directly to \code{\link[=nma]{nma()}}.}
+\item{...}{Additional arguments passed directly to \code{\link[=nma]{nma()}}.}
 }
 \value{
-An \code{nma} fit with extra components:
-\itemize{
-\item \code{baseline_summary}: data frame of summaries for \code{baseline_new},
-\code{baseline_mean}, \code{baseline_sd}, and \code{mu[i]}.
-\item \code{priors$prior_intercept_sd}: the prior you supplied (for plotting, etc.).
-}
+A \code{stan_baseline} object, inheriting from \link{stan_nma}.
 }
 \description{
-Runs \code{nma()} with random baseline enabled and returns the fit with an
-attached summary of baseline-related parameters.
+Runs a baseline synthesis model, placing a random effect on the
+study-specific intercepts to obtain a pooled estimate of the absolute
+outcomes on the network reference treatment. This can be combined with a
+regression model to obtain an adjusted estimate. Estimates of both the
+overall mean and standard deviation (\code{baseline_mean} and \code{baseline_sd}) as
+well as the predictive distribution (\code{baseline_new}) are returned.
+}
+\details{
+The baseline synthesis model places a random effect on the
+study-specific intercept parameters of the NMA or ML-NMR model fitted by
+\code{\link[=nma]{nma()}}:
+\deqn{\mu_j \sim \mathrm{N}(m, \tau_\mu)}{\mu_j ~ N(m, \tau_\mu)}
+The prior distribution on the mean \eqn{m} is specified by the
+\code{prior_intercept} argument, and the prior for \eqn{\tau_\mu}$ by
+\code{prior_intercept_sd}.
 }

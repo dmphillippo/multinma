@@ -8,48 +8,36 @@
 #'
 #' @return A list with a `summary` dataframe and `distance_matrix`.
 #'
-#' @importFrom magrittr %>%
-#' @importFrom dplyr select filter group_by summarise mutate left_join bind_rows distinct across all_of tibble n
-#' @importFrom tidyr separate pivot_wider
-#' @importFrom tibble column_to_rownames
-#' @importFrom rlang abort expr sym
 #' @importFrom stats glm model.matrix predict weighted.mean sd var weights
-#' @importFrom utils type.convert
 #' @export
 compare_populations <- function(network,
                                 covariates = NULL,
-                                method = c("euclidean", "propensity")) {
+                                method = c("propensity", "euclidean")) {
 
-  valid_choices <- c("euclidean", "propensity")
-  method <- tryCatch({
-    if (missing(method)) stop()
-    if (length(method) > 1) stop()
-    match.arg(method, choices = valid_choices)
-  }, error = function(e) {
-    rlang::abort("Argument `method` must be either 'euclidean' or 'propensity'.")
-  })
+  method <- rlang::arg_match(method)
 
   # Check network
   if (!inherits(network, "nma_data")) {
     abort("Expecting an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
   }
 
-  # Check for Integration Code
-  if (is.null(network$integration_code)) {
-    abort("The network object does not contain integration code. Please run `add_integration()` on your network first to define the covariate distributions.")
+  # Check for integration call
+  if (is.null(network$int_call)) {
+    abort(c('Integration points must be present for type = "propensity".',
+            'Set up integration points using `add_integration()` to define the covariate distributions, or set type = "euclidean" to compare means.'))
   }
-  avail_covariates <- names(network$integration_code)
+  avail_covariates <- names(network$int_call)
 
   # Checks for covariates argument
   if (is.null(covariates)) {
     covariates <- avail_covariates
-    message(paste0("Using covariates defined in integration code: ", paste(covariates, collapse = ", ")))
+    inform(paste0("Comparing on all covariates with integration points: ", paste(covariates, collapse = ", ")))
   } else {
     missing_covs <- setdiff(covariates, avail_covariates)
     if (length(missing_covs) > 0) {
-      abort(paste0("The following covariates are NOT defined in the network's integration code: ",
+      abort(c(paste0("Cannot compare requested covariates missing integration points: ",
                    paste(missing_covs, collapse = ", "),
-                   ". Please define them using `add_integration()` or remove them."))
+                   "."), "Set up integration points using `add_integration()`."))
     }
   }
 
@@ -101,8 +89,8 @@ compare_populations <- function(network,
           cbind(all_data[[j]], study_indicator = 0L)
         )
 
-        model <- glm(study_indicator ~ ., data = combined_df, family = "binomial")
-        ps <- predict(model, newdata = combined_df, type = "response")
+        model <- stats::glm(study_indicator ~ ., data = combined_df, family = "binomial")
+        ps <- stats::predict(model, newdata = combined_df, type = "response")
 
         combined_df$propensity_score <- ps
         combined_df$ate_weight <- ifelse(
@@ -212,7 +200,7 @@ compare_populations <- function(network,
         dplyr::group_by(.data$.study) %>%
         dplyr::summarise(
           total_n = dplyr::n(),
-          dplyr::across(all_of(covariates), list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE))),
+          dplyr::across(dplyr::all_of(covariates), list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE))),
           .groups = "drop"
         )
     }
@@ -225,7 +213,7 @@ compare_populations <- function(network,
       retained_covariates <- c()
 
       for (cov in covariates) {
-        distr_obj <- network$integration_code[[cov]]
+        distr_obj <- network$int_call[[cov]]
         args <- distr_obj
 
         is_binary_dist <- "prob" %in% names(args)
@@ -242,7 +230,7 @@ compare_populations <- function(network,
             # Auto-calculate SD for binary: sqrt(p * (1-p))
             df[[paste0(cov, "_sd")]] <- sqrt(p * (1 - p))
           } else {
-            warning(glue::glue("Probability column '{prob_col}' for covariate '{cov}' not found in AgD. Dropped."))
+            warn(glue::glue("Probability column '{prob_col}' for covariate '{cov}' not found in AgD. Dropped."))
             add_covariate <- FALSE
           }
 
@@ -257,7 +245,7 @@ compare_populations <- function(network,
         } else if (cov %in% colnames(agd_df)) {
           df[[paste0(cov, "_mean")]] <- agd_df[[cov]]
         } else {
-          warning(glue::glue("Mean for covariate '{cov}' not found in AgD. Covariate dropped."))
+          warn(glue::glue("Mean for covariate '{cov}' not found in AgD. Covariate dropped."))
           add_covariate <- FALSE
         }
 
@@ -269,7 +257,7 @@ compare_populations <- function(network,
 
           } else {
               # Continuous variable missing SD (or percentage > 1) -> Drop it
-              warning(glue::glue("SD column '{sd_col}' for covariate '{cov}' not found in AgD. Dropped (Continuous variable requires explicit SD)."))
+              warn(glue::glue("SD column '{sd_col}' for covariate '{cov}' not found in AgD. Dropped (Continuous variable requires explicit SD)."))
               df[[paste0(cov, "_mean")]] <- NULL
               add_covariate <- FALSE
             }
@@ -304,7 +292,7 @@ compare_populations <- function(network,
       vars <- colnames(agd_all)[cols]
       miss <- unique(data.frame(study = studies, variable = vars, stringsAsFactors = FALSE))
       lines_by_var <- tapply(miss$study, miss$variable, function(s) paste(unique(s), collapse = ", "))
-      stop(paste0(
+      abort(paste0(
         "AgD covariate inputs contain missing values:\n",
         paste(" \u2022 ", names(lines_by_var), " missing in studies: ", unname(lines_by_var), collapse = "\n"),
         "\nPlease remove these variables from `covariates`"
@@ -415,15 +403,15 @@ compare_populations <- function(network,
 #' @export
 cross_validation <- function(nma) {
   if (!requireNamespace("loo", quietly = TRUE)) {
-    stop("The 'loo' package is required. Please install it with install.packages('loo').")
+    abort("The 'loo' package is required. Please install it with install.packages('loo').")
   }
 
   if (!inherits(nma, "stan_nma")) {
-    stop("Input must be a 'stan_nma' object.")
+    abort("Input must be a 'stan_nma' object.")
   }
   ipd_data <- nma$network$ipd
   if (!isTRUE(nrow(ipd_data) > 0)) {
-    stop("The network must contain IPD to compute individual-level LOO R2.")
+    abort("The network must contain IPD to compute individual-level LOO R2.")
   }
   # Get design matrix for covariates
   X <- model.matrix(nma$regression, data = ipd_data)
@@ -434,7 +422,7 @@ cross_validation <- function(nma) {
   n_patients <- nrow(ipd_data)
   n_iters <- nrow(log_lik)
   if (ncol(log_lik) != n_patients) {
-    stop("The log_lik matrix does not align with the number of IPD rows.")
+    abort("The log_lik matrix does not align with the number of IPD rows.")
   }
   eta_samples <- matrix(0, nrow = n_patients, ncol = n_iters)
   pars_oi <- nma$stanfit@sim$pars_oi
@@ -511,14 +499,14 @@ cross_validation <- function(nma) {
     } else if (link_fun == "probit") {
       var_res_scalar <- 1.0
     } else {
-      warning(paste("Link", link_fun, "not standard. Defaulting to logit variance."))
+      warn(paste("Link", link_fun, "not standard. Defaulting to logit variance."))
       var_res_scalar <- pi^2 / 3
     }
   } else if (outcome_type == "continuous") {
     sigma <- as.matrix(nma$stanfit, pars = "sigma")
     var_res_scalar <- mean(as.vector(sigma^2))
   } else {
-    stop(paste("Outcome type", outcome_type, "not supported."))
+    abort(paste("Outcome type", outcome_type, "not supported."))
   }
   loo_obj <- suppressWarnings(loo::loo(log_lik, save_psis = TRUE))
   psis_weights <- weights(loo_obj$psis_object, normalize = TRUE, log = FALSE)
