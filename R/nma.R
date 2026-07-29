@@ -4052,13 +4052,16 @@ con <- function(type = c("fixed", "random"),
 apply_connect_fixed <- function(network, studies) {
   new_name <- paste(studies, collapse = " & ")
 
+  n_s_ipd <- n_s_agd <- 0
   if (has_ipd(network)) {
     network$ipd$.study <-
       forcats::fct_collapse(network$ipd$.study, !!new_name := studies)
+    n_s_ipd <- length(unique(network$ipd$.study))
   }
   if (has_agd_arm(network)) {
     network$agd_arm$.study <-
       forcats::fct_collapse(network$agd_arm$.study, !!new_name := studies)
+    n_s_agd <- length(unique(network$agd_arm$.study))
   }
   if (has_agd_contrast(network)) {
     network$agd_contrast$.study <-
@@ -4067,7 +4070,7 @@ apply_connect_fixed <- function(network, studies) {
 
   network$studies <- forcats::fct_collapse(network$studies, !!new_name := studies)
   network$studies <- forcats::fct_unique(network$studies)
-  diff <- length(unique(network$agd_arm$.study)) + length(unique(network$ipd$.study)) - length(network$studies)
+  diff <- n_s_agd + n_s_ipd - length(network$studies)
 
   list(network = network, n_collapsed = diff)
 }
