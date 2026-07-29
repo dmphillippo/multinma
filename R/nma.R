@@ -1837,8 +1837,8 @@ nma.fit <- function(ipd_x, ipd_y,
                                  .trt = unname(apply(ipd_x[, col_trt, drop = FALSE], 1, get_trt)))
     ipd_s_t <- dplyr::distinct(ipd_s_t_all) %>% dplyr::mutate(.arm = 1:dplyr::n())
     ipd_arm <-  dplyr::left_join(ipd_s_t_all, ipd_s_t, by = c(".study", ".trt")) %>% dplyr::pull(.data$.arm)
-    ipd_study <- ipd_s_t$.study
-    ipd_trt <- ipd_s_t$.trt
+    ipd_study <- as.array(ipd_s_t$.study)
+    ipd_trt <- as.array(ipd_s_t$.trt)
     narm_ipd <- max(ipd_arm)
     ni_ipd <- nrow(ipd_x)
   } else {
