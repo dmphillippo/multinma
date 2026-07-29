@@ -351,7 +351,7 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
       dplyr::group_by(.data$from, .data$to, .data$.type) %>%
       dplyr::summarise(.nstudy = dplyr::n_distinct(.data$.study)) %>%
       dplyr::mutate(.nstudy = dplyr::if_else(is.na(.data$.nstudy), 0L, .data$.nstudy)) %>%
-      dplyr::arrange(dplyr::desc(.data$.type), .data$from, .data$to)
+      dplyr::arrange(dplyr::desc(.data$.type), .data$to, .data$from)
   }
 
   if (has_agd_sample_size(x)) {
