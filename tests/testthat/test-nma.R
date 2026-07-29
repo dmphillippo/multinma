@@ -624,12 +624,52 @@ test_that("con() warns if prior_baseline is supplied with type = 'fixed'", {
 })
 
 test_that("con() with type = 'fixed' collapses the named studies onto a shared baseline", {
-  fit <- suppressWarnings(nma(fixnet,
-                              connect_baseline = con(type = "fixed", studies = c("F1", "F2")),
-                              test_grad = TRUE))
+  # fit <- suppressWarnings(nma(fixnet,
+  #                             connect_baseline = con(type = "fixed", studies = c("F1", "F2")),
+  #                             test_grad = TRUE))
+  #
+  # expect_s3_class(fit, "stan_nma")
+  # expect_equal(levels(fit$network$studies), "F1 & F2")
 
-  expect_s3_class(fit, "stan_nma")
-  expect_equal(levels(fit$network$studies), "F1 & F2")
+  # Same data sources
+  s1dat <- data.frame(study = "S1", trt = "A", r = 1, n = 1)
+  s2dat <- data.frame(study = "S2", trt = "B", r = 1, n = 1)
+
+  fit_a <- nma(
+    combine_network(set_agd_arm(s1dat, study, trt, r = r, n = n, allow_single_arm = TRUE),
+                    set_agd_arm(s2dat, study, trt, r = r, n = n, allow_single_arm = TRUE)),
+    connect_baseline = con("fixed", studies = c("S1", "S2")),
+    prior_intercept = normal(0,1), prior_trt = normal(0, 1),
+    test_grad = TRUE
+  )
+
+  expect_s3_class(fit_a, "stan_nma")
+  expect_equal(levels(fit_a$network$studies), "S1 & S2")
+
+  fit_i <- nma(
+    combine_network(set_ipd(s1dat, study, trt, r = r, allow_single_arm = TRUE),
+                    set_ipd(s2dat, study, trt, r = r, allow_single_arm = TRUE)),
+    connect_baseline = con("fixed", studies = c("S1", "S2")),
+    prior_intercept = normal(0,1), prior_trt = normal(0, 1),
+    test_grad = TRUE
+  )
+
+  expect_s3_class(fit_i, "stan_nma")
+  expect_equal(levels(fit_i$network$studies), "S1 & S2")
+
+
+  # Different data sources
+  fit_ai <- nma(
+    combine_network(set_agd_arm(s1dat, study, trt, r = r, n = n, allow_single_arm = TRUE),
+                    set_ipd(s2dat, study, trt, r = r, allow_single_arm = TRUE)),
+    connect_baseline = con("fixed", studies = c("S1", "S2")),
+    prior_intercept = normal(0,1), prior_trt = normal(0, 1),
+    test_grad = TRUE
+  )
+
+  expect_s3_class(fit_ai, "stan_nma")
+  expect_equal(levels(fit_ai$network$studies), "S1 & S2")
+
 })
 
 disc_dat <- tibble(study = c("S1", "S1", "S2", "S2", "S3"),
