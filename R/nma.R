@@ -337,7 +337,7 @@ nma <- function(network,
   }
 
   # Check and apply connect_baseline specifications
-  connect_flag <- 0
+  connect_baseline_random <- FALSE
   if (!is.null(connect_baseline)) {
 
     if (is_network_connected(network))
@@ -387,7 +387,7 @@ nma <- function(network,
 
       } else if (spec$type == "random") {
 
-        connect_flag <- 1
+        connect_baseline_random <- TRUE
         totns <- length(network$studies)
         prior_intercept_org <- prior_intercept
         prior_intercept <- rep(list(prior_intercept), totns)
@@ -685,7 +685,7 @@ nma <- function(network,
   has_intercepts <- has_agd_arm(network) || has_ipd(network)
 
   # Check priors
-  if (connect_flag == 1){
+  if (connect_baseline_random){
     prior_intercept_unique <- unique(prior_intercept)
     lapply(prior_intercept_unique, check_prior)
   } else {
@@ -706,7 +706,7 @@ nma <- function(network,
 
   # Prior defaults
   prior_defaults <- list()
-  if (connect_flag == 1){
+  if (connect_baseline_random){
     if (has_intercepts && .is_default(prior_intercept_org))
       prior_defaults$prior_intercept_org <- get_prior_call(prior_intercept_org)
   } else {
@@ -1401,7 +1401,7 @@ if (class_effects == "exchangeable") {
     likelihood = likelihood,
     link = link,
     consistency = consistency,
-    connect_flag = connect_flag,
+    connect_baseline_random = connect_baseline_random,
     mixed_studies = mixed_studies,
     n_baseline_studies = n_baseline_studies,
     baseline_study_idx = baseline_study_idx,
@@ -1653,7 +1653,7 @@ nma.fit <- function(ipd_x, ipd_y,
                     likelihood = NULL,
                     link = NULL,
                     consistency = c("consistency", "ume", "nodesplit"),
-                    connect_flag = 0,
+                    connect_baseline_random = FALSE,
                     mixed_studies = 0,
                     ...,
                     prior_intercept,
@@ -1788,7 +1788,7 @@ nma.fit <- function(ipd_x, ipd_y,
        (has_ipd || has_agd_arm))
 
   # Check priors
-  if (connect_flag == 1){
+  if (connect_baseline_random){
     prior_intercept_unique <- unique(prior_intercept)
     lapply(prior_intercept_unique, check_prior)
   } else {
@@ -2033,15 +2033,15 @@ nma.fit <- function(ipd_x, ipd_y,
     brmr_col = as.array(which(col_brmr)),
     xbar_mu = xbar_mu %||% 0,
     # random baseline effect
-    random_baseline = ifelse(random_baseline == TRUE, 1, 0),
+    random_baseline = random_baseline,
     n_baseline_studies = if (random_baseline && !is.null(n_baseline_studies)) n_baseline_studies else 0L,
     baseline_study_idx = if (random_baseline && !is.null(baseline_study_idx)) as.array(baseline_study_idx) else integer(0),
-    connect_baseline = connect_flag,
-    mixed_studies = mixed_studies
+    baseline_priors = connect_baseline_random,
+    n_mixed_studies = mixed_studies
   )
 
   # Add priors
-  if (connect_flag == 1){
+  if (connect_baseline_random){
     standat <- purrr::list_modify(standat,
       !!! prior_standat_list(prior_intercept, "prior_intercept",
                              valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")))

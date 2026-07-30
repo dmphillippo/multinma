@@ -8,7 +8,7 @@ int<lower=0> ni_ipd; // total number of IPD individuals
 int<lower=0> ni_agd_arm; // total number of AgD (arm-based) data points
 int<lower=0> ni_agd_contrast; // total number of AgD (contrast-based) data points
 
-int<lower=0> mixed_studies; // total number of studies that contain both IPD and AgD (arm-based)
+int<lower=0> n_mixed_studies; // total number of studies that contain both IPD and AgD (arm-based)
 
 // Treatment IDs
 int<lower=0> narm_ipd; // Number of IPD arms
@@ -67,12 +67,12 @@ array[brmr_n_col] int<lower=1> brmr_col;
 real xbar_mu;
 
 // -- Priors --
-// Scalar when connect_baseline = 0, study-specific vector otherwise
-int<lower=0, upper=1> connect_baseline;
-array[connect_baseline ? ns_ipd + ns_agd_arm : 1] int<lower=0,upper=3> prior_intercept_dist;
-array[connect_baseline ? ns_ipd + ns_agd_arm : 1] real prior_intercept_location;
-array[connect_baseline ? ns_ipd + ns_agd_arm : 1] real<lower=0> prior_intercept_scale;
-array[connect_baseline ? ns_ipd + ns_agd_arm : 1] real<lower=0> prior_intercept_df;
+// Scalar when baseline_priors = 0, study-specific vector otherwise
+int<lower=0, upper=1> baseline_priors;
+array[baseline_priors ? ns_ipd + ns_agd_arm : 1] int<lower=0,upper=3> prior_intercept_dist;
+array[baseline_priors ? ns_ipd + ns_agd_arm : 1] real prior_intercept_location;
+array[baseline_priors ? ns_ipd + ns_agd_arm : 1] real<lower=0> prior_intercept_scale;
+array[baseline_priors ? ns_ipd + ns_agd_arm : 1] real<lower=0> prior_intercept_df;
 
 int<lower=0,upper=6> prior_intercept_sd_dist;
 real prior_intercept_sd_location;
