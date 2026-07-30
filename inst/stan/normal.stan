@@ -57,12 +57,12 @@ transformed parameters {
         }
       }
 
-    // Add random‐baseline contribution to AgD arms
-    if (random_baseline == 1) {
-      for (i in 1:ni_agd_arm) {
-        eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_baseline[agd_arm_study[i]];
+      // Add random‐baseline contribution to AgD arms
+      if (random_baseline == 1) {
+        for (i in 1:ni_agd_arm) {
+          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_baseline[agd_arm_study[i]];
+        }
       }
-    }
 
       if (RE) {
         if (link == 1) { // identity link
@@ -99,24 +99,22 @@ transformed parameters {
         }
       }
     } else { // -- If no integration --
-      if (RE) {
 
-        // Add class effects contribution to the linear predictor
-        if (class_effects) {
-          for (i in 1:ni_agd_arm) {
-            if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
-              eta_agd_arm_noRE[i] += f_class[which_fclass[agd_arm_trt[i] - 1]];
-            }
-          }
-        }
-
-      // Add random‐baseline contribution when no integration
-      if (random_baseline) {
+      // Add class effects contribution to the linear predictor
+      if (class_effects) {
         for (i in 1:ni_agd_arm) {
-          eta_agd_arm_noRE[i] += f_baseline[agd_arm_study[i]];
+          if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+            eta_agd_arm_noRE[i] += f_class[which_fclass[agd_arm_trt[i] - 1]];
+          }
         }
       }
 
+      // Add random‐baseline contribution when no integration
+      if (random_baseline) {
+        eta_agd_arm_noRE += f_baseline[agd_arm_study];
+      }
+
+      if (RE) {
         if (link == 1) { // identity link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
@@ -133,21 +131,6 @@ transformed parameters {
           }
         }
       } else {
-        // Add class effects contribution to the linear predictor
-        if (class_effects) {
-          for (i in 1:ni_agd_arm) {
-            if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
-              eta_agd_arm_noRE[i] += f_class[which_fclass[agd_arm_trt[i] - 1]];
-            }
-          }
-        }
-
-        if (random_baseline) {
-          for (i in 1:ni_agd_arm) {
-            eta_agd_arm_noRE[i] += f_baseline[agd_arm_study[i]];
-          }
-        }
-
         if (link == 1) { // identity link
           theta_agd_arm_bar = eta_agd_arm_noRE;
         } else if (link == 2) { // log link

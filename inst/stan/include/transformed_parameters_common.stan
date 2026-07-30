@@ -115,9 +115,7 @@ if (ni_ipd) {
 
   // Add random baseline contribution
   if (random_baseline) {
-    for (i in 1:ni_ipd) {
-      eta_ipd[i] += f_baseline[ipd_study[ipd_arm[i]]];
-    }
+    eta_ipd += f_baseline[ipd_study[ipd_arm]];
   }
 }
 
