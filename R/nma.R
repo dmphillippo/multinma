@@ -2041,16 +2041,9 @@ nma.fit <- function(ipd_x, ipd_y,
   )
 
   # Add priors
-  if (connect_baseline_random){
-    standat <- purrr::list_modify(standat,
-      !!! prior_standat_list(prior_intercept, "prior_intercept",
-                             valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")))
-  } else {
   standat <- purrr::list_modify(standat,
-    !!! prior_standat(prior_intercept, "prior_intercept",
-                      valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")))
-  }
-  standat <- purrr::list_modify(standat,
+    !!! prior_standat_list(prior_intercept, "prior_intercept",
+                           valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
     !!! prior_standat(prior_intercept_sd, "prior_intercept_sd",
                       valid = c("Normal", "half-Normal", "log-Normal",
                                 "Cauchy",  "half-Cauchy",
@@ -3731,52 +3724,28 @@ prior_standat <- function(x, par, valid){
   # need to pass rstan checks
   out[is.na(out)] <- 0
   names(out) <- paste0(par, "_", names(out))
-  if (par == "prior_intercept")
-    out <- lapply(out, function(z) array(z, dim = 1L))
   return(out)
 }
 
-#’ To vectorise the list of intercept priors ready for stan
+#’ Vectorise a list of priors into array specs for Stan
 
-#' @param x a list of `nma_prior` object
+#' @param x a list of `nma_prior` objects
 #' @param par character string, giving the Stan root parameter name (e.g.
 #'   "prior_trt")
 #' @param valid character vector, giving valid distributions
 #'
 #' @noRd
 prior_standat_list <- function(x, par, valid) {
-  if (!purrr::every(unique(x), ~inherits(.x, "nma_prior"))) {
-    abort("All elements of prior_intercept must be `nma_prior` objects.")
-  }
-  dists  <- vapply(unique(x), `[[`, character(1), "dist")
-  dist   <- vapply(x, `[[`, character(1), "dist")
-  bad <- unique(dists[is.na(dists) | !(dists %in% valid)])
-  if (length(bad)) {
-    abort(glue::glue(
-      "Invalid `{par}` distribution{if (length(bad)>1) 's' else ''}: ",
-      "{glue::glue_collapse(bad, ', ', last = ', and ')}. ",
-      "Allowed: {glue::glue_collapse(valid, ', ', last = ', or ')}."
-    ))
-  }
-  dist_lookup <- c(
-    "flat (implicit)" = 0L,
-    "Normal"          = 1L,
-    "Cauchy"          = 2L,
-    "Student t"       = 3L
-  )
-  distn <- unname(as.integer(dist_lookup[dist]))
 
-  out <- list(
-    dist     = as.integer(distn),
-    location = unname(vapply(x, function(pr) pr$location, numeric(1))),
-    scale    = unname(vapply(x, function(pr) pr$scale,    numeric(1))),
-    df       = unname(vapply(x, function(pr) pr$df,       numeric(1)))
-  )
-  # Set unnecessary (NA) parameters to zero. These will be ignored by Stan, but
-  # need to pass rstan checks
-  out <- lapply(out, function(v) { v[is.na(v)] <- 0; v })
-  names(out) <- paste0(par, "_", names(out))
-  return(out)
+  if (inherits(x, "nma_prior")) x <- list(x)
+
+  if (!purrr::every(unique(x), ~inherits(.x, "nma_prior"))) {
+    abort(glue::glue("All elements of `{par}` must be `nma_prior` objects."))
+  }
+
+  purrr::map(x, prior_standat, par = par, valid = valid) %>%
+    purrr::list_transpose() %>%
+    purrr::map(as.array)
 }
 
 #' Get covariance structure contrast-based data, using se on baseline arm
@@ -4011,8 +3980,17 @@ con <- function(type = c("fixed", "random"),
     abort(glue::glue('`studies` must be a vector of study names of length > {switch(type, fixed = 2L, random = 1L)} for type = "{type}".'))
 
   if (type == "random") {
-    if (is.null(prior_baseline)) abort('`prior_baseline` must be provided when type = "random".')
+    if (is.null(prior_baseline)) {
+      abort('`prior_baseline` must be provided when type = "random".')
+    }
+
     check_prior(prior_baseline)
+
+    valid <- c("Normal", "Cauchy", "Student t", "flat (implicit)")
+    if (!prior_baseline$dist %in% valid) {
+        abort(glue::glue("Invalid `prior_baseline`. Suitable distributions are: ",
+                         glue::glue_collapse(valid, sep = ", ", last = ", or ")))
+    }
   } else {
     if (!is.null(prior_baseline)) {
       warn(glue::glue('Ignoring `prior_baseline` provided with type = "fixed" for stud{if (length(studies)  > 1) "ies" else "y"}: ',

@@ -587,13 +587,18 @@ test_that("con() argument checks", {
 
   expect_error(nma(disc_net, connect_baseline = con(type = "random",
                                                    studies = c("FIXTURE", "FEATURE"),
-                                                   prior_baseline = letters),),
+                                                   prior_baseline = letters)),
                "`prior_baseline` must be a prior distribution, see ?priors", fixed = TRUE)
 
   expect_error(nma(disc_net, connect_baseline = con(type = "random",
                                                    studies = c("FIXTURE", "FEATURE"),
-                                                   prior_baseline = list(normal(0, 1))),),
+                                                   prior_baseline = list(normal(0, 1)))),
                "`prior_baseline` must be a prior distribution, see ?priors", fixed = TRUE)
+
+  expect_error(nma(disc_net, connect_baseline = con(type = "random",
+                                                    studies = c("FIXTURE", "FEATURE"),
+                                                    prior_baseline = half_normal(1))),
+               "Invalid `prior_baseline`. Suitable distributions are", fixed = TRUE)
 })
 
 test_that("con() rejects studies from AgD-contrast data", {
