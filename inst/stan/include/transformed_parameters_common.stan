@@ -43,14 +43,9 @@ if (totns) {
 }
 
 if (random_baseline) {
-  real bmean = baseline_mean[1];
-  real bsd   = baseline_sd[1];
   f_baseline = rep_vector(0.0, totns);
-  for (i in 1:n_baseline_studies) {
-    int s = baseline_study_idx[i];
-    f_baseline[s] = bmean - mu[s] + bsd * z_baseline[i];
-    mu[s] = bmean + bsd * z_baseline[i];
-  }
+  f_baseline[baseline_study_idx] = baseline_mean[1] - mu[baseline_study_idx] + baseline_sd[1] * z_baseline;
+  mu[baseline_study_idx] = baseline_mean[1] + baseline_sd[1] * z_baseline;
 }
 
 // -- Treatment effects --
