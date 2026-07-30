@@ -744,3 +744,96 @@ test_that("nma() errors if still disconnected after con() applied", {
                   "stan_nma")
 })
 
+s1dat <- data.frame(study = "A", trt = "A", y = 0.5, se = 0.1)
+s2dat <- data.frame(study = "B", trt = "B", y = 1.5, se = 0.1)
+s3dat <- data.frame(study = "C", trt = "C", y = qnorm(seq(0.001, 0.999, length.out = 100), mean = 1, sd = 0.1))
+
+sdC <- sd(s3dat$y)
+
+net_aa <- combine_network(
+  set_agd_arm(s1dat, study, trt, y = y, se = se, allow_single_arm = TRUE),
+  set_agd_arm(s2dat, study, trt, y = y, se = se, allow_single_arm = TRUE)
+)
+
+net_ai <- combine_network(
+  set_agd_arm(s1dat, study, trt, y = y, se = se, allow_single_arm = TRUE),
+  set_ipd(s3dat, study, trt, y = y, allow_single_arm = TRUE)
+)
+
+net_aai <- combine_network(
+  set_agd_arm(s1dat, study, trt, y = y, se = se, allow_single_arm = TRUE),
+  set_agd_arm(s2dat, study, trt, y = y, se = se, allow_single_arm = TRUE),
+  set_ipd(s3dat, study, trt, y = y, allow_single_arm = TRUE)
+)
+
+test_that("basic correctness of fixed baseline connections", {
+  tol <- 0.05
+
+  fit_aa <- nma(net_aa,
+                connect_baseline = con("fixed", studies = c("A", "B")),
+                prior_intercept = normal(0, 100),
+                prior_trt = normal(0, 10))
+  s_aa <- as.data.frame(summary(fit_aa, pars ="d"))
+
+  expect_equal(s_aa$mean, 1, tolerance = tol)
+  expect_equal(s_aa$sd, sqrt(0.1^2 + 0.1^2), tolerance = tol)
+
+  fit_ai <- nma(net_ai,
+                connect_baseline = con("fixed", studies = c("A", "C")),
+                prior_intercept = normal(0, 100),
+                prior_trt = normal(0, 10),
+                prior_aux = half_normal(1))
+  s_ai <- as.data.frame(summary(fit_ai, pars ="d"))
+
+  expect_equal(s_ai$mean, 0.5, tolerance = tol)
+  expect_equal(s_ai$sd, sqrt(0.1^2 + sdC^2), tolerance = tol)
+
+  fit_aai <- nma(net_aai,
+                connect_baseline = con("fixed", studies = c("A", "B", "C")),
+                prior_intercept = normal(0, 100),
+                prior_trt = normal(0, 10),
+                prior_aux = half_normal(1))
+  s_aai <- as.data.frame(summary(fit_aai, pars ="d"))
+
+  expect_equal(s_aai$mean, c(1, 0.5), tolerance = tol)
+  expect_equal(s_aai$sd, c(sqrt(0.1^2 + 0.1^2), sqrt(0.1^2 + sdC^2)), tolerance = tol)
+})
+
+test_that("basic correctness of random baseline connections", {
+  tol <- 0.05
+
+  fit_aa <- nma(net_aa,
+                connect_baseline = con("random",
+                                       studies = "B",
+                                       prior_baseline = normal(-1, 0.2)),
+                prior_intercept = normal(0, 100),
+                prior_trt = normal(0, 10))
+  s_aa <- as.data.frame(summary(fit_aa, pars ="d"))
+
+  expect_equal(s_aa$mean, 2.5, tolerance = tol)
+  expect_equal(s_aa$sd, sqrt(0.1^2 + 0.2^2 + 0.1^2), tolerance = tol)
+
+  fit_ai <- nma(net_ai,
+                connect_baseline = con("random",
+                                       studies = "C",
+                                       prior_baseline = normal(-1, 0.2)),
+                prior_intercept = normal(0, 100),
+                prior_trt = normal(0, 10),
+                prior_aux = half_normal(1))
+  s_ai <- as.data.frame(summary(fit_ai, pars ="d"))
+
+  expect_equal(s_ai$mean, 2, tolerance = tol)
+  expect_equal(s_ai$sd, sqrt(0.1^2 + 0.2^2 + sdC^2), tolerance = tol)
+
+  fit_aai <- nma(net_aai,
+                 connect_baseline = con("random",
+                                        studies = c("B", "C"),
+                                        prior_baseline = normal(-1, 0.2)),
+                 prior_intercept = normal(0, 100),
+                 prior_trt = normal(0, 10),
+                 prior_aux = half_normal(1))
+  s_aai <- as.data.frame(summary(fit_aai, pars ="d"))
+
+  expect_equal(s_aai$mean, c(2.5, 2), tolerance = tol)
+  expect_equal(s_aai$sd, c(sqrt(0.1^2 + 0.2^2 + 0.1^2), sqrt(0.1^2 + 0.2^2 + sdC^2)), tolerance = tol)
+})
