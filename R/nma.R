@@ -868,6 +868,7 @@ nma <- function(network,
   # Notify if default reference treatment is used
   if (.is_default(network$treatments))
     inform(glue::glue('Note: Setting "{levels(network$treatments)[1]}" as the network reference treatment.'))
+
   # Error if network is disconnected (must use baseline_synthesis() or connect_baseline instead)
   if (!is_network_connected(network) && is.null(baseline_subnet) && is.null(connect_baseline))
     abort("Network is disconnected. See ?is_network_connected for more details.")
@@ -885,6 +886,7 @@ nma <- function(network,
     subnetwork_trt        <- id_map[as.character(raw_subnet)]
     names(subnetwork_trt) <- names(raw_subnet)
   }
+
   # Notify if reference treatment is within a class when running the exchangeable class model
   if (class_effects == "exchangeable" && !is.null(network$classes)) {
     ref_trt <- levels(network$treatments)[1]
@@ -1143,31 +1145,29 @@ nma <- function(network,
   offset_agd_arm <- X_list$offset_agd_arm
   offset_agd_contrast <- X_list$offset_agd_contrast
 
-  # Compute baseline study indices (for random baseline hierarchy)
-  {
-    X_check <- if (!is.null(X_ipd)) X_ipd else if (!is.null(X_agd_arm)) X_agd_arm else X_agd_contrast
-    x_nms   <- colnames(X_check)
-    col_sty <- grepl("^\\.study[^:]+$", x_nms)
-    sty_nms <- sub("^\\.study", "", x_nms[col_sty])
+  # Compute indices for studies in random baseline model, for picking out elements of f_baseline
+  X_check <- if (!is.null(X_ipd)) X_ipd else if (!is.null(X_agd_arm)) X_agd_arm else X_agd_contrast
+  x_nms   <- colnames(X_check)
+  col_sty <- grepl("^\\.study[^:]+$", x_nms)
+  sty_nms <- sub("^\\.study", "", x_nms[col_sty])
 
-    if (!is.null(subnetwork_trt) && !is.null(baseline_subnet)) {
-      all_study_trt <- dplyr::bind_rows(
-        if (has_ipd(network)) dplyr::distinct(dat_ipd,
-          .study = as.character(.data$.study), .trt = as.character(.data$.trt)) else NULL,
-        if (has_agd_arm(network)) dplyr::distinct(idat_agd_arm,
-          .study = as.character(.data$.study), .trt = as.character(.data$.trt)) else NULL
-      )
-      bl_studies <- all_study_trt %>%
-        dplyr::mutate(.sn = subnetwork_trt[.data$.trt]) %>%
-        dplyr::filter(.data$.sn == baseline_subnet) %>%
-        dplyr::pull(.data$.study) %>%
-        unique()
-      baseline_study_idx <- which(sty_nms %in% bl_studies)
-      n_baseline_studies <- length(baseline_study_idx)
-    } else {
-      n_baseline_studies <- length(sty_nms)
-      baseline_study_idx <- seq_len(n_baseline_studies)
-    }
+  if (!is.null(subnetwork_trt) && !is.null(baseline_subnet)) {
+    all_study_trt <- dplyr::bind_rows(
+      if (has_ipd(network)) dplyr::distinct(dat_ipd,
+        .study = as.character(.data$.study), .trt = as.character(.data$.trt)) else NULL,
+      if (has_agd_arm(network)) dplyr::distinct(idat_agd_arm,
+        .study = as.character(.data$.study), .trt = as.character(.data$.trt)) else NULL
+    )
+    bl_studies <- all_study_trt %>%
+      dplyr::mutate(.sn = subnetwork_trt[.data$.trt]) %>%
+      dplyr::filter(.data$.sn == baseline_subnet) %>%
+      dplyr::pull(.data$.study) %>%
+      unique()
+    baseline_study_idx <- which(sty_nms %in% bl_studies)
+    n_baseline_studies <- length(baseline_study_idx)
+  } else {
+    n_baseline_studies <- length(sty_nms)
+    baseline_study_idx <- seq_len(n_baseline_studies)
   }
 
   # Construct RE correlation matrix
@@ -1364,24 +1364,25 @@ nma <- function(network,
     aux_group <- aux_id
   }
 
-if (class_effects == "exchangeable") {
-  # Create class design vector for class means
-  class_mean_design <- which_CE(network$classes, class_sd)
+  if (class_effects == "exchangeable") {
+    # Create class design vector for class means
+    class_mean_design <- which_CE(network$classes, class_sd)
 
-  # Create class design vector for class SDs
-  if (is.list(class_sd)) {
-    class_sd_design <- which_CE(forcats::fct_collapse(network$classes, !!!class_sd), class_sd)
-  } else if (class_sd == "common") {
-    class_sd_design <- list(
-      # Change non-zero class IDs to 1
-      id = pmin(class_mean_design$id, 1),
-      # Set common class label
-      label = "All Classes"
-    )
-  } else if (class_sd == "independent") {
-    class_sd_design <- class_mean_design
+    # Create class design vector for class SDs
+    if (is.list(class_sd)) {
+      class_sd_design <- which_CE(forcats::fct_collapse(network$classes, !!!class_sd), class_sd)
+    } else if (class_sd == "common") {
+      class_sd_design <- list(
+        # Change non-zero class IDs to 1
+        id = pmin(class_mean_design$id, 1),
+        # Set common class label
+        label = "All Classes"
+      )
+    } else if (class_sd == "independent") {
+      class_sd_design <- class_mean_design
+    }
   }
-}
+
   # Fit using nma.fit
   stanfit <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
     agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
@@ -1401,8 +1402,8 @@ if (class_effects == "exchangeable") {
     likelihood = likelihood,
     link = link,
     consistency = consistency,
-    connect_baseline_random = connect_baseline_random,
     mixed_studies = mixed_studies,
+    connect_baseline_random = connect_baseline_random,
     n_baseline_studies = n_baseline_studies,
     baseline_study_idx = baseline_study_idx,
     ...,
