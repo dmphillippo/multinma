@@ -52,6 +52,10 @@ print.stan_nma <- function(x, ...) {
   } else {
     cglue("A {x$trt_effects} effects {type} with a {x$likelihood} likelihood ({x$link} link).")
   }
+  if (!is.null(x$connect_baseline)) {
+    con_type <- x$connect_baseline[[1]]$type
+    cglue("Connected study baselines with a {con_type} baseline model.")
+  }
   if (x$likelihood %in% c("mspline", "pexp")) {
     deg <- switch(x$likelihood,
                   mspline = switch(attr(x$basis[[1]], 'degree'),
