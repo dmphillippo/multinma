@@ -1606,7 +1606,7 @@ nma <- function(network,
 
   if (likelihood %in% c("mspline", "pexp")) out$basis <- basis
   if (!is.null(connect_baseline)) out$connect_baseline <- connect_baseline
-  if (!is.null(baseline_subnet)) out$baseline_studies <- forcats::fct_drop(factor(bl_studies, levels = levels(network$studies)))
+  if (!is.null(baseline_subnet)) out$baseline_studies <- sort(forcats::fct_drop(factor(bl_studies, levels = levels(network$studies))))
 
   if (inherits(network, "mlnmr_data")) class(out) <- c("stan_mlnmr", "stan_nma")
   else class(out) <- "stan_nma"
