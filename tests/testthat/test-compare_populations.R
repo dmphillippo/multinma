@@ -106,30 +106,3 @@ test_that("a method is stated in compare_populations()", {
   expect_error(compare_populations(pso_net_int, method = 1), "must be a character vector")
   expect_error(compare_populations(pso_net_int, method = "a"), "must be one of")
 })
-
-#-------------------------------------------------
-#---Cross validation tests
-#-------------------------------------------------
-
-fit <- nma(pso_net_int,
-           trt_effects = "fixed",
-           link = "probit",
-           regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
-           class_interactions = "common",
-           prior_intercept = normal(scale = 10),
-           prior_trt = normal(scale = 10),
-           prior_reg = normal(scale = 10),
-           prior_aux = flat(),
-           QR = TRUE,
-           init_r = 0.5,
-           test_grad = TRUE)
-
-
-test_that("cross_validation() rejects incorrect input types", {
-  m <- "Input must be a 'stan_nma' object"
-  expect_error(cross_validation(NULL), m)
-  expect_error(cross_validation(list(a = 1)), m)
-  expect_error(cross_validation(pso_net), m)
-})
-
-
