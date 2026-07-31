@@ -811,7 +811,7 @@ test_that("basic correctness of random baseline connections", {
   s_aa <- as.data.frame(summary(fit_aa, pars ="d"))
 
   expect_equal(s_aa$mean, 2.5, tolerance = tol)
-  expect_equal(s_aa$sd, sqrt(0.1^2 + 0.2^2 + 0.1^2), tolerance = tol)
+  expect_equal(s_aa$sd, sqrt(0.2^2 + 0.1^2), tolerance = tol)
 
   fit_ai <- nma(net_ai,
                 connect_baseline = con("random",
@@ -823,7 +823,7 @@ test_that("basic correctness of random baseline connections", {
   s_ai <- as.data.frame(summary(fit_ai, pars ="d"))
 
   expect_equal(s_ai$mean, 2, tolerance = tol)
-  expect_equal(s_ai$sd, sqrt(0.1^2 + 0.2^2 + sdC^2), tolerance = tol)
+  expect_equal(s_ai$sd, sqrt(0.2^2 + sdC^2), tolerance = tol)
 
   fit_aai <- nma(net_aai,
                  connect_baseline = con("random",
@@ -835,5 +835,5 @@ test_that("basic correctness of random baseline connections", {
   s_aai <- as.data.frame(summary(fit_aai, pars ="d"))
 
   expect_equal(s_aai$mean, c(2.5, 2), tolerance = tol)
-  expect_equal(s_aai$sd, c(sqrt(0.1^2 + 0.2^2 + 0.1^2), sqrt(0.1^2 + 0.2^2 + sdC^2)), tolerance = tol)
+  expect_equal(s_aai$sd, c(sqrt(0.2^2 + 0.1^2), sqrt(0.2^2 + sdC^2)), tolerance = tol)
 })
