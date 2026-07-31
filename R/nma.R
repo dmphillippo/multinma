@@ -478,14 +478,14 @@ nma <- function(network,
   if (is.list(class_sd)) {
     # Check that all classes listed in 'class_sd' are in 'network$classes'
     if (!all(unlist(class_sd) %in% network$classes)) {
-      stop("Some classes listed in 'class_sd' are not present in the network.")
+      abort("Some classes listed in `class_sd` are not present in the network.")
     }
 
 
     # Check that all the collapsed classes are distinct and don't share a class
     flattened_classes <- unlist(class_sd)
     if (length(flattened_classes) != length(unique(flattened_classes))) {
-      stop("Some classes are listed in more than one shared standard deviation group in 'class_sd'")
+      abort("Some classes are listed in more than one shared standard deviation group in `class_sd`")
     }
   } else {
     class_sd <- rlang::arg_match(class_sd)
