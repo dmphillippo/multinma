@@ -83,7 +83,7 @@ print.stan_nma <- function(x, ...) {
   sf <- as.stanfit(x)
   dots <- list(...)
   if (inherits(x, "stan_baseline") && !"pars" %in% names(dots)) {
-    pars <- c("baseline_new", "baseline_mean", "baseline_sd", "mu", "lp__")
+    pars <- c("baseline_new", "baseline_mean", "baseline_sd", paste0("mu[", x$baseline_studies, "]"), "lp__")
     include <- TRUE
   } else {
     include <- "pars" %in% names(dots)
@@ -167,7 +167,7 @@ summary.stan_nma <- function(object, ...,
 
   # Set defaults for pars, include
   if (inherits(object, "stan_baseline") && missing(pars)) {
-    pars <- c("baseline_new", "baseline_mean", "baseline_sd", "mu")
+    pars <- c("baseline_new", "baseline_mean", "baseline_sd", paste0("mu[", object$baseline_studies, "]"))
     include <- TRUE
   }
   if (missing(include)) {
