@@ -268,7 +268,8 @@ test_that("TSD5 smoking cessation - simultaneous modelling", {
                             prior_intercept = normal(scale = 100),
                             prior_trt = normal(scale = 100),
                             prior_het = normal(scale = 5),
-                            prior_intercept_sd = half_normal(2.5))
+                            prior_intercept_sd = half_normal(2.5),
+                            iter = 10000)
 
 
   tol <- 0.05
@@ -302,7 +303,8 @@ test_that("TSD5 smoking cessation - separate modelling", {
                             prior_intercept = normal(scale = 100),
                             prior_trt = normal(scale = 100),
                             prior_het = normal(scale = 5),
-                            prior_intercept_sd = half_normal(2.5))
+                            prior_intercept_sd = half_normal(2.5),
+                            iter = 10000)
 
 
   tol <- 0.05
