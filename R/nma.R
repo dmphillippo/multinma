@@ -1593,7 +1593,6 @@ nma <- function(network,
               likelihood = likelihood,
               link = link,
               aux_by = if (has_aux_by) colnames(get_aux_by_data(aux_dat, by = aux_by)) else NULL,
-              connect_baseline = connect_baseline,
               priors = list(prior_intercept = if (has_intercepts) prior_intercept else NULL,
                             prior_intercept_sd = if (random_baseline) prior_intercept_sd else NULL,
                             prior_trt = prior_trt,
@@ -1606,7 +1605,8 @@ nma <- function(network,
                             prior_aux_reg = if (has_aux_regression) prior_aux_reg else NULL))
 
   if (likelihood %in% c("mspline", "pexp")) out$basis <- basis
-  if (!is.null(baseline_subnet)) out$baseline_study_idx <- baseline_study_idx
+  if (!is.null(connect_baseline)) out$connect_baseline <- connect_baseline
+  if (!is.null(baseline_subnet)) out$baseline_studies <- forcats::fct_drop(factor(bl_studies, levels = levels(network$studies)))
 
   if (inherits(network, "mlnmr_data")) class(out) <- c("stan_mlnmr", "stan_nma")
   else class(out) <- "stan_nma"
