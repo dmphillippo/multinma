@@ -104,21 +104,21 @@ test_that("AgD, IPD, and mixed analysis identical", {
                        prior_intercept = normal(0, 10),
                        prior_intercept_sd = half_normal(0.1),
                        prior_trt = normal(0, 1),
-                       iter = 20000))
+                       iter = 30000))
 
   fit_i <- suppressWarnings(
              baseline_synthesis(bnet_i,
                               prior_intercept = normal(0, 10),
                               prior_intercept_sd = half_normal(0.1),
                               prior_trt = normal(0, 1),
-                              iter = 20000))
+                              iter = 30000))
 
   fit_ai <- suppressWarnings(
              baseline_synthesis(bnet_ai,
                               prior_intercept = normal(0, 10),
                               prior_intercept_sd = half_normal(0.1),
                               prior_trt = normal(0, 1),
-                              iter = 20000))
+                              iter = 30000))
 
   s_a <- as.data.frame(summary(fit_a)) %>% select(-"Bulk_ESS", -"Tail_ESS", -"Rhat")
   s_i <- as.data.frame(summary(fit_i)) %>% select(-"Bulk_ESS", -"Tail_ESS", -"Rhat")
