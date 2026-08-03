@@ -45,13 +45,15 @@ compare_populations <- function(network,
 
   # Check covariates argument
   if (is.null(covariates)) {
-    if (method == "euclidean" || length(int_covariates) < 1) {
+    if (method == "euclidean" && length(int_covariates) < 1) {
       abort('Please provide `covariates` to compare on when method = "euclidean"')
+    } else if (method == "propensity" && length(int_covariates) < 1) {
+      abort('Please provide `covariates` to compare on')
     } else {
       covariates <- int_covariates
       inform(paste0("Comparing on all covariates with integration points: ", paste(covariates, collapse = ", ")))
     }
-  } else {
+  } else if (has_agd_arm(network) || has_agd_contrast(network)) {
     missing_covs <- setdiff(covariates, int_covariates)
     if (length(missing_covs) > 0) {
       abort(c(paste0("Cannot compare requested covariates missing integration points: ",
