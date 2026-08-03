@@ -1,12 +1,25 @@
-#' Comparing population covariates
+#' Compare population covariate distributions
 #'
-#' Runs distance tests between multivariate distributions across studies.
+#' Covariate distributions for studies in the network may be compared by overlap
+#' effective sample size (via propensity scores) or by (standardised) Euclidean
+#' distance between the covariate means. The overlap effective sample size
+#' accounts for the full multivariate joint distribution of the covariates,
+#' whereas the Euclidean distance between the covariate means only accounts for
+#' the location and not the range of variation or joint structure.
 #'
-#' @param network An `nma_data` object.
-#' @param covariates Character vector of covariate names. Cannot accept categorical variables.
-#' @param method Character; "euclidean", or "propensity". Determines the distance calculation method.
+#' @param network An `nma_data` network object.
+#' @param covariates Character vector of covariate names to compare on.
+#' @param method Method to compare distributions, either `"propensity"` to
+#' calculate overlap effective sample size with propensity scores, or
+#' `"euclidean"` to calculate standardised Euclidean distance between means.
+#' @param na_action Optional function (or function name) for handling missing
+#'   IPD covariate values, passed to
+#'   \code{\link[stats:model.matrix]{model.matrix()}}. The default is to remove
+#'   IPD observations with NAs with a warning. Missing values in the AgD will
+#'   always give an error.
 #'
-#' @return A list with a `summary` dataframe and `distance_matrix`.
+#' @return A `pop_diff` object, containing a `summary` data frame and
+#'   `comparison_matrix` matrix of pairwise comparisons.
 #'
 #' @importFrom stats glm model.matrix predict weighted.mean sd var weights
 #' @export
