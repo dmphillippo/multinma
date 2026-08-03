@@ -2,24 +2,61 @@
 % Please edit documentation in R/compare_populations.R
 \name{compare_populations}
 \alias{compare_populations}
-\title{Comparing population covariates}
+\alias{print.pop_comp}
+\title{Compare population covariate distributions}
 \usage{
 compare_populations(
   network,
   covariates = NULL,
   method = c("propensity", "euclidean")
 )
+
+\method{print}{pop_comp}(
+  x,
+  order = c("decreasing", "increasing"),
+  simplify = TRUE,
+  ...,
+  digits = 2L,
+  n = 10
+)
 }
 \arguments{
-\item{network}{An \code{nma_data} object.}
+\item{network}{An \code{nma_data} network object.}
 
-\item{covariates}{Character vector of covariate names. Cannot accept categorical variables.}
+\item{covariates}{Character vector of covariate names to compare on.}
 
-\item{method}{Character; "euclidean", or "propensity". Determines the distance calculation method.}
+\item{method}{Method to compare distributions, either \code{"propensity"} to
+calculate overlap effective sample size with propensity scores, or
+\code{"euclidean"} to calculate standardised Euclidean distance between means.}
+
+\item{x}{A \code{pop_comp} object produced by \code{compare_populations()}}
+
+\item{order}{String, the order in which to display the comparison summaries.
+Either \code{"decreasing"}, to list most similar studies first (the default), or
+\code{"increasing"} to list most dissimilar studies first.}
+
+\item{simplify}{Logical, should the output be simplified to only show
+comparisons between subnetworks (\code{TRUE}, default), or between every study
+in the network (\code{FALSE})? If a connected network was provided, then
+\code{simplify} is always \code{FALSE}.}
+
+\item{...}{Additional arguments (unused)}
+
+\item{digits}{Number of digits to print in the summary, default 2}
+
+\item{n}{Number of rows to show in the table of study summaries}
 }
 \value{
-A list with a \code{summary} dataframe and \code{distance_matrix}.
+A \code{pop_comp} object, containing a \code{summary} data frame and
+\code{comparison_matrix} matrix of pairwise comparisons.
+When \code{method = "propensity"}, a list \code{propensity_scores} of data frames of
+fitted propensity scores will also be included.
 }
 \description{
-Runs distance tests between multivariate distributions across studies.
+Covariate distributions for studies in the network may be compared by overlap
+effective sample size (via propensity scores) or by (standardised) Euclidean
+distance between the covariate means. The overlap effective sample size
+accounts for the full multivariate joint distribution of the covariates,
+whereas the Euclidean distance between the covariate means only accounts for
+the location and not the range of variation or joint structure.
 }
