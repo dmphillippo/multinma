@@ -244,32 +244,14 @@ compare_populations <- function(network,
       propensity_scores = propensity_scores
     )
 
-      sub1 <- dplyr::filter(study_components, .data$subnetwork == 1)$.study
+  } else if (method == "euclidean") {
 
-  # ==========================================
-  # METHOD: EUCLIDEAN
-  # ==========================================
-  if (method == "euclidean") {
-
-    # Validation
-    if (isTRUE(nrow(network$agd_contrast) > 0)) {
-      # Check if the specific column ".sample_size" is MISSING
-      if (!".sample_size" %in% colnames(network$agd_contrast)) {
-        abort("Aggregate contrast data must contain a '.sample_size' column.")
-      }
-    }
-
-    # Process IPD: Convert logical to numeric and average by study
-    if (nrow(network$ipd) > 0) {
-      ipd_covariate_data <- network$ipd
-      ipd_covariate_data[covariates] <- lapply(ipd_covariate_data[covariates], function(x) {
-        if (is.logical(x)) as.numeric(x) else x
-      })
-      ipd_summary <- ipd_covariate_data %>%
+    if (has_ipd(network)) {
+      ipd_summary <- dplyr::mutate(ipd_covs, .study = ipd_study) %>%
         dplyr::group_by(.data$.study) %>%
         dplyr::summarise(
-          total_n = dplyr::n(),
-          dplyr::across(dplyr::all_of(covariates), list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE))),
+          original_n = dplyr::n(),
+          dplyr::across(dplyr::all_of(covariates), list(mean = mean, sd = sd)),
           .groups = "drop"
         )
     }
