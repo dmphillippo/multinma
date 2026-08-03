@@ -474,3 +474,93 @@ na_omit_warn <- function(object, ...) {
   return(out)
 }
 
+
+#' @param x A `pop_comp` object produced by `compare_populations()`
+#' @param order String, the order in which to display the comparison summaries.
+#'   Either `"decreasing"`, to list most similar studies first (the default), or
+#'   `"increasing"` to list most dissimilar studies first.
+#' @param simplify Logical, should the output be simplified to only show
+#'   comparisons between subnetworks (`TRUE`, default), or between every study
+#'   in the network (`FALSE`)? If a connected network was provided, then
+#'   `simplify` is always `FALSE`.
+#' @param ... Additional arguments (unused)
+#' @param digits Number of digits to print in the summary, default 2
+#' @param n Number of rows to show in the table of study summaries
+#'
+#' @export
+#' @rdname compare_populations
+print.pop_comp <- function(x,
+                           order = c("decreasing", "increasing"),
+                           simplify = TRUE, ..., digits = 2L, n = 10) {
+
+  order <- rlang::arg_match(order)
+  if (!rlang::is_bool(simplify))
+    abort("`simplify` must be TRUE or FALSE.")
+  if (!rlang::is_integerish(digits, n = 1, finite = TRUE) || digits < 0)
+    abort("`digits` must be a single non-negative integer.")
+  if (!rlang::is_integerish(x = n, n = 1, finite = TRUE) || n < 1)
+    abort("`n` must be a single positive integer.")
+
+
+  m <- switch(x$method,
+              propensity = "propensity score overlap",
+              euclidean = "standardised Euclidean distance")
+  cglue("Compared populations using {m}, based on the following covariates: ",
+        "{glue::glue_collapse(x$covariates, sep = ', ', last = ' and ')}.")
+  cat("\n")
+
+
+  sec_header(glue::glue("Pairwise comparisons in {order} order of similarity"))
+
+  ncomp <- max(x$components$component)
+  if (ncomp > 2) {
+    cglue(subtle("Subnetwork shown in brackets next to study name."))
+  }
+
+  x_sum <- x$summary
+  num_col <- setdiff(names(x_sum)[purrr::map_lgl(x_sum, is.numeric)], "original_n")
+
+  if (simplify && ncomp > 1) {
+    comp_lookup <- setNames(x$components$component, x$components$.study)
+
+    # Add component numbers if more than 2 components
+    if (ncomp > 2) {
+      x_sum$comparison <- paste0(x_sum$study1, " (", comp_lookup[x_sum$study1], ") vs. ",
+                                 x_sum$study2, " (", comp_lookup[x_sum$study2], ")")
+    }
+
+    # Show only comparisons across subnetworks
+    x_sum <- dplyr::filter(x_sum, comp_lookup[study1] != comp_lookup[study2])
+  }
+
+  x_sum <- dplyr::mutate_at(x_sum, num_col, ~round(., digits)) %>%
+    dplyr::select(-"study1", -"study2") %>%
+    as.data.frame()
+
+  names(x_sum)[names(x_sum) == "comparison"] <- ""
+
+  print(head(x_sum, n = n), row.names = FALSE)
+
+  if (nrow(x_sum) > n) {
+    cglue(subtle(" ... plus {nrow(x_sum) - n} more comparisons"))
+  }
+
+  cat("\n")
+  sec_header("Matrix of pairwise comparisons")
+
+  mat <- round(x$comparison_matrix, digits)
+
+  if (simplify && ncomp > 1) {
+    for (c1 in 1:(ncomp - 1)) for (c2 in 2:ncomp) {
+      cat("Subnetwork ", c2, " vs. ", c1, ":\n", sep = "")
+      s1 <- which(comp_lookup == c1)
+      s2 <- which(comp_lookup == c2)
+      print(mat[s1, s2])
+      cat("\n")
+    }
+  } else {
+    print(mat)
+  }
+
+}
+
