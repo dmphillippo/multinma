@@ -232,49 +232,13 @@ compare_populations <- function(network,
       sorted_matrix[s2, s1] <- val
     }
 
-    # Detect subnetworks
-    g <- igraph::as.igraph(network)
-    components <- igraph::components(g)
-    treatment_components <- data.frame(
-      .trt = names(components$membership),
-      subnetwork = components$membership
-    )
-
-    study_trt_lookup <- list(network$ipd, network$agd_contrast, network$agd_arm) %>%
-      purrr::compact() %>%
-      purrr::map_dfr(~ {
-        if (all(c(".study", ".trt") %in% colnames(.x))) {
-          dplyr::tibble(.study = as.character(.x$.study), .trt = as.character(.x$.trt))
-        } else {
-          NULL
-        }
-      }) %>%
-      dplyr::distinct()
-
-    study_components <- study_trt_lookup %>%
-      dplyr::left_join(treatment_components, by = ".trt") %>%
-      dplyr::select(-".trt") %>%
-      dplyr::distinct(.data$.study, .data$subnetwork)
-
-    output_list <- list(
-      propensity_scores = propensity_scores,
+    out <- list(
       summary = ess_summary,
-      full_matrix = sorted_matrix
+      comparison_matrix = sorted_matrix,
+      propensity_scores = propensity_scores
     )
 
-    if (max(study_components$subnetwork) == 2) {
       sub1 <- dplyr::filter(study_components, .data$subnetwork == 1)$.study
-      sub2 <- dplyr::filter(study_components, .data$subnetwork == 2)$.study
-      output_list$subnetwork_matrix <- sorted_matrix[
-        rownames(sorted_matrix) %in% sub1,
-        colnames(sorted_matrix) %in% sub2,
-        drop = FALSE
-      ]
-    }
-
-    return(output_list)
-
-  }
 
   # ==========================================
   # METHOD: EUCLIDEAN
