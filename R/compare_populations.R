@@ -45,6 +45,12 @@ compare_populations <- function(network,
     }
   }
 
+  # Need AgD sample sizes
+  if (!has_agd_sample_size(network)) {
+    abort(c("AgD sample sizes must be available.",
+            "Provide these using the `sample_size` argument in set_agd_*()."))
+  }
+
   # Check covariates argument
   if (is.null(covariates)) {
     if (method == "euclidean" && length(int_covariates) < 1) {
@@ -89,7 +95,6 @@ compare_populations <- function(network,
   if (has_agd_arm(network)) {
     if (method == "propensity") {
       # Resample integration points with n_int = .sample_size
-
       ds <- purrr::map(rlang::list2(!!! network$int_call), rlang::eval_tidy)
 
       dat_agd_arm <- network$agd_arm %>%
@@ -128,7 +133,6 @@ compare_populations <- function(network,
   if (has_agd_contrast(network)) {
     if (method == "propensity") {
       # Resample integration points with n_int = .sample_size
-
       ds <- purrr::map(rlang::list2(!!! network$int_call), rlang::eval_tidy)
 
       dat_agd_contrast <- network$agd_contrast %>%
