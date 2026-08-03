@@ -37,22 +37,33 @@ compare_populations <- function(network,
     abort("Expecting an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
   }
 
-  # Check for integration call
-  if (is.null(network$int_call)) {
-    abort(c('Integration points must be present for type = "propensity".',
-            'Set up integration points using `add_integration()` to define the covariate distributions, or set type = "euclidean" to compare means.'))
+  # Check for integration call if AgD present
+  if (method == "propensity") {
+    if ((has_agd_arm(network) || has_agd_contrast(network))) {
+      if (is.null(network$int_call)) {
+        abort(c('Integration points must be present for method = "propensity".',
+                'Set up integration points using `add_integration()` to define the covariate distributions, or set method = "euclidean" to compare means.'))
+      } else {
+        int_covariates <- names(network$int_call)
+      }
+    } else {
+      int_covariates <- character()
+    }
   }
-  avail_covariates <- names(network$int_call)
 
-  # Checks for covariates argument
+  # Check covariates argument
   if (is.null(covariates)) {
-    covariates <- avail_covariates
-    inform(paste0("Comparing on all covariates with integration points: ", paste(covariates, collapse = ", ")))
+    if (method == "euclidean" || length(int_covariates) < 1) {
+      abort('Please provide `covariates` to compare on when method = "euclidean"')
+    } else {
+      covariates <- int_covariates
+      inform(paste0("Comparing on all covariates with integration points: ", paste(covariates, collapse = ", ")))
+    }
   } else {
-    missing_covs <- setdiff(covariates, avail_covariates)
+    missing_covs <- setdiff(covariates, int_covariates)
     if (length(missing_covs) > 0) {
       abort(c(paste0("Cannot compare requested covariates missing integration points: ",
-                   paste(missing_covs, collapse = ", "),
+                     paste(missing_covs, collapse = ", "),
                    "."), "Set up integration points using `add_integration()`."))
     }
   }
