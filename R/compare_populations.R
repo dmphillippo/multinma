@@ -109,13 +109,13 @@ compare_populations <- function(network,
         ps <- stats::predict(model, newdata = combined_df, type = "response")
 
         combined_df$propensity_score <- ps
-        combined_df$ate_weight <- ifelse(
+        combined_df$overlap_weight <- ifelse(
           combined_df$study_indicator == 1L,
           1 / ps,
           1 / (1 - ps)
         )
 
-        w <- combined_df$ate_weight
+        w <- combined_df$overlap_weight
         ess <- sum(w)^2 / sum(w^2)
 
         pair_name <- paste(s1, s2, sep = "_vs_")
