@@ -202,7 +202,7 @@ compare_populations <- function(network,
         w <- combined_df$overlap_weight
         ess <- sum(w)^2 / sum(w^2)
 
-        pair_name <- paste(s1, s2, sep = "_vs_")
+        pair_name <- paste(s1, s2, sep = " vs. ")
         propensity_scores[[pair_name]] <- combined_df
 
         ess_rows[[k]] <- dplyr::tibble(
