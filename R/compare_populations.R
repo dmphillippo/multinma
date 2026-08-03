@@ -32,17 +32,19 @@ compare_populations <- function(network,
   }
 
   # Check for integration call if AgD present
-  if (method == "propensity") {
-    if ((has_agd_arm(network) || has_agd_contrast(network))) {
-      if (is.null(network$int_call)) {
+  if ((has_agd_arm(network) || has_agd_contrast(network))) {
+    if (is.null(network$int_call)) {
+      if (method == "propensity") {
         abort(c('Integration points must be present for method = "propensity".',
                 'Set up integration points using `add_integration()` to define the covariate distributions, or set method = "euclidean" to compare means.'))
       } else {
-        int_covariates <- names(network$int_call)
+        int_covariates <- character()
       }
     } else {
-      int_covariates <- character()
+      int_covariates <- names(network$int_call)
     }
+  } else {
+    int_covariates <- character()
   }
 
   # Need AgD sample sizes
