@@ -68,38 +68,70 @@ compare_populations <- function(network,
     }
   }
 
-  # ==========================================
-  # METHOD: PROPENSITY
-  # ==========================================
-  if (method == "propensity") {
+  # Get covariates
+  cov_formula <- as.formula(paste0("~", paste(covariates, collapse = " + ")))
+  if (has_ipd(network)) {
+    dat_ipd <- network$ipd
+    withCallingHandlers(
+      ipd_covs <- as.data.frame(model.matrix(cov_formula, dat_ipd, na.action = na_action)[, -1]),
+      error = ~abort(paste0("Failed to get IPD covariate data.\n", .)))
+    ipd_study <- dat_ipd$.study
+  }
 
-    # Prepare IPD Data
-    if (!isTRUE(nrow(network$ipd) > 0)) {
-      abort("IPD must be present when wanting to compare populations using method = `propensity`")
-    }
+  if (has_agd_arm(network)) {
+    if (method == "propensity") {
+      # Resample integration points with n_int = .sample_size
 
-    ipd_df <- as.data.frame(
-      lapply(network$ipd[c(covariates, ".study")], function(x) if (is.logical(x)) as.numeric(x) else x)
-    )
-    ipd_covariate_data <- split(ipd_df[covariates], ipd_df$.study, drop = TRUE)
+      ds <- purrr::map(rlang::list2(!!! network$int_call), rlang::eval_tidy)
 
-    # Prepare AGD Data: unnest existing integration points, combine arms within each study
-    agd_covariate_data <- if (isTRUE(nrow(network$agd_arm) > 0)) {
-      agd_study_labels <- as.character(network$agd_arm$.study)
-      arm_data <- lapply(seq_len(nrow(network$agd_arm)), function(i) {
-        unnested <- unnest_integration(network$agd_arm[i, , drop = FALSE])
-        unnested[covariates]
-      })
-      names(arm_data) <- agd_study_labels
-      # Combine arms that belong to the same study
-      lapply(split(arm_data, agd_study_labels), function(arms) do.call(rbind, arms))
+      dat_agd_arm <- network$agd_arm %>%
+        dplyr::select(-dplyr::starts_with(".int_")) %>%
+        dplyr::group_by(.data$.study, .data$.trt) %>%
+        dplyr::group_modify(~rlang::exec(add_integration, x = .x,
+                                         !!! ds,
+                                         n_int = .x$.sample_size,
+                                         cor = network$int_cor)) %>%
+        .unnest_integration()
+
+    } else if (!is.null(network$int_call)) {
+      dat_agd_arm <- .unnest_integration(network$agd_arm)
     } else {
-      list()
+      dat_agd_arm <- network$agd_arm
     }
 
-    all_data <- c(ipd_covariate_data, agd_covariate_data)
-    study_names <- names(all_data)
-    n_studies <- length(all_data)
+    withCallingHandlers(
+      agd_arm_covs <- as.data.frame(model.matrix(cov_formula, dat_agd_arm, na.action = na_action)[, -1]),
+      error = ~abort(paste0("Failed to get Agd (arm-based) covariate data.\n", .)))
+    agd_arm_study <- dat_agd_arm$.study
+  }
+
+  if (has_agd_contrast(network)) {
+    if (method == "propensity") {
+      # Resample integration points with n_int = .sample_size
+
+      ds <- purrr::map(rlang::list2(!!! network$int_call), rlang::eval_tidy)
+
+      dat_agd_contrast <- network$agd_contrast %>%
+        dplyr::select(-dplyr::starts_with(".int_")) %>%
+        dplyr::group_by(.data$.study, .data$.trt) %>%
+        dplyr::group_modify(~rlang::exec(add_integration, x = .x,
+                                         !!! ds,
+                                         n_int = .x$.sample_size,
+                                         cor = network$int_cor)) %>%
+        .unnest_integration()
+
+    } else if (!is.null(network$int_call)) {
+      dat_agd_contrast <- .unnest_integration(network$agd_contrast)
+    } else {
+      dat_agd_contrast <- network$agd_contrast
+    }
+
+    withCallingHandlers(
+      agd_contrast_covs <- as.data.frame(model.matrix(cov_formula, dat_agd_contrast, na.action = na_action)[, -1]),
+      error = ~abort(paste0("Failed to get Agd (contrast-based) covariate data.\n", .)))
+    agd_contrast_study <- dat_agd_contrast$.study
+  }
+
 
     # Single pass: fit model, compute propensity scores, weights, and ESS per pair
     propensity_scores_list <- list()
