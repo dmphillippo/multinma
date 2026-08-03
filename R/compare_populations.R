@@ -133,19 +133,28 @@ compare_populations <- function(network,
   }
 
 
+  if (method == "propensity") {
+
+    dat_list <- c(if (has_ipd(network)) split(ipd_covs, ipd_study, drop = TRUE) else NULL,
+                  if (has_agd_arm(network)) split(agd_arm_covs, agd_arm_study, drop = TRUE) else NULL,
+                  if (has_agd_contrast(network)) split(agd_contrast_covs, agd_contrast_study, drop = TRUE) else NULL)
+
+    studies <- names(dat_list)
+    n_studies <- length(dat_list)
+
     # Single pass: fit model, compute propensity scores, weights, and ESS per pair
-    propensity_scores_list <- list()
+    propensity_scores <- list()
     ess_rows <- vector("list", n_studies * (n_studies - 1L) / 2L)
-    k <- 0L
+    k <- 1L
 
     for (i in 1:(n_studies - 1)) {
       for (j in (i + 1):n_studies) {
-        s1 <- study_names[i]
-        s2 <- study_names[j]
+        s1 <- studies[i]
+        s2 <- studies[j]
 
         combined_df <- rbind(
-          cbind(all_data[[i]], study_indicator = 1L),
-          cbind(all_data[[j]], study_indicator = 0L)
+          cbind(dat_list[[i]], study_indicator = 1L),
+          cbind(dat_list[[j]], study_indicator = 0L)
         )
 
         model <- stats::glm(study_indicator ~ ., data = combined_df, family = "binomial")
@@ -162,26 +171,25 @@ compare_populations <- function(network,
         ess <- sum(w)^2 / sum(w^2)
 
         pair_name <- paste(s1, s2, sep = "_vs_")
-        propensity_scores_list[[pair_name]] <- combined_df
+        propensity_scores[[pair_name]] <- combined_df
 
-        k <- k + 1L
-        ess_rows[[k]] <- data.frame(
+        ess_rows[[k]] <- dplyr::tibble(
           comparison = pair_name,
           study1 = s1,
           study2 = s2,
           original_n = nrow(combined_df),
           ess = ess,
-          ess_percent_of_original = ess / nrow(combined_df) * 100,
-          stringsAsFactors = FALSE
+          ess_percent_of_original = ess / nrow(combined_df) * 100
         )
+        k <- k + 1L
       }
     }
 
-    ess_summary <- do.call(rbind, ess_rows)
+    ess_summary <- dplyr::bind_rows(ess_rows)
     ess_summary <- ess_summary[order(ess_summary$ess_percent_of_original, decreasing = TRUE), ]
 
     # Build symmetric ESS matrix directly
-    sorted_names <- sort(study_names)
+    sorted_names <- sort(studies)
     n <- length(sorted_names)
     sorted_matrix <- matrix(NA_real_, nrow = n, ncol = n, dimnames = list(sorted_names, sorted_names))
     for (r in seq_len(nrow(ess_summary))) {
@@ -217,7 +225,7 @@ compare_populations <- function(network,
       dplyr::distinct(.data$.study, .data$subnetwork)
 
     output_list <- list(
-      propensity_scores = propensity_scores_list,
+      propensity_scores = propensity_scores,
       summary = ess_summary,
       full_matrix = sorted_matrix
     )
