@@ -468,12 +468,6 @@ compare_populations <- function(network,
   return(out)
 }
 
-na_omit_warn <- function(object, ...) {
-  out <- stats::na.omit(object, ...)
-  if (length(out) < length(object)) warn("Observations with missing values removed.")
-  return(out)
-}
-
 
 #' @param x A `pop_comp` object produced by `compare_populations()`
 #' @param order String, the order in which to display the comparison summaries.
