@@ -13,8 +13,10 @@
 #' calculate overlap effective sample size with propensity scores, or
 #' `"euclidean"` to calculate standardised Euclidean distance between means.
 #'
-#' @return A `pop_diff` object, containing a `summary` data frame and
+#' @return A `pop_comp` object, containing a `summary` data frame and
 #'   `comparison_matrix` matrix of pairwise comparisons.
+#'   When `method = "propensity"`, a list `propensity_scores` of data frames of
+#'   fitted propensity scores will also be included.
 #'
 #' @importFrom stats glm model.matrix predict weighted.mean sd var weights
 #' @export
@@ -209,14 +211,14 @@ compare_populations <- function(network,
           study2 = s2,
           original_n = nrow(combined_df),
           ess = ess,
-          ess_percent_of_original = ess / nrow(combined_df) * 100
+          ess_percent = ess / nrow(combined_df) * 100
         )
         k <- k + 1L
       }
     }
 
     ess_summary <- dplyr::bind_rows(ess_rows)
-    ess_summary <- ess_summary[order(ess_summary$ess_percent_of_original, decreasing = TRUE), ]
+    ess_summary <- ess_summary[order(ess_summary$ess_percent, decreasing = TRUE), ]
 
     # Build symmetric ESS matrix directly
     sorted_names <- sort(studies)
@@ -225,7 +227,7 @@ compare_populations <- function(network,
     for (r in seq_len(nrow(ess_summary))) {
       s1 <- ess_summary$study1[r]
       s2 <- ess_summary$study2[r]
-      val <- ess_summary$ess_percent_of_original[r]
+      val <- ess_summary$ess_percent[r]
       sorted_matrix[s1, s2] <- val
       sorted_matrix[s2, s1] <- val
     }
@@ -493,7 +495,10 @@ compare_populations <- function(network,
   components <- purrr::imap_dfr(comps,
     ~dplyr::tibble(.study = unique(igraph::edge_attr(.x, ".study")), component = .y))
 
+  # Common outputs
   out$components <- components
+  out$method <- method
+  out$covariates <- covariates
 
   class(out) <- c("pop_comp", class(out))
   return(out)
