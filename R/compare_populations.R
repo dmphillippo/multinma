@@ -12,11 +12,6 @@
 #' @param method Method to compare distributions, either `"propensity"` to
 #' calculate overlap effective sample size with propensity scores, or
 #' `"euclidean"` to calculate standardised Euclidean distance between means.
-#' @param na_action Optional function (or function name) for handling missing
-#'   IPD covariate values, passed to
-#'   \code{\link[stats:model.matrix]{model.matrix()}}. The default is to remove
-#'   IPD observations with NAs with a warning. Missing values in the AgD will
-#'   always give an error.
 #'
 #' @return A `pop_diff` object, containing a `summary` data frame and
 #'   `comparison_matrix` matrix of pairwise comparisons.
@@ -25,12 +20,9 @@
 #' @export
 compare_populations <- function(network,
                                 covariates = NULL,
-                                method = c("propensity", "euclidean"),
-                                na_action) {
+                                method = c("propensity", "euclidean")) {
 
   method <- rlang::arg_match(method)
-
-  if (missing(na_action)) na_action <- na_omit_warn
 
   # Check network
   if (!inherits(network, "nma_data")) {
@@ -72,8 +64,20 @@ compare_populations <- function(network,
   cov_formula <- as.formula(paste0("~", paste(covariates, collapse = " + ")))
   if (has_ipd(network)) {
     dat_ipd <- network$ipd
+
+    if (!all(covariates %in% names(dat_ipd))) {
+      abort(paste0("Covariates not found in IPD:", paste(setdiff(covariates, names(dat_ipd)), sep = ", ")))
+    }
+
+    complete <- complete.cases(dat_ipd[, covariates])
+    if (any(!complete)) {
+      nmiss <- sum(!complete)
+      warn(glue::glue("Removed {nmiss} observation{if (nmiss > 1) 's' else ''} with missing covariate values from IPD."))
+      dat_ipd <- dat_ipd[complete, ]
+    }
+
     withCallingHandlers(
-      ipd_covs <- as.data.frame(model.matrix(cov_formula, dat_ipd, na.action = na_action)[, -1]),
+      ipd_covs <- as.data.frame(model.matrix(cov_formula, dat_ipd)[, -1]),
       error = ~abort(paste0("Failed to get IPD covariate data.\n", .)))
     ipd_study <- dat_ipd$.study
   }
@@ -99,8 +103,20 @@ compare_populations <- function(network,
       dat_agd_arm <- network$agd_arm
     }
 
+    if (!all(covariates %in% names(dat_agd_arm))) {
+      abort(paste0("Covariates not found in AgD (arm-based):", paste(setdiff(covariates, names(dat_agd_arm)), sep = ", ")))
+    }
+
+    complete <- complete.cases(dat_agd_arm[, covariates])
+    if (any(!complete)) {
+      nmiss <- nrow(dplyr::distinct(dat_agd_arm[!complete, ], .data$.study, .data$.trt))
+      warn(glue::glue("Removed {nmiss} study arm{if (nmiss > 1) 's' else ''} with missing covariate values from AgD (arm-based)."))
+
+      dat_agd_arm <- dat_agd_arm[complete, ]
+    }
+
     withCallingHandlers(
-      agd_arm_covs <- as.data.frame(model.matrix(cov_formula, dat_agd_arm, na.action = na_action)[, -1]),
+      agd_arm_covs <- as.data.frame(model.matrix(cov_formula, dat_agd_arm)[, -1]),
       error = ~abort(paste0("Failed to get Agd (arm-based) covariate data.\n", .)))
     agd_arm_study <- dat_agd_arm$.study
   }
@@ -126,8 +142,20 @@ compare_populations <- function(network,
       dat_agd_contrast <- network$agd_contrast
     }
 
+    if (!all(covariates %in% names(dat_agd_contrast))) {
+      abort(paste0("Covariates not found in AgD (contrast-based):", paste(setdiff(covariates, names(dat_agd_contrast)), sep = ", ")))
+    }
+
+    complete <- complete.cases(dat_agd_contrast[, covariates])
+    if (any(!complete)) {
+      nmiss <- nrow(dplyr::distinct(dat_agd_contrast[!complete, ], .data$.study, .data$.trt))
+      warn(glue::glue("Removed {nmiss} study arm{if (nmiss > 1) 's' else ''} with missing covariate values from AgD (contrast-based)."))
+
+      dat_agd_contrast <- dat_agd_contrast[complete, ]
+    }
+
     withCallingHandlers(
-      agd_contrast_covs <- as.data.frame(model.matrix(cov_formula, dat_agd_contrast, na.action = na_action)[, -1]),
+      agd_contrast_covs <- as.data.frame(model.matrix(cov_formula, dat_agd_contrast)[, -1]),
       error = ~abort(paste0("Failed to get Agd (contrast-based) covariate data.\n", .)))
     agd_contrast_study <- dat_agd_contrast$.study
   }
