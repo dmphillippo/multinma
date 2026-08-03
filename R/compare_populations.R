@@ -456,6 +456,17 @@ compare_populations <- function(network,
       return(list(summary = all_summary, distance_matrix = dist_matrix, distance_matrix_full = dist_matrix_full))
     }
   }
+
+  # Detect subnetworks
+  g <- igraph::as.igraph(network, collapse = FALSE)
+  comps <- igraph::decompose(g)
+  components <- purrr::imap_dfr(comps,
+    ~dplyr::tibble(.study = unique(igraph::edge_attr(.x, ".study")), component = .y))
+
+  out$components <- components
+
+  class(out) <- c("pop_comp", class(out))
+  return(out)
 }
 
 na_omit_warn <- function(object, ...) {
