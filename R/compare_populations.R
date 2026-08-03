@@ -25,9 +25,12 @@
 #' @export
 compare_populations <- function(network,
                                 covariates = NULL,
-                                method = c("propensity", "euclidean")) {
+                                method = c("propensity", "euclidean"),
+                                na_action) {
 
   method <- rlang::arg_match(method)
+
+  if (missing(na_action)) na_action <- na_omit_warn
 
   # Check network
   if (!inherits(network, "nma_data")) {
@@ -403,3 +406,10 @@ compare_populations <- function(network,
     }
   }
 }
+
+na_omit_warn <- function(object, ...) {
+  out <- stats::na.omit(object, ...)
+  if (length(out) < length(object)) warn("Observations with missing values removed.")
+  return(out)
+}
+
