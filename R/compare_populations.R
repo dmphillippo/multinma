@@ -56,19 +56,19 @@ compare_populations <- function(network,
   # Check covariates argument
   if (is.null(covariates)) {
     if (method == "euclidean" && length(int_covariates) < 1) {
-      abort('Please provide `covariates` to compare on when method = "euclidean"')
+      abort('Provide `covariates` to compare on when method = "euclidean"')
     } else if (method == "propensity" && length(int_covariates) < 1) {
-      abort('Please provide `covariates` to compare on')
+      abort('Provide `covariates` to compare on')
     } else {
       covariates <- int_covariates
       inform(paste0("Comparing on all covariates with integration points: ", paste(covariates, collapse = ", ")))
     }
-  } else if (has_agd_arm(network) || has_agd_contrast(network)) {
+  } else if ((has_agd_arm(network) || has_agd_contrast(network)) && !is.null(network$int_call)) {
     missing_covs <- setdiff(covariates, int_covariates)
     if (length(missing_covs) > 0) {
       abort(c(paste0("Cannot compare requested covariates missing integration points: ",
                      paste(missing_covs, collapse = ", "),
-                   "."), "Set up integration points using `add_integration()`."))
+                     "."), "Set up integration points using `add_integration()`."))
     }
   }
 
@@ -92,10 +92,12 @@ compare_populations <- function(network,
       ipd_covs <- as.data.frame(model.matrix(cov_formula, dat_ipd)[, -1]),
       error = ~abort(paste0("Failed to get IPD covariate data.\n", .)))
     ipd_study <- dat_ipd$.study
+  } else {
+    ipd_covs <- ipd_study <- NULL
   }
 
   if (has_agd_arm(network)) {
-    if (method == "propensity") {
+    if (!is.null(network$int_call)) {
       # Resample integration points with n_int = .sample_size
       ds <- purrr::map(rlang::list2(!!! network$int_call), rlang::eval_tidy)
 
@@ -107,15 +109,12 @@ compare_populations <- function(network,
                                          n_int = .x$.sample_size,
                                          cor = network$int_cor)) %>%
         .unnest_integration()
-
-    } else if (!is.null(network$int_call)) {
-      dat_agd_arm <- .unnest_integration(network$agd_arm)
     } else {
       dat_agd_arm <- network$agd_arm
     }
 
     if (!all(covariates %in% names(dat_agd_arm))) {
-      abort(paste0("Covariates not found in AgD (arm-based):", paste(setdiff(covariates, names(dat_agd_arm)), sep = ", ")))
+      abort(paste0("Covariates not found in AgD (arm-based): ", paste(setdiff(covariates, names(dat_agd_arm)), collapse = ", ")))
     }
 
     complete <- complete.cases(dat_agd_arm[, covariates])
@@ -130,10 +129,12 @@ compare_populations <- function(network,
       agd_arm_covs <- as.data.frame(model.matrix(cov_formula, dat_agd_arm)[, -1]),
       error = ~abort(paste0("Failed to get Agd (arm-based) covariate data.\n", .)))
     agd_arm_study <- dat_agd_arm$.study
+  } else {
+    agd_arm_covs <- agd_arm_study <- NULL
   }
 
   if (has_agd_contrast(network)) {
-    if (method == "propensity") {
+    if (!is.null(network$int_call)) {
       # Resample integration points with n_int = .sample_size
       ds <- purrr::map(rlang::list2(!!! network$int_call), rlang::eval_tidy)
 
@@ -146,8 +147,6 @@ compare_populations <- function(network,
                                          cor = network$int_cor)) %>%
         .unnest_integration()
 
-    } else if (!is.null(network$int_call)) {
-      dat_agd_contrast <- .unnest_integration(network$agd_contrast)
     } else {
       dat_agd_contrast <- network$agd_contrast
     }
@@ -168,6 +167,8 @@ compare_populations <- function(network,
       agd_contrast_covs <- as.data.frame(model.matrix(cov_formula, dat_agd_contrast)[, -1]),
       error = ~abort(paste0("Failed to get Agd (contrast-based) covariate data.\n", .)))
     agd_contrast_study <- dat_agd_contrast$.study
+  } else {
+    agd_contrast_covs <- agd_contrast_study <- NULL
   }
 
 
@@ -250,175 +251,60 @@ compare_populations <- function(network,
       ipd_summary <- dplyr::mutate(ipd_covs, .study = ipd_study) %>%
         dplyr::group_by(.data$.study) %>%
         dplyr::summarise(
-          original_n = dplyr::n(),
+          sample_size = dplyr::n(),
           dplyr::across(dplyr::all_of(covariates), list(mean = mean, sd = sd)),
           .groups = "drop"
         )
+    } else {
+      ipd_summary <- NULL
     }
 
-    # Helper Function: Extract AGD Means
-    extract_agd_means <- function(agd_df) {
-      if (nrow(agd_df) == 0) return(NULL)
+    if (has_agd_arm(network) || has_agd_contrast(network)) {
+      dat_agd_all <- dplyr::bind_rows(network$agd_arm, network$agd_contrast)
+      agd_covs_all <- dplyr::bind_rows(agd_arm_covs, agd_contrast_covs)
+      agd_study_all <- c(agd_arm_study, agd_contrast_study)
 
-      df <- agd_df[, c(".study", ".sample_size"), drop = FALSE]
-      retained_covariates <- c()
-
-      for (cov in covariates) {
-        distr_obj <- network$int_call[[cov]]
-        args <- distr_obj
-
-        is_binary_dist <- "prob" %in% names(args)
-
-        add_covariate <- TRUE
-
-        if (is_binary_dist) {
-          # BINARY LOGIC (Bernoulli/Binomial)
-          prob_col <- as.character(args$prob)
-
-          if (prob_col %in% colnames(agd_df)) {
-            p <- agd_df[[prob_col]]
-            df[[paste0(cov, "_mean")]] <- p
-            # Auto-calculate SD for binary: sqrt(p * (1-p))
-            df[[paste0(cov, "_sd")]] <- sqrt(p * (1 - p))
-          } else {
-            warn(glue::glue("Probability column '{prob_col}' for covariate '{cov}' not found in AgD. Dropped."))
-            add_covariate <- FALSE
-          }
-
-        } else {
-
-          mean_col <- as.character(args$mean)
-          sd_col <- as.character(args$sd)
-
-        # Handle Means
-        if (mean_col %in% colnames(agd_df)) {
-          df[[paste0(cov, "_mean")]] <- agd_df[[mean_col]]
-        } else if (cov %in% colnames(agd_df)) {
-          df[[paste0(cov, "_mean")]] <- agd_df[[cov]]
-        } else {
-          warn(glue::glue("Mean for covariate '{cov}' not found in AgD. Covariate dropped."))
-          add_covariate <- FALSE
-        }
-
-        # Handle SDs
-        if (add_covariate) {
-          if (sd_col %in% colnames(agd_df)) {
-            # Explicit SD column exists -> Use it
-            df[[paste0(cov, "_sd")]] <- agd_df[[sd_col]]
-
-          } else {
-              # Continuous variable missing SD (or percentage > 1) -> Drop it
-              warn(glue::glue("SD column '{sd_col}' for covariate '{cov}' not found in AgD. Dropped (Continuous variable requires explicit SD)."))
-              df[[paste0(cov, "_mean")]] <- NULL
-              add_covariate <- FALSE
-            }
-          }
-        }
-
-        # --- Final Decision ---
-        if (add_covariate) {
-          retained_covariates <- c(retained_covariates, cov)
-        } else {
-          # Cleanup if we failed halfway through
-          df[[paste0(cov, "_mean")]] <- NULL
-          df[[paste0(cov, "_sd")]] <- NULL
-        }
-      }
-      # Update the 'covariates' list to exclude dropped ones
-      assign("covariates", retained_covariates, envir = parent.env(environment()))
-      return(df)
-    }
-
-    # Extract AGD Data
-    agd_contrast_means <- extract_agd_means(network$agd_contrast)
-    agd_arm_means <- extract_agd_means(network$agd_arm)
-    agd_all <- dplyr::bind_rows(agd_contrast_means, agd_arm_means)
-
-    # Check for NAs in extracted AGD
-    idx <- which(is.na(agd_all), arr.ind = TRUE)
-    if (nrow(idx)) {
-      rows <- idx[, "row"]
-      cols <- idx[, "col"]
-      studies <- if (".study" %in% names(agd_all)) agd_all$.study[rows] else rownames(agd_all)[rows]
-      vars <- colnames(agd_all)[cols]
-      miss <- unique(data.frame(study = studies, variable = vars, stringsAsFactors = FALSE))
-      lines_by_var <- tapply(miss$study, miss$variable, function(s) paste(unique(s), collapse = ", "))
-      abort(paste0(
-        "AgD covariate inputs contain missing values:\n",
-        paste(" \u2022 ", names(lines_by_var), " missing in studies: ", unname(lines_by_var), collapse = "\n"),
-        "\nPlease remove these variables from `covariates`"
-      ))
-    }
-
-    # Weighted Summary of AGD
-    agd_summary <- agd_all %>%
-      dplyr::group_by(.data$.study) %>%
-      dplyr::summarise(
-        total_n = sum(.data$.sample_size, na.rm = TRUE),
-        !!!setNames(unlist(lapply(covariates, function(cov) {
-          list(
-            rlang::expr(weighted.mean(!!rlang::sym(paste0(cov, "_mean")), w = .data$.sample_size, na.rm = TRUE)),
-            rlang::expr(sqrt(weighted.mean((!!rlang::sym(paste0(cov, "_sd")))^2, w = .data$.sample_size, na.rm = TRUE)))
+      if (!is.null(network$int_call)) {
+        # With integration points available, use these to get summaries - will be identical to using reported stats
+        agd_summary <- dplyr::mutate(agd_covs, .study = agd_study) %>%
+          dplyr::group_by(.data$.study) %>%
+          dplyr::summarise(
+            sample_size = dplyr::n(),
+            dplyr::across(dplyr::all_of(covariates), list(mean = mean, sd = sd)),
+            .groups = "drop"
           )
-        }), recursive = FALSE), unlist(lapply(covariates, function(cov) {
-          c(paste0(cov, "_mean"), paste0(cov, "_sd"))
-        }))),
-        .groups = "drop"
-      )
+      } else {
+        # One row per study arm, reported summary stats.
+        # Assume covariate column provides mean, covariate_sd column available for sd
+        cov_sd <- paste0(covariates, "_sd")
+        miss_sd <- setdiff(cov_sd, names(dat_agd_all))
+        if (length(miss_sd)) {
+          abort(glue::glue("Standard deviation columns not found in AgD: ",
+                           glue::glue_collapse(miss_sd, sep = ", ", last = " and ")))
+        }
+        if (any(is.na(dat_agd_all[, cov_sd])) || any(is.infinite(unlist(dat_agd_all[, cov_sd])))) {
+          abort("Missing or infinite values for covariate standard deviations.")
+        }
 
-    ipd_summary$source <- "IPD"
-    agd_summary$source <- "AGD"
+        agd_summary <- dplyr::mutate(agd_covs_all, .study = agd_study_all) %>%
+          dplyr::bind_cols(dat_agd_all[, c(".sample_size", cov_sd)]) %>%
+          dplyr::group_by(.data$.study) %>%
+          dplyr::summarise(
+            sample_size = sum(.data$.sample_size),
+            dplyr::across(covariates, ~weighted.mean(., .data$.sample_size), .names = "{.col}_mean"),
+            dplyr::across(cov_sd, ~sqrt(weighted.mean(.^2, .data$.sample_size - 1)), .names = "{.col}")
+          )
+      }
+    } else {
+      agd_summary <- NULL
+    }
+
     all_summary <- dplyr::bind_rows(ipd_summary, agd_summary)
 
-    # Identify Subnetworks
-    g <- igraph::as.igraph(network)
-    components <- igraph::components(g)
-    treatment_components <- data.frame(
-      .trt = names(components$membership),
-      subnetwork = components$membership
-    )
-    study_trt_lookup <- list(network$ipd, network$agd_contrast, network$agd_arm) %>%
-      purrr::compact() %>%
-      purrr::map_dfr(~ {
-        cols <- colnames(.x)
-        if (all(c(".study", ".trt") %in% cols)) {
-          dplyr::tibble(.study = as.character(.x$.study), .trt = as.character(.x$.trt))
-        } else {
-          NULL
-        }
-      }) %>%
-      dplyr::distinct()
+    dist_matrix <- matrix(NA, nrow = nrow(all_summary), ncol = nrow(all_summary),
+                          dimnames = list(all_summary$.study, all_summary$.study))
 
-    study_components <- study_trt_lookup %>%
-      dplyr::left_join(treatment_components, by = ".trt") %>%
-      dplyr::select(-".trt") %>%
-      dplyr::distinct(.data$.study, .data$subnetwork)
-
-    all_summary <- dplyr::left_join(all_summary, study_components, by = ".study")
-
-    sub1 <- dplyr::filter(all_summary, .data$subnetwork == 1)
-    sub2 <- dplyr::filter(all_summary, .data$subnetwork == 2)
-
-    dist_matrix <- matrix(NA, nrow = nrow(sub1), ncol = nrow(sub2), dimnames = list(sub1$.study, sub2$.study))
-    dist_matrix_full <- matrix(NA, nrow = nrow(all_summary), ncol = nrow(all_summary), dimnames = list(all_summary$.study, all_summary$.study))
-
-    # Calculate Distances (Subnetwork 1 vs 2)
-    if (nrow(sub2) < 1) {
-      for (i in seq_len(nrow(sub1))) {
-        for (j in seq_len(nrow(sub2))) {
-          vec1 <- as.numeric(sub1[i, paste0(covariates, "_mean")])
-          vec2 <- as.numeric(sub2[j, paste0(covariates, "_mean")])
-          sd1 <- as.numeric(sub1[i, paste0(covariates, "_sd")])
-          sd2 <- as.numeric(sub2[j, paste0(covariates, "_sd")])
-          pooled_sd <- sqrt((sd1^2 + sd2^2) / 2)
-          valid <- !is.na(vec1) & !is.na(vec2) & !is.na(pooled_sd) & pooled_sd > 0
-          diff_scaled <- (vec1[valid] - vec2[valid]) / pooled_sd[valid]
-          dist_matrix[i, j] <- sqrt(sum(diff_scaled^2))
-        }
-      }
-    }
-
-    # Calculate Distances (Full Matrix)
+    # Calculate Distances
     for (i in seq_len(nrow(all_summary))) {
       for (j in seq_len(nrow(all_summary))) {
         if (i == j) next
@@ -429,16 +315,12 @@ compare_populations <- function(network,
         pooled_sd <- sqrt((sd1^2 + sd2^2) / 2)
         valid <- !is.na(vec1) & !is.na(vec2) & !is.na(pooled_sd) & pooled_sd > 0
         diff_scaled <- (vec1[valid] - vec2[valid]) / pooled_sd[valid]
-        dist_matrix_full[i, j] <- sqrt(sum(diff_scaled^2))
+        dist_matrix[i, j] <- sqrt(sum(diff_scaled^2))
       }
     }
 
-    # Return Euclidean Results
-    if (nrow(sub2) < 1) {
-      return(list(summary = all_summary, distance_matrix = dist_matrix_full))
-    } else {
-      return(list(summary = all_summary, distance_matrix = dist_matrix, distance_matrix_full = dist_matrix_full))
-    }
+    out <- list(summary = data.frame(),
+                comparison_matrix = dist_matrix)
   }
 
   # Detect subnetworks
