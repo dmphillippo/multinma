@@ -200,8 +200,8 @@ compare_populations <- function(network,
 
     for (i in 1:(n_studies - 1)) {
       for (j in (i + 1):n_studies) {
-        s1 <- studies[i]
-        s2 <- studies[j]
+        s1 <- as.character(studies[i])
+        s2 <- as.character(studies[j])
 
         combined_df <- rbind(
           cbind(dat_list[[s1]], study_indicator = 1L),
@@ -226,8 +226,8 @@ compare_populations <- function(network,
 
         ess_rows[[k]] <- dplyr::tibble(
           comparison = pair_name,
-          study1 = s1,
-          study2 = s2,
+          study1 = studies[i],
+          study2 = studies[j],
           original_n = nrow(combined_df),
           ess = ess,
           ess_percent = ess / nrow(combined_df) * 100
@@ -351,7 +351,7 @@ compare_populations <- function(network,
       dplyr::mutate(sample_size = ss1 + ss2) %>%
       dplyr::select(-"ss1", -"ss2") %>%
       dplyr::relocate("comparison", "study1", "study2", "sample_size", dplyr::everything()) %>%
-      dplyr::filter(which(network$studies == .data$study1) <
+      dplyr::filter(which(network$studies == .data$study1) >
                       which(network$studies == .data$study2)) %>%
       dplyr::arrange(distance)
 
