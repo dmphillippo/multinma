@@ -399,7 +399,7 @@ print.pop_comp <- function(x,
     abort("`simplify` must be TRUE or FALSE.")
   if (!rlang::is_integerish(digits, n = 1, finite = TRUE) || digits < 0)
     abort("`digits` must be a single non-negative integer.")
-  if (!rlang::is_integerish(x = n, n = 1, finite = TRUE) || n < 1)
+  if (!rlang::is_integerish(x = n, n = 1) || n < 1)
     abort("`n` must be a single positive integer.")
 
 
