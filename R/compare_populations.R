@@ -311,22 +311,28 @@ compare_populations <- function(network,
       agd_summary <- NULL
     }
 
-    all_summary <- dplyr::bind_rows(ipd_summary, agd_summary)
+    all_summary <- dplyr::bind_rows(ipd_summary, agd_summary) %>%
+      dplyr::arrange(.data$.study)
 
-    dist_matrix <- matrix(NA, nrow = nrow(all_summary), ncol = nrow(all_summary),
+    # Get overall standardising sd for each covariate
+    ssd <- all_summary %>%
+      dplyr::ungroup() %>%
+      dplyr::summarise(dplyr::across(cov_sd, ~sqrt(weighted.mean(.^2, .data$sample_size - 1)),
+                                     .names = "{.col}")) %>%
+      unlist()
+
+    dist_matrix <- matrix(0, nrow = nrow(all_summary), ncol = nrow(all_summary),
                           dimnames = list(all_summary$.study, all_summary$.study))
 
     # Calculate Distances
+    cov_mean <- paste0(covariates, "_mean")
+    cov_sd <- paste0(covariates, "_sd")
     for (i in seq_len(nrow(all_summary))) {
       for (j in seq_len(nrow(all_summary))) {
         if (i == j) next
-        vec1 <- as.numeric(all_summary[i, paste0(covariates, "_mean")])
-        vec2 <- as.numeric(all_summary[j, paste0(covariates, "_mean")])
-        sd1 <- as.numeric(all_summary[i, paste0(covariates, "_sd")])
-        sd2 <- as.numeric(all_summary[j, paste0(covariates, "_sd")])
-        pooled_sd <- sqrt((sd1^2 + sd2^2) / 2)
-        valid <- !is.na(vec1) & !is.na(vec2) & !is.na(pooled_sd) & pooled_sd > 0
-        diff_scaled <- (vec1[valid] - vec2[valid]) / pooled_sd[valid]
+        vec1 <- all_summary[i, cov_mean]
+        vec2 <- all_summary[j, cov_mean]
+        diff_scaled <- (vec1 - vec2) / ssd
         dist_matrix[i, j] <- sqrt(sum(diff_scaled^2))
       }
     }
