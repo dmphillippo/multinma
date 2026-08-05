@@ -242,7 +242,7 @@ compare_populations <- function(network,
     # Build symmetric ESS matrix directly
     sorted_names <- sort(studies)
     n <- length(sorted_names)
-    sorted_matrix <- matrix(NA_real_, nrow = n, ncol = n, dimnames = list(sorted_names, sorted_names))
+    sorted_matrix <- matrix(100, nrow = n, ncol = n, dimnames = list(sorted_names, sorted_names))
     for (r in seq_len(nrow(ess_summary))) {
       s1 <- ess_summary$study1[r]
       s2 <- ess_summary$study2[r]
@@ -337,7 +337,15 @@ compare_populations <- function(network,
       }
     }
 
-    out <- list(summary = data.frame(),
+    # Summary data frame
+    summary_df <- dplyr::as_tibble(dist_matrix, rownames = "study1") %>%
+      tidyr::pivot_longer(!"study1", names_to = "study2", values_to = "distance") %>%
+      dplyr::mutate(comparison = paste(study1, study2, sep = " vs. ")) %>%
+      dplyr::relocate("comparison", "study1", "study2", dplyr::everything()) %>%
+      dplyr::filter(.data$study1 < .data$study2) %>%
+      dplyr::arrange(distance)
+
+    out <- list(summary = summary_df,
                 comparison_matrix = dist_matrix)
   }
 
