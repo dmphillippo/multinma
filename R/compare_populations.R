@@ -101,7 +101,7 @@ compare_populations <- function(network,
     }
 
     withCallingHandlers(
-      ipd_covs <- as.data.frame(model.matrix(cov_formula, dat_ipd)[, -1]),
+      ipd_covs <- as.data.frame(model.matrix(cov_formula, dat_ipd)[, -1, drop = FALSE]),
       error = ~abort(paste0("Failed to get IPD covariate data.\n", .)))
     ipd_study <- dat_ipd$.study
   } else {
@@ -138,7 +138,7 @@ compare_populations <- function(network,
     }
 
     withCallingHandlers(
-      agd_arm_covs <- as.data.frame(model.matrix(cov_formula, dat_agd_arm)[, -1]),
+      agd_arm_covs <- as.data.frame(model.matrix(cov_formula, dat_agd_arm)[, -1, drop = FALSE]),
       error = ~abort(paste0("Failed to get Agd (arm-based) covariate data.\n", .)))
     agd_arm_study <- dat_agd_arm$.study
   } else {
@@ -176,7 +176,7 @@ compare_populations <- function(network,
     }
 
     withCallingHandlers(
-      agd_contrast_covs <- as.data.frame(model.matrix(cov_formula, dat_agd_contrast)[, -1]),
+      agd_contrast_covs <- as.data.frame(model.matrix(cov_formula, dat_agd_contrast)[, -1, drop = FALSE]),
       error = ~abort(paste0("Failed to get Agd (contrast-based) covariate data.\n", .)))
     agd_contrast_study <- dat_agd_contrast$.study
   } else {
