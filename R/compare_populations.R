@@ -477,6 +477,34 @@ print.pop_comp <- function(x,
   } else {
     print(mat)
   }
+}
 
+#' @rdname compare_populations
+#' @export
+plot.pop_comp <- function(x, ...) {
+
+  if (x$method == "propensity") {
+    limits <- c(0, 100)
+    label <- "ESS %"
+    direction <- 1
+  } else if (x$method == "euclidean") {
+    limits <- c(0, max(x$comparison_matrix))
+    label <- "Distance"
+    direction <- -1
+  }
+
+  dat <- dplyr::as_tibble(x$comparison_matrix, rownames = "study1") %>%
+    tidyr::pivot_longer(!"study1", names_to = "study2", values_to = "value")
+
+  ggplot2::ggplot(data = dat,
+                  ggplot2::aes(x = .data$study1, y = .data$study2,
+                               fill = .data$value)) +
+    ggplot2::geom_tile() +
+    ggplot2::scale_fill_viridis_c(name = label, limits = limits,
+                                  direction = direction, option = "magma") +
+    ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 90)) +
+    ggplot2::scale_y_discrete(limits = rev(levels(x$summary$study2))) +
+    ggplot2::labs(x = "Study 1", y = "Study 2") +
+    theme_multinma()
 }
 

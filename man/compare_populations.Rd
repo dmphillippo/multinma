@@ -3,6 +3,7 @@
 \name{compare_populations}
 \alias{compare_populations}
 \alias{print.pop_comp}
+\alias{plot.pop_comp}
 \title{Compare population covariate distributions}
 \usage{
 compare_populations(
@@ -19,6 +20,8 @@ compare_populations(
   digits = 2L,
   n = 10
 )
+
+\method{plot}{pop_comp}(x, ...)
 }
 \arguments{
 \item{network}{An \code{nma_data} network object.}
