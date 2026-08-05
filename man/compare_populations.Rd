@@ -60,3 +60,16 @@ accounts for the full multivariate joint distribution of the covariates,
 whereas the Euclidean distance between the covariate means only accounts for
 the location and not the range of variation or joint structure.
 }
+\section{Aggregate data setup}{
+When aggregate data are present in the network, some setup is necessary to
+use this function. For \code{method = "propensity"}, the network must have
+integration points present; specify these using \code{\link[=add_integration]{add_integration()}}. For
+\code{method = "euclidean"}, the network must either have integration points
+present, or the mean and standard deviation of covariates can be provided in
+the original input data when setting up the network. In the latter case, the
+covariate means are assumed to be provided in the named \verb{<covariate>} column,
+and the corresponding standard deviation in a column named \verb{<covariate>_sd}.
+For example, if the covariate is \code{age}, mean age should be provided in the
+\code{age} column, and the standard devation of age in \code{age_sd} column.
+}
+

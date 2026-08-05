@@ -7,6 +7,18 @@
 #' whereas the Euclidean distance between the covariate means only accounts for
 #' the location and not the range of variation or joint structure.
 #'
+#' # Aggregate data setup
+#' When aggregate data are present in the network, some setup is necessary to
+#' use this function. For `method = "propensity"`, the network must have
+#' integration points present; specify these using [add_integration()]. For
+#' `method = "euclidean"`, the network must either have integration points
+#' present, or the mean and standard deviation of covariates can be provided in
+#' the original input data when setting up the network. In the latter case, the
+#' covariate means are assumed to be provided in the named `<covariate>` column,
+#' and the corresponding standard deviation in a column named `<covariate>_sd`.
+#' For example, if the covariate is `age`, mean age should be provided in the
+#' `age` column, and the standard devation of age in `age_sd` column.
+#'
 #' @param network An `nma_data` network object.
 #' @param covariates Character vector of covariate names to compare on.
 #' @param method Method to compare distributions, either `"propensity"` to
