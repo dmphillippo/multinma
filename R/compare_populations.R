@@ -341,9 +341,17 @@ compare_populations <- function(network,
     summary_df <- dplyr::as_tibble(dist_matrix, rownames = "study1") %>%
       tidyr::pivot_longer(!"study1", names_to = "study2", values_to = "distance") %>%
       dplyr::mutate(comparison = paste(study1, study2, sep = " vs. ")) %>%
-      dplyr::relocate("comparison", "study1", "study2", dplyr::everything()) %>%
+      # Add total sample size
+      dplyr::left_join(dplyr::transmute(all_summary, .data$.study, ss1 = .data$sample_size),
+                       by = dplyr::join_by(x$study1 == y$.study)) %>%
+      dplyr::left_join(dplyr::transmute(all_summary, .data$.study, ss2 = .data$sample_size),
+                       by = dplyr::join_by(x$study2 == y$.study)) %>%
+      dplyr::mutate(sample_size = ss1 + ss2) %>%
+      dplyr::select(-"ss1", -"ss2") %>%
+      dplyr::relocate("comparison", "study1", "study2", "sample_size", dplyr::everything()) %>%
       dplyr::filter(.data$study1 < .data$study2) %>%
       dplyr::arrange(distance)
+
 
     out <- list(summary = summary_df,
                 comparison_matrix = dist_matrix)
