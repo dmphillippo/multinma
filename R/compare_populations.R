@@ -190,7 +190,7 @@ compare_populations <- function(network,
                   if (has_agd_arm(network)) split(agd_arm_covs, agd_arm_study, drop = TRUE) else NULL,
                   if (has_agd_contrast(network)) split(agd_contrast_covs, agd_contrast_study, drop = TRUE) else NULL)
 
-    studies <- names(dat_list)
+    studies <- network$studies
     n_studies <- length(dat_list)
 
     # Single pass: fit model, compute propensity scores, weights, and ESS per pair
@@ -204,8 +204,8 @@ compare_populations <- function(network,
         s2 <- studies[j]
 
         combined_df <- rbind(
-          cbind(dat_list[[i]], study_indicator = 1L),
-          cbind(dat_list[[j]], study_indicator = 0L)
+          cbind(dat_list[[s1]], study_indicator = 1L),
+          cbind(dat_list[[s2]], study_indicator = 0L)
         )
 
         model <- stats::glm(study_indicator ~ ., data = combined_df, family = "binomial")
@@ -240,9 +240,7 @@ compare_populations <- function(network,
     ess_summary <- ess_summary[order(ess_summary$ess_percent, decreasing = TRUE), ]
 
     # Build symmetric ESS matrix directly
-    sorted_names <- sort(studies)
-    n <- length(sorted_names)
-    sorted_matrix <- matrix(100, nrow = n, ncol = n, dimnames = list(sorted_names, sorted_names))
+    sorted_matrix <- matrix(100, nrow = n_studies, ncol = n_studies, dimnames = list(studies, studies))
     for (r in seq_len(nrow(ess_summary))) {
       s1 <- ess_summary$study1[r]
       s2 <- ess_summary$study2[r]
@@ -342,7 +340,9 @@ compare_populations <- function(network,
     # Summary data frame
     summary_df <- dplyr::as_tibble(dist_matrix, rownames = "study1") %>%
       tidyr::pivot_longer(!"study1", names_to = "study2", values_to = "distance") %>%
-      dplyr::mutate(comparison = paste(study1, study2, sep = " vs. ")) %>%
+      dplyr::mutate(comparison = paste(.data$study1, .data$study2, sep = " vs. "),
+                    study1 = factor(.data$study1, levels = levels(network$studies)),
+                    study2 = factor(.data$study2, levels = levels(network$studies))) %>%
       # Add total sample size
       dplyr::left_join(dplyr::transmute(all_summary, .data$.study, ss1 = .data$sample_size),
                        by = dplyr::join_by(x$study1 == y$.study)) %>%
@@ -351,7 +351,8 @@ compare_populations <- function(network,
       dplyr::mutate(sample_size = ss1 + ss2) %>%
       dplyr::select(-"ss1", -"ss2") %>%
       dplyr::relocate("comparison", "study1", "study2", "sample_size", dplyr::everything()) %>%
-      dplyr::filter(.data$study1 < .data$study2) %>%
+      dplyr::filter(which(network$studies == .data$study1) <
+                      which(network$studies == .data$study2)) %>%
       dplyr::arrange(distance)
 
 
