@@ -259,6 +259,8 @@ compare_populations <- function(network,
 
   } else if (method == "euclidean") {
 
+    cov_sd <- paste0(covariates, "_sd")
+
     if (has_ipd(network)) {
       ipd_summary <- dplyr::mutate(ipd_covs, .study = ipd_study) %>%
         dplyr::group_by(.data$.study) %>%
@@ -278,7 +280,7 @@ compare_populations <- function(network,
 
       if (!is.null(network$int_call)) {
         # With integration points available, use these to get summaries - will be identical to using reported stats
-        agd_summary <- dplyr::mutate(agd_covs, .study = agd_study) %>%
+        agd_summary <- dplyr::mutate(agd_covs_all, .study = agd_study_all) %>%
           dplyr::group_by(.data$.study) %>%
           dplyr::summarise(
             sample_size = dplyr::n(),
@@ -303,8 +305,8 @@ compare_populations <- function(network,
           dplyr::group_by(.data$.study) %>%
           dplyr::summarise(
             sample_size = sum(.data$.sample_size),
-            dplyr::across(covariates, ~weighted.mean(., .data$.sample_size), .names = "{.col}_mean"),
-            dplyr::across(cov_sd, ~sqrt(weighted.mean(.^2, .data$.sample_size - 1)), .names = "{.col}")
+            dplyr::across(dplyr::all_of(covariates), ~weighted.mean(., .data$.sample_size), .names = "{.col}_mean"),
+            dplyr::across(dplyr::all_of(cov_sd), ~sqrt(weighted.mean(.^2, .data$.sample_size - 1)), .names = "{.col}")
           )
       }
     } else {
@@ -317,7 +319,7 @@ compare_populations <- function(network,
     # Get overall standardising sd for each covariate
     ssd <- all_summary %>%
       dplyr::ungroup() %>%
-      dplyr::summarise(dplyr::across(cov_sd, ~sqrt(weighted.mean(.^2, .data$sample_size - 1)),
+      dplyr::summarise(dplyr::across(dplyr::all_of(cov_sd), ~sqrt(weighted.mean(.^2, .data$sample_size - 1)),
                                      .names = "{.col}")) %>%
       unlist()
 
