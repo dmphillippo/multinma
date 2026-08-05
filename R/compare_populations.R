@@ -408,7 +408,22 @@ print.pop_comp <- function(x,
   }
 
   x_sum <- x$summary
-  num_col <- setdiff(names(x_sum)[purrr::map_lgl(x_sum, is.numeric)], "original_n")
+
+  if (order == "decreasing") {
+    if (x$method == "propensity") {
+      x_sum <- dplyr::arrange(x_sum, dplyr::desc(.data$ess_percent))
+    } else if (x$method == "euclidean") {
+      x_sum <- dplyr::arrange(x_sum, distance)
+    }
+  } else {
+    if (x$method == "propensity") {
+      x_sum <- dplyr::arrange(x_sum, .data$ess_percent)
+    } else if (x$method == "euclidean") {
+      x_sum <- dplyr::arrange(x_sum, dplyr::desc(distance))
+    }
+  }
+
+  num_col <- setdiff(names(x_sum)[purrr::map_lgl(x_sum, is.numeric)], c("original_n", "sample_size"))
 
   if (simplify && ncomp > 1) {
     comp_lookup <- setNames(x$components$component, x$components$.study)
