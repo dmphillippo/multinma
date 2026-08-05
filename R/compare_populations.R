@@ -477,6 +477,8 @@ print.pop_comp <- function(x,
   } else {
     print(mat)
   }
+
+  invisible(x)
 }
 
 #' @rdname compare_populations
