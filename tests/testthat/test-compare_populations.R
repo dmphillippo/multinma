@@ -169,9 +169,9 @@ test_that("print outputs", {
   expect_output(print(comp),
                 "Compared populations using propensity score overlap, based on the following covariates: durnpso, prevsys, bsa, weight, psa, age and male")
   expect_output(print(comp, n = 1),
-                "UNCOVER-2 vs\\. UNCOVER-3 +2558 +2528\\.59 +98\\.85")
+                "UNCOVER-2 vs\\. UNCOVER-3 +2558 +2534\\.98 +99\\.1")
   expect_output(print(comp, n = 1, simplify = FALSE),
-                "UNCOVER-2 vs\\. UNCOVER-3 +2558 +2528\\.59 +98\\.85")
+                "UNCOVER-2 vs\\. UNCOVER-3 +2558 +2534\\.98 +99\\.1")
 })
 
 test_that("type = 'euclidean' with integration points", {
@@ -195,7 +195,7 @@ test_that("type = 'euclidean' with integration points", {
 })
 
 # Disconnected network
-pso_net <- combine_network(
+pso_net_disc <- combine_network(
   set_ipd(pso_ipd %>% filter(!trtc %in% c("SEC_150", "SEC_300", "UST")),
           study = studyc,
           trt = trtc,
@@ -216,7 +216,7 @@ pso_net <- combine_network(
               trt_class = trtclass)
 )
 
-pso_net_int <- add_integration(pso_net,
+pso_net_disc <- add_integration(pso_net_disc,
                            durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
                            prevsys = distr(qbern, prob = prevsys),
                            bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
@@ -226,26 +226,26 @@ pso_net_int <- add_integration(pso_net,
                            male = distr(qbern, prob = male))
 
 test_that("output class", {
-  out <- compare_populations(pso_net_int)
+  out <- compare_populations(pso_net_disc)
 
   expect_s3_class(out,"pop_comp")
   expect_equal(out$method, "propensity")
   expect_equal(unique(out$components$component), c(1L, 2L))
 
-  expect_equal(colnames(out$comparison_matrix), levels(pso_net_int$studies))
-  expect_equal(rownames(out$comparison_matrix), levels(pso_net_int$studies))
-  expect_equal(nrow(out$summary), choose(nlevels(pso_net_int$studies), 2))
+  expect_equal(colnames(out$comparison_matrix), levels(pso_net_disc$studies))
+  expect_equal(rownames(out$comparison_matrix), levels(pso_net_disc$studies))
+  expect_equal(nrow(out$summary), choose(nlevels(pso_net_disc$studies), 2))
 })
 
 test_that("print outputs", {
-  comp <- compare_populations(pso_net_int)
+  comp <- compare_populations(pso_net_disc)
   expect_output(print(comp),
                 "Compared populations using propensity score overlap, based on the following covariates: durnpso, prevsys, bsa, weight, psa, age and male")
   expect_output(print(comp, n = 1, simplify = TRUE),
-                "UNCOVER-2 vs\\. CLEAR +1888 +1601\\.31 +84\\.81")
+                "ERASURE vs\\. UNCOVER-3 +1827 +1781\\.52 +97\\.51")
   expect_output(print(comp, n = 1, simplify = TRUE),
                 "Subnetwork 2 vs\\. 1")
   expect_output(print(comp, n = 1, simplify = FALSE),
-                "UNCOVER-2 vs\\. UNCOVER-3 +2558 +2528\\.59 +98\\.85")
+                "CLEAR vs\\. ERASURE +1157 +1151\\.69 +99\\.54")
 })
 
