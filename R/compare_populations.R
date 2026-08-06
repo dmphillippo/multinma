@@ -208,8 +208,12 @@ compare_populations <- function(network,
           cbind(dat_list[[s2]], study_indicator = 0L)
         )
 
-        model <- stats::glm(study_indicator ~ ., data = combined_df, family = "binomial")
-        ps <- stats::predict(model, newdata = combined_df, type = "response")
+        model <- suppressWarnings(
+          stats::glm(study_indicator ~ ., data = combined_df, family = "binomial",
+                            weights = 1 / c(rep(nrow(dat_list[[s1]]), nrow(dat_list[[s1]])),
+                                            rep(nrow(dat_list[[s2]]), nrow(dat_list[[s2]]))))
+        )
+        ps <- stats::predict(model, type = "response")
 
         combined_df$propensity_score <- ps
         combined_df$overlap_weight <- ifelse(combined_df$study_indicator == 1L, 1 - ps, ps)
