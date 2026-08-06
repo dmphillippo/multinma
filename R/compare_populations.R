@@ -208,12 +208,13 @@ compare_populations <- function(network,
           cbind(dat_list[[s2]], study_indicator = 0L)
         )
 
-        model <- suppressWarnings(
-          stats::glm(study_indicator ~ ., data = combined_df, family = "binomial",
-                            weights = 1 / c(rep(nrow(dat_list[[s1]]), nrow(dat_list[[s1]])),
-                                            rep(nrow(dat_list[[s2]]), nrow(dat_list[[s2]]))))
-        )
-        ps <- stats::predict(model, type = "response")
+        model <- stats::glm(study_indicator ~ ., data = combined_df, family = "binomial")
+
+        # model intercept is log odds of being in s1 given sample sizes, i.e. log(sample size ratio)
+        # but we want to predict at an intercept of zero, i.e. equally likely to be from either sample
+        # (can also do this using inverse sample size weights in the GLM)
+        # ps <- plogis(stats::predict(model, type = "link") - log(nrow(dat_list[[s1]]) / nrow(dat_list[[s2]])))
+        ps <- plogis(stats::predict(model, type = "link") - log(nrow(dat_list[[s1]])) + log(nrow(dat_list[[s2]])))
 
         combined_df$propensity_score <- ps
         combined_df$overlap_weight <- ifelse(combined_df$study_indicator == 1L, 1 - ps, ps)

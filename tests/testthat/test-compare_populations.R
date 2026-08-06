@@ -169,9 +169,9 @@ test_that("print outputs", {
   expect_output(print(comp),
                 "Compared populations using propensity score overlap, based on the following covariates: durnpso, prevsys, bsa, weight, psa, age and male")
   expect_output(print(comp, n = 1),
-                "UNCOVER-2 vs\\. UNCOVER-3 +2558 +2534\\.98 +99\\.1")
+                "UNCOVER-2 vs\\. UNCOVER-3 +2558 +2534\\.92 +99\\.1")
   expect_output(print(comp, n = 1, simplify = FALSE),
-                "UNCOVER-2 vs\\. UNCOVER-3 +2558 +2534\\.98 +99\\.1")
+                "UNCOVER-2 vs\\. UNCOVER-3 +2558 +2534\\.92 +99\\.1")
 })
 
 test_that("type = 'euclidean' with integration points", {
@@ -242,10 +242,10 @@ test_that("print outputs", {
   expect_output(print(comp),
                 "Compared populations using propensity score overlap, based on the following covariates: durnpso, prevsys, bsa, weight, psa, age and male")
   expect_output(print(comp, n = 1, simplify = TRUE),
-                "ERASURE vs\\. UNCOVER-3 +1827 +1781\\.52 +97\\.51")
+                "ERASURE vs\\. UNCOVER-3 +1827 +1780\\.72 +97\\.47")
   expect_output(print(comp, n = 1, simplify = TRUE),
                 "Subnetwork 2 vs\\. 1")
   expect_output(print(comp, n = 1, simplify = FALSE),
-                "CLEAR vs\\. ERASURE +1157 +1151\\.69 +99\\.54")
+                "CLEAR vs\\. ERASURE +1157 +1151\\.65 +99\\.54")
 })
 
