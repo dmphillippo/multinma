@@ -191,7 +191,7 @@ compare_populations <- function(network,
                   if (has_agd_contrast(network)) split(agd_contrast_covs, agd_contrast_study, drop = TRUE) else NULL)
 
     studies <- network$studies
-    n_studies <- length(dat_list)
+    n_studies <- length(studies)
 
     # Single pass: fit model, compute propensity scores, weights, and ESS per pair
     propensity_scores <- list()
