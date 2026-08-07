@@ -1569,6 +1569,12 @@ nma <- function(network,
     }
   }
 
+
+  if (has_ipd(network) && likelihood == "normal") {
+    sig_labels <- get_aux_labels(dat_ipd, by = c(".study", ".trt"))
+    fnames_oi[grepl("^sigma\\[[0-9]+\\]$", fnames_oi)] <- paste0("sigma[", sig_labels, "]")
+  }
+
   if (class_effects == "exchangeable"){
     # Label class_mean parameters
     fnames_oi[grepl("^class_mean\\[[0-9]+\\]$", fnames_oi)] <- paste0("class_mean[", class_mean_design$label, "]")
@@ -2694,7 +2700,6 @@ nma.fit <- function(ipd_x, ipd_y,
     fnames_oi <- gsub("baseline_sd[1]", "baseline_sd", fnames_oi, fixed = TRUE)
     fnames_oi <- gsub("baseline_new[1]", "baseline_new", fnames_oi, fixed = TRUE)
   }
-
 
   if (likelihood == "ordered") {
     if (has_ipd) l_cat <- colnames(ipd_y$.r)[-1]
