@@ -41,11 +41,7 @@ bayes_R2.stan_nma <- function(object, ..., probs = c(0.025, 0.5, 0.975), summary
       mean(rowSums(pmat * (1 - pmat)))
     })
   } else if (object$likelihood == "normal") {
-    ss <- dplyr::group_by(object$network$ipd, .data$.study, .data$.trt) %>%
-      dplyr::summarise(n = dplyr::n()) %>%
-      dplyr::arrange(.data$.study, .data$.trt) %>%
-      dplyr::pull("n")
-    var_res[,,1] <- apply(as.array(object, pars = "sigma")^2, 1:2, FUN = weighted.mean, w = ss)
+    var_res[,,1] <- apply(as.array(object, pars = "sigma")^2, 1:2, FUN = "mean")
   } else if (object$likelihood == "poisson") {
     var_res[,,1] <- apply(mu_pred, 1:2, "mean")
   } else {
