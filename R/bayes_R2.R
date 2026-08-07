@@ -1,17 +1,19 @@
-#' Bayesian and Leave-One-Out R-squared
+#' Predictive performance
 #'
-#' Calculate Bayesian-$R^2$ and LOO-$R^2$ values for a regression model.
-#' Currently this is only calculated for IPD regression models. Any models with
-#' both IPD and AgD (e.g. ML-NMR) will ignore the AgD part for this calculation.
+#' Calculate Bayesian-$R^2$, LOO-$R^2$, and leave-one-out predictive metrics for
+#' a regression model. Currently this is only calculated for IPD regression
+#' models. Any models with both IPD and AgD (e.g. ML-NMR) will ignore the AgD
+#' part for this calculation.
 #'
-#' @param object A `stan_nma` object.
+#' @param object,x A `stan_nma` object.
 #' @param ... Not used.
 #' @param probs Numeric vector of quantiles of interest to present in computed
 #'   summary, default `c(0.025, 0.25, 0.5, 0.75, 0.975)`
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #'
-#' @return A [nma_summary] object if `summary = TRUE`, otherwise a 3D MCMC array
-#'  of samples of the Bayesian or LOO $R^2$.
+#' @return For `bayes_R2()` and `loo_R2()`: a [nma_summary] object if `summary =
+#'   TRUE`, otherwise a 3D MCMC array of samples of the Bayesian or LOO $R^2$.
+#'   For `loo_predictive_metric()`: a list with the estimate and standard error.
 #' @aliases bayes_R2
 #' @importFrom rstantools bayes_R2
 #' @export
@@ -95,7 +97,7 @@ loo_R2.stan_nma <- function(object, ..., probs = c(0.025, 0.5, 0.975), summary =
     abort(glue::glue("Likelihood '{object$likelihood}' not yet supported."))
   }
 
-  n <- length(y)
+  n <- nrow(object$network$ipd)
 
   # Array of predicted responses
   mu_pred <- as.array(object, pars = "fitted_ipd")
@@ -104,7 +106,9 @@ loo_R2.stan_nma <- function(object, ..., probs = c(0.025, 0.5, 0.975), summary =
   mu_pred_mat <- as.matrix.nma_summary(mu_pred)
 
   log_ratios <- -as.matrix(object, pars = "log_lik")[, 1:n, drop = FALSE]
-  psis_object <- loo::psis(log_ratios)
+  r_eff <- loo::relative_eff(exp(-log_ratios),
+                             chain_id = rep(1:dim(mu_pred)[2], each = dim(mu_pred)[1]))
+  psis_object <- loo::psis(log_ratios, r_eff = r_eff)
 
   mu_pred_loo <- loo::E_loo(mu_pred_mat, psis_object, log_ratios = log_ratios)$value
   err_loo <- mu_pred_loo - y
@@ -139,3 +143,51 @@ loo_R2.stan_nma <- function(object, ..., probs = c(0.025, 0.5, 0.975), summary =
   return(out)
 }
 
+#' @param metric The type of predictive metric to be calculated. See
+#'   [loo::loo_predictive_metric()]. The default is root mean squared error
+#'   (`"rmse"`) for continuous or poisson outcomes, and true positive prediction
+#'   rate (`"acc"`) for binary outcomes.
+#' @aliases loo_predictive_metric
+#' @importFrom loo loo_predictive_metric
+#' @rdname bayes_R2.stan_nma
+#' @export
+loo_predictive_metric.stan_nma <- function(x, metric, ...) {
+  require_pkg("loo")
+
+  if (!has_ipd(x$network)) abort("No IPD present for which to calculate LOO predictive performance.")
+  if (has_agd_arm(x$network) || has_agd_contrast(x$network))
+    inform("Note: R2 calculated on IPD portion of the model only.")
+  if (x$likelihood %in% valid_lhood$survival) abort("Not supported for survival outcomes.")
+
+  if (x$likelihood == "ordered") abort("Not supported for ordered outcomes.")
+
+  if (missing(metric)) {
+    if (x$likelihood %in% c("normal", "poisson")) {
+      inform('Using metric = "rmse"')
+      metric <- "rmse"
+    } else if (x$likelihood %in% c(valid_lhood$binary, valid_lhood$count)) {
+      inform('Using metric = "acc"')
+      metric <- "acc"
+    }
+  }
+
+  # Observations
+  if (x$likelihood %in% c(valid_lhood$binary, valid_lhood$count, "poisson")) {
+    y <- x$network$ipd$.r
+  } else if (x$likelihood == "normal") {
+    y <- x$network$ipd$.y
+  } else {
+    abort(glue::glue("Likelihood '{object$likelihood}' not yet supported."))
+  }
+
+  # Array of predicted responses
+  n <- nrow(x$network$ipd)
+  mu_pred <- as.matrix(x, pars = "fitted_ipd")[, 1:n, drop = FALSE]
+
+  lp <- as.array(x, pars = "lp__")
+
+  log_lik <- as.matrix(x, pars = "log_lik")[, 1:n, drop = FALSE]
+  r_eff <- loo::relative_eff(exp(-log_lik), chain_id = rep(1:dim(lp)[2], each = dim(lp)[1]))
+
+  loo::loo_predictive_metric(mu_pred, ..., y = y, metric = metric, log_lik = log_lik, r_eff = r_eff)
+}

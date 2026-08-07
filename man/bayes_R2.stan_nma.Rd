@@ -5,14 +5,18 @@
 \alias{bayes_R2}
 \alias{loo_R2.stan_nma}
 \alias{loo_R2}
-\title{Bayesian and Leave-One-Out R-squared}
+\alias{loo_predictive_metric.stan_nma}
+\alias{loo_predictive_metric}
+\title{Predictive performance}
 \usage{
 \method{bayes_R2}{stan_nma}(object, ..., probs = c(0.025, 0.5, 0.975), summary = TRUE)
 
 \method{loo_R2}{stan_nma}(object, ..., probs = c(0.025, 0.5, 0.975), summary = TRUE)
+
+\method{loo_predictive_metric}{stan_nma}(x, metric, ...)
 }
 \arguments{
-\item{object}{A \code{stan_nma} object.}
+\item{object, x}{A \code{stan_nma} object.}
 
 \item{...}{Not used.}
 
@@ -20,13 +24,19 @@
 summary, default \code{c(0.025, 0.25, 0.5, 0.75, 0.975)}}
 
 \item{summary}{Logical, calculate posterior summaries? Default \code{TRUE}.}
+
+\item{metric}{The type of predictive metric to be calculated. See
+\code{\link[loo:loo_predictive_metric]{loo::loo_predictive_metric()}}. The default is root mean squared error
+(\code{"rmse"}) for continuous or poisson outcomes, and true positive prediction
+rate (\code{"acc"}) for binary outcomes.}
 }
 \value{
-A \link{nma_summary} object if \code{summary = TRUE}, otherwise a 3D MCMC array
-of samples of the Bayesian or LOO $R^2$.
+For \code{bayes_R2()} and \code{loo_R2()}: a \link{nma_summary} object if \code{summary = TRUE}, otherwise a 3D MCMC array of samples of the Bayesian or LOO $R^2$.
+For \code{loo_predictive_metric()}: a list with the estimate and standard error.
 }
 \description{
-Calculate Bayesian-$R^2$ and LOO-$R^2$ values for a regression model.
-Currently this is only calculated for IPD regression models. Any models with
-both IPD and AgD (e.g. ML-NMR) will ignore the AgD part for this calculation.
+Calculate Bayesian-$R^2$, LOO-$R^2$, and leave-one-out predictive metrics for
+a regression model. Currently this is only calculated for IPD regression
+models. Any models with both IPD and AgD (e.g. ML-NMR) will ignore the AgD
+part for this calculation.
 }

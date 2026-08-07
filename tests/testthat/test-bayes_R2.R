@@ -27,9 +27,11 @@ test_that("argument checks", {
 
   expect_error(bayes_R2(fit_a), "No IPD")
   expect_error(loo_R2(fit_a), "No IPD")
+  expect_error(loo_predictive_metric(fit_a), "No IPD")
 
   expect_error(bayes_R2(fit_s), "Not supported for survival outcomes.")
   expect_error(loo_R2(fit_s), "Not supported for survival outcomes.")
+  expect_error(loo_predictive_metric(fit_s), "Not supported for survival outcomes.")
 })
 
 skip_on_cran()
@@ -83,6 +85,10 @@ test_that("normal outcome", {
 
   # rstanarm::stan_glm(y ~ x1 * trt, data = dat) |> rstanarm::loo_R2() |> summary()
   expect_equal(lr2$summary$mean, c(loo_R2 = 0.91), tolerance = 0.01)
+
+  expect_equal(loo_predictive_metric(fit),
+               list(estimate = 0.2, se = 0.007),
+               tolerance = 0.01)
 })
 
 test_that("poisson outcome", {
@@ -137,6 +143,11 @@ test_that("binary outcome", {
 
   # rstanarm::stan_glm(r ~ x1 * trt, data = dat, family = "binomial") |> rstanarm::loo_R2() |> summary()
   expect_equal(lr2$summary$mean, c(loo_R2 = 0.10), tolerance = 0.01)
+
+
+  expect_equal(loo_predictive_metric(fit),
+               list(estimate = 0.666, se = 0.021),
+               tolerance = 0.01)
 })
 
 test_that("ordered outcome", {
