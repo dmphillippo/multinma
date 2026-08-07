@@ -1,8 +1,8 @@
-#' Bayesian R-squared
+#' Bayesian and Leave-One-Out R-squared
 #'
-#' Calculate Bayesian-$R^2$ values for a regression model. Currently this is
-#' only calculated for IPD regression models. Any models with both IPD and AgD
-#' (e.g. ML-NMR) will ignore the AgD part for this calculation.
+#' Calculate Bayesian-$R^2$ and LOO-$R^2$ values for a regression model.
+#' Currently this is only calculated for IPD regression models. Any models with
+#' both IPD and AgD (e.g. ML-NMR) will ignore the AgD part for this calculation.
 #'
 #' @param object A `stan_nma` object.
 #' @param ... Not used.
@@ -11,7 +11,7 @@
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #'
 #' @return A [nma_summary] object if `summary = TRUE`, otherwise a 3D MCMC array
-#'  of samples of the Bayesian $R^2$.
+#'  of samples of the Bayesian or LOO $R^2$.
 #' @aliases bayes_R2
 #' @importFrom rstantools bayes_R2
 #' @export

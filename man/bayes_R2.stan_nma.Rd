@@ -5,7 +5,7 @@
 \alias{bayes_R2}
 \alias{loo_R2.stan_nma}
 \alias{loo_R2}
-\title{Bayesian R-squared}
+\title{Bayesian and Leave-One-Out R-squared}
 \usage{
 \method{bayes_R2}{stan_nma}(object, ..., probs = c(0.025, 0.5, 0.975), summary = TRUE)
 
@@ -23,10 +23,10 @@ summary, default \code{c(0.025, 0.25, 0.5, 0.75, 0.975)}}
 }
 \value{
 A \link{nma_summary} object if \code{summary = TRUE}, otherwise a 3D MCMC array
-of samples of the Bayesian $R^2$.
+of samples of the Bayesian or LOO $R^2$.
 }
 \description{
-Calculate Bayesian-$R^2$ values for a regression model. Currently this is
-only calculated for IPD regression models. Any models with both IPD and AgD
-(e.g. ML-NMR) will ignore the AgD part for this calculation.
+Calculate Bayesian-$R^2$ and LOO-$R^2$ values for a regression model.
+Currently this is only calculated for IPD regression models. Any models with
+both IPD and AgD (e.g. ML-NMR) will ignore the AgD part for this calculation.
 }
