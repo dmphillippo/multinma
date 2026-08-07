@@ -21,7 +21,7 @@ bayes_R2.stan_nma <- function(object, ..., probs = c(0.025, 0.5, 0.975), summary
 
   if (!has_ipd(object$network)) abort("No IPD present for which to calculate R2.")
   if (has_agd_arm(object$network) || has_agd_contrast(object$network))
-    inform("Note: R-squared calculated on IPD portion of the model only.")
+    inform("Note: R2 calculated on IPD portion of the model only.")
   if (object$likelihood %in% valid_lhood$survival) abort("Not supported for survival outcomes.")
 
   # Array of predicted responses
@@ -82,12 +82,11 @@ loo_R2.stan_nma <- function(object, ..., probs = c(0.025, 0.5, 0.975), summary =
 
   if (!has_ipd(object$network)) abort("No IPD present for which to calculate R2.")
   if (has_agd_arm(object$network) || has_agd_contrast(object$network))
-    inform("Note: R-squared calculated on IPD portion of the model only.")
+    inform("Note: R2 calculated on IPD portion of the model only.")
   if (object$likelihood %in% valid_lhood$survival) abort("Not supported for survival outcomes.")
 
   if (object$likelihood == "ordered") abort("Not supported for ordered outcomes.")
 
-  # Observed outcomes (non-ordered, unchanged)
   if (object$likelihood %in% c(valid_lhood$binary, valid_lhood$count, "poisson")) {
     y <- object$network$ipd$.r
   } else if (object$likelihood == "normal") {
