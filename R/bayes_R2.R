@@ -41,7 +41,11 @@ bayes_R2.stan_nma <- function(object, ..., probs = c(0.025, 0.5, 0.975), summary
       mean(rowSums(pmat * (1 - pmat)))
     })
   } else if (object$likelihood == "normal") {
-    var_res[,,1] <- as.array(object, pars = "sigma")^2
+    ss <- dplyr::group_by(object$network$ipd, .data$.study, .data$.trt) %>%
+      dplyr::summarise(n = dplyr::n()) %>%
+      dplyr::arrange(.data$.study, .data$.trt) %>%
+      dplyr::pull("n")
+    var_res[,,1] <- apply(as.array(object, pars = "sigma")^2, 1:2, FUN = weighted.mean, w = ss)
   } else if (object$likelihood == "poisson") {
     var_res[,,1] <- apply(mu_pred, 1:2, "mean")
   } else {
@@ -85,7 +89,7 @@ loo_R2.stan_nma <- function(object, ..., probs = c(0.025, 0.5, 0.975), summary =
     inform("Note: R-squared calculated on IPD portion of the model only.")
   if (object$likelihood %in% valid_lhood$survival) abort("Not supported for survival outcomes.")
 
-  if (object$likelihood == "ordered") abort("loo_R2 is not supported for ordered outcomes.")
+  if (object$likelihood == "ordered") abort("Not supported for ordered outcomes.")
 
   # Observed outcomes (non-ordered, unchanged)
   if (object$likelihood %in% c(valid_lhood$binary, valid_lhood$count, "poisson")) {
