@@ -27,14 +27,21 @@ test_that("argument checks", {
 
   expect_error(bayes_R2(fit_a), "No IPD")
   expect_error(loo_R2(fit_a), "No IPD")
-  expect_error(loo_predictive_metric(fit_a), "No IPD")
 
   expect_error(bayes_R2(fit_s), "Not supported for survival outcomes.")
   expect_error(loo_R2(fit_s), "Not supported for survival outcomes.")
+})
+
+
+skip_on_cran()
+
+library(loo)
+
+test_that("argument checks", {
+  expect_error(loo_predictive_metric(fit_a), "No IPD")
   expect_error(loo_predictive_metric(fit_s), "Not supported for survival outcomes.")
 })
 
-skip_on_cran()
 
 # Generate some IPD
 set.seed(24601)
