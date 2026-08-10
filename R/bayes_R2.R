@@ -148,9 +148,9 @@ loo_R2.stan_nma <- function(object, ..., probs = c(0.025, 0.5, 0.975), summary =
 #'   (`"rmse"`) for continuous or poisson outcomes, and true positive prediction
 #'   rate (`"acc"`) for binary outcomes.
 #' @aliases loo_predictive_metric
-#' @importFrom loo loo_predictive_metric
 #' @rdname bayes_R2.stan_nma
-#' @export
+#' @method loo_predictive_metric stan_nma
+# Dynamically exported, see zzz.R
 loo_predictive_metric.stan_nma <- function(x, metric, ...) {
   require_pkg("loo")
 
