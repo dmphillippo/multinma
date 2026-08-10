@@ -31,12 +31,13 @@ summary, default \code{c(0.025, 0.25, 0.5, 0.75, 0.975)}}
 rate (\code{"acc"}) for binary outcomes.}
 }
 \value{
-For \code{bayes_R2()} and \code{loo_R2()}: a \link{nma_summary} object if \code{summary = TRUE}, otherwise a 3D MCMC array of samples of the Bayesian or LOO $R^2$.
-For \code{loo_predictive_metric()}: a list with the estimate and standard error.
+For \code{bayes_R2()} and \code{loo_R2()}: a \link{nma_summary} object if \code{summary = TRUE}, otherwise a 3D MCMC array of samples of the Bayesian or LOO
+\eqn{R^2}. For \code{loo_predictive_metric()}: a list with the estimate and
+standard error.
 }
 \description{
-Calculate Bayesian-$R^2$, LOO-$R^2$, and leave-one-out predictive metrics for
-a regression model. Currently this is only calculated for IPD regression
-models. Any models with both IPD and AgD (e.g. ML-NMR) will ignore the AgD
-part for this calculation.
+Calculate Bayesian-\eqn{R^2}, LOO-\eqn{R^2}, and leave-one-out predictive
+metrics for a regression model. Currently this is only calculated for IPD
+regression models. Any models with both IPD and AgD (e.g. ML-NMR) will ignore
+the AgD part for this calculation.
 }

@@ -1,9 +1,9 @@
 #' Predictive performance
 #'
-#' Calculate Bayesian-$R^2$, LOO-$R^2$, and leave-one-out predictive metrics for
-#' a regression model. Currently this is only calculated for IPD regression
-#' models. Any models with both IPD and AgD (e.g. ML-NMR) will ignore the AgD
-#' part for this calculation.
+#' Calculate Bayesian-\eqn{R^2}, LOO-\eqn{R^2}, and leave-one-out predictive
+#' metrics for a regression model. Currently this is only calculated for IPD
+#' regression models. Any models with both IPD and AgD (e.g. ML-NMR) will ignore
+#' the AgD part for this calculation.
 #'
 #' @param object,x A `stan_nma` object.
 #' @param ... Not used.
@@ -12,8 +12,9 @@
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #'
 #' @return For `bayes_R2()` and `loo_R2()`: a [nma_summary] object if `summary =
-#'   TRUE`, otherwise a 3D MCMC array of samples of the Bayesian or LOO $R^2$.
-#'   For `loo_predictive_metric()`: a list with the estimate and standard error.
+#'   TRUE`, otherwise a 3D MCMC array of samples of the Bayesian or LOO
+#'   \eqn{R^2}. For `loo_predictive_metric()`: a list with the estimate and
+#'   standard error.
 #' @aliases bayes_R2
 #' @importFrom rstantools bayes_R2
 #' @export
