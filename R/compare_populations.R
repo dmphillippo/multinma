@@ -346,15 +346,15 @@ compare_populations <- function(network,
                     study2 = factor(.data$study2, levels = levels(network$studies))) %>%
       # Add total sample size
       dplyr::left_join(dplyr::transmute(all_summary, .data$.study, ss1 = .data$sample_size),
-                       by = dplyr::join_by(x$study1 == y$.study)) %>%
+                       by = c("study1" = ".study")) %>%
       dplyr::left_join(dplyr::transmute(all_summary, .data$.study, ss2 = .data$sample_size),
-                       by = dplyr::join_by(x$study2 == y$.study)) %>%
-      dplyr::mutate(sample_size = ss1 + ss2) %>%
+                       by = c("study2" = ".study")) %>%
+      dplyr::mutate(sample_size = .data$ss1 + .data$ss2) %>%
       dplyr::select(-"ss1", -"ss2") %>%
       dplyr::relocate("comparison", "study1", "study2", "sample_size", dplyr::everything()) %>%
       dplyr::filter(which(network$studies == .data$study1) >
                       which(network$studies == .data$study2)) %>%
-      dplyr::arrange(distance)
+      dplyr::arrange(.data$distance)
 
 
     out <- list(summary = summary_df,
@@ -425,13 +425,13 @@ print.pop_comp <- function(x,
     if (x$method == "propensity") {
       x_sum <- dplyr::arrange(x_sum, dplyr::desc(.data$ess_percent))
     } else if (x$method == "euclidean") {
-      x_sum <- dplyr::arrange(x_sum, distance)
+      x_sum <- dplyr::arrange(x_sum, .data$distance)
     }
   } else {
     if (x$method == "propensity") {
       x_sum <- dplyr::arrange(x_sum, .data$ess_percent)
     } else if (x$method == "euclidean") {
-      x_sum <- dplyr::arrange(x_sum, dplyr::desc(distance))
+      x_sum <- dplyr::arrange(x_sum, dplyr::desc(.data$distance))
     }
   }
 
@@ -447,7 +447,7 @@ print.pop_comp <- function(x,
     }
 
     # Show only comparisons across subnetworks
-    x_sum <- dplyr::filter(x_sum, comp_lookup[study1] != comp_lookup[study2])
+    x_sum <- dplyr::filter(x_sum, comp_lookup[.data$study1] != comp_lookup[.data$study2])
   }
 
   x_sum <- dplyr::mutate_at(x_sum, num_col, ~round(., digits)) %>%
