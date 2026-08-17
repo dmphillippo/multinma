@@ -82,9 +82,9 @@ ndmm_agd_covs
 #> 4 65.59387 8.384686  0.3186275        0.7450980 0.6151961
 ```
 
-Phillippo et al. ([2026](#ref-Phillippo_survival)) analysed these data
-using multilevel network meta-regression (ML-NMR), and we recreate these
-analyses here.
+Phillippo, Dias, et al. ([2026](#ref-Phillippo_survival)) analysed these
+data using multilevel network meta-regression (ML-NMR), and we recreate
+these analyses here.
 
 ## Study data
 
@@ -298,9 +298,11 @@ log-log plot.
 ## ML-NMR models with M-spline baseline hazards
 
 We fit a proportional hazards survival model with cubic M-splines on the
-baseline hazard Phillippo et al. ([2026](#ref-Phillippo_survival)). This
-allows the baseline hazard to flexibly follow any shape that the
-baseline hazard may take. ML-NMR models are fit using the
+baseline hazard ([Phillippo, Sadek, et al.
+2026](#ref-Phillippo_mspline); [Phillippo, Dias, et al.
+2026](#ref-Phillippo_survival)). This allows the baseline hazard to
+flexibly follow any shape that the baseline hazard may take. ML-NMR
+models are fit using the
 [`nma()`](https://dmphillippo.github.io/multinma/dev/reference/nma.md)
 function, and we specify that a M-spline baseline hazard should be used
 with `likelihood = "mspline"`.
@@ -311,8 +313,8 @@ location of the knots. By default, seven internal knots are used
 observed event times within each study. Overfitting is avoided by the
 use of a random walk prior distribution on the (inverse softmax
 transformed) spline coefficients that penalises complexity and shrinks
-towards a constant baseline hazard ([Phillippo et al.
-2025](#ref-Phillippo_mspline)); in practice this means that the number
+towards a constant baseline hazard ([Phillippo, Sadek, et al.
+2026](#ref-Phillippo_mspline)); in practice this means that the number
 of knots can be set to a sufficiently large number and left to shrink to
 a suitable level of complexity controlled by the standard deviation of
 the random walk. The number of knots can be changed using the `n_knots`
@@ -540,8 +542,8 @@ plot(predict(ndmm_fit, type = "hazard", level = "individual",
 
 We can relax and assess the proportional hazards (PH) assumption by
 allowing the spline coefficients to vary between treatment arms within
-each study ([Phillippo et al. 2025](#ref-Phillippo_mspline)). This may
-be achieved using the `aux_by` argument, with
+each study ([Phillippo, Sadek, et al. 2026](#ref-Phillippo_mspline)).
+This may be achieved using the `aux_by` argument, with
 `aux_by = c(.study, .trt)`. Technically, `aux_by = .study` is always
 assumed in order to respect randomisation (analogous to stratifying the
 intercept terms in a NMA by study), and we could simply write
@@ -703,8 +705,8 @@ proportional hazards using the `aux_regression` argument to
 [`nma()`](https://dmphillippo.github.io/multinma/dev/reference/nma.md)
 which places a model on the (inverse softmax transformed) spline
 coefficients, or on the shape parameters in a parametric model
-([Phillippo et al. 2025](#ref-Phillippo_mspline)). For example, we can
-allow the baseline hazard to vary smoothly by treatment arm
+([Phillippo, Sadek, et al. 2026](#ref-Phillippo_mspline)). For example,
+we can allow the baseline hazard to vary smoothly by treatment arm
 (`aux_regression = ~.trt`) and/or by other covariates
 (e.g. `aux_regression = ~.trt + iss_stage3`). This further relaxes the
 proportional hazards assumption (which is already relaxed by the
@@ -1094,7 +1096,7 @@ Analysis.” *Journal of the Royal Statistical Society Series A:
 Statistics in Society* 189 (3): 1856–75.
 <https://doi.org/10.1093/jrsssa/qnaf169>.
 
-Phillippo, D. M., A. Sadek, H. Pedder, and N. J. Welton. 2025. “Network
+Phillippo, D. M., A. Sadek, H. Pedder, and N. J. Welton. 2026. “Network
 Meta-Analysis of Survival Outcomes with Non-Proportional Hazards Using
-Flexible M-splines.” *arXiv*, ahead of print.
-<https://doi.org/10.48550/ARXIV.2509.10383>.
+Flexible M-splines.” *Statistics in Medicine* 45 (18-19): e70695.
+<https://doi.org/10.1002/sim.70695>.
