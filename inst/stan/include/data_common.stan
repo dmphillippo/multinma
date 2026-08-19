@@ -3,10 +3,12 @@
 int<lower=0> ns_ipd; // number of IPD studies
 int<lower=0> ns_agd_arm; // number of AgD (arm-based) studies
 int<lower=0> ns_agd_contrast; // number of AgD (contrast-based) studies
+int<lower=0> ns_agd_regression; // number of AgD (regression coefficient) studies
 
 int<lower=0> ni_ipd; // total number of IPD individuals
 int<lower=0> ni_agd_arm; // total number of AgD (arm-based) data points
 int<lower=0> ni_agd_contrast; // total number of AgD (contrast-based) data points
+int<lower=0> ni_agd_regression; // total number of AgD (regression coefficient) data points
 
 // Treatment IDs
 int<lower=0> narm_ipd; // Number of IPD arms
@@ -38,10 +40,30 @@ int<lower=1> link; // link function
 vector[ni_agd_contrast] agd_contrast_y;
 cov_matrix[ni_agd_contrast ? ni_agd_contrast : 1] agd_contrast_Sigma;
 
+// -- AgD regression coefficients --
+int<lower=0> nc_agd_regression; // Total number of coef.
+int<lower=0> no_agd_regression; // Total number of omitted coef.
+int<lower=0> nl_agd_regression; // Total number of included coef.
+int<lower=0> agd_regression_max_ncoef;
+int<lower=0> agd_regression_max_ncoef_omt;
+int<lower=0> agd_regression_max_ncoef_inc;
+int<lower=0> agd_regression_max_nrow;
+vector[ns_agd_regression ? nc_agd_regression : 0] agd_regression_est; // Reported coef. estimations
+array[ns_agd_regression ? ns_agd_regression : 0] int<lower=0,upper=agd_regression_max_ncoef> agd_regression_ncoef; // Number of coef. in each regression model
+array[ns_agd_regression ? ns_agd_regression : 0] cholesky_factor_cov[agd_regression_max_ncoef] agd_regression_cov;
+array[ns_agd_regression ? ns_agd_regression : 0] int<lower=0,upper=1> agd_regression_reduced_study; // specify reduced study, (yes = 1)
+array[ni_agd_regression ? nl_agd_regression : 0] int XI_col_vec; // Column numbers of included coef. in the network design matrix
+array[ni_agd_regression ? no_agd_regression : 0] int XO_col_vec; // Column numbers of omitted coef. in the netwoek design matrix
+matrix[ni_agd_regression ? ni_agd_regression : 0, ni_agd_regression ? nX : 0] X_agd_regression_int; // Design matrix using integration points
+array[ns_agd_regression ? ns_agd_regression : 0] int<lower=0> agd_regression_nx; // Number of rows for AgD regression design matrix for each study
+array[ns_agd_regression ? ns_agd_regression : 0] int<lower=0,upper=agd_regression_max_ncoef_omt> agd_regression_ncoef_omt; // Number of omitted coef. in each regression model
+array[ns_agd_regression ? ns_agd_regression : 0] int<lower=0,upper=agd_regression_max_ncoef_inc> agd_regression_ncoef_inc; // Number of included coef. in each regression model
+
 // -- Design matrix or thin QR decomposition --
 int<lower=0, upper=1> QR; // use QR decomposition (yes = 1)
-matrix[ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast), nX] X; // X is Q from QR decomposition if QR = 1
+matrix[ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast) + nc_agd_regression, nX] X; // X is Q from QR decomposition if QR = 1
 matrix[QR ? nX : 0, QR ? nX : 0] R_inv;
+//matrix[QR ? nX : 0, QR ? nX : 0] R;
 
 // -- Offsets --
 int<lower=0, upper=1> has_offset; // Offset flag (yes = 1)
@@ -49,7 +71,7 @@ vector[has_offset ? ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast) : 0] offs
 
 // -- Random effects --
 int<lower=0, upper=1> RE; // Random effects flag (yes = 1)
-array[RE ? narm_ipd + narm_agd_arm + ni_agd_contrast : 0] int<lower=0> which_RE; // ID of RE delta for each arm (0 for no RE delta)
+array[RE ? narm_ipd + narm_agd_arm + ni_agd_contrast + nc_agd_regression : 0] int<lower=0> which_RE; // ID of RE delta for each arm (0 for no RE delta)
 corr_matrix[RE ? max(which_RE) : 1] RE_cor; // RE correlation matrix
 
 // -- Node-splitting --

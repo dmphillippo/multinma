@@ -18,6 +18,50 @@ data {
 }
 transformed data {
 #include /include/transformed_data_common.stan
+
+// -- AgD model (regression coefficients) --
+vector [(link == 2 && no_agd_regression) ? ni_agd_regression:0] eta_red;
+vector [(link == 2 && no_agd_regression) ? ni_agd_regression:0] mu_red;
+array[no_agd_regression ? ns_agd_regression : 0] matrix[agd_regression_max_ncoef_inc, agd_regression_max_ncoef_omt] agd_regression_OVB_mat_omt; // (XI' XI)^{-1}XI' XO
+array[no_agd_regression ? ns_agd_regression : 0] matrix[agd_regression_max_ncoef_inc, agd_regression_max_nrow] agd_regression_OVB_mat_hat; // (XI' XI)^{-1} XI'
+
+ if (no_agd_regression){
+   int c_c = 0; // coef. counter
+   int c_i = 0; // Included coef. counter
+   int c_o = 0; // Omitted coef. counter
+   int c_x = 0; // X_int rows counter
+   for (i in 1:ns_agd_regression) {
+
+     if(agd_regression_reduced_study[i]){
+
+      // vector mdivide_left_spd( M,  N)  equals to inverse(M) * N
+      // matrix crossprod(matrix x) equals to X'X
+
+      agd_regression_OVB_mat_hat[i][1:agd_regression_ncoef_inc[i], 1:agd_regression_nx[i] ]  =
+      mdivide_left_spd( crossprod(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ]) ,
+      (X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ])' );
+
+      agd_regression_OVB_mat_omt[i][1:agd_regression_ncoef_inc[i], 1:agd_regression_ncoef_omt[i] ]  =
+      agd_regression_OVB_mat_hat[i][1:agd_regression_ncoef_inc[i], 1:agd_regression_nx[i] ] *
+      (X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ]);
+
+      if (link == 2){ // log link
+        eta_red[(c_x+1):(c_x+agd_regression_nx[i])] =
+        X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] *
+        agd_regression_est[(c_c+1):(c_c+agd_regression_ncoef[i])];
+
+        mu_red[(c_x+1):(c_x+agd_regression_nx[i])]  =  exp(eta_red[(c_x+1):(c_x+agd_regression_nx[i])]);
+       }
+
+     }
+
+     c_c += agd_regression_ncoef[i];
+     c_i += agd_regression_ncoef_inc[i];
+     c_o += agd_regression_ncoef_omt[i];
+     c_x += agd_regression_nx[i];
+   }
+ }
+
 }
 parameters {
 #include /include/parameters_common.stan
@@ -136,6 +180,69 @@ transformed parameters {
       }
     }
   }
+
+  // -- AgD model (regression coefficients) --
+  vector [(link == 2 && no_agd_regression) ? ni_agd_regression:0] mu_ful;
+  vector [(link == 2 && no_agd_regression) ? ni_agd_regression:0] lp_err; // linear predictor mismatch
+  vector [(link == 2 && no_agd_regression) ? ni_agd_regression:0] mu_err; // mu mismatch
+  if (nc_agd_regression) {
+
+    if (sum(agd_regression_reduced_study)){
+      // vector [nX] allbeta_OVB;
+      int c_c = 0; // coef. counter
+      int c_i = 0; // Included coef. counter
+      int c_o = 0; // Omitted coef. counter
+      int c_x = 0; // X_int rows counter
+      for (i in 1:ns_agd_regression) {
+        // OVB adjustment
+        if (agd_regression_reduced_study[i] ){
+          if (link == 1){ // identity link
+
+            eta_agd_regression[(c_c+1):(c_c+agd_regression_ncoef[i])] =
+              allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] +
+              block(agd_regression_OVB_mat_omt[i], 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_ncoef_omt[i] ) *
+              allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]];
+
+          }else if (link == 2){ // log link (GLM)
+
+            mu_ful[(c_x+1):(c_x+agd_regression_nx[i])] =  exp(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]),] * allbeta) ;
+
+            mu_err[(c_x+1):(c_x+agd_regression_nx[i])] =
+              mu_red[ (c_x+1):(c_x+agd_regression_nx[i])] -
+              mu_ful[ (c_x+1):(c_x+agd_regression_nx[i])];
+
+            lp_err[(c_x+1):(c_x+agd_regression_nx[i])] =
+              eta_red[(c_x+1):(c_x+agd_regression_nx[i])] -
+              log(mu_red[(c_x+1):(c_x+agd_regression_nx[i])] - mu_err[(c_x+1):(c_x+agd_regression_nx[i])]);
+
+            eta_agd_regression[(c_c+1):(c_c+agd_regression_ncoef[i])] =
+              allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] +
+              block(agd_regression_OVB_mat_omt[i], 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_ncoef_omt[i] ) *
+              allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]] +
+              block(agd_regression_OVB_mat_hat[i]  , 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_nx[i] ) *
+              lp_err[(c_x+1):(c_x+agd_regression_nx[i])];
+          }
+        } else{
+          eta_agd_regression[ (c_c+1):(c_c+agd_regression_ncoef[i]) ] = X_agd_regression_no_QR[ (c_c+1):(c_c+agd_regression_ncoef[i]), ] * allbeta;
+        }
+        c_c += agd_regression_ncoef[i];
+        c_i += agd_regression_ncoef_inc[i];
+        c_o += agd_regression_ncoef_omt[i];
+        c_x += agd_regression_nx[i];
+      }
+    }else{
+      eta_agd_regression = X_agd_regression * beta_tilde;
+    }
+
+    if (RE) {
+      for (i in 1:nc_agd_regression) {
+        if (which_RE[narm_ipd + narm_agd_arm + ni_agd_contrast + i])
+          eta_agd_regression[i] = eta_agd_regression[i] + f_delta[which_RE[narm_ipd + narm_agd_arm + ni_agd_contrast + i]];
+      }
+    }
+
+  }
+
 }
 model {
 #include /include/model_common.stan
@@ -149,6 +256,26 @@ model {
 
   // -- AgD likelihood (arm-based) --
   agd_arm_y ~ normal(theta_agd_arm_bar, agd_arm_se);
+
+  // -- AgD regression soft constraints --
+  if(link == 2 && no_agd_regression){
+    int c_x = 0;
+    int c_i = 0;
+    for (i in 1:ns_agd_regression) {
+      if(agd_regression_reduced_study[i]){
+
+           (
+              ((X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]) , XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]])' *
+               mu_err[(c_x+1):(c_x+agd_regression_nx[i])]) / agd_regression_nx[i]
+           ) ~ normal( 0 , 0.01) ;
+
+      }
+      c_i += agd_regression_ncoef_inc[i];
+      c_x += agd_regression_nx[i];
+    }
+  }
+
+
 }
 generated quantities {
 #include /include/generated_quantities_theta_fitted.stan

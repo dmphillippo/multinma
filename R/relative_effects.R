@@ -228,7 +228,7 @@ relative_effects <- function(x, newdata = NULL, study = NULL,
               tidyr::unnest(cols = c(".Surv", ".data_orig"))
           } else {
             # Drop nested .Surv column, breaks join with ipd
-            dat_agd_arm <- dplyr::select(x$network$agd_arm, -.data$.Surv)
+            dat_agd_arm <- dplyr::select(x$network$agd_arm, -".Surv")
           }
 
           # Unnest integration points if present

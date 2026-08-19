@@ -9,6 +9,7 @@ nma(
   consistency = c("consistency", "ume", "nodesplit"),
   trt_effects = c("fixed", "random"),
   regression = NULL,
+  OVB_adj = c("all", "auto", "none"),
   class_interactions = c("common", "exchangeable", "independent"),
   class_effects = c("independent", "common", "exchangeable"),
   class_sd = c("independent", "common"),
@@ -53,6 +54,12 @@ effect-modifying terms for a regression model. Any references to treatment
 should use the \code{.trt} special variable, for example specifying effect
 modifier interactions as \code{variable:.trt} (see details). The special
 variable \code{.mu} can be used for baseline risk meta-regression: \code{~.mu:.trt}.}
+
+\item{OVB_adj}{Character string controlling omitted variable bias (OVB)
+adjustment for reduced models.
+\code{"all"} (the default) apply OVB adjustment to all reduced models. Quasi–Monte Carlo (QMC) integration points must be available for all reduced model(s).
+\code{"auto"} apply OVB adjustment only to reduced models which the QMC integration points are available.
+\code{"none"} do not apply OVB adjustment for reduced model(s), even if QMC integration points are provided.}
 
 \item{class_interactions}{Character string specifying whether effect modifier
 interactions are specified as \code{"common"}, \code{"exchangeable"}, or

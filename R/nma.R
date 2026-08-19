@@ -14,6 +14,11 @@
 #'   should use the `.trt` special variable, for example specifying effect
 #'   modifier interactions as `variable:.trt` (see details). The special
 #'   variable `.mu` can be used for baseline risk meta-regression: `~.mu:.trt`.
+#' @param OVB_adj Character string controlling omitted variable bias (OVB)
+#'   adjustment for reduced models.
+#'   `"all"` (the default) apply OVB adjustment to all reduced models. Quasi–Monte Carlo (QMC) integration points must be available for all reduced model(s).
+#'   `"auto"` apply OVB adjustment only to reduced models which the QMC integration points are available.
+#'   `"none"` do not apply OVB adjustment for reduced model(s), even if QMC integration points are provided.
 #' @param class_interactions Character string specifying whether effect modifier
 #'   interactions are specified as `"common"`, `"exchangeable"`, or
 #'   `"independent"`.
@@ -280,6 +285,7 @@ nma <- function(network,
                 consistency = c("consistency", "ume", "nodesplit"),
                 trt_effects = c("fixed", "random"),
                 regression = NULL,
+                OVB_adj = c("all", "auto", "none"),
                 class_interactions = c("common", "exchangeable", "independent"),
                 class_effects = c("independent", "common", "exchangeable"),
                 class_sd =  c("independent", "common"),
@@ -321,6 +327,7 @@ nma <- function(network,
   consistency <- rlang::arg_match(consistency)
   trt_effects <- rlang::arg_match(trt_effects)
   class_effects <- rlang::arg_match(class_effects)
+  OVB_adj <- rlang::arg_match(OVB_adj)
 
   # Check class_effects and network classes
   if (class_effects != "independent") {
@@ -564,7 +571,7 @@ nma <- function(network,
                                 "gamma", "gengamma", "mspline", "pexp")
 
   # Are study intercepts present? Not if only contrast data
-  has_intercepts <- has_agd_arm(network) || has_ipd(network)
+  has_intercepts <- has_agd_arm(network) || has_ipd(network) || has_agd_regression(network)
 
   # Check priors
   check_prior(prior_intercept)
@@ -715,7 +722,6 @@ nma <- function(network,
     aux_by <- NULL
   }
 
-
   # Use numerical integration? TRUE if class mlnmr_data and regression is not NULL
   # (Avoids unnecessary use of integration points if regression formula not specified)
   use_int <- inherits(network, "mlnmr_data") && (!is.null(regression) || aux_needs_integration(aux_regression = aux_regression, aux_by = aux_by))
@@ -726,7 +732,7 @@ nma <- function(network,
 
   # Warn if combining AgD and IPD in a meta-regression without using integration
   if (!is.null(regression) && !inherits(network, "mlnmr_data") && has_ipd(network) &&
-      (has_agd_arm(network) || has_agd_contrast(network))) {
+      (has_agd_arm(network) || has_agd_contrast(network) || has_agd_regression(network))) {
     warn(glue::glue("No integration points available, using naive plug-in model at aggregate level.\n",
                     "Use `add_integration()` to add integration points to the network."))
   }
@@ -872,9 +878,439 @@ nma <- function(network,
     Sigma_agd_contrast <- NULL
   }
 
+  # Make NMA formula
+  nma_formula <- make_nma_formula(regression,
+                                  consistency = consistency,
+                                  classes = !is.null(network$classes),
+                                  class_interactions = class_interactions)
+
+  if (has_agd_regression(network)) {
+
+    dat_agd_regression <- network$agd_regression
+
+    # Convert to a list by study to manipulate it easier using map()
+    dat_agd_regression_split <- dat_agd_regression %>%
+      split(forcats::fct_inorder(forcats::fct_drop(.$.study))) # keep the original order
+
+    # Check regression models in agd_regression are compatible with NMA regression
+    # Check all terms, such as main and interaction terms, rather than just check variables
+    agd_reg_f <- dat_agd_regression_split %>%
+      purrr::map(~make_nma_formula(.x$.regression[[1]],
+                                   consistency = consistency,
+                                   classes = !is.null(network$classes),
+                                   class_interactions = class_interactions))
+
+    # Sort interaction terms to prevent X:.trtclass and .trtclass:X from being considered different terms.
+    agd_reg_term <- agd_reg_f %>%
+      purrr::map(.,~attr(terms(make_nma_formula(.,
+                                                consistency = consistency,
+                                                classes = !is.null(network$classes),
+                                                class_interactions = class_interactions)), "term.labels")) %>%
+      purrr::map( ~ sapply(strsplit(.x,':'), function(q) paste0(sort(q),collapse = ':') ) )
+
+    nma_formula_term <- purrr::map_chr(strsplit(  attr(terms(nma_formula), "term.labels")  ,':') , ~ paste0(sort(.x),collapse = ':'))
+
+    if (any(purrr::map_lgl(agd_reg_term,~ length(setdiff(.,nma_formula_term)) > 0)))
+      abort("AgD regression formulas must be from nested models of `regression`")
+
+    # Check which variables (not terms) are omitted in regression models
+    agd_reg_var_nma <- all.vars(nma_formula) %>% stringr::str_subset("^\\.",negate = TRUE)
+    agd_reg_var_reg <- agd_reg_f %>% purrr::map(~all.vars(.)%>% stringr::str_subset("^\\.",negate = TRUE) )
+    omitted_vars <- purrr::map(agd_reg_var_reg, ~setdiff(agd_reg_var_nma,.))
+    omitted_vars_common <- purrr::reduce(omitted_vars, intersect)
+
+    # Add common omitted vars as dummy (zero value) to work smoothly with other design matrices, e.g., IPD or AgD
+    if(length(omitted_vars_common)){
+      dat_agd_regression_split <- dat_agd_regression_split %>%
+        purrr::map(~ .x %>% dplyr::select(-any_of(omitted_vars_common)) %>%
+		tibble::add_column(!!!rlang::set_names(rep(list(0), length(omitted_vars_common)), omitted_vars_common)))
+    }
+
+    # Identify reduced models
+    dat_agd_regression_split <- purrr::map2(dat_agd_regression_split ,agd_reg_term,
+                                            ~ .x %>% dplyr::mutate(.is_reduced =  as.integer(!setequal(.y,nma_formula_term)) ) )
+
+    agd_regression_reduced <- dat_agd_regression_split %>%
+      purrr::map(~.x %>% dplyr::filter(!is.na(.estimate)) %>% dplyr::pull(.is_reduced) ) %>% unlist()
+
+    agd_regression_reduced_study <-  dat_agd_regression_split %>%
+      purrr::map_int(~.x %>% dplyr::filter(is.na(.estimate)) %>% dplyr::pull(.is_reduced) )
+
+    # Number of coef. in each study
+    agd_regression_ncoef <- dat_agd_regression_split %>% purrr::map_int( ~ sum(!is.na(.x$.estimate)))
+    agd_regression_max_ncoef <- max(agd_regression_ncoef)
+
+    # Total number of studies
+    ns_agd_regression <- length(dat_agd_regression_split)
+    # Total number of coef.
+    nc_agd_regression <- sum(agd_regression_ncoef)
+
+    # Check availability of QMC integration points for each study
+    if (all(paste0('.int_',agd_reg_var_nma) %in% colnames(dat_agd_regression_split[[1]]))){
+     agd_regression_qmc_known <- dat_agd_regression_split %>%
+      purrr::map_lgl(
+        ~ all(purrr::flatten(
+          .x %>% dplyr::select( paste0('.int_',agd_reg_var_nma))
+        ) %>% purrr::map_int(length))
+      )
+    }else{
+      agd_regression_qmc_known <- rep(FALSE, ns_agd_regression)
+    }
+    # Unlist dat_agd_regression
+    dat_agd_regression <- dplyr::bind_rows(dat_agd_regression_split)
+
+    # Split into baseline and non-baseline rows
+    dat_agd_regression_bl <- dplyr::filter(dat_agd_regression, is.na(.data$.estimate))
+    dat_agd_regression_nonbl <- dplyr::filter(dat_agd_regression, !is.na(.data$.estimate))
+
+    # Study names
+    agd_regression_name_study <- dat_agd_regression_bl %>% dplyr::pull(.data$.study) %>% as.character()
+
+    # Pull estimates
+    est_agd_regression <- dat_agd_regression_nonbl$.estimate
+
+    # Study IDs
+    study_agd_regression <- as.integer(dat_agd_regression_nonbl$.study)
+
+    # --- Covariance structure ---
+    agd_regression_cov_known <-  dat_agd_regression_split %>%
+      purrr::map_lgl(~ .x %>% dplyr::filter(!is.na(.estimate)) %>%
+                dplyr::summarise(.cov_known =  all(.cov_known)) %>% dplyr::pull(.cov_known) )
+
+    if ( sum(!agd_regression_cov_known) && likelihood %in% valid_lhood$survival ) {
+      abort("Reconstructing the variance-covariance matrix of coefficient estimates is not yet supported for survival likelihoods. For each regression model, specify `se` and `cor`, or `cov`.")
+    } else if( any( miss_names <- !agd_regression_cov_known &  !agd_regression_qmc_known ) ){
+      abort(glue::glue("Integration points are not provided to reconstruct the covariance matrix of the coefficients",
+                       " for stud{if (sum(miss_names)>1) 'ies' else 'y'} ",
+                       glue::glue_collapse(glue::double_quote(agd_regression_name_study[miss_names]), sep = ", ", last = " and ", width = 30),
+                       ".\nFor each study, provide `se` and integration points with `add_integration()`, or provide `se` and `cor`, or `cov`."))
+    }
+    # Unpack given covariance matrices and others will be reconstructed
+    cov_agd_regression <- vector("list", ns_agd_regression )
+    cov_agd_regression[agd_regression_cov_known] <-
+      by( dat_agd_regression_split %>%  dplyr::bind_rows() %>% dplyr::filter(.data$.cov_known) ,
+          ~.study, function(x) unpack_tri(x$.cov))[ names(agd_regression_cov_known)[agd_regression_cov_known] ]
+
+    # --- Update reduced study status using OVB adjustment type ---
+    if (OVB_adj == 'all' && sum(agd_regression_reduced_study) == 0) OVB_adj <- "none"
+    if (OVB_adj == 'none' && any( miss_names <- agd_regression_reduced_study) ){
+      # Ignore OVB for reduced models
+      agd_regression_reduced_study <- rep(0,length(agd_regression_reduced_study))
+      inform(glue::glue('OVB_adj = "{OVB_adj}".',
+                         " AgD (regression) stud{if (sum(miss_names)>1) 'ies' else 'y'} ",
+                         glue::glue_collapse(glue::double_quote(agd_regression_name_study[as.logical(miss_names)]), sep = ", ", last = " and ", width = 30),
+                         " provide{if (sum(miss_names)>1) '' else 's'} results from {if (sum(miss_names)>1) 'reduced models' else 'a reduced model'}.\nNo OVB adjustment will be applied."
+      ))
+
+    } else if(OVB_adj == 'auto' && any( miss_names <- agd_regression_reduced_study & !agd_regression_qmc_known )  ){
+      # Apply OVB for reduced studies with QMC integration points
+      agd_regression_reduced_study <- as.numeric( agd_regression_reduced_study & agd_regression_qmc_known )
+      inform(glue::glue("Integration points are not provided",
+                         " for stud{if (sum(miss_names)>1) 'ies' else 'y'} ",
+                         glue::glue_collapse(glue::double_quote(agd_regression_name_study[miss_names]), sep = ", ", last = " and ", width = 30),
+                         ".\nOVB adjustment will not apply to {if (sum(miss_names)>1) 'these studies' else 'this study'}."))
+
+    } else if(OVB_adj == 'all' &&  any( miss_names <- agd_regression_reduced_study & !agd_regression_qmc_known) ){
+      abort(glue::glue('OVB_adj = "{OVB_adj}", but no integration points are provided',
+                       " for stud{if (sum(miss_names)>1) 'ies' else 'y'} ",
+                       glue::glue_collapse(glue::double_quote(agd_regression_name_study[miss_names]), sep = ", ", last = " and ", width = 30), '\nUse add_integration(), or set OVB_adj = "auto" or "none".'
+      ))
+    }
+
+    # --- intercepts ---
+    dat_agd_regression_split <- dat_agd_regression_split %>%
+      purrr::map(~ .x %>% dplyr::mutate(.is_intercept = rowSums(across(all_of(agd_reg_var_nma))) == 0 & (.trt %in% .trt[is.na(.estimate)]) & !is.na(.estimate) ))
+    agd_regression_ncoef_cpt <- dat_agd_regression_split %>% purrr::map_int(~sum(.x$.is_intercept))
+    np_agd_regression <- sum(agd_regression_ncoef_cpt) # Total number of intercepts
+
+    X_agd_regression_cc <- agd_regression_est_map_cc <- NULL
+    if (likelihood == 'ordered'){
+
+      if (any(agd_regression_reduced_study & agd_regression_ncoef_cpt == 0))
+        abort("No intercept specified in AgD regression for reduced models.")
+
+      if (any(agd_regression_reduced_study)  && !'.rank_intercept'  %in% colnames(dat_agd_regression))
+        abort('Specify cuts using `ordinal_cut` and `ordinal_cut_lab` argumnets for reduced models.')
+
+      if ('.rank_intercept' %in% colnames(dat_agd_regression)){
+
+        if (any(dat_agd_regression_split %>%
+                purrr::map_lgl( ~ (.x %>% dplyr::filter( .rank_intercept == 0 & .is_intercept) %>% nrow()) > 0)))
+          abort('`ordinal_cut` must be used only for intercept rows.')
+
+        if (any(!(dat_agd_regression_split %>%
+                  purrr::map_lgl( ~ (.x %>% dplyr::filter( .rank_intercept == 1 & .is_intercept) %>% nrow()) > 0))
+                & agd_regression_reduced_study))
+          abort('Intercept(s) at least must include the smallest one (study baseline) for reduced models.')
+      }
+
+      # Cutpoint labels
+      agd_regression_ordinal_cut_lab <- dat_agd_regression$.ordinal_cut_lab[[1]]
+      agd_regression_ncat_ordinal <- length( agd_regression_ordinal_cut_lab ) +1
+
+      # Complementary design matrix for cc
+      agd_regression_intercept_rnk  <- dat_agd_regression_split %>%
+        purrr::map(~ .x %>% dplyr::filter(!is.na(.estimate)) %>%
+                     dplyr::pull(.rank_intercept)) %>% unlist()
+
+      X_agd_regression_cc <-
+        model.matrix(~ 1 + factor(agd_regression_intercept_rnk, levels = 0:(agd_regression_ncat_ordinal-1))  )[,-1]
+      colnames(X_agd_regression_cc) <- agd_regression_ordinal_cut_lab
+
+      # Maps each position in agd_regression_est (which includes all intercepts/cutpoints)
+      # to its corresponding position in the version excluding them (needed for Stan)
+      agd_regression_est_map_cc <- agd_regression_intercept_rnk
+      agd_regression_est_map_cc[ agd_regression_est_map_cc <= 1] <- 1:sum(agd_regression_intercept_rnk <= 1)
+      tmp_std <- rep(1:ns_agd_regression,agd_regression_ncoef)
+      for(i in 1:length(agd_regression_est_map_cc) ){
+        if( agd_regression_intercept_rnk[i] >1 ){
+          agd_regression_est_map_cc[i] <-
+            agd_regression_est_map_cc[ (agd_regression_intercept_rnk == 1) & (tmp_std == tmp_std[i]) ]
+        }
+      }
+
+    }else if( likelihood %in% c('exponential', 'weibull', 'gompertz','mspline', 'pexp') ){
+      if ( any(agd_regression_ncoef_cpt >1) )
+        abort("Intercept rows are not allowed in Cox PH models.")
+    }else{
+      if ( any(agd_regression_ncoef_cpt >1))
+        abort("More than one intercept per study is not allowed.")
+
+      if ( any(agd_regression_reduced_study & agd_regression_ncoef_cpt==0))
+        abort("No intercept row specified for reducd models.")
+    }
+
+    # --- Set up integration variables if present ---
+    # Check integration variables
+    if( use_int && length(setdiff(paste0('.int_',agd_reg_var_nma),colnames(dat_agd_regression_split[[1]] ))))
+      warn("No integration points provided for some or all variables (AgD regression)")
+
+    # For each regression model: select the ref. row and rows with different treatment from the ref. row
+    if (use_int) {
+      idat_agd_regression <- dat_agd_regression_split %>%
+        purrr::map(~{
+          # OVB adjustment or reconstructing for not given Cov matrix
+          if( .x$.is_reduced[1] || !(.x %>% dplyr::filter(!is.na(.estimate)) %>% dplyr::slice(1) %>% dplyr::pull(.cov_known)) ){
+            dplyr::bind_rows(
+              .x %>% dplyr::filter(is.na(.estimate)) %>%
+                dplyr::select( stringr::str_subset(colnames(.),"^\\.int_",negate = TRUE)  ) %>% dplyr::slice(1), # Keep the ref. rows to match the structure
+              .unnest_integration(dplyr::bind_rows(
+                .x %>% dplyr::filter(is.na(.estimate)) %>% dplyr::slice(1) , # keep one intercept row; ordinal may have some
+                .x %>% dplyr::filter( .trt != .trt[is.na(.estimate)] ) %>% dplyr::distinct(.trt, .keep_all = TRUE)
+              )) %>% dplyr::mutate(.estimate = 0) # set zero to indicate non-ref rows and  prevent removing the rows later
+            )
+          } else {
+            # tibble::tibble()
+            .x
+          }
+        })
+
+      # Number of rows for each study
+      agd_regression_nx <- idat_agd_regression %>% purrr::map_int(~{
+        if(nrow(.x)!=0)
+          .x %>% dplyr::filter(!is.na(.estimate)) %>% nrow()
+        else 0
+      })
+      agd_regression_max_nrow <- max(agd_regression_nx)
+
+      idat_agd_regression <- idat_agd_regression %>% dplyr::bind_rows()
+    } else {
+      idat_agd_regression <- dat_agd_regression
+    }
+
+    # --- Included and omitted design matrix ---
+    tmp_X_agd_regression <-
+      purrr::map( c(nma_formula,agd_reg_f), # The first one is the full design matrix of the network
+                  ~ make_nma_model_matrix(nma_formula = .x,
+                                          dat_ipd = dat_ipd,
+                                          dat_agd_arm = idat_agd_arm,
+                                          dat_agd_contrast = idat_agd_contrast,
+                                          agd_contrast_bl = if (has_agd_contrast(network)) is.na(idat_agd_contrast$.y) else logical(),
+
+                                          agd_regression_design_matrix_format = TRUE,
+                                          dat_agd_regression = idat_agd_regression,
+                                          agd_regression_bl = if (has_agd_regression(network)) is.na(idat_agd_regression$.estimate) else logical(),
+
+                                          xbar = NULL,#xbar,
+                                          consistency = consistency,
+                                          nodesplit = nodesplit,
+                                          classes = !is.null(network$classes))$X_agd_regression )
+
+    # Remove intercept columns from the network design matrix for COX PH models (AgD regression) whose intercept estimation(s) have not been reported.
+    if( likelihood %in%c('exponential', 'weibull', 'gompertz','mspline', 'pexp') &&
+        length(agd_regression_name_study) ){
+      tmp_X_agd_regression[[1]] <- tmp_X_agd_regression[[1]][ , !colnames(tmp_X_agd_regression[[1]])%in%
+                                                                paste0(".study",agd_regression_name_study) , drop = FALSE]
+      for(i in 2:(length(tmp_X_agd_regression) )){
+        tmp_X_agd_regression[[i]] <-
+          tmp_X_agd_regression[[i]][ , !colnames(tmp_X_agd_regression[[i]])%in%
+                                       paste0(".study",agd_regression_name_study) , drop = FALSE]
+
+      }
+
+    }
+
+    # Unnest integration design matrix of full model
+    X_agd_regression_int <- tmp_X_agd_regression[[1]]
+    ni_agd_regression <- nrow(X_agd_regression_int)
+    # Included and omitted matrix
+    XI <- list()
+    XO <- list()
+    # Column index of included and omitted matrix in full design matrix of network (nma_formula)
+    XI_col <- list()
+    XO_col <- list()
+
+    tmp_x <- tmp_c <- 0 # counters
+    for(i in 1:(length(tmp_X_agd_regression)-1)){
+      if( agd_regression_reduced_study[i] || !agd_regression_cov_known[i] ){
+        # Find included and omitted cols
+        x_ful <- tmp_X_agd_regression[[1  ]][ (tmp_x+1):(tmp_x+agd_regression_nx[i]) ,,drop=FALSE]
+        x_reg <- tmp_X_agd_regression[[i+1]][ (tmp_x+1):(tmp_x+agd_regression_nx[i]) ,,drop=FALSE]
+
+        x_ful <- x_ful[, colSums(x_ful) != 0, drop = FALSE]
+        x_reg <- x_reg[, colSums(x_reg) != 0, drop = FALSE]
+
+        XI_col[[i]] <- match( colnames(x_reg)                          , colnames(tmp_X_agd_regression[[1]]) )
+        XO_col[[i]] <- match( setdiff(colnames(x_ful), colnames(x_reg)), colnames(tmp_X_agd_regression[[1]]) )
+
+        XI[[i]] <- tmp_X_agd_regression[[1]][,XI_col[[i]],drop=FALSE ][ (tmp_x+1):(tmp_x+agd_regression_nx[i]) ,,drop=FALSE]
+        XO[[i]] <- tmp_X_agd_regression[[1]][,XO_col[[i]],drop=FALSE ][ (tmp_x+1):(tmp_x+agd_regression_nx[i]) ,,drop=FALSE]
+
+        #  Reconstruct not given Covariance matrix
+        if( !agd_regression_cov_known[i] ){
+
+          coef_recon <- dat_agd_regression_nonbl$.estimate [ (tmp_c + 1):(tmp_c + agd_regression_ncoef[i]) ]
+          se_recon   <- dat_agd_regression_nonbl$.se       [ (tmp_c + 1):(tmp_c + agd_regression_ncoef[i]) ]
+          eta_recon  <- as.vector(x_reg%*%coef_recon)
+
+          if(link=='logit'){
+            mu_recon <- exp(eta_recon)/(1+exp(eta_recon))
+            W_recon <- diag( mu_recon*(1-mu_recon) )
+            XtWX_inv_recon <- solve(t(x_reg)%*%W_recon%*%x_reg)
+          }else if(link=='probit'){
+            mu_recon <- pnorm(eta_recon)
+            W_recon <- diag( (dnorm(eta_recon)^2) / (mu_recon*(1-mu_recon)) )
+            XtWX_inv_recon <- solve(t(x_reg)%*%W_recon%*%x_reg)
+          }else if(link=='log'){
+            mu_recon <- exp(eta_recon)
+            W_recon <- diag( mu_recon )
+            XtWX_inv_recon <- solve(t(x_reg)%*%W_recon%*%x_reg)
+          }else if(link=='cloglog'){
+            mu_recon <- 1 - exp(-1*exp(eta_recon))
+            W_recon <- diag( (exp(2*eta_recon)*(1-mu_recon))/mu_recon )
+            XtWX_inv_recon <- solve(t(x_reg)%*%W_recon%*%x_reg)
+          }else if(link=='identity'){
+            XtX_inv_recon <- solve(t(x_reg)%*%x_reg)
+            sigma2_recon <- (se_recon^2) / diag(XtX_inv_recon)
+            XtWX_inv_recon <- mean(sigma2_recon)*XtX_inv_recon
+          }else{
+            abort("Reconstructing variance-covariance matrix is not supported for {link} link function.")
+          }
+
+          # Correction
+          R_recon <- cov2cor(XtWX_inv_recon)
+          D_recon <- diag(se_recon)
+          vcov_recon <- D_recon %*% R_recon %*% D_recon
+          # Check Reconstructed covariance matrix
+          if (!isSymmetric(vcov_recon, check.attributes = FALSE) || !all(eigen(vcov_recon, only.values = TRUE)$values > sqrt(.Machine$double.eps)))
+            abort(glue::glue("Reconstructed variance-covarince matrix is not symmetric positive definite for study {names(agd_regression_cov_known)[i]}."))
+
+          cov_agd_regression[[i]] <- vcov_recon
+
+        }
+
+      }else{
+
+        XI_col[[i]] <- tibble::tibble()
+        XO_col[[i]] <- tibble::tibble()
+        XI[[i]] <- tibble::tibble()
+        XO[[i]] <- tibble::tibble()
+
+      }
+      tmp_x <- tmp_x + agd_regression_nx[i]
+      tmp_c <- tmp_c + agd_regression_ncoef[i]
+    }
+
+    # Provide message regarding reconstructing contrivance matrices
+    if( any(miss_names <- !agd_regression_cov_known) ){
+      inform(glue::glue("Variance-covariance matrix reconstructed using provided `se` and integration points",
+                         " for stud{if (sum(miss_names)>1) 'ies' else 'y'} ",
+                         glue::glue_collapse(glue::double_quote(agd_regression_name_study[miss_names]), sep = ", ", last = " and ", width = 30)
+      ))
+    }
+
+    # Number of included columns in each reduced study
+    agd_regression_ncoef_inc <- XI_col %>% purrr::map_int(length)
+    agd_regression_ncoef_omt <- XO_col %>% purrr::map_int(length)
+    # Number of omitted columns in each reduced study
+    agd_regression_max_ncoef_inc <- max(agd_regression_ncoef_inc)
+    agd_regression_max_ncoef_omt <- max(agd_regression_ncoef_omt)
+    # Total number of omitted and included coefficients
+    no_agd_regression <- sum(agd_regression_ncoef_omt)
+    nl_agd_regression <- sum(agd_regression_ncoef_inc)
+    # Column indexes for each study, match with full design matrix
+    XI_col_vec <- unlist(XI_col)
+    XO_col_vec <- unlist(XO_col)
+
+    # --- OVB adjustments ---
+    if(sum(agd_regression_reduced_study)){
+      # Calculate inverse(XI'XI)
+      for(i in 1:ns_agd_regression ){
+        if(agd_regression_reduced_study[i]){
+          XtX <- t(XI[[i]]) %*% XI[[i]]
+          if( det(XtX) == 0 )
+            glue::glue("The included matrix is singular and cannot be inverted for study {agd_regression_name_study[i]}.")
+        }
+      }
+    }else{
+      dat_agd_regression <- dat_agd_regression %>%
+        dplyr::select( stringr::str_subset(colnames(.),"^\\.int_",negate = TRUE)  )
+
+      idat_agd_regression <- idat_agd_regression_bl <- idat_agd_regression_nonbl <- tibble::tibble()
+      no_agd_regression <- nl_agd_regression <- ni_agd_regression <- 0
+      agd_regression_max_ncoef_omt <- agd_regression_max_ncoef_inc  <- agd_regression_max_nrow <- 0
+      agd_regression_ncoef_omt <- agd_regression_ncoef_inc <- agd_regression_nx <- NULL
+      XI_col_vec <- XO_col_vec <- NULL
+      X_agd_regression_int <- NULL
+      # agd_regression_OVB_COX <- NULL
+
+    }
+
+    # Take only necessary columns
+    dat_agd_regression <- get_model_data_columns(dat_agd_regression, regression = regression, label = "AgD (regression coefficients)")
+
+    # Split into baseline and non-baseline
+    dat_agd_regression_bl <- dplyr::filter(dat_agd_regression, is.na(.data$.estimate))
+    dat_agd_regression_nonbl <- dplyr::filter(dat_agd_regression, !is.na(.data$.estimate))
+
+
+
+  } else {
+    dat_agd_regression <- dat_agd_regression_bl <- dat_agd_regression_nonbl <- tibble::tibble()
+    ns_agd_regression <-  nc_agd_regression <- 0
+    agd_regression_max_ncoef <- 0
+    cov_agd_regression <- NULL
+    study_agd_regression <- NULL
+    est_agd_regression <- agd_regression_ncoef <- NULL
+    agd_regression_name_study <- c()
+    np_agd_regression <- 0
+    agd_regression_ncoef_cpt <- NULL
+    X_agd_regression_cc <- agd_regression_est_map_cc <- NULL
+
+    # Reduced related
+    idat_agd_regression <- idat_agd_regression_bl <- idat_agd_regression_nonbl <- tibble::tibble()
+    agd_regression_reduced_study <- NULL
+    no_agd_regression <- nl_agd_regression <- ni_agd_regression <- 0
+    agd_regression_max_ncoef_omt <- agd_regression_max_ncoef_inc  <- agd_regression_max_nrow <- 0
+    agd_regression_ncoef_omt <- agd_regression_ncoef_inc <- agd_regression_nx <- NULL
+    XI_col_vec <- XO_col_vec <- NULL
+    X_agd_regression_int <- NULL
+    # agd_regression_OVB_COX <- NULL
+  }
+
   # Combine
-  idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast_nonbl)
-  idat_all_plus_bl <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast)
+  idat_all <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast_nonbl, dat_agd_regression_nonbl)
+  idat_all_plus_bl <- dplyr::bind_rows(dat_ipd, idat_agd_arm, idat_agd_contrast, dat_agd_regression)
 
   # Get sample sizes for centering
   if (((!is.null(regression) && !is_only_offset(regression)) || has_aux_regression) && center) {
@@ -923,11 +1359,15 @@ nma <- function(network,
     if (has_agd_arm(network) && network$outcome$agd_arm == "survival") {
       wts <- c(rep(1, nrow(dat_ipd)),
                rep(1 / n_int, nrow(idat_agd_arm)),
-               rep(N_agd_contrast / n_int, each = n_int))
+               rep(N_agd_contrast / n_int, each = n_int),
+               # AgD regression data are currently ignored in calculating centering
+               rep(0, nrow(dat_agd_regression)))
     } else {
       wts <- c(rep(1, nrow(dat_ipd)),
                rep(N_agd_arm / n_int, each = n_int),
-               rep(N_agd_contrast / n_int, each = n_int))
+               rep(N_agd_contrast / n_int, each = n_int),
+               # AgD regression data are currently ignored in calculating centering
+               rep(0, nrow(dat_agd_regression)))
     }
 
     # Center numeric columns used in regression model
@@ -958,7 +1398,12 @@ nma <- function(network,
 
     # Take weighted mean of all rows (including baseline rows for contrast data)
     if (any(reg_numeric)) {
-      xbar <- purrr::map_dbl(idat_all_plus_bl[, reg_names[reg_numeric]], weighted.mean, w = wts)
+      if (has_agd_regression(network) && !has_ipd(network) && !has_agd_arm(network) && !has_agd_contrast(network)) {
+        # If only AgD regression data just use raw means of reference levels
+        xbar <- purrr::map_dbl(dat_agd_regression_bl[, reg_names[reg_numeric]], mean)
+      } else {
+        xbar <- purrr::map_dbl(idat_all_plus_bl[, reg_names[reg_numeric]], weighted.mean, w = wts)
+      }
     } else {
       xbar <- NULL
     }
@@ -968,19 +1413,14 @@ nma <- function(network,
   }
 
   xbar_mu <- if (".mu" %in% all.vars(regression)) calculate_baseline_risk(network, link) else NULL
-
-  # Make NMA formula
-  nma_formula <- make_nma_formula(regression,
-                                  consistency = consistency,
-                                  classes = !is.null(network$classes),
-                                  class_interactions = class_interactions)
-
   # Construct model matrix
   X_list <- make_nma_model_matrix(nma_formula = nma_formula,
                                   dat_ipd = dat_ipd,
                                   dat_agd_arm = idat_agd_arm,
                                   dat_agd_contrast = idat_agd_contrast,
-                                  agd_contrast_bl = is.na(idat_agd_contrast$.y),
+                                  agd_contrast_bl = if (has_agd_contrast(network)) is.na(idat_agd_contrast$.y) else logical(),
+                                  dat_agd_regression = dat_agd_regression,
+                                  agd_regression_bl = if (has_agd_regression(network)) is.na(dat_agd_regression$.estimate) else logical(),
                                   xbar = xbar,
                                   consistency = consistency,
                                   nodesplit = nodesplit,
@@ -989,10 +1429,22 @@ nma <- function(network,
   X_ipd <- X_list$X_ipd
   X_agd_arm <- X_list$X_agd_arm
   X_agd_contrast <- X_list$X_agd_contrast
+  X_agd_regression <- X_list$X_agd_regression
+
+  # Remove intercept columns from network design matrix for COX PH models (AgD regression)
+  # Note: Remove from the Agd regression models that the intercept estimation(s) have not been reported.
+  if( likelihood %in%c('exponential', 'weibull', 'gompertz','mspline', 'pexp') &&
+      length(agd_regression_name_study) ){
+    X_ipd <- X_list$X_ipd[ , !colnames(X_list$X_ipd)%in%paste0(".study",agd_regression_name_study)]
+    X_agd_arm <- X_list$X_agd_arm[ , !colnames(X_list$X_agd_arm)%in%paste0(".study",agd_regression_name_study)]
+    X_agd_contrast <- X_list$X_agd_contrast[ , !colnames(X_list$X_agd_contrast)%in%paste0(".study",agd_regression_name_study)]
+    X_agd_regression <- X_list$X_agd_regression[ , !colnames(X_list$X_agd_regression)%in%paste0(".study",agd_regression_name_study)]
+  }
 
   offset_ipd <- X_list$offset_ipd
   offset_agd_arm <- X_list$offset_agd_arm
   offset_agd_contrast <- X_list$offset_agd_contrast
+  offset_agd_regression <- X_list$offset_agd_regression
 
   # Construct RE correlation matrix
   if (trt_effects == "random") {
@@ -1016,20 +1468,41 @@ nma <- function(network,
       tdat_agd_contrast_nonbl <- tibble::tibble()
     }
 
-    tdat_all <- dplyr::bind_rows(tdat_ipd_arm, tdat_agd_arm, tdat_agd_contrast_nonbl)
+    if (has_agd_regression(network)) {
+      # For which_RE we set trt=NA for everything but treatment effects
+      trt_cols <- grepl("^\\.trt(?!class)[^\\:]+$", colnames(X_agd_regression), perl = TRUE)
+      trt_rows <- apply(X_agd_regression, 1, function(x) any(x[trt_cols] != 0) && all(x[!trt_cols] == 0))
 
-    contr <- rep(c(FALSE, FALSE, TRUE),
-                 times = c(nrow(tdat_ipd_arm), nrow(tdat_agd_arm), nrow(tdat_agd_contrast_nonbl)))
+      tdat_agd_regression <- dplyr::select(dat_agd_regression_nonbl, ".study", ".trt")
+      tdat_agd_regression[!trt_rows, ".trt"] <- NA
+
+      # For RE_cor we take only the treatment coefficient rows (with contrast = TRUE)
+      # tdat_agd_regression_trt <- tdat_agd_regression[trt_rows, ]
+
+    } else {
+      tdat_agd_regression <- tibble::tibble()
+    }
+
+    tdat_all <- dplyr::bind_rows(tdat_ipd_arm, tdat_agd_arm, tdat_agd_contrast_nonbl, tdat_agd_regression)
+
+    contr <- rep(c(FALSE, FALSE, TRUE, TRUE),
+                 times = c(nrow(tdat_ipd_arm), nrow(tdat_agd_arm), nrow(tdat_agd_contrast_nonbl), nrow(tdat_agd_regression)))
+
+    tdat_all2 <- dplyr::bind_rows(tdat_ipd_arm, tdat_agd_arm, tdat_agd_contrast_nonbl, tdat_agd_regression)
+
+    contr2 <- rep(c(FALSE, FALSE, TRUE, TRUE),
+                 times = c(nrow(tdat_ipd_arm), nrow(tdat_agd_arm), nrow(tdat_agd_contrast_nonbl), nrow(tdat_agd_regression)))
 
     if (consistency %in% c("consistency", "nodesplit")) {
       .RE_cor <- RE_cor(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "reftrt")
-      .which_RE <- which_RE(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "reftrt")
+      .which_RE <- which_RE(tdat_all2$.study, tdat_all2$.trt, contrast = contr2, type = "reftrt")
     } else if (consistency == "ume") {
       .RE_cor <- RE_cor(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "blshift")
-      .which_RE <- which_RE(tdat_all$.study, tdat_all$.trt, contrast = contr, type = "blshift")
+      .which_RE <- which_RE(tdat_all2$.study, tdat_all2$.trt, contrast = contr2, type = "blshift")
     } else {
       abort(glue::glue("Inconsistency '{consistency}' model not yet supported."))
     }
+
   } else {
     .RE_cor <- NULL
     .which_RE <- NULL
@@ -1208,41 +1681,75 @@ if (class_effects == "exchangeable") {
 }
   # Fit using nma.fit
   stanfit <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
-    agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
-    agd_contrast_x = X_agd_contrast, agd_contrast_y = y_agd_contrast,
-    agd_contrast_Sigma = Sigma_agd_contrast,
-    n_int = n_int,
-    ipd_offset = offset_ipd,
-    agd_arm_offset = offset_agd_arm,
-    agd_contrast_offset = offset_agd_contrast,
-    trt_effects = trt_effects,
-    xbar_mu = xbar_mu,
-    RE_cor = .RE_cor,
-    which_RE = .which_RE,
-    class_effects = class_effects,
-    which_CE = if (class_effects == "exchangeable") class_mean_design$id else NULL,
-    which_CE_sd = if (class_effects == "exchangeable") class_sd_design$id else NULL,
-    likelihood = likelihood,
-    link = link,
-    consistency = consistency,
-    ...,
-    prior_intercept = prior_intercept,
-    prior_trt = prior_trt,
-    prior_het = prior_het,
-    prior_het_type = prior_het_type,
-    prior_reg = prior_reg,
-    prior_aux = prior_aux,
-    prior_aux_reg = prior_aux_reg,
-    prior_class_mean = prior_class_mean,
-    prior_class_sd = prior_class_sd,
-    aux_id = aux_id,
-    aux_group = aux_group,
-    X_aux = X_aux,
-    QR = QR,
-    adapt_delta = adapt_delta,
-    int_thin = int_thin,
-    int_check = int_check,
-    basis = basis)
+                     agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
+                     agd_contrast_x = X_agd_contrast, agd_contrast_y = y_agd_contrast,
+                     agd_contrast_Sigma = Sigma_agd_contrast,
+
+                     ns_agd_regression = ns_agd_regression,
+                     nc_agd_regression = nc_agd_regression,
+                     no_agd_regression = no_agd_regression,
+                     nl_agd_regression = nl_agd_regression,
+                     ni_agd_regression = ni_agd_regression,
+                     np_agd_regression = np_agd_regression,
+
+                     agd_regression_ncoef = agd_regression_ncoef,
+                     agd_regression_ncoef_omt = agd_regression_ncoef_omt,
+                     agd_regression_ncoef_inc = agd_regression_ncoef_inc,
+                     agd_regression_ncoef_cpt = agd_regression_ncoef_cpt,
+                     agd_regression_max_ncoef = agd_regression_max_ncoef,
+                     agd_regression_max_ncoef_omt = agd_regression_max_ncoef_omt,
+                     agd_regression_max_ncoef_inc = agd_regression_max_ncoef_inc,
+
+                     X_agd_regression_cc = X_agd_regression_cc,
+                     agd_regression_est_map_cc = agd_regression_est_map_cc,
+                     X_agd_regression_int = X_agd_regression_int,
+                     agd_regression_x = X_agd_regression,
+                     agd_regression_est = est_agd_regression,
+                     agd_regression_cov = cov_agd_regression,
+                     agd_regression_study = study_agd_regression,
+                     agd_regression_reduced_study = agd_regression_reduced_study,
+                     agd_regression_nx = agd_regression_nx,
+                     agd_regression_max_nrow = agd_regression_max_nrow,
+
+                     XI_col_vec = XI_col_vec,
+                     XO_col_vec = XO_col_vec,
+
+                     # agd_regression_OVB_GLM = agd_regression_OVB_GLM,
+                     # agd_regression_OVB_LM = agd_regression_OVB_LM,
+                     # agd_regression_OVB_COX = agd_regression_OVB_COX,
+
+                     n_int = n_int,
+                     ipd_offset = offset_ipd,
+                     agd_arm_offset = offset_agd_arm,
+                     agd_contrast_offset = offset_agd_contrast,
+                     trt_effects = trt_effects,
+                     xbar_mu = xbar_mu,
+                     RE_cor = .RE_cor,
+                     which_RE = .which_RE,
+                     class_effects = class_effects,
+                     which_CE = if (class_effects == "exchangeable") class_mean_design$id else NULL,
+                     which_CE_sd = if (class_effects == "exchangeable") class_sd_design$id else NULL,
+                     likelihood = likelihood,
+                     link = link,
+                     consistency = consistency,
+                     ...,
+                     prior_intercept = prior_intercept,
+                     prior_trt = prior_trt,
+                     prior_het = prior_het,
+                     prior_het_type = prior_het_type,
+                     prior_reg = prior_reg,
+                     prior_aux = prior_aux,
+                     prior_aux_reg = prior_aux_reg,
+                     prior_class_mean = prior_class_mean,
+                     prior_class_sd = prior_class_sd,
+                     aux_id = aux_id,
+                     aux_group = aux_group,
+                     X_aux = X_aux,
+                     QR = QR,
+                     adapt_delta = adapt_delta,
+                     int_thin = int_thin,
+                     int_check = int_check,
+                     basis = basis)
 
   # Make readable parameter names for generated quantities
   fnames_oi <- stanfit@sim$fnames_oi
@@ -1435,6 +1942,10 @@ if (class_effects == "exchangeable") {
 #' @param agd_contrast_x  Design matrix for AgD studies (contrast-based)
 #' @param agd_contrast_y  Outcome data frame for AgD studies (contrast-based)
 #' @param agd_contrast_Sigma List of covariance matrices for contrast-based data
+#' @param agd_regression_x   Design matrix for AgD regression coefficients
+#' @param agd_regression_est AgD regression coefficient estimates
+#' @param agd_regression_cov List of covariance matrices for AgD regression coefficients
+#' @param agd_regression_study Integer variable giving the study ID for each estimate
 #' @param n_int Number of numerical integration points used
 #' @param ipd_offset Vector of offset values for IPD
 #' @param agd_arm_offset Vector of offset values for AgD (arm-based)
@@ -1446,9 +1957,21 @@ if (class_effects == "exchangeable") {
 #' @param basis Spline basis for `mspline` and `pexp` models
 #'
 #' @noRd
-nma.fit <- function(ipd_x, ipd_y,
-                    agd_arm_x, agd_arm_y,
-                    agd_contrast_x, agd_contrast_y, agd_contrast_Sigma,
+nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
+                    agd_arm_x = NULL, agd_arm_y = NULL,
+                    agd_contrast_x = NULL, agd_contrast_y = NULL, agd_contrast_Sigma = NULL,
+                    agd_regression_x = NULL, agd_regression_est = NULL, agd_regression_cov = NULL, agd_regression_study = NULL,
+                    ns_agd_regression = NULL,nc_agd_regression = NULL,no_agd_regression = NULL,nl_agd_regression = NULL,ni_agd_regression = NULL,
+                    XI_col_vec = NULL,XO_col_vec = NULL,
+                    agd_regression_ncoef = NULL,agd_regression_ncoef_omt = NULL,agd_regression_ncoef_inc = NULL,
+                    agd_regression_max_ncoef = NULL,agd_regression_max_ncoef_omt = NULL,agd_regression_max_ncoef_inc = NULL,
+                    X_agd_regression_int = NULL, agd_regression_max_nrow = NULL,
+                    agd_regression_reduced_study = NULL, agd_regression_nx = NULL,
+                    # agd_regression_OVB_GLM = NULL,
+                    # agd_regression_OVB_LM = NULL,
+                    # agd_regression_OVB_COX = NULL,
+                    np_agd_regression = NULL, agd_regression_ncoef_cpt = NULL, X_agd_regression_cc = NULL, agd_regression_est_map_cc = NULL,
+
                     n_int,
                     ipd_offset = NULL, agd_arm_offset = NULL, agd_contrast_offset = NULL,
                     trt_effects = c("fixed", "random"),
@@ -1480,14 +2003,6 @@ nma.fit <- function(ipd_x, ipd_y,
                     int_check = TRUE,
                     basis) {
 
-  if (missing(ipd_x)) ipd_x <- NULL
-  if (missing(ipd_y)) ipd_y <- NULL
-  if (missing(agd_arm_x)) agd_arm_x <- NULL
-  if (missing(agd_arm_y)) agd_arm_y <- NULL
-  if (missing(agd_contrast_x)) agd_contrast_x <- NULL
-  if (missing(agd_contrast_y)) agd_contrast_y <- NULL
-  if (missing(agd_contrast_Sigma)) agd_contrast_Sigma <- NULL
-
   # Check available x and y
   if (xor(is.null(ipd_x), is.null(ipd_y)))
     abort("`ipd_x` and `ipd_y` should both be present or both NULL.")
@@ -1495,10 +2010,13 @@ nma.fit <- function(ipd_x, ipd_y,
     abort("`agd_arm_x` and `agd_arm_y` should both be present or both NULL.")
   if (xor(is.null(agd_contrast_x), is.null(agd_contrast_y)) || xor(is.null(agd_contrast_x), is.null(agd_contrast_Sigma)))
     abort("`agd_contrast_x`, `agd_contrast_y`, `agd_contrast_Sigma` should all be present or all NULL.")
+  if (xor(is.null(agd_regression_x), is.null(agd_regression_est)) || xor(is.null(agd_regression_x), is.null(agd_regression_cov)))
+    abort("`agd_regression_x`, `agd_regression_est`, `agd_regression_cov` should all be present or all NULL.")
 
   has_ipd <- !is.null(ipd_x) && !is.null(ipd_y)
   has_agd_arm <- !is.null(agd_arm_x) && !is.null(agd_arm_y)
   has_agd_contrast <-  !is.null(agd_contrast_x) && !is.null(agd_contrast_y) && !is.null(agd_contrast_Sigma)
+  has_agd_regression <-  !is.null(agd_regression_x) && !is.null(agd_regression_est) && !is.null(agd_regression_cov)
 
   # Ignore n_int if no AgD
   if (!has_agd_arm && !has_agd_contrast) n_int <- 1
@@ -1533,6 +2051,18 @@ nma.fit <- function(ipd_x, ipd_y,
     if (!is.list(agd_contrast_Sigma) || any(purrr::map_lgl(agd_contrast_Sigma, ~!is.numeric(.))))
       abort("`agd_contrast_Sigma` should be a list of covariance matrices, of length equal to the number of AgD (contrast-based) studies.")
   }
+  if (has_agd_regression) {
+    if (!is.matrix(agd_regression_x) || !is.numeric(agd_regression_x))
+      abort("`agd_regression_x` should be a numeric matrix.")
+    if (!is.numeric(agd_regression_est))
+      abort("`agd_regression_est` should be numeric regression coefficient estimates.")
+    # if (nrow(agd_regression_x) != length(agd_regression_est))
+    #   abort("Number of rows in `agd_regression_x` and `agd_regression_est` do not match.")
+    if (!is.list(agd_regression_cov) || any(purrr::map_lgl(agd_regression_cov, ~!is.numeric(.))))
+      abort("`agd_regression_cov` should be a list of covariance matrices, of length equal to the number of AgD (regression coefficient) studies.")
+    if (is.null(agd_regression_study) || !rlang::is_integerish(agd_regression_study, finite = TRUE))
+      abort("`agd_regression_study` must be an integer vector of study IDs for each estimate.")
+  }
 
   # Check offsets
   has_ipd_offset <- !is.null(ipd_offset)
@@ -1561,11 +2091,11 @@ nma.fit <- function(ipd_x, ipd_y,
     abort("`agd_contrast_offset` should be a numeric vector with length matching `agd_contrast_x`, `agd_contrast_y`")
 
   # Check matching X column names and dimensions if more than one present
-  if ((has_ipd &&
-       ((has_agd_arm && !identical(colnames(ipd_x), colnames(agd_arm_x))) ||
-        (has_agd_contrast && !identical(colnames(ipd_x), colnames(agd_contrast_x))))) ||
-      (has_agd_arm &&
-       (has_agd_contrast && !identical(colnames(agd_arm_x), colnames(agd_contrast_x)))))
+  colnames_all <- list(colnames(ipd_x),
+                       colnames(agd_arm_x),
+                       colnames(agd_contrast_x),
+                       colnames(agd_regression_x))[c(has_ipd, has_agd_arm, has_agd_contrast, has_agd_regression)]
+  if (length(colnames_all) >= 2 && any(purrr::map_lgl(colnames_all[-1], ~!identical(., colnames_all[[1]]))))
     abort("Non-matching columns in *_x matrices.")
 
   # Check model arguments
@@ -1634,6 +2164,7 @@ nma.fit <- function(ipd_x, ipd_y,
   if (has_ipd) x_names <- colnames(ipd_x)
   else if (has_agd_arm) x_names <- colnames(agd_arm_x)
   else if (has_agd_contrast) x_names <- colnames(agd_contrast_x)
+  else if (has_agd_regression) x_names <- colnames(agd_regression_x)
 
   col_study <- grepl("^\\.study[^:]+$", x_names)
   col_trt <- grepl("^(\\.trt|\\.contr)[^:]+$", x_names)
@@ -1643,7 +2174,7 @@ nma.fit <- function(ipd_x, ipd_y,
 
   n_trt <- sum(col_trt) + 1
 
-  get_study <- function(x) which(x == 1)
+  get_study <- function(x) match(1, x, nomatch = NA_integer_)
   get_trt <- function(x, v = 1) if (any(x == v)) which(x == v) + 1 else 1
 
   if (has_ipd) {
@@ -1706,9 +2237,45 @@ nma.fit <- function(ipd_x, ipd_y,
     ns_agd_contrast <- 0
   }
 
+  if (has_agd_regression) {
+    # agd_regression_s_t_all <- dplyr::tibble(.study = agd_regression_study,
+    #                                         .trt = unname(apply(agd_regression_x[, col_trt, drop = FALSE], 1, get_trt)))
+    # agd_regression_s_t <- dplyr::distinct(agd_regression_s_t_all) %>% dplyr::mutate(.arm = 1:dplyr::n())
+    # agd_regression_arm <-  dplyr::left_join(agd_regression_s_t_all, agd_regression_s_t, by = c(".study", ".trt")) %>% dplyr::pull(.data$.arm)
+    # agd_regression_study <- agd_regression_s_t$.study
+    # agd_regression_trt <- agd_regression_s_t$.trt
+    # narm_agd_regression <- max(agd_regression_arm)
+    # ni_agd_regression <- nrow(agd_regression_x)
+
+    # Get number of AgD regression studies from length of covariance matrix list
+    # ns_agd_regression <- length(agd_regression_cov)
+
+    # Construct array of cholesky decompositions of covariance matrices
+    # agd_regression_ncoef <- purrr::map_int(agd_regression_cov, nrow)
+    # agd_regression_max_ncoef <- max(agd_regression_ncoef)
+    agd_regression_chol <- array(NA_real_, dim = c(ns_agd_regression, agd_regression_max_ncoef, agd_regression_max_ncoef))
+    for (i in 1:ns_agd_regression) {
+      agd_regression_chol[i, , ] <- diag(agd_regression_max_ncoef) # pad out ragged array
+      agd_regression_chol[i, 1:agd_regression_ncoef[i], 1:agd_regression_ncoef[i]] <- t(chol(agd_regression_cov[[i]]))
+    }
+
+    if (sum(agd_regression_ncoef) != nc_agd_regression)
+      abort("Dimensions of `agd_regression_cov` covariance matrices do not match the regression coefficient data.")
+  } else {
+    # agd_regression_s_t_all <- dplyr::tibble(.study = integer(), .trt = integer())
+    # agd_regression_study <- agd_regression_trt <- agd_regression_arm <- numeric()
+    # ni_agd_regression <- 0
+    # narm_agd_regression <- 0
+    # ns_agd_regression <- 0
+    # agd_regression_ncoef <- integer()
+    # agd_regression_max_ncoef <- 1
+    agd_regression_chol <- array(1, dim = c(0, 1, 1))
+    # agd_regression_est <- numeric()
+  }
+
   # Set up random effects
   if (trt_effects == "random") {
-    narm <- narm_ipd + narm_agd_arm + ni_agd_contrast
+    narm <- narm_ipd + narm_agd_arm + ni_agd_contrast + nc_agd_regression
     if (!is.null(which_RE)) {
       if (!rlang::is_integerish(which_RE) ||
           any(which_RE < 0) ||
@@ -1738,7 +2305,7 @@ nma.fit <- function(ipd_x, ipd_y,
   }
 
   # Make full design matrix
-  X_all <- rbind(ipd_x, agd_arm_x, agd_contrast_x)
+  X_all <- rbind(ipd_x, agd_arm_x, agd_contrast_x, agd_regression_x)
 
   # Make sure columns of X_all are in correct order (study, trt, omega (if nodesplit), regression terms)
   X_all <- cbind(X_all[, col_study, drop = FALSE],
@@ -1778,6 +2345,8 @@ nma.fit <- function(ipd_x, ipd_y,
     ni_agd_arm = ni_agd_arm,
     ns_agd_contrast = ns_agd_contrast,
     ni_agd_contrast = ni_agd_contrast,
+    ns_agd_regression = ns_agd_regression,
+    ni_agd_regression = ni_agd_regression,
     nt = n_trt,
     nchains = nchains,
     nint_max = nint_max,
@@ -1794,6 +2363,34 @@ nma.fit <- function(ipd_x, ipd_y,
     agd_contrast_trt_b = as.array(agd_contrast_trt_b),
     agd_contrast_y = if (has_agd_contrast) as.array(agd_contrast_y$.y) else numeric(),
     agd_contrast_Sigma = Sigma,
+    agd_regression_est = if(is.null(agd_regression_est)) numeric(0) else agd_regression_est,
+    agd_regression_max_ncoef = agd_regression_max_ncoef,
+    agd_regression_max_ncoef_omt = agd_regression_max_ncoef_omt,
+    agd_regression_max_ncoef_inc = agd_regression_max_ncoef_inc,
+    no_agd_regression = no_agd_regression,
+    nl_agd_regression = nl_agd_regression,
+    agd_regression_ncoef = if(is.null(agd_regression_ncoef)) numeric() else as.array(agd_regression_ncoef),
+    agd_regression_ncoef_omt = if(is.null(agd_regression_ncoef_omt) & ns_agd_regression!=0 ) as.array(rep(0,ns_agd_regression)) else if (is.null(agd_regression_ncoef_omt) & ns_agd_regression==0 ) as.array(numeric(0)) else as.array(agd_regression_ncoef_omt),
+    agd_regression_ncoef_inc = if(is.null(agd_regression_ncoef_inc) & ns_agd_regression!=0 ) as.array(rep(0,ns_agd_regression)) else if (is.null(agd_regression_ncoef_inc) & ns_agd_regression==0 ) as.array(numeric(0)) else as.array(agd_regression_ncoef_inc),
+    agd_regression_cov = if(is.null(agd_regression_cov)) array(numeric(0), dim = c(0,agd_regression_max_ncoef,agd_regression_max_ncoef)) else agd_regression_chol,
+    nc_agd_regression = nc_agd_regression,
+    XI_col_vec = if(is.null(XI_col_vec)) numeric() else array(XI_col_vec),
+    XO_col_vec = if(is.null(XO_col_vec)) numeric() else array(XO_col_vec),
+    agd_regression_reduced_study = if(is.null(agd_regression_reduced_study)) numeric() else as.array(agd_regression_reduced_study),
+    agd_regression_nx = if(is.null(agd_regression_nx) & ns_agd_regression!=0 ) as.array(rep(0,ns_agd_regression)) else if (is.null(agd_regression_nx) & ns_agd_regression==0 ) as.array(numeric(0)) else as.array(agd_regression_nx),
+    agd_regression_max_nrow = agd_regression_max_nrow,
+    X_agd_regression_int = if(is.null(X_agd_regression_int)) matrix(numeric(0), nrow = 0, ncol = 0) else X_agd_regression_int,
+    # agd_regression_OVB_LM = if(is.null(agd_regression_OVB_LM)) array(numeric(0), dim = c(0,agd_regression_max_ncoef_inc,agd_regression_max_ncoef_omt)) else agd_regression_OVB_LM,
+    # agd_regression_OVB_GLM = if(is.null(agd_regression_OVB_GLM)) numeric(0) else agd_regression_OVB_GLM,
+    # agd_regression_OVB_COX = if(is.null(agd_regression_OVB_COX)) array(numeric(0), dim = c(0,agd_regression_max_nrow,agd_regression_max_ncoef_inc+2)) else agd_regression_OVB_COX,
+    np_agd_regression = np_agd_regression,
+    agd_regression_ncoef_cpt = if(is.null(agd_regression_ncoef_cpt)) numeric() else as.array(agd_regression_ncoef_cpt),
+    X_agd_regression_cc = if(is.null(X_agd_regression_cc)) matrix(numeric(0), nrow = 0, ncol = 0) else X_agd_regression_cc,
+    agd_regression_est_map_cc = if(is.null(agd_regression_est_map_cc)) numeric() else agd_regression_est_map_cc,
+
+    # agd_regression_arm = agd_regression_arm,
+    # agd_regression_trt = agd_regression_trt,
+    # narm_agd_regression = narm_agd_regression,
     # ipd_study = ipd_study,
     # agd_arm_study = agd_arm_study,
     # agd_contrast_study = agd_contrast_study,
@@ -2009,8 +2606,12 @@ nma.fit <- function(ipd_x, ipd_y,
       agd_arm_n <- rowSums(agd_arm_y$.r, na.rm = TRUE)
     }
 
-    if (!has_ipd && !has_agd_arm) {
-      abort("No IPD or AgD (arm-based) in the network. Cannot fit ordered model to contrast data only.")
+    if (has_agd_regression && !has_ipd && !has_agd_arm) {
+      ncat <- ncol(X_agd_regression_cc) + 1
+    }
+
+    if (!has_ipd && !has_agd_arm && !has_agd_regression) {
+      abort("No IPD, AgD (arm-based), or AgD (regression) in the network. Cannot fit ordered model to contrast data only.")
     }
 
     standat <- purrr::list_modify(standat,
@@ -2456,6 +3057,7 @@ nma.fit <- function(ipd_x, ipd_y,
   if (likelihood == "ordered") {
     if (has_ipd) l_cat <- colnames(ipd_y$.r)[-1]
     else if (has_agd_arm) l_cat <- colnames(agd_arm_y$.r)[-1]
+    else if (has_agd_regression) l_cat <- colnames(X_agd_regression_cc)
     fnames_oi[grepl("^cc\\[[0-9]+\\]$", fnames_oi)] <- paste0("cc[", l_cat, "]")
   }
 
@@ -2513,7 +3115,7 @@ RE_cor <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
   reftrt <- levels(trt)[1]
   if (type == "reftrt") {
     # Treat contrast rows as non ref trt arms (since they always have REs)
-    nonref <- trt != reftrt | contrast
+    nonref <- (trt != reftrt | contrast) & !is.na(trt)
     nRE <- sum(nonref)  # RE for each non ref trt arm
     Rho <- matrix(0, nrow = nRE, ncol = nRE)
     study <- study[nonref]
@@ -2523,7 +3125,7 @@ RE_cor <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
     # Treat contrast rows as non baseline arms (since they always have REs)
     nonbl <- tibble::tibble(study, trt, contrast) %>%
       dplyr::group_by(.data$study) %>%
-      dplyr::mutate(nonbl = .data$contrast | .data$trt != sort(.data$trt)[1] | (duplicated(.data$trt) & .data$trt != reftrt)) %>%
+      dplyr::mutate(nonbl = (.data$contrast | .data$trt != sort(.data$trt)[1] | (duplicated(.data$trt) & .data$trt != reftrt)) & !is.na(.data$trt)) %>%
       dplyr::pull(.data$nonbl)
     nRE <- sum(nonbl)  # RE for each non baseline arm
     Rho <- matrix(0, nrow = nRE, ncol = nRE)
@@ -2571,13 +3173,13 @@ which_RE <- function(study, trt, contrast, type = c("reftrt", "blshift")) {
 
   reftrt <- levels(trt)[1]
   if (type == "reftrt") {
-    trt_nonref <- trt != reftrt | contrast
+    trt_nonref <- (trt != reftrt | contrast) & !is.na(trt)
     id[trt_nonref] <- 1:sum(trt_nonref)
   } else if (type == "blshift") {
     # Consider baseline arm to be first by treatment order
     non_bl <- tibble::tibble(study, trt, contrast) %>%
       dplyr::group_by(.data$study) %>%
-      dplyr::mutate(non_bl = .data$contrast | .data$trt != sort(.data$trt)[1] | (duplicated(.data$trt) & .data$trt != reftrt)) %>%
+      dplyr::mutate(non_bl = (.data$contrast | .data$trt != sort(.data$trt)[1] | (duplicated(.data$trt) & .data$trt != reftrt)) & !is.na(.data$trt)) %>%
       dplyr::pull(.data$non_bl)
     id[non_bl] <- 1:sum(non_bl)
   }
@@ -2632,7 +3234,7 @@ which_CE <- function(classes, class_sd)   {
 #'
 #' @noRd
 check_likelihood <- function(x, outcome) {
-  if (missing(outcome)) valid_lhood <- unlist(valid_lhood)
+  if (missing(outcome) || all(is.na(outcome))) valid_lhood <- unlist(valid_lhood)
   else if (!is.na(outcome$ipd)) {
     valid_lhood <- valid_lhood[[outcome$ipd]]
     otype <- outcome$ipd
@@ -2648,7 +3250,8 @@ check_likelihood <- function(x, outcome) {
   # Choose default likelihood if NULL
   if (is.null(x) && missing(outcome)) abort("Please specify a suitable likelihood.")
   else if (is.null(x)) {
-    x <- valid_lhood[1]
+    if (all(is.na(outcome))) x <- "normal"  # default for agd_regression only networks
+    else x <- valid_lhood[1]
 
   # Check valid option if given
   } else if (!is.character(x) || length(x) > 1 || !tolower(x) %in% valid_lhood) {
@@ -2972,7 +3575,10 @@ make_nma_model_matrix <- function(nma_formula,
                                   dat_agd_arm = tibble::tibble(),
                                   dat_agd_contrast = tibble::tibble(),
                                   agd_contrast_bl = logical(),
+                                  dat_agd_regression = tibble::tibble(),
+                                  agd_regression_bl = logical(),
                                   xbar = NULL,
+                                  agd_regression_design_matrix_format = FALSE,
                                   consistency = c("consistency", "nodesplit", "ume"),
                                   nodesplit = NULL,
                                   classes = FALSE,
@@ -2981,7 +3587,8 @@ make_nma_model_matrix <- function(nma_formula,
   if (!rlang::is_formula(nma_formula)) abort("`nma_formula` is not a formula")
   stopifnot(is.data.frame(dat_ipd),
             is.data.frame(dat_agd_arm),
-            is.data.frame(dat_agd_contrast))
+            is.data.frame(dat_agd_contrast),
+            is.data.frame(dat_agd_regression))
   consistency <- rlang::arg_match(consistency)
   if (!rlang::is_bool(classes)) abort("`classes` should be TRUE or FALSE")
   if (nrow(dat_agd_contrast) && !rlang::is_logical(agd_contrast_bl, n = nrow(dat_agd_contrast)))
@@ -3002,6 +3609,7 @@ make_nma_model_matrix <- function(nma_formula,
   .has_ipd <- if (nrow(dat_ipd)) TRUE else FALSE
   .has_agd_arm <- if (nrow(dat_agd_arm)) TRUE else FALSE
   .has_agd_contrast <- if (nrow(dat_agd_contrast)) TRUE else FALSE
+  .has_agd_regression <- if (nrow(dat_agd_regression)) TRUE else FALSE
 
   # Sanitise factors
   if (.has_ipd) {
@@ -3018,6 +3626,11 @@ make_nma_model_matrix <- function(nma_formula,
     dat_agd_contrast <- dplyr::mutate_at(dat_agd_contrast,
                             .vars = if (classes) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
                             .funs = fct_sanitise)
+  }
+  if (.has_agd_regression) {
+    dat_agd_regression <- dplyr::mutate_at(dat_agd_regression,
+                                         .vars = if (classes) c(".trt", ".study", ".trtclass") else c(".trt", ".study"),
+                                         .funs = fct_sanitise)
   }
 
   # Define contrasts for UME model
@@ -3042,11 +3655,13 @@ make_nma_model_matrix <- function(nma_formula,
     # For AgD (contrast-based), take the specified baseline arm (with .y = NA)
     # Need to make sure to construct contrast the correct way around (d_12 instead of d_21)
     # and then make a note to change the sign if necessary
-    if (.has_agd_contrast) {
-      contrs_contr <- dat_agd_contrast %>%
+    if (.has_agd_contrast || .has_agd_regression) {
+      contrs_contr <- dplyr::bind_rows(dat_agd_contrast, dat_agd_regression) %>%
         dplyr::distinct(.data$.study, .data$.trt) %>%  # In case integration data passed
-        dplyr::left_join(dplyr::distinct(dat_agd_contrast[agd_contrast_bl, ], .data$.study, .data$.trt) %>%
-                           dplyr::transmute(.data$.study, .trt_b = .data$.trt), by = ".study") %>%
+        dplyr::left_join(
+          dplyr::bind_rows(dat_agd_regression[agd_regression_bl, ],
+                           dplyr::distinct(dat_agd_contrast[agd_contrast_bl, ], .data$.study, .data$.trt)) %>%
+            dplyr::transmute(.data$.study, .trt_b = .data$.trt), by = ".study") %>%
         dplyr::distinct(.data$.study, .data$.trt, .data$.trt_b) %>%
         dplyr::mutate(.contr_sign = dplyr::if_else(as.numeric(.data$.trt) < as.numeric(.data$.trt_b), -1, 1),
                       .contr = dplyr::if_else(.data$.trt == .data$.trt_b,
@@ -3081,6 +3696,9 @@ make_nma_model_matrix <- function(nma_formula,
     if (.has_agd_contrast) {
       dat_agd_contrast <- dplyr::left_join(dat_agd_contrast, contrs_all, by = c(".study", ".trt"))
     }
+    if (.has_agd_regression) {
+      dat_agd_regression <- dplyr::left_join(dat_agd_regression, contrs_all, by = c(".study", ".trt"))
+    }
   }
 
   # Derive .omega indicator for node-splitting model
@@ -3100,23 +3718,33 @@ make_nma_model_matrix <- function(nma_formula,
         dplyr::mutate(.omega = all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2]) %>%
         dplyr::ungroup()
     }
+    if (.has_agd_regression) {
+      dat_agd_regression <- dplyr::group_by(dat_agd_regression, .data$.study) %>%
+        dplyr::mutate(.omega = all(nodesplit %in% .data$.trt) & .data$.trt == nodesplit[2]) %>%
+        dplyr::ungroup()
+    }
   }
 
   # Construct design matrix all together then split out, so that same dummy
   # coding is used everywhere
-  dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
+  dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast, dat_agd_regression)
 
   # Check that required variables are present in each data set, and non-missing
   check_regression_data(nma_formula,
                         dat_ipd = dat_ipd,
                         dat_agd_arm = dat_agd_arm,
                         dat_agd_contrast = dat_agd_contrast,
+                        dat_agd_regression = dat_agd_regression,
                         newdata = newdata)
 
   # Center
   if (!is.null(xbar)) {
-    dat_all[, names(xbar)] <-
-      purrr::map2(dat_all[, names(xbar), drop = FALSE], xbar, ~.x - .y)
+    # Only center baseline rows of agd_regression data
+    cen_bl <- c(rep(TRUE, nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast)),
+                agd_regression_bl)
+
+    dat_all[cen_bl, names(xbar)] <-
+      purrr::map2(dat_all[cen_bl, names(xbar), drop = FALSE], xbar, ~.x - .y)
   }
 
   # Explicitly set contrasts attribute for key variables
@@ -3150,17 +3778,77 @@ make_nma_model_matrix <- function(nma_formula,
 
   disc_names <- setdiff(names(attr(X_all, "contrasts")), c(".study", ".trt", ".trtclass", ".contr", ".omega"))
 
+  # Determine "order" of terms: intercepts and trt effects=0, main effects=1, 1st order interactions=2, ...
+  # Needed for agd_regression setup
+  X_order <- attr(terms(nma_formula), "order")[attr(X_all, "assign")]
+  names(X_order) <- if ("(Intercept)" %in% colnames(X_all)) colnames(X_all)[-1] else colnames(X_all)
+  X_order[grepl(paste0("^\\.study$|^\\.study(\\Q", paste0(unique(dat_all$.study), collapse = "\\E|\\Q"), "\\E)$"), names(X_order), perl = TRUE)] <- 0
+  X_order[grepl(paste0("^\\.trt(\\Q", paste0(unique(dat_all$.trt), collapse = "\\E|\\Q"), "\\E)$"), names(X_order), perl = TRUE)] <- 0
+
+  # Determine columns corresponding to factor terms (including trt, study, trtclass)
+  fct_vars <- names(attr(X_all, "contrasts"))
+  fct_cols <- attr(X_all, "assign") %in% which(colSums(attr(terms(nma_formula), "factors")[fct_vars, , drop = FALSE] > 0) > 0)
+  names(fct_cols) <- colnames(X_all)
+
+  if (!is.null(single_study_label)) {
+    names(fct_cols) <- stringr::str_replace(names(fct_cols),
+                                          "^\\.study$",
+                                          paste0(".study", single_study_label))
+    fct_cols[paste0(".study", single_study_label)] <- TRUE
+  }
+
+  # Get design matrix for agd regression with all factors set to within-study reference levels
+  if (.has_agd_regression) {
+
+    d1 <- dat_all[-(nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression)), ]
+
+    d2 <- dplyr::select(dat_all[nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression), ],
+                        -dplyr::any_of(c(".trt", ".trtclass")), -dplyr::all_of(fct_vars), ".study")
+
+    d3 <- dat_agd_regression[agd_regression_bl, ] %>%
+      dplyr::select(".study", ".trt",
+                    if (classes) ".trtclass" else NULL,
+                    dplyr::all_of(fct_vars))
+
+    if (!is.null(single_study_label)) {
+      d3$.study_temp <- d3$.study
+      d3$.study <- 1L
+    }
+
+    dat_all_ref <-
+      dplyr::bind_rows(
+        d1,
+        dplyr::left_join(d2, d3, by = ".study")
+      )
+
+    X_all_ref <- model.matrix(nma_formula, data = dat_all_ref)
+  }
+
   if (!is.null(single_study_label)) {
     # Restore single study label and .study column
     colnames(X_all) <- stringr::str_replace(colnames(X_all),
                                             "^\\.study$",
                                             paste0(".study", single_study_label))
+
+    names(X_order) <- if ("(Intercept)" %in% colnames(X_all)) colnames(X_all)[-1] else colnames(X_all)
+
     dat_all <- dat_all %>%
       dplyr::mutate(.study = .data$.study_temp) %>%
       dplyr::select(-".study_temp")
 
     # Drop intercept column from design matrix
     if ("(Intercept)" %in% colnames(X_all)) X_all <- X_all[, -1, drop = FALSE]
+
+    if (.has_agd_regression) {
+      colnames(X_all_ref) <- stringr::str_replace(colnames(X_all_ref),
+                                              "^\\.study$",
+                                              paste0(".study", single_study_label))
+      dat_all_ref <- dat_all_ref %>%
+        dplyr::mutate(.study = .data$.study_temp) %>%
+        dplyr::select(-".study_temp")
+
+      if ("(Intercept)" %in% colnames(X_all_ref)) X_all_ref <- X_all_ref[, -1, drop = FALSE]
+    }
   }
 
   # Remove columns for reference level of .trtclass
@@ -3169,6 +3857,10 @@ make_nma_model_matrix <- function(nma_formula,
     col_trtclass_ref <- grepl(paste0(".trtclass\\Q", ref_class, "\\E"),
                               colnames(X_all), perl = TRUE)
     X_all <- X_all[, !col_trtclass_ref, drop = FALSE]
+
+    if (.has_agd_regression) {
+      X_all_ref <- X_all_ref[, !col_trtclass_ref, drop = FALSE]
+    }
   }
 
   # Remove columns for reference levels of discrete covariates
@@ -3196,6 +3888,7 @@ make_nma_model_matrix <- function(nma_formula,
     if (!is.null(x_ref)) {
       col_x_ref <- grepl(paste0("(`?)\\Q", xvar, "\\E(`?)\\Q", x_ref, "\\E"), colnames(X_all), perl = TRUE)
       X_all <- X_all[, !col_x_ref, drop = FALSE]
+      if (.has_agd_regression) X_all_ref <- X_all_ref[, !col_x_ref, drop = FALSE]
     }
   }
 
@@ -3207,15 +3900,20 @@ make_nma_model_matrix <- function(nma_formula,
                             "\\:\\.trtclass\\Q", ref_class, "\\E$|^\\.trtclass\\Q", ref_class, "\\E\\:")
   col_int_ref <- grepl(regex_int_ref, colnames(X_all), perl = TRUE)
   X_all <- X_all[, !col_int_ref, drop = FALSE]
+  if (.has_agd_regression) X_all_ref <- X_all_ref[, !col_int_ref, drop = FALSE]
 
   # Remove global intercept column (present for aux_regression)
   X_all <- X_all[, colnames(X_all) != "(Intercept)", drop = FALSE]
+  if (.has_agd_regression) X_all_ref <- X_all_ref[, colnames(X_all_ref) != "(Intercept)", drop = FALSE]
 
   if (consistency == "ume") {
     # Set relevant entries to +/- 1 for direction of contrast, using .contr_sign
     contr_cols <- grepl("^\\.contr", colnames(X_all))
     X_all[, contr_cols] <- sweep(X_all[, contr_cols, drop = FALSE], MARGIN = 1,
                                  STATS = dat_all$.contr_sign, FUN = "*")
+
+    if (.has_agd_regression) X_all_ref[, contr_cols] <- sweep(X_all_ref[, contr_cols, drop = FALSE], MARGIN = 1,
+                                                          STATS = dat_all$.contr_sign, FUN = "*")
   }
 
   if (.has_ipd) {
@@ -3266,22 +3964,96 @@ make_nma_model_matrix <- function(nma_formula,
 
     # Remove columns for study baselines corresponding to contrast-based studies - not used
     s_contr <- unique(dat_agd_contrast$.study)
-    bl_s_reg <- paste0("^\\.study(\\Q", paste0(s_contr, collapse = "\\E|\\Q"), "\\E)$")
-    bl_cols <- grepl(bl_s_reg, colnames(X_agd_contrast), perl = TRUE)
+    bl_s_contr_reg <- paste0("^\\.study(\\Q", paste0(s_contr, collapse = "\\E|\\Q"), "\\E)$")
+    bl_contr_cols <- grepl(bl_s_contr_reg, colnames(X_agd_contrast), perl = TRUE)
 
-    X_agd_contrast <- X_agd_contrast[, !bl_cols, drop = FALSE]
-    if (.has_ipd) X_ipd <- X_ipd[, !bl_cols, drop = FALSE]
-    if (.has_agd_arm) X_agd_arm <- X_agd_arm[, !bl_cols, drop = FALSE]
+    X_agd_contrast <- X_agd_contrast[, !bl_contr_cols, drop = FALSE]
+    if (.has_ipd) X_ipd <- X_ipd[, !bl_contr_cols, drop = FALSE]
+    if (.has_agd_arm) X_agd_arm <- X_agd_arm[, !bl_contr_cols, drop = FALSE]
   } else {
     X_agd_contrast <- offset_agd_contrast <- NULL
+  }
+
+  if (.has_agd_regression) {
+    X_agd_regression_all <- X_all[nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression), , drop = FALSE]
+    offset_agd_regression_all <-
+      if (has_offset) {
+        offsets[nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression)]
+      } else {
+        NULL
+      }
+
+    # Baseline rows
+    X_bl <- X_agd_regression_all[agd_regression_bl, , drop = FALSE]
+    if (has_offset) offset_bl <- offset_agd_regression_all[agd_regression_bl]
+
+    X_agd_regression <- X_agd_regression_all[!agd_regression_bl, , drop = FALSE]
+    offset_agd_regression <-
+      if (has_offset) {
+        offset_agd_regression_all[!agd_regression_bl]
+      } else {
+        NULL
+      }
+
+    # Design matrix with all factors set to within-study reference level
+    X_agd_regression_ref_all <- X_all_ref[nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression), , drop = FALSE]
+    X_agd_regression_ref <- X_agd_regression_ref_all[!agd_regression_bl, , drop = FALSE]
+
+    # Determine study and treatment columns
+    studies_reg <- unique(dat_agd_regression$.study)
+    studies_reg_reg <- paste0("^\\.study(\\Q", paste0(studies_reg, collapse = "\\E|\\Q"), "\\E)$")
+    study_reg_cols <- grepl(studies_reg_reg, colnames(X_agd_regression), perl = TRUE)
+
+    trts_reg <- unique(dat_agd_regression$.trt)
+    trts_reg_reg <- paste0("^\\.trt(\\Q", paste0(trts_reg, collapse = "\\E|\\Q"), "\\E)$")
+    trt_reg_cols <- grepl(trts_reg_reg, colnames(X_agd_regression), perl = TRUE)
+
+    fct_cols <- fct_cols[colnames(X_agd_regression)]
+    X_order <- X_order[colnames(X_agd_regression)]
+
+    if (!agd_regression_design_matrix_format){
+      for (i in 1:nrow(X_agd_regression)) {
+        # Get corresponding reference row
+        bl_id <- match(dat_agd_regression$.study[!agd_regression_bl][i], dat_agd_regression$.study[agd_regression_bl])
+        ord_pre_i <- max(X_order[X_agd_regression[i, ] != 0])
+
+        if (all(X_agd_regression[i, trt_reg_cols] == X_bl[bl_id, trt_reg_cols]) &&
+            all(X_agd_regression[i, !study_reg_cols & !trt_reg_cols] == 0)) {
+          # Intercept rows
+          # Set reference values of covariates
+          X_agd_regression[i, !study_reg_cols & !trt_reg_cols] <- X_bl[bl_id, !study_reg_cols & !trt_reg_cols]
+        } else {
+          # All other rows
+          # Difference out reference levels of factors
+          X_agd_regression[i, fct_cols] <- X_agd_regression[i, fct_cols, drop = FALSE] - X_agd_regression_ref[i, fct_cols, drop = FALSE]
+        }
+
+        ord_post_i <- max(X_order[X_agd_regression[i, ] != 0])
+        ord_i <- min(ord_pre_i, ord_post_i)
+
+        # Only highest order terms in each row have non-zero entries in design matrix
+        X_agd_regression[i, X_order < ord_i] <- 0
+      }
+    }
+
+    # Remove columns for study baselines corresponding to contrast-based studies - not used
+    if (.has_agd_contrast) {
+      bl_contr_cols <- grepl(bl_s_contr_reg, colnames(X_agd_regression), perl = TRUE)
+      X_agd_regression <- X_agd_regression[, !bl_contr_cols, drop = FALSE]
+    }
+
+  } else {
+    X_agd_regression <- offset_agd_regression <- NULL
   }
 
   return(list(X_ipd = X_ipd,
               X_agd_arm = X_agd_arm,
               X_agd_contrast = X_agd_contrast,
+              X_agd_regression = X_agd_regression,
               offset_ipd = offset_ipd,
               offset_agd_arm = offset_agd_arm,
-              offset_agd_contrast = offset_agd_contrast))
+              offset_agd_contrast = offset_agd_contrast,
+              offset_agd_regression = offset_agd_regression))
 }
 
 #' Extract columns used in model from data frame
@@ -3337,7 +4109,7 @@ get_model_data_columns <- function(data, regression = NULL, aux_regression = NUL
 #' constructed, and that there are no missing values.
 #'
 #' @param formula Model formula
-#' @param dat_ipd,dat_agd_arm,dat_agd_contrast Data frames
+#' @param dat_ipd,dat_agd_arm,dat_agd_contrast,dat_agd_regression Data frames
 #' @param newdata Providing newdata post-fitting? TRUE / FALSE
 #'
 #' @noRd
@@ -3345,11 +4117,13 @@ check_regression_data <- function(formula,
                                   dat_ipd = tibble::tibble(),
                                   dat_agd_arm = tibble::tibble(),
                                   dat_agd_contrast = tibble::tibble(),
+                                  dat_agd_regression = tibble::tibble(),
                                   newdata = FALSE) {
 
   .has_ipd <- if (nrow(dat_ipd)) TRUE else FALSE
   .has_agd_arm <- if (nrow(dat_agd_arm)) TRUE else FALSE
   .has_agd_contrast <- if (nrow(dat_agd_contrast)) TRUE else FALSE
+  .has_agd_regression <- if (nrow(dat_agd_regression)) TRUE else FALSE
 
   # Check that required variables are present in each data set, and non-missing
   if (.has_ipd) {
@@ -3382,9 +4156,20 @@ check_regression_data <- function(formula,
     X_agd_contrast_has_na <- character(0)
   }
 
+  if (.has_agd_regression) {
+    withCallingHandlers(
+      X_agd_regression_frame <- model.frame(formula, dat_agd_regression, na.action = NULL),
+      error = ~abort(paste0(if (newdata) "Failed to construct design matrix for `newdata`.\n" else "Failed to construct design matrix for AgD (regression-based).\n", .)))
+
+    X_agd_regression_has_na <- names(which(purrr::map_lgl(X_agd_regression_frame, ~any(is.na(.) | is.infinite(.)))))
+  } else {
+    X_agd_regression_has_na <- character(0)
+  }
+
   dat_has_na <- c(length(X_ipd_has_na) > 0,
                   length(X_agd_arm_has_na) > 0,
-                  length(X_agd_contrast_has_na) > 0)
+                  length(X_agd_contrast_has_na) > 0,
+                  length(X_agd_regression_has_na) > 0)
   if (any(dat_has_na)) {
     if (newdata) {
       abort(glue::glue("Variables with missing or infinite values in `newdata`: {paste(c(X_ipd_has_na, X_agd_arm_has_na, X_agd_contrast_has_na), collapse = ', ')}."))
@@ -3392,7 +4177,8 @@ check_regression_data <- function(formula,
       abort(glue::glue(glue::glue_collapse(
         c("Variables with missing or infinite values in IPD: {paste(X_ipd_has_na, collapse = ', ')}.",
           "Variables with missing or infinite values in AgD (arm-based): {paste(X_agd_arm_has_na, collapse = ', ')}.",
-          "Variables with missing or infinite values in AgD (contrast-based): {paste(X_agd_contrast_has_na, collapse = ', ')}."
+          "Variables with missing or infinite values in AgD (contrast-based): {paste(X_agd_contrast_has_na, collapse = ', ')}.",
+          "Variables with missing or infinite values in AgD (regression-based): {paste(X_agd_regression_has_na, collapse = ', ')}."
         )[dat_has_na], sep = "\n")))
     }
   }
