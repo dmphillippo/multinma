@@ -4,6 +4,8 @@
 into a single model object. For MCMC arrays, a new `cbind.mcmc_array()` method
 combines multiple MCMC arrays containing samples of the same parameters into a 
 single MCMC array.
+* Feature: Added `debug` option to `nma()`. When `TRUE`, the model will not be
+fitted and instead a list of input data to Stan is returned.
 * Improvement: `relative_effects()` now works when `newdata` contains
 integration points. Furthermore, `relative_effects()` will now ask for 
 integration points to be provided for models that involve non-linear covariate 

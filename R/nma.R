@@ -108,6 +108,10 @@
 #'   `knots`, a named list of M-spline bases (one for each study) can be
 #'   provided with `mspline_basis` which will be used directly. In this case,
 #'   all other M-spline options will be ignored.
+#' @param debug If `TRUE`, the model will not be fitted and instead a list of
+#'   the data input to Stan will be returned. Note that the full design matrix
+#'   (combined across all data types) is element `X` of this list. Default
+#'   `FALSE`.
 #'
 #' @details When specifying a model formula in the `regression` argument, the
 #'   usual formula syntax is available (as interpreted by [model.matrix()]). The
@@ -306,7 +310,8 @@ nma <- function(network,
                 mspline_degree = 3,
                 n_knots = 7,
                 knots = NULL,
-                mspline_basis = NULL) {
+                mspline_basis = NULL,
+                debug = FALSE) {
 
   # Check network
   if (!inherits(network, "nma_data")) {
@@ -641,6 +646,8 @@ nma <- function(network,
       QR <- FALSE
     }
   }
+
+  if (!rlang::is_bool(debug)) abort("`debug` must be TRUE or FALSE.")
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
@@ -1242,7 +1249,11 @@ if (class_effects == "exchangeable") {
     adapt_delta = adapt_delta,
     int_thin = int_thin,
     int_check = int_check,
-    basis = basis)
+    basis = basis,
+    debug = debug)
+
+  # If debug=TRUE return data list
+  if (debug) return(stanfit)
 
   # Make readable parameter names for generated quantities
   fnames_oi <- stanfit@sim$fnames_oi
@@ -1478,7 +1489,8 @@ nma.fit <- function(ipd_x, ipd_y,
                     adapt_delta = NULL,
                     int_thin = 0,
                     int_check = TRUE,
-                    basis) {
+                    basis,
+                    debug = FALSE) {
 
   if (missing(ipd_x)) ipd_x <- NULL
   if (missing(ipd_y)) ipd_y <- NULL
@@ -1619,6 +1631,7 @@ nma.fit <- function(ipd_x, ipd_y,
       int_thin < 0) abort("`int_thin` should be an integer >= 0.")
   if (!rlang::is_bool(int_check)) abort("`int_check` should be a logical scalar (TRUE or FALSE).")
   if (int_thin > 0) int_check <- FALSE
+  if (!rlang::is_bool(debug)) abort("`debug` must be TRUE or FALSE.")
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
@@ -2321,6 +2334,9 @@ nma.fit <- function(ipd_x, ipd_y,
   } else {
     abort(glue::glue('"{likelihood}" likelihood not supported.'))
   }
+
+  # Return stan data if debug TRUE
+  if (debug) return(standat)
 
   # Call sampling, managing warnings for integration checks if required
   if (n_int > 1 && int_check) {

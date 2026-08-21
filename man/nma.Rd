@@ -35,7 +35,8 @@ nma(
   mspline_degree = 3,
   n_knots = 7,
   knots = NULL,
-  mspline_basis = NULL
+  mspline_basis = NULL,
+  debug = FALSE
 )
 }
 \arguments{
@@ -174,6 +175,11 @@ investigate knot placement prior to model fitting.}
 \code{knots}, a named list of M-spline bases (one for each study) can be
 provided with \code{mspline_basis} which will be used directly. In this case,
 all other M-spline options will be ignored.}
+
+\item{debug}{If \code{TRUE}, the model will not be fitted and instead a list of
+the data input to Stan will be returned. Note that the full design matrix
+(combined across all data types) is element \code{X} of this list. Default
+\code{FALSE}.}
 }
 \value{
 \code{nma()} returns a \link{stan_nma} object, except when \code{consistency = "nodesplit"} when a \link{nma_nodesplit} or \link{nma_nodesplit_df} object is
