@@ -37,7 +37,8 @@ nma(
   mspline_degree = 3,
   n_knots = 7,
   knots = NULL,
-  mspline_basis = NULL
+  mspline_basis = NULL,
+  debug = FALSE
 )
 ```
 
@@ -247,6 +248,13 @@ nma(
   named list of M-spline bases (one for each study) can be provided with
   `mspline_basis` which will be used directly. In this case, all other
   M-spline options will be ignored.
+
+- debug:
+
+  If `TRUE`, the model will not be fitted and instead a list of the data
+  input to Stan will be returned. Note that the full design matrix
+  (combined across all data types) is element `X` of this list. Default
+  `FALSE`.
 
 ## Value
 
@@ -518,7 +526,7 @@ smk_fit_FE
 #> d[Self-help]                  0.31     0.46  2696    1
 #> lp__                      -5856.58 -5852.87  1699    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Aug 17 11:20:16 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:19:15 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -551,7 +559,7 @@ smk_fit_RE
 #> lp__                      -5763.68 -5756.83  1081    1
 #> tau                           0.93     1.26  1169    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Aug 17 11:20:21 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:19:21 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -601,7 +609,7 @@ smk_fit_RE_UME
 #> lp__                                            -5754.24   929    1
 #> tau                                                 1.43  1050    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Aug 17 11:20:26 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:19:29 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -930,7 +938,7 @@ pso_fit
 #> d[SEC_300]                              2.45     2.53     2.68  5719    1
 #> lp__                                -1576.05 -1573.88 -1570.57  1619    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Aug 17 11:21:55 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:21:43 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -1005,7 +1013,7 @@ ndmm_fit
 #> shape[Morgan2012]       0.94  5126    1
 #> shape[Palumbo2014]      1.16  4504    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Aug 17 11:24:59 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:26:40 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).

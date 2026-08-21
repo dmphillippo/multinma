@@ -268,7 +268,7 @@ pso_fit
 #> d[SEC_300]                              2.45     2.53     2.69  5543    1
 #> lp__                                -1576.06 -1573.90 -1570.67  1681    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Aug 17 11:27:12 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:30:17 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).

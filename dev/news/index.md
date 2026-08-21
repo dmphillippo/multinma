@@ -9,6 +9,10 @@
   [`cbind.mcmc_array()`](https://dmphillippo.github.io/multinma/dev/reference/bind_chains.md)
   method combines multiple MCMC arrays containing samples of the same
   parameters into a single MCMC array.
+- Feature: Added `debug` option to
+  [`nma()`](https://dmphillippo.github.io/multinma/dev/reference/nma.md).
+  When `TRUE`, the model will not be fitted and instead a list of input
+  data to Stan is returned.
 - Improvement:
   [`relative_effects()`](https://dmphillippo.github.io/multinma/dev/reference/relative_effects.md)
   now works when `newdata` contains integration points. Furthermore,

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">multinma</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.9.1.9002</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.9.1.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,6 +61,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.1.9000" id="multinma-0919000">multinma 0.9.1.9000<a class="anchor" aria-label="anchor" href="#multinma-0919000"></a></h2>
 <ul><li>Feature: New function <code><a href="../reference/bind_chains.html">bind_chains()</a></code> combines multiple runs of the same model into a single model object. For MCMC arrays, a new <code><a href="../reference/bind_chains.html">cbind.mcmc_array()</a></code> method combines multiple MCMC arrays containing samples of the same parameters into a single MCMC array.</li>
+<li>Feature: Added <code>debug</code> option to <code><a href="../reference/nma.html">nma()</a></code>. When <code>TRUE</code>, the model will not be fitted and instead a list of input data to Stan is returned.</li>
 <li>Improvement: <code><a href="../reference/relative_effects.html">relative_effects()</a></code> now works when <code>newdata</code> contains integration points. Furthermore, <code><a href="../reference/relative_effects.html">relative_effects()</a></code> will now ask for integration points to be provided for models that involve non-linear covariate terms, so that these can be averaged over correctly.</li>
 <li>Fix: Error in <code><a href="../reference/dic.html">dic()</a></code> for models with IPD and a Normal likelihood, caused by dplyr deprecation.</li>
 </ul></div>
