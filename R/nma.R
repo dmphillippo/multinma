@@ -394,6 +394,16 @@ nma <- function(network,
         idx <- match(spec$studies, levels(network$studies))
         prior_intercept[idx] <- rep(list(spec$prior_baseline), length(idx))
 
+        if (!is.null(spec$baseline_trt)) {
+          if (!spec$baseline_trt %in% levels(network$treatments)) {
+            abort(glue::glue('Treatment "{spec$baseline_trt}" listed in `baseline_trt` is not present in the network.'))
+          }
+          baseline_trt <- which(levels(network$treatments) == spec$baseline_trt)
+        } else {
+          # If unspecified, baseline treatment is network reference
+          baseline_trt <- 1L
+        }
+
       }
     }
 
@@ -402,14 +412,14 @@ nma <- function(network,
       # With random baselines, check everything now joined to reference treatment
       # by prior information
 
-      # Get a study on the network reference treatment
+      # Get a study on the baseline treatment
       refstudy <- dplyr::bind_rows(
         if (has_ipd(network)) dplyr::select(network$ipd, ".study", ".trt") else NULL,
         if (has_agd_arm(network)) dplyr::select(network$agd_arm, ".study", ".trt") else NULL) %>%
-        dplyr::filter(.data$.trt == levels(network$treatments)[1])
+        dplyr::filter(.data$.trt == levels(network$treatments)[baseline_trt])
       refstudy <- refstudy$.study[1]
 
-      # Check by connecting up network reference treatment study with con() studies
+      # Check by connecting up baseline treatment study with con() studies
       net_temp <- apply_connect_fixed(network,
                                       studies = c(as.character(refstudy),
                                                   unlist(purrr::map(connect_baseline, "studies"))))
@@ -571,6 +581,7 @@ nma <- function(network,
                          trt_effects = trt_effects,
                          class_effects = class_effects,
                          class_sd = class_sd,
+                         connect_baseline = connect_baseline,
                          regression = regression,
                          likelihood = likelihood,
                          link = link,
@@ -1406,6 +1417,7 @@ nma <- function(network,
     connect_baseline_random = connect_baseline_random,
     n_baseline_studies = n_baseline_studies,
     baseline_study_idx = baseline_study_idx,
+    baseline_trt = baseline_trt,
     ...,
     prior_intercept = prior_intercept,
     prior_trt = prior_trt,
@@ -1684,7 +1696,8 @@ nma.fit <- function(ipd_x, ipd_y,
                     basis,
                     random_baseline = FALSE,
                     n_baseline_studies = NULL,
-                    baseline_study_idx = NULL) {
+                    baseline_study_idx = NULL,
+                    baseline_trt = NULL) {
 
   if (missing(ipd_x)) ipd_x <- NULL
   if (missing(ipd_y)) ipd_y <- NULL
@@ -2044,6 +2057,7 @@ nma.fit <- function(ipd_x, ipd_y,
     random_baseline = random_baseline,
     n_baseline_studies = if (random_baseline && !is.null(n_baseline_studies)) n_baseline_studies else 0L,
     baseline_study_idx = if (random_baseline && !is.null(baseline_study_idx)) as.array(baseline_study_idx) else integer(0),
+    baseline_trt = if (random_baseline) baseline_trt else 1L,
     baseline_priors = connect_baseline_random,
     n_mixed_studies = mixed_studies
   )
@@ -3971,12 +3985,18 @@ aux_needs_integration <- function(aux_regression, aux_by) {
 #' @param studies Vector of study names.
 #' @param prior_baseline Prior distribution for the baseline parameters of
 #'   `studies` when `type = "random"`, as a [nma_prior] object (see [priors]).
+#' @param baseline_trt Which treatment the baseline prior distribution applies
+#'   to, when `type = "random"`. By default, the random baseline prior will be
+#'   placed on the network reference treatment. This should be changed if, for
+#'   example, the prior was obtained from a baseline synthesis of a different
+#'   treatment.
 #'
 #' @return An object of class `nma_connect`.
 #' @export
 con <- function(type = c("fixed", "random"),
                 studies,
-                prior_baseline = NULL) {
+                prior_baseline = NULL,
+                baseline_trt = NULL) {
 
   type <- rlang::arg_match(type)
 
@@ -3985,6 +4005,7 @@ con <- function(type = c("fixed", "random"),
       type == "fixed" && length(studies) < 2 ||
       type == "random" && length(studies) < 1)
     abort(glue::glue('`studies` must be a vector of study names of length > {switch(type, fixed = 2L, random = 1L)} for type = "{type}".'))
+
 
   if (type == "random") {
     if (is.null(prior_baseline)) {
@@ -3998,18 +4019,26 @@ con <- function(type = c("fixed", "random"),
         abort(glue::glue("Invalid `prior_baseline`. Suitable distributions are: ",
                          glue::glue_collapse(valid, sep = ", ", last = ", or ")))
     }
+
+    if (!is.null(baseline_trt)) {
+      baseline_trt <- as.character(baseline_trt)
+      if (!is.vector(baseline_trt) || length(baseline_trt) > 1) abort("`baseline_trt` must be a the name of a single treatment, or NULL.")
+    }
+
   } else {
     if (!is.null(prior_baseline)) {
       warn(glue::glue('Ignoring `prior_baseline` provided with type = "fixed" for stud{if (length(studies)  > 1) "ies" else "y"}: ',
                       glue::glue_collapse(glue::double_quote(studies), sep = ", ", last = " and "), "."))
       prior_baseline <- NULL
     }
+    baseline_trt <- NULL
   }
 
   structure(
     list(type      = type,
          studies   = studies,
-         prior_baseline  = prior_baseline),
+         prior_baseline  = prior_baseline,
+         baseline_trt = baseline_trt),
     class = "nma_connect"
   )
 }

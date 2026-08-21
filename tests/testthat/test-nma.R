@@ -582,6 +582,13 @@ test_that("con() argument checks", {
                fixed = TRUE)
 
   expect_error(nma(disc_net, connect_baseline = con(type = "random",
+                                                    studies = "S2",
+                                                    prior_baseline = normal(0,10),
+                                                    baseline_trt = "wrong")),
+               'Treatment "wrong" listed in `baseline_trt` is not present in the network',
+               fixed = TRUE)
+
+  expect_error(nma(disc_net, connect_baseline = con(type = "random",
                                                    studies = c("FIXTURE", "FEATURE"))),
                '`prior_baseline` must be provided when type = "random".')
 
@@ -836,4 +843,32 @@ test_that("basic correctness of random baseline connections", {
 
   expect_equal(s_aai$mean, c(2.5, 2), tolerance = tol)
   expect_equal(s_aai$sd, c(sqrt(0.2^2 + 0.1^2), sqrt(0.2^2 + sdC^2)), tolerance = tol)
+})
+
+test_that("correctness of baseline_trt argument", {
+  tol <- 0.05
+
+  fit_aa <- nma(net_aa,
+                connect_baseline = con("random",
+                                       studies = "B",
+                                       prior_baseline = normal(-1, 0.2),
+                                       baseline_trt = "A"),
+                prior_intercept = normal(0, 100),
+                prior_trt = normal(0, 10))
+  s_aa <- as.data.frame(summary(fit_aa, pars ="d"))
+
+  expect_equal(s_aa$mean, 2.5, tolerance = tol)
+  expect_equal(s_aa$sd, sqrt(0.2^2 + 0.1^2), tolerance = tol)
+
+  fit_aa2 <- nma(net_aa,
+                connect_baseline = con("random",
+                                       studies = "A",
+                                       prior_baseline = normal(3, 0.2),
+                                       baseline_trt = "B"),
+                prior_intercept = normal(0, 100),
+                prior_trt = normal(0, 10))
+  s_aa2 <- as.data.frame(summary(fit_aa2, pars ="d"))
+
+  expect_equal(s_aa2$mean, 2.5, tolerance = tol)
+  expect_equal(s_aa2$sd, sqrt(0.2^2 + 0.1^2), tolerance = tol)
 })

@@ -5,7 +5,12 @@
 \alias{con}
 \title{Specify baseline connections}
 \usage{
-con(type = c("fixed", "random"), studies, prior_baseline = NULL)
+con(
+  type = c("fixed", "random"),
+  studies,
+  prior_baseline = NULL,
+  baseline_trt = NULL
+)
 }
 \arguments{
 \item{type}{Type of connection, either "fixed" or "random".}
@@ -14,6 +19,12 @@ con(type = c("fixed", "random"), studies, prior_baseline = NULL)
 
 \item{prior_baseline}{Prior distribution for the baseline parameters of
 \code{studies} when \code{type = "random"}, as a \link{nma_prior} object (see \link{priors}).}
+
+\item{baseline_trt}{Which treatment the baseline prior distribution applies
+to, when \code{type = "random"}. By default, the random baseline prior will be
+placed on the network reference treatment. This should be changed if, for
+example, the prior was obtained from a baseline synthesis of a different
+treatment.}
 }
 \value{
 An object of class \code{nma_connect}.
