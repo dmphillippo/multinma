@@ -28,9 +28,8 @@
 #'   list names will be used to name the output parameters, otherwise the name
 #'   will be taken from the first class in each set.
 #' @param connect_baseline Baseline connections created by [con()], used to
-#'   connect a disconnected network. Multiple [con()] specifications of
-#'   `type = "fixed"` may be provided as a list. Currently a single
-#'   `type = "random"` connection must be given on its own.
+#'   connect a disconnected network. Multiple [con()] specifications may be
+#'   provided as a list.
 #' @param likelihood Character string specifying a likelihood, if unspecified
 #'   will be inferred from the data (see details)
 #' @param link Character string specifying a link function, if unspecified will
@@ -353,13 +352,6 @@ nma <- function(network,
 
     is_random <- purrr::map_lgl(connect_baseline, function(spec) spec$type == "random")
 
-    if (length(connect_baseline) > 1 && any(is_random)) {
-      abort(c(
-        "Only a single `con()` is allowed in `connect_baseline` when using `type = \"random\"`.",
-        "Multiple `con()` specifications are only supported when all are `type = \"fixed\"`."
-      ))
-    }
-
     all_studies <- unlist(lapply(connect_baseline, function(spec) spec$studies), use.names = FALSE)
     dup_studies <- unique(all_studies[duplicated(all_studies)])
     if (length(dup_studies)) {
@@ -367,8 +359,8 @@ nma <- function(network,
               paste0("Duplicates found: ", paste(dup_studies, collapse = ", "))))
     }
 
+    # First pass: checks
     for (spec in connect_baseline) {
-
       if (has_agd_contrast(network) &&
           any(spec$studies %in% as.character(network$agd_contrast$.study))) {
         abort("`connect_baseline` cannot include studies from AgD-contrast data.")
@@ -380,20 +372,27 @@ nma <- function(network,
       if (!all(spec$studies %in% known_studies)) {
         abort("Some studies listed in `connect_baseline` are not present in the network (IPD or AgD arm-based).")
       }
+    }
 
-      if (spec$type == "fixed") {
+    # Second pass: fixed
+    if (any(!is_random)) for (spec in connect_baseline) {
+      if (spec$type == "fixed") network <- apply_connect_fixed(network, spec$studies)
+    }
 
-        network <- apply_connect_fixed(network, spec$studies)
+    # Third pass: random
+    if (any(is_random)) {
+      connect_baseline_random <- TRUE
+      totns <- length(network$studies)
+      prior_intercept_org <- prior_intercept
+      prior_intercept <- rep(list(prior_intercept), totns)
+      baseline_trt <- rep(1L, totns)
 
-      } else if (spec$type == "random") {
+      for (spec in connect_baseline) {
 
-        connect_baseline_random <- TRUE
-        totns <- length(network$studies)
-        prior_intercept_org <- prior_intercept
-        prior_intercept <- rep(list(prior_intercept), totns)
+        if (spec$type == "fixed") next
+
         idx <- match(spec$studies, levels(network$studies))
         prior_intercept[idx] <- rep(list(spec$prior_baseline), length(idx))
-        baseline_trt <- rep(1L, totns)
 
         if (!is.null(spec$baseline_trt)) {
           if (!spec$baseline_trt %in% levels(network$treatments)) {
@@ -401,35 +400,31 @@ nma <- function(network,
           }
           baseline_trt[idx] <- which(levels(network$treatments) == spec$baseline_trt)
         }
-
       }
     }
 
     # Check connectedness
-    if (any(is_random)) {
-      # With random baselines, check everything now joined to reference treatment
-      # by prior information
+    net_temp <- network
+
+    if (any(is_random)) for (spec in connect_baseline) {
+
+      if (spec$type == "fixed") next
 
       # Get a study on the baseline treatment
       refstudy <- dplyr::bind_rows(
-        if (has_ipd(network)) dplyr::select(network$ipd, ".study", ".trt") else NULL,
-        if (has_agd_arm(network)) dplyr::select(network$agd_arm, ".study", ".trt") else NULL) %>%
-        dplyr::filter(.data$.trt == spec$baseline_trt %||% levels(network$treatments)[1])
+        if (has_ipd(net_temp)) dplyr::select(net_temp$ipd, ".study", ".trt") else NULL,
+        if (has_agd_arm(net_temp)) dplyr::select(net_temp$agd_arm, ".study", ".trt") else NULL) %>%
+        dplyr::filter(.data$.trt == spec$baseline_trt %||% levels(net_temp$treatments)[1])
       refstudy <- refstudy$.study[1]
 
       # Check by connecting up baseline treatment study with con() studies
-      net_temp <- apply_connect_fixed(network,
-                                      studies = c(as.character(refstudy),
-                                                  unlist(purrr::map(connect_baseline, "studies"))))
-
-      if (!is_network_connected(net_temp))
-        abort("Network is still disconnected after applying con() connections.")
-
-    } else {
-      # With fixed baselines, check updated network is connected
-      if (!is_network_connected(network))
-        abort("Network is still disconnected after applying con() connections.")
+      net_temp <- apply_connect_fixed(net_temp,
+                                      studies = c(as.character(refstudy), spec$studies))
     }
+
+    if (!is_network_connected(net_temp))
+      abort("Network is still disconnected after applying con() connections.")
+
   }
 
   # Calculate number of mixed studies, those appearing in both IPD and AgD arm.

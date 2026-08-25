@@ -531,25 +531,6 @@ test_that("con() argument checks", {
                                                prior_baseline = normal(0,10)))),
                '`type` must be')
 
-  m_multi_random <- "Only a single `con()` is allowed in `connect_baseline` when using `type = \"random\"`."
-
-  expect_error(nma(disc_net,
-                   connect_baseline = list(con(type = "random",
-                                               studies = c("FIXTURE"),
-                                               prior_baseline = normal(0,10)),
-                                           con(type = "fixed",
-                                               studies = c("FEATURE", "JUNCTURE")))),
-               m_multi_random, fixed = TRUE)
-
-  expect_error(nma(disc_net,
-                   connect_baseline = list(con(type = "random",
-                                               studies = c("FIXTURE"),
-                                               prior_baseline = normal(0,10)),
-                                           con(type = "random",
-                                               studies = c("JUNCTURE"),
-                                               prior_baseline = normal(0,10)))),
-               m_multi_random, fixed = TRUE)
-
   expect_error(nma(disc_net, connect_baseline = list(con(type = "fixed",
                                                         studies = c("FIXTURE", "JUNCTURE")),
                                                     con(type = "fixed",
@@ -894,4 +875,28 @@ test_that("correctness of baseline_trt argument", {
 
   expect_equal(s_aa3$mean, c(0.5, 0.5), tolerance = tol)
   expect_equal(s_aa3$sd, c(sqrt(0.2^2 + 0.1^2 + 0.1^2 + 0.1^2), sqrt(0.1^2 + 0.1^2)), tolerance = tol)
+})
+
+test_that("mixed connections", {
+
+  tol <- 0.05
+
+  s4dat <- data.frame(study = "D", trt = "D", y = 0.5, se = 0.1)
+  s5dat <- data.frame(study = "E", trt = "E", y = 1.5, se = 0.1)
+
+  net <- set_agd_arm(rbind(s1dat, s2dat, s4dat, s5dat),
+                     study = study, trt = trt, y = y, se = se,
+                     trt_ref = "A", allow_single_arm = TRUE)
+
+  fit <- nma(net, connect_baseline =
+               list(con("fixed", studies = c("A", "B")),
+                    con("random", studies = "D", prior_baseline = normal(0, 0.2)),
+                    con("random", studies = "E", prior_baseline = normal(1, 0.2), baseline_trt = "B")),
+             prior_intercept = normal(0, 100),
+             prior_trt = normal(0, 10))
+
+  s <- as.data.frame(summary(fit, pars = "d"))
+
+  expect_equal(s$mean, c(1, 0.5, 1.5), tolerance = tol)
+  expect_equal(s$sd, c(sqrt(0.1^2 + 0.1^2), sqrt(0.1^2 + 0.2^2), sqrt(0.1^2 + 0.2^2 + 0.1^2)), tolerance = tol)
 })

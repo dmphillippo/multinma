@@ -72,9 +72,8 @@ list names will be used to name the output parameters, otherwise the name
 will be taken from the first class in each set.}
 
 \item{connect_baseline}{Baseline connections created by \code{\link[=con]{con()}}, used to
-connect a disconnected network. Multiple \code{\link[=con]{con()}} specifications of
-\code{type = "fixed"} may be provided as a list. Currently a single
-\code{type = "random"} connection must be given on its own.}
+connect a disconnected network. Multiple \code{\link[=con]{con()}} specifications may be
+provided as a list.}
 
 \item{likelihood}{Character string specifying a likelihood, if unspecified
 will be inferred from the data (see details)}
