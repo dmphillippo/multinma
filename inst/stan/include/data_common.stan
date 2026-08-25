@@ -27,7 +27,6 @@ array[random_baseline ? ni_agd_arm : 0] int<lower=1> agd_arm_study;
 // array[ni_agd_contrast] int<lower=1> agd_contrast_study;
 int<lower=0> n_baseline_studies;
 array[random_baseline ? n_baseline_studies : 0] int<lower=1> baseline_study_idx;
-int<lower=1> baseline_trt;
 
 int<lower=1> nt; // number of treatments
 int<lower=0> nX; // number of columns of design matrix
@@ -74,6 +73,8 @@ array[baseline_priors ? ns_ipd + ns_agd_arm : 1] int<lower=0,upper=3> prior_inte
 array[baseline_priors ? ns_ipd + ns_agd_arm : 1] real prior_intercept_location;
 array[baseline_priors ? ns_ipd + ns_agd_arm : 1] real<lower=0> prior_intercept_scale;
 array[baseline_priors ? ns_ipd + ns_agd_arm : 1] real<lower=0> prior_intercept_df;
+
+array[baseline_priors ? ns_ipd + ns_agd_arm : 0] int<lower=1> baseline_trt;
 
 int<lower=0,upper=6> prior_intercept_sd_dist;
 real prior_intercept_sd_location;

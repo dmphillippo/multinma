@@ -871,4 +871,27 @@ test_that("correctness of baseline_trt argument", {
 
   expect_equal(s_aa2$mean, 2.5, tolerance = tol)
   expect_equal(s_aa2$sd, sqrt(0.2^2 + 0.1^2), tolerance = tol)
+
+
+  s1dat2 <- data.frame(study = "A", trt = "A", y = 0.5, se = 0.1)
+  s2dat2 <- data.frame(study = "B", trt = c("B", "C"), y = c(1, 1.5), se = 0.1)
+
+  net_aa3 <- combine_network(
+    set_agd_arm(s1dat2, study, trt, y = y, se = se, allow_single_arm = TRUE),
+    set_agd_arm(s2dat2, study, trt, y = y, se = se, allow_single_arm = TRUE),
+    trt_ref = "B"
+  )
+
+  fit_aa3 <- nma(net_aa3,
+                 connect_baseline = con("random",
+                                        studies = "A",
+                                        prior_baseline = normal(0.5, 0.2),
+                                        baseline_trt = "C"),
+                 prior_intercept = normal(0, 100),
+                 prior_trt = normal(0, 10))
+
+  s_aa3 <- as.data.frame(summary(fit_aa3, pars ="d"))
+
+  expect_equal(s_aa3$mean, c(0.5, 0.5), tolerance = tol)
+  expect_equal(s_aa3$sd, c(sqrt(0.2^2 + 0.1^2 + 0.1^2 + 0.1^2), sqrt(0.1^2 + 0.1^2)), tolerance = tol)
 })

@@ -393,15 +393,13 @@ nma <- function(network,
         prior_intercept <- rep(list(prior_intercept), totns)
         idx <- match(spec$studies, levels(network$studies))
         prior_intercept[idx] <- rep(list(spec$prior_baseline), length(idx))
+        baseline_trt <- rep(1L, totns)
 
         if (!is.null(spec$baseline_trt)) {
           if (!spec$baseline_trt %in% levels(network$treatments)) {
             abort(glue::glue('Treatment "{spec$baseline_trt}" listed in `baseline_trt` is not present in the network.'))
           }
-          baseline_trt <- which(levels(network$treatments) == spec$baseline_trt)
-        } else {
-          # If unspecified, baseline treatment is network reference
-          baseline_trt <- 1L
+          baseline_trt[idx] <- which(levels(network$treatments) == spec$baseline_trt)
         }
 
       }
@@ -416,7 +414,7 @@ nma <- function(network,
       refstudy <- dplyr::bind_rows(
         if (has_ipd(network)) dplyr::select(network$ipd, ".study", ".trt") else NULL,
         if (has_agd_arm(network)) dplyr::select(network$agd_arm, ".study", ".trt") else NULL) %>%
-        dplyr::filter(.data$.trt == levels(network$treatments)[baseline_trt])
+        dplyr::filter(.data$.trt == spec$baseline_trt %||% levels(network$treatments)[1])
       refstudy <- refstudy$.study[1]
 
       # Check by connecting up baseline treatment study with con() studies
@@ -2057,7 +2055,7 @@ nma.fit <- function(ipd_x, ipd_y,
     random_baseline = random_baseline,
     n_baseline_studies = if (random_baseline && !is.null(n_baseline_studies)) n_baseline_studies else 0L,
     baseline_study_idx = if (random_baseline && !is.null(baseline_study_idx)) as.array(baseline_study_idx) else integer(0),
-    baseline_trt = if (random_baseline) baseline_trt else 1L,
+    baseline_trt = if (connect_baseline_random) baseline_trt else integer(),
     baseline_priors = connect_baseline_random,
     n_mixed_studies = mixed_studies
   )

@@ -5,8 +5,8 @@
 if (random_baseline == 0) {
   if (baseline_priors == 1) {
     for (s in 1:totns) {
-      if (baseline_trt > 1) {
-        prior_select2_lp(mu[s] + d[baseline_trt - 1], prior_intercept_dist[s], prior_intercept_location[s], prior_intercept_scale[s], prior_intercept_df[s]);
+      if (baseline_trt[s] > 1) {
+        prior_select2_lp(mu[s] + d[baseline_trt[s] - 1], prior_intercept_dist[s], prior_intercept_location[s], prior_intercept_scale[s], prior_intercept_df[s]);
       } else {
         prior_select2_lp(mu[s], prior_intercept_dist[s], prior_intercept_location[s], prior_intercept_scale[s], prior_intercept_df[s]);
       }
