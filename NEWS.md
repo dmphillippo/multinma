@@ -60,6 +60,8 @@ see TSD 5.
 into a single model object. For MCMC arrays, a new `cbind.mcmc_array()` method
 combines multiple MCMC arrays containing samples of the same parameters into a 
 single MCMC array.
+* Feature: Added `debug` option to `nma()`. When `TRUE`, the model will not be
+fitted and instead a list of input data to Stan is returned.
 * Feature: New `allow_mixed_studies` argument to `combine_network()` allows 
 studies to be included in more than one data type.
 * Improvement: `relative_effects()` now works when `newdata` contains
