@@ -1280,7 +1280,6 @@ set_agd_regression <- function(data,
     # Re-drop factors, in case extra unneeded study rows included in covariate data
     d$.study <- forcats::fct_drop(d$.study)
 
-    d$.qmc_known <- d$.study %in% .cov_study
   }
 
   # Check for a list of matrices

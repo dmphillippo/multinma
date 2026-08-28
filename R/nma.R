@@ -1262,6 +1262,31 @@ nma <- function(network,
             glue::glue("The included matrix is singular and cannot be inverted for study {agd_regression_name_study[i]}.")
         }
       }
+
+	    # Cox PH
+      if(likelihood %in%c('exponential', 'weibull', 'gompertz','mspline', 'pexp') ){
+        # Sort
+        i = 0
+        i  =i+1
+
+        tmp_x <- tmp_c <- 0 # counters
+        for(i in 1:ns_agd_regression ){
+          if(agd_regression_reduced_study[i]){
+
+            tmp_eta <-
+              X_agd_regression_int[(tmp_x+1):(tmp_x+agd_regression_nx[i]), XI_col[[i]] ] %*%
+              est_agd_regression[(tmp_c+1):(tmp_c+agd_regression_ncoef[i])]
+
+            X_agd_regression_int[(tmp_x+1):(tmp_x+agd_regression_nx[i]), ] <-
+              X_agd_regression_int[(tmp_x+1):(tmp_x+agd_regression_nx[i]), ][order(tmp_eta,decreasing = TRUE), ]
+
+          }
+          tmp_x <- tmp_x + agd_regression_nx[i]
+          tmp_c <- tmp_c + agd_regression_ncoef[i]
+        }
+
+      }
+
     }else{
       dat_agd_regression <- dat_agd_regression %>%
         dplyr::select( stringr::str_subset(colnames(.),"^\\.int_",negate = TRUE)  )
