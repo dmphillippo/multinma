@@ -363,9 +363,10 @@ compare_populations <- function(network,
 
   # Detect subnetworks
   g <- igraph::as.igraph(network, collapse = FALSE)
-  comps <- igraph::decompose(g)
-  components <- purrr::imap_dfr(comps,
-    ~dplyr::tibble(.study = unique(igraph::edge_attr(.x, ".study")), component = .y))
+  membership <- igraph::components(g)$membership
+  components <- igraph::as_data_frame(g, what = "edges") %>%
+    dplyr::transmute(.study = .data$.study, component = unname(membership[.data$from])) %>%
+    dplyr::distinct()
 
   # Common outputs
   out$components <- components
@@ -470,9 +471,9 @@ print.pop_comp <- function(x,
   if (simplify && ncomp > 1) {
     for (c1 in 1:(ncomp - 1)) for (c2 in 2:ncomp) {
       cat("Subnetwork ", c2, " vs. ", c1, ":\n", sep = "")
-      s1 <- which(comp_lookup == c1)
-      s2 <- which(comp_lookup == c2)
-      print(mat[s1, s2])
+      s1 <- names(comp_lookup)[comp_lookup == c1]
+      s2 <- names(comp_lookup)[comp_lookup == c2]
+      print(mat[s1, s2, drop = FALSE])
       cat("\n")
     }
   } else {
