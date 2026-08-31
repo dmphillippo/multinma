@@ -69,6 +69,13 @@ reference:
   - matches("[pdq]logt")
   - matches("[pdq]logitnorm")
 
+- title: Comparing study population covariate distributions
+  desc: >
+    Functions for comparing the (joint) covariate distribution of the studies in
+    the network.
+  contents:
+  - compare_populations
+
 - title: Prior distributions
   desc: Specify and summarise prior distributions.
   contents:
@@ -88,10 +95,16 @@ reference:
   - plot.stan_nma
   - pairs.stan_nma
   - stan_nma-class
+  - con
   - adapt_delta
   - which_RE
   - RE_cor
   - .default
+
+- title: Baseline synthesis
+  desc: Fitting of models on the baseline risk.
+  contents:
+  - baseline_synthesis
 
 - title: Model checking and comparison
   desc: Checking model fit and comparing models.
@@ -137,6 +150,13 @@ reference:
   - as.matrix.stan_nma
   - as.stanfit.stan_nma
   - bind_chains
+
+- title: Assessing predictive perforomance
+  desc: Functions for assessing predictive performance of a fitted regression model.
+  contents:
+  - bayes_R2.stan_nma
+  - loo_R2.stan_nma
+  - loo_predictive_metric.stan_nma
 
 - title: M-spline hazards
   desc: Functions for flexibile M-splines on the baseline hazard.

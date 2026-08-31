@@ -4,13 +4,18 @@
 \alias{combine_network}
 \title{Combine multiple data sources into one network}
 \usage{
-combine_network(..., trt_ref)
+combine_network(..., trt_ref, allow_mixed_studies = FALSE)
 }
 \arguments{
 \item{...}{multiple data sources, as defined using the \verb{set_*} functions}
 
 \item{trt_ref}{reference treatment for the entire network, as a string (or
 coerced as such) referring to the levels of the treatment factor variable}
+
+\item{allow_mixed_studies}{Logical scalar (default \code{FALSE}), whether to
+allow the same study label to appear in more than one data source. By
+default, studies with the same label found in multiple data sources will
+produce an error.}
 }
 \value{
 An object of class \link{nma_data}

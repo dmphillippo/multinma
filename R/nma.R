@@ -17,14 +17,19 @@
 #' @param class_interactions Character string specifying whether effect modifier
 #'   interactions are specified as `"common"`, `"exchangeable"`, or
 #'   `"independent"`.
-#' @param class_effects Character string specifying a model for treatment class effects,
-#'   either `"independent"` (the default), `"exchangeable"`, or `"common"`.
-#' @param class_sd Character string specifying whether the class standard deviations in a
-#'   class effects model should be `"independent"` (i.e. separate for each class, the default),
-#'   or `"common"` (i.e. shared across all classes). Alternatively this can be a list of
-#'   character vectors, each of which describe a set classes for which to share a common class SD;
-#'   any list names will be used to name the output parameters, otherwise the name will be taken
-#'   from the first class in each set.
+#' @param class_effects Character string specifying a model for treatment class
+#'   effects, either `"independent"` (the default), `"exchangeable"`, or
+#'   `"common"`.
+#' @param class_sd Character string specifying whether the class standard
+#'   deviations in a class effects model should be `"independent"` (i.e.
+#'   separate for each class, the default), or `"common"` (i.e. shared across
+#'   all classes). Alternatively this can be a list of character vectors, each
+#'   of which describe a set classes for which to share a common class SD; any
+#'   list names will be used to name the output parameters, otherwise the name
+#'   will be taken from the first class in each set.
+#' @param connect_baseline Baseline connections created by [con()], used to
+#'   connect a disconnected network. Multiple [con()] specifications may be
+#'   provided as a list.
 #' @param likelihood Character string specifying a likelihood, if unspecified
 #'   will be inferred from the data (see details)
 #' @param link Character string specifying a link function, if unspecified will
@@ -287,6 +292,7 @@ nma <- function(network,
                 class_interactions = c("common", "exchangeable", "independent"),
                 class_effects = c("independent", "common", "exchangeable"),
                 class_sd =  c("independent", "common"),
+                connect_baseline = NULL,
                 likelihood = NULL,
                 link = NULL,
                 ...,
@@ -313,6 +319,18 @@ nma <- function(network,
                 mspline_basis = NULL,
                 debug = FALSE) {
 
+  # Get random baseline arguments from ...
+  dlist <- list(...)
+  if ("random_baseline" %in% names(dlist)) {
+    random_baseline <- dlist$random_baseline
+    prior_intercept_sd <- dlist$prior_intercept_sd
+    baseline_subnet <- dlist$baseline_subnet %||% 1L
+  } else {
+    random_baseline <- FALSE
+    prior_intercept_sd <- NULL
+    baseline_subnet <- NULL
+  }
+
   # Check network
   if (!inherits(network, "nma_data")) {
     abort("Expecting an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
@@ -321,6 +339,105 @@ nma <- function(network,
   if (all(purrr::map_lgl(network, is.null))) {
     abort("Empty network.")
   }
+
+  # Check and apply connect_baseline specifications
+  connect_baseline_random <- FALSE
+  if (!is.null(connect_baseline)) {
+
+    if (is_network_connected(network))
+      warn(c("`connect_baseline` supplied with a connected network.",
+             "This is not recommended and may lead to bias."))
+
+    if (inherits(connect_baseline, "nma_connect")) connect_baseline <- list(connect_baseline)
+
+    if (!rlang::is_bare_list(connect_baseline) ||
+        !all(purrr::map_lgl(connect_baseline, inherits, what = "nma_connect"))) {
+      abort("`connect_baseline` must be a con() specification or list of con() specifications.")
+    }
+
+    is_random <- purrr::map_lgl(connect_baseline, function(spec) spec$type == "random")
+
+    all_studies <- unlist(lapply(connect_baseline, function(spec) spec$studies), use.names = FALSE)
+    dup_studies <- unique(all_studies[duplicated(all_studies)])
+    if (length(dup_studies)) {
+      abort(c("Each study may appear in at most one con() specification. ",
+              paste0("Duplicates found: ", paste(dup_studies, collapse = ", "))))
+    }
+
+    # First pass: checks
+    for (spec in connect_baseline) {
+      if (has_agd_contrast(network) &&
+          any(spec$studies %in% as.character(network$agd_contrast$.study))) {
+        abort("`connect_baseline` cannot include studies from AgD-contrast data.")
+      }
+
+      known_studies <- c(if (has_ipd(network)) as.character(network$ipd$.study) else NULL,
+                         if (has_agd_arm(network)) as.character(network$agd_arm$.study) else NULL)
+
+      if (!all(spec$studies %in% known_studies)) {
+        abort("Some studies listed in `connect_baseline` are not present in the network (IPD or AgD arm-based).")
+      }
+    }
+
+    # Second pass: fixed
+    if (any(!is_random)) for (spec in connect_baseline) {
+      if (spec$type == "fixed") network <- apply_connect_fixed(network, spec$studies)
+    }
+
+    # Third pass: random
+    if (any(is_random)) {
+      connect_baseline_random <- TRUE
+      totns <- length(network$studies)
+      prior_intercept_org <- prior_intercept
+      prior_intercept <- rep(list(prior_intercept), totns)
+      baseline_trt <- rep(1L, totns)
+
+      for (spec in connect_baseline) {
+
+        if (spec$type == "fixed") next
+
+        idx <- match(spec$studies, levels(network$studies))
+        prior_intercept[idx] <- rep(list(spec$prior_baseline), length(idx))
+
+        if (!is.null(spec$baseline_trt)) {
+          if (!spec$baseline_trt %in% levels(network$treatments)) {
+            abort(glue::glue('Treatment "{spec$baseline_trt}" listed in `baseline_trt` is not present in the network.'))
+          }
+          baseline_trt[idx] <- which(levels(network$treatments) == spec$baseline_trt)
+        }
+      }
+    }
+
+    # Check connectedness
+    net_temp <- network
+
+    if (any(is_random)) for (spec in connect_baseline) {
+
+      if (spec$type == "fixed") next
+
+      # Get a study on the baseline treatment
+      refstudy <- dplyr::bind_rows(
+        if (has_ipd(net_temp)) dplyr::select(net_temp$ipd, ".study", ".trt") else NULL,
+        if (has_agd_arm(net_temp)) dplyr::select(net_temp$agd_arm, ".study", ".trt") else NULL) %>%
+        dplyr::filter(.data$.trt == spec$baseline_trt %||% levels(net_temp$treatments)[1])
+      refstudy <- refstudy$.study[1]
+
+      # Check by connecting up baseline treatment study with con() studies
+      net_temp <- apply_connect_fixed(net_temp,
+                                      studies = c(as.character(refstudy), spec$studies))
+    }
+
+    if (!is_network_connected(net_temp))
+      abort("Network is still disconnected after applying con() connections.")
+
+  }
+
+  # Calculate number of mixed studies, those appearing in both IPD and AgD arm.
+  # This reduces the number of intercept parameters in the network
+  mixed_studies <- length(intersect(
+    if (has_ipd(network))     unique(network$ipd$.study)     else character(0),
+    if (has_agd_arm(network)) unique(network$agd_arm$.study) else character(0)
+  ))
 
   # Check model arguments
   consistency <- rlang::arg_match(consistency)
@@ -335,6 +452,11 @@ nma <- function(network,
     }
   }
 
+  # Check for single treatment only (e.g. baseline synthesis)
+  if (length(network$treatments) == 1) {
+    trt_effects <- "fixed"
+    if (consistency != "consistency") abort("Only a single treatment, cannot fit inconsistency model.")
+  }
 
 
   if (class_effects == "common") {
@@ -364,14 +486,14 @@ nma <- function(network,
   if (is.list(class_sd)) {
     # Check that all classes listed in 'class_sd' are in 'network$classes'
     if (!all(unlist(class_sd) %in% network$classes)) {
-      stop("Some classes listed in 'class_sd' are not present in the network.")
+      abort("Some classes listed in `class_sd` are not present in the network.")
     }
 
 
     # Check that all the collapsed classes are distinct and don't share a class
     flattened_classes <- unlist(class_sd)
     if (length(flattened_classes) != length(unique(flattened_classes))) {
-      stop("Some classes are listed in more than one shared standard deviation group in 'class_sd'")
+      abort("Some classes are listed in more than one shared standard deviation group in `class_sd`")
     }
   } else {
     class_sd <- rlang::arg_match(class_sd)
@@ -457,6 +579,7 @@ nma <- function(network,
                          trt_effects = trt_effects,
                          class_effects = class_effects,
                          class_sd = class_sd,
+                         connect_baseline = connect_baseline,
                          regression = regression,
                          likelihood = likelihood,
                          link = link,
@@ -482,7 +605,6 @@ nma <- function(network,
                          mspline_basis = mspline_basis)
 
       if (!missing(class_interactions)) ns_arglist$class_interactions <- class_interactions
-
 
       for (i in 1:nrow(nodesplit)) {
 
@@ -572,7 +694,15 @@ nma <- function(network,
   has_intercepts <- has_agd_arm(network) || has_ipd(network)
 
   # Check priors
-  check_prior(prior_intercept)
+  if (connect_baseline_random){
+    prior_intercept_unique <- unique(prior_intercept)
+    lapply(prior_intercept_unique, check_prior)
+  } else {
+    check_prior(prior_intercept)
+  }
+  if (random_baseline == TRUE){
+    check_prior(prior_intercept_sd)
+  }
   check_prior(prior_trt)
   check_prior(prior_het)
   check_prior(prior_reg)
@@ -585,8 +715,16 @@ nma <- function(network,
 
   # Prior defaults
   prior_defaults <- list()
+  if (connect_baseline_random){
+    if (has_intercepts && .is_default(prior_intercept_org))
+      prior_defaults$prior_intercept_org <- get_prior_call(prior_intercept_org)
+  } else {
   if (has_intercepts && .is_default(prior_intercept))
     prior_defaults$prior_intercept <- get_prior_call(prior_intercept)
+  }
+  if (random_baseline == TRUE && .is_default(prior_intercept_sd)) {
+    prior_defaults$prior_intercept_sd <- get_prior_call(prior_intercept_sd)
+  }
   if (.is_default(prior_trt))
     prior_defaults$prior_trt <- get_prior_call(prior_trt)
   if (trt_effects == "random" && .is_default(prior_het))
@@ -741,9 +879,25 @@ nma <- function(network,
   # Notify if default reference treatment is used
   if (.is_default(network$treatments))
     inform(glue::glue('Note: Setting "{levels(network$treatments)[1]}" as the network reference treatment.'))
-  # Notify if network is disconnected
-  if (!is_network_connected(network))
-    inform("Note: Network is disconnected. See ?is_network_connected for more details.")
+
+  # Error if network is disconnected (must use baseline_synthesis() or connect_baseline instead)
+  if (!is_network_connected(network) && is.null(baseline_subnet) && is.null(connect_baseline))
+    abort("Network is disconnected. See ?is_network_connected for more details.")
+
+  # Auto-compute subnetwork_trt from igraph components when baseline_subnet is set
+  subnetwork_trt <- NULL
+  if (!is.null(baseline_subnet)) {
+    g          <- igraph::as.igraph(network)
+    comp       <- igraph::components(g)
+    raw_subnet <- comp$membership
+    ref_trt    <- as.character(levels(network$treatments)[1])
+    ref_comp   <- raw_subnet[[ref_trt]]
+    old_ids    <- c(ref_comp, setdiff(seq_len(comp$no), ref_comp))
+    id_map     <- stats::setNames(seq_len(comp$no), old_ids)
+    subnetwork_trt        <- id_map[as.character(raw_subnet)]
+    names(subnetwork_trt) <- names(raw_subnet)
+  }
+
   # Notify if reference treatment is within a class when running the exchangeable class model
   if (class_effects == "exchangeable" && !is.null(network$classes)) {
     ref_trt <- levels(network$treatments)[1]
@@ -991,7 +1145,8 @@ nma <- function(network,
                                   xbar = xbar,
                                   consistency = consistency,
                                   nodesplit = nodesplit,
-                                  classes = !is.null(network$classes))
+                                  classes = !is.null(network$classes),
+                                  subnetwork_trt = subnetwork_trt)
 
   X_ipd <- X_list$X_ipd
   X_agd_arm <- X_list$X_agd_arm
@@ -1000,6 +1155,31 @@ nma <- function(network,
   offset_ipd <- X_list$offset_ipd
   offset_agd_arm <- X_list$offset_agd_arm
   offset_agd_contrast <- X_list$offset_agd_contrast
+
+  # Compute indices for studies in random baseline model, for picking out elements of f_baseline
+  X_check <- if (!is.null(X_ipd)) X_ipd else if (!is.null(X_agd_arm)) X_agd_arm else X_agd_contrast
+  x_nms   <- colnames(X_check)
+  col_sty <- grepl("^\\.study[^:]+$", x_nms)
+  sty_nms <- sub("^\\.study", "", x_nms[col_sty])
+
+  if (!is.null(subnetwork_trt) && !is.null(baseline_subnet)) {
+    all_study_trt <- dplyr::bind_rows(
+      if (has_ipd(network)) dplyr::distinct(dat_ipd,
+        .study = as.character(.data$.study), .trt = as.character(.data$.trt)) else NULL,
+      if (has_agd_arm(network)) dplyr::distinct(idat_agd_arm,
+        .study = as.character(.data$.study), .trt = as.character(.data$.trt)) else NULL
+    )
+    bl_studies <- all_study_trt %>%
+      dplyr::mutate(.sn = subnetwork_trt[.data$.trt]) %>%
+      dplyr::filter(.data$.sn == baseline_subnet) %>%
+      dplyr::pull(.data$.study) %>%
+      unique()
+    baseline_study_idx <- which(sty_nms %in% bl_studies)
+    n_baseline_studies <- length(baseline_study_idx)
+  } else {
+    n_baseline_studies <- length(sty_nms)
+    baseline_study_idx <- seq_len(n_baseline_studies)
+  }
 
   # Construct RE correlation matrix
   if (trt_effects == "random") {
@@ -1195,24 +1375,25 @@ nma <- function(network,
     aux_group <- aux_id
   }
 
-if (class_effects == "exchangeable") {
-  # Create class design vector for class means
-  class_mean_design <- which_CE(network$classes, class_sd)
+  if (class_effects == "exchangeable") {
+    # Create class design vector for class means
+    class_mean_design <- which_CE(network$classes, class_sd)
 
-  # Create class design vector for class SDs
-  if (is.list(class_sd)) {
-    class_sd_design <- which_CE(forcats::fct_collapse(network$classes, !!!class_sd), class_sd)
-  } else if (class_sd == "common") {
-    class_sd_design <- list(
-      # Change non-zero class IDs to 1
-      id = pmin(class_mean_design$id, 1),
-      # Set common class label
-      label = "All Classes"
-    )
-  } else if (class_sd == "independent") {
-    class_sd_design <- class_mean_design
+    # Create class design vector for class SDs
+    if (is.list(class_sd)) {
+      class_sd_design <- which_CE(forcats::fct_collapse(network$classes, !!!class_sd), class_sd)
+    } else if (class_sd == "common") {
+      class_sd_design <- list(
+        # Change non-zero class IDs to 1
+        id = pmin(class_mean_design$id, 1),
+        # Set common class label
+        label = "All Classes"
+      )
+    } else if (class_sd == "independent") {
+      class_sd_design <- class_mean_design
+    }
   }
-}
+
   # Fit using nma.fit
   stanfit <- nma.fit(ipd_x = X_ipd, ipd_y = y_ipd,
     agd_arm_x = X_agd_arm, agd_arm_y = y_agd_arm,
@@ -1232,6 +1413,11 @@ if (class_effects == "exchangeable") {
     likelihood = likelihood,
     link = link,
     consistency = consistency,
+    mixed_studies = mixed_studies,
+    connect_baseline_random = connect_baseline_random,
+    n_baseline_studies = n_baseline_studies,
+    baseline_study_idx = baseline_study_idx,
+    baseline_trt = baseline_trt,
     ...,
     prior_intercept = prior_intercept,
     prior_trt = prior_trt,
@@ -1254,6 +1440,16 @@ if (class_effects == "exchangeable") {
 
   # If debug=TRUE return data list
   if (debug) return(stanfit)
+
+  dlist <- list(...)
+  if ("random_baseline" %in% names(dlist)) {
+    random_baseline <- dlist$random_baseline
+    prior_intercept_sd <- dlist$prior_intercept_sd
+    dlist  <- NULL
+  } else {
+    random_baseline <- FALSE
+    prior_intercept_sd <- NULL
+  }
 
   # Make readable parameter names for generated quantities
   fnames_oi <- stanfit@sim$fnames_oi
@@ -1389,6 +1585,12 @@ if (class_effects == "exchangeable") {
     }
   }
 
+
+  if (has_ipd(network) && likelihood == "normal") {
+    sig_labels <- get_aux_labels(dat_ipd, by = c(".study", ".trt"))
+    fnames_oi[grepl("^sigma\\[[0-9]+\\]$", fnames_oi)] <- paste0("sigma[", sig_labels, "]")
+  }
+
   if (class_effects == "exchangeable"){
     # Label class_mean parameters
     fnames_oi[grepl("^class_mean\\[[0-9]+\\]$", fnames_oi)] <- paste0("class_mean[", class_mean_design$label, "]")
@@ -1414,6 +1616,7 @@ if (class_effects == "exchangeable") {
               link = link,
               aux_by = if (has_aux_by) colnames(get_aux_by_data(aux_dat, by = aux_by)) else NULL,
               priors = list(prior_intercept = if (has_intercepts) prior_intercept else NULL,
+                            prior_intercept_sd = if (random_baseline) prior_intercept_sd else NULL,
                             prior_trt = prior_trt,
                             prior_class_mean = if (class_effects == "exchangeable") prior_class_mean else NULL,
                             prior_class_sd = if (class_effects == "exchangeable") prior_class_sd else NULL,
@@ -1424,6 +1627,8 @@ if (class_effects == "exchangeable") {
                             prior_aux_reg = if (has_aux_regression) prior_aux_reg else NULL))
 
   if (likelihood %in% c("mspline", "pexp")) out$basis <- basis
+  if (!is.null(connect_baseline)) out$connect_baseline <- connect_baseline
+  if (!is.null(baseline_subnet)) out$baseline_studies <- sort(forcats::fct_drop(factor(bl_studies, levels = levels(network$studies))))
 
   if (inherits(network, "mlnmr_data")) class(out) <- c("stan_mlnmr", "stan_nma")
   else class(out) <- "stan_nma"
@@ -1472,8 +1677,11 @@ nma.fit <- function(ipd_x, ipd_y,
                     likelihood = NULL,
                     link = NULL,
                     consistency = c("consistency", "ume", "nodesplit"),
+                    connect_baseline_random = FALSE,
+                    mixed_studies = 0,
                     ...,
                     prior_intercept,
+                    prior_intercept_sd,
                     prior_trt,
                     prior_het,
                     prior_het_type = c("sd", "var", "prec"),
@@ -1490,6 +1698,10 @@ nma.fit <- function(ipd_x, ipd_y,
                     int_thin = 0,
                     int_check = TRUE,
                     basis,
+                    random_baseline = FALSE,
+                    n_baseline_studies = NULL,
+                    baseline_study_idx = NULL,
+                    baseline_trt = NULL,
                     debug = FALSE) {
 
   if (missing(ipd_x)) ipd_x <- NULL
@@ -1602,7 +1814,18 @@ nma.fit <- function(ipd_x, ipd_y,
        (has_ipd || has_agd_arm))
 
   # Check priors
-  check_prior(prior_intercept)
+  if (connect_baseline_random){
+    prior_intercept_unique <- unique(prior_intercept)
+    lapply(prior_intercept_unique, check_prior)
+  } else {
+    check_prior(prior_intercept)
+  }
+  if (random_baseline == TRUE){
+    check_prior(prior_intercept_sd)
+  } else {
+    # Dummy intercept priors for fixed baseline models, not used but requested by Stan data
+    prior_intercept_sd <- half_normal(1)
+  }
   check_prior(prior_trt)
   if (trt_effects == "random") check_prior(prior_het)
   check_prior(prior_reg)
@@ -1664,8 +1887,8 @@ nma.fit <- function(ipd_x, ipd_y,
                                  .trt = unname(apply(ipd_x[, col_trt, drop = FALSE], 1, get_trt)))
     ipd_s_t <- dplyr::distinct(ipd_s_t_all) %>% dplyr::mutate(.arm = 1:dplyr::n())
     ipd_arm <-  dplyr::left_join(ipd_s_t_all, ipd_s_t, by = c(".study", ".trt")) %>% dplyr::pull(.data$.arm)
-    ipd_study <- ipd_s_t$.study
-    ipd_trt <- ipd_s_t$.trt
+    ipd_study <- as.array(ipd_s_t$.study)
+    ipd_trt <- as.array(ipd_s_t$.trt)
     narm_ipd <- max(ipd_arm)
     ni_ipd <- nrow(ipd_x)
   } else {
@@ -1679,7 +1902,7 @@ nma.fit <- function(ipd_x, ipd_y,
     ni_agd_arm <- nrow(agd_arm_y)
     aa1 <- 0:(ni_agd_arm - 1)*n_int + 1
     agd_arm_study <- apply(agd_arm_x[aa1, col_study, drop = FALSE], 1, get_study)
-    agd_arm_trt <- apply(agd_arm_x[aa1, col_trt, drop = FALSE], 1, get_trt)
+    agd_arm_trt <- as.array(apply(agd_arm_x[aa1, col_trt, drop = FALSE], 1, get_trt))
 
     if (!is_survival) {
       narm_agd_arm <- ni_agd_arm
@@ -1688,7 +1911,7 @@ nma.fit <- function(ipd_x, ipd_y,
       agd_arm_s_t <- dplyr::distinct(agd_arm_s_t_all) %>% dplyr::mutate(.arm = 1:dplyr::n())
       agd_arm_arm <-  dplyr::left_join(agd_arm_s_t_all, agd_arm_s_t, by = c(".study", ".trt")) %>% dplyr::pull(.data$.arm)
       agd_arm_study <- agd_arm_s_t$.study
-      agd_arm_trt <- agd_arm_s_t$.trt
+      agd_arm_trt <- as.array(agd_arm_s_t$.trt)
       narm_agd_arm <- max(agd_arm_arm)
     }
 
@@ -1764,7 +1987,12 @@ nma.fit <- function(ipd_x, ipd_y,
     X_all_qr <- qr(X_all)
     X_all_Q <- qr.Q(X_all_qr) * sqrt(nrow(X_all) - 1)
     X_all_R <- qr.R(X_all_qr)[, sort.list(X_all_qr$pivot)] / sqrt(nrow(X_all) - 1)
-    X_all_R_inv <- solve(X_all_R)
+    if (X_all_qr$rank < ncol(X_all_R)){
+      X_all_R_qr <- Matrix::qr(Matrix::Matrix(X_all_R))
+      X_all_R_inv <- as.matrix(Matrix::solve(X_all_R_qr, Matrix::Diagonal(ncol(X_all_R))))
+    } else {
+      X_all_R_inv <- solve(X_all_R)
+    }
   }
 
   # Handle integration points
@@ -1799,16 +2027,16 @@ nma.fit <- function(ipd_x, ipd_y,
     int_thin = int_thin,
     # Study and treatment details
     narm_ipd = narm_ipd,
-    ipd_arm = ipd_arm,
-    ipd_trt = ipd_trt,
+    ipd_arm = as.array(ipd_arm),
+    ipd_trt = as.array(ipd_trt),
     narm_agd_arm = narm_agd_arm,
-    agd_arm_trt = agd_arm_trt,
+    agd_arm_trt = as.array(agd_arm_trt),
     agd_contrast_trt = as.array(agd_contrast_trt),
     agd_contrast_trt_b = as.array(agd_contrast_trt_b),
     agd_contrast_y = if (has_agd_contrast) as.array(agd_contrast_y$.y) else numeric(),
     agd_contrast_Sigma = Sigma,
-    # ipd_study = ipd_study,
-    # agd_arm_study = agd_arm_study,
+    ipd_study = if (random_baseline) as.array(ipd_study) else integer(0),
+    agd_arm_study = if (random_baseline) as.array(agd_arm_study) else integer(0),
     # agd_contrast_study = agd_contrast_study,
     # Random effects
     RE = switch(trt_effects, fixed = 0, random = 1),
@@ -1830,13 +2058,25 @@ nma.fit <- function(ipd_x, ipd_y,
     # Baseline risk meta-regression
     brmr_n_col = sum(col_brmr),
     brmr_col = as.array(which(col_brmr)),
-    xbar_mu = xbar_mu %||% 0
+    xbar_mu = xbar_mu %||% 0,
+    # random baseline effect
+    random_baseline = random_baseline,
+    n_baseline_studies = if (random_baseline && !is.null(n_baseline_studies)) n_baseline_studies else 0L,
+    baseline_study_idx = if (random_baseline && !is.null(baseline_study_idx)) as.array(baseline_study_idx) else integer(0),
+    baseline_trt = if (connect_baseline_random) baseline_trt else integer(),
+    baseline_priors = connect_baseline_random,
+    n_mixed_studies = mixed_studies
   )
 
   # Add priors
   standat <- purrr::list_modify(standat,
-    !!! prior_standat(prior_intercept, "prior_intercept",
-                      valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
+    !!! prior_standat_list(prior_intercept, "prior_intercept",
+                           valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
+    !!! prior_standat(prior_intercept_sd, "prior_intercept_sd",
+                      valid = c("Normal", "half-Normal", "log-Normal",
+                                "Cauchy",  "half-Cauchy",
+                                "Student t", "half-Student t", "log-Student t",
+                                "Exponential", "flat (implicit)")),
     !!! prior_standat(prior_trt, "prior_trt",
                       valid = c("Normal", "Cauchy", "Student t", "flat (implicit)")),
     !!! prior_standat(prior_reg, "prior_reg",
@@ -1887,6 +2127,11 @@ nma.fit <- function(ipd_x, ipd_y,
     pars <- c(pars, "class_mean", "class_sd")
   }
 
+  # Monitor baseline mean, sd and new if random baselines in use
+  if (random_baseline == TRUE) {
+    pars <- c(pars, "baseline_mean", "baseline_sd", "baseline_new")
+  }
+
   # Set adapt_delta, but respect other control arguments if passed in ...
   stanargs <- list(...)
   if ("control" %in% names(stanargs))
@@ -1904,6 +2149,11 @@ nma.fit <- function(ipd_x, ipd_y,
   # Set chain_id to make CHAIN_ID available in data block
   stanargs$chain_id <- 1L
 
+  # Zap extra arguments from ... passed by random baseline model
+  if (random_baseline) {
+    stanargs$baseline_subnet <- NULL
+  }
+
   # Call Stan model for given likelihood
 
   # -- Normal likelihood
@@ -1914,9 +2164,9 @@ nma.fit <- function(ipd_x, ipd_y,
 
     standat <- purrr::list_modify(standat,
       # Add outcomes
-      ipd_y = if (has_ipd) ipd_y$.y else numeric(),
-      agd_arm_y = if (has_agd_arm) agd_arm_y$.y else numeric(),
-      agd_arm_se = if (has_agd_arm) agd_arm_y$.se else numeric(),
+      ipd_y = as.array(if (has_ipd) ipd_y$.y else numeric()),
+      agd_arm_y = as.array(if (has_agd_arm) agd_arm_y$.y else numeric()),
+      agd_arm_se = as.array(if (has_agd_arm) agd_arm_y$.se else numeric()),
 
       # Add prior for auxiliary parameter - individual-level variance
       !!! prior_standat(prior_aux, "prior_aux",
@@ -1939,9 +2189,9 @@ nma.fit <- function(ipd_x, ipd_y,
 
     standat <- purrr::list_modify(standat,
       # Add outcomes
-      ipd_r = if (has_ipd) ipd_y$.r else integer(),
-      agd_arm_r = if (has_agd_arm) agd_arm_y$.r else integer(),
-      agd_arm_n = if (has_agd_arm) agd_arm_y$.n else integer(),
+      ipd_r = as.array(if (has_ipd) ipd_y$.r else integer()),
+      agd_arm_r = as.array(if (has_agd_arm) agd_arm_y$.r else integer()),
+      agd_arm_n = as.array(if (has_agd_arm) agd_arm_y$.n else integer()),
 
       # Specify link
       link = switch(link, logit = 1, probit = 2, cloglog = 3)
@@ -1957,9 +2207,9 @@ nma.fit <- function(ipd_x, ipd_y,
 
     standat <- purrr::list_modify(standat,
       # Add outcomes
-      ipd_r = if (has_ipd) ipd_y$.r else integer(),
-      agd_arm_r = if (has_agd_arm) agd_arm_y$.r else integer(),
-      agd_arm_n = if (has_agd_arm) agd_arm_y$.n else integer(),
+      ipd_r = as.array(if (has_ipd) ipd_y$.r else integer()),
+      agd_arm_r = as.array(if (has_agd_arm) agd_arm_y$.r else integer()),
+      agd_arm_n = as.array(if (has_agd_arm) agd_arm_y$.n else integer()),
 
       # Specify link
       link = switch(link, logit = 1, probit = 2, cloglog = 3)
@@ -1975,10 +2225,10 @@ nma.fit <- function(ipd_x, ipd_y,
 
     standat <- purrr::list_modify(standat,
       # Add outcomes
-      ipd_r = if (has_ipd) ipd_y$.r else integer(),
-      ipd_E = if (has_ipd) ipd_y$.E else numeric(),
-      agd_arm_r = if (has_agd_arm) agd_arm_y$.r else integer(),
-      agd_arm_E = if (has_agd_arm) agd_arm_y$.E else numeric(),
+      ipd_r = as.array(if (has_ipd) ipd_y$.r else integer()),
+      ipd_E = as.array(if (has_ipd) ipd_y$.E else numeric()),
+      agd_arm_r = as.array(if (has_agd_arm) agd_arm_y$.r else integer()),
+      agd_arm_E = as.array(if (has_agd_arm) agd_arm_y$.E else numeric()),
 
       # Specify link
       link = switch(link, log = 1)
@@ -2017,9 +2267,9 @@ nma.fit <- function(ipd_x, ipd_y,
                          }))
       agd_arm_ncat <- rowSums(agd_arm_cat > 0)
       # Replace missing category counts with 0 (these will drop out of the likelihood)
-      agd_arm_r <- agd_arm_y$.r
+      agd_arm_r <- as.array(agd_arm_y$.r)
       agd_arm_r[is.na(agd_arm_r)] <- 0
-      agd_arm_n <- rowSums(agd_arm_y$.r, na.rm = TRUE)
+      agd_arm_n <- as.array(rowSums(agd_arm_y$.r, na.rm = TRUE))
     }
 
     if (!has_ipd && !has_agd_arm) {
@@ -2030,14 +2280,14 @@ nma.fit <- function(ipd_x, ipd_y,
       # Add outcomes
       ncat = ncat,
 
-      ipd_r = if (has_ipd) ipd_r_int else integer(),
-      ipd_cat = if (has_ipd) ipd_cat else matrix(0, 0, ncat),
-      ipd_ncat = if (has_ipd) ipd_ncat else integer(),
+      ipd_r = if (has_ipd) as.array(ipd_r_int) else integer(),
+      ipd_cat = if (has_ipd) as.array(ipd_cat) else matrix(0, 0, ncat),
+      ipd_ncat = if (has_ipd) as.array(ipd_ncat) else integer(),
 
-      agd_arm_r = if (has_agd_arm) agd_arm_r else matrix(0, 0, ncat),
+      agd_arm_r = if (has_agd_arm) as.array(agd_arm_r) else matrix(0, 0, ncat),
       agd_arm_n = if (has_agd_arm) agd_arm_n else integer(),
-      agd_arm_cat = if (has_agd_arm) agd_arm_cat else matrix(0, 0, ncat),
-      agd_arm_ncat = if (has_agd_arm) agd_arm_ncat else integer(),
+      agd_arm_cat = if (has_agd_arm) as.array(agd_arm_cat) else matrix(0, 0, ncat),
+      agd_arm_ncat = if (has_agd_arm) as.array(agd_arm_ncat) else integer(),
 
       # Add prior for auxiliary parameters - latent cutoffs
       !!! prior_standat(prior_aux, "prior_aux",
@@ -2468,6 +2718,11 @@ nma.fit <- function(ipd_x, ipd_y,
   fnames_oi <- gsub("tau[1]", "tau", fnames_oi, fixed = TRUE)
   fnames_oi <- gsub("omega[1]", "omega", fnames_oi, fixed = TRUE)
 
+  if (random_baseline == TRUE) {
+    fnames_oi <- gsub("baseline_mean[1]", "baseline_mean", fnames_oi, fixed = TRUE)
+    fnames_oi <- gsub("baseline_sd[1]", "baseline_sd", fnames_oi, fixed = TRUE)
+    fnames_oi <- gsub("baseline_new[1]", "baseline_new", fnames_oi, fixed = TRUE)
+  }
 
   if (likelihood == "ordered") {
     if (has_ipd) l_cat <- colnames(ipd_y$.r)[-1]
@@ -2992,7 +3247,8 @@ make_nma_model_matrix <- function(nma_formula,
                                   consistency = c("consistency", "nodesplit", "ume"),
                                   nodesplit = NULL,
                                   classes = FALSE,
-                                  newdata = FALSE) {
+                                  newdata = FALSE,
+                                  subnetwork_trt = NULL) {
   # Checks
   if (!rlang::is_formula(nma_formula)) abort("`nma_formula` is not a formula")
   stopifnot(is.data.frame(dat_ipd),
@@ -3121,6 +3377,28 @@ make_nma_model_matrix <- function(nma_formula,
   # Construct design matrix all together then split out, so that same dummy
   # coding is used everywhere
   dat_all <- dplyr::bind_rows(dat_ipd, dat_agd_arm, dat_agd_contrast)
+
+  if (nlevels(dat_all$.trt) == 1) {
+    # Single treatment only (some baseline syntheses)
+    nma_formula <- update(nma_formula, ~ . -.trt)
+  } else {
+
+    # Recode .trt factor for disconnected networks so each subnetwork has its own
+    # reference treatment, both mapping to "..ref.." so R drops both as reference
+    if (!is.null(subnetwork_trt)) {
+      trt_levels <- levels(dat_all$.trt)
+      sn_of_trt  <- subnetwork_trt[trt_levels]
+      subnet_refs <- tapply(trt_levels, sn_of_trt, function(x) x[[1]])
+      new_trt_labels <- vapply(trt_levels, function(trt) {
+        ref <- subnet_refs[[as.character(sn_of_trt[[trt]])]]
+        if (trt == ref) "..ref.." else paste0(trt, " vs ", ref)
+      }, character(1))
+      names(new_trt_labels) <- trt_levels
+      new_trt_levels <- c("..ref..", setdiff(new_trt_labels, "..ref.."))
+      dat_all$.trt <- factor(new_trt_labels[as.character(dat_all$.trt)],
+                             levels = new_trt_levels)
+    }
+  }
 
   # Check that required variables are present in each data set, and non-missing
   check_regression_data(nma_formula,
@@ -3479,6 +3757,27 @@ prior_standat <- function(x, par, valid){
   return(out)
 }
 
+#’ Vectorise a list of priors into array specs for Stan
+
+#' @param x a list of `nma_prior` objects
+#' @param par character string, giving the Stan root parameter name (e.g.
+#'   "prior_trt")
+#' @param valid character vector, giving valid distributions
+#'
+#' @noRd
+prior_standat_list <- function(x, par, valid) {
+
+  if (inherits(x, "nma_prior")) x <- list(x)
+
+  if (!purrr::every(unique(x), ~inherits(.x, "nma_prior"))) {
+    abort(glue::glue("All elements of `{par}` must be `nma_prior` objects."))
+  }
+
+  purrr::map(x, prior_standat, par = par, valid = valid) %>%
+    purrr::list_transpose() %>%
+    purrr::map(as.array)
+}
+
 #' Get covariance structure contrast-based data, using se on baseline arm
 #'
 #' @param x A data frame of agd_contrast data
@@ -3673,4 +3972,165 @@ get_aux_by_data <- function(data, by, add_study = TRUE) {
 aux_needs_integration <- function(aux_regression, aux_by) {
   (!is.null(aux_regression) && length(setdiff(colnames(attr(terms(aux_regression), "factor")), c(".study", ".trt", ".trtclass"))) > 0) ||
     (!is.null(aux_by) && length(setdiff(aux_by, c(".study", ".trt", ".trtclass"))) > 0)
+}
+
+#' Specify baseline connections
+#'
+#' Helper function for the `connect_baseline` argument of [nma()] to specify how
+#' study baselines (intercepts) are linked, to connect a disconnected network or
+#' single-arm studies.
+#'
+#' @details A random baseline connection is specified with `type = "random"`.
+#'   This places an informative prior distribution on the baselines of studies
+#'   listed in `studies`, specified with the `prior_baseline` argument.
+#'
+#'   A fixed baseline connection is specified with `type = "fixed"`. This shares
+#'   the baseline parameter for studies listed in `studies`.
+#'
+#' @name connect_baseline
+#' @rdname connect_baseline
+#' @aliases con
+#' @param type Type of connection, either "fixed" or "random".
+#' @param studies Vector of study names.
+#' @param prior_baseline Prior distribution for the baseline parameters of
+#'   `studies` when `type = "random"`, as a [nma_prior] object (see [priors]).
+#' @param baseline_trt Which treatment the baseline prior distribution applies
+#'   to, when `type = "random"`. By default, the random baseline prior will be
+#'   placed on the network reference treatment. This should be changed if, for
+#'   example, the prior was obtained from a baseline synthesis of a different
+#'   treatment.
+#'
+#' @return An object of class `nma_connect`.
+#' @export
+con <- function(type = c("fixed", "random"),
+                studies,
+                prior_baseline = NULL,
+                baseline_trt = NULL) {
+
+  type <- rlang::arg_match(type)
+
+  studies <- as.character(studies)
+  if (!is.vector(studies) ||
+      type == "fixed" && length(studies) < 2 ||
+      type == "random" && length(studies) < 1)
+    abort(glue::glue('`studies` must be a vector of study names of length > {switch(type, fixed = 2L, random = 1L)} for type = "{type}".'))
+
+
+  if (type == "random") {
+    if (is.null(prior_baseline)) {
+      abort('`prior_baseline` must be provided when type = "random".')
+    }
+
+    check_prior(prior_baseline)
+
+    valid <- c("Normal", "Cauchy", "Student t", "flat (implicit)")
+    if (!prior_baseline$dist %in% valid) {
+        abort(glue::glue("Invalid `prior_baseline`. Suitable distributions are: ",
+                         glue::glue_collapse(valid, sep = ", ", last = ", or ")))
+    }
+
+    if (!is.null(baseline_trt)) {
+      baseline_trt <- as.character(baseline_trt)
+      if (!is.vector(baseline_trt) || length(baseline_trt) > 1) abort("`baseline_trt` must be a the name of a single treatment, or NULL.")
+    }
+
+  } else {
+    if (!is.null(prior_baseline)) {
+      warn(glue::glue('Ignoring `prior_baseline` provided with type = "fixed" for stud{if (length(studies)  > 1) "ies" else "y"}: ',
+                      glue::glue_collapse(glue::double_quote(studies), sep = ", ", last = " and "), "."))
+      prior_baseline <- NULL
+    }
+    baseline_trt <- NULL
+  }
+
+  structure(
+    list(type      = type,
+         studies   = studies,
+         prior_baseline  = prior_baseline,
+         baseline_trt = baseline_trt),
+    class = "nma_connect"
+  )
+}
+
+
+#' Apply fixed baseline connections
+#'
+#' Collapse studies so that they share a common baseline under a fixed
+#' connection.
+#'
+#' @param network An `nma_data` object
+#' @param studies Character vector of study names to combine
+#'
+#' @return Modified `nma_data` object
+#' @noRd
+apply_connect_fixed <- function(network, studies) {
+  new_name <- paste(studies, collapse = " & ")
+
+  if (has_ipd(network)) {
+    network$ipd$.study <-
+      forcats::fct_collapse(network$ipd$.study, !!new_name := studies)
+  }
+  if (has_agd_arm(network)) {
+    network$agd_arm$.study <-
+      forcats::fct_collapse(network$agd_arm$.study, !!new_name := studies)
+  }
+  if (has_agd_contrast(network)) {
+    network$agd_contrast$.study <-
+      forcats::fct_collapse(network$agd_contrast$.study, !!new_name := studies)
+  }
+
+  network$studies <- forcats::fct_collapse(network$studies, !!new_name := studies)
+  network$studies <- forcats::fct_unique(network$studies)
+
+  return(network)
+}
+
+#' Baseline synthesis models
+#'
+#' Runs a baseline synthesis model, placing a random effect on the
+#' study-specific intercepts to obtain a pooled estimate of the absolute
+#' outcomes on the network reference treatment. This can be combined with a
+#' regression model to obtain an adjusted estimate. Estimates of both the
+#' overall mean and standard deviation (`baseline_mean` and `baseline_sd`) as
+#' well as the predictive distribution (`baseline_new`) are returned.
+#'
+#' @details The baseline synthesis model places a random effect on the
+#'   study-specific intercept parameters of the NMA or ML-NMR model fitted by
+#'   [nma()]:
+#'   \deqn{\mu_j \sim \mathrm{N}(m, \tau_\mu)}{\mu_j ~ N(m, \tau_\mu)}
+#'   The prior distribution on the mean \eqn{m} is specified by the
+#'   `prior_intercept` argument, and the prior for \eqn{\tau_\mu}$ by
+#'   `prior_intercept_sd`.
+#'
+#' @name baseline_synthesis
+#' @param network A `multinma` network object.
+#' @param prior_intercept Prior for the mean of the random effects distribution
+#'   on the study-specific intercepts.
+#' @param prior_intercept_sd Prior for standard deviation of the random effects
+#'   distribution on the study-specific intercepts.
+#' @param ... Additional arguments passed directly to [nma()].
+#' @return A `stan_baseline` object, inheriting from [stan_nma].
+#' @export
+
+baseline_synthesis <- function(network,
+                               prior_intercept = .default(normal(scale = 100)),
+                               prior_intercept_sd = .default(half_normal(scale = 5)),
+                               ...) {
+
+  check_prior(prior_intercept)
+  check_prior(prior_intercept_sd)
+
+  fit <- nma(
+    network = network,
+    # The baseline subnetwork is always 1 — nma() reorders components so the
+    # network reference treatment's subnetwork is always subnetwork 1
+    baseline_subnet = 1L,
+    random_baseline = TRUE,
+    prior_intercept = prior_intercept,
+    prior_intercept_sd = prior_intercept_sd,
+    ...
+  )
+
+  class(fit) <- c("stan_baseline", class(fit))
+  fit
 }

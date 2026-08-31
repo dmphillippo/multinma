@@ -12,6 +12,7 @@ nma(
   class_interactions = c("common", "exchangeable", "independent"),
   class_effects = c("independent", "common", "exchangeable"),
   class_sd = c("independent", "common"),
+  connect_baseline = NULL,
   likelihood = NULL,
   link = NULL,
   ...,
@@ -59,15 +60,21 @@ variable \code{.mu} can be used for baseline risk meta-regression: \code{~.mu:.t
 interactions are specified as \code{"common"}, \code{"exchangeable"}, or
 \code{"independent"}.}
 
-\item{class_effects}{Character string specifying a model for treatment class effects,
-either \code{"independent"} (the default), \code{"exchangeable"}, or \code{"common"}.}
+\item{class_effects}{Character string specifying a model for treatment class
+effects, either \code{"independent"} (the default), \code{"exchangeable"}, or
+\code{"common"}.}
 
-\item{class_sd}{Character string specifying whether the class standard deviations in a
-class effects model should be \code{"independent"} (i.e. separate for each class, the default),
-or \code{"common"} (i.e. shared across all classes). Alternatively this can be a list of
-character vectors, each of which describe a set classes for which to share a common class SD;
-any list names will be used to name the output parameters, otherwise the name will be taken
-from the first class in each set.}
+\item{class_sd}{Character string specifying whether the class standard
+deviations in a class effects model should be \code{"independent"} (i.e.
+separate for each class, the default), or \code{"common"} (i.e. shared across
+all classes). Alternatively this can be a list of character vectors, each
+of which describe a set classes for which to share a common class SD; any
+list names will be used to name the output parameters, otherwise the name
+will be taken from the first class in each set.}
+
+\item{connect_baseline}{Baseline connections created by \code{\link[=con]{con()}}, used to
+connect a disconnected network. Multiple \code{\link[=con]{con()}} specifications may be
+provided as a list.}
 
 \item{likelihood}{Character string specifying a likelihood, if unspecified
 will be inferred from the data (see details)}

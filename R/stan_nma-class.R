@@ -46,7 +46,16 @@ NULL
 print.stan_nma <- function(x, ...) {
   if (inherits(x$network, "mlnmr_data")) type <- "ML-NMR"
   else type <- "NMA"
-  cglue("A {x$trt_effects} effects {type} with a {x$likelihood} likelihood ({x$link} link).")
+  if (inherits(x, "stan_baseline")) {
+    cglue("A baseline synthesis model with a {x$likelihood} likelihood ({x$link} link).")
+    cglue("Study baselines correspond to reference treatment: {levels(x$network$treatments)[1]}.")
+  } else {
+    cglue("A {x$trt_effects} effects {type} with a {x$likelihood} likelihood ({x$link} link).")
+  }
+  if (!is.null(x$connect_baseline)) {
+    con_type <- x$connect_baseline[[1]]$type
+    cglue("Connected study baselines with a {con_type} baseline model.")
+  }
   if (x$likelihood %in% c("mspline", "pexp")) {
     deg <- switch(x$likelihood,
                   mspline = switch(attr(x$basis[[1]], 'degree'),
@@ -73,23 +82,34 @@ print.stan_nma <- function(x, ...) {
 
   sf <- as.stanfit(x)
   dots <- list(...)
-  include <- "pars" %in% names(dots)
+  if (inherits(x, "stan_baseline") && !"pars" %in% names(dots)) {
+    pars <- c("baseline_new", "baseline_mean", "baseline_sd", paste0("mu[", x$baseline_studies, "]"), "lp__")
+    include <- TRUE
+  } else {
+    include <- "pars" %in% names(dots)
+    pars <- c("log_lik", "resdev",
+              "fitted_ipd",
+              "fitted_agd_arm",
+              "fitted_agd_contrast",
+              "theta_bar_cum_agd_arm",
+              "theta_bar_cum_agd_contrast",
+              "theta2_bar_cum",
+              "mu", "delta",
+              if (!is.null(x$aux_regression) &&
+                  length(setdiff(colnames(attr(terms(x$aux_regression), "factor")), ".trt")) > 0) {
+                if (x$likelihood %in% c("mspline", "pexp")) NULL else "d_aux"
+              } else {
+                "beta_aux"
+              },
+              "scoef")
+  }
+  if (inherits(x, "stan_baseline") && !xor(any(grepl("^d(\\[|$)", dots$pars %||% pars)), dots$include %||% include)) {
+    warn(c("Accessing relative treatment effects `d` from baseline synthesis model. Proceed with caution!",
+           "Treatment effect estimates may be biased unless the baseline model is correct."),
+         class = "access_baseline_d")
+  }
   dots <- rlang::dots_list(x = sf,
-                           pars = c("log_lik", "resdev",
-                                    "fitted_ipd",
-                                    "fitted_agd_arm",
-                                    "fitted_agd_contrast",
-                                    "theta_bar_cum_agd_arm",
-                                    "theta_bar_cum_agd_contrast",
-                                    "theta2_bar_cum",
-                                    "mu", "delta",
-                                    if (!is.null(x$aux_regression) &&
-                                        length(setdiff(colnames(attr(terms(x$aux_regression), "factor")), ".trt")) > 0) {
-                                      if (x$likelihood %in% c("mspline", "pexp")) NULL else "d_aux"
-                                    } else {
-                                      "beta_aux"
-                                    },
-                                    "scoef"),
+                           pars = pars,
                            include = include,
                            use_cache = FALSE,
                            !!! dots,
@@ -146,6 +166,10 @@ summary.stan_nma <- function(object, ...,
                              ) {
 
   # Set defaults for pars, include
+  if (inherits(object, "stan_baseline") && missing(pars)) {
+    pars <- c("baseline_new", "baseline_mean", "baseline_sd", paste0("mu[", object$baseline_studies, "]"))
+    include <- TRUE
+  }
   if (missing(include)) {
     include <- !missing(pars)
   } else {
@@ -206,7 +230,8 @@ plot.stan_nma <- function(x, ...,
 #' @param ... Additional arguments passed on to methods
 #' @param prior Character vector selecting the prior and posterior
 #'   distribution(s) to plot. May include `"intercept"`, `"trt"`, `"het"`,
-#'   `"reg"`, `"aux"`, `"class_mean"` or `"class_sd"` as appropriate.
+#'   `"reg"`, `"aux"`, `"class_mean"`, `"class_sd"`, `"baseline_mean"` or
+#'   `"baseline_sd"` as appropriate.
 #' @param post_args List of arguments passed on to [ggplot2::geom_histogram] to
 #'   control plot output for the posterior distribution
 #' @param prior_args List of arguments passed on to [ggplot2::geom_path] to
@@ -262,7 +287,8 @@ plot_prior_posterior <- function(x, ...,
       "aux"[!is.null(x$priors$prior_aux)],
       "aux_reg"[!is.null(x$priors$prior_aux_reg)],
       "class_mean"[!is.null(x$priors$prior_class_mean)],
-      "class_sd"[!is.null(x$priors$prior_class_sd)])
+      "class_sd"[!is.null(x$priors$prior_class_sd)],
+      "intercept_sd"[!is.null(x$priors$prior_intercept_sd)])
 
   if (is.null(prior)) {
     prior <- priors_used
@@ -290,9 +316,23 @@ plot_prior_posterior <- function(x, ...,
     if (prior[i] %in% c("het", "aux") || (prior[i] == "aux_reg" && x$likelihood %in% c("mspline", "pexp"))) trunc <- c(0, Inf)
     else trunc <- NULL
 
+    if (prior[i] == "intercept" && !inherits(x$priors$prior_intercept, "nma_prior")){
+      unique_priors <- unique(x$priors$prior_intercept)
+      sig <- vapply(x$priors$prior_intercept, function(p) paste(capture.output(dput(p)), collapse = ""), character(1))
+      map_tbl <- tibble::tibble(
+        parameter = paste0("mu[", x$network$studies, "]"),
+        intercept_id = match(sig, unique(sig))
+      )
+
+      #prior_dat[i] <- vector("list", length(unique_priors))
+      for (j in seq_along(unique_priors)) {
+        prior_dat[[i]][[j]] <- get_tidy_prior(unique_priors[[j]], trunc = trunc) %>%
+          tibble::add_column(prior = "intercept")
+      }
+    } else {
     prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc) %>%
       tibble::add_column(prior = prior[i])
-
+    }
     if (x$likelihood == "gengamma" && prior[i] == "aux") {
       prior_dat[[i]] <-
         dplyr::bind_rows(get_tidy_prior(x$priors$prior_aux$sigma, trunc = trunc),
@@ -300,14 +340,17 @@ plot_prior_posterior <- function(x, ...,
         tibble::add_column(prior = c("aux", "aux2"))
 
     } else {
+      if (!(isTRUE(prior[i] == "intercept") && !inherits(x$priors$prior_intercept, "nma_prior"))){
       prior_dat[[i]] <- get_tidy_prior(x$priors[[paste0("prior_", prior[i])]], trunc = trunc) %>%
         tibble::add_column(prior = prior[i])
+      }
     }
   }
 
   prior_dat <- dplyr::bind_rows(prior_dat) %>%
     dplyr::mutate(par_base = dplyr::recode(.data$prior,
-                                           intercept = "mu",
+                                           # If baseline synthesis then intercept prior is on baseline_mean rather than mu
+                                           intercept = if (inherits(x, "stan_baseline")) "baseline_mean" else "mu",
                                            trt = "d",
                                            het = "tau",
                                            reg = "beta",
@@ -331,7 +374,8 @@ plot_prior_posterior <- function(x, ...,
                                                             lognormal =, loglogistic =, gamma =,
                                                             gengamma = "beta_aux"),
                                            class_mean = "class_mean",
-                                           class_sd = "class_sd"))
+                                           class_sd = "class_sd",
+                                           intercept_sd = "baseline_sd"))
 
   # Add in omega parameter if node-splitting model, which uses prior_trt
   if (inherits(x, "nma_nodesplit")) {
@@ -342,10 +386,16 @@ plot_prior_posterior <- function(x, ...,
     )
   }
 
+  # If single treatment only (some baseline syntheses) drop d
+  if (length(x$network$treatments) == 1) {
+    prior_dat <- dplyr::filter(prior_dat, .data$prior != "trt")
+  }
+
   # Get parameter samples
   pars <- unique(prior_dat$par_base)
 
-  draws <- tibble::as_tibble(as.matrix(x, pars = pars))
+  draws <- suppressWarnings(tibble::as_tibble(as.matrix(x, pars = pars)),
+                            classes = "access_baseline_d")
 
   # Transform heterogeneity samples to prior scale (SD, variance, precision)
   if ("het" %in% prior) {
@@ -384,6 +434,10 @@ plot_prior_posterior <- function(x, ...,
 
   draws$par_base <- stringr::str_remove(draws$parameter, "\\[.*\\]")
   draws$parameter <- forcats::fct_inorder(factor(draws$parameter))
+
+  if (exists("map_tbl")) {
+    draws <- dplyr::left_join(draws, map_tbl[, c("parameter", "intercept_id")], by = "parameter")
+  }
 
   # Join prior name into posterior
   draws <- dplyr::left_join(draws, prior_dat[, c("par_base", "prior")], by = "par_base")
@@ -430,17 +484,40 @@ plot_prior_posterior <- function(x, ...,
   prior_dat <- tibble::add_column(prior_dat, xseq = xseq, dens = dens)
   prior_dat <- tidyr::unnest(prior_dat, c("xseq", "dens"))
 
+  if (!inherits(x$priors$prior_intercept, "nma_prior")) {
+    prior_dat$intercept_id <- NA_integer_
+    idx <- with(prior_dat, prior == "intercept" & par_base == "mu")
+    prior_dat$intercept_id[idx] <- match(prior_dat$args[idx], unique(prior_dat$args[idx]))
+    }
+
   # Repeat rows of prior_dat for each corresponding parameter
   if (packageVersion("dplyr") >= "1.1.1") {
+    if (exists("map_tbl")) {
     prior_dat <- dplyr::left_join(prior_dat,
-                                  dplyr::distinct(draws, .data$par_base, .data$parameter),
-                                  by = "par_base",
+                                  dplyr::distinct(draws, .data$par_base, .data$parameter, .data$intercept_id),
+                                  by = c("par_base", "intercept_id"),
                                   relationship = "many-to-many")
+    } else {
+      prior_dat <- dplyr::left_join(prior_dat,
+                                    dplyr::distinct(draws, .data$par_base, .data$parameter),
+                                    by = "par_base",
+                                    relationship = "many-to-many")
+    }
   } else {
+    if (exists("map_tbl")) {
     prior_dat <- dplyr::left_join(prior_dat,
-                                  dplyr::distinct(draws, .data$par_base, .data$parameter),
-                                  by = "par_base")
+                                  dplyr::distinct(draws, .data$par_base, .data$parameter, .data$intercept_id),
+                                  by = c("par_base", "intercept_id"))
+    } else {
+      prior_dat <- dplyr::left_join(prior_dat,
+                                    dplyr::distinct(draws, .data$par_base, .data$parameter),
+                                    by = "par_base")
+    }
   }
+
+  # if (!inherits(x$priors$prior_intercept, "nma_prior")) {
+  #  prior_dat <- dplyr::left_join(prior_dat,
+  # }
 
   # Construct plot
   xlim <- c(min(draws$value, 0), max(draws$value))
@@ -758,6 +835,12 @@ as.array.stan_nma <- function(x, ..., pars, include = TRUE) {
     if (length(badpars))
       abort(glue::glue("No parameter{if (length(badpars) > 1) 's' else ''} ",
                        glue::glue_collapse(glue::double_quote(badpars), sep = ", ", last = " or "), "."))
+
+    if (inherits(x, "stan_baseline") && !xor(any(grepl("^d(\\[|$)", pars)), include)) {
+      warn(c("Accessing relative treatment effects `d` from baseline synthesis model. Proceed with caution!",
+             "Treatment effect estimates may be biased unless the baseline model is correct."),
+           class = "access_baseline_d")
+    }
 
     # Extract from stanfit only parameters represented in pars
     if (include) {
