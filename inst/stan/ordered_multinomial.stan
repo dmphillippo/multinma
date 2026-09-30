@@ -62,7 +62,7 @@ if (no_agd_regression){
       agd_regression_OVB_mat_hat[i][1:agd_regression_ncoef_inc[i], 1:agd_regression_nx[i] ] *
       (X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ]);
 
-      int tmp_idx [agd_regression_max_ncoef];
+      array[agd_regression_max_ncoef] int tmp_idx;
       int tmp_idx_n = 0;
       for (j in 1:agd_regression_ncoef[i] ) {
         // index rows that are NOT related to cutpoints, except the smallest one (study baseline)
