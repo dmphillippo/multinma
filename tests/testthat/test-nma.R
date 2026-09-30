@@ -53,6 +53,21 @@ test_that("nma() link must be valid", {
   expect_error(nma(smknet, link = c("log", "identity")), m)
 })
 
+test_that("nma() debug argument", {
+  expect_error(nma(smknet,
+                   prior_intercept = normal(0, 10),
+                   prior_trt = normal(0, 10),
+                   debug = "a"),
+               "must be TRUE or FALSE")
+
+  out <- nma(smknet,
+             prior_intercept = normal(0, 10),
+             prior_trt = normal(0, 10),
+             debug = TRUE)
+  expect_true(rlang::is_bare_list(out))
+  expect_true(is.matrix(out$X))
+})
+
 sa_net <- set_agd_contrast(social_anxiety, studyc, trtc, y = y, se = se, trt_class = classc, trt_ref = "Waitlist")
 
 #Class effect parameter error checks

@@ -68,10 +68,11 @@ papers:
 > 183(3):1189-1210. doi:
 > [10.1111/rssa.12579](https://doi.org/10.1111/rssa.12579).
 
-> Phillippo, D. M. et al. (2025). “Multilevel network meta-regression
+> Phillippo, D. M. et al. (2026). “Multilevel network meta-regression
 > for general likelihoods: synthesis of individual and aggregate data
 > with applications to survival analysis”. *Journal of the Royal
-> Statistical Society: Series A (Statistics in Society)*, qnaf169. doi:
+> Statistical Society: Series A (Statistics in Society)*,
+> 189(3):1856-1875. doi:
 > [10.1093/jrsssa/qnaf169](https://doi.org/10.1093/jrsssa/qnaf169).
 
 ## Citing multinma
@@ -79,7 +80,7 @@ papers:
 The `multinma` package can be cited as follows:
 
 > Phillippo, D. M. (2026). *multinma: Bayesian Network Meta-Analysis of
-> Individual and Aggregate Data*. R package version 0.9.1.9000, doi:
+> Individual and Aggregate Data*. R package version 0.9.1.9002, doi:
 > [10.5281/zenodo.3904454](https://doi.org/10.5281/zenodo.3904454).
 
 When fitting ML-NMR models, please cite the methods paper:
@@ -92,21 +93,20 @@ When fitting ML-NMR models, please cite the methods paper:
 
 For ML-NMR models with time-to-event outcomes, please cite:
 
-> Phillippo, D. M. et al. (2025). “Multilevel network meta-regression
+> Phillippo, D. M. et al. (2026). “Multilevel network meta-regression
 > for general likelihoods: synthesis of individual and aggregate data
 > with applications to survival analysis”. *Journal of the Royal
-> Statistical Society: Series A (Statistics in Society)*, qnaf169. doi:
+> Statistical Society: Series A (Statistics in Society)*,
+> 189(3):1856-1875. doi:
 > [10.1093/jrsssa/qnaf169](https://doi.org/10.1093/jrsssa/qnaf169).
 
 ## References
 
-<div id="refs" class="references csl-bib-body hanging-indent"
-entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 
 <div id="ref-Carpenter2017" class="csl-entry">
 
-Carpenter, B., A. Gelman, M. D. Hoffman, D. Lee, B. Goodrich, M.
-Betancourt, M. Brubaker, J. Guo, P. Li, and A. Riddell. 2017. “Stan: A
+Carpenter, B., A. Gelman, M. D. Hoffman, et al. 2017. “Stan: A
 Probabilistic Programming Language.” *Journal of Statistical Software*
 76 (1). <https://doi.org/10.18637/jss.v076.i01>.
 
@@ -122,11 +122,10 @@ Bristol.
 
 <div id="ref-methods_paper" class="csl-entry">
 
-Phillippo, D. M., S. Dias, A. E. Ades, M. Belger, A. Brnabic, A.
-Schacht, D. Saure, Z. Kadziola, and N. J. Welton. 2020. “Multilevel
-Network Meta-Regression for Population-Adjusted Treatment Comparisons.”
-*Journal of the Royal Statistical Society: Series A (Statistics in
-Society)* 183 (3): 1189–1210. <https://doi.org/10.1111/rssa.12579>.
+Phillippo, D. M., S. Dias, A. E. Ades, et al. 2020. “Multilevel Network
+Meta-Regression for Population-Adjusted Treatment Comparisons.” *Journal
+of the Royal Statistical Society: Series A (Statistics in Society)* 183
+(3): 1189–210. <https://doi.org/10.1111/rssa.12579>.
 
 </div>
 
