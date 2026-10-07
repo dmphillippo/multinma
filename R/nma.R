@@ -789,7 +789,7 @@ nma <- function(network,
 
   # Set adapt_delta
   if (is.null(adapt_delta)) {
-    adapt_delta <- switch(trt_effects, fixed = 0.8, random = 0.95)
+    adapt_delta <- if (trt_effects == "random" || random_baseline) 0.95 else 0.8
   } else if (!rlang::is_scalar_double(adapt_delta) ||
       adapt_delta <= 0 || adapt_delta >= 1) abort("`adapt_delta` should be a  numeric value in (0, 1).")
 
