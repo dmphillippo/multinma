@@ -375,7 +375,7 @@ ndmm_fit_gengamma <- suppressWarnings(nma(ndmm_net,
                                           prior_intercept = normal(0, 100),
                                           prior_trt = normal(0, 10),
                                           prior_aux = list(sigma = half_normal(5), k = half_normal(5)),
-                                          iter = 10))
+                                          iter = 10, init_r = 0))
 
 ndmm_fit_gengamma_nphr <- suppressWarnings(nma(ndmm_net,
                                           likelihood = "gengamma",
@@ -384,7 +384,7 @@ ndmm_fit_gengamma_nphr <- suppressWarnings(nma(ndmm_net,
                                           prior_trt = normal(0, 10),
                                           prior_aux = list(sigma = half_normal(5), k = half_normal(5)),
                                           prior_aux_reg = normal(0, 10),
-                                          iter = 10))
+                                          iter = 10, init_r = 0))
 
 ndmm_fit_gengamma_nphs <- suppressWarnings(nma(ndmm_net,
                                                likelihood = "gengamma",
@@ -392,7 +392,7 @@ ndmm_fit_gengamma_nphs <- suppressWarnings(nma(ndmm_net,
                                                prior_intercept = normal(0, 100),
                                                prior_trt = normal(0, 10),
                                                prior_aux = list(sigma = half_normal(5), k = half_normal(5)),
-                                               iter = 10))
+                                               iter = 10, init_r = 0))
 
 ndmm_fit_mspline <- suppressWarnings(nma(ndmm_net,
                                          likelihood = "mspline",
@@ -1373,7 +1373,7 @@ ndmm_fit_gengamma_reg <- suppressWarnings(nma(ndmm_net,
                                               prior_trt = normal(0, 10),
                                               prior_reg = normal(0, 10),
                                               prior_aux = list(sigma = half_normal(5), k = half_normal(5)),
-                                              init_r = 0.1,
+                                              init_r = 0,
                                               iter = 10))
 
 ndmm_fit_gengamma_reg_nphr <- suppressWarnings(nma(ndmm_net,
@@ -1385,7 +1385,7 @@ ndmm_fit_gengamma_reg_nphr <- suppressWarnings(nma(ndmm_net,
                                               prior_trt = normal(0, 10),
                                               prior_reg = normal(0, 10),
                                               prior_aux = list(sigma = half_normal(5), k = half_normal(5)),
-                                              init_r = 0.1,
+                                              init_r = 0,
                                               iter = 10))
 
 ndmm_fit_gengamma_reg_nphs <- suppressWarnings(nma(ndmm_net,
@@ -1397,7 +1397,7 @@ ndmm_fit_gengamma_reg_nphs <- suppressWarnings(nma(ndmm_net,
                                               prior_trt = normal(0, 10),
                                               prior_reg = normal(0, 10),
                                               prior_aux = list(sigma = half_normal(5), k = half_normal(5)),
-                                              init_r = 0.1,
+                                              init_r = 0,
                                               iter = 10))
 
 ndmm_fit_mspline_reg <- suppressWarnings(nma(ndmm_net,
