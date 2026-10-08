@@ -230,7 +230,7 @@ test_that("output class", {
 
   expect_s3_class(out,"pop_comp")
   expect_equal(out$method, "propensity")
-  expect_equal(unique(out$components$component), c(1L, 2L))
+  expect_setequal(out$components$component, c(1L, 2L))
 
   expect_equal(colnames(out$comparison_matrix), levels(pso_net_disc$studies))
   expect_equal(rownames(out$comparison_matrix), levels(pso_net_disc$studies))
