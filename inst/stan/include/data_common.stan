@@ -51,6 +51,8 @@ int<lower=0> agd_regression_max_nrow;
 vector[ns_agd_regression ? nc_agd_regression : 0] agd_regression_est; // Reported coef. estimations
 array[ns_agd_regression ? ns_agd_regression : 0] int<lower=0,upper=agd_regression_max_ncoef> agd_regression_ncoef; // Number of coef. in each regression model
 array[ns_agd_regression ? ns_agd_regression : 0] cholesky_factor_cov[agd_regression_max_ncoef] agd_regression_cov;
+int<lower=0, upper=1> agd_regression_use_cov_ful; // 1: use full covarince matrix
+cholesky_factor_cov[ns_agd_regression ? nc_agd_regression : 0] agd_regression_cov_ful;
 array[ns_agd_regression ? ns_agd_regression : 0] int<lower=0,upper=1> agd_regression_reduced_study; // specify reduced study, (yes = 1)
 array[ni_agd_regression ? nl_agd_regression : 0] int XI_col_vec; // Column numbers of included coef. in the network design matrix
 array[ni_agd_regression ? no_agd_regression : 0] int XO_col_vec; // Column numbers of omitted coef. in the netwoek design matrix

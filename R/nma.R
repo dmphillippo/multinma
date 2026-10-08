@@ -980,6 +980,13 @@ nma <- function(network,
     study_agd_regression <- as.integer(dat_agd_regression_nonbl$.study)
 
     # --- Covariance structure ---
+	  agd_regression_use_cov_ful <- as.integer(any(!is.na(dat_agd_regression$.cov_ful)))
+    if (agd_regression_use_cov_ful){
+      cov_agd_regression_ful <- unpack_tri(dat_agd_regression_nonbl$.cov_ful)
+    }else{
+      cov_agd_regression_ful <- NULL
+    }
+
     agd_regression_cov_known <-  dat_agd_regression_split %>%
       purrr::map_lgl(~ .x %>% dplyr::filter(!is.na(.estimate)) %>%
                 dplyr::summarise(.cov_known =  all(.cov_known)) %>% dplyr::pull(.cov_known) )
@@ -1322,6 +1329,8 @@ nma <- function(network,
     ns_agd_regression <-  nc_agd_regression <- 0
     agd_regression_max_ncoef <- 0
     cov_agd_regression <- NULL
+	  cov_agd_regression_ful <- NULL
+	  agd_regression_use_cov_ful <- 0
     study_agd_regression <- NULL
     est_agd_regression <- agd_regression_ncoef <- NULL
     agd_regression_name_study <- c()
@@ -1738,6 +1747,8 @@ if (class_effects == "exchangeable") {
                      agd_regression_x = X_agd_regression,
                      agd_regression_est = est_agd_regression,
                      agd_regression_cov = cov_agd_regression,
+					           agd_regression_cov_ful = cov_agd_regression_ful,
+					           agd_regression_use_cov_ful = agd_regression_use_cov_ful,
                      agd_regression_study = study_agd_regression,
                      agd_regression_reduced_study = agd_regression_reduced_study,
                      agd_regression_nx = agd_regression_nx,
@@ -1996,7 +2007,7 @@ if (class_effects == "exchangeable") {
 nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
                     agd_arm_x = NULL, agd_arm_y = NULL,
                     agd_contrast_x = NULL, agd_contrast_y = NULL, agd_contrast_Sigma = NULL,
-                    agd_regression_x = NULL, agd_regression_est = NULL, agd_regression_cov = NULL, agd_regression_study = NULL,
+                    agd_regression_x = NULL, agd_regression_est = NULL, agd_regression_cov = NULL, agd_regression_cov_ful = NULL, agd_regression_use_cov_ful = NULL,agd_regression_study = NULL,
                     ns_agd_regression = NULL,nc_agd_regression = NULL,no_agd_regression = NULL,nl_agd_regression = NULL,ni_agd_regression = NULL,
                     XI_col_vec = NULL,XO_col_vec = NULL,
                     agd_regression_ncoef = NULL,agd_regression_ncoef_omt = NULL,agd_regression_ncoef_inc = NULL,
@@ -2297,6 +2308,12 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
       agd_regression_chol[i, 1:agd_regression_ncoef[i], 1:agd_regression_ncoef[i]] <- t(chol(agd_regression_cov[[i]]))
     }
 
+	  agd_regression_chol_ful <- array(NA_real_, dim = c(nc_agd_regression, nc_agd_regression))
+    agd_regression_chol_ful <- diag(nc_agd_regression) # pad out ragged array
+    if (agd_regression_use_cov_ful) {
+      agd_regression_chol_ful <- t(chol(agd_regression_cov_ful))
+    }
+
     if (sum(agd_regression_ncoef) != nc_agd_regression)
       abort("Dimensions of `agd_regression_cov` covariance matrices do not match the regression coefficient data.")
   } else {
@@ -2411,6 +2428,8 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
     agd_regression_ncoef_omt = if(is.null(agd_regression_ncoef_omt) & ns_agd_regression!=0 ) as.array(rep(0,ns_agd_regression)) else if (is.null(agd_regression_ncoef_omt) & ns_agd_regression==0 ) as.array(numeric(0)) else as.array(agd_regression_ncoef_omt),
     agd_regression_ncoef_inc = if(is.null(agd_regression_ncoef_inc) & ns_agd_regression!=0 ) as.array(rep(0,ns_agd_regression)) else if (is.null(agd_regression_ncoef_inc) & ns_agd_regression==0 ) as.array(numeric(0)) else as.array(agd_regression_ncoef_inc),
     agd_regression_cov = if(is.null(agd_regression_cov)) array(numeric(0), dim = c(0,agd_regression_max_ncoef,agd_regression_max_ncoef)) else agd_regression_chol,
+	  agd_regression_cov_ful = if(is.null(agd_regression_chol_ful)) array(numeric(0), dim = c(0,0)) else agd_regression_chol_ful,
+    agd_regression_use_cov_ful = agd_regression_use_cov_ful,
     nc_agd_regression = nc_agd_regression,
     XI_col_vec = if(is.null(XI_col_vec)) numeric() else array(XI_col_vec),
     XO_col_vec = if(is.null(XO_col_vec)) numeric() else array(XO_col_vec),
@@ -2424,7 +2443,7 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
     np_agd_regression = np_agd_regression,
     agd_regression_ncoef_cpt = if(is.null(agd_regression_ncoef_cpt)) numeric() else as.array(agd_regression_ncoef_cpt),
     X_agd_regression_cc = if(is.null(X_agd_regression_cc)) matrix(numeric(0), nrow = 0, ncol = 0) else X_agd_regression_cc,
-    agd_regression_est_map_cc = if(is.null(agd_regression_est_map_cc)) numeric() else agd_regression_est_map_cc,
+    agd_regression_est_map_cc = if(is.null(agd_regression_est_map_cc)) numeric() else as.array(agd_regression_est_map_cc),
 
     # agd_regression_arm = agd_regression_arm,
     # agd_regression_trt = agd_regression_trt,

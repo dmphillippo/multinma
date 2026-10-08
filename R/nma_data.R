@@ -1048,6 +1048,7 @@ set_agd_regression <- function(data,
                                study,
                                trt,
                                estimate, se, cor, cov,
+							                 cov_ful,
                                regression,
                                covariates = NULL,
                                trt_ref = NULL,
@@ -1283,6 +1284,25 @@ set_agd_regression <- function(data,
   }
 
   # Check for a list of matrices
+  d$.cov_ful <- NA_real_
+  if (!missing(cov_ful)){
+
+    if (nrow(cov_ful) != ncol(cov_ful) ||
+        nrow(cov_ful) != sum(!is.na(d$.estimate))) {
+      abort(glue::glue("Dimensions of 'cov_ful' matrix do not match the number of coefficients in `data`"))
+    }
+
+    # Store covariance matrix in compact lower triangular form
+    d$.cov_ful[!is.na(d$.estimate)] <- pack_tri(cov_ful)
+
+    # Generate dummy covarinces to prevent errors and warnings.
+    cov <- vector("list", length = length(regression))
+    names(cov) <- names(regression)
+    for(i in 1:length(regression)){
+      cov[[i]] <- diag(sum(!is.na(d$.estimate[d$.study == names(cov)[i]])))
+    }
+  }
+
   if ( !missing(cov) && !is.list(cov) )
     abort("`cov` must be a named list of covariance matrices.")
   if ( !missing(cor) && !is.list(cor) )
