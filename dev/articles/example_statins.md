@@ -133,15 +133,15 @@ statin_fit_FE
 #> post-warmup draws per chain=1000, total post-warmup draws=4000.
 #> 
 #>                                          mean se_mean   sd     2.5%      25%      50%      75%
-#> beta[.trtStatin:preventionSecondary]    -0.21    0.00 0.11    -0.43    -0.28    -0.21    -0.13
-#> d[Statin]                               -0.10    0.00 0.10    -0.29    -0.17    -0.10    -0.04
-#> lp__                                 -7246.65    0.09 3.40 -7254.24 -7248.77 -7246.33 -7244.14
+#> beta[.trtStatin:preventionSecondary]    -0.21    0.00 0.11    -0.42    -0.29    -0.21    -0.13
+#> d[Statin]                               -0.10    0.00 0.10    -0.31    -0.17    -0.10    -0.03
+#> lp__                                 -7246.75    0.08 3.34 -7254.35 -7248.68 -7246.36 -7244.38
 #>                                         97.5% n_eff Rhat
-#> beta[.trtStatin:preventionSecondary]     0.01  2522    1
-#> d[Statin]                                0.09  2463    1
-#> lp__                                 -7241.06  1543    1
+#> beta[.trtStatin:preventionSecondary]     0.02  2034    1
+#> d[Statin]                                0.09  1995    1
+#> lp__                                 -7241.21  1665    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:55:13 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:26:08 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -222,17 +222,17 @@ statin_fit_RE
 #> post-warmup draws per chain=1000, total post-warmup draws=4000.
 #> 
 #>                                          mean se_mean   sd     2.5%      25%      50%      75%
-#> beta[.trtStatin:preventionSecondary]    -0.30    0.01 0.26    -0.90    -0.43    -0.27    -0.15
-#> d[Statin]                               -0.06    0.01 0.21    -0.46    -0.18    -0.07     0.04
-#> lp__                                 -7255.75    0.18 5.35 -7266.83 -7259.27 -7255.51 -7252.11
-#> tau                                      0.25    0.01 0.21     0.01     0.09     0.19     0.34
+#> beta[.trtStatin:preventionSecondary]    -0.31    0.01 0.25    -0.87    -0.45    -0.29    -0.16
+#> d[Statin]                               -0.06    0.01 0.20    -0.45    -0.17    -0.07     0.06
+#> lp__                                 -7255.71    0.16 5.17 -7266.73 -7258.98 -7255.39 -7252.15
+#> tau                                      0.25    0.01 0.20     0.01     0.10     0.20     0.34
 #>                                         97.5% n_eff Rhat
-#> beta[.trtStatin:preventionSecondary]     0.19   970 1.01
-#> d[Statin]                                0.39  1080 1.01
-#> lp__                                 -7246.03   863 1.01
-#> tau                                      0.77   667 1.01
+#> beta[.trtStatin:preventionSecondary]     0.16  1338    1
+#> d[Statin]                                0.38  1472    1
+#> lp__                                 -7246.37   982    1
+#> tau                                      0.76   793    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:55:18 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:26:13 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -268,17 +268,17 @@ function:
 ``` r
 
 (statin_dic_FE <- dic(statin_fit_FE))
-#> Residual deviance: 45.9 (on 38 data points)
-#>                pD: 21.6
-#>               DIC: 67.5
+#> Residual deviance: 46.1 (on 38 data points)
+#>                pD: 21.8
+#>               DIC: 67.9
 ```
 
 ``` r
 
 (statin_dic_RE <- dic(statin_fit_RE))
-#> Residual deviance: 42.5 (on 38 data points)
-#>                pD: 25
-#>               DIC: 67.4
+#> Residual deviance: 42.6 (on 38 data points)
+#>                pD: 25.2
+#>               DIC: 67.8
 ```
 
 The DIC is very similar between FE and RE models, so we might choose the
@@ -333,7 +333,7 @@ statin_releff_FE
 #>     Primary
 #> 
 #>                    mean  sd  2.5%   25%  50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d[Primary: Statin] -0.1 0.1 -0.29 -0.17 -0.1 -0.04  0.09     2476     2633    1
+#> d[Primary: Statin] -0.1 0.1 -0.31 -0.17 -0.1 -0.03  0.09     1997     2698    1
 #> 
 #> -------------------------------------------------------------- Study: Secondary ---- 
 #> 
@@ -342,7 +342,7 @@ statin_releff_FE
 #>   Secondary
 #> 
 #>                       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d[Secondary: Statin] -0.31 0.05 -0.42 -0.35 -0.31 -0.28 -0.21     4856     3721    1
+#> d[Secondary: Statin] -0.31 0.05 -0.41 -0.35 -0.31 -0.28 -0.21     3807     3451    1
 ```
 
 The [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method may

@@ -202,15 +202,15 @@ uninformative priors on the treatment effects with
 <code><a href="../reference/dic.html">dic()</a></code> function.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">sa_dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">sa_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 288.1<span style="color: #555555;"> (on 147 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 39.9</span></span>
-<span><span class="co">#&gt;               DIC: 328.1</span></span>
+<span><span class="co">#&gt; Residual deviance: 288<span style="color: #555555;"> (on 147 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 39.8</span></span>
+<span><span class="co">#&gt;               DIC: 327.7</span></span>
 <span><span class="op">(</span><span class="va">sa_dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">sa_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 162.6<span style="color: #555555;"> (on 147 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 94.3</span></span>
-<span><span class="co">#&gt;               DIC: 256.9</span></span></code></pre></div>
-<p>The DIC for the random effects model (256.9) is much lower than that
-of the fixed effects model (328.1) due to the large decrease in residual
+<span><span class="co">#&gt; Residual deviance: 162.7<span style="color: #555555;"> (on 147 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 94.7</span></span>
+<span><span class="co">#&gt;               DIC: 257.5</span></span></code></pre></div>
+<p>The DIC for the random effects model (257.5) is much lower than that
+of the fixed effects model (327.7) due to the large decrease in residual
 deviance showing a much better fit to the data. Therefore, our preferred
 model is the RE model, which we use in subsequent steps.</p>
 </div>
@@ -231,23 +231,23 @@ specify <code>consistency = "ume"</code>.</p>
 RE model using the <code><a href="../reference/dic.html">dic()</a></code> function and <span class="math inline">\tau</span>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">sa_dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">sa_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 162.6<span style="color: #555555;"> (on 147 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 94.3</span></span>
-<span><span class="co">#&gt;               DIC: 256.9</span></span>
+<span><span class="co">#&gt; Residual deviance: 162.7<span style="color: #555555;"> (on 147 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 94.7</span></span>
+<span><span class="co">#&gt;               DIC: 257.5</span></span>
 <span><span class="op">(</span><span class="va">sa_dic_ume_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">sa_UME_RE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 161.3<span style="color: #555555;"> (on 147 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 109</span></span>
-<span><span class="co">#&gt;               DIC: 270.4</span></span>
+<span><span class="co">#&gt; Residual deviance: 160.5<span style="color: #555555;"> (on 147 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 108.6</span></span>
+<span><span class="co">#&gt;               DIC: 269</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">sa_UME_RE</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     mean   sd 2.5% 25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; tau 0.22 0.03 0.16 0.2 0.22 0.24  0.29      878     2051    1</span></span>
+<span><span class="co">#&gt; tau 0.22 0.03 0.16 0.2 0.22 0.24  0.29      898     1804    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">sa_fit_RE</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;     mean   sd 2.5%  25% 50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; tau 0.21 0.03 0.15 0.18 0.2 0.23  0.27     1127     2095    1</span></span></code></pre></div>
+<span><span class="co">#&gt;     mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; tau 0.21 0.03 0.15 0.19 0.21 0.23  0.27     1403     2022    1</span></span></code></pre></div>
 <p>The residual deviance is not meaningfully different between the two
-models, however, the DIC is lower in the NMA model (256.9) compared to
-the UME model (270.4). There is no evidence of inconsistency at the
+models, however, the DIC is lower in the NMA model (257.5) compared to
+the UME model (269.0). There is no evidence of inconsistency at the
 global level.</p>
 <p>To asses local inconsistency, we use the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> function
 that produces a “dev-dev” plot of the residual deviance contributions
@@ -265,11 +265,11 @@ the line of equality.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">resdev</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          .study n_contrast   resdev  leverage      dic df</span></span>
-<span><span class="co">#&gt; 1     ALDEN2011          1 6.734567 0.4807275 7.215294  1</span></span>
-<span><span class="co">#&gt; 2 EMMELKAMP2006          2 6.726275 0.9495117 7.675786  2</span></span>
-<span><span class="co">#&gt; 3  STANGIER2003          2 5.370313 1.0404009 6.410714  2</span></span>
-<span><span class="co">#&gt; 4  VERSIANI1992          2 4.678505 1.1216433 5.800149  2</span></span>
-<span><span class="co">#&gt; 5  HEIMBERG1998          3 4.428477 2.0041343 6.432611  3</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 EMMELKAMP2006          2 6.855606 0.9916948 7.847300  2</span></span>
+<span><span class="co">#&gt; 2     ALDEN2011          1 6.718790 0.4664427 7.185233  1</span></span>
+<span><span class="co">#&gt; 3  STANGIER2003          2 5.393027 1.0605881 6.453615  2</span></span>
+<span><span class="co">#&gt; 4  VERSIANI1992          2 4.632448 1.1113424 5.743791  2</span></span>
+<span><span class="co">#&gt; 5  HEIMBERG1998          3 4.336949 2.0011162 6.338065  3</span></span></code></pre></div>
 <p>We can see from investigating the pointwise contributions to the
 residual deviance that the two outlier studies are ALDEN2011 and
 EMMELKAMP2006 with their large <code>resdev</code> values in the no
@@ -319,60 +319,60 @@ These are then passed to the <code>nodesplit</code> argument within the
 <span><span class="co">#&gt; Node-splitting model fitted for 1 comparison: CBT group vs. Waitlist.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_dir -0.90 0.14 -1.17 -0.99 -0.90 -0.81 -0.63     3562     3110    1</span></span>
-<span><span class="co">#&gt; d_ind -0.74 0.14 -1.01 -0.83 -0.73 -0.64 -0.46     1008     1685    1</span></span>
-<span><span class="co">#&gt; omega -0.16 0.18 -0.53 -0.28 -0.16 -0.03  0.18     1750     2566    1</span></span>
-<span><span class="co">#&gt; tau    0.21 0.03  0.15  0.19  0.21  0.23  0.27     1268     2393    1</span></span>
+<span><span class="co">#&gt; d_dir -0.89 0.14 -1.16 -0.98 -0.89 -0.80 -0.63     3391     3244    1</span></span>
+<span><span class="co">#&gt; d_ind -0.74 0.14 -1.01 -0.83 -0.74 -0.64 -0.46      856     1330    1</span></span>
+<span><span class="co">#&gt; omega -0.15 0.18 -0.51 -0.28 -0.15 -0.02  0.20     1629     2523    1</span></span>
+<span><span class="co">#&gt; tau    0.21 0.03  0.15  0.19  0.21  0.23  0.27     1126     2368    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 161.9<span style="color: #555555;"> (on 147 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 94.9</span></span>
-<span><span class="co">#&gt;               DIC: 256.8</span></span>
+<span><span class="co">#&gt; Residual deviance: 161.4<span style="color: #555555;"> (on 147 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 95.4</span></span>
+<span><span class="co">#&gt;               DIC: 256.7</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.38</span></span>
+<span><span class="co">#&gt; Bayesian p-value: 0.42</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">sa_fit_RE_nodesplit_EMMELKAMP</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Node-splitting models fitted for 3 comparisons.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">---------------------</span> <span style="font-weight: bold;">Node-split Psychodynamic psychotherapy vs. CBT individual</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;       mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_dir 0.71 0.33  0.07 0.50 0.72 0.93  1.34     4630     3316    1</span></span>
-<span><span class="co">#&gt; d_ind 0.44 0.26 -0.08 0.27 0.43 0.61  0.93     2503     2808    1</span></span>
-<span><span class="co">#&gt; omega 0.27 0.39 -0.49 0.02 0.28 0.53  1.03     3634     2533    1</span></span>
-<span><span class="co">#&gt; tau   0.21 0.03  0.15 0.19 0.21 0.23  0.27     1101     2198    1</span></span>
+<span><span class="co">#&gt; d_dir 0.72 0.33  0.07 0.50 0.72 0.94  1.36     4784     2727    1</span></span>
+<span><span class="co">#&gt; d_ind 0.44 0.26 -0.09 0.26 0.44 0.61  0.95     2429     2438    1</span></span>
+<span><span class="co">#&gt; omega 0.28 0.39 -0.43 0.02 0.27 0.53  1.06     2890     2808    1</span></span>
+<span><span class="co">#&gt; tau   0.21 0.03  0.15 0.19 0.21 0.23  0.27     1131     2126    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 161.8<span style="color: #555555;"> (on 147 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 94.8</span></span>
-<span><span class="co">#&gt;               DIC: 256.5</span></span>
+<span><span class="co">#&gt; Residual deviance: 162.1<span style="color: #555555;"> (on 147 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 95.4</span></span>
+<span><span class="co">#&gt;               DIC: 257.5</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Bayesian p-value: 0.47</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">---------------------------</span> <span style="font-weight: bold;">Node-split Psychodynamic psychotherapy vs. Waitlist</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_dir -0.60 0.18 -0.95 -0.72 -0.60 -0.48 -0.24     5165     3238    1</span></span>
-<span><span class="co">#&gt; d_ind -0.67 0.42 -1.49 -0.96 -0.67 -0.38  0.14     3636     3389    1</span></span>
-<span><span class="co">#&gt; omega  0.07 0.44 -0.78 -0.23  0.08  0.37  0.94     3816     3242    1</span></span>
-<span><span class="co">#&gt; tau    0.21 0.03  0.15  0.19  0.21  0.23  0.27     1516     2297    1</span></span>
+<span><span class="co">#&gt; d_dir -0.60 0.18 -0.95 -0.72 -0.60 -0.48 -0.24     5630     3551    1</span></span>
+<span><span class="co">#&gt; d_ind -0.69 0.43 -1.50 -0.98 -0.69 -0.40  0.16     3468     2896    1</span></span>
+<span><span class="co">#&gt; omega  0.09 0.46 -0.80 -0.22  0.09  0.41  0.99     3472     2894    1</span></span>
+<span><span class="co">#&gt; tau    0.21 0.03  0.15  0.19  0.21  0.23  0.27     1256     2304    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 163<span style="color: #555555;"> (on 147 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 95.6</span></span>
-<span><span class="co">#&gt;               DIC: 258.6</span></span>
+<span><span class="co">#&gt; Residual deviance: 162.8<span style="color: #555555;"> (on 147 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 95.1</span></span>
+<span><span class="co">#&gt;               DIC: 257.9</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.87</span></span>
+<span><span class="co">#&gt; Bayesian p-value: 0.85</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">----------------------------------------</span> <span style="font-weight: bold;">Node-split CBT individual vs. Waitlist</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d_dir -0.84 0.24 -1.31 -1.00 -0.84 -0.68 -0.37     5278     3755 1.00</span></span>
-<span><span class="co">#&gt; d_ind -1.46 0.24 -1.95 -1.62 -1.46 -1.29 -0.98     1636     2329 1.00</span></span>
-<span><span class="co">#&gt; omega  0.62 0.34 -0.05  0.39  0.63  0.84  1.29     2198     2805 1.00</span></span>
-<span><span class="co">#&gt; tau    0.20 0.03  0.15  0.18  0.20  0.22  0.27     1290     1878 1.01</span></span>
+<span><span class="co">#&gt; d_dir -0.83 0.24 -1.30 -1.00 -0.83 -0.67 -0.34     4610     3445    1</span></span>
+<span><span class="co">#&gt; d_ind -1.45 0.24 -1.94 -1.61 -1.46 -1.30 -0.98     2016     2700    1</span></span>
+<span><span class="co">#&gt; omega  0.62 0.34 -0.04  0.40  0.62  0.84  1.29     2775     2809    1</span></span>
+<span><span class="co">#&gt; tau    0.20 0.03  0.15  0.18  0.20  0.22  0.27     1121     2412    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Residual deviance: 161.7<span style="color: #555555;"> (on 147 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 94.3</span></span>
-<span><span class="co">#&gt;               DIC: 256</span></span>
+<span><span class="co">#&gt; Residual deviance: 161.4<span style="color: #555555;"> (on 147 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 94.5</span></span>
+<span><span class="co">#&gt;               DIC: 255.9</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Bayesian p-value: 0.071</span></span></code></pre></div>
+<span><span class="co">#&gt; Bayesian p-value: 0.061</span></span></code></pre></div>
 <p>Our node‐splitting analysis shows that the CBT individual and
 Waitlist comparison has a p-value of 0.065 and a stronger effect for the
 indirect estimate compared to the direct estimate, however the CrIs do
@@ -419,20 +419,20 @@ aiding estimation of these parameters. For the class effects means,
 class RE model using the <code><a href="../reference/dic.html">dic()</a></code> function and <span class="math inline">\tau</span>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">sa_dic_EXclass_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">sa_fit_EXclass_RE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 163.4<span style="color: #555555;"> (on 147 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 88.2</span></span>
-<span><span class="co">#&gt;               DIC: 251.6</span></span>
-<span><span class="op">(</span><span class="va">sa_dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">sa_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Residual deviance: 162.6<span style="color: #555555;"> (on 147 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 94.3</span></span>
-<span><span class="co">#&gt;               DIC: 256.9</span></span>
+<span><span class="co">#&gt;                pD: 87.7</span></span>
+<span><span class="co">#&gt;               DIC: 250.3</span></span>
+<span><span class="op">(</span><span class="va">sa_dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">sa_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Residual deviance: 162.7<span style="color: #555555;"> (on 147 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 94.7</span></span>
+<span><span class="co">#&gt;               DIC: 257.5</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">sa_fit_RE</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;     mean   sd 2.5%  25% 50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; tau 0.21 0.03 0.15 0.18 0.2 0.23  0.27     1127     2095    1</span></span>
+<span><span class="co">#&gt;     mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
+<span><span class="co">#&gt; tau 0.21 0.03 0.15 0.19 0.21 0.23  0.27     1403     2022    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">sa_fit_EXclass_RE</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     mean   sd 2.5%  25% 50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; tau  0.2 0.03 0.14 0.18 0.2 0.22  0.26     1366     2407    1</span></span></code></pre></div>
+<span><span class="co">#&gt; tau  0.2 0.03 0.14 0.18 0.2 0.22  0.26     1137     2236    1</span></span></code></pre></div>
 <p>We use the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> function that produces a “dev-dev”
 plot of the residual deviance contributions for the Exchangeable class
 model plotted against the no class model.</p>
@@ -441,10 +441,10 @@ model plotted against the no class model.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Residual deviance - Exchangeable Class model"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Residual deviance - No Class model"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_social_anxiety_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
-<p>Although both models yield similar residual deviance (163.4
-vs. 162.6) and between‐study heterogeneity, the exchangeable class model
+<p>Although both models yield similar residual deviance (162.6
+vs. 162.7) and between‐study heterogeneity, the exchangeable class model
 reduces model complexity—reflected by a lower effective number of
-parameters ( vs. 94.3) and a lower DIC (251.6 vs. 256.9). A
+parameters ( vs. 94.7) and a lower DIC (250.3 vs. 257.5). A
 deviance–deviance plot confirms that all data points fit equally well.
 Overall, these findings support using the class model for the social
 anxiety data.</p>
@@ -486,27 +486,27 @@ Exchangeable class RE and Common class RE.</p>
 exchangeable class RE model.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">sa_dic_COclass_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">sa_fit_COclass_RE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 157.7<span style="color: #555555;"> (on 147 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 93</span></span>
-<span><span class="co">#&gt;               DIC: 250.7</span></span>
+<span><span class="co">#&gt; Residual deviance: 158.8<span style="color: #555555;"> (on 147 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 93.4</span></span>
+<span><span class="co">#&gt;               DIC: 252.2</span></span>
 <span><span class="op">(</span><span class="va">sa_dic_EXclass_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">sa_fit_EXclass_FE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 284.9<span style="color: #555555;"> (on 147 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 34.4</span></span>
-<span><span class="co">#&gt;               DIC: 319.3</span></span>
+<span><span class="co">#&gt; Residual deviance: 284.6<span style="color: #555555;"> (on 147 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 34.1</span></span>
+<span><span class="co">#&gt;               DIC: 318.7</span></span>
 <span><span class="op">(</span><span class="va">sa_dic_EXclass_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">sa_fit_EXclass_RE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 163.4<span style="color: #555555;"> (on 147 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 88.2</span></span>
-<span><span class="co">#&gt;               DIC: 251.6</span></span>
+<span><span class="co">#&gt; Residual deviance: 162.6<span style="color: #555555;"> (on 147 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 87.7</span></span>
+<span><span class="co">#&gt;               DIC: 250.3</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">sa_fit_COclass_RE</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; tau 0.25 0.03  0.2 0.23 0.25 0.27  0.31      842     1890    1</span></span>
+<span><span class="co">#&gt; tau 0.25 0.03  0.2 0.23 0.25 0.27  0.31     1354     2458    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">sa_fit_EXclass_RE</span>, pars <span class="op">=</span> <span class="st">"tau"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     mean   sd 2.5%  25% 50%  75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; tau  0.2 0.03 0.14 0.18 0.2 0.22  0.26     1366     2407    1</span></span></code></pre></div>
+<span><span class="co">#&gt; tau  0.2 0.03 0.14 0.18 0.2 0.22  0.26     1137     2236    1</span></span></code></pre></div>
 <p>Both random‐effects models showed substantially better fit than the
-fixed‐effect model (posterior mean residual deviance of 157.7 and 163.4
-versus 284.9, and DIC values of 250.7 and 251.6 versus 319.3). Although
+fixed‐effect model (posterior mean residual deviance of 158.8 and 162.6
+versus 284.6, and DIC values of 252.2 and 250.3 versus 318.7). Although
 the common class model achieved a slightly better absolute fit, it had
 higher between‐study heterogeneity (0.25 vs. 0.20) than the exchangeable
 class model. We use the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> function to produce a

@@ -76,9 +76,9 @@ smk_OR_RE <- summary(OR_array)
 # This can then be printed or plotted
 smk_OR_RE
 #>                           mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS
-#> d[Group counselling]      3.22 1.51 1.27 2.24 2.94 3.82  6.89     1927     2122
-#> d[Individual counselling] 2.37 0.61 1.44 1.96 2.28 2.68  3.80     1173     1735
-#> d[Self-help]              1.79 0.77 0.75 1.27 1.63 2.14  3.73     1990     2528
+#> d[Group counselling]      3.34 1.76 1.31 2.25 2.97 3.97  7.61     1924     2375
+#> d[Individual counselling] 2.39 0.62 1.45 1.96 2.31 2.71  3.87     1147     1549
+#> d[Self-help]              1.79 0.79 0.74 1.27 1.64 2.14  3.67     1830     2353
 #>                           Rhat
 #> d[Group counselling]         1
 #> d[Individual counselling]    1
@@ -95,7 +95,7 @@ names(tausq_array) <- "tausq"
 
 # Summarise
 summary(tausq_array)
-#>       mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> tausq 0.71 0.32 0.29 0.49 0.64 0.87  1.53     1325     2047    1
+#>       mean   sd 2.5% 25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
+#> tausq 0.73 0.34 0.29 0.5 0.66 0.88   1.6     1154     1750 1.01
 # }
 ```

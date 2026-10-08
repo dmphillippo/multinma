@@ -123,17 +123,17 @@ function.
 ``` r
 
 (sa_dic_FE <- dic(sa_fit_FE))
-#> Residual deviance: 288.1 (on 147 data points)
-#>                pD: 39.9
-#>               DIC: 328.1
+#> Residual deviance: 288 (on 147 data points)
+#>                pD: 39.8
+#>               DIC: 327.7
 (sa_dic_RE <- dic(sa_fit_RE))
-#> Residual deviance: 162.6 (on 147 data points)
-#>                pD: 94.3
-#>               DIC: 256.9
+#> Residual deviance: 162.7 (on 147 data points)
+#>                pD: 94.7
+#>               DIC: 257.5
 ```
 
-The DIC for the random effects model (256.9) is much lower than that of
-the fixed effects model (328.1) due to the large decrease in residual
+The DIC for the random effects model (257.5) is much lower than that of
+the fixed effects model (327.7) due to the large decrease in residual
 deviance showing a much better fit to the data. Therefore, our preferred
 model is the RE model, which we use in subsequent steps.
 
@@ -161,25 +161,25 @@ function and \tau.
 ``` r
 
 (sa_dic_RE <- dic(sa_fit_RE))
-#> Residual deviance: 162.6 (on 147 data points)
-#>                pD: 94.3
-#>               DIC: 256.9
+#> Residual deviance: 162.7 (on 147 data points)
+#>                pD: 94.7
+#>               DIC: 257.5
 (sa_dic_ume_RE <- dic(sa_UME_RE))
-#> Residual deviance: 161.3 (on 147 data points)
-#>                pD: 109
-#>               DIC: 270.4
+#> Residual deviance: 160.5 (on 147 data points)
+#>                pD: 108.6
+#>               DIC: 269
 
 summary(sa_UME_RE, pars = "tau")
 #>     mean   sd 2.5% 25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> tau 0.22 0.03 0.16 0.2 0.22 0.24  0.29      878     2051    1
+#> tau 0.22 0.03 0.16 0.2 0.22 0.24  0.29      898     1804    1
 summary(sa_fit_RE, pars = "tau")
-#>     mean   sd 2.5%  25% 50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> tau 0.21 0.03 0.15 0.18 0.2 0.23  0.27     1127     2095    1
+#>     mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
+#> tau 0.21 0.03 0.15 0.19 0.21 0.23  0.27     1403     2022    1
 ```
 
 The residual deviance is not meaningfully different between the two
-models, however, the DIC is lower in the NMA model (256.9) compared to
-the UME model (270.4). There is no evidence of inconsistency at the
+models, however, the DIC is lower in the NMA model (257.5) compared to
+the UME model (269.0). There is no evidence of inconsistency at the
 global level.
 
 To asses local inconsistency, we use the
@@ -206,11 +206,11 @@ as.data.frame(sa_dic_RE) %>%
   arrange(desc(resdev)) %>%
   head(5)
 #>          .study n_contrast   resdev  leverage      dic df
-#> 1     ALDEN2011          1 6.734567 0.4807275 7.215294  1
-#> 2 EMMELKAMP2006          2 6.726275 0.9495117 7.675786  2
-#> 3  STANGIER2003          2 5.370313 1.0404009 6.410714  2
-#> 4  VERSIANI1992          2 4.678505 1.1216433 5.800149  2
-#> 5  HEIMBERG1998          3 4.428477 2.0041343 6.432611  3
+#> 1 EMMELKAMP2006          2 6.855606 0.9916948 7.847300  2
+#> 2     ALDEN2011          1 6.718790 0.4664427 7.185233  1
+#> 3  STANGIER2003          2 5.393027 1.0605881 6.453615  2
+#> 4  VERSIANI1992          2 4.632448 1.1113424 5.743791  2
+#> 5  HEIMBERG1998          3 4.336949 2.0011162 6.338065  3
 ```
 
 We can see from investigating the pointwise contributions to the
@@ -268,60 +268,60 @@ summary(sa_fit_RE_nodesplit_ALDEN)
 #> Node-splitting model fitted for 1 comparison: CBT group vs. Waitlist.
 #> 
 #>        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d_dir -0.90 0.14 -1.17 -0.99 -0.90 -0.81 -0.63     3562     3110    1
-#> d_ind -0.74 0.14 -1.01 -0.83 -0.73 -0.64 -0.46     1008     1685    1
-#> omega -0.16 0.18 -0.53 -0.28 -0.16 -0.03  0.18     1750     2566    1
-#> tau    0.21 0.03  0.15  0.19  0.21  0.23  0.27     1268     2393    1
+#> d_dir -0.89 0.14 -1.16 -0.98 -0.89 -0.80 -0.63     3391     3244    1
+#> d_ind -0.74 0.14 -1.01 -0.83 -0.74 -0.64 -0.46      856     1330    1
+#> omega -0.15 0.18 -0.51 -0.28 -0.15 -0.02  0.20     1629     2523    1
+#> tau    0.21 0.03  0.15  0.19  0.21  0.23  0.27     1126     2368    1
 #> 
-#> Residual deviance: 161.9 (on 147 data points)
-#>                pD: 94.9
-#>               DIC: 256.8
+#> Residual deviance: 161.4 (on 147 data points)
+#>                pD: 95.4
+#>               DIC: 256.7
 #> 
-#> Bayesian p-value: 0.38
+#> Bayesian p-value: 0.42
 summary(sa_fit_RE_nodesplit_EMMELKAMP)
 #> Node-splitting models fitted for 3 comparisons.
 #> 
 #> --------------------- Node-split Psychodynamic psychotherapy vs. CBT individual ---- 
 #> 
 #>       mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d_dir 0.71 0.33  0.07 0.50 0.72 0.93  1.34     4630     3316    1
-#> d_ind 0.44 0.26 -0.08 0.27 0.43 0.61  0.93     2503     2808    1
-#> omega 0.27 0.39 -0.49 0.02 0.28 0.53  1.03     3634     2533    1
-#> tau   0.21 0.03  0.15 0.19 0.21 0.23  0.27     1101     2198    1
+#> d_dir 0.72 0.33  0.07 0.50 0.72 0.94  1.36     4784     2727    1
+#> d_ind 0.44 0.26 -0.09 0.26 0.44 0.61  0.95     2429     2438    1
+#> omega 0.28 0.39 -0.43 0.02 0.27 0.53  1.06     2890     2808    1
+#> tau   0.21 0.03  0.15 0.19 0.21 0.23  0.27     1131     2126    1
 #> 
-#> Residual deviance: 161.8 (on 147 data points)
-#>                pD: 94.8
-#>               DIC: 256.5
+#> Residual deviance: 162.1 (on 147 data points)
+#>                pD: 95.4
+#>               DIC: 257.5
 #> 
 #> Bayesian p-value: 0.47
 #> 
 #> --------------------------- Node-split Psychodynamic psychotherapy vs. Waitlist ---- 
 #> 
 #>        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d_dir -0.60 0.18 -0.95 -0.72 -0.60 -0.48 -0.24     5165     3238    1
-#> d_ind -0.67 0.42 -1.49 -0.96 -0.67 -0.38  0.14     3636     3389    1
-#> omega  0.07 0.44 -0.78 -0.23  0.08  0.37  0.94     3816     3242    1
-#> tau    0.21 0.03  0.15  0.19  0.21  0.23  0.27     1516     2297    1
+#> d_dir -0.60 0.18 -0.95 -0.72 -0.60 -0.48 -0.24     5630     3551    1
+#> d_ind -0.69 0.43 -1.50 -0.98 -0.69 -0.40  0.16     3468     2896    1
+#> omega  0.09 0.46 -0.80 -0.22  0.09  0.41  0.99     3472     2894    1
+#> tau    0.21 0.03  0.15  0.19  0.21  0.23  0.27     1256     2304    1
 #> 
-#> Residual deviance: 163 (on 147 data points)
-#>                pD: 95.6
-#>               DIC: 258.6
+#> Residual deviance: 162.8 (on 147 data points)
+#>                pD: 95.1
+#>               DIC: 257.9
 #> 
-#> Bayesian p-value: 0.87
+#> Bayesian p-value: 0.85
 #> 
 #> ---------------------------------------- Node-split CBT individual vs. Waitlist ---- 
 #> 
 #>        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d_dir -0.84 0.24 -1.31 -1.00 -0.84 -0.68 -0.37     5278     3755 1.00
-#> d_ind -1.46 0.24 -1.95 -1.62 -1.46 -1.29 -0.98     1636     2329 1.00
-#> omega  0.62 0.34 -0.05  0.39  0.63  0.84  1.29     2198     2805 1.00
-#> tau    0.20 0.03  0.15  0.18  0.20  0.22  0.27     1290     1878 1.01
+#> d_dir -0.83 0.24 -1.30 -1.00 -0.83 -0.67 -0.34     4610     3445    1
+#> d_ind -1.45 0.24 -1.94 -1.61 -1.46 -1.30 -0.98     2016     2700    1
+#> omega  0.62 0.34 -0.04  0.40  0.62  0.84  1.29     2775     2809    1
+#> tau    0.20 0.03  0.15  0.18  0.20  0.22  0.27     1121     2412    1
 #> 
-#> Residual deviance: 161.7 (on 147 data points)
-#>                pD: 94.3
-#>               DIC: 256
+#> Residual deviance: 161.4 (on 147 data points)
+#>                pD: 94.5
+#>               DIC: 255.9
 #> 
-#> Bayesian p-value: 0.071
+#> Bayesian p-value: 0.061
 ```
 
 Our node‐splitting analysis shows that the CBT individual and Waitlist
@@ -377,20 +377,20 @@ function and \tau.
 ``` r
 
 (sa_dic_EXclass_RE <- dic(sa_fit_EXclass_RE))
-#> Residual deviance: 163.4 (on 147 data points)
-#>                pD: 88.2
-#>               DIC: 251.6
-(sa_dic_RE <- dic(sa_fit_RE))
 #> Residual deviance: 162.6 (on 147 data points)
-#>                pD: 94.3
-#>               DIC: 256.9
+#>                pD: 87.7
+#>               DIC: 250.3
+(sa_dic_RE <- dic(sa_fit_RE))
+#> Residual deviance: 162.7 (on 147 data points)
+#>                pD: 94.7
+#>               DIC: 257.5
 
 summary(sa_fit_RE, pars = "tau")
-#>     mean   sd 2.5%  25% 50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> tau 0.21 0.03 0.15 0.18 0.2 0.23  0.27     1127     2095    1
+#>     mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
+#> tau 0.21 0.03 0.15 0.19 0.21 0.23  0.27     1403     2022    1
 summary(sa_fit_EXclass_RE, pars = "tau")
 #>     mean   sd 2.5%  25% 50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> tau  0.2 0.03 0.14 0.18 0.2 0.22  0.26     1366     2407    1
+#> tau  0.2 0.03 0.14 0.18 0.2 0.22  0.26     1137     2236    1
 ```
 
 We use the [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
@@ -407,10 +407,10 @@ plot(sa_dic_EXclass_RE, sa_dic_RE, show_uncertainty = FALSE) +
 
 ![](example_social_anxiety_files/figure-html/unnamed-chunk-17-1.png)
 
-Although both models yield similar residual deviance (163.4 vs. 162.6)
+Although both models yield similar residual deviance (162.6 vs. 162.7)
 and between‐study heterogeneity, the exchangeable class model reduces
 model complexity—reflected by a lower effective number of parameters (
-vs. 94.3) and a lower DIC (251.6 vs. 256.9). A deviance–deviance plot
+vs. 94.7) and a lower DIC (250.3 vs. 257.5). A deviance–deviance plot
 confirms that all data points fit equally well. Overall, these findings
 support using the class model for the social anxiety data.
 
@@ -457,29 +457,29 @@ exchangeable class RE model.
 ``` r
 
 (sa_dic_COclass_RE <- dic(sa_fit_COclass_RE))
-#> Residual deviance: 157.7 (on 147 data points)
-#>                pD: 93
-#>               DIC: 250.7
+#> Residual deviance: 158.8 (on 147 data points)
+#>                pD: 93.4
+#>               DIC: 252.2
 (sa_dic_EXclass_FE <- dic(sa_fit_EXclass_FE))
-#> Residual deviance: 284.9 (on 147 data points)
-#>                pD: 34.4
-#>               DIC: 319.3
+#> Residual deviance: 284.6 (on 147 data points)
+#>                pD: 34.1
+#>               DIC: 318.7
 (sa_dic_EXclass_RE <- dic(sa_fit_EXclass_RE))
-#> Residual deviance: 163.4 (on 147 data points)
-#>                pD: 88.2
-#>               DIC: 251.6
+#> Residual deviance: 162.6 (on 147 data points)
+#>                pD: 87.7
+#>               DIC: 250.3
 
 summary(sa_fit_COclass_RE, pars = "tau")
 #>     mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> tau 0.25 0.03  0.2 0.23 0.25 0.27  0.31      842     1890    1
+#> tau 0.25 0.03  0.2 0.23 0.25 0.27  0.31     1354     2458    1
 summary(sa_fit_EXclass_RE, pars = "tau")
 #>     mean   sd 2.5%  25% 50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> tau  0.2 0.03 0.14 0.18 0.2 0.22  0.26     1366     2407    1
+#> tau  0.2 0.03 0.14 0.18 0.2 0.22  0.26     1137     2236    1
 ```
 
 Both random‐effects models showed substantially better fit than the
-fixed‐effect model (posterior mean residual deviance of 157.7 and 163.4
-versus 284.9, and DIC values of 250.7 and 251.6 versus 319.3). Although
+fixed‐effect model (posterior mean residual deviance of 158.8 and 162.6
+versus 284.6, and DIC values of 252.2 and 250.3 versus 318.7). Although
 the common class model achieved a slightly better absolute fit, it had
 higher between‐study heterogeneity (0.25 vs. 0.20) than the exchangeable
 class model. We use the

@@ -120,10 +120,10 @@ blocker_fit_FE
 #> post-warmup draws per chain=1000, total post-warmup draws=4000.
 #> 
 #>                     mean se_mean   sd     2.5%      25%      50%      75%    97.5% n_eff Rhat
-#> d[Beta Blocker]    -0.26    0.00 0.05    -0.36    -0.30    -0.26    -0.23    -0.16  3693    1
-#> lp__            -5960.39    0.09 3.48 -5968.17 -5962.42 -5960.09 -5957.94 -5954.57  1363    1
+#> d[Beta Blocker]    -0.26    0.00 0.05    -0.36    -0.29    -0.26    -0.23    -0.16  3136    1
+#> lp__            -5960.40    0.08 3.40 -5967.79 -5962.43 -5960.05 -5957.94 -5954.74  1649    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:38:11 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:10:25 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -196,11 +196,11 @@ blocker_fit_RE
 #> post-warmup draws per chain=1000, total post-warmup draws=4000.
 #> 
 #>                     mean se_mean   sd     2.5%      25%      50%      75%    97.5% n_eff Rhat
-#> d[Beta Blocker]    -0.25    0.00 0.06    -0.38    -0.29    -0.25    -0.21    -0.13  4174    1
-#> lp__            -5970.70    0.17 5.66 -5982.57 -5974.43 -5970.52 -5966.81 -5960.34  1072    1
-#> tau                 0.13    0.00 0.08     0.01     0.07     0.13     0.19     0.31   928    1
+#> d[Beta Blocker]    -0.25    0.00 0.07    -0.37    -0.29    -0.25    -0.21    -0.11  3392 1.00
+#> lp__            -5970.64    0.18 5.45 -5981.85 -5974.32 -5970.47 -5966.72 -5960.78   931 1.01
+#> tau                 0.14    0.00 0.08     0.01     0.07     0.13     0.19     0.31   947 1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:38:16 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:10:29 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -237,15 +237,15 @@ function:
 
 (dic_FE <- dic(blocker_fit_FE))
 #> Residual deviance: 46.8 (on 44 data points)
-#>                pD: 23.1
-#>               DIC: 69.9
+#>                pD: 23.2
+#>               DIC: 70
 ```
 
 ``` r
 
 (dic_RE <- dic(blocker_fit_RE))
-#> Residual deviance: 41.8 (on 44 data points)
-#>                pD: 28.1
+#> Residual deviance: 41.7 (on 44 data points)
+#>                pD: 28.2
 #>               DIC: 69.9
 ```
 
@@ -338,7 +338,7 @@ pred_FE <- predict(blocker_fit_FE,
 pred_FE
 #>                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> pred[Control]      0.11 0.05 0.04 0.07 0.10 0.14  0.24     4073     3875    1
-#> pred[Beta Blocker] 0.09 0.04 0.03 0.06 0.08 0.11  0.19     4086     3948    1
+#> pred[Beta Blocker] 0.09 0.04 0.03 0.06 0.08 0.11  0.20     3953     4085    1
 plot(pred_FE)
 ```
 
@@ -352,7 +352,7 @@ pred_RE <- predict(blocker_fit_RE,
 pred_RE
 #>                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> pred[Control]      0.11 0.05 0.04 0.07 0.10 0.14  0.25     4384     3718    1
-#> pred[Beta Blocker] 0.09 0.05 0.03 0.06 0.08 0.11  0.20     4373     3486    1
+#> pred[Beta Blocker] 0.09 0.05 0.03 0.06 0.08 0.11  0.20     4356     4056    1
 plot(pred_RE)
 ```
 
@@ -376,7 +376,7 @@ pred_FE_beta <- predict(blocker_fit_FE,
 pred_FE_beta
 #>                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> pred[Control]      0.11 0.05 0.03 0.07 0.10 0.14  0.23     3493     3846    1
-#> pred[Beta Blocker] 0.09 0.04 0.02 0.06 0.08 0.11  0.19     3523     3885    1
+#> pred[Beta Blocker] 0.09 0.04 0.02 0.06 0.08 0.11  0.19     3517     3716    1
 plot(pred_FE_beta)
 ```
 
@@ -391,7 +391,7 @@ pred_RE_beta <- predict(blocker_fit_RE,
 pred_RE_beta
 #>                    mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> pred[Control]      0.11 0.05 0.03 0.07 0.10 0.14  0.23     3990     3890    1
-#> pred[Beta Blocker] 0.09 0.04 0.03 0.06 0.08 0.11  0.19     4017     3918    1
+#> pred[Beta Blocker] 0.09 0.04 0.02 0.06 0.08 0.11  0.19     3990     3811    1
 plot(pred_RE_beta)
 ```
 

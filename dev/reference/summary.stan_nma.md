@@ -101,132 +101,132 @@ if (!exists("smk_fit_RE")) example("example_smk_re", run.donttest = TRUE)
 # Summary and plot of all model parameters
 summary(smk_fit_RE)
 #>                                    mean   sd  2.5%   25%   50%   75% 97.5%
-#> mu[1]                             -2.78 0.33 -3.46 -3.00 -2.77 -2.56 -2.17
-#> mu[2]                             -2.58 0.78 -4.17 -3.07 -2.56 -2.07 -1.08
-#> mu[3]                             -2.14 0.12 -2.38 -2.22 -2.14 -2.06 -1.91
-#> mu[4]                             -4.05 0.57 -5.29 -4.41 -4.03 -3.66 -3.02
-#> mu[5]                             -2.16 0.14 -2.45 -2.25 -2.15 -2.06 -1.89
-#> mu[6]                             -3.42 0.75 -5.08 -3.83 -3.33 -2.91 -2.17
-#> mu[7]                             -3.01 0.44 -3.94 -3.29 -2.98 -2.71 -2.24
-#> mu[8]                             -2.69 0.59 -3.97 -3.06 -2.65 -2.28 -1.65
-#> mu[9]                             -1.84 0.42 -2.72 -2.11 -1.82 -1.55 -1.07
-#> mu[10]                            -2.08 0.12 -2.32 -2.16 -2.08 -2.00 -1.86
-#> mu[11]                            -3.62 0.23 -4.10 -3.77 -3.61 -3.46 -3.20
-#> mu[12]                            -2.22 0.13 -2.47 -2.31 -2.22 -2.13 -1.97
-#> mu[13]                            -2.68 0.44 -3.59 -2.96 -2.66 -2.38 -1.88
-#> mu[14]                            -2.41 0.23 -2.88 -2.56 -2.40 -2.26 -1.98
-#> mu[15]                            -2.65 0.71 -4.22 -3.08 -2.58 -2.15 -1.41
-#> mu[16]                            -2.62 0.34 -3.34 -2.84 -2.60 -2.39 -1.99
-#> mu[17]                            -2.38 0.11 -2.59 -2.45 -2.38 -2.30 -2.17
-#> mu[18]                            -2.57 0.27 -3.13 -2.75 -2.56 -2.39 -2.07
-#> mu[19]                            -1.90 0.12 -2.13 -1.98 -1.90 -1.82 -1.68
-#> mu[20]                            -2.80 0.13 -3.05 -2.89 -2.80 -2.72 -2.56
-#> mu[21]                            -1.13 0.81 -2.71 -1.63 -1.12 -0.61  0.46
-#> mu[22]                            -2.40 0.84 -4.12 -2.91 -2.39 -1.86 -0.76
-#> mu[23]                            -2.30 0.82 -3.93 -2.84 -2.29 -1.77 -0.72
-#> mu[24]                            -2.78 0.85 -4.55 -3.32 -2.75 -2.22 -1.10
-#> d[Group counselling]               1.08 0.42  0.24  0.81  1.08  1.34  1.93
-#> d[Individual counselling]          0.83 0.24  0.37  0.67  0.82  0.99  1.34
-#> d[Self-help]                       0.50 0.40 -0.29  0.24  0.49  0.76  1.32
-#> tau                                0.82 0.18  0.54  0.70  0.80  0.93  1.24
-#> delta[1: Individual counselling]   1.07 0.38  0.36  0.81  1.05  1.31  1.84
-#> delta[1: Group counselling]        0.37 0.42 -0.46  0.09  0.37  0.65  1.23
-#> delta[2: Self-help]                0.68 0.79 -0.84  0.16  0.67  1.17  2.27
-#> delta[2: Individual counselling]   0.76 0.79 -0.76  0.25  0.74  1.26  2.34
-#> delta[2: Group counselling]        0.99 0.79 -0.55  0.47  0.99  1.50  2.58
-#> delta[3: Individual counselling]   2.16 0.14  1.90  2.07  2.16  2.25  2.43
-#> delta[4: Individual counselling]   0.91 0.58 -0.14  0.52  0.88  1.26  2.14
-#> delta[5: Individual counselling]   0.44 0.16  0.14  0.33  0.44  0.55  0.75
-#> delta[6: Individual counselling]   1.70 0.73  0.45  1.19  1.65  2.13  3.33
-#> delta[7: Individual counselling]   2.13 0.47  1.28  1.80  2.10  2.43  3.11
-#> delta[8: Individual counselling]   1.64 0.60  0.58  1.21  1.60  2.02  2.92
-#> delta[9: Individual counselling]   0.58 0.46 -0.30  0.27  0.58  0.89  1.52
-#> delta[10: Self-help]               0.01 0.17 -0.32 -0.10  0.01  0.12  0.35
-#> delta[11: Self-help]               0.40 0.31 -0.21  0.20  0.40  0.61  1.02
-#> delta[12: Individual counselling]  0.41 0.17  0.09  0.30  0.41  0.52  0.74
-#> delta[13: Individual counselling]  0.39 0.50 -0.58  0.06  0.39  0.72  1.37
-#> delta[14: Individual counselling]  0.62 0.28  0.07  0.43  0.62  0.81  1.18
-#> delta[15: Group counselling]       2.11 0.74  0.79  1.61  2.04  2.55  3.73
-#> delta[16: Self-help]               0.66 0.40 -0.11  0.39  0.65  0.91  1.45
-#> delta[17: Individual counselling]  0.55 0.14  0.28  0.46  0.55  0.65  0.82
-#> delta[18: Individual counselling]  0.03 0.31 -0.57 -0.18  0.03  0.24  0.65
-#> delta[19: Individual counselling] -0.19 0.17 -0.52 -0.30 -0.19 -0.08  0.13
-#> delta[20: Individual counselling]  0.08 0.19 -0.29 -0.05  0.08  0.20  0.44
-#> delta[21: Self-help]               0.70 0.81 -0.91  0.18  0.68  1.21  2.35
-#> delta[21: Individual counselling]  0.65 0.79 -0.94  0.14  0.65  1.16  2.25
-#> delta[22: Self-help]               0.32 0.82 -1.31 -0.21  0.31  0.84  1.98
-#> delta[22: Group counselling]       1.27 0.83 -0.38  0.72  1.26  1.79  2.98
-#> delta[23: Individual counselling]  0.66 0.81 -0.93  0.15  0.65  1.17  2.24
-#> delta[23: Group counselling]       1.26 0.83 -0.36  0.71  1.24  1.80  2.91
-#> delta[24: Individual counselling]  1.02 0.81 -0.53  0.48  1.00  1.54  2.70
-#> delta[24: Group counselling]       0.87 0.84 -0.80  0.33  0.88  1.40  2.56
+#> mu[1]                             -2.78 0.33 -3.44 -2.99 -2.77 -2.56 -2.17
+#> mu[2]                             -2.54 0.78 -4.12 -3.02 -2.54 -2.03 -1.04
+#> mu[3]                             -2.14 0.12 -2.39 -2.22 -2.14 -2.06 -1.90
+#> mu[4]                             -4.05 0.56 -5.20 -4.41 -4.03 -3.66 -3.03
+#> mu[5]                             -2.15 0.14 -2.43 -2.25 -2.15 -2.05 -1.89
+#> mu[6]                             -3.41 0.71 -4.92 -3.84 -3.35 -2.91 -2.18
+#> mu[7]                             -3.02 0.45 -3.98 -3.30 -3.00 -2.71 -2.23
+#> mu[8]                             -2.70 0.61 -4.04 -3.06 -2.65 -2.27 -1.64
+#> mu[9]                             -1.84 0.42 -2.70 -2.11 -1.82 -1.55 -1.07
+#> mu[10]                            -2.08 0.12 -2.32 -2.16 -2.08 -2.00 -1.85
+#> mu[11]                            -3.63 0.23 -4.11 -3.78 -3.62 -3.46 -3.19
+#> mu[12]                            -2.22 0.13 -2.48 -2.31 -2.22 -2.13 -1.98
+#> mu[13]                            -2.68 0.45 -3.61 -2.97 -2.66 -2.37 -1.84
+#> mu[14]                            -2.41 0.23 -2.89 -2.56 -2.40 -2.25 -1.98
+#> mu[15]                            -2.69 0.75 -4.30 -3.15 -2.63 -2.17 -1.39
+#> mu[16]                            -2.62 0.34 -3.32 -2.83 -2.60 -2.38 -2.00
+#> mu[17]                            -2.38 0.11 -2.60 -2.45 -2.37 -2.30 -2.17
+#> mu[18]                            -2.57 0.27 -3.10 -2.74 -2.56 -2.39 -2.07
+#> mu[19]                            -1.90 0.12 -2.14 -1.98 -1.90 -1.82 -1.66
+#> mu[20]                            -2.80 0.13 -3.05 -2.88 -2.80 -2.72 -2.56
+#> mu[21]                            -1.13 0.81 -2.77 -1.64 -1.14 -0.59  0.45
+#> mu[22]                            -2.41 0.85 -4.13 -2.96 -2.38 -1.86 -0.78
+#> mu[23]                            -2.31 0.83 -3.98 -2.84 -2.31 -1.78 -0.68
+#> mu[24]                            -2.80 0.86 -4.56 -3.35 -2.81 -2.23 -1.12
+#> d[Group counselling]               1.10 0.44  0.27  0.81  1.09  1.38  2.03
+#> d[Individual counselling]          0.84 0.25  0.37  0.67  0.84  1.00  1.35
+#> d[Self-help]                       0.50 0.41 -0.30  0.24  0.49  0.76  1.30
+#> tau                                0.84 0.19  0.54  0.71  0.81  0.94  1.27
+#> delta[1: Individual counselling]   1.07 0.38  0.33  0.81  1.07  1.33  1.83
+#> delta[1: Group counselling]        0.37 0.42 -0.44  0.09  0.37  0.65  1.19
+#> delta[2: Self-help]                0.64 0.80 -0.92  0.13  0.62  1.13  2.27
+#> delta[2: Individual counselling]   0.73 0.79 -0.80  0.22  0.72  1.23  2.37
+#> delta[2: Group counselling]        0.96 0.79 -0.56  0.46  0.97  1.47  2.52
+#> delta[3: Individual counselling]   2.16 0.14  1.88  2.07  2.16  2.26  2.45
+#> delta[4: Individual counselling]   0.90 0.58 -0.20  0.51  0.89  1.29  2.06
+#> delta[5: Individual counselling]   0.44 0.16  0.14  0.33  0.43  0.54  0.75
+#> delta[6: Individual counselling]   1.72 0.72  0.43  1.22  1.67  2.17  3.22
+#> delta[7: Individual counselling]   2.15 0.48  1.27  1.80  2.13  2.45  3.18
+#> delta[8: Individual counselling]   1.64 0.62  0.55  1.22  1.60  2.02  3.02
+#> delta[9: Individual counselling]   0.59 0.46 -0.30  0.28  0.59  0.89  1.53
+#> delta[10: Self-help]               0.00 0.17 -0.32 -0.11  0.01  0.12  0.32
+#> delta[11: Self-help]               0.41 0.30 -0.17  0.22  0.41  0.61  1.00
+#> delta[12: Individual counselling]  0.41 0.17  0.09  0.30  0.42  0.53  0.75
+#> delta[13: Individual counselling]  0.40 0.51 -0.57  0.06  0.40  0.74  1.41
+#> delta[14: Individual counselling]  0.63 0.29  0.07  0.44  0.63  0.82  1.20
+#> delta[15: Group counselling]       2.15 0.78  0.76  1.61  2.10  2.61  3.84
+#> delta[16: Self-help]               0.66 0.40 -0.10  0.39  0.65  0.92  1.46
+#> delta[17: Individual counselling]  0.55 0.14  0.29  0.46  0.55  0.64  0.83
+#> delta[18: Individual counselling]  0.03 0.31 -0.57 -0.18  0.02  0.23  0.65
+#> delta[19: Individual counselling] -0.19 0.17 -0.53 -0.31 -0.19 -0.08  0.14
+#> delta[20: Individual counselling]  0.08 0.19 -0.29 -0.04  0.08  0.21  0.45
+#> delta[21: Self-help]               0.70 0.81 -0.90  0.18  0.69  1.21  2.30
+#> delta[21: Individual counselling]  0.65 0.80 -0.93  0.12  0.66  1.16  2.24
+#> delta[22: Self-help]               0.32 0.84 -1.31 -0.24  0.31  0.85  2.02
+#> delta[22: Group counselling]       1.29 0.85 -0.32  0.73  1.27  1.83  2.99
+#> delta[23: Individual counselling]  0.65 0.81 -0.92  0.13  0.64  1.17  2.24
+#> delta[23: Group counselling]       1.26 0.84 -0.33  0.72  1.26  1.78  2.95
+#> delta[24: Individual counselling]  1.04 0.83 -0.59  0.50  1.04  1.56  2.65
+#> delta[24: Group counselling]       0.90 0.87 -0.85  0.34  0.91  1.46  2.56
 #>                                   Bulk_ESS Tail_ESS Rhat
-#> mu[1]                                 4702     3002    1
-#> mu[2]                                 2551     2147    1
-#> mu[3]                                 6854     2907    1
-#> mu[4]                                 4139     2720    1
-#> mu[5]                                 6945     3037    1
-#> mu[6]                                 3245     2270    1
-#> mu[7]                                 4406     2276    1
-#> mu[8]                                 3176     2768    1
-#> mu[9]                                 4671     2776    1
-#> mu[10]                                7850     2512    1
-#> mu[11]                                6283     2985    1
-#> mu[12]                                6818     3243    1
-#> mu[13]                                4644     3373    1
-#> mu[14]                                4980     3103    1
-#> mu[15]                                3742     2832    1
-#> mu[16]                                6163     2816    1
-#> mu[17]                                7542     2893    1
-#> mu[18]                                4771     2967    1
-#> mu[19]                                7289     3104    1
-#> mu[20]                                7743     3112    1
-#> mu[21]                                3014     2654    1
-#> mu[22]                                2692     2450    1
-#> mu[23]                                2619     2203    1
-#> mu[24]                                3443     2796    1
-#> d[Group counselling]                  1927     2122    1
-#> d[Individual counselling]             1173     1735    1
-#> d[Self-help]                          1990     2528    1
-#> tau                                   1325     2047    1
-#> delta[1: Individual counselling]      4643     2990    1
-#> delta[1: Group counselling]           5102     3512    1
-#> delta[2: Self-help]                   2562     2226    1
-#> delta[2: Individual counselling]      2507     2210    1
-#> delta[2: Group counselling]           2607     2240    1
-#> delta[3: Individual counselling]      5779     3604    1
-#> delta[4: Individual counselling]      4061     2993    1
-#> delta[5: Individual counselling]      6470     3191    1
-#> delta[6: Individual counselling]      3045     2086    1
-#> delta[7: Individual counselling]      3971     2526    1
-#> delta[8: Individual counselling]      3207     2895    1
-#> delta[9: Individual counselling]      4229     2937    1
-#> delta[10: Self-help]                  4939     3328    1
-#> delta[11: Self-help]                  5902     2787    1
-#> delta[12: Individual counselling]     6123     3461    1
-#> delta[13: Individual counselling]     4892     3512    1
-#> delta[14: Individual counselling]     4716     2910    1
-#> delta[15: Group counselling]          3342     2573    1
-#> delta[16: Self-help]                  5791     3057    1
-#> delta[17: Individual counselling]     5685     3582    1
-#> delta[18: Individual counselling]     4858     3031    1
-#> delta[19: Individual counselling]     5674     3663    1
-#> delta[20: Individual counselling]     6179     3603    1
-#> delta[21: Self-help]                  2970     2569    1
-#> delta[21: Individual counselling]     2943     2276    1
-#> delta[22: Self-help]                  2805     2764    1
-#> delta[22: Group counselling]          2644     2486    1
-#> delta[23: Individual counselling]     2656     2650    1
-#> delta[23: Group counselling]          2583     2185    1
-#> delta[24: Individual counselling]     3462     2900    1
-#> delta[24: Group counselling]          3550     2859    1
+#> mu[1]                                 5035     2967 1.00
+#> mu[2]                                 2639     2638 1.00
+#> mu[3]                                10078     2794 1.00
+#> mu[4]                                 4478     2698 1.00
+#> mu[5]                                 7861     2879 1.00
+#> mu[6]                                 3799     2249 1.00
+#> mu[7]                                 4114     2659 1.00
+#> mu[8]                                 3843     2423 1.00
+#> mu[9]                                 5106     2848 1.00
+#> mu[10]                                8825     2537 1.00
+#> mu[11]                                7680     3062 1.00
+#> mu[12]                                7624     2502 1.00
+#> mu[13]                                5320     3097 1.00
+#> mu[14]                                6093     2503 1.00
+#> mu[15]                                3369     2196 1.00
+#> mu[16]                                5719     2751 1.00
+#> mu[17]                                7684     2965 1.00
+#> mu[18]                                6324     3093 1.00
+#> mu[19]                                8218     3036 1.00
+#> mu[20]                                9148     3163 1.00
+#> mu[21]                                2842     2078 1.00
+#> mu[22]                                2937     2308 1.00
+#> mu[23]                                2967     2934 1.00
+#> mu[24]                                3002     2605 1.00
+#> d[Group counselling]                  1924     2375 1.00
+#> d[Individual counselling]             1147     1549 1.00
+#> d[Self-help]                          1830     2353 1.00
+#> tau                                   1154     1750 1.01
+#> delta[1: Individual counselling]      5317     3164 1.00
+#> delta[1: Group counselling]           4364     3214 1.00
+#> delta[2: Self-help]                   2670     2439 1.00
+#> delta[2: Individual counselling]      2763     2699 1.00
+#> delta[2: Group counselling]           2675     2718 1.00
+#> delta[3: Individual counselling]      7520     3320 1.00
+#> delta[4: Individual counselling]      4468     3512 1.00
+#> delta[5: Individual counselling]      6777     3243 1.00
+#> delta[6: Individual counselling]      3705     2598 1.00
+#> delta[7: Individual counselling]      3847     2991 1.00
+#> delta[8: Individual counselling]      3911     2620 1.00
+#> delta[9: Individual counselling]      4873     3091 1.00
+#> delta[10: Self-help]                  5773     3433 1.00
+#> delta[11: Self-help]                  5952     3386 1.00
+#> delta[12: Individual counselling]     5655     2758 1.00
+#> delta[13: Individual counselling]     4742     3211 1.00
+#> delta[14: Individual counselling]     5664     2574 1.00
+#> delta[15: Group counselling]          3197     2709 1.00
+#> delta[16: Self-help]                  5565     2871 1.00
+#> delta[17: Individual counselling]     6941     3331 1.00
+#> delta[18: Individual counselling]     5975     3210 1.00
+#> delta[19: Individual counselling]     5411     3525 1.00
+#> delta[20: Individual counselling]     6023     3523 1.00
+#> delta[21: Self-help]                  2822     2125 1.00
+#> delta[21: Individual counselling]     2852     2257 1.00
+#> delta[22: Self-help]                  3046     2574 1.00
+#> delta[22: Group counselling]          2882     2083 1.00
+#> delta[23: Individual counselling]     2998     2787 1.00
+#> delta[23: Group counselling]          3023     2913 1.00
+#> delta[24: Individual counselling]     3072     2753 1.00
+#> delta[24: Group counselling]          3106     2752 1.00
 plot(smk_fit_RE)
 
 
 # Summary and plot of heterogeneity tau only
 summary(smk_fit_RE, pars = "tau")
-#>     mean   sd 2.5% 25% 50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> tau 0.82 0.18 0.54 0.7 0.8 0.93  1.24     1325     2047    1
+#>     mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
+#> tau 0.84 0.19 0.54 0.71 0.81 0.94  1.27     1154     1750 1.01
 plot(smk_fit_RE, pars = "tau")
 
 

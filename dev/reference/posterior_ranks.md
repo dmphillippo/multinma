@@ -121,10 +121,10 @@ if (!exists("smk_fit_RE")) example("example_smk_re", run.donttest = TRUE)
 smk_rank_RE <- posterior_ranks(smk_fit_RE, lower_better = FALSE)
 smk_rank_RE
 #>                              mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS
-#> rank[No intervention]        3.90 0.31    3   4   4   4     4     2381       NA
-#> rank[Group counselling]      1.37 0.62    1   1   1   2     3     2812     2553
-#> rank[Individual counselling] 1.93 0.64    1   2   2   2     3     2474     2625
-#> rank[Self-help]              2.80 0.68    1   3   3   3     4     2517       NA
+#> rank[No intervention]        3.89 0.33    3   4   4   4     4     2122       NA
+#> rank[Group counselling]      1.36 0.62    1   1   1   2     3     2908     2983
+#> rank[Individual counselling] 1.93 0.63    1   2   2   2     3     2542     2764
+#> rank[Self-help]              2.82 0.69    1   3   3   3     4     2612       NA
 #>                              Rhat
 #> rank[No intervention]           1
 #> rank[Group counselling]         1
@@ -137,10 +137,10 @@ plot(smk_rank_RE)
 smk_rankprob_RE <- posterior_rank_probs(smk_fit_RE, lower_better = FALSE)
 smk_rankprob_RE
 #>                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]
-#> d[No intervention]             0.00      0.00      0.10      0.90
-#> d[Group counselling]           0.70      0.23      0.06      0.01
-#> d[Individual counselling]      0.24      0.59      0.17      0.00
-#> d[Self-help]                   0.06      0.18      0.67      0.10
+#> d[No intervention]             0.00      0.00      0.11      0.89
+#> d[Group counselling]           0.71      0.22      0.07      0.00
+#> d[Individual counselling]      0.23      0.60      0.17      0.00
+#> d[Self-help]                   0.06      0.18      0.66      0.11
 plot(smk_rankprob_RE)
 
 
@@ -149,10 +149,10 @@ smk_cumrankprob_RE <- posterior_rank_probs(smk_fit_RE, lower_better = FALSE,
                                            cumulative = TRUE)
 smk_cumrankprob_RE
 #>                           p_rank[1] p_rank[2] p_rank[3] p_rank[4]
-#> d[No intervention]             0.00      0.00      0.10         1
-#> d[Group counselling]           0.70      0.93      0.99         1
-#> d[Individual counselling]      0.24      0.83      1.00         1
-#> d[Self-help]                   0.06      0.23      0.90         1
+#> d[No intervention]             0.00      0.00      0.11         1
+#> d[Group counselling]           0.71      0.93      1.00         1
+#> d[Individual counselling]      0.23      0.83      1.00         1
+#> d[Self-help]                   0.06      0.23      0.89         1
 plot(smk_cumrankprob_RE)
 
 

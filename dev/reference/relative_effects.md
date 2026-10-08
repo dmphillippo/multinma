@@ -92,32 +92,32 @@ if (!exists("smk_fit_RE")) example("example_smk_re", run.donttest = TRUE)
 smk_releff_RE <- relative_effects(smk_fit_RE)
 smk_releff_RE
 #>                           mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> d[Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> d[Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> d[Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> d[Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> d[Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> d[Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                           Tail_ESS Rhat
-#> d[Group counselling]          2122    1
-#> d[Individual counselling]     1735    1
-#> d[Self-help]                  2528    1
+#> d[Group counselling]          2375    1
+#> d[Individual counselling]     1549    1
+#> d[Self-help]                  2353    1
 plot(smk_releff_RE, ref_line = 0)
 
 
 # Relative effects for all pairwise comparisons
 relative_effects(smk_fit_RE, all_contrasts = TRUE)
 #>                                                  mean   sd  2.5%   25%   50%
-#> d[Group counselling vs. No intervention]         1.08 0.42  0.24  0.81  1.08
-#> d[Individual counselling vs. No intervention]    0.83 0.24  0.37  0.67  0.82
-#> d[Self-help vs. No intervention]                 0.50 0.40 -0.29  0.24  0.49
-#> d[Individual counselling vs. Group counselling] -0.25 0.40 -1.03 -0.51 -0.25
-#> d[Self-help vs. Group counselling]              -0.58 0.47 -1.48 -0.90 -0.58
-#> d[Self-help vs. Individual counselling]         -0.33 0.40 -1.11 -0.58 -0.34
+#> d[Group counselling vs. No intervention]         1.10 0.44  0.27  0.81  1.09
+#> d[Individual counselling vs. No intervention]    0.84 0.25  0.37  0.67  0.84
+#> d[Self-help vs. No intervention]                 0.50 0.41 -0.30  0.24  0.49
+#> d[Individual counselling vs. Group counselling] -0.26 0.42 -1.10 -0.53 -0.26
+#> d[Self-help vs. Group counselling]              -0.61 0.48 -1.58 -0.93 -0.60
+#> d[Self-help vs. Individual counselling]         -0.34 0.40 -1.13 -0.60 -0.33
 #>                                                   75% 97.5% Bulk_ESS Tail_ESS
-#> d[Group counselling vs. No intervention]         1.34  1.93     1927     2122
-#> d[Individual counselling vs. No intervention]    0.99  1.34     1173     1735
-#> d[Self-help vs. No intervention]                 0.76  1.32     1990     2528
-#> d[Individual counselling vs. Group counselling]  0.02  0.54     2698     2503
-#> d[Self-help vs. Group counselling]              -0.28  0.38     3019     2749
-#> d[Self-help vs. Individual counselling]         -0.07  0.47     2311     2468
+#> d[Group counselling vs. No intervention]         1.38  2.03     1924     2375
+#> d[Individual counselling vs. No intervention]    1.00  1.35     1147     1549
+#> d[Self-help vs. No intervention]                 0.76  1.30     1830     2353
+#> d[Individual counselling vs. Group counselling]  0.01  0.54     2724     2409
+#> d[Self-help vs. Group counselling]              -0.29  0.35     3153     2804
+#> d[Self-help vs. Individual counselling]         -0.08  0.44     2177     2499
 #>                                                 Rhat
 #> d[Group counselling vs. No intervention]           1
 #> d[Individual counselling vs. No intervention]      1
@@ -129,13 +129,13 @@ relative_effects(smk_fit_RE, all_contrasts = TRUE)
 # Relative effects against a different reference treatment
 relative_effects(smk_fit_RE, trt_ref = "Self-help")
 #>                            mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS
-#> d[No intervention]        -0.50 0.40 -1.32 -0.76 -0.49 -0.24  0.29     1990
-#> d[Group counselling]       0.58 0.47 -0.38  0.28  0.58  0.90  1.48     3019
-#> d[Individual counselling]  0.33 0.40 -0.47  0.07  0.34  0.58  1.11     2311
+#> d[No intervention]        -0.50 0.41 -1.30 -0.76 -0.49 -0.24  0.30     1830
+#> d[Group counselling]       0.61 0.48 -0.35  0.29  0.60  0.93  1.58     3153
+#> d[Individual counselling]  0.34 0.40 -0.44  0.08  0.33  0.60  1.13     2177
 #>                           Tail_ESS Rhat
-#> d[No intervention]            2528    1
-#> d[Group counselling]          2749    1
-#> d[Individual counselling]     2468    1
+#> d[No intervention]            2353    1
+#> d[Group counselling]          2804    1
+#> d[Individual counselling]     2499    1
 
 # Transforming to odds ratios
 # We work with the array of relative effects samples
@@ -148,9 +148,9 @@ smk_OR_RE <- summary(OR_array)
 # This can then be printed or plotted
 smk_OR_RE
 #>                           mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS
-#> d[Group counselling]      3.22 1.51 1.27 2.24 2.94 3.82  6.89     1927     2122
-#> d[Individual counselling] 2.37 0.61 1.44 1.96 2.28 2.68  3.80     1173     1735
-#> d[Self-help]              1.79 0.77 0.75 1.27 1.63 2.14  3.73     1990     2528
+#> d[Group counselling]      3.34 1.76 1.31 2.25 2.97 3.97  7.61     1924     2375
+#> d[Individual counselling] 2.39 0.62 1.45 1.96 2.31 2.71  3.87     1147     1549
+#> d[Self-help]              1.79 0.79 0.74 1.27 1.64 2.14  3.67     1830     2353
 #>                           Rhat
 #> d[Group counselling]         1
 #> d[Individual counselling]    1

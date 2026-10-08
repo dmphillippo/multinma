@@ -97,266 +97,266 @@ marginal_effects(smk_fit_RE, mtype = "difference")
 #> ---------------------------------------------------------------------- Study: 1 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[1: Group counselling]      0.10 0.06  0.01 0.06 0.09 0.14  0.25     1933
-#> marg[1: Individual counselling] 0.07 0.03  0.02 0.05 0.06 0.09  0.15     1477
-#> marg[1: Self-help]              0.04 0.04 -0.02 0.01 0.03 0.06  0.13     2061
+#> marg[1: Group counselling]      0.11 0.07  0.02 0.06 0.10 0.14  0.27     2129
+#> marg[1: Individual counselling] 0.07 0.03  0.02 0.05 0.07 0.09  0.15     1503
+#> marg[1: Self-help]              0.04 0.04 -0.02 0.01 0.03 0.06  0.14     1930
 #>                                 Tail_ESS Rhat
-#> marg[1: Group counselling]          2407    1
-#> marg[1: Individual counselling]     1953    1
-#> marg[1: Self-help]                  2513    1
+#> marg[1: Group counselling]          2362    1
+#> marg[1: Individual counselling]     2103    1
+#> marg[1: Self-help]                  2354    1
 #> 
 #> ---------------------------------------------------------------------- Study: 2 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[2: Group counselling]      0.12 0.07  0.01 0.06 0.11 0.16  0.30     2288
-#> marg[2: Individual counselling] 0.08 0.05  0.02 0.05 0.07 0.11  0.20     2472
-#> marg[2: Self-help]              0.05 0.05 -0.03 0.01 0.04 0.07  0.17     2644
+#> marg[2: Group counselling]      0.13 0.08  0.02 0.07 0.11 0.17  0.31     2783
+#> marg[2: Individual counselling] 0.09 0.05  0.02 0.05 0.08 0.11  0.21     2249
+#> marg[2: Self-help]              0.05 0.05 -0.03 0.02 0.04 0.07  0.18     2190
 #>                                 Tail_ESS Rhat
-#> marg[2: Group counselling]          2288    1
-#> marg[2: Individual counselling]     2641    1
-#> marg[2: Self-help]                  2528    1
+#> marg[2: Group counselling]          3016    1
+#> marg[2: Individual counselling]     2457    1
+#> marg[2: Self-help]                  2308    1
 #> 
 #> ---------------------------------------------------------------------- Study: 3 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[3: Group counselling]      0.16 0.08  0.02 0.10 0.15 0.21  0.34     1963
-#> marg[3: Individual counselling] 0.11 0.04  0.04 0.08 0.11 0.14  0.20     1200
-#> marg[3: Self-help]              0.06 0.06 -0.02 0.02 0.06 0.10  0.20     1994
+#> marg[3: Group counselling]      0.16 0.09  0.03 0.10 0.15 0.21  0.37     1946
+#> marg[3: Individual counselling] 0.11 0.04  0.04 0.08 0.11 0.14  0.21     1182
+#> marg[3: Self-help]              0.06 0.06 -0.03 0.02 0.06 0.10  0.20     1838
 #>                                 Tail_ESS Rhat
-#> marg[3: Group counselling]          2096    1
-#> marg[3: Individual counselling]     1834    1
-#> marg[3: Self-help]                  2497    1
+#> marg[3: Group counselling]          2373    1
+#> marg[3: Individual counselling]     1656    1
+#> marg[3: Self-help]                  2451    1
 #> 
 #> ---------------------------------------------------------------------- Study: 4 ---- 
 #> 
-#>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[4: Group counselling]      0.04 0.03  0.00 0.02 0.03 0.05  0.12     2516
-#> marg[4: Individual counselling] 0.02 0.02  0.00 0.01 0.02 0.03  0.07     2375
-#> marg[4: Self-help]              0.01 0.02 -0.01 0.00 0.01 0.02  0.06     2311
+#>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
+#> marg[4: Group counselling]      0.04 0.03 0.00 0.02 0.03 0.05  0.13     2825
+#> marg[4: Individual counselling] 0.02 0.02 0.01 0.01 0.02 0.03  0.07     2553
+#> marg[4: Self-help]              0.01 0.02 0.00 0.00 0.01 0.02  0.06     2064
 #>                                 Tail_ESS Rhat
-#> marg[4: Group counselling]          2242    1
-#> marg[4: Individual counselling]     2591    1
-#> marg[4: Self-help]                  2577    1
+#> marg[4: Group counselling]          2624    1
+#> marg[4: Individual counselling]     2771    1
+#> marg[4: Self-help]                  2507    1
 #> 
 #> ---------------------------------------------------------------------- Study: 5 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[5: Group counselling]      0.16 0.08  0.02 0.10 0.15 0.21  0.34     1958
-#> marg[5: Individual counselling] 0.11 0.04  0.04 0.08 0.11 0.13  0.21     1216
-#> marg[5: Self-help]              0.06 0.06 -0.02 0.02 0.05 0.10  0.20     2015
+#> marg[5: Group counselling]      0.16 0.09  0.03 0.10 0.15 0.21  0.37     1924
+#> marg[5: Individual counselling] 0.11 0.04  0.04 0.08 0.11 0.14  0.21     1141
+#> marg[5: Self-help]              0.06 0.06 -0.03 0.02 0.06 0.09  0.20     1842
 #>                                 Tail_ESS Rhat
-#> marg[5: Group counselling]          1987    1
-#> marg[5: Individual counselling]     1735    1
-#> marg[5: Self-help]                  2545    1
+#> marg[5: Group counselling]          2246    1
+#> marg[5: Individual counselling]     1825    1
+#> marg[5: Self-help]                  2428    1
 #> 
 #> ---------------------------------------------------------------------- Study: 6 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[6: Group counselling]      0.07 0.05  0.00 0.03 0.06 0.09  0.21     2890
-#> marg[6: Individual counselling] 0.04 0.03  0.01 0.02 0.04 0.06  0.12     2563
-#> marg[6: Self-help]              0.03 0.03 -0.01 0.01 0.02 0.04  0.10     2367
+#> marg[6: Group counselling]      0.07 0.06  0.01 0.03 0.06 0.10  0.23     3016
+#> marg[6: Individual counselling] 0.05 0.03  0.01 0.02 0.04 0.06  0.12     2459
+#> marg[6: Self-help]              0.03 0.03 -0.01 0.01 0.02 0.04  0.10     2388
 #>                                 Tail_ESS Rhat
-#> marg[6: Group counselling]          2115    1
-#> marg[6: Individual counselling]     2208    1
-#> marg[6: Self-help]                  2725    1
+#> marg[6: Group counselling]          2569    1
+#> marg[6: Individual counselling]     2428    1
+#> marg[6: Self-help]                  2638    1
 #> 
 #> ---------------------------------------------------------------------- Study: 7 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[7: Group counselling]      0.09 0.06  0.01 0.05 0.08 0.12  0.22     2361
-#> marg[7: Individual counselling] 0.06 0.03  0.02 0.04 0.05 0.07  0.13     1858
-#> marg[7: Self-help]              0.03 0.03 -0.01 0.01 0.03 0.05  0.12     2171
+#> marg[7: Group counselling]      0.09 0.06  0.01 0.05 0.08 0.12  0.24     2307
+#> marg[7: Individual counselling] 0.06 0.03  0.02 0.04 0.05 0.07  0.13     1765
+#> marg[7: Self-help]              0.03 0.03 -0.01 0.01 0.03 0.05  0.11     2124
 #>                                 Tail_ESS Rhat
-#> marg[7: Group counselling]          2139    1
-#> marg[7: Individual counselling]     2084    1
-#> marg[7: Self-help]                  2632    1
+#> marg[7: Group counselling]          2549    1
+#> marg[7: Individual counselling]     1952    1
+#> marg[7: Self-help]                  2559    1
 #> 
 #> ---------------------------------------------------------------------- Study: 8 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[8: Group counselling]      0.11 0.07  0.01 0.06 0.10 0.15  0.29     2447
-#> marg[8: Individual counselling] 0.08 0.04  0.02 0.05 0.07 0.10  0.17     2251
-#> marg[8: Self-help]              0.04 0.04 -0.02 0.01 0.03 0.06  0.16     2255
+#> marg[8: Group counselling]      0.12 0.08  0.01 0.06 0.10 0.16  0.30     2416
+#> marg[8: Individual counselling] 0.08 0.04  0.02 0.05 0.07 0.10  0.18     2124
+#> marg[8: Self-help]              0.04 0.04 -0.02 0.01 0.04 0.06  0.15     2238
 #>                                 Tail_ESS Rhat
-#> marg[8: Group counselling]          1869    1
-#> marg[8: Individual counselling]     2149    1
-#> marg[8: Self-help]                  2559    1
+#> marg[8: Group counselling]          2670    1
+#> marg[8: Individual counselling]     1952    1
+#> marg[8: Self-help]                  2527    1
 #> 
 #> ---------------------------------------------------------------------- Study: 9 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[9: Group counselling]      0.19 0.09  0.03 0.12 0.18 0.24  0.39     2059
-#> marg[9: Individual counselling] 0.13 0.05  0.05 0.09 0.13 0.16  0.26     1500
-#> marg[9: Self-help]              0.08 0.07 -0.03 0.03 0.07 0.11  0.24     2037
+#> marg[9: Group counselling]      0.19 0.10  0.03 0.12 0.18 0.25  0.42     2149
+#> marg[9: Individual counselling] 0.13 0.05  0.04 0.09 0.13 0.17  0.25     1504
+#> marg[9: Self-help]              0.08 0.07 -0.03 0.03 0.07 0.11  0.24     1849
 #>                                 Tail_ESS Rhat
-#> marg[9: Group counselling]          1853    1
-#> marg[9: Individual counselling]     1959    1
-#> marg[9: Self-help]                  2512    1
+#> marg[9: Group counselling]          2404    1
+#> marg[9: Individual counselling]     1868    1
+#> marg[9: Self-help]                  2254    1
 #> 
 #> --------------------------------------------------------------------- Study: 10 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[10: Group counselling]      0.16 0.08  0.03 0.11 0.16 0.21  0.35     1988
-#> marg[10: Individual counselling] 0.11 0.04  0.04 0.08 0.11 0.14  0.21     1201
-#> marg[10: Self-help]              0.07 0.06 -0.03 0.03 0.06 0.10  0.21     1992
+#> marg[10: Group counselling]      0.17 0.09  0.03 0.11 0.16 0.22  0.38     1945
+#> marg[10: Individual counselling] 0.12 0.04  0.04 0.09 0.11 0.14  0.22     1191
+#> marg[10: Self-help]              0.07 0.06 -0.03 0.03 0.06 0.10  0.21     1818
 #>                                  Tail_ESS Rhat
-#> marg[10: Group counselling]          2091    1
-#> marg[10: Individual counselling]     1681    1
-#> marg[10: Self-help]                  2581    1
+#> marg[10: Group counselling]          2314    1
+#> marg[10: Individual counselling]     1565    1
+#> marg[10: Self-help]                  2413    1
 #> 
 #> --------------------------------------------------------------------- Study: 11 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[11: Group counselling]      0.05 0.03  0.01 0.03 0.05 0.07  0.13     2065
-#> marg[11: Individual counselling] 0.03 0.02  0.01 0.02 0.03 0.04  0.07     1447
-#> marg[11: Self-help]              0.02 0.02 -0.01 0.01 0.02 0.03  0.06     1984
+#> marg[11: Group counselling]      0.05 0.04  0.01 0.03 0.05 0.07  0.15     2058
+#> marg[11: Individual counselling] 0.03 0.02  0.01 0.02 0.03 0.04  0.07     1382
+#> marg[11: Self-help]              0.02 0.02 -0.01 0.01 0.02 0.03  0.06     1858
 #>                                  Tail_ESS Rhat
-#> marg[11: Group counselling]          1916    1
-#> marg[11: Individual counselling]     2142    1
-#> marg[11: Self-help]                  2433    1
+#> marg[11: Group counselling]          2223    1
+#> marg[11: Individual counselling]     1753    1
+#> marg[11: Self-help]                  2368    1
 #> 
 #> --------------------------------------------------------------------- Study: 12 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[12: Group counselling]      0.15 0.08  0.02 0.10 0.14 0.20  0.33     1952
-#> marg[12: Individual counselling] 0.10 0.04  0.04 0.08 0.10 0.13  0.20     1201
-#> marg[12: Self-help]              0.06 0.05 -0.02 0.02 0.05 0.09  0.19     2023
+#> marg[12: Group counselling]      0.16 0.09  0.03 0.10 0.15 0.20  0.36     1954
+#> marg[12: Individual counselling] 0.11 0.04  0.04 0.08 0.10 0.13  0.20     1168
+#> marg[12: Self-help]              0.06 0.05 -0.02 0.02 0.05 0.09  0.19     1830
 #>                                  Tail_ESS Rhat
-#> marg[12: Group counselling]          2080    1
-#> marg[12: Individual counselling]     1751    1
-#> marg[12: Self-help]                  2598    1
+#> marg[12: Group counselling]          2237    1
+#> marg[12: Individual counselling]     1755    1
+#> marg[12: Self-help]                  2383    1
 #> 
 #> --------------------------------------------------------------------- Study: 13 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[13: Group counselling]      0.11 0.07  0.02 0.06 0.10 0.15  0.28     2353
-#> marg[13: Individual counselling] 0.08 0.04  0.02 0.05 0.07 0.10  0.16     1894
-#> marg[13: Self-help]              0.04 0.04 -0.02 0.01 0.03 0.06  0.16     2200
+#> marg[13: Group counselling]      0.12 0.08  0.02 0.06 0.10 0.16  0.31     2378
+#> marg[13: Individual counselling] 0.08 0.04  0.02 0.05 0.07 0.10  0.17     1765
+#> marg[13: Self-help]              0.04 0.04 -0.02 0.01 0.04 0.07  0.16     1982
 #>                                  Tail_ESS Rhat
-#> marg[13: Group counselling]          2448    1
-#> marg[13: Individual counselling]     2495    1
-#> marg[13: Self-help]                  2507    1
+#> marg[13: Group counselling]          2560    1
+#> marg[13: Individual counselling]     2326    1
+#> marg[13: Self-help]                  2368    1
 #> 
 #> --------------------------------------------------------------------- Study: 14 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[14: Group counselling]      0.13 0.07  0.02 0.08 0.12 0.18  0.31     2043
-#> marg[14: Individual counselling] 0.09 0.04  0.03 0.07 0.09 0.11  0.18     1291
-#> marg[14: Self-help]              0.05 0.05 -0.02 0.02 0.04 0.08  0.17     2044
+#> marg[14: Group counselling]      0.14 0.08  0.02 0.08 0.13 0.18  0.33     2016
+#> marg[14: Individual counselling] 0.09 0.04  0.03 0.07 0.09 0.11  0.18     1281
+#> marg[14: Self-help]              0.05 0.05 -0.02 0.02 0.05 0.08  0.17     1893
 #>                                  Tail_ESS Rhat
-#> marg[14: Group counselling]          2155    1
-#> marg[14: Individual counselling]     1853    1
-#> marg[14: Self-help]                  2564    1
+#> marg[14: Group counselling]          2329    1
+#> marg[14: Individual counselling]     1737    1
+#> marg[14: Self-help]                  2241    1
 #> 
 #> --------------------------------------------------------------------- Study: 15 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[15: Group counselling]      0.11 0.07  0.01 0.07 0.10 0.15  0.27     2566
-#> marg[15: Individual counselling] 0.08 0.05  0.02 0.05 0.07 0.11  0.19     2680
-#> marg[15: Self-help]              0.05 0.05 -0.02 0.01 0.03 0.07  0.17     2370
+#> marg[15: Group counselling]      0.11 0.07  0.01 0.06 0.10 0.15  0.29     2520
+#> marg[15: Individual counselling] 0.08 0.05  0.01 0.04 0.07 0.11  0.19     2294
+#> marg[15: Self-help]              0.04 0.05 -0.02 0.01 0.03 0.07  0.16     2297
 #>                                  Tail_ESS Rhat
-#> marg[15: Group counselling]          2124    1
-#> marg[15: Individual counselling]     2495    1
-#> marg[15: Self-help]                  2530    1
+#> marg[15: Group counselling]          2464    1
+#> marg[15: Individual counselling]     2769    1
+#> marg[15: Self-help]                  2292    1
 #> 
 #> --------------------------------------------------------------------- Study: 16 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[16: Group counselling]      0.12 0.07  0.02 0.07 0.11 0.15  0.28     2145
-#> marg[16: Individual counselling] 0.08 0.04  0.02 0.05 0.07 0.10  0.17     1615
-#> marg[16: Self-help]              0.04 0.04 -0.02 0.02 0.04 0.07  0.15     2055
+#> marg[16: Group counselling]      0.12 0.07  0.02 0.07 0.11 0.16  0.30     2129
+#> marg[16: Individual counselling] 0.08 0.04  0.02 0.05 0.08 0.10  0.17     1600
+#> marg[16: Self-help]              0.04 0.04 -0.02 0.02 0.04 0.07  0.15     1896
 #>                                  Tail_ESS Rhat
-#> marg[16: Group counselling]          2200    1
-#> marg[16: Individual counselling]     2037    1
-#> marg[16: Self-help]                  2448    1
+#> marg[16: Group counselling]          2582    1
+#> marg[16: Individual counselling]     2137    1
+#> marg[16: Self-help]                  2460    1
 #> 
 #> --------------------------------------------------------------------- Study: 17 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[17: Group counselling]      0.14 0.07  0.02 0.09 0.13 0.18  0.31     1944
-#> marg[17: Individual counselling] 0.09 0.04  0.03 0.07 0.09 0.11  0.18     1195
-#> marg[17: Self-help]              0.05 0.05 -0.02 0.02 0.05 0.08  0.17     1994
+#> marg[17: Group counselling]      0.14 0.08  0.02 0.09 0.13 0.18  0.33     1948
+#> marg[17: Individual counselling] 0.09 0.04  0.03 0.07 0.09 0.12  0.18     1157
+#> marg[17: Self-help]              0.05 0.05 -0.02 0.02 0.05 0.08  0.17     1830
 #>                                  Tail_ESS Rhat
-#> marg[17: Group counselling]          2120    1
-#> marg[17: Individual counselling]     1700    1
-#> marg[17: Self-help]                  2512    1
+#> marg[17: Group counselling]          2276    1
+#> marg[17: Individual counselling]     1657    1
+#> marg[17: Self-help]                  2303    1
 #> 
 #> --------------------------------------------------------------------- Study: 18 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[18: Group counselling]      0.12 0.07  0.02 0.07 0.11 0.16  0.30     1962
-#> marg[18: Individual counselling] 0.08 0.04  0.03 0.06 0.08 0.10  0.17     1296
-#> marg[18: Self-help]              0.05 0.04 -0.02 0.02 0.04 0.07  0.16     2059
+#> marg[18: Group counselling]      0.13 0.08  0.02 0.07 0.11 0.17  0.31     2075
+#> marg[18: Individual counselling] 0.08 0.04  0.03 0.06 0.08 0.10  0.17     1362
+#> marg[18: Self-help]              0.05 0.05 -0.02 0.02 0.04 0.07  0.16     1867
 #>                                  Tail_ESS Rhat
-#> marg[18: Group counselling]          2251    1
-#> marg[18: Individual counselling]     1752    1
-#> marg[18: Self-help]                  2245    1
+#> marg[18: Group counselling]          2439    1
+#> marg[18: Individual counselling]     1985    1
+#> marg[18: Self-help]                  2401    1
 #> 
 #> --------------------------------------------------------------------- Study: 19 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[19: Group counselling]      0.18 0.09  0.03 0.12 0.18 0.23  0.38     1949
-#> marg[19: Individual counselling] 0.13 0.05  0.05 0.10 0.12 0.16  0.23     1202
-#> marg[19: Self-help]              0.08 0.06 -0.03 0.03 0.07 0.11  0.23     2012
+#> marg[19: Group counselling]      0.19 0.09  0.03 0.12 0.18 0.24  0.40     1944
+#> marg[19: Individual counselling] 0.13 0.05  0.05 0.10 0.13 0.16  0.24     1175
+#> marg[19: Self-help]              0.07 0.07 -0.03 0.03 0.07 0.11  0.23     1836
 #>                                  Tail_ESS Rhat
-#> marg[19: Group counselling]          2115    1
-#> marg[19: Individual counselling]     1773    1
-#> marg[19: Self-help]                  2530    1
+#> marg[19: Group counselling]          2424    1
+#> marg[19: Individual counselling]     1564    1
+#> marg[19: Self-help]                  2389    1
 #> 
 #> --------------------------------------------------------------------- Study: 20 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[20: Group counselling]      0.10 0.06  0.01 0.06 0.09 0.13  0.24     1961
-#> marg[20: Individual counselling] 0.07 0.03  0.02 0.05 0.06 0.08  0.13     1212
-#> marg[20: Self-help]              0.04 0.04 -0.01 0.01 0.03 0.06  0.13     1999
+#> marg[20: Group counselling]      0.11 0.06  0.02 0.06 0.10 0.14  0.27     1972
+#> marg[20: Individual counselling] 0.07 0.03  0.02 0.05 0.06 0.08  0.14     1196
+#> marg[20: Self-help]              0.04 0.04 -0.01 0.01 0.03 0.06  0.13     1855
 #>                                  Tail_ESS Rhat
-#> marg[20: Group counselling]          2189    1
-#> marg[20: Individual counselling]     1691    1
-#> marg[20: Self-help]                  2483    1
+#> marg[20: Group counselling]          2354    1
+#> marg[20: Individual counselling]     1594    1
+#> marg[20: Self-help]                  2324    1
 #> 
 #> --------------------------------------------------------------------- Study: 21 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[21: Group counselling]      0.22 0.10  0.04 0.15 0.22 0.28  0.42     2288
-#> marg[21: Individual counselling] 0.17 0.06  0.06 0.12 0.16 0.20  0.29     1597
-#> marg[21: Self-help]              0.09 0.08 -0.06 0.04 0.09 0.14  0.27     2231
+#> marg[21: Group counselling]      0.22 0.10  0.04 0.15 0.22 0.29  0.43     2375
+#> marg[21: Individual counselling] 0.17 0.06  0.05 0.12 0.17 0.21  0.29     1640
+#> marg[21: Self-help]              0.09 0.08 -0.06 0.04 0.09 0.15  0.26     2108
 #>                                  Tail_ESS Rhat
-#> marg[21: Group counselling]          2506    1
-#> marg[21: Individual counselling]     2385    1
-#> marg[21: Self-help]                  2462    1
+#> marg[21: Group counselling]          2673    1
+#> marg[21: Individual counselling]     2167    1
+#> marg[21: Self-help]                  2374    1
 #> 
 #> --------------------------------------------------------------------- Study: 22 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[22: Group counselling]      0.13 0.08  0.02 0.07 0.12 0.17  0.31     3023
-#> marg[22: Individual counselling] 0.10 0.06  0.02 0.05 0.08 0.13  0.23     2522
-#> marg[22: Self-help]              0.05 0.05 -0.03 0.02 0.04 0.07  0.19     2596
+#> marg[22: Group counselling]      0.13 0.08  0.02 0.08 0.12 0.18  0.32     3794
+#> marg[22: Individual counselling] 0.10 0.06  0.02 0.05 0.09 0.13  0.23     2497
+#> marg[22: Self-help]              0.05 0.05 -0.03 0.02 0.04 0.07  0.17     2473
 #>                                  Tail_ESS Rhat
-#> marg[22: Group counselling]          2465    1
-#> marg[22: Individual counselling]     2587    1
-#> marg[22: Self-help]                  2435    1
+#> marg[22: Group counselling]          2982    1
+#> marg[22: Individual counselling]     2698    1
+#> marg[22: Self-help]                  2459    1
 #> 
 #> --------------------------------------------------------------------- Study: 23 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[23: Group counselling]      0.14 0.08  0.02 0.08 0.13 0.19  0.33     3276
-#> marg[23: Individual counselling] 0.10 0.05  0.02 0.06 0.09 0.13  0.23     3090
-#> marg[23: Self-help]              0.06 0.06 -0.02 0.02 0.04 0.08  0.21     2492
+#> marg[23: Group counselling]      0.14 0.09  0.02 0.08 0.13 0.19  0.34     2924
+#> marg[23: Individual counselling] 0.10 0.06  0.02 0.06 0.09 0.13  0.23     2691
+#> marg[23: Self-help]              0.06 0.06 -0.03 0.02 0.04 0.08  0.21     2197
 #>                                  Tail_ESS Rhat
-#> marg[23: Group counselling]          2199    1
-#> marg[23: Individual counselling]     2958    1
-#> marg[23: Self-help]                  2540    1
+#> marg[23: Group counselling]          2522    1
+#> marg[23: Individual counselling]     2613    1
+#> marg[23: Self-help]                  2419    1
 #> 
 #> --------------------------------------------------------------------- Study: 24 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[24: Group counselling]      0.11 0.07  0.01 0.05 0.09 0.14  0.29     2879
-#> marg[24: Individual counselling] 0.07 0.05  0.01 0.04 0.06 0.10  0.20     3252
-#> marg[24: Self-help]              0.04 0.05 -0.02 0.01 0.03 0.06  0.18     2404
+#> marg[24: Group counselling]      0.11 0.08  0.01 0.05 0.09 0.15  0.30     3287
+#> marg[24: Individual counselling] 0.07 0.05  0.01 0.04 0.06 0.10  0.20     3106
+#> marg[24: Self-help]              0.04 0.05 -0.02 0.01 0.03 0.06  0.17     2143
 #>                                  Tail_ESS Rhat
-#> marg[24: Group counselling]          2558    1
-#> marg[24: Individual counselling]     2452    1
-#> marg[24: Self-help]                  2528    1
+#> marg[24: Group counselling]          2843    1
+#> marg[24: Individual counselling]     2566    1
+#> marg[24: Self-help]                  2198    1
 #> 
 
 # Since there are no covariates in the model, the marginal and conditional
@@ -365,276 +365,276 @@ marginal_effects(smk_fit_RE, mtype = "link")
 #> ---------------------------------------------------------------------- Study: 1 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[1: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[1: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[1: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[1: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[1: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[1: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                 Tail_ESS Rhat
-#> marg[1: Group counselling]          2122    1
-#> marg[1: Individual counselling]     1735    1
-#> marg[1: Self-help]                  2528    1
+#> marg[1: Group counselling]          2375    1
+#> marg[1: Individual counselling]     1549    1
+#> marg[1: Self-help]                  2353    1
 #> 
 #> ---------------------------------------------------------------------- Study: 2 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[2: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[2: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[2: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[2: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[2: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[2: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                 Tail_ESS Rhat
-#> marg[2: Group counselling]          2122    1
-#> marg[2: Individual counselling]     1735    1
-#> marg[2: Self-help]                  2528    1
+#> marg[2: Group counselling]          2375    1
+#> marg[2: Individual counselling]     1549    1
+#> marg[2: Self-help]                  2353    1
 #> 
 #> ---------------------------------------------------------------------- Study: 3 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[3: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[3: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[3: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[3: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[3: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[3: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                 Tail_ESS Rhat
-#> marg[3: Group counselling]          2122    1
-#> marg[3: Individual counselling]     1735    1
-#> marg[3: Self-help]                  2528    1
+#> marg[3: Group counselling]          2375    1
+#> marg[3: Individual counselling]     1549    1
+#> marg[3: Self-help]                  2353    1
 #> 
 #> ---------------------------------------------------------------------- Study: 4 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[4: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[4: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[4: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[4: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[4: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[4: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                 Tail_ESS Rhat
-#> marg[4: Group counselling]          2122    1
-#> marg[4: Individual counselling]     1735    1
-#> marg[4: Self-help]                  2528    1
+#> marg[4: Group counselling]          2375    1
+#> marg[4: Individual counselling]     1549    1
+#> marg[4: Self-help]                  2353    1
 #> 
 #> ---------------------------------------------------------------------- Study: 5 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[5: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[5: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[5: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[5: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[5: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[5: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                 Tail_ESS Rhat
-#> marg[5: Group counselling]          2122    1
-#> marg[5: Individual counselling]     1735    1
-#> marg[5: Self-help]                  2528    1
+#> marg[5: Group counselling]          2375    1
+#> marg[5: Individual counselling]     1549    1
+#> marg[5: Self-help]                  2353    1
 #> 
 #> ---------------------------------------------------------------------- Study: 6 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[6: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[6: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[6: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[6: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[6: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[6: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                 Tail_ESS Rhat
-#> marg[6: Group counselling]          2122    1
-#> marg[6: Individual counselling]     1735    1
-#> marg[6: Self-help]                  2528    1
+#> marg[6: Group counselling]          2375    1
+#> marg[6: Individual counselling]     1549    1
+#> marg[6: Self-help]                  2353    1
 #> 
 #> ---------------------------------------------------------------------- Study: 7 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[7: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[7: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[7: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[7: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[7: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[7: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                 Tail_ESS Rhat
-#> marg[7: Group counselling]          2122    1
-#> marg[7: Individual counselling]     1735    1
-#> marg[7: Self-help]                  2528    1
+#> marg[7: Group counselling]          2375    1
+#> marg[7: Individual counselling]     1549    1
+#> marg[7: Self-help]                  2353    1
 #> 
 #> ---------------------------------------------------------------------- Study: 8 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[8: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[8: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[8: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[8: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[8: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[8: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                 Tail_ESS Rhat
-#> marg[8: Group counselling]          2122    1
-#> marg[8: Individual counselling]     1735    1
-#> marg[8: Self-help]                  2528    1
+#> marg[8: Group counselling]          2375    1
+#> marg[8: Individual counselling]     1549    1
+#> marg[8: Self-help]                  2353    1
 #> 
 #> ---------------------------------------------------------------------- Study: 9 ---- 
 #> 
 #>                                 mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[9: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[9: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[9: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[9: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[9: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[9: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                 Tail_ESS Rhat
-#> marg[9: Group counselling]          2122    1
-#> marg[9: Individual counselling]     1735    1
-#> marg[9: Self-help]                  2528    1
+#> marg[9: Group counselling]          2375    1
+#> marg[9: Individual counselling]     1549    1
+#> marg[9: Self-help]                  2353    1
 #> 
 #> --------------------------------------------------------------------- Study: 10 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[10: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[10: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[10: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[10: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[10: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[10: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                  Tail_ESS Rhat
-#> marg[10: Group counselling]          2122    1
-#> marg[10: Individual counselling]     1735    1
-#> marg[10: Self-help]                  2528    1
+#> marg[10: Group counselling]          2375    1
+#> marg[10: Individual counselling]     1549    1
+#> marg[10: Self-help]                  2353    1
 #> 
 #> --------------------------------------------------------------------- Study: 11 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[11: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[11: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[11: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[11: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[11: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[11: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                  Tail_ESS Rhat
-#> marg[11: Group counselling]          2122    1
-#> marg[11: Individual counselling]     1735    1
-#> marg[11: Self-help]                  2528    1
+#> marg[11: Group counselling]          2375    1
+#> marg[11: Individual counselling]     1549    1
+#> marg[11: Self-help]                  2353    1
 #> 
 #> --------------------------------------------------------------------- Study: 12 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[12: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[12: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[12: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[12: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[12: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[12: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                  Tail_ESS Rhat
-#> marg[12: Group counselling]          2122    1
-#> marg[12: Individual counselling]     1735    1
-#> marg[12: Self-help]                  2528    1
+#> marg[12: Group counselling]          2375    1
+#> marg[12: Individual counselling]     1549    1
+#> marg[12: Self-help]                  2353    1
 #> 
 #> --------------------------------------------------------------------- Study: 13 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[13: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[13: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[13: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[13: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[13: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[13: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                  Tail_ESS Rhat
-#> marg[13: Group counselling]          2122    1
-#> marg[13: Individual counselling]     1735    1
-#> marg[13: Self-help]                  2528    1
+#> marg[13: Group counselling]          2375    1
+#> marg[13: Individual counselling]     1549    1
+#> marg[13: Self-help]                  2353    1
 #> 
 #> --------------------------------------------------------------------- Study: 14 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[14: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[14: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[14: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[14: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[14: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[14: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                  Tail_ESS Rhat
-#> marg[14: Group counselling]          2122    1
-#> marg[14: Individual counselling]     1735    1
-#> marg[14: Self-help]                  2528    1
+#> marg[14: Group counselling]          2375    1
+#> marg[14: Individual counselling]     1549    1
+#> marg[14: Self-help]                  2353    1
 #> 
 #> --------------------------------------------------------------------- Study: 15 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[15: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[15: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[15: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[15: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[15: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[15: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                  Tail_ESS Rhat
-#> marg[15: Group counselling]          2122    1
-#> marg[15: Individual counselling]     1735    1
-#> marg[15: Self-help]                  2528    1
+#> marg[15: Group counselling]          2375    1
+#> marg[15: Individual counselling]     1549    1
+#> marg[15: Self-help]                  2353    1
 #> 
 #> --------------------------------------------------------------------- Study: 16 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[16: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[16: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[16: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[16: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[16: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[16: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                  Tail_ESS Rhat
-#> marg[16: Group counselling]          2122    1
-#> marg[16: Individual counselling]     1735    1
-#> marg[16: Self-help]                  2528    1
+#> marg[16: Group counselling]          2375    1
+#> marg[16: Individual counselling]     1549    1
+#> marg[16: Self-help]                  2353    1
 #> 
 #> --------------------------------------------------------------------- Study: 17 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[17: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[17: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[17: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[17: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[17: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[17: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                  Tail_ESS Rhat
-#> marg[17: Group counselling]          2122    1
-#> marg[17: Individual counselling]     1735    1
-#> marg[17: Self-help]                  2528    1
+#> marg[17: Group counselling]          2375    1
+#> marg[17: Individual counselling]     1549    1
+#> marg[17: Self-help]                  2353    1
 #> 
 #> --------------------------------------------------------------------- Study: 18 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[18: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[18: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[18: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[18: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[18: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[18: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                  Tail_ESS Rhat
-#> marg[18: Group counselling]          2122    1
-#> marg[18: Individual counselling]     1735    1
-#> marg[18: Self-help]                  2528    1
+#> marg[18: Group counselling]          2375    1
+#> marg[18: Individual counselling]     1549    1
+#> marg[18: Self-help]                  2353    1
 #> 
 #> --------------------------------------------------------------------- Study: 19 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[19: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[19: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[19: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[19: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[19: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[19: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                  Tail_ESS Rhat
-#> marg[19: Group counselling]          2122    1
-#> marg[19: Individual counselling]     1735    1
-#> marg[19: Self-help]                  2528    1
+#> marg[19: Group counselling]          2375    1
+#> marg[19: Individual counselling]     1549    1
+#> marg[19: Self-help]                  2353    1
 #> 
 #> --------------------------------------------------------------------- Study: 20 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[20: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[20: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[20: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[20: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[20: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[20: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                  Tail_ESS Rhat
-#> marg[20: Group counselling]          2122    1
-#> marg[20: Individual counselling]     1735    1
-#> marg[20: Self-help]                  2528    1
+#> marg[20: Group counselling]          2375    1
+#> marg[20: Individual counselling]     1549    1
+#> marg[20: Self-help]                  2353    1
 #> 
 #> --------------------------------------------------------------------- Study: 21 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[21: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[21: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[21: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[21: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[21: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[21: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                  Tail_ESS Rhat
-#> marg[21: Group counselling]          2122    1
-#> marg[21: Individual counselling]     1735    1
-#> marg[21: Self-help]                  2528    1
+#> marg[21: Group counselling]          2375    1
+#> marg[21: Individual counselling]     1549    1
+#> marg[21: Self-help]                  2353    1
 #> 
 #> --------------------------------------------------------------------- Study: 22 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[22: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[22: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[22: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[22: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[22: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[22: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                  Tail_ESS Rhat
-#> marg[22: Group counselling]          2122    1
-#> marg[22: Individual counselling]     1735    1
-#> marg[22: Self-help]                  2528    1
+#> marg[22: Group counselling]          2375    1
+#> marg[22: Individual counselling]     1549    1
+#> marg[22: Self-help]                  2353    1
 #> 
 #> --------------------------------------------------------------------- Study: 23 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[23: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[23: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[23: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[23: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[23: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[23: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                  Tail_ESS Rhat
-#> marg[23: Group counselling]          2122    1
-#> marg[23: Individual counselling]     1735    1
-#> marg[23: Self-help]                  2528    1
+#> marg[23: Group counselling]          2375    1
+#> marg[23: Individual counselling]     1549    1
+#> marg[23: Self-help]                  2353    1
 #> 
 #> --------------------------------------------------------------------- Study: 24 ---- 
 #> 
 #>                                  mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[24: Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> marg[24: Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> marg[24: Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> marg[24: Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> marg[24: Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> marg[24: Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                                  Tail_ESS Rhat
-#> marg[24: Group counselling]          2122    1
-#> marg[24: Individual counselling]     1735    1
-#> marg[24: Self-help]                  2528    1
+#> marg[24: Group counselling]          2375    1
+#> marg[24: Individual counselling]     1549    1
+#> marg[24: Self-help]                  2353    1
 #> 
 relative_effects(smk_fit_RE)
 #>                           mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> d[Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927
-#> d[Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173
-#> d[Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990
+#> d[Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924
+#> d[Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147
+#> d[Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830
 #>                           Tail_ESS Rhat
-#> d[Group counselling]          2122    1
-#> d[Individual counselling]     1735    1
-#> d[Self-help]                  2528    1
+#> d[Group counselling]          2375    1
+#> d[Individual counselling]     1549    1
+#> d[Self-help]                  2353    1
 
 # Marginal risk differences in a population with 67 observed events out of
 # 566 individuals on No Intervention, corresponding to a Beta(67, 566 - 67)
@@ -644,13 +644,13 @@ relative_effects(smk_fit_RE)
                                baseline_type = "response",
                                mtype = "difference"))
 #>                              mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> marg[Group counselling]      0.17 0.09  0.03 0.11 0.16 0.22  0.36     1934
-#> marg[Individual counselling] 0.12 0.05  0.04 0.09 0.12 0.15  0.22     1189
-#> marg[Self-help]              0.07 0.06 -0.03 0.03 0.06 0.10  0.22     1994
+#> marg[Group counselling]      0.18 0.09  0.03 0.11 0.17 0.23  0.39     1922
+#> marg[Individual counselling] 0.12 0.05  0.04 0.09 0.12 0.15  0.23     1190
+#> marg[Self-help]              0.07 0.06 -0.03 0.03 0.06 0.10  0.21     1823
 #>                              Tail_ESS Rhat
-#> marg[Group counselling]          2224    1
-#> marg[Individual counselling]     1752    1
-#> marg[Self-help]                  2512    1
+#> marg[Group counselling]          2263    1
+#> marg[Individual counselling]     1625    1
+#> marg[Self-help]                  2328    1
 plot(smk_rd_RE)
 
 # }

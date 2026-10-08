@@ -133,15 +133,15 @@ bcg_fit_unadj
 #> post-warmup draws per chain=5000, total post-warmup draws=20000.
 #> 
 #>                    mean se_mean   sd      2.5%       25%       50%       75%     97.5% n_eff
-#> d[Vaccinated]     -0.76    0.00 0.22     -1.20     -0.90     -0.76     -0.62     -0.33  6566
-#> lp__          -13453.89    0.06 4.49 -13463.54 -13456.77 -13453.55 -13450.72 -13446.06  5292
-#> tau                0.68    0.00 0.20      0.39      0.54      0.65      0.78      1.16  6576
+#> d[Vaccinated]     -0.75    0.00 0.22     -1.20     -0.89     -0.75     -0.61     -0.32  6181
+#> lp__          -13453.94    0.06 4.50 -13463.72 -13456.79 -13453.63 -13450.78 -13446.06  5313
+#> tau                0.68    0.00 0.20      0.39      0.54      0.65      0.78      1.17  7014
 #>               Rhat
 #> d[Vaccinated]    1
 #> lp__             1
 #> tau              1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:37:49 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:10:04 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -230,16 +230,16 @@ bcg_fit_lat
 #> 
 #>                                    mean se_mean   sd      2.5%       25%       50%       75%
 #> beta[.trtVaccinated:latitude]     -0.03    0.00 0.01     -0.05     -0.04     -0.03     -0.03
-#> d[Vaccinated]                     -0.76    0.00 0.12     -1.03     -0.83     -0.76     -0.69
-#> lp__                          -13457.21    0.12 5.07 -13468.16 -13460.40 -13456.94 -13453.61
-#> tau                                0.30    0.00 0.18      0.03      0.16      0.27      0.40
+#> d[Vaccinated]                     -0.77    0.00 0.13     -1.04     -0.83     -0.76     -0.69
+#> lp__                          -13457.10    0.14 5.13 -13467.86 -13460.41 -13456.79 -13453.39
+#> tau                                0.30    0.00 0.19      0.02      0.17      0.27      0.41
 #>                                   97.5% n_eff Rhat
-#> beta[.trtVaccinated:latitude]     -0.01  4569    1
-#> d[Vaccinated]                     -0.54  4898    1
-#> lp__                          -13448.27  1772    1
-#> tau                                0.73  1905    1
+#> beta[.trtVaccinated:latitude]     -0.01  4110    1
+#> d[Vaccinated]                     -0.53  3020    1
+#> lp__                          -13447.92  1408    1
+#> tau                                0.77  1590    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:37:56 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:10:12 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -278,17 +278,17 @@ function:
 ``` r
 
 (bcg_dic_unadj <- dic(bcg_fit_unadj))
-#> Residual deviance: 26 (on 26 data points)
+#> Residual deviance: 26.1 (on 26 data points)
 #>                pD: 23.5
-#>               DIC: 49.5
+#>               DIC: 49.6
 ```
 
 ``` r
 
 (bcg_dic_lat <- dic(bcg_fit_lat))
-#> Residual deviance: 30.7 (on 26 data points)
-#>                pD: 21.5
-#>               DIC: 52.1
+#> Residual deviance: 30.3 (on 26 data points)
+#>                pD: 21.3
+#>               DIC: 51.7
 ```
 
 The DIC is very similar between the two models, so we might at first
@@ -302,10 +302,10 @@ a much lower estimated heterogeneity standard deviation:
 
 summary(bcg_fit_unadj, pars = "tau")
 #>     mean  sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> tau 0.68 0.2 0.39 0.54 0.65 0.78  1.16     6616    10707    1
+#> tau 0.68 0.2 0.39 0.54 0.65 0.78  1.17     6891    10393    1
 summary(bcg_fit_lat, pars = "tau")
-#>     mean   sd 2.5%  25%  50% 75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> tau  0.3 0.18 0.03 0.16 0.27 0.4  0.73     1678     2461    1
+#>     mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
+#> tau  0.3 0.19 0.02 0.17 0.27 0.41  0.77     1373     1700    1
 ```
 
 Adjusting for latitude is explaining a substantial amount of
@@ -316,7 +316,7 @@ coefficient also excludes zero:
 
 summary(bcg_fit_lat, pars = "beta")
 #>                                mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> beta[.trtVaccinated:latitude] -0.03 0.01 -0.05 -0.04 -0.03 -0.03 -0.01     4890     4242    1
+#> beta[.trtVaccinated:latitude] -0.03 0.01 -0.05 -0.04 -0.03 -0.03 -0.01     4322     4588    1
 
 plot(bcg_fit_lat, 
      pars = "beta", 
@@ -359,7 +359,7 @@ bcg_releff_lat
 #>        10
 #> 
 #>                              mean   sd  2.5%   25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d[10° latitude: Vaccinated] -0.02 0.22 -0.52 -0.13   0 0.1  0.41     4584     4077    1
+#> d[10° latitude: Vaccinated] -0.03 0.23 -0.56 -0.14   0 0.1  0.41     3707     3837    1
 #> 
 #> ----------------------------------------------------------- Study: 20° latitude ---- 
 #> 
@@ -368,7 +368,7 @@ bcg_releff_lat
 #>        20
 #> 
 #>                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d[20° latitude: Vaccinated] -0.34 0.16 -0.69 -0.42 -0.32 -0.25 -0.03     4587     4402    1
+#> d[20° latitude: Vaccinated] -0.34 0.17 -0.72 -0.43 -0.32 -0.24 -0.05     3627     3718    1
 #> 
 #> ----------------------------------------------------------- Study: 30° latitude ---- 
 #> 
@@ -377,7 +377,7 @@ bcg_releff_lat
 #>        30
 #> 
 #>                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d[30° latitude: Vaccinated] -0.65 0.12 -0.93 -0.72 -0.65 -0.58 -0.42     4890     4879    1
+#> d[30° latitude: Vaccinated] -0.66 0.13 -0.94 -0.72 -0.65 -0.58 -0.42     3909     3541    1
 #> 
 #> ----------------------------------------------------------- Study: 40° latitude ---- 
 #> 
@@ -386,7 +386,7 @@ bcg_releff_lat
 #>        40
 #> 
 #>                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d[40° latitude: Vaccinated] -0.97 0.14 -1.27 -1.05 -0.97 -0.89 -0.71     5451     5245    1
+#> d[40° latitude: Vaccinated] -0.97 0.15 -1.28 -1.05 -0.96 -0.89 -0.68     4336     3706    1
 #> 
 #> ----------------------------------------------------------- Study: 50° latitude ---- 
 #> 
@@ -394,8 +394,8 @@ bcg_releff_lat
 #>  latitude
 #>        50
 #> 
-#>                              mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d[50° latitude: Vaccinated] -1.29 0.19 -1.68 -1.39 -1.29 -1.18 -0.89     5398     4690    1
+#>                              mean  sd  2.5%  25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
+#> d[50° latitude: Vaccinated] -1.29 0.2 -1.71 -1.4 -1.28 -1.18 -0.87     4566     3913    1
 ```
 
 The [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method may
@@ -478,8 +478,10 @@ effects:
 ``` r
 
 (bcg_predeff_unadj <- relative_effects(bcg_fit_unadj, predictive_distribution = TRUE))
-#>                        mean   sd 2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> delta_new[Vaccinated] -0.77 0.75 -2.3 -1.22 -0.76 -0.31  0.73    16583    17208    1
+#> 
+#>  Elapsed Time: 0.013 seconds (Generated Quantities)
+#>                        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
+#> delta_new[Vaccinated] -0.76 0.75 -2.27 -1.22 -0.76 -0.31  0.72    16312    17399    1
 ```
 
 The predictive probability of a new trial showing a harmful effect is:
@@ -487,7 +489,7 @@ The predictive probability of a new trial showing a harmful effect is:
 ``` r
 
 mean(as.matrix(bcg_predeff_unadj) > 0)
-#> [1] 0.1316
+#> [1] 0.13585
 ```
 
 For the analysis adjusting for latitude, the predictive distribution of
@@ -501,6 +503,8 @@ bcg_predeff_lat <- relative_effects(bcg_fit_lat,
                                                             label = paste0(latitude, "\u00B0 latitude")),
                                    study = label,
                                    predictive_distribution = TRUE)
+#> 
+#>  Elapsed Time: 0.005 seconds (Generated Quantities)
 
 bcg_predeff_lat
 #> ------------------------------------------------------------ Study: 0° latitude ---- 
@@ -510,7 +514,7 @@ bcg_predeff_lat
 #>         0
 #> 
 #>                                    mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> delta_new[0° latitude: Vaccinated]  0.3 0.46 -0.71 0.08 0.32 0.52   1.2     6645     5618    1
+#> delta_new[0° latitude: Vaccinated] 0.29 0.48 -0.74 0.06 0.32 0.52  1.25     5927     6386    1
 #> 
 #> ----------------------------------------------------------- Study: 10° latitude ---- 
 #> 
@@ -519,7 +523,7 @@ bcg_predeff_lat
 #>        10
 #> 
 #>                                      mean   sd  2.5%   25% 50%  75% 97.5% Bulk_ESS Tail_ESS
-#> delta_new[10° latitude: Vaccinated] -0.02 0.41 -0.93 -0.21   0 0.18   0.8     7313     6060
+#> delta_new[10° latitude: Vaccinated] -0.02 0.43 -0.96 -0.23   0 0.18  0.85     6640     6324
 #>                                     Rhat
 #> delta_new[10° latitude: Vaccinated]    1
 #> 
@@ -529,8 +533,8 @@ bcg_predeff_lat
 #>  latitude
 #>        20
 #> 
-#>                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS
-#> delta_new[20° latitude: Vaccinated] -0.34 0.38 -1.18 -0.51 -0.32 -0.16  0.45     8079     6925
+#>                                      mean  sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS
+#> delta_new[20° latitude: Vaccinated] -0.34 0.4 -1.19 -0.52 -0.32 -0.15  0.47     7467     6506
 #>                                     Rhat
 #> delta_new[20° latitude: Vaccinated]    1
 #> 
@@ -541,7 +545,7 @@ bcg_predeff_lat
 #>        30
 #> 
 #>                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS
-#> delta_new[30° latitude: Vaccinated] -0.65 0.37 -1.44 -0.82 -0.64 -0.48  0.12     8646     7396
+#> delta_new[30° latitude: Vaccinated] -0.65 0.39 -1.46 -0.83 -0.64 -0.48  0.13     8270     5995
 #>                                     Rhat
 #> delta_new[30° latitude: Vaccinated]    1
 #> 
@@ -552,7 +556,7 @@ bcg_predeff_lat
 #>        40
 #> 
 #>                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS
-#> delta_new[40° latitude: Vaccinated] -0.97 0.38 -1.75 -1.15 -0.96 -0.79 -0.18     8573     7868
+#> delta_new[40° latitude: Vaccinated] -0.97 0.39 -1.78 -1.15 -0.96 -0.79 -0.16     8403     5943
 #>                                     Rhat
 #> delta_new[40° latitude: Vaccinated]    1
 #> 
@@ -562,8 +566,8 @@ bcg_predeff_lat
 #>  latitude
 #>        50
 #> 
-#>                                      mean  sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS
-#> delta_new[50° latitude: Vaccinated] -1.29 0.4 -2.12 -1.47 -1.29 -1.09 -0.45     7930     7734
+#>                                      mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS
+#> delta_new[50° latitude: Vaccinated] -1.28 0.41 -2.13 -1.48 -1.28 -1.09 -0.41     7814     5734
 #>                                     Rhat
 #> delta_new[50° latitude: Vaccinated]    1
 ```
@@ -575,11 +579,11 @@ latitude showing a harmful effect can be calculated as:
 
 colMeans(as.matrix(bcg_predeff_lat) > 0)
 #>  delta_new[0° latitude: Vaccinated] delta_new[10° latitude: Vaccinated] 
-#>                              0.8062                              0.5047 
+#>                              0.7920                              0.5012 
 #> delta_new[20° latitude: Vaccinated] delta_new[30° latitude: Vaccinated] 
-#>                              0.1327                              0.0398 
+#>                              0.1341                              0.0392 
 #> delta_new[40° latitude: Vaccinated] delta_new[50° latitude: Vaccinated] 
-#>                              0.0135                              0.0061
+#>                              0.0154                              0.0078
 ```
 
 So the predictive probability that a new trial carried out at the

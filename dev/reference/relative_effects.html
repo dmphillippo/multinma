@@ -154,32 +154,32 @@ frame of study information.</p>
 <span class="r-in"><span><span class="va">smk_releff_RE</span> <span class="op">&lt;-</span> <span class="fu">relative_effects</span><span class="op">(</span><span class="va">smk_fit_RE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">smk_releff_RE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           mean   sd  2.5%  25%  50%  75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]      1.08 0.42  0.24 0.81 1.08 1.34  1.93     1927</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling] 0.83 0.24  0.37 0.67 0.82 0.99  1.34     1173</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]              0.50 0.40 -0.29 0.24 0.49 0.76  1.32     1990</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]      1.10 0.44  0.27 0.81 1.09 1.38  2.03     1924</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling] 0.84 0.25  0.37 0.67 0.84 1.00  1.35     1147</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]              0.50 0.41 -0.30 0.24 0.49 0.76  1.30     1830</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          2122    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     1735    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  2528    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          2375    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     1549    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]                  2353    1</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">smk_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="relative_effects-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Relative effects for all pairwise comparisons</span></span></span>
 <span class="r-in"><span><span class="fu">relative_effects</span><span class="op">(</span><span class="va">smk_fit_RE</span>, all_contrasts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                  mean   sd  2.5%   25%   50%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]         1.08 0.42  0.24  0.81  1.08</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]    0.83 0.24  0.37  0.67  0.82</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                 0.50 0.40 -0.29  0.24  0.49</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling] -0.25 0.40 -1.03 -0.51 -0.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]              -0.58 0.47 -1.48 -0.90 -0.58</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]         -0.33 0.40 -1.11 -0.58 -0.34</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]         1.10 0.44  0.27  0.81  1.09</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]    0.84 0.25  0.37  0.67  0.84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                 0.50 0.41 -0.30  0.24  0.49</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling] -0.26 0.42 -1.10 -0.53 -0.26</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]              -0.61 0.48 -1.58 -0.93 -0.60</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]         -0.34 0.40 -1.13 -0.60 -0.33</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                   75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]         1.34  1.93     1927     2122</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]    0.99  1.34     1173     1735</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                 0.76  1.32     1990     2528</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]  0.02  0.54     2698     2503</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]              -0.28  0.38     3019     2749</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]         -0.07  0.47     2311     2468</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]         1.38  2.03     1924     2375</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]    1.00  1.35     1147     1549</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. No intervention]                 0.76  1.30     1830     2353</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. Group counselling]  0.01  0.54     2724     2409</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Group counselling]              -0.29  0.35     3153     2804</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help vs. Individual counselling]         -0.08  0.44     2177     2499</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                 Rhat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling vs. No intervention]           1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling vs. No intervention]      1</span>
@@ -191,13 +191,13 @@ frame of study information.</p>
 <span class="r-in"><span><span class="co"># Relative effects against a different reference treatment</span></span></span>
 <span class="r-in"><span><span class="fu">relative_effects</span><span class="op">(</span><span class="va">smk_fit_RE</span>, trt_ref <span class="op">=</span> <span class="st">"Self-help"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                            mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[No intervention]        -0.50 0.40 -1.32 -0.76 -0.49 -0.24  0.29     1990</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]       0.58 0.47 -0.38  0.28  0.58  0.90  1.48     3019</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]  0.33 0.40 -0.47  0.07  0.34  0.58  1.11     2311</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[No intervention]        -0.50 0.41 -1.30 -0.76 -0.49 -0.24  0.30     1830</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]       0.61 0.48 -0.35  0.29  0.60  0.93  1.58     3153</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]  0.34 0.40 -0.44  0.08  0.33  0.60  1.13     2177</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           Tail_ESS Rhat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[No intervention]            2528    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          2749    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     2468    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[No intervention]            2353    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]          2804    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]     2499    1</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Transforming to odds ratios</span></span></span>
 <span class="r-in"><span><span class="co"># We work with the array of relative effects samples</span></span></span>
@@ -210,9 +210,9 @@ frame of study information.</p>
 <span class="r-in"><span><span class="co"># This can then be printed or plotted</span></span></span>
 <span class="r-in"><span><span class="va">smk_OR_RE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]      3.22 1.51 1.27 2.24 2.94 3.82  6.89     1927     2122</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling] 2.37 0.61 1.44 1.96 2.28 2.68  3.80     1173     1735</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]              1.79 0.77 0.75 1.27 1.63 2.14  3.73     1990     2528</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]      3.34 1.76 1.31 2.25 2.97 3.97  7.61     1924     2375</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling] 2.39 0.62 1.45 1.96 2.31 2.71  3.87     1147     1549</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> d[Self-help]              1.79 0.79 0.74 1.27 1.64 2.14  3.67     1830     2353</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           Rhat</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[Group counselling]         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d[Individual counselling]    1</span>

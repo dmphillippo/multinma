@@ -346,314 +346,314 @@ predict(smk_fit_RE)
 #> ---------------------------------------------------------------------- Study: 1 ---- 
 #> 
 #>                                  mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[1: No intervention]        -2.78 0.33 -3.46 -3.00 -2.77 -2.56 -2.17
-#> pred[1: Group counselling]      -1.70 0.51 -2.72 -2.04 -1.71 -1.37 -0.70
-#> pred[1: Individual counselling] -1.95 0.39 -2.73 -2.19 -1.95 -1.70 -1.20
-#> pred[1: Self-help]              -2.28 0.49 -3.24 -2.61 -2.28 -1.96 -1.33
+#> pred[1: No intervention]        -2.78 0.33 -3.44 -2.99 -2.77 -2.56 -2.17
+#> pred[1: Group counselling]      -1.68 0.52 -2.67 -2.03 -1.68 -1.34 -0.60
+#> pred[1: Individual counselling] -1.94 0.39 -2.68 -2.20 -1.94 -1.69 -1.17
+#> pred[1: Self-help]              -2.28 0.51 -3.28 -2.62 -2.28 -1.95 -1.28
 #>                                 Bulk_ESS Tail_ESS Rhat
-#> pred[1: No intervention]            4702     3002    1
-#> pred[1: Group counselling]          2238     2777    1
-#> pred[1: Individual counselling]     2467     2714    1
-#> pred[1: Self-help]                  2663     2915    1
+#> pred[1: No intervention]            5035     2967    1
+#> pred[1: Group counselling]          2575     2222    1
+#> pred[1: Individual counselling]     2547     2456    1
+#> pred[1: Self-help]                  2474     2656    1
 #> 
 #> ---------------------------------------------------------------------- Study: 2 ---- 
 #> 
 #>                                  mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[2: No intervention]        -2.58 0.78 -4.17 -3.07 -2.56 -2.07 -1.08
-#> pred[2: Group counselling]      -1.50 0.76 -3.02 -1.98 -1.49 -1.01 -0.01
-#> pred[2: Individual counselling] -1.74 0.76 -3.23 -2.23 -1.74 -1.26 -0.26
-#> pred[2: Self-help]              -2.08 0.77 -3.67 -2.58 -2.07 -1.58 -0.59
+#> pred[2: No intervention]        -2.54 0.78 -4.12 -3.02 -2.54 -2.03 -1.04
+#> pred[2: Group counselling]      -1.43 0.75 -2.93 -1.92 -1.43 -0.96  0.05
+#> pred[2: Individual counselling] -1.70 0.76 -3.21 -2.19 -1.69 -1.21 -0.21
+#> pred[2: Self-help]              -2.04 0.78 -3.60 -2.55 -2.04 -1.53 -0.44
 #>                                 Bulk_ESS Tail_ESS Rhat
-#> pred[2: No intervention]            2551     2147    1
-#> pred[2: Group counselling]          2816     2393    1
-#> pred[2: Individual counselling]     2942     2735    1
-#> pred[2: Self-help]                  3156     2100    1
+#> pred[2: No intervention]            2639     2638    1
+#> pred[2: Group counselling]          3279     2690    1
+#> pred[2: Individual counselling]     2929     2822    1
+#> pred[2: Self-help]                  3362     2986    1
 #> 
 #> ---------------------------------------------------------------------- Study: 3 ---- 
 #> 
 #>                                  mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[3: No intervention]        -2.14 0.12 -2.38 -2.22 -2.14 -2.06 -1.91
-#> pred[3: Group counselling]      -1.06 0.43 -1.92 -1.34 -1.06 -0.78 -0.19
-#> pred[3: Individual counselling] -1.31 0.26 -1.80 -1.48 -1.31 -1.13 -0.78
-#> pred[3: Self-help]              -1.64 0.41 -2.44 -1.92 -1.65 -1.36 -0.81
+#> pred[3: No intervention]        -2.14 0.12 -2.39 -2.22 -2.14 -2.06 -1.90
+#> pred[3: Group counselling]      -1.04 0.46 -1.90 -1.34 -1.05 -0.76 -0.11
+#> pred[3: Individual counselling] -1.30 0.27 -1.82 -1.48 -1.31 -1.14 -0.75
+#> pred[3: Self-help]              -1.65 0.42 -2.48 -1.93 -1.64 -1.37 -0.81
 #>                                 Bulk_ESS Tail_ESS Rhat
-#> pred[3: No intervention]            6854     2907    1
-#> pred[3: Group counselling]          2055     2160    1
-#> pred[3: Individual counselling]     1365     1995    1
-#> pred[3: Self-help]                  2101     2602    1
+#> pred[3: No intervention]           10078     2794    1
+#> pred[3: Group counselling]          2049     2374    1
+#> pred[3: Individual counselling]     1371     1961    1
+#> pred[3: Self-help]                  1972     2425    1
 #> 
 #> ---------------------------------------------------------------------- Study: 4 ---- 
 #> 
 #>                                  mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[4: No intervention]        -4.05 0.57 -5.29 -4.41 -4.03 -3.66 -3.02
-#> pred[4: Group counselling]      -2.98 0.68 -4.40 -3.40 -2.96 -2.53 -1.68
-#> pred[4: Individual counselling] -3.22 0.58 -4.43 -3.60 -3.20 -2.83 -2.10
-#> pred[4: Self-help]              -3.55 0.67 -4.90 -4.00 -3.53 -3.11 -2.31
+#> pred[4: No intervention]        -4.05 0.56 -5.20 -4.41 -4.03 -3.66 -3.03
+#> pred[4: Group counselling]      -2.95 0.69 -4.34 -3.41 -2.94 -2.47 -1.60
+#> pred[4: Individual counselling] -3.21 0.58 -4.39 -3.58 -3.19 -2.81 -2.12
+#> pred[4: Self-help]              -3.55 0.68 -4.94 -3.99 -3.52 -3.10 -2.27
 #>                                 Bulk_ESS Tail_ESS Rhat
-#> pred[4: No intervention]            4139     2720    1
-#> pred[4: Group counselling]          3332     2450    1
-#> pred[4: Individual counselling]     3683     3051    1
-#> pred[4: Self-help]                  3308     2967    1
+#> pred[4: No intervention]            4478     2698    1
+#> pred[4: Group counselling]          3421     2831    1
+#> pred[4: Individual counselling]     4256     3233    1
+#> pred[4: Self-help]                  3138     2350    1
 #> 
 #> ---------------------------------------------------------------------- Study: 5 ---- 
 #> 
 #>                                  mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[5: No intervention]        -2.16 0.14 -2.45 -2.25 -2.15 -2.06 -1.89
-#> pred[5: Group counselling]      -1.08 0.44 -1.94 -1.38 -1.08 -0.78 -0.21
-#> pred[5: Individual counselling] -1.33 0.28 -1.86 -1.51 -1.32 -1.15 -0.76
-#> pred[5: Self-help]              -1.66 0.42 -2.50 -1.94 -1.67 -1.38 -0.82
+#> pred[5: No intervention]        -2.15 0.14 -2.43 -2.25 -2.15 -2.05 -1.89
+#> pred[5: Group counselling]      -1.05 0.46 -1.91 -1.36 -1.06 -0.76 -0.10
+#> pred[5: Individual counselling] -1.31 0.28 -1.86 -1.50 -1.32 -1.13 -0.74
+#> pred[5: Self-help]              -1.66 0.43 -2.49 -1.93 -1.65 -1.37 -0.81
 #>                                 Bulk_ESS Tail_ESS Rhat
-#> pred[5: No intervention]            6945     3037    1
-#> pred[5: Group counselling]          2070     2182    1
-#> pred[5: Individual counselling]     1443     2111    1
-#> pred[5: Self-help]                  2201     2545    1
+#> pred[5: No intervention]            7861     2879    1
+#> pred[5: Group counselling]          2036     2327    1
+#> pred[5: Individual counselling]     1303     2159    1
+#> pred[5: Self-help]                  2006     2518    1
 #> 
 #> ---------------------------------------------------------------------- Study: 6 ---- 
 #> 
 #>                                  mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[6: No intervention]        -3.42 0.75 -5.08 -3.83 -3.33 -2.91 -2.17
-#> pred[6: Group counselling]      -2.34 0.83 -4.15 -2.82 -2.27 -1.78 -0.87
-#> pred[6: Individual counselling] -2.58 0.73 -4.21 -3.02 -2.51 -2.08 -1.32
-#> pred[6: Self-help]              -2.92 0.81 -4.70 -3.37 -2.87 -2.37 -1.49
+#> pred[6: No intervention]        -3.41 0.71 -4.92 -3.84 -3.35 -2.91 -2.18
+#> pred[6: Group counselling]      -2.30 0.80 -4.03 -2.81 -2.26 -1.76 -0.80
+#> pred[6: Individual counselling] -2.57 0.71 -4.09 -3.00 -2.52 -2.07 -1.35
+#> pred[6: Self-help]              -2.91 0.79 -4.61 -3.40 -2.86 -2.37 -1.52
 #>                                 Bulk_ESS Tail_ESS Rhat
-#> pred[6: No intervention]            3245     2270    1
-#> pred[6: Group counselling]          3360     2266    1
-#> pred[6: Individual counselling]     3417     2215    1
-#> pred[6: Self-help]                  3234     2043    1
+#> pred[6: No intervention]            3799     2249    1
+#> pred[6: Group counselling]          3841     2217    1
+#> pred[6: Individual counselling]     3673     2542    1
+#> pred[6: Self-help]                  3260     2482    1
 #> 
 #> ---------------------------------------------------------------------- Study: 7 ---- 
 #> 
 #>                                  mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[7: No intervention]        -3.01 0.44 -3.94 -3.29 -2.98 -2.71 -2.24
-#> pred[7: Group counselling]      -1.93 0.57 -3.12 -2.30 -1.92 -1.53 -0.86
-#> pred[7: Individual counselling] -2.18 0.46 -3.14 -2.47 -2.16 -1.87 -1.33
-#> pred[7: Self-help]              -2.51 0.57 -3.67 -2.88 -2.49 -2.12 -1.43
+#> pred[7: No intervention]        -3.02 0.45 -3.98 -3.30 -3.00 -2.71 -2.23
+#> pred[7: Group counselling]      -1.92 0.59 -3.10 -2.31 -1.90 -1.52 -0.79
+#> pred[7: Individual counselling] -2.18 0.47 -3.20 -2.47 -2.15 -1.86 -1.33
+#> pred[7: Self-help]              -2.52 0.59 -3.77 -2.89 -2.51 -2.13 -1.45
 #>                                 Bulk_ESS Tail_ESS Rhat
-#> pred[7: No intervention]            4406     2276    1
-#> pred[7: Group counselling]          2902     2446    1
-#> pred[7: Individual counselling]     3154     2415    1
-#> pred[7: Self-help]                  3036     2352    1
+#> pred[7: No intervention]            4114     2659    1
+#> pred[7: Group counselling]          2873     2915    1
+#> pred[7: Individual counselling]     2975     2600    1
+#> pred[7: Self-help]                  2958     2343    1
 #> 
 #> ---------------------------------------------------------------------- Study: 8 ---- 
 #> 
 #>                                  mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[8: No intervention]        -2.69 0.59 -3.97 -3.06 -2.65 -2.28 -1.65
-#> pred[8: Group counselling]      -1.62 0.70 -3.12 -2.06 -1.59 -1.15 -0.30
-#> pred[8: Individual counselling] -1.86 0.59 -3.13 -2.23 -1.82 -1.46 -0.80
-#> pred[8: Self-help]              -2.20 0.69 -3.62 -2.63 -2.17 -1.72 -0.94
+#> pred[8: No intervention]        -2.70 0.61 -4.04 -3.06 -2.65 -2.27 -1.64
+#> pred[8: Group counselling]      -1.59 0.71 -3.10 -2.04 -1.56 -1.11 -0.28
+#> pred[8: Individual counselling] -1.86 0.61 -3.16 -2.24 -1.82 -1.44 -0.75
+#> pred[8: Self-help]              -2.20 0.69 -3.68 -2.62 -2.15 -1.74 -0.93
 #>                                 Bulk_ESS Tail_ESS Rhat
-#> pred[8: No intervention]            3176     2768    1
-#> pred[8: Group counselling]          2915     2319    1
-#> pred[8: Individual counselling]     3376     2434    1
-#> pred[8: Self-help]                  2996     2163    1
+#> pred[8: No intervention]            3843     2423    1
+#> pred[8: Group counselling]          3148     2843    1
+#> pred[8: Individual counselling]     3561     2492    1
+#> pred[8: Self-help]                  3354     2330    1
 #> 
 #> ---------------------------------------------------------------------- Study: 9 ---- 
 #> 
 #>                                  mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[9: No intervention]        -1.84 0.42 -2.72 -2.11 -1.82 -1.55 -1.07
-#> pred[9: Group counselling]      -0.76 0.58 -1.93 -1.13 -0.76 -0.37  0.35
-#> pred[9: Individual counselling] -1.00 0.46 -1.94 -1.30 -1.00 -0.69 -0.10
-#> pred[9: Self-help]              -1.34 0.57 -2.45 -1.71 -1.33 -0.94 -0.26
+#> pred[9: No intervention]        -1.84 0.42 -2.70 -2.11 -1.82 -1.55 -1.07
+#> pred[9: Group counselling]      -0.74 0.60 -1.93 -1.13 -0.75 -0.34  0.45
+#> pred[9: Individual counselling] -1.00 0.47 -1.94 -1.30 -1.00 -0.68 -0.10
+#> pred[9: Self-help]              -1.34 0.58 -2.48 -1.73 -1.33 -0.95 -0.23
 #>                                 Bulk_ESS Tail_ESS Rhat
-#> pred[9: No intervention]            4671     2776    1
-#> pred[9: Group counselling]          2615     2371    1
-#> pred[9: Individual counselling]     2725     2573    1
-#> pred[9: Self-help]                  2622     2836    1
+#> pred[9: No intervention]            5106     2848    1
+#> pred[9: Group counselling]          2872     2757    1
+#> pred[9: Individual counselling]     3062     2685    1
+#> pred[9: Self-help]                  2659     2832    1
 #> 
 #> --------------------------------------------------------------------- Study: 10 ---- 
 #> 
 #>                                   mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[10: No intervention]        -2.08 0.12 -2.32 -2.16 -2.08 -2.00 -1.86
-#> pred[10: Group counselling]      -1.01 0.44 -1.87 -1.29 -1.01 -0.73 -0.12
-#> pred[10: Individual counselling] -1.25 0.27 -1.75 -1.43 -1.26 -1.08 -0.70
-#> pred[10: Self-help]              -1.58 0.41 -2.38 -1.86 -1.59 -1.33 -0.74
+#> pred[10: No intervention]        -2.08 0.12 -2.32 -2.16 -2.08 -2.00 -1.85
+#> pred[10: Group counselling]      -0.98 0.46 -1.84 -1.28 -0.99 -0.70 -0.03
+#> pred[10: Individual counselling] -1.24 0.27 -1.76 -1.43 -1.25 -1.06 -0.69
+#> pred[10: Self-help]              -1.58 0.42 -2.39 -1.85 -1.59 -1.32 -0.74
 #>                                  Bulk_ESS Tail_ESS Rhat
-#> pred[10: No intervention]            7850     2512    1
-#> pred[10: Group counselling]          2112     2197    1
-#> pred[10: Individual counselling]     1372     2117    1
-#> pred[10: Self-help]                  2123     2416    1
+#> pred[10: No intervention]            8825     2537    1
+#> pred[10: Group counselling]          2017     2407    1
+#> pred[10: Individual counselling]     1387     1862    1
+#> pred[10: Self-help]                  1859     2425    1
 #> 
 #> --------------------------------------------------------------------- Study: 11 ---- 
 #> 
 #>                                   mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[11: No intervention]        -3.62 0.23 -4.10 -3.77 -3.61 -3.46 -3.20
-#> pred[11: Group counselling]      -2.55 0.47 -3.47 -2.85 -2.56 -2.24 -1.63
-#> pred[11: Individual counselling] -2.79 0.33 -3.44 -3.01 -2.78 -2.57 -2.15
-#> pred[11: Self-help]              -3.12 0.43 -3.97 -3.40 -3.12 -2.84 -2.27
+#> pred[11: No intervention]        -3.63 0.23 -4.11 -3.78 -3.62 -3.46 -3.19
+#> pred[11: Group counselling]      -2.52 0.49 -3.43 -2.85 -2.53 -2.21 -1.53
+#> pred[11: Individual counselling] -2.79 0.34 -3.45 -3.01 -2.79 -2.57 -2.13
+#> pred[11: Self-help]              -3.13 0.44 -3.99 -3.42 -3.12 -2.85 -2.27
 #>                                  Bulk_ESS Tail_ESS Rhat
-#> pred[11: No intervention]            6283     2985    1
-#> pred[11: Group counselling]          2427     2560    1
-#> pred[11: Individual counselling]     2096     2432    1
-#> pred[11: Self-help]                  2247     2565    1
+#> pred[11: No intervention]            7680     3062    1
+#> pred[11: Group counselling]          2322     2209    1
+#> pred[11: Individual counselling]     1978     2713    1
+#> pred[11: Self-help]                  2165     2512    1
 #> 
 #> --------------------------------------------------------------------- Study: 12 ---- 
 #> 
 #>                                   mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[12: No intervention]        -2.22 0.13 -2.47 -2.31 -2.22 -2.13 -1.97
-#> pred[12: Group counselling]      -1.14 0.44 -2.01 -1.43 -1.14 -0.85 -0.27
-#> pred[12: Individual counselling] -1.39 0.27 -1.91 -1.57 -1.39 -1.21 -0.82
-#> pred[12: Self-help]              -1.72 0.41 -2.53 -2.00 -1.74 -1.45 -0.86
+#> pred[12: No intervention]        -2.22 0.13 -2.48 -2.31 -2.22 -2.13 -1.98
+#> pred[12: Group counselling]      -1.12 0.46 -1.97 -1.42 -1.14 -0.82 -0.16
+#> pred[12: Individual counselling] -1.38 0.27 -1.91 -1.56 -1.39 -1.21 -0.82
+#> pred[12: Self-help]              -1.72 0.42 -2.55 -2.00 -1.73 -1.45 -0.87
 #>                                  Bulk_ESS Tail_ESS Rhat
-#> pred[12: No intervention]            6818     3243    1
-#> pred[12: Group counselling]          2034     2184    1
-#> pred[12: Individual counselling]     1399     2057    1
-#> pred[12: Self-help]                  2096     2440    1
+#> pred[12: No intervention]            7624     2502    1
+#> pred[12: Group counselling]          2043     2308    1
+#> pred[12: Individual counselling]     1339     2064    1
+#> pred[12: Self-help]                  1954     2280    1
 #> 
 #> --------------------------------------------------------------------- Study: 13 ---- 
 #> 
 #>                                   mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[13: No intervention]        -2.68 0.44 -3.59 -2.96 -2.66 -2.38 -1.88
-#> pred[13: Group counselling]      -1.60 0.58 -2.75 -1.99 -1.59 -1.20 -0.50
-#> pred[13: Individual counselling] -1.84 0.47 -2.83 -2.15 -1.83 -1.53 -0.98
-#> pred[13: Self-help]              -2.18 0.57 -3.32 -2.56 -2.18 -1.80 -1.05
+#> pred[13: No intervention]        -2.68 0.45 -3.61 -2.97 -2.66 -2.37 -1.84
+#> pred[13: Group counselling]      -1.57 0.63 -2.76 -2.00 -1.58 -1.16 -0.35
+#> pred[13: Individual counselling] -1.84 0.49 -2.84 -2.15 -1.82 -1.50 -0.89
+#> pred[13: Self-help]              -2.18 0.59 -3.37 -2.56 -2.16 -1.78 -1.06
 #>                                  Bulk_ESS Tail_ESS Rhat
-#> pred[13: No intervention]            4644     3373    1
-#> pred[13: Group counselling]          3193     3544    1
-#> pred[13: Individual counselling]     3387     3379    1
-#> pred[13: Self-help]                  3294     3361    1
+#> pred[13: No intervention]            5320     3097    1
+#> pred[13: Group counselling]          3069     2785    1
+#> pred[13: Individual counselling]     3355     2952    1
+#> pred[13: Self-help]                  3099     2741    1
 #> 
 #> --------------------------------------------------------------------- Study: 14 ---- 
 #> 
 #>                                   mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[14: No intervention]        -2.41 0.23 -2.88 -2.56 -2.40 -2.26 -1.98
-#> pred[14: Group counselling]      -1.33 0.48 -2.24 -1.64 -1.34 -1.02 -0.37
-#> pred[14: Individual counselling] -1.58 0.32 -2.21 -1.79 -1.58 -1.37 -0.93
-#> pred[14: Self-help]              -1.91 0.45 -2.82 -2.21 -1.92 -1.62 -0.99
+#> pred[14: No intervention]        -2.41 0.23 -2.89 -2.56 -2.40 -2.25 -1.98
+#> pred[14: Group counselling]      -1.31 0.50 -2.27 -1.64 -1.32 -0.99 -0.31
+#> pred[14: Individual counselling] -1.57 0.33 -2.22 -1.79 -1.57 -1.36 -0.94
+#> pred[14: Self-help]              -1.91 0.46 -2.85 -2.22 -1.91 -1.62 -0.98
 #>                                  Bulk_ESS Tail_ESS Rhat
-#> pred[14: No intervention]            4980     3103    1
-#> pred[14: Group counselling]          2296     2302    1
-#> pred[14: Individual counselling]     1780     2511    1
-#> pred[14: Self-help]                  2370     2910    1
+#> pred[14: No intervention]            6093     2503    1
+#> pred[14: Group counselling]          2255     2358    1
+#> pred[14: Individual counselling]     1804     2295    1
+#> pred[14: Self-help]                  2232     2317    1
 #> 
 #> --------------------------------------------------------------------- Study: 15 ---- 
 #> 
 #>                                   mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[15: No intervention]        -2.65 0.71 -4.22 -3.08 -2.58 -2.15 -1.41
-#> pred[15: Group counselling]      -1.57 0.69 -3.07 -2.00 -1.52 -1.09 -0.35
-#> pred[15: Individual counselling] -1.82 0.71 -3.39 -2.24 -1.75 -1.33 -0.57
-#> pred[15: Self-help]              -2.15 0.76 -3.75 -2.63 -2.11 -1.63 -0.80
+#> pred[15: No intervention]        -2.69 0.75 -4.30 -3.15 -2.63 -2.17 -1.39
+#> pred[15: Group counselling]      -1.59 0.73 -3.18 -2.03 -1.54 -1.09 -0.31
+#> pred[15: Individual counselling] -1.85 0.75 -3.49 -2.31 -1.79 -1.33 -0.53
+#> pred[15: Self-help]              -2.20 0.80 -3.96 -2.70 -2.14 -1.64 -0.79
 #>                                  Bulk_ESS Tail_ESS Rhat
-#> pred[15: No intervention]            3742     2832    1
-#> pred[15: Group counselling]          3669     2931    1
-#> pred[15: Individual counselling]     3988     2941    1
-#> pred[15: Self-help]                  3711     3017    1
+#> pred[15: No intervention]            3369     2196    1
+#> pred[15: Group counselling]          3425     2668    1
+#> pred[15: Individual counselling]     3446     2481    1
+#> pred[15: Self-help]                  3317     2260    1
 #> 
 #> --------------------------------------------------------------------- Study: 16 ---- 
 #> 
 #>                                   mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[16: No intervention]        -2.62 0.34 -3.34 -2.84 -2.60 -2.39 -1.99
-#> pred[16: Group counselling]      -1.54 0.53 -2.61 -1.89 -1.54 -1.20 -0.51
-#> pred[16: Individual counselling] -1.79 0.41 -2.60 -2.05 -1.79 -1.52 -0.98
-#> pred[16: Self-help]              -2.12 0.48 -3.09 -2.42 -2.12 -1.81 -1.17
+#> pred[16: No intervention]        -2.62 0.34 -3.32 -2.83 -2.60 -2.38 -2.00
+#> pred[16: Group counselling]      -1.51 0.55 -2.57 -1.87 -1.51 -1.15 -0.45
+#> pred[16: Individual counselling] -1.78 0.41 -2.62 -2.04 -1.77 -1.50 -1.00
+#> pred[16: Self-help]              -2.12 0.47 -3.07 -2.43 -2.12 -1.81 -1.19
 #>                                  Bulk_ESS Tail_ESS Rhat
-#> pred[16: No intervention]            6163     2816    1
-#> pred[16: Group counselling]          2694     2766    1
-#> pred[16: Individual counselling]     2767     2886    1
-#> pred[16: Self-help]                  2898     2809    1
+#> pred[16: No intervention]            5719     2751    1
+#> pred[16: Group counselling]          2650     2813    1
+#> pred[16: Individual counselling]     2780     2794    1
+#> pred[16: Self-help]                  2543     2887    1
 #> 
 #> --------------------------------------------------------------------- Study: 17 ---- 
 #> 
 #>                                   mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[17: No intervention]        -2.38 0.11 -2.59 -2.45 -2.38 -2.30 -2.17
-#> pred[17: Group counselling]      -1.30 0.44 -2.17 -1.59 -1.30 -1.02 -0.44
-#> pred[17: Individual counselling] -1.54 0.26 -2.04 -1.72 -1.55 -1.38 -1.01
-#> pred[17: Self-help]              -1.88 0.41 -2.69 -2.15 -1.88 -1.61 -1.06
+#> pred[17: No intervention]        -2.38 0.11 -2.60 -2.45 -2.37 -2.30 -2.17
+#> pred[17: Group counselling]      -1.27 0.46 -2.13 -1.57 -1.28 -0.98 -0.32
+#> pred[17: Individual counselling] -1.54 0.27 -2.06 -1.71 -1.54 -1.37 -1.00
+#> pred[17: Self-help]              -1.88 0.42 -2.71 -2.14 -1.88 -1.61 -1.05
 #>                                  Bulk_ESS Tail_ESS Rhat
-#> pred[17: No intervention]            7542     2893    1
-#> pred[17: Group counselling]          2010     2308    1
-#> pred[17: Individual counselling]     1314     2029    1
-#> pred[17: Self-help]                  2068     2602    1
+#> pred[17: No intervention]            7684     2965    1
+#> pred[17: Group counselling]          2008     2209    1
+#> pred[17: Individual counselling]     1250     1901    1
+#> pred[17: Self-help]                  1892     2389    1
 #> 
 #> --------------------------------------------------------------------- Study: 18 ---- 
 #> 
 #>                                   mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[18: No intervention]        -2.57 0.27 -3.13 -2.75 -2.56 -2.39 -2.07
-#> pred[18: Group counselling]      -1.49 0.50 -2.43 -1.83 -1.50 -1.17 -0.47
-#> pred[18: Individual counselling] -1.74 0.36 -2.42 -1.98 -1.74 -1.49 -1.04
-#> pred[18: Self-help]              -2.07 0.48 -3.00 -2.39 -2.07 -1.76 -1.10
+#> pred[18: No intervention]        -2.57 0.27 -3.10 -2.74 -2.56 -2.39 -2.07
+#> pred[18: Group counselling]      -1.46 0.52 -2.44 -1.81 -1.48 -1.12 -0.38
+#> pred[18: Individual counselling] -1.73 0.36 -2.43 -1.96 -1.73 -1.49 -1.02
+#> pred[18: Self-help]              -2.07 0.48 -3.03 -2.39 -2.06 -1.76 -1.07
 #>                                  Bulk_ESS Tail_ESS Rhat
-#> pred[18: No intervention]            4771     2967    1
-#> pred[18: Group counselling]          2287     2646    1
-#> pred[18: Individual counselling]     1945     2670    1
-#> pred[18: Self-help]                  2501     2793    1
+#> pred[18: No intervention]            6324     3093    1
+#> pred[18: Group counselling]          2418     2511    1
+#> pred[18: Individual counselling]     2083     2582    1
+#> pred[18: Self-help]                  2254     2649    1
 #> 
 #> --------------------------------------------------------------------- Study: 19 ---- 
 #> 
 #>                                   mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[19: No intervention]        -1.90 0.12 -2.13 -1.98 -1.90 -1.82 -1.68
-#> pred[19: Group counselling]      -0.82 0.44 -1.69 -1.11 -0.82 -0.54  0.04
-#> pred[19: Individual counselling] -1.07 0.27 -1.58 -1.24 -1.07 -0.90 -0.53
-#> pred[19: Self-help]              -1.40 0.41 -2.23 -1.67 -1.40 -1.13 -0.55
+#> pred[19: No intervention]        -1.90 0.12 -2.14 -1.98 -1.90 -1.82 -1.66
+#> pred[19: Group counselling]      -0.80 0.46 -1.64 -1.10 -0.81 -0.51  0.17
+#> pred[19: Individual counselling] -1.06 0.27 -1.58 -1.24 -1.07 -0.89 -0.51
+#> pred[19: Self-help]              -1.40 0.42 -2.22 -1.68 -1.40 -1.14 -0.54
 #>                                  Bulk_ESS Tail_ESS Rhat
-#> pred[19: No intervention]            7289     3104    1
-#> pred[19: Group counselling]          2024     2129    1
-#> pred[19: Individual counselling]     1371     2013    1
-#> pred[19: Self-help]                  2112     2576    1
+#> pred[19: No intervention]            8218     3036    1
+#> pred[19: Group counselling]          2015     2425    1
+#> pred[19: Individual counselling]     1358     1988    1
+#> pred[19: Self-help]                  1926     2268    1
 #> 
 #> --------------------------------------------------------------------- Study: 20 ---- 
 #> 
 #>                                   mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[20: No intervention]        -2.80 0.13 -3.05 -2.89 -2.80 -2.72 -2.56
-#> pred[20: Group counselling]      -1.73 0.44 -2.61 -2.02 -1.72 -1.45 -0.86
-#> pred[20: Individual counselling] -1.97 0.27 -2.50 -2.14 -1.98 -1.80 -1.41
-#> pred[20: Self-help]              -2.30 0.41 -3.10 -2.58 -2.31 -2.03 -1.45
+#> pred[20: No intervention]        -2.80 0.13 -3.05 -2.88 -2.80 -2.72 -2.56
+#> pred[20: Group counselling]      -1.70 0.46 -2.56 -2.01 -1.71 -1.41 -0.72
+#> pred[20: Individual counselling] -1.96 0.28 -2.49 -2.15 -1.97 -1.79 -1.39
+#> pred[20: Self-help]              -2.30 0.42 -3.14 -2.58 -2.30 -2.03 -1.47
 #>                                  Bulk_ESS Tail_ESS Rhat
-#> pred[20: No intervention]            7743     3112    1
-#> pred[20: Group counselling]          2034     2354    1
-#> pred[20: Individual counselling]     1370     2062    1
-#> pred[20: Self-help]                  2126     2517    1
+#> pred[20: No intervention]            9148     3163    1
+#> pred[20: Group counselling]          2063     2369    1
+#> pred[20: Individual counselling]     1370     1815    1
+#> pred[20: Self-help]                  2017     2566    1
 #> 
 #> --------------------------------------------------------------------- Study: 21 ---- 
 #> 
 #>                                   mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[21: No intervention]        -1.13 0.81 -2.71 -1.63 -1.12 -0.61  0.46
-#> pred[21: Group counselling]      -0.05 0.86 -1.75 -0.61 -0.06  0.48  1.69
-#> pred[21: Individual counselling] -0.30 0.79 -1.84 -0.79 -0.29  0.20  1.27
-#> pred[21: Self-help]              -0.63 0.79 -2.21 -1.12 -0.64 -0.13  0.94
+#> pred[21: No intervention]        -1.13 0.81 -2.77 -1.64 -1.14 -0.59  0.45
+#> pred[21: Group counselling]      -0.02 0.86 -1.74 -0.58 -0.03  0.53  1.67
+#> pred[21: Individual counselling] -0.29 0.79 -1.88 -0.80 -0.29  0.24  1.32
+#> pred[21: Self-help]              -0.63 0.79 -2.18 -1.12 -0.63 -0.13  0.94
 #>                                  Bulk_ESS Tail_ESS Rhat
-#> pred[21: No intervention]            3014     2654    1
-#> pred[21: Group counselling]          3252     2822    1
-#> pred[21: Individual counselling]     3269     2826    1
-#> pred[21: Self-help]                  3678     2552    1
+#> pred[21: No intervention]            2842     2078    1
+#> pred[21: Group counselling]          3371     2139    1
+#> pred[21: Individual counselling]     3148     2706    1
+#> pred[21: Self-help]                  3594     2481    1
 #> 
 #> --------------------------------------------------------------------- Study: 22 ---- 
 #> 
 #>                                   mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[22: No intervention]        -2.40 0.84 -4.12 -2.91 -2.39 -1.86 -0.76
-#> pred[22: Group counselling]      -1.32 0.78 -2.88 -1.81 -1.31 -0.82  0.22
-#> pred[22: Individual counselling] -1.57 0.84 -3.25 -2.09 -1.56 -1.02  0.10
-#> pred[22: Self-help]              -1.90 0.82 -3.53 -2.41 -1.90 -1.37 -0.34
+#> pred[22: No intervention]        -2.41 0.85 -4.13 -2.96 -2.38 -1.86 -0.78
+#> pred[22: Group counselling]      -1.30 0.79 -2.88 -1.83 -1.29 -0.80  0.25
+#> pred[22: Individual counselling] -1.57 0.84 -3.26 -2.11 -1.55 -1.03  0.07
+#> pred[22: Self-help]              -1.91 0.81 -3.54 -2.44 -1.89 -1.39 -0.36
 #>                                  Bulk_ESS Tail_ESS Rhat
-#> pred[22: No intervention]            2692     2450    1
-#> pred[22: Group counselling]          3652     2867    1
-#> pred[22: Individual counselling]     3024     2591    1
-#> pred[22: Self-help]                  3665     2677    1
+#> pred[22: No intervention]            2937     2308    1
+#> pred[22: Group counselling]          4198     2670    1
+#> pred[22: Individual counselling]     3343     2461    1
+#> pred[22: Self-help]                  4160     2947    1
 #> 
 #> --------------------------------------------------------------------- Study: 23 ---- 
 #> 
 #>                                   mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[23: No intervention]        -2.30 0.82 -3.93 -2.84 -2.29 -1.77 -0.72
-#> pred[23: Group counselling]      -1.23 0.79 -2.80 -1.75 -1.21 -0.70  0.30
-#> pred[23: Individual counselling] -1.47 0.79 -3.05 -1.98 -1.46 -0.96  0.08
-#> pred[23: Self-help]              -1.80 0.85 -3.46 -2.38 -1.80 -1.24 -0.11
+#> pred[23: No intervention]        -2.31 0.83 -3.98 -2.84 -2.31 -1.78 -0.68
+#> pred[23: Group counselling]      -1.20 0.80 -2.75 -1.72 -1.22 -0.69  0.40
+#> pred[23: Individual counselling] -1.47 0.81 -3.07 -1.99 -1.46 -0.96  0.13
+#> pred[23: Self-help]              -1.81 0.86 -3.51 -2.37 -1.81 -1.24 -0.11
 #>                                  Bulk_ESS Tail_ESS Rhat
-#> pred[23: No intervention]            2619     2203    1
-#> pred[23: Group counselling]          3721     2841    1
-#> pred[23: Individual counselling]     3590     2493    1
-#> pred[23: Self-help]                  3469     2589    1
+#> pred[23: No intervention]            2967     2934    1
+#> pred[23: Group counselling]          3970     2882    1
+#> pred[23: Individual counselling]     3611     3006    1
+#> pred[23: Self-help]                  3270     2928    1
 #> 
 #> --------------------------------------------------------------------- Study: 24 ---- 
 #> 
 #>                                   mean   sd  2.5%   25%   50%   75% 97.5%
-#> pred[24: No intervention]        -2.78 0.85 -4.55 -3.32 -2.75 -2.22 -1.10
-#> pred[24: Group counselling]      -1.70 0.83 -3.37 -2.24 -1.69 -1.15 -0.08
-#> pred[24: Individual counselling] -1.95 0.83 -3.64 -2.49 -1.94 -1.41 -0.27
-#> pred[24: Self-help]              -2.28 0.90 -4.06 -2.85 -2.26 -1.71 -0.45
+#> pred[24: No intervention]        -2.80 0.86 -4.56 -3.35 -2.81 -2.23 -1.12
+#> pred[24: Group counselling]      -1.70 0.85 -3.37 -2.26 -1.70 -1.15 -0.03
+#> pred[24: Individual counselling] -1.97 0.84 -3.67 -2.51 -1.96 -1.42 -0.31
+#> pred[24: Self-help]              -2.31 0.91 -4.09 -2.91 -2.30 -1.72 -0.56
 #>                                  Bulk_ESS Tail_ESS Rhat
-#> pred[24: No intervention]            3443     2796    1
-#> pred[24: Group counselling]          3870     2783    1
-#> pred[24: Individual counselling]     4041     2710    1
-#> pred[24: Self-help]                  3725     3025    1
+#> pred[24: No intervention]            3002     2605    1
+#> pred[24: Group counselling]          3702     2822    1
+#> pred[24: Individual counselling]     3738     2786    1
+#> pred[24: Self-help]                  3070     2811    1
 #> 
 
 # Predicted probabilities of success in each study in the network
@@ -661,314 +661,314 @@ predict(smk_fit_RE, type = "response")
 #> ---------------------------------------------------------------------- Study: 1 ---- 
 #> 
 #>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[1: No intervention]        0.06 0.02 0.03 0.05 0.06 0.07  0.10     4702
-#> pred[1: Group counselling]      0.16 0.07 0.06 0.12 0.15 0.20  0.33     2238
-#> pred[1: Individual counselling] 0.13 0.04 0.06 0.10 0.12 0.15  0.23     2467
-#> pred[1: Self-help]              0.10 0.05 0.04 0.07 0.09 0.12  0.21     2663
+#> pred[1: No intervention]        0.06 0.02 0.03 0.05 0.06 0.07  0.10     5035
+#> pred[1: Group counselling]      0.17 0.07 0.06 0.12 0.16 0.21  0.35     2575
+#> pred[1: Individual counselling] 0.13 0.04 0.06 0.10 0.13 0.16  0.24     2547
+#> pred[1: Self-help]              0.10 0.05 0.04 0.07 0.09 0.12  0.22     2474
 #>                                 Tail_ESS Rhat
-#> pred[1: No intervention]            3002    1
-#> pred[1: Group counselling]          2777    1
-#> pred[1: Individual counselling]     2714    1
-#> pred[1: Self-help]                  2915    1
+#> pred[1: No intervention]            2967    1
+#> pred[1: Group counselling]          2222    1
+#> pred[1: Individual counselling]     2456    1
+#> pred[1: Self-help]                  2656    1
 #> 
 #> ---------------------------------------------------------------------- Study: 2 ---- 
 #> 
 #>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[2: No intervention]        0.09 0.06 0.02 0.04 0.07 0.11  0.25     2551
-#> pred[2: Group counselling]      0.21 0.12 0.05 0.12 0.18 0.27  0.50     2816
-#> pred[2: Individual counselling] 0.17 0.10 0.04 0.10 0.15 0.22  0.44     2942
-#> pred[2: Self-help]              0.13 0.09 0.02 0.07 0.11 0.17  0.36     3156
+#> pred[2: No intervention]        0.09 0.07 0.02 0.05 0.07 0.12  0.26     2639
+#> pred[2: Group counselling]      0.22 0.12 0.05 0.13 0.19 0.28  0.51     3279
+#> pred[2: Individual counselling] 0.18 0.11 0.04 0.10 0.16 0.23  0.45     2929
+#> pred[2: Self-help]              0.14 0.09 0.03 0.07 0.12 0.18  0.39     3362
 #>                                 Tail_ESS Rhat
-#> pred[2: No intervention]            2147    1
-#> pred[2: Group counselling]          2393    1
-#> pred[2: Individual counselling]     2735    1
-#> pred[2: Self-help]                  2100    1
+#> pred[2: No intervention]            2638    1
+#> pred[2: Group counselling]          2690    1
+#> pred[2: Individual counselling]     2822    1
+#> pred[2: Self-help]                  2986    1
 #> 
 #> ---------------------------------------------------------------------- Study: 3 ---- 
 #> 
 #>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[3: No intervention]        0.11 0.01 0.08 0.10 0.11 0.11  0.13     6854
-#> pred[3: Group counselling]      0.26 0.08 0.13 0.21 0.26 0.31  0.45     2055
-#> pred[3: Individual counselling] 0.22 0.04 0.14 0.19 0.21 0.24  0.31     1365
-#> pred[3: Self-help]              0.17 0.06 0.08 0.13 0.16 0.20  0.31     2101
+#> pred[3: No intervention]        0.11 0.01 0.08 0.10 0.11 0.11  0.13    10078
+#> pred[3: Group counselling]      0.27 0.09 0.13 0.21 0.26 0.32  0.47     2049
+#> pred[3: Individual counselling] 0.22 0.05 0.14 0.19 0.21 0.24  0.32     1371
+#> pred[3: Self-help]              0.17 0.06 0.08 0.13 0.16 0.20  0.31     1972
 #>                                 Tail_ESS Rhat
-#> pred[3: No intervention]            2907    1
-#> pred[3: Group counselling]          2160    1
-#> pred[3: Individual counselling]     1995    1
-#> pred[3: Self-help]                  2602    1
+#> pred[3: No intervention]            2794    1
+#> pred[3: Group counselling]          2374    1
+#> pred[3: Individual counselling]     1961    1
+#> pred[3: Self-help]                  2425    1
 #> 
 #> ---------------------------------------------------------------------- Study: 4 ---- 
 #> 
 #>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[4: No intervention]        0.02 0.01 0.01 0.01 0.02 0.03  0.05     4139
-#> pred[4: Group counselling]      0.06 0.04 0.01 0.03 0.05 0.07  0.16     3332
-#> pred[4: Individual counselling] 0.04 0.02 0.01 0.03 0.04 0.06  0.11     3683
-#> pred[4: Self-help]              0.03 0.02 0.01 0.02 0.03 0.04  0.09     3308
+#> pred[4: No intervention]        0.02 0.01 0.01 0.01 0.02 0.03  0.05     4478
+#> pred[4: Group counselling]      0.06 0.04 0.01 0.03 0.05 0.08  0.17     3421
+#> pred[4: Individual counselling] 0.04 0.02 0.01 0.03 0.04 0.06  0.11     4256
+#> pred[4: Self-help]              0.03 0.02 0.01 0.02 0.03 0.04  0.09     3138
 #>                                 Tail_ESS Rhat
-#> pred[4: No intervention]            2720    1
-#> pred[4: Group counselling]          2450    1
-#> pred[4: Individual counselling]     3051    1
-#> pred[4: Self-help]                  2967    1
+#> pred[4: No intervention]            2698    1
+#> pred[4: Group counselling]          2831    1
+#> pred[4: Individual counselling]     3233    1
+#> pred[4: Self-help]                  2350    1
 #> 
 #> ---------------------------------------------------------------------- Study: 5 ---- 
 #> 
 #>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[5: No intervention]        0.10 0.01 0.08 0.10 0.10 0.11  0.13     6945
-#> pred[5: Group counselling]      0.26 0.08 0.13 0.20 0.25 0.31  0.45     2070
-#> pred[5: Individual counselling] 0.21 0.05 0.13 0.18 0.21 0.24  0.32     1443
-#> pred[5: Self-help]              0.17 0.06 0.08 0.13 0.16 0.20  0.31     2201
+#> pred[5: No intervention]        0.10 0.01 0.08 0.10 0.10 0.11  0.13     7861
+#> pred[5: Group counselling]      0.27 0.09 0.13 0.20 0.26 0.32  0.47     2036
+#> pred[5: Individual counselling] 0.22 0.05 0.13 0.18 0.21 0.24  0.32     1303
+#> pred[5: Self-help]              0.17 0.06 0.08 0.13 0.16 0.20  0.31     2006
 #>                                 Tail_ESS Rhat
-#> pred[5: No intervention]            3037    1
-#> pred[5: Group counselling]          2182    1
-#> pred[5: Individual counselling]     2111    1
-#> pred[5: Self-help]                  2545    1
+#> pred[5: No intervention]            2879    1
+#> pred[5: Group counselling]          2327    1
+#> pred[5: Individual counselling]     2159    1
+#> pred[5: Self-help]                  2518    1
 #> 
 #> ---------------------------------------------------------------------- Study: 6 ---- 
 #> 
 #>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[6: No intervention]        0.04 0.03 0.01 0.02 0.03 0.05  0.10     3245
-#> pred[6: Group counselling]      0.11 0.07 0.02 0.06 0.09 0.14  0.30     3360
-#> pred[6: Individual counselling] 0.08 0.05 0.01 0.05 0.08 0.11  0.21     3417
-#> pred[6: Self-help]              0.06 0.05 0.01 0.03 0.05 0.09  0.18     3234
+#> pred[6: No intervention]        0.04 0.03 0.01 0.02 0.03 0.05  0.10     3799
+#> pred[6: Group counselling]      0.11 0.08 0.02 0.06 0.09 0.15  0.31     3841
+#> pred[6: Individual counselling] 0.08 0.05 0.02 0.05 0.07 0.11  0.21     3673
+#> pred[6: Self-help]              0.06 0.05 0.01 0.03 0.05 0.09  0.18     3260
 #>                                 Tail_ESS Rhat
-#> pred[6: No intervention]            2270    1
-#> pred[6: Group counselling]          2266    1
-#> pred[6: Individual counselling]     2215    1
-#> pred[6: Self-help]                  2043    1
+#> pred[6: No intervention]            2249    1
+#> pred[6: Group counselling]          2217    1
+#> pred[6: Individual counselling]     2542    1
+#> pred[6: Self-help]                  2482    1
 #> 
 #> ---------------------------------------------------------------------- Study: 7 ---- 
 #> 
 #>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[7: No intervention]        0.05 0.02 0.02 0.04 0.05 0.06  0.10     4406
-#> pred[7: Group counselling]      0.14 0.07 0.04 0.09 0.13 0.18  0.30     2902
-#> pred[7: Individual counselling] 0.11 0.04 0.04 0.08 0.10 0.13  0.21     3154
-#> pred[7: Self-help]              0.08 0.04 0.02 0.05 0.08 0.11  0.19     3036
+#> pred[7: No intervention]        0.05 0.02 0.02 0.04 0.05 0.06  0.10     4114
+#> pred[7: Group counselling]      0.14 0.07 0.04 0.09 0.13 0.18  0.31     2873
+#> pred[7: Individual counselling] 0.11 0.04 0.04 0.08 0.10 0.14  0.21     2975
+#> pred[7: Self-help]              0.08 0.04 0.02 0.05 0.08 0.11  0.19     2958
 #>                                 Tail_ESS Rhat
-#> pred[7: No intervention]            2276    1
-#> pred[7: Group counselling]          2446    1
-#> pred[7: Individual counselling]     2415    1
-#> pred[7: Self-help]                  2352    1
+#> pred[7: No intervention]            2659    1
+#> pred[7: Group counselling]          2915    1
+#> pred[7: Individual counselling]     2600    1
+#> pred[7: Self-help]                  2343    1
 #> 
 #> ---------------------------------------------------------------------- Study: 8 ---- 
 #> 
 #>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[8: No intervention]        0.07 0.04 0.02 0.04 0.07 0.09  0.16     3176
-#> pred[8: Group counselling]      0.19 0.10 0.04 0.11 0.17 0.24  0.43     2915
-#> pred[8: Individual counselling] 0.15 0.07 0.04 0.10 0.14 0.19  0.31     3376
-#> pred[8: Self-help]              0.12 0.07 0.03 0.07 0.10 0.15  0.28     2996
+#> pred[8: No intervention]        0.07 0.04 0.02 0.04 0.07 0.09  0.16     3843
+#> pred[8: Group counselling]      0.19 0.10 0.04 0.11 0.17 0.25  0.43     3148
+#> pred[8: Individual counselling] 0.15 0.07 0.04 0.10 0.14 0.19  0.32     3561
+#> pred[8: Self-help]              0.12 0.07 0.02 0.07 0.10 0.15  0.28     3354
 #>                                 Tail_ESS Rhat
-#> pred[8: No intervention]            2768    1
-#> pred[8: Group counselling]          2319    1
-#> pred[8: Individual counselling]     2434    1
-#> pred[8: Self-help]                  2163    1
+#> pred[8: No intervention]            2423    1
+#> pred[8: Group counselling]          2843    1
+#> pred[8: Individual counselling]     2492    1
+#> pred[8: Self-help]                  2330    1
 #> 
 #> ---------------------------------------------------------------------- Study: 9 ---- 
 #> 
 #>                                 mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[9: No intervention]        0.14 0.05 0.06 0.11 0.14 0.17  0.26     4671
-#> pred[9: Group counselling]      0.33 0.12 0.13 0.24 0.32 0.41  0.59     2615
-#> pred[9: Individual counselling] 0.28 0.09 0.13 0.21 0.27 0.33  0.48     2725
-#> pred[9: Self-help]              0.22 0.09 0.08 0.15 0.21 0.28  0.43     2622
+#> pred[9: No intervention]        0.14 0.05 0.06 0.11 0.14 0.18  0.26     5106
+#> pred[9: Group counselling]      0.34 0.13 0.13 0.24 0.32 0.42  0.61     2872
+#> pred[9: Individual counselling] 0.28 0.09 0.13 0.21 0.27 0.34  0.48     3062
+#> pred[9: Self-help]              0.22 0.10 0.08 0.15 0.21 0.28  0.44     2659
 #>                                 Tail_ESS Rhat
-#> pred[9: No intervention]            2776    1
-#> pred[9: Group counselling]          2371    1
-#> pred[9: Individual counselling]     2573    1
-#> pred[9: Self-help]                  2836    1
+#> pred[9: No intervention]            2848    1
+#> pred[9: Group counselling]          2757    1
+#> pred[9: Individual counselling]     2685    1
+#> pred[9: Self-help]                  2832    1
 #> 
 #> --------------------------------------------------------------------- Study: 10 ---- 
 #> 
 #>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[10: No intervention]        0.11 0.01 0.09 0.10 0.11 0.12  0.13     7850
-#> pred[10: Group counselling]      0.28 0.09 0.13 0.22 0.27 0.33  0.47     2112
-#> pred[10: Individual counselling] 0.23 0.05 0.15 0.19 0.22 0.25  0.33     1372
-#> pred[10: Self-help]              0.18 0.06 0.08 0.14 0.17 0.21  0.32     2123
+#> pred[10: No intervention]        0.11 0.01 0.09 0.10 0.11 0.12  0.14     8825
+#> pred[10: Group counselling]      0.28 0.09 0.14 0.22 0.27 0.33  0.49     2017
+#> pred[10: Individual counselling] 0.23 0.05 0.15 0.19 0.22 0.26  0.33     1387
+#> pred[10: Self-help]              0.18 0.06 0.08 0.14 0.17 0.21  0.32     1859
 #>                                  Tail_ESS Rhat
-#> pred[10: No intervention]            2512    1
-#> pred[10: Group counselling]          2197    1
-#> pred[10: Individual counselling]     2117    1
-#> pred[10: Self-help]                  2416    1
+#> pred[10: No intervention]            2537    1
+#> pred[10: Group counselling]          2407    1
+#> pred[10: Individual counselling]     1862    1
+#> pred[10: Self-help]                  2425    1
 #> 
 #> --------------------------------------------------------------------- Study: 11 ---- 
 #> 
 #>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[11: No intervention]        0.03 0.01 0.02 0.02 0.03 0.03  0.04     6283
-#> pred[11: Group counselling]      0.08 0.04 0.03 0.05 0.07 0.10  0.16     2427
-#> pred[11: Individual counselling] 0.06 0.02 0.03 0.05 0.06 0.07  0.10     2096
-#> pred[11: Self-help]              0.05 0.02 0.02 0.03 0.04 0.05  0.09     2247
+#> pred[11: No intervention]        0.03 0.01 0.02 0.02 0.03 0.03  0.04     7680
+#> pred[11: Group counselling]      0.08 0.04 0.03 0.05 0.07 0.10  0.18     2322
+#> pred[11: Individual counselling] 0.06 0.02 0.03 0.05 0.06 0.07  0.11     1978
+#> pred[11: Self-help]              0.05 0.02 0.02 0.03 0.04 0.05  0.09     2165
 #>                                  Tail_ESS Rhat
-#> pred[11: No intervention]            2985    1
-#> pred[11: Group counselling]          2560    1
-#> pred[11: Individual counselling]     2432    1
-#> pred[11: Self-help]                  2565    1
+#> pred[11: No intervention]            3062    1
+#> pred[11: Group counselling]          2209    1
+#> pred[11: Individual counselling]     2713    1
+#> pred[11: Self-help]                  2512    1
 #> 
 #> --------------------------------------------------------------------- Study: 12 ---- 
 #> 
 #>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[12: No intervention]        0.10 0.01 0.08 0.09 0.10 0.11  0.12     6818
-#> pred[12: Group counselling]      0.25 0.08 0.12 0.19 0.24 0.30  0.43     2034
-#> pred[12: Individual counselling] 0.20 0.04 0.13 0.17 0.20 0.23  0.31     1399
-#> pred[12: Self-help]              0.16 0.06 0.07 0.12 0.15 0.19  0.30     2096
+#> pred[12: No intervention]        0.10 0.01 0.08 0.09 0.10 0.11  0.12     7624
+#> pred[12: Group counselling]      0.26 0.09 0.12 0.19 0.24 0.30  0.46     2043
+#> pred[12: Individual counselling] 0.20 0.04 0.13 0.17 0.20 0.23  0.31     1339
+#> pred[12: Self-help]              0.16 0.06 0.07 0.12 0.15 0.19  0.29     1954
 #>                                  Tail_ESS Rhat
-#> pred[12: No intervention]            3243    1
-#> pred[12: Group counselling]          2184    1
-#> pred[12: Individual counselling]     2057    1
-#> pred[12: Self-help]                  2440    1
+#> pred[12: No intervention]            2502    1
+#> pred[12: Group counselling]          2308    1
+#> pred[12: Individual counselling]     2064    1
+#> pred[12: Self-help]                  2280    1
 #> 
 #> --------------------------------------------------------------------- Study: 13 ---- 
 #> 
 #>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[13: No intervention]        0.07 0.03 0.03 0.05 0.07 0.08  0.13     4644
-#> pred[13: Group counselling]      0.18 0.08 0.06 0.12 0.17 0.23  0.38     3193
-#> pred[13: Individual counselling] 0.15 0.06 0.06 0.10 0.14 0.18  0.27     3387
-#> pred[13: Self-help]              0.11 0.06 0.03 0.07 0.10 0.14  0.26     3294
+#> pred[13: No intervention]        0.07 0.03 0.03 0.05 0.07 0.09  0.14     5320
+#> pred[13: Group counselling]      0.19 0.09 0.06 0.12 0.17 0.24  0.41     3069
+#> pred[13: Individual counselling] 0.15 0.06 0.06 0.10 0.14 0.18  0.29     3355
+#> pred[13: Self-help]              0.11 0.06 0.03 0.07 0.10 0.14  0.26     3099
 #>                                  Tail_ESS Rhat
-#> pred[13: No intervention]            3373    1
-#> pred[13: Group counselling]          3544    1
-#> pred[13: Individual counselling]     3379    1
-#> pred[13: Self-help]                  3361    1
+#> pred[13: No intervention]            3097    1
+#> pred[13: Group counselling]          2785    1
+#> pred[13: Individual counselling]     2952    1
+#> pred[13: Self-help]                  2741    1
 #> 
 #> --------------------------------------------------------------------- Study: 14 ---- 
 #> 
 #>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[14: No intervention]        0.08 0.02 0.05 0.07 0.08 0.09  0.12     4980
-#> pred[14: Group counselling]      0.22 0.08 0.10 0.16 0.21 0.26  0.41     2296
-#> pred[14: Individual counselling] 0.18 0.05 0.10 0.14 0.17 0.20  0.28     1780
-#> pred[14: Self-help]              0.14 0.05 0.06 0.10 0.13 0.17  0.27     2370
+#> pred[14: No intervention]        0.08 0.02 0.05 0.07 0.08 0.10  0.12     6093
+#> pred[14: Group counselling]      0.22 0.09 0.09 0.16 0.21 0.27  0.42     2255
+#> pred[14: Individual counselling] 0.18 0.05 0.10 0.14 0.17 0.20  0.28     1804
+#> pred[14: Self-help]              0.14 0.06 0.05 0.10 0.13 0.17  0.27     2232
 #>                                  Tail_ESS Rhat
-#> pred[14: No intervention]            3103    1
-#> pred[14: Group counselling]          2302    1
-#> pred[14: Individual counselling]     2511    1
-#> pred[14: Self-help]                  2910    1
+#> pred[14: No intervention]            2503    1
+#> pred[14: Group counselling]          2358    1
+#> pred[14: Individual counselling]     2295    1
+#> pred[14: Self-help]                  2317    1
 #> 
 #> --------------------------------------------------------------------- Study: 15 ---- 
 #> 
 #>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[15: No intervention]        0.08 0.05 0.01 0.04 0.07 0.10  0.20     3742
-#> pred[15: Group counselling]      0.19 0.10 0.04 0.12 0.18 0.25  0.41     3669
-#> pred[15: Individual counselling] 0.16 0.09 0.03 0.10 0.15 0.21  0.36     3988
-#> pred[15: Self-help]              0.12 0.08 0.02 0.07 0.11 0.16  0.31     3711
+#> pred[15: No intervention]        0.08 0.05 0.01 0.04 0.07 0.10  0.20     3369
+#> pred[15: Group counselling]      0.19 0.10 0.04 0.12 0.18 0.25  0.42     3425
+#> pred[15: Individual counselling] 0.16 0.09 0.03 0.09 0.14 0.21  0.37     3446
+#> pred[15: Self-help]              0.12 0.08 0.02 0.06 0.11 0.16  0.31     3317
 #>                                  Tail_ESS Rhat
-#> pred[15: No intervention]            2832    1
-#> pred[15: Group counselling]          2931    1
-#> pred[15: Individual counselling]     2941    1
-#> pred[15: Self-help]                  3017    1
+#> pred[15: No intervention]            2196    1
+#> pred[15: Group counselling]          2668    1
+#> pred[15: Individual counselling]     2481    1
+#> pred[15: Self-help]                  2260    1
 #> 
 #> --------------------------------------------------------------------- Study: 16 ---- 
 #> 
 #>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[16: No intervention]        0.07 0.02 0.03 0.06 0.07 0.08  0.12     6163
-#> pred[16: Group counselling]      0.19 0.08 0.07 0.13 0.18 0.23  0.38     2694
-#> pred[16: Individual counselling] 0.15 0.05 0.07 0.11 0.14 0.18  0.27     2767
-#> pred[16: Self-help]              0.12 0.05 0.04 0.08 0.11 0.14  0.24     2898
+#> pred[16: No intervention]        0.07 0.02 0.03 0.06 0.07 0.08  0.12     5719
+#> pred[16: Group counselling]      0.19 0.08 0.07 0.13 0.18 0.24  0.39     2650
+#> pred[16: Individual counselling] 0.15 0.05 0.07 0.12 0.15 0.18  0.27     2780
+#> pred[16: Self-help]              0.12 0.05 0.04 0.08 0.11 0.14  0.23     2543
 #>                                  Tail_ESS Rhat
-#> pred[16: No intervention]            2816    1
-#> pred[16: Group counselling]          2766    1
-#> pred[16: Individual counselling]     2886    1
-#> pred[16: Self-help]                  2809    1
+#> pred[16: No intervention]            2751    1
+#> pred[16: Group counselling]          2813    1
+#> pred[16: Individual counselling]     2794    1
+#> pred[16: Self-help]                  2887    1
 #> 
 #> --------------------------------------------------------------------- Study: 17 ---- 
 #> 
 #>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[17: No intervention]        0.09 0.01 0.07 0.08 0.09 0.09  0.10     7542
-#> pred[17: Group counselling]      0.22 0.07 0.10 0.17 0.21 0.27  0.39     2010
-#> pred[17: Individual counselling] 0.18 0.04 0.12 0.15 0.17 0.20  0.27     1314
-#> pred[17: Self-help]              0.14 0.05 0.06 0.10 0.13 0.17  0.26     2068
+#> pred[17: No intervention]        0.09 0.01 0.07 0.08 0.09 0.09  0.10     7684
+#> pred[17: Group counselling]      0.23 0.08 0.11 0.17 0.22 0.27  0.42     2008
+#> pred[17: Individual counselling] 0.18 0.04 0.11 0.15 0.18 0.20  0.27     1250
+#> pred[17: Self-help]              0.14 0.05 0.06 0.11 0.13 0.17  0.26     1892
 #>                                  Tail_ESS Rhat
-#> pred[17: No intervention]            2893    1
-#> pred[17: Group counselling]          2308    1
-#> pred[17: Individual counselling]     2029    1
-#> pred[17: Self-help]                  2602    1
+#> pred[17: No intervention]            2965    1
+#> pred[17: Group counselling]          2209    1
+#> pred[17: Individual counselling]     1901    1
+#> pred[17: Self-help]                  2389    1
 #> 
 #> --------------------------------------------------------------------- Study: 18 ---- 
 #> 
 #>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[18: No intervention]        0.07 0.02 0.04 0.06 0.07 0.08  0.11     4771
-#> pred[18: Group counselling]      0.19 0.08 0.08 0.14 0.18 0.24  0.38     2287
-#> pred[18: Individual counselling] 0.16 0.05 0.08 0.12 0.15 0.18  0.26     1945
-#> pred[18: Self-help]              0.12 0.05 0.05 0.08 0.11 0.15  0.25     2501
+#> pred[18: No intervention]        0.07 0.02 0.04 0.06 0.07 0.08  0.11     6324
+#> pred[18: Group counselling]      0.20 0.08 0.08 0.14 0.19 0.25  0.41     2418
+#> pred[18: Individual counselling] 0.16 0.05 0.08 0.12 0.15 0.18  0.27     2083
+#> pred[18: Self-help]              0.12 0.05 0.05 0.08 0.11 0.15  0.26     2254
 #>                                  Tail_ESS Rhat
-#> pred[18: No intervention]            2967    1
-#> pred[18: Group counselling]          2646    1
-#> pred[18: Individual counselling]     2670    1
-#> pred[18: Self-help]                  2793    1
+#> pred[18: No intervention]            3093    1
+#> pred[18: Group counselling]          2511    1
+#> pred[18: Individual counselling]     2582    1
+#> pred[18: Self-help]                  2649    1
 #> 
 #> --------------------------------------------------------------------- Study: 19 ---- 
 #> 
 #>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[19: No intervention]        0.13 0.01 0.11 0.12 0.13 0.14  0.16     7289
-#> pred[19: Group counselling]      0.31 0.09 0.16 0.25 0.31 0.37  0.51     2024
-#> pred[19: Individual counselling] 0.26 0.05 0.17 0.22 0.26 0.29  0.37     1371
-#> pred[19: Self-help]              0.21 0.07 0.10 0.16 0.20 0.24  0.37     2112
+#> pred[19: No intervention]        0.13 0.01 0.10 0.12 0.13 0.14  0.16     8218
+#> pred[19: Group counselling]      0.32 0.10 0.16 0.25 0.31 0.37  0.54     2015
+#> pred[19: Individual counselling] 0.26 0.05 0.17 0.22 0.26 0.29  0.38     1358
+#> pred[19: Self-help]              0.21 0.07 0.10 0.16 0.20 0.24  0.37     1926
 #>                                  Tail_ESS Rhat
-#> pred[19: No intervention]            3104    1
-#> pred[19: Group counselling]          2129    1
-#> pred[19: Individual counselling]     2013    1
-#> pred[19: Self-help]                  2576    1
+#> pred[19: No intervention]            3036    1
+#> pred[19: Group counselling]          2425    1
+#> pred[19: Individual counselling]     1988    1
+#> pred[19: Self-help]                  2268    1
 #> 
 #> --------------------------------------------------------------------- Study: 20 ---- 
 #> 
 #>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[20: No intervention]        0.06 0.01 0.05 0.05 0.06 0.06  0.07     7743
-#> pred[20: Group counselling]      0.16 0.06 0.07 0.12 0.15 0.19  0.30     2034
+#> pred[20: No intervention]        0.06 0.01 0.05 0.05 0.06 0.06  0.07     9148
+#> pred[20: Group counselling]      0.16 0.07 0.07 0.12 0.15 0.20  0.33     2063
 #> pred[20: Individual counselling] 0.13 0.03 0.08 0.10 0.12 0.14  0.20     1370
-#> pred[20: Self-help]              0.10 0.04 0.04 0.07 0.09 0.12  0.19     2126
+#> pred[20: Self-help]              0.10 0.04 0.04 0.07 0.09 0.12  0.19     2017
 #>                                  Tail_ESS Rhat
-#> pred[20: No intervention]            3112    1
-#> pred[20: Group counselling]          2354    1
-#> pred[20: Individual counselling]     2062    1
-#> pred[20: Self-help]                  2517    1
+#> pred[20: No intervention]            3163    1
+#> pred[20: Group counselling]          2369    1
+#> pred[20: Individual counselling]     1815    1
+#> pred[20: Self-help]                  2566    1
 #> 
 #> --------------------------------------------------------------------- Study: 21 ---- 
 #> 
 #>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[21: No intervention]        0.27 0.14 0.06 0.16 0.25 0.35  0.61     3014
-#> pred[21: Group counselling]      0.49 0.18 0.15 0.35 0.49 0.62  0.84     3252
-#> pred[21: Individual counselling] 0.43 0.17 0.14 0.31 0.43 0.55  0.78     3269
-#> pred[21: Self-help]              0.36 0.16 0.10 0.25 0.34 0.47  0.72     3678
+#> pred[21: No intervention]        0.27 0.14 0.06 0.16 0.24 0.36  0.61     2842
+#> pred[21: Group counselling]      0.49 0.18 0.15 0.36 0.49 0.63  0.84     3371
+#> pred[21: Individual counselling] 0.44 0.17 0.13 0.31 0.43 0.56  0.79     3148
+#> pred[21: Self-help]              0.36 0.16 0.10 0.25 0.35 0.47  0.72     3594
 #>                                  Tail_ESS Rhat
-#> pred[21: No intervention]            2654    1
-#> pred[21: Group counselling]          2822    1
-#> pred[21: Individual counselling]     2826    1
-#> pred[21: Self-help]                  2552    1
+#> pred[21: No intervention]            2078    1
+#> pred[21: Group counselling]          2139    1
+#> pred[21: Individual counselling]     2706    1
+#> pred[21: Self-help]                  2481    1
 #> 
 #> --------------------------------------------------------------------- Study: 22 ---- 
 #> 
 #>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[22: No intervention]        0.11 0.08 0.02 0.05 0.08 0.14  0.32     2692
-#> pred[22: Group counselling]      0.24 0.13 0.05 0.14 0.21 0.31  0.55     3652
-#> pred[22: Individual counselling] 0.20 0.13 0.04 0.11 0.17 0.26  0.53     3024
-#> pred[22: Self-help]              0.16 0.10 0.03 0.08 0.13 0.20  0.42     3665
+#> pred[22: No intervention]        0.10 0.08 0.02 0.05 0.08 0.13  0.31     2937
+#> pred[22: Group counselling]      0.24 0.13 0.05 0.14 0.22 0.31  0.56     4198
+#> pred[22: Individual counselling] 0.20 0.12 0.04 0.11 0.17 0.26  0.52     3343
+#> pred[22: Self-help]              0.15 0.10 0.03 0.08 0.13 0.20  0.41     4160
 #>                                  Tail_ESS Rhat
-#> pred[22: No intervention]            2450    1
-#> pred[22: Group counselling]          2867    1
-#> pred[22: Individual counselling]     2591    1
-#> pred[22: Self-help]                  2677    1
+#> pred[22: No intervention]            2308    1
+#> pred[22: Group counselling]          2670    1
+#> pred[22: Individual counselling]     2461    1
+#> pred[22: Self-help]                  2947    1
 #> 
 #> --------------------------------------------------------------------- Study: 23 ---- 
 #> 
 #>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[23: No intervention]        0.11 0.08 0.02 0.06 0.09 0.15  0.33     2619
-#> pred[23: Group counselling]      0.25 0.14 0.06 0.15 0.23 0.33  0.58     3721
-#> pred[23: Individual counselling] 0.21 0.12 0.05 0.12 0.19 0.28  0.52     3590
-#> pred[23: Self-help]              0.17 0.12 0.03 0.08 0.14 0.22  0.47     3469
+#> pred[23: No intervention]        0.11 0.08 0.02 0.06 0.09 0.14  0.34     2967
+#> pred[23: Group counselling]      0.26 0.14 0.06 0.15 0.23 0.33  0.60     3970
+#> pred[23: Individual counselling] 0.21 0.13 0.04 0.12 0.19 0.28  0.53     3611
+#> pred[23: Self-help]              0.17 0.12 0.03 0.09 0.14 0.22  0.47     3270
 #>                                  Tail_ESS Rhat
-#> pred[23: No intervention]            2203    1
-#> pred[23: Group counselling]          2841    1
-#> pred[23: Individual counselling]     2493    1
-#> pred[23: Self-help]                  2589    1
+#> pred[23: No intervention]            2934    1
+#> pred[23: Group counselling]          2882    1
+#> pred[23: Individual counselling]     3006    1
+#> pred[23: Self-help]                  2928    1
 #> 
 #> --------------------------------------------------------------------- Study: 24 ---- 
 #> 
 #>                                  mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
-#> pred[24: No intervention]        0.08 0.06 0.01 0.03 0.06 0.10  0.25     3443
-#> pred[24: Group counselling]      0.18 0.12 0.03 0.10 0.16 0.24  0.48     3870
-#> pred[24: Individual counselling] 0.15 0.10 0.03 0.08 0.13 0.20  0.43     4041
-#> pred[24: Self-help]              0.12 0.10 0.02 0.05 0.09 0.15  0.39     3725
+#> pred[24: No intervention]        0.08 0.06 0.01 0.03 0.06 0.10  0.25     3002
+#> pred[24: Group counselling]      0.18 0.12 0.03 0.09 0.15 0.24  0.49     3702
+#> pred[24: Individual counselling] 0.15 0.10 0.02 0.08 0.12 0.19  0.42     3738
+#> pred[24: Self-help]              0.12 0.10 0.02 0.05 0.09 0.15  0.36     3070
 #>                                  Tail_ESS Rhat
-#> pred[24: No intervention]            2796    1
-#> pred[24: Group counselling]          2783    1
-#> pred[24: Individual counselling]     2710    1
-#> pred[24: Self-help]                  3025    1
+#> pred[24: No intervention]            2605    1
+#> pred[24: Group counselling]          2822    1
+#> pred[24: Individual counselling]     2786    1
+#> pred[24: Self-help]                  2811    1
 #> 
 
 # Predicted probabilities in a population with 67 observed events out of 566
@@ -981,14 +981,14 @@ predict(smk_fit_RE, type = "response")
                         type = "response"))
 #>                              mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
 #> pred[No intervention]        0.12 0.01 0.09 0.11 0.12 0.13  0.15     4260
-#> pred[Group counselling]      0.29 0.09 0.14 0.23 0.28 0.34  0.48     1982
-#> pred[Individual counselling] 0.24 0.05 0.15 0.20 0.23 0.27  0.35     1446
-#> pred[Self-help]              0.19 0.06 0.09 0.14 0.18 0.23  0.34     2165
+#> pred[Group counselling]      0.29 0.09 0.14 0.23 0.28 0.35  0.51     1990
+#> pred[Individual counselling] 0.24 0.05 0.15 0.20 0.23 0.27  0.36     1399
+#> pred[Self-help]              0.19 0.06 0.09 0.14 0.18 0.22  0.33     1929
 #>                              Tail_ESS Rhat
 #> pred[No intervention]            4099    1
-#> pred[Group counselling]          2350    1
-#> pred[Individual counselling]     2128    1
-#> pred[Self-help]                  2657    1
+#> pred[Group counselling]          2480    1
+#> pred[Individual counselling]     1872    1
+#> pred[Self-help]                  2534    1
 plot(smk_pred_RE, ref_line = c(0, 1))
 
 
@@ -1002,14 +1002,14 @@ plot(smk_pred_RE, ref_line = c(0, 1))
                          type = "response"))
 #>                              mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
 #> pred[No intervention]        0.12 0.01 0.10 0.11 0.12 0.13  0.15     3990
-#> pred[Group counselling]      0.29 0.09 0.15 0.23 0.28 0.35  0.49     2088
-#> pred[Individual counselling] 0.24 0.05 0.16 0.21 0.24 0.27  0.35     1349
-#> pred[Self-help]              0.19 0.06 0.09 0.14 0.18 0.23  0.34     2098
+#> pred[Group counselling]      0.30 0.09 0.15 0.23 0.29 0.35  0.51     2167
+#> pred[Individual counselling] 0.24 0.05 0.15 0.21 0.24 0.27  0.36     1417
+#> pred[Self-help]              0.19 0.07 0.09 0.14 0.18 0.23  0.34     1965
 #>                              Tail_ESS Rhat
 #> pred[No intervention]            3834    1
-#> pred[Group counselling]          2173    1
-#> pred[Individual counselling]     2111    1
-#> pred[Self-help]                  2591    1
+#> pred[Group counselling]          2241    1
+#> pred[Individual counselling]     2070    1
+#> pred[Self-help]                  2378    1
 plot(smk_pred_RE2, ref_line = c(0, 1))
 
 # }

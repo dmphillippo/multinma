@@ -508,7 +508,7 @@ method:</p>
 <span><span class="co">#&gt; d[SEC_300]                              2.68  6502    1</span></span>
 <span><span class="co">#&gt; lp__                                -1570.45  1745    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:42:16 2026.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:14:00 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -573,7 +573,7 @@ except now with <code>trt_effects = "random"</code>.</p>
 <span>                  init_r <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>                  QR <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: Setting "PBO" as the network reference treatment.</span></span>
-<span><span class="co">#&gt; Warning: There were 6 divergent transitions after warmup. See</span></span>
+<span><span class="co">#&gt; Warning: There were 9 divergent transitions after warmup. See</span></span>
 <span><span class="co">#&gt; https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</span></span>
 <span><span class="co">#&gt; to find out why this is a problem and how to eliminate them.</span></span>
 <span><span class="co">#&gt; Warning: Examine the pairs() plot to diagnose sampling problems</span></span></code></pre></div>
@@ -592,52 +592,52 @@ method:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                                         mean se_mean   sd     2.5%      25%      50%      75%</span></span>
 <span><span class="co">#&gt; beta[durnpso]                           0.05    0.00 0.06    -0.07     0.01     0.05     0.09</span></span>
-<span><span class="co">#&gt; beta[prevsys]                          -0.13    0.00 0.16    -0.44    -0.23    -0.13    -0.02</span></span>
-<span><span class="co">#&gt; beta[bsa]                              -0.11    0.01 0.44    -1.00    -0.41    -0.10     0.18</span></span>
-<span><span class="co">#&gt; beta[weight]                            0.04    0.00 0.03    -0.01     0.03     0.04     0.06</span></span>
-<span><span class="co">#&gt; beta[psa]                              -0.06    0.00 0.17    -0.40    -0.17    -0.06     0.05</span></span>
-<span><span class="co">#&gt; beta[durnpso:.trtclassTNFa blocker]    -0.03    0.00 0.07    -0.17    -0.08    -0.03     0.02</span></span>
-<span><span class="co">#&gt; beta[durnpso:.trtclassIL blocker]      -0.01    0.00 0.07    -0.15    -0.06    -0.01     0.03</span></span>
-<span><span class="co">#&gt; beta[prevsys:.trtclassTNFa blocker]     0.18    0.00 0.19    -0.18     0.06     0.18     0.31</span></span>
-<span><span class="co">#&gt; beta[prevsys:.trtclassIL blocker]       0.05    0.00 0.18    -0.30    -0.06     0.05     0.17</span></span>
-<span><span class="co">#&gt; beta[bsa:.trtclassTNFa blocker]         0.10    0.01 0.52    -0.93    -0.25     0.09     0.42</span></span>
-<span><span class="co">#&gt; beta[bsa:.trtclassIL blocker]           0.35    0.01 0.49    -0.61     0.02     0.34     0.67</span></span>
+<span><span class="co">#&gt; beta[prevsys]                          -0.13    0.00 0.16    -0.43    -0.24    -0.13    -0.02</span></span>
+<span><span class="co">#&gt; beta[bsa]                              -0.10    0.01 0.46    -1.00    -0.42    -0.08     0.21</span></span>
+<span><span class="co">#&gt; beta[weight]                            0.04    0.00 0.03    -0.01     0.03     0.05     0.06</span></span>
+<span><span class="co">#&gt; beta[psa]                              -0.06    0.00 0.17    -0.40    -0.17    -0.06     0.06</span></span>
+<span><span class="co">#&gt; beta[durnpso:.trtclassTNFa blocker]    -0.04    0.00 0.07    -0.18    -0.08    -0.03     0.01</span></span>
+<span><span class="co">#&gt; beta[durnpso:.trtclassIL blocker]      -0.02    0.00 0.07    -0.15    -0.06    -0.02     0.03</span></span>
+<span><span class="co">#&gt; beta[prevsys:.trtclassTNFa blocker]     0.19    0.00 0.19    -0.18     0.06     0.19     0.32</span></span>
+<span><span class="co">#&gt; beta[prevsys:.trtclassIL blocker]       0.05    0.00 0.17    -0.28    -0.07     0.05     0.17</span></span>
+<span><span class="co">#&gt; beta[bsa:.trtclassTNFa blocker]         0.08    0.01 0.53    -0.95    -0.28     0.08     0.45</span></span>
+<span><span class="co">#&gt; beta[bsa:.trtclassIL blocker]           0.34    0.01 0.49    -0.59     0.00     0.33     0.67</span></span>
 <span><span class="co">#&gt; beta[weight:.trtclassTNFa blocker]     -0.17    0.00 0.04    -0.24    -0.20    -0.17    -0.15</span></span>
 <span><span class="co">#&gt; beta[weight:.trtclassIL blocker]       -0.10    0.00 0.03    -0.17    -0.13    -0.10    -0.08</span></span>
-<span><span class="co">#&gt; beta[psa:.trtclassTNFa blocker]        -0.07    0.00 0.20    -0.46    -0.20    -0.07     0.06</span></span>
-<span><span class="co">#&gt; beta[psa:.trtclassIL blocker]          -0.01    0.00 0.19    -0.37    -0.13    -0.01     0.12</span></span>
-<span><span class="co">#&gt; d[ETN]                                  1.55    0.00 0.14     1.26     1.47     1.55     1.64</span></span>
-<span><span class="co">#&gt; d[IXE_Q2W]                              2.98    0.00 0.15     2.69     2.89     2.97     3.06</span></span>
-<span><span class="co">#&gt; d[IXE_Q4W]                              2.56    0.00 0.14     2.28     2.48     2.56     2.65</span></span>
-<span><span class="co">#&gt; d[SEC_150]                              2.12    0.01 0.22     1.64     1.99     2.12     2.25</span></span>
-<span><span class="co">#&gt; d[SEC_300]                              2.42    0.00 0.22     1.96     2.29     2.43     2.55</span></span>
-<span><span class="co">#&gt; lp__                                -1580.38    0.15 4.86 -1590.84 -1583.55 -1579.99 -1576.86</span></span>
-<span><span class="co">#&gt; tau                                     0.18    0.00 0.11     0.01     0.10     0.16     0.24</span></span>
+<span><span class="co">#&gt; beta[psa:.trtclassTNFa blocker]        -0.07    0.00 0.21    -0.49    -0.22    -0.07     0.07</span></span>
+<span><span class="co">#&gt; beta[psa:.trtclassIL blocker]          -0.01    0.00 0.19    -0.36    -0.14    -0.01     0.12</span></span>
+<span><span class="co">#&gt; d[ETN]                                  1.56    0.00 0.14     1.29     1.47     1.55     1.64</span></span>
+<span><span class="co">#&gt; d[IXE_Q2W]                              2.98    0.00 0.15     2.70     2.88     2.97     3.06</span></span>
+<span><span class="co">#&gt; d[IXE_Q4W]                              2.56    0.00 0.15     2.27     2.47     2.56     2.64</span></span>
+<span><span class="co">#&gt; d[SEC_150]                              2.13    0.00 0.23     1.65     2.00     2.13     2.26</span></span>
+<span><span class="co">#&gt; d[SEC_300]                              2.44    0.01 0.23     1.96     2.30     2.44     2.57</span></span>
+<span><span class="co">#&gt; lp__                                -1580.38    0.16 4.78 -1590.71 -1583.39 -1579.97 -1576.93</span></span>
+<span><span class="co">#&gt; tau                                     0.18    0.00 0.12     0.01     0.10     0.17     0.24</span></span>
 <span><span class="co">#&gt;                                        97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; beta[durnpso]                           0.17  4020 1.00</span></span>
-<span><span class="co">#&gt; beta[prevsys]                           0.19  3907 1.00</span></span>
-<span><span class="co">#&gt; beta[bsa]                               0.77  3637 1.00</span></span>
-<span><span class="co">#&gt; beta[weight]                            0.10  3630 1.00</span></span>
-<span><span class="co">#&gt; beta[psa]                               0.25  3306 1.00</span></span>
-<span><span class="co">#&gt; beta[durnpso:.trtclassTNFa blocker]     0.11  4154 1.00</span></span>
-<span><span class="co">#&gt; beta[durnpso:.trtclassIL blocker]       0.12  4486 1.00</span></span>
-<span><span class="co">#&gt; beta[prevsys:.trtclassTNFa blocker]     0.55  4048 1.00</span></span>
-<span><span class="co">#&gt; beta[prevsys:.trtclassIL blocker]       0.40  4881 1.00</span></span>
-<span><span class="co">#&gt; beta[bsa:.trtclassTNFa blocker]         1.14  3997 1.00</span></span>
-<span><span class="co">#&gt; beta[bsa:.trtclassIL blocker]           1.34  4433 1.00</span></span>
-<span><span class="co">#&gt; beta[weight:.trtclassTNFa blocker]     -0.10  3680 1.00</span></span>
-<span><span class="co">#&gt; beta[weight:.trtclassIL blocker]       -0.04  4403 1.00</span></span>
-<span><span class="co">#&gt; beta[psa:.trtclassTNFa blocker]         0.34  4076 1.00</span></span>
-<span><span class="co">#&gt; beta[psa:.trtclassIL blocker]           0.37  4221 1.00</span></span>
-<span><span class="co">#&gt; d[ETN]                                  1.85  2066 1.00</span></span>
-<span><span class="co">#&gt; d[IXE_Q2W]                              3.29  1624 1.00</span></span>
-<span><span class="co">#&gt; d[IXE_Q4W]                              2.87  1643 1.00</span></span>
-<span><span class="co">#&gt; d[SEC_150]                              2.54  1792 1.00</span></span>
-<span><span class="co">#&gt; d[SEC_300]                              2.84  2141 1.00</span></span>
-<span><span class="co">#&gt; lp__                                -1572.12   984 1.00</span></span>
-<span><span class="co">#&gt; tau                                     0.46   619 1.01</span></span>
+<span><span class="co">#&gt; beta[durnpso]                           0.16  4127 1.00</span></span>
+<span><span class="co">#&gt; beta[prevsys]                           0.18  4057 1.00</span></span>
+<span><span class="co">#&gt; beta[bsa]                               0.75  3729 1.00</span></span>
+<span><span class="co">#&gt; beta[weight]                            0.10  4403 1.00</span></span>
+<span><span class="co">#&gt; beta[psa]                               0.27  4013 1.00</span></span>
+<span><span class="co">#&gt; beta[durnpso:.trtclassTNFa blocker]     0.11  3991 1.00</span></span>
+<span><span class="co">#&gt; beta[durnpso:.trtclassIL blocker]       0.12  5423 1.00</span></span>
+<span><span class="co">#&gt; beta[prevsys:.trtclassTNFa blocker]     0.56  4217 1.00</span></span>
+<span><span class="co">#&gt; beta[prevsys:.trtclassIL blocker]       0.38  4229 1.00</span></span>
+<span><span class="co">#&gt; beta[bsa:.trtclassTNFa blocker]         1.14  4024 1.00</span></span>
+<span><span class="co">#&gt; beta[bsa:.trtclassIL blocker]           1.34  4555 1.00</span></span>
+<span><span class="co">#&gt; beta[weight:.trtclassTNFa blocker]     -0.10  4682 1.00</span></span>
+<span><span class="co">#&gt; beta[weight:.trtclassIL blocker]       -0.04  4803 1.00</span></span>
+<span><span class="co">#&gt; beta[psa:.trtclassTNFa blocker]         0.36  4417 1.00</span></span>
+<span><span class="co">#&gt; beta[psa:.trtclassIL blocker]           0.37  4974 1.00</span></span>
+<span><span class="co">#&gt; d[ETN]                                  1.85  2005 1.00</span></span>
+<span><span class="co">#&gt; d[IXE_Q2W]                              3.29  1947 1.00</span></span>
+<span><span class="co">#&gt; d[IXE_Q4W]                              2.87  1978 1.00</span></span>
+<span><span class="co">#&gt; d[SEC_150]                              2.61  2336 1.00</span></span>
+<span><span class="co">#&gt; d[SEC_300]                              2.94  2164 1.00</span></span>
+<span><span class="co">#&gt; lp__                                -1572.13   911 1.01</span></span>
+<span><span class="co">#&gt; tau                                     0.46   570 1.00</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:45:49 2026.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:16:41 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -675,9 +675,9 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <span><span class="co">#&gt;                pD: 24</span></span>
 <span><span class="co">#&gt;               DIC: 3153.3</span></span>
 <span><span class="op">(</span><span class="va">pso_dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">pso_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 3123.7<span style="color: #555555;"> (on 3858 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 28.2</span></span>
-<span><span class="co">#&gt;               DIC: 3151.9</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 3123.4<span style="color: #555555;"> (on 3858 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 28</span></span>
+<span><span class="co">#&gt;               DIC: 3151.4</span></span></code></pre></div>
 <p>The DIC is similar between the FE and RE models, suggesting that
 there is little evidence for any residual heterogeneity.</p>
 </div>

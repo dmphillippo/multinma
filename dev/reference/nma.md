@@ -516,17 +516,17 @@ smk_fit_FE
 #> post-warmup draws per chain=1000, total post-warmup draws=4000.
 #> 
 #>                               mean se_mean   sd     2.5%      25%      50%
-#> d[Group counselling]          0.84    0.00 0.18     0.51     0.72     0.84
-#> d[Individual counselling]     0.76    0.00 0.06     0.65     0.73     0.76
-#> d[Self-help]                  0.22    0.00 0.13    -0.04     0.14     0.22
-#> lp__                      -5859.19    0.09 3.69 -5867.22 -5861.48 -5858.86
+#> d[Group counselling]          0.84    0.00 0.17     0.50     0.72     0.85
+#> d[Individual counselling]     0.77    0.00 0.06     0.66     0.73     0.77
+#> d[Self-help]                  0.22    0.00 0.13    -0.03     0.14     0.22
+#> lp__                      -5859.25    0.08 3.62 -5867.44 -5861.43 -5858.90
 #>                                75%    97.5% n_eff Rhat
-#> d[Group counselling]          0.96     1.19  2025    1
-#> d[Individual counselling]     0.80     0.88  1998    1
-#> d[Self-help]                  0.31     0.46  2696    1
-#> lp__                      -5856.58 -5852.87  1699    1
+#> d[Group counselling]          0.96     1.19  2344    1
+#> d[Individual counselling]     0.80     0.88  1575    1
+#> d[Self-help]                  0.31     0.47  2973    1
+#> lp__                      -5856.68 -5853.07  1929    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:19:15 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 10:49:30 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -547,19 +547,19 @@ smk_fit_RE
 #> post-warmup draws per chain=1000, total post-warmup draws=4000.
 #> 
 #>                               mean se_mean   sd     2.5%      25%      50%
-#> d[Group counselling]          1.10    0.01 0.44     0.27     0.80     1.09
-#> d[Individual counselling]     0.84    0.01 0.25     0.38     0.68     0.84
-#> d[Self-help]                  0.49    0.01 0.40    -0.29     0.23     0.48
-#> lp__                      -5768.32    0.20 6.59 -5782.07 -5772.64 -5768.00
-#> tau                           0.83    0.01 0.18     0.55     0.71     0.81
+#> d[Group counselling]          1.10    0.01 0.43     0.29     0.83     1.09
+#> d[Individual counselling]     0.84    0.01 0.24     0.38     0.68     0.83
+#> d[Self-help]                  0.51    0.01 0.39    -0.25     0.25     0.50
+#> lp__                      -5768.05    0.20 6.53 -5781.74 -5772.33 -5767.62
+#> tau                           0.84    0.01 0.19     0.54     0.70     0.82
 #>                                75%    97.5% n_eff Rhat
-#> d[Group counselling]          1.39     1.96  1833    1
-#> d[Individual counselling]     1.00     1.35  1170    1
-#> d[Self-help]                  0.75     1.31  1654    1
-#> lp__                      -5763.68 -5756.83  1081    1
-#> tau                           0.93     1.26  1169    1
+#> d[Group counselling]          1.37     1.99  1635    1
+#> d[Individual counselling]     0.99     1.32  1122    1
+#> d[Self-help]                  0.75     1.30  1786    1
+#> lp__                      -5763.37 -5756.69  1071    1
+#> tau                           0.94     1.26   976    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:19:21 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 10:49:38 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -582,34 +582,34 @@ smk_fit_RE_UME
 #> post-warmup draws per chain=1000, total post-warmup draws=4000.
 #> 
 #>                                                     mean se_mean   sd     2.5%
-#> d[Group counselling vs. No intervention]            1.13    0.02 0.80    -0.33
-#> d[Individual counselling vs. No intervention]       0.91    0.01 0.28     0.40
-#> d[Self-help vs. No intervention]                    0.33    0.01 0.58    -0.80
-#> d[Individual counselling vs. Group counselling]    -0.31    0.01 0.61    -1.52
-#> d[Self-help vs. Group counselling]                 -0.61    0.01 0.70    -2.03
-#> d[Self-help vs. Individual counselling]             0.13    0.02 1.03    -1.93
-#> lp__                                            -5765.69    0.21 6.37 -5778.98
-#> tau                                                 0.92    0.01 0.22     0.58
+#> d[Group counselling vs. No intervention]            1.12    0.02 0.80    -0.33
+#> d[Individual counselling vs. No intervention]       0.90    0.01 0.27     0.39
+#> d[Self-help vs. No intervention]                    0.36    0.01 0.59    -0.78
+#> d[Individual counselling vs. Group counselling]    -0.29    0.01 0.60    -1.47
+#> d[Self-help vs. Group counselling]                 -0.62    0.01 0.73    -2.08
+#> d[Self-help vs. Individual counselling]             0.15    0.02 1.05    -1.94
+#> lp__                                            -5765.27    0.20 6.44 -5778.84
+#> tau                                                 0.94    0.01 0.23     0.57
 #>                                                      25%      50%      75%
-#> d[Group counselling vs. No intervention]            0.60     1.10     1.62
-#> d[Individual counselling vs. No intervention]       0.72     0.89     1.08
-#> d[Self-help vs. No intervention]                   -0.05     0.33     0.70
-#> d[Individual counselling vs. Group counselling]    -0.70    -0.32     0.08
-#> d[Self-help vs. Group counselling]                 -1.07    -0.62    -0.15
-#> d[Self-help vs. Individual counselling]            -0.55     0.14     0.81
-#> lp__                                            -5769.77 -5765.33 -5761.22
-#> tau                                                 0.77     0.90     1.04
+#> d[Group counselling vs. No intervention]            0.61     1.08     1.63
+#> d[Individual counselling vs. No intervention]       0.73     0.89     1.07
+#> d[Self-help vs. No intervention]                   -0.02     0.35     0.73
+#> d[Individual counselling vs. Group counselling]    -0.68    -0.29     0.09
+#> d[Self-help vs. Group counselling]                 -1.08    -0.64    -0.14
+#> d[Self-help vs. Individual counselling]            -0.52     0.14     0.81
+#> lp__                                            -5769.40 -5764.90 -5760.65
+#> tau                                                 0.77     0.91     1.07
 #>                                                    97.5% n_eff Rhat
-#> d[Group counselling vs. No intervention]            2.85  2455    1
-#> d[Individual counselling vs. No intervention]       1.49  1249    1
-#> d[Self-help vs. No intervention]                    1.45  2489    1
-#> d[Individual counselling vs. Group counselling]     0.88  2588    1
-#> d[Self-help vs. Group counselling]                  0.73  2915    1
-#> d[Self-help vs. Individual counselling]             2.12  3099    1
-#> lp__                                            -5754.24   929    1
-#> tau                                                 1.43  1050    1
+#> d[Group counselling vs. No intervention]            2.79  2416 1.00
+#> d[Individual counselling vs. No intervention]       1.46  1272 1.00
+#> d[Self-help vs. No intervention]                    1.53  2039 1.00
+#> d[Individual counselling vs. Group counselling]     0.91  2365 1.00
+#> d[Self-help vs. Group counselling]                  0.80  2873 1.00
+#> d[Self-help vs. Individual counselling]             2.21  3839 1.00
+#> lp__                                            -5753.99  1010 1.01
+#> tau                                                 1.47  1021 1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:19:29 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 10:49:46 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -640,98 +640,98 @@ summary(smk_fit_RE_nodesplit)
 #> ------------------------------ Node-split Group counselling vs. No intervention ---- 
 #> 
 #>                  mean   sd  2.5%   25%   50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d_net            1.12 0.44  0.29  0.83  1.11 1.41  2.00     2316     2639    1
-#> d_dir            1.07 0.76 -0.33  0.57  1.06 1.54  2.67     3104     2460    1
-#> d_ind            1.14 0.56  0.04  0.78  1.14 1.50  2.24     1464     2043    1
-#> omega           -0.07 0.91 -1.83 -0.66 -0.08 0.50  1.85     2019     2461    1
-#> tau              0.87 0.20  0.56  0.73  0.84 0.98  1.35     1197     1179    1
-#> tau_consistency  0.84 0.18  0.55  0.71  0.82 0.95  1.25     1335     2260    1
+#> d_net            1.09 0.44  0.27  0.80  1.08 1.37  1.98     2256     2475    1
+#> d_dir            1.09 0.76 -0.33  0.57  1.07 1.57  2.66     3508     2757    1
+#> d_ind            1.15 0.54  0.08  0.81  1.13 1.48  2.27     1838     2288    1
+#> omega           -0.06 0.90 -1.80 -0.65 -0.07 0.52  1.77     2605     2817    1
+#> tau              0.88 0.20  0.56  0.73  0.85 0.99  1.33     1170     1512    1
+#> tau_consistency  0.84 0.18  0.54  0.71  0.82 0.95  1.26     1221     1888    1
 #> 
-#> Residual deviance: 53.8 (on 50 data points)
-#>                pD: 43.9
-#>               DIC: 97.7
+#> Residual deviance: 53.6 (on 50 data points)
+#>                pD: 44
+#>               DIC: 97.5
 #> 
-#> Bayesian p-value: 0.93
+#> Bayesian p-value: 0.94
 #> 
 #> ------------------------- Node-split Individual counselling vs. No intervention ---- 
 #> 
 #>                 mean   sd  2.5%   25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d_net           0.85 0.24  0.41  0.69 0.84 0.99  1.34     1199     1957    1
-#> d_dir           0.88 0.26  0.40  0.70 0.87 1.04  1.42     1983     2322    1
-#> d_ind           0.59 0.69 -0.74  0.13 0.57 1.02  1.96     1574     1640    1
-#> omega           0.29 0.72 -1.12 -0.17 0.28 0.77  1.70     1598     2070    1
-#> tau             0.86 0.20  0.56  0.72 0.84 0.97  1.34     1285     1977    1
-#> tau_consistency 0.84 0.18  0.55  0.71 0.82 0.95  1.25     1335     2260    1
+#> d_net           0.85 0.24  0.40  0.69 0.84 1.00  1.35     1273     2084    1
+#> d_dir           0.89 0.25  0.40  0.72 0.88 1.04  1.41     1837     2402    1
+#> d_ind           0.60 0.64 -0.68  0.17 0.60 1.00  1.88     1766     2415    1
+#> omega           0.29 0.67 -1.03 -0.14 0.29 0.73  1.64     1693     2702    1
+#> tau             0.85 0.20  0.55  0.71 0.83 0.97  1.31     1319     1949    1
+#> tau_consistency 0.84 0.18  0.54  0.71 0.82 0.95  1.26     1221     1888    1
 #> 
-#> Residual deviance: 54 (on 50 data points)
-#>                pD: 44
-#>               DIC: 98
+#> Residual deviance: 54.4 (on 50 data points)
+#>                pD: 44.4
+#>               DIC: 98.7
 #> 
 #> Bayesian p-value: 0.65
 #> 
 #> -------------------------------------- Node-split Self-help vs. No intervention ---- 
 #> 
 #>                  mean   sd  2.5%   25%   50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d_net            0.49 0.40 -0.27  0.22  0.48 0.76  1.34     1987     2363 1.00
-#> d_dir            0.32 0.55 -0.81 -0.03  0.33 0.69  1.40     3691     2732 1.00
-#> d_ind            0.70 0.62 -0.54  0.28  0.70 1.10  1.92     2162     2598 1.00
-#> omega           -0.37 0.83 -2.05 -0.91 -0.35 0.18  1.24     2391     2271 1.00
-#> tau              0.86 0.20  0.56  0.72  0.83 0.97  1.34     1233     2120 1.01
-#> tau_consistency  0.84 0.18  0.55  0.71  0.82 0.95  1.25     1335     2260 1.00
+#> d_net            0.49 0.41 -0.31  0.23  0.48 0.75  1.33     1835     2169    1
+#> d_dir            0.33 0.54 -0.73 -0.02  0.32 0.66  1.42     3514     2289    1
+#> d_ind            0.69 0.64 -0.57  0.26  0.67 1.10  2.03     1929     2177    1
+#> omega           -0.36 0.84 -2.05 -0.90 -0.34 0.17  1.29     2047     2008    1
+#> tau              0.86 0.19  0.55  0.72  0.84 0.97  1.31     1249     1985    1
+#> tau_consistency  0.84 0.18  0.54  0.71  0.82 0.95  1.26     1221     1888    1
 #> 
-#> Residual deviance: 54.2 (on 50 data points)
-#>                pD: 44.5
-#>               DIC: 98.7
+#> Residual deviance: 54.4 (on 50 data points)
+#>                pD: 44.7
+#>               DIC: 99
 #> 
-#> Bayesian p-value: 0.65
+#> Bayesian p-value: 0.66
 #> 
 #> ----------------------- Node-split Individual counselling vs. Group counselling ---- 
 #> 
 #>                  mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d_net           -0.27 0.41 -1.05 -0.55 -0.27  0.00  0.53     3123     2385    1
-#> d_dir           -0.12 0.49 -1.10 -0.42 -0.12  0.20  0.89     3380     3073    1
-#> d_ind           -0.53 0.64 -1.81 -0.94 -0.52 -0.12  0.74     1113     1443    1
-#> omega            0.42 0.70 -0.95 -0.03  0.41  0.87  1.81     1246     1725    1
-#> tau              0.87 0.20  0.55  0.73  0.85  0.99  1.33     1023     1610    1
-#> tau_consistency  0.84 0.18  0.55  0.71  0.82  0.95  1.25     1335     2260    1
+#> d_net           -0.24 0.42 -1.10 -0.51 -0.24  0.04  0.56     2961     2795    1
+#> d_dir           -0.11 0.48 -1.05 -0.42 -0.11  0.21  0.83     4377     3019    1
+#> d_ind           -0.52 0.61 -1.78 -0.91 -0.53 -0.13  0.68     1699     2223    1
+#> omega            0.42 0.68 -0.89 -0.01  0.41  0.84  1.79     1812     1890    1
+#> tau              0.86 0.19  0.56  0.72  0.83  0.96  1.30     1244     1723    1
+#> tau_consistency  0.84 0.18  0.54  0.71  0.82  0.95  1.26     1221     1888    1
 #> 
-#> Residual deviance: 53.8 (on 50 data points)
-#>                pD: 44.4
-#>               DIC: 98.2
+#> Residual deviance: 53.9 (on 50 data points)
+#>                pD: 44.2
+#>               DIC: 98.1
 #> 
-#> Bayesian p-value: 0.53
+#> Bayesian p-value: 0.51
 #> 
 #> ------------------------------------ Node-split Self-help vs. Group counselling ---- 
 #> 
 #>                  mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d_net           -0.63 0.50 -1.62 -0.95 -0.62 -0.30  0.34     3109     2888    1
-#> d_dir           -0.62 0.68 -1.97 -1.05 -0.60 -0.18  0.72     3889     2936    1
-#> d_ind           -0.63 0.68 -1.98 -1.08 -0.63 -0.18  0.71     2097     2354    1
-#> omega            0.01 0.90 -1.80 -0.56  0.01  0.59  1.82     2212     2436    1
-#> tau              0.88 0.19  0.57  0.74  0.86  0.99  1.34     1446     2530    1
-#> tau_consistency  0.84 0.18  0.55  0.71  0.82  0.95  1.25     1335     2260    1
+#> d_net           -0.60 0.49 -1.57 -0.92 -0.60 -0.27  0.37     2608     2933    1
+#> d_dir           -0.60 0.66 -1.89 -1.03 -0.61 -0.18  0.73     3227     2706    1
+#> d_ind           -0.63 0.67 -1.96 -1.05 -0.63 -0.19  0.66     1822     2197    1
+#> omega            0.03 0.87 -1.64 -0.55  0.02  0.59  1.81     1867     2008    1
+#> tau              0.88 0.20  0.56  0.73  0.85  0.99  1.32     1245     2222    1
+#> tau_consistency  0.84 0.18  0.54  0.71  0.82  0.95  1.26     1221     1888    1
 #> 
-#> Residual deviance: 53.8 (on 50 data points)
-#>                pD: 44.3
-#>               DIC: 98
+#> Residual deviance: 54.1 (on 50 data points)
+#>                pD: 44.5
+#>               DIC: 98.6
 #> 
-#> Bayesian p-value: 0.99
+#> Bayesian p-value: 0.98
 #> 
 #> ------------------------------- Node-split Self-help vs. Individual counselling ---- 
 #> 
 #>                  mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> d_net           -0.36 0.41 -1.15 -0.62 -0.35 -0.09  0.46     2369     2496 1.00
-#> d_dir            0.08 0.65 -1.21 -0.34  0.09  0.49  1.33     3636     2885 1.00
-#> d_ind           -0.61 0.53 -1.69 -0.94 -0.60 -0.26  0.38     1826     2268 1.00
-#> omega            0.69 0.82 -0.88  0.16  0.67  1.21  2.31     2230     2456 1.00
-#> tau              0.86 0.19  0.56  0.72  0.83  0.97  1.28     1190     1885 1.01
-#> tau_consistency  0.84 0.18  0.55  0.71  0.82  0.95  1.25     1335     2260 1.00
+#> d_net           -0.35 0.42 -1.22 -0.62 -0.35 -0.08  0.48     1992     2255    1
+#> d_dir            0.06 0.66 -1.22 -0.36  0.05  0.49  1.32     3552     2936    1
+#> d_ind           -0.63 0.55 -1.77 -0.96 -0.61 -0.26  0.39     1541     2125    1
+#> omega            0.69 0.84 -0.92  0.15  0.68  1.22  2.35     1816     2083    1
+#> tau              0.86 0.19  0.55  0.72  0.83  0.96  1.33     1283     2254    1
+#> tau_consistency  0.84 0.18  0.54  0.71  0.82  0.95  1.26     1221     1888    1
 #> 
-#> Residual deviance: 53.7 (on 50 data points)
-#>                pD: 44.1
-#>               DIC: 97.8
+#> Residual deviance: 53.5 (on 50 data points)
+#>                pD: 43.8
+#>               DIC: 97.3
 #> 
-#> Bayesian p-value: 0.39
+#> Bayesian p-value: 0.38
 # }
 
 ## Plaque psoriasis ML-NMR
@@ -938,7 +938,7 @@ pso_fit
 #> d[SEC_300]                              2.45     2.53     2.68  5719    1
 #> lp__                                -1576.05 -1573.88 -1570.57  1619    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:21:43 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 10:51:25 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -1013,7 +1013,7 @@ ndmm_fit
 #> shape[Morgan2012]       0.94  5126    1
 #> shape[Palumbo2014]      1.16  4504    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:26:40 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 10:55:17 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).

@@ -132,7 +132,7 @@ diet_fit_FE
 #> d[Reduced Fat]   -0.01    0.00 0.05   -0.11   -0.04   -0.01    0.03    0.10  3568    1
 #> lp__           5386.16    0.06 2.49 5380.38 5384.77 5386.50 5387.97 5389.91  1586    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:39:24 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:11:28 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -205,11 +205,11 @@ diet_fit_RE
 #> post-warmup draws per chain=1000, total post-warmup draws=4000.
 #> 
 #>                   mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat
-#> d[Reduced Fat]   -0.02    0.00 0.09   -0.19   -0.06   -0.02    0.03    0.15  1581    1
-#> lp__           5379.23    0.11 3.74 5371.41 5376.76 5379.38 5381.88 5385.92  1217    1
-#> tau               0.13    0.00 0.12    0.01    0.05    0.10    0.18    0.45   819    1
+#> d[Reduced Fat]   -0.02    0.00 0.08   -0.19   -0.07   -0.01    0.03    0.15  1608    1
+#> lp__           5379.04    0.12 3.87 5370.72 5376.69 5379.29 5381.73 5385.88  1063    1
+#> tau               0.13    0.00 0.11    0.00    0.04    0.10    0.18    0.41   877    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:39:30 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:11:32 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -315,7 +315,7 @@ pred_RE <- predict(diet_fit_RE,
 pred_RE
 #>                   mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> pred[Control]     0.07 0.06 0.01 0.03 0.05 0.08  0.22     4379     3576    1
-#> pred[Reduced Fat] 0.07 0.06 0.01 0.03 0.05 0.08  0.21     4394     3531    1
+#> pred[Reduced Fat] 0.07 0.06 0.01 0.03 0.05 0.08  0.21     4352     3769    1
 plot(pred_RE)
 ```
 

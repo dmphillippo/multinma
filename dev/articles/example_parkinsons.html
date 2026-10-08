@@ -233,7 +233,7 @@ method:</p>
 <span><span class="co">#&gt; d[5] -0.30    0.00 0.22  -0.73 -0.45 -0.30 -0.15  0.12  3127    1</span></span>
 <span><span class="co">#&gt; lp__ -6.76    0.06 2.41 -12.44 -8.12 -6.42 -5.02 -3.12  1724    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:40:54 2026.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:12:47 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -307,14 +307,14 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean se_mean   sd   2.5%    25%    50%    75% 97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[1]   0.53    0.01 0.61  -0.65   0.15   0.55   0.91  1.69  1935    1</span></span>
-<span><span class="co">#&gt; d[2]  -1.33    0.02 0.71  -2.72  -1.75  -1.31  -0.88 -0.05  1448    1</span></span>
-<span><span class="co">#&gt; d[3]   0.02    0.01 0.47  -0.90  -0.25   0.03   0.31  0.91  1999    1</span></span>
-<span><span class="co">#&gt; d[5]  -0.29    0.01 0.41  -1.09  -0.49  -0.29  -0.10  0.54  2340    1</span></span>
-<span><span class="co">#&gt; lp__ -13.00    0.10 3.53 -20.90 -15.16 -12.71 -10.46 -7.04  1160    1</span></span>
-<span><span class="co">#&gt; tau    0.37    0.02 0.39   0.01   0.11   0.26   0.49  1.46   516    1</span></span>
+<span><span class="co">#&gt; d[1]   0.53    0.02 0.66  -0.81   0.16   0.54   0.92  1.79  1064 1.01</span></span>
+<span><span class="co">#&gt; d[2]  -1.34    0.02 0.75  -2.87  -1.75  -1.32  -0.89  0.03  1041 1.01</span></span>
+<span><span class="co">#&gt; d[3]   0.03    0.01 0.51  -1.00  -0.23   0.05   0.31  0.95  1238 1.00</span></span>
+<span><span class="co">#&gt; d[5]  -0.29    0.01 0.44  -1.19  -0.50  -0.29  -0.08  0.63  2182 1.00</span></span>
+<span><span class="co">#&gt; lp__ -12.69    0.10 3.53 -20.42 -14.87 -12.40 -10.15 -6.71  1351 1.00</span></span>
+<span><span class="co">#&gt; tau    0.41    0.02 0.41   0.02   0.13   0.30   0.55  1.62   553 1.01</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:40:59 2026.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:12:50 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -341,8 +341,8 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <span><span class="co">#&gt;               DIC: 24.7</span></span></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">arm_dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">arm_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 13.7<span style="color: #555555;"> (on 15 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 12.4</span></span>
+<span><span class="co">#&gt; Residual deviance: 13.6<span style="color: #555555;"> (on 15 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 12.5</span></span>
 <span><span class="co">#&gt;               DIC: 26.1</span></span></code></pre></div>
 <p>Both models fit the data well, having posterior mean residual
 deviance close to the number of data points. The DIC is similar between
@@ -375,10 +375,10 @@ against placebo using the <code><a href="../reference/relative_effects.html">rel
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">arm_releff_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">arm_fit_RE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[4] -0.53 0.61 -1.69 -0.91 -0.55 -0.15  0.65     1998     1640    1</span></span>
-<span><span class="co">#&gt; d[2] -1.86 0.54 -2.97 -2.14 -1.84 -1.55 -0.87     4450     1638    1</span></span>
-<span><span class="co">#&gt; d[3] -0.50 0.64 -1.74 -0.88 -0.50 -0.12  0.72     3033     2509    1</span></span>
-<span><span class="co">#&gt; d[5] -0.82 0.72 -2.19 -1.25 -0.84 -0.39  0.58     2075     1955    1</span></span>
+<span><span class="co">#&gt; d[4] -0.53 0.66 -1.79 -0.92 -0.54 -0.16  0.81     1368     1101 1.01</span></span>
+<span><span class="co">#&gt; d[2] -1.87 0.52 -2.95 -2.15 -1.85 -1.57 -0.94     4101     2675 1.00</span></span>
+<span><span class="co">#&gt; d[3] -0.50 0.66 -1.82 -0.89 -0.49 -0.10  0.80     2432     1596 1.00</span></span>
+<span><span class="co">#&gt; d[5] -0.82 0.79 -2.33 -1.28 -0.82 -0.38  0.82     1536     1263 1.00</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/arm_releff_RE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2">2011</a>)</span>, we produce absolute predictions of
@@ -411,11 +411,11 @@ identity link function was used.)</p>
 <span>                       baseline_trt <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">arm_pred_RE</span></span>
 <span><span class="co">#&gt;          mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[4] -1.25 0.64 -2.50 -1.68 -1.26 -0.85 -0.02     2148     1954    1</span></span>
-<span><span class="co">#&gt; pred[1] -0.73 0.22 -1.16 -0.87 -0.73 -0.58 -0.30     3976     3867    1</span></span>
-<span><span class="co">#&gt; pred[2] -2.58 0.58 -3.76 -2.90 -2.57 -2.25 -1.49     4216     1441    1</span></span>
-<span><span class="co">#&gt; pred[3] -1.23 0.68 -2.57 -1.63 -1.22 -0.82  0.06     3151     2639    1</span></span>
-<span><span class="co">#&gt; pred[5] -1.55 0.75 -3.02 -2.00 -1.55 -1.10 -0.08     2181     2142    1</span></span>
+<span><span class="co">#&gt; pred[4] -1.26 0.70 -2.58 -1.67 -1.28 -0.85  0.14     1499     1109 1.01</span></span>
+<span><span class="co">#&gt; pred[1] -0.73 0.22 -1.16 -0.87 -0.73 -0.58 -0.30     3976     3867 1.00</span></span>
+<span><span class="co">#&gt; pred[2] -2.60 0.57 -3.76 -2.90 -2.58 -2.27 -1.54     4028     2640 1.00</span></span>
+<span><span class="co">#&gt; pred[3] -1.23 0.70 -2.61 -1.65 -1.22 -0.81  0.14     2576     2163 1.00</span></span>
+<span><span class="co">#&gt; pred[5] -1.54 0.83 -3.11 -2.03 -1.56 -1.08  0.16     1668     1348 1.00</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">arm_pred_RE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/arm_pred_RE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>If the <code>baseline</code> argument is omitted, predictions of mean
@@ -600,13 +600,13 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;       mean se_mean   sd  2.5%   25%   50%   75% 97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[1]  0.54    0.01 0.46 -0.37  0.23  0.53  0.84  1.43  2175    1</span></span>
-<span><span class="co">#&gt; d[2] -1.27    0.01 0.50 -2.26 -1.62 -1.27 -0.93 -0.29  2263    1</span></span>
-<span><span class="co">#&gt; d[3]  0.05    0.01 0.33 -0.58 -0.18  0.05  0.27  0.71  3058    1</span></span>
-<span><span class="co">#&gt; d[5] -0.30    0.00 0.21 -0.71 -0.44 -0.30 -0.16  0.08  3831    1</span></span>
-<span><span class="co">#&gt; lp__ -3.12    0.03 1.36 -6.55 -3.77 -2.82 -2.12 -1.39  1841    1</span></span>
+<span><span class="co">#&gt; d[1]  0.52    0.01 0.48 -0.44  0.21  0.52  0.84  1.48  2178    1</span></span>
+<span><span class="co">#&gt; d[2] -1.29    0.01 0.52 -2.35 -1.63 -1.29 -0.94 -0.30  2311    1</span></span>
+<span><span class="co">#&gt; d[3]  0.05    0.01 0.32 -0.60 -0.17  0.05  0.27  0.65  3294    1</span></span>
+<span><span class="co">#&gt; d[5] -0.30    0.00 0.21 -0.69 -0.45 -0.30 -0.16  0.10  3130    1</span></span>
+<span><span class="co">#&gt; lp__ -3.14    0.03 1.39 -6.73 -3.84 -2.82 -2.12 -1.39  1883    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:41:10 2026.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:13:00 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -669,14 +669,14 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;       mean se_mean   sd   2.5%    25%   50%   75% 97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[1]  0.51    0.01 0.60  -0.65   0.13  0.52  0.90  1.65  2435 1.00</span></span>
-<span><span class="co">#&gt; d[2] -1.33    0.01 0.69  -2.70  -1.74 -1.31 -0.89 -0.01  2356 1.00</span></span>
-<span><span class="co">#&gt; d[3]  0.03    0.01 0.47  -0.83  -0.24  0.03  0.30  0.95  1953 1.00</span></span>
-<span><span class="co">#&gt; d[5] -0.31    0.01 0.41  -1.19  -0.52 -0.30 -0.10  0.48  2077 1.00</span></span>
-<span><span class="co">#&gt; lp__ -8.27    0.09 2.92 -14.84 -10.03 -7.97 -6.20 -3.43  1172 1.00</span></span>
-<span><span class="co">#&gt; tau   0.38    0.01 0.38   0.01   0.12  0.28  0.52  1.42   945 1.01</span></span>
+<span><span class="co">#&gt; d[1]  0.54    0.01 0.64  -0.68   0.16  0.53  0.92  1.78  1865 1.00</span></span>
+<span><span class="co">#&gt; d[2] -1.31    0.02 0.69  -2.66  -1.73 -1.30 -0.87 -0.03  1792 1.00</span></span>
+<span><span class="co">#&gt; d[3]  0.04    0.01 0.46  -0.84  -0.25  0.02  0.31  0.94  2497 1.00</span></span>
+<span><span class="co">#&gt; d[5] -0.29    0.02 0.48  -1.20  -0.50 -0.29 -0.08  0.60   994 1.00</span></span>
+<span><span class="co">#&gt; lp__ -8.27    0.08 2.81 -14.56 -10.05 -7.99 -6.23 -3.62  1193 1.01</span></span>
+<span><span class="co">#&gt; tau   0.40    0.02 0.42   0.01   0.13  0.27  0.52  1.59   471 1.02</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:41:13 2026.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:13:03 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -697,14 +697,14 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">contr_dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">contr_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 6.2<span style="color: #555555;"> (on 8 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 3.9</span></span>
-<span><span class="co">#&gt;               DIC: 10.2</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 6.3<span style="color: #555555;"> (on 8 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 4</span></span>
+<span><span class="co">#&gt;               DIC: 10.3</span></span></code></pre></div>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">contr_dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">contr_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 6.5<span style="color: #555555;"> (on 8 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 5.3</span></span>
-<span><span class="co">#&gt;               DIC: 11.8</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 6.6<span style="color: #555555;"> (on 8 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 5.4</span></span>
+<span><span class="co">#&gt;               DIC: 12</span></span></code></pre></div>
 <p>Both models fit the data well, having posterior mean residual
 deviance close to the number of data points. The DIC is similar between
 models, so we choose the FE model based on parsimony.</p>
@@ -727,19 +727,19 @@ against placebo using the <code><a href="../reference/relative_effects.html">rel
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">contr_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">contr_fit_FE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[4] -0.54 0.46 -1.43 -0.84 -0.53 -0.23  0.37     2193     2485    1</span></span>
-<span><span class="co">#&gt; d[2] -1.81 0.33 -2.46 -2.03 -1.81 -1.58 -1.17     5584     3277    1</span></span>
-<span><span class="co">#&gt; d[3] -0.49 0.48 -1.43 -0.81 -0.48 -0.15  0.46     3041     2924    1</span></span>
-<span><span class="co">#&gt; d[5] -0.83 0.50 -1.83 -1.18 -0.83 -0.50  0.15     2444     2494    1</span></span>
+<span><span class="co">#&gt; d[4] -0.52 0.48 -1.48 -0.84 -0.52 -0.21  0.44     2189     2508    1</span></span>
+<span><span class="co">#&gt; d[2] -1.81 0.33 -2.47 -2.04 -1.81 -1.58 -1.16     6139     3327    1</span></span>
+<span><span class="co">#&gt; d[3] -0.47 0.49 -1.42 -0.81 -0.47 -0.15  0.49     3073     2801    1</span></span>
+<span><span class="co">#&gt; d[5] -0.82 0.52 -1.87 -1.16 -0.82 -0.47  0.22     2218     2283    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_releff_FE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/contr_releff_FE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">contr_releff_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">contr_fit_RE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[4] -0.51 0.60 -1.65 -0.90 -0.52 -0.13  0.65     2505     2312    1</span></span>
-<span><span class="co">#&gt; d[2] -1.84 0.51 -2.85 -2.12 -1.83 -1.55 -0.87     3437     2322    1</span></span>
-<span><span class="co">#&gt; d[3] -0.48 0.63 -1.71 -0.86 -0.49 -0.11  0.75     3210     2479    1</span></span>
-<span><span class="co">#&gt; d[5] -0.82 0.74 -2.29 -1.25 -0.82 -0.38  0.59     2325     1876    1</span></span>
+<span><span class="co">#&gt; d[4] -0.54 0.64 -1.78 -0.92 -0.53 -0.16  0.68     2172     1716 1.00</span></span>
+<span><span class="co">#&gt; d[2] -1.85 0.52 -2.94 -2.13 -1.84 -1.54 -0.91     2805     1360 1.01</span></span>
+<span><span class="co">#&gt; d[3] -0.50 0.64 -1.76 -0.88 -0.50 -0.11  0.73     2599     1647 1.00</span></span>
+<span><span class="co">#&gt; d[5] -0.83 0.82 -2.40 -1.29 -0.83 -0.40  0.79     1728      937 1.00</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/contr_releff_RE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2">2011</a>)</span>, we produce absolute predictions of
@@ -758,11 +758,11 @@ identity link function was used.)</p>
 <span>                       baseline_trt <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">contr_pred_FE</span></span>
 <span><span class="co">#&gt;          mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[4] -1.26 0.51 -2.27 -1.61 -1.27 -0.91 -0.25     2343     3040    1</span></span>
+<span><span class="co">#&gt; pred[4] -1.25 0.53 -2.28 -1.59 -1.26 -0.91 -0.18     2413     2946    1</span></span>
 <span><span class="co">#&gt; pred[1] -0.73 0.22 -1.16 -0.88 -0.73 -0.58 -0.30     3988     3629    1</span></span>
-<span><span class="co">#&gt; pred[2] -2.54 0.39 -3.33 -2.80 -2.54 -2.28 -1.77     4860     3667    1</span></span>
-<span><span class="co">#&gt; pred[3] -1.22 0.53 -2.24 -1.58 -1.22 -0.87 -0.18     3029     3222    1</span></span>
-<span><span class="co">#&gt; pred[5] -1.56 0.55 -2.65 -1.94 -1.56 -1.19 -0.51     2499     2945    1</span></span>
+<span><span class="co">#&gt; pred[2] -2.54 0.41 -3.34 -2.82 -2.55 -2.27 -1.74     4986     3222    1</span></span>
+<span><span class="co">#&gt; pred[3] -1.20 0.54 -2.28 -1.57 -1.19 -0.84 -0.16     3254     3555    1</span></span>
+<span><span class="co">#&gt; pred[5] -1.55 0.57 -2.69 -1.92 -1.56 -1.17 -0.41     2403     2555    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_pred_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/contr_pred_FE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
@@ -772,11 +772,11 @@ identity link function was used.)</p>
 <span>                       baseline_trt <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">contr_pred_RE</span></span>
 <span><span class="co">#&gt;          mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[4] -1.25 0.63 -2.47 -1.65 -1.25 -0.84 -0.01     2628     2267    1</span></span>
-<span><span class="co">#&gt; pred[1] -0.73 0.22 -1.16 -0.88 -0.73 -0.59 -0.31     3715     3592    1</span></span>
-<span><span class="co">#&gt; pred[2] -2.58 0.55 -3.67 -2.91 -2.58 -2.24 -1.50     3516     2575    1</span></span>
-<span><span class="co">#&gt; pred[3] -1.22 0.67 -2.51 -1.63 -1.22 -0.80  0.09     3217     2295    1</span></span>
-<span><span class="co">#&gt; pred[5] -1.56 0.77 -3.09 -2.02 -1.55 -1.09 -0.04     2445     2093    1</span></span>
+<span><span class="co">#&gt; pred[4] -1.27 0.67 -2.60 -1.69 -1.27 -0.87  0.00     2260     1792 1.00</span></span>
+<span><span class="co">#&gt; pred[1] -0.73 0.22 -1.16 -0.88 -0.73 -0.59 -0.31     3715     3592 1.00</span></span>
+<span><span class="co">#&gt; pred[2] -2.58 0.56 -3.75 -2.91 -2.57 -2.24 -1.55     2877     1348 1.01</span></span>
+<span><span class="co">#&gt; pred[3] -1.24 0.67 -2.55 -1.63 -1.23 -0.83  0.05     2574     1894 1.00</span></span>
+<span><span class="co">#&gt; pred[5] -1.56 0.84 -3.17 -2.03 -1.56 -1.11  0.12     1816     1116 1.00</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_pred_RE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/contr_pred_RE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>If the <code>baseline</code> argument is omitted an error will be
@@ -789,31 +789,31 @@ cumulative rank probabilities.</p>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">contr_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">contr_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; rank[4] 3.49 0.70    2   3   3   4     5     2741       NA    1</span></span>
-<span><span class="co">#&gt; rank[1] 4.68 0.73    2   5   5   5     5     2532       NA    1</span></span>
-<span><span class="co">#&gt; rank[2] 1.04 0.23    1   1   1   1     2     2825     2834    1</span></span>
-<span><span class="co">#&gt; rank[3] 3.51 0.92    2   3   4   4     5     3397       NA    1</span></span>
-<span><span class="co">#&gt; rank[5] 2.28 0.65    1   2   2   2     4     2845     2127    1</span></span>
+<span><span class="co">#&gt; rank[4] 3.50 0.70    2   3   3   4     5     2774       NA    1</span></span>
+<span><span class="co">#&gt; rank[1] 4.64 0.77    2   5   5   5     5     2524       NA    1</span></span>
+<span><span class="co">#&gt; rank[2] 1.05 0.27    1   1   1   1     2     2276     2288    1</span></span>
+<span><span class="co">#&gt; rank[3] 3.54 0.92    2   3   4   4     5     3341       NA    1</span></span>
+<span><span class="co">#&gt; rank[5] 2.27 0.67    1   2   2   2     4     2395     2597    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_ranks</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/parkinsons_contr_ranks-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">contr_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">contr_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]</span></span>
-<span><span class="co">#&gt; d[4]      0.00      0.04      0.50      0.39      0.07</span></span>
-<span><span class="co">#&gt; d[1]      0.00      0.03      0.06      0.11      0.80</span></span>
-<span><span class="co">#&gt; d[2]      0.96      0.03      0.00      0.00      0.00</span></span>
-<span><span class="co">#&gt; d[3]      0.00      0.17      0.25      0.45      0.12</span></span>
-<span><span class="co">#&gt; d[5]      0.03      0.72      0.19      0.05      0.01</span></span>
+<span><span class="co">#&gt; d[4]      0.00      0.04      0.51      0.37      0.08</span></span>
+<span><span class="co">#&gt; d[1]      0.00      0.04      0.07      0.11      0.78</span></span>
+<span><span class="co">#&gt; d[2]      0.96      0.04      0.00      0.00      0.00</span></span>
+<span><span class="co">#&gt; d[3]      0.00      0.16      0.25      0.46      0.13</span></span>
+<span><span class="co">#&gt; d[5]      0.04      0.72      0.17      0.05      0.01</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_rankprobs</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/parkinsons_contr_rankprobs-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">contr_cumrankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">contr_fit_FE</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]</span></span>
-<span><span class="co">#&gt; d[4]      0.00      0.04      0.54      0.93         1</span></span>
-<span><span class="co">#&gt; d[1]      0.00      0.03      0.09      0.20         1</span></span>
+<span><span class="co">#&gt; d[4]      0.00      0.04      0.55      0.92         1</span></span>
+<span><span class="co">#&gt; d[1]      0.00      0.04      0.10      0.22         1</span></span>
 <span><span class="co">#&gt; d[2]      0.96      0.99      1.00      1.00         1</span></span>
-<span><span class="co">#&gt; d[3]      0.00      0.18      0.43      0.88         1</span></span>
-<span><span class="co">#&gt; d[5]      0.03      0.75      0.94      0.99         1</span></span>
+<span><span class="co">#&gt; d[3]      0.00      0.17      0.41      0.87         1</span></span>
+<span><span class="co">#&gt; d[5]      0.04      0.76      0.94      0.99         1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">contr_cumrankprobs</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/parkinsons_contr_cumrankprobs-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
@@ -934,13 +934,13 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;       mean se_mean   sd  2.5%   25%   50%   75% 97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[1]  0.51    0.01 0.48 -0.43  0.18  0.50  0.83  1.46  1586    1</span></span>
-<span><span class="co">#&gt; d[2] -1.31    0.01 0.53 -2.35 -1.66 -1.31 -0.94 -0.31  1626    1</span></span>
-<span><span class="co">#&gt; d[3]  0.04    0.01 0.32 -0.62 -0.18  0.04  0.26  0.64  2553    1</span></span>
-<span><span class="co">#&gt; d[5] -0.30    0.00 0.21 -0.72 -0.44 -0.29 -0.16  0.11  3050    1</span></span>
-<span><span class="co">#&gt; lp__ -4.66    0.05 1.87 -9.12 -5.73 -4.34 -3.23 -2.01  1640    1</span></span>
+<span><span class="co">#&gt; d[1]  0.55    0.01 0.47 -0.40  0.23  0.55  0.87  1.46  1494    1</span></span>
+<span><span class="co">#&gt; d[2] -1.26    0.01 0.52 -2.30 -1.61 -1.26 -0.92 -0.24  1532    1</span></span>
+<span><span class="co">#&gt; d[3]  0.05    0.01 0.32 -0.56 -0.17  0.05  0.27  0.69  2636    1</span></span>
+<span><span class="co">#&gt; d[5] -0.30    0.00 0.20 -0.70 -0.44 -0.30 -0.16  0.12  3231    1</span></span>
+<span><span class="co">#&gt; lp__ -4.61    0.04 1.91 -9.34 -5.62 -4.25 -3.20 -1.97  1851    1</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:41:21 2026.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:13:09 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -984,7 +984,11 @@ values implied by these prior distributions with the
 <span>                  prior_trt <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
 <span>                  prior_het <span class="op">=</span> <span class="fu"><a href="../reference/priors.html">half_normal</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
 <span>                  adapt_delta <span class="op">=</span> <span class="fl">0.99</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Note: Setting "4" as the network reference treatment.</span></span></code></pre></div>
+<span><span class="co">#&gt; Note: Setting "4" as the network reference treatment.</span></span>
+<span><span class="co">#&gt; Warning: There were 4 divergent transitions after warmup. See</span></span>
+<span><span class="co">#&gt; https://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</span></span>
+<span><span class="co">#&gt; to find out why this is a problem and how to eliminate them.</span></span>
+<span><span class="co">#&gt; Warning: Examine the pairs() plot to diagnose sampling problems</span></span></code></pre></div>
 <p>We do see a small number of divergent transition errors, which cannot
 simply be removed by increasing the value of the
 <code>adapt_delta</code> argument (by default set to <code>0.95</code>
@@ -1010,14 +1014,14 @@ method:</p>
 <span><span class="co">#&gt; post-warmup draws per chain=1000, total post-warmup draws=4000.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        mean se_mean   sd   2.5%    25%    50%   75% 97.5% n_eff Rhat</span></span>
-<span><span class="co">#&gt; d[1]   0.55    0.01 0.59  -0.61   0.15   0.54  0.91  1.73  1945    1</span></span>
-<span><span class="co">#&gt; d[2]  -1.30    0.01 0.67  -2.61  -1.73  -1.29 -0.88  0.01  2026    1</span></span>
-<span><span class="co">#&gt; d[3]   0.03    0.01 0.45  -0.86  -0.24   0.02  0.30  0.92  2923    1</span></span>
-<span><span class="co">#&gt; d[5]  -0.31    0.01 0.40  -1.13  -0.51  -0.30 -0.09  0.47  2330    1</span></span>
-<span><span class="co">#&gt; lp__ -10.88    0.09 3.26 -18.03 -12.90 -10.60 -8.59 -5.26  1465    1</span></span>
-<span><span class="co">#&gt; tau    0.37    0.01 0.36   0.01   0.12   0.27  0.49  1.28  1080    1</span></span>
+<span><span class="co">#&gt; d[1]   0.50    0.01 0.65  -0.77   0.12   0.52  0.90  1.72  1899 1.00</span></span>
+<span><span class="co">#&gt; d[2]  -1.33    0.02 0.71  -2.81  -1.74  -1.32 -0.90  0.01  2001 1.00</span></span>
+<span><span class="co">#&gt; d[3]   0.02    0.01 0.48  -0.94  -0.25   0.02  0.31  0.89  2422 1.00</span></span>
+<span><span class="co">#&gt; d[5]  -0.29    0.01 0.46  -1.12  -0.50  -0.29 -0.08  0.54  1449 1.00</span></span>
+<span><span class="co">#&gt; lp__ -10.83    0.10 3.31 -18.23 -12.77 -10.49 -8.49 -5.36  1178 1.01</span></span>
+<span><span class="co">#&gt; tau    0.40    0.01 0.40   0.02   0.12   0.28  0.53  1.52   756 1.00</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Fri Aug 21 12:41:25 2026.</span></span>
+<span><span class="co">#&gt; Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:13:12 2026.</span></span>
 <span><span class="co">#&gt; For each parameter, n_eff is a crude measure of effective sample size,</span></span>
 <span><span class="co">#&gt; and Rhat is the potential scale reduction factor on split chains (at </span></span>
 <span><span class="co">#&gt; convergence, Rhat=1).</span></span></code></pre></div>
@@ -1039,14 +1043,14 @@ the <code><a href="../reference/plot_prior_posterior.html">plot_prior_posterior(
 <p>Model fit can be checked using the <code><a href="../reference/dic.html">dic()</a></code> function:</p>
 <div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">mix_dic_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">mix_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 9.3<span style="color: #555555;"> (on 11 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 7</span></span>
-<span><span class="co">#&gt;               DIC: 16.3</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 9.2<span style="color: #555555;"> (on 11 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 6.9</span></span>
+<span><span class="co">#&gt;               DIC: 16.1</span></span></code></pre></div>
 <div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">mix_dic_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dic.html">dic</a></span><span class="op">(</span><span class="va">mix_fit_RE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Residual deviance: 9.6<span style="color: #555555;"> (on 11 data points)</span></span></span>
-<span><span class="co">#&gt;                pD: 8.4</span></span>
-<span><span class="co">#&gt;               DIC: 18</span></span></code></pre></div>
+<span><span class="co">#&gt; Residual deviance: 9.8<span style="color: #555555;"> (on 11 data points)</span></span></span>
+<span><span class="co">#&gt;                pD: 8.6</span></span>
+<span><span class="co">#&gt;               DIC: 18.4</span></span></code></pre></div>
 <p>Both models fit the data well, having posterior mean residual
 deviance close to the number of data points. The DIC is similar between
 models, so we choose the FE model based on parsimony.</p>
@@ -1069,19 +1073,19 @@ against placebo using the <code><a href="../reference/relative_effects.html">rel
 <div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">mix_releff_FE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">mix_fit_FE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[4] -0.51 0.48 -1.46 -0.83 -0.50 -0.18  0.43     1606     2262    1</span></span>
-<span><span class="co">#&gt; d[2] -1.81 0.33 -2.47 -2.04 -1.81 -1.58 -1.16     5739     2842    1</span></span>
-<span><span class="co">#&gt; d[3] -0.47 0.49 -1.43 -0.80 -0.47 -0.14  0.50     2409     3011    1</span></span>
-<span><span class="co">#&gt; d[5] -0.80 0.53 -1.85 -1.16 -0.79 -0.45  0.27     1713     2275    1</span></span>
+<span><span class="co">#&gt; d[4] -0.55 0.47 -1.46 -0.87 -0.55 -0.23  0.40     1497     2237    1</span></span>
+<span><span class="co">#&gt; d[2] -1.81 0.33 -2.43 -2.03 -1.82 -1.60 -1.16     5481     2777    1</span></span>
+<span><span class="co">#&gt; d[3] -0.50 0.49 -1.45 -0.83 -0.50 -0.16  0.44     2317     2765    1</span></span>
+<span><span class="co">#&gt; d[5] -0.85 0.51 -1.83 -1.19 -0.85 -0.50  0.16     1630     2090    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_releff_FE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_releff_FE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">mix_releff_RE</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_effects.html">relative_effects</a></span><span class="op">(</span><span class="va">mix_fit_RE</span>, trt_ref <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; d[4] -0.55 0.59 -1.73 -0.91 -0.54 -0.15  0.61     1952     2171    1</span></span>
-<span><span class="co">#&gt; d[2] -1.85 0.49 -2.89 -2.13 -1.85 -1.55 -0.96     4054     2813    1</span></span>
-<span><span class="co">#&gt; d[3] -0.52 0.62 -1.74 -0.89 -0.51 -0.13  0.64     2989     2480    1</span></span>
-<span><span class="co">#&gt; d[5] -0.85 0.71 -2.23 -1.28 -0.84 -0.40  0.51     2067     1959    1</span></span>
+<span><span class="co">#&gt; d[4] -0.50 0.65 -1.72 -0.90 -0.52 -0.12  0.77     1990     1612    1</span></span>
+<span><span class="co">#&gt; d[2] -1.83 0.50 -2.84 -2.13 -1.83 -1.53 -0.85     4329     2654    1</span></span>
+<span><span class="co">#&gt; d[3] -0.48 0.63 -1.73 -0.86 -0.48 -0.11  0.73     3114     2376    1</span></span>
+<span><span class="co">#&gt; d[5] -0.79 0.80 -2.23 -1.25 -0.81 -0.38  0.75     1893     1419    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_releff_RE</span>, ref_line <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_releff_RE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>Following <span class="citation">Dias et al. (<a href="#ref-TSD2">2011</a>)</span>, we produce absolute predictions of
@@ -1100,11 +1104,11 @@ identity link function was used.)</p>
 <span>                       baseline_trt <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">mix_pred_FE</span></span>
 <span><span class="co">#&gt;          mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[4] -1.23 0.53 -2.27 -1.59 -1.22 -0.88 -0.17     1777     2613    1</span></span>
+<span><span class="co">#&gt; pred[4] -1.27 0.52 -2.27 -1.63 -1.27 -0.92 -0.24     1614     2341    1</span></span>
 <span><span class="co">#&gt; pred[1] -0.72 0.22 -1.14 -0.87 -0.72 -0.58 -0.29     3556     3638    1</span></span>
-<span><span class="co">#&gt; pred[2] -2.53 0.39 -3.31 -2.80 -2.53 -2.26 -1.78     5108     3551    1</span></span>
-<span><span class="co">#&gt; pred[3] -1.19 0.54 -2.24 -1.55 -1.21 -0.82 -0.10     2525     3106    1</span></span>
-<span><span class="co">#&gt; pred[5] -1.52 0.57 -2.66 -1.91 -1.52 -1.14 -0.37     1842     2382    1</span></span>
+<span><span class="co">#&gt; pred[2] -2.54 0.39 -3.31 -2.79 -2.53 -2.28 -1.75     4259     3575    1</span></span>
+<span><span class="co">#&gt; pred[3] -1.22 0.53 -2.27 -1.57 -1.22 -0.85 -0.20     2374     3025    1</span></span>
+<span><span class="co">#&gt; pred[5] -1.57 0.55 -2.64 -1.95 -1.56 -1.21 -0.49     1735     2548    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_pred_FE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_pred_FE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
@@ -1114,11 +1118,11 @@ identity link function was used.)</p>
 <span>                       baseline_trt <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">mix_pred_RE</span></span>
 <span><span class="co">#&gt;          mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[4] -1.27 0.63 -2.52 -1.68 -1.27 -0.87 -0.06     2088     2415    1</span></span>
+<span><span class="co">#&gt; pred[4] -1.23 0.69 -2.52 -1.66 -1.24 -0.82  0.14     2090     2045    1</span></span>
 <span><span class="co">#&gt; pred[1] -0.73 0.22 -1.17 -0.88 -0.73 -0.58 -0.31     4051     3817    1</span></span>
-<span><span class="co">#&gt; pred[2] -2.58 0.54 -3.68 -2.90 -2.57 -2.24 -1.57     4000     2896    1</span></span>
-<span><span class="co">#&gt; pred[3] -1.25 0.65 -2.52 -1.66 -1.24 -0.84  0.01     3099     2869    1</span></span>
-<span><span class="co">#&gt; pred[5] -1.58 0.74 -2.99 -2.04 -1.58 -1.14 -0.13     2124     2509    1</span></span>
+<span><span class="co">#&gt; pred[2] -2.56 0.54 -3.63 -2.90 -2.56 -2.23 -1.47     4133     3094    1</span></span>
+<span><span class="co">#&gt; pred[3] -1.21 0.67 -2.52 -1.61 -1.21 -0.80  0.08     3114     2385    1</span></span>
+<span><span class="co">#&gt; pred[5] -1.52 0.84 -3.04 -2.01 -1.55 -1.07  0.11     1937     1603    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_pred_RE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_pred_RE-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>If the <code>baseline</code> argument is omitted, predictions of mean
@@ -1130,29 +1134,29 @@ in the network based on their estimated baseline response <span class="math inli
 <span><span class="co">#&gt; <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 1</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;             mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[1: 4] -1.64 0.45 -2.50 -1.94 -1.65 -1.34 -0.70     2068     2403    1</span></span>
-<span><span class="co">#&gt; pred[1: 1] -1.13 0.43 -1.95 -1.42 -1.14 -0.84 -0.29     3407     2920    1</span></span>
-<span><span class="co">#&gt; pred[1: 2] -2.94 0.52 -3.93 -3.29 -2.94 -2.59 -1.96     3148     3019    1</span></span>
-<span><span class="co">#&gt; pred[1: 3] -1.60 0.39 -2.35 -1.86 -1.61 -1.34 -0.84     3552     3294    1</span></span>
-<span><span class="co">#&gt; pred[1: 5] -1.93 0.50 -2.88 -2.28 -1.93 -1.60 -0.94     2099     2516    1</span></span>
+<span><span class="co">#&gt; pred[1: 4] -1.66 0.45 -2.54 -1.96 -1.66 -1.35 -0.78     2083     2687    1</span></span>
+<span><span class="co">#&gt; pred[1: 1] -1.11 0.43 -1.95 -1.40 -1.10 -0.81 -0.26     3324     2985    1</span></span>
+<span><span class="co">#&gt; pred[1: 2] -2.92 0.51 -3.93 -3.27 -2.92 -2.57 -1.93     3205     2615    1</span></span>
+<span><span class="co">#&gt; pred[1: 3] -1.61 0.39 -2.36 -1.86 -1.61 -1.35 -0.83     3628     3090    1</span></span>
+<span><span class="co">#&gt; pred[1: 5] -1.96 0.49 -2.91 -2.29 -1.96 -1.63 -1.00     2215     2401    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 2</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;             mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[2: 4] -1.14 0.52 -2.14 -1.50 -1.13 -0.79 -0.10     1589     2167    1</span></span>
-<span><span class="co">#&gt; pred[2: 1] -0.64 0.26 -1.15 -0.81 -0.63 -0.46 -0.11     4656     3462    1</span></span>
-<span><span class="co">#&gt; pred[2: 2] -2.45 0.24 -2.93 -2.61 -2.45 -2.28 -1.96     5173     3692    1</span></span>
-<span><span class="co">#&gt; pred[2: 3] -1.11 0.53 -2.15 -1.46 -1.11 -0.74 -0.05     2303     2812    1</span></span>
-<span><span class="co">#&gt; pred[2: 5] -1.44 0.56 -2.53 -1.83 -1.44 -1.05 -0.31     1690     2295    1</span></span>
+<span><span class="co">#&gt; pred[2: 4] -1.19 0.51 -2.17 -1.54 -1.19 -0.86 -0.18     1459     2058    1</span></span>
+<span><span class="co">#&gt; pred[2: 1] -0.64 0.26 -1.16 -0.81 -0.64 -0.46 -0.15     4895     4016    1</span></span>
+<span><span class="co">#&gt; pred[2: 2] -2.45 0.25 -2.94 -2.62 -2.46 -2.29 -1.97     5339     3831    1</span></span>
+<span><span class="co">#&gt; pred[2: 3] -1.14 0.53 -2.21 -1.51 -1.12 -0.78 -0.12     2220     2592    1</span></span>
+<span><span class="co">#&gt; pred[2: 5] -1.49 0.54 -2.54 -1.87 -1.49 -1.12 -0.43     1566     2145    1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">----------------------------------------------------------------------</span> <span style="font-weight: bold;">Study: 3</span> <span style="color: #555555;">----</span> </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;             mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; pred[3: 4] -1.10 0.42 -1.94 -1.38 -1.10 -0.81 -0.28     2007     2612    1</span></span>
-<span><span class="co">#&gt; pred[3: 1] -0.59 0.36 -1.30 -0.84 -0.60 -0.35  0.11     4337     2979    1</span></span>
-<span><span class="co">#&gt; pred[3: 2] -2.41 0.39 -3.17 -2.66 -2.41 -2.14 -1.66     3882     3167    1</span></span>
-<span><span class="co">#&gt; pred[3: 3] -1.06 0.47 -1.99 -1.39 -1.04 -0.75 -0.14     3112     2988    1</span></span>
-<span><span class="co">#&gt; pred[3: 5] -1.40 0.48 -2.34 -1.71 -1.40 -1.06 -0.47     2072     2409    1</span></span>
+<span><span class="co">#&gt; pred[3: 4] -1.14 0.42 -1.95 -1.41 -1.14 -0.86 -0.30     1775     2629    1</span></span>
+<span><span class="co">#&gt; pred[3: 1] -0.59 0.36 -1.31 -0.82 -0.58 -0.34  0.10     4567     3352    1</span></span>
+<span><span class="co">#&gt; pred[3: 2] -2.40 0.38 -3.15 -2.66 -2.40 -2.13 -1.69     3915     3238    1</span></span>
+<span><span class="co">#&gt; pred[3: 3] -1.09 0.48 -2.01 -1.41 -1.09 -0.75 -0.15     2869     3035    1</span></span>
+<span><span class="co">#&gt; pred[3: 5] -1.44 0.46 -2.36 -1.74 -1.44 -1.13 -0.51     1881     2375    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_pred_FE_studies</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/mix_pred_FE_all-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <p>We can also produce treatment rankings, rank probabilities, and
@@ -1160,31 +1164,31 @@ cumulative rank probabilities.</p>
 <div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">mix_ranks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_ranks</a></span><span class="op">(</span><span class="va">mix_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         mean   sd 2.5% 25% 50% 75% 97.5% Bulk_ESS Tail_ESS Rhat</span></span>
-<span><span class="co">#&gt; rank[4] 3.51 0.71    2   3   3   4     5     2379       NA    1</span></span>
-<span><span class="co">#&gt; rank[1] 4.63 0.79    2   5   5   5     5     2077       NA    1</span></span>
-<span><span class="co">#&gt; rank[2] 1.05 0.26    1   1   1   1     2     2572     2682    1</span></span>
-<span><span class="co">#&gt; rank[3] 3.52 0.92    2   3   4   4     5     3397       NA    1</span></span>
-<span><span class="co">#&gt; rank[5] 2.29 0.68    1   2   2   3     4     2517     2745    1</span></span>
+<span><span class="co">#&gt; rank[4] 3.49 0.71    2   3   3   4     5     2072       NA    1</span></span>
+<span><span class="co">#&gt; rank[1] 4.67 0.74    2   5   5   5     5     2147       NA    1</span></span>
+<span><span class="co">#&gt; rank[2] 1.06 0.29    1   1   1   1     2     2003     2008    1</span></span>
+<span><span class="co">#&gt; rank[3] 3.51 0.91    2   3   4   4     5     3292       NA    1</span></span>
+<span><span class="co">#&gt; rank[5] 2.26 0.65    1   2   2   2     4     2506     2894    1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_ranks</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/parkinsons_mix_ranks-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">mix_rankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">mix_fit_FE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]</span></span>
-<span><span class="co">#&gt; d[4]      0.00      0.04      0.49      0.39      0.08</span></span>
-<span><span class="co">#&gt; d[1]      0.00      0.04      0.07      0.11      0.78</span></span>
-<span><span class="co">#&gt; d[2]      0.96      0.03      0.01      0.00      0.00</span></span>
-<span><span class="co">#&gt; d[3]      0.00      0.17      0.25      0.45      0.13</span></span>
-<span><span class="co">#&gt; d[5]      0.04      0.71      0.19      0.05      0.01</span></span>
+<span><span class="co">#&gt; d[4]      0.00      0.04      0.50      0.38      0.08</span></span>
+<span><span class="co">#&gt; d[1]      0.00      0.04      0.05      0.11      0.80</span></span>
+<span><span class="co">#&gt; d[2]      0.95      0.04      0.01      0.00      0.00</span></span>
+<span><span class="co">#&gt; d[3]      0.01      0.16      0.26      0.46      0.11</span></span>
+<span><span class="co">#&gt; d[5]      0.04      0.73      0.17      0.05      0.01</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_rankprobs</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/parkinsons_mix_rankprobs-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">mix_cumrankprobs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_ranks.html">posterior_rank_probs</a></span><span class="op">(</span><span class="va">mix_fit_FE</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      p_rank[1] p_rank[2] p_rank[3] p_rank[4] p_rank[5]</span></span>
-<span><span class="co">#&gt; d[4]      0.00      0.04      0.53      0.92         1</span></span>
-<span><span class="co">#&gt; d[1]      0.00      0.04      0.11      0.22         1</span></span>
-<span><span class="co">#&gt; d[2]      0.96      0.99      1.00      1.00         1</span></span>
-<span><span class="co">#&gt; d[3]      0.00      0.17      0.43      0.87         1</span></span>
-<span><span class="co">#&gt; d[5]      0.04      0.75      0.94      0.99         1</span></span>
+<span><span class="co">#&gt; d[4]      0.00      0.04      0.54      0.92         1</span></span>
+<span><span class="co">#&gt; d[1]      0.00      0.04      0.09      0.20         1</span></span>
+<span><span class="co">#&gt; d[2]      0.95      0.99      1.00      1.00         1</span></span>
+<span><span class="co">#&gt; d[3]      0.01      0.16      0.43      0.89         1</span></span>
+<span><span class="co">#&gt; d[5]      0.04      0.77      0.94      0.99         1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mix_cumrankprobs</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_parkinsons_files/figure-html/parkinsons_mix_cumrankprobs-1.png" class="r-plt" alt="" width="700" style="display: block; margin: auto;"></p>
 </div>
