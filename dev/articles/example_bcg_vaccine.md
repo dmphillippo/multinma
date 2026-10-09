@@ -141,7 +141,7 @@ bcg_fit_unadj
 #> lp__             1
 #> tau              1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Oct  9 09:34:48 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Oct  9 11:34:35 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -239,7 +239,7 @@ bcg_fit_lat
 #> lp__                          -13447.92  1408    1
 #> tau                                0.77  1590    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Oct  9 09:34:55 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Oct  9 11:34:43 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -479,7 +479,7 @@ effects:
 
 (bcg_predeff_unadj <- relative_effects(bcg_fit_unadj, predictive_distribution = TRUE))
 #> 
-#>  Elapsed Time: 0.014 seconds (Generated Quantities)
+#>  Elapsed Time: 0.018 seconds (Generated Quantities)
 #>                        mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
 #> delta_new[Vaccinated] -0.76 0.75 -2.27 -1.22 -0.76 -0.31  0.72    16312    17399    1
 ```

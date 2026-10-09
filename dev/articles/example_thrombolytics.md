@@ -150,7 +150,7 @@ thrombo_fit
 #> d[UK]           1
 #> lp__            1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Oct  9 09:54:25 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Oct  9 11:50:03 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -270,7 +270,7 @@ thrombo_fit_ume
 #> d[UK vs. t-PA]         5410    1
 #> lp__                   1365    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Fri Oct  9 09:54:34 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Oct  9 11:50:10 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
