@@ -15,7 +15,8 @@ set_agd_arm(
   E = NULL,
   sample_size = NULL,
   trt_ref = NULL,
-  trt_class = NULL
+  trt_class = NULL,
+  allow_single_arm
 )
 }
 \arguments{
@@ -48,6 +49,12 @@ will be chosen (see details).}
 
 \item{trt_class}{column of \code{data} specifying treatment classes, coded using
 integers, strings, or factors. By default, no classes are specified.}
+
+\item{allow_single_arm}{Should single-arm studies be allowed? If \code{"warn"}
+(the default) a warning is given when single-arm studies are present. If
+\code{"error"} or \code{FALSE}, an error is given when single-arm studies are
+present. If \code{TRUE} or \code{"inform"} an informative note is given. The default
+can be set globally via option \code{multinma.allow_single_arm}.}
 }
 \value{
 An object of class \link{nma_data}

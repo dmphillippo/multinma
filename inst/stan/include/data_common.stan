@@ -8,6 +8,8 @@ int<lower=0> ni_ipd; // total number of IPD individuals
 int<lower=0> ni_agd_arm; // total number of AgD (arm-based) data points
 int<lower=0> ni_agd_contrast; // total number of AgD (contrast-based) data points
 
+int<lower=0> n_mixed_studies; // total number of studies that contain both IPD and AgD (arm-based)
+
 // Treatment IDs
 int<lower=0> narm_ipd; // Number of IPD arms
 array[ni_ipd] int<lower=1> ipd_arm; // Arm indicator for IPD (i.e. picking element of which_RE)
@@ -17,10 +19,14 @@ array[narm_agd_arm] int<lower=1> agd_arm_trt;
 array[ni_agd_contrast] int<lower=1> agd_contrast_trt;
 array[ni_agd_contrast] int<lower=1> agd_contrast_trt_b;
 
+// Flag to indicate whether a random baseline is used (1 = random, 0 = fixed)
+int<lower=0, upper=1> random_baseline;
 // Study IDs
-// array[max(ipd_arm)] int<lower=1> ipd_study;
-// array[ni_agd_arm] int<lower=1> agd_arm_study;
+array[random_baseline && ni_ipd > 0 ? max(ipd_arm) : 0] int<lower=1> ipd_study;
+array[random_baseline ? ni_agd_arm : 0] int<lower=1> agd_arm_study;
 // array[ni_agd_contrast] int<lower=1> agd_contrast_study;
+int<lower=0> n_baseline_studies;
+array[random_baseline ? n_baseline_studies : 0] int<lower=1> baseline_study_idx;
 
 int<lower=1> nt; // number of treatments
 int<lower=0> nX; // number of columns of design matrix
@@ -61,10 +67,19 @@ array[brmr_n_col] int<lower=1> brmr_col;
 real xbar_mu;
 
 // -- Priors --
-int<lower=0,upper=3> prior_intercept_dist;
-real prior_intercept_location;
-real<lower=0> prior_intercept_scale;
-real<lower=0> prior_intercept_df;
+// Scalar when baseline_priors = 0, study-specific vector otherwise
+int<lower=0, upper=1> baseline_priors;
+array[baseline_priors ? ns_ipd + ns_agd_arm : 1] int<lower=0,upper=3> prior_intercept_dist;
+array[baseline_priors ? ns_ipd + ns_agd_arm : 1] real prior_intercept_location;
+array[baseline_priors ? ns_ipd + ns_agd_arm : 1] real<lower=0> prior_intercept_scale;
+array[baseline_priors ? ns_ipd + ns_agd_arm : 1] real<lower=0> prior_intercept_df;
+
+array[baseline_priors ? ns_ipd + ns_agd_arm : 0] int<lower=1> baseline_trt;
+
+int<lower=0,upper=6> prior_intercept_sd_dist;
+real prior_intercept_sd_location;
+real<lower=0> prior_intercept_sd_scale;
+real<lower=0> prior_intercept_sd_df;
 
 int<lower=0,upper=3> prior_trt_dist;
 real prior_trt_location;

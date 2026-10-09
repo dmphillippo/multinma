@@ -1,15 +1,75 @@
 # multinma 0.9.1.9000
 
+## Feature: Models for connecting disconnected networks/single-arm studies
+
+* A new `connect_baseline` argument to `nma()` allows users to connect networks
+that are disconnected or include single-arm studies, under strong assumptions
+about predicting absolute outcomes between disconnected components/studies.
+* The new `con()` function specifies the type of baseline connection to use, 
+either:
+  * Fixed baseline connections where the (adjusted) study baselines are 
+  assumed to be equal between the specified studies; or
+  * Random baseline connections where an informative prior distribution is 
+  placed on the (adjusted) study baseline(s) specified.
+  
+  The latter allows for additional uncertainty due to residual variation in
+  baseline risk (i.e. unobserved prognostic factors or effect modifiers) to be 
+  incorporated. The random baseline distribution may be estimated first by
+  fitting a baseline synthesis model, with the new `baseline_synthesis()` 
+  function (see below).
+  
+* The strong assumption of (conditional, with a regression model) constancy of
+absolute effects may be assessed by:
+  * Comparing study populations prior to model fitting, using the new
+  `compare_populations()` function to compute the effective sample size overlap 
+  between the joint covariate distributions, or the standardised Euclidean
+  distance between the mean covariate values.
+  * Considering the magnitude of the heterogeneity standard deviation estimated
+  in the baseline synthesis model, and the predictive interval for a new study
+  baseline.
+  * Investigating the predictive performance of the model using Bayesian or 
+  leave-one-out $R^2$ statistics, implemented in the new `bayes_R2()` and 
+  `loo_R2()` functions, and/or investigating the leave-one-out cross validation
+  predictive performance with the new `loo_predictive_metric()` function.
+  
+* The new `allow_single_arm` argument to the `set_*()` functions (and associated 
+global option `multinma.allow_single_arm`) controls the behaviour when 
+single-arm studies are included in the network at setup stage. By default a
+warning will be given (except for survival data), but this can be changed to an
+error or an information message.
+
+## Feature: Baseline synthesis models
+
+* The new `baseline_synthesis()` function fits baseline synthesis models. A 
+random effect is placed on the (adjusted) study-specific baseline (intercept) 
+parameters, to obtain a pooled estimate of the absolute outcomes on the network 
+reference treatment.
+* Estimates of both the overall baseline mean and standard deviation are 
+returned, as well as the predictive distribution for outcomes in a new study.
+* The predictive distribution may be used to connect a network that is
+disconnected or includes single-arm studies, as the input to the
+`connect_baseline` argument of `nma()`, and to judge the magnitude of 
+unexplained variation in absolute outcomes between studies.
+* Baseline synthesis models are also useful in standard NMA for obtaining a
+distribution on baseline risk for which to produce absolute predictions against,
+see TSD 5.
+
+## Other updates
+
 * Feature: New function `bind_chains()` combines multiple runs of the same model
 into a single model object. For MCMC arrays, a new `cbind.mcmc_array()` method
 combines multiple MCMC arrays containing samples of the same parameters into a 
 single MCMC array.
 * Feature: Added `debug` option to `nma()`. When `TRUE`, the model will not be
 fitted and instead a list of input data to Stan is returned.
+* Feature: New `allow_mixed_studies` argument to `combine_network()` allows 
+studies to be included in more than one data type.
 * Improvement: `relative_effects()` now works when `newdata` contains
 integration points. Furthermore, `relative_effects()` will now ask for 
 integration points to be provided for models that involve non-linear covariate 
 terms, so that these can be averaged over correctly. 
+* Improvement: The arm-level outcome standard deviation parameters `sigma` in
+models with a  Normal likelihood and IPD are now labelled informatively.
 * Fix: Error in `dic()` for models with IPD and a Normal likelihood, caused by
 dplyr deprecation.
 

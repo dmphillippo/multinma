@@ -13,7 +13,8 @@
   weight_nodes = FALSE,
   show_trt_class = FALSE,
   level = c("treatment", "class"),
-  nudge = 0
+  nudge = 0,
+  show_single_arm = FALSE
 )
 }
 \arguments{
@@ -42,6 +43,11 @@ Default is \code{FALSE}.}
 \item{nudge}{Numeric value to nudge the treatment labels away from the nodes
 when \code{weight_nodes = TRUE}. Default is \code{0} (no adjustment to label
 position). A small value like \code{0.1} is usually sufficient.}
+
+\item{show_single_arm}{Display single-arm studies as points on the treatment
+nodes? Default is \code{FALSE}. When \code{TRUE}, each treatment with single-arm
+studies is marked by a point with the legend listing the corresponding
+study names.}
 }
 \value{
 A \code{ggplot} object, as produced by
