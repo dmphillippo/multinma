@@ -132,7 +132,7 @@ diet_fit_FE
 #> d[Reduced Fat]   -0.01    0.00 0.05   -0.11   -0.04   -0.01    0.03    0.10  3568    1
 #> lp__           5386.16    0.06 2.49 5380.38 5384.77 5386.50 5387.97 5389.91  1586    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:11:28 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Oct  9 09:36:25 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -209,7 +209,7 @@ diet_fit_RE
 #> lp__           5379.04    0.12 3.87 5370.72 5376.69 5379.29 5381.73 5385.88  1063    1
 #> tau               0.13    0.00 0.11    0.00    0.04    0.10    0.18    0.41   877    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:11:32 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Oct  9 09:36:29 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).

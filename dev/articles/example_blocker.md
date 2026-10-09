@@ -123,7 +123,7 @@ blocker_fit_FE
 #> d[Beta Blocker]    -0.26    0.00 0.05    -0.36    -0.29    -0.26    -0.23    -0.16  3136    1
 #> lp__            -5960.40    0.08 3.40 -5967.79 -5962.43 -5960.05 -5957.94 -5954.74  1649    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:10:25 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Oct  9 09:35:07 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -200,7 +200,7 @@ blocker_fit_RE
 #> lp__            -5970.64    0.18 5.45 -5981.85 -5974.32 -5970.47 -5966.72 -5960.78   931 1.01
 #> tau                 0.14    0.00 0.08     0.01     0.07     0.13     0.19     0.31   947 1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 11:10:29 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Oct  9 09:35:10 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).

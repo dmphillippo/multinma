@@ -98,7 +98,7 @@ smk_fit_RE_UME
 #> lp__                                            -5754.10  1031    1
 #> tau                                                 1.43  1335    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Thu Oct  8 10:45:55 2026.
+#> Samples were drawn using NUTS(diag_e) at Fri Oct  9 09:15:34 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
