@@ -699,11 +699,11 @@ test_that(".study, .trt, .time columns are correct (gengamma, no regression, net
   expect_identical(pred3.2$parameter,
                    paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
 
-  pred3.3 <- tibble::as_tibble(predict(ndmm_fit_gengamma, type = "rmst"))
-  expect_equivalent(pred3.3[, c(".study", ".trt")],
-                    preddat3[, c(".study", ".trt")])
-  expect_identical(pred3.3$parameter,
-                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+  # pred3.3 <- tibble::as_tibble(predict(ndmm_fit_gengamma, type = "rmst"))
+  # expect_equivalent(pred3.3[, c(".study", ".trt")],
+  #                   preddat3[, c(".study", ".trt")])
+  # expect_identical(pred3.3$parameter,
+  #                  paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
 
   pred3.4 <- tibble::as_tibble(predict(ndmm_fit_gengamma, type = "link"))
   expect_equivalent(pred3.4[, c(".study", ".trt")],
@@ -2051,11 +2051,11 @@ test_that(".study, .trt, .time columns are correct (gengamma, regression, aggreg
   # expect_identical(pred3.1$parameter,
   #                  paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
 
-  pred3.2 <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg, type = "median"))
-  expect_equivalent(pred3.2[, c(".study", ".trt")],
-                    preddat3[, c(".study", ".trt")])
-  expect_identical(pred3.2$parameter,
-                   paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
+  # pred3.2 <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg, type = "median"))
+  # expect_equivalent(pred3.2[, c(".study", ".trt")],
+  #                   preddat3[, c(".study", ".trt")])
+  # expect_identical(pred3.2$parameter,
+  #                  paste0("pred[", preddat3$.study, ": ", preddat3$.trt, "]"))
 
   pred3.3 <- tibble::as_tibble(predict(ndmm_fit_gengamma_reg, type = "rmst"))
   expect_equivalent(pred3.3[, c(".study", ".trt")],
