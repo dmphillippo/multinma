@@ -1,4 +1,3 @@
-#' @param data a data frame
 #' @param trt column of `data` specifying treatments, coded using integers,
 #'   strings, or factors
 #' @param trt_ref reference treatment for the network, as a single integer,

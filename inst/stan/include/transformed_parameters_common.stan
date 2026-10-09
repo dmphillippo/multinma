@@ -3,6 +3,7 @@
 // -- Linear and transformed predictors --
 vector[ni_ipd] eta_ipd; // IPD linear predictor
 // vector[ni_ipd] theta_ipd; // IPD transformed predictor
+vector[nc_agd_regression] eta_agd_regression; // AgD regression coefficients linear predictor
 
 // -- RE deltas --
 // Avoid evaluating tau[1] when no RE (u_delta is zero dim in this case)
@@ -171,3 +172,4 @@ if (ni_agd_contrast) {
     }
   }
 }
+
