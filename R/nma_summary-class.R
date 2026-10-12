@@ -603,7 +603,7 @@ summary_mcmc_array <- function(x, probs = c(0.025, 0.25, 0.5, 0.75, 0.975)) {
   # p_se_mean <- p_sd / sqrt(apply(x, 3, rstan:::ess_mean))
 
   qt <- function(x, probs, ...) {
-    if (all(is.na(x))) setNames(rlang::rep_along(probs, NA_real_), paste0(probs*100, "%"))
+    if (any(is.na(x))) setNames(rlang::rep_along(probs, NA_real_), paste0(probs*100, "%"))
     else quantile(x, probs = probs, ...)
   }
 
