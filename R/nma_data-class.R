@@ -854,9 +854,13 @@ plot.nma_data <- function(x, ..., layout, circular,
   }
 
   dat_mixed <- has_ipd(x) && (has_agd_arm(x) || has_agd_contrast(x))
-  g <- ggraph::ggraph(igraph::as.igraph(x), layout = layout, circular = circular, ...)
+  ig <- igraph::as.igraph(x)
+  g <- ggraph::ggraph(ig, layout = layout, circular = circular, ...)
 
-  if (weight_edges) {
+  # catch networks with no edges (single arms only)
+  no_edges <- igraph::ecount(ig) - igraph::count_loops(ig) == 0
+
+  if (!no_edges && weight_edges) {
     g <- g +
       ggraph::geom_edge_fan(ggplot2::aes(edge_width = .data$.nstudy,
                                        edge_colour = .data$.type),
