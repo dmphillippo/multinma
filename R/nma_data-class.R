@@ -889,15 +889,6 @@ plot.nma_data <- function(x, ..., layout, circular,
                                 shape = 21)
     }
 
-    if (!is.null(sa_nodes)) {
-      sa_tmp <- dplyr::left_join(sa_nodes, g$data[, c("name", "x", "y")],
-                                 by = "name")
-      g <- g +
-        ggplot2::geom_point(data = sa_tmp,
-                            ggplot2::aes(x = .data$x, y = .data$y, shape = .data$name),
-                            size = 2, colour = "black")
-    }
-
     # Calculate nudge positions
     if (nudge == 0) {
       pos <- ggplot2::position_identity()
