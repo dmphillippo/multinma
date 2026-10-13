@@ -12,9 +12,9 @@
   weight_edges = TRUE,
   weight_nodes = FALSE,
   show_trt_class = FALSE,
+  show_single_arm = FALSE,
   level = c("treatment", "class"),
-  nudge = 0,
-  show_single_arm = FALSE
+  nudge = 0
 )
 }
 \arguments{
@@ -38,16 +38,15 @@ layout functions provided by \link[igraph:igraph-package]{igraph}.}
 \item{show_trt_class}{Colour treatment nodes by class, if \code{trt_class} is set?
 Default is \code{FALSE}.}
 
+\item{show_single_arm}{Label single-arm studies? Default is \code{FALSE}. When
+\code{TRUE}, each treatment node with single-arm studies is marked with a
+footnote listing the single-arm studies on that treatment.}
+
 \item{level}{Display network at the \code{"treatment"} (default) or \code{"class"} level.}
 
 \item{nudge}{Numeric value to nudge the treatment labels away from the nodes
 when \code{weight_nodes = TRUE}. Default is \code{0} (no adjustment to label
 position). A small value like \code{0.1} is usually sufficient.}
-
-\item{show_single_arm}{Display single-arm studies as points on the treatment
-nodes? Default is \code{FALSE}. When \code{TRUE}, each treatment with single-arm
-studies is marked by a point with the legend listing the corresponding
-study names.}
 }
 \value{
 A \code{ggplot} object, as produced by

@@ -720,11 +720,10 @@ has_indirect <- function(network, trt1, trt2) {
 #'   `FALSE`.
 #' @param show_trt_class Colour treatment nodes by class, if `trt_class` is set?
 #'   Default is `FALSE`.
+#' @param show_single_arm Label single-arm studies? Default is `FALSE`. When
+#'   `TRUE`, each treatment node with single-arm studies is marked with a
+#'   footnote listing the single-arm studies on that treatment.
 #' @param level Display network at the `"treatment"` (default) or `"class"` level.
-#' @param show_single_arm Display single-arm studies as points on the treatment
-#'   nodes? Default is `FALSE`. When `TRUE`, each treatment with single-arm
-#'   studies is marked by a point with the legend listing the corresponding
-#'   study names.
 #' @param nudge Numeric value to nudge the treatment labels away from the nodes
 #'   when `weight_nodes = TRUE`. Default is `0` (no adjustment to label
 #'   position). A small value like `0.1` is usually sufficient.
@@ -785,9 +784,9 @@ plot.nma_data <- function(x, ..., layout, circular,
                           weight_edges = TRUE,
                           weight_nodes = FALSE,
                           show_trt_class = FALSE,
+                          show_single_arm = FALSE,
                           level = c("treatment", "class"),
-                          nudge = 0,
-                          show_single_arm = FALSE) {
+                          nudge = 0) {
   level <- rlang::arg_match(level)
   if (missing(layout) && missing(circular)) {
     layout <- "linear"
@@ -850,6 +849,8 @@ plot.nma_data <- function(x, ..., layout, circular,
         dplyr::group_by(.data$from) %>%
         dplyr::summarise(study = paste(.data$.study, collapse = ", "), .groups = "drop") %>%
         dplyr::rename(name = "from")
+
+      sa_nodes$mark <- if (nrow(sa_nodes) < 4) c("*", "\u2020", "\u2021")[1:nrow(sa_nodes)] else paste0("[", 1:nrow(sa_nodes), "]")
     }
   }
 
@@ -921,12 +922,13 @@ plot.nma_data <- function(x, ..., layout, circular,
   }
 
   if (!is.null(sa_nodes)) {
-    sa_tmp <- dplyr::left_join(sa_nodes, g$data[, c("name", "x", "y")],
-                               by = "name")
+    g_tmp <- dplyr::left_join(g$data[, c("name", "x", "y")], sa_nodes,
+                               by = "name") %>%
+      dplyr::mutate(name = dplyr::if_else(!is.na(.data$mark), paste(.data$name, .data$mark), .data$name))
+    g$data$name <- g_tmp$name
+
     g <- g +
-      ggplot2::geom_point(data = sa_tmp,
-                          ggplot2::aes(x = .data$x, y = .data$y, shape = .data$name),
-                          size = 2, colour = "black")
+      ggplot2::labs(caption = paste0("Single-arm studies:\n", paste(sa_nodes$mark, sa_nodes$study, collapse = "\n")))
   }
 
   if (show_trt_class) {
@@ -945,7 +947,8 @@ plot.nma_data <- function(x, ..., layout, circular,
   g <- g +
     ggraph::scale_edge_colour_manual("Data", values = c(AgD = "#113259", IPD = "#55A480", Mixed = "#E5A93C"),
                                      guide = if (dat_mixed) "legend" else "none") +
-    ggraph::theme_graph(base_family = "") +
+    ggraph::theme_graph(base_family = "")  +
+    ggplot2::theme(plot.caption = ggplot2::element_text(hjust = 0)) +
     ggplot2::coord_fixed(clip = "off")
   return(g)
 }
