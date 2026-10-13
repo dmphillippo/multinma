@@ -79,8 +79,8 @@ test_that("nma() class_effect must be valid", {
 })
 
 test_that("nma() class_sd lists must be valid", {
-  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = list(group1 = c("Exposure", "NonExistentClass"))), "Some classes listed in 'class_sd' are not present in the network", fixed = TRUE)
-  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = list(group1 = c("Exposure", "NSSA"), group2 = c("NSSA", "SSRI/SNRI"))), "Some classes are listed in more than one shared standard deviation group in 'class_sd'")
+  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = list(group1 = c("Exposure", "NonExistentClass"))), "Some classes listed in `class_sd` are not present in the network", fixed = TRUE)
+  expect_error(nma(sa_net, class_effect = "exchangeable", class_sd = list(group1 = c("Exposure", "NSSA"), group2 = c("NSSA", "SSRI/SNRI"))), "Some classes are listed in more than one shared standard deviation group in `class_sd`")
 })
 
 test_that("nma() class_sd must be valid", {
@@ -440,7 +440,6 @@ test_that("nma() gives warnings for default priors", {
   expect_warning(nma(smknet_yi, trt_effects = "random", prior_trt = normal(0, 1), test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_het.+", "prior_aux.+"))
   expect_warning(nma(smknet_yi, trt_effects = "random", prior_het = half_normal(1), test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_trt.+", "prior_aux.+"))
   expect_warning(nma(smknet_yi, trt_effects = "random", prior_aux = half_normal(1), test_grad = TRUE), paste0(m, ".+prior_intercept.+", "prior_trt.+", "prior_het.+"))
-
 })
 
 test_that("nma() error with incompatible priors", {
@@ -496,4 +495,423 @@ test_that("rstan R-hat and ESS warnings are captured correctly", {
     "The largest R-hat is"),
     "Bulk Effective Sample(s?) Size \\(ESS\\) is too low"),
     "Tail Effective Sample(s?) Size \\(ESS\\) is too low")
+})
+
+
+disc_dat <- tibble(study = c("S1", "S1", "S2", "S2", "S3"),
+                   trt   = c("A", "B", "C", "D", "A"),
+                   r     = c(50, 60, 55, 65, 1),
+                   n     = c(100, 100, 100, 100, 1))
+disc_net <- set_agd_arm(disc_dat, study, trt, r = r, n = n, allow_single_arm = TRUE)
+
+test_that("con() argument checks", {
+  expect_warning(nma(smknet,
+                     connect_baseline = con("random", c(1, 2), normal(0, 1)),
+                     prior_intercept = normal(0, 10),
+                     prior_trt = normal(0, 10),
+                     test_grad = TRUE),
+                 "`connect_baseline` supplied with a connected network")
+
+  expect_error(nma(disc_net, connect_baseline = "a"),
+               "`connect_baseline` must be a con() specification or list of con() specifications.",
+               fixed = TRUE)
+
+  expect_error(nma(disc_net,
+                   connect_baseline = con(type = "rando",
+                                          studies = c("FIXTURE", "FEATURE"),
+                                          prior_baseline = normal(0,10))),
+               '`type` must be one of "fixed" or "random"')
+
+  expect_error(nma(disc_net,
+                   connect_baseline = con(type = 1,
+                                          studies = c("FIXTURE", "FEATURE"),
+                                          prior_baseline = normal(0,10))),
+               '`type` must be')
+
+  expect_error(nma(disc_net,
+                   connect_baseline = list(con(type = "rando",
+                                               studies = c("FIXTURE", "FEATURE"),
+                                               prior_baseline = normal(0,10)),
+                                           con(type = "random",
+                                               studies = c("JUNCTURE"),
+                                               prior_baseline = normal(0,10)))),
+               '`type` must be one of "fixed" or "random"')
+
+  expect_error(nma(disc_net,
+                   connect_baseline = list(con(type = "random",
+                                               studies = c("FIXTURE", "FEATURE"),
+                                               prior_baseline = normal(0,10)),
+                                           con(type = 1,
+                                               studies = c("JUNCTURE"),
+                                               prior_baseline = normal(0,10)))),
+               '`type` must be')
+
+  expect_error(nma(disc_net, connect_baseline = list(con(type = "fixed",
+                                                        studies = c("FIXTURE", "JUNCTURE")),
+                                                    con(type = "fixed",
+                                                        studies = "FEATURE"))),
+               '`studies` must be a vector of study names of length > 2 for type = "fixed"')
+
+  expect_error(nma(disc_net, connect_baseline = list(con(type = "fixed",
+                                                        studies = c("FIXTURE", "JUNCTURE")),
+                                                    con(type = "random",
+                                                        studies = list(),
+                                                        prior_baseline = normal(0,1)))),
+               '`studies` must be a vector of study names of length > 1 for type = "random"')
+
+  expect_error(nma(disc_net, connect_baseline = list(con(type = "fixed",
+                                                        studies = c("FIXTURE", "JUNCTURE")),
+                                                    con(type = "fixed",
+                                                        studies = c("FIXTURE", "FEATURE")))),
+               "Each study may appear in at most one con\\(\\) specification\\..*Duplicates found: FIXTURE")
+
+  expect_error(nma(disc_net, connect_baseline = con(type = "random",
+                                                   studies = c("FIXTUR", "FEATURE"),
+                                                   prior_baseline = normal(0,10))),
+               "Some studies listed in `connect_baseline` are not present in the network (IPD or AgD arm-based).",
+               fixed = TRUE)
+
+  expect_error(nma(disc_net, connect_baseline = con(type = "random",
+                                                   studies = c(1, "FEATURE"),
+                                                   prior_baseline = normal(0,10))),
+               "Some studies listed in `connect_baseline` are not present in the network (IPD or AgD arm-based).",
+               fixed = TRUE)
+
+  expect_error(nma(disc_net, connect_baseline = con(type = "random",
+                                                    studies = "S2",
+                                                    prior_baseline = normal(0,10),
+                                                    baseline_trt = "wrong")),
+               'Treatment "wrong" listed in `baseline_trt` is not present in the network',
+               fixed = TRUE)
+
+  expect_error(nma(disc_net, connect_baseline = con(type = "random",
+                                                   studies = c("FIXTURE", "FEATURE"))),
+               '`prior_baseline` must be provided when type = "random".')
+
+  expect_error(nma(disc_net, connect_baseline = con(type = "random",
+                                                   studies = c("FIXTURE", "FEATURE"),
+                                                   prior_baseline = letters)),
+               "`prior_baseline` must be a prior distribution, see ?priors", fixed = TRUE)
+
+  expect_error(nma(disc_net, connect_baseline = con(type = "random",
+                                                   studies = c("FIXTURE", "FEATURE"),
+                                                   prior_baseline = list(normal(0, 1)))),
+               "`prior_baseline` must be a prior distribution, see ?priors", fixed = TRUE)
+
+  expect_error(nma(disc_net, connect_baseline = con(type = "random",
+                                                    studies = c("FIXTURE", "FEATURE"),
+                                                    prior_baseline = half_normal(1))),
+               "Invalid `prior_baseline`. Suitable distributions are", fixed = TRUE)
+})
+
+test_that("con() rejects studies from AgD-contrast data", {
+  cs_study <- as.character(sa_net$agd_contrast$.study[1])
+  expect_warning(
+    expect_error(
+      nma(sa_net, connect_baseline = con(type = "random", studies = cs_study, prior_baseline = normal(0, 10))),
+      "`connect_baseline` cannot include studies from AgD-contrast data"),
+    "`connect_baseline` supplied with a connected network")
+})
+
+fixdat <- tibble(study = c("F1", "F1", "F2", "F2"),
+                 trt   = c("P", "Q", "P", "Q"),
+                 r     = c(20, 25, 22, 28),
+                 n     = c(50, 50, 50, 50))
+fixnet <- set_agd_arm(fixdat, study, trt, r = r, n = n)
+
+test_that("con() warns if prior_baseline is supplied with type = 'fixed'", {
+  expect_warning(
+    nma(fixnet,
+        connect_baseline = con(type = "fixed", studies = c("F1", "F2"), prior_baseline = normal(0, 10)),
+        prior_intercept = normal(0, 100), prior_trt = normal(0, 10),
+        test_grad = TRUE),
+    'Ignoring `prior_baseline` provided with type = "fixed"'
+  )
+})
+
+test_that("con() with type = 'fixed' collapses the named studies onto a shared baseline", {
+  # fit <- suppressWarnings(nma(fixnet,
+  #                             connect_baseline = con(type = "fixed", studies = c("F1", "F2")),
+  #                             test_grad = TRUE))
+  #
+  # expect_s3_class(fit, "stan_nma")
+  # expect_equal(levels(fit$network$studies), "F1 & F2")
+
+  # Same data sources
+  s1dat <- data.frame(study = "S1", trt = "A", r = 1, n = 1)
+  s2dat <- data.frame(study = "S2", trt = "B", r = 1, n = 1)
+
+  fit_a <- nma(
+    combine_network(set_agd_arm(s1dat, study, trt, r = r, n = n, allow_single_arm = TRUE),
+                    set_agd_arm(s2dat, study, trt, r = r, n = n, allow_single_arm = TRUE)),
+    connect_baseline = con("fixed", studies = c("S1", "S2")),
+    prior_intercept = normal(0,1), prior_trt = normal(0, 1),
+    test_grad = TRUE
+  )
+
+  expect_s3_class(fit_a, "stan_nma")
+  expect_equal(levels(fit_a$network$studies), "S1 & S2")
+
+  fit_i <- nma(
+    combine_network(set_ipd(s1dat, study, trt, r = r, allow_single_arm = TRUE),
+                    set_ipd(s2dat, study, trt, r = r, allow_single_arm = TRUE)),
+    connect_baseline = con("fixed", studies = c("S1", "S2")),
+    prior_intercept = normal(0,1), prior_trt = normal(0, 1),
+    test_grad = TRUE
+  )
+
+  expect_s3_class(fit_i, "stan_nma")
+  expect_equal(levels(fit_i$network$studies), "S1 & S2")
+
+
+  # Different data sources
+  fit_ai <- nma(
+    combine_network(set_agd_arm(s1dat, study, trt, r = r, n = n, allow_single_arm = TRUE),
+                    set_ipd(s2dat, study, trt, r = r, allow_single_arm = TRUE)),
+    connect_baseline = con("fixed", studies = c("S1", "S2")),
+    prior_intercept = normal(0,1), prior_trt = normal(0, 1),
+    test_grad = TRUE
+  )
+
+  expect_s3_class(fit_ai, "stan_nma")
+  expect_equal(levels(fit_ai$network$studies), "S1 & S2")
+
+
+  # Should work with contrast data present (just not used for bridging)
+  s3dat <- data.frame(study = "S3", trt = c("A", "C"), y = c(NA, 1), se = c(NA, 0.1))
+
+  fit_aic <- nma(
+    combine_network(set_agd_arm(s1dat, study, trt, r = r, n = n, allow_single_arm = TRUE),
+                    set_ipd(s2dat, study, trt, r = r, allow_single_arm = TRUE),
+                    set_agd_contrast(s3dat, study, trt, y = y, se = se)),
+    connect_baseline = con("fixed", studies = c("S1", "S2")),
+    prior_intercept = normal(0,1), prior_trt = normal(0, 1),
+    test_grad = TRUE
+  )
+
+  expect_s3_class(fit_aic, "stan_nma")
+  expect_equal(levels(fit_aic$network$studies), c("S1 & S2", "S3"))
+
+  fit_aac <- nma(
+    combine_network(set_agd_arm(s1dat, study, trt, r = r, n = n, allow_single_arm = TRUE),
+                    set_agd_arm(s2dat, study, trt, r = r, n = n, allow_single_arm = TRUE),
+                    set_agd_contrast(s3dat, study, trt, y = y, se = se)),
+    connect_baseline = con("fixed", studies = c("S1", "S2")),
+    prior_intercept = normal(0,1), prior_trt = normal(0, 1),
+    test_grad = TRUE
+  )
+
+  expect_s3_class(fit_aac, "stan_nma")
+  expect_equal(levels(fit_aac$network$studies), c("S1 & S2", "S3"))
+})
+
+test_that("nma() errors on a disconnected network unless baseline_subnet or connect_baseline is given", {
+  expect_error(nma(disc_net, prior_intercept = normal(0, 1), prior_trt = normal(0, 1)),
+               "Network is disconnected")
+
+  fit_subnet <- nma(disc_net, baseline_subnet = 1L, random_baseline = TRUE,
+                    prior_intercept_sd = half_normal(scale = 5),
+                    prior_intercept = normal(0, 1), prior_trt = normal(0, 1),
+                    test_grad = TRUE)
+  expect_s3_class(fit_subnet, "stan_nma")
+
+  fit_connect <- nma(disc_net,
+                     connect_baseline = con(type = "random", studies = c("S1", "S2"), prior_baseline = normal(0, 10)),
+                     prior_intercept = normal(0, 1), prior_trt = normal(0, 1),
+                     test_grad = TRUE)
+  expect_s3_class(fit_connect, "stan_nma")
+})
+
+test_that("nma() errors if still disconnected after con() applied", {
+
+  # Still disconnected
+  expect_error(nma(disc_net, prior_intercept = normal(0, 1), prior_trt = normal(0, 1),
+                   connect_baseline = con("fixed", c("S1", "S3"))),
+               "Network is still disconnected after applying con() connections",
+               fixed = TRUE)
+
+  expect_error(nma(disc_net, prior_intercept = normal(0, 1), prior_trt = normal(0, 1),
+                   connect_baseline = con("random", c("S1", "S3"), prior_baseline = normal(0, 1))),
+               "Network is still disconnected after applying con() connections",
+               fixed = TRUE)
+
+  # Connected
+  expect_s3_class(nma(disc_net, prior_intercept = normal(0, 1), prior_trt = normal(0, 1),
+                      connect_baseline = con("fixed", c("S1", "S2")),
+                      test_grad = TRUE),
+                  "stan_nma")
+
+  expect_s3_class(nma(disc_net, prior_intercept = normal(0, 1), prior_trt = normal(0, 1),
+                      connect_baseline = con("random", "S2", prior_baseline = normal(0, 1)),
+                      test_grad = TRUE),
+                  "stan_nma")
+})
+
+s1dat <- data.frame(study = "A", trt = "A", y = 0.5, se = 0.1)
+s2dat <- data.frame(study = "B", trt = "B", y = 1.5, se = 0.1)
+s3dat <- data.frame(study = "C", trt = "C", y = qnorm(seq(0.001, 0.999, length.out = 100), mean = 1, sd = 0.1))
+
+sdC <- sd(s3dat$y)
+
+net_aa <- combine_network(
+  set_agd_arm(s1dat, study, trt, y = y, se = se, allow_single_arm = TRUE),
+  set_agd_arm(s2dat, study, trt, y = y, se = se, allow_single_arm = TRUE)
+)
+
+net_ai <- combine_network(
+  set_agd_arm(s1dat, study, trt, y = y, se = se, allow_single_arm = TRUE),
+  set_ipd(s3dat, study, trt, y = y, allow_single_arm = TRUE)
+)
+
+net_aai <- combine_network(
+  set_agd_arm(s1dat, study, trt, y = y, se = se, allow_single_arm = TRUE),
+  set_agd_arm(s2dat, study, trt, y = y, se = se, allow_single_arm = TRUE),
+  set_ipd(s3dat, study, trt, y = y, allow_single_arm = TRUE)
+)
+
+test_that("basic correctness of fixed baseline connections", {
+  tol <- 0.05
+
+  fit_aa <- nma(net_aa,
+                connect_baseline = con("fixed", studies = c("A", "B")),
+                prior_intercept = normal(0, 100),
+                prior_trt = normal(0, 10))
+  s_aa <- as.data.frame(summary(fit_aa, pars ="d"))
+
+  expect_equal(s_aa$mean, 1, tolerance = tol)
+  expect_equal(s_aa$sd, sqrt(0.1^2 + 0.1^2), tolerance = tol)
+
+  fit_ai <- nma(net_ai,
+                connect_baseline = con("fixed", studies = c("A", "C")),
+                prior_intercept = normal(0, 100),
+                prior_trt = normal(0, 10),
+                prior_aux = half_normal(1))
+  s_ai <- as.data.frame(summary(fit_ai, pars ="d"))
+
+  expect_equal(s_ai$mean, 0.5, tolerance = tol)
+  expect_equal(s_ai$sd, sqrt(0.1^2 + sdC^2), tolerance = tol)
+
+  fit_aai <- nma(net_aai,
+                connect_baseline = con("fixed", studies = c("A", "B", "C")),
+                prior_intercept = normal(0, 100),
+                prior_trt = normal(0, 10),
+                prior_aux = half_normal(1))
+  s_aai <- as.data.frame(summary(fit_aai, pars ="d"))
+
+  expect_equal(s_aai$mean, c(1, 0.5), tolerance = tol)
+  expect_equal(s_aai$sd, c(sqrt(0.1^2 + 0.1^2), sqrt(0.1^2 + sdC^2)), tolerance = tol)
+})
+
+test_that("basic correctness of random baseline connections", {
+  tol <- 0.05
+
+  fit_aa <- nma(net_aa,
+                connect_baseline = con("random",
+                                       studies = "B",
+                                       prior_baseline = normal(-1, 0.2)),
+                prior_intercept = normal(0, 100),
+                prior_trt = normal(0, 10))
+  s_aa <- as.data.frame(summary(fit_aa, pars ="d"))
+
+  expect_equal(s_aa$mean, 2.5, tolerance = tol)
+  expect_equal(s_aa$sd, sqrt(0.2^2 + 0.1^2), tolerance = tol)
+
+  fit_ai <- nma(net_ai,
+                connect_baseline = con("random",
+                                       studies = "C",
+                                       prior_baseline = normal(-1, 0.2)),
+                prior_intercept = normal(0, 100),
+                prior_trt = normal(0, 10),
+                prior_aux = half_normal(1))
+  s_ai <- as.data.frame(summary(fit_ai, pars ="d"))
+
+  expect_equal(s_ai$mean, 2, tolerance = tol)
+  expect_equal(s_ai$sd, sqrt(0.2^2 + sdC^2), tolerance = tol)
+
+  fit_aai <- nma(net_aai,
+                 connect_baseline = con("random",
+                                        studies = c("B", "C"),
+                                        prior_baseline = normal(-1, 0.2)),
+                 prior_intercept = normal(0, 100),
+                 prior_trt = normal(0, 10),
+                 prior_aux = half_normal(1))
+  s_aai <- as.data.frame(summary(fit_aai, pars ="d"))
+
+  expect_equal(s_aai$mean, c(2.5, 2), tolerance = tol)
+  expect_equal(s_aai$sd, c(sqrt(0.2^2 + 0.1^2), sqrt(0.2^2 + sdC^2)), tolerance = tol)
+})
+
+test_that("correctness of baseline_trt argument", {
+  tol <- 0.05
+
+  fit_aa <- nma(net_aa,
+                connect_baseline = con("random",
+                                       studies = "B",
+                                       prior_baseline = normal(-1, 0.2),
+                                       baseline_trt = "A"),
+                prior_intercept = normal(0, 100),
+                prior_trt = normal(0, 10))
+  s_aa <- as.data.frame(summary(fit_aa, pars ="d"))
+
+  expect_equal(s_aa$mean, 2.5, tolerance = tol)
+  expect_equal(s_aa$sd, sqrt(0.2^2 + 0.1^2), tolerance = tol)
+
+  fit_aa2 <- nma(net_aa,
+                connect_baseline = con("random",
+                                       studies = "A",
+                                       prior_baseline = normal(3, 0.2),
+                                       baseline_trt = "B"),
+                prior_intercept = normal(0, 100),
+                prior_trt = normal(0, 10))
+  s_aa2 <- as.data.frame(summary(fit_aa2, pars ="d"))
+
+  expect_equal(s_aa2$mean, 2.5, tolerance = tol)
+  expect_equal(s_aa2$sd, sqrt(0.2^2 + 0.1^2), tolerance = tol)
+
+
+  s1dat2 <- data.frame(study = "A", trt = "A", y = 0.5, se = 0.1)
+  s2dat2 <- data.frame(study = "B", trt = c("B", "C"), y = c(1, 1.5), se = 0.1)
+
+  net_aa3 <- combine_network(
+    set_agd_arm(s1dat2, study, trt, y = y, se = se, allow_single_arm = TRUE),
+    set_agd_arm(s2dat2, study, trt, y = y, se = se, allow_single_arm = TRUE),
+    trt_ref = "B"
+  )
+
+  fit_aa3 <- nma(net_aa3,
+                 connect_baseline = con("random",
+                                        studies = "A",
+                                        prior_baseline = normal(0.5, 0.2),
+                                        baseline_trt = "C"),
+                 prior_intercept = normal(0, 100),
+                 prior_trt = normal(0, 10))
+
+  s_aa3 <- as.data.frame(summary(fit_aa3, pars ="d"))
+
+  expect_equal(s_aa3$mean, c(0.5, 0.5), tolerance = tol)
+  expect_equal(s_aa3$sd, c(sqrt(0.2^2 + 0.1^2 + 0.1^2 + 0.1^2), sqrt(0.1^2 + 0.1^2)), tolerance = tol)
+})
+
+test_that("mixed connections", {
+
+  tol <- 0.05
+
+  s4dat <- data.frame(study = "D", trt = "D", y = 0.5, se = 0.1)
+  s5dat <- data.frame(study = "E", trt = "E", y = 1.5, se = 0.1)
+
+  net <- set_agd_arm(rbind(s1dat, s2dat, s4dat, s5dat),
+                     study = study, trt = trt, y = y, se = se,
+                     trt_ref = "A", allow_single_arm = TRUE)
+
+  fit <- nma(net, connect_baseline =
+               list(con("fixed", studies = c("A", "B")),
+                    con("random", studies = "D", prior_baseline = normal(0, 0.2)),
+                    con("random", studies = "E", prior_baseline = normal(1, 0.2), baseline_trt = "B")),
+             prior_intercept = normal(0, 100),
+             prior_trt = normal(0, 10))
+
+  s <- as.data.frame(summary(fit, pars = "d"))
+
+  expect_equal(s$mean, c(1, 0.5, 1.5), tolerance = tol)
+  expect_equal(s$sd, c(sqrt(0.1^2 + 0.1^2), sqrt(0.1^2 + 0.2^2), sqrt(0.1^2 + 0.2^2 + 0.1^2)), tolerance = tol)
 })

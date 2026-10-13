@@ -440,6 +440,12 @@ transformed parameters {
       }
     }
 
+    if (random_baseline) {
+      for (i in 1:ni_agd_arm) {
+        eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_baseline[agd_arm_study[i]];
+      }
+    }
+
 
     if (nint_max > 1) { // -- If integration points are used --
 

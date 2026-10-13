@@ -25,7 +25,14 @@ array[RE_sparse ? n_delta + 1 : 0] int RE_L_u = RE_sparse ? csr_extract_u(RE_L) 
 // int totni = ni_ipd + nint * (ni_agd_arm + ni_agd_contrast);
 
 // Total number of study intercepts (none for contrast-based data)
-int totns = ns_ipd + ns_agd_arm; // + ns_agd_contrast;
+int totns = ns_ipd + ns_agd_arm - (n_mixed_studies ? n_mixed_studies : 0); // + ns_agd_contrast;
+
+// Indicator for studies in the baseline synthesis subnetwork
+array[random_baseline ? totns : 0] int<lower=0, upper=1> in_baseline_subnet;
+if (random_baseline) {
+  for (s in 1:totns) in_baseline_subnet[s] = 0;
+  for (i in 1:n_baseline_studies) in_baseline_subnet[baseline_study_idx[i]] = 1;
+}
 
 // Number of IPD arms
 // int<lower=0> narm_ipd = ni_ipd ? max(ipd_arm) : 0;
