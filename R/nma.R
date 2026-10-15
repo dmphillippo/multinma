@@ -1817,6 +1817,15 @@ if (class_effects == "exchangeable") {
     agd_contrast_data_labels <- NULL
   }
 
+  if (has_agd_regression(network)) {
+    agd_regression_data_labels <- dplyr::group_by(dat_agd_regression_nonbl, .data$.study) %>%
+      dplyr::mutate(.id = 1:dplyr::n(),
+                    .lab = paste0(.data$.study, ", ", .data$.id)) %>%
+      dplyr::pull(.data$.lab)
+  } else {
+    agd_regression_data_labels <- NULL
+  }
+
   if (has_ipd(network))
     fnames_oi[grepl("^fitted_ipd\\[[0-9]+\\]$", fnames_oi)] <- paste0("fitted_ipd[", ipd_data_labels, "]")
 
@@ -1825,6 +1834,9 @@ if (class_effects == "exchangeable") {
 
   if (has_agd_contrast(network))
     fnames_oi[grepl("^fitted_agd_contrast\\[[0-9]+\\]$", fnames_oi)] <- paste0("fitted_agd_contrast[", agd_contrast_data_labels, "]")
+
+  if (has_agd_regression(network))
+    fnames_oi[grepl("^fitted_agd_regression\\[[0-9]+\\]$", fnames_oi)] <- paste0("fitted_agd_regression[", agd_regression_data_labels, "]")
 
   # Labels for RE deltas
   if (trt_effects == "random") {
@@ -1871,7 +1883,8 @@ if (class_effects == "exchangeable") {
   # Labels for log_lik, resdev (only one entry per AgD contrast study)
   dev_labels <- c(ipd_data_labels,
                   agd_arm_data_labels,
-                  if (has_agd_contrast(network)) as.character(dat_agd_contrast_bl$.study) else NULL)
+                  if (has_agd_contrast(network)) as.character(dat_agd_contrast_bl$.study) else NULL,
+                  if (has_agd_regression(network)) as.character(dat_agd_regression_bl$.study) else NULL)
 
   fnames_oi[grepl("^log_lik\\[[0-9]+\\]$", fnames_oi)] <- paste0("log_lik[", dev_labels, "]")
   fnames_oi[grepl("^resdev\\[[0-9]+\\]$", fnames_oi)] <- paste0("resdev[", dev_labels, "]")
@@ -2487,6 +2500,7 @@ nma.fit <- function(ipd_x = NULL, ipd_y = NULL,
   if (has_ipd && !is_survival) pars <- c(pars, "fitted_ipd")
   if (has_agd_arm && !is_survival) pars <- c(pars, "fitted_agd_arm")
   if (has_agd_contrast) pars <- c(pars, "fitted_agd_contrast")
+  if (has_agd_regression) pars <- c(pars, "fitted_agd_regression")
 
   # Monitor heterogeneity SD and study deltas if RE model
   if (trt_effects == "random") {
