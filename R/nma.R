@@ -3846,7 +3846,7 @@ make_nma_model_matrix <- function(nma_formula,
     d2 <- dplyr::select(dat_all[nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression), ],
                         -dplyr::any_of(c(".trt", ".trtclass")), -dplyr::all_of(fct_vars), ".study")
 
-    d3 <- dat_agd_regression[agd_regression_bl, ] %>%
+    d3 <- dat_all[nrow(dat_ipd) + nrow(dat_agd_arm) + nrow(dat_agd_contrast) + 1:nrow(dat_agd_regression), ][agd_regression_bl, ] %>%
       dplyr::select(".study", ".trt",
                     if (classes) ".trtclass" else NULL,
                     dplyr::all_of(fct_vars))
