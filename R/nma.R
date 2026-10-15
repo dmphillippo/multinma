@@ -3700,8 +3700,8 @@ make_nma_model_matrix <- function(nma_formula,
       contrs_contr <- dplyr::bind_rows(dat_agd_contrast, dat_agd_regression) %>%
         dplyr::distinct(.data$.study, .data$.trt) %>%  # In case integration data passed
         dplyr::left_join(
-          dplyr::bind_rows(dat_agd_regression[agd_regression_bl, ],
-                           dplyr::distinct(dat_agd_contrast[agd_contrast_bl, ], .data$.study, .data$.trt)) %>%
+          dplyr::bind_rows(if (.has_agd_regression) dat_agd_regression[agd_regression_bl, ] else NULL,
+                           if (.has_agd_contrast) dplyr::distinct(dat_agd_contrast[agd_contrast_bl, ], .data$.study, .data$.trt) else NULL) %>%
             dplyr::transmute(.data$.study, .trt_b = .data$.trt), by = ".study") %>%
         dplyr::distinct(.data$.study, .data$.trt, .data$.trt_b) %>%
         dplyr::mutate(.contr_sign = dplyr::if_else(as.numeric(.data$.trt) < as.numeric(.data$.trt_b), -1, 1),
