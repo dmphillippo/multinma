@@ -414,7 +414,8 @@ add_integration.nma_data <- function(x, ...,
 
     if (!isTRUE(attr(network$agd_regression, "has_covariates"))) {
 
-      inform(c(i = "No integration points added for AgD regression data: OVB adjustment will not be available.",
+      inform(c(i = "No integration points added for AgD regression data: covariate data not provided.",
+               "*" = "No OVB adjustment or reconstruction of covariances between parameter estimates will be available.",
                "*" = "Specify `covariates` data frame in set_agd_regression() if this is needed."))
 
     } else {
