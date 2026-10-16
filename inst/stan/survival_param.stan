@@ -3,6 +3,12 @@ functions {
 #include /include/count_nonzero.stan
 #include /include/vector_functions.stan
 
+  // -- Covariance Computation --
+  real cov_xy(vector x, vector y) {
+    int N = num_elements(x);
+    return dot_product(x - mean(x), y - mean(y)) / (N - 1);
+  }
+
   // -- Generalised Gamma ldpf --
   real gengamma_lpdf(real y, real mu, real sigma, real k) {
     // Parameterisation of Lawless
@@ -525,6 +531,10 @@ data {
   real<lower=0> prior_aux_reg_df;
 }
 transformed data {
+  // -- AgD regression coefficients --
+  vector[(no_agd_regression && dist<=3) ? ni_agd_regression : 0] exp_std_gen; // Generated sampels from Exp(1) used in COX PH OVB adjustment
+  if(no_agd_regression && dist<=3) for (i in 1:ni_agd_regression) exp_std_gen[i] = exponential_rng(1);
+
   // Exponential model indicator, 0 = exponential
   int<lower=0, upper=1> nonexp = (dist == 1 || dist == 4) ? 0 : 1;
   // Generalised Gamma model indicator, 1 = gengamma
@@ -565,6 +575,53 @@ transformed data {
     if (ni_aux_group_ipd[i]) wi_aux_group_ipd[i, 1:ni_aux_group_ipd[i]] = which(aux_group_ipd, i);
     if (ni_aux_group_agd_arm[i]) wi_aux_group_agd_arm[i, 1:ni_aux_group_agd_arm[i]] = which(aux_group_agd_arm, i);
   }
+
+  // -- AgD model (regression coefficients) --
+  vector [(dist<=3 && no_agd_regression) ? ni_agd_regression:0] eta_red;
+  array[ no_agd_regression ? ns_agd_regression : 0] matrix[agd_regression_max_ncoef_inc, agd_regression_max_ncoef_omt] agd_regression_OVB_mat_omt; // (XI' XI)^{-1}XI' XO
+  array[ no_agd_regression ? ns_agd_regression : 0] matrix[agd_regression_max_ncoef_inc, agd_regression_max_nrow] agd_regression_OVB_mat_hat; // (XI' XI)^{-1} XI'
+
+   if (no_agd_regression){
+     int c_c = 0; // coef. counter
+     int c_i = 0; // Included coef. counter
+     int c_o = 0; // Omitted coef. counter
+     int c_x = 0; // X_int rows counter
+     for (i in 1:ns_agd_regression) {
+
+       if(agd_regression_reduced_study[i]){
+
+        // vector mdivide_left_spd( M,  N)  equals to inverse(M) * N
+        // matrix crossprod(matrix x) equals to X'X
+
+        agd_regression_OVB_mat_hat[i][1:agd_regression_ncoef_inc[i], 1:agd_regression_nx[i] ]  =
+        mdivide_left_spd( crossprod(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ]) ,
+        (X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])] ])' );
+
+        agd_regression_OVB_mat_omt[i][1:agd_regression_ncoef_inc[i], 1:agd_regression_ncoef_omt[i] ]  =
+        agd_regression_OVB_mat_hat[i][1:agd_regression_ncoef_inc[i], 1:agd_regression_nx[i] ] *
+        (X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]) ,XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])] ]);
+
+        if(agd_regression_reduced_study[i] && dist<=3 ){ // Apply OVB for COX PH models
+
+          eta_red[(c_x+1):(c_x+agd_regression_nx[i])] =
+          X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]) ,XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] *
+          agd_regression_est[(c_c+1):(c_c+agd_regression_ncoef[i])];
+
+        }
+
+       }
+
+       c_c += agd_regression_ncoef[i];
+       c_i += agd_regression_ncoef_inc[i];
+       c_o += agd_regression_ncoef_omt[i];
+       c_x += agd_regression_nx[i];
+     }
+   }
+
+  // Update totns (no intercepts for Cox)
+  if(no_agd_regression && dist<=3)
+    totns -= ns_agd_regression;
+
 }
 parameters {
 #include /include/parameters_common.stan
@@ -787,6 +844,100 @@ transformed parameters {
       }
     }
   }
+
+    // -- AgD model (regression coefficients) --
+  vector [(dist<=3 && no_agd_regression) ? ni_agd_regression:0] lp_err; // linear predictor mismatch
+  vector [(dist<=3 && no_agd_regression) ? ni_agd_regression:0] e_err; // mu mismatch
+   if (nc_agd_regression) {
+
+    if (sum(agd_regression_reduced_study)){
+
+      real A_red;
+      real A_ful;
+
+      int c_c = 0; // coef. counter
+      int c_i = 0; // Included coef. counter
+      int c_o = 0; // Omitted coef. counter
+      int c_x = 0; // X_int rows counter
+
+      for (i in 1:ns_agd_regression) {
+        // OVB adjustment
+        if(agd_regression_reduced_study[i]){
+
+          if( dist<=3 ){ // Apply OVB for COX PH models
+
+          vector [agd_regression_nx[i]] P_ful;
+          vector [agd_regression_nx[i]] P_red;
+          vector [agd_regression_nx[i]] exp_eta_red;
+          vector [agd_regression_nx[i]] exp_eta_ful;
+
+          // initial value
+          e_err[(c_x+1):(c_x+agd_regression_nx[i])] = rep_vector(0, agd_regression_nx[i] );
+          // e_err = rep_vector(0,ni_agd_regression);
+          exp_eta_red = exp(eta_red[(c_x+1):(c_x+agd_regression_nx[i])]);
+          exp_eta_ful = exp(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]),] * allbeta);
+          A_red = sum(exp_eta_red);
+          A_ful = sum(exp_eta_ful);
+
+          // the first risk set
+          P_red = exp_eta_red/ A_red;
+          P_ful = exp_eta_ful/ A_ful;
+
+          lp_err[(c_x+1):(c_x+agd_regression_nx[i])] =
+            log(P_red ./ P_ful)  -  log(A_ful / A_red);
+
+          for(j in 1:agd_regression_nx[i]  ) {
+
+            P_red[j:agd_regression_nx[i]] = exp_eta_red[j:agd_regression_nx[i]] / A_red;
+            P_ful[j:agd_regression_nx[i]] = exp_eta_ful[j:agd_regression_nx[i]] / A_ful;
+
+            //e_err[j:agd_regression_nx[i]] +=  P_red - P_ful ;
+            e_err[(c_x+j):(c_x+agd_regression_nx[i])] +=
+            P_red[j:agd_regression_nx[i]] -
+            P_ful[j:agd_regression_nx[i]] ;
+
+            A_red = A_red - exp_eta_red[j] ;
+            A_ful = A_ful - exp_eta_ful[j] ;
+
+          }
+
+
+          eta_agd_regression[(c_c+1):(c_c+agd_regression_ncoef[i])] =
+            allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] +
+            block(agd_regression_OVB_mat_omt[i], 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_ncoef_omt[i] ) *
+            allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]] +
+            block(agd_regression_OVB_mat_hat[i]  , 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_nx[i] ) *
+            lp_err[(c_x+1):(c_x+agd_regression_nx[i])];
+
+
+          }else if( dist>=4 ){ // Apply OVB for AFT models
+            eta_agd_regression[(c_c+1):(c_c+agd_regression_ncoef[i])] =
+              allbeta[XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]] +
+              block(agd_regression_OVB_mat_omt[i], 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_ncoef_omt[i] ) *
+              allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]];
+          }
+
+        }else{
+          eta_agd_regression[ (c_c+1):(c_c+agd_regression_ncoef[i]) ] = X_agd_regression_no_QR[ (c_c+1):(c_c+agd_regression_ncoef[i]), ] * allbeta;
+        }
+        c_x += agd_regression_nx[i];
+        c_c += agd_regression_ncoef[i];
+        c_i += agd_regression_ncoef_inc[i];
+        c_o += agd_regression_ncoef_omt[i];
+      }
+    }else{
+      eta_agd_regression = X_agd_regression * beta_tilde;
+    }
+
+    if (RE) {
+      for (i in 1:nc_agd_regression) {
+        if (which_RE[narm_ipd + narm_agd_arm + ni_agd_contrast + i])
+          eta_agd_regression[i] = eta_agd_regression[i] + f_delta[which_RE[narm_ipd + narm_agd_arm + ni_agd_contrast + i]];
+      }
+    }
+
+  }
+
 }
 model {
 #include /include/model_common.stan
@@ -804,6 +955,24 @@ model {
 
   // -- AgD likelihood (arm-based) --
   target += log_L_agd_arm;
+
+  // -- AgD regression soft constraints --
+  if(dist<=3 && no_agd_regression){
+    int c_x = 0;
+    int c_i = 0;
+    for (i in 1:ns_agd_regression) {
+      if(agd_regression_reduced_study[i]){
+
+        (
+          ((X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]) , XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]])' *
+          e_err[(c_x+1):(c_x+agd_regression_nx[i])]) / agd_regression_nx[i]
+        ) ~ normal( 0 , 1.0) ;
+
+      }
+      c_i += agd_regression_ncoef_inc[i];
+      c_x += agd_regression_nx[i];
+    }
+  }
 
 }
 generated quantities {
