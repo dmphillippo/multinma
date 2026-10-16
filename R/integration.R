@@ -463,8 +463,9 @@ add_integration.nma_data <- function(x, ...,
           invalid_int_generated = invalid_int_generated)
       }
 
-      copula_cor <- attr(out$agd_regression, "copula_cor")
     }
+
+    copula_cor <- attr(out$agd_regression, "copula_cor")
   }
 
   # Set as mlnmr_data class
