@@ -985,7 +985,8 @@ test_that("set_agd_regression - OVB_adj", {
               x = c(NA,0,1,0, NA,0,0,1,0))
   s2 <- s[-6,]
   AgD_reg <- set_agd_regression(s2, study = study, trt = trt, estimate = est,
-                                regression = ~ x, cov = list(A = diag(3), B = diag(3)))
+                                regression = ~ x, cov = list(A = diag(3), B = diag(3)),
+                                covariates = data.frame(study = c("A", "B"), x1_mean = 1, x1_sd = 1, x2_mean = 1, x2_sd = 1))
   expect_error(nma(AgD_reg, regression = ~ x + z, likelihood = "bernoulli" , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
 })
 
@@ -996,10 +997,13 @@ test_that("set_agd_regression - intercept", {
               se = c(NA, 1, 1,1, NA, 1, 1,1,1),
               x1 = c(0,0,1,0, 0,0,0,1,0))
   AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est,
-                                regression = ~ x1, cov = list(A = diag(3), B = diag(4)))
+                                regression = ~ x1, cov = list(A = diag(3), B = diag(4)),
+                                covariates = data.frame(study = c("A", "B"),
+                                                        x1_mean = 1, x1_sd = 1,
+                                                        x2_mean = 1, x2_sd = 1))
   AgD_reg <- add_integration(AgD_reg,
-                             x1 = distr(qnorm,mean=1,sd=1),
-                             x2 = distr(qnorm,mean=1,sd=1),
+                             x1 = distr(qnorm,mean=x1_mean,sd=x1_sd),
+                             x2 = distr(qnorm,mean=x2_mean,sd=x2_sd),
                              cor=diag(2))
   m <- "Intercept rows are not allowed in Cox PH models\\."
   expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "exponential" , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
@@ -1031,7 +1035,8 @@ test_that("set_agd_regression - intercept", {
 
   s2 <- s[-c(2,6),]
   AgD_reg <- set_agd_regression(s2, study = study, trt = trt, estimate = est,
-                                regression = ~ .trt + x1, cov = list(A = diag(2), B = diag(3)))
+                                regression = ~ .trt + x1, cov = list(A = diag(2), B = diag(3)),
+                                covariates = data.frame(study = c("A", "B"), x1_mean = 1, x1_sd = 1, x2_mean = 1, x2_sd = 1))
 
   AgD_reg <- add_integration(AgD_reg,
                              x1 = distr(qnorm,mean=1,sd=1),
@@ -1053,7 +1058,8 @@ test_that("set_agd_regression - intercept", {
   AgD_reg <- set_agd_regression(s2, study = study, trt = trt, estimate = est, regression = ~ x1,
                                 cov = list(A = diag(2), B = diag(4)),
                                 ordinal_cut = 'ord_cut',
-                                ordinal_cut_lab = c('1|2','2|3','3|4'))
+                                ordinal_cut_lab = c('1|2','2|3','3|4'),
+                                covariates = data.frame(study = c("A", "B"), x1_mean = 1, x1_sd = 1, x2_mean = 1, x2_sd = 1))
   AgD_reg <- add_integration(AgD_reg,
                              x1 = distr(qnorm,mean=1,sd=1),
                              x2 = distr(qnorm,mean=1,sd=1),
@@ -1063,7 +1069,8 @@ test_that("set_agd_regression - intercept", {
 
   m <- 'Specify cuts using `ordinal_cut` and `ordinal_cut_lab` argumnets for reduced models\\.'
   AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1,
-                                cov = list(A = diag(3), B = diag(4))
+                                cov = list(A = diag(3), B = diag(4)),
+                                covariates = data.frame(study = c("A", "B"), x1_mean = 1, x1_sd = 1, x2_mean = 1, x2_sd = 1)
                                 # ordinal_cut = 'ord_cut',
                                 #ordinal_cut_lab = c('1|2','2|3','3|4')
                                 )
@@ -1078,6 +1085,7 @@ test_that("set_agd_regression - intercept", {
   s$ord_cut <- c(NA,NA,'1|2',NA,NA,'2|3','1|2',NA,NA)
   AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1,
                                 cov = list(A = diag(3), B = diag(4)),
+                                covariates = data.frame(study = c("A", "B"), x1_mean = 1, x1_sd = 1, x2_mean = 1, x2_sd = 1),
                                 ordinal_cut = 'ord_cut',
                                 ordinal_cut_lab = c('1|2','2|3','3|4')
   )
@@ -1093,6 +1101,7 @@ test_that("set_agd_regression - intercept", {
   s$ord_cut <- c(NA,'2|3',NA,NA,NA,'2|3','1|2',NA,NA)
   AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1,
                                 cov = list(A = diag(3), B = diag(4)),
+                                covariates = data.frame(study = c("A", "B"), x1_mean = 1, x1_sd = 1, x2_mean = 1, x2_sd = 1),
                                 ordinal_cut = 'ord_cut',
                                 ordinal_cut_lab = c('1|2','2|3','3|4')
   )
