@@ -1123,6 +1123,9 @@ nma <- function(network,
       idat_agd_regression <- idat_agd_regression %>% dplyr::bind_rows()
     } else {
       idat_agd_regression <- dat_agd_regression
+      agd_regression_nx <- dplyr::group_by(dat_agd_regression, .data$.study) %>%
+        dplyr::summarise(nx = sum(!is.na(.data$.estimate))) %>%
+        dplyr::pull(.data$nx)
     }
 
     # --- Included and omitted design matrix ---
