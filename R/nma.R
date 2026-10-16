@@ -1089,7 +1089,9 @@ nma <- function(network,
 
     # --- Set up integration variables if present ---
     # Check integration variables
-    if( use_int && length(setdiff(paste0('.int_',agd_reg_var_nma),colnames(dat_agd_regression_split[[1]] ))))
+    if( use_int &&
+        length(setdiff(paste0('.int_',agd_reg_var_nma),colnames(dat_agd_regression_split[[1]] ))) &&
+        (any(!agd_regression_cov_known) || any(agd_regression_reduced_study)) )
       warn("No integration points provided for some or all variables (AgD regression)")
 
     # For each regression model: select the ref. row and rows with different treatment from the ref. row
