@@ -3592,7 +3592,7 @@ make_nma_formula <- function(regression,
     if (".mu" %in% all.vars(regression)) nma_formula <- update.formula(nma_formula, ~. - .mu)
 
     if (consistency == "ume") {
-      nma_formula <- update.formula(nma_formula, ~.study + .contr + . -1)
+      nma_formula <- update.formula(nma_formula, ~.study + .contr + . -1 -.trt)
     } else if (consistency == "nodesplit") {
       nma_formula <- update.formula(nma_formula, ~.study + .trt + .omega + . -1)
     } else {
