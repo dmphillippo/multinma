@@ -1280,6 +1280,9 @@ set_agd_regression <- function(data,
     # Re-drop factors, in case extra unneeded study rows included in covariate data
     d$.study <- forcats::fct_drop(d$.study)
 
+    attr(d, "has_covariates") <- TRUE
+  } else {
+    attr(d, "has_covariates") <- FALSE
   }
 
   # Check for a list of matrices
