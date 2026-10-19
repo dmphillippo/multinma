@@ -3,12 +3,6 @@ functions {
 #include /include/count_nonzero.stan
 #include /include/vector_functions.stan
 
-  // -- Covariance Computation --
-  real cov_xy(vector x, vector y) {
-    int N = num_elements(x);
-    return dot_product(x - mean(x), y - mean(y)) / (N - 1);
-  }
-
   // -- Generalised Gamma ldpf --
   real gengamma_lpdf(real y, real mu, real sigma, real k) {
     // Parameterisation of Lawless
