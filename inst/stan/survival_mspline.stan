@@ -612,57 +612,55 @@ transformed parameters {
 
   // -- AgD model (regression coefficients) --
   vector [no_agd_regression ? ni_agd_regression:0] lp_err; // linear predictor mismatch
-  vector [no_agd_regression ? ni_agd_regression:0] e_err;
-
+  vector [no_agd_regression ? ni_agd_regression:0] mu_err; // mu mismatch
   if (nc_agd_regression) {
-
 
     if (sum(agd_regression_reduced_study)){
 
-      real A_red;
-      real A_ful;
+      real exp_eta_red_tot;
+      real exp_eta_ful_tot;
 
       int c_c = 0; // coef. counter
       int c_i = 0; // Included coef. counter
       int c_o = 0; // Omitted coef. counter
       int c_x = 0; // X_int rows counter
-      for (i in 1:ns_agd_regression) {
 
+      for (i in 1:ns_agd_regression) {
         // OVB adjustment
         if(agd_regression_reduced_study[i]){
 
-          vector [agd_regression_nx[i]] P_ful;
-          vector [agd_regression_nx[i]] P_red;
-          vector [agd_regression_nx[i]] exp_eta_red;
-          vector [agd_regression_nx[i]] exp_eta_ful;
+          vector [agd_regression_nx[i]] P_ful; // probability of event in full model
+          vector [agd_regression_nx[i]] P_red; // probability of event in reduced model
+          vector [agd_regression_nx[i]] exp_eta_red; // exp(eta) in full model
+          vector [agd_regression_nx[i]] exp_eta_ful; // exp(eta) in reduced model
 
           // initial value
-          e_err[(c_x+1):(c_x+agd_regression_nx[i])] = rep_vector(0, agd_regression_nx[i] );
-          // e_err = rep_vector(0,ni_agd_regression);
+          mu_err[(c_x+1):(c_x+agd_regression_nx[i])] = rep_vector(0, agd_regression_nx[i] );
+
           exp_eta_red = exp(eta_red[(c_x+1):(c_x+agd_regression_nx[i])]);
           exp_eta_ful = exp(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]),] * allbeta);
-          A_red = sum(exp_eta_red);
-          A_ful = sum(exp_eta_ful);
 
-          // the first risk set
-          P_red = exp_eta_red/ A_red;
-          P_ful = exp_eta_ful/ A_ful;
+          exp_eta_red_tot = sum(exp_eta_red);
+          exp_eta_ful_tot = sum(exp_eta_ful);
+
+          P_red = exp_eta_red / exp_eta_red_tot;
+          P_ful = exp_eta_ful / exp_eta_ful_tot;
 
           lp_err[(c_x+1):(c_x+agd_regression_nx[i])] =
-            log(P_red ./ P_ful)  -  log(A_ful / A_red);
+            log(P_red ./ P_ful)  -  log(exp_eta_ful_tot / exp_eta_red_tot);
 
-          for(j in 1:agd_regression_nx[i]  ) {
+          // data sorted by event order
+          for(j in 1:agd_regression_nx[i]) {
 
-            P_red[j:agd_regression_nx[i]] = exp_eta_red[j:agd_regression_nx[i]] / A_red;
-            P_ful[j:agd_regression_nx[i]] = exp_eta_ful[j:agd_regression_nx[i]] / A_ful;
+            P_red[j:agd_regression_nx[i]] = exp_eta_red[j:agd_regression_nx[i]] / exp_eta_red_tot;
+            P_ful[j:agd_regression_nx[i]] = exp_eta_ful[j:agd_regression_nx[i]] / exp_eta_ful_tot;
 
-            //e_err[j:agd_regression_nx[i]] +=  P_red - P_ful ;
-            e_err[(c_x+j):(c_x+agd_regression_nx[i])] +=
-            P_red[j:agd_regression_nx[i]] -
-            P_ful[j:agd_regression_nx[i]] ;
+            mu_err[(c_x+j):(c_x+agd_regression_nx[i])] +=
+              P_red[j:agd_regression_nx[i]] -
+              P_ful[j:agd_regression_nx[i]] ;
 
-            A_red = A_red - exp_eta_red[j] ;
-            A_ful = A_ful - exp_eta_ful[j] ;
+            exp_eta_red_tot -= exp_eta_red[j] ;
+            exp_eta_ful_tot -= exp_eta_ful[j] ;
 
           }
 
@@ -723,8 +721,8 @@ model {
 
         (
           ((X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]) , XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]])' *
-          e_err[(c_x+1):(c_x+agd_regression_nx[i])]) / agd_regression_nx[i]
-        ) ~ normal( 0 , 1.0) ;
+          mu_err[(c_x+1):(c_x+agd_regression_nx[i])]) / agd_regression_nx[i]
+        ) ~ normal(0, 0.01) ;
 
       }
       c_i += agd_regression_ncoef_inc[i];
