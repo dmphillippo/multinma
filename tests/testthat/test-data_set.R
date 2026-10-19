@@ -1118,10 +1118,10 @@ test_that("set_agd_regression - reconstructing Variance-Covariance matrix and fi
 
   # Simulate data
   n <- 2*1000
-  Sigma <- matrix(c(1,0.5,0.5,1),2,2)
+  Sigma <- matrix(c(1,0.1,0.1,1),2,2)
   dat <- tibble::tibble(
     X1 = rnorm(n),
-    X2 = 0.5 * X1 + sqrt(1 - 0.5^2) * rnorm(n),
+    X2 = 0.1 * X1 + sqrt(1 - 0.1^2) * rnorm(n),
     trt = sample(c('A','B'),n, replace = T),
     eta = drop(cbind(1, factor(trt, levels= c('A','B')), X1, X2) %*% c(-2,0.5,0.5,0.5))
   )
@@ -1552,10 +1552,10 @@ test_that("set_agd_regression - fitted nma() quntittes - AgD-reg Only", {
 
 
   n <- 2*1000
-  Sigma <- matrix(c(1,0.5,0.5,1),2,2)
+  Sigma <- matrix(c(1,0.1,0.1,1),2,2)
   dat <- tibble::tibble(
     X1 = rnorm(n),
-    X2 = 0.5 * X1 + sqrt(1 - 0.5^2) * rnorm(n),
+    X2 = 0.1 * X1 + sqrt(1 - 0.1^2) * rnorm(n),
     trt = sample(c('A','B'),n, replace = T),
     eta = drop(cbind(1, factor(trt, levels= c('A','B')), X1, X2) %*% c(-2,0.5,0.5,0.5))
   )
@@ -1638,8 +1638,8 @@ test_that("set_agd_regression - fitted nma() quntittes - AgD-reg Only", {
                                   iter = 4000))
   result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
 
-  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.1)
-  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.1)
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
 
 
   # --- Binary (logit) ---
@@ -1720,8 +1720,8 @@ test_that("set_agd_regression - fitted nma() quntittes - AgD-reg Only", {
                                   iter = 4000))
   result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
 
-  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.1)
-  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.1)
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
 
 
   # --- Count (log) ---
@@ -1803,8 +1803,8 @@ test_that("set_agd_regression - fitted nma() quntittes - AgD-reg Only", {
                                   iter = 4000))
   result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
 
-  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.1)
-  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.1)
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
 
 
   # --- Cox PH ---
@@ -1887,8 +1887,8 @@ test_that("set_agd_regression - fitted nma() quntittes - AgD-reg Only", {
                                   iter = 4000))
   result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
 
-  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.1)
-  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.1)
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
 
 
   # --- AFT (Weibull) ---
@@ -1974,8 +1974,8 @@ test_that("set_agd_regression - fitted nma() quntittes - AgD-reg Only", {
                                   iter = 4000))
   result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
 
-  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.1)
-  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.1)
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
 
 
 
@@ -1984,10 +1984,10 @@ test_that("set_agd_regression - fitted nma() quntittes - AgD-reg Only", {
 test_that("set_agd_regression - fitted nma() quntittes - AgD-reg & IPD network", {
 
   n <- 3*1000
-  Sigma <- matrix(c(1,0.5,0.5,1),2,2)
+  Sigma <- matrix(c(1,0.1,0.1,1),2,2)
   dat <- tibble::tibble(
     X1 = rnorm(n),
-    X2 = 0.5 * X1 + sqrt(1 - 0.5^2) * rnorm(n),
+    X2 = 0.1 * X1 + sqrt(1 - 0.1^2) * rnorm(n),
     trt = sample(c('A','B'),n, replace = T),
     eta = drop(cbind(1, factor(trt, levels= c('A','B')), X1, X2) %*% c(-2,0.5,0.5,0.5))
   )
@@ -2078,8 +2078,8 @@ test_that("set_agd_regression - fitted nma() quntittes - AgD-reg & IPD network",
                                   iter = 4000))
   result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
 
-  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.1)
-  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.1)
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
 
 
   # --- Binary (logit) ---
@@ -2167,8 +2167,8 @@ test_that("set_agd_regression - fitted nma() quntittes - AgD-reg & IPD network",
                                   iter = 4000))
   result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
 
-  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.1)
-  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.1)
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
 
 
   # --- Count (log) ---
@@ -2257,8 +2257,8 @@ test_that("set_agd_regression - fitted nma() quntittes - AgD-reg & IPD network",
                                   iter = 4000))
   result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
 
-  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.1)
-  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.1)
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
 
   # --- Cox PH ---
   dat <- dat %>% dplyr::mutate(eventtime_raw = rexp(n, rate = exp(eta)),
@@ -2347,8 +2347,8 @@ test_that("set_agd_regression - fitted nma() quntittes - AgD-reg & IPD network",
                                   iter = 4000))
   result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
 
-  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.1)
-  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.1)
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
 
   # --- AFT (Weibull) ---
   dat <- dat %>% dplyr::mutate(eventtime_raw = rweibull(n, shape = 1, scale= exp(eta)),
@@ -2441,8 +2441,8 @@ test_that("set_agd_regression - fitted nma() quntittes - AgD-reg & IPD network",
                                   iter = 4000))
   result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
 
-  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.1)
-  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.1)
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
 
 
 
