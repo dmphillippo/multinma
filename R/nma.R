@@ -984,8 +984,9 @@ nma <- function(network,
       purrr::map_lgl(~ .x %>% dplyr::filter(!is.na(.estimate)) %>%
                 dplyr::summarise(.cov_known =  all(.cov_known)) %>% dplyr::pull(.cov_known) )
 
-    if ( sum(!agd_regression_cov_known) && likelihood %in% valid_lhood$survival ) {
-      abort("Reconstructing the variance-covariance matrix of coefficient estimates is not yet supported for survival likelihoods. For each regression model, specify `se` and `cor`, or `cov`.")
+    if ( sum(!agd_regression_cov_known) && likelihood %in%
+         c("lognormal", "loglogistic", "gamma", "gengamma",   'exponential', 'weibull', 'gompertz','mspline', 'pexp') ) {
+      abort("Reconstructing the variance-covariance matrix of coefficient estimates is not yet supported for certain likelihoods. For each regression model, specify `se` and `cor`, or `cov`.")
     } else if( any( miss_names <- !agd_regression_cov_known &  !agd_regression_qmc_known ) ){
       abort(glue::glue("Integration points are not provided to reconstruct the covariance matrix of the coefficients",
                        " for stud{if (sum(miss_names)>1) 'ies' else 'y'} ",
@@ -1195,28 +1196,45 @@ nma <- function(network,
           se_recon   <- dat_agd_regression_nonbl$.se       [ (tmp_c + 1):(tmp_c + agd_regression_ncoef[i]) ]
           eta_recon  <- as.vector(x_reg%*%coef_recon)
 
-          if(link=='logit'){
+          if(likelihood %in% c('exponential-aft','weibull-aft') ){
+            XtWX_inv_recon <- solve(t(x_reg)%*%x_reg)
+
+          # }else if(likelihood %in% c('lognormal','loglogistic','gamma','gengamma', 'exponential','weibull','mspline' ,'pexp') ){
+
+          }else if(likelihood %in% c('bernoulli','bernoulli2') && link=='logit'){
             mu_recon <- exp(eta_recon)/(1+exp(eta_recon))
             W_recon <- diag( mu_recon*(1-mu_recon) )
             XtWX_inv_recon <- solve(t(x_reg)%*%W_recon%*%x_reg)
-          }else if(link=='probit'){
+
+          }else if(likelihood %in% c('bernoulli','bernoulli2') && link=='probit'){
             mu_recon <- pnorm(eta_recon)
             W_recon <- diag( (dnorm(eta_recon)^2) / (mu_recon*(1-mu_recon)) )
             XtWX_inv_recon <- solve(t(x_reg)%*%W_recon%*%x_reg)
-          }else if(link=='log'){
+
+          }else if(likelihood %in% c('normal') && link=='log'){
+            mu_recon <- exp(eta_recon)
+            W_recon <- diag(mu_recon^2)
+            XtWX_inv_recon <- solve(t(x_reg)%*%W_recon%*%x_reg)
+
+          }else if(likelihood %in% c('poisson') && link=='log'){
             mu_recon <- exp(eta_recon)
             W_recon <- diag( mu_recon )
             XtWX_inv_recon <- solve(t(x_reg)%*%W_recon%*%x_reg)
-          }else if(link=='cloglog'){
+
+          }else if(likelihood %in% c('bernoulli','bernoulli2') && link=='cloglog'){
             mu_recon <- 1 - exp(-1*exp(eta_recon))
             W_recon <- diag( (exp(2*eta_recon)*(1-mu_recon))/mu_recon )
             XtWX_inv_recon <- solve(t(x_reg)%*%W_recon%*%x_reg)
-          }else if(link=='identity'){
-            XtX_inv_recon <- solve(t(x_reg)%*%x_reg)
-            sigma2_recon <- (se_recon^2) / diag(XtX_inv_recon)
-            XtWX_inv_recon <- mean(sigma2_recon)*XtX_inv_recon
+
+          }else if(likelihood %in% c('normal') && link=='identity'){
+            XtWX_inv_recon <- solve(t(x_reg)%*%x_reg)
+
           }else{
-            abort("Reconstructing variance-covariance matrix is not supported for {link} link function.")
+            abort(glue::glue(
+              "Reconstructing the variance-covariance matrix is not supported ",
+              "for the {glue::double_quote(likelihood)} likelihood",
+              "{if (!is.null(link))  paste(' with the', glue::double_quote(link), 'link function') else ''}."
+            ))
           }
 
           # Correction
